@@ -452,6 +452,9 @@
 *        limits, replacing ORDLOW and ORDUPP.  Added control of the
 *        x-limits via parameter ABSLIM.  Used dynamic defaults for
 *        ABSLIM and ORDLIM.  Increased the maximum line thickness.
+*     1997 April 7 (MJC):
+*        Fixed bug for reversed abscissa.  Reimplemented 1997 November
+*        22. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -512,6 +515,7 @@
                                  ! NDF
       INTEGER ADIM               ! The dimension along which data are
                                  ! plotted
+      CHARACTER * ( VAL__SZR ) ALC( 2 ) ! Reversed-axis limits
       REAL ANCLIP( 4 )           ! Fraction of the frame zone in which the
                                  ! plot will appear when there are axes.
                                  ! (Needed as parameter cannot be an
@@ -559,19 +563,18 @@
       CHARACTER * ( 9 ) ESHAPE   ! Shape of error bars
       INTEGER ESPACE             ! Spacing between points with error
                                  ! bars
+      CHARACTER * ( 2 * VAL__SZR + 7 ) FOR( 1 ) ! Forward mapping for
+                                 ! reversed co-ordinates
       LOGICAL FWORK              ! Workspace for flipped axis centres
                                  ! obtained?
-      LOGICAL FEWORK             ! Workspace for flipped axis error
-                                 ! obtained?
       CHARACTER * ( 4 ) FOUNT    ! Fount type
-      LOGICAL FWWORK             ! Workspace for flipped pixel widths
-                                 ! obtained?
-      INTEGER FXPNTR( 3 )        ! Pointers to the flipped x-axis
-                                 ! co-ordinates and errors
+      INTEGER FXPNTR( 1 )        ! Pointers to the flipped x-axis
+                                 ! co-ordinates
       INTEGER GSTAT              ! GKS status
       REAL HXMAX                 ! Maximum data co-ordinate in histogram
       REAL HXMIN                 ! Minimum data co-ordinate in histogram
       INTEGER IERR               ! GKS error indicator
+      CHARACTER * ( 1 ) INV( 1 ) ! Inverse mapping (null)
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Processing type of the image
       INTEGER IWKID              ! GKS workstation identifier
       INTEGER LASF( 13 )         ! GKS list of aspect source flags
@@ -591,6 +594,8 @@
                                  ! y axes respectively
       CHARACTER * ( 9 ) MODE     ! Type of the plot
       LOGICAL MONOTO             ! Axis is monotonic?
+      INTEGER NCAL( 2 )          ! Number of characters in abscissa
+                                 ! limits
       INTEGER NDF                ! NDF identifier
       INTEGER NDFC               ! Identifier for input section
       INTEGER NDFS               ! NDF identifier of the section
@@ -638,6 +643,8 @@
       REAL THICK                 ! The line thickness (standard is 1.0)
       REAL THRESH( 2 )           ! Thresholds for YLOG option
       REAL TICDEF( 2 )           ! Suggested default axis-tick values
+      CHARACTER * ( DAT__SZLOC ) TRNLOC ! Locator to transformation
+      INTEGER TRID               ! Transformation identifier
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of the NDF
       LOGICAL USEWID             ! Use axis widths?
       LOGICAL WIWORK             ! Workspace for pixel widths obtained?
@@ -1229,8 +1236,6 @@
       ERWORK = .FALSE.
       WIWORK = .FALSE.
       FWORK = .FALSE.
-      FEWORK = .FALSE.
-      FWWORK = .FALSE.
 
       IF ( DATACO ) THEN
 
@@ -1511,22 +1516,31 @@
 
          CALL PSX_CALLOC( EL, '_REAL', FXPNTR( 1 ), STATUS )
          FWORK = .TRUE.
-         CALL KPG1_FLIPR( 1, EL, %VAL( PXPNTR( 1 ) ), 1,
-     :                    %VAL( FXPNTR( 1 ) ), STATUS )
 
-         IF ( ERRBAR ) THEN
-            CALL PSX_CALLOC( EL, '_REAL', FXPNTR( 2 ), STATUS )
-            FEWORK = .TRUE.
-            CALL KPG1_FLIPR( 1, EL, %VAL( PXPNTR( 2 ) ), 1,
-     :                       %VAL( FXPNTR( 2 ) ), STATUS )
-         END IF
+*  Need to compute the complementary axis value within the graph to make
+*  it appear as if SGS can handle reveresed axes.  To do this we use a
+*  transformation.
+*
+*  Set up the transformation.  Only the forward mapping is needed.
+*  Convert the bounds into characters to form the forward mapping.
+         CALL CHR_RTOC( ABSLIM( 1 ), ALC( 1 ), NCAL( 1 ) )
+         CALL CHR_RTOC( ABSLIM( 2 ), ALC( 2 ), NCAL( 2 ) )
+         FOR( 1 ) = 'XREV='//ALC( 1 )( :NCAL( 1 ) )//'-X+'/
+     :                      /ALC( 2 )( :NCAL( 2 ) )
+         INV( 1 ) = 'X'
 
-         IF ( USEWID ) THEN
-            CALL PSX_CALLOC( EL, '_REAL', FXPNTR( 3 ), STATUS )
-            FWWORK = .TRUE.
-            CALL KPG1_FLIPR( 1, EL, %VAL( PXPNTR( 3 ) ), 1,
-     :                       %VAL( FXPNTR( 3 ) ), STATUS )
-         END IF
+*  Create a temporary transformation and compile it.
+         CALL TRN_NEW( 1, 1, FOR, INV, '_REAL:', 'reversed axis',
+     :                 ' ', ' ', TRNLOC, STATUS )
+         CALL TRN_COMP( TRNLOC, .TRUE., TRID, STATUS )
+
+*  Perform the co-ordinate transformation.
+         CALL TRN_TR1R( .FALSE., EL, %VAL( PXPNTR( 1 ) ), TRID,
+     :                  %VAL( FXPNTR( 1 ) ), STATUS )
+
+*  Tidy up.
+         CALL DAT_ANNUL( TRNLOC, STATUS )
+         CALL TRN_ANNUL( TRID, STATUS )
       END IF
  
 *  Obtain the axis style.
@@ -1647,7 +1661,7 @@
 
 *  Draw the locus of the line plot.
          CALL KPS1_LINPL( MODE, EL, %VAL( FXPNTR( 1 ) ),
-     :                    %VAL( FXPNTR( 3 ) ), %VAL( PNTRI( 1 ) ),
+     :                    %VAL( PXPNTR( 3 ) ), %VAL( PNTRI( 1 ) ),
      :                    ABSLIM( 1 ), ABSLIM( 2 ), ORDLIM( 1 ),
      :                    ORDLIM( 2 ), XLOG, YLOG, LINPEN, SYMBOL,
      :                    SYMPEN, %VAL( WPNTR ), STATUS )
@@ -1656,7 +1670,7 @@
 
 *  Draw the error bars.
             CALL KPG1_ERBAR( ESHAPE, ERRPEN, ESPACE, EL,
-     :                       %VAL( FXPNTR( 1 ) ), %VAL( FXPNTR( 2 ) ),
+     :                       %VAL( FXPNTR( 1 ) ), %VAL( PXPNTR( 2 ) ),
      :                       %VAL( PNTRI( 1 ) ), %VAL( PNTRI( 2 ) ),
      :                       ABSLIM( 1 ), ABSLIM( 2 ), ORDLIM( 1 ),
      :                       ORDLIM( 2 ), XLOG, YLOG, STATUS )
@@ -1865,8 +1879,6 @@
       IF ( ERWORK ) CALL PSX_FREE( PXPNTR( 2 ), STATUS )
       IF ( WIWORK ) CALL PSX_FREE( PXPNTR( 3 ), STATUS )
       IF ( FWORK ) CALL PSX_FREE( FXPNTR( 1 ), STATUS )
-      IF ( FEWORK ) CALL PSX_FREE( FXPNTR( 2 ), STATUS )
-      IF ( FWWORK ) CALL PSX_FREE( FXPNTR( 3 ), STATUS )
 
 *  Graphics closedown sequence.
 *  ============================
