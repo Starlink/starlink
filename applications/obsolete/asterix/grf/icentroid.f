@@ -46,7 +46,7 @@
 *  ensure transformations are correct
         CALL GTR_RESTORE(STATUS)
 
-        CALL IMG_GETCIRC('X','Y',RAD',XC,YC,RAD,STATUS)
+        CALL IMG_GETCIRC('X','Y','RAD',XC,YC,RAD,STATUS)
 
 *  plot initial circle
         CALL IMG_CIRCLE(XC,YC,RAD,STATUS)
