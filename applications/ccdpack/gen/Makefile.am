@@ -1,6 +1,10 @@
-noinst_LIBRARIES = libccdpack_gen.a
-libccdpack_gen_a_SOURCES = $(GENSRC) $(GENRDSRC) $(GENLRDICSRC) \
-                           $(GENLRDISRC) $(GENLNSRC) $(DGENSRC)
+lib_LTLIBRARIES = libccdpack_gen.la
+libccdpack_gen_la_SOURCES = $(GENSRC:.gen=.f) \
+                            $(GENRDSRC:.grd=.f) \
+                            $(GENLRDICSRC:.glrdic=.f) \
+                            $(GENLRDISRC:.glrdi=.f) \
+                            $(GENLNSRC:.gln=.f) \
+                            $(DGENSRC:.dgen=.f)
 
 AM_FCFLAGS = -I../
 
@@ -15,43 +19,31 @@ FORTRAN_COMPILE = $(FC) $(AM_FCFLAGS) $(FCFLAGS)
 SUFFIXES = .o .c .gen .grd .glrdi .glrdic .gln .dgen .f .h
 
 #  Suffix rules.
-.gen.o:
+.gen.f:
 	$(GENERIC) -t n $< 
-	$(FORTRAN_COMPILE) -c $(<:.gen=.f)
-	$(RM) $(<:.gen=.f)
 
-.grd.o:
+.grd.f:
 	cp $< $(<:.grd=.gen)
 	$(GENERIC) -t rd $(<:.grd=.gen)
-	$(FORTRAN_COMPILE) -c $(<:.grd=.f)
-	$(RM) $(<:.grd=.f)
-	$(RM)   $(<:.grd=.gen)
+	$(RM) $(<:.grd=.gen)
 
-.glrdic.o:
+.glrdic.f:
 	cp $< $(<:.glrdic=.gen)
 	$(GENERIC) -t lrdic $(<:.glrdic=.gen)
-	$(FORTRAN_COMPILE) -c $(<:.glrdic=.f)
-	$(RM) $(<:.glrdic=.f)
 	$(RM) $(<:.glrdic=.gen)
 
-.glrdi.o:
+.glrdi.f:
 	cp $< $(<:.glrdi=.gen)
 	$(GENERIC) -t lrdi $(<:.glrdi=.gen)
-	$(FORTRAN_COMPILE) -c $(<:.glrdi=.f)
-	$(RM) $(<:.glrdi=.f)
 	$(RM) $(<:.glrdi=.gen)
 
-.gln.o:
+.gln.f:
 	cp $< $(<:.gln=.gen)
 	$(GENERIC) -t ln $(<:.gln=.gen)
-	$(FORTRAN_COMPILE) -c $(<:.gln=.f)
-	$(RM) $(<:.gln=.f)
 	$(RM) $(<:.gln=.gen)
 
-.dgen.o:
+.dgen.f:
 	./dgeneric $< n
-	$(FORTRAN_COMPILE) -c $(<:.dgen=.f)
-	$(RM) $(<:.dgen=.f)
 
 
 #  Normal generic routines.

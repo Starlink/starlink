@@ -1,5 +1,5 @@
-noinst_LIBRARIES = libccdpack_tasks.a
-libccdpack_tasks_a_SOURCES = $(TASKSRC)
+noinst_LTLIBRARIES = libccdpack_tasks.la
+libccdpack_tasks_la_SOURCES = $(TASKSRC)
 
 AM_FCFLAGS = -I../
 

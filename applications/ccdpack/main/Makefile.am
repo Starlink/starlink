@@ -1,5 +1,5 @@
-noinst_LIBRARIES = libccdpack.a
-libccdpack_a_SOURCES = $(SUBSRC) $(CSUBSRC)
+noinst_LTLIBRARIES = libccdpack.la
+libccdpack_la_SOURCES = $(SUBSRC) $(CSUBSRC)
 
 AM_FCFLAGS = -I../
 
