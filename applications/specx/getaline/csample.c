@@ -1,9 +1,10 @@
 
+#include <stdlib.h>
 #include <stdio.h>
 
 #define SLEN 81
 
-main()
+int main()
 {
   char line[SLEN], prompt[SLEN];
   
@@ -38,5 +39,7 @@ main()
 	printf("....*choke* remainder truncated\n");
     }
   printf("\n");
+
+  return EXIT_SUCCESS;
 
 }

@@ -4,12 +4,18 @@ static char Sccsid[] = {"@(#) getline.c 1.1 01/23/95"};
 
 /*
 
+$Revision$
+
 Author: Remo Tilanus  (rpt@jach.hawaii.edu)
 __________________________________________       _________________________
 UK/NL/CAN Joint Astronomy Centre          \__^__/    JJ   CCC  MM MM  TTTT
 660 N. Aohoku Pl., Hilo, HI 96720           [J]      JJ  CC    M M M   TT
 ph.: (808) 935-4332; FAX: 961-6516          /|\     JJ    CCC  M   M   TT 
 __________________________________________________________________________
+
+ 25-JUL-2004 (Tim Jenness):
+    Import into autoconf system
+
 
 */
 /* ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -154,11 +160,30 @@ __________________________________________________________________________
 **
 ** ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-
-
-
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
 
 #include <stdio.h>
+
+#if HAVE_STRINGS_H
+# include <strings.h>
+#endif
+
+#if HAVE_READLINE_READLINE_H
+# include <readline/readline.h>
+#endif
+#if HAVE_READLINE_HISTORY_H
+# include <readline/history.h>
+#endif
+
+/* Only say we have readline if we have all of it including the libraries */
+#if HAVE_READLINE_READLINE_H && HAVE_LIBREADLINE
+#define HAVE_READLINE 1
+#else
+#define HAVE_READLINE 0
+#endif
+
 
 #define PLEN 256
 
@@ -214,7 +239,7 @@ int  llen, plen;     /*     (in)     Length of line and prompt. Answer  */
   lprompt[slen] = (char)NULL;
 
                                     /* get answer from stdin */
-#ifndef NO_READLINE
+#if HAVE_READLINE
   if ( (line_read = do_gets(lprompt)) == (char *)NULL )
     {
       return(-1);
@@ -255,7 +280,7 @@ int  llen, plen;     /*     (in)     Length of line and prompt. Answer  */
   return(len);
 }
 
-#if !defined( NO_READLINE )
+#if HAVE_READLINE
 
 char *do_gets(prompt)
 /*----------------------------------------------------------------------*/
@@ -296,21 +321,21 @@ char *prompt;             /*   (in)   Prompt to use  (can be empty: "") */
 }
 
 /*
-** Add STARLINK System definition here is you need RINDEX.
+** Optionally build rindex fallback routine (can assume we have strchr!)
 */
 
-#if defined( NEED_RINDEX ) || defined( sun4_Solaris )
+#if ! HAVE_INDEX
 
-char *index(s, c)
-char *s;
-int c;
+char *index(char * s, int c)
 {
    return( (char *)strchr(s,c) );
 }
 
-char *rindex(s, c)
-char *s;
-int c;
+#endif
+
+#if ! HAVE_RINDEX
+
+char *rindex(char * s, int c)
 {
    return( (char *)strrchr(s,c) );
 }
