@@ -5,6 +5,9 @@
 *  Purpose:
 *     Defines the common block for communicating file descriptors.
 
+*  Invocation:
+*     INCLUDE 'CCD1_FDCM'
+
 *  Description:
 *     This houses the common block for communicating file descriptors 
 *     to the source and sink routines required when using AST Channels.
@@ -26,16 +29,13 @@
 
 *-
 *  Global Variables:
-*        CCD1_FDIN = INTEGER
-*           File descriptor for input (as used by source routine).
-*        CCD1_FDOUT = INTEGER
-*           File descriptor for output (as used by sink routine).
+*        CCD1_ASTFD = INTEGER
+*           File descriptor for AST channel
 
 *  File descriptor variable declarations.
-      INTEGER CCD1_FDIN
-      INTEGER CCD1_FDOUT
+      INTEGER CCD1_ASTFD
 
 *  Define common block.
-      COMMON/ CCD1_FDCM / CCD1_FDIN, CCD1_FDOUT
+      COMMON/ CCD1_FDCM / CCD1_ASTFD
 
 * $Id$

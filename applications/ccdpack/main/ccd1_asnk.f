@@ -10,18 +10,20 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CHAN = AST_CHANNEL( SOURCE, CCD1_ASNK, OPTIONS, STATUS )
+*     CALL CCD1_ASNK( STATUS )
 
 *  Description:
 *     This routine implements a sink routine which has to be passed to
 *     the AST Channel construction routines (AST_CHANNEL, AST_FITSCHAN)
-*     in order to do input/output on AST objects other than to or from
-*     the WCS component of an NDF.  It uses FIO to do the output, via
-*     a file descriptor held in a common block.
+*     in order to do input/output on AST objects to a file.  It uses 
+*     FIO to do the output, via a file descriptor held in a common block.
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Usage:
+*     CHAN = AST_CHANNEL( SOURCE, CCD1_ASNK, OPTIONS, STATUS )
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
@@ -48,7 +50,7 @@
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameters
       
 *  Global Variables:
-      INCLUDE 'CCD1_FDCM'        ! File descriptor common block
+      INCLUDE 'CCD1_FDCM'        ! File descriptor for AST channel CCD1_ASTFD
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -67,7 +69,7 @@
 
 *  Write to output file using FIO system.
       IF ( NCHAR .GT. 0 ) 
-     :   CALL FIO_WRITE( CCD1_FDOUT, LINE( :NCHAR ), STATUS )
+     :   CALL FIO_WRITE( CCD1_ASTFD, LINE( :NCHAR ), STATUS )
 
       END
 * $Id$
