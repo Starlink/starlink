@@ -1,0 +1,157 @@
+*+
+*  Name:
+*     SPD_EPAR
+
+*  Purpose:
+*     Define the Specdre Extension global constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of module:
+*     Global constants include file.
+
+*  Invocation:
+*     INCLUDE 'SPD_EPAR'
+
+*  Description:
+*     This file contains the definitions of the global constants that
+*     describe the Specdre Extension. These are HDS component names and
+*     types. Where the type is '_REAL' this is the default type, the
+*     actual type may always be '_DOUBLE'.
+
+*  Authors:
+*     hme: Horst Meyerdierks (UoE, Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     19 Jun 1992 (hme):
+*        Original version.
+*     03 Aug 1994 (hme):
+*        Version 1.1: Add COORD1 and COORD2.
+*     30 Jan 1995 (hme):
+*        Remove blank lines between continuation lines.
+*     {enter_further_changes_here}
+
+*-
+
+      CHARACTER
+     :   XNAME * 7, XTYPE * 11,
+     :   XCMP1 * 8, XTYP1 * 8,
+     :   XCMP2 * 9, XTYP2 * 8,
+     :   XCMP3 * 9, XTYP3 * 5,
+     :   XCMP4 * 7, XTYP4 * 5,
+     :   XCMP5 * 8, XTYP5 * 8,
+     :   XCMP6 * 8, XTYP6 * 3,
+     :   XC6D * 4, XT6D * 5, XC6L * 5, XT6L * 8, XC6U * 5, XT6U * 8,
+     :   XCMP7 * 8, XTYP7 * 3,
+     :   XC7D  * 4, XT7D  * 5,
+     :   XCMP8 * 5, XTYP8 * 3,
+     :   XC8D  * 4, XT8D  * 5
+
+      INTEGER
+     :   XC9NC, XC9NP
+
+      CHARACTER
+     :   XCMP9 * 7, XTYP9 * 3,
+     :   XC9D * 4, XT9D * 5, XC9V * 8, XT9V * 5,
+     :   XC9C1 * 8, XT9C1 * 8, XC9C2 * 7, XT9C2 * 5,
+     :   XC9C3 * 8, XT9C3 * 8, XC9C4 * 5, XT9C4 * 8,
+     :   XC9C5 * 5, XT9C5 * 5, XC9C6 * 5, XT9C6 * 5,
+     :   XC9P1 * 8, XT9P1 * 8,
+     :   XCMP10 * 6, XTYP10 * 3,
+     :   XC10D * 4, XT10D * 5,
+     :   XC10L * 5, XT10L * 8, XC10U * 5, XT10U * 8,
+     :   XCMP11 * 6, XTYP11 * 3,
+     :   XC11D * 4, XT11D * 5,
+     :   XC11L * 5, XT11L * 8, XC11U * 5, XT11U * 8
+
+      PARAMETER (
+     :   XNAME  = 'SPECDRE',      ! The Specdre Extension
+     :   XTYPE  = 'SPECDRE_EXT',
+     :   XCMP1  = 'SPECAXIS',     ! Spectroscopic axis number
+     :   XTYP1  = '_INTEGER',
+     :   XCMP2  = 'RESTFRAME',    ! Frame of reference
+     :   XTYP2  = '_CHAR*32'
+     :   )
+
+      PARAMETER (
+     :   XCMP3  = 'INDEXREFR',    ! Index of refraction
+     :   XTYP3  = '_REAL',
+     :   XCMP4  = 'FREQREF',      ! Reference frequency decadic mantisse
+     :   XTYP4  = '_REAL',
+     :   XCMP5  = 'FREQUNIT',     ! Reference frequency decadic exponent
+     :   XTYP5  = '_INTEGER'
+     :   )
+
+      PARAMETER (
+     :   XCMP6  = 'SPECVALS',     ! Spectroscopic pixel centre for each
+     :   XTYP6  = 'NDF',          ! image pixel
+     :   XC6D   = 'DATA',
+     :   XT6D   = '_REAL',
+     :   XC6L   = 'LABEL',        ! Label and unit of spectroscopic
+     :   XT6L   = '_CHAR*64',     ! values
+     :   XC6U   = 'UNITS',
+     :   XT6U   = '_CHAR*64',
+     :   XCMP7  = 'SPECWIDS',     ! Spectroscopic pixel width for each
+     :   XTYP7  = 'NDF',          ! image pixel
+     :   XC7D   = 'DATA',
+     :   XT7D   = '_REAL'
+     :   )
+
+      PARAMETER (
+     :   XCMP8  = 'COVRS',        ! For pixel correlation along the
+     :   XTYP8  = 'NDF',          ! spectroscopic axis, this is for each
+     :   XC8D   = 'DATA',         ! image pixel the sum of covariances
+     :   XT8D   = '_REAL',        ! with other pixels offset along the
+     :                            ! spectroscopic axis
+     :   XCMP9  = 'RESULTS',      ! Fit results
+     :   XTYP9  = 'NDF',
+     :   XC9D   = 'DATA',         ! Fitted parameters
+     :   XT9D   = '_REAL',
+     :   XC9V   = 'VARIANCE',     ! Fit parameter variances
+     :   XT9V   = '_REAL',
+     :   XC9NC  = 6,              ! There are 6 component related vectors
+     :   XC9NP  = 1               ! There is  1 parameter related vector
+     :   )
+
+      PARAMETER (
+     :   XC9C1  = 'LINENAME',     ! Astronomers line identification
+     :   XT9C1  = '_CHAR*32',
+     :   XC9C2  = 'LABFREQ',      ! Laboratory frequency decad. mantisse
+     :   XT9C2  = '_REAL',
+     :   XC9C3  = 'COMPTYPE',     ! Model function description
+     :   XT9C3  = '_CHAR*32',
+     :   XC9C4  = 'NPARA',        ! How many parameters describe model
+     :   XT9C4  = '_INTEGER',
+     :   XC9C5  = 'MASKL',        ! Mask left bound
+     :   XT9C5  = '_REAL',
+     :   XC9C6  = 'MASKR',        ! Mask right bound
+     :   XT9C6  = '_REAL',
+     :   XC9P1  = 'PARATYPE',     ! Model parameter description
+     :   XT9P1  = '_CHAR*32'
+     :   )
+
+      PARAMETER (
+     :   XCMP10 = 'COORD1',       ! First coordinate for each spectrum
+     :   XTYP10 = 'NDF',
+     :   XC10D   = 'DATA',
+     :   XT10D   = '_REAL',
+     :   XC10L   = 'LABEL',       ! Label and unit of first coordinates
+     :   XT10L   = '_CHAR*64',
+     :   XC10U   = 'UNITS',
+     :   XT10U   = '_CHAR*64'
+     :   )
+
+      PARAMETER (
+     :   XCMP11 = 'COORD2',       ! First coordinate for each spectrum
+     :   XTYP11 = 'NDF',
+     :   XC11D   = 'DATA',
+     :   XT11D   = '_REAL',
+     :   XC11L   = 'LABEL',       ! Label and unit of first coordinates
+     :   XT11L   = '_CHAR*64',
+     :   XC11U   = 'UNITS',
+     :   XT11U   = '_CHAR*64'
+     :   )
+
+*.
