@@ -17392,7 +17392,7 @@ iraf! {
             vpath PROMPT
             ppath GLOBAL CURRENT
             association <->GLOBAL.DATA_ARRAY
-            prompt {The NDF to be modified}
+            prompt {The input NDF}
             helpkey *
           }
 
