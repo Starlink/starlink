@@ -22,6 +22,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
