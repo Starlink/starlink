@@ -54,7 +54,8 @@
 *        Original version.
 *     2-JUL-1998 (DSB):
 *        Changed the corners of the box used to define the WinMap so
-*        that it never has zero area.
+*        that it never has zero area. Supplied "1.0D0" instead of "1.0"
+*        as constant value to AST_PERMMAP.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,7 +116,7 @@
       OUTPERM( 1 ) = 1
       OUTPERM( 2 ) = 2
       
-      PERM = AST_PERMMAP( 3, INPERM, 2, OUTPERM, 1.0, ' ', STATUS )
+      PERM = AST_PERMMAP( 3, INPERM, 2, OUTPERM, 1.0D0, ' ', STATUS )
 
 *  Now create a WinMap which scales and shifts each axis in the 2D Frame
 *  according to the values supplied in TR. 
