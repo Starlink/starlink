@@ -115,6 +115,7 @@
       INTEGER			PTR			! Item data address
 
       LOGICAL			OK			! Locator is valid?
+      LOGICAL			PRIM			! Object is primitive?
       LOGICAL			THERE			! Object exists?
 *.
 
