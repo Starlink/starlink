@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_CMULR( BAD, EL, A, CONST, B, NBAD, STATUS )
+      SUBROUTINE KPG1_CMUL<T>( BAD, EL, A, CONST, B, NBAD, STATUS )
 *+
 *  Name:
 *     KPG1_CMULx
@@ -45,6 +45,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
  
 *  History:
@@ -55,6 +56,8 @@
 *        array.
 *     1996 May 20 (MJC):
 *        Replaced LIB$ESTABLISH and LIB$REVERT calls.
+*     2004 Oct 1 (TIMJ):
+*        Recreate generic from constituent parts
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -75,11 +78,11 @@
 *  Arguments Given:
       LOGICAL BAD
       INTEGER EL
-      REAL A( EL )
+      <TYPE> A( EL )
       DOUBLE PRECISION CONST
  
 *  Arguments Returned:
-      REAL B( EL )
+      <TYPE> B( EL )
       INTEGER NBAD
  
 *  Status:
@@ -117,13 +120,13 @@
  
 *  Multiply the array by the constant, using floating-point arithmetic.
          DO 1 I = 1, EL
-            B( I ) = NUM_RTOR( RCONST * NUM_RTOR( A( I ) ) )
+            B( I ) = NUM_RTO<T>( RCONST * NUM_<T>TOR( A( I ) ) )
  
 *  Check for numerical errors (i.e. overflow). If present, then assign
 *  a bad value to the output array element and count the error. Reset
 *  the numerical error flag.
             IF ( NUM_ERROR .NE. SAI__OK ) THEN
-               B( I ) = VAL__BADR
+               B( I ) = VAL__BAD<T>
                NBAD = NBAD + 1
                NUM_ERROR = SAI__OK
             END IF
@@ -135,16 +138,16 @@
  
 *  If the input array element is bad, then so is the output element.
          DO 2 I = 1, EL
-            IF ( A( I ) .EQ. VAL__BADR ) THEN
-               B( I ) = VAL__BADR
+            IF ( A( I ) .EQ. VAL__BAD<T> ) THEN
+               B( I ) = VAL__BAD<T>
                NBAD = NBAD + 1
  
 *  Otherwise, multiply by the constant, again checking for numerical
 *  errors.
             ELSE
-               B( I ) = NUM_RTOR( RCONST * NUM_RTOR( A( I ) ) )
+               B( I ) = NUM_RTO<T>( RCONST * NUM_<T>TOR( A( I ) ) )
                IF ( NUM_ERROR .NE. SAI__OK ) THEN
-                  B( I ) = VAL__BADR
+                  B( I ) = VAL__BAD<T>
                   NBAD = NBAD + 1
                   NUM_ERROR = SAI__OK
                END IF

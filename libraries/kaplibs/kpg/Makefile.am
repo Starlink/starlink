@@ -19,11 +19,19 @@ C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c  kpg1_trmsz.c \
 kpg1_ieeer.c  kpg1_isfinr.c  kpg1_tkast.c
 
 F_ROUTINES = $(KPG_NONGEN) $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
-	$(KPG_DIR_GEN:.gdir=.f)
+	$(KPG_DIR_GEN:.gdir=.f) $(KPG_NXD_GEN:.gnxd=.f)
 
+# Numeric types except Double precision
+# Note that in this case the suffix is strange since a case insensitive
+# filename can not distinguish b and B or w and W
+KPG_NXD_GEN = kpg1_cmul.gnxd
+
+# All numeric types
 KPG_N_GEN = kpg1_dara.gn kpg1_frac.gn kpg1_hsta.gn kpg1_thrs.gn \
 kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn kpg1_cadd.gn
 
+
+# Double and REAL
 KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr \
 kpg1_mixv.gdr kpg1_stds.gdr kpg1_stfl.gdr
 
@@ -48,9 +56,9 @@ kpg1_chepd.f kpg1_chepr.f kpg1_chevd.f kpg1_chevr.f kpg1_chaxd.f \
 kpg1_chaxr.f kpg1_chvab.f kpg1_chvad.f kpg1_chvai.f kpg1_chvar.f \
 kpg1_chvaub.f kpg1_chvauw.f kpg1_chvaw.f kpg1_cmadd.f kpg1_cmadr.f \
 kpg1_cmavd.f kpg1_cmavr.f kpg1_cmpkb.f kpg1_cmpkd.f kpg1_cmpki.f \
-kpg1_cmpkr.f kpg1_cmpkub.f kpg1_cmpkuw.f kpg1_cmpkw.f kpg1_cmulb.f \
-kpg1_cmuld.f kpg1_cmuli.f kpg1_cmulr.f kpg1_cmulub.f kpg1_cmuluw.f \
-kpg1_cmulw.f kpg1_cmvdd.f kpg1_cmvdr.f kpg1_cmvvd.f kpg1_cmvvr.f \
+kpg1_cmpkr.f kpg1_cmpkub.f kpg1_cmpkuw.f kpg1_cmpkw.f \
+kpg1_cmuld.f \
+kpg1_cmvdd.f kpg1_cmvdr.f kpg1_cmvvd.f kpg1_cmvvr.f \
 kpg1_cnlim.f kpg1_colnm.f kpg1_cpntb.f kpg1_cpntd.f kpg1_cpnti.f \
 kpg1_cpntr.f kpg1_cpntub.f kpg1_cpntuw.f kpg1_cpntw.f \
 kpg1_crout.f kpg1_csubb.f kpg1_csubd.f kpg1_csubi.f kpg1_csubr.f \
@@ -173,7 +181,13 @@ kpg1_pgsht.f kpg1_pacol.f
 	$(GENERIC)  -t dr $(<:.gdr=.gen)
 	rm $(<:.gdr=.gen)
 
+.gnxd.f:
+	cp $< $(<:.gnxd=.gen)
+	$(GENERIC)  -t bBirwW $(<:.gnxd=.gen)
+	rm $(<:.gnxd=.gen)
+
 .gdir.f:
 	$(GENERIC) $(<)
+
 
 AM_FCFLAGS = -I../ira @TCL_CFLAGS@ @TK_CFLAGS@
