@@ -437,6 +437,7 @@
       INTEGER IWCS( CCD1__MXNDF ) ! AST pointers to WCS frameset for each NDF
       INTEGER JPIX              ! Frame index of pixel frame
       INTEGER LBND( 2 )         ! Lower bounds of NDF
+      INTEGER MAPSET( CCD1__MXNDF ) ! CCD_SET->pixel coordinate mapping
       INTEGER MAXCNV            ! Initial maximum dimension of display region
       INTEGER NCOUT             ! Number of chosen points
       INTEGER NDFGR             ! Input NDF group identifier
@@ -499,7 +500,8 @@
       CALL PAR_GET0L( 'OVERRIDE', OVERRD, STATUS )
 
 *  Group the NDFs into Sets.
-      CALL CCD1_SETSW( NDFGR, NNDF, USESET, ISET, NSET, SNAMGR, STATUS )
+      CALL CCD1_SETSW( NDFGR, NNDF, USESET, ISET, NSET, SNAMGR, MAPSET,
+     :                 STATUS )
 
 *  Call the routine which does all the user interaction and obtains a
 *  list of pairings with associated offsets.
@@ -663,7 +665,7 @@
             IMAP = AST_GETMAPPING( IWCS( I ), AST__CURRENT, JPIX,
      :                             STATUS )
             CALL AST_TRAN2( IMAP, NOUT( IS ), %VAL( IPXO( IS ) ),
-     :                      %VAL( IPYO( IS ) ), 1, %VAL( IPXP ),
+     :                      %VAL( IPYO( IS ) ), .TRUE., %VAL( IPXP ),
      :                      %VAL( IPYP ), STATUS )
 
 *  Get the bounds of the NDF.
