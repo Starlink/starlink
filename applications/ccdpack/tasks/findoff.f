@@ -22,12 +22,11 @@
 
 *  Description:
 *     This routine is designed to determine which positions in many
-*     unaligned and unlabeled lists match, subject to the condition
-*     that the transformations between the lists are well modeled by
-*     simple translations.  Although the representation of the positions
-*     in the lists themselves is in pixel coordinates, the lists may
-*     be related by translations in the Current frames of the WCS
-*     components of the associated NDFs.
+*     unaligned and unlabelled lists match, subject to the condition
+*     that the transformations between the lists are well modelled by
+*     simple translations.  Although the position lists are written
+*     in pixel coordinates, the objects can be related by translations
+*     in the Current coordinate system of the associated NDFs.
 *
 *     The results from this routine are labelled position lists (one
 *     for each input list) which may be used to complete image
@@ -192,20 +191,19 @@
 *        and have consequently been rejected.  
 *        [TRUE]
 *     RESTRICT = LOGICAL (Read)
-*        This parameter determines whether the Current coordinate frame
+*        This parameter determines whether the Current coordinate system
 *        is used to restrict the choice of objects to match with each
 *        other.  If set TRUE, then the only objects which are
 *        considered for matching are those which would appear in
-*        the overlap of two frames given that their PIXEL-domain to
-*        Current frame mapping is exact, and that these frames refer
-*        to the same coordinate space.  If it is set FALSE, then
-*        no such restriction is made.
+*        the overlap of two frames given that they are correctly 
+*        aligned in their Current coordinate system.  If it is set 
+*        FALSE, then all objects in both frames are considered for
+*        matching.
 *
-*        This parameter should therefore be set TRUE if the translational
-*        part of the information about the coordinate frames in the 
-*        WCS components is fairly accurate (especially in the case that
-*        there are many objects and a small overlap), and FALSE if it 
-*        is not.
+*        This parameter should therefore be set TRUE if the frames 
+*        are quite well aligned in their Current coordinate systems
+*        (especially in the case that there are many objects and a 
+*        small overlap), and FALSE if they are not.
 *
 *        This parameter is ignored if USEWCS is FALSE.
 *        [FALSE]
@@ -220,16 +218,11 @@
 *     USEWCS = LOGICAL (Read)
 *        This parameter specifies whether the coordinates in the
 *        position lists should be transformed from Pixel coordinates
-*        into the coordinates of the Current frame of the WCS 
-*        component of the associated NDF before use.  FINDOFF can only
-*        match objects between frames which are related by a simple
-*        translation (shift in X and Y), so if the pixel coordinates
-*        of the NDFs are related by a more complicated transformation
-*        it is necessary to encode this information in the WCS 
-*        components of the NDFs (or resample the images first).
-*        If the Current frame of the WCS component is related to the
-*        Pixel frame by a translation, the setting of this parameter
-*        is usually unimportant (but see also the RESTRICT parameter).
+*        into the Current coordinate system of the associated NDF 
+*        before use.
+*        If the Current coordinates are related to pixel coordinates
+*        by a translation, the setting of this parameter is usually 
+*        unimportant (but see also the RESTRICT parameter).
 *
 *        This parameter is ignored if NDFNAMES is false.
 *        [TRUE]
@@ -342,9 +335,9 @@
 *     findoff inlist='*' error=1 outlist='*.off'
 *        In this example all the NDFs in the current directory are
 *        accessed and their associated position lists are used.  
-*        The coordinates used for object matching are those in the
-*        position lists transformed into the Current frames of the
-*        WCS components of the NDFs.  The matched position lists are 
+*        The NDFs are related by a simple offset (translation) in
+*        their Current coordinate system, although not necessarily
+*        their pixel coordinate system.  The matched position lists are 
 *        named *.off.  The method used is to try the FAST algorithm, 
 *        switching to SLOW if FAST fails. The completeness measure 
 *        is used when forming the spanning tree.  Matches with 
@@ -365,26 +358,24 @@
 *        are rejected.
 *
 *     findoff inlist='data*' outlist='*.off' restrict=true
-*        This form would be used if the NDFs 'data*' have WCS components
-*        which are already approximately correct.  The Current domain 
-*        of each should be set to the domain in which they are all 
-*        (approximately) registered.  Setting the RESTRICT parameter
-*        then tells FINDOFF to consider only objects in the region which 
-*        the WCS components say ought to overlap between pairs of frames.
-*        This can save a lot of time if there are many objects and a 
-*        small overlap, but will result in failure of the program if 
-*        the WCS components are not translationally registered 
-*        reasonably well.
+*        This form would be used if the NDFs 'data*' are already
+*        approximately aligned in their Current coordinates. Setting the
+*        RESTRICT parameter then tells FINDOFF to consider only objects
+*        in the region which the WCS components say ought to overlap
+*        between pairs of frames. This can save a lot of time if there
+*        are many objects and a small overlap, but will result in
+*        failure of the program if the NDFs are not translationally
+*        aligned reasonably well in the first place.
 *
 *     findoff inlist='data*' outlist='*.off' restrict minmatch=2
 *             maxdisp=20 minsep=30
 *        In this example the NDFs are sparsely populated, and a pair 
 *        will be considered to match if as few as two matching objects
-*        can be found.  The NDFs have been initially aligned in the 
-*        Current frames of their WCS components to an accuracy of 20
-*        or better.  As an additional safeguard, no objects within 
-*        30 units (in coordinates of the Current frame) of each other 
-*        in the same NDF are used for matching.
+*        can be found.  The NDFs have been initially aligned in their
+*        Current coordinate systems to an accuracy of 20 or better.  As
+*        an additional safeguard, no objects within 30 units (in
+*        coordinates of the Current frame) of each other in the same NDF
+*        are used for matching.
 
 *  Behaviour of parameters:
 *     Most parameters retain their current value as default. The
