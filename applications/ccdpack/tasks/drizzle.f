@@ -41,7 +41,7 @@
 *     CORRECT = LITERAL (Read)
 *        Name of the sequential file containing the SCALE and ZERO point
 *        corrections for the list of input NDFs given by the IN parameter
-*        [DRIZZLE.DAT]
+*        [!]
 *     IN = LITERAL (Read)
 *        A list of the names of the input NDFs which are to be combined
 *        into a mosaic. The NDF names should be separated by commas

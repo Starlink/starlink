@@ -94,11 +94,13 @@
 *        happen, for instance, if an input NDF is the result of a
 *        previous mosaic-ing process).
 *        [TRUE]
-*     CORRECT = LITERAL (Write)
+*     CORRECT = LITERAL (Read)
 *        The name of the file used to output the scale and zero-point
-*        corrections (see SCALE, ZERO and WRITESZ parameters). This
-*        file can be read by the DRIZZLE A-task.
-*        [drizzle.dat]
+*        corrections (see SCALE and ZERO parameters). This file can be 
+*        read by the DRIZZLE task.  If the file already exists, it is
+*        overwritten.  If a null (!) value is supplied, or if SCALE and
+*        ZERO are both set to FALSE, no file is written.
+*        [!]
 *     GENVAR = _LOGICAL (Read)
 *        If GENVAR is set to TRUE and all the input NDFs supplied
 *        contain statistical error (variance) information, then
@@ -456,12 +458,6 @@
 *        variance information. Otherwise, the input variance values are
 *        used to weight the input data when they are combined.
 *        [!]
-*     WRITESZ = _LOGICAL (Read)
-*        If set to TRUE then MAKEMOS will output a file containing the
-*        scale and zero-point corrections (see SCALE and ZERO parameters)
-*        which can be read into the DRIZZLE program. IF SCALE and ZERO are
-*        both set to FALSE, no file will be generated
-*        [FALSE]
 *     ZERO = _LOGICAL (Read)
 *        This parameter specifies whether MAKEMOS should attempt to
 *        adjust the input data values by applying zero-point (i.e.
@@ -660,6 +656,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     PDRAPER: Peter Draper (STARLINK)
 *     AALLAN: Alasdair Allan (Keele University, STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -695,8 +692,10 @@
 *     15-JAN-1999 (PDRAPER):
 *        Added changed to support estimation of output variances from 
 *        input data.
-*     13-SEP-1999 (AALLAN)
+*     13-SEP-1999 (AALLAN):
 *        Added WRITESZ and CORRECT parameters and associated chaanges
+*     31-JAN-2000 (MBT):
+*        Removed WRITESZ.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -820,7 +819,6 @@
       LOGICAL USEVAR             ! Use input variance information?
       LOGICAL USEWT              ! Use user-supplied weights?
       LOGICAL VAR                ! Variance array present?
-      LOGICAL WRSAZ              ! Write scale and zero-point info to file?
       REAL ALPHA                 ! Fraction of data to remove
       REAL NSIGMA                ! Clipping limit
       REAL RMAX                  ! Maximum data value
@@ -1488,20 +1486,31 @@
 *  If we want the SCALE and ZERO point information to be written to a
 *  file then we do so here -- this file can be input into the DRIZZLE
 *  program via the CORRECT parameter.
-      CALL PAR_GET0L( 'writesz', WRSAZ, STATUS )
-      
-*  Should we output data?
-      IF ( WRSAZ .AND. ( GETS .OR. GETZ ) ) THEN
+      IF ( GETS .OR. GETZ ) THEN
 
 *  Get file for output.
+         IF ( STATUS .NE. SAI__OK ) GO TO 99
          CALL CCD1_ASFIO( 'CORRECT', 'WRITE', 'LIST', 0, FDSZ, OPNSZ,
      :                    STATUS )
-         IF ( OPNSZ ) THEN
+         IF ( STATUS .EQ. PAR__ABORT ) THEN
+            GO TO 99
+         ELSE IF ( STATUS .NE. SAI__OK ) THEN
 
-*  File opened successfully.  Get a unit number
+*  File open failed - warn user.
+            CALL CCD1_MSG( ' ', ' ', STATUS )
+            CALL CCD1_MSG( ' ',
+     :      'WARNING: Correction file could not be opened', STATUS )
+            CALL CCD1_MSG( ' ',
+     :      '         Scale factors and zero points will not be output',
+     :                     STATUS )
+            CALL ERR_ANNUL( STATUS )
+
+         ELSE IF ( OPNSZ ) THEN
+
+*  File opened successfully.  Get a unit number.
             CALL FIO_UNIT( FDSZ, UNIT, STATUS )
 
-*  Write to file
+*  Write to file.
             WRITE( UNIT, '(A)' ) '#'
             DO I = 1, NIN
                IF ( GETS .AND. GETZ ) THEN
@@ -1515,16 +1524,7 @@
                ENDIF                           
             END DO
             CALL FIO_CLOSE( FDSZ, STATUS )
-         ELSE
-
-*  File open failed - warn user.
-            CALL CCD1_MSG( ' ', ' ', STATUS )
-            CALL CCD1_MSG( ' ',
-     :      'WARNING: Correction file could not be opened', STATUS )
-            CALL CCD1_MSG( ' ',
-     :      '         Scale factors and zero points will not be output',
-     :                     STATUS )
-         ENDIF
+         END IF
 
       ENDIF
      

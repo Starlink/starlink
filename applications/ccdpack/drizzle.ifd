@@ -18,6 +18,8 @@
 #     	 Original Version
 #     25-OCT-1999 (AALLAN):
 #        Added PRESERVE keyword
+#     31-JAN-2000 (MBT):
+#        Changed default of CORRECT.
 #     {enter_further_changes_here}
 
 #-
@@ -42,7 +44,7 @@
            access   READ
            vpath    PROMPT
            ppath    CURRENT DEFAULT
-           default  drizzle.dat
+           default  !
            prompt   {File containing corrections}
            helpkey  *
          }

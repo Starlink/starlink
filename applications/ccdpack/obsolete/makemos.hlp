@@ -90,11 +90,13 @@ CMPVAR = _LOGICAL (Read)
 
 CORRECT
 
-CORRECT = LITERAL (Write)
+CORRECT = LITERAL (Read)
    The name of the file used to output the scale and zero-point
-   corrections (see SCALE, ZERO and WRITESZ parameters). This
-   file can be read by the DRIZZLE A-task.
-   [drizzle.dat]
+   corrections (see the SCALE and ZERO parameters). This file can be 
+   read by the DRIZZLE task.  If the file already exists, it is 
+   overwritten.  If a null (!) value is supplied, or if SCALE and 
+   ZERO are both set to FALSE, no file is written.
+   [!] 
 
 GENVAR
 
@@ -536,15 +538,6 @@ WEIGHTS( ) = _REAL (Read)
    used to weight the input data when they are combined.
    [!]
 
-WRITESZ
-
-WRITESZ = _LOGICAL (Read)
-   If set to TRUE then MAKEMOS will output a file containing the
-   scale and zero-point corrections (see SCALE and ZERO parameters)
-   which can be read into the DRIZZLE program. IF SCALE and ZERO are
-   both set to FALSE, no file will be generated
-   [FALSE]
-
 ZERO
 
 ZERO = _LOGICAL (Read)
@@ -749,6 +742,8 @@ PDRAPER: Peter Draper (STARLINK)
 
 AALLAN: Alasdair Allan (Keele University, STARLINK)
 
+MBT: Mark Taylor (STARLINK)
+
 History
 
  5-AUG-1992 (RFWS):
@@ -795,8 +790,11 @@ History
     Added changed to support estimation of output variances from
     input data.
 
- 13-SEP-1999 (AALLAN)
+ 13-SEP-1999 (AALLAN):
     Added WRITESZ and CORRECT parameters and associated chaanges
+
+ 31-JAN-2000 (MBT):
+    Removed WRITESZ.
 
 Implementation_Status
 

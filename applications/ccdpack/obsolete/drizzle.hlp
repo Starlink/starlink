@@ -31,7 +31,7 @@ CORRECT
 CORRECT = LITERAL (Read)
    Name of the sequential file containing the SCALE and ZERO point
    corrections for the list of input images given by the IN parameter
-   [DRIZZLE.DAT]
+   [!]
 
 IN
 

@@ -19,6 +19,8 @@
 #        Original version.
 #     7-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     31-JAN-2000 (MBT):
+#        Removed WRITESZ parameter and changed default of CORRECT.
 #     {enter_changes_here}
 
 #-
@@ -48,12 +50,12 @@
           }
           
          parameter correct {
-                          #  File containing scale and zero pint information
+                          #  File containing scale and zero point information
            type     LITERAL
            access   READ
            vpath    CURRENT DEFAULT
            ppath    CURRENT DEFAULT
-           default  drizzle.dat
+           default  !
            prompt   {File containing corrections}
            helpkey  *
          }
@@ -311,17 +313,6 @@
             default !
             size *
             prompt {NDF weighting factors}
-            helpkey *
-          }
-
-         parameter writesz {
-                           # Write scale and zero-point info to file?
-            type _LOGICAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default FALSE
-            prompt {Write scale and zero-point info to file?}
             helpkey *
           }
 

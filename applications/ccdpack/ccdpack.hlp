@@ -159,8 +159,10 @@
 
 1 Changes_this_release
 
-  Release 3.0-1 makes only non-user-visible code modifications and minor
-  documentation bugfixes to the beta test release 3.0-0b.
+  Release 3.0-1 makes a few non-user-visible code modifications and minor
+  documentation bugfixes to the beta test release 3.0-0b.  The WRITESZ
+  parameter of MAKEMOS is also withdrawn and the defaults of the CORRECT
+  parameters in MAKEMOS and DRIZZLE correspondingly modified.
 
   Version 3.0 is a major update to CCDPACK.
 
@@ -2927,7 +2929,7 @@ For information on individual parameters, select from the list below:
 CORRECT = LITERAL (Read)
    Name of the sequential file containing the SCALE and ZERO point
    corrections for the list of input images given by the IN parameter
-   [DRIZZLE.DAT]
+   [!]
 3 IN
 IN = LITERAL (Read)
    A list of the names of the input images which are to be combined
@@ -5924,11 +5926,13 @@ CMPVAR = _LOGICAL (Read)
    previous mosaic-ing process).
    [TRUE]
 3 CORRECT
-CORRECT = LITERAL (Write)
+CORRECT = LITERAL (Read)
    The name of the file used to output the scale and zero-point
-   corrections (see SCALE, ZERO and WRITESZ parameters). This
-   file can be read by the DRIZZLE A-task.
-   [drizzle.dat]
+   corrections (see SCALE and ZERO parameters). This file can be 
+   read by the DRIZZLE task.  If the file already exists, it is 
+   overwritten.  If a null (!) value is supplied, or if SCALE and
+   ZERO are both set to FALSE, no file is written.
+   [!]
 3 GENVAR
 GENVAR = _LOGICAL (Read)
    If GENVAR is set to TRUE and all the input images supplied
@@ -6323,13 +6327,6 @@ WEIGHTS( ) = _REAL (Read)
    variance information. Otherwise, the input variance values are
    used to weight the input data when they are combined.
    [!]
-3 WRITESZ
-WRITESZ = _LOGICAL (Read)
-   If set to TRUE then MAKEMOS will output a file containing the
-   scale and zero-point corrections (see SCALE and ZERO parameters)
-   which can be read into the DRIZZLE program. IF SCALE and ZERO are
-   both set to FALSE, no file will be generated
-   [FALSE]
 3 ZERO
 ZERO = _LOGICAL (Read)
    This parameter specifies whether MAKEMOS should attempt to
@@ -6567,8 +6564,12 @@ AALLAN: Alasdair Allan (Keele University, STARLINK)
     Added changed to support estimation of output variances from
     input data.
 
- 13-SEP-1999 (AALLAN)
+ 13-SEP-1999 (AALLAN):
     Added WRITESZ and CORRECT parameters and associated chaanges
+
+ 31-JAN-2000 (MBT):
+    Removed WRITESZ.
+
 2 Implementation_Status
    - MAKEMOS supports "bad" pixel values and all non-complex data
      types, with arithmetic being performed using the appropriate

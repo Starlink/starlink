@@ -7410,7 +7410,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }{
          Name of the sequential file containing the SCALE and ZERO point
          corrections for the list of input images given by the IN parameter
-         [DRIZZLE.DAT]
+         [!]
       }
       \sstsubsection{
          IN = LITERAL (Read)
@@ -10846,12 +10846,14 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          [TRUE]
       }
       \sstsubsection{
-         CORRECT = LITERAL (Write)
+         CORRECT = LITERAL (Read)
       } {
          The name of the file used to output the scale and zero-point
-         corrections (see SCALE, ZERO and WRITESZ parameters). This
-         file can be read by the DRIZZLE A-task.
-         [drizzle.dat]
+         corrections (see SCALE and ZERO parameters). This file can be 
+         read by the DRIZZLE task.  If the file already exists, it is
+         overwritten.  If a null (!) value is supplied, or if SCALE and
+         ZERO are both set to FALSE, no file is written.
+         [!]
       }
       \sstsubsection{
          GENVAR = \_LOGICAL (Read)
@@ -11308,15 +11310,6 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          variance information. Otherwise, the input variance values are
          used to weight the input data when they are combined.
          [!]
-      }
-      \sstsubsection{
-         WRITESZ = \_LOGICAL (Read)
-      } {
-         If set to TRUE then MAKEMOS will output a file containing the
-         scale and zero-point corrections (see SCALE and ZERO parameters)
-         which can be read into the \xroutine{DRIZZLE} program. IF SCALE and ZERO are
-         both set to FALSE, no file will be generated
-         [FALSE]
       }
       \sstsubsection{
          ZERO = \_LOGICAL (Read)
@@ -15840,7 +15833,7 @@ introduces a small amount of new functionality.
 \end{itemize}
 
 
-\subsection{This release 3.0}
+\subsection{Release 3.0-0b}
 
 This is a major update to CCDPACK.
 
@@ -15955,6 +15948,13 @@ This is a major update to CCDPACK.
     \end{itemize}
 \end{itemize}
 
+\subsection{This release 3.0-1}
+
+  Release 3.0-1 makes a few non-user-visible code modifications and minor
+  documentation bugfixes to the beta test release 3.0-0b.  The WRITESZ
+  parameter of \xroutine{MAKEMOS} is also withdrawn and the defaults of
+  the CORRECT parameters in \xroutine{MAKEMOS} and \xroutine{DRIZZLE} 
+  correspondingly modified.
 
 
 \begin{latexonly}

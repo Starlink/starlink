@@ -1,7 +1,9 @@
 1 CCDPACK_major_update
 
-  Release 3.0-1 makes only non-user-visible code modifications and minor
-  documentation bugfixes to the beta test release 3.0-0b.
+  Release 3.0-1 makes a few non-user-visible code modifications and minor
+  documentation bugfixes to the beta test release 3.0-0b.  The WRITESZ
+  parameter of MAKEMOS is also withdrawn, and the defaults of the CORRECT
+  parameters in MAKEMOS and DRIZZLE correspondingly modified.
 
   Version 3.0 is a major update to CCDPACK.
 
