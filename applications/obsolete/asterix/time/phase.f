@@ -163,7 +163,7 @@
       CALL BDI_AXPUT0C( OFID, TAXIS, 'Units', 'unitless', STATUS )
 
 *  Execute time-phase conversion
-      CALL PHASE_DOIT( DIMS(TAXIS), %VAL(INAXPTR), COEFF,
+      CALL PHASE_DOIT( LDIM(TAXIS), %VAL(INAXPTR), COEFF,
      :                 %VAL(OUTAXPTR), STATUS )
 
 *  History
