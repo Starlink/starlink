@@ -1,4 +1,5 @@
 Makefile.PL
+MessageRelay.pl
 Core/Makefile.PL
 Core/Core.pm
 Init/Makefile.PL
