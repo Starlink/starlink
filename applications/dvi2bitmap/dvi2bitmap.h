@@ -2,7 +2,6 @@
  * Copyright 1999, Particle Physics and Astronomy Research Council.
  * See file LICENCE for conditions.
  */
-// part of dvi2bitmap
 // $Id$
 
 #ifndef DVI2BITMAP_HEADER_READ
@@ -39,9 +38,7 @@ class DviBug : public DviError {
 // before I include <iostream>, the problem goes away...
 //
 // I think this must just be a small GCC STL buglet.
-// Define DEFINE_NULL 1 if this needs to be done
-#define DEFINE_NULL 0
-#if DEFINE_NULL
+#ifndef NULL
 #define NULL 0
 #endif
 

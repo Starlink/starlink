@@ -6,8 +6,8 @@
 // $Id$
 
 #include "dvi2bitmap.h"
-#include <iostream>
 #include <vector>
+#include <iostream>
 
 #if NO_CSTD_INCLUDE
 #include <stdio.h>		// for vsprintf
