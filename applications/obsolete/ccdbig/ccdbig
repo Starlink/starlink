@@ -200,10 +200,11 @@
             sed -e'/^ *#/d' -e'/^ *$/d' ccdbig_obj.dat  \
           | awk 'NR <= '$objects' { print $1, $2*'$field_pixels', $3*'$field_pixels', $4*0.1, $5 }' \
           > ccdtest_obj.dat
-            if ( `wc -l ccdtest_obj.dat` < $objects ) then
+            set lines = `cat ccdtest_obj.dat | wc -l`
+            if ( "$lines" < "$objects" ) then
                echo " "
-               echo " Insufficient test objects in data file ccdbig_obj.dat."
-               echo " Using only "`wc -l ccdtest_obj.dat`" instead of $objects."
+               echo " Not enough test objects in data file ccdbig_obj.dat."
+               echo " Using only $lines objects instead of $objects."
                echo " "
             endif
 
