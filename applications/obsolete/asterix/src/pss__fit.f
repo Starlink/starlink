@@ -1047,6 +1047,7 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
       END IF
 
 *    Dataset block
+      FIT_DS = 1
       DATASET_D_ID(FIT_DS) = IM_ID
 
 *    Set up flux parameter
