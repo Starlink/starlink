@@ -3,7 +3,7 @@
 bin_SCRIPTS = shl_link shl_link_adam
 
 bin_PROGRAMS = browsehlp
-include_HEADERS = shl.h
+include_HEADERS = $(PUBLIC_INCLUDES) shl.h
 
 browsehlp_SOURCES = browsehlp.c
 browsehlp_LDADD = libshl.la `err_link` `one_link` `hlp_link` `fio_link`\
@@ -13,6 +13,7 @@ browsehlp_DEPENDENCIES = shl.h
 lib_LTLIBRARIES = libshl.la libshl_adam.la
 
 libshl_la_SOURCES = \
+	$(PUBLIC_INCLUDES) \
 	$(F_ROUTINES) \
 	$(C_ROUTINES)
 
@@ -20,7 +21,7 @@ libshl_la_DEPENDENCIES = $(PRIVATE_INCLUDES)
 
 libshl_adam_la_SOURCES = $(ADAM_F_ROUTINES)
 
-PRIVATE_INCLUDES = SHL_HLPCMD
+PUBLIC_INCLUDES = SHL_HLPCMD
 
 # These are the standard KAPPA help routines renamed to
 # enter the SHL namespace
