@@ -758,23 +758,6 @@
 
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Write start of composite record if outside and ARD modes
-        IF ( ARD .AND. OUTSIDE ) THEN
-
-*        Get extrema of imag
-          CALL IMG_PIXTOWORLD( 1, 1, XMIN, YMIN, STATUS )
-          CALL IMG_PIXTOWORLD( I_NX, I_NY, XMAX, YMAX, STATUS )
-
-*        Box containing whole image
-          CALL MSG_SETR( 'XLO', XMIN )
-          CALL MSG_SETR( 'XHI', XMAX )
-          CALL MSG_SETR( 'YLO', YMIN )
-          CALL MSG_SETR( 'YHI', YMAX )
-          CALL MSG_MAKE( '  BOX( ^XLO , ^YLO , ^XHI , ^YHI )',
-     :                                             TEXT, TLEN )
-          CALL ARX_PUT(GRPID,0,TEXT(:TLEN),STATUS)
-
-        END IF
 
         DOIT=.TRUE.
         DO WHILE (DOIT)
@@ -787,7 +770,7 @@
 
 *        Create description
             IF ( OUTSIDE ) THEN
-              TEXT = '  .AND. .NOT. POLYGON('
+              TEXT = '  .NOT. POLYGON('
             ELSE
               TEXT = 'POLYGON('
             ENDIF
