@@ -17,7 +17,7 @@ F_ROUTINES = \
 	cocomo.f cocoom.f cocomm.f wfwcs0.f \
 	opw.f opr.fpp
 
-opr.f: opr.fpp
+opr.o: opr.f
 
 BLOCK_DATA_FILES = params.f
 
