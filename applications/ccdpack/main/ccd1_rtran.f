@@ -1,5 +1,5 @@
       SUBROUTINE CCD1_RTRAN( TRTYPE, INEXT, TR, XMAP, YMAP, LOCTR,
-     :                       FORWRD, STATUS )
+     :                       FORWRD, FR1PAR, FR2PAR, IWCSF, STATUS )
 *+
 *  Name:
 *     CCD1_RTRAN
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL CCD1_RTRAN( TRTYPE, INEXT, TR, XMAP, YMAP, LOCTR, FORWRD,
-*                      STATUS )
+*                      FR1PAR, FR2PAR, IWCSF, STATUS )
 
 *  Description:
 *     This routine writes a report about the transformation options
@@ -37,11 +37,21 @@
 *     FORWRD = LOGICAL (Given)
 *        If true then the forward transformation was used. Otherwise the
 *        inverse transformation.
+*     FR1PAR = CHARACTER * ( * ) (Given)
+*        Name of an ADAM parameter supplying the name of the source frame
+*        if TRTYPE is WCS.
+*     FR2PAR = CHARACTER * ( * ) (Given)
+*        Name of an ADAM parameter supplying the name of the destination
+*        frame if TRTYPE is WCS.
+*     IWCSF = INTEGER (Given)
+*        NDF identifier for NDF containing WCS information if TRTYPE is 
+*        WCS and INEXT is false.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -52,6 +62,8 @@
 *        information.
 *     14-JUN-1993 (PDRAPER):
 *        Added INEXT parameter + associated changes.
+*     1-APR-1999 (MBT):
+*        Added WCS mode and farmed out TR output to CCD1_TROUT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -75,15 +87,16 @@
       CHARACTER * ( * ) YMAP
       CHARACTER * ( * ) LOCTR
       LOGICAL FORWRD
+      CHARACTER * ( * ) FR1PAR
+      CHARACTER * ( * ) FR2PAR
+      INTEGER IWCSF
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( MSG__SZMSG ) BUFFER ! Buffer to hold output
-                                               ! strings
-      INTEGER IAT                ! Position in string
-      INTEGER NCHAR              ! Number of characters returned
+      CHARACTER * ( MSG__SZMSG ) FR1 ! Value of source frame parameter
+      CHARACTER * ( MSG__SZMSG ) FR2 ! Value of destination frame parameter
 
 *.
 
@@ -97,39 +110,11 @@
 
 *  Transformation given as a series of linear coefficients.
          CALL CCD1_MSG( ' ',
-     : '  Transformation defined by a series of linear coefficients',
+     : '  Transformation defined by a series of linear coefficients:',
      :   STATUS )
 
-*  Construct an output string with a tabular look.
-         IAT = 5
-         BUFFER( IAT: ) = 'C1 = '
-         IAT = 11
-         CALL CHR_DTOC( TR( 1 ), BUFFER( IAT : ), NCHAR )
-         IAT = IAT + VAL__SZD
-         BUFFER( IAT: ) = '    C2 = '
-         IAT = IAT + 12
-         CALL CHR_DTOC( TR( 2 ), BUFFER( IAT : ), NCHAR )
-         CALL CCD1_MSG( ' ', BUFFER, STATUS )
-
-         IAT = 5
-         BUFFER( IAT: ) = 'C3 = '
-         IAT = 11
-         CALL CHR_DTOC( TR( 3 ), BUFFER( IAT : ), NCHAR )
-         IAT = IAT + VAL__SZD
-         BUFFER( IAT: ) = '    C4 = '
-         IAT = IAT + 12
-         CALL CHR_DTOC( TR( 4 ), BUFFER( IAT : ), NCHAR )
-         CALL CCD1_MSG( ' ', BUFFER, STATUS )
-
-         IAT = 5
-         BUFFER( IAT: ) = 'C5 = '
-         IAT = 11
-         CALL CHR_DTOC( TR( 5 ), BUFFER( IAT : ), NCHAR )
-         IAT = IAT + VAL__SZD
-         BUFFER( IAT: ) = '    C6 = '
-         IAT = IAT + 12
-         CALL CHR_DTOC( TR( 6 ), BUFFER( IAT : ), NCHAR )
-         CALL CCD1_MSG( ' ', BUFFER, STATUS )
+*  Output coefficients.
+         CALL CCD1_TROUT( TR, STATUS )
 
 *  Transformation given as a expression.
       ELSE IF ( TRTYPE .EQ. 'EXPRES' ) THEN 
@@ -142,7 +127,30 @@
          CALL CCD1_MSG( ' ',
      : '    ^YMAP', STATUS )
 
-      ELSE
+      ELSE IF ( TRTYPE .EQ. 'WCS' ) THEN
+
+*  Transformation derived from a WCS component of an NDF.  This is 
+*  either the WCS component of each NDF or from one which serves all.
+*  Print frame identifiers.
+         CALL PAR_GET0C( FR1PAR, FR1, STATUS )
+         CALL PAR_GET0C( FR2PAR, FR2, STATUS )
+         CALL MSG_SETC( 'FR1', FR1 )
+         CALL MSG_SETC( 'FR2', FR2 )
+         CALL CCD1_MSG( ' ', 
+     : '  Transformation is the mapping from frame ^FR1 to frame ^FR2',
+     :                     STATUS )
+
+*  Print name of single WCS containing file or alternative as appropriate.
+         IF ( INEXT ) THEN
+            CALL CCD1_MSG( ' ', 
+     : '  in the WCS component of each NDF.', STATUS )
+         ELSE 
+            CALL NDF_MSG( 'WCSFIL', IWCSF )
+            CALL CCD1_MSG( ' ', 
+     : '  in the WCS component of NDF ^WCSFIL.', STATUS )
+         END IF
+
+      ELSE IF ( TRTYPE .EQ. 'STRUCT' ) THEN
 
 *  Transformation given as a TRN_TRANSFORM structure. This is either in
 *  the NDF extension or directly.
