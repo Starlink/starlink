@@ -77,6 +77,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -138,16 +139,11 @@ F77_INTEGER_FUNCTION(irg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
   char *spec;           /* Local copy of FileSpec */
   char *wild;           /* Pointer to irg_wild script*/
   char Char;            /* Byte read from pipe */
-  char Command[LINE_LEN];    /* script command executed */
-  char LastChar;        /* Last non-blank char read in line */
   char Line[LINE_LEN];  /* String into which line is read */
   int *Fdptr;           /* Pointer to array of two integer file descriptors */
   int Bytes;            /* Number of bytes read from pipe */
-  int ColonIndex;       /* Index in Line of last colon */
   int GotFileName;      /* Used to control loop reading lines from command */
-  int I;                /* Loop index used to copy strings */
   int Ichar;            /* Index into FileName for next character */
-  int Nchars;           /* Maximum number of chars that can be copied */
   int NullFd;           /* File descriptor for the null device */
   int Status;           /* Status value returned to caller */
 
