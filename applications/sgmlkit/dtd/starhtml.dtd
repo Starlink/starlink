@@ -583,7 +583,8 @@ Here is an example:
         colspan NUMBER   1         -- number of cols spanned by cell --
         %cell.halign;              -- horizontal alignment in cell --
         %cell.valign;              -- vertical alignment in cell --
-        width   %Pixels  #IMPLIED  -- suggested width for cell --
+        --width   %Pixels  #IMPLIED  Starlink: replaced by %Length --
+        width   %Length  #IMPLIED  -- suggested width for cell --
         height  %Pixels  #IMPLIED  -- suggested height for cell --
         >
 
