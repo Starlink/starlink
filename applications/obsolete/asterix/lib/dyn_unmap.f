@@ -1,111 +1,123 @@
-*+  DYN_UNMAP - unmaps dynamic memory
-      SUBROUTINE DYN_UNMAP(PTR)
-*    Description :
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     BHVAD::RJV
-*    History :
-*
-*     16 Jun 92 : Uses PSX call for memory deallocation (DJA)
-*
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*    Status :
-      INTEGER STATUS
-*    Import :
-      INTEGER PTR			! pointer to dynamic memory
-*    Import/Export :
-*    Export :
-*    External references :
-*    Global variables :
-*    Local Constants :
-      INTEGER NULL
-      PARAMETER (NULL=0)
-*    Local variables :
-      INTEGER NPAGE			! number of pages
-      LOGICAL FOUND			! whether pointer in list
-      LOGICAL SECTION
-      CHARACTER*(DAT__SZLOC) LOC
-*-
-      FOUND=.FALSE.
-      SECTION=.FALSE.
-      NPAGE=0
-      CALL DYN_UNMAP_REM(PTR,NPAGE,FOUND,SECTION,LOC)
-      IF (FOUND) THEN
-        IF (SECTION) THEN
-          STATUS=SAI__OK
-          CALL HDS_ERASE(LOC,STATUS)
-        ELSE
-          CALL PSX_FREE( PTR, STATUS )
-        ENDIF
-      ENDIF
-      END
-
-
+      SUBROUTINE DYN_UNMAP( PTR, STATUS )
 *+
-      SUBROUTINE DYN_UNMAP_REM(PTR,NPAGE,FOUND,SECTION,LOC)
-*    Description :
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     BHVAD::RJV
-*    History :
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*    Status :
-*    Import :
-      INTEGER PTR			! pointer to dynamic memory
-*    Import/Export :
-*    Export :
-      INTEGER NPAGE			! number of pages
-      LOGICAL FOUND			! whether pointer in list
-      LOGICAL SECTION			! whether disk section
-      CHARACTER*(DAT__SZLOC) LOC	! locator to disk section
-*    External references :
-*    Global variables :
-      INCLUDE 'ASTLIB(DYN_CMN)'
-*    Local Constants :
-*    Local variables :
-      INTEGER IPTR,JPTR
+*  Name:
+*     DYN_UNMAP
+
+*  Purpose:
+*     Unmap memory allocated by DYN
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL DYN_UNMAP( PTR, STATUS )
+
+*  Description:
+*     Unmap memory allocated by DYN. It is an error to supply this routine
+*     with an address not allocated by DYN.
+
+*  Arguments:
+*     PTR = INTEGER (given)
+*        Address of a memory section allocated by DYN
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     DYN Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/dyn.html
+
+*  Keywords:
+*     package:dyn, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     20 Mar 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-      FOUND=.FALSE.
-      SECTION=.FALSE.
-      IPTR=0
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
 
-*  find pointer in list
-      DO WHILE (.NOT.FOUND.AND.IPTR.LT.NPTR)
-        IPTR=IPTR+1
-        FOUND=(PTR.EQ.LIST(IPTR).PTR)
-      ENDDO
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
-      IF (FOUND) THEN
-*  return number of pages to release
-        NPAGE=LIST(IPTR).NPAGE
-        IF (LIST(IPTR).SECTION) THEN
-          SECTION=.TRUE.
-          LOC=LIST(IPTR).LOC
-        ENDIF
+*  Global Variables:
+      INCLUDE 'DYN_CMN'                                 ! DYN common block
+*       DYN_ISINIT = LOGICAL (given)
+*         DYN class definitions loaded?
 
-*  remove from list
-        DO JPTR=IPTR,NPTR-1
-          LIST(JPTR) = LIST(JPTR+1)
-        ENDDO
-        LIST(NPTR).PTR=0
-        LIST(NPTR).NITEM=0
-        LIST(NPTR).NPAGE=0
-        LIST(NPTR).NBYTE=0
-        LIST(NPTR).LOC=' '
-        LIST(NPTR).SECTION=.FALSE.
-        NPTR=NPTR-1
-      ENDIF
+*  Arguments Given:
+      INTEGER			PTR			! Memory address
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL                  DYN0_BLK                ! Ensures inclusion
+
+*  Local Variables:
+      INTEGER			SLOT			! Internal slot number
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check initialised
+      IF ( .NOT. DYN_ISINIT ) THEN
+        STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'DYN system has not been initialised',
+     :                STATUS )
+      END IF
+
+*  Locate the memory
+      CALL DYN0_FIND( PTR, SLOT, STATUS )
+
+*  Unmap it
+      CALL DYN0_UNMAP( SLOT, STATUS )
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'DYN_UNMAP', STATUS )
+
       END

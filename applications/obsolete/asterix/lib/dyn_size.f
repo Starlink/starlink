@@ -115,7 +115,8 @@
 *  Check initialised
       IF ( .NOT. DYN_ISINIT ) THEN
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'DYN system has not been initialised', STATUS )
+        CALL ERR_REP( ' ', 'DYN system has not been initialised',
+     :                STATUS )
       END IF
 
 *  Locate the memory
