@@ -108,6 +108,10 @@ fonts.</px>
 <px>Enhancement of internal documentation.  Added &ddash;help option.</px>
 </distribution>
 
+      <distribution string="0.12" date="20-Dec-2003" author="ng" versionid="v0-12">
+        <px>Significant refactoring of library, and addition of functionality.</px>
+      </distribution>
+
 </history>
 
 <copyright>
