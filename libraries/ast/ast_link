@@ -110,6 +110,8 @@
 #        Added switches.
 #     18-NOV-1997 (RFWS):
 #        Adapted prologue for document extraction.
+#     28-SEP-1998 (RFWS):
+#        Distinguish between -pgp and -pgplot options.
 #     {enter_further_changes_here}
 
 #  Bugs:
