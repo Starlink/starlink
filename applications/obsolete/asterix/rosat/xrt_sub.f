@@ -1817,6 +1817,8 @@ D          WRITE(1,*)HEAD.OFFAX
           XOFF = XCENT + (XLP-NX/2.0) * XSCALE
           YOFF = YCENT + (YLP-NY/2.0) * YSCALE
           OFFAX = SQRT(XOFF*XOFF + YOFF*YOFF) * 60.0
+*  limit radial extent to prevent silly values
+          OFFAX=MAX(OFFAX,OFFMAX)
 *
 *    Set vignetting correction according to formula in HRI calibration
 *    report  (December 93)
@@ -1832,7 +1834,6 @@ D          WRITE(1,*)HEAD.OFFAX
             QE=FACTOR(I-1)+(OFFAX-ANGLE(I-1))/(ANGLE(I)-ANGLE(I-1))*
      :                                          (FACTOR(I)-FACTOR(I-1))
           ELSE
-            OFFAX=MAX(OFFAX,OFFMAX)		! limit extrapolation
             QE=FACTOR(NQE)-(OFFAX-ANGLE(NQE))*
      :                           (FACTOR(NQE-1)-FACTOR(NQE))/
      :                              (ANGLE(NQE)-ANGLE(NQE-1))
@@ -3349,6 +3350,9 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 
       ENDIF
 
+      CALL MSG_SETR('VIG',VSING)
+      CALL MSG_PRNT('Vignetting correction : ^VIG')
+
 999   CONTINUE
 *
       IF (STATUS .NE. SAI__OK) THEN
@@ -3514,25 +3518,26 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
         GOTO 999
       ENDIF
 
+*  limit radial extent to prevent silly values
+      OFF=MAX(OFFAX,OFFMAX)
 
 *
 *    Set vignetting correction according to formula in HRI calibration
 *    report  (December 93)
-      VIG=1.0 - 1.49E-3*OFFAX -3.07E-4*OFFAX**2
+      VIG=1.0 - 1.49E-3*OFF -3.07E-4*OFF**2
 
 *    Get quantum efficiency factor
-      IF (OFFAX.LE.ANGLE(1)) THEN
+      IF (OFF.LE.ANGLE(1)) THEN
 
         QE=FACTOR(1)
-      ELSEIF (OFFAX.LT.ANGLE(NQE)) THEN
+      ELSEIF (OFF.LT.ANGLE(NQE)) THEN
         I=1
-        DO WHILE (OFFAX.GT.ANGLE(I))
+        DO WHILE (OFF.GT.ANGLE(I))
           I=I+1
         ENDDO
-        QE=FACTOR(I-1)+(OFFAX-ANGLE(I-1))/(ANGLE(I)-ANGLE(I-1))*
+        QE=FACTOR(I-1)+(OFF-ANGLE(I-1))/(ANGLE(I)-ANGLE(I-1))*
      :                                          (FACTOR(I)-FACTOR(I-1))
       ELSE
-        OFF=MAX(OFFAX,OFFMAX)			! limit extrapolation
         QE=FACTOR(NQE)-(OFF-ANGLE(NQE))*
      :                           (FACTOR(NQE-1)-FACTOR(NQE))/
      :                              (ANGLE(NQE)-ANGLE(NQE-1))
