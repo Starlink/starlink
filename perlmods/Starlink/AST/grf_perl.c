@@ -46,7 +46,7 @@ extern "C" {
 #include "EXTERN.h"   /* std perl include */
 #include "perl.h"     /* std perl include */
 #include "XSUB.h"     /* XSUB include */
-#include "ppport.h"
+  /* #include "ppport.h" */
 #ifdef __cplusplus
 }
 #endif
@@ -247,14 +247,211 @@ int astGMark( int n, const float *x, const float *y, int type ){
 
 int astGText( const char *text, float x, float y, const char *just,
               float upx, float upy ){
-   Report( "astGText" );
-   return 0;
+  dSP;
+  SV * cb;
+  SV * external;
+  int retval;
+  int len;
+  int i;
+
+  if (!astOK) return 0;
+  if (CurrentPlot == NULL ) {
+    astError( AST__GRFER, "No Plot object stored. Should not happen." );
+    return 0;
+  }
+
+  cb = Perl_getHashAttr( "_gtext" );
+ 
+  if (astOK) {
+    if ( cb != NULL ) {
+      int count;
+      ENTER;
+      SAVETMPS;
+
+      PUSHMARK(sp);
+
+      /* If we have a registered external object, push that on as
+	 a first argument. */
+      external = Perl_getHashAttr( "_gexternal" );
+      if ( external != NULL ) {
+	XPUSHs( external );
+      }
+    
+      XPUSHs( sv_2mortal(newSVpv(text, 0) ) );
+      XPUSHs( sv_2mortal(newSVnv(x) ) );
+      XPUSHs( sv_2mortal(newSVnv(y) ) );
+      XPUSHs( sv_2mortal(newSVpv(just, 0) ) );
+      XPUSHs( sv_2mortal(newSVnv(upx) ) );
+      XPUSHs( sv_2mortal(newSVnv(upy) ) );
+      PUTBACK;
+
+      count = perl_call_sv( SvRV(cb), G_SCALAR );
+
+      SPAGAIN;
+
+      if (astOK) {
+	if (count != 1) {
+	  astError( AST__GRFER, 
+		    "Returned more than 1 arg from GText callback");
+	  retval = 0;
+	} else {
+	  retval = POPi;
+	}
+      } else {
+	retval = 0;
+      }
+
+      PUTBACK;
+
+      FREETMPS;
+      LEAVE;
+    } else {
+      retval = 0;
+      Report("astGTExt");
+    }
+  } else {
+    retval = 0;
+  }
+  return retval;
 }               
 
 int astGTxExt( const char *text, float x, float y, const char *just,
                float upx, float upy, float *xb, float *yb ){
-   Report( "astGTxExt" );
-   return 0;
+
+  dSP;
+  SV * cb;
+  SV * external;
+  SV * retarg;
+  AV * retarr;
+  SV ** elem;
+  int retval;
+  int len;
+  int i;
+  static float outxb[4];
+  static float outyb[4];
+
+  if (!astOK) return 0;
+  if (CurrentPlot == NULL ) {
+    astError( AST__GRFER, "No Plot object stored. Should not happen." );
+    return 0;
+  }
+
+  cb = Perl_getHashAttr( "_gtxext" );
+ 
+  if (astOK) {
+    if ( cb != NULL ) {
+      int count;
+      ENTER;
+      SAVETMPS;
+
+      PUSHMARK(sp);
+
+      /* If we have a registered external object, push that on as
+	 a first argument. */
+      external = Perl_getHashAttr( "_gexternal" );
+      if ( external != NULL ) {
+	XPUSHs( external );
+      }
+    
+      XPUSHs( sv_2mortal(newSVpv(text, 0) ) );
+      XPUSHs( sv_2mortal(newSVnv(x) ) );
+      XPUSHs( sv_2mortal(newSVnv(y) ) );
+      XPUSHs( sv_2mortal(newSVpv(just, 0) ) );
+      XPUSHs( sv_2mortal(newSVnv(upx) ) );
+      XPUSHs( sv_2mortal(newSVnv(upy) ) );
+      PUTBACK;
+
+      count = perl_call_sv( SvRV(cb), G_ARRAY );
+
+      SPAGAIN;
+
+      if (astOK) {
+	if (count != 3) {
+	  astError( AST__GRFER,
+		    "Must return 3 args from GTxExt callback not %d",count);
+	  retval = 0;
+	} else {
+	  /* The status will be on the stack furthest back so we 
+	     need to read off yb, then xb then status  */
+
+	  /* yb. Read and copy into static storage space 
+	     We can do this because we know there are always 4 numbers.
+	     We do not want to have to allocate mortal space and then
+	     worry about where our FREETMPS/SAVETMPS go
+	  */
+	  retarg = POPs;
+	  if ( SvROK(retarg) && SvTYPE(SvRV(retarg))==SVt_PVAV) {
+	    retarr = (AV*)SvRV(retarg);
+	    len = av_len(retarr) + 1;
+	    if (len != 4 ) {
+	      astError( AST__GRFER,
+			"yb must contain 4 elements not %d", len);
+	      retval = 0;
+	    } else {
+	      for (i=0; i<len; i++) {
+		elem = av_fetch( retarr, i, 0);
+		if (elem == NULL ) {
+		  outyb[i] = 0.0;
+		} else {
+		  outyb[i] = (float)SvNV(*elem);
+		}
+	      }
+	      yb = outyb;
+	    }
+	  } else {
+	    astError( AST__GRFER,
+		      "Must return ref to array with values yb");
+	    retval = 0;
+	  }
+
+	  /* xb. Read and copy into static storage. */
+	  if (astOK) {
+	    retarg = POPs;
+	    if ( SvROK(retarg) && SvTYPE(SvRV(retarg))==SVt_PVAV) {
+	      retarr = (AV*)SvRV(retarg);
+	      if (len != 4 ) {
+		astError( AST__GRFER,
+			  "xb must contain 4 elements not %d", len);
+		retval = 0;
+	      } else {
+		for (i=0; i<len; i++) {
+		  elem = av_fetch( retarr, i, 0);
+		  if (elem == NULL ) {
+		    outxb[i] = 0.0;
+		  } else {
+		    outxb[i] = (float)SvNV(*elem);
+		  }
+		}
+		xb = outxb;
+	      }
+	    } else {
+	      astError( AST__GRFER,
+			"Must return ref to array with values xb");
+	      retval = 0;
+	    }
+	  }
+
+	  /* Status return */
+	  if (astOK) {
+	    retval = POPi;
+	  }
+	}
+      } else {
+	retval = 0;
+      }
+
+      PUTBACK;
+
+      FREETMPS;
+      LEAVE;
+    } else {
+      retval = 0;
+      Report("astGTxExt");
+    }
+  } else {
+    retval = 0;
+  }
+  return retval;
 }               
 
 int astGAttr( int attr, double value, double *old_value, int prim ){

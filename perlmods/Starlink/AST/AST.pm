@@ -459,7 +459,8 @@ sub debug {
   $self->GQch( sub {&__dumpargs("GQch",@_ );    return 1; });
   $self->GMark( sub {&__dumpargs("GMark",@_);   return 1; });
   $self->GText( sub {&__dumpargs("GText",@_);   return 1; });
-  $self->GTxExt( sub { &__dumpargs("GTxExt",@_);return 1; });
+  $self->GTxExt( sub { &__dumpargs("GTxExt",@_);return (1,[1,1,1,1],
+							[1,1,1,1]); });
   $self->GAttr( sub { &__dumpargs("GAttr",@_);  return (1,1);} );
 
 }
