@@ -10756,23 +10756,26 @@ proc SkyOff {} {
    global SKY_FRAME
    global SKY_METHOD
 
-# If sky subtraction has just been switched on...
+# If sky subtraction is switched on...
    if { $SKYOFF } {
 
-# Set the text for the status item describing the sky subtraction.
+# Set the text for the status item describing the sky subtraction,
+# and determine whether the sky area buttons should be enabled or disabled.
       if { $SKY_METHOD == $SKY_FRAME } {
          set SKYTEXT $SKYIMS($IMAGE_DISP)
+         set state disabled
       } {
          set SKYTEXT "displayed image"
+         set state normal
       }
 
-# Enable all the sky buttons.
+# Enable or disable all the sky buttons.
       foreach obj "$O_RAY_SKY $E_RAY_SKY" {
-         $RB_CUR($obj) configure -state normal
-         $RB_REF($obj) configure -state normal
+         $RB_CUR($obj) configure -state $state
+         $RB_REF($obj) configure -state $state
       }
 
-# If sky subtraction has just been switched off...
+# If sky subtraction is switched off...
    } {
 
 # Set the text for the status item describing the sky subtraction.
