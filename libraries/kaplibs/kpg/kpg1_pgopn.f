@@ -4,7 +4,7 @@
 *     KPG1_PGOPN
 
 *  Purpose:
-*     Open the AGI daqtabase anc activate a PGPLOT workstation.
+*     Open the AGI database and activate a PGPLOT workstation.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,9 +14,9 @@
 
 *  Description:
 *     This routine opens the graphics data abse and actiavtes a PGPLOT
-*     workstation selected using trhe specified parameter. Ther user's
-*     pallette is then re-instated, over-riding the pallette established
-*     by PGPLOT. 
+*     workstation selected using the specified parameter. Ther user's
+*     pallette and colour table is then re-instated, over-riding the 
+*     those established by PGPLOT. 
 *
 *     The device should normally be shut down using KPG1_PGCLS.
 
@@ -64,6 +64,7 @@
 
 *  Local Variables:
       INTEGER IPICB              ! Base picture identifier
+
 *.
 
 *  Check the inherited global status.
@@ -82,9 +83,10 @@
       CALL AGP_NVIEW( .FALSE., STATUS )
 
 *  PGPLOT resets the colour table each time it is opened. So re-instate
-*  the user's pallette by loading it from a previously saved file. (see
-*  KPG1_PLSAV).
+*  the user's pallette and LUT by loading them from previously saved files 
+*  (see KPG1_PLSAV and KPG1_LTSAV).
       CALL KPG1_PLLOD( STATUS )
+      CALL KPG1_LTLOD( STATUS )
 
 *  Attempt to close down the device if an error has occurred.
       IF( STATUS .NE. SAI__OK ) CALL KPG1_PGCLS( PNAME, .FALSE., 

@@ -205,6 +205,7 @@
       INTEGER I                  ! Loop counter
       INTEGER IACT               ! Index of terminator key in KEYS
       INTEGER IAT                ! No. of characters in string
+      INTEGER LRBMOD             ! Rubber band mode
       INTEGER NPL                ! Number of graphical elements requested
       INTEGER OK                 ! Zero if no position was obtained
       INTEGER POSN               ! Zero if no acnhor position is available
@@ -395,12 +396,15 @@
 *  Initialise the number of positions stored so far.
       NPNT = 0
 
+*  Initialize the rubber band mode to "none" for the first point.
+      LRBMOD = 0
+
 *  Loop round getting positions.
       LOOP = .TRUE.
       DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK ) 
 
 *  Get a position using a straight line rubber band.
-         IF( RBMODE .EQ. 1 ) THEN
+         IF( LRBMOD .EQ. 1 ) THEN
             IF( POSN .NE. 0 ) THEN
                OK = PGBAND( 1, POSN, XG, YG, XG, YG, CG ) 
             ELSE
@@ -408,7 +412,7 @@
             END IF
 
 *  Get a position using a rectangular box rubber band.
-         ELSE IF( RBMODE .EQ. 2 ) THEN
+         ELSE IF( LRBMOD .EQ. 2 ) THEN
             IF( POSN .NE. 0 ) THEN
                OK = PGBAND( 2, POSN, XG, YG, XG, YG, CG ) 
             ELSE
@@ -419,6 +423,9 @@
          ELSE
             OK = PGBAND( 0, POSN, XG, YG, XG, YG, CG ) 
          END IF         
+
+*  From now on use the requested rubber band mode.
+         LRBMOD = RBMODE
 
 *  We now have an anchor point (the position just entered).
          POSN = 1

@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_PLPUT( CI1, CI2, ARRAY, STATUS )
+      SUBROUTINE KPG1_PLPUT( CI1, CI2, LBND, UBND, ARRAY, STATUS )
 *+
 *  Name:
 *     KPG1_PLPUT
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_PLPUT( CI1, CI2, ARRAY, STATUS )
+*     CALL KPG1_PLPUT( CI1, CI2, LBND, UBND, ARRAY, STATUS )
 
 *  Description:
 *     This routine puts a specified section of the colour palette for the 
@@ -22,7 +22,11 @@
 *        The lowest colour index to change in the array.
 *     CI2 = INTEGER (Given)
 *        The highest colour index to change in the array.
-*     ARRAY( 3, 0 : CI2 ) = REAL (Given and Returned)
+*     LBND = INTEGER (Given)
+*        The lower bound of the second axis of ARRAY.
+*     UBND = INTEGER (Given)
+*        The upper bound of the second axis of ARRAY.
+*     ARRAY( 3, LBND : UBND ) = REAL (Given and Returned)
 *        The array to recieved the palette.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -39,6 +43,8 @@
 *        Original version.
 *     1-OCT-1999 (DSB):
 *        Converted to PGPLOT.
+*     3-OCT-2001 (DSB):
+*        Added arguments LBND and UBND.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -56,9 +62,11 @@
 *  Arguments Given:
       INTEGER CI1
       INTEGER CI2
+      INTEGER LBND
+      INTEGER UBND
 
 *  Arguments Given and Returned:
-      REAL ARRAY( 3, 0 : CI2 )
+      REAL ARRAY( 3, LBND:UBND )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -72,7 +80,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Inquire the palette colour indices, and store in the array.
-      DO  I = CI1, CI2
+      DO  I = MAX( LBND, CI1 ), MIN( UBND, CI2 )
          CALL PGQCR( I, ARRAY( 1, I ), ARRAY( 2, I ), ARRAY( 3, I ) )
       END DO
 

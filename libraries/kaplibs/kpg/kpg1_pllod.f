@@ -67,8 +67,7 @@
       CHARACTER LOC*(DAT__SZLOC) ! Locator to top-level container file object
       CHARACTER PATH*132         ! Path to the container file
       CHARACTER PLOC*(DAT__SZLOC)! Locator to palette array 
-      CHARACTER PREFIX*25        ! Device prefix
-      CHARACTER TYPE*20          ! Device name
+      CHARACTER TYPE*(DAT__SZNAM)! Device name
       INTEGER DIMS( 2 )          ! Array dimensions
       INTEGER EL                 ! Number of mapped array elements
       INTEGER NC                 ! Number of characters in the buffer
@@ -134,28 +133,19 @@
 *  Get the name of the component within the HDS container file which
 *  contains the palette for the currently opened graphics device. 
 *  =================================================================
-
-*  Get the workstation type, and remove any leading blanks.
-         CALL PGQINF( 'TYPE', TYPE, NC )
-         CALL CHR_RMBLK( TYPE )
-
-*  Format the workstation type, prepending the string "PGP_" to it.
-         PREFIX = 'PGP_'
-         NC = 4
-         CALL CHR_APPND( TYPE, PREFIX, NC )
-         TYPE = PREFIX
+         CALL KPG1_PGHNM( TYPE, STATUS )
 
 *  Find the palette array within the container file.
 *  =================================================
 
 *  See if a component with this name exists within the container file.
-         CALL DAT_THERE( LOC, TYPE( : NC ), THERE, STATUS )
+         CALL DAT_THERE( LOC, TYPE, THERE, STATUS )
 
 *  If so...
          IF( THERE ) THEN
 
 *  Get a locator for it.
-            CALL DAT_FIND( LOC, TYPE( : NC ), PLOC, STATUS )
+            CALL DAT_FIND( LOC, TYPE, PLOC, STATUS )
 
 *  Get its dimensions.
             CALL DAT_SHAPE( PLOC, 2, DIMS, NDIM, STATUS )

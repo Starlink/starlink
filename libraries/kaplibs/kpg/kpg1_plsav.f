@@ -94,19 +94,16 @@
       CHARACTER LOC*(DAT__SZLOC) ! Locator to top-level container file object
       CHARACTER PATH*132         ! Path to the container file
       CHARACTER PLOC*(DAT__SZLOC)! Locator to palette array 
-      CHARACTER TYPE*15          ! Device name
-      CHARACTER PREFIX*15        ! Prefix to be added to TYPE
+      CHARACTER TYPE*(DAT__SZNAM)! Device name
       INTEGER DIMS( 2 )          ! Array dimensions
       INTEGER EL                 ! Number of mapped array elements
       INTEGER LCI1               ! Local copy of CI1
       INTEGER LCI2               ! Local copy of CI2
-      INTEGER LENGTH             ! Length of string returned by PGQINF
       INTEGER LOWER              ! Lowest colour index
       INTEGER NC                 ! Number of characters in the buffer
       INTEGER NDIM               ! Number of array dimensions
       INTEGER NINTS              ! Number of colour indices on the workstation
       INTEGER PNTR               ! Pointer to mapped array
-      INTEGER UPPER              ! Highest colour index
       LOGICAL THERE              ! Object present?
 
 *.
@@ -164,16 +161,7 @@
 *  Get the name of the component within the HDS container file which
 *  contains the palette for the currently opened graphics device. 
 *  =================================================================
-
-*  Get the workstation type, and remove any blanks.
-      CALL PGQINF( 'TYPE', TYPE, LENGTH )
-      CALL CHR_RMBLK( TYPE )
-
-*  Format the workstation type, prepending the string "PGP_" to it.
-      PREFIX = 'PGP_'
-      NC = 4
-      CALL CHR_PUTC( TYPE, PREFIX, NC )
-      TYPE = PREFIX
+      CALL KPG1_PGHNM( TYPE, STATUS )
 
 *  Create an array of suitable dimensions within the container file to
 *  store the palette data.
@@ -187,13 +175,13 @@
 
 *  See if a component with this name already exists within the container
 *  file.
-      CALL DAT_THERE( LOC, TYPE( : NC ), THERE, STATUS )
+      CALL DAT_THERE( LOC, TYPE, THERE, STATUS )
 
 *  If so...
       IF( THERE ) THEN
 
 *  Get a locator for it.
-         CALL DAT_FIND( LOC, TYPE( : NC ), PLOC, STATUS )
+         CALL DAT_FIND( LOC, TYPE, PLOC, STATUS )
 
 *  Get its dimensions.
          CALL DAT_SHAPE( PLOC, 2, DIMS, NDIM, STATUS )
@@ -202,7 +190,7 @@
          IF( NDIM .NE. 2 .OR. DIMS( 1 ) .NE. 3 .OR. 
      :       DIMS( 2 ) .NE. NINTS ) THEN
             CALL DAT_ANNUL( PLOC, STATUS )
-            CALL DAT_ERASE( LOC, TYPE( : NC ), STATUS )
+            CALL DAT_ERASE( LOC, TYPE, STATUS )
             THERE = .FALSE.
          END IF
 
@@ -213,8 +201,8 @@
       IF( .NOT. THERE ) THEN
          DIMS( 1 ) = 3
          DIMS( 2 ) = NINTS
-         CALL DAT_NEW( LOC, TYPE( : NC ), '_REAL', 2, DIMS, STATUS ) 
-         CALL DAT_FIND( LOC, TYPE( : NC ), PLOC, STATUS )
+         CALL DAT_NEW( LOC, TYPE, '_REAL', 2, DIMS, STATUS ) 
+         CALL DAT_FIND( LOC, TYPE, PLOC, STATUS )
          ACCESS = 'WRITE'
       ELSE
          ACCESS = 'UPDATE'
@@ -241,7 +229,7 @@
       END IF
 
 *  Store the required section of the colour table in the array.
-      CALL KPG1_PLPUT( LCI1, LCI2, %VAL( PNTR ), STATUS )
+      CALL KPG1_PLPUT( LCI1, LCI2, 0, LCI2, %VAL( PNTR ), STATUS )
 
 *  Tidy up.
 *  ========

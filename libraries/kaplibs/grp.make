@@ -155,7 +155,8 @@ kpg1_expow.f kpg1_logab.f kpg1_logad.f kpg1_logai.f kpg1_logar.f \
 kpg1_logaub.f kpg1_logauw.f kpg1_logaw.f kpg1_cpbdr.f kpg1_pgclr.f \
 kpg1_pgcls.f kpg1_pgopn.f kpg1_asshr.f kpg1_lutky.f kpg1_pvers.f \
 kpg1_is3d.f kpg1_wtm3d.f kpg1_is3r.f kpg1_wtm3r.f kpg1_orvar.f \
-kpg1_lutk2.f kpg1_lutk3.f kpg1_lutk4.f kpg1_pglut.f
+kpg1_lutk2.f kpg1_lutk3.f kpg1_lutk4.f kpg1_pglut.f kpg1_lstar.f  \
+kpg1_ltlod.f  kpg1_ltsav.f
 
 # The contents of the kpg_source.tar file (including expanded generic
 # files and the generic source files):
