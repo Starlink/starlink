@@ -56,10 +56,10 @@
          parameter mode {
             type LITERAL
             access READ
-            vpath CURRENT DEFAULT
+            vpath PROMPT
             ppath CURRENT DEFAULT
             default LIST
-            prompt {Set header write mode (LIST,CONTAINER or ERASE)}
+            prompt {Set header write mode (LIST,CONTAINER or FITS)}
             helpkey *
          }
 
@@ -79,6 +79,44 @@
             ppath CURRENT DEFAULT
             prompt {Add a CCD_SET aligned coordinate frame?}
             default FALSE
+            helpkey *
+         }
+
+         parameter astfile {
+            type LITERAL
+            access READ
+            vpath prompt
+            ppath CURRENT DEFAULT
+            prompt {Name of file containing exported AST framesets}
+            default !
+            helpkey *
+         }
+
+         parameter fitsindex {
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {FITS header keyword indicating Set Index}
+            helpkey *
+         }
+
+         parameter fitsname {
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {FITS header keyword giving Set Name}
+            helpkey *
+         }
+
+         parameter indexvals {
+            type literal
+            access READ
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Mapping of FITINDEX card value to Set Index value}
+            size *
             helpkey *
          }
 
