@@ -41,7 +41,7 @@
 *-
 
 *  Global Constants:
-      INCLUDE '/star/include/msg_par'            ! Size of the MSG system buffer
+      INCLUDE 'MSG_PAR'            ! Size of the MSG system buffer
 
 *  Global Variables:
       CHARACTER * ( MSG__SZMSG ) CCD1_BUFF ! MSG system buffer
