@@ -93,13 +93,19 @@
 
 *  Status:
       INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			FOID			! FileObject
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Locate FileObject
+      CALL ADI_GETFILE( FID, FOID, STATUS )
+
 *  Extract unit number
-      CALL ADI_CGET0I( FID, 'Lun', LUN, STATUS )
+      CALL ADI_CGET0I( FOID, 'Lun', LUN, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_GETLUN', STATUS )
