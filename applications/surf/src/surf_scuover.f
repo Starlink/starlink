@@ -81,6 +81,11 @@
 *     rebinned image).
 *     - Pointing shifts are taken into account.
 
+*  Related Applications:
+*     SURF: REBIN, SCUPA
+*     KAPPA: DISPLAY, GDSET
+*     FIGARO: IMAGE
+
 *  Authors :
 *     JFL: J.Lightfoot (ROE)
 *     TIMJ: T. Jenness (timj@jach.hawaii.edu)
