@@ -1,7 +1,7 @@
       PROGRAM PLOTTER
 
 *  Usage:
-*     PLOTTER <fits file> <attr> <ps file>
+*     PLOTTER <fits file> <attr> <ps file> [<xlo> <ylo> <xhi> <yhi>]
 
 *  Description:
 *     Plots a standard grid from the specified fits header file, using
@@ -16,14 +16,16 @@
 *        settings for the Plot.
 *     ps file
 *        The output postscript file
-*
+*     xlo xhi ylo yhi
+*        The bounds within the GRID Frame of the required plot.
+*        Taken from the FITS headers if not supplied
 
 
       IMPLICIT NONE
       INCLUDE 'AST_PAR'
 
       INTEGER STATUS, FC, FS, NAXIS1, NAXIS2, PL, PGBEG, IARGC
-      CHARACTER FILE*80, CARD*80, DEVN*80, PSFILE*80, ATTR*80
+      CHARACTER FILE*80, CARD*80, DEVN*80, PSFILE*80, ATTR*80, TEXT*80
       REAL GBOX(4), RANGE, DELTA, ASP
       DOUBLE PRECISION PBOX(4)
 
@@ -31,7 +33,8 @@
 * Check command line arguments have been supplied.
 *
       IF( IARGC() .LT. 3 ) THEN
-         WRITE(*,*) 'Usage: plotter <file file> <attrs> <ps file>'
+         WRITE(*,*) 'Usage: plotter <file file> <attrs> <ps file> '//
+     :              '[<xlo> <ylo> <xhi> <yhi>]'
          RETURN
       END IF
 
@@ -57,23 +60,49 @@
 
  10   CLOSE( 10 )
 
+
+*
+*  If the base frame box was supplied on the command line, use it.
+*
+      IF( IARGC() .GT. 6 ) THEN
+         CALL GETARG( 4, TEXT )
+         READ( TEXT, '*' ) PBOX( 1 )
+
+         CALL GETARG( 5, TEXT )
+         READ( TEXT, '*' ) PBOX( 2 )
+
+         CALL GETARG( 6, TEXT )
+         READ( TEXT, '*' ) PBOX( 3 )
+
+         CALL GETARG( 7, TEXT )
+         READ( TEXT, '*' ) PBOX( 4 )
+
+*  Otherwise use NAXISi keywords in the header.
+      ELSE
+
 *
 * See if values were supplied for NAXIS1 and NAXIS2. If not assume a value
 * of 100 for each. The FitsChan is re-wound before calling AST_FINDFITS so
 * that the search starts form the beginning.
 *
-      CALL AST_CLEAR( FC, 'CARD', STATUS )
-      IF ( AST_FINDFITS( FC, 'NAXIS1', CARD, .TRUE., STATUS ) ) THEN
-         READ(CARD(11:),*) NAXIS1
-      ELSE
-         NAXIS1 = 100
-      END IF
+         CALL AST_CLEAR( FC, 'CARD', STATUS )
+         IF ( AST_FINDFITS( FC, 'NAXIS1', CARD, .TRUE., STATUS ) ) THEN
+            READ(CARD(11:),*) NAXIS1
+         ELSE
+            NAXIS1 = 100
+         END IF
+   
+         CALL AST_CLEAR( FC, 'CARD', STATUS )
+         IF ( AST_FINDFITS( FC, 'NAXIS2', CARD, .TRUE., STATUS ) ) THEN
+            READ(CARD(11:),*) NAXIS2
+         ELSE
+            NAXIS2 = 100
+         END IF
 
-      CALL AST_CLEAR( FC, 'CARD', STATUS )
-      IF ( AST_FINDFITS( FC, 'NAXIS2', CARD, .TRUE., STATUS ) ) THEN
-         READ(CARD(11:),*) NAXIS2
-      ELSE
-         NAXIS2 = 100
+         PBOX(3) = 0.0
+         PBOX(2) = 0.0
+         PBOX(1) = DBLE( NAXIS1 )
+         PBOX(4) = DBLE( NAXIS2 )
       END IF
 
 * 
@@ -121,12 +150,6 @@
             RANGE = GBOX(4) - GBOX(2)
             GBOX(2) = GBOX(2) + 0.05*RANGE
             GBOX(4) = GBOX(4) - 0.05*RANGE
-
-            PBOX(3) = 0.0
-            PBOX(2) = 0.0
-            PBOX(1) = DBLE( NAXIS1 )
-            PBOX(4) = DBLE( NAXIS2 )
-
 
             ASP = REAL( NAXIS2 )/REAL( NAXIS1 )
             IF( ASP .GT. 1.0 ) THEN
