@@ -44,6 +44,7 @@ RCSID='$Id$'
 #     --help: display usage and exit.
 #     --version: display version and exit.
 #     --debug: do some debugging.  Specifically, don't tidy up at end.
+#     -n: don't actually run anything, just show what would happen.
 #
 #  Authors:
 #     NG: Norman Gray (Starlink, Glasgow)
@@ -57,7 +58,12 @@ LIBDIR=${STARLINK_SGML_DIR}/lib
 DECL=${STARLINK_SGML_DIR}/dtd/starlink.decl
 STYLESHEET=${STARLINK_SGML_DIR}/dsssl/sl
 
-JADE=jade
+# Binaries
+# Allow the names of the jade and sgmlnorm binaries to be overridden
+# (mostly for testing, though I can imagine _some_ production use of
+# this feature).
+test -n "$JADE"     || JADE=jade
+test -n "$SGMLNORM" || SGMLNORM=sgmlnorm
 JADEFLAGS=
 IMGEQ=$LIBDIR/img-eqlist.pl
 DVI2BITMAP=dvi2bitmap
@@ -288,7 +294,7 @@ if [ -r MANIFEST -o -n "$run" ]; then
 	case $f in
 	*.html)
 	    #sed '/<[aA] *$/{:a;N;s/\n>/ >/;t;s/\n/ /;b a;}' $f >$PACKAGEDIR/$f
-	    $run sgmlnorm -d $DECL $f >$PACKAGEDIR/$f \
+	    $run $SGMLNORM -d $DECL $f >$PACKAGEDIR/$f \
 		2>>$PACKAGEDIR/sgmlnorm.errors
 	    ;;
 	*)
