@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_VASVUW( OEL, INDICE, IEL, INARR, OUTARR, NBAD,
+      SUBROUTINE KPG1_VASV<T>( OEL, INDICE, IEL, INARR, OUTARR, NBAD,
      :                         STATUS )
 *+
 *  Name:
@@ -73,10 +73,10 @@
       INTEGER OEL
       INTEGER IEL
       INTEGER INDICE( OEL )
-      INTEGER*2 INARR( IEL )
+      <TYPE> INARR( IEL )
  
 *  Arguments Returned:
-      INTEGER*2 OUTARR( OEL )
+      <TYPE> OUTARR( OEL )
       INTEGER NBAD
  
 *  Status:
@@ -99,7 +99,7 @@
 *  Check that the index is valid.  Count the number of bad values.
          IF ( INDICE( I ) .EQ. VAL__BADI .OR. INDICE( I ) .LT. 1 .OR.
      :        INDICE( I ) .GT. IEL ) THEN
-            OUTARR( I ) = VAL__BADUW
+            OUTARR( I ) = VAL__BAD<T>
             NBAD = NBAD + 1
  
 *  Use the index to assign an output value.

@@ -30,7 +30,7 @@ KPG_NXD_GEN = kpg1_cmul.gnxd
 # All numeric types
 KPG_N_GEN = kpg1_dara.gn kpg1_frac.gn kpg1_hsta.gn kpg1_thrs.gn \
 kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn kpg1_cadd.gn \
-kpg1_csub.gn kpg1_past.gn kpg1_tdli.gn
+kpg1_csub.gn kpg1_past.gn kpg1_tdli.gn kpg1_vasv.gn
 
 # All except unsigned types
 KPG_BDIRW_GEN = kpg1_iscl.gbdirw
@@ -132,8 +132,7 @@ kpg1_trlib.f kpg1_trlid.f kpg1_trlii.f \
 kpg1_trlir.f kpg1_trliub.f kpg1_trliuw.f kpg1_trliw.f  \
 kpg1_trspb.f kpg1_trspd.f kpg1_trspi.f kpg1_trspr.f \
 kpg1_trspub.f kpg1_trspuw.f kpg1_trspw.f kpg1_unz2d.f kpg1_unz2r.f \
-kpg1_vasvb.f kpg1_vasvd.f kpg1_vasvi.f kpg1_vasvr.f kpg1_vasvub.f \
-kpg1_vasvuw.f kpg1_vasvw.f kpg1_vec2n.f kpg1_wmodb.f \
+kpg1_vec2n.f kpg1_wmodb.f \
 kpg1_wmodd.f kpg1_wmodi.f kpg1_wmodr.f kpg1_wmodub.f kpg1_wmoduw.f \
 kpg1_wmodw.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f \
 ld2ar.f logarr.f normal.f \
