@@ -138,7 +138,7 @@
 	>
 
 <!--==================== Element structure ====================-->
-<!ELEMENT programcode	O O (docblock, (codegroup | codereference)+)
+<!ELEMENT programcode	O O (docblock, routine*, (codegroup | codereference)*)
 		-- Document element -->
 <!ELEMENT codegroup	- O (docblock, routine+)
 		-- A codegroup is a collection of functions or other
@@ -162,7 +162,8 @@
 
 <!ELEMENT docblock	O O (title, description?,
 			     userkeywords?, softwarekeywords?,
-			     authorlist?, copyright?, history?)>
+			     copyright?, history?) 			     -- authorlist?, --
+>
 
 <!ELEMENT routine	O O (codeopener?, routineprologue, codebody)
 		-- The specification of one function, or procedure or
@@ -355,9 +356,11 @@
 				   distinct from `parameters', which
 				   are the arguments for ADAM
 				   applications. -->
-<!ELEMENT examplelist	O O ((example,description)+)>
+<!ELEMENT examplelist	O O ((example,examplenote)+)>
 <!ELEMENT example	- O (#PCDATA) 
 				-- text of the example, set in tt font -->
+<!ELEMENT examplenote	- O (%paralist;)
+				-- discussion of the example -->
 <!ELEMENT funcname - - (#PCDATA)
 			-- funcname : the name of a function,
 			   presumably in the same broad collection of
@@ -396,21 +399,46 @@
 		#IMPLIED
 	>
 
-<!-- The AUTHOR element includes full details about an author and has
-     a required ID attribute, the AUTHORREF element simply refers to an
-     AUTHOR element elsewhere using an IDREF.  We need the distinction
-     since it follows that a document can have only one AUTHOR element
-     per author.  If the actual text of a document is scattered amongst
-     several source-code files, then it would be appropriate for the
-     scattered files to have AUTHORREF elements, and for the
-     corresponding AUTHOR element to be in a CODEGROUPHEAD element in a
-     `master' file which collects together the source-code files for
-     documentation purposes.  It might be appropriate to let the
-     AUTHORREF element have some content, so that a suitable note can go
-     in the source-code file, to make it more nearly standalone.
-     -->
+
+<!-- The AUTHOR element collects information about an author.  There
+     is no central location for this information, but it is instead
+     gathered from the scattered AUTHOR elements.  The `id' for each
+     author is not an SGML ID, but is a keyword which is supposed to
+     be distinct for different authors.  The problem is that the
+     routine elements are typically maintained in _separate_ source
+     files, but also have to be standalone as human-readable files.
+     That means (a) the information will typically be duplicated, and
+     (b), the ids couldn't be SGML IDs, since there's only one of each
+     of those in a document.  A design in which the author elements in
+     the routines _do_ have IDs which link to some other repository of
+     details is attractive, but turns out to be impractical, since
+     that forces the author of the skeleton document which collects
+     all these files to collect all the author information together.
+     On balance, it seems adequate to have in-principle distinct
+     author elements scattered amongst the program source files,
+     rather loosely linked by the non-ID ids.
+
+     For completeness (and comparison), here's the documentation of
+     the old design: The AUTHOR element includes full details about an
+     author and has a required ID attribute, the AUTHORREF element
+     simply refers to an AUTHOR element elsewhere using an IDREF.  We
+     need the distinction since it follows that a document can have
+     only one AUTHOR element per author.  If the actual text of a
+     document is scattered amongst several source-code files, then it
+     would be appropriate for the scattered files to have AUTHORREF
+     elements, and for the corresponding AUTHOR element to be in a
+     CODEGROUPHEAD element in a `master' file which collects together
+     the source-code files for documentation purposes.  It might be
+     appropriate to let the AUTHORREF element have some content, so
+     that a suitable note can go in the source-code file, to make it
+     more nearly standalone.  -->
+<![ IGNORE [
 <!ELEMENT authorlist	O O ((author+ | authorref+), otherauthors?)>
 <!ELEMENT otherauthors	- O (author+ | authorref+)
+				-- other authors who have contributed -->
+]]>
+<!ELEMENT authorlist	O O (author+, otherauthors?)>
+<!ELEMENT otherauthors	- O (author+)
 				-- other authors who have contributed -->
 <!ELEMENT history	O O (change+)
 				-- the changes should be in
@@ -423,7 +451,9 @@
 <!ELEMENT authornote	- O (%paralist;)
 				-- Other information/notes about this
 				   author -->
+<![ IGNORE [
 <!ELEMENT authorref	- O (#PCDATA)>
+]]>
 <!ELEMENT change	- O (%paralist;)>
 <!ELEMENT parameter	- O (name, type, description)>
 <!ELEMENT type		- O (#PCDATA)>
@@ -450,7 +480,7 @@
 
 <!ATTLIST author
 	id		-- identify author --
-		ID
+		CDATA
 		#REQUIRED
 	affiliation	-- where based --
 		CDATA
@@ -463,6 +493,7 @@
 		#IMPLIED
 	-- etc... add further author details --
 	>
+<![ IGNORE [
 <!ATTLIST authorref
 	id		-- refer to author --
 		IDREF
@@ -478,9 +509,10 @@
 		CDATA
 		#IMPLIED
 	>
+]]>
 <!ATTLIST change
 	author		-- who made this mod? --
-		IDREF
+		CDATA
 		#REQUIRED
 	date		-- ... and when? --
 		CDATA
