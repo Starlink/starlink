@@ -13,10 +13,10 @@
 #     The script creates a series of test frames using CCDBGEN. It
 #     then executes various of the CCDPACK Atasks, as well as a few 
 #     KAPPA ones, simulating a data reduction sequence. 
-#     Intermediary results are displayed (if requested).
-#     The process is repeated for increasingly large images:
+#     Intermediary results are displayed on a graphics device (if requested).
+#     The process is repeated for different image sizes:
 #     both the size of the image in pixels and the number of objects
-#     per image is changed.
+#     per image can be changed.
 #     By modifying the assignments at the head of the script some
 #     aspects of the reduction process and characteristics of the 
 #     synthetic data can be controlled.
@@ -66,7 +66,7 @@
       # (else interpolate between bias strips)
             set biasframe = TRUE
 
-      # Do we want to normalize the frames for scale and zero factors?
+      # Do we want to normalise the frames for scale and zero factors?
             set normalise = TRUE
 
       # Data type (_WORD, _INTEGER, _REAL or _DOUBLE)
@@ -195,10 +195,12 @@
 
 #  Generate file containing objects for use by ccdbgen:
 #  First strip comments and blank lines,
+#  then sort for more efficient test data generation,
 #  then select fields and scale by image size.
             rm -f ccdtest_obj.dat
             sed -e'/^ *#/d' -e'/^ *$/d' ccdbig_obj.dat  \
-          | awk 'NR <= '$objects' { print $1, $2*'$field_pixels', $3*'$field_pixels', $4*0.1, $5 }' \
+          | sort -n -k 3 \
+          | awk 'NR <= '$objects' { print NR, $2*'$field_pixels', $3*'$field_pixels', $4*0.1, $5 }' \
           > ccdtest_obj.dat
             set lines = `cat ccdtest_obj.dat | wc -l`
             if ( "$lines" < "$objects" ) then
@@ -629,4 +631,4 @@
 #  Exit label
      EXIT:
      exit
-# $Id: ccdbig_link_adam,v 1.2 1998/07/01 16:46:44 mbt Exp $
+# $Id: ccdbig,v 1.23 1998/07/06 14:22:08 mbt Exp $
