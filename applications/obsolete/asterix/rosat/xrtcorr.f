@@ -1413,10 +1413,6 @@ D        WRITE(*,*) RLP
       ENDIF
 
       END
-      CALL XRTCORR_DOIT(LOCOUT, HEAD, NX, NY, NT, NP, NR, NWIRE,
-     &          NTHRESH, %val(CDPNTR), %val(PVSING), PSING,
-     &          %val(CIVPNTR), %val(CTPNTR), %val(CWPNTR), %val(DXPNTR),
-     &          %val(DPNTR), %val(VPNTR), %val(QPNTR),STATUS)
 
 *+  XRTCORR_DOIT - apply corrections to an XRT data array
       SUBROUTINE XRTCORR_DOIT(LOC, HEAD, NX, NY, NT, NP, NR,
