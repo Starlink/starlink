@@ -930,7 +930,7 @@ static int write_wrapper(Sysattr *sys, Function *fn)
 /*
  * Compose the wrapper file name.
  */
-  sprintf(buffer, "%s.c", "pgbind_generated");
+  sprintf(buffer, "%s.c", "cpgplot");
 /*
  * Open the wrapper file.
  */
