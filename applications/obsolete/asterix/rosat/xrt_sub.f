@@ -263,7 +263,7 @@
             DO LPX=1,NX
 *
                IF ( (QUAL(LPX,LPY,1,1,1) .AND. MASK)
-     &                                         .EQ. QUAL_GOOD ) THEN
+     &                                         .EQ. QUAL__GOOD ) THEN
                   PCOUNT = PCOUNT + 1
 *
 *       Sum the offset angles of each GOOD pixel. (Relies on the X axis

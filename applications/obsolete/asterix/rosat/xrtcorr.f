@@ -1035,7 +1035,7 @@ D            WRITE(3,*)EXPOS(TLP)
             DCORR(LP) = 1.0
 *
 *      If quality of this bin is good - increment error counter
-            IF (QUAL(LP) .EQ. QUAL_GOOD) GQERR = GQERR + 1
+            IF (QUAL(LP) .EQ. QUAL__GOOD) GQERR = GQERR + 1
 
          ENDIF
 *
@@ -1474,7 +1474,7 @@ D                  WRITE(2,*)DCORR(TLP),EXPOS(TLP)
 *
 *       Check exposure time is non-zero
                   IF (EXPOS(TLP) .GT. 0.0 .AND.
-     &               QUAL(XLP,YLP,TLP,PLP,RLP) .EQ. QUAL_GOOD) THEN
+     &               QUAL(XLP,YLP,TLP,PLP,RLP) .EQ. QUAL__GOOD) THEN
 *
                      TOT_CORR = DCORR(TLP) * TCORR(1) * PCORR *
      &                           VCORR(RLP) * WCORR(1) / EXPOS(TLP)
@@ -1486,16 +1486,16 @@ D                  WRITE(2,*)DCORR(TLP),EXPOS(TLP)
      &                  VAR(XLP,YLP,TLP,PLP,RLP) * TOT_CORR * TOT_CORR
 *
                   ELSEIF (QUAL(XLP,YLP,TLP,PLP,RLP) .EQ.
-     &                                          QUAL_GOOD) THEN
+     &                                          QUAL__GOOD) THEN
 *
-                     QUAL(XLP,YLP,TLP,PLP,RLP) = QUAL_BAD
+                     QUAL(XLP,YLP,TLP,PLP,RLP) = QUAL__BAD
 *
                   ENDIF
 
 *    Set variance good if quality has been set bad. This is to avoid the
 *    plots looking stupid. The t-series analysis routines wont use these
 *    pixels anyway.
-                  IF (QUAL(XLP,YLP,TLP,PLP,RLP) .NE. QUAL_GOOD) THEN
+                  IF (QUAL(XLP,YLP,TLP,PLP,RLP) .NE. QUAL__GOOD) THEN
                      VAR(XLP,YLP,TLP,PLP,RLP) = 0
                   ENDIF
 *
@@ -1699,7 +1699,7 @@ D                  WRITE(2,*)DCORR(TLP),EXPOS(TLP)
          CALL ARR_INIT1B(0, NELS, %val(TQPNTR),STATUS)
 *
 *  Create mask in output file
-         MASK=QUAL_MASK
+         MASK=QUAL__MASK
          CALL BDA_PUTMASK(LOCIN, MASK, STATUS)
 *
       ENDIF
@@ -2509,7 +2509,7 @@ C
       DO TLP=1,NT
 *
 *   Set output quality bad
-         OQUAL(TLP) = QUAL_BAD
+         OQUAL(TLP) = QUAL__BAD
 *
          DO XLP=1,NX
            DO YLP=1,NY
@@ -2518,7 +2518,7 @@ C
 *
 *     If this bin is good - set output quality good
                IF ( (IQUAL(XLP,YLP,TLP,PLP,RLP) .AND. MASK) .EQ. 0) THEN
-                  OQUAL(TLP) = QUAL_GOOD
+                  OQUAL(TLP) = QUAL__GOOD
                ENDIF
 *
              ENDDO
