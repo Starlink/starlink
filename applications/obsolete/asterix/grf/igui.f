@@ -195,6 +195,22 @@
         CALL NBS_DEFINE_PRIMITIVE(ID,'REGYMAX','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
 
+*  background modeller
+        CALL NBS_DEFINE_PRIMITIVE(ID,'BG_RMS','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'BG_MAXR','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'BG_MAXX','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'BG_MAXY','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'BG_MINR','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'BG_MINX','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'BG_MINY','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+
 *  colour table
         CNAME='DATA'
         DO I=1,9
