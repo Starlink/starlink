@@ -9,22 +9,21 @@
 *    History :
 *      3 May 90 : Original (RJV)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     27 Mar 95 : V1.8-0 uses BIT_ (RJV)
+*     27 Mar 95 : V1.8-1 Uses BIT_ (RJV)
+*     24 Apr 95 : V1.8-2 Updated data interfaces (DJA)
+*
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *    Status :
       INTEGER STATUS
 *    Local Constants :
 
       CHARACTER*(30) VERSION		! version ID
-         PARAMETER (VERSION='PROJECT Version 1.8-1')
+         PARAMETER (VERSION='PROJECT Version 1.8-2')
+
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) ILOC       ! input dataset locator
-      CHARACTER*(DAT__SZLOC) OLOC       ! output dataset locator
-      CHARACTER*(DAT__SZLOC) RECORD     ! history record locator
-      CHARACTER*(DAT__SZTYP) TYPE       ! input dataset type
       CHARACTER*80           TEXT(8)    ! history text
       CHARACTER*80           ITEXT(4)   ! name of input file
       CHARACTER*80           OTEXT(4)   ! name of output file
@@ -33,17 +32,16 @@
       LOGICAL OK			! data valid
       LOGICAL VOK			! Data VARIANCE present
       LOGICAL QOK                       ! data quality present
-      LOGICAL INPRIM                    ! Primitive input?
       INTEGER NDIM			! # dimensions
       INTEGER NVQDIM			! # dimensions
-      INTEGER DIMS(DAT__MXDIM)   	! data_array dimensions
-      INTEGER VQDIMS(DAT__MXDIM)   	! data_array dimensions
+      INTEGER DIMS(ADI__MXDIM)   	! data_array dimensions
+      INTEGER VQDIMS(ADI__MXDIM)   	! data_array dimensions
       INTEGER NDIMQ			! # dimensions QUALITY
       INTEGER NDIMV			! # dimensions data VARIANCE
       INTEGER NP			! length of projected axis
-      INTEGER EQDIM(DAT__MXDIM)		! equivalent output bins in input
+      INTEGER EQDIM(ADI__MXDIM)		! equivalent output bins in input
       INTEGER ONDIM			! # dimensions for output
-      INTEGER ODIMS(DAT__MXDIM)   	! data_array dimensions
+      INTEGER ODIMS(ADI__MXDIM)   	! data_array dimensions
       INTEGER PAX                       ! projection axis
       INTEGER DPTR	              ! data
       INTEGER QPTR	              ! quality
@@ -52,6 +50,10 @@
       INTEGER QPTRO	              ! quality
       INTEGER VPTRO	              ! data VARIANCE
       INTEGER I,J
+
+      INTEGER			IFID			! Input dataset id
+      INTEGER			OFID			! Output dataset id
+
       BYTE MASK                      	! QUALITY mask
       INTEGER INLINES                	! # lines input name
       INTEGER ONLINES                	! # line output name
@@ -62,11 +64,11 @@
       CALL AST_INIT()
 
 * Associate input dataset
-      CALL USI_ASSOCI ('INP','READ',ILOC,INPRIM,STATUS)
+      CALL USI_TASSOCI ('INP','OUT','READ',IFID,OFID,STATUS)
       CALL USI_NAMEI(INLINES,ITEXT,STATUS)
 
 * Check input dataset
-      CALL BDA_CHKDATA(ILOC,OK,NDIM,DIMS,STATUS)
+      CALL BDI_CHKDATA(IFID,OK,NDIM,DIMS,STATUS)
 
       IF(.NOT.OK) THEN
         CALL MSG_PRNT('AST_ERR: invalid input data')
@@ -76,18 +78,11 @@
         STATUS=SAI__ERROR
       ENDIF
 
-* Obtain type of dataset
-      CALL DAT_TYPE(ILOC,TYPE,STATUS)
-
-* create output  dataset
-      CALL USI_ASSOCO('OUT',TYPE,OLOC,STATUS)
-
-
       IF (STATUS .NE. SAI__OK) GOTO 9000
 
 * find out axes to project
       DO I=1,NDIM
-        CALL BDA_GETAXLABEL(ILOC,I,STRING,STATUS)
+        CALL BDI_GETAXLABEL(IFID,I,STRING,STATUS)
         CALL MSG_SETC('STRING',STRING)
         CALL MSG_SETI('I',I)
         CALL MSG_PRNT( 'Axis ^I is ^STRING' )
@@ -100,9 +95,8 @@
         STATUS=SAI__ERROR
       ENDIF
 
-
 * check if projected axis normalised
-      CALL BDA_GETAXNORM(ILOC,PAX,NORM,STATUS)
+      CALL BDI_GETAXNORM(IFID,PAX,NORM,STATUS)
       NP=DIMS(PAX)
 
 * set up dummy dimensions for coerced data (coerced to 7-D)
@@ -111,21 +105,20 @@
       ENDDO
 
 * map DATA
-      CALL BDA_MAPDATA(ILOC,'READ',DPTR,STATUS)
+      CALL BDI_MAPDATA(IFID,'READ',DPTR,STATUS)
 
 * map QUALITY if present
-      CALL BDA_CHKQUAL(ILOC,QOK,NVQDIM,VQDIMS,STATUS)
+      CALL BDI_CHKQUAL(IFID,QOK,NVQDIM,VQDIMS,STATUS)
       IF (QOK) THEN
-        CALL BDA_MAPQUAL(ILOC,'READ',QPTR,STATUS)
-        CALL BDA_GETMASK(ILOC,MASK,STATUS)
+        CALL BDI_MAPQUAL(IFID,'READ',QPTR,STATUS)
+        CALL BDI_GETMASK(IFID,MASK,STATUS)
       ENDIF
 
 * map VARIANCE if present
-      CALL BDA_CHKVAR(ILOC,VOK,NVQDIM,VQDIMS,STATUS)
+      CALL BDI_CHKVAR(IFID,VOK,NVQDIM,VQDIMS,STATUS)
       IF(VOK) THEN
-        CALL BDA_MAPVAR(ILOC,'READ',VPTR,STATUS)
+        CALL BDI_MAPVAR(IFID,'READ',VPTR,STATUS)
       ENDIF
-
 
 * work out output dimensions taking projection into account
       J=1
@@ -141,27 +134,27 @@
 * create output data components
 
 * textual lables
-      CALL BDA_COPTEXT(ILOC,OLOC,STATUS)
+      CALL BDI_COPTEXT(IFID,OFID,STATUS)
 
 * DATA
-      CALL BDA_CREDATA(OLOC,ONDIM,ODIMS,STATUS)
-      CALL BDA_MAPDATA(OLOC,'WRITE',DPTRO,STATUS)
+      CALL BDI_CREDATA(OFID,ONDIM,ODIMS,STATUS)
+      CALL BDI_MAPDATA(OFID,'WRITE',DPTRO,STATUS)
 * QUALITY
       IF (QOK) THEN
-        CALL BDA_CREQUAL(OLOC,ONDIM,ODIMS,STATUS)
-        CALL BDA_MAPQUAL(OLOC,'WRITE',QPTRO,STATUS)
-        CALL BDA_PUTMASK(OLOC,MASK,STATUS)
+        CALL BDI_CREQUAL(OFID,ONDIM,ODIMS,STATUS)
+        CALL BDI_MAPQUAL(OFID,'WRITE',QPTRO,STATUS)
+        CALL BDI_PUTMASK(OFID,MASK,STATUS)
       ENDIF
 * VARIANCE if required
       IF(VOK) THEN
-        CALL BDA_CREVAR(OLOC,ONDIM,ODIMS,STATUS)
-        CALL BDA_MAPVAR(OLOC,'WRITE',VPTRO,STATUS)
+        CALL BDI_CREVAR(OFID,ONDIM,ODIMS,STATUS)
+        CALL BDI_MAPVAR(OFID,'WRITE',VPTRO,STATUS)
       ENDIF
 
-      CALL BDA_CREAXES(OLOC,ONDIM,STATUS)
+      CALL BDI_CREAXES(OFID,ONDIM,STATUS)
       DO I=1,ONDIM
 * copy axis values etc from input
-        CALL BDA_COPAXIS(ILOC,OLOC,EQDIM(I),I,STATUS)
+        CALL BDI_COPAXIS(IFID,OFID,EQDIM(I),I,STATUS)
       ENDDO
 
 
@@ -173,26 +166,26 @@
      :       %VAL(DPTRO),%VAL(VPTRO),%VAL(QPTRO),STATUS)
 
 * Copy and update history
-      CALL HIST_COPY(ILOC,OLOC,STATUS)
-      CALL HIST_ADD(OLOC,VERSION,STATUS)
-      CALL HIST_PTXT(OLOC,INLINES,ITEXT,STATUS)
+      CALL HSI_COPY(IFID,OFID,STATUS)
+      CALL HSI_ADD(OFID,VERSION,STATUS)
+      CALL HSI_PTXT(OFID,INLINES,ITEXT,STATUS)
       CALL USI_NAMEO(ONLINES,OTEXT,STATUS)
-      CALL HIST_PTXT(OLOC,ONLINES,OTEXT,STATUS)
+      CALL HSI_PTXT(OFID,ONLINES,OTEXT,STATUS)
       TEXT(1)='Axis   collapsed'
       WRITE(TEXT(1)(6:6),'(I1)') PAX
 * Write this into history structure
-      CALL HIST_PTXT(OLOC,2,TEXT,STATUS)
+      CALL HSI_PTXT(OFID,2,TEXT,STATUS)
 
 * Copy over ancillary components
-      CALL BDA_COPMORE(ILOC,OLOC,STATUS)
+      CALL BDI_COPMORE(IFID,OFID,STATUS)
 
 * Tidy up
 9000  CONTINUE
 
-      CALL BDA_UNMAP(OLOC,STATUS)
-      CALL BDA_UNMAP(ILOC,STATUS)
-      CALL USI_ANNUL(ILOC,STATUS)
-      CALL USI_ANNUL(OLOC,STATUS)
+      CALL BDI_UNMAP(OFID,STATUS)
+      CALL BDI_UNMAP(IFID,STATUS)
+      CALL USI_TANNUL(IFID,STATUS)
+      CALL USI_TANNUL(OFID,STATUS)
 
       CALL AST_CLOSE()
       CALL AST_ERR(STATUS)
