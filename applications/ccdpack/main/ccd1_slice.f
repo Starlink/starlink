@@ -1,7 +1,7 @@
-      SUBROUTINE IRG1_SLICE( NAME, SLICE, START, STATUS )
+      SUBROUTINE CCD1_SLICE( NAME, SLICE, START, STATUS )
 *+
 *  Name:
-*     IRG1_SLICE
+*     CCD1_SLICE
 
 *  Purpose:
 *     Find and remove any NDF slice specification from a name.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRG1_SLICE( NAME, SLICE, START, STATUS )
+*     CALL CCD1_SLICE( NAME, SLICE, START, STATUS )
 
 *  Description:
 *     A slice specification is taken to be anything between the first
@@ -35,11 +35,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     19-SEP-1991 (DSB):
 *        Original version.
+*     29-JUN-2000 (MBT):
+*        Renamed from IRG1_SLICE to CCD1_SLICE.
 *     {enter_changes_here}
 
 *  Bugs:

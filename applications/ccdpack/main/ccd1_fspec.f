@@ -1,7 +1,7 @@
-      SUBROUTINE IRG1_FSPEC( FSPEC, DFSPEC, FLDNAM, FIELD, STATUS )
+      SUBROUTINE CCD1_FSPEC( FSPEC, DFSPEC, FLDNAM, FIELD, STATUS )
 *+
 *  Name:
-*     IRG1_FSPEC
+*     CCD1_FSPEC
 
 *  Purpose:
 *     Produces a new file specification by modification of an old file
@@ -11,7 +11,7 @@
 *     Fortran-77.
 
 *  Invocation:
-*     CALL IRG1_FSPEC( FSPEC, DFSPEC, FLDNAM, FIELD, STATUS )
+*     CALL CCD1_FSPEC( FSPEC, DFSPEC, FLDNAM, FIELD, STATUS )
 
 *  Description:
 *     This is a UNIX specific routine.
@@ -45,11 +45,14 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     27-FEB-1992 (PDRAPER):
 *        Original Unix version - based on VMS version of same name.
+*     29-JUN-2000 (MBT):
+*        Renamed from IRG1_FSPEC to CCD1_FSPEC.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -62,8 +65,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'IRH_PAR'          ! IRH parameters.
-      INCLUDE 'IRG_ERR'          ! IRG error values.
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Arguments Given:
       CHARACTER * ( * ) FSPEC
@@ -82,13 +84,13 @@
                                  ! string.
 
 *  Local Variables:
-      CHARACTER * ( IRH__SZNAM ) DIR1 ! Directory specification in FSPEC
-      CHARACTER * ( IRH__SZNAM ) DIR2 ! Directory specification in
+      CHARACTER * ( GRP__SZNAM ) DIR1 ! Directory specification in FSPEC
+      CHARACTER * ( GRP__SZNAM ) DIR2 ! Directory specification in
                                       ! DFSPEC
-      CHARACTER * ( IRH__SZNAM ) NAM1 ! Name specification in FSPEC
-      CHARACTER * ( IRH__SZNAM ) NAM2 ! Name specification in DFSPEC
-      CHARACTER * ( IRH__SZNAM ) TYP1 ! Type specification in FSPEC
-      CHARACTER * ( IRH__SZNAM ) TYP2 ! Type specification in DFSPEC
+      CHARACTER * ( GRP__SZNAM ) NAM1 ! Name specification in FSPEC
+      CHARACTER * ( GRP__SZNAM ) NAM2 ! Name specification in DFSPEC
+      CHARACTER * ( GRP__SZNAM ) TYP1 ! Type specification in FSPEC
+      CHARACTER * ( GRP__SZNAM ) TYP2 ! Type specification in DFSPEC
       CHARACTER UPFLD * ( 2 )    ! First two characters of FLDNAM
                                  ! converted to upper case.
       INTEGER DIREND             ! Position of last directory character
@@ -114,7 +116,7 @@
 
 *  Parse input file name into directory, name and type.
 *  Look for directory terminator first -- last '/'
-      CALL IRG1_LASTO( FSPEC, '/', DIREND, STATUS )
+      CALL CCD1_LASTO( FSPEC, '/', DIREND, STATUS )
       IF ( DIREND .EQ. 0 ) THEN
 
 *  No directory information just supply a blank.
@@ -182,7 +184,7 @@
 
 *  Parse input file name into directory, name and type.
 *  Look for directory terminator first -- last '/'
-      CALL IRG1_LASTO( DFSPEC, '/', DIREND, STATUS )
+      CALL CCD1_LASTO( DFSPEC, '/', DIREND, STATUS )
       IF ( DIREND .EQ. 0 ) THEN
 
 *  No directory information just supply a blank.
@@ -285,10 +287,10 @@
 
 *  If the field name was unrecognised, report an error.
          ELSE
-            STATUS = IRG__BADFN
+            STATUS = SAI__ERROR
             CALL MSG_SETC( 'NAM', FLDNAM )
-            CALL ERR_REP( 'IRG1_FSPEC_ERR1',
-     :              'IRG1_FSPEC: Unrecognised field requested - "^NAM"',
+            CALL ERR_REP( 'CCD1_FSPEC_ERR1',
+     :              'CCD1_FSPEC: Unrecognised field requested - "^NAM"',
      :               STATUS )
             GO TO 999
          END IF
