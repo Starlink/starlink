@@ -13694,6 +13694,45 @@ default value.
    }
    \sstparameters{
       \sstsubsection{
+         CATFRAME = LITERAL (Read)
+      }{
+         A string determining the co-ordinate Frame in which positions are
+         to be stored in the output catalogue associated with parameter
+         OUTCAT. The string supplied for CATFRAME can be one of the
+         following:
+
+         \sstitemlist{
+
+            \sstitem
+            A Domain name such as SKY, AXIS, PIXEL, \emph{etc}.
+
+            \sstitem
+            An integer value giving the index of the required Frame.
+
+            \sstitem
+            An IRAS90 Sky Co-ordinate System (SCS) values such as
+            EQUAT(J2000) (see SUN/163).
+
+         }
+         If a null (!) value is supplied, the positions will be stored
+         in a SKY Frame, if a SKY Frame is available within the input
+         catalogue. Otherwise, they will be stored in PIXEL co-ordinates,
+         if a PIXEL Frame is available within the input catalogue.
+         Otherwise, they are stored in the base Frame of the supplied
+         WCS information. {\tt [!]}
+      }
+      \sstsubsection{
+         CATEPOCH = DOUBLE PRECISION (Read)
+      }{
+         The epoch at which the sky positions stored in the output
+         catalogue were determined. It will only be accessed if an epoch
+         value is needed to qualify the co-ordinate Frame specified by
+         COLFRAME. If required, it should be given as a decimal years
+         value, with or without decimal places ({\tt "}1996.8{\tt "} for example).
+         Such values are interpreted as a Besselian epoch if less than
+         1984.0 and as a Julian epoch otherwise.
+      }
+      \sstsubsection{
          CENTRE  = LITERAL (Write)
       }{
          The formatted co-ordinates of the last centroid position, in
@@ -13867,7 +13906,7 @@ default value.
       }{
          The output catalogue in which to store the centroided positions.
          If a null value (!) is supplied, no output catalogue is produced.
-         {\tt [!]}
+         See also parameter CATFRAME. {\tt [!]}
       }
       \sstsubsection{
          PLOTSTYLE = LITERAL (Read)
@@ -14000,11 +14039,12 @@ default value.
          file centroids.log.
       }
       \sstexamplesubsection{
-         centroid cluster mode=cat incat=a outcat=b
+         centroid cluster mode=cat incat=a outcat=b catframe=ecl
       }{
          This example reads the initial guess positions from the
          positions list in file a.FIT, and writes the accurate centroid
-         positions to positions list file b.FIT. The input file may, for
+         positions to positions list file b.FIT, storing the output
+         positions in ecliptic co-ordinates. The input file may, for
          instance, have been created using the application CURSOR.
       }
    }
@@ -16502,7 +16542,6 @@ default value.
       }
    }
 }
-
 \sstroutine{
    CURSOR
 }{
@@ -16533,24 +16572,63 @@ default value.
    }
    \sstparameters{
       \sstsubsection{
+         CATFRAME = LITERAL (Read)
+      }{
+         A string determining the co-ordinate Frame in which positions are
+         to be stored in the output catalogue associated with parameter
+         OUTCAT. The string supplied for CATFRAME can be one of the
+         following:
+
+         \sstitemlist{
+
+            \sstitem
+            A Domain name such as SKY, AXIS, PIXEL, \emph{etc}.
+
+            \sstitem
+            An integer value giving the index of the required Frame.
+
+            \sstitem
+            An IRAS90 Sky Co-ordinate System (SCS) values such as
+            EQUAT(J2000) (see SUN/163).
+
+         }
+         If a null (!) value is supplied, the positions will be stored
+         in a SKY Frame, if a SKY Frame is available within the input
+         catalogue. Otherwise, they will be stored in PIXEL co-ordinates,
+         if a PIXEL Frame is available within the input catalogue.
+         Otherwise, they are stored in the base Frame of the supplied
+         WCS information. {\tt [!]}
+      }
+      \sstsubsection{
+         CATEPOCH = DOUBLE PRECISION (Read)
+      }{
+         The epoch at which the sky positions stored in the output
+         catalogue were determined. It will only be accessed if an epoch
+         value is needed to qualify the co-ordinate Frame specified by
+         COLFRAME. If required, it should be given as a decimal years
+         value, with or without decimal places ({\tt "}1996.8{\tt "} for example).
+         Such values are interpreted as a Besselian epoch if less than
+         1984.0 and as a Julian epoch otherwise.
+      }
+      \sstsubsection{
          CLOSE = \_LOGICAL (Read)
       }{
          This parameter is only accessed if parameter PLOT is set to
-         {\tt "}Chain{\tt "} or {\tt "}Poly{\tt "}. If {\tt TRUE}, polygons will be closed by joining
-         the first position to the last position. {\tt [}current value{\tt ]}
+         {\tt "}Chain{\tt "} or {\tt "}Poly{\tt "}. If TRUE, polygons will be closed by joining
+         the first position to the last position. {\tt [current value]}
       }
       \sstsubsection{
          DESCRIBE = \_LOGICAL (Read)
       }{
-         If {\tt TRUE}, a detailed description of the co-ordinate Frame in which
+         If TRUE, a detailed description of the co-ordinate Frame in which
          subsequent positions will be reported is produced each time a
-         position is reported within a new picture. {\tt [}current value{\tt ]}
+         position is reported within a new picture. {\tt [current value]}
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
          The graphics workstation.  This device must support cursor
-         interaction. [current graphics device]
+         interaction. {\tt [current graphics device]}
       }
       \sstsubsection{
          EPOCH = \_DOUBLE (Read)
@@ -16568,7 +16646,7 @@ default value.
       }{
          A string determining the co-ordinate Frame in which positions are
          to be reported. When a data array is displayed by an application
-         such as DISPLAY, CONTOUR, etc, WCS information describing the co-ordinate
+         such as DISPLAY, CONTOUR, \emph{etc}, WCS information describing the co-ordinate
          systems known to the data array are stored with the DATA picture
          in the graphics database. This application can report positions in
          any of the co-ordinate Frames stored with each picture. The
@@ -16577,7 +16655,7 @@ default value.
          \sstitemlist{
 
             \sstitem
-            A domain name such as SKY, AXIS, PIXEL, {\it etc.}\ The special domains
+            A domain name such as SKY, AXIS, PIXEL, \emph{etc}. The special domains
             AGI\_WORLD and AGI\_DATA are used to refer to the world and data
             co-ordinate system stored in the AGI graphics database. They can
             be useful if no WCS information was store with the picture when
@@ -16587,14 +16665,13 @@ default value.
             An integer value giving the index of the required Frame.
 
             \sstitem
-            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) 
-            (see section \latexelsehtml{Section~\ref{se:scs}}{\htmlref{here}{se:scs}} ).
-
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
+            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95).
 
          }
-         If a null value ({\tt !}) is supplied, positions are reported in the
+         If a null value (!) is supplied, positions are reported in the
          co-ordinate Frame which was current when the picture was created.
-         [!]
+         {\tt [!]}
       }
       \sstsubsection{
          GEODESIC = \_LOGICAL (Read)
@@ -16611,22 +16688,22 @@ default value.
       \sstsubsection{
          INFO = \_LOGICAL (Read)
       }{
-         If {\tt TRUE} then messages are displayed describing the use of the
+         If TRUE then messages are displayed describing the use of the
          mouse prior to obtaining the first position. Note, these
          informational messages are not suppressed by setting parameter
-         QUIET to {\tt TRUE}. {\tt [TRUE]}
+         QUIET to TRUE. {\tt [TRUE]}
       }
       \sstsubsection{
          JUST = LITERAL (Read)
       }{
-         A string specifying the justification to be used when displaying 
-         text strings at the supplied cursor positions. This parameter is 
-         only accessed if parameter PLOT is set to {\tt "Text"}. The supplied
-         string should contain two characters; the first should be {\tt "B"},
-         {\tt "C"} or {\tt "T"}, meaning bottom, centre or top. The second 
-         should be {\tt "L"}, {\tt "C"} or {\tt "R"}, meaning left, centre or 
-         right. The text is displayed so that the supplied position is at the 
-         specified point within the displayed text string. {\tt [CC] }
+         A string specifying the justification to be used when displaying
+         text strings at the supplied cursor positions. This parameter is
+         only accessed if parameter PLOT is set to {\tt "}Text{\tt "}. The supplied
+         string should contain two characters; the first should be {\tt "}B{\tt "},
+         {\tt "}C{\tt "} or {\tt "}T{\tt "}, meaning bottom, centre or top. The second should be
+         {\tt "}L{\tt "}, {\tt "}C{\tt "} or {\tt "}R{\tt "}, meaning left, centre or right. The text is
+         displayed so that the supplied position is at the specified
+         point within the displayed text string. {\tt [CC]}
       }
       \sstsubsection{
          LASTDIM = \_INTEGER (Write)
@@ -16648,7 +16725,7 @@ default value.
          positions selected with the cursor may be stored. This is intended
          primarily for recording the screen output, and not for communicating
          positions to subsequent applications (use parameter OUTCAT for this
-         purpose). A null string ({\tt !}) means that no file is created.  [!]
+         purpose). A null string (!) means that no file is created.  {\tt [!]}
       }
       \sstsubsection{
          MARKER = \_INTEGER (Read)
@@ -16658,21 +16735,21 @@ default value.
          position should be marked, and should be given as an integer
          PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot,
          2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The
-         value must be larger than or equal to -31. {\tt [}current value{\tt ]}
+         value must be larger than or equal to -31. {\tt [current value]}
       }
       \sstsubsection{
          MAXPOS = \_INTEGER (Read)
       }{
          The maximum number of positions which may be supplied before the
          application terminates. The number must be in the range 1 to 200.
-         [200]
+         {\tt [200]}
       }
       \sstsubsection{
          MINPOS = \_INTEGER (Read)
       }{
          The minimum number of positions which may be supplied. The user
          is asked to supply more if necessary. The number must be in the
-         range 0 to the value of parameter MAXPOS. [0]
+         range 0 to the value of parameter MAXPOS. {\tt [0]}
       }
       \sstsubsection{
          MODE = LITERAL (Read)
@@ -16699,7 +16776,7 @@ default value.
             possible.
 
          }
-         [{\tt "}Dynamic{\tt "}]
+         {\tt ["Dynamic"]}
       }
       \sstsubsection{
          NAME = LITERAL (Read)
@@ -16707,7 +16784,7 @@ default value.
          Only pictures of this name are to be selected.  For instance, if
          you want positions in a DATA picture which is covered by a
          transparent FRAME picture, then you could specify NAME=DATA.
-         A null ({\tt !}) or blank string means that pictures of all names may
+         A null (!) or blank string means that pictures of all names may
          be selected. NAME is ignored when MODE = {\tt "}Current{\tt "}. {\tt [!]}
       }
       \sstsubsection{
@@ -16728,14 +16805,15 @@ default value.
          binary table. If a file type of .txt is given, then the catalogue
          is stored in a text file in {\tt "}Small Text List{\tt "} (STL) format. If no
          file type is given, then {\tt "}.fit{\tt "} is assumed. If a null value is
-         supplied, no output positions list is produced. {\tt [!]}
+         supplied, no output positions list is produced. See also
+         parameter CATFRAME. {\tt [!]}
       }
       \sstsubsection{
          PLOT = LITERAL (Read)
       }{
          The type of graphics to be used to mark the selected positions
          which have valid co-ordinates.  The appearance of these graphics
-         (colour, size, {\it etc}\ ) is controlled by the STYLE parameter. PLOT
+         (colour, size, \emph{etc} ) is controlled by the STYLE parameter. PLOT
          can take any of the following values:
 
          \sstitemlist{
@@ -16761,38 +16839,35 @@ default value.
             specify the symbols and lines to use.
 
             \sstitem
-            {\tt "}Box{\tt "} -- A rectangular box with edges parallel to the 
-            edges of the graphics device is drawn with the specified position 
-            at one corner, and the previously specified position at the 
-            diagonally opposite corner.
+            {\tt "}Box{\tt "} -- A rectangular box with edges parallel to the edges of
+            the graphics device is drawn with the specified position at one
+            corner, and the previously specified position at the diagonally
+            opposite corner.
 
             \sstitem
-            {\tt "}Vline{\tt "} -- A vertial line is drawn through each 
-            specified position, extending the entire height of the selected 
-            picture.
+            {\tt "}Vline{\tt "} -- A vertial line is drawn through each specified
+            position, extending the entire height of the selected picture.
 
             \sstitem
-            {\tt "}Hline{\tt "} -- A horizontal line is drawn through each 
-            specified position, extending the entire width of the selected 
-            picture.
+            {\tt "}Hline{\tt "} -- A horizontal line is drawn through each specified
+            position, extending the entire width of the selected picture.
 
             \sstitem
-            {\tt "}Cross{\tt "} -- A combination of {\tt "}Vline{\tt "} and 
-            {\tt "}Hline{\tt "}.
+            {\tt "}Cross{\tt "} -- A combination of {\tt "}Vline{\tt "} and {\tt "}Hline{\tt "}.
 
             \sstitem
-            {\tt "}Text{\tt "} -- A text string is used to mark each position. 
-            The string is drawn horizontally with the justification specified 
-            by parameter JUST.  The strings to use for each position are 
-            specified using parameter STRINGS.
+            {\tt "}Text{\tt "} -- A text string is used to mark each position. The string
+            is drawn horizontally with the justification specified by parameter
+            JUST.  The strings to use for each position are specified using
+            parameter STRINGS.
 
          }
-         {\tt [}current value{\tt ]}
+         {\tt [current value]}
       }
       \sstsubsection{
          QUIET = \_LOGICAL (Read)
       }{
-         If {\tt TRUE} then positions are not reported on the screen. Output
+         If TRUE then positions are not reported on the screen. Output
          parameters and files are still created. The display of informational
          messages describing the use of the cursor is controlled by the
          parameter INFO. {\tt [FALSE]}
@@ -16800,35 +16875,32 @@ default value.
       \sstsubsection{
          SHOWPIXEL = \_LOGICAL (Read)
       }{
-         If {\tt TRUE}, the pixel co-ordinates of each selected position are
+         If TRUE, the pixel co-ordinates of each selected position are
          shown on a separate line, following the co-ordinates requested
          using parameter FRAME. If pixel co-ordinates are being displayed
-         anyway (see parameter FRAME) then a value of {\tt FALSE} is used for.
-         SHOWPIXEL. {\tt [}current value{\tt ]}
+         anyway (see parameter FRAME) then a value of FALSE is used for.
+         SHOWPIXEL. {\tt [current value]}
       }
-
       \sstsubsection{
          STRINGS = LITERAL (Read)
       }{
-         A group of text strings which are used to mark the supplied
-	 positions if parameter PLOT is set to {\tt "}TEXT{\tt "}. The
-	 first string in the group is used to mark the first position,
-	 the second string is used to mark the second position, {\it
-	 etc.}\ If more positions are given than there are strings in the
-	 group, then the extra positions will be marked with an integer
-	 value indicating the index within the list of supplied
-	 positions. If a null value ({\tt !}) is given for the parameter,
-	 then all positions will be marked with integer indices, starting
-	 at 1.
+         A group of text strings which are used to mark the supplied positions
+         if parameter PLOT is set to {\tt "}TEXT{\tt "}. The first string in the
+         group is used to mark the first position, the second string is
+         used to mark the second position, \emph{etc}. If more positions are
+         given than there are strings in the group, then the extra
+         positions will be marked with an integer value indicating the
+         index within the list of supplied positions. If a null value (!)
+         is given for the parameter, then all positions will be marked
+         with integer indices, starting at 1.
 
          A comma-separated list should be given in which each element is
-	 either a marker string, or the name of a text file preceded by
-	 an up-arrow character {\tt "}$\wedge${\tt "}. Such text files
-	 should contain further comma-separated lists which will be read
-	 and interpreted in the same manner. Note, strings within text
-	 files can be separated by new lines as well as commas.
+         either a marker string, or the name of a text file preceded by an
+         up-arrow character {\tt "}$\wedge${\tt "}. Such text files should contain further
+         comma-separated lists which will be read and interpreted in the
+         same manner. Note, strings within text files can be separated by
+         new lines as well as commas.
       }
-
       \sstsubsection{
          STYLE = LITERAL (Read)
       }{
@@ -16851,17 +16923,17 @@ default value.
          where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
          the value to assign to the attribute. Default values will be
          used for any unspecified attributes. All attributes will be
-         defaulted if a null value ({\tt !}) is supplied. See section {\tt "}Plotting
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
          Attributes{\tt "} in SUN/95 for a description of the available
          attributes. Any unrecognised attributes are ignored (no error is
          reported).
 
          In addition to the attributes which control the appearance of
-         the graphics (Colour, Font, {\it etc}), the following attributes may
+         the graphics (Colour, Font, \emph{etc}), the following attributes may
          be set in order to control the appearance of the formatted axis
          values reported on the screen: Format, Digits, Symbol, Unit. These
          may be suffixed with an axis number (eg {\tt "}Digits(2){\tt "}) to refer to
-         the values displayed for a specific axis. {\tt [}current value{\tt ]}
+         the values displayed for a specific axis. {\tt [current value]}
       }
    }
    \sstexamples{
@@ -16872,6 +16944,14 @@ default value.
          current graphics device by use of the cursor. Positions are
          reported in pixel co-ordinates if available, and in the current
          co-ordinate Frame of the picture otherwise.
+      }
+      \sstexamplesubsection{
+         cursor frame=pixel outcat=a catframe=gal
+      }{
+         Like the previous example, except that, in addition to being
+         displayed on the screen, the positions are transformed into
+         galactic co-ordinates and stored in FITS binary table called
+         {\tt "}a.FIT{\tt "}, together with any associated WCS information.
       }
       \sstexamplesubsection{
          cursor frame=equat(J2010)
@@ -16898,7 +16978,7 @@ default value.
          and are joined with a straight line. The positions are written to
          a FITS binary catalogue called slice.FIT but are not displayed on
          the screen. The catalogue may be used to communicate the positions
-         to later applications (LISTSHOW, PROFILE, {\it etc}).
+         to later applications (LISTSHOW, PROFILE, \emph{etc}).
       }
       \sstexamplesubsection{
          cursor name=data style={\tt "}$\wedge$mystyle,digits(1)=5,digits(2)=7{\tt "}
@@ -16908,15 +16988,13 @@ default value.
          text file mystyle, but is then modified so that 5 digits are used
          to format axis 1 values, and 7 to format axis 2 values.
       }
-
       \sstexamplesubsection{
-         cursor plot=box style={\tt "}width=3,colour=red{\tt "} maxpos=2 minpos=2 
+         cursor plot=box style={\tt "}width=3,colour=red{\tt "} maxpos=2 minpos=2
       }{
          Exactly two positions must be given using the cursor, and a red box
          is drawn joining the two positions. The lines making up the box
          are three times the default width.
       }
-
       \sstexamplesubsection{
          cursor plot=text style={\tt "}size=2,textbackcolour=clear{\tt "}
       }{
@@ -16943,6 +17021,12 @@ default value.
          co-ordinates in the BASE picture are reported.
 
          \sstitem
+         Pixel co-ordinates are formatted with 1 decimal place unless a
+         format has already been specified by setting the Format attributes
+         for the axes of the PIXEL co-ordinate Frame (eg using application
+         WCSATTRIB).
+
+         \sstitem
          Positions can be removed (the instructions state how), starting
          from the most-recent one.  Such positions are excluded from the
          output positions list and log file (if applicable). If graphics
@@ -16956,8 +17040,12 @@ default value.
    }{
       KAPPA: LISTSHOW, LISTMAKE, PICCUR; Figaro: ICUR, IGCUR.
    }
+   \sstdiytopic{
+      $*$
+   }{
+      Bugs:
+   }
 }
-
 \sstroutine{
    DISPLAY
 }{
@@ -23683,7 +23771,6 @@ plot (6k).
       }
    }
 }
-
 \sstroutine{
    LINPLOT
 }{
@@ -24246,10 +24333,6 @@ plot (6k).
       }
    }
 }
-\begin{htmlonly}
-Click \htmladdnormallink{here}{linplot_exam.gif} to see an example
-plot (10k).
-\end{htmlonly}
 \sstroutine{
    LISTMAKE
 }{
@@ -24540,6 +24623,30 @@ plot (10k).
    }
    \sstparameters{
       \sstsubsection{
+         CATFRAME = LITERAL (Read)
+      }{
+         A string determining the co-ordinate Frame in which positions are
+         to be stored in the output catalogue associated with parameter
+         OUTCAT. See parameter FRAME for a description of the allowed
+         values for this parameter. If a null (!) value is supplied, the
+         positions will be stored in a SKY Frame, if a SKY Frame is
+         available within the input catalogue. Otherwise, they will be
+         stored in PIXEL co-ordinates, if a PIXEL Frame is available
+         within the input catalogue. Otherwise, they are stored in the
+         Frame used to specify positions within the input catalogue. {\tt [!]}
+      }
+      \sstsubsection{
+         CATEPOCH = DOUBLE PRECISION (Read)
+      }{
+         The epoch at which the sky positions stored in the output
+         catalogue were determined. It will only be accessed if an epoch
+         value is needed to qualify the co-ordinate Frame specified by
+         COLFRAME. If required, it should be given as a decimal years
+         value, with or without decimal places ({\tt "}1996.8{\tt "} for example).
+         Such values are interpreted as a Besselian epoch if less than
+         1984.0 and as a Julian epoch otherwise.
+      }
+      \sstsubsection{
          CLOSE = LOGICAL (Read)
       }{
          This parameter is only accessed if parameter PLOT is set to
@@ -24620,7 +24727,7 @@ plot (10k).
       }{
          This parameter is only accessed if parameter PLOT is set to
          {\tt "}Chain{\tt "} or {\tt "}Poly{\tt "}. It specifies whether the curves drawn between
-         positions should be straight lines, or should be geodesic curves.
+         positions should be stright lines, or should be geodesic curves.
          In many co-ordinate Frames geodesic curves will be simple straight
          lines. However, in others (such as the majority of celestial
          co-ordinates Frames) geodesic curves will be more complex curves
@@ -24695,7 +24802,7 @@ plot (10k).
          be found, or if a null value is supplied, the current picture itself
          is used. The name BASE can also be supplied as a special case, which
          causes the BASE picture to be used even though it will not in
-         general fall within the current picture. {\tt [{\tt "}DATA{\tt "}]}
+         general fall within the current picture. {\tt ["DATA"]}
       }
       \sstsubsection{
          NUMBER = \_INTEGER (Write)
@@ -24705,8 +24812,9 @@ plot (10k).
       \sstsubsection{
          OUTCAT = FILENAME (Write)
       }{
-         The output catalogue in which to store the selected positions. If a
-         null value is supplied, no output catalogue is produced. {\tt [!]}
+         The output catalogue in which to store the selected positions.
+         If a null value is supplied, no output catalogue is produced. See
+         parameter COLFRAME. {\tt [!]}
       }
       \sstsubsection{
          PLOT = LITERAL (Read)
@@ -24859,6 +24967,14 @@ plot (10k).
          to the output parameter POSNS as well as to the screen.
       }
       \sstexamplesubsection{
+         listshow star outcat=star-gal catframe=gal quiet
+      }{
+         This copies a position list from catalogue {\tt "}star{\tt "} to a new
+         catalogue called {\tt "}star-gal{\tt "}. The positions are stored in galactic
+         co-ordinates in the output catalogue. Nothing is displayed on
+         the screen.
+      }
+      \sstexamplesubsection{
          listshow stars.fit equat(J2010) first=3 last=3 quiet
       }{
          This extracts position 3 from the catalogue stars.fit transforming
@@ -24904,7 +25020,6 @@ plot (10k).
       KAPPA: CURSOR, LISTMAKE; CURSA: XCATVIEW, CATSELECT.
    }
 }
-
 \sstroutine{
    LOG10
 }{
@@ -32636,7 +32751,6 @@ plot (9k).
       }
    }
 }
-
 \sstroutine{
    PROFILE
 }{
@@ -32657,6 +32771,45 @@ plot (9k).
    }
    \sstparameters{
       \sstsubsection{
+         CATFRAME = LITERAL (Read)
+      }{
+         A string determining the co-ordinate Frame in which positions are
+         to be stored in the output catalogue associated with parameter
+         OUTCAT. The string supplied for CATFRAME can be one of the
+         following:
+
+         \sstitemlist{
+
+            \sstitem
+            A Domain name such as SKY, AXIS, PIXEL, \emph{etc}.
+
+            \sstitem
+            An integer value giving the index of the required Frame.
+
+            \sstitem
+            An IRAS90 Sky Co-ordinate System (SCS) values such as
+            EQUAT(J2000) (see SUN/163).
+
+         }
+         If a null (!) value is supplied, the positions will be stored
+         in a SKY Frame, if a SKY Frame is available within the input
+         catalogue. Otherwise, they will be stored in PIXEL co-ordinates,
+         if a PIXEL Frame is available within the input catalogue.
+         Otherwise, they are stored in the base Frame of the supplied
+         WCS information. {\tt [!]}
+      }
+      \sstsubsection{
+         CATEPOCH = DOUBLE PRECISION (Read)
+      }{
+         The epoch at which the sky positions stored in the output
+         catalogue were determined. It will only be accessed if an epoch
+         value is needed to qualify the co-ordinate Frame specified by
+         COLFRAME. If required, it should be given as a decimal years
+         value, with or without decimal places ({\tt "}1996.8{\tt "} for example).
+         Such values are interpreted as a Besselian epoch if less than
+         1984.0 and as a Julian epoch otherwise.
+      }
+      \sstsubsection{
          FINISH = LITERAL (Read)
       }{
          The co-ordinates of the last sample in the profile, in the current
@@ -32664,7 +32817,7 @@ plot (9k).
          the required co-ordinate Frame). The position should be supplied as
          a list of formatted axis values separated by spaces. This parameter
          is only accessed if parameter MODE is set to {\tt "}Curve{\tt "} and a null
-         ({\tt !}) value is given for INCAT. If the last (top right) pixel in the
+         (!) value is given for INCAT. If the last (top right) pixel in the
          NDF has valid co-ordinates in the current co-ordinate Frame of the
          NDF, then these co-ordinates will be used as the suggested default.
          Otherwise there will be no suggested default.
@@ -32672,17 +32825,17 @@ plot (9k).
       \sstsubsection{
          GEODESIC = LOGICAL (Read)
       }{
-         If {\tt TRUE} then the line segments which form the profile will be
+         If TRUE then the line segments which form the profile will be
          geodesic curves within the current co-ordinate Frame of the NDF.
          Otherwise, the line segments are simple straight lines. This
          parameter is only accessed if parameter MODE is set to {\tt "}Curve{\tt "}.
 
          As an example, consider a profile consisting of a single line segment
          which starts at RA=0h DEC=$+$80d and finishes at RA=12h DEC=$+$80d. If
-         GEODESIC is {\tt FALSE}, the line segment will be a line of constant
-         declination, {\it{i.e.}}\ the {\tt "}straight{\tt "} line from the position (0,80) to the
-         position (12,80), passing through (1,80), (2,80), {\it etc.}\ If GEODESIC
-         is {\tt TRUE}, then the line segment will be the curve of shortest
+         GEODESIC is FALSE, the line segment will be a line of constant
+         declination, \emph{i.e.} the {\tt "}straight{\tt "} line from the position (0,80) to the
+         position (12,80), passing through (1,80), (2,80), \emph{etc}. If GEODESIC
+         is TRUE, then the line segment will be the curve of shortest
          distance on the celestial sphere between the start and end. In this
          particaular case, this will be a great circle passing through the
          north celestial pole. {\tt [FALSE]}
@@ -32698,7 +32851,7 @@ plot (9k).
          A catalogue containing a set of vertices or sample positions defining
          the required profile. The file should be in the format of a {\tt "}positions
          list{\tt "} such as produced by applications CURSOR and LISTMAKE. If a
-         null value ({\tt !}) is given then parameters START and FINISH will be
+         null value (!) is given then parameters START and FINISH will be
          used to obtain the vertex positions. If parameter MODE is given the
          value {\tt "}Curve{\tt "}, then the parameter INCAT is only accessed if a value
          is given for it on the command line (otherwise a null value is
@@ -32727,10 +32880,10 @@ plot (9k).
             INCAT). No other sample positions are used.
 
          }
-         [Curve]
+         {\tt [Curve]}
       }
       \sstsubsection{
-         NSAMP = \_INTEGER (Read)
+         NSAMP = INTEGER (Read)
       }{
          The number of samples required along the length of the profile.
          The first sample is at the first supplied vertex, and the last
@@ -32754,7 +32907,7 @@ plot (9k).
          positions to subsequent applications. It includes information
          describing the available WCS co-ordinate Frames as well as the
          positions themselves. If a null value is supplied, no output
-         positions list is produced. {\tt [!]}
+         positions list is produced. See also parameter CATFRAME. {\tt [!]}
       }
       \sstsubsection{
          START = LITERAL (Read)
@@ -32764,7 +32917,7 @@ plot (9k).
          the required co-ordinate Frame). The position should be supplied as
          a list of formatted axis values separated by spaces. This parameter
          is only accessed if parameter MODE is set to {\tt "}Curve{\tt "} and a null
-         ({\tt !}) value is given for INCAT. If the first (bottom left) pixel in
+         (!) value is given for INCAT. If the first (bottom left) pixel in
          the NDF has valid co-ordinates in the current co-ordinate Frame of
          the NDF, then these co-ordinates will be used as the suggested
          default. Otherwise there will be no suggested default.
@@ -32782,7 +32935,7 @@ plot (9k).
          This example assumes that the current co-ordinate Frame in the NDF
          my\_data represents pixel co-ordinates. This can be ensured by
          issuing the command {\tt "}wcsframe my\_data pixel{\tt "} before running
-         profile. A FITS binary catalogue is created called samps.fit
+         profile. A FITS binary catalogue is created called samps.FIT
          containing the positions of all samples in the profile, together with
          information describing all the co-ordinate Frames in which the
          positions of the samples are known. This file may be examined
@@ -32799,17 +32952,17 @@ plot (9k).
          determined by the resolution of the data.
       }
       \sstexamplesubsection{
-         profile allsky prof incat=prof\_path npoint=200 geodesic outcat=aa
+         profile allsky prof incat=prof\_path npoint=200 geodesic outcat=aa.fit
       }{
          This examples creates a profile of the NDF allsky through a set of
-         points given in a FITS binary catalogue called prof\_path.fit. Such
+         points given in a FITS binary catalogue called prof\_path.FIT. Such
          catalogues can be created (for example) using application CURSOR.
          Each line segment is a geodesic curve. The profile is sampled at 200
          points. The samples positions are written to the output positions
          list aa.fit.
       }
       \sstexamplesubsection{
-         profile allsky2 prof2 mode=point incat=aa
+         profile allsky2 prof2 mode=point incat=aa.fit
       }{
          This examples creates a profile of the NDF allsky2 containing
          samples at the positions given in the positions list aa.fit. Thus,
@@ -32824,7 +32977,7 @@ plot (9k).
          \sstitem
          This application uses the conventions of the CURSA package (SUN/190)
          for determining the formats of input and output positions list
-         catalogues. If a file type of .fits is given, then the catalogue is
+         catalogues. If a file type of .fit is given, then the catalogue is
          assumed to be a FITS binary table. If a file type of .txt is given,
          then the catalogue is assumed to be stored in a text file in {\tt "}Small
          Text List{\tt "} (STL) format. If no file type is given, then {\tt "}.fit{\tt "} is
@@ -32834,7 +32987,7 @@ plot (9k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: LINPLOT, CURSOR, LISTMAKE, LISTSHOW; CURSA: XCATVIEW.
+      KAPPA: LINPLOT, CURSOR, LISTMAKE, LISTSHOW; CURSA: XCATVIEW
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -32851,7 +33004,6 @@ plot (9k).
       }
    }
 }
-
 \sstroutine{
    PSF
 }{
@@ -43777,6 +43929,14 @@ co-ordinate Frame. GRID co-ordinates are like PIXEL co-ordinates except
 the centre of the bottom left pixel always has GRID co-ordinates ( 1.0,
 1.0 ). If a ``Z'' column also exists, the GRID co-ordinates are assumed
 to be 3-dimensional.
+
+\item Applications which create catalogues holding positions lists
+now allow the user to specify the co-ordinate Frame in which positions
+should be stored within the catalogue columns. This is done using a new
+parameter called CATFRAME which has been added to all appropriate
+commands. Previously positions were always stored in the base Frame of
+the associated WCS information. Now, the default is to use SKY coordinates
+if available, otherwise PIXEL coordinates.
 
 \end{itemize}
 
