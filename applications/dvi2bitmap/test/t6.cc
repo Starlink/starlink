@@ -12,22 +12,37 @@
 #if HAVE_CSTD_INCLUDE
 #include <cstdio>
 #include <cstdlib>
-#include <cerrno>
 #else
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #endif
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <sys/stat.h>		// for mkfifo
 
+#if HAVE_SYS_ERRNO_H
+/* If it's available, use sys/errno.h rather than <cerrno> or <errno.h>.
+ * If we're compiling in a strict-ansi mode, these will _not_ have errors
+ * which are specific to Unix/POSIX, which are, of course, precisely the
+ * ones we're hoping to use.
+ */
+#  include <sys/errno.h>
+#else
+/* what else can we do? */
+#  if HAVE_CSTD_INCLUDE
+#    include <cerrno>
+#  else
+#    include <errno.h>
+#  endif
+#endif
 
-using STD::cout;
+
+using STD::cout;		// we use these ones a lot
 using STD::cerr;
 using STD::endl;
 using STD::ends;
+using STD::strerror;
 
 #include <string>
 
@@ -291,7 +306,7 @@ int do_stream_tests()
 		int pid = fork();
 		if (pid < 0) {
 		    cerr << "Can't fork!" << strerror(errno) << endl;
-		    exit(1);	// give up immediately
+		    STD::exit(1);	// give up immediately
 		} else if (pid == 0) {
 		    // child
 		    execl("./t6.test",
@@ -301,7 +316,7 @@ int do_stream_tests()
 			  0);
 		    cerr << "Oh-oh: couldn't exec in child of "
 			 << getppid() << ": " << strerror(errno) << endl;
-		    exit(1);
+		    STD::exit(1);
 		} else {
 		    // parent
 		    int status;
@@ -438,7 +453,7 @@ int do_stream_tests()
 			  0);
                     cerr << "Oh-oh: couldn't exec in child of "
                          << getppid() << ": " << strerror(errno) << endl;
-                    exit(1);
+                    STD::exit(1);
 		} else {
 		    // parent
 		    InputByteStream IBS(PIPE_NAME);
@@ -465,6 +480,13 @@ int do_stream_tests()
 
     return nfails;
 }
+
+#if HAVE_SETENV
+extern "C" int setenv(const char* name, const char *value, int overwrite);
+#endif
+#if HAVE_PUTENV
+extern "C" int putenv(const char* string);
+#endif
 
 int do_pipe_tests()
 {
@@ -537,6 +559,14 @@ int do_pipe_tests()
         
         try {
             string cmd = "./t6.test -e LOGNAME HOME T TT";
+#if HAVE_SETENV
+            setenv("TT", "test", 1);
+#elif HAVE_PUTENV	    
+            putenv((char*)"TT=test");
+#else
+#  error "Can't set environment variables"
+#endif
+	    /*
 #if defined(HAVE_SETENV) && HAVE_DECL_SETENV
             setenv("TT", "test", 1);
 #elif defined(HAVE_PUTENV) && HAVE_DECL_PUTENV
@@ -550,6 +580,7 @@ int do_pipe_tests()
 #else
 #error "Can't set environment variables"
 #endif
+	    */
             string envs = "LOGNAME=blarfl HOME=blarfl T=t + LOGNAME=you TT + LOGNAME=me";
             string expected = "LOGNAME=me!HOME=";
             char* h = getenv("HOME");
@@ -622,7 +653,7 @@ int main (int argc, char **argv)
 		    Usage();
                 if ((output = fopen(*argv, "w")) == 0) {
                     fprintf(stderr, "Can't open file %s to write\n", *argv);
-                    exit (1);
+                    STD::exit (1);
 		}
                 // Sleep for a moment, in case the output file is a
                 // FIFO (that is, we are being called by the code
@@ -653,7 +684,7 @@ int main (int argc, char **argv)
 	{
 	    if (argc == 0)
 		Usage();
-	    int n = strtol(*argv, 0, 10);
+	    int n = STD::strtol(*argv, 0, 10);
 	    if (n <= 0)
 		Usage();
 	    generate_data(n, output);
@@ -673,13 +704,13 @@ int main (int argc, char **argv)
     if (verbosity > normal)
 	cerr << "Total fails: " << totalfails << endl;
 
-    exit (totalfails);
+    STD::exit (totalfails);
 }
 
 void Usage(void)
 {
     cerr << "Usage: " << progname << " [-o output] [-g num] [-e var...]"
 	 << endl;
-    exit (1);
+    STD::exit (1);
 }
 
