@@ -427,7 +427,7 @@ printf( "linear\n" );
    return result;
 }
 
-static int ResampleSection( AstMapping *this,
+static int ResampleSection( AstMapping *this, const double *linear,
                       int ndim_in, const int *lbnd_in, const int *ubnd_in,
                       const double *in,
                       AstInterpolate method,
@@ -458,8 +458,6 @@ static int ResampleSection( AstMapping *this,
    }
    offset = astMalloc( sizeof( int ) * (size_t) npoint );
    dim = astMalloc( sizeof( int ) * (size_t) ndim_out );
-   pset_out = astPointSet( npoint, ndim_out, "" );
-   ptr_out = astGetPoints( pset_out );
    stride = astMalloc( sizeof( int ) * (size_t) ndim_out );
 
    off = 0;
@@ -471,26 +469,64 @@ static int ResampleSection( AstMapping *this,
       off += ( dim[ idim ] - lbnd_out[ idim ] ) * stride[ idim ];
    }
 
-   for ( done = 0, point = 0; !done; point++ ) {
-      for ( idim = 0; idim < ndim_out; idim++ ) {
-         ptr_out[ idim ][ point ] = (double) dim[ idim ];
+   if ( !linear ) {
+      pset_out = astPointSet( npoint, ndim_out, "" );
+      ptr_out = astGetPoints( pset_out );
+      for ( done = 0, point = 0; !done; point++ ) {
+         for ( idim = 0; idim < ndim_out; idim++ ) {
+            ptr_out[ idim ][ point ] = (double) dim[ idim ];
+         }
+         offset[ point ] = off;
+         idim = 0;
+         while ( !done ) {
+            if ( dim[ idim ] < ubnd[ idim ] ) {
+               dim[ idim ]++;
+               off += stride[ idim ];
+               break;
+            } else {
+               dim[ idim ] = lbnd[ idim ];
+               off -= ( ubnd[ idim ] - lbnd[ idim ] ) * stride[ idim ];
+               done = ( ++idim == ndim_out );
+            }
+         }
       }
-      offset[ point ] = off;
-      idim = 0;
-      while ( !done ) {
-         if ( dim[ idim ] < ubnd[ idim ] ) {
-            dim[ idim ]++;
-            off += stride[ idim ];
-            break;
-         } else {
-            dim[ idim ] = lbnd[ idim ];
-            off -= ( ubnd[ idim ] - lbnd[ idim ] ) * stride[ idim ];
-            done = ( ++idim == ndim_out );
+      pset_in = astTransform( this, pset_out, 0, NULL );
+      ptr_in = astGetPoints( pset_in );
+      pset_out = astAnnul( pset_out );
+   } else {
+      int coord_in;
+      int coord_out;
+      int ndim_in = astGetNin( this );
+      const double *zero = linear + ndim_in * ndim_out;
+      pset_in = astPointSet( npoint, ndim_in, "" );
+      ptr_in = astGetPoints( pset_in );
+
+      for ( done = 0, point = 0; !done; point++ ) {
+         for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+            double y = zero[ coord_in ];
+            for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+               double x = (double) dim[ coord_out ];
+               double x0 = 0.5 * (double) ( lbnd[ coord_out ] +
+                                            ubnd[ coord_out ] );
+               y += linear[ coord_in + ndim_in * coord_out ] * ( x - x0 );
+            }
+            ptr_in[ coord_in ][ point ] = y;
+         }
+         offset[ point ] = off;
+         idim = 0;
+         while ( !done ) {
+            if ( dim[ idim ] < ubnd[ idim ] ) {
+               dim[ idim ]++;
+               off += stride[ idim ];
+               break;
+            } else {
+               dim[ idim ] = lbnd[ idim ];
+               off -= ( ubnd[ idim ] - lbnd[ idim ] ) * stride[ idim ];
+               done = ( ++idim == ndim_out );
+            }
          }
       }
    }
-   pset_in = astTransform( this, pset_out, 0, NULL );
-   ptr_in = astGetPoints( pset_in );
    if ( astOK ) {
       if ( method == AST__NEAREST ) {
          result = InterpolatePixelNearest( ndim_in, lbnd_in, ubnd_in, in,
@@ -509,7 +545,6 @@ static int ResampleSection( AstMapping *this,
    dim = astFree( dim );
    offset = astFree( offset );
    pset_in = astAnnul( pset_in );
-   pset_out = astAnnul( pset_out );
    stride = astFree( stride );
    if ( !astOK ) result = 0;
    return result;
@@ -519,7 +554,201 @@ static int Min( int a, int b ) {
   return ( a < b ) ? a : b;
 }
 
-static int Resample( AstMapping *this,
+static double *TestIfLinear( AstMapping *this,
+                             const int *lbnd, const int *ubnd, double acc) {
+
+   AstPointSet *pset_ina;
+   AstPointSet *pset_inb;
+   AstPointSet *pset_outa;
+   AstPointSet *pset_outb;
+   double **ptr_ina;
+   double **ptr_inb;
+   double **ptr_outa;
+   double **ptr_outb;
+   double *grad;
+   double z;
+   double diff;
+   double err;
+   double x0;
+   double x;
+   double y;
+   int *limit;
+   int coord_in;
+   int coord_out;
+   int done;
+   int face1;
+   int face2;
+   int face;
+   int linear;
+   int ndim_in;
+   int ndim_out;
+   int npoint;
+   int point;
+   double in1;
+   double in2;
+   double out1;
+   double out2;
+   double outdiff;
+   double *zero;
+
+   ndim_in = astGetNin( this );
+   ndim_out = astGetNout( this );
+   linear = 1;
+
+   grad = astMalloc( sizeof( double ) * (size_t) ( ( ndim_in + 1 ) * ndim_out ) );
+   zero = grad + ndim_in * ndim_out;
+   limit = astMalloc( sizeof( int ) * (size_t) ndim_out );
+   pset_outa = astPointSet( 2 * ndim_out, ndim_out, "" );
+   ptr_outa = astGetPoints( pset_outa );
+   ptr_ina = AST__NULL;
+   if ( astOK ) {
+
+/* Set up output coordinates at centre of each face. */
+      for ( face = 0; face < ( 2 * ndim_out ); face++ ) {
+         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+            ptr_outa[ coord_out ][ face ] =
+               0.5 * ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+         }
+         ptr_outa[ face / 2 ][ face ] = ( face % 2 ) ?
+                                        ubnd[ face / 2 ] : lbnd[ face / 2 ];
+      }
+   }
+
+/* Transform to input coordinate space. */
+   pset_ina = astTransform( this, pset_outa, 0, NULL );
+   ptr_ina = astGetPoints( pset_ina );
+   if ( astOK ) {
+
+/* Calculate gradients and zero points assuming a linear transformation. */
+      for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+         z = 0.0;
+         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+            face1 = 2 * coord_out;
+            face2 = face1 + 1;
+            out1 = ptr_outa[ coord_out ][ face1 ];
+            out2 = ptr_outa[ coord_out ][ face2 ];
+            in1 = ptr_ina[ coord_in ][ face1 ];
+            in2 = ptr_ina[ coord_in ][ face2 ];
+            if ( ( in1 == AST__BAD ) || ( in2 == AST__BAD ) ) {
+               linear = 0;
+               break;
+            }
+            z += ( in1 + in2 );
+            outdiff = out2 - out1;
+            if ( outdiff != 0.0 ) {
+               grad[ coord_in + ndim_in * coord_out ] = ( in2 - in1 ) /
+                                                        outdiff;
+            } else {
+               grad[ coord_in + ndim_in * coord_out ] = 0.0;
+            }
+         }
+         if ( !linear ) break;
+         zero[ coord_in ] = z / (double) ( 2 * ndim_out );
+      }
+   }
+
+/* Set up test points in th eoutput coordinate space. */
+   if ( astOK && linear ) {
+      npoint = 1;
+      for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+         npoint *= 2;
+         limit[ coord_out ] = 0;
+      }
+      npoint = 1 + 2 * ndim_out + 2 * npoint;
+      pset_outb = astPointSet( npoint, ndim_out, "" );
+      ptr_outb = astGetPoints( pset_outb );
+
+/* One point at the centre. */
+      point = 0;
+      for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+         ptr_outb[ coord_out ][ point ] =
+           0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+      }
+      point++;
+
+/* One half way to the centre of each face. */
+      for ( face = 0; face < ( 2 * ndim_out ); face++ ) {
+         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+            ptr_outb[ coord_out ][ point ] =
+               0.5 * ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+         }
+         ptr_outb[ face / 2 ][ point ] =
+           0.5 * ( ( (double) ( ( face % 2 ) ? ubnd[ face / 2 ] :
+                                               lbnd[ face / 2 ] ) ) +
+                   ptr_outb[ face / 2 ][ 0 ] );
+         point++;
+      }
+
+/* One at each vertex and half way to each vertex. */
+      done = 0;
+      while ( !done ) {
+         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+            ptr_outb[ coord_out ][ point ] = limit[ coord_out ] ?
+                                             ubnd[ coord_out ] :
+                                             lbnd[ coord_out ];
+            ptr_outb[ coord_out ][ point + 1 ] =
+              0.5 * ( ptr_outb[ coord_out ][ point ] +
+                      ptr_outb[ coord_out ][ 0 ] );
+         }
+         point += 2;
+         coord_out = 0;
+         while ( !done ) {
+            if ( !limit[ coord_out ] ) {
+               limit[ coord_out ] = 1;
+               break;
+            } else {
+               limit[ coord_out ] = 0;
+               done = ( ++coord_out == ndim_out );
+            }
+         }
+      }
+
+/* Transform the test points to the input coordinate space. */
+      pset_inb = astTransform( this, pset_outb, 0, NULL );
+      ptr_inb = astGetPoints( pset_inb );
+
+/* Apply the linear transformation to each test point. */
+      for ( point = 0; point < npoint; point++ ) {
+         err = 0.0;
+         for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+            y = zero[ coord_in ];
+            for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+               x = ptr_outb[ coord_out ][ point ];
+               if ( x == AST__BAD ) {
+                  linear = 0;
+                  break;
+               }
+               x0 = 0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+               y += grad[ coord_in + ndim_in * coord_out ] * ( x - x0 );
+            }
+            if ( !linear ) break;
+printf( "%g ", y );
+
+/* Test if the maximum difference is significant. */
+            diff = ( y - ptr_inb[ coord_in ][ point ] );
+            err += diff * diff;
+         }
+         if ( !linear ) break;
+printf( "\n" );
+for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+   printf( "%g ", ptr_inb[ coord_in ][ point ] );
+}
+printf( ", err = %g\n", sqrt( err ) );
+         if ( sqrt( err ) > acc ) {
+            linear = 0;
+            break;
+         }
+      }
+   }
+   pset_ina = astAnnul( pset_ina );
+   pset_outa = astAnnul( pset_outa );
+   limit = astFree( limit );
+printf( "linear = %d\n", linear );
+   if ( ! linear || !astOK ) grad = astFree( grad );
+   return grad;
+}
+                         
+static int ResampleBlock( AstMapping *this, const double *linear,
                       int ndim_in, const int *lbnd_in, const int *ubnd_in,
                       const double *in,
                       AstInterpolate method, double acc,
@@ -595,7 +824,7 @@ static int Resample( AstMapping *this,
          printf( "\n" );
       }
 #endif
-      result += ResampleSection( this, ndim_in, lbnd_in, ubnd_in, in,
+      result += ResampleSection( this, linear, ndim_in, lbnd_in, ubnd_in, in,
                                  method,
                             usebad, badflag,
                             ndim_out, lbnd_out, ubnd_out,
@@ -620,6 +849,33 @@ static int Resample( AstMapping *this,
    lbnd_sect = astFree( lbnd_sect );
    ubnd_sect = astFree( ubnd_sect );
    step = astFree( step );
+   if ( !astOK ) result = 0;
+   return result;
+}
+
+static int Resample( AstMapping *this,
+                      int ndim_in, const int *lbnd_in, const int *ubnd_in,
+                      const double *in,
+                      AstInterpolate method, double acc,
+                      int usebad, double badflag,
+                      int ndim_out, const int *lbnd_out, const int *ubnd_out,
+                      const int *lbnd, const int *ubnd, double *out ) {
+   double *linear;
+   int result;
+
+   result = 0;
+   if ( !astOK ) return result;
+
+   linear = TestIfLinear( this, lbnd, ubnd, acc );
+
+
+   result = ResampleBlock( this, linear,
+                           ndim_in, lbnd_in, ubnd_in, in,
+                           method, acc,
+                           usebad, badflag,
+                           ndim_out, lbnd_out, ubnd_out,
+                           lbnd, ubnd, out );
+   if ( linear ) linear = astFree( linear );
    if ( !astOK ) result = 0;
    return result;
 }
