@@ -38,7 +38,6 @@
       INTEGER			BFID			! Bgnd dataset id
       INTEGER                IACT, BACT    ! Area correction arrays
       INTEGER			IFID			! Source dataset id
-      INTEGER                INDIM, BNDIM,LDIM! Input dimesnionalities
       INTEGER                INELM,BNELM
       INTEGER                NDIM
       INTEGER                IDPTR, BDPTR  ! Data pointers
@@ -48,8 +47,6 @@
       INTEGER                VALPTR
 
       LOGICAL                IOK, BOK      ! Datasets ok?
-      LOGICAL                BAD
-      LOGICAL                IQUALOK,BQUALOK
 *
 *    Version id :
 *
