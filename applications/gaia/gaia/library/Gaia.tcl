@@ -527,6 +527,10 @@ itcl::class gaia::Gaia {
          {Perform interactive galaxy surface photometry} \
          -command [code $this make_toolbox esp] \
 
+      add_menuitem $m command "Select positions...  " \
+         {Select or identify object positions and properties} \
+         -command [code $this make_toolbox positions] \
+
       if { $itk_option(-demo_mode) } {
 	 add_menuitem $m command "Demonstration mode..." \
 	       {See a demonstration of GAIA (needs an empty directory)} \
@@ -808,6 +812,20 @@ itcl::class gaia::Gaia {
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
             -clone_cmd [code $this make_toolbox esp 1]
+      }
+   }
+
+   #  Make positions toolbox.
+   public method make_positions_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaPositions $w_.\#auto \
+            -image $image_ \
+            -rtdimage [$image_ get_image] \
+            -canvas [$image_ get_canvas] \
+            -transient $itk_option(-transient_tools) \
+            -number $clone_ \
+            -clone_cmd [code $this make_toolbox astreference 1] \
+            -really_die $cloned
       }
    }
 

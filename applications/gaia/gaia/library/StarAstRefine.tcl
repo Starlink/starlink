@@ -156,10 +156,10 @@ itcl::class gaia::StarAstRefine {
       #  Markers menu
       set Marker [add_menubutton Markers]
 
-      #  Create a StarAstTable to display the positions that we are using
+      #  Create a GaiaAstTable to display the positions that we are using
       #  to refine the WCS.
       itk_component add table {
-	  StarAstTable $w_.table \
+	  GaiaAstTable $w_.table \
 		  -editmenu $Edit \
 		  -markmenu $Marker \
 		  -rtdimage $itk_option(-rtdimage) \
@@ -623,7 +623,7 @@ itcl::class gaia::StarAstRefine {
       set tr3(6) [expr $tr2(5)*$tr1(3) + $tr2(6)*$tr1(6)]
    }
 
-   #  Trap an attempt by the StarAstTable to convert the equinox (used
+   #  Trap an attempt by the GaiaAstTable to convert the equinox (used
    #  when grabbing a catalogue).
    protected method fix_equinox_ {equinox} {
        $itk_component(table) change_equinox [$itk_option(-rtdimage) wcsequinox]

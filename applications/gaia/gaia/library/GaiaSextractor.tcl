@@ -1414,9 +1414,9 @@ itcl::class gaia::GaiaSextractor {
       }
       pack $itk_component(radtype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(radtype) \
-         {Type of values used to determine isophotal levels}
+         {Type of values used to determine isophotal thresholds}
       foreach {lname sname} \
-         "Default NONE {Surface Brightness} SB Intensity INT" {
+         "Default NONE {Surface brightness} SB {Data counts} INT" {
          $itk_component(radtype) add \
             -label $lname \
             -value $sname \
@@ -1437,8 +1437,7 @@ itcl::class gaia::GaiaSextractor {
       }
       pack $itk_component(radthresh) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(radthresh) \
-         {Step, start and zeropoint (SB only) of thresholds}
-
+         {Step, [start] and [zeropoint] (SB only) of thresholds}
       toggle_radtype_ $values_($this,radtype)
    }
 

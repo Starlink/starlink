@@ -15,7 +15,7 @@
 #     corresponding RA,Dec positions on any other image that is displayed
 #     (in another clone). The positions may be "centroided" and a list of
 #     them is displayed in a text window. When completed these positions
-#     may be used to update a StarAstTable object.
+#     may be used to update a GaiaAstTable object.
 
 #  Invocations:
 #

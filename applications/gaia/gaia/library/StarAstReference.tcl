@@ -209,7 +209,7 @@ itcl::class gaia::StarAstReference {
       #  adds to the edit menu and the markers menu which controls
       #  the apperance of the graphics markers.
       itk_component add table {
-         StarAstTable $w_.table \
+         GaiaAstTable $w_.table \
 		 -editmenu $Edit \
 		 -markmenu $Markers \
 		 -rtdimage $itk_option(-rtdimage) \

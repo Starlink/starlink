@@ -6,11 +6,11 @@
 #     [incr Tk] class
 
 #  Purpose:
-#     Extends StarAstTable to allow the interactive definition of X-Y
+#     Extends GaiaAstTable to allow the interactive definition of X-Y
 #     and RA/Dec pairs on images.
 
 #  Description:
-#     This class extends the ability of the StarAstTable widget adding
+#     This class extends the ability of the GaiaAstTable widget adding
 #     controls for selecting X-Y positions on an associated image and
 #     for selecting the corresponding RA-Dec positions on any other
 #     image that is displayed (in another clone). The positions may be
@@ -60,7 +60,7 @@ itcl::class gaia::GaiaAstTransferTable {
 
    #  Inheritances:
    #  -------------
-   inherit gaia::StarAstTable
+   inherit gaia::GaiaAstTable
 
    #  Nothing
 
@@ -71,12 +71,12 @@ itcl::class gaia::GaiaAstTransferTable {
       #  Change the internal configuration of Table widget to suit.
       set selectmode_ single
       set exportselection_ 1
-      eval gaia::StarAstTable::constructor $args
+      eval gaia::GaiaAstTable::constructor $args
    } {
 
       #  Evaluate any options [incr Tk].
-      itk_option remove gaia::StarAstTable::coupled
-      itk_option remove gaia::StarAstTable::bind_enters
+      itk_option remove gaia::GaiaAstTable::coupled
+      itk_option remove gaia::GaiaAstTable::bind_enters
       eval itk_initialize $args
 
       #  Override short help for Table window.
@@ -403,7 +403,7 @@ itcl::class gaia::GaiaAstTransferTable {
    #  Override clear_table to also clear the RA/Dec marker.
    public method clear_table {} {
       remove_radec
-      StarAstTable::clear_table
+      GaiaAstTable::clear_table
    }
 
    #  Configuration options: (public variables)
