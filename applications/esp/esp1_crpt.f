@@ -52,12 +52,8 @@
       INTEGER STATUS
 
 *  Local variables:
-      CHARACTER *(AST__SZCHR) DOMAIN  ! Domain of Current frame
-      DOUBLE PRECISION X1             ! XB in double precision
       DOUBLE PRECISION XC             ! X coord in Current frame
-      DOUBLE PRECISION Y1             ! YB in double precision
       DOUBLE PRECISION YC             ! Y coord in Current frame
-      INTEGER MAP                     ! AST pointer to mapping Base->Current
       INTEGER FRAME                   ! AST pointer to Current frame
 
 *.
@@ -68,9 +64,15 @@
 *   Load Current coordinate values and Domain into MSG tokens.
       CALL ESP1_XYFMT(FSET,XB,YB,'X','Y','DOMAIN',STATUS)
 
+*   Get coordinate symbol names.
+      FRAME=AST_GETFRAME(FSET,AST__CURRENT,STATUS)
+      CALL MSG_SETC('XSYMBOL',AST_GETC(FRAME,'Symbol(1)',STATUS))
+      CALL MSG_SETC('YSYMBOL',AST_GETC(FRAME,'Symbol(2)',STATUS))
+      CALL AST_ANNUL(FRAME,STATUS)
+
 *   Output coordinates to user.
-      CALL MSG_OUT(' ','  Cursor co-ordinates (^DOMAIN frame):  ^X  ^Y',
-     :             STATUS)
+      CALL MSG_OUT(' ','  ^DOMAIN frame co-ordinates:  '//
+     :             '^XSYMBOL = ^X,  ^YSYMBOL = ^Y', STATUS)
 
 *   Ensure graphics/text synchronisation.
       CALL MSG_SYNC(STATUS)
