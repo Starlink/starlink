@@ -13,11 +13,15 @@
 *
 *    History :
 *
-*     26 May 92 : Original (DJA)
-*      7 Apr 93 : Moved setting of DC_CP_C outside quality test. If the
-*                 centre pixel is bad, this picks up the last good cached
-*                 pixel. (DJA)
-*     28 Feb 94 : Quality now pre-masked, so test changed (DJA)
+*     26 May 1992 (DJA):
+*        Original version
+*      7 Apr 1993 (DJA):
+*        Moved setting of DC_CP_C outside quality test. If the centre pixel is
+*        bad, this picks up the last good cached pixel
+*     28 Feb 1994 (DJA):
+*        Quality now pre-masked, so test changed
+*      4 Mar 1996 (DJA):
+*        Changed IAND to AND for Linux port
 *
 *    Type definitions :
 *
@@ -81,13 +85,13 @@
 *    Cacheing switches
       DO_IMD = .TRUE.
       DO_PSF = .TRUE.
-      DO_BGND = IAND(CACHE_CTRL,DC_F_BGND).NE.0
-      DO_LBGND = IAND(CACHE_CTRL,DC_F_LBGND).NE.0
-      DO_IMBV = IAND(CACHE_CTRL,DC_F_IMBV).NE.0
-      DO_BGDV = IAND(CACHE_CTRL,DC_F_BGDV).NE.0
-      DO_IMD_SUM = IAND(CACHE_CTRL,DC_F_IMD_SUM).NE.0
-      DO_PSF_SUM = IAND(CACHE_CTRL,DC_F_PSF_SUM).NE.0
-      DO_BGND_SUM = IAND(CACHE_CTRL,DC_F_BGND_SUM).NE.0
+      DO_BGND = AND(CACHE_CTRL,DC_F_BGND).NE.0
+      DO_LBGND = AND(CACHE_CTRL,DC_F_LBGND).NE.0
+      DO_IMBV = AND(CACHE_CTRL,DC_F_IMBV).NE.0
+      DO_BGDV = AND(CACHE_CTRL,DC_F_BGDV).NE.0
+      DO_IMD_SUM = AND(CACHE_CTRL,DC_F_IMD_SUM).NE.0
+      DO_PSF_SUM = AND(CACHE_CTRL,DC_F_PSF_SUM).NE.0
+      DO_BGND_SUM = AND(CACHE_CTRL,DC_F_BGND_SUM).NE.0
 
 *    Cache psf?
       CP = 0

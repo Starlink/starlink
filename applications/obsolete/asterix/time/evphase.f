@@ -205,7 +205,8 @@
 *  Locate the list the user hsa nominated
       CALL EDI_IDXNAM( IFID, TLIST, TLID, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', 'Unable to find time list '//TLIST, STATUS )
+        CALL MSG_SETC( 'TL', TLIST )
+        CALL ERR_REP( ' ', 'Unable to find time list ^TL', STATUS )
         GOTO 99
       END IF
       CALL ADI_ERASE( TLID, STATUS )
