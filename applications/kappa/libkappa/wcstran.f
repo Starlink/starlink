@@ -122,6 +122,8 @@
 *  History:
 *     4-NOV-1998 (DSB):
 *        Original version.
+*     25-AUG-1999 (DSB):
+*        Add TOKEN arg in call to KPG1_ASFRM
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -177,8 +179,9 @@
 *  Set the current Frame to be the required input Frame specified by 
 *  parameter FRAMEIN. If "WORLD" co-ordinates are requested, use PIXEL. 
 *  If "DATA" co-ordinates are requested, use "AXIS".
+      CALL NDF_MSG( 'NDF', INDF )
       CALL KPG1_ASFRM( 'FRAMEIN', 'EPOCHIN', IWCS, 'PIXEL', 'AXIS',
-     :                 .TRUE., STATUS )
+     :                 .TRUE., '^NDF', STATUS )
 
 *  Get a pointer to the input Frame.
       FRMIN = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
@@ -200,8 +203,9 @@
 *  Set the current Frame to be the required output Frame specified by 
 *  parameter FRAMEOUT. If "WORLD" co-ordinates are requested, use PIXEL. 
 *  If "DATA" co-ordinates are requested, use "AXIS".
+      CALL NDF_MSG( 'NDF', INDF )
       CALL KPG1_ASFRM( 'FRAMEOUT', 'EPOCHOUT', IWCS, 'PIXEL', 'AXIS',
-     :                 .TRUE., STATUS )
+     :                 .TRUE., '^NDF', STATUS )
 
 *  Get a pointer to the output Frame.
       FRMOUT = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )

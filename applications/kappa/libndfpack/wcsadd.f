@@ -134,6 +134,8 @@
 *  History:
 *     2-OCT-1998 (DSB):
 *        Original version.
+*     25-AUG-1999 (DSB):
+*        Add TOKEN arg in call to KPG1_ASFRM
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -204,8 +206,9 @@
 
 *  Get the existing Frame which is to be used as the basis for the new Frame. 
 *  The selected Frame becomes the Current Frame.
+      CALL NDF_MSG( 'NDF', INDF )
       CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IWCS, 'PIXEL', 'AXIS', .TRUE.,
-     :                 STATUS )
+     :                 '^NDF', STATUS )
 
 *  Get its index, get a pointer to it, and save the number of axes in it.
       IBASIS = AST_GETI( IWCS, 'CURRENT', STATUS )

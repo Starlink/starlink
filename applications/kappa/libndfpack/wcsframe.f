@@ -101,6 +101,8 @@
 *  History:
 *     13-AUG-1998 (DSB):
 *        Original version.
+*     25-AUG-1999 (DSB):
+*        Add TOKEN arg in call to KPG1_ASFRM
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -149,8 +151,9 @@
 *  Set the new Current Frame using parameter FRAME. If "WORLD" co-ordinates
 *  are requested, use PIXEL. If "DATA" co-ordinates are requested, use
 *  "AXIS".
+      CALL NDF_MSG( 'NDF', INDF )
       CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IWCS, 'PIXEL', 'AXIS', .TRUE.,
-     :                 STATUS )
+     :                 '^NDF', STATUS )
 
 *  Save a copy of the modified FrameSet in the NDF's WCS component.
       CALL NDF_PTWCS( IWCS, INDF, STATUS )

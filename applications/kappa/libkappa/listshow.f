@@ -317,6 +317,8 @@
 *        Original version.
 *     22-JUN-1999 (DSB):
 *        Display the alignment Frame even if QUIET is TRUE.
+*     25-AUG-1999 (DSB):
+*        Add TOKEN arg in call to KPG1_ASFRM.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -575,7 +577,7 @@
 *  a different sky co-ordinate system. For this reason, we took a copy of
 *  the Current Frame above, rather than just saving its index.
       CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IWCS, 'PIXEL', 'AXIS', 
-     :                 .TRUE., STATUS )
+     :                 .TRUE., 'positions list ''$INCAT''', STATUS )
 
 *  Get the number of axes in the requested Frame.
       NRAX = AST_GETI( IWCS, 'NAXES', STATUS )
