@@ -106,6 +106,13 @@ if test $ac_cv_fc_type_kind = yes; then
 fi
 
 
+dnl    So they can be noted in the generated parameter files, pass the
+dnl    $build and FC variables in to config.h
+AC_DEFINE_UNQUOTED([INFO_BUILD], "$build", 
+    "The config.guess value for the build system")
+AC_DEFINE_UNQUOTED([INFO_FC],    "$FC",
+    "The Fortran compiler whose characteristics were tested")
+
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [sae])
