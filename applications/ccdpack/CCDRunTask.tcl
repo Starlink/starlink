@@ -50,15 +50,17 @@
 #        Other CCDPACK applications will also show a little
 #        information. If this value is 3 then we just wait.
 #     args = window (read)
-#        The description to use in the window while waiting. This
-#        arguments are not required if wait is 0 or 3.
+#        If wait is 1 or 2 then the first of these (syntactically) 
+#        optional arguments must give the name of the window controlling
+#        the busy window.  A second optional argument may be given
+#        specifying the text to write in the busy window.
 
 #  Global variables (of note):
 #     CCDdir = string (read)
 #        The CCDPACK binary directory.
 #     CCDseetasks = boolean (read)
 #        Whether the output from the tasks should be displayed or not.
-#    TASK = array (read and write)
+#     TASK = array (read and write)
 #        The element.
 #
 #          TASK($app,return)
@@ -114,6 +116,9 @@
 #        Changed to use new task & application controls.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     3-JUL-2001 (MBT):
+#        Fixed some bugs from last change, farmed out window centring,
+#        made task invocation get written out to log window.
 #     {enter_further_changes_here}
 
 #-
@@ -151,9 +156,8 @@ this interface (probably programming error)."
 
 #  Set the names of the variable top-level widgets.
       set Btop [lindex $args 0]
-      set btop [CCDPathOf $Btop]
-      set otopwin ".taskoutput"
-      set itopwin ".taskwait"
+      set Otopwin ".taskoutput"
+      set Itopwin ".taskwait"
 
 #------------------------------------------------------------------------------
 #  Create a top-level widget for looking at the task output if needed, and/or
@@ -162,15 +166,15 @@ this interface (probably programming error)."
       if { $CCDseetasks } {
 
 #  Check if output window already exists, if not create one.
-         if { ! [winfo exists $otopwin] } {
+         if { ! [winfo exists [CCDPathOf $Otopwin]] } {
 
 #  Top level widget.
             CCDCcdWidget Otop otop \
-               Ccd_toplevel $otopwin -title "Output from applications"
+               Ccd_toplevel $Otopwin -title "Output from applications"
 
 #  Menubar.
             CCDCcdWidget Menubar menubar \
-               Ccd_helpmenubar $Otop.menubar -standard 1
+               Ccd_helpmenubar $Otop.menubar
 
 #  Scrolled text widget for the output.
             CCDCcdWidget Output output Ccd_scrolltext $Otop.output
@@ -194,12 +198,14 @@ this interface (probably programming error)."
             pack $menubar -fill x
             pack $choice -side bottom -fill x
             pack $output -fill both -expand true
+         } else {
+            set Output $Otopwin.output
          }
       }
       if { $wait == 1 || $wait == 2 } {
 
 #  Use an information window about status.
-         CCDCcdWidget Itop itop Ccd_toplevel $itopwin -title {Information...}
+         CCDCcdWidget Itop itop Ccd_toplevel $Itopwin -title {Information...}
          wm withdraw $itop
          CCDTkWidget Frame1 frame1 frame $itop.frame1
          CCDTkWidget Frame2 frame2 frame $itop.frame2
@@ -225,19 +231,12 @@ this interface (probably programming error)."
          pack $message -fill both -expand true
 
 #  Make sure that this can be seen and position it prominently.
-         update idletasks
          if { $CCDseetasks } {
-            set x [expr [winfo rootx $otop] + [winfo reqwidth $otop]/2 \
-                      -[winfo reqwidth $itop]/2]
-            set y [expr [winfo rooty $otop] + [winfo reqheight $otop]/2 \
-                      -[winfo reqheight $itop]/2]
+            set Master $Otopwin
          } else {
-            set x [expr [winfo rootx $btop] + [winfo reqwidth $btop]/2 \
-                      -[winfo reqwidth $itop]/2]
-            set y [expr [winfo rooty $btop] + [winfo reqheight $btop]/2 \
-                      -[winfo reqheight $itop]/2]
+            set Master $Btop
          }
-         wm geometry $itop +$x+$y
+         CCDCentreWindow $Itop $Master
          wm deiconify $itop
 
 #  And animate it with the appropriate function.
@@ -257,7 +256,12 @@ this interface (probably programming error)."
 #------------------------------------------------------------------------------
       set TASK($app,error) ""
       set TASK($app,output) ""
-      set TASK(window) $otopwin.output
+      if { $CCDseetasks } { 
+         set TASK(window) $Output
+         $Output insert end "% $app $arguments\n"
+      } else {
+         set TASK(window) NO_WINDOW
+      }
       set TASK($app,progress) 0
       if { $wait == 2 } { set seeprogress 1 } else { set seeprogress 0 }
 
