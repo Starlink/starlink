@@ -5,6 +5,7 @@
      :     BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
+     :     QMF, QUALITY_PTR, QUALITY_END,
      :     INT_LIST, WEIGHT, SHIFT_DX, SHIFT_DY,
      :     NPARS, PARS, STATUS)
 *+
@@ -22,6 +23,7 @@
 *     :     BOL_ADC, BOL_CHAN,
 *     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
 *     :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
+*     :     QMF, QUALITY_PTR, QUALITY_END,
 *     :     INT_LIST, WEIGHT, SHIFT_DX, SHIFT_DY,
 *     :     NPARS, PARS, STATUS)
  
@@ -90,6 +92,13 @@
 *        Array of pointers to variance values read from each file
 *     VARIANCE_END( MAX_FILE ) = INTEGER (Returned)
 *        Array of pointers to end of variance values
+*     QMF = LOGICAL (Given)
+*        Flag to decide whether quality is being stored (.FALSE.) or
+*        being folded into the data array (.true.). See NDF_SQMF
+*     QUALITY_PTR = INTEGER (Returned)
+*        Pointer to quality array
+*     QUALITY_END = INTEGER (Returned)
+*        Pointer to end of quality array
 *     INT_LIST( MAX_FILE, MAX_INTS+1) = INTEGER (Returned)
 *        Position of integrations in each data file
 *     WEIGHT( MAX_FILE ) = REAL (Returned)
@@ -156,6 +165,7 @@
       INTEGER          MAX_FILE
       CHARACTER*(*)    NAME
       CHARACTER*(*)    OUT_COORDS
+      LOGICAL          QMF
 
 *  Arguments Given & Returned:
       INTEGER          N_FILE
@@ -182,6 +192,8 @@
       INTEGER          NPARS
       REAL             PARS(3) ! I know there are 3 parameters
       CHARACTER*(*)    OBJECT(MAX_FILE)
+      INTEGER          QUALITY_END(MAX_FILE)
+      INTEGER          QUALITY_PTR(MAX_FILE)
       INTEGER          RLEV    ! Recursion level
       REAL             SHIFT_DX(MAX_FILE)
       REAL             SHIFT_DY(MAX_FILE)
@@ -298,7 +310,8 @@
      :           BOL_RA_END(N_FILE), BOL_DEC_PTR(N_FILE),
      :           BOL_DEC_END(N_FILE), DATA_PTR(N_FILE), 
      :           DATA_END(N_FILE), VARIANCE_PTR(N_FILE),
-     :           VARIANCE_END(N_FILE), INT_LIST, STATUS)
+     :           VARIANCE_END(N_FILE), QMF, QUALITY_PTR(N_FILE),
+     :           QUALITY_END(N_FILE), INT_LIST, STATUS)
 
             CALL MSG_BLANK(STATUS)
 
@@ -414,6 +427,7 @@
      :                    BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :                    BOL_DEC_END, DATA_PTR, DATA_END, 
      :                    VARIANCE_PTR, VARIANCE_END,
+     :                    QMF, QUALITY_PTR, QUALITY_END,
      :                    INT_LIST, WEIGHT, SHIFT_DX, 
      :                    SHIFT_DY,  NPARS, PARS, 
      :                    STATUS)
@@ -451,6 +465,7 @@
      :     BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
+     :     QMF, QUALITY_PTR, QUALITY_END,
      :     INT_LIST, WEIGHT, SHIFT_DX, SHIFT_DY,
      :     NPARS, PARS,
      :     STATUS)
@@ -486,6 +501,7 @@
       INTEGER          MAX_FILE
       CHARACTER*(*)    SNAME
       CHARACTER*(*)    OUT_COORDS
+      LOGICAL          QMF
 
 *  Arguments Given & Returned:
       INTEGER          N_FILE
@@ -512,6 +528,8 @@
       INTEGER          NPARS
       REAL             PARS(3) ! I know there are 3 parameters
       CHARACTER*(*)    OBJECT(MAX_FILE)
+      INTEGER          QUALITY_END(MAX_FILE)
+      INTEGER          QUALITY_PTR(MAX_FILE)
       INTEGER          RLEV    ! Recursion level
       REAL             SHIFT_DX(MAX_FILE)
       REAL             SHIFT_DY(MAX_FILE)
@@ -536,6 +554,7 @@
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, 
      :     VARIANCE_PTR, VARIANCE_END,
+     :     QMF, QUALITY_PTR, QUALITY_END,
      :     INT_LIST, WEIGHT, SHIFT_DX, 
      :     SHIFT_DY,  NPARS, PARS, 
      :     STATUS)
