@@ -19,6 +19,7 @@
  *                           (needed to allow HDU access).
  *                 14/08/00  Added getReadonly member so that assumed
  *                           access mode can be determined.
+ *                 16/08/00  Added write and mergeHeader members.
  */
 
 #include "FitsIO.h"
@@ -65,6 +66,12 @@ public:
     
     //  Return if the data and header are mapped with readonly access.
     int getReadonly();
+
+    //  Merge the primary and extension FITS headers.
+    void mergeHeader();
+
+    //  Write a FITS image to disk.
+    int write( const char *filename );
 };
 
 #endif _StarFitsIO_h_

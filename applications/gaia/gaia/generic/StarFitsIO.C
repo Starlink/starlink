@@ -5,8 +5,10 @@
  *
  * StarFitsIO.C - method definitions for class StarFitsIO, for operating on
  *                Fits files. This class redefines class FitsIO to use
- *                the Starlink AST library. It also forces the use of 
+ *                the Starlink AST library. It also forces the use of
  *                readonly access, if that is all that is available
+ *                and correctly saves a set of merged headers for
+ *                extension images.
  *
  * who             when      what
  * --------------  --------  ----------------------------------------
@@ -18,7 +20,12 @@
  *                 14/08/00  Changed readonly access behaviour. This
  *                           is now used when only mechanism possible,
  *                           rather then throwing an error. The
- *                           readonly status should be queried after opening.
+ *                           readonly status should be queried after
+ *                           opening. Now also saves the merged
+ *                           headers with any extension images.
+ *                 16/08/00  Changed extension header merging to be more
+ *                           correct. Added write member to added a
+ *                           merged set of headers to any new files.
  */
 static const char* const rcsId="@(#) $Id$";
 
@@ -35,6 +42,8 @@ static const char* const rcsId="@(#) $Id$";
 #include "Mem.h"
 #include "StarWCS.h"
 #include "StarFitsIO.h"
+
+enum {FITSBLOCK=2880};
 
 /*
  * create and return a temporary file with a copy of stdin.
@@ -194,34 +203,6 @@ StarFitsIO* StarFitsIO::initialize(Mem& header, Mem& data, fitsfile* fitsio)
 }
 
 /*
- *  Initialize world coordinates (based on the image header)
- */
-int StarFitsIO::wcsinit()
-{
-    //   If there are multiple HDUs, merge the primary header with
-    //   the extension header to get all of the WCS info.
-    if ( getNumHDUs() > 1 ) {
-        int length = header_.length() + primaryHeader_.length();
-        mergedHeader_ = Mem( length + 1, 0 );
-        if ( mergedHeader_.status() == 0 ) {
-            strncpy( (char *)mergedHeader_.ptr(),
-                     (char *)header_.ptr(),
-                     header_.length() );
-            strncpy( (char *)mergedHeader_.ptr() + header_.length(),
-                     (char *)primaryHeader_.ptr(),
-                     primaryHeader_.length() );
-
-            ( (char *)mergedHeader_.ptr() )[length] = '\0';
-
-            wcs_ = WCS(new StarWCS( (const char *)mergedHeader_.ptr() ) );
-            return wcs_.status();
-        }
-    }
-    wcs_ = WCS(new StarWCS( (const char *)header_.ptr() ) );
-    return wcs_.status();
-}
-
-/*
  *  Return if the data is mapped readonly (this may happen even if
  *  readwrite access was initially specified).
  */
@@ -232,3 +213,248 @@ int StarFitsIO::getReadonly() {
         return 1;
     }
 }
+
+/*
+ *  Initialize world coordinates (based on the image header)
+ */
+int StarFitsIO::wcsinit()
+{
+   //   If there are multiple HDUs, merge the primary header with
+   //   the extension header to get all of the WCS info.
+   if ( getNumHDUs() > 1 && getHDUNum() != 1 ) {
+      mergeHeader();
+      wcs_ = WCS( new StarWCS( (const char *)mergedHeader_.ptr() ) );
+      return wcs_.status();
+   }
+   wcs_ = WCS(new StarWCS( (const char *)header_.ptr() ) );
+   return wcs_.status();
+}
+
+/*  
+ *  Merge the current primary and extension header into a single
+ *  header. The merge is done by taking the extension header and
+ *  adding the any primary items that are not already present.
+ *  All 'COMMENT', 'HISTORY' or ' ' (blank) cards are retained.
+ */
+void StarFitsIO::mergeHeader()
+{
+    //  Allocate space for merged header. Note this is maximum as some
+    //  cards could be duplicated. Also use malloc so we can give
+    //  control of memory to a Mem object when completed.
+    int plength = primaryHeader_.length();
+    int elength = header_.length();
+    int maxlen = elength + plength + 1;
+    char *newheader = (char *) malloc( (size_t) maxlen );
+
+    //  Copy the extension header into place. Replacing the first card
+    //  which should be XTENSION='IMAGE', with SIMPLE = T.
+    sprintf( newheader, "%-80s", 
+             "SIMPLE  =                    T / Fits standard" );
+    strncpy( newheader + 80, (char *)header_.ptr() + 80, elength - 80 );
+
+    //  Get number of cards in each of the headers.
+    int fixedcards = elength / 80;
+    int extracards = plength / 80;
+
+    //  Locate and skip the END card (this is where we start adding
+    //  any new cards).
+    char *endPtr = (char *) newheader;
+    int newlength = 0;
+    for ( int i = 0 ; i < fixedcards; i++, endPtr += 80, newlength += 80 ) {
+        if ( strncmp( endPtr, "END     ", 8 ) == 0 ) {
+            break;
+        }
+    }
+    fixedcards = newlength / 80;
+
+    //  Loop over all primary headers, adding any new or special
+    //  cards to the end of the new headers.
+    char *extraPtr = (char *) primaryHeader_.ptr();
+    int skip = 0;
+    for ( int i = 0 ; i < extracards; i++, extraPtr += 80 ) {
+
+        //  Special cards are always added to the end. Note END card
+        //  is always copied from primary headers.
+        if ( strncmp( extraPtr, "END     ", 8 ) == 0 ) { 
+            skip = 0;
+            i = extracards;  // Time to stop
+        } else if ( strncmp( extraPtr, "COMMENT ", 8 ) == 0 ||
+                    strncmp( extraPtr, "HISTORY ", 8 ) == 0 ||
+                    strncmp( extraPtr, "        ", 8 ) == 0 ) {
+            skip = 0;
+        } else {
+
+            //  Need to check for an existing keyword and skip
+            //  position if found. 
+            skip = 0;
+            char *mainPtr = (char *) newheader;
+            for ( int j = 0; j < fixedcards; j++, mainPtr += 80 ) {
+                if ( strncmp( extraPtr, mainPtr, 8 ) == 0 ) {
+                    skip = 1;
+                    break;
+                }
+            }
+        }
+        if ( ! skip ) {
+            
+            //  Keyword not seen or special, so append this.
+            strncpy( endPtr, extraPtr, 80 );
+            endPtr += 80;
+            newlength += 80;
+        }
+    }
+    char *tmpPtr = newheader;
+    for ( int i = 0; i < newlength; i++ ) {
+        printf( "%c", *tmpPtr++ );
+    }
+    printf( "\n" );
+
+    //  Truncate memory to that actually used.
+    char *finalheader = (char *) realloc( (void *)newheader, newlength );
+
+    //  Now create the merged header Mem object.
+    mergedHeader_ = Mem( (void *) finalheader, newlength, 1 );
+}
+
+/*
+ *  Write a FITS file using the image data and headers.
+ *
+ *  Override to correctly output merged headers when saving a
+ *  extension image.
+ */
+int StarFitsIO::write( const char *filename )
+{
+    char tmpfilename[1024];
+    int istemp = 1;
+
+    if (fitsio_) {
+	// flush any changes done in a memory FITS file
+	int status = 0;
+	if (fits_flush_file(fitsio_, &status) != 0)
+	    return cfitsio_error();
+    }
+
+    // if the file exists, rename it to make a backup and to avoid
+    // crashing if we have the file mapped already
+    if (access(filename, F_OK) == 0) {
+	char backup[1024];
+	sprintf(backup, "%s.BAK", filename);
+	if (rename(filename, backup) != 0)
+	    return sys_error("can't create backup file for ", filename);
+    }
+
+    FILE *f;
+    f = fopen(filename,"w");
+    if (f == NULL)
+	return error("can't create FITS file: ", filename);
+
+    // if we have a FITS header, use it, otherwise create one from what we know
+    // and add some "blank cards" at the end for application use
+    int header_length = header_.length();
+    if ( header_length > 0 ) {
+       char *nextrec = (char *)header_.ptr();
+       if ( getNumHDUs() > 1 && getHDUNum() != 1 ) {
+
+           //  Need to save the merged version of the headers.
+           if ( mergedHeader_.ptr() == NULL ) {
+               mergeHeader();
+           }
+           header_length = mergedHeader_.length();
+           nextrec = (char *)mergedHeader_.ptr();
+       }
+       fwrite((char *)nextrec, 1, header_length, f);
+       padFile(f, header_length);
+    }
+    else {
+	// create a FITS header
+	int size = FITSBLOCK/80;  // number of keyword lines in FITS header, including END
+
+	// output keywords
+	put_keyword(f, "SIMPLE", 'T'); size--;
+	int bitpix = bitpix_;
+	if (bitpix == -16)
+	    bitpix = 16;
+	put_keyword(f, "BITPIX", bitpix); size--;
+	put_keyword(f, "NAXIS", 2); size--;
+	put_keyword(f, "NAXIS1", width_); size--;
+	put_keyword(f, "NAXIS2", height_); size--;
+	if (bitpix_ == -16) {
+	    put_keyword(f, "BZERO", (double)32768.0); size--;
+	    put_keyword(f, "BSCALE", (double)1.0); size--;
+	}
+	put_keyword(f, "COMMENT", "Generated by FitsIO::write on:"); size--;
+
+	// add a timestamp
+	char buf2[25];
+	time_t clock = time(0);
+	strftime(buf2, sizeof(buf2), "%Y-%m-%dT%H:%M:%S", localtime(&clock));
+	put_keyword(f, "DATE", buf2); size--;
+
+	// leave some "blank cards" for later modification by other applications
+	char buf[10];
+	int i = 0;
+	while (size > 1) {
+	    sprintf(buf, "BLANK%02d", ++i);
+	    put_keyword(f, buf, " "); size--;
+	}
+
+	fprintf(f, "%-80s", "END");
+
+	// ... no need for padding, since we filled up the FITS block
+    }
+
+    // now write the image data
+    int tsize = abs(bitpix_)/8;   // size of a pixel value
+    switch(bitpix_) {
+    case -8: // note: special non-fits format for a saved XImage
+    case 8:
+    case 16:
+    case 32:
+    case -32:
+	fwrite((char*)data_.ptr(), tsize, width_*height_, f);
+	break;
+    case -16:
+    {
+	// unsigned short needs to be converted (conversion taken from Midas)
+	unsigned short *pu = (unsigned short *)data_.ptr();
+	int i = width_*height_;
+	short *ps_new = new short[i];
+	short *ps = ps_new;
+	if (ps_new == 0) {
+	    fclose(f);
+	    return error("Not enough memory");
+	}
+	int nn;
+	while (i--) {
+	    nn = (int)(*pu++) - 32768;
+	    *ps++ = (unsigned int) nn;
+	}
+	fwrite((char*)ps_new, tsize, width_*height_, f);
+	delete ps_new;
+    }
+    break;
+    default:
+	fclose(f);
+	return error("unsupported image type");
+    }
+
+    // round off file size
+    padFile(f, width_*height_*tsize);
+
+    fclose(f);
+
+    // check the file extension for recognized compression types
+
+    const char *tmpfile = check_compress(filename, tmpfilename, sizeof(tmpfilename),
+					 istemp, 0, bitpix_);
+    if (tmpfile == NULL)
+	return ERROR;
+
+    if (strcmp(tmpfile, filename) != 0) {
+	if (rename(tmpfile, filename) != 0)
+	    return sys_error("cannot rename to file ", filename);
+    }
+
+    return OK;
+}
+
