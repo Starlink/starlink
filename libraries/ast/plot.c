@@ -284,6 +284,16 @@ f     using AST_GRID
 *     13-JUN-2001 (DSB):
 *        Added public method astGenCurve, astGrfSet, astGrfPop, astGrfPush.
 *        Made DrawAxes attribute axis specific.
+*     4-JUL-2001 (DSB):
+*        The Crv function used to have a restriction that if *any*
+*        subsection was very short, then *none* of the subsections were
+*        subdivided. This meant that long subsections which needed
+*        subdividing were not subdivided if there was also a very short
+*        subsection. To get round this problem the restriction was changed
+*        to "if *all* subsections are very short then none are divided.
+*        This was implemented by changing dl2_min to dl2_max, and adding
+*        a check for very short segments (which are then not sub-divided). 
+
 *class--
 */
 
@@ -5925,8 +5935,8 @@ static int Cross( float ax, float ay, float bx, float by,
    return ret;
 }
 
-static void Crv( AstPlot *this, double *d, double *x, double *y, const char *method, 
-                 const char *class ){
+static void Crv( AstPlot *this, double *d, double *x, double *y, 
+                 const char *method, const char *class ){
 /*
 *  Name:
 *     Crv
@@ -6034,7 +6044,7 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, const char *met
    static double cosang;  /* Cosine of angle between adjacent segments */
    static double d0;      /* Distance to start of first sub-segment */
    static double delta;   /* Distance between adjacent sub-segments */
-   static double dl2_min; /* Minimum squred segment length */
+   static double dl2_max; /* Maximum squred segment length */
    static double dl;      /* Segment length in graphics coordinates */
    static double last_x;  /* Graphics X at the end of the previous segment */
    static double last_y;  /* Graphics Y at the end of the previous segment */
@@ -6104,8 +6114,8 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, const char *met
    pdy = dy;
    pdl2 = dl2;
 
-/* Initialise the smallest squared length value. */
-   dl2_min = DBL_MAX;
+/* Initialise the largest squared length value. */
+   dl2_max = 0.0;
 
 /* Loop round each segment. */
    for( i = 0; i < CRV_NSEG; i++ ){
@@ -6129,8 +6139,8 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, const char *met
             *(pdy++) = t2;
             *(pdl2++) = t3;
 
-/* Update the minimum squared length. */
-            if( t3 < dl2_min ) dl2_min = t3;
+/* Update the maximum squared length. */
+            if( t3 > dl2_max ) dl2_max = t3;
 
 /* If the start was bad, the length of the segment is not defined so store 
    bad values. */
@@ -6257,6 +6267,11 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, const char *met
 
    if( !(*segm) ) *seg0 = 0;
 
+/* Very short segments should not be sub-divided. */
+   for( i = 0; i < CRV_NSEG; i++ ){
+      if( !seg_ok[i] && dl2[i] < limit2 ) seg_ok[i] = 1;
+   }
+
 /* ======================================================================
    The next section of this function draws the curve. Each segment is drawn
    as a straight line if the corresponding flag in "seg_ok" is set.
@@ -6270,10 +6285,10 @@ static void Crv( AstPlot *this, double *d, double *x, double *y, const char *met
 
 /* If we have made the maximum number of recursive entries into this
    function, or if every supplied point was bad or outside the plotting
-   area, or if any of the segments were very short in graphics space, we will 
+   area, or if all the segments were very short in graphics space, we will 
    not be attempting to subdivide any segments which cannot be drawn directly 
    as a straight line. */
-   subdivide = ( Crv_nent < CRV_MXENT && !all_bad && dl2_min > limit2 );
+   subdivide = ( Crv_nent < CRV_MXENT && !all_bad && dl2_max > limit2 );
 
 /* Initialise some pointers to the data defineding the subsegments. */
    dd = NULL;
@@ -16162,6 +16177,7 @@ static void Map4( int n, double *dist, double *x, double *y,
 */
 
 /* Local Variables: */
+   int i;
    double *ptr1[ 1 ];                /* Pointer to distances data */
    double *ptr3[ 2 ];                /* Pointers to graphics coord data */
    static AstPointSet *pset1 = NULL; /* PointSet holding distances */
