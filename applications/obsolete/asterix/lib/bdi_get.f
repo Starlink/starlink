@@ -383,10 +383,12 @@
 *      Map the axis data
           CALL BDI_AXMAPR( ID, AXNO, 'Data', 'READ', AXPTR, STATUS )
 
-*      Values are regular?
+*      Extract extrema and convert to base and scale
           CALL BDI_GETSHP( ID, ADI__MXDIM, DIMS, NDIM, STATUS )
-          CALL ARR_CHKREG( %VAL(AXPTR), DIMS(AXNO), REG, SPARR(1),
-     :                     SPARR(2), STATUS )
+          CALL ARR_ELEM1R( AXPTR, DIMS(AXNO), 1, SPARR(1), STATUS )
+          CALL ARR_ELEM1R( AXPTR, DIMS(AXNO), DIMS(AXNO), SPARR(2),
+     :                     STATUS )
+          SPARR(2) = (SPARR(2) - SPARR(1))/REAL(DIMS(AXNO)-1)
 
 *      Unmap the axis
           CALL BDI_AXUNMAP( ID, AXNO, 'Data', AXPTR, STATUS )
