@@ -88,7 +88,7 @@
       }
 
 #  Add more control groups.
-      addgroup style Style
+      addgroup style Display
       addgroup cutoff Cutoff
 
 #  Construct additional control widgets.
@@ -110,6 +110,8 @@
 #  Add new control widgets to the panel.
       addcontrol $itk_component(dstyle) style
       addcontrol $itk_component(percut) cutoff
+      pack [ groupwin style ] -before [ groupwin action ] -side left -fill y
+      pack [ groupwin cutoff ] -before [ groupwin style ] -side left -fill y
 
 #  Do requested configuration.
       eval itk_initialize $args
@@ -303,7 +305,7 @@
                margin=0 \
                style=\"tickall=1,drawtitle=0,$displaystyle\" \
                reset \
-            "
+            " "Displaying image [ $ndf name ]" $itk_interior
 
 #  Draw any points which have already been selected onto the new display.
          refreshpoints
