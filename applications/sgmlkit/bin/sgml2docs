@@ -263,7 +263,8 @@ if [ -r MANIFEST ]; then
     for f in `awk 'NF==1 {print $1}' MANIFEST`; do
 	case $f in
 	*.html)
-	    sed '/<[aA] *$/{:a;N;s/\n>/ >/;t;s/\n/ /;b a;}' $f >$PACKAGEDIR/$f
+	    #sed '/<[aA] *$/{:a;N;s/\n>/ >/;t;s/\n/ /;b a;}' $f >$PACKAGEDIR/$f
+	    sgmlnorm -d $f >$PACKAGEDIR/$f 2>>$PACKAGEDIR/sgmlnorm.errors
 	    ;;
 	*)
 	    mv $f $PACKAGEDIR
