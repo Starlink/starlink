@@ -48,6 +48,8 @@ f     The PermMap class does not define any new routines beyond those
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitPermMapVtab
 *        method.
+*     11-SEP-2003 (DSB):
+*        Added methods astGetInPerm and astGetOutPerm.
 *class--
 */
 
@@ -104,9 +106,124 @@ static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
+static int *GetOutPerm( AstPermMap * );
+static int *GetInPerm( AstPermMap * );
 
 /* Member functions. */
 /* ================= */
+
+static int *GetInPerm( AstPermMap *this ){
+/*
+*  Name:
+*     GetInPerm
+
+*  Purpose:
+*     Return a pointer to the InPerm array of a PermMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "permmap.h"
+*     int *astGetInPerm( AstPermMap *this )
+
+*  Class Membership:
+*     PermMap method 
+
+*  Description:
+*     This function returns a pointer to a dynamically allocated array 
+*     holding a copy of the InPerm array supplied when thre PermMap was 
+*     created.
+
+*  Parameters:
+*     this
+*        Pointer to the PermMap.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated array holding a copy of the 
+*     InPerm array. The pointer should be freed using astFree when it is
+*     no longer needed. The number of elements in the array will be given
+*     by the value of the Nin attribute.
+
+*  Notes:
+*     - A value of NULL will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   int *result;                /* Pointer to the returned array */
+
+/* Initialise the returned result. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Allocate memoy and put a copy of the InPerm array in it. */
+   result = (int *) astStore( NULL, this->inperm, 
+                              sizeof( int ) * (size_t) astGetNin( this ) );
+
+/* Return the result. */
+   return result;
+}
+
+static int *GetOutPerm( AstPermMap *this ){
+/*
+*  Name:
+*     GetOutPerm
+
+*  Purpose:
+*     Return a pointer to the OutPerm array of a PermMap.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "permmap.h"
+*     int *astGetOutPerm( AstPermMap *this )
+
+*  Class Membership:
+*     PermMap method 
+
+*  Description:
+*     This function returns a pointer to a dynamically allocated array 
+*     holding a copy of the OutPerm array supplied when thre PermMap was 
+*     created.
+
+*  Parameters:
+*     this
+*        Pointer to the PermMap.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated array holding a copy of the 
+*     OutPerm array. The pointer should be freed using astFree when it is
+*     no longer needed. The number of elements in the array will be given
+*     by the value of the Nout attribute.
+
+*  Notes:
+*     - A value of NULL will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   int *result;                /* Pointer to the returned array */
+
+/* Initialise the returned result. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Allocate memoy and put a copy of the OutPerm array in it. */
+   result = (int *) astStore( NULL, this->outperm, 
+                              sizeof( int ) * (size_t) astGetNout( this ) );
+
+/* Return the result. */
+   return result;
+}
+
 void astInitPermMapVtab_(  AstPermMapVtab *vtab, const char *name ) {
 /*
 *+
@@ -163,8 +280,8 @@ void astInitPermMapVtab_(  AstPermMapVtab *vtab, const char *name ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
-
-/* None. */
+   vtab->GetInPerm = GetInPerm;
+   vtab->GetOutPerm = GetOutPerm;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -2126,4 +2243,12 @@ AstPermMap *astLoadPermMap_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
-/* (None). */
+int *astGetInPerm_( AstPermMap *this ){
+   if( !astOK ) return NULL;
+   return (**astMEMBER(this,PermMap,GetInPerm))( this );
+}
+
+int *astGetOutPerm_( AstPermMap *this ){
+   if( !astOK ) return NULL;
+   return (**astMEMBER(this,PermMap,GetOutPerm))( this );
+}

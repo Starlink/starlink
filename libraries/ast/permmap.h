@@ -47,7 +47,14 @@
 *           Transform a set of points.
 
 *  New Methods Defined:
-*     None.
+*     Public:
+*        None.
+*
+*     Protected:
+*        astGetInPerm
+*           Obtain a copy of the input permutation array
+*        astGetOutPerm
+*           Obtain a copy of the output permutation array
 
 *  Other Class Functions:
 *     Public:
@@ -151,8 +158,8 @@ typedef struct AstPermMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-
-/* None. */
+   int *(* GetInPerm)( AstPermMap * );
+   int *(* GetOutPerm)( AstPermMap * );
 
 } AstPermMapVtab;
 #endif
@@ -190,7 +197,10 @@ AstPermMap *astLoadPermMap_( void *, size_t, AstPermMapVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-/* None. */
+# if defined(astCLASS)           /* Protected */
+int *astGetInPerm_( AstPermMap * );
+int *astGetOutPerm_( AstPermMap * );
+#endif
 
 /* Function interfaces. */
 /* ==================== */
@@ -236,5 +246,10 @@ astINVOKE(O,astLoadPermMap_(mem,size,vtab,name,astCheckChannel(channel)))
 /* Here we make use of astCheckPermMap to validate PermMap pointers
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
+
+#if defined(astCLASS)            /* Protected */
+#define astGetInPerm(this) astINVOKE(V,astGetInPerm_(astCheckPermMap(this)))
+#define astGetOutPerm(this) astINVOKE(V,astGetOutPerm_(astCheckPermMap(this)))
+#endif
 
 #endif
