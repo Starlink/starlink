@@ -163,26 +163,13 @@
 
 1 Changes_this_release
 
-  Release v4.0-14 is a bugfix update of CCDPACK.
+  Release v4.0-15 is a bugfix update of CCDPACK.
 
-  Changes since v4.0-10
+  Changes since v4.0-14
   ---------------------
 
-   - In TRANNDF a copy of the pre-transformation PIXEL coordinate system
-     will be preserved, under the name CCD_OLDPIXEL, in the World 
-     Coordinate System component of the transformed image.
-
-   - A bug which caused problems with OVERRIDE=TRUE in FINDOFF has been
-     fixed.  This is only likely to have caused problems to ORAC-DR users.
-
-   - A bug which prevented REGISTER from working with FITTYPE=6
-     has been fixed.
-
-   - A bug in which TRANNDF with linear interpolation failed to apply
-     flux conservation has been fixed.
-
-   - An improvement to the histogram determination routine used by FINDOBJ
-     and DRAWNDF has been made.
+  - In TRANNDF a bug in which flux conservation was lost when using
+    flipped images has been fixed.
 
 1 ASTEXP
 Exports coordinate system information from images

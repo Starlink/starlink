@@ -1007,7 +1007,7 @@
 *  Jacobian.
             CALL KPG1_MDETD( NVIN, NDF__MXDIM, JACOB, WORK1, WORK2,
      :                       FLUX, STATUS )
-            IF ( FLUX .GT. VAL__SMLD ) THEN
+            IF ( ABS( FLUX ) .GT. VAL__SMLD ) THEN
                FLUX = ABS( 1.0D0 / FLUX )
             ELSE
                FLUX = 1.0D0
