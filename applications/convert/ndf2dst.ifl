@@ -1,0 +1,48 @@
+## NDF2DST - Converts an NDF to a Figaro DST file.
+
+#+
+#  Name:
+#     NDF2DST.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     JM: Jo Murray (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     29-JUN-1990 (JM):
+#	 Original version.
+#     1992 January 30 (MJC):
+#     	 Renamed the file parameters to IN and OUT.  Added help from
+#	 a library.
+#     1992 August 27 (MJC):
+#     	 Make the current NDF the suggested default for IN.
+#     {enter_further_changes_here}
+
+#-
+
+interface NDF2DST
+
+   helplib        'CONVERT_DIR:CONVERT'
+
+   parameter	  IN             # Name of input NDF
+      position    1
+      type	  'NDF'
+      ppath       'GLOBAL,CURRENT'
+      prompt      'NDF to be converted'
+      association '<-GLOBAL.DATA_ARRAY'
+      helpkey     '*'
+   endparameter
+
+   parameter       OUT           # Name of output Figaro file
+      position     2
+      type         '_CHAR'
+      ppath        'CURRENT'
+      prompt       'Name of output Figaro file'
+      helpkey      '*'
+   endparameter
+
+endinterface
