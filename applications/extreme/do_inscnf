@@ -51,14 +51,14 @@
       fi
 
 #  Set up location of commands.
-      inscnf=$EXTREME_DIR/inscnf
-      fcmppl=$EXTREME_DIR/fcmp.pl
-      fcmp="perl $fcmppl"
-      if [ -x $inscnf -a -x $EXTREME_DIR/fcmp.pl ]
+      inscnf=inscnf
+      fcmppl=fcmp.pl
+      fcmp="perl `which $fcmppl`"
+      if [ `which $inscnf | wc -w` = "1" -a `which $fcmppl | wc -w` = "1" ]
       then
          :
       else
-         echo "EXTREME_DIR must contain inscnf and fcmp.pl commands."
+         echo "$0: The inscnf and fcmp.pl commands must be in the path."
          exit 1
       fi
  
