@@ -55,9 +55,67 @@ install-data: install-data-am
 uninstall: uninstall-am
 endif !%?SUBDIRS%
 
+# Wrap the installation in an environment which has MANIFEST_FD open on
+# a manifest file which the rest of the installation
+# should append to.  Only do this if STAR_MANIFEST_DIR is defined and
+# MANIFEST_FD isn't -- this should always be the case, but don't
+# fail if it isn't.  If we permit MANIFEST_FD to be defined, then
+# (a) it makes it possible to control this from outside by defining
+# this variable deliberately (given that we were ever to decide that
+# was a cunning plan), and (b) if one of these makefiles has its
+# `install-am' target invoked (which I don't _think_ should happen)
+# then we don't end up creating two manifests.
 .PHONY: install-am
 install-am: all-am
+if %?INSTALLMANIFEST%
+# Create an install manifest, and install it in the required manifest location
+	if test -n "$(STAR_MANIFEST_DIR)" -a -z "$(MANIFEST_FD)"; then \
+	    $(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR); \
+	    MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 5>$$MF && \
+	    echo "<?xml version='1.0'?>"                          >&5 ; \
+	    echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&5 ; \
+	    echo "<manifest component='$(PACKAGE_NAME)'>"         >&5 ; \
+	    echo "<version>$(PACKAGE_VERSION)</version>"          >&5 ; \
+	    echo "<files>"                                        >&5 ; \
+## If this is a standard package, then it's easy -- just define the
+## MANIFEST_FD variable in the environment.
+?STANDARDMANIFEST?	    MANIFEST_FD=5 $(MAKE) $(AM_MAKEFLAGS) \
+?STANDARDMANIFEST?	        install-exec-am install-data-am; \
+## Otherwise, install the component to a staging area, using the
+## STAR_MANIFEST_INSTALL_COMMAND defined in the Makefile.am, here available
+## in MANIFESTMAKEINSTALL.
+?!STANDARDMANIFEST?	    STG=$${TMPDIR-/tmp}/starconf-$$$$ ; \
+?!STANDARDMANIFEST?	    rm -Rf $$STG ; \
+?!STANDARDMANIFEST?	    $(mkdir_p) $$STG ; \
+?!STANDARDMANIFEST?	    ( DESTDIR=$$STG; prefix=$(prefix); \
+?!STANDARDMANIFEST?	        export DESTDIR prefix; \
+?!STANDARDMANIFEST?	        %MANIFESTMAKEINSTALL% ) ; \
+?!STANDARDMANIFEST?	    $(mkdir_p) $(DESTDIR)$(prefix) ; \
+## Find all the files in the staging area $STG, add any final installation
+## location, append each of these to the manifest FD, and delete each
+## (installed) file, so that the cp below will work.  There is a potential
+## problem here in that files which are not regular files or links will not
+## appear in the manifest; but they should still be installed.
+?!STANDARDMANIFEST?	    (cd $$STG && find . -type f -o -type l | \
+?!STANDARDMANIFEST?	      sed "s,^\.,$$DESTDIR," | \
+?!STANDARDMANIFEST?	      while read f; do \
+?!STANDARDMANIFEST?	        echo $$f>&5; \
+?!STANDARDMANIFEST?	        test -f $$f && { chmod 777 $$f && rm -f $$f; }; \
+?!STANDARDMANIFEST?	      done ); \
+?!STANDARDMANIFEST?	    echo "(cd $$STG; cp -R . $${DESTDIR-/})"; \
+?!STANDARDMANIFEST?	    (cd $$STG; cp -R . $${DESTDIR-/}); \
+?!STANDARDMANIFEST?	    rm -Rf $$STG; \
+	    echo "</files>"                                       >&5; \
+	    echo "</manifest>"                                    >&5; \
+	    exec 5>&-; \
+	    $(INSTALL_DATA) $$MF $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE); \
+	    rm -f $$MF; \
+	else \
+	    $(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am; \
+	fi
+else !%?INSTALLMANIFEST%
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+endif !%?INSTALLMANIFEST%
 ## Starlink: install a stamp file, just in case install-manifest isn't run
 	rm -f stamp-starlink-install
 	echo "component=\"$(PACKAGE_NAME)\"" >stamp-starlink-install

@@ -4320,6 +4320,37 @@ sub handle_footer
 # Generate `make install' rules.
 sub handle_install ()
 {
+  # Starlink material -- handle manifests
+  # Get definition of STAR_MANIFEST_DIR.  If this is non-zero, then
+  # this variable was defined, and we do want to include the manifest
+  # support in the generated Makefile.in.
+  my $manifestdir = var ('STAR_MANIFEST_DIR');
+  # If variable STAR_SPECIAL_INSTALL_COMMAND was defined, it's a command
+  # to use to install the component in a staging directory.
+  my $star_special_install_command = var ('STAR_SPECIAL_INSTALL_COMMAND');
+  # If $standard_manifest is true, use the standard way of creating and
+  # installing a manifest; if false, use the command in
+  # STAR_SPECIAL_INSTALL_COMMAND.
+  my $standard_manifest = 1;
+  my $make_cmd = '';
+  if ($star_special_install_command)
+    {
+      $make_cmd = $star_special_install_command->variable_value;
+      # Substitute prefix _and_ exec_prefix: some older Makefile.in files
+      # don't define the latter using the former.
+      if ($make_cmd =~ s{\$\(MAKE\)}{\$(MAKE) prefix=\$\$prefix exec_prefix=\$\$prefix})
+        {
+          # Escape newlines neatly
+          $make_cmd =~ s/\s*\n\s*/ \\\n\t  /g;
+          $standard_manifest = 0;
+        }
+      else
+        {
+          err_am ("STAR_SPECIAL_INSTALL_COMMAND doesn't include \$(MAKE)");
+          $make_cmd = '';
+        }
+    }
+
   $output_rules .= &file_contents
     ('install',
      new Automake::Location,
@@ -4329,7 +4360,11 @@ sub handle_install ()
 			     : ''),
      'installdirs-local' => (rule 'installdirs-local'
 			     ? ' installdirs-local' : ''),
-     am__installdirs => variable_value ('am__installdirs') || '');
+     am__installdirs => variable_value ('am__installdirs') || '',
+     INSTALLMANIFEST => $manifestdir,
+     STANDARDMANIFEST => $standard_manifest,
+     MANIFESTMAKEINSTALL => $make_cmd
+    );
 }
 
 
@@ -4721,10 +4756,6 @@ sub handle_minor_options
 
 sub handle_starlink
 {
-    # Get definition of STAR_MANIFEST_DIR.  If this is non-zero, then
-    # this variable was defined, and we do want to include install-manifest
-    # in the generated Makefile.in.
-    my $manifestdir = var ('STAR_MANIFEST_DIR');
     my $havelatex =
       defined($starlink_seen_features{latexdocs})
         && $starlink_seen_features{latexdocs};
@@ -4780,25 +4811,6 @@ sub handle_starlink
         register_suffix_rule (INTERNAL, '.ifl', '.ifc');
       }
 
-    my $starlink_manifest_install_command
-      = var ('STAR_MANIFEST_INSTALL_COMMAND');
-    my $standard_manifest = 1;
-    my $make_cmd = '';
-    if ($starlink_manifest_install_command)
-      {
-        $make_cmd = $starlink_manifest_install_command->variable_value;
-        if ($make_cmd =~ s{STAGINGPREFIX}{\$\$STG}g) 
-          {
-            $make_cmd =~ s/\s*\n\s*/ /g;
-            $standard_manifest = 0;
-          }
-        else
-          {
-            err_am ("STAR_MANIFEST_INSTALL_COMMAND doesn't include STAGINGPREFIX");
-            $make_cmd = '';
-          }
-      }
-
     if ($havelatex) 
       {
         # the starlink.am file defines template rules to generate
@@ -4814,9 +4826,6 @@ sub handle_starlink
 
     $output_rules .= &file_contents ('starlink',
                                      new Automake::Location,
-                                     INSTALLMANIFEST => $manifestdir,
-                                     STANDARDMANIFEST => $standard_manifest,
-                                     MANIFESTMAKEINSTALL => $make_cmd,
                                      LATEXDOCS => $havelatex,
                                      COMPIFL => $want_compifl
                                     );
