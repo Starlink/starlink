@@ -312,8 +312,11 @@
 *    Get the indentation columns for the type and value.
 
       CALL PAR_GDR0I( 'TYPIND', 15, 10, 40, .FALSE., CMNTYP, STATUS )
-      IF ( .NOT. NEWLIN )
-     :  CALL PAR_GDR0I( 'VALIND', 15, 10, 40, .FALSE., CMNVAL, STATUS )
+      IF ( .NOT. NEWLIN ) THEN
+         CALL PAR_GDR0I( 'VALIND', 15, 10, 40, .FALSE., CMNVAL, STATUS )
+      ELSE 
+         CMNVAL = 15
+      ENDIF
 
 *    Get the switch for character array elements to appear on one line.
 
