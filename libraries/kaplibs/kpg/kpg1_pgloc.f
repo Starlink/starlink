@@ -104,7 +104,7 @@
       ELSE
 
 *  Get the corresponding PGPLOT device type.
-         CALL AGP_ASPEC( AGINAM, .FALSE., SPEC, STATUS )
+         CALL AGI_ASPEC( AGINAM, .FALSE., SPEC, STATUS )
          PTYPE = SPEC( INDEX( SPEC, '/' ): )
 
 *  Loop round all components in the supplied object.
@@ -118,7 +118,7 @@
 *  Convert the AGI name into a PGPLOT device specification, and compare 
 *  to the device type for the currently opened device. If they are the 
 *  same, return with the current component locator.
-            CALL AGP_ASPEC( AGINAM, .FALSE., SPEC, STATUS )
+            CALL AGI_ASPEC( AGINAM, .FALSE., SPEC, STATUS )
             IF( PTYPE .EQ. SPEC( INDEX( SPEC, '/' ): ) ) THEN
                GO TO 999
 
