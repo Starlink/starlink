@@ -140,31 +140,38 @@ void astThrowException ( int status, AV* errorstack ) {
 
 /* Callbacks */
 
+/* sourceWrap is called by the fitschan constructor immediately and not
+   by the Read method. This means that there are no worries about 
+   reference counting or keeping copies of the function around.
+ */
+
 static char *sourceWrap( const char *(*source)() ) {
   dSP;
   SV * cb;
-  SV * myobject;
+  SV * retsv;
   int count;
+  int len;
   char * line;
+  char * retval;
 
   /* Return directly if ast status is set. */
   if ( !astOK ) return NULL;
+  if ( source == NULL ) {
+    astError( AST__INTER, "source function called without Perl callback");
+    return NULL;
+  }
 
   /* Need to cast the source argument to a SV*  */
-  myobject = (SV*) source;
-
-  cb = getPerlObjectAttr( myobject, "_source" );
-
-  if (cb == NULL) {
-    astError( AST__INTER, "Callback in channel 'source' not defined!");
-    return "";
-  }
+  cb = (SV*) source;
 
   /* call the callback with the supplied line */
   ENTER;
   SAVETMPS;
 
-  count = perl_call_sv( SvRV(cb), G_NOARGS | G_SCALAR | G_EVAL );
+  PUSHMARK(sp);
+  PUTBACK;
+
+  count = perl_call_sv( cb, G_NOARGS | G_SCALAR | G_EVAL );
 
   ReportPerlError( AST__INTER );
 
@@ -174,7 +181,20 @@ static char *sourceWrap( const char *(*source)() ) {
     if (count != 1) {
       astError( AST__INTER, "Returned more than one arg from channel source");
     } else {
-      line = POPp;
+      retsv = POPs;
+
+      if (SvOK(retsv)) {
+	line = SvPV(retsv, len);
+
+	/* The sourceWrap function must return the line in memory
+	   allocated using the AST memory allocator */
+	retval = astMalloc( len + 1 );
+	if ( retval != NULL ) {
+	  strcpy( retval, line );
+	}
+      } else {
+	retval = NULL;
+      }
     }
   }
 
@@ -182,7 +202,7 @@ static char *sourceWrap( const char *(*source)() ) {
   FREETMPS;
   LEAVE;
 
-  return line;
+  return retval;
 }
 
 static void sinkWrap( void (*sink)(const char *), const char *line ) {
@@ -488,10 +508,10 @@ MODULE = Starlink::AST  PACKAGE = Starlink::AST::Channel
 # matches.
 
 SV *
-_new( class, has_source, has_sink, options )
+_new( class, sourcefunc, sinkfunc, options )
   char * class
-  bool has_source
-  bool has_sink
+  SV * sinkfunc
+  SV * sourcefunc
   char * options;
  PREINIT:
   SV ** value;
@@ -500,6 +520,8 @@ _new( class, has_source, has_sink, options )
   AstChannel * channel;
   AstFitsChan * fitschan;
   AstXmlChan * xmlchan;
+  bool has_source = 0;
+  bool has_sink = 0;
  CODE:
   /* create the object without a pointer */
   RETVAL = createPerlObject( class, NULL );
@@ -508,13 +530,31 @@ _new( class, has_source, has_sink, options )
      Do this rather than always registering callback for efficiency reasons
      and because I am not sure if the presence of a callback affects the
      behaviour of the channel. */
+
+  /* First see whether we were given valid callbacks */
+  if (SvOK(sourcefunc) && SvROK(sourcefunc) && 
+        SvTYPE(SvRV(sourcefunc)) == SVt_PVCV) has_source = 1;
+  if (SvOK(sourcefunc) && SvROK(sinkfunc) && 
+        SvTYPE(SvRV(sinkfunc)) == SVt_PVCV) has_sink = 1;
+
   if ( has_source || has_sink) {
     /* Take a reference to the object but do not increment the REFCNT. We
        Want this to be freed when the perl object disappears. */
     /* only take one reference */
+
+    /* For sink functions we have to keep them around in the object 
+       since they are called when the object is annulled. */
     SV * rv = newRV_noinc( SvRV( RETVAL ));
-    if (has_source) source = rv;
-    if (has_sink) sink = rv;
+    if (has_sink) {
+      /* Store reference to object */
+      sink = rv;
+      /* and store the actual sink callback in the object */
+      setPerlObjectAttr( RETVAL, "_sink", newRV( SvRV(sinkfunc) ));
+    }
+
+    /* Source functions are called immediately so we can simply
+       pass the CV directly to the constructor */
+    if (has_source) source = sourcefunc;
   }
 
   /* Need to use astChannelFor style interface so that we can register
@@ -528,9 +568,11 @@ _new( class, has_source, has_sink, options )
   } else if (strstr( class, "FitsChan") != NULL) {
    ASTCALL(
     fitschan = astFitsChanFor( (const char *(*)()) source, sourceWrap,
-                             (void (*)( const char * )) sink, sinkWrap, options );
+                             (void (*)( const char * )) sink, sinkWrap, options );  printf("Got back from astChannelFor\n");
    )
+   printf("Got back from astChannelFor\n");
    if (astOK) setPerlAstObject( RETVAL, (AstObject*)fitschan );
+   printf("Got back from astChannelFor\n");
   } else if (strstr( class, "XmlChan") != NULL ) {
 #ifndef HASXMLCHAN   
    Perl_croak(aTHX_ "XmlChan: Please upgrade to AST V3.1 or greater");
@@ -966,13 +1008,20 @@ astClear( this, attrib )
     astClear( this, attrib );
   )
 
+# Store flag in the object when annulled so that the object destructor
+# does not cause a second annul.
+
 void
 astAnnul( this )
   AstObject * this
+ PREINIT:
+  SV* arg = ST(0);
  CODE:
   ASTCALL(
    astAnnul( this );
   )
+  setPerlObjectAttr( arg, "_annul",newSViv(1));
+
 
 AstObject *
 ast_Clone( this )
@@ -1142,6 +1191,7 @@ astDESTROY( obj )
   int *old_ast_status;
   int i;
   SV ** elem;
+  SV * flag;
   char one[3] = "! ";
   char two[3] = "!!";
   char * pling;
@@ -1151,30 +1201,35 @@ astDESTROY( obj )
   IV mytmp;
   AstObject * this;
  CODE:
-  /* DESTROY always inserts stub code for INT2PTR not what is in the typemap */
-  /* Do it manually */
-  mytmp = extractAstIntPointer( obj );
-  this = INT2PTR( AstObject *, mytmp );
+  /* see if we have annulled already */
+  flag = getPerlObjectAttr( obj, "_annul");
+  if (flag == NULL || ! SvTRUE(flag) ) {
+    /* DESTROY always seems to insert stub code for SVREF not what is in  */
+    /* the typemap file. Do it manually */
+    mytmp = extractAstIntPointer( obj );
+    this = INT2PTR( AstObject *, mytmp );
 
-  MUTEX_LOCK(&AST_mutex);
-  My_astClearErrMsg();
-  old_ast_status = astWatch( my_xsstatus );
-  astAnnul( this );
-  astWatch( old_ast_status );
-  My_astCopyErrMsg( &local_err );
-  MUTEX_UNLOCK(&AST_mutex);
-  if (*my_xsstatus != 0 ) {
-    for (i=0; i <= av_len( local_err ); i++ ) {
-      pling = ( i == 0 ? two : one );
-      elem = av_fetch( local_err, i, 0 );
-      if (elem != NULL ) {
-        PerlIO_printf( PerlIO_stderr(),  "%s %s\n", pling,
-		       SvPV( *elem, msglen ));
+    MUTEX_LOCK(&AST_mutex);
+    My_astClearErrMsg();
+    old_ast_status = astWatch( my_xsstatus );
+    astAnnul( this );
+    astWatch( old_ast_status );
+    My_astCopyErrMsg( &local_err );
+    MUTEX_UNLOCK(&AST_mutex);
+    if (*my_xsstatus != 0 ) {
+      for (i=0; i <= av_len( local_err ); i++ ) {
+        pling = ( i == 0 ? two : one );
+        elem = av_fetch( local_err, i, 0 );
+        if (elem != NULL ) {
+          PerlIO_printf( PerlIO_stderr(),  "%s %s\n", pling,
+		         SvPV( *elem, msglen ));
+        }
       }
+      if (!s) s = "(none)";
+      PerlIO_printf( PerlIO_stderr(),  
+                     "!  (in cleanup from file %s:%" IVdf ")\n",
+                     s, (IV) CopLINE(PL_curcop));
     }
-    if (!s) s = "(none)";
-    PerlIO_printf( PerlIO_stderr(),  "!  (in cleanup from file %s:%" IVdf ")\n",
-                s, (IV) CopLINE(PL_curcop));
   }
 
 

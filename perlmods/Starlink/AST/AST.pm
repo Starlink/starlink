@@ -203,12 +203,8 @@ sub new {
   $options = join(",",@options) if @options;
 
   # Call the underlying routine
-  my $self = $class->_new( defined $source, defined $sink, $options );
-
-  # Kluge - retain reference to the callback [inc ref count]
-  # Currently not used directly by the callback routine
-  $self->{_source} = $source if defined $source;
-  $self->{_sink}   = $sink if defined $sink;
+  # Pass in sink and source functions. Can be undef.
+  my $self = $class->_new( $source, $sink, $options );
 
   return $self;
 }
@@ -312,6 +308,7 @@ sub Read {
   my $self = shift;
   my $new = $self->_Read();
   return if !defined $new;
+  return if ! keys %$new; # Nothing returned from FitsChan
   my $ast_class = $new->GetC( "Class" );
   my $perl_class = "Starlink::AST::" . $ast_class;
   return bless $new, $perl_class;
