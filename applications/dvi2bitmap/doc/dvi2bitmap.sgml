@@ -167,6 +167,20 @@ dvi2bitmap [flags] dvi-file
 converted to a bitmap.  dvi2bitmap looks for the file both with and
 without the default extension <code>.dvi</code>.</p>
 
+<p>You may also read the DVI file from the standard input by giving the
+DVI file as 
+<code>"-"</code>, thus 
+<verbatim>
+cat myfile.dvi | dvi2bitmap -
+</verbatim>
+is an alternative way of reading the file (rather pointless in this
+case, but it shows the principle).
+For more arcane purposes, the DVI file may also be specified as 
+<code>&lt;osfile&gt;dvi-file</code>
+(which is entirely equivalent), or 
+<code>&lt;osfd&gt;integer</code>, where the given integer specifies an
+open file descriptor; specifying <code>"-"</code> as the input file is equivalent to <code>&lt;osfd&gt;0</code></p>
+
 <p>The motivation for this program was the need for a helper program
 to produce small bitmaps for inclusion in web pages.  Accordingly, the
 program's underlying usage model is that one would generate a file of
@@ -377,7 +391,8 @@ file extension will be added.</p></dd>
 
 <dt><code>&ddash;pipe</code></dt>
 <dd>Indicates that the dvi-file argument is a non-seekable file, such as
-a named pipe</dd>
+a named or unnamed pipe.  This is automatically the case if you
+specify the DVI file as stdin, "-".</dd>
 
 <dt><code>-p, &ddash;start-page=num</code>,
 <code>-l, &ddash;end-page=num</code>,

@@ -28,6 +28,24 @@ argument is the name of a DVI file to be converted to a bitmap.
 dvi2bitmap looks for the file both with and without the default
 extension
 .I .dvi
+.PP
+You may also read the DVI file from the standard input by giving the
+DVI file as 
+.I "-"
+, thus 
+    \f(CRcat myfile.dvi | dvi2bitmap -\fP
+.br
+is an alternative way of reading the file (rather pointless in this
+case, but it shows the principle).
+For more arcane purposes, the DVI file may also be specified as 
+.I <osfile>dvi-file
+(which is entirely equivalent) or 
+.I <osfd>integer
+, where the given integer specifies an open file descriptor;
+specifying 
+.I "-"
+as the input file is equivalent to 
+.I <osfd>0
 .SS OPTIONS
 .PP
 Various of the options below have common syntax features.
@@ -213,7 +231,8 @@ extension will be added.
 .TP
 .I --pipe
 Indicates that the dvi-file argument is a non-seekable file, such as
-a named pipe
+a named or unnamed pipe.  This is automatically the case if you
+specify the DVI file as stdin, "-".
 .TP
 .I "-p, --start-page=num"
 .TP
