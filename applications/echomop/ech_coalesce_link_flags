@@ -1,0 +1,53 @@
+#! /bin/sh -
+
+#+
+#  Name:
+#     ech_coalesce_link_flags
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking echmono
+#     Note, this is for use when building the application; it is not
+#     installed, and is not intended for general use.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by the ECHOMOP makefile alone.
+#     The arguments generated are written to the standard output.
+#     The awk magic below is based on the various *_link scripts, originally
+#     written by RFWS.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        f77 -o program -L/star/lib `ech_coalesce_link_flags pgp_link one_link_adam` program.f
+
+#  Copyright:
+#     Copyright (C) 1995-1998 Council for the Central Laboratory of the Research Councils.
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     BLY:  M.J. Bly (Starlink, RAL)
+#     DLT:  D.L. Terrett (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     See CVS history
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+if test $# = 0; then
+    : do nothing
+else
+    for s in "$@"
+    do
+        echo `$s`
+    done | awk 'BEGIN{RS=" ";FS="\n"}
+                {f[i++]=$1}
+                END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+fi
