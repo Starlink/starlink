@@ -927,7 +927,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
      &           'pixels', REAL(SRT.MIN_YD), REAL(SRT.MAX_YD),
      &           DATAPTR(4), DATALOC(4), STATUS)
 *
-      CALL LIST_CREMAP( OUTLOC, 'RAW_TIMETAG', '_DOUBLE', MAPLIM, 0.0,
+      CALL LIST_CREMAP( OUTLOC, 'RAW_TIMETAG', '_DOUBLE', MAPLIM, 0.0d0,
      &   'seconds', SRT.MIN_T(1), SRT.MAX_T(SRT.NTIME), DATAPTR(5),
      &    DATALOC(5), STATUS)
 *
@@ -939,27 +939,22 @@ C     CALL BDA_ANNUL(LIV, STATUS)
      &          'channel_no', REAL(SRT.MIN_EN), REAL(SRT.MAX_EN),
      &           DATAPTR(7), DATALOC(7), STATUS)
 *
-*   Check status - drop out if bad
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error creating event lists')
-         GOTO 999
-      ENDIF
 *
+	print *,'x'
 *   Initialise lists
       CALL ARR_INIT1R(0.0, MAPLIM, %val(DATAPTR(1)),STATUS)
       CALL ARR_INIT1R(0.0, MAPLIM, %val(DATAPTR(2)),STATUS)
       CALL ARR_INIT1I(0, MAPLIM, %val(DATAPTR(3)),STATUS)
       CALL ARR_INIT1I(0, MAPLIM, %val(DATAPTR(4)),STATUS)
-      CALL ARR_INIT1D(0.0, MAPLIM, %val(DATAPTR(5)),STATUS)
+      CALL ARR_INIT1D(0.0d0, MAPLIM, %val(DATAPTR(5)),STATUS)
       CALL ARR_INIT1I(0, MAPLIM, %val(DATAPTR(6)),STATUS)
       CALL ARR_INIT1I(0, MAPLIM, %val(DATAPTR(7)),STATUS)
 *
+	print *,'y'
 *   Write the title and units
       CALL BDA_PUTTITLE (OUTLOC, HEAD.TITLE, STATUS)
       CALL BDA_PUTUNITS (OUTLOC, 'Counts', STATUS)
 
-*   Check status - drop out if bad
-      IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *   Create ASTERIX structure.
       CALL XRTSORT_CRE_ASTERIX( OUTLOC, SRT, HEAD, STATUS )
