@@ -156,6 +156,9 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.22  2000/06/27 02:44:38  timj
+*     Allow for a small range of WAVElengths
+*
 *     Revision 1.21  2000/06/16 01:25:15  timj
 *     Use new-format SCULIB_GET_MJD
 *
@@ -630,7 +633,9 @@
       IF (N_FILE .EQ. 1) THEN
          WAVELENGTH = RTEMP
       ELSE
-         IF (WAVELENGTH .NE. RTEMP) THEN
+*     Check to make sure the wavelength is okay. Allow a 20 micron
+*     error.
+         IF (ABS(WAVELENGTH - RTEMP) .GT. 20.0) THEN
             IF (STATUS .EQ. SAI__OK) THEN
                CALL MSG_SETR ('WAVE', RTEMP)
                CALL MSG_SETR ('WAVE1', WAVELENGTH)
