@@ -701,7 +701,7 @@ sub _GAttr {
 sub ReportGrfError {
   my $text = shift;
   warn "Generated AST error in perl PGPLOT callback: $text\n";
-  Starlink::AST::Error( &Starlink::AST::AST__GRFER(), $text);
+  Starlink::AST::_Error( &Starlink::AST::Status::AST__GRFER(), $text);
 }
 
 
