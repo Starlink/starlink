@@ -38,6 +38,8 @@
 *  History:
 *     10-SEP-1999 (DSB):
 *        Original version.
+*     2-DEC-1999 (DSB):
+*        Added options argument to ctg1_wild call.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -89,7 +91,7 @@
 
 *  Attempt to find the next matching file.
             FILE = ' '
-            ISTAT = CTG1_WILD( TEMPLT, FILE, ICONTX )
+            ISTAT = CTG1_WILD( TEMPLT, ' ', FILE, ICONTX )
 
 *  If another file was found which matches the name...
             IF( ISTAT .EQ. CTG__OK ) THEN

@@ -27,8 +27,9 @@ typedef struct ContextStruct {
 } ContextStruct;
 
 
-F77_INTEGER_FUNCTION(ctg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
-                                 POINTER(Context) TRAIL(FileSpec) 
+F77_INTEGER_FUNCTION(ctg1_wild)( CHARACTER(FileSpec), CHARACTER(Options), 
+                                 CHARACTER(FileName), POINTER(Context) 
+                                 TRAIL(FileSpec) TRAIL(Options)
                                  TRAIL(FileName) ) {
 /*
 *  Routine:
@@ -60,12 +61,16 @@ F77_INTEGER_FUNCTION(ctg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
 *     C, designed to be called from Fortran.
 
 *  Invocation:
-*     STATUS = CTG1_WILD( FILESPEC, FILENAME, CONTEXT )
+*     STATUS = CTG1_WILD( FILESPEC, OPTIONS, FILENAME, CONTEXT )
 
 *  Arguments:
 *     FILESPEC = CHARACTER * ( * ) (Given)
 *        The file pattern to be matched.  May contain wildcards, etc.  
 *        Case sensitive.
+*     OPTIONS = CHARACTER * ( * ) (Returned) 
+*        An option string holding options for the unix "ls" command (e.g.
+*        "-d" to get a listing of the directory files, instead of he
+*        files int he directory).
 *     FILENAME = CHARACTER * ( * ) (Returned) 
 *        The name of a file that matches FILESPEC.
 *     CONTEXT = INTEGER (Given and Returned)
@@ -93,9 +98,13 @@ F77_INTEGER_FUNCTION(ctg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
 *     8-OCT-1999 (DSB):
 *        Modified so that the shell run in the child process does not
 *        execute a (t)csh start up script (eg .cshrc).
+*     2-DEC-1999 (DSB):
+*        Added options argument.
 */
    GENPTR_CHARACTER(FileSpec) /* Pointer to file specification. Length is
                                  FileSpec_length */
+   GENPTR_CHARACTER(Options)  /* Pointer to "ls" options string. Length is
+                                 Options_length */
    GENPTR_CHARACTER(FileName) /* Pointer to string to return file name in
                                  Length is FileName_length */
    GENPTR_POINTER(Context)    /* Used to remember context of search */
@@ -103,6 +112,7 @@ F77_INTEGER_FUNCTION(ctg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
 /* Local variables  */
    ContextStruct *ContextPtr; /* Pointer to current context information */
    char *command;        /* The shell commmand to use */
+   char *opts;           /* Local copy of Options */
    char *spec;           /* Local copy of FileSpec */
    char Char;            /* Byte read from pipe */
    char Line[LINE_LEN];  /* String into which line is read */
@@ -158,11 +168,16 @@ F77_INTEGER_FUNCTION(ctg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
 /* Import the FileSpec string */
       spec = cnf_creim( FileSpec, FileSpec_length );
 
+/* Import the Options string */
+      opts = cnf_creim( Options, Options_length );
+
 /* Construct the command used to list the file. */
-      command = (char *) malloc( strlen( spec ) + 10 );
+      command = (char *) malloc( strlen( spec ) + strlen( opts ) + 12 );
       if( !command )  return (CTG__WMER);
 
       strcpy( command, "ls " );
+      strcpy( command + strlen( command ), opts );
+      strcpy( command + strlen( command ), " " );
       strcpy( command + strlen( command ), spec );
 
 /* Allocate ourselves enough space for the context structure we will use 
@@ -232,6 +247,7 @@ F77_INTEGER_FUNCTION(ctg1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
       }
 
       cnf_free( spec );
+      cnf_free( opts );
       free( command );
 
    }

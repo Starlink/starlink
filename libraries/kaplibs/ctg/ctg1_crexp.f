@@ -53,6 +53,8 @@
 *  History:
 *     10-SEP-1999 (DSB):
 *        Original version.
+*     2-DEC-1999 (DSB):
+*        Expand shell meta-characters in directory path.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -68,6 +70,7 @@
       INCLUDE 'GRP_PAR'          ! GRP constants.
       INCLUDE 'CTG_CONST'        ! CTG constants.
       INCLUDE 'PSX_ERR'          ! PSX error constants
+      INCLUDE 'CTG_ERR'          ! CTG error constants.
 
 *  Arguments Given:
       CHARACTER GRPEXP*(*)
@@ -85,6 +88,8 @@
 
 *  Externals:
       INTEGER CHR_LEN
+      INTEGER CTG1_WILD
+      INTEGER CTG1_EWILD
 
 *  Local Constants:
       INTEGER MXTYP              ! Max. number of foreign data formats
@@ -98,6 +103,7 @@
       CHARACTER DEFTYP*20          ! First choice file type from CAT_FORMATS_OUT
       CHARACTER DIR*(GRP__SZNAM)   ! Directory path 
       CHARACTER DIR1*(GRP__SZFNM)  ! Supplied directory path 
+      CHARACTER DIR2*(GRP__SZFNM)  ! Expanded directory path 
       CHARACTER FMTOUT*(CTG__SZFMT)! List of output catalogue formats
       CHARACTER NAME*(GRP__SZNAM)  ! Current name
       CHARACTER EXT1*50            ! Supplied catalogue section (ignored)
@@ -108,9 +114,11 @@
       INTEGER I                  ! Loop count
       INTEGER IAT                ! Index of last non-blank character
       INTEGER IAT2               ! Index of last non-blank character
+      INTEGER ICONTX             ! Context for CTG1_wild
       INTEGER IGRPB              ! Group of file base names
       INTEGER IGRPD              ! Group of directories
       INTEGER IGRPT              ! Group of file types
+      INTEGER ISTAT              ! Local status value
       INTEGER MODIND             ! Index of basis spec
       INTEGER NTYP               ! No. of known foreign data formats
       INTEGER SIZE0              ! Size of group on entry.
@@ -209,6 +217,52 @@
 *  Split this up into directory, basename, suffix and FITS extension (not
 *  used).
          CALL CTG1_FPARS( NAME, DIR1, BN1, SUF1, EXT1, STATUS )
+
+*  If a directory spec was included, expand it to remove any shell
+*  meta-characters.
+         IF( DIR1 .NE. ' ' ) THEN
+
+*  Initialise the context value used by CTG1_WILD so that a new file
+*  searching context will be started.
+            ICONTX = 0
+
+*  Expand the directory path to remove shell meta-characters. Use the "-d"
+*  option for the "ls" command to get the directory name itself, rather
+*  than the contents of the directory.
+            IAT = CHR_LEN( DIR1 ) 
+            DIR2 = ' '
+            ISTAT = CTG1_WILD( DIR1( : IAT ), '-d', DIR2, ICONTX )
+
+*  If found, use the expanded directory path.
+            IF( ISTAT .EQ. CTG__OK ) THEN
+               DIR1 = DIR2
+
+*  Reconstruct the full file name with the expanded directory.
+               NAME = ' '
+               IAT = 0
+               CALL CHR_APPND( DIR1, NAME, IAT )
+               CALL CHR_APPND( BN1, NAME, IAT )
+               CALL CHR_APPND( SUF1, NAME, IAT )
+               CALL CHR_APPND( EXT1, NAME, IAT )
+           
+*  If a system error was detected by CTG1_WILD, report it.
+            ELSE IF ( ISTAT .EQ. CTG__WPER ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'CTG1_CREXP_ERR1', 'CTG1_CREXP: Error'//
+     :                    ' getting pipe from forked process', 
+     :                    STATUS )
+      
+            ELSE IF ( ISTAT .EQ. CTG__WMER ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'CTG1_CREXP_ERR2', 'CTG1_CREXP: '//
+     :                    'Cannot allocate memory', STATUS )
+      
+            END IF
+
+*  End the search context.
+            ISTAT = CTG1_EWILD( ICONTX )
+
+         END IF
 
 *  Get the index of the name within the basis group from which the new
 *  name was derived. If the new name was not specified by a
