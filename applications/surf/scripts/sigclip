@@ -1,0 +1,106 @@
+#!/star/bin/ndfperl -s
+#
+#  This program requires the NDF module and ndfperl.
+#  This program will run as long as ndfperl exists in /star/bin
+#  Note that this ndfperl can be a soft link to your normal
+#  perl so long as the NDF module is installed as a shareable module.
+
+# SIGCLIP
+#    - Program to clip a dataset at a given sigma level
+
+# Load the NDF module
+use NDF;
+
+my ($par, $pkg);
+
+# Get the location of KAPPA
+ 
+if (defined $ENV{"KAPPA_DIR"}) {
+  $kappa = $ENV{"KAPPA_DIR"};
+} else {
+  die "Can not start - The KAPPA_DIR environment variable is not set\n";
+}
+
+die "Usage: sigclip NDF NSIGMA\n" if $#ARGV != 1;
+
+# Where to look for the adam directory
+($ndf, $nsigma) = @ARGV;
+
+$status = &NDF::SAI__OK;
+
+# Check for file
+($froot, $junk) = split('\.',$ndf);
+-e "$froot.sdf" || die "File $ndf.sdf not found\n";
+
+
+# Run stats
+
+$exstat = system("$kappa/stats $ndf > /dev/null");
+die "STATS finished abnormally...stopping (status = $exstat)\n"
+  if ($exstat != 0);
+
+($mean) =  par_get("mean", "stats", \$status);
+($sigma) = par_get("sigma", "stats", \$status);
+
+$max = $mean + ($nsigma * $sigma);
+$min = $mean - ($nsigma * $sigma);
+
+# Run thresh
+
+$out = $ndf."_clip";
+$exstat = 
+  system("$kappa/thresh $ndf OUT=$out THRLO=$min NEWLO=bad THRHI=$max newhi=bad");
+
+die "THRESH finished abnormally...stopping (status = $exstat)\n" 
+  if ($exstat != 0);
+
+print "Clipped data written to $out.sdf\n";
+
+__END__
+*+
+*  Name:
+*    sigclip
+
+*  Purpose:
+*    Clip a dataset at n-sigma
+
+*  Type of module:
+*    Perl 5 script
+
+*  Description:
+*    This program uses kappa STATS to calculate mean and standard 
+*    deviation of an NDF. It then uses kappa THRESH to set the values at +/-
+*    n-sigma to BAD. The clipped data are written to NDF_clip.sdf.
+
+*  Usage:
+*    sigclip NDF SIGMA
+
+*  ADAM Parameters:
+*    NDF (Given)
+*      The required dataset
+*    SIGMA (Given)
+*      The clipping level
+
+*  Examples:
+*     sigclip test 3.0
+*        Clips test.sdf at +/-3.0 sigma and writes the data to
+*        test_clip.sdf.
+
+*  Related Applications:
+*     SURF: SCUCAT, SCUPHOT;
+*     KAPPA: STATS, THRESH
+
+*  Implementation Status:
+*     - The program must have two arguments. Parameters are not requested
+*       if an argument is omitted from the command line.
+*     - The output of STATS is not displayed therefore no error message is
+*       reported if STATS can not access the NDF (usually because the NDF
+*       has been specified incorrectly). If sigclip freezes without printing
+*       any output this is usually because STATS is waiting for input. You
+*       can check if the NDF has been specified correctly  by running it
+*       through STATS outside of sigclip and examining the output.
+
+*-
+*.
+
+
