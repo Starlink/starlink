@@ -84,7 +84,7 @@
 *     24 Nov 94 : V1.8-3  Now use USI for user interface (DJA)
 *      5 Dec 94 : V1.8-4  ARD and other modes no longer exclusive. Made
 *                         selection mechanism a bit more modular (DJA)
-*
+*     21 Dec 94 : V1.8-5  Changed to new ARD (RJV)
 *    Type Definitions :
 *
       IMPLICIT NONE
@@ -1338,28 +1338,22 @@
 *
 *    Local variables :
 *
-      INTEGER AUNIT                           ! logical unit of ARD file
-      INTEGER EPNTR,WPNTR                     ! workspace pointers
       CHARACTER*20 UNITS(2)                   ! units of each data axis
-      CHARACTER*60 AFILE                      ! name of ARD file
       REAL BASE(2),SCALE(2)                   ! base and scale of data axes
       INTEGER IMAX(2)                         ! Axis numbers of the X,Y axis
       INTEGER MPNTR                           ! Pointer to image mask
       INTEGER MDIM(2)                         ! Dimensions of image mask
       INTEGER LP,NELM
+      INTEGER ARDID
 *-
 
 *    Initialise
       CALL ARR_SUMDIM( DAT__MXDIM, DIM, NELM )
       CALL ARR_INIT1L( .FALSE., NELM, SELECT, STATUS )
 
-*    Get name of ARD file and open it
-      CALL USI_GET0C( 'ARDFILE', AFILE, STATUS )
-      IF (STATUS .NE. SAI__OK) GOTO 999
-
 *    Open the ARD file
-      CALL FIO_OPEN( AFILE, 'READ', 'LIST' , 0, AUNIT, STATUS )
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      CALL ARX_OPEN('READ',ARDID,STATUS)
+      CALL ARX_READ('ARDFILE',ARDID,STATUS)
 
 *    Find the X and Y axis dimensions
       CALL AXIS_GET( LOC, 'X pos', 'XDIM', NDIM, IMAX(1), STATUS )
@@ -1370,7 +1364,7 @@
 *    Create a dynamic array to hold the mask for the image region
       MDIM(1) = DIM(IMAX(1))
       MDIM(2) = DIM(IMAX(2))
-      CALL DYN_MAPL(2,MDIM,MPNTR,STATUS)
+      CALL DYN_MAPI(2,MDIM,MPNTR,STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Insufficient dynamic memory')
@@ -1381,13 +1375,6 @@
       CALL BDA_GETAXUNITS(LOC, IMAX(1), UNITS(1), STATUS)
       CALL BDA_GETAXUNITS(LOC, IMAX(2), UNITS(2), STATUS)
 *
-*  set to blank if not found
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_ANNUL(STATUS)
-         UNITS(1) = '   '
-         UNITS(2) = '   '
-      ENDIF
-*
 *  calculate the scale values of each axis
       DO LP=1,2
         BASE(LP) = AXLO(IMAX(LP))
@@ -1395,16 +1382,8 @@
      :                 REAL(DIM(IMAX(LP))-1)
       ENDDO
 
-* Map some dynamic memory
-*  EPNTR is the exclude array - not used at present but could be enabled
-      CALL DYN_MAPL(2,MDIM,EPNTR,STATUS)
-      CALL DYN_MAPL(2,MDIM,WPNTR,STATUS)
-      CALL ARR_INIT1L(.FALSE., MDIM(1)*MDIM(2), %val(WPNTR), STATUS )
-      CALL ARR_INIT1L(.FALSE., MDIM(1)*MDIM(2), %val(MPNTR), STATUS )
-
-*    Read the ARD file and modify the image mask accordingly
-      CALL QUALITY_ARD_DRIVE(BASE, SCALE, UNITS, AUNIT, EPNTR, MPNTR,
-     :                                MDIM(1), MDIM(2), WPNTR, STATUS)
+*    Use ARD to create image mask
+      CALL ARX_MASK(ARDID,MDIM,BASE,SCALE,UNITS,%val(MPNTR),STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 999
 
 *    Modify the full quality mask with the 2-d one just produced
@@ -1414,7 +1393,7 @@
      :         DIM(7), SELECT )
 
 *    Close the ARD file
-      CALL FIO_CLOSE(AUNIT, STATUS)
+      CALL ARX_CLOSE(ARDID,STATUS)
 
 *    Abort point
  999  CONTINUE
@@ -1833,7 +1812,7 @@
 *    Import :
 *
       INTEGER MDIM1,MDIM2                 ! Image mask dimensions
-      LOGICAL IMASK(MDIM1,MDIM2)          ! Image mask
+      INTEGER IMASK(MDIM1,MDIM2)          ! Image mask
       INTEGER IMAX1,IMAX2                 ! Dim. of X and Y axis in big array
       INTEGER DIM1,DIM2,DIM3,DIM4,DIM5,DIM6,DIM7 ! Dims of big mask
 *
@@ -1861,7 +1840,7 @@
                   DO LP1=1,DIM1
                     LPVAL(1) = LP1
                     MASK(LP1,LP2,LP3,LP4,LP5,LP6,LP7) =
-     :                   IMASK(LPVAL(IMAX1),LPVAL(IMAX2))
+     :                   (IMASK(LPVAL(IMAX1),LPVAL(IMAX2)).NE.0)
                   ENDDO
                 ENDDO
               ENDDO
