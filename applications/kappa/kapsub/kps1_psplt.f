@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_PSPLT( NBIN, SIGMA, AXISR, AMP, GAMMA, BACK,
-     :                       SCALE, YSCALE, RUNITS, PNMIN, PROFIL, 
-     :                       PROFR, PROFWT, WORK, STATUS )
+     :                       SCALE, YSCALE, RUNITS, YUNITS, PNMIN, 
+     :                       PROFIL, PROFR, PROFWT, WORK, STATUS )
 *+
 *  Name:
 *     KPS1_PSPLT
@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     CALL KPS1_PSPLT( NBIN, SIGMA, AXISR, AMP, GAMMA, BACK, SCALE,
-*                      YSCALE, RUNITS, PNMIN, PROFIL, PROFR, PROFWT, 
-*                      WORK, STATUS )
+*                      YSCALE, RUNITS, YUNITS, PNMIN, PROFIL, PROFR, 
+*                      PROFWT, WORK, STATUS )
 
 *  Description:
 *     This routine plots the mean point-spread-function profile along
@@ -45,6 +45,9 @@
 *        The units of the radial profile after applying argument SCALE
 *        to the pixel steps.  It gets used to make the default X axis
 *        label in the plot.
+*     YUNITS = CHARACTER * ( * ) (Given)
+*        The units of the data value axis after applying argument YSCALE.
+*        It gets used to make the default Y axis label in the plot.
 *     PNMIN = CHARACTER * ( * ) (Given)
 *        The name of an ADAM parameter which will be used to decide
 *        whether to plot the profile along the minor or major axis.
@@ -89,6 +92,8 @@
 *        Re-formated and generally tidied up.
 *     2-MAY-2000 (DSB):
 *        Added argument YSCALE.
+*     17-MAY-2000 (DSB):
+*        Added YUNITS argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -114,6 +119,7 @@
       REAL SCALE
       REAL YSCALE
       CHARACTER RUNITS * ( * )
+      CHARACTER YUNITS * ( * )
       CHARACTER PNMIN * ( * )
 
 *  Arguments Given and Returned:
@@ -126,9 +132,9 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER DEFLAB*72        ! Default X axis label
+      CHARACTER DEFLBX*72        ! Default X axis label
       INTEGER BIN                ! Bin counter for a star
-      INTEGER IAT                ! Length of X axis label
+      INTEGER IATX                ! Length of X axis label
       INTEGER IPLOT              ! AST Plot for plotting
       INTEGER NDATA              ! Number points to plot in the mean profile
       LOGICAL MINOR              ! Plot profile along the minor axis?
@@ -148,23 +154,33 @@
       CALL PAR_GTD0L( PNMIN, .TRUE., .TRUE., MINOR, STATUS )
 
 *  Get the plot X axis label and set the axis sigma.
-      DEFLAB = ' '
-      IAT = 0
+      DEFLBX = ' '
+      IATX = 0
 
       IF ( MINOR ) THEN
-         CALL CHR_APPND( 'Minor-axis Distance', DEFLAB, IAT )
+         CALL CHR_APPND( 'Minor-axis Distance', DEFLBX, IATX )
          AXSIG = SIGMA
          RAXIS = 1.0
       ELSE
-         CALL CHR_APPND( 'Major-axis Distance', DEFLAB, IAT )
+         CALL CHR_APPND( 'Major-axis Distance', DEFLBX, IATX )
          AXSIG = SIGMA * AXISR
          RAXIS = AXISR
       END IF
 
       IF( RUNITS .NE. ' ' ) THEN
-         CALL CHR_APPND( ' (', DEFLAB, IAT )
-         CALL CHR_APPND( RUNITS, DEFLAB, IAT )
-         CALL CHR_APPND( ')', DEFLAB, IAT )
+         CALL CHR_APPND( ' (', DEFLBX, IATX )
+         CALL CHR_APPND( RUNITS, DEFLBX, IATX )
+         CALL CHR_APPND( ')', DEFLBX, IATX )
+      END IF
+
+*  Get the plot Y axis label.
+      DEFLBY = 'Intensity'
+      IATX = 9
+
+      IF( YUNITS .NE. ' ' ) THEN
+         CALL CHR_APPND( ' (', DEFLBY, IATY )
+         CALL CHR_APPND( YUNITS, DEFLBY, IATY )
+         CALL CHR_APPND( ')', DEFLBY, IATY )
       END IF
 
 *  Initialise counter of good bins.
@@ -213,7 +229,7 @@
 
 *  Plot the binned data.
       CALL KPG1_GRAPH( NDATA + 1, PROFR, PROFIL, 0.0, 0.0, 
-     :                 DEFLAB( : IAT ), 'Intensity', 
+     :                 DEFLBX( : IATX ), DEFLBY( : IATY ), 
      :                 'Mean Star Profile', 'XDATA', 'YDATA', 3, 
      :                 .TRUE., 0.0, VAL__BADR, DMIN, DMAX, 
      :                 'KAPPA_PSF', .TRUE., .FALSE., IPLOT, STATUS ) 
