@@ -1,0 +1,853 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocsource}    {ssn\stardocnumber}
+\newcommand{\stardoccopyright} 
+{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {77.0}
+\newcommand{\stardocauthors}   {A.J. Chipperfield}
+\newcommand{\stardocdate}      {16 August 2001}
+\newcommand{\stardoctitle}     {ADAM\\[2ex]
+                                The Control Subsystem}
+\newcommand{\stardocabstract}  {This document describes the way an ADAM task
+interacts with the ADAM Message System
+(\xref{AMS}{sun241}{}).
+It is intended for system programmers.
+
+The reader is expected to be familiar with the Starlink Software Environment
+documented in
+\xref{SG/4}{sg4}{},
+\xref{SUN/144}{sun144}{}
+and
+\xref{SUN/134}{sun134}{}}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     ssn.tex
+%
+%  Purpose:
+%     Template for Starlink System Note (SSN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\textbf{\stardoctitle}}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex Copyright Statement
+%  =========================
+\begin{latexonly}
+\newpage
+\vspace*{\fill}
+\stardoccopyright
+\end{latexonly}
+% ? End of Latex copyright statement
+
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+% ? Main text
+\section{Introduction}
+ADAM tasks consist of user code wrapped up in the `ADAM fixed part'.
+The top level of the user's code is a subroutine with the same name as the
+task and a single argument \texttt(STATUS) conforming to 
+\xref{the normal Starlink inherited status strategy}
+{sun104}{inherited_status_checking}.
+The ADAM fixed part is provided by the task-building scripts, 
+\xref{\texttt{alink} and \texttt{ilink}}{sun144}{adam_link_scripts},
+and handles the interface with the outside world. The two main parts of the
+ADAM fixed part are:
+\begin{description}
+\item[The control subsystem]
+provided by the DTASK and TASK libraries and the ADAM message system,
+\xref{AMS}{sun241}{}).
+This allows a task to be run directly from the shell, or to
+be controlled from a user-interface (or another task) and to control
+subsidiary tasks. It makes use of the TASK library which
+maintains information about the task in its COMMON blocks and provides user
+facilities for writing complete instrumentation systems with control tasks
+running subsidiary tasks. For more details on this, see
+\xref{ADAM -- Guide to Writing Instrumentation Tasks}{sun134}{}\latex{
+(SUN/134)}.
+\item[The parameter subsystem] provided by the SUBPAR, PARSECON and LEX
+libraries. This allows the task to obtain parameter
+values from a variety of sources, to output parameter values, to remember
+previous values and to share `GLOBAL' parameter values with other tasks.
+ \end{description}
+All the subroutine libraries involved are released as the Starlink Software
+Item
+\xref{PCS}{ssn29}{}.
+
+This document describes the control subsystem and the way it interacts with the
+message system and the parameter system.
+
+\section{\label{the_adam_main_routine}The ADAM Main Routine}
+When a task is first started, \texttt{MAINTASK} (in \texttt{dtask\_main.f})
+finds out if it is being run via the ADAM message system or directly from the
+shell, by inspecting the environment variable \texttt{ICL\_TASK\_NAME}.
+
+If \texttt{ICL\_TASK\_NAME} is not set, it is assumed that the task is being
+run direct from the shell -- signal handling is disabled and
+\texttt{DTASK\_DCLTASK()} is called. The parameter system is activated, the
+user's code is run through once and the parameter system de-activated, updating
+GLOBAL parameters if required. The program then exits. Any output messages
+or parameter prompts will go directly to \texttt{stdout} and replies to
+parameter prompts are read from \texttt{stdin} -- the message system will take
+no part in the proceedings.
+This very simple running of a task is not discussed further in this document.
+
+If \texttt{ICL\_TASK\_NAME} is set, it is assumed that the task is being run
+via the ADAM message system -- signal handling is enabled
+(\texttt{DTASK\_SETSIG()}) and \texttt{DTASK\_DTASK()} is called to handle
+messages.
+
+\section{\label{dtask_applic}DTASK\_APPLIC}
+\texttt{DTASK\_APPLIC()} is called by any of the DTASK routines which need to
+activate the user's application code.
+
+The code for \texttt{DTASK\_APPLIC} is built into the ADAM task linking
+scripts, \texttt{alink} and \texttt{ilink}, and is modified by them to call
+the user's top-level subroutine.
+
+\texttt{DTASK\_APPLIC} copies information about the current action into the
+TASK common blocks, runs the user's code, runs down the parameter system
+if required and retrieves values, such as the action sequence number, the
+action value string, the delay before next action entry and the application
+request which may have been set by the user's code. These are passed back to
+the ADAM fixed part for appropriate action.
+
+The code for \texttt{DTASK\_APPLIC} differs between \texttt{alink} and
+\texttt{ilink} in that the process of closing down the parameter system, thus
+updating `GLOBAL' parameters and resetting all parameters to the `ground'
+state, does not occur with an \texttt{ilink}ed task.
+(It may also be prevented with an \texttt{alink}ed task by setting the
+environment variable \texttt{ADAM\_TASK\_TYPE} to `I' in the task's process
+when the task is run.)
+
+As can be seen from the above, although the user's code will probably differ
+markedly in structure between A-tasks, A-task monoliths, I-tasks and control
+tasks, as far as the ADAM fixed part is concerned there is very little
+difference between them.
+(There are further differences in the way the parameter subsystem handles
+things. These are triggered by the structure of the task's
+\xref{interface module}{sun115}{abstract}.)
+
+\section{\label{receiving_control_messages}Receiving Control Messages}
+\texttt{DTASK\_DTASK()} firstly calls \texttt{DTASK\_PRCNAM()} to get the name
+by which the task is to register with the ADAM message system.
+This will be the name set in
+\texttt{ICL\_TASK\_NAME} by the controlling task -- \texttt{DTASK\_PRCNAM()}
+does not involve the message system.
+The task then registers with this name by calling \texttt{AMS\_INIT()}
+(from \texttt{DTASK\_INIT()}).
+
+A loop is then entered, which continues until a bad \texttt{STATUS} is found.
+Within the loop most errors will be handled, but an MSP error probably means
+that no more messages can be sent or received so the task will exit.
+
+Within the loop:
+\begin{itemize}
+\item The path for SUBPAR output is first set to 0 -- \textit{i.e.} the task
+is not handling a message from another task.
+There should be no output but if there is it will go to \texttt{stdout}.
+\item \texttt{AMS\_RECEIVE()} with infinite timeout waits for a message --
+The message may come from a controlling task or user interface, or may be
+generated internally, by a timeout for example.
+Certain control messages such as connection requests are handled invisibly
+by \texttt{AMS\_RECEIVE()} but it returns when it receives a normal message
+(message function \texttt{MESSYS\_\_MESSAGE}), a new transaction is started
+and the message status (\texttt{MSGSTATUS}) indicates the type of message.
+\item The message is handled. This may involve sending and receiving further
+messages as part of the same transaction.
+\item The transaction is closed by sending a final acknowledgement with an
+appropriate message status.
+\end{itemize}
+
+\section{Message Types}
+In a normal message (message function MESSYS\_\_MESSAGE) received by an ADAM
+task, the message status \texttt{MSGSTATUS} indicates the action required.
+\begin{description}
+\item[\texttt{MSGSTATUS = SAI\_\_OK}] indicates the message is a `GSOCC'
+message, the message context, \texttt{CONTEXT} indicates which one of:
+\begin{description}
+\item[\texttt{GET}]      Requesting a parameter value from the task.
+\item[\texttt{SET}]      Setting a parameter value for the task.
+\item[\texttt{OBEY}]     Requesting that an action is obeyed.
+\item[\texttt{CANCEL}]   Requesting that an action in a waiting state is
+cancelled.
+\item[\texttt{CONTROL}]  Requesting that a control function be performed.
+
+Permitted control functions are:
+\begin{description}
+\item[\texttt{DEFAULT}] to set the task's current working directory.
+\item[\texttt{SETENV}] to set the value of an environment variable in the
+task's process.
+\item[\texttt{PAR\_RESET}] to reset all parameters, or parameters of a named
+action in a monolith, back to the `ground' state.
+For a discussion of parameter states, see
+\xref{SUN/114}{sun114}{parameter_states_}.
+\end{description}
+\emph{N.B. \texttt{DEFAULT} and \texttt{SETENV} are required because tasks are
+run in separate processes, therefore (under Unix anyway) changing the current
+working directory or environment variables of the controlling process will
+not alter them for any existing subsidiary tasks.}
+\end{description}
+See
+\htmlref{Handling GSOCC Messages}{handling_gsocc_messages}\latex{ (Section
+\ref{handling_gsocc_messages})}
+for more details.
+\item[\texttt{MSGSTATUS} not \texttt{SAI\_\_OK}] may be:
+\begin{description}
+\item[\texttt{MESSYS\_\_EXTINT}] This should not happen in a task -- the
+facility is for use by user interfaces.
+An error report is made and the event ignored.
+\item[\texttt{MESSYS\_\_RESCHED}]   A timer has expired in this task and
+\texttt{AMS\_REMSG()} has been called. \texttt{DTASK\_TIMEOUT()} is called
+to handle the message. It checks that the specified action is active and that
+the reschedule was expected. If all is OK, the action is obeyed
+(\texttt{DTASK\_OBEY()}).
+\item[\texttt{MESSYS\_\_ASTINT}]  An AST has fired in this task and
+\texttt{AMS\_ASTINT()} or \texttt{AMS\_ASTMSG()} has been called.
+\texttt{DTASK\_ASTINT()} checks the action and obeys it if OK
+(\texttt{DTASK\_OBEY()}).
+\item[\texttt{MESSYS\_\_KICK}] Subroutine \texttt{AMS\_KICK()} has been
+called by this task to run one of its actions. \texttt{DTASK\_KICK()} checks
+the action and obeys it if OK (\texttt{DTASK\_OBEY()}).
+\item[\texttt{Other > 0}]   May be from a subsidiary task.
+See
+\htmlref{Messages from Subsidiary Tasks}
+{messages_from_subsidiary_tasks}\latex{ (Section~\ref{messages_from_subsidiary_tasks})} for more details.
+\item[\texttt{MSGSTATUS < 0}]  An MSP error, set STATUS to terminate loop.
+\end{description}
+\end{description}
+
+\section{\label{handling_gsocc_messages}Handling GSOCC Messages}
+These are handled by \texttt{DTASK\_GSOC()} in the first instance. In addition
+to the transaction identification, \texttt{PATH} and \texttt{MESSID}, the
+\texttt{CONTEXT}, \texttt{NAME} and \texttt{VALUE} components of the received
+message are passed. 
+
+Firstly the \texttt{PATH} and \texttt{MESSID} from the message are set for
+SUBPAR (\texttt{SUBPAR\_PUTPATH()}) in case it wants to reply with a message or
+request a parameter value as a result of this message, then a DTASK routine
+appropriate to the \texttt{CONTEXT} is called.
+
+When the required action for the \texttt{CONTEXT} is complete, the transaction
+is ended by calling (\texttt{DTASK\_COMSHUT()}) which flushes any error
+messages on the stack to the master task (using 
+\xref{\texttt{ERR\_CLEAR()}}{ssn4}{ERR_CLEAR})
+before sending a final acknowledgment. 
+(The master task must therefore be prepared to handle any
+\texttt{MESSYS\_\_INFORM} messages prior to the final acknowledgement in any
+\texttt{CONTEXT}.)
+The final acknowledgement will have an appropriate message status and the
+message value will depend upon the status and the \texttt{CONTEXT}.
+
+\subsection{\label{get_context}\texttt{GET} Context}
+\texttt{GET} is handled by \texttt{DTASK\_GET()}.
+\texttt{NAME} contains the name of the required parameter. If the task is a 
+\xref{monolith}{sun144}{introduction}, the parameter name must be of the form
+\texttt{ACTION:PARNAME} to specify the particular action within the monolith.
+
+The value of the named parameter is obtained, by searching the
+\xref{vpath}{sun115}{the_vpath_field}
+if the parameter is not already active.
+
+Note that there are some restrictions on the vpath search:
+\begin{itemize}
+\item Dynamic will usually have no effect because any
+dynamic defaults will be cancelled initially and if the parameter was reset.
+\item Prompting is disabled so any attempt to prompt will return status
+\texttt{PAR\_\_NOUSR}.
+\end{itemize}
+
+The transaction is then closed (\texttt{DTASK\_COMSHUT()}). Assuming the
+status is \texttt{SAI\_\_OK}, the message value of the final acknowledgement is
+the parameter value as a character string.  In the event of an error, error
+messages are reported and the message status set appropriately.
+
+\subsection{\label{set_context}\texttt{SET} Context}
+\texttt{SET} is handled by \texttt{DTASK\_SET()}. 
+\texttt{NAME} contains the name of the required parameter as for
+\htmlref{\texttt{GET}}{get_context}.
+\texttt{VALUE} is a character string which the parameter subsystem can resolve
+into a value for the specified parameter.
+The given value is put into the parameter's internal storage and the parameter
+is made active (\texttt{SUBPAR\_CMDPAR()}).
+The transaction is then closed (\texttt{DTASK\_COMSHUT()}). If an error
+occurred, error messages will be reported and an appropriate status set in
+the final acknowledgement.
+
+\subsection{\label{obey_and_cancel_context}
+\texttt{OBEY} and \texttt{CANCEL} Context}
+\texttt{OBEY} and \texttt{CANCEL} are further checked in
+\texttt{DTASK\_GSOC()}.
+
+\texttt{NAME} contains the name of the required action (or task within a
+monolith) and \texttt{VALUE} is a string specifying parameter
+values in a format acceptable to the parameter system.
+
+For \texttt{OBEY} the action must not be active and for \texttt{CANCEL} the
+action must be active; otherwise the transaction is terminated (in 
+\texttt{DTASK\_COMSHUT()}) by calling \texttt{AMS\_REPLY()} with a suitable
+bad message status.
+
+If the \texttt{OBEY}/\texttt{CANCEL} is valid, \texttt{SUBPAR\_FINDACT()}
+is called to set up the parameter system for the specified action and the
+\texttt{VALUE} string is processed (\texttt{SUBPAR\_CMDLINE()}) to set the
+value of any given parameters.
+
+\subsubsection{\texttt{OBEY}}
+The new action is added to the active list and the list of
+subsidiary tasks for it is cleared. \texttt{AMS\_REPLY()} is called with
+message status \texttt{DTASK\_\_ACTSTART} to send an initial acknowledgement
+of the \texttt{OBEY} message .
+
+If that fails the action and/or transaction are
+closed (\texttt{DTASK\_ACTSHUT()} or \texttt{DTASK\_COMSHUT()}); if it is
+OK, \texttt{DTASK\_OBEY()} is called.
+
+\texttt{DTASK\_OBEY()} calls \texttt{DTASK\_APPLIC()} with context
+\texttt{OBEY} and that in turn calls the user's top-level routine.
+
+On return from \texttt{DTASK\_APPLIC()} if \texttt{STATUS} is not
+\texttt{SAI\_\_OK}, the message status, \texttt{MESSTATUS}, for the final
+acknowledgement message is set to the bad status value; 
+if \texttt{STATUS} is
+\texttt{SAI\_\_OK}, the \texttt{REQUEST} returned from the application is
+checked
+(\texttt{DTASK\_ACT\_SCHED()}) to see whether the action is to be terminated
+or is to be
+\htmlref{rescheduled}{rescheduling}.
+If the user's code has not changed it, the  \texttt{REQUEST} will be
+\texttt{ACT\_\_END}.
+
+If a reschedule is requested, \texttt{DTASK\_ACT\_SCHED()} will set it up;
+otherwise the action is ended and the communications transaction closed by
+sending a reply to the task which initiated the \texttt{OBEY}.
+\texttt{MESSTATUS} for the reply depends on the \texttt{STATUS} and
+\texttt{REQUEST} returned from \texttt{DTASK\_APPLIC()}.
+
+If a reschedule was not requested, \texttt{MESSTATUS} will depend upon the
+value of \texttt{REQUEST} as
+follows:
+\begin{center}
+\texttt{
+\begin{tabular}{|l|l|} \hline
+REQUEST & MESSTATUS \\
+\hline
+ACT\_\_END & DTASK\_\_ACTCOMPLETE \\
+ACT\_\_UNIMP & DTASK\_\_UNIMP \\
+ACT\_\_INFORM & DTASK\_\_ACTINFORM \\
+SAI\_\_OK & DTASK\_\_IVACTSTAT \\
+DTASK\_\_SYSNORM & DTASK\_\_IVACTSTAT \\
+ACT\_\_CANCEL & DTASK\_\_IVACTSTAT \\
+\textnormal{Other}& REQUEST \\
+\hline
+\end{tabular}
+}
+\end{center}
+Error messages may also be reported.
+
+\subsubsection{\texttt{CANCEL}}
+\texttt{CANCEL} is handled by calling \texttt{DTASK\_CANCEL()}.
+
+Details of the OBEY transaction which started this action are obtained from
+the COMMON blocks (\texttt{DTASK\_CMN}) then \texttt{DTASK\_APPLIC()} is called
+with context \texttt{CANCEL} and that in turn calls the user's code.
+See
+\xref{SUN/134}{sun134}{}
+for examples of how the user's code might handle a
+\texttt{CANCEL}
+
+On return from \texttt{DTASK\_APPLIC} the status and \texttt{REQUEST} returned
+from the application are checked (\texttt{DTASK\_ACT\_SCHED()}) to see whether
+the action is to be terminated or is to continue rescheduling. 
+In any case, an acknowledgement is sent to the task which requested the
+\texttt{CANCEL}. 
+If the action has ended, an acknowledgement is also sent to the task which
+issued the \texttt{OBEY}.
+
+\subsection{\label{control_context}\texttt{CONTROL} Context}
+\texttt{CONTROL} is handled by \texttt{DTASK\_CONTROL()}.
+The message name component, passed as \texttt{ACTION} defines the particular
+control function required, \texttt{'DEFAULT'}, \texttt{'SETENV'} or
+\texttt{'PAR\_RESET'}.
+The required action is performed. 
+
+If a problem occurs in the process, an appropriate bad status value is set
+and error report is made.
+
+The transaction is then closed (\texttt{DTASK\_COMSHUT()}).
+
+\subsubsection{\texttt{DEFAULT}}
+The message value specifies a new `current working directory' required for the
+task. If the value is blank, no change is required; otherwise the change is
+made by calling the appropriate system routine.
+
+Whether or not a change was made, the `new' current working directory is
+obtained and returned as the message value in final reply message.
+\texttt{CONTROL DEFAULT} can therefore be used to enquire the task's current
+working directory without changing it.
+
+\subsubsection{\texttt{SETENV}}
+The message value specifies a new value for an environment variable for the
+task. It has the form: `\texttt{VARIABLE = NEWVALUE}', where \texttt{VARIABLE}
+is the name of the environment variable and \texttt{NEWVALUE} is the required
+value. The string may be quoted -- quotes will be stripped in the usual way.
+If the string is unquoted, leading blanks will also be stripped from
+\texttt{NEWVALUE}.
+
+The environment variable is set by calling the appropriate system routine.
+
+\subsubsection{\texttt{PAR\_RESET}}
+This causes the task's parameters to be reset to the `ground' state.
+The message value may be used to specify the name of an individual task in a
+monolith; if it doesn't, parameters for all tasks in the monolith are reset.
+Resetting is done by calling \texttt{SUBPAR\_DEACT()} with argument
+\texttt{TTYPE} set to `R' -- MIN, MAX and dynamic default values are also
+cancelled but GLOBAL values are not updated.
+
+\section{\label{messages_from_subsidiary_tasks}Messages from Subsidiary Tasks}
+\texttt{DTASK\_SUBSID()} is called to check it. Given the \texttt{PATH} and
+\texttt{MESSID} of the message, the Active Subsidiary Task Action Block (see
+the TASK library) is searched and the associated action in this task found (or
+an error).
+Communications to the parent task for the associated action are set for
+SUBPAR (\texttt{SUBPAR\_PUTPATH()}), then the particular message is handled
+depending upon the \texttt{MSGSTATUS}.
+\begin{description}
+\item[\texttt{MESSYS\_\_INFORM}] is relayed on to this task's parent (using
+\texttt{SUBPAR\_WRITE()}).
+\item[\texttt{MESSYS\_\_PARAMREQ}] is handled by \texttt{TASK\_ASKPARAM()}.
+It relays the parameter request on to this task's parent (using
+\texttt{SUBPAR\_REQUEST()} which waits for the \texttt{MESSYS\_\_PARAMREP} 
+reply and returns the value).
+\texttt{TASK\_ASKPARAM()} then returns the value in a
+\texttt{MESSYS\_\_PARAMEREP} to the subsidiary task.
+\item[\texttt{MESSYS\_\_SYNC}] causes this task to
+\htmlref{synchronise}{synchronisation}\latex{ (see
+Section~\ref{synchronisation})}
+(in \texttt{SUBPAR\_SYNC()}) with its parent and then acknowledge the original
+message with a \texttt{MESSYS\_\_SYNCREP} to the subsidiary task (using
+\texttt{AMS\_REPLY()}). See
+
+\end{description}
+The above are said to be `transparent' messages. If the message is not
+one of these, the message information is put (\texttt{TASK\_PUT\_MESSINFO()})
+into the Current D-task Action Block in case the associated action requires it
+later.
+
+If there is a failure in any of the above attempts to relay messages, the
+subsidiary task is removed from the Active Subsidiary Task Action Block
+and the action in this task obeyed (\texttt{DTASK\_OBEY()}) again.
+\begin{description}
+\item[\texttt{MESSYS\_\_TRIGGER}] causes the associated action in this task to
+be obeyed (\texttt{DTASK\_OBEY()}) as if it were initiated by its parent.
+\item[Other \texttt{MSGSTATUS > 0}] is assumed to mean that action is complete
+in the subsidiary task -- the subsidiary task action is cleared from the
+Active Subsidiary Task Action Block and, again \texttt{DTASK\_OBEY()} is
+called.
+Failure to relay and other terminations are therefore treated the same.
+\end{description}
+
+\section{\label{rescheduling}Re-scheduling}
+An action being obeyed or cancelled can request that it is re-entered
+(re-scheduled) upon some future event by calling \texttt{TASK\_PUT\_REQUEST()}
+and optionally \texttt{TASK\_PUT\_DELAY()}. See
+\xref{SUN/134}{sun134}{}
+for details.
+
+Any values of the request and delay which have been set are returned to the
+calling routine (\texttt{DTASK\_OBEY} or \texttt{DTASK\_CANCEL} by
+\texttt{DTASK\_APPLIC} and \texttt{DTASK\_ACT\_SCHED} is called to check if
+a reschedule is required and set it up if required.
+
+Reschedule requests may be:
+\begin{description}
+\item[\texttt{ACT\_\_STAGE}] Re-schedule immediately (in fact after 10ms).
+\item[\texttt{ACT\_\_WAIT}] Re-schedule after \texttt{DELAY} ms.
+\item[\texttt{ACT\_\_ASTINT}] Re-schedule on AST (with timeout of
+\texttt{DELAY}ms).
+\item[\texttt{ACT\_\_MESSAGE}] Re-schedule on completion of an action in a
+subsidiary task (with timeout of \texttt{DELAY}ms).
+\end{description}
+For \texttt{ACT\_\_ASTINT} and \texttt{ACT\_\_MESSAGE}, \texttt{DELAY} may be
+\texttt{MESSYS\_\_INFINITE} indicating that no timer should be set.
+
+As each reschedule is set, the action sequence number, initially 0, is
+incremented.
+
+Where a timeout is required, an ATIMER timer is set by:
+\begin{quote} \begin{verbatim}
+CALL DTASK_RESCHED( ACTPTR, ACTCNT, SCHEDTIME, STATUS )
+\end{verbatim} \end{quote}
+
+\texttt{ACTPTR} specifies the action to be rescheduled, and \texttt{ACTCT}
+the timer identifier.
+The timer is set to call \texttt{DTASK\_CHDLR()} after \texttt{SCHEDTIME}
+millisecs. \texttt{DTASK\_CHDLR()} is written in C and is a straight-through
+call to \texttt{DTASK\_ASTHDLR()} which calls \texttt{AMS\_RESMSG()} to
+send a reschedule message (message status \texttt{MESSYS\_\_RESCHED}) to this
+task.
+
+When \texttt{DTASK\_DTASK()} receives the  reschedule message, it calls
+\texttt{DTASK\_TIMEOUT()} which de-constructs the passed value into an action
+pointer and count, and checks that the specified action reschedule was
+expected.
+
+If that checks OK, the action is obeyed (\texttt{DTASK\_OBEY()}); if not, it is
+ignored.
+
+\section{\label{synchronisation}Synchronisation}
+If the task needs to output directly to the user's terminal, to switch it to
+`graphics' mode for example, it is necessary to ensure that the user-interface
+has completed output of previously sent text messages before the graphics
+output is sent. This is achieved by the user's code calling
+\xref{\texttt{MSG\_SYNC()}}{sun104}{MSG_SYNC}
+which sends a \texttt{MESSYS\_SYNC} message to the master task and waits for a
+\texttt{MESSYS\_SYNCREP} message to be returned. As all messages are queued by
+the ADAM message system, we can be sure that all earlier message have been
+handled by the time the task receives the reply. \emph{Note that this only
+works where no other tasks can send messages to the user-interface in the
+meantime.}
+
+Where a control task lies between a subsidiary task and the user-interface,
+the messages are simply relayed.
+
+\section{Use of the TASK Library}
+The TASK library maintains two lists in COMMON: the Current D-task Action Block
+and the Active Subsidiary Task Action Block.
+It also maintains the AST interrupt flag, indicating if
+\texttt{TASK\_ASTSIGNAL()} has been called.
+
+The Current D-task Action Block holds details of the current D-task action,
+\textit{i.e.} the one on whose behalf the current call to ACT has been made.
+Items held are:
+\begin{itemize}
+\item Action pointer for current action
+\item Message path resulting in current entry
+\item Message id resulting in current entry
+\item Context in message resulting in entry
+\item Status in message resulting in entry
+\item Context for current action
+\item Name code for current action
+\item Sequence number for current action
+\item Delay before next entry
+\item Request for rescheduling
+\item Current action name
+\item Action name in message
+\item Value string for current action
+\end{itemize}
+
+The Active Subsidiary Task Action Block holds details of active actions that
+have been initiated in subsidiary tasks. If an incoming message corresponds to
+one of the actions described in this common block, it will result in an entry
+to ACT. Items held are (for each subsidiary action):
+\begin{itemize}
+\item Action pointer for initiating action (in this task)
+\item Message path for initiated action
+\item Message id for initiated action
+\end{itemize}
+\vfill
+\appendix
+\section{Typical A-task Message Sequence}
+\begin{center}
+\begin{tabular}{|p{65mm}|c|p{75mm}|}
+\hline
+User Interface & & Task\\
+\hline
+Register with message system & &\\
+Load task & &\\
+& & Register with message system\\
+& & Await message\\
+Send connection request & $>$ &\\
+& $<$ & Acknowledge connection request (automatically)\\
+& & Wait for next message\\
+Send GSOCC OBEY & $>$ &\\
+& $<$ & Acknowledge GSOC OBEY \\
+& & Obey user's code \\
+\hline
+\end{tabular}
+
+The user's code may, potentially, generate any number of:
+
+\begin{tabular}{|p{65mm}|c|p{75mm}|}
+\hline
+& $<$ & Reply with \texttt{MESSYS\_\_INFORM}
+(output from \texttt{MSG\_OUT()}, \texttt{ERR\_FLUSH()} \textit{etc.})\\
+Display message value to user & &\\
+\hline
+\end{tabular}
+
+or:
+
+\begin{tabular}{|p{65mm}|c|p{75mm}|}
+\hline
+& $<$ & Reply with \texttt{MESSYS\_\_PARAMREQ} 
+(Request a prompt for a parameter value)\\
+Prompt User & & \\
+Reply with \texttt{MESSYS\_\_PARAMREP} & $>$ & \\
+& & Set parameter value\\
+\hline
+\end{tabular}
+
+or:
+
+\begin{tabular}{|p{65mm}|c|p{75mm}|}
+\hline
+& $<$ & Reply with \texttt{MESSYS\_\_SYNC} (Output from \texttt{MSG\_SYNC})\\
+Prompt user & & \\
+Reply with \texttt{MESSYS\_\_SYNCREP} &$>$ & \\
+\hline
+\end{tabular}
+
+and finally, from the ADAM fixed part:
+
+\begin{tabular}{|p{65mm}|c|p{75mm}|}
+\hline
+& $<$ & Reply with terminating message status
+(\texttt{DTASK\_\_ACTCOMPLETE} is good)\\
+Terminate transaction (automatically) & & \\
+Display final status if bad. & & \\
+\hline
+\end{tabular}
+\end{center}
+% ? End of main text
+\end{document}

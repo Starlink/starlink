@@ -1,0 +1,51 @@
+1 PCS Version 4.1-1
+
+LEX_PARSE now initialises the output token string to prevent warnings from the
+memory checker. (Fix courtesy of Tim Jenness, JACH.)
+
+1 PCS Version 4.1
+
+A new subroutine SUBPAR_GREF provides the functionality required by the MERS
+routine MSG1_GREF. Use of the new routine by MERS (Version 1.8) allows easier
+replacement of the underlying Parameter System (in particular the Java (JPCS)
+Parameter System to be substituted for PCS SUBPAR). (Older versions of MERS
+will still work with this version of PCS.)
+
+A bug in the LEX libarary has been fixed to allow correct parsing of the square
+brackets in a command-line specifier such as IN=file.fits[2]. 
+
+1 PCS Version 4.0-1
+
+This version fixes some minor bugs in SUBPAR and makes subpar_err.h a 'public'
+file in /star/include. Documents SUN/115 and SUN/134 have been moved into this
+package but there are no significant changes to them.
+
+Bugs fixed:
+  1. Correctly handle INTERNAL parameter values given on the command line.
+  2. Improve error messages if truncation occurs in SUBPAR_GET0C.
+  3. Memory leak in SUBPAR_FIFIL.
+  
+1 PCS Version 4.0 for Unix has been released.
+
+ This version removes the ADAM and MESSYS layers of the ADAM message system.
+ DTASK, TASK and SUBPAR subroutines now call the Fortran interface to AMS
+ directly. Executables are significantly smaller and message handling is more
+ efficient. There should be no functional changes and it should not be
+ necessary to re-link tasks unless they use shared PCS libraries.
+
+ In addition;
+
+ 1. A new document SUN/241 describes AMS for Programmers.
+
+ 2. A new document SSN/77 describes the way an ADAM task interacts with the
+    ADAM message system.
+
+ 3. SUN/144 and SSN/29 have been updated.
+
+ 4. Environment variable ADAM_NOPROMPT may now be set to prevent any prompts
+    from a task. Error status will result if a prompt is required to obtain
+    a parameter value or resolve an ambiguous keyword.
+
+ 5. There have been parameter system internal mods to assist in handling
+    groups of NDFs in CCDPACK.
+

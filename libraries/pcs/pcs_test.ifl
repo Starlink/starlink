@@ -1,0 +1,50 @@
+interface pcs_test
+
+parameter X
+#  keyword xParam2
+  position 1
+  type '_REAL'
+  prompt 'x value'
+  vpath prompt
+#  vpath current
+  ppath 'dynamic,current'
+  ppath 'current,default'
+#  help  '%parhelp:test test parameters x'
+  default 1.0
+#  default /adam/ajc/NUMBER
+#  default !
+  help 'What''s the trouble?'
+  range 1,10
+  access 'read'
+endparameter
+
+
+parameter Y
+  position 2
+  type '_REAL'
+  prompt 'x value'
+  vpath prompt
+  ppath 'default,current'
+#  help  '%parhelp:test test parameters x'
+#  default 1.0
+  default /adam/ajc/NUMBER
+  help 'What''s the trouble?'
+  range 1,10
+endparameter
+
+
+parameter Z
+  position 3
+  type '_REAL'
+  prompt 'x value'
+  vpath prompt
+  ppath 'default,current'
+#  help  '%parhelp:test test parameters x'
+#  default 1.0
+  default /adam/ajc/NUMBER
+  help 'What''s the trouble?'
+  range 1,10
+endparameter
+
+endinterface
+

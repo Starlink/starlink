@@ -1,0 +1,22 @@
+#!/bin/sh -
+# This is not a starconf bootstrap file
+
+if test -f configure -a configure -nt configure.ac; then
+    : nothing to do
+else
+    autoconf
+fi
+if test ! -x configure; then
+    echo "Ooooh dear, autoconf didn't work -- I can't find ./configure"
+    exit 1
+fi
+
+activesubdirs=`sed -n 's/^AC_CONFIG_SUBDIRS(\([^)]*\).*/\1/p' configure.ac`
+echo "Bootstrapping..."
+for d in $activesubdirs
+do
+    echo "Bootstrapping $d..."
+    (cd $d; ./bootstrap)
+done
+
+exit 0

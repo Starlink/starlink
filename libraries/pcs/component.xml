@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="pcs">
+  <version>4.1-1</version>
+  <path>libraries/pcs</path>
+  <description>The Parameter and Communication Subsystems</description>
+  <abstract><p>Application programs often need to obtain parameter
+      values from a variety of sources and to communicate with other
+      programs. The Parameter and Communication Subsystems (PCS) are a
+      set of closely-related subroutine libraries which provide these
+      facilities for many Starlink applications and the associated
+      user-interfaces.</p>
+    <p>The PCS libraries will not generally be called directly by
+      application programs, but form a basic part of the Starlink
+      Software Environment</p></abstract>
+  <dependencies>
+    <build> subpar</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
