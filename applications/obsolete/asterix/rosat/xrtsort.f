@@ -734,23 +734,19 @@ c      ENDIF
       CALL BDI_PUT0C( OUTFID, 'Units', 'counts', STATUS )
 
 *  Create and map the data array
-      CALL BDI_MAPR( OUTFID, 'Data', 'WRITE', ARRPTR, STATUS )
+      CALL BDI_MAPR( OUTFID, 'Data', 'WRITE/ZERO', ARRPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL MSG_PRNT('Error creating output data array')
         GOTO 99
       END IF
 
 *  Create and map data quality
-      CALL BDI_MAPUB( OUTFID, 'Quality', 'WRITE', QPTR, STATUS )
+      CALL BDI_MAPUB( OUTFID, 'Quality/QGOOD', 'WRITE', QPTR, STATUS )
       CALL BDI_PUT0UB( OUTFID, 'QualityMask', QUAL__MASK, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL MSG_PRNT( 'Error creating output quality array' )
         GOTO 99
       ENDIF
-
-*  Initialise data and quality
-      CALL ARR_INIT1R( 0.0, TOTELS, %val(ARRPTR), STATUS )
-      CALL ARR_INIT1B( QUAL__GOOD, TOTELS, %val(QPTR), STATUS )
 
 *  Calculate maximum and minimum axis values
       PTOD = HEAD.PIXEL / 3600.0
