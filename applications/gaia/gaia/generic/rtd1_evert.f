@@ -18,7 +18,7 @@ C            SVECT  R*4(*)  Weights
 C----------------------------------------------------------------------
       INTEGER*2 IX
       REAL*4    SVECT(1), DX
-      INTEGER*2 N, NR, IR0, IV0, MC, IR
+      INTEGER*2 NR, IR0, IV0, MC, IR
       REAL*4    U, W, CW, CU, W2, U2, R0
 C                             Everett Interpolation internal variables:
       REAL*4    BCOEF(49), SV(14)

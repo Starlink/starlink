@@ -111,7 +111,6 @@
       CHARACTER * ( NDF__SZTYP ) DTYPE ! Type of NDF data array
       INTEGER DIM( 1 )          ! Dimension of FITS extension
       INTEGER EL                ! Number of pixels in NDF
-      INTEGER I                 ! Loop variable
       INTEGER IAT               ! Position of .sdf in name
       INTEGER IDNEW             ! Identifier of new NDF
       INTEGER IERR              ! Not used

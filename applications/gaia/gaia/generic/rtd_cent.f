@@ -110,9 +110,7 @@
 *  Local Variables:
       LOGICAL SIGN              ! Sign of features (positive!)
       DOUBLE PRECISION XACC     ! Centroid position
-      DOUBLE PRECISION XPOS     ! Initial position
       DOUBLE PRECISION YACC     ! Centroid position 
-      DOUBLE PRECISION YPOS     ! Initial position
       INTEGER I                 ! Loop counter
 
 *.

@@ -126,11 +126,9 @@
       INTEGER DIM( NDF__MXDIM ) ! NDF dimensions
       INTEGER I                 ! Loop variable
       INTEGER IAT               ! Position of .sdf in name
-      INTEGER IWCS              ! NDF WCS component identifer
       INTEGER NAMLEN            ! Length of name string
       INTEGER NDIM              ! Number of NDF dimensions
       INTEGER PLACE             ! NDF placeholder (not used)
-      LOGICAL EXISTS            ! WCS system exists
       LOGICAL FIRST             ! TRUE when seeking first significant
                                 ! dimension. 
 *.

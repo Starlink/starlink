@@ -95,7 +95,6 @@ char *argv[]
    {
       return Tcl_Eval(interp, "exit");
    }
-   return 0;
 }
 
 
