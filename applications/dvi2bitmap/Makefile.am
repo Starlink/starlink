@@ -56,7 +56,7 @@ EXTRA_DIST = $(libdocdir) test manual.tar $(man1_MANS) VERSION
 
 # The test directory has a couple of things to make prior to distribution
 dist-hook:
-	cd test; $(MAKE) prepare-dist
+	cd $(distdir)/test; $(MAKE) prepare-dist
 
 # Generate library documentation using Doxygen
 libdocdir = @DOXYGEN_OUTPUT_DIRECTORY@
