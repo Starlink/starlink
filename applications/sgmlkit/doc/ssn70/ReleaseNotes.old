@@ -1,0 +1,478 @@
+<!-- 
+  Starlink SGML system, release notes
+  $Id$
+-->
+
+<subsect id=release-0.5 export>Release Notes, version DR-0.5
+
+<p>This is developers' release 0.5.
+
+<subsubsect>New in this release
+
+<p>Prior to the SGML meeting scheduled for Friday 24 September, I've
+made assorted further changes of detail, mostly to the Programcode
+DTD, as agreed at the last programmers' meeting.  These have been
+implemented in both the HTML and &latex; down-converters, but not yet
+documented.
+
+<subsubsect>Changes
+
+<p>The following are the changes to the Programcode DTD agreed after
+the last meeting. 
+<dl>
+
+<dt>CODEPROLOGUE content model
+<dd>The CODEPROLOGUE element has changed to ROUTINEPROLOGUE, and
+almost all of its contents are now optional, as well as being in any
+order.  As a result, the MISCCODE element is redundant, and has been
+removed.
+
+<dt>Paragraph content
+<dd>The paragraph content model has been substantially enlarged, and
+is now identical with that of the General DTD, with the exception of
+the cross-reference elements.  As part of this, the General DTD was
+substantially restructured, to extract the paragraph-content elements
+into a separate DTD fragment, which the two DTDs share.
+
+<dt>The changes are implemented in the down-converters
+<dd>&ellip; though not very prettily.  They <em/should/ be robust
+enough that trial documents conforming to the updated DTDs should be
+testable.
+
+<dt>Defects list added
+<dd>The `defects list' is now part of the maintained code, and
+included in the distribution.  This is the (supposedly authoritative)
+list of what changes have been suggested, and comments on their
+implementation.
+
+
+</dl>
+
+<subsubsect>Outstanding issues
+
+<p>This is the to-do list.  These are the issues which should either
+be addressed before the next full release, or postponed as being
+unresolvable just now.  For more wishful thinking, see <ref
+id=final.development>.
+
+<p>This is more-or-less the same to-do list as in the previous release
+(see <ref id=release-0.4> for details).  This release has concentrated
+on the issues arising from the last programmers' meeting.
+
+<dl>
+<dt>Bundle Jade with the system
+<dd>At present, the distribution consists of the SGML kit plus a Jade
+distribution.  However, I still haven't managed to get Jade to build
+on Suns or Alphas.  This might change, as work has started -- by the
+community rather than James Clark alone -- on an open-source version
+of Jade called <webref url='http://jade-cvs.avionitek.com/'
+>OpenJade</webref>.  This <em/might/ include work on getting Jade to
+build on other platforms.
+
+<dt>Use of FPI: should we use <code>-//Starlink//...</code> or
+<code>+//IDN star.rl.ac.uk...</code>? 
+<dd>I haven't had any comments or thoughts on this.
+
+<dt>Include some facility for dealing with obsolete exported IDs.
+<dd>Since I've had no objections to this structure, I'll include DTD
+and down-converter support for this anon.
+
+<dt>Development of the down-converters for the programcode DTD
+<dd>These currently work, but the results are hideously ugly.  The
+changes also need to be documented.
+
+<dt>Bugs in Jade's LaTeX back-end
+<dd>I've since discovered that my identification of these as bugs was
+mistaken.  They're features: the character-reference mechanism I
+thought was failing was actually the wrong approach, Jade was
+correctly barfing on it, and my `fix' was a dirty rotten hack;
+unfortunately, Jade doesn't yet seem to support the correct approach,
+but OpenJade might soon.
+
+<dt>OpenJade
+<dd>I'll see if it's sensible to shift to OpenJade away from Clark's
+distribution.
+
+<dt>Defects list
+<dd>There are a variety of more-or-less urgent issues notes in the
+Defects list.
+
+</dl>
+
+
+<subsect id=release-0.4 export>Release Notes, version DR-0.4
+
+<p>This is developers' release 0.4.
+
+<subsubsect>New in this release
+
+<p>After a long discussion at the August programmers' meeting, and a
+detailed discussion with Mark Taylor, there have been numerous changes
+of detail, but few substantial additions.
+
+<subsubsect>Changes
+
+<p>The following are the changes agreed after the last meeting.
+<dl>
+
+<dt>Equations
+<dd>Equations are now numbered, and can be referred to.  The
+definition of the equation elements has changed slightly, with the
+addition of the MLINE content to MEQNARRAY and the addition of the
+MLABEL element.  Generation of the GIF versions of the equations is
+smoother (well, should be -- I'm still unsure how sensitive the
+dvi2bitmap program is to its &tex; environment).
+
+<dt>Tables
+<dd>There is now a TABULAR element for tablar material, which sits
+within the TABLE element, which is responsible for matters such as
+captioning and floating the result.  This orthogonality means that
+TABULAR is now a `structuring' element, at the same level as elements
+like BLOCKQUOTE and lists, so it can appear within paragraphs.
+
+<dt>Cross references
+<dd>The DOCXREF element now has a title attribute, allowing you to
+override the generation of the link text.  Also, I've added a
+<code/%short-crossrefs%/ parameter to the DSSSL stylesheets (set true
+buy default), which allows you to control whether you get short or
+long generated text.
+
+<dt>Figure notations
+<dd>The set of figure notations has expanded, now including (after
+much debate) arbitrary &latex; as an acceptable notation.  At the same
+time, the content model for the FIGURE element has changed, so that
+each FIGURECONTENT element now specifies a single alternative.
+
+<dt>Assorted bug-fixing
+<dd>Includes wrinkles in the DTD as well as in the down-converters.
+
+</dl>
+
+<subsubsect>Outstanding issues
+
+<p>This is the to-do list.  These are the issues which should either
+be addressed before the next full release, or postponed as being
+unresolvable just now.  For more wishful thinking, see <ref
+id=final.development>.
+
+<p>This is more-or-less the same to-do list as in the previous release
+(see <ref id=release-0.3> for details).  This release has concentrated
+on the issues arising from the last programmers' meeting.
+
+<dl>
+<dt>Bundle Jade with the system
+<dd>At present, the distribution consists of the SGML kit plus a Jade
+distribution.  However, I still haven't managed to get Jade to build
+on Suns or Alphas.  This might change, as work has started -- by the
+community rather than James Clark alone -- on an open-source version
+of Jade called <webref url='http://jade-cvs.avionitek.com/'
+>OpenJade</webref>.  This <em/might/ include work on getting Jade to
+build on other platforms.
+
+<dt>Use of FPI: should we use <code>-//Starlink//...</code> or
+<code>+//IDN star.rl.ac.uk...</code>? 
+<dd>I haven't had any comments or thoughts on this.
+
+<dt>Include some facility for dealing with obsolete exported IDs.
+<dd>Since I've had no objections to this structure, I'll include DTD
+and down-converter support for this anon.
+
+<dt>Development of the programcode DTD
+<dd>There was discussion of this at the programmers' meeting, and
+there will be developments before the next release.
+
+<dt>Bugs in Jade's LaTeX back-end
+<dd>I've since discovered that my identification of these as bugs was
+mistaken.  They're features: the character-reference mechanism I
+thought was failing was actually the wrong approach, Jade was
+correctly barfing on it, and my `fix' was a dirty rotten hack;
+unfortunately, Jade doesn't yet seem to support the correct approach,
+but OpenJade might soon.
+
+<dt>DTD and down-converter changes forthcoming
+<dd>Assorted changes to the programcode DTD were mooted and disputed;
+I'll add these.  The HTML down-converter should be extended to process
+&latex; code in the `latexgraphics' notation.  Clive suggested the
+addition of hours and degrees elements.
+
+<dt>OpenJade
+<dd>I'll see if it's sensible to shift to OpenJade away from Clark's
+distribution.
+
+</dl>
+
+
+<subsect id=release-0.3 export>Release Notes, version DR-0.3
+
+<p>This is developers' release 0.3.
+
+<p>The system relies on the DSSSL engine Jade, but
+it does <em/not/ contain a pre-built version of Jade.  See <ref
+id=install> for further details of obtaining and building Jade.
+
+<subsubsect>New in this release
+
+<p>Additional features include some hooks for customising the
+output, described in <ref id=appx.system.paramdsssl>.  The generation
+of the backmatter was rewritten.  Numerous other fixes and tweaks.
+
+<subsubsect>Changes
+
+<p>Mostly from the last to-do list.
+<dl>
+
+<dt>Changes in DTD
+<dd>UPDATE element can now go at the end of the SUBHEAD (ie,
+effectively before the beginning of the section content.  BACKMATTER
+is now an empty element, with a 
+`bibliography' attribute, so elements bibliography, indexcontents and
+notecontents have disappeared.  Addition of `type' formatting-hint
+attribute to code element.  Addition of %simplephrase formatting
+elements to content model of verbatim.
+
+<dt>Finish documentation
+<dd>Considerable additions to the developer/maintainer section.
+Various other corrections and additions, some required by changes to
+the DTD in this release.
+
+<dt>Output of HTML down-converter should be compatible with HTX.
+<dd>Output modified with this intent.  FIXME: not yet checked against hlink.
+
+<dt>Coverpage image in DTD
+<dd>Done
+
+<dt>BOS and manifest support
+<dd>There's no support for extraction of the BOS (the `bounded object set', a
+formally-definable list of the entities required in a `complete'
+source document set) from a source document.  This is easy to extract
+yourself: any files included in an SGML document must be declared as
+entities in the Declaration Subset, you you can construct a BOS by hand
+perfectly reliably.
+<p>The stylesheets now generate a manifest of generated files, in
+<code/HTML.manifest/ and <code/LaTeX.manifest/ (configurable).
+
+<dt>Dealing with exported labels: emit a TOC of
+exported IDs at end, with links both ways
+<dd>The `link policy' is expressed in DTD.  The exported-id list has
+been catered for by adding a customisation variable
+<code/show-element-ids/ (see <ref id=appx.system.paramdsssl>) so that
+you can prepare a version of the document which displays these IDs.
+This isn't quite the same thing, but the other can be added if anyone
+feels strongly about it.
+
+<dt>Sectioning: the references to CODECOLLECTION sections within
+ROUTINECODE elements come out with the wrong numbers.
+<dd>Fixed
+
+<dt>Include a print button in the generated HTML.
+<dd>Done.
+
+<dt>Updated Jade patches
+<dd>I've fixed a couple of buglets in the Jade back-end I produced.
+The stylesheets now need version <code/1.2.1-starlink-1.0b2/.
+
+</dl>
+
+<subsubsect>Outstanding issues
+
+<p>This is the to-do list.  These are the issues which should either
+be addressed before the next full release, or postponed as being
+unresolvable just now.  For more wishful thinking, see <ref
+id=final.development>.
+
+<dl>
+<dt>Bundle Jade with the system
+<dd>At present, the distribution consists only of the SGML library stuff.
+I need to work out the magic to get Jade to build on Suns and Alphas,
+and then distribute them together.  Since Jade is needed to build the
+documetation during installation, you can't even install the package
+on systems which don't have Jade.  I therefore haven't tested the
+installation makefile other than on Linux: Tru64's make is dumb enough
+that I can just about guarantee that there'll be problems there.
+
+<dt>Finish documentation
+<dd>Read-through for style, plus more expansive installation notes.
+
+<dt>Use of FPI: should we use <code>-//Starlink//...</code> or
+<code>+//IDN star.rl.ac.uk...</code>? 
+<dd>The second is a standard `registered prefix' built up from a DNS
+domain name.  Is there any prospect of a <code>starlink.ac.uk</code>
+domain name?
+
+<dt>Include some facility for dealing with obsolete exported IDs.
+<dd>One
+possibility (discussed at the programmers' meeting) was <code>&lt;sect
+id=newid>Intro&lt;oldid id=oldid></code>, but that's not very flexible
+-- it'd only apply to sections.  I thought instead of
+<verbatim><![CDATA[
+<!element oldidlist o o (oldid+)>
+<!element oldid     - o EMPTY>
+<!attlist oldid
+	id	id	#required	-- the now-obsolete id --
+	newid	idref	#requred	-- replacement --
+	-- resolve a reference to this element as if it were a
+           reference to the element pointed to by newid, but
+	   warn or issue an error about a deprecation --
+	export	(export) #fixed export	-- for compat/consistency? --
+	>
+]]></verbatim>
+This means that at the top of the document (probably), you could
+include a list of elements:
+<verbatim>
+&lt;oldidlist>
+&lt;oldid id=old.id newid=replacement.id>
+&lt;oldid id=another.id newid=another.replacement>
+&lt;/oldidlist>
+</verbatim>
+This is both perfectly generic, and usefully visible.
+
+<dt>Development of the programcode DTD
+<dd>As discussed in <ref id=doccode.devel>, I am uncertain of the
+optimal balance between flexibility and structure in the programcode
+DTD.  We need to reach a consensus on this before the structure is frozen.
+
+<dt>Bugs in Jade's LaTeX back-end
+<dd>There's a deficiency in the &latex; back-end I added to
+Jade.  There's some weakness in the way that
+characters are output, which results in SDATA entities not being
+processed properly, when
+the character data is obtained via (data) rather than
+(process-children).  Unfortunately, I think that fixing this
+one is going to need more knowledge of Jade internals than I have to
+hand right now.  The only available workaround is to avoid using any
+of the entities in <ref id=table.entities> within `DT' elements (which
+is the only place the stylesheet uses the feature which triggers the
+bug).  If you fall victim to the bug, the only effect would be a
+<code/&amp;#65533/ or <code/\\char65533/ in the output, which might
+confuse a browser or &latex, but do nothing worse.
+
+<dt>Bugs in the mk script
+<dd>There are currently a few missing targets in the installation makefile.
+
+</dl>
+
+
+<subsect id=release-0.2 export>Release Notes, version 0.2
+
+<p>This is developers' release 0.2.
+
+<subsubsect>New in this release
+
+<p>This release consists of the SGML DTDs, down-converters, and other
+miscellaneous software.
+
+<p>The system relies on the DSSSL engine Jade, but
+it does <em/not/ contain a pre-built version of Jade.  Jade turns out
+to be a real hassle to build with a compiler other than gcc.  The
+author, James Clark, is a fine programmer, but apparently a bit of a
+standards purist (he was involved with writing the DSSSL standard, and
+with the development of XML/XSL): he seems to take the position that a
+standards document is an adequate C++ user manual, and doesn't appear
+to believe that porting software to non-conforming compilers should be
+high on his priority list.  Jade builds
+perfectly happily on gcc, but I've been struggling away for ages
+trying to get it to build using Sun's and Digital's C++ compilers.  I
+will distribute a runnable version of Jade eventually, but for the
+moment, you'll have to build Jade yourself.  If <em/you/ manage to
+build it using one of those, could you tell me what you had to do....
+
+<p>Get Jade from Clark's <webref
+url='http://www.jclark.com/jade/' >Jade pages</webref>.  Before you
+build it, you need to patch it to a Starlink-specific version, using
+the patch at
+<url>http://www.astro.gla.ac.uk/users/norman/distrib/jade.html</url>.
+The configuration you'll need is:
+<verbatim>
+% mkdir -p /my/star/bin/sgml/bin /my/star/bin/sgml/lib
+% ./configure --enable-latex --prefix=/my/star/bin/sgml
+% make
+% make install
+</verbatim>
+
+<subsubsect>Outstanding issues
+
+<p>This is the to-do list.  It still contains several small items from
+the last programmers' meeting.  These are important, but not
+show-stopping.
+
+<dl>
+<dt>Bundle Jade with the system
+<dd>At present, the distribution consists only of the SGML library stuff.
+I need to work out the magic to get Jade to build on Suns and Alphas,
+and then distribute them together.
+
+<dt>Finish documentation
+<dd>This should be considered a first draft of the documentation -- it
+needs a proper read-through, plus additions concerned with installing
+the software, plus more detailed developer/maintainer notes.
+
+<dt>Output of HTML down-converter should be compatible with HTX.
+<dd>Should need nothing more than a quick check that this is true
+
+<dt>Use of FPI: should we use <code>-//Starlink//...</code> or
+<code>+//IDN star.rl.ac.uk...</code>? 
+<dd>The second is a standard `registered prefix' built up from a DNS
+domain name.  Is there any prospect of a <code>starlink.ac.uk</code>
+domain name?
+
+<dt>Coverpage image in DTD
+<dd>Coming...
+
+<dt>Dealing with exported labels: do not export by default, but warn very
+        visibly (or fail) if policy not followed; emit a TOC of
+        exported IDs at end, with links both ways; produce appropriate
+        comments in HTML.
+<dd>The `link policy' is expressed in DTD.  The exported-id list will
+be little work.
+
+<dt>Include some facility for dealing with obsolete exported IDs.
+<dd>One
+possibility (discussed at the programmers' meeting) was <code>&lt;sect
+id=newid>Intro&lt;oldid id=oldid></code>, but that's not very flexible
+-- it'd only apply to sections.  I thought instead of
+<verbatim><![CDATA[
+<!element oldidlist o o (oldid+)>
+<!element oldid     - o EMPTY>
+<!attlist oldid
+	id	id	#required	-- the now-obsolete id --
+	newid	idref	#requred	-- replacement --
+	-- resolve a reference to this element as if it were a
+           reference to the element pointed to by newid, but
+	   warn or issue an error about a deprecation --
+	export	(export) #fixed export	-- for compat/consistency? --
+	>
+]]></verbatim>
+This means that at the top of the document (probably), you could
+include a list of elements:
+<verbatim>
+&lt;oldidlist>
+&lt;oldid id=old.id newid=replacement.id>
+&lt;oldid id=another.id newid=another.replacement>
+&lt;/oldidlist>
+</verbatim>
+This is both perfectly generic, and usefully visible.
+
+<dt>Include a print button in the generated HTML.
+<dd>Easy
+
+<dt>Sectioning: the references to CODECOLLECTION sections within
+ROUTINECODE elements come out with the wrong numbers.
+<dd>This probably needs some detailed fixing of
+the code in (make-section-reference), but nothing too taxing.
+
+<dt>BOS support
+<dd>Support extraction of the BOS (the `bounded object set', a
+formally-definable list of the entities required in a `complete'
+source document set) from a source document.  This is
+related to, but distinct from, the issue of generating a manifest of
+generated files for packaging and 
+distribution.  The latter isn't completely resolved, as
+it's not transparently clear what to do with the entity declared
+values of the codecollection and docxref elements.  Needs thought.
+
+<dt>Include elements for Examples, Notes, Warnings?
+<dd>I think that examples should go within %body.content, and
+contain paragraphs.  Notes and warnings should be in p.content?  I'm
+not sure how necessary it is to support these so explicitly.
+
+</dl>
