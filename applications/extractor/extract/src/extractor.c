@@ -1,5 +1,3 @@
-void extractor( int *status ) {
-
 /*+
  *  Name:
  *     EXTRACTOR
@@ -136,92 +134,94 @@ void extractor( int *status ) {
 #include        "par.h"
 #include        "ndf.h"
 
-  /* Declarations: */
-  jmp_buf         env;  /*  Program environment when setjmp called */
+/* Global variables: */
+jmp_buf env;          /*  Program environment when setjmp called */
 
+void extractor( int *status ) {
+
+  /* Declarations@ */
   int keywords=0;       /*  Prompt for interactive parameters */
-  char *argkey[20];     /*  Parameter name */
-  char *argval[20];     /*  Parameter value */
-  char argstr[800];
-  int narg;
+  char *argkey[20];     /*  Pointers to parameter names */
+  char *argval[20];     /*  Pointers to parameter values */
+  char argstr[800];     /*  Storage space for parameters */
+  int narg;             /*  Number of parameters */
   int i;
-  int nim;
+  int nim;              /*  Number of images given (max=2) */
   char *str;
-
+  
   if ( setjmp( env ) == 0 ) {
-
+    
     /* Run program. */
-
+    
     /* Default parameters */
     memset( &prefs, '\0', sizeof(prefstruct) );
     prefs.nimage_name = 1;
     prefs.image_name[0] = "image";
-
+    
     /* See if any KEYWORDS to be specified as parameters */
-   parGet0l( "KEYWORDS", &keywords, status );
-
-   /*   keywords = 0;*/
-   if ( keywords ) {
-
-     /*  KEYWORDS to be given - 
-      *   set pointers to names in argkey
-      *   and pointers to value strings in argval
-      *   Use argstr as temporary buffer
-      */
-     argkey[0] = argstr;
-     for ( narg=0; (*status == SAI__OK) && (narg < 20); narg++ ) {
-
-       /*     Get KEYWORD name */
-       parGet0c( "NAME", argkey[narg], 20, status );
-       argval[narg] = argkey[narg] + strlen(argkey[narg]) + 1;
-
-       /*     Get value */
-       parGet0c( "VALUE", argval[narg], 20, status );
-       argkey[narg+1] = argval[narg] + strlen(argval[narg]) + 1;
-       parCancl( "NAME", status );
-       parCancl( "VALUE", status );
-     }
-     if ( *status == PAR__NULL ) errAnnul( status );
-     narg--;
-   } else {
-     narg = 0;
-   }
-
-   /* Get configuration file name */
-   parGet0c( "CONFIG", prefs.prefs_name, MAXCHAR, status );
-   if ( *status == SAI__OK ) {
-     readprefs(prefs.prefs_name, argkey, argval, narg);
-   }
-
-   /* and image name(s) - again use argstr as buffer */
-   parGet0c( "IMAGE", argstr, MAXCHAR, status );
-   if ( *status == SAI__OK ) {
-     for (nim = 0; (str=strtok( nim?NULL:argstr, notokstr ))!=NULL; nim++) {
-       if (nim<MAXIMAGE) {
-         prefs.image_name[nim] = str;
-       } else {
-         error(EXIT_FAILURE, "*Error*: Too many input images: ", str);
-       }
-     }
-     prefs.nimage_name = nim;
-
-/* Now do the business */
-     errStat( status );
-     if ( *status == SAI__OK ) { 
-       ndfBegin();
-       makeit();
-       errStat( status );
-       ndfEnd( status );
-     }
-     if ( *status == SAI__OK ) {
-       NFPRINTF(OUTPUT, "All done");
-       NPRINTF(OUTPUT, "\n");
-     }
-   }
-
-} else
-
-  /* Return from longjmp in error() -- would be nice to close any open 
-     files at this point.... */
-  errStat( status );
+    parGet0l( "KEYWORDS", &keywords, status );
+    
+    /*   keywords = 0;*/
+    if ( keywords ) {
+      
+      /*  KEYWORDS to be given - 
+       *   set pointers to names in argkey
+       *   and pointers to value strings in argval
+       *   Use argstr as temporary buffer
+       */
+      argkey[0] = argstr;
+      for ( narg=0; (*status == SAI__OK) && (narg < 20); narg++ ) {
+        
+        /*     Get KEYWORD name */
+        parGet0c( "NAME", argkey[narg], 20, status );
+        argval[narg] = argkey[narg] + strlen(argkey[narg]) + 1;
+        
+        /*     Get value */
+        parGet0c( "VALUE", argval[narg], 20, status );
+        argkey[narg+1] = argval[narg] + strlen(argval[narg]) + 1;
+        parCancl( "NAME", status );
+        parCancl( "VALUE", status );
+      }
+      if ( *status == PAR__NULL ) errAnnul( status );
+      narg--;
+    } else {
+      narg = 0;
+    }
+    
+    /* Get configuration file name */
+    parGet0c( "CONFIG", prefs.prefs_name, MAXCHAR, status );
+    if ( *status == SAI__OK ) {
+      readprefs(prefs.prefs_name, argkey, argval, narg);
+    }
+    
+    /* and image name(s) - again use argstr as buffer */
+    parGet0c( "IMAGE", argstr, MAXCHAR, status );
+    if ( *status == SAI__OK ) {
+      for (nim = 0; (str=strtok( nim?NULL:argstr, notokstr ))!=NULL; nim++) {
+        if (nim<MAXIMAGE) {
+          prefs.image_name[nim] = str;
+        } else {
+          error(EXIT_FAILURE, "*Error*: Too many input images: ", str);
+        }
+      }
+      prefs.nimage_name = nim;
+      
+      /* Now do the business */
+      errStat( status );
+      if ( *status == SAI__OK ) { 
+        ndfBegin();
+        makeit();
+        errStat( status );
+        ndfEnd( status );
+      }
+      if ( *status == SAI__OK ) {
+        NFPRINTF(OUTPUT, "All done");
+        NPRINTF(OUTPUT, "\n");
+      }
+    }
+  } else {
+    /* Return from longjmp in error() -- would be nice to close any open 
+       files at this point.... */
+    errStat( status );
+  }
 }

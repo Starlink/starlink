@@ -27,7 +27,7 @@
 #include 	"merswrap.h"
 #include        "sae_par.h"
 
-jmp_buf		env;
+extern jmp_buf		env;
 
 /********************************* error ************************************/
 /*
