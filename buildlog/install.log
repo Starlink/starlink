@@ -972,7 +972,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/topcat
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 187 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 188 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copied 3 empty directories to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 78 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Treeview target: install
@@ -1124,4 +1124,4 @@ install:
 [loggedcopy] Copied 1 empty directory to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 6 seconds
+Total time: 4 minutes 14 seconds

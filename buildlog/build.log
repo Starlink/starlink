@@ -378,7 +378,7 @@ build_demo:
       [tar] Building tar: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2
 
 build:
-    [javac] Compiling 74 source files to /apps/cvsbuild/java/source/topcat/build/classes
+    [javac] Compiling 75 source files to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copying 55 files to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copying 23 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat
@@ -462,4 +462,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 5 seconds
+Total time: 1 minute 4 seconds

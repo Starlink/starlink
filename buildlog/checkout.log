@@ -8995,6 +8995,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/ViewerTableModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/WindowAction.java
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/func
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Angles.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Miscellaneous.java
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/join
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/InterMatchSpec.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/IntraMatchSpec.java

@@ -744,7 +744,7 @@ dist:
 install:
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 187 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 188 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 78 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Treeview target: install
 
@@ -877,4 +877,4 @@ export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 6 seconds
+Total time: 4 minutes 5 seconds
