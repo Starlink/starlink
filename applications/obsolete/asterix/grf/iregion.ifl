@@ -84,5 +84,10 @@ interface IREGION
     prompt 'Output filename'
     help 'Name of object to hold region mask'
   endparameter
+  parameter INP
+    type 'UNIV'
+    prompt 'Input filename'
+    help 'Name of object containing region mask to be loaded'
+  endparameter
 endinterface
 
