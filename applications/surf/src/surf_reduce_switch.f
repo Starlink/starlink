@@ -127,6 +127,9 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.27  1998/07/21 02:11:58  timj
+*     Annull SECNDF
+*
 *     Revision 1.26  1997/10/08 18:44:02  timj
 *     Fix 'no data' message when using 2 switches (^PKG instead of PKG)
 *
@@ -741,6 +744,9 @@ c
 *     Propogate the section to the output
 
       CALL NDF_PROP (SECNDF, ' ', 'OUT', OUT_NDF, STATUS)
+
+*     Annull the section
+      CALL NDF_ANNUL(SECNDF, STATUS)
 
 *     create a history component in the output file
 
