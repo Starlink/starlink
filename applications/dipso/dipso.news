@@ -1,6 +1,6 @@
 1 DIPSO - friendly spectrum analysis program
 
- V3.5-3 (21-AUG-2000) 
-    DIPSO V3.5-3 has been released. This includes a fix for a bug which
-    caused the "ISATM" command to loose the current Gl and Gu values 
+ V3.5-4 (27-OCT-2000) 
+    DIPSO V3.5-4 has been released. This includes a fix for a bug which
+    caused the ISCALC command to report "columns too small (<100 cm-2)"
     when being run under Linux.
