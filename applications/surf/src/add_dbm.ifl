@@ -17,6 +17,8 @@
  
    INTERFACE ADD_DBM
 
+     HELPLIB 'SURF_HELP:'
+
       PARAMETER MSG_FILTER
         TYPE     '_CHAR'
         PROMPT   'Messaging level'
