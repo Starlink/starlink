@@ -19,6 +19,7 @@
 *     27-May-1994  Opens output textfile with STATUS="UNKNOWN"
 *      6-Apr-1998  V 2.2-1 Structures removed (rjv)
 *      9-Feb-1999  V 2.3-0 FITS file input (DGED)
+*     30 Mar 99    V 2.3-1 Display parameters (rjv)
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -110,7 +111,7 @@
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTHK Version 2.3-0')
+      PARAMETER (VERSION = 'XRTHK Version 2.3-1')
 *-
       CALL AST_INIT(STATUS)
       CALL MSG_PRNT(VERSION)
