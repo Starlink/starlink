@@ -7778,6 +7778,7 @@ U java/source/util/src/testcases/uk/ac/starlink/util/DOMUtilsTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/DataSourceTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/NodeDescendantsTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/SourceReaderTest.java
+U java/source/util/src/testcases/uk/ac/starlink/util/TestCaseTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/XMLUtilTest.java
 cvs checkout: Updating java/source/votable
 U java/source/votable/build.xml
