@@ -31,7 +31,7 @@ FILES        = \
  StarDemo.tcl StarEnterObject.tcl StarLabelCheck.tcl StarPatch.tcl \
  StarPhotom.tcl StarPhotomDetails.tcl StarPhotomExtras.tcl \
  StarPhotomList.tcl StarPhotomObject.tcl gaia2astrom.tcl gaiaMain.tcl \
- gaia_defaults.tcl gaia_util.tcl gaia_version.tcl graphics_features.tcl
+ gaia_defaults.tcl gaia_util.tcl gaia_version.tcl graphics_features.tcl \
  Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp \
  StarArd.hlp StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp \
  StarAstGrid.hlp StarAstReference.hlp StarAstRefine.hlp \
