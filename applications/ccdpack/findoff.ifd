@@ -186,6 +186,7 @@
             ppath CURRENT DYNAMIC DEFAULT
             default 5.0
             prompt {Minimum distance between positions}
+            dynamic yes
             helpkey *
           }
 
