@@ -47,7 +47,9 @@
 *  History:
 *     1992 July 20 (MJC):
 *        Original version based loosely on RDDSCN.
-*     {enter_changes_here}
+*     1992 November 17 (MJC):
+*        Skip over any descriptors marked for deletion.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -120,17 +122,29 @@
 *  Search through the descriptor block(s).
       NUMDES = 0
       LOOP = .TRUE.
+
       DO WHILE ( LOOP )
  
+*  Skip over the current descriptor if it is not marked for deletion,
+*  and the end of the descriptors has not been reached.
+         DO WHILE ( LDB_DWORD( DWN ) .LT. 0 .AND. LOOP )
+
 *  Read the current descriptor name and its associated value.
-         CALL STL_RATLDB( ENTRY, DESCR, DWN )
-         CALL STL_RATLDB( ENTRY, VALUE, DWN )
+            CALL STL_RATLDB( ENTRY, DESCR, DWN )
+            CALL STL_RATLDB( ENTRY, VALUE, DWN )
 
 *  Check if the end of the descriptor list is encountered.
-         LOOP = LDB_BLKNUM .NE. FCB_ENDLDB( 1 ) .OR.
-     :          DWN .NE. FCB_ENDLDB( 2 )
+            LOOP = LDB_BLKNUM .NE. FCB_ENDLDB( 1 ) .OR.
+     :             DWN .NE. FCB_ENDLDB( 2 )
+         END DO
 
+*  Store the descriptor if the end of the descriptors has not been
+*  reached.
          IF ( LOOP ) THEN
+
+*  Read the current descriptor name and its associated value.
+            CALL STL_RATLDB( ENTRY, DESCR, DWN )
+            CALL STL_RATLDB( ENTRY, VALUE, DWN )
 
 *  This is another descriptor, so store its name and value in the
 *  arrays.
@@ -138,6 +152,11 @@
             DESNAM( NUMDES ) = DESCR( 1:8 )
             DESVAL( NUMDES ) = VALUE( 1:VALLEN )
          END IF
+
+*  Check if the end of the descriptor list is encountered.
+         LOOP = LDB_BLKNUM .NE. FCB_ENDLDB( 1 ) .OR.
+     :          DWN .NE. FCB_ENDLDB( 2 )
+
       END DO
 
  999  CONTINUE   
