@@ -132,7 +132,11 @@ to need explanation or elaboration.
 
 (element em
   (make command name: "emph"
-    (process-children)))
+	(process-children)))
+
+(element foreign
+  (make command name: "textit"
+	(process-children)))
 
 (element kbd
   (make command name: "Kbd"
@@ -227,3 +231,24 @@ to need explanation or elaboration.
 
 (element update				; ignore in default mode
   (empty-sosofo))
+
+;;; Angle element
+; There's no error-checking here, so if the user includes an angle
+; element with _no_ angles within it, or includes, say, just an angle
+; and fractions of a second, this won't pick it up.
+(element angle
+  (let ((ishours (and (attribute-string (normalize "unit"))
+		      (string=? (attribute-string (normalize "unit"))
+				"hours"))))
+    (make environment brackets: '("$" "$")
+	  (apply sosofo-append
+		 (map (lambda (el)
+			(let ((val (attribute-string
+				    (normalize (symbol->string el)))))
+			  (if val
+			      (make empty-command
+				name: (string-append (if ishours "hms" "dms")
+						     (symbol->string el))
+				parameters: `(,val))
+			      (empty-sosofo))))
+		      '(angle minutes seconds fraction))))))
