@@ -376,7 +376,7 @@
               GOTO 99
             END IF
             DO IPOS = 1, NIPOS
-              PSF_PPS(IPOS) = MAX(1,NINT(ABS(PSF_PIXL(ILEV,IPOS)))
+              PSF_PPS(IPOS) = MAX(1,NINT(ABS(PSF_PIXL(ILEV,IPOS))))
             END DO
             NUR = NIPOS
 
