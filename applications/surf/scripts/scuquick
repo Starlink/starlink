@@ -264,7 +264,7 @@ foreach $onesub (@subs) {
 
   $subname = lc($onesub);
   $subname = substr($subname, 0, 3);
-  $outext = $in."_ext_$subname";
+  $outext = $in."_${subname}_ext";
 
   ########################################################################
   # Extinction
