@@ -121,6 +121,11 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.23  1997/07/19 00:21:21  timj
+*     Add PACKAGE variable to SEARCH_DATADIR
+*     (plus looks like some skydip stuff but I thought that was already done in
+*     v1.21)
+*
 *     Revision 1.22  1997/07/03 20:20:11  timj
 *     Forgot to remove a print statement.
 *
@@ -209,12 +214,26 @@ c
 
 *    Local variables :
       LOGICAL      ABORTED             ! .TRUE. if observation was aborted
+      REAL         AV_DATA(SCUBA__MAX_SUB, SCUBA__MAX_MEAS) ! Average skydip
+      BYTE         AV_QUAL(SCUBA__MAX_SUB,SCUBA__MAX_MEAS) ! Quality of AV_QUAL
+      REAL         AV_VAR(SCUBA__MAX_SUB,SCUBA__MAX_MEAS)! Var for av skydip
       INTEGER      BEAM                ! beam index in DO loop
       INTEGER      BEAM_OFFSET         ! offset in output data array due to
                                        ! beam index
       REAL         BEAM_WEIGHT (SCUBA__MAX_BEAM)
                                        ! weight assigned to the reduced data
                                        ! for each beam
+      INTEGER      BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
+                                        ! A/D numbers of bolometers measured in
+                                        ! input file
+      INTEGER      BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
+                                        ! channel numbers of bolometers
+      CHARACTER*20 BOL_TYPE (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                        ! bolometer types
+      REAL         BOL_DU3 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                        ! dU3 Nasmyth coord of bolometers
+      REAL         BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                        ! dU4 Nasmyth coord of bolometers
       LOGICAL      CALIBRATOR          ! .TRUE. if internal calibrator was ON
       CHARACTER*15 CHOP_FUNCTION       ! type of chop used
       CHARACTER*20 DATA_KEPT           ! types of data stored in file
@@ -287,6 +306,7 @@ c
       CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC
                                        ! HDS locator of REDS extension in 
                                        ! output file
+      CHARACTER*(DAT__SZLOC) OUT_FITSX_LOC ! Locator .FITS output
       INTEGER      OUT_QUL_PTR         ! Mapped output file quality
       INTEGER      OUT_QUALITY_END     ! end of qual array.
       INTEGER      OUT_QUALITY_PTR     ! pointer to quality array in output 
@@ -300,6 +320,8 @@ c
       INTEGER      RUN_NUMBER          ! run number of observation
       CHARACTER*15 SAMPLE_MODE         ! sample mode of observation
       INTEGER      SECNDF              ! Section NDF identifier
+      INTEGER      SLICE_PTR_END       ! End of skydip work space
+      INTEGER      SLICE_PTR           ! Skydip workspace
       INTEGER      SPIKE_LEVEL         ! level to despike
       INTEGER      START_BEAM          ! first reduced beam
       CHARACTER*80 STATE               ! string describing the 'state'
@@ -345,7 +367,7 @@ c
 
       CALL NDF_BEGIN
 
-      CALL SCULIB_SEARCH_DATADIR('IN', IN_NDF, STATUS)
+      CALL SCULIB_SEARCH_DATADIR(PACKAGE, 'IN', IN_NDF, STATUS)
 
 *  get some general descriptive parameters of the observation
 
@@ -376,18 +398,14 @@ c
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC('PKG', PACKAGE)
-      CALL MSG_OUTIF (MSG__NORM, ' ', 
-     :     '^PKG: run ^RUN was a ^MODE observation '//
-     :     'of object ^OBJECT', STATUS)
-
-      IF (OBSERVING_MODE .EQ. 'SKYDIP') THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_SETC ('MODE', OBSERVING_MODE)
-         CALL ERR_REP (' ','^PKG: REDUCE_SWITCH can not be run on '//
-     :        '^MODE observations', STATUS)
-      ENDIF
-
+      IF (OBSERVING_MODE .NE. 'SKYDIP')THEN
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        '^PKG: run ^RUN was a ^MODE observation '//
+     :        'of object ^OBJECT', STATUS)
+      ELSE
+         CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :        '^PKG: run ^RUN was a ^MODE observation ', STATUS)
+      END IF
 
 *  check that the history of the input file is OK
 
@@ -463,12 +481,21 @@ c
      :  N_BOLS, STATUS)
 
 *  does the user want to divide the data by the internal calibrator
+*  Not relevant for SKYDIP
 
-      CALL PAR_GET0L ('USE_CALIBRATOR', USE_CALIBRATOR, STATUS)
+      IF (OBSERVING_MODE .NE. 'SKYDIP') THEN
 
-*  check input file is OK
+         CALL PAR_GET0L ('USE_CALIBRATOR', USE_CALIBRATOR, STATUS)
 
-      IF (STATUS .EQ. SAI__OK) THEN
+      ELSE
+
+         USE_CALIBRATOR = .FALSE.
+
+      END IF
+
+*  check input file is OK (irrelevant for SKYDIP)
+
+      IF (STATUS .EQ. SAI__OK .AND. OBSERVING_MODE .NE. 'SKYDIP') THEN
          IF ((CHOP_FUNCTION .NE. 'SQUARE') .AND.
      :        (CHOP_FUNCTION .NE. 'SCUBAWAVE') .AND.
      :        (CHOP_FUNCTION .NE. 'RAMPWAVE') .AND.
@@ -514,7 +541,10 @@ c
       CALL NDF_DIM (IN_NDF, MAXDIM, DIM, NDIM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
+
+         IF (OBSERVING_MODE .EQ. 'SKYDIP') THEN
+            EXPECTED_DIM1 = 3     ! This is the number of skydip temperatures
+         ELSE IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
             EXPECTED_DIM1 = 5
          ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
             EXPECTED_DIM1 = 4
@@ -552,8 +582,9 @@ c
      :     N_MEASUREMENTS, STATUS)
 
 *  check that the number of switches matches the SWITCH_MODE
+*  irrelevant for SKYDIP
 
-      IF (STATUS .EQ. SAI__OK) THEN
+      IF (STATUS .EQ. SAI__OK .AND. OBSERVING_MODE .NE. 'SKYDIP') THEN
          IF (N_SWITCHES .NE. SWITCHES) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC ('SWITCH_MODE', SWITCH_MODE)
@@ -603,46 +634,52 @@ c
 
       END IF 
 
+*     Do some non-SKYDIP stuff
+
+      IF (OBSERVING_MODE .NE. 'SKYDIP') THEN
+
 *  Ask for the level at switch spikes should be removed
 
-      CALL PAR_GET0I('SPIKE_LEVEL', SPIKE_LEVEL, STATUS)
-      SPIKE_LEVEL = SPIKE_LEVEL * 256
+         CALL PAR_GET0I('SPIKE_LEVEL', SPIKE_LEVEL, STATUS)
+         SPIKE_LEVEL = SPIKE_LEVEL * 256
 
 *  Ask which switch we are going to keep
 *     0:  Reduce as normal
 *     1:  Select 1st switch
 *     2:  Select 2nd switch
 *     3:  Select 3rd switch
-
-      SWITCH = 0
-
-      IF (N_SWITCHES .GT. 1) THEN
-         CALL PAR_DEF0I('SWITCH', SWITCH, STATUS)
-         CALL PAR_MINI('SWITCH', SWITCH, STATUS)
-         CALL PAR_MAXI('SWITCH', N_SWITCHES, STATUS)
-         CALL PAR_GET0I('SWITCH', SWITCH, STATUS)
-      END IF
-
+         
+         SWITCH = 0
+      
+         IF (N_SWITCHES .GT. 1) THEN
+            CALL PAR_DEF0I('SWITCH', SWITCH, STATUS)
+            CALL PAR_MINI('SWITCH', SWITCH, STATUS)
+            CALL PAR_MAXI('SWITCH', N_SWITCHES, STATUS)
+            CALL PAR_GET0I('SWITCH', SWITCH, STATUS)
+         END IF
+         
 *  get some scratch memory and copy the different sections of the data array
 *  into it
 
-      CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, DEMOD_DATA_PTR,
-     :  DEMOD_DATA_END, STATUS)
-      CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, DEMOD_VARIANCE_PTR,
-     :  DEMOD_VARIANCE_END, STATUS)
-      CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR,
-     :  DEMOD_CALIBRATOR_PTR, DEMOD_CALIBRATOR_END, STATUS)
-      CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, 
-     :  DEMOD_CAL_VARIANCE_PTR, DEMOD_CAL_VARIANCE_END, STATUS)
-      CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBUB, DEMOD_QUALITY_PTR,
-     :  DEMOD_QUALITY_END, STATUS)
+         CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, DEMOD_DATA_PTR,
+     :        DEMOD_DATA_END, STATUS)
+         CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, 
+     :        DEMOD_VARIANCE_PTR, DEMOD_VARIANCE_END, STATUS)
+         CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR,
+     :        DEMOD_CALIBRATOR_PTR, DEMOD_CALIBRATOR_END, STATUS)
+         CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, 
+     :        DEMOD_CAL_VARIANCE_PTR, DEMOD_CAL_VARIANCE_END, STATUS)
+         CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBUB, 
+     :        DEMOD_QUALITY_PTR, DEMOD_QUALITY_END, STATUS)
+         
+         IF (STATUS .EQ. SAI__OK) THEN
+            CALL SCULIB_COPY_DEMOD_SWITCH (N_BOLS, EXPECTED_DIM1, N_POS,
+     :           SPIKE_LEVEL, %val(IN_DATA_PTR), %val(DEMOD_DATA_PTR),
+     :           %val(DEMOD_VARIANCE_PTR), %val(DEMOD_CALIBRATOR_PTR),
+     :           %val(DEMOD_CAL_VARIANCE_PTR), %val(DEMOD_QUALITY_PTR),
+     :           STATUS)
+         END IF
 
-      IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_COPY_DEMOD_SWITCH (N_BOLS, EXPECTED_DIM1, N_POS,
-     :     SPIKE_LEVEL, %val(IN_DATA_PTR), %val(DEMOD_DATA_PTR),
-     :     %val(DEMOD_VARIANCE_PTR), %val(DEMOD_CALIBRATOR_PTR),
-     :     %val(DEMOD_CAL_VARIANCE_PTR), %val(DEMOD_QUALITY_PTR),
-     :     STATUS)
       END IF
 
 *     Propogating the input to the output results in an output NDF that
@@ -701,15 +738,6 @@ c
       CALL SCULIB_MALLOC(N_POS * N_BOLS * UBND(3) * VAL__NBUB,
      :     OUT_QUALITY_PTR, OUT_QUALITY_END, STATUS)
 
-*     Map the output data
-
-*      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
-*     :  OUT_QUALITY_PTR, ITEMP, STATUS)
-*      CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE', 
-*     :  OUT_DATA_PTR, ITEMP, STATUS)
-*      CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE',
-*     :  OUT_VARIANCE_PTR, ITEMP, STATUS)
-
 *  find the .SCUBA.DEM_PNTR array, change its bounds and map it
 
       NDIM = 3
@@ -722,6 +750,52 @@ c
       CALL CMP_MAPV(OUT_SCUBAX_LOC, 'DEM_PNTR', '_INTEGER', 'WRITE',
      :     OUT_DEM_PNTR_PTR, ITEMP, STATUS)
 
+*     Run SKYDIP reduction if needed
+*     else do a normal reduce_switch
+
+      IF (OBSERVING_MODE .EQ. 'SKYDIP') THEN
+
+*     We need the bolometer descriptions for the skydip
+
+      CALL SCULIB_GET_BOL_DESC(OUT_SCUBAX_LOC, SCUBA__NUM_CHAN,
+     :     SCUBA__NUM_ADC, N_BOLS, BOL_TYPE, BOL_DU3,
+     :     BOL_DU4, BOL_ADC, BOL_CHAN, STATUS)
+
+
+*     Need to get some scratch data to work with
+         SLICE_PTR = 0
+         SLICE_PTR_END = 0
+ 
+         CALL SCULIB_MALLOC (SCUBA__N_TEMPS * N_BOLS * N_INTEGRATIONS *
+     :        VAL__NBR, SLICE_PTR, SLICE_PTR_END, STATUS)
+         
+*     Now calculate the skydip temperatures
+
+         CALL SCULIB_CALC_SKYDIP_TEMPS(SCUBA__N_TEMPS, 0, N_FITS, FITS,
+     :        'T_COLD', N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
+     :        N_BOLS, SCUBA__MAX_SUB, SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
+     :        BOL_CHAN, BOL_TYPE, BOL_ADC, %VAL(IN_DEM_PNTR_PTR), 
+     :        %VAL(IN_DATA_PTR), %VAL(OUT_DATA_PTR), 
+     :        %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR),
+     :        %VAL(OUT_DEM_PNTR_PTR), AV_DATA, AV_VAR, AV_QUAL,
+     :        %VAL(SLICE_PTR), STATUS)
+
+*     Have now finished with input data
+
+         CALL SCULIB_FREE ('SLICE' , SLICE_PTR, SLICE_PTR_END, STATUS)
+
+*     We still have the same number of points so just make sure the
+*     copy to the output file works okay
+         EXP_POINTER = N_POS + 1
+
+*     Now write the possibly modified FITS header back to the output
+
+         CALL NDF_XLOC (OUT_NDF, 'FITS', 'UPDATE', OUT_FITSX_LOC, 
+     :        STATUS)
+
+         CALL DAT_PUT1C (OUT_FITSX_LOC, N_FITS, FITS, STATUS)
+
+      ELSE
 *  now got through the various exposures in the observation, reducing the
 *  component switches into the output array
 
@@ -991,9 +1065,15 @@ c
             END DO
          END DO
 
-*  unmap and set the dimensions of the main data array to their final values
+*     This is the end of the If SKYDIP ELSE section
+      END IF
 
-*         CALL NDF_UNMAP (OUT_NDF, '*', STATUS)
+      END IF
+
+*  set the dimensions of the main data array to their final values
+
+      IF (STATUS .EQ. SAI__OK) THEN
+
          NDIM = 2
          LBND (1) = 1
          LBND (2) = 1
@@ -1030,20 +1110,25 @@ c
      :     STATUS)
 
 *  write the BEAM_WEIGHT array to the REDS extension
+*  if this is not a SKYDIP
 
-      IF (STATUS .EQ. SAI__OK) THEN
-         CALL NDF_XLOC (IN_NDF, 'REDS', 'UPDATE', OUT_REDSX_LOC, STATUS)
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL ERR_ANNUL (STATUS)
-            CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
-     :        0, 0, OUT_REDSX_LOC, STATUS)
+
+      IF (OBSERVING_MODE .NE. 'SKYDIP') THEN
+         IF (STATUS .EQ. SAI__OK) THEN
+            CALL NDF_XLOC (OUT_NDF, 'REDS', 'UPDATE', OUT_REDSX_LOC, 
+     :           STATUS)
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL ERR_ANNUL (STATUS)
+               CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
+     :              0, 0, OUT_REDSX_LOC, STATUS)
+            END IF
          END IF
+         CALL CMP_MOD (OUT_REDSX_LOC, 'BEAM_WT', '_REAL', 1,
+     :        SCUBA__MAX_BEAM, STATUS)
+         CALL CMP_PUT1R (OUT_REDSX_LOC, 'BEAM_WT', SCUBA__MAX_BEAM,
+     :        BEAM_WEIGHT, STATUS)
+         CALL DAT_ANNUL (OUT_REDSX_LOC, STATUS)
       END IF
-      CALL CMP_MOD (OUT_REDSX_LOC, 'BEAM_WT', '_REAL', 1,
-     :  SCUBA__MAX_BEAM, STATUS)
-      CALL CMP_PUT1R (OUT_REDSX_LOC, 'BEAM_WT', SCUBA__MAX_BEAM,
-     :  BEAM_WEIGHT, STATUS)
-      CALL DAT_ANNUL (OUT_REDSX_LOC, STATUS)
 
 * Write the axis info
 *     For PHOTOM observations there are 3 axes 
@@ -1080,7 +1165,37 @@ c
 *     - probably use DEM_PNTR.
 *     SKYDIP will use measurements.
 
-      IF (SAMPLE_MODE .NE. 'RASTER') THEN
+      IF (OBSERVING_MODE .EQ. 'SKYDIP') THEN
+
+         CALL NDF_AMAP (OUT_NDF, 'CENTRE', 2, '_REAL', 'WRITE',
+     :        OUT_A_PTR, ITEMP, STATUS)
+
+*     I know that these are multiple measurements and I know how
+*     many integrations there are per measurement. So this is fairly
+*     easy. I also know how many numbers I am dealing with (from ITEMP)
+
+         N_POS = ITEMP
+
+         IF (STATUS .EQ. SAI__OK) THEN
+*     Fill with numbers 1->N_POS
+            CALL SCULIB_NFILLR(N_POS, %VAL(OUT_A_PTR))
+*     Start the counting at 0
+            CALL SCULIB_ADDCAR(N_POS, %VAL(OUT_A_PTR),
+     :           -1.0, %VAL(OUT_A_PTR))
+*     Mulitply these numbers by 1/N_INTEGRATIONS
+            CALL SCULIB_MULCAR(N_POS, %VAL(OUT_A_PTR), 
+     :           1.0/REAL(N_INTEGRATIONS), %VAL(OUT_A_PTR))
+*     Offset these number by 1 unit so that the first entry is 1
+            CALL SCULIB_ADDCAR(N_POS, %VAL(OUT_A_PTR),
+     :           1.0, %VAL(OUT_A_PTR))
+         END IF
+
+         CALL NDF_ACPUT ('Measurements', OUT_NDF, 'LABEL', 2, STATUS)
+         CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 2, STATUS)
+
+
+
+      ELSE IF (SAMPLE_MODE .NE. 'RASTER') THEN
 
          CALL NDF_AMAP (OUT_NDF, 'CENTRE', 2, '_REAL', 'WRITE',
      :        OUT_A_PTR, ITEMP, STATUS)
@@ -1127,9 +1242,19 @@ c
 
 *     and a title
 
-      CALL NDF_CPUT('Raw data', OUT_NDF, 'LAB', STATUS) 
-      CALL NDF_CPUT(OBJECT, OUT_NDF, 'Title', STATUS)
-      CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
+      IF (OBSERVING_MODE .NE. 'SKYDIP') THEN
+
+         CALL NDF_CPUT('Raw data', OUT_NDF, 'LAB', STATUS) 
+         CALL NDF_CPUT(OBJECT, OUT_NDF, 'Title', STATUS)
+         CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
+         
+      ELSE
+
+         CALL NDF_CPUT('Sky temperature', OUT_NDF, 'LAB', STATUS) 
+         CALL NDF_CPUT('SKYDIP', OUT_NDF, 'Title', STATUS)
+         CALL NDF_CPUT('Kelvin', OUT_NDF, 'UNITS', STATUS)
+         
+      END IF
 
 
 *  tidy up
@@ -1140,16 +1265,20 @@ c
       CALL SCULIB_FREE('RESW_QUAL', OUT_QUALITY_PTR, OUT_QUALITY_END,
      :     STATUS)
 
-      CALL SCULIB_FREE ('DEMOD_DATA', DEMOD_DATA_PTR, DEMOD_DATA_END,
-     :  STATUS)
-      CALL SCULIB_FREE ('DEMOD_VARIANCE', DEMOD_VARIANCE_PTR,
-     :  DEMOD_VARIANCE_END, STATUS)
-      CALL SCULIB_FREE ('DEMOD_CALIBRATOR', DEMOD_CALIBRATOR_PTR,
-     :  DEMOD_CALIBRATOR_END, STATUS)
-      CALL SCULIB_FREE ('DEMOD_CAL_VARIANCE', DEMOD_CAL_VARIANCE_PTR,
-     :  DEMOD_CAL_VARIANCE_END, STATUS)
-      CALL SCULIB_FREE ('DEMOD_QUALITY', DEMOD_QUALITY_PTR,
-     :  DEMOD_QUALITY_END, STATUS)
+      IF (OBSERVING_MODE .NE. 'SKYDIP') THEN
+
+         CALL SCULIB_FREE ('DEMOD_DATA', DEMOD_DATA_PTR, DEMOD_DATA_END,
+     :        STATUS)
+         CALL SCULIB_FREE ('DEMOD_VARIANCE', DEMOD_VARIANCE_PTR,
+     :        DEMOD_VARIANCE_END, STATUS)
+         CALL SCULIB_FREE ('DEMOD_CALIBRATOR', DEMOD_CALIBRATOR_PTR,
+     :        DEMOD_CALIBRATOR_END, STATUS)
+         CALL SCULIB_FREE ('DEMOD_CAL_VARIANCE', DEMOD_CAL_VARIANCE_PTR,
+     :        DEMOD_CAL_VARIANCE_END, STATUS)
+         CALL SCULIB_FREE ('DEMOD_QUALITY', DEMOD_QUALITY_PTR,
+     :        DEMOD_QUALITY_END, STATUS)
+
+      END IF
 
 * Set the bit mask
       CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
