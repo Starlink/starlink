@@ -24,8 +24,8 @@
 *     Transformations are defined either by a set of 6 coefficients
 *     for the linear transform, by an algebraic expression given by
 *     you, by using a forward or inverse mapping from a TRANSFORM
-*     structure, or by a mapping between two frames stored in a
-*     WCS component.
+*     structure, or by a mapping between two coordinate sytems 
+*     in the WCS component of the NDF.
 
 *  Usage:
 *     tranlist inlist outlist trtype
@@ -80,9 +80,9 @@
 *        [PIXEL]
 *     FRAMEOUT = LITERAL (Read)
 *        If TRTYPE="WCS" then the transformation is a mapping from the
-*        frame specified by the FRAMEIN parameter to that specified
-*        by this parameter.  The value of this parameter can be one of
-*        the following:
+*        coordinate frame specified by the FRAMEIN parameter to that
+*        specified by this parameter.  The value of this parameter can
+*        be one of the following:
 *        - A domain name such as SKY, AXIS, PIXEL, etc.
 *        - An integer value giving the index of the required Frame 
 *          within the WCS component.
@@ -233,8 +233,8 @@
 *        containing the WCS component should be supplied (this will be
 *        picked up automatically through the association of an NDF
 *        and a position list if NDFNAMES and INEXT are both TRUE).
-*        The transformation will be that between the frames defined by
-*        the FRAMEIN and FRAMEOUT parameters.
+*        The transformation will be that between the coordinate systems 
+*        defined by the FRAMEIN and FRAMEOUT parameters.
 *
 *        STRUCT signifies that a transform structure (probably created
 *        by REGISTER or CCDEDIT) is to be applied to the data. In this
@@ -262,8 +262,8 @@
 *        Only one structure can be used at a time.
 *     WCSFILE = NDF (Read)
 *        If TRTYPE="WCS" and INEXT is false, then this parameter gives
-*        the name of the NDF containing the WCS component which is to
-*        be used for the transformation.
+*        the name of the NDF containing the WCS component containing
+*        coordinate systems to be used for the transformation.
 *     XFOR = LITERAL (Read)
 *        If TRTYPE="EXPRES" is chosen then this parameter specifies the
 *        transformation that maps to the new X coordinate. The
@@ -293,7 +293,7 @@
 *        accessed and their associated position lists are opened.
 *        The WCS component of each NDF is used to transform the 
 *        coordinates in the position lists from pixel coordinates to
-*        coordinates in the Current coordinate frame.  The output
+*        coordinates in the Current coordinate system.  The output
 *        lists are called ndf-name.reg and are associated with the
 *        NDFs.
 *     tranlist inlist='*' outlist='*.tran' trtype=struct forward=false
