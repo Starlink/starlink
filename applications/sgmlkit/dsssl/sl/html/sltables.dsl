@@ -9,8 +9,8 @@ Model subset of the CALS table model (see
 texts).
 
 <p>The Exchange Table Model can be customised.  The only such
-customisation at present is to replace the optional TITLE element with
-a required CAPTION.
+customisations at present are: replace the optional TITLE element with
+a required CAPTION, and add an implied ID attribute to the TABLE.
 
 
 <authorlist>
@@ -51,7 +51,7 @@ first.
     (process-children)
     (if (last-sibling? (current-node))
 	(empty-sosofo)
-	(let ((colno (t-colno)))
+	(let ((colno (table-colno)))
 	  (if colno
 	      (make element gi: "tr"
 		    (make element gi: "td"
@@ -87,24 +87,25 @@ first.
 	  (process-children))))
 
 <func>
-<routinename>t-colno
+<routinename>table-colno
 <purpose>Return a list of numbers, indicating the current column number and the
 total number of columns.
 <description>Checks only the <code/ENTRY/ and <code/TGROUP/ elements,
 the first to find the column number, and the second to find the total
 number of columns.
-<returnvalue type='list of numbers'>A list of numbers, where
-the <code/car/ is the current column number, 
-and the <code/cadr/ is the total number of columns.
-If the argument is not for an <code/ENTRY/ element,
-then the current column number will be returned as zero.
+<returnvalue type='list of numbers'><p>A list of numbers, where
+  the <code/car/ is the current column number, 
+  and the <code/cadr/ is the total number of columns.
+  <p>If the argument is not for an <code/ENTRY/ element,
+  then the current column number will be returned as zero.
+  <p>If the node doesn't have a <code/TABLE/ in its ancestry,
+  then return <code/#f/.
 <parameter optional default='(current-node)'>nd
   <type>singleton node-list<description>Node we want the column number of.
   If this is not an <code/ENTRY/ element, then the column number will be
-  returned as zero.  If the node doesn't have a <code/TABLE/ in its ancestry,
-  then return <code/#f/.
+  returned as zero.
 <codebody>
-(define (t-colno #!optional (nd (current-node)))
+(define (table-colno #!optional (nd (current-node)))
   (let ((isentry (string=? (gi nd) (normalize "entry")))
 	(tgroup-cols (inherited-element-attribute-string (normalize "tgroup")
 							 (normalize "cols")
