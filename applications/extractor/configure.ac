@@ -16,6 +16,9 @@ AC_CONFIG_SRCDIR([extractor.news])
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
+dnl    Need to build an atask, depends on much the same as a full monolith.
+STAR_MONOLITHS
+
 dnl    To configure the two components we just run ./configure in the
 dnl    extract and sextractor directories. Do not invoke AC_CONFIG_SUBDIRS,
 dnl    since that prompts autoreconf to try to reconfigure that directory, and
@@ -33,15 +36,13 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
-STAR_CHECK_PROGS([ndf_link_adam alink compifl])
-
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [ast ndf sae])
 STAR_DECLARE_DEPENDENCIES(link,  ndf)
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
-STAR_LATEX_DOCUMENTATION(sun226, [sun226.ps sun226.htx_tar])
+STAR_LATEX_DOCUMENTATION(sun226, [sun226.tex sun226.ps sun226.htx_tar])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
