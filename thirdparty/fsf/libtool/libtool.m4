@@ -5409,7 +5409,7 @@ $echo "local: *; };" >> $output_objdir/$libname.ver~
     	  lt_int_apple_cc_single_mod=yes
     	fi
     	if test "X$lt_int_apple_cc_single_mod" = Xyes ; then
-    	  _LT_AC_TAGVAR(archive_cmds, $1)='$CC -dynamiclib -single_module $allow_undefined_flag -o $lib $libobjs $deplibs $compiler_flags -install_name $rpath/$soname $verstring'
+    	  _LT_AC_TAGVAR(archive_cmds, $1)='$CC -dynamiclib -nostdlib -single_module $allow_undefined_flag -o $lib $libobjs $deplibs $compiler_flags -install_name $rpath/$soname $verstring'
     	else
         _LT_AC_TAGVAR(archive_cmds, $1)='$CC -r ${wl}-bind_at_load -keep_private_externs -nostdlib -o ${lib}-master.o $libobjs~$CC -dynamiclib $allow_undefined_flag -o $lib ${lib}-master.o $deplibs $compiler_flags -install_name $rpath/$soname $verstring'
       fi
