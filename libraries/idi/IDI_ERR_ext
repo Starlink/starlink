@@ -1,0 +1,7 @@
+
+* Note: IDI__OK status added manually
+
+*     Normal status
+      INTEGER IDI__OK
+      PARAMETER ( IDI__OK = 0 )
+
