@@ -133,6 +133,10 @@
 
    Other changes include:
 
+     - COMPADD and COMPAVE: News parameters TRIM and ALIGN have been 
+       added to give greater control over the exact placement of the
+       compression bins within the input image.
+
      - FITSDIN and FITSIN: Include support the new FITS WCS standards 
        based on keywords CDi_j, PVj_m, etc., plus explicit support for 
        the previous draft standard (based on PCjjjiii keywords), and  

@@ -9086,6 +9086,15 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
+         parameter align {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default ORIGIN
+            prompt {Position for a compresion box corner}
+            helpkey *
+         }
+
          parameter axweight {
             type _LOGICAL
             vpath DEFAULT
@@ -9152,6 +9161,15 @@ package kappa {
             helpkey *
           }
 
+         parameter trim {
+            type _LOGICAL
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            default TRUE
+            prompt {Trim input NDF to a whole number of compression boxes?}
+            helpkey *
+          }
+
          parameter wlim {
             position 4
             type _REAL
@@ -9169,6 +9187,15 @@ package kappa {
          alias {compav(e)}
 
          helplib {$KAPPA_HELP}
+
+         parameter align {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default ORIGIN
+            prompt {Position for a compresion box corner}
+            helpkey *
+         }
 
          parameter axweight {
             type _LOGICAL
@@ -9224,6 +9251,15 @@ package kappa {
             vpath DEFAULT
             prompt {Title for output NDF}
             default !
+            helpkey *
+          }
+
+         parameter trim {
+            type _LOGICAL
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            default TRUE
+            prompt {Trim input NDF to a whole number of compression boxes?}
             helpkey *
           }
 

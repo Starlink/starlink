@@ -3331,10 +3331,10 @@ the following lines
 
 \small
 \begin{verbatim}
-     Gwm*xwindows*colours:         80
-     Gwm*xwindows*overlay:         True
-     Gwm*xwindows*ovcolour:        Yellow
-     Gwm*xwindows2*colours:        20
+     gwm*xwindows*colours:         80
+     gwm*xwindows*overlay:         True
+     gwm*xwindows*ovcolour:        Yellow
+     gwm*xwindows2*colours:        20
 \end{verbatim}
 \normalsize
 and you can also set the sizes of the windows too.  Notice that the
@@ -14752,19 +14752,60 @@ default value.
       This application takes an NDF data structure and reduces it in
       size by integer factors along each dimension.  The compression
       is achieved by adding the values of the input NDF within
-      non-overlapping `rectangular' boxes whose dimensions are the
+      non-overlapping `rectangular{\tt '} boxes whose dimensions are the
       compression factors.  The additions may be normalised to correct
-      for any bad values present in the input NDF.
+      for any bad values present in the input NDF. The exact placement of
+      the boxes can be controlled using parameter ALIGN.
    }
    \sstusage{
       compadd in out compress [wlim]
    }
    \sstparameters{
       \sstsubsection{
+         ALIGN = LITERAL (Read)
+      }{
+         This parameter controls the placement of the compression boxes
+         within the input NDF (also see parameter TRIM). It can take any
+         of the following values:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}ORIGIN{\tt "} --- The compression boxes are placed so that the
+            origin of the pixel co-ordinate Frame in the input NDF
+            corresponds to a corner of a compression box. This results in
+            the pixel origin being retain in the output NDF. For instance,
+            if a pair of 2-dimensional images which have previously been
+            aligned in pixel co-ordinates are compressed, then using this
+            option ensures that the compressed images will also be aligned
+            in pixel co-ordinates.
+
+            \sstitem
+            {\tt "}FIRST{\tt "} --- The compression boxes are placed so that the
+            first pixel in the input NDF (for instance, the bottom left
+            pixel in a 2-dimensional image) corresponds to the first pixel
+            in a compression box. This can result in the pixel origin being
+            shifted by up to one compression box in the output image. Thus,
+            images which were previously aligned in pixel co-ordinates may
+            not be aligned after compression. You may want to use this option
+            if you are using a very large box to reduce the number of
+            dimensions in the data (for instance summing across the entire
+            width of an image to produce a 1-dimensional array).
+
+            \sstitem
+            {\tt "}LAST{\tt "} --- The compression boxes are placed so that the
+            last pixel in the input NDF (for instance, the top right
+            pixel in a 2-dimensional image) corresponds to the last pixel
+            in a compression box. See the {\tt "}FIRST{\tt "} option above for further
+            comments.
+                                                 {\tt ["ORIGIN"]}
+         }
+      }
+      \sstsubsection{
          AXWEIGHT = \_LOGICAL (Read)
       }{
          When there is an AXIS variance array present in the NDF and
-         AXWEIGHT={\tt TRUE} the application forms weighted averages of the
+         AXWEIGHT=TRUE the application forms weighted averages of the
          axis centres using the variance.  For all other conditions
          the non-bad axis centres are given equal weight during the
          averaging to form the output axis centres. {\tt [FALSE]}
@@ -14791,12 +14832,12 @@ default value.
       }{
          When there are bad pixels present in the summation box these
          are ignored.  Therefore a simple addition of the input-array
-         component's values will yield a result discordant with
+         component{\tt '}s values will yield a result discordant with
          neighbouring output pixels that were formed from summation of
-         all the pixels in the box.  When NORMAL={\tt TRUE} the output values
+         all the pixels in the box.  When NORMAL=TRUE the output values
          are normalised: the addition is multiplied by the ratio of the
          number of pixels in the box to the number of good pixels
-         therein to arrive at the output value.  When NORMAL={\tt FALSE} the
+         therein to arrive at the output value.  When NORMAL=FALSE the
          output values are always just the sum of the good pixels.
          {\tt [TRUE]}
       }
@@ -14818,8 +14859,21 @@ default value.
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Title for the output NDF structure.  A null value ({\tt !})
+         Title for the output NDF structure.  A null value (!)
          propagates the title from the input NDF to the output NDF. {\tt [!]}
+      }
+      \sstsubsection{
+         TRIM = \_LOGICAL (Read)
+      }{
+         If parameter TRIM is set TRUE, the output NDF only contains data
+         for compression boxes which are entirely contained within the
+         input NDF. Any pixels around the edge of the input NDF which are
+         not contained within a compression box are ignored. If TRIM is set
+         FALSE, the output NDF contains data for all compression boxes which
+         have any overlap with the input NDF.  All pixels outside the
+         bounds of the NDF are assumed to be bad. That is, any boxes which
+         extend beyond the bounds of the input NDF are padded with bad
+         pixels. See also parameter ALIGN. {\tt [current value]}
       }
       \sstsubsection{
          WLIM = \_REAL (Read)
@@ -14853,6 +14907,21 @@ default value.
          components.
       }
       \sstexamplesubsection{
+         compave cosmos profile [10000,1] wlim=0 align=first trim=no
+      }{
+         This compresses the 2-dimensional NDF called cosmos to produce a
+         1-dimensional NDF called profile. This is done using a
+         compression box which is 1 pixel high, but which is wider than
+         the whole input image. Each pixel in the output NDF thus
+         corresponds to the sum of the corresponding row in the
+         input image. WLIM is set to zero to ensure that bad pixels
+         are ignored. ALIGN is set to FIRST so that each compression box
+         is flush with the left edge of the input image. TRIM is set to
+         NO so that compression boxes which extend outside the bounds of
+         the input image (which will be all of them if the input image is
+         narrower than 10000 pixels) are retained in the output NDF.
+      }
+      \sstexamplesubsection{
          compadd cosmos galaxy 4 wlim=1.0
       }{
          This compresses the NDF called cosmos adding four times in
@@ -14867,18 +14936,18 @@ default value.
       }{
          As above except that a summation box need only contains a
          single non-bad pixels for the output pixel to be good, and
-         galaxy's array components will have the same as those in
+         galaxy{\tt '}s array components will have the same as those in
          cosmos.
       }
       \sstexamplesubsection{
-         compadd cosmos galaxy [4,3] nonormal title="COSMOS compressed"
+         compadd cosmos galaxy [4,3] nonormal title={\tt "}COSMOS compressed{\tt "}
       }{
          This compresses the NDF called cosmos adding four times in
          the first dimension and three times in higher dimensions, and
          stores the reduced data in the NDF called galaxy.  Thus if
          cosmos is two-dimensional, this command would result in a
          twelve-fold reduction in the array components.  Also, if there
-         are bad pixels there will be no normalistion correction for the
+         are bad pixels there will be no normalisation correction for the
          missing values.  The title of the output NDF is {\tt "}COSMOS
          compressed{\tt "}.
       }
@@ -14893,13 +14962,6 @@ default value.
    }
    \sstnotes{
       \sstitemlist{
-
-         \sstitem
-         The compression is centred on the origin of the pixel co-ordinate
-         Frame. That is, if a position has a value $p(i)$ on the $i$'th pixel 
-         co-ordinate axis of the input NDF, then it will have position 
-         $p(i)/COMPRESS(i)$ on the corresponding axis of the output NDF. The
-         pixel index bounds of the output NDF are chosen accordingly.
 
          \sstitem
          The axis centres and variances are averaged, whilst the widths
@@ -14917,19 +14979,19 @@ default value.
 
          \sstitem
          This routine correctly processes the AXIS, DATA, VARIANCE,
-         LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF
-         and propagates all extensions.  QUALITY is not
-         processed since it is a series of flags, not numerical values.
+         LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF and
+         propagates all extensions.  QUALITY is not processed since it is
+         a series of flags, not numerical values.
 
          \sstitem
-         Processing of bad pixels and automatic quality masking are supported.
+         Processing of bad pixels and automatic quality masking are
+         supported.
 
          \sstitem
          All non-complex numeric data types can be handled.
 
          \sstitem
          Any number of NDF dimensions is supported.
-
       }
    }
 }
@@ -14943,19 +15005,60 @@ default value.
       This application takes an NDF data structure and reduces it in
       size by integer factors along each dimension.  The compression
       is achieved by averaging the input NDF within non-overlapping
-      `rectangular' boxes whose dimensions are the compression factors.
+      `rectangular{\tt '} boxes whose dimensions are the compression factors.
       The averages may be weighted when there is a variance array
-      present.
+      present. The exact placement of the boxes can be controlled using
+      parameter ALIGN.
    }
    \sstusage{
       compave in out compress [wlim]
    }
    \sstparameters{
       \sstsubsection{
+         ALIGN = LITERAL (Read)
+      }{
+         This parameter controls the placement of the compression boxes
+         within the input NDF (also see parameter TRIM). It can take any
+         of the following values:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}ORIGIN{\tt "} --- The compression boxes are placed so that the
+            origin of the pixel co-ordinate Frame in the input NDF
+            corresponds to a corner of a compression box. This results in
+            the pixel origin being retain in the output NDF. For instance,
+            if a pair of 2-dimensional images which have previously been
+            aligned in pixel co-ordinates are compressed, then using this
+            option ensures that the compressed images will also be aligned
+            in pixel co-ordinates.
+
+            \sstitem
+            {\tt "}FIRST{\tt "} --- The compression boxes are placed so that the
+            first pixel in the input NDF (for instance, the bottom left
+            pixel in a 2-dimensional image) corresponds to the first pixel
+            in a compression box. This can result in the pixel origin being
+            shifted by up to one compression box in the output image. Thus,
+            images which were previously aligned in pixel co-ordinates may
+            not be aligned after compression. You may want to use this option
+            if you are using a very large box to reduce the number of
+            dimensions in the data (for instance averaging across the entire
+            width of an image to produce a 1-dimensional array).
+
+            \sstitem
+            {\tt "}LAST{\tt "} --- The compression boxes are placed so that the
+            last pixel in the input NDF (for instance, the top right
+            pixel in a 2-dimensional image) corresponds to the last pixel
+            in a compression box. See the {\tt "}FIRST{\tt "} option above for further
+            comments.
+                                                             {\tt ["ORIGIN"]}
+         }
+      }
+      \sstsubsection{
          AXWEIGHT = \_LOGICAL (Read)
       }{
          When there is an AXIS variance array present in the NDF and
-         AXWEIGHT={\tt TRUE} the application forms weighted averages of the
+         AXWEIGHT=TRUE the application forms weighted averages of the
          axis centres using the variance.  For all other conditions
          the non-bad axis centres are given equal weight during the
          averaging to form the output axis centres. {\tt [FALSE]}
@@ -14968,9 +15071,7 @@ default value.
          fewer are supplied the last value in the list of compression
          factors is given to the remaining dimensions.  Thus if a
          uniform compression is required in all dimensions, just one
-         value need be entered.  All values are constrained to be in
-         the range one to the size of its corresponding dimension.  The
-         suggested default is the current value.
+         value need be entered. The suggested default is the current value.
       }
       \sstsubsection{
          IN  = NDF (Read)
@@ -14994,14 +15095,27 @@ default value.
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Title for the output NDF structure.  A null value ({\tt !})
+         Title for the output NDF structure.  A null value (!)
          propagates the title from the input NDF to the output NDF. {\tt [!]}
+      }
+      \sstsubsection{
+         TRIM = \_LOGICAL (Read)
+      }{
+         If parameter TRIM is set TRUE, the output NDF only contains data
+         for compression boxes which are entirely contained within the
+         input NDF. Any pixels around the edge of the input NDF which are
+         not contained within a compression box are ignored. If TRIM is set
+         FALSE, the output NDF contains data for all compression boxes which
+         have any overlap with the input NDF. All pixels outside the
+         bounds of the NDF are assumed to be bad. That is, any boxes which
+         extend beyond the bounds of the input NDF are padded with bad
+         pixels. See also parameter ALIGN. {\tt [current value]}
       }
       \sstsubsection{
          WEIGHT = \_LOGICAL (Read)
       }{
          When there is a variance array present in the NDF and
-         WEIGHT={\tt TRUE} the application forms weighted averages of the
+         WEIGHT=TRUE the application forms weighted averages of the
          data array using the variance.  For all other conditions
          the non-bad pixels are given equal weight during averaging.
          {\tt [FALSE]}
@@ -15038,6 +15152,21 @@ default value.
          components.
       }
       \sstexamplesubsection{
+         compave cosmos profile [10000,1] wlim=0 align=first trim=no
+      }{
+         This compresses the 2-dimensional NDF called cosmos to produce a
+         1-dimensional NDF called profile. This is done using a
+         compression box which is 1 pixel high, but which is wider than
+         the whole input image. Each pixel in the output NDF thus
+         corresponds to the average of the corresponding row in the
+         input image. WLIM is set to zero to ensure that bad pixels
+         are ignored. ALIGN is set to FIRST so that each compression box
+         is flush with the left edge of the input image. TRIM is set to
+         NO so that compression boxes which extend outside the bounds of
+         the input image (which will be all of them if the input image is
+         narrower than 10000 pixels) are retained in the output NDF.
+      }
+      \sstexamplesubsection{
          compave cosmos galaxy 4 wlim=1.0
       }{
          This compresses the NDF called cosmos averaging four times in
@@ -15052,11 +15181,11 @@ default value.
       }{
          As above except that an averaging box need only contains a
          single non-bad pixels for the output pixel to be good, and
-         galaxy's array components will have the same as those in
+         galaxy{\tt '}s array components will have the same as those in
          cosmos.
       }
       \sstexamplesubsection{
-         compave cosmos galaxy [4,3] weight title="COSMOS compressed"
+         compave cosmos galaxy [4,3] weight title={\tt "}COSMOS compressed{\tt "}
       }{
          This compresses the NDF called cosmos averaging four times in
          the first dimension and three times in higher dimensions, and
@@ -15080,13 +15209,6 @@ default value.
       \sstitemlist{
 
          \sstitem
-         The compression is centred on the origin of the pixel co-ordinate
-         Frame. That is, if a position has a value $p(i)$ on the $i$'th pixel 
-         co-ordinate axis of the input NDF, then it will have position 
-         $p(i)/COMPRESS(i)$ on the corresponding axis of the output NDF. The
-         pixel index bounds of the output NDF are chosen accordingly.
-
-         \sstitem
          The axis centres and variances are averaged, whilst the widths
          are summed and always normalised for bad values.
       }
@@ -15102,19 +15224,19 @@ default value.
 
          \sstitem
          This routine correctly processes the AXIS, DATA, VARIANCE,
-         LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF
-         and propagates all extensions.  QUALITY is not
-         processed since it is a series of flags, not numerical values.
+         LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF and
+         propagates all extensions.  QUALITY is not processed since it is
+         a series of flags, not numerical values.
 
          \sstitem
-         Processing of bad pixels and automatic quality masking are supported.
+         Processing of bad pixels and automatic quality masking are
+         supported.
 
          \sstitem
          All non-complex numeric data types can be handled.
 
          \sstitem
          Any number of NDF dimensions is supported.
-
       }
    }
 }
@@ -45199,6 +45321,20 @@ lists below for details.}
 The following applications have been modified:
 
 \begin{description}
+
+   \item [\htmlref{COMPADD}{COMPADD}] \mbox{}
+      \begin{itemize}
+         \item New parameters TRIM and ALIGN have been added to give
+               greater control over the exact placement of the compression 
+               bins within the input image.
+      \end{itemize}
+
+   \item [\htmlref{COMPAVE}{COMPAVE}] \mbox{}
+      \begin{itemize}
+         \item New parameters TRIM and ALIGN have been added to give
+               greater control over the exact placement of the compression 
+               bins within the input image.
+      \end{itemize}
 
    \item [\htmlref{FITSIN}{FITSIN}] \mbox{}
       \begin{itemize}
