@@ -93,6 +93,9 @@
  
 *  History:
 *     $Log$
+*     Revision 1.2  1998/03/18 23:32:54  timj
+*     Add BOLWT
+*
 *     Revision 1.1  1998/01/27 02:01:33  timj
 *     Initial revision
 *
@@ -124,6 +127,8 @@
       PARAMETER (NDIM = 3)
 
 * Local variables:
+      REAL    BOLWT (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
+                                        ! Bolometer weights
       INTEGER BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! A/D numbers of bolometers measured in
                                         ! input file
@@ -265,7 +270,7 @@
      :     DATA_END, VARIANCE_PTR,
      :     VARIANCE_END, QMF, QUALITY_PTR,
      :     QUALITY_END, QBITS, USELST, LST_PTR,
-     :     INT_LIST, STATUS)
+     :     INT_LIST, BOLWT, STATUS)
 
 *     Number of points per beam
       N_PTS = N_POS * N_BOL
