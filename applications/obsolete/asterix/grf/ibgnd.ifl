@@ -23,6 +23,11 @@ interface IBGND
     prompt 'Radius'
     help 'Radius of circle in axis units'
   endparameter
+  parameter RBIN
+    type '_REAL'
+    prompt 'Radial bin size'
+    help 'The width in axis units of the annular bins'
+  endparameter
   parameter ISRC
     type '_INTEGER'
     prompt 'Source number'
