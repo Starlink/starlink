@@ -237,8 +237,9 @@ typedef struct AstMapping {
 
 #define astMAKE_INTERPOLATE_TYPE(abbrev,type) \
 typedef int (* AstInterpolate##abbrev)( int, const int *, const int *, \
-                                        const type *, int, const int *, \
-                                        double *, int, type, type * );
+                                        const type *, const type *, int, \
+                                        const int *, \
+                                        double *, int, type, type *, type * );
 astMAKE_INTERPOLATE_TYPE(LD,long double)
 astMAKE_INTERPOLATE_TYPE(D,double)
 astMAKE_INTERPOLATE_TYPE(F,float)
@@ -254,6 +255,10 @@ astMAKE_INTERPOLATE_TYPE(UB,unsigned char)
 
 #define AST__NEAREST ( (void *) 1 )
 #define AST__LINEAR ( (void *) 0 ) /* Default if NULL given */
+#if defined(astCLASS) || defined(astFORTRAN77)
+#define AST__USEVAR 1
+#endif
+#define AST__USEBAD 2
 
 /* Virtual function table. */
 /* ----------------------- */
@@ -279,7 +284,7 @@ typedef struct AstMappingVtab {
    int (* GetTranInverse)( AstMapping * );
    int (* MapMerge)( AstMapping *, int, int, int *, AstMapping ***, int ** );
 #define astRESAMPLE_VTAB_ENTRY(abbrev,type) \
-   int (* Resample##abbrev)( AstMapping *, int, const int *, const int *, const type *, AstInterpolate##abbrev, double, int, int, type, int, const int *, const int *, const int *, const int *, type * );
+   int (* Resample##abbrev)( AstMapping *, int, const int *, const int *, const type *, const type *, AstInterpolate##abbrev, double, int, int, type, int, const int *, const int *, const int *, const int *, type *, type * );
 astRESAMPLE_VTAB_ENTRY(LD,long double)
 astRESAMPLE_VTAB_ENTRY(D,double)
 astRESAMPLE_VTAB_ENTRY(F,float)
@@ -333,7 +338,7 @@ AstMapping *astLoadMapping_( void *, size_t, int, AstMappingVtab *,
 /* -------------------------------- */
 AstMapping *astSimplify_( AstMapping * );
 #define astRESAMPLE_PROTOTYPE(abbrev,type) \
-int astResample##abbrev##_( AstMapping *, int, const int *, const int *, const type *, AstInterpolate##abbrev, double, int, int, type, int, const int *, const int *, const int *, const int *, type * );
+int astResample##abbrev##_( AstMapping *, int, const int *, const int *, const type *, const type *, AstInterpolate##abbrev, double, int, int, type, int, const int *, const int *, const int *, const int *, type *, type * );
 astRESAMPLE_PROTOTYPE(LD,long double)
 astRESAMPLE_PROTOTYPE(D,double)
 astRESAMPLE_PROTOTYPE(F,float)
@@ -415,28 +420,28 @@ astINVOKE(O,astLoadMapping_(mem,size,init,vtab,name,astCheckChannel(channel)))
    pointer to the wrong sort of object is supplied. */
 #define astInvert(this) \
 astINVOKE(V,astInvert_(astCheckMapping(this)))
-#define astResampleLD(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
-astINVOKE(V,astResampleLD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
-#define astResampleD(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
-astINVOKE(V,astResampleD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
-#define astResampleF(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
-astINVOKE(V,astResampleF_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
-#define astResampleL(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
-astINVOKE(V,astResampleL_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
-#define astResampleUL(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
-astINVOKE(V,astResampleUL_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
-#define astResampleI(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
-astINVOKE(V,astResampleI_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
-#define astResampleUI(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
-astINVOKE(V,astResampleUI_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
-#define astResampleS(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
-astINVOKE(V,astResampleS_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
-#define astResampleUS(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
-astINVOKE(V,astResampleUS_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
-#define astResampleB(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
-astINVOKE(V,astResampleB_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
-#define astResampleUB(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
-astINVOKE(V,astResampleUB_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method,acc,gridsize,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
+#define astResampleLD(this,ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleLD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleD(this,ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleF(this,ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleF_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleL(this,ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleL_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleUL(this,ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleUL_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleI(this,ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleI_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleUI(this,ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleUI_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleS(this,ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleS_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleUS(this,ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleUS_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleB(this,ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleB_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
+#define astResampleUB(this,ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astResampleUB_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,method,acc,gridsize,flags,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
 #define astSimplify(this) astINVOKE(O,astSimplify_(astCheckMapping(this)))
 #define astTran1(this,npoint,xin,forward,xout) \
 astINVOKE(V,astTran1_(astCheckMapping(this),npoint,xin,forward,xout))

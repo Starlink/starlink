@@ -58,25 +58,26 @@ static F77_INTEGER_TYPE (* ast_resample_METHOD)();
 #define MAKE_AST_RESAMPLE_METHOD(cabbrev,ctype,ftype) \
 static int ast_resample_method##cabbrev( int ndim, \
                                          const int *lbnd, const int *ubnd, \
-                                         const ctype *in, int npoint, \
+                                         const ctype *in, \
+                                         const ctype *in_var, int npoint, \
                                          const int *offset, double *coord, \
-                                         int usebad, ctype badflag, \
-                                         ctype *out ) { \
+                                         int flags, ctype badval, \
+                                         ctype *out, ctype *out_var ) { \
    DECLARE_INTEGER(STATUS); \
-   DECLARE_LOGICAL(USEBAD); \
 \
-   USEBAD = usebad ? F77_TRUE : F77_FALSE; \
    STATUS = astStatus; \
    return ( *ast_resample_METHOD )( INTEGER_ARG(&ndim), \
                                     INTEGER_ARRAY_ARG(lbnd), \
                                     INTEGER_ARRAY_ARG(ubnd), \
                                     ftype##_ARRAY_ARG(in), \
+                                    ftype##_ARRAY_ARG(in_var), \
                                     INTEGER_ARG(&npoint), \
                                     INTEGER_ARRAY_ARG(offset), \
                                     DOUBLE_ARRAY_ARG(coord), \
-                                    LOGICAL_ARG(&USEBAD), \
-                                    ftype##_ARG(&badflag), \
+                                    INTEGER_ARG(flags), \
+                                    ftype##_ARG(&badval), \
                                     ftype##_ARRAY_ARG(out), \
+                                    ftype##_ARRAY_ARG(out_var), \
                                     INTEGER_ARG(&STATUS) ); \
    astSetStatus( STATUS ); \
 }
@@ -95,33 +96,37 @@ F77_INTEGER_FUNCTION(ast_resample##fabbrev)( INTEGER(THIS), \
                                              INTEGER_ARRAY(LBND_IN), \
                                              INTEGER_ARRAY(UBND_IN), \
                                              ftype##_ARRAY(IN), \
+                                             ftype##_ARRAY(IN_VAR), \
                                              F77_INTEGER_TYPE (* METHOD)(), \
                                              DOUBLE(ACC), \
                                              INTEGER(GRIDSIZE), \
-                                             LOGICAL(USEBAD), \
-                                             ftype(BADFLAG), \
+                                             INTEGER(FLAGS), \
+                                             ftype(BADVAL), \
                                              INTEGER(NDIM_OUT), \
                                              INTEGER_ARRAY(LBND_OUT), \
                                              INTEGER_ARRAY(UBND_OUT), \
                                              INTEGER_ARRAY(LBND), \
                                              INTEGER_ARRAY(UBND), \
                                              ftype##_ARRAY(OUT), \
+                                             ftype##_ARRAY(OUT_VAR), \
                                              INTEGER(STATUS) ) { \
    GENPTR_INTEGER(THIS) \
    GENPTR_INTEGER(NDIM_IN) \
    GENPTR_INTEGER_ARRAY(LBND_IN) \
    GENPTR_INTEGER_ARRAY(UBND_IN) \
    GENPTR_##ftype##_ARRAY(IN) \
+   GENPTR_##ftype##_ARRAY(IN_VAR) \
    GENPTR_DOUBLE(ACC) \
    GENPTR_INTEGER(GRIDSIZE) \
-   GENPTR_LOGICAL(USEBAD) \
-   GENPTR_##ftype(BADFLAG) \
+   GENPTR_INTEGER(FLAGS) \
+   GENPTR_##ftype(BADVAL) \
    GENPTR_INTEGER(NDIM_OUT) \
    GENPTR_INTEGER_ARRAY(LBND_OUT) \
    GENPTR_INTEGER_ARRAY(UBND_OUT) \
    GENPTR_INTEGER_ARRAY(LBND) \
    GENPTR_INTEGER_ARRAY(UBND) \
    GENPTR_##ftype##_ARRAY(OUT) \
+   GENPTR_##ftype##_ARRAY(OUT_VAR) \
    GENPTR_INTEGER(STATUS) \
    AstInterpolate##cabbrev method; \
    F77_INTEGER_TYPE RESULT; \
@@ -136,12 +141,23 @@ F77_INTEGER_FUNCTION(ast_resample##fabbrev)( INTEGER(THIS), \
          ast_resample_METHOD = METHOD; \
          method = ast_resample_method##cabbrev; \
       } \
-      RESULT = astResample##cabbrev( astI2P( *THIS ), *NDIM_IN, \
-                                     LBND_IN, UBND_IN, IN, \
-                                     method, *ACC, *GRIDSIZE, \
-                                     F77_ISTRUE( *USEBAD ), *BADFLAG, \
-                                     *NDIM_OUT, LBND_OUT, UBND_OUT, \
-                                     LBND, UBND, OUT ); \
+      if ( *FLAGS & AST__USEVAR ) { \
+printf("variance\n" );\
+         RESULT = astResample##cabbrev( astI2P( *THIS ), *NDIM_IN, \
+                                        LBND_IN, UBND_IN, IN, IN_VAR, \
+                                        method, *ACC, *GRIDSIZE, \
+                                        *FLAGS, *BADVAL, \
+                                        *NDIM_OUT, LBND_OUT, UBND_OUT, \
+                                        LBND, UBND, OUT, OUT_VAR ); \
+      } else { \
+printf("no variance\n" );\
+         RESULT = astResample##cabbrev( astI2P( *THIS ), *NDIM_IN, \
+                                        LBND_IN, UBND_IN, IN, NULL, \
+                                        method, *ACC, *GRIDSIZE, \
+                                        *FLAGS, *BADVAL, \
+                                        *NDIM_OUT, LBND_OUT, UBND_OUT, \
+                                        LBND, UBND, OUT, NULL ); \
+      } \
    ) \
    return RESULT; \
 }

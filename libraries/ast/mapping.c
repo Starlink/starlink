@@ -204,10 +204,11 @@ typedef enum DataType {
 static int InterpolatePixelNearest##abbrev( int ndim, \
                                             const int *lbnd, const int *ubnd, \
                                             const type *in, \
+                                            const type *in_var, \
                                             int npoint, const int *offset, \
                                             double *coord, \
-                                            int usebad, double badflag, \
-                                            type *out ) { \
+                                            int flags, double badval, \
+                                            type *out, type *out_var ) { \
 \
 /* Local Variables: */ \
    double *xn_max;               /* Pointer to upper limits array (n-d) */ \
@@ -229,6 +230,8 @@ static int InterpolatePixelNearest##abbrev( int ndim, \
    int point;                    /* Loop counter for output points */ \
    int result;                   /* Returned result value */ \
    int s;                        /* Temporary variable for strides */ \
+   int usebad;                   /* Use "bad" input pixel values? */ \
+   int usevar;                   /* Process variance array? */ \
    int ystride;                  /* Stride along input array y direction */ \
 \
 /* Initialise. */ \
@@ -236,6 +239,9 @@ static int InterpolatePixelNearest##abbrev( int ndim, \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return result; \
+\
+   usebad = flags & AST__USEBAD; \
+   usevar = in_var && out_var; \
 \
 /* Handle the 1-dimensional case optimally. */ \
 /* ---------------------------------------- */ \
@@ -259,17 +265,27 @@ static int InterpolatePixelNearest##abbrev( int ndim, \
             off_in = ( (int) floor( x + 0.5 ) ) - lbnd[ 0 ]; \
 \
 /* If necessary, test if the input pixel is bad. */ \
-            bad = ( in[ off_in ] == badflag ) && usebad; \
+            bad = ( in[ off_in ] == badval ) && usebad; \
          } \
 \
 /* If the output pixel is not bad, obtain its value from the input \
    image. */ \
          if ( !bad ) { \
             out[ offset[ point ] ] = in[ off_in ]; \
+            if ( usevar ) { \
+               bad = ( in_var[ off_in ] == badval ) && usebad; \
+               if ( !bad ) { \
+                  out_var[ offset[ point ] ] = in_var[ off_in ]; \
+               } else { \
+                  out_var[ offset[ point ] ] = badval; \
+                  result++; \
+               } \
+            } \
 \
 /* Otherwise, assign a bad output pixel and count it. */ \
          } else { \
-            out[ offset[ point ] ] = badflag; \
+            out[ offset[ point ] ] = badval; \
+            if ( usevar ) out_var[ offset[ point ] ] = badval; \
             result++; \
          } \
       } \
@@ -312,7 +328,7 @@ static int InterpolatePixelNearest##abbrev( int ndim, \
                off_in = iy * ystride + ix; \
 \
 /* If necessary, test if the input pixel is bad. */ \
-               bad = ( in[ off_in ] == badflag ) && usebad; \
+               bad = ( in[ off_in ] == badval ) && usebad; \
             } \
          } \
 \
@@ -323,7 +339,7 @@ static int InterpolatePixelNearest##abbrev( int ndim, \
 \
 /* Otherwise, assign a bad output pixel and count it. */ \
          } else { \
-            out[ offset[ point ] ] = badflag; \
+            out[ offset[ point ] ] = badval; \
             result++; \
          } \
       } \
@@ -376,7 +392,7 @@ static int InterpolatePixelNearest##abbrev( int ndim, \
 \
 /* Once the required input pixel has been located, test if it is bad \
    if necessary. */ \
-            bad = bad || ( ( in[ off_in ] == badflag ) && usebad ); \
+            bad = bad || ( ( in[ off_in ] == badval ) && usebad ); \
 \
 /* If the output pixel is not bad, obtain its value from the input \
    image. */ \
@@ -385,7 +401,7 @@ static int InterpolatePixelNearest##abbrev( int ndim, \
 \
 /* Otherwise, assign a bad output pixel and count it. */ \
             } else { \
-               out[ offset[ point ] ] = badflag; \
+               out[ offset[ point ] ] = badval; \
                result++; \
             } \
          } \
@@ -420,10 +436,11 @@ MAKE_INTERPOLATE_PIXEL_NEAREST(UB,unsigned char)
 static int InterpolatePixelLinear##abbrev( int ndim, \
                                            const int *lbnd, const int *ubnd, \
                                            const type *in, \
+                                           const type *in_var, \
                                            int npoint, const int *offset, \
                                            double *coord, \
-                                           int usebad, type badflag, \
-                                           type *out ) { \
+                                           int flags, type badval, \
+                                           type *out, type *out_var ) { \
    double *frac_hi; \
    double *frac_lo; \
    double *wt; \
@@ -446,10 +463,13 @@ static int InterpolatePixelLinear##abbrev( int ndim, \
    int point; \
    int result; \
    int s; \
+   int usebad; \
  \
    result = 0; \
    if ( !astOK ) return result; \
  \
+   usebad = flags & AST__USEBAD; \
+\
 /* Allocate workspace. */ \
    frac_hi = astMalloc( sizeof( double ) * (size_t) ndim ); \
    frac_lo = astMalloc( sizeof( double ) * (size_t) ndim ); \
@@ -541,10 +561,10 @@ static int InterpolatePixelLinear##abbrev( int ndim, \
             wt[ dim ] = frac_lo[ dim ]; \
          } \
  \
-         bad = bad || ( ( in[ pixel ] == badflag ) && usebad ); \
+         bad = bad || ( ( in[ pixel ] == badval ) && usebad ); \
         \
          if ( bad ) { \
-            out[ offset[ point ] ] = badflag; \
+            out[ offset[ point ] ] = badval; \
             result++; \
  \
          } else { \
@@ -552,7 +572,7 @@ static int InterpolatePixelLinear##abbrev( int ndim, \
             sum = (flt_type) 0.0; \
             wtsum = (flt_type) 0.0; \
             while ( !done ) { \
-               if ( ( in[ off ] != badflag ) || !usebad ) { \
+               if ( ( in[ off ] != badval ) || !usebad ) { \
                   for ( pixwt = 1.0, dim = 0; dim < ndim; dim++ ) { \
                      pixwt *= wt[ dim ]; \
                   } \
@@ -611,10 +631,12 @@ MAKE_INTERPOLATE_PIXEL_LINEAR(UB,unsigned char,0,float)
 
 static int ResampleSection( AstMapping *this, const double *linear_fit,
                       int ndim_in, const int *lbnd_in, const int *ubnd_in,
-                      const void *in, DataType type, int (* method)(),
-                      int usebad, const void *badflag_ptr,
+                      const void *in, const void *in_var,
+                      DataType type, int (* method)(),
+                      int flags, const void *badval_ptr,
                       int ndim_out, const int *lbnd_out, const int *ubnd_out,
-                      const int *lbnd, const int *ubnd, void *out ) {
+                      const int *lbnd, const int *ubnd,
+                      void *out, void *out_var ) {
    int npoint;
    int idim;
    int *offset;
@@ -748,10 +770,12 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
             case ( name ): \
                result = \
                InterpolatePixelNearest##abbrev( ndim_in, lbnd_in, ubnd_in, \
-                                                (type *) in, npoint, offset, \
-                                                ptr_in[ 0 ], usebad, \
-                                                *( (type *) badflag_ptr ), \
-                                                (type *) out ); \
+                                                (type *) in, (type *) in_var, \
+                                                npoint, offset, \
+                                                ptr_in[ 0 ], flags, \
+                                                *( (type *) badval_ptr ), \
+                                                (type *) out, \
+                                                (type *) out_var ); \
                break;
        
          switch ( type ) {
@@ -776,10 +800,12 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
             case ( name ): \
                result = \
                InterpolatePixelLinear##abbrev( ndim_in, lbnd_in, ubnd_in,\
-                                               (type *) in, npoint, offset, \
-                                               ptr_in[ 0 ], usebad, \
-                                               *( (type *) badflag_ptr ), \
-                                               (type *) out ); \
+                                               (type *) in, (type *) in_var, \
+                                               npoint, offset, \
+                                               ptr_in[ 0 ], flags, \
+                                               *( (type *) badval_ptr ), \
+                                               (type *) out, \
+                                               (type *) out_var ); \
                break;
 
          switch ( type ) {
@@ -803,10 +829,10 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
             case ( name ): \
                result = ( *( (AstInterpolate##abbrev) method ) ) \
                            ( ndim_in, lbnd_in, ubnd_in, \
-                             (type *) in, npoint, \
+                             (type *) in, (type *) in_var, npoint, \
                              offset, ptr_in[ 0 ], \
-                             usebad, *( (type *) badflag_ptr ), \
-                                                     (type *) out ); \
+                             flags, *( (type *) badval_ptr ), \
+                             (type *) out, (type *) out_var ); \
                break;
 
          switch ( type ) {
@@ -1037,11 +1063,12 @@ static double *TestIfLinear( AstMapping *this,
                          
 static int ResampleBlock( AstMapping *this, const double *linear,
                       int ndim_in, const int *lbnd_in, const int *ubnd_in,
-                      const void *in, DataType type,
+                      const void *in, const void *in_var, DataType type,
                       int (* method)(), double acc,
-                      int usebad, const void *badflag_ptr,
+                      int flags, const void *badval_ptr,
                       int ndim_out, const int *lbnd_out, const int *ubnd_out,
-                      const int *lbnd, const int *ubnd, void *out ) {
+                      const int *lbnd, const int *ubnd,
+                      void *out, void *out_var ) {
 
    int *lbnd_sect;
    int *ubnd_sect;
@@ -1112,11 +1139,11 @@ static int ResampleBlock( AstMapping *this, const double *linear,
       }
 #endif
       result += ResampleSection( this, linear, ndim_in, lbnd_in, ubnd_in,
-                                 in,
+                                 in, in_var,
                                  type, method,
-                            usebad, badflag_ptr,
+                            flags, badval_ptr,
                             ndim_out, lbnd_out, ubnd_out,
-                            lbnd_sect, ubnd_sect, out );
+                            lbnd_sect, ubnd_sect, out, out_var );
       idim = 0;
       while ( !done ) {
          if ( ubnd_sect[ idim ] < ubnd[ idim ] ) {
@@ -1141,13 +1168,70 @@ static int ResampleBlock( AstMapping *this, const double *linear,
    return result;
 }
 
+/*
+*++
+*  Name:
+c     astResample<X>
+f     AST_RESAMPLE<X>
+
+*  Purpose:
+*     Resample a rectangular grid of data in one or more dimensions.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "mapping.h"
+c     int astResample<X>( AstMapping *this, int ndim_in,
+c                         const int lbnd_in[], const int ubnd_in[],
+c                         const <Xtype> in[], const <Xtype> in_var[],
+c                         AstInterpolate<X> method, double acc, int gridsize,
+c                         int flags, <Xtype> badval, int ndim_out,
+c                         const int lbnd_out[], const int ubnd_out[],
+c                         const int lbnd[], const int ubnd[],
+c                         <Xtype> *out, <Xtype> *out_var )
+f     CALL AST_RESAMPLEX( THIS, NDIM_IN, LBND_IN, UBND_IN, IN, IN_VAR,
+f                         METHOD, ACC, GRIDSIZE, FLAGS, BADVAL,
+f                         NDIM_OUT, LBND_OUT, UBND_OUT, LBND, UBND,
+f                         OUT, OUT_VAR, STATUS )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Mapping.
+c     ndim_in
+f     NDIM_IN = INTEGER
+*        The number of dimensions of the input data grid.
+c     lbnd_in
+f     LBND_IN( NDIM_IN ) = INTEGER (Given)
+*        
+c     ubnd_in
+f     UBND_IN( NDIM_IN ) = INTEGER (Given)
+
+c     in
+f     IN( * ) = <XTYPE> (Given)
+
+c     in_var
+f     IN_VAR( * ) = <XTYPE> (Given)
+
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+*--
+*/
 #define MAKE_RESAMPLE(name,abbrev,type) \
 static int Resample##abbrev( AstMapping *this, int ndim_in, \
                              const int *lbnd_in, const int *ubnd_in, \
-                             const type *in, AstInterpolate##abbrev method, double acc, int gridsize, \
-                             int usebad, type badflag, int ndim_out, \
-                             const int *lbnd_out, const int *ubnd_out, \
-                             const int *lbnd, const int *ubnd, type *out ) { \
+                             const type *in, const type *in_var, \
+                             AstInterpolate##abbrev method, double acc, \
+                             int gridsize, int flags, type badval, \
+                             int ndim_out, const int *lbnd_out, \
+                             const int *ubnd_out, const int *lbnd, \
+                             const int *ubnd, type *out, type *out_var ) { \
    double *linear_fit; \
    int result; \
    int npix; \
@@ -1194,11 +1278,12 @@ printf( " %s\n", ( linear_fit ? "linear" : "non-linear" ) ); \
       if ( !divide ) { \
          result += ResampleBlock( this, linear_fit, \
                                   ndim_in, lbnd_in, ubnd_in, \
-                                  (void *) in, name, \
+                                  (void *) in, (void *) in_var, name, \
                                   (int (*)()) method, acc, \
-                                  usebad, (void *) &badflag, \
+                                  flags, (void *) &badval, \
                                   ndim_out, lbnd_out, ubnd_out, \
-                                  lbnd, ubnd, (void *) out ); \
+                                  lbnd, ubnd, \
+                                  (void *) out, (void *) out_var ); \
       } else { \
          int lo[ 100 ]; \
          int hi[ 100 ]; \
@@ -1209,18 +1294,20 @@ printf( " %s\n", ( linear_fit ? "linear" : "non-linear" ) ); \
          } \
          tmp = hi[ dimx ]; \
          hi[ dimx ] = ( ubnd[ dimx ] + lbnd[ dimx ] ) / 2; \
-         result += Resample##abbrev( this, ndim_in, lbnd_in, ubnd_in, in, \
+         result += Resample##abbrev( this, ndim_in, lbnd_in, ubnd_in, \
+                                     in, in_var, \
                              method, acc, gridsize, \
-                             usebad, badflag, \
+                             flags, badval, \
                              ndim_out, lbnd_out, ubnd_out, \
-                             lo, hi, out ); \
+                             lo, hi, out, out_var ); \
          lo[ dimx ] = hi[ dimx ] + 1; \
          hi[ dimx ] = tmp; \
-         result += Resample##abbrev( this, ndim_in, lbnd_in, ubnd_in, in, \
+         result += Resample##abbrev( this, ndim_in, lbnd_in, ubnd_in, \
+                                     in, in_var, \
                              method, acc, gridsize, \
-                             usebad, badflag, \
+                             flags, badval, \
                              ndim_out, lbnd_out, ubnd_out, \
-                             lo, hi, out ); \
+                             lo, hi, out, out_var ); \
       } \
    } \
    if ( linear_fit ) linear_fit = astFree( linear_fit ); \
@@ -6112,19 +6199,22 @@ void astReportPoints_( AstMapping *this, int forward,
 #define MAKE_RESAMPLE_(abbrev,type) \
 int astResample##abbrev##_( AstMapping *this, int ndim_in, \
                             const int *lbnd_in, const int *ubnd_in, \
-                            const type *in, AstInterpolate##abbrev method, \
-                            double acc, int gridsize, int usebad, \
-                            type badflag, int ndim_out, const int *lbnd_out, \
+                            const type *in, const type *in_var, \
+                            AstInterpolate##abbrev method, \
+                            double acc, int gridsize, int flags, \
+                            type badval, int ndim_out, const int *lbnd_out, \
                             const int *ubnd_out, const int *lbnd, \
-                            const int *ubnd, type *out ) { \
+                            const int *ubnd, type *out, type *out_var ) { \
    if ( !astOK ) return 0; \
    return (**astMEMBER(this,Mapping,Resample##abbrev))( this, ndim_in, \
-                                                        lbnd_in, ubnd_in, in, \
+                                                        lbnd_in, ubnd_in, \
+                                                        in, in_var, \
                                                         method, acc, \
-                                                        gridsize, usebad, \
-                                                        badflag, ndim_out, \
+                                                        gridsize, flags, \
+                                                        badval, ndim_out, \
                                                         lbnd_out, ubnd_out, \
-                                                        lbnd, ubnd, out ); \
+                                                        lbnd, ubnd, \
+                                                        out, out_var ); \
 }
 MAKE_RESAMPLE_(LD,long double)
 MAKE_RESAMPLE_(D,double)
