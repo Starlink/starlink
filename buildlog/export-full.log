@@ -383,7 +383,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 54 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 60 files to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
 javadoc-sources:
@@ -448,7 +448,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1172 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1184 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 3 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
@@ -901,7 +901,7 @@ install:
 prepare:
 
 check_packages:
-[available] Apr 7, 2003 4:17:59 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Apr 8, 2003 4:18:40 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1359,7 +1359,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 52 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 58 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/lib/table
@@ -1402,7 +1402,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/table
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
-[loggedcopy] Copying 74 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 81 files to /apps/cvsbuild/star/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -3869,9 +3869,9 @@ javadoc-sources:
   [javadoc] Loading source files for package uk.ac.starlink.array...
   [javadoc] Loading source files for package uk.ac.starlink.ndx...
   [javadoc] Loading source files for package uk.ac.starlink.table...
+  [javadoc] Loading source files for package uk.ac.starlink.table.gui...
   [javadoc] Loading source files for package uk.ac.starlink.table.view...
   [javadoc] Loading source files for package uk.ac.starlink.table.jdbc...
-  [javadoc] Loading source files for package uk.ac.starlink.table.gui...
   [javadoc] Loading source files for package uk.ac.starlink.fits...
   [javadoc] Loading source files for package uk.ac.starlink.votable...
   [javadoc] Loading source files for package uk.ac.starlink.hdx...
@@ -4197,4 +4197,4 @@ export-full:
      [copy] Copying 2 files to /apps/cvsbuild/export
 
 BUILD SUCCESSFUL
-Total time: 9 minutes 58 seconds
+Total time: 11 minutes 6 seconds
