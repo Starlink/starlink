@@ -72,6 +72,8 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *        - Included STP conversion functions.
 *     11-JUN-2003 (DSB):
 *        - Added HFK5Z and FK5HZ conversion functions.
+*     28-SEP-2003 (DSB):
+*        - Added HEEQ and EQHE conversion functions.
 *class--
 */
 
@@ -104,6 +106,8 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 #define AST__EQHPR      18       /* J2000.0 equatorial to Helioprojective-Radial */
 #define AST__SLA_HFK5Z  19       /* ICRS to FK5 J2000.0, no pm or parallax */
 #define AST__SLA_FK5HZ  20       /* FK5 J2000.0 to ICRS, no pm or parallax */
+#define AST__HEEQ       21       /* Helio-ecliptic to equatorial */
+#define AST__EQHE       22       /* Equatorial to helio-ecliptic */
 
 /* Maximum number of arguments required by an SLALIB conversion. */
 #define MAX_SLA_ARGS 4
@@ -298,6 +302,10 @@ static void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args ) {
 *           Convert Helioprojective-Radial coordinates to J2000.0 equatorial.
 *        AST__EQHPR( DATE, OBSX, OBSY, OBSZ )
 *           Convert J2000.0 equatorial coordinates to Helioprojective-Radial.
+*        AST__HEEQ( DATE )
+*           Convert helio-ecliptic to ecliptic coordinates.
+*        AST__EQHE( DATE )
+*           Convert ecliptic to helio-ecliptic coordinates.
 
 *  Notes:
 *     - The specified conversion is appended only if the SlaMap's
@@ -465,6 +473,12 @@ static int CvtCode( const char *cvt_string ) {
 
    } else if ( astChrMatch( cvt_string, "EQHPR" ) ) {
       result = AST__EQHPR;
+
+   } else if ( astChrMatch( cvt_string, "HEEQ" ) ) {
+      result = AST__HEEQ;
+
+   } else if ( astChrMatch( cvt_string, "EQHE" ) ) {
+      result = AST__EQHE;
 
    }
 
@@ -690,6 +704,20 @@ static const char *CvtString( int cvt_code, const char **comment,
       arg[ 1 ] = "Heliocentric-Aries-Ecliptic X value at observer";
       arg[ 2 ] = "Heliocentric-Aries-Ecliptic Y value at observer";
       arg[ 3 ] = "Heliocentric-Aries-Ecliptic Z value at observer";
+      break;
+
+   case AST__HEEQ:
+      result = "HEEQ";
+      *comment = "Helio-ecliptic to equatorial";
+      *nargs = 1;
+      arg[ 0 ] = "Modified Julian Date of observation";
+      break;
+
+   case AST__EQHE:
+      result = "EQHE";
+      *comment = "Equatorial to helio-ecliptic";
+      *nargs = 1;
+      arg[ 0 ] = "Modified Julian Date of observation";
       break;
 
    }
@@ -2222,6 +2250,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Exchange the transformation code for its inverse. */
                SWAP_CODES( AST__EQHPR, AST__HPREQ )
 
+/* J2000 equatorial coordinates to Helio-ecliptic. */
+/* ------------------------------------------------------- */
+/* Exchange the transformation code for its inverse. */
+               SWAP_CODES( AST__EQHE, AST__HEEQ )
+
             }
 
 /* Undefine the local macros. */
@@ -2382,6 +2415,15 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                              cvtargs[ istep + 1 ][ 2 ] ) &&
                            EQUAL( cvtargs[ istep ][ 3 ],
                              cvtargs[ istep + 1 ][ 3 ] ) ) {
+                  istep++;
+                  keep = 0;
+
+/* Eliminate redundant helio-ecliptic coordinate conversions. */
+/* ---------------------------------------------------------- */
+               } else if ( ( PAIR_CVT( AST__EQHE, AST__HEEQ ) ||
+                             PAIR_CVT( AST__HEEQ, AST__EQHE ) ) &&
+                           EQUAL( cvtargs[ istep ][ 0 ],
+                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
 
@@ -2647,6 +2689,8 @@ f     This value should then be supplied to AST_SLAADD in ARGS(1).
 *     - "EQHPC" (DATE,OBSX,OBSY,OBSZ): Convert J2000.0 equatorial coordinates to Helioprojective-Cartesian.
 *     - "HPREQ" (DATE,OBSX,OBSY,OBSZ): Convert Helioprojective-Radial coordinates to J2000.0 equatorial.
 *     - "EQHPR" (DATE,OBSX,OBSY,OBSZ): Convert J2000.0 equatorial coordinates to Helioprojective-Radial.
+*     - "HEEQ" (DATE): Convert helio-ecliptic coordinates to J2000.0 equatorial.
+*     - "EQHE" (DATE): Convert J2000.0 equatorial coordinates to helio-ecliptic.
 *
 
 *--
@@ -2819,6 +2863,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    double *args;                 /* Pointer to argument list for conversion */
    double *delta;                /* Pointer to latitude array */
    double *p[3];                 /* Pointers to arrays to be transformed */
+   double *obs;                  /* Pointer to array holding observers position */
    int cvt;                      /* Loop counter for conversions */
    int ct;                       /* Conversion type */
    int end;                      /* Termination index for conversion loop */
@@ -3253,13 +3298,23 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* ------------------------------------------------ */
             case AST__HPCEQ:
             case AST__HPREQ:
+            case AST__HEEQ:
                {
 
-/* Get the code for the appropriate 3D STP coordinate system to use. */
+/* Get the code for the appropriate 3D STP coordinate system to use.
+   Also, get a point to the observer position, if needed. */
                   if( ct == AST__HPCEQ ) {
                     sys = AST__HPC;
-                  } else {
+                    obs = args + 1;
+
+                  } else if( ct == AST__HPREQ ) {
                     sys = AST__HPR;
+                    obs = args + 1;
+
+                  } else {
+                    sys = AST__GSE;
+                    obs = NULL;
+
                   }
 
 /* Store the 3D positions to be transformed. The supplied arrays are used
@@ -3274,11 +3329,11 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    is appropriate since we are considering points at an infinite distance
    from the observer). */
                   if( forward ) {
-                     STPConv( args[ 0 ], 1, npoint, sys, args + 1, p,
+                     STPConv( args[ 0 ], 1, npoint, sys, obs, p,
                               AST__HAQ, NULL, p );
                   } else {
                      STPConv( args[ 0 ], 1, npoint, AST__HAQ, NULL, p,
-                              sys, args + 1, p );
+                              sys, obs, p );
                   }
 	       }
                break;
@@ -3289,13 +3344,23 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Same as above, but with forward and inverse cases transposed. */
             case AST__EQHPC:
             case AST__EQHPR:
+            case AST__EQHE:
                {
 
-/* Get the code for the appropriate 3D STP coordinate system to use. */
+/* Get the code for the appropriate 3D STP coordinate system to use.
+   Also, get a point to the observer position, if needed. */
                   if( ct == AST__EQHPC ) {
                     sys = AST__HPC;
-                  } else {
+                    obs = args + 1;
+
+                  } else if( ct == AST__EQHPR ) {
                     sys = AST__HPR;
+                    obs = args + 1;
+
+                  } else {
+                    sys = AST__GSE;
+                    obs = NULL;
+
                   }
 
 /* Store the 3D positions to be transformed. The supplied arrays are used
@@ -3311,9 +3376,9 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    from the observer). */
                   if( forward ) {
                      STPConv( args[ 0 ], 1, npoint, AST__HAQ, NULL, p,
-                              sys, args + 1, p );
+                              sys, obs, p );
                   } else {
-                     STPConv( args[ 0 ], 1, npoint, sys, args + 1, p,
+                     STPConv( args[ 0 ], 1, npoint, sys, obs, p,
                               AST__HAQ, NULL, p );
                   }
 	       }

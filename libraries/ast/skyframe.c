@@ -106,6 +106,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *     11-JUN-2003 (DSB):
 *        Added ICRS option for System attribute, and made it the default
 *        in place of FK5.
+*     27-SEP-2003 (DSB):
+*        Added HELIOECLIPTIC option for System attribute.
 *class--
 */
 
@@ -1685,6 +1687,11 @@ static const char *GetLabel( AstFrame *this, int axis ) {
 	    result = ( axis_p == 0 ) ? "Ecliptic longitude" :
                                        "Ecliptic latitude";
 
+/* Helio-ecliptic coordinates. */
+         } else if ( system == AST__HELIOECLIPTIC ) {
+	    result = ( axis_p == 0 ) ? "Helio-ecliptic longitude" :
+                                       "Helio-ecliptic latitude";
+
 /* Galactic coordinates. */
          } else if ( system == AST__GALACTIC ) {
 	    result = ( axis_p == 0 ) ? "Galactic longitude" :
@@ -1909,6 +1916,10 @@ static const char *GetSymbol( AstFrame *this, int axis ) {
 
 /* Ecliptic coordinates. */
          } else if ( system == AST__ECLIPTIC ) {
+	    result = ( axis_p == 0 ) ? "Lambda" : "Beta";
+
+/* Helio-ecliptic coordinates. */
+         } else if ( system == AST__HELIOECLIPTIC ) {
 	    result = ( axis_p == 0 ) ? "Lambda" : "Beta";
 
 /* Galactic coordinates. */
@@ -2194,6 +2205,16 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	    pos = sprintf( buff,
                            "Ecliptic coordinates; mean equinox J%s",
                            astFmtDecimalYr( slaEpj( equinox ), 9 ) );
+	    break;
+
+/* Helio-ecliptic coordinates. */
+/* --------------------------- */
+/* Display only the Epoch value (equinox is fixed). */
+	 case AST__HELIOECLIPTIC:
+	    pos = sprintf( buff,
+                           "Helio-ecliptic coordinates; mean equinox J2000,"
+                           " epoch J%s",
+                           astFmtDecimalYr( slaEpj( epoch ), 9 ) );
 	    break;
 
 /* Galactic coordinates. */
@@ -2757,6 +2778,11 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       } else if ( system == AST__ECLIPTIC ) {
          TRANSFORM_1( "ECLEQ", equinox )
 
+/* From helio-ecliptic coordinates. */
+/* -------------------------------- */
+      } else if ( system == AST__HELIOECLIPTIC ) {
+         TRANSFORM_1( "HEEQ", epoch )
+
 /* From galactic coordinates. */
 /* -------------------------- */
 /* This conversion is supported directly by SLALIB. */
@@ -2778,7 +2804,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
          TRANSFORM_0( "GALEQ" )
 
 /* From unknown coordinates. */
-/* ------------------------------- */
+/* ------------------------- */
 /* No conversion is possible. */
       } else if ( system == AST__UNKNOWN ) {
          match = 0;
@@ -2836,6 +2862,11 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* This conversion is supported directly by SLALIB. */
       } else if ( align_sys == AST__ECLIPTIC ) {
          TRANSFORM_1( "EQECL", equinox )
+
+/* Align in helio-ecliptic coordinates. */
+/* ------------------------------------ */
+      } else if ( align_sys == AST__HELIOECLIPTIC ) {
+         TRANSFORM_1( "EQHE", epoch )
 
 /* Align in galactic coordinates. */
 /* -------------------------------- */
@@ -2936,6 +2967,11 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       } else if ( align_sys == AST__ECLIPTIC ) {
          TRANSFORM_1( "ECLEQ", equinox )
 
+/* From helio-ecliptic coordinates. */
+/* -------------------------------- */
+      } else if ( align_sys == AST__HELIOECLIPTIC ) {
+         TRANSFORM_1( "HEEQ", epoch )
+
 /* From galactic coordinates. */
 /* -------------------------- */
 /* This conversion is supported directly by SLALIB. */
@@ -3015,6 +3051,11 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* This conversion is supported directly by SLALIB. */
       } else if ( system == AST__ECLIPTIC ) {
          TRANSFORM_1( "EQECL", equinox )
+
+/* To helio-ecliptic coordinates. */
+/* ------------------------------ */
+      } else if ( system == AST__HELIOECLIPTIC ) {
+         TRANSFORM_1( "EQHE", epoch )
 
 /* To galactic coordinates. */
 /* ------------------------ */
@@ -4963,6 +5004,9 @@ static AstSystemType SystemCode( AstFrame *this, const char *system ) {
    } else if ( astChrMatch( "ECLIPTIC", system ) ) {
       result = AST__ECLIPTIC;
 
+   } else if ( astChrMatch( "HELIOECLIPTIC", system ) ) {
+      result = AST__HELIOECLIPTIC;
+
    } else if ( astChrMatch( "GALACTIC", system ) ) {
       result = AST__GALACTIC;
 
@@ -5054,6 +5098,10 @@ static const char *SystemString( AstFrame *this, AstSystemType system ) {
 
    case AST__ECLIPTIC:
       result = "ECLIPTIC";
+      break;
+
+   case AST__HELIOECLIPTIC:
+      result = "HELIOECLIPTIC";
       break;
 
    case AST__GALACTIC:
@@ -5543,8 +5591,9 @@ astMAKE_GET(SkyFrame,Equinox,double,AST__BAD,(
                    ( astGetSystem( this ) == AST__FK4_NO_E ) ) ?
                     slaEpb2d( 1950.0 ) : slaEpj2d( 2000.0 ) ) ))
 
-/* Allow any Equinox value to be set. */
-astMAKE_SET(SkyFrame,Equinox,double,equinox,value)
+/* Allow any Equinox value to be set, unless the System is Helio-ecliptic
+   (in which case clear the value so that J2000 is used). */
+astMAKE_SET(SkyFrame,Equinox,double,equinox,((astGetSystem(this)!=AST__HELIOECLIPTIC)?value:AST__BAD))
 
 /* An Equinox value is set if it is not equal to AST__BAD. */
 astMAKE_TEST(SkyFrame,Equinox,( this->equinox != AST__BAD ))

@@ -59,8 +59,8 @@ f     AST_WCSMAP
 *     In addition to those attributes common to all Mappings, every
 *     WcsMap also has the following attributes:
 *
-*     - NatLat: Native latitude of the fiducial point of a FITS-WCS projection
-*     - NatLon: Native longitude of the fiducial point of a FITS-WCS projection
+*     - NatLat: Native latitude of the reference point of a FITS-WCS projection
+*     - NatLon: Native longitude of the reference point of a FITS-WCS projection
 *     - PVi_m: FITS-WCS projection parameters
 *     - WcsAxis(lonlat): FITS-WCS projection axes
 *     - WcsType: FITS-WCS projection type
@@ -147,6 +147,11 @@ f     The WcsMap class does not define any new routines beyond those
 *     18-AUG-2003 (DSB):
 *        In function Map, assign zero longitude to output positions which
 *        are very close to a pole.
+*     23-SEP-2003 (DSB):
+*        - Changed so that the NatLat and NatLon attributes refer to the
+*        fixed values for the projections defined in FITS-WCS paper II, rather
+*        than the user-defined values stored in projection parameter PVi_1 and 
+*        PVi_2 for the longitude axis.
 *class--
 */
 
@@ -1434,8 +1439,10 @@ static double GetNatLat( AstWcsMap *this ) {
 
 *  Description:
 *     This function returns the value of the NatLat attribute. This is
-*     the value of PVi_2 (where "i" is the index of the longitude axis) 
-*     converted from degrees to radians.
+*     fixed value for most projection types , defined in the FITS-WCS paper
+*     II. For instance, all zenithal projections have NatLat = PI/2 (90
+*     degrees). For some prjections (e.g. conics), the value is defined
+*     by a projection parameter.
 
 *  Parameters:
 *     this 
@@ -1448,19 +1455,12 @@ static double GetNatLat( AstWcsMap *this ) {
 */
    double ret;     /* Returned value */
 
-/* The AST-specific TPN projection has a fixed NatLat value of pi/2 */
-   if( astGetWcsType( this ) == AST__TPN ) {
-      ret = AST__DPIBY2;
-
-/* For standard FITS-WCS projections, use PVi_2 for longitude axis "i". */
-   } else {
-
-/* Get the value of the PVi_2 projection parameter for the longitude axis. 
-   A default value appropriate to the projection type will be returned if 
-   no value has been set for the parameter. */
-      ret = astGetPV( this, astGetWcsAxis( this, 0 ), 2 );
-
-/* If a value was obtained, convert it from degrees to radians. */
+/* The native latitude of the reference point of the projection is 
+   constant for most projection, but for some (the conics) it is 
+   specified by projection one on the latitude axis. */
+   ret = FindPrjData( this->type )->theta0;
+   if( ret == AST__BAD ){
+      ret = astGetPV( this, astGetWcsAxis( this, 1 ), 1 );
       if( ret != AST__BAD ) ret *= AST__DD2R;
    }
 
@@ -1489,8 +1489,7 @@ static double GetNatLon( AstWcsMap *this ) {
 
 *  Description:
 *     This function returns the value of the NatLon attribute. This is
-*     the value of PVi_1 (where "i" is the index of the longitude axis) 
-*     converted from degrees to radians.
+*     fixed value of zero for all projection types.
 
 *  Parameters:
 *     this 
@@ -1501,26 +1500,7 @@ static double GetNatLon( AstWcsMap *this ) {
 
 *-
 */
-   double ret;     /* Returned value */
-
-/* The AST-specific TPN projection has a fixed NatLon value of zero. */
-   if( astGetWcsType( this ) == AST__TPN ) {
-      ret = 0.0;
-
-/* For standard FITS-WCS projections, use PVi_1 for longitude axis "i". */
-   } else {
-
-/* Get the value of the PVi_1 projection parameter for the longitude axis. 
-   A default value appropriate to the projection type will be returned if 
-   no value has been set for the parameter. */
-      ret = astGetPV( this, astGetWcsAxis( this, 0 ), 1 );
-
-/* If a value was obtained, convert it from degrees to radians. */
-      if( ret != AST__BAD ) ret *= AST__DD2R;
-   }
-
-/* Return the result. */ 
-   return ret;
+   return 0.0;
 }
 
 static int GetNP( AstWcsMap *this, int i ) { 
@@ -1656,22 +1636,17 @@ static double GetPV( AstWcsMap *this, int i, int m ) {
       if( m == 0 ) { 
          ret = 0.0;
 
-/* Parameter one has a default equal to the normal native longitude of the
-   fiducial point of the projection. This is zero for all projections. */
+/* Parameter one has a default equal to the native longitude of the
+   reference point of the projection, in degrees. */
       } else if( m == 1 ) { 
-         ret = 0.0;
+         ret = astGetNatLon( this )*AST__DR2D;
 
-/* Parameter two has a default equal to the normal native latitude of the
-   fiducial point of the projection (in degrees). This is constant for
+/* Parameter two has a default equal to the native latitude of the
+   reference point of the projection (in degrees). This is constant for
    most projection, but for some (the conics) it is specified by
    projection one on the latitude axis. */
       } else if( m == 2 ) { 
-         ret = FindPrjData( this->type )->theta0;
-         if( ret != AST__BAD ){
-            ret *= AST__DR2D;
-         } else {
-            ret = astGetPV( this, astGetWcsAxis( this, 1 ), 1 );
-         }
+         ret = astGetNatLat( this )*AST__DR2D;
       }
    }
 
@@ -2162,7 +2137,7 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
 /* If we are doing a reverse mapping, get the acceptable range of longitude
    values. */
    if( !forward ) LongRange( prjdata, params, &longhi, &longlo );
-      
+
 /* Loop to apply the projection to each point in turn, checking for
    (and propagating) bad values in the process. */
    for ( point = 0; point < npoint; point++ ) {
@@ -3847,7 +3822,7 @@ astMAKE_GET(WcsMap,WcsType,int,AST__WCSBAD,this->type)
 *     NatLat
 
 *  Purpose:
-*     Native latitude of the fiducial point of a FITS-WCS projection.
+*     Native latitude of the reference point of a FITS-WCS projection.
 
 *  Type:
 *     Public attribute.
@@ -3856,35 +3831,34 @@ astMAKE_GET(WcsMap,WcsType,int,AST__WCSBAD,this->type)
 *     Floating point, read-only.
 
 *  Description:
-*     This attribute gives the latitude of the fiducial point of the
+*     This attribute gives the latitude of the reference point of the
 *     FITS-WCS projection implemented by a WcsMap. The value is in
-*     radians in the "native spherical" coordinate system. The FITS-WCS
-*     paper reserves parameter 2 associated with the longitude axis to 
-*     store this value. The value of the NatLat attribute equals this
-*     projection parameter value converted to radians. A default value 
-*     is used if no value has been set for the projection parameter.
-*     The default value is fixed for most projection types and is specified
-*     in the FITS-WCS paper. The exception is that the default for the conic
-*     projections is variable and is specified by the value of projection 
-*     parameter one associated with the latitude axis.
+*     radians in the "native spherical" coordinate system. This value is
+*     fixed for most projections, for instance it is PI/2 (90 degrees)
+*     for all zenithal projections. For some projections (e.g. the conics) 
+*     the value is not fixed, but is specified by parameter one on the 
+*     latitude axis. 
 *
-*     The NatLat attribute is read-only. The returned value can however
-*     be changed by assigning a new value to the PVi_2 attribute (where 
-*     "i" is the index of the longitude axis).
+*     FITS-WCS paper II introduces the concept of a "fiducial point"
+*     which is logical distinct from the projection reference point.
+*     It is easy to confuse the use of these two points. The fiducial
+*     point is the point which has celestial coordinates given by the
+*     CRVAL FITS keywords. The native spherical coordinates for this point
+*     default to the values of the NatLat and NatLon, but these defaults
+*     mey be over-ridden by values stored in the PVi_j keywords. Put
+*     another way, the CRVAL keywords will by default give the celestial
+*     coordinates of the projection reference point, but may refer to
+*     some other point if alternative native longitude and latitude values 
+*     are provided through the PVi_j keywords.
+*
+*     The NatLat attribute is read-only. 
 
 *  Applicability:
 *     WcsMap
 *        All WcsMaps have this attribute.
 
 *  Notes:
-*     - The AST-specific TPN projection uses all projection parameters on
-*     both axes to represent correction terms. The value of the NatLat
-*     attribute is therefore fixed at 0.5*PI rather than being specified
-*     by a projection parameter.
-*     - A value of AST__BAD is returned if no latitude value is
-*     available.
-*     - For a definition of the fiducial point for a projection, see
-*     the FITS-WCS paper.
+*     - A default value of AST__BAD is used if no latitude value is available.
 *att--
 */
 
@@ -3894,7 +3868,7 @@ astMAKE_GET(WcsMap,WcsType,int,AST__WCSBAD,this->type)
 *     NatLon
 
 *  Purpose:
-*     Native longitude of the fiducial point of a FITS-WCS projection.
+*     Native longitude of the reference point of a FITS-WCS projection.
 
 *  Type:
 *     Public attribute.
@@ -3903,29 +3877,19 @@ astMAKE_GET(WcsMap,WcsType,int,AST__WCSBAD,this->type)
 *     Floating point, read-only.
 
 *  Description:
-*     This attribute gives the longitude of the fiducial point of the
+*     This attribute gives the longitude of the reference point of the
 *     FITS-WCS projection implemented by a WcsMap. The value is in
-*     radians in the "native spherical" coordinate system. The FITS-WCS
-*     paper reserves parameter 1 associated with the longitude axis to 
-*     store this value. The value of the NatLon attribute equals this
-*     projection parameter value converted to radians. A default value 
-*     of zero is used if no value has been set for the projection parameter.
+*     radians in the "native spherical" coordinate system, and will
+*     usually be zero. See the description of attribute NatLat for further 
+*     information.
 *
-*     The NatLon attribute is read-only. The returned value can however
-*     be changed by assigning a new value to the PVi_1 attribute (where 
-*     "i" is the index of the longitude axis).
+*     The NatLon attribute is read-only. 
 
 *  Applicability:
 *     WcsMap
 *        All WcsMaps have this attribute.
 
 *  Notes:
-*     - The AST-specific TPN projection uses all projection parameters on
-*     both axes to represent correction terms. The value of the NatLon
-*     attribute is therefore fixed at zero rather than being specified
-*     by a projection parameter.
-*     - For a definition of the fiducial point for a projection, see
-*     the FITS-WCS paper.
 *att--
 */
 

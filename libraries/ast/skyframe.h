@@ -100,6 +100,11 @@
 *           Ecliptic coordinates (IAU 1980), referred to the ecliptic
 *           and mean equinox as specified by the qualifying Equinox
 *           value.
+*        "HELIOECLIPTIC"
+*           Ecliptic coordinates (IAU 1980), referred to the ecliptic
+*           and mean equinox of J2000.0, in which an offset is added to
+*           the longitude value which results in the centre of the Sun
+*           being at zero longitude at the date given by the Epoch attribute.
 *        "GALACTIC"
 *           Galactic coordinates (IAU 1958).
 *        "SUPERGALACTIC"
@@ -329,7 +334,8 @@
 #define AST__GALACTIC      6
 #define AST__SUPERGALACTIC 7
 #define AST__ICRS          8
-#define AST__UNKNOWN       9
+#define AST__HELIOECLIPTIC 9
+#define AST__UNKNOWN       10
 
 #endif
 

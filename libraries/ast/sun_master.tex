@@ -19116,9 +19116,9 @@ current version):
 
 \begin{enumerate}
 
-\item The SkyFrame class now represents ICRS coordinates by default
-instead of FK5 (that is, the default for the System attribute for SkyFrames 
-has been changed to ``ICRS'').
+\item The SkyFrame class now supports two new coordinate systems "ICRS"
+and "HELIOECLIPTIC". The default for the System attribute for SkyFrames 
+has been changed from ``FK5'' to ``ICRS''.
 
 \item The 
 c+
@@ -19160,6 +19160,11 @@ either the north or south pole is transformed into spherical coordinates.
 \item The WcsMap class now assigns a longitude of zero to output
 celestial coordinates which have a latitude of plus or minus 90 degrees.
 
+\item The Warnings attribute of the FitsChan class now accepts values 
+"BadVal" (which gives warnings about conversion errors when reading 
+FITS keyword values), and "Distortion" (which gives warnings about
+unsupported distortion codes within CTYPE values).
+ 
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in

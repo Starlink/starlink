@@ -9167,6 +9167,13 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        ecliptic and mean equinox specified by the qualifying Equinox
 *        value.
 *
+*        - "HELIOECLIPTIC": Ecliptic coordinates (IAU 1980), referred to the
+*        ecliptic and mean equinox of J2000.0, in which an offset is added to
+*        the longitude value which results in the centre of the sun being at 
+*        zero longitude at the date given by the Epoch attribute. Attempts to 
+*        set a value for the Equinox attribute will be ignored, since this 
+*        system is always referred to J2000.0.
+*
 *        - "GALACTIC": Galactic coordinates (IAU 1958).
 *
 *        - "SUPERGALACTIC": De Vaucouleurs Supergalactic coordinates.

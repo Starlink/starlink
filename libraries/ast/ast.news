@@ -16,9 +16,11 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-o The SkyFrame class now represents ICRS coordinates by default
-instead of FK5 (that is, the default for the System attribute for SkyFrames 
-has been changed to "ICRS").
+
+
+o The SkyFrame class now supports two extra coordinate systems; "ICRS"
+and "HELIOECLIPTIC". The default coordinate system has been changed from
+FK5 to ICRS.
 
 o A function called astRate (AST_RATE) has been added which allows an
 estimate to be made of the rate of change of a Mapping output with
