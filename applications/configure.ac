@@ -7,6 +7,9 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 dnl    Following sanity-check isn't terribly helpful...
 AC_CONFIG_SRCDIR(bootstrap)
 
+dnl    Include defaults for Starlink configurations
+STAR_DEFAULTS
+
 AC_PROG_MAKE_SET
 
 dnl    The following list must be kept up-to-date by hand.
