@@ -121,6 +121,8 @@
       $chooser configure \
                          -title "PAIRNDF chooser" \
                          -watchstate choosestate \
+                         -choosepercentiles 1 \
+                         -choosewcsframe 0 \
                          -validpair [ code pairok %A %B ] \
                          -viewport [ list $PREVX $PREVY ] \
                          -percentiles [ list $PERCLO $PERCHI ]
