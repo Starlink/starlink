@@ -32,7 +32,7 @@
 *       The zenith optical depth is assumed to vary linearly with time between
 *     the values input in parameters FIRST_TAU and LAST_TAU. If the measurement
 *     was taken at a time outside the range covered by FIRST_TAU and LAST_TAU
-*     then the value closest in time will be used.
+*     then the value closest in time will be used with no extrapolation.
 
 *  Usage:
 *     extinction in sub_instrument first_tau first_lst
@@ -55,6 +55,8 @@
 *     SECOND_LST = CHAR (Read)
 *        The local sidereal time at which SECOND_TAU was
 *        the zenith sky opacity, in hh mm ss.ss format.
+*        If this value is less than FIRST_LST it is assumed you
+*        are referring to the following day.
 *     SECOND_TAU = REAL (Read)
 *        The zenith sky opacity after the observation.
 *     SUB_INSTRUMENT = CHAR (Read)
@@ -821,6 +823,18 @@
             CALL ERR_REP (' ', '^TASK: error decoding '//
      :        'LST - ^LST', STATUS)
          END IF
+      END IF
+
+*     Check for the case where FIRST_LST is greater than SECOND_LST
+*     In this case we assume this means that the second lst is referring
+*     to the following day (rather than precedding which makes no sense)
+*     We therefore add 2*PI
+      IF (FIRST_LST_RAD > SECOND_LST_RAD) THEN
+         SECOND_LST_RAD = SECOND_LST_RAD + (2.0D0 * PI)
+         CALL MSG_SETC('TASK',TSKNAME)
+         CALL MSG_OUTIF(MSG__NORM,' ',
+     :        '^TASK: Assuming second LST refers to following day',
+     :        STATUS)
       END IF
 
 *  CREATE an output file
