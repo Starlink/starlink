@@ -4,26 +4,27 @@
 
 <component id="iras90">
   <version>1.1-2</version>
-  <path>applications/echwind</path>
-  <description>UCL Echelle Spectrograph Observation Planning</description>
+  <path>applications/obsolete/iras90</path>
+  <description>IRAS90 - IRAS data processing</description>
   <abstract><p>
-ECHWIND is used to assist in the planning of observations with either the
-Utrecht Echelle Spectrograph (UES) or the UCL coude echelle spectrograph
-(UCLES). It can be run at your home institution, when preparing an observing
-proposal, or before or during an observing run.
+IRAS90 is a suite of programs for processing IRAS data.
   </p></abstract>
   <dependencies >
     <build>parsecon</build><build>dtask</build><build>ard</build><build>agi</build><build>fio</build><build>snx</build><build>ndf</build><build>ary</build><build>sla</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
-      <name>Marion Fisher</name>
+      <name>David Berry</name>
+      <uname>dsb</uname>
     </person>
     <person>
-      <name>William Lupton</name>
+      <name>Diana Parsons</name>
     </person>
     <person>
-      <name>Anne Charles</name>
+      <name>W Gong</name>
+    </person>
+    <person>
+      <name>H J Walker</name>
     </person>
   </developers>
   <documentation> sun161 sun163 sun165</documentation>
