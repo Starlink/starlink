@@ -571,10 +571,8 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES)
 
 #  Rules for extracting source files from the source archive.
 
-$(PUBLIC_SCRIPTS) $(PRIVATE_INCLUDES) $(LINK_SCRIPT) $(MONO_SOURCE) \
-$(HELP_SOURCES) $(MONO_IFL) $(STARTUP_SCRIPT) $(IFL_FILES) $(ICL_SCRIPT) \
-$(F_SUB1) $(B_SUB1) $(C_SUB1) \
-$(F_SUB2) $(B_SUB2) $(C_SUB2):
+$(PUBLIC_SCRIPTS) $(PRIVATE_INCLUDES) $(LINK_SCRIPT) \
+$(HELP_SOURCES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -622,6 +620,8 @@ OBJECT_LIBRARIES = libextractor.a libfits.a
 libextractor.a libfits.a: extractor_source.tar
 	- mkdir extract
 	(cd extract ;\
+	export INSTALL; unset INSTALL;\
+	export LINK; unset LINK; \
 	$(TAR_OUT) ../extractor_source.tar ;\
 	./configure ;\
 	make ;\
@@ -648,10 +648,12 @@ $(MONOLITH): extractor_source.tar $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 $(NATIVE_BINARY): sextractor_source.tar
 	- mkdir sextractor
 	(cd sextractor ;\
-	 $(TAR_OUT) ../sextractor_source.tar ;\
-	 ./configure ;\
-	 make ;\
-	 cp -p src/sex ..)
+	export INSTALL; unset INSTALL;\
+	export LINK; unset LINK; \
+	$(TAR_OUT) ../sextractor_source.tar ;\
+	./configure ;\
+	make ;\
+	cp -p src/sex ..)
 
 #  Rules for building the help libraries.
 
