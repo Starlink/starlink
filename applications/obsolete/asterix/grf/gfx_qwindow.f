@@ -1,4 +1,3 @@
-
 *+  GFX_QWINDOW - inquire limits of plotting window
       SUBROUTINE GFX_QWINDOW(X1,X2,Y1,Y2,STATUS)
 
@@ -15,7 +14,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
 *    Import-export :
       REAL X1,X2,Y1,Y2			! plot window in world coords
@@ -49,7 +47,7 @@
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GFX_QWINDOW',STATUS)
+          CALL AST_REXIT('GFX_QWINDOW',STATUS)
         ENDIF
       ENDIF
       END

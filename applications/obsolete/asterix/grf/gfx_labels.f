@@ -11,7 +11,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'GCB_PAR'
 *    Import :
       CHARACTER*(*) XDEF,YDEF
@@ -117,7 +116,7 @@
         CALL GCB_SETDEF(STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GFX_LABELS',STATUS)
+          CALL AST_REXIT('GFX_LABELS',STATUS)
         ENDIF
 
       ENDIF

@@ -1,4 +1,3 @@
-
 *+  GFX_QLOG - inquire if axes log or lin
       SUBROUTINE GFX_QLOG(XLOG,YLOG,STATUS)
 
@@ -15,7 +14,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
 *    Import-export :
       LOGICAL XLOG,YLOG

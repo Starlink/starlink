@@ -1,5 +1,3 @@
-
-
 *+  GFX_DEFLBL- constructs default labels
       SUBROUTINE GFX_DEFLBL(LABEL,UNITS,LBL,STATUS)
 
@@ -16,7 +14,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       CHARACTER*(*) LABEL,UNITS
 *    Import-export :

@@ -14,7 +14,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Import :
       INTEGER NX,NY
@@ -197,7 +196,7 @@
         CALL PGEBUF()
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GFX_PIXELQ2',STATUS)
+          CALL AST_REXIT('GFX_PIXELQ2',STATUS)
         ENDIF
 
       ENDIF

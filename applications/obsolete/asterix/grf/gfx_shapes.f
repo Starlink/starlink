@@ -11,7 +11,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
 *    Import-Export :
 *    Export :
@@ -131,7 +130,7 @@
         CALL GCB_SETDEF(STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GFX_SHAPES',STATUS)
+          CALL AST_REXIT(GFX_SHAPES',STATUS)
         ENDIF
       ENDIF
       END
