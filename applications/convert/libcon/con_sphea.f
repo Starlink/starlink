@@ -377,7 +377,7 @@
                   CALL NDF_ACLEN( NDF, 'Label', I, NCT, STATUS )
 
 *  Ignore trailing blanks and exclude a blank string.
-                  NCT = CHR_LEN( VALUE( :NCT ) )
+                  NCT = CHR_LEN( VALUE( :MIN( SZFITS, NCT ) ) )
                   IF ( NCT .GT. 0 ) THEN
                      DESCR = ' '
                      CALL CHR_ITOC( I, C, NCD )
@@ -441,7 +441,7 @@
                   CALL NDF_ACLEN( NDF, 'Units', I, NCT, STATUS )
 
 *  Ignore trailing blanks and exclude a blank string.
-                  NCT = CHR_LEN( VALUE( :NCT ) )
+                  NCT = CHR_LEN( VALUE( :MIN( SZFITS, NCT ) ) )
                   IF ( NCT .GT. 0 ) THEN
                      DESCR = ' '
                      CALL CHR_ITOC( I, C, NCD )
@@ -510,7 +510,7 @@
 *  Find the title and its length.  Ignore blank values.
          CALL NDF_CGET( NDF, 'TITLE', VALUE, STATUS )
          CALL NDF_CLEN( NDF, 'TITLE', NCT, STATUS )
-         NCT = CHR_LEN( VALUE( :NCT ) )
+         NCT = CHR_LEN( VALUE( :MIN( SZFITS, NCT ) ) )
          IF ( NCT .GT. 0 ) THEN
             DESCR( 1:8 ) = 'TITLE   '
 
@@ -569,7 +569,7 @@
 *  Find the label and its length.  Ignore blank values.
          CALL NDF_CGET( NDF, 'LABEL', VALUE, STATUS )
          CALL NDF_CLEN( NDF, 'LABEL', NCT, STATUS )
-         NCT = CHR_LEN( VALUE( :NCT ) )
+         NCT = CHR_LEN( VALUE( :MIN( SZFITS, NCT ) ) )
          IF ( NCT .GT. 0 ) THEN
             DESCR( 1:8 ) = 'LABEL   '
 
@@ -628,7 +628,7 @@
 *  Find the units and its length.  Ignore blank values.
          CALL NDF_CGET( NDF, 'UNITS', VALUE, STATUS )
          CALL NDF_CLEN( NDF, 'UNITS', NCT, STATUS )
-         NCT = CHR_LEN( VALUE( :NCT ) )
+         NCT = CHR_LEN( VALUE( :MIN( SZFITS, NCT ) ) )
          IF ( NCT .GT. 0 ) THEN
             DESCR( 1:8 ) = 'BUNITS  '
 
