@@ -58,7 +58,7 @@
       CHARACTER           LSTSTR*12
       CHARACTER           OBS_DATE*24
       CHARACTER           UTSTR*12
-      CHARACTER           WRITE_DATE*8
+      CHARACTER           WRITE_DATE*24
       CHARACTER           LINE*12
       CHARACTER           OBJECT*12
       CHARACTER           ORIGIN*32
@@ -101,14 +101,17 @@
       REAL               FMID
       REAL               RBLANK
       CHARACTER          WRDATE*9
+      CHARACTER          WRTIME*8
       CHARACTER          VELCODE*8
       CHARACTER          VFRAME*4         ! 'TELL', 'HELI', 'GEO' or 'LSR'
       CHARACTER          VDEF*3           ! 'OPT', 'RAD', or 'REL'
 
+      DOUBLE PRECISION   DTEMP
       DOUBLE PRECISION   C  /299792.0D3/
       DOUBLE PRECISION   HOUR_ANGLE
       DOUBLE PRECISION   UTD, UTHRS, JULIAN_DATE, SIDEREAL_TIME
       DOUBLE PRECISION   DPI  /3.141592654/
+      DOUBLE PRECISION   WR_JULIAN_DATE
 
 *     SPECX functions
 
@@ -221,8 +224,17 @@
       XMID = (MIDX-1)*(LXPIX-1) + 1
       YMID = (MIDY-1)*(LYPIX-1) + 1
 
+*     Calculate the current time in the correct FITS format
+*     This requires that we find the current time and date
+*     and convert it to Julian date
       CALL UGETDATE        (WRDATE,        STATUS)
-      CALL DATE_CVT        (WRDATE,        WRITE_DATE)
+      CALL UGETTIME        (WRTIME,        STATUS)
+*      CALL DATE_CVT        (WRDATE,        WRITE_DATE)
+      CALL ASTRO_TIMES (WRTIME, WRDATE, 0.0D0, 0.0D0, .TRUE.,
+     &                  DTEMP, DTEMP, WR_JULIAN_DATE)
+      CALL CVT_TO_DATE_OBS( SPECXJD_TO_MJD(WR_JULIAN_DATE), WRITE_DATE)
+
+*     Calculate the DATE-OBS string in the correct format
 *      CALL DATE_CVT        (IDATE,         OBS_DATE)
       CALL CVT_TO_DATE_OBS( SPECXJD_TO_MJD(JULIAN_DATE), OBS_DATE)
       CALL HOURS_TO_STRING (UTHRS,         UTSTR)
@@ -433,6 +445,9 @@
      &                'Originating reduction system ',       STATUS)
       CALL FIT_WSTR  ('DATE-MAP', WRITE_DATE,
      &                'Date FITS file written ',             STATUS)
+      CALL FIT_WSTR  ('DATE', WRITE_DATE,
+     &                'file creation date(YYYY-MM-DDThh:mm:ss UTC)',
+     &                                                       STATUS)
       CALL FIT_WSTR  ('DATE-OBS', OBS_DATE,
      &                'Date of first map observation ',      STATUS)
 

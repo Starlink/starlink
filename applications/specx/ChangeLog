@@ -1,3 +1,13 @@
+2000-05-18  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* exprt/wrfitsspec.f (SPECX_WRFITSSPEC): Write a FITS Y2K
+	compliant DATE keyword.
+
+	* exprt/wrfitsmap.f (SPECX_WRFITSMAP): Write a FITS Y2K
+	compliant DATE keyword.
+
+	* exprt/wrfitscube.f (SPECX_WRFITSCUBE): Write a FITS Y2K
+	compliant DATE keyword.
 
 Fri Aug 29 09:51:18 1997  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
 
