@@ -1978,7 +1978,7 @@ sub handle_lib_objects
 	     }
 	   return ();
 	 }
-       elsif ($val =~ m{^`(\$\(srcdir\)/)?[a-z_]*_link(_adam)?`$})
+       elsif ($val =~ m{^`(\$\(srcdir\)/)?[a-z_]*_link(_adam)?( *-[a-z-]+)*`$})
          {
            # This is a Starlink extension.  It is common for Starlink
            # libraries to provide a short script, with a name matching
