@@ -7,6 +7,7 @@
 *     BHVAD::RJV
 *    History :
 *    3 Oct 94 : v1.7-0 original (RJV)
+*   13 Dec 94 : v1.8-0 sub-mode added (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -20,11 +21,12 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*10 MODE
+      CHARACTER*10 MODE,SUBMODE
       LOGICAL EXCLUDE
+      LOGICAL MERGE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IREGION Version 1.7-0')
+      PARAMETER (VERSION = 'IREGION Version 1.8-0')
 *-
       CALL USI_INIT()
 
@@ -39,6 +41,9 @@
 *  make sure transformations are correct
         CALL GTR_RESTORE(STATUS)
 
+*  get main mode
+        MERGE=.FALSE.
+        EXCLUDE=.FALSE.
         MODE=' '
         DO WHILE (MODE.EQ.' '.AND.STATUS.EQ.SAI__OK)
           CALL USI_GET0C('MODE',MODE,STATUS)
@@ -49,8 +54,35 @@
             MODE=' '
           ENDIF
         ENDDO
+        CALL IREGION_PARSE_MODE(MODE,MERGE,STATUS)
 
-        CALL USI_GET0L('EXC',EXCLUDE,STATUS)
+
+*  if main mode is mergeable with previous region - get sub-mode
+        IF (MERGE) THEN
+          SUBMODE=' '
+          DO WHILE (SUBMODE.EQ.' '.AND.STATUS.EQ.SAI__OK)
+            CALL USI_GET0C('SUBMODE',SUBMODE,STATUS)
+            CALL CHR_UCASE(SUBMODE)
+            IF (SUBMODE.EQ.'HELP') THEN
+              CALL IREGION_SUBHELP()
+              CALL USI_CANCL('SUBMODE',STATUS)
+              MODE=' '
+            ENDIF
+          ENDDO
+          CALL IREGION_PARSE_SUBMODE(SUBMODE,EXCLUDE,STATUS)
+*  if fresh region - clear decks
+          IF (SUBMODE.EQ.'NEW') THEN
+            CALL IMG_SETWHOLE(STATUS)
+            MERGE=.FALSE.
+          ELSEIF (SUBMODE.EQ.'ADD') THEN
+            MERGE=.FALSE.
+          ELSE
+*  otherwise save current region mask and get memory to store new stuff
+            RPTR=I_REG_PTR
+            CALL DYN_MAPB(1,I_NX*I_NY,I_REG_PTR,STATUS)
+          ENDIF
+        ENDIF
+
         IF (EXCLUDE.AND.I_REG_TYPE.EQ.'NONE') THEN
           CALL ARR_INIT1B('01'X,I_NX*I_NY,%val(I_REG_PTR),STATUS)
           I_REG_TYPE='COMPLEX'
@@ -59,8 +91,6 @@
         IF (STATUS.EQ.SAI__OK) THEN
 
 
-
-          MODE=MODE(:3)
           IF (MODE.EQ.'CIR') THEN
             CALL IREGION_CIRCLE(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'BOX') THEN
@@ -85,16 +115,66 @@
             CALL IREGION_EXPORT(STATUS)
           ELSEIF (MODE.EQ.'IMP') THEN
             CALL IREGION_IMPORT(STATUS)
-          ELSE
-            CALL MSG_PRNT('AST_ERR: unknown mode '//MODE)
           ENDIF
 
 
         ENDIF
 
+        IF (MERGE) THEN
+          CALL IREGION_MERGE(SUBMODE,%val(I_REG_PTR),%val(RPTR),STATUS)
+          CALL DYN_UNMAP(I_REG_PTR,STATUS)
+          I_REG_PTR=RPTR
+        ENDIF
+
       ENDIF
 
       CALL USI_CLOSE()
+
+      END
+
+
+
+*+
+      SUBROUTINE IREGION_MERGE(MODE,NEWREG,OLDREG,STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Import:
+      CHARACTER*(*) MODE
+      BYTE NEWREG(I_NX,I_NY)
+*    Import/Export :
+      BYTE OLDREG(I_NX,I_NY)
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+      BYTE BIT_ANDUB
+*    Local constants :
+*    Local variables :
+      INTEGER I,J
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        IF (MODE.EQ.'AND') THEN
+
+          DO J=1,I_NY
+            DO I=1,I_NX
+              OLDREG(I,J)=BIT_ANDUB(OLDREG(I,J),NEWREG(I,J))
+            ENDDO
+          ENDDO
+
+        ENDIF
+
+      ENDIF
 
       END
 
@@ -698,6 +778,114 @@
 
 
 
+*+
+      SUBROUTINE IREGION_PARSE_MODE(MODE,MERGE,STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global variables :
+*    Import/Export :
+      CHARACTER*(*) MODE
+*    Export :
+      LOGICAL MERGE
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        MODE=MODE(:3)
+
+        IF (MODE.EQ.'CIR'.OR.		! circle
+     :      MODE.EQ.'BOX'.OR.		! box
+     :      MODE.EQ.'POL'.OR.		! polygon
+     :      MODE.EQ.'ANN'.OR.		! annulus
+     :      MODE.EQ.'ELL'.OR.		! ellipse
+     :      MODE.EQ.'REC'.OR.		! rectangle
+     :      MODE.EQ.'GTE'.OR.		! >= level
+     :      MODE.EQ.'ARD') THEN		! ARD text
+
+           MERGE=.TRUE.
+
+        ELSEIF (MODE.EQ.'WHO'.OR.
+     :          MODE.EQ.'SHO'.OR.
+     :          MODE.EQ.'EXP'.OR.
+     :          MODE.EQ.'IMP') THEN
+
+           MERGE=.FALSE.
+
+        ELSE
+           CALL MSG_PRNT('AST_ERR: invalid mode')
+           STATUS=SAI__ERROR
+        ENDIF
+
+
+      ENDIF
+
+      END
+
+
+
+*+
+      SUBROUTINE IREGION_PARSE_SUBMODE(SUBMODE,EXCLUDE,STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global variables :
+*    Import/Export :
+      CHARACTER*(*) SUBMODE
+*    Export :
+      LOGICAL EXCLUDE
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        EXCLUDE=(INDEX(SUBMODE,'NOT').GT.0.OR.
+     :           INDEX(SUBMODE,'EXC').GT.0)
+
+        IF (INDEX(SUBMODE,'ADD').GT.0.OR.
+     :      INDEX(SUBMODE,'OR').GT.0) THEN
+          SUBMODE='ADD'
+        ELSEIF (INDEX(SUBMODE,'AND').GT.0) THEN
+          SUBMODE='AND'
+        ELSEIF (INDEX(SUBMODE,'NEW').GT.0) THEN
+          SUBMODE='NEW'
+        ELSEIF (EXCLUDE) THEN
+          SUBMODE='NEW'
+
+        ELSE
+           CALL MSG_PRNT('AST_ERR: invalid sub-mode')
+           STATUS=SAI__ERROR
+        ENDIF
+
+
+      ENDIF
+
+      END
+
+
 
 *+
       SUBROUTINE IREGION_HELP()
@@ -738,6 +926,50 @@
 
       CALL MSG_BLNK()
       CALL MSG_PRNT('*** WARNING - ellipse doesn''t work yet!!')
+      CALL MSG_BLNK()
+
+      END
+
+
+
+
+*+
+      SUBROUTINE IREGION_SUBHELP()
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+*    Global variables :
+*    Import :
+*    Export :
+*    Status :
+*    Function declarations :
+*    Local constants :
+      INTEGER NLINE
+      PARAMETER (NLINE=6)
+*    Local variables :
+      CHARACTER*79 TEXT(NLINE)
+     :/' ',
+     : ' ',
+     : ' ',
+     : ' ',
+     : ' ',
+     : ' '/
+      INTEGER ILINE
+*-
+
+      CALL MSG_BLNK()
+      CALL MSG_PRNT('Valid sub-modes are:')
+      CALL MSG_BLNK()
+      DO ILINE=1,NLINE
+        CALL MSG_PRNT(TEXT(ILINE))
+      ENDDO
+
       CALL MSG_BLNK()
 
       END

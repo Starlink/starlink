@@ -512,7 +512,8 @@
      :              /'  TRIANGLE     - Triangular response')
       CALL MSG_PRNT( 'TOPHAT       - Circular tophat function '/
      :              /'  FLAT_TRI     - Triangle with flat top')
-      CALL MSG_PRNT( 'KING         - King profile ')
+      CALL MSG_PRNT( 'LORENTZ      - Lorentzian response      '/
+     :              /'  KING         - King profile ')
       CALL MSG_PRNT( ' ')
 
 *    Define the default mask
