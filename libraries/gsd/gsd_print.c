@@ -44,6 +44,11 @@
  *       Original version.
  *    01 Dec 1994 (hme):
  *       Translation to C. Use Unix-ported GSD library.
+
+ * Copyright:
+ *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
+ *    All Rights Reserved. 
+
  *-
  */
 

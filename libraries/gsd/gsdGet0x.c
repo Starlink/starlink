@@ -76,6 +76,10 @@
  *       Let gsd1_getval do the type conversion.
  *       Do not abort when the item is an array. But always specify to
  *       gsd1_getval, that element 1 is the first and last.
+
+ * Copyright:
+ *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
+ *    All Rights Reserved. 
  *-
  */
 

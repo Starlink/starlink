@@ -110,6 +110,11 @@
  *       ANSI C. Change the two given integers to be passed by value.
  *    08 Dec 1994 (hme):
  *       Use gsd2_nativa routine.
+
+ * Copyright:
+ *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
+ *    All Rights Reserved. 
+
  *-
  */
 

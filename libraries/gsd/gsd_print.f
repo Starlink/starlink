@@ -43,6 +43,11 @@
 *    the new library a string array can be returned only if the strings
 *    are declared exactly 16 characters long.
 *
+
+* Copyright:
+*    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
+*    All Rights Reserved. 
+
       IMPLICIT NONE
 *
       INCLUDE 'GSDPARS'

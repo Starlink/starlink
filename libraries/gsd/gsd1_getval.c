@@ -102,6 +102,11 @@
  *    07 Dec 1994 (hme):
  *       Check that last item is within array.
  *       Convert numeric types.
+
+ * Copyright:
+ *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
+ *    All Rights Reserved. 
+
  *-
  */
 

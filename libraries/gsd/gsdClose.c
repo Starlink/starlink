@@ -51,6 +51,11 @@
  *       Adaption to Remo's C code.
  *    30 Nov 1994 (hme):
  *       Translation to C. Renamed from GSD_CLOSE. Interface revised.
+
+ * Copyright:
+ *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
+ *    All Rights Reserved. 
+
  *-
  */
 

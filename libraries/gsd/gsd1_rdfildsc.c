@@ -54,6 +54,11 @@
  *       structure.
  *    08 Dec 1994 (hme):
  *       Use gsd2_nativx routines.
+
+ * Copyright:
+ *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
+ *    All Rights Reserved. 
+
  *-
  */
 

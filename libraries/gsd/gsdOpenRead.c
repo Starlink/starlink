@@ -97,6 +97,10 @@
  *       Support for the actual given filename. 
  *    01 Apr 1997 (timj)
  *       Support for actual given filename in remote DATADIR
+
+ * Copyright:
+ *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
+ *    All Rights Reserved. 
  *-
  */
 

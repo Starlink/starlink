@@ -36,6 +36,11 @@
  * History:
  *    12 Dec 1994 (hme):
  *       Original version.
+
+ * Copyright:
+ *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
+ *    All Rights Reserved. 
+
  *-
  */
 

@@ -30,6 +30,11 @@
  *    29 Nov 1994 (hme):
  *       Remove the system-dependent static external host_order from this file.
  *       Remove the static external gsd_byte as well, used only in one routine.
+
+ * Copyright:
+ *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
+ *    All Rights Reserved.
+
  *-
  */
 

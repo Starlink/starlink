@@ -1,5 +1,21 @@
 1999-12-15  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* gsd_print.f (GSD_PRINT): Add copyright statement
+
+	* gsd_pars.inc: Add copyright statement
+
+	* *.c: Add copyright statement
+
+	* gsd.h: Add copyright statement
+
+	* gsd1.h: Add copyright statement
+
+	* gsd2_alpha_OSF1.h: Add copyright statement
+
+	* gsd2_sun4.h: Add copyright statement
+
+	* gsd2_sun4_Solaris.h: Add copyright statement
+
 	* gsd2_ix86_Linux.h: Added
 
 	* mk: Add ix86_Linux
