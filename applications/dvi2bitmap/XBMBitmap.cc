@@ -1,11 +1,11 @@
 // $Id$
 
+#include "Bitmap.h"
+#include "XBMBitmap.h"
+
 #include <iostream>		// debug code writes to cerr
 #include <cstdio>
 #include <cctype>
-
-#include "Bitmap.h"
-#include "XBMBitmap.h"
 
 XBMBitmap::XBMBitmap (const int w, const int h)
     : BitmapImage (w, h)
