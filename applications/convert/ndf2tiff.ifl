@@ -1,0 +1,52 @@
+# NDF2TIFF - Converts an NDF into an 8-bit TIFF-6.0-format file.
+
+#+
+#  Name:
+#     NDF2TIFF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     GJP: Grant Privett (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     22-NOV-1995 (GJP):
+#        Original version.
+#      5-DEC-1995 (AJC):
+#        Added helplib
+#     1996 February 19 (MJC):
+#     	 Converted to standard (and more readable) style, and added
+#	 function banner.
+#     {enter_further_changes_here}
+
+#-    
+
+interface NDF2TIFF
+
+   helplib        $CONVERT_HELP
+
+   parameter      IN             # The name of the source NDF image to be used.
+      position    1
+      type        'NDF'
+      access      'READ'
+      prompt      'NDF to convert'
+      ppath       'GLOBAL,CURRENT'
+      vpath       'PROMPT'
+      association '<->GLOBAL.DATA_ARRAY'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # The output TIFF file.
+      position    2
+      type        '_CHAR'
+      access      'UPDATE'
+      prompt      'TIFF file'
+      ppath       'CURRENT,DEFAULT'
+      vpath       'PROMPT'
+      helpkey     '*'
+   endparameter
+
+endinterface
