@@ -183,13 +183,6 @@ AC_SUBST(STAR_FCFLAGS)
 AC_SUBST(STAR_FFLAGS)
 AC_SUBST(STAR_LDFLAGS)
 
-# Add these new flags to the LIBS variable, so they're visible in the
-# tests below.  Specifically, they need to be visible when the
-# $ac_link variable is used to compile tests.  This will result in the
-# flags appearing twice in the link commands used to build the
-# package; there's nothing we can do about that, but it's harmless.
-# LIBS="$LIBS $STAR_LDFLAGS"
-
 
 ## If the docs-only option was given, this expands to nothing,
 ## else to the _STAR_RESTFP_FIX macro. 
