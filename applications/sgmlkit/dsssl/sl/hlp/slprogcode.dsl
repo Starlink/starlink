@@ -1,10 +1,8 @@
 <!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
 
-<![ IGNORE [ <!-- These are not currently used -->
-   <!ENTITY lib.dsl     SYSTEM "sllib-jade-1.2.1.dsl" SUBDOC>
-   <!ENTITY common.dsl  SYSTEM "slcommon.dsl" SUBDOC>
-   <!ENTITY dblib.dsl   SYSTEM "dblib.dsl">
-]]>
+   <!ENTITY lib.dsl       SYSTEM "../lib/sllib-jade-1.2.1.dsl">
+   <!ENTITY common.dsl    SYSTEM "../common/slcommon.dsl">
+   <!ENTITY dblib.dsl     SYSTEM "../lib/dblib.dsl">
 
 ]>
 
@@ -168,7 +166,7 @@
                                (if trimmed?
                                    (empty-sosofo)
                                    (make formatting-instruction data: chr)))
-                            (process-node-list node))))))))
+                            (process-children-verb verb-strip node))))))))
 
 
 ;  Process blocks.  An element may have p content, but if the first
@@ -224,6 +222,10 @@
 ;  Some generic functions which are declared elsewhere in the downconverter
 ;  set; definitions are given here for convenience so that this stylesheet
 ;  can be freestanding.
+;
+;  It would be better to use them from their existing homes in the various
+;  library files, but I am unable to get the syntax right to reference
+;  those definitions from this file :-(.
 
 ;  Trim a string of spaces at both ends.
       (define (trim-string s)
@@ -255,6 +257,15 @@
                 chars
                 (loop (cons (string-ref str k) chars) (- k 1)))))
 
+;  List->string - DSSSL function not implemented in Jade 1.2.1.
+      (define (list->string chars)
+        (let loop ((cl chars)
+                   (str ""))
+          (if (null? cl)
+              str
+              (loop (cdr cl)
+                    (string-append str (string (car cl)))))))
+
 ;  Map - DSSSL function not implemented in Jade 1.2.1.
       (define (map f #!rest xs)
          (let ((map1 (lambda (f xs)
@@ -273,6 +284,75 @@
                           '()
                           (cons (apply f (map1 car xs))
                                 (loop (map1 cdr xs)))))))))
+
+
+;  Assoc - the value of a key from an associative list (or #f if key is
+;  not present).
+      (define (assoc obj alist)
+        (let loop ((al alist))
+          (if (null? al)
+              #f
+              (if (equal? obj (car (car al)))
+                  (car al)
+                  (loop (cdr al))))))
+
+;  Isspace? - is character whitespace.
+   (define (isspace? c)
+      (or (not c)
+          (char=? c #\space)
+          (char=? c #\&#TAB)))
+
+
+;  Tokenise-string - tokenise a string.
+   (define (tokenise-string str
+                            #!key
+                            (boundary-char? isspace?)
+                            (isbdy? (lambda (l)
+                                      (if (boundary-char? (car l))
+                                          (let loop ((rest l))
+                                            (if (null? rest)
+                                                '()
+                                                (if (boundary-char? (car rest))
+                                                    (loop (cdr rest))
+                                                    rest)))
+                                          #f)))
+                            (max -1))
+     (let loop ((charlist (string->list str))
+                (wordlist '())
+                (currword '())
+                (splits max))
+       (if (or (= splits 0)                ;reached max split
+               (null? charlist))           ;nothing more to do
+           (let ((cw (append currword charlist)))
+             (if (null? cw)
+                 wordlist
+                 (append wordlist (list (list->string cw)))))
+           (let ((nextword (isbdy? charlist)))
+             (if nextword
+                 (loop nextword            ;word just ended - add to list
+                       (append wordlist (list (list->string currword)))
+                       '()
+                       (- splits 1))
+                 (loop (cdr charlist)      ;within word
+                       wordlist
+                       (append currword (list (car charlist)))
+                       splits))))))
+
+
+;  Get-mediatypes - get value of the media attribute as associative list.
+      (define (get-mediatypes #!optional (nd (current-node)))
+         (let ((medstr (attribute-string (normalize "media") nd)))
+            (if medstr
+                (map (lambda (s)
+                        (let ((l (tokenise-string (trim-string s) max: 1)))
+                           (cons (car l) (if (> (length l) 1) 
+                                             (car (cdr l)) 
+                                             #f))))
+                   (tokenise-string 
+                      (normalize medstr)
+                      boundary-char?: (lambda (c) (char=? c #\,))))
+              #f)))
+
 
 
 
@@ -475,6 +555,14 @@
             (indent-block (process-children-normal))
             (with-mode active (process-first-descendant 'attribution))
             (request "sp")))
+
+      (element span
+         (let ((mediatypes (get-mediatypes (current-node))))
+            (if (or (not mediatypes)
+                    (assoc "tty" mediatypes)
+                    (assoc "all" mediatypes))
+                (process-children-normal)
+                (empty-sosofo))))
 
             
 ;  Programcode specific elements.
