@@ -1,0 +1,62 @@
+      SUBROUTINE PARSEAT( FILNAM )
+*+
+*  Name:
+*     PARSEAT
+
+*  Purpose:
+*     Translate @ file name according to environment variables.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL PARSEAT( FILNAM )
+
+*  Description:
+*     This routine takes a file name and removes any leading $ sign.
+*     Thus $SOME_DIR:some_file.spx might be translated into
+*     SOME_DIR:some_file.spx.
+
+*  Arguments:
+*     FILNAM = CHARACTER * ( * ) (Given and Returned)
+*        The filename, translated in situ. It must be long enough to
+*        hold the translated name.
+
+*  Authors:
+*     hme: Horst Meyerdierks (UoE, Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     07 Feb 1994 (hme):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Arguments Given and Returned:
+      CHARACTER * ( * ) FILNAM
+
+*  Local Variables:
+      INTEGER I
+      INTEGER FILLEN
+
+*  Internal References:
+      INTEGER GEN_ILEN
+
+*.
+
+      IF ( FILNAM(:1) .NE. '$' ) RETURN
+
+      FILLEN = GEN_ILEN( FILNAM )
+      DO 1 I = 1, FILLEN - 1
+         FILNAM(I:I) = FILNAM(I+1:I+1)
+ 1    CONTINUE
+      FILNAM(FILLEN:) = ' '
+
+      END

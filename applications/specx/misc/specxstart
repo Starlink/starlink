@@ -1,0 +1,99 @@
+#+
+#  Name:
+#     specxstart
+#
+#  Purpose:
+#     Start the Specx package from the C shell.
+#
+#  Type of Module:
+#     C shell command list
+#
+#  Invocation:
+#     source specxstart
+#
+#  Description:
+#     This procedure starts the Specx package for use from the C shell by
+#     setting a couple of environment variables and an alias to run the
+#     executable programme.
+#
+#  Prior Requirements (edited for STANDALONE by Remo Tilanus)
+#
+#        SYS_SPECX: The directory with the executable system, including
+#           standard command files. Normally .../.../specx
+#
+   if !($?SYS_SPECX) then
+     echo ' '
+     echo '   You have to define SYS_SPECX to point to the SPECX directory,'
+     echo '   i.e. setenv SYS_SPECX .../.../specx.'
+     echo ' '
+     echo '   Then type: source ${SYS_SPECX}/specxstart to initialize the'
+     echo '   SPECX environment. Then type specx to start the programme.'
+     echo ' '
+     echo '   You may want to edit specx.csh and put it somewhere in your'
+     echo '   path as specx to do this for you or put the initialization'
+     echo '   in your .cshrc or .login file'
+     echo ' '
+     exit
+   endif
+#
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     rpt: Remo Tilanus (JAC, Hilo)
+#     rp:  Rachael Padman (MRAO, Cambridge)
+#     {enter_new_authors_here}
+#
+#  History:
+#     11 Feb 1994 (hme):
+#        Original Version.
+#     16 Feb 1994 (rpt):
+#        STAND-ALONE VERSION
+#     30 Sep 1995 (rp):
+#        Include SXG_GRAPHCAP
+#     {enter_changes_here}
+#
+#-
+#.
+#
+#  There is a file used by a READ/NAMELIST statement to set initial
+#  values for a number of parameters. It is known as $SPECX_INIT.
+#
+   setenv SPECX_INIT $SYS_SPECX/specx_init.dat
+#
+#  There is also the user's file which is @-ed at startup. If the user
+#  has not yet set $SPXINIT to point to her own such file, then we will
+#  use a default one.
+#
+   if ${?SPXINIT} then
+      echo > /dev/null
+   else
+      setenv SPXINIT    $SYS_SPECX/init.spx
+   endif
+#
+#  Point to specx.shl (.shl default) as help file.
+#
+   setenv SPECX_HELP  ${SYS_SPECX}/specx
+#
+#  The standard command definitons use $SPECX_COMMAND for the directory
+#  to find .spx files. This is the same as $SYS_SPECX.
+#
+   setenv SPECX_COMMAND $SYS_SPECX
+#
+#  The current environment is dumped as commanded to the file SPECX_DUMP.
+#  Initialize the value of this to specx.dmp
+#
+   setenv SPECX_DUMP specx.dmp
+#
+#  Finally, the user wants to run the programme via the alias specx.
+#
+   alias specx $SYS_SPECX/specx
+#
+#  PGPLOT X displayer and font file
+#
+#  setenv PGPLOT_DIR   $SYS_SPECX
+#  setenv PGPLOT_FONT  $PGPLOT_DIR/grfont.dat
+   setenv PGPLOT_XW_WIDTH 0.67
+#
+#  Point to graphics definition file for SXG routines
+#
+   setenv SXG_GRAPHCAP $SYS_SPECX/graphcap.txt
+

@@ -1,0 +1,37 @@
+#  Graphcap.txt
+#
+#  Graphics capabilities of PGPLOT devices 
+#
+#  Device number conforms to the following rule:-
+#   1 - 9     dual screen terminal
+#   10 - 19   single screen terminal
+#   20 - 29   print devices with output in real-time
+#   30 -      print devices plotting to file
+#
+#  Format:
+#    Col 1:  SXGPGPLOT internal device #
+#    Col 2:  SXGPGPLOT prompt string
+#    Col 3:  PGPLOT device name
+#    Col 4:  Terminal? (T or F)
+#    Col 5:  Dual screen? (T or F)
+#    Col 6:  Hardcopy? (T or F)
+#    Col 7:  Hardcopy output file (empty for default)
+#
+1   pericom_7800   pericom_78700  T  T  F
+2   pericom_mg     pericom_mg     T  T  F
+3   cifer_t5       cifer_t5       T  T  F
+4   graphon        graphon        T  T  F
+12  tek_4010       tek_4010       T  F  F
+13  tek_4014       tek_4014       T  F  F
+17  xw             /XWINDOW       T  F  F
+17  x2w            /XWINDOW       T  F  F
+17  x3w            /XWINDOW       T  F  F
+17  x4w            /XWINDOW       T  F  F
+20  cps_l          /cps           F  F  T
+20  cps_p          /vcps          F  F  T
+21  ps_l           /ps_l          F  F  T
+21  ps_p           /ps_p          F  F  T
+30  ecpsf_ltex     /cps           F  F  T
+30  ecpsf_ptex     /vcps          F  F  T
+31  epsf_ltex      /ps            F  F  T
+31  epsf_ptex      /vps           F  F  T

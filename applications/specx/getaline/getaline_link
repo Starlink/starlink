@@ -1,0 +1,1 @@
+echo -L./getaline -lgetaline -lreadline -lhistory -ltermcap

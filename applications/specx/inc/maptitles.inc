@@ -1,0 +1,3 @@
+      CHARACTER       MAPTIT(3)*11, AXTIT(3)*6, UNITS*8
+      COMMON /TITLES/ MAPTIT,       AXTIT,      UNITS
+      SAVE   /TITLES/

@@ -1,0 +1,71 @@
+      subroutine qualifiers (use_dump, dumpname, 
+     &                       use_old_map, use_map, mapname)
+
+*  Routine to fetch dump and map qualifiers from SPECX command line.
+
+      implicit none
+
+*  Formal parameters:
+
+      logical*4 use_dump
+      character dumpname*(*)
+      logical*4 use_old_map
+      logical*4 use_map
+      character mapname*(*)
+
+      include '($ssdef)'
+
+      integer*4 istat
+      integer*4 lname
+
+      integer*4 cli$present, cli$get_value
+      external cli$_present, cli$_absent, cli$_defaulted, cli$_negated
+
+*     type *,'-- Qualifiers --'
+
+      use_dump = .true.
+
+      if (cli$present ('DUMP') .eq. %loc(cli$_present)) then
+*       type *,'Qualifier /DUMP present in command line'
+        istat = cli$get_value ('DUMP', dumpname, lname)
+        if (istat .eq. ss$_normal) then
+*         type *,'Dump file name ',dumpname(:lname)
+        else if (istat .eq. %loc(cli$_absent)) then
+*         type *,'No dump file name given!'
+        end if
+      else if (cli$present ('DUMP') .eq. %loc(cli$_negated)) then
+*       type *,'Qualifier /DUMP negated in command line'
+        use_dump = .false.
+      else if (cli$present ('DUMP') .eq. %loc(cli$_absent)) then
+*       type *,'No /DUMP qualifier found'
+      end if
+
+      if (cli$present ('MAP') .eq. %loc(cli$_present)) then
+*       type *,'Qualifier /MAP present in command line'
+        istat = cli$get_value ('MAP', mapname, lname)
+        if (istat .eq. ss$_normal) then
+*         type *,'Map file name given; ',mapname(:lname)
+          use_map     = .true.
+          use_old_map = .false.
+        else if (istat .eq. %loc(cli$_absent)) then
+*         type *,'No map file name given!'
+          use_map     = .false.
+          use_old_map = use_dump
+        end if
+
+      else if (cli$present ('MAP') .eq. %loc(cli$_negated)) then
+*       type *,'Qualifier /MAP negated in command line'
+        use_map     = .false.
+        use_old_map = .false.
+
+      else if (cli$present ('MAP') .eq. %loc(cli$_absent)) then
+*       type *,'No /MAP qualifier found'
+        use_map     = .false.
+        use_old_map = use_dump
+      end if
+
+*     type *,'use_map, use_old_map, mapname=', use_map,
+*    &        use_old_map, mapname
+
+      return
+      end

@@ -1,0 +1,35 @@
+#  Graphcap.txt
+#
+#  Graphics capabilities of PGPLOT devices
+#  Starlink GKS/PGPLOT version
+#
+#  Device number should conform to the following rules:-
+#   1 - 9     dual screen terminal
+#   10 - 19   single screen terminal
+#   20 - 29   print devices with output in real-time
+#   30 -      print devices plotting to file
+#
+#  Format:
+#    Col 1:  SXGPGPLOT internal device #
+#    Col 2:  SXGPGPLOT prompt string
+#    Col 3:  PGPLOT device name  (PGPLOT/GKS version)
+#    Col 4:  Terminal? (T or F)
+#    Col 5:  Dual screen? (T or F)
+#    Col 6:  Colour capability? (T or F)
+#    Col 7:  Hardcopy? (T or F)
+#    Col 8:  Hardcopy output file (empty for default = specxdir:specx_pgplot.ps)
+#
+#   2              3              4  5  6  7    8
+1   retro          /retro         T  T  F  F
+11  ikon           /ikon          T  F  T  F
+12  tek_4010       /tek_4010      T  F  F  F
+13  tek_4014       /tek_4010      T  F  F  F
+17  xw             /xwindows      T  F  T  F
+20  pscol_l        /pscol_l       F  F  T  T    specx_pgplot.ps
+20  pscol_p        /pscol_p       F  F  T  T    specx_pgplot.ps
+21  ps_l           /ps_l          F  F  F  T    specx_pgplot.ps
+21  ps_p           /ps_p          F  F  F  T    specx_pgplot.ps
+30  epsfcol_l      /epsfcol_l     F  F  T  T    specx_pgplot.eps
+30  epsfcol_p      /epsfcol_p     F  F  T  T    specx_pgplot.eps
+31  epsf_l         /epsf_l        F  F  F  T    specx_pgplot.eps
+31  epsf_p         /epsf_p        F  F  F  T    specx_pgplot.eps

@@ -1,0 +1,331 @@
+ X-scale units set - km/s  
+ new plot device has SPECX internal #          17
+ Data seem to be pre-Sept.88
+ Scan #  244
+ --------------------
+
+ Source_name L483                                Observer: NDP             
+ Recorded on 03-SEP-87 at 05:06:17 (UT)
+
+ Map centre is at R.A.  18 14 50.5 Dec. - 4 40 48.98
+
+ Local coordinate system: ;  Position angle of y-axis   0.0 (degrees E of N)
+ Local cell size  10.0 by  10.0 arcsec
+ Offset is (   0.00,   0.00) raster units
+ Scan direction HORIZONTAL       Scan type is DISCRETE        
+ Map size   7 by   7
+ Map start at (  -3.00,  -3.00) raster units
+
+ File contains  49 spectra
+
+ GSD version  3.0
+ Data seem to be pre-Sept.88
+          (x,y) offset = (   0.0,   0.0) arcsec
+          rotation angles: x2y =   90.0 deg.; v2y =    0.0 deg.
+          (r,d) offset = (   0.0,   0.0) arcsec
+
+
+ Stack posn    Scan no    Title
+     X          244      0043.025_B L483      JCMT 
+     Y          244      0043.025_A L483      JCMT 
+ X-register now contains scan  244: 0043.025_A L483      JCMT 
+
+  Quad.   Centre freq.   Increment                  Start        End
+             (GHz)         (MHz)   (km/s  )     (km/s  )       (km/s  )
+ -------------------------------------------------------------------
+
+    1      230.497998        0.7422   -0.9651     92.2360      30.4669
+    2      230.537999        0.7422   -0.9651     40.2202     -21.5488
+    3      230.578001        0.7422   -0.9651    -11.7968     -73.5658
+    4      230.618002        0.7422   -0.9651    -63.8126    -125.5816
+
+ Plot opened; sequence no. 001
+rm: l483core.sdf: No such file or directory
+ Number of stack positions in use is  3
+
+ ( 4 stack positions, length 2048 points)
+ (Y-register data starts at STACK(2304))
+
+
+               Data stack contents
+
+
+ Stack posn    Scan no    Title
+     X           15      DARK_CLOUDS     L483      
+     Y          244      0043.025_A L483      JCMT 
+     Z          244      0043.025_B L483      JCMT 
+     T                                             
+
+  Quad.   Centre freq.   Increment                  Start        End
+             (GHz)         (MHz)   (km/s  )     (km/s  )       (km/s  )
+ -------------------------------------------------------------------
+
+    1      230.537999        0.7422   -0.9651     40.2215     -21.5475
+ Doing R-L-B for quadrant/sub-band #            1
+           2 baseline regions currently defined
+ **Invalid default interval**
+
+ Plot opened; sequence no. 002
+           0 baseline regions currently defined
+ <<EOF implied>>
+ <<EOF implied>>
+
+
+          No of Iterations =     3          Final SUMSQ = 0.2183E+02
+
+                   Parameters of current gaussian model
+
+                  N       Amp.        Width (km/s  )    Pos'n (km/s  )
+                  1      5.890           5.26            15.80
+
+
+
+ Baseline calculated - Pushed into stack
+ new plot device has SPECX internal #          21
+
+ Plot opened; sequence no. 003
+           1 baseline regions currently defined
+ <<EOF implied>>
+ <<EOF implied>>
+
+
+          No of Iterations =     4          Final SUMSQ = 0.8042E+01
+
+                   Parameters of current gaussian model
+
+                  N       Amp.        Width (km/s  )    Pos'n (km/s  )
+                  1      3.886           2.06            12.61
+                  2      7.292           3.03            16.19
+
+
+
+ Baseline calculated - Pushed into stack
+ <<EOF implied>>
+ <<EOF implied>>
+ Disposing of existing plot file...
+ Plotting on hardcopy device
+ Output in file gks74.ps[.N]
+ new plot device has SPECX internal #          17
+rm: l483core.map: No such file or directory
+
+ Map centre (i.e. pos'n corresponding to centre pixel)
+ will be the map centre of first spectrum ADDed to the
+ map after it is created. Use ED-S-H on first spectrum
+ if you want to force some other map centre.
+
+    R.A.  18 14 50.5
+    Dec. -04 40 49.00
+ Current scan header used as prototype for map
+  2 blocks of data per mapped spectrum
+ Spectrum placed in cell (    3,   -3) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    2,   -3) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    1,   -3) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    0,   -3) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -1,   -3) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -2,   -3) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -3,   -3) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    3,   -2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    2,   -2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    1,   -2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    0,   -2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -1,   -2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -2,   -2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -3,   -2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    3,   -1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    2,   -1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    1,   -1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    0,   -1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -1,   -1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -2,   -1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -3,   -1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    3,    0) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    2,    0) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    1,    0) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    0,    0) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -1,    0) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -2,    0) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -3,    0) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    3,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    2,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    1,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    0,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -1,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -2,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -3,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    3,    2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    2,    2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    1,    2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    0,    2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -1,    2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -2,    2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -3,    2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    3,    3) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    2,    3) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    1,    3) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    0,    3) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -1,    3) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -2,    3) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -3,    3) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    6,   -2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    5,   -2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    4,   -2) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    6,   -1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    5,   -1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    4,   -1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    6,    0) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    5,    0) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    4,    0) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -4,   -1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -5,   -1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -6,   -1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -4,    0) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -5,    0) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -6,    0) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -4,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -5,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (   -6,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    8,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    7,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    6,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    5,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Spectrum placed in cell (    4,    1) 
+  -- position is   0.0 arcsec in X and   0.0 arcsec  in Y from pixel centre
+ Contents of map file l483core_map                                                                    
+ File name: L483core                                
+ Owner:     starlink    
+
+ Map centre - from map header:
+    R.A.  18 14 50.58
+    Dec. -04 40 49.0
+
+ R.A.  17 cells @  10.0 arcsec
+ Dec.   9 cells @  10.0 arcsec
+
+   72 spectrum positions used in map file
+    3 blocks reserved for INDEX area
+    0 blocks per entry in map
+
+
+ Prototype spectrum header
+
+ ------------------------------------------------------------------------
+
+ Scan :   0  Title : DARK_CLOUDS     L483      
+  Recorded on 03-SEP-87 at 05:06:17(UT)
+
+ ------------------------------------------------------------------------
+
+ Map centre: R.A. 18 14 50.58  Dec. -04 40 49.00
+     Offset (R.A.,Dec.):  (    0.0      0.0) arcsec.
+ Integration Period :   120.00sec
+ Azimuth     0.00  Elevation    63.10 Degrees
+ Vrad :     0.0Km/s
+
+ Data observed using RAD velocity law; Freq's corrected to LSR  ref. frame.
+ Master sub-band =  0
+ Quad.  #pts. Cent.Ch  Rest Freq(GHz) Obs.Freq(GHz) Inc.freq(MHz) Tsys(K)
+  1     65     33.0       230.5380      230.5380        0.742    860.40    
+
+ ------------------------------------------------------------------------
+
+ Third co-ordinate is Velo
+
+  --- mwindo ---  error in spectral-axis calculation
+ --- mapimage ---
+     file contains (# of maps)            1
+     each has size (x by y) =           49          25
+     virtual memory got (bytes)  =         4900
+  -- contour_map --
+     Min and Max on map =   0.1064717      0.9390055    
+ --- mapimage ---
+     file contains (# of maps)            1
+     each has size (x by y) =           49          25
+     virtual memory got (bytes)  =         4900
+  -- contour_map --
+     Min and Max on map =   0.1064717      0.9390055    
+ Setting colour table 4: blue to yellow
+ Offsets in map coordinates:   0.0000000E+00  0.0000000E+00
+
+ Plot opened; sequence no. 004
+rm: l483cmap_map.sdf: No such file or directory
+
+ Map file l483cmap_map opened.
+ Map version number:    4.100000    
+ --- mapimage ---
+     file contains (# of maps)            1
+     each has size (x by y) =           49          25
+     virtual memory got (bytes)  =         4900
+  -- contour_map --
+     Min and Max on map =   0.1064717      0.9390055    
+ <<EOF>>

@@ -1,0 +1,42 @@
+                           GET_ALINE
+
+
+The installation of 'get_aline' is very simple. Too simple for
+a Makefile.
+
+Use:
+----
+     See get_aline.l
+
+Compilation:
+------------
+
+     (g)cc  -c  [ -DNEED_RINDEX | -DNO_READLINE ]  get_aline.c
+
+ NEED_RINDEX: systems which do not have index and rindex installed
+              (e.g.Sunos5.x) can and probably should use this option.
+              Clearly, linking errors to the effect that index/rindex
+              are undefined are an indication it should be used.
+              (NOTE: for STARLINK it also looks at the SYSTEM
+               variable. If you find you need rindex, you can also
+               add your STARLINK system definition in get_aline.c.
+               Look for sun4_Solaris.)
+
+NO_READLINE:  to compile applications on systems which do not
+              have the READLINE library from GNU's Bash distribution.
+              Get_aline will use the standard I/O function
+              fgets instead. Command-line editing etc. will not be
+              available.
+
+
+Installation:
+-------------
+
+Put the object file somewhere (optional) and edit get_aline_link to
+reflect its location as well as the location of GNU's readline library
+(if present). For ease of use put get_aline_link in a directory which
+is in users' paths (e.g. /usr/local/bin).
+Get_aline_link will substitute the correct link commands when used
+within back-quotes in a compile statement:
+
+        cc csample.c `get_aline_link` -o csample

@@ -1,0 +1,46 @@
+Changes made to setx.f:
+
+Tim Jenness 1996/06/05
+
+
+------
+
+
+Put SNGL and DBLE round variables to match up data types
+
+eg    realvar = SNGL(doublevar)
+
+Rename XSCALE as XSCALE8 if double precision so that it doesn't get confused
+with XSCALE everywhere else. (Same for XFAC and XFAC8)
+
+SUBROUTINE SETX8
+
+	Change call to SETXPTS so that passes first member of XFAC8 NOT
+	the entire array (it expects a single value) to make things explicit
+
+
+    Problems:
+
+	Call to SETXASTRO.  IUTFLG is a LOGICAL but the COMMON block
+	(stackcomm) defines IUTFLG as a BYTE!
+	Can I just change the COMMON BLOCK? and IUTFLG = .TRUE. instead of 1
+
+
+SUBROUTINE SETXFREST
+
+	Change IF statement so that now checks if DOUBLE is greater than
+	small number rather than NOT_EQUAL to 0
+
+SUBROUTINE SETXDOPP
+
+	First argument is DOUBLE but CHANGE_SIDEBAND passes a REAL.
+
+	This is okay from reduce/lsrcor.f (REAL*8 - change to DOUBLE?)
+	and in exprt/calc_image.f
+
+	
+Changes to reduce/change_sb.f:
+
+
+	Change DF to DOUBLE PRECISION
+

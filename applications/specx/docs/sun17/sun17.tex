@@ -1,0 +1,556 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {17.6}
+\newcommand{\stardocauthors}
+   {R.\,M.\,Prestage, H.\,Meyerdierks, J.\,F.\,Lightfoot}
+\newcommand{\stardocdate}      {13 January 1995}
+\newcommand{\stardoctitle}
+   {SPECX --- A Millimetre Wave Spectral Reduction Package}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+DRAL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+{\large Particle Physics \& Astronomy Research Council}\\
+{\large Starlink Project\\}
+{\large \stardoccategory\ \stardocnumber(tex)}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\begin{center}
+{\Large\it Version 6.2 (VMS) and 6.6 (Unix)}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+
+\section {Introduction}
+
+SPECX is a general mm and sub-mm wavelength data reduction system
+written by Rachael Padman at MRAO. At the time of writing the latest
+formally released version on the VAX is 6.2. However, pre-release copies
+of version 6.3 are widely used. Branching off from the 6.3 VMS version,
+SPECX was ported to Unix by Horst Meyerdierks of the Starlink Project
+and Rachael Padman. Remo Tilanus at JACH supplied the core routines to
+read GSD files. The software version count on Unix increased rather
+rapidly. 6.4 was the initial Unix port of 6.3, but it existed only in
+beta-test versions. The first released version was 6.5, but it lacked
+the commands to read GSD files. The current version on Unix is 6.6.
+
+Although SPECX may be used to process spectra obtained from many
+different instruments, Starlink users will find it particularly useful
+for the reduction of data obtained with the James Clerk Maxwell
+Telescope.  SPECX has it's own command line interpreter, and manipulates
+spectra on a pop-down stack.  The package is designed to work on a
+graphics terminal with dual-screen facility and VT emulation ({\em e.g.}
+a Pericom MG100), but can be usefully run on other graphics terminals.
+More and more, X displays are used where an {\tt xterm} client (or {\tt
+DECterm} on VMS) takes the role of the alpha-numeric screen and a GWM
+window that of the graphics screen.  Hardcopy may be output on a number
+of printers for which GKS drivers are provided by Starlink. In the Unix
+version these are mainly different PostScript printers.
+
+Some of the major features of SPECX are:
+\begin{itemize}
+\item
+The ability to process up to eight spectra (quadrants) simultaneously:
+these may have the same or different centre frequencies, resolutions, 
+{\em etc.} This allows users to operate on different filter-banks, or
+dual polarisation data for example, in parallel. 
+\item
+The ability to automatically save the current status of the system 
+after each command is executed. This means that if SPECX is
+stopped (unintentionally or otherwise), when restarted it will
+`remember' the previous state of the program.
+\item
+Commands for the listing and display of spectra on a graphics
+terminal, with hardcopy on a variety of printers.
+\item
+Single and multiple scan arithmetic, scan averaging, {\em etc.}
+\item
+Commands to store and retrieve intermediate spectra in storage registers.
+\item
+Commands to perform the fitting and removal of polynomial, 
+harmonic and gaussian baselines.
+\item
+Commands for filtering and editing spectra.
+\item
+Commands to determine important line parameters (peak intensity, width, 
+{\em etc.}).
+\item
+The ability to perform Fourier transform and power spectrum calculations.
+\item
+Procedures for the calibration of data.
+\item
+The ability to assemble a number of reduced individual spectra into a 
+map file, and contour or greyscale any plane or planes of the resulting cube.
+\item
+The ability to write indirect command files.
+\end{itemize}
+
+A thorough description of the package is given in the ``SPECX Users' Manual''
+which has been distributed as a Starlink Miscellaneous User Document
+(MUD). At the time of writing this MUD is available from Starlink for
+version 6.2. An extended document for version 6.3 is available from
+Rachael Padman at MRAO. No document has been prepared yet for the Unix
+version, and the document on 6.3 is the closest approximation for Unix
+users.
+
+SPECX is intended primarily for the analysis of JCMT data and can read
+such data directly from the GSD files produced at the
+telescope.
+In the VMS version there are also facilities for reading data from a
+range of other important mm-wave telescopes, {\em e.g.} Onsala,
+FCRAO, UMASS CO survey, IRAM-FITS, JCMT RxG, NRAO 8-beam (see 
+the SPECX user manual for details). 
+Spectra and maps can be output as FITS files,
+Starlink NDFs (VMS version only), or ASCII files for reading into other
+packages.
+
+
+\section {The VMS version 6.2}
+\subsection {Getting started}
+
+SPECX is made available by typing:
+\begin{verbatim}
+      $ specxstart
+\end{verbatim}
+and started by typing:
+\begin{verbatim}
+      $ specx 
+\end{verbatim}
+The program will display the current version number and
+a brief informational message, then the SPECX prompt ({\tt>>}) will appear.
+
+\begin{verbatim}
+
+                   -------------------------------------------
+                           SPECX V6.2    7th-June-1992
+                             Copyright (C) R.Padman
+                   -------------------------------------------
+
+        .
+        .
+
+      >> 
+\end{verbatim}
+
+Commands may then be entered to read and process data.
+SPECX commands consist of one or more keywords, separated
+by hyphens. Minimum matching is applied to each keyword
+individually. A full list of all valid SPECX commands
+may be found by entering {\tt SHOW-COMMANDS}, with a carriage return
+in response to the resulting prompt. On-line help is available
+using the command {\tt HELP}.
+
+A DCL command may be executed by preceding it with a {\tt \$}, {\em e.g.}
+
+\begin{verbatim}
+      >> $dir
+\end{verbatim}
+
+The tab and blank characters, `,', `\verb+\+' and `;' are SPECX delimiters;
+to pass these to DCL the entire string must be enclosed in single 
+inverted commas, {\em e.g.}
+
+\begin{verbatim}
+      >> '$dir/size scan*.dat'
+\end{verbatim}
+
+Control-C may be used to interrupt commands in progress.
+Control-C typed at the command level (when the
+{\tt>>} prompt is displayed) will exit the program.
+
+The EXIT command is the normal method of returning to DCL.
+
+
+\subsection {SPECX files and directories}
+
+SPECX uses and produces a variety of files. For graphics, 
+intermediate plot files (called {\tt PLOT.}nnn) are produced in the directory 
+with logical name {\tt SPECXDIR}. The {\tt SPECXSTART} command assigns 
+{\tt SPECXDIR} to {\tt SYS\$LOGIN} so that, 
+by default, the {\tt PLOT.}nnn files will appear in 
+your login directory. This may be over-ridden if you define 
+{\tt SPECXDIR} as a process logical name. For example, typing
+
+\begin{verbatim}
+      $ define SPECXDIR disk$scratch:[user.data]
+\end{verbatim}
+
+after the {\tt SPECXSTART} will cause plot files to appear in the named
+directory.
+
+SPECX uses Starlink PGPLOT for graphics  and thus will produce data  files for
+plots sent to some graphics devices ({\em e.g.} {\tt CANON.DAT} for the
+Canon laser printer, {\tt GKS\_72.PS} for a PostScript printer). These
+are created in the current default directory, and are automatically
+deleted when the plot finishes.
+
+There is an option (defaulted true) in SPECX which  allows dumping of the
+current status of the program after each  command is executed. This is saved in
+the file {\tt SPECX.DMP} in the  current default directory. If this file
+does not exist when SPECX  is started for the first time, it will be
+created. If it is
+subsequently deleted (or SPECX is started from a different  directory), the
+package will restart with default initialisation; otherwise SPECX will be
+re-started will all flags as previously  set, data files opened, and so on. 
+
+
+\subsection {Examples}
+
+New users should read the introductory chapters of the SPECX manual,
+which give explanations and examples of basic techniques. Some sample
+data and a demonstration command file are also available in the
+{\tt [.EXAMPLE]} sub-directory of {\tt SYS\_SPECX}. These can be copied
+to the user's own
+file space and tried out. The demonstration file is {\tt DEMO.SPX},
+which the user should print out and work through by typing the commands
+in from the terminal. It demonstrates the reading of JCMT data,
+the fitting of baselines and gaussians to spectra, and shows how to make
+and display a datacube. The file can also be run as an indirect command
+file by an experienced user to check that the package is working correctly.
+
+
+\subsection{Linking user-supplied subroutines}
+
+User-defined commands can be added to SPECX by making use of the
+subroutines EXTRNL1 to EXTRNL10. For the Starlink version of SPECX 
+the steps required are:
+
+\begin{itemize}
+\item
+Compile your routine:
+\begin{small}
+\begin{verbatim}
+$ specxstart
+$ @sys_specx:specxdev ! to set up logical names for include files such as SPECX
+$                     ! common blocks. These common blocks should always be
+$                     ! the official ones referred to by the logical names, and
+$                     ! not private copies.
+$ fortran extrnl1
+
+\end{verbatim}
+\end{small}
+\item
+Set up the logical names required to link with the NDF library.
+\begin{verbatim}
+$ ndf_dev
+\end{verbatim}
+
+\item
+Copy the file {\tt LINKPG\_NDF.COM} from {\tt SYS\_SPECX}. 
+and edit it to link
+in your own version of the appropriate routine. For example, the
+line:
+\begin{verbatim}
+$ link /exe=specx_v6-2 -
+\end{verbatim}
+might be replaced by:
+\begin{verbatim}
+$ link /exe=specx_v6-2 extrnl1, -
+\end{verbatim}
+\item
+Copy the CLD file {\tt SYS\_SPECX:SPECX62.CLD}, and 
+edit it to run your own version of {\tt SPECX\_V6-2.EXE}. 
+Redefine the SPECX command by typing:
+\begin{verbatim}
+$ set command specx62.cld
+\end{verbatim}
+\end{itemize}
+
+
+\section {The Unix version 6.6}
+\subsection {Getting started}
+
+SPECX is made available by typing:
+\begin{verbatim}
+      % specxstart
+\end{verbatim}
+and started by typing:
+\begin{verbatim}
+      % specx 
+\end{verbatim}
+The program will display the current version number and
+a brief informational message, then the SPECX prompt ({\tt>>}) will appear.
+
+\begin{verbatim}
+                   -------------------------------------------
+                     Specx v6.6 (Unix) ---- 14 December 1994
+                         Copyright (C)  R.Padman & PPARC
+                      Acknowledgements to Horst Meyerdierks
+                   -------------------------------------------
+
+        .
+        .
+
+      >> 
+\end{verbatim}
+
+Commands may then be entered to read and process data.
+SPECX commands consist of one or more keywords, separated
+by hyphens. Minimum matching is applied to each keyword
+individually. A full list of all valid SPECX commands
+may be found by entering {\tt show-commands}, with a carriage return
+in response to the resulting prompt. On-line help is available
+using the command {\tt help}. However, the on-line help is mainly a copy
+from the VMS version 6.3. There are some added topics on the Unix version.
+
+A shell command may be executed by preceding it with a {\tt \$}, {\em e.g.}
+
+\begin{verbatim}
+      >> $ls
+\end{verbatim}
+
+The tab and blank characters, `,', `\verb+\+' and `;' are SPECX delimiters;
+to pass these to the shell the entire string must be enclosed in single 
+inverted commas, {\em e.g.}
+
+\begin{verbatim}
+      >> '$ls -l scan*.dat'
+\end{verbatim}
+
+{\em Control-C cannot be used to interrupt commands in progress.
+Control-C typed at any time will abort the program. Open files may be
+corrupted.}
+
+The {\tt exit} command is the normal method of returning to the shell.
+SPECX can also be suspended in the usual way with Control-Z and later
+resumed with the shell command {\tt fg}.
+
+In some situations SPECX has to be given an end-of-file character. On
+VMS this was Control-Z. On Unix it is Control-D.
+
+
+\subsection {SPECX files and directories}
+
+SPECX uses and produces a variety of files. For graphics, 
+intermediate plot files (called {\tt PLOT.}nnn) are produced in the
+current working directory.
+
+SPECX uses Starlink PGPLOT for graphics and thus will produce data files for
+plots sent to some graphics devices ({\em e.g.} {\tt gks74.ps}.N for a
+PostScript printer). These
+are created in the current default directory. They are not submitted to
+any printer and are not deleted. SPECX does not even report the exact
+name of the file when it is created. The user has to keep score of these
+files and send them to printers as desired.
+
+There is an option (defaulted true) in SPECX which  allows dumping of the
+current status of the program after each  command is executed. This is saved in
+the file {\tt specx.dmp} in the  current default directory. If this file
+does not exist when SPECX  is started for the first time, it will be
+created. If it is
+subsequently deleted (or SPECX is started from a different  directory), the
+package will restart with default initialisation; otherwise SPECX will be
+re-started will all flags as previously  set, data files opened, and so on. 
+
+
+\subsection {Examples}
+
+New users should read the introductory chapters of the SPECX manual,
+which give explanations and examples of basic techniques. There is a
+test procedure in {\tt \$SYS\_SPECX/test.spx} and the data files
+necessary are in the same directory. However, this procedure is not
+commented at all. User are advised to compare it with {\tt demo.spx},
+which is a copy from the VMS version and will probably not work, but has
+comments as to the meaning of the commands.
+{\tt demo.spx} demonstrates the reading of JCMT data,
+the fitting of baselines and gaussians to spectra, and shows how to make
+and display a data cube.
+
+
+\subsection{Linking user-supplied subroutines}
+
+User-defined commands can be added to SPECX by making use of the
+subroutines EXTRNL1 to EXTRNL10. There is currently little support for
+this and the user is left to hack her way around the SPECX directory
+tree.
+
+It is relatively easy to modify the distributed source code. This is
+mainly an option for a local but site-wide version with EXTRNLn
+routines. Assuming that you are a Starlink site manager you would
+proceed as follows
+\begin{verbatim}
+      % cd /star/specx                               # 1
+      % setenv INSTALL /star
+      % ./mk deinstall
+
+      % cd /star                                     # 2
+      % mv specx /star/specx /star/local/specx
+
+      % cd /star/local/specx/external                # 3
+      {Make your modifications in this directory}
+
+      % cd /star/local/specx                         # 4
+      % setenv INSTALL /star/local
+      % ./mk build
+      % ./mk clean
+      % ./mk install
+
+      % cd /star/local/etc                           # 5
+      {Modify files login and cshrc to reflect that SPECX is in /star/local}
+\end{verbatim}
+\begin{itemize}
+\item[1] De-install the existing package from {\tt /star/bin/specx} and
+   {\tt /star/help/specx}. After this step the existing package will
+   still be in its built form in {\tt /star/specx}.
+\item[2] Move (or copy with {\tt cp -pr}) the built system to the local
+   Starlink tree. You can use any directory.
+\item[3] Generate your own version of the ``external'' library. You have
+   to carefully inspect the {\tt makefile} and amend it. Also check {\tt
+   makefile}s in sister directories like {\tt ../fitting} to see how
+   include files are handled.
+\item[4] Re-build and install SPECX. Installation goes into {\tt
+   /star/local/bin/specx} and {\tt /star/\-local/help/specx}. You can use
+   something else instead of {\tt /star/local}.
+\item[5] Amend the Starlink login files to reflect the different place
+   for the SPECX installation.
+\end{itemize}
+In order to re-build SPECX you need a number of Starlink libraries and
+include files in their usual place. Non-Starlink sites may or may not
+have been issued with these libraries. As indicators, you can check
+whether you have {\tt /star/lib/libhds*}, {\tt /star/include/dat\_par}
+and {\tt /star/figaro/lib/libfit.a}.
+
+
+\section{Data formats in, and data migration to, the Unix version}
+
+Unix SPECX introduced yet another version of data formats (4.1) for
+spectra and for maps. It can read and write disk-FITS. From version 6.6
+onwards it can also read GSD files.
+
+Version 4.1 spectral format is based on Starlink's Hierarchical Data
+Structures (HDS), a binary format that is portable between different
+machine architectures. Thus you can take version 4.1 spectra from a Sun
+workstation to an Alpha workstation and back, without noticing it.
+
+Version 4.1 map format, too, is based on HDS. Thus maps are portable as
+well.
+
+Data currently held on a VMS file system can be carried across to Unix
+as detailed below. Note that the way back may not be possible, or at
+least difficult.
+\begin{itemize}
+\item {\bf GSD files:}
+    Data in GSD format can be copied binary. One way is the
+    Unix {\tt cp} command if both disks are mounted by the Unix machine.
+    Another way is {\tt ftp} in binary mode. Then use {\tt
+    READ-GSD-DATA} in the usual way.
+
+    For going back from Unix to VMS similar problems may arise as with
+    disk-FITS files (see below).
+
+\item {\bf Disk-FITS files:}
+    These must be written with IBM byte order (swap order
+    on Digital machines). They can then be copied binary. One way is the
+    Unix {\tt cp} command if both disks are mounted by the Unix machine.
+    Another way is {\tt ftp} in binary mode.
+
+    This works between Unix machines and from VMS to Unix. If disk-FITS
+    files are moved from Unix to VMS, it may be necessary to make them
+    files of fixed record length 2880 byte. {\tt cp} is thus unsuitable.
+    {\tt ftp} in binary mode will create the right sort of file with the
+    wrong record length of 512 byte. You can either rectify this with
+    some VMS command, or use a more tolerant disk-FITS reader under VMS.
+
+\item {\bf Spectral data version 2 and 3:}
+    These are VMS binary formats. Take a
+    binary copy to the destination machine. The VMS versions SPECX 6.2
+    and 6.3 can use it straight away, of course. For SPECX 6.6 the file
+    has to be imported (converted into a version 4.1 file) with the
+    command {\tt CONVERT-VAX-FILE}. This keeps the existing file (say
+    {\tt file.dat}) and creates an new file ({\tt file.sdf}).
+
+\item {\bf Spectral data version 4.0 and 4.1:}
+    These are portable binary formats
+    based on HDS. Just take a binary copy to the destination machine
+    (Unix {\tt cp} or {\tt ftp} in binary mode). The file can be used straight
+    away. Optionally you can convert it to the native flavour of the HDS
+    format on the destination machine. Use the command {\tt native} in the
+    Kappa package. This should speed up data access somewhat.
+
+    Version 4.0 or 4.1 spectral data cannot be imported back into SPECX
+    6.2 or 6.3.
+
+\item {\bf Map files version 2 and 3:}
+    These are VMS binary formats. Take a binary
+    copy to the destination machine. The VMS versions SPECX 6.2 and 6.3
+    can use it straight away, of course. For SPECX 6.6 the file has to
+    be imported (converted into a version 4.1 file) with the command
+    {\tt CONVERT-VAX-MAP}. This keeps the existing file (say {\tt
+    file.map}) and creates an new file ({\tt file\_map.sdf}).
+
+\item {\bf Map files version 4.0:}
+    These are ``local'' binary formats written only by
+    the beta test version of SPECX 6.4. ``Local'' means they can only be
+    read by the same type of machine that wrote them, either a Sun4
+    workstation or an Alpha workstation. These files can be converted to
+    format version 4.1 with {\tt CONVERT-VAX-MAP}. In spite of the name of the
+    command, the file will be assumed to have been written by the same
+    Unix machine that the command is run on. The existing file (say
+    {\tt file.map}) is kept and a new file ({\tt file\_map.sdf}) created.
+
+    Version 4.0 map files cannot be imported back into SPECX 6.2 or 6.3.
+
+\item {\bf Map files version 4.1:}
+    This is a portable binary format based on HDS.
+    Just take a binary copy to the destination machine (Unix {\tt cp} or
+    {\tt ftp} in binary mode). The file can be used straight away.
+    Optionally you can convert it to the native flavour of the HDS
+    format on the destination machine. Use the command {\tt native} in the
+    Kappa package. This should speed up data access somewhat.
+
+    Version 4.1 map files cannot be imported back into SPECX 6.2 or 6.3.
+\end{itemize}
+
+Dump files and the {\tt mapplane.tmp} files are not portable. Care has to
+be taken when the same file space is used with different machines,
+because SPECX may not run properly on one machine while there is a SPECX
+dump in the working directory that was written by another machine.
+
+
+\section{Acknowledgements}
+
+Starlink would like to acknowledge Rachael Padman for making
+the SPECX package available for use, assisting in its installation,
+and providing the example data.
+
+\end{document}

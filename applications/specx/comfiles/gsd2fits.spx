@@ -1,0 +1,85 @@
+declare nmin i4
+declare nmax i4
+declare nspec i4
+declare fitsoutfile c18
+declare cscan       c4
+declare csscan      c3
+
+print ' '
+print 'Routine to directly convert GSD DAS/AOSC files to FITS using CONCAT'
+print 'and DAS-MERGE if necessary.'
+print ' '
+print '*** WARNING *** THIS ROUTINE IS DANGEROUS: data that need CONCAT'
+print 'and/or DAS-MERGE should really be inspected after these operations'
+print 'and before conversion to FITS, otherwise the DATA QUALITY may be'
+print 'severely compromised.'
+print ' '
+
+
+ask 'First scan #?', nmin, ?
+ask 'Last scan #?', nmax, ?
+
+! make sure it won't crash if file not found or unreadable
+set-error f
+last_error = 0
+
+! do over requested range of scan numbers
+do n nmin nmax
+
+! find out how many scans in file
+  r-g-d n 1
+  index-gsd-files n
+  nspec = no_gsd_spectra
+
+! check for predictable errors and reset
+
+  if (last_error = 10)
+    last_error = 0
+    nspec = 0
+  elseif (last_error = 38)
+    last_error = 0
+    nspec = 0
+  elseif (last_error<>0)
+    print ' Other error - terminating fitsloop'
+    return
+  endif
+
+! read in each spectrum in turn, write to fits file named 
+! jcmt_####_###.fits
+
+  if (nspec>0)
+    do m 1 nspec
+      r-g-d\n\m\
+
+      cscan = scan_title
+      csscan = subscan_no
+      fitsoutfile = ' '
+      write fitsoutfile 'jcmt_',cscan,'_',csscan,'.fits'
+
+      if (no_new_spectra=1)
+        if nquad > 1
+           das-merge\\y\
+        endif
+        open-fits\o\d\fitsoutfile\y\
+        write-fits-spec
+        close-fits
+
+! if two subbands, concatenate first
+      elseif (no_new_spectra=2)
+        concat
+        if nquad > 1
+           das-merge\\y\
+        endif
+        open-fits\o\d\fitsoutfile\y\
+        write-fits-spec
+        close-fits
+      endif
+
+    print 'G2F> ---------------------------------------------'
+    print 'G2F> converted scan ',n:i4.4,'_',m:i3.3,' to ',fitsoutfile
+    print 'G2F> ---------------------------------------------'
+
+    enddo
+  endif
+  last_error = 0
+enddo

@@ -1,0 +1,11 @@
+
+#  N.B. the previous line should be blank.
+#+
+#-
+     echo `pgplot_link` `ndf_link` `fio_link` `psx_link` `chr_link` `hlp_link`\
+     -lgetaline -lreadline -ltermcap \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.

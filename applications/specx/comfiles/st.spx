@@ -1,0 +1,183 @@
+!SPECX COMMAND FILE TO PLOT STANDARD AND REFERENCE SPECTRA
+! L.AVERY, Feb 15,1996
+!
+declare snum I4
+declare source_nam C10
+declare line_nam C10
+declare full_name C40
+declare fil_num I4
+declare help C1; declare dum C10
+help = 'h'
+
+! Print the preamble
+!
+print ' '
+print 'This command file plots standard and reference spectra.'
+print 'A standard spectrum is one for which 3 or more self-consistent'
+print 'observations exist. A reference spectrum is one that is thought'
+print 'to be accurate, but for which 3 or more observations are not'
+print 'yet available.  The type of spectrum is shown in the scan title'
+print 'of the plot.'
+print ' '
+print ' '
+print 'The standard sources are:'
+print ' ' 
+!
+! Get source name
+!
+print '1 W3OH'
+print '2 L1551'
+print '3 CRL618'
+print '4 OMC1'
+print '5 N2071'
+print '6 OH231'
+print '7 IRC10216'
+print '8 16293-2422'
+print '9 NGC6334I'
+print '10 G34.3'
+print '11 W75N'
+print '12 N7027'
+print '13 N7538'
+print '14 None of the above'
+print ' '
+print 'Enter the number of the source of interest'
+ask ' :' snum ?
+print ' '
+if snum = 1
+source_nam = 'W3OH'
+elseif snum = 2
+source_nam = 'L1551'
+elseif snum = 3 
+source_nam = 'CRL618'
+elseif snum = 4
+source_nam = 'OMC1'
+elseif snum = 5
+source_nam = 'N2071'
+elseif snum = 6
+source_nam = 'OH231'
+elseif snum = 7
+source_nam = 'IRC10216'
+elseif snum = 8 
+source_nam = '16293'
+elseif snum = 9
+source_nam = 'N6334I'
+elseif snum = 10
+source_nam = 'G34'
+elseif snum = 11
+source_nam = 'W75N'
+elseif snum = 12 
+source_nam = 'N7027'
+elseif snum = 13
+source_nam = 'N7538'
+elseif snum = 14
+return
+endif
+print source_nam
+!
+! Get line to plot.
+!
+print ' '
+print ' '
+print 'The available standard lines in order of frequency are as follows.'
+print ' '
+print '1 H2CO 3-2'
+print '2 C18O 2-1'
+print '3 13CO 2-1'
+print '4   CO 2-1'
+print '5 CH3OH 5-4'
+print '6   CS 5-4'
+print '7  HCN 3-2'
+print '8 HCO+ 3-2'
+print '9 C18O 3-2'
+print '10 13CO 3-2'
+print '11 CH3OH 7-6'
+print '12    CS 7-6'
+print '13    CO 3-2'
+print '14   HCN 4-3'
+print '15  HCO+ 4-3'
+print '16  H2CO 5-4'
+print '17    CO 4-3'
+print '18    CI'
+print '19 None of the above'
+print ' '
+print ' '
+print 'Enter the number of the desired line.'
+ask ' :' snum ?
+
+! print ' '
+! if dum = help
+! print ' '
+! print 'For brevity, some transition designations have been shortened.'
+! print 'You should enter the transition as it appears here. All letters'
+! print 'are upper case. This list is in order of increasing frequency.'
+! print ' '
+! print 'H2CO32, C18O21, 13CO21, CO21, CH3OH54, CS54, HCN32, HCO32'
+! print 'C18O32, CH3OH76, CS76, CO32, HCN43, HCO43, H2CO54, CO43, CI'
+! print ' '
+! ask 'Line? :' line_nam ?
+! else
+if snum = 1
+line_nam = 'H2CO32' 
+elseif snum = 2
+line_nam = 'C18O21'
+elseif snum = 3
+line_nam = '13CO21'
+elseif snum = 4
+line_nam = 'CO21'
+elseif snum = 5
+line_nam = 'CH3OH54'
+elseif snum = 6
+line_nam = 'CS54'
+elseif snum = 7
+line_nam = 'HCN32'
+elseif snum = 8
+line_nam = 'HCO32'
+elseif snum = 9
+line_nam = 'C18O32'
+elseif snum = 10
+line_nam = '13CO32'
+elseif snum = 11
+line_nam = 'CH3OH76'
+elseif snum = 12
+line_nam = 'CS76'
+elseif snum = 13
+line_nam = 'CO32'
+elseif snum = 14
+line_nam = 'HCN43'
+elseif snum = 15
+line_nam = 'HCO43'
+elseif snum = 16
+line_nam = 'H2CO54'
+elseif snum = 17
+line_nam = 'CO43'
+elseif snum = 18
+line_nam = 'CI'
+elseif snum = 19
+return
+endif
+print line_nam
+print ' '
+write full_name 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+! char count     123456789012345678901234567890123456789412345678951234
+full_name = ' '
+write full_name '/home/lwa/devel/',source_nam,'_',line_nam
+print full_name 
+!
+! Open the relevant file and plot the spectrum
+!
+open-file \full_name\
+print ' '
+print 'The open files are'
+li-op-file
+print ' '
+ask 'Enter the appropriate file number :' fil_num ?
+read-sp \fil_num\1\
+new-plot \1\5\
+!
+! Close the file
+!
+clo-file \fil_num\
+return
+
+
+

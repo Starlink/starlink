@@ -1,0 +1,120 @@
+*-----------------------------------------------------------------------
+
+      SUBROUTINE GEN_INQSYMB (INSYMBOL, SYM_INDEX, TYPE,
+     &                        LENGTH, ADDRESS, READONLY, IERR)
+
+      IMPLICIT NONE
+
+*     Formal parameters
+
+      CHARACTER INSYMBOL*(*)
+      INTEGER*4 SYM_INDEX
+      CHARACTER TYPE*(*)
+      INTEGER*4 LENGTH
+      INTEGER*4 ADDRESS
+      LOGICAL*4 READONLY
+      INTEGER*4 IERR          ! = 1, symbol not found; 6, table not installed
+
+*     Symbol table
+
+      INCLUDE  'GEN_SYMBOLS.INC'
+
+*     User variables
+
+      INTEGER*4 C1, C2
+      INTEGER*4 ELEMENT
+      INTEGER*4 ILS
+      INTEGER*4 NCH
+      INTEGER*4 ERROR
+      INTEGER*4 IDIGITS, FDIGITS, EDIGITS
+
+*     Functions
+
+      INTEGER*4 GEN_ILEN
+      LOGICAL   GEN_INTEGER
+      LOGICAL   GEN_DFORMAT
+      LOGICAL   GEN_EFORMAT
+
+*  OK? Go..
+
+      IF (.NOT. SYMTAB_INSTALLED) THEN
+        IERR = 6
+        RETURN
+      END IF
+
+      ILS = GEN_ILEN (INSYMBOL)
+      C1 = INDEX (INSYMBOL, '(') - 1
+      IF (C1.LT.0) C1 = ILS
+      
+      CALL GEN_INQSYMB1 (%VAL(TABLE_ADDRESS), %VAL(LENGTH_ADDRESS), 
+     &                   INSYMBOL(:C1),
+     &                   SYM_INDEX, TYPE, LENGTH, ADDRESS,
+     &                   READONLY, IERR)
+
+      IF (IERR.NE.0) THEN
+        IERR = 99
+        RETURN
+      ELSE IF (SYM_INDEX.EQ.0) THEN
+        IERR = 100
+        RETURN
+      END IF
+
+D     TYPE *,'-- gen_inqsymb --'
+
+      IF (C1.NE.ILS) THEN
+        CALL GET_SUBEXPR  (INSYMBOL, C1, C2, IERR)
+        IF (IERR.NE.0) RETURN
+
+        IF (GEN_INTEGER (INSYMBOL(C1:C2))) THEN
+          READ (INSYMBOL(C1:C2), '(I)', IOSTAT=ERROR) ELEMENT
+          IF (ERROR.NE.0) THEN
+            TYPE *,'-- gen_inqsymb --'
+            TYPE *,'   error reading index from string ''',
+     &                 INSYMBOL(C1:C2), ''''
+            IERR = -1
+            RETURN
+          END IF
+
+        ELSE IF (GEN_EFORMAT (INSYMBOL(C1:C2),
+     &                        IDIGITS, FDIGITS, EDIGITS)) THEN
+          TYPE *,'-- gen_inqsymb --'
+          TYPE *, '   constant array index must be integer'
+          IERR = -1
+          RETURN
+
+        ELSE IF (GEN_DFORMAT (INSYMBOL(C1:C2),
+     &                        IDIGITS, FDIGITS, EDIGITS)) THEN
+          TYPE *,'-- gen_inqsymb --'
+          TYPE *, '   constant array index must be integer'
+          IERR = -1
+          RETURN
+
+        ELSE
+D         TYPE *, '   evaluating array index: ', INSYMBOL(C1:C2)
+          CALL GEN_EVAL_AE (INSYMBOL(C1:C2), 'I4', ELEMENT, IERR)
+          IF (IERR.NE.0) RETURN
+D         TYPE *, '   array index result = ', ELEMENT
+
+        END IF
+
+      ELSE
+        ELEMENT = 0
+      END IF
+
+      READ (TYPE(2:GEN_ILEN(TYPE)), '(I)', IOSTAT=ERROR) NCH
+      IF (ERROR.NE.0) THEN
+        TYPE *, '-- gen_inqsymb --'
+        TYPE *, '   error reading # bytes from type string ',TYPE
+        IERR = 99
+        RETURN
+      END IF
+
+D     TYPE *, '   symbol length and element number: ', NCH, ELEMENT
+
+      IF (ELEMENT.NE.0) THEN
+        ADDRESS = ADDRESS + NCH*(ELEMENT-1)
+        LENGTH  = 1
+      END IF
+
+      RETURN
+      END

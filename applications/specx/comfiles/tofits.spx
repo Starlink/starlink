@@ -1,0 +1,42 @@
+declare fscan     i4
+declare lscan     i4
+declare kscan     i4
+declare spxfile   i4
+declare fitsname  c19
+declare cscan     c4
+declare csscan    c4
+declare fmode     l4
+print ' '
+print 'TOFITS> This utility expects the scans to be in a SPECX file'
+print 'TOFITS> It will read those scans and write them to disk as'
+print 'TOFITS> fitsfiles: obs_jcmt_####.fits'
+print 'TOFITS> #### can be set to be the original scan number or'
+print 'TOFITS> the sequence number in the specx file.'
+print ' '
+spxfile = 1
+ask 'File to read? [1]:' spxfile ?
+set-fil-ac \spxfile\rw\
+fscan = 1
+ask 'First scan? [1]:' fscan ?
+lscan = no_file_spectra
+print 'TOFITS> Assuming last scan to be ',lscan
+ask 'Last scan? [last]:    ' lscan ?
+fmode = true
+ask 'Use orig. scannr (else seqnr)?' fmode ?
+write fitsname 'xxxxxxxxxxxxxxxxxxx'
+do kscan fscan lscan
+   read-sp \spxfile\kscan\
+   cscan = scan_title
+   csscan = subscan_no
+   fitsname = ' '
+   if (fmode) then
+     read scan_no cscan
+     write fitsname 'jcmt_',cscan,'_',csscan,'.fits'
+   else
+     write fitsname 'jcmt_',kscan:i4.4,'.fits'
+   endif     
+   open-fits-file \fitsname\ \
+   write-fits-spectrum
+   close-fits-file
+   print 'TOFITS>    ',kscan:i4.4,'    ',cscan,'   ',fitsname,'    Written'
+enddo

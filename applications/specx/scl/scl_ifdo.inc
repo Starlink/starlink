@@ -1,0 +1,16 @@
+*     ENDDO flag
+
+      LOGICAL*4   ENDDO
+      COMMON /DO/ ENDDO
+      SAVE   /DO/
+
+*     IF flags
+
+      INTEGER*4 IF_LEVEL
+      INTEGER*4 IF_SKIP
+      LOGICAL*4 DO_TO_ELSEIF
+      LOGICAL*4 WAIT_FOR_ENDIF
+      COMMON /IF/ IF_LEVEL, IF_SKIP, DO_TO_ELSEIF, WAIT_FOR_ENDIF
+      SAVE   /IF/
+
+

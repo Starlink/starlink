@@ -1,0 +1,85 @@
+*  History:
+*     19 Nov 1993 (hme):
+*        Realise COMND as a call to SYSTEM.
+C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+C
+C                    [PADMAN.SPECX]NDLIB.FOR
+C                    -----------------------
+C
+C   This library contains subroutines to replace those found in the
+C   system library of the Cambridge radioastronomy NORD 100/500.
+C   In the first instance the routines are those required by the
+C   spectral line reduction program SPECX and its derivatives.
+C
+C   Rachael Padman, 25th March 1983
+C    amended 16th April, ERMSG moved to FORLIB, retyped.
+C
+C+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+      SUBROUTINE COMND(COM)
+
+C   This routine submits a request to the VAX/VMX operating system.
+C   In the VAX this spawns a sub-process and puts the master process
+C   or calling program into a wait state until the subprocess has been
+C   completed. LIB$SPAWN is described in the RUN-TIME library users 
+C   reference manual
+
+C   Rachael Padman
+C   25th March, 1983
+C   Berkeley astronomy VAX
+
+C Converted to unix by Tim Jenness
+
+
+      IMPLICIT NONE
+      CHARACTER COM*(*)
+      INTEGER ISTATUS
+C      INTEGER SH 
+      INTEGER SYSTEM
+
+C      ISTATUS = SH(COM)    ! SH is far faster than SYSTEM
+
+      ISTATUS = SYSTEM(COM)
+
+      if (ISTATUS.NE.0) print *,'Error executing system command'
+
+      RETURN
+      END
+
+C************************************************************************
+
+      SUBROUTINE RFILE(LUN,ISHARE,IADD,IREC,IRECL)
+
+C   Random access read on unit LUN. Shared access OK if ISHARE.ne.0
+C   IRECL I*2 words of data read from record IREC (in NORD convention, first
+C   scan in file labelled 0) and returned into array IADD.
+
+C   Shared access not implemented in this version, ISHARE ignored.
+
+      INTEGER*2 IADD(1)
+
+      IPOS=IREC+1
+      READ(LUN'IPOS) (IADD(I),I=1,IRECL)
+
+      RETURN
+      END
+
+C***********************************************************************
+
+      SUBROUTINE WFILE(LUN,ISHARE,IADD,IREC,IRECL)
+
+C   Random access write on unit LUN. Shared access OK if ISHARE.ne.0
+C   IRECL words of data written to record IREC (in NORD convention, first
+C   scan in file labelled 0) from array IADD.
+
+C   Shared access not implemented in this version, ISHARE ignored.
+
+      INTEGER*2 IADD(1)
+
+      IPOS=IREC+1
+      WRITE(LUN'IPOS) (IADD(I),I=1,IRECL)
+
+      RETURN
+      END
+
+C***********************************************************************

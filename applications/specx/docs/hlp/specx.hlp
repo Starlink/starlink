@@ -1,0 +1,2201 @@
+0 Help
+ This is the SPECX on-line help system.
+
+ Try a question mark for a list of topics.
+1 1D-plotting
+
+Plotting of single spectra etc. It is possible to overlay more than one plot
+on the same scales. Thus for hardcopy devices it is necessary to indicate
+when the plot is finally ready for printing.
+
+2 Interactive_plotting
+
+For plotting on the graphics terminals both alpha and graphics screens
+are used simultaneously. If you have interactive graphics mode enabled
+(use the SET-INTERACTIVE command) then the plot is always left with
+graphics cross-hair displayed. Subsequent processing is controlled by
+typing single characters at the terminal. Each time a key is hit a
+message appears telling you the (x,y) co-ordinates of the cross-hair
+at that time. At all times when a plot is displayed in this way it is
+possible to rescale the plot interactively, or to measure positions on
+the screen. Other options are possible, depending on the command -
+FIT-POLYNOMIAL-BASELINE for example requires input of a number of
+regions within which the baseline is to be fitted. 
+
+Whenever the graphics cross-hair is displayed typing H will cause a list
+of all valid keys and their meanings to be displayed on the alpha
+screen. The possible options are listed below. The concept of the
+current box is crucial to use of this facility. When the plot is first
+put up the current box is defined to have limits in x and y that
+correspond to the limits of the plot. These limits may be changed using
+the cross-hair and the L, R, T and B keys, repeatedly until you are
+satisfied with the limits . You can hit any of the L, R, T or B keys
+more than once - the new value simply replaces the old one. When you
+like the limits you can pass them to the computer, using one of the
+other keys as appropriate.
+
+When selecting baseline regions (for FITting, FINDing, etc) then only
+the L and R keys are relevant for selection of the region. In order to
+allow you to update the region boundaries until you are satisfied, the
+program needs some indication that the current box has been finalized.
+The ACCEPT (A) key tells the program to use the currently selected
+baseline region, and to go on to another if the routine permits it (if 
+you reach the maximum allowed number of baseline regions the routine 
+will exit from the plot automatically - otherwise you need to type E or 
+Q to indicate that there are no more regions to be selected).
+
+There is no need ever to draw the current box (D) - this facility is
+provided only to allow you to see the currently selected box - for
+Pericoms and similar terminals this command undraws the previous box so
+that you can always see only the current box. 
+
+Cursor options available are listed below:
+
+
+ Key   Mnemonic                   Function
+
+  H      HELP           Produces a list of all valid options
+  ?      QUERY          Tells you the X & Y coordinates of the cursor
+  L      LEFT           Define the left-hand boundary of the current 'box'
+  R      RIGHT          Define the right-hand boundary of the current box
+  T      TOP            Define the top boundary of the current box
+  B      BOTTOM         Define the bottom boundary of the current box
+  D      DRAW           Draw the current box
+  C      CLEAR          Erase the alpha (ASCII) screen
+  Q      QUIT           Leave interactive graphics
+  E      END            Leave interactive graphics, erase graphics screen
+  N      NEW_LIMITS     Redraw the plot taking the current box as new 
+                        limits. Note that if the limits have not been
+                        redefined in one co-ordinate then you get back the
+                        original limits according to SET-PLOT-SCALES
+  S      LIMITS         Ask for new limits as in SET-PLOT-SCALES, and redraw
+                        the plot. Good for making the plot BIGGER than it was.
+  A      ACCEPT         Tell the program to accept the current box
+  +      MARK           Mark position using cross-hair
+  <CR>   RETURN         Accept default box (for input of baseline regions)
+
+2 CLOSE-PLOT
+
+Causes any open plot file to be closed and in the case of hardcopy 
+graphics devices submitted for printing. OVERLAY-SPECTRUM cannot be used 
+again until after a NEW-PLOT.
+
+2 DELETE-LAST-PLOT
+
+Removes the last spectrum in the plotfile. Thus if you do a PLOT-
+SPECTRUM or NEW-PLOT and don't like the new plot, but don't want to 
+lose all you have done, then D-L-P and modify your spectrum 
+appropriately before doing a OVERLAY-SPECTRUM again.
+
+2 NEW-PLOT
+
+Starts a new plot on the graphics device: Draws a labelled box and the
+current spectrum. Causes any previously open plotfile to be closed -
+for hardcopy devices the plotfile is then submitted for plotting.  The
+two arguments are line thickness and color index (0: black, 1: white,
+2: red, 3: green, 4: blue,...,15:darkgrey).
+NOTE: if the color is specified as < 0, each quadrant of a multi-quadrant
+spectrum will be plotted with a successive color.
+
+Auto Y-axis scaling for NEW-PLOT, R-L-B etc. looks only at points in
+current X-axis range. Still no autoscaling within interactive graphics
+however.
+
+2 OVERLAY-SPECTRUM
+
+Plots the spectrum in X on the same axes as the last plot. On the 
+screen the whole plot is redrawn - on a hardcopy device the spectrum 
+is just added to the picture being built up internally.
+The arguments are the same as for NEW-PLOT.
+
+2 SEE-PLOT
+
+Allows you to preview a plotfile on the same or another device without
+adding another spectrum.
+
+2 SET-INTERACTIVE
+
+Invokes the crosshair cursor once each plot is complete on the terminal.
+You can do the same thing by setting the control flag directly -- i.e.
+">> interactive = true".
+
+2 SET-HARDCOPY-DEVICE
+
+Tells SPECX which hardcopy device you want to use -- choose from i.e.
+/PS, /CPS, /LJ, /GIF etc. Default orientation is Landscape; adding a
+"V" after the slash in general converts to Portrait mode.
+
+2 SET-PLOT-DEVICE
+
+Allows you to choose one of the currently selected hardcopy, terminal
+or null devices. These can be defined independently using 
+SET-HARDCOPY-DEVICE and SET-TERMINAL-DEVICE.
+
+A null device is available. This may be useful if you want to
+accumulate lots of overlaid plots without seeing the intermediate
+product (S-P-D to null, and then SEE-PLOT to get a look at it), or
+if you want to reduce the execution time of command files with NEW or
+PLOT-SP in them.
+
+2 SET-PLOT-PARAMETERS
+
+Lets you set up the overall appearance of your plot - default
+character height is 3.0mm which causes the terminals etc to use their
+internal character generators where possible - this works much faster
+than generating characters via vector fonts. However for the best
+appearance use a slightly different character height (e.g. 2.999)
+to generate nice PGPLOT Roman font labels etc.
+
+An option now is to omit all non-essential details from the plot (the 
+frame and tickmarks, labels etc). This may be useful when doing first-
+order data reduction, when you want to save time. You can still 
+determine coordinates using the interactive cursor.
+
+2 SET-PLOT-SCALES
+
+You can choose to set plot limits explicitly, or to allow automatic 
+choice of axis scaling by the program. Neither precludes use of the 
+crosshair cursor in interactive mode to window a smaller part of the 
+plot frame - the limits set up interactively remain in force until 
+cancelled by one of a number of events - see below.
+
+Autoscaling operates according to the following rules:
+
+o  If in non-auto plot mode, the program takes your nominated 
+   start and end values for each axis.
+
+o  In auto-scaling mode the data are used to define the range of
+   both axes, in the same way as before. 
+
+o  Interactive rescaling is reset by a new plot in non-auto scaling
+   mode, but continues until reset by a S-P-S/Yes/ command in
+   autoscaling mode.
+
+o  Taking the interactive cursor outside of the plot area will reset
+   the appropriate plot limit to that defined by the initial scaling
+   of the plot - that is, user limits for non-auto scaling, and
+   auto-scaled limits otherwise.
+             
+Thus, if you have been setting plot limits interactively, but want
+autoscaling for your next plot, then just give the command 
+SET-PLOT-SCALES/Y/ to get limits appropriate to the new plot.
+          
+This seems to give the widest range of options for controlling plot
+limits, with the least amount of extra typing required from the user
+(it would be equally tedious having set limits interactively for them
+to vanish at the next plot, forcing you to go into S-P-S to change
+them or to go through all the interactive bit again)
+
+2 SET-PLOT-SIZE
+
+Defines absolute size of plotting window in mm (may not be accurate 
+for some terminals emulating those that are actually supported).
+
+2 SET-TERMINAL-DEVICE
+
+Tells SPECX the current terminal device type. PGPLOT recognizes a number of 
+different types of terminals:
+
+  /TEK4010   Tektronix 4006/4010 storage-tube terminal	
+  /GF        GraphOn terminal	
+  /RETRO     RetroGraphics terminal	
+  /GTERM     GTERM Tektronix terminal emulator	
+  /XTERM     XTERM Tektronix terminal emulator	
+  /VT125     Dec Regis terminals (VT125 etc.)	
+  /XWINDOW   Workstations running X Window System
+  /XSERVE    Persistent window on X Window System
+  /XDISP     PGDISP or FIGDISP server for X workstations
+
+1 2D-plotting         
+
+Contour and greyscale plots may be made for any two co-ordinates (R.A.,
+Dec. and Velocity), with either integration or averaging over a
+specified range in the remaining co-ordinate. The plot is only printed
+where the data exist in the input map. This requires that for a given
+'cell' on the contour plot there must be valid data values at all four
+vertices. If this condition is not met no contours are plotted in the
+cell. I think this is better than using zeros to fill-in for missing
+data, as that may lead to a spurious boundary to the source. 
+
+2 Interactive_plotting
+
+For plotting on the graphics terminals both alpha and graphics screens
+are used simultaneously. If you have interactive graphics mode enabled
+(use the SET-INTERACTIVE command) then the plot is always left with
+graphics cross-hair displayed. Subsequent processing is controlled by
+typing single characters at the terminal. Each time a key is hit a
+message appears telling you the (x,y) co-ordinates of the cross-hair
+at that time. At all times when a plot is displayed in this way it is
+possible to rescale the plot interactively, or to measure positions on
+the screen. 
+
+Whenever the graphics cross-hair is displayed typing H will cause a
+list of all valid keys and their meanings to be displayed on the alpha
+screen. The possible options are listed below. The concept of the
+current box is crucial to use of this facility. When the plot is first
+put up the current box is defined to have limits in x and y that
+correspond to the limits of the plot. These limits may be changed
+using the cross-hair and the L, R, T and B keys. When you are
+satisfied with the limits you can pass them to the computer, using one
+of the other keys as appropriate. You can hit any of the L, R, T or B
+keys more than once - the new value simply replaces the old one. 
+
+Options which may be available using the crosshair cursor are listed 
+below (the exact subset depends on the particular command and on what 
+is sensible)
+
+  Key   Mnemonic                   Function
+
+   H    HELP       Produces a list of all valid options
+   C    CLEAR      Erase the alpha (ASCII) screen
+   L    LEFT       Define the left-hand boundary of the current 'box
+   R    RIGHT      Define the right-hand boundary of the current box
+   T    TOP        Define the top boundary of the current box
+   B    BOTTOM     Define the bottom boundary of the current box
+   D    DRAW       Draw the current box
+   N    NEWLIM     Redraw the plot taking the current box as new 
+                   limits. Note that if the limits have not been
+                   redefined in one co-ordinate then you get back the
+                   original limits according to SET-PLOT-SCALES
+   I    CONTOUR    Lets you adjust the contouring "interactively"
+   W    NEWGREY    Lets you adjust the greyscaling "interactively"
+   X    MINMAX     Tells you the maximum and minimum on MAPPLANE.TMP
+   S    INTEG      Reports the integrated intensity inside LRTB box.
+   M    MARKZ      Make triangle and write map value at crosshair position
+   1    ONE        Change to colour table 1 (linear black to white)
+   2    TWO        Change to colour table 2 (colour contours)
+   3    THREE      Change to colour table 3 (power-law black to white)
+   4    FOUR       Change to colour table 4 (blue to yellow)
+   5    FIVE       Change to colour table 5 (NRAO blue->white spiral)
+   G    GETSPEC    Grab spectrum from current map position and place in
+                   stack X position. Note that this gets the spectrum from
+                   the cube, NOT from the map file.
+   V    VALID      Make spots at positions for which there is valid
+                   data in the cube.
+   ?    TELLZ      Write (x,y) position and map value to alpha screen.
+   Q    QUIT       Leave interactive graphics
+   E    END        Leave interactive graphics, erase graphics screen
+
+2 CHANNEL-MAPS
+
+Like CONTOUR-MAP: Draws a set of contour or greyscale maps representing
+parallel slices through the cube. Will average across a given range in
+the third coordinate and display in terms of integrated or average
+intensity in the range. Full interactive graphics available via SET-
+INTERACTIVE. Note that to get greyscales *without* contours it is 
+necessary *either* first to do a simple GREYSCALE on a single channel,
+*or* to set the SCL variables PLOT_CONTOURS and PLOT_GREYSCALE to FALSE
+and TRUE respectively with = statements.
+
+2 CONTOUR-PLOT
+
+This is logically two functions in a row.
+
+First...
+
+Generates a 2D image from any slice of the cube. Will average across a
+given range in the third coordinate and display in terms of integrated
+or average intensity in the range. Full interactive graphics available
+via SET-INTERACTIVE. 
+
+If you select an integration range of 0 for the z-coordinate as a 
+response to the prompt SPECX will attempt to integrate/average in a 
+bin plus and minus a half channel around the nominated value.
+
+The image is stored in the (temporary) file MAPPLANE.TMP This is a
+binary image compatible with MONGO, and can be plotted directly using
+that program. In order to get hold of it, just rename mapplane.tmp to
+something else before commanding MAKE-MAP again (or call MONGO from
+within SPECX, or exit SPECX, and operate on MAPPLANE.TMP directly).
+
+Then...
+
+Contours the current 2D map using the contouring set with SET-CONTOUR.
+The map can be contoured any number of times without having to make a
+new one - this revision to the old scheme should speed things up a bit. 
+
+2 GRAYSCALE-MAP
+
+See GREYSCALE-MAP (English spelling!)
+
+2 GREYSCALE-MAP
+
+Like CONTOUR-MAP, this is logically two functions in a row.
+
+First...
+
+Generates a 2D image from any slice of the cube. Will average across a
+given range in the third coordinate and display in terms of integrated
+or average intensity in the range. Full interactive graphics available
+via SET-INTERACTIVE. 
+
+If you select an integration range of 0 for the z-coordinate as a 
+response to the prompt SPECX will attempt to integrate/average in a 
+bin plus and minus a half channel around the nominated value.
+
+The image is stored in the (temporary) file MAPPLANE.TMP This is a
+binary image compatible with MONGO, and can be plotted directly using
+that program. In order to get hold of it, just rename mapplane.tmp to
+something else before commanding MAKE-MAP again (or call MONGO from
+within SPECX, or exit SPECX, and operate on MAPPLANE.TMP directly).
+
+Then...
+
+Plots the current 2D map using the greyscale set with SET-GREYSCALE.
+The map can be greyscaled any number of times without having to make a
+new one - this revision to the old scheme should speed things up a bit. 
+
+2 GRID-SPECTRA
+
+Draws a grid of spectra representing the current X,Y window set by SET
+-MAP-SCALES. X- and Y-axes are as set by the question at the start of
+this command. 
+
+2 PLOT-LINE-PARAMETERS
+
+Plots contour and/or greyscale maps showing the peak itensity,
+integrated intensity, velocity of the peak and equivalent width of the
+line as contour maps in the current X-Y window. The layout of the final
+plot can be controlled by nominating which plots you want and in which
+order. Contouring is autoscaled except for the case that only *one* line
+parameter is plotted in which case the parameters from SET-CONTOUR are
+interpreted as for CONTOUR-MAP. Interactive graphics available to label
+contours, measure values etc. 
+
+Like CONTOUR-MAP, this routine generates an intermediate plotfile called
+MAPPLANE.TMP   If you want to process the data "off-line" using MONGO or
+some other plot package, just rename and save this file before a 
+subsequent CONTOUR, GREYSCALE, PLOT-LINE-PARS or CHANNEL-MAP.
+
+2 ROTATE-MAP
+
+Selects the rotation angle ("anticlockwise" - i.e. position angle) to 
+be applied to the map in the sky plane before extracting the requested 
+plane. The cube is interpolated to a new cube rotated with respect to 
+the data by the nominated angle, and the map is then extracted from 
+that cube as if the X and Y axes were the same as before. That is, 
+coordinate ranges nominated in SET-MAP-SCALES apply equally to the
+the new coordinates for the rotated cube, and thus integration 
+is along slanted lines in the original data set.
+
+The new axes are rotated by <rotation angle> anticlockwise with respect
+to the old axes, so that when viewed in the new coordinate system the
+map appears to be rotated clockwise. Rotation in all cases is about the
+map centre, or (0,0) position. 
+
+Rotation can be undone (with no loss of resolution) by setting a new
+rotation angle of zero, or by asking for no rotation. Map making then
+reverts to the original (unfiddled) cube.
+
+2 SET-CONTOUR-LEVELS
+
+Define the contouring for the current map. May be explicit (linear) 
+contouring with up to 30 levels, or can be auto scaled to fit the  
+nominated number of contours in to the range between the map maximum 
+and minimum. A third alternative is to enter up to 16 contour levels
+manually, one at a time.
+
+Autoscaling does not apply to CHANNEL-MAPS - this uses the last
+manually set contours regardless. 
+
+2 SET-INTERACTIVE
+
+Causes the cross hair cursor to come up after the map has been drawn 
+on the screen of a terminal. 
+
+2 SET-MAP-ACCEPT
+
+Define whether or not a new spectrum at the same position as an
+existing one is to overwrite the old one, and also specifies how
+close the spectrum position needs to be to a map grid point for
+it to be acceptable.
+
+2 SET-MAP-PARAMETERS
+
+Allows you to choose the main factors which affect the appearance of
+your map - whether the sample points are indicated, the level of
+interpolation to be applied to the data before contouring. A facility
+has recently been added to let you nominate line types separately for
+the positive, zero and negative contours - this may be useful when you
+want to overlay different maps. The effects of different line types will
+depend on the exact graphics device - 0,1 and 2 give good results on
+most devices. 
+
+2 SET-MAP-SIZE
+
+If you respond to the the S-M-SI prompt with 0 or 0,0 then you 
+will get maps/grids etc automatically scaled to the maximum
+size of the current plot device. Saves resetting to
+get the most out of the device.
+
+If you specify one but not both of the dimensions then the other
+will automatically scaled to give the same "natural scaling" for
+each axis. This is useful if the plot axes are R & D or X & Y but
+not so useful if one of the plot axes is V, freq etc.
+
+If you specify both dimensions then these control the size directly.
+
+2 SET-MAP-SCALES
+
+For CONTOUR-MAP and CHANNEL-MAP chooses the orientation of the slice 
+of the cube to be displayed (e.g. X-axis = velocity, y-axis = R.A.).
+Also determines the window in X and Y for the current map.
+
+If both limits for either the X or Y plot axis are set to zero then 
+the program will calculate sensible limits equal to the extent of the 
+current map, at the time that the plot is actually made. 
+
+2 SET-GRAYSCALE
+
+See SET-GREYSCALE (English spelling!)
+
+2 SET-GREYSCALE
+
+Allows you to setup the greyscaling for GREYSCALE-MAP, CHANNEL-MAPS and
+PLOT-LINE-PARAMETERS. 
+ o   Choose whether to set the greyscale automatically from the map 
+     extrema, or manually.
+ o   If manually, specify the limits corresponding to black and white.
+ o   Choose whether contours should be overplotted on the greyscale.
+ o   Nominate a colour table for the greyscale.
+
+1 Baselines           
+2 CALCULATE-GAUSSIAN-MODEL
+
+Pushes the stack, and clears the X-register. Then calculates a
+baseline from the current model. The prompts let you select which
+lines in the current model are to be used for the calculation. You can
+give either a range (e.g. 5,8 implies lines 5 to 8 inclusively) or a
+single line. Lines are added to the "baseline" until you exit the
+routine by using ^D/^Z or \ in response to the prompt. 
+
+2 DRAW-PLOT-USING-CURSOR
+
+In extremis, you can specify a "baseline" by drawing it using the 
+cursor. In interactive mode only, puts up a spectrum and then edits 
+data values to a linear interpolation of successive points indicated 
+by the "+" key. The resulting spectrum can be stored, used as a 
+baseline or whatever. Please consider whether this is honest science!
+
+2 ENTER-GAUSSIAN-MODEL
+
+Lets you enter the parameters (amplitude, width and position in 
+current X-axis units) of up to 10 gaussian profiles into the 
+"current model". This is used as the basis for both gaussian fitting 
+and to calculate "baselines" consisting of the sum of some combination 
+of these gaussians.
+
+2 FIT-COMPOSITE-BASELINE
+
+A somewhat tricky routine. Accepts up to 8 x-axis ranges over which to
+fit a sum of harmonic sinusoids plus a polynomial. The period of the
+sinusoids may be fixed or left free as part of the fitting. The
+resulting least-squares fit is pushed into X: SUBTRACT yields the
+residuals. Note that the unfitted quadrants are set to zero - if you
+subtract the fit then all other quadrants are left unchanged. 
+
+This routine was developed for work on baseline ripple at Parkes 
+in 1976, and may be of limited applicability to most data. However it
+can also be used as either a pure harmonic sinusoid remover or a pure
+polynomial remover. We often use it at MRAO to remove a d.c. offset 
+plus a baseline ripple fundamental sinusoid, possibly with a second 
+harmonic too.
+
+The "phase" in the prompt is the position of a positive-going zero 
+crossing (with increasing value of the x-axis units). It does not seem 
+to be too critical.
+
+2 FIT-GAUSSIAN-MODEL
+
+Accepts up to 8 regions of the X-axis over which to fit the baseline.
+Updates the model and uses this as the starting point for a non-linear 
+least squares fit to the current spectrum in X If the fitting 
+procedure converges within the number of iterations set in SET-
+BASELINE then the stack is pushed to leave the spectrum in Y and the 
+least-squares baseline in X - just do SUBTRACT to get the residuals.
+
+Note that the unfitted quadrants are set to zero - if you subtract the
+fit then all other quadrants are left unchanged.
+
+2 FIT-POLYNOMIAL-BASELINE
+
+Accepts up to 8 x-axis regions over which it is to fit a polynomial of 
+up to 10th order. The polynomial is calculated by direct least-squares 
+and is pushed into the X-register. SUBTRACT to give the residuals.
+
+Note that the unfitted quadrants are set to zero - if you subtract the
+fit then all other quadrants are left unchanged.
+
+2 REMOVE-LINEAR-BASELINE
+
+Removes a linear trend from the spectrum in X. Accepts two X-axis
+ranges and then fits a linear baseline to the average of the points
+within each range. The baseline is automatically subtracted from the
+current spectrum. 
+
+2 SHOW-GAUSSIAN-MODEL
+
+Produce a listing of the current gaussian model on the current listing 
+file.
+
+1 Calibration         
+
+2 FIND-ZENITH-DISTANCE
+
+Calculate the zenith distance from the telescope latitude and 
+longitude, the date and time of observation, and the RA and Dec of the 
+source.
+
+2 SET-SITE-PARAMETERS
+
+Enter the latitude and longitude of the telescope, and the local time 
+correction for use if the time of observation is not given in U.T.
+
+1 Command_language    
+2 Specx_arguments
+
+Command line qualifiers now available. 
+
+3 /DUMP
+
+The /NODUMP qualifier lets you turn off the automatic restart from the
+default dump file (with logical name SPECX_DUMP), while you can start
+from another dump file altogether using /DUMP=filename.
+
+3 /MAP
+
+The /MAP=filename qualifier lets you change the map that is opened on
+entry to SPECX, whilst the /NOMAP qualifier prevents any map being
+opened even is one is specified as open by the dump file. The filename
+will be terminated with .MAP if no file extension is supplied in the
+filename string. 
+
+3 Example
+
+        Example:  $SPECX/NODUMP/MAP=L483CORE
+
+   -- starts up SPECX, does not use the dump file, and opens the map
+      file L483CORE.MAP
+
+2 Emacs_bindings
+
+UNIX Specx is linked with GNU's Readline library which provides full
+Emacs key-bindings (Vi optional) at the Specx prompt
+
+    e.g.  ^P, Up:    previous line
+          ^N, Down:  next line
+          ^F, Right: next character
+          ^B, Left:  previous character
+
+          ^A:        beginning of line
+          ^E:        end of line
+
+          ^D:        delete character
+          ^K:        kill to end of line, store to kill buffer
+          ^Y:        yank: insert last kill at current position
+      + many more.
+     
+In addition there are a number of advanced features:
+
+          ^R text:   will start a reverse isearch through the
+                     command history for a line that starts with
+                     'text'. Keep adding to text until correct
+                     line found.
+        text'TAB':   will attempt to expand the 'text' to the full
+                     command, directory, or filename.
+                     E.g. >> open_fil ng'TAB' may expand to
+                          >> open-fil ngc6334.sdf
+
+2 Vi_bindings
+
+Instead of Emacs bindings (see Emacs_bindings) a subset of Vi bindings
+are also supported. Use 'Esc-C j' to interactively switch to Vi-Mode.
+
+2 Command_files
+
+Indirect command files are ordinary ASCII files from which command
+input can be taken. They are invoked by typing `@filename' in response
+to the >> prompt. Command files always have the extension `.SPX', and
+this should not be specified in the command line. Thus a command file
+called M17.SPX is invoked by typing `@M17'.  Indirect command files
+are created and modified using the VAX editor, either from outside
+SPECX or as invoked using a command line such as $EDIT M17.SPX. If you
+do it the latter way you will return to SPECX on exit from EDIT. The
+lines of a .SPX file look exactly like those you would type at the
+terminal, except that ^D/^Z must be used where you would otherwise
+like CTRL-D, CTRL-Z, and you can't use CTRL-C.
+
+Command files may be nested to a depth of 8, that is, it is permissible
+to include lines such as `@filename' in an indirect command file. A `?'
+encountered in response to a prompt is referred to the calling file for
+resolution, and this process may be repeated. 
+
+Note that the prompt is modified when it is the result of a command from
+within a command file: the prompt is prefixed by the name of the calling
+file, to indicate just who it is that you are talking to. 
+
+2 Journal_file
+
+A journal file is supported. To turn on journalling, type SET-JOURNAL
+y in response to the >> prompt: turn it off again with SET-JOURNAL n.
+
+"SET-JOURNAL y" creates a NEW file SPECX.SPX which can be run as a
+command file later on (and modified, edited, etc etc). All commands
+entered from the terminal are reproduced in the journal file. Responses
+to immediate>> prompts are reproduced only as comments, as by definition
+they can't be read. 
+
+
+2 Symbols
+
+Symbol definition is available. Just type a SPECX type command
+name (the symbol) followed by := and the definition (any valid
+SPECX command line). Examples:
+
+   >>  symbol-a := 'disp-stack;exit'
+   >>  symbol-b := disp-x
+
+To delete a symbol just define it with a null definition:
+
+   >> symbol-a := ' '
+
+Symbols can be redefined. 
+
+   >> symb-a := something else
+
+o   Symbol names are added to the same command table as the built-in 
+    commands, and are decoded in exactly the same way.
+
+o   A symbol name *may* be a contraction of another command or symbol 
+    name. In this case just commanding the *full* symbol name will 
+    always invoke the requested symbol; any contraction will of course
+    still be ambiguous.
+
+o   To see what symbols you have defined, type either just SHOW-SYMBOLS
+    or "SHOW-SYMBOLS symbol-name" in response to the >> prompt: Thus
+
+        >> SHOW-SYMBOLS
+     or >> SHOW-SYMBOLS sym-a
+
+o   The current limit is 64 symbols each of 64 characters. I suppose I
+    might be able to use this amount of memory to give you essentially
+    an unlimited number of symbols, but I'm not worried about it yet.
+
+o   Because it is possible to get in a knot when the translation of a
+    symbol is erroneous (was it the symbol name the interpreter didn't
+    find or the value?) I have modified the command interpreter error
+    messages slightly.
+
+
+2  Do_loops
+
+Execute a given command or command sequence a fixed number of times. The
+arguments are identical to those of the FORTRAN DO. The DO increment can
+be negative, so that you can count down -- if not specified it defaults
+to +1 if N2 is greater than N1, and to -1 if N2 is less than N1. 
+
+At the top level (i.e. the terminal), the format is slightly
+different, in that after specifying the DO range you are put into
+INSERT mode, whereupon you enter the sequence of command lines you
+wish to see iterated. Use EOF (UNIX: CTRL-D; VMS: CTRL-Z) to exit this
+mode --- the file thus generated is then executed as an indirect
+command file. Since there is no syntax checking at INSERT time, it is
+generally better for complicated sequences to first EDIT a command
+file, and then DO that.
+
+The DO variable may be any integer variable --- the six integer counting
+variables i,j,k,l,m,n are pre-declared and can be used freely for this
+purpose. 
+
+Examples:
+    >> do<CR>
+    Do variable name? n<CR>
+    First, last, increment ? 1 200<CR>
+    Enter commands to do, line at a time, CTRL-D/Z to finish
+    insert >> x = 0.5318*x^2-1<CR>
+    insert >> print x<CR>
+    insert >> ^d/^z<CR>
+      -1.000000
+     -0.4682000
+     -0.8834234
+     -0.5849636
+     -0.8180274
+     -0.6441361
+     -0.7793502
+      :
+      :
+     -0.7224417
+     -0.7224419
+     -0.7224417
+
+2  "Login_file"
+
+SPECX now looks for a command file with logical name SPINIT
+when it starts up. If it finds it then it attempts to execute it.
+Thus it is essentially just like LOGIN.COM. Use it to set up values
+of symbols, give you reminders, whatever. Best to put your SPINIT
+file (I call mine init.spx) in your login directory or in your top
+level data reduction directory.
+
+
+2  Variables
+
+These constitute one of the methods by which commands can fetch
+parameter values. If at any time the input is a valid arithmetic
+expression involving only constants, defined variables, and supplied
+functions, then the expression will be evaluated and the resulting value
+used as input. As a concrete example, let us suppose that the (real)
+variable x and the (integer) variable n have both been defined, and have
+sensible values. Then for instance the transaction: 
+
+    >> offset-spectrum x+2*n
+
+would be a valid command line. The expression x+2*n is first translated
+according to the normal rules of precedence, and then used as a response
+to the ``Offset? " prompt. 
+
+SCL includes a symbol table, which gives access to predeclared and
+user-defined variables. User variables may be of type real, double
+precision, logical, integer or character, and may be scalars or
+one-dimensional arrays (vectors). They must be created using the DECLARE
+command before they can be accessed. Pre-defined variables exist for
+almost all items in the current scan (header and data items), for many
+of the useful flags (i.e. the set of defaults which characterize the
+current environment), and for a number of derived quantities, such as
+the results of gaussian and sinusoidal fits etc. Variables also exist
+which contain the number of scans in the current file, the number of
+spectra in a GSD file, and the number of entries in the map file. The six
+integer counting variables i,j,k,l,m,n, and logical constants TRUE &
+FALSE, are also predefined. 
+
+The full set of currently defined variables, together with their type
+and vector length, may be inspected using the SHOW-VARIABLES. You will
+note that several of the variables have a "*" as their first character.
+This is SCL's way of knowing that the variables are read-only, and must
+not (cannot) be altered by the SPECX user. In general things are only
+read-only if the result of changing them would be to risk damage to your
+files etc, but (for example) the logical variable TRUE is readonly too;
+the consequences of redefining TRUE to be false may be imagined. 
+
+Variables may be set using the = command (see below), and inspected
+using the PRINT command (also described later). It is possible to give
+any variable or arithmetic expression defined variables in response to a
+prompt. Thus, for example, "4*x + 5" would be a valid response to the
+OFFSET? prompt, provided that "x" had already been declared. Note that
+variable names are not case sensitive (or are not meant to be - let me
+know of any that appear to be!) 
+
+
+2  Expressions
+
+3  Arithmetic_expressions
+
+Arithmetic expressions may be used anywhere that a value is expected.
+Expressions may be of mixed type --- operands are automatically
+converted to the most general type when a mixed type expression is
+evaluated. The hierarchy of types is I4 -> R4 -> R8. Conversions between
+character (Cnnn), logical and numeric types are not supported.
+Expressions may contain subexpressions (contained within ordinary
+brackets), and are evaluated left to right, with normal FORTRAN operator
+precedence. Array subscripts may also be expressions. 
+
+             Operators and precedence
+
+          Unary minus        -         4
+          exponentiation     ^         3
+          multiplication     *         2
+          division           *         2
+          addition           +         1
+          subtraction        -         1
+
+A higher precedence indicates that the operator is applied before any
+operator of lower precedence that could also act on the same
+argument(s). A small set of standard real functions is also provided.
+For now only the 13 functions listed below are available, but I can put
+in more if there is user demand. 
+
+                Built-in functions
+
+           square root            sqrt
+           |x|                    abs
+           NINT(x)                nint
+           FLOAT(x)               flt
+           natural log            ln
+           log10                  log
+           exp                    exp
+           sine                   sin
+           cosine                 cos
+           tangent                tan
+           arcsine                asin
+           arccosine              acos
+           arctangent             atan
+
+3  Logical_expressions
+
+Only the simplest logical operators are provided. Note that for now the
+logical NOT (~) and arithmetic unary minus (-) are the same thing, but I
+do not guarantee that this will continue, and in any case, expressions
+are easier to use if you distinguish between the two uses. The two
+binary operators & and ! have the same precedence, but lower than that
+of any of the relational operators. Expressions are evaluated left to
+right. 
+
+               Valid Logical operators
+               -----------------------
+                  &           AND 
+                  !           OR
+                  ~           NOT
+
+
+3  Relational_expressions
+
+Relational expressions are defined to be simple binary expressions -
+i.e. one operand and two operators, and may compare either two string
+items or two numeric items. String items may be tested only for equality
+or inequality and are case-independent. 
+
+               Valid Relational operators
+               ---------------------------
+                   =          equal
+                >< or <>      not equal
+                   <          less than
+                   >          greater than
+               <=  or =<      less than or equal to
+               >=  or =>      greater than or equal to
+
+
+2  Comments
+
+Within a command file, lines beginning with * or with ! are treated as
+comments. These characters are ONLY interpreted as comment introducers
+if they are the first character on the line. Note that comments which
+echo to the terminal have been removed --- use PRINT 'string' for this
+purpose. 
+
+
+1 Control_functions   
+2 $
+
+Pass the following command to DCL. If the command is blank, then
+this starts up a DCL subprocess, in which you can carry out any
+DCL sequence you like: exit to SPECX by logging out of the subprocess.
+
+2 @
+
+Invoke an indirect command file (i.e. a .SPX file). Command files can
+be nested to a depth of 8.
+
+2 =
+
+Equate a variable to an argument or expression. e.g. 
+    >> interactive = true
+
+2 :=
+
+Define a command symbol. e.g.
+    >> my-symbol := '@my_commands.spx;print-spectrum-header;exit'
+
+2 ASK
+
+Request a value for either a user-defined or pre-defined variable. e.g.
+    >> ask 'Give new value of x?', x, ?
+
+2 DECLARE
+
+Create a new SPECX variable. May be of type real (R4), double precision 
+(R8), integer (I4) or string (Cnnn). All sorts of variables may arrays.
+
+    >> declare ii i4
+    >> declare string c28
+    >> declare string_array(5) c10
+    >> declare real_array(10) r4
+
+2 DIAGNOSTICS
+
+Gives a list of current usage of virtual memory and logical units. 
+Mainly included as a programmer diagnostic - not very useful to common 
+users.
+
+2 DO
+
+Set up an interative loop. Similar to FORTRAN DO in syntax, except
+that increment may be negative. When used interactively the command
+drops you into "INSERT" mode: enter the sequence of commands and
+terminate it with a EOF (UNIX: CTRL-D; VMS: CTRL-Z) e.g. 
+
+Interactively:
+    >> DO i 1 10
+    INSERT> print i
+    INSERT> ^d/^z
+
+In a command file:
+    DO i 1 10
+      print i
+    END DO
+
+2 DUMP
+
+SPECX can maintain a record of its current state in a special "dump" 
+file. By default the dump file is updated when you exit the program 
+and is read back when the program is entered. However you can also 
+dump the current state at any time to the default file (which has 
+logical name SPECX_DUMP, defaulting to SPECX.DMP in your local
+directory) or any other, using this command.
+
+This may be useful if you are reducing data from more than one 
+telescope or instrument and want to maintain essentially different 
+versions of SPECX with reduction parameters tailored differently in 
+each case.
+
+2 EXIT
+
+Leave the program. Current state is saved to the file assigned to the
+logical name SPECX_DUMP.
+
+2 IF
+
+Conditional execution. Very similar to FORTRAN implementation. Note
+also ELSEIF, ELSE and ENDIF. Test expression may be any logical 
+expression, if desired having relational and arithmetic subexpressions.
+
+The IF command has one prompt:
+     Expression?    (string)
+
+Logical expression evaluation has now been implemented. Thus the string
+can be any of: (a), a logical variable name (including the readonly
+variables .TRUE., TRUE, T, .FALSE., FALSE or F); (b), a relational
+expression; (c), a logical expression consisting of one or more
+relational expressions separated by logical operators. Relational
+expressions are defined to be simple binary expressions - i.e. one
+operand and two operators, and may compare either two string items or
+two numeric items. String items may be tested only for equality or
+inequality and are case-independent. 
+
+The expression may optionally be enclosed in brackets for readability.
+
+If the expression encountered by an IF or ELSEIF statement is logically
+true then the following commands to the next ELSEIF/ELSE or ENDIF will
+be executed and any further commands before the ENDIF ignored; otherwise
+they will be skipped until the next ELSEIF which is treated like a new
+IF. If an ELSE statement is encountered without any of the tests on the
+IF or any following ELSEIFs having been true the commands following the
+ELSE are executed. IF structures can be nested to a depth of 16. 
+
+Example: 
+             !  Command file to demonstrate IF command
+                   if 3*x^2+4 <= 27
+                     offset x
+                   elseif (x/4 = 2)
+                     x = 27
+                   else
+                     print 'no action taken'
+                   endif
+
+2 PAUSE
+
+Lets you interrupt execution of a command file or macro. Gives you the
+option of continuing (if you are happy with progress so far) or of 
+quitting now. A CTRL-C at this stage will get you all the way back to 
+command level (i.e. the >> prompt). To use the language of the draft
+FORTRAN 8X standard, this feature is 'Obsolete' (or at least
+'Deprecated') -- use the IF and RETURN statements instead.
+
+2 PRINT
+
+Print a string or value of a variable to the current output file, as
+selected with SET-LIST-FILE. Output may be formatted with standard
+FORTRAN format expressions -- e.g.
+
+      >> print x
+      >> print 'value of x is: ', x
+      >> print 'value of x is: ', x:f5.4
+
+2 RESTART
+
+Retrieve the program state from a nominated dump file.
+
+2 RETURN
+
+Unconditional return from a command file to next highest level.
+Clearly only useful within an IF block, as return executed
+in any case at end-of-file.
+
+2 SET-DUMP
+
+This allows you to set a flag so that the program dumps every time the 
+program state changes. If the program crashes inadvertently you should 
+be able to get back to exactly where you were just be re-entering 
+SPECX. However it does add significantly to the execution time. Note 
+that this feature is turned off during execution of both macros and 
+command files, to save time and to prevent storage of partially reduced 
+data.
+
+2 SET-ERROR-RETURN
+
+Define the error severity which will be sufficient to cause the 
+command sequence or macro to abort. Note that F (fatal) errors
+*cannot* be trapped, I (informative) errors never need be.
+
+2 SET-JOURNAL
+
+Open a file SPECX.SPX which will receive a copy of all terminal
+input. Once closed, this can be edited (if so desired) and used
+as an indirect command file.
+
+2 SHOW-SYMBOLS
+
+Print the definitions of the specified symbol or symbols to the
+current output device.
+
+2 SHOW-VARIABLES
+
+Print the definitions of either the specified variable, or if no
+variable specified, of all defined variables. Tells you variable
+type and array length.
+
+2 WRITE
+
+Lets you encode SCL variables as ASCII character string (e.g. for use
+in making up filenames for a DO loop.) Example:
+
+                         >> declare filename c16
+                         >> declare iscan i4
+                         >> iscan = 2
+                         >> write filename 'scan_',iscan:i4.4,'.fit'
+                         >> print filename
+                         >> scan_0002.fit
+
+1 Data_export         
+2 See_also_under_FITS.
+
+2 WRITE-ASCII-MAP
+
+Writes out the MEASURED data points within the current map to 4 columns
+of an ASCII file called ASCII_MAP.TMP    In order the values represent: 
+  x-offset ("), y-offset("), Data value, noise.
+The noise column in all zeros for present - this is included for 
+compatibility with various MEM programs etc that use these data.
+
+2 WRITE-ASCII-SPECTRUM
+
+Write the spectrum currently in the X-register and its header to an
+ASCII datafile with name specified by you. This is useful if you want to
+plug the data into MONGO for instance. (The header info can by bypassed
+in MONGO using the *LINES command.) Columns are 1: Line #; 2: Channel #;
+3: X-axis value; 4: data value. 
+
+2 WRITE-GILDAS-IMAGE
+
+Write the current SPECX map to a GILDAS data cube suitable for 
+manipulating with GILDAS and CLASS. At present only the cube
+itself is written: header variables need to be updated with the
+GILDAS HEADER command. Note also that the cube is stored with
+the Declination axis running the wrong way, and that GILDAS,
+although capable of labelling the axes correctly, is not able
+to invert the cube so that declination increases to the top.
+The next version of SPECX will attempt to fix these problems.
+
+1 Data_processing     
+
+2 DROP-CHANNELS
+
+Drop nominated channels at each end of the spectrum. Since in general 
+this is aysmmetric the centre frequencies etc are adjusted 
+accordingly.
+
+2 INVERT-SPECTRUM
+
+Swap the spectrum end for end, amending the header appropriately. May be
+useful when trying to average spectra of the same line observed in
+adifferent sidebands for example. Use it if necessary before any
+operations such as ADD, SUBTRACT, F-Q-S etc that operate on a
+channel-by-channel basis and do not regrid first. For example, if two
+spectra from different instruments are to be averaged: 
+
+      1.   INVERT-SPECTRUM if necessary to get velocity scales
+           running the same direction on both.
+      2.   REGRID one of the spectra to the same velocity sampling
+           as the other.
+      3.   DROP-CHANNELS from one or both spectra to get them to
+           cover EXACTLY the same velocity interval.
+      4.   AVERAGE.
+
+Sure, sure, I could automate this. I will when I get time!
+
+Note that this swaps the WHOLE spectrum - thus the quadrant order is
+reversed also. So if you were plotting quadrant 1 which was the
+low-resolution AOSC channel for example, after INV-SP you would then be
+plotting the high-resolution channel (all appropriately reversed, except
+that in velocity or frequency scale the scales will still be right, and
+all you will notice is that the spectrum now plots across the screen in
+the opposite direction). 
+
+2 REGRID-SPECTRUM
+
+Resample the data onto a new (evenly spaced) grid with sampling and 
+centre frequency as defined by you. You should choose whether you want 
+the final spectrum to have an odd or even number of channels, 
+depending on whether you want a sample at the centre frequency or not.
+
+2 REMOVE_SPIKES
+
+Buddy Martin's routine to clip data which exceeds some specified 
+threshold and set it to the average of the channels on either side. 
+Presently contains some ludicrously low upper limit on the number of 
+spikes which can be removed, but I may get round to changing it one 
+day.
+
+2 CLIP-SPECTRUM
+
+Use to set datapoints with values outside the specified range to some
+value you nominate. May be useful to make default plot scales more useful,
+and when writing data out in standard 2-bytes FITS, to avoid loss of
+precision.
+
+2 SET-CHANNELS
+
+A very non-scientific form of data editing. If you don't like the 
+value of a particular data channel, or group of channels, then reset 
+it to whatever you like. Very useful, but don't own up in Monthly 
+Notices that this is what you have done.
+
+2 SHIFT-SPECTRUM
+
+Shift the data laterally within the set of samples. For example, you 
+could move the line so that peak shifted from channel 37 to channel 32.
+The vlsr is amended so that line will still plot at the same peak 
+velocity - if you are shifting it to correct an error in the 
+observations then you may need to edit the vlsr to the correct or 
+original value to yield the desired result.
+
+2 TRUNCATE-SPECTRUM
+
+Drop the nominated number of channels from both ends of the current X-
+register data. Centre frequency etc are therefore unaffected.
+
+1 Filtering           
+2 BIN-SPECTRUM
+
+Forms a new spectrum in X by averaging together successive groups of 
+channels of specified width. Data equivalent to that from SMOOTH-
+SPECTRUM except that it is still sampled at the same rate relative to 
+the frequency resolution. Since the number of data points may not be 
+an exact multiple of the width of the bin points must be dropped - you 
+specify where by nominating a start channel for the binning process.
+
+2 CONVOLVE-SPECTRUM
+
+Convolves the spectrum currently in the X-register with a truncated
+end of the spectrum for which the convolving function does not lie
+entirely within the spectrum. 
+
+2 DIFFERENTIATE-SPECTRUM
+
+Forms a new function in X by evaluating succesive differences between 
+channels. Most useful for looking at data like drift scans across the 
+moon where the total power is roughly the integral of the 1-D beam 
+shape.
+
+2 FOLD-SPECTRUM
+
+Evaluates the symmetric part of the spectrum in the stack X-register,
+and leaves in the same position. No other registers are affected.
+
+2 HANN-SPECTRUM
+
+Applies hanning weighting (0.25 0.5 0.25) over the spectrum currently 
+in the X-register. Then drops one channel at each end of the spectrum.
+
+2 REMOVE-SPIKES
+
+Very simple despiking routine to flag channels above a certain
+threshold and then to set them equal to the average of their neighbours.
+
+2 SMOOTH-SPECTRUM
+
+Performs a running average of a boxcar function over the spectrum 
+currently in the X-register. Then drops those channels at the end of 
+the spectrum for which the boxcar does not lie entirely within the 
+spectrum.
+
+1 FITS_(read_and_write)
+
+SPECX now has an interface to the FITS (Flexible Image Transport System)
+format, to allow export of data to other packages, particularly the IRAM
+CLASS/GREG system. Both single spectra and maps can be exported; this
+will probably be extended in the near future to allow export of data
+cubes also. FITS maps can be read directly into AIPS.
+
+The SPECX FITS utilities use Keith Shortridge's FIT_ routines, which he
+has kindly consented to me using in this program.
+
+2 CLOSE-FITS-FILE
+
+Closes an open FITS file on either disk or tape (the latter by writing
+a double tape mark).
+
+2 OPEN-FITS-FILE
+
+Creates an output file to receive FITS spectra on either disk or tape.
+In the case of a disk file you may choose whether to have the data bytes
+reversed or not: non-reversed (IBM standard) is the FITS standard, but
+this may not matter for transfer between two VAX-VMS programs.
+In the case of a tape file you need to specify the tape drive name (e.g.
+MSA0:), the blocking factor (in multiples of the standard 2880-byte FITS
+block length) and whether you want to open the tape for write at the
+beginning or to append after all existing files.
+
+2 WRITE-FITS-SPECTRUM
+
+Write the current contents of the stack X-register to an open FITS output
+file on either disk or tape.
+
+2 WRITE-FITS-MAP
+
+Writes a 2-D map to a FITS file on either disk or tape.
+
+2 WRITE-FITS-CUBE
+
+Writes a 3-D cube to a FITS file on either disk or tape.
+
+1 Fourier_analysis    
+2 FOURIER-POWER-SPECTRUM
+
+Useful function for looking for the noise structure of the data, or 
+for spurious features at particular ripple periods. Can be used to 
+control your filtering in a primitive sort of Wiener filter technique.
+
+Direct transform. Cannot be reversed of course.
+
+2 FOURIER-TRANSFORM
+
+Since the actual spectrum is real and symmetric, it can transformed in 
+both directions using the same function. Normalization is such that 
+you come back to where you started after two transformations. Good for 
+looking for correlator funnies. Direct transform, so does not need to 
+pad with zeros to get 2**N points - therefore sampling unchanged.
+
+1 GSD_files           
+2 INDEX-GSD-FILES
+
+Produces a listing of the specified GSD scan files on the current 
+output device (set by SET-LIST-FILE). This includes information on 
+date and time of observation, as well as map centre position and map 
+size where appropriate. Note that the command loops until you give the
+^D/^Z or \ response to the prompt. Thus the response 27,31/33\ would 
+serve to give you the index of scans 27 to 31 inclusively and 33 also.
+
+2 READ-GSD-DATA
+
+Reads a spectrum from the nominated GSD data file into the bottom 
+stack position(s). It checks a directory DATADIR (setenv DATADIR ...
+before starting Specx) if the file is not found in the current
+directory.
+
+If more than one observation in a file then it prompts for which one
+you want. Requires one stack position per front end receiver channel
+(i.e. per polarization).
+
+If there is more than one scan in a given GSD file taken at the same
+sky position, then the routine offers you a choice as to which of them
+you want.
+
+WARNING: in order to make R-G-D as speedy as possible, it reads all
+subscans to memory at once. Drawback: R-G-D won't re-read the disk file
+(even when altered on disk) until another GSD file has been read.
+
+2 READ-GSD-RASTER
+
+This is a high-speed routine to read all spectra from a multi-subscan
+('On-the-fly', RASTER, GRID, PATTERN) file directly to a Specx data
+file, optionally with a DAS-MERGE along the way (See also MERGE-FILES
+in Specx_files). The user has to make sure the target file is open for
+Write (use S-F-A W/RW for existing files). The routine is the FORTRAN
+(much faster!) implementation of the Specx sequence:
+        do i 1 nsub
+          read-gsd-data scan i
+          das-merge            (optional)
+          write-spec #
+        enddo
+
+2 SET-GSD-FILENAME
+
+Sets the GSD filename prefix. GSD filenames are of the form 
+<prefix>_<nnnn>.DAT, where nnnn is a four digit scan number. The 
+OBS_<backend_name>_ - e.g. a typical scan is OBS_KENT_0123.DAT
+
+1 Information         
+2 HELP
+
+The command you are now using. Interfaces to the VMS help utilities to
+read information from the help file SPECX.HLB, which is accessed via 
+the logical name SPECX_HELP.
+
+2 SHOW-COMMANDS
+
+This used to be called HELP. It uses the command string facilities to 
+find all commands where any single word begins with the string you 
+supply in response to the prompt. Thus for instance the response 
+"fit" would get you a list of commands including FIT-POLYNOMIAL-BASELINE,
+OPEN-FITS-OUTPUT-FILE, etc.
+
+2 SHOW-NEWS
+
+The news file is updated each time a significant change is made to the 
+program. It is a text file which is added to at the start, so that it 
+is only necessary to read until you get to the stuff you had seen 
+before - then you can exit. This command allows you to read the file 
+from the beginning from within SPECX. If you want hardcopy of the 
+complete file then from DCL send the command $PRINT SPECXNEWS.LIS, and
+you should have the whole thing.
+
+1 Initialization      
+2 INITIALIZE-PARAMETERS
+
+Annihilates the effect of starting from a dump file, or of having been 
+running the program. Sets all parameters back to their initial state. 
+Note that some parameters are initialized according to the contents of 
+the site-specfic data file with logical name SPECX_INIT - this will 
+usually be the file SYS_SPECX:SPECX_INIT.DAT, which contains entries for 
+many of the variables.
+
+1 Line_parameters     
+2 FIND-CENTROID
+
+Finds the position of the centroid of the line profile.
+
+2 FIND-INTEGRATED-INTENSIT(y)
+
+Measures the integrated flux in a chosen range of the spectrum.
+
+2 FIND-LINE-WIDTH
+
+Allows you to use the cursor or otherwise specify two x-axis values, 
+and then calculates the difference and stores it in the header. Not 
+very useful, but it is not easy to find a good algorithm for line 
+width that will be popularly acceptable. May change it to equivalent 
+width at some time.
+
+2 FIND-MAXIMUM
+
+Determines the maximum value of the scan. Uses an interpolating 
+routine, so the value may be higher than the highest value in the 
+data, although generally differences are small.
+
+Also reports the X-axis position of the maximum. Results are stored 
+in the scan header.
+
+2 FIND-MOMENTS
+
+Measure first and second moments of the spectrum about a nominated 
+centre position, with a "gap" in which data are not calculated. 
+Written by Buddy Martin to compare red and blue line wings without 
+measuring ambient cloud material.
+
+2 FIND-SKEWNESS
+
+Determines first 4 moments of the line profile about the centroid.
+
+2 FIND-SPECTRUM-STATISTICS
+
+Accepts up to 5 regions of the spectrum over which to measure the mean 
+and standard deviation. From these and the integration time and 
+resolution bandwidth it also calculates an effective noise
+temperature.
+
+1 Listing_and_display 
+
+Many of the reduction operations give a printout of the most important 
+results. This will generally appear on the current listing file, which
+is usually the terminal but may also be set to the system printer.
+
+2 LIST-SPECTRUM
+
+Produce a listing of the data in each unmasked quadrant or sector of 
+the spectrum (output to current listing file).
+
+2 PRINT-SPECTRUM-HEADER
+
+Produce a formatted output of the header of the spectrum in the X 
+position of the stack - includes all information about noise 
+temperatures, time, date and position of observation, observing 
+frequency etc (output to current listing file).
+
+2 SET-LIST-FILE
+
+Choose a file for listing things like spectrum values, headers, gaussian
+fits etc. You can set it to the terminal or the printer (printer output
+is automatically dumped to the system printer after each macro or
+procedure completes), OR you can dump it to a file of your own choosing
+or to the null output device (i.e. the bit-bucket). 
+
+1 Map_making          
+
+SPECX is able to deal with spectral line maps - i.e. data cubes - as
+well as with single spectra. As the average size of data sets has
+increased, so have demands on memory and i/o associated with cube
+handling, and it has been necessary to modify the way in which SPECX
+does this significantly. 
+
+SPECX maintains the map in two forms. The permanent form is the mapfile.
+This consists of a single header (the "prototype header") representing
+the invariant information describing the spectra, followed by the
+individual spectra for each point. Because spectral line maps are often
+only sparsely sampled the data are stored sequentially in the order they
+are added to the map, with an index block to describe where in the file
+the data for each map point are to be found. This index block is
+consulted whenever a spectrum is taken from the mapfile, and modified
+whenever a spectrum is added or deleted. 
+
+Given that there is only one header, it follows that all points in the
+map will be described as if they have the same integration time,
+velocity resolution etc. 
+
+In order to obtain faster access to the data, SPECX also maintains a
+temporary form of the map whenever a map file is opened. This is a 3-D
+array, known as the cube, which is resident in virtual memory (and in
+physical memory also if the working set is large enough). The INDEX
+array from the map file contains information concerning where in the
+mapfile each spectrum came from, or whether it has been interpolated
+from those around it (or is even not present at all). This is therefore
+used to control whether or not certain areas of the map are contoured or
+greyscaled. SPECX is full of tricky stuff to maintain the mapfile in
+parallel with the cube - thus once the cube is loaded i/o is confined to
+modifying small parts of the map file in response to the various
+operations on the map itself. Interpolated data are never stored in the
+map file, but can be obtained relatively quickly on demand. 
+
+2 OPEN-MAP
+
+Opens an existing map file and reads the data it already contains into 
+the data cube. If the file does not exist then it creates a new map 
+file for you, and prompts for various map parameters (overall extent,
+RA and Dec of map centre, cell size, rotation wrt N, etc).
+
+The details of the spectra in the map file are not known until you add 
+the first spectrum to the map and cube. The header of the first 
+spectrum is used as the "prototype" header, which thereafter applies 
+to all spectra in the map. In particular, the position of the "map 
+centre" of the prototype header is also used as the centre of the map
+unless the RA and Dec are specified now.
+
+Note that the mapfile name should be specified WITHOUT the .MAP 
+extension.
+
+2 ADD-TO-MAP
+
+Writes the spectrum currently in the stack X-register to the map file 
+and cube. Its position in the cube is established from its own map 
+centre and RA/Dec offset relative to the map centre of the prototype 
+header. If the map file already has a spectrum for that position then 
+you are prompted to see if you want to replace it.
+
+The map file contains only single-quadrant spectra, so if your 
+spectrum has more than one quadrant the usual rules for selecting one 
+quadrant apply - you will be prompted if the program cannot select one 
+sensibly by itself.
+
+2 GET-SPECTRUM-FROM-MAP
+
+Extract a spectrum from a given position in the map, and place in the 
+stack X-register (stack is pushed first, so T-register data is lost). 
+Spectrum may be specified either by its position in the file, R.A. and 
+Dec., or offsets in terms of the map "local" coordinates.
+
+If you specify the spectrum by scan number you will get the spectrum
+direct from that position in the map file. If you specify it by position
+either on the sky or within the map you will get the spectrum from the
+data cube. This thus gives you a way to plot the spectra from the cube
+when it has been interpolated. 
+
+Note that the position offsets returned in the spectrum will be 
+relative to the nominal "map center" defined in the header of the
+first scan added to the map; NOT relative to the actual map center.
+
+The same function is available interactively within CONTOUR and
+GREYSCALE using the crosshair cursor menu item "G". This saves you
+having to specify the position numerically (but gives you data from the
+cube only). 
+
+2 LIST-MAP
+
+Produces a listing of the map details on the current listing device
+(use SET-LIST-FILE to alter this). Details include the prototype 
+header, the size and shape of the map, and the mapping of spectra onto 
+the cube. The option determines whether or not you get a line of 
+information about each entry in the map, telling you what spectrum 
+describes which position.
+
+For maps exceeding 25 spectra INDEX-FILE asks for an ordinal
+scan-number and offset range.
+
+2 DELETE-FROM-MAP
+
+Delete a given spectrum from the mapfile and cube. Use it if you have 
+inadvertently put a spectrum in the wrong position and want to remove 
+it without replacement. Otherwise you can also use ADD-TO-MAP, with a 
+YES response to the appropriate prompt.
+
+2 INTERPOLATE-MAP
+
+Calculate interpolated spectra for those positions in the mapfile and
+cube for which no data have been entered. Interpolating function is a
+gaussian, whose width you would normally set to be equal to the beam
+diameter, and of extent defined by your response to the prompts. Only
+those positions which are in some sense "between" nearby valid data
+points can be interpolated in this way. Note that from V5-4 on this
+performs a true convolution from the measured data points, so that the
+original points are lost. If you attempt to re-interpolate the map you
+will get an error message, since the "original" data points are gone.
+To reconvolve with a new beam, do a new OPEN-MAP to reload the data
+cube with the raw data. 
+
+The optimum interpolating function is equal to your beam. However this
+of course means that you will suffer a sqrt(2) degradation in resolution
+if you just interpolate the map to fill in a few missing samples. Things
+you might try in this case are: 
+
+i. interpolating the map; then extracting the samples you need and
+   reinserting them in the original map.
+
+ii.interpolating with a beam much smaller than the actual beam. This 
+   will not give such a good estimate of the missing samples, but will 
+   spread stuff around much less. Since the map IS already convolved   
+   with the actual beam, an interpolating function less than half the
+   beamsize will have negligible effect on the appearance of the 
+   existing data.
+
+Interpolation may be applied immediately, in which case you will need a
+working set quota sufficient to contain *two* complete cubes, as one is
+interpolated onto the other, or, alternatively, interpolation can be
+specified as taking place "on demand" - that is, interpolated spectra
+are produced from the uninterpolated cube as and when they are required
+by the plotting command. This uses less memory, but the individual
+plotting commands may execute more slowly due to the greater number of
+disk accesses. Interpolation on demand has the added advantage that the
+interpolation can be altered at will, without having to reopen the map
+and wait for the cube actually to be interpolated. In the former case
+(immediate interpolation) the interpolation may proceed rather slowly
+for a large map/cube, so the current row number is displayed as
+reassurance that something is happening. The choice is yours. During
+INTERPOLATE-MAP you also specify a (gaussian) convolving function for
+the velocity dimension of the cube. This convolving function is only
+applied if velocity is one of the map axes, and is applied only after
+the map has been extracted from the cube. It thus provides a method for
+smoothing the velocity dimension of a position-velocity diagram. 
+
+2 CLOSE-MAP
+
+Close the map file if one is open, and release the virtual memory 
+occupied by the cube. Useful if you are not going to use the map for a 
+while as it reduces the memory requirements of your process, and makes 
+restarting faster (since the cube doesn't need to be reloaded).
+
+If you forget to do this but want to restart SPECX without the map being
+loaded into the cube use the /NOMAP option with the $SPECX command line.
+
+1 Multi-quadrant_data 
+
+As mentioned previously, SPECX contains facilities for handling
+several spectra under one header. This is useful for example when
+observing with an auto-correlation receiver which typically has
+several 'quadrants' centred on different frequencies,, when observing
+in two polarizations at once, or when observing simultaneously with
+two or more different spectral resolutions. Different observatories
+use different words to describe this system - at NRAO Kitt Peak they
+refer to different 'Receivers', while historically the different
+channels of an autocorrelation backend have generally been referred to
+as 'Quadrants'. The latter term is used here to describe the general
+case. 
+
+2 DAS-MERGE
+
+This routine combines a TRUNC-SPECTRA with a MERGE-QUADRANT to speed
+the handling of DAS data. The TRUNC is necessary because the 'sharp'
+edge of the passband of each correlator subband induces huge
+noise-spikes in the edge channels which need to be dropped before
+MERGING the quadrants. The default is to keep the inner 50% of the
+overlap as illustrated below. In general one should NOT adjust for DC
+offset because if may introduce e.g. a random-walk effect (DAS-MERGE
+start at one and of the spectrum, not the middle). Also the internal
+adjustment is thought to be more accurate than basing one on the
+edges alone. Adjusting for DC offsets has the tendency to introduce
+sloping baselines, but is handy as a diagnostic for DAS defects
+(e.g. a sloping baseline of an individual DAS subband).
+
+DAS-MERGE:
+                          <- ovrlap ->
+                             aaaaaaddd
+           ---------------------------
+                          ---------------------------
+                          dddaaaaaa   
+
+        a: averged (default is center half of channels in overlap)
+        d: dropped (default is outer quarter of overlap of each subband)
+
+2 EXTRACT-QUADRANT
+
+Forms a new spectrum in X which has a single quadrant. The quadrant to 
+be retained is specified using the usual rules - if the program cannot 
+satisfactorily choose one you will be prompted to nominate one. The 
+rest of the stack is not affected.
+
+2 MERGE-QUADRANT
+
+For data such as that from the KENT correlator only, produces a spectrum
+with a single quadrant from multi-quadrant data. First checks that all
+quadrants have identical sampling. If so and if they do overlap it
+shifts the data within each quadrant to minimize the differences in the
+overlap region, then resamples succeeding quadrants onto the frequency
+grid established by the first, and finally averages data in the overlap
+region. 
+
+If the parameter MERGE_OFFSET is set to false then the vertical 
+offsetting is suppressed, and the sectors are merely regridded to a 
+common sampling, and then averaged.
+
+2 SET-QUADRANT-DISPLAY
+
+Sets up an array which controls which quadrants are displayed in plots 
+and listings, and are operated on in various reduction operations. A 1 
+in a given position enables reduction, a 0 disables it.
+
+2 SLIDE-QUADRANT
+
+For data such as that from the NRAO 12-metre telescope only, where two 
+polarization channels are squidged onto a single quadrant. Averages 
+together corresponding frequency channels in the two halves, and 
+corrects the centre frequency etc to make it all OK.
+
+2 CONCATENATE-SPECTRA
+
+Use this function to form spectra in X and Y stack positions into separate
+quadrants/sectors of the final X spectrum. If X and/or Y individually have
+more than one sector, this structure will be preserved in the output. Thus
+if X has 4 sectors, and Y has 2 sectors, the output in X will have 6
+sectors. Spectra may not be concatenated if the final spectrum would have
+either more sectors or more data points than the limits (currently 8
+sectors and 2048 data points total). 
+
+1 NEWS                
+2 Welcome_message_Unix_Specx_6.7
+
+Welcome to the Unix port of Specx. It is important to read the
+relevant item in the on-line help. So if you run Specx on Unix
+for the first time, do a
+       >> help
+       Topic? news unix
+
+This is the JAC Version. It includes:
+    -  command-line editing (Emacs-style)
+    -  exception handling (for ^C)
+Please report any problems with floating-point exceptions.
+
+
+Other changes:
+
+   NEW-PLOT and OVERLAY now accept a color index (1-15) as second
+     argument. If the color index is negative, each subband (quadrant)
+     of a spectrum is plotted with a different color. The default
+     is now retained in the dump.
+   Auto Y-axis scaling for NEW-PLOT, R-L-B etc now looks only at points
+     in current X-axis range. Still no autoscaling within interactive
+     graphics however.
+   READ-GSD-DATA now also checks DATADIR for gsd files after current
+     directory (setenv DATADIR ... before starting Specx). Has also
+     been speeded up significantly. Reads all subscans at once. 
+     Drawback: won't re-read the disk file (even when altered) until 
+     another GSD file has been read.
+   DAS_MERGE default for DC adjust changed to 'N'. DAS-MERGE has been 
+     changed from a script to a FORTRAN coded command.
+   SET-INTERACTIVE now 'N' upon entry of specx.
+   REGRID has been rewritten to be more robust. ** It has new questions **
+     The original functionality is retained, but it also allows you specify
+     the final number of channels and the centre (in current x-units) of
+     the regridded spectrum.
+   PLOT-LINE-PARS: the bug that cause a crash when not plotting a linear
+     sequence of parameter maps (e.g 1, 2, 3) has now been fixed.
+   INDEX-FILE, COMPRESS-FILE, LIST-MAP allow limits on scan nr and 
+     offset positions if more than 25 scans.
+   New NDF map format - much faster. 
+     Version 4.1 maps WILL BE COPIED to the new format. 
+
+New commands:
+
+   DAS-MERGE is now a FORTRAN subroutine i.s.o. a Specx Macro.
+   WRITE-FITS-CUBE (under test).
+   INFO-FILE  (update NDF spectral file header information: for
+      use with SPECX macros. Ensures SPECX variables refer to
+      indicated file.)
+   READ-GSD-RASTER (under test: directly reads all subscans
+      from GSD file into a SPECX file with an optional DAS-MERGE
+      along the way. Much faster than SPECX do-loop)
+
+1 Specx_file_formats  
+Specx 6.7 introduced version 4.2 of data formats for spectra and for
+maps.  Version 4.x spectral format is based on Starlink's Hierarchical
+Data Structures (HDS), a binary format that is portable between
+different machine architectures. Thus you can take version 4.x spectra
+from a Sun workstation to an Alpha workstation and back, without
+noticing it.
+
+Version 4.x map format, too, is based on HDS. Thus maps are portable as
+well.
+
+
+2 Data_migration
+
+GSD files: Data in GSD format can be converted to Specx spectral or
+   map format using READ-GSD-DATA or READ-GSD-RASTER.
+
+Disk-FITS files: These must be written with IBM byte order (swap order
+   on Digital machines). They can then be copied binary. One way is the
+   Unix "cp" command if both disks are mounted by the Unix machine.
+   Another way is "ftp" in binary mode.
+
+   This works between Unix machines and from VMS to Unix. If disk-FITS
+   files are moved from Unix to VMS, it may be necessary to make them
+   files of fixed record length 2880 byte. "cp" is thus unsuitable.
+   "ftp" in binary mode will create the right sort of file with the
+   wrong record length of 512 byte. You can either rectify this with
+   some VMS command, or use a more tolerant disk-FITS reader under VMS.
+
+Spectral data version 2 and 3: These are VMS binary formats. Take a
+   binary copy to the destination machine. The VMS versions Specx 6.2
+   and 6.3 can use it straight away, of course. For Specx 6.5 and up
+   the file has to be imported (converted into a version 4.x file) with 
+   the command CONVERT-VAX-FILE. This keeps the existing file (say
+   "file.dat") and creates an new file ("file.sdf").
+
+Spectral data version 4.0 and up: These are portable binary formats
+   based on HDS. Just take a binary copy to the destination machine
+   (Unix "cp" or "ftp" in binary mode). The file can be used straight
+   away. Optionally you can convert it to the native flavour of the HDS
+   format on the destination machine. Use the command "native" in the
+   Kappa package. This should speed up data access somewhat.
+
+   Version 4.x spectral data cannot be imported back into Specx 6.2 or 
+   6.3.
+
+Map files version 2 and 3: These are VMS binary formats. Take a binary
+   copy to the destination machine. The VMS versions Specx 6.2 and 6.3
+   can use it straight away, of course. For Specx 6.5 and up the file
+   has to be imported (converted into a version 4.x file) with the command
+   CONVERT-VAX-MAP. This keeps the existing file (say "file.map") and
+   creates an new file ("file_map.sdf").
+
+Map files version 4.0: These are "local" binary formats written only by
+   the beta test version of Specx 6.4. "Local" means they can only be
+   read by the same type of machine that wrote them, either a Sun4
+   workstation or an Alpha workstation. These files can be converted to
+   format version 4.x with CONVERT-VAX-MAP. In spite of the name of the
+   command, the file will be assumed to have been written by the same
+   Unix machine that the command is run on. The existing file (say
+   "file.map") is kept and a new file ("file_map.sdf") created.
+
+   Version 4.0 map files cannot be imported back into Specx 6.2 or 6.3.
+
+Map files version 4.1 and up: This is a portable binary format based on 
+   HDS. Just take a binary copy to the destination machine (Unix "cp" or
+   "ftp" in binary mode). The file can be used straight away.
+   Optionally you can convert it to the native flavour of the HDS
+   format on the destination machine. Use the command "native" in the
+   Kappa package. This should speed up data access somewhat.
+
+   Version 4.x map files cannot be imported back into Specx 6.2 or 6.3.
+
+Dump files and the "mapplane.tmp" files are not portable. Care has to
+be taken when the same file space is used with different machines,
+because one Specx may not run on one machine while there is a Specx
+dump in the working directory that was written by another machine.
+
+2 CONVERT-VAX-FILE
+
+CONVERT-VAX-FILE copies a VAX binary file with version 2 or 3 Specx
+spectral data into a file with format version 4.x.  In order that the
+new file can be given the file name extension ".sdf", the existing
+file must have an extension, usually ".dat", but this must not be
+".sdf".
+
+NOTE: the filename must be specified in full (including ".dat").
+
+
+2 CONVERT-VAX-MAP
+
+CONVERT-VAX-MAP copies a VAX binary file with a version 2 or 3 Specx
+map into a map file with format version 4.1. A version 4.0 local
+binary file can also be converted with this command.  In order that
+the new file can be given the file name extension "_map.sdf", the
+existing file must have the extension ".map".
+
+NOTE: the filename must be specified WITHOUT the ".dat" suffix.
+
+1 Scan_arithmetic     
+2 ADD-SPECTRA
+
+Adds spectra in X and Y stack positions on a channel by channel basis. 
+Gives a warning if number of points in the two spectra is different.
+Result appears in X, rest of stack is popped. Header that survives is
+that of the scan in Y. See also AVERAGE-SPECTRA.
+
+2 AVERAGE-SPECTRA
+
+Performs weighted average of scans in X and Y positions, placing 
+result in X and popping rest of stack. Prints a warning if number of 
+points in the two spectra is not the same. Weighting factors are 
+computed from integration times and system temperatures of each 
+quadrant such that total noise is minimized, and final integration 
+time equals the sum of the integration times of the two spectra. 
+Computed final noise temperature is therefore intermediate between 
+values of TN for the two component spectra.
+
+For example, if two spectra from different instruments are to be
+averaged: 
+      1.   INVERT-SPECTRUM if necessary to get velocity scales running the
+           same direction on both.
+      2.   REGRID one of the spectra to the same velocity sampling as the other.
+      3.   DROP-CHANNELS from one or both spectra to get them to cover EXACTLY
+           the same velocity interval.
+      4.   AVERAGE.
+
+2 DIVIDE-SPECTRUM
+
+Divide each point of the scan in X by a constant factor.
+
+2 FORM-QUOTIENT-SPECTRUM
+
+Divide scan in Y by scan in X on a channel by channel basis. Will only
+execute if number of data points is the same in both spectra. Final
+result appears in X, rest of stack is POPped. Header that survives is
+that of the scan in Y. See also AVERAGE-SPECTRA.
+
+2 INVERT-SPECTRUM
+
+Swap the spectrum end for end, amending the header appropriately. May be
+useful when trying to average spectra of the same line observed in
+different sidebands for example. Use it if necessary before any
+operations such as ADD, SUBTRACT, F-Q-S etc that operate on a
+channel-by-channel basis and do not regrid first. For example, if two
+spectra from different instruments are to be averaged: 
+      1.   INVERT-SPECTRUM if necessary to get velocity scales running 
+           the same direction on both.
+      2.   REGRID one of the spectra to the same velocity sampling
+           as the other.
+      3.   DROP-CHANNELS from one or both spectra to get them to cover
+           EXACTLY the same velocity interval.
+      4.   AVERAGE.
+Sure, sure, I could automate this. I will when I get time!
+
+Note that this swaps the WHOLE spectrum - thus the quadrant order is
+reversed also. So if you were plotting quadrant 1 which was the
+low-resolution AOSD channel for example, after INV-SP you would then be
+plotting the high-resolution channel (all appropriately reversed, except
+that in velocity or frequency scale the scales will still be right, and
+all you will notice is that the spectrum now plots across the screen in
+the opposite direction). 
+
+2 MULTIPLY-SPECTRUM
+
+Multiply each point of the scan in X by a constant factor.
+
+2 OFFSET-SPECTRUM
+
+Add a constant to each point of the scan in the X-register.
+
+2 SUBTRACT-SPECTRUM
+
+Subtracts the scan in X from the scan in Y on a channel by channel 
+basis. Gives a warning if the number of points in the two spectra is 
+different. Result appears in X, rest of stack is popped. Header that
+survives is that of the scan in X. See also AVERAGE-SPECTRA.
+
+1 Specx_files         
+
+SPECX has two data file formats. Its own-format file is fixed format, 
+and is therefore quick to access. These files can be read and written, 
+although files created before about July 1987 will be in a slightly 
+incompatible format which can only be opened READ-ONLY. Data can be 
+written to these files regardless of its origin - i.e. GSD or SPECX.
+
+Up to 3 specx datafiles can be open at any one time, any one of which 
+may have any of READONLY, WRITEONLY or READWRITE access.
+
+Spectra are accessed by their scan number, which is equal to their 
+position in the file.
+
+2 CLOSE-FILE
+
+Closes an open SPECX datafile.
+
+2 COMPRESS-FILE
+
+Compresses the data file, overwriting deleted spectra, which are 
+therefore irretrievably lost at this point.
+
+(For files exceeding 25 spectra COMPRESS-FILE asks for an ordinal
+scan-number and offset range for the listing of the resulting
+file)
+
+2 DELETE-SPECTRUM-FROM-FIL(e)
+
+Marks the nominated spectrum for deletion by giving it a negative 
+index number. However it is not physically removed at this stage, but 
+is just rendered inaccessible.
+
+2 EDIT-FILE-HEADER
+
+Lets you change unimportant things about the header - namely the 
+filename and owner strings.
+
+2 INDEX-FILE
+
+Lists the contents of a SPECX datafile on the current listing device
+(use SET-LIST-FILE to change it). Long or short formats for 132-column 
+and 80-column modes. Use LONG format to get a list of the RA and Dec of
+the "map-centre" for each scan, and the RA and Dec offsets of the 
+current scan from that centre.
+
+For files exceeding 25 spectra INDEX-FILE asks for an ordinal
+scan-number and offset range.
+
+2 INFO-FILE
+
+Fills SPECX variable NO_FILE_SPECTRA (number of spectra in file).
+This command is primarily intended for use within SPECX macros
+to make sure the variable is set correctly before looping over
+the spectra in the file.
+
+2 LIST-OPEN-FILES
+
+Gives you a list on the terminal of the currently open files and their 
+access modes.
+
+2 MERGE-FILES
+
+Produces the DOT-product of two Specx files: coincident files are
+avaraged and unique scans are copied to the output file.  This routine
+is meant for combination of mosaiced RASTER ('on-the-fly') fields or
+multiple passes of the same field, while e.g. 'corrupted' or otherwise
+unacceptable points have been deleted from one or the or other file.
+The output file should have be open for Write/ReadWrite (see
+SET-FILE-ACCESS).
+
+2 OPEN-FILE
+
+Opens an existing file (default access is READONLY), or creates a new 
+one (WRITEONLY) if it does not already exist. You must nominate the 
+maximum number of scans it will ever hold at creation time, as all 
+headers are stored before all data for speed of access. The "file 
+name" and "owner" are character strings for your information only - 
+they do not relate to VMS filenames and owners.
+
+2 READ-SPECTRUM
+
+Get a spectrum from a SPECX datafile (which must be open for READ) and 
+copy it into the X-register of the stack, pushing the stack up.
+
+2 RECOVER-FILE
+
+Resets sequence number of all deleted spectra positive, thus un-
+deleting them.
+
+2 REWRITE-SPECTRUM
+
+Write the spectrum currently in the X-register to the position in the 
+file indicated by its current scan number. Will work as long as it has 
+not got any longer while you had it out to work on it.
+
+2 SET-FILE-ACCESS
+
+Modifies file access, to one of READONLY (R), WRITEONLY (W) or 
+READWRITE (RW)
+
+2 WRITE-SPECTRUM
+
+Write the spectrum currently in the X-register to an SPECX datafile open
+for WRITE access. If you want to change the spectrum title at this point
+say something like "scan_title='my scan'" before you give this command.
+Spectrum is written to first vacant position at the end of the datafile,
+and will carry that position as its sequence number when retrieved from
+the file. 
+
+1 Stack_operations    
+
+The program operates in a very similar way to an HP-45 calculator.
+Reading a spectrum automatically causes the stack to be pushed to
+create space. The stack can be moved up or down using PUSH or POP.
+ROLL first POPs, then puts the previous current scan into the
+top-of-stack position. XY interchanges the bottom two spectra. The
+command DISPLAY-STACK shows the contents of the various 'registers'
+labelled according to standard Hewlett-Packard notation. 
+
+As well as the stack registers 5 other storage registers are
+available, and are accessed with the STORE-SPECTRUM and
+RECALL-SPECTRUM commands. Note that the storage register 5 is
+sometimes used by the rest of the program as a buffer for reduction
+operations, and so must be regarded as volatile memory. 
+
+
+2 CLEAR-STACK
+
+Zeroes the current stack contents, and resets the counter to 0, thus
+declaring the stack empty.
+
+2 POP-STACK-DOWN
+
+Pulls the stack down one position, losing the current contents of X
+altogether. Currently defined to leave the T position empty.
+
+2 PUSH-STACK-UP
+
+Pushes all spectra into the stack, duplicating the spectrum in the X 
+register into Y.
+
+2 RECALL-SPECTRUM
+
+Retrieves a spectrum from one of the 5 storage registers, whence it 
+was put using the STORE command. Spectra will be truncated if
+necessary to fit the stack (may apply if stack item length has been
+modified after the spectrum was STOREd).
+
+2 ROLL-STACK
+
+Rotates the stack - effectively a POP followed by writing the old X 
+register back into the new T register.
+
+2 SET-STACK
+
+Lets you define the number of spectrum registers in the stack and the 
+number of data points in each register. The stack space is currently 
+set at 9216 integer*4 words, while each spectrum takes up 128 words 
+for the header plus whatever is required for the data. Thus the stack 
+can hold up to 4 full spectra from AOSD (1024 wideband channels plus 1024
+narrowband channels) but many more from the Kent correlator (512 
+channels only). Note that the length of each stack position need not 
+be identical to the length of the spectrum - anything greater will do 
+equally well
+
+2 SHOW-STACK
+
+Shows the current stack usage. Bottom three (most accessible) stack 
+positions are denoted X,Y and Z respectively, top-of-stack (least 
+accessible) is denoted T. Intermediate positions numbered 4 to T-1 in 
+order.
+
+2 SHOW-STORE-REGISTERS
+
+Just like SHOW-STACK. Summarizes the current contents of all the 
+storage registers.
+
+2 STORE-SPECTRUM
+
+Lets you put the current X register contents into one of 5 separate 
+registers (you choose which one). It can be retrieved later using
+RECALL. These registers are currently 2048 points long - longer
+spectra will be truncated when stored.
+
+2 XY-INTERCHANGE
+
+Exchanges the spectra in the X and Y stack positions.
+
+1 User_routines       
+
+SPECX contains ports for linking to up to 10 user-defined FORTRAN
+subroutines. More detailed instructions are given in the current
+documentation (manual for V6.2). The subroutines have names EXTRNL1 to
+EXTRNL10, and are invoked by the 10 commands EXTERNAL-1 to EXTERNAL-10. A
+typical subroutine might take the form: 
+
+            SUBROUTINE EXTRNL2 (IFAIL)
+
+      C   This routine is just to demonstrate the form
+
+            INTEGER*4 IFAIL
+            INCLUDE   'FLAGCOMM'
+            INCLUDE   'STACKCOMM'
+
+            IFAIL=0
+              .
+              .
+              .
+            RETURN
+            END
+
+Any user input required by the subroutine should be obtained by using
+the routines GEN_GETtna (where t is the type I or R, n is the number
+of bytes per word 2,4 or 8, and a is equal to A for input of arrays).
+These routines will be linked automatically on the MT VAX. 
+
+Use of the routines is facilitated by writing a one line macro with an
+informative name so that information is available through the HELP
+facility. For example, if the purpose of your subroutine is to do some
+fancy filtering you might define a symbol FANCY-FILTER-SPECTRUM, which
+contains a single line EXTERNAL-1. 
+
+1 X-axis_scaling      
+2 CHANGE-SIDEBAND
+
+Prompts for I.F. frequency and current sideband; then modifies
+frequency and velocity parameters in scan header to make it 
+appropriate to the image sideband.
+
+2 SET-LINE-REST-FREQ
+
+Set the rest frequencies assumed to apply to each data quadrant.
+Mostly of relevance when you want to shift the reference away from the
+centre of the scan (for example to look at the kinematics of a totally
+different molecular species). Note that if the value set this way is
+non-zero it will always take precedence over the frequencies in the scan
+header. So set it back when you are pau with this cleverness.
+
+Use it also with older data if there is no centre frequency set - 
+calculations and modifications of velocity scales cannot be done until 
+the rest frequency used as the basis of the vlsr correction is known.
+
+2 SET-VELOCITY-FRAME
+
+Establish an alternative reference frame for the display of frequency
+and velocity. As noted for SET-X-SCALE, frequencies and velocities are
+normally plotted wrt the same reference frame as they were observed
+in, using the same velocity law. They may however be plotted in other 
+frames: available frames are:
+
+        TELLuric     ---  in which the telescope is at rest
+        LSR          ---  the local standard of rest
+        HELIocentric ---  in which the sun is at rest
+        GEOcentric   ---  in which the earth's centre is at rest.
+
+You also have the option to change the velocity *law* --- options are:
+
+        RADio        ---  v = - c.Delta(f)/f0
+        OPTical      ---  v = c.Delta(lambda)/lambda0 = - c.Delta(f)/f
+        RELativistic ---  v = v.(1-(f/f0)^2)/(1+(f/f0)^2)
+
+If a velocity other than zero is selected then the reference frame 
+will be offset to one moving at `velocity' with respect to the
+basic frame (telluric, lsr etc).
+
+2 SET-X-SCALE
+
+Choose whether the spectral axis is set to be channels, frequency, 
+velocity or some other user defined title.
+
+Frequencies and velocities are normally plotted wrt the same reference
+frame as they were observed in, using the same velocity law.
+These may be changed by using the command SET-VELOCITY-FRAME (qv).
+If SET-VEL-FRAME requests a modification of the frame, then you have
+the further choice of changing the reference velocity. Thus to
+display rest frequencies in a source with vlsr=+20 km/s, select
+LSR frame, radio velocity law, and velocity=vlsr=20.
+
+In frequency mode, you have the further choice of whether to display 
+absolute frequencies (i.e. in GHz, corrected to the chosen frame) or
+relative (in MHz), with respect to EITHER the centre of the current scan,
+or to the position in the scan where a line at rest in the chosen
+frame would appear.
+
+2 SHOW-X-SCALE
+
+Display the coverage of the current X-axis spectrum in terms of both 
+frequency and the current X-axis units.
+

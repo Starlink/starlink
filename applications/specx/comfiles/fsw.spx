@@ -1,0 +1,48 @@
+declare ifsw  i4
+declare f1    i4
+declare f2    i4
+declare vv    r4
+declare sh    r8
+declare frest r8
+declare fdiff r8
+if (nquad <> 1)
+  print ' '
+  print 'FSW>  ***WARNING*** YOU MAY HAVE TO USE MERGE/DAS-MERGE'
+  print 'FSW>                BEFORE FSW, RATHER THAN AFTER.'
+  print ' '
+endif
+ask 'shift (MHz)' sh ?
+fdiff = 0.0
+frest = f_rest(1)
+!OLD slowfreq routine
+if (frest < 300e6 or frest >= 400e6)
+  f1 = nint(frest/1.e2+sh*10.0)
+  f2 = nint(frest/1.e2-sh*10.0)
+  fdiff = frest / 1.0e6
+  print 'fsw> === A and C data before 25-SEP-1995: ==='
+  print 'fsw> The rest frequency (',fdiff:f8.4,') needs to be corrected.'
+  print 'fsw> (Probably ',(f1/1.e4):f9.4,'  or ',(f2/1.e4):f9.4,')'
+  ask 'Rest freq (GHz) [NO CHANGE]:' fdiff ?
+  fdiff = fdiff * 1.0e6 - frest
+endif
+store 3
+vv=sh*1.0e6/f_inc
+set-x 1
+shift -vv
+store 4
+recal 3
+shift vv
+mult -1
+recal 4
+av
+set-x 3 n
+do ifsw 1 nquad
+  if (fdiff <> 0.0)
+     f_rest(ifsw)=   f_rest(ifsw)+ fdiff
+     f_cen(ifsw) =   f_cen(ifsw) + fdiff
+     lo_freq(ifsw) = lo_freq(ifsw) + fdiff/1.0e6
+  endif
+  f_cen(ifsw) =   f_cen(ifsw) + sh*1000.0
+  if_freq(ifsw) = if_freq(ifsw) + sh/1.0e3
+enddo
+set-pl-sc y \ \ \

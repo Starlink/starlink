@@ -1,0 +1,125 @@
+1 SPECX - Millimetre-wave Spectral data reduction - v6.7-5
+
+ SPECX version 6.7-5 is now available.  This is a maintenance update to 
+ modify the build system to continue to use Starlink-PGPLOT.  There is
+ no chnange to functionality.
+
+2 Version 6.7-4
+
+ At this update the graphics devices not available to GKS/PGPLOT have 
+ been removed from the graphics devices file (various termianl types 
+ and gif files).  There is also a fix to prevent an error when using 
+ colour PostScript devices.
+
+2 Version 6.7-3
+
+ This is a minor update to correct the graphics device names to use the 
+ GKS/PGPLOT device names, and to fix a bug in the plotting system that 
+ caused problenms for PostScript devices.
+ 
+2 Version 6.7-2
+
+ This release includes a fix to the calculation of integration times
+ from RASTER maps and some bug fixes.
+
+ The changes include:
+
+  a) Correct calculation of integration time for Raster data.
+
+     This version correctly calculates the equivalent "on+off"
+     integration time for on-the-fly spectra (e.g. a raster time of 5
+     seconds in a 55 by y raster will show up in SPECX as an
+     integration time of about 17 seconds). This change means that you
+     now can safely average raster data with regular "on+off" spectra
+     or different size raster maps.
+
+     Also, note that if you want to combine new rasters with raster
+     data in existing SPECX files, you'll either have to read the old
+     gsd raster files again or you'll have to change the integration
+     time in the headers of the data in the old SPECX files:
+
+	 INT_TIME = INT_TIME*4/(1+sqrt(55))
+
+     for a raster with 55 points per row.
+
+  b) Now correctly reads CLASS format FITS data via READ-FITS-SPECTRUM
+
+  c) A new variable has been added which gives access to the max and min
+     values used for greyscale plots. The new symbol is MAPLIMITS(2)
+     e.g.  >> print maplimits(1)
+
+     would print the minimum value used for the last greyscale.
+     This is sometimes useful from scripts.
+
+  d) GET-SPECTRUM-FROM-MAP now sets the scan number stored in the header
+     to the position of the spectrum in the map. This was to get over
+     a problem encountered when writing spectra to data files that had
+     scan numbers of 0.
+
+ Minor technical changes:
+
+   a) GSD-PREFIX can now be 32 characters instead of 16.
+   b) The title used for dual channel data (eg RxB3) is now constructed 
+      correctly.
+   c) System calls are now performed with the SH command on Solaris
+      (this is 10 times faster than the equivalent SYSTEM command
+      since a .cshrc file is not sourced).  This means that different 
+      system source files must be used on Alpha and Solaris systems.
+
+2 Version 6.7-1
+
+   -  command-line editing (Emacs-style)
+   -  exception handling (for ^C)
+
+   Please report any problems with floating-point exceptions.
+ 
+   Other changes:
+ 
+    o NEW-PLOT and OVERLAY now accept a color index (1-15) as second
+        argument. If the color index is negative, each subband (quadrant)
+        of a spectrum is plotted with a different color. The default
+        is now retained in the dump.
+
+    o Auto Y-axis scaling for NEW-PLOT, R-L-B etc now looks only at points
+        in current X-axis range. Still no autoscaling within interactive
+        graphics however.
+
+    o READ-GSD-DATA now also checks DATADIR for gsd files after current
+        directory (setenv DATADIR ... before starting Specx). Has also
+        been speeded up significantly. Reads all subscans at once. 
+        Drawback: won't re-read the disk file (even when altered) until 
+        another GSD file has been read.
+
+    o DAS-MERGE default for DC adjust changed to 'N'. DAS-MERGE has been 
+        changed from a script to a FORTRAN coded command.
+
+    o SET-INTERACTIVE now 'N' upon entry to SPECX.
+
+    o REGRID has been rewritten to be more robust. ** It has new questions **
+        The original functionality is retained, but it also allows you specify
+        the final number of channels and the centre (in current x-units) of
+        the regridded spectrum.
+
+    o PLOT-LINE-PARS: the bug that cause a crash when not plotting a linear
+        sequence of parameter maps (e.g 1, 2, 3) has now been fixed.
+
+    o INDEX-FILE, COMPRESS-FILE, LIST-MAP allow limits on scan nr and 
+        offset positions if more than 25 scans.
+
+    o New NDF map format - much faster. 
+        Version 4.1 maps WILL BE COPIED to the new format. 
+
+   New commands:
+ 
+    o DAS-MERGE is now a FORTRAN subroutine i.s.o. a Specx Macro.
+
+    o WRITE-FITS-CUBE (under test).
+
+    o INFO-FILE  (update NDF spectral file header information: for
+         use with SPECX macros. Ensures SPECX variables refer to
+         indicated file.)
+
+    o READ-GSD-RASTER (under test: directly reads all subscans
+         from GSD file into a SPECX file with an optional DAS-MERGE
+         along the way. Much faster than SPECX do-loop)
+

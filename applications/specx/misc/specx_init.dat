@@ -1,0 +1,47 @@
+ $specx
+   TOL    = .05,
+   MAXITS = 20,
+   IER    = -1,
+ 
+   ALAT   = 19.8261111D0,
+   ALONG  = 155.4716667D0,
+   TIMCOR = 10.D0,
+   OBSTIT = 'JCMT-Hawaii',
+ 
+   CHARHT    = 3.0,
+   XLEN      = 0.,
+   YLEN      = 0.,
+   HISTOGRAM = .TRUE.,
+ 
+   IDEV   = 17,
+   TTNN   = ' ',
+   ANDXLG = .FALSE.,
+ 
+   ISUM    = .FALSE.,
+   CONTI   = 1.0,
+   CONT0   = 0.0,
+   NCONT   = 10,
+   AX1LEN  = 0.,
+   AX2LEN  = 0.,
+   THETA   = 0.0,
+   ICAUTO  = .TRUE.,
+   MVPTS   = .FALSE.,
+   MAP_TOL = 0.71,
+   REPLACE_MAP_DATA = .FALSE.,
+   COLOUR_TABLE = 1,
+   AUTOGREY     = .TRUE.,
+   OVERCONT     = .TRUE.,
+   GREYMIN      = 0.0,
+   GREYMAX      = 10.0,
+ 
+   NXS   = 3,
+   IREST = 1,
+   INTERACTIVE = .FALSE.,
+ 
+   IDUMP = 1,
+ 
+   TERMDEV  = 'xw',
+   PRINTDEV = 'ps_l',
+ 
+   GSDNAME  = 'obs_das_'
+ $end

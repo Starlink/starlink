@@ -1,0 +1,11 @@
+
+#  N.B. the previous line should be blank.
+# Link file for the specx_help help system
+#+
+#-
+   echo `hlp_link` `fio_link` `cnf_link` \
+      | awk 'BEGIN{RS=" ";FS="\n"}
+          {f[i++]=$1}
+          END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.

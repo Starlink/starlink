@@ -1,0 +1,22 @@
+*-----------------------------------------------------------------------
+
+*   Include file to define command table
+
+      INTEGER*4 MAX_COMMAND
+      PARAMETER (MAX_COMMAND=256)
+
+      INTEGER*4 NFUNC
+      CHARACTER COMMS*32
+
+      COMMON /COMMS/ NFUNC, COMMS(MAX_COMMAND)
+      SAVE   /COMMS/
+
+      INTEGER*4 M_CTAB
+      PARAMETER (M_CTAB=503)
+
+      INTEGER*4 TABLE(0:M_CTAB-1)
+
+      COMMON /CTABLE/ TABLE
+      SAVE   /CTABLE/
+
+*-----------------------------------------------------------------------

@@ -1,0 +1,62 @@
+*+
+*  Name:
+*     mapv4.inc
+
+*  Purpose:
+*     Specx MAPV4 include file.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'MAPV4'
+
+*  Description:
+*     This include file describes the map file information for the
+*     NDF/HDS-based map file format (mv4 library).
+*
+*     byte  lwrd  type  content
+*                       +--------+--------+
+*        0     0  I4    | IDXNDF | IDXPTR |
+*                       +--------+--------+
+
+
+*  Prior Requirements:
+*     DAT_PAR must be included before this file.
+
+*  Authors:
+*     hme: Horst Meyerdierks (UoE, Starlink)
+*     timj: Tim Jenness (JAC, Hilo)
+*     {enter_new_authors_here}
+
+*  History:
+*     30 Aug 1994 (hme):
+*        Original version.
+*
+*     06 Oct 1995 (timj):
+*        Change common block to NDF identifiers and pointers
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Variables:
+      INTEGER IDXNDF        ! Index NDF identifier
+      INTEGER IDXPTR        ! File index pointer
+      INTEGER POSNDF        ! POSN NDF identifier
+      INTEGER POSPTR        ! POSN file pointer
+
+
+      COMMON / MAPV4 / IDXNDF, IDXPTR, POSNDF, POSPTR
+
+*. End of mapv4.inc
+
+
+
+
+
+
+
+

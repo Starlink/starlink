@@ -1,0 +1,16 @@
+ 
+ SPECX Millimetre-wave Spectral data reduction v6.7-5.
+ ====================================================
+
+   Welcome to the Unix port of Specx.  It is important to read the
+   relevant item in the on-line help.  If you are running Specx on 
+   Unix for the first time, type:
+
+          >> help
+          Topic? news unix
+ 
+   This is the Starlink Version, using GKS PGPLOT graphics.  The 
+   graphics capability file has been modified to use GKS PGPLOT 
+   device names rather than the Native PGPLOT device names.
+
+ 

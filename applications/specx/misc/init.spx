@@ -1,0 +1,65 @@
+!--------------------------------------------
+!               Init.spx
+set-list-file T
+print 'Defining new symbols for JCMT...'
+!--------------------------------------------
+!
+!
+!  New JCMT symbols...
+   aosc                :=  'Set-gsd-filename obs_aosc_'
+   das                 :=  'Set-gsd-filename obs_das_'
+   rxc                 :=  'Set-gsd-filename obs_rxc_'
+   scan                :=  'Set-gsd-filename scan_'
+ 
+   hardcopy            :=  's-p-d H'
+   terminal            :=  's-p-d T'
+   laser-plot          :=  'See-plot H; lp'
+   lp                  :=  'print 'Printing plot';$ lp specx_pgplot.ps ; $ \rm specx_pgplot.ps'
+ 
+   new                 :=  'new-plot\\3\;'
+   n                   :=  'new-plot\\3\;'
+   o                   :=  'overlay \\2\;'
+   reset-plot-scales   :=  'set-plot-scales y y'
+   make-new-plot       :=  'reset-p-s; new-plot'
+   reset-map-scales    :=  's-m-si 0 0; s-m-sc R D 0 0; set-cont y 10'
+ 
+   see-map             :=  'hard; cont\\\;   term'
+   see-channel-maps    :=  'hard; chann\\\\\\\; term'
+   see-grey            :=  'hard; grey\\\;   term'
+   see-grid-spectra    :=  'hard; gr-sp\\\\;  term'
+   see-line-par        :=  'hard; p-l-p\\\;  term'
+ 
+!  edit-position             :=  'external-1'
+!  times                     :=  'external-2'
+   get-interpolated-spectrum :=  'external-10'
+ 
+   baseline            :=  '@$SPECX_COMMAND/baseline'
+   convert-to-map-format :='@$SPECX_COMMAND/convert'
+!   das-merge           :=  '@$SPECX_COMMAND/dasmerge\'
+   fetch               :=  '@$SPECX_COMMAND/fetch'
+   fsw                 :=  '@$SPECX_COMMAND/fsw'
+   image-freq          :=  '@$SPECX_COMMAND/image'
+   linearize-aosc-freq :=  '@$SPECX_COMMAND/frqfix'
+   make-dbmem-map      :=  '@$SPECX_COMMAND/specx_to_dbmem'
+   map-average         :=  '@$SPECX_COMMAND/map_av'
+   show-astronomy      :=  '@$SPECX_COMMAND/showastro'
+   source-freq         :=  '@$SPECX_COMMAND/source'
+   tofits              :=  '@$SPECX_COMMAND/tofits'
+   gsd2fits            :=  '@$SPECX_COMMAND/gsd2fits'
+   g2f                 :=  '@$SPECX_COMMAND/gsd2fits'
+   unaverage           :=  '@$SPECX_COMMAND/unaverage'
+   vertical            :=  '@$SPECX_COMMAND/vertical'
+ 
+   utils               :=  '$more $SPECX_COMMAND/utils.txt'
+
+   quit                :=  exit
+! A Dummy command to prevent q always being quit
+   qexit               :=  print 'This is a dummy command to protect QUIT'
+ 
+! This is Lorne's script
+   plot-standard            :=  '@$SPECX_COMMAND/st'
+ 
+print ' '
+print 'Do a show-symbols command to inspect currently defined symbols.'
+print ' '
+ 

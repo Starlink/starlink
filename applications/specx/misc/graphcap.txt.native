@@ -1,0 +1,39 @@
+#  Graphcap.txt
+#
+#  Graphics capabilities of PGPLOT devices 
+#
+#  Device number should conform to the following rules:-
+#   1 - 9     dual screen terminal
+#   10 - 19   single screen terminal
+#   20 - 29   print devices with output in real-time
+#   30 -      print devices plotting to file
+#
+#  Format:
+#    Col 1:  SXGPGPLOT internal device #
+#    Col 2:  SXGPGPLOT prompt string
+#    Col 3:  PGPLOT device name
+#    Col 4:  Terminal? (T or F)
+#    Col 5:  Dual screen? (T or F)
+#    Col 6:  Colour capability? (T or F)
+#    Col 7:  Hardcopy? (T or F)
+#    Col 8:  Hardcopy output file (empty for default = specxdir:specx_pgplot.ps)
+#
+1   retro          /retro         T  T  F  F
+11  ikon           /ikon          T  F  T  F
+12  tek_4010       /tek4010       T  F  F  F
+13  tek_4014       /tek4010       T  F  F  F
+15  vt125          /vt125         T  F  T  F
+17  xw             /xwindow       T  F  T  F
+18  xserve         /xserve        T  F  T  F
+20  cps_l          /cps           F  F  T  T    specx_pgplot.ps
+20  cps_p          /vcps          F  F  T  T    specx_pgplot.ps
+21  ps_l           /ps            F  F  F  T    specx_pgplot.ps
+21  ps_p           /vps           F  F  F  T    specx_pgplot.ps
+22  ln03_l         /ln03          F  F  F  T    specx_pgplot.ln03
+22  ln03_p         /vln03         F  F  F  T    specx_pgplot.ln03
+30  ecpsf_ltex     /cps           F  F  T  T    specx_pgplot.eps
+30  ecpsf_ptex     /vcps          F  F  T  T    specx_pgplot.eps
+31  epsf_ltex      /ps            F  F  F  T    specx_pgplot.eps
+31  epsf_ptex      /vps           F  F  F  T    specx_pgplot.eps
+32  gif_l          /gif           F  F  T  T    specx_pgplot.gif
+32  gif_p          /vgif          F  F  T  T    specx_pgplot.gif
