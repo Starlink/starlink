@@ -40,7 +40,11 @@
 #include "Bitmap.h"		// for BitmapError exception class
 #include "GIFBitmap.h"
 
+#if NO_CSTD_INCLUDE
 #include <math.h>		// for floor() and ceil() in iround
+#else
+#include <cmath>
+#endif
 
 #if ! NO_CSTD_INCLUDE		// ie, there _is_ a <cstdio>
 using std::fopen;
@@ -48,6 +52,7 @@ using std::fwrite;
 using std::fputc;
 using std::fclose;
 using std::fflush;
+using std::fprintf;
 #endif
 
 const unsigned long GIFBitmap::masks[] 
@@ -64,7 +69,8 @@ GIFBitmap::GIFBitmap (const int w, const int h, const int bpp)
       in_count(1), out_count(0), cur_accum(0), cur_bits(0)
 {
     maxmaxcode = (code_int)1 << BITS;
-    //fprintf (stderr, "GIFBitmap: w=%d  h=%d\n", w, h);
+    if (verbosity_ > normal)
+	fprintf (stderr, "GIFBitmap: w=%d  h=%d\n", w, h);
 }
 
 GIFBitmap::~GIFBitmap()
@@ -113,12 +119,10 @@ void GIFBitmap::write (const string filename)
 
     if (verbosity_ > normal)
     {
-	cerr << "GIFBitmap colour tables:\n";
+	fprintf (stderr, "GIFBitmap colour tables:\n");
 	for (int i=0; i<ncolours; i++)
-	    cerr << i << '\t'
-		 << RedCT[i] << '\t'
-		 << GreenCT[i] << '\t'
-		 << BlueCT[i] << '\n';
+	    fprintf (stderr, "%d\t%d\t%d\t%d\n",
+		     i, RedCT[i], GreenCT[i], BlueCT[i]);
     }
 
     //const int step = 256 >> bpp_;

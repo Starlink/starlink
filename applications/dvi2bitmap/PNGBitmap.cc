@@ -10,7 +10,12 @@
 
 #include <time.h>
 #include <assert.h>
+
+#if NO_CSTD_INCLUDE
 #include <math.h>		// for floor()
+#else
+#include <cmath>		// for floor()
+#endif
 
 #include "Bitmap.h"		// for BitmapError exception class
 #include "PNGBitmap.h"
