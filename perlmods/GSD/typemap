@@ -1,0 +1,32 @@
+TYPEMAP
+int *	T_INTP
+float	T_NV
+float *	T_FLOATP
+double * T_DOUBLEP
+Logical	T_IV
+item_descriptor *                  T_PTR
+file_descriptor *                  T_PTR
+
+INPUT 
+
+
+T_INTP
+        $var = ($type)pack1D($arg,'i')
+T_FLOATP
+        $var = ($type)pack1D($arg,'f')
+ 
+T_DOUBLEP
+        $var = ($type)pack1D($arg,'d')
+
+
+OUTPUT
+
+T_INTP
+        sv_setpv((SV*)$arg, (char *)$var);
+T_FLOATP
+        sv_setpv((SV*)$arg, (char *)$var);
+T_DOUBLEP
+        sv_setpv((SV*)$arg, (char *)$var);
+ 
+
+
