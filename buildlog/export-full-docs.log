@@ -1273,10 +1273,6 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Add an array of objects to the selection. the model should
   [javadoc]  highlight the selected objects."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionDragger.java:54: warning - @history is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorListener.java:36: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ArcConnector.java:52: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ArcConnector.java:364: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/connector/ArcConnector.html...
   [javadoc] "Set the flag that says that this arc is drawn as a "self-loop."
   [javadoc]  Apart from changing (slightly) the way the arc geometry is
@@ -1286,13 +1282,17 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the flag that says that this arc is drawn as a "self-loop."
   [javadoc]  "
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/Arrowhead.java:173: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/connector/Arrowhead.html...
   [javadoc] "Set the flag that says the arrowhead is "flipped." This means
   [javadoc]  that the arrowhead is drawn so that the apparent direction
   [javadoc]  of the arrowhead is the same as its normal."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the flag that says the arrowhead is "flipped." "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionDragger.java:54: warning - @history is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorListener.java:36: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ArcConnector.java:52: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ArcConnector.java:364: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/Arrowhead.java:173: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/CenterSite.java:40: warning - @ is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorAdapter.java:18: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorEvent.java:25: warning - @contributor is an unknown tag.
@@ -2134,4 +2134,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:413: Compile failed; see the compiler error output for details.
 
-Total time: 5 minutes 18 seconds
+Total time: 4 minutes 46 seconds
