@@ -13,7 +13,7 @@ CAT	S	yes		CLRC
 CATPAC	U	obsolete			Not in sources, not autoconfed		
 CCDPACK	S	yes		CLRC, apart from obsolete dir		
 CFITSIO	U	thirdparty			AJC,MJB (No doc),(external pkg)			
-CGS4DR	J		Frossie Economou				
+CGS4DR	U		Frossie Economou				
 CHART	U	obsolete	Clive Davenhall				
 CHR	S	yes		CLRC			
 CNF	S	yes		CLRC			
@@ -68,12 +68,12 @@ INIT	S	yes			Problem with datestamps
 IRAF	U		Software Librarian				
 IRAFSTAR	U		Alan Chipperfield				
 IRAS90	U	obsolete			Autoconfed, but not de-nagged		
-IRCAMDR	J	obsolete	Frossie Economou		De-nagged		
+IRCAMDR	U	obsolete	Frossie Economou		De-nagged		
 IRCAMPACK	U	obsolete	David Berry		Not autoconfed		
 ISPELL	U		Brian McIlwrath				
 ITCL	U	thirdparty		
 IUEDR	U		Mark Taylor	CLRC			
-JCMTDR	J		Tim Jenness		Needs Figaro libs		
+JCMTDR	U		Tim Jenness		Needs Figaro libs		
 JED	U		Brian McIlwrath				
 JNIAST	S	java	Mark Taylor	CLRC			
 JNIHDS	S	java	Mark Taylor	CLRC			
