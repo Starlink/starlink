@@ -166,8 +166,8 @@
          file=ccdtest_obj.dat \
          type=$exten \
          pixels='[128,128]' \
-         origins='[1,1,39,1,1,74,39,74]' \
-         angles='[0,-30,0,0]' \
+         origins='[-1,-1,-40,15,-10,-74,-35,-70]' \
+         angles='[0,30,0,0]' \
          accept
 #     end ccdgenerate
 
