@@ -53,6 +53,7 @@
       WRITE (*,'(28X,A)') '---------------------'
 
       IWKS = 0
+      icntx = 0
   200 CONTINUE
       CALL GNS_GWNI(GNS_FILTI,ICNTX,NAME,DESCR,LD,STATUS)
       IF (STATUS.NE.0) THEN
