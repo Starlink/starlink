@@ -3,9 +3,9 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-lib_LTLIBRARIES = libopt.la
+lib_LTLIBRARIES = libappsub.la
 
-libopt_la_SOURCES = \
+libappsub_la_SOURCES = \
      $(F_ROUTINES) 
 
 F_ROUTINES = \
