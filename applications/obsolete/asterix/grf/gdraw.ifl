@@ -1,6 +1,6 @@
  INTERFACE GDRAW
    parameter INP
-     type 'UNIV'
+     type 'LITERAL'
      position 1
      ppath 'GLOBAL,CURRENT'
      association '<->GLOBAL.BINDS'
