@@ -98,6 +98,10 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  External References:
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
+
 *  Local Variables:
       INTEGER			ARGS(3)			! Method arguments
       INTEGER			OARG			! Method result
