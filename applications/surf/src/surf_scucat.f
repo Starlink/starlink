@@ -23,13 +23,15 @@
 *     This routine reads in a list of user specified files and concatenates
 *     their data, variance and quality arrays so that KAPPA routines like
 *     STATS and KSTEST can analyse a complete set of photometry observations.
-*     Data for each individual bolometer is written to a different file.
+*     If METHOD=SEPARATE (default) data for each individual bolometer is 
+*     written to a different file.
 *     If a file contained data for H7 and H9 then two output files would
 *     be created (eg test_h7 and test_h9 - if the OUT parameter was set to
 *     `test'). For each new bolometer a new file is created (existing
 *     files are overwritten) and data is appended to these files when
 *     more data for these bolometers is supplied.
-*     
+*     If METHOD=CATALL all data is written to a single file regardless
+*     of the bolometer.
 
 *  Usage:
 *     scucat out in
@@ -48,10 +50,18 @@
 *       a text file (use the ^ character)
 *     LOOP = LOGICAL (Read)
 *       Turns the looping on (default is true) or off (false)
+*     METHOD = CHAR (Read)
+*       Concatentation method for bolometers.
+*         SEPARATE: Store each bolometer (h7, c14 etc) in a separate
+*                   output file based on OUT and the bolometer name.
+*                   This is the default.
+*         CATALL:   Combine all data into one file regardless of
+*                   bolometer name.
 *     MSG_FILTER = CHAR (Read)
 *       Message filter level. Default is NORM.
 *     OUT = CHAR (Write)
-*       The root name of the output NDF. 
+*       The root name of the output NDF if METHOD=SEPARATE.
+*       The output filename if METHOD=CATALL
 
 *  Examples:
 *     scucat test phot
@@ -93,6 +103,10 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.23  1998/04/23 04:03:44  timj
+*     Add METHOD parameter to decide on
+*     whether to keep bolometers separate or not. Start writing HISTORY.
+*
 *     Revision 1.22  1998/04/23 01:05:51  timj
 *     Use GRP for filename input.
 *
@@ -230,6 +244,7 @@ c
       LOGICAL       LOOPING     ! Controls read loop
       INTEGER       LOWER       ! Lower bound of section
       CHARACTER*10  MODE        ! Access mode for output
+      CHARACTER*10  METHOD      ! Concatenation method
       INTEGER       N           ! Bolometer counter
       CHARACTER*15  NAME(MAXCMP) ! Names of NDFs
       INTEGER       NBOLUSED    ! Number of bolometers catted
@@ -278,6 +293,10 @@ c
       DO I = 1, MAXBOLS
          OUT_EXIST(I) = .FALSE.
       END DO
+
+*     Ask for the concatenation method
+      CALL PAR_CHOIC('METHOD', 'SEPARATE','SEPARATE,CATALL', .TRUE.,
+     :     METHOD, STATUS)
 
 *     Ask for the output root name
       CALL PAR_GET0C('OUT', OUTROOT, STATUS)
@@ -406,10 +425,17 @@ c
                            IF (STATUS .EQ. SAI__OK) THEN
 
 *     Now I need to actually ask for the bolometer name
+*     so long as we are processing data separately
+*     (if we are combining all then no need to ask)
 
-                              CALL PAR_GET0C('BOL', BOL(N_PHOT),STATUS)
-                              CALL CHR_LCASE(BOL(N_PHOT))
-                              CALL PAR_CANCL('BOL', STATUS)
+                              IF (METHOD .EQ. 'SEPARATE') THEN
+                                 CALL PAR_GET0C('BOL', BOL(N_PHOT),
+     :                                STATUS)
+                                 CALL CHR_LCASE(BOL(N_PHOT))
+                                 CALL PAR_CANCL('BOL', STATUS)
+                              ELSE
+                                 BOL(N_PHOT) = 'UNKNOWN'
+                              END IF
 
                               IF (STATUS .EQ. PAR__ABORT) THEN 
 
@@ -587,10 +613,20 @@ c
 
 *     First work out the filename
 
-                        IPOSN = CHR_LEN(OUTROOT)
-                        OUTFILE = OUTROOT
-                        CALL CHR_APPND('_', OUTFILE, IPOSN)
-                        CALL CHR_APPND(BOLUSED(INDEX) ,OUTFILE, IPOSN)
+                        IF (METHOD .EQ. 'SEPARATE') THEN
+
+                           IPOSN = CHR_LEN(OUTROOT)
+                           OUTFILE = OUTROOT
+                           CALL CHR_APPND('_', OUTFILE, IPOSN)
+                           CALL CHR_APPND(BOLUSED(INDEX) ,OUTFILE, 
+     :                          IPOSN)
+
+                        ELSE IF (METHOD .EQ. 'CATALL') THEN
+                           
+                           OUTFILE = OUTROOT
+                           INDEX = 1  ! Always use same index
+
+                        END IF
 
 
                         IF (OUT_EXIST(INDEX)) THEN
@@ -616,6 +652,9 @@ c
                            IF (STATUS .EQ. SAI__OK) THEN
                               OUT_EXIST(INDEX) = .TRUE.
                            END IF
+
+*     Start history recording
+                           CALL NDF_HCRE(OUT_NDF, STATUS)
 
 *     Setup the axis and title labels
                            CALL NDF_ACPUT('Integration', OUT_NDF, 
