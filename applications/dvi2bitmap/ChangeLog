@@ -1,3 +1,15 @@
+2003-10-03  Norman Gray  <norman@astro.gla.ac.uk>
+
+	* DviFile.cc, DviFile.h (convertUnits): added functionality to
+	convert to and from arbitrary unit combinations.
+
+	* DviFile.cc, DviFile.h, PkFont.cc, PkFont.h: Rationalised the way
+	that magnifications and unit conversions are done, to enable new
+	functionality (converting between units more rationally).  This
+	is tremendously error-prone, and difficult to write a regression
+	test for, but it produces apparently correct results from
+	test/magtest.tex.
+
 2003-09-30  Norman Gray  <norman@astro.gla.ac.uk>
 
 	* Bitmap.cc, Bitmap.h : Added support for marks in bitmaps,

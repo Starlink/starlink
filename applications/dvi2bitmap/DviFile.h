@@ -212,7 +212,17 @@ public:
     }
     int hSize();
     int vSize();
-    static double convertFromScaledPoints(int sp, DviUnits units);
+    static double convertFromScaledPoints(int sp, DviUnits units,
+					  DviFile *dvif=0)
+	    throw (DviError);
+    static double convertToScaledPoints(double length, DviUnits units,
+					DviFile *dvif=0)
+	    throw (DviError);
+    static double convertUnits(double length,
+			       DviUnits from_units,
+			       DviUnits to_units,
+			       DviFile *dvif=0)
+	    throw (DviError);
     static verbosities verbosity(const verbosities level);
     /**
      * Return the net magnification factor for the DVI file
@@ -294,6 +304,8 @@ private:
      * Definition is <code>1sp = dviu_per_sp_ * 1dviu</code>.
      */
     double dviu_per_sp_;
+
+    double dviu_per_(DviUnits unit);
 
     /**
      * The factor by which the file's internal magnification

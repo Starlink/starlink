@@ -739,17 +739,34 @@ int DviFile::pixel_round(int dp)
 }
 
 /**
- * Convert a TeX scaled point to another unit.  You cannot convert to
- * pixels or DVI units with this method; instead you should get a
- * pixel position solely through {@link #currH} or {@link #currV}.
+ * Convert a TeX scaled point to another unit.
+ *
+ * <p>It is possible to convert to pixel units with this method;
+ * however it is generally better to either get pixel positions
+ * directly (through {@link #currH} or {@link #currV} for example) or
+ * to convert from DVIunits to pixels using {@link #pixel_round} (the
+ * conversion here avoids the specific rounding algorithm required
+ * for that).
+ *
+ * <p>The conversions to DVIunits and pixels are not universal, but
+ * are instead dependent on a particular DVI file; if you wish to
+ * convert to either of these units, you must supply a reference to a
+ * DVI file.  If not, and argument here is ignored, and may be zero
+ * (the default).
  *
  * @param sp the length in scaled points
  * @param units the unit to convert it to
+ * @param dvif a DVI file, if pixels or DVIunits are requested
  *
- * @return the converted unit, or zero if the target unit was,
- * erroneously, pixels or DVI units
+ * @return the converted unit
+ *
+ * @throws DviError if pixels or DVIunits were requested and no dvif
+ * parameter was supplied
+ * @see #convertToScaledPoints
+ * @see #convertUnits
  */
-double DviFile::convertFromScaledPoints(int sp, DviUnits units)
+double DviFile::convertFromScaledPoints(int sp, DviUnits units, DviFile *dvif)
+    throw (DviError)
 {
     double ans;
     switch (units) {
@@ -781,9 +798,152 @@ double DviFile::convertFromScaledPoints(int sp, DviUnits units)
 	ans = sp;
 	break;
       case unit_pixels:
-      case unit_dvi:
-	ans = 0;
+	if (dvif == 0)
+	    throw DviError
+		  ("Conversion to pixels requested, but no DVI file supplied");
+	ans = sp * dvif->dviu_per_(unit_sp) // ...to dviu
+		/ dvif->dviu_per_(unit_pixels); // ...to px
 	break;
+      case unit_dvi:
+	if (dvif == 0)
+	    throw DviError
+		("Conversion to DVIunits requested, but no DVI file supplied");
+	ans = sp * dvif->dviu_per_(unit_sp);
+	break;
+      default:
+	assert(false);
+    }
+    return ans;
+}
+
+/**
+ * Convert a length to TeX scaled points.
+ *
+ * <p>The conversions from DVIunits and pixels are not universal, but
+ * are instead dependent on a particular DVI file; if you wish to
+ * convert from either of these units, you must supply a reference to a
+ * DVI file.  If not, and argument here is ignored, and may be zero
+ * (the default).
+ *
+ * @param length the length to be converted
+ * @param units the units in which the length is currently
+ * @param dvif a DVI file, if pixels or DVIunits are requested
+ *
+ * @return the input length as a multiple of the TeX scaled-point
+ *
+ * @throws DviError if pixels or DVIunits were requested and no dvif
+ * parameter was supplied
+ * @see #convertFromScaledPoints
+ * @see #convertUnits
+ */
+double DviFile::convertToScaledPoints(double length, DviUnits units,
+				      DviFile *dvif)
+    throw (DviError)
+{
+    double ans;
+    switch (units) {
+      case unit_pt:
+	ans = length * 65536.0;
+	break;
+      case unit_pc:
+	ans = length * 65536 * 12;
+	break;
+      case unit_in:
+	ans = length * 65536.0 * 72.27;
+	break;
+      case unit_bp:
+	ans = length * 65536.0 * 72.27 / 72.0;
+	break;
+      case unit_cm:
+	ans = length * 65536.0 * 72.27 / 2.54;
+	break;
+      case unit_mm:
+	ans = length * 65536.0 * 72.27 / 25.4;
+	break;
+      case unit_dd:
+	ans = length * 65536.0 * 1238.0 / 1157.0;
+	break;
+      case unit_cc:
+	ans = length * 65536.0 * 1238.0 / 1157.0 * 12.0;
+	break;
+      case unit_sp:
+	ans = length;
+	break;
+      case unit_pixels:
+	if (dvif == 0)
+	    throw DviError
+	("Conversion from pixels requested, but no DVI file supplied");
+	ans = length
+		* dvif->dviu_per_(unit_pixels) // ...to dviu
+		/ dvif->dviu_per_(unit_sp); // ...to sp
+	break;
+      case unit_dvi:
+	if (dvif == 0)
+	    throw DviError
+	      ("Conversion from DVIunits requested, but no DVI file supplied");
+	ans = length / dvif->dviu_per_(unit_sp);
+	break;
+      default:
+	assert(false);
+    }
+    return ans;
+}
+
+/**
+ * Convert a length from one set of units to another.
+ *
+ * <p>The conversions to DVIunits and pixels are not universal, but
+ * are instead dependent on a particular DVI file; if you wish to
+ * convert to either of these units, you must supply a reference to a
+ * DVI file.  If not, and argument here is ignored, and may be zero
+ * (the default).
+ *
+ * @param length the length to be converted
+ * @param from_units the units in which length is currently expressed
+ * @param to_units the target units
+ * @param dvif a DVI file, if pixels or DVIunits are requested
+ *
+ * @return the length expressed as a multiple of the target unit
+ *
+ * @throws DviError if pixels or DVIunits were requested and no dvif
+ * parameter was supplied
+ * @see #convertFromScaledPoints
+ * @see #convertToScaledPoints
+ */
+double DviFile::convertUnits(double length,
+			     DviUnits from_units,
+			     DviUnits to_units,
+			     DviFile *dvif)
+    throw (DviError)
+{
+    if (from_units == to_units)
+	return length;
+    else
+	return convertFromScaledPoints
+		(static_cast<int>(convertToScaledPoints(length,
+							from_units,
+							dvif)),
+		 to_units,
+		 dvif);
+}
+
+/**
+ * Ratio of DVIu to DVI-file-specific units.  Helper function for
+ * <code>convert...</code> functions.  May only be used with argument
+ * <code>unit_pixels</code> and <code>unit_sp</code>, and throws an
+ * assertion error otherwise.
+ *
+ * @param unit the unit we want to relate to DVIu
+ * @return the number of DVIunits in the given unit
+ */
+double DviFile::dviu_per_(DviUnits unit)
+{
+    double ans;
+    switch (unit) {
+      case unit_pixels:
+	ans = dviu_per_px_;
+      case unit_sp:
+	ans = dviu_per_sp_;
       default:
 	assert(false);
     }
