@@ -20,10 +20,12 @@
      is configured and built during bootstrapping, or "noauto" if it
      should be optionally configured and built during bootstrapping;
      if so, it might need special handling in the top-level bootstrap
-     file. -->
+     file.  The status should be marked obsolete when appropriate, as
+     this allows us to check if any component depends on an obsolete one.  -->
 <!ATTLIST component
         id      	ID      #REQUIRED
 	buildsupport	( yes | no | noauto )	"no"
+	status		( current | obsolete )  "current"
         >
 
 <!-- Version number of this component, which should be the same as the
