@@ -46,6 +46,9 @@
 *     1995 March 16 (MJC):
 *        Corrected some typo's and used the modern style for variable
 *        declarations.
+*     4-OCT-2004 (DSB):
+*        Use SHL_HLPCMD instead of HLPCMD (its been moved from kaplibs
+*        to shl).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -61,7 +64,7 @@
       INCLUDE 'GRP_PAR'          ! GRP public constants
 
 *  Global Variables:
-      INCLUDE 'HLPCMD'           ! Paged screen I/O
+      INCLUDE 'SHL_HLPCMD'       ! Paged screen I/O
 *        CMD = CHARACTER * ( 80 ) (Write)
 *           The command line.
 *        LHELP = INTEGER (Write)
