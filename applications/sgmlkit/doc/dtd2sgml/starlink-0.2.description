@@ -1,11 +1,9 @@
-<!doctype dtddescription system "dtddescription.dtd" [
-  <!entity slelems system "starlink-everything.dtdsummary" subdoc>
-]>
+<!doctype dtddescription system "dtddescription.dtd">
 <!-- $Id$ -->
 
 <!-- Fixed attributes not documented -->
 
-<dtddescription elementlist=slelems prefix='slgen'>
+<dtddescription docelem=sun>
 
 <element gi='abstract'>
 <p>The abstract for the document
