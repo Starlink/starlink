@@ -65,7 +65,7 @@
 *  Get data from input file
       CALL TIM_GETDAT( IFID, NTOT, NGOOD, TPNTR, DPNTR, LVAR,
      :                                        VPNTR, STATUS )
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
 * Get input parameters
 *   Oversampling function
@@ -78,7 +78,7 @@
 *   function is not wanted
       CALL USI_GET0R('WFREQ', F1, STATUS)
 *
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 *
 * Calculate the maximum workspace requirement in TIM_FASPER
       VALUE = REAL(OFAC * HIFAC * NGOOD * 4.0)
@@ -112,7 +112,7 @@
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error obtaining virtual memory')
-         GOTO 999
+         GOTO 99
       ENDIF
 
 *  Call time series application
