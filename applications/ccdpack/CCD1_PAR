@@ -40,6 +40,8 @@
 *        Modified package version string for automatic editing at build time.
 *     9-MAY-2001 (MBT):
 *        Added symbolic constant CCD1__BADSI.
+*     3-JUL-2001 (MBT):
+*        Added symbolic constant CCD1__MXSI.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -92,6 +94,10 @@
 *  Maximum length of NAME field (FRAME_TYPE or FILTER)
       INTEGER CCD1__NMLEN
       PARAMETER ( CCD1__NMLEN = 33 )
+
+*  Maximum number of Set Index values treated at once.
+      INTEGER CCD1__MXSI
+      PARAMETER ( CCD1__MXSI = 20 )
 
 *  Invalid value for Set Index attribute.
       INTEGER CCD1__BADSI
