@@ -785,6 +785,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 create_archives:
@@ -837,6 +838,10 @@ build_demo:
 
 build:
 
+docs_check:
+
+docs:
+
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/jel_g.jar
@@ -852,11 +857,11 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/topcat-0.5-1.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/topcat/topcat-0.5-1.tar
-     [gzip] Building: /apps/cvsbuild/export/topcat-0.5-1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/topcat-0.5-1.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/topcat/topcat-0.5-1.tar
+      [zip] Building zip: /apps/cvsbuild/export/topcat-1.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/topcat/topcat-1.0.tar
+     [gzip] Building: /apps/cvsbuild/export/topcat-1.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/topcat-1.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/topcat-1.0.tar
      [echo] Executing Treeview target: export
 
 export:
@@ -1000,4 +1005,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
 
 BUILD SUCCESSFUL
-Total time: 13 minutes 22 seconds
+Total time: 13 minutes 32 seconds

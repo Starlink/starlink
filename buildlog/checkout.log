@@ -8784,7 +8784,11 @@ cvs checkout: Updating java/source/topcat/src
 cvs checkout: Updating java/source/topcat/src/docs
 U java/source/topcat/src/docs/JEL-licence
 U java/source/topcat/src/docs/Ptplot-licence
-U java/source/topcat/src/docs/Topcat.txt
+U java/source/topcat/src/docs/docs.dtd
+U java/source/topcat/src/docs/sun178.xml
+U java/source/topcat/src/docs/toHTML.xslt
+U java/source/topcat/src/docs/toHTML1.xslt
+U java/source/topcat/src/docs/toHelp.xslt
 cvs checkout: Updating java/source/topcat/src/etc
 cvs checkout: Updating java/source/topcat/src/etc/demo
 cvs checkout: Updating java/source/topcat/src/etc/demo/fits
@@ -8814,11 +8818,14 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/BitsRowSubset.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/BooleanColumnRowSubset.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CheckBoxMenu.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CheckBoxStack.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnCellRenderer.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnComboBoxModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnIndexSpinner.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnInfoWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnList.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ControlWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CustomComboBoxRenderer.java
-U java/source/topcat/src/main/uk/ac/starlink/topcat/HelpTransformer.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/Driver.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELRowReader.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELUtils.java
@@ -8837,6 +8844,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/ResourceIcon.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/RestrictedColumnComboBoxModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/RowSubset.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/SizingScrollPane.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/SortOrder.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/StatsWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/SubsetWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/SyntheticColumn.java
@@ -8844,73 +8852,29 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/SyntheticColumnQueryWindow.j
 U java/source/topcat/src/main/uk/ac/starlink/topcat/SyntheticRowSubset.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/SyntheticSubsetQueryWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/TableColumnModelAdapter.java
-U java/source/topcat/src/main/uk/ac/starlink/topcat/TableViewer.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/TableViewerWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/TopcatListener.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/TopcatModel.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/TopcatViewWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/UpDownButton.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ViewerTableModel.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/WindowAction.java
 cvs checkout: Updating java/source/topcat/src/resources
 cvs checkout: Updating java/source/topcat/src/resources/uk
 cvs checkout: Updating java/source/topcat/src/resources/uk/ac
 cvs checkout: Updating java/source/topcat/src/resources/uk/ac/starlink
 cvs checkout: Updating java/source/topcat/src/resources/uk/ac/starlink/topcat
 cvs checkout: Updating java/source/topcat/src/resources/uk/ac/starlink/topcat/help
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/Map.xml
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/TOC.xml
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/Topcat.hs
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/ack.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/browser.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/colinfo.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/direct.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/fits-read.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/fits-write.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/help.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/html-write.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/index.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/intro.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/invoke.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/io.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/jdbc-read.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/jdbc-write.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/jdbc.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/jel.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/latex-write.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/load-file.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/load-formats.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/load-jdbc.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/load-node.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/load-text.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/methods.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/mirage.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/param.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/plot.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/read.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/release.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/save-file.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/save-formats.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/save-jdbc.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/save-text.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/script.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/stats.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/subsets-win.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/subsets.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/synthetic.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/tablecopy.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/template.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/text-read.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/text-write.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/topcat.css
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/viewers.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/votable-read.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/votable-write.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/wdc-read.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/windows.html
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/write.html
 cvs checkout: Updating java/source/topcat/src/resources/uk/ac/starlink/topcat/images
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/4way3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Back24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Column.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/ColumnDelete24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Copy24.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Down.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Forward24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Help3.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Home24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Minus1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Open24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/PageSetup24.gif
@@ -8919,7 +8883,10 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Print24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Redo24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Save24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/TopCat2.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Up.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/ab3.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/arrow_n.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/arrow_s.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/blank24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/browser1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/burst.gif
@@ -8929,6 +8896,8 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/fx2.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridoff.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridon.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/handle1.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/handle2.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/hide1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/multiply4.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/plot0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/query_message.gif
@@ -8939,11 +8908,6 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/tablemeta0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/tc3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/venn2.gif
 cvs checkout: Updating java/source/topcat/src/resources/uk/ac/starlink/topcat/images/treeview
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/treeview/Down.gif
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/treeview/Home24.gif
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/treeview/Up.gif
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/treeview/handle-closed.gif
-U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/treeview/handle-open.gif
 cvs checkout: Updating java/source/topcat/src/script
 U java/source/topcat/src/script/topcat
 cvs checkout: Updating java/source/topcat/src/testcases
@@ -9230,6 +9194,7 @@ U java/source/util/src/main/uk/ac/starlink/util/GenericNioBuffer.java
 U java/source/util/src/main/uk/ac/starlink/util/IOUtils.java
 U java/source/util/src/main/uk/ac/starlink/util/Loader.java
 U java/source/util/src/main/uk/ac/starlink/util/MapGroup.java
+U java/source/util/src/main/uk/ac/starlink/util/MultiXML.java
 U java/source/util/src/main/uk/ac/starlink/util/NodeDescendants.java
 U java/source/util/src/main/uk/ac/starlink/util/PipeReaderThread.java
 U java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeDecode.java

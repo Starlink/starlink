@@ -136,7 +136,7 @@ install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/etc
-[loggedcopy] Copying 77 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 78 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Task target: install
 
 prepare:
@@ -229,7 +229,6 @@ webstart:
 
 dist:
      [copy] Copying 284 files to /apps/cvsbuild/java/source/diva/docs/diva
-    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/diva
@@ -831,6 +830,22 @@ build_demo:
 
 build:
 
+docs_check:
+
+docs:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/docs
+     [copy] Copying 43 files to /apps/cvsbuild/java/source/topcat/build/docs
+     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/topcat/build/docs
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/docs/sun178
+     [xslt] Processing /apps/cvsbuild/java/source/topcat/build/docs/sun178.xml to /apps/cvsbuild/java/source/topcat/build/docs/sun178/sun178.html
+     [xslt] Loading stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHTML1.xslt
+     [java] Parsing document /apps/cvsbuild/java/source/topcat/build/docs/sun178.xml
+     [java] Transforming with stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHTML.xslt
+     [java] Writing 62 files to /apps/cvsbuild/java/source/topcat/build/docs/sun178
+     [java] Parsing document /apps/cvsbuild/java/source/topcat/build/docs/sun178.xml
+     [java] Transforming with stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHelp.xslt
+     [java] Writing 65 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/help
+
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/jel_g.jar
@@ -847,13 +862,17 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/bin
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/etc/topcat
      [copy] Copying 1 file to /apps/cvsbuild/java/source/topcat/bin
+     [copy] Copying 104 files to /apps/cvsbuild/java/source/topcat/docs/topcat
+     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/topcat/docs/topcat
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/topcat
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/topcat
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 52 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 124 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copied 2 empty directories to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 41 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Treeview target: install
 
 prepare:
@@ -1001,4 +1020,4 @@ install:
 [loggedcopy] Copying 152 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 23 seconds
+Total time: 3 minutes 40 seconds

@@ -41,7 +41,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/classes
-    [javac] Compiling 46 source files to /apps/cvsbuild/java/source/util/build/classes
+    [javac] Compiling 47 source files to /apps/cvsbuild/java/source/util/build/classes
      [copy] Copying 17 files to /apps/cvsbuild/java/source/util/build/classes
      [echo] Executing Task target: build
 
@@ -374,8 +374,9 @@ build_demo:
       [tar] Building tar: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2
 
 build:
-    [javac] Compiling 38 source files to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 90 files to /apps/cvsbuild/java/source/topcat/build/classes
+    [javac] Compiling 47 source files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 41 files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/topcat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
      [copy] Copying 2 files to /apps/cvsbuild/java/source/topcat/lib/topcat
      [echo] Executing Treeview target: build
@@ -456,4 +457,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 4 seconds
+Total time: 1 minute 1 second
