@@ -3887,40 +3887,33 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       INTEGER SID
 *-
       IF (STATUS .NE. SAI__OK) RETURN
-*  write spatial selection
+
       CALL SLN_NEWREC(VERSION,SID,STATUS)
-      CALL SLN_PUTARD(SID,'Spatial',ASRT.ARDID,STATUS)
-      CALL SLN_PUTREC(ID,SID,STATUS)
+
+
+*  write spatial selection
+      CALL SLN_PUTARD(SID,'SPACE',ASRT.ARDID,STATUS)
 
 
 *  write detector coordinate selection
-      CALL SLN_NEWREC(VERSION,SID,STATUS)
-      CALL SLN_PUTRNGI(SID,'XDetector',1,ASRT.MIN_XD,ASRT.MAX_XD,
-     :                                                     STATUS)
-      CALL SLN_PUTREC(ID,SID,STATUS)
-      CALL SLN_NEWREC(VERSION,SID,STATUS)
-      CALL SLN_PUTRNGI(SID,'YDetector',1,ASRT.MIN_YD,ASRT.MAX_YD,
-     :                                                     STATUS)
-      CALL SLN_PUTREC(ID,SID,STATUS)
+      CALL SLN_PUTRNGI(SID,'XDET',1,ASRT.MIN_XD,ASRT.MAX_XD,STATUS)
+      CALL SLN_PUTRNGI(SID,'YDET',1,ASRT.MIN_YD,ASRT.MAX_YD,STATUS)
 
 
 *  write time ranges
-      CALL SLN_NEWREC(VERSION,SID,STATUS)
-      CALL SLN_PUTRNGI(SID,'Time',ASRT.NTIME,
+      CALL SLN_PUTRNGI(SID,'TIME',ASRT.NTIME,
      :             ASRT.MIN_T,ASRT.MAX_T,STATUS)
-      CALL SLN_PUTREC(ID,SID,STATUS)
 
 
 *  write PH channel selection
-      CALL SLN_NEWREC(VERSION,SID,STATUS)
-      CALL SLN_PUTRNGI(SID,'PHChannel',1,ASRT.MIN_PH,ASRT.MAX_PH,
-     :                                                    STATUS)
-      CALL SLN_PUTREC(ID,SID,STATUS)
+      CALL SLN_PUTRNGI(SID,'PH_CHANNEL',1,ASRT.MIN_PH,ASRT.MAX_PH,
+     :                                                      STATUS)
 
 *  write corrected PH channel selection
-      CALL SLN_NEWREC(VERSION,SID,STATUS)
-      CALL SLN_PUTRNGI(SID,'Energy',1,ASRT.MIN_EN,ASRT.MAX_EN,
+      CALL SLN_PUTRNGI(SID,'ENERGY',1,ASRT.MIN_EN,ASRT.MAX_EN,
      :                                                    STATUS)
+
+
       CALL SLN_PUTREC(ID,SID,STATUS)
 
 *
