@@ -182,7 +182,7 @@ StarWCS::StarWCS( const char *header )
             //  Establish which error conditions we'd like to see mentioned
             //  in the ASTWARN cards. These should be shown to the user when
             //  convenient.
-            astSet( fitschan, "Warnings=Tnx Zpx BadCel NoEquinox NoRadesys" );
+            astSet(fitschan, "Warnings=%s", astGetC(fitschan, "AllWarnings"));
             
             // Now try to read in the FITS headers to create a frameset
             // (this contains frames for the image pixels and how to map

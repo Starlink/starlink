@@ -420,7 +420,7 @@ itcl::class gaia::GaiaImageCtrl {
          set message \
             "The astrometric calibration of your image produced the following warnings:\n\n$warn"
       } else {
-         set message "There are no known problems with your astrometry calibration"
+         set message "There are no known issues with your astrometry calibration"
       }
       set existed [winfo exists $w_.astwarn]
       utilReUseWidget util::TextDialog $w_.astwarn \
