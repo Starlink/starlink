@@ -279,7 +279,7 @@ libast_slalib_la_SOURCES = sla.c
 libast_wcslib_la_SOURCES = proj.c wcstrig.c tpn.c
 
 # The following files are built by the targets in this makefile.
-MAINTAINERCLEANFILES = error.h version.h builddocs addversion \
+MAINTAINERCLEANFILES = version.h builddocs addversion \
 	ast.h $(DOCUMENTATION_PRODUCTS)
 
 # Special cases start here
@@ -319,10 +319,7 @@ ast.h: $(AST_H_FILES) ast_err.h makeh
 # just rely on the dependencies expressed in the main body above to
 # have AST_PAR built before it is needed.
 #
-# error.h doesn't _have_ to be built this early, but almost all of the 
-# modules depend on it, so it's more robust to list it here rather than
-# in each of the _SOURCES declarations above.
-BUILT_SOURCES = AST_ERR ast_err.h error.h
+BUILT_SOURCES = AST_ERR ast_err.h 
 
 object.c: version.h
 
@@ -342,14 +339,11 @@ install-exec-local: libast.la
 # The source files here should be mentioned in STAR_PREDIST_SOURCES in
 # configure.ac
 @PREDIST@predist_subs = sed \
-@PREDIST@    -e 's,@star_facilitycode\@,$(star_facilitycode),' \
 @PREDIST@    -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),' \
 @PREDIST@    -e 's,@PACKAGE_VERSION_MAJOR\@,$(PACKAGE_VERSION_MAJOR),' \
 @PREDIST@    -e 's,@PACKAGE_VERSION_MINOR\@,$(PACKAGE_VERSION_MINOR),' \
 @PREDIST@    -e 's,@PACKAGE_VERSION_RELEASE\@,$(PACKAGE_VERSION_RELEASE),' \
 @PREDIST@    -e 's,@PERL\@,$(PERL),'
-@PREDIST@error.h: error.h.in
-@PREDIST@	rm -f $@; $(predist_subs) $< >$@
 @PREDIST@version.h: version.h.in
 @PREDIST@	rm -f $@; $(predist_subs) $< >$@
 @PREDIST@builddocs: builddocs.in

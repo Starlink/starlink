@@ -74,7 +74,7 @@
 /* ======= */
 /* Define a facility number that is unique to this library. */
 #if defined(astCLASS)            /* Protected */
-#define AST__FAC (@star_facilitycode@)
+#define AST__FAC (1521)
 #endif
 
 /* Function prototypes. */

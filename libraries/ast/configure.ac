@@ -43,12 +43,8 @@ AC_CHECK_DECLS([isnan],,,[#include <math.h>
 STAR_DECLARE_DEPENDENCIES(sourceset, sst)
 STAR_DECLARE_DEPENDENCIES(build, sla)
 
-#   Declare the message file.  This macro is documented to leave the
-#   discovered facility code in the shell variable
-#   $star_facilitycode, so make this available for substitution (into
-#   error.h -- done in Makefile.am rather than by configure).
+#   Declare the message file.  
 STAR_MESSGEN(ast_err.msg)
-AC_SUBST(star_facilitycode)
 
 #   Declare the documentation.  We need to do complicated things to
 #   satisfy these targets, so give a non-null value
@@ -65,6 +61,6 @@ AC_CONFIG_FILES(Makefile component.xml ast_link)
 AC_CONFIG_FILES([ast_cpp], [chmod +x ast_cpp])
 #   Following are files which are substituted by the Makefile at
 #   distribution time, rather than by configure.  They are not distributed.
-STAR_PREDIST_SOURCES(error.h.in version.h.in builddocs.in addversion.in)
+STAR_PREDIST_SOURCES(version.h.in builddocs.in addversion.in)
 
 AC_OUTPUT
