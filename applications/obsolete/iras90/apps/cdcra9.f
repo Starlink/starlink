@@ -130,6 +130,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      NAMELN = 0
+
 * ***********************************************************************
 * Construct the name and title of the output NDF
 * ***********************************************************************

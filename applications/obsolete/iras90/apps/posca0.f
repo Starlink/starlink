@@ -141,6 +141,8 @@
 
 *.
 
+      CLDETN = 0
+
 *  Store bad values to indicate that no valid data has yet been stored 
 *  for this NDF.
       DO I = 1, NITEM

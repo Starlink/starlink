@@ -99,6 +99,10 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      LINNO = 0
+      LOSMP = 0
+      UPSMP = 0
+
 *  If the input profile array contains only one profile, use it for all
 *  waveband.
       IF ( NPROF .EQ. 1 ) THEN

@@ -144,6 +144,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      YMIN = 0.0
+
 *  Find the sample numbers at the bottom trace corresponding to lower
 *  and upper in-scan display limits.
       FOUND = .FALSE.

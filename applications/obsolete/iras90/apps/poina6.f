@@ -168,6 +168,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      PREVSD = 0.0
+
 *  Set a dummy standard deviation to a high value so that no values will
 *  be rejected because they are over the threshold in the first iteration
       STDDEV = 1.0E10

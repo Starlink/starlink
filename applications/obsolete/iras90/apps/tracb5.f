@@ -120,6 +120,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      XMIN = 0.0
+
 *  Return with zero slope and offset if the detector is dead.
       IF( SCALE .EQ. VAL__BADR ) THEN
          SLOPE = 0.0

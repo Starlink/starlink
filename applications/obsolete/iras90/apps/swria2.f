@@ -131,6 +131,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      PRNTXT = 0
+
 *  Inquire the present attribute setting.
       CALL SGS_ITXA( NF, NPR, HT, AR, XU, YU, SP, TXJ )
       CALL SGS_IPEN( NPEN )

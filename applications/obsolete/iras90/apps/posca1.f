@@ -82,6 +82,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      START = 0
+
 *  Sort the data so that SOP numbers monotonically from low indices to 
 *  high indices.
       CALL IRM_SORTD( .TRUE., 7, NCRDDF, NITEM, WORK1, NUSED, STATUS )

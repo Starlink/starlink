@@ -155,6 +155,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      ROTDIR = .FALSE.
+
 *  Get the value of FITS keyword EPOCH (the epoch of the reference
 *  equinox, not of the observations).
       CALL IRM_GKEYR( NCARD, FITS, 1, 'EPOCH', THERE, EQU, CARD, 

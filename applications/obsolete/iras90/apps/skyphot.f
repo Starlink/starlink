@@ -304,6 +304,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      GOTFIL = .FALSE.
+      DEVOPN = .FALSE.
+
 *  Establish the conditional message filter level using parameter
 *  MSG_LEVEL.
       CALL MSG_IFGET( 'MSG_FILTER', STATUS )

@@ -112,6 +112,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      IDALBD = 0
+      IDAUBD = 0
+
 *  Search the input data for the first valid sample after the start of the 
 *  range to be evaluated
       FOUNDS = .FALSE.

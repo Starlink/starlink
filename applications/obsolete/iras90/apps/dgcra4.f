@@ -85,6 +85,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Note that L is used as an index before it is set!
+      L = 0
+
 *  Processing the data in the input array row by row.
       DO I = 1, NDET
 

@@ -147,6 +147,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      IOS = 0
+      NOLINE = 0
+
 *  *********************************************************************
 *  Check whether display is to terminal ( DISMOD = .TRUE. ) or
 *  to file ( DISMOD = .FALSE. )

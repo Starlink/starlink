@@ -340,6 +340,10 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      SCALE = 0.0
+      INTUBD = 0
+      INTLBD = 0
+
 *  Initialisation
       CALL POINA0( 'AUTOMATIC', 'LOGFILE', 'MSG_FILTER', 
      :             AUTO, BANDLU, LOGFID, LOGREQ, STATUS )

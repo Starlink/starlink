@@ -184,6 +184,11 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialise
+      DIFSCS = .FALSE.
+      TSORA = 0.0
+      TSODEC = 0.0
+
 * **********************************************************************
 *  If the source is being edited store the current source details in
 *  case the user decides the new values he enters are not correct, and
