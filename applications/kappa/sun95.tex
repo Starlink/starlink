@@ -970,7 +970,7 @@ whose variances are too large}{ERRCLIP};
 dimensionality;
 \item normalisation of NDF pairs;
 \item \htmlref{compression and expansion of images}{cl:compexp};
-\item \htmlref{generalised resampling}{cl:resample} of NDFs using
+\item \htmlref{generalised resampling}{cl:regrid} of NDFs using
 arbitrary transformations;
 \item filtering: \htmlref{box}{BLOCK}, \htmlref{Gaussian}{GAUSMOOTH},
 and \htmlref{median smoothing}{MEDIAN}; very efficient
@@ -11011,8 +11011,8 @@ picture.}
  Creates a 1-d profile through an N-d NDF.}
 \menuitem{PSF}{
  Determines the parameters of a model star profile by fitting star images in a two-dimensional NDF.}
-\menuitem{RESAMPLE}{
- Use an arbitrary mapping to resample an NDF.}
+\menuitem{REGRID}{
+ Use an arbitrary mapping to regrid an NDF.}
 \menuitem{RESHAPE}{
  Reshapes an NDF, treating its arrays as vectors.}
 \menuitem{RIFT}{
@@ -11396,8 +11396,8 @@ functions as follows.
  Expands an NDF by pixel duplication.
 \classitem{SQORST}
  Squashes or stretches a 2-d data array in either or both axes.
-\classitem{RESAMPLE}
- Use an arbitrary mapping to resample an NDF.
+\classitem{REGRID}
+ Use an arbitrary mapping to regrid an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \end{description}
@@ -11417,8 +11417,8 @@ functions as follows.
  Permutes the axes of an NDF.
 \classitem{PROFILE}
  Creates a 1-d profile through an N-d NDF.
-\classitem{RESAMPLE}
- Use an arbitrary mapping to resample an NDF.
+\classitem{REGRID}
+ Use an arbitrary mapping to regrid an NDF.
 \classitem{RESHAPE}
  Reshapes an NDF, treating its arrays as vectors.
 \classitem{ROTATE}
@@ -11618,11 +11618,11 @@ WCS component of an NDF.
 \end{description}
 \vspace*{0.7ex}
 %
-\label{cl:resample}
+\label{cl:regrid}
 \item {\large\bf Resampling and transformations}
 \begin{description}
-\classitem{RESAMPLE}
- Use an arbitrary mapping to resample an NDF.
+\classitem{REGRID}
+ Use an arbitrary mapping to regrid an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \end{description}
@@ -15141,7 +15141,7 @@ default value.
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: BLOCK, COMPAVE, COMPICK, PIXDUPE, SQORST, RESAMPLE;
+      KAPPA: BLOCK, COMPAVE, COMPICK, PIXDUPE, SQORST, REGRID;
       Figaro: ISTRETCH, YSTRACT.
    }
    \sstimplementationstatus{
@@ -15386,7 +15386,7 @@ default value.
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: BLOCK, COMPADD, COMPICK, PIXDUPE, SQORST, RESAMPLE;
+      KAPPA: BLOCK, COMPADD, COMPICK, PIXDUPE, SQORST, REGRID;
       Figaro: ISTRETCH.
    }
    \sstimplementationstatus{
@@ -15508,7 +15508,7 @@ default value.
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: BLOCK, COMPADD, COMPAVE, PIXDUPE, SQORST, RESAMPLE;
+      KAPPA: BLOCK, COMPADD, COMPAVE, PIXDUPE, SQORST, REGRID;
       Figaro: ISTRETCH.
    }
    \sstimplementationstatus{
@@ -21411,7 +21411,7 @@ plot (101k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: ROTATE, RESAMPLE; Figaro: IREVX, IREVY, IROT90.
+      KAPPA: ROTATE, REGRID; Figaro: IREVX, IREVY, IROT90.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -33756,12 +33756,12 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
 \end{htmlonly}
 
 \sstroutine{
-   RESAMPLE
+   REGRID
 }{
    Applies a geometrical transformation to an NDF
 }{
    \sstdescription{
-      This application uses a specified Mapping to transform the pixel
+      This application uses a specified Mapping to re-grid the pixel
       positions in an NDF. The specified Mapping should transform pixel
       co-ordinates in the input NDF into the corresponding pixel
       co-ordinates in the output NDF.
@@ -33783,7 +33783,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       parameter MAPPING).
    }
    \sstusage{
-      resample in out [method]
+      regrid in out [method]
    }
    \sstparameters{
       \sstsubsection{
@@ -33945,14 +33945,14 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
    }
    \sstexamples{
       \sstexamplesubsection{
-         resample sg28948 sg28948r mapping=rotate.ast
+         regrid sg28948 sg28948r mapping=rotate.ast
       }{
          Here sg28948 is resampled into a new co-ordinate system using
          the AST Mapping stored in a text file called rotate.ast (which
          may have been created using WCSADD for instance).
       }
       \sstexamplesubsection{
-         resample flat distorted mapping=$\backslash$!
+         regrid flat distorted mapping=$\backslash$!
       }{
          This transforms the NDF called flat.sdf into its current
          co-ordinate Frame, writing the result to an NDF called
@@ -33966,7 +33966,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          to hold the transformed copies of all the pixels from {\tt "}flat{\tt "}.
       }
       \sstexamplesubsection{
-         resample flat distorted mapping=$\backslash$! scale=1 method=sinccos params=[0,3]
+         regrid flat distorted mapping=$\backslash$! scale=1 method=sinccos params=[0,3]
       }{
          As the previous example, but the additional scaling factor will
          not be applied even in the case of large size discrepancy,
@@ -33974,7 +33974,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          rolls off at a distance of 3 pixels from the central one.
       }
       \sstexamplesubsection{
-         resample flat distorted mapping=$\backslash$! scale=0.2 method=blockave params=2
+         regrid flat distorted mapping=$\backslash$! scale=0.2 method=blockave params=2
       }{
          In this case, an additional shrinking factor of 0.2 is being
          applied to the output NDF (\emph{i.e.} performed following the
@@ -33987,7 +33987,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          adding a contribution to one pixel of the output NDF.
       }
       \sstexamplesubsection{
-         resample a119 a119s mapping=$\backslash$! lbound=[1,-20] ubound=[256,172]
+         regrid a119 a119s mapping=$\backslash$! lbound=[1,-20] ubound=[256,172]
       }{
          This transforms the NDF called a119 into an NDF called a119s.
          It uses nearest-neighbour resampling.  The shape of a119s
@@ -34558,7 +34558,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: FLIP, RESAMPLE; Figaro: IREVX, IREVY, IROT90.
+      KAPPA: FLIP, REGRID; Figaro: IREVX, IREVY, IROT90.
    }
    \sstimplementationstatus{
       The propagation rules depend on parameters ANGLE and NNMETH.
@@ -38848,7 +38848,7 @@ plot (7k).
       optionally use the Mapping to add a new co-ordinate Frame into
       the WCS component of an NDF (see parameter NDF). An output text file
       may also be created holding a textual representation of the
-      Mapping for future use by other applications such as RESAMPLE (see
+      Mapping for future use by other applications such as REGRID (see
       parameter MAPOUT). A number of different types of Mapping can be
       used (see parameter MAPTYPE).
 
@@ -38984,7 +38984,7 @@ plot (7k).
          MAPOUT = FILENAME (Write)
       }{
          The name of a text file in which to store a textual representation
-         of the Mapping. This can be used, for instance, by the RESAMPLE
+         of the Mapping. This can be used, for instance, by the REGRID
          application. If a null (!) value is supplied, no file is
          created. {\tt [!]}
       }
@@ -39181,7 +39181,7 @@ plot (7k).
          This constructs a pincushion-type distortion Mapping centred
          on the origin with a distortion coefficient of 5.3e-10,
          and writes out the Mapping as a text file called pcd.ast.
-         This file could then be used by RESAMPLE to resample
+         This file could then be used by REGRID to resample
          the pixels of an NDF according to this transformation.
          No NDF is accessed.
       }
@@ -39200,7 +39200,7 @@ plot (7k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: RESAMPLE, NDFTRACE, WCSFRAME, WCSREMOVE, WCSATTRIB.
+      KAPPA: REGRID, NDFTRACE, WCSFRAME, WCSREMOVE, WCSATTRIB.
       CCDPACK: WCSEDIT.
    }
 }
@@ -39429,7 +39429,7 @@ plot (7k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: RESAMPLE, WCSFRAME; CCDPACK: TRANNDF.
+      KAPPA: REGRID, WCSFRAME; CCDPACK: TRANNDF.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -43825,7 +43825,7 @@ The following new applications have been added:
       Creates or edits an graphics device colour table. It uses a graphical
       user interface to allow interactive manipulation of the colour
       table in many ways.
-   \item [\htmlref{RESAMPLE}{RESAMPLE}] \mbox{}
+   \item [\htmlref{REGRID}{REGRID}] \mbox{}
       Applies an arbitrary geometrical transformation to an NDF. This is a 
       WCS-aware replacement for the old TRANSFORMER command.
 \end{description}
@@ -43852,7 +43852,7 @@ need that may occur for them (see SUN/239).
 \item [TRANINVERT] Use \htmlref{WCSATTRIB}{WCSATTRIB} instead.
 \item [TRANJOIN] Use \htmlref{WCSADD}{WCSADD} instead.
 \item [TRANMAKE] Use \htmlref{WCSADD}{WCSADD} instead.
-\item [TRANSFORMER] Use \htmlref{RESAMPLE}{RESAMPLE} instead.
+\item [TRANSFORMER] Use \htmlref{REGRID}{REGRID} instead.
 \item [TRANTRACE] Use \htmlref{WCSSHOW}{WCSSHOW} instead.
 \end{description}
 
@@ -43957,7 +43957,7 @@ The following applications have been modified:
          distortion.
          \item The selected Mapping can now be dumped to a text file
          for use by other applications such as
-         \htmlref{RESAMPLE}{RESAMPLE}.
+         \htmlref{REGRID}{REGRID}.
       \end{itemize}
 
 \end{description}
@@ -44262,7 +44262,7 @@ functions as follows.
  Expands an NDF by pixel duplication.
 \classitem{SQORST}
  Squashes or stretches a 2-d data array in either or both axes.
-\classitem{RESAMPLE}
+\classitem{REGRID}
  Applies a geometrical transformation to an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
@@ -44283,7 +44283,7 @@ functions as follows.
  Permutes the axes of an NDF.
 \classitem{PROFILE}
  Creates a 1-d profile through an N-d NDF.
-\classitem{RESAMPLE}
+\classitem{REGRID}
  Applies a geometrical transformation to an NDF.
 \classitem{RESHAPE}
  Reshapes an NDF, treating its arrays as vectors.
@@ -44485,8 +44485,8 @@ functions as follows.
 %
 \item {\large\bf Resampling and transformations}
 \begin{description}
-\classitem{RESAMPLE}
- Use an arbitrary mapping to resample an NDF.
+\classitem{REGRID}
+ Use an arbitrary mapping to regrid an NDF.
 \classitem{WCSALIGN}
  Aligns a group of 2-d NDFs using WCS information.
 \end{description}

@@ -12639,8 +12639,8 @@ iraf! {
 
       }
 
-      action resample {
-         alias {resamp(le)}
+      action regrid {
+         alias {regr(id)}
 
          helplib {$KAPPA_HELP}
 
@@ -12715,7 +12715,7 @@ iraf! {
             type LITERAL
             vpath DEFAULT
             ppath CURRENT DEFAULT
-            default {KAPPA - Resample}
+            default {KAPPA - Regrid}
             prompt {Output NDF title}
             helpkey *
          }
@@ -15457,7 +15457,7 @@ iraf! {
    }
 
    command transformer {
-      obsolete { The transformer command has been retired to the KAPRH package. See SUN/239. Use "resample" instead. }
+      obsolete { The transformer command has been retired to the KAPRH package. See SUN/239. Use "regrid" instead. }
    } 
 
    command traninvert {

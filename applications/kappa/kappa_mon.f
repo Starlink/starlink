@@ -379,8 +379,8 @@
             CALL PSF ( STATUS )
 
 *  Transforms an NDF.
-         ELSE IF ( NAME .EQ. 'RESAMPLE' ) THEN
-            CALL RESAMPLE ( STATUS )
+         ELSE IF ( NAME .EQ. 'REGRID' ) THEN
+            CALL REGRID ( STATUS )
 
 *  Adds a scalar to a section of a an NDF data structure to correct
 *  rift-valley defects.
