@@ -1,3 +1,5 @@
+// $Id$
+
 #include "dvi2bitmap.h"
 #include <cstdio>
 

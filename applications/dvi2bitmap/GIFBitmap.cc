@@ -1,5 +1,7 @@
 /*
- * GIFEncode.c - GIF image compression interface.
+ * GIFEncode.cc - GIF image compression interface.
+ *
+ * $Id$
  *
  * This is based on GIFENCOD by David Rowley, as extracted from the
  * ppmtogif.c program which is part of the pbmplus distribution.  I'm
