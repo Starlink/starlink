@@ -19,8 +19,13 @@ ignore the HyTime attributes!
 <title>Support cross references
 
 <misccode>
-<description>REF is a simple reference to another element in the same document.
+<description>
+<p>REF is a simple reference to another element in the same document.
 Check that the target is a member of the list <funcname/target-element-list/.
+<p>If the target is a member of the list returned by
+<funcname/section-element-list/, then make the section reference by
+calling <funcname/make-section-reference/; otherwise, process the
+target in mode <code/section-reference/.
 <codebody>
 (element ref
   (let ((target (element-with-id (attribute-string (normalize "id")
@@ -35,7 +40,10 @@ Check that the target is a member of the list <funcname/target-element-list/.
 	  ;  (process-node-list target))
 	  (if linktext
 	      (literal linktext)
-	      (make-section-reference target: target specify-type: #t))
+	      (if (member (gi target) (section-element-list))
+		  (make-section-reference target: target specify-type: #t)
+		  (with-mode section-reference
+		    (process-node-list target))))
 	  )
 	(error (string-append
 	     "The stylesheet is presently unable to link to elements of type "
