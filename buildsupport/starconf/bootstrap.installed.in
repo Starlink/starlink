@@ -45,17 +45,22 @@ else
 fi
 
 
-# Bootstrap any child directories, but don't object if there's no
-# bootstrap file present.
+# Bootstrap any child directories mentioned in AC_CONFIG_SUBDIRS.
+# These bootstrap files must exist, so that starconf is run in each
+# subdirectory, creating the correct acinclude.m4, so that the
+# STAR_DEFAULTS in the directory's configure.ac does indeed have a
+# definition.
 for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` DUMMY
 do
-    if test -n "$d" -a -d "$d" -a -f "$d/bootstrap"; then
+    if test -n "$d" -a -d "$d"; then
         echo "Bootstrapping $d..."
         if test -x $d/bootstrap; then
+            # good...
             (cd $d; ./bootstrap)
         else
-            echo "bootstrap: file $d/bootstrap exists but is not executable"
-            echo "bootstrap: file $d/bootstrap exists but is not executable" >&2
+            echo "bootstrap: no file $d/bootstrap -- run starconf in $d"
+            echo "bootstrap: no file $d/bootstrap -- run starconf in $d" >&2
+            exit 1
         fi
     fi
 done
