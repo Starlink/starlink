@@ -305,7 +305,7 @@ of extended astronomical objects, using data obtained from a dual-beam
 polarimeter\footnote{It is hoped that POLPACK will be extended at the
 next release to include support for circular polarization, and
 single-beam polarimeters.}. Other assumptions regarding the specific form
-of the data or the polarimetry have, as far as is possible, been avoided.
+of the data or the polarimeter have, as far as possible, been avoided.
 
 POLPACK processes data in {\em NDF} format. This is the standard data
 format used by most Starlink software, and is described fully in
@@ -318,241 +318,348 @@ The facilities provided by POLPACK include:
 
 \begin{itemize}
 \item alignment of images on the sky.
-\item extraction of image areas containing data for each analyser position.
+\item extraction of $O$ and $E$ images from a single frame.
 \item sky subtraction.
 \item calculation of Stokes parameters.
-\item binning of Stokes prameters.
+\item binning of Stokes parameters.
 \item creation of catalogues of polarization vectors.
 \item graphical display of vector maps.
 \end{itemize}
 
-POLPACK does not provide faciltities for instrumental corrections such as
-flat-fielding, de-biassing, etc. Such corrections should be applied to the 
-data before using POLPACK, so that pixel values can be assumed to be
-proportional to the combined intensity of sky and object. Some comments
-on the use of \xref{CCDPACK}{sun139}{} and \xref{KAPPA}{sun95}{} to
-perform these corrections can be found \hyperref{here}{in
-section}{}{SEC:FLATFIELDING}. However, POLPACK can apply corrections to the
-supplied data when calculating Stokes parameters to take account of differing 
-exposure times, and any difference in the sensitivity of the two channels of 
-a dual-beam polarimeter. These corrections are based on redundancy in the
-supplied data, and require a specific set of analyser positions to be
-used (described \hyperref{here}{in section}{}{SEC:EFCOR}) when obtaining the 
-data.
+POLPACK does not provide facilities for performing instrumental
+corrections such as flat-fielding, de-biassing, etc. Such corrections
+should be applied to the data before using POLPACK, so that POLPACK can
+assume that pixel values are proportional to the combined intensity of sky and
+object. Some comments on how \xref{CCDPACK}{sun139}{} and
+\xref{KAPPA}{sun95}{} may be used to perform these corrections can be found
+\hyperref{here}{in section }{}{SEC:CCDPACK}. 
 
-\section{\xlabel{dualbeampolarimetry}Dual-beam Polarimetry}
+POLPACK can, however, apply certain corrections to the supplied data when
+calculating Stokes parameters. These corrections take account of any
+differences in the exposure times between raw frames, and any difference
+in the sensitivity of the two channels of the dual-beam polarimeter. They
+rely on redundancy in the supplied data, and require a specific set of
+analyser positions to be used (described \hyperref{here}{in section }{}
+{SEC:DETCOR}) when obtaining the data.
+
+\section{\label{SEC:DBPOL}\xlabel{dualbeampolarimetry}Dual-beam Polarimetry}
 This section gives a brief introduction to the general principles of
 dual-beam polarimetry. It explains words and concepts used later, and
 defines the data model used by POLPACK. A practical example of a dual-beam 
 polarimeter is described by Scarrott et al. ({\em Mon. Not. R. astr. Soc.} 
 (1983) {\bf 204}, 1163 - 1177).
 
-A dual-beam polarimeter generally contains an {\em analyser} which splits
-incoming partially plane polarised light up into two beams; one (called
-the ordinary, or ``$O$'', ray) contains the component of the incoming
-light which is parallel to the axis of the analyser, and the other
-(called the extraordinary, or ``$E$'', ray) contains the component of the
-incoming light which is orthogonal to the axis of the analyser. These two
-beams are recorded simultaneously on a suitable detector such as a CCD.
-The advantage of this system over a single-beam instrument (in which only
-one state of polarisation is recorded on a given exposure), is that
-variations in sky background between exposures affect both states of
-polarisation equally, and so can be eliminated.
+\subsection{The Polarimeter}
+A dual-beam polarimeter usually contains the following optical components:
 
-In an imaging polarimeter, the two beams form two images of the same area of
-sky on the detector, displaced by some distance determined by the design
-of the instrument. A masking system is usually used to prevent any
-overlap between the two images. In some instruments this takes the form
-of a series of parallel, equally spaced bars in the focal plane of the
-telescope (see Figure~\ref{fig:grids}). In this case, the instrument is
-designed so that the displacement between the two images formed by the
-$O$ and $E$ rays is perpendicular to the bars, and equal in size to the
-width of a bar. Thus, the two images form two inter-leaving sets of bars.
+\begin{enumerate}
+\item A focal-plane {\em mask}.
+\item A {\em half-wave plate}.
+\item An {\em analyser}.
+\item A {\em detector}.
+\end{enumerate}
+
+The light collected by the telescope passes through these components in
+the order listed (see Figure~\ref{fig:optical}). Each component is
+described more fully below.
+
+\begin{latexonly}
+  \begin{figure}[htb]
+  \begin{center}
+  \includegraphics[scale=0.5]{sun223_figures/optical.eps}
+  \caption{The main optical components in a typical dual-beam imaging polarimeter.}
+  \label{fig:optical}
+  \end{center}
+  \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   \begin{quote}
+   \begin{figure}[bhtp]
+   \label{fig:optical}
+   \includegraphics[scale=0.8,width=8in]{sun223_figures/optical.eps}
+   \caption{The main optical components in a typical dual-beam imaging polarimeter.}
+   \end{figure}
+   \end{quote}
+\end{htmlonly}
+
+The heart of the polarimeter is the {\em analyser}, which splits incoming
+partially plane polarized light up into two beams; one (called the
+ordinary, or $O$ ray) contains the component of the incoming light
+which is polarized parallel to the axis of the analyser, and the other
+(called the extraordinary, or $E$ ray) contains the component of the
+incoming light which is polarized orthogonally to the axis of the
+analyser. These two beams are recorded simultaneously on a suitable
+detector such as a CCD. The advantage of this system over a single-beam
+instrument (in which only one state of polarization is recorded on a
+given exposure), is that variations in sky background between exposures
+affect both states of polarization equally, and so can be eliminated.
+
+In an imaging polarimeter, the two beams form two images on the detector,
+displaced by some distance determined by the design of the instrument;
+both images representing the same area of the sky. A {\em masking system}
+is used to prevent any overlap between the two images. In some
+instruments this takes the form of a series of parallel, equally spaced
+bars in the focal plane of the telescope (see Figure~\ref{fig:grids}). In
+this case, the instrument is designed so that the displacement between
+the two images formed by the $O$ and $E$ rays is perpendicular to the
+bars, and equal in size to the width of a bar. Thus, the two images form
+two inter-leaving sets of bars. There are several other systems (such as 
+a mask containing only a single aperture), but the principle is the same.
 
 \begin{latexonly}
   \begin{figure}[p]
   \begin{center}
   \includegraphics[scale=0.8]{sun223_figures/grids.eps}
-  \caption{The masking system in a typical dual-beam imaging polarimeter.}
+  \caption{An example of a masking system used in a dual-beam imaging polarimeter.}
   \label{fig:grids}
   \end{center}
   \end{figure}
 \end{latexonly}
 \begin{htmlonly}
    \begin{quote}
-   \begin{figure}[btp]
+   \begin{figure}[hbtp]
    \label{fig:grids}
-   \includegraphics[scale=1.2]{sun223_figures/grids.eps}
-   \caption{The masking system in a typical dual-beam imaging polarimeter.}
+   \includegraphics[scale=0.5,width=8in]{sun223_figures/grids.eps}
+   \caption{An example of a masking system used in a dual-beam imaging polarimeter.}
    \end{figure}
    \end{quote}
 \end{htmlonly}
 
-
-If the incoming light is only partially polarised, then at least two
+If the incoming light is only partially polarized, then at least two
 exposures are required to estimate both the degree and the orientation of
-the polarisation, each exposure recording the intensity in two orthogonal
-states of polarisation as described above. The analyser axis is rotated
-in steps of 45\dgs\ between exposures. In practice, physically
-rotating the analyser would usually result in the displacement between
-the $O$ and the $E$ ray images also rotating. This would cause the images
-to overlap on the detector and would make the data reduction process much
-harder (if not impossible). For this reason, the analyser is usually left
-in a fixed position, and the plane of polarisation of the incoming light
-is rotated instead. This is achieved by rotating a half-wave plate in
-front of the analyser in steps of 22.5\dgs, resulting in a rotation
-of the eletric vector of 45\dgs. Using this scheme the positions of
-the $O$ and $E$ ray images on the detector are unchanged.
+the polarization, each exposure recording the intensity in two orthogonal
+states of polarization as described above. The analyser axis is rotated
+in steps of 45\dgs\ between these exposures. In practice, physically rotating
+the analyser would result in the displacement between the $O$ and
+the $E$ ray images also rotating. This would cause the images to overlap
+on the detector and would make the data reduction process much harder (if
+not impossible). For this reason, the analyser is usually left in a fixed
+position, and the plane of polarization of the incoming light is rotated
+instead. This is achieved by placing a {\em half-wave plate} in
+front of the analyser, and rotating it in steps of 22.5\dgs, resulting in
+a rotation of the plane of polarization of 45\dgs. Using this scheme the
+positions of the $O$ and $E$ ray images on the detector are unchanged.
 
-The orientation of the plane of polarisation of the incoming light is 
+The orientation of the plane of polarization of the incoming light is
 measured relative to a fixed ``reference'' direction. The analyser axis
-and the ``0\dgs'' position of the half-wave plate are usually
-parallel to this direction. The symbol $I_{\alpha}$ will be used to
-represent the intensity of the component of the electric vector parallel
-to a line making an angle $\alpha$ to the reference direction. With the
-half-wave plate in its original position (parallel to the reference
-direction), the $O$ ray image will record the intensity $I_{0}$ and the
-$E$ ray image will record the intensity $I_{90}$. Malus' law gives these
-intensities as:
+and the 0\dgs\ position of the half-wave plate are usually parallel to
+this direction. 
 
+\subsection{\label{SEC:OBS}\xlabel{theobservationalprocedure}The Observational Procedure}
+At least two exposures are required to estimate the degree and
+orientation of the polarization, taken with half-wave plate positions of
+0\dgs\ and 22.5\dgs (see \hyperref{here}{appendix }{}{APP:POL}). For ease
+of reference, these exposures are referred to here as $T_{0}$ and
+$T_{22.5}$. The $O$ and $E$ ray images in $T_{0}$ measure the intensities
+parallel and perpendicular to the reference direction. $T_{22.5}$ has an
+effective analyser angle of 45\dgs\ (twice the half-wave plate angle) and
+so measures the intensities at angles of 45\dgs\ and 135\dgs\ to the
+reference direction
+
+Ideally a further two exposures should be taken at half-wave plate
+positions of 45\dgs\ and 67.5\dgs\ (referred to here as exposures
+$T_{45}$ and $T_{67.5}$). These provide some redundancy in the data and 
+enable internal consistency checks to be made during the data reduction
+stage. 
+
+These exposures are denoted by the letter $T$ to indicate that they are
+{\em target} exposures. In addition to these target exposures, some {\em
+flat-field} exposures are also required. These are used to correct for
+any spatial variation in the sensitivity of the system, and consist of
+exposures of a photometrically flat surface. Ideally, the flat-field
+source should be unpolarized. However, if the additional target exposures
+$T_{45}$ and $T_{67.5}$ are taken, then a constant polarization across
+the flat-field source can be corrected for during data reduction.
+
+Flat-field exposures should be taken at half-wave plate positions of
+0\dgs\ and 22.5\dgs\, and are referred to here as exposures $L_{0}$ and 
+$L_{22.5}$. {\em Note, flat-fields are not required for half-wave plate
+positions 45\dgs\ and 67.5\dgs\ even if the additional target exposures
+$T_{45}$ and $T_{67.5}$ are taken}. Further discussion of the flat-fielding
+procedure is given \hyperref{here}{in section }{}{SEC:DETCOR}.
+
+\subsection{The Data Reduction}
+Several steps are involved in the production of a polarization map from
+the raw exposures recorded by the detector. An over-view of these steps
+is given here. Details of how they may be implemented in practice using
+POLPACK are given in later sections of this document.
+
+\subsubsection{\label{SEC:DETCOR}Corrections Related to the Detector}
+These convert the raw data numbers measured by the detector into values
+which are proportional to the combined sky and object intensity
+transmitted by the analyser (plus noise of course). The details of these
+corrections will depend on the nature of the detector. For a CCD camera,
+they will usually involve at least flat-fielding, and de-biassing. 
+
+Flat-fielding is worthy of some extra discussion, since it can be
+complicated by the presence of the polarimeter in the light path. The
+purpose of flat-fielding is to ensure that there are no spatial
+variations in the sensitivity of the detector. This is normally achieved
+by taking images of a photometrically flat surface such as the inside of
+the observatory dome, or the twilight sky. Since the brightness of this
+surface is constant, any variations in the recorded image (the
+``flat-field'' image) must be due to variations in the sensitivity of the
+detector. These variations can then removed from the target observation
+by dividing every pixel value in the target image by the corresponding 
+pixel value in the flat-field image.
+
+Introducing a polarimeter into the light path can complicate this if the
+flat-field is taken in polarized light (such as produced by reflective
+surfaces in the dome, or by light scattering in the atmosphere). In this
+case the intensity of the light reaching the detector will not be
+constant across the field, but will depend on the polarization. Also, if
+the detector itself is intrinsically sensitive to the polarization of
+the incident light, then this will introduce a difference in sensitivity
+between the two channels.
+
+If the polarization of the flat-field and the polarization-dependency 
+of the detector are spatially constant, then the following method for
+flat-field correction can be used so long as the additional target
+exposures \hyperref{$T_{45}$ and $T_{67.5}$}{$T_{45}$ and $T_{67.5}$ 
+(see section }{)}{SEC:OBS} are available:
+
+\begin{enumerate}
+
+\item Divide the two target exposures $T_{0}$ and $T_{45}$ by the flat-field
+exposure $L_{0}$.
+
+\item Divide the two target exposures $T_{22.5}$ and $T_{67.5}$ by the 
+flat-field exposure $L_{22.5}$.
+
+\end{enumerate}
+
+If this procedure is followed, any constant polarization in the
+flat-field source appears as a simple difference in sensitivity between
+the two channels of the polarimeter (the ``F-factor''), which can be
+estimated and corrected for when calculating the Stokes parameters.
+A mathematical description of the flat-fielding and F-factor corrections
+is given \hyperref{here}{in appendix }{}{APP:FFCOR}.
+
+\subsubsection{Extraction of the $O$ and $E$ Ray Images}
+Each exposure contains two images of the same area of the sky; the $O$
+and the $E$ ray images. Once any detector corrections have been applied,
+these images need to be identified and extracted into two separate arrays for
+further processing.
+
+\begin{latexonly}
+  \begin{figure}[htbp]
+  \begin{center}
+  \includegraphics[scale=0.5]{sun223_figures/extract.eps}
+  \caption{Extraction of the $O$ and $E$ ray images.}
+  \label{fig:extract}
+  \end{center}
+  \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   \begin{quote}
+   \begin{figure}[hbtp]
+   \label{fig:extract}
+   \includegraphics[scale=0.8,width=8in]{sun223_figures/extract.eps}
+   \caption{Extraction of the $O$ and $E$ ray images.}
+   \end{figure}
+   \end{quote}
+\end{htmlonly}
+
+\subsubsection{Image Alignment}
+The arrays holding the extracted $O$ and $E$ ray images now need to be
+aligned so that the same pixel in each array corresponds to the same
+position on the sky. This can usually be achieved by aligning stars
+within the arrays.
+
+\subsubsection{Sky Subtraction}
+The intensity of the background night sky now needs to be estimated and
+subtracted from each of the aligned arrays. The sky may be polarized, and
+so this needs to be performed independently within each of the aligned arrays.
+
+\subsubsection{Estimation of the Stokes Parameters}
+The {\em Stokes parameters} $I$, $Q$ and $U$ are all measures of intensity,
+and together provide a useful description of the polarization of the object
+being studied. Since $I$, $Q$ and $U$ all have the same units, this
+description is generally easier to use than the more obvious description
+given by the degree of polarization and the orientation of the plane of
+polarization. The mathematical connection between the Stokes parameters 
+and the sky-subtracted intensities is described \hyperref{here}{in
+appendix }{}{APP:POL}. The output from this stage of the reduction process
+is a {\em Stokes vector} (i.e. a set of $I$, $Q$ and $U$ values) for each
+measured pixel on the sky.
+
+\subsubsection{Binning of the Stokes Parameters}
+One consequence of the fact that the Stokes parameters $I$, $Q$ and $U$
+are all measures of intensity, is that they can be binned spatially. This
+not only produces less confusing polarization maps (due to the reduced
+number of measurements), but also improves the signal-to-noise ratio.
+
+\subsubsection{Calculation of the Degree and Orientation of the Polarization}
+The use of Stokes parameters to describe polarization has mathematical
+advantages, but is not easy to represent in a graphical manner. For human
+interpretation therefore, polarization is usually described by the degree
+of polarization, $p$, (i.e. the ratio of polarized to total intensity),
+and the orientation of the plane of polarization, $\theta$. Note,
+$\theta$ is the angle between the plane of polarization and the reference
+direction of the polarimeter. To convert this to a position angle on the
+sky, the position angle of the reference direction must be known. The
+simplest way to derive these parameters from the Stokes parameters is as
+follows:
+
+\begin{myquote}
 \begin{eqnarray*}
-  I_{0} & = & I_{p}.\cos^{2}\theta + \frac{I_{u}}{2} \\
- I_{90} & = & I_{p}.\cos^{2}(90 - \theta) + \frac{I_{u}}{2} \\
-        & = & I_{p}.\sin^{2}\theta + \frac{I_{u}}{2}
+  I_{p} & = & \sqrt{ Q^{2} + U^{2} } \\
+  p & = & I_{p}/I \\ \\
+  \theta & = & 0.5.\arctan U/Q
 \end{eqnarray*}
+\end{myquote}
 
-Here, $I_{p}$ and $I_{u}$ are the polarised and unpolarised intensities
-in the incoming light, and $\theta$ is the angle between the plane of
-polarisation and the reference direction (i.e. the analyser axis). The
-total intensity $I$ is the sum of $I_{p}$ and $I_{u}$, and can be found
-as follows:
+where $I_{p}$ is the {\em polarized intensity}. However, the estimation
+of $p$ is complicated by the non-symmetric statistics produced by squaring
+and adding $Q$ and $U$. For low polarizations, this will tend to shift
+the mean of the distribution of $p$ to higher values, thus resulting in
+an over-estimation of $p$. The use of the following expression for $I_{p}$
+reduces the effect of this statistical bias:
 
+\begin{myquote}
 \begin{eqnarray*}
-  I_{0} + I_{90} & = & I_{p}.(\cos^{2}\theta + \sin^{2}\theta) + I_{u} \\
-                 & = & I_{p} + I_{u} \\
-                 & = & I
+  I_{p} & = & \sqrt{ Q^{2} + U^{2} - \sigma^{2}} \\
 \end{eqnarray*}
+\end{myquote}
 
-Thus, summing the $O$ and the $E$ ray images gives the total intensity
-image. The half-wave plate is now rotated by 22.5\dgs\ and another
-exposure is taken. Rotating the half-wave plate by 22.5\dgs\ is
-equivalent to rotating the analyser by 45\dgs, and so the $O$ and
-$E$ ray images now record the intensities $I_{45}$ and $I_{135}$, where:
+where $\sigma^{2}$ is the variance on $Q$ or $U$ (which are assumed
+equal). A description of the statistical behaviour of polarization
+parameters is given by Serkowski ({\em Advances in Astronomy and
+Astrophysics}, ed. Z. Kopal, Academic Press, New York, London (1962),
+{\bf 1}, 304).
 
-\begin{eqnarray*}
-  I_{45} & = & I_{p}.\cos^{2}(45 - \theta) + \frac{I_{u}}{2} \\
- I_{135} & = & I_{p}.\cos^{2}(135 - \theta) + \frac{I_{u}}{2} \\
-         & = & I_{p}.\sin^{2}(45 - \theta) + \frac{I_{u}}{2}
-\end{eqnarray*}
+\subsubsection{Display of the Final Polarization Data}
+The final polarization parameters are usually presented graphically in
+the form of a {\em polarization map}. Each measurement is represented as
+a vector parallel to the plane of polarization. The length of the vector
+is proportional to the degree of polarization, which varies from 0\% to
+100\%. The Stokes vectors can be binned to reduce the number of vectors
+in the map to a manageable number. The map is often overlayed on a total
+intensity image of the object to emphasize any correlation between the
+visual appearance of the object and the morphology of the polarization
+map.
 
-Again, the sum of the $O$ and $E$ ray intensities ($I_{45}+I_{135}$)
-gives the total intensity $I$. 
-
-The mathematical description of polarisation can be simplified by using 
-the quantities $Q$ and $U$ defined as:
-
-\begin{eqnarray*}
-  Q & = & I_{p}.\cos 2\theta \\
-  U & = & I_{p}.\sin 2\theta \\
-\end{eqnarray*}
-
-Together with the total intensity, $I$, these quanities are known as 
-{\em Stokes parameters}\footnote{There is a fourth Stokes parameter, $V$, which is
-always zero for linearly polarised light, but is non-zero for circularly
-polarised light.}. Using these definitions, the polarised intensity, $I_{p}$, 
-is:
-
-\begin{eqnarray*}
-  I_{p} & = & \sqrt{ Q^{2} + U^{2} }
-\end{eqnarray*}
-
-and the orientation of the plane of polarisation is:
-
-\begin{eqnarray*}
-  \theta & = & 0.5*\arctan U/Q
-\end{eqnarray*}
-
-The degree of polarisation, $p$, is the ratio of polarised to total
-intensity, $I_{p}/I$.
-
-Using the expressions for $I_{0}$ and $I_{45}$ above, it can be seen that:
-
-\begin{eqnarray*}
-  I_{0} - I_{90} & = & I_{p}.\cos^{2}\theta - I_{p}.\sin^{2}\theta \\
-                 & = & I_{p}.\cos 2\theta \\
-                 & = & Q
-\end{eqnarray*}
-
-Likewise,
-
-\begin{eqnarray*}
-  I_{45} - I_{135} & = & I_{p}.\cos^{2}(45 - \theta) - I_{p}.\sin^{2}(45 - \theta) \\
-                   & = & I_{p}.\cos 2.(45 - \theta) \\
-                   & = & I_{p}.\cos (90 - 2\theta) \\
-                   & = & I_{p}.\sin 2\theta \\
-                   & = & U
-\end{eqnarray*}
-
-Thus, using the four intensities $I_{0}$, $I_{45}$, $I_{90}$ and $I_{135}$
-(obtained on two exposures with half-wave plate positions 0\dgs\ and
-45\dgs), both $Q$ and $U$ can be found, together with two
-independant estimates of $I$. This allows the polarised intensity, the
-degree of polarisation and the orientation of the plane of polarisation to
-be found using only two exposures. 
-
-If additional exposures are taken with have-wave plate positions 45\dgs\
-and 67.5\dgs, then the resulting intensities may be used to perform
-simple internal consistency checks during subsequent data analysis. The
-$O$ and $E$ ray images in the 45\dgs\ exposure will give estimates of
-$I_{0}$ and $I_{90}$, but they will be reversed compared to the first
-(0\dgs) exposure (i.e. the $O$ ray image will give $I_{90}$ amd the $E$
-ray image will give $I_{0}$). Likewise, the 67.5\dgs\ exposure will give
-extimates of $I_{45}$ and $I_{135}$ in reversed order compared to the
-second (22.5\dgs) exposure. We label the eight intensities from the four
-exposures ($i_{1}$ and $i_{2}$), ($i_{3}$ and $i_{4}$), ($i_{5}$ and
-$i_{6}$), ($i_{7}$ and $i_{8}$), and assume the exposures have relative
-exposure factors of 1, $E_{1}$, $E_{2}$ and $E_{3}$. In addition, we
-assume the relative sensitivity of the two channels of the polarimeter is
-given by a factor $F$. All these factors will normally be close to unity
-and position independant, since spatial variations should have been
-removed by earlier flat field corrections. The factor $F$ may be
-estimated from:
-
-\begin{eqnarray*}
-  F & = & [(i_{6}/i_{1})(i_{2}/i_{5})(i_{8}/i_{3})(i_{4}/i_{7})]^{1/4}
-\end{eqnarray*}
-
-and the factors $E_{1}$, $E_{2}$ and $E_{3}$ are then found from:
-
-\begin{eqnarray*}
-  E_{1} & = & (i_{3}+i_{4}/F)/(i_{1}+i_{2}/F)
-\end{eqnarray*}
-
-with similar expressions for $E_{2}$ and $E_{3}$.
-
-
-
-
-
+\section{\xlabel{datareductionusingpolpack}Data Reduction Using POLPACK}
 
 
 \section{\xlabel{startup}Starting up POLPACK}
 
-The POLPACK applications are made available from the C shell using the command:
+The applications within POLPACK are made available from the C shell using the 
+command:
 \begin{myquote}
 \begin{verbatim}
 % polpack
 \end{verbatim}
 \end{myquote}
 
-Note that the \text{\%} represents the C-shell prompt and shouldn't be typed.
-
+Note that the \text{\%} represents the C-shell prompt and should not be typed.
 POLPACK is also available from the \xref{ICL}{sg5}{} command language.
 
 \subsection{\xlabel{gettinghelp}Getting Help}
 
-Help is available in two forms; from the command-line and via a
-hypertext version of this document. Just type:
+Help is available in several forms: 
+\begin{itemize}
+\item As simple text in the command-line window. Type:
 
 \begin{myquote}
 \begin{verbatim}
@@ -560,7 +667,19 @@ hypertext version of this document. Just type:
 \end{verbatim}
 \end{myquote}
 
-to get the command-line version, and
+Additional arguments may be given indicating the subject on which help is
+required. For instance:
+
+\begin{myquote}
+\begin{verbatim}
+% polhelp polka parameters
+\end{verbatim}
+\end{myquote}
+
+will enter the help library at the point containing information on the
+parameters available for application POLKA.
+
+\item As hypertext in a separate browser window. Type:
 
 \begin{myquote}
 \begin{verbatim}
@@ -568,10 +687,17 @@ to get the command-line version, and
 \end{verbatim}
 \end{myquote}
 
-to display the hypertext version. 
+\item In response to prompts issued by applications for parameter values. 
+Entering a single question mark will display help on the parameter being
+prompted for, and then return you to the parameter prompt. Entering two
+question marks also displays help on the parameter, but will leave you in the
+help library, allowing you to navigate through any other necessary
+topics. Leaving the help library returns you to the parameter prompt.
 
-Help is also available in the reduction GUI menus or from program
-prompts (by responding with a `?').
+\item Additional information describing the detailed use of the POLKA
+GUI is available from the {\em Help} menu within the GUI.
+
+\end{itemize}
 
 \subsection{Running from the C-shell}
 When using POLPACK from the C-shell (or any other shell) care needs to be
@@ -618,11 +744,11 @@ POLHELP }
 \quickdes{POLKA}{An X-based GUI which converts raw photometric images
 into Stokes vectors.}{ POLKA }
 
-\quickdes{POLPLOT}{Displays polarisation vectors supplied in a
+\quickdes{POLPLOT}{Displays polarization vectors supplied in a
 catalogue.}{ POLPLOT }
 
 \quickdes{POLVEC}{Converts a Stokes vector cube into a catalogue of
-polarisation vectors.}{ POLVEC }
+polarization vectors.}{ POLVEC }
 
 \end{latexonly}
 
@@ -906,7 +1032,7 @@ The POLPACK routine descriptions are contained in the following pages.
    Bins a catalogue containing Stokes vectors
 }{
    \sstdescription{
-      This application creates a new catalogue of polarisation vectors by
+      This application creates a new catalogue of polarization vectors by
       binning the Stokes vectors in the supplied catalogue. The input
       catalogue should contain columns with the same names and meanings
       as those produced by POLVEC. In particularly, the bin sizes are
@@ -922,7 +1048,7 @@ The POLPACK routine descriptions are contained in the following pages.
       to one of these cells. The Stokes parameters for the cell are formed
       by combining together the Stokes parameter of all input positions
       which fall within the cell, using a method specified by the user.
-      The degree of polarisation, angle of polarisation, and polarised
+      The degree of polarization, angle of polarization, and polarized
       intensity are then derived from these Stokes parameters. The (X,Y)
       positions in the output catalogue are the positions at the centre
       of each of the cells.
@@ -941,14 +1067,14 @@ The POLPACK routine descriptions are contained in the following pages.
          DEBIAS = \_LOGICAL (Read)
       }{
          TRUE if a correction for statistical bias is to be made to
-         percentage polarisation and polarised intensity. This correction
-         subtracts the variance of the percentage polarisation from the
-         squared percentage polarisation, and uses the square root of this
-         as the corrected percentage polarisation.  The corresponding
-         polarised intensity is then found by multiplying the corrected
-         percentage polarisation by the total intensity.  The returned
+         percentage polarization and polarized intensity. This correction
+         subtracts the variance of the percentage polarization from the
+         squared percentage polarization, and uses the square root of this
+         as the corrected percentage polarization.  The corresponding
+         polarized intensity is then found by multiplying the corrected
+         percentage polarization by the total intensity.  The returned
          variance values are unchanged. This correction only applies to
-         calculations of plane polarisation, and cannot be used if the
+         calculations of plane polarization, and cannot be used if the
          input catalogue does not contain variance values. If a null value
          (!) is supplied, then the correction is applied if output variances
          are being created, and not otherwise.           [!]
@@ -1000,7 +1126,7 @@ The POLPACK routine descriptions are contained in the following pages.
       }{
          Bins the Stokes vectors in catalogue {\tt "}intab{\tt "} and produces
          catalogue {\tt "}outtab{\tt "} containing binned Stokes parameters and
-         corresponding polarisation parameters. Each bin measures 4 units
+         corresponding polarization parameters. Each bin measures 4 units
          along both the X and Y axes, and has a value based on the median
          of the corresponding input Stokes values.
       }
@@ -1009,18 +1135,18 @@ The POLPACK routine descriptions are contained in the following pages.
 \sstroutine{
    POLCAL
 }{
-   Calculate polarisation parameters for dual-beam imaging
+   Calculate polarization parameters for dual-beam imaging
    linear and circular polarimetry
 }{
    \sstdescription{
-      Calculate polarisation parameters for dual-beam imaging
+      Calculate polarization parameters for dual-beam imaging
       polarimetry. This routine accesses a list of input NDF data
       structures which should contain processed polarimetric
       information. It is assumed that the input data are bias/dark
       corrected, flatfielded, sky subtracted and mutually aligned.
 
       Each input NDF should contain an image recorded in a
-      single polarisation state. The polarisation state should be
+      single polarization state. The polarization state should be
       indicated by two descriptors WPLATE (the waveplate position, one of
       0.0,45.0,22.5,67.5) and RAY (either O (ordinary) or E
       (extraordinary)) which should reside in a POLPACK NDF extension.
@@ -1031,10 +1157,10 @@ The POLPACK routine descriptions are contained in the following pages.
 
       The input data files are first validated using the descriptor
       information in their POLPACK extensions. They are then sorted into
-      sets that can be used to calculate the output polarisation
+      sets that can be used to calculate the output polarization
       parameters.
 
-      The instrumental polarisation efficiency (F factor) is calculated
+      The instrumental polarization efficiency (F factor) is calculated
       by intercomparing images to calculate the scale factors and zero
       levels. All possible intercomparisons are used and a weighted mean
       F factor calculated.
@@ -1044,7 +1170,7 @@ The POLPACK routine descriptions are contained in the following pages.
       are calculated. The E factors are calculated by comparing total
       intensity images against an iteratively refined median image.
 
-      The input data is `corrected{\tt '} by the polarisation and time
+      The input data is `corrected{\tt '} by the polarization and time
       dependent efficiencies and the stokes images (I,Q,U) or (I,V) are
       calculated. The output stokes images are formed by median stacking
       all possible estimates.
@@ -1656,7 +1782,7 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          MODE = LITERAL (Read)
       }{
-         The type of polarisation being measured; Linear or Circular. This
+         The type of polarization being measured; Linear or Circular. This
          parameter is only accessed if an output cube holding Stokes
          parameters is being created (i.e. if OUT\_S is not given a null (!)
          value). [Linear]
@@ -2191,11 +2317,11 @@ The POLPACK routine descriptions are contained in the following pages.
 \sstroutine{
    POLVEC
 }{
-   Calculates polarisation vectors from supplied Stokes parameters
+   Calculates polarization vectors from supplied Stokes parameters
 }{
    \sstdescription{
-      This routine calculates values of percentage polarisation, polarisation
-      angle, total intensity and polarised intensity, based on Stokes
+      This routine calculates values of percentage polarization, polarization
+      angle, total intensity and polarized intensity, based on Stokes
       parameters in the supplied input cube (which will normally have been
       created by POLCAL). These calculated values may be stored either in
       a series of 2-dimensional NDFs, or in a single table which may be
@@ -2213,7 +2339,7 @@ The POLPACK routine descriptions are contained in the following pages.
       }{
          The x and y sizes (in pixels) of the bins to be used when
          binning the supplied Stokes parameters prior to estimating the
-         polarisation vectors. If only a single value is given,
+         polarization vectors. If only a single value is given,
          then it will be duplicated so that a square bin is used. A value
          of 1 produces no binning. If a null (!) value is supplied, then a
          default is used which gives about 30 square bins along the longest
@@ -2223,7 +2349,7 @@ The POLPACK routine descriptions are contained in the following pages.
          CAT = LITERAL (Read)
       }{
          The name of a catalogue to create, holding the calculated
-         polarisation paremeters tabulated at each point for which Stokes
+         polarization paremeters tabulated at each point for which Stokes
          parameters are available. If a null (!) value is supplied, then
          no catalogue is created. The catalogue will contain the following
          columns (all stored as single precision \_REAL values):
@@ -2233,9 +2359,9 @@ The POLPACK routine descriptions are contained in the following pages.
             I     : The total intensity.
             Q     : The Stokes Q parameter.
             U     : The Stokes U parameter.
-            P     : The percentage polarisation.
-            THETA : The polarisation angle (in degrees).
-            PI    : The polarised intensity.
+            P     : The percentage polarization.
+            THETA : The polarization angle (in degrees).
+            PI    : The polarized intensity.
 
          If VAR is TRUE, then the catalogue will also contain
          additional columns giving the standard deviation on each of the
@@ -2243,7 +2369,7 @@ The POLPACK routine descriptions are contained in the following pages.
          these columns will be formed by prepending the letter D to the
          start of the column names listed above.
 
-         When measuring circular polarisation, the columns describing Q
+         When measuring circular polarization, the columns describing Q
          and U will be replaced by equivalent columns describing V.
 
          The coordinates contained in columns X and Y refer to pixel
@@ -2263,14 +2389,14 @@ The POLPACK routine descriptions are contained in the following pages.
          DEBIAS = \_LOGICAL (Read)
       }{
          TRUE if a correction for statistical bias is to be made to
-         percentage polarisation and polarised intensity. This correction
-         subtracts the variance of the percentage polarisation from the
-         squared percentage polarisation, and uses the square root of this
-         as the corrected percentage polarisation.  The corresponding
-         polarised intensity is then found by multiplying the corrected
-         percentage polarisation by the total intensity.  The returned
+         percentage polarization and polarized intensity. This correction
+         subtracts the variance of the percentage polarization from the
+         squared percentage polarization, and uses the square root of this
+         as the corrected percentage polarization.  The corresponding
+         polarized intensity is then found by multiplying the corrected
+         percentage polarization by the total intensity.  The returned
          variance values are unchanged. This correction only applies to
-         calculations of plane polarisation, and cannot be used if the
+         calculations of plane polarization, and cannot be used if the
          input NDF does not contain variance values, or if you supply a
          FALSE value for parameter VARIANCE. If a null value (!) is
          supplied, then the correction is applied if output variances
@@ -2291,7 +2417,7 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          IP = NDF (Write)
       }{
-         An output NDF holding the polarised intensity. A null value can be
+         An output NDF holding the polarized intensity. A null value can be
          supplied if this output image is not required. [!]
       }
       \sstsubsection{
@@ -2315,7 +2441,7 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          P = NDF (Write)
       }{
-         An output NDF holding percentage polarisation. A null value can be
+         An output NDF holding percentage polarization. A null value can be
          supplied if this output image is not required. [!]
       }
       \sstsubsection{
@@ -2327,8 +2453,8 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          THETA = NDF (Write)
       }{
-         An output NDF holding the polarisation angle in degrees. In the
-         the case of circular polarisation, a value of zero is stored
+         An output NDF holding the polarization angle in degrees. In the
+         the case of circular polarization, a value of zero is stored
          if the normalised Stokes parameter V is positive, and a value
          of 90 is stored otherwise. A null value can be supplied if this
          output image is not required. [!]
@@ -2364,9 +2490,285 @@ The POLPACK routine descriptions are contained in the following pages.
 
          \sstitem
          The output NDFs are deleted if there is an error during the
-         formation of the polarisation parameters.
+         formation of the polarization parameters.
       }
    }
 }
+
+\section{\label{APP:POL}\xlabel{calculatingthepolarization}Calculating the Polarization}
+This section gives a mathematical description of the calculation of the
+degree and orientation of the polarisation, based on the observed
+intensities. It is assumes that any required corrections (such as
+flat-fielding, sky-subtraction, etc), have already been applied.
+
+Each target exposure measures the components of the incoming light
+polarized in two different orthogonal directions (depending on the
+orientation of the half-wave plate). If the symbol $I_{\alpha}$ is used
+to represent the intensity of the component polarized at an angle
+$\alpha$ to the reference direction, then in each exposure the $O$ ray
+image records $I_{\alpha}$ and the $E$ ray image records $I_{\alpha+90}$.
+
+The first exposure ($T_{0}$) is taken with the half-wave plate in its 0\dgs\
+position. The $O$ ray image will then record the intensity $I_{0}$ and
+the $E$ ray image will record the intensity $I_{90}$. Malus' law gives
+these intensities as:
+
+\begin{myquote}
+\begin{eqnarray*}
+  I_{0} & = & I_{p}.\cos^{2}\theta + \frac{I_{u}}{2} \\
+ I_{90} & = & I_{p}.\cos^{2}(90 - \theta) + \frac{I_{u}}{2} \\
+        & = & I_{p}.\sin^{2}\theta + \frac{I_{u}}{2}
+\end{eqnarray*}
+\end{myquote}
+
+Here, $I_{p}$ and $I_{u}$ are the polarized and unpolarized intensities
+in the incoming light, and $\theta$ is the angle between the plane of
+polarization and the reference direction (i.e. the 0\dgs\ position). The
+total intensity $I$ is the sum of $I_{p}$ and $I_{u}$, and can be found
+as follows:
+\begin{myquote}
+\begin{eqnarray*}
+  I_{0} + I_{90} & = & I_{p}.(\cos^{2}\theta + \sin^{2}\theta) + I_{u} \\
+                 & = & I_{p} + I_{u} \\
+                 & = & I
+\end{eqnarray*}
+\end{myquote}
+
+Thus, summing the $O$ and the $E$ ray images gives the total intensity
+image. 
+
+The half-wave plate is now rotated by 22.5\dgs\ and another exposure
+($T_{22.5}$) is taken. Rotating the half-wave plate by 22.5\dgs\ is
+equivalent to rotating the analyser by 45\dgs, and so the $O$ and $E$ ray
+images now record the intensities $I_{45}$ and $I_{135}$, where:
+\begin{myquote}
+\begin{eqnarray*}
+  I_{45} & = & I_{p}.\cos^{2}(45 - \theta) + \frac{I_{u}}{2} \\
+ I_{135} & = & I_{p}.\cos^{2}(135 - \theta) + \frac{I_{u}}{2} \\
+         & = & I_{p}.\sin^{2}(45 - \theta) + \frac{I_{u}}{2}
+\end{eqnarray*}
+\end{myquote}
+
+Again, the sum of the $O$ and $E$ ray intensities ($I_{45}+I_{135}$)
+gives the total intensity $I$. 
+
+The mathematical description of polarization can be simplified by using 
+the quantities $Q$ and $U$ defined as:
+\begin{myquote}
+\begin{eqnarray*}
+  Q & = & I_{p}.\cos 2\theta \\
+  U & = & I_{p}.\sin 2\theta \\
+\end{eqnarray*}
+\end{myquote}
+
+Together with the total intensity, $I$, these quantities are known as 
+{\em Stokes parameters}\footnote{There is a fourth Stokes parameter, $V$, which is
+always zero for linearly polarized light, but is non-zero for circularly
+polarized light.}. Using these definitions, the polarized intensity, $I_{p}$, 
+is:
+\begin{myquote}
+\begin{eqnarray*}
+  I_{p} & = & \sqrt{ Q^{2} + U^{2} }
+\end{eqnarray*}
+\end{myquote}
+
+and the orientation of the plane of polarization is:
+\begin{myquote}
+\begin{eqnarray*}
+  \theta & = & 0.5.\arctan U/Q
+\end{eqnarray*}
+\end{myquote}
+
+The degree of polarization, $p$, is the ratio of polarized to total
+intensity, $I_{p}/I$. Using the expressions for $I_{0}$ and $I_{90}$
+above, it can be seen that:
+\begin{myquote}
+\begin{eqnarray*}
+  I_{0} - I_{90} & = & I_{p}.\cos^{2}\theta - I_{p}.\sin^{2}\theta \\
+                 & = & I_{p}.\cos 2\theta \\
+                 & = & Q
+\end{eqnarray*}
+\end{myquote}
+
+Likewise,
+\begin{myquote}
+\begin{eqnarray*}
+  I_{45} - I_{135} & = & I_{p}.\cos^{2}(45 - \theta) - I_{p}.\sin^{2}(45 - \theta) \\
+                   & = & I_{p}.\cos 2.(45 - \theta) \\
+                   & = & I_{p}.\cos (90 - 2\theta) \\
+                   & = & I_{p}.\sin 2\theta \\
+                   & = & U
+\end{eqnarray*}
+\end{myquote}
+
+Thus, using the four intensities $I_{0}$, $I_{45}$, $I_{90}$ and $I_{135}$
+(obtained on two exposures with half-wave plate positions 0\dgs\ and
+45\dgs), both $Q$ and $U$ can be found, together with two
+independent estimates of $I$. This allows the polarized intensity, the
+degree of polarization and the orientation of the plane of polarization to
+be found using only two exposures. However, it is usually advisable to
+obtain additional exposures at half-wave plate positions of 45\dgs\ and
+67.5\dgs\ in order to correct for any difference in the sensitivity of
+the two channels of the polarimeter (such as may be produced for instance
+by a polarised flat-field).
+
+\section{\label{APP:FFCOR}\xlabel{flatfieldcorrectionsandtheFFactor}Flat-field
+          Corrections and the F-Factor}
+This section describes the flat-fielding process and F-factor correction
+in mathematical terms.
+
+Let the intensity in the $O$ and $E$ beams transmitted by the analyser be
+$I_{o}(\alpha)$ and $I_{e}(\alpha)$, where $\alpha$ is the effective 
+analyser angle (i.e. twice the half-wave plate rotation angle).
+\hyperref{Malus' law}{Malus' law (see appendix }{)}{APP:POL} gives:
+
+\begin{myquote}
+\begin{eqnarray*}
+  I_{o}(\alpha) & = & I_{p}.\cos^{2}( \alpha - \theta ) + \frac{I_{u}}{2} \\
+  I_{e}(\alpha) & = & I_{p}.\sin^{2}( \alpha - \theta ) + \frac{I_{u}}{2} 
+\end{eqnarray*}
+\end{myquote}
+
+where $I_{p}$ is the polarized intensity, $I_{u}$ is the unpolarized
+intensity, and $\theta$ is the angle between the plane of polarization
+and the reference direction. 
+
+The signals measured by the detector (before flat-fielding) are:
+
+\begin{myquote}
+\begin{eqnarray*}
+  M_{o}(\alpha) & = & S_{o}.I_{o}(\alpha) \\
+  M_{e}(\alpha) & = & S_{e}.I_{e}(\alpha) 
+\end{eqnarray*}
+\end{myquote}
+
+where $S_{o}$ and $S_{e}$ are the sensitivities of the detector to the $O$ 
+and $E$ rays. These are independent of $\alpha$, but vary across the
+detector.
+
+For target exposure $T_{0}$ (for which $\alpha$ is zero), the transmitted
+intensities are denoted as $I^{t}_{o}(0)$ and $I^{t}_{e}(0)$ and the
+measured intensities as $M^{t}_{o}(0)$ and $M^{t}_{e}(0)$. For flat-field
+exposure $L_{0}$, the transmitted intensities are denoted as
+$I^{l}_{o}(0)$ and $I^{l}_{e}(0)$ and the measured intensities as
+$M^{l}_{o}(0)$ and $M^{l}_{e}(0)$. The actual flat-field intensities are
+assumed to be spatially constant, but the measured intensities will
+reflect any variation in $S_{o}$ and $S_{e}$.
+
+Target exposure $T_{0}$ is flat-fielded by dividing it by the flat-field
+exposure with the same value of $\alpha$ (i.e. $L_{0}$) . Thus, the
+measured intensities after the flat-field correction ($M^{c}_{o}(0)$ and
+$M^{c}_{e}(0)$) are:
+
+\begin{myquote}
+\begin{eqnarray*}
+  M^{c}_{o}(0) & = & M^{t}_{o}(0) / M^{l}_{o}(0) \\
+                    & = & \frac{ S_{o}.I^{t}_{o}(0) }{ S_{o}.I^{l}_{o}(0) } \\
+                    & = & \frac{ I^{t}_{o}(0) }{ I^{l}_{o}(0) } \\ \\
+  M^{c}_{e}(0) & = & M^{t}_{e}(0) / M^{l}_{e}(0) \\
+                    & = & \frac{ S_{e}.I^{t}_{e}(0) }{ S_{e}.I^{l}_{e}(0) } \\
+                    & = & \frac{ I^{t}_{e}(0) }{ I^{l}_{e}(0) } 
+\end{eqnarray*}
+\end{myquote}
+
+If the target exposure $T_{45}$ is taken with an analyser angle 
+of 90\dgs\ (accomplished by rotating the half-wave plate by 45\dgs), then
+the $O$ and $E$ ray intensities are $I^{t}_{o}(90)$ and $I^{t}_{e}(90)$, where:
+
+\begin{myquote}
+\begin{eqnarray*}
+  I^{t}_{o}(90) & = & I_{p}.\cos^{2}( 90 - \theta ) + \frac{I_{u}}{2} \\
+                 & = & I_{p}.\sin^{2}( \theta ) + \frac{I_{u}}{2} \\
+                 & = & I^{t}_{e}(0) \\ \\
+  I^{t}_{e}(90) & = & I_{p}.\sin^{2}( 90 - \theta ) + \frac{I_{u}}{2} \\
+                 & = & I_{p}.\cos^{2}( \theta ) + \frac{I_{u}}{2} \\
+                 & = & I^{t}_{o}(0) 
+\end{eqnarray*}
+\end{myquote}
+
+In other words, exposure $T_{45}$ records the same intensities as
+exposure $T_{0}$, but swapped so that the $O$ ray becomes the
+$E$ ray, and vice versa. The measured target intensities at this new
+analyser angle are:
+
+\begin{myquote}
+\begin{eqnarray*}
+  M^{t}_{o}(90) & = & S_{o}.I^{t}_{o}(90) \\
+                    & = & S_{o}.I^{t}_{e}(0) \\ \\
+  M^{t}_{e}(90) & = & S_{e}.I^{t}_{e}(90) \\
+                    & = & S_{e}.I^{t}_{o}(0) 
+\end{eqnarray*}
+\end{myquote}
+
+These measured intensities are flat-fielded {\em using the flat-field
+exposure for the original analyser angle {\em (0\dgs)}, NOT the new angle
+{\em (90\dgs)}}. Thus:
+
+\begin{myquote}
+\begin{eqnarray*}
+  M^{c}_{o}(90) & = & M^{t}_{o}(90) / M^{l}_{o}(0) \\
+                & = & \frac{ S_{o}.I^{t}_{e}(0) }{ S_{o}.I^{l}_{o}(0) } \\
+                & = & \frac{ I^{t}_{e}(0) }{ I^{l}_{o}(0) } \\ \\
+  M^{c}_{e}(90) & = & M^{t}_{e}(90) / M^{l}_{e}(0) \\
+                & = & \frac{ S_{e}.I^{t}_{o}(0) }{ S_{e}.I^{l}_{e}(0) } \\
+                & = & \frac{ I^{t}_{o}(0) }{ I^{l}_{e}(0) } 
+\end{eqnarray*}
+\end{myquote}
+
+To simplify the notation, put $i_{1}=M^{c}_{o}(0)$, $i_{2}=M^{c}_{e}(0)$,
+$i_{5}=M^{c}_{o}(90)$ and $i_{6}=M^{c}_{e}(90)$. In other words, $i_{1}$ and
+$i_{2}$ are the flat-fielded $O$ and $E$ ray intensities from exposure
+$T_{0}$, and $i_{5}$ and $i_{6}$ are the corresponding intensities from
+exposure $T_{45}$ ($i_{3}$, $i_{4}$, $i_{7}$ and $i_{8}$ are the
+intensities from exposures $T_{22.5}$ and $T_{67.5}$). If both channels
+of the polarimeter were equally sensitive, $i_{1}$ and $i_{6}$ would be
+equal, as would $i_{2}$ and $i_{5}$. In reality, the ratios of these
+quantities give two estimates of the relative sensitivity of the two
+channels:
+
+\begin{myquote}
+\begin{eqnarray*}
+  \frac{i_{6}}{i_{1}} & = & \frac{ I^{t}_{o}(0)/I^{l}_{e}(0) } 
+                                 { I^{t}_{o}(0)/I^{l}_{o}(0) } \\
+                      & = & \frac{ I^{l}_{o}(0) }{ I^{l}_{e}(0) } \\ \\
+  \frac{i_{2}}{i_{5}} & = & \frac{ I^{t}_{e}(0)/I^{l}_{e}(0) } 
+                                 { I^{t}_{e}(0)/I^{l}_{o}(0) } \\
+                      & = & \frac{ I^{l}_{o}(0) }{ I^{l}_{e}(0) } 
+\end{eqnarray*}
+\end{myquote}
+
+This ratio ($I^{l}_{o}(0)/I^{l}_{e}(0)$) is known as the ``F-factor'' and
+is constant (since the polarization of the flat-field surface was assumed
+to be constant). The intensities $i_{1}$ and $i_{5}$ can be normalized
+using $F$ to correct for the difference in sensitivity of the two channels:
+
+\begin{myquote}
+\begin{eqnarray*}
+  i_{1}.F & = & \frac{ I^{t}_{o}(0) }{ I^{l}_{o}(0) }.
+                \frac{ I^{l}_{o}(0) }{ I^{l}_{e}(0 } \\
+          & = & \frac{ I^{t}_{o}(0) }{ I^{l}_{e}(0) } \\ \\
+  i_{5}.F & = & \frac{ I^{t}_{e}(0) }{ I^{l}_{o}(0) }.
+                \frac{ I^{l}_{o}(0) }{ I^{l}_{e}(0 } \\
+          & = & \frac{ I^{t}_{e}(0) }{ I^{l}_{e}(0) } 
+\end{eqnarray*}
+\end{myquote}
+
+Thus $i_{1}.F$, $i_{2}$, $i_{5}.F$ and $i_{6}$ all have the same 
+constant of proportionality ($1/I^{l}_{e}(0)$) and can be used as 
+normalized estimates of the $O$ and $E$ ray intensities for exposures
+$T_{0}$ and $T_{45}$.
+
+The target exposures $T_{22.5}$ and $T_{67.5}$ are required, together
+with the flat-field exposure $L_{22.5}$, to estimate the degree and
+orientation of the polarization. If, after flat-fielding using the above 
+process, these target exposures give $O$ and $E$ intensities $i_{3}$, 
+$i_{4}$, $i_{7}$, and $i_{8}$, then they give two more estimates of $F$.
+In practice the geometric mean of all four estimates is used:
+
+\begin{myquote}
+\begin{eqnarray*}
+  F & = & [(i_{6}/i_{1})(i_{2}/i_{5})(i_{8}/i_{3})(i_{4}/i_{7})]^{1/4}
+\end{eqnarray*}
+\end{myquote}
 
 \end{document}

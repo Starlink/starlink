@@ -1563,6 +1563,7 @@ proc Copy {} {
    global PNTPY
    global PNTPX
    global PNTVID
+   global PNTTAG
    global MODE
  
 # Do nothing if there is no selected area, or we are not in MODE 1
@@ -3937,6 +3938,7 @@ proc Effects {im effect nodisp} {
    global PSF_SIZE
    global SCAHIGH
    global SCALOW
+   global SELECTED_AREA
    global SKYOFF
    global SKYOP
    global SKY_METHOD
@@ -4369,6 +4371,64 @@ proc Effects {im effect nodisp} {
             set update 0
          }
    
+#---------------------------------------------------------------
+# Stats - Display statistics of the data within the selected area of the
+# currenrly displayed image.
+      } elseif { $effect == "Stats" } {
+
+# We do not need to update the display.
+         set update 0
+
+# Issue a warning and return if there is no selected area.
+         if { $SELECTED_AREA == "" } { 
+            Message "Select an area by clicking and dragging over the image before using the \"Stats\" effect."
+
+#  Otherwise...
+         } {
+
+# Get the bounds in canvas coordinates of the selected area.
+            set cxlo [lindex $SELECTED_AREA 0]      
+            set cylo [lindex $SELECTED_AREA 1]      
+            set cxhi [lindex $SELECTED_AREA 2]      
+            set cyhi [lindex $SELECTED_AREA 3]      
+
+# Convert these to pixel coordinates. Note, the Y axis is reversed since the
+# TK origin is at the UPPER left corner.
+            set pxyl [CanToNDF $cxlo $cyhi]
+            if { $pxyl == "" } { return } 
+            set pxlo [lindex $pxyl 0]
+            set pylo [lindex $pxyl 1]
+            set pxyl [CanToNDF $cxhi $cylo]
+            set pxhi [lindex $pxyl 0]
+            set pyhi [lindex $pxyl 1]
+
+# Convert these to pixel indices.
+            set ipxlo [expr round($pxlo) + 1 ]
+            set ipylo [expr round($pylo) + 1 ]
+            set ipxhi [expr round($pxhi) ]
+            set ipyhi [expr round($pyhi) ]
+
+# Create the NDF section specifier for the selected area.
+            set section "($ipxlo:$ipxhi,$ipylo:$ipyhi)"
+
+# Run KAPPA:STATS and display the output if succesful.
+            if { [Obey kappa stats "ndf=${image}${section}"] } {
+               set mess "\nPixel statistics within section $section:\n"
+               append mess "Total data sum     \t\t:  [format "%.5g" [GetParam kappa stats:total]]\n"
+               append mess "Mean value         \t\t:  [format "%.5g" [GetParam kappa stats:mean]]\n"
+               append mess "Standard deviation \t:  [format "%.5g" [GetParam kappa stats:sigma]]\n"
+               append mess "Maximum value      \t:  [format "%.5g" [GetParam kappa stats:maximum]]\n"
+               append mess "Minimum value      \t:  [format "%.5g" [GetParam kappa stats:minimum]]\n"
+               append mess "No. of good pixels \t\t:  [GetParam kappa stats:numgood]\n"
+               append mess "Total no. of pixels\t\t:  [GetParam kappa stats:numpix]\n"
+               Message $mess
+            }
+
+# Cancel the area selection.
+            CancelArea
+
+         }
+
 #---------------------------------------------------------------
 # Fill - Replace any bad pixels in the image. If a constant fill value is
 # supplied, use KAPPA:NOMAGIC, otherwise use KAPPA:FILLBAD.
@@ -6446,6 +6506,7 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
    pack $cf -padx 2m -pady 2m -fill x -expand 1
 
 # Loop round every supplied variable.
+   set nent 0
    set n [llength $vars]
    for {set i 0} {$i < $n} {incr i} {
 
@@ -6493,6 +6554,7 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 
 # _REAL...
       if { $type == "_REAL" } {
+         incr nent
 
 # Set the width for the data entry boxes.
          set wid [expr $tcl_precision + 6]
@@ -6522,6 +6584,7 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 
 # _INTEGER...
       } elseif { $type == "_INTEGER" } {
+         incr nent
 
 # Extract the min and max values from the limits list.
          if { $nlims > 0 } { 
@@ -6558,6 +6621,7 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
 
 # _CHAR
       } elseif { [regexp {^_CHAR} $type] } {
+         incr nent
 
 # Extract the character length from the supplied type. Use 30 if no
 # length was supplied.
@@ -6609,9 +6673,10 @@ proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
       pack $b4 -side left -expand 1 -padx 2m
    }
 
-# If there is only one variable being obtained, then create a binding so
-# that pressing the <Return> key behaves like clicking the OK button.
-   if { $n == 1 } { bind $top <Return> "set INPUTS_BUTTON ok" }
+# If there is only one variable being obtained through an entry, then create a 
+# binding so that pressing the <Return> key behaves like clicking the OK 
+# button.
+   if { $nent == 1 } { bind $top <Return> "set INPUTS_BUTTON ok" }
 
 # Ensure that closing the window from the window manager is like pressing
 # the Cancel button.
@@ -10882,6 +10947,75 @@ proc ScreenSec {section} {
    return $newsec
 }
 
+proc SearchHelp {} {
+#+
+#  Name:
+#     SearchHelp
+#
+#  Purpose:
+#     Search the POLKA on-line manual for a given word.
+#-
+   global WSRCH
+   global EXSRCH
+   global POLPACK_HELP
+
+#  Store a description of the controls in the dialog box to be created by
+#  GetPars.
+   set vars [list WSRCH EXSRCH]
+   set type(WSRCH) "_CHAR*30"
+   set type(EXSRCH) "_LOGICAL"
+   set labs(WSRCH) "Search for:"
+   set labs(EXSRCH) "Exact search?"
+   set limit(WSRCH) ""   
+   set limit(EXSRCH) ""   
+
+#  Set up initial default valus.
+   if { ![info exists WSRCH] || ![info exists EXSRCH] } {
+      set WSRCH ""
+      set EXSRCH 0
+   }
+
+# Get the word to search for, and see if an exact search is required. Only
+# proceed if the Cancel button is not pressed.
+   if { [GetPars $vars type labs limit "Search for help on..." \
+                 POLKA_HSEARCH \
+                 ". Search the on-line help manual for a given word." ] } {
+
+# Tell the user what is happening.
+      set told [SetInfo "Searching for \"$WSRCH\". Please wait..." 0]
+
+# Save the old cursor and switch on a "watch" cursor.
+      set old_cursor [. cget -cursor]
+      . config -cursor watch
+      update idletasks
+
+# Run findme to display the results of the search. Use the -h and -l switches 
+# to make it search the page headings and lines. Use the -s switch to make it 
+# arrange the results in order of significance. If an exact search is required 
+# use the -w and -c switches to ensure only whole words are matched, and case 
+# is significant. Use -q to suppress output to standard output.
+      if { $EXSRCH } {
+         set err [catch {exec findme -q -h -l -s -w -c  $WSRCH $POLPACK_HELP/polka} mess] 
+      } {
+         set err [catch {exec findme -q -h -l -s $WSRCH $POLPACK_HELP/polka} mess] 
+      }      
+
+#  Re-instate the original cursor.
+      . config -cursor $old_cursor
+      update idletasks
+
+# Report any error. Note, the "child process exited abnormally"n error
+# does not stop things from working.
+      if { $err && $mess != "child process exited abnormally" } {
+         Message "Findme failed to find the help documentation...\n\n$mess"
+      }
+
+# Cancel the informative text set earlier in this procedure.
+      if { $told } { SetInfo "" 0 }
+
+   }
+}
+
 proc SecCen {section} {
 #+
 #  Name:
@@ -14033,25 +14167,4 @@ proc pp {a b c} {
    StackDump
    puts "++++++++++++++++++++++++\n"
 }
-
-
-#+
-#  Name:
-#     
-#
-#  Purpose:
-#     
-#
-#  Arguments:
-#     
-#
-#  Returned Value:
-#     
-#
-#  Globals:
-#     
-#
-#  Notes:
-#    - 
-#-
 

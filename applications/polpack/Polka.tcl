@@ -221,8 +221,8 @@
    source $POLPACK_DIR/CCDShowHelp.tcl
 
 # If the variable START_HELP has been defined (by the polka a-task) then
-# start up a hyper-text browser displaying the polka manual contents page.
-   if { [info exists START_HELP] } { ShowHelp POLKA_CONTENTS }
+# start up a hyper-text browser displaying the polka tutorial page.
+   if { [info exists START_HELP] } { ShowHelp POLKA_TUTORIAL }
 
 # Quit when control-c is pressed.
    bind . <Control-c> {Finish 0}
@@ -543,6 +543,7 @@
    $helpmenu add command -label "Contents" -command {ShowHelp "POLKA_CONTENTS"}
    $helpmenu add command -label "Controls" -command {ShowHelp "POLKA_CONTROLS"}
    $helpmenu add command -label "How do I..." -command {ShowHelp "POLKA_HOW_DO_I"}
+   $helpmenu add command -label "Search for..." -command SearchHelp 
    $helpmenu add command -label "Tutorial" -command {ShowHelp "POLKA_TUTORIAL"}
    $helpmenu add command -label "Using Help" -command {ShowHelp "POLKA_USING_HELP"}
 
@@ -553,6 +554,7 @@
    MenuHelp $helpmenu "Controls"    ".  Display help on the controls in the GUI."
    MenuHelp $helpmenu "How do I..." ".  Display answers to some common questions."
    MenuHelp $helpmenu "Tutorial"    ".  Display a simple step-by-step guide to the use of Polka."
+   MenuHelp $helpmenu "Search for..." ".  Search the on-line help manual for a given word."
    MenuHelp $helpmenu "Using Help"  ".  Display help on how to use the Polka help system."
    MenuHelp $helpmenu "Pointer..."  ".  Select this menu item, and then click with the pointer over a widget to see help on the widget."
 
@@ -576,7 +578,7 @@
    bind . <Control-q> {Finish 0}
 
 # Add menu items to the Effects menu.
-   foreach effect [list Align Fill Filter "Fit Sky" Log Maths Negate Smooth Threshold] {
+   foreach effect [list Align Fill Filter "Fit Sky" Log Maths Negate Smooth Stats Threshold] {
       $EFFECTSMENU add command -label $effect -command "Effects \$IMAGE_DISP \"$effect\" 0"
    }
    $EFFECTSMENU add separator
@@ -592,6 +594,7 @@
    MenuHelp $EFFECTSMENU "Negate"    ".  Multiply the currently displayed image by -1.0."
    MenuHelp $EFFECTSMENU "Fit Sky"   ".  Estimate the sky background based on the current sky areas or supplied sky frames, and optionally subtract it from the displayed image."
    MenuHelp $EFFECTSMENU "Smooth"    ".  Apply Gaussian smoothing to the displayed image."
+   MenuHelp $EFFECTSMENU "Stats"     ".  Display statistics of the currently displayed image within the currently selected area."
    MenuHelp $EFFECTSMENU "Threshold" ".  Remove values outside a given range from the displayed image."
    MenuHelp $EFFECTSMENU "Undo"      ".  Undo the most recent effect for the currently diplayed image."
    MenuHelp $EFFECTSMENU "Undo All"  ".  Undo all effects for the currently diplayed image."

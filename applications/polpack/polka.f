@@ -220,7 +220,7 @@
 *        the SKYFRAMES parameter. [TRUE]
 *     STARTHELP = _LOGICAL (Read)
 *        If a true value is supplied, then a hyper-text browser will be
-*        created with the GUI, displaying the contents page of the Polka
+*        created with the GUI, displaying the tutorial page of the Polka
 *        on-line help documentation. Otherwise, the browser is only created
 *        if the user accesses the on-line help information explicitly
 *        from within the GUI by using the "Help" menu or the F1 key on 
