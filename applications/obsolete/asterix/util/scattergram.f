@@ -53,6 +53,7 @@
 *     28 Apr 93 : V1.7-0 Handles input quality correctly (DJA)
 *     25 Jun 93 : V1.7-1 Removed superfluous STATUS argument to MSG_MAKE (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     14 Aug 95 : V1.8-1 Start of ADI updates (DJA)
 *
 *    Type Definitions :
 *
@@ -74,15 +75,14 @@
 
         INTEGER MARKER
            PARAMETER (MARKER=2)			! PGPLOT marker number
+      BYTE	BIT_ORUB
+
 *
 *    Local variables :
 *
-	CHARACTER*(DAT__SZLOC) LOC1		! 1st input locator
-	CHARACTER*(DAT__SZLOC) LOC2		! 2nd input locator
-	CHARACTER*(DAT__SZLOC) DLOC		! output object locator
-	CHARACTER*(DAT__SZNAM) XNAME,YNAME	! data object names
-	CHARACTER*(80)         YUNIT		! data object units
 	CHARACTER*(132) LINES(MAXLINES)		! history text
+      CHARACTER*80	LABEL,UNITS
+      CHARACTER*132	PATH,FILE		!
 
         INTEGER IQPTR1, IQPTR2                  ! Input quality
         INTEGER NLINES                          ! Lines of history text used
@@ -98,6 +98,7 @@
         INTEGER NITEM                           ! Variable used in item count
         INTEGER OQPTR                           ! Output quality
         INTEGER TLEN                            ! Length of a message string
+      INTEGER			IFID1, IFID2, DFID, NLEV
 
         BYTE    MASK1, MASK2                    ! Input quality masks
         BYTE    OMASK                           ! Output quality mask
@@ -112,7 +113,7 @@
 *    Version id :
 *
       CHARACTER*(30) VERSION
-	 PARAMETER   (VERSION = 'SCATTERGRAM Version 1.8-0')
+	 PARAMETER   (VERSION = 'SCATTERGRAM Version 1.8-1')
 *-
 
 *    Version announcement
@@ -121,12 +122,14 @@
       CALL AST_INIT()
 
 *    Associate input objects
-      CALL USI_ASSOCI( 'INP1', 'READ', LOC1, PRIM1, STATUS )
-      CALL USI_ASSOCI( 'INP2', 'READ', LOC2, PRIM2, STATUS )
+      CALL USI_TASSOCI( 'INP1', '*', 'READ', IFID1, STATUS )
+      CALL USI_TASSOCI( 'INP2', '*', 'READ', IFID2, STATUS )
+      CALL BDI_PRIM( IFID1, PRIM1, STATUS )
+      CALL BDI_PRIM( IFID2, PRIM2, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check out input objects
-      CALL BDA_CHKDATA( LOC1, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( IFID1, OK, NDIM, DIMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
@@ -136,7 +139,7 @@
       END IF
       CALL ARR_SUMDIM( NDIM, DIMS, SIZE1 )
 
-      CALL BDA_CHKDATA( LOC2, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( IFID2, OK, NDIM, DIMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
@@ -147,12 +150,12 @@
       CALL ARR_SUMDIM( NDIM, DIMS, SIZE2 )
 
 *    Errors present in inputs?
-      CALL BDA_CHKVAR( LOC1, DEX, NDIM, DIMS, STATUS )
-      CALL BDA_CHKVAR( LOC2, DEY, NDIM, DIMS, STATUS )
+      CALL BDI_CHKVAR( IFID1, DEX, NDIM, DIMS, STATUS )
+      CALL BDI_CHKVAR( IFID2, DEY, NDIM, DIMS, STATUS )
 
 *    Quality present in inputs?
-      CALL BDA_CHKQUAL( LOC1, QOK1, NDIM, DIMS, STATUS )
-      CALL BDA_CHKQUAL( LOC2, QOK2, NDIM, DIMS, STATUS )
+      CALL BDI_CHKQUAL( IFID1, QOK1, NDIM, DIMS, STATUS )
+      CALL BDI_CHKQUAL( IFID2, QOK2, NDIM, DIMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check sizes
@@ -200,29 +203,29 @@
       CALL USI_GET0L( 'MARKER', DOMARKER, STATUS )
 
 *    Create display object
-      CALL USI_ASSOCO( 'OUT', 'SCATTERGRAM', DLOC, STATUS )
+      CALL USI_TASSOCO( 'OUT', 'SCATTERGRAM', DFID, STATUS )
 
 *    Create components
-      CALL BDA_CREDATA(DLOC,1,NITEM,STATUS)
-      CALL BDA_CREAXVAL(DLOC,1,.FALSE.,NITEM,STATUS)
+      CALL BDI_CREDATA(DFID,1,NITEM,STATUS)
+      CALL BDI_CREAXVAL(DFID,1,.FALSE.,NITEM,STATUS)
 
 *    Create output quality?
       OUTQ = (QOK1 .OR. QOK2)
       IF ( OUTQ ) THEN
 
 *      Read input quality arrays
-        CALL BDA_MAPQUAL( LOC1, 'READ', IQPTR1, STATUS )
-        CALL BDA_MAPQUAL( LOC2, 'READ', IQPTR2, STATUS )
-        CALL BDA_GETMASK( LOC1, MASK1, STATUS )
-        CALL BDA_GETMASK( LOC2, MASK2, STATUS )
+        CALL BDI_MAPQUAL( IFID1, 'READ', IQPTR1, STATUS )
+        CALL BDI_MAPQUAL( IFID2, 'READ', IQPTR2, STATUS )
+        CALL BDI_GETMASK( IFID1, MASK1, STATUS )
+        CALL BDI_GETMASK( IFID2, MASK2, STATUS )
 
 *      Output mask is the bit-wise OR of the inputs
-        OMASK = (MASK1.OR.MASK2)
+        OMASK = BIT_ORUB(MASK1,MASK2)
 
 *      Create o/p quality
-        CALL BDA_CREQUAL( DLOC, 1, NITEM, STATUS )
-        CALL BDA_MAPQUAL( DLOC, 'WRITE', OQPTR, STATUS )
-        CALL BDA_PUTMASK( DLOC, OMASK, STATUS )
+        CALL BDI_CREQUAL( DFID, 1, NITEM, STATUS )
+        CALL BDI_MAPQUAL( DFID, 'WRITE', OQPTR, STATUS )
+        CALL BDI_PUTMASK( DFID, OMASK, STATUS )
 
 *      Copy it
         CALL SCATTERGRAM_COPQUAL( QOK1, %VAL(IQPTR1),
@@ -233,11 +236,11 @@
        END IF
 
 *    Map and copy data
-      CALL BDA_MAPDATA( LOC1, 'READ', XPTR, STATUS )
-      CALL BDA_MAPDATA( LOC2, 'READ', YPTR, STATUS )
+      CALL BDI_MAPDATA( IFID1, 'READ', XPTR, STATUS )
+      CALL BDI_MAPDATA( IFID2, 'READ', YPTR, STATUS )
 
-      CALL BDA_MAPDATA(DLOC,'WRITE',DPTR,STATUS)
-      CALL BDA_MAPAXVAL(DLOC,'WRITE',1,APTR,STATUS)
+      CALL BDI_MAPDATA( DFID,'WRITE',DPTR,STATUS)
+      CALL BDI_MAPAXVAL(DFID,'WRITE',1,APTR,STATUS)
 
       CALL SCATTERGRAM_COPDATR(%VAL(XPTR),FROM,TO,INCR,%VAL(APTR),
      :                                                   STATUS )
@@ -246,31 +249,31 @@
 
 *    Map and copy error data
       IF ( DEX ) THEN
-         CALL BDA_MAPVAR( LOC1, 'READ', VPTR, STATUS )
-         CALL BDA_CREAXWID(DLOC,1,.FALSE.,NITEM,STATUS)
-         CALL BDA_MAPAXWID(DLOC,'W',1,WPTR,STATUS)
-         CALL SCATTERGRAM_COPWID(%VAL(VPTR),FROM,TO,INCR,%VAL(WPTR),
+        CALL BDI_MAPVAR( IFID1, 'READ', VPTR, STATUS )
+        CALL BDI_CREAXWID(DFID,1,.FALSE.,NITEM,STATUS)
+        CALL BDI_MAPAXWID(DFID,'W',1,WPTR,STATUS)
+        CALL SCATTERGRAM_COPWID(%VAL(VPTR),FROM,TO,INCR,%VAL(WPTR),
      :                                                      STATUS )
       END IF
       IF ( DEY ) THEN
-         CALL BDA_COPVAR(LOC2,DLOC,STATUS)
+        CALL BDI_COPVAR( IFID2, DFID, STATUS )
       END IF
 
 *    Fill in labels and units
       IF ( PRIM1 ) THEN
-        CALL DAT_NAME(LOC1,XNAME,STATUS)
+        CALL ADI_FTRACE( IFID1, NLEV, LABEL, FILE, STATUS )
+        UNITS = ' '
       ELSE
-        CALL BDA_GETLABEL(LOC1,XNAME,STATUS)
-        CALL BDA_GETUNITS(LOC1,YUNIT,STATUS)
-        CALL BDA_PUTAXUNITS(DLOC,1,YUNIT,STATUS)
+        CALL BDI_GETLABEL( IFID1, LABEL, STATUS )
+        CALL BDI_GETUNITS( IFID1, UNITS, STATUS )
       END IF
-      CALL BDA_PUTAXLABEL(DLOC,1,XNAME,STATUS)
+      CALL BDI_PUTAXTEXT( DFID, 1, LABEL, UNITS, STATUS )
 
       IF ( PRIM2 ) THEN
-        CALL DAT_NAME(LOC2,YNAME,STATUS)
-        CALL BDA_PUTLABEL(DLOC,YNAME,STATUS)
+        CALL ADI_FTRACE( IFID2, NLEV, LABEL, FILE, STATUS )
+        CALL BDI_PUTLABEL( DFID, LABEL, STATUS )
       ELSE
-        CALL BDA_COPTEXT( LOC2, DLOC, STATUS )
+        CALL BDI_COPTEXT( IFID2, DFID, STATUS )
       END IF
 
 *    GCB control (format output as markers)
@@ -280,31 +283,31 @@
         CALL GCB_LCONNECT(STATUS)
         CALL GCB_SETL('POINT_FLAG',.TRUE.,STATUS)
         CALL GCB_SETI('POINT_SYMBOL',MARKER,STATUS)
-        CALL GCB_SAVE(DLOC,STATUS)
+        CALL GCB_FSAVE(DFID,STATUS)
         CALL GCB_DETACH(STATUS)
 
       END IF
 
 *    History
-      CALL HIST_ADD( DLOC, VERSION, STATUS )
+      CALL HSI_ADD( DFID, VERSION, STATUS )
 
       IF ( STATUS .EQ. SAI__OK ) THEN
-         LINES(1) = 'X data {INP1}'
-         LINES(2) = 'Y data {INP2}'
-         CALL MSG_SETI( 'FROM', SUBSET(1) )
-         CALL MSG_SETI( 'TO', SUBSET(2) )
-         CALL MSG_SETI( 'STEPS', SUBSET(3) )
-         CALL MSG_MAKE( 'Subset from ^FROM to ^TO in steps of ^STEPS',
+        LINES(1) = 'X data {INP1}'
+        LINES(2) = 'Y data {INP2}'
+        CALL MSG_SETI( 'FROM', SUBSET(1) )
+        CALL MSG_SETI( 'TO', SUBSET(2) )
+        CALL MSG_SETI( 'STEPS', SUBSET(3) )
+        CALL MSG_MAKE( 'Subset from ^FROM to ^TO in steps of ^STEPS',
      :                                                LINES(3), TLEN )
-         NLINES = MAXLINES
-         CALL USI_TEXT( 3, LINES, NLINES, STATUS )
-         CALL HIST_PTXT( DLOC, NLINES, LINES, STATUS )
+        NLINES = MAXLINES
+        CALL USI_TEXT( 3, LINES, NLINES, STATUS )
+        CALL HSI_PTXT( DFID, NLINES, LINES, STATUS )
       END IF
 
 *    Release files
-      CALL BDA_RELEASE( LOC1, STATUS )
-      CALL BDA_RELEASE( LOC2, STATUS )
-      CALL BDA_RELEASE( DLOC, STATUS )
+      CALL BDI_RELEASE( IFID1, STATUS )
+      CALL BDI_RELEASE( IFID2, STATUS )
+      CALL BDI_RELEASE( DFID, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE
