@@ -248,6 +248,8 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     10-MAY-1998 (DSB):
 *        Bug fixed in astSplit which caused comments associated with string
 *        keywords to be lost when storing the card in a FitsChan.
+*     15-JUN-1999 (DSB):
+*        Report an error if an unrecognised projection name is supplied.
 *class--
 */
 
@@ -11101,10 +11103,17 @@ static int StoreFits( AstFitsChan *this, int rep, int naxis, int *ialt,
          prj = astWcsPrjType( store->ctype[ iaxis ] + 4 );
          (store->prj)[ iaxis ] = prj;
 
-/* Identify celestial coordinate axes from the first 4 characters of the
-   CTYPE value. In order to be a celestial coordinate axis, the CTYPE keyword 
-   must include a recognised WCS projection code. */
-         if( prj != AST__WCSBAD ){
+/* Report an error if the projection specification was not recognised. */
+         if( prj == AST__WCSBAD ){
+            astError( AST__BDFTS, "%s(%s): FITS keyword '%s' refers to "
+                     "an unknown projection type '%s'.", method, class, 
+                      store->ctype_name[ iaxis ], store->ctype[ iaxis ] + 4 );
+            ret = 0;
+            break;
+
+/* Otherwise, identify celestial coordinate axes from the first 4 characters 
+   of the CTYPE value. */
+         } else {
 
 /* See if this is a longitude axis (Eg if the first 4 character of CTYPE are 
    "RA--" or "xLON"). If so, store the value of "x" (or char(1) for equatorial 
