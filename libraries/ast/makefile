@@ -356,7 +356,7 @@ STARTUP_SCRIPT = $(PKG_NAME)_dev
 #  built.)
 
 PUBLIC_C_INCLUDES = $(PKG_NAME).h
-PUBLIC_F_INCLUDES = $(PKG_NAME)_err grf_err
+PUBLIC_F_INCLUDES = $(PKG_NAME)_err grf_par
 PUBLIC_INCLUDES = $(PUBLIC_C_INCLUDES) $(PUBLIC_F_INCLUDES)
 
 #  List of private include files.  These are additional include files
