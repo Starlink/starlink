@@ -450,7 +450,7 @@ install:
 prepare:
 
 check_packages:
-[available] Apr 10, 2003 4:30:58 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Apr 11, 2003 4:32:41 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -908,10 +908,10 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 59 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 62 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/table/lib/table
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/table/lib/table
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/table/lib/table/table.jar
@@ -940,9 +940,8 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:32: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableBuilder
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:29: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:29: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/view/ExtendedStarTableModel.java:28: warning - Tag @link: reference not found: getColumnInfo
   [javadoc] Generating /apps/cvsbuild/java/source/table/docs/table/javadocs/stylesheet.css...
-  [javadoc] 9 warnings
+  [javadoc] 8 warnings
 
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/bin
@@ -951,9 +950,9 @@ dist:
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/table
     [mkdir] Created dir: /apps/cvsbuild/star/docs/table
-[loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 3 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
-[loggedcopy] Copying 82 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 85 files to /apps/cvsbuild/star/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -2498,10 +2497,10 @@ execute_mk_script:
      [exec]          ar x $f; \
      [exec]       fi;\
      [exec] done)
+     [exec] g77: temp/*.o: No such file or directory
      [exec] Processing 
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
-     [exec] g77: temp/*.o: No such file or directory
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
