@@ -1,7 +1,7 @@
-      SUBROUTINE SCULIB_WTFN_REGRID( N_MAPS, N_PTS, WTFNRAD, WTFNRES,
-     :     WEIGHTSIZE, DIAMETER, WAVELENGTH, PXSIZE, NX_OUT, NY_OUT, 
-     :     I_CENTRE, J_CENTRE, WTFN, WEIGHT, BOLWT, N_BOL, MAX_BOLS,
-     :     DATA_PTR, VAR_PTR, 
+      SUBROUTINE SCULIB_WTFN_REGRID( USEGRD, N_MAPS, N_PTS, WTFNRAD, 
+     :     WTFNRES, WEIGHTSIZE, SCALE, DIAMETER, WAVELENGTH, PXSIZE, 
+     :     NX_OUT,  NY_OUT,  I_CENTRE, J_CENTRE, WTFN, WEIGHT, BOLWT, 
+     :     N_BOL, MAX_BOLS, DATA_PTR, VAR_PTR, 
      :     XPOS_PTR, YPOS_PTR, OUT_DATA, OUT_VARIANCE, 
      :     OUT_QUALITY, CONV_WEIGHT, STATUS )
 *+
@@ -15,8 +15,8 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     SUBROUTINE SCULIB_PROCESS_BOLS(N_MAPS, N_PTS, WTFNRAD, WTFNRES,
-*    :     WEIGHTSIZE, DIAMETER, WAVELENGTH, PXSIZE, NX_OUT, NY_OUT, 
+*     SUBROUTINE SCULIB_PROCESS_BOLS(USEGRD, N_MAPS, N_PTS, WTFNRAD, WTFNRES,
+*    :     WEIGHTSIZE, SCALE, DIAMETER, WAVELENGTH, PXSIZE, NX_OUT, NY_OUT, 
 *    :     I_CENTRE, J_CENTRE, WTFN, WEIGHT, BOLWT, N_BOL, MAX_BOLS,
 *    :     DATA_PTR, VAR_PTR, 
 *    :     XPOS_PTR,YPOS_PTR, OUT_DATA, OUT_VARIANCE, 
@@ -27,8 +27,84 @@
 *     This routine takes data with a variance array and x y positions
 *     and regrids it onto a rectangular grid using a weight function
 *     interpolation.
+*     Here is a description:
+*     This is an image space implementation of fourier techniques.
+*     In Fourier terms the technique could be described
+*     as follows:-
+*
+*     1. Do a 2-d discrete Fourier transform of the data points. The result
+*     is a repeating pattern made up of copies of the transform of
+*     the map as a continuous function, each copied displaced from its
+*     neighbours by 1/dx, where dx is the sample spacing of the input points
+*     (assumed equal in x and y). Different copies of the 'continuous map' 
+*     transforms will overlap ('alias') if there is any power in the 
+*     map at frequencies greater than 1/(2dx). It is not possible to unravel
+*     aliased spectra and this constraint leads to the Nyquist sampling
+*     criterion.
+*
+*     2. We want to derive the 'continuous map' so that map values on the new
+*     grid mesh can be derived. Do this by multiplying the transform of the
+*     data by a function that has zero value beyond a radius of 0.5/dx from the
+*     origin. This will get rid of all the repeats in the pattern and leave
+*     just the transform of the 'continuous map'.
+*
+*     3. Do an inverse FT on the remaining transform for the points where you
+*     wish the resampled points to be (note: FFTs implicitly assume that the
+*     data being transformed DO repeat ad infinitum so we'd have to be careful
+*     when using them to do this).
+*
+*     The analogue of these process steps in image space is as follows:
+*
+*     1. Nothing.
+*     2. Convolve the input data with the FT of the function used to isolate
+*     the 'continuous map' transform.
+*     3. Nothing.
+
+*     If the method is done properly, the rebinned map is in fact the map on
+*     the new sample mesh that has the same FT as the continuous function
+*     going through the original sample points.
+*
+*     Convolution Functions
+*     ---------------------
+*
+*     Bessel 
+*     For good data and with no time constraint on reduction the best
+*     convolution function would be one whose FT is a flat-topped cylinder in
+*     frequency space, centred on the origin and of a radius such that
+*     frequencies to which the telescope is not sensitive are set to zero.
+*     Unfortunately, this function is a Bessel function, which extends to
+*     infinity along both axes and has significant power out to a large radius.
+*     To work correctly this would require an infinite map and infinite
+*     computing time. However, a truncated Bessel function should work well on
+*     a large map, except near the edges. Edge effects can be removed by
+*     pretending that the map extends further - of course, this only works if
+*     you know what data the pretend map area should contain, i.e. zeros. 
+*     
+*     Another problem with a Bessel function arises from the fact that it does
+*     truncate the FT of the map sharply. If the data are good then there 
+*     should be nothing but noise power at the truncation radius and the 
+*     truncation of the FT should have no serious effect. However, if the data
+*     has spikes (power at all frequencies in the FT) or suffers from seeing 
+*     effects such that the data as measured DO have power beyond the 
+*     truncation radius, then this will cause ringing in the rebinned map.
+*     
+*     Gaussian 
+*     In fact, any function that is finite in frequency space will have
+*     infinite extent in image space (I think). As such they will all
+*     drag in some power from the aliased versions of the map transform
+*     and all suffer from edge effects and large compute times. Some are
+*     worse than others, however. For example, a Gaussian can have most
+*     of its power concentrated over a much smaller footprint than a
+*     Bessel function, so the convolution calculation will be much
+*     faster. It is also more robust in the presence of spikes and
+*     seeing problems because it does not truncate the map FT as sharply
+*     as the Bessel function - such effects give rise to smoother
+*     defects in the rebinned map though the defects will still BE
+*     there.
  
 *  Arguments:
+*     USEGRD = LOGICAL (Given)
+*       Use guard ring for final stage of rebin
 *     N_MAPS = INTEGER (Given)
 *        Number of data files read in
 *     N_PTS (N_MAPS) = INTEGER (Given)
@@ -39,6 +115,8 @@
 *        Number of values per scale length in the supplied weight function
 *     WEIGHTSIZE = INTEGER (Given)
 *        Radius of supplied weighting function
+*     SCALE = REAL (Given)
+*        Size of a scale length in the same units as PXSIZE
 *     DIAMETER = REAL (Given)
 *        Diameter of telescope in metres
 *     WAVELENGTH = REAL (Given)
@@ -104,6 +182,7 @@
       INCLUDE 'MSG_PAR'          ! MSG_ constants
  
 *  Arguments Given:
+      LOGICAL USEGRD
       INTEGER N_MAPS
       INTEGER MAX_BOLS
       REAL    BOLWT(MAX_BOLS, N_MAPS)
@@ -116,6 +195,7 @@
       INTEGER NX_OUT
       INTEGER NY_OUT
       REAL    PXSIZE
+      REAL    SCALE
       INTEGER VAR_PTR(N_MAPS)
       REAL    WAVELENGTH
       REAL    WEIGHT(N_MAPS)
@@ -266,14 +346,14 @@
          END IF
 
 *     The actual dirty work
-         CALL SCULIB_WTFN_REGRID_2 (DIAMETER, WTFNRES,
+         CALL SCULIB_WTFN_REGRID_2 (WTFNRES,
      :        %val(DATA_PTR(I)), %val(VAR_PTR(I)),
      :        WEIGHT(I), USEBOLWT, %VAL(BOLWT_PTR),
      :        %val(XPOS_PTR(I)), %val(YPOS_PTR(I)),
      :        N_PTS(I), PXSIZE, NX_OUT, NY_OUT,
      :        I_CENTRE, J_CENTRE, %VAL(TOTAL_WEIGHT_PTR),
      :        WAVELENGTH, OUT_DATA, OUT_VARIANCE,
-     :        CONV_WEIGHT, WEIGHTSIZE, WTFN, STATUS)
+     :        CONV_WEIGHT, WEIGHTSIZE, SCALE, WTFN, STATUS)
 
 
 *     Free the bolometer weights array
@@ -291,11 +371,11 @@
       CALL MSG_OUTIF(MSG_LEV, ' ','^PKG: Entering third rebin phase '//
      :     '(T = ^T1 seconds)', STATUS)
 
-      CALL SCULIB_WTFN_REGRID_3 (DIAMETER, WTFNRES, PXSIZE, 
+      CALL SCULIB_WTFN_REGRID_3 (USEGRD, WTFNRES, PXSIZE, 
      :     NX_OUT, NY_OUT,
      :     I_CENTRE, J_CENTRE, %VAL(TOTAL_WEIGHT_PTR), WAVELENGTH,
      :     OUT_DATA, OUT_VARIANCE,
-     :     OUT_QUALITY, CONV_WEIGHT, WEIGHTSIZE,
+     :     OUT_QUALITY, CONV_WEIGHT, WEIGHTSIZE, SCALE,
      :     WTFN, STATUS)
 
 *     Finish
