@@ -113,6 +113,9 @@
 *        Fixed overflow bug possibly when using DOUBLE type.
 *     24-NOV-2000 (MBT):
 *        Fixed another type-dependent bug.
+*     16-JUL-2001 (MBT):
+*        Added a new STATUS check to prevent errors when dealing with
+*        data arrays containing all the same values.
 *     {enter_further_changes_here}
 
 *-
@@ -213,11 +216,13 @@
             CALL ERR_REP( 'CCG1_FRAC_BADDAT', 
      :'  CCG1_FRAC: FRAC values out of range (programming error)',
      :   STATUS )
+            GO TO 999
          ELSE IF ( I .GT. 1 .AND. FRAC( I ) .LT. FRAC( I - 1 ) ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'CCG1_FRAC_BADDAT',
      :'  CCG1_FRAC: FRAC values out of order (programming error)',
      :   STATUS )
+            GO TO 999
          END IF
       END DO
 
@@ -396,6 +401,7 @@
          ELSE
             FINDHI = .TRUE.
          END IF
+         IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Count the number of non-empty bins in the histogram.
          NUMBER = 0
@@ -420,7 +426,8 @@
 *  Try to eliminate the outliers.  Sum the histogram bins skipped over
 *  until the lower fraction limit is reached.
                J = 1
-               DO WHILE ( CLIPSU( 1 ) .LT. FRATOT( 1 ) )
+               DO WHILE ( CLIPSU( 1 ) .LT. FRATOT( 1 ) .AND.
+     :                    J .LE. CLNBIN )
                   CLIPSU( 1 ) = CLIPSU( 1 ) + HIST( J )
                   J = J + 1
                END DO
@@ -453,7 +460,7 @@
 *  Try to eliminate the outliers.  Sum the histogram bins skipped over
 *  until the upper fraction limit is reached.
                K = CLNBIN
-               DO WHILE ( CLIPSU( 2 ) .LT. FRATOT( 2 ) )
+               DO WHILE ( CLIPSU( 2 ) .LT. FRATOT( 2 ) .AND. K .GE. 1 )
                   CLIPSU( 2 ) = CLIPSU( 2 ) + HIST( K )
                   K = K - 1
                END DO
