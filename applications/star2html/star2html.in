@@ -1,4 +1,4 @@
-#! @PERL@
+#! @PERL@ -W
 # @edited_input@
 #+
 #  Name:
@@ -314,7 +314,7 @@ while (@ARGV) {
      #  is a filename. If the value is "none", no copyright statement
      #  will appear; if it is omitted, we revert to the default behaviour.
      if ( $COPYRIGHT =~ /^-.*/ ) {
-       unshift( ARGV, $COPYRIGHT );
+       unshift( @ARGV, $COPYRIGHT );
        $COPYRIGHT = "";
        $NOCOPYRIGHT = "";
      } elsif ( $COPYRIGHT =~ /^none$/i ) {
@@ -323,7 +323,7 @@ while (@ARGV) {
        $maybe_file = $COPYRIGHT;
        if ( $maybe_file !~ /.tex$/ ) { $maybe_file .= '.tex'; }
        if ( -e $maybe_file ) {
-         unshift( ARGV, $COPYRIGHT );
+         unshift( @ARGV, $COPYRIGHT );
          $COPYRIGHT = "";
          $NOCOPYRIGHT = "";
        }
@@ -635,7 +635,6 @@ sub edit_main {
 #  Open the "copy".
    open( EDIT, ">$DESTFILE" )
       || &clear_up( "Star2HTML fatal: Cannot open new file for editing.\n" );
-   $have_texcopy = 1;
 
 #  Now start copying the main file to the edited version. Partitioning
 #  sections into new files.
@@ -681,10 +680,7 @@ sub edit_main {
          if ( m/^\\section|^\\subsection|^\\sstroutine|^\\routine/o ) {
 
 
-#  New file. Close existing one first.
-            if ( stat( SECTION ) != "" ) { 
-               close( SECTION );
-            }
+#  New section (note reusing SECTION closes previous file).
             $section_file = "section$NSECTIONS.tex";
             $NSECTIONS++;
             open( SECTION, ">$section_file" )
@@ -813,7 +809,7 @@ sub get_item {
 #  Bugs:
 #    This will fail if the item contains verbatim {}'s.
 #-
-   local($item) = @_[0];
+   local($item) = $_[0];
 
 #  Quote all words to stop problems with special characters.
    $item =~ s/(\W)/\\$1/g;
@@ -873,7 +869,7 @@ sub tidy_latex {
    for (@_) {
       $* = 1;                        # Grep over multilines
       s/(\\LaTeX\\|\\LaTeX)/LaTeX/g; # Remove special \LaTeX\ & \LaTeX
-      s/(\\TeX\\|\TeX)/TeX/g;        # Remove special \TeX\ & \TeX
+      s/(\\TeX\\|\\TeX)/TeX/g;       # Remove special \TeX\ & \TeX
       s/\~/ /g;                      # ~   ==> " "
       s/\\\\[\s]*\[[^\]]*\]/\n/g;    # \\ [len] ==> \n, none-greedy form
       s/\\\\/\n/g;                   # \\  ==> \n
@@ -1137,7 +1133,7 @@ sub get_filename_and_directory {
       if ( scalar(@path) == 0 ) {
         $directory = "./";
       } elsif ( scalar(@path) == 1 ) {
-        $directory = "@path/";
+        $directory = &get_absolute_directory( "@path/" );
       } else {
         $directory = join( '/', @path );
       }
