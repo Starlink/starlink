@@ -151,9 +151,9 @@
 *
       IF (OVER) THEN
 *
-         CALL USI_TASSOCI('INP','*','UPDATE',ILOC,STATUS)
+         CALL USI_TASSOCI('INP','*','UPDATE',IFID,STATUS)
 *
-*   Clone an output locator
+*   Clone an output identifier
          CALL ADI_CLONE( IFID, OFID, STATUS )
 *
       ELSE
