@@ -365,42 +365,41 @@ C        END IF
       END IF
 
 *  Create output dataset
-      CALL USI_TASSOCO( 'OUT', 'POLAR', OFID, STATUS )
-      CALL BDI_CREDATA( OFID, NDIM, ODIMS, STATUS )
-      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
+      CALL BDI_LINK( 'BinDS', NDIM, ODIMS, 'REAL', OFID, STATUS )
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
 
 *  Create AXIS structure
-      CALL BDI_CREAXES( OFID, NDIM, STATUS )
-      CALL BDI_CREAXVAL( OFID, 1, REG, NRAD, STATUS )
-      CALL BDI_CREAXWID( OFID, 1, REG, NRAD, STATUS )
       IF ( REG ) THEN
-        CALL BDI_PUTAXVAL( OFID, 1, 0.0, RBINSZ, NRAD, STATUS )
-        CALL BDI_PUTAXWID( OFID, 1, RBINSZ, STATUS )
+        SPARR(1) = 0.0
+        SPARR(2) = RBINSZ
+        CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
+        CALL BDI_AXPUT0R( OFID, 1, 'ScalarWidth', RBINSZ, STATUS )
       ELSE
-        CALL BDI_MAPAXVAL( OFID, 'WRITE', 1, OAPTR, STATUS )
-        CALL BDI_MAPAXVAL( OFID, 'WRITE', 1, OWPTR, STATUS )
+        CALL BDI_AXMAPR( OFID, 1, 'Data', 'WRITE', OAPTR, STATUS )
+        CALL BDI_AXMAPR( OFID, 1, 'Width', 'WRITE', OWPTR, STATUS )
         CALL AXIS_RNG2VALW( NRAD, RANGE, %VAL(OAPTR), %VAL(OWPTR),
      :                                                    STATUS )
       END IF
-      CALL BDI_PUTAXLABEL( OFID, 1, 'Radius', STATUS )
+      CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Radius', STATUS )
       IF ( ORUNIT .GT. ' ' ) THEN
-        CALL BDI_PUTAXUNITS( OFID, 1, ORUNIT, STATUS )
+        CALL BDI_AXPUT0C( OFID, 1, 'Units', ORUNIT, STATUS )
       END IF
       IF ( NDIM .EQ. 2 ) THEN
-        CALL BDI_CREAXVAL( OFID, 2, .TRUE., NAZ, STATUS )
-        CALL BDI_PUTAXVAL( OFID, 2,0.5*ABINSIZE, ABINSIZE, NAZ, STATUS )
-        CALL BDI_CREAXWID( OFID, 2, .TRUE., NAZ, STATUS )
-        CALL BDI_PUTAXWID( OFID, 2, ABINSIZE, STATUS )
-        CALL BDI_PUTAXTEXT( OFID, 2, 'Azimuth', 'degree', STATUS )
+        SPARR(1) = 0.5*ABINSIZE
+        SPARR(2) = ABINSIZE
+        CALL BDI_AXPUT1R( OFID, 2, 'SpacedData', 2, SPARR, STATUS )
+        CALL BDI_AXPUT0R( OFID, 2, 'ScalarWidth', ABINSIZE, STATUS )
+        CALL BDI_AXPUT0C( OFID, 2, 'Label', 'Azimuth', STATUS )
+        CALL BDI_AXPUT0C( OFID, 2, 'Units', 'degree', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Initialise quality to data missing
       CALL ARR_SUMDIM( NDIM, ODIMS, ONELM )
       IF ( QUALITY .AND. QKEEP ) THEN
-        CALL BDI_CREQUAL( OFID, NDIM, ODIMS, STATUS )
-        CALL BDI_MAPQUAL( OFID, 'WRITE', OQPTR, STATUS )
-        CALL BDI_PUTMASK( OFID, QUAL__MASK, STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
+        CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
         CALL ARR_INIT1B( QUAL__MISSING, ONELM, %VAL(OQPTR), STATUS )
       END IF
 
@@ -438,23 +437,23 @@ C        END IF
      :                                LOY, HIY, %VAL(ODPTR), STATUS )
         END IF
       END IF
-      CALL BDI_PUTAXNORM( OFID, 1, NORMALISE, STATUS )
+      CALL BDI_AXPUT0L( OFID, 1, 'Normalised', NORMALISE, STATUS )
       IF ( NDIM .EQ. 2 ) THEN
-        CALL BDI_PUTAXNORM( OFID, 2, NORMALISE, STATUS )
+        CALL BDI_AXPUT0L( OFID, 2, 'Normalised', NORMALISE, STATUS )
       END IF
 
 *  Copy ancillary stuff
-      CALL BDI_COPTEXT( IFID, OFID, STATUS )
-      CALL BDI_COPMORE( IFID, OFID, STATUS )
+      CALL BDI_COPY( IFID, 'Title,Label,Units', OFID, ' ', STATUS )
+      CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Re-write data units
       IF ( NORMALISE ) THEN
         CALL MSG_SETC( 'UN', ORUNIT )
         CALL MSG_MAKE( 'count/^UN**2', TEXT, LEN )
-        CALL BDI_PUTUNITS( OFID, TEXT(:LEN), STATUS )
+        CALL BDI_PUT0C( OFID, 'Units', TEXT(:LEN), STATUS )
       ELSE
-        CALL BDI_PUTUNITS( OFID, 'count', STATUS )
+        CALL BDI_PUT0C( OFID, 'Units', 'count', STATUS )
       END IF
 
 *  Update history
