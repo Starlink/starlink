@@ -17,3 +17,8 @@ libtool
 starconf.m4
 starconf.status
 starconf.status.local
+convrt
+pcrbin
+ezmap.dat
+pwritx.dat
+sun88.*
