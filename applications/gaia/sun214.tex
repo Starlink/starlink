@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {214.8}
 \newcommand{\stardocauthors}   {Peter W. Draper \& Norman Gray}
-\newcommand{\stardocdate}      {17 July 2000}
+\newcommand{\stardocdate}      {27 July 2000}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
 \newcommand{\stardocversion}   {2.5}
@@ -334,7 +334,7 @@ you first need to initialize the \mytt{gaia} package:
 (you could do this once and for all in your \mytt{login.cl}
 file). Next you need to use the \mytt{gaiadisp} command. This command
 has two arguments, the name of the image to display and the plane
-({\em i.e.} GAIA clone) that you want to display into. So for instance
+(\textit{i.e.} GAIA clone) that you want to display into. So for instance
 if you wanted to display the default IRAF test image you'd use a
 command like:
 \begin{quote}
@@ -364,7 +364,7 @@ to explore it interactively. For specific windows (those which are
 more GAIA than SkyCat) help is available on-line; many windows also
 feature short one-line help descriptions of their controls.
 
-\subsection{\xlabel{image_display_capabilities}Image Display Capabilities}
+\subsection{\xlabel{image_display_capabilities}Image display capabilities}
 GAIA provides the following normal ``image display tool'' features:
 \begin{itemize}
 \item Display of images in FITS and Starlink \xref{NDF}{sun33}{}
@@ -383,7 +383,7 @@ GAIA provides the following normal ``image display tool'' features:
   circles, polygons, lines with arrowheads, ellipses \ldots).
 
 \item Printing of the displayed image and annotations (annotations
-  are drawn using printer resolution, {\em i.e.} not a screen dump)
+  are drawn using printer resolution, \textit{i.e.} not a screen dump)
   to a postscript file.
 
 \item Real time pixel value table. A table displaying the data
@@ -392,7 +392,7 @@ GAIA provides the following normal ``image display tool'' features:
 
 \end{itemize}
 
-\subsection{\xlabel{image_analysis_capabilities}Image Analysis Capabilities}
+\subsection{\xlabel{image_analysis_capabilities}Image analysis capabilities}
 GAIA provides the following features, which are specifically aimed at
 astronomical work with images:
 \begin{itemize}
@@ -450,7 +450,7 @@ astronomical work with images:
 
 \item Celestial coordinates readout. If your data have suitable
   astrometric calibration data available (in recognised headers
-  {\em i.e.} FITS/IRAF or NDF WCS) then a continuous readout of the
+  \textit{i.e.} FITS/IRAF or NDF WCS) then a continuous readout of the
   current RA and Dec is provided.
 
 \item Astrometric calibration. You can either fit a new
@@ -486,7 +486,7 @@ astronomical work with images:
   based on a 2D gaussian fit.
 \end{itemize}
 
-\subsection{\xlabel{online_catalogue_capabilities}On-line Catalogue Capabilities}
+\subsection{\xlabel{online_catalogue_capabilities}On-line catalogue capabilities}
 Using the facilities provided by
 \htmladdnormallink{SkyCat}{http://archive.eso.org/skycat}, GAIA is
 also capable of using some of the increasingly large amounts of
@@ -548,7 +548,7 @@ OBJ2 <TAB>   210.01 <TAB>   54.01 <TAB>  15.1
 ....
 \end{verbatim}
 \end{quote}
-The usual format of a catalogue is as above, {\em i.e.} an object identifier
+The usual format of a catalogue is as above, \textit{i.e.} an object identifier
 followed by an RA and DEC (in J2000 decimal degrees). Note the
 \mytt{<TAB>} strings shouldn't be typed in, they are shown explicitly
 just to make clear where they should be placed. The TST format is also
@@ -557,7 +557,7 @@ contains a description of this format.
 
 Additional formats that can be also read and written by GAIA (with a
 performance penalty) are those supported by the \xref{CURSA}{sun190}{}
-package ({\em i.e.} FITS-tables and STL format) and the
+package (\textit{i.e.} FITS-tables and STL format) and the
 ``ASCII\_HEAD'' format of the SExtractor/EXTRACTOR package
 (\xref{SUN/226}{sun226}{}).
 
@@ -618,7 +618,7 @@ symbols you should consult the ESO document
 {http://star-www.dur.ac.uk/\~{}pdraper/gaia/docs/cat.ps.gz}
 
 \mybold{FITS tables:} much of the above also applies to FITS tables
-that GAIA will read, {\em i.e.} FITS keywords with the names
+that GAIA will read, \textit{i.e.} FITS keywords with the names
 \mytt{X\_COL}, \mytt{Y\_COL} and \mytt{SYMBOL} will be interpreted
 correctly. Special parameter names that are longer than 8 characters
 (such as \mytt{search\_cols}, \mytt{sort\_order}, \mytt{show\_cols}
@@ -626,7 +626,7 @@ and \mytt{copyright}) should be truncated. Long symbol expressions can
 span more than one card by using the names: \mytt{SYMBOL1} through
 \mytt{SYMBOL9}.
 
-\subsection{\xlabel{image_formats}Image formats}
+\subsection{\xlabel{image_formats}Accessing images of differing formats}
 
 GAIA can display and perform analyses on many different data
 formats. It does this by using the ``on-the-fly'' conversion
@@ -635,7 +635,7 @@ conversion uses external programs that can convert your data from its
 current format into an NDF and then back again (if necessary).
 
 The CONVERT \xref{(SUN/55)}{sun55}{} package provides many formats
-that are useful for astronomers (e.g. FITS, IRAF and old FIGARO
+that are useful for astronomers (\textit{e.g.} FITS, IRAF and old FIGARO
 formats) and is automatically used by GAIA (unless you have set up
 your own conversion facilities, see \xref{SSN/20}{ssn20}{} if you
 think you need to do this). All the formats recognised at any time by
@@ -643,11 +643,50 @@ GAIA are shown in a menu in the file chooser, so check this to see
 if your format is available.
 
 FITS files are a special case in that GAIA will read these natively
-(which gains increased efficiency), however, any analysis routines
-(such as those used in the photometry toolbox) will still need to be
-able to convert these files into NDFs, using the on-the-fly
+(which gains increased efficiency), however, any external analysis
+routines (such as those used in the photometry toolbox) will still
+need to be able to convert these files into NDFs, using the on-the-fly
 facility, so if you define your own conversion facilities make sure
 that you include a FITS converter.
+
+To display any of these images in GAIA just type the full disk-file
+name on the command-line (either when you start GAIA or by using the
+\mytt{gaiadisp} command), or similarly select the disk-file in the
+open file window. 
+
+To display a FITS file extension image, either open the disk file and
+choose the extension from the \mytt{HDU} selector window that appears,
+or add the extension number to the disk-file name:
+\begin{quote}
+\begin{verbatim}
+# gaia mef_file.fits'[2]'
+\end{verbatim}
+\end{quote}
+The FITS primary array is number $1$.
+
+A similar mechanism exists for NDFs stored in container files at other
+than the top-level:
+\begin{quote}
+\begin{verbatim}
+# gaia hdscontainer.ndf_1
+\end{verbatim}
+\end{quote}
+In this case any other NDFs stored at the same level in the container
+file will also be shown in a selector window. NDF slices can also be
+used:
+\begin{quote}
+\begin{verbatim}
+# gaia hdscontainer.ndf_1'(200:500,100:700)'
+\end{verbatim}
+\end{quote}
+This can also be applied to FITS files and other foreign formats, but
+note that this means that FITS files will now be accessed as foreign, 
+\textit{i.e.} the FITS files will really be NDFs:
+\begin{quote}
+\begin{verbatim}
+# gaia file.fits'(300:700,300:700)'
+\end{verbatim}
+\end{quote}
 
 \section{\xlabel{configuration_options}\label{configuration_options}Configuration options}
 
@@ -840,7 +879,7 @@ This is a minor release of GAIA that includes a new toolbox and some
 minor improvements/fixes.
 
 The new toolbox provides an interactive environment for doing the
-surface photometry of extended sources ({\em i.e.} galaxies) and inspecting
+surface photometry of extended sources (\textit{i.e.} galaxies) and inspecting
 the results. It is based on the ESP (\xref{SUN/180}{sun180}{}) package
 commands ELLPRO and ELLFOU.
 
