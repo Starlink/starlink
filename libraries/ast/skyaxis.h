@@ -69,6 +69,8 @@
 *     Protected:
 *        astAxisAbbrev
 *           Abbreviate a formatted SkyAxis value by skipping leading fields.
+*        astAxisDistance
+*           Find the distance between two SkyAxis values.
 *        astAxisGap
 *           Find a "nice" gap for tabulating SkyAxis values.
 *        astClearAxisFormat
@@ -87,6 +89,8 @@
 *           Set a value for the Format attribute of a SkyAxis.
 *        astTestAxisFormat
 *           Test if a value has been set for the Format attribute of a SkyAxis.
+*        astAxisOffset
+*           Add an increment onto a supplied SkyAxis value.
 *        astAxisOverlay
 *           Overlay the attributes of a template SkyAxis on to another Axis.
 *        astSetAttrib

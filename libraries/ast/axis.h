@@ -95,8 +95,12 @@
 *     Protected:
 *        astAxisAbbrev
 *           Abbreviate a formatted Axis value by skipping leading fields.
+*        astAxisDistance
+*           Find the distance between two axis values.
 *        astAxisGap
 *           Find a "nice" gap for tabulating Axis values.
+*        astAxisOffset
+*           Add an increment onto a supplied axis value.
 *        astAxisOverlay
 *           Overlay the attributes of a template Axis on to another Axis.
 *        astClearAxisDigits
@@ -207,6 +211,8 @@
 *        Added astAxisGap (written by DSB).
 *     25-FEB-1998 (RFWS):
 *        Added astAxisUnformat.
+*     29-AUG-2001 (DSB):
+*        Added AxisDistance and AxisOffset.
 *-
 */
 
@@ -260,6 +266,8 @@ typedef struct AstAxisVtab {
    const char *(* GetAxisSymbol)( AstAxis * );
    const char *(* GetAxisUnit)( AstAxis * );
    double (* AxisGap)( AstAxis *, double, int * );
+   double (* AxisDistance)( AstAxis *, double, double );
+   double (* AxisOffset)( AstAxis *, double, double );
    int (* AxisUnformat)( AstAxis *, const char *, double * );
    int (* GetAxisDigits)( AstAxis * );
    int (* GetAxisDirection)( AstAxis * );
@@ -323,6 +331,8 @@ const char *astGetAxisLabel_( AstAxis * );
 const char *astGetAxisSymbol_( AstAxis * );
 const char *astGetAxisUnit_( AstAxis * );
 double astAxisGap_( AstAxis *, double, int * );
+double astAxisDistance_( AstAxis *, double, double );
+double astAxisOffset_( AstAxis *, double, double );
 int astGetAxisDigits_( AstAxis * );
 int astGetAxisDirection_( AstAxis * );
 int astTestAxisDigits_( AstAxis * );
@@ -400,6 +410,10 @@ astINVOKE(V,astAxisUnformat_(astCheckAxis(this),string,value))
 astINVOKE(V,astAxisAbbrev_(astCheckAxis(this),str1,str2))
 #define astAxisGap(this,gap,ntick) \
 astINVOKE(V,astAxisGap_(astCheckAxis(this),gap,ntick))
+#define astAxisDistance(this,v1,v2) \
+astINVOKE(V,astAxisDistance_(astCheckAxis(this),v1,v2))
+#define astAxisOffset(this,v1,dist) \
+astINVOKE(V,astAxisOffset_(astCheckAxis(this),v1,dist))
 #define astAxisOverlay(template,result) \
 astINVOKE(V,astAxisOverlay_(astCheckAxis(template),astCheckAxis(result)))
 #define astClearAxisDigits(this) \

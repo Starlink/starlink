@@ -55,6 +55,9 @@ f     only within textual output (e.g. from AST_WRITE).
 *     10-AUG-2000 (DSB):
 *        Fixed bug in DHmsFormat which could cause (for instance) a formatted 
 *        galactic longitude value of zero to be formated as "-0.-0".
+*     29-AUG-2001 (DSB):
+*        Added AxisDistance and AxisOffset.
+
 *class--
 */
 
@@ -126,6 +129,8 @@ static const char *GetAxisUnit( AstAxis * );
 static const char *DHmsFormat( const char *, double );
 static const char *DHmsUnit( const char *, int );
 static double AxisGap( AstAxis *, double, int * );
+static double AxisDistance( AstAxis *, double, double );
+static double AxisOffset( AstAxis *, double, double );
 static double DHmsGap( const char *, double, int * );
 static int AxisUnformat( AstAxis *, const char *, double * );
 static int GetAxisAsTime( AstSkyAxis * );
@@ -258,6 +263,71 @@ static const char *AxisAbbrev( AstAxis *this_axis,
 /* Quit looping once the end if either string is reached. */
       if ( !str1[ i ] || !str2[ i ] ) break;
    }
+
+/* Return the result. */
+   return result;
+}
+
+static double AxisDistance( AstAxis *this_axis, double v1, double v2 ) {
+/*
+*  Name:
+*     astAxisDistance
+
+*  Purpose:
+*     Find the distance between two axis values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyaxis.h"
+*     AxisDistance( AstAxis *this, double v1, double v2 )
+
+*  Class Membership:
+*     SkyAxis member function (over-rides the protected astAxisDistance
+*     method inherited from the Axis class).
+
+*  Description:
+*     This function returns a signed value representing the axis increment 
+*     from axis value v1 to axis value v2.
+*
+*     For a SkyAxis, the angular difference between the two supplied axis 
+*     values is normalized into the range +PI to -PI.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyAxis.
+*     v1
+*        The first axis value
+*     v2
+*        The second axis value
+
+*  Returned Value:
+*     The axis increment from v1 to v2.
+
+*  Notes:
+*     - A value of AST__BAD is returned if either axis value is AST__BAD.
+*     - A value of AST__BAD will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstSkyAxis *this;             /* Pointer to the SkyAxis structure */
+   double result;                /* Returned gap size */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Check both axis values are OK, and form the returned increment,
+   normalizing it into the range +PI to -PI. */
+   if( v1 != AST__BAD && v2 != AST__BAD ) result = slaDrange( v2 - v1 );
+
+/* Return the result. */
+   return result;
 
 /* Return the result. */
    return result;
@@ -468,6 +538,70 @@ static void AxisNorm( AstAxis *this_axis, double *value ) {
       if ( astOK ) *value = is_latitude ? slaDrange( *value ) :
                                           slaDranrm( *value );
    }
+}
+
+static double AxisOffset( AstAxis *this_axis, double v1, double dist ) {
+/*
+*
+*  Name:
+*     astAxisOffset
+
+*  Purpose:
+*     Add an increment onto a supplied axis value.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyaxis.h"
+*     AxisOffset( AstSkyAxis *this, double v1, double dist ) 
+
+*  Class Membership:
+*     SkyAxis member function (over-rides the protected astAxisOffset
+*     method inherited from the Axis class).
+
+*  Description:
+*     This function returns an axis value formed by adding a signed axis
+*     increment onto a supplied axis value.
+*
+*     For a SkyFrame, the result is normalized into the correct angular 
+*     range (+PI to -PI for latitude axes, and 0 to 2*PI for longitude axes).
+
+*  Parameters:
+*     this
+*        Pointer to the SkyAxis.
+*     v1
+*        The supplied axis value
+*     dist
+*        The axis increment
+
+*  Returned Value:
+*     The axis value which is the specified increment away from v1.
+
+*  Notes:
+*     - A value of AST__BAD is returned if either axis value is AST__BAD.
+*     - A value of AST__BAD will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   double result;                /* Returned gap size */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Check both axis values are OK, and form the returned axis value. */
+   if( v1 != AST__BAD && dist != AST__BAD ) {
+      result = v1 + dist;
+      AxisNorm( this_axis, &result );
+   }
+
+/* Return the result. */
+   return result;
 }
 
 static void AxisOverlay( AstAxis *template_axis, AstAxis *result ) {
@@ -2141,6 +2275,8 @@ static void InitVtab( AstSkyAxisVtab *vtab ) {
    axis->AxisAbbrev = AxisAbbrev;
    axis->AxisFormat = AxisFormat;
    axis->AxisGap = AxisGap;
+   axis->AxisDistance = AxisDistance;
+   axis->AxisOffset = AxisOffset;
    axis->AxisNorm = AxisNorm;
    axis->AxisUnformat = AxisUnformat;
    axis->ClearAxisFormat = ClearAxisFormat;

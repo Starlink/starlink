@@ -56,6 +56,8 @@ f     In addition to those routines applicable to all Mappings, the
 f     following routines may also be applied to all Frames:
 *
 c     - astAngle: Calculate the angle subtended by two points at a third point
+c     - astAxDistance: Calculate the distance between two axis values
+c     - astAxOffset: Calculate an offset along an axis
 c     - astConvert: Determine how to convert between two coordinate systems
 c     - astDistance: Calculate the distance between two points in a Frame
 c     - astFindFrame: Find a coordinate system with specified characteristics
@@ -67,6 +69,8 @@ c     - astPermAxes: Permute the order of a Frame's axes
 c     - astPickAxes: Create a new Frame by picking axes from an existing one
 c     - astUnformat: Read a formatted coordinate value for a Frame axis
 f     - AST_ANGLE: Calculate the angle subtended by two points at a third point
+f     - AST_AXDISTANCE: Calculate the distance between two axis values
+f     - AST_AXOFFSET: Calculate an offset along an axis
 f     - AST_CONVERT: Determine how to convert between two coordinate systems
 f     - AST_DISTANCE: Calculate the distance between two points in a Frame
 f     - AST_FINDFRAME: Find a coordinate system with specified characteristics
@@ -627,6 +631,8 @@ static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void InitVtab( AstFrameVtab * );
 static void Norm( AstFrame *, double[] );
+static double AxDistance( AstFrame *, int, double, double );
+static double AxOffset( AstFrame *, int, double, double );
 static void Offset( AstFrame *, const double[], const double[], double, double[] );
 static double Offset2( AstFrame *, const double[2], double, double, double[2] );
 static void Overlay( AstFrame *, const int *, AstFrame * );
@@ -966,6 +972,172 @@ f     invoked with STATUS set to an error value, or if it should fail for
 
 /* Return the result. */
    return result;
+}
+
+static double AxDistance( AstFrame *this, int axis, double v1, double v2 ) {
+/*
+*++
+*  Name:
+c     astAxDistance
+f     AST_AXDISTANCE
+
+*  Purpose:
+*     Find the distance between two axis values.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "frame.h"
+c     double astAxDistance( AstFrame *this, int axis, double v1, double v2 ) 
+f     RESULT = AST_AXDISTANCE( THIS, AXIS, V1, V2, STATUS )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+c     This function returns a signed value representing the axis increment 
+f     This routine returns a signed value representing the axis increment 
+*     from axis value v1 to axis value v2.
+*
+*     For a simple Frame, this is a trivial operation returning the
+*     difference between the two axis values. But for other derived classes 
+*     of Frame (such as a SkyFrame) this is not the case.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Frame.
+c     v1
+f     V1 = DOUBLE PRECISION (Given)
+*        The first axis value.
+c     v2
+f     V2 = DOUBLE PRECISION (Given)
+*        The second axis value.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astAxDistance
+f     AST_AXDISTANCE = DOUBLE PRECISION
+*        The distance between the two axis values.
+
+*  Notes:
+*     - This function will return a "bad" result value (AST__BAD) if
+*     any of the input vaues has this value.
+*     - A "bad" value will also be returned if this function is
+c     invoked with the AST error status set, or if it should fail for
+f     invoked with STATUS set to an error value, or if it should fail for
+*     any reason.
+*--
+*/
+
+/* Local Variables: */
+   AstAxis *ax;                  /* Pointer to Axis object */
+   double result;                /* The returned answer */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Validate the axis index and obtain a pointer to the required Axis. */
+   (void) astValidateAxis( this, axis - 1, "astAxDistance" );
+   ax = astGetAxis( this, axis - 1 );
+
+/* Use the AxisDistance method associated with the Axis. */
+   if( astOK ) result = astAxisDistance( ax, v1, v2 );
+
+/* Annul the Axis pointer. */
+   ax = astAnnul( ax );
+
+/* Return the result. */
+   return result;
+
+}
+
+static double AxOffset( AstFrame *this, int axis, double v1, double dist ) {
+/*
+*++
+*  Name:
+c     astAxOffset
+f     AST_AXOFFSET
+
+*  Purpose:
+*     Add an increment onto a supplied axis value.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "frame.h"
+c     double astAxOffset( AstFrame *this, int axis, double v1, double dist ) 
+f     RESULT = AST_AXOFFSET( THIS, AXIS, V1, DIST, STATUS )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+c     This function returns an axis value formed by adding a signed axis
+f     This routine returns an axis value formed by adding a signed axis
+*     increment onto a supplied axis value.
+*
+*     For a simple Frame, this is a trivial operation returning the
+*     sum of the two supplied values. But for other derived classes 
+*     of Frame (such as a SkyFrame) this is not the case.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Frame.
+c     v1
+f     V1 = DOUBLE PRECISION (Given)
+*        The original axis value.
+c     dist
+f     DIST = DOUBLE PRECISION (Given)
+*        The axis increment to add to the original axis value.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astAxOffset
+f     AST_AXOFFSET = DOUBLE PRECISION
+*        The incremented axis value.
+
+*  Notes:
+*     - This function will return a "bad" result value (AST__BAD) if
+*     any of the input vaues has this value.
+*     - A "bad" value will also be returned if this function is
+c     invoked with the AST error status set, or if it should fail for
+f     invoked with STATUS set to an error value, or if it should fail for
+*     any reason.
+*--
+*/
+
+/* Local Variables: */
+   AstAxis *ax;                  /* Pointer to Axis object */
+   double result;                /* The returned answer */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Validate the axis index and obtain a pointer to the required Axis. */
+   (void) astValidateAxis( this, axis - 1, "astAxOffset" );
+   ax = astGetAxis( this, axis - 1 );
+
+/* Use the AxisOffset method associated with the Axis. */
+   if( astOK ) result = astAxisOffset( ax, v1, dist );
+
+/* Annul the Axis pointer. */
+   ax = astAnnul( ax );
+
+/* Return the result. */
+   return result;
+
 }
 
 static void CheckPerm( AstFrame *this, const int *perm, const char *method ) {
@@ -3463,6 +3635,8 @@ static void InitVtab( AstFrameVtab *vtab ) {
    vtab->GetUnit = GetUnit;
    vtab->Match = Match;
    vtab->Norm = Norm;
+   vtab->AxDistance = AxDistance;
+   vtab->AxOffset = AxOffset;
    vtab->Offset = Offset;
    vtab->Offset2 = Offset2;
    vtab->Overlay = Overlay;
@@ -7700,6 +7874,14 @@ int astMatch_( AstFrame *this, AstFrame *target,
 void astNorm_( AstFrame *this, double value[] ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Frame,Norm))( this, value );
+}
+double astAxDistance_( AstFrame *this, int axis, double v1, double v2 ) {
+   if ( !astOK ) return AST__BAD;
+   (**astMEMBER(this,Frame,AxDistance))( this, axis, v1, v2 );
+}
+double astAxOffset_( AstFrame *this, int axis, double v1, double dist ) {
+   if ( !astOK ) return AST__BAD;
+   (**astMEMBER(this,Frame,AxOffset))( this, axis, v1, dist );
 }
 void astOffset_( AstFrame *this, const double point1[], const double point2[],
                  double offset, double point3[] ) {

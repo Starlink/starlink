@@ -35,6 +35,8 @@ f     only within textual output (e.g. from AST_WRITE).
 *        Added astAxisGap (written by DSB).
 *     25-FEB-1998 (RFWS):
 *        Added astAxisUnformat.
+*     29-AUG-2001 (DSB):
+*        Added AxisDistance and AxisOffset.
 *class--
 */
 
@@ -106,7 +108,9 @@ static const char *GetAxisFormat( AstAxis * );
 static const char *GetAxisLabel( AstAxis * );
 static const char *GetAxisSymbol( AstAxis * );
 static const char *GetAxisUnit( AstAxis * );
+static double AxisDistance( AstAxis *, double, double );
 static double AxisGap( AstAxis *, double, int * );
+static double AxisOffset( AstAxis *, double, double );
 static int AxisUnformat( AstAxis *, const char *, double * );
 static int GetAxisDigits( AstAxis * );
 static int GetAxisDirection( AstAxis * );
@@ -211,6 +215,67 @@ static const char *AxisAbbrev( AstAxis *this,
    identical, in which case we return a pointer to the final null in
    "str2". */
    if ( !strcmp( str1, str2 ) ) result += strlen( str2 );
+
+/* Return the result. */
+   return result;
+}
+
+static double AxisDistance( AstAxis *this, double v1, double v2 ) {
+/*
+*+
+*  Name:
+*     astAxisDistance
+
+*  Purpose:
+*     Find the distance between two axis values.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     AxisDistance( AstAxis *this, double v1, double v2 )
+
+*  Class Membership:
+*     Axis method.
+
+*  Description:
+*     This function returns a signed value representing the axis increment 
+*     from axis value v1 to axis value v2.
+*
+*     For a simple Axis, this is a trivial operation. But for other
+*     derived classes of Axis (such as a SkyAxis) this is not the case.
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+*     v1
+*        The first axis value
+*     v2
+*        The second axis value
+
+*  Returned Value:
+*     The axis increment from v1 to v2.
+
+*  Notes:
+*     - A value of AST__BAD is returned if either axis value is AST__BAD.
+*     - A value of AST__BAD will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Local Variables: */
+   double result;                /* Returned gap size */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Check both axis values are OK, and form the returned increment. */
+   if( v1 != AST__BAD && v2 != AST__BAD ) result = v2 - v1;
 
 /* Return the result. */
    return result;
@@ -477,6 +542,67 @@ static void AxisNorm( AstAxis *this, double *value ) {
 /* In the Axis class there are no constraints, so simply return
    without action. */
    return;
+}
+
+static double AxisOffset( AstAxis *this, double v1, double dist ) {
+/*
+*+
+*  Name:
+*     astAxisOffset
+
+*  Purpose:
+*     Add an increment onto a supplied axis value.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     AxisOffset( AstAxis *this, double v1, double dist ) 
+
+*  Class Membership:
+*     Axis method.
+
+*  Description:
+*     This function returns an axis value formed by adding a signed axis
+*     increment onto a supplied axis value.
+*
+*     For a simple Axis, this is a trivial operation. But for other
+*     derived classes of Axis (such as a SkyAxis) this is not the case.
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+*     v1
+*        The supplied axis value
+*     dist
+*        The axis increment
+
+*  Returned Value:
+*     The axis value which is the specified increment away from v1.
+
+*  Notes:
+*     - A value of AST__BAD is returned if either axis value is AST__BAD.
+*     - A value of AST__BAD will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Local Variables: */
+   double result;                /* Returned gap size */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Check both axis values are OK, and form the returned axis value. */
+   if( v1 != AST__BAD && dist != AST__BAD ) result = v1 + dist;
+
+/* Return the result. */
+   return result;
 }
 
 static void AxisOverlay( AstAxis *template, AstAxis *result ) {
@@ -884,6 +1010,8 @@ static void InitVtab( AstAxisVtab *vtab ) {
    virtual methods for this class. */
    vtab->AxisAbbrev = AxisAbbrev;
    vtab->AxisFormat = AxisFormat;
+   vtab->AxisDistance = AxisDistance;
+   vtab->AxisOffset = AxisOffset;
    vtab->AxisGap = AxisGap;
    vtab->AxisNorm = AxisNorm;
    vtab->AxisOverlay = AxisOverlay;
@@ -1911,6 +2039,14 @@ const char *astAxisAbbrev_( AstAxis *this,
 const char *astAxisFormat_( AstAxis *this, double value ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Axis,AxisFormat))( this, value );
+}
+double astAxisDistance_( AstAxis *this, double v1, double v2 ) {
+   if ( !astOK ) return AST__BAD;
+   return (**astMEMBER(this,Axis,AxisDistance))( this, v1, v2 );
+}
+double astAxisOffset_( AstAxis *this, double v1, double dist ) {
+   if ( !astOK ) return AST__BAD;
+   return (**astMEMBER(this,Axis,AxisOffset))( this, v1, dist );
 }
 double astAxisGap_( AstAxis *this, double gap, int *ntick ) {
    if ( !astOK ) return 0.0;

@@ -213,6 +213,10 @@
 *     Public:
 *        astAngle
 *           Calculate the angle between three points.
+*        astAxDistance
+*           Calculate the distance between two axis values
+*        astAxOffset
+*           Calculate an offset along an axis
 *        astConvert
 *           Determine how to convert between two coordinate systems.
 *        astDistance
@@ -437,6 +441,8 @@
 *        Added astUnformat.
 *     21-JUN-2001 (DSB):
 *        Added astAngle and astOffset2.
+*     29-AUG-2001 (DSB):
+*        Added astAxDistance and astAxOffset.
 *-
 */
 
@@ -515,6 +521,8 @@ typedef struct AstFrameVtab {
    double (* Angle)( AstFrame *, const double[], const double[], const double[] );
    double (* Distance)( AstFrame *, const double[], const double[] );
    double (* Gap)( AstFrame *, int, double, int * );
+   double (* AxDistance)( AstFrame *, int, double, double );
+   double (* AxOffset)( AstFrame *, int, double, double );
    int (* GetDigits)( AstFrame * );
    int (* GetDirection)( AstFrame *, int );
    int (* GetMatchEnd)( AstFrame * );
@@ -626,6 +634,8 @@ AstFrameSet *astFindFrame_( AstFrame *, AstFrame *, const char * );
 double astAngle_( AstFrame *, const double[], const double[], const double[] );
 double astDistance_( AstFrame *, const double[], const double[] );
 void astNorm_( AstFrame *, double[] );
+double astAxDistance_( AstFrame *, int, double, double );
+double astAxOffset_( AstFrame *, int, double, double );
 double astOffset2_( AstFrame *, const double[2], double, double, double[2] );
 void astOffset_( AstFrame *, const double[], const double[], double, double[] );
 
@@ -761,6 +771,10 @@ astINVOKE(V,astDistance_(astCheckFrame(this),point1,point2))
 astINVOKE(O,astFindFrame_(astCheckFrame(target),astCheckFrame(template),domainlist))
 #define astNorm(this,value) \
 astINVOKE(V,astNorm_(astCheckFrame(this),value))
+#define astAxDistance(this,axis,v1,v2) \
+astINVOKE(V,astAxDistance_(astCheckFrame(this),axis,v1,v2))
+#define astAxOffset(this,axis,v1,dist) \
+astINVOKE(V,astAxOffset_(astCheckFrame(this),axis,v1,dist))
 #define astOffset(this,point1,point2,offset,point3) \
 astINVOKE(V,astOffset_(astCheckFrame(this),point1,point2,offset,point3))
 #define astOffset2(this,point1,angle,offset,point2) \

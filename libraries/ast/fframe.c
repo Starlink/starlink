@@ -15,6 +15,8 @@
 
 *  Routines Defined:
 *     AST_ANGLE
+*     AST_AXDISTANCE
+*     AST_AXOFFSET
 *     AST_CONVERT
 *     AST_DISTANCE
 *     AST_FORMAT
@@ -43,6 +45,8 @@
 *        Added AST_UNFORMAT.
 *     21-JUN-2001 (DSB):
 *        Added AST_ANGLE and AST_OFFSET2.
+*     29-AUG-2001 (DSB):
+*        Added AST_AXDISTANCE and AST_AXOFFSET.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -111,6 +115,42 @@ F77_DOUBLE_FUNCTION(ast_distance)( INTEGER(THIS),
    astAt( "AST_DISTANCE", NULL, 0 );
    astWatchSTATUS(
       RESULT = astDistance( astI2P( *THIS ), POINT1, POINT2 );
+   )
+   return RESULT;
+}
+
+F77_DOUBLE_FUNCTION(ast_axdistance)( INTEGER(THIS),
+                                     INTEGER(AXIS),
+                                     DOUBLE(V1),
+                                     DOUBLE(V2),
+                                     INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(AXIS)
+   GENPTR_DOUBLE(V1)
+   GENPTR_DOUBLE(V2)
+   F77_DOUBLE_TYPE(RESULT);
+
+   astAt( "AST_AXDISTANCE", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astAxDistance( astI2P( *THIS ), *AXIS, *V1, *V2 );
+   )
+   return RESULT;
+}
+
+F77_DOUBLE_FUNCTION(ast_axoffset)( INTEGER(THIS),
+                                   INTEGER(AXIS),
+                                   DOUBLE(V1),
+                                   DOUBLE(DIST),
+                                   INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(AXIS)
+   GENPTR_DOUBLE(V1)
+   GENPTR_DOUBLE(DIST)
+   F77_DOUBLE_TYPE(RESULT);
+
+   astAt( "AST_AXOFFSET", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astAxOffset( astI2P( *THIS ), *AXIS, *V1, *DIST );
    )
    return RESULT;
 }
