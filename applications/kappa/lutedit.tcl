@@ -1117,16 +1117,17 @@ proc cintCent {x} {
 
 #  Ensure the current pen is a legal whole number, and find the corresponding
 #  fractional entry value.
-      set CPEN [expr round($PX0+$PX1*$x)]
+      set cpen [expr $PX0+$PX1*$x]
+      set CPEN [expr round($cpen)]
       if { $CPEN < $LP } {
          set CPEN $LP
       } elseif { $CPEN > $UP } {
          set CPEN $UP
       }
-      set fe [expr $EX0+$EX1*($XP0+$XP1*$CPEN)]
 
 #  Set the current entry to the nearest entry, and limit to available
 #  entries.
+      set fe [expr $EX0+$EX1*($XP0+$XP1*$cpen)]
       set CENT [expr round( $fe )]
       if { $CENT > $NENTM1 } {
          set CENT $NENTM1
@@ -2847,7 +2848,7 @@ proc gwmMake {} {
 
 # Set the desired size of the GWM canvas item equal to slighlty less than
 # the current size of the canvas (it may have been resized).
-      update 
+      update idletasks
       set wid [expr [winfo width $CAN] - 4]
       set hgt [expr [winfo height $CAN] - 4]
 
@@ -2886,17 +2887,19 @@ proc gwmMake {} {
          set GWMNEW 1
          set mess ""
 
-#  Determine the number of colours in the display by saving the colour
-#  table into an NDF and getting its dimensions.
-         set ndf [UniqueFile]
-         Obey kapview lutsave "lut=$ndf device=$DEVICE" 1
-         Obey ndfpack ndftrace "ndf=$ndf" 
-         set dims [GetParamED ndfpack ndftrace:dims]
-         regexp {\[([-+0-9]+),([-+0-9]+)\]} $dims a xd yd
-         set NP $yd
-         set UP [expr $LP + $NP - 1]
-         set PPENT [format "%.2f" [expr double($NP)/double($NENT)]]
-         file delete -force "$ndf.sdf"
+#  On the first invocation, determine the number of colours in the display 
+#  by saving the colour table into an NDF and getting its dimensions.
+         if { $NP == "" } {
+            set ndf [UniqueFile]
+            Obey kapview lutsave "lut=$ndf device=$DEVICE" 1
+            Obey ndfpack ndftrace "ndf=$ndf" 
+            set dims [GetParamED ndfpack ndftrace:dims]
+            regexp {\[([-+0-9]+),([-+0-9]+)\]} $dims a xd yd
+            set NP $yd
+            set UP [expr $LP + $NP - 1]
+            set PPENT [format "%.2f" [expr double($NP)/double($NENT)]]
+            file delete -force "$ndf.sdf"
+         }
 
 #  Set up the coefficients of the transformations between canvas X
 #  coord in the editor canvas, pen number and table entry.
@@ -3979,8 +3982,39 @@ proc Resize {} {
 #     Resize
 #
 #  Purpose:
-#     Respond to an interactive re-size of the window by replacing the
-#     GWM canvas item with a new one with an appropriate new size.
+#     Respond to an interactive re-size of the window.
+#
+#  Arguments:
+#     None
+#
+#  Returned Value:
+#     None
+#-
+   global TKT
+
+#  We do not want to continually update the GWM items if the interface is
+#  slowly resized by the user (causing a series of continual calls to ths
+#  procedure), because each GWM update takes ages. We just want to
+#  respond to the final resize. So... Issue a ticket to the current resize, 
+#  and then tell it to wait for a second. If no other tickets have been 
+#  taken at the end of 1 second, then go ahead and resize the display 
+#  (resetting the ticket number for the next resize).
+   incr TKT
+   after 1000 "
+      if { \$TKT == $TKT } {
+          doResize
+          set TKT 0
+      }
+   "
+}
+
+proc doResize {} {
+#+
+#  Name:
+#     doResize
+#
+#  Purpose:
+#     Replace the GWM canvas item with a new one with an appropriate new size.
 #
 #  Arguments:
 #     None
@@ -3997,6 +4031,7 @@ proc Resize {} {
    global DEVICE
    global UWIN
    global INITLUT
+   global TKT
 
 #  Cancel the binding for Configure so that the configuration changes 
 #  produced by this procedure do not cause an infinite loop.
@@ -4709,7 +4744,7 @@ proc WaitFor {name args} {
    set CANHGT 250
    set LP 16
    set UP [expr $GWM_NCOL - 1 ]
-   set NP [expr $UP - $LP + 1 ]
+   set NP ""
 
 #  Initialise LutEdit global variables.
    set ACTION ""
@@ -4749,8 +4784,8 @@ proc WaitFor {name args} {
    set MARKID ""
    set MENT ""
    set NEGIMAGE 0
-   set NENT $NP
-   set NENTM1 [expr $NP-1]
+   set NENT [expr $UP-$LP+1]
+   set NENTM1 [expr $NENT-1]
    set NN "NO"
    set NOLD 0
    set PPENT 1
@@ -4765,6 +4800,7 @@ proc WaitFor {name args} {
    set TOP ""
    set ZOOMX 1
    set ZOOMY 1
+   set TKT 0
 
 #   set LOGFILE_ID stdio
 
@@ -4927,6 +4963,7 @@ proc WaitFor {name args} {
 #  create a toplevel to contain the user interface, with the same private 
 #  colour map as the first frame.
          frame .hold -colormap new
+         wm withdraw .
          set UWIN [toplevel .lutedit -colormap .hold]
          centreWin $UWIN
 
@@ -5175,10 +5212,10 @@ proc WaitFor {name args} {
 
    grid columnconfigure $cframe 0 -weight 1
    grid columnconfigure $cframe 1 -weight 0
-   grid rowconfigure $cframe 0 -weight 0
-   grid rowconfigure $cframe 0 -weight 0
+   grid rowconfigure $cframe 0 -weight 1
+   grid rowconfigure $cframe 1 -weight 0
 
-   pack $cframe -side left -fill x -expand 1 -pady 1m
+   pack $cframe -side left -fill both -expand 1 -pady 1m
 
    set rhs [frame $F4.rhs]
 
