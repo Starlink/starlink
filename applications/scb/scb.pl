@@ -71,7 +71,8 @@
 #           "file" queries the $file_index StarIndex object for a key of
 #              $name or possibly $name capitalised.
 #           "func" queries the $func_index StarIndex object for a key of
-#              $name or possibly $name followed by an underscore.
+#              $name or possibly $name followed by an underscore or 
+#              $name in lower case.
 #           NULL   combines the functions of "file" and "func".
 #           "regex" performs a Perl regular expression search on the keys
 #              of both StarIndex objects
@@ -210,8 +211,8 @@ if ($name && $type ne 'regex') {
 #  (if the name contains a '.' try file first, else try func first).
 #  For each type of match, try it exact first, but (unless the -exact flag
 #  has been given) look for variants if that fails - specifically, 
-#  try appending an underscore to function names, and try lowercasing 
-#  something which looks like a Fortran include.
+#  try appending or lowercasing an underscore to function names, and try 
+#  lowercasing something which looks like a Fortran include.
 #  By using the '||=' operator, once get_module has completed successfully,
 #  no further calls are attempted.  If all attempts fail, exit with an
 #  error.
@@ -224,8 +225,13 @@ if ($name && $type ne 'regex') {
    foreach $t (@types) {
       my @names = ($name);
       unless ($exact) {
-         push @names, lc ($name) if ($t eq 'file' && $name =~ /^[A-Z0-9_]*$/);
-         push @names, $name . "_" if ($t eq 'func' && $name !~ /_$/);
+         if ($t eq 'file') {
+            push @names, lc ($name) if ($name =~ /^[A-Z0-9_]*$/);
+         } 
+         elsif ($t eq 'func') {
+            push @names, $name . "_" if ($name !~ /_$/);
+            push @names, lc ($name) if ($name =~ /^[A-Z0-9_]*[A-Z0-9]$/);
+         }
       }
       foreach $n (@names) {
          $success ||= get_module ($t, $n, $package);
@@ -842,7 +848,7 @@ sub search_keys {
             print "\n<h3>$indtext:</h3>\n";
          }
          else {
-            print "$indtext:\n";
+            print "\n$indtext:\n";
          }
          foreach $pack (sort keys %{$match{$index}}) {
             print "<h4>$pack</h4>\n" if ($html && !$package);
@@ -1283,7 +1289,7 @@ sub output {
 #                       Include file: generate a type=file reference.
 
                         my $file = $1;
-                        if ($file =~ /^[A-Z0-9_]*$/ && 
+                        if ($file =~ /^[A-Z0-9_.-]*$/ && 
                            !$file_index->get($file)) {
                            $file =~ tr/A-Z/a-z/;
                         }
