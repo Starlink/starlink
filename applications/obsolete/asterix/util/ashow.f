@@ -275,6 +275,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
+      INCLUDE 'MATH_PAR'
 
 *  Arguments Given:
       INTEGER			IFID			! Input dataset id
@@ -348,7 +349,7 @@
         IF ( SYS(1:2) .EQ. 'FK' ) THEN
           CALL STR_DRADTOC( PNT(1)*MATH__DDTOR, 'HHh MMm SS.SSs', RAS,
      :                      STATUS )
-          CALL STR_DRADTOC( PNT(2)*MATH__DDTOR, 'SDDd MMm SS.Ss', DECS,
+          CALL STR_DRADTOC( PNT(2)*MATH__DDTOR, 'SDDd MMm SS.Ss',DECS,
      :                      STATUS )
           CALL MSG_SETC( 'A', RAS )
           CALL MSG_SETC( 'B', DECS )
@@ -365,8 +366,8 @@
           IF ( SYS(1:2) .EQ. 'FK' ) THEN
             CALL STR_DRADTOC( PNT(1)*MATH__DDTOR, 'HHh MMm SS.SSs', RAS,
      :                      STATUS )
-            CALL STR_DRADTOC( PNT(2)*MATH__DDTOR, 'SDDd MMm SS.Ss', DECS,
-     :                      STATUS )
+            CALL STR_DRADTOC( PNT(2)*MATH__DDTOR, 'SDDd MMm SS.Ss',
+     :                      DECS, STATUS )
             CALL MSG_SETC( 'A', RAS )
             CALL MSG_SETC( 'B', DECS )
           ELSE
