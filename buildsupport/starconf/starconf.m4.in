@@ -482,24 +482,32 @@ AC_DEFUN([STAR_FC_LIBRARY_LDFLAGS],
 
 # STAR_PATH_TCLTK([minversion=0], [options=''])
 # ---------------------------------------------
+#
 # Finds a tclsh and wish, and the associated libraries.  Sets output
 # variable TCL_CFLAGS to the C compiler flags necessary to compile
-# with Tcl, and TCL_LIBS to the required library flags.  Define
-# the cpp variable TCL_MISSING to 1 if Tcl is not available.  Similar
-# to macro AC_PATH_XTRA.
+# with Tcl, TCL_LIBS to the required library flags, and TCLSH to the
+# full path of the tclsh executable; if Tk is requested, it similarly
+# sets TK_CFLAGS, TK_LIBS and WISH.  Define the cpp variable
+# TCL_MISSING to 1 if Tcl is not available.  Similar to macro
+# AC_PATH_XTRA.
 #
 # If argument MINVERSION is present, it specifies the minimum Tcl/Tk
-# version number required.  The macro searches first in the path, and
+# version number required.
+#
+# The macro searches first in the path, and
 # then in a selection of platform-specific standard locations.  The
 # configure option --with-tcl allows you to provide a path to a tclsh
 # binary, which is put at the head of the list of locations to search.
+# Option --without-tcl suppresses the search, and results in no
+# variables being substituted.
 #
 # If the argument OPTIONS is present, it is a space-separated list of
 # the words 'tk' or 'itcl'.  If one or both of these is present, then
 # the macro will find a Tcl location which also has Tk or itcl
 # installed (note that the itcl test doesn't do anything at present).
 AC_DEFUN([STAR_PATH_TCLTK],
-    [AC_ARG_WITH([tcl],
+    [_star_use_tcl=:
+     AC_ARG_WITH([tcl],
                  AS_HELP_STRING([--with-tcl],
                                 [give path to tclsh (dir which contains binary)]),
                  [if test "X$withval" = Xno; then
@@ -511,23 +519,25 @@ AC_DEFUN([STAR_PATH_TCLTK],
                       _star_try_tcldir=$withval
                   fi])
      if $_star_use_tcl; then
-         AC_CACHE_CHECK(
-             [where to find Tcl/Tk[]m4_ifval([$1], [ $1+])],
-             [star_cv_settcldir],
+         _star_searchfor=Tcl
+         if expr "x m4_ifval([$2], [$2], []) " : 'x.* tk ' >/dev/null; then
+             search_tk=:
+             _star_searchfor="$_star_searchfor/Tk"
+         else
+             search_tk=false
+         fi
+         if expr "x m4_ifval([$2], [$2], []) " : 'x.* itcl ' >/dev/null; then
+             search_itcl=:
+             _star_searchfor="$_star_searchfor/itcl"
+             echo "Searching for itcl does nothing so far!"
+         else
+             search_itcl=false
+         fi
+         AC_MSG_CHECKING([where to find $_star_searchfor m4_ifval([$1], [$1+], [(any version)])])
+         AC_CACHE_VAL([star_cv_settcldir],
              [star_cv_settcldir=unknown
               reqversint=`echo m4_ifval([$1], [$1], 0.0)-0-0 | [sed 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\).*/10000 \1* 100 \2*+ \3+p/']|dc`
               tclsources=`echo $PATH | sed "s/$PATH_SEPARATOR/ /g"`
-              if expr "x m4_ifval([$2], [$2], []) " : 'x.* tk ' >/dev/null; then
-                  search_tk=:
-              else
-                  search_tk=false
-              fi
-              if expr "x m4_ifval([$2], [$2], []) " : 'x.* itcl ' >/dev/null; then
-                  search_itcl=:
-              else
-                  search_itcl=false
-              fi
-              echo "tk=$search_tk  itcl=$search_itcl"
               stdsources='
 dnl  Search in /usr and /usr/local at least
 /usr/bin
@@ -538,112 +548,131 @@ dnl  and Fink on OSX
 /sw/bin'
               for d in $_star_try_tcldir $STARCONF_DEFAULT_STARLINK/bin $tclsources $stdsources
               do
-                  echo "Trying in $d..."
                   locok=:
-                  test -x $d/tclsh -a -r $d/../include/tcl.h || locok=false
-                  if $search_tk; then
-                      test -x $d/wish -a -r $d/../include/tk.h || locok=false
+                  if test -d $d; then
+                      tcldir=`cd $d/..; pwd`
+                      test -f $d/tclsh -a -f $tcldir/include/tcl.h || locok=false
+                  else
+                      locok=false
                   fi
-                  if $search_itcl; then
-                      test -x $d/../lib/libitcl.aXXX || locok=false
+                  if $locok && $search_tk; then
+                      test -f $d/wish -a -f $tcldir/include/tk.h || locok=false
+                  fi
+                  if $locok && $search_itcl; then
+                      test -f $tcldir/lib/libitcl.aXXX || locok=false
                   fi
                   if $locok; then
-                       if test ! -r $d/../lib/tclConfig.sh; then
-                           echo "$d/../lib/tclConfig.sh unexpectedly missing"
+                       if test ! -f $tcldir/lib/tclConfig.sh; then
+                           echo "$tcldir/lib/tclConfig.sh unexpectedly missing"
                            break
                        fi
-                       if $search_tk && test ! -r $d/../lib/tkConfig.sh; then
-                           echo "$d/../lib/tkConfig.sh unexpectedly missing"
+                       if $search_tk && test ! -f $tcldir/lib/tkConfig.sh; then
+                           echo "$tcldir/lib/tkConfig.sh unexpectedly missing"
                            break
                        fi
-                       rm -f conftest.sh
-                       exec 8>conftest.sh
-                       echo tcldir=`cd $d/..; pwd`   >&8
-                       echo search_tk=$search_tk     >&8
-                       echo search_itcl=$search_itcl >&8
-                       echo reqversint=$reqversint   >&8
-                       cat <<\_STAREOF >&8
-. $tcldir/lib/tclConfig.sh
-if $search_tk; then
-    . $tcldir/lib/tkConfig.sh
-fi
-tclversint=`[echo $TCL_VERSION$TCL_PATCH_LEVEL-0-0 | sed 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\).*/10000 \1* 100 \2*+ \3+p/'|dc]`
-if test $tclversint -gt $reqversint; then
-    # New enough version.
-
-    # Dereference the tclsh and wish links -- the "->" _is_ standard,
-    # mandated by POSIX.
-    lslink=`ls -l $tcldir/bin/tclsh`
-    tclsh_loc=`expr "x$lslink" : "x.*-> *\(.*\)"`
-    if test -n "$tclsh_loc" -a -x "$tclsh_loc"; then
-        : OK
-    elif test -x "$tcldir/bin/tclsh"; then
-        # Odd: either .../bin/tclsh isn't a link, or it doesn't point to an
-        # executable.  But .../bin/tclsh is OK, so use that.
-        tclsh_loc="$tcldir/bin/tclsh"
-    else
-        # This really shouldn't happen, since we checked above that
-        # $d/tclsh was executable.  Still, it clearly has happened,
-        # so don't go mad.
-        echo "Warning: found Tcl libraries, but not tclsh!" >&2
-        tclsh_loc=
-    fi
-
-    temp_include="$TCL_INCLUDE_SPEC"
-    temp_libs="$TCL_LIB_SPEC"
-
+                       rm -f conftest.results
+                       (
+    . $tcldir/lib/tclConfig.sh
     if $search_tk; then
-        # Same for wish
-        lslink=`ls -l $tcldir/bin/wish`
-        wish_loc=`expr "x$lslink" : "x.*-> *\(.*\)"`
-        if test -n "$wish_loc" -a -x "$wish_loc"; then
-            : OK
-        elif test -x "$tcldir/bin/wish"; then
-            wish_loc="$tcldir/bin/wish"
+        . $tcldir/lib/tkConfig.sh
+    fi
+    tclversint=`[echo $TCL_VERSION$TCL_PATCH_LEVEL-0-0 | sed 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\).*/10000 \1* 100 \2*+ \3+p/'|dc]`
+    if test $tclversint -gt $reqversint; then
+        # New enough version.
+
+        # Dereference the tclsh and wish links -- the "->" _is_ standard,
+        # mandated by POSIX.
+        lslink=`ls -l $tcldir/bin/tclsh`
+        tclsh_loc=`expr "x$lslink" : "x.*-> *\(.*\)"`
+        if test -n "$tclsh_loc" -a -x "$tclsh_loc"; then
+           : OK
+        elif test -x "$tcldir/bin/tclsh"; then
+            # Odd: either .../bin/tclsh isn't a link, or it doesn't point to an
+            # executable.  But .../bin/tclsh is OK, so use that.
+            tclsh_loc="$tcldir/bin/tclsh"
         else
-            echo "Warning: found Tk libraries, but not wish!" >&2
-            wish_loc=
+            # This really shouldn't happen, since we checked above that
+            # $d/tclsh was executable.  Still, it clearly has happened,
+            # so don't go mad.
+            echo "Warning: found Tcl libraries, but not tclsh!" >&2
+            tclsh_loc=
         fi
-        temp_libs="$temp_libs $TK_LIB_SPEC $TK_XLIBSW"
+
+        res="_star_tcldir=$tcldir;"
+
+        # These envs include $TCL_DBGX -- expand this out.
+        eval "I=\"$TCL_INCLUDE_SPEC\"; L=\"$TCL_LIB_SPEC\""
+        res="$res TCL_CFLAGS=\"$I\"; TCL_LIBS=\"$L\"; TCLSH=\"$tclsh_loc\";"
+
+        if $search_tk; then
+            # Same for wish
+            lslink=`ls -l $tcldir/bin/wish`
+            wish_loc=`expr "x$lslink" : "x.*-> *\(.*\)"`
+            if test -n "$wish_loc" -a -x "$wish_loc"; then
+                : OK
+            elif test -x "$tcldir/bin/wish"; then
+                wish_loc="$tcldir/bin/wish"
+            else
+                echo "Warning: found Tk libraries, but not wish!" >&2
+                wish_loc=
+            fi
+            # These envs potentially include $TK_DBGX -- expand this out.
+            eval "I=\"$TK_XINCLUDES\"; L=\"$TK_LIB_SPEC\""
+            res="$res TK_CFLAGS=\"$I\"; TK_LIBS=\"$L\"; WISH=\"$wish_loc\";"
+        fi
+
+        # similarly for $search_itcl
+
+        echo $res >conftest.results
+        status=0
+    else
+        msg="$tcldir: found Tcl-$TCL_VERSION$TCL_PATCH_LEVEL"
+        if $search_tk; then
+            msg="$msg, Tk-$TK_VERSION$TK_PATCH_LEVEL"
+        fi
+        echo "$msg: older than required" >&2
+        status=1
     fi
-
-    # similarly for $search_itcl
-
-    # These envs include $TCL_DBGX -- expand this out.
-    eval "I=\"$temp_include\"; L=\"$temp_libs\""
-
-    res="TCL_CFLAGS=\"$I\"; TCL_LIBS=\"$L\"; TCLSH=\"$tclsh_loc\";"
-    if $search_tk; then
-        res="$res WISH=\"$wish_loc\";"
-    fi
-    echo $res
-    status=0
-else
-    echo "Found Tcl/Tk $TCL_VERSION$TCL_PATCH_LEVEL/$TK_VERSION$TK_PATCH_LEVEL: older than required" >&2
-    status=1
-fi
-exit $status
-_STAREOF
-                       exec 8>&-
-                       if /bin/sh conftest.sh >conftest.results; then
+    exit $status
+                       )
+                       teststat=$?
+                       if test $teststat = 0; then
                            star_cv_settcldir=`cat conftest.results`
                        fi
+                       test -f conftest.results && cp conftest.results safe-conftest.results
                        if test "$star_cv_settcldir" != unknown; then
                            break
                        fi
-                  fi
+                  fi # $locok
               done])
+
+        if test "$star_cv_settcldir" = unknown; then
+            AC_MSG_RESULT(unknown)
+        else
+            eval $star_cv_settcldir
+            AC_MSG_RESULT($_star_tcldir)
+        fi
+    else # $_star_use_tcl
+        AC_MSG_WARN(Compiling without Tcl/Tk)
     fi # $_star_use_tcl
-    if test "$star_cv_settcldir" = unknown; then
+
+    if $_star_use_tcl && test "$star_cv_settcldir" != unknown; then
+        :
+    else
         AC_DEFINE(TCL_MISSING, 1,
                   [Define to 1 if no Tcl/Tk libraries can be found])
-    else
-        eval $star_cv_settcldir
     fi
+
     AC_SUBST(TCL_CFLAGS)
     AC_SUBST(TCL_LIBS)
     AC_SUBST(TCLSH)
+
+    AC_SUBST(TK_CFLAGS)
+    AC_SUBST(TK_LIBS)
     AC_SUBST(WISH)
+
+    # add itcl variables here
+
 ])# STAR_PATH_TCLTK
 
 
