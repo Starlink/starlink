@@ -48,10 +48,10 @@ Section constructors
 (element subsubsubsect ($latex-section$ "paragraph"))
 ;(element appendices ($latex-section$ "section"))
 
-;; Discard the subhead, except when we're in in-section-head mode
+;; Discard the subhead, in general.
+;; This is so we can call (process-children) on sections, and only process
+;; the body.  We only need to go inside the subhead when we're in 
+;; section-reference mode.
 (element subhead
   (empty-sosofo))
-(mode in-section-head
-  (element subhead
-    (process-children-trim)))
 
