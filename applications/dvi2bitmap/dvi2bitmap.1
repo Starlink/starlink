@@ -188,7 +188,7 @@ specify a resolution of 100, and a magnification of 2, then
 .I dvi2bitmap
 will search for PK files at 200 dpi.
 .TP
-.I "-n, --preamble-only"
+.I "-n, --nodvi"
 Do not actually process the DVI file, but read the DVI pre- and
 postamble.  Useful in conjunction with the 
 .I "--query"
@@ -196,8 +196,8 @@ options.  If this option is present, then the program returns non-zero
 if any fonts were missing.  The 
 .I "-n"
 is for brevity and consistency with other tools -- the behaviour can
-be more rationally specified as
-.I "--process=nodvi,nopostamble"
+be alternatively specified as
+.I "--process=nodvi"
 .TP
 .I "-o, --output=[filename-pattern]"
 Choose the output filename pattern.  The value is a 
@@ -303,14 +303,14 @@ and
 useful with the
 .I "\-n"
 or
-.I --process=preamble-only
+.I --process=options
 options, to investigate a DVI file before processing.  Others (
 .I --query=types
 and 
 .I --query=paper
 ) are probably useful only
 with
-.I --process=options-only.
+.I --process=options.
 The option
 .I "--query=bitmaps"
 is only useful if you do actually generate bitmaps.
@@ -436,7 +436,7 @@ returned by
 This is useful either to make sure that
 there is enough room on the initial bitmap, to avoid the warning
 above, or, along with the
-.I "\-\-process=crop=no"
+.I "\-\-process=nocrop"
 option, to force the output bitmap to be a certain size.
 .TP
 .I "-v, --verbose=[quiet|silent]"
@@ -445,7 +445,7 @@ chatter, and does not display warnings or errors either.
 .TP
 .I "-V, --version"
 Display the version number and compilation options, and exit.
-.IP
+.TP
 .I "-X, --process=[keyword-list]"
 Specifies the processing to be done.
 Keywords are as follows
@@ -471,12 +471,9 @@ processing is incompatible with the
 options which examine the fonts in the file.  By default, both the
 DVI body and the postamble are processed.
 .IP
-.I --process=preamble-only
+.I --process=options
 : shorthand for 
-.I --process=nodvi,nopostamble.  Only the preamble is examined.
-This can be expressed more compactly with the conventional
-.I -n
-option.
+.I --process=nopreamble,nodvi,nopostamble.  Only the options are examined
 .IP
 .I blur
 and

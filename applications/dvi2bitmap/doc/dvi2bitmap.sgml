@@ -354,15 +354,15 @@ specify a resolution of 100, and a magnification of 2, then
 <code>dvi2bitmap</code>
 will search for PK files at 200 dpi.</p></dd>
 
-<dt><code>-n, &ddash;preamble-only</code></dt>
+<dt><code>-n, &ddash;nodvi</code></dt>
 
 <dd><p>Do not actually process the DVI file, but read the DVI pre- and
 postamble.  Useful in conjunction with the <code>&ddash;query</code>
 options.  If this option is present, then the program returns non-zero
 if any fonts were missing (see also <ref id=usage.exit/>).  The
 <code>-n</code> is for brevity and consistency with other tools -- the
-behaviour can be more rationally specified as
-<code>&ddash;process=nodvi,nopostamble</code></p></dd>
+behaviour can be alternatively specified as
+<code>&ddash;process=nodvi</code></p></dd>
 
 <dt><code>-o, &ddash;output=[filename-pattern]</code></dt>
 
@@ -438,11 +438,11 @@ option would start
 
 <p>Some of these options (<code>&ddash;query=missing-fonts</code> and
 <code>&ddash;query=missing-fontgen</code>) are probably most useful
-with the <code>-n</code> or <code>&ddash;process=preamble-only</code>
+with the <code>-n</code> or <code>&ddash;process=options</code>
 options, to investigate a DVI file before processing.  Others
 (<code>&ddash;query=types</code> and <code>&ddash;query=paper</code>)
 are probably useful only with
-<code>&ddash;process=options-only</code>.  The option
+<code>&ddash;process=options</code>.  The option
 <code>&ddash;query=bitmaps</code> is only useful if you do actually
 generate bitmaps.  For consistency (and so you don't have to remember
 which ones do which), the appropriate <code>&ddash;process</code>
@@ -538,7 +538,7 @@ the program was configured.</dd>
 returned by <code>&ddash;query=paper</code>.  This is useful either to
 make sure that there is enough room on the initial bitmap, to avoid
 the warning above, or, along with the
-<code>&ddash;process=crop=no</code> option, to force the output bitmap
+<code>&ddash;process=nocrop</code> option, to force the output bitmap
 to be a certain size.</dd>
 
 <dt><code>-v, &ddash;verbose=[quiet|silent]</code></dt>
@@ -565,10 +565,9 @@ processing is incompatible with the
 <code>--query</code> options which examine the fonts in the file.  By
 default, both the DVI body and the postamble are processed.</p>
 
-<p><code>--process=preamble-only</code>: shorthand for 
-<code>--process=nodvi,nopostamble</code>.  Only the preamble is
-examined.  This can be expressed more compactly with the conventional
-<code>-n</code> option.</p>
+<p><code>--process=options</code>: shorthand for 
+<code>--process=nopreamble,nodvi,nopostamble</code>.  Only the options
+are examined.</p>
 
 <p><code>blur</code> and <code>noblur</code>: if true, blurs the
 bitmap, making a half-hearted attempt to make a low-resolution bitmap

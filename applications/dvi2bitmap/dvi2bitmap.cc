@@ -182,7 +182,7 @@ int main (int argc, char **argv)
 	{ (char*)"end-page",      1, 0, 'l' },
 	{ (char*)"magnification", 1, 0, 'm' },
 	{ (char*)"font-mode",     1, 0, 'M' },
-	{ (char*)"preamble-only", 0, 0, 'n' },
+	{ (char*)"nodvi",	  0, 0, 'n' },
 	{ (char*)"output",        1, 0, 'o' },
 	{ (char*)"start-page",    1, 0, 'p' },
 	{ (char*)"page-range",    1, 0, 'P' },
@@ -477,10 +477,10 @@ int main (int argc, char **argv)
 	    magmag = atof (optarg);
 	    break;
 
-	  case 'n':		// --preamble-only
+	  case 'n':		// --nodvi
 	    // don't actually process the DVI file
 	    processing_.reset(process_dvi);
-	    processing_.reset(process_postamble);
+	    //processing_.reset(process_postamble);
 	    PkFont::setFontgen(false);
 	    break;
 
@@ -761,7 +761,7 @@ int main (int argc, char **argv)
 		    (char*)"notransparent",	// 9
 		    (char*)"crop",		// 10
 		    (char*)"nocrop",		// 11
-		    (char*)"preamble-only",	// 12
+		    (char*)"options",		// 12
 		    NULL
 		};
 		int cropmargin;
@@ -789,7 +789,7 @@ int main (int argc, char **argv)
 		      case 5:	// nopostamble
 			processing_.reset(process_postamble);
 			break;
-		      case 12:	// preamble-only
+		      case 12:	// options-only
 			processing_.reset(); // reset everything
 			break;
 
