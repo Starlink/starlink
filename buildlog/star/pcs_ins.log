@@ -1170,13 +1170,13 @@ if test -n "ssn29.htx ssn77.htx sun115.htx sun134.htx sun144.htx sun224.htx sun2
            export HTX_PATH;\
            /apps/cvsbuild/star/bin/hlink /apps/cvsbuild/star/docs /apps/cvsbuild/star/help;\
         fi;
+Updating index file for document: sun144
+Updating index file for document: sun224
+Updating index file for document: sun241
 Updating index file for document: ssn29
 Updating index file for document: ssn77
 Updating index file for document: sun115
 Updating index file for document: sun134
-Updating index file for document: sun144
-Updating index file for document: sun224
-Updating index file for document: sun241
 8 hypertext documents need re-linking
    updating cross-references in document ssn29 (5 files to modify)...
    replacing original files with re-linked versions...
