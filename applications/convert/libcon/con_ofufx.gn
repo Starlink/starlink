@@ -99,7 +99,8 @@
       DO  I = 1, NREC
 
 *  Write a record of the values.
-         WRITE( LUN, IOSTAT=FIOSTA ) ( A( J ), J = K + 1, K + NOVPRE )
+         WRITE( LUN, IOSTAT=FIOSTA ) ( A( J ), J = K + 1,
+     :     MIN( EL, K + NOVPRE ) )
 
 *  Watch for an error.  Make an informative report, setting status to
 *  bad, and exit.
