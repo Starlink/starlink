@@ -60,7 +60,6 @@ pgwnad( 0,1,0,1 );
 
 my ( $x1, $x2, $y1, $y2 ) = (0,1,0,1);
 
- 
 my $xscale = ( $x2 - $x1 ) / $nx;
 my $yscale = ( $y2 - $y1 ) / $ny;
 my $scale = ( $xscale < $yscale ) ? $xscale : $yscale;
