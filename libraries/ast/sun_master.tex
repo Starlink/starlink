@@ -17609,6 +17609,10 @@ used to select the default reference frame and equinox to be used if
 a FitsChan with foreign encoding contains no indication of the
 reference frame or equinox.
 
+\item A bug has been fixed in the FitsChan class which could prevent
+astWrite from creating a set of FITS headers from an otherwise valid
+FrameSet, when when using FITS-AIPS encoding.
+
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in

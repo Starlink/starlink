@@ -371,8 +371,10 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     28-SEP-2001 (DSB):
 *        GoodWarns changed so that no error is reported if a blank list
 *        of conditions is supplied.
-*     12-SEP-2001 (DSB):
-*        Added DefB1950 attribute.
+*     12-OCT-2001 (DSB):
+*        - Added DefB1950 attribute.
+*        - Corrected sign in equations which calculate CROTA when writing 
+*        FITS-AIPS encodings.
 *class--
 */
 
@@ -1321,7 +1323,7 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
 
 /* Find the CROTA and CDELT values for the celestial axes. */
    if( ok && axlon >= 0 && axlat >= 0 ) {
-      rho_a = atan2( cdlat_lon, -cdelt[ axlon ] );
+      rho_a = atan2( cdlat_lon, cdelt[ axlon ] );
       rho_b = atan2( -cdlon_lat, cdelt[ axlat ] );
 
       if( fabs( slaDrange( rho_a - rho_b ) ) < 1.0E-3 ){
