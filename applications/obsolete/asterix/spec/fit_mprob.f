@@ -51,7 +51,7 @@
 *
 *    Function declarations :
 *
-      DOUBLE PRECISION 		G01BCF
+      DOUBLE PRECISION 		G01ECF
       DOUBLE PRECISION 		G01EAF
 *
 *
@@ -78,7 +78,7 @@
 
 *      Get probability from NAG routine
         NAGSTAT = 0
-        FPROB = G01BCF( STATMIN, SSCALE, NAGSTAT )
+        FPROB = G01ECF( 'Lower-tail', STATMIN, REAL(SSCALE), NAGSTAT )
 
 *    Likelihood
       ELSE IF ( FSTAT .EQ. FIT__LOGL ) THEN
