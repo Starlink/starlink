@@ -44,13 +44,16 @@
 #        alpha_OSF1
 #           DEC Alpha machines running OSF1
 #
-#        sun4_Solaris
+#        sun4_Solaris (alias sun4u_SunOS)
 #           SUN Sparcstations running SunOS 5.x (Solaris)
 #
-#     In addition, the following systems have been supported at some
+#        ix86_Linux (alias i686_Linux)
+#           Intel box, running Linux.
+#
+#     In addition, the following systems have been supported for some
+#     Starlink applications at some
 #     time in the past.  This script contains the macro definitions 
-#     needed for these systems, but it is not known whether AUTOASTROMETRY
-#     will still build or run on these systems:
+#     needed for these systems, but AUTOASTROM has not been tested on them:
 #
 #        mips
 #           DECstations running Ultrix
@@ -345,7 +348,7 @@
 
 #  SUN Sparcstations running SunOS 5.x (Solaris).
 #  ---------------------------------------------
-            sun4_Solaris)
+            sun4_Solaris|sun4u_SunOS)
                AR_DEL='ar -d'
                AR_IN='ar -r'
                AR_OUT='ar -x'
@@ -363,7 +366,7 @@
 #  ==========
 #  Intel PC running Linux.
 #  ----------------------
-            ix86_Linux)
+            ix86_Linux|i686_Linux)
                AR_DEL='ar d'
                AR_IN='ar r'
                AR_OUT='ar x'
