@@ -442,7 +442,7 @@
      :                            STATUS )
 
                   IF( T .NE. VAL__BADR ) THEN
-                     CALL CAT_PUT0R( THCAT,  ANGROT - T, .FALSE., 
+                     CALL CAT_PUT0R( THCAT,  ANG - T, .FALSE., 
      :                               STATUS )
                   ELSE
                      CALL CAT_PUT0R( THCAT,  VAL__BADR, .TRUE., 

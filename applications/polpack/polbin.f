@@ -375,13 +375,13 @@
 
 *  Get the Q, U and THETA values from the input catalogue for the current
 *  row.
-            CALL FGT0R( CIIN, IROW, GTHETA, THETA, NULL1, STATUS )
-            CALL FGT0R( CIIN, IROW, GI( Q_ID ), Q, NULL2, STATUS )
-            CALL FGT0R( CIIN, IROW, GI( U_ID ), U, NULL3, STATUS )
+            CALL CAT_FGT0R( CIIN, IROW, GTHETA, THETA, NULL1, STATUS )
+            CALL CAT_FGT0R( CIIN, IROW, GI( Q_ID ), Q, NULL2, STATUS )
+            CALL CAT_FGT0R( CIIN, IROW, GI( U_ID ), U, NULL3, STATUS )
 
 *  If they are all good, work out the implied value of ANGROT, and leave
 *  the loop.
-            IF( .NOT. NULL1 .AND. .NOT. NULL2 .AND. NOT. NULL3 ) THEN
+            IF( .NOT. NULL1 .AND. .NOT. NULL2 .AND. .NOT. NULL3 ) THEN
                ANGROT = THETA + RTOD*0.5*ATAN2( U, Q )
                GO TO 10            
             END IF
