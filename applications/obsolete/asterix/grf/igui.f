@@ -653,6 +653,7 @@
 *    Local variables :
       CHARACTER TEXT*80,JUST*1
       REAL SIZE
+      REAL X,Y,ANGLE
       INTEGER FONT,BOLD,COLOUR
       INTEGER I,N
       INTEGER FLAG
