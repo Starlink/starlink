@@ -43,6 +43,8 @@
 #include	"psf.h"
 #include	"retina.h"
 
+#include        "userradii.h"
+
 static obj2struct	*obj2 = &outobj2;
 
 /********************************* analyse ***********************************/
