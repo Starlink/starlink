@@ -131,7 +131,6 @@
       INTEGER                  ITER                    ! # iterations
       INTEGER			MCTRL			! Minimisation control
       INTEGER                  PSCALE                  ! Statistic scale factor
-      INTEGER                  NIT                     ! # fitting iterations
       INTEGER                  PEGCODE(PSS__FITNPAR)   ! Error peg code
       INTEGER                  PPARS(2)                ! Position par nos.
 
@@ -139,7 +138,6 @@
       LOGICAL                  FINISHED                ! Minimum found
       LOGICAL                  FROZEN(PSS__FITNPAR)    ! Parameter frozen?
       LOGICAL                  GOOD_FIT                ! Successful FIT_ run?
-      LOGICAL                  INITIALISE              ! Initialise fitting
       LOGICAL                  PEGGED(PSS__FITNPAR)    ! Parameter pegged?
 *
 *    External references :
@@ -1674,7 +1672,7 @@
      :               PARAM, STATMIN, DPTR, %VAL(QPTR), GQMASK, STATUS )
 
 *  Destroy minimisation control
-      CALL ADI_ERASE( MTRL, STATUS )
+      CALL ADI_ERASE( MCTRL, STATUS )
 
 *  Write quality mask
       CALL BDI_PUTUB( GID, 'QualityMask', GQMASK, STATUS )
