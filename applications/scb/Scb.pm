@@ -84,15 +84,15 @@ sub error { &main::error (@_) }
 
 #  By overriding the standard Perl 'chdir' with the one from the Cwd 
 #  module, the PWD environment variable is kept up to date.  We then 
-#  provide our own cwd using PWD.
-#  This is preferable to using &Cwd::cwd, because the latter gives the
-#  actual directory location instead of the location we've asked to go
-#  to; the actual one can be in some weird symlinked place that the 
+#  provide our own cwd using PWD.  If PWD isn't set initially we set it.
+#  Using PWD is preferable to using &Cwd::cwd, because the latter gives
+#  the actual directory location instead of the location we've asked to
+#  go to; the actual one can be in some weird symlinked place that the 
 #  automounter umounts while we're not looking, which causes trouble
 #  if we try to go back there some time.
 
 use Cwd 'chdir';
-sub cwd { $ENV{'PWD'} }
+sub cwd { $ENV{'PWD'} ||= Cwd::cwd }
 
 ########################################################################
 #  Global variables.
