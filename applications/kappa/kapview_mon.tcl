@@ -3,7 +3,7 @@
 # 19Dec97
 #
 set OutputParList(contour) {length number}
-set DynParList(contour) {margin device useaxis}
+set DynParList(contour) {device}
 set OutputParList(contover) {}
 set DynParList(contover) {device}
 set OutputParList(crelut) {}
@@ -13,7 +13,7 @@ set DynParList(cursor) {device}
 set OutputParList(drawsig) {}
 set DynParList(drawsig) {device}
 set OutputParList(display) {scahigh scalow}
-set DynParList(display) {centre fill margin device useaxis}
+set DynParList(display) {fill device}
 set OutputParList(elprof) {}
 set DynParList(elprof) {}
 set OutputParList(gdclear) {}
@@ -39,7 +39,7 @@ set DynParList(idstate) {device}
 set OutputParList(inspect) {}
 set DynParList(inspect) {mode_ overlay}
 set OutputParList(linplot) {}
-set DynParList(linplot) {align axes key margin useaxis xleft xright ytop ybot device}
+set DynParList(linplot) {device}
 set OutputParList(lutable) {}
 set DynParList(lutable) {device}
 set OutputParList(lutflip) {}
@@ -55,7 +55,7 @@ set DynParList(luttweak) {device}
 set OutputParList(lutview) {}
 set DynParList(lutview) {device high low}
 set OutputParList(mlinplot) {}
-set DynParList(mlinplot) {axes key margin useaxis xleft xright ytop ybot device}
+set DynParList(mlinplot) {device}
 set OutputParList(ovclear) {}
 set DynParList(ovclear) {device}
 set OutputParList(ovset) {}
@@ -89,7 +89,7 @@ set DynParList(pictrans) {cosys device}
 set OutputParList(picvis) {}
 set DynParList(picvis) {device}
 set OutputParList(scatter) {}
-set DynParList(scatter) {margin useaxis xleft xright ytop ybot device}
+set DynParList(scatter) {device}
 set OutputParList(snapshot) {}
 set DynParList(snapshot) {device}
 set OutputParList(turbocont) {}

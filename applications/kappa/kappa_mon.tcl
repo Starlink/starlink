@@ -21,7 +21,7 @@ set DynParList(calpol) {}
 set OutputParList(cdiv) {}
 set DynParList(cdiv) {}
 set OutputParList(centroid) {centre xcen ycen}
-set DynParList(centroid) {cosys device mode_}
+set DynParList(centroid) {device mode_}
 set OutputParList(chpix) {}
 set DynParList(chpix) {}
 set OutputParList(cmult) {}
@@ -77,7 +77,7 @@ set DynParList(laplace) {}
 set OutputParList(listmake) {}
 set DynParList(listmake) {}
 set OutputParList(listshow) {dim number posns}
-set DynParList(listshow) {first last quiet device}
+set DynParList(listshow) {device}
 set OutputParList(log10) {}
 set DynParList(log10) {}
 set OutputParList(kstest) {comp dist errmean files mean nkept prob sigma}
