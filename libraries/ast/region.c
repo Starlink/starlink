@@ -7,15 +7,14 @@
 *     Represents a region within a coordinate system.
 
 *  Constructor Function:
-c     astRegion
-f     AST_REGION
+*     None.
 
 *  Description:
 *     This class provides the basic facilities for describing a region within 
 *     a specified coordinate system. However, the Region class does not
 *     have a constructor function of its own, as it is simply a container 
-*     class for a family of specialised Regions which implement Regions
-*     with particular shapes.
+*     class for a family of specialised sub-classes such as Circle, Box, etc, 
+*     which implement Regions with particular shapes.
 *
 *     All sub-classes of Region require a Frame to be supplied when the Region
 *     is created. This Frame describes the coordinate system in which the
