@@ -1,28 +1,6 @@
 <subsect id=rn-0.7 export>Release 0.7
 
-<p>Added support for PNG graphics, using the libpng library, if it's
-installed.
-
-<p>A few small changes, including changes to the option list.
-<ul>
-<li>The Metafont mode used for building fonts is now configurable at
-runtime; the default is configurable at configuration time; and
-default default (!) mode and resolution now properly match, so that
-you no longer have to give the <code/-r/ option every single time.
-
-<li>The manpage source was brought up to date.
-
-<li>The <code/-f/ option was split into the <code/-fp/, <code/-fm/,
-<code/-fg/ and <code/-fG/ options.
-
-<li>The <code/&ddash;enable-fontgen/ flag was added to the
-configuration script.
-
-<li>Various clarifications to the documentation.
-
-<li>Assorted tidy-ups to get it to compile cleanly.
-
-<li>Version number fiddling: this is still beta software, and as such
+<p>Version number fiddling: this is still beta software, and as such
 shouldn't be sent out with a major version number of&nbsp;1.  Also,
 I'd been updating the `release number' (after the hyphen) with new
 releases -- this is incorrect, as this should indicate only bug-fixing
@@ -32,7 +10,27 @@ the extent of modifying the notes in this ReleaseNotes section.  This
 shouldn't cause significant confusion, as this package has up to now only
 been circulated internally.
 
-</ul>
+<p>Added support for PNG graphics, using the libpng library, if it's
+installed.
+
+<p>The Metafont mode used for building fonts is now configurable at
+runtime; the default is configurable at configuration time; and
+default default (!) mode and resolution now properly match, so that
+you no longer have to give the <code/-r/ option every single time.
+
+<p>The manpage source was brought up to date.
+
+<p>The <code/-f/ option was split into the <code/-fp/, <code/-fm/,
+<code/-fg/ and <code/-fG/ options.
+
+<p>The <code/&ddash;enable-fontgen/ flag was added to the
+configuration script.
+
+<p>Various clarifications to the documentation.
+
+<p>Assorted tidy-ups to get it to satisfy <code/-Wall/ on a wider
+range of platforms.
+
 
 <subsect id=rn-0.6 export>Release 0.6
 
