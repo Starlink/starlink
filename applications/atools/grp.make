@@ -22,6 +22,12 @@ ATOOLS_IRAF = doc addframe.par astclear.par astget.par astset.par \
 asttest.par cmpframe.par cmpmap.par frame.par getframe.par getmapping.par \
 unitmap.par
 
+#  The fortran A-task files containing prologues to be included in the
+#  on-line help file.
+USER_TASKS = addframe.f astclear.f astget.f astset.f \
+asttest.f cmpframe.f cmpmap.f frame.f getframe.f getmapping.f \
+unitmap.f
+
 #  Contents of the doc/ directory in atools_iraf.tar
 IRAF_DOCS = addframe.hlp astclear.hlp astget.hlp astset.hlp \
 asttest.hlp cmpframe.hlp cmpmap.hlp frame.hlp getframe.hlp getmapping.hlp \
