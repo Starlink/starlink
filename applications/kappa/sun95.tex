@@ -11,10 +11,10 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.26}
-\newcommand{\stardocnumber}    {95.26}
+\newcommand{\stardocsource}    {sun95.27}
+\newcommand{\stardocnumber}    {95.27}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {16th March 2004}
+\newcommand{\stardocdate}      {15th April 2004}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.3}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -42978,7 +42978,7 @@ plot (7k).
          stored in a text file named {\tt "}fudge.dat{\tt "}.
       }
       \sstexamplesubsection{
-         zaplin grubby cleaned i lincol=r columns=[188,190] lines=[15,16]
+         zaplin grubby cleaned i lincol=r columns={\tt "}188 190{\tt "} lines={\tt "}15 16{\tt "}
       }{
          This replaces a region from pixel (188,15) to (190,16) within the
          NDF called {\tt "}grubby{\tt "} and stores the result in the NDF called
@@ -42987,7 +42987,7 @@ plot (7k).
          performed using linear interpolation.
       }
       \sstexamplesubsection{
-         zaplin grubby(6,,) cleaned i lincol=r columns=[188,190]
+         zaplin grubby(6,,) cleaned i lincol=r columns={\tt "}188 190{\tt "}
       }{
          This replaces columns 188 to 190 in the 6th y-z plane region
          within the NDF called {\tt "}grubby{\tt "} and stores the result in the NDF
@@ -47282,6 +47282,9 @@ error is reported if the same NDF is specified as both input and output). To
 enable this facility define the environment variable KAPPA\_REPLACE,
 giving it any arbitrary value.
  
+\item A bug has been fixed in ZAPLIN which caused looping to occur in
+interface mode even if the LINCOL parameter was specified on the command line.
+
 \end{itemize}
 
 \begin{latexonly}
