@@ -1,7 +1,7 @@
 Interface SINFIT
    Parameter    INP
       POSITION       1
-      TYPE           'UNIV'
+      TYPE           'LITERAL'
       vpath          'PROMPT'
       ppath          'GLOBAL'
       association    '<->GLOBAL.BINDS'
@@ -11,7 +11,7 @@ Interface SINFIT
 
    Parameter    OUT
       POSITION       2
-      TYPE           'UNIV'
+      TYPE           'LITERAL'
       association    '->GLOBAL.GRAFDS'
       prompt         'Enter name of output dataset'
       help           'This will be an HDS object'
@@ -39,7 +39,7 @@ Interface SINFIT
    EndParameter
 
    Parameter   PHASE
-      type           'UNIV'
+      type           'LITERAL'
       vpath          'DEFAULT'
       ppath          'DEFAULT'
       default        !
