@@ -1,6 +1,6 @@
 *+  SCULIB_FIT_SKYDIP - fit the SKYDIP data
       SUBROUTINE SCULIB_FIT_SKYDIP (N_MEASUREMENTS, AIRMASS, J_MEASURED,
-     :  VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, SUB_FILTER, T_TEL,
+     :  J_VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, SUB_FILTER, T_TEL,
      :  T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, B_FIT, TAUZ_FIT, STATUS)
 *    Description :
 *     This routine fits a sub-instrument's measurements of the sky 
@@ -44,36 +44,6 @@
 *     input to the routine with a value below zero. If the input
 *     value is greater than zero then the routine will fix it at
 *     that for the fit.
-*
-*
-*        The routine proceeds as follows:-
-*
-*           If N_MEASUREMENTS is larger than the maximum number the
-*           routine can handle then an error message is output and
-*           bad status returned.
-*
-*           The weights of each measurement in the fit are calculated.
-*           The weights are set equal to the inverse of the variance
-*           for the measurement, subject to the variance being greater
-*           than 1.0e-2 (an error of 0.1 K in the temperature measured),
-*           the object being to reduce the effect of high noise
-*           measurements without having the fit dominated by a measurement
-*           with a freakishly low noise.
-*
-*           Next, the fixed values or initial guesses at parameter 
-*           values are set, together with limits on the range that
-*           varying values can take:-
-*
-*                  0.9999 > ETAtel > 0.0001
-*                  0.9999 >   b    > 0.0001
-*                  15.0   >  tau   > 0.0001
-*
-*           The routine LSQ_FIT is called to do the work.
-*
-*           If the fit fails then a warning message will be reported 
-*           and the routine will return with bad status. Otherwise, 
-*           the fitted results and the chi-squared achieved will be
-*           reported. 
 *
 *    Invocation :
 *     CALL SCULIB_FIT_SKYDIP (N_MEASUREMENTS, AIRMASS, DATA,
@@ -122,17 +92,21 @@
 *      7-FEB-1996: split off from SCUDR_SKYDIP_SWITCH.
 *     23-JUL-1996: renamed SCULIB_ from SCUDR_ and made to fit the correct
 *                  function (JFL).
+*     10-MAR-1997: new version, using LSQ_FIT rather than NAG routine (TIMJ).
+*     11-MAR-1997: try again, using Bevington LSQ fit routine (JFL).
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'              ! for VAL__NBx
+      INTEGER MAX_FIT_DATA           ! max number of measurements
+      PARAMETER (MAX_FIT_DATA = 100)
 *    Import :
       INTEGER N_MEASUREMENTS
       REAL    AIRMASS (N_MEASUREMENTS)
       REAL    J_MEASURED (N_MEASUREMENTS)
-      REAL    VARIANCE (N_MEASUREMENTS)
+      REAL    J_VARIANCE (N_MEASUREMENTS)
       REAL    SUB_WAVELENGTH
       CHARACTER*(*) SUB_INSTRUMENT
       CHARACTER*(*) SUB_FILTER
@@ -149,57 +123,66 @@
       INTEGER STATUS
 *    External references :
       REAL     SCULIB_JNU            ! brightness temperature function
-      EXTERNAL SCULIB_SKYFUNC        ! Skydip function
-      EXTERNAL SCULIB_SKYFUNCD       ! Partial derivatives of skydip fn
+      EXTERNAL SCULIB_SKYDIP_XISQ    ! Skydip chi-squared function
 *    Global variables :
+      DOUBLE PRECISION C_AIRMASS (MAX_FIT_DATA)
+      DOUBLE PRECISION C_B_HI
+      DOUBLE PRECISION C_B_LO
+      DOUBLE PRECISION C_ETA_TEL_HI
+      DOUBLE PRECISION C_ETA_TEL_LO
+      DOUBLE PRECISION C_J_AMB
+      DOUBLE PRECISION C_J_MEASURED (MAX_FIT_DATA)
+      INTEGER          C_J_QUALITY (MAX_FIT_DATA)
+      DOUBLE PRECISION C_J_TEL
+      DOUBLE PRECISION C_J_VARIANCE (MAX_FIT_DATA)
+      INTEGER          C_M
+      COMMON /SCULIB_SKYDIP_FIT_DATA_I/ C_J_QUALITY,
+     :                                  C_M
+      COMMON /SCULIB_SKYDIP_FIT_DATA_D/ C_AIRMASS,
+     :                                  C_B_HI,
+     :                                  C_B_LO,
+     :                                  C_ETA_TEL_HI,
+     :                                  C_ETA_TEL_LO,
+     :                                  C_J_AMB,
+     :                                  C_J_MEASURED,
+     :                                  C_J_TEL,
+     :                                  C_J_VARIANCE
 *    Local Constants :
-      REAL             LAB           ! Mixing parameter of fit
-      PARAMETER (LAB = 0.01)
       REAL             LIGHT         ! velocity of light
       PARAMETER (LIGHT = 2.997929E8)
-      INTEGER          MAX_ITER      ! Maximum number of allowed iterations
-      PARAMETER (MAX_ITER = 1000)
-      INTEGER          MAX_PTS       ! Maximum number of data points for fit
-      PARAMETER (MAX_PTS = 100)
-      REAL             MIN_VAR       ! Minimum variance for weighting
-      PARAMETER (MIN_VAR = 1.0E-2)
-      INTEGER          NUM_PARS      ! Number of parameters
-      PARAMETER (NUM_PARS = 5)   
-      REAL             TOL           ! Tolerance of fit
-      PARAMETER (TOL = 1.0E-5)
 *    Local variables :
+      DOUBLE PRECISION ALPHA (3,3)   ! scratch used by SCULIB_FIT_FUNCTION
+      DOUBLE PRECISION BETA (3)
       CHARACTER*80     BUFFER        ! buffer to hold results of fit
-      REAL             CHISQ         ! the reduced chi-squared of the fit
-      REAL             ERR_PARS(NUM_PARS)
-                                     ! error in parameters
-      INTEGER          I             ! Loop variable
+      DOUBLE PRECISION DA (6)    
+      DOUBLE PRECISION FIT (3)       ! the fitted parameters
+      INTEGER          I             ! DO loop variable
+      INTEGER          IK (3)
+      INTEGER          ITERATION     ! fit iteration
+      INTEGER          JK (3)     
       REAL             J_AMB         ! brightness temperature of ambient air
       REAL             J_TEL         ! brightness temperature of telescope 
-      REAL             LOWER(NUM_PARS)
-                                     ! Lower limit of parameters
-      INTEGER          NRT           ! Number of iterations for fit (-ve=err)
+      DOUBLE PRECISION LAMBDA
+      LOGICAL          LOOPING
       REAL             NU            ! frequency
-      INTEGER          NUM_DOF       ! Number of degrees of freedom for CHISQ
-      INTEGER          MASK(NUM_PARS)! Parameter mask (free or fixed)
-      REAL             PARS(NUM_PARS)! Initial value of each parameter
-      REAL             UPPER(NUM_PARS)
-                                     ! Upper limit of parameters
-      REAL             VALUE         ! Value of skydip function
-      REAL             WEIGHTS(MAX_PTS)
-                                     ! Weight of each data point
-
+      INTEGER          QUALITY       ! quality of fit
+      DOUBLE PRECISION XICUT         ! when an iteration produces an
+                                     ! improvement in chi-squared below
+                                     ! this limit no further iterations
+                                     ! will be performed
+      DOUBLE PRECISION XIOLD         ! chi-squared of fit
+      DOUBLE PRECISION XISQ          ! chi-squared of fit
 *    Internal References :
 *    Local data :
-      DATA ERR_PARS/0.,0.,0.,0.,0./  ! No errors on input parameters
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
 
 * Check number of data points for fit
 
-      IF (N_MEASUREMENTS .GT. MAX_PTS) THEN
+      IF (N_MEASUREMENTS .GT. MAX_FIT_DATA) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP(' ','SCULIB_FIT_SKYDIP: Too many data points.',
+         CALL ERR_REP (' ','SCULIB_FIT_SKYDIP: Too many data points.',
      :        STATUS)
          RETURN
       END IF
@@ -210,142 +193,120 @@
       J_TEL = SCULIB_JNU (NU, T_TEL, STATUS)
       J_AMB = SCULIB_JNU (NU, T_AMB, STATUS)
 
-* Calculate weight
+* Put data into common
+
+      C_M = N_MEASUREMENTS
+      C_J_AMB = DBLE (J_AMB)
+      C_J_TEL = DBLE (J_TEL)
 
       DO I = 1, N_MEASUREMENTS
-         IF (VARIANCE(I) .LT. 0.0) THEN 
-            WEIGHTS(I) = 0.0
-         ELSE IF (VARIANCE(I) .GT. MIN_VAR) THEN
-            WEIGHTS(I) = 1.0 / VARIANCE(I)
-         ELSE
-            WEIGHTS(I) = 1.0 / MIN_VAR
-         ENDIF
+         C_AIRMASS (I) = DBLE (AIRMASS(I))
+         C_J_MEASURED (I) = DBLE (J_MEASURED(I))
+         C_J_VARIANCE (I) = DBLE (MAX (J_VARIANCE(I), 1.0E-2))
+         C_J_QUALITY (I) = 0
       END DO
 
-* set arrays holding details of each parameter:-
-
-*      index 1 = ETA_TEL 
-*      index 2 = B
-*      index 3 = TAU
-*            4 = J_AMB
-*            5 = J_TEL
-
-* J_AMB and J_TEL are always fixed. Use parameters to avoid COMMON
-
-* Need to set initial guess for parameter (PARS) and
-* whether the parameter is fixed(0) or free(1) via MASK
-* upper and lower bounds are set via the UPPER and LOWER arrays
-
-* Deal with ETA_TEL
-
-      IF (ETA_TEL_IN .LT. 0.0) THEN
-         MASK(1) = 1
-         PARS(1) = 0.99
-         NUM_DOF = NUM_DOF + 1
-      ELSE
-         MASK(1) = 0
-         PARS(1) = ETA_TEL_IN
-      ENDIF
-
-      UPPER(1) = 0.9999
-      LOWER(1) = 0.0001
-
-* The second parameter is B
-
-      IF (B_IN .LT. 0.0) THEN
-         MASK(2) = 1
-         PARS(2) = 0.99
-         NUM_DOF = NUM_DOF + 1
-      ELSE
-         MASK(2) = 0
-         PARS(2) = B_IN
-      ENDIF
-
-      UPPER(2) = 0.9999
-      LOWER(2) = 0.0001
-
-* TAU
-
-      MASK(3) = 1
-      PARS(3) = 0.5  
-      NUM_DOF = 1
-      UPPER(3) = 15.00
-      LOWER(3) = 0.0001
-
-* J_AMB
-
-      MASK(4) = 0
-      PARS(4) = J_AMB
-
-* J_TEL
-
-      MASK(5) = 0
-      PARS(5) = J_TEL
-      
 * Now try to fit this
 
       IF (STATUS .EQ. SAI__OK) THEN
 
-         CALL LSQ_FIT (AIRMASS, 1, J_MEASURED, WEIGHTS,
-     :        N_MEASUREMENTS, PARS, ERR_PARS, NUM_PARS, TOL,
-     :        MAX_ITER, LAB, MASK, .TRUE., LOWER, UPPER, NRT,
-     :        SCULIB_SKYFUNC, SCULIB_SKYFUNCD)
+* Set initial guess and limits
 
-         ETA_TEL_FIT = PARS(1)
-         B_FIT = PARS(2)
-         TAUZ_FIT = PARS(3)
-
-         IF (NRT .LT. 0) THEN
-            CALL MSG_SETI ('IFAIL', NRT)
-            CALL MSG_SETC ('SUB', SUB_INSTRUMENT)
-            CALL MSG_SETC ('FILT', SUB_FILTER)
-            STATUS = SAI__ERROR
-
-            CALL ERR_REP (' ', 'SCULIB_FIT_SKYDIP: '//
-     :           'LSQ_FIT has failed to fit ETA_TEL, B and '//
-     :           'TAUZ for filter = ^FILT and sub-instrument '//
-     :           '^SUB with IFAIL = ^IFAIL', STATUS)
-
-            IF (NRT .EQ. -4) THEN
-               CALL ERR_REP(' ', ' - Determinant of the coefficient '//
-     :              'matrix is zero', STATUS)
-            ELSE IF (NRT .EQ. -3) THEN
-               CALL ERR_REP(' ', ' - Diagonal of matrix contains '//
-     :              'elements which are zero or almost zero', STATUS)
-            ELSE IF (NRT .EQ. -2) THEN
-               CALL ERR_REP(' ', ' - Maximum number of iterations '//
-     :              'too small to obtain a solution which satisfies '//
-     :              'the required tolerance', STATUS)
-            ENDIF
-
+         IF (B_IN .LT. 0.0) THEN
+            C_B_HI = 0.9999D0
+            C_B_LO = 0.0001D0
+            FIT (2) = 0.7D0
          ELSE
+            C_B_HI = DBLE (B_IN)
+            C_B_LO = DBLE (B_IN)
+            FIT (2) = DBLE (B_IN)
+         END IF
+         
+         IF (ETA_TEL_IN .LT. 0.0) THEN
+            C_ETA_TEL_HI = 0.9999D0
+            C_ETA_TEL_LO = 0.0001D0
+            FIT (1) = 0.7D0
+         ELSE
+            C_ETA_TEL_HI = DBLE (ETA_TEL_IN)
+            C_ETA_TEL_LO = DBLE (ETA_TEL_IN)
+            FIT (1) = DBLE (ETA_TEL_IN)
+         END IF
 
-* Calculate CHISQ by hand
+         FIT (3) = 0.5D0
 
-            CHISQ = 0.0
-            DO I = 1, N_MEASUREMENTS
-               IF (VARIANCE(I) .GT. 0.0) THEN
-                  CALL SCULIB_SKYFUNC(VALUE, AIRMASS(I), PARS, 5)
-                  CHISQ = CHISQ + (J_MEASURED(I) - VALUE)**2 
-     :                 / VARIANCE(I)
-                  NUM_DOF = NUM_DOF + 1
-               ENDIF
-            END DO
+* some initial settings
 
-* Reduced Chi Sq - num of free parameters
+         LAMBDA = 0.001
+         CALL SCULIB_SKYDIP_XISQ (XISQ, 3, FIT, STATUS)
+         XICUT = MAX (0.00001D0 * XISQ, 0.01D0)
 
-            CHISQ = CHISQ / REAL(NUM_DOF - 1)
+* now iterate
 
-* Print out answer
+         QUALITY = 0
+         LOOPING = .TRUE.
+         ITERATION = 0
 
+         DO WHILE (LOOPING)
+            CALL SCULIB_FIT_FUNCTION (SCULIB_SKYDIP_XISQ, XICUT, 
+     :        3, FIT, LAMBDA, ALPHA, BETA, IK, JK, DA, STATUS)
+
+            ITERATION = ITERATION + 1
+   
+* check for last integration
+
+            IF (STATUS .NE. SAI__OK) THEN
+               LOOPING = .FALSE.
+               QUALITY = 1
+            ELSE IF (ABS(XIOLD-XISQ) .LT. XICUT) THEN
+               LOOPING = .FALSE.
+            ELSE IF (ITERATION .GT. 40) THEN
+               STATUS = SAI__WARN
+               CALL ERR_OUT (' ', 'SCULIB_FIT_SKYDIP: '//
+     :           'SKYDIP fit has failed to converge after 40 '//
+     :           'iterations', STATUS)
+               LOOPING = .FALSE.
+               QUALITY = 1
+            END IF
+
+            XIOLD = XISQ
+            CALL SCULIB_SKYDIP_XISQ (XISQ, 3, FIT, STATUS)
+
+* report the iteration result
+
+            CALL MSG_SETI ('ITER', ITERATION)
+            CALL MSG_SETR ('CHISQ', REAL(XISQ))
+*            CALL MSG_OUT (' ', 'iter=^ITER chisq=^CHISQ', STATUS)
+         END DO
+
+         ETA_TEL_FIT = REAL (FIT(1))
+         B_FIT = REAL (FIT(2))
+         TAUZ_FIT = REAL (FIT(3))
+
+*  output results
+
+         IF (QUALITY .NE. 0) THEN
+            CALL MSG_SETC ('SUB', SUB_INSTRUMENT)
+            CALL MSG_SETC ('FILT', SUB_FILTER)
+
+            STATUS = SAI__ERROR
+            CALL ERR_REP (' ', 'SCULIB_FIT_SKYDIP: fit failed '//
+     :        'for filter = ^FILT and sub-instrument ^SUB', STATUS)
+            CALL ERR_REP (' ', ' - last fit values were:-', STATUS)
+
+            WRITE (BUFFER, 20) ETA_TEL_FIT, B_FIT, TAUZ_FIT, 
+     :           REAL(XISQ), ITERATION
+
+            CALL MSG_SETC ('BUFFER', BUFFER)
+            CALL ERR_REP (' ', ' ^BUFFER', STATUS)
+         ELSE
             CALL MSG_SETC ('FILT', SUB_FILTER)
             CALL MSG_SETC ('SUB', SUB_INSTRUMENT)
+
             CALL MSG_OUT (' ', 'SCULIB: fit for filter '//
-     :           '^FILT and sub-instrument ^SUB with ETA '//
-     :           'varying', STATUS)
-            
-            WRITE (BUFFER, 20) PARS(1), PARS(2), PARS(3), 
-     :           CHISQ, NRT
+     :           '^FILT and sub-instrument ^SUB', STATUS)
+
+            WRITE (BUFFER, 20) ETA_TEL_FIT, B_FIT, TAUZ_FIT, 
+     :           REAL(XISQ), ITERATION
  20         FORMAT ('eta = ', F6.2, '          b = ', F6.2,
      :           '  tau = ', F6.2, '  X = ', F7.1, '  N = ', I4)
 
