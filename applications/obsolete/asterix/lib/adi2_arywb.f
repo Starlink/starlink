@@ -79,6 +79,8 @@
 *        Original version.
 *     15 May 1997 (RB):
 *        Actually write some code!
+*     17 Jul 1997 (RB):
+*        Give up if there's nothing to unmap
 *     {enter_changes_here}
 
 *  Bugs:
@@ -116,6 +118,12 @@
 *  Extract information required to free cache object
       CALL ADI_CGET0I( PSID, 'CacheID', CACHEID, STATUS )
       CALL ADI_CGET0I( PSID, 'Ptr', PTR, STATUS )
+
+*  Anything to unmap?
+      IF ( CACHEID .EQ. ADI__NULLID ) THEN
+        CALL ERR_ANNUL( STATUS )
+        GOTO 98
+      END IF
 
 *  Is the object an array?
       CALL ADI_THERE( CACHEID, 'SHAPE', THERE, STATUS )
@@ -167,7 +175,7 @@
  99   CALL ADI_CUNMAP( CACHEID, 'Value', PTR2, STATUS )
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) THEN
+ 98   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'ADI2_ARYWB', STATUS )
       END IF
 
