@@ -42,6 +42,7 @@
 *     26 Nov 93 : V1.7-3  Correct termination when no wildcards used (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *     12 Nov 95 : V1.8-1  Merge EXT_SIG field (DJA)
+*      8 Feb 96 : V1.8-2  Updated SSI access (DJA)
 *
 *    Type definitions :
 *
@@ -97,6 +98,7 @@
       INTEGER                FD                       ! File descriptor
       INTEGER                ICOMP                    ! Loop over object comp's
       INTEGER                IDPTR                    ! Input ID field
+      INTEGER			IFID			! Input file identifier
       INTEGER                IFILE                    ! Loop over input files
       INTEGER                I                        ! Loop over fields
       INTEGER                IPTR                     ! Input field data
@@ -143,7 +145,7 @@
 *    Version id :
 *
       CHARACTER*30          VERSION
-        PARAMETER           ( VERSION = 'SSMERGE Version 1.8-1' )
+        PARAMETER           ( VERSION = 'SSMERGE Version 1.8-2' )
 *-
 
 *    Check status
@@ -192,7 +194,8 @@
             NEW_SPEC = .FALSE.
           END IF
           CALL FIO_READF( FD, AFILE, STATUS )
-          CALL HDS_OPEN( AFILE, 'READ', ILOC, STATUS )
+          CALL ADI_FOPEN( AFILE, 'SSDSset|SSDS', 'READ', IFID, STATUS )
+
         ELSE
           SLEN = CHR_LEN(SPEC(ISPEC))
           LAST4 = SPEC(ISPEC)(MAX(1,SLEN-3):SLEN)
@@ -202,8 +205,9 @@
           END IF
           CALL UTIL_FINDFILE_INT( '.', SPEC(ISPEC), SCONTEXT,
      :                                        SFILE, STATUS )
-          CALL HDS_OPEN( SFILE, 'READ', ILOC, STATUS )
+          CALL ADI_FOPEN( SFILE, 'SSDSset|SSDS', 'READ', IFID, STATUS )
           ANYWILD = .TRUE.
+
         END IF
 
 *      No more inputs?
@@ -225,15 +229,14 @@
         ELSE IF ( STATUS .EQ. SAI__OK ) THEN
 
 *        Is it a set?
-          CALL DAT_TYPE( ILOC, TYPE, STATUS )
-          IS_SET(NFILE) = ( TYPE(1:8) .EQ. 'SSDS_SET' )
+          CALL ADI_DERVD( IFID, 'SSDSset', IS_SET(NFILE), STATUS )
 
 *        Get number of sources
-          CALL SSO_GETNSRC( ILOC, NSRC(NFILE), STATUS )
+          CALL ADI_CGET0I( IFID, 'NSRC', NSRC(NFILE), STATUS )
           TNSRC = TNSRC + NSRC(NFILE)
 
 *        Get number of components in BOOK structure
-          CALL SSO_CHKBOOK( ILOC, OK, NCOMP(NFILE), STATUS )
+          CALL ADI_CGET0I( IFID, 'NFILE', NCOMP(NFILE), STATUS )
 
 *        Store origin for this file
           IF ( NFILE .EQ. 1 ) THEN
@@ -245,7 +248,7 @@
 *        Which fields are present?
           IF ( NSRC(NFILE) .GT. 0 ) THEN
             DO I = 1, MAXFLD
-              CALL SSO_CHKFLD( ILOC, FLD(I), OK, STATUS )
+              CALL SSI_CHKFLD( IFID, FLD(I), OK, STATUS )
               IF ( FIRST_WITH_SRC ) THEN
                 COPY(I) = OK
               ELSE IF ( COPY(I) .AND. .NOT. OK ) THEN
@@ -263,8 +266,8 @@
           NFILE = NFILE + 1
 
 *        Release file
-          CALL SSO_RELEASE( ILOC, STATUS )
-          CALL HDS_CLOSE( ILOC, STATUS )
+          CALL SSI_RELEASE( IFID, STATUS )
+          CALL ADI_CLOSE( IFID, STATUS )
 
         END IF
 
@@ -320,11 +323,11 @@
             NEW_SPEC = .FALSE.
           END IF
           CALL FIO_READF( FD, AFILE, STATUS )
-          CALL HDS_OPEN( AFILE, 'READ', ILOC, STATUS )
+          CALL ADI_FOPEN( AFILE, 'SSDSset|SSDS', 'READ', IFID, STATUS )
         ELSE
           CALL UTIL_FINDFILE_INT( '.', SPEC(ISPEC), SCONTEXT,
      :                                        SFILE, STATUS )
-          CALL HDS_OPEN( SFILE, 'READ', ILOC, STATUS )
+          CALL ADI_FOPEN( SFILE, 'SSDSset|SSDS', 'READ', IFID, STATUS )
         END IF
 
         IF ( (STATUS.EQ.PAR__NULL) .OR. (STATUS.EQ.FIO__EOF) ) THEN
@@ -475,8 +478,8 @@
         END IF
 
 *      Free this dataset
-        CALL SSO_RELEASE( ILOC, STATUS )
-        CALL HDS_CLOSE( ILOC, STATUS )
+        CALL SSI_RELEASE( IFID, STATUS )
+        CALL ADI_FCLOSE( IFID, STATUS )
 
 *      Bump up counter
         CSRC = CSRC + NSRC(IFILE)

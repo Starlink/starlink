@@ -165,7 +165,7 @@
       CALL ADI1_GETLOC( SFID, SLOC, STATUS )
 
 *  Get number of sources
-      CALL SSI_GETNSRC( SFID, NSRC, STATUS )
+      CALL ADI_CGET0I( SFID, 'NSRC', NSRC, STATUS )
 
 *  Output field errors?
       CALL USI_GET0L( 'ERRORS', DOERR, STATUS )

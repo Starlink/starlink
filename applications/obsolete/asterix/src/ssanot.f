@@ -111,7 +111,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Get number of sources in source list
-      CALL SSI_GETNSRC( SID, NSRC, STATUS )
+      CALL ADI_CGET0I( SID, 'NSRC', NSRC, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         IF ( NSRC .EQ. 0 ) THEN
           CALL MSG_PRNT('No sources in this SSDS')

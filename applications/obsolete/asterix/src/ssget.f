@@ -112,7 +112,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get number of sources
-      CALL SSI_GETNSRC( SFID, NSRC, STATUS )
+      CALL ADI_CGET0I( SFID, 'NSRC', NSRC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get item code

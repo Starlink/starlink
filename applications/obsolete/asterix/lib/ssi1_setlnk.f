@@ -100,6 +100,7 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	LOC			! Dataset locator
+      CHARACTER*(DAT__SZLOC)	PLOC			! POSIT object
       CHARACTER*(DAT__SZLOC)	TYP			! Top-level type
 *.
 
@@ -118,6 +119,15 @@
 *  Correct type?
       IF ( TYP .EQ. 'SSDS' ) THEN
         CALL ADI_SETLNK( ARGS(1), ARGS(2), STATUS )
+
+*    Locate POSIT
+        CALL DAT_FIND( LOC, 'POSIT', PLOC, STATUS )
+
+*    Copy NSRC to ADI object
+        CALL ADI1_CCH2AI( PLOC, 'NSRC', ARGS(1), 'NSRC', STATUS )
+
+*    Release POSIT
+        CALL DAT_ANNUL( PLOC, STATUS )
 
       ELSE
 
@@ -237,6 +247,7 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	LOC			! Dataset locator
+      CHARACTER*(DAT__SZLOC)	PLOC			! POSIT object
       CHARACTER*(DAT__SZLOC)	TYP			! Top-level type
 
       INTEGER			NDIM			! Object dimensionality
@@ -272,6 +283,15 @@
           NFILE = 0
         END IF
         CALL ADI_CPUT0I( ARGS(1), 'NFILE', NFILE, STATUS )
+
+*    Locate POSIT
+        CALL DAT_FIND( LOC, 'POSIT', PLOC, STATUS )
+
+*    Copy NSRC to ADI object
+        CALL ADI1_CCH2AI( PLOC, 'NSRC', ARGS(1), 'NSRC', STATUS )
+
+*    Release POSIT
+        CALL DAT_ANNUL( PLOC, STATUS )
 
       ELSE
 

@@ -151,7 +151,7 @@
       IF ( SSDS ) THEN
 
 *    Get number of sources
-        CALL SSI_GETNSRC( IFID, NSRC, STATUS )
+        CALL ADI_CGET0I( IFID, 'NSRC', NSRC, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           IF ( NSRC .EQ. 0 ) THEN
             STATUS = SAI__ERROR
