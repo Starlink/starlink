@@ -31,9 +31,12 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
-*     Revision 1.11  1996/12/18 00:17:27  timj
-*     Add SCUOVER
+*     Revision 1.12  1997/01/11 01:30:54  timj
+*     Add BOLREBIN (as option to REBIN)
 *
+c Revision 1.11  1996/12/18  00:17:27  timj
+c Add SCUOVER
+c
 c Revision 1.10  1996/12/17  20:30:31  timj
 c Add final ELSE to see if task is not recognised
 c
@@ -91,6 +94,10 @@ c
 
          CALL REDS_CROSSTALK (STATUS)
 
+      ELSE IF (NAME .EQ. 'BOLREBIN') THEN
+
+         CALL REDS_REBIN (.TRUE., STATUS)
+
       ELSE IF (NAME .EQ. 'EXTINCTION') THEN
 
          CALL REDS_EXTINCTION (STATUS)
@@ -117,7 +124,7 @@ c
 
       ELSE IF (NAME .EQ. 'REBIN') THEN
 
-         CALL REDS_REBIN (STATUS)
+         CALL REDS_REBIN (.FALSE., STATUS)
 
       ELSE IF (NAME .EQ. 'REDUCE_SWITCH') THEN
 
