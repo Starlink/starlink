@@ -176,7 +176,7 @@
 *  Calculate the length of the vector in units of pixels.
             VECLEN = VECMAG( I ) / DSCALE
 
-*  Calculate the vector orientation, in radians. Within KPG1_VECT, the
+*  Calculate the vector orientation, in radians. Within POL1_VECT, the
 *  vector orientations are measured from the Y axis, but the supplied
 *  VECORN values are measured from the X axis. So subtract 90 degrees
 *  from the supplied value to make zero equivalent to the Y axis.
@@ -186,7 +186,7 @@
                VECANG = ANGFAC * VECORN( I ) + ANGROT - PIBY2
             END IF
 *  Plot the vector.      
-            CALL KPG1_VECT( REAL( X( I ) ), REAL( Y( I ) ), JUST, 
+            CALL POL1_VECT( REAL( X( I ) ), REAL( Y( I ) ), JUST, 
      :                      VECLEN, VECANG, AHSIZE, STATUS )
 
 *  Abort if an error has occurred.

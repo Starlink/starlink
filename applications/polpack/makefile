@@ -427,7 +427,7 @@ pol1_knext.f polimp.f ccd1_iscom.f pol1_deftb.f polexp.f pol1_setft.f \
 polvec.f pol1_plvec.f pol1_gtwcs.f ccd1_orvar.f pol1_stk.f \
 pol1_stbin.f pol1_cm1rr.f pol1_cm3rr.f ccg1_mer1r.f ccg1_mer3r.f \
 ccg1_scr1r.f ccg1_scr3r.f ccg1_clipr.f pol1_mkcat.f pol1_clcat.f \
-pol1_cpctd.f pol1_cpctr.f \
+pol1_cpctd.f pol1_cpctr.f pol1_vect.f \
 pol1_gtcta.f pol1_gtctc.f \
 pol1_vecky.f pol1_vecpl.f polplot.f \
 pol1_squar.f pol1_clcnt.f \

@@ -45,7 +45,7 @@ pol1_gtcta.f pol1_gtctc.f \
 pol1_vecky.f polplot.f polplot.ifl pol1_vecpl.f pol1_clcnt.f \
 pol1_ctclm.f pol1_setd.f pol1_squar.f pol1_stk2.f polbin.f polbin.ifl \
 ccd1_repc.f polext.f polext.ifl pol1_gtctw.f \
-pol1_rmbnd.f
+pol1_rmbnd.f pol1_vect.f
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.

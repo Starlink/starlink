@@ -740,12 +740,19 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
+*  Get the bounds of the viewport in millimetres, and convert to metres.
+      CALL PGQVP( 2, X1, X2, Y1, Y2 )
+      XM = ( X2 - X1 )/1000.0
+      YM = ( Y2 - Y1 )/1000.0
+
+*  Get the bounds of the PGPLOT window (this will also be in meillimetres).
+      CALL PGQWIN( X1, X2, Y1, Y2 )
+
 *  Establish the default value for the vector scaling factor such that
 *  a typical data value corresponds to a vector equal to one 15th of 
 *  the smallest DATA zone dimension, and then get a new (positive) value.  
 *  If a value of zero is supplied, use the default value.  XM is measured in 
 *  metres so 100 time converts to centimetres.
-      CALL KPG1_GDQPC( X1, X2, Y1, Y2, XM, YM, STATUS )
       DEFSCA = ABS( NVEC0 * TYPDAT / ( 100.0 * MIN( XM, YM ) ) )
       CALL PAR_DEF0R( 'VSCALE', DEFSCA, STATUS )
       CALL PAR_GET0R( 'VSCALE', VSCALE, STATUS )
@@ -770,9 +777,6 @@
 
 *  Produce the plot.
 *  =================
-*  First draw the axes if required. 
-      IF ( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
-
 *  Get the Mapping from the Frame in which catalogue positions are stored,
 *  to graphics world coordinates.
       MAP = AST_GETMAPPING( IPLOT, ICAT, AST__BASE, STATUS )
@@ -793,6 +797,9 @@
 
 *  Re-instate the previous PGPLOT attributes.
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTRS, STATUS )
+
+*  First draw the axes if required. 
+      IF ( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
 
 *  Plot the key.
 *  =============
