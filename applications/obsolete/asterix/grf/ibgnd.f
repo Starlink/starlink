@@ -1117,7 +1117,6 @@
           PMIN = 0.95*PMIN
           PMAX = 1.05*PMAX
         END IF
-	print *,'pix range ',pmin,pmax,status
         I_PMIN = PMIN
         I_PMAX = PMAX
 
@@ -1125,12 +1124,12 @@
         IF ( (PCODE.NE.1) .AND. I_QOK .AND. I_BAD ) THEN
           CALL GFX_PIXEL(I_WKPTR,I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
      :                .TRUE.,%VAL(I_XPTR),%VAL(I_YPTR),0,0,
-     :                     %VAL(I_DPTR), PMIN,PMAX,%VAL(I_QPTR),
+     :                     %VAL(DPTR), PMIN,PMAX,%VAL(I_QPTR),
      :                    I_MASK,STATUS)
         ELSE
           CALL GFX_PIXEL(I_WKPTR,I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
      :                .TRUE.,%VAL(I_XPTR),%VAL(I_YPTR),0,0,
-     :                     %VAL(I_DPTR), PMIN,PMAX,STATUS)
+     :                     %VAL(DPTR), PMIN,PMAX,STATUS)
         END IF
 
 *    Convert back from residuals?
@@ -2728,8 +2727,18 @@
         CALL GCB_SETDEF( STATUS )
         CALL GCB_SETL( 'ERR_FLAG', .TRUE., STATUS )
         CALL GCB_SETL( 'STEP_FLAG', .FALSE., STATUS )
-        CALL GCB_SETL( 'POLY_FLAG', .TRUE., STATUS )
+        CALL GCB_SETL( 'POLY_FLAG', .FALSE., STATUS )
         CALL GCB_SETL( 'POINT_FLAG', .FALSE., STATUS )
+
+*    Go to new zone and plot
+        CALL GDV_CLEAR( STATUS )
+        CALL IMG_PLOT( STATUS )
+
+*    Flag current plotting status
+        I_DISP = .FALSE.
+        I_DISP_1D = .TRUE.
+        I_CLEAR = .FALSE.
+        I_BGM_DISIM = 0
 
 *    Cache the GCB
         CALL GCB_CACHE( I_CACHE_1D, STATUS )
