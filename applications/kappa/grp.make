@@ -299,6 +299,15 @@ wcsremove.f wcsshow.f chain.f reshape.f
 # A group of all the generic source files.
 GENERIC_SOURCES = $(KAPSUB_GEN) 
 
+#  The help files for sripts and alias commands
+OTHER_HELPS = exp10.help fitsval.help lutcol.help lutheat.help \
+lutspec.helppicdata.help expe.help fitswrite.help lutcold.help \
+lutikon.help lutwarm.helppicframe.help fitsedit.help log10.help \
+lutcont.help lutneg.help lutzebra.help picgrid.help \
+fitsexist.help loge.help lutfc.help lutramps.help \
+outline.helppiclast.help fitshead.help lutbgyrw.help \
+lutgrey.help lutread.help picbase.helppicxy.help
+
 # The other files which need to be extracted from the source code
 # repository and which end up in kappa.tar.
 UNIX_OTHERS = makefile mk sun95.tex sun95_gd1.eps sun95_gd2.eps \
@@ -310,7 +319,7 @@ sun95_pixco.eps sun95_gridco.eps kappa.news sun221.tex sun95_gd9.eps
 #  to make a UNIX release. 
 UNIX_RELEASE =  $(UNIX_OTHERS) kappa.star-hlp kappa.ifd \
 $(KAPPA_SOURCE) $(KAPPA_DATA) $(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SOURCES) \
-$(KAPPA_CCDPACK) $(KAPVIEW_SUB) $(NDFPACK_SUB) 
+$(KAPPA_CCDPACK) $(KAPVIEW_SUB) $(NDFPACK_SUB) $(OTHER_HELPS)
 
 #  The contents of kappa.tar.
 UNIX_TOTAL = kappa_source.tar makefile mk sun95.tex sun95_gd1.eps \
