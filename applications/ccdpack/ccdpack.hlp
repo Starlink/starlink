@@ -173,11 +173,7 @@
      incarnations. 
 
 
-  The following minor changes have also been made since v3.1-0:
-
-   - There have been bug fixes to MAKEMOS: previously when USEVAR was 
-     false, and SCALE was true or WEIGHTS were set, the wrong weights 
-     were sometimes applied to images in overlap regions.
+  The following minor changes have also been made since v3.1-1:
      
    - There have been some improvements and bug fixes to the percentile
      location routine used by FINDOBJ.
