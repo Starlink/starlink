@@ -1241,7 +1241,7 @@ $(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 $(NDFPACK_MON) : $(NDFPACK_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) lsfun1.o $(LINK_SCRIPT)
 	$(ALINK) $(NDFPACK_MONO_SOURCE:.f=.o) -o $(NDFPACK_MON) \
 	         lsfun1.o $(OBJECT_LIBRARIES) \
-	         $(ADDLIBS) `./$(LINK_SCRIPT)` $(TCLLIBS) $(LDFLAGS)
+	         $(ADDLIBS) $(TCLLIBS) `./$(LINK_SCRIPT)` $(LDFLAGS)
 
 #  List of the interface files to be built and rules for compiling them.
 
