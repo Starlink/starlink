@@ -146,6 +146,8 @@
 *        Added argument TRIM.
 *     22-FEB-2001 (DSB):
 *        Modified to support 3D data.
+*     22-MAR-2001 (DSB):
+*        Correct expresion for DIMZ.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -192,9 +194,9 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER DIM1               ! X dimension of output cube (spatial axis 1)
-      INTEGER DIM2               ! Y dimension of output cube (spatial axis 2)
-      INTEGER DIM3               ! Z dimension of output cube (freq axis 3)
+      INTEGER DIMX               ! X dimension of output cube (spatial axis 1)
+      INTEGER DIMY               ! Y dimension of output cube (spatial axis 2)
+      INTEGER DIMZ               ! Z dimension of output cube (freq axis 3)
       INTEGER DIMST              ! Dimension of output cube on the Stokes axis
       INTEGER EL                 ! No. of elements in a plane of the output NDF
       INTEGER I                  ! Index of current input NDF
@@ -249,13 +251,13 @@
 
 *  Get the bounds and dimensions of the output NDF.
       CALL NDF_BOUND( INDFO, 4, LBND, UBND, NDIM, STATUS )
-      DIM1 = UBND( 1 ) - LBND( 1 ) + 1
-      DIM2 = UBND( 2 ) - LBND( 2 ) + 1
+      DIMX = UBND( 1 ) - LBND( 1 ) + 1
+      DIMY = UBND( 2 ) - LBND( 2 ) + 1
       IF( NDIM .EQ. 4 ) THEN
-         DIM3 = UBND( 3 ) - LBND( 3 )
+         DIMZ = UBND( 3 ) - LBND( 3 ) + 1
          DIMST = UBND( 4 ) - LBND( 4 ) + 1
       ELSE
-         DIM3 = 1
+         DIMZ = 1
          DIMST = UBND( 3 ) - LBND( 3 ) + 1
       END IF
 
@@ -270,7 +272,7 @@
       END DO
 
 *  Store the number of elements per Stokes parameter in the output NDF.
-      EL = DIM1*DIM2*DIM3
+      EL = DIMX*DIMY*DIMZ
 
 *  Map the output DATA array in which to store the IQU values. NEL gets
 *  set to the number of elements in the entire output NDF.
@@ -353,7 +355,7 @@
 *  fitting a least squares quadratic surface to the data within a small 
 *  fitting box.
       IF( ITER .GT. 0 ) THEN 
-         CALL POL1_SNGSM( ILEVEL, HW, DIM1, DIM2, DIM3, DIMST, 
+         CALL POL1_SNGSM( ILEVEL, HW, DIMX, DIMY, DIMZ, DIMST, 
      :                    %VAL( IPVOUT ), %VAL( IPDOUT ), 
      :                    %VAL( IPCOUT ), %VAL( IPIE1 ),
      :                    %VAL( IPX4 ), %VAL( IPX3Y ), 
