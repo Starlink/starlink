@@ -71,6 +71,9 @@
 *        point values should be formatted in no more than 20 columns.
 *     Ncard
 *        This read-only attribute gives the number of cards in the FitsChan.
+*     Warnings
+*        A set of conditions which are to be reported by the addition of
+*        ASTWARN cards to the FitsChan.
 
 *  Methods Over-Ridden:
 *     Public:
@@ -119,6 +122,9 @@
 *           Store a FITS header card in a FitsChan.
 *
 *     Protected:
+*        Test, Clear, Get and Set functions for all the above attributes,
+*        plus:
+*
 *        astFitsEof
 *           See if the FitsChan is at "end-of-file".
 *        astFitsGet<X>
@@ -129,36 +135,10 @@
 *           Store a keyword value in a FitsChan.
 *        astSplit
 *           Splits a header card up into its component parts.
-*        astClearCard
-*           Clear the Card attribute value for a FitsChan.
-*        astClearEncoding  
-*           Clear the Encoding attribute value for a FitsChan.
-*        astClearFitsDigits  
-*           Clear the FitsDigits attribute value for a FitsChan.
 *        astEmpty
 *           Remove all cards and related data from a FitsChan.
 *        astKeyFields
 *           Find the ranges taken by fields within keyword names.
-*        astGetCard  
-*           Get the value of the Card attribute for a FitsChan.
-*        astGetEncoding  
-*           Get the value of the Encoding attribute for a FitsChan.
-*        astGetFitsDigits  
-*           Get the value of the FitsDigits attribute for a FitsChan.
-*        astGetNcard
-*           Get the value of the Ncard attribute for a FitsChan.
-*        astSetCard  
-*           Set the value of the Card attribute for a FitsChan.
-*        astSetEncoding  
-*           Set the value of the Encoding attribute for a FitsChan.
-*        astSetFitsDigits  
-*           Set the value of the FitsDigits attribute for a FitsChan.
-*        astTestCard  
-*           Test the Card attribute value for a FitsChan.
-*        astTestEncoding  
-*           Test the Encoding attribute value for a FitsChan.
-*        astTestFitsDigits  
-*           Test the FitsDigits attribute value for a FitsChan.
            
 *  Other Class Functions:
 *     Public:
@@ -233,6 +213,8 @@
 *        o  Renamed astFields as astKeyFields.
 *     1-APR-2000 (DSB):
 *        Changes for CDi_j based FITS-WCS standard.
+*     18-MAY-2000 (DSB):
+*        Added Warnings attribute.
 *-
 */
 
@@ -277,6 +259,7 @@ typedef struct AstFitsChan {
 /* Attributes specific to objects in this class. */
    int encoding;    /* System for encoding AST objects ito FITS headers */
    int fitsdigits;  /* No. of decmial places in formatted floating point keyword values */
+   char *warnings;  /* Pointer to a string containing warning conditions */
    void *card;      /* Pointer to next FitsCard to be read */
    void *head;      /* Pointer to first FitsCard in the circular linked list */
    void *keyseq;    /* List of keyword sequence numbers used */
@@ -338,6 +321,10 @@ typedef struct AstFitsChanVtab {
    int (* TestEncoding)( AstFitsChan * );
    void (* SetEncoding)( AstFitsChan *, int );
    void (* ClearEncoding)( AstFitsChan * );
+   const char *(* GetWarnings)( AstFitsChan * );
+   int (* TestWarnings)( AstFitsChan * );
+   void (* ClearWarnings)( AstFitsChan * );
+   void (* SetWarnings)( AstFitsChan *, const char * );
 
 } AstFitsChanVtab;
 #endif
@@ -419,6 +406,11 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, int, AstFitsChanVtab *,
    int astTestFitsDigits_( AstFitsChan * );
    void astSetFitsDigits_( AstFitsChan *, int );
    void astClearFitsDigits_( AstFitsChan * );
+
+   const char *astGetWarnings_( AstFitsChan * );
+   int astTestWarnings_( AstFitsChan * );
+   void astClearWarnings_( AstFitsChan * );
+   void astSetWarnings_( AstFitsChan *, const char * );
 
    int astGetNcard_( AstFitsChan * );
 
@@ -561,6 +553,15 @@ astINVOKE(V,astGetFitsDigits_(astCheckFitsChan(this)))
 astINVOKE(V,astSetFitsDigits_(astCheckFitsChan(this),fitsdigits))
 #define astTestFitsDigits(this) \
 astINVOKE(V,astTestFitsDigits_(astCheckFitsChan(this)))
+
+#define astClearWarnings(this) \
+astINVOKE(V,astClearWarnings_(astCheckFitsChan(this)))
+#define astGetWarnings(this) \
+astINVOKE(V,astGetWarnings_(astCheckFitsChan(this)))
+#define astSetWarnings(this,warnings) \
+astINVOKE(V,astSetWarnings_(astCheckFitsChan(this),warnings))
+#define astTestWarnings(this) \
+astINVOKE(V,astTestWarnings_(astCheckFitsChan(this)))
 
 #define astGetNcard(this) \
 astINVOKE(V,astGetNcard_(astCheckFitsChan(this)))
