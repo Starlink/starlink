@@ -36,6 +36,7 @@
 *     15 Dec 92 : V1.7-0 Made units switchable, and added DX,DY parameter (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     28 Mar 95 : V1.8-1 Use new data interface (DJA)
+*     15 Nov 95 : V2.0-0 Full ADI port (DJA)
 *
 *    Type definitions :
 *
@@ -44,6 +45,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'MATH_PAR'
 *
@@ -59,9 +61,11 @@
 
       REAL              	DX, DY                 	! Table to psf offset
       REAL              	SCALE                  	! Image binsize in arcmin
+      REAL			SPARR(2)		! Spaced array data
       REAL              	TOR                    	! Units to radian conversion
       REAL              	X0, Y0                 	! Image position
 
+      INTEGER			BID			! Binned dataset object
       INTEGER           	DIMS(2)                	! Image dimensions
       INTEGER           	DPTR                   	! Pointer to data
       INTEGER			OFID			! Output dataset id
@@ -74,7 +78,7 @@
 *    Version id :
 *
       CHARACTER*30      VERSION
-         PARAMETER      ( VERSION = 'CREPSF Version 1.8-1' )
+         PARAMETER      ( VERSION = 'CREPSF Version 2.0-0' )
 *-
 
 *    Check status
@@ -87,24 +91,32 @@
       CALL AST_INIT()
 
 *    Get output dataset
-      CALL USI_TASSOCO( 'OUT', 'PSF_DATA', OFID, STATUS )
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
 
 *    Get units to work with
       CALL USI_GET0C( 'UNITS', UNITS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       CALL CONV_UNIT2R( UNITS, TOR, STATUS )
 
+*    Get size of output psf dataset
+      CALL USI_GET0I( 'RADIUS', RADIUS, STATUS )
+      DIMS(1) = RADIUS*2+1
+      DIMS(2) = RADIUS*2+1
+
 *    Decide on image size etc.
       CALL USI_PROMT( 'PIXSIZE', 'Pixel size in '//UNITS, STATUS )
       CALL USI_GET0R( 'PIXSIZE', SCALE, STATUS )
 
+*    Create data object
+      CALL BDI_NEW( 'XYimage', 2, DIMS, 'REAL', BID, STATUS )
+      CALL ADI_SETLNK( BID, OFID, STATUS )
+
 *    Create axes
-      CALL BDI_CREAXES( OFID, 2, STATUS )
-      CALL BDI_PUTAXUNITS( OFID, 1, UNITS, STATUS )
-      CALL BDI_PUTAXUNITS( OFID, 2, UNITS, STATUS )
-      CALL BDI_PUTAXLABEL( OFID, 1, 'X position', STATUS )
-      CALL BDI_PUTAXLABEL( OFID, 2, 'Y position', STATUS )
-      CALL BDI_PUTUNITS( OFID, 'Probability/pixel', STATUS )
+      CALL BDI_AXPUT0C( BID, 1, 'Label', 'X position', STATUS )
+      CALL BDI_AXPUT0C( BID, 2, 'Label', 'Y position', STATUS )
+      CALL BDI_AXPUT0C( BID, 1, 'Units', UNITS, STATUS )
+      CALL BDI_AXPUT0C( BID, 2, 'Units', UNITS, STATUS )
+      CALL BDI_PUT0C( OFID, 'units', 'Probability/pixel', STATUS )
 
 *    Image position
       CALL USI_GET0R( 'X0', X0, STATUS )
@@ -133,23 +145,19 @@
         CALL TCI_PUTID( OFID, TIMID, STATUS )
       END IF
 
-*    Get size of output psf dataset
-      CALL USI_GET0I( 'RADIUS', RADIUS, STATUS )
-      DIMS(1) = RADIUS*2+1
-      DIMS(2) = RADIUS*2+1
-
 *    Create axis values
-      CALL BDI_PUTAXVAL( OFID, 1, RADIUS*SCALE, -SCALE, DIMS(1),
-     :                                                  STATUS )
-      CALL BDI_PUTAXVAL( OFID, 2, -RADIUS*SCALE, SCALE, DIMS(2),
-     :                                                  STATUS )
+      SPARR(1) = RADIUS*SCALE
+      SPARR(2) = -SCALE
+      CALL BDI_AXPUT1R( BID, 1, 'SpacedData', 2, SPARR, STATUS )
+      SPARR(1) = RADIUS*SCALE
+      SPARR(2) = SCALE
+      CALL BDI_AXPUT1R( BID, 2, 'SpacedData', 2, SPARR, STATUS )
 
 *    Create PSF structure and associate with PSF system
       CALL PSF_ASSOCO( OFID, PSLOT, STATUS )
 
 *    Map data
-      CALL BDI_CREDATA( OFID, 2, DIMS, STATUS )
-      CALL BDI_MAPDATA( OFID, 'WRITE', DPTR, STATUS )
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', DPTR, STATUS )
 
 *    Get psf <-> grid offsets
       CALL USI_GET0R( 'DX', DX, STATUS )
