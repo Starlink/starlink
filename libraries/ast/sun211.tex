@@ -17,7 +17,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {211.2}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {2nd June 1998}
+\newcommand{\stardocdate}      {9th June 1998}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -588,14 +588,19 @@ coordinate spaces---{\em{i.e.}}\ map projections (the \htmlref{DssMap}{DssMap} a
 and \htmlref{ZoomMap}{ZoomMap}).
 
 \item Lookup tables (the \htmlref{LutMap}{LutMap}).
+
+\item Transformations for internal use within a program, based on
+private transformation functions which you write yourself in C (the
+\htmlref{IntraMap}{IntraMap}).
 \end{itemize}
 
 {\bf{Further reading:}} For a more complete description of each of the
 Mappings mentioned above, see its entry in
 \appref{ss:classdescriptions}. In addition, see the discussion of the
-PermMap in \secref{ss:permmapexample} and the \htmlref{UnitMap}{UnitMap} in
-\secref{ss:unitmapexample}. The ZoomMap is used as an example
-throughout \secref{ss:primer}.
+PermMap in \secref{ss:permmapexample}, the \htmlref{UnitMap}{UnitMap} in
+\secref{ss:unitmapexample} and the IntraMap in
+\secref{ss:intramaps}. The ZoomMap is used as an example throughout
+\secref{ss:primer}.
 
 \subsection{\label{ss:cmpmapoverview}Compound Mappings}
 
@@ -960,7 +965,7 @@ see the Plot entry in \appref{ss:classdescriptions}.
 \cleardoublepage
 %\include{howto}
 %docstatus howto:
-\section{How To\ldots}
+\section{\label{ss:howto}How To\ldots}
 
 For those of you with a plane to catch, this section provides some
 instant templates and recipes for performing the most
@@ -2446,6 +2451,7 @@ as a whole and some of the sub-classes it contains:
    Mapping
       CmpMap
       DssMap
+      IntraMap
       MatrixMap
       PermMap
       SlaMap
@@ -4082,6 +4088,15 @@ use recommended below should be carefully observed:
 
 \begin{quote}
 \begin{description}
+\item[GRAPHICS]\begin{latexonly}\mbox{}\\ \end{latexonly} Identifies
+the coordinate system used by an underlying computer graphics system
+to specify plotting operations. Typically, when performing graphical
+operations, AST is used to define additional coordinate systems which
+are related to these ``native'' graphical coordinates.  Plotting may
+be carried out in any of these coordinate systems, but the GRAPHICS
+domain identifies the native coordinates through which AST
+communicates with the underlying graphics system.
+
 \item[GRID]\begin{latexonly}\mbox{}\\ \end{latexonly} Identifies the
 instantaneous {\em{data grid}} used to store and handle data, together
 with an associated coordinate system. In this coordinate system, the
@@ -21101,23 +21116,18 @@ current version):
 
 \begin{enumerate}
 
-\item A bug has been fixed which could occasionally cause a \htmlref{MatrixMap}{MatrixMap}
-to be used with the wrong \htmlref{Invert}{Invert} attribute value when it forms part of
-a compound \htmlref{Mapping}{Mapping} which is being simplified using \htmlref{astSimplify}{astSimplify}.
+\item A new ``How To\ldots'' section (\secref{ss:howto}) has been
+added to this document. It contains simple recipies for performing
+commonly-required operations using AST.
 
-\item The internal structure of a \htmlref{FrameSet}{FrameSet} is now automatically tidied
-to eliminate redundant nodes whenever any of its Frames is removed or
-re-mapped. Automatic simplification of any compound Mappings which
-result may also occur. The effect of this change is to prevent the
-accumulation of unnecessary structure in FrameSets which are
-repeatedly modified.
-
-\item The internal integrity of a FrameSet is now automatically
-preserved whenever changes are made to any attributes which affect the
-current \htmlref{Frame}{Frame} (either by setting or clearing their values). This is
-accomplished by appropriately re-mapping the current Frame to account
-for any change to the coordinate system which it represents
-(\secref{ss:framesetintegrity}).
+\item A new \htmlref{astUnformat}{astUnformat} function has been provided to read formatted
+coordinate values for the axes of a \htmlref{Frame}{Frame}
+(\secref{ss:unformattingaxisvalues}). In essence, this function is the
+inverse of \htmlref{astFormat}{astFormat}. It may be used to decode user-supplied formatted
+values representing coordinates, turning them into numerical values
+for processing. Celestial coordinates may also be read using this
+function (\secref{ss:unformattingskyaxisvalues}) and free-format input
+is supported.
 
 \item The Format attribute string used by a \htmlref{SkyFrame}{SkyFrame} when formatting
 celestial coordinate values now allows the degrees/hours field to be
@@ -21128,26 +21138,11 @@ field is no longer included by default.  A new ``t'' format specifier
 has been introduced (see the Format attribute) to allow minutes and/or
 seconds of time to be specified if required.
 
-\item A new \htmlref{astUnformat}{astUnformat} function has been provided to read formatted
-coordinate values for the axes of a Frame
-(\secref{ss:unformattingaxisvalues}). In essence, this function is the
-inverse of \htmlref{astFormat}{astFormat}. It may be used to decode user-supplied formatted
-values representing coordinates, turning them into numerical values
-for processing. Celestial coordinates may also be read using this
-function (\secref{ss:unformattingskyaxisvalues}) and free-format input
-is supported.
-
-\item Interfaces to the internal functions and macros used by AST for
-handling memory and error conditions are now provided {\em{via}} the
-``ast.h'' header file. This is for the benefit of those writing
-({\em{e.g.}}) new graphics interfaces for AST.
-
-\item Some improvements have been made to the algorithms for
-simplifying compound Mappings, as used by astSimplify.
-
-\item The textual representation used for some Objects
-({\em{i.e.}}\ when they are written to a \htmlref{Channel}{Channel}) has changed
-slightly, but remains compatible with earlier versions of AST.
+\item A new function \htmlref{astMapBox}{astMapBox} has been introduced. This allows you to
+find the extent of a ``bounding box'' which just encloses another box
+after it has been transformed by a \htmlref{Mapping}{Mapping}. A typical use might be to
+calculate the size which an image would have if it were transformed by
+the Mapping.
 
 \item A new class of \htmlref{Object}{Object}, the \htmlref{IntraMap}{IntraMap}, has been introduced
 (\secref{ss:intramaps}). This is a specialised form of Mapping which
@@ -21156,11 +21151,31 @@ encapsulates a privately-defined coordinate transformation function
 Mapping. This allows you to create Mappings that perform any
 conceivable coordinate transformation.
 
-\item A new function \htmlref{astMapBox}{astMapBox} has been introduced. This allows you to
-find the extent of a ``bounding box'' which just encloses another box
-after it has been transformed by a Mapping. A typical use might be to
-calculate the size which an image would have if it were transformed by
-the Mapping.
+\item The internal integrity of a \htmlref{FrameSet}{FrameSet} is now automatically
+preserved whenever changes are made to any attributes which affect the
+current Frame (either by setting or clearing their values). This is
+accomplished by appropriately re-mapping the current Frame to account
+for any change to the coordinate system which it represents
+(\secref{ss:framesetintegrity}).
+
+\item The internal structure of a FrameSet is now automatically tidied
+to eliminate redundant nodes whenever any of its Frames is removed or
+re-mapped. Automatic simplification of any compound Mappings which
+result may also occur. The effect of this change is to prevent the
+accumulation of unnecessary structure in FrameSets which are
+repeatedly modified.
+
+\item Some improvements have been made to the algorithms for
+simplifying compound Mappings, as used by \htmlref{astSimplify}{astSimplify}.
+
+\item The textual representation used for some Objects
+({\em{i.e.}}\ when they are written to a \htmlref{Channel}{Channel}) has changed
+slightly, but remains compatible with earlier versions of AST.
+
+\item Interfaces to the internal functions and macros used by AST for
+handling memory and error conditions are now provided {\em{via}} the
+``ast.h'' header file. This is for the benefit of those writing
+({\em{e.g.}}) new graphics interfaces for AST.
 
 \item A problem has been fixed which could result when using \htmlref{astRead}{astRead}
 to read FITS headers in which the CDELT value is zero. Previously,
@@ -21168,6 +21183,11 @@ this could produce a Mapping whose inverse transformation was not
 defined and this could unnecessarily restrict the use to which it
 could be put. The problem has been overcome by supplying a suitable
 small CDELT value for FITS axes which have only a single pixel.
+
+\item A bug has been fixed which could occasionally cause a \htmlref{MatrixMap}{MatrixMap}
+to be used with the wrong \htmlref{Invert}{Invert} attribute value when it forms part of
+a compound Mapping which is being simplified using astSimplify.
+
 
 \end{enumerate}
 
