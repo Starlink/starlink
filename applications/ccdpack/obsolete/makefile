@@ -119,6 +119,8 @@
 #           The hypertext linker.
 #        GENERIC
 #           Generic code expander utility
+#        IFD
+#           Generic interface definition file processing module.
 #
 #  Notes:
 #     This makefile uses the presence/absence of the hidden files
@@ -235,6 +237,8 @@
 #     1-APR-1999 (MBT):
 #        Added a number of files copied from KAPPA to assist in AST
 #        frameset manipulation.
+#     10-MAY-1999 (MBT):
+#        Modified to use IFD files as source of IFL files.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -502,13 +506,14 @@ CONFIG_SCRIPTS = EEV3QUICK.DAT EEV3STANDARD.DAT EEV5QUICK.DAT \
 IRAF_SCRIPTS = ccdexercise.cl use_globals.cl $(MONOLITHS:=.tcl) \
                ccdpack.hd ccdpack.men _ccdpack.hd root.hd
 
-#  Startup script.  This is the file that must be executed (sourced)
+#  Startup scripts.  These are the files that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases
-#  and environment variables.  It is listed separately from the public
-#  scripts as it is edited by the installation procedure.
+#  and environment variables.  They are listed separately from the public
+#  scripts as they are edited by the installation procedure.
 
 STARTUP_SCRIPT = $(PKG_NAME).csh
 IRAF_STARTUP_SCRIPT = $(PKG_NAME).cl
+ICL_STARTUP_SCRIPT = $(PKG_NAME).icl
 
 #  Link script.  This script does not form part of the package but is
 #  required for building it.  It will not be installed.
@@ -519,13 +524,6 @@ LINK_SCRIPT2 = $(PKG_NAME)_graphics_link_adam
 #  Private scripts required to build the package.
 
 PRIVATE_SCRIPTS = dgeneric
-
-#  Startup ICL script.  This is the file that must be loaded by ICL
-#  for a user of this package,  in order to define the package command
-#  set within ICL.  It is listed separately from the public scripts as
-#  it is edited by the installation procedure.
-
-ICL_SCRIPT = $(PKG_NAME).icl
 
 #  List of private include files.  These are include files
 #  which form part of the package and are required in order to build
@@ -740,6 +738,17 @@ MONOLITH5 = $(PKG_NAME)_scr
 MONO_IFL = $(PKG_NAME)_red.ifl $(PKG_NAME)_reg.ifl $(PKG_NAME)_res.ifl \
            $(PKG_NAME)_nag.ifl $(PKG_NAME)_scr.ifl
 
+#  Monolith tcl file names.
+
+MONO_TCL = $(PKG_NAME)_red.tcl $(PKG_NAME)_reg.tcl $(PKG_NAME)_res.tcl \
+           $(PKG_NAME)_nag.tcl $(PKG_NAME)_scr.tcl
+
+#  IFD interface files.
+
+IFD_FILES = $(PKG_NAME).ifd $(REDTASKS:=.ifd) $(REGTASKS:=.ifd) \
+            $(RESTASKS:=.ifd) $(NAGTASKS:=.ifd) $(SCRTASKS:=.ifd) \
+            $(HELPTASK).ifd 
+
 #  IRAF parameter files.
 
 IRAF_PAR = $(REDTASKS:=.par) $(REGTASKS:=.par) $(RESTASKS:=.par) \
@@ -816,7 +825,7 @@ HAVE_NAG = 0
 
 BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
  $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MONOLITHS) $(IFC_FILES) \
- $(HELP_FILES) $(ICL_SCRIPT) $(STARTUP_SCRIPT) \
+ $(HELP_FILES) $(ICL_STARTUP_SCRIPT) $(STARTUP_SCRIPT) \
  $(IRAF_STARTUP_SCRIPT) $(HELPTASK) $(PLATFORM_TCLBINARIES) \
  $(IRAF_SCRIPTS) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
 
@@ -892,14 +901,12 @@ USER_ERR:	user_err;	          $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
-$(PRIVATE_INCLUDES) $(HELP_SOURCES) $(MONO_SOURCE) \
-$(STARTUP_SCRIPT) $(IFL_FILES) $(ICL_SCRIPT):
+$(PRIVATE_INCLUDES) $(HELP_SOURCES) $(MONO_SOURCE) $(IFD_FILES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
 	  else echo $@ is not in the tar file; exit 1; fi
 
-
-$(PUBLIC_SCRIPTS) $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS):
+$(PUBLIC_SCRIPTS) $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) :
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	chmod 755 $@
 	@ if test -f $@; then :;\
@@ -955,7 +962,7 @@ $(HELPSRC) : $(HELPTASK).tar
 	@ if test -f $@; then :;\
 	  else echo $@ is not in the tar file; exit 1; fi
 
-$(IRAF_SCRIPTS) $(IRAF_STARTUP_SCRIPT) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip: $(PKG_NAME)_iraf.tar
+$(IRAF_SCRIPTS) $(IRAF_HELP) helpdb.mip: $(PKG_NAME)_iraf.tar
 	$(TAR_OUT) $(PKG_NAME)_iraf.tar $@
 	@ if test -f $@; then :;\
 	   else echo $@ is not in the tar file; exit 1; fi
@@ -971,12 +978,11 @@ CCDPACK_HOME = /mbt/support/ccdpack
 
 RCSFILES = makefile mk $(LATEX_DOCS) $(PKG_NAME).news $(HELPSRC) \
            $(PRIVATE_INCLUDES) $(MONO_SOURCE) $(HELP_SOURCES) \
-           $(STARTUP_SCRIPT) $(IFL_FILES) $(ICL_SCRIPT) $(PUBLIC_SCRIPTS) \
+           $(IFD_FILES) $(PUBLIC_SCRIPTS) \
            $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
            $(SUBSRC) $(CSUBSRC) $(DGENSRC) $(GENSRC) $(GENRDSRC) \
            $(GENLRDICSRC) $(GENLRDISRC) $(TASKSRC) $(IRGSRC) $(CIRGSRC) \
-           $(IRHSRC) $(DATA_FILES) $(IRAF_SCRIPTS) $(IRAF_STARTUP_SCRIPT) \
-           $(IRAF_PAR) $(IRAF_HELP)
+           $(IRHSRC) $(DATA_FILES) $(IRAF_SCRIPTS) $(IRAF_HELP)
 
 #  Build all required source files for distribution (tar archives etc)
 
@@ -1012,11 +1018,9 @@ $(PKG_NAME)_source.tar :
 	co $(PRIVATE_INCLUDES)
 	co $(MONO_SOURCE)
 	co $(HELP_SOURCES)
-	co $(STARTUP_SCRIPT)
-	co $(IFL_FILES)
-	co $(ICL_SCRIPT)
+	co $(IFD_FILES)
 	chmod 644 $(HELP_SOURCES) $(MONO_SOURCE) $(PRIVATE_INCLUDES) \
-		  $(STARTUP_SCRIPT) $(IFL_FILES) $(ICL_SCRIPT)
+		  $(IFD_FILES)
 	co $(PUBLIC_SCRIPTS)
 	co $(LINK_SCRIPT1)
 	co $(LINK_SCRIPT2)
@@ -1036,14 +1040,12 @@ $(PKG_NAME)_source.tar :
 	gunzip atclsh.sun4_Solaris.gz
 	gunzip atclsh.ix86_Linux.gz
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PRIVATE_INCLUDES) $(MONO_SOURCE) \
-	   $(HELP_SOURCES) $(STARTUP_SCRIPT) $(IFL_FILES) \
-	   $(ICL_SCRIPT) $(PUBLIC_SCRIPTS) \
+	   $(HELP_SOURCES) $(IFD_FILES) $(PUBLIC_SCRIPTS) \
 	   $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
 	   ccdwish.alpha_OSF1 ccdwish.sun4_Solaris ccdwish.ix86_Linux \
 	   atclsh.alpha_OSF1 atclsh.sun4_Solaris atclsh.ix86_Linux
 	@- $(RM) $(PRIVATE_INCLUDES) $(MONO_SOURCE) \
-		$(HELP_SOURCES) $(STARTUP_SCRIPT) \
-		$(IFL_FILES) $(ICL_SCRIPT) $(PUBLIC_SCRIPTS) \
+		$(HELP_SOURCES) $(IFD_FILES) $(PUBLIC_SCRIPTS) \
 		$(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
 	        ccdwish.alpha_OSF1 ccdwish.sun4_Solaris ccdwish.ix86_Linux \
 	        atclsh.alpha_OSF1 atclsh.sun4_Solaris atclsh.ix86_Linux
@@ -1111,12 +1113,10 @@ $(DATA_FILES):
 	chmod 644 $(DATA_FILES)
 
 $(PKG_NAME)_iraf.tar:
-	co $(IRAF_SCRIPTS) $(IRAF_STARTUP_SCRIPT) $(IRAF_PAR) $(IRAF_HELP)
+	co $(IRAF_SCRIPTS) $(IRAF_HELP)
 	cp $(CCDPACK_HOME)/documents/helpdb.mip ./
-	   $(TAR_IN) $(PKG_NAME)_iraf.tar $(IRAF_STARTUP_SCRIPT) \
-	   $(IRAF_SCRIPTS) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
-	@- $(RM) $(IRAF_SCRIPTS) $(IRAF_STARTUP_SCRIPT) \
-	   $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
+	$(TAR_IN) $(PKG_NAME)_iraf.tar $(IRAF_SCRIPTS) $(IRAF_HELP) helpdb.mip
+	@- $(RM) $(IRAF_SCRIPTS) $(IRAF_HELP) helpdb.mip
 
 #  Rules for extracting platform specific source files from the source
 #  archive.
@@ -1272,7 +1272,7 @@ $(MONOLITH4): $(PKG_NAME)_nag.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
         else \
 	   if test -f $(MONOLITH4) ; then $(RM) -f $(MONOLITH4) ; else :; fi;\
 	   echo "#!/bin/sh" > $(MONOLITH4);\
-	   echo "echo Sorry no NAG based routines are available." > \
+	   echo "echo Sorry no NAG based routines are available." >> \
                 $(MONOLITH4);\
 	   chmod 755 $(MONOLITH4) ;\
 	fi
@@ -1303,27 +1303,24 @@ IFC_FILES = $(IFL_FILES:.ifl=.ifc) $(MONO_IFL:.ifl=.ifc)
 .ifl.ifc:
 	$(STAR_BIN)/compifl $<
 
-#  Rule to create the monolith interface files from the source.
-$(MONO_IFL): $(IFL_FILES)
-	@- if test -f $(PKG_NAME)_red.ifl ; then $(RM) -f $(PKG_NAME)_red.ifl ; else :; fi
-	echo "MONOLITH $(PKG_NAME)_red" > $(PKG_NAME)_red.ifl
-	cat $(REDTASKS:=.ifl) >> $(PKG_NAME)_red.ifl
-	echo "ENDMONOLITH" >> $(PKG_NAME)_red.ifl
-	@- if test -f $(PKG_NAME)_reg.ifl ; then $(RM) -f $(PKG_NAME)_reg.ifl ; else :; fi
-	echo "MONOLITH $(PKG_NAME)_reg" > $(PKG_NAME)_reg.ifl
-	cat $(REGTASKS:=.ifl) >> $(PKG_NAME)_reg.ifl
-	echo "ENDMONOLITH" >> $(PKG_NAME)_reg.ifl
-	@- if test -f $(PKG_NAME)_res.ifl ; then $(RM) -f $(PKG_NAME)_res.ifl ; else :; fi
-	echo "MONOLITH $(PKG_NAME)_res" > $(PKG_NAME)_res.ifl
-	cat $(RESTASKS:=.ifl) >> $(PKG_NAME)_res.ifl
-	echo "ENDMONOLITH" >> $(PKG_NAME)_res.ifl
-	@- if test -f $(PKG_NAME)_nag.ifl ; then $(RM) -f $(PKG_NAME)_nag.ifl ; else :; fi
-	echo "MONOLITH $(PKG_NAME)_nag" > $(PKG_NAME)_nag.ifl
-	cat $(NAGTASKS:=.ifl) >> $(PKG_NAME)_nag.ifl
-	echo "ENDMONOLITH" >> $(PKG_NAME)_nag.ifl
-	echo "MONOLITH $(PKG_NAME)_scr" > $(PKG_NAME)_scr.ifl
-	cat $(SCRTASKS:=.ifl) >> $(PKG_NAME)_scr.ifl
-	echo "ENDMONOLITH" >> $(PKG_NAME)_scr.ifl
+#  Rule for generating the ADAM interface files and startup scripts from
+#  the IFD files.
+
+$(IFL_FILES) $(MONO_IFL) $(STARTUP_SCRIPT) $(ICL_STARTUP_SCRIPT): $(IFD_FILES)
+	$(STAR_BIN)/ifd2star $(PKG_NAME)
+
+#  Rule for generating the IRAF interface files, tcl files and startup 
+#  script from the IFD files.  Note some of these need a little bit of
+#  tweaking.
+
+$(IRAF_PAR) $(MONO_TCL) $(IRAF_STARTUP_SCRIPT): $(IFD_FILES)
+	$(STAR_BIN)/ifd2iraf $(PKG_NAME)
+	$(RM) $(PKG_NAME).par
+	for f in $(MONO_TCL); do \
+           echo >>$$f 'global env' \
+           echo >>$$f 'if { ! info exists $env(CCDPACK_GLOBALS) \'
+           echo >>$$f '|| $env(CCDPACK_GLOBALS) != yes } {unset DynParList}'; \
+        done
 
 #  Name of the date stamp file.  This is used to record the time of the
 #  most recent build for use in subsequent operations that require it.
@@ -1647,10 +1644,10 @@ install:
 #  Install the package ICL script.  The package version number must be
 #  edited into this, and read permission given.	 Leave the original file
 #  in place.
-	if test -n "$(ICL_SCRIPT)"; then \
+	if test -n "$(ICL_STARTUP_SCRIPT)"; then \
 	   sed -e s#PKG_VERS#$(PKG_VERS)# \
-	      $(ICL_SCRIPT) >$(INSTALL_BIN)/$(ICL_SCRIPT) ;\
-	   chmod 755 $(INSTALL_BIN)/$(ICL_SCRIPT) ;\
+	      $(ICL_STARTUP_SCRIPT) >$(INSTALL_BIN)/$(ICL_STARTUP_SCRIPT) ;\
+	   chmod 755 $(INSTALL_BIN)/$(ICL_STARTUP_SCRIPT) ;\
 	else :; fi
 #
 #   Install the IRAF files. Thes go into INSTALL_IRAF_BIN and
@@ -1921,11 +1918,11 @@ do_deinstall:
 #  Deinstall the package ICL file.  Since it will have been edited
 #  during installation, we remove the installed copy, if present, and
 #  then ensure that the original exists.
-	- if test -n "$(ICL_SCRIPT)"; then \
-           if test -f $(INSTALL_BIN)/$(ICL_SCRIPT); then\
-              $(RM) $(INSTALL_BIN)/$(ICL_SCRIPT);\
+	- if test -n "$(ICL_STARTUP_SCRIPT)"; then \
+           if test -f $(INSTALL_BIN)/$(ICL_STARTUP_SCRIPT); then\
+              $(RM) $(INSTALL_BIN)/$(ICL_STARTUP_SCRIPT);\
            else :; fi ;\
-           $(MAKE) $(ICL_SCRIPT);\
+           $(MAKE) $(ICL_STARTUP_SCRIPT);\
         else :; fi
 #
 #  Deinstall the Latex documentation, if installed versions exist.
@@ -2126,7 +2123,8 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 clean:
 	@- $(RM) $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) $(IFL_FILES) \
 		 $(MONO_IFL) $(HELP_SOURCES) $(PLATFORM_F) $(BLOCK_DATA) \
-		 $(C_ROUTINES) $(PRIVATE_SCRIPTS) 1>/dev/null 2>/dev/null
+		 $(C_ROUTINES) $(PRIVATE_SCRIPTS) $(IFD_FILES) \
+	         1>/dev/null 2>/dev/null
 	@- $(RM) $(F_ROUTINES) 1>/dev/null 2>/dev/null
 	@- $(RM) $(OBJECT_FILES) 1>/dev/null 2>/dev/null
 	@ echo
