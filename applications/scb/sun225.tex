@@ -400,11 +400,18 @@ An example site installation might go as follows:
 \end{verbatim}
 \end{quote}
 
+Note that the variables defining installation directories 
+etc.\ must be defined at {\em build} time, 
+and not between building and installation.
+
 SCB requires Perl 5.  It was developed using version 5.004\_04.
 Earlier versions of Perl may work, but have not been tested.
 
 
-\subsection{\label{sec:install-cgi}Installing the CGI script}
+\subsection{\xlabel{sec:install-cgi}Installing the CGI script}
+
+This part of the installation can normally only be done by 
+the system manager.
 
 In order to use this package to browse source code using a
 World Wide Web browser, the browser script {\tt scb.pl}
@@ -436,8 +443,12 @@ ScriptAlias /cgi-bin/star/ /star/bin/cgi/
 \end{quote}
 Alternatively, the script {\tt /star/bin/cgi/scb.pl} may be copied 
 into an existing CGI directory.
-Setting up the CGI program can usually only 
-be done by the system manager.
+The script does make use of external libraries in the directory 
+defined by PERL\_MOD\_DIR (typically {\tt /star/lib/perl5}), 
+but as long as this was
+defined (in the {\tt mk} script or by an environment variable)
+at build time, the CGI script will locate the libraries correctly
+even if copied away from its installed position.
 
 Every attempt has been made to make the CGI script secure against
 abuse by users of the browsing facility, but anybody setting it 
@@ -485,7 +496,7 @@ in the SCB\_SOURCES directory
 
 
 
-\subsection{\label{sec:indexing} Generating the index}
+\subsection{\xlabel{sec:indexing} Generating the index}
 
 In order for the browser to work, indexes of the source files must be
 generated.  This is done by the script {\tt scbindex.pl}, installed
@@ -583,7 +594,7 @@ The error message in this case should give an indication of what has
 gone wrong and how to fix it.
 
 
-\subsubsection{\label{sec:personal}Creating a personalised index}
+\subsubsection{\xlabel{sec:personal}Creating a personalised index}
 
 As well as examining all the source files from their natural home
 in the main Starlink source tree (the SCB\_SOURCES directory),
@@ -656,13 +667,13 @@ section \ref{sec:indexing}.
 The browser system tries to come up with the requested section of
 source code, but for one reason and another sometimes fails to 
 do so.  
-% For more insight into why it behaves as it does, and 
-% how it might be coaxed into behaving otherwise, 
-% section \ref{sec:internals} gives some explanation of how the
-% indexing and extraction is done.
+For more insight into why it behaves as it does, and 
+how it might be coaxed into behaving otherwise, 
+section \ref{sec:internals} gives some explanation of how the
+indexing and extraction is done.
 
 
-\subsection{Command line operation}
+\subsection{\xlabel{sec:extract-commandline}Command line operation}
 
 However the package has been installed, it should be 
 possible to use the extractor program, {\tt scb.pl},
@@ -829,7 +840,7 @@ If the {\tt -exact} flag is given then these variations are not attempted.
 
 
 
-\subsection{Browsing using HTML}
+\subsection{\xlabel{sec:extract-cgi}Browsing using HTML}
 
 If the extractor program {\tt scb.pl} has been installed
 as a CGI program as described in section \ref{sec:install-cgi}
@@ -849,7 +860,7 @@ if you have built your own index).
 
 
 \subsubsection{Locating a source file}
-\label{BROWSER-HELP} 
+\xlabel{BROWSER-HELP} 
 
 The top level page of the source code browser is a form
 with the following parts:
@@ -967,6 +978,314 @@ is contained in the tar archive {\tt figaro\_dsa.tar}, and
 within that archive is called {\tt dsa/dsa\_dat\_sz.f}.
 
 At the bottom of each file is a copyright notice.
+
+
+\section{Internal workings}
+
+The code is mainly documented by in-line comments,
+but an overview of its operation is given here so 
+that the interested reader can gain more insight into
+the capabilities and limitations of the package.
+This overview will also prove useful as an introduction to
+the code for anyone wishing to modify or extend it, 
+for instance by adding or replacing modules for indexing 
+given source code languages.
+
+This section is not required reading for users of this package.
+
+\subsection{Index files}
+
+The indexing program builds disk-based indexes, and the browser program
+interrogates them.  There are three indexes:
+\begin{itemize}
+\item {\bf Tasks}:
+For each package, a list of all the tasks which have been identified
+is kept (the definition of what constitutes a task is rather 
+loose, but it is intended to be programs which can be invoked by
+typing their names from the Unix shell, ADAM ICL, or other external
+environment).
+Only the name of each task is stored here; 
+for each task there will be a corresponding entry for
+that package in the Routines index.
+This list also serves as a list of all the
+packages which have been indexed.
+%
+\item {\bf Files}:
+An index of every file which makes up the indexed source code set,
+indexed by bare filename (i.e.\ the tail of the filename, excluding
+path information).
+%
+\item {\bf Routines}:
+An index of every C and Fortran function and subroutine, 
+indexed by the name used by the Unix linker on the supported systems;
+thus C functions are indexed by their function names 
+as written in the source code, and Fortran routines by the function 
+or subroutine name in lower case, followed by a single underscore.
+C preprocessor macro functions are also indexed,
+but Fortran statement functions are not.
+The location stored for each function gives only the file in
+which it can be found, not the position within that file.
+\end{itemize}
+
+The Tasks index is stored in a plain text file called {\tt tasks};
+being plain text it has, in general, to be read in its entirety to find any
+required piece of information.
+
+The File and Routine indexes
+each resemble a table which
+maps a key (name of the routine or file), and optionally a 
+Starlink package name, to a location in the source tree. 
+For each name which occurs at all 
+the index contains a list of one or more locations, 
+one for each package in which it occurs.
+The index can be interrogated by requesting any location for a given name,
+or by requesting a location which is preferentially within a given package
+(using the `name' and `package' arguments of the CGI script respectively).
+An important upshot of this is that if there are two instances of
+the same file name or of the same function/routine name 
+{\em in the same package\/}, only one will be indexed, so that the
+browser program will never access the other.
+The same routine name may crop in different packages without causing
+clashes however.
+
+The File and Routine indexes are
+handled by the program as StarIndex 
+objects (named {\tt file} and {\tt func} respectively), 
+i.e.\ are of a type 
+defined in the supplied module {\tt StarIndex.pm}.
+The corresponding files are much larger than the Tasks file 
+(a couple of megabytes or more each),
+but because of the way they are implemented 
+(currently as a hash of flattened lists tied to an NDBM file), 
+any given entry can be accessed by key very quickly.
+The design of these objects was dictated chiefly by the requirements
+of the browser program, as explained in 
+section \ref{sec:internals-extractor}).
+
+
+
+\subsection{\xlabel{sec:internals-tagging}Parsing and tagging source code}
+
+Both the indexer and the extractor need to be able to parse the 
+source code: the indexer needs to know which
+functions/subroutines are indexed in each source file so that
+it can write the `func' index, and the extractor needs to know
+what is a reference to another file so that it can generate
+hyperlinks, and also the position of function/subroutine 
+definitions so that references can point to the right place in
+source files (via {\tt <a name=''>} tags).
+
+Both routines therefore use the same parsing routines. 
+A detailed description of how these interface with
+the indexer and extractor programs are given in the 
+module {\tt Scb.pm}, but the basic idea is that these routines
+take as input the raw source code and output the same text
+with added HTML-like tags indicating where functions are defined 
+and where they are called.
+
+One routine is supplied for tagging C source and one for 
+Fortran.  
+Each uses routines from the module {\tt Tag.pm}
+which is designed to make it fairly painless to write a
+reasonably successful tagging program in Perl.
+The SCB package has been designed to make
+replacing one of the language-specific tagging modules 
+(for instance with a more efficient or more accurate one),
+or adding a new one (for instance for a different language), 
+fairly easy---aspects of this 
+procedure are documented in the modules {\tt Scb.pm} and {\tt Tag.pm},
+while the existing tagging modules {\tt CTag.pm} and {\tt FortranTag.pm}
+serve as examples.
+
+The existing tagging routines are good enough to generate 
+accurate indexing information and hypertext 
+for a large majority of the source files in the
+Starlink software collection, but could be improved upon:
+they can be quite inefficient on memory and slow
+for the largest source files, and can be fooled into misinterpreting
+the source code, e.g.\ the C module can be confused by conditional
+compilation directives, and the Fortran one fails to identify
+statement function definitions.
+
+
+
+\subsection{Operation of the indexer program}
+
+The function of the indexer program {\tt scbindex.pl} 
+is to go through
+each of the Starlink packages in turn, writing the name and 
+location of each task, file and function into the appropriate 
+indexes.
+
+For each package being indexed, every file in 
+its directory or tar archive, 
+and in any subdirectories or subarchives thereof is examined. 
+Any file within a tar archive 
+is written to the Files index
+(files which only occur outside tar files are omitted
+from that index since they are probably intermediate files 
+generated as the result of building the package; 
+a few explicit exceptions to this rule are made 
+including makefiles and Starlink documents). 
+Any file for which a
+source code tagging routine exists
+is passed through the tagging routine;
+the output is examined for any function definitions 
+(tags of the form `{\tt <a name='...'>}'), 
+and an entry is written to the Routines index for each of these.
+
+Finally various heuristics are pursued to identify
+keys from the Routine index which also appear to be tasks, 
+and an entry is written to the Tasks index containing these.
+Even if no tasks are found, an entry containing just the package
+name is written to the Tasks index to serve as a record that 
+the current package has been indexed.
+
+
+\subsection{\xlabel{sec:internals-extractor}Operation of the extractor program}
+
+The extractor program {\tt scb.pl} functions in two main modes;
+as a normal program which can be invoked from the Unix shell and
+outputs plain text,
+and as a CGI program which is run under the control of an HTTP server
+to produce (predominantly) HTML output.
+
+In command line mode, the main function of the extractor
+program is to locate 
+the file or routine requested using whatever arguments it
+has been given (see section \ref{sec:extract-commandline}),
+which may require pulling it out from within tar archives.
+If no such file can be found, an error message is written.
+
+In CGI mode, the program has two additional responsibilities.
+Firstly, if invoked without sufficient arguments to identify 
+a file for output, it must present some useful alternative in HTML.
+Secondly, when presenting source code, it must mark up 
+appropriate words as HTML anchors.
+
+When supplied with insufficient arguments it may simply present
+a formatted (and hopefully useful) error message. 
+More commonly however, for instance if invoked with no arguments
+at all, it will present a form and/or a series of links 
+enabling the user to re-invoke the program 
+in such a way as to present the source file required.
+The philosophy here is to put the user in a better position 
+to find what he or she is looking for; the form/links
+listed may or may not be what are expected, but they should be useful.
+
+Marking the source code up with HTML anchor tags 
+is done partly by the extractor program itself, 
+and partly by separate language-specific tagging routines.
+Having extracted the source code, the extractor 
+checks whether a suitable tagging routine exists. 
+If not, then some basic markup is done and the file written 
+more or less raw.
+If such a routine does exist however, it is called, 
+which adds
+HTML-like tags indicating the positions of routine definitions 
+and code references.
+The extractor program goes through this, and converts it to 
+actual HTML before writing it out.
+The following example should clarify this.  
+If the original code is:
+%
+% This is rather ugly LaTeX, sorry - I think it's worthwhile if you're
+% looking at the (latex2html'd) results in HTML though.
+%
+\begin{quote}
+\tt
+\#include "header.h" \\
+int code (int argc, char **argv) \{ \\
+\mbox{}\ \ \ (void) do\_stuff(); \\
+\} \\
+\end{quote}
+it will changed by the tagging routine to read:
+\begin{quote}
+\tt
+\#include "{\bf $<$a href='INCLUDE-header.h'$>$}header.h{\bf $<$/a$>$}" \\
+int {\bf $<$a name='code'$>$}code{\bf $<$/a$>$} (int argc, char **argv) \{ \\
+\mbox{}\ \ \ (void) {\bf $<$a href='do\_stuff'$>$}do\_stuff{\bf $<$/a$>$}(); \\
+\} \\
+\end{quote}
+which, assuming the code appears within a package named ``pack'', 
+will finally be modified for output by the extractor to look something like:
+\begin{quote}
+\tt
+\#include "{\bf $<$a href='scb.pl?header.h\&package=pack\&type=file'$>$}header.h{\bf $<$/a$>$}" \\
+int {\bf $<$a name='code'$>$}code{\bf $<$/a$>$} (int argc, char **argv) \{ \\
+\mbox{}\ \ \ (void) {\bf $<$a href='scb.pl?do\_stuff\&package=pack\&type=func\#do\_stuff'$>$}do\_stuff{\bf $<$/a$>$}(); \\
+\} \\
+\end{quote}
+The hyperlinks written by the browser program are thus such
+(see section \ref{sec:extract-commandline})
+that they effectively point to a routine or file of the given name from
+the current package if one exists, but if it does not, it will
+use one from another package.
+This can sometimes resolve to the wrong routine - for instance
+if there are multiple routines of the same name inside the
+package, or none inside but one in each of several different packages.
+However, it has a good chance of resolving to the right routine,
+especially for routines named in the usual Starlink way of
+{\tt pre\_name}, and importantly it has no need to attempt to 
+understand include files, link scripts or makefiles, which 
+would make the whole task a great deal more complicated.
+
+Note that the link to the function (although not to the include file)
+includes specification of a target within the document, 
+which is important if the referenced function is just one of many within a
+large source file (frequent in C source, although less so in Fortran).
+Links to locations within a file work because of the
+{\tt $<$a name='...'$>$} tags at function definitions.
+
+A couple of other subtleties are observed in creating these hyperlinks.
+Firstly, if no file or routine of the given name exists for any package,
+the link is not created, but the word which would otherwise have
+been a link is simply printed in bold to indicate that it looks
+like it ought to reference another file but does not.
+Secondly, if the referenced item exists in the same source file,
+a truncated URL giving only the relative position in the same
+file is written.  This prevents the behaviour (which smart browsers
+may in any case avoid) of having to reload the same file when all
+that is required is to move around in it.
+
+
+
+
+
+
+
+
+
+% \section{Extending the code}
+% 
+% As it stands, SCB will index all the files in each package,
+% and the functions and subroutines which can be identified
+% within C and Fortran source files. 
+% The latter are indexed using the names which the linker 
+% invoked by the Unix linker gives them on the supported 
+% platforms -- that is C functions are indexed using exactly the
+% names they have in the source code, and Fortran functions and
+% subroutines by lowercase versions of the names, with a single
+% underscore appended.
+% 
+% This is sufficient to cover a large proportion of the Starlink
+% source code, but it may be desirable in future to index 
+% code in a different language, or to use more efficient or more
+% accurate parsing routines for the languages already handled.
+% Hooks are present in the SCB programs to enable this, 
+% and this section explains how these can be used.
+% 
+% Three problems arise in extending the package to deal with additional
+% languages.  The first is writing a parsing routine 
+% which understands the source code in the new language,
+% the second is telling the SCB package when to use this, 
+% and the third is causing SCB to maintain an index of 
+% callable routines in the new language.
+% 
+% \subsection{Writing a parser routine for use with SCB}
+
+
+
 
 
 
