@@ -81,8 +81,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     5 Jan 1995 (DJA):
+*      5 Jan 1995 (DJA):
 *        Original version.
+*     12 Nov 1995 (DJA):
+*        Proof against silly ATAN2 behaviour.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -128,12 +130,19 @@
 
       ELSE IF ( OP .EQ. WCI__OPS2N ) THEN
 
-*    Distance from special point
-        RTHETA = SQRT( PROJ(1)**2 + PROJ(2)**2 )
-
 *    Convert linear x,y to native sphericals
-        UNPROJ(1) = ATAN2( PROJ(1), - PROJ(2) )
-        UNPROJ(2) = ATAN( 1D0 / RTHETA )
+        IF ( (PROJ(1).EQ.0.0D0) .AND. (PROJ(2).EQ.0.0D0) ) THEN
+          UNPROJ(1) = 0.0
+          UNPROJ(2) = 0.0
+        ELSE
+
+*      Distance from special point
+          RTHETA = SQRT( PROJ(1)**2 + PROJ(2)**2 )
+
+          UNPROJ(1) = ATAN2( PROJ(1), - PROJ(2) )
+          UNPROJ(2) = ATAN( 1D0 / RTHETA )
+
+        END IF
 
       END IF
 
