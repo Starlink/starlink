@@ -1,5 +1,6 @@
 %pointer
 
+%{
 /*+
 * Name:
 *    ctag-l.l
@@ -39,7 +40,17 @@
 *        Initial version.
 *-
 */
+
+void count();
+void comment();
+void cpluspluscomm();
+void cpp();
+void ecount();
+void define();
+void include();
+void munch();
  
+%}
 
 
 D			[0-9]
@@ -51,25 +62,11 @@ IS			[uUlL]*
 S			[ \t\v\n\f]*
 IDENT			{L}({L}|{D})*
 
-/* Limits bigger than default required for lex (not flex). */
 
 %k 1000
 %p 5000
 %a 3000
 
-
-%{
-
-void count();
-void comment();
-void cpluspluscomm();
-void cpp();
-void ecount();
-void define();
-void include();
-void munch();
-
-%}
 
 %%
 
@@ -114,7 +111,7 @@ void munch();
 "while"/{S}\(?			{ count(); return(WHILE); }
 
 F77_SUBROUTINE/{S}\(		{ count(); return(F77_SUBROUTINE); }
-F77_[A-Z]+_FUNCTION/{S}\(	{ count(); return(F77_FUNCTION); }
+F77_[A-Z]+_FUNCTION{S}/\(	{ count(); return(F77_FUNCTION); }
 F77_EXTERNAL_NAME/{S}\(		{ count(); return(F77_EXTERNAL); }
 F77_CALL/{S}\(			{ count(); return(F77_CALL); }
 
@@ -130,7 +127,7 @@ F77_CALL/{S}\(			{ count(); return(F77_CALL); }
 {D}*"."{D}+({E})?{FS}?		{ count(); return(CONSTANT); }
 {D}+"."{D}*({E})?{FS}?		{ count(); return(CONSTANT); }
 
-\"(\\.|[^\\"])*\"		{ count(); return(STRING_LITERAL); }
+\"(\\.|[^\\"])*\"		{ ecount(); return(STRING_LITERAL); }
 
 ";"				{ count(); return(';'); }
 "{"				{ count(); return('{'); }
@@ -167,30 +164,9 @@ F77_CALL/{S}\(			{ count(); return(F77_CALL); }
 #include <ctype.h>
 #include <stdlib.h>
 
+
 extern char *yylval;
 extern int yyleng;
-
-#define BUFINC 128       /* Amount by which to increase buffer each time.
-                            Affects only time/memory efficiency. */
-
-/*
-*  These definitions set up variables to be used for passing text to
-*  the parser.  When each token is returned, as well as the matched 
-*  characters an extra string is prepended to them as follows:
-*
-*     preval   
-*        The text to precede the next yylval.
-*     length   
-*        The length of preval, excluding the terminating NULL.
-*     prealloc 
-*        The space allocated for preval, excluding the terminating NULL.
-*
-*  The routines which modify these keep the amount of space allocated
-*  and the length values up to date.
-*/
-   char *preval = "";
-   int preleng = 0;
-   int prealloc = 0;
 
 
    int yywrap() {
@@ -217,89 +193,6 @@ extern int yyleng;
       return(1); 
    }
 
-   void sappend( char *s ) {
-/*
-*+
-*  Name:
-*     sappend
-*
-*  Purpose:
-*     Append a string to the preval string.
-*
-*  Description:
-*     This routine appends a string to the preval string.  If the preval
-*     string is not long enough to hold the new one, then more space 
-*     is allocated for it.
-*-
-*/
-
-/* Local variables. */
-      int leng;
-
-/* See how many extra characters are to be added to preval. */
-      leng = strlen( s );
-
-/* Extend the allocated space if necessary. */
-      while ( preleng + leng > prealloc ) {
-         if ( prealloc == 0 ) {
-            preval = (char *) malloc( BUFINC + 1 );
-            *preval = '\0';
-         }
-         else {
-            preval = (char *) realloc( preval, prealloc + BUFINC + 1 );
-         }
-         prealloc += BUFINC;
-      }
-
-/* Append the string to preval. */
-      strcat( preval, s );
-      preleng += leng;
-   }
-
-   void cappend( char c ) {
-/*
-*+
-*  Name:
-*     cappend
-*
-*  Purpose:
-*     Append a character to the preval string.
-*
-*  Description:
-*     This routine appends a single character to the preval string. 
-*     If the character is '<', '>' or '&', then it is replaced in the
-*     preval string by the appropriate HTML entity reference.
-*-
-*/
-
-/* Switch on the value of the character. */
-      switch( c ) {
-
-/* If it needs to be replaced by an entity reference, do so via sappend. */
-         case '<':
-            sappend( "&lt;" );
-            break;
-         case '>':
-            sappend( "&gt;" );
-            break;
-         case '&':
-            sappend( "&amp;" );
-            break;
-
-/* Otherwise it's just a single character: extend allocation if necessary
-   and add the new character. */
-         default:
-            if ( preleng + 1 > prealloc ) {
-               if ( prealloc == 0 ) 
-                  preval = (char *) malloc( BUFINC + 1 );
-               else
-                  preval = (char *) realloc( preval, prealloc + BUFINC + 1 );
-               prealloc++;
-            }
-            preval[ preleng ] = c;
-            preval[ ++preleng ] = '\0';
-      }
-   }
 
    void count() {
 /*
@@ -318,7 +211,7 @@ extern int yyleng;
 *-
 */
 
-/*  Append preval and the matched text. */
+/* Append preval and the matched text. */
       yyleng = preleng + strlen( yytext );
       yylval = (char *) malloc( yyleng + 1 );
       if ( preleng > 0 ) {
@@ -329,7 +222,7 @@ extern int yyleng;
          strcpy( yylval, yytext );
       }
 
-/*  Reclaim space used by preval if necessary. */
+/* Reclaim space used by preval if necessary. */
       if ( prealloc > 0 ) {
          free( preval );
          preleng = 0;
@@ -354,7 +247,7 @@ extern int yyleng;
       int i;
       for ( i = 0; i < strlen( yytext ); i++ )
          cappend( yytext[ i ] );
-      yytext = "";
+      *yytext = '\0';
       yyleng = 0;
       count();
    }
