@@ -1,3 +1,4 @@
+
   GAIA TODO LIST
   ==============
 
@@ -98,6 +99,9 @@ Note not many of these are likely as time and funding are short...
       - Increase search box maximum
 
       - Add Landolt catalogue
+
+      - Open binary FITS tables using Skycat methods (avoids problems
+        when file has multiple periods which CAT doesn't like).
 
   o Regions
        
