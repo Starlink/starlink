@@ -160,6 +160,7 @@
       INTEGER SOP                ! SOP of the CRDD file
       INTEGER OBS                ! Observation number of the CRDD file
       INTEGER UBND( 2 )          ! Upper bounds of CRDD data array
+      CHARACTER *(80) TEMPSTR    ! Temporary string holder
 
 *.
 
@@ -241,9 +242,10 @@
 
 *  Convert the sky coordinate to string form.
                SCSLN = CHR_LEN( SCS )
+               TEMPSTR = SCS( : SCSLN )
                CALL FIO_WRITE( LOGFID, 
      :         ' Reference position taken as expected source '/
-     :         /'position ('//SCS( : SCSLN )//' ): ', STATUS )
+     :         /'position ('//TEMPSTR//' ): ', STATUS )
                CALL IRA_DTOC( LON( 1 ), LAT( 1 ), SCS, 1, 
      :                        LONST, LATST, STATUS )
                CALL FIO_WRITE( LOGFID, '      '//LONST, STATUS )
@@ -282,8 +284,9 @@
 
 *  Convert the sky coordinate to string form.
                   SCSLN = CHR_LEN( SCS )
+                  TEMPSTR = SCS( : SCSLN )
                   CALL FIO_WRITE( LOGFID, ' Expected source position ('/
-     :                     /SCS( : SCSLN )//' ): ', STATUS )
+     :                     /TEMPSTR//' ): ', STATUS )
                   CALL IRA_DTOC( LON( 1 ), LAT( 1 ), SCS, 1, 
      :                           LONST, LATST, STATUS )
                   CALL FIO_WRITE( LOGFID, '      '//LONST, STATUS )

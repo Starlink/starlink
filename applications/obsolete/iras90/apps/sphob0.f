@@ -64,6 +64,7 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
+      CHARACTER*40 TEMPSTR       ! Temporary string
 
 *.
 
@@ -85,7 +86,8 @@
 
          CALL FIO_WRITE( FD, 'Log file from IRAS90:SKYPHOT',
      :                   STATUS )
-         CALL FIO_WRITE( FD, 'Sky coordinates: '//SCS, STATUS )
+         TEMPSTR = SCS
+         CALL FIO_WRITE( FD, 'Sky coordinates: '//TEMPSTR, STATUS )
 
       END IF         
 
