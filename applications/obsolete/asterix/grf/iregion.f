@@ -64,6 +64,8 @@
             CALL IREGION_GTE(STATUS)
           ELSEIF (MODE.EQ.'ARD') THEN
             CALL IREGION_ARD(STATUS)
+          ELSEIF (MODE.EQ.'SHO') THEN
+            CALL IREGION_SHOW(STATUS)
           ELSE
             CALL MSG_PRNT('AST_ERR: unknown mode '//MODE)
           ENDIF
@@ -426,6 +428,49 @@
       ENDIF
 
       END
+
+
+
+*+
+      SUBROUTINE IREGION_SHOW(STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'QUAL_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Import :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL GFX_QCONTOUR(I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
+     :                   %val(I_XPTR),%val(I-YPTR),%val(I_REGPTR),
+     :                                           QUAL_MASK,STATUS)
+
+        IF (STATUS.NE.SAI__OK) THEN
+          CALL ERR_REP(' ','from IREGION_SHOW',STATUS)
+        ENDIF
+
+      ENDIF
+
+      END
+
+
 
 
 
