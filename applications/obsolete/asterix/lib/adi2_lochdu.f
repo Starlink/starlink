@@ -59,7 +59,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     ADI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/adi.html
+*     ADI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/adi.html
 
 *  Keywords:
 *     package:adi, usage:private, FITS
@@ -175,7 +175,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     ADI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/adi.html
+*     ADI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/adi.html
 
 *  Keywords:
 *     package:adi, usage:private, FITS

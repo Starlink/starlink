@@ -356,7 +356,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 
 *+ AXCENTROID_7 - Perform sum over axis 7
       SUBROUTINE AXCENTROID_7( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q,
-     :                 QFLAG, MASK,VFLAG, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                 QFLAG, MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
 *    Description :
 *
@@ -376,7 +376,6 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *    Input :
 *
       LOGICAL                QFLAG               ! Use quality
-      LOGICAL                VFLAG               ! Use variance
 
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       REAL                   I_A(*)              ! Axis values
@@ -453,7 +452,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 
 *+ AXCENTROID_6 - Perform sum over axis 6
       SUBROUTINE AXCENTROID_6( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q,
-     :                 QFLAG, MASK,VFLAG, M1,M2,M3,M4,M5,M7, O_D, O_Q )
+     :                 QFLAG, MASK,M1,M2,M3,M4,M5,M7, O_D, O_Q )
 
 *    Description :
 *
@@ -473,7 +472,6 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *    Input :
 *
       LOGICAL                QFLAG               ! Use quality
-      LOGICAL                VFLAG               ! Use variance
 
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       REAL                   I_A(*)              ! Axis values
@@ -550,7 +548,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 
 *+ AXCENTROID_5 - Perform sum over axis 5
       SUBROUTINE AXCENTROID_5( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q,
-     :                 QFLAG, MASK,VFLAG, M1,M2,M3,M4,M6,M7, O_D, O_Q )
+     :                 QFLAG, MASK,M1,M2,M3,M4,M6,M7, O_D, O_Q )
 
 *    Description :
 *
@@ -570,7 +568,6 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *    Input :
 *
       LOGICAL                QFLAG               ! Use quality
-      LOGICAL                VFLAG               ! Use variance
 
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       REAL                   I_A(*)              ! Axis values
@@ -647,8 +644,8 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 
 *+ AXCENTROID_4 - Perform sum over axis 4
       SUBROUTINE AXCENTROID_4( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q,
-     :                 QFLAG, MASK,VFLAG, M1,M2,M3,M5,M6,M7, O_D, O_Q )
-
+     :                 QFLAG, MASK,M1,M2,M3,M5,M6,M7, O_D, O_Q )
+*
 *    Description :
 *
 *    History :
@@ -667,7 +664,6 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *    Input :
 *
       LOGICAL                QFLAG               ! Use quality
-      LOGICAL                VFLAG               ! Use variance
 
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       REAL                   I_A(*)              ! Axis values
@@ -744,7 +740,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 
 *+ AXCENTROID_3 - Perform sum over axis 3
       SUBROUTINE AXCENTROID_3( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q,
-     :                 QFLAG, MASK,VFLAG, M1,M2,M4,M5,M6,M7, O_D, O_Q )
+     :                 QFLAG, MASK,M1,M2,M4,M5,M6,M7, O_D, O_Q )
 
 *    Description :
 *
@@ -764,7 +760,6 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *    Input :
 *
       LOGICAL                QFLAG               ! Use quality
-      LOGICAL                VFLAG               ! Use variance
 
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       REAL                   I_A(*)              ! Axis values
@@ -840,7 +835,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 
 *+ AXCENTROID_2 - Perform sum over axis 2
       SUBROUTINE AXCENTROID_2( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q,
-     :                 QFLAG, MASK,VFLAG, M1,M3,M4,M5,M6,M7, O_D, O_Q )
+     :                 QFLAG, MASK,M1,M3,M4,M5,M6,M7, O_D, O_Q )
 
 *    Description :
 *
@@ -860,7 +855,6 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *    Input :
 *
       LOGICAL                QFLAG               ! Use quality
-      LOGICAL                VFLAG               ! Use variance
 
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       REAL                   I_A(*)              ! Axis values
@@ -937,7 +931,7 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 
 *+ AXCENTROID_1 - Perform sum over axis 1
       SUBROUTINE AXCENTROID_1( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q,
-     :                 QFLAG, MASK,VFLAG, M2, M3,M4,M5,M6,M7, O_D, O_Q )
+     :                 QFLAG, MASK,M2, M3,M4,M5,M6,M7, O_D, O_Q )
 
 *    Description :
 *
@@ -957,7 +951,6 @@ c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *    Input :
 *
       LOGICAL                QFLAG               ! Use quality
-      LOGICAL                VFLAG               ! Use variance
 
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       REAL                   I_A(*)              ! Axis values

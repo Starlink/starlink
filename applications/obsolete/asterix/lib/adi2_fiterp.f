@@ -61,13 +61,13 @@
 *     {DIY_prologue_text}
 
 *  References:
-*     {routine_references}...
+*     ADI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/adi.html
 
 *  Keywords:
 *     package:adi, usage:private, FITSIO, error reporting
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
