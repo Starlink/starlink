@@ -15,6 +15,8 @@
 #  History:
 #     7-JUL-1998 (DSB):
 #     	 Original version.
+#     18-NOV-1998 (DSB):
+#        Added RAY.
 #     {enter_further_changes_here}
 
 #-
@@ -77,6 +79,15 @@ interface POLEXT
       ppath    'DEFAULT'
       default  F
       prompt   'Should all screen output be suppressed?'
+   endparameter
+
+   parameter RAY
+      type     LITERAL
+      access   READ
+      ppath    'DEFAULT'
+      vpath    'DEFAULT'
+      default  !
+      prompt   'A new RAY value'
    endparameter
 
    parameter WPLATE

@@ -2630,6 +2630,18 @@ for NDF applications.
          file are listed before being modified. Otherwise, nothing is written
          to the screen. [FALSE]
       }
+
+      \sstsubsection{
+         WPLATE = LITERAL (Read)
+      }{
+         This parameter indicates if the supplied files contain $O$ or $E$ ray 
+         data. It is appropriate only to files containing extracted data 
+         equivalent to the output images from \htmlref{POLKA}{POLKA}. It 
+         should be supplied equal to ``O'' or ``E''. The same value is stored 
+         in all supplied data files. If a null (!) value is supplied, any 
+         existing RAY values are left unchanged, but no new ones are added. [!]
+      }
+
       \sstsubsection{
          WPLATE = LITERAL (Read)
       }{
@@ -4682,6 +4694,9 @@ now (roughly) proportional to the size of the picture being used.
 \item The default title is now obtained from the TITLE component of
 the Stokes cube. Previously it was obtained from the Title attribute of
 the WCS information.
+
+\item A new parameter called ``RAY'' has been added to POLEXT to allow the RAY
+component of the POLPACK extension to be assigned a value.
 
 \end{enumerate}
 

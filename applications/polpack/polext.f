@@ -79,6 +79,13 @@
 *        If FALSE, then the contents of the POLPACK extension in each data 
 *        file are listed before being modified. Otherwise, nothing is written 
 *        to the screen. [FALSE] 
+*     RAY = LITERAL (Read)
+*        This parameter indicates if the supplied files contain O or E ray 
+*        data. It is appropriate only to files containing extracted data 
+*        equivalent to the output images from POLKA. It should be supplied 
+*        equal to "O" or "E". The same value is stored in all supplied data 
+*        files. If a null (!) value is supplied, any existing RAY values are 
+*        left unchanged, but no new ones are added. [!]
 *     WPLATE = LITERAL (Read)
 *        The half-wave plate position, in degrees, as a string. This must be 
 *        one of "0.0", "22.5", "45.0", "67.5" (abbreviations are allowed).
@@ -117,6 +124,8 @@
 *  History:
 *     7-JUL-1997 (DSB):
 *        Original version.
+*     18-NOV-1998 (DSB):
+*        Added RAY parameter.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -155,6 +164,8 @@
       CHARACTER IMGJ*( IDLEN )         ! A comparison IMGID value 
       CHARACTER NDFNAM*( GRP__SZNAM )  ! Name of current NDF
       CHARACTER POLLOC*( DAT__SZLOC )  ! Locator to POLPACK extension
+      CHARACTER RAY*1                  ! Supplied ray indicator; "O" or "E"
+      CHARACTER RY*1                   ! Ray indicator to store; "O" or "E"
       CHARACTER STOKES*5               ! Current value of STOKES component
       CHARACTER WPL*5                  ! The WPLATE value to store
       CHARACTER WPLATE*5               ! The supplied WPLATE value
@@ -180,6 +191,7 @@
       LOGICAL GOTFIL             ! Was a FILTER value given?
       LOGICAL GOTIMG             ! Were any IMGID values given?
       LOGICAL GOTPOL             ! Does NDF contain a POLPACK extension?
+      LOGICAL GOTRAY             ! Was a RAY value given?
       LOGICAL GOTWPL             ! Was a WPLATE value given?
       LOGICAL QUIET              ! Run silently?
       REAL ANG                   ! The ANGROT value to store
@@ -330,6 +342,17 @@
          GOTWPL = .TRUE.
       END IF
 
+*  Get the RAY value. Annul the error if a null (!) value was supplied,
+*  and set a flag indicating whether to store the RAY value.
+      CALL PAR_CHOIC( 'RAY', ' ', 'O,E', .FALSE., RAY, STATUS )
+
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )    
+         GOTRAY = .FALSE.
+      ELSE
+         GOTRAY = .TRUE.
+      END IF
+
 *  Create a group to hold the names of the NDFs which were processed
 *  successfully.
       CALL GRP_NEW( 'Good NDFs', IGRP2, STATUS )
@@ -376,6 +399,7 @@
          ANG = 0.0
          IMG = NDFNAM( MAX( 1, LNDF - IDLEN + 1 ) : LNDF )
          WPL = ' '
+         RY = ' '
 
          IF( GOTPOL ) THEN
             CALL NDF_XGT0C( INDF, 'POLPACK', 'STOKES', STOKES, STATUS )
@@ -383,6 +407,7 @@
             CALL NDF_XGT0C( INDF, 'POLPACK', 'FILTER', FILT, STATUS )
             CALL NDF_XGT0C( INDF, 'POLPACK', 'IMGID', IMG, STATUS )
             CALL NDF_XGT0C( INDF, 'POLPACK', 'WPLATE', WPL, STATUS )
+            CALL NDF_XGT0C( INDF, 'POLPACK', 'RAY', RY, STATUS )
 
 *  Create the POLPACK extension if there isn't one.
          ELSE
@@ -396,6 +421,7 @@
          IF( GOTFIL ) FILT = FILTER
          IF( GOTIMG ) CALL GRP_GET( IGRP3, INDX, 1, IMG, STATUS )
          IF( GOTWPL ) WPL = WPLATE
+         IF( GOTRAY ) RY = RAY
 
 *  Store the values. First do Stokes vector cubes.
          IF( STOKES .NE. ' ' ) THEN
@@ -417,6 +443,8 @@
             CALL NDF_XPT0C( FILT, INDF, 'POLPACK', 'FILTER', STATUS )
             CALL NDF_XPT0C( IMG, INDF, 'POLPACK', 'IMGID', STATUS )
             CALL NDF_XPT0C( WPL, INDF, 'POLPACK', 'WPLATE', STATUS )
+            IF( RY .NE. ' ' ) CALL NDF_XPT0C( RY, INDF, 'POLPACK', 
+     :                                        'RAY', STATUS )
 
          END IF
 
