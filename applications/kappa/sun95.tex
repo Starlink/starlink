@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun95.17}
 \newcommand{\stardocnumber}    {95.17}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {10 July 2001}
+\newcommand{\stardocdate}      {20 August 2001}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {0.18}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -12801,7 +12801,7 @@ default value.
    Uses an ARD file to set some pixels of an NDF to be bad
 }{
    \sstdescription{
-      This task allows regions of a NDF's data array to be masked, so
+      This task allows regions of a NDF{\tt '}s data array to be masked, so
       that they can be excluded from subsequent data processing.  ARD
       (ASCII Region Definition) descriptions stored in a text
       file define which pixels of the data array are masked.  An
@@ -12817,22 +12817,17 @@ default value.
          ARDFILE = FILENAME (Read)
       }{
          The name of the ARD file containing a description of the parts
-         of the image to be masked out, {\it i.e.}\ set to bad.  The suggested
-         default is the current value or {\tt ardfile.dat} if there is no
-         current value.
-      }
-      \sstsubsection{
-         COSYS = LITERAL (Read)
-      }{
-         The co-ordinate system to be used.  This can be either {\tt "World"}
-         or {\tt "Data"}.  If COSYS = {\tt "World"} the co-ordinates used in the
-         ARD file are pixel co-ordinates.  If COSYS = {\tt "Data"}
-         the co-ordinates used in the ARD file are interpreted as data
-         co-ordinates, provided the NDF contains axes that map onto
-         pixel co-ordinates using linear transformations.  If there are
-         no axes, pixel co-ordinates are assumed; if axes are present
-         but non-linear, the task fails.  COSYS={\tt "World"} is recommended.
-         {\tt [}Current co-ordinate system{\tt ]}
+         of the image to be masked out, \emph{i.e.} set to bad. The suggested
+         default is the current value or ardfile.dat if there is no current
+         value. The co-ordinate system in which positions within this file
+         are given should be indicated by including suitable COFRAME or WCS
+         statements within the file (see SUN/183). For instance, starting the
+         file with a line containing the text {\tt "}COFRAME(PIXEL){\tt "} will indicate
+         that positions are specified in pixel coordinates. The statement
+         {\tt "}COFRAME(SKY,System=FK5){\tt "} would indicate that positions are
+         specified in RA/DEC (FK5,J2000). If no such statements are included,
+         then it is assumed that positions are given within the current
+         co-ordinate system of the input NDF.
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -12847,17 +12842,17 @@ default value.
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Title for the output NDF structure.  A null value ({\tt !})
+         Title for the output NDF structure.  A null value (!)
          propagates the title from the input NDF to the output NDF. {\tt [!]}
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         ardmask a1060 galaxies.ard a1060\_sky title="A1060 galaxies masked"
+         ardmask a1060 galaxies.ard a1060\_sky title={\tt "}A1060 galaxies masked{\tt "}
       }{
          This flags pixels defined by the ARD file galaxies.ard within
          the NDF called a1060 to create a new NDF called a1060\_sky.
-         a1060\_sky has a title={\tt "A1060 galaxies masked"}.  This might be
+         a1060\_sky has a title={\tt "}A1060 galaxies masked{\tt "}.  This might be
          to flag the pixels where bright galaxies are located to
          exclude them from sky-background fitting.
       }
@@ -12868,12 +12863,6 @@ default value.
          and sets the pixels specified by the ARD description contained
          in ardfile.txt to the bad value.  The resultant image is
          output to the NDF called ic3374a.  The title is unchanged.
-      }
-      \sstexamplesubsection{
-         ardmask in=ic3374 ardfil=ardfile.txt out=ic3374a cosys=data
-      }{
-         As the previous example except that the ARD file is
-         written using data co-ordinates.
       }
    }
    \sstdiytopic{
@@ -12886,29 +12875,31 @@ default value.
       There is also a summary with examples in the main body of SUN/95
       and the online help.
    }
-   \sstimplementationstatus{
-      \sstitemlist{
-
-         \sstitem
-         This routine correctly processes the AXIS, DATA, QUALITY,
-         LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
-         data structure and propagates all extensions.
-
-         \sstitem
-         Processing of bad pixels and automatic quality masking are supported.
-
-         \sstitem
-         All non-complex numeric data types can be handled.
-
-      }
-   }
    \sstdiytopic{
       Related Applications
    }{
       KAPPA: ARDGEN.
    }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the WCS, AXIS, DATA, QUALITY,
+         LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
+         data structure and propagates all extensions.
+
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
+
+         \sstitem
+         Bad pixels and automatic quality masking are supported.
+
+         \sstitem
+         All non-complex numeric data types can be handled.
+      }
+   }
 }
-\newpage
 \sstroutine{
    AXCONV
 }{
@@ -44148,10 +44139,25 @@ KEY to ``Y''.
 \item [TURBOCONT] Use \htmlref{CONTOUR}{CONTOUR} instead.
 \end{description}
 
+\subsection{ARD - ASCII Region Definitions}
+Applications which use ARD to describe regions of an image (ARDMASK,
+etc), now make use of the extended WCS facilities includes in ARD version
+2 (see SUN/183). In particular, this means that positions within an ARD
+file can be given in any coordinate system which 
+
 \subsection{Modified Commands}
 The following applications have been modified:
 
 \begin{description}
+
+   \item [\htmlref{ARDMASK}{ARDMASK}] \mbox{}
+      \begin{itemize}
+         \item The COSYS parameter has been removed. Unless the ARD file
+               indicates otherwise, positions within the ARD file are now 
+               assumed to be in the current Frame of the NDF. The ARD file 
+               can contain COFRAME and WCS statements to indicate that
+               positions are given in some other co-ordinate Frame.
+      \end{itemize}
 
    \item [\htmlref{ELPROF}{ELPROF}] \mbox{}
       \begin{itemize}
@@ -44174,7 +44180,7 @@ The following applications have been modified:
          the displayed profile to be saved in a 1-dimensional NDF.
       \end{itemize}
 
-   \item [\htmlref{THRESH}{THRESH] \mbox{}
+   \item [\htmlref{THRESH}{THRESH}] \mbox{}
       \begin{itemize}
          \item A bug has been fixed which could cause bad values in the output
          to be treated as good values.
@@ -44182,7 +44188,7 @@ The following applications have been modified:
 
 \end{description}
 
-\subsecton{KAPPA Subroutine Libraries}
+\subsection{KAPPA Subroutine Libraries}
 Many of the internal subroutines used within KAPPA are of potential
 use to people developing their own applications. To make it easier for
 such people to use the internal facilities of KAPPA, the following
@@ -44195,7 +44201,7 @@ distributed as a separate software item called KAPLIBS (see SUN/238):
 \item libfits.a  
 \item libira.a
 \item libkapgen.a
-\item libkapgrf.a (contains grf_kappa.o)
+\item libkapgrf.a (contains grf\_kappa.o)
 \item liblpg.a
 \end{itemize}
 
