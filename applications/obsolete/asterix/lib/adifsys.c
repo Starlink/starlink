@@ -70,7 +70,24 @@ void adix_newlnk( ADIobj id, ADIobj lid, ADIstatus status )
   adix_execi( DnameNewLink, 2, args, status );
   }
 
-ADIobj adix_setlnk( ADIobj id, ADIobj lid, ADIstatus status )
+ADIlogical adix_chk_in_cls( char *clist, int clen, char *name )
+  {
+  int	found = ADI__false;
+  int	i = 0;
+  int   nlen = strlen(name);
+
+  while ( (i<=(clen-nlen)) && ! found ) {
+    if ( clist[i] == name[0] )
+      found = ! memcmp( clist + i, name, nlen );
+    i++;
+    }
+
+  return found;
+  }
+
+
+ADIobj adix_setlnk( ADIobj id, ADIobj lid, char *clist, int clen,
+                    ADIstatus status )
   {
   ADIobj        args[2];
   ADIclassDef	*otdef;
@@ -86,12 +103,15 @@ ADIobj adix_setlnk( ADIobj id, ADIobj lid, ADIstatus status )
   if ( _valid_q(rval) ) {
 
 /* The alternative supplied must be be derived from our original l.h.s */
+/* or must be present in the supplied list of class names */
     otdef = _DTDEF(id);
-    if ( adix_chkder( _DTDEF(rval), otdef, status ) ) {
+    if ( adix_chkder( _DTDEF(rval), otdef, status ) ||
+         adix_chkcls( clist, clen, otdef->name ) {
 
 /* Destroy the original L.H.S, and return the new object */
       adic_erase( &id, status );
       }
+
     else {
       adic_setecs( SAI__ERROR,
       "The SetLink method returned an object of a class which is not derived from the required class %s",
@@ -510,7 +530,7 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
 		   &newid, status );
 
 /*   Try to link them */
-        newid = adix_setlnk( newid, id, status );
+        newid = adix_setlnk( newid, id, cls, clen, status );
 
 /*   Linkage worked? Return new object */
         if ( _ok(status) ) {
