@@ -58,7 +58,7 @@
 
         CALL GCB_ATTACH('IMAGE',STATUS)
         CALL IMG_2DGCB(STATUS)
-	print *,mode,i_gui
+
         IF (MODE.EQ.'LOAD'.AND.I_GUI) THEN
           CALL ICOLOUR_GUI_LOAD(STATUS)
         ELSEIF (MODE.EQ.'UPDATE'.AND.I_GUI) THEN
@@ -1014,7 +1014,6 @@
       INTEGER ICOL
       INTEGER GCBID
 *-
-	print *,ncol,nshade,first,last
       IF (STATUS.EQ.SAI__OK.AND.NCOL.GE.16) THEN
 
 *  locate noticeboard copy of GCB
@@ -1033,7 +1032,6 @@
         CALL NBS_FIND_ITEM(GCBID,'COLOUR_RED',ID,STATUS)
         CALL NBS_GET_CVALUE(ID,0,STRING,NB,STATUS)
         READ(STRING(:NB),*) RED
-	print *,icol,ci,red
         COL(1,ICOL)=RED
         CALL NBS_FIND_ITEM(GCBID,'COLOUR_GREEN',ID,STATUS)
         CALL NBS_GET_CVALUE(ID,0,STRING,NB,STATUS)
@@ -1065,7 +1063,7 @@
         RED=COL(1,J2)
         GREEN=COL(2,J2)
         BLUE=COL(3,J2)
-        CALL PGSCR(LAST,RED,GREEN,BLUE)
+        CALL PGSCR(CI,RED,GREEN,BLUE)
 
       ENDIF
 
