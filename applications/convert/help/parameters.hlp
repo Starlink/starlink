@@ -4,7 +4,7 @@ which you can qualify their behaviour.  Parameters are obtained in
 response to prompts or supplied on a command line.
 
 For convenience, the main aspects of the ADAM parameter system as
-seen by a user of CONVERT are described below.  Though note that most
+seen by a user of CONVERT are described below, but note that most
 of what follows is applicable to any ADAM application.
 
 2 Defaults
@@ -49,7 +49,7 @@ it is when the filename is a number, e.g. if your NDF was called 234
 you must enter @234, otherwise ADAM will think you are giving the
 integer 234.  Note that the file extension must not be included
 when giving the name of an NDF file.  Otherwise HDS will look
-for an object called SDF within the file. 
+for an object called SDF nested within the file. 
 
 The default value can be edited to save typing by first pressing the
 <TAB> key. The editor behaves like the DCL command-line editor.
@@ -138,7 +138,7 @@ the help system you're reprompted for the parameter.
 Some CONVERT parameters are menus from which you select an option.
 You do not have to enter the full option string, but merely a string
 that selects a choice unambiguously.  In many cases this can be as
-little as a single character.  Here is an example:
+little as a single character.  Here is an example.
 
      TYPE - HDS data type required for NDF /'_REAL'/ ?
 
@@ -216,7 +216,7 @@ Alternatively, you can specify command-line values by position:
      $ DST2NDF MYDST MYNDF
  
 The application converts the Figaro DST file called MYDST.DST to the
-NDF called MYNDF.  Note trailing parameters may missed but
+NDF called MYNDF.  Note that trailing parameters may be omitted but
 intermediate ones may not. The position of a parameter can be found
 in the "Usage" topic for the application.
 
