@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/obsolete/chart</path>
+  <description>CHART - Finding chart and stellar data system</description>
+  <abstract><p>
+The CHART package extracts positions, magnitudes and other data from
+certain stellar and non-stellar astronomical catalogues.  The results
+may be listed on a terminal or printer, or used to plot finding charts
+or perform astrometric reductions.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>P M Allan</name>
+      <uname>pma</uname>
+    </person>
+    <person>
+      <name>Ken Hartley</name>
+    </person>
+    <person>
+      <name>Joe Vickerstaff</name>
+    </person>
+    <person>
+      <name>Tim Wilkins</name>
+    </person>
+    <person>
+      <name>J V Carey</name>
+    </person>
+    <person>
+      <name>Malcolm Currie</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

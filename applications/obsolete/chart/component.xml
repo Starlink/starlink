@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="chart">
+  <version>4.0-1</version>
+  <path>applications/obsolete/chart</path>
+  <description>CHART - Finding chart and stellar data system</description>
+  <abstract><p>
+The CHART package extracts positions, magnitudes and other data from
+certain stellar and non-stellar astronomical catalogues.  The results
+may be listed on a terminal or printer, or used to plot finding charts
+or perform astrometric reductions.
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>chr</build><build>err</build><build>sgs</build><build>gks</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P M Allan</name>
+      <uname>pma</uname>
+    </person>
+    <person>
+      <name>Ken Hartley</name>
+    </person>
+    <person>
+      <name>Joe Vickerstaff</name>
+    </person>
+    <person>
+      <name>Tim Wilkins</name>
+    </person>
+    <person>
+      <name>J V Carey</name>
+    </person>
+    <person>
+      <name>Malcolm Currie</name>
+    </person>
+  </developers>
+  <documentation> sun32</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
