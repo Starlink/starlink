@@ -71,7 +71,7 @@
 
 *     Open for sequential access.
          OPEN (LU,STATUS='UNKNOWN',FILE=FILETR,
-#ifdef HAVE_F77_OPEN_READONLY
+#if HAVE_FC_OPEN_READONLY
      :        READONLY,
 #endif
      :        ERR=9000)
@@ -79,7 +79,7 @@
 
 *     Open for direct access.
          OPEN (UNIT=LU,STATUS='OLD',ACCESS='DIRECT',RECL=LREC,
-#ifdef HAVE_F77_OPEN_READONLY
+#if HAVE_FC_OPEN_READONLY
      :         READONLY,
 #endif
      :         FORM='FORMATTED',ERR=9000,FILE=FILETR)

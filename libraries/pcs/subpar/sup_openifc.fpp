@@ -89,7 +89,7 @@
 *        If number is not in use, use it to open the file
             ISTAT = 0
             OPEN ( UNIT = LUCON, FILE = IFCNAM, STATUS = 'OLD',
-#ifdef HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_READONLY
      :           READONLY, 
 #endif
      :           FORM = 'UNFORMATTED', IOSTAT = ISTAT )
