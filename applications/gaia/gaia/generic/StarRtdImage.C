@@ -148,6 +148,11 @@
 //        Added astaddcolour command.
 //     15-MAY-2001 (PWD):
 //        Changed method for estimating contour region.
+//     08-AUG-2001 (PWD):
+//        Fixed problem with native objects being written at start of
+//        FITS headers (there is a remaining issue with native cards
+//        being written in a non-contiguous fashion that remains
+//        unresolved, hence the "#if 0" sections of code in dumpCmd).
 //-
 
 #include <string.h>
@@ -741,22 +746,26 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             astClear( chan, "Card" );
             AstFrameSet *tmpset = (AstFrameSet *) astRead( chan );
             if ( !astOK ) {
-                cout << "INITIAL READ FAILED" << endl;
                 astClearStatus;
             }
             if ( tmpset != AST__NULL && astIsAFrameSet( tmpset ) ) {
-                astShow( tmpset );
                 tmpset = (AstFrameSet *) astAnnul( tmpset );
             }
 
-            //  If the card position is at the beginning (why?) then
-            //  we should move it past the standard headers.
-            cout << "card position after read = " << 
-                astGetI( chan, "card" ) << endl;
+            //  If the card position is at the beginning then
+            //  we should move it past the standard headers, these are
+            //  those up to the last NAXIS card.
+            int startCard = astGetI( chan, "card" );
+#if 0
             if ( astGetI( chan, "Card" ) == 1 ) {
-                //  Move to end of channel?
-                astSetI( chan, "Card", astGetI( chan, "Ncard" ) );
+                while( astFindFits( chan, "NAXIS%d", card, 1 ) ) {
+                    startCard = astGetI( chan, "card" );
+                }
             }
+#endif
+            //  XXX write at end of headers until AST stops splitting
+            //  native objects. Then use the above.
+            startCard = astGetI( chan, "Ncard" );
 
             //  Now we can try to add the WCS encoding. The encoding
             //  type of the channel is either set to "Native" or
@@ -769,14 +778,25 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                 return TCL_ERROR;
             }
             AstFrameSet *newwcs = wcsp->astWCSClone();
+            astSetI( chan, "Card", startCard );
             nwrite = astWrite( chan, newwcs );
             const char *encod = astGetC( chan, "Encoding" );
+#if 0
+            cout << "MERGED CARDS" << endl;
+            ncard = astGetI( chan, "Ncard" );
+            astClear( chan, "Card" );
+            for ( int i = 0; i < ncard; i++ ) {
+                astFindFits( chan, "%f", card, 1 );
+                cout << card << endl;
+            }
+#endif
             if ( !astOK || nwrite == 0 ) {
 
                 //  Failed to write WCS using default encoding. Try native.
                 if ( ! astOK ) astClearStatus;
                 if ( strcmp( "NATIVE", encod ) != 0 ) {
                     astSet( chan, "Encoding=Native" );
+                    astSetI( chan, "Card", startCard );
                     nwrite = astWrite( chan, newwcs );
                     if ( astOK && nwrite != 0 ) {
                         native = 1;
@@ -808,6 +828,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             //  except native will only have one representations).
             if ( argc == 2 ) {
                 astSet( chan, "Encoding=%s", argv[1] );
+                astSetI( chan, "Card", startCard );
                 nextra = astWrite( chan, newwcs );
 
                 if ( astOK && nextra != 0 ) {
