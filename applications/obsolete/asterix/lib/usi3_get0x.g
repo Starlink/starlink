@@ -155,7 +155,7 @@
 *    Duff status? Try again unless too many times already
         IF ( (STATUS.NE.SAI__OK) .AND. (STATUS.NE.PAR__NULL) .AND.
      :       (STATUS.NE.PAR__ABORT) .AND. (NTRY .LT. MAXTRY) ) THEN
-          CALL ERR_ANNUL( STATUS )
+          CALL ERR_FLUSH( STATUS )
           CLEN = 0
         ELSE
           OK = .TRUE.
