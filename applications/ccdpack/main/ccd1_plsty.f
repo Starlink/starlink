@@ -29,7 +29,9 @@
 *        The name of an ADAM parameter from which additional style 
 *        settings are to be taken.  This will be treated as a GRP 
 *        group, so the normal GRP facilities such as continuation lines 
-*        and file indirection are available.
+*        and file indirection are available.  If set to an empty
+*        string, no attempt will be made to interrogate the parameter
+*        system.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
