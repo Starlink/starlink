@@ -4,7 +4,7 @@
 
 test: dvi2bitmap.tested
 
-dvi2bitmap.tested: hello.dvi
+dvi2bitmap.tested: ../dvi2bitmap hello.dvi
 	sh ./test-font-gen.sh ../dvi2bitmap hello.dvi
 	touch dvi2bitmap.tested
 
