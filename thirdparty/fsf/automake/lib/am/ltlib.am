@@ -55,19 +55,20 @@ install-%DIR%LTLIBRARIES: $(%DIR%_LTLIBRARIES)
 ## guarantee that the $p are all .la files -- so fail noisily if this isn't
 ## the case.
 	    if test -n "$$MANIFEST_FILE"; then \
-		    echo "$(DESTDIR)$(%NDIR%dir)/$$f" >>$$MANIFEST_FILE; \
+	      echo "$(DESTDIR)$(%NDIR%dir)/$$f" >>$$MANIFEST_FILE; \
+	      expr $$p : '.*\.la$$' >/dev/null || \
+		{ echo "Installing non-la file $$p!"; exit 1; }; \
+	      (. $$p; \
+		if test -n "$$library_names"; then \
+		  for l in $$library_names; do \
+		    echo "$$libdir/$$l" >>$$MANIFEST_FILE; \
+		  done; \
+		fi; \
+		if test -n "$$old_library"; then \
+		  echo "$$libdir/$$old_library" >>$$MANIFEST_FILE; \
+		else :; fi; \
+              ); \
 	    else :; fi; \
-	    expr $$p : '.*\.la$$' >/dev/null || \
-		{ echo "Installing non-la file!"; exit 1; }; \
-	    (. $$p; \
-		  if test -n "$$library_names"; then \
-		      for l in $$library_names; do \
-		          echo "$$libdir/$$l" >>$$MANIFEST_FILE; \
-		      done; \
-		  else :; fi; \
-		  if test -n "$$old_library"; then \
-		      echo "$$libdir/$$old_library" >>$$MANIFEST_FILE; \
-		  else :; fi; ); \
 	  else :; fi; \
 	done
 endif %?INSTALL%
