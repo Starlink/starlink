@@ -50,9 +50,11 @@ New release.
 
 </history>
 
+<!--
 <copyright>
 Copyright 1999, Particle Physics and Astronomy Research Council
 </copyright>
+-->
 
 <abstract>
 <px>This application processes a DVI file produced by &tex;,
@@ -946,7 +948,7 @@ conversion factors wrong (I hate these!), please correct me.
 <caption>
 Sizes in TeX
 </caption>
-<tabular>
+<tabular frame="all">
 <tgroup cols="3">
 <thead>
 <row><entry>Context<entry>Description<entry>See
