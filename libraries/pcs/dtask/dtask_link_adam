@@ -32,6 +32,7 @@
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     AJC:  A.J. Chipperfield (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -43,6 +44,8 @@
 #        Generic version.
 #     14-SEP-1995 (AJC):
 #        Modified for DTASK
+#      8-JUL-2004 (TIMJ):
+#        Now use err_link_adam rather than explicit liberr
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -50,7 +53,7 @@
 
 #-
 
-     echo -ldtask_adam -ltask_adam -lerr -lerr_adam `subpar_link_adam` \
+     echo -ldtask_adam -ltask_adam `err_link_adam` `subpar_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
