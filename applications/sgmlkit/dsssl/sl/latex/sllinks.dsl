@@ -21,6 +21,13 @@ ignore the HyTime attributes!
 <misccode>
 <description>REF is a simple reference to another element in the same document.
 Check that the target is a member of the list <funcname/target-element-list/.
+If the `text' attribute is present, then use that as the link text,
+rather than generating it from the link target.  In this case, do not put
+the link text in italics, as it has presumably been chosen to blend in with
+the surrounding text, even though this will make it invisible in a 
+presentation which has no links (the motivation for this was the fact that
+`ref' elements <em/can/ occur within `verbatim' elements, in which a `textit'
+command stands out somewhat).
 <codebody>
 (element ref
   (let ((target (element-with-id (attribute-string (normalize "id")
@@ -28,9 +35,9 @@ Check that the target is a member of the list <funcname/target-element-list/.
 	(linktext (attribute-string (normalize "text")
 				    (current-node))))
     (if (member (gi target) (target-element-list))
-	(make command name: "textit"
-	      (if linktext
-		  (literal linktext)	;override generation of link text
+	(if linktext
+	    (literal linktext)	;override generation of link text
+	    (make command name: "textit"
 		  (if (member (gi target) (section-element-list))
 		      (make-section-reference target: target specify-type: #t)
 		      (with-mode section-reference
