@@ -114,6 +114,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.5  2002/09/11 00:00:33  timj
+*     Initialize the weights array
+*
 *     Revision 1.4  2000/08/22 00:14:18  timj
 *     Some MALLOC variables were not being initialised
 *
@@ -255,6 +258,12 @@
      :     TOTAL_WEIGHT_END, STATUS)
       CALL SCULIB_MALLOC (NX * NY * VAL__NBI, REGRID1_PTR,
      :     REGRID1_END, STATUS)
+
+*     Fill with zeroes
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_CFILLI(NX * NY, 0, %VAL(TOTAL_WEIGHT_PTR))
+      END IF
+
 
       DO I = 1, N_FILES
 

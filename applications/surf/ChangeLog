@@ -1,3 +1,8 @@
+2002-09-10  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib/surflib_median_regrid.f (SURFLIB_MEDIAN_REGRID):
+	Initialize the weights array
+
 2002-09-09  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* src/surf_remsky.f (SURF_REMSKY): Fix "use of unintialized value"
