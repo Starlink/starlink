@@ -61,7 +61,7 @@
             position 4
             type LITERAL
             access READ
-            vpath PROMPT
+            vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             prompt {Frame in NDFs to use as Base frame in AST file}
             default PIXEL
