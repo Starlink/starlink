@@ -859,13 +859,15 @@ do_test:
         mkdir $$SCB_INDEX; \
         echo "scbindex.pl:  Indexing scb_test.tar"; \
         echo " "; \
-        $(INSTALL_BIN)/scbindex.pl scb_test.tar; \
-        echo " "; \
-        echo "scb.pl:  Extracting fortran file"; \
-        echo " "; \
-        $(INSTALL_BIN)/scb.pl -html -exact cmp_struc_ type=func >/dev/null; \
-        $(INSTALL_BIN)/scb.pl -html -exact hds_copy_  type=func >/dev/null; \
-        rm -rf $$SCB_INDEX
+        $(INSTALL_BIN)/scbindex.pl scb_test.tar && \
+        echo " " && \
+        echo "scb.pl:  Extracting fortran file" && \
+        echo " " && \
+        $(INSTALL_BIN)/scb.pl -html -exact scb_hw_  type=func >/dev/null && \
+        $(INSTALL_BIN)/scb.pl -html -exact scb_hw   type=func >/dev/null && \
+        $(INSTALL_BIN)/scb.pl -html -exact Makefile type=file >/dev/null && \
+        echo "Test successful"; echo " ";
+	SCB_INDEX=/usr/tmp/scb_test; rm -rf $$SCB_INDEX
 #
 #  Note the test has been run.
 	@ touch .TESTED_$(SYSTEM)
