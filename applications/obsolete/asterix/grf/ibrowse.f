@@ -578,11 +578,6 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        VAR=.FALSE.
-        ERR=.FALSE.
-        SIGNIF=.FALSE.
-        QUAL=.FALSE.
-        ISCALE=0
 *  locate noticeboard items
         CALL NBS_FIND_ITEM(I_NBID,'X',XID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'Y',YID,STATUS)
@@ -622,6 +617,23 @@
 
         FLAG=0
         DO WHILE (FLAG.EQ.0)
+
+*  get current display option
+          CALL NBS_GET_CVALUE(OID,0,OPTIONS,NB,STATUS)
+          VAR=.FALSE.
+          ERR=.FALSE.
+          SIGNIF=.FALSE.
+          QUAL=.FALSE.
+          ISCALE=0
+          IF (INDEX(OPTIONS,'Q').NE.0) THEN
+            QUAL=.TRUE.
+          ELSEIF (INDEX(OPTIONS,'V').NE.0) THEN
+            VAR=.TRUE.
+          ELSEIF (INDEX(OPTIONS,'E').NE.0) THEN
+            ERR=.TRUE.
+          ELSEIF (INDEX(OPTIONS,'S').NE.0) THEN
+            SIGNIF=.TRUE.
+          ENDIF
 
 *  get current cursor position in device coords
           CALL NBS_GET_VALUE(XPID,0,VAL__NBI,IXP,NB,STATUS)
