@@ -4339,7 +4339,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         CALL ADI_CGET0I( PSID, 'PhaLo', PHALO, STATUS )
         ENERGY = REAL(PHALO)/100.0
       ELSE
-        CALL ADI_CGET0R( PSID, 'Energy', ENERGY, STATUS )
+        CALL PSF0_GETID0R( PSID, 'Energy', ENERGY, STATUS )
       END IF
 
 *  Get PSPC option
