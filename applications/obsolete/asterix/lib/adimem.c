@@ -831,7 +831,7 @@ if (dmp_on) ADImemDump( bptr->cdef, status );
       }
 
 /* Linked list representation */
-    else {
+    else if ( bptr->size >= sizeof(ADIidIndex) ) {
 
       char		*cdata = bptr->data + iobj*bptr->size;
       int		i;
