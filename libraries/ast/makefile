@@ -314,7 +314,7 @@ PKG_NUM = 1521
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 2.0-2.0
+PKG_VERS = <VERSION_NUMBER>-<RELEASE_NUMBER>
 
 #  Library version number.
 #
