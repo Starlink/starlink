@@ -122,7 +122,6 @@ interface POLCAL
    parameter   OUT              # Output NDF
       type     NDF
       access   WRITE
-      vpath    'CURRENT, PROMPT'
       ppath    'CURRENT'
       prompt   'Output NDF'
       helpkey  '*'

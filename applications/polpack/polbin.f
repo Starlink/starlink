@@ -147,7 +147,7 @@
       INTEGER CIIN               ! CAT identifier for input catalogue
       INTEGER CIOUT              ! CAT identifier for output catalogue
       INTEGER GI( 8 )            ! CAT identifiers for columns to be read
-      INTEGER GANG               ! CAT identifiers for ANG column
+      INTEGER GANG               ! CAT identifiers for ANGROT parameter
       INTEGER IP                 ! Pointers to arrays to be filled
       INTEGER IPBIN              ! Pointer to binned Stokes parameters
       INTEGER IPCOV              ! Pointer to workspace
@@ -223,27 +223,6 @@
       REAL TR2( 4 )              ! Coeff.s of cell indices -> (X,Y) mapping
       REAL X0                    ! X at bottom left of bottom left cell
       REAL Y0                    ! Y at bottom left of bottom left cell
-
-*  CAT column attributes...
-      CHARACTER COMM*80
-      CHARACTER EXCEPT*1
-      CHARACTER EXPR*1
-      CHARACTER EXTFMT*20
-      CHARACTER FNAME*10
-      DOUBLE PRECISION DATE 
-      DOUBLE PRECISION SCALEF
-      DOUBLE PRECISION ZEROP
-      INTEGER CI
-      INTEGER CSIZE
-      INTEGER DIMS
-      INTEGER DTYPE
-      INTEGER GENUS
-      INTEGER NULL
-      INTEGER ORDER
-      INTEGER SIZEA
-      INTEGER SZDIM
-      LOGICAL PRFDSP
-
 *.
 
 *  Check the inherited global status.
@@ -370,15 +349,11 @@
       END IF
 
 *  If we are dealing with linear polarisation, get the ACW angle from the
-*  X axis to the reference direction (ANGROT). This is the zero point value
-*  for the ANG column in the supplied catalogue (see POLVEC).
+*  X axis to the reference direction (ANGROT). 
       IF( .NOT. CIRC ) THEN
-         CALL CAT_TIDNT( CIIN, 'ANG', GANG, STATUS )       
-         CALL CAT_CINQ( GANG, SZDIM, CI, FNAME, GENUS, EXPR, DTYPE, 
-     :                  CSIZE, DIMS, SIZEA, NULL, EXCEPT, SCALEF, 
-     :                  ZEROP, ORDER, UNITS, EXTFMT, PRFDSP, COMM, 
-     :                  DATE, STATUS)
-         ANGROT = REAL( ZEROP )
+         CALL CAT_TIDNT( CIIN, 'ANGROT', GANG, STATUS )       
+         CALL CAT_TIQAR( GANG, 'VALUE', ANGROT, STATUS )
+         CALL CAT_TRLSE( GANG, STATUS )
       END IF
 
 *  Decide whether or not a bias correction is needed and possible.

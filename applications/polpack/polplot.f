@@ -36,8 +36,8 @@
 *  ADAM Parameters:
 *     ANGROT = _REAL (Read)
 *        A rotation angle in degrees to be added to each vector
-*        orientation before plotting the vectors (see parameter COLANG).
-*        It should be in the range 0--360. [0.0]
+*        orientation before plotting the vectors (see parameters
+*        COLANG and NEGATE). It should be in the range 0--360. [0.0]
 *     ARROW = LITERAL (Read)
 *        Vectors are drawn as arrows with the size of the arrow head
 *        specified by this parameter. Simple lines can be drawn by setting
@@ -183,6 +183,11 @@
 *     PYSIZE = _REAL (Read)
 *        The length (y axis) of the plot in metres. [Maximum that can
 *        fit in the current picture whilst preserving square pixels]
+*     NEGATE = _LOGICAL (Read)
+*        If a TRUE value is supplied, then the angles giving the
+*        orientation of the polarization (i.e. the values in the column
+*        specified by parameter COLANG) are negated before adding on any 
+*        value specified by parameter ANGROT. [FALSE]
 *     STYLE = GROUP (Read)
 *        The plotting style to use for the annotated axes. This should be 
 *        a group of comma-separated name=value strings where "name" is the 
@@ -335,6 +340,7 @@
       INTEGER VCI                ! Vector colour index
       LOGICAL AXES               ! Annotated axes to be drawn?
       LOGICAL KEY                ! A key to vector scale to be plotted?
+      LOGICAL NEGATE             ! Negate supplied angles?
       LOGICAL THERE              ! Was a FrameSet read fom the catalogue?
       REAL AHSIZE                ! Arrowhead size in world co-ordinates
       REAL AHSIZM                ! Arrowhead size in metres
@@ -591,6 +597,9 @@
      :                STATUS )
       ANGROT = ANGROT * DTOR
 
+*  See if the angles are to be negated before being used.
+      CALL PAR_GET0L( 'NEGATE', NEGATE, STATUS )
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -647,7 +656,7 @@
 *  Plot the vectors.
       CALL POL1_VECPL( NVEC, %VAL( IPX2 ), %VAL( IPY2 ), %VAL( IPMAG ),
      :                 %VAL( IPANG ), ANGFAC, ANGROT, DSCALE, AHSIZE, 
-     :                 JUST, .FALSE., STATUS )
+     :                 JUST, NEGATE, STATUS )
 
 *  Re-instate the previous PGPLOT attributes.
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTRS, STATUS )

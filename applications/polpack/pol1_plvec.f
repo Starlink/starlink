@@ -84,15 +84,6 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Notes:
-*     -  The polarization angles stored in the catalogue are theta values 
-*     (i.e. anti-clockwise angle from the reference direction to the 
-*     polarisation vector). The ANG column should already have had the zero 
-*     point attribute set for it which convert these theta values into ANG 
-*     values (anti-clockwise from the X axis). Scaled values are stored
-*     so that the ANGROT value (i.e. the zero point) can be retrieved by 
-*     POLBIN.
-
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
@@ -449,10 +440,16 @@
      :                            STATUS )
                   CALL CAT_PUT0R( PCAT,   P, ( P .EQ. VAL__BADR ), 
      :                            STATUS )
-                  CALL CAT_PUT0R( ANCAT,  T, ( T .EQ. VAL__BADR ), 
-     :                            STATUS )
                   CALL CAT_PUT0R( PICAT, IP, ( IP .EQ. VAL__BADR ),
      :                            STATUS )
+
+                  IF ( T .NE. VAL__BADR ) THEN
+                     CALL CAT_PUT0R( ANCAT,  ANGROT + T, .FALSE.,
+     :                               STATUS )
+                  ELSE
+                     CALL CAT_PUT0R( ANCAT,  VAL__BADR, .TRUE., 
+     :                               STATUS )
+                  END IF
 
                   IF( VAR ) THEN
                      IF( VI .NE. VAL__BADR ) THEN

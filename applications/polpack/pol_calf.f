@@ -88,11 +88,16 @@
 *
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     11-SEP-1997 (TMG):
 *        Original version.
+*     12-MAY-1998 (DSB):
+*        Reversed order of data arrays passed to CCD1_CMPRR. Previously
+*        the returned scale factor was the reciprocal of the required
+*        value.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -222,10 +227,11 @@
 * Calculate the ratio of the first pair of like `Q' polarisation states,
 * I4/I1.
 
-            CALL CCD1_CMPRR( BAD, VAR, NEL, %VAL( IPDIN( 4, ISET ) ),
-     :                       %VAL( IPVIN( 4, ISET ) ),
+            CALL CCD1_CMPRR( BAD, VAR, NEL, 
      :                       %VAL( IPDIN( 1, ISET ) ),
      :                       %VAL( IPVIN( 1, ISET ) ),
+     :                       %VAL( IPDIN( 4, ISET ) ),
+     :                       %VAL( IPVIN( 4, ISET ) ),
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
      :                       NITER, DS, DZ, %VAL( IPWRK1 ),
@@ -237,10 +243,11 @@
 * Calculate the ratio of the second pair of like `Q' polarisation
 * states, I2/I3.
 
-            CALL CCD1_CMPRR( BAD, VAR, NEL, %VAL( IPDIN( 2, ISET ) ),
-     :                       %VAL( IPVIN( 2, ISET ) ),
+            CALL CCD1_CMPRR( BAD, VAR, NEL, 
      :                       %VAL( IPDIN( 3, ISET ) ),
      :                       %VAL( IPVIN( 3, ISET ) ),
+     :                       %VAL( IPDIN( 2, ISET ) ),
+     :                       %VAL( IPVIN( 2, ISET ) ),
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
      :                       NITER, DS, DZ, %VAL( IPWRK1 ),
@@ -301,10 +308,11 @@
 * Calculate the ratio of the first pair of like `U' polarisation states,
 * I8/I5.
 
-            CALL CCD1_CMPRR( BAD, VAR, NEL, %VAL( IPDIN( 8, ISET ) ) ,
-     :                       %VAL( IPVIN( 8, ISET ) ),
+            CALL CCD1_CMPRR( BAD, VAR, NEL, 
      :                       %VAL( IPDIN( 5, ISET ) ),
      :                       %VAL( IPVIN( 5, ISET ) ),
+     :                       %VAL( IPDIN( 8, ISET ) ) ,
+     :                       %VAL( IPVIN( 8, ISET ) ),
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
      :                       NITER, DS, DZ, %VAL( IPWRK1 ),
@@ -317,10 +325,11 @@
 * states, I6/I7.
 
 
-            CALL CCD1_CMPRR( BAD, VAR, NEL, %VAL( IPDIN( 6, ISET ) ),
-     :                       %VAL( IPVIN( 6, ISET ) ),
+            CALL CCD1_CMPRR( BAD, VAR, NEL, 
      :                       %VAL( IPDIN( 7, ISET ) ),
      :                       %VAL( IPVIN( 7, ISET ) ),
+     :                       %VAL( IPDIN( 6, ISET ) ),
+     :                       %VAL( IPVIN( 6, ISET ) ),
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
      :                       NITER, DS, DZ, %VAL( IPWRK1 ),

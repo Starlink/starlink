@@ -8,9 +8,9 @@
 \newcommand{\stardocsource}    {sun\stardocumber}
 \newcommand{\stardocnumber}    {223.0}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {16 April 1998}
+\newcommand{\stardocdate}      {12 May 1998}
 \newcommand{\stardoctitle}     {POLPACK}
-\newcommand{\stardoconeline}   {A Dual-beam imaging polarimetry reduction package}
+\newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
 \newcommand{\stardocversion}   {Version 1.0}
 \newcommand{\stardocmanual}    {Users' Manual}
 % ? End of document identification
@@ -129,6 +129,9 @@
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
+
+% centre an asterisk
+\newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
 
 % Environment for indenting and using a small font.
 \newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
@@ -305,7 +308,7 @@ polarization of extended astronomical objects, using data obtained from a
 dual-beam polarimeter\footnote{At the moment, Stokes vectors cannot be
 produced for single-beam data. It is hoped that this restriction will be
 removed at the next release.} It is assumed that the analyser is stepped
-in units of 45\dgs\ and that there is no rotation between exposures.
+in units of 45\dgs\ and that no rotation occurs between target exposures.
 Other assumptions regarding the specific form of the data or the
 polarimeter have, as far as possible, been avoided.
 
@@ -331,10 +334,9 @@ The facilities provided by POLPACK include:
 POLPACK does not provide facilities for performing instrumental
 corrections such as flat-fielding, de-biassing, etc. Such corrections
 should be applied to the data before using POLPACK, so that POLPACK can
-assume that pixel values are proportional to the combined intensity of sky and
-object. Some comments on how \xref{CCDPACK}{sun139}{} and
-\xref{KAPPA}{sun95}{} may be used to perform these corrections can be found
-\hyperref{here}{in section }{}{SEC:CCDPACK}. 
+assume that pixel values are proportional to the combined intensity of
+sky and object. Further comments on these corrections can be found
+\hyperref{here}{in section }{}{SEC:CCDPACK}.
 
 POLPACK can, however, apply certain corrections to the supplied data when
 calculating Stokes parameters. These corrections take account of any
@@ -458,11 +460,10 @@ effective analyser angle of 45\dgs\ (twice the half-wave plate angle) and
 so measures the intensities at angles of 45\dgs\ and 135\dgs\ to the
 reference direction
 
-Ideally a further two exposures should be taken at half-wave plate
-positions of 45\dgs\ and 67.5\dgs\ (referred to here as exposures
-$T_{45}$ and $T_{67.5}$). These provide some redundancy in the data and 
-enable internal consistency checks to be made during the data reduction
-stage. 
+Usually, a further two exposures are taken at half-wave plate positions
+of 45\dgs\ and 67.5\dgs\ (referred to here as exposures $T_{45}$ and
+$T_{67.5}$). These provide some redundancy in the data and enable
+internal consistency checks to be made during the data reduction stage.
 
 These exposures are denoted by the letter $T$ to indicate that they are
 {\em target} exposures. In addition to these target exposures, some {\em
@@ -470,15 +471,17 @@ flat-field} exposures are also required. These are used to correct for
 any spatial variation in the sensitivity of the system, and consist of
 exposures of a photometrically flat surface. Ideally, the flat-field
 source should be unpolarized. However, if the additional target exposures
-$T_{45}$ and $T_{67.5}$ are taken, then a constant polarization across
-the flat-field source can be corrected for during data reduction.
+$T_{45}$ and $T_{67.5}$ are taken, then a spatially constant polarization 
+across the flat-field source can be corrected for during data reduction.
+Since the polarization of the flat-field surface is rarely known to be
+zero, these additional target exposures should always be taken. 
 
-Flat-field exposures should be taken at half-wave plate positions of
-0\dgs\ and 22.5\dgs\, and are referred to here as exposures $L_{0}$ and 
-$L_{22.5}$. {\em Note, flat-fields are not required for half-wave plate
-positions 45\dgs\ and 67.5\dgs\ even if the additional target exposures
-$T_{45}$ and $T_{67.5}$ are taken}. Further discussion of the flat-fielding
-procedure is given \hyperref{here}{in section }{}{SEC:DETCOR}.
+It is important that the flat-field has a good signal-to-noise ratio.
+For this reason, it is common practice to take one or more flat-field 
+exposures at each half-wave plate position, and stack them together into a 
+single master flat-field (although it is not strictly necessary to use
+different half-wave plate positions). Further discussion of the flat-fielding
+procedure is given \hyperref{here}{in section }{}{SEC:DETCOR}. 
 
 \subsection{The Data Reduction}
 Several steps are involved in the production of a polarization map from
@@ -511,31 +514,22 @@ Introducing a polarimeter into the light path can complicate this if the
 flat-field is taken in polarized light (such as produced by reflective
 surfaces in the dome, or by light scattering in the atmosphere). In this
 case the intensity of the light reaching the detector will not be
-constant across the field, but will depend on the polarization. Also, if
-the detector itself is intrinsically sensitive to the polarization of
-the incident light, then this will introduce a difference in sensitivity
-between the two channels.
+constant across the field, but will depend on the polarization. 
 
-If the polarization of the flat-field and the polarization-dependency 
-of the detector are spatially constant, then the following method for
-flat-field correction can be used so long as the additional target
-exposures \hyperref{$T_{45}$ and $T_{67.5}$}{$T_{45}$ and $T_{67.5}$ 
-(see section }{)}{SEC:OBS} are available:
+If the polarization of the flat-field is non-zero and spatially constant,
+then the $O$ and $E$ ray flat-field images will have different mean
+values (visible as sharply defined dark and light areas in the flat
+field). If such a flat-field is used to correct the target exposures,
+then the different mean values in the flat-field will result in an
+apparent difference in sensitivity between the two channels of the
+polarimeter (known as the ``F-factor''). Such a difference in sensitivity
+can be corrected for when calculating the polarization if the additional
+target exposures \hyperref{$T_{45}$ and $T_{67.5}$}{$T_{45}$ and
+$T_{67.5}$ (see section }{)}{SEC:OBS} are available. 
 
-\begin{enumerate}
+{\em Note, the same flat-field should be used to flat-field all target
+exposures, irrespective of half-wave plate position.}
 
-\item Divide the two target exposures $T_{0}$ and $T_{45}$ by the flat-field
-exposure $L_{0}$.
-
-\item Divide the two target exposures $T_{22.5}$ and $T_{67.5}$ by the 
-flat-field exposure $L_{22.5}$.
-
-\end{enumerate}
-
-If this procedure is followed, any constant polarization in the
-flat-field source appears as a simple difference in sensitivity between
-the two channels of the polarimeter (the ``F-factor''), which can be
-estimated and corrected for when calculating the Stokes parameters.
 A mathematical description of the flat-fielding and F-factor corrections
 is given \hyperref{here}{in appendix }{}{APP:FFCOR}.
 
@@ -644,9 +638,138 @@ visual appearance of the object and the morphology of the polarization
 map.
 
 \section{\xlabel{datareductionusingpolpack}Data Reduction Using POLPACK}
+This section gives a detailed description of the steps involved in using 
+POLPACK to produce a vector map from dual-beam polarimetry data which
+conforms to the model outlines in the previous section. An over-view of
+the data reduction process is given in Figure~\ref{fig:dataflow}.
 
+\begin{latexonly}
+  \begin{figure}[htpb]
+  \begin{center}
+  \includegraphics[scale=0.8]{sun223_figures/dataflow.eps}
+  \caption{The main steps in the production of a polarization map.}
+  \label{fig:dataflow}
+  \end{center}
+  \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   \begin{quote}
+   \begin{figure}[bhtp]
+   \label{fig:dataflow}
+   \includegraphics[scale=0.8,width=8in]{sun223_figures/dataflow.eps}
+   \caption{The main steps in the production of a polarization map.}
+   \end{figure}
+   \end{quote}
+\end{htmlonly}
 
-\section{\xlabel{startup}Starting up POLPACK}
+\subsection{\label{SEC:CONVERT}\xlabel{formatconversion}Format Conversion}
+The first step is to ensure that your data files are in a format which
+POLPACK can process. The native data format used by POLPACK is the 
+Starlink \xref{NDF}{sun33}{} format (note, NDF structures are usually stored in
+files with a file type of \verb+.sdf+). If your data is already in this
+format, then you can proceed immediately to the next step. Otherwise,
+you have two options:
+
+\begin{enumerate}
+
+\item You can explicitly convert your data files into NDF format at the
+beginning, and use the NDF versions there-after. The
+\xref{CONVERT}{sun55}{} package provides facilities for converting to and
+from most common astronomical data formats. For instance, if your data is
+in the form of a set of FITS files, you could use commands similar to the
+following to convert them into NDFs:
+
+\begin{myquote}
+\begin{verbatim}
+% convert
+% fits2ndf "*.fit" "*"
+\end{verbatim}
+\end{myquote}
+
+Note that the \text{\%} represents the C-shell prompt and should not be typed.
+The first command initialise the commands required to use the CONVERT
+package. The second command converts all FITS files with a file type of
+\verb+.fit+ within the current directory, into equivalent NDFs with the
+same file names, but a file typ of \verb+.sdf+\footnote{The double quotes
+are needed to prevent the asterisks being expanded by the shell. The
+expansion of these file templates is performed internally, within
+\verb+fits2ndf+.}. The \verb+.sdf+ files can then be given as inputs to
+any application from POLPACK, CCDPACK or KAPPA.
+
+\item You can rely on the facilities of the NDF library to perform
+automatic on-the-fly data conversions as and when necessary. Using this
+technique, POLPACK, CCDPACK and KAPPA all appear to process your data files
+directly without you needing to do any explicit data conversion. All you
+need to do to enable these facilities is to initialise the CONVERT
+package using the single command:
+
+\begin{myquote}
+\begin{verbatim}
+% convert
+\end{verbatim}
+\end{myquote}
+
+If you adopt this approach, you may still see references to ``NDFs''
+appearing on the screen. There is usually no significance in the use of
+the term ``NDF'' in this context (unless there are indications to the
+contrary), and you should undertand these as referring to your own
+non-NDF data files.
+
+\end{enumerate}
+
+\subsection{\label{SEC:CCDPACK}Corrections for Instrumental Effects}
+POLPACK expects your data to be calibrated so that the pixel values are
+proportional to the analysed intensity. You should therefore correct your
+data for any known instrumental effects such as non-linearity, variation
+of sensitivity across the detector, zero point offsets, etc, before
+proceeding to use POLPACK. The details will obviously depend on your
+detector, but if you are using a CCD camera, then \xref{CCDPACK}{sun139}{} 
+will usually be able to perform these corrections,
+
+If target exposures are available at half-wave plate positions of
+45.0\dgs\ and 67.5\dgs\ (as well as 0\dgs and 22.5\dgs), then POLPACK can
+make corrections for the following effects when calculating the Stokes
+vectors:
+
+\begin{enumerate}
+\item Differences in exposure times between the target exposures
+\item A constant difference in sensitivity between the $O$ and $E$ ray
+channels.
+\end{enumerate}
+
+These effects therefore do not need to be calibrated out of the raw data.
+
+One aspect of calibration common to all detectors is flat-fielding. If
+your flat-fields are obtained in polarized light (such as produced by
+reflection or scattering, for instance), then the mean signals measured
+in the $O$ and $E$ ray images will be different. When such a flat-field
+is used to calibrate your target exposures, these different mean levels
+will introduce an apparent difference in sensitivity between the $O$ and
+$E$ ray channels. If the {\em same} flat-field is used for all target
+exposures, then this difference in sensitivity will be constant and can
+be removed while calculating the Stokes parameters (provided you have
+target exposures at half-wave plate positions of 0, 22.5, 45 and 67.5
+degrees). \hyperref{Go here for}{Appendix}{contains}{APP:FFCOR} a
+mathematical description of the flat-fielding process, and the
+corrections applied by POLPACK when calculating the Stokes parameters.
+
+{\em Do not forget to use the same flat-field to correct {\em all} target
+exposures}. This will usually be a master flat-field formed by co-adding
+several individual flat-field exposures. This reduces the noise in the
+master flat-field. This is important since any noise in the flat-field
+gets passed directly into the final results.
+
+Another aspect of instrumental calibration is the estimation of the
+uncertainty on every pixel value. If you know the noise characteristics
+of your detector, you may be able to store this information with your data in 
+the form of an NDF {\em VARIANCE component}. This is an array holding an 
+estimate of the variance at every pixel in your data. If present, POLPACK
+will process this information to obtain estimates of the uncertainty in
+the final polarisation parameters. If you use CCDPACK to calibrate your
+data, then VARIANCE components are created automatically if you supply the
+required information.
+
+\subsection{\xlabel{startup}Starting up POLPACK}
 
 The applications within POLPACK are made available from the C shell using the 
 command:
@@ -656,11 +779,399 @@ command:
 \end{verbatim}
 \end{myquote}
 
-Note that the \text{\%} represents the C-shell prompt and should not be typed.
+This command must be issued before attempting to use any POLPACK command.
 POLPACK is also available from the \xref{ICL}{sg5}{} command language.
 
-\subsection{\xlabel{gettinghelp}Getting Help}
+\subsection{\label{SEC:IMPORT}Importing Header Information}
+POLPACK needs to know certain items of header information about each of
+the supplied data files. These include the half-wave plate position, the
+orientation of the reference direction, etc. Different instruments may
+store this information in different ways, and for this reason, POLPACK
+includes an application which finds the required items of information and
+stores them away in a standard place within the data file from where the
+other POLPACK applications can extract them when needed. This standard
+place is known as the ``POLPACK extension''. The process of copying this
+information from its original, instrument specific location, into the
+POLPACK extension is known as ``importing'' the data, and is performed by
+the \htmlref{POLIMP}{POLIMP} application\footnote{Once imported, the POLPACK
+extension is propagated through the entire data reduction sequence, with
+new items being added at various points to describe the intermediate
+stages of processing.}.
 
+You tell POLIMP where to find each required item of information by
+supplying it with a ``control table''. This is a text file containing a
+line for each item of information to be imported into the POLPACK
+extension. Each such item has a name by which other POLPACK applications
+refer to it (these are described \hyperref{here}{in
+appendix}{}{APP:POLEXT}). As well as the name of a POLPACK extension
+item, each line of the control table contains a description of where to
+obtained the corresponding value. This description is given in terms of
+FITS keywords. For instance, the line
+
+\begin{myquote}
+\begin{verbatim}
+   WPLATE HWPANG
+\end{verbatim}
+\end{myquote}
+
+tells POLIMP to find the value of the FITS keyword HWPANG and store it as 
+item ``WPLATE'' in the POLPACK extension (this is the half-wave plate 
+position).
+
+If your data is supplied in the form of a set of FITS files, then the
+HWPANG value is simply obtained from the primary header. If your data is
+supplied in the form of a set of NDF structures, then the value is read
+from the FITS extension in the NDF structure (which should have been
+created by the data aquisition system). For other data formats, the
+origin of the keyword value depends on how the data conversion is
+performed. \xref{SUN/55}{sun55}{} contains details of how FITS keywords are
+created from the foreign data file.
+
+The POLIMP control table also allows POLPACK extension items to be
+derived from one or more FITS keyword values, combined together to form a
+Fortran-like mathematical expression. For instance, this may be useful if
+the FITS keyword uses a different set of units, or has a different sign
+convention. See the description of the \htmlref{POLIMP}{POLIMP}
+application for further details of the syntax of the control table.
+
+There is also a \htmlref{POLEXP}{POLEXP} application which reverses the 
+importing process. It copies the information stored in the POLPACK
+extension into named FITS keywords. The primary purpose of POLEXP is 
+to allow the automatic format conversion facilities of the NDF library to
+convert a POLPACK NDF structure back into a foreign data file.
+It is generally not necessary for users to call POLEXP explicitly. 
+
+The contents of the POLPACK extension within an NDF can be examined using
+the \xref{\verb+hdstrace+}{sun102} command. For instance, to check the
+contents of the POLPACK extension in the NDF \verb+partproc.sdf+, do:
+
+\begin{myquote}
+\begin{verbatim}
+   % hdstrace partproc.more.polpack
+\end{verbatim}
+\end{myquote}
+
+\subsection{Creation of Stokes Parameters}
+The creation of Stokes vectors from the calibrated, imported 
+target exposures involves the following steps:
+
+\begin{itemize}
+\item The extraction of the $O$ and $E$ ray images in each target
+exposure into separate files.
+\item The alignment of all these separated $O$ and $E$ ray images, so
+that a given pixel position corresponds to the same place on the sky in
+all images.
+\item The subtraction of a sky background from each $O$ and $E$ ray image.
+\item The calculation of the Stokes vectors from these sky-subtracted
+images.
+\end{itemize}
+
+The first three of these steps can be performed using applications from
+KAPPA and CCDPACK, and the final step is performed by the POLPACK
+application \htmlref{POLCAL}{POLCAL}. However, this is a fairly involved
+process since the available applications are somewhat low-level. For this
+reason, POLPACK includes a tool called \htmlref{POLKA}{POLKA} which
+simplifies the process. POLKA is effectively a script which calls the
+KAPPA, CCDPACK and POLPACK applications required to perform all four of
+the steps listed above\footnote{The final step - calculating the Stokes
+parameters - is optional. This allows POLKA to be used as a general
+purpose image alignment tool for non-polarimetric data.}. While some
+options are provided to allow the user to customise the exact recipe
+used, POLKA does not provide as much versatility or control over the
+processing as would be available if the individual applications were
+called ``by hand''. If you hit a problem which POLKA cannot handle, then
+you may need to adopt this alternative approach.
+
+The POLKA command activates a standard Starlink a-atask which aquires
+parameter values using the normal methods employed by most Starlink
+applications. The a-task then activates a script written in a language
+called Tk/Tcl which performs the processing. This script requires you
+to identify the following features:
+
+\begin{itemize}
+\item The areas containing the $O$ and $E$ ray images.
+\item The sky areas.
+\item Any star-like features which can be used to align the images.
+\end{itemize}
+
+A Graphical User Interface (GUI) is created for this purpose, including
+an image display area in which any of the input images may be displayed,
+and controls to select any of the above features. Once the required
+features have been supplied, POLKA commences the processing of the
+supplied data frames. This may take a significant length of time depending
+on your hardware, and the size and number of your images. A window
+display the progress being made during this phase.
+
+Once complete, a 3D cube is created in which the x-y plane corresponds to
+pixel positions within the extracted, aligned intensity images. Each
+plane in the cube contains a single Stokes parameter. The lowest plane is
+always the total intensity. The other planes contain either Q and U for
+linear polarisation, or V for circular polarization. In addition, the
+separate intensity images on which the Stokes parameters were based may
+be saved once the processing is complete.
+
+The POLKA application has many parameters. The values provided for some of
+these may be changed from within the GUI. However, some may not be
+changed and should always be assigned appropriate values when invoking POLKA.
+Of these, the most important will usually be:
+
+\begin{description}
+\item [IN] - A list of the input target frames. These should have been
+calibrated and imported. The list may be supplied in several forms
+(described \hyperref{here}{in section}{}{SEC:GRPEXP}).
+\item [MODE] - Can be CIRCULAR or LINEAR, and indicates what sort of
+polarization you are measuring.
+\item [OUT\_E] - A list of the output images to recieve the extracted,
+aligned, sky-subtracted $E$ ray images. If a null value (!) is supplied, 
+these images are not saved.
+\item [OUT\_O] - This is like OUT\_E, but refers to the $O$ ray images
+instead of the $E$ ray images.
+\item [OUT\_S] - The name of the output cube to receive the Stokes
+parameters. If a null value (!) is supplied, no Stokes parameters are
+created.
+\item [POL] - This should be set to FALSE if you want to use POLKA as a
+general purpose image alignment tool for non-polarimetric data. If this
+is done, the aligned, sky-subtracted images should be specified using parameter
+OUT (parameters OUT\_S, OUT\_E and OUT\_O are not used). In this mode,
+the supplied images are treated like $O$ ray images, and the controls
+related to the $E$ ray images are disabled.
+\item [SKYFRAMES] - POLKA provides two methods of sky subtraction. If a
+list of frames is supplied for parameter SKYFRAMES, then these frames are
+subtracted pixel-by-pixel from the target intensity frames. If a null
+parameter value (!) is supplied for SKYFRAMES, then you must use the GUI to
+identify areas of sky within each of the input target frames. A smooth
+surface is then fitted to these areas and used as the sky background.
+
+\end{description}
+
+A separate guide is available describing POLKA in detail. This guide
+contains a step-by-step tutorial, detailed descriptions of 
+each control in the GUI, answers to some common questions, etc. It may be
+accessed using the \verb+Help+ menu within the GUI. When POLKA is
+activated, the tutorial is automatically displayed in a WWW browser (this
+may be disabled using the STARTHELP parameter when running POLKA). If you
+are new to POLKA, it is  a good idea to work your way through the tutorial.
+
+
+\subsection{Displaying the Results}
+Linear polarimetry results are usually expressed in terms of the percentage
+polarization and the orientation of the plane of polarization (see
+\hyperref{here}{appendix}{}{APP:POL}). Vectors may be used to represent
+these quantities graphically. The following POLPACK applications can be
+used to produce a map of vectors describing the polarization at different
+points on the sky:
+
+\begin{description}
+\item [\htmlref{POLVEC}{POLVEC}] - This converts a 3-D cube containing Stokes parameters
+(such as produced by POLKA or POLCAL) into a catalogue containing the
+following columns:
+\begin{description}
+\item [X] - X pixel coordinates within the supplied cube.
+\item [Y] - Y pixel coordinates within the supplied cube.
+\item [I] - Total intensity.
+\item [Q] - Stokes parameter Q.
+\item [U] - Stokes parameter U.
+\item [P] - Percentage polarization.
+\item [ANG] - The anti-clockwise angle from the X pixel axis to the plane of 
+polarization, in degrees.
+\end{description}
+
+For cicular polarimetry, the Q and U columns are replaced by a single V
+column. If variance information is available (see
+\hyperref{here}{section}{}{SEC:CCDPACK}) then columns are also produced
+holding the standard deviations associated with each of the above
+quantities (except X and Y). The catalogue contains a single row for each
+pixel in the x-y plane of the supplied cube.
+
+POLVEC can also produce a set of 2-D images holding the above quantities.
+
+\item [\htmlref{POLBIN}{POLBIN}] - This accepts a catalogue containing Stokes parameters
+as input (such as produced by POLVEC), and creates a new output catalogue
+in the same format. The output catalogue is formed by binning the Stokes 
+vectors in the input catalogue within a grid of equally sized
+rectangular bins. Corresponding values for the P and ANG columns are
+calculated on the basis of the binned Stokes parameters.
+
+\item [\htmlref{POLPLOT}{POLPLOT}] - This displays a map of polarization 
+vectors, obtained from a catalogue produced by POLVEC or POLBIN. If the
+map is drawn over an existing picture, then the vectors can be aligned
+with the previously displayed image.
+
+\end{description}
+
+Since the polarization parameters are stored in a catalogue, the
+\xref{CURSA}{sun190} package {\latexonly (see SUN/190)} can be used to
+examine and manipulate them. One particularly useful facility within
+CURSA is the \xref{CATSELECT}{sun190}{SELECT} application, which
+allows rows within a catalogue to be selected on the basis of an
+arbitrary mathematical expression. For instance the following commands
+creates a new catalogue called \verb+selcat.FIT+ which contains all the
+vectors from \verb+bincat.FIT+ for which the polarization is less than
+30 \% and has a standard deviation less than 5 \%:
+
+\begin{myquote}
+\begin{verbatim}
+   % cursa
+   % catselect catin=bincat catout=selcat norejcat seltyp=e "expr='p<30 & dp<5'"
+\end{verbatim}
+\end{myquote}
+
+The \xref{XCATVIEW}{sun190}{XVIEW} application allows you to examine the
+data in a catalogue, using a Graphical User Interface to control the
+operation and display the results.
+
+A typical recipe for using the above applications (together with KAPPA)
+would involve the following steps:
+
+\begin{enumerate}
+
+\item Convert the 3-D NDF containing Stokes vector in file \verb+cube.sdf+ 
+(created by POLKA) into a catalogue stored in file \verb+cat.FIT+:
+
+\begin{myquote}
+\begin{verbatim}
+   % polvec cube cat
+\end{verbatim}
+\end{myquote}
+
+\item Bin the catalogue to reduce the noise, and to decrease the density
+of vectors in the final map. The bins used are 8 by 8 pixels (measured in
+the Stokes parameter NDF \verb+cube.sdf+), and the Stokes parameters are
+combined using a median. The binned catalogue is stored in file \verb+bincat.FIT+:
+
+\begin{myquote}
+\begin{verbatim}
+   % polbin cat bincat 8 method=med
+\end{verbatim}
+\end{myquote}
+
+\item Create a new catalogue (in file \verb+selcat.FIT+) containing just
+the vectors with polarizations of less than 50 \% and standard deviations of
+less than 5 \%:
+
+\begin{myquote}
+\begin{verbatim}
+   % cursa
+   % catselect catin=bincat catout=selcat norejcat seltyp=e "expr='p<50 & dp<5'"
+\end{verbatim}
+\end{myquote}
+
+\item \label{STEP:DEVICE} Select the graphics device and the image display device (both set to an X 
+windows display in this case):
+\begin{myquote}
+\begin{verbatim}
+   % gdset xwindows
+   % idset xwindows
+\end{verbatim}
+\end{myquote}
+
+\item Clear the screen:
+\begin{myquote}
+\begin{verbatim}
+   % gdclear
+\end{verbatim}
+\end{myquote}
+
+\item \label{STEP:PICDEF} Create a ``picture'' to contain a greyscale display of the total
+intensity. A picture is an area of the screen in which subsequent graphics
+will appear. The one we create here is centred on the screen and occupies
+three quarters of its height and width. This leaves a border available
+for annotation round the display:
+\begin{myquote}
+\begin{verbatim}
+   % picdef mode=cc fraction=0.75
+\end{verbatim}
+\end{myquote}
+
+\item \label{STEP:DISPLAY} Display the total intensity image contained in the bottom plane of 
+the Stokes vector cube, and ensure it is displayed with the standard 
+monochrome colour table:
+\begin{myquote}
+\begin{verbatim}
+   % display "cube(,,1)" mode=per percentiles="[5,95]"
+   % lutgrey
+\end{verbatim}
+\end{myquote}
+
+\item \label{STEP:POLPLOT} Display the vector map, retaining the existing picture so that the
+vectors appear in alignment with the previously displayed total intensity
+image. The vectors are drawn in blue. A default scale will be used for the 
+vectors, but this can be over-ridden if necessary by specifying a value for
+parameter VSCALE:
+\begin{myquote}
+\begin{verbatim}
+   % polplot selcat noclear "style='colour(vect)=blue'"
+\end{verbatim}
+\end{myquote}
+
+\end{enumerate}
+
+The above basic recipe can be modified in many ways. For instance:
+
+\begin{itemize}
+
+\item If you want to display only a sub-section of the map, specify the
+sub-section in step \ref{STEP:DISPLAY} by including bounds for the
+first and second axes of input cube. For instance, to restrict the
+display to X pixel coordinates 50 to 100, and Y pixel coordinates 300 
+to 380, do:
+
+\begin{myquote}
+\begin{verbatim}
+   % display "cube(50:100,300:380,1)" mode=per percentiles="[5,95]"
+\end{verbatim}
+\end{myquote}
+
+\item If you do not want the vectors to be overlaid on a total
+intensity image, then omit steps \ref{STEP:PICDEF} and
+\ref{STEP:DISPLAY}, and remove the \verb+noclear+ setting from the
+POLPLOT command line in step \ref{STEP:POLPLOT}.
+
+\item If you want the vectors overlaid on a contour map instead of a
+greyscale image, replace step \ref{STEP:DISPLAY} with:
+
+\begin{myquote}
+\begin{verbatim}
+   % contour "cube(,,1)" mode=per percentiles="[90,93,96,99]" noaxes nokey
+\end{verbatim}
+\end{myquote}
+
+\item If you want your output in the form of a PostScript file, there is
+an extra step. This is because graphics applications such as DISPLAY,
+CONTOUR and POLPLOT produce separate output PostScript files which then
+need to be combined into a single file. In step \ref{STEP:DEVICE},
+specify the device as \verb+epsf_l+ (Encapsulated PostScript, landscape
+mode) instead of \verb+xwindows+. The first graphics applications to be
+run will then write its output to the file \verb+gks74.ps+, and
+subsequent graphics applications will write their output to files
+\verb+gks74.ps.1+, \verb+gks74.ps.2+, etc. To produce a contour map with
+overlaid vectors, replace steps \ref{STEP:DISPLAY} and \ref{STEP:POLPLOT}
+with:
+
+\begin{myquote}
+\begin{verbatim}
+   % rm gks74.ps*
+   % contour "cube(,,1)" mode=per percentiles="[90,93,96,99]" noaxes nokey
+   % mv gks74.ps.1 contour.ps
+   % polplot selcat noclear 
+   % mv gks74.ps.1 polplot.ps
+   % psmerge contour.ps polplot.ps > total.ps
+\end{verbatim}
+\end{myquote}
+
+Note, CONTOUR produces two PostScript files (\verb+gks74.ps+ and
+\verb+gks74.ps.1+). Make sure you use \verb+gks74.ps.1+.
+
+The file \verb+total.ps+ then  contains the combined PostScript data
+which can be printed on a suitable printer.
+
+\end{itemize}
+
+These are just a few examples of the possibilities for varying the above
+recipe. Familiarity with the parameters of the relevant KAPPA and POLPACK
+applications will suggest many more.
+
+\subsection{\xlabel{gettinghelp}Getting Help}
 Help is available in several forms: 
 \begin{itemize}
 \item As simple text in the command-line window. Type:
@@ -703,7 +1214,9 @@ GUI is available from the {\em Help} menu within the GUI.
 
 \end{itemize}
 
-\subsection{Running from the C-shell}
+
+
+\section{Running from the C-shell}
 When using POLPACK from the C-shell (or any other shell) care needs to be
 taken with some special characters. Wildcard characters \text{*,?,[a-z]},
 quoted strings \text{""} and vector braces \text{[ ]} must be protected
@@ -711,23 +1224,261 @@ by using either the escape character {\small \verb+\+} or by single
 quotes (wildcard characters must be protected as these are expanded
 internally by POLPACK, rather than by the shell).
 
-\section{POLPACK's data format}
-POLPACK uses data stored in the NDF format (the N-dimensional data
-format (\xref{SUN/33}{sun33}{}), which is based on HDS,
-the Hierarchical Data System \xref{(SUN/92)}{sun92}{}).
-This is portable between the operating
-systems that POLPACK runs on (Digital UNIX, Solaris and Linux at this time)
-so it can be copied, accessed via NFS and ftp'd (using binary
-transfer) between these systems. If your data is in another format you
-will need to convert it to NDF. The CONVERT package
-(\xref{SUN/55}{sun55}{}) contains many applications for doing this. The
-KAPPA package (\xref{SUN/95}{sun95}{}) contains an application
-\xref{FITSIN}{sun95}{FITSIN} that reads FITS tapes and writes the
-results as NDFs.
+\section{\label{SEC:GRPEXP}\xlabel{groupexpressions}Group Expressions}
+Several of the POLPACK applications have parameters which are described
+{\latexonly in appendix \ref{APP:DESCRIPTION}} as being associated with
+{\em groups} (or {\em lists}) of objects. For instance, the 
+\htmlref{POLKA}{POLKA} parameter ``IN'' specifies a group of input data 
+files, and the \htmlref{POLPLOT}{POLPLOT} parameter ``STYLE'' specifies a
+group of plotting attributes. A {\em group expression} is the string
+typed in by the user in response to a prompt for such a parameter. It
+should identify the members of the required group in any of the following
+ways:
+
+\begin{itemize}
+\item As a comma separated list ( e.g. ``12.1, 23.2, 1.3''
+     or ``HH1\_B1S1,HH2\_B1S2'' ). 
+
+\item By reading them from a text file (see
+     ``\htmlref{Indirection}{SEC:IND}'').
+
+\item By modifying an existing group of objects using editing 
+     specified within the group expression (see
+     ``\htmlref{Modification}{SEC:MOD}'').
+\end{itemize}
+
+If the supplied group expression is terminated with a minus
+sign, the user is re-prompted for another group expression. The
+objects specified by this second group expression are added to
+those specified by the first. This re-prompting continues until
+a group expression is supplied which does not end with a minus
+sign. 
+
+Certain classes of objects have additional features, for 
+instance if the objects are the names of data files, then wild-card characters 
+are allowed in the supplied values (see \hyperref{here}{section}{}{SEC:NDF}) 
+
+\subsection{\label{SEC:IND}Indirection}
+It is sometimes convenient to store strings in a text file which specify the
+objects to be used. The name of the text file can
+then be given in response to a prompt for a group expression,
+rather than giving a long list of explicit values. This is done
+by preceeding the name of the text file with an up-arrow (``\verb+^+'')
+character. For instance, the group expression ``\^{}{\small style.dat}''
+would result in the file {\small style.dat} being opened and the strings
+read from the file. Each line within the file is considered to
+be a group expression, and is processed in the same way as a
+group expression supplied directly. In particular, a text file
+may contain references to other text files. If the file
+{\small style.dat} contained the following two lines: 
+
+\begin{myquote}
+\begin{verbatim}
+grid=1,colour(grid)=red,border=1
+colour(border)=red,^labels.dat
+\end{verbatim}
+\end{myquote}
+
+The the strings \verb+grid=1+, \verb+colour(grid)=red+, \verb+border=1+
+and \verb+colour(border)=red+ would be returned to the 
+application, and in addition the file {\small labels.dat} would be 
+searched for further strings. This nesting of text files can go
+down to seven levels. Text files may also contain comments. 
+Anything occurring after a ``\verb+#+'' character is ignored. To ignore
+an entire line the \verb+#+ character must be in column 1 (any blanks in 
+front of the \verb+#+ character are considered to be significant).
+
+\subsection{\label{SEC:MOD}Modification}
+A group of objects can be given by specifying some editing to
+apply to another already existing group of objects. For instance,
+if the string \verb+new_*b|_ds|_im|+ was given in response to a request
+for a group expression, then the following steps occur: 
+
+\begin{itemize}
+\item   Each element in some existing group of objects (identified in 
+     the description of the parameter concerned) is substituted 
+     in turn for the ``\lsk'' character.
+\item  Any occurrences of the string ``\_ds'' is replaced by the string 
+     ``\_im''.
+\item  The string ``b'' is added to the end of the string.
+\item  The string ``new\_'' is added to the start of the string.
+\end{itemize}
+
+Thus if the existing group contained the strings {\small file1\_ds} and
+{\small file2\_ds}, the resulting group would be {\small new\_file1\_imb}
+and {\small new\_file2\_imb}. Note, this facility is only available if
+the parameter description identifies an existing group which will be used
+as the basis for the modified strings.
+
+\subsection{Groups of Data Files}
+\label{SEC:NDF}
+If a group expression is used to specify a list of input data files,
+then file names may be specified which contain wild card characters 
+(``\lsk'' and ``?''). These  will be expanded into a list of explicit 
+file names before returning the group to the application. Note,
+group expressions containing wild-cards must be enclosed
+in quotes if they are supplied on the command line (this prevents the shell
+from expanding the wild-cards itself). 
+
+If the final character in a group expression is a colon (:), then a list
+of the data files represented by the group expression (minus the colon)
+is displayed, but no data files are actually added to the group of files
+to be processed. The user is then re-prompted for another group
+expression. Note, this facility only applies to group expressions
+representing existing data files, not data files which are to be created
+by the application.
+
+\subsection{Examples}
+\begin{itemize}
+\item If an application asks for a group of input data files, the following 
+are all possible responses:
+
+\begin{myquote}
+\begin{verbatim}
+  b1,b2,b3,b4
+\end{verbatim}
+\end{myquote}
+\vspace{-3mm}
+
+This means ``Use the NDFs stored in files b1.sdf, b2.sdf, b3.sdf and
+b4.sdf''. If automatic format conversion is being used (see 
+\hyperref{here}{section}{}{SEC:CONVERT}), then an example such as 
+
+\begin{myquote}
+\begin{verbatim}
+  b1.fit,b2,fit,b3,fit,b4.fit
+\end{verbatim}
+\end{myquote}
+
+is also legal, and reads the corresponding FITS files.
+
+\begin{myquote}
+\begin{verbatim}
+  cena_b1-
+\end{verbatim}
+\end{myquote}
+\vspace{-3mm}
+This means ``Use cena\_b1.sdf and then (because of the minus sign at the end)
+ask the user for  more data files''.
+
+\begin{myquote}
+\begin{verbatim}
+  *
+\end{verbatim}
+\end{myquote}
+\vspace{-3mm}
+This means ``Use all accessable data files in the current directory''. 
+
+\begin{myquote}
+\begin{verbatim}
+  hh1_b1s*_ds
+\end{verbatim}
+\end{myquote}
+\vspace{-3mm}
+This means ``Use hh1\_b1s1\_ds.sdf, hh1\_b1s2\_ds.sdf, etc''.
+
+\begin{myquote}
+\begin{verbatim}
+  ^files.lis
+\end{verbatim}
+\end{myquote}
+\vspace{-3mm}
+This means ``Read the names of data files from the text file
+\verb+files.lis+.''
+
+\begin{myquote}
+\begin{verbatim}
+  ../data/*
+\end{verbatim}
+\end{myquote}
+\vspace{-3mm}
+This means ``Use all accessable data files contained in the directory 
+../data''.
+
+\item If an application asks for a group of output data files, the following 
+are possible responses:
+
+\begin{myquote}
+\begin{verbatim}
+  file1,file2,file3
+\end{verbatim}
+\end{myquote}
+\vspace{-3mm}
+This means ``Create file1.sdf, file2.sdf and file3.sdf''.
+
+\begin{myquote}
+\begin{verbatim}
+  ^out.dat
+\end{verbatim}
+\end{myquote}
+\vspace{-3mm}
+This means ``Read the names of the output data files from 
+text file out.dat''.
+
+\begin{myquote}
+\begin{verbatim}
+  *_ds
+\end{verbatim}
+\end{myquote}
+\vspace{-3mm}
+This means ``Append the string ``\_ds'' to the end of all 
+                      the input data file names.
+
+\begin{myquote}
+\begin{verbatim}
+  ../bk/*|_ds|_bk|
+\end{verbatim}
+\end{myquote}
+\vspace{-3mm}
+This means ``Substitute the string ``\_bk'' for all  occurrences of the string
+``\_ds'' in the  input data file names, and put the files in 
+directory ../bk''.
+\end{itemize}
+
+Group expressions can be used to specify objects other than data files.
+For instance,  if an application asks for a group of pixels to
+be specified by  their X and Y pixel indices, then the pixels (10,11),
+(21,-10) and (0,0) could be specified in any of the following ways:
+
+\begin{myquote}
+\begin{verbatim}
+  10,11,21,-10,0,0  
+\end{verbatim}
+\end{myquote}
+\vspace{-3mm}
+This gives the indices as a comma separated list.
+
+\begin{myquote}
+\begin{verbatim}
+  10,11-
+  21,-10-
+  0,0
+\end{verbatim}
+\end{myquote}
+\vspace{-3mm}
+Ending each line with a minus  sign causes the user to be re-prompted for more
+values.
+
+\begin{myquote}
+\begin{verbatim}
+  ^pixels.dat
+\end{verbatim}
+\end{myquote}
+\vspace{-3mm}
+The file pixels.dat is read. The file could contain the  following four lines:
+
+\begin{myquote}
+\begin{verbatim}
+  #  Approximate star centres.
+  10,11
+  21,-10
+  0,0
+\end{verbatim}
+\end{myquote}
 
 \newpage
 \appendix
-\section{Description of the POLPACK applications \label{app:description}}
+\section{ \label{APP:DESCRIPTION}Description of the POLPACK applications}
 \begin{latexonly}
 \latexonlysubsection{Alphabetic list of POLPACK routines.}
 %
@@ -2617,9 +3368,9 @@ the two channels of the polarimeter (such as may be produced for instance
 by a polarised flat-field).
 
 \section{\label{APP:FFCOR}\xlabel{flatfieldcorrectionsandtheFFactor}Flat-field
-          Corrections and the F-Factor}
-This section describes the flat-fielding process and F-factor correction
-in mathematical terms.
+          Corrections, and the E and F-Factors}
+This section describes the flat-fielding process, and the E and F-factor 
+corrections in mathematical terms.
 
 Let the intensity in the $O$ and $E$ beams transmitted by the analyser be
 $I_{o}(\alpha)$ and $I_{e}(\alpha)$, where $\alpha$ is the effective 
@@ -2641,42 +3392,51 @@ The signals measured by the detector (before flat-fielding) are:
 
 \begin{myquote}
 \begin{eqnarray*}
-  M_{o}(\alpha) & = & S_{o}.I_{o}(\alpha) \\
-  M_{e}(\alpha) & = & S_{e}.I_{e}(\alpha) 
+  M_{o}(\alpha) & = & S_{o}.I_{o}(\alpha).E_{\alpha} \\
+  M_{e}(\alpha) & = & S_{e}.I_{e}(\alpha).E_{\alpha}
 \end{eqnarray*}
 \end{myquote}
 
 where $S_{o}$ and $S_{e}$ are the sensitivities of the detector to the $O$ 
-and $E$ rays. These are independent of $\alpha$, but vary across the
-detector.
+and $E$ rays (These are independent of $\alpha$, but vary across the
+detector), and $E_{\alpha}$ is an {\em exposure factor} which takes into
+account any differences in exposure time, sky transparency, etc.
 
 For target exposure $T_{0}$ (for which $\alpha$ is zero), the transmitted
 intensities are denoted as $I^{t}_{o}(0)$ and $I^{t}_{e}(0)$ and the
-measured intensities as $M^{t}_{o}(0)$ and $M^{t}_{e}(0)$. For flat-field
-exposure $L_{0}$, the transmitted intensities are denoted as
-$I^{l}_{o}(0)$ and $I^{l}_{e}(0)$ and the measured intensities as
-$M^{l}_{o}(0)$ and $M^{l}_{e}(0)$. The actual flat-field intensities are
-assumed to be spatially constant, but the measured intensities will
-reflect any variation in $S_{o}$ and $S_{e}$.
+measured signals as $M^{t}_{o}(0)$ and $M^{t}_{e}(0)$. 
 
-Target exposure $T_{0}$ is flat-fielded by dividing it by the flat-field
-exposure with the same value of $\alpha$ (i.e. $L_{0}$) . Thus, the
-measured intensities after the flat-field correction ($M^{c}_{o}(0)$ and
-$M^{c}_{e}(0)$) are:
+If the polarization of the flat-field surface is spatially constant, then
+the measured signals in the flat-field exposure will be proportional to
+the detector sensitivity functions $S_{o}$ and $S_{e}$. If the constants
+of proportionality for the $O$ and $E$ ray images are $K_{o}$ and
+$K_{e}$, then the measured signals in the flat-field images can be
+written as:
 
 \begin{myquote}
 \begin{eqnarray*}
-  M^{c}_{o}(0) & = & M^{t}_{o}(0) / M^{l}_{o}(0) \\
-                    & = & \frac{ S_{o}.I^{t}_{o}(0) }{ S_{o}.I^{l}_{o}(0) } \\
-                    & = & \frac{ I^{t}_{o}(0) }{ I^{l}_{o}(0) } \\ \\
-  M^{c}_{e}(0) & = & M^{t}_{e}(0) / M^{l}_{e}(0) \\
-                    & = & \frac{ S_{e}.I^{t}_{e}(0) }{ S_{e}.I^{l}_{e}(0) } \\
-                    & = & \frac{ I^{t}_{e}(0) }{ I^{l}_{e}(0) } 
+  M^l_{o} & = & S_{o}.K_{o} \\
+  M^l_{e} & = & S_{e}.K_{e}
 \end{eqnarray*}
 \end{myquote}
 
-If the target exposure $T_{45}$ is taken with an analyser angle 
-of 90\dgs\ (accomplished by rotating the half-wave plate by 45\dgs), then
+Target exposure $T_{0}$ is flat-fielded by dividing it by the flat-field
+exposure. Thus, the measured intensities after the flat-field correction
+($M^{c}_{o}(0)$ and $M^{c}_{e}(0)$) are:
+
+\begin{myquote}
+\begin{eqnarray*}
+  M^{c}_{o}(0) & = & M^{t}_{o}(0) / M^{l}_{o} \\
+                    & = & \frac{ S_{o}.I^{t}_{o}(0).E_{0} }{ S_{o}.K_{o} } \\
+                    & = & \frac{ I^{t}_{o}(0).E_{0} }{ K_{o} } \\ \\
+  M^{c}_{e}(0) & = & M^{t}_{e}(0) / M^{l}_{e} \\
+                    & = & \frac{ S_{e}.I^{t}_{e}(0).E_{0} }{ S_{e}.K_{e} } \\
+                    & = & \frac{ I^{t}_{e}(0).E_{0} }{ K_{e} } 
+\end{eqnarray*}
+\end{myquote}
+
+The target exposure $T_{45}$ is taken with an analyser angle 
+of 90\dgs\ (accomplished by rotating the half-wave plate by 45\dgs), and
 the $O$ and $E$ ray intensities are $I^{t}_{o}(90)$ and $I^{t}_{e}(90)$, where:
 
 \begin{myquote}
@@ -2692,87 +3452,141 @@ the $O$ and $E$ ray intensities are $I^{t}_{o}(90)$ and $I^{t}_{e}(90)$, where:
 
 In other words, exposure $T_{45}$ records the same intensities as
 exposure $T_{0}$, but swapped so that the $O$ ray becomes the
-$E$ ray, and vice versa. The measured target intensities at this new
+$E$ ray, and vice versa. The measured target signals at this new
 analyser angle are:
 
 \begin{myquote}
 \begin{eqnarray*}
-  M^{t}_{o}(90) & = & S_{o}.I^{t}_{o}(90) \\
-                    & = & S_{o}.I^{t}_{e}(0) \\ \\
-  M^{t}_{e}(90) & = & S_{e}.I^{t}_{e}(90) \\
-                    & = & S_{e}.I^{t}_{o}(0) 
+  M^{t}_{o}(90) & = & S_{o}.I^{t}_{o}(90).E_{90} \\
+                & = & S_{o}.I^{t}_{e}(0).E_{90} \\ \\
+  M^{t}_{e}(90) & = & S_{e}.I^{t}_{e}(90).E_{90} \\
+                & = & S_{e}.I^{t}_{o}(0).E_{90} 
 \end{eqnarray*}
 \end{myquote}
 
-These measured intensities are flat-fielded {\em using the flat-field
-exposure for the original analyser angle {\em (0\dgs)}, NOT the new angle
-{\em (90\dgs)}}. Thus:
+These measured signals are flat-fielded to give the following corrected
+signals:
 
 \begin{myquote}
 \begin{eqnarray*}
   M^{c}_{o}(90) & = & M^{t}_{o}(90) / M^{l}_{o}(0) \\
-                & = & \frac{ S_{o}.I^{t}_{e}(0) }{ S_{o}.I^{l}_{o}(0) } \\
-                & = & \frac{ I^{t}_{e}(0) }{ I^{l}_{o}(0) } \\ \\
+                & = & \frac{ S_{o}.I^{t}_{e}(0).E_{90} }{ S_{o}.K_{o} } \\
+                & = & \frac{ I^{t}_{e}(0).E_{90} }{ K_{o} } \\ \\
   M^{c}_{e}(90) & = & M^{t}_{e}(90) / M^{l}_{e}(0) \\
-                & = & \frac{ S_{e}.I^{t}_{o}(0) }{ S_{e}.I^{l}_{e}(0) } \\
-                & = & \frac{ I^{t}_{o}(0) }{ I^{l}_{e}(0) } 
+                & = & \frac{ S_{e}.I^{t}_{o}(0).E_{90} }{ S_{e}.K_{e} } \\
+                & = & \frac{ I^{t}_{o}(0).E_{90} }{ K_{e} } 
 \end{eqnarray*}
 \end{myquote}
 
-To simplify the notation, put $i_{1}=M^{c}_{o}(0)$, $i_{2}=M^{c}_{e}(0)$,
-$i_{5}=M^{c}_{o}(90)$ and $i_{6}=M^{c}_{e}(90)$. In other words, $i_{1}$ and
-$i_{2}$ are the flat-fielded $O$ and $E$ ray intensities from exposure
-$T_{0}$, and $i_{5}$ and $i_{6}$ are the corresponding intensities from
-exposure $T_{45}$ ($i_{3}$, $i_{4}$, $i_{7}$ and $i_{8}$ are the
-intensities from exposures $T_{22.5}$ and $T_{67.5}$). If both channels
-of the polarimeter were equally sensitive, $i_{1}$ and $i_{6}$ would be
-equal, as would $i_{2}$ and $i_{5}$. In reality, the ratios of these
-quantities give two estimates of the relative sensitivity of the two
-channels:
+To simplify the notation, put $s_{1}=M^{c}_{o}(0)$, $s_{2}=M^{c}_{e}(0)$,
+$s_{3}=M^{c}_{o}(90)$ and $s_{4}=M^{c}_{e}(90)$. In other words, $s_{1}$ and
+$s_{2}$ are the flat-fielded $O$ and $E$ ray signals from exposure
+$T_{0}$, and $s_{5}$ and $s_{6}$ are the corresponding signals from
+exposure $T_{45}$. In order to calculate the polarisation we need signals
+which are proportional to the incoming intensities, with a common
+constant of proportionality. In order to achive this, we need to
+estimate the ratio of the exposure factors, $E_{0}$ and $E_{90}$, and the 
+``F-factor'', $F$, where:
 
 \begin{myquote}
 \begin{eqnarray*}
-  \frac{i_{6}}{i_{1}} & = & \frac{ I^{t}_{o}(0)/I^{l}_{e}(0) } 
-                                 { I^{t}_{o}(0)/I^{l}_{o}(0) } \\
-                      & = & \frac{ I^{l}_{o}(0) }{ I^{l}_{e}(0) } \\ \\
-  \frac{i_{2}}{i_{5}} & = & \frac{ I^{t}_{e}(0)/I^{l}_{e}(0) } 
-                                 { I^{t}_{e}(0)/I^{l}_{o}(0) } \\
-                      & = & \frac{ I^{l}_{o}(0) }{ I^{l}_{e}(0) } 
+   F & = & K_{e}/K_{o}
 \end{eqnarray*}
 \end{myquote}
 
-This ratio ($I^{l}_{o}(0)/I^{l}_{e}(0)$) is known as the ``F-factor'' and
-is constant (since the polarization of the flat-field surface was assumed
-to be constant). The intensities $i_{1}$ and $i_{5}$ can be normalized
-using $F$ to correct for the difference in sensitivity of the two channels:
+ 
+From the above expressions for the flat-fielded signals, it can be seen
+that:
 
 \begin{myquote}
 \begin{eqnarray*}
-  i_{1}.F & = & \frac{ I^{t}_{o}(0) }{ I^{l}_{o}(0) }.
-                \frac{ I^{l}_{o}(0) }{ I^{l}_{e}(0 } \\
-          & = & \frac{ I^{t}_{o}(0) }{ I^{l}_{e}(0) } \\ \\
-  i_{5}.F & = & \frac{ I^{t}_{e}(0) }{ I^{l}_{o}(0) }.
-                \frac{ I^{l}_{o}(0) }{ I^{l}_{e}(0 } \\
-          & = & \frac{ I^{t}_{e}(0) }{ I^{l}_{e}(0) } 
+   F & = & \sqrt {\left( \frac {s_{1}}{s_{4}} . \frac {s_{3}}{s_{2}} \right)}
 \end{eqnarray*}
 \end{myquote}
 
-Thus $i_{1}.F$, $i_{2}$, $i_{5}.F$ and $i_{6}$ all have the same 
-constant of proportionality ($1/I^{l}_{e}(0)$) and can be used as 
-normalized estimates of the $O$ and $E$ ray intensities for exposures
-$T_{0}$ and $T_{45}$.
-
-The target exposures $T_{22.5}$ and $T_{67.5}$ are required, together
-with the flat-field exposure $L_{22.5}$, to estimate the degree and
-orientation of the polarization. If, after flat-fielding using the above 
-process, these target exposures give $O$ and $E$ intensities $i_{3}$, 
-$i_{4}$, $i_{7}$, and $i_{8}$, then they give two more estimates of $F$.
-In practice the geometric mean of all four estimates is used:
+We use this value of $F$ to correct the measured $E$ ray flat-fielded
+signals, $s_{2}$ and $s_{4}$ to get:
 
 \begin{myquote}
 \begin{eqnarray*}
-  F & = & [(i_{6}/i_{1})(i_{2}/i_{5})(i_{8}/i_{3})(i_{4}/i_{7})]^{1/4}
+   s'_{2} & = & s_{2} . F \\
+         & = & \frac{ I^{t}_{e}(0).E_{0} }{ K_{e} } . \frac {K_{e}}{K_{o}} \\
+         & = & \frac{ I^{t}_{e}(0).E_{0} }{ K_{o} } \\ \\
+   s'_{4} & = & s_{4} . F \\
+         & = & \frac{ I^{t}_{o}(0).E_{90} }{ K_{e} } . \frac {K_{e}}{K_{o}} \\
+         & = & \frac{ I^{t}_{o}(0).E_{90} }{ K_{o} } 
 \end{eqnarray*}
 \end{myquote}
+
+Summing the $O$ and corrected $E$ rays signals for exposure $T_{0}$ 
+($s_{1}$ and $s'_{2}$) gives:
+
+\begin{myquote}
+\begin{eqnarray*}
+   s_{1} + s'_{2} & = & \frac{ I^{t}_{o}(0).E_{0} }{ K_{o} } + 
+                        \frac{ I^{t}_{e}(0).E_{0} }{ K_{o} } \\ 
+                  & = & \frac{ ( I^{t}_{o}(0) + I^{t}_{e}(0) ).E_{0} }{ K_{o} } \\ 
+                  & = & \frac{ I_{T}.E_{0} }{ K_{o} } 
+\end{eqnarray*}
+\end{myquote}
+
+where $I_{T}$ is the total intensity (equal to the sum of the $O$ and $E$
+ray intensities). Likewise, summing the $O$ and corrected $E$ rays signals 
+for exposure $T_{45}$ ($s_{3}$ and $s'_{4}$) gives:
+
+\begin{myquote}
+\begin{eqnarray*}
+   s_{3} + s'_{4} & = & \frac{ I^{t}_{e}(0).E_{90} }{ K_{o} } +
+                        \frac{ I^{t}_{o}(0).E_{90} }{ K_{o} } \\
+                  & = & \frac{ ( I^{t}_{e}(0) + I^{t}_{o}(0) ).E_{90} }{ K_{o} } \\ 
+                  & = & \frac{ I_{T}.E_{90} }{ K_{o} } 
+\end{eqnarray*}
+\end{myquote}
+
+From this, the ratio of the exposure factors $E_{0}$ and $E_{90}$ can be
+found by dividing these expression:
+
+\begin{myquote}
+\begin{eqnarray*}
+   \frac{ s_{3} + s'_{4} }{ s_{1} + s'_{2} }  & = & \frac{ I_{T}.E_{90} }{ K_{o} }.\frac{ K_{o} }{ I_{T}.E_{0} } \\
+                                              & = & \frac{ E_{90} }{ E_{0} } 
+\end{eqnarray*}
+\end{myquote}
+
+This ratio, together with the F-factor found earlier, allow the measured
+signals $s_{1}$ to $s_{4}$ to be corrected so that they all have a common
+calibration. An identical procedure can be applied to the other pair of
+target exposures ($T_{22.5}$ and $T_{67.5}$), leading to estimates of
+their exposure factors, and another estimate of the F factor.
+
+{\em Note, each pair of target exposures must be flat-fielded using
+{\em the same} master flat-field frame.}
+
+\section{\label{APP:POLEXT}\xlabel{thepolpackndfextension}The POLPACK NDF Extension}
+Figure Figure~\ref{fig:polext} lists the items which may be stored in
+the POLPACK extension within a data file. The \htmlref{POLEXP}{POLEXP}
+and \htmlref{POLIMP}{POLIMP} applications may be used to transfer these items
+to and from a set of corresponding FITS keywords (see 
+\hyperref{here}{section}{}{SEC:IMPORT}). The contents of the POLPACK
+extension within an NDF may be examined using the
+\xref{\verb+hdstrace+}{sun102} command.
+\begin{latexonly}
+  \begin{figure}[htb]
+  \begin{center}
+  \includegraphics[scale=0.8]{sun223_figures/polext.eps}
+  \caption{The allowed items within the POLPACK extension.}
+  \label{fig:polext}
+  \end{center}
+  \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   \begin{quote}
+   \begin{figure}[bhtp]
+   \label{fig:polext}
+   \includegraphics[scale=0.8,width=8in]{sun223_figures/polext.eps}
+   \caption{The allowed items within the POLPACK extension.}
+   \end{figure}
+   \end{quote}
+\end{htmlonly}
 
 \end{document}
