@@ -298,7 +298,7 @@ if test $tcl_ok = yes; then
     AC_MSG_RESULT(yes)
 else
     AC_MSG_RESULT([broken, using substitute])
-    LIBOBJS="$LIBOBJS strstr.o"
+    AC_LIBOBJ(strstr.c)
 fi
 
 #--------------------------------------------------------------------
@@ -323,7 +323,7 @@ int main()
 }], , tcl_ok=0, tcl_ok=0)
 if test "$tcl_ok" = 0; then
     test -n "$verbose" && echo "	Adding strtoul.o."
-    LIBOBJS="$LIBOBJS strtoul.o"
+    AC_LIBOBJ(strtoul.c)
 fi
 
 #--------------------------------------------------------------------
@@ -347,7 +347,7 @@ int main()
 }], , tcl_ok=0, tcl_ok=0)
 if test "$tcl_ok" = 0; then
     test -n "$verbose" && echo "	Adding strtod.o."
-    LIBOBJS="$LIBOBJS strtod.o"
+    AC_LIBOBJ(strtod.c)
 fi
 
 #--------------------------------------------------------------------
@@ -376,7 +376,7 @@ int main()
 	AC_MSG_RESULT(ok)
     else
 	AC_MSG_RESULT(buggy)
-	LIBOBJS="$LIBOBJS fixstrtod.o"
+	AC_LIBSOURCE(fixstrtod.c)
 	AC_DEFINE(strtod, fixstrtod)
     fi
 fi
@@ -498,7 +498,7 @@ if test "$tcl_ok" = 0; then
     AC_CHECK_LIB(inet, strncasecmp, tcl_ok=1, tcl_ok=0)
 fi
 if test "$tcl_ok" = 0; then
-    LIBOBJS="$LIBOBJS strncasecmp.o"
+    AC_LIBOBJ(strncasecmp.c)
 fi
 
 #--------------------------------------------------------------------
@@ -665,8 +665,8 @@ TCL_UNSHARED_LIB_SUFFIX=""
 TCL_TRIM_DOTS='`echo ${VERSION} | tr -d .`'
 ECHO_VERSION='`echo ${VERSION}`'
 TCL_LIB_VERSIONS_OK=ok
-CFLAGS_DEBUG=-g
-CFLAGS_OPTIMIZE=-O
+CFLAGS_DEBUG="-g $CFLAGS"
+CFLAGS_OPTIMIZE="-O $CFLAGS"
 case $system in
     AIX-4.[[2-9]])
 	SHLIB_CFLAGS=""
