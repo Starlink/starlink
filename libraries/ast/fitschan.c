@@ -67,10 +67,10 @@ f     (e.g. using AST_FINDFITS or AST_READ).
 *     represent, in the number of Object descriptions that can coexist
 *     in the same FitsChan, and in their accessibility to other
 *     (external) astronomy applications (see the Encoding attribute
-*     for details). Encodings are not mutually exclusive and it is
-*     possible to describe the same Object in several ways within a
-*     particular set of FITS header cards by using several different
-*     encodings.
+*     for details). Encodings are not necessarily mutually exclusive
+*     and it may sometimes be possible to describe the same Object in
+*     several ways within a particular set of FITS header cards by
+*     using several different encodings.
 *
 c     The detailed behaviour of astRead and astWrite, when used with
 f     The detailed behaviour of AST_READ and AST_WRITE, when used with
@@ -81,7 +81,7 @@ f     all use of AST_READ is destructive, so that FITS header cards
 *     removed from the FitsChan.
 *
 *     If the encoding in use allows only a single Object description
-*     to be stored in a FitsChan (e.g. the DSS, FITS-WCS, FITS-IRAF and
+*     to be stored in a FitsChan (e.g. the DSS, FITS-WCS and FITS-IRAF
 c     encodings), then write operations using astWrite will
 f     encodings), then write operations using AST_WRITE will
 *     over-write any existing Object description using that
@@ -16235,12 +16235,12 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *     external applications which can potentially read and interpret
 *     the FITS header cards produced.
 *
-*     The encoding options available are not mutually exclusive, and
-*     it is possible to store multiple Objects (or the same Object
-*     several times) using different encodings within the same set of
-*     FITS header cards. This possibility increases the likelihood of
-*     other applications being able to read and interpret the
-*     information.
+*     The encoding options available are not necessarily mutually
+*     exclusive, and it may sometimes be possible to store multiple
+*     Objects (or the same Object several times) using different
+*     encodings within the same set of FITS header cards. This
+*     possibility increases the likelihood of other applications being
+*     able to read and interpret the information.
 *
 *     By default, a FitsChan will attempt to determine which encoding
 *     system is already in use, and will set the default Encoding
@@ -16266,22 +16266,32 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *     well-established astronomy applications. For further details,
 *     see the section "The DSS Encoding" below.
 *
-*     - "FITS-IRAF": Encodes coordinate system information in FITS
-*     header cards using the conventions described in the document
-*     "World Coordinate Systems Representations Within the FITS Format" 
-*     by R.J. Hanisch and D.G. Wells, 1988, available by ftp from
-*     fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z. The main advantage
-*     of this encoding is that it is currently in use by IRAF. For further 
-*     details, see the section "The FITS-IRAF Encoding" below.
-*
 *     - "FITS-WCS": Encodes coordinate system information in FITS
-*     header cards using the convention described in the (draft) FITS
-*     world coordinate system (FITS-WCS) paper by E.W.Greisen and
-*     M.Calabretta (A & A, in preparation). The main advantages of
+*     header cards using the conventions described in the (draft) FITS
+*     world coordinate system (FITS-WCS) paper by E.W. Greisen and
+*     M. Calabretta (A & A, in preparation). The main advantages of
 *     this encoding are that it should be understood by any FITS-WCS
 *     compliant application and is likely to be adopted widely for
-*     FITS data in future. For further details, see the section "The
-*     FITS-WCS Encoding" below.
+*     FITS data in future. At present, however, it suffers from the
+*     disadvantage that the FITS-WCS standard is only a draft (and is
+*     not stable), so it cannot yet be recommended for regular
+*     use. For further details, see the section "The FITS-WCS
+*     Encoding" below.
+*
+*     - "FITS-IRAF": Encodes coordinate system information in FITS
+*     header cards using the conventions described in the document
+*     "World Coordinate Systems Representations Within the FITS
+*     Format" by R.J. Hanisch and D.G. Wells, 1988 (available by ftp
+*     from fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z). This
+*     encoding is currently employed by the IRAF data analysis
+*     facility, so its use will facilitate data exchange with
+*     IRAF. Its main advantages are that it is a stable convention
+*     which approximates to a sub-set of the propsed FITS-WCS encoding
+*     (above). This makes it suitable as an interim method for storing
+*     coordinate system information in FITS headers until the FITS-WCS
+*     encoding becomes stable. Since many datasets currently use the
+*     FITS-IRAF encoding, conversion of data from FITS-IRAF to the
+*     final form of FITS-WCS is likely to be well supported.
 *
 *     - "NATIVE": Encodes AST Objects in FITS header cards using a
 *     convention which is private to the AST library (but adheres to
@@ -16303,9 +16313,9 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *
 *     - If the FitsChan contains any keywords beginning with the
 *     string "BEGAST", then NATIVE encoding is used,
-*     - Otherwise, if the FitsChan contains a keyword of the form "CDi_j"
-*     or "CDiiijjj", where i and j are single digits, then FITS-IRAF 
-*     encoding is used,
+*     - Otherwise, if the FitsChan contains a keyword of the form
+*     "CDi_j" or "CDiiijjj", where "i" and "j" are single digits, then
+*     FITS-IRAF encoding is used,
 *     - Otherwise, if the FitsChan contains the "CRVAL1" keyword, then
 *     FITS-WCS encoding is used,
 *     - Otherwise, if the FitsChan contains the "PLTRAH" keyword, then
@@ -16320,8 +16330,9 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *     Note that when writing information to a FitsChan, the choice of
 *     encoding will depend greatly on the type of application you
 *     expect to be reading the information in future. If you do not
-*     know this, there may be an advantage in writing the information
-*     several times, using a different encoding on each occasion.
+*     know this, there may sometimes be an advantage in writing the
+*     information several times, using a different encoding on each
+*     occasion.
 
 *  The DSS Encoding:
 *     The DSS encoding uses FITS header cards to store a multi-term
@@ -16446,22 +16457,29 @@ f     no data will be written to the FitsChan and AST_WRITE will
 *     return zero. No error will result.
 
 *  The FITS-IRAF Encoding:
-*     The FITS-IRAF encoding is to all intents and purposes a subset of the
-*     FITS-WCS encoding. The main differences are:
+*     The FITS-IRAF encoding can, for most purposes, be considered as
+*     a subset of the FITS-WCS encoding (above), although it differs
+*     in the details of the FITS keywords used. It is used in exactly
+*     the same way and has the same restrictions, but with the
+*     addition of the following:
 *
-*     - Secondary axis descriptions are not supported by the FITS-IRAF
-*     encoding. When writing a FrameSet, only the Base and Current Frames 
-*     will be stored in the FitsChan.
-*     - The range of sky projections which can be described by the
-*     FITS-IRAF encoding is considerably smaller.
-*     - The FITS-IRAF encoding can only describe equatorial, galactic and
-*     ecliptic sky coordinates.
+*     - The only celestial coordinate systems that may be represented
+*     are equatorial, galactic and ecliptic,
+*     - The range of sky projections which can be represented is
+*     considerably smaller than FITS-WCS,
+*     - Secondary axis descriptions are not supported, so when writing
+*     a FrameSet to a FitsChan, only information from the base and
+*     current Frames will be stored.
 *
-*     When writing a FrameSet using the FITS-IRAF encoding, the axis
-*     rotations are specified by a matrix of keywords of the form CDi_j
-*     where "i" is the index of a pixel axis and "j" is the axis of a
-*     physical axis. The alternative form CDiiijjj is recognised when
+*     When writing a FrameSet using the FITS-IRAF encoding, axis
+*     rotations are specified by a matrix of FITS keywords of the form
+*     "CDi_j", where "i" and "j" are single digits. The alternative
+*     form "CDiiijjj", which is also in use, is recognised when
 *     reading an Object, but is never written.
+*
+*     You should not attempt to mix the FITS-IRAF and FITS-WCS
+*     encodings within the same FitsChan, since keyword clashes may
+*     occur.
 
 *  The NATIVE Encoding:
 *     The NATIVE encoding may be used to store a description of any
@@ -17112,10 +17130,10 @@ f     (e.g. using AST_FINDFITS or AST_READ).
 *     represent, in the number of Object descriptions that can coexist
 *     in the same FitsChan, and in their accessibility to other
 *     (external) astronomy applications (see the Encoding attribute
-*     for details). Encodings are not mutually exclusive and it is
-*     possible to describe the same Object in several ways within a
-*     particular set of FITS header cards by using several different
-*     encodings.
+*     for details). Encodings are not necessarily mutually exclusive
+*     and it may sometimes be possible to describe the same Object in
+*     several ways within a particular set of FITS header cards by
+*     using several different encodings.
 *
 c     The detailed behaviour of astRead and astWrite, when used with
 f     The detailed behaviour of AST_READ and AST_WRITE, when used with
