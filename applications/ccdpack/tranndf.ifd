@@ -13,6 +13,7 @@
 #     MJC: Malcolm J. Currie (STARLINK)
 #     PDRAPER: Peter Draper (STARLINK)
 #     MBT: Mark Taylor (STARLINK)
+#     AALLAN: Alasdair Allan (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -25,6 +26,8 @@
 #     	 Changed to TRANNDF.
 #     7-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     17-MAY-1999 (AALLAN):
+#        Added USEWCS parameter.
 #     {enter_further_changes_here}
 
 #-
@@ -133,6 +136,17 @@
             prompt {Transformation structure}
             helpkey *
           }
+
+         parameter usewcs {
+                           # Use AST framesets
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Use AST framesets}
+            helpkey '*'
+         }
 
          parameter logto {
                           # Logging system interaction level
