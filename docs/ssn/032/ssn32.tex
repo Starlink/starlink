@@ -1,0 +1,862 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocsource}    {ssn32.1}
+\newcommand{\stardocnumber}    {32.1}
+\newcommand{\stardocauthors}   {Geoff Mellor}
+\newcommand{\stardocdate}      {8 November 1995}
+\newcommand{\stardoctitle}     {Custom Jumpstart Tutorial}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on  the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+%  \vspace{10mm}
+%  \begin{center}
+%     {\Large\bf Abstract}
+%  \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+% \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+% \newpage
+ \begin{latexonly}
+   \large
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+%\setcounter{page}{1}
+
+\large
+
+\section {Introduction}
+
+
+Custom Jumpstart is a facility provided by Sun
+which allows (almost) hands free Solaris installation.  
+
+It provides the following benefits
+\begin{itemize}
+\item Unattended Solaris installation 
+\item Facilitates multiple installations 
+\item Facilitates subsequent operating system upgrades 
+\item Automates post-installation configuration tasks
+\item Enables easy system reconfiguration 
+\item Reduces the need to backup system partitions
+\end{itemize}
+
+It requires perhaps a day's work to configure initially
+but the subsequent savings in adminstration time make it 
+really worthwhile. Whilst of most value to the larger 
+installations, a Site Manager with more than three Suns can benefit
+from using this process.
+
+This tutorial is not meant to be a comprehensive guide but
+just details of how I configured my system to utilise Jumpstart.
+I don't claim it to be the best method but it works for me.
+Hopefully it will save you some configuration time.
+
+
+\section{Overview}
+
+The key stages in configuring a jumpstart system are the following:
+
+\begin{itemize}
+\item Set up automatic system configuration
+\item Configuring the Servers
+\item Set up configuration directory
+\item Add the install clients
+\end{itemize}
+
+Jumpstart works in the following way:
+
+When the client is booted (using the command {\tt boot net - install}),
+it issues a {\tt RARP} call to determine its Internet address from  the
+boot server. It then uses {\tt tftp} to obtain the jumpstart boot image
+from the boot server. From the client, the jumpstart boot image then issues a
+{\tt hostconfig} request for boot parameters which are returned by the
+bootserver. The client then mounts the root partition from the boot server
+and executes {\tt /kernel/unix}. The bootstrap is now complete. The
+client searches for the configuration and install servers using bootparams 
+information and
+then mounts the configuration and installation directories. The client
+then runs {\tt suninstall} and installs itself.
+
+\section{Automatic System Configuration}
+
+The automatic system configuration involves collecting and setting up
+the information for a system to introduce it to the network. The following 
+items of information are required:
+
+\begin{itemize}
+\item Locale (only needed for non-English computing environments)
+\item Ethernet Address
+\item Host name
+\item IP address
+\item Time Zone
+\end{itemize}
+
+It is necessary to add entries for the ethernet, hostname and ip address
+of the new system to your network tables. Make sure that your network
+netmasks database also contains the correct entry for the subnet on which
+this system will reside.
+
+Finally it is necessary to include an entry in the timezone network map
+for each domain. Using the admintool timezone database; the domainname
+should be entered in the {\tt Host Name} field and the {\tt Timezone}
+should be {\tt GB-Eire}. Then it is necessary to modify the hosts
+database to specify the server that you wish to supply the time to the
+systems {\em e.g.}:
+
+\begin{quote}
+{\tt 143.210.36.51   ltsun1 timehost \# Sparcstation 2}
+\end{quote}
+
+Finally edit the {\tt /etc/nsswitch.conf} file on all NIS+ servers, to
+include a {\tt timezone} entry:
+
+\begin{quote}
+{\tt timezone: nisplus}
+\end{quote}
+
+\section{Configuring the Servers}
+
+There are three server functions required by jumpstart:
+
+\begin{itemize}
+\item {\bf Configuration Server} This server contains the customised
+configuration files used during the automatic installation process.
+\item {\bf Install Server} This server provides the Solaris distribution media
+\item {\bf Boot Server} This server provides clients on the same subnet with 
+the ability to boot and access the network.
+\end{itemize}
+
+All my clients are on the same subnet, so I used one machine to provide
+all three functions. If you have clients on a separate subnet then you
+will have to consult the Sun documentation to determine how to
+configure a separate boot server.
+
+It is possible to either serve the Solaris distribution from a CD drive
+or to copy an image to disk and serve that.  Sun strongly recommend the
+latter method as it greatly improves performance.  As I had sufficient
+free space (approx 400Mb), I chose to create a disk image under the
+directory {\tt /export/install}.
+
+
+This is achieved by first mounting the CD and then typing:
+
+\begin{verbatim}
+      # cd /cdrom/sol_2_4_hw1194_sparc/s0
+      # ./setup_install_server /export/install
+\end{verbatim}
+
+Then export this directory {\it read-only} with root access for the install
+client.
+
+\section{Setting up a configuration directory}
+
+The configuration directory contains all the files required to customise
+your client installation. It contains the following items:
+
+\begin{itemize}
+\item A {\it class profile} for each category of install clients
+\item Possibly {\it begin} scripts which are executed before the
+      class files (ie before the actual installation of the software)
+\item Possibly {\it finish} scripts which are executed post-installation 
+\item A {\tt rules} file specifying which of the above file should be
+      executed for each client or category of clients.
+\item The script {\tt check} which produces a file called {\tt rules.ok}
+      from the {\tt rules} file. This is the actual rules file used 
+      during the installation process.
+\end{itemize}
+
+
+First create a directory on your configuration server (e.g. {\tt
+/export/jumpstart}) and export it as below:
+
+\begin{quote}
+{\tt share -F nfs -o ro,anon=0 /export/jumpstart}
+\end{quote}
+
+Then change directory to your Solaris distribution. In my case, it
+is the disk image in {\tt /export/install}.  Next,
+copy the template files in the {\tt auto\_install\_sample} directory, 
+{\em  e.g.}:
+
+\begin{quote}
+{\tt cp -r auto\_install\_sample/* /export/jumpstart}
+\end{quote}
+
+This populates your configuration directory with a set of examples
+which you can use to create your configuration files.
+
+
+\subsection{The {\tt rules} file}
+
+Begin first by creating the {\tt rules} file. This is a lookup table
+consisting of one or more rules that define matches between system
+attributes and the class profiles and scripts. It is possible to match
+on a variety of attributes such as architecture, model, domainname {\em etc}.
+
+As I have only a relatively small number of mainly individual machines,
+I just simply match on the hostname. My example {\tt rules} file is
+in Appendix \ref{app:rules}. There are five entries to each line. The
+first entry is the keyword and the second is the keyword value. The
+next three entries specify the begin script, the profile and the finish
+script respectively.
+
+\subsection{Begin scripts}
+
+Begin scripts are mainly used to create derived profiles. My setup
+is not complicated enough to require such facilities so I don't use
+them. Hence the ``{\tt -}'' in the {\tt rules} file.
+
+
+\subsection{The Class Profile}
+
+The class profile defines how the Solaris system shall be installed on the
+system. Essentially, it provides answers to  most of the questions normally
+asked during an interactive upgrade. The profile is used to specify
+whether an upgrade or full installation take place. It can also specify
+such things as the system type, disk partitioning and the software group
+to be installed. An example profile is listed in Appendix \ref{app:profile}.
+
+The first keyword in the example is {\tt install\_type}. This is required in
+every profile to determine the type of installation (either {\tt
+initial\_install} or {\tt upgrade}). 
+
+The next keywords relate to the {\tt system\_type}. As I am configuring a
+server without diskless clients, I then define the {\tt num\_clients} and
+{\tt client\_swap} as 0.
+
+I chose to do explicit partitioning and define all of my filesystem sizes
+as can be seen from the next series of commands. It is also possible to use
+{\tt existing} or {\tt default} partitioning. 
+
+On my server, I have chosen to install the full Solaris release ({\tt
+SUNWcall}) but the installed software can be completely tailored with
+{\tt cluster} and {\tt package} commands if required.
+
+For further  details, on profiles, see the Sun documentation.
+
+\subsection{Finish scripts}
+
+
+Finish scripts are where jumpstart gets exciting.  They allow you to do
+all those post installation tasks automatically.
+
+In my example, in Appendix \ref{app:finish}, I create some standard
+directories and then copy in my standard files. This makes use of the
+fact that during the installation the Jumpstart directory is mounted
+onto the directory specified by the variable {\tt SI\_CONFIG\_DIR}.
+Thus it is possible to keep master versions of these files and use them
+for each install.  I create a subdirectory of my jumpstart directory
+({\tt /files}) and place the files there. Note, that during the
+installation, the new root directory is mounted under {\tt /a} so the
+destination of the copy commands are all realative to {\tt /a}.
+
+Next I run a script to set the root password at install time (This
+script is provided as an example file when you configure the jumpstart
+configuration directory).
+
+It is also posible to install the patches automatically. The mandatory
+patches which exist on the Solaris 2.4  distribution (and thus on my
+disk image) can be installed in the standard way\footnote{The Solaris
+distribution is mounted under the directory {\tt /cdrom} regardless of
+whether it is a disk image or the distribution CD.}.  Then I use the
+finish script to install some additional patches too.  First I created
+a subdirectory of the Solaris distribution directory called: 
+
+\begin{quote}
+{\tt /export/install/additional\_patches}
+\end{quote}
+
+which can then be referenced as {\tt /cdrom/additional\_patches} from
+the installation.  Then I install them as if onto a diskless client
+with the {\tt installpatch -R } option.
+
+Finally there are a few things that cannot be done during the install
+and need to be done once the system has been rebooted (eg printer
+configuration). So, I copy a final configuration file into the {\tt
+/etc/init.d} directory and link to it from the {\tt /etc/rc3.d}
+directory.  Thus it gets run at startup time. The final line of the
+file deletes the link and so it only gets run once.
+
+\subsection{Final configuration file}
+
+My example final configuration file is shown in Appendix \ref{app:config}.
+The main set of commands in here configure my printer systems. Then I also
+run the {\tt newaliases} command.
+
+The only thing that I have not found it possible to do is to run the
+{\tt nisclient} script and this is the only thing I have left to configure
+after the automatic upgrade. 
+
+\subsection{The {\tt check} script}
+
+Once you have written your files, run the {\tt check} script in the 
+configuration directory. It will check the validity of the {\tt rules}
+file and the {\tt class} files. If all is in order, it will create
+a {\tt rules.ok} file for use during the installation.
+
+
+\section{Adding Install Clients}
+
+
+Now it is only necessary to add the install clients to the install server.
+If your client is a dataless client and you are running a name service,
+first use the {\tt hostmanager} form in {\tt admintool} to enter details
+for your system. Apart from the standard information, you are required to
+specify the fileserver for the {\tt /usr} and {\tt /usr/kvm} filesystems
+and also the O.S. release. Note that the {\tt Remote Install} button
+should be set to {\tt disable} regardless of whether you are installing
+over a network or not.
+
+Then it is necessary to run the {\tt add\_install\_client} script as below:
+
+\begin{quote}
+{\tt ./add\_install\_client -c }{\it server:jumpstart\_dir  host\_name
+architecture}
+\end{quote}
+
+{\em e.g.}:
+
+\begin{quote}
+{\tt ./add\_install\_client -c ltsun0:/export/jumpstart ltsun7 sun4m}
+\end{quote}
+
+This creates an entry in the bootparams file on the install server.
+
+\section{Commencing Installation}
+
+Now it should be just necessary to boot your client using the syntax:
+
+\begin{quote}
+{\tt boot net - install} 
+\end{quote}
+
+and the auto installation should just get going. Time not just for a
+coffee, but lunch as well!
+
+
+\section{Troubleshooting}
+
+These are the two problems that I encountered:
+
+
+\begin{itemize}
+
+\item
+If the client complains ``{\tt Timeout waiting for ARP/RARP packet ...}''
+then it can't find a system that knows about it on the network. Verify
+the client details (hostname, ethernet address) on the server. 
+
+\item
+Make sure that you export the Jumpstart directory {\it read-only} as it
+says in the manual. This disk is normally read-write on my system and I
+found out the hard way that it matters!  It is a known bug that
+exporting the disk read-write can allow the disk image to become
+slightly corrupted - this manifests itself in a failure of the install
+process to produce a {\tt hostname.le0} file on the client.  The client
+cannot then  configure its network devices. If you get to this point,
+you can recreate your disk image or add a line to the finish script to
+create this file with the hostname in during install.
+
+\end{itemize}
+
+\section{References}
+
+The relevant Sun documentation that describes this process in detail
+is the ``{\it SPARC: Installing Solaris Software}'' manual. The Sun
+``{\it Network Administration Student Guide}'' provides some additional
+detail and is more coherent than the basic manual.
+
+Neither book provides much detail on the details of writing finish scripts
+and most of the examples described in this tutorial were determined by
+trial and error. I have just obtained a new book from Sun Express
+called ``{\it Automating Solaris Installations: A Custom Jumpstart
+Guide}'' which provides many examples (on a floppy disk too!). I have
+not had chance to review this book yet but beware with some of the
+listed examples as I have already seen reports of some of them not
+working correctly.
+
+\appendix
+
+\newpage
+\section{Example {\tt rules} file}
+\label{app:rules}
+
+\begin{small}
+\begin{verbatim}
+#
+# Geoff's rules file
+#
+# v1.0 1/8/95
+#
+#############################################################################
+#
+# RULE_KEYWORD AND RULE_VALUE DESCRIPTIONS
+#
+#
+# rule_keyword    rule_value Type       rule_value Description
+# ------------    ---------------       ----------------------
+#  any            minus sign (-)        always matches
+#  arch           text                  system's architecture type
+#  domainname     text                  system's domain name 
+#  disksize       text range            system's disk size 
+#                                          disk device name (text)
+#                                          disk size (MBytes range) 
+#  hostname       text                  system's host name
+#  installed      text text             system's installed version of Solaris
+#                                          disk device name (text)
+#                                          OS release (text)
+#  karch          text                  system's kernel architecture
+#  memsize        range                 system's memory size (MBytes range)
+#  model          'text'                system's model number
+#  network        text                  system's IP address
+#  totaldisk      range                 system's total disk size (MBytes range)
+#
+#############################################################################
+
+# rule keywords and rule values   begin script  profile          finish script
+# -----------------------------   ------------  -------          -------------
+
+hostname ltsun7                   -             ltsun7-profile   server-finish
+
+hostname darc                     -             darc-upgrade     -
+ 
+hostname darc2                    -             darc2-profile    client-finish
+
+hostname euve1                    -             euve1-profile    server-finish
+
+\end{verbatim}
+\end{small}
+
+\newpage
+
+
+\section{Example class profile}
+\label{app:profile}
+
+\begin{small}
+\begin{verbatim}
+
+#
+# ltsun7-profile
+#
+# installation of Solaris 2.4  - 1/8/95
+#
+install_type    initial_install
+system_type     server
+num_clients     0
+client_swap     0
+#
+#
+partitioning    explicit
+filesys         c0t3d0s0 50 /
+filesys         c0t3d0s1 150 swap
+filesys         c0t3d0s3 75 /var
+filesys         c0t3d0s4 100 /opt
+filesys         c0t3d0s5 250 /usr
+filesys         c0t3d0s7 free /export/home
+filesys         c0t1d0s2 all /soft1
+#
+cluster         SUNWCall
+#
+
+\end{verbatim}
+\end{small}
+
+\newpage
+
+\section{Example finish file}
+\label{app:finish}
+
+\begin{small}
+\begin{verbatim}
+
+#!/bin/sh
+#
+# server-finish
+#
+# grm 1/8/95
+#
+# finish script for server
+#
+umask = 022
+#
+# first create a few directories
+#
+echo "create directories"
+#
+mkdir /a/alpha
+mkdir /a/soft1 /a/soft2 /a/scratch /a/star /a/temp
+mkdir /a/euve /a/rdac_ftp /a/data1 /a/ftp
+ln -s /ftp/pub /a/pub
+#
+ # now copy a few files in
+#
+echo "copy files"
+#
+# common files
+#
+cp ${SI_CONFIG_DIR}/files/sendmail.cf /a/etc/mail/sendmail.cf
+cp ${SI_CONFIG_DIR}/files/.??* /a
+cp ${SI_CONFIG_DIR}/files/defaultrouter /a/etc/defaultrouter
+cp ${SI_CONFIG_DIR}/files/inetd.conf   /a/etc/inetd.conf
+cp ${SI_CONFIG_DIR}/files/resolv.conf /a/etc/resolv.conf
+cp ${SI_CONFIG_DIR}/files/syslog.conf  /a/etc/syslog.conf
+cp ${SI_CONFIG_DIR}/files/shells      /a/etc/shells
+#
+# server files
+#
+cp ${SI_CONFIG_DIR}/files/xdm-init     /a/etc/init.d/xdm
+cp ${SI_CONFIG_DIR}/files/dfstab-xrcad1  /a/etc/dfs/dfstab
+cp ${SI_CONFIG_DIR}/files/auto_master-cad /a/etc/auto_master
+#
+# replace the xdm config files:
+#
+rm -f /a/usr/openwin/lib/xdm/*
+cp ${SI_CONFIG_DIR}/files/xdm/* /a/usr/openwin/lib/xdm
+#
+# now do some links
+#
+ln -s /etc/init.d/xdm /a/etc/rc3.d/S30xdm 
+ln -s /usr/local/bin/perl /a/usr/bin/perl
+ln -s /soft2/X11R5 /a/opt/X11R5
+ln -s /soft2/X11R5/include/X11 /a/usr/include/X11
+#set client password
+#
+echo "set client password"
+#
+${SI_CONFIG_DIR}/set_root_pw
+#
+# Unpack man pages
+#
+catman
+#
+# add some hosts in
+#
+cat ${SI_CONFIG_DIR}/files/hosts.main >> /a/etc/inet/hosts
+#
+# Patch installation
+echo "install patches"
+#
+# The mandatory stuff:
+#
+cd /cdrom/Patches
+./install_patches /a
+#
+#
+# now the other patches for Solaris 2.4
+# (this assumes that an extra directory
+#  called additional_patches has been created
+#  on the disk image of the installation CD
+#  and the patches moved there)
+#
+cd /cdrom/additional_patches/101945-29
+./installpatch -R /a . > /a/var/sadm/install_data/extra_patches.log 2>&1
+#
+cd /cdrom/additional_patches/101959-03
+./installpatch -R /a . >> /a/var/sadm/install_data/extra_patches.log 2>&1
+#
+cd /cdrom/additional_patches/102216-01
+./installpatch -R /a . >> /a/var/sadm/install_data/extra_patches.log 2>&1
+#
+cd /cdrom/additional_patches/102218-02
+./installpatch -R /a . >> /a/var/sadm/install_data/extra_patches.log 2>&1
+#
+cd /cdrom/additional_patches/102922-02
+./installpatch -R /a . >> /a/var/sadm/install_data/extra_patches.log 2>&1
+#
+cd /cdrom/additional_patches/102292-01
+./installpatch -R /a . >> /a/var/sadm/install_data/extra_patches.log 2>&1
+#
+#
+# final configuration file (for after reboot)
+#
+cp ${SI_CONFIG_DIR}/files/S99finish_install /a/etc/init.d/S99finish_install
+ln -s /etc/init.d/S99finish_install /a/etc/rc3.d/S99finish_install
+#
+
+\end{verbatim}
+\end{small}
+
+\newpage
+
+\section{Example final configuration file}
+\label{app:config}
+
+\begin{small}
+\begin{verbatim}
+
+#!/bin/sh
+#
+# /etc/init.d/S99finish_install
+#
+# grm 11/8/95
+#
+# This script is intended to be run once after system installation
+#
+# finishes off the install after reboot:
+# 1)configures system printers for all systems
+# 2)runs newaliases
+#
+#
+echo "Running finish_install script"
+#
+# define PATH
+#
+PATH=/usr/bin:/bin:/usr/sbin:/usr/lib/nis; export PATH
+#
+# Identify print servers
+#
+echo "Configuring printers ..."
+#
+lpsystem -t s5 ltsun0
+lpsystem -t s5 ltsun1
+#
+# configure and enable the printers
+#
+lpadmin -p star_citoh -s ltsun1 -T unknown -I any \
+ -D "C.Itoh 5000      - Line printer                - Starlink Terminal
+Room"
+accept star_citoh
+enable star_citoh
+#
+lpadmin -p star_canon -s ltsun1 -T unknown -I any \
+ -D "Canon LBP-8II    - Text printer                - Starlink Terminal
+Room"
+accept star_canon
+enable star_canon
+#
+lpadmin -p star_ps1 -s ltsun1 -T unknown -I any \
+ -D "HP laserjet IIID - Postscript printer (duplex) - Starlink Terminal
+Room"
+accept star_ps1
+enable star_ps1
+#
+# set default printer destination
+#
+lpadmin -d star_citoh
+#
+#
+# now do newaliases
+#
+echo "Creating Sendmail DBM files ..."
+#
+newaliases
+#
+# now delete link to startup file
+#
+rm /etc/rc3.d/S99finish_install
+#
+# and reboot
+#
+shutdown -i6 -y -g0
+
+\end{verbatim}
+\end{small}
+
+\end{document}

@@ -1,0 +1,1086 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocnumber}    {42.1}
+\newcommand{\stardocsource}    {sgp42.1}
+\newcommand{\stardocauthors}   {R.F.~Warren-Smith}
+\newcommand{\stardocdate}      {18th May 1995}
+\newcommand{\stardoctitle}     {Starlink Software Strategy}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\symbol{95}}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Hypertext definitions.
+% These are used by the LaTeX2HTML translator in conjuction with star2html.
+
+% Comment.sty: version 2.0, 19 June 1992
+% Selectively in/exclude pieces of text.
+%
+% Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\externallabels}[2]{}
+\newcommand{\externalref}[1]{}
+\newcommand{\html}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+% Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%------------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Un-comment the following to debug links in the HTML version using Latex.
+
+%\newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+%\renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+%\renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+%\renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+%\renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+%\renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%------------------------------------------------------------------------------
+% Add any document specific \newcommand or \newenvironment commands here
+
+\newcommand{\hi}[1]{{\tt{#1}}}
+\newcommand{\qt}[1]{``#1''}
+\newcommand{\st}[1]{{\em{#1}}}
+\begin{htmlonly}
+   \renewcommand{\qt}[1]{{\tt{"}}#1{\tt{"}}}
+   \renewcommand{\_}{\_}
+\end{htmlonly}
+\newcommand{\dev}[1]{\htmlref{#1}{development}}
+\newcommand{\dis}[1]{\htmlref{#1}{distribution}}
+\newcommand{\mnt}[1]{\htmlref{#1}{maintenance}}
+\newcommand{\spt}[1]{\htmlref{#1}{support}}
+
+\newcommand{\ssgurl}[0]{http://star-www.rl.ac.uk/\~{}rfws/projects/ssginput.html}
+\newcommand{\prgurl}[0]{http://star-www.rl.ac.uk/\~{}rfws/projects/index.html}
+\newcommand{\linuxurl}[0]{http://bima.astro.umd.edu/nemo/linuxastro/linux.html}
+\newcommand{\aipsurl}[0]{http://info.cv.nrao.edu/aips++/docs/html/aips++.html}
+\newcommand{\midasurl}[0]{http://http.hq.eso.org/midas-info/midas.html}
+\newcommand{\irafurl}[0]{http://iraf.noao.edu/iraf-homepage.html}
+\newcommand{\ssgref}[1]{\htmladdnormallink{#1}{\ssgurl}}
+\newcommand{\prgref}[1]{\htmladdnormallink{#1}{\prgurl}}
+\newcommand{\mgrref}[1]{\xref{#1}{sgp25}{}}
+\newcommand{\usscref}[1]{\xref{#1}{sun1}{}}
+\newcommand{\figaroref}[1]{\xref{#1}{sun86}{}}
+\newcommand{\ndffmtref}[1]{\xref{#1}{ssn20}{}}
+\newcommand{\aipsref}[1]{\htmladdnormallink{#1}{\aipsurl}}
+\newcommand{\midasref}[1]{\htmladdnormallink{#1}{\midasurl}}
+\newcommand{\irafref}[1]{\htmladdnormallink{#1}{\irafurl}}
+%------------------------------------------------------------------------------
+%  Title page.
+%  ==========
+\begin{document}
+\thispagestyle{empty}
+\begin{htmlonly}
+   \xlabel{}
+   \label{stardoctoppage}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+%  Add picture here if appropriate.
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCL}{http://www.clrc.ac.uk/} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.clrc.ac.uk/ral/index.html} \\
+      Particle Physics \& Astronomy Research Council \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+\end{htmlonly}
+\begin{latexonly}
+   CCL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+\end{latexonly}
+
+%  Table of contents.
+%  =================
+\htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+                                         {stardoctoppage}}
+
+%------------------------------------------------------------------------------
+%  Introduction page.
+%  =================
+
+\section{INTRODUCTION}
+
+This document contains the text of a paper presented to the Starlink
+Panel in March 1995 and describes a strategy for Starlink software
+activities over the next 3 years. It is based heavily on the input
+provided by the 1993-94 Starlink Software Survey (SGP/43) and
+subsequent discussions at Starlink Software Strategy Group
+(SSG) meetings during late 1994.
+
+\subsection{Definition of Terms}
+
+The terms \qt{maintenance}, \qt{support}, \st{etc.}\ are used with a
+variety of meanings in software discussions and this can potentially
+lead to misunderstanding. In this paper, the generic term \qt{support}
+is used in its loose sense, but italics are also used where necessary
+to indicate the following specific meanings:
+
+\begin{description}
+\item[\label{distribution}Distribution:]
+Assessing software, checking that it builds and runs on supported
+platforms and meets rudimentary \qt{health checks}, packaging it to
+facilitate distribution and installation (by \mgrref{Site Managers} and
+others), and copying and distributing the documentation.
+
+\item[\label{support}Support:]
+Maintaining an awareness of what software items are available and how
+they work, and providing advice on their use and diagnosis of problems
+that may occur. Suggesting work-arounds where necessary.
+
+\item[\label{maintenance}Maintenance:]
+Repairing software when it is found not to behave as advertised or
+expected. Includes bug fixing and updating of items that go out of
+date or cease to function properly due to external changes.
+
+\item[\label{development}Development:]
+Adding new capabilities to software which go beyond its previously
+advertised functionality. Includes writing new software from scratch
+and writing substantially new documentation.
+
+\end{description}
+
+\section{CURRENT PROBLEMS AND TRENDS}
+
+\subsection{\label{started}Documentation and Ease of Software Use}
+
+One of the clearest messages to emerge from the 1993/94 Starlink
+Software Survey was the need to improve the ease with which the
+average user can learn about and utilise Starlink software. Issues
+relating to this dominated the priority list for ways to improve both
+Starlink software and documentation, and there appear to be a number
+of closely related requirements:
+
+\begin{enumerate}
+\item To improve the \qt{friendliness} of software and the ease with
+which people can understand and make use of it.
+
+\item To improve the documentation so that it is both more accessible
+in itself, and also allows users to identify the software they require
+more easily.
+
+\item To provide \qt{cookbooks} and examples of software use that allow
+users to perform standard data reduction tasks by simply following a
+pre-defined recipe without needing to become too expert in the
+technical aspects of the processing.
+
+\item To help users choose which tools best suit their purposes.
+\end{enumerate}
+
+In contrast to these issues, more traditional priorities such as
+software performance, reliability, and the addition of new processing
+capabilities must clearly be regarded as less important at present (we
+expect them to re-emerge as priorities once the above problems have
+been tackled).
+
+To respond to this, we have begun \prgref{a programme} to address the
+objective of improving documentation and software presentation, with
+ease of use primarily in mind.  Given the amount of documentation and
+software in use, it will require a sustained effort over a number
+years before the problem is completely solved.  However, new
+technologies such as hypertext (\st{e.g.}\ the World Wide Web) and
+tools for developing more intuitive Graphical User Interfaces (GUIs)
+make this a timely development and should allow us to make substantial
+improvements within the next few years (see \S\ref{infra}).
+
+\subsection{Software Diversity}
+
+A theme which was much discussed at SSG meetings was the
+increasing need to make use of many different software packages in
+order to access the most powerful facilities at each stage of data
+processing.\footnote{For instance, the Spectroscopy SSG identified no
+less than 13 major software packages in active use for spectroscopic
+data reduction (doubtless still overlooking a few) and most other
+groups could have made similar lists. All of them felt that this
+software diversity should be regarded as a valuable resource and be
+exploited.}  The Software Survey also provides ample evidence of this
+in the wide range of software packages in use.
+
+The Project believes that this trend is extremely important and likely
+to continue or even accelerate with the much easier access to software
+from around the world that modern network tools provide. As a result,
+good new software can find its way into widespread use remarkably
+quickly, replacing previous methods.
+
+It is easy to see the advantages of exploiting this (usually) free
+software, much of it written by acknowledged experts who would not be
+available to write software for Starlink.  Very often, the support
+available is also good, with active user groups and regular postings by
+knowledgeable people.
+
+By depending on an international \qt{software market} such as this, one
+also hopes to benefit from evolutionary forces which will, over time,
+improve software quality and establish standards. If we wish to
+benefit from this, our approach to software must be sufficiently
+flexible to adapt to new approaches as they emerge.
+
+\section{DISCUSSION}
+
+\subsection{Implications for Starlink}
+
+Traditionally, developers of astronomical software have made their
+packages perform a wide range of tasks, making them \qt{complete} and
+independent of other packages. However, such an approach is becoming
+increasingly difficult to sustain because the resulting software is
+large and inflexible, and can respond only slowly to new
+expectations. The weaker areas of large packages become a burden and
+can swiftly be overtaken by new, more specialised tools. The
+increasing difficulty of maintaining large packages in the face of
+such developments is causing users to diversify the range of software
+they use -- despite the barriers they face when moving from one
+software package to another.
+
+Because of these weaknesses in the traditional approach, we believe
+the trend towards freer exchange of software will be a very difficult
+one to ignore, although the consequent diversity will be costly in
+support effort.  In this situation, we do not believe it is good use of
+Starlink's resources to be \st{\mnt{maintaining}} the weaker areas of any
+large software package (\st{i.e.}\ simply bringing them up to par)
+when there is already better software available. A better strategy is
+to ensure that we can adapt to use the new software as conveniently as
+possible. This is not to say that we should avoid \st{\dev{developing}} new
+software in areas where it already exists, but that if we do, our
+endeavours must be sufficiently well-focussed that our products are
+{\bf significantly better} than the alternatives -- simply matching
+them is not good enough.
+
+This approach requires a clear recognition of the international
+context of our work and a determination to concentrate resources where
+they will be most effective in this context. It also means recognising
+that increasing software diversity is something we must accept as a
+price for the advantages of free software exchange. We must then find
+ways to exploit this diversity and to manage the problems that it
+brings.
+
+\subsection{How Far should we Specialise?}
+
+In many enterprises, the emergence of more open competition is a
+signal to specialise. For Starlink, however, the degree to which we
+should do this not so clear. Although we are a software supplier and
+want to see our products succeed, we also provide a computing service
+for UK astronomy which involves, almost uniquely,
+\st{\dis{distributing}} and \st{\spt{supporting}} a great deal of
+software which we have not ourselves developed. These two functions
+are somewhat at odds.
+
+If we were to concentrate all our work in a particular area (say
+optical spectroscopy) we would doubtless be able to \st{\dev{develop}}
+rather better software and offer far better \st{\mnt{maintenance}} and
+\st{support}, but this would be at the price of withdrawing almost
+completely from other areas of astronomy.  We believe this would
+undermine much of the cross-discipline support that makes Starlink
+unique and accounts for its success.
+
+On the other hand, if we spread our resources evenly between every
+available item of software, we would not have enough people even to
+understand how it all works. Our software \st{development} would then
+cease and our \st{maintenance} and \st{support} activities would be
+reduced to minor tinkering -- contributing very little of value. With
+this loss of value, our reasons for providing software
+\st{\dis{distribution}} would also be eroded.
+
+We would prefer to maintain a broad involvement in most areas of
+astronomy, with the aim of providing UK astronomers with a choice of
+the most up to date and powerful software for their data reduction
+irrespective of where it comes from, together with advice on how to
+use it. However, we need to concentrate our \st{development} effort
+more if we are to produce world-class software capable of featuring
+amongst the choices available.
+
+\subsection{Finding our Place in the World}
+
+What we propose, therefore, is the maintenance of a broad software
+provision at the level of \st{\dis{distribution}} so that the scope of our
+computing service does not change greatly, but with an increasing
+degree of specialisation as we move through \st{\spt{support}},
+\st{\mnt{maintenance}} and \st{\dev{development}} activities. This continues a
+trend that has existed since the 1980s.
+
+A consequence of this is that we see a future of increasing dependence
+on software \st{developed} by other people and on the \st{support}
+and \st{maintenance} they provide.  Our own \st{support} activities
+will then need to shift towards making the resulting more diverse
+software collection easier to use.  With these changes, there will be
+less need to \st{develop} or \st{maintain} software for such a wide
+range of purposes, and this will give us scope to concentrate our
+\st{development} efforts on areas where we can make world-class
+contributions.
+
+We do not, however, anticipate complete withdrawal of our
+\st{development} work from whole areas of astronomy.  Rather, we
+envisage limiting the breadth of our \st{development} projects and
+employing a finer level of granularity, so that they are not (as in
+the past) all-embracing enterprises covering whole disciplines but
+well-focussed projects aimed at specific problems. This might often
+involve working at the level of individual applications rather than
+entire packages.  In doing this, we must be prepared in many areas to
+defer to non-UK workers, but we should also be prepared vigorously to
+defend those areas where we have the best expertise and which are of
+particular importance to UK astronomy.
+
+The following sections discuss some of the practical implications of
+these proposals.
+
+\section{PROPOSED STRATEGY}
+
+\subsection{Distribution}
+
+Our software \st{\dis{distribution}} should, in future, be directed towards
+a broad level of software provision for all currently-supported areas
+of UK astronomy, but we should achieve this by depending to a greater
+extent than in the early days on software from non-UK sources,
+continuing the trend of the past few years.
+
+Where software is already freely available from sources outside
+Starlink, we should regard its re-distribution through Starlink as
+an opportunity to add value. Typically this might consist of providing
+UK-specific \st{\spt{support}} (over and above that available from its
+suppliers), or the ability to make a particular trustworthy version
+easily available so that it is standard at Starlink sites.  There are
+many other pitfalls associated with using free software, and these
+would also provide opportunities for Starlink to contribute.
+
+We should adopt an increasingly international approach to distributing
+software developed in the UK, involving at least:
+\begin{itemize}
+\item Configuring the software so that there is nothing \qt{special}
+or restrictive about it that will prevent it being easily installed
+and used at non-Starlink sites, and
+\item Developing an automatic software distribution mechanism (based on the
+WWW) that will make it readily available anywhere in the world.
+\end{itemize}
+
+These moves should be supported by long-overdue revised statements of
+our \htmlref{international software distribution and support
+policy}{international}\begin{latexonly} (see
+below)\end{latexonly}. This would include any copyright and licensing
+restrictions, \st{etc.}, which should be kept to a minimum.
+
+We expect the \usscref{UNIX Starlink Software Collection} to continue
+to grow in size, as there is \htmlref{little benefit}{USSC} in
+attempting to reduce its size for its own sake\begin{latexonly} (see
+\S\ref{USSC})\end{latexonly}. However, when considering new platforms,
+we should examine each software item on its merits before porting it,
+and expect the collection to be reduced in size as a result.
+
+\subsection{Support and Maintenance Priorities}
+
+We favour \htmlref{prioritising}{priority} the majority of our
+software work in the form of specific projects\begin{latexonly} (see
+\S\ref{priority})\end{latexonly}, but there will always be a spectrum
+of \st{\mnt{maintenance}} and \st{\spt{support}} activities that
+either cannot be foreseen or which are too small to warrant
+consideration as individual projects.  The following describes current
+practice in this area which is, we think, well adapted to future
+needs:
+
+\begin{enumerate}
+\item Allocate an annual manpower budget to \qt{baseline} \st{support} and
+\st{maintenance}. This governs the overall amount of work undertaken
+in this category.
+
+\item Allow this work to be event-driven by user requests. This
+ensures that we concentrate only on problems that cause real
+difficulty in software that people actually use.
+
+\item Use discretion in deciding to what extent any particular request
+requires action. This helps relate the response to the seriousness of
+the problem.
+
+\item If demand exceeds the allocated manpower, then decide priorities on
+the basis of software usage statistics. This helps to ensure that the
+minimum number of people are kept waiting.
+
+\item If the work involved in a request is clearly too large to handle
+in this way, then regard it as an identifiable project, to be
+considered in competition with other projects (see \S\ref{priority}).
+
+\end{enumerate}
+
+The budget allocated to these activities in the current year is around
+25\% of our total software manpower. This means that routine
+\st{support} and \st{maintenance} is a significant but minor activity
+-- the majority of our work being \st{\dev{development}}.
+
+In line with the increasing dependence on non-UK software, we should in
+future also depend increasingly on the associated external sources of
+technical software \st{support}. Our own \st{support} activity must
+instead concentrate on the added value of providing indexing,
+cookbooks and advice, \st{etc.}\ to help users find the software they
+need and learn how to use it (see \S\ref{infra}).  The wider diversity
+of software which we anticipate will therefore probably increase our
+\st{support} costs.
+
+It will however, be very difficult to provide \st{maintenance} (such
+as bug fixes) for other people's software and we should attempt to do
+this only in exceptional circumstances, depending instead on the
+original suppliers for this \st{maintenance} work. Consequently, we
+would expect our \st{maintenance} costs to fall.
+
+\label{international}To encourage wider use of UK-developed software,
+we should extend our \st{support} and \st{maintenance} services to
+non-UK users, but without guarantee and only when the
+\htmlref{benefits}{foreign} are in balance with the small extra costs
+involved\begin{latexonly} (see \S\ref{foreign})\end{latexonly}.
+
+\subsection{\label{infra}Key Infrastructure Developments}
+
+Our proposal to accept a more diverse range of software and to rely
+increasingly on external suppliers means accepting that
+rationalisation of astronomical functionality (so that a user need not
+trudge from one package to another in search of the best applications)
+is unlikely to happen in the near future. Some users may regret this,
+but it seems an unavoidable conclusion given the many different
+sources of software that now exist.  There will, as a result, be an
+increased need for help in finding the best item of software, learning
+how to use it, and facilitating the transfer of information between
+packages. This trend is, of course, already apparent and brings us
+back to \hyperref{where we started}{where we started (}{)}{started}.
+
+We believe there are a number of promising approaches to help
+alleviate these difficulties and to provide data reduction facilities
+that are considerably more uniform and easier to use than can be
+achieved simply by copying software from the Internet:
+
+\begin{description}
+\item[Improved Documentation:] We plan that a great deal of the guidance
+about which software to use for a particular purpose should come from
+documentation in a \qt{cookbook} style, providing recipes for common
+types of data reduction. While we expect opinions to continue to
+differ about which software is best, this will at least allow us to
+provide recommendations that can identify \qt{primary} packages for
+particular purposes, chosen freely from what is available.
+
+We anticipate using hypertext extensively in this work because:
+\begin{itemize}
+\item It offers better opportunities to present pictorial and other
+information in an easily accessible way.
+\item It presents the user with an integrated documentation system in
+which the boundaries between individual documents are hidden even
+though they may actually come from disparate sources.
+\item It opens up new indexing and searching possibilities.
+\item It offers significant maintenance advantages because
+cross-linking between documents results in far less duplication of
+material.
+\end{itemize}
+
+\item[User Interfaces:] By designing new user interfaces
+(often graphical) for specific purposes, it should be possible to
+encapsulate software items from different sources (or items that are
+currently hard to use) so that they are presented to a user as a
+single coherent and intuitive system. In effect, this is an
+\qt{interactive cookbook} that helps guide the inexperienced user
+through the necessary processing and isolates him from the underlying
+software, while not preventing the more knowledgeable from accessing
+it directly.
+
+\item[Interoperability:] We believe there is much we can do to improve
+the ease with which the applications software we develop can be used
+alongside software from other sources. This issue of
+\qt{\htmlref{interoperability}{interop}} also has a number of other
+benefits\begin{latexonly} (see \S\ref{interop})\end{latexonly} which
+will help to make our software more relevant to the international
+context and to users who are already familiar with different systems.
+
+\end{description}
+
+We regard these developments as very important because the assistance
+we provide and the way that the \usscref{Starlink Software Collection}
+is distributed, organised, presented and described will in future
+constitute a larger part of the service we offer.
+
+We expect to spend about one year developing and testing the
+techniques described above and implementing a number of pilot projects
+that make use of them. This will be followed by approximately two
+years in which we put these into use to provide hypertext
+documentation, cookbooks and improved user interfaces and
+interoperability for a range of astronomical data reduction purposes.
+
+\subsection{\label{priority}Identifying Development Priorities}
+
+Going beyond the infrastructure developments above, which are designed
+to make future software support tractable, we must also identify the
+astronomical application areas that we will address.
+
+For reasons outlined in \S\ref{concentrate}, we consider it unwise to
+allocate software effort uncritically to \qt{packages}, as it is far too
+hard to control their evolution, and this approach too easily becomes
+a commitment to develop a wide range of software of arguable quality
+across a whole discipline.  A better strategy for using resources
+effectively is to \st{identify the functionality required} and then
+\st{examine the best way of obtaining it}. In this way we can clearly
+prioritise our objectives and need not expend effort on activities
+that are irrelevant to achieving them. Developing existing packages
+is, of course, not ruled out by this.
+
+The system introduced last year, of identifying software plans
+annually based on input from users and SSG meetings was
+intended to identify specific high-priority software objectives and to
+ensure that these objectives remain relevant with the passage of time.
+This seems to have functioned quite well so far, although there is
+still scope for increasing user involvement.
+
+In assessing how to achieve the objectives that have been identified,
+one must consider:
+\begin{enumerate}
+\item Identifying and using software that already exists,
+
+\item Making enhancements to existing software and/or documentation,
+
+\item Assembling a new facility by drawing components from other
+existing systems,
+
+\item Writing new material where there is no suitable basis from which
+to start.
+\end{enumerate}
+
+Normally, one would expect the priority order to be that
+above. However, the best approach will often hinge on complex issues
+involving user requirements (and prejudice), technical considerations
+and knowledge of the available products. As weeks or months of
+investigation may be involved, this work has to be regarded as part
+of the design phase of each project and handled by the software staff
+who will implement it.
+
+In delegating this work, the Project is well aware that critical
+decisions should not rest with software implementors alone and that a
+thorough and objective investigation of the alternatives must be
+carried out.  A important part of this should be a survey of the
+opinions of users who already use related software and will be the
+likely users of the new product, and the Project's responsibility lies
+in ensuring that this investigation is thorough and appropriate to the
+project being undertaken. We have already developed resources such as
+mailing lists to help us in this, and intend to monitor their
+effectiveness and extend them as necessary.
+
+\subsection{Concentrating Development Activity}
+
+A further consideration is the timeliness and quality of our software
+development, since very often a long development time can render a
+product obsolete before it is finished. It may also be necessary to
+devote more than a single person to a project if we are to improve on
+what is already available (there is a limit to what a single person
+can achieve).
+
+For this reason, we favour identifying key projects, when necessary, on
+which resources can be concentrated in order to achieve a high-quality
+result over a suitably short period. We imagine that such projects
+might be allowed to consume up to about 50\% of software manpower for
+short periods (1 or 2 years, with annual reviews).
+
+Clearly, such major projects can only be undertaken where the need is
+clear and the benefits substantial.  The area must be sufficiently
+narrow to be tractable, but with more than niche appeal.  Users and
+SSGs should be informed that such possibilities exist, and that they
+should consider proposing such projects where they are justified. It
+would lie with the Starlink Panel to give final approval.
+
+\section{FURTHER CONSIDERATIONS}
+
+\subsection{Future Programming Languages}
+
+It appears that our users' programming language requirements are
+evolving only rather slowly at present, with little interest in new
+languages for their own sake.  Most people seem to feel comfortable
+with Fortran~77 and can do most of what they want with it (although
+they would naturally like to be able to do it more easily, if they
+could). There is some interest in C as an alternative, and a little
+interest in Fortran~90 (mainly from the Theory community for
+compatibility with other computing services).
+
+Internationally, however, use of Fortran~77 seems to be declining
+(certainly in the USA) and software written in it is becoming
+noticeably less acceptable to projects evaluating products for their
+own use. The most internationally-acceptable language at present is
+undoubtedly C.
+
+The \aipsref{AIPS++} group (and also, perhaps, \midasref{MIDAS}) are
+looking towards C++ as the language of the future, and it is certainly
+gaining popularity in the USA (outside astronomy) and in
+commerce. However, there seems to be little evidence that these moves
+are being driven by astronomical users -- indeed, there are serious
+worries that the novelty and additional complexities of C++ may prove
+unacceptable to many of these.  Instead, it seems to be mainly system
+implementors who are increasingly having to cope with greater software
+complexity that demands this radical change. With much existing
+Fortran expertise in the UK, Fortran~90 may be an attractive
+alternative to C++ (it has comparable capabilities although it lacks
+standard interfaces to many widely-used libraries and operating
+systems). However, neither is really yet in wide enough use in
+scientific circles to be sure.
+
+At present, Starlink provides facilities for writing applications only
+in Fortran~77 but we do not expect this to remain adequate for long.
+A significant fraction of our infrastructure software is already
+implemented in C and it is our policy to use C exclusively for this
+purpose in future.
+
+Moving wholesale to either C++ or Fortran~90 (particularly the former)
+would probably be very expensive for us: it could easily consume most
+of our software effort for several years adapting to the new
+programming paradigm, establishing new standards and re-educating
+programmers and users. We do not feel that such a drastic move is yet
+justified by user demand, and think it unlikely to be necessary in the
+near future. Nevertheless, a measured involvement in investigating
+these languages is warranted and may perhaps progress to a more
+concrete proposal in time.
+
+A more modest but practical alternative is a migration towards C
+programming interfaces and, increasingly, writing applications in C
+over the next 2 or 3 years. This is an achievable goal that would
+provide worthwhile benefits for programmers as well as addressing the
+need for more internationally accepted practice in our software work.
+
+\subsection{New Platforms}
+
+Sun and DEC seem likely to continue to provide competitively priced
+workstation hardware in the near future, and this will probably be in
+wide use in the international astronomical community. Hence, we do not
+currently anticipate any major porting of software to new workstation
+platforms.
+
+There is, however, a growing recognition of the capabilities and
+advantages of PC hardware. The availability of
+\htmladdnormallinkfoot{Linux}{\linuxurl} (a free UNIX operating system
+for PCs) and, very recently, a Fortran compiler for it means that many
+more astronomers around the world will be able to use PCs in future
+for their work. We therefore plan to introduce provision of Starlink
+software for such machines over the next 2 years (although initially
+at a lower level than on workstations). We have already embarked on
+the first step, of porting the Starlink infrastructure software.
+
+In the longer term, there may be much to gain from greater
+exploitation of commercial software written for the PC market. In
+particular, the high quality and relatively low price of this software
+should allow us to make far better provision for (\st{e.g.}) text
+processing and database/tables handling than we can at present. The
+current obstacle is the lack of an accepted multi-tasking operating
+system that will support both astronomical data reduction software and
+commercial applications while running on widely-available hardware.
+When this problem is solved (as seems likely in the next few years),
+the potential benefits mean that we should then seriously consider
+providing software to run on whatever turns out to be the next
+successful PC operating system.
+
+\section{SUMMARY -- KEY POINTS}
+
+To summarise, the key points of the strategy we propose are:
+
+\begin{enumerate}
+
+\item To recognise the international context of our work and
+the need to depend increasingly on software originating outside the
+UK.
+
+\item To maintain a broad level of software provision in the form of
+\st{\dis{distribution}} in all current areas of UK astronomy, but to
+introduce an increasing level of specialisation as we move through
+software \st{\spt{support}}, \st{\mnt{maintenance}} and \st{\dev{development}}.
+
+\item To depend increasingly on the \st{support} and \st{maintenance}
+services provided by others, and to shift our own \st{support}
+services towards managing the resulting increase in software diversity
+and helping users to exploit the range of software available
+(through cookbooks, \st{etc.}).
+
+\item To concentrate our \st{maintenance} services (\st{e.g.}\ bug-fixing) on
+software developed within the UK and to extend our \st{support} and
+\st{maintenance} services for this software to non-UK users in a
+limited form, so as to promote international use.
+
+\item To focus our astronomical software \st{developments} in areas where
+we can make world-class contributions or where no alternative software
+exists and, where necessary, to devote larger proportions of our
+development effort to key applications projects.
+
+\item To develop key infrastructure technologies (\st{e.g.}\ automatic
+software distribution, hypertext documentation, GUIs and
+interoperability) to support the activities above.
+\end{enumerate}
+
+\newpage
+\appendix
+\section{FREQUENTLY ASKED QUESTIONS}
+
+The following addresses a few frequently asked questions whose answers
+are relevant to the arguments presented in this paper.
+
+\subsection{\label{USSC}Does the Starlink Software Collection Need to
+be so Big?}
+
+{\Large \bf Q:} The \usscref{Starlink Software Collection} (USSC)
+contains a large number of items. Surely these can't all be needed?
+Wouldn't it be less expensive if we reduced its size?
+
+{\Large \bf A:} Only a small subset of the USSC routinely demands
+any \st{\mnt{maintenance}} or \st{\dev{development}} activity, so the costs associated
+directly with its size are mainly those of \st{\dis{distribution}}. Since only
+the most actively-used packages tend to be regularly updated and
+re-installed at sites, this is where most of the effort is expended.
+
+User surveys have always shown that usage of Starlink software is very
+broadly distributed, with all items being used to some extent. There
+is no clear cut-off between heavily-used and under-used items, so it
+is not easy to remove items from the USSC without inconveniencing a
+significant number of people. In some cases items have fallen out of
+use through obsolescence and have been removed.  Since they had
+remained untouched for years, however, the manpower saving was
+negligible.  A more aggressive stance on deleting little-used items
+would save very little manpower, as these items demand little
+attention anyway. Indeed, supporting users who were inconvenienced by
+software deletions would probably result in an overall increase in our
+costs.
+
+There is, in conclusion, little reason to prevent little-used software
+items from remaining in the collection as they consume negligible
+resources. There is, however, good reason to examine carefully the
+need to make any new software item available, as it is the initial
+release of any item which is usually the most time consuming.
+
+\subsection{\label{duplication}Why is there so much Duplication?}
+
+{\Large \bf Q:} The \usscref{Starlink Software Collection} contains
+many alternative ways of doing the same thing. Surely this is
+wasteful? Why can't it be rationalised by eliminating duplication to
+save on support costs?
+
+{\Large \bf A:} If we had planned and written the USSC as it currently
+exists, it would, indeed, have been wasteful to have incorporated so
+much duplication (to say nothing of the confusion and difficulty this
+causes for users). However, it did not happen that way.
+
+The vast majority of this software has not been written by Starlink
+but was contributed by various authors over more than a decade.  When
+it was submitted to Starlink its authors had already chosen how
+compatible it should be with other software, and to what extent to
+introduce duplication.  Unfortunately, the desire of many authors to
+make their software independent of others has tended to drive them
+towards duplicating features available elsewhere. Starlink has always
+discouraged this practice and extolled the virtues of software
+compatibility, but most of this work has taken place outside
+Starlink's control.
+
+\label{illfeeling}Having received such software, and appreciating that
+it is valuable, Starlink is faced with two options:
+
+\begin{enumerate}
+\item Attempt to rationalise it by transferring its valuable functions
+into other packages which we already distribute, or
+
+\item Accept the duplication and the costs of distributing the new
+software as it stands.
+\end{enumerate}
+
+Experience of attempting the former approach has shown that it nearly
+always takes very much more effort than expected and succeeds in
+alienating both the author (because the original character of the
+software rarely survives) and potential users (who suffer considerable
+delays in receiving the software). Overall, the latter approach has
+proved by far the more acceptable and cheaper option.
+
+It is not hard to see that attempts to rationalise software become
+even more infeasible once the increasing amount of free software
+available on the Internet is considered.  Starlink simply cannot hope
+to assimilate the entire software output of the rest of the world's
+astronomers in this way. It seems that duplication is an inevitable
+consequence of the free exchange of software.
+
+\subsection{\label{concentrate}Why not Concentrate on just a few Packages?}
+
+{\Large \bf Q:} Starlink supports\footnote{Note we are really
+discussing \st{\dev{development}} work here rather than \st{\spt{support}} --
+people typically want new things added to the software they use.} so
+many packages.  Wouldn't it be better to concentrate on just a few and
+make them really good?
+
+{\Large \bf A:} It is a common notion that most astronomers do much the
+same operations on their data, so it should be possible to identify
+whichever package is best at it, and concentrate on that one.
+
+In reality, however, there is almost no agreement amongst Starlink
+users about which software is best for any particular purpose.  People
+want different things and choose the software that provides them.
+There is plenty of evidence for this in the Starlink Software Survey
+results, which show a very wide spread of usage between different
+packages, and it becomes extremely obvious if you visit a range of
+Starlink sites or gather a group of users in a room and ask them to
+agree.
+
+This means that whichever package you decided to concentrate on, you
+would have to abandon a large number of users who needed features that
+it did not provide. It then becomes difficult to resist the demand to
+transfer these features into the preferred package. Performing this
+rationalisation and supporting the affected users takes a great deal
+of effort and generates ill feeling (see the \htmlref{previous
+question}{illfeeling}). Although the resulting package may be a
+little less work to support, the potential barrier to achieving this
+is substantial and the net result in terms of increased functionality
+is nil. By the time the work is finished, some better product is quite
+likely to have come along.
+
+Another difficulty is the \qt{umbrella effect}. Suppose we had just
+designated \figaroref{Figaro} as the only package to be supported by
+Starlink. An excellent package in many ways, Figaro is nevertheless
+large with many old and weaker features that it would be of doubtful
+value to support (given that better software exists elsewhere). By
+sheltering under the Figaro umbrella, these weaker features start to
+consume our resources, whereas we would otherwise expend this effort
+more effectively on the better alternatives.
+
+A related problem is that the designated package would grow rapidly in
+size as every new software development advertised itself as being part
+of it (which now guarantees it support from Starlink).  Large packages
+are extremely difficult to \st{\mnt{maintain}} and respond slowly to
+change, so we would soon be back to the original problem: a large and
+uncontrollable accumulation of software with a commitment to support
+it all -- but now with a reduced ability to do so.
+
+In reality, it is often cheaper to accept that you have a spread of
+requirements and to develop individual packages to satisfy each of
+them. The economy comes through keeping the packages small, and
+ensuring that you concentrate only on the strengths of each one and do
+not allow it to expand into areas that are already well covered
+elsewhere. The small level of duplication involved is more than made
+up for by the saving in overheads of a single large package attempting
+to cater for more diverse requirements.
+
+\subsection{\label{foreign}Why Should we Support non-UK Users?}
+
+{\Large \bf Q:} Why should we provide software support for users outside
+the UK? Surely Starlink's priorities lie at home?
+
+{\Large \bf A:} It is true that our activities should be
+directed towards the support of UK astronomy. However, this astronomy,
+like the software it depends on, cannot be isolated from its
+international context. It is therefore important to consider both the
+export of software from the UK as well as simply importing software
+from others. There are good practical reasons for this:
+
+\begin{itemize}
+\item If software (and support) only flows into the UK, and
+not out, then astronomers with international collaborations have
+little choice but to use the software dictated by their foreign
+collaborators. If this differs from that generally used in the UK,
+then Starlink's scope for supporting them is greatly reduced.
+
+\item There is an economic advantage in ensuring that any \st{ad hoc}
+international standards that emerge are influenced by our own ideas
+and software developments. The payoff for this is a reduced cost in
+adapting to future developments and a greater likelihood that software
+developed elsewhere will be useful to us. In practice, such standards
+can only be established by supplying foreign users with successful
+products and encouraging them to use them and base future developments
+upon them. Lack of support, or an obviously \qt{UK only} attitude are
+common obstacles that prevent this happening.
+
+\item International contacts help to ensure that we are kept aware of
+developments elsewhere and increase the chance that users will suggest
+good new ideas (or even contribute software) which we can
+exploit. Overall, this helps prevent our approach to software becoming
+too UK-centred. An overseas user base is a cost-effective way of
+maintaining this sort of contact.
+
+\item There is, in reality, very little cost in providing a modest
+international service once the initial investment has been made. This
+is because the effort spent on many forms of \st{\mnt{maintenance}} and
+\st{\spt{support}} activity benefits all users of the software, regardless
+of who reports the problem.  The use of the WWW to distribute software
+and documentation will also keep the cost to a minimum.
+
+\end{itemize}
+
+The question of software \st{\dev{development}} priorities is, of course, a
+different matter and needs to reflect UK needs above all.
+
+\subsection{\label{interop}What is Interoperability?}
+
+{\Large \bf Q:} What is \qt{interoperability} and how can it benefit us?
+
+{\Large \bf A:} At present, there are many different software packages
+in use, with each trying to be complete in itself. This leads to
+considerable duplication (\st{e.g.}\ every package has its own
+\qt{add} and \qt{display} commands). Because of the effort of developing
+this wide range of functions, most packages have weak areas that their
+users have little option but to tolerate until the author gets around
+to improving them.  The package as a whole therefore develops far more
+slowly than if the author were free to concentrate on its strengths
+and ignore its weaknesses.
+
+This situation is maintained by the barriers that exist (intentionally
+or otherwise) to prevent users moving freely between software
+packages.  Users would, in fact, often be far better off using
+selected applications from different packages, choosing whichever is
+best.  Many do so already, but generally at a rather coarse level,
+switching between packages for different phases of data reduction
+because the barriers to inter-mixing applications more intimately are
+too high.
+
+There are considerable advantages in trying to reduce these barriers,
+which is what interoperability in this context is all about:
+
+\begin{itemize}
+\item It makes it easier for users to select the best application for a given
+purpose.
+
+\item It exposes application developers to more open competition,
+making it less attractive to develop new applications unless they have
+clear advantages over what is already available.
+
+\item As a result, it allows us to reduce support for applications which are
+already better provided from elsewhere.
+
+\item It allows small projects to compete at the level of individual
+\qt{high value} applications against larger packages that enjoy much
+higher levels of manpower.
+
+\item It allows us to develop new applications that are useful to a wider
+range of users, regardless of which package or environment they
+already use.
+
+\item It should help to promote standards as a result of developers
+selecting the best features available from different sources.
+
+\end{itemize}
+
+In an ideal world, one might imagine writing applications that,
+chameleon-like, could run in a number of different environments, so
+that a user could not distinguish them from \qt{native} applications.
+Whether one actually needs to go that far, however, is debatable (and
+in any case there may be formidable technical obstacles to this
+ideal).  More probably, a workable degree of inter-operability between
+two or three of the major astronomical data reduction packages would
+go a long way towards establishing common standards that others would
+follow. This potential for catalysis is one of the attractions of this
+approach.
+
+There are currently three main barriers to the sort of
+interoperability we envisage:
+
+\begin{description}
+\item[Data:] Applications must be able to read and write data in a
+variety of formats, so that they can exchange information with other
+applications with which they may be used. We have developed an
+\ndffmtref{initial solution} to this problem and plan to release the
+relevant software this year.
+
+\item[User Interface:] Users would probably want to be presented with
+a similar style of application command line, prompt, \st{etc.}, as a
+\qt{native} application.  We are currently pursuing prospects for
+compatibility with \irafref{IRAF} in this area, and have had a
+favourable initial response from its developers.\footnote{The favoured
+approach involves an additional process that lies between the user
+interface and the application, effectively \qt{adapting} it to the
+environment. The resulting deception is expected to be fairly good,
+and is potentially extensible to other environments.} One possible
+outcome of this might be the availability of Starlink applications
+within the IRAF command language -- a capability that can already be
+demonstrated up to a point.
+
+\item[Graphics:] The need for graphical interoperability is somewhat
+uncertain, as X-windows already provides a fair degree of
+compatibility and very few applications in practice depend on more
+intimate interaction (such as sharing the same plotting space). The
+ability to share image servers might, however, be useful and this
+possibility is being investigated.
+
+\end{description}
+
+\end{document}

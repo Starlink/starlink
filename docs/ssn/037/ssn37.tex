@@ -1,0 +1,1057 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocsource}    {ssn\stardocnumber}
+\newcommand{\stardocnumber}    {37.1}
+\newcommand{\stardocauthors}   {C A Clayton}
+\newcommand{\stardocdate}      {30th May 1996}
+\newcommand{\stardoctitle}     {Starlink Security}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on  the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+%   \vspace{10mm}
+%   \begin{center}
+%      {\Large\bf Abstract}
+%   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+%  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+% \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+% \setcounter{page}{1}
+
+\section{\label{introduction}\xlabel{introduction}Introduction} 
+
+There is already a very large amount of documentation on Unix security,
+indeed too much for your average site manager to find time to read. The
+purpose of this document is not to duplicate that documentation but
+instead to discuss just a few topics which are considered to be
+particularly relevant to Starlink sites and which are not covered to an
+appropriate depth elsewhere. For example, issues relating to network
+security are well documented elsewhere but concerns such as disaster
+recovery are not. References to the more complete guides on Unix
+security can be found on the Starlink security WWW page at URL:
+
+\begin{quote}{\tt
+\htmladdnormallink{http://star-www.rl.ac.uk/\~{}cac/security}
+{http://star-www.rl.ac.uk/\~{}cac/security}}
+\end{quote}
+
+The references listed there are not repeated here in order to extend the
+lifetime of this document. Suggestions for new links from these WWW pages
+are always welcome.
+
+The issues covered here are those about which queries have been
+received from Site Managers. I have also tried to make this guide short
+and pragmatic, listing practical tips and actions without a full blown
+description of the background, which can be found elsewhere. It is
+assumed that you know how to use basic security related commands such
+as {\tt chmod}. This guide is also not intended to be a ``Hacker's
+Handbook''. Hence, I have been deliberately vague in several
+areas. For further information, contact the author.
+
+There is no such thing as ``total security''. In our environment,
+setting security too tight can make life very difficult for users, to
+the extent of being counter-productive, not to mention making you very
+unpopular. However, we must make our system as secure as possible to
+avoid the worse alternative of having your system compromised.  A good
+strategy is to set security as tight as you can without significantly
+affecting the usability of the system and to check the file system
+regularly for signs of security lapses. Both of these topics are
+discussed in the present paper. You might like to let students at your
+site know you do this checking to dissuade them of trying anything.
+These checks can be run regularly and automatically using {\tt cron}
+and any lapses can mailed back to you. Hence, security lapse monitoring
+need not involve you in any extra work once it has been set up.
+
+Security is not just about keeping out hackers. It also covers security
+against user error and hardware failures (\emph{e.g.}, backups), and theft.
+A section of disaster recovery is included in this paper.
+
+I have attempted to make this document Unix-flavour neutral. In a few
+places I have given examples for Solaris simply because that is what I
+am familiar with. However, most of the contents apply equally to any
+other flavour of Unix, such as Digital Unix or Linux.
+
+% I have also assumed that the potential hacker is not a current user
+% of your system but an outside agent. In practise this may not be the case
+% but your users are likely to attempt non-destructive hacking. The author
+% can provide advise on how to guard against being hacked by current
+% users of the system if you feel this is necessary.
+
+\subsection{What is in this document?}
+
+\begin{itemize}
+\item Some basic steps for securing your system
+\item A system for checking for security lapses
+\item Disaster recovery procedures
+\item Trusted host security issues
+\item References to existing documentation and security tools (via WWW)
+\end{itemize}
+
+\subsection{What is not in this document?}
+
+\begin{itemize}
+\item Basic Unix Security
+\item Descriptions of security loopholes
+\item Physical security of hardware
+\item Many network security issues
+\end{itemize}
+
+%------------------------------------------------------------------------
+
+\section{\label{securing_your_system}\xlabel{securing_your_system}Securing your system}
+
+This is not a description on how to weld your system shut. 
+Such actions are likely to reduce the usability of your system
+to the extent that your users complain. Instead emphasis is placed
+on plugging up loopholes and avoiding bad practise. 
+
+The following list is far from complete. Only a small selection of the more
+important issues are considered. Site managers wishing further
+recommendations on securing their system are referred to the
+documentation available via the \htmladdnormallink{Starlink security WWW page}{http://star-www.rl.ac.uk/\~{}cac/security}.  For
+example, the Sun White Paper ``A practical Guide to Solaris Security''
+is a must for all Unix managers, Solaris or otherwise.
+
+
+\subsection{Security patches}
+
+The news group {\tt comp.security.announce} contains announcements
+about security problems (and fixes). Install all security related
+patches for the OS that you are running. Sun also maintain a list of
+security related patches on their WWW SunSolve service (link available
+from the \htmladdnormallink{Starlink security WWW pages).}{http://star-www.rl.ac.uk/\~{}cac/security}
+
+\subsection{Single user boot security}
+
+Ensure that your systems require that a password must be given when
+booted single user, if possible. Additionally, remote login as root
+should be disabled.  Root logins can still be accomplished, but users
+must first login as a user and then {\tt su} to root. This is done for
+logging and accountability purposes. Both are the default on Solaris
+2.x but the former is not for Digital Unix. 
+
+\subsection{Passwords}
+
+\subsubsection{Cracking passwords}
+
+It is not difficult for a potential hacker to get access to your
+password information. I will not go into details here for obvious
+reasons. This information can then be ``cracked'' using even a modest
+computer in a relatively short amount of time. The cracking procedure
+usually involves comparing your encrypted password with encryptions of
+dictionary words and variations on this theme. Thus, easy passwords
+such as ``galaxy'' can be discovered in this way almost instantly. A
+less crackable password is one containing gibberish such as
+non-dictionary words and one or more non-alphabetic characters.
+
+We recommend that you run a cracking program on your own password file
+(for the sole purpose of ensuring that your users don't have easy to
+crack passwords) and asking users with passwords which you crack to
+change them for more sophisticated ones. Details of the availability of
+such software can be found on the
+\htmladdnormallink{WWW.}{http://star-www.rl.ac.uk/\~{}cac/security}
+
+These WWW pages also give access to a script for producing passwords
+which have proven to be uncrackable but which are still memorable.
+This is done by constructing a password from parts of other words.  The
+results is very secure and yet easy to remember since it is
+pronounceable (not that you would ever speak it!) and the words used
+are given at the time of generation.
+
+You should be aware that programs for cracking passwords are not very
+complex. You can do it in 32 lines of C. More sophisticated versions are
+considerably longer but can crack even some very obscure passwords.
+
+\subsubsection{Old and new accounts} 
+
+This is an area for potential security lapses. Make sure that new
+accounts have passwords on them as soon as they are created and ensure
+that this temporary password is unique and non-trivial. Although
+you may ask the user to log on and change it immediately, some users
+continue to use the password that you set for them. Hence, you could
+end up with several accounts with the password ``newuser'' or something
+similar.
+
+When users leave, their accounts should be removed or at the very least
+disabled. If the remote user needs to use it again, it can easily be
+re-enabled. Old accounts are a risk partly because the password on them
+is not being changed regularly and partly because users no longer
+at your site still have access to your system possibly unnecessarily.
+
+\subsubsection{Password management features}
+
+You might like to consider using any password management features
+offered by your operating system. For example, Solaris 2.x allows
+password aging (enables the administrator to set an expiration date for
+passwords), password qualification (checks that the password passed
+certain simple criteria to make it more difficult for someone else to
+guess) and account expiration. One can also disallow the reuse of an
+old password.
+
+\subsection {NFS}
+
+Network security is a vast topic in itself and is covered already in
+other documents (see WWW pages). It is recommended that you read one of
+those documents.  Here I restrict myself to pointing out the importance of
+one particular NFS mount option. You should mount
+user disks with the {\tt nosuid} option (ignore and {\tt `s'} bits set
+in the file permissions). Why is this important? If you were to mount
+up a disk from a remote machine with an untrusted root account, you
+could end up allowing users on your machine to run scripts as root.
+
+\subsection{File system permissions}
+
+\subsubsection{File system permission gotchas}
+Here are a couple of ``gotchas'' which are worth bearing in mind.
+
+\begin{itemize}
+\item To delete a file, you just need ``write access'' to the directory
+in which it is in and not the file. 
+\item Always send a new user a welcoming mail message. The mail directory
+has public write access (to allow mail delivery) but consequently if
+a user does not already have a mail file there, then another user could
+create that file before they receive any mail and place a ``spoof'' message 
+in it.
+\end{itemize}
+
+\subsubsection{The dreaded {\tt `s'} bit}
+
+Any user is allowed to alter the user accounts file {\tt /etc/passwd}
+by using the {\tt passwd} command even though this file is at the heart
+of your system's security. This is achieved through the {\tt `s'} bit being
+set on the program {\tt /usr/bin/passwd}. Setting the {\tt `s'} bit on
+certain files is vital to the operation of your system but this
+facility is unfortunately well known about and potentially one of the
+most dangerous security problems on any Unix system.
+
+Later in this paper you will be shown how to look for files with the
+{\tt `s'} bit set.
+
+A user with access to the root account for just a moment can use this
+facility to completely compromise your system. Similarly, be careful
+when running commands for a user as root and either have `.' last in
+your path or not at all, to avoid root running a user's enhanced
+version of a system command instead of the real version. The rules of
+thumb are:
+
+\begin{itemize}
+\item Don't run code as root unless you have to
+\item Don't run setuid programs unless you have to. If it is necessary
+to run such a program or script, take a look at it first. 
+\end{itemize}
+
+If for some reason you think you need to write a setuid script, try and think
+of a work around. If you cannot then don't make it a script, as many shells
+can be forced to go interactive. It is far better to write a program.
+
+\subsection{The Prom password}
+
+On most flavours of Unix, it is possible to boot off of a CD-ROM and
+gain root access to a system. This is now becoming common knowledge.
+There are several steps you can take to avoid this happening at your
+site:
+
+\begin{enumerate}
+\item Remove CD-ROM drives from systems (impractical)
+\item Prevent users getting access to OS installation CD-ROMs (impractical)
+\item Set a prom password so that users cannot boot off of a CD-ROM drive
+without knowledge of that password.
+This can be done on a Sun either on the console or via the {\tt eeprom}
+command:
+
+\begin{quote}
+\verb+ok> setenv security-mode command+\\
+or\\
+\verb+# eeprom security-mode command+
+\end{quote}
+
+If you forget the prom password, you can reset it via the {\tt eeprom}
+program.  If you forget the prom password and cannot get into your
+system as root, you are in deep trouble.
+
+\end{enumerate}
+
+\subsection{Preventing root access to documents}
+
+Suppose you have a sensitive document that you don't want anyone else
+to read (\emph{e.g.}, the scientific discovery of the century, or more likely
+a staff report). You can use {\tt chmod} to ensure that no-one but
+yourself and root can read it. If there are other users of the system
+with knowledge of the root account, then your document is not secure. 
+Under Solaris 2.5 it is possible to easily encrypt your documents so that
+a password is required in order to render them readable. One option is
+to use {\tt vi -x}. This prompts for a password and the resultant file
+(and temporary file in {\tt /tmp}) are encrypted. An alternative is to use
+the {\tt crypt} command to encrypt and decrypt ascii files using
+a password. See the {\tt vi} and {\tt crypt} man pages for more details.
+These facilities are, unfortunately, not available under Digital Unix
+nor Linux.
+
+\subsection{C2 security}
+
+The U.S. government's security classification system called Orange Book 
+defines a series of divisions for D (least secure) to A (most secure)
+and levels within those divisions. Division D (minimal protection)
+covers systems such as PCs running DOS. 
+
+Division C, level 1 (discretionary security protection) is where most
+Unix systems come in (\emph{i.e.}, they have the concept of users, with users
+having control over objects they own).  Division C, level 2 (controlled
+access protection) adds auditing and increased validations (and
+increased system loading). An example of a C2 implementation would be
+Solaris 2.x's SunShield. Note that some C2 implementations are just the
+bare minimum to get the government certification and hence they work
+but the data provided can come in a very raw form. We do not recommend
+the use of C2 on Starlink machines.
+
+\subsection {Anonymous {\tt ftp} and {\tt tftp}}
+
+By default, anonymous {\tt ftp} is disabled. A full description of the setup
+and security mechanisms may be found in the {\tt ftpd} manual page and in
+Starlink Forum.
+
+{\tt tftp} (trivial file transfer protocol) must be set up with some care.
+Starlink sites may wish to use this system for booting X-terminals.  If
+so, be sure to set it up as indicated in the X-terminal documentation
+to avoid introducing a security loophole into your system. Use NFS
+instead if possible.  If you must run the {\tt tftp} daemon (\verb+tftpd+),
+configure it to run within a particular directory by specifying the
+{\tt -s /tftpboot} in the {\tt /etc/inet/inetd.conf} file (Solaris) or
+{\tt /etc/inetd.conf} file (Digital Unix).
+
+%------------------------------------------------------------------------
+
+\section{\label{detecting_security_lapses}\xlabel{detecting_security_lapses}Detecting security lapses}
+
+What might a hacker do once he/she has access to your system? Here are
+a some of the tools of the trade:
+
+\begin{description}
+\item {\bf Holes} -- 
+Just poor security. Some flavours of Unix as supplied by the manufacturer 
+are full of holes. 
+\item {\bf Trojan Horses} -- 
+Where something is placed on your system for activation later -- either at the
+request of the person who placed it, or by a user (or you) accidentally falling over it.
+\item {\bf Worms} -- 
+Where a system gains illegal access to your workstation over the network,
+copies itself onto your system, and start trying to gain access to the next
+system. 
+\item {\bf Viruses} -- 
+Where a program `fragment' attaches itself to another program and keeps replicating within further applications as they are run. These are almost unheard of 
+on Unix.
+\item {\bf Mimics/spoofs} -- 
+Programs that appear to be what they are not. Spoofing a login session 
+on Unix requires a trivial 13 line script and can be run by any user and
+there is very little that you can do about it. Only users who already have
+an account on the system can do this but it might appeal to students
+wanting to pinch each others passwords.
+Use of X-terminals and X-based login sessions prevents this. 
+\end{description}
+
+How do you know if your security has been breached? What should you do
+if you receive a CERT announcement that many machines have been
+hacked via an operating system loophole? Here is a list of things to 
+look for on your system that may indicate that you have received a 
+visit from a hacker:
+
+\begin{enumerate}
+\item Look for files called {\tt ...}, {\tt .\^E}, {\tt" "}
+\item Look for a {\tt .exrc} file in {\tt /tmp}
+\item Look for extra lines added to the end of {\tt /etc/passwd}
+\item Look for shells with the {\tt `s'} bit set (see below)
+\item Look for other accounts with UID {\tt `0'} 
+\end{enumerate}
+
+This can be done automatically via scripts run from {\tt cron} and the
+results mailed back to you. If you really suspect a hacker, you should also
+run this at irregular intervals  -- the hacker may have looked at your
+{\tt crontab} file and may hide himself when a scan is due.
+
+Here are a selection of commands to help you hunt for hackers.
+
+\subsection{Monitoring files -- times}
+
+All files and directories have three separate times associated with them under
+Unix. The commands refer to Solaris 2.x and may be slightly different
+on other flavours of Unix.
+
+\begin{itemize}
+\item file ACCESS time (\emph{e.g.}, file reads):
+\begin{quote} {\tt ls -lu} \end{quote}
+\item file CHANGE time (\emph{e.g.}, {\tt chmod, chown, chgrp}):
+\begin{quote} {\tt ls -lc} \end{quote}
+\item file MODIFICATION time (\emph{e.g.}, file edited):
+\begin{quote} {\tt ls -l} \end{quote}
+\end{itemize}
+
+The file MODIFICATION time is the most recent time that the contents of
+the file were written or altered -- for example by editing. The file
+CHANGE time is the most recent time that the file header was altered --
+so this will be changed by both editing {\em and} commands like {\tt chmod}.
+The distinction is important since it is possible for a user to alter
+the MODIFICATION time of a file so that it looks old but the CHANGE
+time gives it away.
+
+\subsection{Locating files by criteria -- sweeps}
+
+The excellent {\tt find} command may be used to search all (or part)
+of the Unix file tree for files or directories which meet certain
+criteria. The full syntax of the command can be found in the man pages
+but here are a few useful examples:
+
+\begin{itemize}
+
+\item Search all local disks for setuid files (files with the dreaded
+{\tt `s'} bit set):
+\begin{quote} {\tt find / -mount  -type f -perm -4000 -ls} \end{quote}
+Some system commands are supposed to have this permission (\emph{e.g.},
+{\tt passwd} but not, for example, shells (\emph{e.g.}, {\tt csh}).
+
+\item Search from the current directory downwards for files 
+which have been changed in the last 3 days:
+\begin{quote} {\tt find . -ctime -3 -print} \end{quote}
+This command is also useful for finding out who has recently filled up a disk.
+
+\item Search for setuid files which have been modified in the last 3 days
+(there should be none!):
+\begin{quote} {\tt find / -mount -type f -perm -4000 -mtime -3 -ls} \end{quote} 
+This is a good one to have as a {\tt cron} job.
+
+\item Look for files recently altered in {\tt /usr}:
+\begin{quote} {\tt find /usr -type f -mtime -s -ls} \end{quote}
+This too is a good one to have as a {\tt cron} job.
+
+\item Search for publicly writable files and directories on local
+disks:
+\begin{quote}
+{\verb+find / -mount -perm -2 \( -type f -o -type d \) -print+}
+\end{quote}
+
+\item Look for writable block device files and character device files:
+
+\begin{quote} {\tt find / -mount -type b -perm -2 -print} \end{quote}
+\begin{quote} {\tt find / -mount -type c -perm -s print | more} \end{quote}
+
+Look for funny looking devices. Why? A hacker with temporary
+access to the root account can create a new device with the same major
+and minor device numbers as, say, the system disk and then make himself
+the owner of that new device. He could then bypass all the Unix file
+system security and get at the raw system disk from his own account. 
+
+\end{itemize}
+
+\subsection{Monitoring users}
+
+System administrators are not permitted to monitor users actions
+without their knowledge. 
+
+However, you should be aware that Unix has plenty of commands for
+monitoring system usage which might be invaluable when chasing a
+hacker.
+
+\begin{itemize}
+\item {\tt last} --- (to check recent logins)
+\item {\tt lastcomm} --- (to check all recently run commands)
+\item {\tt view /var/adm/messages} (to check log of some recent system events)
+\item {\tt grep su /var/adm/messages} (to check who been using the {\tt su} command)
+\end{itemize}
+
+To ``tune'' what sort of messages go into {\tt /var/adm/messages}, use the 
+file {\tt /etc/syslog.conf}. You can also divert messages to a
+private file. 
+
+%------------------------------------------------------------------------
+
+\section{\label{disaster_recovery}\xlabel{disaster_recovery}Disaster Recovery}
+
+Imagine that you come in one morning and the majority of your hardware
+has been stolen (remember that this has already happened at one
+Starlink site). What steps would you have had to have taken prior to the
+theft to ensure that you can replace the functionality of your system?
+
+\begin{enumerate}
+
+\item Are you insured? Remember that your Starlink site contract (if
+applicable) requires you to indemnify Starlink against any loss of
+its equipment \emph{i.e.}, it is your institution's responsibility to
+replace the equipment. Check with your Site Chairman that you are
+properly covered.  You might also like to ask what the insurance
+covers:
+
+\begin{enumerate}
+
+\item Cover of specific hardware to a certain value?
+
+\item Cover for the cost of getting everything running again?
+
+\item Cover for consequential loss \emph{i.e.}, loss of data?
+
+\item Cover for hiring equipment temporarily until permanent replacements
+are bought? Starlink will of course try to help in any way possible to 
+provide stop-gap hardware but in practise, we seldom have unused hardware
+available.
+
+\end{enumerate}
+
+\item Is your hardware properly maintained? Starlink maintains most of
+the hardware at most sites but there are exceptions, particularly
+new sites which arrange their own maintenance via starter grants. 
+Even if Starlink is nominally maintaining your hardware, be sure that
+you have actually told RAL about your new equipment and its serial numbers
+and that all your equipment is actually on a maintenance schedule 
+(see \xref{SGP/25}{sgp25}{} for further details). 
+
+
+\item Is your system regularly backed up and are the backup tapes
+safe?  A detailed discussion on backup policies is beyond the scope of
+the present document but you absolutely must backup
+system and permanent user space. Keep a copy of a recent set of backup
+tapes away from the location of your system. Imagine if the whole
+building burnt down or, more likely, a thief steals your system with
+the backup tape still in the drive. If you prefer to keep your backups
+in a fire safe near to the systems, make sure that it is not the sort
+that could be easily removed by a thief when he takes your machine away!
+It is probably wisest to keep the latest backups locally (for easy access
+for file restoration) and an older set off site or in another building
+in case of emergency.
+
+\item Do you have detailed records of your current system setup?
+If your entire system was stolen/destroyed, do you have sufficient
+information to re-construct it? Here is a list of the sort of information 
+you would need:
+
+\begin{enumerate}
+
+\item Inventory list with model names and serial numbers for every piece
+of equipment. You will need this not only so that you know what you need to 
+order in the way of replacements but also because this information will
+almost certainly be required for your insurance claim. 
+
+\item Configuration diagram. You will need to know how all these pieces 
+of equipment fitted together. Which disks were on which machines?
+What were the disks called, or the machines for that matter. 
+
+\item Detailed system-by-system configuration information. For example,
+you will need the hostid if you have commercial software tied to that machine
+(For example, Sun can give you a new machine with a specified hostid). Also
+you will need listings of disk partitions so that you can restore your
+backups. 
+
+\begin{enumerate}
+
+\item Machine details (Hostname, model type, \emph{etc.})
+\begin{quote} {\tt uname -a} \end{quote}
+
+\item hostid 
+\begin{quote} {\tt hostid} \end{quote}
+
+\item eeprom details 
+\begin{quote} {\tt /usr/sbin/eeprom} (Solaris 2.x) \end{quote}
+
+\item Processor details 
+\begin{quote} {\tt /usr/sbin/psrinfo -v} \end{quote}
+
+\item Memory details 
+\begin{quote} {\tt /usr/sbin/prtconf | grep Memory} \end{quote}
+
+\item Disk information  
+\begin{quote} {\tt /usr/sbin/prtvtoc} {\it raw disk} (Solaris 2.x) \end{quote}
+
+\item showrev information, including patch level 
+\begin{quote} {\tt /usr/bin/showrev -a} (Solaris 2.x) \end{quote}
+
+\end{enumerate}
+
+Scripts to gather most of this information for you for both Solaris and
+Digital Unix are available via the \htmladdnormallink{Starlink 
+security WWW pages.}{http://star-www.rl.ac.uk/\~{}cac/security}
+
+Example output from such a script showing, the sort of information you
+may need for system recovery, can be found in 
+\htmlref{Appendix A}{system_recovery}. Make sure that 
+you keep a paper copy of this file!
+
+\item Backups of your file system. Make sure that you know which are the last
+set of tapes, when they were written and how to restore from them.
+
+\end{enumerate}
+
+\end{enumerate}
+
+%----------------------------------------------------------------------
+
+\section{\label{trusted_host_security}\xlabel{trusted_host_security}Trusted host security}
+
+\subsection {{\tt .rhosts} and {\tt /etc/hosts.equiv}}
+
+This topic is discussed in gory detail in almost every Unix systems
+administration or security guide and hence I will not repeat that
+information again here (a brief summary is given in 
+\htmlref{Appendix B}{app_trusted_host_security}
+for your convenience). 
+Instead, I will make some general comments and give a few
+examples of why these files can be dangerous.
+
+Some people argue that these files should not be used at all due to
+their potential security risks: {\tt .rhosts} files are bad once your
+system has been hacked because the hacker gets immediate access to 
+other systems.
+
+However, I personally don't see a problem using {\tt .rhosts} to allow
+transparent access between machines which are tightly-coupled together,
+\emph{i.e.},  share the same password information, as long as the
+intrusion was via a poor password.
+
+If, however, the intruder gains access to a particular machine via
+another method (\emph{e.g.}, user left him/herself logged on, network
+loophole, \emph{etc.},) then the {\tt .rhosts} file might grant access
+to other machines which the intruder might not otherwise have had.
+
+I think that the biggest worry is that users control their own {\tt .rhosts}
+file and can (through error or otherwise) configure it so that
+non-accredited users can gain access \emph{i.e.}, without any reference to
+you the system manager. For example, one Starlink site
+reported that a user trusted hosts from several domains in Spain
+with a wildcard in the user field because ``he had a different 
+username there''. In practise, this meant that this user had given access
+to the system to {\em any} user on those remote Spanish systems.  
+
+I use a {\tt .rhosts} file within our own cluster (\emph{i.e.}, machines
+which share the same password information) but would not use it
+between, for example, Starlink sites.
+
+The following examples refer to files under the control of the system
+administrator. 
+
+\begin{description}
+
+\item [Lethal example 1] -- A remote host has a solitary {\tt +}
+associated with it in {\tt /.rhosts}.  Anyone who can gain root access
+to ANY workstation (it does not have to be a known one, \emph{i.e.},
+one in {\tt /etc/hosts} or equivalent \verb|NIS/NIS+| maps and tables), can
+read and write with {\tt rcp}. An intruder could pull your passwd file,
+edit it and put it back without leave any trace of his/her presence in
+{\tt /var/adm/messages}.  {\tt lastcomm} (if it is running) will only
+note that {\tt rcp} ran, and from where but make no note of which file
+was involved!
+
+\item [Lethal example 2] -- {\tt /.rhosts} contains ``\verb|+ +|''.
+Any user from any machine can log in as root without a password!
+
+\item [Lethal example 3] -- {\tt /etc/hosts.equiv} on machine {\tt littlesun}
+contains ``\verb|bigsun +|''. Here {\tt any} user on machine {\tt bigsun} can
+log in as {\em any other} user on {\tt littlesun} without giving a password!
+
+\end{description}
+
+If you are going to use trusted hosts, trust should be given to a user
+as well as a host. The {\tt /.rhosts}, {\tt /etc/hosts.equiv} and {\tt
+.rhosts} file should always contain two entries per line, one entry for
+the host and an additional entry for the particular user that is to be
+trusted for the host. Hence, if you want to trust user {\tt cac} from
+host {\tt bigsun}, the entry should be:
+
+\begin{quote}{\tt bigsun cac} \end{quote}
+
+%------------------------------------------------------------------------
+
+\newpage
+\appendix
+
+\section{\label{system_recovery}\xlabel{system_recovery}System recovery information example}
+
+\begin{quote}
+\begin{verbatim}
+
+System report. Information for holding with backups
+----------------------------------------------------------
+machine details
+SunOS rlssp0 5.5 Generic sun4m sparc SUNW,SPARCstation-10
+Thu May 23 11:52:20 BST 1996
+----------------------------------------------------------
+eeprom details
+tpe-link-test?=true
+output-device=screen
+input-device=keyboard
+sbus-probe-list=f0123
+keyboard-click?=false
+keymap: data not available.
+ttyb-rts-dtr-off=false
+ttyb-ignore-cd=true
+ttya-rts-dtr-off=false
+ttya-ignore-cd=false
+ttyb-mode=9600,8,n,1,-
+ttya-mode=9600,8,n,1,-
+fcode-debug?=false
+diag-file: data not available.
+diag-device=net
+boot-file: data not available.
+boot-device=disk
+auto-boot?=true
+watchdog-reboot?=false
+local-mac-address?=false
+screen-#columns=80
+screen-#rows=34
+selftest-#megs=1
+scsi-initiator-id=7
+use-nvramrc?=false
+nvramrc: data not available.
+sunmon-compat?=false
+security-mode=none
+security-password: data not available.
+security-#badlogins=0
+oem-logo: data not available.
+oem-logo?=false
+oem-banner: data not available.
+oem-banner?=false
+hardware-revision: data not available.
+last-hardware-update: data not available.
+testarea=0
+mfg-switch?=false
+diag-switch?=false
+name=options
+----------------------------------------------------------
+hostid details
+726053b6
+----------------------------------------------------------
+Processor details
+Status of processor 0 as of: 05/23/96 11:52:22
+  Processor has been on-line since 05/03/96 16:42:23.
+  The sparc processor operates at 50 MHz,
+	and has a sparc floating point processor.
+----------------------------------------------------------
+Showrev information, including patch level
+Hostname: rlssp0
+Hostid: 726053b6
+Release: 5.5
+Kernel architecture: sun4m
+Application architecture: sparc
+Hardware provider: Sun_Microsystems
+Domain: ral_project.starlink.uk
+Kernel version: SunOS 5.5 Generic November 1995
+
+OpenWindows version: 
+OpenWindows Version 3.5 29 September 1995
+Patch: 101911-01  Obsoletes:   Packages: SPROf77.2 3.0.1,PATCH=01, 
+   SPROlang.2 3.0.1,PATCH=01
+----------------------------------------------------------
+Disk information
+details for disc 1
+* /dev/dsk/c0t1d0s2 partition map
+*
+* Dimensions:
+*     512 bytes/sector
+*      72 sectors/track
+*      14 tracks/cylinder
+*    1008 sectors/cylinder
+*    2038 cylinders
+*    2036 accessible cylinders
+*
+* Flags:
+*   1: unmountable
+*  10: read-only
+*
+*                          First     Sector    Last
+* Partition  Tag  Flags    Sector     Count    Sector  Mount Directory
+       0      0    00          0   1919232   1919231
+       1      0    00    1919232    133056   2052287
+       2      0    00          0   2052288   2052287
+----------------------------------------------------------
+details for disc 2
+* /dev/dsk/c0t2d0s2 partition map
+*
+* Dimensions:
+*     512 bytes/sector
+*      96 sectors/track
+*      15 tracks/cylinder
+*    1440 sectors/cylinder
+*    2577 cylinders
+*    2574 accessible cylinders
+*
+* Flags:
+*   1: unmountable
+*  10: read-only
+*
+*                          First     Sector    Last
+* Partition  Tag  Flags    Sector     Count    Sector  Mount Directory
+       0      0    00          0     57600     57599
+       1      0    00      57600    194400    251999
+       2      0    00          0   3706560   3706559   /soft1
+       6      0    00     252000   3454560   3706559
+----------------------------------------------------------
+details for disc 3
+* /dev/dsk/c0t3d0s2 partition map
+*
+* Dimensions:
+*     512 bytes/sector
+*      80 sectors/track
+*       9 tracks/cylinder
+*     720 sectors/cylinder
+*    2500 cylinders
+*    1151 accessible cylinders
+*
+* Flags:
+*   1: unmountable
+*  10: read-only
+*
+*                          First     Sector    Last
+* Partition  Tag  Flags    Sector     Count    Sector  Mount Directory
+       0      2    00          0     61920     61919   /
+       1      3    01      61920    164160    226079
+       2      5    00          0    828720    828719
+       5      6    00     226080    151920    377999   /opt
+       6      4    00     378000    450720    828719   /usr
+----------------------------------------------------------
+
+\end{verbatim}
+\end{quote}
+
+\newpage
+\section{\label{app_trusted_host_security}\xlabel{app_trusted_host_security}Trusted host security}
+
+The method of network communication between Unix machines depends
+whether the connection is to a trusted or non-trusted host. The
+commands to communicate with a trusted host may differ from those used
+to communicate with a non-trusted host. Trusted host commands are more
+analogous to commands used on a local machine (\emph{e.g.}, {\tt cp} and
+{\tt rcp}) and simplify access by bypassing the password security check
+otherwise required.  One can define which remote hosts and which users
+on those hosts are trusted.
+
+The file {\tt /etc/hosts.equiv} specifies the names of machines from
+which users are allowed to login (\verb+rlogin+), remote copy
+(\verb+rcp+) or perform remote shell (\verb+rsh+) functions. {\tt
+/etc/hosts.equiv} requires only machine hostnames as entries and allows
+a user on a machine registered in the file to login to the local
+machine only if an entry for that specific user is found in {\tt
+/etc/passwd} on the local machine. If there is an entry for the
+specific user in {\tt /etc/passwd} but no entry for the machine of that
+user in {\tt /etc/hosts.equiv}, then the user will not be allowed to
+use the above commands.  Note that the symbol {\tt +} is a wildcard
+\emph{i.e.}, anyone can {\tt rlogin} without a password if there is an
+account with the same username on that machine.
+
+The file {\tt .rhosts} may exist in the home directory
+of each user. Its purpose is to allow a specific user to access a
+particular machine, but not just from any machine. Again, the user must
+also have an entry in the {\tt /etc/passwd} file of the machine used.
+Be careful if you have a {\tt /.rhosts} file on your systems since users
+placed in this file will automatically have access to your system as
+root.
+
+Unfortunately, if is necessary to use these mechanisms to access
+peripherals despite the potential security risk. For example, it is
+necessary to use {\tt /.rhosts} in order to allow a system manager to
+dump partitions on a tapeless workstation disk to an DLT on a Server.
+
+\end{document}

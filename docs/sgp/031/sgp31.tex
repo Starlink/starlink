@@ -1,0 +1,1023 @@
+\documentstyle{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocsource}    {sgp\stardocnumber}
+\newcommand{\stardocnumber}    {31.11}
+\newcommand{\stardocauthors}   {\small M D Lawden}
+\newcommand{\stardocdate}      {\small 17 June 1996}
+\newcommand{\stardoctitle}     {\Large\bf STARLINK}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{100mm}
+\setlength{\textheight}{154mm}
+\setlength{\topmargin}{0mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+\newcommand{\latexonlysection}[1]{\section{#1}}
+\newcommand{\latexonlysubsection}[1]{\subsection{#1}}
+\newcommand{\latexonlysubsubsection}[1]{\subsubsection{#1}}
+\begin{htmlonly}
+   \renewcommand{\latexonlysection}[1]{#1}
+   \renewcommand{\latexonlysubsection}[1]{#1}
+   \renewcommand{\latexonlysubsubsection}[1]{#1}
+\end{htmlonly}
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   {\small CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}}\\
+   Particle Physics \& Astronomy Research Council\\
+   Starlink Project\\
+   \stardoccategory\ \stardocnumber
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{3mm}
+   \begin{center}
+   {\large\bf \stardoctitle}
+   \end{center}
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+% \newpage
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\begin{center}
+{\large\bf Support for astronomical computing in the UK}
+\end{center}
+
+\vspace*{5mm}
+
+Starlink was set up in 1980 to help astronomers use computers to analyse their
+observations.
+It is:
+
+\begin{itemize}
+\item A network of {\bf computers} used by UK astronomers; 
+\item A collection of {\bf software} to reduce and analyse astronomical data,
+and work on some types of theory;
+\item A team of {\bf people} giving hardware, software, and administrative
+support. 
+\end{itemize}
+
+Starlink's main objectives are to:
+
+\begin{itemize}
+\item Provide and coordinate {\bf interactive data reduction and analysis
+facilities} for use as a research tool by UK astronomers.
+\item Encourage {\bf software sharing and standardisation} to prevent
+unnecessary duplication of effort.
+\item Provide {\bf systems software support} for astronomers.
+\end{itemize}
+
+\newpage
+
+\section*{Work supported}
+
+The {\bf types of astronomy} supported by Starlink are:
+
+\begin{itemize}
+\item Normal data reduction and analysis.
+\item Limited theoretical work.
+\end{itemize}
+
+Work on Starlink computers has the following {\bf priorities}:
+
+\begin{enumerate}
+\item Astronomical data reduction that can only be done interactively.
+\item Other astronomical data reduction.
+\item Other astronomical research work that can only be done interactively.
+\item Other astronomical research work.
+\item Other PPARC astronomy work.
+\end{enumerate}
+
+(In this list `astronomical data' includes data obtained from telescopes
+and data obtained from theoretical calculations made on other computers.)
+
+\newpage
+
+The following types of astronomy are {\bf not supported} by Starlink:
+
+\begin{itemize}
+\item Large scale theoretical work.
+\item Instrument research and construction.
+\item Observations taken with telescopes and space missions that can only
+ observe solar system objects.
+\item Geophysics and solar-terrestrial physics.
+\item Undergraduate and other purely educational work (which is normally
+ supported by the DfE).
+\end{itemize}
+
+These types of work are normally supported by other sources of funding, such as
+PPARC grants.
+
+
+\newpage
+
+\section*{Sites}
+
+Starlink facilities are concentrated at a number of
+\htmladdnormallink{sites}{http://star-www.rl.ac.uk/sites.html}
+spread around the country.
+\begin{latexonly}
+Details of individual sites are given in Appendix B.
+\end{latexonly}
+
+Day-to-day management of a Starlink site is the responsibility of its
+Site Manager, who may be helped at large sites by an Assistant.
+The overall management of a site is monitored by a Site Chairman, accredited by
+the Project.
+
+How many sites are there? -- That depends on your viewpoint:
+\begin{description}
+\item[\mbox{}]\mbox{}
+\begin{description}
+\item [Geographical] --
+ The obvious one.
+ We call them {\bf Sites}.
+ There are {\bf 26} of them.
+ The Cambridge site is split between IoA/RGO and MRAO, which are a 10-minute
+ walk apart but regarded as a single Site.
+\item [Administrative] --
+ The administrator's view.
+ Its primary criterion is the allocation of long-term  on-site management.
+ We call them {\bf Nodes}.
+ There are {\bf 26} of them.
+ But these are not quite the same as the 26 sites.
+ The sites at Armagh and Belfast are regarded as the ``Northern Ireland" node,
+ while the RAL site contains two nodes: the ``Project" node and the
+ ``RAL -- Astrophysics node."
+\item [Operational] --
+ This is the way things look when you want to send an e-mail message or
+ count user numbers.
+ We call them {\bf User-Centres}.
+ There are {\bf 28} of them.
+ The Northern Ireland node has two user-centres (Armagh and Belfast), and
+ the Cambridge node also has two user-centres (IoA/RGO and MRAO).
+ (In practice, the word ``site" is often used to refer to a user-centre.)
+\end{description}
+\end{description}
+The thing to remember is that Northern Ireland has one node and two sites,
+RAL has one site and two nodes, and Cambridge has two user-centres.
+All the other sites have one of everything.
+
+\subsection*{Remote User Groups}
+
+In addition to Starlink Nodes, there are Remote User Groups (RUGs).
+A RUG does not have funding for long-term on-site management but receives,
+or expects to receive, hardware and software support from Starlink.
+It may also receive ``remote" site management effort from other sites.
+There are 5 RUGs, at present, which have not been counted in the numbers
+given above.
+
+\subsection*{Central facilities}
+
+A further Starlink facility is a central computer system at RAL which stores
+astronomical catalogues and proprietary software which is licensed only for
+this one machine.
+Any Starlink user may use it from any site, via a network connection.
+
+\newpage
+
+\section*{Users}
+
+In May 1996 there were 1948 Starlink 
+{\htmladdnormallink{Users}{http://star-www.rl.ac.uk/people.html}.
+\begin{latexonly}
+Details may be found in Appendix B, which also includes a chart showing the
+history of user numbers since the start of the Project.
+\end{latexonly}
+
+Users are classified in several ways.
+The most commonly used are:
+
+\begin{description}
+\item[\mbox{}]\mbox{}
+\begin{description}
+\item [Uniqueness] --
+ This is used to avoid double counting.
+ The problem is that some users are registered at more than one site.
+ This means that if you add up the number of users registered at each site,
+ the grand total will be higher than the actual number of users.
+ To solve this problem, each site classifies its users in two ways:
+ \begin{itemize}
+ \item Primary
+ \item Secondary
+ \end{itemize}
+\item [Type] --
+ This is used to help us estimate the number of users who do different types
+ of work.
+ It helps us allocate resources rationally.
+ The Types are:
+ \begin{description}
+\item[\mbox{}]\mbox{}
+ \begin{description}
+ \item [r] -- Research astronomer actively processing data.
+ \item [t] -- Scientific \& technical support staff.
+ \item [o] -- Others, like secretaries.
+ \item [u] -- Undergraduate engaged in an astronomical research programme.
+ \item [a] -- Associate user (does not have an official position in a
+              university or similar institution).
+ \item [f] -- People who are usually not resident in the UK, such as visitors.
+ \end{description}
+ \end{description}
+\item [Community] --
+ Users are allocated a:
+ \begin{itemize}
+ \item Location code
+ \end{itemize}
+ Not all users work at the same place or in the same department as that in
+ which a Starlink site is located.
+ This code helps us get a better idea of the size and location of the different
+ communities of workers we are supporting.
+\end{description}
+\end{description}
+
+Application forms for prospective Starlink users are available from the Site
+Manager of the site they wish use.
+
+Postgraduate students will need it countersigned by their supervisor.
+Undergraduates, unfortunately, cannot be accepted, except for collaboration in
+research aimed at publication, as Starlink is not funded for educational work.
+Applications from people not associated with an HEI, for example a serious
+amateur astronomer doing research, are considered on a case-by-case basis.
+Such a person should normally be working in collaboration with astronomers at
+an HEI.
+
+All applications are formally authorised by the Starlink Project Scientist.
+
+\newpage
+
+\section*{User support}
+
+Users can get help from many places:
+
+\begin{itemize}
+\item \htmladdnormallink{Site Manager}
+ {http://star-www.rl.ac.uk/managers.html}.
+\item \htmladdnormallink{Site Chairman}
+ {http://star-www.rl.ac.uk/whoswho}.
+\item Starlink Local User Group (SLUG).
+\item \htmladdnormallink{Application Programmers}
+ {http://star-www.rl.ac.uk/programmers.html}.
+\item \htmladdnormallink{Starlink Project Group}
+ {http://star-www.rl.ac.uk/pro.html} at RAL.
+\item \htmladdnormallink{Project Scientist}
+ {http://star-www.rl.ac.uk/pro.html}.
+\end{itemize}
+
+The primary focus of user support is the Site Manager.
+Informal contacts with colleagues can also resolve many problems.
+
+Overall policy on how a site is run is overseen by the Site Chairman, in 
+consultation with its users, with the Site Manager, and with Starlink
+management.
+The aim is to operate each site in accordance with the needs and wishes of its
+users.
+The exact nature of local support organisations can vary, but they usually
+involve a Starlink Local User Group (SLUG) which all users may attend and
+participate in.
+The Site Chairman has a direct input to Starlink to report difficulties and
+to recommend policy changes.
+
+Starlink welcomes input from users.
+They can contact the sources of support mentioned above.
+Other communication routes are Software Strategy Groups, Software
+Questionnaires, and the Starlink meeting at the annual National Astronomy
+Meetings.
+There is also an established complaints procedure.
+
+\newpage
+
+\subsection*{Information sources}
+
+Extensive 
+\htmladdnormallink{documentation}{http://star-www.rl.ac.uk/documentation.html}
+is available on the Project itself, and on individual software items.
+Many of the larger packages have on-line help systems.
+The information sources are described in detail in the {\em Starlink User's
+Guide} (\xref{SUG}{sug}{}), but the main source is the set of
+{\em Starlink User Notes}\/ (\htmladdnormallink{SUN}{http://star-www.rl.ac.uk/sun.html}),
+{\em Starlink Guides}\/ (\htmladdnormallink{SG}{http://star-www.rl.ac.uk/sg.html}),
+and {\em Starlink Cookbooks}\/ (\htmladdnormallink{SC}{http://star-www.rl.ac.uk/sc.html}).
+There are over 180 of these Notes and Guides (about 6000 pages), and they
+are extensively indexed.
+Also, a newsletter called the 
+{\em \htmladdnormallink{Starlink Bulletin}
+{http://star-www.rl.ac.uk/bulletin.html}} 
+is published twice a year and circulated to all users to keep them in touch
+with what is happening in the Project.
+
+A large amount of information about Starlink is also provided on the World
+Wide Web, including most of the Notes and Guides.
+Most sites have their own home pages, but the central one is maintained
+by the 
+\htmladdnormallink{Project node}{http://star-www.rl.ac.uk/}
+ and its URL is:
+\begin{quote}
+{\tt http://star-www.rl.ac.uk/}
+\end{quote}
+From here you can branch to all the other sites which provide web pages.
+
+\newpage
+
+\section*{Software}
+
+The major software product provided by Starlink for its users is the
+{\em Starlink Software Collection}\/ 
+(\htmladdnormallink{SSC}{http://star-www.rl.ac.uk/software.html}).
+It is managed and distributed by the Starlink Software Librarian at RAL.
+It is installed at every Starlink site, and has also been distributed to
+many other sites all over the world.
+
+The SSC comprises about 120 items (40 packages, 40 utilities, 40 subroutine
+libraries and infrastructure).
+It is being actively developed and there are about 40 software releases per
+year.
+This means that published information like this gets out-of-date rapidly,
+so it is worth checking with the Project on the latest information --- the
+World Wide Web and the Starlink Bulletin are good sources of current
+information.
+\begin{latexonly}
+A summary of the current software available is given in Appendix B.
+\end{latexonly}
+The best survey of the SSC as a whole is \xref{SUN/1}{sun1}{}.
+
+Starlink software originates from many different sources and has different
+levels of support.
+Some is a legacy from Starlink's past.
+Some is being actively developed and supported by Starlink's own programmers.
+Some (like AIPS, IDL, IRAF) has been obtained from outside the Project.
+Starlink software development is controlled by the Starlink Panel,
+Software Strategy Groups, and the Project Group at RAL.
+
+\newpage
+
+\subsection*{Software Environments}
+
+An important software issue is the {\em software environment}\/.
+This term covers:
+programming languages;
+job control;
+command languages;
+data systems;
+graphics;
+documentation aids;
+utilities;
+error handling.
+It is important both for reasons of software development efficiency, and
+because of its central role in the organisation of Starlink software.
+
+Environment designs lie on a continuum between two extreme positions.
+
+At one extreme, the facilities provided by the computer manufacturer are used,
+together with a collection of {\em ad hoc}\/ routines.
+The dangers of this are:
+huge monolithic programs offering facilities of limited flexibility;
+a multiplicity of systems which are idiosyncratic to user and programmer;
+fixed, inflexible data formats;
+incompatibility between different systems;
+duplication.
+
+At the other extreme, an ideal system is created which is machine, operating
+system, and programming language independent.
+The dangers of this are:
+might not be what the users want or need;
+takes a long time to develop;
+takes application programming effort;
+inefficient and slow.
+
+The first approach tends to be favoured by users innocent of the real cost
+of software, who just want to get on with the job of analysing data as
+quickly as possible.
+The second approach tends to be favoured by computer scientists, who are more
+interested in a clever system than one that is useful for astronomers.
+
+Starlink, with the approval of the relevant UK astronomical committees,
+adopted a middle course based on the ADAM environment.
+This provides application programmers with a uniform and powerful system of
+data storage, user interface, programming tools, job control, command language,
+and graphics.
+It is described in \xref{SG/4}{sg4}{}.
+
+\newpage
+
+\section*{Hardware}
+
+Each Starlink site has a computer system based on Unix workstations and servers.
+At present these are based on DEC Alpha/Digital Unix and Sun SPARC/Solaris
+architectures,
+although other systems may be adopted in the future (for example, Linux on PCs).
+A residual VAX/VMS service is maintained at the Project Node to run ``legacy"
+software.
+
+In addition to Unix CPUs, the Project also supplies X-terminals, SCSI disks,
+Exabyte and DAT tape drives (for data exchange, backups, etc.), printers
+(mostly PostScript, and including some colour devices), networking equipment
+and other more specialized pieces of hardware.
+
+A central computing facility is also provide at the Project Node to 
+give all Starlink users access to some expensive commercial software and large
+databases.
+
+Hardware enhancements are decided after annual bids to the Starlink Panel.
+Hardware funded from other sources, e.g.\ grants, may be brought under the
+Starlink umbrella.
+If this is agreed, Starlink takes over the running costs and management.
+
+\newpage
+
+\section*{Organisation}
+
+Starlink is run on behalf of the
+{\em Particle Physics and Astronomy Research Council}\/ 
+(\htmladdnormallink{PPARC}{http://www.pparc.ac.uk/}) 
+by the
+{\em \htmladdnormallink{Starlink Project Group}
+{http://star-www.rl.ac.uk/pro.html}}\/ 
+within the
+{\em Space Science Department}\/
+(\htmladdnormallink{SSD}
+{http://star-www.rl.ac.uk/ssd.html}})
+of 
+{\em Rutherford Appleton Laboratory}\/
+(\htmladdnormallink{RAL}
+{http://www.cclrc.ac.uk/ral/index.html}).
+It has an annual budget of about 2 million pounds.
+
+RAL is part of the
+{\em Council for the Central Laboratory of the Research Councils}\/ 
+(\htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk/}).
+
+PPARC is one of the
+{\em \htmladdnormallink{Research Councils}
+{http://www.nerc.ac.uk/joint_res_councils.html}}
+funded by the
+{\em Office of Science and Technology}\/ 
+(\htmladdnormallink{OST}
+{http://www.open.gov.uk/ost/osthome.htm}) 
+within the
+{\em Department of Trade and Industry}\/ 
+(\htmladdnormallink{DTI}{http://www.dti.gov.uk/}).
+
+\subsection*{Starlink Panel}
+
+This is a PPARC committee which:
+
+\begin{itemize}
+\item Advises PPARC on the operation and development of Starlink and its
+financial requirements.
+\item Establishes scientific priorities for Starlink within PPARC policy and its
+budget.
+\item Approves Starlink expenditure.
+\end{itemize}
+It consists of a Chairman and seven others.
+They are university staff with interests covering a wide range of computing
+and astronomy.
+It normally meets three times a year, in March, July, and November.
+
+\newpage
+
+\subsection*{Starlink Project Group}
+
+This is located at RAL and is the focus of day-to-day Project management.
+It:
+\begin{itemize}
+\item Manages and coordinates the software collection (SSC).
+\item Manages and coordinates the software and Project documentation.
+\item Manages the purchase of computers and their operating systems and
+arranges maintenance.
+\item Manages the contracts for its site managers and programmers.
+\item Writes infrastructure, systems, network, and core applications software.
+\item Writes general Project documentation.
+\item Maintains an information database for the Project on software,
+ documentation, and users.
+\item Supports the Starlink Panel, advises PPARC on computing matters, and
+advises sites on the purchase and operation of Starlink compatible equipment.
+\end{itemize}
+
+\newpage
+
+\subsection*{Software Strategy Groups}
+
+These groups are one of the main sources of advice for Starlink on the
+development of its software.
+They cover the following areas:
+\begin{itemize}
+\item Spectroscopy.
+\item Image processing.
+\item Theory \& statistical analysis.
+\item Information services \& databases.
+\item Graphics \& infrastructure.
+\item Radio, mm, \& sub-mm astronomy.
+\item X-ray astronomy.
+\end{itemize}
+
+\newpage
+
+\section*{History}
+
+In the 1970's it became clear that the data processing facilities available at
+that time to UK astronomers were inadequate to deal with the anticipated
+flood of data in digital form which would be generated by new data
+acquisition techniques.
+
+In April 1978, the Science Research Council (which became the SERC, and later
+PPARC) set
+up a {\em Panel on Astronomical Image and Data Processing}\/ under the
+chairmanship of Professor M J Disney to ascertain the computing needs of
+UK astronomers for the next 5 to 7 years.
+This Panel reported in April 1979 and recommended the installation of 6
+super-minicomputers connected together in a star network by leased lines; 
+hence the name {\em Starlink}.
+
+The computer chosen was the DEC VAX 11/780.
+Between December 1979 and July 1980, these were installed at Cambridge,
+Manchester, RAL, RGO, ROE, and UCL.
+Astronomers at other sites used Starlink facilities via network links.
+The initial Project staff were appointed by mid 1980 with the administrative
+centre located at RAL.
+Starlink was inaugurated on 24th October 1980 by Mr D N MacFarlane,
+Parliamentary Under Secretary at the Department of Education and Science.
+
+Starlink was the first astronomical data processing system to use networking
+extensively.
+The early links ran at 4800 baud and used DEC protocols exclusively.
+
+A Scientific Advisory Group (SAG) and later a Starlink Users' Committee (SUC)
+advised RAL management on the running of the Project.
+There were also Area Management Committees (AMCs) for groups of sites
+geographically close to each other.
+Special Interest Groups (SIGs) considered software development in specific
+application areas.
+A Hardware Advisory Group (HAG) advised the Project on hardware purchase.
+
+\subsection*{Sites and Users}
+
+Since Starlink began in 1980 the number of Starlink sites has grown from 6
+to 28 and the number of users has grown from about 200 to about 2000.
+\begin{latexonly}
+Details are given in Appendix B.
+\end{latexonly}
+This reflects an increase in the use of computers by astronomers, and a
+move by university groups to transfer from non-Starlink to Starlink systems.
+In 1990 the RGO node merged with the Cambridge node when RGO moved from
+Sussex to Cambridge, and the RAL node split into the Project node and the
+Astrophysics node.
+
+\subsection*{Hardware}
+
+Right from the outset, Starlink has used equipment from a variety of suppliers
+to maximize cost-effectiveness.
+For example, the original six VAX 780s were equipped with disks from System
+Industries and printers from Printronix and Versatec.
+ 
+As new Starlink sites were established, they were set up with VAX 750s and,
+subsequently, MicroVAXes.
+From 1988 onwards, MicroVAXes were first added to VAX 780 and 750 sites to
+create VAX clusters, and then the 780s and 750s themselves were replaced by
+MicroVAXes.
+The last Starlink 780 was removed from Herstmonceux in early 1990, when RGO
+moved to Cambridge.
+ 
+By 1990, Starlink's hardware comprised clusters of MicroVAXes and VAXstations,
+and workstation screens had replaced the earlier specialized image display
+devices, such as the Sigma ARGS.
+By basing our software on VMS alone since Starlink was established we had
+economised on software costs, but Unix offered two major benefits:
+\begin{itemize}
+\item Compatibility with overseas astronomers (Unix was becoming a
+{\em de facto} standard for astronomical computing).
+\item A choice of suppliers offering cost-effective hardware.
+\end{itemize}
+It was decided, therefore, to move from VMS to Unix, and in 1992 the Willmore
+Review of Starlink recommended that the move should be completed by April 1995.
+Starlink's first Unix hardware was a DECstation 2100 running Ultrix, purchased
+by the Project in late 1989 to investigate software porting questions.
+
+The move to Unix took several years, but was completed by the April 1995
+target.
+During the move, Starlink supported up to five platforms in parallel 
+-- VAX/VMS, SPARC/SunOS, SPARC/Solaris, DECstation/Ultrix, Alpha/OSF 
+(Digital Unix).
+Since completing the move we have rationalized support, concentrating
+on our two main platforms: SPARC/Solaris and Alpha/Digital Unix.
+Nothing stands still, however, and Starlink has recently started to offer
+support for a third platform: PCs running Linux.
+
+\subsection*{Software}
+
+Software development plans were first discussed at a workshop held at Appleton
+Laboratory in November 1979 and the following recommendations were made:
+
+\begin{itemize}
+\item An overall supervisory system should be written.
+\item There should be a hierarchical data system.
+\item There should be a command system with facilities for parameter handling,
+defaulting mechanisms, symbols, help, prompting, multi-stream, and batch.
+\item There should be a standard graphics system.
+\item Data interchange on tape should be in FITS format.
+\end{itemize}
+
+The first software release occurred in March 1980.
+
+The first Starlink software environment (INTERIM), first released in
+September 1980, was a data and parameter system towards the pragmatic end of
+the spectrum.
+It also had a fairly primitive command language (DSCL).
+It was tolerably efficient, very easy to use, and was available within 9
+months of the start of the Project.
+It served as the basis for a lot of application software which was widely
+used.
+
+The second Starlink software environment (SSE) was an ambitious
+concept residing near the utopian end of the spectrum, and very similar to the
+successful IRAF system which appeared some years later.
+It was developed for 5 years but was never considered satisfactory and was
+inadequately documented.
+It was 44 times bigger than INTERIM (even though incomplete) and command
+processing was unacceptably slow on the equipment of the time.
+It contained some powerful and promising packages, in particular a good
+graphics system based on GKS and a Hierarchical Data System (HDS) of
+considerable elegance, power, and efficiency.
+Its failure was due to its development being badly affected by catastrophic
+losses of key staff and, more generally, by lack of central programming
+effort in a Project whose customer base was expanding rapidly.
+This serious situation was considered at two meetings at RAL in November 1985
+and February 1986.
+
+The result was that a new software environment (ADAM) was adopted for
+development.
+This did not represent a fresh start in the way that SSE was a
+radically different design from INTERIM.
+In fact it derived from many sources taken from many different places.
+It owed a lot to SSE, and in some respects was a re-implementation
+of it with a greater emphasis on efficiency.
+The initial focus for this work was the production of a real-time telescope
+and instrument control system at ROE and RGO, but this was now broadened to
+encompass Starlink's data-analysis requirements.
+The initial release was in September 1986, and it has since been developed
+extensively.
+
+All Starlink software development in the eighties was based on VMS.
+A major challenge and opportunity in the nineties was presented by the arrival
+of powerful Unix-based workstations.
+It was necessary to port selected Starlink software to these machines; in
+particular, a big effort was needed to port the ADAM environment.
+In the event, this was achieved comfortably before the April 1995 deadline for
+the move to Unix.
+Software development is now concentrated on Unix systems.
+
+\subsection*{Questionnaires}
+
+In the spring of 1986, a major exercise was carried out to determine what the
+users thought should be the future direction of the Starlink Project.
+A 14-page questionnaire was distributed to 669 users and potential users and
+394 were returned, a very high proportion.
+The returns were analysed and the results influenced the direction of the
+Project.
+
+Another extensive questionnaire, concerned specifically with Starlink software,
+was distributed to over 1600 users in January 1994.
+Over 500 were returned and the results heavily influenced Starlink's software
+development plans.
+
+A further software questionnaire was distributed to nearly 2000 users in March
+1996.
+Once again, over 500 were returned and the results of their analysis will have
+a similar influence on the Project.
+
+\newpage
+
+\section*{What have we learnt?}
+
+The Starlink Project has been going for sixteen years.
+What have we learnt during this time?
+
+The VAX computer was an excellent initial choice.
+It provided a powerful, well documented, user-friendly operating system.
+For some time it was the standard hardware for mainstream, world-wide
+astronomical computing.
+Developments, such as microVAXes and VAX clusters, provided a natural growth
+path for the Project.
+The choice of VAX/VMS and UK-wide networking made Starlink a success, in spite
+of many problems.
+The arrival of powerful Unix-based scientific workstations changed the
+situation, and we completed a move from VMS to Unix by early 1995.
+
+Compatible hardware at each site allows software to be distributed easily
+and avoids wasteful development of different versions for different
+hardware.
+Central purchase and maintenance of this hardware has allowed Starlink to
+negotiate extra discounts from suppliers and so reduce costs.
+
+The network has been vital.
+It enables a basic set of software to be controlled centrally and distributed
+rapidly, so that a common user environment exists at every site.
+The electronic mail facilities are heavily used and extremely valuable.
+They bind the astronomical community together.
+
+Our first software environment (INTERIM) was modest but successful.
+The second (SSE) proved to be over-ambitious in relation to our
+limited resources, and on the computers of the time was just too slow for users
+to tolerate.
+The third (ADAM) seems to have been a good move forward.
+Perhaps the biggest lesson is the importance of having a strong, central
+programming team under firm control when embarking on this kind of project.
+After prolonged efforts by Starlink management, this situation was
+achieved by the creation at RAL of an Infrastructure support group.
+
+Once a large collection of software has been distributed, the maintenance
+and support requirements remain considerable.
+This is not understood by some astronomers, and is one of Starlink's most
+intractable problems.
+
+Central management of the preparation and distribution of software releases
+by a Software Librarian is vital to the cohesiveness of the Project.
+A properly integrated set of software, documentation and administrative
+information installed at multiple sites is difficult to achieve and has to
+be well supported.
+A related problem is the dispersion of different versions of specific software
+items within different packages.
+This leads to waste of storage space and difficulties with updates.
+The solution lies in central co-ordination of software development and the
+use of programming support environments.
+
+\section*{Acknowledgements}
+
+I would like to thank the following people for their significant contributions
+to this document:
+Chris Clayton,
+Alan Penny,
+Andrea Roberts,
+John Sherman,
+Dave Terrett,
+Patrick Wallace.
+
+\newpage
+
+\appendix
+
+\section{Glossary}
+
+\vspace{-6mm}
+
+{\small
+\begin{tabbing}
+XX\=ABCDEFGHI\=XX\kill
+\>  \>  \\
+\>AMC   \>Area Management Committee  \\
+\>CCLRC \>Council for the Central Laboratory of the\\
+\>      \>Research Councils\\
+\>CPU   \>Central Processor Unit \\
+\>DEC   \>Digital Equipment Corporation\\
+\>DfE   \>Department for Education \\
+\>DTI   \>Department of Trade and Industry \\
+\>HAG   \>Hardware Advisory Group\\
+\>HEI   \>Higher Educational Institute  \\
+\>HST   \>Hubble Space Telescope\\
+\>IoA   \>Institute of Astronomy, Cambridge\\
+\>MRAO  \>Mullard Radio Astronomy Observatory  \\
+\>OST   \>Office of Science and Technology \\
+\>PC    \>Personal Computer (IBM compatible)\\
+\>PPARC \>Particle Physics \& Astronomy Research Council\\
+\>RAL   \>Rutherford Appleton Laboratory\\
+\>RGO   \>Royal Greenwich Observatory\\
+\>ROE   \>Royal Observatory Edinburgh\\
+\>RUG   \> Remote User Group \\
+\>SAG   \>Scientific Advisory Group\\
+\>SC    \>Starlink Cookbook\\
+\>SCSI  \>Simple Computer System Interface\\
+\>SERC  \>Science and Engineering Research Council\\
+\>SG    \>Starlink Guide\\
+\>SIG   \>Special Interest Group\\
+\>SLUG  \>Starlink Local User Group\\
+\>SSC   \>Starlink Software Collection\\
+\>SSD   \>Space Science Department (RAL)\\
+\>SSE   \>Starlink Software Environment \\
+\>SUC   \>Starlink User' Committee \\
+\>SUG   \>Starlink User's Guide\\
+\>SUN   \>Starlink User Note\\
+\>UCL   \>University College London\\
+\>UK    \>United Kingdom \\
+\>URL   \>Universal Resource Locator\\
+\>VAX   \>Virtual Address Extension (DEC)\\
+\>VMS   \>Virtual Memory System (DEC)\\
+\end{tabbing}
+}
+
+\begin{latexonly}
+\newpage
+
+\latexonlysection{Detailed information}
+
+The pages that follow contain charts and tables that give detailed information
+about Starlink.
+These are described below in order of appearance.
+The information was the latest available at the time of publication.
+
+\begin{enumerate}
+
+\item Shows the number of users at each User-Centre.
+The {\em Prim}\/ block shows the number of Primary users at a site.
+The {\em Sec}\/ block shows the number of Secondary users at a site.
+
+\item Shows the proportions of different types of user (specified on page 6).
+
+\item Shows the growth in the total number of Starlink users since the Project
+began in 1980.
+
+\item Shows the growth in the number of User-Centres since the Project began.
+See page 4 for a definition of User-Centre.
+
+\item Lists the names of the items in the Starlink Software Collection
+(SSC), classified into functional area.
+
+\item Lists the postal address of every Starlink User-Centre.
+The RAL/Astrophysics User-Centre and the Project User-Centre are both located
+at RAL and have the same postal address.
+Thus, only 27 addresses are given in the list, although there are 28 Starlink
+User-Centres
+
+\end{enumerate}
+\end{latexonly}
+
+\end{document}

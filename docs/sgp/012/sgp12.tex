@@ -1,0 +1,323 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocnumber}    {12.1}
+\newcommand{\stardocauthors}   {D L Terrett}
+\newcommand{\stardocdate}      {16 September 1992}
+\newcommand{\stardoctitle}     {AVS as a GUI for ADAM}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+The basis of this report is 2 days spent with an AVS expert from DEC's CERN
+project office attempting to convert an ADAM application into an AVS module.
+The experiment was successful in that we succeeded in running a KAPPA
+application (ADD) as a module in an AVS network without modifying the
+applications program code in any way. We took many short cuts and it became
+clear that doing the job properly would be a major exercise, but we 
+learned enough to know that the job is feasible and gained a clear idea of 
+what the final system would look like and what it would be capable of.  
+
+\section{What is AVS}
+
+At the heart of AVS is the concept of a ``network''. An AVS network is similar
+to  the more familiar pipeline where the output of one application is fed into
+the input of another application, but in a network applications can have
+several inputs and several outputs and can therefore be connected up in a more
+complex way. It is even possible to have loops that implement iterative
+techniques. AVS uses the terms ``module'' for the individual elements of a
+network and ``ports''  for the inputs and outputs.
+
+Networks are created with the graphical ``network editor''; modules are dragged
+from lists of available modules (organized into module libraries) with the
+mouse and placed in a diagram of the network (each module represented by a box
+with colour coded blobs representing the module's inputs and outputs). The
+output ports of one module can then be connected to the input ports of other
+modules, also with the mouse. Networks can be saved on disk and restored later.
+
+As well as input and output ports, a module also has parameters; parameters
+have their values set by the user via a ``control panel''. There are a variety
+of styles of control (AVS uses the X11 term ``widget''), such as sliders,
+dials, text input fields, etc. available. The layout of the control panel is
+defined by code in the module but can be altered by the user with the ``layout
+editor'' (for example, the widget for an integer parameter could be changed
+from a dial to a text entry field) and parameters can be converted to input
+ports so that they can be connected to the output ports of other modules
+instead of being set directly from the control panel. 
+
+The layout editor can also move controls from one control panel to another and
+could be used to create a single control panel  for an entire network with the
+parameters renamed to use terminology appropriate to the particular job the
+network was designed to do.
+
+An AVS module is a program, and the program is run (in a sub-process) as it is
+dragged onto the network diagram. At this point the module's initialisation
+routine is called; this routine calls AVS subroutines to define the contents
+and layout of the control panel which also pops up at this point. A single
+executable program can contain several AVS modules (cf.\ ADAM monoliths).
+
+The execution routine of a module is called whenever any of the module's input
+ports or parameters change their values (this can happen because the user
+changed the value of a parameter with the control panel, the output of some
+other module in the network changed, or the connection to the input port was
+changed). It may not always be appropriate to run the applications code at this
+point; for example, all the necessary input ports may not be connected (e.g.\
+while the network is being edited) and the user would normally want to set
+several parameter values before running the application. There are AVS
+subroutines that can be called to determine whether a parameter or input port
+has changed its value etc.
+
+If the applications code is run, the execution routine then calls subroutines
+to inform AVS whether or not the module's output ports have changed their
+values. If they have, this  will cause other modules in the network to execute
+and so on until the change  has propagated throughout the network and a new
+final output has been  generated. It is worth noting that there is no parallel
+processing involved;  AVS invokes the execution routine of each module in turn,
+waiting for it to  finish before invoking the next.
+
+AVS comes with a large number of modules which implement a wide range of 2 and
+3D image processing algorithms and data visualization techniques. It is access
+to these data visualization modules that makes the use of AVS as a GUI for ADAM 
+particularly attractive.
+
+\section{AVS Data Types}
+
+Every parameter and port has a data type associated with it, and output ports
+can only be connected to input ports with compatible data types. AVS defines
+the usual simple types, integer, float, string etc, and a variety of more
+complex types for representing 2D and 3D images, colour maps etc. User defined
+data types can also be created but are limited to things that can be defined by
+a C structure definition, so are essentially fixed size.
+
+None of these data types gets anywhere near what is needed for NDFs or HDS
+structures, so we elected to pass the names of HDS files between applications
+as character strings. (A full implementation would probably define a user data
+type for this purpose rather than using the built in character string type.)
+When an NDF is being used for transferring data from one module to another
+within a network it is necessary to generate ``scratch'' NDF names and care
+needs to be taken to ensure that they are deleted when no longer required in
+order to prevent the file system being overwhelmed by temporary NDFs.
+
+\section{Modifications to ADAM}
+
+In order to integrate ADAM applications properly with AVS the following
+modifications to the ADAM system code would be required:
+\begin{description}
+
+\item[The fixed part]
+The ADAM fixed part needs to be restructured somewhat to match the AVS module
+structure of separate initialisation and invocation routines.
+
+\item[The parameter system]
+AVS cannot support the concept of an application rejecting the current value of
+a parameter and prompting for a new value so the parameter system needs to be
+modified to return an error rather than prompting under these circumstances.
+
+\item[The message/error system]
+Although an AVS module can write to its standard output or error channels, the
+output appears in the terminal window from which AVS was invoked which is not
+ideal. The error and message systems therefore should be modified to call 
+AVS subroutines that display messages in pop-up windows.
+
+\end{description}
+
+\section{Creating a Module}
+
+For each ADAM application an initialisation routine, an execution routine and
+possibly a destruction routine has to be written. Both C and Fortran are
+supported but C is the easier option because the routines have to deal with
+pointers and structures and this is somewhat convoluted in Fortran and didn't
+appear very portable. (We initially started work in Fortran but switched to C
+after failing to get certain operations to work---however, we were working
+without manuals and the DEC programmer was not familar with Fortran.) 
+
+This initialisation routine has to do the following:
+\begin{itemize}
+
+\item Initialise the ADAM parameter system.
+
+\item Create an input port for each input NDF.
+
+\item Create an AVS parameter for all other input ADAM parameters and set their
+  initial values (obtained from the ADAM parameter system).
+
+\item Optionally set the widget type and layout for each parameter (there is a
+  default widget type for each parameter data type).
+
+\item Create output ports for all output ADAM parameters.
+
+\item Create a ``GO'' parameter attached to a button widget that can be used by the
+  user to indicate that all parameters have been set and that the application
+  should execute.
+
+\item Create AVS parameters of type character string for all input and output NDFs
+  to allow the names of the NDFs to be set by the user. This enables the user
+  to explicitly set the name of an input or output NDF instead of having some
+  scratch file name generated. This is necessary when a module has ports not 
+  connected to any other module.
+
+\end{itemize}
+This is straightforward and could conceivably be generated automatically from
+the interface file (perhaps with the addition of some new interface file
+keywords). Alternatively, AVS contains a module generation tool that uses menus
+to define parameters and ports and their properties and will generate the
+neccessary code (in either C or Fortran).      
+
+The execution routine has to:
+\begin{itemize}
+
+\item Examine the state of its input ports in order to decide whether the
+  application should be executed.
+
+\end{itemize}
+If the decision is to execute the application code:
+\begin{itemize}
+
+\item Copy the values of the AVS parameters to the corresponding ADAM parameters.
+
+\item Generate names for any output NDFs which don't have their names specified 
+  by AVS parameters and set the corresponding ADAM parameters.
+
+\item Execute the applications code.
+
+\item Set the values of any output ports from the values of the corresponding ADAM
+  parameters.
+
+\end{itemize}
+The decision whether to execute the application or not is quite tricky but is
+something along the lines of:
+\begin{quote}
+	If all inputs have either a valid value or the corresponding NDF 
+	name parameter has a value then execute if either ``GO'' was 
+	pressed or one of the inputs has changed its value. 
+\end{quote}
+
+The destruction routine is called when a module is removed from the network or
+the network as a whole is deleted, and would be responsible for removing and
+scratch NDFs created by the module.
+
+\section{Other Tasks}
+
+To produce a finished product there are a number of other things that would need
+to be done, none of them particularly challenging:
+
+\begin{itemize}
+
+\item Organise ADAM applications into AVS module libraries, probably along the
+  existing package lines but something like KAPPA may be too big for comfort.
+  When building a network, modules have to be selected from a list of all the
+  modules in a library; finding the one you want among 200 could be tedious.
+
+\item Write a module (or modules) for converting NDFs to AVS internal data types so
+  that the results of computations can be displayed using the wealth of
+  visualisation tools that AVS provides.
+
+\item Convert ADAM help information into AVS format.
+
+\end{itemize}
+
+\section{Problems}
+
+What clouds does this particular silver lining have ?
+\begin{itemize}
+
+\item Only ADAM programs that are ``black boxes'' could be run from AVS; no
+  interaction with the user other than the display of messages is allowed once
+  the applications code has started running.
+
+\item No dynamic defaults. Default values for parameters have to be set before
+  the applications code runs.
+
+\item Cost. The list price for AVS on a DECstation 5000 is 3K pounds. Chest deals
+  etc. may make it cheaper (even free) for some but probably not everyone.
+
+\item Hardware required. A fairly powerful system is needed; a DECstation 5000
+  with 48 Mbyte of memory is probably a minimum for real data processing. The
+  visualisation stuff really requires fancy graphics accelerators and
+  preferably 24 bit displays. To quote the AVS manual:
+\begin{quote}
+	``AVS was originally implemented to run on very high performance,
+	true colour (24 plane) workstations with considerable hardware
+	support for 3D graphics rendering, including gouraud shading, 
+	lighting, texture mapping, and hardware-assisted polygon and 
+	sphere rendering and transformations.''
+\end{quote}
+  Having all the applications in a network loaded at once places
+  considerable demands on things like system swap space, and the intermediate
+  files created as the network executed would stretch the available disk space.
+  Inadequate system resources could easily make the whole thing effectively 
+  unusable.
+
+\item A non-negligible amount of effort would be required to implement the system,
+  although probably not more (and quite possibly less) than other approaches to
+  creating a GUI interface for ADAM. I would estimate perhaps 3 man-months to
+  get a system that could demonstrate what could be achieved and another 3 to 
+  get a releaseable system. Elapsed time would probably be double this.
+
+\item The ``global association'' mechanism used to connect the output of one ADAM
+  application to the input of another is probably superfluous and may well
+  conflict with way a network works. It may therefore be necessary to modify 
+  all interface files (alternatively it might be better to disable this 
+  mechanism within the parameter system).
+
+\end{itemize}
+
+\section{Data Acquisition}
+
+That AVS would be a useful tool for data reduction is clear (to me at least!)
+but what about in the data acquisition environment? I don't have the knowledge
+to do more than speculate on this but the control panel interface seems
+applicable and the network editor could be used to set up and then save the set
+of ADAM tasks required for a particular instrument setup. There is no
+requirement for all the modules in a network to be actually connected so they
+can equally well exist as separate applications that are just executed
+individually at the request of the user and AVS modules are allowed to execute
+continuously (AVS calls them coroutines). The layout editor could be used to
+design a unified interface for the whole set of applications.
+
+\end{document}

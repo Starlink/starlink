@@ -1,0 +1,1046 @@
+\documentstyle{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\makeatletter
+%+                              M A N . S T Y
+%
+%  Module name:
+%    MAN.STY
+%
+%  Function:
+%    Default definitions for \LaTeX\ macros used in MAN output
+%
+%  Description:
+%    As much as possible of the output from the MAN automatic manual generator
+%    uses calls to user-alterable macros rather than direct calls to built-in
+%    \LaTeX\ macros. This file contains the default definitions for these
+%    macros.
+%
+%  Language:
+%    \LaTeX
+%
+%  Support:
+%    William Lupton, {AAO}
+%-
+%  History:
+%    16-Nov-88 - WFL - Add definitions to permit hyphenation to work on
+%		 words containing special characters and in teletype fonts.
+
+\typeout{Default MAN macros. Released 8th November 1988}
+
+% permit hyphenation when in teletype font (support 9,10,11,12 point only -
+% could extend), define lccodes for special characters so that the hyphen-
+% ation algorithm is not switched off. Define underscore character to be
+% explicit underscore rather than lots of kerns etc.
+
+%\hyphenchar\nintt=`-\hyphenchar\tentt=`-\hyphenchar\elvtt=`-\hyphenchar\twltt=`-
+
+\lccode`_=`_\lccode`$=`$
+
+\renewcommand{\_}{{\tt\char'137}}
+
+%+                      M A N _ I N T R O
+%
+%  Section name:
+%    MAN_INTRO
+%                                 
+%  Function:
+%    Macros used in the .TEX_INTRO file
+%
+%  Description:
+%    There are no such special macros.
+%-
+
+%+                      M A N _ S U M M A R Y
+%
+%  Section name:
+%    MAN_SUMMARY
+%
+%  Function:
+%    Macros used in the .TEX_SUMMARY file
+%
+%  Description:
+%    There is a command to introduce a new section (mansection) and a list-like
+%    environment (mansectionroutines) that handles the list of routines in the
+%    current section. In addition a mansectionitem command can be used instead
+%    of the item command to introduce a new routine in the current section.
+%-
+
+\newcommand {\mansection}[2]{\subsection{#1 --- #2}}
+
+\newenvironment {mansectionroutines}{\begin{description}\item[\mbox{}]\mbox{}\begin{description}}%
+{\end{description}\end{description}}
+
+\newcommand {\mansectionitem}[1]{\item [#1:] \mbox{}}
+
+%+                      M A N _ D E S C R
+%
+%  Section name:
+%    MAN_DESCR
+%
+%  Function:
+%    Macros used in the .TEX_DESCR file
+%
+%  Description:
+%    There is a command to introduce a new routine (manroutine) and a list-like
+%    environment (manroutinedescription) that handles the list of paragraphs
+%    describing the current routine. In addition a manroutineitem command can
+%    be used instead of the item command to introduce a new paragraph for the
+%    current routine.
+%
+%    Two-column tables (the ones that can occur anywhere and which are
+%    triggered by "=>" as the second token on a line) are bracketed by a
+%    new environment (mantwocolumntable). Other sorts of table are introduced
+%    by relevant  environments (manparametertable, manfunctiontable and
+%    manvaluetable). The definitions of these environments call various other
+%    user-alterable commands, thus allowing considerable user control over such
+%    tables... (to be filled in when the commands have been written)
+%-
+
+\newcommand {\manrule}{\rule{\textwidth}{0.5mm}}
+
+\newcommand {\manroutine}[2]{\subsection{#1 --- #2}}
+
+\newenvironment {manroutinedescription}{\begin{description}}{\end{description}%
+\manrule}
+
+\newenvironment {mansubparameterdescription}{\begin{description}}%
+{\end{description}}
+
+\newcommand {\manroutineitem}[2]{\item [#1:] #2\mbox{}}
+
+% two column tables
+
+\newcommand {\mantwocolumncols}{||l|p{80mm}||}
+
+\newcommand {\mantwocolumntop}{\hline}
+
+\newcommand {\mantwocolumnblank}{\mantwocolumn@ss\mantwocolumn@hl%
+\gdef\mantwocolumn@hl{}\gdef\mantwocolumn@ss{}}
+
+\newcommand {\mantwocolumnbottom}{\mantwocolumn@ss\mantwocolumn@hl}
+
+\newenvironment {mantwocolumntable}{\gdef\mantwocolumn@ss{}%
+\gdef\mantwocolumn@hl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{center}%
+\begin{tabular}{\mantwocolumncols}\mantwocolumntop}{\mantwocolumnbottom%
+\end{tabular}\end{center}}
+
+\newcommand{\mantwocolumnentry}[1]{\mantwocolumn@ss\gdef\mantwocolumn@ss{\\}%
+\gdef\mantwocolumn@hl{\hline}#1 & }
+
+% parameter tables
+
+\newcommand {\manparametercols}{lllp{80mm}}
+
+\newcommand {\manparameterorder}[3]{#1 & #2 & #3 & }
+
+\newcommand {\manparametertop}{}
+
+\newcommand {\manparameterblank}{\gdef\manparameter@hl{}\gdef\manparameter@ss{}}
+
+\newcommand {\manparameterbottom}{}
+
+\newenvironment {manparametertable}{\gdef\manparameter@ss{}%
+\gdef\manparameter@hl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{trivlist}%
+\item[]\begin{tabular}{\manparametercols}\manparametertop}{\manparameterbottom%
+\end{tabular}\end{trivlist}}
+
+\newcommand {\manparameterentry}[3]{\manparameter@ss\gdef\manparameter@ss{\\}%
+\gdef\manparameter@hl{\hline}\manparameterorder{#1}{#2}{#3}}
+
+% return tables
+
+\newcommand {\manreturncols}{lllp{80mm}}
+
+\newcommand {\manreturnorder}[3]{#1 & #2 & #3 & }
+
+\newcommand {\manreturntop}{}
+
+\newcommand {\manreturnblank}{\gdef\manreturn@hl{}\gdef\manreturn@ss{}}
+
+\newcommand {\manreturnbottom}{}
+
+\newenvironment {manreturntable}{\gdef\manreturn@ss{}%
+\gdef\manreturn@hl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{trivlist}%
+\item[]\begin{tabular}{\manreturncols}\manreturntop}{\manreturnbottom%
+\end{tabular}\end{trivlist}}
+
+\newcommand {\manreturnentry}[3]{\manreturn@ss\gdef\manreturn@ss{\\}%
+\gdef\manreturn@hl{\hline}\manreturnorder{#1}{#2}{#3}}
+
+% function tables
+
+\newcommand {\manfunctioncols}{||l|l|p{80mm}||}
+
+\newcommand {\manfunctionorder}[2]{#1 & #2 & }
+
+\newcommand {\manfunctiontop}{\hline}
+
+\newcommand {\manfunctionblank}{\manfunction@ss\manfunction@hl%
+\gdef\manfunction@ss{}\gdef\manfunction@hl{}}
+
+\newcommand {\manfunctionbottom}{\manfunction@ss\manfunction@hl}
+
+\newenvironment {manfunctiontable}{\gdef\manfunction@ss{}\gdef\manfunction@hl{}%
+\hspace*{\fill}\vspace*{-\partopsep}\begin{center}\begin{tabular}%
+{\manfunctioncols}\manfunctiontop}{\manfunctionbottom\end{tabular}\end{center}}
+
+\newcommand {\manfunctionentry}[2]{\manfunction@ss\gdef\manfunction@ss{\\}%
+\gdef\manfunction@hl{\hline}\manfunctionorder{#1}{#2}}
+
+% value tables
+
+\newcommand {\manvaluecols}{||l|l|l|p{80mm}||}
+
+\newcommand {\manvalueorder}[3]{#1 & #2 & #3 & }
+
+\newcommand {\manvaluetop}{\hline}
+
+\newcommand {\manvalueblank}{\manvalue@ss\manvalue@hl\gdef\manvalue@ss{}%
+\gdef\manvalue@hl{}}
+
+\newcommand {\manvaluebottom}{\manvalue@ss\manvalue@hl}
+
+\newenvironment {manvaluetable}{\gdef\manvalue@ss{}\gdef\manvalue@hl{}%
+\hspace*{\fill}\vspace*{-\partopsep}\begin{center}\begin{tabular}%
+{\manvaluecols}\manvaluetop}{\manvaluebottom\end{tabular}\end{center}}
+
+\newcommand {\manvalueentry}[3]{\manvalue@ss\gdef\manvalue@ss{\\}%
+\gdef\manvalue@hl{\hline}\manvalueorder{#1}{#2}{#3}}
+
+% list environments
+
+\newenvironment {manenumerate}{\begin{enumerate}}{\end{enumerate}}
+
+\newcommand {\manenumerateitem}[1]{\item [#1]}
+
+\newenvironment {manitemize}{\begin{itemize}}{\end{itemize}}
+
+\newcommand {\manitemizeitem}{\item}
+
+\newenvironment {mandescription}{\begin{description}\item[\mbox{}]\mbox{}\begin{description}}%
+{\end{description}\end{description}}
+
+\newcommand {\mandescriptionitem}[1]{\item [#1]}
+
+\newcommand {\mantt}{\tt}
+
+% "semi-verbatim" environment (modified from LaTeX source)
+
+\def\@mansemiverbatim{\trivlist\item[]\if@minipage\else\vskip\parskip\fi%
+\leftskip\@totalleftmargin\rightskip\z@%
+\parindent\z@\parfillskip\@flushglue\parskip\z@%
+\@tempswafalse\def\par{\if@tempswa\hbox{}\fi\@tempswatrue\@@par}%
+\obeylines}
+
+\def\mansemiverbatim{\@mansemiverbatim\frenchspacing\@vobeyspaces}
+
+\let\endmansemiverbatim=\endtrivlist
+%------------------------------------------------------------------------------
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {3.1}
+\newcommand{\stardocauthors}   {William Lupton}
+\newcommand{\stardocdate}      {22nd December 1989}
+\newcommand{\stardoctitle}     {The ECH Echelle Spectrograph Model Package}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\newcommand{\coude}{coud\'{e}}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+The ECH package consists of a set of routines which model the behaviour of the
+UCL \coude\ echelle spectrograph (UCLES) and of echelle spectrographs of
+similar design. Such spectrographs can differ in
+\begin{itemize}
+\item collimator focal length (which is in fact irrelevant to the model package)
+\item cross dispersing prism apex angle
+\item echelle ruling frequency
+\item echelle blaze angle
+\item camera focal length
+\end{itemize}
+
+It is not capable of dealing with spectrographs which differ in any more major
+ways from UCLES, although it could be extended to do so should the need arise.
+
+\section{Routine Summary}
+
+The following routines are available. Refer to the next section for an overview
+of how they are used.
+
+%\input{ech_block.tex_summary}-------------------------------------------------
+\begin{mansectionroutines}
+\mansectionitem {{\mantt{ECH\_BLOCK}}}
+  {\mantt{BLOCK}} {\mantt{DATA}} to initialise spectrograph configuration
+                 {\mantt{COMMON}} block
+\mansectionitem {{\mantt{ECH\_COLLIMATOR}}}
+  Determine which collimator to use at a given wavelength
+\mansectionitem {{\mantt{ECH\_DISP}}}
+  Determine the dispersion in mm for a given wavelength
+                in a given order at a specified configuration
+\mansectionitem {{\mantt{ECH\_FORMAT\_CENTRE}}}
+  Determine the appropriate spectrograph settings
+                         to place a specified wavelength in a specified order
+                         at the centre of the field
+\mansectionitem {{\mantt{ECH\_FRSPR}}}
+  Determine the free spectral range in Angstroms
+                 of a specified order at a specified configuration
+\mansectionitem {{\mantt{ECH\_INIT}}}
+  Initialise {\mantt{COMMON}} blocks for a specified instrument combination
+\mansectionitem {{\mantt{ECH\_LOAD}}}
+  Load {\mantt{COMMON}} blocks describing spectrograph parameters
+\mansectionitem {{\mantt{ECH\_ORDERNUM}}}
+  Determine the order number of a specified wavelength
+                    at a specified configuration
+\mansectionitem {{\mantt{ECH\_PRISMPOS}}}
+  Determine the optimal prism rotation and position
+                    at a specified wavelength
+\mansectionitem {{\mantt{ECH\_REFINDEX}}}
+  Determine the refractive index of fused silica
+                    at a specified wavelength
+\mansectionitem {{\mantt{ECH\_SLITANGLE}}}
+  Determine the optimum slit angle
+                     at a specified configuration
+\mansectionitem {{\mantt{ECH\_WAVECEN}}}
+  Determine the central wavelength of the order
+                   nearest to the centre of the field at a specified
+                   configuration
+\mansectionitem {{\mantt{ECH\_WCENTRAL}}}
+  Determine the central wavelength in Angstroms
+                    in a specified order at a given configuration
+\mansectionitem {{\mantt{ECH\_XDISPFS}}}
+  Determine the cross-dispersion in mm for a given wavelength
+                   at a specified configuration
+\end{mansectionroutines}
+%------------------------------------------------------------------------------
+
+\section{Overview}
+
+The routine that is called is {\tt ECH\_LOAD}. This reads and interprets a
+spectrograph parameter file which defines the list of available spectrographs
+and their echelles and cameras. The use of {\tt ECH\_LOAD} is in fact optional
+--- if it is not called then only UCLES with its 31 and 79 echelle and its long
+camera is available.
+
+The next routine that is called is {\tt ECH\_INIT}. This selects the actual
+instrument / echelle / camera combination that is to be modelled. {\tt
+ECH\_INIT} allows use of the syntax ``instrument/echelle/camera'' in response
+to the prompt for the echelle name. The user response is split up into tokens
+and then the first token is checked against the list of defined instruments. If
+it matches one of them, attention switches to the next token. If it doesn't,
+the first instrument defined in the spectrograph parameter file is assumed and
+the same token is regarded as a candidate echelle name. The list of defined
+echelles for the current instrument is searched in exactly the same way, as is
+the list of defined cameras. Attention only moves to the next token if a match
+is found to the current token. If, after all this, any unmatched tokens remain,
+an error is reported and the first instrument /  echelle / camera combination
+defined in the spectrograph parameter file is assumed.
+
+Once {\tt ECH\_INIT} has been called, any of the other routines can be called.
+Two of the routines are at a higher level than the rest of them. These are {\tt
+ECH\_FORMAT\_CENTRE}, which determines the spectrograph settings for a given
+central wavelength and order number, and {\tt ECH\_WAVECEN}, which determines
+the central wavelength and order number for a given set of spectrograph
+settings.
+
+One of the best ways to work out how to use the routines is to study and
+understand examples of their use. The source code for the ECHWIND program is a
+good place to start and Francisco Diego's PhD thesis (he is one of the
+principal designers of UCLES) provides much valuable background information and
+develops most of the algorithms. A future version of this note will perhaps
+contain more examples.
+
+\appendix
+\section{Routine Descriptions}
+
+This section contains details of each routine. In particular, refer to the
+descriptions of the {\tt ECH\_LOAD} and {\tt ECH\_INIT} routines for details of
+how to create and use spectrograph parameter files, and refer to the
+description of the {\tt ECH\_FORMAT\_CENTRE} routine for details of how the
+spectrograph configuration for a specified wavelength is determined.
+
+%\input{ech_block.tex_descr}---------------------------------------------------
+\manroutine {{\mantt{ECH\_BLOCK}}}{  {\mantt{BLOCK}} {\mantt{DATA}} to %
+initialise spectrograph configuration}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     This refers to the {\mantt{ECH\_PARAMS}} {\mantt{COMMON}} block, which %
+contains the parameters
+     of all possible spectrographs, not to the {\mantt{ECH\_COMMON}} {\mantt{%
+COMMON}} block, which
+     contains the details only of the current configuration.
+
+     This {\mantt{BLOCK}} {\mantt{DATA}} initialises the {\mantt{COMMON}} %
+block in such a way that a call
+     to {\mantt{ECH\_INIT}} without a call to {\mantt{ECH\_LOAD}} to load the %
+parameters of a
+     specific spectrograph configuration will use the values which are correct
+     for {\mantt{UCLES}}. These values also serve to provide defaults for %
+quantities
+     which are not overridden as a result of {\mantt{ECH\_LOAD}}.
+
+\manroutineitem {Bugs }{}
+     None known.
+
+\manroutineitem {Authors }{}
+     W.F. Lupton  {\mantt{AAO}}  ({\mantt{AAOEPP}}::{\mantt{WFL}})
+
+\end{manroutinedescription}
+\manroutine {{\mantt{ECH\_COLLIMATOR}}}{  Determine which collimator to use at %
+a given wavelength}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     If a central wavelength is given, use the {\mantt{WIDE}} collimator for %
+wavelengths
+     longer than 4000 Angstroms and the {\mantt{UV}} collimator otherwise. %
+Otherwise
+     make the decision based on whether gamma is greater or less than 0.1369
+     degrees. For {\mantt{UCLES}}, this value of gamma corresponds a central %
+wavelength
+     of very close to 4000 Angstroms.
+
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{ECH\_COLLIMATOR}} ({\mantt{WAVE}}, {\mantt{GAMMA}},%
+ {\mantt{COLOUR}}, {\mantt{STATUS}})
+
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}}}{{\mantt{WAVE}}    }{{\mantt{REAL}} } %
+Central wavelength of detector. If
+                                      specified as {\mantt{<=}} 0, is not used
+                                      (Angstroms)
+\manparameterentry {{\mantt{READ}}}{{\mantt{GAMMA}}   }{{\mantt{REAL}} } %
+Echelle gamma angle corresponding to the
+                                      current configuration. Is used only if
+                                      {\mantt{WAVE}} is {\mantt{<=}} 0
+                                      (radians)
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{COLOUR}}  }{{\mantt{CHARACTER}} } %
+The optimal collimator, either {\mantt{WIDE}} or {\mantt{UV}}
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{STATUS}}  }{{%
+\mantt{INTEGER}} } Global status value
+\end{manparametertable}
+\manroutineitem {Bugs }{}
+     The algorithm is too simplistic. It should take account of the detector
+     size and guarantee that the best choice of collimator is made for the
+     whole detector rather than just for its centre (although this is rather
+     hard without knowledge of the configuration history!).
+
+\manroutineitem {Authors }{}
+     C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
+
+\end{manroutinedescription}
+\manroutine {{\mantt{ECH\_DISP}}}{  Determine the dispersion in mm for a given %
+wavelength}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     Use the grating equation to calculate the echelle beta angle at the given
+     wavelength in the given order. Then calculate it at the point where the
+     dispersion is by definition zero. Knowing the focal length of the camera,
+     calculate the dispersion in mm.
+
+     {\mantt{ECH\_INIT}} must be called before calling this routine.
+
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{ECH\_DISP}} ({\mantt{WAVE}}, M, {\mantt{THETA}}, {%
+\mantt{GAMMA}}, {\mantt{DEL}}, {\mantt{STATUS}})
+
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}}}{{\mantt{WAVE}}    }{{\mantt{REAL}} } %
+Wavelength of point at which dispersion
+                                      is to be calculated (Angstroms)
+\manparameterentry {{\mantt{READ}}}{M       }{{\mantt{INTEGER}} } Order number %
+in which this wavelength
+                                      lies (it doesn't have to be within the
+                                      free spectral range)
+\manparameterentry {{\mantt{READ}}}{{\mantt{THETA}}   }{{\mantt{REAL}} } %
+Echelle theta angle corresponding to the
+                                      current configuration (radians)
+\manparameterentry {{\mantt{READ}}}{{\mantt{GAMMA}}   }{{\mantt{REAL}} } %
+Echelle gamma angle corresponding to the
+                                      current configuration (radians)
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{DEL}}     }{{\mantt{REAL}} } %
+Dispersion (mm)
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{STATUS}}  }{{%
+\mantt{INTEGER}} } Global status value
+\end{manparametertable}
+\manroutineitem {Bugs }{}
+     None known.
+
+\manroutineitem {Authors }{}
+     C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
+
+\end{manroutinedescription}
+\manroutine {{\mantt{ECH\_FORMAT\_CENTRE}}}{  Determine the appropriate %
+spectrograph settings}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     Firstly, calculate the prism system rotation and position. The required
+     echelle gamma angle is not quite the same as the prism rotation angle.
+     This is because of the 12 degree separation between the incoming ray to
+     to the echelle grating and the outgoing ray to the camera - the prism
+     rotation angle has to be multiplied by an empirical correction factor
+     of 1.011 (I am not sure of the complete justification for this).
+
+     Having determined the appropriate echelle gamma angle, the cross
+     dispersion is now correct and it is necessary to determine the
+     appropriate echelle theta angle to give the correct wavelength in the
+     centre of the field. If the order number was not explicitly specified,
+     assume the order within which the given wavelength lies with the free
+     spectral range. Theta is determined simply by stepping along the order
+     and, once having stepped past the required wavelength, binary chopping
+     until convergence.
+
+     Finally, determine the appropriate collimator to use and the necessary
+     slit assembly rotation in order to give vertical slit images on the
+     detector.
+
+     {\mantt{ECH\_INIT}} must be called before calling this routine.
+
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{ECH\_FORMAT\_CENTRE}} ({\mantt{WC}}, {\mantt{MCEN}}%
+, {\mantt{THETA}}, {\mantt{GAMMA}}, {\mantt{COL\_COLOUR}}, {\mantt{PRISM\_POS}},
+                                                        {\mantt{SLIT\_ANGLE}}, %
+{\mantt{STATUS}})
+
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}}}{{\mantt{WC}}          }{{\mantt{REAL}} } %
+Desired central wavelength
+                                          (Angstroms)
+\manparameterentry {{\mantt{READ}}}{{\mantt{MCEN}}        }{{\mantt{INTEGER}} }%
+ Desired central order. If {\mantt{<=0}} the
+                                          order in which the above wavelength
+                                          lies within the free spectral range
+                                          is used
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{THETA}}       }{{\mantt{REAL}} } %
+Echelle theta (radians)
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{GAMMA}}       }{{\mantt{REAL}} } %
+Echelle gamma (radians)
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{COL\_COLOUR}}  }{{\mantt{%
+CHARACTER}} } Collimator ({\mantt{UV}} or {\mantt{WIDE}})
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{PRISM\_POS}}   }{{\mantt{REAL}} } %
+Prism position (mm)
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{SLIT\_ANGLE}}  }{{\mantt{REAL}} } %
+Slit angle (radians)
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{STATUS}}      }{{%
+\mantt{INTEGER}} } Global status value
+\end{manparametertable}
+\manroutineitem {Bugs }{}
+     None known.
+
+\manroutineitem {Authors }{}
+     F. Diego  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{FD}})
+
+\end{manroutinedescription}
+\manroutine {{\mantt{ECH\_FRSPR}}}{  Determine the free spectral range in %
+Angstroms}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     Determine the central wavelength of the specified order and then
+     use the grating equation directly to calculate the free spectral
+     range.
+
+     {\mantt{ECH\_INIT}} must be called before calling this routine.
+
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{ECH\_FRSPR}} (M, {\mantt{THETA}}, {\mantt{GAMMA}}, %
+{\mantt{FREE}}, {\mantt{STATUS}})
+
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}}}{M       }{{\mantt{INTEGER}} } Order number %
+for which to calculate the
+                                      free spectral range
+\manparameterentry {{\mantt{READ}}}{{\mantt{THETA}}   }{{\mantt{REAL}} } %
+Echelle theta angle corresponding to the
+                                      current configuration (radians)
+\manparameterentry {{\mantt{READ}}}{{\mantt{GAMMA}}   }{{\mantt{REAL}} } %
+Echelle gamma angle corresponding to the
+                                      current configuration (radians)
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{FREE}}    }{{\mantt{REAL}} } Free %
+spectral range (Angstroms)
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{STATUS}}  }{{%
+\mantt{INTEGER}} } Global status value
+\end{manparametertable}
+\manroutineitem {Bugs }{}
+     None known.
+
+\manroutineitem {Authors }{}
+     C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
+
+\end{manroutinedescription}
+\manroutine {{\mantt{ECH\_INIT}}}{  Initialise {\mantt{COMMON}} blocks for a %
+specified instrument combination}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     If a parameter name has been specified, ask the user which configuration
+     to use. Otherwise use the one which was supplied.
+
+     The resulting configuration name is a string which consists of zero or
+     more words separated by slahes. They are converted to upper case and
+     then an attempt is made to interpret the first as the name of a supported
+     instrument. If no match is found, the first instrument defined in the
+     spectrograph parameter file read by {\mantt{ECH\_LOAD}} is assumed or, if %
+{\mantt{ECH\_LOAD}}
+     was not called, the default instrument ({\mantt{UCLES}}) is used. Having %
+determined
+     the instrument, an attempt is made to interpret the remaining words as
+     names of supported echelles and cameras respectively. If no match is
+     found, the first defined echelle and camera of the instrument are assumed.
+
+     Having determined the instrument, echelle and camera, copy the relevant
+     parameters to the {\mantt{ECH\_COMMON}} {\mantt{COMMON}} block for use by %
+the rest of the
+     spectrograph model routines.
+
+     The result is that simple input such as ``31'' and ``79'' can continue to
+     be accepted as it always has, but that it is easy to refer to other
+     instruments, echelles and cameras.
+
+     This routine must be called before any of the other spectrograph model
+     routines are called. {\mantt{ECH\_LOAD}} may optionally be called before %
+this
+     routine. If it is not, the only available instrument is {\mantt{UCLES}} %
+with the
+     31 and 79 echelles and the {\mantt{LONG}} camera.
+
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{ECH\_INIT}} ({\mantt{PARAM}}, {\mantt{CONFIG}}, {%
+\mantt{STATUS}})
+
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}}}{{\mantt{PARAM}}    }{{\mantt{CHARACTER}} } %
+Name of program parameter
+                                         corresponding to the configuration
+                                         to use. If blank, no parameter is read
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{CONFIG}}  }{{%
+\mantt{CHARACTER}} } Configuration to use. See description
+                                         above. Is read if {\mantt{PARAM}} is %
+blank. Is
+                                         set to echelle name if {\mantt{PARAM}}
+                                         is non-blank
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{STATUS}}   }{{%
+\mantt{INTEGER}} } Global status value
+\end{manparametertable}
+\manroutineitem {Bugs }{}
+     None known.
+
+\manroutineitem {Authors }{}
+     C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
+
+\end{manroutinedescription}
+\manroutine {{\mantt{ECH\_LOAD}}}{  Load {\mantt{COMMON}} blocks describing %
+spectrograph parameters}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     If a parameter name has been specified, ask the user which file contains
+     the parameters. Otherwise use the one which was supplied.
+
+     This file is a text file. Any line beginning with a ``{\mantt{!}}'' is a %
+comment line
+     and is ignored. Non-comment lines are split up into space, tab or comma
+     separated tokens (quotes can be used to protect delimiters within tokens
+     should this be necessary) and these tokens are processed in pairs (the
+     number of tokens on a line must be even and will probably usually be 2).
+     The first of each pair is a keyword and the second is a value associated
+     with that keyword. The keyword determines the expected type of the value.
+     All non quoted tokens are converted to upper case.
+
+     As the file is processed, there is always a current instrument, a current
+     echelle and a current camera. Initially these are the defaults of
+     ``{\mantt{UCLES}}'', ``31'' and ``{\mantt{LONG}}'' respectively. They are %
+changed by
+     ``{\mantt{INSTRUMENT}} instrument'', ``{\mantt{ECHELLE}} echelle'' and ``{%
+\mantt{CAMERA}} camera'' entries in
+     the file. Individual spectrograph parameters are each associated with the
+     instrument and with either the echelle or the camera and their entries
+     always apply to the current instrument, echelle and camera.
+
+     Instrument-related parameters are:
+
+\begin{mandescription}
+\mandescriptionitem {FCOL}   collimator focal length ({\mantt{REAL}} mm)
+\mandescriptionitem {NPR}    number of prisms in cross-disperser ({\mantt{%
+INTEGER}})
+\mandescriptionitem {ANGLE}  prism angle ({\mantt{REAL}} degrees)
+
+\end{mandescription}
+     Echelle-related parameters are:
+
+\begin{mandescription}
+\mandescriptionitem {D}      number of lines per mm ({\mantt{REAL}})
+\mandescriptionitem {M0}     central order number ({\mantt{INTEGER}})
+\mandescriptionitem {WAVE0}  central wavelength ({\mantt{REAL}} Angstroms)
+\mandescriptionitem {THETAB} blaze angle ({\mantt{REAL}} degrees)
+\mandescriptionitem {THETA0} central theta ({\mantt{REAL}} degrees)
+\mandescriptionitem {GAMMA0} central gamma ({\mantt{REAL}} degrees)
+
+\end{mandescription}
+     Camera-related parameters are:
+
+\begin{mandescription}
+\mandescriptionitem {FCAM}   camera focal length ({\mantt{REAL}} mm)
+
+\end{mandescription}
+     Note that the order of instruments, echelles and cameras within the
+     file may be significant. For example, the default instrument, echelle
+     or camera may be the first one that was defined in the file (although
+     this routine does not need to make any assumptions about this).
+
+     The following example describes {\mantt{UCLES}} and illustrates a %
+notional short
+     camera of focal length 400mm.
+     \begin{verbatim}
+*       !+ UCLES.DAT
+*       !
+*       !  UCLES spectrograph parameters.
+*       !
+*       INSTRUMENT UCLES
+*          FCOL 6000.0
+*          NPR 3
+*          ANGLE 54.1
+*          ECHELLE 31
+*             D 31.6046
+*             M0 138
+*             WAVE0 4119.68
+*             THETAB 64.66
+*             THETA0 0.0
+*             GAMMA0 0.0
+*          ECHELLE 79
+*             D 79.0115
+*             M0 55
+*             WAVE0 4097.99
+*             THETAB 63.55
+*             THETA0 0.0
+*             GAMMA0 0.0
+*          CAMERA LONG
+*             FCAM 700.0
+*          CAMERA SHORT
+*             FCAM 400.0
+*     \end{verbatim}
+     This routine should be called before {\mantt{ECH\_INIT}} is called. If it %
+is not
+     called, {\mantt{ECH\_INIT}} will only be able to support the 31 and 79 %
+echelles on
+     the {\mantt{UCLES}} {\mantt{LONG}} camera.
+
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{ECH\_LOAD}} ({\mantt{PARAM}}, {\mantt{FILE}}, {%
+\mantt{STATUS}})
+
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}}}{{\mantt{PARAM}}    }{{\mantt{CHARACTER}} } %
+Name of program parameter
+                                         corresponding to the file to use.
+                                         If blank, no parameter is read
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{FILE}}     }{{%
+\mantt{CHARACTER}} } File to use. Default file type is
+                                         .{\mantt{DAT}}. Is read if {\mantt{%
+PARAM}} is blank. Is
+                                         written if {\mantt{PARAM}} is non-blank
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{STATUS}}   }{{%
+\mantt{INTEGER}} } Global status value
+\end{manparametertable}
+\manroutineitem {Bugs }{}
+     None known.
+
+\manroutineitem {Authors }{}
+     W.F. Lupton  {\mantt{AAO}}  ({\mantt{AAOEPP}}::{\mantt{WFL}})
+
+\end{manroutinedescription}
+\manroutine {{\mantt{ECH\_ORDERNUM}}}{  Determine the order number of a %
+specified wavelength}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     Use the grating equation to calculate the free spectral range and then
+     derive the order number directly from it.
+
+     {\mantt{ECH\_INIT}} must be called before calling this routine.
+
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{ECH\_ORDERNUM}} (W, {\mantt{THETA}}, {\mantt{GAMMA}%
+}, M, {\mantt{STATUS}})
+
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}}}{W       }{{\mantt{REAL}} } Wavelength %
+whose order number is to be
+                                      determined (ie the order number within
+                                      which it lies within the free spectral
+                                      range) (Angstroms)
+\manparameterentry {{\mantt{READ}}}{{\mantt{THETA}}   }{{\mantt{REAL}} } %
+Echelle theta angle corresponding to the
+                                      current configuration (radians)
+\manparameterentry {{\mantt{READ}}}{{\mantt{GAMMA}}   }{{\mantt{REAL}} } %
+Echelle gamma angle corresponding to the
+                                      current configuration (radians)
+\manparameterentry {{\mantt{WRITE}}}{M       }{{\mantt{INTEGER}} } Order %
+number corresponding to wavelength
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{STATUS}}  }{{%
+\mantt{INTEGER}} } Global status value
+\end{manparametertable}
+\manroutineitem {Bugs }{}
+     None known.
+
+\manroutineitem {Authors }{}
+     C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
+
+\end{manroutinedescription}
+\manroutine {{\mantt{ECH\_PRISMPOS}}}{  Determine the optimal prism rotation %
+and position}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     Determine the prism rotation and position by direct calculation. The
+     rotation is such that a ray of the specified wavelength will fall on
+     the centre of the detector. The position is such that the echelle is
+     fully illuminated by rays of the specified wavelength.
+
+     {\mantt{ECH\_INIT}} must be called before calling this routine.
+
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{ECH\_PRISMPOS}} ({\mantt{WC}}, {\mantt{GAMMA}}, {%
+\mantt{POS}}, {\mantt{STATUS}})
+
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}}}{{\mantt{WC}}      }{{\mantt{REAL}} } %
+Desired central wavelength (Angstroms)
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{GAMMA}}   }{{\mantt{REAL}} } %
+Optimal prism rotation (radians)
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{POS}}     }{{\mantt{REAL}} } %
+Optimal prism position (mm)
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{STATUS}}  }{{%
+\mantt{INTEGER}} } Global status value
+\end{manparametertable}
+\manroutineitem {Bugs }{}
+     None known.
+
+\manroutineitem {Authors }{}
+     C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
+
+\end{manroutinedescription}
+\manroutine {{\mantt{ECH\_REFINDEX}}}{  Determine the refractive index of %
+fused silica}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     Use the empirical expression derived by I.H. Malitson, J.O.S.A 55, 1205,
+     Oct 1965. This expression is:
+     \begin{verbatim}
+*                  0.6961663 . w**2     0.4079426 . w**2      0.8974794 . w**2
+*     ref**2 = 1 + ----------------- + ------------------- + ------------------
+*                 w**2 - 0.0684043**2  w**2 - 0.0062414**2   w**2 - 9.896161**2
+*     \end{verbatim}
+     where wavelength is measured in microns. This routine uses wavelength in
+     Angstroms and converts to microns internally.
+
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{ECH\_REFINDEX}} ({\mantt{WAVE}}, {\mantt{REF}}, {%
+\mantt{STATUS}})
+
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}}}{{\mantt{WAVE}}    }{{\mantt{REAL}} } %
+Wavelength (Angstroms)
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{REF}}     }{{\mantt{REAL}} } %
+Refractive index
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{STATUS}}  }{{%
+\mantt{INTEGER}} } Global status value
+\end{manparametertable}
+\manroutineitem {Bugs }{}
+     None known.
+
+\manroutineitem {Authors }{}
+     W.F. Lupton  {\mantt{AAO}}  ({\mantt{AAOEPP}}::{\mantt{WFL}})
+
+\end{manroutinedescription}
+\manroutine {{\mantt{ECH\_SLITANGLE}}}{  Determine the optimum slit angle}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     Determine the slit angle by direct calculation.
+
+     {\mantt{ECH\_INIT}} must be called before calling this routine.
+
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{ECH\_SLITANGLE}} ({\mantt{GAMMA}}, {\mantt{ANG}}, {%
+\mantt{STATUS}})
+
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}}}{{\mantt{GAMMA}}   }{{\mantt{REAL}} } %
+Echelle gamma angle corresponding to the
+                                      current configuration (radians)
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{ANG}}     }{{\mantt{REAL}} } %
+Optimal slit angle (radians)
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{STATUS}}  }{{%
+\mantt{INTEGER}} } Global status value
+\end{manparametertable}
+\manroutineitem {Bugs }{}
+     None known.
+
+\manroutineitem {Authors }{}
+     C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
+
+\end{manroutinedescription}
+\manroutine {{\mantt{ECH\_WAVECEN}}}{  Determine the central wavelength of the %
+order}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     Use a binary chop search to determine the order which corresponds to
+     the given echelle gamma angle. Having determined the order, perform a
+     similar search to determine the wavelength within the order which
+     corresponds to the given echelle theta angle.
+
+     {\mantt{ECH\_INIT}} must be called before calling this routine.
+
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{ECH\_WAVECEN}} ({\mantt{THETA}}, {\mantt{GAMMA}}, {%
+\mantt{WC}}, {\mantt{MC}}, {\mantt{STATUS}})
+
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}}}{{\mantt{THETA}}   }{{\mantt{REAL}} } %
+Echelle theta angle corresponding to the
+                                      current configuration (radians)
+\manparameterentry {{\mantt{READ}}}{{\mantt{GAMMA}}   }{{\mantt{REAL}} } %
+Echelle gamma angle corresponding to the
+                                      current configuration (radians)
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{WC}}      }{{\mantt{REAL}} } %
+Central wavelength corresponding to the
+                                      current configuration (ie that wavelength
+                                      which lies within order M and is closest
+                                      to that in the centre of the field)
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{MC}}      }{{\mantt{INTEGER}} } %
+Order number corresponding to the current
+                                      configuration (the order closest to that
+                                      in the centre of the field)
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{STATUS}}  }{{%
+\mantt{INTEGER}} } Global status value
+\end{manparametertable}
+\manroutineitem {Bugs }{}
+     None known.
+
+\manroutineitem {Authors }{}
+     C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
+
+\end{manroutinedescription}
+\manroutine {{\mantt{ECH\_WCENTRAL}}}{  Determine the central wavelength in %
+Angstroms}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     Use the grating equiation directly to determine the central wavelength.
+
+     {\mantt{ECH\_INIT}} must be called before calling this routine.
+
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{ECH\_WCENTRAL}} (M, {\mantt{THETA}}, {\mantt{GAMMA}%
+}, {\mantt{WC}}, {\mantt{STATUS}})
+
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}}}{M          }{{\mantt{INTEGER}} } Order %
+number
+\manparameterentry {{\mantt{READ}}}{{\mantt{THETA}}      }{{\mantt{REAL}} } %
+Echelle theta angle corresponding to the
+                                      current configuration (radians)
+\manparameterentry {{\mantt{READ}}}{{\mantt{GAMMA}}      }{{\mantt{REAL}} } %
+Echelle gamma angle corresponding to the
+                                      current configuration (radians)
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{WC}}         }{{\mantt{REAL}} } %
+Central wavelength of this order
+                                      (Angstroms)
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{STATUS}}  }{{%
+\mantt{INTEGER}} } Global status value
+\end{manparametertable}
+\manroutineitem {Bugs }{}
+     None known.
+
+\manroutineitem {Authors }{}
+     C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
+
+\end{manroutinedescription}
+\manroutine {{\mantt{ECH\_XDISPFS}}}{  Determine the cross-dispersion in mm %
+for a given wavelength}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     Calculate the refractive index at the given wavelength. Then calculate it
+     at the point where the cross-dispersion is by definition zero. Knowing
+     the focal length of the camera, calculate the cross-dispersion in mm on
+     the assumption that the light enters and leaves the prisms at the same
+     angles of incidence (a first order approximation is used).
+
+     {\mantt{ECH\_INIT}} must be called before calling this routine.
+
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{ECH\_XDISPFS}} ({\mantt{WAVE}}, {\mantt{GAMMA}}, {%
+\mantt{DEL}}, {\mantt{STATUS}})
+
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}}}{{\mantt{WAVE}}    }{{\mantt{REAL}} } %
+Wavelength of point at which
+                                      cross-dispersion is to be calculated
+                                      (Angstroms)
+\manparameterentry {{\mantt{READ}}}{{\mantt{GAMMA}}   }{{\mantt{REAL}} } %
+Echelle gamma angle corresponding to the
+                                      current configuration (radians)
+\manparameterentry {{\mantt{WRITE}}}{{\mantt{DEL}}     }{{\mantt{REAL}} } %
+Cross-dispersion (mm)
+\manparameterentry {{\mantt{READ}}, {\mantt{WRITE}}}{{\mantt{STATUS}}  }{{%
+\mantt{INTEGER}} } Global status value
+\end{manparametertable}
+\manroutineitem {Bugs }{}
+     None known.
+
+\manroutineitem {Authors }{}
+     C.J. Hirst  {\mantt{UCL}}  ({\mantt{ZUVAD}}::{\mantt{CJH}})
+
+\end{manroutinedescription}
+%------------------------------------------------------------------------------
+
+\end {document}

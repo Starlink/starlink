@@ -1,0 +1,649 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocnumber}    {7.1}
+\newcommand{\stardocauthors}   {P.T.Wallace}
+\newcommand{\stardocdate}      {6th August 1991}
+\newcommand{\stardoctitle}     {Unix and Starlink}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{4mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{1mm}
+\begin{quote}
+{\it In order to exploit the most cost-effective hardware and to
+maintain compatibility with the international community, Starlink has
+begun introducing Unix-based computers.  A mixed Unix/VMS service, with
+its extra system management and software support costs, will not be
+efficient in the long term, and over the next few years the existing
+VMS service will run down and a complete change to Unix will occur.
+The details and timing of this transition will vary from site to site in
+accordance with local needs and conditions.  However, as far as possible
+all future hardware purchases will be Unix-based.  As representatives of
+the user community, the Starlink Users' Committee has worked closely
+with the Project in formulating these plans and firmly endorses them.}
+\end{quote}
+
+\vspace{0.5mm}
+
+%------------------------------------------------------------------------------
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\pagebreak
+
+\section{INTRODUCTION}
+An important feature of Starlink since its creation in 1980, to which
+the Project owes much of its success, is the compatibility of the
+computers at each site.  This uniformity has meant that programs
+developed at one site run, usually without any changes at all, on all
+other Starlink machines and on many VAXs throughout the World.  That
+this has been possible despite profound changes in the computer hardware
+itself (from VAX-11/780s in the early days to MicroVAXs and VAXstations
+now) is, of course, due to the constancy of the VMS operating system and
+the scalability of the VAX architecture.  However, the VMS era is
+drawing to a close;  new Starlink machines will be based instead on the
+Unix operating system.  This is clearly a profound change, and one which
+will bring costs as well as benefits to UK astronomers.  The present
+paper gives the reasons for making the switch and explains some of the
+consequences.
+
+\section{UNIX}
+\subsection{Unix and Other Operating Systems}
+Unix is the name of a family of operating systems, two specific examples
+of which are (i)~SunOS, the implementation of Unix found on the Starlink
+Sun workstations, and (ii)~Ultrix, the implementation of Unix found on
+the Starlink DECstations.  Two other operating systems well-known to UK
+astronomers are VMS, which runs on VAX, and MS-DOS, which runs on
+IBM-PC.  Unix and VMS are both multi-user, interactive, multi-tasking,
+virtual memory operating systems.  In contrast, MS-DOS is a single-user
+system, and offers neither (serious) multi-tasking nor virtual memory.
+
+\subsection{Unix versus VMS}
+The parts of an operating system which give it a distinct character to
+users are the user interface and the utilities.  Programmers are in
+addition conscious of the underlying {\it system services}\, and the
+range of low-level facilities, especially the input/output functions, to
+which these services give access.  In all these respects Unix and VMS
+differ significantly.
+
+To typical Starlink users, familiar with the VMS system, Unix appears as
+another command language (or {\it shell}\, in Unix parlance) to learn, a
+different file and directory system to cope with, and another set of
+tools and utility programs to master.  Compared with VMS, the commands
+are terse and oddly-named, and rather inconsistent.  Guessing can be
+hazardous;  there is great power and freedom, but attendant danger.  The
+programmer gets a powerful and comprehensive, but unpolished, set of
+tools, many oriented towards the systems programmer (and other users
+of the C language).  The computer-science community has generated an
+enormous collection of Unix-based utility software, certain items of
+which have passed into what is generally accepted to be ``standard''
+Unix.  Many of these items have no counterparts under VMS.
+
+In summary, when VMS and Unix are compared, VMS comes across as a
+well-finished and fully standardised product which carries out a
+specific range of tasks extremely effectively, whereas Unix comes in kit
+form and in various flavours, is never as tidy and safe as VMS, but is
+ultimately more versatile.  More importantly, Unix has the great
+advantage of running on many different sorts of computer while VMS is
+restricted to VAXs.
+
+Both Unix and VMS are capable of running typical Fortran astronomical
+application programs equally efficiently.
+
+\subsection{Why has Unix become popular?}
+Computing enthusiasts attribute the popularity of Unix to its various
+technical strengths -- pipes and I/O redirection, ``lightweight''
+processes, multiple shells and so on -- and from its ``toolbox'' style,
+which allows complicated and powerful new facilities to be constructed
+quickly just by plugging together simple existing tools.  However, the
+real secret of its success is that it was available to hardware
+manufacturers at low cost, so that there is now a huge range of machines
+on which some variant of Unix runs.  This sets Unix apart fundamentally
+from any other operating system:  almost all interesting new equipment
+is Unix-based, from workstations to minisupercomputers, and few computer
+manufacturers today would seriously contemplate developing their own
+operating system from scratch.
+
+Thus, the purely technical strengths of Unix are {\it not}\, the
+reason why it is set to become the principal Starlink operating system;
+indeed, it would even be possible to argue that, overall, VMS is the
+better operating system of the two.  Such considerations are irrelevant:
+the current move to Unix is because it is the {\it de facto}\, standard
+(just as VAX/VMS was in its day), that will enable Starlink users to run
+a wealth of applications software on the latest and fastest hardware.
+
+\section{UNIX AND STARLINK}
+\subsection{Why Starlink is Switching to Unix}
+Unix will completely replace VMS at all Starlink sites over the next
+few years.  There are two key reasons why this policy has to be pursued:
+\begin{itemize}
+\item Starlink users need to run software imported from astronomical
+communities abroad.  At one time such software was always VAX/VMS-based,
+but in recent years the balance has swung decisively towards Unix, most
+often on Sun or Convex.  For this reason alone, therefore, Starlink
+users are certain to be confronted increasingly by Unix, and will expect
+support from Starlink in this area.
+\item To get the best value for money, we must use RISC\footnote{RISC
+stands for {\it Reduced Instruction Set Computer}, a design of processor
+which achieves very high speed by having a small instruction set
+designed to be compatible with pipelining and other speed-enhancing
+techniques.  Many Unix computers use RISC chips;  present VAX processors
+are all CISC {\it (Complex Instruction Set Computer)} machines.  CISC
+designs have properties which are less advantageous now than in former
+times when, for example, memory was expensive.} hardware.  Providing
+Unix-based forms of our applications software are available, we have the
+freedom to select new computers from a wide range of vendors, in the
+knowledge that the vigorous competition between vendors is securing
+leading-edge performance at low prices.
+\end{itemize}
+
+\subsection{What will happen if Starlink ignores Unix?}
+At the time of writing, considerable use of Unix within Starlink is
+already occurring, mainly as a consequence of the introduction of the
+SUN workstations, and this will grow even without any Starlink-led
+replacement of VAX hardware with Unix equipment.
+
+However, there are those who argue that Starlink's manpower resources
+are already too thinly-spread, and that the introduction of a completely
+new operating system is madness.  After all, the VAXs are providing a
+satisfactory service, DEC are unlikely to go out of business in the
+foreseeable future (and in a couple of years will be offering RISC-based
+VAX/VMS systems which have much better price/performance than present
+VAXs) and almost all of Starlink's software is VMS-based.  Many existing
+Starlink users, satisfied with VMS and reluctant to come to grips with a
+new and initially unfriendly system, will feel that a diversion of
+scarce effort away from VMS-related work into Unix is wasteful and
+unnecessary.
+
+Despite these understandable views, the Project and the Starlink Users'
+Committee have concluded that there is an urgent need to break out of
+the VMS proprietary straitjacket and into ``open systems''.  If Starlink
+and its user community were not to rise to the Unix challenge, the
+following undesirable consequences would follow:
+\begin{itemize}
+\item Money would be wasted on slow VAXs.  A large gap in performance
+exists between RISC and VAX processors at the same price.  At the time
+of writing, for example, a Sun SPARCstation~2 offers 2.5 times better
+CPU price performance than a comparably-priced VAXstation, while a
+DECstation~5000/200 is even better value at 3.2 times the VAX's
+price/performance.\footnote{The models compared were
+(i)~the VAXstation~3100/76, 12Mb, 19-inch colour display, 104Mb~disc,
+6.8~SPECmarks for \pounds10257,
+(ii)~the Sun SPARCstation~2, 16Mb, 16-inch colour display, 207Mb~disc,
+21~SPECmarks for \pounds12485,
+(iii)~DECstation~5000/120, 16Mb, 16-inch colour display, 330Mb~disc, CD,
+14~SPECmarks for \pounds6482, and
+(iv)~DECstation~5000/200, 16Mb, 16-inch colour display, 330Mb~disc, CD,
+20~SPECmarks for \pounds9348.  One SPECmark is about the CPU power
+of a VAX-11/780.
+All prices are one-off, include discounts and VAT, and are for
+July~1991.}  A version of VMS running on a RISC processor is under
+development by DEC, but this will do no more than narrow the present
+price/performance gap, and at some unknown time in the future.
+\item Hardware and software provision in UK astronomy would become
+uncoordinated.  If Starlink had nothing to do with Unix, the
+introduction of Unix hardware via grants could result in
+diversification, duplication and waste.
+\item We would risk cutting ourselves off from international
+collaborators.  If the absence of Unix support and applications were to
+cause Starlink sites to reject the introduction of Unix hardware,
+valuable software provided by overseas groups would not be exploited.
+Conversely, astronomers overseas are already losing interest in
+VMS-based applications developed by UK astronomers.  A related issue is
+the difficulties that will be experienced by VMS-only Starlink users
+working temporarily overseas (especially in the USA), and by the new
+breed of Unix-only visitors to the UK encountering old-fashioned
+VMS-only Starlink sites.
+\item We would not be able to use commercial packages, which are
+increasingly based on Unix (and/or MS-DOS), and which in some areas
+(for example graphics) already offer far more than the equivalent
+Starlink facilities ever will.
+\end{itemize}
+
+\subsection{Starlink's VAX/VMS Service in the Future}
+It is always possible that the promised future migration onto RISC
+hardware of the VMS operating system would revitalise VMS usage in
+astronomy.  However, the pressure on Starlink to eliminate the costs of
+supporting multiple hardware types and software versions means that it
+is only a matter of time before Starlink sites switch over completely
+from VMS to Unix.  This has already happened in important institutions
+overseas, and UK astronomers have fallen noticeably behind international
+practice in this regard.  We do not have the resources to support
+multiple operating systems;  if we pick one, it has to be Unix.
+
+Despite the inevitability of the move to Unix, it is unlikely that any
+Starlink site will be ready to make a complete change within less than
+about 2~years and some will still be offering limited VMS capability in
+5~years.  The lifetime of the existing VAX hardware, the availability of
+money for new hardware, and the existence of VMS-only software are all
+factors which will limit the speed of change.
+
+At any particular Starlink site, when the switch does come the Project
+naturally hopes that the change will have the blessing of the majority
+of users.  However, cost considerations will have to be allowed to
+outweigh the opposition to change that will inevitably linger on in
+places.
+
+One of the first consequences of the Project's Unix policy to be seen at
+the Starlink sites is that it will be much more difficult to justify, in
+the future, the purchase of VAX hardware.  Only if there is a very
+strong case for doing so will such hardware be purchased.
+
+\subsection{Effects Outside Starlink}
+In supporting the UK astronomy community, the Project must consider the
+likely impact of its Unix policy on SERC astronomy activities not
+directly served by Starlink but within its sphere of influence.
+For example, we have to take into account various space activities
+and, in particular the SERC's overseas observatories.
+
+Will the present excellent level of compatibility between the
+observatories and Starlink be damaged?
+Contact between the observatories and the Starlink Project has always
+been good, in terms of e-mail accessibility and the exchange of ideas
+if not in person.  When the initiative for hardware changes has come
+from Starlink, the observatories have always been able to follow suit
+in order to maintain compatibility;  conversely, innovations at the
+observatories have stimulated matching changes in Starlink.  The need
+for uniformity is widely accepted and so major incompatibilities are
+unlikely to develop.  There are no indications at present that the
+observatories will be slower to phase out their VAXs than the most
+conservative of the Starlink nodes.
+
+At all the observatories, software portability is now regarded as
+crucial, and Starlink-compatible Unix equipment is either already
+present or planned.  The same remarks apply to various space activities,
+where international pressures are already forcing the move to Unix and
+where Unix-compatible products from Starlink will be as influential in
+the future as the VMS-based products have been in the past.
+
+\section{THE IMPACT OF UNIX ON STARLINK}
+\subsection{Disadvantages}
+Despite the advantages of moving to Unix described so far --
+compatibility with the international community, and access to the latest
+and fastest computer hardware -- there is a price to pay:
+\begin{itemize}
+\item Most users will initially dislike Unix, finding it terse and
+unforgiving, and will resent having to grapple with it merely to do what
+they can already do on the VAX.  However, experience so far shows that
+in about a month of regular use Starlink users will begin to appreciate
+the flexibility of the Unix operating system and the concise commands.
+Overseas groups report that astronomers who encounter Unix
+first and subsequently are obliged to use VMS find the Unix-to-VMS
+transition just as painful as the converse, and moreover continue to
+prefer Unix to VMS afterwards.  This indicates that any hostility
+towards Unix from existing Starlink users will be due at least in part
+to lack of familiarity and fear of the unknown, albeit understandable
+for those many users who will not see clear and immediate benefits from
+making the change.
+\item Much of the existing Starlink software is unashamedly
+VMS-specific (despite forthright advice given by the Project over the
+years) and adapting such software for use under Unix will take a long
+time, absorb large amounts of skilled software effort and may even in
+some cases be impractical.  (ADAM-based applications will, in contrast,
+port readily once the ADAM environment itself is available in
+Unix-compatible form.)
+\item There are differences between the various implementations of
+Unix.  These tend to be headaches for software developers and
+system managers rather than users.  The difficulties can be minimised
+by (i)~sticking to one type of equipment at one site and (ii)~using
+Starlink-provided portability tools.  An example of the latter is the
+set of C macros already released which allows C and Fortran code to
+be mixed on all current Starlink hardware types.  In any case, there is
+a strong convergence taking place into two principal Unix strains, the
+{\it Unix International}\, (System~V) and the {\it Open Systems
+Foundation}\, (Berkeley) versions, and in addition each of these
+implementations is steadily being enhanced to incorporate the
+features of the other.  Further impetus to the convergence is provided
+by the {\it POSIX}\, standards, which both major Unix offerings (and a
+number of other operating systems including VMS) support.  For users and
+programmers, the best policy is to be aware of those areas in which
+there are differences, and to avoid techniques which are peculiar to one
+flavour of Unix.
+\item Unix takes longer to learn and is harder to master than VMS, and
+new Unix users will expect a lot of support from Starlink, in particular
+from their site managers.  The extra site management effort that is
+needed is, in fact, one of the Project's biggest worries.  In addition
+to the increased workload from new hardware and system software, the
+hard-pressed site managers will also have to deal with the wider range
+of astronomy applications software that will be available on Unix
+systems.
+\end{itemize}
+
+\subsection{Hardware}
+Starlink has, for some time, been buying peripheral devices which
+are compatible with the non-VAX-dependent SCSI interface standard.
+Small sums spent on SCSI interfaces will enable these to be transferred
+to future Unix systems.  Peripherals which cannot be transferred will
+either be retired along with their host VAX, some years from now, or
+will be replaced with SCSI devices as they get old.  It should not be
+forgotten that several generations of Starlink peripheral have come and
+gone during the VAX era, and even in a period of financial restraint it
+will still be cost-effective to phase out obsolescent equipment, to save
+on maintenance for example.
+
+In the future all CPU and peripherals purchased will, as far as
+possible, be Unix-compatible.  The hardware mix will thus move from the
+present VAX/VMS dominance (110~VAX/VMS CPUs and 20~Unix CPUs) towards
+Unix dominance, as existing VAX/VMS equipment reaches the end of its
+useful life and is eliminated.  The pace of this change is limited by
+several factors, two important ones being:
+\begin{itemize}
+\item The availability of suitable software to run on the new Unix
+hardware.  This varies from site to site, some sites being able to do
+almost all their processing on Unix platforms at present whereas others,
+regrettably, will not have suitable software available for some time.
+\item The availability of funds.  After the severe cuts in Starlink's
+funding introduced in 1990/91 there is very little, if any, money to
+spend on new hardware.  Unless this state of affairs can be corrected,
+the pace of change in hardware will be much slower than is required to
+keep abreast of international competition.  Furthermore, a slow change
+from VAX/VMS to Unix equipment will increase costs and/or reduce the
+levels of service to astronomers since it will lengthen the expensive
+period when both systems are run in parallel.
+\end{itemize}
+
+\subsection{System Management}
+The Project recognises the need for extra site management effort during
+the transition from VAX/VMS to Unix and would ideally like to provide it
+through additional contract staff.  However, at present funding levels
+this is unlikely so that fully effective use of new Unix hardware will
+require increased levels of ``self-help''.  It should of course be borne
+in mind that self-help by research astronomers may give poorer
+value-for-money to the community than employing and training appropriate
+technical staff, when lost scientific output is included in the analysis.
+
+\subsection{Applications Software}
+Throughout the history of Starlink, astronomers have preferred to see
+resources concentrated on providing new hardware and in order to do so
+have been willing to forego the development of integrated and
+machine-independent software.  The consequence of this policy is that
+Starlink software has lagged behind developments in hardware and has
+some catching-up to do.  Until all key Starlink software has been made
+to run on the new hardware, users will naturally turn to whichever
+existing package suits their work best -- IRAF, AIPS, Sun-Figaro, IDL,
+MIDAS {\it etc}.  There is clearly a possibility that such usage will
+become permanent, with the adverse consequences that the user community
+will remain fragmented, software support effort will be diluted, and the
+existing investment in Starlink software made by the Special Interest
+Groups will be thrown away.
+
+Porting of many existing Starlink applications is already underway,
+using the infrastructure software that has already been provided in
+SunOS- and Ultrix-compatible form (for example PGPLOT and HDS), and
+quick results are being achieved.  Conversion of the various libraries
+and tools which make up the ADAM environment is in hand, and the easy
+porting of large quantities of application code will begin in less than
+a year.  Adaptation of individual applications by astronomer/programmers
+is usually straightforward, especially since both the Sun and DECstation
+machines support VAX Fortran extensions.
+
+Until Unix versions of popular applications appear, experience suggests
+that most users will not bother to change from VMS.  (An exception to
+this may be Figaro, where some users will be prepared to adapt their
+work to the Caltech Sun version.  This is not a worry, because Figaro
+{\it applications}\, have been an important part of Starlink's plans
+for several years, and their compatibility with Starlink's
+{\it infrastructure}\, software is steadily increasing.)
+
+Another factor which blurs the switch to Unix and stretches the time
+available for application porting is that the portable HDS system,
+together with the NFS file-serving facilities, will enable users to work
+on the same set of files simultaneously from a VAX and a Unix machine
+(from the same screen if an X-terminal is available).  This means that a
+user will be able to exploit a Sun (say) for CPU-intensive parts of his
+work long before every last VAX application that he might need has been
+ported.
+
+But as Starlink's investment in Unix equipment grows, why not simply run
+IRAF, AIPS and so on, letting the present Starlink software die with the
+VAXs?  One reason not to pursue such a policy is that in comparison with
+competing packages, the Starlink products offer significant advantages,
+including:
+\begin{itemize}
+\item A great deal of application software is already available under
+the ADAM environment, much of it superior to corresponding programs in
+the older packages.  For example, the ADAM 2-D photometry package
+PHOTOM is far better than the corresponding set of facilities in Figaro.
+\item Separate specialised application packages retain their advantages,
+yet can share data with each other using HDS and have a common
+user-interface.
+\item The data structuring facilities are much better than in most other
+packages, offering a rational approach to extension, the ability to
+process sub-arrays, handling of ``data quality'' and ``error-bar''
+information, and so on.
+\item The applications are written in industry-standard languages
+(notably Fortran) and are easy to develop.
+\item There is technical support from Starlink and a development
+programme under UK control.
+\item An extensive suite of kernel applications makes expensive
+duplication between separate packages avoidable.
+\end{itemize}
+None of the existing software environments from sources outside Starlink
+offers all of these advantages.
+
+\subsection{Networking}
+With the eclipse of the VAXs, the present DECnet service will be
+overtaken by one based on TCP/IP protocols.  TCP/IP is the natural
+networking to use with UNIX systems, and is used on those networks in
+the USA and elsewhere commonly referred to as the {\it Internet}.  The
+TCP/IP protocols offer broadly the same capabilities and performance as
+DECnet but are less integrated with the rest of the operating system.
+The Joint Academic Network JANET, which supports Starlink's present
+DECnet service, will soon be running TCP/IP and will be integrated with
+the Internet in the same way that Starlink's current DECnet is
+integrated with SPAN.
+
+Starlink's present high levels of network security will need to be
+maintained throughout the transition to Unix.  Most present Unix
+implementations are less comprehensive than VMS in this area, and so
+care and circumspection will be needed if existing levels of protection
+against unauthorised use are to continue.
+
+\subsection{Why Not Scrap VMS Immediately?}
+Having accepted that a transition to Unix is coming, many users will
+naturally wish to get on with the change.  Why not suspend maintenance
+on the VMS software and the VAX hardware, switch off individual VAXs as
+they become unserviceable, or run Unix on the existing VAXs?  Here are
+some of the factors that will affect the timing of the transition and
+the level of any residual VMS service:
+\begin{itemize}
+\item There is a large body of more or less VAX-specific application
+software which astronomers need to use, both private and
+Starlink-distributed.
+\item Users need time to adapt themselves and their software to the new
+ways.  The body of VMS expertise that the community has built up over
+the last decade is a valuable resource that should not be sacrificed
+with unnecessary haste.
+\item There are vital DEC utilities which need to continue (for example
+VAX Notes).  Time will be needed to identify and install Unix
+equivalents.
+\item Compatibility with wide-area-networks needs to be maintained,
+and it will take time to make a full transition to TCP/IP-based
+protocols.
+\item It is important to remain compatible with the overseas
+observatories, various space missions and other existing activities.
+\item The pace of change is limited by the funds available for new
+hardware.
+\end{itemize}
+
+\section{WORK IN PROGRESS}
+\subsection{Software}
+Very little of Starlink's current software work is VAX-specific.
+
+Open standards are now accepted by everyone, from the users (most
+of whom no longer regard software portability as a frivolous
+computer-science distraction) to manufacturers (who are finding it
+ever harder to ensnare their customers through machine-specific
+software).  It is now possible for almost every line of code being
+written to be platform-independent (non-Unix as well as non-VMS);
+consequently, most of the VMS-specific effort now being expended by
+Starlink is in the areas of system support and software distribution, as
+opposed to developing new software.
+
+Most of the applications software currently available on Starlink's Unix
+hardware runs under portable environments from overseas sources where
+the switch from VMS to Unix was made some years ago:  AIPS, MIDAS, IRAF,
+IDL.  There are also various freestanding applications in use, including
+the SAOIMAGE image display and manipulation utility.  A Caltech version
+of the popular FIGARO package is available for Sun.  (The applications
+from the AAO-sourced Figaro can be run under the ADAM environment and
+will therefore in due course operate on Unix platforms, hopefully
+eliminating the need for a separate and less up-to-date Caltech version.)
+Most of the completed Starlink Project porting work to date has
+concentrated on infrastructure software (GKS, SGS, GNS, PGPLOT, and
+various ADAM libraries) to enable programmers to begin porting
+applications, both ADAM and non-ADAM.  Work is almost complete on Sun
+and DECstation versions of the HDS package, a vital part of Starlink
+applications and unmatched in rival environments.  Applications software
+which conforms to the Starlink programming standard (SGP/16, which has
+been available since 1981), is likely to run unchanged on Unix
+platforms, or with minimal changes.  For example all but one or two
+minor routines from the SLALIB library run without change on DECstation
+and Sun, and DECstation versions of the ASTROM and COCO applications
+have been demonstrated (also MS-DOS versions on PC).  Portable
+adaptations of these and other existing Starlink applications will be
+produced as dictated by user demand and the availability of manpower.
+
+Much of the work on ADAM applications in the past has been to adapt
+pre-existing packages, providing a more consistent user interface,
+allowing easy and efficient data interchange, and giving access to
+common graphical tools, all of which are, directly or indirectly,
+major benefits for the user.  The main thrust of this integration
+programme has been in the important FIGARO system, particularly through
+the use of standard Starlink NDF/HDS data structures.  Another package
+brought into the ADAM-based set is DAOPHOT, and an ADAM version of NOD2
+is in preparation.  In addition to these adapted applications, many
+packages have been developed specially for ADAM, or are now offered
+only in ADAM form.  These include KAPPA, PHOTOM, PISA, ASTERIX, IRCAM,
+SCAR, TSP, TRACE and IKONPAINT.  The bulk of the work on new
+applications being carried out by Starlink is ADAM-based.  Packages in
+preparation include IRAS90, PONGO, CCDPACK and a galaxy photometry
+suite.  There are also ADAM-based supporting utilities
+for data translation, program metrics and documentation production --
+CONVERT and SST.  All of these applications will be readily portable to
+Unix machines once the Unix-compatible ADAM is available.  The same goes
+for the private software which has been developed within the ADAM
+framework, or using major ADAM subsystems like the graphics and image
+display libraries and the HDS hierarchical data system.
+
+\subsection{Hardware}
+Most discussions on Unix-based hardware for Starlink have tended to talk
+of ``workstations'', simply because this class of device is the one most
+sites are asking for and the only one currently represented on Starlink.
+However, in addition to workstations, the Project is looking actively at
+several other types of equipment, from minisupercomputers like the
+Convex to board-level processors like the i860.  Nevertheless, in spite
+of the obvious fact that processing tasks requiring the fastest CPUs or
+the largest memories can only be run on specialised devices of one sort
+or another, experience shows that workstations are useful for a
+surprisingly wide variety of tasks.  For example, at Jodrell~Bank the
+Sun SPARCstation~2 has proved to be faster than the Alliant
+minisupercomputer on scalar work and, unexpectedly, comparable to the
+Alliant on AIPS mapping job-mixes where the Alliant was expected to
+excel.  Also, multi-user access to Sun and DEC workstations from X- and
+character-terminals proves very successful, allowing the workstations to
+double as compute servers.
+
+Another point to be considered is the extent to which the existing
+Starlink workstations, most of which are Suns, will dictate future
+purchases.  Are we to be locked into Sun equipment?  The answer to this
+question is no.  We already have a mixture of equipment on Starlink,
+including DECstations as well as Suns, and it is the Project's intention
+to continue developing truly portable forms of the Starlink software,
+not Sun-only (or even Unix-only) versions.  However, system management
+workload has to be taken into account when deciding what equipment to
+use, and at a site which already had, say, Suns there would be a strong
+incentive to continue using them.
+
+\section{ADVICE TO STARLINK USERS}
+Resource constraints, both in terms of money and manpower, mean that
+though Starlink will do its best to extend Unix capabilities to all
+sites soon, it cannot provide the large numbers of Unix computers which
+users want, nor the user-training and the documentation to bring the
+equipment into effective use.  Several sites still do not have a
+single Starlink-provided Unix machine, and this may be true for another
+year or two in places.  Even at sites where such equipment has been
+provided, present budgets will not allow elaborate education programmes
+to be carried out by Starlink, nor is it clear that this is needed.  It
+should be possible to obtain the required growth in Unix expertise from
+local resources, as follows:
+
+\begin{itemize}
+\item On the hardware side, users should make every effort to gain
+access to HEI-provided Unix computers.  This may mean taking up local
+computing departments' offers of equipment (as has happened in some
+cases already) or making direct approaches and asking for such hardware.
+\item Site managers and users should investigate what training courses
+are locally available.  Most HEI computing departments have several
+years' experience in Unix, and the quality of training they can provide
+is generally very good.
+\item Having gained access both to the hardware (whether
+Starlink-provided or not) and to training, users should be prepared to
+transfer some part of their work from the VAX to the Unix equipment --
+perhaps one-off Fortran development, or text-processing -- in order to
+develop and retain expertise in Unix commands and utilities.
+\item Programmers planning to move private code from the VAX to a Unix
+platform would be well advised to check their programs for compliance
+with the Starlink Application Programming Standard (see SGP/16).  Even
+though both of the present favourite machines (Sun and DECstation)
+support DEC Fortran extensions, these extensions may not be available on
+HEI-provided equipment or on hardware which the Project may purchase in
+the future.  A further piece of advice is to adapt applications to run
+in the Starlink ADAM environment -- in other words to call Starlink
+libraries to perform input/output, error-handling, parameter input and
+so on.  Such applications can be run now on the VAXs, and later will
+move to Unix platforms without significant extra effort.
+\item Agreeing on an acceptable Unix-compatible text editor is a
+potential problem.  Users have the choice of (i)~learning Unix's
+hairshirt screen editor {\it vi}, (ii)~mastering the comprehensive
+portable editor EMACS, or (iii)~giving in to temptation and using
+whatever machine-specific screen editor comes with their Unix computer.
+For most users EMACS is probably the best choice, and it is being provided
+on all Starlink processor types.  Programming specialists tend to use
+{\it vi}, which they can rely on finding on all Unix systems and with
+which they can achieve high typing speeds.
+\item Many Unix features are most accessible from the C programming
+language, and some astronomer/programmers will find proficiency in C of
+growing benefit.  C compilers are provided on Starlink VAXs, and there
+is a Starlink C programming standard (SGP/4).  However, C is less suited
+to applications involving intensive numerical work, where Fortran is
+still the recommended language, and in the future Fortran~90 is expected
+to take over from Fortran~77 as the language of choice for Starlink
+applications.  The document SGP/5 shows how to write applications in a
+mixture of Fortran and C.
+\end{itemize}
+\end{document}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            

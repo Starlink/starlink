@@ -1,0 +1,686 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocsource}    {sgp\stardocnumber}
+\newcommand{\stardocnumber}    {49.1}
+\newcommand{\stardocauthors}   {J.\,C.\,Sherman\\
+                                C.\,A.\,Clayton}
+\newcommand{\stardocdate}      {28th May 1996}
+\newcommand{\stardoctitle}     {Starlink's Support for PCs}
+\newcommand{\stardocabstract}  {
+
+This paper outlines Starlink's policy on support for PCs.
+Essentially, we aim to use PCs as low-end multi-user
+workstations running Linux, a variant of Unix, and to
+integrate them with existing Unix systems.  We also aim to
+make most Starlink software available for the PC/Linux
+platform.
+ 
+Starlink's policy on support of PCs is likely to develop
+over the next few years.  Readers are therefore advised
+to check that they have the most up-to-date version of this
+document.  The policy outlined here was agreed by the
+Starlink Panel at their meeting in March 1996.
+
+}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+% \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section{Introduction}
+
+The policy on Starlink's support for PCs, as outlined here, is our first
+such policy but, we expect, not our last.  In other words, we expect
+this initial policy to be modified in the light of experience.   We
+are therefore starting with a modest level of support, which can be
+increased subsequently if practical and desirable. Much of what
+follows is aimed at minimizing the PC support load on Site Managers and
+RAL staff, PC support being in addition to present duties which are
+already demanding.
+
+It is intended that Starlink's PCs are treated as low-end, multi-user
+workstations (only a few users simultaneously), similar to present
+low-end SPARC and Alpha workstations, and {\em not} as ``personal''
+systems.  To this extent the title of this paper is misleading; a
+better title might be {\em Starlink's Support for Low-cost Unix
+Workstations}.  Some sites are already using PCs as X-terminals but the
+present policy goes well beyond such use.  The multi-user approach has
+many implications and consequences, as noted in the following sections,
+and makes a large contribution towards minimizing the support load on
+Site Managers and RAL.
+
+\section{Why bother with PCs?}
+
+Starlink is incorporating PC hardware into present SPARC and Alpha
+systems for several reasons, as outlined in the following sections, but
+not least of all because PCs are good value for money.   Compared with
+SPARC workstations, for example, a Pentium based PC can be purchased
+for less than a SPARC 4 but with more CPU power than a SPARC 10, or
+even some models of SPARC 20.  Of course, such comparisons are not
+straightforward because there are other parameters besides price and
+CPU power, for example I/O speed and expandability.  Comparisons are
+also difficult because prices and product specs are continually
+changing.  Nevertheless, we believe that PCs represent good value for
+money and could be valuable enhancements to existing systems.   
+
+Some detailed comparisons of price and performance for Pentium PCs,
+low-end SPARC workstations and low-end Alpha workstations are given in
+Appendix A.
+
+
+\section{What Operating System?}
+
+Starlink supports only PCs running Linux.  In other
+words, no significant support is provided for PCs
+running any other operating system.  Linux
+has been chosen because it is a version of Unix (and hence multi-user),
+is free and is in widespread use by astronomers.   The advantages of
+choosing a version of Unix are that (a)
+differences with existing systems are minimized, for both users and
+support staff and (b) porting Starlink software is relatively easy. Sun's
+Solaris is also available for PCs but is not free and, more importantly,
+its use is far less widespread than Linux. Linux is becoming the {\em
+de facto} standard for astronomical applications on PCs --- IRAF, AIPS,
+MIDAS and IDL are already available.   Furthermore, Linux comes with
+various important Unix tools built-in, such as \LaTeX, {\tt pine, Tcl/Tk}
+and compilers, and experience shows it to be reliable (at least as reliable
+as Solaris).   Starlink supports only Linux
+(as opposed to Linux plus a variety of other PC operating systems)
+simply to minimize the support load.  The adoption of Linux rules out
+support of Macs at present, which do not run Linux at the time of writing.
+
+Of course, Linux is not without its disadvantages.  Because it is free,
+support cannot be guaranteed, but our experience so far is that help
+with problems is, nevertheless, readily available.  The usual Linux Fortran
+compilers (g77 and f2c) also have some problems but the lack of VMS
+extensions in one of them (f2c)  has been corrected as part of our
+porting work (see the next section).  Finally, Linux has less support
+for updating a cluster of machines than Solaris but we expect
+Starlink's Linux upgrades to be infrequent.
+
+All in all, the choice of Linux over other operating
+systems for PCs seems clear and work on porting
+Starlink software to Linux has been going on at a low level since
+early 1995 (see the next section).   It is intended that the version(s)
+of Linux adopted by Starlink will be compatible with IRAF, AIPS and IDL.
+
+\section{Starlink Software under Linux}
+
+At the time of writing, all of Starlink's infrastructure software has
+been ported to Linux and has been tested subsystem by subsystem.  We
+have six applications running at present, FIGARO, DIPSO, SPECDRE, KAPPA,
+IRAS90 and
+CATAPP, and work is continuing on testing these applications, testing
+the infrastructure through them and porting further applications.
+These first applications have been chosen because they
+are NAG-free (except KAPPA) and because they are good tests of the
+Linux compiler and infrastructure port. We expect to have most
+Starlink applications ported by the summer of 1996.
+
+Experience with running the applications ported so far indicates that
+PC/Linux performance is well up to expectations, in line with the
+positive reports from those running IRAF on this platform.  We have run
+the Linux versions of SPECDRE and KAPPA as part of Starlink's
+benchmarking suite but as yet don't have enough applications running
+under Linux to provide a STARmark rating for PC/Linux.  Early
+indications are that the memory required to properly exploit a Pentium
+PC running Starlink applications is 32 Mbyte.  The same software will
+also run on older 486 based PCs with less memory, but obviously with
+lower performance. Nevertheless, we expect 486 performance to be
+acceptable to a single user for many applications.
+
+PC hardware requirements for various astronomical software systems are
+listed in Appendix B. 
+
+\section{Other Advantages}
+
+As well as the value for money benefits noted in \S 2, there are
+several other major advantages to UK astronomers which follow from
+Starlink support of the Pentium PC/Linux platform.  They stem from the
+fact that there are a significant number of ``non-Starlink'' PCs
+already in use at Starlink sites.   If these PCs remain non-Starlink
+(no integration with Starlink systems, no Site Manager support and no
+maintenance) then Starlink software (under Linux) will nevertheless be
+available for them, alongside IRAF, AIPS, IDL etc.   If, on the other
+hand, these PCs become ``part-Starlink'', then as well as software the
+benefits for astronomers would include integration into existing
+Starlink systems, Site Manager support and maintenance.
+
+As with other equipment which becomes part-Starlink, such PCs would
+become part of the {\em site's} equipment under the control of the
+local Management committee and would be available to
+all.  However, the hardware configuration of some non-Starlink PCs may
+be very different from that of ``standard'' PCs (see below), making the
+adoption of such machines as part-Starlink impractical.  The
+adoption and integration of non-Starlink PCs is decided case by case
+and site by site, with the change to part-Starlink status going ahead
+only if all parties (the original purchaser of the equipment, the site,
+the Site Manager and Starlink) are in agreement.   If management or
+support problems do arise, the PC concerned will revert to
+non-Starlink status.
+
+\section{Hardware Restrictions}
+
+It is intended that Starlink PCs are fully integrated into existing
+systems and are loaded with software from the network and from CD-ROM
+(see the \S 8).  The {\em minimum} hardware requirement for a
+``standard'' Starlink PC is therefore a powerful processor (Pentium),
+16 Mbytes of memory (32Mb recommended), an ethernet interface and a sizeable hard disc
+(half Gbyte or more).  This minimum requirement assumes a CD-ROM drive
+can be accessed via the network.
+
+There are many different varieties of PC on the market.  To provide
+full support for all possible combinations of PC, add-on boards
+(ethernet) and peripherals (hard disc, CD-ROM) would be an impossibly
+large load on Site Managers and RAL staff.   Instead, 
+full support is restricted to  (a) the PCs, add-on boards, discs etc.
+purchased by RAL, and (b) the very similar equipment purchased by
+others which has been given part-Starlink status.  Of course, Linux and
+Starlink software will probably run on other ``non-standard'' hardware
+combinations but support for such non-standard hardware will be limited
+to only a best-efforts basis.
+
+Furthermore, the equipment purchased by RAL for sites, and
+therefore fully supported, is restricted initially to the type of
+hardware RAL is already familiar with --- Viglen PCs. 
+This range of hardware may expand somewhat as our experience
+increases.  Advice on whether other hardware combinations could run
+Starlink software or could be integrated into Starlink systems will be
+provided, but again only on a best-efforts basis.   All the
+restrictions noted here are aimed at minimizing the extra support load on
+Site Managers and RAL staff which follows from support for a third
+platform (PC/Linux) in addition to the present two platforms
+(SPARC/Solaris and Alpha/Digital-Unix).
+
+\section{Some Difficulties}
+
+One obvious difficulty is that support for PCs will be in addition to
+present duties.   However,  constant themes of this policy are: (a) to
+minimize the extra workload and (b) to make PC support optional for
+each site (it will not be optional for the Project at RAL or for our
+contract programmers).  In addition,  the reduction over the past two
+years in the number of platforms supported, from a peak of five
+(MicroVAX/VMS, DECstation/Ultrix, SPARC/SunOS, SPARC/Solaris,
+Alpha/Digital-Unix) down to two (SPARC/Solaris, Alpha/Digital-Unix), 
+will at many sites open up the possibility of taking on PCs.
+
+There are two, more serious, difficulties, both related to Starlink
+users' perception of PCs:  \begin{itemize} \item Many see them as
+personal machines and may be disappointed that Starlink is treating
+them as multi-user.  Starlink may eventually reach a situation where
+every user has an X-screen on his or her desk, or even where every user
+has a CPU on their desk.  However, we are at present far from this
+ideal situation (we have, roughly, 1 Unix system per 4 active on--site
+research users) so it is inevitable that users have to share CPUs.
+Hence, although it may disappoint some users, we have decided to run
+the systems as shared, multi-user, low-end Unix workstations.
+
+\item Many users may expect PCs to run Windows and may be disappointed
+to find Starlink PCs running Linux.  \end{itemize}
+
+Both difficulties can be ameliorated by allowing Starlink PCs to
+occasionally run Windows, say 10\% of the time or less.  When they do
+so they they would no longer be multi-user systems so the decisions on
+when to change from one system to the other would be for the site as a
+whole (the Site Manager and Site Chairman), not for individual users.
+Starlink would not provide any support for Windows, the Site Managers'
+maximum involvement with Windows being to shut down Linux and boot Windows
+and vice versa.  We hope that sites that wish to work this way will be
+able to devise suitable arrangements to allow a small amount of Windows
+use to  co-exist with the majority Linux use. Sites wishing to provide 
+user support for Windows will have to find the necessary effort from their
+own resources.
+
+Starlink recognizes the benefits to astronomers of Windows applications
+such as DTP and spreadsheets but has concluded that the limited
+resource available for PCs and PC support at present must be
+concentrated on the PC/Linux platform, with only negligible resource
+diverted to PC/Windows.
+
+\section{Software Distribution}
+
+PC software, both Linux and Starlink, is
+distributed on CD-ROM (Starlink now has the capability of making a
+small number of CD-ROMs).  For Linux, we distribute the Linux
+CD-ROM set, some optional pre-built kernels suitable for Starlink
+hardware, configuration files tailored to Starlink hardware, a
+recommended book on running Linux and Starlink documentation on Linux
+building and installation.   All of this is backed up by advice
+and support from RAL.   Linux, like other versions of Unix, can be
+configured in many different ways.   We hope that by distributing
+pre-built kernels and configuration files and through the documentation
+we can reduce diversity and so can reduce the support load on Site
+Managers and RAL.   Starlink's Linux distributions take place
+from time to time, depending on the changes in Linux since the previous
+distribution.  We expect the frequency to be less than once per year.
+
+Starlink software for PCs, both infrastructure and
+applications, is available via the
+network from Starlink's ``Software Store'', in just the same way as
+software for SPARC/Solaris and Alpha/Digital-Unix.   In addition, at
+roughly six month intervals, we will take a snap-shot of the PC
+part of the software store and distribute it on CD-ROM to relevant
+sites.  It is a well established policy that Starlink software for
+SPARC/Solaris and Alpha/Digital-Unix stems from a single version of the
+source code.  This policy has been extended to include
+PC/Linux so that all three platforms share a common source.   To
+this extent, the level of software development and support for all
+three platforms is the same --- bug fixes and improvements made
+to software running on one platform will at the same time benefit the
+other platforms.
+
+A major difference compared with software distribution for our two main
+platforms is that there is {\em no} requirement for Site Managers to
+update their copies of PC/Linux software whenever there is a change.
+For SPARC/Solaris and Alpha/Digital-Unix software there is such a
+requirement (the USSCs), so that sites remain up to date and in step
+with each other,  but updates would be optional for PC/Linux.  
+At a minimum sites should update PC/Linux software
+whenever they receive a CD-ROM distribution, roughly once every six
+months. Some sites will of course choose to keep their various versions of
+the Starlink software in step for the convenience of their users.
+As well as distributing a Starlink CD-ROM, we could also, if
+sites wished, distribute CD-ROMs for other software of interest to
+astronomers, for example IRAF.
+
+
+\section{Ancillary Software}
+
+As well as the operating system, infrastructure software and
+astronomical applications, the SPARC and Alpha systems run a variety of
+other software, such as {\tt pine}, \LaTeX, {\tt perl, ispell, jed,
+NuTPU, Mosaic \& Netscape, Vbackup, pidentd} and {\tt httpd}.   
+Where this software can be easily provided for PC/Linux
+we will do so but where it would take considerable effort we will
+not.  The latter arrangement is reasonable in view of the fact that all
+the software is already available on the main SPARC and Alpha systems.
+
+The details of what will and will not be made available for PC/Linux
+systems have not yet been fully worked out, but some examples (covering
+around half the software involved) are:  \begin{itemize} \item {\tt
+pine}, \LaTeX and {\tt perl} come with Linux.  They might
+      be different versions from those running on our SPARC and Alpha
+      systems but any differences apparent to users are unlikely to be
+      significant.  \item {\tt ispell} and {\tt jed} also come with
+Linux.   To make them
+      the same as the versions running on SPARC and Alpha systems, 
+      we will copy across Starlink's (English) dictionaries for
+      {\tt ispell} and our tailored configuration files for {\tt jed}.
+\item {\tt NuTPU} is proprietary software which was purchased to
+      make an EDT-like editor available on Unix.  It will not be
+      made available on PCs.  \item {\tt Mosaic \& Netscape} should
+be made available on PCs but at
+      present they are not on the Linux CD-ROMs.   We therefore intend
+      that RAL will obtain them and make them available with our Linux
+      distributions.  \item {\tt Vbackup} is proprietary software which
+was purchased to
+      allow VMS backup tapes to be read on Unix systems.   It 
+      will not be made available on PCs.  \item {\tt pidentd} is the
+identity checking software which is required
+      to run Starlink Forum.  Like {\tt Mosaic \& Netscape}, it does
+      not come with Linux but RAL will make it available with our Linux
+      distributions.  \item {\tt httpd} is the web server.  Since other
+machines will
+      probably be more suitable as web servers, it is not proposed to
+      make this available on PCs.  \end{itemize}
+
+Taking the above together with the
+previous section (Software Distribution), it can be seen that all
+software running on SPARC and Alpha systems will also be available on
+PCs, with the exceptions that (a) Starlink's astronomy applications {\em may}
+be up to six months behind and (b) some ancillary software may be
+missing or a different version.
+
+\section{Maintenance and other Support}
+ 
+As for other equipment purchased by Starlink, Starlink would maintain
+the PCs it purchased, either per-call or, if the numbers are sufficient,
+via an on-site maintenance contract.
+ 
+To help ensure that Starlink and part-Starlink PCs, like other
+Starlink hardware, are accessible to all users at a site, we require
+that they are located on-site, not, for example, at an astronomer's home.
+Consistent with this, if non-Starlink
+PCs are located at home then the support provided by Site Managers
+for such PCs, for example, to do with logging on from home, should be
+at most
+on a best efforts basis.
+ 
+PC hard discs will be backed up as part of the usual site-wide disc
+backups in a similar way to discs on other low-end workstations.
+%However, Linux does not include a version of the {\tt dump} program and
+%hence including PC hard discs into existing procedures will create
+%additional work for Site Managers.
+
+\section{What Next?}
+ 
+Sites wishing to obtain  Starlink PC(s) should bid for them
+in their responses to Starlink's Announcements of Opportunity
+(AO).  As described previously, the bids should be for PC(s)
+to run Linux and for use in astronomical data reduction and
+analysis.  The PC could run Starlink applications or
+Linux versions of IRAF, AIPS, etc.
+ 
+Sites wishing to obtain the Linux version of Starlink software,
+for use on Starlink or non-Starlink PCs,
+can do so via the Starlink Software Store 
+or via CD-ROM.  Requests for CD-ROMs should be addressed to
+Mr K P Duffey, Starlink, RAL.
+ 
+Sites wishing to have existing non-Starlink PCs adopted as
+part-Starlink should first make themselves familiar with
+the conditions associated with such adoptions and then
+contact Mr D J Rawlinson, RAL.
+ 
+
+\section{Summary}
+ 
+In summary, this policy states that:
+\begin{itemize}
+\item   PCs running Linux, bid for by sites and allocated by the Panel 
+        as part of the
+        AO round, will be integrated into existing Starlink systems as an
+        alternative type of low-end Unix workstation;
+\item   The support provided by RAL and Site Managers for such equipment
+        is the same as provided for present low-end Unix workstations, with
+        the exception that software updates need not be as frequent and
+        not all ancillary software will be available (see \S 8 and \S 9);
+\item   Existing PCs can be adopted as part-Starlink, if a site
+        agrees, provided the hardware is sufficiently similar to
+       ``standard'' hardware and provided the equipment becomes
+        accessible to all users;
+\item   A small amount of Windows use can, if a site wishes, be
+        combined with the majority Linux use but almost all the Starlink 
+        resource going into PCs and PC support must be concentrated on the 
+        PC/Linux platform.
+\end{itemize}
+ 
+\newpage
+
+\appendix
+
+\section{Price and Performance Comparisons for ``low-end'' Machine (May 1996)}
+
+The following table gives a simple price/performance comparison for
+low--end Digital, Sun and PC-based systems. Various configurations of
+varying compute power are given, but with otherwise identical hardware
+features (where possible). Issues such as relative bus speed,
+graphics acceleration and expandability have {\em not} been taken into
+account. The price is given ex-VAT and after discount.
+
+Specification:
+\begin{itemize}
+\item 17" Colour monitor
+\item 32Mb RAM (greater on Digital Unix machines which require more RAM)
+\item 1Gb internal disk
+\item Ethernet card
+\end{itemize}
+ 
+\begin{table}[h]
+\begin{center}
+\begin {tabular}{|l|r|r|}
+\hline
+{\bf System}                 & {\bf Performance}  &   {\bf Price (ex-VAT)} \\
+\hline
+AlphaStation 200 4/100       &    92 SPECfp92 &   No longer available  \\
+AlphaStation 200 4/166 (40Mb)&   134 SPECfp92 &   \pounds 2799  \\
+AlphaStation 255 5/233 (64Mb)&   230 SPECfp92 &   \pounds 5000  \\
+\hline
+SPARCstation 4 Model 110     &    65 SPECfp92 &   \pounds 2562  \\
+SPARCstation 10 Model 51     &    83 SPECfp92 &   No longer available  \\
+Ultra 1 M140                 &   303 SPECfp92 &   \pounds 6104  \\
+\hline 
+Pentium 100                  &    90 SPECfp92 &   \pounds 1785  \\
+Pentium 133                  &   110 SPECfp92 &   \pounds 1885  \\
+\hline 
+\end{tabular}
+\caption{Price and Performance comparisons (May 1996)}
+\end{center}
+\end {table}
+
+%\newpage
+
+\section{PC Hardware Requirements}
+
+To give an indication of the sort of hardware that is 
+suitable for running astronomical applications, 
+the recommendations for PC hardware to run IRAF, AIPS and IDL
+are noted below. It is expected that the requirements of Starlink
+software will be similar to those of IRAF and AIPS.  An ethernet
+interface will also be required. The following notes come from the
+software providers themselves (IRAF and IDL) or from Jodrell Bank (AIPS).
+ 
+\begin{tabbing}
+xxxxxxxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxx\kill
+{\bf IRAF minimum}  \> 486-33DX CPU with 16 Mb memory, 500 Mb disc\\
+                    \> and 15" monitor;\\
+{\bf IRAF recommended} \> Pentium 90 CPU with PCI bus, 32 Mb memory,\\
+                       \> 2 Gb disc and 17" monitor;\\
+{\bf AIPS minimum}  \> 486-66DX2 CPU with 20 Mb memory, 1Gb disc\\
+                    \> and 15" monitor;\\
+{\bf AIPS recommended} \> Pentium 90 CPU with PCI bus, 32 Mb memory,\\
+                       \> 2 Gb disc and 17" monitor;\\
+{\bf IDL minimum}   \> 486-66DX2 CPU with 8 Mb memory.
+\end{tabbing}
+ 
+\newpage
+ 
+\end{document}

@@ -1,0 +1,590 @@
+\documentstyle{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {6.1}
+\newcommand{\stardocauthors}   {C A Clayton}
+\newcommand{\stardocdate}      {9 October 1990}
+\newcommand{\stardoctitle}     {The Cipher M990 Tape drive}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction}
+
+Starlink uses a variety of 1600/6250 bpi tape drives at its various sites.
+These include the SI 9621, the CDC Keystone 3, the Cipher M990 and one or two
+other drives. 
+Starlink currently has Cipher M990 tape drives at Manchester, Leicester, ROE,
+Cambridge, Birmingham, Armagh, Belfast, Oxford, UCL, Southampton, St. Andrews,
+Sussex, Cardiff and QMW. The majority of these are controlled by Dilog DQ153
+and DQ3153 controllers. Managers as 
+sites which do not have one of these controllers and who
+are unhappy with the functionality of their present controller should contact
+the author.
+
+This document is aimed at Site Managers and describes how to make the most of
+their Cipher M990s. Some of these devices have not been optimally set-up by
+engineers and some simple tuning may improve performance dramatically.
+Any corrections, improvements or suggestions for this document will be most
+gratefully received by the author. This document does not attempt to explain
+to users how to use the drive since this is almost impossible to do this
+without complex diagrams and it is far more effective for a Site Manager to 
+actually demonstrate the procedures to new users. 
+              
+
+\section{Loading and Unloading tapes}
+
+The following tips should be passed on to new users when you show them
+how to use the Cipher.
+
+\subsection{Automatically loading a tape}
+
+To load a tape you simply insert the tape into the drive and onto the hub,
+close the door and press the load button and then the on-line button.  However,
+it is worth noting that you can increase the chance of the drive successfully
+loading your tape first time and more quickly by leaving about 30cm of tape 
+hanging out of the drive when you close the door. This is known  as the
+Dragon's tongue method of loading a tape, since as the tape starts to  rotate
+the ``tongue'' of tape flicks around as it is pulled into the  interior of the
+drive. Tapes sometimes fail to load when the end of the tape adheres to the
+main roll of tape and the tape drive is unable to  blow the end along the tape
+path and wind it onto the take-up hub. The dragon's tongue method of loading
+keeps the end of the tape free and allows the drive to blow it easily along the
+tape path.
+
+\subsection {Manually loading a tape}
+
+In cases of dire emergency, it is also possible to load a tape manually but
+this is generally not recommended since there is potential to damage both the 
+user and the drive. In addition, it is very time consuming. The first time the
+author tried this, it took him over 10 minutes to succeed in loading a tape
+manually. The difficult parts are getting the feet to lock onto the tape 
+reel properly and
+ensuring that the correct amount of tape is wound onto the rear hub.
+
+\begin{enumerate}
+
+\item Switch off unit.
+
+\item Extend front support leg of rack (if any) and slide drive out of rack.
+
+\item Lift up top cover and switch on unit.
+
+\item Place reel of tape on the front hub.
+
+\item Depress and hold the white manual unlock button, located behind the
+front-panel door on the bottom left-hand side of the tape reel opening,
+while simultaneously rotating the front hub clockwise until the front hub is locked
+in place.
+
+\item Manually thread the tape leader around the tape guides. {\bf Take care} 
+when moving the spring-loaded tachometer (the arm with the rubber wheel which
+rests against the rear hub) towards the rear hub. {\bf Do not} let the
+tachometer strike sharply against the hub.
+
+\item Move the tachometer away from the rear hub and thread the tape 
+leader around the hub in a clockwise direction. Gently rest the tachometer on
+the rear hub.
+{\bf Never} to try to operate the
+drive with the tachometer arm  pulled away from the take up hub. The tachometer
+measures the speed at which the tape is going past it and adjusts the rotation
+speed of the hub to a constant number of inches per second past the read/write
+head. If you take the tachometer arm away (because you have got some tape
+wrapped around it perhaps) then the thing takes off at warp 9 and shreds your
+tape. Very spectacular, but not recommended.
+
+\item Manually rotate the rear hub about three turns.
+
+\item Activate test 133 to override the cover interlocks (see Section 5).
+
+\item Press the Load switch while pressing the Density select switch.
+
+\item Release both switches, stand well back and wait for the tape to load.
+There is some degree of danger at this stage since there
+is nothing to protect you against the tape end as it whips around.
+                                                                     
+
+\end{enumerate}
+
+\subsection{Unloading a tape}
+
+To unload a tape, simply take the drive off-line and press the unload  button.
+Occasionally, users leave the drive in a state where the three ``feet'' that hold
+the tape onto the hub get stuck in the engaged position and it is not possible
+to take the tape out. {\bf Do not} try using brute force to  remove the tape. You
+will damage the feet and render the drive useless. The correct procedure to
+release the tape is to open the door, press and hold in the white button below
+and left of the tape and then slowly rotate the tape anti-clockwise. The feet will retract into
+the body of the hub and you will be able to remove the tape without damaging
+the drive. The last part of the rotation before the feet retract requires a 
+{\bf slight} amount of additional force. 
+
+
+\section{Configuring your Cipher M990 for efficient operation}
+
+To optimise performance of the Cipher M990 unit, certain operating
+parameters for blocksize, transfer rate and various other options can be
+adjusted using diagnostic test 142 (Edit NOVRAM).
+
+\subsection{Using test 142}
+
+Take the drive off-line and unload tape (if any). 
+
+The front panel of the drive appears as follows
+
+\begin{verbatim}
+       load       unload      online      wrt test    density
+      -------     -------     -------     -------     -------
+         1           2           3           4           5 
+      -------     -------     -------     -------     -------
+\end{verbatim}
+
+Key in 451425 and the display will display the current value of the serial 
+port baud rate parameter (Parameter 1). The values of the configuration
+parameters can be displayed in the same order as the following list:
+
+\begin{center}\begin{tabular}{l@{\hspace{1cm}}l@{\hspace{1cm}}l}
+
+Number 	& Description				& Recommended value \\
+
+&&\\
+
+1	& Serial Port Baud Rate                   & INACTIVE \\
+2	& Host Supplied Parity                    & NO \\
+3	& Echo Read Strobes on Write              & YES \\
+4	& EOT Mode                                & NORMAL \\
+5	& Forward Hitch on Reverse                & YES \\
+6	& Echo 3200 bpi ID Burst                  & NO \\
+7	& Reserved                                & INACTIVE \\
+8	& Abort Active Writes on Overwrites       & NO \\
+9	& Interface Transfer Rate (kHz)           & 90.4  \\
+10	& Default Density on Power-up             & 6250 \\
+11	& Maximum Block Size (kbytes)            & 9  \\
+12	& Interface Ramp Delay                    & 3  \\
+13	& File Mark Write Sync                    & SINGLE  FMK \\
+14	& Read Error Retries                      & 3  \\
+15	& Write Error Retries                     & 8  \\
+16	& Error Correction on                     & YES \\
+17	& Unit                                    & 0 \\
+18	& Lock Out 3200 bpi Writes                & YES \\
+19	& Remote Density Select enabled           & YES \\
+20	& Report Corrected Errors                  & YES \\
+21	& Allow One Track Down on Writes          & NO  \\
+22	& 6250 Write Current                      & --- \\
+	& (read as XX.XX  ma) & \\
+23	& 1600 Write Current                      & --- \\
+24	& 3200 Write Current                      & --- \\
+25	& 6250 RAW Threshold                      & --- \\
+	& (read as .XXX  mv) & \\
+26	& 1600 RAW Threshold                      & --- \\
+27	& 3200 RAW Threshold                      & --- \\
+28	& 6250/3200 select BPI as 6250            & NO \\
+29	& Display ft                              & YES \\
+30	& Write error override                    & NO \\
+31	& Load/online                            &  NO 
+
+\end{tabular}\end{center}
+
+\begin{enumerate}
+
+\item Press the Load switch to display the next parameter. If you press and hold the
+Load switch, the display will increment through the parameter list.
+
+\item Press the Unload switch to display the previous parameter. Press and hold the
+Unload switch to decrement through the parameter list.
+
+\item Press the on-line switch to re-display the current parameter.
+
+\item To exit the test without changing any of the parameters, press the Wrt En/Test
+switch.
+
+\item If you want to change a parameter value, select the appropriate number, using
+the Load and Unload switch, and enter the edit mode by pressing the Density
+Select switch. Note that parameters 22 through 27 are not alterable by test 142
+and should only be adjusted by trained engineers.
+
+\item Press the Load switch to get a yes/no parameter value to yes, or  increment a
+value parameter to its next higher value.
+
+\item Press the Unload switch to set a yes/no parameter to no, or decrement a value
+parameter to its next lower value.
+
+\item To scroll the parameter name through the display, press the on-Line switch. The
+parameter value will remain in the display.
+
+\item Press the Density Select switch to return to the test execution mode.
+
+\item To save the new parameter values and exit the test, press the Wrt En/Test and
+Density Select switches together. These values will be stores in the NOVRAM
+when the unit is powered down. Hence, to implement changes immediately you  must
+power cycle the drive.
+
+\item Please note that the recommended values may not apply to you machine. Make sure
+that you record your old values before attempting to tune your device or else
+you may end up worse off than you started.
+
+\end{enumerate}
+
+\subsection{Explanation of selected parameters}
+
+{\bf Parameter 3. Echo Read Strobe on Writes} - echoes a read strobe on write
+operations for systems that require an echo to know that data are being written.
+
+{\bf Parameter 4. EOT mode} - causes the last record to be written at, or
+before, the EOT marker. This function supports systems that do not accept
+records written beyond the EOT marker. This option should only be
+used where necessary, because performance degradation near EOT will occur.
+
+{\bf Parameter 5. FWD Hitch enabled} - causes the drive to jog the tape
+forward prior to any reverse operations in order to overcome static friction.
+
+{\bf Parameter 9.  Interface Transfer Rate (ITR)} - sets the burst rate at
+which data are transferred between the Cipher and the VAX. The 
+optimum setting is VAX-type dependent and 
+can be determined as follows:
+
+\begin{enumerate}
+
+\item Select a data transfer rate compatible with your system using test 142.
+Start with 90.4 kHz.
+
+\item Run an actual tape program to establish basic compatibility; e.g. measure
+time to BACKUP 20,000 blocks on an unloaded system as a reference.
+%Calculate the throughput using the following formula:
+
+%Total number of bytes written / 
+%		1000 * Total seconds required to complete write = ITR (kHz)
+
+\item Select the next highest transfer rate using test 142.
+
+\item Repeat steps 2 and 3 until the data rate of the Cipher exceeds
+the data rate capability of the VAX, as evidenced by a substantial increase
+in re-positioning activity in the Cipher (caused by write retries
+due to incomplete data transfers).
+
+\item Select the next lowest transfer rate using test 142 to complete 
+the configuration.
+
+\end{enumerate}
+
+{\bf Parameter 11.  Maximum block size.} The accepted sizes are
+9K, 16K, 32K and 64K. This is usually set to 9K by default.
+Increasing it will improve performance. However, beware of setting it to 64K
+since it will use the whole cache for even a 1K transfer. The optimal setting
+can be found by starting with a low maximum block size and increasing it
+step-by-step using test 142 until the performance degrades. 
+
+
+{\bf Parameter 12. Interface Ramp Delay} -  is a command 
+response time which, in a start/stop drive, would be the ramp time (delay while
+the drive spins up to speed).  If you set the ramp time low then the CPU is not
+waiting for the tape to get up speed and so it can get on with the transfer of
+data. On a microVAX, the CPU is not able to keep up with the Cipher so it never
+streams at 6250bpi.  With BACKUP on VMS 5.3, a Cipher 990 on a microVAX II will go
+just about flat out at 1600bpi. It tends to get ahead of the processor about
+every 5 to 10 seconds and have to do a re-position cycle (on write), but on a
+verify pass it goes flat out all the time.
+
+{\bf Parameter 14.  Read error retries.} The default is 3. One might  expect that this should be
+set high to give yourself the maximum chance of recovering  data. However, this
+parameter is the number of times the controller tries to read each time 
+VMS requests a retry (up to 15 times, I believe) so the default of 3 actually
+results in 45 read retries, which should be sufficient. 
+
+{\bf Parameter 15.  Write error retries.}  This is set at 15 by default. The author believes that
+it should be set lower (e.g. 8). If the drive requires excessive tries at
+writing to  a tape, then the user should be warned since it may mean that the media
+is bad which in turn may lead to problems reading the data back at a later
+date.
+
+{\bf Parameter 18. Lock out 3200-bpi Write} - prevents the selection of the 
+3200-bpi density. However, the drive can still {\bf read} a 3200-bpi tape.
+
+{\bf Parameter 21.  Allow One track Down on Writes.} These drives are nine-track; eight for data
+and one for parity. This parameter should always be set to NO. If a track goes down,
+it is important that it be fixed rather than continue running with one
+track down without anyone realising. Once the fact that the head is 
+defective has been discovered, this option could be enabled to allow
+usage of the drive for {\bf read only} until an engineer arrives to fix it. This is
+possible since the error correction system will allow recovery of the missing data track
+by  using the information in the parity track. 
+
+{\bf Parameter 29. Display ft.} Displays number of feet to end of tape. This is very useful
+even if just to tell users that  the tape is going around.
+The display sometimes shows a negative number of feet remaining.
+This is normal since the method used to judge the number of remaining feet is
+very approximate. The relative rotation rate of the tachometer wheel compared
+with that of the rear hub indicates the thickness, 
+and hence length of tape wrapped around the rear hub.
+
+{\bf Parameter 31. Load/on-line.} Determines if the device automatically goes on-line when
+loaded. I recommend leaving this disabled in order to be consistent with other
+tape drives. Even with this disabled, one can press the on-line button
+before the drive has finished loading the tape so there is no need to 
+wait by the drive while it load before you press the on-line button
+(unlike some drives).
+
+
+\section{Checking your Cipher's read/write performance}
+
+If your users complain that your Cipher seems to be 
+reading/writing very slowly, then it may either be due to 
+very heavy use of system or the drive failing and retrying to read/write 
+many times (perhaps due to a defective head). Using test 255 will 
+determine which.
+
+During a BACKUP operation, CTRL/Y and then take the Cipher off-line.
+The front panel of the drive appears as follows
+
+\begin{verbatim}
+       load       unload      online      wrt test    density
+      -------     -------     -------     -------     -------
+         1           2           3           4           5 
+      -------     -------     -------     -------     -------
+\end{verbatim}
+
+Key in 452555 and the display will come up STATUS.
+
+The buttons then function as follows:
+
+\begin{itemize}
+
+\item Button 1 \qquad	Shows Hard errors and Correctable errors
+
+\item Button 2 \qquad	Shows Write Retries and Read retries
+
+\item Button 3 \qquad	Shows Track error History
+
+\item Button 4 \qquad	Gives the option to clear the above (yes/no = button 1/2)
+
+\item Button 5 \qquad	Exits the test.
+
+\end{itemize}
+
+There should be no (or virtually no) errors. If you find numerous errors
+on one or more tracks, contact your service engineer.
+
+Press on-line and type
+
+\begin{quote}
+
+\$ CONTINUE
+
+\end{quote}
+
+in order to resume the BACKUP.
+
+Note that if you dismount a tape, the error history is cleared, and 
+hence the need to CTRL/Y out of a BACKUP.
+
+Also if you wish to monitor the streaming progress of a tape,
+the code 452335 disables the door lock. DO NOT rewind a tape with
+the door or lid open; it can be dangerous.
+
+The Cipher tape drive heads come ready calibrated from the factory. You should
+have a sticker on the side of the head (left side in the case of the Cambridge
+drive) with the optimum read and write currents written on it as determined by
+the manufacturer. Do not attempt changing the currents yourself.
+
+The author once had trouble reading some recently written tapes. 
+An engineer informed him that they were written with the write current set
+10\% too high and hence the tape was saturated. Our current was set to the
+factory recommendation i.e. these recommendations are not always correct.
+The optimum value can be determined to some extent by varying the current
+and trying test 255. Only usage over several weeks
+can tell you if you have the currents set correctly.
+
+\section{Other useful tests}
+
+The Cipher M990 has three separate types of built-in diagnostic tests:
+
+\begin{itemize}
+
+\item Power-up self-tests. If your drive fails these, call an engineer.
+
+\item Series 100 tests - Diagnostic tests {\bf without} a tape loaded
+
+\item Series 200 tests - Diagnostic tests {\bf with} a tape loaded
+
+\end {itemize}
+
+I have already described examples of both Series 100 and 200 tests
+(tests 142 and 255) but there are a number of other tests that might prove useful
+to you:
+
+\begin{itemize}
+
+\item Test 125 (PROM Revision) - displays the part number of the PROMs
+installed in the unit.
+
+\item Test 133 (Door open) - deactivates the front panel and top cover lock
+solenoid so that the covers may be opened during the next load attempt.
+Beware of the end of the tape which may harm you.
+
+\item Test 212 (Read/Write Data) - writes test data to tape, without error
+correction.
+
+\item Test 233 (Door open) - disengages the front panel and top cover lock.
+
+\item Test 242 (Edit NOVRAM) - Same as Test 142 except that the tape is loaded
+on the drive during the test.
+
+\end{itemize}
+
+\subsection{Starting the Diagnostic Tests}
+
+Check to see that the on-line indicator is off. If the indicator is on, press
+the on-line
+switch to switch the unit to an off-line mode.
+
+Steps 2 through 4 must be accomplished within 3 seconds between keystrokes. If
+you are too slow, the M990 will automatically return to the normal
+operating mode.
+
+\begin{enumerate}
+
+\item Press the Wrt En/Test switch number 4
+
+\item Press the Density Select switch number 5.
+
+\item Press the switch numbers that represent the test to be run.
+
+\item Press the Density Select switch number 5 to START the diagnostic test.
+
+\item Press the Wrt En/Test switch number 4 to STOP the test from running.
+
+\end{enumerate}
+
+When the diagnostic test is first entered, specific front panel indicators
+are lit to indicate the options available at this point. During the test, the
+alphanumeric display will display information about the drive's status.
+See the Cipher maintenance manual for detailed information about each test.
+
+The manual recommends that you remove any tape prior to running series 100
+tests, since they may result in damage to the tape. However, it is necessary
+to use test 133 while trying to manually load a tape (see Section 2.2).
+
+
+\section{Tape caching}
+
+The area of tape caching is quite confusing, partly because caches may 
+exist on both the drive itself and the controller. Also, it is not 
+obvious under what conditions the cache is of use. 
+
+In a system where the I/O rate of the CPU/disk combination is greater than 
+that of the tape drive, the system will always be limited by the tape drive I/O
+rate. This situation does not occur in Starlink systems.
+
+In a system where the I/O rate of the CPU/disk combination is less than 
+that of the tape drive, the system will always be limited by the CPU/disk
+combination I/O rate. This is the normal situation at Starlink sites
+where we use relatively slow Q-buses and microVAXes (compared with big
+VAXes, such as the VAX 6000).
+
+On a lightly loaded microVAX, the realised tape I/O rate will be slightly below that 
+of the CPU/disk combination. As the load on the VAX increases (i.e. more 
+processes are making demands on the CPU), the realised tape I/O rate on a non-cached
+system will fall. However, on a cached system, the cache is able to keep 
+data flowing to the drive during the short periods while the CPU is servicing
+other processes and avoids the drive running out of data and re-positioning,
+leading to a drop in performance.
+Hence, the cache is of most use on a heavily loaded system.
+
+It is important to note that re-positioning does not necessarily mean that 
+your drive is not running at full capacity. There is no loss of performance if
+the drive re-positions while the cache is filling up with data from the CPU
+since this indicates that the CPU has been unable to supply data fast
+enough and the re-positioning is not preventing writing taking place. If
+the cache is full while the drive is re-positioning, then the realised I/O 
+rate will fall and the system will be limited by the drive re-positioning
+speed. Matching of the drive transfer rate with the data rate capability
+of the host VAX can be achieved using the procedure described in Section 3.2.
+ 
+The Cipher M990 has a built-in 64K cache. As I understand it, this is in use
+all of the time. The DQ153/3153 controllers also contain a 64K cache. By
+default, the controller cache is disabled. To enable write caching for the tape
+controller you must mount your tape with the qualifier
+
+\begin{quote}
+
+\$ MOUNT MUxx: /CACHE=TAPE\_CACHE
+
+\end{quote}
+
+%The DQ153/3153 controllers emulate TU81s (MU devices) which support tape
+%caching. The advantage of tape caching is that it should allow the drive to
+%stream and cope with hiccups in the flow of data to the drive (likely on a
+%multi-user machine). 
+
+However, timing tests have shown no performance improvement when mounting tapes
+with the /CACHE qualifier and running BACKUP.
+
+\section{Remote density selection}
+
+Most Starlink Cipher M990 tape drives are controlled by either a DQ153
+(microVAX II) or DQ3153 (microVAX 3xxx) controller. Both controllers are
+exactly the same except for minor physical differences that reflect the
+different cabinets in which they are installed. Your tape drive should be set up
+for remote density select; i.e. if you initialize a tape with the /DENSITY=XXXX,
+the controller will put the tape drive into this  density mode. 
+
+Manual (or local) density selection is done by a button
+on the tape drive. Density selection, both manual and remote is
+usually done only at BOT for write-type operations and is then stored in the
+drive until changed. For read operations, density is automatically selected at
+BOT by testing the ``ID burst'' on the tape. 
+In any case, remote density selection can be
+done only if the tape drive is in the REMOTE DENSITY  select mode (see Section
+3.1). On
+DQ153/3153 controllers of revision level lower than G remote density
+selection is not possible on a tri-density drive such as the M990. All Starlink
+controllers should be at revision level G or later. If not, then they should be
+upgraded free of charge under maintenance.
+
+It is worth noting that with these controllers, the density of the drive as
+shown with 
+
+\begin{quote}
+
+\$ SHOW DEV/FULL MUxx:
+
+\end{quote}
+
+is correct. This is not the case for multi-density drives emulating a TS11
+drive (MSxx:), which was a single density drive. In this case, the density shown
+with the above command will always show 1600 bpi, regardless of what density
+the drive is actually working at.  Drives on a controller emulating a TS11 can
+only have the density set on the front panel. 
+
+\end{document}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            

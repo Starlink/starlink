@@ -1,0 +1,1803 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocsource}    {sgp\stardocnumber}
+\newcommand{\stardocnumber}    {25.13}
+\newcommand{\stardocauthors}   {Starlink Project\footnote[1]{Contributors: 
+ M J Bly, C A Clayton, M J Currie, M D Lawden, A J Penny, D J Rawlinson,
+ A V Roberts, J C Sherman, P T Wallace.
+ Edited by M D Lawden}}
+\newcommand{\stardocdate}      {9 December 1997}
+\newcommand{\stardoctitle}     {Starlink Site Manager's Guide}
+\newcommand{\stardocabstract}  {This guide helps Starlink Site
+Managers carry out their r\^ole within the Starlink Project.
+It details their responsibilities and describes the methods of communication
+and administration used to manage Starlink.
+It also describes the operating standards for Starlink computers and Starlink
+software.
+Finally, it describes the management of Starlink users.}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+\newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+~
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section {\label{introduction}Introduction}
+
+This paper is intended primarily for the managers of Starlink sites,
+the majority of whom are supported by Starlink via site contracts.
+Managers should be familiar with the terms of these contracts, copies of which
+are available from the University or from Starlink.
+
+This paper will help you understand the Starlink Project and your
+r\^{o}le in it.
+It assumes you are aware of the documentation that vendors provide for managers
+of their computers and associated hardware, and so it contains only the extra
+information you need for Starlink purposes.
+It makes many references to other Starlink documents (indicated by a code
+number, such as SGP/41); you need to become familiar with these in order to do
+your job properly.
+
+There are many people you can turn to for help.
+These include other Site Managers and Project Staff with particular areas
+of expertise.
+Their names, addresses (electronic and postal), and functions are specified in
+file {\tt /star/admin/whoswho}.
+In general, use e-mail to communicate with people as your message can then be
+dealt with at a convenient time and you have a record of it.
+However, don't be afraid to telephone if you have a serious or urgent problem.
+
+All Starlink documents, including this one and the ``whoswho", are available
+on the World Wide Web (called the ``web" hereafter).
+Starting from the Project's home page, simply follow the link
+\htmladdnormallink{{\bf Documentation}}{http://star-www.rl.ac.uk/docs.html}.
+
+\subsection{What's New?}
+
+The whole text has been revised to bring minor details up-to-date and
+to clarify meaning.
+In particular, the following changes have been made:
+
+\begin{itemize}
+\item {\bf Section \ref{meetings}}:
+ the Astronomical Computing Panel has replaced the Starlink Panel.
+\item {\bf Section \ref{distribution}}:
+ new procedures for the release and distribution of Starlink Software.
+\item {\bf Section \ref{qps}}:
+ new quick programming service for users.
+\item {\bf Section \ref{amateurs}}:
+ support for amateur astronomers.
+\item {\bf Section \ref{NUDP}}:
+ include quick reference cards in the New User Document-Pack.
+\item {\bf Section \ref{documentlibrary}}:
+ revised numbers of documents distributed to sites by default.
+\item {\bf Section \ref{references}}:
+ new documents (\xref{SUN/212}{sun212}{} and \xref{SGP/51}{sgp51}{}).
+\item {\bf Appendix \ref{starlinkcontacts}}:
+ new r\^{o}les (PC/Linux Support and Communications).
+\item {\bf Appendix \ref{sitecodes}}:
+ new codes (ULS and UMI).
+\item {\bf Appendix \ref{cronjob}}:
+ what to do when a cron job fails.
+\end{itemize}
+
+\newpage
+
+\section {\label{sitemanagersresponsibilities}Site Manager's Responsibilities}
+
+A Site Manager's responsibilities are many and varied.
+The following list specifies those duties which apply at every Starlink site;
+individual Site Managers may be asked by the Project to perform additional
+duties from time to time.
+
+\begin{itemize}
+
+\item {\bf Implement Starlink policy}.
+This means both Project-wide policy (as communicated to you by Project staff)
+which is relevant to your site, and local policy recommended by your Site
+Chairman and/or Local Management Committee
+(\xref{SGP/41}{sgp41}{}).
+Communicate Starlink policy and developments to your users.
+Feed back user views to the Project.
+
+\item {\bf Liaise with Starlink central management}, especially with regard to
+hardware and software changes, and inform central management at the first hint
+of problems with maintenance companies. 
+
+\item {\bf Liaise with field service organisations} and other
+maintainers of equipment and software, and deal with equipment faults.
+
+\item {\bf Operate the computers and associated equipment} to provide a
+satisfactory day-to-day service to your users, both on- and off-site users.
+Check system performance by running the Starlink benchmark suite
+(\xref{SSN/23}{ssn23}{}),
+especially after installing new hardware or after a major software change.
+
+\item Find out if there any local rules concerning the {\bf testing and safety
+of electrical equipment}.
+If there are, make sure you carry them out on Starlink equipment.
+
+\item Install and maintain the {\bf Starlink Software Collection and licensed
+software}.
+Software changes issued by RAL should be implemented as soon as possible.
+
+\item Provide {\bf advice and assistance to users of Starlink software} and
+answer questions regarding operating systems and other commercial software.
+You should be the first person that users turn to when they have problems,
+although you may need to refer some of their questions to others for an
+answer.
+
+\item Encourage users who are developing software to do so according to
+{\bf Starlink programming standards}
+(\xref{SGP/16}{sgp16}{} and
+\xref{SGP/4}{sgp4}{}) and to use the {\bf Starlink Software Infrastructure}
+(\xref{SG/4}{sg4}{}), in order to help them produce
+high-quality code which could, eventually, be supported by others.
+
+\item {\bf Register new users} and ensure that only accredited people use the
+system.
+{\bf Remove details of users who have finished their work} at your site from
+your list of registered users.
+Maintain a Local Usernames File containing current details of your active
+registered users.
+Arrange for this file to be copied to RAL every month for merging with those of
+other sites in order to produce a complete list of registered Starlink users.
+
+\item Maintain copies of {\bf paper Starlink documents} for reference by, or
+loan to, your users.
+Keep these up-to-date, complete, and easily accessible.
+Distribute new issues of the Starlink Bulletin to {\em all}\, your
+{\em Primary}\, users.
+
+\item Keep appropriate {\bf non-users} at your site informed about Starlink.
+Give them things like the Starlink Bulletin, Starlink Glossies, and the
+general introduction to Starlink
+(\xref{SGP/31}{sgp31}{}).
+
+\item Maintain on-line and up-to-date {\bf inventory lists}.
+
+\item Keep your on-line {\bf maintenance schedules} at RAL up-to-date and
+accurate.
+You are encouraged to produce configuration diagrams for your own use,
+but this is not mandatory.
+
+\item {\bf Keep in touch} with relevant Starlink newsgroups, web pages, and
+Starlink Forum conferences.
+
+\item Help manage the {\bf finances} of the node where possible (this is not
+appropriate at some sites).
+An example of such financial concerns is consumables expenditure.
+
+\end{itemize}
+
+In carrying out these duties you will sometimes need advice or information
+from Project Staff at RAL.
+Details of Starlink contacts there can be found in file
+{\tt /star/admin/whoswho}, or on the back of the Starlink Bulletin, or in
+{\em Appendix~\ref{starlinkcontacts}},
+or in Starlink's web pages.
+
+Some of your duties are more important than others.
+{\bf The primary aim of a Site Manager is User Support}, {\em i.e.\ to
+help astronomers at your site to get the most out of Starlink's (PPARC's)
+investment in hardware and software.} 
+Consequently, duties directly related to this are the most important, but this
+does {\em not}\, mean that others can be neglected.
+ 
+To fulfill your primary aim you should be aware of the work your users are
+doing, or trying to do.
+Thus, when the opportunity arises, ask them about their work methods --  you may
+be able to suggest better ones.
+A receptive audience for such advice is each year's intake of post-graduate
+students.
+If you would like assistance in advising users, for example a presentation on
+some aspects of application software, then Project Staff or Starlink's Contract
+Programmers will try to help.
+You should also tell the Project about user concerns, such as local hardware
+or software problems.
+ 
+Many Site Manager's activities are ``event driven."
+For example, if a hardware or software fault has halted your system, then
+getting it running again (and letting users know what is happening) clearly has
+top priority. 
+In these circumstances it is easy to lose sight of longer-term activities, but
+a balance between event-driven and longer-term work is essential for a
+Starlink node to be successful.
+
+\newpage
+
+\section {\label{communications}Communications}
+
+\subsection {\label{meetings}Meetings}
+
+There are four series of meetings which you must attend:
+
+\begin{quote}
+\begin{description}
+\item [SMM -- Site Managers' Meeting:]
+ This brings Site Managers and appropriate Project Staff together to discuss
+ problems, report  developments, and agree on common standards and procedures.
+ Meetings are held twice a year, once at RAL and once at one of the other
+ Starlink sites.
+ Attendance is optional (but recommended) for managers who are only partly
+ funded by Starlink, but is mandatory for fully-funded managers.
+\item [AGM -- Annual General Meeting:]
+ This is held once a year at RAL (Cosener's House).
+ It is similar to an SMM, but also involves Contract Application Programmers and
+ all Site Managers. 
+ It is, therefore, considerably larger and lasts longer than an SMM.
+ It is mandatory for {\em all}\, Site Managers.
+\item [SLUG -- Starlink Local User Group:]
+ These are informally constituted and comprise all the users of a site.
+ These meetings are:
+ \begin{itemize}
+ \item the main forum for comments and suggestions about all aspects of the
+  running of the node.
+ \item an important source of suggestions for new hardware and software to
+  include in your site's annual bid to the Starlink Panel.
+ \end{itemize}
+ They may be chaired by a user, with the manager acting as secretary, or
+ {\it vice versa}.
+ The Site Manager and Site Chairman should ensure that SLUG meetings are held
+ regularly and are properly advertised.
+ We recommend a minimum of two per year, plus others if there is a demand from
+ users or if important issues arise that they would like to discuss.
+ At least one meeting a year {\em must}\, be open to an address by a Project
+ Representative.
+ 
+ A great strength of the SLUG system is that no user need feel excluded from
+ decisions about the running of his or her site.
+ It is important, therefore, that users see their Site Chairman and the local
+ committee as representing them and taking account of their recommendations.
+
+\item [LMC -- Local Management Committee:]
+ See \xref{SGP/41}{sgp41}{}.
+\end{description}
+\end{quote}
+
+The dates of all Starlink meetings are usually known well in advance, so clashes
+with other commitments can be avoided.
+ 
+There are two other series of meetings which you need to know about:
+
+\begin{quote}
+\begin{description}
+
+\item [Astronomical Computing Panel:]
+This is a PPARC committee which oversees all astronomical computing,
+including Starlink, but excluding supercomputing.
+It advises the PPARC executive and PPARC's Astronomy Committee, and meets at
+least times a year.
+Its membership is listed in {\tt /star/admin/whoswho}.
+The Project Management attends these meetings when Starlink is on the agenda.
+
+\item [SSG -- Software Strategy Groups:]
+These are user groups which consider software development in specific areas.
+You may be asked to be a member of an SSG if you have special expertise,
+so volunteer if you believe you can contribute.
+When an SSG meeting is held at your site, by all means attend as an observer
+even if you are not a member.
+
+\end{description}
+\end{quote}
+
+\subsection {Starlink Forum}
+
+{\em Starlink Forum}\, is a hypertext-based conferencing system on the web
+(\xref{SUN/205}{sun205}{} and 
+\xref{SSN/33}{ssn33}{}).
+It is used to share information and opinions.
+It operates from the Starlink Project Node at RAL and is used primarily by
+Starlink Site Managers and Programmers.
+
+To access it, use the
+\htmladdnormallink{{\bf Forum}}{http://rlsaxps.bnsc.rl.ac.uk/Forum}
+link on the Starlink Project home page or set
+up your own link to the URL:
+\begin{quote}
+{\tt http://rlsaxps.bnsc.rl.ac.uk/Forum}
+\end{quote}
+You should regularly read and contribute to the Conferences listed below
+(they have restricted access).
+If you can't access them, contact the Site Manager at the RAL Project Node.
+
+\begin{quote}
+\begin{description}
+\item [Systems-Management] --
+ This is the {\em most important} conference for Site Managers.
+ It contains valuable advice and instructions from other managers and
+ staff which are found nowhere else ({\em e.g.}\ the availability of new
+ versions of system software).
+ You should read this conference at least once a week, preferably daily.
+\item [Faults] --
+ Use this to log all hardware faults.
+ We can use this information to identify design faults, unreliable batches of
+ hardware, and as ammunition when trying to demonstrate a fault to a supplier. 
+\item [Maintenance] --
+ Maintenance contract issues.
+\item [Linux] --
+ Linux-specific operations.
+\end{description}
+\end{quote}
+
+\subsection{Starlink News Groups}
+
+Starlink has two Usenet News Groups:
+
+\begin{quote}
+{\bf uk.org.starlink.announce\\
+     uk.org.starlink.misc}
+\end{quote}
+
+The most important one for you is {\bf uk.org.starlink.announce}.
+This is where software updates are announced.
+It also carries news items which you should post at your site.
+You should read this group several times a week. 
+Access to these groups can be provided by RAL if your local news feed
+does not carry them.
+
+\subsection{\label{web}World Wide Web}
+
+The World Wide Web (the ``web") is now one of Starlink's most important
+channels for providing information to the user community and Site Managers.
+The Project maintains a home page at URL:
+
+\begin{quote}
+\htmladdnormallink{{\bf http://star-www.rl.ac.uk/}}{http://star-www.rl.ac.uk/}
+\end{quote}
+
+and this contains many useful links.
+In particular, you should review the 
+\htmladdnormallink{{\bf Operations}}
+{http://star-www.rl.ac.uk/operations.html}
+link regularly as this gives access to information about operational aspects of
+particular types of Starlink equipment.
+For example, there are pages to help managers of SPARC/Solaris,
+Alpha/Digital-Unix, and Linux computers.
+There are also links to publicity material, to help you demonstrate and
+advertise Starlink facilities, and to your maintenance schedules.
+
+\subsection {Liaison between Starlink and its Users}
+
+One of your key duties is to pass on information about Starlink to your users,
+and to help them find it for themselves.
+Do this in several ways so as to reach as many of them as possible (some don't
+read news items or login messages) --  find out from them which are the best
+methods to use.
+Small sites often rely on personal contact; larger sites must rely on several
+methods, including:
+
+\begin{itemize}
+\item Regular and interesting {\bf SLUG} meetings.
+\item Informal Starlink {\bf seminars}.
+\item Starlink {\bf News} -- to submit a news item (such as a job advert) to
+ this medium for distribution within Starlink, mail it to
+ {\tt announce@star.rl.ac.uk}.
+ Items should be in plain ASCII text (no hypertext), and should include an
+ expiry date.
+\item {\bf motd} (message of the day).
+\item {\bf Web} pages -- your site's, other sites', and the Project's.
+\item Global {\bf E-mail}.
+\item A physical Starlink {\bf Notice Board}.
+\item {\bf Starlink Documents}, particularly the Starlink User's Guide, 
+ Starlink Unix Guide, Starlink Bulletin, plus any local guides.
+ Encourage your users to read these.
+\end{itemize}
+
+You should also talk to your users about Starlink and feed their views back to
+the Project.
+For example, we need to know what software is used at your site and what users
+think of it.
+We also need to know of new developments at your site which might require
+advanced planning by the Project to provide new services.
+You are also welcome to write an interesting article for the Starlink Bulletin,
+preferably with lots of coloured pictures (send it to Anne Charles).
+
+\newpage
+
+\section {\label{administration}Administration}
+
+\subsection {Maintenance Schedules}
+
+{\em Site Managers are responsible for ensuring that their Starlink-maintained
+equipment is on an appropriate maintenance contract administered by RAL.}
+
+Maintenance schedules are stored on-line at RAL, and are available on the
+web to all managers via the
+\htmladdnormallink{{\bf Operations}}{http://star-www.rl.ac.uk/operations.html}
+link on the Project home page.
+You will need a special username and password to access the maintenance
+schedules -- these  are available from the {\em maintenance-contact}\, at RAL
+on request.
+
+Please check these pages regularly (at least once a month), especially if any
+amendments have been requested for your site. 
+
+The stored schedule lists are exact copies of the details that each maintenance
+company has for each site.
+{\em If details of a piece of equipment are not on-line and it has not been
+requested as an amendment by yourself, then we do not have any record of it
+for maintenance purposes.}
+For amendments, additions, or deletions required for your site, please send
+full details of the changes to the {\em maintenance-contact}\, at RAL, stating
+schedule numbers where known.
+The amendments will not be put on-line until confirmation of change has been
+received from the maintenance company.
+
+It is vital that these maintenance schedules are kept up to date.
+Failure to do so will cause substantial delays (weeks, not days) in
+repairing faults and can cost many hundreds of pounds.
+When you receive new equipment from Starlink, it is vital that you inform the
+{\em maintenance-contact}\, at RAL of the arrival of this kit and all relevant
+serial numbers.
+{\em New equipment cannot be put onto maintenance without these serial
+numbers}.
+Do not assume that because Starlink bought the equipment, it will automatically
+be put onto maintenance for you.
+This needs input from you.
+
+\subsection{Inventory Lists}
+
+It is important that RAL has accurate and up-to-date records of the equipment
+installed at your site.
+A hardware inventory of such equipment (in the approved format) should be
+maintained and sent once a month to the {\em maintenance-contact}\, at RAL.
+Even if the inventory hasn't changed, change the ``update date" in the file to
+the current date and send the listing to RAL as above.
+
+\subsection{Expenses}
+
+All Site Managers are entitled to reimbursement of their expenses when
+they travel on Starlink business ({\em e.g.}\, to attend Site Managers'
+meetings, Software Strategy Group meetings, or {\em ad hoc}\, meetings called
+by the Project).
+
+The managers of university sites should submit a claim to the University,
+consistent with the University's normal regulations.
+Subsequently, the University can claim reimbursement from Starlink by
+including the expenses on one of the quarterly site contract invoices.
+These arrangements are noted in the site contract document, which also notes
+that prior approval must have been obtained from Starlink before any claim can
+be paid.
+Prior approval has already been given for all travel and subsistence expenses
+in connection with several ``standard" purposes, this approval being in
+the form of a letter from John Sherman dated 28 July 1989, and subsequent
+updates dated 16 December 1992 and 8 December 1997.
+If the letter, with its list of ``standard'' purposes, has been mislaid or
+if your site joined Starlink after December 1997, please ask the
+{\em Head of Operations}\, for a copy.
+Prior approval must still be obtained, case by case, for any travel and
+subsistence expenses in connection with visits which are not in the
+``standard'' list, or where there is some doubt.
+
+RAL imposes strict rules about who can be paid travelling expenses, so it is
+worth contacting the Project beforehand in dubious or unusually expensive cases
+({\em e.g.}\, where overnight accommodation will be required or where several trips
+per day are claimed).
+
+If your site is still grant-funded, prior to being adopted by Starlink, you
+will need to fill in a Visitor's expense claim form (available from Andrea
+Roberts) for expenses incurred while on Starlink business.
+Please return it to Andrea for signature and forwarding to the RAL claims
+office.
+
+\subsection{Consumables Budget}
+
+Most sites have a consumables budget based on the number of research
+and technical users on site.
+Management of this fund {\em may}\, be the responsibility of the Site Manager --
+check with your Site Chairman.
+The University will claim money spent under this budget (up to an agreed
+amount) via the site contract.
+Books bought for your sites' users come out of this budget.
+
+\subsection {Additions to a Node via Grants}
+
+It is recommended that additions to your node which are proposed by users and
+which are not funded by Starlink ({\em e.g.}\, those funded by PPARC block
+grant or by {\em ad hoc}\, PPARC or other grants) be discussed with yourself
+and with the Starlink Project well before the proposal is finalised.
+The advantages of early discussion with the Project are:
+
+\begin{itemize}
+\item Short-term and long-term maintenance can be discussed.
+\item In the case of PPARC grants, subsequent review by the relevant 
+ committees and panels will be simplified.
+\end{itemize}
+
+\newpage
+
+\section{\label{operatingstandards}Operating Standards}
+
+There are some practical aspects to consider when setting up and operating a
+Starlink computer, some of which are described below.
+If necessary, you will be helped to set up your system by an experienced
+manager, so this section does not describe the set-up procedure in detail.
+Make the most of Site Managers' Meetings to find out what ingenious, but
+doubtless undocumented, procedures are used at other sites.
+
+The names of the staff at RAL responsible for technical support
+of the various types of hardware can be found in
+{\em Appendix~\ref{starlinkcontacts}}.
+Advice on setting up a Starlink SPARC/Solaris System can be found in
+\xref{SSN/18}{ssn18}{}. 
+
+\subsection {Backing-up File Systems}
+
+Backing-up your file systems is one of your most important duties.
+The purpose of backup is to protect your computer against accidental file
+deletion, usually caused by user error or disk failure -- in that order.
+Scratch space need not be backed up, but users should be made aware of what this
+means to them if this is the policy at your site.
+
+The following recommendations should not be treated as rigid rules -- there is
+room for local variation.
+Nevertheless, any site which deviates substantially from them should consider
+why their procedures are different from those at other sites.
+ 
+\begin{itemize}
+\item Zero level (full) dumps should be run at least every few weeks.
+\item Incremental dumps should be run on user partitions at least once a week
+ (most sites run incrementals once a day).
+ The frequency of incrementals depends on local factors, such as the number and
+ type of tape drives available.
+ Incremental dumps of system partitions ({\em e.g.}\ {\tt /usr}) need not be done as
+ frequently as for user partitions.
+\item Where possible, dumps should be done outside prime time, for example
+ during early morning or evening or weekend, and high capacity cartridge drives
+ should be used to enable backups to be run overnight.
+\item Consider storing your backup media away from the systems to reduce
+ the possibility of both the on-line data and the backups being destroyed by the
+ same disaster.
+\item Be very careful when you brief a stand-in to act as manager in your
+ absence.
+ Starlink's experience is that, despite the best of intentions, stand-ins have
+ been a major cause of damage to system files.
+ Please ask the stand-in to call RAL or another Site Manager if they get stuck.
+ A stand-in who presses on with fingers crossed when things don't go quite as
+ the manager had led them to expect can do a surprising amount of damage when
+ armed with the root password.
+\item If you have not yet retrieved files from your dumps, use a scratch disk
+ to make an end-to-end test of your procedures.
+\end{itemize}
+
+Scripts for dumps are available from the RAL Project Site Manager.
+
+\subsection {Special Usernames}
+
+You can contact other Site Managers by sending e-mail messages to the {\tt star}
+username at their nodes  -- they will use the same username to send e-mail to
+you.
+This is the primary way of communicating between sites and
+should be monitored regularly; a deputy must be instructed to do this if you
+are away, even for a day.
+Username {\tt star} is also used for maintaining Starlink software.
+
+Some sites can't use {\tt star} for e-mail due to local restrictions.
+The back page of the Starlink Bulletin and the {\tt /star/admin/whoswho} file
+give appropriate addresses for the Site Managers at these sites.
+
+Every manager is permitted a username on the Project system at RAL.
+This is required to allow you to download some proprietary software.
+Its password should never be divulged to users.
+
+\subsection {Benchmarks}
+
+One of your duties is to ensure the efficient running of your hardware. 
+A suite of benchmarking software
+(\xref{SSN/23}{ssn23}{}),
+based on Starlink Software and on IRAF, is available to allow you to confirm
+that your system is running as it should.
+Running this software has, on many occasions, shown up problems with system
+set-up which were previously overlooked.
+
+\subsection {Games}
+
+Game playing, along with any other flippant or improper uses of Starlink
+computers, is not allowed.
+
+\newpage
+
+\section {\label{starlinksoftware}Starlink Software}
+
+The Starlink Software Collection is comprehensively documented.
+The following documents provide general background to Starlink software
+development:
+
+\begin{quote}
+\begin{description}
+\item [\xref{SUN/1:}{sun1}{}] Starlink software collection.
+\item [\xref{SGP/4:}{sgp4}{}] Starlink C programming standard.
+\item [\xref{SGP/16:}{sgp16}{}] Starlink application programming standard.
+\item [\xref{SGP/42:}{sgp42}{}] Starlink software strategy.
+\item [\xref{SGP/46:}{sgp46}{}] Starlink software work during last year.
+\end{description}
+\end{quote}
+
+Other documents describe the management of the Collection:
+
+\begin{quote}
+\begin{description}
+\item [\xref{SUN/212:}{sun212}{}] Starlink software CD-ROMs, user's guide.
+\item [\xref{SGP/21:}{sgp21}{}] Starlink software distribution policy.
+\item [\xref{SGP/51:}{sgp51}{}] Starlink software maintenance procedures.
+\item [\xref{SSN/9:}{ssn9}{}] Installing the Unix Starlink software.
+\end{description}
+\end{quote}
+
+You should read these to understand Starlink software and its management.
+ 
+Every Starlink site should have an
+up-to-date copy of the required parts of the Starlink Software Collection
+installed on its system.
+\xref{SSN/9}{ssn9}{}
+tells you how to install the Collection from scratch.
+
+Do not distribute any part of the Collection to anyone else without
+permission from Starlink management 
+(\xref{SGP/21}{sgp21}{}) --
+contact the {\em Software Librarian}\, in the first instance.
+In particular, proprietary software, such as the NAG libraries, {\em must not}\,
+be distributed.
+If you do receive permission to distribute Starlink software to another site,
+give the {\em Software Librarian}\, the following details about the site:
+
+\begin{itemize}
+\item Full postal address, network address, telephone, and fax number.
+\item What you sent, when you sent it, and the type of media used.
+\item Name of a site contact.
+\item What support you intend to give.
+ (Will you answer queries from users?
+ Will you supply updates?)
+\end{itemize}
+
+The GKS graphics package may be distributed to non-profit-making astronomical
+research centres for use in connection with other Starlink software.
+This involves a registration procedure and must be done by the Project.
+ 
+If you, or a user, have trouble with a software item, send details to the
+{\em Software Librarian}.
+Do not just make a local fix and forget about it; inform the {\em Librarian}\,
+and get the correction properly distributed through the official release
+mechanism.
+When reporting bugs, please include sufficient detail to make the bug
+repeatable -- a bug which cannot be repeated cannot, in general, be fixed.
+In urgent cases, if the affected user wants to contact the author of the 
+software directly, this is permissible.
+However, please also submit a proper bug report. 
+
+Don't let your version of Starlink software become chronically different from
+RAL's.
+This has caused major problems in the past.
+Also, software developed at another site has, on occasion, been submitted
+for release and did not work at RAL because it relied on some local
+modification.
+Conversely, there have been cases where software which was released by RAL
+didn't work at another site because of local peculiarities.
+Be warned: if you allow your site to get into this kind of mess you may find
+that new or improved software doesn't run at your site.
+
+Some items in the Collection belong to the {\em Base Set}.
+These are non-astronomical, proprietary, and public domain software.
+Base set items are specified in the Starlink Software Index
+({\tt /star/admin/ssi}).
+All base set items must be installed at all sites.
+
+\subsection {\label{distribution}Distribution and Maintenance}
+
+In October 1997, Starlink changed the way it distributes the Starlink
+Software Collection from the old system, based on frequently issued
+software updates via the network, to a new one using CD-ROMs and the Starlink
+Software Store. 
+This enables a Starlink Software installation to be tailored to match the
+precise requirements of a Site.
+
+The primary distribution medium will be CD-ROM.
+The Software Librarian will build all the libraries, packages, and utilities
+from scratch every six months (March and September), for all supported
+systems, and issue a complete system on a multi-CD set.
+The set will contain a CD for each supported platform with a ready-to-run
+Software Collection, and a CD of all the software packaged individually, again
+for all supported systems.
+In addition, rebuilt versions of the Base Set software will be provided.
+Each release will be documented by a new version of SUN/212.
+
+Sites will be able to update their local Starlink Software installation
+from the CD-ROM in one go using the tools provided, or update selected
+packages in batches, depending on local needs.
+Sites may also replace their local installation completely with the one on
+the CD-ROM should they wish, or run the software from the CD-ROM itself,
+although this may only be practicable on a PC running Linux with a fast (8X)
+CD-ROM drive.
+
+At the same time that the CD-ROM sets are issued, the Starlink Software
+Store will be updated with distribution sets of the software packages, so 
+that the software versions in the Store match those on the CD-ROM.
+Thereafter, until the next CD-ROM, the Store will be updated with any
+bug fixes required for the packages.
+Sites may update their installations with patches from the Software Store, or
+wait until the next CD-ROM is available.
+
+Some software will not be included on the CD-ROM, because it uses the
+proprietary NAG libraries.
+Starlink has removed any dependency on the NAG libraries from the majority of
+packages, replacing the calls to NAG routines with calls to appropriate
+routines in the Starlink Public Domain Algorithms (PDA) library.
+Such NAG-free packages will be included on the CDs.
+The NAG libraries themselves will not be included on the CDs, nor will the
+MEMSYS (Maximum Entropy) libraries.
+Instead, they will be available to Starlink Sites from RAL using a modified
+version of the existing distribution method.
+
+Starlink regularly distributed information files, such as lists of users and
+document indexes, as part of the old distribution system.
+These files, and documents not associated with a specific software package,
+will now be updated once a month by a simplified version of the previous
+network-based distribution method.
+
+\subsection {\label{qps}QUICK -- Quick Programming Service}
+
+In 1997, Starlink launched {\em Quick} -- a custom Programming Service aimed at
+solving individual user's small data reduction and analysis problems.
+The service provides quick solutions to specific astronomical data
+reduction/analysis problems by, for example, supplying a recipe or script
+using existing software, or adding minor functionality to an existing
+application. 
+
+The problems should be those which a programmer can solve in about
+a day (or less), and should be in areas of Starlink expertise so that the
+knowledge gained can be fed back to the Starlink user community.
+Longer jobs will have to vie with other contenders to be included in future
+software plans.
+
+{\em Quick}\/ is experimental.
+Its future depends on its popularity, and the availability of appropriate
+Starlink staff. 
+Please encourage your users to use it.
+A successful service will help Starlink too.
+For instance, if common themes appear in the requests, this will pinpoint
+gaps in our software, and areas where Starlink needs to provide new or better
+documentation, such as cookbooks.
+
+Requests for the service should be e-mailed to {\tt quick@star.rl.ac.uk}.
+There is also a Web page ({\tt http://star-www.rl.ac.uk/quick}) where a
+selection of programming solutions will be made public to benefit
+other users.
+
+\newpage
+
+\section {\label{usermanagement}User Management}
+
+Previous sections have already mentioned several of your responsibilities
+towards your site's users, such as providing ``advice and assistance."
+This section is concerned specifically with how to manage your users.
+The term {\em User Management}\, covers the following aspects of your work:
+\begin{itemize}
+\item Who is allowed to use Starlink facilities, and how are users
+      classified?
+\item What do I do when a new user arrives or an existing user departs?
+\item What documents do I give to, and keep in stock for, my users?
+\item What information do I keep on my users, and in what format?
+\item Who do I tell about my users and how often do I tell it?
+\item Is there any software to help me maintain my user information?
+\item How does the Data Protection Act affect the way I keep information on
+      users?
+\end{itemize}
+
+\subsection{\label{worktype}Types of Work supported by Starlink}
+
+The types of work that are appropriate for Starlink facilities are described
+in \xref{SGP/31}{sgp31}{}.
+They are:
+
+\begin{itemize}
+\item Normal astronomical data reduction and analysis.
+\item Limited theoretical astronomy.
+\end{itemize}
+
+Within these broad guidelines, different types of work have the following
+priorities:
+
+\begin{enumerate} 
+\item Astronomical data reduction that can only be done interactively.  
+\item Other astronomical data reduction.  
+\item Other astronomical research work that can only be done interactively.
+\item Other astronomical research work.  
+\item Other PPARC astronomical work.
+\end{enumerate} 
+
+If you are not sure whether or not some proposed work falls within Starlink's
+terms of reference, refer to
+\xref{SGP/31}{sgp31}{}
+or consult the {\em Project Scientist}.
+A difficult question is where precisely to draw the line between, for
+example, routine telemetry processing associated with the operation of
+a particular satellite or instrument, which is clearly not Starlink
+work, and analysis of calibrated scientific data, which clearly is.
+The analysis and visualization of theoretical data generated on other more
+powerful machines is considered mainstream Starlink work, but the generation of
+those data is not.
+(Supercomputers are regarded as the theoreticians' telescopes or satellites.)
+
+\subsubsection{\label{amateurs}Support for Amateur Astronomy}
+
+Although Starlink is not funded to support amateur astronomers, it allows the
+Starlink Software Collection to be used for non-profit, astronomical use by
+amateurs.
+Starlink is, however, unable to provide support for this class of use.
+The Project is aware that fruitful pro-am collaborations do take place,
+leading to peer-reviewed publications.
+Amateurs collaborating with professionals should rely on their collaborators
+to give guidance on the reduction of data and related support.
+In addition, amateurs are expected to form a self-help group run over e-mail
+and the web (many of the relevant people already have access to this
+technology).
+It is this group's responsibility to provide amateur-specific advice on how to
+use the software to solve particular problems.
+For example, the group could produce its own cookbooks for the standard amateur
+CCD cameras.
+Structures for organizing this type of group already exist in the amateur
+community, as well as motivated individuals who are willing to put in effort to
+make this software available.
+
+When new Starlink Software CD-ROMs are pressed, a limited number will be
+sent to a ``senior" member of the UK amateur community (nominated by Starlink)
+who is then responsible for advertising the CD-ROMs and distributing them to the
+relevant people.
+This person is Starlink's sole interface to the amateur community in terms of
+software distribution.
+Amateurs can also get the software from the Starlink Software Store.
+Direct requests to the Project for CD-ROMs from anyone other than the official
+amateur contact will be acknowledged, but cannot otherwise be responded to.
+The same applies to technical queries.
+
+Starlink values the views of amateur astronomers regarding its software, and,
+through the official amateur/Starlink contact, welcomes feedback.
+
+\subsubsection{\label{teaching}Support for Teaching}
+
+Starlink is intended to support astronomical research, not teaching.
+Consequently, the Starlink resources, including Site Manager's time, that can
+be spent on teaching are strictly limited.
+This applies to teaching both in schools and at undergraduate level in
+universities (but see section~\ref{usertypes} for undergraduates doing
+research).
+Nevertheless, Starlink software can be used for teaching, as long as no
+significant support from Starlink is required and as long as the standard
+restrictions on software distribution are observed.
+
+\subsection{\label{usertypes}Types of Starlink User}
+
+There are a large number of Starlink users and they use Starlink facilities
+for many different reasons.
+It is useful, indeed essential, to classify them in some way.
+For example, user classification helps to determine appropriate resource
+allocation for Starlink sites, and is essential for determining consumables
+funding.
+
+The current classification is based on the following coding system:
+
+\begin{quote}
+\begin{description}
+\item [r] -- UK-resident research astronomer actively processing data
+ (includes post-graduate students).
+\item [t] -- UK-resident scientific or technical staff member supporting
+ astronomy research (includes Site Managers).
+\item [o] -- Other UK-resident user ({\em e.g.}\, secretaries and e-mail-only
+ users).
+\item [u] -- Undergraduate engaged in an astronomical research programme.
+\item [a] -- Associate user (a person who does not have an official
+ astronomical position in a university or recognised research institution).
+\item [f] -- Non UK-resident user, abroad for at least half the current academic
+ year.
+\end{description}
+\end{quote}
+
+Starlink Staff are ``{\bf t}" users because their primary r\^{o}le is to support
+astronomers rather than to do astronomical research themselves.
+Of course, some staff may do astronomical research in addition to their other
+duties.
+As always, classification schemes throw up difficult borderline cases.
+The answer is to do what seems reasonable.
+
+The sub-sections below discuss in more detail the rationale behind the two most
+recent user classes to have been introduced -- those indicated by
+``{\bf u}" and ``{\bf a}" codes.
+Users in these classes must be registered in the same way as other Starlink
+users and should be given individual accounts.
+The amount of site management support given to them should be determined by the 
+Site Chair and will normally be at a level substantially below that given to
+other users.
+They will not count towards the allocation of Starlink resources to a site,
+neither do they qualify for consumables support.
+The Site Chair should regularly review their research output and their impact
+on other Starlink users, and should ensure that they understand Starlink rules
+concerning the distribution of Starlink software.
+
+\subsubsection{Undergraduate User -- (u)}
+
+There is a growing trend for universities to incorporate a research project in
+undergraduate education.
+In part, this is due to the introduction of 4-year courses.
+
+As noted in section~\ref{teaching},
+and with the exception of software, significant Starlink resources cannot be
+used for undergraduate teaching.
+However, Starlink resources {\em can} be used for an {\em undergraduate
+research project}\, (at the discretion of the local Site Chair) provided that: 
+
+\begin{itemize}
+\item The normal post-graduate research work at the site is not seriously
+ affected.
+\item The output of the project is likely to form a significant part of a
+ published work.
+\end{itemize}
+
+\subsubsection{Associate User -- (a)}
+
+Associate users are people who do not have an official astronomical position
+in a university or research institution, {\em e.g.}\ amateur
+astronomers.
+(An unpaid position, such as Honorary Research Fellow, is regarded here as an
+official position, and the other user classifications apply.)
+
+At the discretion of the local Site Chair such people can use Starlink, but
+only in specific cases.
+Each case must be examined individually.
+If in doubt, consult the {\em Project Scientist}.
+In general, a person qualifies if:
+
+\begin{itemize}
+\item The output of the proposed work is likely to form a significant part of
+ an article in a research publication.
+\item The associate user collaborates actively with an existing Starlink user.
+ This is not absolutely essential, but an associate user whose work is
+ completely separate from other work at the site would need special
+ justification.
+\item The work will not seriously affect the site.
+\end{itemize}
+
+\subsection{Registration and Termination of Starlink Users}
+
+If someone wants to use the facilities of your site, they must complete a
+{\em Starlink User Application Form} and return it to you -- this is true,
+even if they are already registered at another site.
+
+To save time you may register new users yourself, in advance of formal
+accreditation, as long as you are reasonably sure that the work involved is
+appropriate for Starlink
+(see sections~\ref{worktype} and \ref{usertypes}).
+Dubious cases should be referred to the {\em Project Scientist}\, before you
+allow the user onto your system.
+
+Here is a checklist of things you should do to register a new user:
+
+\begin{itemize}
+\item Check the form and ensure that it has been completed satisfactorily.
+ (Is it legible?
+ Have all the questions been answered satisfactorily?)
+\item If the user is a research student, make sure his or her Supervisor has
+ signed it.
+\item When you are happy, sign the form yourself {\em and date it}.
+ Fill in the section headed {\em``For completion by the Site Manager"}\, at
+ the bottom of the back page.
+\item Make a copy, and file the original with your other completed application
+ forms.
+\item Send the copy to the {\em Project Scientist}\, at RAL.
+ He will check it and sign it if he is happy, or get back to you with any
+ queries.
+ If the proposed work does not meet Starlink criteria, he will ask you to
+ withdraw the username.
+\item Add details of your new user to your local {\em Starlink User Database}
+ (see section \ref{SUD}).
+ In particular, {\bf add a record for the user to your usernames.lis file and
+ change its date.}
+\end{itemize}
+
+Please use the latest version of the application form (currently dated
+``95/11" in the bottom left-hand corner of the front page).
+Stocks are obtainable from the {\em Document Librarian}.
+
+Each form should cover one person and one username only.
+Shared usernames should be avoided unless absolutely essential as they are a
+security risk.
+If you have such usernames, make sure that their use is properly controlled.
+
+As a user's work evolves, it may change in nature and become less legitimate. 
+If so, ask the user to make a new application to use your site and treat this
+like any other new application.
+
+A person may have a username at more than one Starlink site, although this
+should rarely be necessary.
+Such a user should specify one of these sites as his {\em Primary Node}\,
+which is then responsible for his primary support.
+His other sites are called {\em Secondary Nodes}.
+A user is called a {\em Primary User}\, at their Primary Node, and a
+{\em Secondary User}\, at their Secondary Nodes.
+(People registered at only one site are Primary Users of that site by default.)
+The distinction between Primary and Secondary nodes avoids us counting users
+more than once when figuring out how many users we've got.
+The {\em Document Librarian}\, keeps an eye on multiple registrations and makes
+sure that such users have only one Primary Node.
+
+When a user leaves permanently (say for more than 3 months), remove (or archive)
+his details from your Starlink User Database and his files from your system.
+In particular, {\bf delete his record from your usernames.lis file and change
+the date}.
+This should be done within one month of departure.
+
+\subsection{Documentation for Users}
+
+It is important that your users are aware of, and use, relevant documents
+distributed by Starlink.
+
+\subsubsection{\label{NUDP}New User Document-Pack}
+
+You should give new users a {\em ``New User Document-Pack."}
+(If they have previously used other sites, they may only need any local
+documents you think appropriate.)
+Its contents are at your discretion, but should include:
+
+\begin{quote}
+\begin{description}
+\item [\xref{SUG}{sug}{}] -- Starlink user's guide.
+\item [\xref{SUN/1}{sun1}{}] -- Starlink software collection (including
+quick reference card)
+\item [\xref{SUN/145}{sun145}{}] -- Unix: An introduction (including quick
+reference card).
+\item [Glossies] -- A folder containing glossies on Starlink, our software
+ environment, and popular applications.
+\end{description}
+\end{quote}
+
+You should add anything else they need in order to work effectively, such
+as a local guide to your site or descriptions of software they intend to use.
+You may wish to bind together into a single volume a set of local documents
+for your users.
+A generic coloured cover is available entitled ``Starlink Documents" together
+with a matching back cover.
+These can be used to make your locally-produced volumes match Starlink's
+``package" documents in style, and can be supplied by the Document Librarian.
+ 
+\subsubsection{World Wide Web}
+
+As mentioned in section \ref{web},
+most Starlink documentation is available on the web, together with a lot of
+extra information that is useful to users.
+Two particularly useful commands which use the web to find and display
+information are {\bf showme} and {\bf findme}.
+They are illustrated in the \xref{Starlink User's Guide}{sug}{}, and
+you should make sure that your users are aware of them.
+
+\subsubsection{Starlink Bulletin}
+
+Twice a year, Starlink issues a newsletter called the 
+\htmladdnormallink{{\em Starlink Bulletin}}
+{http://star-www.rl.ac.uk/bulletin.html}.
+
+Copies are sent to every site and you must send one to all your {\em Primary
+Users}.
+(Your {\em Secondary Users}\, should receive a copy from their Primary Node.)
+Also, give one to any local non-users you think may be interested.
+
+The Bulletin is one of the most important ways in which Starlink informs its
+users about Project status, new software, developments, policies, and plans.
+Please distribute it promptly.
+
+\subsubsection{\label{documentlibrary}Paper Document Library}
+
+A list of Starlink documents is kept in files
+    {\tt /star/docs/docs\_lis}
+and {\tt /star/docs/mud\_lis},
+but an easier way to find out what is available is to follow the
+\htmladdnormallink{{\bf Documentation}}{http://star-www.rl.ac.uk/docs.html}
+link on the Starlink Project web home page.
+
+Your users should have access to paper copies of Starlink documents if they
+want them, and they should know where to find them.
+Keep this {\em Document Library}\, stocked, up-to-date, and visible (use the
+Starlink sticky coloured labels to identify your binders and filing cabinets).
+
+You must decide the best method of managing your Document Library -- different
+sites have different needs.
+At RAL we keep the Library in well-labelled filing cabinets.
+Each drawer holds lots of individual pockets, each labelled with a specific
+document code.
+Each such pocket contains several copies of the document corresponding to its
+label.
+Above these there is an overflow shelf which holds extra copies of some
+documents (particularly large ones) so that the pockets in the filing cabinets
+do not get over-stuffed.
+We do {\em not}\, keep a reference set in binders because when someone wants a
+document they go straight to the filing cabinet.
+This works fine at RAL but you may find that a reference set in binders with
+some sort of backup stock is more suitable for your environment.
+The important thing is that your users should know where to find Starlink
+documents and that your Library should be reliable ({\em i.e.}\, complete
+and up-to-date).
+
+Most Starlink documents are issued as stapled photocopies of A4 sheets.
+Some of the more important ones are issued in bound form to make them more
+attractive and easier to use.
+Some managers tear off these covers and file the tattered remains in binders;
+not what Starlink intends: try putting them on shelves next to the binders.
+
+RAL sends every Starlink site one paper copy of every new Project-wide document
+(many sites issue local documents, but normally these are not distributed to
+other sites).
+If the document is issued with a special binding and cover (like `software
+package' documents), then more than one copy will be sent.
+If you want more of these special documents, ask the {\em Document Librarian}.
+If you want more of the plain stapled documents, you are expected to
+produce them yourself from the source file(s) in {\tt /star/docs}.
+
+\subsection{\label{SUD}Starlink User Database}
+
+You should set up and maintain a {\em Starlink User Database}\, containing
+information about your sites's users.
+You can keep any information you like on your users (within the constraints
+of the Data Protection Act, see section~\ref{DPA}), but we recommend as a
+minimum the following three files (normally stored in directory
+{\tt /star/local/admin}):
+
+\begin{quote}
+\begin{description}
+\item [usernames.lis] -- names, usernames, classification codes, location
+ codes, and e-mail addresses.
+\item [users.lis] -- more detailed information.
+\item [people.adr] -- postal addresses.
+\end{description}
+\end{quote}
+
+Of these, the first ({\bf usernames.lis}) is {\em mandatory}\, and is
+described in section~\ref{LUF}.
+The others are optional.
+
+Many sites maintain a {\bf users.lis} file, but their format varies widely.
+We recommend that the {\tt staradmin} utility (see section~\ref{staradmin}) 
+is used to set it up and maintain it.
+The file should contain things like room and phone numbers, research interests,
+expected leaving date, and so on.
+Its purpose is to help you find out things about your users fast (maybe in
+response to a question from the Project).
+
+The {\bf people.adr} file is used to hold user's postal addresses in a form
+that can be used by a program called STICKY (LSN/28 (PRO)).
+This is used at RAL to print sticky address labels to help us send things
+to users and sites.
+Each address can be tagged with one or more codes to indicate specific
+distribution lists for various types of reader.
+STICKY then extracts the addresses on a specified list and writes a file for
+printing.
+Other sites find it useful for the same job and you can get the program
+from Kevin Duffey on request ({\tt kpd@star.rl.ac.uk}).
+
+\subsubsection{\label{LUF}The local usernames File -- usernames.lis}
+
+You {\em must} install and maintain a {\bf Local Usernames File}
+called {\bf usernames.lis} containing information about your users.
+Keeping this file accurate and up-to-date is {\em vital}.
+The set of Local Usernames Files collected from every Starlink site is the
+best way we have of determining who is currently a Starlink user.
+It makes your users ``visible" to others in the astronomical community, and
+the equivalent file at other Starlink sites make their users visible to
+yours.
+
+Every month, RAL merges the Local Usernames File from every Starlink site to
+produce a complete list of all currently registered Starlink users.
+This list is then distributed to sites via the network in the form of two files:
+
+\begin{quote}
+\begin{description}
+\item [\htmladdnormallink{star/admin/usernames}
+ {http://star-www.rl.ac.uk/usernames1}] 
+ -- contains username, name, category, and
+ site code for every user at every site, together with a count of the
+ users (Primary and Secondary) and user-codes at each site.
+\item [star/admin/unixnames]
+ -- contains name, location code, and e-mail address for every user.
+\end{description}
+\end{quote}
+
+These files enable the Project to keep accurate current and historical records
+of Starlink's user population.
+They are also the primary sources of information for people who wish to know a
+Starlink user's e-mail address, site, or location.
+
+Merging the Local Usernames Files usually throws up inconsistencies.
+The {\em Document Librarian}\, then sends a ``Username queries" message to the
+sites involved to try to resolve them.
+Please read and act promptly on this message.
+
+The correct format of your Local Usernames File is described in
+{\em Appendix~\ref{usernamesfile}}.
+The file should be maintained by the {\bf staradmin} procedure
+(see section~\ref{staradmin}).
+
+\subsubsection{\label{SYLUF}Sending your local usernames File to RAL}
+
+You {\em must}\, send a copy of your Local Usernames File to RAL every
+month for merging with the others.
+This is done by a ``cron job" -- an automatic procedure that copies the file
+from your site to the RAL ftp machine.
+After all the cron jobs have finished, the copied files are then copied into
+the {\em Document Librarian}'s file space.
+(This only happens after the automatic procedure has run -- the {\em Document
+Librarian}\, doesn't get files sent by re-run cron jobs.)
+A description of how to set up such a job is given in
+{\em Appendix~\ref{cronjob}}.
+
+\subsubsection{\label{staradmin}A Database Maintainer --  staradmin}
+
+Installing information in your local Starlink User Database and keeping it
+up-to-date is a rather tiresome process.
+Fortunately, Adrian Fish (a former Site Manager at UCL) wrote a
+perl script to do it automatically (apart from putting the data in).
+This has been released as a Starlink Software Item called {\bf staradmin}
+(SSN/27) and is maintained Tim Gledhill ({\tt star@star.herts.ac.uk}).
+Refer to 
+\xref{SSN/27}{ssn27}{} to find out how to make your life easier.
+
+\subsection{\label{DPA}Data Protection Act}
+
+In the UK, information about people that is kept on a computer is subject to the
+Data Protection Act.
+This demands that such information be registered and places restrictions on its
+use.
+
+Starlink's files are believed to be covered {\em at Research Council sites
+only}\, by the general RAL registration, and we have given full details of the
+relevant files to the appropriate RAL contact.
+However, this does not cover Universities.
+The manager of every Starlink university site should, therefore, inform
+their Data Protection Officer of the existence and contents of any
+files held on their Starlink computer(s) which contain information about
+specific people.
+Your DP officer will probably have a form for you to fill in.
+
+Users of Starlink facilities are also responsible for registering their
+own files containing information on other people with their DP registrar.
+However, we believe this does not involve the Site Manager.
+
+An entry on the {\em Data Protection Register}\, gives the data user's name and
+address, together with broad descriptions of:
+
+\begin{itemize}
+\item The personal data held.
+\item The purposes for which it is used.
+\item The sources from which the information may be obtained.
+\item The people to whom the information may be disclosed ({\em i.e.}\ shown or
+ passed on to).
+\item Any overseas countries or territories to which the data may be transferred.
+\end{itemize}
+
+Once registered, the data users must comply with the eight {\em Data Protection
+Principles}\, of good practice contained within the Act.
+Broadly, these state that personal data must be:
+
+\begin{enumerate}
+\item Obtained and processed fairly and lawfully.
+\item Held only for the lawful purposes described in the data user's register
+ entry.
+\item Used only for those purposes, and disclosed only to those people,
+ described in the register entry.
+\item Adequate, relevant, and not excessive in relation to the purpose for which
+ they are held.
+\item Accurate and, where necessary, kept up-to-date.
+\item Held no longer than is necessary for the registered purpose.
+\item Accessible to the individual concerned who, where appropriate, has the
+ right to have information about themselves corrected or erased.
+\item Surrounded by proper security.
+\end{enumerate}
+
+\newpage
+
+\section {\label{references}References}
+
+\begin{quote}
+\begin{description}
+\item [LSN/28 (PRO)] -- STICKY: Produce address labels from an address list.
+\item [\xref{SG/4}{sg4}{}] -- ADAM: The Starlink software environment.
+\item [\xref{SGP/4}{sgp4}{}] -- Starlink C programming standard.
+\item [\xref{SGP/16}{sgp16}{}] -- Starlink application programming standard.
+\item [\xref{SGP/21}{sgp21}{}] -- Starlink software distribution policy.
+\item [\xref{SGP/31}{sgp31}{}] -- Starlink.
+\item [\xref{SGP/41}{sgp41}{}] -- Local management arrangements.
+\item [\xref{SGP/42}{sgp42}{}] -- Starlink software strategy.
+\item [\xref{SGP/46}{sgp46}{}] -- Starlink's software work during last year.
+\item [\xref{SGP/51}{sgp51}{}] -- Starlink software maintenance procedures.
+\item [\xref{SSN/9}{ssn9}{}] -- Installing the Unix Starlink software.
+\item [\xref{SSN/18}{ssn18}{}] -- Administering Solaris Sun systems.
+\item [\xref{SSN/23}{ssn23}{}] -- Starlink benchmarking utility.
+\item [\xref{SSN/27}{ssn27}{}] -- staradmin: Starlink user database maintainer.
+\item [\xref{SSN/33}{ssn33}{}] -- FORUM: Installation guide.
+\item [\xref{SUG}{sug}{}] -- Starlink user's guide.
+\item [\xref{SUN/1}{sun1}{}] -- The Starlink software collection.
+\item [\xref{SUN/145}{sun145}{}] -- Unix: An introduction.
+\item [\xref{SUN/205}{sun205}{}] -- FORUM: Starlink conferencing system.
+\item [\xref{SUN/212}{sun212}{}] -- Starlink software CD-ROMs, user's guide.
+\item [Glossies] -- a folder (available from the Document Librarian) containing
+glossy A4 sheets on Starlink software.  There are 9 sheets available at present
+(also available from the Document Librarian).
+\end{description}
+\end{quote}
+
+\appendix
+
+\newpage
+
+\section {\label{starlinkcontacts}Starlink Contacts}
+
+\begin{quote}
+\begin{tabbing}
+Contactxxxxxxxxxxxxxxxxxxxxxxxxxxxx\=Namexxxxxxxxxxxxxxx\=\kill
+{\em R\^{o}le}                   \> {\em Contact}  \>{\em E-mail address}\\
+\\
+{\bf Project Manager}            \> Pat Wallace    \>{\tt ptw@star.rl.ac.uk} \\
+{\bf Project Scientist}          \> Alan Penny     \>{\tt A.J.Penny@rl.ac.uk} \\
+{\bf Head of Operations}         \> John Sherman   \>{\tt jcs@star.rl.ac.uk} \\
+{\bf Software Librarian}         \> Martin Bly     \>{\tt ussc@star.rl.ac.uk} \\
+{\bf Site Manager (PRO)}         \> Hiten Patel    \>{\tt hiten@star.rl.ac.uk} \\
+{\bf Maintenance}                \> Andrea Roberts \>{\tt avr@star.rl.ac.uk} \\
+{\bf Inventories}                \> Andrea Roberts \>{\tt avr@star.rl.ac.uk} \\
+{\bf SPARC/Solaris support}      \> Chris Clayton  \>{\tt cac@star.rl.ac.uk} \\
+{\bf Alpha/Digital Unix support} \> David Rawlinson\>{\tt djr@star.rl.ac.uk} \\
+{\bf PC/Linux support}           \> David Rawlinson\>{\tt djr@star.rl.ac.uk} \\
+{\bf Peripheral support}         \> Kevin Duffey   \>{\tt kpd@star.rl.ac.uk} \\
+{\bf Hardware purchasing}        \> Chris Clayton  \>{\tt cac@star.rl.ac.uk} \\
+{\bf Site contract renewals}     \> Kevin Duffey   \>{\tt kpd@star.rl.ac.uk} \\
+                                 \> Andrea Roberts \>{\tt avr@star.rl.ac.uk} \\
+{\bf Programmer contracts}        \> David Rawlinson \>{\tt djr@star.rl.ac.uk} \\
+{\bf Applications software development}\> Rodney Warren-Smith \>{\tt rfws@star.rl.ac.uk} \\
+{\bf Graphics and networking}    \> David Terrett  \>{\tt dlt@star.rl.ac.uk} \\
+{\bf Communications}             \> Chris Clayton  \>{\tt cac@star.rl.ac.uk}
+\end{tabbing}
+\end{quote}
+
+\newpage
+
+\section{\label{sitecodes}Site Codes}
+
+\begin{quote}
+\begin{tabbing}
+Codexxxxx\=Namexxxxxxxxxxxx\kill
+{\bf ARM} \> Armagh \\
+{\bf BEL} \> Belfast \\
+{\bf BIR} \> Birmingham \\
+{\bf BRI} \> Bristol \\
+{\bf CAM} \> Cambridge: IOA/RGO \\
+{\bf MRA} \> Cambridge: MRAO \\
+{\bf CAR} \> Cardiff \\
+{\bf DUR} \> Durham \\
+{\bf EDI} \> Edinburgh \\
+{\bf GLA} \> Glasgow \\
+{\bf HAT} \> Herts (Hatfield) \\
+{\bf IMP} \> Imperial College \\
+{\bf JOD} \> Jodrell Bank \\
+{\bf KEE} \> Keele \\
+{\bf KEN} \> Kent (Canterbury) \\
+{\bf LEE} \> Leeds \\
+{\bf LEI} \> Leicester \\
+{\bf LJM} \> Liverpool John Moores \\
+{\bf MAN} \> Manchester \\
+{\bf OXF} \> Oxford \\
+{\bf PRE} \> Central Lancashire (Preston) \\
+{\bf QMW} \> Queen Mary \& Westfield College \\
+{\bf PRO} \> RAL: Project \\
+{\bf RAL} \> RAL: Astrophysics \\
+{\bf SHE} \> Sheffield \\
+{\bf STA} \> St Andrews \\
+{\bf SOU} \> Southampton \\
+{\bf SUS} \> Sussex (Brighton) \\
+{\bf UCL} \> University College London \\
+\\
+{\bf Remote User Groups:} \\
+\\
+{\bf BRA} \> Bradford \\
+{\bf NOT} \> Nottingham \\
+{\bf OPU} \> Open University \\
+{\bf ULO} \> UCL Observatory, Mill Hill\\
+{\bf ULS} \> Ulster\\
+{\bf UMI} \> UMIST
+\end{tabbing}
+\end{quote}
+
+\newpage
+
+\section{\label{usernamesfile}Format of usernames.lis File}
+
+\begin{itemize}
+
+\item {\bf Header section}.
+
+This should start off with a Title on the first line which identifies your site,
+followed by a line containing the date of the last revision and the file name.
+An example of what is required is:
+
+\begin{verbatim}
+                    LOCAL STARLINK USERNAMES (PRO)
+Current date: 15-Nov-95                    /star/local/admin/usernames.lis
+\end{verbatim}
+Put your 3-character site code (see {\em Appendix~\ref{sitecodes}}) at the end
+of the Title to identify your site.
+
+This can be followed by any other information you like, such as the meaning
+of user codes, or lists of generic usernames in use at your site.
+Any information you put in the Header section will be ignored by the merging
+programs.
+Only information in the User section will be used.
+
+\item {\bf User section}.
+
+This is the most important section of the file.
+It contains the information that is extracted and merged at RAL to produce
+complete user lists.
+{\em Do not use tabs to separate fields, in fact don't use tabs anywhere in
+the file -- they derange the merging programs.}
+
+{\bf The section must start with a line containing the characters
+{\tt +++} in columns 3 to 5.}
+This is important because it is what the merging programs look for to find
+the start of the User section.
+
+This is followed by one line for each user containing the following
+information in the following format:
+
+\begin{itemize}
+\item Column 1: {\bf User code:}
+ \begin{quote}
+ \begin{description}
+  \item [r] -- Research astronomer (UK).
+  \item [t] -- Technical support (UK).
+  \item [o] -- Other (UK).
+  \item [u] -- Undergraduate (UK).
+  \item [a] -- Associate (UK).
+  \item [f] -- Foreign (non-UK).
+ \end{description}
+ \end{quote}
+ Specify a user code {\em only}\, for your {\em Primary}\, users.
+ Leave the field blank for your {\em Secondary}\, users (it will be ignored
+ in this case by the merge programs).
+\item Column 2: {\bf Secondary user.}\\
+ Type an {\tt *} if the user is a Secondary user; leave blank otherwise.
+ Thus, if column 1 contains a code, column 2 should be blank, and if column 2
+ contains an {\tt *}, column 1 should be blank.
+\item Columns 3-26: {\bf Username(s).}\\
+ If more than one is specified, separate them with a {\tt /} character.
+\item Columns 27-49: {\bf Surname.}
+\item Columns 51-68: {\bf First name} or familiar name.
+\item Columns 70-74: {\bf Location code.}\\
+ Use the codes specified in file {\tt /star/admin/location}.
+ If an appropriate code isn't listed, invent one and tell the
+ {\em Document Librarian}\, about it.
+\item Columns 82-132: {\bf E-mail address.}\\
+ Include the username, {\em e.g.}\ {\tt pma@star.rl.ac.uk}.
+ If a user has more than one, then he will have to pick one to have
+ advertised in this slot.
+\end{itemize}
+\end{itemize}
+
+\newpage
+
+\section{\label{cronjob}Cron Job to send usernames.lis file to RAL once a month}
+
+{\em Procedure:}
+
+\begin{itemize}
+
+\item Select a machine on which to run the cron job and put an entry in the
+crontab file, as described below, to run the ftp job at the time specified
+below for your site.
+
+\item Login as root.
+
+\item The entry in the crontab file should be of the form:
+\begin{quote}
+{\tt <minute> 0 14 * * ftp starlink-ftp.rl.ac.uk}
+\end{quote}
+This tells your computer to open an ftp session to {\tt starlink-ftp.rl.ac.uk}
+at {\tt <minute>} past midnight on the 14th day of each month.
+The actual ftp of the file is carried out using a {\tt /.netrc} file 
+owned by root and with 600 permission.
+
+\item The {\tt /.netrc} file should contain the following lines:
+\begin{quote}
+----------------------------------------------\\
+{\tt 
+machine starlink-ftp.rl.ac.uk\\
+login anonymous\\
+password usernames\\
+macdef init\\
+cd /admin/mdl\\
+put /star/local/admin/usernames.lis namesXXX.lis\\
+quit\\
+\\
+}
+----------------------------------------------
+\end{quote}
+The blank line at the end is {\em required}.
+In the ``put" command, use the full name of your current Local Usernames File.
+(Beware: in the past, some sites have sent obsolete versions of this file by
+mistake.)
+Replace {\tt XXX} with your 3-letter site code (see {\em
+Appendix~\ref{sitecodes}}).
+Use uppercase characters for your site code -- for example the correct name for
+the Project site would be {\tt namesPRO.lis}.
+
+\item Now set up your crontab file:
+
+\begin{itemize}
+
+\item Make a copy of your current crontab file:
+\begin{quote}
+{\tt \# crontab -l {\verb+>+} cron.tmp}
+\end{quote}
+
+\item Edit this file to add the entry shown previously.
+
+\item Resubmit your crontab file.
+\begin{quote}
+{\tt \# crontab cron.tmp}
+\end{quote}
+
+\item Check that it is there with:
+\begin{quote}
+{\tt \# crontab -l}
+\end{quote}
+
+\end{itemize}
+\end{itemize}
+
+Each site should copy their file at a different time to avoid overloading
+RAL's ftp machine.
+The correct value of {\tt <minute>} at your site is specified in the following
+table:
+
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{||lr|lr|lr|lr||} 	\hline
+%CODExxx\=\kill
+ARM &  2 & BEL &  4 & BIR &  6 & CAM &  8 \\
+MRA & 10 & CAR & 12 & DUR & 14 & EDI & 16 \\
+GLA & 18 & HAT & 20 & IMP & 22 & JOD & 24 \\
+KEE & 26 & KEN & 28 & LEI & 30 & LJM & 32 \\
+MAN & 34 & OXF & 36 & PRE & 38 & QMW & 40 \\
+PRO & 42 & RAL & 44 & STA & 46 & SOU & 48 \\
+SUS & 50 & UCL & 52 & SHE & 54 & BRI & 56 \\
+LEE & 58 &     &    &     &    &     &    \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+Sometimes the cron job fails to copy the usernames file to RAL successfully.
+When this happens, you may get a request from Kevin Duffey for you to
+e-mail the file to him directly.
+It is important that you send the file directly to him by e-mail, rather than
+just re-running the cron job.
+This is because the cron job only copies the file to a system directory at
+RAL.
+Another step is required to copy this file from here to Mike's working
+directory, and this only happens once a month (after the original cron jobs
+have run).
+If you just re-run the cron job, Mike won't get the file.
+
+\end{document}

@@ -1,0 +1,1249 @@
+\documentstyle[twoside,11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocsource}    {sgp\stardocnumber}
+\newcommand{\stardocnumber}    {47.1}
+\newcommand{\stardocauthors}   {Martin Clayton}
+\newcommand{\stardocdate}      {11 March 1997}
+\newcommand{\stardoctitle}     {Computer Algebra Software}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
+\newcommand{\sgspec}[2]{#1}
+\begin{htmlonly}
+\renewcommand{\sgspec}[2]{#2}
+\end{htmlonly}
+
+% star2HTML and post-processing
+% =============================
+%
+% This following can be used to invoke star2html and post-process this
+% document to generate HTML as the author intended.
+%
+% To run the script, automatically extracting from this file:
+%
+%    % egrep -e "^%%S2HPOST" sgp47.tex | sed -e "s/^%%S2HPOST//" | csh
+
+%%S2HPOST#!/bin/csh
+%%S2HPOST
+%%S2HPOST# Definitions.
+%%S2HPOST    set AUTH_NAME = 'Martin Clayton';
+%%S2HPOST    set AUTH_EMAIL = 'mjc@star.ucl.ac.uk';
+%%S2HPOST    set DOC_CODE = sgp47;
+%%S2HPOST    set DOC_TITLE = 'Computer Algebra Software';
+%%S2HPOST
+%%S2HPOST# Star2html process.
+%%S2HPOST    star2html -a "${AUTH_NAME}" -m "${AUTH_EMAIL}" -t \
+%%S2HPOST            "${DOC_TITLE}" ${DOC_CODE}
+%%S2HPOST
+%%S2HPOST# Generate Perl script to do the work.
+%%S2HPOST    cat >! ${DOC_CODE}$$.pl <<FOO
+%%S2HPOST#!/usr/local/bin/perl
+%%S2HPOST
+%%S2HPOST# To be used in a pipe.
+%%S2HPOST# Post-processing for star2html.
+%%S2HPOST
+%%S2HPOST\$last_line = '';
+%%S2HPOST\$last_invisanchor = 0;
+%%S2HPOST\$AUTH_EMAIL = '$AUTH_EMAIL';
+%%S2HPOST
+%%S2HPOST\$nlines = 0;
+%%S2HPOSTwhile ( <> ) {
+%%S2HPOST
+%%S2HPOST# Add mailto URL if e-mail address is found.
+%%S2HPOST    s#\$AUTH_EMAIL#<A HREF="mailto:\${AUTH_EMAIL}">\${AUTH_EMAIL}</A>#;
+%%S2HPOST
+%%S2HPOST# Some small adjustments - gets rid of blank space at page top.
+%%S2HPOST    s/<P><ADDRESS>/<ADDRESS>/;
+%%S2HPOST    s/<BR> <HR>/<HR>/g;
+%%S2HPOST    s/<HR> <P>/<HR>/g;
+%%S2HPOST    s/<DD>  <BR>/<DD>/g;
+%%S2HPOST
+%%S2HPOST# Convert em dashes into single hyphens.
+%%S2HPOST    s/([^-])---([^-])/\1-\2/g;
+%%S2HPOST
+%%S2HPOST# Try to get rid of "invisible" anchors by tying them to the next word.
+%%S2HPOST# Also try to handle "doubles" caused by \xlabel{}\label{} type things.
+%%S2HPOST    s:(<H[1-9]><A NAME=SECTION[^>]*><A NAME=[^>]*>)&#160;(</A>)(<A NAME=[^>]*>)&#160;(</A>)([^<]*):\1\3\5\2\4:;
+%%S2HPOST    s:(<H[1-9]><A NAME=SECTION[^>]*><A NAME=[^>]*>)&#160;(</A>)([^<]*):\1\3\2:;
+%%S2HPOST
+%%S2HPOST# Same procedure for invisible anchors in list items...
+%%S2HPOST    s:(<LI> <b><A NAME=[^>]*>)&#160(</A>)([^<]*)(</b><BR>):\1\3\2\4:;
+%%S2HPOST
+%%S2HPOST# Minor correct for some lists.
+%%S2HPOST    s:<LI> :<LI>:;
+%%S2HPOST
+%%S2HPOST# Get rid of double horizontal rules (shouldn't be any...)
+%%S2HPOST    if ( \$last_line eq "<HR>\n" ) {
+%%S2HPOST        if ( \$_ eq "<HR>\n" ) {
+%%S2HPOST            next;
+%%S2HPOST        }
+%%S2HPOST
+%%S2HPOST# Get rid of double Paragraph breaks.
+%%S2HPOST    } elsif ( \$last_line eq "<P>\n" ) {
+%%S2HPOST        if ( \$_ eq "<P>\n" ) {
+%%S2HPOST            next;
+%%S2HPOST        }
+%%S2HPOST
+%%S2HPOST# This is an attempt to convert invisible anchors introduced by \indexentry
+%%S2HPOST# to be attached to the next word.
+%%S2HPOST    } elsif ( \$last_invisanchor != 0 ) {
+%%S2HPOST        if ( \$_ eq "<P>\n" ) {
+%%S2HPOST            next;
+%%S2HPOST
+%%S2HPOST        } else {
+%%S2HPOST            \$last_invisanchor = 0;
+%%S2HPOST            ( \$firstword, \$rest ) = split( ' ', \$_, 2 );
+%%S2HPOST            print "\$1\$firstword\$2 \$rest";
+%%S2HPOST            \$last_line = \$_;
+%%S2HPOST            next;
+%%S2HPOST        }
+%%S2HPOST    }
+%%S2HPOST
+%%S2HPOST# Note that an \indexentry introduced anchor is here.
+%%S2HPOST    if ( m-^[ ]?(<A NAME=[^>]*>)&#160;(</A>)- ) {
+%%S2HPOST        \$last_invisanchor = 1;
+%%S2HPOST        \$last_line = \$_;
+%%S2HPOST        next;
+%%S2HPOST
+%%S2HPOST    }
+%%S2HPOST
+%%S2HPOST    print;
+%%S2HPOST    \$last_line = \$_;
+%%S2HPOST
+%%S2HPOST# Encapsulate page in HTML tags.
+%%S2HPOST    if ( \$nlines == 0 ) {
+%%S2HPOST       print "<HTML>\n";
+%%S2HPOST       \$nlines = 1;
+%%S2HPOST    }
+%%S2HPOST}
+%%S2HPOST
+%%S2HPOST# End encapsulate
+%%S2HPOSTprint "</HTML>\n";
+%%S2HPOST
+%%S2HPOST#
+%%S2HPOST# End-of-file.
+%%S2HPOSTFOO
+%%S2HPOST    chmod 755 ${DOC_CODE}$$.pl;
+%%S2HPOST
+%%S2HPOST# Make changes.
+%%S2HPOST    cd ${DOC_CODE}.htx;
+%%S2HPOST    echo '';
+%%S2HPOST    echo "! star2html post-processing ${DOC_CODE}.";
+%%S2HPOST    echo -n "! General HTML changes";
+%%S2HPOST    foreach f ( *.html )
+%%S2HPOST        cat $f | ../${DOC_CODE}$$.pl >! temp$$.html;
+%%S2HPOST        mv -f temp$$.html $f;
+%%S2HPOST        echo -n '.';
+%%S2HPOST    end
+%%S2HPOST    rm -f ../${DOC_CODE}$$.pl;
+%%S2HPOST    rm -f temp$$.html;
+%%S2HPOST    echo '';
+%%S2HPOST    echo -n '! Correcting References, file: ';
+%%S2HPOST    set REFS_FILE = `grep -l 'value="References' n*.html`;
+%%S2HPOST    echo ${REFS_FILE}.;
+%%S2HPOST    perl -e 's:<DD> :<DD>:' -p ${REFS_FILE} > t$$.html;
+%%S2HPOST    mv -f t$$.html ${REFS_FILE};
+%%S2HPOST    echo '! Hyperlinking document against Master Document Set at RAL.';
+%%S2HPOST    cd ..;
+%%S2HPOST    setenv HTX_PATH .;
+%%S2HPOST    hlink .;
+%%S2HPOST    echo '! Hyperlink done.';
+%%S2HPOST    echo '! star2html post-processing complete.'
+%%S2HPOST
+%%S2HPOSTexit
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents.
+%  ================================
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
+  \label{stardoccontents}
+  \begin{rawhtml}
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+This document is designed as an aid to those who need to find, or use,
+software for computer algebra.
+Some of the text is based on a review undertaken to determine whether
+the existing Starlink provision for computer algebra is sufficient and
+appropriate.
+At present there is a copy of Maple, available to anyone with a Starlink
+account, on the central stadat machine.
+
+The document compares the two main packages available for computer algebra,
+gives short descriptions of other popular packages, includes a list of
+`pointers' to other sources of information, and offers some general hints
+on selecting software.
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+ \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \setcounter{tocdepth}{2}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+%   \markright{\stardocname}{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\xlabel{introduction}\label{se_introduction}Introduction}
+\markboth{\stardocname}{Introduction}
+
+This document is designed as an aid to those who need to find, or use,
+software for computer algebra.
+Some of the text is based on a review undertaken to determine whether
+the existing Starlink provision for computer algebra is sufficient and
+appropriate.
+At present there is a copy of Maple, available to anyone with a Starlink
+account, on the central stadat machine.
+
+The document compares the two main packages available for computer algebra,
+gives short descriptions of other popular packages, includes a list of
+`pointers' to other sources of information, and offers some general hints
+on selecting software.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\xlabel{maple_mathematica}\label{se_maple_mathematica}Maple and
+         Mathematica}
+\markboth{\stardocname}{Maple \& Mathematica}
+
+The two major software packages available for computer algebra are Maple
+and Mathematica.  Both Packages are commercial and have similar
+capabilities.  Both packages are available for a wide range of operating
+systems, including those which Starlink supports.
+
+
+\subsection{Maple}
+
+Maple is the on-going product of a research project at the University of
+Waterloo in Canada.  Maple was first developed by the authors in the early
+1980s in response to their perception that the (then) existing software in
+the field was inadequate.
+The current version is Maple V Release~4.
+
+Maple is a general-purpose package for mathematical manipulation.
+It is programmable, and the source code for its internal routines is
+available as part of the package.
+This allows easy inspection of the algorithms used in standard functions,
+and adaption of these functions to similar tasks.
+The program has extensive support for graphical display of functions and
+equations etc., on-screen, in a manner resembling normal mathematical
+notation.
+
+Waterloo Maple have a set of world-wide web pages which start at:
+
+\begin{itemize}
+
+\item \htmladdnormallink{{\tt http://www.mathematics.com/}}
+      {http://www.mathematics.com/}
+
+\end{itemize}
+
+
+\subsection{Mathematica}
+
+Mathematica is a product of Wolfram Research Inc.\ founded by the
+`architect' of the system, Stephen Wolfram.  Mathematica first appeared in
+1988.  The most recent release is Version 3.0 which is styled as the
+`World's only fully integrated technical computing system'.
+Wolfram are well known for their no-holds-barred hype.
+
+Mathematica, like Maple, offers capabilities for symbolic and numerical
+computations.  Numeric computations can be carried out to `arbitrary'
+precision, though obviously the higher the precision, the more time required
+to complete the calculation.  There is a full suite of functions supporting
+2- and 3-dimensional plotting of data and functions.  Mathematica
+incorporates a graphics language capability which can be used to produce
+visualisations of complex objects.
+
+There is an {\sl Applications Library} available which includes a range of
+application-tailored tools written in Mathematica's language.  These include:
+a 3-D real-time graphics tool; a control-system tool; an experimental data
+analyser; mechanical, electrical, and signal analysers.  There are also
+packages for financial work.
+
+There have been several papers and reviews critical of Mathematica; this
+is at least partly due to the marketing strategy of the company.  At least
+some of these critical reviews have turned on the debate about the difference
+between accuracy and precision (sic).  There is an extensive
+review available via FTP\cite{fateman}\@.
+
+Wolfram have a set of world-wide web pages which start at:
+
+\begin{itemize}
+
+\item \htmladdnormallink{{\tt http://www.wri.com/}}{http://www.wri.com/}
+
+\end{itemize}
+
+
+\subsection{Comparison of Maple \& Mathematica}
+
+Maple and Mathematica have largely the same capabilities in the area
+of computer algebra, however, they do differ in some important ways,
+reflecting their designs.
+
+Both Mathematica and Maple provide on-line help facilities which document
+their capabilities.  These help facilities are useful for locating
+functions (and functionality) you might require.  The on-line help for
+Maple is more extensive than that in Mathematica, providing examples and
+cross-references not normally present in the Mathematica help.
+
+Maple is written in its own programming language and this source is
+available to the user who can inspect and modify the code, perhaps
+adapting the code to specific requirements.  The source code for
+Mathematica is written in C and is not generally available.
+
+Programming in the two systems is different.  The Maple language is
+similar in style to Pascal.
+Mathematica supports several styles of programming:
+object-oriented, procedural, rule-based and functional.
+The naming convention for internal functions in Maple is less consistent
+than that of Mathematica.
+All built-in Mathematica functions start with a capital letter.
+Built-in Maple functions can be fully upper-case, capitalised or fully
+lower-case.
+
+Mathematica has a large, monolithic kernel and can take a small amount of
+time to load into memory.
+Maple, on the other hand, is modular in design;
+the Maple kernel loads functions into memory on demand and thus can be
+expected to generally run in less memory than Mathematica.  This would
+only be a problem if the system is expected to run on a PC with less than
+32 Megabytes of RAM\@.
+
+Both Maple and Mathematica support output of equations and the like
+in \LaTeX\ format.
+
+\subsection{Maple or Mathematica?}
+
+It's difficult to make a firm recommendation of either Maple or
+Mathematica\sgspec{---}{ - }it depends on what you want to do, what
+hardware you have available, and so on.  It may be the case that the
+various `frills' which Mathematica offers will be of use to you,
+for example, the provision of the ability to manifest a function
+in sound.
+
+University-based individuals might investigate local expertise in one or
+both of the packages; there is no substitute for a local guru when trying
+to get something to work.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\xlabel{starlink_maple}\label{se_starlink_maple}Central Starlink
+         Maple Service}
+\markboth{\stardocname}{The Central Starlink Maple service}
+
+Starlink provides a central Maple service for those who do not have access
+to computer algebra facilities at their Starlink site.
+The system is installed on the stadat machine at RAL.
+If you do not already have access to the machine\sgspec{---}{ - }some
+Starlink sites may have a single account for all their
+users\sgspec{---}{ - }you will have to apply for an account (not as painful
+as it might sound).
+The service, how to access it, and an introduction to usage, can be found in
+the Starlink document \xref{SUN/107, {\sl Maple\sgspec{---}{ - }Mathematical
+Manipulation Language}}{sun107}{}\@.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\xlabel{other_software}\label{se_other_software}Other Software}
+\markboth{\stardocname}{Other Software}
+
+At the time of writing there are no packages of comparable capabilities and
+widespread use as Maple and Mathematica.
+Both products attempt to be market leaders and undergo continuous development.
+There are many packages with subsets of the capabilities available and these
+are comprehensively listed in a database maintained at Berkeley (see the
+\htmlref{Appendix}{se_packages}).
+
+There is a newsgroups which may be of interest to those investigating
+computer algebra software:
+
+\begin{itemize}
+
+\item \htmladdnormallink{{\tt news:sci.math.symbolic}}{sci.math.symbolic}
+
+\end{itemize}
+
+The appendix data are drawn from the extensive on-line database about
+mathematical software at Berkeley.  The source file is:
+
+\begin{itemize}
+
+\item \htmladdnormallink{\tt
+        ftp://math.berkeley.edu/pub/Symbolic\_Soft/Available\_Systems}
+       {ftp://math.berkeley.edu/pub/Symbolic_Soft/Available_Systems}
+
+\end{itemize}
+
+There is more extensive information available on many of these packages
+at this site.
+
+One package mentioned only very briefly in the Appendix is MathSoft's
+{\sl MathCad.}  MathCad offers many of the facilities present in Maple
+and Mathematica, its symbolic technology is actually based on that of
+maple.  MathCad is available for MS-Windows and Macintosh systems.
+MathCad's world-wide web homepage is:
+
+\begin{itemize}
+
+\item \htmladdnormallink{\tt http://www.mathsoft.com/all60.htm}
+       {http://www.mathsoft.com/all60.htm}
+
+\end{itemize}
+
+Per Bergehed maintains a `Math Software' web page which is a useful
+resource:
+
+\begin{itemize}
+
+\item \sgspec{{\tt
+       http://www.dtek.chalmers.se/\symbol{126}d0pbm/math/math.html}}
+       {\htmladdnormallink{
+       \verb+http://www.dtek.chalmers.se/~d0pbm/math/math.html+}
+       {http://www.dtek.chalmers.se/\~{}d0pbm/math/math.html}}
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thebibliography}{99}\addcontentsline{toc}{section}{References}
+\markboth{\stardocname}{References}
+
+\bibitem{leaves} Bruce W.~Char, Keith O.~Geddes, Gaston H.~Gonnet,
+     Michael B.~Monagan and Stephen M.~Watt,\\
+     {\sl MAPLE First Leaves, A Tutorial Introduction to Maple,}\\
+     (Third Edition), Publ.~Waterloo Maple Publishing, 1990.
+
+\bibitem{maple} Bruce W.~Char, Keith O.~Geddes, Gaston H.~Gonnet,
+     Michael B.~Monagan and Stephen M.~Watt,\\
+     {\sl MAPLE Reference Manual,}\\
+     (Fifth Edition), Publ.~Waterloo Maple Publishing, March 1988.
+
+\bibitem{fateman} Richard J.~Fateman,\\
+     {\sl A Review of Mathematica,}\\
+     \htmladdnormallink{{\tt
+      ftp://math.berkeley.edu/pub/Symbolic\_Soft/Mathematica/Review.tex}}
+     {ftp://math.berkeley.edu/pub/Symbolic_Soft/Mathematica/Review.tex}.
+
+\bibitem{wolfram2} Stephen Wolfram,\\
+     {\sl Mathematica, A system for Doing Mathematics by Computer,}\\
+     (Second Edition), Publ.~Addison Wesley, July 1993.
+
+\bibitem{wolfram3} Stephen Wolfram,\\
+     {\sl The Mathematica Book,}\\
+     (Third Edition), Wolfram Media/Cambridge University Press, 1996.
+
+\bibitem{deSouza} Paulo Ney de Souza,\\
+     {\sl Computer Algebra Systems,}\\
+     Department of Mathematics, University of California, Berkeley,
+     California.\\
+     \htmladdnormallink{{\tt
+      ftp://math.berkeley.edu/pub/Symbolic\_Soft/Available\_Systems}}
+     {ftp://math.berkeley.edu/pub/Symbolic_Soft/Available_Systems}
+
+\end{thebibliography}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\appendix
+\section{\xlabel{packages}\label{se_packages}Algebra Software Packages}
+\markboth{\stardocname}{Algebra Software Packages}
+
+{\sl Only those packages from the software list with computer algebra
+capabilities, and available for PCs or Starlink-supported operating
+systems, are included.  Some lengthy lists of supported operating systems
+have been removed.}
+
+This is the  list of  currently  developed  and   distributed   software  for
+symbolic mathematical applications. It was started a few years ago by  Booker
+Bense of the UC San Diego Supercomputer Center. He is responsible for     the
+lay-out and for the idea of collecting this database. Most of the information
+here is obtained from the developers and we try to keep it up to date, a  not
+so easy task.
+
+Electronic mail concerning this database and additions to it could be
+sent to:
+
+\begin{verbatim}
+   ca@math.berkeley.edu
+\end{verbatim}
+
+\subsection{General Purpose}
+
+\subsubsection{Axiom}
+\begin{verbatim}
+  Type:      Commercial
+  Machines:  SUN Sparc, IBM RS 6000's and other IBM mainframe platforms.
+  Contact:   USA:                         Rest of the world:
+             ryan@nag.com                 valerie@nag.co.uk
+             NAG Inc                      NAG Ltd
+             1400 Opus Place, Suite 200   Wilkinson House
+             Downers Grove, Il 60515-5702 Jordan Hill Rd.
+             Phone: 708-971-2337          Oxford OX2 8DR
+             Fax:   708-971-2706          United Kingdom
+                                          Phone: [+44] 865-51-1245
+                                          Fax:   [+44] 865-31-0139
+             or
+             axiom@watson.ibm.com
+  Version:   1.2
+  Comments:  General purpose. Object oriented with multiple inheritance
+             based on algebraic concepts. Powerful type-inferencing
+             techniques to minimise the need for type declarations.
+             Hypertext browser and on-line documentation with source code
+             available for all library functions. High level interactive
+             language and powerful graphics capability. Design goal:
+             unlimited extensibility without degradation in performance
+             or usability. Release 2 will provide ability to create
+             stand-alone packages and links to Nag Fortran Libraries of
+             numerical and statistical routines and a compiler for Axiom
+             programs.
+\end{verbatim}
+
+\newpage
+\subsubsection{Derive}
+\begin{verbatim}
+  Type:      Commercial
+  Machines:  Runs on PC's and HP 95's.
+  Contact:   Soft Warehouse Inc. 3660 Waialae Ave, Suite 304
+             Honolulu Hi 96816-3236 Phone: 808-734-5801
+  Version:   2.59
+  Comments:  Very robust, gets problems that other larger programs fail
+             on. Low cost. Runs on the tiny palmtops like HP 95-100 and
+             on meager machines like the PC XT.
+\end{verbatim}
+
+\subsubsection{FORM}
+\begin{verbatim}
+  Type:      Version 1 is public domain, Version 2 is commercial
+  Machines:  MS-DOS, AtariSt, Amiga, Mac, Sun3, SunSparc, Apollo, NeXT,
+             VAX/VMS, VAX/Ultrix, DECStation, HP, IBM Risc, IBM 3090,
+             MIPS, Alliant, Gould and SGI.
+  Contact:   t68@nikhef.nl (Jos Vermaseren)
+             Binary versions of version 1 are available
+             by anonymous FTP from nikhef.nikhef.nl (192.16.199.1)
+             Version 2 is commercially distributed by:
+             CAN, Kruislaan 419, 1098 VA Amsterdam,
+             The Netherlands
+             form@can.nl  Phone: [+31] 20 560-8400 Fax: [+31] 20 560-8448
+  Version:   1 and 2.
+  Comments:  General purpose, designed for BIG problems, batch-like
+             interface.
+\end{verbatim}
+
+\subsubsection{GNU-calc}
+\begin{verbatim}
+  Type:      GNU copyleft
+  Machines:  Where Emacs runs.
+  Contact:   Free Software Foundation
+  Comments:  It runs inside GNU Emacs and is written entirely in Emacs
+             Lisp. It does the usual things: arbitrary precision integer,
+             real, and complex arithmetic (all written in Lisp),
+             scientific functions, symbolic algebra and calculus,
+             matrices, graphics, etc. and can display expressions with
+             square root signs and integrals by drawing them on the
+             screen with ASCII characters. It comes with a well written
+             600 page on-line manual. You can FTP it from any GNU site.
+\end{verbatim}
+
+\subsubsection{JACAL}
+\begin{verbatim}
+  Type:      Gnu CopyLeft
+  Machines:  Needs Scheme ver. R4RS.
+  Contact:   Aubrey Jaffer, 84 Pleasant St. Wakefield MA 01880, USA.
+             jaffer@martigny.ai.mit.edu
+  Version:   1a4
+  Comments:  An IBM PC version on floppy for $99 is available from
+             Aubrey Jaffer, 84 Pleasant St. Wakefield MA 01880, USA.
+             There is a Scheme implementation available from the same
+             sites as JACAL which will run it on just about any machine
+             with a C compiler (Amiga, Atari-ST, MacOS, MS-DOS, OS/2,
+             NOS/VE, Unicos, VMS, Unix and similar systems). FTP sites:
+             altdorf.ai.mit.edu:archive/scm/jacal1a4.tar.gz
+             prep.ai.mit.edu:pub/gnu/jacal/jacal1a4.tar.gz
+             nexus.yorku.ca:pub/scheme/new/jacal1a4.tar.gz
+             ftp.maths.tcd.ie:pub/bosullvn/jacal/jacal1a4.tar.gz
+             JACAL is a symbolic mathematics system for the simplification
+             and manipulation of equations and single and multiple valued
+             algebraic expressions constructed of numbers, variables,
+             radicals, and algebraic functions, differential, and
+             holonomic functions.  In addition, vectors and matrices of
+             the above objects are included.
+\end{verbatim}
+
+\subsubsection{Macsyma}
+\begin{verbatim}
+  Macsyma was developed at MIT and has spun-off a series of different
+  versions that run on specific machines. The full list consists of:
+  Macsyma, DOE-Macsyma, Maxima, Aljabr, Paramacs and Vaxima.
+
+  (i) Macsyma
+  Type:      Commercial
+  Machines:  PC386/387 and 486 (no SX's) PC's.
+             SPARC Solaris, SPARC SunOS, HP9000 RISC, and IBM
+             RS/6000, and the SGI IRIX release will ship soon
+  Contact:   Macsyma Inc,  20 Academy St., Arlington MA 02174-6436
+             info-macsyma@macsyma.com Phone: 800-MACSYMA Fax: 617-646-3161
+  Version:   Version 2 for PC's and 419 for Unix Workstations.
+  Comments:  General purpose, many diverse capabilities, one of the
+             oldest around. Includes proprietary improvements from
+             Symbolics and Macsyma Inc. Descendant of MIT's Macsyma.
+             Recent major enhancements include new capabilities in ODE's,
+             Laplace transforms, integrations, inequalities, linear
+             algebra and partial differential equations.
+
+  (ii) DOE-Macsyma:
+  Type:      Distribution fee only
+  Machines:  The public domain Franz Lisp version, runs on Unix machines,
+             including Suns and Vaxes using Unix.
+  Contact:   ESTSC - Energy Science & Technology Software Center
+             P. O. Box 1020 Oak Ridge TN 37831-1020
+             Phone: 615-576-2606
+  Comments:  Help with DOE-Macsyma; general and specific help with issues
+             such as support, new versions, etc: lph@paradigm.com
+             Leo Harten from Paradigm Associates, Inc. 29 Putnam Avenue,
+             Suite 6, Cambridge, MA 02139 617-492-6079.
+
+  (iii) Maxima
+  Type:      License for a fee. Get license from ESTSC before download.
+  Machines:  Unix workstations (Sun, MIPS, HP, PC's) and PC-DOS (beta).
+  Contact:   Bill Schelter (wfs@math.utexas.edu)
+  Version:   4.155
+  Comments:  General purpose -  MIT Macsyma family. Common Lisp
+             implementation by William F. Schelter, based on Kyoto
+             Common Lisp. Modified version of DOE-Macsyma available
+             to ESTSC (DOE) sites. Get the license from ESTSC (Phone:
+             615-576-2606) and then download the software from
+             DOS: math.utexas.edu:pub/beta-max.zip   or
+             UNIX: rascal.ics.utexas.edu:pub/maxima-4-155.tar.Z
+             Currently their charge for 1 machine license is $165 to
+             universities. Site licenses are also available.
+
+  (iv) Aljabr
+  Type:      Commercial
+  Machines:  Mac's with 4Meg of RAM.
+  Contact:   Fort Pond Research, 15 Fort Pond Road, Acton MA  01720 US
+             aljabr@fpr.com, Phone: 508-263-9692
+  Version:   1.0
+  Comments:  MIT Macsyma family descendant, uses Franz LISP.
+
+  (v)  Paramacs
+  Type:      Commercial
+  Machines:  VAX-VMS, Sun-3, Sun-4, (SGI and Mac's on the works)
+  Contact:   Paradigm Associates, Inc.
+             29 Putnam Avenue, Suite 6, Cambridge, MA 02139
+             lph@paradigm.com, Phone: 617-492-6079
+  Version:   1
+  Comments:  Improved SHARE library and enhanced ODE solver (over
+             DOE-Macsyma) and animated graphics. Maintenance, phone
+             services, and site licensing available.
+
+  (vi) Vaxima
+  Type:      Distribution fee only
+  Machines:  VAX-Unix
+  Contact:   ESTSC (see DOE-Macsyma above)
+  Comments:  General purpose -  MIT Macsyma family descendant.
+             Includes source and binaries with assembler for Macsyma
+             and Franz Lisp Opus 38
+\end{verbatim}
+
+\subsubsection{Maple}
+\begin{verbatim}
+  Type:      Commercial
+  Machines:  Most common systems.
+  Contact:   Waterloo Maple Software, 450 Phillip Street,
+             Waterloo, Ontario, Canada     N2L 5J2
+             info@maplesoft.on.ca, support@maplesoft.on.ca
+             Phone: 519-747-2373 and 800-267-6583
+             Fax: 519-747-5284
+  Version:   5 release 3.
+  Comments:  General purpose, source available for most routines. Graphic
+             and animation. On-screen and printable real-math notation.
+             Worksheet interface on Amiga, Macintosh, NeXT, Unix X
+             Windows, PC Windows and DEC VMS. Demo programs available
+             for DOS, Windows 3.1 and Macintosh. The demo of the program
+             for PC-DOS can be obtained from anonymous FTP at
+             wuarchive.wustl.edu:/edu/math/msdos/modern.algebra/maplev.zip
+             Student versions available for MAC and PC's. A share library
+             contains many additional Maple routines, packages, and
+             application worksheets. It is distributed with the product,
+             and is also available through anonymous ftp from
+
+                     daisy.uwaterloo.ca      129.97.140.58
+                     neptune.inf.ethz.ch     129.132.101.33
+                     ftp.inria.fr            128.93.2.54
+                     canb.can.nl             192.16.187.2
+                     ftp.maplesoft.on.ca
+
+             Maple's symbolic technology is incorporated into MathCAD
+             (MathSoft, Inc), MATLAB (The MathWORKS, Inc) and PV-WAVE
+             (Visual Numerics, Inc).
+\end{verbatim}
+
+\subsubsection{MAS}
+\begin{verbatim}
+  Type:      Anonymous FTP
+  Machines:  Atari ST (TDI and SPC Modula-2 compilers), IBM PC/AT
+             (M2SDS and Topspeed Modula-2 compilers) and Commodore
+             Amiga (M2AMIGA compiler).
+  Contact:   H. Kredel. Computer Algebra Group
+             University of Passau, Germany
+  Version:   0.60
+  Comments:  MAS is an experimental computer algebra system combining
+             imperative programming facilities with algebraic
+             specification capabilities for design and study of algebraic
+             algorithms. MAS is available via anonymous FTP from:
+             alice.fmi.uni-passau.de = 123.231.10.1
+\end{verbatim}
+
+\subsubsection{Matlab Symbolic Math Toolbox}
+\begin{verbatim}
+  Type:      Commercial
+  Machines:  Microsoft Windows, Sun SPARC, HP 9000/700, DEC, IBM RS/6000,
+             Silicon Graphics.  Under preparation: Macintosh
+  Contact:   The MathWorks, Inc.
+             24 Prime Park Way
+             Natick, MA  01760-1500
+             info@mathworks.com  Phone: 508-653-1415  Fax: 508-653-2997
+  Version:   1.0
+  Comments:  General purpose. Based on the Maple V computational kernel,
+             with a set of MATLAB M-files designed to make symbolic
+             computation more easy. The MATLAB Symbolic Math Toolbox
+             includes the computational functions in the Maple kernel
+             and the linear algebra package.  An Extended Symbolic Math
+             Toolbox is also available that supports Maple procedure
+             execution and includes other Maple packages for statistics,
+             Grobner basis, combinatorial functions, number theory,
+             Euclidean geometry, Lie symmetries, etc.
+\end{verbatim}
+
+
+\subsubsection{Mathematica}
+\begin{verbatim}
+  Type:      Commercial
+  Machines:  Most common systems.
+  Contact:   Wolfram Research, Inc.
+             100 Trade Center Drive, Champaign IL 61820-7237
+             Phone: 1-800-441-MATH  & 217-398-0700
+             Fax: 217-398-0747
+             email: info@wri.com
+
+             Wolfram Research Europe Ltd.
+             10 Blenheim Office Park, Lower Road, Long Hanborough,
+             Oxfordshire OX8 8LN, UNITED KINGDOM
+             Phone: +44-(0)1993-883400, Fax: +44-(0)1993-883800
+             email: info-euro@wri.com
+
+  Version:   2.2
+  Comments:  General purpose, Notebook interface on Windows, NEXTSTEP, Mac,
+             and most Unix platforms (Sun SPARC and Solaris, Silicon
+             Graphics, HP, DEC RISC, IBM Risc System/6000) nice graphics.
+             Packages include: MathTensor for Tensors and NCAlgebra for
+             Non-Commutative Algebra  & Combinatorica for Graph Theory.
+             Specialty packages for Finance and Electrical Eng. are sold by
+             WRI. Student version available for MAC and PC's. MathLink
+             libraries included for communicating with external programs
+             (not MS-DOS version).
+\end{verbatim}
+
+\subsubsection{Mock-Mma}
+\begin{verbatim}
+  Type:      Anonymous FTP
+  Machines:  Anywhere running Common LISP.
+  Contact:   Richard Fateman
+             Department of Comp. Science
+             University of California
+             Berkeley CA 94720
+             fateman@cs.berkeley.edu
+  Version:   1.5
+  Comments:  It is a framework of a parser, display, polynomial
+             manipulator, and a few other pieces, that allow one to
+             program other pieces of a common-lisp systems for computer
+             algebra. The pieces supplied are roughly consistent with the
+             conventions adopted by the Mathematica system.  Available
+             through anonymous FTP from from peoplesparc.berkeley.edu:
+             /pub directory.
+\end{verbatim}
+
+\subsubsection{MuPAD}
+\begin{verbatim}
+  Type:      Anonymous FTP (free, but not PD; registration required)
+  Machines:  Unix workstations (IBM, Sun),
+             Prereleased Versions exist for PC-386 (DOS & Unix), Mac,
+             Sequent. Please call for others.
+  Contact:   MuPAD-Distribution, Fachbereich 17 Mathematik-Informatik,
+             Univ. of Paderborn, Warburger Str. 100,
+             D 4790 Paderborn, Germany.
+             E-mail: MuPAD-distribution@uni-paderborn.de
+             Phone: +49-5251-602633
+  Version:   1 release 1.
+  Comments:  General purpose, source available for library routines,
+             graphics support, source code debugger, on-line hypertext
+             help system.  Obtained by anonymous FTP at
+             athene.uni-paderborn.de:unix/MuPAD
+\end{verbatim}
+
+\subsubsection{Reduce}
+\begin{verbatim}
+  Type:      Commercial
+  Machines:  Just about anything you can think of.
+  Contact:   Anthony C. Hearn, RAND, 1700 Main Street
+             P. O. Box 2138, Santa Monica CA 90407-2138 U.S.A.
+             Phone: 310-393-0411 Ext. 7681  Fax: 310-393-4818
+             reduce@rand.org
+  Version:   3.5
+  Comments:  Interactive system and programming language for general
+             purpose symbolic and numeric calculations. Specific
+             application packages for various fields. Complete source
+             available. Demos for MS DOS, Windows and Linux available
+             from ftp.zib-berlin.de:pub/reduce/demo. Demos for Macintosh
+             and MS DOS available from ftp.bath.ac.uk:pub/jpff/REDUCE.
+             More complete information is available from URL
+             http://www.rrz.uni-koeln.de/REDUCE/ or by sending the email
+             message "send info-package" to reduce-netlib@rand.org.
+\end{verbatim}
+
+
+\subsubsection{SACLIB}
+\begin{verbatim}
+  Type:      Anonymous FTP, registration required.
+  Machines:  Sun Sparc, Ultrix, Sequent, Generic Unix and Amiga.
+  Contact:   saclib@risc.uni-linz.ac.at
+             SACLIB Maintenance
+             Research Institute for Symbolic Computation
+             Johannes Kepler University
+             4020 Linz
+             Austria
+  Version:   1.1
+  Comments:  SACLIB is a library of C programs for computer algebra
+             derived from the SAC2 system, and incorporating many
+             improvements. It contains programs for list processing,
+             infinite precision arithmetic (integer, rational and
+             modular), operations on multivariate polynomials, polynomial
+             real root isolation and refinement, and operations with real
+             algebraic numbers and polynomials having algebraic number
+             coefficients. Improved and extended versions of SACLIB, and
+             several SACLIB application packages, are already in advanced
+             stages of development.  These include arbitrary precision
+             floating point and interval arithmetic, improved greatest
+             common divisor and factorization algorithms for polynomials,
+             isolation and refinement of complex roots of polynomials,
+             Groebner basis computation and quantifier elimination.
+\end{verbatim}
+
+\subsubsection{SENAC}
+\begin{verbatim}
+  Type:      Commercial
+  Machines:  Microsoft Windows (PCs), Unix workstations (DEC, HP, IBM,
+             Sun, SGI), Convex, and Cray. For other implementations
+             please contact us.
+  Contact:   senac@ulcc.ac.uk, senac@waikato.ac.uk
+             For Europe:                        For rest of the world:
+             Minaz Punjani                      Kevin. A. Broughan
+             University of London Comp Centre   Mathematical Soft Project
+             20 Guilford Street                 University of Waikato
+             London WC1N 1DZ                    Private Bag 3105
+             England                            Hamilton, New Zealand
+             Tel: [+44] 71 405 8400             Tel: [+64] 7 856 2889
+             Fax: [+44] 71 242 1845             Fax: [+64] 7 838 4155
+  Version:   6.0
+  Comments:  General purpose  environment for numeric and algebraic
+             computing. An interactive computer algebra host language, an
+             interactive library including Numerical Recipes, graphics
+             library with postscript output, a fully automated symbolic
+             numeric interface to the NAG library, a symbolic graphic
+             interface to the NAG Graphics library.
+             Specialities in large scale optimisation and finite element
+             modelling.
+\end{verbatim}
+
+
+\subsection{Algebra \& Number Theory}
+
+\subsubsection{Cocoa}
+\begin{verbatim}
+  Type:      Anonymous FTP
+  Machines:  Mac's; PC's on the works.
+  Contact:   Gianfranco Niesi
+             Dipartimento di Matematica
+             Via L. B. Alberti, 4
+             I-16134   Genova  Italy
+             cocoa@igecuniv.bitnet
+  Version:   1.5
+  Comments:  Computations in commutative algebra. Available on the
+             anonymous FTP at  ftp.dm.unipi.it:/pub/alpi-cocoa/cocoa
+             or diskettes (2) sent in a self-addressed to the author.
+\end{verbatim}
+
+\subsubsection{GANITH}
+\begin{verbatim}
+  Type:      Version 1 is public domain. Current Version 3 is commercial
+  Machines:  Unix Workstations under X-11 R5 (SUN, SGI, HP, ..)
+  Contact:   Chandrajit Bajaj
+             Department of Computer Science, Purdue University
+             West Lafayette, IN 47907
+             bajaj@cs.purdue.edu
+  Comments:  GANITH is an algebraic geometry toolkit, for the computation
+             and visualization of solutions to systems of algebraic
+             equations.
+             Example applications of this for geometric modeling and
+             computer graphics are algebraic curve and surface
+             display, curve-curve intersections, surface-surface
+             intersections, global and local parameterizations,
+             implicitization.
+             GANITH also incorporates techniques for interpolation and
+             least-squares approximation (multivariate data fitting)
+             with algebraic curves and surfaces.
+             Version 1 of GANITH is available from anonymous FTP at
+             ftp.cs.purdue.edu in the file /pub/shastra/ganith-sun.tar.Z
+             The latest release is being sold by the Technology Transfer
+             Division of Purdue University for $250 (binary) and
+             $1000 (source code).
+\end{verbatim}
+
+\subsubsection{Magma}
+\begin{verbatim}
+  Type:      Cost recovery.
+  Machines:  Sun 3, Sun4, DECStation, HP9000/7000, IBM RS6000 and Mac
+             running A/UX 2.01
+  Contact:   The Secretary
+             Computational Algebra Group
+             School of Mathematics
+             University of Sydney
+             NSW 2006
+             Australia
+             Email: magma@maths.su.oz.au
+             Telephone: +61 2 692 3338        Fax: +61 2 692 4534
+  Version:   1.01-2
+  Comments:  The system is designed to support computation in algebra,
+             number theory, geometry and algebraic combinatorics. It
+             has an advanced functional programming language with many
+             novel features designed for concise and efficient
+             specification of algebraic algorithms. The kernel has
+             (coded in) the fundamental algorithms for ring theory
+             (polynomial rings, matrix rings, integer rings), field
+             theory (general algebraic number fields -- KANT V.2, finite
+             fields, real and complex fields), module theory, group
+             theory (fp groups, permutation groups, soluble groups and
+             matrix groups) and algebraic combinatorics (coding theory
+             and graph theory).
+\end{verbatim}
+
+\subsubsection{PARI}
+\begin{verbatim}
+  Type:      Anonymous FTP
+  Machines:  Most  Unix workstations, NeXT, PC386 and  Mac. Special 64-bit
+             version for the Dec Alpha machines.
+  Contact:   pari@ceremab.u-bordeaux.fr
+  Version:   1.38
+  Comments:  Number theoretical computations, source available, key
+             routines are in assembler, ASCII and Xwindows graphics.
+             Complete package for algebraic number theory computations
+             including handling of ideals, prime ideals, prime ideal
+             factorization, p-adic factorization, etc ...
+             Unix and Amiga versions available from:
+             megrez.ceremab.u-bordeaux.fr (147.210.16.17), math.ucla.edu
+             and ftp.inria.fr. PC-DOS version available from anonymous FTP
+             at wuarchive.wustl.edu:/edu/math/msdos/modern.algebra/pari386
+             or  math.ucla.edu (128.97.64.16) in the directory /pub/pari.
+\end{verbatim}
+
+\subsubsection{SIMATH}
+\begin{verbatim}
+  Type:      Anonymous FTP
+  Machines:  Suns.
+  Contact:   SIMATH-Gruppe, Lehrstuhl Prof. Dr. H.G. Zimmer,
+             FB 9 Mathematik, Universitaet des Saarlandes,
+             D-W-6600 Saarbruecken, Germany.
+             E-mail: simath@math.uni-sb.de,
+             phone: [0681]302-2206.
+  Version:   3.7
+  Comments:  SIMATH is written in C, contains an interactive
+             calculator (simcalc) and many C-functions over
+             algebraic structures as arbitrary long integers,
+             rational numbers, floating point numbers, poly-
+             nomials, Galoisfields, matrices, elliptic curves,
+             algebraic number fields, modular integers, finite fields,
+             Groebner basis, etc...
+             Version 3.7 contains a handbook written in English.
+             Available from: ftp.math.uni-sb.de (134.96.32.23)
+             or ftp.math.orst.edu (128.193.80.160). You have to
+             get one extra file by an Email-Server, see the
+             installation hints.
+\end{verbatim}
+
+
+\subsection{PC Shareware}
+
+\subsubsection{CLA}
+\begin{verbatim}
+  Type:      Anonymous FTP
+  Machines:  PC-DOS
+  Contact:   Lenimar Nunes de Andrade (ccendm03@brufpb.bitnet)
+             UFPB - CCEN - Dep.  de Matema'tica
+             58.059 - Joa~o Pessoa, PB - BRAZIL
+  Version:   2.0
+  Comments:  A linear or matrix algebra package which computes
+             rank, determinant, row-reduced echelon form, Jordan
+             canonical form, characteristic equation, eigenvalues,
+             etc. of a matrix. Available from anonymous FTP at
+             wuarchive.wustl.edu:/edu/math/msdos/linear.algebra/cla20.zip
+\end{verbatim}
+
+\subsubsection{Mercury}
+\begin{verbatim}
+  Type:      Shareware
+  Machines:  PC-DOS
+  Contact:   Roger Schlafly, Real Software, PO Box 1680, Soquel, CA 95073
+             Phone or Fax: 408-476-3550, 76646.323@compuserve.com
+             TTDX08A@prodigy.com
+  Version:   2.06
+  Comments:  Limited in symbolic capabilities, but is extremely adept
+             at numerically solving equations and produces publication
+             quality graphical output. This used to be Borland's Eureka!,
+             but when Borland abandoned it, its original author started
+             selling it as shareware under the name Mercury. Available
+             from anonymous FTP at
+             wuarchive.wustl.edu:/edu/math/msdos/calculus/mrcry206.zip
+\end{verbatim}
+
+\subsubsection{PFSA}
+\begin{verbatim}
+  Type:      Public Domain
+  Machines:  PC-DOS and a Unix non-interactive version.
+  Contact:   Don Stevens, Courant Institute, 251 Mercer St., NY NY 10012
+             stevens@cims.nyu.edu, Phone: 212-998-3275
+  Version:   5.46
+  Comments:  Written if Fortran, it is very fast but is limited to
+             polynomial algebra and calculus  The DOS version is available
+             from the anonymous FTP at wuarchive.wustl.edu:/edu/math/msdos
+             /modern.algebra/vol546.zip and the Unix version at
+             math.berkeley.edu:pub/PFSA
+\end{verbatim}
+
+\subsubsection{SymbMath}
+\begin{verbatim}
+  Type:      Shareware, student and advanced versions.
+  Machines:  IBM PC
+  Contact:   Dr Weiguang Huang, Dept. of Analytical Chemistry
+             University of New South Wales - Kensington NSW 2033 Australia
+             Phone: [61] 2-697-4643, Fax: [61] 2-662-2835
+             w.huang@unsw.edu.au  or s9300078@cumulus.csd.unsw.oz.au
+  Version:   3.1
+  Comments:  Runs on plain (640k) DOS machines (8086). An expert system
+             that can learn from the user. More capable versions are
+             available by mail-order from the author.
+             Also available by anonymous FTP from:
+             math.bekerley.edu: /pub/Software/SymbMath/sm31a.zip
+             oak.oakland.edu: /pub/msdos/calculator/sm31a.zip
+             garbo.uwasa.fi: /pc/math/sm31a.zip
+             wuarchive.wustl.edu: /mirrors/msdos/calculator/sm31a.zip
+             or by sending the following e-mail:
+             /pdget mail pd:<msdos.calculator>sm31a.zip  to
+             listserv@vm1.nodak.edu, or listserv@ndsuvm1.bitnet
+\end{verbatim}
+
+
+\end{document}

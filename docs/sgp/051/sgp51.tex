@@ -1,0 +1,1340 @@
+\documentstyle[twoside,11pt]{article}
+\pagestyle{myheadings}
+
+\setcounter{tocdepth}{2}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocsource}    {sgp\stardocnumber}
+\newcommand{\stardocnumber}    {51.1}
+\newcommand{\stardocauthors}   {M.\,J.\,Bly\\R.\,F.\,Warren-Smith}
+\newcommand{\stardocdate}      {10th March 1997}
+\newcommand{\stardoctitle}     {Starlink Software Maintenance Procedures}
+\newcommand{\stardocabstract}  {
+
+This document sets out the steps involved in maintaining and developing
+the Starlink Software Collection.  The intended audience is all those
+involved in maintenance and development of Starlink software.   Some
+sections will be of particular relevance to programmers while other
+sections will be of interest to those involved in software
+distribution.
+
+It details the process from the passing of a bug report to the support
+programmer through to the final release of a fix to a package.  It also
+specifies the steps required for handling a new package, porting of
+existing packages to new platforms, and developing updates to
+packages.
+
+There are also sections on beta-testing packages, and the production of
+{\sc{CD-rom}}s.
+
+It does not cover Base Set software, nor does it detail the use of
+Starlink standard makefiles, and does not specify the mechanics of the
+procedures, which evolve with operational demands.
+
+}
+
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\huge\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markboth{\stardocname}{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+
+% MAINPART
+\cleardoublepage
+\markboth{\stardocname}{\stardocname}
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section{\label{introduction}\xlabel{introduction}Introduction}
+
+The Starlink Software Collection is a large and complex set of packages.
+It is maintained through the efforts of various support programmers and 
+the Starlink Software Librarian.  There are a large number of diverse
+packages, each with its own requirements which have to be dealt with 
+when put through a change cycle.
+
+To avoid having to remember several different ways of building and
+manipulating software, Starlink has evolved a standard method of
+manipulation which allows each element of the collection to be
+treated separately, while remaining part of a cohesive whole.  This requires
+software to use a standard {\tt{makefile}} style.
+
+Any large software system needs a set of procedures that govern how
+changes are made.  A number of steps have been identified through
+which each software change must pass.  These are set out in this
+document, and make up the Software Change Cycle.  Each step has a
+series of requirements which must be satisfied before the process may
+progress to the next step.
+
+In some circumstances it may be appropriate to skip a step, but this
+should only be done after consultation with the Starlink Software
+Librarian.
+
+\section{\label{the_software_change_cycle}\xlabel{the_software_change_cycle}The Software Change Cycle}
+
+The following steps are {\bf{required}} for a complete software release
+into the Starlink Software Collection (USSC).  The following sections
+describe each step in more detail.
+
+\begin{enumerate}
+
+\item Fix the problem, produce an update, and package a submission
+
+\item Submit the software to the Software Librarian
+
+\item Check and test the submitted software
+
+\item Build the checked software for release
+
+\item Beta-test the software if required
+
+\item Prepare a USSC update
+
+\item Release the USSC update
+
+\item Tidy up after the release
+\end{enumerate}
+
+There is an emphasis on checking and testing during the steps -- the
+amount and scope of the testing depending on the step involved.  The
+testing phases are particularly important, since late finding of
+problems causes effort already expended to have been wasted.
+
+\subsection{\label{fix_the_problem}\xlabel{fix_the_problem}Fix the problem and/or produce an update}
+
+\begin{description}
+
+\item[File the bug report]: Programmer and Software Librarian.
+
+The bug report is frequently the first step in the change cycle -- the
+support Programmer or Software Librarian receives a bug report for a
+piece of software, and a fix is required.
+
+All bug reports received by a programmer should be copied to the
+Software Librarian to be included in the records for the package.  The
+Software Librarian will print and keep paper copies of all bug reports
+in the package file.
+
+The Software Librarian will forward bug reports for a package to the
+appropriate programmer, and print and file a copy of the report in the
+package file.
+
+\item[Find and fix the problem/bug]: Programmer.
+
+The fix for a bug is up to the programmer, who must
+find and solve the problem.  
+
+\item[Update the software to add new functionality]: Programmer.
+
+In some cases a more detailed change is to be made and instead of a fix
+to an individual problem, a series of fixes and possibly additional functions 
+are required.  Updates are usually assigned by the Head
+of Software as part of the annual Software Plan (for details see
+\xref{SGP/48}{sgp48}{}), though some requests for enhancements or
+modifications may come from the Software Librarian.
+
+\item[Provide integration to common source where appropriate]: Programmer.
+
+Once a fix has been made, or an update developed, the programmer should
+integrate the fix with the common source set for the package, and ensure
+the bug is fixed or the update works correctly on all supported
+hardware and software combinations.
+
+\item[Update the news file]: Programmer.
+
+Create or update the {\tt{package.news}} file to detail the fix, update
+or new functionality.  The news file is very important because it is the
+first notification users will see which describe the changes to a package.
+It should detail clearly and concisely the changes and fixes made, and
+any changes in behaviour.  It should also reference the documentation.
+
+\item[Update the documentation]: Programmer and Document Librarian
+
+If required, the documentation for the package should be updated.  It
+is the programmer's responsibility to generate new documents, or
+update existing documents, but the Document Librarian is
+responsible for clearing a document for release.
+
+\begin{description}
+
+\item [New Documents]:  Programmer.
+
+\begin{enumerate}
+
+\item New documents should be provided by the programmer.
+
+\item New document numbers (not revision numbers) are allocated by the
+Starlink Document Librarian at RAL and should be obtained by the
+programmer before the document is submitted for clearance.
+
+\item A new document should have the revision number {\tt{1(Draft)}}
+until it is has been cleared for release by the Documentation
+Librarian.  Thereafter it should have the revision number {\tt{1}}.
+
+\item New documents must conform to the Starlink House Style.  Details
+may be found in \xref{SGP/50}{sgp50}{}.
+
+\end{enumerate}
+
+\item [Existing Documents]: Programmer.
+
+\begin{enumerate}
+
+\item Make all required changes to the document text and format.
+
+\item Update document revision number and date.
+
+The document revision number is updated when new sections are
+added, or existing sections changed to enhance detail about the
+package.  The revision number is the number after the period in the
+{\verb+\stardocnumber+} command definition in the document header, and
+may only be incremented, never decremented.
+
+The document revision number is not changed if the only change since
+the last release is to correct spelling and format errors. 
+
+\end{enumerate}
+
+\item [All Documents]: Programmer and Document Librarian.  
+
+\begin{enumerate}
+
+\item All Starlink User Notes (SUNs) describing software packages  must
+have a title page, and the abstract and introduction sections.  All other
+Starlink documentation should conform to the Starlink House Style (see
+\xref{SGP/50}{sgp50}{}).
+
+\item All Starlink User Notes (SUNs) for software `packages' are normally
+produced with coloured covers in the Starlink House Style.  Programmers
+should provide the Document Librarian with one or more
+`screen-shot' pictures to be used on the coloured cover, otherwise a
+default coloured cover will be used.  The Document Librarian is
+responsible for deciding which documents (SUNs) should be issued with
+coloured covers.
+
+\item All {\verb+\section+} and {\verb+\subsection+} commands must be
+labeled using {\verb+\label+} and {\verb+\xlabel+} commands, to allow
+cross-referencing between documents.  The labels should be appropriate
+to the section.
+
+\item The document must be spell checked.
+
+\item A new hypertext version of the document should be produced and
+checked.  All details of any post-processing of the converted hypertext
+should be recorded in comments inside the document source so that the
+hypertext version may be produced without involving the programmer.
+
+\begin{quote}{\em
+The \LaTeX\ and hypertext versions of a document must match, except
+where there are {\verb+\latexonly+} or {\verb+\htmlonly+} sections.}
+\end{quote}
+\item A new hypertext document archive should be created.
+
+\item New documentation, and new sections to existing documentation,
+must be submitted to the Document Librarian to be cleared for release.
+
+Submission should be made by email, and contain the document source.
+For large documents it may be appropriate for the programmer to copy
+the document source to the RAL systems and notify the Document
+Librarian of the location.
+
+\item The Document Librarian should check that the submitted
+document conforms where practicable to the Starlink House Style, and
+that the document revision number and date have been updated
+appropriately.  
+
+\item The Document Librarian must clear the document for release.
+
+Where no changes to the submitted document are necessary, the Document
+Librarian will clear the document for release by emailing the programmer
+to tell him.
+
+In some cases the Document Librarian may at his discretion make
+modifications to the document before returning it to the programmer.  The
+modified document source should be returned by email.
+
+If modifications are made, a new hypertext version of the document should  
+be created (by the programmer).
+
+If the Document Librarian does not clear the document for release, the
+document source (modified or not) should be returned to the programmer by
+email with notes detailing deficiencies in the document.  The programer
+should address the deficiencies and resubmit the document for clearance.
+
+\item After a document has been cleared for release, the programmer should
+include the cleared document master, any attendant illustration files and
+the hypertext archive in any submission of the software for release.
+
+\end{enumerate}
+\end{description}
+
+\item[Update package version number]: Programmer.
+
+The Package Version number in the {\tt{makefile}} should be updated to
+show that a change has occurred.  The significance of the change is
+indicated by how the Package Version number is changed.
+
+Package Version numbers have the form: {\tt{major.minor-release}}
+
+\begin{enumerate}
+
+\item Bug fixes and {\it{minor}} changes should be indicated by
+incrementing the {\tt{release}} number.  This typically occurs when
+a change is made to a {\tt{makefile}} or {\tt{mk}} script, or the document
+is modified.
+
+\item More significant changes, updates, and new ports should be
+indicated by incrementing the {\tt{minor}} version number, and
+returning the {\tt{release}} number to zero.  Significant revisions to
+documentation should also coincide with a release of this magnitude.
+
+\item Major changes and updates to functionality, and additional
+functions in a package should be indicated by incrementing the
+{\tt{major}} version number, with both {\tt{minor}} and {\tt{release}}
+numbers returned to zero.
+
+\item If a beta-test is to be carried out, the letter {\tt{b}} should
+be added to the {\tt{release}} number.  The {\tt{b}} will be removed
+for final release after the beta-test period.  
+
+\end{enumerate}
+
+For libraries, a Library Version number is defined, similar to the
+Package Version number, but without the {\tt{release}} number.  
+
+\begin{enumerate}
+
+\item The {\tt{minor}} version number should be incremented to indicate
+bug fixes and {\it{minor}} updates.
+
+\item The {\tt{major}} version number should only be incremented if a
+dynamic linked program linked with the new library would not run with
+the older versions of the library, {\em{e.g.}}, if new subroutines had
+been added to the library.  The {\tt{minor}} version number should be
+returned to zero.  
+
+\end{enumerate}
+
+\item[Testing procedures]: Programmer
+
+It is the responsibility of the programer to verify that a fix or update
+for a piece of software works, and does not adversely affect the existing 
+functionality of the software.
+
+It is also the responsibility of the programmer to provide information
+that can be used by other testers or the Software Librarian to verify that
+a newly submitted version of the software has the fix or update included.
+This information should be provided in the submission notice (see next
+section) sent to the Software Librarian, and/or in information provided to
+other testers if appropriate (see next section).
+
+Once the programmer is confident that the fix or update works, the
+software must be subjected to and pass a testing regime, which must
+include tests of the bug fix and/or update, and the standard package
+tests.  The tests must be passed on all supported hardware and software
+combinations:
+
+\begin{enumerate}
+
+\item The fix and/or update must verifiably have been included in the 
+the new source set for the package.
+
+\item The {\tt{./mk test}} for the package should be passed on all platforms.
+
+The {\tt{./mk test}} (the {\tt{test}} target in the {\tt{makefile}}) should,
+after package installation, check that all appropriate binaries will run, 
+and that all required files are installed correctly.  It is not intended that
+the {\tt{./mk test}} should do an exhaustive test of all functionality in a
+package.
+
+\item The package demonstration programs must run.  These are often used
+by Starlink when testing software, and in providing demonstrations of
+software capability to new users and visitors to sites.  It is important
+that any demonstration programs provided as part of the package run smoothly.
+
+\item The {\tt{export}} and {\tt{export\_run}} targets in the
+makefile must be run to check that valid exportable sets are created.
+Both {\tt{export}} and {\tt{export\_run}} sets must be capable of being
+correctly installed.
+
+\item Where the software is critical to the operation of other items of
+software,  the interface between the two packages should be tested
+to ensure that existing software continues to work with the fixed or updated
+software.
+
+It is the responsibility of the programmer to maintain in fixed or
+updated software any existing compatibility with other software, where
+reasonably practicable.  Any instance where this is not possible should
+be discussed with the Software Librarian.  
+
+The requirement for maintaining existing capability does not preclude
+the possibility of changes in functionality breaking existing
+capability, however, this should be the exception and all such
+possibilities must be discussed with the Software Librarian and the
+Head of Software.
+
+\end{enumerate}
+
+The aim is to ensure that as much of the software as is possible and
+appropriate is tested before the submission is made.
+
+\end{description}
+
+\subsection{\label{software_submission}\xlabel{software_submission}Software submission}
+
+When testing is completed, the package should be prepared for
+submission.  All the stages in the preceeding step must have been
+completed satisfactorily.
+
+\begin{description}
+
+\item[Risk assessment]: Programmer and Software Librarian.
+
+An assessment of the risk involved in the fix or update must be made, in
+order to determine whether a beta-test of the package is required.  
+
+There is a risk to other packages in the Software Collection from any
+release -- changes in functionality in the package may break existing 
+software, and major updates may introduce new bugs to the package that
+may not show up in testing before release.
+
+In most cases the risks are slight, but an assessment of the scope
+of any such effects must always be made by the programmer.
+
+If the risk of disruption is sufficient, a beta-test of the package will
+be deemed appropriate by the Software Librarian.
+
+The programmer should provide factual information to the Software
+Librarian about the scope and impact of the fix or update.  This
+information will be used by the Software Librarian in determining
+whether a beta-test is needed, though if a programmer thinks fit, he
+may recommend a beta-test be carried out.   
+
+The Software Librarian will normally consult the Head of Software when
+determining whether a beta-test is to be made, but it is the
+responsibility of the Software Librarian to make the risk assessment,
+and the responsibility of the programmer to provide the information on
+which a decision can be based.
+
+\item[Release Priorities]: Programer and Software Librarian.
+
+Each package submitted has to be queued for release along with all the
+other packages in the system.  The scheduling is fluid, so that items
+can be queued according to their individual priority.
+
+The programmer should supply a statement of priority with the
+submission.  This information will be taken into account by the
+Software Librarian when constructing the release schedule.  He will use
+his discretion to resolve conflicts of priority.
+
+If a submission is dependent on another package submission, {\em{e.g.}},
+an application requires a new version of a subroutine library, this
+information must also be provided by the programmer in the submission note.
+
+The up-to-date release schedule will be maintained on-line so that
+programmers may track their submissions through the release procedure
+after submission.
+
+\item[Create a {\tt{package.tar.Z}} archive]: Programmer.
+
+Once a package is ready for submission, the programmer should create an
+archive (compressed tar file) using the {\tt{export\_source}} target in
+the {\tt{makefile}}:
+
+\begin{quote}
+\begin{verbatim}
+% ./mk export_source
+\end{verbatim}
+\end{quote}
+
+This creates a {\tt{package.tar.Z}} archive.   
+
+\item[Upload to RAL or local {\tt{ftp}} system]: Programmer.
+
+The {\tt{package.tar.Z}} archive should be uploaded to the local
+anonymous {\tt{ftp}} system at the programmer's Site, or the
+{\tt{/pub/incoming}} directory on the Starlink anonymous {\tt{ftp}}
+system at RAL.  Programmers with access to the RAL systems should leave
+the {\tt{package.tar.Z}} file in their own home directory tree on the RAL
+systems.
+
+\item[Notify Software Librarian of submission]: Programmer.
+
+The programmer should notify the Software Librarian of a submission 
+by sending an email message to {\tt{ussc@star.rl.ac.uk}}.  
+
+The message should contain:
+
+\begin{enumerate}
+
+\item the location of the {\tt{package.tar.Z}} archive,
+
+\item any special instructions for installation, and details of 
+any new command aliases and environment variables required.
+
+\item a statement of priority, and any specific scheduling requirements.
+
+\item information on the impact and scope of the fix or update in
+order that a risk assessment may be made.
+
+\item a request for a beta-test (if the programmer thinks it necessary).
+
+\item information on which tests are appropriate to verify the fixing
+of a bug, and the location of any required test data.  Where data is
+needed for testing, it should also be made available with (but not in)
+the {\tt{package.tar.Z}} archive.
+
+\item a copy of the {\tt{package.news}} file `attached' (using
+{\tt{Pine}}) for reference. 
+
+\end{enumerate}
+
+Once a submission message has been submitted, a programmer should NOT
+update or modify the submitted {\tt{package.tar.Z}} archive without
+first checking with the Software Librarian, to make sure that the
+package has not already been entered into the submission checking
+system.
+
+\end{description}
+
+\subsection{\xlabel{checking_submission}\label{checking_submission}Checking the submission}
+
+The Software Librarian will initiate a check of the submitted software,
+which will be carried out either by the Software Librarian or by a
+designated checker.  
+
+The check will normally be carried out over a period of a few days,
+and the programmer will be notified beforehand that the check is about
+to occur, so that any last minute changes may be incorporated and
+notified to the Software Librarian before the check starts.  
+
+Any major last minute changes will cause the submission to be handed
+back to the programmer for proper resubmission.
+
+The person assigned to check the submission is responsible for ensuring that 
+the submission is checked according to the procedure below.
+
+\begin{description}
+
+\item[Version numbers and dates]\mbox{}
+
+The package and library version numbers, and document version number
+and date should be checked to see if they have been updated correctly.
+
+\item[{\tt{Makefile}} and {\tt{mk}} script]\mbox{}
+
+The {\tt{makefile}} and {\tt{mk}} script should be checked where
+appropriate to make sure they conform to the Starlink standards.
+
+\item[Documentation standard]\mbox{}
+
+The Document Librarian should be consulted to see that the document 
+has been cleared for release.  If the document has not been cleared,
+the submission should be rejected.
+
+\item[Build and installation tests]\mbox{}
+
+A build and installation should be performed on all systems to ensure
+a `clean' build and install, {\em{i.e.}} the build occurs in one pass
+without failing, and the installation occurs without failing.
+The test building should be done on the development systems at RAL, but
+not in the main USSC directories, or by the owner of those directories.
+
+\item[Testing]\mbox{}
+
+The package should be tested to verify that a fix or update is
+included, and the {\tt{./mk test}} runs successfully.  Where available,
+package demonstration scripts should also be used to provide more
+extended verification that the package runs.
+
+\item[Deinstallation, cleaning, and export tests]\mbox{}
+
+The package {\tt{export}} and {\tt{export\_run}} distribution archives
+should be created and tested to ensure that they can be installed
+correctly.  
+
+The package deinstallation procedure should be tested to
+ensure that the deinstallation occurs without failing.
+
+The package {\tt{clean}} and {\tt{unbuild}} procedures should be tested to 
+ensure that no extraneous files remain after their operation.
+
+\item[Clearing for release]\mbox{}
+
+When the check is complete the checker should confirm to the
+Software Librarian that the submission has passed all the checking steps.
+
+The Software Librarian will then clear the submission for release.
+
+Any submission not passing all the checking steps will
+be handed back to the programmer for correction.   This should be the
+exception rather than the rule.
+
+\end{description}
+
+\subsection{\label{build_package_for_release}\xlabel{build_package_for_release}Building the package for release}
+
+The Software Librarian will build the submission from scratch on the
+RAL development systems, using the {\tt{`star'}} account which owns the
+USSC file hierarchy.  This is required for all supported hardware and
+software combinations.
+
+\begin{enumerate}
+
+\item {\bf{Deinstall existing version}}
+
+Any existing version of the package should be deinstalled, and its
+source directory renamed from {\tt{package}} to {\tt{old.package}}.
+
+\item {\bf{Create a new directory}}
+
+A new {\tt{package}} source directory should be created, and the 
+distribution {\tt{package.tar.Z}} archive should be unpacked into it.
+
+\item {\bf{Build the package}}
+
+The software should be built, with log files kept in the logs directory
+for future reference.
+
+\item {\bf{Clean, strip and install}}
+
+After a `clean' build (to completion in one pass), the software should be
+cleaned, any binaries stripped, and the package installed on each system.
+
+\item {\bf{Final Testing}}
+
+The built-for-release version should be tested by running the {\tt{./mk
+test}} and all other appropriate tests using a different account than
+used for building or checking.  This is normally done by the Software
+Librarian using a personal userid, and verifies that the package runs
+under a generic account as well as the special Maintenance accounts.
+
+\end{enumerate}
+
+If all the tests are passed, the package should be released.
+
+\subsection{\label{beta-testing}\xlabel{beta-testing}Beta-testing}
+
+If a beta-test has been decided upon prior to or during the risk
+assessments, a beta-test release should be prepared and distributed.
+Otherwise, this step may be omitted.
+
+\begin{description}
+
+\item[Importance]\mbox{}
+
+Beta-testing of software is vital to the Starlink software strategy,
+and it is important that beta-tests are carried out properly, even
+if this means that software fails the test and has to be revised.
+
+The Software Librarian, Site Managers at beta-test sites, and the
+Programmers each have a responsibility to ensure that a beta-test is
+completed successfully, and this is best achieved by cooperation.
+
+The following sections detail the responsibilities of each.
+
+\item[Identifying beta-test sites]: Programmer, Software Librarian.
+
+Appropriate beta-test sites should be suggested by the Programmer.  The
+Head of Software and the Software Librarian may also be able to suggest
+beta-test sites.
+
+The Software Librarian should request a site to participate in
+the beta-test.
+
+Site Managers requested to participate in a beta-test are strongly
+encouraged to participate.
+
+\item[Build beta-test version of package]: Software Librarian.
+
+The Software Librarian will build and test a beta-test release in the
+same manner as a standard release.  The beta-test submission must have
+passed all the previous steps.
+
+\item[Prepare beta-test release note]: Software Librarian.
+
+The Software Librarian will prepare a beta-test release note.  This
+will detail:
+
+\begin{enumerate}
+
+\item the beta-release installation instructions
+
+\item the instructions on how to switch back to the standard release
+
+\item the procedure for reporting problems
+
+\item the period over which the beta-test will run.
+
+\end{enumerate}
+
+\item[Upload the beta-test distribution sets]: Software Librarian.
+
+The beta-test distribution sets will be made available in the 
+Starlink anonymous {\tt{ftp}} system beta-test directory, 
+with the beta-test release note.
+
+\item[Issue beta-test note]: Software Librarian.
+
+The beta-test release note should be emailed to the beta-test sites.
+It should not be posted on Usenet.
+
+\item[Installation of beta-tests]: Site Managers.
+
+Site Managers at sites participating in beta tests must inform the
+Software Librarian that the beta-test has been installed, and should
+ensure that users are aware of it and are able to use the beta-test
+software.
+
+If a Site Manager at a proposed beta-test site is unable to run a
+beta-test, the Software Librarian must be informed immediately.
+
+Site Managers at beta-test sites are responsible for ensuring that the
+beta-test is run, and that problem reports are passed on to the
+Software Librarian.
+
+\item[Problem reporting]: Site Managers, Software Librarian, Programmers.
+
+It is important that any problem with beta-test software is reported,
+no matter how trivial.
+
+The Site Manager at a beta-test site is responsible for reporting all
+problems with beta-test software that he is made aware of in addition to
+any report of the problem by a user.
+
+The Software Librarian will pass on to the Programmer any bug reports
+from the beta-test sites.  It is the Programmer's responsibility to
+follow up all problem reports.
+
+\item[Completion of the beta-test period]: Site Managers, Software Librarian.
+
+Site Managers at the beta-test sites must confirm the completion of the
+beta-test at their site, and provide evidence that the users have both used
+the beta-test software, and reported any problems they encountered.
+
+When the test period is complete (minimum 2 weeks), the test should be
+withdrawn.  The Software Librarian should issue a proper release, or
+instructions for reverting to the old release.  All bug and problem
+reports should be fed back to the Programmer responsible.
+
+\end{description}
+
+\subsection{\label{preparing_a_release}\xlabel{preparing_a_release}Preparing a release}
+
+The Software Librarian is responsible for the tasks in this section.
+
+When one or more packages are cleared for release, a release bundle
+should be made.  The precise method of release depends upon the inventory 
+of packages to be released, but all releases follow the same basic pattern.
+
+\begin{enumerate}
+
+\item{\bf{Create temporary distribution directories}}
+
+As well as the permanent preparation directory, each release requires
+a set of release- and system-specific distribution directories.  These
+should be created in the distribution staging area.
+
+\item{\bf{Generate distribution archives}}
+
+Create {\tt{export\_run}} and {\tt{export}} sets for each supported
+system.  Large optional items should be chopped into smaller chunks.
+Copies of the {\tt{export}} sets should be placed in the system
+specific distribution staging directories.
+
+\item{\bf{Create document masters}}
+
+Where documents have been updated, create new paper masters, and pass them 
+to the Documentation Librarian for bulk copying.  Where possible,
+paper masters should be printed double-sided.
+
+The Software Librarian should use discretion when deciding whether 
+new paper masters are needed.  Minor spelling corrections would normally
+not require a complete new copy run, but it would be appropriate to
+generate a new paper master so that future copies are made from the
+latest master.
+
+\item{\bf{Create package news items}}
+
+Each package should have a news item to announce a bug fix or update.
+
+The news item should contain a short description of the package, and
+details of the update in simple terms.  More complicated details of the 
+release may also be included, but should be restricted to subtopics of
+the news item.
+
+The Software Librarian should generate a suitable news item for each 
+package to be issued, based on the submitted {\tt{package.news}} file.
+Distribution news items should be called {\tt{news\_package.txt}}.  The
+news item should be placed in the permanent staging directory.
+
+Note that providing a {\tt{package.news}} file is the responsibility of the programmer as detailed in Section~\ref{fix_the_problem}.
+
+\item{\bf{Generate release note, implementation script and summary news item}}
+
+Create a release implementation script and
+release summary news item in the permanent staging directory. Also
+create a release note, detailing the contents of the release, and
+giving the implementation instructions.  These are created from
+standard templates.
+
+\item{\bf{Starlink database and information files}}
+
+Update the Starlink database to contain details of changes to software,
+documentation, personnel and contact information, as appropriate.  New
+information files should be generated from the database in the
+permanent staging directory.
+
+\item{\bf{Check implementation script, notes and news item}}
+
+Print out and check the implementation script, release news item and
+release note for errors and typographical mistakes.  Once they are OK,
+{\tt{touch}} the contents of the preparation directory to give all the
+files a common date and time stamp.
+
+\item{\bf{Copy the generic distribution files}}
+
+Copy all the generic distribution files (information files, news items,
+the implementation script) from the permanent staging directory into
+each of the system-specific staging directories to create a complete
+distribution directory for each system.
+
+\end{enumerate}
+
+\subsection{\label{sofwtare_release}\xlabel{software_release}Software release}
+
+The Software Librarian is responsible for these stages.
+
+The release of an update has two stages: first, the RAL control
+versions are updated, followed by the development systems; and second,
+the release is issued to sites.
+
+\begin{description}
+
+\item[Test the updates at RAL]\mbox{}
+
+This stage is performed for two reasons.  The first is to test that the
+actual update procedure works as intended, and the second is to update
+all the RAL systems to keep them in step.
+
+\begin{enumerate}
+
+\item{\bf{Implement update on control systems}}
+
+Implement the update on the control systems at RAL as if implementing
+the update at a site, by running the update procedure.  Monitor the
+size of the various packages so that size data may be included in the
+distribution note.
+
+\item{\bf{Implement update on development systems}}
+
+Implement the update on the development versions at RAL.  It is usually
+only necessary to do the compulsory parts of an update, to update the
+information file set.
+
+In some cases, special steps must be taken to allow an update to
+proceed on an already updated system, for instance when new software is
+added.  For example, new packages may have been built in a directory
+that has the same name as that to be created and used by the update
+procedure.
+
+\end{enumerate}
+
+\item[Issue the update]\mbox{}
+
+\begin{enumerate}
+
+\item{\bf{Update Software Store}}
+
+Copy the package {\tt{export}}, {\tt{export\_run}} and
+{\tt{export\_source}} sets to the Software Store if licence conditions
+permit.  Each package has its own subdirectory of the main store
+directory.
+
+The Software Store web pages should be updated to show new packages (where
+appropriate), and update information for existing packages.
+
+\item{\bf{Update source archive}}
+
+Delete the old version of the package source from the source archive
+directory, and unpack the {\tt{export\_source}} set into the source
+archive directory to replace it.
+
+\item{\bf{Create release update archives}}
+
+Create the update archives for the release from the system-specific
+(or in some cases generic) staging directories.
+
+\item{\bf{Add sizes data and news summary to the release note}}
+
+Add data for the sizes of the released packages and the update archives
+to the appropriate places in the release note.  Add the summary news
+item to its place at the top of the release note.
+
+\item{\bf{Copy update archives to the {\tt{ftp}} system}}
+
+Copy all the update archives, one for each system, or generic archives
+to the Starlink anonymous {\tt{ftp}} system, together with a copy of
+the release note.
+
+\item{\bf{Distribute the Release}}
+
+Distribute the release note to sites using the {\tt{ussc\_mailer}}
+script and the {\tt{ussc\_sites}} distribution list.  
+
+\item{\bf{Issue the release note to Usenet}}
+
+The {\tt{ussc\_sites}} distribution list has an entry that sends the
+release note to the moderator of the {\tt{uk.org.starlink.announce}}
+news group, {\tt{announce@star.rl.ac.uk}}.  Using this account, post the
+release note to the news group.
+
+In some circumstances, wider distribution of release notes is appropriate.
+In this case, the release notes will be posted to a relevant selection of
+news groups.
+
+\item{\bf{Print and archive implementation script and release note}}
+
+Save a copy of the emailed release note and print it, and print
+a copy of the implementation script.  File both in the archive folder, in
+the Software Librarian's Office.
+
+Archive the on-line copies of the release note and implementation script
+using the {\tt{ussc\_arc}} script.
+
+\end{enumerate}
+
+\end{description}
+
+\subsection{\label{tidying_up}\xlabel{tidying_up}Tidying up after a release}
+
+After a release, the Software Librarian should tidy up the development
+system used to build the release by removing old copies of software,
+purging test directories and staging areas, and filing all email and 
+notes in the software package file.
+
+\begin{enumerate}
+
+\item{\bf{Delete copies of the release notes}}
+
+Copies of the release notes and implementation script used for emailing
+and on-line archiving should be deleted once the emailing has been completed.
+
+\item{\bf{Remove old versions of software}}
+
+The procedure for building software prior to release requires that a 
+`deinstalled' copy of the software be kept on-line in an {\tt{old.package}}
+directory at the same level in the directory hierarchy as the {\tt{package}}
+directory.  The {\tt{old.package}} directory should be deleted.
+
+\item{\bf{Clean preparation, test and staging directories}}
+
+The inventory of files comprising a release should be deleted from
+the preparation directories.
+
+Source copies of the released packages ({\tt{package.tar.Z}} files)
+left in the {\tt{import}} staging area, and export copies left in the
+{\tt{export}} staging area should be deleted.
+
+In addition, any test copies remaining in the test directories should
+be removed.
+
+\item{\bf{File paper copies of notes}}
+
+All email traffic and submission notes concerning each released package
+should be filed in the appropriate package file.
+
+\end{enumerate}
+
+This ends the release cycle.
+
+\newpage
+\section{\label{porting_procedures}\xlabel{porting_procedures}Porting Procedures}
+
+Porting Starlink Software to a new hardware and software combination is
+not something to be undertaken lightly.  That said, following the
+simple guidelines and procedures detailed here should result in a
+successful port. 
+
+A successful port is defined as the complete conversion of a package
+onto a new hardware and software combination, and the reintegration of
+any necessary modifications into the common source for the package,
+without compromising the functioning of the package on existing
+hardware and software combinations.  A package will not be adopted
+until it has passed all its tests.
+
+\subsection{\label{where_to_start_a_port}\xlabel{where_to_start_a_port}Where to start a port}
+
+A port of a package is either easy, in that you only have to port the
+package itself, or hard, in that you have to port all the necessary
+infrastructure as well.  
+
+\subsection{\label{who_does_the_port}\xlabel{who_does_the_port}Who does the port}
+
+The port should be done either by the programmer supporting the
+package, or when the port is part of a whole system port exercise (see
+below), the programmer assigned to the port.
+
+In some cases, the porter is not the support programmer or a Starlink
+programmer doing a whole system port, but this makes little difference
+to the procedures involved.
+
+\subsection{\label{single_package_ports}\xlabel{single_package_ports}Single package ports}
+
+A single package port is usually straight forward, if the originating
+programmer has adhered to the Starlink coding standards, and not used
+esoteric system-specific Fortran extensions.
+
+The infrastructure is already available and all that is necessary is to
+make the package run on the new system.
+
+\subsubsection{Port procedure}
+
+The procedure for porting (in terms of the Software Cycle) is to treat 
+the port exercise as a development update to the package, and use Steps
+1 and 2 of the Software Cycle.  
+
+If the porter is not the support programmer for the package, he should
+note all the modifications necessary to the package to complete the
+port, and feed these back to the support programmer as an update
+request. This will trigger the complete Software Cycle for the package,
+and will lead to a release of the package for all supported systems.
+
+It is the responsibility of the package support programmer to ensure that
+the package is sufficiently tested to pass Step 2 of the Software Cycle.
+
+\subsection{\label{porting_the_whole_ussc}\xlabel{porting_the_whole_ussc}Porting the whole USSC}
+
+A complete port of the whole system to a new hardware and software
+combination is best left to the Starlink Project, and is usually
+assigned to one programmer.  
+
+\subsubsection{Port procedure}
+
+The method is to start at the lowest level of the infrastructure and
+work up the dependencies till the whole infrastructure is ported.
+This must be done using steps 1 and 2 of the Software Cycle applied
+to each separate package in the infrastructure.  
+
+Notes must be kept of modifications require to each package, and these
+should be fed back to the package support programmers so that they may
+carry out integration and testing for steps 1 and 2 of the Software
+Cycle.
+
+Once the infrastructure is ported, applications and utilities can be
+ported, again by using steps 1 and 2 of the Software Cycle, and
+treating each port as a development update.
+
+\subsection{\label{adpopting_a_new_port}\xlabel{adpopting_a_new_port}Adopting a new port}
+
+The decision to adopt a new port is take by the Head of Software, in
+consultation with the Software Librarian.  A port will be considered
+for adoption only after it has been fully tested and integrated.
+
+\newpage
+\section{\label{producing_cdroms}\xlabel{producing_cdroms}Producing {\sc{CD-rom}}s}
+
+The production of Starlink {\sc{CD-rom}}s is a relatively straightforward
+process, requiring the production of a copy of the appropriate
+software directories, which is then processed into ISO-9660 format and
+dumped onto a reserved disk partition.  This copy is then used to
+`burn' new {\sc{CD-rom}}s.  Many {\sc{CD-rom}}s can be made by
+{\sc{CD-rom}} `burner', or a bulk order made from one master by a
+commercial manufacturer.
+
+\subsection{\label{cdrom_inventory}\xlabel{cdrom_inventory}{\sc{CD-rom}} inventory}
+
+The Starlink Software Librarian will decide when a new {\sc{CD-rom}} is
+to be made, and the inventory of software to be provided, in
+consultation with the Head of Software.  In general, only versions of
+software that have been stable in production service for a period will
+be put onto {\sc{CD-rom}}.
+
+Additionally, extra systems software, such as compilers and general
+utilities, will be provided on {\sc{CD-rom}}.  The inventory of these will be
+agreed upon within Operations group, and such software will  be
+provided by Operations group and others as appropriate.
+
+\subsection{\label{cdrom_snapshot}\xlabel{cdrom_snapshot}{\sc{CD-rom}} snapshot}
+
+The {\sc{CD-rom}} will contain a snapshot of the RAL `control' version
+of one of the supported USSC versions.  This is the version that is
+maintained to be the same as the versions running at Starlink sites,
+rather than the `development' versions used at RAL for testing,
+which sometimes differ considerably from the `control' versions.
+
+\subsection{\label{snapshot_testing}\xlabel{snapshot_testing}Snapshot testing}
+
+When a release date and inventory have been agreed, changes to the
+`control' version to be used for the snapshot will be locked out for an
+extended period of testing by programmers and support personnel.  Testing
+will also be done by Operations group, to check that the snapshot of
+the USSC has no major flaws.
+
+Any major problems found in a piece of software during this period will
+be fixed prior to release on {\sc{CD-rom}}, or the software to be
+withdrawn from the snapshot copy, particularly if the software is newly
+written or ported.
+
+\subsection{\label{update_the_cdrom_document}\xlabel{update_the_cdrom_document}Update the {\sc{CD-rom}} document}
+
+There is a document detailing the use of the {\sc{CD-rom}} which
+contains some details of the software inventory, and the layout of the
+{\sc{CD-rom}}.  For the Linux distribution, this document is 
+\xref{SUN/212}{sun212}{}. The document must be updated to reflect the
+new {\sc{CD-rom}} to be produced.
+
+\subsection{\label{create_test_cdroms}\xlabel{create_test_cdroms}Create test {\sc{CD-rom}}s}
+
+Before the {\sc{CD-rom}} can be mass produced for distribution, a small
+number of test copies are made to test the integrity of the snapshot
+and additional software, using the {\sc{CD-rom}} copy.
+
+A complete hierarchy of directories to be placed on the {\sc{CD-rom}},
+including a copy of the `snapshot', should be assembled and processed
+into ISO-9660 format.
+
+This copy should then be used by the {\sc{CD-rom}} burner to cut up to 5
+test {\sc{CD-rom}}s.
+
+\subsection{\label{pre-production_testing}\xlabel{pre-production_testing}Pre-production testing}
+
+The Starlink Software Librarian and the Head of Applications will
+select some test sites or individuals to receive a copy of the new
+{\sc{CD-rom}}, and arrange for them to test it.
+Additional testing will be done by Operations group.
+
+At this stage, there should be no problems with the software, but
+testing may highlight technical problems with file arrangements on
+disc, or use of the {\sc{CD-rom}}.
+
+The testers should confirm that testing is complete, and report any
+problems the Starlink Software Librarian.  Any problems should then be
+fixed, and a final release date set.
+
+\subsection{\label{cdrom_inserts}\xlabel{cdrom_inserts}{\sc{CD-rom}} inserts}
+
+A new {\sc{CD-rom}} version should be provided with a new jewel case insert
+detailing the version number and date of the release.  This should also 
+have brief details of how to use the {\sc{CD-rom}}.
+
+\subsection{\label{cdrom_production}\xlabel{cdrom_production}{\sc{CD-rom}} production}
+
+Once the Starlink Software Librarian is happy that the test
+{\sc{CD-rom}} is OK, he will clear the new {\sc{CD-rom}} for bulk
+production and distribution.  Bulk production is the responsibility of
+Operations group.
+
+\end{document}

@@ -1,0 +1,582 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% ----------------------------------------------------
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocsource}    {sgp\stardocnumber}
+% Variable part
+\newcommand{\stardocnumber}    {50.3}
+\newcommand{\stardocauthors}   {M D Lawden}
+\newcommand{\stardocdate}      {20 November 1997}
+\newcommand{\stardoctitle}     {Starlink Document Styles}
+
+\newcommand{\stardocabstract}  {
+This document describes the various styles which are recommended for Starlink
+documents.
+It also explains how to use the templates which are provided by
+Starlink to help authors create documents in a standard style.
+\par
+This paper is concerned mainly with conveying the ``look and feel" of the
+various styles of Starlink document rather than describing the technical
+details of how to produce them.
+Other Starlink papers give recommendations for the detailed
+aspects of document production, design, layout, and typography.
+\par
+The only style that is likely to be used by most Starlink authors is the
+{\em Standard}\, style, described in section~\ref{standard_style}.}
+
+%                                                            Section 1 - End *
+% ? End of Document summary **************************************************
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+
+
+% ? Document specific commands ***********************************************
+%                                                          Section 2 - Begin *
+
+% Put in this section any \newcommand or \newenvironment commands you need to 
+% define.  If you don't need to do this, leave this section alone.
+% (If you've no idea what these command are, proceed immediately to Section 3.
+
+%                                                            Section 2 - End *
+% ? End of Document specific commands ****************************************
+
+%  Front Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+
+\begin{document}
+\thispagestyle{empty}
+
+% ? Latex document front page heading ****************************************
+%                                                          Section 3 - Begin *
+
+% If you haven't specified a [software-version], then delete the line below
+% containing "\stardocversion".
+% If you haven't specified a [manual-type], then delete the line below
+% containing "\stardocmanual".
+
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project}\\
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+
+   \end{center}
+   \vspace{5mm}
+
+%                                                            Section 3 - End *
+% ? End of Latex document front page heading *********************************
+
+% ? Heading for Abstract *****************************************************
+%                                                          Section 4 - Begin *
+
+% Delete this section if you haven't supplied an Abstract in Section 1.
+
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+
+%                                                            Section 4 - End *
+% ? End of Heading for Abstract **********************************************
+
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Picture ******************************************************************
+%                                                          Section 5 - Begin *
+
+% If you want to add a picture for display on the front page of the HTML
+% version of your document, put the reference to it here.
+% If you don't want to do this, leave this section alone.
+
+%                                                            Section 5 - End *
+% ? End of Picture ***********************************************************
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? Abstract section *********************************************************
+%                                                          Section 6 - Begin *
+
+% Delete this section if you haven't supplied an Abstract in Section 1.
+
+  \section{\xlabel{abstract}Abstract}
+
+%                                                            Section 6 - End *
+% ? End of Abstract section **************************************************
+
+\end{htmlonly}
+
+% ? Abstract text ************************************************************
+%                                                          Section 7 - Begin *
+
+% Delete this section if you haven't supplied an Abstract in Section 1.
+
+\stardocabstract
+
+%                                                            Section 7 - End *
+% ? End of Abstract text *****************************************************
+
+% ? Latex document Table of Contents *****************************************
+%                                                          Section 8 - Begin *
+
+% Delete this section if you do not want a Table of Contents in the Latex
+% version of your document.
+% (The HTML version of your document will always have a Table of Contents.)
+
+ \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+
+%                                                            Section 8 - End *
+% ? End of Latex document Table of Contents **********************************
+
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+% ? Document Text ************************************************************
+%                                                          Section 9 - Begin *
+
+% Replace the place-holder [text] with the text of your document
+
+\section{\label{introduction}\xlabel{introduction}Introduction}
+
+This document describes the various styles that are recommended for Starlink
+documents.
+(Miscellaneous User Documents (MUDs) are not regarded as Starlink documents
+in this context because they originate outside of the Project, so Starlink has
+no control over their style.)
+These styles are:
+\begin{quote}
+\begin{description}
+\item [Standard] --
+This is the ``default" style which is used for most Starlink documents.
+Other styles are used by the Starlink Document Librarian to either
+``package" documents written in {\em Standard} style, or to produce special
+documents.
+\item [Package] --
+This style is for Starlink User Notes (larger than about 30 pages) which are
+associated with Starlink Software Packages.
+It may also be used as the basis for other document categories ({\em e.g.}
+Cookbooks) which need to be made more attractive to readers.
+\item [Introduction] --
+This style is for the three components of the {\em New User's Document Pack},
+(\xref{SUG}{sug}{},
+ \xref{SUN/1}{sun1}{},
+ \xref{SUN/145}{sun145}{}).
+\item [Brochure] --
+This style is for
+\xref{SGP/31}{sgp31}{},
+the document which describes the Starlink Project for outsiders.
+\item [Glossy] --
+This style is for promotional handouts and displays for exhibitions, visitors,
+and new users.
+\item [Bulletin] --
+This style is for Starlink's newsletter, the
+{\em \htmladdnormallink{Starlink Bulletin}
+{http://star-www.rl.ac.uk/bulletin.html}}.
+\end{description}
+\end{quote}
+This document is concerned with the overall ``look and feel" of Starlink
+documents.
+It doesn't give detailed guidance on document production, design, layout, and
+typography.
+For guidance on these matters, please consult the following documents:
+\begin{quote}
+\begin{description}
+\item [\xref{SC/9}{sc9}{}] --
+ illustrates the most common typographical structures used in Starlink
+ documents, and shows how to create them.
+\item [\xref{SGP/28}{sgp28}{}] --
+ gives general advice on how to write documents for Starlink.
+\item [\xref{SUN/9}{sun9}{}] --
+ shows how to use \LaTeX\ to create a document on paper.
+\item [\xref{SUN/199}{sun199}{}] -- 
+ shows how to add hypertext facilities to your documents.
+\end{description}
+\end{quote}
+
+\section{\label{styles}\xlabel{styles}Styles}
+
+\subsection{\label{standard_style}\xlabel{standard_style}Standard style}
+
+The {\em Standard}\, style is the one you should use by default.
+The other styles are specialist styles that are usually used only by the
+Starlink Document Librarian.
+
+The {\em Standard}\, style is based on \LaTeX\ document templates stored in
+directory {\tt /star/docs}.
+The names of the files which hold the templates are based on the codes
+used to describe Starlink's document series (see
+\xref{SUG}{sug}{} section 6.1).
+For example, the file holding the template for Starlink User Notes (SUNs)
+is called {\tt sun.tex}.
+
+To use a template, copy it from {\tt /star/docs}, replace the variable fields
+with your own values, and add the document text.
+The variable fields are at the front of the template and are enclosed by
+brackets, for example {\tt [author]}.
+
+The first set of variables ({\tt [number].[version]}, {\tt [author]},
+{\tt [date]}, {\tt [title]}) are the things that appear at the top of a
+document to identify it.
+
+The next two ({\tt [software-version]}, {\tt [manual-type]}) are mainly used
+by Programmers who are writing User Manuals for their software.
+Delete these two lines if they are not appropriate for your document.
+If you delete {\tt [software-version]} and {\tt [manual-type]},
+also delete any other lines which contain the strings
+\verb+\stardocversion+ or \verb+\stardocmanual+, otherwise you will get
+\LaTeX\ error messages.
+
+All but the shortest documents should have an abstract.
+Replace {\tt [Text of abstract]} with your text.
+If you don't supply an Abstract, delete all the lines (indicated as
+{\tt ...}) between the following pairs of headings:
+\begin{quote}
+\begin{verbatim}
+% ? Heading for abstract if used.
+...
+% ? End of heading for abstract.
+
+% ? New section for abstract if used.
+...
+% ? End of new section for abstract
+
+% ? Document Abstract. (if used)
+...
+% ? End of document abstract
+\end{verbatim}
+\end{quote}
+
+As an example, here is the top section of a recently issued Starlink document
+(SUN/28.11) showing how the variables have been replaced by actual values:
+
+\begin{quote}
+\begin{verbatim}
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% ---------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+% Variable part
+\newcommand{\stardocnumber}    {28.11}
+\newcommand{\stardocauthors}   {M.\,J.\,Bly}
+\newcommand{\stardocdate}      {22nd August 1996}
+\newcommand{\stardoctitle}     {NAG \\[2ex]
+                                Numerical and Graphics Subroutine
+                                Libraries}
+\newcommand{\stardocversion}   {Mk 16/4}
+\newcommand{\stardocmanual}    {User's Manual}
+\newcommand{\stardocabstract}  {
+The NAG Fortran and Graphics libraries are highly regarded in the field
+of Numerical Computation and Graphics.
+Starlink provides implementations of both for its UK sites, at double
+precision, with interfaces to the Starlink GKS and standard X11 graphics
+subsystems.
+Single precision versions of the Fortran Library may also be available.}
+% ? End of document identification
+
+% ---------------------------------------------------------------
+...
+\end{verbatim}
+\end{quote}
+
+A good way of acquiring typographical skills is to look at existing Starlink
+documents for features that you want to use, and then look at the source
+code in {\tt /star/docs} to see how it is done.
+The file name tells you the code of the document it contains.
+
+\subsection{\label{package_style}\xlabel{package_style}Package style}
+
+The {\em Package}\, style is simply a {\em Standard}\, style document with a
+characteristic cover and binding.
+The front cover has a coloured outside in a characteristic style, and a standard
+inside containing a copyright notice, acknowledgement, address, {\em etc.}
+The back cover is blank.
+The binding is ``Spiral bound."
+
+If you write a {\em Package}\, document, write it in {\em Standard}\, style
+and submit it to Starlink for distribution.
+If appropriate, a cover will be added by the Starlink Document Librarian who
+will also organise the binding and copying, so you need not worry about these
+details.
+If you wish, supply one or more sample images (such as screen shots) to
+be added to the cover.
+These should illustrate the functionality of the software being described.
+They will help to identify the document for readers.
+
+An example of a typical cover in this style is shown in the Samples section.
+
+\subsection{\label{introduction_style}\xlabel{introduction_style}Introduction style}
+
+This style is used for components of the {\em New User's Document Pack}.
+These documents are written and produced by the Starlink Document Librarian, 
+so they need not be described in detail here.
+They are characterised by their small size (A5), black spiral binding, and
+coloured cover containing a picture of our mascot, Captain Starlink, against
+a background image of the Orion Nebula.
+They also have similar text to {\em Package}\, documents on their inside front
+cover.
+
+An example of a typical cover in this style is shown in the Samples section.
+
+\subsection{\label{brochure_style}\xlabel{brochure_style}Brochure style}
+
+This style is used only for SGP/31, which is really a Brochure describing the
+Starlink Project for outsiders.
+It is similar to the {\em Introduction}\, style but has wrap round binding
+instead of spiral, a picture of the Vela Supernova Remnant instead of Orion, and
+a graphical logo instead of Captain Starlink.
+It is produced by the Starlink Document Librarian, so it need not be described
+further here.
+
+The cover is shown in the Samples section.
+ 
+\subsection{\label{glossy_style}\xlabel{glossy_style}Glossy style}
+
+This style is a single-sheet, double-sided A4 colour glossy, laid out in three
+columns with a characteristic header and border.
+
+Documents in this style are produced by the Starlink Document Librarian on a
+PC using Pagemaker, so they need not be described further here.
+
+An example is shown in the Samples section.
+
+\subsection{\label{bulletin_style}\xlabel{bulletin_style}Bulletin style}
+
+This is an A4-sized booklet laid out in two columns.
+It has a characteristic front page and back page and usually contains several
+coloured figures.
+The text is produced by the Starlink Document Librarian using \LaTeX\ and
+Pagemaker, and the figures are added by the printer from masters copies.
+
+An example of the front cover design is shown in the Samples section.
+
+This style is likely to change after issue 19 (September 1997) because the
+editor will change from Mike Lawden to Anne Charles.
+
+\section{\label{references}\xlabel{references}References}
+
+\begin{quote}
+\begin{description}
+\item [\xref{SC/9}{sc9}{}] -- \LaTeX: Cookbook.
+\item [\xref{SGP/28}{sgp28}{}] -- How to write good documents for Starlink.
+\item [\xref{SUG}{sug}{}] -- Starlink User's Guide.
+\item [\xref{SUN/9}{sun9}{}] -- \LaTeX: Document preparation system.
+\item [\xref{SUN/199}{sun199}{}] -- 
+ STAR2HTML: Convert Starlink documents to hypertext,
+User's Manual.
+\end{description}
+\end{quote}
+
+
+\appendix
+
+\section{\label{samples}\xlabel{samples}Samples}
+
+The following pages show samples of the different styles of Starlink document.
+Coloured covers are reproduced in black-and-white -- this is adequate for
+conveying the graphic design.
+
+The samples are shown in the following order:
+\begin{enumerate}
+\item {\em 
+ \htmladdnormallink{Standard}
+ {http://star-www.rl.ac.uk/star/docs/sgp50.htx/sgp50f1.gif}}\, style --
+ front page.
+\item {\em
+ \htmladdnormallink{Package}
+ {http://star-www.rl.ac.uk/star/docs/sgp50.htx/sgp50f2.gif}}\, style --
+ outside front cover.
+\item {\em 
+ \htmladdnormallink{Package}
+ {http://star-www.rl.ac.uk/star/docs/sgp50.htx/sgp50f3.gif}}\, style --
+ inside front cover.
+\item {\em 
+ \htmladdnormallink{Introduction}
+ {http://star-www.rl.ac.uk/star/docs/sgp50.htx/sgp50f4.gif}}\, style --
+ outside front cover.
+\item {\em 
+ \htmladdnormallink{Brochure}
+  {http://star-www.rl.ac.uk/star/docs/sgp50.htx/sgp50f5.gif}}\, style --
+ outside front cover.
+\item {\em 
+ \htmladdnormallink{Glossy}
+  {http://star-www.rl.ac.uk/star/docs/sgp50.htx/sgp50f6.gif}}\, style --
+ front page.
+\item {\em 
+ \htmladdnormallink{Bulletin}
+ {http://star-www.rl.ac.uk/star/docs/sgp50.htx/sgp50f7.gif}}\, style -- 
+ front page.
+\end{enumerate}
+
+\end{document}

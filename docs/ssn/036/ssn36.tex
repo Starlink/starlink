@@ -1,0 +1,1155 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocsource}    {ssn36.1}
+\newcommand{\stardocnumber}    {36.1}
+\newcommand{\stardocauthors}   {K P Duffey}
+\newcommand{\stardocdate}      {7th February 1996}
+\newcommand{\stardoctitle}     {XpressWare Installation User guide}
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+% Hypertext definitions.
+% These are used by the LaTeX2HTML translator in conjuction with star2html.
+
+% Comment.sty: version 2.0, 19 June 1992
+% Selectively in/exclude pieces of text.
+%
+% Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+% Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to recentre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Un-comment the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% Add any document specific \newcommand or \newenvironment commands here
+
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+%  Add heading for abstract if used.
+%   \vspace{10mm}
+%   \begin{center}
+%      {\Large\bf Description}
+%   \end{center}
+\end{latexonly}
+
+%  HTML documentation header.
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+%  Add picture here if required.
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      Particle Physics \& Astronomy Research Council \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+% HTML document table of contents (if used). 
+% ==========================================
+% Add table of contents header and a navigation button to return 
+% to this point in the document (this should always go before the
+% abstract \section). This places the table of contents on the title
+% page. Do not use this if you want the normal behaviour.
+   \label{stardoccontents}
+   \begin{rawhtml} 
+     <HR>
+     <H2>Contents</H2>
+   \end{rawhtml}
+   \renewcommand{\latexonlytoc}[0]{}
+   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+                                            {stardoccontents}}
+
+%  Start new section for abstract if used.
+%  \section{\xlabel{abstract}Abstract}
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+%  Document Abstract. (if used)
+%  ==================
+% -----------------------------------------------------------------------------
+%  Latex document Table of Contents. (if used)
+%  ===========================================
+%  Replace the \latexonlytoc command with \tableofcontents if you're
+%  not only having a contents list on the title page.
+ \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \latexonlytoc
+    \setlength{\parskip}{\medskipamount}
+    \markright{\stardocname}
+ \end{latexonly}
+% -----------------------------------------------------------------------------
+
+
+\clearpage
+
+\section {Introduction}
+
+XpressWare is a set of X terminal software, released by Tektronix Inc, that
+accommodates the X Window system on a range of host computers. The software
+comprises boot files (the X server image), configuration files, fonts, and
+font tools to support the X terminal. The files can be installed on one host
+or distributed across multiple hosts
+
+The purpose of this guide is to present the system or network administrator
+with a step-by-step account of how to install XpressWare, and how subsequently
+to configure the X terminals appropriately for the environment in which they
+operate.
+
+It is assumed that the administrator is familiar with the operating system of
+the intended host computer, and conversant with the network protocols and
+concepts related to the local-area network (LAN). A working knowledge of the
+X environment, including window managers and display managers is also assumed.
+
+The contents of the guide include:
+
+\begin {enumerate}
+
+\item Extracting the INSTALL script from the distribution medium.
+
+\item Using the INSTALL script to extract the required XpressWare files.
+
+\item X terminal installation.
+
+\item Booting the first X terminal.
+
+\item Starting a Telnet session.
+
+\item Configuring the X terminal environment.
+
+\item A sample INSTALL session.
+
+\end {enumerate}
+
+
+\section {Getting Started}
+
+
+\subsection {....Before You Begin!}
+
+Each Version of XpressWare is accompanied by a set of Release notes, which
+contain information that is likely to influence decisions made during the
+installation. It is highly recommended that the Release notes be read thoroughly
+before commencing the installation of the relevant Version for the first time.
+Though it should be apparent that the essence of the Release notes is contained
+within this user guide, with emphasis on installation for Sun5 (Solaris 2.X)
+and DEC (OSF/1) systems.
+
+
+\subsection {Software Distribution}
+
+The XpressWare Software is (re-)released periodically as a new Version, which
+generally incorporates a number of bug-fixes for the previous version(s), and
+perhaps one or more additional features. The current version at the time of
+writing is XpressWare Version 8.0.
+
+Under a maintenance agreement with Tektronix UK, the Starlink Project receive
+the XpressWare updates on CD-ROM, with a ``right to copy'' for each of the
+Starlink Sites covered by the agreement.
+
+
+\section {Installation from CD-ROM}
+
+{\bf Note:} You must be logged in as {\tt root} to perform an installation.
+Before starting, verify that your root umask is set correctly to preserve file
+permissions. Your umask should be set to 022, so that {\tt root} has read,
+write and execute privileges, but others only have read and execute. To set your
+umask type:
+
+{\bf \# umask 022}
+
+
+\subsection {Installation Considerations}
+
+\paragraph {NFS Boot Security}
+
+To boot via NFS, the installation directory must be exported so the X terminal
+can access the boot files. Select an installation directory tree that does not
+contain secured or proprietary information. For example, you might install
+files under the directory {\tt /usr/tekxp} instead of {\tt /tekxp}. Thereby
+exporting the {\tt /usr/tekxp} partition instead of the root ({\tt /}) or
+{\tt /usr} partition.
+
+\paragraph {Secure tftp}
+
+There are considerations if the boot or font hosts use {\tt secure tftp}. Secure
+tftp does not follow symbolic links to files outside the secure directory, so
+all boot and configuration files must be installed under the common secure
+directory (for example, {\tt /usr/tekxp}). The secure directory is either
+specified in the {\tt inetd.conf} file or in the {\tt /etc/passwd} file,
+depending on your host.
+
+Although you cannot link the files outside the secure directory, it is possible
+to symbolically link the secure directory to another partition if disk space is
+limited in the secure directory. For example, {\tt /tftpboot/tekxp} could be
+linked to {\tt /usr/tftpboot/tekxp}. Refer to your host documentation for
+specific information regarding {\tt secure tftp}.
+
+
+\subsection {Extracting the INSTALL Script}
+
+It is only necessary to extract the INSTALL script from the distribution medium
+in preparation for the first installation of a given Release of XpressWare.
+The same script can be re-used to extract additional files or to re-install the
+software.
+
+\begin {enumerate}
+
+\item If you have your own distribution CD-ROM, then insert the CD-ROM into the
+drive.
+
+\item Use {\bf cd} to change to the parent directory on the local host, where
+the installation software is to be off-loaded. The directory must have world
+read and execute privilege. This is where the {\tt INSTALL} script will build
+the {\tt tekxp} directory tree. A typical installation requires about 80 MByte
+of free space. Online Xpress, the online documentation set, requires another
+100 MByte or so.
+
+{\bf Note} that we are using the {\tt root} partition by way of example,
+throughout:
+
+{\bf \# cd /}
+
+{\bf Note}, moreover, the comments regarding security, given at section 3.1
+above.
+
+\item Enter the command to mount the CD-ROM to the {\tt /cdrom} directory (if
+you are running the volume manager, this step is not necessary).
+
+Sun5: {\bf \# mount -F hsfs -r /dev/sdNc /cdrom}
+
+The {\bf -F} indicates the file system type ({\tt hsfs}), the {\bf -r} indicates
+the contents are {\tt read-only}, and {\tt /dev/sd}{\bf N}{\tt c} is the device
+name where {\bf N} is the logical unit number of the CD-ROM.
+
+Digital Unix: {\bf \# mount -t cdfs -o noversion /dev/rzNc /cdrom}
+
+The {\bf -t} indicates the file system type ({\tt cdfs}), {\bf -o noversion}
+strips version numbers and does not convert file names to uppercase, and
+{\tt /dev/rz}{\bf N}{\tt c} is the device name where {\bf N} is the logical
+unit number of the CD-ROM.
+
+Where the distribution software is to be copied from RAL, it is recommended
+that the CD-ROM be mounted remotely. For example, the following command would
+be appropriate for a network transfer of XpressWare from a CD-ROM set up on the
+host {\tt rlssp2}, running Solaris 2.X.
+
+{\bf \# mount -F nfs rlssp2.bnsc.rl.ac.uk:/cdrom/cdrom0 /mnt}
+
+\item Extract the INSTALL script.
+
+Sun5: {\bf \# tar -xvpf /cdrom/cdrom0/sun/install.tar}
+
+or
+
+{\bf \# tar -xvpf /mnt/sun/install.tar} if the CD-ROM has been mounted
+remotely with a mount-point of {\bf /mnt}.
+
+Digital Unix: {\bf \# tar -xvpf /cdrom/cdrom0/ultrix/install.tar}
+
+or
+
+{\bf \# tar -xvpf /mnt/ultrix/install.tar} if the CD-ROM has been mounted 
+remotely with a mount-point of {\bf /mnt}.
+
+\end {enumerate}
+
+
+\subsection {Using the INSTALL Script}
+
+When you run {\tt INSTALL}, it creates a log file
+({\tt /tekxp/INSTALL/install.log}) to keep track of installation activities.
+If you have multiple log files, the installation date and time are appended to
+the file. If, for example, you perform a partial installation initially, and
+subsequently include further X Terminal models in the System, the additional
+XpressWare files can be installed as required.
+
+If you have a current installation, your configuration files are saved for you.
+Be sure to check the new configuration files for any new commands, and add any
+applicable commands to your saved configuration files.
+
+\begin {itemize}
+
+\item If there is a previous installation in the current directory, the
+configuration files ({\tt .cnf} and {\tt .tbl} files) are automatically
+preserved. The new configuration files unloaded from the media are stored in
+the file {\tt /tekxp/config\_date} where {\tt date} is the date and time.
+
+\item If you have an installation in another directory, you can invoke the
+{\tt INSTALL} script with the {\bf -oldq} and {\bf -oldu} switches to preserve
+existing configuration files. New configuration files unloaded from the media
+are saved as {\tt file.date,} where {\tt date} is the date and time.
+
+\item There are {\bf -host} and {\bf -user} switches to install files from a
+remote host.
+
+\end {itemize}
+
+To run the installation script:
+
+\begin {enumerate}
+
+\item Use {\bf cd} to change to the {\tt INSTALL} directory,
+{\tt tekxp/INSTALL}.
+
+{\bf \# cd tekxp/INSTALL}
+
+\item Make sure that the media is still in the drive, then run the script:
+
+{\bf \# ./INSTALL -f} {\tt file} [{\bf -oldq} {\tt dir}] [{\bf -oldu} {\tt dir}]
+[{\bf -host} {\tt host}] [{\bf -user} {\tt user}]
+
+{\bf -f} {\tt file} specifies the name of the tar file. {\tt file} is one of the
+following:
+
+Sun5 (with volume manager), Digital Unix: {\tt /cdrom/cdrom0/common/tekxp.tar}
+
+or {\tt /mnt/common/tekxp.tar} if the CD-ROM has been mounted remotely with a
+mount-point of {\bf /mnt}.
+
+{\bf -oldq} and {\bf -oldu} save the configuration files from a previous
+installation using the {\tt TekXpress Quick Install} and {\tt TekXpress Utility}
+tapes.
+
+{\tt dir} specifies the location of those configuration files. For
+example, the default path for the {\tt xp.cnf} file would be:
+
+{\bf -oldq}{\tt /tftpboot/XP}
+
+and for the {\tt .tbl} files:
+
+{\bf -oldu}{\tt /usr/lib/X11/XP/site}.
+
+{\bf -host} and {\bf -user} options are used to install the files from a remote
+{\tt host}. You must specify a valid user name ({\tt user}) for the remote host.
+
+\item The CD-ROM supports multiple hosts. Unless you want to install all of the
+host files, answer {\tt no} ({\bf n}) to the question:
+{\tt Do you wish to do a full install}. The script prompts you through the
+available host choices, and then through the file choices. Each file group
+displays the approximate size. Answer {\tt yes} ({\bf y}) to install a group,
+{\tt no} ({\bf n}) to skip the group, or, when listed, {\tt partial} ({\bf p})
+to selectively install a file group (such as font groups).
+
+{\bf Note:} An example INSTALL session is summarised as an appendix to this
+guide.
+
+\item When you have answered all the questions, the groups you have selected
+are displayed. Enter {\bf y} to accept the groups, of {\bf n} to abort.
+
+\item When complete, unmount and remove the disc from the drive:
+
+{\bf \# umount /cdrom}
+
+or
+
+{\bf \# eject}\ \ \ \ \ \ \ if using the volume manager on a local system
+
+\end {enumerate}
+
+
+\subsection {Media Contents}
+
+The directory hierarchy is created relative to the current directory. For
+example, if you are at the {\bf root} partition ({\bf /}), the directory
+{\tt /tekxp} is created., if you are at {\tt /usr}, the directory is
+{\tt /usr/tekxp}.  Instructions in this guide assume that the initial directory
+is {\tt /tekxp}. The {\tt tekxp} directories are as follows:
+
+\begin {itemize}
+
+\item {\tt /tekxp/INSTALL} contains the installation scripts and log files.
+
+\item {\tt /tekxp/bin/<host>} contains X terminal-specific utilities.
+
+\item {\tt /tekxp/boot} contains boot files, fonts and clients. Files that
+differ between models use a {\tt .model} suffix.
+
+\item {\tt /tekxp/boot/config} contains the X terminal configuration files.
+
+\item {\tt /tekxp/boot/fonts} contains the supplied non-resident fonts.
+
+\item {\tt /tekxp/boot/<language\_directory>/app-defaults} contains translated
+text for X terminal clients.
+
+\item {\tt /tekxp/doc/bin} contains binaries to view Online Xpress.
+
+\item {\tt /tekxp/doc/online} contains Online Xpress, the online documents.
+
+\item {\tt /tekxp/examples} contains examples such as {\tt Xsession} and
+{\tt bootptab}.
+
+\item {\tt /tekxp/man} contains man pages for many of the included utilities.
+
+\item {\tt /tekxp/mgmt} contains a sample SNMP MIB file.
+
+\item {\tt /tekxp/obsolete} contains files that support earlier X terminals.
+
+\item {\tt /tekxp/src} contains source files to support generic UNIX hosts.
+
+\end {itemize}
+
+
+\subsection {Conserving Disk Space}
+
+Depending on the manufacturer of the intended host, model type of the X
+terminals, and whether or not the software options are to be used or the Online
+Xpress documentation is to be installed, options are available to minimise the
+disk space used for the XpressWare installation. Ways to conserve space
+include:
+
+\begin {itemize}
+
+\item Using the fonts already available on the host instead of those supplied
+with XpressWare software.
+
+For Sun5 (Solaris 2.X) hosts, native fonts are typically available in
+
+{\tt /usr/openwin/lib/X11/fonts}.
+
+For DEC (Digital Unix) hosts, native fonts are typically available in
+
+{\tt /usr/lib/X11/fonts}.
+
+{\tt TekXpress} X terminals can use these fonts directly. If you choose not to
+off-load the fonts from the media, the INSTALL script will automatically update
+the {\tt fonts.tbl} file with the default path for the native fonts. If the
+fonts on your host are located elsewhere, change the path in the {\tt fonts.tbl}
+file to the correct directory.
+
+As a second step to access the default fonts, add to the {\tt xp.cnf} file an
+nfs\_table entry that mounts the X terminal to the {\tt /usr} directory of the
+host. Remember to export {\tt /usr} to allow the X terminal access. Both the
+{\tt xp.cnf} and {\tt fonts.tbl} files are located at {\tt /tekxp/boot/config}
+following the installation. For more information on either file, consult the
+{\tt TekXpress} X terminal documentation. Any unresolved issues may be addressed
+to {\tt Kevin Duffey} (see section 6).
+
+\item Performing a partial install supporting just those X terminal models that
+are present in the required system.
+
+If your X terminal system includes only one or two model types, such as XP350
+and XP200 Series, you can elect to perform a partial installation. You have the
+opportunity to specify a partial installation shortly after invoking the INSTALL
+script. When the script asks the question: {\tt Do you wish to do a full install}
+respond with {\bf n}. The INSTALL script responds with questions about specific
+model types in your system. Requesting only specific model support can save you
+a substantial amount of disk space.
+
+\item Removing certain files from the installation based on purchased options.
+If you decide not to use the Online Xpress documents, refuse the
+{\tt doc\_viewer} and {\tt doc\_online} bundles while running the INSTALL
+script. If you want to use the online documents but do not need the
+multimedia functions, remove the
+{\tt /sights} and {\tt /sounds} subdirectories from each document subdirectory
+located at {\tt /tekxp/doc/online} after the installation. You
+may also remove Frame's Online Manuals directory at
+
+{\tt /tekxp/doc/bin/frame4/fminit/usenglish}.
+
+This is the only directory under {\tt /tekxp/doc/bin/frame4}
+that you may remove.
+
+Another group of files that you might remove following the installation are the
+optional local clients, located at {\tt /tekxp/boot}. Local clients that you
+might consider removing are:
+
+\begin {description}
+
+\item [-\ \ ] {\tt mwm.*} and {\tt mwmv1.*} (local Motif window managers)
+
+\item [-\ \ ] {\tt olwm.*} (local OPEN LOOK window manager)
+
+\item [-\ \ ] {\tt tek3179g.*} and {\tt tek3270.*} (local IBM terminal emulators)
+
+\item [-\ \ ] {\tt tek340.*} (local DEC terminal emulator)
+
+\item [-\ \ ] {\tt vplay.350} and {\tt aplay.350} (local digital video and
+audio players)
+
+\item [-\ \ ] {\tt windd.*} (local Windows NT access client)
+
+\item [-\ \ ] {\tt xie.*, xie\_dis.*,} and {\tt xieview.*} (local XIE imaging
+extensions and player)
+
+\item [-\ \ ] {\tt xpwm.*} (local {\tt TekXpress} window manager)
+
+\end {description}
+
+If in the future you decide to take advantage of some or all of these software
+options, simply restore these files from the media using the INSTALL script.
+
+\end {itemize}
+
+
+\section {X Terminal Installation}
+
+This section describes adding the first X terminal to your system. It contains
+step-by-step procedures for performing a basic X terminal installation. By
+following these instructions, you become familiar with the X terminal's network
+configuration parameters, {\tt Boot Monitor, HostMenu} and {\tt Client Launcher}
+utilities. In addition to learning about the X terminal, the procedures
+presented in this section lead you through some of the basic host configuration
+procedures for supporting X terminals.
+
+These steps are performed during the basic X terminal installation:
+
+\begin {itemize}
+
+\item Collect information about your environment which is needed to boot the
+X terminal.
+
+\item Configure host files to support the X terminal.
+
+\item Use the {\tt Boot Monitor} to enter X terminal communication parameters
+and establish a host connection.
+
+\item Log in through a Telnet session from {\tt HostMenu} or
+{\tt Client launcher}
+
+\end {itemize}
+
+After the basic X terminal installation is complete, the X terminal can:
+
+\begin {itemize}
+
+\item Locate the host on the network.
+
+\item Download the operating system, configuration, and font files.
+
+\item Apply configuration files residing on the host.
+
+\end {itemize}
+
+
+\subsection {X Environment Parameters}
+
+In a distributed computer environment, host computers perform a variety of
+functions. The {\tt boot\_host} sends the {\tt boot\_file} to the terminal,
+allowing it to function as an X display. The {\tt font\_host} contains the
+files defining the appearance of the various character fonts that can be
+displayed by the X terminal. The X terminal needs access to this host
+frequently in the course of a user session. The {\tt login\_host} is the host
+where the user's login account is found. The login host supplies a login window
+to the X terminal, using some utility that provides login services. These
+various host functions can be performed by a single host, or distributed across
+multiple hosts.
+
+Here is an example showing information about a sample environment:
+
+{\bf Boot Host Name:}\ \ \ \ \ rlxxp9\ \ \ \ \ \ {\bf IP Address:} 130.235.35.37
+
+{\bf X Terminal Model:}\ \ \ XP115M
+
+{\bf X Terminal Name:}\ \ \ xtkd\ \ \ \ \ \ \ \ {\bf IP Address:} 130.235.35.38
+
+{\bf Netmask:}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 255.255.252.0
+
+{\bf Gateway Address:}\ \ \ \ 130.235.33.31
+
+{\bf Broadcast Address:}\ \ 130.235.33.255
+
+{\bf Boot Method:}\ \ \ \ \ \ \ \ \ \ nfs
+
+{\bf Font Host Name:}\ \ \ \ \ \ rlxxp9\ \ \ \ \ \ {\bf IP Address:} 130.235.35.37
+
+{\bf File Access Method:}\ nfs
+
+
+\subsection {Configuring Host Files}
+
+\paragraph {Enabling NFS} By way of example, the primary method for booting and
+file access is {\tt NFS}.
+
+\begin {enumerate}
+
+\item Set up the {\tt boot\_directory (/tekxp)} for export from the host. To
+enable use of the host fonts, treat likewise the {\tt font\_directory (/usr)}.
+These directories might be exported as {\tt read only}, but consideration
+should be given to local security policy; it may not be the intention to
+permit world read access to sensitive or proprietary software or other data!
+
+Sun5: Edit the {\tt /etc/dfs/dfstab} file to export the directories
+
+\ \ \ \ {\bf share -F nfs -o ro -d ``X Terminal files'' /tekxp}
+
+\ \ \ \ {\bf share -F nfs -o ro -d ``X Terminal files'' /usr}
+
+Digital Unix: Edit the {\tt /etc/exports} file to export the directories
+
+\ \ \ \ {\bf /tekxp -ro}
+
+\ \ \ \ {\bf /usr -ro}
+
+\item Edit the remote configuration file {\tt /tekxp/boot/config/xp.cnf} to add
+the host name and address and the local X terminal mount points and read sizes.
+Search for the {\tt ip\_host\_table} and {\tt nfs\_table} commands. Be sure to
+remove the comment character ({\bf \#}).
+
+\ \ \ \ ip\_host\_table\ \ ``130.235.35.37'' \ ``rlxxp9''
+
+\ \ \ \ nfs\_table\ \ \ \ \ \ rlxxp9:/tekxp\ \ \ /tekxp\ \ \ 8192
+
+\ \ \ \ nfs\_table\ \ \ \ \ \ rlxxp9:/usr\ \ \ \ \ /usr\ \ \ \ \ 8192
+
+\item Edit the {\tt /etc/hosts} file, or the equivalent Network Information
+Service (NIS) file, to add the X terminal name and address.
+
+\ \ \ \ 130.235.35.38\ \ \ xtkd
+
+\item To enable the mount point immediately without booting:
+
+Sun5: {\bf \# shareall}
+
+\item To verify the export, type
+
+Digital Unix: {\bf \# showmount -e}
+
+\item Use the {\bf ps} command to see if {\bf nfsd} is running. For System
+V-type OS (e.g. SunOS) use {\bf edf} for {\tt options}, for Berkeley-type OS
+(e.g. DEC Unix), use {\bf aux} for {\tt options}.
+
+{\bf \# ps} {\tt -options} {\bf $|$ grep nfsd $|$ sed /grep/d}
+
+root 62 1\ \ 0\ \ Jan 26\ \ ?\ \ 0:01 nfsd
+
+If {\bf nfsd} is not running, type:
+
+{\bf \# /usr/etc/nfsd 8 \&}
+
+or for Sun5: {\bf \# /usr/lib/nfs/nfsd 8 \&}
+
+If {\bf nfsd} is running, use the {\bf kill} command with the PID to restart
+the daemon (the PID is 62 in the preceding {\bf ps} example):
+
+{\bf \# kill -1} {\tt PID}
+
+\item Sun5: Use the {\bf ps} command to see if {\bf mountd} is running:
+
+{\bf \# ps -edf $|$ grep mountd $|$ sed /grep/d}
+
+root 62 1\ \ 0\ \ Jan 26\ \ ?\ \ 0:01 /usr/lib/nfs/mountd
+
+If {\bf mountd} is not running, type:
+
+{\bf \# /usr/lib/nfs/mountd \&}
+
+\end {enumerate}
+
+
+\subsection {Powering on the X Terminal}
+
+Verify the physical installation of the X terminal's cables, power cords,
+keyboard, mouse and network connection with the pictorial installation sheet
+included in the packing box. Perform any electrical equipment testing as
+specified at your site.
+
+Turn on the X terminal's power switch. On the first power-up, you must specify
+the keyboard you are using. By default, the North American 101/102 or VT200 is
+selected (depending on the connected keyboard). Press {\tt Enter} or
+{\tt Return} to accept this keyboard. If using a different keyboard or
+nationality, press the {\tt Spacebar} to scroll through the list of available
+keyboards and press {\tt Enter} or {\tt Return} to select the appropriate
+keyboard.
+
+After specifying the keyboard, press the {\tt Enter} or {\tt Return} key again
+to display the {\bf BOOT$>$} prompt.
+
+\subsection {Booting the X Terminal}
+
+The {\bf BOOT$>$} prompt indicates that you are in the {\tt Boot Monitor}. The
+{\tt Boot Monitor} is a simple command-line utility that provides an easy way
+to input boot commands. These boot commands set the parameters which describe
+the X terminal in your network environment.
+
+The {\tt scoreboard} is an area in the upper right-hand corner of the boot
+screen. At this time, the scoreboard shows only default values. Use the
+scoreboard to verify the entries you make in the steps that follow.
+
+To enter a boot command, type the command plus its associated parameter after
+the {\bf BOOT$>$} prompt. To complete an entry, press {\tt Enter}. To see a list
+of the {\tt Boot Monitor} commands, type {\bf help} and press {\tt Enter}. Check
+the scoreboard to verify your entries. If there is an error, re-enter the
+command.
+
+\begin {enumerate}
+
+\item Use the {\bf iaddr} command to enter the terminal IP address.
+
+{\bf BOOT$>$} {\bf iaddr} {\tt ip\_address}
+
+\item Use the {\bf bpath} command to enter the boot path.
+
+{\bf BOOT$>$} {\bf bpath} {\tt /<boot\_directory>/boot/os.<model>}
+
+\item Use the {\bf imask} command to enter the subnet mask.
+
+{\bf BOOT$>$} {\bf imask} {\tt ip\_subnet\_mask}
+
+\item Use the {\bf ihost} command to enter the boot host IP address.
+
+{\bf BOOT$>$} {\bf ihost} {\tt ip\_address}
+
+\item Use the {\bf igate} command to enter the IP address for a gateway host if
+the X terminal is booting through a gateway.
+
+{\bf BOOT$>$} {\bf igate} {\tt ip\_address}
+
+\item Use the {\bf bmethod} command to specify NFS as the boot method. The 8192
+parameter in the example at section 4.2 represents an NFS read size.
+
+{\bf BOOT$>$} {\bf bmethod nfs 8192}
+
+\item Use the {\bf nsave} command to save the values in non-volatile memory.
+
+{\bf BOOT$>$} {\bf nsave}
+
+\item Use the {\bf boot} command to initiate the boot process.
+
+{\bf BOOT$>$} {\bf boot}
+
+\end {enumerate}
+
+If the X terminal locates the host and boot files, a bar appears on the boot
+screen showing the percent of download complete. Once the terminal downloads
+all of the files required, a grey screen with an X-shaped cursor appears. If
+the boot process fails without error messages, you probably entered an
+incorrect parameter. Enter the appropriate command and parameter to correct
+the error. After correcting the error, execute the {\bf nsave} and {\bf boot}
+commands.
+
+
+\subsection {Starting a Session}
+
+Once the X terminal is booted, the {\tt HostMenu} client appears by default.
+You can either start a session from {\tt HostMenu} or from the
+{\tt Client Launcher}.
+
+{\tt HostMenu} is a local client that displays a list of host names and
+network addresses. The buttons across the top select the login list to be
+displayed. The default host connection is via the X Display Manager {\bf xdm}.
+The X terminal broadcasts XDMCP requests and displays a list of hosts that
+respond. Instructions for enabling {\bf xdm} are included in the {\tt TekXpress}
+X terminal documentation.
+
+Hosts can be accessed via other protocols, such as {\tt Telnet} and {\tt Cterm}.
+To see the alternate lists, click on the appropriate button. For most lists, you
+can enter your host name or address in the Host name field, then press
+{\tt Enter}.
+
+
+\subsection {Client launcher}
+
+The {\tt Client Launcher} provides a menu of local clients and host connections
+available to the X terminal. {\tt Client Launcher} is accessed on most keyboards
+by pressing the {\tt Setup} key. For alternate keyboards, use these sequences:
+
+101/102 ({\tt Pause} key):\ \ \ {\tt Shift-Setup}
+
+UNIX:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ {\tt AltGraph-Setup}
+
+Sun5:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ {\tt AltGraph-Help}
+
+LK401:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ {\tt Compose-Backspace}
+
+You can customise the Launcher client for other users through the
+{\tt system.launcher} file. Refer to the {\tt TekXpress} X terminal
+documentation.
+
+\clearpage
+
+\subsection {Opening a Telnet Session}
+
+Telnet provides a direct connection from the X terminal to a host computer.
+When Telnet is running, the X terminal acts as a standard VT102 terminal. To
+open a Telnet session from {\tt HostMenu}:
+
+\begin {enumerate}
+
+\item Click on the {\bf TELNET} list button.
+
+\item Click on your host, or enter your host name or address in the Host Name
+field.
+
+\end {enumerate}
+
+To open a Telnet session from the {\tt Client Launcher}:
+
+\begin {enumerate}
+
+\item Position the pointer on the Host Connections option to display the
+submenu. Select {\tt Telnet} to open a Telnet window.
+
+\item Use the mouse to position the pointer in the Telnet window. You can type
+{\bf H} and press {\tt Enter} to see a list of Telnet commands.
+
+\item At the {\bf Telnet$>$} prompt, type:
+
+{\bf Telnet$>$} {\bf open} {\tt hostname}
+
+where {\tt hostname} is the name or network address of the host.
+
+\end {enumerate}
+
+Once a connection is made you can login to your host.
+
+\begin {enumerate}
+
+\item At the {\bf login:} prompt, login to the host computer by entering your
+user name:
+
+{\bf login:} {\tt user\_name}
+
+\item At the {\bf password} prompt, enter your password:
+
+{\bf password:} {\tt password}
+
+\item Now that you are connected to the host, type the command plus its
+associated parameter after the {\bf \#} prompt. To terminate an entry, press
+{\tt Enter}. Set the display environment variable for the X terminal by entering
+the following using the X terminal IP address:
+
+{\bf \# setenv DISPLAY} {\tt ip\_address}
+
+\item Enter the command to start your window manager.
+
+If the Motif Window Manager is installed, and setup in your path, type:
+
+{\bf \# mwm \&}
+
+If the OPENLOOK Window Manager is installed, and setup in your path, type:
+
+{\bf \# olwm \&}
+
+If you do not have a host-based window manager, you can start a local window
+manager via the {\tt Client launcher}. Local window managers can also be started
+through the {\bf xpsh} command discussed in the online documentation.
+
+\end {enumerate}
+
+
+\subsection {Closing a Telnet Session}
+
+When you are ready to conclude the Telnet session, logout of your host:
+
+{\bf \# exit}
+
+To close the Telnet window from the {\bf Telnet$>$} prompt:
+
+{\bf Telnet$>$ quit}
+
+
+\section {Configuring Your Environment}
+
+After installing the software and starting a session, use the X terminal to
+finish configuring your environment. The following is a list of recommended
+tasks for the configuration process:
+
+\begin {itemize}
+
+\item Start {\tt Online Xpress}, if selected during the INSTALL phase, to view
+the online documentation. (Instructions for starting {\tt Online Xpress} are
+located in the {\tt XpressWare} Release Notes.) Otherwise refer to the ``paper
+documentation'', which has been made available to the Starlink Site Managers.
+
+\item From the main menu, select {\tt Configuring the X Terminal Environment}.
+As you are working your way through the strategies section, you can edit the
+necessary files by invoking your text editor from within your Telnet window.
+
+\item If using {\tt Online Xpress}, then for additional ease of use, you can
+also open the {\tt Accessing X Terminal Reference Information} from the main
+menu. By using the included index and the Previous Jump button, you can quickly
+look up command details while keeping your Strategy window open.
+
+\item To save time, gather in advance the information about each X terminal
+that you are going to install in your environment.
+
+\item Physically connect each additional X terminal to the network. Once the
+configuration is complete, one should simply be able to power-on the X terminal
+and use the environment that has been defined.
+
+\end {itemize}
+
+
+\section {Further Help}
+
+If you have any comments concerning this User Guide and information contained
+therein, or require additional help with XpressWare installation, please
+contact {\tt Kevin Duffey}:
+
+c/o Space Science Department
+
+\ \ \ \ \ Rutherford Appleton Laboratory
+
+\ \ \ \ \ Chilton, Didcot, OXON, OX11 0QX
+
+Tel: 01235 44 6362
+
+Fax: 01235 44 5848
+
+E-mail: kpd@star.rl.ac.uk
+
+\clearpage
+
+\appendix
+
+\section {Sample INSTALL Session}
+
+Given below is a summary of an INSTALL session for XpressWare Version 8.0.
+
+On invoking the INSTALL procedure, you will be automatically advised that the
+size of the entire installation is 285324 Kilobytes. The entire installation
+caters for all applicable X terminal types, includes all available fonts, and
+the online documentation and viewing software.
+
+On starting-up, the procedure will ask if a full installation is required. For
+a case where a full installation has {\bf not} been requested, the dialogue
+might procede along the following lines ({\bf Note} that certain text has been
+re-phrased or omitted here for brevity):
+
+{\tt Size of entire installation is 285324 KB}
+
+{\tt Full install (y/n)} n
+
+{\tt Load hp files (y/n)} n
+
+{\tt Load sun files (y/n)} y
+
+{\tt Load dec files (y/n)} n
+
+{\tt Load sgi files (y/n)} n
+
+{\tt Load ibm files (y/n)} n
+
+{\tt Size of the boot group is 2256 KB}
+
+{\tt Install `boot' group (y/n)} y
+
+{\tt Size of xpbinaries is 34848 KB (for XP10, XP100, XP330, XP350, pex)}
+
+{\tt Install xpbinaries (y/n/p)} p
+
+{\tt Size of xpbinaries.xp10 group is 10512 KB; install `xp10' (y/n)} n
+
+{\tt Size of xpbinaries.xp330 group is 13712 KB; install `xp330' (y/n)} n
+
+{\tt Size of xpbinaries.xp350 group is 16268 KB; install `xp350' (y/n)} y
+
+{\tt Size of xpbinaries.pex group is 3552 KB; install `pex' (y/n)} n
+
+{\tt Size of fonts group is 12880 KB}
+
+{\tt Install `fonts' group (y/n/p)} p
+
+{\tt Size of fonts.misc group is 2496 KB; install `misc' (y/n)} y
+
+{\tt Size of fonts.100dpi group is 2396 KB; install `100dpi' (y/n)} y
+
+{\tt Size of fonts.75dpi group is 2092 KB; install `75dpi' (y/n)} y
+
+{\tt Size of fonts.japanese group is 2532 KB; install `japanese' (y/n)} n
+
+{\tt Size of fonts.oldx11 group is 1056 KB; install `oldx11' (y/n)} y
+
+{\tt Size of fonts.openlook group is 104 KB; install `openlook' (y/n)} y
+
+{\tt Size of fonts.tek100dpi group is 564 KB; install `tek100dpi' (y/n)} y
+
+{\tt Size of fonts.Speedo group is 568 KB; install `Speedo' (y/n)} n
+
+{\tt Size of fonts.Type1 group is 1072 KB; install `Type1' (y/n)} n
+
+{\tt Size of man group is 512 KB}
+
+{\tt Install `man' group (y/n)} y
+
+{\tt Size of mgmt group is 76 KB}
+
+{\tt Install `mgmt' group (y/n)} y
+
+{\tt Size of obsolete group is 468 KB}
+
+{\tt Install `obsolete' group (y/n)} y
+
+{\tt Size of examples group is 212 KB}
+
+{\tt Install `examples' group (y/n)} y
+
+{\tt Size of Xext group is 108 KB}
+
+{\tt Install `Xext' group (y/n)} y
+
+{\tt Size of bin group is 7016 KB}
+
+{\tt Install `bin' group (y/n)} y
+
+{\tt Size of src group is 1100 KB}
+
+{\tt Install `src' group (y/n)} n
+
+{\tt Size of audioIntercept group is 756 KB}
+
+{\tt Install `audioIntercept' group (y/n)} n
+
+{\tt Size of Acrobat group is 8448 KB}
+
+{\tt Install `Acrobat' group (y/n)} n
+
+{\tt Size of DpsNx group is 24412 KB}
+
+{\tt Install `DpsNx' group (y/n)} n
+
+{\tt Size of doc\_viewer group is 41296 KB}
+
+{\tt Install `doc\_viewer' group (y/n)} n
+
+{\tt Size of doc\_online group is 61120 KB}
+
+{\tt Install `doc\_online' group (y/n)} n
+
+
+{\tt Total size of install is 35624 KB}
+
+
+{\tt Do you wish to do the installation (y/n)}
+
+
+If you go ahead with an installation without the online documentation and
+viewer, these can be brought in with a subsequent installation at a cost of an
+additional 102416 KB
+
+\end{document}

@@ -1,0 +1,2274 @@
+%
+% Writing Catalogue and Image Servers for GAIA and CURSA.
+%
+% Copyright 2000  Starlink, CCLRC.
+%
+% A.C. Davenhall (Edinburgh), 11/3/00.
+%
+
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+
+% Define commands for displaying angles as sexagesimal hours and minutes
+% or degrees and minutes.
+
+\newcommand{\tmin}   {\mbox{$^{\rm m}\!\!.$}}
+\newcommand{\hm}[3] {$#1^{\rm h}\,#2\tmin#3$}
+\newcommand{\dm}[2] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}$}
+\newcommand{\arcmin} {\raisebox{-0.5ex}{$^{'}$} }
+
+\newcommand{\arcsec} {$\hspace{-0.05em}\raisebox{-0.5ex}
+                     {$^{'\hspace{-0.1em}'}$}
+                     \hspace{-0.7em}.\hspace{-0.05em}$}
+\newcommand{\tsec}   {\mbox{$^{\rm s}\!\!.$}}
+\newcommand{\hms}[4] {$#1^{\rm h}\,#2^{\rm m}\,#3\tsec#4$}
+\newcommand{\dms}[4] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}\,#3\arcsec#4$}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocsource}    {ssn\stardocnumber}
+\newcommand{\stardoccopyright} 
+{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {75.1}
+\newcommand{\stardocauthors}   {A.C.~Davenhall}
+\newcommand{\stardocdate}      {26 July 2000}
+\newcommand{\stardoctitle}     {Writing Catalogue and Image Servers for
+GAIA and CURSA}
+\newcommand{\stardocabstract}
+{GAIA and CURSA can interrogate remote catalogues via the Internet to
+return lists of objects which satisfy a given criterion.  GAIA can also
+extract images of a specified region of sky from remote databases.
+Similar facilities are also available in other packages, such as the
+ESO {\it SkyCat}\/ image display tool and the Gemini observing tool.
+This functionality is achieved by having servers running on the remote
+systems which accept queries sent by GAIA \emph{etc}, interrogate their
+local copies of the catalogues to find the data which satisfy the query
+and return them.  The servers can communicate with GAIA \emph{etc.} because
+the query is sent, and the results returned, in a standard format.  This
+document describes how to write such servers.
+
+\begin{latexonly}
+\vspace{5mm}
+\end{latexonly}
+
+\begin{center}
+{\bf Who Should Read this Document?}
+\end{center}
+
+This document is aimed at programmers who intend to write servers which
+will provide catalogue and image data for GAIA \emph{etc}.}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     ssn.tex
+%
+%  Purpose:
+%     Template for Starlink System Note (SSN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\textbf{\stardoctitle}}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+\newpage
+\section*{Accessing this document}
+
+A hypertext version of this document is available.  To access it on
+Starlink systems type:
+
+\begin{quote}
+{\tt showme ~ ssn75}
+\end{quote}
+
+On non-Starlink systems access URL:
+
+\begin{quote}
+\htmladdnormallink{
+{\tt http://www.starlink.rl.ac.uk/docs/ssn75.htx/ssn75.html}}
+{http://www.starlink.rl.ac.uk/docs/ssn75.htx/ssn75.html}
+\end{quote}
+
+Paper copies can be obtained from the Starlink document librarian,
+who can be contacted as follows.
+
+Postal address: \\
+\begin{tabular}{l}
+The Document Librarian. Starlink Project, Rutherford Appleton Laboratory, 
+  Chilton, \\
+DIDCOT, Oxfordshire, OX11 0QX, United Kingdom.                \\
+\end{tabular}
+
+% \vspace{3mm}
+
+Electronic mail: {\tt ussc@star.rl.ac.uk}
+
+% \vspace{3mm}
+
+Fax: \\
+\begin{tabular}{lr}
+from within the United Kingdom: &    01235-445-848 \\
+from overseas:                  & +44-1235-445-848 \\
+\end{tabular}
+
+
+\section*{Obtaining assistance}
+
+If you run into difficulties writing a server then I might be able to
+offer advice or assistance.  I can be contacted as follows.
+
+Postal address: \\
+\begin{tabular}{l}
+A.C.~Davenhall.  Institute for Astronomy, Royal Observatory, Blackford Hill, \\
+Edinburgh, EH9 3HJ, United Kingdom.  \\
+\end{tabular}
+
+% \vspace{4mm}
+
+Electronic mail: {\tt acd@roe.ac.uk}
+
+% \vspace{4mm}
+
+Fax: \\
+\begin{tabular}{lr}
+from within the United Kingdom: &    0131-668-8416 \\
+from overseas:                  & +44-131-668-8416 \\
+\end{tabular}
+
+\section*{Revision history}
+
+\begin{enumerate}
+
+  \item 26th July 2000: Version 1. Original version (ACD).
+
+\end{enumerate}
+
+% ? Latex Copyright Statement
+
+ \vspace*{\fill}
+ \stardoccopyright
+
+ \cleardoublepage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \tableofcontents
+
+%   \newpage
+   \listoffigures
+   \listoftables
+
+   \setlength{\parskip}{\medskipamount}
+   \markboth{\stardocname}{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section{\xlabel{INTRO}\label{INTRO}Introduction}
+
+\xref{GAIA}{sun214}{}\cite{SUN214} and \xref{CURSA}{sun190}{}\cite{SUN190}
+can interrogate remote catalogues via the Internet to retrieve lists of
+objects which satisfy a given criterion.  GAIA can also extract images
+of a specified region of sky from remote databases.  Similar facilities
+are also available in other packages, such as the ESO 
+\htmladdnormallinkfoot{{\it SkyCat}\/}{http://archive.eso.org/skycat/}
+image display tool and the Gemini observing tool.  This functionality
+is achieved by having servers on the remote systems which accept queries
+sent by GAIA \emph{etc}, interrogate their local copies of the catalogues
+to find the data which satisfy the query and return them to the client
+which sent the query.  This method of working is an example of a
+`client-server architecture', with GAIA, CURSA \emph{etc.} acting as the
+client.  The server and client can communicate because the query is sent,
+and the results returned, in a standard format.  This document describes
+how to write such servers and also the formats of the queries and results.
+
+The standard formats for the queries and returned data were developed by
+Allan~Brighton and colleagues at ESO for use with their Astronomical
+Catalogue Library (ACL).  This subroutine library provides the
+functionality for a client to access a remote server, and is used by,
+for example, {\it SkyCat}\/ and GAIA.  Consequently, in this document
+the formats will be called the `ACL format' and a server which accepts
+queries and returns data in these formats will be called an `ACL server'.
+
+The communication between the client and the server uses the Hyper-Text
+Transfer Protocol (HTTP)  developed as part of the World Wide Web.  The
+servers are, strictly speaking, {\it gateways}\/ using the Common Gateway
+Interface (CGI).  One way of thinking of the client is as a very
+specialised Web browser.  A consequence of this approach is that if a
+site is to host an ACL server it must also be running a Web server.  The
+HTTP and CGI protocols are, of course, enormously flexible and the
+ACL format is a set of additional rules and restrictions which sit `on
+top' of them.
+
+An ACL server is a CGI gateway, and CGI gateways can be provided in any
+number of different ways.  However, the usual technique is to implement
+the gateway as a Perl script and this approach will be adopted in this
+document.  Usually (though not always) the Perl script will invoke a
+special-purpose program or Database Management System (DBMS) to
+interrogate the catalogue database.
+
+This document is divided into two parts:
+
+\begin{description}
+
+  \item[{\rm Part I}] -- a tutorial example of creating a simple ACL
+   server,
+
+  \item[{\rm Part II}] -- reference material, mostly describing the
+   ACL format.
+
+\end{description}
+
+
+\section{\xlabel{FURTHER}\label{FURTHER}Further Reading}
+
+The ACL format is documented in Section~2 of Allan~Brighton's {\it
+Astronomical Catalogue Library User Manual}\/\cite{BRIGHTON98} (and the
+description in Part~II is largely based on this manual).  It is a
+subset of a proposed general format for exchanging information between
+remote astronomical information services which is being developed at the
+Centre de Donn\'{e}es astronomiques de Strasbourg (CDS) and elsewhere.
+The full proposal is described in the working document {\it Astronomical
+Server URL}\, by M.~Albrecht {\it et al.}\cite{SERVERURL}.
+
+There are numerous books describing the HTTP and CGI protocols; I
+have found the {\it The HTML Source Book}\/ by Ian~Graham\cite{GRAHAM95}
+to be useful.  Similarly, there are many books on Perl.  I have used
+{\it Learning Perl}\/ by  Randall~Schwartz\cite{SCHWARTZ93} and {\it
+Programming Perl}\/ by Larry~Wall and Randall~Schwartz\cite{WALL91} and
+found them comprehensive, convenient and accessible.
+
+% - Part I ------------------------------------------------------------
+\cleardoublepage
+\markboth{\stardocname}{\stardocname}
+\part{Tutorial Example: Creating a Simple Server}
+\markboth{\stardocname}{\stardocname}
+\section{\xlabel{INTRO_T}\label{INTRO_T}Introduction}
+
+This part of the document is a tutorial example which describes how to
+create a simple ACL server.  Example files are provided which illustrate
+the procedure.  Firstly, however, the basics of using an ACL server to
+query a catalogue are reviewed.
+
+
+\section{\xlabel{BASICS_T}\label{BASICS_T}Basics of Querying Remote
+Catalogues}
+
+The basics of querying a catalogue are that some criterion is specified,
+all the rows in the catalogue are examined and those which satisfy the
+criterion are returned as the list of selected rows.  Some criteria
+might be:
+
+\begin{itemize}
+
+  \item stars whose Right Ascension lies in the range \hm{13}{30}{0} to
+   \hm{14}{00}{0},
+
+  \item stars brighter than $m_{v} = 13.0$,
+
+  \item stars with a B-V colour greater than 0.2.
+
+\end{itemize}
+
+However, a very common sort of search on astronomical catalogues is the
+so-called `circular area search' or `cone search'.  Virtually all
+astronomical catalogues contain celestial coordinates, in practice
+Right Ascension and Declination for some equinox and epoch.  In a circular
+area search the central coordinates and angular radius are specified.
+All the objects in the catalogue which are less than this angular radius
+from the central coordinates are selected.  That is, the circular area
+search finds all the objects in the catalogue within a given circular
+patch of sky.
+
+It is usual for ACL servers to a support a circular area search and
+often this may be the only type of search provided.  The full form of
+an ACL circular area search is slightly more general, with both an inner
+and outer radius specified, so that objects inside an annulus rather than
+a circle are selected.  (The `traditional' circular area search corresponds
+to setting the inner radius to zero.)
+
+The catalogue being accessed will doubtless have other columns as well
+as the Right Ascension and Declination, and the ACL server may permit
+`range' searches on some of these columns.  In a range search minimum and
+maximum values are specified for a column and a row is selected if its
+value for the column falls within the given range.  Any range searches
+specified are combined with each other and with the circular area
+search using a `logical and'.  That is, for example, the objects selected
+would correspond to those which are both in a given area of sky and in
+a given magnitude range.  Though this mechanism allows powerful queries
+to be made it still provides only a subset of all the conceivable types of
+queries.
+
+Before starting work on an ACL server for a catalogue, you need to decide
+two things.
+
+\begin{enumerate}
+
+  \item Are circular area searches to be supported (the answer is almost
+   certainly yes)?
+
+  \item On which, if any, additional columns are range searches to be
+   supported?
+
+\end{enumerate}
+
+In order to implement the server you need to provide two things:
+
+\begin{enumerate}
+
+  \item the server itself,
+
+  \item an entry for the server in an ACL `configuration file'.
+
+\end{enumerate}
+
+An ACL configuration file defines the list of catalogues which a client,
+such as \xref{GAIA}{sun214}{} or {\it SkyCat}, currently knows about.  It
+has an entry for each catalogue.  The entry specifies details of the
+catalogue which the client needs to know: the URL of its server, the
+types of queries that it supports, the name by which it is to be described
+to the user \emph{etc}.
+
+
+\section{\xlabel{OBTAIN_T}\label{OBTAIN_T}Obtaining Example Files}
+
+Some simple examples of server scripts and a configuration file are
+provided with this document.  Subsequent sections of the tutorial
+will describe these files and explain how to install them.  You may
+also find them useful as templates for developing your own servers
+and configuration files.  The files can be obtained in two different ways.
+
+\begin{itemize}
+
+  \item On Starlink systems they should be present in directory:
+
+  \begin{quote}
+   {\tt /star/examples/ssn75}
+  \end{quote}
+
+  \item Copies can be obtained by anonymous ftp from Edinburgh.  The
+   details are:
+
+  \begin{tabular}{ll}
+   Anonymous ftp to: & {\tt ftp.roe.ac.uk}    \\
+   Directory:        & {\tt /pub/acd/misc}    \\
+   File:             & {\tt ssn75\_examples.tar} \\
+  \end{tabular}
+
+   The file is an uncompressed tar archive (it is only 52 Kb in size).
+   Set ftp to `binary' mode to retrieve it.
+
+\end{itemize}
+
+The important files used in the tutorial are:
+
+\begin{description}
+
+  \item[{\tt simpleserver.cgi}] a simple server script,
+
+  \item[{\tt secondserver.cgi}] a second, slightly more complicated, server
+   script, 
+
+  \item[{\tt genfield.c}] a program to generate the list of stars returned
+   by the servers,
+
+  \item[{\tt simpleconfig.cfg}] a configuration file including the two
+   example servers.
+
+  \item[{\tt checkcfg}] a script for checking configuration files.
+
+\end{description}
+
+File {\tt 0README.LIS} gives a complete list.  You will probably find it
+useful to print out copies of the files and have them to hand as you work
+through the examples.  Copies of the servers are installed at Edinburgh, so
+the URLs given in the examples should work, though you will be accessing
+the Edinburgh versions rather than your own copies.
+
+
+\section{\xlabel{SERVER_T}\label{SERVER_T}Creating a Server}
+
+An ACL server is a Perl script which accepts a query in a standard format,
+searches the corresponding catalogue to find the objects which satisfy
+the query and returns them to the remote client.  The server {\tt
+simpleserver.cgi} supplied with this document is more-or-less the simplest
+practical server, but it illustrates the structure that they usually have.
+You will find it helpful to have a copy to hand as you read through this
+section.  {\tt simpleserver.cgi} supports only circular area searches
+in which a central Right Ascension and Declination and an angular radius
+are specified.  Because it is provided as an example it generates and
+returns an artificial list of stars, centred on, and scaled to fit, the
+specified area, rather than searching a real catalogue.  The overall
+structure of {\tt simpleserver.cgi} is:
+
+\begin{quote}
+obtain the query string \\
+parse the query string to obtain the central coordinates and radius \\
+generate the list of stars to fit in this field \\
+\hspace*{3 mm} (a real server would search a catalogue instead) \\
+return the results to the client
+\end{quote}
+
+The comments in the source code should make the detailed working obvious.
+However, the following notes about the query string and results returned
+might be useful.
+
+\subsection{Query string}
+
+\begin{enumerate}
+
+  \item If a CGI gateway is implemented as a Perl script the query
+   string appears in the variable \verb-$ENV{'QUERY_STRING'}-.
+   In {\tt simpleserver.cgi} the query is copied into a local variable
+   by the line:
+
+  \begin{quote}
+   \verb-$query = $ENV{'QUERY_STRING'};-
+  \end{quote}
+
+  \item In {\tt simpleserver.cgi} the query string has the format:
+
+  \begin{quote}
+   {\tt ra={\it xxx}\&dec={\it yyy}\&radius={\it zzz}}
+  \end{quote}
+
+   For example:
+
+  \begin{quote}
+   {\tt ra=10:30:00\&dec=-30:30.0\&radius=3}
+  \end{quote}
+
+   where {\tt ra=}, {\tt dec=} and {\tt radius=} have their obvious
+   meanings.  When you set up the entry for the server in the configuration
+   file (see Section~\ref{CONFIG_T}, below) you have considerable latitude
+   over this format.  However, the one used by {\tt simpleserver.cgi} is a
+   common one, and is as good as any.  {\tt simpleserver.cgi} supports
+   only circular area searches; if additional types of search were
+   supported then the query string would contain additional parameters.
+
+  \item The formats and units required for the parameters are as follows:
+
+  \begin{description}
+
+    \item[Right Ascension] sexagesimal or decimal hours,
+
+    \item[Declination] sexagesimal or decimal degrees,
+
+    \item[Radius] decimal minutes of arc.
+
+  \end{description}
+
+   If a sexagesimal value is entered then a colon (`:') should be used
+   as a separator.  The Right Ascension and Declination should be for
+   equinox and epoch J2000.  The server {\it must}\/ accept values in
+   these units and formats because typically the client will present
+   the same recipe and information to the user when requesting input
+   for any of the various catalogues available to it.
+
+\end{enumerate}
+
+\subsection{Results returned}
+
+\begin{enumerate}
+
+  \item The first line of information returned by the server should
+   always be the MIME type.  In {\tt simpleserver.cgi} it is written by
+   the line:
+
+  \begin{quote}
+   \verb+{  print "Content-type: text/plain\n\n\n";+
+  \end{quote}
+
+   The MIME type is not part of the table of results, but rather is
+   used by the client or Web browser to interpret the format of the data
+   which follows.
+
+  \item The list of selected objects are returned to the client as a
+   stream of ASCII characters.  The list is written in the Tab-Separated
+   Table (TST) format (see Section~\ref{TST_R}).
+
+  \item The Perl script should simply write the results to standard
+   output (whence it will be automatically forwarded to the remote
+   client).  In {\tt simpleserver.cgi} the lines:
+
+  \begin{quote}
+   \verb-$tst = `$queryExe $ra $dec $radius`;- \\
+   \verb-print "$tst";-
+  \end{quote}
+
+   invoke program {\tt genfield} (variable \verb-$queryExe- has
+   previously been set to contain the name and directory specification
+   of the executable for {\tt genfield}) to generate the star list,
+   copy the list the to variable \verb-$tst- and then write the contents
+   of \verb-$tst- to standard output.  (Hint: Perl has several mechanisms
+   for invoking processes and directing their output to standard output;
+   I found the one described to be the most suitable for use in a CGI
+   script.)
+
+  \item The last line written to standard output should be:
+
+  \begin{quote}
+   \verb-print "[EOD]\n";-
+  \end{quote}
+
+   The string `{\tt [EOD]}' informs the client that the server has
+   finished sending data.
+
+\end{enumerate}
+
+\subsection{Installing and testing the server}
+
+The procedures for installing CGI scripts vary at different sites; your
+system manager should be able to advise on arrangements at your site.
+However, to install {\tt simpleserver.cgi} you need to follow at least
+the following steps.
+
+\begin{enumerate}
+
+  \item Copy files {\tt simpleserver.cgi} and {\tt genfield.c} to a
+   suitable directory (there are likely to be restrictions on which
+   directories can contain CGI scripts; see your system manager).
+
+  \item Compile program {\tt genfield.c} and name the executable {\tt
+   genfield}.  {\tt genfield.c} is a standard (and simple) C program;
+   any C compiler should be able to handle it.
+
+  \item Edit file {\tt simpleserver.cgi}.  Locate the line:
+
+  \begin{quote}
+   \verb-$queryExe = "/star/examples/ssn75/genfield";-
+  \end{quote}
+
+   which is towards the top of the script and change it to correspond
+   to whichever directory you have put the files in.
+
+  \item Check with your system manager whether there are any other
+   local requirements for running CGI scripts.
+
+  \item You are now ready to test the server.  The tests are best conducted
+   from a normal Web browser, such as {\tt netscape}.  Start the browser
+   and enter a URL similar to:
+
+  \begin{verbatim}
+http://www.roe.ac.uk/~acd/cgi-bin/simpleserver.cgi?ra=10.0&dec=30.0&radius=3
+  \end{verbatim}
+
+   This string comprises the normal URL for the CGI script, followed
+   by a `{\tt ?}', followed by the query.  This format is the normal
+   syntax for invoking CGI scripts and passing queries to them.  To
+   invoke your version of the server you would substitute the appropriate
+   URL in the example above.  Typing in the example exactly as given
+   should invoke a version of the server running in Edinburgh.  If
+   all is working correctly the browser should display a table similar
+   to the one in Figure~\ref{SIMPLE_TST}.  If the server fails then
+   your Web server probably maintains error logs which might contain
+   useful diagnostics; your system manager should know where these logs
+   are kept.
+
+\end{enumerate}
+
+\begin{figure}[htbp]
+
+\begin{quote}
+\begin{verbatim}
+
+Example Star Field. 
+
+#column-units:          DEGREES         DEGREES         Magnitudes 
+#column-types:   CHAR*8         DOUBLE  DOUBLE  REAL 
+#column-formats: A8     F12.6   F12.6   F6.2 
+
+Id      RA      DEC     mag 
+--      --      ---     ---
+Star 1  150.026667      30.050000       0.580000 
+Star 2  149.968333      29.961667       0.120000 
+Star 3  149.983333      30.041667       1.640000 
+Star 4  149.993333      30.005000       2.210000 
+Star 5  150.000000      30.000000       1.700000 
+Star 6  150.006667      29.996667       1.790000 
+Star 7  149.983333      29.993333       3.380000 
+Star 8  150.015000      29.951667       4.130000 
+[EOD]
+\end{verbatim}
+
+\caption{The table of values returned by the ACL server {\tt
+simpleserver.cgi}.
+\label{SIMPLE_TST} }
+\end{quote}
+
+\end{figure}
+
+
+\subsection{Modifying the server}
+
+Other servers are likely to be similar to {\tt simpleserver.cgi}.  To
+modify it to access your own catalogue you would replace the invocation
+of program {\tt getfield} with an invocation of a program which searched
+your catalogue or DBMS.
+
+{\tt simpleserver.cgi} is more-or-less the simplest practical server,
+and is provided as an example.  Additional useful features in a server
+include: copying the queries to a log file (so that you can monitor
+usage) and copying error messages to a second log file (as diagnostics
+in case of misadventure).  Another server, {\tt secondserver.cgi}, which
+incorporates these features, is supplied with this document.  To install
+it, follow the same procedure as for {\tt simpleserver.cgi}, except that
+the lines towards the top of the script which need to be modified are:
+
+  \begin{quote}
+    \verb+$queryExe = "/star/examples/ssn75/genfield";+ \\
+    \verb+$logDir = "/star/examples/ssn75/examplelogs";+
+  \end{quote}
+
+When developing a server it is often useful to comment out the line:
+
+\begin{quote}
+\begin{verbatim}
+     $query = $ENV{'QUERY_STRING'};
+\end{verbatim}
+\end{quote}
+
+and un-comment the line:
+
+\begin{quote}
+\begin{verbatim}
+#    $query = "ra=10:30:00&dec=-30:30.0&radius=3";
+\end{verbatim}
+\end{quote}
+
+so that the script has a query `hard-wired'.  It can now be run directly
+from the command line rather than be invoked via a Web browser.  This
+trick often makes debugging scripts a {\it lot}\/ easier.
+
+Both the query and error log files written by {\tt secondserver.cgi}
+are simple text files.  Note, however, that file {\tt query.TXT}, which
+is supplied with the examples, allows the query log to be accessed by
+\xref{CURSA}{sun190}{}\cite{SUN190} as an STL (Small Text List) format
+catalogue.  Once the query log becomes large you might find it more
+convenient to examine it with the CURSA catalogue browser {\tt xcatview}
+rather than Unix commands such as {\tt cat} and {\tt more}.
+
+
+\section{\xlabel{CONFIG_T}\label{CONFIG_T}Creating a Configuration File}
+
+The configuration file used by \xref{GAIA}{sun214}{} \emph{etc}. mediates
+interaction between the client and server.  It is an ASCII text file
+containing details for each of a list of catalogues.  GAIA (or whatever)
+reads the file and the catalogues listed in it become the ones that GAIA
+knows about.  The details supplied for each catalogue are things like:
+its URL, the type of queries supported, the name that will be used to
+describe it to users \emph{etc}.  The entry for a typical simple catalogue
+looks something like:
+
+\begin{verbatim}
+serv_type:      catalog
+long_name:      Simple example server.
+short_name:     simple@roe
+url:            http://www.roe.ac.uk/~acd/cgi-bin/simpleserver.cgi?ra=...
+symbol:         mag circle 3
+\end{verbatim}
+
+This entry is taken from {\tt simpleconfig.cfg}, the example configuration
+file supplied with this document, though the {\tt url} entry has been
+truncated.  By convention configuration files have file type `{\tt .cfg}'.
+The purposes of the various items are as follows.
+
+\begin{description}
+
+  \item[{\tt serv\_type:}] is the type of the server.  For a
+   straightforward catalogue the value required is `{\tt catalog}'.
+   Other values are possible, though you will probably rarely use them.
+
+  \item[{\tt long\_name:}] a one-line name or short description of the
+   catalogue.  It will be presented to the user to allow him to identify
+   the catalogue.
+
+  \item[{\tt short\_name:}] a short name for the catalogue.  Conventionally
+   it has the form:
+
+  \begin{quote}
+   {\it catalogue}{\tt @}{\it institution}
+  \end{quote}
+
+   where {\it catalogue}\, is an abbreviation for the catalogue and {\it
+   institution}\, a standardised abbreviation for the institution where
+   the on-line version is located.  By convention {\it institution}\/ has
+   three or four characters.
+
+  \item[{\tt url:}] the URL used to access the server.  Following the
+   usual conventions for a CGI gateway it consists of the URL corresponding
+   to the script which constitutes the server, followed by a `{\tt ?}'
+   and then a string defining the query passed to the server (see 
+   Section~\ref{QUERY_T}).
+
+  \item[{\tt symbol:}] specifies how objects are to be plotted (see
+   Section~\ref{PLOTTING_R}).
+
+\end{description}
+
+There are various other optional items which can be included.  They are
+described in Section~\ref{CONFIG_R}.
+
+\subsection{\label{QUERY_T}URL query}
+
+The string appended to the server URL in the configuration file and which
+defines the type of queries supported by the catalogue has a format
+something like:
+
+\begin{quote}
+\verb-ra=%ra&dec=%dec&radius=%r2-
+\end{quote}
+
+It consists of simple characters and `tokens'.  The tokens start with
+a `{\tt \%}' character.  When GAIA makes a query the tokens are replaced
+with values which correspond to the individual query and the resulting
+string is sent to the server.  For example, tokens in the above string
+might be susbstituted to yield:
+
+\begin{quote}
+\begin{verbatim}
+ra=10:30:00&dec=-30:30.0&radius=3
+\end{verbatim}
+\end{quote}
+
+Obviously the format of the query string appended to the URL in the
+configuration file must correspond to that expected by the server.
+Various standard tokens can be included in the query string.  Some common
+ones are:
+
+\begin{description}
+
+  \item[{\tt \%ra}] Right Ascension,
+
+  \item[{\tt \%dec}] Declination,
+
+  \item[{\tt \%r1}] inner radius,
+
+  \item[{\tt \%r2}] outer radius,
+
+  \item[{\tt \%n}] maximum number of objects to return.
+
+\end{description}
+
+For a complete list see Section~\ref{CONFIG_R}.
+
+\subsection{Installing and testing the configuration file}
+
+Installing and testing the configuration file should be quite
+straightforward.  The servers \newline
+{\tt simpleserver.cgi} and {\tt secondserver.cgi} should be installed
+(see Section~\ref{SERVER_T}, above).  Then proceed as follows.
+
+\begin{enumerate}
+
+  \item Edit the configuration file and change the URLs for the servers
+   {\tt simple@roe} and {\tt second@roe} to correspond to wherever
+   you have installed the servers.
+
+  \item A Perl script to check a configuration file for errors is
+   included with the example files for this document.  To check that
+   you have not introduced any errors whilst editing the example
+   configuration file type:
+
+  \begin{quote}
+   {\tt /star/examples/ssn75/checkcfg ~ simpleconfig.cfg}
+  \end{quote}
+
+   (If the example files are not in their standard location on a Starlink
+   system then obviously you need to alter the directory specification
+   accordingly.  Also, on non-Starlink systems you might need to edit the
+   first line of {\tt checkcfg} to correspond to wherever Perl is installed
+   on your system.)  If the configuration file is valid then {\tt checkcfg}
+   will report:
+
+  \begin{quote}
+   {\tt Configuration file parsed successfully.}
+  \end{quote}
+
+   Conversely, if it contains errors then messages describing the problems
+   will be reported.  {\tt checkcfg} is described in
+   Section~\ref{CHECKCFG_R}.
+
+  \item Start GAIA and test the server.  To import the configuration
+   file into GAIA click on the {\sf Data-Servers} button on the right
+   hand side of the main menu bar and choose the {\sf Browse Catalog
+   Directories} option.  A window showing the catalogues available should
+   appear.  Click on the {\sf File} button at the left of its top menu
+   bar and choose the {\sf Load Config file\ldots} option.  A window
+   allowing you to select the required file should then appear.
+
+   Once the configuration file has been loaded you can choose from
+   amongst its catalogues and make selections in the normal fashion.
+   If you make a selection from the simple example server a list of
+   objects similar to Figure~\ref{SIMPLE_TST} should be returned.
+
+\end{enumerate}
+
+\subsection{Modifying the configuration file}
+
+When you create a new server you need to create an entry for it in
+your configuration file.  If the server is just a simple variation of
+{\tt simpleserver.cgi} or {\tt secondserver.cgi} and only supports
+circular area queries then just duplicate the entry for {\tt simple@roe}
+and change {\tt long\_name}, {\tt short\_name} and {\tt url} to correspond
+to your server.
+
+Additional modifications can be made as required.  The following section
+gives some examples and the options are documented in
+Section~\ref{CONFIG_R}.  Remember that script {\tt checkcfg} (see
+Section~\ref{CHECKCFG_R}) is available for checking configuration files.
+
+
+\section{\xlabel{CARRYON_T}\label{CARRYON_T}Carrying On}
+
+This section introduces a few additional features that are often
+required in servers and configuration files.
+
+\subsection{Multiple catalogue servers}
+
+{\tt simpleserver.cgi} can access only a single catalogue.  Often you
+may want to write a server which can access each of several catalogues.
+In this case your configuration file must contain an entry for each
+{\it catalogue}, not each server.  An additional parameter, whose value
+identifies the catalogue, is added to the query.  The server parses this
+parameter to identify the catalogue required.  You can decide the
+syntax and values of this parameter, though the configuration file and
+server must agree.
+
+For example, suppose that you are writing a server which will provide
+access to the SAO, PPM and Hipparcos astrometric catalogues.  You might
+invent a parameter called `{\tt catalogue}' whose value identifies the
+catalogue.  Your configuration file would then have three entries like:
+
+{\small
+\begin{verbatim}
+serv_type:  catalog
+long_name:  SAO (Smithsonian Astrophysical Observatory) catalog
+short_name: sao@roe
+url:        http://www.roe.ac.uk/~acd/cgi-bin/ast.cgi?catalogue=sao&ra=%ra&dec=...
+symbol:     mag square 3
+
+serv_type:  catalog
+long_name:  PPM (Positions and Proper Motions) catalogue
+short_name: ppm@roe
+url:        http://www.roe.ac.uk/~acd/cgi-bin/ast.cgi?catalogue=ppm&ra=%ra&dec=...
+symbol:     mag square 3
+
+serv_type:  catalog
+long_name:  Hipparcos catalogue
+short_name: sao@roe
+url:        http://www.roe.ac.uk/~acd/cgi-bin/ast.cgi?catalogue=hipparcos&ra=%ra&dec=...
+symbol:     mag square 3
+\end{verbatim}
+}
+
+The server would be written to parse the value of {\tt catalogue} and then
+search the catalogue indicated.
+
+\subsection{Providing range queries}
+
+As well as selecting objects in a circular area of sky it is possible
+to further restrict the objects selected to only those for which the
+values of some column lie within a given range.  Suppose selections
+from an optical catalogue were to be optionally restricted to also
+lie within a specified range of magnitudes and the column of magnitudes
+was named {\tt mag}.  To provide this facility for a catalogue its entry in
+the configuration file should be include the keyword {\tt search\_cols}
+and the query part of its {\tt url} keyword should include the token
+{\tt \%cond}.
+
+\begin{enumerate}
+
+  \item The syntax of the {\tt search\_cols} keyword is:
+
+  \begin{quote}
+   {\tt search\_cols:} {\it column-name minimum-prompt maximum-prompt}
+  \end{quote}
+
+   For example:
+
+  \begin{quote}
+   {\tt search\_cols: mag "Bright limit" "Faint limit"}
+  \end{quote}
+
+   {\it column-name}\/ is the name of the column.  The client uses
+   {\it minimum-prompt}\/ and {\it maximum-prompt}\/ as prompts when
+   soliciting the extrema of the required range from the user.  (Note
+   that because the example column is a magnitude the ``Bright limit"
+   corresponds to the smallest numerical value and the ``Faint limit"
+   to the largest.)
+
+  \item The {\tt \%cond} token is added to the query part of the {\tt
+   url} keyword to supply details of the range query.  Such a query
+   string might look like:
+
+  \begin{quote}
+  \verb-ra=%ra&dec=%dec&radius=%r2&%cond-
+  \end{quote}
+
+   The syntax of the values substituted into the {\tt \%cond} string is:
+
+  \begin{quote}
+   {\it column-name}\/ {\tt =} {\it minimum-value}{\tt ,}{\it maximum-value}
+  \end{quote}
+
+   For example, if a range of first to second magnitude had been specified
+   for column {\tt mag} then {\tt \%cond} would translate to:
+
+  \begin{quote}
+   {\tt mag=1.0,2.0}
+  \end{quote}
+
+   The server that parses the query must interpret this string and
+   ensure that the range selection specified is applied.
+
+\end{enumerate}
+
+See Section~\ref{RANGE_R} for further details.
+
+\subsection{Linked configuration files}
+
+In addition to entries for individual catalogues, configuration files
+can also contain entries for other configuration files.  Typically
+when such an entry is chosen all the entries in the target configuration
+file are loaded into the client.  In this way a tree (or rather a network,
+because recursion is allowed) of entries can be built up.  Entries of
+this type are referred to as `directories' (by analogy with an hierachical
+file system).
+
+For a directory entry the {\tt serv\_type} should be `{\tt directory}'
+and the {\tt url} should be the URL of the destination configuration
+file.  {\tt long\_name} and {\tt short\_name} have their usual meaning.
+Other options are unlikely to be required.  An example might be:
+
+\begin{verbatim}
+serv_type:      directory
+long_name:      ESO Catalogues
+short_name:     catalogs@eso
+url:            http://archive.eso.org/skycat/skycat2.0.cfg
+\end{verbatim}
+
+\subsection{Handling queries which return no results}
+
+Sometimes users will submit a query which no objects in the catalogue
+satisfy.  For example, the query might correspond to an empty patch of
+sky.  In practice such queries are quite common.  Unfortunately, the ACL
+format does not prescribe the action the server should take in this case.
+However, the {\it recommended}\/ action is for the server to return an
+empty TST table.  That is, it should return all the header information
+for a TST generated from the catalogue being queried (see 
+Section~\ref{TST_R}), down to and including the list of column names
+and the line of dashes anf tab characters which terminate the header,
+but no table of values.
+
+
+% - Part II -----------------------------------------------------------
+\cleardoublepage
+\markboth{\stardocname}{\stardocname}
+\part{Reference Material}
+\section{\xlabel{INTRO_R}\label{INTRO_R}Introduction}
+
+This part of the document comprises reference material describing
+the ACL configuration file and the Tab-Separated Table (TST) format.
+Most of the material is adapted from Section~2 of Allan~Brighton's {\it
+Astronomical Catalogue Library User Manual}\/\cite{BRIGHTON98}.
+
+
+\section{\xlabel{CONFIG_R}\label{CONFIG_R}The Configuration File}
+
+This section describes the format of the ACL configuration file.  When
+you refer to it you might find it useful to have to hand a copy of
+either {\tt simpleconfig.cfg} or some other configuration file.
+
+An ACL configuration file mediates the interaction between 
+a client such as \xref{GAIA}{sun214}{} and a remote server.  
+The configuration file comprises a list of one or more databases,
+giving details for each.  Usually each `database' will be a simple
+astronomical catalogue.  However, other alternatives are possible:
+archives, name servers, \emph{etc}.  Consequently, in this section the
+generic term `database' is used to denote each entry.  Also, it is
+individual databases, not servers, which are listed in the configuration
+file: some servers might give access to more than one database.
+The details supplied for each database are things like: its URL, the
+type of queries supported, the name that will be used to describe it to
+users \emph{etc}.  The client reads the configuration file and the
+databases listed become the ones that it knows about.
+
+By convention, configuration files have file-type `{\tt .cfg}'.
+They are ASCII text files which may be created and modified with a text
+editor.  Their basic syntax is as follows.
+
+\begin{itemize}
+
+  \item Blank lines are ignored.
+
+  \item Lines beginning with `{\tt \#}' are considered to be comments
+   and are ignored.
+
+  \item Lines ending with `${\tt \backslash}$' (backslash) are continued
+   on the next line.
+
+  \item The description for each database comprises several `keyword:value'
+   pairs.  Each keyword:value pair occupies a single line, unless continued
+   over more than one line.  The individual keywords are described in
+   Section~\ref{KEYWORDS_R}, below.  Most are optional.
+
+  \item The first keyword of each database entry must be {\tt serv\_type}.
+
+  \item Subsequent keywords of each database entry can occur in any
+   order.
+
+  \item Unrecognised keywords are ignored (to permit future extensions).
+
+  \item Many of the optional keywords correspond to facilities that are not
+   supported by most databases.
+
+  \item Some of the keywords require a list of values.  All such lists
+   have the same basic format as a Tcl\footnote{The Tcl scripting language
+   is described by its author, John~Ousterhout, in his {\it Tcl and the Tk
+   Toolkit}\/\cite{OUSTERHOUT94}.} list: usually a list of words
+   or strings enclosed in double-quotes (`{\tt "}') and separated by one
+   or more space characters.  Alternatively, curly brackets (`{\tt \{ \}}')
+   may be used instead of double-quotes.
+
+  \item If a keyword's value comprises more than one list then these
+   lists are separated by a colon (`{\tt :}').
+
+  \item If a keyword's value includes a variable reference (see
+   Section~\ref{PLOTTING_R}, below) then the variable is expressed in
+   Tcl format: in practice it will start with a dollar character (`{\tt
+   \$}').
+
+\end{itemize}
+
+\subsection{\label{KEYWORDS_R}Keywords}
+
+The entry for an individual database in a configuration file comprises
+some of the following keywords.  The entry for the database must begin
+with the {\tt serv\_type} keyword.  Other keywords can occur in any
+order.  The keywords are optional unless otherwise indicated.  The
+keywords are case-sensitive and must be specified entirely in lower case.
+
+\begin{description}
+
+  \item[{\tt serv\_type}] (mandatory) The type of database.  The
+   options permitted are described in Section~\ref{SERVERS_R}, below.
+
+  \item[{\tt long\_name}] (mandatory) A one-line description of the
+   database.  Typically the client will display it to allow the user to
+   identify the database.
+
+  \item[{\tt short\_name}] (mandatory) A short name for the database.
+   Conventionally it has the form:
+
+  \begin{quote}
+   {\it database}{\tt @}{\it institution}
+  \end{quote}
+
+   where {\it database}\, is an abbreviation for the database and {\it
+   institution}\, a standardised abbreviation for the institution where the
+   on-line version is located.  By convention {\it institution}\/ has three
+   or four characters; some common values are listed in Table~\ref{REMINST}.
+
+\begin{table}[htbp]
+
+\begin{center}
+\begin{tabular}{cl}
+Abbreviation  &  Institution  \\ \hline
+{\tt cadc} & Canadian Astronomy Data Centre, Dominion Astrophysical
+    Observatory  \\
+{\tt eso} &  European Southern Observatory, Garching bei M\"{u}nchen \\
+{\tt lei} &  Department of Physics and Astronomy, University of Leicester \\
+{\tt roe} &  Royal Observatory Edinburgh \\
+\end{tabular}
+\end{center}
+
+\caption{Abbreviations for institutions hosting ACL servers
+\label{REMINST} }
+
+\end{table}
+
+  \item[{\tt url}] (mandatory) The URL and query template to access the
+   server.  See Section~\ref{QUERY_R}.
+
+  \item[{\tt symbol}] Defines how objects in the returned table should
+   be plotted.  See Section~\ref{PLOTTING_R}.
+
+  \item[{\tt copyright}] A copyright notice for the client to display.
+
+  \item[{\tt search\_cols}] A list of columns on which range searches
+   are permitted.  See Section~\ref{RANGE_R}.
+
+  \item[{\tt sort\_cols}] The columns on which the returned table is
+   sorted.
+
+  \item[{\tt sort\_order}] The order into which the returned table is
+   sorted.  The permitted values are: {\tt increasing} and {\tt
+   descreasing}.
+
+  \item[{\tt show\_cols}] By default a client will display all the
+   columns in the returned table.  If a {\tt show\_cols} list is specified
+   then by default only the columns in the list will be displayed.  Also
+   the order of the list defines the order in which the columns should be
+   displayed.
+
+  \item[{\tt id\_col}] The number of a column in the returned table
+   which contains a unique identifier (or `name') for each object in
+   the table.  By default the first column of a TST format table contains
+   such an identifer (see Section~\ref{TST_R}).
+
+  \item[{\tt ra\_col}] The number of a column in the returned table
+   which contains the Right Ascension.  By default the second column of a
+   TST format table contains the Right Ascension (see Section~\ref{TST_R}).
+
+  \item[{\tt dec\_col}] The number of a column in the returned table
+   which contains the Declination.  By default the third column of a
+   TST format table contains Declination (see Section~\ref{TST_R}).
+
+  \item[{\tt x\_col}] The number of a column in the returned table
+   which contains $x$\/ image pixel coordinates.
+
+  \item[{\tt y\_col}] The number of a column in the returned table
+   which contains $y$\/ image pixel coordinates.
+
+  \item[{\tt is\_tcs}] If this keyword is present it should be set to
+   `1'.  Its presence indicates that the returned table either is in or
+   should be converted to TCS format.  TCS format catalogues have fixed
+   column names and rules for converting column names when catalogues
+   are imported from other formats.
+
+  \item[{\tt help}] A URL pointing to a Web page (or pages) describing
+   the database.
+
+  \item[{\tt backup1}] A reserve URL to be used to access the database
+   in the case where the URL specified by the {\tt url} keyword does
+   not respond.
+
+  \item[{\tt backup2}] A second reserve URL to be used to access the
+   database in the case where the URLs specified by the {\tt url} and
+   {\tt backup1} keywords do not respond.
+
+\end{description}
+
+For keywords {\tt id\_col}, {\tt ra\_col}, {\tt dec\_col}, {\tt x\_col}
+and {\tt y\_col} the number of a column is defined as its sequence
+number in the list of column names which defines the columns in a TST
+table (see Section~\ref{TST_R} and Figure~\ref{TSTEXAMP}).  The first
+column is numbered zero.  This sequence number is sometimes referred
+to as the `column index'.
+
+\subsection{\label{SERVERS_R}Types of servers}
+
+The types of database which may be specified for keyword {\tt serv\_type}
+are as follows.  If an unrecognised type is specified it will be ignored
+(to permit future extensions).
+
+\begin{description}
+
+  \item[{\tt catalog}] The database is a simple catalogue; this is the
+   simplest and most common option.
+
+  \item[{\tt archive}] The database is an archive.  This option is
+   similar to `{\tt catalog}', but the table returned may contain
+   special columns whose values are URLs giving access to `bulk data'
+   (images, spectra, time-series \emph{etc}\/) for the selected objects.
+   See Section~\ref{TSTSPCOL_R} for details of these special columns.
+
+  \item[{\tt namesvr}] The database is a name server.  The only type
+   of query permitted is to submit to the server a character string
+   corresponding to the name of an astronomical object.  The server
+   returns a TST catalogue with a single row and three columns.
+   The row corresponds to the object named and the three columns are:
+   identifier (name), Right Ascension and Declination.  See
+   configuration file {\tt simpleconfig.cfg} for an example of a 
+   {\tt namesvr} entry.
+
+  \item[{\tt imagesvr}] The database is an image server.  See
+   Section~\ref{IMAGE_R}.
+
+  \item[{\tt local}] The database is a local catalogue in the TST format.
+
+  \item[{\tt directory}] The `database' is another configuration file.
+   This facility allows a tree (or rather network, since recursion is
+   permitted) of linked configuration files to be built up.  The {\tt url}
+   keyword gives the URL of the destination configuration file.  The term
+   `directory' comes from making an analogy with an hierachical file
+   system.  See configuration file {\tt simpleconfig.cfg} for an example.
+
+\end{description}
+
+\subsection{\label{QUERY_R}URL and query specification}
+
+The {\tt url} keyword prescribes how the client should access a remote
+server to query a database.  Following the usual conventions for a CGI
+gateway it consists of the URL corresponding to the script which
+constitutes the server, followed by a `{\tt ?}' and then a string
+defining the query passed to the server.  The query string consists of
+simple characters and `tokens'.  The tokens start with a `{\tt \%}'
+character.  When a client makes a query the tokens are replaced 
+with values which correspond to the individual query and the resulting
+string is sent to the server.  An example query string for a server
+which provides circular area searches on a single catalogue might be:
+
+\begin{quote}
+\verb-ra=%ra&dec=%dec&radius=%r2-
+\end{quote}
+
+which contains the tokens {\tt \%ra}, {\tt \%dec} and {\tt \%r2}.  The
+client might substitute them to yield:
+
+\begin{quote}
+\begin{verbatim}
+ra=10:30:00&dec=-30:30.0&radius=3
+\end{verbatim}
+\end{quote}
+
+The format of the query string must correspond to that expected by the
+server.  This restriction aside, considerable freedom is allowed in the
+format of the query string.  See configuration file {\tt simpleconfig.cfg}
+for examples.  The complete list of the permitted tokens is as follows.
+
+\begin{description}
+
+  \item[{\tt \%ra}] Right Ascension (see Section~\ref{CUF_R}).
+
+  \item[{\tt \%dec}] Declination (see Section~\ref{CUF_R}).
+
+  \item[{\tt \%x}] $x$\/ image pixel coordinate (see Section~\ref{CUF_R}).
+
+  \item[{\tt \%y}] $y$\/ image pixel coordinate (see Section~\ref{CUF_R}).
+
+  \item[{\tt \%r}] radius of a circular area search (see Section~\ref{CUF_R}).
+
+  \item[{\tt \%r1}] inner radius (see Section~\ref{CUF_R}).
+
+  \item[{\tt \%r2}] outer radius (see Section~\ref{CUF_R}).
+
+  \item[{\tt \%w}] width of a rectangular region (see Section~\ref{CUF_R}).
+
+  \item[{\tt \%h}] height of a rectangular region (see Section~\ref{CUF_R}).
+
+  \item[{\tt \%m1}] Minimum magnitude.
+
+  \item[{\tt \%m2}] Maximum magnitude.
+
+  \item[{\tt \%m}] Maximum magnitude when no minimum is specified.
+
+  \item[{\tt \%n}] Maximum number of objects (or rows) to return.
+
+  \item[{\tt \%cols }] A list of the columns which the returned table
+   is to contain.  If no value is supplied all the columns in the
+   database will be returned.  The order of the list corresponds to the
+   order in which the columns are returned.
+
+  \item[{\tt \%id }] The name (or identifier) of an object submitted to
+   a {\tt namesvr} (`name server') database.
+
+  \item[{\tt \%mime-type}] The HTTP mime-type to be inserted in a HTTP
+   {\tt get} command.
+
+  \item[{\tt \%sort}] A list of columns on which the returned table is
+   to be sorted.  If no value is specified the table is returned unsorted.
+
+  \item[{\tt \%sortorder}] The order into which the returned table is
+   sorted.  The permitted values are {\tt increasing} and {\tt decreasing}.
+
+  \item[{\tt \%cond}] A string specifying one or more range searches.
+   See Section~\ref{RANGE_R}.
+
+\end{description}
+
+\subsection{\label{CUF_R}Coordinates, units and formats}
+
+By default databases are assumed to contain columns of Right Ascension
+and Declination on which they can be searched.  However, some databases
+do not contain such coordinates, but rather have Cartesian $x,y$\/
+positions.  Typically such positions occur in catalogues generated
+by detecting the objects present in a CCD direct image frame or a
+digitised photographic plate.  The following rules apply.
+
+\begin{enumerate}
+
+  \item By default databases are assumed to be searchable on columns
+   of Right Ascension and Declination.  Further, these columns are
+   assumed to be called `{\tt ra}' and `{\tt dec}', respectively.
+   Simply include the tokens {\tt \%ra} and {\tt \%dec} in the query.
+
+  \item If a `positional' search (ie. one finding objects in either a
+   circular area or a region bounded by meridians of Right Ascension and
+   parallels of Declination) is to be made on columns of Right Ascension
+   and Declination then the formats and units of the given values should
+   be:
+
+  \begin{description}
+
+    \item[Right Ascension] sexagesimal or decimal hours,
+
+    \item[Declination] sexagesimal or decimal degrees.
+
+  \end{description}
+
+   If a sexagesimal value is entered than a colon (`:') should be used
+   as a separator.  The coordinates should be for equinox and epoch J2000.
+
+  \item If a database is searchable on $x,y$\/ positions rather than
+   celestial coordinates then the following keywords should be added to
+   its entry in the configuration file:
+
+  \begin{quote}
+    \verb+ra_col:     -1+  \\
+    \verb+dec_col:    -1+  \\
+    \verb+x_col:      +(sequence number of column holding $x$\/ coordinate) \\
+    \verb+y_col:      +(sequence number of column holding $y$\/ coordinate) 
+  \end{quote}
+
+   Setting {\tt ra\_col} and {\tt dec\_col} to {\tt -1} indicates that
+   columns of Right Ascension and Declination are not available.
+
+  \item The units of the $x,y$\/ positions are simply `pixels', that is,
+   dimensionless numbers.  Note however, that they are of type REAL rather
+   than INTEGER; positions can be expressed to a fraction of a pixel.
+
+  \item The units in which the radius, height and width of circular and
+   `rectangular' positional searches are expressed also vary depending
+   on whether the database contains celestial coordinates or $x,y$\/
+   positions.  The tokens affected are:
+
+  \begin{quote}
+   {\tt \%r \%r1 \%r2 \%w \%h}
+  \end{quote}
+
+   The alternatives for their units are:
+
+  \begin{description}
+
+    \item[in a search on celestial coordinates:] decimal minutes of arc,
+
+    \item[in a search on $x,y$\/ positions:] decimal pixels.
+
+  \end{description}
+
+\end{enumerate}
+
+\subsection{\label{RANGE_R}Range queries}
+
+To permit range queries on one or more columns of a database the keyword
+{\tt search\_cols} should be included in the entry for the database in
+the configuration file and the {\tt \%cond} keyword should be included
+in the query part of its {\tt url} keyword.  These items have the
+following syntax.
+
+\begin{description}
+
+  \item[{\tt search\_cols} keyword] A list of one or more column names
+   together with text prompts for the minimum and maximum values of the
+   range required.
+
+  \begin{quote}
+   {\tt search\_cols:} {\it column-name-1 minimum-prompt-1 maximum-prompt-1}
+   {\tt :} \\
+   {\it column-name-2 minimum-prompt-2 maximum-prompt-2} \ldots
+  \end{quote}
+
+   The client uses the minimum and maximum prompts when soliciting the
+   extrema of the required range from the user.  An example might be
+
+  \begin{quote}
+   {\tt search\_cols: mag "Bright limit" "Faint limit" : ${\tt \backslash}$ \\
+   b\_v "Minimum colour" "Maximum colour"}
+  \end{quote}
+
+  \item[{\tt \%cond} token] This token is included in the query part
+   of the {\tt url} keyword and specifies any range search that is
+   supplied.  The syntax of the values substututed into the {\tt \%cond}
+   string is:
+
+  \begin{quote}
+   {\it column-name-1}\/ {\tt =} {\it minimum-value-1}{\tt ,}{\it
+   maximum-value-1}{\tt \&}
+   {\it column-name-2}\/ {\tt =} {\it minimum-value-2}{\tt ,}{\it
+   maximum-value-2} \ldots
+  \end{quote}
+
+   When a search is specified {\it column-name-n}, {\it minimum-value-n}\/
+   and  {\it maximum-value-n}\/ are substituted with respectively the column
+   name, minimum value and maximum value.  The server should process this
+   string and return only rows that lie within the given ranges.  An
+   example of substituted query might be:
+
+  \begin{quote}
+   {\tt mag=1.0,2.0\&b\_v=0.1,0.3}
+  \end{quote}
+
+\end{description}
+
+\subsection{\label{PLOTTING_R}Plotting directives}
+
+The keyword {\tt symbol} prescribes how objects in the returned table
+of values are to be displayed in finding charts, image overlays \emph{etc}.
+Considerable flexibility is allowed in the way that objects are plotted.
+In particular, the two common types of cases which are conventionally used
+in atlases and finding charts are supported:
+
+\begin{itemize}
+
+  \item the size of the plotted symbol is scaled according to some
+   property not directly related to the apparent size of the object.
+   For optical star catalogues the magnitude is traditionally used,
+
+  \item the size and orientation of the plotted symbol bears some
+   relation to the apparent size and orientation of the image.  For
+   example, galaxies are often plotted as ellipses with the outline of
+   the ellipse approximating to some isophote.
+
+\end{itemize}
+
+The {\tt symbol} keyword only prescribes how objects should be plotted
+in finding charts and image overlays; it is not appropriate for
+scatter-plots where the two axes are not celestial coordinates or $x,y$\/
+positions.  The syntax of the {\tt symbol} keyword is:
+
+\begin{quote}
+{\tt symbol:} {\it column-names symbol-info size-expr}\/ {\tt :} \ldots
+\end{quote}
+
+This triumavirate of items can be repeated an arbitrary number of times,
+with each occurence being separated by a colon (`{\tt :}').  The meaning
+of each of the three items is as follows.
+
+\begin{description}
+
+  \item[{\it column-names}] is a list of the names of columns in the
+   returned table which appear as variables in {\it symbol-info}\/ or
+   {\it size-expr}.  The names should be separated by spaces.  Column
+   names containing embedded spaces or characters which Tcl\footnote{The
+   Tcl scripting language is described by its author, John~Ousterhout, in
+   his {\it Tcl and the Tk Toolkit}\/\cite{OUSTERHOUT94}.} interprets as
+   special should be enclosed in curly brackets (`{\tt \{ \} }').
+   Alternatively, names which contain spaces but not any characters
+   which Tcl regards as special may be enclosed in double-quotes
+   (`{\tt " "}').
+
+  \item[{\it symbol-info}] prescribes the appearance of the plotting
+   symbol.  See Section~\ref{SYMBOLINFO_R} for details.
+
+  \item[{\it size-expr}] is an expression which is evaluated to give the
+   size of each symbol.  This expression uses Tcl syntax, with some or
+   all of the column names listed in {\it column-names}\/ appearing as
+   variables.  The expression may optionally be followed by the units
+   of the value computed.  The units permitted are:
+
+  \begin{description}
+
+    \item[{\tt image}] image pixels,
+
+    \item[{\tt deg J2000}] degrees for equinox J2000,
+
+    \item[{\tt deg B1950}] degrees for equinox B1950.
+
+  \end{description}
+
+\end{description}
+
+\pagebreak
+\begin{table}
+\begin{center}
+\begin{tabular}{lc}
+Symbol & Scale and \\
+       & rotate?   \\ \hline
+{\tt square}   &   \\
+{\tt circle}   &   \\
+{\tt triangle} &   \\
+{\tt cross}    &   \\
+{\tt diamond}  &   \\
+{\tt plus}     &  $\bullet$ \\
+{\tt ellipse}  &  $\bullet$ \\
+{\tt compass}  &  $\bullet$ \\
+{\tt line}     &  $\bullet$ \\
+{\tt arrow}    &  $\bullet$ \\
+\end{tabular}
+\end{center}
+
+\begin{center}
+\caption{Plotting symbols \label{PLOTTING_SYMBOLS} }
+\end{center}
+
+\end{table}
+
+\begin{table}[htbp]
+
+\begin{center}
+\begin{tabular}{ll}
+Colour   & Name \\ \hline
+default  & (default)      \\
+red      & {\tt red}      \\
+green    & {\tt green}    \\
+blue     & {\tt blue}     \\
+cyan     & {\tt cyan}     \\
+magenta  & {\tt magenta}  \\
+yellow   & {\tt yellow}   \\
+\end{tabular}
+\end{center}
+
+\begin{quote}
+The default colour is the opposite of the plot background.  Usually
+it will be black or white.
+\end{quote}
+
+\begin{center}
+\caption{Colours for plot symbols recognised by CURSA \label{CURSA_COLOURS} }
+\end{center}
+
+\end{table}
+
+\subsubsection{symbol-info \label{SYMBOLINFO_R}}
+
+{\it symbol-info}\/ prescribes the appearance of the symbol plotted.
+It is a list comprising the following items:
+
+\begin{quote}
+{\it symbol ~colour ~ratio ~angle ~label ~condition}
+\end{quote}
+
+{\it symbol}\/ is mandatory; the other items are optional.
+
+\begin{description}
+
+  \item[{\it symbol}] is the plotting symbol to be used.  The values
+   permitted are listed in Table~\ref{PLOTTING_SYMBOLS}.  The symbols
+   marked with a bullet (`$\bullet$') are typically scaled and rotated
+   to correspond to the appearance of the image; see {\it ratio}\/ and
+   {\it angle}, below.
+
+  \item[{\it colour}] is the colour in which the symbol is plotted.  It may
+   be any valid X colour name.  If {\it colour}\/ is omitted then GAIA
+   and {\it SkyCat}\/ draw the symbol in black and white, which stand the
+   best chance of being visible when overlaid on a colour image.  CURSA
+   will recognise only the restricted set of colours listed in
+   Table~\ref{CURSA_COLOURS}.
+
+  \item[{\it ratio}\/ and {\it angle}] are respectively the width / height
+   ratio of the object and rotation from north.
+%  {\it angle} {\sf is measured clockwise? widdershins?, in degrees? radians?}.
+   Both quantities may be given as expressions involving column names.
+
+  \item[{\it label}] is the label for each object.  It may be fixed text,
+   an expression involving column names or a mixture of the two.
+
+  \item[{\it condition}] is a boolean expression involving column names
+   whose value prescribes whether the object is plotted or not.  If the
+   expression evaluates to {\tt true} (or 1) then the object is plotted;
+   if it evaluates to {\tt false} (or 0) it is not.  By having a list of
+   entries for the {\tt symbol} keyword, each with a different condition
+   attached to the {\it symbol-info}\/ item different symbols can be
+   plotted for each object, depending on the values of its column entries.
+
+\end{description}
+
+\subsubsection{Examples}
+
+\begin{description}
+
+  \item[{\tt symbol: "" circle 12}] ~ \\
+   Plots objects as circles of constant size.
+
+  \item[{\tt symbol: mag circle 15-\$mag}] ~ \\
+   Plots objects as circles scaled according to magnitude (column {\tt
+   mag}).
+
+  \item[{\tt symbol: mag \{circle red\} 15-\$mag}] ~ \\
+   Plots objects as red circles scaled according to magnitude.
+
+  \item[{\tt symbol: \{a b pa\} \{ellipse red \$a/\$b \$pa\} 
+   \{\$a/3600.0 "deg J2000"\} }] ~ \\
+   Plots objects as red ellipses.  The ratio of the ellipse is computed
+   from the semi-major and semi-minor axes ({\tt a} and {\tt b}
+   respectively).  The orientation is computed from position angle ({\tt
+   pa}).  The image size is computed in degrees from the semi-major axis,
+   which is assumed to be in seconds of arc.
+
+  \item[{\tt symbol: \{mag rv\} \{circle red "" "" "" \$rv>0 \} 15-\$mag :} 
+   ${\tt \backslash}$] ~ \\
+   {\tt \{mag rv\} \{circle blue "" "" "" \$rv<=0 \} 15-\$mag} \\
+   Plot objects as circles scaled according to magnitude.  However,
+   the colour of each circle depends on the radial velocity ({\tt rv}).
+   Objects with a positive radial velocity are shown in red, those with
+   a negative one in blue.
+
+\end{description}
+
+\subsubsection{Inserting private Tcl procedures}
+
+If a standard Tcl expression does not allow you to calculate the symbol
+size as you wish then you may be able to invoke your own Tcl procedure
+to perform the calculation.  This facility is only available if you are
+using {\it SkyCat}\/ as a client and is only likely to be useful with
+your own catalogues.  An example might be:
+
+\begin{quote}
+{\tt symbol "rmag bmag" circle "[my\_plot\_proc \$rmag \$bmag]"}
+\end{quote}
+
+where you provide Tcl procedure {\tt my\_plot\_proc}.
+
+\subsection{\label{CHECKCFG_R}Checking a configuration file}
+
+A Perl script is available to check the validity of configuration files.
+You can use it to check for errors in any configuration files that you
+have created or modified.  It is included with the examples provided with
+this document as file:
+
+\begin{quote}
+{\tt /star/examples/ssn75/checkcfg}
+\end{quote}
+
+You can either run it from the examples directory or copy it to a
+convenient local directory.  On non-Starlink systems you may need to edit
+the first line to correspond to wherever Perl is located on your system.
+
+To use the script simply specify the name of the configuration file,
+optionally preceded by the appropriate directory specification, on the
+command line:
+
+\begin{quote}
+{\tt /star/examples/ssn75/checkcfg} ~ {\it configuration-file-name}
+\end{quote}
+
+For example, to check a copy of the example configuration file supplied
+with this document (assuming that there is a copy in your current
+directory):
+
+\begin{quote}
+{\tt /star/examples/ssn75/checkcfg ~ simpleconfig.cfg}
+\end{quote}
+
+If the configuration file is valid the {\tt checkcfg} will display the
+message:
+
+\begin{quote}
+{\tt Configuration file parsed successfully.}
+\end{quote}
+
+Conversely, if there are problems with the configuration file then
+explanatory error messages are displayed.  Usually the number of the
+invalid line in the configuration file is included in the message.
+Note that {\tt checkcfg} is mostly checking for syntax errors; it does
+not, for example, check that any URLs specified are valid.
+
+
+\section{\xlabel{TST_R}\label{TST_R}The Tab-Separated Table Format}
+
+This section gives a brief description of the tab-separated table (TST)
+format.  ACL servers should return the list of selected objects in this
+format.  Various packages, including GAIA, CURSA and Starbase can also
+read local files containing catalogues in this format.  There are
+alternative descriptions of it in \xref{SUN/214}{sun214}{}\cite{SUN214},
+the \htmladdnormallinkfoot{Starbase FAQ}
+{http://www.astro.uiuc.edu/\~{}bima/starbase/}
+and the {\it Astronomical Catalogue Library User Manual}\/\cite{BRIGHTON98}.
+
+TST format files are text files.  They are usually generated by a remote
+server in response to a query from a local client.  However, they could
+equally well be local files created with a text editor.
+Figure~\ref{TSTEXAMP} shows a simple example of a tab-separated table.
+This example is available as file:
+
+\begin{verse}
+{\tt /star/examples/ssn75/simple.TAB}
+\end{verse}
+
+\begin{figure}[htbp]
+
+% Ensure that this figure corresponds to the example data file.
+
+\begin{verbatim}
+Simple TST example; stellar photometry catalogue.
+
+A.C. Davenhall (Edinburgh) 26/7/00.
+
+Catalogue of U,B,V colours.
+UBV photometry from Mount Pumpkin Observatory,
+see Sage, Rosemary and Thyme (1988).
+
+# Start of parameter definitions.
+EQUINOX: J2000.0
+EPOCH: J1996.35
+# End of parameter definitions.
+
+#column-units: <tab>Hours <tab>Degrees <tab>Magnitudes <tab>Magnitudes <tab>Magnitudes
+#column-types: CHAR*6 <tab>DOUBLE <tab>DOUBLE <tab>REAL <tab>REAL <tab>REAL
+#column-formats: A6 <tab>D13.6 <tab>D13.6 <tab>F6.2 <tab>F6.2 <tab>F6.2
+
+Id<tab>ra<tab>dec<tab>V<tab>B_V<tab>U_B
+--<tab>--<tab>---<tab>-<tab>---<tab>---
+Obj. 1<tab> 5:09:08.7<tab> -8:45:15<tab>  4.27<tab>  -0.19<tab>  -0.90
+Obj. 2<tab> 5:07:50.9<tab> -5:05:11<tab>  2.79<tab>  +0.13<tab>  +0.10
+Obj. 3<tab> 5:01:26.3<tab> -7:10:26<tab>  4.81<tab>  -0.19<tab>  -0.74
+Obj. 4<tab> 5:17:36.3<tab> -6:50:40<tab>  3.60<tab>  -0.11<tab>  -0.47
+...
+\end{verbatim}
+
+\begin{quote}
+\caption[A simple tab-separated table.]{A simple tab-separated table.
+Note that in a tab-separated table the list of column names, sequences of
+dashes and fields in the table are separated by tab characters.  In this
+figure tab characters are indicated by `{\tt <tab>}'.  (Note that the
+first column, {\tt Id}, is an object name and hence its units are left
+blank.  Thus, the CURSA-specific {\tt column-units:} is separated from
+the following {\tt <tab>} character by only one or more spaces; see
+Section~\ref{CURSA_R} for details of the CURSA extensions.)
+\label{TSTEXAMP} }
+\end{quote}
+
+\end{figure}
+
+The description of the table and the table of values occupy the same
+file and the description occurs at the start of the file.  Most of the
+description shown in Figure~\ref{TSTEXAMP} is optional.
+
+The first line of the description is a title.  Lines beginning with a
+`{\tt \#}' are comments which are ignored.
+
+Parameter definitions start with the parameter name, and a colon (`{\tt :}')
+is appended to the end of the name to identify it as such.  The rest of
+the line contains the parameter value.  The name and value are the only
+information stored for each parameter.  The example contains two
+parameters: {\tt EQUINOX} and {\tt EPOCH}.
+
+Any remaining lines in the description (apart from the last two, which
+immediately precede the table of values) are free text.
+
+The only mandatory items in the description are the two lines immediately
+before the table of values.  The first of these lines is the list of column
+names.  Each name is separated by a single tab character (ASCII code nine;
+strictly speaking the horizontal tab).  In the figure tab characters are
+shown as `{\tt <tab>}'; obviously a real tab-separated table would contain
+actual tab characters instead.  The name is the only mandatory information
+stored for each column.  The TST format places few restrictions on the
+column names: they can contain spaces, special and punctuation characters
+\emph{etc}.  However, it is usually a prudent precaution to restrict
+column names to contain only alphanumeric and underscore (`{\tt \_}')
+characters and to make the first character alphabetic.  If these
+precautions are observed then fewer problems are likely to occur if the
+table is subsequently converted to another format or read by a variety
+of different clients.  Remember that if you are writing a server which
+returns a TST table via the Internet then you do not know which client
+will be used to access it.
+
+The line immediately after the list of column names indicates the end of
+the description and the start of the table.  It consists solely of dashes
+and tab characters.  By convention there are as many sequences of dashes
+as there are column names, each sequence is separated by a single tab
+character and each has the same number of dashes as there are characters
+in the corresponding column name.
+
+In the table of values each row occupies a single line.  Individual fields
+are separated by a single tab character.  The fields occur in the same
+order as the corresponding column names.
+
+\subsection{\label{TSTSPCOL_R}Special columns of identifiers and
+celestial coordinates}
+
+The TST format has the following additional rules for special columns
+containing identifiers and celestial coordinates.
+
+\begin{enumerate}
+
+  \item By default, the first three columns in the table are: an identifier
+   (that is, an object name), Right Ascension and Declination.  These
+   columns are usually called {\tt Id}, {\tt ra} and {\tt dec}
+   respectively.
+
+  \item If the first three columns of the table are not an identifier,
+   Right Ascension and Declination then the TST should contain the
+   following three parameters:
+
+  \begin{quote}
+   {\tt id\_col \\
+   ra\_col \\
+   dec\_col}
+  \end{quote}
+
+   The value of each parameter should be the number of the appropriate
+   column or, if there is no such column, {\tt -1}.  The column number is the
+   sequence number of the column in the list of column names, starting
+   counting at zero.
+
+  \item The Right Ascension and the Declination are either both in
+   decimal degrees or the Right Ascension is in sexagesimal hours
+   and the Declination is in sexagesimal degrees.  If sexagesimal
+   notation is used then a colon (`{\tt :}') is used as the sexagesimal
+   separator.
+
+  \item The equinox and epoch are specified using parameters {\tt
+   equinox} and {\tt epoch} respectively.  The default value if the
+   equinox and epoch are not specified is J2000.0.
+
+\end{enumerate}
+
+\subsection{Conventions for tables returned by ACL servers}
+
+In addition to the basic TST format the following additional conventions
+apply to tables returned by ACL servers.
+
+\begin{enumerate}
+
+  \item Keywords specified for a database in its entry in the configuration
+   file are equivalent to, and treated as, parameters in the TST.  Thus,
+   {\tt id\_col}, {ra\_col} and {\tt dec\_col} are usually supplied as
+   keywords in the configuration file rather than parameters in the TST
+   returned by the server.  If a client writes a table of retrieved objects
+   as a local file in the TST format it should include these keywords as
+   parameters.
+
+  \item Some types of database, particularly {\tt archives} (see
+   Section~\ref{SERVERS_R}), may return tables containing columns called
+   {\tt more} and {\tt preview}.  These columns are optional.  However, if
+   present they should be used as follows.
+
+  \begin{description}
+
+    \item[{\tt more}] a URL giving more information on the object.  The
+     destination URL will typically be a conventional page of HTML,
+     suitable for display with a Web browser.
+
+    \item[{\tt preview}] a URL pointing to an image of the object.
+
+  \end{description}
+
+\end{enumerate}
+
+\subsection{\label{CURSA_R}CURSA extensions}
+
+Some additional items can be added to the TST header information which
+provide additional information about the catalogue and allow
+\xref{CURSA}{sun190}{}\cite{SUN190} to interpret it more precisely.
+These items begin with a `{\tt \#}' character and thus are TST comments.
+Consequently a catalogue which contains them remains perfectly standard
+and valid and can be processed with software other than CURSA.  The
+items are illustrated in Tables~\ref{SIMPLE_TST} and ~\ref{TSTEXAMP}
+and are as follows.
+
+\begin{description}
+
+  \item[{\tt \#column-units:}] is followed by a tab-separated list of
+   units for the columns.
+
+  \item[{\tt \#column-types:}] is followed by a tab-separated list of
+   data types for the columns.  The permitted data types are listed in
+   Table~\ref{DATA_TYPES}.
+
+  \item[{\tt \#column-formats:}] is followed by a tab-separated list of
+   display formats for the columns.  Fortran-like, FITS-compatible formats
+   are used.  This convention facilitates converting tables between the
+   TST and FITS tables formats without loss of information.
+
+\end{description}
+
+\begin{table}[htbp]
+
+\begin{center}
+\begin{tabular}{llc}
+CURSA Data Type & Description      & Standard \\
+                &                  & Fortran 77? \\ \hline
+BYTE            & Signed byte      & No   \\
+WORD            & Signed word      & No   \\
+INTEGER         & Signed integer   & Yes  \\
+REAL            & Single precision & Yes  \\
+DOUBLE          & Double precision & Yes  \\
+LOGICAL         & Logical          & Yes  \\
+CHAR[$*n$]      & Character string & Yes  \\
+\end{tabular}
+
+\begin{quote}
+$n$ is the number of elements in the character string; it is a positive
+integer.
+\end{quote}
+
+\caption{CURSA data types \label{DATA_TYPES} }
+\end{center}
+
+\end{table}
+
+In all cases the items are listed in the order in which they occur
+in the table.  There is no tab character between {\tt \#column-units:},
+{\tt \#column-types:} and {\tt \#column-formats:} and the following
+value.  Values in the special TST columns of Right Ascension and
+Declination (that is, those identified by the {\tt ra\_col} and {\tt
+dec\_col} parameters) are always interpretted using the TST rules for
+representing angles rather than the CURSA ones.
+
+\subsection{\label{MIME_R}MIME type}
+
+The first line of information returned by an ACL server should always
+be the MIME\footnote{Multipurpose Internet Mail Extensions.  The MIME
+protocol was originally developed to allow non-text data to be included
+in e-mail messages and was subsequently adopted for use with HTTP.} type:
+
+\begin{quote}
+{\tt Content-type: text/plain}
+\end{quote}
+
+This line is strictly speaking not part of the TST table and will be
+used by the client or Web browser to interpret the format of the data
+which follow.
+
+
+\section{\xlabel{IMAGE_R}\label{IMAGE_R}Image Servers}
+
+Image servers differ from other types of ACL server in that they return
+a direct image or `pixel map' of a region of sky rather than a catalogue
+of objects.  The image is returned formatted as a 
+\htmladdnormallinkfoot{FITS}{http://fits.gsfc.nasa.gov/fits\_home.html}
+file which may optionally be compressed.
+
+\begin{enumerate}
+
+  \item Image servers have a configuration file entry similar to those
+   for other types of database.  The server type is {\tt imagesvr}.
+   The region of sky required is specified by giving the central
+   Right Ascension and Declination (or $x,y$\/ pixel position if
+   celestial coordinates are not available), width and height.  The
+   usual tokens (see Section~\ref{QUERY_R}):
+
+  \begin{quote}
+  {\tt ~\%ra ~\%dec ~\%x ~\%y ~\%w ~\%h}
+  \end{quote}
+
+   are included in a query string as part of a {\tt url} keyword in the
+   usual fashion.  The tokens have their usual meaning and units.  An
+   example configuration file entry for an image server is:
+
+\begin{verbatim}
+serv_type:      imagesvr
+long_name:      Digitized Sky at ESO
+short_name:     dss@eso
+url:            http://archive.eso.org/dss/dss\
+?ra=%ra&dec=%dec&mime-type=%mime-type&x=%w&y=%h
+copyright:      Digitized Sky Survey (c) by AURA, provided online by ESO
+\end{verbatim}
+
+  \item The server parses the query and generates a FITS file corresponding
+   to the region specified.  It first returns the MIME type, followed
+   by the FITS file which optionally may be compressed.  The MIME types
+   corresponding to the various types of compression are listed in
+   Table~\ref{FITS_MIME}.  For example, the MIME type for a gzipped
+   FITS file is:
+
+  \begin{quote}
+   {\tt Content-type: image/x-gfits}
+  \end{quote}
+
+\end{enumerate}
+
+\begin{table}[htbp]
+
+\begin{center}
+\begin{tabular}{ll}
+MIME type                & Type of compression   \\ \hline
+{\tt image/fits}         & uncompressed          \\
+{\tt image/x-hfits}      & H compressed          \\
+{\tt image/x-gfits}      & gzipped               \\
+{\tt image/x-gstarbase}  & gzipped (alternative) \\
+{\tt image/x-cfits}      & UNIX compressed       \\
+{\tt image/x-cstarbase}  & UNIX compressed (alternative)  \\
+{\tt text/html}          & error message in HTML format   \\
+\end{tabular}
+
+\caption{MIME types for compressed FITS images \label{FITS_MIME} }
+\end{center}
+
+\end{table}
+
+% \newpage
+\addcontentsline{toc}{section}{Acknowledgements}
+\section*{Acknowledgements}
+
+The material in Part II is largely based on Section~2 of Allan~Brighton's
+{\it Astronomical Catalogue Library User Manual}\/\cite{BRIGHTON98}.
+Martin~Bly, Allan~Brighton, Peter~Draper and Mike~Read provided useful
+comments on the draft version of the document.  Any mistakes, of course,
+are my own.
+
+
+% References ----------------------------------------------------------
+
+% \section{References}
+
+% \input{refs.tex}
+
+\newpage
+\addcontentsline{toc}{section}{References}
+\begin{thebibliography}{99}
+
+  \bibitem{SERVERURL} M.~Albrecht, M.~Barylak, D.~Durand, P.~Fernique, 
+   A.~Micol, F.~Ochsenbein, F.~Pasian, B.~Pirenne, D.~Ponz and 
+   M.~Wenger, 19 September 1996, {\it Astronomical Server URL}\,
+   (Version 1.0).  See URL: \htmladdnormallink{
+   {\tt http://vizier.u-strasbg.fr/doc/asu.html}}
+   {http://vizier.u-strasbg.fr/doc/asu.html}
+
+  \bibitem{BRIGHTON98} A.~Brighton, 16 January 1998, {\it Astronomical
+   Catalog Library User Manual}, issue 3.1 (document number
+   GEN-SPE-ESO-19400-0949), European Southern Observatory Very Large
+   Telescope Data Management Division.
+
+  \bibitem{SUN190} A.C.~Davenhall, 25 July 2000,
+   \xref{SUN/190.8}{sun190}{}: {\it CURSA --- Catalogue and Table
+    Manipulation Applications}, Starlink.
+
+  \bibitem{SUN214} P.W.~Draper and N.~Gray, 27 January 2000,
+   \xref{SUN/214.7}{sun214}{}: {\it GAIA --- Graphical Astronomy and
+   Image Analysis Tool}, Starlink.
+
+  \bibitem{GRAHAM95} I.S.~Graham, {\it The HTML Sourcebook}, 1995 (John
+   Wiley and Sons: New York).
+
+  \bibitem{OUSTERHOUT94} J.K.Ousterhout, 1994, {\it Tcl and the Tk
+   Toolkit}\/ (Addison-Wesley: Reading, Massachusetts).
+
+  \bibitem{SCHWARTZ93} R.L.~Schwartz, 1993, {\it Learning Perl}
+   (O'Reilly and Associates Inc: Sebastopol, California).
+
+  \bibitem{WALL91} L.~Wall and R.~L.~Schwartz, 1991, {\it Programming
+   Perl}, (O'Reilly and Associates Inc: Sebastopol, California).
+
+\end{thebibliography}
+
+\typeout{  }
+\typeout{*****************************************************}
+\typeout{  }
+\typeout{Reminder: run this document through Latex three times}
+\typeout{to resolve the references.}
+\typeout{  }
+\typeout{*****************************************************}
+\typeout{  }
+
+\end{document}

@@ -1,0 +1,767 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocsource}    {sgp\stardocnumber}
+\newcommand{\stardoccopyright} 
+{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {21.10}
+\newcommand{\stardocauthors}   {M. J. Bly}
+\newcommand{\stardocdate}      {11 February 2000}
+\newcommand{\stardoctitle}     {Starlink Software Distribution Policy}
+\newcommand{\stardocabstract}  {This paper describes Starlink's software 
+distribution policy and the conditions of use of the collection.
+There is also a section giving contact information of some of the 
+commercial software Starlink provides for its UK sites but may not
+redistribute.} 
+
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sgp.tex
+%
+%  Purpose:
+%     Template for Starlink General Paper (SGP) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
+\newcommand{\latexonlysmall}{\small}
+\begin{htmlonly}
+   \newcommand{\latexonlysmall}{}
+\end{htmlonly}
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\textbf{\stardoctitle}}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex Copyright Statement
+%  =========================
+% \begin{latexonly}
+% \newpage
+% \vspace*{\fill}
+% \stardoccopyright
+% \end{latexonly}
+% ? End of Latex copyright statement
+
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \vspace*{\fill}
+    \stardoccopyright
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+% ? Main text
+\section{\xlabel{introduction}Introduction}
+\label{introduction}
+
+This paper specifies Starlink's policy for distributing the Starlink Software
+Collection, both within Starlink, and to non-Starlink sites in the UK and 
+around the world.
+
+It applies to all software distributed by Starlink and to all recipients
+whether they be UK Starlink site managers or individuals at observatories 
+and universities.
+
+Starlink distinguishes between \textbf{\textit{non-commercial
+software}} usually written by astronomers or Starlink contract
+programmers, and \textbf{\textit{commercial software}} which is used
+under license or has been bought.  
+
+The collection also contains some packages which have their own
+distribution conditions, most notably those covered by the GNU Public
+Licence.  Where this is the case the GNU Public Licence or other
+licence conditions take precedence over the Starlink licence.
+
+\section{\xlabel{non-commercial_software}Non-commercial Software}
+\label{non-commercial_software}
+
+The \textbf{\textit{non-commercial software}} consists of software
+from sources including astronomers in the UK and abroad, `Public
+Domain' and GNU licensed packages, and some major astronomical
+reduction systems such as IRAF and AIPS.  
+
+\subsection{\xlabel{astronomical_software}Astronomical software}
+\label{astronomical_software}
+
+Most of the Starlink software is astronomical packages, libraries and 
+utilities.  The collection has built up over the years from contributions
+submitted to Starlink by their authors `for the common good' or written 
+by Starlink contract programmers.
+
+It is hard in some cases to assign `ownership' to each package or part
+or a package since many individuals have contributed to the evolution
+of such packages over the years.  Nevertheless, the Starlink Project
+has decided that by default, software in the collection will be covered
+by the Starlink Terms and conditions.
+
+Where individuals and institutions outside Starlink have an interest 
+in a particular package, Starlink acknowledges their interest whilst
+continuing to distribute the software.
+
+Each package in the collection should have its own copy of the
+Terms and Conditions.  In cases where ownership is easy to assign or
+establish, the Terms and Conditions will be the standard Starlink conditions
+or the terms and conditions required by the authors(s).
+
+Most of the \textbf{\textit{non-commercial software}} is distributed 
+by the Starlink Project on CD-ROM\@.  The distribution is revised, rebuilt and
+reissued twice a year in Spring and Autumn.
+
+Major elements such as IRAF and AIPS are not distributed but are provided
+on FTP mirror sites at RAL (IRAF) or Manchester (AIPS).
+
+In general, the Starlink software is distributed for non-profit use in
+astronomical research and is free of distribution and media charges.
+
+The full conditions under which \textbf{\textit{non-commercial\/}}
+Starlink software is distributed to non-Starlink sites are given in
+\latexhtml{appendix~\ref{conditions_of_use}.}{the \htmlref{Conditions
+of Use}{conditions_of_use} section.}
+
+Non-Starlink sites and individuals wanting to obtain copies of the CD-ROM
+sets should contact the CD-ROM distribution email address:
+
+\begin{quote}
+\htmladdnormallink{\texttt{cdrom@star.rl.ac.uk}}{mailto:cdrom@star.rl.ac.uk}
+\end{quote}
+
+specifying which of the available distributions is required.  Details
+of the available distributions can be found on the Starlink CD-ROM
+page:
+
+\begin{quote}
+\htmladdnormallink{\texttt{http://www.starlink.rl.ac.uk/cdrom/cdrom.html}}{http://www.starlink.rl.ac.uk/cdrom/cdrom.html}
+\end{quote}
+
+\section{\xlabel{commercial_software}Commercial Software}
+\label{commercial_software}
+
+The Starlink Project provides various commercial packages for use at the
+sites, and makes use of `bulk' licensing agreements where possible.
+However the licences do not permit Starlink to distribute the software 
+outside Starlink sites so users at non-Starlink sites who wish to use a
+particular package will have to make their own licensing arrangements.
+
+Starlink distributes the commercial software for which it has licences 
+using a private distribution mechanism.  For details, please contact the 
+Starlink Software Librarian.
+
+Contact details for the packages Starlink has licences for are given in 
+\latexhtml{appendix~\ref{commercial_software_contact_addresses}}{the 
+\htmlref{Commercial software contact addresses}{commercial_software_contact_addresses} 
+section.}
+
+The licensing details for each commercial software package in the Starlink
+Software Collection is described in more detail below.
+
+
+\begin{description}
+
+\item[CLUSTAN]\mbox{}
+
+This software is licensed for five Starlink sites: Birmingham, Cambridge,
+Durham, Edinburgh and RAL\@.  It may not be installed at other Starlink sites 
+or be distributed to non-Starlink sites.
+
+\item[FORCHECK and SPAG]\mbox{}
+
+FORCHECK and SPAG are licensed for the Starlink central Unix service at RAL
+and may not be redistributed.
+
+\item[IDL]\mbox{}
+
+IDL is licensed site-by-site according to the requirements at the site -- each
+site has its own licence.  IDL may not be redistributed.
+
+\item[MAPLE]\mbox{}
+
+This software is licensed for the the Starlink central Unix service only 
+and may not be distributed to other sites.
+
+\item[MEMSYS Libraries]\mbox{}
+
+Starlink's licence for the MEMSYS libraries permits the software to be
+distributed to the UK Starlink sites and the three UK National Observatory
+sites: the Anglo Australian Observatory, the Issac Newton Group on La Palma 
+and the Joint Astronomy Center, Hawaii.  MEMSYS may not be distributed outside
+these sites.
+
+In addition, access is strictly controlled by site managers to users who
+have signed a copy of the \emph{Memsys Starlink Academic User's Licence
+Agreement}.  Copies may be obtained from the Starlink Software Librarian
+or from the MEMSYS distribution.  Completed Licence Agreements should be
+returned to the Starlink Software Librarian at RAL.
+
+\item[NAG Libraries and Compiler]\mbox{}
+
+Starlink has a 5-year licence commencing 1 April 1999 which provides 
+the NAG Fortran 77 Numerical and Graphics Libraries and the Fortran 
+\texttt{f95} compiler for Linux.  The licence covers all machines in
+the Starlink network in the UK\@.  The Libraries and compiler may not be
+redistributed.
+
+Programs (binaries) linked using the Linux \texttt{f95} compiler may be 
+copied to any Linux machine accompanied by the required run time libraries
+buy the compiler itself and its support systems may not be copied.
+
+Programs linked with the NAG Numerical Libraries may not be distributed 
+or copied to sites or machines that are not covered by a NAG licence.
+
+Distributions of the NAG products are provided by the Starlink Software 
+Librarian.
+
+\item[NCAR graphics library]\mbox{}
+
+The NCAR graphics library was originally distributed as `public domain'
+software.  However the status of NCAR was changed in 1986 and newer
+versions of NCAR are not in the `public domain'.  Commercial distribution
+is prohibited.
+
+Starlink's view is that the Starlink Software distribution is not a
+commercial distribution and Starlink is entitled to use and distribute
+the (old) Starlink version of the NCAR library. 
+
+The Starlink version has been ported to Unix from VMS and various minor
+internal modifications made to adapt it to our requirements.  It has not
+been `updated' since 1986.  Use of the NCAR libraries is being dropped
+from the USSC packages.
+
+\item[SM plotting package]\mbox{}
+
+The Starlink licence for SM covers all Starlink machines.  The authors
+have agreed that use of SM on PCs (\emph{e.g} laptops and home PCs) by
+users registered at UK Starlink sites is covered by the licence.  SM
+may not be distributed further.  Users who cease to be registered at a
+UK Starlink site cease to be covered by the Starlink licence.
+
+
+\item[XV image viewer]\mbox{}
+
+Starlink's licence for the XV image viewer covers all machines owned, 
+operated or maintained by the Project.  It may not be redistributed.
+
+Distributions are provided for Starlink sites by the Starlink Software
+Librarian.
+
+\end{description}
+
+\newpage
+\appendix
+
+\section{\xlabel{conditions_of_use}Conditions of Use}
+\label{conditions_of_use}
+
+The Starlink Software is distributed under these licence terms:
+
+\begin{quote}
+\latexonlysmall
+\begin{center}\textbf{STARLINK SOFTWARE LICENCE}\end{center}
+ 
+\textbf{PREAMBLE}
+
+The purpose of this document is to state the terms and conditions
+under which Starlink software, documentation, data and other associated
+material (``the Software'') may be used.
+\par 
+\textbf{NOTICE TO USER:}
+\par 
+\textbf{BY USING THE SOFTWARE YOU ACCEPT THE FOLLOWING TERMS AND CONDITIONS
+WHICH APPLY TO ITS USE.}
+ 
+\begin{enumerate}
+\item The Software is owned by the Council for the Central Laboratory of the
+Research Councils (``CCLRC'') unless a statement to the contrary appears
+within the Software itself.
+ 
+\item The Software is made available free of charge for use in teaching and
+research by:
+\begin{enumerate}
+\item private individuals for non-profit research; and
+\item non-profit educational, academic and research institutions.
+\end{enumerate}
+ 
+\item Commercial use of the Software is specifically excluded from the terms
+and conditions of this licence.  Commercial use of the Software is subject
+to the prior written agreement of CCLRC on terms to be agreed.
+ 
+\item The provision of any version of the Software under the terms and
+conditions specified herein does not imply that future versions will also
+be made available under the same terms and conditions.
+ 
+\item The user may modify the Software for his own purposes.  The user may
+distribute the modified software provided that CCLRC is informed and that
+a copy of the modified software is made available to CCLRC on request.
+All modifications made by the user shall be clearly identified to show how
+the modified software differs from the original Software.
+ 
+\item In any published work produced by the user and which includes results
+achieved by using the Software, the user shall acknowledge that the Software
+was used in producing the information contained in such publication.
+ 
+\item The user may incorporate or embed the Software into other software
+products which he may then give away free of charge but not sell provided
+the user makes due acknowledgement of the use which he has made of the
+Software in creating such software products.   Any redistribution of the
+Software in this way shall be made under the same terms and conditions
+under which the user received it from CCLRC.
+ 
+\item The user shall not cause the Software to be brought into disrepute,
+either by misuse, or use for inappropriate tasks, or by inappropriate
+modification.
+ 
+\item The Software is provided to the user ``as is'' and CCLRC makes no
+warranty as to its suitability or performance.   CCLRC does not and
+cannot warrant the performance or results which the user may obtain by
+using the Software.  CCLRC makes no warranties, express or implied, as
+to non-infringement of third party rights, merchantability, or fitness
+for any particular purpose.  In no event will CCLRC be liable to the
+user for any consequential, incidental, or special damages, including
+any lost profits or lost savings, even if a CCLRC representative has
+been advised of such damages, or for any claim by any third party.
+
+\end{enumerate}
+\end{quote}
+
+\newpage
+\section{\xlabel{commercial_software_contact_addresses}Commercial software contact addresses}
+\label{commercial_software_contact_addresses}
+
+This section gives contact details for the various commercial packages used 
+at Starlink sites and is provided for reference.  
+
+\subsection{\xlabel{clustan}CLUSTAN}
+\label{clustan}
+
+Purchase enquiries should be directed to:
+
+\begin{quote}
+\begin{tabular}{l}
+CLUSTAN Ltd,\\
+16 Kingsburgh Road,\\
+EDINBURGH,\\
+EH12 6DZ\\
+UNITED KINGDOM.\\
+\\
+Tel: \texttt{+44|0-131-337-1448}
+\end{tabular}
+\end{quote}
+
+\subsection{\xlabel{forcheck_and_spag}FORCHECK and SPAG}
+\label{forcheck_and_spag}
+
+Purchase enquiries should be directed to:
+
+\begin{quote}
+\begin{tabular}{l}
+Polyhedron Software Ltd,\\
+Linden House,\\
+93 High Street,\\
+Standlake,\\
+WITNEY,\\
+OX8 7RH\\
+UNITED KINGDOM.\\
+\\
+Tel: \texttt{+44|0-1865-300-579} \\
+Fax: \texttt{+44|0-1865-300-232} \\ 
+email: \htmladdnormallink{\texttt{sales@polyhedron.com}}{mailto:sales@polyhedron.com} \\
+WWW: \htmladdnormallink{\texttt{http://www.polyhedron.com}}{http://www.polyhedron.com}
+
+\end{tabular}
+\end{quote}
+
+
+\subsection{\xlabel{idl}IDL}
+\label{idl}
+
+IDL is developed by Research Systems, Inc., (RSI).
+
+Purchase enquiries for the UK should be directed to:
+
+\begin{quote}
+\begin{tabular}{l}
+Research Systems International (UK) Ltd \\
+34 Wellington Business Park \\
+Dukes Ride, \\
+Crowthorn \\
+Berkshire  \\
+RG45 6LS \\
+\\
+email: \htmladdnormallink{\texttt{uk@rsinc.com}}{mailto:uk@rsinc.com} \\
+WWW: \htmladdnormallink{\texttt{http://www.rsinc.com}}{http://www.rsinc.com}
+\end{tabular}
+\end{quote}
+
+Outside the UK, purchase enquiries should be directed to:
+
+\begin{quote}
+\begin{tabular}{l}
+Research Systems, Inc. \\
+4990 Pearl East Circle \\
+Boulder, CO 80301 \\
+USA \\
+\\
+Tel: \texttt{+1-303-786-9900} \\
+Fax: \texttt{+1-303-786-9909} \\
+email: \htmladdnormallink{\texttt{info@rsinc.com}}{mailto:info@rsinc.com} \\
+WWW: \htmladdnormallink{\texttt{http://www.rsinc.com}}{http://www.rsinc.com}
+\end{tabular}
+\end{quote}
+
+\subsection{\xlabel{maple}MAPLE}
+\label{maple}
+
+The MAPLE package is developed and distributed by \textit{Waterloo Maple Inc.}
+
+Purchase enquiries in the UK should be directed to:
+
+\begin{quote}
+\begin{tabular}{l}
+Adept Scientific plc \\
+6 Business Centre West \\
+Avenue One, \\
+LETCHWORTH \\
+Hertfordshire \\
+SG6 2HB \\
+\\
+Tel: \texttt{+44|0-1462-480055} \\
+Fax: \texttt{+44|0-1462-480213} \\
+email: \htmladdnormallink{\texttt{info@adeptscience.co.uk}}{mailto:info@adeptscience.co.uk} \\
+WWW: \htmladdnormallink{\texttt{http://www.adeptscience.co.uk}}{http://www.adeptscience.co.uk}
+\end{tabular}
+\end{quote}
+
+\textit{Waterloo Maple Inc.} can be contacted at:
+
+\begin{quote}
+\begin{tabular}{l}
+Waterloo Maple Inc.,\\
+450 Philip Street,\\
+Waterloo,\\
+Ontario,\\
+N2L 3L3,\\
+CANADA \\
+\\
+Tel: \texttt{+1-519-747-2373} \\
+Fax: \texttt{+1-519-747-5284} \\
+email: \htmladdnormallink{\texttt{info@maplesoft.com}}{mailto:info@maplesoft.com} \\
+WWW: \htmladdnormallink{\texttt{http://www.maplesoft.com}}{http://www.maplesoft.com}
+\end{tabular}
+\end{quote}
+
+\subsection{\xlabel{memsys_libraries}MEMSYS libraries}
+\label{memsys_libraries}
+
+Purchase enquiries should be directed to:
+
+\begin{quote}
+\begin{tabular}{l}
+Maximum Entropy Data Consultants Ltd \\
+20 Cockcroft Place, \\
+CAMBRIDGE \\
+CB3 0HF \\
+UNITED KINGDOM \\
+\\
+Tel: \texttt{+44|0-1223-312562} \\
+Fax: \texttt{+44|0-1223-354599}
+\end{tabular}
+\end{quote}
+
+\subsection{\xlabel{nag_libraries_and_compiler}NAG libraries and compiler}
+\label{nag_libraries_and_compiler}
+
+The NAG Libraries and compiler are developed by \textit{the Numerical 
+Algorithms Group Ltd}.
+
+Purchase enquiries should be directed to:
+
+\begin{quote}
+\begin{tabular}{l}
+NAG Ltd\\
+Wilkinson House\\
+Jordan Hill Road\\
+OXFORD, OX2 8DR\\
+UNITED KINGDOM \\
+\\
+Tel: \texttt{+44|0-1865-511245} \\
+Fax: \texttt{+44|0-1865-310139} \\
+email: \htmladdnormallink{\texttt{sales@nag.co.uk}}{mailto:sales@nag.co.uk} \\
+WWW: \htmladdnormallink{\texttt{http://www.nag.co.uk/}}{http://www.nag.co.uk/}
+\end{tabular}
+\end{quote}
+
+\subsection{\xlabel{ncar_library}NCAR Library}
+\label{ncar_library}
+
+The latest versions of the NCAR graphics software may be obtained from:
+
+\begin{quote}
+\begin{tabular}{l}
+National Center for Atmospheric Research\\
+SCD/NCAR Graphics Orders\\
+P O Box 3000\\
+Boulder\\
+CO 80307-3000\\
+USA\\
+\\
+Tel: \texttt{+44-1-303-497-1201} \\
+Fax: \texttt{+44-1-303-497-1814} \\
+email: \htmladdnormallink{\texttt{ncarginf@ncar.ucar.edu}}{mailto:ncarginf@ncar.ucar.edu} \\
+WWW: \htmladdnormallink{\texttt{http://ngwww.ucar.edu/}}{http://ngwww.ucar.edu/}
+\end{tabular}
+\end{quote}
+
+\subsection{\xlabel{xv_image_viewer}XV Image viewer}
+\label{xv_image_viewer}
+
+The author of XV is John Bradley.  His address is:
+
+\begin{quote}
+\begin{tabular}{l}
+John Bradley \\
+1053 Floyd Terrace \\
+Bryn Mawr \\
+PA 1901 \\
+USA \\
+\\
+Fax: \texttt{+44-1-610-520-2042} \\
+email: \htmladdnormallink{\texttt{xvbiz@trilon.com}}{mailto:xvbiz@trilon.com} \\
+WWW: \htmladdnormallink{\texttt{http://www.trilon.com/xv/}}{http://www.trilon.com/xv/}
+\end{tabular}
+\end{quote}
+
+% ? End of main text
+\end{document}

@@ -1,0 +1,776 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {18.1}
+\newcommand{\stardocauthors}   {C A Clayton}
+\newcommand{\stardocdate}      {14 January 1994}
+\newcommand{\stardoctitle}     {Administering Solaris Sun systems}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+
+\section {Introduction}
+
+This document is intended for Sun System administrators
+as a follow up to SSN/7 which described how to set up
+Starlink Sun systems under SunOS 4.X. The present document refers to the set up
+of Sun systems under Solaris 2.X (a.k.a. SunOS 5.X). Throughout this document,
+the term Solaris is understood to mean Solaris 2.X., Sun's new Unix Operating
+environment based on SVR4. SSN/7 will remain in circulation 
+until all Starlink Suns have moved over to Solaris. Areas of system
+administration which have not changed  between SunOS 4.X and Solaris and which
+were discussed in SSN/7 are not covered again in this document. Instead the
+reader is referred to SSN/7 when appropriate. Some sections however have been
+significantly updated and thus are reproduced here in full.  This document can
+be considered as an  extension to SSN/7 in which changes between the two
+systems are highlighted. Eventually, there will be a single document containing
+the information in both documents, but relating just to Solaris.
+
+The purpose of SSN/7 and this document is to ensure that all of the Starlink
+Sun systems are set up in a secure, logical and consistent fashion and that
+they do not begin to diverge from one another. One of the strengths of Starlink
+is that 90\% of a site manager's technical problems can be solved either by 
+simply looking at how another Starlink system is set up or by asking other site
+managers. If all systems are set up nearly identically, then all managers will
+encounter the same problems but only one manager need actually solve each
+problem. Solutions can be posted in the UNIX\_MANAGEMENT VAXnotes
+conference. This conference has restricted access and hence sensitive matters
+such as security can be discussed there. New system software and patches are
+also announced in this conference so it is vital that system managers read
+entries regularly.
+
+This is not a tutorial document. It is assumed that the reader is capable of
+reading man pages and manuals.  It is assumed that the reader has a basic
+understanding of Sun system management and no attempt is made either to clarify
+Sun \& UNIX terminology or to explain system
+management functions which are clearly described in the Sun documentation. The
+topics covered are those that apply directly to the Starlink systems and the
+particular way in which we need to install and use them; these topics may not
+be covered in the Sun manuals.
+
+This document is based on Solaris 2.3. Solaris is scheduled to be upgraded
+every 6 months. However, it is unlikely that this document will be updated more
+than once a year partly due to pressure of work and partly because the changes
+between successive versions of the OS will probably not warrant a re-write of
+the document. As it is, this first edition is not as comprehensive as the
+author would like. It was felt that a limited document on Solaris would be of
+more use than no document at all. The sections in need of work are are obvious
+and site managers who gain expertise in these areas are invited to contribute
+to this document.
+
+It is intended that this document will grow as we gain more knowledge
+of Solaris. Any corrections, comments or suggestions will be
+gratefully received by the author. 
+
+
+\section{Initial installation}
+
+\subsection{Installing Solaris}
+
+If you have a single Sun, you should configure it as a server system in
+anticipation of getting more Suns in the future. If you have two
+or more Suns, the choice is less clear. You should set one up as a
+server and the others up either as diskless or as dataless clients.
+Dataless clients have their own copy of / and a swap area on a local disk.
+Diskless clients have all of their files (including the swap area) on a 
+remote server. The dataless client setup is more efficient in terms of
+ethernet traffic but the diskless client system {\bf may} be easier to manage, 
+particularly when it comes to upgrades. It is also possible to set up 
+``diskless'' clients with swap areas on local disks. This set up helps
+reduce ethernet traffic but still retains many of the management
+advantages of the true diskless system. 
+
+Different sites will find a given set up best for their site.
+At RAL we run our Suns as a mixture of standalone and server/dataless client
+machines; we only have three CPUs and hence there is little advantage in
+a server/diskless client setup. Also, having only 3 CPUs makes it difficult to
+compare the management overheads of the different schemes and that is where
+your experiences would be of interest. We need your feedback on the
+relative advantages of the two approaches. 
+
+We asked a Sun technical expert about the relative merits of a
+server/diskless client scenario versus a server/dataless client scenario
+from a system management point of view. Somewhat surprisingly, he
+recommended the dataless approach. Sun intend to provide a full suite
+of tools under Solaris to allow the administrator to run a network of
+Suns from a single machine and hence a diskless setup will not have a
+significant management advantage. Solaris 2.3 includes a ``distributed
+administration framework'' on which these tools will be based.  For
+example, Solaris 2.3 offered the option to upgrade a machine from
+Solaris 2.2 by only replacing the files that had changed. This upgrade was
+very easy and required very little intervention by the Site Manager. 
+In a future
+release, this process is intended to be automated so that you can stick
+a CD-ROM on the server and the dataless clients will upgrade
+themselves.
+
+If you wish to have some personal advice on this complex topic, fell free to
+contact the author. 
+
+\subsubsection{Disk partitions}
+
+One of the difficulties of configuring a new UNIX system is getting the
+file store layout correct. If the layout is wrong then there may be little room
+for expansion, or the system may run slowly. Once the disk has been partitioned
+its geometry is fixed and it a time consuming to change.
+
+
+Sun recommend at least 24Mb for the swap partition, 32Mb being the default. 
+Fortunately, it is not critical that you estimate the size of swap partition
+required correctly since it is trivial to add additional (albeit less efficient)
+swap areas later as required, even while the system is running, using the
+\verb+mkfile+ and \verb+swap+ commands. Alternatively, a partition
+from a local data disk could be used as a second swap partition. 
+You can monitor swap space usage using the command \verb+swap -l+.
+
+Be generous when allocating space to {\tt / \& /usr}. Running out of
+space in either of these partitions later is a major inconvenience.
+Note that the root partition has to be much larger under Solaris than
+under SunOS 4.X.  This is because the new System V packages system
+keeps all of its administration files in {\tt /var/sadm} and these can
+grow very large.  Do NOT delete these files. They keep a track of what
+is installed on your system and are needed by the system software
+installation and upgrade procedures. Furthermore, when patches are applied
+to the system, by default files which are replaced in the patch are copied
+to {\tt /var/sadm} so that one can ``back out'' of the patch at a later
+stage. Thus, once several patches have been applied, {\tt /var/sadm}
+will grow quite large. Hence, there should either be a separate partition 
+for {\tt /var} or the root partition should be configured with plenty 
+of free space. Note that there is an option with patch installations which
+prevents the old files from being saved in {\tt /var}.
+The author allows 30+Mb for his
+root partitions under Solaris, of which 15Mb is currently in use.
+Alternatively, {\tt /var} can be a separate partition altogether. This
+avoids the root partition filling up completely and hanging the machine. 
+
+\subsubsection{Software options}
+
+During the SUNinstall procedure, you are asked what optional software you 
+wish to install. Adding and removing software packages is trivial
+under Solaris with the introduction of the SVR4 packages system. Hence, 
+I would advise that you initially install the entire distribution and 
+delete unnecessary packages as necessary when you require additional 
+disk space. This option requires minimal work for system managers and also
+reduces the risk of not installing an apparently unnecessary piece of software
+which is actually quite vital to the running of the system. 
+
+If you are short of disk space, you may wish to consider not installing the
+packages listed in Table 1. Make sure that the options which are hardware specific
+are not needed by your system (e.g. Leo Device Drivers). 
+
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{||l|l|r||}
+\hline
+
+Package Title & Name & Size (Mb)\\
+\hline
+GT Runtime Support Software	& SUNWgtu	& 1.20  \\
+GT device drivers 		& SUNWgt	& 1.74  \\
+Leo Device Drivers		& SUNWleo	& 4.44  \\
+Leo Runtime Support		& SUNWleou	& 1.70  \\
+Leo Shapes Support		& SUNWleoow	& 0.17  \\
+Online Diagnostic Tool		& SUNWdiag	& 13.48 \\
+OpenWindows Demo Images		& SUNWowdim	& 5.04  \\
+OpenWindows Demo Programs	& SUNWowdem	& 1.08  \\
+OpenWindows Online Handbooks	& SUNWowbk	& 2.25 	\\
+OpenWindows Sample Source	& SUNWowsrc	& 6.70  \\
+OpenWindows Static Libraries	& SUNWowslb	& 15.91 \\
+Solaris PEX Runtime		& SUNWpexcl	& 1.92  \\
+Solaris PEX Runtime		& SUNWpexsv	& 0.34  \\
+XGL English localization	& SUNWxgler	& 2.34  \\
+XGL Generic Loadable Libraries	& SUNWxgldr	& 0.03  \\
+XGL Runtime Environment		& SUNWxglrt	& 2.07  \\
+\hline
+\end {tabular}
+\caption{Non-critical software options}
+\end{center}
+\end {table}
+
+The manual pages take up over 15Mb and managers should consider only installing 
+them on one machine at each site and NFS serving them to all the other
+machines.
+
+There are some packages which you might be tempted to de-install but which
+you must not:
+
+\begin{itemize}
+
+\item OpenWindows optional fonts (SUNWowpft - 9.58Mb). 
+These are needed by the answerbook software. 
+
+\item Basic networking software (Networking UUCP Utilities).
+Although we do not use UUCP networking, the useful \verb+uudecode+ program
+is part of this option. 
+
+\item The binary compatibility options (SUNWscbcp, SUNWowbcp \& SUNWbcp). These
+are needed if you want to run old SunOS executables under Solaris. 
+
+\end{itemize}
+                                                         
+\subsection {Upgrading Solaris}
+
+It is vital that all sites run the same version of Solaris. Software prepared
+at RAL for release on one version may not function on older versions
+since Solaris is evolving so rapidly. 
+Sites should aim to upgrade to new versions of Solaris as soon as
+possible after RAL.
+
+SunOS upgrades used to be much more painful than VMS ones. 
+Many amounted to installing a new system  and hence it was vital that you kept
+a copy of files that had  been modified locally and put these back on the
+system after the upgrade. Such files included {\tt /etc/hosts}, {\tt
+/etc/group} and {\tt /etc/resolv.conf}. 
+
+Sun offered an upgrade option from Solaris 2.2 to Solaris 2.3 
+This upgrade was trivial to perform  and required almost no 
+post-upgrade work by the site manager to get everything working again. 
+
+Alternatively, you can re-install the OS each time but unless you have
+kept very careful notes on all changes that you have made to the system,
+this is likely to be more time consuming. This is {\bf not} recommended.
+
+\subsection{Unbundled software}
+
+Unbundled software is SUNspeak for layered products.	
+Under Solaris, all of these products should be installed under \verb+/opt+.
+This should mean that they are mostly unaffected by OS upgrades,
+although in practice there have been some minor problems. 
+
+The following pieces of software have been bought for every Starlink
+Sun site and should be installed in the following directories:
+
+\begin{itemize}
+
+\item	Sun Fortran compiler ({\tt /opt/SUNWspro})
+\item	Sun C compiler ({\tt /opt/SUNWspro})
+\item   Sun SPARCworks software tool set ({\tt /opt/SUNWspro})
+
+\end{itemize}
+
+Other pieces of software have been obtained from the public domain
+or from third-party suppliers. These are flagged in the
+UNIX\_MANAGEMENT VAXnotes conference and should be installed when announced.
+At the time of writing these include:
+
+\begin{itemize}
+
+\item GNU C compiler
+
+\item MIT X11R5 windowing system and additional Motif window manager and
+libraries.
+
+\item nu/TPU (TPU emulator)
+
+\item pine mail utility
+
+\item tcsh shell (extended C-shell)
+
+\item jed (EDT-like editor)
+
+\item emacs editor
+
+\end{itemize}
+
+Details of how to obtain and install the above software is given in
+the UNIX\_MANAGEMENT VAXnotes conference.
+
+\subsection{Kernel Configuration}
+
+Unlike SunOS 4.x, Ultrix or OSF/1, it is not necessary (or indeed even
+possible) to rebuild the kernel on a Solaris machine. All Solaris 2
+drivers are packaged as loadable modules and hence it is not necessary to
+configure options into the kernel any longer. However, if you do add {\bf any}
+new hardware to your system you will need to boot with the \verb+-r+ option
+so that the new device will be configured into the appropriate databases.
+
+Administrators can adjust kernel 
+integer variables by resetting a field in a system file rather than
+rebuilding the kernel. Kernel configuration is achieved using the 
+\verb+nm+ and \verb+sysdef+ commands and the \verb+/etc/system+ file.
+Further details can be found in the Sun documentation. 
+
+You should be aware that there is no longer an absolute link between
+SCSI ID and tape drive number. The first drive seen is always 0, the next
+is 1, etc. This can cause some confusion if you are not aware of the 
+numbering process. 
+
+\subsection{Networking}
+
+\subsubsection{Network access to Suns}
+
+Sun systems do not support LAT so it is not possible to log directly on to 
+a Sun from a terminal on a LAT-based terminal server such as a DECserver 200.
+There are a number of solutions to this problem. Different solutions
+have been adopted at different sites.
+                                 
+\begin{itemize}
+
+\item Log into a VAX which has UCX loaded and start a telnet session
+from the VAX to the Sun. This is clearly an inefficient use of a VAX 
+login slot but will work at all sites which still have a VAX.
+
+\item X-terminals support TCP/IP so it is possible to directly log into a Sun
+with a telnet session.
+
+\item Emulex terminal servers can be upgraded so that they support both LAT
+and TCP/IP.
+
+\item It is possible to buy terminal servers that not only provide dual
+protocol support (LAT \& TCP/IP) but which can also act as transparent 
+protocol converter and allow you to log into a Sun ``directly'' from
+a LAT terminal server. 
+
+\item Set-up a DEC Unix workstation as a LAT to TCP/IP gateway. This is what
+has been done at Cambridge to allow there many LAT-only DECserver 200s 
+access to their TCP/IP only Suns. 
+
+\end{itemize}
+
+\subsubsection{Network File System (NFS)}
+
+There have been few changes in NFS between SunOS 4.x and
+Solaris. The reader is referred to SSN/7 on general advice on
+configuring NFS but it is worth pointing out here that the commands
+and files associated with NFS administration have changed (see Table 2). 
+NFS is also supposed to be more efficient under Solaris. 
+
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{||l|l||}
+\hline
+
+SunOS 4.x & Solaris 2.X\\
+\hline
+mount -a 		&       mountall     	\\
+umount -a		&	umountall	\\
+showmount -d		&	dfsmounts	\\
+showmount -e		&	dfshares	\\
+exportfs		&	share		\\
+exportfs -a		&	shareall	\\
+exportfs -u		&	unshare		\\
+\hline
+{\tt /etc/exports}	& {\tt /etc/dfs/dfstab} \\
+{\tt /etc/fstab}	& {\tt /etc/vfstab}	\\
+{\tt /etc/xtab}		& {\tt /etc/dfs/sharetab} \\
+{\tt /etc/mtab}		& {\tt /etc/mnttab}	\\
+\hline
+\end {tabular}
+\caption{Changes in NFS administration commands and files}
+\end{center}
+\end {table}
+
+
+Solaris (as did SunOS) offers a utility called the automounter. The mount command is restricted
+to the superuser. If we were to allow normal users to use mount, they could
+over-mount directories such as {\tt /usr} and {\tt /usr/bin}. This would lead to an
+insecure and uncontrolled environment. The automounter can be used to supply
+NFS partitions to users on demand. It allows users to mount remote file
+systems themselves in a secure and transparent manner. System administrators
+will probably want to use the automounter rather than the mount command
+wherever practical.
+
+The automounter utility is described in detail in the Sun documentation but
+here is an example of simple use of the automounter under Solaris. 
+
+\verb+/etc/auto_master+
+
+\begin{verbatim}
+
+# Master map for automounter
+#
++auto_master
+/-              /etc/auto.misc
+/net            -hosts          -nosuid
+
+\end{verbatim}
+
+\verb+/etc/auto.misc+
+
+\begin{verbatim}
+
+/user1          -rw,hard,intr                   rlstar:/user1
+/var/mail       -rw,hard,intr                   rlssp1:/var/spool/mail
+/rlssp1         -rw,hard,intr                   rlssp1:/rlssp1
+/ds_scratch     -rw,hard,intr                   adam2:/ds_scratch
+
+\end{verbatim}
+
+With the above files, the automounter will mount up the file systems
+in \verb+/etc/auto.misc+ on demand. The {\tt /net} entry in \verb+/etc/auto_master+
+means that any user can access any file system exported globally by any 
+other machine on the local network! Access is via the path
+
+\verb+/net/<host>/<filesystem>+
+
+For example, at RAL we can access all globally exported files systems 
+on non-Starlink machine \verb+hardy+ (without any intervention by
+managers of either \verb+hardy+ or the Starlink machines) via 
+the path \verb+/net/hardy+.
+
+Note that the above information can be distributed ``cluster-wide'' via an
+NIS map. Thus, changes made to the master file will be propagated to all
+NIS clients. 
+
+Use of indirect maps is also recommended since they more readily allow for
+the movement of disks between machines. More details can be found in the 
+Solaris manual ``Administering NFS and RFS''.
+
+
+\subsubsection{Network Information Service (NIS) and (NIS+)}
+
+The Network Information Service (NIS), formerly known as Yellow Pages, is a
+distributed database lookup network service. NIS allows single copies of
+frequently updated files to be made available to many machines and avoids
+having to update the relevant files on every machine whenever there is a
+modification. Files affected by the NIS include {\tt /etc/group} and 
+{\tt /etc/hosts} and also password file information. 
+
+With the introduction of Solaris, Sun have replaced NIS with a more
+comprehensive (and complex) system called NIS+. Unfortunately, none
+of the other Unix operating systems support NIS+ (yet). However, a
+Solaris NIS+ server will support NIS clients.
+
+Under Solaris, your can either configure your clients as NIS or NIS+
+clients but servers can only be NIS+ servers, i.e. a Sun under Solaris
+cannot be a NIS server. Hence, you have two choices:
+
+\begin{enumerate}
+
+\item Set up a Sun running Solaris as a NIS+ server. Solaris clients can be
+NIS+ (or NIS) clients and SunOS 4.x (Ultrix, OSF/1, HP-UX etc) clients can be
+NIS clients since a NIS+ server will also support NIS clients. 
+
+\item Set up a non-Solaris machine as a NIS server. All clients (including
+Solaris machines) then become NIS clients. 
+
+\end{enumerate}
+
+Option 2 is attractive partly because NIS is simpler than NIS+ but also
+because there are less chances of inter-operability problems between different
+versions of Unix. However, sites with all Sun or mostly Sun kit will in due
+course want to have a NIS+ server as all the machines move to Solaris. Sites
+should move over to using NIS+ at a pace that suits their needs. 
+At RAL, we have a NIS+ server but are still using NIS since the majority of
+our machines are non-SUN and hence don't support NIS+ (e.g. Ultrix, OSF/1,
+HP-UX, SunOS 4.x).
+
+
+Sites with mostly DEC Alpha workstations will probably stick with NIS
+until DEC adopt NIS+. 
+
+\subsubsection{Mail}
+
+Encourage users to use the pine mailer (SUN/169) rather than the terse
+\verb+mailx+ program that comes as part of the operating system. 
+
+If you are running a NIS/NIS+ cluster, (i.e. you have multiple machines)
+then you should set up your system so that 
+mail sent to any host in the cluster can be read from any other host in that
+cluster (as with VAXclusters). 
+
+For the purposes of this explanation, it is {\bf not} assumed that all machines
+are running Solaris 2.x, even though it complicates the explanation.
+In practice this is likely to be the case since not
+all of your machines will necessarily have been upgraded to Solaris 2.x yet.
+This is certainly the case at RAL where the machine on which the mail is stored
+is still running SunOS 4.x. Not all possible options are covered below but
+enough examples are given for you to figure out what to do at your site. 
+
+To serve the file server's mail directory to each of the clients, you will
+need to include an appropriate line in the file controlling NFS file
+sharing.
+
+
+On a SunOS 4.x machine edit {\tt /etc/exports}
+\begin{verbatim}
+
+/var/spool/mail -rw=client1:client2
+
+\end{verbatim}
+
+On a Solaris machine edit {\tt /etc/dfs/dfstab}
+\begin{verbatim}
+
+share -F nfs -o -rw=client1:client2 /var/mail
+
+\end{verbatim}
+
+You will also need a corresponding line in the relevant file 
+on each of the clients so that the mail hosts mail directory 
+will be over-mounted on top of the local mail directory.
+
+On a Solaris 2.X client with a SunOS 4.x mail host edit {\tt /etc/auto.misc} (or 
+equivalent)
+\begin{verbatim}
+
+/var/mail       -rw,hard,intr                   othermachine:/var/spool/mail
+
+\end{verbatim}
+
+On a Solaris 2.X client with a Solaris 2.X mail host edit {\tt /etc/auto.misc} (or 
+equivalent)
+\begin{verbatim}
+
+/var/mail       -rw,hard,intr                   othermachine:/var/mail
+
+\end{verbatim}
+
+
+The details of setting your Suns up so that they can send mail off site 
+is site-specific and you should consult your local computing service
+(or equivalent) for instructions. In the case of RAL, this procedure
+simply involved editing \verb+/etc/mail/sendmail.cf+ and inserting
+the RAL mail relay name into the section marked \verb+major relay host+
+and making a couple of other minor alterations. 
+At your site it may more complex. If you have difficulty understanding
+the basic requirements of what you have to do, call Dave Terrett 
+or Chris Clayton for advice.
+
+
+\subsubsection{VMS/ULTRIX Connection software (UCX)}
+
+This software has been fully described in SSN/7 and that information is not
+repeated here. 
+
+
+\section{Security}
+
+Unix is infamous for having poor security. It would appear that, by
+default, Suns are relatively insecure compared with VAXes but it is possible to 
+take a few simple steps to plug up the loopholes and make your system
+considerably more secure. At this time C2 level security is not considered
+worth implementing. The overheads in terms of both disk space (up to 5MB per
+machine per day) and the CPU overhead of the auditing processes do not justify
+the gains in security. Secure NFS is also not considered necessary at present.
+
+SSN/7 contains a large section on security. This information is not repeated
+here but changes between SunOS 4.x and Solaris are noted below. This section
+should be read in conjunction with SSN/7.
+
+The whole of the section on network security in SSN/7 still applies. 
+Be sure to read this, especially the parts relating to trusted hosts. 
+
+
+
+\begin{itemize}
+
+\item Encrypted passwords are no longer kept in the world-readable 
+file {\tt /etc/passwd}. Instead they are stored in the protected
+file {\tt /etc/shadow}. This prevents intruders from obtaining 
+encrypted passwords and attempting to decode them (which is quite 
+easy to do). You can convert your old password file to the new system
+using the {\tt pwconv} command. {\tt pwconv} should also
+be used to update password information rather than {\tt vipw} since it 
+ensures that both the {\tt shadow} and {\tt passwd} files remain consistent.  
+
+\item The root password is required when the machine is brought to single-user
+mode by default. There is {\bf no way} to disable this security feature.
+
+\item Solaris provides better control on password aging then SunOS 4.x.
+New aging controls include:
+
+\begin{itemize}
+
+\item Days since password last changed
+
+\item Maximum number of days the password is valid
+
+\item an expiration date
+
+\end{itemize}
+
+\item Solaris gives an exponential delay on login attempts if a password is
+incorrectly entered. Unsuccessful logins are stored in {\tt /var/adm/loginlog}.
+
+\item Solaris includes an Automatic Security Enhancement Tool (ASET)
+which system managers can use for automatic security administration. 
+Further details can be found in the Sun documentation. 
+
+\item The file {\tt /etc/ttytab} which was previously used to controls
+root access to a machine, no longer exists under Solaris. It has been replaced
+by the Service Access Facility (SAF). 
+
+\end{itemize}
+
+
+\section{Operating standards}
+
+\subsection{Adding users}
+
+There are no changes to this section in SSN/7. However, managers should
+be aware that Starlink distributes template startup files for new users
+which you can modify as appropriate to your site. For more details see
+the VAXnotes conference UNIX\_MANAGEMENT.
+
+\subsection{Dumping the file structure}
+
+Site managers should establish a dump (BACKUP in VMSspeak) schedule 
+to protect against accidental loss of file by user error and hardware failure. 
+On Sun systems with a large amount of local disk space, it will be necessary 
+to establish a comprehensive dumping timetable. The following recommendations
+should be followed, although the details of how you implement them are 
+up to your or your local management committee(s). A variety of dump schemes are
+described in the Sun documentation. 
+
+\begin{itemize}
+
+\item Level 0 dumps should be taken every 4 to 6 weeks. This should be done
+in single-user mode, if possible, and preferably out of prime time. However,
+taking the system down to single-user mode may not be practical at your site. 
+
+\item Incremental dumps should be made on partitions containing user files 
+several times per week, preferably daily.
+
+\end{itemize} 
+
+One can only dump disk partitions and not NFS served file structures. Hence,
+to dump a partition on a local disk on a tapeless workstation, one must use 
+a remote tape device. An entry in {\tt .rhosts} of the remote machine is required
+to allow use of its tape drive.
+
+The following are template dump commands that have been tried out by the
+author and which can be used for 0 level dumps on the present Starlink Sun
+configurations. The various qualifiers are described  in the Sun documentation.
+The device names will probably be different on your system, depending how they
+have been configured on the SCSI bus. 
+
+Note that under Solaris, the dump command has been renamed \verb+ufsdump+.
+Unfortunately, they have also included a new command also called \verb+dump+
+which dumps selected parts of an object file so beware!. The {\tt restore} 
+command has also been renamed to \verb+ufsrestore+. 
+
+\begin{enumerate}
+
+\item To dump a partition (/dev/rdsk/c0t3d0s6) on a local disk to a local 
+Exabyte drive.
+
+\begin{verbatim}
+/usr/sbin/ufsdump 0ucbsdf 56 51900 4100000 /dev/rmt/0h /dev/rdsk/c0t3d0s6
+\end{verbatim}
+
+\item To dump a partition (/dev/rdsk/c0t3d0s6) on a local disk to a remote 
+Exabyte drive on host rlssp1 (running SunOS 4.x). An entry will have to be 
+made in {\tt /.rhosts} on rlssp1 to allow this.
+
+\begin{small}
+\begin{verbatim}
+/usr/sbin/ufsdump 0ucbsdf 56 51900 4100000 rlssp1:/dev/rst1 /dev/rdsk/c0t3d0s6
+\end{verbatim}
+\end{small}
+
+\item To dump a partition (/dev/rdsk/c0t3d0s6) to a local DAT drive.
+
+\begin{verbatim}
+/usr/sbin/ufsdump 0ucbsdf 126 5000 61000  /dev/rmt/1h /dev/rdsk/c0t3d0s
+\end{verbatim}
+
+\end{enumerate}
+
+The Solaris {\tt ufsdump} command will copy the whole or part of a partition to
+tape depending on the level of backup chosen. A level 0 backup is a complete 
+copy of a single partition. Incremental backups may be at levels 1 through to
+9. The {\tt ufsdump} command will copy all files which have been altered since
+the last backup of the current or lower levels. For instance a level 3 backup
+copies all files that have been altered since the last backup at level 3,
+including any files already backed up at levels 4 through to 9. This system
+allows a backup sequence to be devised which provides for many incremental
+dumps between full dumps, but allows the incremental tapes to be ``merged'',
+which reduces the number of tapes needed to backup and restore the file store.
+As time goes on, the lowest incremental dump tapes (usually level 1) will
+gradually become more and more full.
+
+\subsection{Accounting}
+
+Accounting under Solaris 2 appears to be similar to that under SunOS 4.x
+with the exception of some file name changes.
+For further details see SSN/7. Note that at this time, implementing
+accounting on your systems is entirely optional. 
+
+\subsection{Quotas}
+
+The UNIX disk quota system should be used, where necessary, to control the
+amount of disk space used by each user in a given disk partition. The system 
+works on a hard partition basis, for both local and NFS partitions. The
+administrator must set up limits for each user on each partition on which
+quotas are to be applied.
+
+Quotas can be controlled using the {\tt edquota} command, as described in the
+Sun documentation. Users use the {\tt quota} and {\tt du} commands to get
+information about disk usage and limits.
+
+\subsection{Monitoring system performance} 
+
+The memory management system of UNIX is very similar to that of VMS. The main
+differences that a VAX/VMS system manager will notice are that:
+
+\begin{itemize}
+
+\item There are few parameters that can be tuned under SunOS 4.x
+and even less under Solaris. 
+
+\item The page and swap files are combined into a single swap space. Additional
+swap partitions and files may be added by the system administrator with the 
+{\tt swap} command ({\tt swap} under Solaris replaces {\tt swapon} under
+SunOs 4.x.)
+
+\item One cannot limit the working set of individual processes or those owned
+by a given user. Users themselves can limit resource consumptions of their
+own processes with the {\tt limit} built--in function of {\tt csh}. System
+managers should be aware of this problem since since it is possible for
+a single job to grab virtually all of the physical memory on a system and
+apparently bring the machine to a halt (as seen by everyone else!). 
+
+\end {itemize}
+
+System administrators should monitor the performance of their systems and
+become familiar with {\tt vmstat} (report virtual memory statistics - 
+equivalent to \$ MONITOR),  {\tt iostat}(I/O statistics)
+{\tt sar} (system activity reporter) and {\tt ps}
+(process status - equivalent to  \$ SHOW SYSTEM). Note that the useful
+{\tt pstat} command found on SunOS 4.x systems is no longer available. 
+Also the {\tt ps} qualifiers under Solaris are different. 
+
+\end{document}

@@ -1,0 +1,18 @@
+!+
+! Log file for the queries submitted to the example ACL server
+! secondserver.cgi.
+!
+! See SSN/75 for further details.
+!
+! A.C. Davenhall (Edinburgh) 11/4/00.
+!-
+
+C DATE    CHAR*30  1  ! Date and time of query.
+C RA      DOUBLE   2  UNITS='RADIANS{HOURS}'   TBLFMT='HOURS'   ! Right Ascension.
+C DEC     DOUBLE   3  UNITS='RADIANS{DEGREES}' TBLFMT='DEGREES' ! Declination.
+C RADIUS  INTEGER  4  UNITS='Minutes of arc'  ! Search radius.
+
+P EQUINOX  CHAR*10  'J2000.0'
+P EPOCH    CHAR*10  'J2000.0'
+
+D FILE='query.LOG'

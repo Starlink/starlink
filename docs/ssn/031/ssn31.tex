@@ -1,0 +1,2132 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocsource}    {ssn31.1}
+\newcommand{\stardocnumber}    {31.1}
+\newcommand{\stardocauthors}   {K.\, P.\, Duffey}
+\newcommand{\stardocdate}      {17th November 1995}
+\newcommand{\stardoctitle}     {A Starlink Guide to Cartridge Tape Subsystems}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on  the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+%  \vspace{10mm}
+%  \begin{center}
+%     {\Large\bf Abstract}
+%  \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+% \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+% \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section {Introduction}
+
+Various data storage solutions have been adopted by the Starlink Project,
+including SCSI (Small Computer Systems Interface) Winchester Disks and
+different types of magnetic tape storage.
+
+SCSI Winchester Disk devices are representative of Primary Data Storage,
+where data is maintained online, and may be accessed randomly. Secondary
+Data Storage is removable data storage; data is only accessible when the
+media has been inserted in the appropriate device as, for example with
+floppy disk drives. Backup Data Storage generally works sequentially, and is
+often represented by Magnetic Tape Subsystems.
+
+This guide is concerned with Backup Data Storage, and sets out to highlight
+the similarities and differences between the three tape options most
+commonly selected for Starlink applications: DAT (Digital Audio Tape),
+Exabyte and DLT (Digital Linear Tape). The purpose of this guide is to
+provide a helpful starting-point for anyone seeking to know more about one
+or other of these options.
+
+The contents of the guide include:
+
+\begin {itemize}
+
+\item Information on the different technologies employed by DAT, Exabyte and
+DLT.
+
+\item Textual examples of available devices together with performance data and
+a brief description of notable features.
+
+\item A quick-lookup table embodying the principal features of all three tape
+options covered.
+
+\item Useful hints for operation and maintenance of media and drives.
+
+\item Technical details that relate to DAT and Exabyte (included as
+appendices).
+
+\end {itemize}
+
+\section {DAT, EXABYTE OR DLT?}
+
+\subsection {Selection Criteria}
+
+What do DAT, Exabyte and DLT have to offer, and at what price?
+
+We have to accept that prices are continually on the move, driven by market
+conditions and advances in manufacturing technologies. Let us consider some
+current (November 1995) Price-Performance figures. At the lower end of the
+price-range for these options, one can purchase a 4 GByte native capacity
+DAT subsystem that incorporates switchable data compression, for around
+\pounds 1000. A similarly disposed Exabyte subsystem with a native capacity
+of 3 GByte can be purchased for a little over \pounds 1000; a 7 GByte native
+version would cost about 50\% more. Then, for around \pounds 3000, DLT
+subsystems are available with a native capacity of 10 GByte; a 20 GByte
+native version would, again, cost about 50\% more. A 15 GByte native DLT
+subsystem has recently appeared that currently costs little more than
+its 10 GByte predecessor. In each case, data compression generally permits
+up to a twofold increase in capacity.
+
+If `Cost per GigaByte' is paramount then, faced with these example costings,
+we might look no further than the DLT. But what other factors could possibly
+influence our selection? We need to consider how much money we can outlay,
+and how we can spend this most effectively. Our spending power will, for
+example, determine how far up the product ranges we can go.
+
+Reliability is an important issue (see Section 2.2), compatibility with
+existing systems is another. Familiarity with a particular product can be
+the deciding factor; one may prefer to stay with the technology which one
+understands best, or which has a well-proven track-record, but one must be
+careful not to overlook new technologies, or perhaps radical developments
+of existing ones.
+
+\subsection {Points for Consideration}
+
+In seeking to make a well-balanced appraisal, we need to understand the
+differing technologies behind the currently available tape storage options.
+With a greater appreciation of the weaknesses and strengths of each, we are
+less likely to make an inappropriate choice.
+
+Despite generally slow access times (relative to those for SCSI Winchester
+Disk subsystems, for example), Cartridge Tape Subsystems (CTS's) are excellent
+for backup purposes because they are relatively inexpensive. The main
+distinguishing features are storage capacity, data transfer rate, physical
+format and media format.
+
+The following points regarding storage capacities and transfer rates are worth
+noting:
+
+\begin {description}
+
+\item [\ \ \ 1.] Net capacities can only be given for preformatted data. The
+storage capacity depends on the available usable length of the tape as well as
+its density (bits per inch). The recording format itself reduces the available
+data storage capacity through the incorporation of Error Correction Codes
+(ECC), Control Codes, and filemarks.
+
+\item [\ \ \ 2.] Some drives afford data compression. The compression factor
+will depend on the data compression algorithm as well as the number of redundant
+data sequences. This is why the capacity indicated by manufacturers usually
+refers to the total storage capacity for the appropriate media.
+
+\item [\ \ \ 3.] If the data transfer rate for a given host exceeds the
+recording rate of the tape device, then the tape will be written-to
+near-continuously, and thus be utilised to its full potential; this action is
+termed `Streaming'. The system's transfer rate is dependent upon the access time
+of the media being backed up, as well as the transfer rates of the controller
+and the bus. The backup software's logic and the size of the file being backed
+up are additional influences.
+
+\end {description}
+
+If a new backup system is being considered, and overall data capacity is not
+paramount, then a brief comparison of the major features of DAT and Exabyte
+won't go amiss. The following points are therefore worth noting:
+
+\begin {description}
+
+\item [\ \ \ 4.] Under high usage, DAT devices are reckoned to prove themselves
+to be longer lasting and more reliable than Exabyte devices.
+
+\item [\ \ \ 5.] Thanks to faster tape transport and a different filemark
+system, files can be found on a DAT drive up to five times faster than on an
+Exabyte drive.
+
+\item [\ \ \ 6.] The data transfer rates of these two types of drive are almost
+identical. In fact, the computer and the controller, which send the data to the
+tape drive, have more of an effect on the performance than the tape drive
+itself. In most cases, the access time for the primary storage device and the
+CPU performance of the computer on which the data backup is based are the
+limiting factors, and not the transfer rate of the backup tape device.
+
+\item [\ \ \ 7.] A particular technical advantage of DAT over Exabyte is the
+tape's minimal tape/drum wrap angle - 90 degrees, compared to 221 degrees for
+the Video8-based technology. This feature results in lower tape tension as well
+as a simpler drive construction.
+
+\end {description}
+
+Points that particularly concern DLT are mentioned separately, as the
+underlying technology differs radically from that for DAT and Exabyte:
+
+\begin {description}
+
+\item [\ \ \ 8.] Utilising a less complicated recording mechanism, DLT drives
+should be inherently more reliable than their DAT and Exabyte counterparts.
+
+\item [\ \ \ 9.] DLT drives currently have a data transfer rate of up to three
+times that of DAT or Exabyte.
+
+\item [\ 10.] Although Exabyte drives are currently available that will always
+store more data on a cartridge than any available DAT drive, DLT drives offer up
+to three times the capacity of the Exabytes. 
+
+\end {description}
+
+\subsection {Recommendations}
+
+\begin {itemize}
+
+\item[{\Large\bf +}] Starlink recommends DAT drives for use by users for the
+loading and backing up of their own personal data sets.
+
+\item[{\Large\bf +}] DLT drives are recommended for use by system managers for
+system backups, except at the smaller sites where a DAT drive will suffice.
+
+\item[{\huge\bf -}] At the time of writing, Starlink is {\bf not} recommending
+the purchase of Exabyte drives.
+
+\end {itemize}
+\section {Magnetic Tape Cartridge Media}
+
+As far back as 1990/1991, accelerated life testing by the NML (National
+Media Lab, USA) revealed problems with the dimensional stability of tape
+substrates, and problems with the permanence of the magnetic characteristics
+of the `pigment' used. The problem with the substrate is that most 4mm and
+8mm tapes for DAT and Exabyte applications are highly tensilised (stretched)
+in the longitudinal direction. This adds strength and stiffness to the tape.
+Unfortunately, in an environment with high temperature and/or humidity, the
+substrate tries to revert to its original shape. This causes distortion of
+the tape geometry, which poses significant problems especially for helical
+recording systems, as employed by DAT and Exabyte drives. Note that QIC
+(Quarter Inch Cartridge) drives and DLT drives (which utilise half-inch
+tape cartridges) do not use tensilised tape, and moreover do not depend on
+helical recording.
+
+\subsection {Magnetic Tape Composition}
+
+The tapes used in DAT and 8mm (Exabyte, for example) helical scan technologies
+are based on MP (Metal Particle) formulations designed originally for audio and
+video applications. When exposed to temperature and humidity extremes, it
+has been shown that oxidation can occur which changes the magnetic state of the
+medium, and can alter or destroy data; this can occur in spite of the
+encapsulation of the metal particles in a ceramic material, designed to counter
+such effects. Apparently, QIC tapes use an older magnetic layer, which provides
+for greater stability.
+
+DAT's main problem for the future is packing the higher capacities on to
+such a small thin tape, as DAT has the lowest area of tape available of all
+the technologies.
+
+\subsection {Caring for your Tapes}
+
+Only data media especially designed for long term archival storage should be
+used. Media bearing the DDS (Digital Data Storage) seal should be used with DAT
+drives, since this media has been specifically developed for data storage;
+audio cartridges should {\bf not} be used.
+
+Original Exabyte cartridges are particularly advised for Exabyte drives.
+Exabyte and Sony guarantee a minimum archive longevity of 10 years for their
+own manufactured media.
+
+In a report by NML on ``Proper Archival of Data Storage on 8mm Metal-Particle
+Media'' (6th December 1990) they claim that ten year archival is entirely
+feasible under the following conditions:
+
+\begin {itemize}
+
+\item Archival tapes should not be brand new. Rather they should have
+undergone somewhere between four and twenty passes through a drive before
+the data are recorded on them. This is because new tapes often contain
+manufacturing debris that gets removed in the first few passes.
+
+\item The operational and storage environments should be maintained at a
+constant temperature and humidity to reduce media stress. The preferred
+environment is between 62 and 75 degrees Fahrenheit at 40\% humidity.
+
+\item Always return the tapes to their protective enclosures and store them
+on edge rather than stacked flat.
+
+\item Do not drop them, and do not put heavy weights on top of them.
+
+\item Keep the operational and storage areas clean.
+
+\item Clean your Exabyte drives regularly, using only the Exabyte cleaning
+tapes. In order to assure that things are going well, sample data sets
+should be read back periodically and the error rates should be carefully
+monitored.
+
+\end {itemize}
+
+{\bf Note} that it would seem appropriate to apply these handling conditions to
+all Magnetic Cartridge Tape media.
+
+The Exabyte manufacturers themselves had concluded, after their own extensive
+tests, that the only point considered crucial was that a tape be allowed to
+acclimatise to the environment for 24 hours before reading from or writing
+to it. This implies that one should remove the plastic wrapping film from a
+brand new tape at least a day before intended use.
+
+\section {Operational Maintenance}
+
+With the degree to which Cartridge Tape Subsystems have been modularised,
+the remedy for a faulty unit might involve the replacement of a module, or
+the replacement of an entire unit - under a Maintenance Contract of course!
+
+The only regular attention required of the `operator' is the cleaning of the
+read/write heads, using the appropriate recommended cleaning kit. If cleaning
+agents other than those prescribed by the drive manufacturer are applied,
+then the read/write heads can be damaged. Drive manufacturers invariably
+recommend cleaning after a maximum data transfer of 30 GByte, or at least
+once a month.
+
+\section {Example Cartridge Tape Subsystems - past and present}
+
+Whilst technology marches ahead at its own pace, manufacturers and suppliers
+are keen to maintain their own edge on the market by shipping out `the next
+generation' of a product ahead of the competition. When one is faced with a
+large choice from a range with not dissimilar specifications and price-tags,
+we are quite likeley to be moved toward a given product for its packaging.
+This is not unreasonable when selecting an external (i.e. desktop) Cartridge
+Tape Subsystem. For a given technology, DAT for example, there may be a
+number of different suppliers who are utilising the same basic drive, but
+have incorporated this into their own custom-designed enclosure. Features
+specific to the enclosure might include LED (Light-Emitting Diode) diagnostics
+display lamps, DIP Switches (Dual-Inline-Pin hardware switches) (for
+controlling data compression, selection of recording mode, host selection,
+etc.), SCSI-select switches and read-out displays (for error rates or
+tape-remaining, etc.).
+
+Brief descriptions of some example Cartridge Tape Subsystems for DAT,
+Exabyte and DLT are given in this Section. Current models that are in place at
+some or all Starlink Sites are represented, as are some earlier models which
+may be present at some sites. Also included, for comparison, are some that have
+never been adopted by Starlink.
+
+For a given technology one will recognise identical performance figures
+for certain models; this will often be due to the same tape drive unit being
+incorporated into these models.
+
+But please {\bf note}:
+\begin {itemize}
+
+\item[{\LARGE\bf $\star$}] The Starlink Project view all Manufacturers' capacity
+and throughput performance figures as being only ``Guaranteed not to exceed''.
+
+\end {itemize}
+It is likely that some models have already been superseded by others, and
+that some newer products have not been included. Nonetheless, the intention
+herein is to provide the basis for making a comparison between the three
+tape options in question, and for appreciating what is basically available.
+
+\subsection {DAT Subsystems with HP Drives}
+
+\paragraph {HP35480A}
+
+The HP35480A (3.5 inch Half Height form factor) incorporates a DDS drive, and
+can store up to 2 GByte native on a 90 metre tape cartridge, with a quoted data
+transfer rate of 183 KByte/sec. Up to 4 GByte can be stored on the same
+cartridge using DDS-DC data compression, with a quoted data transfer rate of
+0.4 MByte/sec. The HP35480A features a 1 MByte data buffer.
+
+Data compression is generally controlled through SCSI commands and the setting
+of DIP Switches (Dual-Inline-Pin hardware switches). This should allow for a
+range of operation from transparent data compression, where the HP35480A is
+connected to systems with no changes to existing host drivers, to full control
+and optimisation of the data compression features.
+
+Fast-Search provides an average access time of 30 seconds for any part of a
+90 metre tape.
+
+\paragraph {HP35480A DAT drive under SUN Solaris 2.X}
+
+For HP35480A DAT drives on Solaris 2.X platforms, users are unable to flip
+between compression and non-compression modes by simply referring to the
+device by different device names; though the drives in theory should support
+this.
+
+Some drivers are `smart' in that they can enable/disable compression
+according to device file minor numbers (i.e. the name by which the device
+is referred to). Sun's Solaris driver is different in that it cannot control
+DC-ON/OFF in the DAT drive based on the device file name (even though it can
+do this for other tape devices). The problem arises due to multiple methods
+in the SCSI specification for switching DC {\tt on} and {\tt off}. HP uses
+one method, Exabyte uses another, etc.
+
+A small custom program has been produced that modifies the system kernel
+data structures to support DC-ON and DC-OFF, according to the value of a
+user-supplied parameter. For this fix to function, the HP35480A {\bf must}
+be installed with Version 11 (or later) of the DAT Firmware.
+
+The program can be found on
+{\tt http://star-www.rl.ac.uk/}\~{ }{\tt cac/sunspot/dat.sun}; {\bf note}
+that it must generally be run as {\tt root}, but could conceivably be installed
+with the {\tt setuid} bit set, if users are to be allowed to switch DC modes
+themselves.
+
+The recommended DIP Switch settings on the DAT drive are as follows:
+
+\ \ \ \ Switch 1 {\tt off}\ \ *\ \ Switches 2-5 {\tt on}\ \ *\ \ Switches
+6-8 {\tt off}
+
+The setting of Switch 1 is not important if DC control is via this program.
+Usually, if Switch 1 is {\tt on}, then data compression is {\tt on}, and vice
+versa.
+
+\paragraph {HP35480A DAT drive under DEC OSF/1}
+
+The above-mentioned driver problem associated with SUN Solaris 2.X does not
+affect operation of the HP35480A under DEC OSF/1; hence, for DEC Alphas,
+there is no need to run the custom program as specified for switching DC
+{\tt on} and {\tt off} under SUN Solaris 2.X. However, the requirement for
+Version 11 (or later) of the DAT Firmware {\bf does} apply.
+
+The recommended DIP Switch settings on the DAT drive are as follows:
+
+\ \ \ \ Switches 1-5 {\tt on}\ \ *\ \ Switches 6-8 {\tt off}
+
+\paragraph {HPC1533A}
+
+The HPC1533A (3.5 inch Half Height form factor) supports the newer DDS-2
+standard, which is backwards-compatible with the DDS standard used by the
+HP35480A. Up to 4 GByte can be stored on a 120 metre cartridge on this drive
+in native mode, with a quoted data transfer rate of 510 KByte/sec. The max.
+capacity increases to 8 GByte with DDS-DC data compression, with a quoted data
+transfer rate of 1 MByte/sec.
+
+Because they are longer and thinner, the 120 metre tapes intended for use
+with these drives should {\bf not} be used in other DAT drives.
+
+Media can be exchanged with other drives (with the notable exception of the
+120 metre tape cartridges), as long as each supports the same format, and
+compatible backup software is used. If data compression is in play, the
+drives must use the same compression technique (DDS-DC).
+
+\subsection {DAT Subsystems from SUN}
+
+SUN produce a DAT drive (3.5 inch Half Height form factor), which they
+document as a ``5GB 4mm Backup Tape Drive''. It is, in reality, a 2 GByte
+native capacity subsystem, for a 90 metre tape. Incorporating a DDS/DDS-DC
+tape drive unit, it features a 1 MByte data buffer.
+
+Fast-Search and tape rewind are performed at up to 100 times the nominal
+tape speed, and the average file access time for a 90 metre tape is under
+30 seconds.
+
+The native data transfer rate quoted is 366 KByte/sec.  Built-in data
+compression is said to increase native capacity and transfer rate by between
+two and four times; the amount of data compression realised will vary with
+the actual data being compressed; 5 GByte and 915 KByte/sec assume a typical
+compression ratio of 2.5:1.
+
+Originally, under Solaris 2.1, the drive automatically defaulted to using
+data compression mode only. Beyond Solaris 2.1, the drive should be able to
+operate optionally in either compressed or non-compressed mode via a
+software {\tt mode-select} command.
+
+\subsection {DAT Subsystems from TTi}
+
+\paragraph {CTS-4000}
+
+The CTS-4000 (3.5 inch Half Height form factor) incorporates a DDS drive that
+can store up to 2 GByte on a 90 metre tape, with a quoted data transfer rate
+of 183 KByte/sec.
+
+The CTS-4000 features a 1 MByte data buffer, and a Fast-Search capability that
+functions at approximately 200 times the nominal read/write speed.
+
+\paragraph {CTS-4410}
+
+The CTS-4410 (3.5 inch Half Height form factor) incorporates a DDS-2/DDS-DC
+drive. Using a 120 metre tape it has a native capacity of up to 4 GByte,
+with a quoted data transfer rate of 366 KByte/sec. The max. capacity increases 
+to 8 GByte with DCLZ data compression, with a quoted data transfer rate of
+732 KByte/sec.
+
+The CTS-4410 features a 1 MByte data buffer, and a Fast-Search capability that
+functions at approximately 200 times the nominal read/write speed.
+
+The front-panel LED display on the device enclosure indicates the remaining
+native tape capacity in Megabytes. The display shows, also, ECC error
+correction code usage to help monitor tape quality and wear.
+
+Additional front-panel LEDs relate to the drive's current mode of operation
+(Read, Write, WFM (Writing-File-Mark), Rewind, Search), `Write Protection' on
+the data cartridge, `Tape in Use' and `Use Cleaning Tape'; the latter is
+triggered when the `Percentage Rewrites/ECC' exceeds a fixed, pre-determined
+threshold.
+
+Data compression on the CTS-4410 is controlled by a pushbutton switch on the
+front panel. Host control over compression can be set using a switch located
+on the rear of the unit.
+
+\subsection {DAT Subsystems from Exabyte}
+
+\begin {itemize}
+
+\item[{\huge\bf -}] The Exabyte 4200 Series subsystems are unlikely to be found
+in any Starlink Site's hardware base. They are included here for comparison with
+the HP, SUN and TTi subsystems.
+
+\end {itemize}
+
+\paragraph {EXB-4200c}
+
+The EXB-4200c (3.5 inch Half Height form factor) incorporates a DDS-DC drive
+and features a 1 MByte data buffer. The EXB-4200c can store up to 2 GByte
+native on a standard 90 metre tape cartridge, with a quoted data transfer
+rate of 233 KByte/sec. The max. capacity increases to 4 GByte with data
+compression, with a quoted data transfer rate of 466 KByte/sec.
+
+\subsection {Exabyte 8mm Subsystems}
+
+\paragraph {EXB-8200T}
+
+The EXB-8200T tabletop Cartridge Tape Subsystem (5.25 inch Half Height form
+factor) is an earlier model in the Exabyte range, offering up to 2.5 GByte
+of data storage capacity on a 112 metre tape, with a quoted data transfer
+rate of 246 KByte/sec; data compression is not an option. The EXB-8200T
+incorporates a 256 KByte `Speed-Matching' buffer.
+
+Fast-Search is performed at 10 times nominal tape speed, and maximum tape
+rewind speed is 75 times nominal.
+
+Various operational states are indicated via the firmware-controlled activity
+on a pair of LEDs on the front-panel. A combination of {\tt fast, medium, slow}
+and {\tt random} flash, {\tt on}, and {\tt off} for the amber and green
+LEDs reveal:\ \ power-on, self-test, ready and tape-loaded statuses, SCSI bus
+activity, normal tape motion, Fast-Search/Rewind, and certain fail-conditions.
+
+\paragraph {EXB-8500T}
+
+The EXB-8500T tabletop Cartridge Tape Subsystem (5.25 inch Half Height form
+factor) is a more recent product in use at some Starlink Sites, offering up
+to 5 GByte of data storage capacity and a quoted data transfer rate of 0.5
+MByte/sec in its EXB-8500 mode; or up to 2.5 GByte and 246 KByte/sec in
+EXB-8200 mode. The EXB-8500T features a 1 MByte `Speed-Matching' buffer. The
+EXB-8500T can also read or write cartridges in the EXB-8200 format.
+
+Fast-Search is performed at up to 37.5 MByte/sec, and maximum tape rewind
+speed is 75 times nominal.
+
+Various operational states are indicated via the firmware-controlled activity
+on a pair of LEDs on the front-panel. A combination of {\tt fast, medium, slow}
+and {\tt random} flash, {\tt on}, and {\tt off} for the amber and green
+LEDs reveal:\ \ power-on, self-test, ready and tape-loaded statuses, SCSI bus
+activity, normal tape motion, Fast-Search/Rewind, and certain fail-conditions.
+
+More up-to-date Exabyte models (EXB-8205XL and EXB-8505XL, for example)
+exist that utilise specifically designed cartridges to achieve greater
+storage capacities.
+
+\paragraph {EXB-8205XL}
+
+The EXB-8205XL (5.25 inch Half Height form factor) can store up to 3.5 MByte
+native on a 160 metre tape, with a quoted data transfer rate of 263
+KByte/sec. The max. capacity increases to 7 GByte with IDRC data compression,
+with a quoted data transfer rate of 0.5 MByte/sec.
+
+\paragraph {EXB-8505XL}
+
+The EXB-8505XL (5.25 inch Half Height form factor) can store up to 7 MByte
+native on a 160 metre tape, with a quoted data transfer rate of 0.5
+MByte/sec. The max. capacity increases to 14 GByte with IDRC data compression,
+with a quoted data transfer rate of 1 MByte/sec.
+
+The EXB-8505XL is read/write compatible with the EXB-8205XL, but it has two
+read and two write heads and so can record with twice the density.
+
+The EXB-8505XL automatically adjusts to the format of the inserted cartridge.
+Other recording formats can be used through the selection of other device
+files via a set of user-accessible mode switches. Blank cartridges are
+automatically initialised in the standard format of the drive.
+
+{\bf Note} that these new 160 metre cartridges {\bf cannot} be used in older
+drives. The tape used in this new medium is considerably thinner than that
+in standard cartridges, and is likely to be torn if used in older Exabyte
+drives.
+
+\paragraph {Exabyte Mammoth}
+
+The Exabyte Mammoth, supposedly available from the end of 1995, should be
+capable of storing up to 20 GByte native, and up to 40 GByte with data
+compression. This is three times the capacity of currently available Exabyte
+drives. The suggested data transfer rate of around 3 MByte/sec is presumably
+for compressed data.
+
+\subsection {8mm Subsystems from TTi}
+
+\begin {itemize}
+
+\item[{\huge\bf -}] The following TTi 8mm subsystem is unlikely to be found in
+any Starlink Site's hardware base, but has been included for comparison with its
+Exabyte counterparts.
+
+\end {itemize}
+
+\paragraph {CTS-8000H}
+
+The CTS-8000H (5.25 inch Half Height form factor) is a single-drive tabletop
+unit that can store up to 5 GByte native or up to 10 GByte compressed on a
+112 metre tape; the quoted data transfer rates are 0.5 MByte/sec and 1
+MByte/sec, respectively. The CTS-8000H features a 1 MByte `Speed-Matching'
+buffer.
+
+Fast-Search allows the drive to fast-forward to any tape location, with an
+average access time of 85 seconds for a tape that contains up to 10 GByte of
+data. The rewind speed is 75 times the nominal tape speed.
+
+The CTS-8000H permits full data interchange with existing EXB-8200 and
+EXB-8500 based 8mm drives. Tapes written on any 2.5 GByte or 5 GByte drive
+can be read by Series 8000H drives; tapes can also be written that can be
+read by 2.5 GByte or 5 GByte drives.
+
+The front-panel LED display on the device enclosure indicates the remaining
+native tape capacity in Megabytes. The display shows, also, ECC error
+correction code usage to help monitor tape quality and wear.
+
+The required recording format can be used through the selection of the
+appropriate device file via a set of user-accessible mode switches. The
+available emulations are Exabyte EXB-8200/8500, DEC TK50Z, IBM RS/6000 and
+HP-3645.
+
+\subsection {DLT Subsystems from TTi}
+
+\paragraph {CTS-2110}
+
+The CTS-2110 (5.25 inch Full Height form factor) has a native capacity of up
+to 10 GByte on a 1200ft tape, with a quoted data transfer rate of 1.25
+MByte/sec. The max. capacity increases to 20 GByte with data compression, with a
+quoted data transfer rate of 2.5 MByte/sec.
+
+The front-panel LED display on the device enclosure indicates the remaining
+native tape capacity in Megabytes. The display shows, also, ECC error
+correction code usage to help monitor tape quality and wear.
+
+Additional front-panel LEDs relate to the drive's current mode of operation
+(Read, Write, WFM (Writing-File-Mark), Rewind, Search), `Write Protection' on
+the data cartridge, `Tape in Use' and `Use Cleaning Tape'; the latter is
+triggered when the `Percentage Rewrites/ECC' exceeds a fixed, pre-determined
+threshold.
+
+Data compression is facilitated via a `Density Select' pushbutton switch on the
+front-panel.
+
+The CTS-2110 was subject of a Starlink Project evaluation exercise early
+this year (January 1995). Details are presented later in this paper (see
+Section 8.6).
+
+\paragraph {CTS-2110XT}
+
+The CTS-2110XT (5.25 inch Full Height form factor) has a native capacity of
+up to 15 GByte on an 1800ft tape, with a suggested data transfer rate of about
+1.38 MByte/sec. The max. capacity increases to 30 GByte with data compression,
+with a suggested data transfer rate of about 2.75 MByte/sec.
+
+The CTS-2110XT may also operate with a 1200ft tape, when the capacities and
+data transfer rates are as given for the CTS-2110.
+
+The front-panel LED display on the device enclosure indicates the remaining
+native tape capacity in Megabytes. The display shows, also, ECC error
+correction code usage to help monitor tape quality and wear.
+
+Additional front-panel LEDs relate to the drive's current mode of operation
+(Read, Write, WFM (Writing-File-Mark), Rewind, Search), `Write Protection' on
+the data cartridge, `Tape in Use' and `Use Cleaning Tape'; the latter is
+triggered when the `Percentage Rewrites/ECC' exceeds a fixed, pre-determined
+threshold.
+
+Data compression is facilitated via a `Density Select' pushbutton switch on the
+front-panel.
+
+\paragraph {CTS-2210}
+
+The CTS-2210 (5.25 inch Full Height form factor) has a native capacity of up
+to 20 GByte on an 1800ft tape, with a quoted data transfer rate of 1.5
+MByte/sec. The max. capacity increases to 40 GByte with DLZ (Digital Lempel-Ziv)
+high-efficiency data compression, with a quoted data transfer rate of 3
+MByte/sec. A dual-channel read/write head and a tape mark directory maximise
+data throughput and minimise data access time.
+
+The front-panel LED display on the device enclosure indicates the remaining
+native tape capacity in Megabytes. The display shows, also, ECC error
+correction code usage to help monitor tape quality and wear.
+
+Additional front-panel LEDs relate to the drive's current mode of operation
+(Read, Write, WFM (Writing-File-Mark), Rewind, Search), `Write Protection' on
+the data cartridge, `Tape in Use' and `Use Cleaning Tape'; the latter is
+triggered when the `Percentage Rewrites/ECC' exceeds a fixed, pre-determined
+threshold.
+
+Data compression is facilitated via a `Density Select' pushbutton switch on the
+front-panel.
+
+The CTS-2210 features, also, a configurable Personality Module to emulate
+Exabyte EXB-8200/8500, DEC TK50Z and IBM RS/6000. A set of switches on the rear
+panel of the enclosure work with custom firmware in the subsystem. The required
+emulation is selected via the front panel or switch settings at the rear.
+
+\subsection {DLT Subsystems with Quantum Drives}
+
+\begin {itemize}
+
+\item[{\Large\bf +}] The DLT200 and DLT4000 subsystems are DEC-compatible, and
+are approved by the Starlink Project for operating with DEC host systems.
+
+\item[{\huge\bf -}] The DLT2000 and DLT4000 subsystems, however, do {\bf not}
+feature a configurable Personality Module, and hence are {\bf not} recommended
+by the Starlink Project for operating with SUN host systems.
+
+\end {itemize}
+
+\paragraph {DLT2000}
+
+The DLT2000 (5.25 inch Full Height form factor) can store up to 20 GByte of
+data on a half-inch tape cartridge using DLZ (Digital Lempel-Ziv) data
+compression, with a quoted data transfer rate of 2.5 MByte/sec.
+
+Front-panel LED information includes `Write Protection' on the data cartridge,
+`Tape in Use' and `Use Cleaning Tape'.
+
+\paragraph {DLT4000}
+
+By using a half-inch tape cartridge with a higher density and DLZ data
+compression, the DLT4000 (5.25 inch Full Height form factor) can store up to
+40 GByte with a quoted data transfer rate of 3 MByte/sec. This drive is
+read-compatible with DLT2000 tapes as well as with tapes created on older
+generation DLT drives.
+
+Front-panel LED information includes `Write Protection' on the data cartridge,
+`Tape in Use' and `Use Cleaning Tape'.
+
+\subsection {A Summary of DAT, Exabyte and DLT Performance - Table 1}
+
+\begin{table}[h]
+\begin{scriptsize}
+\begin {center}
+\begin{tabular}{||c|c|c|c|c|c|c|c|c||} \hline
+& & \multicolumn{2}{c|}{{\em (Maximum)}} &
+\multicolumn{2}{c|}{{\em (Maximum)}} & & & \\
+{\em TAPE} & {\em DRIVE} & \multicolumn{2}{c|}{{\em DATA CAPACITY}}
+& \multicolumn{2}{c|}{{\em TRANSFER RATE}}
+& {\em TAPE} & {\em FORM} & {\em DRIVE} \\ \cline{3-6}
+{\em SYSTEM} & {\em MODEL} & {\em Native} & {\em Compr.}
+& {\em Native} & {\em Compr.} & {\em SIZE} & {\em F'CT'R}
+& {\em FORMAT} \\ \hline
+{\em DAT} & {\bf HP35480A} & 2GB & 4GB & 183KB/s & 0.4MB/s
+& 90m & 3.5HH & DDS/DDS-DC \\
+{\em (4mm)} & {\bf HPC1533A} & 4GB & 8GB & 510KB/s & 1MB/s
+& 120m & 3.5HH & DDS/DDS-2 \\
+& & & & & & & & /DDS-DC \\
+& {\bf SUN 5GB} & 2GB & 5GB & 366KB/s & 915KB/s
+& 90m & 3.5HH & DDS/DDS-DC \\
+& {\bf CTS-4000} & 2GB & n/a & 183KB/s & n/a
+& 90m & 3.5HH & DDS \\
+& {\bf CTS-4410} & 4GB & 8GB & 366KB/s & 732KB/s
+& 120m & 3.5HH & DDS/DDS-DC \\
+& {\bf EXB-4200c} & 2GB & 4GB & 233KB/s & 466KB/s
+& 90m & 3.5HH & DDS/DDS-DC \\ \hline \hline
+{\em EXABYTE} & {\bf EXB-8200T} & 2.5GB & n/a & 246KB/s & n/a
+& 112m & 5.25HH & \\
+{\em (8mm)} & {\bf EXB-8500T} & 2.5GB & 5GB & 246KB/s & 0.5MB/s
+& 112m & 5.25HH & \\
+& {\bf EXB-8205XL} & 3.5GB & 7GB & 263KB/s & 0.5MB/s
+& 160m & 5.25HH & \\
+& {\bf EXB-8505XL} & 7GB & 14GB & 0.5MB/s & 1MB/s
+& 160m & 5.25HH & \\
+& {\bf CTS-8000H} & 5GB & 10GB & 0.5MB/s & 1MB/s
+& 112m & 5.25HH & \\ \hline \hline
+{\em DLT} & {\bf CTS-2110} & 10GB & 20GB & 1.25MB/s & 2.5MB/s
+& 1200ft & 5.25FH & \\
+{\em (0.5in)} & {\bf CTS-2110XT} & 15GB & 30GB & 1.38MB/s & 2.75MB/s
+& 1800ft & 5.25FH & \\
+& {\bf CTS-2210} & 20GB & 40GB & 1.5MB/s & 3MB/s
+& 1800ft & 5.25FH & \\
+& {\bf DLT2000} & n/a & 20GB & n/a & 2.5MB/s
+& 1200ft & 5.25FH & \\
+& {\bf DLT4000} & n/a & 40GB & n/a & 3MB/s
+& 1800ft & 5.25FH & \\ \hline
+\end{tabular}
+\caption {Nominal Performance Specifications for DAT, Exabyte and DLT}
+\end{center}
+\end{scriptsize}
+\end{table}
+
+\section {DAT SUBSYSTEMS}
+
+Sony entered the market in 1988 with 4mm DAT (Digital Audio Tape) drives based
+on their commercial audio DAT drives, but it was Hewlett Packard who developed
+the UK market for DAT.
+
+\subsection {DAT Technology}
+
+Certain computer tape drives and audio mechanisms, such as QIC (Quarter
+Inch Cartridge) and DLT (Digital Linear Tape, see Section 8), record on
+parallel tracks along the length of the tape. The data storage capacities
+achieved via this method, though, can be limited by mechanical tolerances
+and magnetic crosstalk (interaction between signals from neighbouring tracks).
+
+These problems are largely overcome within DAT devices through helical scan
+technology, in which high recording density and data storage capacity are
+attained by recording tracks diagonally across the tape.
+
+Two read/write heads are mounted on a rotating drum whose axis is off-set
+6 degrees from the vertical. With a 90 degree tape/drum wrap angle, the tape
+moves slowly (8mm/sec) across the drum, which rotates in the same direction
+at 2000rpm, while the diametrically-opposed heads describe segments of a
+helix on the tape. Each head writes a track of data on the tape from bottom
+to top.
+
+The heads are wider than the tracks, so the tracks overlap with no wasted
+space between them. Crosstalk between the tracks is minimised by each head
+writing its data in angled strips along the track; this angle is called the
+azimuth angle. Each head is set with a different azimuth angle, so alternate
+tracks on the tape have their data written at different angles. This
+technique is known as `Alternate-Azimuth Recording'.
+
+In the design of the DDS-format DAT drives used by Starlink, two more heads
+are located within the rotating drum at 90 degrees to the others. These
+enable the drive to read data immediately after it has been written. If a
+write error is detected, the drive can rewrite the erroneous frame repeatedly
+until it can be read back successfully.
+
+A disadvantage of the DAT technology is that, in order to provide the required
+amount of contact between the drum and the tape, the tape needs to be drawn
+out of the cartridge housing and wrapped around a sector of the drum. To
+achieve this level of tape manipulation, a number of expensive servo motors
+are required.
+
+Another drawback with the mechanism design is that as the drum spins at a
+high rate, the heads accordingly tend to wear-out at a higher rate than for
+fixed-head design.
+
+\subsection {DAT Recording Formats}
+
+The DDS (Digital Data Storage) format was designed specifically for computer
+data storage, and was originally implemented for DAT subsystems, yielding an
+intended capacity of 1.3 GByte on a 60 metre tape. This soon progressed to
+2 GByte with the introduction of 90 metre tapes.
+
+The DDS format has been extended to include data compression. This newer
+format is called DDS-DC (Digital Data Storage - Data Compression), allowing
+up to 8 GByte of compressed data to be stored on a tape. The DDS-DC format
+uses the same error correction techniques as implemented in the DDS format.
+
+Data capacities have been further enhanced with the introduction of DDS-2.
+This advancement owes much to improvements in manufacturing techniques that
+permit the production of longer, thinner tapes. Up to 4 GByte native can be
+stored on a 120 metre tape. The DDS-2 standard is backward compatible with
+the DDS standard. Some Starlink Sites have DDS-2 drives.
+
+Another recording format for DAT, DataDAT, enables random access to the
+stored data, as opposed to the sequential access provided for by DDS.
+However, it requires that the tape first be formatted, which can take of the
+order of 60 minutes for a 90 metre tape. {\bf Note} that this format is
+{\bf not} recommended by Starlink.
+
+\subsection {Fast-Search for DAT}
+
+DDS, DDS-2 and DDS-DC format DAT drives can perform a Fast-Search at up to
+200 times the nominal read/write speed.
+
+Fast-Search is invoked by an internal algorithm making decisions about what
+is in the buffer, and depends on whether the command is a {\tt space} forward
+or reverse of a number of blocks or filemarks, for example.
+
+Fast-Search for DAT is described in more detail in Appendix A.
+
+\subsection {Error Handling for DAT}
+
+Audio DAT has two levels of Error Correction Code (ECC) - C1 and C2. DDS
+uses the same levels as the audio DAT format but adds extra error-correction
+techniques:
+
+\begin {enumerate}
+
+\item C3 ECC.
+
+\item Read-After-Write (RAW).
+
+\item N-Group Writing.
+
+\item Data Randomiser.
+
+\item Checksums.
+
+\end {enumerate}
+
+Error-correction techniques employed by DDS are described in detail in
+Appendix A.
+
+\subsection {Data Compression for DAT}
+
+Data compression reduces the amount of physical activity that is needed to
+get the data onto tape. Consequently, the compression decreases the error
+rate in real terms. For example, if the error rate without compression is
+1 in 10 to the 15th bits, and the compression ratio is 2:1, the error rate
+with compression becomes 1 in 2 times 10 to the 15th bits - twice the
+performance. If a hard error does occur however, more data will be lost,
+because more data is written in the same area of tape.
+
+The data compression algorithm is itself lossless; that is, it guarantees
+that what was compressed can be decompressed without error. Equally, this
+means that if an error exists in the data before it is compressed, the error
+will still be there after decompression.
+
+Most current generation DAT tape drives have data compression capability
+built in. This affords a twofold to fourfold increase in both the native
+capacity and the data transfer rate specifications of the drive, depending
+on the nature of the data being compressed. The data compression algorithm
+employed by DAT is reckoned to be one of the most robust available, usually
+of the LZ (Lempel-Ziv) type, making the data transfer rate performance of
+DAT drives comparable to that of 8mm tape drives utilising data compression.
+
+In the DDS-DC format, data blocks are compressed into entities which consist
+of a header and one or more compressed data blocks. The header, which
+contains control information about the compressed data blocks, remains
+uncompressed. The DDS-DC format thus allows compressed data to be stored in
+a way that maintains the full functionality of the DDS format, whilst
+ensuring backward compatibility with existing DDS-format drives.
+
+In general, the existence of entities is completely transparent to the host
+system. However, in order for interchange to be possible between devices
+which support compression and those that do not, some host systems may
+implement software decompression. In this case it is necessary for the host
+system to have a full knowledge of the structure of an entity.
+
+\subsection {DAT Cartridge Handling Subsystems}
+
+Cartridge handling subsystems are designed for facilitating the backing up
+of large data sets. Of these subsystems, known variously as stackers,
+autoloaders, automatic-changers or jukeboxes, models are currently available
+for DAT that can handle from 6 to 50 cartridges.
+
+The simpler models allow only sequential manipulation of the cartridges,
+whereby the next tape in physical sequence is automatically loaded following
+an {\tt unload} command. One disadvantage of this method is that the autoloader
+may have to search through all of the tapes before finding the correct
+cartridge. Random access models are generally more expensive, and usually
+require special firmware to load specific tapes in the magazine.
+
+\subsection {DAT Form Factor}
+
+DAT has the advantage of small media with a large capacity, at a relatively
+low cost. It is the only technology in this mid-range tape market with a 3.5
+inch Half Height form factor as standard. This allows for very flexible
+packaging options, fitting the same space as a 3.5 inch disk or floppy drive,
+for example, within a desktop system package. Additionally, DAT's small form
+factor has fuelled the development of very small tape autoloaders that fit
+standard 5.25 inch form factor packaging. With such small autoloaders, DAT
+can provide low cost unattended backup of around 20 to 30 GByte capacity, and
+fit 5.25 inch disk drive packaging found in many data centre file servers.
+
+\subsection {DAT Performance}
+
+DAT drives have very fast file access times due to features originally
+developed for audio applications. Individual files can be located within
+30 seconds on average, twice as fast as for 8mm devices. Moreover, the
+reliability of 4mm drives generally is deemed to be significantly higher
+than for 8mm technology, reflecting more robust head drum motors and
+assemblies. This is almost certainly a consequence of the audio origins of
+4mm technology, being designed to handle a high degree of start/stop
+activity.
+
+Manufacturers' nominal data transfer rates for 4mm DAT drives can be as high
+as 0.5 MByte/sec native, and 1 MByte/sec compressed; these figures are
+near-identical to those for comparative 8mm subsystems.
+
+But please {\bf note}:
+\begin {itemize}
+
+\item[{\LARGE\bf $\star$}] The Starlink Project view all Manufacturers' capacity
+and throughput performance figures as being only ``Guaranteed not to exceed''.
+
+\end {itemize}
+\subsection {Applications for DAT}
+
+DAT is reckoned to be particularly suitable for archive and retrieval, data
+interchange, software distribution, besides standard backup applications.
+For backup functions, where on-going, unattended operation is required, DAT
+drives are expected to experience fewer failures and provide more consistent
+operation than their 8mm counterparts.
+
+DAT drives can be considered a cost-effective option over the 2 to 4 GByte
+range, where they are used typically for backups. However, with the cost of
+alternative technologies falling, DAT may well be outpaced by DLT, for
+example, where capacities are more positively on the increase.
+
+\section {EXABYTE SUBSYSTEMS}
+
+In 1985 the founders of Boulder, Colorado-based Exabyte Corp. took their cue
+from the 8mm tapes used in portable camcorders, and set about adapting the
+technology for computer data storage peripherals. Prompted into action by
+tape technology that had failed to keep up with the ever-increasing capacity
+of Winchester disk drives, Exabyte introduced its first 8mm tape drive for
+computer data storage in 1987.
+
+Although Exabyte competes well with DAT (Digital Audio Tape, see Section 6)
+in the mid-market range, it is already being surpassed by DLT (Digital Linear
+Tape, see Section 8), and is likely to fall further behind.
+
+\subsection {Exabyte Technology}
+
+Exabyte drives originated out of Sony ``Video8'' camcorder technology, using
+double the width of DAT tape to allow even greater data storage capacities
+to be obtained. 8mm has gone through a series of changes but still gives
+full backwards compatibility with the earlier tapes.
+
+In common with DAT, Exabyte also uses helical scan technology to attain high
+recording density, with opportunity for correspondingly high data storage
+capacity. The tape/drum wrap angle, however, is 221 degrees, compared with
+90 degrees for DAT; the consequences are higher tape tension and a more
+complex drive construction.
+
+A refinement of helical scan technology termed `Alternate-Azimuth Recording',
+utilises two read heads and two write heads to permit recording at twice the
+density.
+
+\subsection {Exabyte Recording Formats}
+
+\begin {itemize}
+
+\item[{\huge\bf -}] Two Exabyte recording formats, selected by way of example,
+relate to the Exabyte EXB-8200 and EXB-8500 subsystems. These particular
+subsystems are {\tt not} in the {\tt preferred} Starlink set; though the
+formats are available to other drives, in some instances via a Personality
+Module.
+
+\end {itemize}
+
+The Manufacturer's quoted capacity for the Exabyte EXB-8200 drive operating
+with a 112 metre Exatape cartridge is 2.5 GByte, utilising the EXB-8200
+format. The corresponding figure  for the EXB-8500 drive is 5 GByte with the
+same tape but utilising the EXB-8500 format. The EXB-8500 can also read or
+write cartridges in the EXB-8200 format.
+
+But please {\bf note}:
+\begin {itemize}
+
+\item[{\LARGE\bf $\star$}] The Starlink Project view all Manufacturers' capacity
+and throughput performance figures as being only ``Guaranteed not to exceed''.
+
+\end {itemize}
+More up-to-date Exabyte models exist that use specifically designed 160 metre
+cartridges to achieve, in the case of the EXB-8505XL, a native capacity of
+up to 7 GByte, or up to 14 GByte with data compression.
+
+\paragraph {Exabyte Tape Capacity}
+
+A few words of warning are offered on the writing of data to Exabyte. In a
+simple test in which many single-block files were `copied' to a 2.3 GByte
+capacity cartridge tape, only 316 files were accommodated. This is only 161
+KByte on a full cartridge, a factor of 15,000 less than advertised! The
+reason for this is that the tape marks that separate files are several
+inches long, and take up as much space as about 2 MByte (4,000 blocks) of
+data. Also, on a labelled tape, each file is preceded by a header file (plus
+tape mark) and a trailer file (plus tape mark). The upshot of this is that
+unless files are more than 30,000 blocks in size then more than 50\% of the
+cartridge will be wasted.
+
+This simple test, which wasted 99.993\% of the capacity of the cartridge,
+reveals how easy it is to use the Exabyte inefficiently.
+
+It is recommended that the `copying' of files should be avoided unless
+files are {\bf much} bigger than 30,000 blocks. {\tt tar} or {\tt dump}
+should be utilised instead; these are more efficient as no matter how many
+files are being saved, these applications write only a single saveset (plus
+header and trailer) on the cartridge. Writing multiple savesets is fine, but
+again they should be bigger than 30,000 blocks to use the cartridge really
+effectively.
+
+\paragraph {Exabyte Tape Layout}
+
+In both EXB-8500 format and EXB-8200 format, each physical track contains
+eight physical blocks. A physical block can contain user data or other
+information. In both formats, a physical block containing user data includes
+the following information:
+
+\begin {itemize}
+
+\item 2 bytes of Cyclic Redundancy Check (CRC) data.
+
+\item 14 bytes of header information
+
+\item 400 bytes of Error Correction Code (ECC) data.
+
+\item 1,024 bytes of user data
+
+\end {itemize}
+
+{\bf Note} that this information is arranged somewhat differently between
+the two formats.
+
+Since each physical track contains eight physical blocks, each track can
+contain a maximum of 8,192 bytes of user data. The header, ECC data and CRC
+data do not affect the capacity of the tape.
+
+\paragraph {End of Data (EOD)}
+
+When writing tapes in EXB-8500 format, the EXB-8500 writes an End of Data
+(EOD) mark after the last data written to tape. This mark is used by the
+{\tt space} command to perform a Fast-Search to the last data written to tape.
+The EOD mark is overwritten when additional data is written to tape.
+
+\subsection {Fast-Search for Exabyte EXB-8500}
+
+A track written in EXB-8500 format also contains search fields that enable
+the EXB-8500 to perform Fast-Search at up to 75 times the nominal tape speed.
+Fast-Search occurs when the initiator issues a {\tt locate} or a {\tt space}
+command. The search fields are the only areas of the tape that are readable
+during a Fast-Search. They consist of small data areas interspersed with clock
+synchronisation areas. The search field data contains information for
+locating files and blocks.
+
+{\bf Note} that tapes written in EXB-8200 format do not contain search fields
+and do not support EXB-8500 Fast-Search.
+
+\subsection {Streaming and Start/Stop Modes for Exabyte EXB-8500}
+
+The EXB-8500 features a 1 MByte data buffer that enables it to operate as
+either a Streaming tape device or as a start/stop tape device. The mode of
+operation depends on the rate at which data can be transferred between the
+initiator and the EXB-8500. If the initiator can sustain a transfer of 0.5
+MByte/sec, the EXB-8500 operates in Streaming mode. If the initiator cannot
+sustain this transfer rate, starting and stopping of the tape occur
+automatically.
+
+Streaming and Start/Stop Modes are described in more detail in Appendix B.
+
+\subsection {Tape Loading for Exabyte EXB-8500}
+
+To load a data cartridge into the EXB-8500, follow these steps:
+
+\begin {enumerate}
+
+\item Ensure that the write-protect switch on the data cartridge has been
+set correctly for the desired operation.
+
+\item If the EXB-8500 has just been powered-on, be sure that the green LED
+on the front panel is off, indicating that the EXB-8500 is ready to load the
+data cartridge.
+
+\item If necessary, press the unload button to open the door on the EXB-8500.
+
+\item Insert the data cartridge into the EXB-8500 with the label-side up and
+the write-protect switch facing you.
+
+\item Gently close the door. The EXB-8500 automatically loads the data
+cartridge and presents ready status (green LED on).
+
+\end {enumerate}
+
+{\bf Note} that, if autoload has been disabled with a {\tt mode-select}
+command, the EXB-8500 will not go to the ready state until a {\tt load} command
+has been executed.
+
+\paragraph {Load Time}
+
+The time required to load the data cartridge and position the tape to LBOT
+(Logical Beginning of Tape) after the door is closed is approximately 30
+seconds for a rewound cartridge.  When loading a tape, the EXB-8500 spaces
+forward, from PBOT (Physical Beginning of Tape) and determines the tape
+format (blank, EXB-8500 format or EXB-8200 format).
+
+\subsection {Error Handling for Exabyte}
+
+The EXB-8200 format and EXB-8500 format both feature ECC (Error Correction
+Code), CRC (Cyclic Redundancy Check) and RAW (Read-After-Write)
+error-correction techniques.
+
+\subsection {Data Compression for Exabyte}
+
+Data compression, when available, uses the IDRC (Improved Data Recording
+Capability) compression algorithm.
+
+\subsection {Exabyte Cartridge Handling Subsystems}
+
+Cartridge handling subsystems are available for Exabyte, with models that
+can handle in excess of 100 cartridges. The comments on access-mode (i.e.
+serial versus sequential) given for DAT (see Section 6.6) apply also to Exabyte.
+
+Tape array subsystems, with their multiple-drive configuration are another
+option engineered for Exabyte, which have a number of advantages over
+single-drive systems. In common with stackers, `automatic drive switching'
+enables continuous writing on several cartridges without requirement for
+operator intervention. Tape arrays generally have a higher storage capacity.
+
+These systems also allow `tape mirroring', i.e. writing data to several
+different cartridges at the same time. Tape mirroring is an advantage when
+critical data must be stored in several locations, when writing on at least
+two storage media is required, for example.
+
+`Striping' may be offered as a special feature. This allows data to be
+distributed evenly across several cartridges during writing, effectively
+increasing the data transfer rate by up to 1 MByte/sec for each additional
+drive utilised. Striping is particularly advantageous when very large data
+sets are required to be backed-up in a short space of time. However, in
+order to make use of this feature, the host system must also support the
+appropriate high transfer rate.
+
+\subsection {Exabyte Form Factor}
+
+Exabyte drives are packaged with a 5.25 inch Half Height form factor. This
+renders them slightly bulkier than the DAT drives, which have a standard
+form factor of 3.5 inch.
+
+\subsection {Exabyte Performance}
+
+Although Exabyte tends to be slower than DAT for `fast file access', there 
+is little to choose between the two when comparing the data transfer rates
+for the higher-performance models.
+
+Manufacturers quote typical file transfer rates, for Exabyte systems, of 0.5
+MByte/sec and 1 MByte/sec with uncompressed data and compressed data
+respectively.
+
+But please {\bf note}:
+\begin {itemize}
+
+\item[{\LARGE\bf $\star$}] The Starlink Project view all Manufacturers' capacity
+and throughput performance figures as being only ``Guaranteed not to exceed''.
+
+\end {itemize}
+\subsection {Applications for Exabyte}
+
+Any applications for which DAT is considered ideal (see Section 6.9) are
+equally suitable for Exabyte. However, DAT has certain recognised advantages
+over Exabyte, generally having the edge on speed and reliability. Dat is
+therefore the {\bf preferred} solution.
+
+\section {DLT SUBSYSTEMS}
+
+DLT (Digital Linear Tape) is the development of the TK-series of DEC half-inch
+cartridge drives. This development was initially a joint venture between
+Digital and Cipher.
+
+\subsection {DLT Technology}
+
+DLT technology uses essentially the same recording procedure as the QIC
+(Quarter Inch Cartridge) technology. As the data cartridge is inserted into the
+drive, a non-spinning head lowers onto the tape. Whilst this action alone would
+not allow a very high recording density to be achieved, the head is stepped
+vertically up the tape a small way when the end-of-tape is reached, allowing
+further data to be recorded back along the tape. This process is repeated,
+allowing data to be recorded as a series of thin linear strips.
+
+Utilising stationary magnetic heads and an uncomplicated tape transport
+mechanism, the tension placed on heads and tapes is less than that for the
+comparative technologies for DAT (Digital Audio Tape, see Section 6) and
+Exabyte (see Section 7).
+
+TTi (Transitional Technology inc) who are among the market leaders for DLT
+subsystems, claim an unequalled hard error rate specification for their
+Series 2200 drives of 1 error in 10 to the 17th bits - supposedly the best
+data integrity specification in a 5.25 inch format tape subsystem. This
+impressive statistic is largely attributed to a custom Reed Solomon ECC (Error
+Correction Code), a custom 64-bit CRC (Cyclic Redundancy Check) on each 4 KByte
+of data on the media, end-to-end 16-bit CRC on each record overlapped with
+parity from the SCSI (Small Computer Systems Interface) bus, and internal
+checking on the cache buffer.
+
+The comparative error rate specification for DAT subsystems is typically
+1 error in 10 to the 15th bits.
+
+\subsection {DLT Recording Formats}
+
+In common with QIC, DLT uses a linear serpentine track format, which is the
+result of the tape and incremental head movements described in Section 8.1.
+
+This recording format does have one particular drawback in that this
+serpentine track must also be traversed when reading-back the data.
+
+DLT records on half-inch tapes in compact cartridges. Compared to all other
+currently available technologies, DLT drives offer the greatest storage
+capacities. At the time of writing, DLT drives exist that can supposedly
+record up to 20 GByte native on an 1800ft tape, or up to 40 GByte with data
+compression.
+
+\subsection {Data Compression for DLT}
+
+By way of example, TTi's Series 2200 drives offer DLZ (Digital Lempel-Ziv)
+high-efficiency data compression.
+
+\subsection {DLT Cartridge Handling Subsystems}
+
+Autoloaders are currently available that handle five or seven cartridges.
+The latter can store up to 140 GByte native using 20 GByte cartridges.
+
+TTi provide a dual-drive subsystem for Series 2200 that permits Cascade Mode
+selection, whereby data will be automatically written to the second drive
+when the first tape is full; Mirroring Mode is similarly accommodated, in
+which data may be written to both drives simultaneously.
+
+\subsection {DLT Form Factor}
+
+All currently known DLT drives are produced with a 5.25 inch Full Height
+form factor.
+
+\subsection {DLT Performance}
+
+The manufacturers' quoted transfer rates for all DLT subsystems covered in
+Section 5 exceed those for the DAT and Exabyte subsystems.
+
+By way of example, TTi's Series 2200 single drive subsystems can supposedly
+store up to 20 GByte native and up to 40 GByte compressed, with quoted data
+transfer rates of up to 1.5 MByte/sec native and up to 3 Mbyte/sec
+compressed. A dual-channel read/write head and a tape mark directory
+maximise data throughput and minimise data access time.
+
+But please {\bf note}:
+\begin {itemize}
+
+\item[{\LARGE\bf $\star$}] The Starlink Project view all Manufacturers' capacity
+and throughput performance figures as being only ``Guaranteed not to exceed''.
+
+\end {itemize}
+
+\paragraph {Starlink Project evaluation of the CTS-2110 DLT Subsystem}
+
+TTi's CTS-2110 variant of the DLT range (tested as the TTi2000) has been
+evaluated by the Starlink Project. The supplied technical literature claims
+a capacity of 10 GByte native and 20 GByte compressed, with quoted
+respective maximum throughput of 1.25 MByte/sec and 2.5 MByte/sec.
+
+In the Project's evaluation of the CTS-2110 DLT Subsystem, a maximum of
+around 14 GByte data storage with data compression was achieved, when
+performing multiple dumps of a {\tt /usr} partition from a DEC Alpha
+3000/300. This underlines the point that the extent to which data compresses
+depends very much on the nature of the data being compressed.
+
+As part of the same evaluation, on the DEC Alpha 3000/300, the maximum
+throughput achieved, for compressed data, was around 0.7 MByte/sec. A
+congested SCSI bus was suspected, and so the CTS-2110 was moved to the
+external SCSI on a DEC Alpha 3000/400. The internal SCSI had an {\bf rz26}
+and an {\bf rz28} on it and the only device on the external SCSI was the
+CTS-2110. A maximum throughput of 1.5 MByte/sec was observed when using
+{\tt dump/dd/tar/cpio} in compressed mode (still a good way off the 2.5
+MByte/sec mark!).
+
+The OSF tape exerciser utility, {\tt tapex}, was then used to test the
+throughput of the DLT drive; 2.8 MByte/sec compressed and around 1.25
+MByte/sec native were achieved. {\tt tapex} appears to write directly to the
+drive.
+
+The limiting factor is the interaction between the filesystem/device and
+the drive. If data can be supplied to the drive sufficiently quickly, then
+one has a chance of achieving the advertised throughput. However, any real
+application ({\tt dump, tar}, etc.) is limited by the filesystem.
+
+\subsection {Applications for DLT}
+
+DLT drives have a data transfer rate of up to three times that of DAT or
+Exabyte drives, and up to five times the data storage capacity. Taking these
+figures into consideration, along with design features that should render
+them effectively more reliable than their DAT and Exabyte counterparts, DLT
+drives can be {\bf highly recommended} for networks requiring unattended
+backups of very large data sets.
+
+\clearpage
+
+\appendix
+
+\section {Technical Information Relating to DAT}
+
+This appendix is intended to supplement the technical information included
+earlier for DAT devices.
+
+\subsection {The DDS Recording Format}
+
+In addition to the error-correction and data integrity features provided by
+DAT, the DDS format has the following features:
+
+\begin {itemize}
+
+\item A Fast-Search capability at up to 200 times the nominal read/write
+speed.
+
+\item The option of formatting the tape into a One-Partition or Two-Partition
+structure.
+
+\item A third level of error-correction (C3 ECC) which can recover errors
+that are are too severe for the basic DAT format techniques (C1 and C2 ECC)
+to correct.
+
+\item A Read-After-Write (RAW) facility which checks the data for errors
+immediately after it is written, and rewrites it if necessary.
+
+\item The option of N-Group Writing (Multiple Group Writing), where each
+group of data is repeated a specified number of times before the next group
+is written.
+
+\end {itemize}
+
+The DDS format is structured to overlay the basic audio format. It does this
+by organising the frames (pair of tracks) of the audio format into a
+sequence of data groups on the tape, each group with a fixed data capacity.
+Each group consists of 22 frames-worth of data, where a frame is a pair of
+tracks at a skew angle across the tape.
+
+As with the audio format, 60\% of the length of a track is user data. The
+rest consists of:
+
+\begin {enumerate}
+
+\item Margin Areas, which are used as guard bands.
+
+\item Sub-Code areas, which are used to facilitate Fast-Search at up to 200
+times the nominal read/write speed. This enables the drive to access any
+file on the tape rapidly, within 30 seconds on average. The timing of
+Fast-Search will depend on where the desired block is located on tape.
+When the drive is at `Beginning of Partition', the search time for blocks
+near the beginning of tape which require Fast-Search will be approximately
+7 seconds. For blocks near the end of the tape, the search time will be
+approximately 50 seconds.
+
+\item ATF (Automatic Track Finding) areas, which are used to centre the head
+on the track.
+
+\end {enumerate}
+
+A host computer sends data and separator marks to a tape drive which
+supports the DDS format. The separator marks identify where logical
+collections of data (files and sets of files, for example) begin and end.
+The tape drive organises the information into groups and writes it to tape.
+An index in each group identifies and locates the data blocks and separator
+marks contained in the group, and each group can be followed by an optional
+error-correction frame.
+
+The method of indexing allows for fixed and variable length blocks and for
+separator marks to be encoded onto the tape without significantly affecting
+the amount of data that can be stored on a particular cartridge.
+
+\subsection {DAT Tape Layout}
+
+The DDS format supports the formatting of tapes into a One-Partition or a
+Two-Partition structure. The host decides whether a blank tape is to be
+formatted into one or two partitions before writing any data. If no format
+command is sent by the host before writing to a blank tape, the tape will
+default to a One-Partition structure.
+
+If two partitions are created, then the partition closest to the end of the
+tape is known as Partition 0. The size of Partition 1, in Megabytes, is
+determined by the host during formatting.
+
+Creating two partitions allows a single tape to contain two separate areas,
+which can be written to and read independently. The size of each partition
+can be defined to suit application needs, and redefined later if necessary.
+In each of the two partitions, new data may be appended to existing data at
+any time. However, when data is written to a partition, any existing data
+which is beyond the current writing point in that partition will be lost.
+
+A possible use of the Two-Partition structure is for Partition 1 to contain
+a directory of the data files held in Partition 0. The directory could then
+be accessed very rapidly by the drive to get information about the location
+of data files. Such a directory could be written to Partition 1 after the
+files have been written to Partition 0.
+
+Note that in all circumstances, write operations can only be performed if
+the tape is write-enabled. A write-protect tab is located along one corner
+edge of the tape cartridge; if the red tab is not visible, then the tape is
+write-enabled.
+
+\subsubsection {One-Partition Tape}
+
+The overall tape layout consists of six areas:
+
+\begin {enumerate}
+
+\item Beginning of Medium
+
+\item Device Area.
+
+\item Reference and System Area.
+
+\item Data Area.
+
+\item End of Data (EOD) Area.
+
+\item Early Warning and End of Partition/Medium
+
+\end {enumerate}
+
+\paragraph {Beginning of Medium}
+
+Beginning of Medium (BOM) is the point where the magnetic tape is physically
+joined to a transparent leader tape.
+
+\paragraph {Device Area}
+
+The Device area has three sections:
+
+\begin {latexonly}
+
+\begin {enumerate}
+\renewcommand{\theenumi}{\alph{enumi}}
+
+\item The load section, which is the part of the tape
+that is wrapped around the drum when the tape is first loaded.
+
+\item A test section, where read and write tests of the
+drive's electronics and servo are performed.
+
+\item A guard section, which provides a safety zone
+between the test section and the start of recorded frames.
+
+\end {enumerate}
+
+\end {latexonly}
+
+\begin{htmlonly}
+\begin{rawhtml}
+<UL>
+<LI> The load section, which is the part of the tape that is wrapped around
+the drum when the tape is first loaded.
+<LI> A test section, where read and write tests of the drive's electronics
+and servo are performed.
+<LI> A guard section, which provides a safety zone between the test section
+and the start of recorded frames.
+</UL>
+\end{rawhtml}
+\end{htmlonly}
+
+\paragraph {Reference and System Area}
+
+The Reference area defines the Beginning of Partition (BOP), and facilitates
+efficient positioning when updating the System area. The tape logs of usage
+and soft error occurrences are stored in the System area. This logged
+information is lost whenever a tape is (re-)formatted.
+
+\paragraph {Data Area}
+
+The Data area is written as a sequence of groups, starting with a special
+Vendor Group which is written automatically by the drive. The Vendor Group
+holds details of the drive which created the partition, and the date. It is
+followed by data groups, which have a fixed capacity, and are used to store
+blocks, filemarks and setmarks written by the host. Fixed-length or
+variable-length data blocks may be written. These, together with tape marks,
+are mapped into the fixed-capacity groups by a method known as Indexing,
+which uses a minimal amount of the data capacity of the tape.
+
+A block may be written within a single group or span several groups,
+depending upon its size. The mapping process is invisible to the host system.
+
+DDS provides for two types of separator marks - filemarks and setmarks -
+which are each represented by 4 bytes in the index of a group. It is the
+responsibility of the application developer to define the logical
+significance of these marks.
+
+The meaning of filemarks is defined by the host.
+
+Setmarks provide an additional method of data segmentation. This new type
+of mark gives the host the freedom to include any number of blocks and
+filemarks within a set, and the ability to search to the end of it in one
+motion. Searching to setmarks automatically invokes the drive's Fast-Search
+facility, unless the setmark is in the buffer. The host does not need to
+know the number of blocks and filemarks contained in a set in order to
+position past it, before appending more data.
+
+The use of the setmark is not restricted to marking the end of data. The
+host is free to assign any meaning to this mark that is desired.
+
+\paragraph {End of Data (EOD) Area}
+
+The End of Data (EOD) area specifies the point on the tape where the host
+stopped writing the data. The host does not specifically command the writing
+of this section of the tape. It is the drive's responsibility to detect
+conditions which indicate that the host has stopped writing data, and generate
+the EOD area at this point.
+
+Marking the end of the recorded data serves two purposes:
+
+\begin {itemize}
+
+\item It limits Fast-Search to the area of the tape containing recorded
+data, and no time is wasted searching unrecorded areas.
+
+\item It shows which data is valid. When data is written to the tape it may
+either be appended to the tape's existing contents, starting at the current
+EOD, or it may be written over existing data. If no overwriting is done, the
+Data area grows and the EOD area is written nearer the end of the tape. If
+existing data is overwritten, and there is less new data than was originally
+on the tape, the EOD area is written closer to the beginning of the tape. In
+this case, any recorded data beyond the new EOD area is no longer valid.
+
+\end {itemize}
+
+\paragraph {Early Warning and End of Partition/Medium}
+
+At the end of the tape are the Early Warning (EW) and End of
+Partition/Medium (EOP/M) points.
+
+EW is a fixed distance (205 frames - at least 500mm) from EOP/M, and is
+generated automatically by the drive. When the drive detects the EW point while
+writing, it indicates to the host that it should stop writing data to the tape.
+
+End of Medium (EOM) is the point where the magnetic tape is physically joined
+to a transparent trailer tape.
+
+\subsubsection {Two-Partition Tape}
+
+A Two-Partition tape has a single Device area, the same as for a
+One-Partition structure. Each partition has its own Reference and System
+Area, Data area and EOD area. In addition, an EW mark and EOP are defined for
+Partition 1 and BOP is defined for Partition 0.
+
+Each partition has its own System area, as it is likely that the two
+partitions will experience different degrees and types of use, and so show
+different error occurrences; a single log might mask significant differences
+between the two partitions.
+
+For both partitions, the System area is preceded by a Reference area.
+
+Separate Vendor Groups are written automatically by the drive(s) employed to
+write each partition. They provide information about the drive, the time the
+partition was initialised, and the type of interface.
+
+\subsection {Tape Loading}
+
+The tape loading algorithm varies depending on whether the tape is blank,
+formatted as a single partition, or formatted into two partitions.
+
+\subsubsection {Loading Algorithm for Blank or One-Partition Tapes}
+
+For tapes that are blank or formatted as One-Partition, the following
+algorithm generally applies:
+
+\begin {enumerate}
+
+\item A data cassette is inserted in the front slot.
+
+\item The drive detects the insertion of the data cassette and draws it
+fully in.
+
+\item The tape is threaded onto the drum.
+
+\item The tape is rewound to BOM.
+
+\item The drive searches for BOP and checks the tape to see if there is a
+Reference area, whether the tape is DDS format, and if the tape has one or
+two partitions.
+
+\item The drive's internal data area is updated to reflect the current
+status. The information is then mapped to the appropriate interface status.
+
+\item If the tape is DDS format, the System area logs are read from the tape
+into the drive's internal log area.
+
+\item The drive positions the tape at BOM and issues a Normal report to the
+interface.
+
+\end {enumerate}
+
+{\bf Note} that if a tape is already loaded, the drive will perform steps
+6 through 8.
+
+\subsubsection {Loading Algorithm for Two-Partition Tapes}
+
+\begin{htmlonly}
+\begin{rawhtml}
+<P>
+For tapes that formatted as Two-Partition, the following algorithm generally
+applies:
+<OL>
+<LI> A data cassette is inserted in the front slot.
+<LI> The drive detects the insertion of the data cassette and draws it
+fully in.
+<LI> The tape is threaded onto the drum.
+<LI> The tape is rewound to BOM.
+<LI> The drive searches for BOP and checks the tape to see if there is a
+Reference area, whether the tape is DDS format, and if the tape has one or
+two partitions.
+<LI> The drive searches for the second Reference Area and checks the
+validity of that area.
+<LI> The System area logs of the second partition (Partition 0) are read
+into the drive's internal log area.
+<LI> The drive rewinds the tape to BOM, and the System area logs of
+Partition 1 are read into the drive's internal log area.
+<LI> The drive's internal data area is updated to reflect the current
+status. The information is then mapped to the appropriate interface status.
+<LI> The drive positions the tape at BOM and issues a Normal report to the
+interface.
+</OL>
+\end{rawhtml}
+\end{htmlonly}
+
+\begin {latexonly}
+
+For steps 1 through 5, the drive performs the same operations as those
+described above.
+
+\begin {enumerate}
+
+\setcounter {enumi}{5}
+
+\item The drive searches for the second Reference Area and checks the
+validity of that area.
+
+\item The System area logs of the second partition (Partition 0) are read
+into the drive's internal log area.
+
+\item The drive rewinds the tape to BOM, and the System area logs of
+Partition 1 are read into the drive's internal log area.
+
+\item The drive's internal data area is updated to reflect the current
+status. The information is then mapped to the appropriate interface status.
+
+\item The drive positions the tape at BOM and issues a Normal report to the
+interface.
+
+\end {enumerate}
+
+\end {latexonly}
+
+The conclusions are as follows:
+
+\begin {itemize}
+
+\item Loading a Two-Partition tape can take significantly longer than loading
+a blank or One-Partition tape.
+
+\item When a Two-Partition tape is reformatted into one partition, the
+loading time is reduced accordingly (to typically 25 seconds).
+
+\end {itemize}
+
+\subsection {Performing Fast-Search}
+
+The drive uses information encoded in the Sub-Code areas of each track to
+perform Fast-Search at up to 200 times the nominal read/write speed.
+
+The information in the Sub-Code areas includes a group count, setmark count,
+filemark count and block count. Fast-Search is carried-out in response to a
+{\tt space} command from the host to find a specified setmark, filemark or
+block.
+
+When performing Fast-Search, the tape head follows a different path to that
+in the normal read mode, because both the head rotation rate and tape speed
+are changed.
+
+To allow the drive's electronics to lock on and acquire the positional
+information required for Fast-Search, the information in the Sub-Code areas
+is repeated for each frame in a group.
+
+Once the largest group has been found, the drive uses the information in the
+group index to find out where specific setmarks, filemarks or blocks are
+located within the group.
+
+Fast-Search is invoked by an internal algorithm making decisions about what
+is in the buffer, and depends on whether the command is a {\tt space} forward
+or reverse of a number of blocks, filemarks or setmarks.
+
+\subsection {Error Handling}
+
+Audio DAT has two levels of Error Correction Code (ECC) - C1 and C2. DDS
+uses the same levels as the audio DAT format but adds extra error-correction
+techniques:
+
+\begin {enumerate}
+
+\item C3 ECC.
+
+\item Read-After-Write (RAW).
+
+\item N-Group Writing.
+
+\item Data Randomiser.
+
+\item Checksums.
+
+\end {enumerate}
+
+\subsubsection {Audio Format C1 and C2 ECC}
+
+C1 ECC is (32,28) Reed Solomon code and can detect and correct errors in any
+two symbols, or it can correct four symbols where the error location is
+known. A symbol is basically equivalent to one byte. C2 ECC is (32,26) Reed
+Solomon code and can correct errors up to three symbols long, or six symbols
+when the error location is known.
+
+To minimise the probability of faulty detection of an error, the C2 code
+decoder typically corrects two symbols, and six symbols where the error
+location is known, using C1 error condition flags.
+
+C1/C2 code can correct up to 0.3mm width horizontal error pattern. If the
+error exceeds this limit, all the tracks become uncorrectable, and so no
+type of C3 ECC can help.
+
+C1/C2 code can correct up to 2.6mm width vertical error pattern. Outside
+this limit, about 190 tracks become uncorrectable simultaneously, assuming
+circular defects. Correcting an error like this using a track-based
+correction would require a C3 capable of correcting more than 190 tracks.
+
+\subsubsection {C3 ECC}
+
+C3 ECC is (46,44) Reed Solomon code, and introduces an extra level of
+error-correction in addition to those offered by the audio DAT format. This
+feature has the ability to correct any two tracks which are bad in a group.
+The error-correction bits are stored in an additional (ECC) frame at the end
+of each group.
+
+C3 is well suited to correct helical errors (soft errors caused by `head
+clog'). One way of removing the error is through `retry', but this affects
+the data transfer rate. The chance of a head clog occurring depends very
+much on the condition in which the drive is maintained.
+
+\subsubsection {Read-After-Write (RAW)}
+
+The DDS format supports a Read-After-Write technique to ensure that any data
+written to the tape can be read back without error. Each frame is examined
+after it has been written to check that it has been recorded correctly.
+
+When a frame is identified as bad, it is rewritten later down the tape
+after two other dummy frames have been written. Each frame, and the two in
+sequence after it, can be rewritten multiple times, thus having the effect
+of skipping over bad areas on the tape. The number of instances of a
+repeated sequence is set at a default value in the drive's firmware. When
+this number is exceeded, the writing of that group is aborted and the drive
+reports a hard error.
+
+Also, in order to limit the physical group size, the maximum number of RAW
+frame rewrites that are allowed is set in the drive's firmware.
+
+When reading a group, any rewritten frames need to be identified. If a
+frame has been rewritten, there will be more than one frame with the same
+Logical Frame Number. To recover the data in the group, all that is required
+is to make sure that at least one of each logical frame is read in the
+correct order. Any duplicates are ignored. If any frame is unreadable, the
+drive reads ahead up to six frames to see if the frame has been rewritten.
+If it has, the rewritten frame is used and the drive continues reading from
+that point.
+
+To perform Read-After-Write, two additional heads are located on the drum,
+making a total of four at 90 degrees to each other.
+
+\subsubsection {N-Group Writing}
+
+N-Group Writing is a technique that writes every group more than once. Each
+group is repeated on the tape a number of times before the next group is
+written. Each set of rewritten groups is contiguous and contains instances
+of only one group.
+
+The data and indexes of the rewritten groups are identical.
+
+The maximum number of times a group can be repeated is seven; that is up to
+eight instances may be written.
+
+\subsubsection {Data Randomiser}
+
+The error rates between random data and worst-pattern data differ by a
+factor of 10. By using a data randomiser, it is possible to reduce the
+worst-case error rate. The randomiser also produces data with a spread of
+transitions which have a more consistent RF envelope, allowing accurate RF
+level detection as a Read-After-Write criterion.
+
+\subsubsection {Checksums}
+
+If a head clog occurs during writing, there is a chance that the previously
+recorded data is not overwritten but remains intact. This is called
+`drop-in'. It is important to check for this type of error occurring during
+both writes and reads, because it will not be detected by the track-based C1
+and C2 codes.
+
+The structure of the C3 ECC is such that it will correct any two tracks if
+the location of the erroneous tracks is known, but only one track if the
+track location is unknown. By recording the track checksum in four subcode
+areas, the location of a drop-in is sure to be detected using the track
+checksum. This allows a full two tracks-worth of ECC to be provided with the
+C3 algorithm.
+
+\pagebreak
+
+\section {Technical Information Relating to Exabyte}
+
+This appendix is intended to supplement the technical information included
+earlier for Exabyte devices.
+
+\subsection {EXB-8500 and EXB-8200 Formats}
+
+\paragraph {Alternate-Azimuth Recording}
+
+When reading data written in EXB-8500 format, the EXB-8500 uses its two read
+heads (R1 and R2) to read the two partially-overlapping physical tracks. The
+single servo head (SVO) reads the servo data that was written on the tape by
+the second write head (W2).
+
+Of the two tracks in the pair, track 1 has a +20 degree azimuth. This track
+is written by head W1 and read by head R1. Track 2 has a -10 degree azimuth.
+This track is written by head W2 and read by heads R2 and SVO.
+
+\subsection {Streaming and Start/Stop Write Operations}
+
+The EXB-8500 features a 1 MByte data buffer that enables it to operate as
+either a Streaming tape device or as a start/stop tape device. The mode of
+operation depends on the rate at which data can be transferred between the
+initiator and the EXB-8500. If the initiator can sustain a transfer of 0.5
+MByte/sec, the EXB-8500 operates in Streaming mode. If the initiator cannot
+sustain this transfer rate, starting and stopping of the tape occur
+automatically.
+
+In a start/stop write operation for the EXB-8500, the initiator-to-buffer
+transfer speed is slower than the buffer-to-tape transfer speed (that is,
+data transfers from the initiator occur at less than 500 KBytes/sec). In
+this mode of operation, the motion threshold value represents the minimum
+amount of data (in 4 KByte increments) that must be in the EXB-8500's
+1 MByte buffer before tape motion will start and data will be written to
+tape.
+
+When the motion threshold value is exceeded, tape motion starts. The
+write-to-tape operation continues until the buffer is empty and the tape
+motion stops. Tape motion does not restart until the amount of data in the
+buffer once again exceeds the motion threshold value or until the buffer is
+flushed for some other reason (such as a {\tt reverse-tape-motion} command).
+
+When the reconnect threshold value is exceeded, the EXB-8500 reconnects to
+the initiator and data transfer resumes. The data transfer to the initiator
+continues until the buffer is empty. Then, the EXB-8500 disconnects from the
+initiator but continues to transfer data from the tape to the buffer.
+
+\subsubsection {Motion Threshold}
+
+In start/stop mode, the `motion threshold' can be used to fine-tune the
+starting and stopping of tape motion by controlling data transfers between
+the buffer and the tape.
+
+The motion threshold is measured in 4 KByte increments. The default value
+for motion threshold is 512 KBytes; this value can be changed with a
+{\tt mode-select} command.
+
+\subsubsection {Reconnect Threshold}
+
+In Streaming mode, the `reconnect threshold' can be used to fine-tune the
+rate of disconnects and reconnects between the EXB-8500 and the initiator.
+
+The reconnect threshold is measured in 4 KByte increments. The default
+value for reconnect threshold is 512 KBytes; this value can be changed with
+a {\tt mode-select} command.
+
+\subsubsection {Guidelines for Motion and Reconnect Thresholds}
+
+The motion threshold and the reconnect threshold can be used to fine-tune
+the rate of data transfer as follows:
+
+\begin {itemize}
+
+\item If the initiator transfer rate is greater than 500 KBytes/sec, lower
+the motion threshold and raise the reconnect threshold an equal amount.
+
+\item If the initiator transfer rate is less than 500 KBytes/sec, raise the
+motion threshold and lower the reconnect threshold an equal amount.
+
+\end {itemize}
+
+\end{document}

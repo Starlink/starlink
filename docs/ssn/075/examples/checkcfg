@@ -1,0 +1,556 @@
+#!/star/Perl/bin/perl
+#+
+#  Name:
+#     checkcfg
+#  Purpose:
+#     Check an ACL configuration file for syntax errors.
+#  Language:
+#     Perl 5.
+#  Description:
+#     Check an ACL configuration file for syntax errors.
+#  Usage:
+#     checkcfg configuration_file_name
+#  Algorithm:
+#     Initialise the status.
+#     If there is more than one command line argument then
+#       Extract the name of the configuration file.
+#       Attempt to read the configuration file.
+#       If ok then
+#         Attempt to parse the configuration file.
+#       end if
+#     end if
+#     Report success or failure.
+#  Copyright:
+#     Copyright (C) 2000 Central Laboratory of the Research Councils
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     21/4/00 (ACD): Original version.
+#     27/6/00 (ACD): First stable version.
+#  Bugs:
+#     None known
+#  Libraries required:
+#     None.
+#-
+
+#
+#  Initialise the status.
+
+    $status = 0;
+    $statusMessage = "success.";
+
+
+#
+#  Set the flag indicating that warning messages are to be reported
+#  if unrecognised keywords are encountered.
+
+    $keywordCheck = 1;
+
+#
+#  Determine the number of command line arguments and proceed if there
+#  is more than one.
+
+    if ($#ARGV >= 0)
+    {
+
+#
+#     Extract the first command line argument as the configuration
+#     file name.
+
+       $configFileName = $ARGV[0];
+
+#
+#     Attempt to read the configuration file and proceed if ok.
+
+       $status = &ReadConfigFile;
+       if ($status == 0)
+       {
+
+#
+#        Attempt to parse the configuration file and proceed if ok.
+
+          $status = &ParseConfigFile;
+       }
+    }
+    else
+    {  $status = 1;
+       $statusMessage = "no configuration file specified.";
+    }
+
+#
+#  Report success or failure.
+
+    if ($status == 0)
+    {  print "Configuration file parsed successfully. \n";
+    }
+    else
+    {  print "Failed to parse configuration file. \n";
+       print "Error: $statusMessage \n";
+    }
+
+#
+# Functions.........................................................
+
+#
+# Read the configuration file from a local file.
+
+sub ReadConfigFile
+{  if ($status == 0)
+   {  $configLines = -1;
+
+#
+#    Open and read the file.
+
+      $openStatus = open (CONFIG, "$configFileName");
+      if ($openStatus != 0)
+      {  while (<CONFIG>)
+         {  $currentLine = $_;
+            chop($currentLine);
+            $currentLine =~ s/\t/ /;
+            $currentLine =~ s/\s*//;
+
+            $configLines = $configLines + 1;
+            $config[$configLines] = $currentLine;
+         }
+
+         close (CONFIG);
+
+#
+#       Set the status if no lines were read.
+
+         if ($configLines < 0)
+         {  $status = 1;
+            $statusMessage = "empty configuration file.";
+         }
+      }
+      else
+      {  $status = 1;
+         $statusMessage = "failed to open the configuration file.";
+      }   
+   }
+   $status;
+}
+
+
+#
+#  Parse the configuration file.
+#
+#  Algorithm:
+#   Initialise the list of recognised-but-unused keywords.
+#   Initialise the number of databases.
+#   For every line in the configuration file
+#     If the line is neither a blank nor a comment then
+#     Attempt to split the line into keyword and value
+#     If ok then
+#       Remove the leading spaces from the keyword and value.
+#       If the keyword is serv_type then
+#         Increment the number of databases.
+#         Set the server type.
+#         Initialise all the other keywords.
+#       else if the keyword is ... any other keyword then
+#         If any the number of the current database is defined then
+#           If the keyword is undefined then
+#             Set the keyword value.
+#           else
+#             Report error: multiple definition of keyword.
+#           end if
+#         else
+#           Report error: first keyword is not serv_type.
+#         end if
+#       end if
+#     end if
+#   end do
+#   For every database
+#     For each mandatory keyword
+#       If the keyword is undefined
+#         Report error: mandatory keyword is missing.
+#       end if
+#     end do
+#   end do
+#   If an eror occurred then
+#     Set the error message text.
+#   end if
+
+sub ParseConfigFile
+{  if ($status == 0)
+   {  
+
+#
+#    Initialise the list of recognised-but-unused keywords from
+#    the appropriate environment variable.
+
+      @knownKeywords = ("sort_cols","sort_order","show_cols","is_tcs",
+        "backup1","backup2");
+
+#
+#    Initialise the number of databases.
+
+      $numDatabases = -1;
+
+#
+#    Examine every line in the configuration file.
+
+      for ($line = 0; $line <= $configLines; $line++)
+      {  $cfgline = $line + 1;
+         $currentLine = $config[$line];
+
+#
+#       Proceed if the line is neither blank nor a comment (indicated
+#       by starting with '#').
+
+         if ($currentLine =~ /\S/)
+         {  $hashPos = index($currentLine, "#");
+            if ($hashPos == -1)
+            {
+
+#
+#             Attempt to split the line into keyword and value.  The
+#             keyword should end in a colon (':').
+
+               $colonPos = index($currentLine, ":");
+               if ($colonPos > -1)
+               {
+
+#
+#                A keyword was found.  Extract the keyword and value
+#                and remove any leading spaces.
+
+                  $keyword = substr($currentLine, 0, $colonPos);
+                  $value = substr($currentLine, $colonPos+1, 300);
+
+                  $keyword =~ s/ *//;
+                  $value =~ s/ *//;
+
+#                  print "keyword: $keyword \n value: $value \n\n";
+
+#
+#                Check for the various keywords.
+#
+#                serv_type
+
+                  if ($keyword eq "serv_type")
+                  {
+
+#
+#                   Increment the number of databases.
+
+                     $numDatabases = $numDatabases + 1;
+
+#
+#                   Set the server type.
+
+                     $serv_type[$numDatabases] = $value;
+
+#
+#                   Initialise all the other keywords.
+
+                     $long_name[$numDatabases] = "<undefined>";
+                     $short_name[$numDatabases] = "<undefined>";
+                     $url[$numDatabases] = "<undefined>";
+                     $symbol[$numDatabases] = "<undefined>";
+                     $copyright[$numDatabases] = "<undefined>";
+                     $search_cols[$numDatabases] = "<undefined>";
+                     $id_col[$numDatabases] = "<undefined>";
+                     $ra_col[$numDatabases] = "<undefined>";
+                     $dec_col[$numDatabases] = "<undefined>";
+                     $x_col[$numDatabases] = "<undefined>";
+                     $y_col[$numDatabases] = "<undefined>";
+                     $help[$numDatabases] = "<undefined>";
+                  }
+
+#
+#                Check for the remaining keywords.  For each check for
+#                various error conditions and if ok then set the keyword;
+#                otherwise set the status.
+#
+#                long_name
+
+                  elsif ($keyword eq "long_name")
+                  {  $check = &CheckKeyword("long_name",@long_name);
+                     if ($check == 0)
+                     {  $long_name[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                short_name
+
+                  elsif ($keyword eq "short_name")
+                  {  $check = &CheckKeyword("short_name",@short_name);
+                     if ($check == 0)
+                     {  $short_name[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                url
+
+                  elsif ($keyword eq "url")
+                  {  $check = &CheckKeyword("url",@url);
+                     if ($check == 0)
+                     {  $url[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                symbol
+
+                  elsif ($keyword eq "symbol")
+                  {  $check = &CheckKeyword("symbol",@symbol);
+                     if ($check == 0)
+                     {  $symbol[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                copyright
+
+                  elsif ($keyword eq "copyright")
+                  {  $check = &CheckKeyword("copyright",@copyright);
+                     if ($check == 0)
+                     {  $copyright[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                search_cols
+
+                  elsif ($keyword eq "search_cols")
+                  {  $check = &CheckKeyword("search_cols",@search_cols);
+                     if ($check == 0)
+                     {  $search_cols[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                id_col
+
+                  elsif ($keyword eq "id_col")
+                  {  $check = &CheckKeyword("id_col",@id_col);
+                     if ($check == 0)
+                     {  $id_col[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                ra_col
+
+                  elsif ($keyword eq "ra_col")
+                  {  $check = &CheckKeyword("ra_col",@ra_col);
+                     if ($check == 0)
+                     {  $ra_col[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                dec_col
+
+                  elsif ($keyword eq "dec_col")
+                  {  $check = &CheckKeyword("dec_col",@dec_col);
+                     if ($check == 0)
+                     {  $dec_col[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                x_col
+
+                  elsif ($keyword eq "x_col")
+                  {  $check = &CheckKeyword("x_col",@x_col);
+                     if ($check == 0)
+                     {  $x_col[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                y_col
+
+                  elsif ($keyword eq "y_col")
+                  {  $check = &CheckKeyword("y_col",@y_col);
+                     if ($check == 0)
+                     {  $y_col[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                help
+
+                  elsif ($keyword eq "help")
+                  {  $check = &CheckKeyword("help",@help);
+                     if ($check == 0)
+                     {  $help[$numDatabases] = $value;
+                     }
+                     else
+                     {  $status = 1;
+                     }
+                  }
+
+#
+#                Check for other recognised keywords, if required.
+
+                  else
+                  {  if ($keywordCheck == 1)
+                     {  $recognisedKeyword = 1;
+
+                        for ($loop = 0; $loop < $#knownKeywords; $loop++)
+                        {  if ($keyword eq $knownKeywords[$loop])
+                           {  $recognisedKeyword = 0;
+                           }
+                        }
+
+                        if ($recognisedKeyword == 1)
+                        {  print "Warning, line $cfgline, ";
+                           print "unrecognised keyword: $keyword \n";
+                        }
+                     }
+                  }
+
+               }
+               else
+               {  print "Line $cfgline: bad line (missing colon):- \n";
+                  print "  $currentLine \n";
+
+                  $status = 1;
+               }
+            }
+         }
+      }
+
+#
+#    Check every database to ensure that the mandatory keywords are
+#    defined.
+
+      for ($dbase = 0; $dbase <= $numDatabases; $dbase++)
+      {  $dbcount = $dbase + 1;
+
+         if ($long_name[$dbase] eq "<undefined>")
+         {  print "Database $dbcount ";
+            print "($short_name[$dbase]): ";
+            print "mandatory keyword long_name omitted. \n";
+
+            $status = 1;
+         }
+         elsif ($short_name[$dbase] eq "<undefined>")
+         {  print "Database $dbcount: ";
+            print "mandatory keyword short_name omitted. \n";
+
+            $status = 1;
+         }
+         elsif ($url[$dbase] eq "<undefined>")
+         {  print "Database $dbcount ";
+            print "($short_name[$dbase]): ";
+            print "mandatory keyword url omitted. \n";
+
+            $status = 1;
+         }
+      }
+
+#
+#    Set the status message if an error occurred.
+
+      if ($status != 0)
+      {  $statusMessage = "bad configuration file.";
+      }
+   }
+   $status;
+}
+
+#
+#  Perform a series of checks prior to setting the value of a keyword.
+#
+#  Given:
+#   The array of values for which the keyword to be set.
+#
+#  Note that this routine attempts to execute irrespective of the
+#  running status.
+
+sub CheckKeyword
+{  
+
+#  Initialise the check status to ok.
+
+    $check = 0;
+
+#
+#  First check that at least one database is defined.
+   
+    if ($numDatabases == -1)
+    {  print "Line $cfgline: keyword serv_type missing. \n";
+
+       $check = 1;
+    }
+    else
+    {
+
+#
+#     Check that the given keyword is not already defined for the
+#     current database.
+
+       if (@_[$numDatabases + 1] ne "<undefined>")
+       {  print "Line $cfgline, database $numDatabases: ";
+          print "multiple definition of keyword ";
+          print "@_[0]. \n";
+
+          $check = 1;
+       }
+       else
+       {
+
+#
+#        Check that the value is not blank.
+
+          if ($value =~ /\S/)
+          {  $isSpace = 1;
+          }
+          else
+          {  $isSpace = 0;
+          }
+
+          if ($isSpace == 0)
+          {  print "Line $cfgline, database $numDatabases: ";
+             print "missing value for keyword ";
+             print "@_[0]. \n";
+
+             $check = 1;
+          }
+       }
+    }
+
+#
+#  Set the return value.
+
+    $check;
+}

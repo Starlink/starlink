@@ -1,0 +1,734 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocsource}    {ssn30.2}
+\newcommand{\stardocnumber}    {30.2}
+\newcommand{\stardocauthors}   {T.\,M.\,Gledhill}
+\newcommand{\stardocdate}      {13th June 1996}
+\newcommand{\stardoctitle}     {SYSTUNE\\[1ex]
+ Tools for SPARC/Solaris Performance Monitoring and Tuning\\[1ex]
+V0.4}
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+% Hypertext definitions.
+% These are used by the LaTeX2HTML translator in conjuction with star2html.
+
+% Comment.sty: version 2.0, 19 June 1992
+% Selectively in/exclude pieces of text.
+%
+% Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+% Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to recentre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Un-comment the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% Add any document specific \newcommand or \newenvironment commands here
+
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+%  Add heading for abstract if used.
+%   \vspace{10mm}
+%   \begin{center}
+%      {\Large\bf Description}
+%   \end{center}
+\end{latexonly}
+
+%  HTML documentation header.
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+%  Add picture here if required.
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      Particle Physics \& Astronomy Research Council \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+% HTML document table of contents (if used). 
+% ==========================================
+% Add table of contents header and a navigation button to return 
+% to this point in the document (this should always go before the
+% abstract \section). This places the table of contents on the title
+% page. Do not use this if you want the normal behaviour.
+%   \label{stardoccontents}
+%   \begin{rawhtml} 
+%     <HR>
+%     <H2>Contents</H2>
+%   \end{rawhtml}
+%   \renewcommand{\latexonlytoc}[0]{}
+%   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+%                                            {stardoccontents}}
+
+%  Start new section for abstract if used.
+%  \section{\xlabel{abstract}Abstract}
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+%  Document Abstract. (if used)
+%  ==================
+% -----------------------------------------------------------------------------
+%  Latex document Table of Contents. (if used)
+%  ===========================================
+%  Replace the \latexonlytoc command with \tableofcontents if you're
+%  not only having a contents list on the title page.
+\begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+\end{latexonly}
+% -----------------------------------------------------------------------------
+
+\newpage
+\section{Introduction}
+
+This document follows on from \xref{SSN/26}{ssn26}{} which provides an
+introduction to performance and tuning issues on SPARC/Solaris systems. 
+Here we describe a package of tools designed to help monitor performance 
+on your system, implement some of the advice given in SSN/26 and provide 
+tuning tips.
+
+In order to monitor performance and perform tuning operations, the Solaris
+system manager traditionally has to rely on tools such as {\tt{vmstat}}, 
+{\tt{iostat}}, {\tt{sar}} and the like which are somewhat limited in their
+scope and usefulness. Repeatedly running tools such as these and maybe
+using perl or awk scripts to parse the results can lead to unacceptable
+overheads and even adversely affect the performance data being recorded.
+
+Using an interpreted language called SymbEL (Symbol Engine Language),
+developed by Richard Pettit at Sun Microsystems, it is now possible to 
+retrieve information directly from the SPARC kernel and to construct
+home-made tools simply by writing a script. This places information 
+resources that were only previously available to the system C programmer 
+at the disposal of every system manager. A good number of tools have already
+been written\footnote{The tools currently available are those distributed
+with the SymbEL package and have been written by Richard Pettit and Adrian
+Cockcroft}, some of which are sophisticated GUI based system monitors, and
+they form the basis of this package.
+
+At the moment the package is essentially a wrap-around for the SPARC tuning
+rules and tools package written by Adrian Cockcroft and Richard Pettit. The
+tools have been collected together using a GUI front end which also provides
+access to documentation and online help. In the near future, additional tools
+should become available (perhaps contributed by Starlink Managers) which
+can be incorporated into the package.
+
+{\bf{Note that this package is only relevant to SPARC systems running Solaris
+2.x}}. It will not work on systems running SunOS 4.x (Solaris 1). In addition,
+some tools require the Motif library which was only included with Solaris at
+version 2.4. 
+
+A detailed guide to the interpretation of results from the various tools
+in this package is beyond the scope of this brief document -- there are
+simply too many options to cover. The package is provided as a toolkit
+to enable system managers to develop the performance monitoring utilities
+that will be of most use to them. 
+
+The following sections describe the package installation, its use, and
+a little about how it works. The document is intended only as an
+introduction and as a pointer to other sources of information.
+
+\section{\label{installation}\xlabel{installation}Installation and Removal}
+
+The package installs under the {\tt{/opt}} filesystem in {\tt{/opt/RICHPse}}
+and currently requires $\sim2$MB of disk space. In order to install the
+package, superuser privileges are required.\footnote{Generally, superuser
+privileges are required to write to {\tt{/opt}} and for {\tt{pkgadd}} to
+execute properly} Scripts are provided to install and remove the package
+cleanly.
+
+\subsection{Installation}
+
+To install the package, proceed as follows:
+
+\begin{enumerate}
+
+\item Obtain the tar file {\tt{systune\_v0.4.tar}} from the Starlink
+FTP server \htmladdnormallinkfoot{}
+{ftp://starlink-ftp.rl.ac.uk/pub/tools/systune\_v0.4.tar}
+and expand the contents into a temporary directory\ldots
+
+\begin{verbatim}
+   # cd /temp-directory
+   # tar xvf systune_0.4.tar
+\end{verbatim}
+
+\ldots to create some files in {\tt{systune\_v0.4}}.
+
+\item Move to the created directory and, as {\tt{root}}, execute the install
+script.
+
+\begin{verbatim}
+   # cd systune_v0.4
+   # ./install
+\end{verbatim}
+
+Some informational messages will be displayed and you will be prompted
+to confirm installation under {\tt{/opt/RICHPse}}. You will be given
+the option of installing the package `architecture neutral'. This just
+means that SE2.5 will work across platforms with different releases of
+Solaris.  If you are only running one release ({\em{e.g.}}, 2.5) then
+say {\tt{`n'}}, otherwise say {\tt{`y'}}. You will also be asked whether
+you want to start some monitoring tools at boot time by inserting
+start-up scripts in {\tt{/etc/rc2.d}}. The recommendation is that you
+decline this option until experience has been gained running the
+monitors from a regular user account. The start-up scripts will still
+be inserted as templates in {\tt{/etc/init.d}}. If you want to enable
+them at a later date then uncomment the commented-out lines.
+
+\item The installation procedure will leave behind a {\tt{remove}} script
+to cleanly remove the installation. This should be kept.
+
+\end{enumerate}
+
+After installation has completed, the software will be
+installed in the directory {\tt{/opt/RICHPse}}. The SysTune GUI can be
+started with the command:
+
+\begin{verbatim}
+   > /opt/RICHPse/starlink/systune.se &
+\end{verbatim}
+
+or by defining an alias to this command. The GUI, and most of the tools
+can be run from a regular user account although a few need to be run as
+root to function properly. Details are given under the Help menu when you 
+run up the GUI.
+
+\subsection{Removal}
+
+The package can be cleanly removed using the {\tt{remove}} script left
+behind by the installation process. You should first terminate any
+running tools or monitors.
+
+\begin{enumerate}
+\item As {\tt{root}}, execute the package removal script.
+\begin{verbatim}
+   # cd /temp-directory/systune_v0.4
+   # ./remove
+\end{verbatim}
+\end{enumerate}
+
+
+\section{\label{using_the_package}\xlabel{using_the_package}Using the Package}
+
+Although the tools in this package can be invoked independently, they
+are more conveniently accessed from the SysTune GUI which groups them
+loosely under two headings: 
+
+\begin{enumerate}
+
+\item {\bf{Statistics:}} These tools retrieve system statistics to give a
+real-time picture of how the system is performing. Examples would be looking
+at disk access times, network collision rates, available swap space {\em{etc.}}
+
+\item {\bf{Monitors:}} These tools typically run in the background and
+periodically check the system for deviation from established performance
+tolerences using a rules strategy. When a performance target is broken,
+the manager is notified.
+
+\end{enumerate}
+
+The tools are summarised in Table~\ref{table1} and Table~\ref{table2} and are
+further described in the online help accessible through the SysTune GUI,
+which is intended to be self documenting to a large extent.
+
+\begin{table}
+\begin{center}
+\begin{tabular}[t]{|l|l|l|l|l|}
+\hline
+\multicolumn{5}{|c|}{\bf Statistics Tools} \\
+\hline \hline
+\bf Networks & \bf CPU system & \bf Disks & \bf NFS & \multicolumn{1}{c|}{\bf Description} \\
+\hline
+collisions &&&& collision rates for ethernet interfaces \\
+net        &&&& network statistics ({\tt netstat -i}) \\
+netstatx   &&&& network retransmissions/collisions \\
+\hline
+& cpus     &&&  cpus and clock rates \\
+& {\bf msacct} &&& microstate accounting \\
+& nproc    &&& number of processes \\
+& ps-ax    &&& {\tt ps-ax} command \\
+& {\bf pwatch}   &&& watch a process \\
+& uptime   &&& continuous uptime display \\
+& cpu meter &&& CPU usage GUI \\
+& multi meter &&& GUI showing CPU and VM system \\
+& kview    &&& GUI to monitor kernel variables \\
+\hline
+&& iostat  &&  like {\tt iostat -D} \\
+&& xio     && disk access statistics \\
+&& xit     && GUI version of {\tt iostat} \\
+&& dfstats && GUI version of {\tt df} \\
+\hline
+&&& {\bf nfsstat-m} & like {\tt nfsstat -m} \\
+\hline
+& \multicolumn{1}{c}{vmstat} &&& like {\tt vmstat} \\
+& \multicolumn{1}{c}{mpvmstat} &&& {\tt vmstat} for multi-processors \\
+\hline
+\multicolumn{3}{|c}{infotool} && global system information GUI\\
+\hline
+\end{tabular}
+\caption{A summary of the tools in the statistics grouping. Tools
+in bold type require root privileges to function properly.}
+\label{table1}
+\end{center}
+\end{table}
+
+\begin{table}
+\begin{tabular}[h]{|l|p{4.5in}|}
+\hline
+\multicolumn{2}{|c|}{\bf Monitor Tools} \\
+\hline \hline
+\multicolumn{1}{|c|}{\bf Monitor}& \multicolumn{1}{c|}{\bf Description} \\
+\hline
+quick tune     & not really a monitor -- performs a quick system tuning 
+                  diagnostic to identify possible problems \\
+ruletool       & probably the most useful tool at the moment -- a GUI based  
+                 monitor that interactively checks a
+                 system at specified intervals for a wide range of        
+                 performance problems \\
+virtual adrian & a command line version of {\em ruletool} -- can be started
+                 at boot time and can log results to a file \\
+calendar monitor & a monitor which logs its results as calendar appointments
+                   using the OpenWindows calendar manager. Useful for  
+                   collecting results from multiple machines \\
+syslog monitor & a monitor which logs its results {\em via} the syslogd \\
+io monitor      & a monitor version of {\tt iostat} -- monitors for slow 
+                 disks \\
+net monitor    & a monitor version of {\tt netstatx} -- monitors for a slow
+                 network \\
+{\bf nfs monitor}   &  a monitor version of {\tt nfsstat-m} -- monitors for slow
+                 NFS client mount points \\
+vm monitor    & a monitor version of {\tt vmstat} -- monitors for low RAM,  
+                swap and CPU overloads \\
+{\bf percollator} & Performance collator: Runs the performance rules, including
+WWW server performance, and writes concise output to a log file or stdout. \\ 
+\hline
+\end{tabular}
+\caption{A summary of the tools in the monitors grouping. Tools in bold type 
+require root privileges to function properly.}
+\label{table2}
+\end{table}
+
+\newpage
+\subsection{Statistics Tools}
+
+The statistics tools retrieve information from the kernel and currently 
+display it in one of three ways:
+
+\begin{enumerate}
+
+\item Tools with GUIs, such as {\tt{infotool}},  use their own pop-up
+text windows or graphics to display information. These tools can be
+exited and otherwise controlled {\em{via}} their own menu bar options.
+After the tool has started, the SysTune window can be used again.
+
+\item Some tools, such as {\tt{ps-ax}}, display their output in the
+SysTune text window. Whilst these tools are running, the SysTune window
+is frozen until they complete their function.
+
+\item Other tools, such as {\tt{iostat}} and {\tt{vmstat}}, run in the 
+background and send their output to stdout. These tools loop until explicitly
+terminated using the {\tt{stop}} button on the SysTune GUI. Whilst these
+tools are executing other tools cannot be launched.
+
+\end{enumerate}
+
+\subsection{\label{montools}\xlabel{montools}Monitor Tools}
+
+The monitor tools run continuously in the background and only output 
+information when they detect a problem. They periodically retrieve
+information from the kernel (such as disk access times and CPU loads) and
+feed it into a series of rules which define acceptable ranges of
+performance. When one of these rules is `broken', the manager is notified.
+
+Each rule has a default definition which can be seen using the {\bf{rules}}
+button on the SysTune GUI. These are the rules that appear in Appendix A
+of {\em{Sun Performance and Tuning}}. The value of a rule can be changed
+by defining a new current value as an environment variable. For example,
+the disk service time beyond which slow disk problems are reported is, by
+default, 50ms. This could be increased to 70ms if required:
+
+\begin{verbatim}
+   > setenv DISK_SVC_T_PROBLEM 70
+\end{verbatim}
+
+Obviously, the default tuning rules should not be changed without good 
+reason and probably only after considerable experimentation. For the changes
+to have effect, any running monitors would have to be restarted. In the 
+current implementation, the SysTune GUI needs to be restarted as well.
+
+The monitor tools use the colour coding scheme described in Appendix A of
+{\em{Sun Performance and Tuning}} to categorise the nature and severity of 
+a problem. This is summarised in Table~\ref{table3}. For a graphic
+illustration of this colour coding scheme in action, start up the RuleTool
+monitor on a fairly busy system.
+
+\begin{table}
+\begin{center}
+\begin{tabular}[t]{|l|p{4.5in}|}
+\hline
+\multicolumn{2}{|c|}{\bf Monitor Colour Codes} \\
+\hline \hline
+\multicolumn{1}{|c|}{\bf Colour} & \multicolumn{1}{c|}{\bf Meaning} \\
+\hline
+blue     & under utilisation or imbalance of an expensive resource \\
+white    & low usage or inactivity \\
+green    & performance within specifications \\
+amber    & warning level - possible problem \\
+red      & problem level - something needs adjusting for good performance \\
+black    & critical problem could cause application or system to hang \\
+\hline
+\end{tabular}
+\caption{A summary of the colour codes used with the monitor tools, as
+defined in Appendix A of {\em{Sun Performance and Tuning}}.}
+\label{table3}
+\end{center}
+\end{table}
+ 
+\subsubsection{Interactive Monitoring}
+
+Most of the monitors use the same rules definitions but output their results
+in different ways. The {\bf{RuleTool}} monitor is probably the most useful
+interactive system monitor available. This is a GUI based tool which uses
+the above mentioned colour-coding scheme to indicate performance problems.
+By clicking on the coloured bars, the data relating to the notified problem
+can be obtained. 
+
+\subsubsection{Non-interactive Monitoring}
+
+It may be more convenient to have a monitor run in the background and
+log its results to a file. The virtual\_adrian, syslog monitor, and calendar
+monitors all provide variations on this theme. 
+
+The calendar monitor ({\tt{mon\_cm}}) checks the system over a 15 minute
+period and if any rule gives an amber state or worse, the rule state is
+entered as an appointment for that time period. The calendar to use can be
+supplied as a command line option so that output from monitors on 
+different hosts can be sent to a calendar manager on a central host.
+
+In order to send output from these monitors to a file or supply other
+options (such as the calendar for {\tt{mon\_cm}} to use) the monitors must be
+started from the command line using the full path, since in the current
+implementation these options cannot be provided if the monitors are
+launched from the SysTune GUI. This is a limitation of the GUI library
+used to implement the SysTune GUI. 
+
+As an example, here is a command to start the {\tt{mon\_cm}} monitor on node
+{\tt{client1}} with a monitoring interval of 30 minutes (1800 seconds) and
+send the output to the calendar manager belonging to user {\tt{star}} on node 
+{\tt{server1}}. A calendar file must already have been created for user 
+{\tt{star}} on {\tt{server1}} using {\tt{cm}} and you must have permission to
+write to it. 
+
+\begin{verbatim}
+   client1> /opt/RICHPse/examples/mon_cm.se 1800 star@server1 &
+\end{verbatim}
+
+For further information on available command line options, see the 
+information on {\bf{Tools}} available through the SysTune HELP menu.
+
+The percollator.se monitor is new to SE2.5. It applies the performance
+rules, including new rules for WWW server performance, and logs its
+results in a concise format. It is intended to be a long-term monitor 
+allowing usage/performance trends to be analysed. Graphing tools which
+will use the concise output are currently being developed.
+
+\subsubsection{Starting Monitors at Boot Time}
+
+The four monitors virtual\_adrian, syslog monitor, percollator and
+calendar monitor can be started at boot time by adding run control
+scripts in /etc/rc2.d at sequence number 90.  The appropriate scripts
+are placed in {\tt{/etc/init.d}} by the package installation procedure.
+The scripts are commented out unless the option to activate monitors at
+boot time was chosen during the installation. The scripts are:
+
+\begin{quote}
+\begin{verbatim}
+/etc/init.d/mon_cm
+/etc/init.d/monlog
+/etc/init.d/va_monitor
+/etc/init.d/percol
+\end{verbatim}
+\end{quote}
+
+For example, to start up the calendar monitor at boot time you would first
+edit {\tt{/etc/init.d/\-mon\_cm}} to remove commented out lines (if any) and
+then create a link to it in {\tt{/etc/rc2.d}} 
+
+\begin{quote}
+{\tt{ln -s /etc/init.d/mon\_cm /etc/rc2.d/S90mon\_cm}}
+\end{quote}
+
+\section{\label{symbel_lang}\xlabel{symbel_lang}The SymbEL Language}
+
+This section describes in a little more detail the SymbEL language used
+to implement the tools in this package. 
+
+SymbEL is an interpreted language ({\em{i.e.}}, it doesn't need to be 
+compiled) that has a syntax very similar to that of C. The beauty of SymbEL
+is that it allows the user to extract information from the running SPARC
+kernel simply by writing a script, in the same way that you could extract
+information from a file by writing a Perl script. Previously, to retrieve
+kernel information, you would have to write and compile a C program to use
+the kernel {\tt{kvm}} library, or in SunOS 5.x the {\tt{kstat}} library
+
+Although the SymbEL language is syntactically similar to C, a key difference
+is the definition of {\bf{active}} and {\bf{inactive}} variables. When an
+active variable is read, a kernel access occurs and data is retrieved from
+the kernel into that variable. Usually, active variables are structures so
+that the whole structure will be filled when the variable is read.
+
+SymbEL provides special {\bf{language classes}} that are used to declare the
+active property of a variable, that is, that it will receive information
+from the  kernel. This property is signified in a SymbEL script by
+preceeding the variable by the language class followed by a dollar ({\tt{\$}})
+sign. There are currently four language classes; the ones that provide
+access to the kstat and kvm data being the kstat and kvm language classes. 
+
+This is probably best illustrated by an example. The following script
+will report the number of processes currently running on the system. If
+the SymbEL interpreter ({\tt{/opt/RICHPse/bin/se}}) is installed on the
+system, then this script could be typed in and executed.
+
+\begin{quote}
+\begin{verbatim}
+   #!/opt/RICHPse/bin/se
+   #include <stdio.se>
+   #include <kstat.se>
+   main ()
+   {
+     ks_system_misc kstat$misc;
+     printf("There are %d processes on the system \n",kstat$misc.nproc);
+   }
+\end{verbatim}
+\end{quote}
+
+{\bf{Programming Notes}}
+
+\begin{enumerate}
+
+\item The initial line flags that this script should be processed using
+the SymbEL interpreter {\tt{se}}.
+
+\item The {\tt{stdio.se}} and {\tt{kstat.se}} header files (located in 
+{\tt{/opt/RICHPse/include}}) are included to provide definitions for the
+{\tt{printf}} function and for the kstat variable types.
+
+\item The statement {\tt{ks\_system\_misc kstat\$misc;}} declares the
+variable {\tt{kstat\$misc}} to be of type {\tt{ks\_system\_misc}} (a structure
+type defined in the header file {\tt{kstat.se}}). The form of the variable
+name indicates that it is an {\em{active}} variable of the {\tt{kstat\$}}
+language class.
+
+\item The print statement prints out the number of processes on the system
+simply by referencing the appropriate structure member. This automatically
+causes the structure to be updated with information from the kernel. 
+
+\end{enumerate}
+
+For a more detailed introduction to the SymbEL language, see the user's
+manual:
+
+\begin{verbatim}
+   /opt/RICHPse/doc/USERS.MANUAL
+\end{verbatim}
+
+or access it through the HELP button on the SysTune GUI.
+ 
+\section{\label{gui}\xlabel{gui}The GUI extension}
+
+The SymbEL language has an {\tt{attach}} statement which allows it to be
+extended by attaching shared libraries, such as system libraries like
+libc.so. User supplied libraries can also be attached and a GUI extensions
+library is included with the SymbEL release. This is basically a widget
+library that allows simple GUI interfaces to be constructed. Although
+fairly easy to use, the library is at present fairly limited and has some
+bugs.
+
+For more information on the GUI extension, see the user's manual
+
+\begin{verbatim}
+   /opt/RICHPse/doc/GUI_MANUAL
+\end{verbatim}
+
+or access it through the HELP button of the SysTune GUI. Alternatively,
+have a look at the SysTune code which is written using the GUI extension
+library.
+
+\section{\label{more_info}\xlabel{more_info}Further Information}
+
+For a general overview of tuning issues on SPARC/Solaris systems, see
+\xref{{\em{Configuring, monitoring and tuning SPARC/Solaris 
+systems}, SSN/26}}{ssn26}{}.
+
+Both this brief note and the above SSN refer to the more detailed treatment
+of tuning issues to be found in {\em{Sun Performance and Tuning -- SPARC and
+Solaris}} by Adrian Cockcroft (ISBN 0-13-149642-5).
+
+Further tuning information is available on-line at various URLs. Since
+this information is being updated all the time and the links may be
+volatile, the URLs are not listed explicitly here. Instead, they can be
+accessed through \htmladdnormallinkfoot{the Starlink System Tuning and
+Configuration Page}{http://star-www.rl.ac.uk/\~{}cac/sunspot/sun\_perf.html}
+
+%===========================================================================
+
+% \newpage
+\appendix
+\section{\label{changes}\xlabel{changes}Changes since V0.3}
+
+This is a maintenance release for Solaris 2.5 platforms. 
+
+\begin{enumerate}
+\item Systune V0.4 includes the SE2.5 package which works correctly on
+Solaris 2.5 platforms (and earlier).
+\item The Systune GUI includes links to 2 contributed tools ({\tt{dfstats}}
+and {\tt{kview}}) and to the
+percollator monitor ({\tt{percollator}}).
+\item Help information and this document have changed accordingly.
+\end{enumerate}
+
+\section{\label{future_releases}\xlabel{future_releases}Future Releases}
+
+The next release should be a major revision to V1.0 and will provide full
+functionality for the SysTune GUI. Graphing tools for analyzing performance
+logs should also become available.
+
+\end{document}

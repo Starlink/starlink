@@ -1,0 +1,375 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {39.6}
+\newcommand{\stardocauthors}   {D.\ L.\ Terrett}
+\newcommand{\stardocdate}      {18 November 1992}
+\newcommand{\stardoctitle}     {GKS --- Installation and Modification}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction}
+
+This note describes how to install GKS 7.2 and how to rebuild the system with a
+different set of device handlers.
+GKS 7.2 is distributed by RAL Central Computing Division (CCD) but has been
+modified by Starlink to suit Starlink's computing environment.
+It does not describe how to write a handler; a guide for this is being prepared
+by RAL Computing Services Division.
+
+\section{Installing the system}
+
+GKS is provided as part of the Starlink Core software. The directory locations
+used throughout this note are relative to {\tt STARDISK:[STARLINK.LIB]} in the
+Core.
+
+When the software has been installed the following directories exist:
+
+\begin{itemize}
+
+\item {\tt [.GKS]} :
+All the files required to link and run programs with GKS, plus those files
+needed to re-build the system which differ from the CCD version.
+
+\item {\tt [.GKS.CCD]} :
+All the files needed to rebuild the system as distributed by CCD including the
+workstation description tables (WDT) for all the CCD device handlers.
+This directory has not been modified by Starlink.
+
+\item {\tt [GKS.DRIVERS]} :
+Source code (in {\tt GKS72.TLB}) and WDT files for all the device handlers
+provided by or modified by Starlink. 
+
+\end{itemize} 
+
+Once the following logical names have been defined (by {\tt
+[STARLINK]STARTUP.COM} on Starlink systems):
+
+\begin{verbatim}
+      "GKS_DIR"            = "STARDISK:[STARLINK.LIB.GKS]"
+      "GKS_EMF"            = "GKS_DIR:GKSEMF.DAM"
+      "GKS_EPAR"           = "GKS_DIR:GKSE.PAR"
+      "GKS_FONTS"          = "GKS_DIR:GKSDBS.DAM"
+      "GKS_IMAGE"          = "GKS_DIR:GKS_IMAGE.EXE"
+      "GKS_IMAGE_ADAM"     = "GKS_DIR:GKS_IMAGE_ADAM.EXE"
+      "GKS_IMAGE_ADAM_PAR" = "GKS_DIR:GKS_IMAGE_ADAM_PAR.EXE"
+      "GKS_PAR"            = "GKS_DIR:GKS.PAR"
+      "GKS_WDT"            = "GKS_DIR:GKSWDT.DAM"
+      "GKS_WS_IMAGE"       = "GKS_DIR:GKS_WS_IMAGE.EXE"
+      "GKSSHARE"           = "GKS_DIR:GKS_WS_IMAGE.EXE"
+\end{verbatim} 
+
+the system is ready to use provided that the workstation handlers used at RAL
+are appropriate. The last ({\tt GKSSHARE}) is required in order to support older
+applications. 
+
+On non-Starlink systems the root of directory tree ({\tt [.GKS]}) can be
+any directory you chose provided that the logical names are modified
+appropriately.
+If a different directory is used it should replace {\tt [.GKS]} throughout
+this document.
+
+The handlers present in the library can be examined by listing the file
+{\tt [.GKS]WORKSTATIONS\-.TEMPLATE}. The version at the time of writing is
+shown in appendix~\ref{se:temp}.
+
+\section{Changing the workstations}
+
+Changing the set of workstations included in the system is simply a matter of
+editing {\tt [.GKS]\-WORKSTATIONS.DAT} to include or exclude workstations as
+required and executing the command procedure {\tt [.GKS]GKS\_REBUILD.COM}. This
+procedure assumes that {\tt GKS\_DIR} has been defined, and new versions of
+{\tt GKS\_WS\_IMAGE.EXE} and {\tt GKSWDT.DAM} will be created in {\tt GKS\_DIR}
+and {\tt GKSLIB.OLB} modified. You may wish to make a backup of these files
+before proceeding.
+
+The program that creates the binary WDT file generates a considerable amount
+of output including many ``caution" messages; these are normal and can be
+ignored.
+
+Starlink sites also need to rebuild the shareable image libraries. This is done
+by running the command procedures {\tt STAR\_LINK.COM} and {\tt
+STAR\_LINK\_ADAM.COM} in {\tt STARDISK:[STARLINK.LIB]}.
+
+The template file {\tt [.GKS]WORKSTATIONS\-.TEMPLATE} may be used as a template
+for your own {\tt [.GKS]\-WORKSTATIONS.DAT}. The supplied version of {\tt
+[.GKS]\-WORKSTATIONS.DAT} is that for use on the Starlink Project VAXCluster 
+at RAL.
+
+
+\section{Modifying or adding a workstation}
+
+The source code of the Starlink written or modified device handlers is found in
+{\tt [.GKS.DRIVERS]\-GKS72.TLB} in modules called {\tt GKntWD} where {\tt t}
+indicates the device manufacture and {\tt n} distinguishes between different
+models, ({\em e.g.} the Tektronix 4010 handler is in {\tt GK0TWD}). The source
+of the workstation description tables is found in {\tt [.GKS.DRIVERS]} in files
+called {\tt Gnnnn.WDT} where {\tt nnnn} is the workstation type.
+
+Drivers are compiled by:
+
+\begin{verbatim}
+      $ FORTRAN filename+[.GKS.CCD]GKS_INCLUDES/LIBRARY
+\end{verbatim}
+
+New versions of the library and binary WDT are created by executing the
+procedure {\tt [GKS.CCD]\-GKS\_CONFIGURE.\-COM}. This procedure prompts for the
+locations of all the files needed to rebuild the system and by specifying
+search lists the procedure can be directed to pick up new and modified files
+from your own directories. For example, suppose your current default directory
+contains some modified WDT files and some object modules containing modified
+drivers.
+
+The prompts from the procedure and your responses would be:
+\begin{quote}
+Where is your existing version of GKSLIB.OLB?\\
+{\tt [.GKS]}
+
+Where are the GKS development files to be found? 
+If they are not all in the same directory you can enter a search list\\
+{\tt [.GKS],[.GKS.CCD]}
+
+Where do you want to build the new version?
+If you specify the same location as the existing version of GKSLIB.OLB the
+existing library will be modified rather than a new version being created\\
+{\tt []}
+
+Enter the names of any object files you want inserted in the library, separated
+by commas.
+The names may contain wild cards\\
+{\tt GK\%\%WDT.OBJ}
+
+Enter the locations to be searched for the workstation description table files,
+separated by commas.
+If you enter more than one location they will be searched in the order
+specified when searching for each workstation\\
+{\tt [],[.GKS.DRIVERS],[.GKS.CCD]}
+
+Enter the name of the file containing the list of workstations that you
+want in your configuration\\
+{\tt [.GKS]WORKSTATIONS.DAT}
+\end{quote}
+
+The new versions of {\tt GKSLIB.OLB}, {\tt GKS\_WS\_IMAGE.EXE} and {\tt 
+GKSWDT.DAM} will be created in your current default directory. The answers to
+the prompts can be supplied as parameters to the command procedure; an example
+of this can be found in {\tt [.GKS]GKS\_REBUILD.COM}.
+
+\section{Test program}
+
+{\tt [.GKS.CCD]TEST.OBJ} is the object module for a test program that will
+execute GKS calls typed in at the keyboard or read from a file. The program is
+driven by typing the name of a GKS function ({\em e.g.} {\tt GOPKS}) and will
+then prompt for all the required parameters. Typing a ``?" will list all the
+available functions. This program was written by, but is not supported by, RAL
+CCD division.
+
+\section{Changes since previous releases}
+
+If you have written a driver for a previous release you may have to make the
+following changes to the code:
+
+\begin{itemize}
+
+\item Change INCLUDE statement from 
+\begin{verbatim}
+      'INCLUDE "GINCLUDE:filename"'
+\end{verbatim}
+to
+\begin{verbatim}
+      'INCLUDE "(filename)"'
+\end{verbatim}
+
+\item Replace {\tt GKS\_} by {\tt G} in all subroutine names.
+
+\end{itemize}
+
+\section{Starlink Modifications}
+
+GKS 7.2 as distributed by Starlink differs from the CCD distribution in
+the following ways:
+
+\begin{itemize}
+
+\item An escape function to suppress the clearing of the screen on open
+workstation has been implemented.
+
+\item The library has been split into two parts. {\tt GKSLIBG.OLB} contains the
+user callable routines plus a few others. {\tt GKSLIB.OLB} contains the rest,
+including device handlers. This allows the {\tt GKSLIB.OLB} to be built as a
+shareable library without preventing applications programs from replacing the
+error handling routine.
+
+\item {\tt GKS\_WS\_IMAGE} does not contain the user callable routines.
+
+\end{itemize}
+
+A system that conforms to the CCD system can be created be inserting the
+contents of {\tt GKSLIBG\-.OLB} into {\tt GKSLIB.OLB} and rebuilding the
+shareable image specifying {\tt [.GKS.CCD]} only as the location of the
+``development" files.
+
+\newpage
+\appendix
+\section{Template of GKS Workstations}
+\label{se:temp}
+\begin{quote}\small
+\begin{verbatim}
+!  WORKSTATIONS.TEMPLATE
+!
+!  This is a template for WORKSTATIONS.DAT which lists all the workstations
+!  that are to be included when the GKS library and workstation description
+!  file are built
+!
+!  Workstations that are not required should be either deleted or commented
+!  out with a ! character at the beginning of the line.
+!
+!  The metafile workstations (10 & 50) MUST be included and the total number
+!  of workstations included must not exceed 60. So at least 21 workstations
+!  must be commented out; this file currently contains 81 workstations, 21 of
+!  which are commented out.
+!
+!  ***  Never remove the next two workstations ***
+!
+0010	! GKS metafile input (Annex E)
+0050	! GKS metafile output (Annex E)
+!
+0101	! Sigmex R5664, colour, 4 planes
+0102	! Sigmex T5674-T1 ,'A' series , greyscale, 1 plane
+0103	! Sigmex T5674-T1 ,'B' series , greyscale, 1 plane
+0104	! Sigmex T5674-T4 ,'A' series , greyscale, 4 planes
+0105	! Sigmex T5674-T4 ,'B' series , greyscale, 4 planes
+0106	! Sigmex T5684-T4, colour, 4 planes
+0108	! Sigmex T5472-T1, black and white, 1 plane
+0109	! Sigmex T5472-T1, black and white, 1 plane
+0110	! Sigmex T5484-T4, colour, 4 planes, joystick input
+!
+0201	! Tektronix 4010 storage tube
+0203	! Tektronix 4014 storage tube
+!
+0700	! Calcomp 81 plotter, A4 sheet feed
+0701	! Calcomp 81 plotter, A3 sheet feed
+0702	! Calcomp 81 plotter, A4 roll feed
+0703	! Calcomp 81 plotter, A3 roll feed
+0704	! Calcomp 81 plotter, roll feed to workstation viewport
+! 
+! Starlink supported workstations
+!
+0160	! Sigmex ARGS 7000
+0161	! Sigmex ARGS 7000 overlay plane
+0162	! Sigmex ARGS 7000 + VT terminal
+0163	! Sigmex ARGS 7000 overlay plane + VT terminal
+!
+0801	! Cifer T5
+0825	! Pericom 7800
+0827	! Pericom Graphpack
+0845	! GraphOn 235
+!
+1000	! Zeta 8
+1001	! Zeta 8 long workstation
+!
+1200	! Printronix P300
+1201	! Printronix P300 square workstation
+!
+!1500	! BBC micro + Acorn termulator chip
+!
+1740	! VAXstation 2000
+1741	! VAXstation 4 plane monochrome
+1742    ! VAXstation 8 plane colour
+1743	! VAXstation 8 plane monchrome
+!
+2600	! Canon LPB-8 Laser printer landscape mode
+2601	! Canon LPB-8 Laser printer portrait mode
+2610    ! Canon for inclusion in Tex documents - landscape
+2611    ! Canon for inclusion in Tex documents - portrait
+!
+2700    ! Apple laserwriter A4 page (portrait)
+2701    ! Apple laserwriter  A4 page (landscape)
+2702    ! Encapsulated Apple laserwriter  A4 page (portrait)
+2703    ! Encapsulated Apple laserwriter  A4 page (landscape)
+2704    ! Postscript A4 page (portrait)
+2705    ! Postscript A4 page (landscape)
+2706    ! Encapsulated Postscript A4 page (portrait)
+2707    ! Encapsulated Postscript A4 page (landscape)
+2708	! LJ 250 Inkjet (portrait)
+2709	! LJ 250 Inkjet (landscape)
+!
+3200    ! Digisolve Ikon 1024 x 780
+3201    ! Digisolve Ikon 1024 x 780 overlay
+3202    ! Digisolve Ikon 1024 x 780 + VT terminal 
+3203    ! Digisolve Ikon 1024 x 780 overlay + VT terminal
+!
+3800	! X Windows
+3801	! X Windows
+3802	! X Windows
+3803	! X Windows
+!
+3805	! X Windows overlay
+3806	! X Windows overlay
+3807	! X Windows overlay
+3808	! X Windows overlay
+!
+!  AAO supported workstations
+!
+!0400	! HP 2648A graphics terminal
+!2000	! QMS landscape software linetypes
+!2001	! QMS portrait     "         "
+!2010	! QMS landscape hardware linetypes
+!2011	! QMS portrait     "         "
+!
+!  Obsolete workstations
+!
+!0830	! Lear-Siegler ADM 3
+!0800	! Cifer 2634G
+!1100	! Versatec 1200A fan fold
+!1101	! Versatec 1200A square workstation
+!
+!  Unsupported Workstations 
+!
+!0410	! HP 7221B sheet A4 plotter
+!0411	! HP 7221B sheet A3 plotter
+!0430	! HPGL plotter A4 paper
+!0431	! HPGL plotter A3 paper
+!0432	! HPGL plotter A2 paper
+!0433	! HPGL plotter A1 paper
+!1400	! Canon 1080 (Epson compatible) dot printer
+!3700	! LN03 laser printer - low res
+!3701	! LN03 laser printer - high res
+!3900	! Complot Houston EDP3 pen plotter
+\end{verbatim}
+\end{quote}
+
+\end{document}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

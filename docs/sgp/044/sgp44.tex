@@ -1,0 +1,740 @@
+\documentclass[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocsource}    {sgp44.1}
+\newcommand{\stardocnumber}    {44.1}
+\newcommand{\stardocauthors}   {R.F. Warren-Smith}
+\newcommand{\stardocdate}      {7th June 1995}
+\newcommand{\stardoctitle}     {Guidelines for Starlink\\
+                                Software Strategy Groups}
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+% Hypertext definitions.
+% These are used by the LaTeX2HTML translator in conjuction with star2html.
+
+% Comment.sty: version 2.0, 19 June 1992
+% Selectively in/exclude pieces of text.
+%
+% Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+% Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  Define commands to recentre underscore for Latex and leave as normal
+%  for HTML (problems with _ in tabbing environments and __ generally 
+%  otherwise).
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\begin{latexonly}
+  \setunderscore
+\end{latexonly}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Un-comment the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% Add any document specific \newcommand or \newenvironment commands here
+
+\newcommand{\planref}[1]{\htmladdnormallink{#1}{http://star-www.rl.ac.uk/\~{}rfws/projects/planitems.html}}
+\newcommand{\projectsref}[1]{\htmladdnormallink{#1}{http://star-www.rl.ac.uk/\~{}rfws/projects/index.html}}
+\newcommand{\sitesref}[1]{\htmladdnormallink{#1}{http://star-www.rl.ac.uk/sites.html}}
+\newcommand{\apref}[1]{\htmladdnormallink{#1}{http://star-www.rl.ac.uk/programmers.html}}
+\newcommand{\staffref}[1]{\htmladdnormallink{#1}{http://star-www.rl.ac.uk/pro.html}}
+\newcommand{\ralref}[1]{\htmladdnormallink{#1}{http://www.clrc.ac.uk/ral/index.html}}
+\newcommand{\cclref}[1]{\htmladdnormallink{#1}{http://www.clrc.ac.uk/}}
+
+\newcommand{\st}[1]{{\em{#1}}}
+\newcommand{\qt}[1]{``#1''}
+\begin{htmlonly}
+   \renewcommand{\qt}[1]{{\tt{"}}#1{\tt{"}}}
+\end{htmlonly}
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+\begin{latexonly}
+   CCL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+%  Add heading for abstract if used.
+%   \vspace{10mm}
+%   \begin{center}
+%      {\Large\bf Description}
+%   \end{center}
+\end{latexonly}
+
+%  HTML documentation header.
+\begin{htmlonly}
+   \xlabel{}
+   \label{stardoctoppage}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+%  Add picture here if required.
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCL}{http://www.clrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.clrc.ac.uk/ral} \\
+      Particle Physics \& Astronomy Research Council \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  Start new section for abstract if used.
+%  \section{\xlabel{abstract}Abstract}
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+%  Document Abstract. (if used)
+%  ==================
+% -----------------------------------------------------------------------------
+%  Table of Contents. (if used)
+%  ==================
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+\begin{htmlonly}
+   \renewcommand{\latexonlytoc}[0]{}
+   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+                                            {stardoctoppage}}
+\end{htmlonly}
+% \begin{latexonly}
+%    \setlength{\parskip}{0mm}
+%    \latexonlytoc
+%    \setlength{\parskip}{\medskipamount}
+%    \markright{\stardocname}
+% \end{latexonly}
+% -----------------------------------------------------------------------------
+
+\section{\xlabel{introduction}INTRODUCTION}
+
+Software Strategy Groups (SSGs) are Starlink user groups which have
+been set up by the Project to allow it to consult with expert software
+users and to obtain advice about those software issues which affect
+the use of its computing service.  The SSGs also form an important
+part of a \htmlref{procedure}{sect:procedure} for annually
+re-assessing the software priorities of the Project and for
+identifying future objectives.
+
+This document describes the nature of the SSGs and the role which they
+play in this procedure. It also covers some \htmlref{administrative
+arrangements}{sect:admin}.  Its primary purpose is to give
+\htmlref{guidance}{sect:guidance} to those participating in SSGs, so
+that they can operate as effectively as possible.
+
+\section{\xlabel{historical}HISTORICAL BACKGROUND}
+
+The formation of the SSGs arose out of the recommendations of a major
+review of Starlink which took place during 1991/92 under the
+Chairmanship of Prof.\ Peter Wilmore of Birmingham University.  In its
+report, the Wilmore Review examined the role of the \st{Special
+Interest Groups} (SIGs) which had until then advised Starlink on its
+applications programming policy. The review identified a number of
+deficiencies in the way the SIGs operated and asked the Starlink
+Panel (also set up as a result of this review) to examine their future
+role.
+
+The Starlink Panel subsequently asked the Project to prepare a policy
+paper proposing new ways of identifying applications software
+priorities and managing the associated software development by
+\apref{contract programmers} located at \sitesref{Starlink
+sites}. This paper was discussed and approved at the July 1993 meeting
+of the Panel.
+
+In making these proposals, the Project examined the way that the SIGs
+had operated in great detail. It shared the view of the Wilmore Review
+that there was scope for reform, but also felt that some of the SIGs'
+functions were very important to Starlink and should be preserved in
+some manner. It also identified some new requirements that had not
+previously been recognised.
+
+As a result, a considerable number of changes have been introduced.
+These include the disbanding of the SIGs and the formation of a
+smaller number of SSGs with a somewhat \htmlref{different
+purpose}{sect:comparison}. The intention has been to transfer to
+others those functions which the SIGs were not able to perform well,
+but to retain in the SSGs their most useful function of allowing the
+Project to consult with expert software users.
+
+In transferring responsibilities to others, the Project was aware that
+each group of people will have different perspectives and priorities,
+and that their advice will therefore have different strengths and
+weaknesses. A software review \htmlref{procedure}{sect:procedure} was
+therefore designed to ensure that contributions from different
+quarters are balanced and complementary.
+
+\section{\xlabel{review_procedure}\label{sect:procedure}THE SOFTWARE REVIEW PROCEDURE}
+
+The procedure for reviewing and updating Starlink's software strategy
+consists of a number of steps which are intended to be repeated
+annually, as follows:
+
+\begin{enumerate}
+\item A {\bf Software Questionnaire,}\footnote{Note that a full
+questionnaire may not be carried out every year if
+previously-collected data is still relevant. The intention is simply
+to keep our information up to date by asking appropriate questions as
+they become necessary.}  circulated to all users, will sample opinion
+and identify those trends and problems that affect substantial numbers
+of users.  It will also measure software usage and identify which
+users are interested in particular types of software. These results
+will be a valuable resource in planning future software strategy and
+will also facilitate more direct contact with interested users,
+allowing them to be targeted when advice is needed on more detailed
+matters that do not warrant a place in the questionnaire itself.
+
+\begin{quote}
+\st{Note: It is expected that these results will most usefully reveal
+deficiencies in the existing service and that those replying to the
+questionnaire will not usually examine future options in much
+detail. Nevertheless, the questionnaire is likely to be as
+\qt{unbiassed} a sample of user opinion as can easily be obtained. The
+questionnaire results and the problems and preferences it identifies
+should therefore be given considerable weight and form a background to
+all SSG discussions.}
+\end{quote}
+
+\item An {\bf Open Meeting} will provide an opportunity to
+describe the Project's status and report on major developments. It
+will also allow early results from the questionnaire to be presented,
+with face-to-face discussion to clarify particular points.
+
+\item The {\bf Software Strategy Groups} will be asked to provide
+advice to the Project on the strategy that should be adopted over the
+following 3 years in order to satisfy (and continue to satisfy) the
+needs identified by users in the questionnaire, having regard for the
+numbers of users involved. They will also be asked to identify in more
+detail those software projects that should be carried out over the
+next year in order to implement the strategy.
+
+\begin{quote}
+\st{Note: SSG discussions are expected to complement the questionnaire
+results by being more forward-looking, examining future options in
+some detail and relating it to actual work required. At the same time,
+SSGs must recognise the same objectives as the Project -- those of
+providing the best possible computing service given the resources
+available by satisfying the needs expressed by typical users in the
+questionnaire. Where these two perspectives produce conflicting
+advice, the Project and the Starlink Panel will need to ensure
+balance.}
+\end{quote}
+
+\item The Project will also invite similar input from {\bf other
+interested groups or individuals} in the astronomical community.  While
+the SSGs are the bodies \qt{officially sponsored} to provide this
+information, this should not be considered their right
+alone. Additional input might be valuable, for instance, where
+particular specialised requirements cannot be well represented by the
+broader interests of the SSGs, or where an SSG has failed to
+adequately address the needs of typical users.
+
+\begin{quote}
+\st{Note: To some extent this is an insurance against SSGs which do
+not function well (their input may be compared with that from other
+sources and discounted if better advice is available) but it also
+provides an opportunity to broaden the range of options considered, in
+case anything promising has been overlooked.}
+\end{quote}
+
+\item The {\bf Starlink Project} will be responsible for producing a
+balanced and coherent overall \xref{strategy}{sgp42}{} for Starlink
+software work over the next 3 years, and a more detailed
+\planref{plan} for the first 12 months of that period. This will be
+based on the questionnaire results and all the input received
+subsequently, and will attempt to strike a balance between the advice
+received from different quarters. It will also include contributions
+from the Project on matters where it has expertise (for example,
+technical feasibility, new software and hardware products,
+\st{etc.}). Any software needs that have been overlooked (because they
+do not fall clearly within the domain of any particular group, for
+instance) will also be included at this stage. The strategy will be
+designed to meet all the constraints imposed by available resources
+(particularly manpower) and will identify timescales whenever
+possible.
+
+\begin{quote}
+\st{Note: Apart from adding its own expertise, the Project's main
+problems here are likely to be in resolving conflicting advice and in
+balancing users' expectations against the resources available. It is,
+of course, probable that a good deal of what is asked for will not be
+achievable, and the Project will aim to make it clear where goals
+cannot be met because of resource constraints.}
+\end{quote}
+
+\item The {\bf Starlink Panel} will discuss the proposed strategy, which
+will be presented along with all the supporting input. The Panel will be
+responsible for making any changes it feels are necessary and for
+approving it along with appropriate levels of manpower to carry it out.
+
+\item The final strategy will be \projectsref{\bf published} so that
+all users can see what software work is to be conducted in the next
+year and what the longer-term objectives are. They will also be able
+to see what work will not be carried out.
+
+\item Starlink's \apref{\bf Applications Programmers} (and
+software \staffref{staff} at \ralref{RAL}, when appropriate) will be
+responsible for carrying out the software work, under the management
+of the Starlink Project which will supervise the scheduling of work to
+ensure that timescales and quality standards are met.  The Project
+will also be responsible for ensuring that its programming staff
+maintain adequate contact with users and any experts needed to advise
+them during their work. This may include e-mail contact based on
+address information obtained via the questionnaire, and visits and
+technical meetings arranged to tackle particular problems, according
+to the requirements of each project.
+
+\begin{quote}
+\st{Note: In the interests of flexibility, Starlink will retain the
+ability to depart from its published strategy where unanticipated
+developments require it to do so. If such changes are significant they
+will be raised with the Starlink Panel who may wish to discuss them
+further.}
+\end{quote}
+
+\item The success of the work carried out in previous years will be
+reviewed annually at each stage of this procedure, and appropriate
+changes made.  If it appears necessary (as a result of the
+questionnaire, for example), the composition of the SSGs and the
+subjects they cover may be modified so that they continue to reflect
+user opinion.
+
+\end{enumerate}
+
+\section{\xlabel{being_effective}\label{sect:guidance}HOW CAN SSGS WORK MOST EFFECTIVELY?}
+
+The following points are intended to help new SSG members by outlining
+the approaches they can take to help the SSGs function most
+effectively:
+
+\begin{description}
+
+\item [{\bf Be Informal.}] One of the main purposes of the SSGs is to
+provide an opportunity for the Project to consult with expert software
+users and to exchange ideas and share experience and expertise. The
+idea is to reach a consensus about where we are going in the future
+and the steps needed to get there. This is likely to work best if SSG
+meetings have a \qt{workshop} atmosphere and a flexible agenda so that
+a wide range of possibilities can be explored before deciding on the
+options that need pursuing.
+
+\item[{\bf Be Well Informed.}] Starlink needs to stay well informed
+about all kinds of developments that may affect its plans. Having
+dozens of SSG members looking out for relevant information is a good
+way of doing this. If you see or hear of anything interesting, then be
+prepared to raise it at an SSG meeting. It may be common knowledge
+to some people, but it could be news to others. Many things are
+potentially interesting: new instrumentation, software, hardware,
+projects, staff, data, books, \st{etc.}, \st{etc.}
+
+\item[{\bf Look Ahead.}] A particular responsibility of the SSGs is to
+look ahead at what might be needed in future (a minimum of 3 years is
+suggested). We all know that computing needs and expectations change
+rapidly and that prediction is an uncertain business, but SSG members
+should be in a far better position to look ahead in many areas of
+astronomy than are members of the Project.  Anticipated increases or
+decreases in data processing requirements as a result of
+instrumentation developments are a good example, and of considerable
+practical importance.
+
+This is a newly-introduced responsibility, but a specific and
+important one. Software takes a long time to develop and major
+projects must be planned in plenty of time.
+
+\item[{\bf Be Responsible.}] When planning for the future, remember
+that Starlink already has a large amount of software in regular use by
+many astronomers and that they may not be happy if we simply abandon
+them to free up manpower for new projects, or ditch their software and
+start again! The problem we have to address is not simply identifying
+what we want in future, it also means planning how to get there from
+where we are now, and doing so within the resources available.
+
+\item[{\bf Be Specific.}] Be prepared to identify the results that are
+needed from a particular software project. Avoid vague terms like
+\qt{support package X} which often covers a multitude of unconvincing
+possibilities and will, quite rightly, be viewed with suspicion by
+others. Instead, be prepared to say what needs doing to it in
+sufficient detail for the cost in terms of manpower to be assessed.
+The value in terms of scientific productivity should also be
+addressed.
+
+\item[{\bf Be Realistic.}] There are usually many more things we would
+like to do to software than can realistically be achieved --
+over-optimism is a major cause of failure in software projects. This
+means we cannot always strive for perfection and may frequently have
+to accept compromise solutions.  Be prepared to identify the things
+that really count and examine what would happen if they didn't get
+done. Make sure you have a backup plan.
+
+\end{description}
+
+\section{\xlabel{admin_arrangements}\label{sect:admin}ADMINISTRATIVE ARRANGEMENTS}
+
+\subsection{Membership}
+
+SSGs will normally consist of around 8 to 10 people, including a Chair
+and a Secretary.
+
+Membership is open to all registered Starlink users (but also see
+below) and will normally be selected by the Chair, subject to
+agreement with the Project. Members should, as a rule, be drawn from a
+variety of \sitesref{Starlink sites} and be capable of representing a
+wide range of opinion and expertise.
+
+To encourage new users to participate, SSG membership will normally
+last for two years. However, contributions for a shorter period (even
+just a single meeting) are equally welcome. Particular individuals may
+be asked to stay on for a further year if this is needed to help stagger
+membership changes.
+
+As far as possible, members should be \qt{typical users} of the
+software under consideration. Where they possess special expertise (as
+many will), \st{it is expertise in research (\st{i.e.}\ astronomy) and
+the associated extensive and/or demanding use of software} which
+should be preferred over technical competence in its design or
+implementation.
+
+For this reason, \staffref{Starlink Project staff} and their
+contractors should not normally be members of SSGs, since they would
+otherwise displace more typical users. Users who are primarily
+providers of software may also be discouraged from SSG membership for
+the same reason. Such people should, however, be encouraged to attend
+SSG meetings as invited experts where their technical knowledge will
+assist the SSG in its discussions (normally this would be at the
+invitation of either the Chair or the Project).
+
+So as to involve as many people as possible, users may be discouraged
+from joining more than one SSG at the same time unless there are
+particularly good reasons for doing so.
+
+Chairs of SSGs are requested to inform the Project of all changes of
+membership as soon as possible so that records can be kept up to date.
+
+\subsection{Meetings}
+
+SSGs should meet once or twice per year -- those that do not may be
+disbanded.
+
+The Chair is responsible (with the Secretary's assistance) for
+convening meetings and selecting a suitable time and location for
+them. It is expected that they will normally be held at a convenient
+Starlink site. Meeting arrangements should be made by the Secretary
+working with the Chair. Care should be taken to ensure that travel to
+meetings is convenient for those attending, and that travel costs are
+no higher than necessary.
+
+When planning a meeting, the Chair or Secretary should contact the
+Project in the first instance to:
+\begin{itemize}
+\item Agree the meeting (this is simply a formality, as expenditure may be
+involved), and
+
+\item Ensure there is no clash with other Starlink events.
+\end{itemize}
+
+\subsection{Keeping Records}
+
+The SSGs will provide formal input to the Project in their annual
+software strategy proposal, and this should document the outcome of
+the discussions which take place at SSG meetings.  Because of this,
+and to keep meetings relatively informal, the Project does not wish to
+impose a further burden of keeping detailed minutes where this would
+lead to unnecessary effort and duplication.
+
+SSGs should discuss how they wish to keep records of their meetings
+and the possible audience these might have. If the dissemination of
+information to other Starlink users is felt to be important, then a
+suitable format (such as the World Wide Web) should be considered.
+
+\subsection{Expenses}
+
+In most cases (see below), Starlink will reimburse necessary expenses
+for SSG members and invited experts attending meetings. For this
+purpose, you should retain all relevant receipts and make a claim on a
+standard \ralref{RAL} visitors' claim form,\footnote{These forms are
+identified by a large \qt{V} at the top. Please do not use \qt{staff}
+claim forms (identified by an \qt{S}) or payment of your claim may be
+delayed.}  which should then be sent to:
+
+\begin{quote}
+Andrea Roberts,\\
+Starlink Project,\\
+Rutherford Appleton Laboratory,\\
+Chilton, DIDCOT,\\
+Oxon OX11 0QX
+\end{quote}
+
+Claim forms should be available at SSG meetings and many Starlink Site
+Managers also keep a stock. If all else fails, e-mail to any
+\staffref{Project member} at RAL will secure a supply.
+
+Different arrangements exist, however, for the following people:
+
+\begin{itemize}
+
+\item {\bf Employees of PPARC establishments,} whose expenses should
+normally be paid by their own establishment.
+
+\item {\bf Starlink contractors,} who should claim from their home
+institution (who will, in turn, invoice Starlink).
+
+\item {\bf \cclref{CCL} staff,} who should normally submit a claim
+against their own project's funds.
+
+\end{itemize}
+
+\section{\xlabel{annual_input}ANNUAL INPUT TO THE PROJECT}
+
+SSGs will normally be asked to provide written input to the Project
+once a year at the end of August. The following checklist outlines the
+items that should be included in this submission:
+
+\begin{enumerate}
+\item The name of your SSG and the date of your submission.
+
+\item A full list of SSG members, indicating if any have not
+contributed (for example, some people may have missed a vital
+meeting).
+
+\item A description of the main developments you expect to take place
+over the next 3 years in your subject area, and the impact you
+anticipate these having on data processing software requirements.
+
+\item A broad strategy, covering at least the next 3 years, that will
+allow your expected software requirements to be met, given anticipated
+resources. For instance, you should identify aspects of Starlink's
+software provision that will need to be developed, and may also need
+to identify activities that should be scaled down to compensate. In
+doing this, you may want to refer to Starlink's overall Software
+Strategy document (\xref{SGP/42}{sgp42}{}) and suggest any changes
+that you think should be made.
+
+\item A list, in priority order, of the most important specific
+objectives that need to be accomplished during the next year in order
+to implement your strategy. In doing this, you should not restrict
+yourself too narrowly to your SSG's subject area. Many developments
+({\em e.g.}\ in documentation and infrastructure software) are
+relevant to many SSGs, and the Project would appreciate knowing how
+your SSG would prioritise them.
+
+\item For each objective (above), provide justification in terms of
+the astronomical benefits expected and the number of anticipated
+users, and briefly outline the software work required (technical
+detail is not expected). Also say when the resulting products will be
+needed and for how long ({\em i.e.}\ estimate their useful
+lifetime). This information will greatly assist the Project in knowing
+how sophisticated a solution must be adopted.
+
+\end{enumerate}
+
+\newpage
+\appendix
+\section{\label{sect:comparison}COMPARISON WITH THE OLD SIGS}
+
+Although \st{Software Strategy Groups} have no particular connection
+with the earlier \st{Special Interest Groups} (SIGs), it is inevitable
+that comparisons will be made, especially as some individuals will
+have been members of both types of group.  There may even be a
+tendency for SSGs to evolve in similar ways. Great care should be
+taken to ensure that this does not happen, however, as future reviews
+of Starlink are unlikely to be sympathetic to the continuation of
+these user groups if the problems associated with the SIGs are seen to
+persist.  To help guard against this, the following points highlight
+some of the most important differences between the SSGs and the SIGs:
+
+\begin{enumerate}
+
+\item SSG members are not necessarily expected to be 
+\qt{typical} Starlink users (\st{i.e.}\ an unbiassed sample).  Being
+relatively expert, they are not likely (for instance) to suffer the
+same difficulties as novice users, for whom Starlink must also cater.
+They should, however, be in a good position to suggest possible
+solutions to these problems once they have been identified.  Because
+of this, SSGs are not intended to be the sole representatives of user
+opinion on software matters.
+
+Emphasis will instead be placed on other sources of information, such
+as the questionnaire and other surveys of individuals, when
+questions arise about the balance of opinion amongst users as a
+whole. A wide range of opinion and representation on the SSGs is, of
+course, still desirable, but its limitations and the impossibility of
+being both \qt{typical} and \qt{expert} are recognised.
+
+\item The SSGs will not manage any of Starlink's software development
+work and therefore do not have an allocation of manpower to call upon
+-- neither should they place actions on \staffref{Starlink staff} or
+\apref{contractors}.  While it should be possible to estimate the
+amount of work that might be achieved in any year, this will not be
+guaranteed and will depend on competing demands from many other
+quarters.
+
+This change recognises that very few SSG members will 
+have either the expertise or time required to manage software
+work in the detail required, and that this is better performed by the
+Project staff for whom it is a full-time occupation. The Project
+is also in a better position to adopt a unified approach across
+different subject areas, given that this may involve individual
+programmers working on a variety of projects.
+
+\item Starlink programmers will not be assigned permanently to subject
+areas, nor associated with particular specialist groups (SIGs in the
+past). Instead, they will constitute a \qt{pool} on which the Project
+will draw in order to carry out its highest priority objectives,
+assessed annually over all subject areas.  In the interests of
+flexibility, this will also give the Project the opportunity to switch
+manpower between different projects as required. The projects
+undertaken need not necessarily be restricted to those identified by
+the SSGs.
+
+As a result, the number of SSGs and programmers will not necessarily
+be equal. To further reinforce this change, Starlink programmers will
+not act as secretaries to SSG meetings. However, they will usually
+attend such meetings as seem relevant to their anticipated work
+schedule.
+
+\item The degree of computing expertise required of SSG members should
+not generally exceed that of an experienced astronomical
+researcher. Although SSG members are expected to be software
+\qt{experts}, this should generally be as a result of their
+particularly heavy or demanding \underline{use} of the software,
+rather than because of technical expertise in its design or
+implementation. Members may also be selected because of their
+knowledge of relevant astronomical developments, for example advances
+in instrumentation.
+
+This change recognises the fact that the SIGs had become dominated by
+expert software developers, making the resulting technical discussions
+inaccessible to more typical users of their software. SSGs must remain
+more open and accessible to participation by ordinary users if they
+are to be accepted and not mistrusted by them. For this reason, a more
+rapid turnover of SSG membership will also be promoted.
+
+It is recognised, of course, that technical expertise may be required
+at SSG meetings, and it is expected that Chairs will invite relevant
+experts to complement the SSG membership and provide any technical
+advice needed in the discussions. The Project will also contribute its
+expertise as required.
+
+\item SSGs are not expected to provide detailed technical advice
+(\st{e.g.}\ on algorithms), nor to evaluate or design software in
+technical detail. The main objectives should normally be to identify
+the projects required, the objectives they need to fulfil and the
+timescales on which they are required.
+
+Detailed technical work (which may include feasibility, evaluation and
+design studies) can be better performed outside formal meetings by
+Starlink programmers working with expert individuals (and other
+programmers where relevant). The SSGs have a role in helping to
+identify these experts.
+
+\end{enumerate}
+
+\end{document}

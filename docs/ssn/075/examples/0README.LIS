@@ -1,0 +1,37 @@
+                        EXAMPLE FILES FOR SSN/75
+                        ========================
+
+
+This directory contains the example files for SSN/75 'Writing Catalogue
+and Image Servers for GAIA and CURSA'.  The files included are as follows.
+
+
+0README.LIS      - this file.
+
+simpleserver.cgi - a simple server (written in Perl).
+secondserver.cgi - a second simple server (written in Perl).
+
+genfield.c       - C source code for program genfield which is used by
+                   simpleserver.cgi and secondserver.cgi.
+query.TXT        - CURSA/STL header for the query log written by
+                   secondserver.cgi.
+
+simpleconfig.cfg - a simple configuration file.
+
+simple.TAB       - An example table in the TST (tab-separated table)
+                   format.
+
+checkcfg         - a Perl script to check configuration files for errors.
+
+
+See SSN/75 for further details.
+
+
+Clive Davenhall,
+28/6/00.
+
+-----------------------------------------------------------------------------
+Clive Davenhall                                      Institute for Astronomy,
+e-mail (internet, JANET): acd @ roe.ac.uk        Royal Observatory Edinburgh,
+fax from within the UK:   0131-668-8416            Blackford Hill, Edinburgh,
+fax from overseas:     +44-131-668-8416                    EH9 3HJ, Scotland.
