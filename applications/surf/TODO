@@ -74,9 +74,11 @@ SURF TODO list
 
 -1. SURFLIB_CALC_OUTPUT_GRID returns error message saying >1000
    instead of 4096
+     [DONE]
 
 0. Does cmp_getvr work in NDF perl module?
    Got error about type from get_mortalspace.
+     [SEEMS TO WORK NOW - 26-JUN-2000]
 
 1. Sculog to support SCUBA_PREFIX
 
