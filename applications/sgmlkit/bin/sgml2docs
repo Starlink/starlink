@@ -66,6 +66,9 @@ BIBTEX=bibtex
 TARGETFORMAT=0			# html
 
 DEBUGGING=false
+run=
+runn=
+tempdest=tmp.stamp
 
 tidy-up ()
 {
@@ -86,7 +89,7 @@ trap tidy-up 0
 
 USAGE="Usage: $0 [--latex] [--html] [--htmlsingle]\
 	[--packagedir directory] [--tarball file.tar] [--jadeflags flags]\
-	[--help]\
+	[--help] [-n]\
 	sgml-file"
 
 PROGNAME=`basename $0`
@@ -102,6 +105,7 @@ while [ $# -gt 0 ]; do
 	--debug) DEBUGGING=true ;;
 	--help) echo $USAGE; exit 0;;
 	--version) echo $RCSID; exit 0;;
+	-n) run=echo; runn=: ; tempdest=/dev/stdout; ;;
 	-*) echo $USAGE; exit 1 ;;
 	*) SGMLSRC=$1 ;;
     esac
@@ -182,38 +186,38 @@ if [ $TARGETFORMAT -eq 0 ]; then
     # Generate HTML
     # generate $ROOT.imgeq.list and convert it to a set of bitmaps
     echo "Pre-processing..."
-    $JADE -t sgml -iOnly.web $JADEFLAGS \
+    $run $JADE -t sgml -iOnly.web $JADEFLAGS \
 	    -d $STYLESHEET/html/slpreprocess.dsl#preprocess.main \
 	    $DECL $SGMLSRC \
-	    > tmp.stamp
-    ROOT=`awk -F: '{print $1}' tmp.stamp`
+	    > $tempdest
+    test -f tmp.stamp && ROOT=`awk -F: '{print $1}' tmp.stamp`
 
     # If there are no maths-mode elements, there's no list file generated
     if [ -r "$ROOT.imgeq.list" ]; then
-	$IMGEQ $ROOT.imgeq.list
+	$run $IMGEQ $ROOT.imgeq.list
 
 	echo "LaTeXing maths..."
-	$LATEX $ROOT.imgeq.tex
+	$run $LATEX $ROOT.imgeq.tex
 
 	echo "dvi2bitmap..."
-	$DVI2BITMAP -m 2 -s 2 -Pt -t gif $ROOT.imgeq.dvi
+	$run $DVI2BITMAP -m 2 -s 2 -Pt -t gif $ROOT.imgeq.dvi
     fi
 
     # Generate backmatter.  Don't fail if no .aux file was generated
     if [ -r "$ROOT.htmlbib.aux" ]; then
 	echo "Backmatter..."
 	# BSTINPUTS set here; require the user to do any setting of BIBINPUTS
-	BSTINPUTS=$LIBDIR $BIBTEX $ROOT.htmlbib
-	sed -f $LIBDIR/postprocess-bbl.sed $ROOT.htmlbib.bbl > t.bbl
-	mv t.bbl $ROOT.htmlbib.bbl
+	BSTINPUTS=$LIBDIR $run $BIBTEX $ROOT.htmlbib
+	$runn sed -f $LIBDIR/postprocess-bbl.sed $ROOT.htmlbib.bbl > t.bbl
+	$runn mv t.bbl $ROOT.htmlbib.bbl
     fi
 
     # Generate the destination file
     echo "Generating output..."
-    $JADE -t sgml -iHTML.entities -iOnly.web $JADEFLAGS \
+    $run $JADE -t sgml -iHTML.entities -iOnly.web $JADEFLAGS \
 	    -d $STYLESHEET/html/sl.dsl#html \
 	    $DECL $SGMLSRC \
-	    > tmp.stamp
+	    > $tempdest
 
     # create the file named MANIFEST, removing duplicates (ie, some gifs)
     # from generated manifest file
@@ -222,22 +226,22 @@ if [ $TARGETFORMAT -eq 0 ]; then
 elif [ $TARGETFORMAT -eq 1 ]; then
     # Generate LaTeX
 
-    $JADE -t sgml -iLaTeX.entities -iOnly.paper $JADEFLAGS \
+    $run $JADE -t sgml -iLaTeX.entities -iOnly.paper $JADEFLAGS \
 	-d $STYLESHEET/latex/slback.dsl#back.main \
 	$DECL $SGMLSRC \
-	> tmp.stamp
-    ROOT=`awk -F: '{print $1}' tmp.stamp`
+	> $tempdest
+    test -f tmp.stamp && ROOT=`awk -F: '{print $1}' tmp.stamp`
 
     # If there was no backmatter, then don't invoke BibTeX
     if [ -r $ROOT.latexbib.aux ]; then
-	BSTINPUTS=$LIBDIR $BIBTEX $ROOT.latexbib
+	$run BSTINPUTS=$LIBDIR $BIBTEX $ROOT.latexbib
     fi
 
     # Generate the final file
-    $JADE -t latex -iLaTeX.entities -iOnly.paper $JADEFLAGS \
+    $run $JADE -t latex -iLaTeX.entities -iOnly.paper $JADEFLAGS \
 	    -d $STYLESHEET/latex/sl.dsl#latex \
 	    $DECL $SGMLSRC \
-	    > tmp.stamp
+	    > $tempdest
 
     test -r LaTeX.manifest && ln -s LaTeX.manifest MANIFEST
 
@@ -258,30 +262,31 @@ fi
 #
 # hlink and showme/findme get confused by Jade's way of generating elements.
 # To help out, run the files through sgmlnorm.
-if [ -r MANIFEST ]; then
+if [ -r MANIFEST -o -n "$run" ]; then
     #mv `awk 'NF==1 {print $1}' MANIFEST` $PACKAGEDIR
     for f in `awk 'NF==1 {print $1}' MANIFEST`; do
 	case $f in
 	*.html)
 	    #sed '/<[aA] *$/{:a;N;s/\n>/ >/;t;s/\n/ /;b a;}' $f >$PACKAGEDIR/$f
-	    sgmlnorm -d $f >$PACKAGEDIR/$f 2>>$PACKAGEDIR/sgmlnorm.errors
+	    $run sgmlnorm -d $DECL $f >$PACKAGEDIR/$f \
+		2>>$PACKAGEDIR/sgmlnorm.errors
 	    ;;
 	*)
-	    mv $f $PACKAGEDIR
+	    $run mv $f $PACKAGEDIR
 	    ;;
 	esac
     done
     (cd $SRCDIR; \
-	eval `awk "NF==2 {printf \"cp %s $WORKDIR/$PACKAGEDIR/%s\n\","'$2,$1}' $WORKDIR/MANIFEST`)
-    cp MANIFEST $PACKAGEDIR
+	eval `awk "NF==2 {printf \"$run cp %s $WORKDIR/$PACKAGEDIR/%s\n\","'$2,$1}' $WORKDIR/MANIFEST`)
+    $run cp MANIFEST $PACKAGEDIR
 else
     # It's not clear what to do here, since _something_ has clearly
     # gone wrong.  However, package up all (?) the generated files and
     # hope for the best.
     echo "$0: Can't find manifest -- something's gone wrong:  I'm tarring up everything and hoping for the best!"
-    mv * $PACKAGEDIR
+    $run mv * $PACKAGEDIR
 fi
-tar cf $TARNAME $PACKAGEDIR
+$run tar cf $TARNAME $PACKAGEDIR
 
 
 # No need to remove the workdir, as that'll be done through the exit trap
