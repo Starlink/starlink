@@ -18,6 +18,13 @@
 *     exempt from this process may be supplied.  For each domain 
 *     removed, a message may be logged through the CCDPACK logging 
 *     system.
+*
+*     Normally the Current and Base frames are not disturbed by 
+*     this routine.  However, if one of these is deleted, a
+*     new Current or Base frame will be assigned using normal AST
+*     rules.  The exception to this is that if a Current or Base
+*     frame is deleted, and JKEEP is a valid frame index, then JKEEP
+*     will become the new one.
 
 *  Arguments:
 *     FSET = INTEGER (Given)
@@ -38,8 +45,8 @@
 *        value have been removed, its numerical value will have changed.
 *
 *        If no frames are to be exempted, this should be set to a 
-*        non-positive integer.  In this case, it is allowed to supply
-*        a constant rather than a variable for this parameter.
+*        non-positive (e.g. AST__NOFRAME).  In this case, it is allowed
+*        to supply a constant rather than a variable for this parameter.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -83,6 +90,8 @@
       INTEGER FRM                ! AST pointer to frame under consideration
       INTEGER J                  ! Frame under consideration
       INTEGER NFRM               ! Number of frames in frameset
+      LOGICAL ISBAS              ! Is this the Base frame?
+      LOGICAL ISCUR              ! Is this the Current frame?
       
 *.
 
@@ -103,15 +112,36 @@
 *  Go through frameset removing frames.  It is necessary to work backwards
 *  so that removing a frame doesn't mess up the numbering.
       DO 1 J = NFRM, 1, -1
+
+*  See if we should remove this frame.
          IF ( J .NE. JKEEP ) THEN
             FRM = AST_GETFRAME( FSET, J, STATUS )
             IF ( AST_GETC( FRM, 'Domain', STATUS ) .EQ. DMN1 ) THEN
+
+*  Check if we are about to remove the Current or Base frame.
+               ISCUR = J .EQ. AST_GETI( FSET, 'Current', STATUS )
+               ISBAS = J .EQ. AST_GETI( FSET, 'Base', STATUS )
+
+*  Remove the frame.
                CALL AST_REMOVEFRAME( FSET, J, STATUS )
+
+*  Log to user if required.
                CALL MSG_SETC( 'DMN', DMN1 )
                IF ( REPORT )
      :            CALL CCD1_MSG( ' ', 
      :         '      Removing existing frame in domain ^DMN', STATUS )
+
+*  Keep track of the position of the retained frame.
                IF ( J .LT. JKEEP ) JKEEP = JKEEP - 1
+
+*  If we have a retained frame and we have just removed the Current or
+*  Base frame, set them to it.
+               IF ( JKEEP .GT. 0 ) THEN
+                  IF ( ISCUR ) CALL AST_SETI( FSET, 'Current', JKEEP,
+     :                                        STATUS )
+                  IF ( ISBAS ) CALL AST_SETI( FSET, 'Base', JKEEP,
+     :                                        STATUS )
+               END IF
             END IF
          END IF
  1    CONTINUE
