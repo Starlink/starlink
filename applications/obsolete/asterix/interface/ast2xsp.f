@@ -816,8 +816,8 @@ c 	CALL DAT_FIND(LOCSRT, 'TIME', LOCTIME, STATUS)
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE '/star/include/sae_par'          			! SAE constants
-      INCLUDE '/lsoft1/asterix/newast/kernel/lib/inc/ADI_PAR'					! ADI constants
+      INCLUDE 'SAE_PAR'          			! SAE constants
+      INCLUDE 'ADI_PAR'					! ADI constants
 
 *  Arguments Given:
       INTEGER			LUN, RMFID
@@ -998,7 +998,7 @@ c 	CALL DAT_FIND(LOCSRT, 'TIME', LOCTIME, STATUS)
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE '/star/include/sae_par'          			! SAE constants
+      INCLUDE 'SAE_PAR'          			! SAE constants
 
 *  Arguments Given:
       INTEGER			LUN, NE, NCH, NRMF, CI(*), EI(*)
@@ -1362,7 +1362,7 @@ c 	CALL DAT_FIND(LOCSRT, 'TIME', LOCTIME, STATUS)
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE '/star/include/sae_par'          			! SAE constants
+      INCLUDE 'SAE_PAR'          			! SAE constants
 
 *  Arguments Given:
       INTEGER			LUN			! See above
