@@ -30,7 +30,9 @@ dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, 
                           [ard ams ast cat fio ndf pda sae subpar], link)
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
-STAR_DECLARE_DEPENDENCIES(use, [autoastrom convert esp extractor kappa photom polpack])
+
+dnl    Need to add AUTOASTROM to this when available.
+STAR_DECLARE_DEPENDENCIES(use, [convert esp extractor kappa photom polpack])
 
 
 dnl    List the sun/ssn/... numbers which document this package and
