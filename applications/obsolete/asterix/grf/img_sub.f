@@ -5197,7 +5197,7 @@ c      REAL HWID
           ENDIF
 
 *  command mode cursor input
-        ELSEIFIF (I_MODE.EQ.1) THEN
+        ELSEIF (I_MODE.EQ.1) THEN
           CALL MSG_PRNT(' ')
           XCENT=I_X
           YCENT=I_Y
@@ -6147,37 +6147,6 @@ c      REAL HWID
 
         CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
         CALL NBS_GET_VALUE(ID,0,VAL__NBI,VAL,NB,STATUS)
-
-
-      ENDIF
-
-      END
-
-
-*+ IMG_NBGET0L
-      SUBROUTINE IMG_NBGET0L(NAME,VAL,STATUS)
-
-      IMPLICIT NONE
-
-*  Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'PRM_PAR'
-*    Global variables :
-      INCLUDE 'IMG_CMN'
-*  Import :
-      CHARACTER*(*) NAME
-*  Export :
-      REAL VAL
-*  Status :
-      INTEGER STATUS
-*  Local constants :
-*  Local variables :
-      INTEGER ID,NB
-*-
-      IF (STATUS.EQ.SAI__OK) THEN
-
-        CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
-        CALL NBS_GET_VALUE(ID,0,VAL__NBL,VAL,NB,STATUS)
 
 
       ENDIF
