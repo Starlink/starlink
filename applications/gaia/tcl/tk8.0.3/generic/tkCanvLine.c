@@ -5,6 +5,7 @@
  *
  * Copyright (c) 1991-1994 The Regents of the University of California.
  * Copyright (c) 1994-1995 Sun Microsystems, Inc.
+ * Copyright (c) 1999 Central Laboratory of the Research Councils.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -1610,6 +1611,12 @@ ArrowheadPostscript(interp, canvas, linePtr, arrowPtr)
 					 * describing arrowhead polygon. */
 {
     Tk_CanvasPsPath(interp, canvas, arrowPtr, PTS_IN_ARROW);
+    /* Modified by P.W. Draper to add colour to arrowheads with
+       stipple */
+
+    if (Tk_CanvasPsColor(interp, canvas, linePtr->fg) != TCL_OK) {
+	return TCL_ERROR;
+    }
     if (linePtr->fillStipple != None) {
 	Tcl_AppendResult(interp, "clip ", (char *) NULL);
 	if (Tk_CanvasPsStipple(interp, canvas, linePtr->fillStipple)
