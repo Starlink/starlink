@@ -3,6 +3,78 @@ interface PLT2D
 # PARAMETERS FOR ICL VERSION
 #---------------------------
 
+parameter FFJ
+  type 'image'
+  vpath 'internal'
+  default NONE
+endparameter
+
+parameter FFH
+  type 'image'
+  vpath 'internal'
+  default NONE
+endparameter
+
+parameter FFK
+  type 'image'
+  vpath 'internal'
+  default NONE
+endparameter
+
+parameter FFNBL
+  type 'image'
+  vpath 'internal'
+  default NONE
+endparameter
+
+parameter FFLP
+  type 'image'
+  vpath 'internal'
+  default NONE
+endparameter
+
+parameter FFNBM
+  type 'image'
+  vpath 'internal'
+  default NONE
+endparameter
+
+parameter STD_SEE
+  type '_char'
+  vpath 'internal'
+  default 'N'
+endparameter
+       
+parameter STD_SKY
+  type '_char'
+  vpath 'internal'
+  default 'M'
+endparameter
+       
+parameter STD_SELECT
+  type '_char'
+  vpath 'internal'
+  default 'A'
+endparameter
+       
+parameter STD_NOSEQ
+  type '_real'
+  vpath 'internal'
+  default 3
+endparameter
+      
+parameter STD_RED
+  type '_char'
+  vpath 'internal'
+  default 'Y'
+endparameter
+       
+parameter STD_PHOWHAT
+  type '_char'
+  vpath 'internal'
+  default 'MOS'
+endparameter
+       
 parameter HOST
   type '_char'
   vpath 'internal'
@@ -15,10 +87,16 @@ parameter IDIR_PREFIX
   default 'IDIR:I'
 endparameter
        
+parameter BADVAL
+  type '_real'
+  vpath 'internal'
+  default -1.0E-20
+endparameter
+      
 parameter QUADMAG
   type '_real'
   vpath 'internal'
-  default 1.0
+  default 0.0
 endparameter
       
 parameter DISP_AP1
@@ -90,7 +168,7 @@ endparameter
 parameter DISP_MAG
   type '_real'
   vpath 'internal'
-  default 2.0
+  default 0.0
 endparameter
       
 parameter DISP_NS
@@ -194,64 +272,22 @@ parameter MAGNIFIER
   default 'OUT'
 endparameter
 
-parameter FITS_AMST
-  type '_integer'
+parameter UTSTART
+  type '_real'
   vpath 'internal'
-  default 25
+  default -999.99
 endparameter
 
-parameter FITS_AMEND
-  type '_integer'
+parameter UTEND
+  type '_real'
   vpath 'internal'
-  default 26
+  default -999.99
 endparameter
 
-parameter FITS_EXP
-  type '_integer'
+parameter MODE
+  type '_char'
   vpath 'internal'
-  default 8
-endparameter
-
-parameter FITS_NEXP
-  type '_integer'
-  vpath 'internal'
-  default 6
-endparameter
-
-parameter FITS_FILTER
-  type '_integer'
-  vpath 'internal'
-  default 36
-endparameter
-
-parameter FITS_OBJECT
-  type '_integer'
-  vpath 'internal'
-  default 2
-endparameter
-
-parameter FITS_RAOFF
-  type '_integer'
-  vpath 'internal'
-  default 21
-endparameter
-
-parameter FITS_DECOFF
-  type '_integer'
-  vpath 'internal'
-  default 22
-endparameter
-
-parameter FITS_PIXSIZE
-  type '_integer'
-  vpath 'internal'
-  default 40
-endparameter
-
-parameter FITS_MAGNIFY
-  type '_integer'
-  vpath 'internal'
-  default 39
+  default 'UNKNOWN'
 endparameter
 
 parameter WORKNUM
@@ -305,13 +341,13 @@ endparameter
 parameter LAST_LUT
   type '_char'
   vpath 'internal'
-  default 'LIRCAMDIR:GREY'
+  default '$LIRCAMDIR/col19'
 endparameter
 
 parameter NAME_IMAGE
   type '_char'
   vpath 'internal'
-  default 'LIRCAMDIR:LOGO'
+  default '$LIRCAMDIR/logo'
 endparameter
 
 parameter LAST_PLOT
@@ -439,37 +475,37 @@ endparameter
 
 parameter IMAGE_NAME
   type 'image'
-  default LIRCAMDIR:LOGO
+  default $LIRCAMDIR/logo
   vpath 'internal'
 endparameter
 
 parameter CONTOUR_IMAGE
   type 'image'
-  default LIRCAMDIR:LOGO
+  default $LIRCAMDIR/logo
   vpath 'internal'
 endparameter
 
 parameter CUT_IMAGE
   type 'image'
-  default LIRCAMDIR:LOGO
+  default $LIRCAMDIR/logo
   vpath 'internal'
 endparameter
 
 parameter CURSOR_IMAGE
   type 'image'
-  default LIRCAMDIR:LOGO
+  default $LIRCAMDIR/logo
   vpath 'internal'
 endparameter
 
 parameter CT_NAME
   type 'colourtable'
-  default LIRCAMDIR:HEAT
+  default $LIRCAMDIR/heat
   vpath 'internal'
 endparameter
 
 parameter SCRATCH_NAME
   type 'image'
-  default ADAM_USER:PLT2D_SCRATCH
+  default $ADAM_USER/plt2d_scratch
   vpath 'internal'
 endparameter
 
@@ -758,7 +794,7 @@ endparameter
 
 parameter MAGNIFICATION
   type '_real'
-  default 1.0
+  default 0.0
   vpath 'internal'
 endparameter
 
@@ -1595,7 +1631,7 @@ endparameter
 
 parameter CUT_MAGNIF
   type '_real'
-  default 6.0
+  default 0.0
   vpath 'internal'
 endparameter
 
@@ -1625,7 +1661,7 @@ endparameter
 
 parameter CUT_OUTFF
   type '_char'
-  default 'PLT2DCUT.DAT'
+  default 'plt2dcut.dat'
   vpath 'internal'
 endparameter
 
@@ -1647,7 +1683,7 @@ endparameter
 
 parameter CONTOUR_MAGNIF
   type '_real'
-  default 8.0
+  default 0.0
   vpath 'internal'
 endparameter
 
@@ -1703,7 +1739,7 @@ endparameter
 
 parameter CONTOUR_TITLE
   type '_char'
-  default '2D IRCAM Image'
+  default 'IRCAM'
   vpath 'internal'
 endparameter
 
@@ -1733,13 +1769,13 @@ endparameter
 
 parameter CONTOUR_TICKINT
   type '_real'
-  default 10.0
+  default 50.0
   vpath 'internal'
 endparameter
 
 parameter CONTOUR_YTICKIN
   type '_real'
-  default 10.0
+  default 50.0
   vpath 'internal'
 endparameter
 
@@ -2054,14 +2090,14 @@ parameter POL_POSITIONING
 endparameter
 
 parameter INPICQP
-  type 'structure'
-  default LIRCAMDIR:P
+  type 'image'
+  default $LIRCAMDIR/p
   vpath 'internal'
 endparameter
 
 parameter INPICUT
-  type 'structure'
-  default LIRCAMDIR:T
+  type 'image'
+  default $LIRCAMDIR/t
   vpath 'internal'
 endparameter
 
@@ -2103,7 +2139,7 @@ endparameter
 
 parameter POLMAG
   type '_real'
-  default 6.0
+  default 0.0
   vpath 'internal'
 endparameter
 
