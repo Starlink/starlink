@@ -76,7 +76,7 @@ unsigned long ImageData::colorn_ = 0;     // reserved color for saturated pixels
 
 // C routine used to get image statistics
 extern "C" {
-    iqe(float *pfm, float *pwm, int mx, int my, float *parm, float *sdev);
+    int iqe(float *pfm, float *pwm, int mx, int my, float *parm, float *sdev);
 }
 
 
