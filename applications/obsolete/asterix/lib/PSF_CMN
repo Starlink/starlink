@@ -54,7 +54,7 @@
       INTEGER                   EM_MODE(PSF_NMAX)
       INTEGER                   EM_NBIN(PSF_NMAX)
       INTEGER                   EM_CBPTR(PSF_NMAX)
-      INTEGER                   EM_OK(PSF_NMAX)
+      LOGICAL                   EM_OK(PSF_NMAX)
 
 *    Library data
       CHARACTER*80              L_NAME(PSF_LMAX)  	! Library names
