@@ -25,12 +25,8 @@ package Scb;
 
 #  Notes:
 #     This module reports errors using the routine &main::error 
-#     (this is to make sensible handling of exceptions easier).
-#     Thus such a routine "error", must have been declared in the 
-#     main program.  If no special exception handling is required,
-#     this can be done with a definition like:
-#
-#        sub error { die @_ }
+#     (this is to make sensible handling of exceptions easier),
+#     if it exists.  Otherwise such errors will be reported using die().
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
@@ -78,7 +74,7 @@ use vars qw/ $incdir $srcdir $bindir $scb_tmpdir $scbindex_tmpdir $indexdir
 
 #  Map error handler routine to that from the main:: namespace.
 
-sub error { &main::error (@_) }
+sub error { defined (&main::error) ? &main::error (@_) : die (@_) }
 
 #  Includes.
 
