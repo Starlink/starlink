@@ -1,6 +1,6 @@
       SUBROUTINE POL1_VECPL( NVEC, X, Y, VECMAG, VECORN, ANGFAC,
      :                       ANGROT, DSCALE, AHSIZE, JUST, NEGATE,
-     :                       STATUS )
+     :                       REFANG, STATUS )
 *+
 *  Name:
 *     POL1_VECPL
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_VECPL( NVEC, X, Y, VECMAG, VECORN, ANGFAC,
-*                      ANGROT, DSCALE, AHSIZE, JUST, NEGATE, STATUS )
+*     CALL POL1_VECPL( NVEC, X, Y, VECMAG, VECORN, ANGFAC, ANGROT, DSCALE, 
+*                      AHSIZE, JUST, NEGATE, REFANG, STATUS )
 
 *  Description:
 *     The supplied vectors are plotted within the current PGPLOT window.
@@ -29,15 +29,14 @@
 *        The data values defining the vector magnitudes.
 *     VECORN( NVEC ) = REAL (Given)
 *        The data values defining the vector orientations.  Measured
-*        from the reference direction given by ANGROT. They are
+*        from the reference direction given by REFANG. They are
 *        anti-clockwise unless NEGATE is .TRUE. The units are defined 
 *        by argument ANGFAC.
 *     ANGFAC = REAL (Given)
 *        The factor which converts values from VECORN into units of
 *        radians.
 *     ANGROT = REAL (Given)
-*        The ACW angle from the X axis to the reference directions,
-*        in radians.
+*        An ACW angle to add on to each orientation, in radians.
 *     DSCALE = REAL (Given)
 *        A factor which converts data values in VECMAG into
 *        corresponding vector lengths in centimetres.
@@ -54,7 +53,11 @@
 *        corresponding pixel.  'END' causes vectors to be drawn ending
 *        at the corresponding pixel.
 *     NEGATE = LOGICAL (Given)
-*        Are the supplied angles clockwise?
+*        If .TRUE., then the VECORN angles are negated before adding on any 
+*        value specified by parameter ANGROT. [FALSE]
+*     REFANG = REAL (Given)
+*        The ACW angle from the X axis to the reference directions,
+*        in radians.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -71,6 +74,8 @@
 *     6-AUG-1998 (DSB):
 *        PGPLOT viewport reduced slightly in order to avoid vectors
 *        over-writing the border.
+*     12-MAY-1999 (DSB):
+*        Added argument REFANG.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,6 +103,7 @@
       REAL AHSIZE
       CHARACTER * ( * ) JUST
       LOGICAL NEGATE
+      REAL REFANG
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -181,9 +187,9 @@
 *  VECORN values are measured from the reference direction. So subtract 
 *  90 degrees to make zero equivalent to the Y axis.
             IF( NEGATE ) THEN
-               VECANG = -ANGFAC * VECORN( I ) + ANGROT - PIBY2
+               VECANG = -ANGFAC * VECORN( I ) + ANGROT + REFANG - PIBY2
             ELSE
-               VECANG = ANGFAC * VECORN( I ) + ANGROT - PIBY2
+               VECANG = ANGFAC * VECORN( I ) + ANGROT +REFANG - PIBY2
             END IF
 
 *  Plot the vector.      

@@ -44,15 +44,12 @@
 
 *  ADAM Parameters:
 *     ANGROT = _REAL (Read)
-*        Specifies the orientation of the reference direction. The angles
-*        specified by parameter COLANG are assumed to be angles measured 
-*        anti-clockwise from this reference direction. The value of ANGROT 
-*        should be the anti-clockwise angle from the positive X axis to the 
-*        reference direction, in degrees. For catalogues created by
-*        POLPACK V2.0 or later, the run time default value is derived from
-*        the POLANAL Frame in the WCS information stored in the catalogue
-*        (or zero if the catalogue does not contain a POLANAL Frame). 
-*        For earlier catalogues, the run time default is zero. []
+*        A rotation angle in degrees to be added to each vector orientation 
+*        before plotting the vectors (see parameters COLANG and NEGATE). It 
+*        should be the range 0-360. Note, this parameter is named ANGROT
+*        for historical reasons, and its use should not be confused with
+*        the ANGROT extension item (see POLIMP) which gives the orientation 
+*        of the reference direction. [0.0]
 *     ARROW = LITERAL (Read)
 *        Vectors are drawn as arrows, with the size of the arrow head
 *        specified by this parameter. Simple lines can be drawn by setting
@@ -87,7 +84,7 @@
 *        vector. The values are considered to be in units of degrees unless 
 *        the UNITS attribute of the column has the value "Radians" (case 
 *        insensitive).  The angles are assumed to be measured anti-clockwise 
-*        from the reference direction given by the ANGROT parameter. A list 
+*        from the reference direction specified in the catalogue. A list 
 *        of available column names is displayed if a non-existent column name 
 *        is given. See also parameter NEGATE. [ANG]
 *     COLMAG = LITERAL (Read)
@@ -225,9 +222,8 @@
 *     NEGATE = _LOGICAL (Read)
 *        If a TRUE value is supplied, then the angles giving the
 *        orientation of the polarization (i.e. the values in the column
-*        specified by parameter COLANG) are assumed to be measured clockwise
-*        (rather than anti-clockwise) from the reference direction given
-*        by parameter ANGROT. [FALSE]
+*        specified by parameter COLANG) are negated before adding on any 
+*        value specified by parameter ANGROT. [FALSE]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to use 
 *        for the contours and annotated axes. 
@@ -288,20 +284,19 @@
 *        across the plot instead of tick marks around the edge; the border,
 *        grid and vectors are drawn in green, blue and red respectively,
 *        and slightly thicker lines are used to draw the border.
-*     polplot poltab ra dec noclear angrot=23.4 frame=eq(B1950)
-*        Produces a vector map in which the reference direction for the 
-*        vectors (as defined by the value zero in the column ANG) is at 
-*        an angle of 23.4 degrees in the displayed map, measured 
-*        anti-clockwise from the positive X axis. The position of each vector
-*        is specified by columns "ra" and "dec". The annotated axes give
-*        equatorial (RA/DEC) coordinates referred to the equinox of B1950.
-*        If the vector map is displayed over an existing DATA picture, then
-*        the vector map will be aligned on the sky with the previously 
-*        displayed data if possible (i.e. the FrameSet associated with the 
-*        existing picture in the AGI database contains a sky coordinate
-*        Frame). If this is not possible, then the vector map will be
-*        aligned in pixel or grid coordinates. A message is displayed
-*        indicating the domain in which alignment took place.
+*     polplot poltab ra dec noclear angrot=90 frame=eq(B1950)
+*        Produces a vector map in which each vector is rotated by 90
+*	 degrees from the orientation specified in the "poltab"
+*	 catalogue. The position of each vector is specified by columns
+*	 "ra" and "dec". The annotated axes give equatorial (RA/DEC)
+*	 coordinates referred to the equinox of B1950. If the vector map
+*	 is displayed over an existing DATA picture, then the vector map
+*	 will be aligned on the sky with the previously displayed data if
+*	 possible (i.e. the FrameSet associated with the existing picture
+*	 in the AGI database contains a sky coordinate Frame). If this is
+*	 not possible, then the vector map will be aligned in pixel or
+*	 grid coordinates. A message is displayed indicating the domain
+*	 in which alignment took place.
 *     polplot poltab arrow=0.01 just=start nokey
 *        Produces a vector map in which each vector is represented by an 
 *        arrow, starting at the position of the corresponding pixel.  No key
@@ -363,9 +358,6 @@
 *        parameter.
 *     22-MAR-1999 (DSB):
 *        Get AXES *before* MARGIN.
-*     6-APR-1999 (DSB):
-*        Change the default for ANGROT from 0.0 to the value of ANGROT in
-*        the supplied catalogue.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -481,6 +473,7 @@
       REAL KEYOFF                ! Offset to top of key 
       REAL KEYPOS( 2 )           ! Key position
       REAL MARGIN( 4 )           ! Margins round DATA picture
+      REAL REFANG                ! ACW angle from +ve X to ref direction
       REAL TYPDAT                ! A typical vector data value
       REAL VECWID                ! Line thickness for vectors
       REAL VSCALE                ! Vector scale, viz. data units per cm
@@ -851,27 +844,32 @@
 *  Obtain the vector-plot characteristics.
 *  =======================================
 
+*  First find the ACW angle from the +ve X axis to the reference direction.
 *  See if the input catalogue was created by V2.0 or later of POLPACK.
       CALL POL1_GTVRC( CI, '2.0', V2PLUS, STATUS )
 
-*  If the catalogue was created before V2.0 of POLPACK, use zero as the
-*  run-time defaulot for ANGROT.
+*  If the catalogue was created before V2.0 of POLPACK, the reference
+*  direction will be the +ve X axis.
       IF( .NOT. V2PLUS ) THEN
-         ANGROT = 0.0
+         REFANG = 0.0
 
-*  Otherwise, for V2 catalogues (or later), get the default ANGROT value
-*  from the POLANAL Frame in the catalogues WCS FrameSet...
+*  Otherwise, for V2 catalogues (or later), get the angle from the POLANAL 
+*  Frame in the catalogues WCS FrameSet...
       ELSE
-         ANGROT = 0.0
-         CALL POL1_GTANG( NDF__NOID, CI, IWCS, ANGROT, STATUS )
+         REFANG = 0.0
+         CALL POL1_GTANG( NDF__NOID, CI, IWCS, REFANG, STATUS )
       END IF
 
-*  Set the dynamic default for ANGROT.
-      CALL PAR_DEF0R( 'ANGROT', ANGROT, STATUS )
+*  Convert to radians.
+      REFANG = REFANG * DTOR
 
-*  Get the new ANGROT value. This is the anti-clockwise angle (in degrees) 
-*  from the positive X axis to the reference direction. 
-      CALL PAR_GET0R( 'ANGROT', ANGROT, STATUS )
+*  Get the angle (in degrees) which is to be added to the values stored
+*  in the supplied catalogue. Do not set a dynamic default. Constrain to 
+*  0 to 360 degrees.
+      CALL PAR_GDR0R( 'ANGROT', -1.0, 0.0, 360.0, .FALSE., ANGROT,
+     :                STATUS )
+
+*  Convert to radians.
       ANGROT = ANGROT * DTOR
 
 *  See if the angles are clockwise (i.e. if they are to be negated before 
@@ -934,7 +932,7 @@
 *  Plot the vectors.
       CALL POL1_VECPL( NIN, %VAL( IPX2 ), %VAL( IPY2 ), %VAL( IPMAG ),
      :                 %VAL( IPANG ), ANGFAC, ANGROT, DSCALE, AHSIZE, 
-     :                 JUST, NEGATE, STATUS )
+     :                 JUST, NEGATE, REFANG, STATUS )
 
 *  Re-instate the previous PGPLOT attributes.
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTRS, STATUS )

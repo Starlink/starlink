@@ -29,8 +29,8 @@ interface POLPLOT
    parameter      ANGROT         
       type        '_REAL'
       prompt      'Orientation of reference direction'
-      vpath       'DYNAMIC,DEFAULT'
-      ppath       'DYNAMIC,DEFAULT'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
       helpkey     '*'
       default     0.0
    endparameter
