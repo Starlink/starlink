@@ -91,6 +91,11 @@
 #        "inactive" if the getpair method will return a pair which 
 #        satisfies this criterion.
 #
+#     viewport = list
+#        The value of the viewport variable is a list of two integers, 
+#        being the width and height in pixels of the window in which 
+#        each previewd NDF is displayed.
+#
 #-
 
 #  Inheritance.
@@ -178,10 +183,10 @@
             frame $interior.choosearea
          }
 
-#  Calculate the dimensions available for viewing the NDFs themselves.
-         set viewx [ expr [ lindex $viewport 0 ] / 2 ]
+#  Set the dimensions of the windows to hold NDFs.
+         set viewx [ lindex $viewport 0 ]
          set viewy [ lindex $viewport 1 ]
-       
+
 #  Most elements of the choosearea have an A side and a B side; construct
 #  these in a loop.
          set tabpos(A) w
@@ -243,11 +248,6 @@
 #  Pack the components into the hull.
          pack $itk_component(choosearea) -side top
 
-#  Save the initial dimensions of the window.
-         # update idletasks
-         # set lastxwin [ winfo width $itk_interior ]
-         # set lastywin [ winfo height $itk_interior ]
-
 #  Generate frames which will contain the windows to be displayed for each
 #  of the NDFs.
          for { set i 0 } { $i < $nndf } { incr i } {
@@ -261,7 +261,7 @@
          eval itk_initialize $args
 
 #  Set a binding to handle window resize events.
-         # bind $itk_interior <Configure> [ code $this winch ]
+         bind $itk_interior <Configure> [ code $this winch ]
       }
 
 
@@ -394,9 +394,11 @@
             container plot$index $itk_component(choosearea) \
                       [ expr "{$index}" == "{1}" ]
 
-#  Create the GWM widget.
-            set width [ expr [ lindex $viewport 0 ] / 2 ]
+#  Get the dimensions of the windows in which NDFs are to be displayed.
+            set width [ lindex $viewport 0 ]
             set height [ lindex $viewport 1 ]
+
+#  Create the GWM widget.
             if { $isndf } {
                set gwmname [ winfo id $itk_component(choosearea) ]_$index
                itk_component add plot$index:display {
@@ -590,9 +592,6 @@
 #-----------------------------------------------------------------------
       private method refreshplot { index } {
 #-----------------------------------------------------------------------
-#  This probably isn't going to work until the GWM bug is fixed.  However,
-#  if it did, it would be how to implement resizing the NDFs after a 
-#  window resize event.
          if { $index == "all" } {
             set pattern {plot[0-9AB]*}
          } else {
@@ -675,20 +674,20 @@
 #-----------------------------------------------------------------------
 #  This method is called if the toplevel window receives a configure
 #  event, which will happen, for instance, if it is resized.
-#  If there is now a discrepancy bewteen the size of the container and
-#  the size of the toplevel widget itself, adjust the size of the viewport
-#  so that they match.
-      #  set vx [ lindex $viewport 0 ]
-      #  set vy [ lindex $viewport 1 ]
-      #  #  Body here refers to the frame directly inside the toplevel.
-      #  incr vx [ expr [ winfo width $itk_interior ] - \
-      #                 [ winfo reqwidth [ $itk_component(body) ] ]
-      #  incr vy [ expr [ winfo height $itk_interior ] - \
-      #                 [ winfo reqheight $itk_component(body) ] ]
-      #  configure -viewport [ list $vx $vy ]
-      #  configure -geometry [ winfo geometry $itk_interior ]
+         update idletasks
+         set xinc [ expr ( [ winfo width $itk_interior ] - \
+                           [ winfo reqwidth $itk_interior ] ) / 2 ]
+         set yinc [ expr [ winfo height $itk_interior ] - \
+                         [ winfo reqheight $itk_interior ] ]
+         if { $xinc != 0 || $yinc != 0 } {
+            set oldbind [ bind $itk_interior <Configure> ]
+            bind $itk_interior ""
+            configure -viewport [ list [ expr [ lindex $viewport 0 ] + $xinc ] \
+                                       [ expr [ lindex $viewport 1 ] + $yinc ] ]
+            update idletasks
+            bind $itk_interior <Configure> $oldbind
+         }
       }
-
 
 
 #-----------------------------------------------------------------------
@@ -751,20 +750,18 @@
 ########################################################################
 
 #-----------------------------------------------------------------------
-      public variable viewport { 400 200 } {
+      public variable viewport { 200 200 } {
 #-----------------------------------------------------------------------
 #  If the viewport size is changed, then all the windows will need to
 #  be redrawn at the right size.
          if { $viewport != $lastvp } {
-            set viewx [ expr [ lindex $viewport 0 ] / 2 ]
-            set viewy [ lindex $viewport 1 ]
             foreach slot { A B } {
                $itk_component(view$slot) configure \
-                   -width $viewx -height $viewy
+                   -width [ lindex $viewport 0 ] -height [ lindex $viewport 1 ]
             }
             for { set i 0 } { $i < $nndf } { incr i } {
                $itk_component(image$i) configure \
-                   -width $viewx -height $viewy
+                   -width [ lindex $viewport 0 ] -height [ lindex $viewport 1 ]
             }
             if { $state == "active" } {
                refreshplot all
@@ -802,8 +799,6 @@
       private variable highlight       ;# Array by ndf index of highlight state
       private variable inview          ;# Array by slot of viewed NDFs
       private variable lastvp { 0 0 }  ;# Last value of viewport variable
-      private variable lastxwin 0
-      private variable lastywin 0
       private variable nndf            ;# Number of NDFs under chooser control
       private variable ndflist         ;# List of ndf objects
       private variable percentilecontrol;# Perc control widgets for each NDF
