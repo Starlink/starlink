@@ -1,0 +1,103 @@
+*+  MESSYS_PAR - MESSYS constants
+*
+*    Authors :
+*     B.D.Kelly (REVAD::BDK)
+*    History :
+*     13.04.1988: original (REVAD::BDK)
+*     09.05.1988: add MSPNAMLEN and extra comments (REVAD::BDK)
+*     23.07.1991: Add MESSYS_QT (ROE::BMC)
+*     25.02.1992: Increase MESSYS_MXTRANS and MXPATH from 16  (RLVAD::AJC)
+*     21.01.1993: Add MESSYS__NETNAME  (RLVAD::AJC)
+*      8.03.1993: Add MESSYS__VAL_LEN  (RLVAD::AJC)
+*-
+
+*
+*   Timeout parameters
+*
+      INTEGER MESSYS__TIMEOUTID   ! id to enable cancellng of timer
+      PARAMETER ( MESSYS__TIMEOUTID = 10001 )
+
+      INTEGER MESSYS__INIT_WAIT_TIME ! timeout for getting a path
+      PARAMETER ( MESSYS__INIT_WAIT_TIME = 120000 ) ! in millisec
+
+      INTEGER MESSYS__INFINITE    ! 'infinite' timeout value
+      PARAMETER ( MESSYS__INFINITE = - 1 )
+
+*
+*   Sizes for MESSYS variables
+*
+      INTEGER MESSYS__MXTRANS     ! maximum number of active 
+      PARAMETER ( MESSYS__MXTRANS = 32 ) !transactions
+
+      INTEGER MESSYS__MXPATH      ! maximum number of open paths
+      PARAMETER ( MESSYS__MXPATH = 32 )
+
+      INTEGER MESSYS__MXMACH      ! maximum number of machines
+      PARAMETER ( MESSYS__MXMACH = 16 )
+
+      INTEGER MESSYS__MNAME       ! maximum size of machine name
+      PARAMETER ( MESSYS__MNAME = 32 )
+
+      INTEGER MESSYS__TNAME       ! maximum size of task name
+      PARAMETER ( MESSYS__TNAME = 32 )
+
+      INTEGER MESSYS__MSPNAMLEN   ! maximum size of an MSP name
+      PARAMETER ( MESSYS__MSPNAMLEN = 20 )
+
+*
+*   The maximum length of a message value (see also DDMSG) should be
+*   used in preference to MSG_VAL_LEN now.
+*
+      INTEGER MESSYS__VAL_LEN     ! maximum size of a message 'value'
+      PARAMETER ( MESSYS__VAL_LEN = 444 )
+*
+*   The valid values of MSG_FUNCTION
+*
+      INTEGER MESSYS__MESSAGE     ! function code for a normal message
+      PARAMETER ( MESSYS__MESSAGE = 0 )
+
+      INTEGER MESSYS__INIT        ! a 'please initialise' message
+      PARAMETER ( MESSYS__INIT = 1 )
+
+      INTEGER MESSYS__ACK_INIT    ! an 'acknowledging initialise' message
+      PARAMETER ( MESSYS__ACK_INIT = 2 )
+
+      INTEGER MESSYS__DE_INIT     ! a 'de-initialise' message
+      PARAMETER ( MESSYS__DE_INIT = 3 )
+
+*
+*   Null values
+*
+      INTEGER MESSYS__NULL_Q      ! nonexistent queue number
+      PARAMETER ( MESSYS__NULL_Q = 0 )
+
+      INTEGER MESSYS__NULL_M      ! nonexistent machine number
+      PARAMETER ( MESSYS__NULL_M = 0 )
+
+      INTEGER MESSYS__NULL_T      ! nenexistent transaction number
+      PARAMETER ( MESSYS__NULL_T = 0 )
+
+      INTEGER MESSYS__NULL_P      ! null path state or number
+      PARAMETER ( MESSYS__NULL_P = 0 )
+
+*
+*   Possible 'states' of a PATH. Note MESSYS__NULL_P doubles as one of 
+*   these.
+*
+      INTEGER MESSYS__PART_P      ! partially installed path state
+      PARAMETER ( MESSYS__PART_P = 1 )
+
+      INTEGER MESSYS__FULL_P      ! fully installed path state
+      PARAMETER ( MESSYS__FULL_P = 2 )
+
+*
+*   Constants associated with networking
+*
+      INTEGER MESSYS__MAXNET      ! Maximum number of network types
+      PARAMETER ( MESSYS__MAXNET = 4 )
+
+      INTEGER MESSYS__SEPLEN      ! Length of network separators
+      PARAMETER ( MESSYS__SEPLEN = 2 )
+
+      CHARACTER*(7) MESSYS__NETNAME  ! Root of Network process names
+      PARAMETER ( MESSYS__NETNAME = 'ADAMNET' )

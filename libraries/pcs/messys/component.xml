@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="messys">
+  <version>3.0</version>
+  <path>libraries/pcs/messys</path>
+  <description>Message system</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies>
+    <build> sae messgen</build>
+    <use> mers ams</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B D Kelly (REVAD::BDK)</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield (RLVAD::AJC)</name>
+    </person>
+  </developers>
+  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Part of the PCS system</p></notes>
+</component>

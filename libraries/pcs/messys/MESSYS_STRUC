@@ -1,0 +1,45 @@
+*+   MESSYS_STRUC - definition for message structure
+*    Authors :
+*     John Cooke (REVS::JAC) 22Mar84
+*    History :
+*     03May84:  msg_len increased to 136 to allow 80-byte value fields
+*               (was 60 before) (REVS::JAC)
+*     14Nov84:  msg_len increased to 256 to allow 200-byte value fields
+*               (was 80 before) (REVS::JAC)
+*     04.03.1988:  declare MSG_NAME_LEN (REVAD::BDK)
+*     01.05.1990:  msg_len increased to 500 to allow 444-byte value field
+*                  512 limit on total message imposed by MSP
+*     17.06.1994:  unix version (BDK)
+*    endhistory
+
+*    data structure for external form of message :
+
+      INTEGER MSG_(MSG_LEN / 4)
+      CHARACTER MSG*(MSG_LEN)
+      INTEGER MSG_PRIV                  ! privilege mask of originating 
+                                        ! task
+      INTEGER MSG_NUMBER                ! message number 
+                                        ! (given by task issuing the 
+                                        ! message)
+      INTEGER MSG_STATUS                ! message status
+      INTEGER MSG_FUNCTION              ! used only by message system
+      INTEGER MSG_CONTEXT               ! message context code 
+                                        ! (get, set, obey, cancel)
+      CHARACTER MSG_NAME*(MSG_NAME_LEN) ! name field 
+                                        ! (mostly used for context 
+                                        ! qualifier)
+      INTEGER MSG_LENGTH                ! length of the non-path part 
+                                        ! of the message
+      CHARACTER MSG_VAL*(MSG_VAL_LEN)   ! buffer to hold value part of 
+                                        ! message
+
+      EQUIVALENCE ( MSG_(1), MSG )   !  integer and character
+      EQUIVALENCE ( MSG_(1), MSG_PRIV )
+      EQUIVALENCE ( MSG_(2), MSG_NUMBER )
+      EQUIVALENCE ( MSG_(3), MSG_STATUS )
+      EQUIVALENCE ( MSG_(4), MSG_FUNCTION )
+      EQUIVALENCE ( MSG_(5), MSG_CONTEXT )
+      EQUIVALENCE ( MSG_(6), MSG_NAME )
+      EQUIVALENCE ( MSG_(14), MSG_LENGTH )
+      EQUIVALENCE ( MSG_(15), MSG_VAL )  !  start depends on name length
+*-

@@ -1,0 +1,27 @@
+*+   MESSYS_LEN - constants for message structure
+*    Authors :
+*     John Cooke (REVS::JAC) 22Mar84
+*    History :
+*     03May84:  msg_len increased to 136 to allow 80-byte value fields
+*               (was 60 before) (REVS::JAC)
+*     14Nov84:  msg_len increased to 256 to allow 200-byte value fields
+*               (was 80 before) (REVS::JAC)
+*     04.03.1988:  declare MSG_NAME_LEN (REVAD::BDK)
+*     01.05.1990:  msg_len increased to 500 to allow 444-byte value field
+*                  512 limit on total message imposed by MSP
+*     17.06.1994:  unix version (BDK)
+*     17.07.1994:  Rename from MESSYS_DD (AJC)
+*    endhistory
+
+*    Global constants :
+      INTEGER MSG_LEN   !  length of message in bytes (from DDPATH)
+      PARAMETER ( MSG_LEN = 500 )   !  must be divisible by 4
+*       !!! N.B. if this is changed MESDEFNS must be changed also
+      INTEGER MSG_FIX_LEN   !  length of non-value part of non-path part
+      PARAMETER ( MSG_FIX_LEN = 56 )
+      INTEGER MSG_VAL_LEN   !  length of value part of message
+      PARAMETER ( MSG_VAL_LEN = MSG_LEN - MSG_FIX_LEN )
+      INTEGER MSG_NAME_LEN
+      PARAMETER ( MSG_NAME_LEN = 32 )
+
+*-
