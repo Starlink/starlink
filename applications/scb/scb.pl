@@ -18,10 +18,11 @@
 #
 #     It operates in two modes:
 #        text:  prints the source file raw.
-#        HTML:  prints the source code using CGI format with HTML markup.
+#        HTML:  prints the source code with HTML markup.
 #
-#     It chooses between the two modes according to whether it appears to
-#     have been called as a CGI program or not.
+#     Normally, it will choose between the two modes according to whether 
+#     it appears to have been called as a CGI program or not.  This can
+#     be overridden to produce HTML output from the command line however.
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
