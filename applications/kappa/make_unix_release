@@ -99,6 +99,9 @@
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
       end
 
+#  Make the ndg source tar file.
+      ${NDG_SYS}/dev/bin/make_source.csh
+
 #  Tar up all the release files and then remove them.
       tar -cvh -f ${TEMPDIR}/kappa.tar `grp unix_total` 
       rm `grp unix_total` 

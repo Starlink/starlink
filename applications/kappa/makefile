@@ -433,7 +433,7 @@ PKG_VERS = 0.14
 
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
                aif_sub.tar fts_sub.tar ira_sub.tar kapgen_sub.tar \
-               ndg_sub.tar kappa_sub.tar kapsub_sub.tar kapview_sub.tar \
+               ndg_source.tar kappa_sub.tar kapsub_sub.tar kapview_sub.tar \
                ndfpack_sub.tar $(PKG_NAME)_ifls.tar $(PKG_NAME)_iraf.tar \
                $(PKG_NAME)_data_alpha_OSF1.tar \
                $(PKG_NAME)_data_ix86_Linux.tar \
@@ -473,8 +473,11 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  it, but which are not required by users of it.
 
 PRIVATE_INCLUDES = c1_com me_com ira_par ira_com ira_err ctm_com \
-                   ctm_par fts_par hlpcmd sft_com ndg_const ndg_err \
-                   kpg_ast kpg_par grf.h grecom.inc grerr
+                   ctm_par fts_par hlpcmd sft_com kpg_ast kpg_par \
+                   grf.h grecom.inc grerr $(I_NDG)
+
+I_NDG = ndg_com ndg_const ndg_err
+
 
 #  List of external include files. These are files which are required
 #  in order to build the package but form part of other, externally
@@ -496,7 +499,7 @@ EXTERNAL_INCLUDES = SAE_PAR AGI_ERR CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
 #  just a list of all the Fortran source files (excluding BLOCK DATA
 #  routines and the main routine, which are treated separately).
 
-F_ROUTINES = $(AIF_F_ROUTINES) $(FITS_F_ROUTINES) $(NDG_F_ROUTINES) \
+F_ROUTINES = $(AIF_F_ROUTINES) $(FITS_F_ROUTINES) $(F_NDG) \
              $(IRA_F_ROUTINES) $(KAPGEN_F_ROUTINES) \
              $(KAPPA_F_ROUTINES) $(KAPSUB_F_ROUTINES) \
              $(KAPVIEW_F_ROUTINES) $(MEM_F_ROUTINES) \
@@ -533,12 +536,12 @@ ira_find.f ira_getco.f ira_geteq.f ira_gtco1.f ira_gtscs.f ira_init.f \
 ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f ira_seteq.f ira_trans.f \
 ira_write.f ira_read.f
 
-NDG_F_ROUTINES = \
-ndg1_chscn.f ndg1_hsplt.f ndg1_pshde.f ndg_assoc.f ndg_ndfpr.f \
+F_NDG = ndg1_chscn.f ndg1_hsplt.f ndg1_pshde.f ndg_assoc.f ndg_ndfpr.f \
 ndg1_expan.f ndg1_lasto.f ndg1_pshdf.f ndg_creat.f ndg1_fparx.f \
-ndg1_appen.f ndg_crexp.f ndg1_hcut.f ndg_delet.f ndg1_hfind.f \
-ndg1_ndfch.f ndg_annul.f ndg_ndfas.f ndg1_pshdb.f ndg_asexp.f \
-ndg_ndfcr.f ndg1_sdfex.f ndg1_ndfdl.f
+ndg1_appen.f ndg_crexp.f ndg1_hcut.f \
+ndg_delet.f ndg1_hfind.f ndg1_ndfch.f ndg_annul.f \
+ndg_ndfas.f ndg1_pshdb.f ndg_asexp.f ndg_ndfcr.f \
+ndg1_sdfex.f ndg1_ndfdl.f
 
 KAPGEN_F_ROUTINES = \
 bad2db.f bad2dd.f bad2di.f bad2dr.f bad2dub.f \
@@ -793,7 +796,7 @@ IRA_BLOCK_DATA = ira1_init.f
 #  C routines required for building the libraries.  This is just a
 #  list of all the C source files.
 
-C_ROUTINES = $(FITS_C_ROUTINES) $(KAPGEN_C_ROUTINES) $(NDG_C_ROUTINES) \
+C_ROUTINES = $(FITS_C_ROUTINES) $(KAPGEN_C_ROUTINES) $(C_NDG) \
              $(GRF_C_ROUTINES)
 
 FITS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
@@ -801,7 +804,7 @@ FITS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
 KAPGEN_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c \
                     kpg1_tkast.c
 
-NDG_C_ROUTINES = ndg1_wild.c 
+C_NDG = ndg1_wild.c 
 
 GRF_C_ROUTINES = grf_kappa.c
 
@@ -967,7 +970,7 @@ BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MEMTASKS) \
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) C1_COM ME_COM CTM_COM CTM_PAR \
                 FTS_PAR HLPCMD SFT_COM IRA_COM IRA_PAR \
-                IRA_ERR NDG_ERR NDG_CONST KPG_PAR KPG_AST
+                IRA_ERR NDG_ERR NDG_CONST NDG_COM KPG_PAR KPG_AST
 
 #
 #  Rules to set up links to locate each of the above include files.
@@ -1006,6 +1009,7 @@ NDF_ERR:     $(STAR_INC)/ndf_err;     $(LINK) $? $@
 NDF_PAR:     $(STAR_INC)/ndf_par;     $(LINK) $? $@
 NDG_CONST:   ndg_const;               $(LINK) $? $@
 NDG_ERR:     ndg_err;                 $(LINK) $? $@
+NDG_COM:     ndg_com;                 $(LINK) $? $@
 NUM_CMN:     $(STAR_INC)/num_cmn;     $(LINK) $? $@
 NUM_DEC:     $(STAR_INC)/num_dec;     $(LINK) $? $@
 NUM_DEC_B:   $(STAR_INC)/num_dec_B;   $(LINK) $? $@
@@ -1064,8 +1068,8 @@ $(IRA_F_ROUTINES) $(IRA_BLOCK_DATA) :
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(NDG_F_ROUTINES) $(NDG_C_ROUTINES) :
-	$(TAR_OUT) ndg_sub.tar $@
+$(F_NDG) $(I_NDG) $(C_NDG) :
+	$(TAR_OUT) ndg_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
@@ -1130,7 +1134,7 @@ $(IRAF_DEMO) :
 #  way as the kappa libraries).
 
 
-OBJECT_FILES = $(AIF_OBJECT_FILES) $(FITS_OBJECT_FILES) $(NDG_OBJECT_FILES) \
+OBJECT_FILES = $(AIF_OBJECT_FILES) $(FITS_OBJECT_FILES) $(O_NDG) \
                $(IRA_OBJECT_FILES) $(KAPGEN_OBJECT_FILES) \
                $(KAPPA_OBJECT_FILES) $(KAPSUB_OBJECT_FILES) \
                $(KAPVIEW_OBJECT_FILES) $(NDFPACK_OBJECT_FILES)
@@ -1141,7 +1145,7 @@ FITS_OBJECT_FILES = $(FITS_F_ROUTINES:.f=.o) $(FITS_C_ROUTINES:.c=.o)
 
 IRA_OBJECT_FILES = $(IRA_F_ROUTINES:.f=.o) $(IRA_BLOCK_DATA:.f=.o) 
 
-NDG_OBJECT_FILES = $(NDG_F_ROUTINES:.f=.o) $(NDG_C_ROUTINES:.c=.o)
+O_NDG = $(F_NDG:.f=.o) $(C_NDG:.c=.o)
 
 KAPGEN_OBJECT_FILES = $(KAPGEN_F_ROUTINES:.f=.o) $(KAPGEN_BLOCK_DATA:.f=.o) \
                       $(KAPGEN_C_ROUTINES:.c=.o)
@@ -1182,7 +1186,7 @@ libira.a: $(IRA_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 #
-libndg.a: $(NDG_OBJECT_FILES)
+libndg.a: $(O_NDG)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 #
@@ -1338,7 +1342,7 @@ $(INSTALL_DIRS):
 
 archive: $(PKG_NAME)_source.tar aif_sub.tar fts_sub.tar \
          kapgen_sub.tar kappa_sub.tar kapsub_sub.tar kapview_sub.tar \
-         ndfpack_sub.tar $(PKG_NAME)_ifls.tar ira_sub.tar ndg_sub.tar \
+         ndfpack_sub.tar $(PKG_NAME)_ifls.tar ira_sub.tar ndg_source.tar \
          $(PKG_NAME)_data_alpha_OSF1.tar $(PKG_NAME)_data_sun4_Solaris.tar
 #
 	@ echo "   Build of the $(PACK_NAME) tar files is complete."
@@ -2348,8 +2352,8 @@ aif_sub.tar:
 fts_sub.tar:
 	$(TAR_IN) fts_sub.tar $(FITS_F_ROUTINES) $(FITS_C_ROUTINES)
 
-ndg_sub.tar:
-	$(TAR_IN) ndg_sub.tar $(NDG_F_ROUTINES) $(NDG_C_ROUTINES)
+ndg_source.tar:
+	$(TAR_IN) ndg_sub.tar $(F_NDG) $(C_NDG) $(I_NDG)
 
 ira_sub.tar:
 	$(TAR_IN) ira_sub.tar $(IRA_F_ROUTINES) $(IRA_BLOCK_DATA)
