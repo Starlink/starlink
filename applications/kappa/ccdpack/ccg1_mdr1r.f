@@ -89,6 +89,7 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
 
 *  Arguments Given:
+      LOGICAL CALCMV
       INTEGER NPIX
       INTEGER NLINES
       INTEGER MINPIX

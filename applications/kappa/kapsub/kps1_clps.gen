@@ -296,7 +296,7 @@
 *  memory requirements for the covariance array becomes huge for large 
 *  images. "Median with estimated variances" is treated as a new IMETH
 *  value, 300.
-         IF( IMETH .EQ. 3 .AND. NLIN .LT. 300 ) IMETH = 300
+         IF( IMETH .EQ. 3 .AND. NLIN .GT. 300 ) IMETH = 300
 
 *  Allocate memory
          CALL PSX_CALLOC( NLIN, '_DOUBLE', IPPP, STATUS )

@@ -98,6 +98,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
+      LOGICAL CALCMV
       INTEGER NENT
       REAL ORDDAT( NENT )
       REAL WEIGHT( NENT )
@@ -117,6 +118,7 @@
       PARAMETER ( PIBY2 = 1.57079632679489661923132 )
 
 *  Local Variables:
+      DOUBLE PRECISION TRGWT     ! The target value of weights
       DOUBLE PRECISION TOTWT     ! The total value of weights
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Loop variable
@@ -161,7 +163,7 @@
  1       CONTINUE
 
 * Search for median weight.
-         TOTWT = TOTWT * 0.5D0
+         TRGWT = TOTWT * 0.5D0
          WTSUM = 0.0D0
          DO 2 I = 1, NENT
             IF ( I .EQ. 1 ) THEN
@@ -171,7 +173,7 @@
      :                 *  0.5D0
             END IF
             WTSUM = WTSUM + WTINC
-            IF ( WTSUM .GT. TOTWT ) GO TO 66
+            IF ( WTSUM .GT. TRGWT ) GO TO 66
  2       CONTINUE
  66      I = MIN( I, NENT )
 
@@ -188,7 +190,7 @@
          USED( I - 1 ) = .TRUE.
 
 *  Set weights factors
-         W1 = ( WTSUM - TOTWT ) / MAX( WTINC, 1.0D-20 )
+         W1 = ( WTSUM - TRGWT ) / MAX( WTINC, 1.0D-20 )
          W2 = 1.0D0 - W1
 
 * Interpolate between data values
@@ -213,10 +215,10 @@
 
 *  Sum variances and twice covariances ( off diagonal elements ).
                   IF( K .EQ. J ) THEN
-                     VSUM = VSUM + IW * JW * COVAR( K + J * ( J - 1 )/ 2 )
+                     VSUM = VSUM + IW * JW * COVAR( K + J*( J - 1 )/2 )
                   ELSE
                      VSUM = VSUM +
-     :                      2.0D0 * IW * JW * COVAR( K + J * ( J - 1 )/ 2 )
+     :                      2.0D0 * IW * JW * COVAR( K + J*( J - 1 )/2 )
                   END IF
  4             CONTINUE
  3          CONTINUE
