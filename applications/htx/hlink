@@ -254,7 +254,7 @@
 
 #  Add an "htx.log" file to each document directory and record details of the
 #  current linking operation.
-      username=`(logname || who am i | awk '{print $1}') > 2>/dev/null`
+      username=`(logname || who am i | awk '{print $1}') 2>/dev/null`
       for dir in ${linkdirs}; do
          log="${dir}/htx.log"
          echo >"${log}" \
