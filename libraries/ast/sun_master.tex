@@ -23,7 +23,7 @@ f+
 \newcommand{\stardocnumber}    {210.8}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {5th December 2000}
+\newcommand{\stardocdate}      {12th December 2000}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -17136,7 +17136,18 @@ WCSNAME keyword. When creating a FrameSet from FITS headers, the values of
 the WCSNAME keywords are now used as the Domain names for the corresponding 
 Frames in the returned FrameSet. When writing a FrameSet to a FITS header
 the Domain names of each Frame are stored in WCSNAME keywords in the
-header. The Domain name is used to create a Title for the Frame.
+header. 
+
+\item The FitsChan class now attempts to assigns a Title to each Frame in
+a FrameSet read using a foreign encoding. The Title is based on the Domain
+name of the Frame. If the Frame has no Domain name, the default Title
+supplied by the Frame class is retained.
+
+\item The FitsChan class uses the comments associated with CTYPE
+keywords as axis labels when reading a foreign encoding. This behaviour 
+has been modified so that the default labels provided by the Frame class
+are retained (instead of using the CTYPE comments) if any of the CTYPE 
+comments are identical.
 
 \item A new ``interpolation'' scheme identified by the symbolic constant
 AST\_\_BLOCKAVE has been added to the AST\_RESAMPLE$<$X$>$ set of
