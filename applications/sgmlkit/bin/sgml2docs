@@ -249,8 +249,9 @@ if [ $TARGETFORMAT -eq 0 ]; then
 
     # If there are no maths-mode elements, there's no list file generated
     if [ -r "$ROOT.imgeq.list" ]; then
-	# find dvi2bitmap's default format
-	imgfmt=`$DVI2BITMAP -Qt | awk '{print $1}'`
+	# Find dvi2bitmap's default format
+	# Default to gif if the dvi2bitmap version doesn't have the -Qt option
+	imgfmt=`$DVI2BITMAP -Qt 2>/dev/null || echo gif | awk '{print $1}'`
 	$run $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list
 
 	echo "LaTeXing maths..."
