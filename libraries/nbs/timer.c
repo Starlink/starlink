@@ -24,7 +24,7 @@ struct tms
 
 /* see Apple Developer Connection Tech Notes
   http://developer.apple.com/technotes/tn2002/tn2071.html */
-#if defined(unix) || defined(__APPLE__) || defined(__MACH__)
+#if defined(unix) || ( defined(__APPLE__) && defined(__MACH__) )
 
 #include <sys/types.h>
 #include <sys/times.h>

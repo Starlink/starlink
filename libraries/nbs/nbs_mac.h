@@ -120,7 +120,7 @@ else {\
 
 /* see Apple Developer Connection Tech Notes
   http://developer.apple.com/technotes/tn2002/tn2071.html */
-#if defined(unix) || defined(__APPLE__) || defined(__MACH__)
+#if defined(unix) || ( defined(__APPLE__) && defined(__MACH__) )
 
 #define _chmove(num,sptr,dptr)\
 {\
@@ -150,7 +150,7 @@ if (!_ADAWI(1,(unsigned short *)(dptr))) (*(dptr))+=0x10000
 
 /* see Apple Developer Connection Tech Notes
   http://developer.apple.com/technotes/tn2002/tn2071.html */
-#if defined(unix) || defined(__APPLE__) || defined(__MACH__)
+#if defined(unix) || ( defined(__APPLE__) && defined(__MACH__) )
 
 #define _add_interlocked(dptr) (*(dptr))++
 #endif
