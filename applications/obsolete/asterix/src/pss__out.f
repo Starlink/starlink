@@ -46,7 +46,7 @@
           CALL ADI_FCLOSE( SID, STATUS )
         END IF
       ELSE
-        CALL USI_ANNUL( 'OUT', STATUS )
+        CALL ADI_FCLOSE( SID, STATUS )
       END IF
 
       END
