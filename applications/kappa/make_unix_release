@@ -34,6 +34,7 @@
 #  Store the name of the release directory, and go there.
       set REL_DIR = ${TEMPDIR}/kappa_${SYSTEM}
       cd ${REL_DIR}
+      echo "Moved to $PWD"
 
 #  See if the hypertext documents are to be re-created.
 #      echo -n "Re-create kappa.htx? (y/n): "
@@ -47,14 +48,17 @@
 
 #  Expand any generic source files.
       foreach file (`grp generic_sources`)
+         echo "Expanding generic source file $file"
          generic -t n -s ${file}
       end
 
 #  Rename unsigned data type files.
       foreach n (*W.f)
+         echo "Renaming expanded file file $n"
          mv $n `basename $n W.f`uw.f
       end
       foreach n (*B.f)
+         echo "Renaming expanded file file $n"
          mv $n `basename $n B.f`ub.f
       end
 
@@ -74,13 +78,16 @@
       endif
 
 #  Copy the hypertext docs to the release directory.
+      echo "Copying the hypertext docs to the release directory."
       cp ${KAPPA_DEV}/../sun95.htx_tar ${REL_DIR}
       cp ${KAPPA_DEV}/../sun221.htx_tar ${REL_DIR}
 
 #  Ensure all files are accessable.
+      echo "Setting protection for all files"
       chmod 777 *
 
 #  Edit in the current package version number into any required source files.
+      echo "Editing the current package version number into source files"
       set vers = `grep "PKG_VERS = " makefile`
       if ( "$vers" == "" ) then
          echo "Can't get package version number from makefile."
@@ -93,6 +100,7 @@
       end
 
 #  Generate the ifl files, and the icl and csh start-up scripts. 
+      echo "Generating ifl files, etc form the ifd file"
       ifd2star kappa
 
 #  Do any necessary post processing of the generated files to overcome 
@@ -111,6 +119,7 @@
       mv temp kappa.csh
 
 #  Generate the IRAF files.
+      echo "Generating iraf files"
       ifd2iraf kappa
 
 #  Generate the IRAF documentation.
@@ -180,6 +189,7 @@ FOO5
 #  Create each of the tar files. First do the system-independant ones
 #  listed in group TAR_FILES_A...
       foreach file (`grp tar_files_a`)
+         echo "Creating ${file}.tar"
          tar -cvh -f ${TEMPDIR}/${file}.tar `grp ${file}`
          rm -f `grp ${file}`
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
@@ -196,6 +206,7 @@ FOO5
             setenv news "$news $new"
          end
 
+         echo "Creating ${file}.tar"
          tar -cvh -f ${TEMPDIR}/${file}.tar $news
          rm -f $news
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
@@ -206,12 +217,14 @@ FOO5
       ${LPG_SYS}/dev/bin/make_source.csh
 
 #  Tar up all the release files and then remove them.
+      echo "Creating kappa.tar"
       tar -cvh -f ${TEMPDIR}/kappa.tar `grp unix_total` 
       rm `grp unix_total` 
       mv ${TEMPDIR}/kappa.tar ${REL_DIR}
       rm -rf doc kappa.ifd
 
 #  Compress it.
+      echo "Compressing kappa.tar"
       compress kappa.tar
 
 # Remove any spare .f files created by the expansion of generic source
