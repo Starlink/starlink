@@ -26,7 +26,12 @@ stdout, then generates an entity which contains the entire LaTeX file.
     (make entity system-id: (string-append (index-file-name) ".tex")
 	  (make empty-command name: "documentclass"
 		parameters: %latex-document-class%)
-	  (make fi data: %latex-document-preamble%)
+	  (make fi data: %latex-document-general-preamble%)
+	  (if onepass-latex
+	      (make fi data: %latex-onepass-toc%)
+	      (make fi data: %latex-ordinary-toc%))
+	  (make fi data: %latex-sst-preamble%)
+	  (make fi data: %latex-end-preamble%)
 	  (make empty-command name: "usepackage"
 		parameters: '("graphics"))
 	  (make environment name: "document"
@@ -60,9 +65,24 @@ interface with the `style file' defined there.
 	 (coverimage (getdocinfo 'coverimage))
 	 (date (format-date (car rel)))
 	 (docref (getdocnumber))
+	 (mantype (getdocinfo 'manualtype))
+	 (swvers (getdocinfo 'softwareversion))
 	 (abstract (getdocbody 'abstract)))
   (make environment name: "FrontMatter"
-    (make command name: "setTitle" (process-node-list title))
+    (make command name: "setTitle"
+	  (process-node-list title))
+    (if (or mantype swvers)
+	(make command name: "setSubTitle"
+	      (if mantype
+		  (process-node-list mantype)
+		  (empty-sosofo))
+	      (if (and mantype swvers)
+		  (literal " -- ")
+		  (empty-sosofo))
+	      (if swvers
+		  (process-node-list swvers)
+		  (empty-sosofo)))
+	(empty-sosofo))
     (make command name: "setDate"  (literal date))
     (make command name: "setAuthorlist"
 	  (with-mode in-docinfo (process-node-list authorlist)))
@@ -72,13 +92,16 @@ interface with the `style file' defined there.
 	(empty-sosofo))
     (if docref
 	(make sequence
-	  (make empty-command name: "setDocCode" parameters: (list docref))
+	  (make empty-command name: "setDocCode"
+		parameters: `(,(string-append docref "." (caddr rel))))
 	  (make empty-command name: "setDocRef"
-		parameters: (list (getdocnumber (current-node) #t))))
+		parameters: `(,(getdocnumber (current-node) #t))))
 	(empty-sosofo))
     (if copy
 	(make command name: "setCopyright" (process-node-list copy))
-	(empty-sosofo))
+	(if %copyright-string%
+	    (make command name: "setCopyright" (literal %copyright-string%))
+	    (empty-sosofo)))
     (if coverimage
 	(make command name: "setCoverimage" (process-node-list coverimage))
 	(empty-sosofo))
@@ -108,6 +131,12 @@ interface with the `style file' defined there.
 						  (cadddr rel)
 						  "\\\\"))
 		    (empty-sosofo))
+		(if swvers
+		    (make sequence
+		      (make fi data: "Software version&")
+		      (process-node-list swvers)
+		      (make fi data: "\\\\"))
+		    (empty-sosofo))
 		))
     (make empty-command name: "TableOfContents"))))
 
@@ -126,3 +155,17 @@ interface with the `style file' defined there.
   (element otherauthors
     (make environment name: "fmtOtherAuthors"
 	  (process-children-trim))))
+
+(element manualtype
+   (case (case-fold-down (attribute-string (normalize "type")))
+      (("users") (literal "User's Guide"))
+      (("programmers") (literal "Programmer's Guide"))
+      (("programmers.c") (literal "Programmer's Guide (C version)"))
+      (("programmers.fortran") (literal "Programmer's Guide (Fortran version)"))
+      (("other") (process-children))
+      (else (error "manualtype: unrecognised manualtype"))))
+
+(element softwareversion
+   (make sequence
+     (literal "Software Version ")
+     (process-children)))
