@@ -317,11 +317,17 @@
 
 #  Perform packing of main elements (need to do this now to get into
 #  correct places.
-         if { $havetop }    { 
-            pack [CCDPathOf $Frames(top)]         -side top    -fill x 
+         if { $havetop && $haveleft } { 
+            pack [CCDPathOf $Frames(top.left)]     -side top    -fill x 
          }
-         if { $havebottom } { 
-            pack [CCDPathOf $Frames(bottom)]      -side bottom -fill x 
+         if { $havetop && $haveright } {
+            pack [CCDPathOf $Frames(top.right)]    -side top    -fill x
+         }
+         if { $havebottom && $haveleft } { 
+            pack [CCDPathOf $Frames(bottom.left)]  -side bottom -fill x
+         }
+         if { $havebottom && $haveright } {
+            pack [CCDPathOf $Frames(bottom.right)] -side bottom -fill x 
          }
          if { $haveleft }   { 
             pack [CCDPathOf $Scrolls(left)]       -side left   -fill y 
