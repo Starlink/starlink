@@ -19,7 +19,7 @@
 
 #  Invocation:
 #     The script is normally invoked as part of a makefile command to
-#     create a monolith in Satrlink standard makefiles, thus:
+#     create a monolith in Starlink standard makefiles, thus:
 #
 #         $(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
 #             -L$(STAR_LIB) `./atools_link_adam`
@@ -43,8 +43,7 @@
 #     {note_any_bugs_here}
 
 #-
-
-      echo `kaplibs_link_adam -nogks` `shl_link_adam` \
+      echo `kaplibs_link_adam -nogks` `ast_link_adam` `shl_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
