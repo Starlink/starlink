@@ -124,11 +124,15 @@ o The File Menu:
 
   - Read Current: Closes the current colour table and loads the colour
   table currently being used to display the image at the top left corner
-  of the interface. This will usually be a representation of the colour
-  table which has just been closed, but may not be exactly the same
-  depending on how many colours are avilable and the interpolation method
-  being used. This command allows you to check how faithfully your
-  requested colour table is being honoured by the image display.
+  of the interface, using a single entry for each pen. This will usually 
+  be a representation of the colour table which has just been closed, but 
+  will include the effects of the colour table interpolation used when
+  the image was displayed. For instance, if your colour table has 240
+  entries but the graphics device only has 64 pens (as is often the case 
+  on an 8 bit X display), then the new colour table will have 64 entries
+  set to the colours of the 64 pens actually used in the image display.
+  This command allows you to check how faithfully your requested colour 
+  table is being honoured by the image display.
 
   - New: Closes the current colour table and initializes a new greyscale
   colour table with a specified number of entries.
