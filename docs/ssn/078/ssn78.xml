@@ -6545,6 +6545,13 @@ BUILT_SOURCES = $(include_MESSAGES)
             it should cause a tree-wide <code>./configure</code> to
             fail.  This macro helps with this situation.</p>
 
+          <p>If this macro is triggered, by the given condition
+            being true, then <code>./configure</code>,
+            <code>make</code> and <code>make install</code>
+            <em>will all succeed</em> without compiling anything, with
+            the latter installing a correctly formed manifest file
+            which does not list any installed files.</p>
+
           <p>The <code>test</code> in the first argument is a shell
             expression which should evaluate to true (ie, return a
             zero status) if the build should be suppressed.  In the
@@ -6567,8 +6574,11 @@ STAR_SUPPRESS_BUILD_IF([test $JADE = NOJADE -o $SGMLNORM = NOSGMLNORM],
             <em>not</em> fail.  Instead, a stamp file
             <code>STAR_SUPPRESS_BUILD</code> is left in the build
             directory, with the consequence that if you subsequently
-            type <kbd>make</kbd>, that build will immediately fail,
-            with the same message.</p>
+            type <kbd>make</kbd>, that build will do nothing, emit the
+            same message, and also not fail.  If you subsequently
+            invoke <kbd>make install</kbd>, that will also succeed,
+            but install no files, except a manifest without a
+            <code>&lt;files&gt;</code> element.</p>
 
           <p>The difference between this and the standard
             <code>AC_FATAL</code> macro is that the latter is for an
@@ -6582,6 +6592,10 @@ STAR_SUPPRESS_BUILD_IF([test $JADE = NOJADE -o $SGMLNORM = NOSGMLNORM],
             more well-mannered interactions with the user, indicating
             that there is other work they might have to do to get this
             component building.</p>
+
+          <p>You should use this macro rather sparingly.  If a
+            component depends on a component thus suppressed, there
+            will likely be trouble.</p>
         </subsect>
 
         <subsect id="macro-xml-documentation" export="export"
