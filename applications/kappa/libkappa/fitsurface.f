@@ -192,6 +192,9 @@
 *     1997 May 10 (MJC):
 *        Computes (via SVD) and records the variances of the polynomial
 *        coefficients.
+*     27-AUG-2003 (DSB):
+*        Check that the values obtained for XMAX, XMIN, YMAX and YMIN are
+*        usable. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -509,35 +512,14 @@
 *  parameters. (These parameters will normally have a VPATH of DEFAULT,
 *  and DEFAULT = !, so the calculated value will be used unless otherwise 
 *  specified).
-            IF( STATUS .EQ. SAI__OK ) THEN
-               CALL PAR_DEF0D( 'XMIN', XMIN, STATUS )
-               CALL PAR_GET0D( 'XMIN', XMIN, STATUS )
-               IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
-            END IF
-
-            IF( STATUS .EQ. SAI__OK ) THEN
-               CALL PAR_DEF0D( 'XMAX', XMAX, STATUS )
-               CALL PAR_GET0D( 'XMAX', XMAX, STATUS )
-               IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
-            END IF
-   
-            IF( STATUS .EQ. SAI__OK ) THEN
-               CALL PAR_DEF0D( 'YMIN', YMIN, STATUS )
-               CALL PAR_GET0D( 'YMIN', YMIN, STATUS )
-               IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
-            END IF
-   
-            IF( STATUS .EQ. SAI__OK ) THEN
-               CALL PAR_DEF0D( 'YMAX', YMAX, STATUS )
-               CALL PAR_GET0D( 'YMAX', YMAX, STATUS )
-               IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
-            END IF
-
-*  Report if something has gone wrong while obtaining the parameters.
-            IF ( STATUS .NE. SAI__OK ) THEN
-               CALL ERR_REP( ' ', 'Error while obtaining %XMIN, '/
-     :           /'%XMAX, %YMIN and %YMAX parameters.', STATUS )
-            END IF
+            CALL PAR_GDR0D( 'XMIN', XMIN, VAL__MIND, XMIN, .TRUE., XMIN, 
+     :                      STATUS ) 
+            CALL PAR_GDR0D( 'XMAX', XMAX, XMAX, VAL__MAXD, .TRUE., XMAX, 
+     :                      STATUS ) 
+            CALL PAR_GDR0D( 'YMIN', YMIN, VAL__MIND, YMIN, .TRUE., YMIN, 
+     :                      STATUS ) 
+            CALL PAR_GDR0D( 'YMAX', YMAX, YMAX, VAL__MAXD, .TRUE., YMAX, 
+     :                      STATUS ) 
 
 *  Check which type of surface fit is required.
             IF ( FITYPE( 1:3 ) .EQ. 'POL' ) THEN
