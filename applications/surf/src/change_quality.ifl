@@ -1,0 +1,82 @@
+## CHANGE_QUALITY - Modify data quality.
+ 
+#+
+#  Name:
+#     CHANGE_QUALITY.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     JFL:  John Lightfoot (ROE)
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1995 (JFL)
+#        Original Version
+#     1996 October (TIMJ)
+#        Add GLOBAL associations
+#     1996 November 1 (TIMJ)
+#        Add header and HELPLIB
+#     1997 March 19 (TIMJ)
+#	 Separate from MODIFY
+#     1997 March 31 (JFL)
+#        Use just BAD_QUALITY and IN parameters
+#     1997 April 30 (TIMJ)
+#        Add MSG_FILTER
+#     1997 May 21 (TIMJ)
+#        Add USE_SECTION parameter
+#     1997 May 29 (TIMJ)
+#	 Add SECTION
+#     {enter_further_changes_here}
+ 
+#-
+
+
+   INTERFACE CHANGE_QUALITY
+
+      HELPLIB 'SCUBA_HELP:'
+
+      PARAMETER BAD_QUALITY
+	 POSITION 2
+         TYPE     '_LOGICAL'
+         DEFAULT  'y'
+         PPATH    'DEFAULT'
+         PROMPT   'Set quality to bad? (No will set quality to good)'
+         HELPKEY  '*'
+      ENDPARAMETER
+ 
+      PARAMETER IN
+         POSITION 1
+         TYPE     '_CHAR'
+         VPATH    'PROMPT'
+         PROMPT   'Data to be modified ndf{data-spec}'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER 'SECTION'
+         TYPE '_CHAR'
+         ACCESS 'READ'
+         VPATH 'PROMPT'
+         PROMPT 'Please enter a section (including {})'
+         HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER USE_SECTION
+        TYPE '_LOGICAL'
+        PROMPT 'Change this section (else change everything else)'
+        DEFAULT 'yes'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+
+   ENDINTERFACE
+
