@@ -6,6 +6,7 @@ version="${AST_VERSION}"
 if test ! -n "${version}"; then
    old_version="`cat ${AST_REF}/version.number`"
    echo;
+   echo "Always include a release number !!! (e.g. \"2.0-1\")"
    echo -n "New version number /${old_version}/ > "
    read version;
    echo;
