@@ -1561,6 +1561,54 @@ astPickAxes( this, axes )
   RETVAL
 
 # Need to think about astResolve  XXXXX
+# Returns reference to array [point4], plus two distances
+
+void
+astResolve( this, point1, point2, point3 )
+  AstFrame * this
+  AV* point1
+  AV* point2
+  AV* point3
+ PREINIT:
+  double * cpoint1;
+  double * cpoint2;
+  double * cpoint3;
+  double * cpoint4;
+  AV * point4;
+  double d1;
+  double d2;
+  int len;
+  int naxes;
+ PPCODE:
+  naxes = astGetI(this, "Naxes");
+  len = av_len(point1) + 1;
+  if ( naxes != len )
+    Perl_croak(aTHX_ "Number of coords in point1 must be equal to the number of axes in frame [%d != %d]", naxes, len);
+  len = av_len(point2) + 1;
+  if ( naxes != len )
+    Perl_croak(aTHX_ "Number of coords in point2 must be equal to the number of axes in frame [%d != %d]", naxes, len);
+  len = av_len(point3) + 1;
+  if ( naxes != len )
+    Perl_croak(aTHX_ "Number of coords in point3 must be equal to the number of axes in frame [%d != %d]", naxes, len);
+
+  cpoint1 = pack1D( newRV_noinc((SV*)point1), 'd');
+  cpoint2 = pack1D( newRV_noinc((SV*)point2), 'd');
+  cpoint3 = pack1D( newRV_noinc((SV*)point3), 'd');
+  cpoint4 = get_mortalspace( naxes, 'd' );
+  
+  ASTCALL(
+    astResolve(this, cpoint1, cpoint2, cpoint3, cpoint4, &d1, &d2);
+  )
+
+  point4 = newAV();
+  unpack1D( newRV_noinc((SV*)point4), cpoint4, 'd', naxes);
+
+  XPUSHs( newRV_noinc((SV*) point4));
+  XPUSHs( sv_2mortal(newSVnv(d1)));
+  XPUSHs( sv_2mortal(newSVnv(d2)));
+
+
+
 
 void
 astSetActiveUnit( this, value )
