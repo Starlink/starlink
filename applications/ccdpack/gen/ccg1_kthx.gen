@@ -123,8 +123,8 @@
 
 *  End of do until I is greater than J.
          IF ( I .LE. J ) GO TO 2
-         IF ( J < K ) L = I
-         IF ( K < I ) M = J
+         IF ( J .LT. K ) L = I
+         IF ( K .GT. I ) M = J
          GO TO 1
       END IF
 
