@@ -120,7 +120,7 @@
       end
       rm *_mon.help
       cat kappa.star-hlp *.help > new.hlp
-      mv new.hlp kappa.hlp kappa.star-hlp
+      mv new.hlp kappa.hlp
       rm *.help
       mv lutedit.gui-help lutedit.help 
 
