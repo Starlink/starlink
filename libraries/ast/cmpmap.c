@@ -72,6 +72,9 @@ f     The CmpMap class does not define any new routines beyond those
 *        suitable PermMap lower neighbour.
 *     23-APR-2004 (DSB):
 *        - Modified Simplify to avoid infinite loops.
+*     27-APR-2004 (DSB):
+*        - Correction to MapMerge to prevent segvio if CmpMap and PermMap
+*        cannot be swapped.
 *class--
 */
 
@@ -1330,7 +1333,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          astSetInvert( cmpmap2, invert2 );     
 
 /* If the Mappings can be swapped... */
-         if( astOK && new_cm && new_pm ) {
+         if( astOK && canswap ) {
 
 /* Annul the supplied pointer to the two Mappings. */
             ( *map_list )[ imap1 ] = astAnnul( ( *map_list )[ imap1 ] );
