@@ -430,9 +430,8 @@
             return
          }
 
-#  This may be time-consuming.  Set the busy cursor.
-         set curs [ $canvas cget -cursor ]
-         $canvas configure -cursor watch
+#  This may be time-consuming.  Post a waiting message.
+         set waitwin [ waiter $itk_interior.wait -text "Drawing images" ]
              
 #  If this pair of NDFs has not been displayed before (but not if only
 #  the display characteristics have changed) then update the title bar.
@@ -511,8 +510,8 @@
                                     [ code $this image_release $slot %x %y ]
          }
 
-#  Unset the busy cursor.
-         $canvas configure -cursor $curs
+#  Remove the waiting message.
+         destroy $waitwin
       }
 
 
