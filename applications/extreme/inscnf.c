@@ -1,24 +1,93 @@
+/*
+*+
+*  Name:
+*     inscnf
+*
+*  Purpose:
+*     Interpolate CNF_PVAL calls round %VAL arguments where necessary.
+*
+*  Usage:
+*     inscnf [ in [ out ] ] 
+*
+*  Description:
+*     This short program is a filter which takes FORTRAN 77 source code
+*     and modifies it so that text which is the argument of a %VAL 
+*     directive is wrapped in a call to CNF_PVAL; i.e. input text
+*
+*        %VAL( IPTR )
+*
+*     is changed to
+*
+*        %VAL( CNF_PVAL( IPTR ) )
+*
+*     If the call to CNF_PVAL is already present no change is made.
+*     Lines with no references to the %VAL directive are left alone,
+*     except that trailing whitespace may be stripped.
+*
+*     Attention is paid to fortran 77 source format, so that lines are
+*     more than 72 characters long are avoided (unless they were there
+*     in the first place.
+*
+*     Characters '\r' (carriage return) and '\t' (tab) might possibly
+*     cause erroneous line breaking - if any are encountered a warning
+*     is given (these shouldn't be in the source really).
+*     Code using columns 73-80 of the source cards for comments is 
+*     likely to be mangled (nobody does this any more do they?).
+*
+*     Under certain improbable circumstances it is possible for the 
+*     program to get stuck trying to break a line; in this case it will
+*     exit with error status and an error message.
+*
+*     Some effort is made to make the output aesthetically pleasing:
+*     line breaks are done, where possible, following the usage in, e.g.,
+*     KAPPA.  An attempt is made copy the style of case usage and bracket 
+*     spacing from the input.
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     06-JAN-2000 (MBT):
+*        Initial version.
+*-
+*/
+
 
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
 
-#define MAXNEST 100
-#define LBUFSIZ 2000
-#define MAXCONT 20
+#define MAXNEST 100                     /* Deepest level of bracket nesting  */
+#define LBUFSIZ 2000                    /* Longest source line               */
+#define MAXCONT 20                      /* Maximum continuation lines        */
 
 
 /* Local function prototypes. */
    void outbuf( char *buffer, char *interp[], int leng );
    void inscnf();
 
+/* Global variables. */
+   char *name;                          /* Name of the program               */
 
-/* Main function of program. */
+
    int main( int argc, char **argv ) {
+/*
+*+
+*  Name:
+*     main
+*
+*  Purpose:
+*     Main routine of C program.
+*
+*  Description:
+*     This routine sets up standard input and standard output as usual
+*     for a Unix filter type program.  It then calls the data processing
+*     routines.
+*-
+*/
 
 /* Declare local variables. */
-      char *name;
-      char *usagef;
+      char *usagef;                     /* Usage format string               */
 
 /* Get name of program etc. */
       name = *(argv++);
@@ -53,28 +122,60 @@
    }
 
 
-/* Main data processing routine. */
+
    void inscnf() {
+/*
+*+
+*  Name:
+*     inscnf
+* 
+*  Purpose:
+*     Perform data processing for inscnf program.
+*
+*  Invocation:
+*     inscnf()
+*
+*  Description:
+*     This routine reads characters from standard input and writes them
+*     to standard output.  The output is substantially similar to the
+*     input except that arguments of %VAL are wrapped in the CNF_PVAL
+*     function.
+*-
+*/
 
 /* Declare local variables. */
-      char *cpc;
-      char *cpo;
-      char *interp[ LBUFSIZ ];
-      char buffer[ LBUFSIZ ];
-      char c;
-
-      int column;
-      int comment;
-      int flush;
-      int leng;
-      int level;
-      int spotcpv;
-      int spotval;
-      int valat[ MAXNEST ];
+      char *cpc[ 4 ];                   /* CNF_PVAL closer strings           */
+      char *cpo[ 4 ];                   /* CNF_PVAL opener strings           */
+      char *interp[ LBUFSIZ ];          /* Pointers to interpolated strings  */
+      char buffer[ LBUFSIZ ];           /* Buffer for raw input text         */
+      char c;                           /* Character read                    */
+      char lastc;                       /* Previous character read           */
+      int column;                       /* Column of input text              */
+      int comment;                      /* Is it a comment line?             */
+      int flush;                        /* Is it time to process buffer?     */
+      int leng;                         /* Length of buffer                  */
+      int level;                        /* Level of bracket nesting          */
+      int rfound = 0;                   /* Number of \r characters found     */
+      int scase;                        /* Apparent case of source code      */
+      int sspace;                       /* Apparent spacing convention       */
+      int spotcpv;                      /* Have we found CNF_PVAL string?    */
+      int spotval;                      /* Have we found %VAL string?        */
+      int tfound = 0;                   /* Number of \t characters found     */
+      int valat[ MAXNEST ];             /* Nesting level of %VAL start       */
 
 /* Set up strings for output. */
-      cpo = " CNF_PVAL(";
-      cpc = " )";
+#define CASE_UPPER 0
+#define CASE_LOWER 2
+#define SPACE_YES  0
+#define SPACE_NO   1
+      cpo[ CASE_UPPER | SPACE_YES ] = " CNF_PVAL(";
+      cpo[ CASE_UPPER | SPACE_NO  ] = "CNF_PVAL(";
+      cpo[ CASE_LOWER | SPACE_YES ] = " cnf_pval(";
+      cpo[ CASE_LOWER | SPACE_NO  ] = "cnf_pval(";
+      cpc[ CASE_UPPER | SPACE_YES ] = " )";
+      cpc[ CASE_UPPER | SPACE_NO  ] = ")";
+      cpc[ CASE_LOWER | SPACE_YES ] = " )";
+      cpc[ CASE_LOWER | SPACE_NO  ] = ")";
 
 /* Initialise values for source code processing. */
       leng = 0;
@@ -94,6 +195,20 @@
 /* Copy character to output buffer. */
          buffer[ leng - 1 ] = c;
          interp[ leng - 1 ] = NULL;
+
+/* Strip trailing whitespace from lines, since it can complicate matters
+   later. */
+         if ( c == '\n' ) {
+            while ( leng > 1 && buffer[ leng - 2 ] == ' ' ) {
+               leng--;
+               column--;
+               buffer[ leng - 1 ] = c;
+            }
+         }
+
+/* Warn about dangerous characters. */
+         if ( c == '\r' ) rfound++;
+         if ( c == '\t' ) tfound++;
 
 /* Work out whether this is a suitable time to process the current contents
    of the buffer.  Suitable is when it contains a whole source line, give
@@ -137,14 +252,14 @@
                   spotval = spotcpv = 0;
                   break;
                case ')':
+                  sspace = ( lastc == ' ' ) ? SPACE_YES : SPACE_NO;
                   if ( valat[ level ] ) {
-                     interp[ valat[ level ] - 1 ] = cpo;
-                     interp[ leng - 1 ] = cpc;
+                     interp[ valat[ level ] - 1 ] = cpo[ scase | sspace ];
+                     interp[ leng - 1 ] = cpc[ scase | sspace ];
                   }
                   level--;
                   spotval = spotcpv = 0;
                   break;
-
                case '%':
                   spotval = 1;
                   spotcpv = 0;
@@ -163,6 +278,7 @@
                case 'L':
                   spotval = ( spotval == 3 ) ? 4 : 0;
                   spotcpv = ( spotcpv == 7 ) ? 8 : 0;
+                  scase = ( c == 'l' ) ? CASE_LOWER : CASE_UPPER;
                   break;
 
                case 'c':
@@ -201,43 +317,87 @@
             }
          }
          if ( c == '\n' || c == '\r' ) column = 0;
+         lastc = c;
       }
 
 /* Flush any remaining text in buffer. */
       outbuf( buffer, interp, leng );
+
+/* Warn about dangerous characters. */
+      if ( tfound )
+         fprintf( stderr, 
+                  "%s: Warning - %d '%s' characters may have caused errors.\n", 
+                  name, "\\t", tfound );
+      if ( rfound )
+         fprintf( stderr,
+                  "%s: Warning - %d '%s' characters may have caused errors.\n",
+                  name, "\\r", rfound );
    }
 
 
    void outbuf( char *buffer, char *interp[], int leng ) {
 /*
 *+
+*  Name:
+*     outbuf
+*
+*  Purpose:
+*     Output text with interpolations.
+*
+*  Usage:
+*     outbuf( char *buffer, char *interp[], int leng )
+*
+*  Description:
+*     This routine outputs a small chunk of text with interpolations
+*     as given by its arguments.  Where necessary it will make suitable
+*     line breaks.
+*
 *     If any interpolated text is present, this routine should be called 
 *     with a single line of source code (i.e. a set of continuation lines
 *     with matched brackets and so on).  Otherwise line breaks may get
 *     put in ugly (though not incorrect) places.  If there is
 *     no interpolation to be done, then output is identical to input,
 *     so it doesn't matter.
+*
+*  Arguments:
+*     buffer = char *
+*        A pointer to the start of the raw input text.
+*     interp[] = char *
+*        Interp is an array containing one pointer to char for each 
+*        character in buffer.  If any of its elements is non-NULL,
+*        then it is interpreted as a pointer to a null-terminated string
+*        to interpolate after the corresponding character of buffer in
+*        the output text.  (Note the term `interpolate' is used here in
+*        its textual sense, and has nothing to do with, e.g. linear
+*        interpolation - cf. Perl documentation etc).
+*     leng = int
+*        The number of characters in buffer, and also the number of 
+*        valid pointers in interp.
 *-
 */
-      char c;
-      char *ls[ MAXCONT ];
-      char *pc;
-      char *qc;
-      char *we;
-      char ebuf[ LBUFSIZ ];
-      static int col = 0;
-      int done;
-      int i;
-      int isinterp[ MAXCONT ];
-      int indent;
-      int j;
-      int line;
-      int lines;
-      int ll[ MAXCONT ];
-      int level;
-      int started;
 
-/* Start of source line, so it shouldn't be within the argument of a %VAL. */
+/* Declare local variables. */
+      char c;                           /* Character read                    */
+      char *ls[ MAXCONT ];              /* Start of line                     */
+      char *pc;                         /* Pointer to character              */
+      char *qc;                         /* Pointer to character              */
+      char *we;                         /* Pointer to end of word            */
+      char ebuf[ LBUFSIZ ];             /* Buffer holding expanded text      */
+      static int col = 0;               /* Current output column             */
+      int done;                         /* Has a line break been found?      */
+      int eindent[ LBUFSIZ ];           /* Preferred indentation at each char*/
+      int eleng;                        /* Length of ebuf                    */
+      int i;                            /* Loop counter                      */
+      int isinterp[ MAXCONT ];          /* Does line contain interpolations? */
+      int indent;                       /* Characters of indent              */
+      int j;                            /* Loop counter                      */
+      int lcol;                         /* Temporary column counter          */
+      int line;                         /* Index of current line             */
+      int lines;                        /* Number of lines in buffer         */
+      int ll[ MAXCONT ];                /* Length of lines                   */
+      int level;                        /* Parenthesis nesting level         */
+      int started;                      /* Has word count got started?       */
+      int stcol[ MAXNEST ];             /* Start column of nesting level     */
 
 /* Copy the input buffer, with interpolations, into an expanded buffer.
    Identify line starts, line lengths, and whether each line contains any 
@@ -261,8 +421,41 @@
             ls[ line ] = qc;
             ll[ line ] = 0;
          }
+         if ( ( qc - ebuf ) > LBUFSIZ ) {
+            fprintf( stderr, "%s: ERROR - buffer too small.\n", name );
+            exit( 1 );
+         }
       }
       lines = line + 1;
+      eleng = qc - ebuf;
+
+/* Set the natural indent level at each position of the buffer.  This is
+   to do with brackets. */
+      level = 0;
+      lcol = col;
+      stcol[ level ] = 0;
+      for ( pc = ebuf; pc - ebuf < eleng; pc++ ) {
+         if ( lcol > 6 ) {
+            switch ( *pc ) {
+               case '(':
+                  level++;
+                  stcol[ level ] = 0;
+                  break;
+               case ')':
+                  level--;
+                  break;
+               case ' ':
+               case '\t':
+               case '\n':
+                  break;
+               default:
+                  if ( stcol[ level ] == 0 ) stcol[ level ] = lcol - 1;
+            }
+         }
+         eindent[ pc - ebuf ] = stcol[ level ];
+         if ( *pc == '\n' ) lcol = 0;
+         lcol++;
+      }
 
 /* Process expanded buffer a line at a time. */
       for ( line = 0; line < lines; line++ ) {
@@ -316,12 +509,18 @@
                   }
                   if ( done ) break;
                }
-               for ( we = qc; *we == ' ' && we >= pc; we-- );
+               for ( we = qc; *we == ' ' && we > pc; we-- );
 
 /* If this word won't fit on the current line, output a line break now. */
                if ( we - pc + col > 73 ) {
+                  indent = eindent[ pc - ebuf ];
+                  if ( indent < 6 ) indent = 6;
+                  if ( we - pc + indent > 73 ) indent = 9;
+                  if ( we - pc + indent > 73 ) indent = 6;
+                  if ( we - pc + indent > 73 ) 
+                     fprintf( stderr, "%s: Failed to break line\n", name );
                   putchar( '\n' );
-                  indent = 6;
+                  indent = eindent[ pc - ebuf ];
                   for ( i = 1; i <= indent; i++ )
                      putchar( i == 6 ? ':' : ' ' );
                   col = indent;
@@ -339,4 +538,4 @@
       }
    }
 
-
+/* $Id$ */
