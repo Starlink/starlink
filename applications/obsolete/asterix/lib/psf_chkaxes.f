@@ -61,6 +61,7 @@
       INTEGER                 	PTR               	! Pointer to axis data
 
       LOGICAL			EVDS			! File is EventDS
+      LOGICAL			GOTAX			! Got axis info?
       LOGICAL                 	OK                	! General validity check
       LOGICAL                 	REG               	! Axis is regular?
 *
