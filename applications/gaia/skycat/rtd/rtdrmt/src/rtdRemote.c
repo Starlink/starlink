@@ -12,6 +12,7 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/03/96  Created
+ * Peter W. Draper 09/02/98  Removed sys_errlist and replaced with strerror.
  */
 static const char* const rcsId="@(#) $Id: rtdRemote.c,v 1.4 1997/04/11 10:51:09 abrighto Exp $";
 
@@ -91,7 +92,6 @@ va_dcl
     char *fmt;
     char buf[sizeof(info.errmsg)];
     extern int sys_nerr;
-    extern char *sys_errlist[];
     extern int errno;
 
     va_start(args);
@@ -101,7 +101,7 @@ va_dcl
     
     if (errno >= 0 && errno < sys_nerr) {
 	strcat(buf, ": ");
-	strcat(buf, sys_errlist[errno]);
+	strcat(buf, strerror(errno));
     }
 
     strcpy(info.errmsg, buf);

@@ -25,16 +25,19 @@
 *	Last Updated	: 2/12/93
 *
 *   Programmer		: Severin Gaudet
+*                       : Peter W. Draper
 *
 *   Modification History:
 *		92/08/11 nrh -	Added check for vms specific errors to
 *				msg_format.
+*               98/02/09 pwd - modifed to use strerror on UNIX calls.
 *
 ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
 ************************************************************************
 -*/
 
 #include <errno.h>
+#include <string.h>
 #ifdef VMS
 #include <perror.h>
 #endif
@@ -43,13 +46,7 @@
 #include "gen_str.h"
 #include "gen_msg.h"
 
-/*
- *  Globally define errno.
- */
-
-int		errno;
-extern int		sys_nerr;
-extern	char	*sys_errlist[];
+int errno;
 
 #define	MSG_NOT_FOUND	"Message not found."
 
@@ -273,7 +270,7 @@ va_list	args;
 	if ( errno != 0 )
 	{
 	    (void) sprintf( temp_buffer2, "(%s+%d)  %s: %s",
-		    prefix, errno, errno_arg, sys_errlist[errno] );
+		    prefix, errno, errno_arg, strerror( errno ) );
 	    errno = 0;
 	}
 
