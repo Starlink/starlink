@@ -2404,8 +2404,10 @@
         END DO
 
 *    Export mean
-        CALL NBS_FIND_ITEM( I_NBID, 'BG_MEAN', ITEMID, STATUS )
-        CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBR, SAMM(1), STATUS )
+        IF ( I_GUI ) THEN
+          CALL NBS_FIND_ITEM( I_NBID, 'BG_MEAN', ITEMID, STATUS )
+          CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBR, SAMM(1), STATUS )
+        END IF
 
 *  Annular sampling?
       ELSE IF ( I_BGM_AREA(1:3) .EQ. 'ANN' ) THEN
