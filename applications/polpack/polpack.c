@@ -34,6 +34,7 @@ int *tclDummyMathPtr = (int *) matherr;
 
 #define SAI__OK 0
 #define SAI__ERROR 148013867
+#define GRP__NOID 0
 #define PACK_DIR "POLPACK_DIR"
 #define TCL_SCRIPT "/PolReg.tcl"
 
@@ -332,7 +333,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                         CHARACTER(VIEW), REAL(PLO), REAL(PHI), LOGICAL(NEWCM),
                         LOGICAL(XHAIR), CHARACTER(XHRCOL), LOGICAL(STHLP),
                         INTEGER(IGRPS), INTEGER(SSIZE), LOGICAL(SKYOFF),
-                        INTEGER(SKYPAR), LOGICAL(STOKES), LOGICAL(DBEAM),
+                        INTEGER(SKYPAR), LOGICAL(IGRP4), LOGICAL(DBEAM),
                         INTEGER(STATUS) 
                         TRAIL(SI) TRAIL(LOGFIL) TRAIL(BADCOL)
                         TRAIL(CURCOL) TRAIL(REFCOL) TRAIL(SELCOL)
@@ -420,9 +421,9 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *        Should the sky background be removed from the output images?
 *     SKYPAR = INTEGER (Given and Returned)
 *        No. of fitting parameters along each axis of a sky surface.
-*     STOKES = LOGICAL (Given)
-*        Produces output Stokes parameters? (otherwise output intensity
-*        images are created).
+*     IGRP4 = INTEGER (Given)
+*        The GRP identifier for the group holding the name of the output
+*        cube holding Stokes parameters.
 *     DBEAM = LOGICAL (Given)
 *        Run in dual-beam mode?
 *     STATUS = INTEGER (Given and Returned)
@@ -467,7 +468,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    GENPTR_INTEGER(SSIZE)
    GENPTR_LOGICAL(SKYOFF)
    GENPTR_LOGICAL(STHLP)
-   GENPTR_LOGICAL(STOKES)
+   GENPTR_INTEGER(IGRP4)
    GENPTR_LOGICAL(DBEAM)
    GENPTR_INTEGER(STATUS)
 
@@ -504,20 +505,21 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 
 /* If producing Stokes parameters as output, store the name of the output
    data set in Tcl variable "stokes". */
-   if( F77_ISTRUE(*STOKES) ) {
-      name = GetName( *IGRP2, 1, STATUS );
+   if( *IGRP4 != GRP__NOID ) {
+      name = GetName( *IGRP4, 1, STATUS );
       SetVar( interp, "stokes", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
-
-/* Otherwise, we are producing aligned output intensity images. */
-   } else {
+   }
 
 /* Store the name of the O-ray output images in Tcl variable "o_list". */
+   if( *IGRP2 != GRP__NOID ) {
       for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
          name = GetName( *IGRP2, i, STATUS );
          SetVar( interp, "o_list", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
       }
+   }
 
 /* Do the same for the E-ray output images (if in dual-beam mode). */
+   if( *IGRP3 != GRP__NOID ) {
       if( F77_ISTRUE(*DBEAM) ) {
          for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
             name = GetName( *IGRP3, i, STATUS );

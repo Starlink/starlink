@@ -8,29 +8,36 @@
 #
 #  Invocation:
 #     1) From the command line:
-#        PolReg.tcl <in> <out_O> [ <out_E> ]
+#        PolReg.tcl <in> <stokes> <out_O> [ <out_E> ]
 #
 #     2) From the polreg A-task. 
 #        See the polreg A-task documentation.
 #
 #  Command Line Arguments:
 #     in    - A list of input images.
-#     out_O - A list of O-ray output images.
+#     stokes- The name of the output cube to hold STokes parameters. 
+#             Not produced if a null value supplied.
+#     out_O - A list of O-ray output images. Not produced if a null value 
+#             supplied.
 #     out_E - An optional list of E-ray output images. If not supplied,
-#             then PolReg functions in single-beam mode.
+#             then PolReg functions in single-beam mode. If supplied, but
+#             null, then PolReg functions in dual-beam mode but throws the 
+#             E-ray output images away. 
 #  
 #  Command Line Examples:
 #
-#     PolReg.tcl "a b" "a_O b_O" "a_E b_E"
+#     PolReg.tcl "a b" "stok" "a_O b_O" "a_E b_E"
 #
 #        Extracts O and E ray areas from the two input images "a" and "b",
 #        aligns them, and stores the O-ray areas in images "a_O" and "b_O",
 #        and the E-ray areas in images "b_O" and "b_E" (dual-beam mode).
+#        The corresponding Stokes parameters are calculated and stored in
+#        "stok".
 #
-#     PolReg.tcl "a b" "a_R b_R" 
+#     PolReg.tcl "a b" "" "a_R b_R"
 #
 #        Aligns the two input images "a" and "b", and stores them in 
-#        images "a_R" and "b_R" (single-beam mode).
+#        images "a_R" and "b_R" (single-beam mode). Calculate 
 #-
 
 # Uncomment this section to see the names of all procedure as they are 
@@ -42,33 +49,6 @@
 #   append newbody $body
 #   tclproc $name $args $newbody
 #}
-
-#rename proc tclproc
-#tclproc proc {name args body} {
-#   set newbody "global CAN
-#                global GOGO
-#                global ABO
-#                if { !\$ABO && \[info exists CAN\] && \[winfo exists \$CAN\]} {
-#                   if { \[lindex \[\$CAN gettags 3\] 1\] != {P0} } {
-#                      puts \"Entering $name\"
-#                      puts \"Id 3 has tags +\[\$CAN gettags 3\]+\"
-#                      if { \$GOGO } { 
-#                         for {set i 1} { \$i < \[info level\] } { incr i} {
-#                            puts \[info level \$i\]
-#                         }
-#                         set ABO 1
-#                         Finish 0 
-#                      }
-#                   } {
-#                      set GOGO 1
-#                   }
-#                }"
-#
-#   append newbody $body
-#   tclproc $name $args $newbody
-#}
-#set GOGO 0
-#set ABO 0
 
 # Display a label asking the user to wait while the main interface is
 # constructed.
@@ -142,6 +122,7 @@
    set CUROBJ_REQ $O_RAY_FEATURES
    set CURRENT_INFO ""
    set CURSOR_STACK ""
+   set CURITEM "" 
    set DEFAULT_INFO ""
    set DOING_DOUBLE 0
    set INFO_TEXT ""
@@ -158,6 +139,7 @@
    set LOCK_SCALE 0
    set LOGFILE_ID ""
    set MODE 0
+   set MOVE 0
    set NPOLY 0
    set OLDVIS "VisibilityObscured"
    set PASTE 0
@@ -327,68 +309,50 @@
    LoadTask ccdpack  $CCDPACK_DIR/ccdpack_reg
    LoadTask polpack  $POLPACK_DIR/polpack_mon
 
-# Obtain the input and output images specified on the command line.
-# Input images are given in the first command line argument, the O-ray
-# output images are given next, and finally the E-ray output images are
-# given. Each of these 3 command line arguments should be a list, and they
-# should all have the same number of elements. The exception to this is
-# that if the third (E-ray) list is empty or not supplied, then we assume
-# single beam mode (DBEAM==0). The polreg A-task will pass these lists in
-# variables in_list, o_list and e_list, so check first if this has been
-# done. If not, get the lists from the command line.
+# If this script was activated from the polreg A-task, then the variable 
+# "in-list" will be defined, holding a list of input images. Otherwise,
+# we get the input and output file names from the command line, and copy
+# them into the variables which would have been used by the a-task.
    if { ![info exists in_list] } {
+
       if { $argc == 0 } {
          puts "PolReg: No input images supplied on command line. Aborting..."
          exit 1
       } {
          set in_list [lindex "$argv" 0]
+         set stokes ""
+         set o_list ""
+         set e_list ""
 
-         if { $argc == 1 } {
+         if { $argc > 1 } { set stokes [lindex "$argv" 1] }
+         if { $argc > 2 } { set o_list [lindex "$argv" 2] }
+         if { $argc > 3 } {
+            set e_list [lindex "$argv" 3] 
+            set DBEAM 1
+         } {
+            set DBEAM 0
+         }
+
+# Check that there are some output images to create.
+         if { $stokes == "" && ![llength $o_list] && ![llength $e_list] } {
             puts "PolReg: No output images supplied on command line. Aborting..."
             exit 1
-         } {
-            set o_list [lindex "$argv" 1]
-
-            if { $argc > 2 } {
-               set e_list [lindex "$argv" 2]
-            }
          }
       }
    }
 
+# Store the list of input image sections, and store how many there are.
    set IMSECS $in_list
    set nin [llength $IMSECS]
 
-# If the variable o_list is not defined, we are producing Stokes
-# parameters as output, instead of intensity images. First get the
-# names of any output intensity images.
-   if { [info exists o_list] } {
-      set STOKES 0
-
-      set nout(O) [llength $o_list]
-      if { [info exists e_list] } {
-         set nout(E) [llength $e_list]
-         set DBEAM 1
-      } {
-         set DBEAM 0
-      }
-
-# Abort if the number of output images does not equal the number of input
-# images.
-      if { $nin != $nout(O) || $DBEAM && $nin != $nout(E) } {
-         puts "PolReg: Numbers of input and output images are different."
-         exit 1
-      }
-
-# If we are producing Stokes parameters, set a flag and store the name of
-# the output cube.
-   } elseif { [info exists stokes] } {
-      set STOKES 1   
+# Store a flag indicating if Stokes parameter cube should be created, and
+# if so, store the name of the cube to create.
+   if { $stokes != "" } {
+      set STOKES 1
       set STKOUT $stokes
-
    } {
-      puts "PolReg: No name supplied for output data cube."
-      exit 1
+      set STOKES 0
+      set STKOUT ""
    }
 
 # Set up convenience variables depending on DBEAM.
@@ -776,12 +740,18 @@
 # If these will be the output images, then use the names supplied by the
 # A-task. If they will be temporary files needed only as input to the
 # Stokes parameter calculation, then store temporary names.
-      if { !$STOKES } {
-         set OUTIMS($image,O) [lindex $o_list $i]
-         if { $DBEAM } { set OUTIMS($image,E) [lindex $e_list $i] }
+      if { $i < [llength $o_list] } {
+         set OUTIMS($image,O) [lindex $o_list $i] 
       } {
          set OUTIMS($image,O) [UniqueFile]
-         if { $DBEAM } { set OUTIMS($image,E) [UniqueFile] }
+      }
+
+      if { $DBEAM } {
+         if { $i < [llength $e_list] } {
+            set OUTIMS($image,E) [lindex $o_list $i] 
+         } {
+            set OUTIMS($image,E) [UniqueFile]
+         }
       }
 
 # Update the length of the longest image section and image name.

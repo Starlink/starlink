@@ -1399,6 +1399,7 @@ polhelp.o: PAR_ERR
 polhelp.o: SAE_PAR
 polmap.o: PAR_ERR
 polmap.o: SAE_PAR
+polreg.o: PRM_PAR
 polreg.o: GRP_PAR
 polreg.o: PAR_ERR
 polreg.o: SAE_PAR

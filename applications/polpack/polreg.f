@@ -58,7 +58,7 @@
 *     the menu bar.
 
 *  Usage:
-*     polreg in outstk [skyframes]
+*     polreg in out_s [skyframes]
 
 *  ADAM Parameters:
 *     BADCOL = LITERAL (Update)
@@ -136,33 +136,37 @@
 *     OEFITTYPE = _INTEGER (Update)
 *        The type of mapping which should be used between O and E rays. See
 *        parameter FITTYPE for a description of the allowed values. [1]
-*     OUTSTK = NDF (Write)
-*        This parameter is only used if parameter STOKES is given a true
-*        value. It is the name of the output cube to create holding the
-*        Stokes parameters calculated from the input images.
+*     OUT_S = NDF (Write)
+*        The name of the output cube to hold the Stokes parameters 
+*        calculated from the input images. If a null value is given then
+*        no Stokes parameters are calculated. Note, the output images 
+*        cannot be specified within the GUI. 
 *     OUT = LITERAL (Write)
-*        This parameter is only used if parameters STOKES and DUALBEAM
-*        are both given false values. It is a list of the names of the 
+*        This parameter is only used if parameter DUALBEAM
+*        is given a false value. It is a list of the names of the 
 *        output images to create in single-beam mode, holding aligned
 *        intensity values from the input images. These should correspond 
-*        one-for-one to the input images supplied using parameter IN. 
+*        one-for-one to the input images supplied using parameter IN. If 
+*        a null (!) value is given, then no intensity images are created. 
 *        Note, the output images cannot be specified within the GUI. 
 *     OUT_E = LITERAL (Write)
-*        This parameter is only used if parameter STOKES is given a false 
-*        value, and DUALBEAM is given a true value. It is a list of the 
+*        This parameter is only used if parameter DUALBEAM is given a 
+*        true value. It is a list of the 
 *        names of the E-ray output images to create in dual-beam mode, 
 *        holding aligned E-ray intensity values from the input images. These 
 *        should correspond one-for-one to the input images supplied using 
-*        parameter IN. Note, the output images cannot be specified within the 
-*        GUI. 
+*        parameter IN. If  a null (!) value is given, then no E-ray intensity
+*        images are created. Note, the output images cannot be specified 
+*        within the GUI. 
 *     OUT_O = LITERAL (Write)
-*        This parameter is only used if parameter STOKES is given a false 
-*        value, and DUALBEAM is given a true value. It is a list of the 
+*        This parameter is only used if parameter DUALBEAM is given a 
+*        true value. It is a list of the 
 *        names of the O-ray output images to create in dual-beam mode, 
 *        holding aligned O-ray intensity values from the input images. These 
 *        should correspond one-for-one to the input images supplied using 
-*        parameter IN. Note, the output images cannot be specified within the 
-*        GUI. 
+*        parameter IN. If  a null (!) value is given, then no O-ray intensity
+*        images are created. Note, the output images cannot be specified 
+*        within the GUI. 
 *     PERCENTILES( 2 ) = _REAL (Update)
 *        The percentiles that define the scaling limits for the displayed
 *        images. For example, [25,75] would scale between the quartile 
@@ -222,13 +226,6 @@
 *        displayed in a box underneath the displayed image. The contents
 *        of this box can be selected using the "Options" menu in the GUI.
 *        [TRUE]
-*     STOKES = _LOGICAL (Read)
-*        If a true value is supplied, then the output will be specified
-*        by parameter OUTSTK and will be a single cube holding Stokes 
-*        parameters. Otherwise, the outputs will be specified either by
-*        parameter OUT (in single-beam mode), or OUT_E and OUT_O (in
-*        dual-beam mode), and will consist of sets of images holding 
-*        aligned intensity values. [TRUE]
 *     VIEW = LITERAL (Update)
 *        This controls how images are placed within the image display
 *        area of the GUI when a new image is selected using the "Images"
@@ -317,6 +314,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP public constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
+      INCLUDE 'PRM_PAR'          ! VAL_ public constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -341,10 +339,13 @@
       INTEGER
      :        DPI,               ! Dots per inch to use
      :        FIT,               ! Fit type for aligning images
+     :        I,                 ! Index for curent input object frame
      :        IGRP1,             ! Identifier for input object frames group
      :        IGRP2,             ! Identifier for output O-ray NDF group
      :        IGRP3,             ! Identifier for output E-ray NDF group
+     :        IGRP4,             ! Identifier for output Stokes NDF group
      :        IGRPS,             ! Identifier for input sky frames group
+     :        INDF,              ! NDF identifier for input object frame
      :        OEFIT,             ! Fit type for aligning the O and E rays
      :        PSF,               ! Size of feature to search for
      :        SIZE,              ! Total size of the object frame group
@@ -359,12 +360,11 @@
      :        SAREA,             ! Is the status area to be displayed?
      :        SKYOFF,            ! Should a sky background be subtracted?
      :        STHLP,             ! Display a WWW browser at start-up?
-     :        STOKES,            ! Produce Stokes parameters?
      :        XHAIR              ! Is a cross-hair required?
       REAL
      :        PERCNT(2),         ! Display percentiles
-     :        PERDEF(2)          ! Default display percentiles
-
+     :        PERDEF(2),         ! Default display percentiles
+     :        WPLATE             ! Value of WPLATE extension component
 *.
 
 *  Check inherited global status.
@@ -408,24 +408,38 @@
          END IF
       END DO
 
-*  See if we should produce aligned intensity images or Stokes parameters.
-      CALL PAR_GET0L( 'STOKES', STOKES, STATUS )
-
 *  See if we should run in dual-beam mode.
       CALL PAR_GET0L( 'DUALBEAM', DBEAM, STATUS )
 
-*  Get the output images. How this is done depends on whether we are
-*  in single or dual beam mode, and whether we are producing Stokes
-*  parameters or aligned intensity images. For STokes parameters a 
-*  single output stack is required.
-      IF ( STOKES ) THEN
-         CALL WRNDF( 'OUTSTK', GRP__NOID, 1, 1, ' ', IGRP2, SIZEO,
-     :               STATUS )
-         IGRP3 = GRP__NOID
+*  Get a group holding the name of the output cube to hold Stokes parameters.
+      CALL WRNDF( 'OUT_S', GRP__NOID, 1, 1, ' ', IGRP4, SIZEO,
+     :             STATUS )
+
+* If we are producing Stokes parameters, check that all of the input
+* object frames hasve POLPACK extensions containing WPLATE values. 
+      IF( IGRP4 .NE. GRP__NOID ) THEN
+         DO I = 1, SIZE
+            CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
+            WPLATE = VAL__BADR
+            CALL NDF_XGT0R( INDF, 'POLPACK', 'WPLATE', WPLATE,
+     :                      STATUS )            
+            IF( STATUS .EQ. SAI__OK .AND. 
+     :          WPLATE .NE. 0.0 .AND. WPLATE .NE. 22.5 .AND.
+     :          WPLATE .NE. 45.0 .AND. WPLATE .NE. 67.5 ) THEN
+               STATUS = SAI__ERROR
+               CALL NDF_MSG( 'NDF', INDF )
+               CALL ERR_REP( 'POLREG_ERR3', 'POLREG: Unable to ' //
+     :                       'obtain a valid WPLATE value ' //
+     :                       'from the POLPACK extension of ' //
+     :                       '''^NDF''.', STATUS )
+            END IF
+            CALL NDF_ANNUL( INDF, STATUS )
+         END DO
+      END IF
 
 * Now deal with cases where we are creating aligned intensity images from
 * dual-beam data.
-      ELSE IF ( DBEAM ) THEN
+      IF ( DBEAM ) THEN
 
 *  Get a group containing the names of the output NDFs to hold the
 *  registered O-ray areas. Base modification elements on the group 
@@ -546,7 +560,7 @@
      :             SI, FIT, OEFIT, LOGFIL( : CHR_LEN( LOGFIL ) ),
      :             BADCOL, CURCOL, REFCOL, SELCOL, VIEW, PERCNT(1),
      :             PERCNT(2), NEWCM, XHAIR, XHRCOL, STHLP, 
-     :             IGRPS, SSIZE, SKYOFF, SKYPAR, STOKES, DBEAM,
+     :             IGRPS, SSIZE, SKYOFF, SKYPAR, IGRP4, DBEAM,
      :             STATUS )
 
 *  The various options values may have been altered by the use of the 
@@ -589,7 +603,7 @@
 
 *  If any other error occurred, then report a contextual message.
          ELSE
-            CALL ERR_REP( 'POLREG_ERR3', 'POLREG: Unable to register '//
+            CALL ERR_REP( 'POLREG_ERR4', 'POLREG: Unable to register '//
      :                    'dual beam polarisation data.', STATUS )
          END IF
 

@@ -1843,6 +1843,58 @@ proc CreateSky {image object} {
    return $ok
 }
 
+proc CursorBind {tags cursors} {
+#+
+#  Name:
+#     CursorBind
+#
+#  Purpose:
+#     Set up binding for canvas items with specified tags so that specified 
+#     cursors are displayed when the pointer is placed over the items.
+#
+#  Arguments:
+#     tags
+#        A list of canvas tags.
+#     cursors
+#        A list of cursor specifications, which should be in one-to-one 
+#        correspondance with the elements in "tags". The specified cursor
+#        is displayed whenever the pointer is placed over a canvas item
+#        with the corresponding tag. If a null value is supplied, then 
+#        the bindings are removed items with the corresponding tag.
+#
+#-
+
+   global CAN
+
+# Loop round each corresponding pair of tag and cursor.
+   for {set i 0} {$i < [llength $tags]} {incr i} {
+      set tag [lindex $tags $i]
+      set cursor [lindex $cursors $i]
+
+# If a null cursor has been supplied, remove the bindings.
+      if { $cursor == "" } {
+         $CAN bind $tag <Enter> ""
+         $CAN bind $tag <Leave> ""
+
+# Otherwise set up new bindings for entering and leaving the canvas item.
+      } {
+         $CAN bind $tag <Enter> \
+            "set citem \[$CAN find withtag current\]
+             if { \$citem != \$CURITEM } {
+                Push CURSOR_STACK \[$CAN cget -cursor\]
+                $CAN config -cursor $cursor
+                set CURITEM \$citem
+             }"
+         $CAN bind $tag <Leave> \
+            "set citem \[$CAN find withtag current\]
+             if { \$citem == \$CURITEM } {
+                $CAN config -cursor \[Pop CURSOR_STACK\]
+                set CURITEM \"\"
+             }"
+      }
+   }
+}
+
 proc DecVal {value max min} {
 #+
 #  Name:
@@ -2851,6 +2903,7 @@ proc DrawPosns {ref reg args} {
 # always displayed at their specified pixel coordinates (i.e. without
 # mapping). 
          if { $ref } {
+            set vtag "rvectors"
             set colour $REFCOL
             if { $reg } {
                MapRefs pxlist pylist
@@ -2859,6 +2912,7 @@ proc DrawPosns {ref reg args} {
                set pylist $PNTPY($image,$object)
             }
          } {
+            set vtag "vectors"
             set colour $CURCOL
             set pxlist $PNTPX($image,$object)
             set pylist $PNTPY($image,$object)
@@ -2939,7 +2993,7 @@ proc DrawPosns {ref reg args} {
                set vid [lindex $PNTVID($image,$object) $i]
                set tag [lindex $PNTTAG($image,$object) $i]
                if { $vid == -1 } {
-                  set vid [$CAN create line $cx $cy $cxn $cyn -fill $colour -tags [list vectors $tag]]
+                  set vid [$CAN create line $cx $cy $cxn $cyn -fill $colour -tags [list $vtag $tag]]
                   set PNTVID($image,$object) [lreplace $PNTVID($image,$object) \
                                                        $i $i $vid]
 
@@ -2947,7 +3001,7 @@ proc DrawPosns {ref reg args} {
 # properties.
                } {
                   $CAN coords $vid $cx $cy $cxn $cyn 
-                  $CAN itemconfigure $vid -fill $colour -tags [list vectors $tag]
+                  $CAN itemconfigure $vid -fill $colour -tags [list $vtag $tag]
                }                   
 
 # If this is the "loose" end of an incomplete mask polygon, store the
@@ -2973,9 +3027,9 @@ proc DrawPosns {ref reg args} {
 # be mask "vertices". Draw the appropriate marker.
             set next [lindex $PNTNXT($image,$object) $i]
             if { $next == "" } {
-               MarkPosn $i $ref 0
+               MarkPosn $i $ref 0 ""
             } {
-               MarkPosn $i $ref 1
+               MarkPosn $i $ref 1 ""
             }
          }
       }
@@ -5614,7 +5668,7 @@ proc GetFeature {cx cy rlabel} {
    if { $px != "" && $py != "" } {
 
 # See if a feature already exists at these pixel coordinates.
-      if { [ FindPosn "PX PY" [list $px $py 2] ] != "" } {
+      if { [ FindPosn "PX PY" [list $px $py] 2] != "" } {
 
 # If so then warn the user and ignore the position. The warning is not
 # issued if this procedure has been entered as a result of the "Accept"
@@ -5650,7 +5704,7 @@ proc GetFeature {cx cy rlabel} {
             set cx [lindex $cxy 0]
             set cy [lindex $cxy 1]
             set newi [SetPosn -1 "PX PY CX CY LBL" [list $px $py $cx $cy $lab] ]
-            set id [MarkPosn $newi 0 0]
+            set id [MarkPosn $newi 0 0 ""]
             SetPosn $newi ID $id
          }
       }
@@ -6575,6 +6629,8 @@ proc HelpArea {} {
    global HAREA
    global HLP_FONT
    global TOP
+   global HSTRUT
+   global HLAB
 
 # If required, create the help frame (if it has not already been created).
    if { $HAREA } {
@@ -6605,15 +6661,15 @@ proc HelpArea {} {
 # size will be retained even though nothing is put in the frame. This
 # strut is used to keep the help area the same size even if the message text 
 # within it requires a narrower area.
-         set strut [frame $F4.strut -width 0 -height $height]
-         pack propagate $strut 0
-         pack $strut -side left
+         set HSTRUT [frame $F4.strut -width 0 -height $height]
+         pack propagate $HSTRUT 0
+         pack $HSTRUT -side left
 
 # Create a message widget to display dynamic help information about 
 # the widget underneath the pointer.
-         set hlab [message $F4.lab -justify left -textvariable HELP \
+         set HLAB [message $F4.lab -justify left -textvariable HELP \
                             -anchor w -font $HLP_FONT -width $width]
-         pack $hlab -fill x -expand 1
+         pack $HLAB -fill x -expand 1
 
 # Set up the help for the help area.
          SetHelp $F4 "An area which shows brief help on the object under the pointer. More detailed help can be obtained using the Help menu." POLREG_HELP_AREA
@@ -6649,6 +6705,20 @@ proc Helper {} {
 
    global HELPS
    global HELP
+   global F4
+   global HSTRUT
+   global HLAB
+
+# If the vertical strut which stops the help area collapsing when the
+# the number of lines in the help area reduces, is smaller than the
+# current height of the help area, extend it.
+   if { $F4 != "" } {
+      set whgt [winfo height $HLAB]
+      set shgt [winfo height $HSTRUT]
+      if { $shgt < $whgt } {
+         $HSTRUT configure -height $whgt
+      }
+   }
 
 # This function is usually invoked when the pointer enters or leaves a
 # widget. The identification of the widget is not reliable if the pointer
@@ -7843,7 +7913,7 @@ proc MarkBind {i image object} {
    }
 }
 
-proc MarkPosn {i ref vertex} {
+proc MarkPosn {i ref vertex tags} {
 #+
 #  Name:
 #     MarkPosn
@@ -7860,6 +7930,8 @@ proc MarkPosn {i ref vertex} {
 #     vertex
 #        If non-zero, then the position is marked as a vertex, otherwise
 #        it is marked as a feature.
+#     tags
+#        A list of additional tags to give to the created canvas item.
 #
 #  Returned Value:
 #      The canvas item identifier for the marker.
@@ -7914,17 +7986,18 @@ proc MarkPosn {i ref vertex} {
 # Set up the bitmap and tags depending on whether the position is a
 # feature or a polygon vertex.
    if { !$vertex } {
-      set tags features
+      lappend tags features
       if { $ref } {
          set bitmap $POLPACK_DIR/rfeature.bit
       } {
          set bitmap $POLPACK_DIR/feature.bit
       }
    } {
-      set tags vertices
       if { $ref } {
+         lappend tags rvertices
          set bitmap $POLPACK_DIR/rvertex.bit
       } {
+         lappend tags vertices
          set bitmap $POLPACK_DIR/vertex.bit
       }
    }
@@ -9053,6 +9126,7 @@ proc ReleaseBind {x y} {
    global CAN
    global CANCEL
    global CURCOL
+   global CURITEM
    global DELETE
    global EDITMENU
    global F_OWNER
@@ -9061,6 +9135,7 @@ proc ReleaseBind {x y} {
    global NPOLY
    global MODE
    global MOVE
+   global ROOTID
    global ROOTI
    global ROOTX
    global ROOTY
@@ -9149,8 +9224,9 @@ proc ReleaseBind {x y} {
             SetPosn $newi VID $vid 
 
 # Create the marker for the new positon, and store its canvas id.
-            set id [MarkPosn $newi 0 1] 
+            set id [MarkPosn $newi 0 1 vroot] 
             SetPosn $newi ID $id 
+            set ROOTID $id
 
 # Store the global values needed to construct the new polygon.
             set V0 $newi
@@ -9186,8 +9262,11 @@ proc ReleaseBind {x y} {
             SetPosn $newi "VID" $vid
 
 # Create the marker for the new positon, and store its canvas id.
-            set id [MarkPosn $newi 0 1] 
+            set id [MarkPosn $newi 0 1 ""] 
             SetPosn $newi ID $id
+
+# Raise the marker of the first (root) vertex to the top of the display list.
+            $CAN raise $ROOTID
 
 # Store the global values needed to construct the new polygon.
             set V1 $newi
@@ -9195,6 +9274,11 @@ proc ReleaseBind {x y} {
 
 # If we are pointing close to the original vertex, close the polygon.
          } {
+
+# Activate the commands which would occur if the pointer was moved away
+# from the root vertex, and then remove the tag vroot from the root vertex.
+            eval [$CAN bind vroot <Leave>]
+            $CAN dtag $ROOTID vroot
 
 # First count the number of vertices in the polygon. If it is less than
 # 3, delete the entire polygon.
@@ -9209,13 +9293,20 @@ proc ReleaseBind {x y} {
 # which ends there. This ensures that the marker is picked up in
 # preference to the vector (for instance when pointing at it with the
 # mouse).
-               $CAN raise [GetPosn $V0 ID] $VID2
+               $CAN raise $ROOTID
 
 # Record the index of the "next" vertex for the current vertex , and
 # enter mode 1.
                SetPosn $V1 NXT $V0
                SetMode 1
+
+# Add the tag "vertices" to the root vertex, and activate the commands which 
+# would occur if the pointer was moved into it.
+               $CAN addtag vertices withtag $ROOTID
+               eval [$CAN bind vertices <Enter>]
+
             }
+
          }
 
 # Mode 3 - "Select a feature label"
@@ -9319,6 +9410,12 @@ proc Save {} {
 #        The sky subtraction method to use; $SKY_AREA or $SKY_FRAME. Any
 #        other value results in no sky subtraction being performed (in which
 #        case the supplied input data is simply copied to the output).
+#     STKOUT (Read)
+#        The name of the output cube to hold Stokes parameters (if $STOKES
+#        is non-zero).
+#     STOKES (Read)
+#        If non-zero, then Stokes parameters are calculated and stored in
+#        a cube with name given by $STKOUT.
 #
 #-
    global ATASK_OUTPUT
@@ -9343,6 +9440,8 @@ proc Save {} {
    global POLPACK_DIR
    global POLY
    global RESAVE
+   global STOKES
+   global STKOUT
    global SAFE
    global S_FONT
    global SIMAGE
@@ -9354,13 +9453,21 @@ proc Save {} {
    set tfc [BeginUF]
 
 # |Display a warning and return if the images have already been saved.
+   if { $STOKES } {
+      set out "Stokes cube"
+      set w1 "is"
+   } {
+      set out "intensity images"
+      set w1 "are"
+   }
+
    if { !$RESAVE } { 
-      Message "The output images are already up-to-date with respect to the current mappings and masks."
+      Message "The output $out $w1 already up-to-date with respect to the current mappings and masks."
       return 1 
    }
 
 # Tell the user what is happening.
-   set told [SetInfo "Creating new output images. Please wait... " 0]
+   set told [SetInfo "Creating new output $out. Please wait... " 0]
 
 # Assume failure.
    set ok 0
@@ -9412,12 +9519,23 @@ proc Save {} {
          SetHelp $pfrm ".  A list of the processing stages involved in creating the output images. Tick marks are displayed next to the stages which have been completed, and the current stage is highlighted in red. "
          pack $imlist $pfrm -side left -fill both -padx 4m -pady 4m
 
+         if { $STOKES } {
+            set stok [frame $topf.stok -background $back]
+            pack $stok -side top -padx 5m -pady 2m
+            set stoklb [label $stok.lb -text "Producing Stokes parameters:" \
+                                       -anchor w -background $back]
+            pack $stoklb -side left -padx 2m -fill x
+            set stoktick [label $stok.tick -foreground $back \
+                                 -background $back -bitmap @$POLPACK_DIR/tick.bit]
+            pack $stoktick -side right
+         }
+
          foreach image $IMAGES {
             regsub -all {\.} $image "" ni
             set fr [frame $imlist.$ni -background $back]
             pack $fr -side top -fill x
 
-            set lb($image) [label $fr.lb -text $image -anchor w \
+            set lb($image) [label $fr.lb -text "$image:" -anchor w \
                             -background $back]
             pack $lb($image) -side left -padx 2m -fill x
             
@@ -9546,6 +9664,9 @@ proc Save {} {
 # Extract the image name section string from the image-section string.
             GetSec $imsec image section
             set SIMAGE $image
+
+# Highlight the image's label in red in the progress dialog box.
+            Wop $lb($image) configure -foreground red
 
 # Do the sky subtraction.
             set image2 [SkySub $imsec $image 1 $selab $setick(O) $setick(E) \
@@ -9789,9 +9910,10 @@ proc Save {} {
                }
             }
 
-# Set the foreground colour of the image's tick in the progress dialog
+# Set the colours of the image's tick and label in the progress dialog
 # box to black.
             Wop $tick($image) configure -foreground black
+            Wop $lb($image) configure -foreground black
 
 # Delete all the temporary files created in this pass through the loop.
             EndUF $tfci ""
@@ -9801,8 +9923,24 @@ proc Save {} {
 
          }
 
+# If required calculate Stokes parameters.
+         if { $STOKES } {
+
+# Highlight the "Producing Stokes parameters" label in red.
+            Wop $stoklb configure -foreground red
+            update idletasks
+            after 2000
+
+# Make the "Producing Stokes parameters" label (and associated tick mark) in 
+# the progress dialog box revert to black.
+            Wop $stoklb configure -foreground black
+            Wop $stoktick configure -foreground black
+          
+         }
+
 # Ensure X events are ignored while ADAM tasks are being executed.
          set SAFE $old_safe
+         update idletasks
 
 # Destroy the progress dialog box.
          if { [winfo exists $top] } { 
@@ -10575,10 +10713,12 @@ proc SetMode {mode} {
    set MODE $mode
 
    if { $mode == 0 } {
+      CursorBind [list vertices vectors] [list "" ""]
       SetHelp $CAN ".  Single click to indicate an image feature.\n.  Click and drag to select an area of the image." POLREG_MODE_0
       SetInfo "Identify star-like features in the image..." 1
 
    } elseif { $mode == 1 } {
+      CursorBind [list vertices vectors] [list fleur pencil]
       SetHelp $CAN ".  Click on a vertex and drag to move the vertex.\n.  Click on a vertex with the shift key pressed to drag the entire polygon.\n.  Click on a polygon edge to insert a new vertex.\n.  Click anywhere else to start a new polygonal mask.\n.  Click anywhere else and drag to select an area." POLREG_MODE_1
       SetInfo "Edit or create a polygonal mask..." 1
       if { $SELECTED_AREA != "" } {
@@ -10589,15 +10729,21 @@ proc SetMode {mode} {
       }    
 
    } elseif { $mode == 2 } {
+      CursorBind [list vertices vectors vroot] [list "" "" X_cursor]
       SetHelp $CAN ".  Click on the first vertex to close the polygon.\n.  Click anywhere else to add another vertex to the polygon.\n.  Click and drag to select an area." POLREG_MODE_2
       $CANCEL configure -state normal
       SetInfo "Complete the construction of a polygon..." 1
 
    } elseif { $mode == 3 } {
+      CursorBind [list vertices vectors] [list "" ""]
       SetHelp $CAN ".  Position pointer over a feature to highlight the corresponding label in the list box.\n.  Click on a feature to close the dialog box and use the feature's label." POLREG_MODE_3
       SetInfo "Select a feature to inherit its label..." 1
 
    } elseif { $mode == 4 } {
+      CursorBind [list vertices vectors] [list "" ""]
+
+# Switch off the cross-hair if currently in use, save the current cursor
+# type, and set up a circular cursor.
       if { $XHAIR } {
          set M4_XHAIR 1
          set XHAIR 0
@@ -11123,9 +11269,11 @@ proc SingleBind {x y shift} {
 #-
    global CAN
    global CURCOL
+   global CURITEM
    global MODE
    global MOVE
    global ROOTI
+   global ROOTID
    global ROOTX
    global ROOTY
    global VID0
@@ -11151,6 +11299,7 @@ proc SingleBind {x y shift} {
 
 # Get the list index of any position with this id.
       set ROOTI [FindPosn ID $id0 0]
+      set ROOTID $id0
 
 # If a position was found with this item id, we must be pointing at a
 # polygon vertex which is to be dragged. Store information about this
@@ -11182,6 +11331,9 @@ proc SingleBind {x y shift} {
             set VID2 $vid
             set VID1 [GetPosn $ROOTI VID]
             set ROOTI $newi               
+            update idletasks
+            eval [$CAN bind vertices <Enter>] 
+
          }
       }
    } {

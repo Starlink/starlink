@@ -141,12 +141,12 @@ interface POLREG
       helpkey  '*'
    endparameter
 
-   parameter OUTSTK
+   parameter OUT_S
       position 2
       type     LITERAL
       access   WRITE
       vpath    'PROMPT '
-      prompt   'Output Stokes parameters'
+      prompt   'Output cube for Stokes parameters'
       helpkey  '*'
    endparameter
 
@@ -258,16 +258,6 @@ interface POLREG
       ppath    'CURRENT,DEFAULT'
       default  YES
       prompt   'Display hyper-text help automatically at start-up?'
-      helpkey  '*'
-   endparameter
-
-   parameter STOKES
-      type     _LOGICAL
-      access   READ
-      vpath    'CURRENT,DEFAULT'
-      ppath    'CURRENT,DEFAULT'
-      default  YES
-      prompt   'Produces Stokes parameters as outputs?"
       helpkey  '*'
    endparameter
 
