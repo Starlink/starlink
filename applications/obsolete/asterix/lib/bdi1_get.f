@@ -77,6 +77,8 @@
 *        Original version.
 *     8 Nov 1995 (DJA):
 *        Handle GET operation for whole axes
+*     6 Dec 1995 (DJA):
+*       Unified invention scheme
 *     {enter_changes_here}
 
 *  Bugs:
@@ -103,8 +105,11 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	CLOC			! New component
-
       CHARACTER*20		ITEM
+
+      INTEGER			ITID			! Invented item id
+      INTEGER			NELM			! # invented elements
+      INTEGER			WBPTR			! Write back address
 
       LOGICAL			OK			! Data is valid?
       LOGICAL			STRUC			! Object is structure
@@ -170,10 +175,27 @@
         END IF
 
       ELSE
-        STATUS = SAI__ERROR
-        CALL MSG_SETC( 'IT', ITEM )
-        CALL ERR_REP( ' ', 'Unable to get item ^IT data from HDS file',
+
+*    Try to invent data
+        CALL ERR_BEGIN( STATUS )
+        CALL BDI1_INVNT( ARGS(1), ARGS(2), ITEM, 'REAL', 'READ',
+     :                   ITID, NELM, WBPTR, STATUS )
+        CALL ERR_END( STATUS )
+
+*    Invented ok?
+        IF ( ITID .NE. ADI__NULLID ) THEN
+
+*      We should store this and re-use it
+
+*      Return to user
+          OARG = ITID
+
+        ELSE
+          STATUS = SAI__ERROR
+          CALL MSG_SETC( 'IT', ITEM )
+          CALL ERR_REP( ' ', 'Unable to get item ^IT data from HDS file',
      :                STATUS )
+        END IF
 
       END IF
 
