@@ -286,6 +286,7 @@
       INTEGER INDF1            ! Input NDF
       INTEGER INDF2            ! Section of input NDF to be listed
       INTEGER IPDAT            ! Pointer to mapped pixel values
+      INTEGER IPIX             ! Index of PIXEL Frame within IWCS
       INTEGER IPLINE           ! Pointer to line buffer
       INTEGER IWCS             ! Pointer to the WCS FrameSet from the NDF
       INTEGER MAXLEN           ! Maximum line length
@@ -517,6 +518,12 @@
 
 *  Read the file to produce an ARD description in a GRP group 
                CALL ARD_GRPEX( FILNAM, GRP__NOID, IGRP, CONT, STATUS )
+
+*  Set the current Frame to PIXEL so that positions in the ard file
+*  are interpreted as pixel coords by default.
+               CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
+               CALL AST_SETI( IWCS, 'CURRENT', IPIX, STATUS )
+
             END IF
 
 *  The next call returns a pointer to some memory which contains a copy of
