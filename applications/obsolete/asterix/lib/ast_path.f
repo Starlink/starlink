@@ -58,6 +58,9 @@
           IF (CHR_LEN(REL).GT.0) THEN
 *  but first see if what we have already points to a file
             INQUIRE(FILE=BUFF,EXIST=ISAFILE)
+            IF (.NOT.ISAFILE) THEN
+              INQUIRE(FILE=BUFF(1:L)//'.sdf',EXIST=ISAFILE)
+            ENDIF
 *  could be case that default expects filename to be added
             IF (ISAFILE) THEN
 *  but alternate doesn't
