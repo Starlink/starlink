@@ -3464,19 +3464,21 @@ The CCDPACK routine descriptions are contained in the following pages.
       which can be derived from other NDFs to which similar framesets
       ought to apply.  The key should be generated in the same way when
       the AST file is used for importing the mapping information by
-      \xroutine{ASTIMP}.  Currently the only way these keys can be 
-      generated is by use of the FITSID parameter.
-   
+      \xroutine{ASTIMP}.  Currently these keys can be generated according to a
+      FITS header card or the order in which the NDFs are presented.
+      Additional information may be written describing what use to
+      make of FITS headers in the NDFs.
+
       Used together, the framesets written out to an AST file can thus
-      contain information about the relative positioning of different
-      images in a set of related NDFs
+      contain information about the positioning of images in a set of
+      related NDFs.
 
       AST files written out by this application can be applied to
       other NDFs of similar origin using the \xroutine{ASTIMP} 
       application, so
       that registration information present in the WCS components of
       one set of NDFs (put there for instance by the \xroutine{REGISTER} 
-      application)
+      or \xroutine{WCSEDIT} applications)
       can be transferred using \xroutine{ASTIMP} and \xroutine{ASTEXP} 
       to another similar set.
       This "similar set" will typically be one from chips in the same
@@ -3496,14 +3498,13 @@ The CCDPACK routine descriptions are contained in the following pages.
       identifiers are not all unique.
    }
    \sstusage{
-      ASTEXP in astfile outdomain baseframe fitsid
+      ASTEXP in astfile outdomain baseframe
    }
    \sstparameters{
       \sstsubsection{
          ASTFILE = LITERAL (Read)
       } {
-         The name of the file to be written containing the sequence
-         of framesets.
+         The name of the AST file to be written.
       }
       \sstsubsection {
          BASEEPOCH = \_DOUBLE (Read)
@@ -3529,7 +3530,7 @@ The CCDPACK routine descriptions are contained in the following pages.
          later be applied using \xroutine{ASTIMP}.  
          AXIS is a good choice since
          this may be applicable to frames which have been modified,
-         for instance by a WCS-aware application like KAPPA's 
+         for instance by an application like KAPPA's 
          \xref{COMPAVE}{sun95}{COMPAVE}.
 
          The value of the parameter can be one of the following:
@@ -3552,6 +3553,30 @@ The CCDPACK routine descriptions are contained in the following pages.
          parameter is copied to the AST file unmodified; in particular
          it retains the same Domain name.
          [AXIS]
+      }
+      \sstsubsection{
+          FITSID = LITERAL (Read)
+      } {
+          If the IDTYPE parameter has the value FITSID, this parameter
+          gives the FITS header keyword whose value distinguishes
+          frames with different coordinate system information.
+          If any lower case characters are given, they are converted
+          to upper case.  This may be a compound name to handle
+          hierarchical keywords, in which case it has the form
+          keyword1.keyword2 etc.  Each keyword must be no longer than
+          8 characters.
+      }
+      \sstsubsection{
+          FITSROT = LITERAL (Read)
+      } {
+          This parameter gives the name of a FITS header keyword whose
+          value will be used to rotate the frames when they are imported.
+          If any lower case characters are given, they are converted
+          to upper case.  This may be a compound name to handle
+          hierarchical keywords, in which case it has the form
+          keyword1.keyword2 etc.  Each keyword must be no longer than
+          8 characters.
+          [!]
       }
       \sstsubsection{
          IDTYPE = LITERAL (Read)
@@ -3587,25 +3612,12 @@ The CCDPACK routine descriptions are contained in the following pages.
           If IDTYPE is set to INDEX, then this parameter is a list of
           integers with as many elements as there are NDFs accessed by
           the IN parameter.  It gives the sequence of indices N to be
-          used for generating the ID values.  Its default value is a
-          list with the appropriate number of elements starting
-          1,2,3,\ldots  This default will normally be appropriate unless
-          the NDFs are being presented in an unusual order, or an order
-          different from that in which they are likely to be presented
-          to \xroutine{ASTIMP}.
-          [Dynamic: 1,2,3\ldots]
-      }
-      \sstsubsection{
-          FITSID = FILENAME (Read)
-      } {
-          If the IDTYPE parameter has the value FITSID, this parameter
-          gives the FITS header keyword whose value distinguishes
-          frames with different coordinate system information.
-          If any lower case characters are given, they are converted
-          to upper case.  This may be a compound name to handle
-          hierarchical keywords, in which case it has the form
-          keyword1.keyword2 etc.  Each keyword must be no longer than
-          8 characters.
+          used for generating the ID values.   If set null (!) the
+          NDFs will be considered in the order 1,2,3,\ldots\ which will
+          normally be appropriate unless the NDFs are being presented
+          in an order different from that in which they are likely to
+          be presented to \xroutine{ASTIMP}.
+          [!]
       }
       \sstsubsection{
          LOGFILE = FILENAME (Read)
@@ -3652,15 +3664,11 @@ The CCDPACK routine descriptions are contained in the following pages.
          OUTDOMAIN = LITERAL (Read)
       } {
           This parameter gives the name of the new alignment domain for
-          the frames written out to the AST file.  Its value is
-          usually not important, but care should be taken that it does
-          not clash with other useful domains which already exist in
-          the WCS components of the NDFs to which ASTFILE will be applied
-          (by the \xroutine{ASTIMP} application).  
-          For this reason it is often not a
-          good idea to use the same name as the Current domain of the
-          NDFs listed in the IN parameter.  A suitable value might be the
-          name of the instrument from which the NDFs are derived.
+          the frames written out to the AST file.  It is a good idea
+          to choose a value which is not likely to exist previously
+          in the WCS components of the NDFs to which ASTFILE will be
+          applied.  A suitable value might be the name of the
+          instrument from which the NDFs are obtained.
 
           Note that the frames which are written to the AST file are the
           Current frames of the NDFs supplied; this parameter only gives
@@ -3707,6 +3715,16 @@ The CCDPACK routine descriptions are contained in the following pages.
          same order as when this command was invoked.  The title of the
          output Current frame will be as given.
       }
+      \sstexamplesubsection{
+         astexp r10595[2,3,4,5] wfc.ast outdomain=WFC
+                idtype=fitsid fitsid=CHIPNAME fitsrot=ROTSKYPA
+      } {
+         This exports the alignment information from the four named
+         NDFs to a file wfc.ast.  The CHIPNAME FITS header identifies
+         the source CCD for each, and the ROTSKYPA FITS header gives
+         a number of degrees to rotate each frame additional to the
+         relative alignment information.
+      }
    }
    \sstdiytopic{
       AST file format
@@ -3721,34 +3739,76 @@ The CCDPACK routine descriptions are contained in the following pages.
       are to be undertaken.  The format of the file is explained
       here.
 
-      The AST file consists of a sequence of framesets.  Each
-      frameset has an ID, and contains two frames (a Base frame and
-      a Current frame) and a mapping between them.  The domains of
-      all the Base frames should normally be the same, and likewise
-      for all the Current frames.  For the NDFs to which the file
-      will be applied by \xroutine{ASTIMP}, their WCS components 
-      should contain
-      frames in the same domain as the AST file's Base frame.
+         The AST file consists of the following, in order:
+         \begin{quote}
+            <global modifiers> \\
+            (blank line) \\
+            <frameset 1> \\
+            <frameset 1 modifiers> \\
+            (blank line) \\
+            <frameset 1> \\
+            <frameset 2 modifiers> \\
+            (blank line) \\
+              \ldots \\
+            (end of file) \\
+         \end{quote}
+         Characters after a \qt{\#} character are normally ignored.  The
+         constituent parts are composed as follows:
+         \sstitemlist{
+            \sstitem
+               Blank line -- \\
+            A single blank line, which may contain spaces but no comments.
+            \sstitem
+               Frameset -- \\
+            The framesets are written in AST native format, as explained
+            in \xref{SUN/210}{sun210}{}.
+ 
+            Each frameset has an ID, and contains two frames (a Base
+            frame and a Current frame) and a mapping between them.
+            The domains of all the Base frames should normally be the
+            same, and likewise for all the Current frames.  For the
+            NDFs to which the file will be applied by \xroutine{ASTIMP}, their
+            WCS components should contain frames in the same domain
+            as the AST file's Base frame.
+ 
+            The ID of each frameset is used to determine, for each NDF,
+            which of the framesets in the file should be applied to it.
+            This ID is a string which can assume one of the following forms:
+            \sstitemlist{
+               \sstitem
+                  \qt{FITSID KEY VALUE} --
+                  This will match an NDF if the first FITS header card
+                  with the keyword KEY has the value VALUE.  If the value
+                  is of type CHARACTER it must be in single quotes. KEY
+                  may be compound (of the form keyword1.keyword2 etc) to
+                  permit reading of hierarchical keywords.
 
-      The ID of each frameset is used to determine, for each NDF,
-      which of the framesets in the file should be applied to it.
-      This ID is a string which can assume one of the following forms:
-      \sstitemlist{
-         \sstitem
-            \qt{FITSID KEY VALUE} --
-            This will match an NDF if the first FITS header card
-            with the keyword KEY has the value VALUE.  If the value
-            is of type CHARACTER it must be in single quotes. KEY
-            may be compound (of the form keyword1.keyword2 etc) to
-            permit reading of hierarchical keywords.
-
-         \sstitem
-           \qt{INDEX N} --
-           This associates a frameset with an integer N.  Usually
-           N will take the values 1,2,3,\ldots for the framesets
-           in the file.  Typically the N'th NDF in a list will
-           match the one with an ID of \qt{INDEX N}.
-      }
+               \sstitem
+                 \qt{INDEX N} --
+                 This associates a frameset with an integer N.  Usually
+                 N will take the values 1,2,3,\ldots for the framesets
+                 in the file.  Typically the N'th NDF in a list will
+                 match the one with an ID of \qt{INDEX N}.
+            }
+ 
+            \sstitem
+              Modifiers -- \\
+            Modifiers describe additional modifications to be made
+            to the framesets on import.  They are of the form
+            \begin{quote}
+               USE keyword arguments
+            \end{quote}
+            Currently the only modifier defined is FITSROT, which
+            defines the name of a FITS header which specifies how
+            many degrees to rotate the image before use.  This
+            rotation is carried out after the mapping defined by
+            the frameset itself.
+ 
+            Global modifiers affect all NDFs processed with the AST
+            file.  Frameset modifiers affect only those NDFs which
+            correspond to their frameset.
+         }
+ 
       Rigorous error checking of the AST file is not performed, so
       that unhelpful modifications to the WCS components of the
       target NDFs may occur if it is not in accordance with these
@@ -3780,7 +3840,7 @@ The CCDPACK routine descriptions are contained in the following pages.
    Imports AST FrameSet information into NDFs
 } {
    \sstdescription{
-      This task reads AST FrameSet information from a suitable file
+      This task reads alignment information from an AST file
       and uses it to modify the WCS components of the given NDFs.
       A frame in a new domain is added (the same for each NDF) within
       which a set of NDFs can be aligned.  This alignment may be used to
@@ -3790,9 +3850,9 @@ The CCDPACK routine descriptions are contained in the following pages.
       added domain is made the Current domain of the WCS components.
    
       AST files for use by this application are intended to be those
-      written by the \xroutine{ASTEXP} application, but with care 
-      frameset files
-      written from other applications or doctored by hand could be used.
+      written by the \xroutine{ASTEXP} application, and may either be
+      standard ones designed for use with a particular instrument, or
+      prepared by the user.
    
       If the WCS component of the NDF has a frame whose Domain has
       the same value as that of the Current frame of the frameset
@@ -3819,6 +3879,17 @@ The CCDPACK routine descriptions are contained in the following pages.
          The format of the file is explained in the Notes section.
       }
       \sstsubsection{
+         FITSROT = LITERAL (Read)
+      } {
+         The name of a FITS header whose value is an angle through
+         which all the imported frames should be rotated.  This
+         rotation is done after the mappings given in the AST file
+         itself have been applied.  If this parameter is supplied it
+         overrides any value given in the modification parts of the
+         AST file.
+         [!]
+      }
+      \sstsubsection{
          IN = LITERAL (Read)
       } {
          A list of NDF names whose WCS components are to be modified
@@ -3835,12 +3906,11 @@ The CCDPACK routine descriptions are contained in the following pages.
          each NDF, what its index number is.  Thus if only one NDF is
          given in the IN list, and the value of INDICES is [3], then
          the frameset with the identifier \qt{INDEX 3} will be chosen.
-         Its default value is a list with the appropriate number of
-         elements starting 1,2,3,\ldots  This default will normally be
-         appropriate unless the NDFs are being presented in an unusual
-         order, i.e.\ different from that in which they were presented
-         to \xroutine{ASTEXP} when generating the AST file.
-         [Dynamic: 1,2,3,...]
+         If set null (!) the NDFs will be considered in the order
+         1,2,3,\ldots which will be appropriate unless the NDFs are being
+         presented in a different order from that in which they were
+         presented to \xroutine{ASTEXP} when generating the AST file.
+         [!]
       }
       \sstsubsection{
          INDOMAIN = LITERAL (Read)
@@ -3891,6 +3961,14 @@ The CCDPACK routine descriptions are contained in the following pages.
          default is \qt{BOTH}.
          [BOTH]
       }
+      \sstsubsection{
+         ROT = \_DOUBLE (Read)
+      } {
+         An angle through which all the imported frames should be
+         rotated.  This rotation is done after the mappings in the AST
+         file itself have been applied.
+         [0]
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -3931,34 +4009,76 @@ The CCDPACK routine descriptions are contained in the following pages.
       are to be undertaken.  The format of the file is explained
       here.
 
-      The AST file consists of a sequence of framesets.  Each
-      frameset has an ID, and contains two frames (a Base frame and
-      a Current frame) and a mapping between them.  The domains of
-      all the Base frames should normally be the same, and likewise
-      for all the Current frames.  For the NDFs to which the file
-      will be applied by \routine{ASTIMP}, their WCS components 
-      should contain
-      frames in the same domain as the AST file's Base frame.
+         The AST file consists of the following, in order:
+         \begin{quote}
+            <global modifiers> \\
+            (blank line) \\
+            <frameset 1> \\
+            <frameset 1 modifiers> \\
+            (blank line) \\
+            <frameset 1> \\
+            <frameset 2 modifiers> \\
+            (blank line) \\
+              \ldots \\
+            (end of file) \\
+         \end{quote}
+         Characters after a \qt{\#} character are normally ignored.  The
+         constituent parts are composed as follows:
+         \sstitemlist{
+            \sstitem
+               Blank line -- \\
+            A single blank line, which may contain spaces but no comments.
+            \sstitem
+               Frameset -- \\
+            The framesets are written in AST native format, as explained
+            in \xref{SUN/210}{sun210}{}.
+ 
+            Each frameset has an ID, and contains two frames (a Base
+            frame and a Current frame) and a mapping between them.
+            The domains of all the Base frames should normally be the
+            same, and likewise for all the Current frames.  For the
+            NDFs to which the file will be applied by \xroutine{ASTIMP}, their
+            WCS components should contain frames in the same domain
+            as the AST file's Base frame.
+ 
+            The ID of each frameset is used to determine, for each NDF,
+            which of the framesets in the file should be applied to it.
+            This ID is a string which can assume one of the following forms:
+            \sstitemlist{
+               \sstitem
+                  \qt{FITSID KEY VALUE} --
+                  This will match an NDF if the first FITS header card
+                  with the keyword KEY has the value VALUE.  If the value
+                  is of type CHARACTER it must be in single quotes. KEY
+                  may be compound (of the form keyword1.keyword2 etc) to
+                  permit reading of hierarchical keywords.
 
-      The ID of each frameset is used to determine, for each NDF,
-      which of the framesets in the file should be applied to it.
-      This ID is a string which can assume one of the following forms:
-      \sstitemlist{
-         \sstitem
-            \qt{FITSID KEY VALUE} --
-            This will match an NDF if the first FITS header card
-            with the keyword KEY has the value VALUE.  If the value
-            is of type CHARACTER it must be in single quotes. KEY
-            may be compound (of the form keyword1.keyword2 etc) to
-            permit reading of hierarchical keywords.
-
-         \sstitem
-           \qt{INDEX N} --
-           This associates a frameset with an integer N.  Usually
-           N will take the values 1,2,3,\ldots for the framesets
-           in the file.  Typically the N'th NDF in a list will
-           match the one with an ID of \qt{INDEX N}.
-      }
+               \sstitem
+                 \qt{INDEX N} --
+                 This associates a frameset with an integer N.  Usually
+                 N will take the values 1,2,3,\ldots for the framesets
+                 in the file.  Typically the N'th NDF in a list will
+                 match the one with an ID of \qt{INDEX N}.
+            }
+ 
+            \sstitem
+              Modifiers -- \\
+            Modifiers describe additional modifications to be made
+            to the framesets on import.  They are of the form
+            \begin{quote}
+               USE keyword arguments
+            \end{quote}
+            Currently the only modifier defined is FITSROT, which
+            defines the name of a FITS header which specifies how
+            many degrees to rotate the image before use.  This
+            rotation is carried out after the mapping defined by
+            the frameset itself.
+ 
+            Global modifiers affect all NDFs processed with the AST
+            file.  Frameset modifiers affect only those NDFs which
+            correspond to their frameset.
+         }
+ 
       Rigorous error checking of the AST file is not performed, so
       that unhelpful modifications to the WCS components of the
       target NDFs may occur if it is not in accordance with these
@@ -7091,6 +7211,9 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
         considered as the same point. Comments may be included in the
         file using the characters \# and !. Columns may be separated by
         the use of commas or spaces.
+
+        In all cases the coordinates in position lists are pixel 
+        coordinates.
    }
    \sstdiytopic{
       Behaviour of parameters
@@ -7138,7 +7261,10 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       This routine is designed to determine which positions in many
       unaligned and unlabeled lists match, subject to the condition
       that the transformations between the lists are well modelled by
-      simple translations.
+      simple translations.  Although the representation of the positions
+      in the lists themselves is in pixel coordinates, the lists may
+      be related by translations in the Current frames of the WCS
+      components of the associated NDFs.
 
       The results from this routine are labelled position lists (one
       for each input list) which may be used to complete image
@@ -7339,22 +7465,32 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
         incomplete solution. Such solutions will result when only a
         subset of the input position lists have been matched. 
 
-        This situation would ideally indicate that one, or more, of the
-        input lists are from positions not coincident with the others, in
-        which case it is perfectly legimate to proceed, however, the more
-        likely scenario is that they have too few positions and have
-        consequently been rejected.
+        In this case, if the associating position lists with NDFs option
+        has been chosen, then any NDFs for which matching was not
+        achieved will have their associated position lists removed
+        from their .MORE.CCDPACK extensions.  Thus after running
+        FINDOFF with OVERRIDE set to TRUE, any position list associated
+        with an NDF is guaranteed to be one which has been matched, and
+        not just one left over from the previously associated unmatched
+        list.
+
+        Incomplete matching would ideally indicate that one, or more,
+        of the input lists are from positions not coincident with the
+        others, in which case it is perfectly legimate to proceed.
+        However, it is equally possible that they have too few positions
+        and have consequently been rejected.
         [TRUE]
       }
       \sstsubsection{
          RESTRICT = LOGICAL (Read)
       } {
-         This parameter determines whether the mapping between coordinate
-         systems of NDF pairs is used to restrict the choice of objects
-         to match with each other.  If set TRUE, then only objects
-         which would appear in the overlap of two frames if the
-         mapping determined by the WCS components of each NDF pair
-         were accurate are tested for matching.  If it is set FALSE, then
+         This parameter determines whether the Current coordinate frame
+         is used to restrict the choice of objects to match with each
+         other.  If set TRUE, then the only objects which are
+         considered for matching are those which would appear in
+         the overlap of two frames given that their PIXEL-domain to
+         Current frame mapping is exact, and that these frames refer
+         to the same coordinate space.  If it is set FALSE, then
          no such restriction is made.
 
          This parameter should therefore be set TRUE if the translational
@@ -7380,28 +7516,18 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       \sstsubsection{
          USEWCS = LOGICAL (Read)
       } {
-         This parameter specifies whether the World Coordinate System
-         information in the NDF should be used to make guesses about
-         how to align the frames.  If set true, and if a mapping
-         between the coordinates of each pair of NDFs can be found in
-         the domain of the Current coordinate frame of either of the pair
-         then this mapping is applied before the match is attempted.
-         Additionally, if the parameter RESTRICT is TRUE, the objects
-         chosen for matching up between each pair of images are only
-         those which would overlap in that pair if the WCS coordinate
-         information in both NDFs were accurate.  No other restriction
-         is made on the basis of this information however.  Since the
-         algorithms rely on shifting images in the X and Y directions
-         therefore, they will be capable of matching up objects even if
-         there is a significant (if RESTRICT is TRUE) or an arbitrarily
-         large (if RESTRICT is FALSE) translational error in the
-         coordinate system of the chosen domain, but other large errors
-         in the mapping (e.g. rotational alignment) will not be
-         tolerated.
-      
-         If this parameter is set FALSE, then object matching proceeds
-         on the assumption that the coordinate frames of all NDFs
-         are the same apart from a translation.
+         This parameter specifies whether the coordinates in the
+         position lists should be transformed from Pixel coordinates
+         into the coordinates of the Current frame of the WCS
+         component of the associated NDF before use.  \routine{FINDOFF} can only
+         match objects between frames which are related by a simple
+         translation (shift in X and Y), so if the pixel coordinates
+         of the NDFs are related by a more complicated transformation
+         it is necessary to encode this information in the WCS
+         components of the NDFs (or resample the images first).
+         If the Current frame of the WCS component is related to the
+         Pixel frame by a translation, the setting of this parameter
+         is usually unimportant (but see also the RESTRICT parameter).
       
          This parameter is ignored if NDFNAMES is false.
          [TRUE]
@@ -7413,14 +7539,14 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       } {
          In this example all the NDFs in the current directory are
          accessed and their associated position lists are used.
-         Before object matching is attempted any transformations
-         implied by aligning the images in the Current frames
-         of the NDFs' WCS components are applied to the position list
-         coordinates.  The matched position lists are named $*$.off.
-         The method used is to try the FAST algorithm, switching to SLOW
-         if FAST fails. The completeness measure is used when forming
-         the spanning tree.  Matches with completenesses less than
-         0.5 and or with less than three positions, are rejected.
+         The coordinates used for object matching are those in the
+         position lists transformed into the Current frames of the
+         WCS components of the NDFs.  The matched position lists are
+         named $*$.off.  The method used is to try the FAST algorithm,
+         switching to SLOW if FAST fails. The completeness measure
+         is used when forming the spanning tree.  Matches with
+         completenesses less than 0.5 and or with less than three
+         positions, are rejected.
       }
       \sstexamplesubsection{
          findoff fast nofailsafe
@@ -7499,6 +7625,9 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
         EXTERNAL format - positions are specified using just an X
         and a Y entry and no other entries.
+
+        In all cases, the coordinates in position lists are pixel
+        coordinates.
 
       \sstitemlist{
 
@@ -11818,6 +11947,22 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          the resultant transformation structures.
       }
       \sstsubsection{
+         USEWCS = \_LOGICAL (Read)
+      } {
+         This parameter specifies whether the coordinates in the
+         position lists should be transformed from Pixel coordinates
+         into the coordinates of the Current frame of the WCS
+         component of the associated NDF before use.  It should
+         normally be set TRUE, in which case the transformation type
+         set by the FITTYPE parameter is the type which will be fit
+         between the Current coordinate frames of the NDFs.
+         Otherwise the fit will be between the Pixel coordinate
+         frames.
+ 
+         This parameter is ignored if NDFNAMES is not TRUE.
+         [TRUE]
+      }
+      \sstsubsection{
          XFOR = LITERAL (Read)
       } {
          If FITTYPE=6 then this parameter specifies the parameterised
@@ -11891,11 +12036,13 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          In this example all the NDFs in the current directory are
          accessed and their associated position lists are opened.
          A global fit between all the datasets is then performed
-         which results in estimates for the offsets from the first input
-         NDF's position.  The results are then coded as new frames,
-         given the domain name \qt{CCD\_REG} in the WCS component of the
-         NDFs.  Actual registration of the images can then be achieved
-         by aligning all the NDFs in the CCD\_REG domain.
+         which results in estimates for the offsets from the first
+         input NDF's position.  These offsets are between the Current
+         coordinate frames of the NDFs.  The results are then coded
+         as new frames, with the domain name \qt{CCD\_REG}, in the WCS
+         component of the NDFs.  Actual registration of the images
+         can then be achieved by aligning all the NDFs in the CCD\_REG
+         domain.
       }
       \sstexamplesubsection{
          register inlist=\qs{$*$} trtype=5 outdomain=result-set1
@@ -11911,7 +12058,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          In this example a solid body fit is performed between the
          position lists associated with the images myndf1 and myndf2.
          The reference positions are chosen to be those associated with
-         myndf2.
+         myndf2, so that the CCD\_REG frame coordinates will be the
+         same as the Current frame in NDF myndf2.
       }
       \sstexamplesubsection{
          register inlist=\qs{\qt{one,two}} fittype=6
@@ -11991,6 +12139,9 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
 
         EXTERNAL format - positions are specified using just an X and
         a Y entry and no other entries.
+
+        In all casese, the coordinates in position lists are pixel
+        coordinates.
 
       \sstitemlist{
 
@@ -12501,8 +12652,10 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                (see section
                \xref{\qt{Sky Co-ordinate Systems}}{sun95}{se_scs} in
                SUN/95).
+            \sstitem
+               Null (!), indicating the Current frame.
          }
-         A domain name is usually the most suitable choice.
+         [!]
       }
       \sstsubsection{
          INEXT = \_LOGICAL (Read)
@@ -12779,16 +12932,15 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
    \sstexamples{
       \sstexamplesubsection{
          tranlist inlist=\qs{$*$} outlist=\qs{$*$.reg} trtype=wcs
-                  framein=pixel frameout=ccd\_reg
+                  framein=pixel
       }{
          In this example all the NDFs in the current directory are
          accessed and their associated position lists are opened.
          The WCS component of each NDF is used to transform the
          coordinates in the position lists from pixel coordinates to
-         coordinates in the frame with a domain \qt{CCD\_REG} (the
-         domain written by default by the \xroutine{REGISTER} program).  The
-         output lists are called ndf-name.reg and are associated
-         with the NDFs.
+         coordinates in the Current coordinate frame.  The output
+         lists are called ndf-name.reg and are associated with the
+         NDFs.
       }
       \sstexamplesubsection{
          tranlist inlist=\qt{$*$} outlist=\qt{$*$.tran} trtype=struct 
@@ -13246,9 +13398,9 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
    Modifies WCS components of a set of NDFs
 } {
    \sstdescription{
-      This task performs a set of miscellaneous modifications to the
+      This task performs a set of modifications to the
       WCS (World Coordinate System) components of a list of NDFs.
-      According to the MODE parameter it can
+      According to the value of the MODE parameter it will:
       \sstitemlist{
          \sstitem
             Set the Current frame
@@ -13256,14 +13408,12 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
             Add a new frame
          \sstitem
             Remove a frame
+         \sstitem
+            Set an attribute for a frame
       }
       The routine does not fail if some of the requested edits cannot
       be performed, but an output parameter MODIFIED records which
       NDFs were successfully modified.
-
-      If a new frame is added it becomes the Current frame.  If a frame
-      is removed, the Current frame is not changed (unless the Current
-      frame itself is removed).
    }
    \sstusage{
       WCSEDIT in mode frame
@@ -13305,6 +13455,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          folded to upper case.  If the new frame is successfully added
          and any frame with the same domain name already exists, it
          will be removed, and a message will be printed to that effect.
+         [CCD\_WCSEDIT]
       }
       \sstsubsection{
          EPOCH = \_DOUBLE (Read)
@@ -13332,8 +13483,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                                  that domain will be removed.
             \sstitem
                 MODE = ADD    -- The new frame will be a copy of the
-                                 basis frame, and will be mapped from it
-                                 using the mapping given.
+                                 basis frame (though Domain and Title
+                                 will be changed), and will be mapped 
+                                 from it using the mapping given.
+            \sstitem
+               MODE = SET     -- The frame whose attributes are to be set
          }
 
          The value of the parameter can be one of the following:
@@ -13349,8 +13503,10 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                (see section
                \xref{\qt{Sky Co-ordinate Systems}}{sun95}{se_scs} in
                SUN/95).
+            \sstitem
+               The Null (!) value; in this case the Current frame is used.
          }
-         A domain name is usually the most suitable choice.
+         A domain name, or !, is usually the most suitable choice.
       }
       \sstsubsection{
          IN = LITERAL (Read)
@@ -13358,6 +13514,13 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          A list specifying the names of the NDFs whose WCS components
          are to be modified.  The NDF names should be separated by
          commas and may include wildcards.
+      }
+      \sstsubsection{
+         INVERT = \_LOGICAL (Read)
+      } {
+         If set TRUE the mapping defined by COEFFS will be applied in
+         the reverse direction.
+         [FALSE]
       }
       \sstsubsection{
          LOGFILE = FILENAME (Read)
@@ -13427,7 +13590,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
             \sstitem
                CURRENT  -- Set the Current frame
             \sstitem
-               REMOVE   -- Remove a frame
+               REMOVE   -- Remove a frame (Current frame is not changed
+                           unless the Current one is removed)
+            \sstitem
+               SET      -- Set frame attributes (Current frame is not
+                           changed)
          }
          [CURRENT]
       }
@@ -13438,6 +13605,14 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          NDFs which were successfully modified.  In particular, if MODE
          is CURRENT, this list will include all the NDFs which contained
          the specified frame, but exclude any which did not.
+      }
+      \sstsubsection{
+         SET = LITERAL (Read)
+      } {
+         If MODE is SET, then this gives a string of the form
+         \qt{attribute=value} which is to be applied to the frame.  The
+         string is passed straight to the \xref{AST\_SET}{sun210}{AST\_SET} 
+         routine (see \xref{SUN/210}{sun210}{}).
       }
    }
    \sstexamples{
@@ -13466,6 +13641,13 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          frames with domain NEW already exist in those NDFs they are
          removed.
       }
+      \sstexamplesubsection{
+         wcsedit ndf1 set ! set=\qt{domain=NEW,title=New frame}
+      } {
+         This changes the value of the Domain attribute of the current
+         frame in the WCS component of NDF1 to the name \qt{NEW} and
+         sets the Title attribute of the frame to \qt{New frame}.
+      }
    }
    \sstnotes{
       This routine provides similar functionality to that provided by
@@ -13482,7 +13664,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
    \sstdescription{
       This application takes a set of NDFs which have World Coordinate
       System (WCS) components, and tries to align them all according
-      to an ordered list of frame domains.  If successful, it adds a
+      to a given list of frame domains.  If successful, it adds a
       new frame to the WCS component of each within which they are
       all aligned.  The \xroutine{TRANLIST} or \xroutine{TRANNDF}  
       applications can then be used on the resulting NDFs.
@@ -13495,7 +13677,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       of alignment types where first choices are not available.
 
       The application operates on a set of NDFs, IN.  A list of
-      domains DOMAINLIST within which to align, in order of preference,
+      domains DOMAINS within which to align, in order of preference,
       is specified, and a reference NDF is denoted by REFPOS.  On
       successful completion, a new frame (which becomes Current), with
       a domain given by OUTDOMAIN (default CCD\_WCSREG) is added to
@@ -13507,20 +13689,21 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       program attempts to find a mapping from the reference NDF to it.
       If it and the reference NDF do not share frames in any of the
       domains given by the DOMAINS parameter, it will try to use the
-      WCS components of intermediate NDFs to find a path between them,
-      using only the domains given.  The shortest available path which
-      provides a link is chosen, and if there is more than one which
+      WCS components of intermediate NDFs to find a path between them;
+      this path is a subgraph of a graph in which the nodes are the
+      NDFs and an edge exists between two nodes if the NDFs share a
+      domain in the given list.  The shortest available path which
+      connects a pair is chosen, and if there is more than one which
       meets this criterion, one which uses domains nearest the head of
       the list is preferred.
 
-      If there is no path from the reference NDF to one of the other
-      NDFs using the domains given, then no new frame will be written
-      to that NDF (and a message indicating failure will be output),
-      but any previously existing frames in the output domain will
-      be removed.
+      If the graph is not fully connected, a list of the existing
+      subgraphs is output, and the program will normally terminate,
+      however it can be made to continue with registration of the
+      connected NDFs by setting the OVERRIDE parameter.
    }
    \sstusage{
-      WCSREG in domainlist
+      WCSREG in domains
    }
    \sstparameters{
       \sstsubsection{
@@ -13613,10 +13796,10 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          REFPOS = \_INTEGER (Read)
       } {
          The position within the IN list which corresponds to the
-         reference NDF.  For each domain in DOMAINLIST, alignment will
+         reference NDF.  For each domain in DOMAINS, alignment will
          be attempted with the reference NDF first, and the mapping
          between the output frame and the first matching name in
-         DOMAINLIST is a unit mapping.
+         DOMAINS is a unit mapping.
          [1]
       }
    }
@@ -13644,7 +13827,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
       \sstexamplesubsection{
          wcsreg \qt{obs1\_$*$,obs2\_$*$} outdomain=final
-                domainlist=\qt{ccd\_reg,inst\_obs1,inst\_obs2}
+                domains=\qt{ccd\_reg,inst\_obs1,inst\_obs2}
       } {
          NDFs with names starting \qt{obs1\_} and \qt{obs2\_} are aligned.
          Where they share the CCD\_REG domain this will be used for
