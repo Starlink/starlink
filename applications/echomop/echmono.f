@@ -90,7 +90,7 @@
 *  If menu task, issue welcome, and display the version number.
       IF ( ACTION .EQ. 'ECHMENU' ) THEN
 *      %%VERSION%%
-         CALL ECH_REPORT( 0, 'This is ECHOMOP Version 3.3-6' )
+         CALL ECH_REPORT( 0, 'This is ECHOMOP Version 3.3-6b1' )
       END IF
       
 *   If the VERSION parameter was present and true, then exit, 
