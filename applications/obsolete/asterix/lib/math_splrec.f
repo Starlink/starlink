@@ -11,13 +11,15 @@
 *           of knots is returned
 *    Parameters :
 *    Method :
-*            The NAG routine E02BBF is used.
+*            The PDA routine PDA_DBVALU is used.
 *    Deficiencies :
 *    Bugs :
 *    Authors :
 *     Richard Saxton (LTVAD::RDS)
+*     Richard Beard (Birmingham)
 *    History :
 *     4 May 1988 Original (LTVAD::RDS)
+*     9 Jun 1997 Converted to PDA (RB)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -35,11 +37,13 @@
 *    Export :
       REAL Y(NPTS)                   !Array of Y values
 *    Global variables :
+      EXTERNAL PDA_DBVALU
+      DOUBLE PRECISION PDA_DBVALU
 *    Local Constants :
 *    Local variables :
-      INTEGER LP                     ! Loop variable
+      INTEGER LP,INVB                ! Loop variable
       DOUBLE PRECISION X             ! X position to fit spline at
-      DOUBLE PRECISION FIT           ! Y value of spline at X position
+      DOUBLE PRECISION WORK(12)	     ! Workspace for PDA_DBVALU
       INTEGER NFAIL                  ! Number of failures of E02BB7
 *    Local data :
 *-
@@ -53,6 +57,7 @@
         ENDIF
 *
         NFAIL=0
+        INVB=1
 *
         DO LP=1,NPTS
 *
@@ -64,8 +69,8 @@
            IF (X.LT.KNOT(4) .OR. X.GT.KNOT(N7-3)) THEN
                NFAIL=NFAIL+1
            ELSE
-	       CALL E02BBF(N7,KNOT,COEFF,X,FIT,STATUS)
-               Y(LP)=REAL(FIT)
+               Y(LP)=REAL(PDA_DBVALU(KNOT,COEFF,N7-4,4,0,X,INVB,WORK,
+     :                                                          STATUS))
            ENDIF
 *
 	ENDDO
