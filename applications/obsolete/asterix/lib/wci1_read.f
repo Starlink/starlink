@@ -117,6 +117,7 @@
       DOUBLE PRECISION		BTAI			! Value of BASE_TAI
       DOUBLE PRECISION		EPOCH			! Epoch
       DOUBLE PRECISION		MJD			! Observation time
+      DOUBLE PRECISION		NPOINT(2)		! Nominal RA, DEC
       DOUBLE PRECISION		PA			! Position angle
       DOUBLE PRECISION		SPOINT(2)		! RA, DEC
 
@@ -134,6 +135,7 @@
       INTEGER			X_AX,Y_AX,E_AX,T_AX	! Axis numbers
 
       LOGICAL			EQOK, EPOK		! Equinox & epoch ok?
+      LOGICAL			FRAOK, FDECOK		! Nominal pointing ok?
       LOGICAL			HASPIX			! Spatial axes exist?
       LOGICAL			RAOK, DECOK, PAOK       ! Found ok flags
       LOGICAL			REG(2)			! Axes regular
@@ -190,6 +192,8 @@
 *     Pointing and orientation
         CALL ADI1_CGET0D( HLOC, 'AXIS_RA', RAOK, SPOINT(1), STATUS )
         CALL ADI1_CGET0D( HLOC, 'AXIS_DEC', DECOK, SPOINT(2), STATUS )
+        CALL ADI1_CGET0D( HLOC, 'FIELD_RA', FRAOK, NPOINT(1), STATUS )
+        CALL ADI1_CGET0D( HLOC, 'FIELD_DEC', FDECOK, NPOINT(2), STATUS )
         CALL ADI1_CGET0D( HLOC, 'POSITION_ANGLE', PAOK, PA, STATUS )
         IF ( .NOT. PAOK ) THEN
           PA = 0D0
@@ -238,10 +242,13 @@
       CALL WCI_NEWSYS( SYS, EQNX, EPOCH, SYSID, STATUS )
 
 *  Create the Projection object, providing defaults
-      IF ( .NOT. PRJOK ) PRJ = 'CAR'
+      IF ( .NOT. PRJOK ) PRJ = 'TAN'
       IF ( .NOT. RAOK ) SPOINT(1) = 0D0
       IF ( .NOT. DECOK ) SPOINT(2) = 0D0
       CALL WCI_NEWPRJ( PRJ, 0, 0.0, SPOINT, 180D0, PRJID, STATUS )
+      IF ( FRAOK .AND. FDECOK ) THEN
+        CALL ADI_CPUT1D( PRJID, 'NPOINT', 2, NPOINT, STATUS )
+      END IF
 
 *  Create the pixellation object, providing defaults
       IF ( HASPIX ) THEN
