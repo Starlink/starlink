@@ -27,22 +27,23 @@ ALL_TARGETS = \
 	$(MANIFEST)/atimer \
 	$(MANIFEST)/atools \
 	$(MANIFEST)/cat \
-        $(MANIFEST)/ccdpack \
+	$(MANIFEST)/ccdpack \
 	$(MANIFEST)/chr \
 	$(MANIFEST)/cnf \
 	$(MANIFEST)/coco \
 	$(MANIFEST)/convert \
 	$(MANIFEST)/daophot \
-	$(MANIFEST)/docfind \
 	$(MANIFEST)/dipso \
+	$(MANIFEST)/docfind \
 	$(MANIFEST)/dtask \
 	$(MANIFEST)/echomop \
 	$(MANIFEST)/ems \
 	$(MANIFEST)/esp \
 	$(MANIFEST)/extractor \
-	$(MANIFEST)/fio \
+	$(MANIFEST)/extreme \
 	$(MANIFEST)/figaro \
-        $(MANIFEST)/findcoords \
+	$(MANIFEST)/findcoords \
+	$(MANIFEST)/fio \
 	$(MANIFEST)/gaia \
 	$(MANIFEST)/gks \
 	$(MANIFEST)/gns \
@@ -60,7 +61,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/img \
 	$(MANIFEST)/info \
 	$(MANIFEST)/init \
-        $(MANIFEST)/itcl \
+	$(MANIFEST)/itcl \
 	$(MANIFEST)/jpl \
 	$(MANIFEST)/kappa \
 	$(MANIFEST)/kaprh \
@@ -89,6 +90,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/ref \
 	$(MANIFEST)/rv \
 	$(MANIFEST)/sae \
+	$(MANIFEST)/scb \
 	$(MANIFEST)/sgs \
 	$(MANIFEST)/shl \
 	$(MANIFEST)/sla \
@@ -98,8 +100,8 @@ ALL_TARGETS = \
 	$(MANIFEST)/string \
 	$(MANIFEST)/subpar \
 	$(MANIFEST)/task \
-        $(MANIFEST)/tcl \
-        $(MANIFEST)/tk \
+	$(MANIFEST)/tcl \
+	$(MANIFEST)/tk \
 	$(MANIFEST)/trn \
 	$(MANIFEST)/xdisplay
 
