@@ -546,7 +546,7 @@ KAP_INC = ctm_com ctm_par hlpcmd
 
 EXTERNAL_INCLUDES = SAE_PAR DAT_PAR GKS_PAR GRP_PAR MSG_PAR NDF_PAR \
 	            NUM_DEC_CVT NUM_DEF_CVT PAR_ERR PAR_PAR \
-	            PRM_PAR DAT_ERR GNS_PAR NDF_FUNC AST_PAR
+	            PRM_PAR DAT_ERR GNS_PAR NDF_FUNC AST_PAR NDF_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -563,7 +563,8 @@ surf_read_rebin_ndf.f surf_rebin.f surf_recurse_read.f surf_reduce_switch.f \
 surf_remsky.f surf_restore.f surf_scan_rlb.f surf_scucat.f surf_scuclip.f \
 surf_scuhelp.f surf_scuover.f surf_scuphot.f surf_skydip.f surf_write_data.f \
 surf_write_photom.f surf_write_photom_header.f surf_scuba2mem.f \
-surf_make_weight.f surf_grid_calcsky.f surf_reduce_noise.f
+surf_make_weight.f surf_grid_calcsky.f surf_reduce_noise.f \
+surf_add_dbm.f
 
 SURF_FCPP_ROUTINES = surf_write_map_info.F
 
@@ -578,7 +579,7 @@ surflib_calc_ijpos.f surflib_histogram_grid.f \
 surflib_calc_output_grid.f surflib_plot_grid.f surflib_clip_grid.f \
 surflib_stats_grid.f surflib_decode_remsky_string.f \
 surflib_median_regrid.f surflib_remove_dc_from_exp.f surflib_rem_timeseries.f \
-surflib_rem_grid.f surflib_2dft_chop.f
+surflib_rem_grid.f surflib_2dft_chop.f surflib_calc_dual_beam.f
 
 SCULIB_FCPP_ROUTINES = sculib_bessel_wtinit.F sculib_skydip_temperatures.F
 
@@ -675,7 +676,7 @@ TASKS = \
 bolrebin calcsky  change_data change_flat change_pointing change_quality \
 despike despike2 extinction extract_data extract_flat flatfield intrebin \
 rebin reduce_switch remsky restore scucat scan_rlb scuclip scuhelp scuover \
-scuphot skydip scuba2mem scumakewt reduce_noise
+scuphot skydip scuba2mem scumakewt reduce_noise add_dbm
 
 #  Monolith routine source name.
 
@@ -775,6 +776,7 @@ GRP_PAR:     $(STAR_INC)/grp_par;     $(LINK) $? $@
 MSG_PAR:     $(STAR_INC)/msg_par;     $(LINK) $? $@
 NDF_FUNC:    $(STAR_INC)/ndf_func;     $(LINK) $? $@
 NDF_PAR:     $(STAR_INC)/ndf_par;     $(LINK) $? $@
+NDF_ERR:     $(STAR_INC)/ndf_err;     $(LINK) $? $@
 NUM_DEC_CVT: $(STAR_INC)/num_dec_cvt; $(LINK) $? $@
 NUM_DEF_CVT: $(STAR_INC)/num_def_cvt; $(LINK) $? $@
 PAR_PAR:     $(STAR_INC)/par_par;     $(LINK) $? $@
@@ -1652,6 +1654,7 @@ strip:
 #    end
 
 
+surf_add_dbm.o: SAE_PAR SURF_PAR NDF_ERR DAT_PAR PAR_ERR
 surf_reduce_noise.o: SAE_PAR MSG_PAR SURF_PAR DAT_PAR PRM_PAR PAR_ERR
 surf_write_map_info.o: DAT_PAR PRM_PAR SAE_PAR SURF_PAR AST_PAR
 surf_chgdata.o: DAT_PAR MSG_PAR NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR SURF_PAR
@@ -1853,6 +1856,7 @@ surflib_rem_grid.o: PRM_PAR SAE_PAR
 surflib_rem_timeseries.o: PRM_PAR SAE_PAR
 surflib_remove_dc_from_exp.o: MSG_PAR PRM_PAR SAE_PAR
 surflib_stats_grid.o: PRM_PAR SAE_PAR
+surflib_calc_dual_beam.o: PRM_PAR SAE_PAR
 ctm_xcols.o: CTM_PAR
 gethlp.o: HLPCMD SAE_PAR
 gthlpi.o: HLPCMD SAE_PAR
