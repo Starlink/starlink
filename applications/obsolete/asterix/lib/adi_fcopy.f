@@ -1,7 +1,7 @@
-      SUBROUTINE USI_FCOPY( IN, OUT, STATUS )
+      SUBROUTINE ADI_FCOPY( IN, OUT, STATUS )
 *+
 *  Name:
-*     USI_FCOPY
+*     ADI_FCOPY
 
 *  Purpose:
 *     Copy a dataset
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL USI_FCOPY( IN, OUT, STATUS )
+*     CALL ADI_FCOPY( IN, OUT, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -111,6 +111,6 @@
       CALL HDX_COPY( ILOC, OLOC, STATUS )
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'USI_FCOPY', STATUS )
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI_FCOPY', STATUS )
 
       END
