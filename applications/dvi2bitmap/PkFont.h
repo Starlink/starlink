@@ -47,8 +47,10 @@ class PkGlyph {
     PkGlyph(unsigned int cc,
 	    unsigned int tfmwidth, unsigned int dx, unsigned int dy,
 	    unsigned int w, unsigned int h,
-	    unsigned int hoff, unsigned int voff,
+	    int hoff, int voff,
 	    PkRasterdata *rasterdata, PkFont *f);
+    // Final constructor is for the single dummy glyph
+    PkGlyph::PkGlyph(int resolution, PkFont *f);
     // bitmap() returns the character's bitmap.  This runs from the 
     // top-left of the character.
     const Byte *bitmap();
@@ -74,7 +76,6 @@ class PkGlyph {
     unsigned int cc_, dx_, dy_, w_, h_;
     double tfmwidth_;
     int hoff_, voff_;
-    unsigned int hoffu_, voffu_;
     PkFont *font_;
     PkRasterdata *rasterdata_;
     bool longform_;
@@ -82,7 +83,6 @@ class PkGlyph {
     static int debug_;
     const double two20_ = 1048576;	// 2^20
     const double two16_ = 65536; // 2^16
-    //int unpackTfmWidth (unsigned int tfmwidth);
 };
 
 class PkFont {
@@ -108,6 +108,17 @@ class PkFont {
     static void setFontPath(char  *fp) { fontpath_ = fp; }
     static void setResolution(int res) { resolution_ = res; }
     string name() const { return name_; }
+    int magnification() const { return dvimag_; }
+    int dpi() const { return resolution_; }
+    int dpiScaled() const {
+	return static_cast<int>(resolution_
+				* (double)font_header_.s
+				/(double)font_header_.d
+				+ 0.5);
+    }
+    double scale() const {
+	return (double)font_header_.s / (double)font_header_.d;
+    }
     bool seenInDoc(void) const { return seen_in_doc_; }
     void setSeenInDoc(void) { seen_in_doc_ = true; }
     // wordSpace(), backSpace() and quad() return those values in DVI units
@@ -115,11 +126,9 @@ class PkFont {
     double backSpace() const { return back_space_; }
     double quad() const { return quad_; }
     // design size, and horiz/vert pixels-per-point, in points
+    // If there's no font available, assume the world is 10-point!
     double designSize() const {
-	if (font_loaded_)
-	    return preamble_.designSize;
-	else
-	    return font_header_.d;
+	return font_loaded_ ? preamble_.designSize : 10;
     }
     double hppp() const { return preamble_.hppp; }
     double vppp() const { return preamble_.vppp; }
@@ -129,12 +138,14 @@ class PkFont {
 
  private:
     string name_;
+    string path_;
     InputByteStream *pkf_;
     bool font_loaded_;		// font loaded successfully
     struct {
 	unsigned int c, s, d;
     } font_header_;		// this is the information retrieved
 				// from the font declaration
+    int dvimag_;		// DVI magnification reported by the file
     struct {
 	unsigned int id, cs;
 	double designSize, hppp, vppp;

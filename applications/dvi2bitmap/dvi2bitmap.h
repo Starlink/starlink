@@ -14,11 +14,13 @@ class DviError {
     virtual void print() const { cerr << "DVI error: " << problem_ << '\n'; }
     string problem() const { return problem_; }
  protected:
+    DviError() { };
     string problem_;
 };
 class DviBug : public DviError {
  public:
     DviBug(string s) : DviError(s) { }
+    DviBug(char *fmt, ...);
     void print() const { cerr << "BUG: " << problem_ << '\n'; }
 };
 

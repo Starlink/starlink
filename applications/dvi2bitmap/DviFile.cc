@@ -169,8 +169,12 @@ DviFileEvent *DviFile::getEvent()
 		    posStack_->push(ps);
 		    //PosState *ps = new PosState(h_,v_,w_,x_,y_,z_);
 		    //posStack_.push(ps);
-		    //if (debug_ > 1)
-		    //cerr << ">>ps=" << ps << '\n';
+		    if (debug_ > 1)
+			cerr << ">>("<<h_<<','<<v_<<','
+			     <<w_<<','<<x_<<','
+			     <<y_<<','<<z_<<','
+			     <<hh_<<','<<vv_
+			     <<")\n";
 		}
 		break;
 	      case 142:		// pop
@@ -194,8 +198,12 @@ DviFileEvent *DviFile::getEvent()
 		    y_ = ps->y;
 		    z_ = ps->z;
 		    delete ps;
-		    //if (debug_ > 1)
-		    //	cerr << "<<ps=" << ps << '\n';
+		    if (debug_ > 1)
+			cerr << "<<("<<h_<<','<<v_<<','
+			     <<w_<<','<<x_<<','
+			     <<y_<<','<<z_<<','
+			     <<hh_<<','<<vv_
+			     <<")\n";
 		}
 		break;
 	      case 143:		// right1
@@ -613,6 +621,10 @@ void DviFile::updateV_ (int y)
     }
     if (dist > max_drift_)
 	vv_ = Kv + sdist*max_drift_;
+    if (debug_ > 1)
+	cerr << "updateV_ ("
+	     << y << ") -> ("
+	     << v_ << ',' << vv_ << ',' << y_ << ',' << z_ << ")\n";
 }
 
 void DviFile::read_postamble()
@@ -682,11 +694,6 @@ void DviFile::read_postamble()
 	    for (int l = getSIU(1); l>0; l--)
 		fontname += static_cast<char>(getByte());
 	    fontMap_[num] = new PkFont(dvimag, c, s, d, fontname);
-	    if (fontMap_[num]->checksum() != c)
-		cerr << "Font " << fontname
-		     << ": expected checksum " << c
-		     << ", got checksum " << fontMap_[num]->checksum()
-		     << '\n';
 	    break;
 
 	  case 244:		// fnt_def2
@@ -790,18 +797,25 @@ void DviFile::check_duplicate_font (int ksize)
 	number = getSIS(4);
     else
 	number = getSIU(ksize);
-    PkFont *f = fontMap_[number];
-    if (f == 0 || f->seenInDoc())
-	throw DviError ("font %d not declared, or declared twice", number);
-    f->setSeenInDoc();
+
     unsigned int int4 = getUIU(4); // c
-    int4 = getUIU(4);		// s
-    int4 = getUIU(4);		// d
+    unsigned int s = getUIU(4);	// s
+    unsigned int d = getUIU(4);	// d
     int namelen = getSIU(1);	// a
-    namelen += getSIU(1);
+    namelen += getSIU(1);	// l
     string name = "";
     for (; namelen>0; namelen--)
-	Byte dummy = getByte();
+	name += getByte();
+
+    PkFont *f = fontMap_[number];
+    if (f == 0)
+	throw DviError
+	    ("font %s at mag %g (number %d) declared in body but not in postamble",
+	     name.c_str(), (double)s/d, number);
+    if (f->seenInDoc())
+	throw DviError ("font %s at mag %g (number %d) declared twice",
+			name.c_str(), (double)s/d, number);
+    f->setSeenInDoc();
 }
 
 
@@ -886,4 +900,22 @@ void DviFile::PosStateStack::clear()
     do
 	delete s[--i];
     while (i != 0);
+}
+
+
+// Font iterator -- probably better implemented as an iterator itself
+PkFont *DviFile::firstFont()
+{
+    fontIter_ = fontMap_.begin();
+    return fontIter_->second;
+}
+PkFont *DviFile::nextFont() 
+{
+    if (fontIter_ == fontMap_.end())
+	return 0;
+    else
+    {
+	++fontIter_;
+	return fontIter_->second;
+    }
 }

@@ -20,12 +20,14 @@ PkFont::PkFont(unsigned int dvimag,
 	       unsigned int s,
 	       unsigned int d,
 	       string name)
-    : font_loaded_(false)
+    : font_loaded_(false), seen_in_doc_(false), pkf_(0)
 {
     font_header_.c = c;
     font_header_.s = s;
     font_header_.d = d;
+    dvimag_ = dvimag;
 
+    name_ = name;
     //name_ = "/var/lib/texmf/pk/ljfour/public/cm/cmr6.600pk"; // temp
     //name_ = "/var/lib/texmf/fonts/pk/ljfour/public/cm/cmr10.600pk";
     //name_ = fontpath_;
@@ -33,40 +35,53 @@ PkFont::PkFont(unsigned int dvimag,
     //name_.replace(strpos, 2, name);
     // Fontpath stuff rudimentary -- eventually replace with KPSE
     char fnbuf[200];
+    int scaled_res = static_cast<int>(resolution_ * (double)s/(double)d);
     sprintf (fnbuf, "%s/%s.%dpk",
-	     fontpath_.c_str(), name.c_str(), resolution_);
-    name_ = fnbuf;
+	     fontpath_.c_str(), name.c_str(), scaled_res);
+    path_ = fnbuf;
     if (debug_ > 1)
-	cerr << "Font file: " << name_ << '\n';
+	cerr << "Font file: " << path_
+	     << ", checksum=" << c
+	     << ", scaled " << s << '/' << d << '=' << (double)s/(double)d
+	     << '\n';
     try
     {
-	pkf_ = new InputByteStream (name_, true);
+	pkf_ = new InputByteStream (path_, true);
 	for (int i=0; i<nglyphs_; i++)
 	    glyphs_[i] = 0;
 	read_font (*pkf_);
 	delete pkf_;		// don't need the file any more
 
-	if (debug_)
-	    cerr << "Opened font " << name_ << " successfully\n";
+	if (debug_ > 1)
+	    cerr << "Opened font " << path_ << " successfully\n";
 
 	fontscale_ = ((double)dvimag/1000.0) * ((double)s/(double)d);
 	if (debug_ > 1)
-	    cout << "PkFont: font scaling: "
+	    cerr << "PkFont: font scaling: "
 		 << dvimag << "/1000 * (" << s << '/' << d
-		 << ")=" << fontscale_ << '\n'
-		 << "DVI's font checksum=" << c << '\n';
+		 << ")=" << fontscale_
+		 << ": DVI font checksum=" << c << '\n';
+
+	if (preamble_.cs != c)
+	    cerr << "Font " << name_
+		 << "found : expected checksum " << c
+		 << ", got checksum " << preamble_.cs
+		 << '\n';
 
 	font_loaded_ = true;
     }
     catch (InputByteStreamError& e)
     {
 	cerr << "Font " << name << " at "
-	     << resolution_ << "dpi not found\n";
-	glyphs_[0] = new PkGlyph(resolution, this); // dummy glyph
+	     << dpiScaled() << "dpi not found\n";
+	preamble_.cs = 0;
+	glyphs_[0] = new PkGlyph(resolution_, this); // dummy glyph
     }
     quad_ = ((double)dvimag/1000.0) * d;
     word_space_ = 0.2*quad_;
     back_space_ = 0.9*quad_;
+    if (debug_ > 1)
+	cerr << "Quad="<<quad_<<" dvi units\n";
 };
 
 PkFont::~PkFont()
@@ -117,19 +132,18 @@ void PkFont::read_font (InputByteStream& pkf)
 
 	    unsigned int g_cc, g_tfmwidth, g_dm, g_dx, g_dy, g_w, g_h;
 	    int g_hoff, g_voff;
-	    unsigned int g_hoffu, g_voffu;
 	    if (two_byte)
 		if (pl_prefix == 3) // long-form character preamble
 		{
 		    packet_length = pkf.getUIU(4);
-		    g_cc       = pkf.getByte();
+		    g_cc       = pkf.getUIU(4);
 		    g_tfmwidth = pkf.getUIU(4);
 		    g_dx       = pkf.getUIU(4);
 		    g_dy       = pkf.getUIU(4);
 		    g_w        = pkf.getUIU(4);
 		    g_h        = pkf.getUIU(4);
-		    g_hoffu    = pkf.getUIU(4);
-		    g_voffu    = pkf.getUIU(4);
+		    g_hoff     = pkf.getSIS(4);
+		    g_voff     = pkf.getSIS(4);
 
 		    if (g_cc < 0 || g_cc >= nglyphs_)
 			throw DviError
@@ -137,12 +151,29 @@ void PkFont::read_font (InputByteStream& pkf)
 
 		    pos = pkf.pos();
 		    packet_length -= 7*4;
+
+		    if (debug_ > 1)
+			cerr << "char " << static_cast<int>(g_cc)
+			     << hex
+			     << ": opcode=" << static_cast<int>(opcode)
+			     << " pl=" << packet_length
+			     << " cc=" << g_cc
+			     << " tfmwidth=" << g_tfmwidth
+			     << " dx=" << g_dx
+			     << " dy=" << g_dy
+			     << " w=" << g_w
+			     << " h=" << g_h
+			     << " hoff=" << g_hoff
+			     << " voff=" << g_voff
+			     << dec
+			     << "(pos="<<pos<<" len="<<packet_length<<")\n";
+
 		    PkRasterdata *rd
 			= new PkRasterdata (opcode,
 					    pkf.getBlock(pos,packet_length),
 					    packet_length, g_w, g_h);
 		    glyphs_[g_cc] = new PkGlyph (g_cc, g_tfmwidth, g_dx, g_dy, 
-						 g_w, g_h, g_hoffu, g_voffu,
+						 g_w, g_h, g_hoff, g_voff,
 						 rd, this);
 		    pkf.skip (packet_length);
 		}
@@ -165,6 +196,22 @@ void PkFont::read_font (InputByteStream& pkf)
 
 		    pos = pkf.pos();
 		    packet_length -= 3 + 5*2;
+
+		    if (debug_ > 1)
+			cerr << "char " << static_cast<int>(g_cc)
+			     << hex
+			     << ": opcode=" << static_cast<int>(opcode)
+			     << " pl=" << packet_length
+			     << " cc=" << g_cc
+			     << " tfmwidth=" << g_tfmwidth
+			     << " dm=" << g_dm
+			     << " w=" << g_w
+			     << " h=" << g_h
+			     << " hoff=" << g_hoff
+			     << " voff=" << g_voff
+			     << dec
+			     << "(pos="<<pos<<" len="<<packet_length<<")\n";
+
 		    PkRasterdata *rd
 			= new PkRasterdata (opcode,
 					    pkf.getBlock(pos,packet_length),
@@ -193,6 +240,22 @@ void PkFont::read_font (InputByteStream& pkf)
 
 		pos = pkf.pos();
 		packet_length -= 8;
+
+		if (debug_ > 1)
+		    cerr << "char " << static_cast<int>(g_cc)
+			 << hex
+			 << ": opcode=" << static_cast<int>(opcode)
+			 << " pl=" << packet_length
+			 << " cc=" << g_cc
+			 << " tfmwidth=" << g_tfmwidth
+			 << " dm=" << g_dm
+			 << " w=" << g_w
+			 << " h=" << g_h
+			 << " hoff=" << g_hoff
+			 << " voff=" << g_voff
+			 << dec
+			 << "(pos="<<pos<<" len="<<packet_length<<")\n";
+
 		PkRasterdata *rd
 		    = new PkRasterdata (opcode,
 					pkf.getBlock(pos,packet_length),
@@ -277,12 +340,12 @@ PkGlyph::PkGlyph(unsigned int cc,
 		 unsigned int dy,
 		 unsigned int w,
 		 unsigned int h,
-		 unsigned int hoff,
-		 unsigned int voff,
+		 int hoff,
+		 int voff,
 		 PkRasterdata *rasterdata,
 		 PkFont *f)
     : cc_(cc), w_(w), h_(h),
-      hoffu_(hoff), voffu_(voff), rasterdata_(rasterdata), font_(f),
+      hoff_(hoff), voff_(voff), rasterdata_(rasterdata), font_(f),
       longform_(true), bitmap_(0)
 {
     tfmwidth_ = tfmwidth/two20_ * f->designSize();
@@ -293,13 +356,18 @@ PkGlyph::PkGlyph(unsigned int cc,
 PkGlyph::PkGlyph(int resolution, PkFont *f)
     : font_(f)
 {
-    tfmwidth_ = f->designSize();
-    throw DviBug ("Whoops haven't supported dummy glyph yet!");
+    tfmwidth_ = f->designSize(); // design size in points
+    w_ = h_ = 0;
+    bitmap_ = 0;
+    // make dx_ = 1 quad in pixels (rather large)
+    dx_ = static_cast<int>(f->designSize() * resolution / 72.27);
+    dy_ = 0;
+    hoff_ = voff_ = 0;
 }
 
 const Byte *PkGlyph::bitmap()
 {
-    if (bitmap_ == 0)
+    if (bitmap_ == 0 && w_ != 0 && h_ != 0)
 	bitmap_ = rasterdata_->bitmap();
     return bitmap_;
 }

@@ -21,9 +21,11 @@ main (int argc, char **argv)
 {
     string dviname;
     int resolution = 72;	// in pixels-per-inch
+    int show_font_list = 0;
 
     bool debug_ = false;
     DviFile::debug(1);
+    PkFont::debug(1);
     //DviFile::debug(2);
     //PkFont::debug(2);
     //PkRasterdata::debug(2);
@@ -49,6 +51,26 @@ main (int argc, char **argv)
 		    Usage();
 		resolution = atoi (*argv);
 		break;
+	      case 'g':		// debugging
+		for (++*argv; **argv != '\0'; ++*argv)
+		    switch (**argv)
+		    {
+		      case 'd':
+			DviFile::debug(2);	break;
+		      case 'p':
+			PkFont::debug(2);	break;
+		      case 'r':
+			PkRasterdata::debug(2);	break;
+		      default:
+			Usage();
+		    }
+		break;
+	      case 'l':		// show missing fonts
+		show_font_list = 1;
+		break;
+	      case 'L':		// show all fonts
+		show_font_list = 2;
+		break;
 	      default:
 		Usage();
 	    }
@@ -70,6 +92,19 @@ main (int argc, char **argv)
 	    cout << "Can't open file " << dviname << " to read\n";
 	    std::exit(1);
 	}
+
+	if (show_font_list > 0)
+	    for (PkFont *f = dvif->firstFont();
+		 f != 0;
+		 f = dvif->nextFont())
+	    {
+		if (show_font_list > 1 || !f->loaded())
+		    // write out font name, base-dpi, dpi, mag and dummy mode
+		    cout << f->name() << ' '
+			 << f->dpi() << ' '
+			 << f->dpiScaled() << ' '
+			 << f->scale() << " localfont\n";
+	    }
 
 	DviFilePostamble *post;
 	DviFileEvent *ev;
@@ -113,6 +148,12 @@ main (int argc, char **argv)
 			       glyph->w(), glyph->h(),
 			       glyph->bitmap());
 	    }
+	    else if (DviFileSetRule *sr = dynamic_cast<DviFileSetRule*>(ev))
+	    {
+		int x = dvif->currH() + resolution;
+		int y = dvif->currV() + resolution;
+		bitmap->rule (x,y,sr->w, sr->h);
+	    }
 	    else if (DviFileFontChange *fc =
 		     dynamic_cast<DviFileFontChange*>(ev))
 		curr_font = fc->font;
@@ -122,29 +163,6 @@ main (int argc, char **argv)
 		     << special->specialString
 		     << '\n';
 
-		/*
-	    if (DviFileFontChange *fc = dynamic_cast<DviFileFontChange*>(ev))
-	    {
-		PkFont *f = fc->font;
-		for (int gnum=0; gnum<=255; gnum++)
-		{
-		    PkGlyph *g = f->glyph(gnum);
-		    if (g == 0)
-			continue;
-		    const Byte *b = g->bitmap();
-		    cout << "\n\nCharacter " << gnum << '\n';
-		    for (int i=0; i<g->h(); i++)
-		    {
-			for (int j=0; j<g->w(); j++)
-			{
-			    cout << (*b ? '*' : ' ');
-			    b++;
-			}
-			cout << '\n';
-		    }
-		}
-	    }
-		*/
 	    delete ev;
 	}
 	while (!(post = dynamic_cast<DviFilePostamble*>(ev)));
@@ -172,8 +190,19 @@ DviError::DviError(char *fmt,...)
     delete[] p;
 }
 
+DviBug::DviBug(char *fmt,...)
+{
+    char *p = new char[2*strlen(fmt)];
+    va_list ap;
+    va_start(ap,fmt);
+    vsprintf (p, fmt, ap);
+    va_end(ap);
+    problem_ = p;
+    delete[] p;
+}
+
 void Usage (void)
 {
-    cout << "Usage: " << progname << " [-f PKpath ] [-r resolution] dvifile" << '\n';
+    cout << "Usage: " << progname << " [-f PKpath ] [-r resolution] [-g[dpr]] [-l] dvifile" << '\n';
     exit (1);
 }

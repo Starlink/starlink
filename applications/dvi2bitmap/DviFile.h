@@ -33,6 +33,10 @@ public:
     // (ie, at (1in,1in)?), then everything should fit on.
     int hSize() const { return static_cast<int>(postamble_.u * px_per_dviu_); }
     int vSize() const { return static_cast<int>(postamble_.l * px_per_dviu_); }
+    // Return first, and subsequent defined fonts.
+    PkFont *firstFont();
+    PkFont *nextFont();
+
 private:
     string fileName_;
     // all dimensions within this class are in DVI units, except where stated.
@@ -87,7 +91,7 @@ private:
     struct PosState {
 	int h, v, w, x, y, z, hh, vv;
 	PosState(int h, int v, int w, int x, int y, int z, int hh, int vv)
-	    : h(h),v(v),w(w),x(x),y(x),z(z),hh(hh),vv(vv) { }
+	    : h(h),v(v),w(w),x(x),y(y),z(z),hh(hh),vv(vv) { }
     };
     //stack<PosState*> posStack_;
     class PosStateStack {
@@ -108,6 +112,7 @@ private:
     };
     PosStateStack *posStack_;
     map<int,PkFont*> fontMap_;
+    map<int,PkFont*>::const_iterator fontIter_;
     static int debug_;
 };
 
