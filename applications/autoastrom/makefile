@@ -1192,9 +1192,13 @@ sun242.xml:
 # moggy/Makefile.in and astrom/astrom.f are pseudo-dependencies: if
 # these don't exist, they're created by unpacking the source tarball.
 # The file build-subdirs must not exist at any time.
-build-subdirs: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a astrom/makefile
+#
+# When building, remove troublesome environment variables
+build-subdirs: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a \
+		astrom/makefile $(MATCHPROG)/Makefile
 	cd moggy && unset INSTALL; make
 	cd astrom && ./mk build
+	cd $(MATCHPROG) && unset INSTALL LINK RANLIB CFLAGS; make
 
 # Creating moggy/Makefile configures the moggy package
 moggy/Makefile: moggy/Makefile.in  $(CATLIBINSTALLDIR)/lib/libcat.a
@@ -1267,13 +1271,12 @@ $(CATLIBINSTALLDIR)/stamp:
 	done
 	touch $(CATLIBINSTALLDIR)/stamp
 
-# Unpack and build match
-$(MATCHPROG)/match:
-	test -f $(MATCHPROG).tar && \
-		$(TAR_OUT) $(MATCHPROG).tar && \
-		cd $(MATCHPROG) && \
-		./configure && \
-		make
+# Unpack match.  Undefine troublesome environment variables, 
+# but leave CXX and CC
+$(MATCHPROG)/Makefile:
+	test -f $(MATCHPROG).tar
+	test -d $(MATCHPROG) || $(TAR_OUT) $(MATCHPROG).tar
+	cd $(MATCHPROG) && LINK= INSTALL= RANLIB= CFLAGS= ./configure
 
 #  Unpack the source tarball.  The extra test is because the makefile
 #  (always/sometimes?) wants to execute this twice.  Things get
