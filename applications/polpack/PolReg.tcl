@@ -407,9 +407,9 @@
 # Create binding which result in the Helper procedure being called
 # whenever a widget is entered, left, or destroyed. Helper stores
 # the appropriate message for display in the dynamic help area.
-   bind all <Enter> "+Helper %X %Y"
-   bind all <Leave> "+Helper %X %Y"
-   bind all <Destroy> "+Helper %X %Y"
+   bind all <Enter> "+Helper"
+   bind all <Leave> "+Helper"
+   bind all <Destroy> "+Helper"
 
 # When the F1 button is pressed, display help on the object under the
 # pointer.

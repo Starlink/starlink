@@ -21,6 +21,12 @@ proc Accept {} {
    global REFIM_DISP
    global REFOBJ_DISP
 
+# Tell the user what is happening.
+   set told [SetInfo "Searching for features at displayed positions. Please wait..." 0]
+
+# Initialise the number of bad positions to zero.
+   set nbad 0
+
 # Loop round each of the displayed reference features.
    set size [NumPosn "" $REFIM_DISP $REFOBJ_DISP]
    for {set i 0} {$i < $size} {incr i} {
@@ -36,10 +42,22 @@ proc Accept {} {
       if { [FindPosn LBL $lab] == "" } {
 
 # If not, search for an image feature at these canvas coordinates. If one is
-# found, give it the same label as the reference feature.
-         GetFeature $cx $cy $lab
+# found, give it the same label as the reference feature. If the
+# centroiding fails, increment the number of bad positions.
+         if { ![GetFeature $cx $cy $lab] } { incr nbad }
       }
    }
+
+# If any positions could ne be found tell the user.
+   if { $nbad == 1 } {
+      Message "1 position could not be located accurately."
+   } elseif { $nbad > 1 } {
+      Message "$nbad positions could not be located accurately."
+   }
+
+# Cancel the informative text set earlier in this procedure.
+   if { $told } { SetInfo "" 0 }
+
 }
 
 proc AllMappings {} {
@@ -100,7 +118,7 @@ proc AllMappings {} {
    set mess ""
 
    if { $missing != "" } {
-      append mess "The following images cannot yet be registered with image \"im0\":\n"
+      append mess "The following images cannot yet be registered with image \"$im0\":\n"
       foreach image $missing {
          append mess "   $image\n"     
       }
@@ -1468,19 +1486,18 @@ proc CreateMask {image object} {
 #
 #  Purpose:
 #    This procedure creates a default mask for the supplied image and
-#    ray if it does not already have a mask. If the image has one mask
-#    but not the other, and also has an OE mapping, then the OE mapping is 
-#    used to create the missing mask, based on the existing map. Otherwise,
-#    if the image has an image mapping (i.e. from the image to the
-#    reference image), and the reference image has a mask, then the image
-#    mapping is used to create the missing mask based on the reference
-#    images's mask. 
+#    ray if it does not already have a mask. A search is made for an
+#    image for which the required mask is defined. If found, the first
+#    such mask is returned. If not found, a search is made for an image
+#    for which the other mask is defined AND which has an OE mapping.
+#    If found, the mapping is used to transform the mask, and the mapped
+#    mask is returned.
 #
 #  Arguments:
 #    image
 #       The image to which the mask refers.
 #    object
-#       The identifier ($O_RAY_MASK/SKY, $E_RAY_MASK/SKY ) for the
+#       The identifier ($O_RAY_MASK, $E_RAY_MASK ) for the
 #       mask to be created.
 #
 #  Returned Value:
@@ -1498,10 +1515,8 @@ proc CreateMask {image object} {
 #        is a list of pixel X coordinates. 
 #-
    global E_RAY_MASK
-   global E_RAY_SKY
    global IMAGES
    global O_RAY_MASK
-   global O_RAY_SKY
    global OBJTYPE
    global PNTPX
 
@@ -1523,30 +1538,127 @@ proc CreateMask {image object} {
       if { $object == $O_RAY_MASK } {      
          set other $E_RAY_MASK
          set inv 0
-
-      } elseif { $object == $E_RAY_MASK } {      
+      } { 
          set other $O_RAY_MASK
          set inv 1
+      }
 
-      } elseif { $object == $O_RAY_SKY } {      
+# Search for an image with a mask of the same type. Copy the first
+# one found.
+      foreach im $IMAGES {
+         if { [llength $PNTPX($im,$object)] > 0 } {
+            TranPXY "ref" 0 $im $object $image $object
+            set ok 1
+            break
+         } 
+      }
+
+# If no usable mask was found...
+      if { !$ok } {
+
+# Search for an image with a mask of the other type AND an OE mapping. Map 
+# the first such mask found.
+         foreach im $IMAGES {
+            set map [OEMapping $im]
+            if { $map != "" && [llength $PNTPX($im,$other)] > 0 } {
+               TranPXY $map $inv $im $other $image $object
+               set ok 1
+               break
+            }
+         }
+      }
+
+# Cancel the informative text set earlier in this procedure.
+      if { $told } { SetInfo "" 0 }
+
+   }
+
+   return $ok
+}
+
+proc CreateSky {image object} {
+#+
+#  Name:
+#    CreateSky
+#
+#  Purpose:
+#    This procedure creates a default sky area for the supplied image and
+#    ray if it does not already have one. 
+#
+#    If the image has one sky area but not the other, and also has an OE 
+#    mapping, then the OE mapping is used to create the missing sky area, 
+#    based on the existing sky area. Otherwise,
+#    if the image has an image mapping (i.e. from the image to the
+#    reference image), and the reference image has a mask, then the image
+#    mapping is used to create the missing mask based on the reference
+#    images's mask. 
+#
+#  Arguments:
+#    image
+#       The image to which the mask refers.
+#    object
+#       The identifier ($O_RAY_SKY, $E_RAY_SKY ) for the
+#       sky area to be created.
+#
+#  Returned Value:
+#    One if the sky area is available, zero otherwise.
+#
+#  Globals:
+#     IMAGES (Read)
+#        A list of the available images (without section strings).
+#     PNTPX (Read)
+#        A 2-d array indexed by image and object type. Each element
+#        is a list of pixel X coordinates. 
+#-
+   global E_RAY_SKY
+   global IMAGES
+   global IMAGE_PREV
+   global O_RAY_SKY
+   global OBJTYPE
+   global PNTPX
+
+# Assume success.
+   set ok 1
+
+# If the requested sky area already exists, do nothing.
+   if { [llength $PNTPX($image,$object)] == 0 } {
+
+# Tell the user what is happening.
+      set told [SetInfo "Creating the default $OBJTYPE($object). Please wait... " 0]
+
+# Assume for the moment that no sky area can be created.
+      set ok 0
+
+# Get the name of the other ray's sky area. Decide whether to use the forward
+# or inverse OE mapping (forward goes from E to O) to create the required
+# sky area from the other sky area (if possible).
+      if { $object == $O_RAY_SKY } {      
          set other $E_RAY_SKY
          set inv 0
-
-      } elseif { $object == $E_RAY_SKY } {      
+      } {
          set other $O_RAY_SKY
          set inv 1
+      }
+
+# Create a list of images to seacrh for a sky area. Start with the
+# previously displayed image (if any).
+      if { [info exists IMAGE_PREV] && $IMAGE_PREV != "" } {
+         set imlist "$IMAGE_PREV $IMAGES"
+      } {
+         set imlist "$IMAGES"
       }
 
 # If the current image has an image mapping...
       set map0 [ImageMapping $image]
       if { $map0 != "" } {
 
-# If so, search for an image which has the required mask, and an image mapping.
-         foreach im $IMAGES {
+# ... search for an image which has the required sky area, and an image 
+# mapping. The previously displayed image is checked first.
+         foreach im $imlist {
             set map1 [ImageMapping $im]
             if { $map1 != "" && [llength $PNTPX($im,$object)] > 0 } {
 
-# Create the require mask from this image's mask.
+# Create the require sky area from this image's sky area.
                set map [ConcMap $map1 0 $map0 1]
                if { $map != "" } {
                   TranPXY $map 0 $im $object $image $object
@@ -1557,8 +1669,8 @@ proc CreateMask {image object} {
          }
       }
 
-# If no suitable image was found, transform the supplied image's other
-# mask (if it exists - and if an OE mapping is available).
+# If no suitable image was found, transform the supplied image's other sky 
+# area (if it exists - and if an OE mapping is available).
       if { !$ok && $other != "" && [llength $PNTPX($image,$other)] > 0 } {
          set map [OEMapping $image]
          if { $map != "" } {
@@ -1567,18 +1679,19 @@ proc CreateMask {image object} {
          }
       }
 
-# If we still do not have a mask, go through the images again, this time
-# looking for one with the other mask and both image and OE mappings.
+# If we still do not have a sky area, go through the images again, this time
+# looking for one with the other sky area and both image and OE mappings.
+# The previously displayed image is checked first.
       if { !$ok && $other != "" } {
          set map0 [ImageMapping $image]
          if { $map0 != "" } {
-            foreach im $IMAGES {
+            foreach im $imlist {
                set map1 [ImageMapping $im]
                set map2 [OEMapping $im]
                if { $map1 != "" && $map2 != "" &&
                     [llength $PNTPX($im,$other)] > 0 } {
 
-# Create the require mask from this image's other mask.
+# Create the require sky area from this image's other sky area.
                   set map [ConcMap [ConcMap $map2 $inv $map1 0] 0 $map0 1]
                   if { $map != "" } {
                      TranPXY $map 0 $im $other $image $object
@@ -2277,7 +2390,7 @@ proc DrawGwm {} {
    global EFFECTSMENU
    global EFFECTS_STACK
    global IMAGE_DISP
-   global IMAGE_DISP
+   global IMAGE_PREV
    global IMAGE_STACK
    global IMAGES
    global IMSEC_DISP
@@ -2310,7 +2423,7 @@ proc DrawGwm {} {
 
 # Extract the image name and section string from the requested image
 # section string. Save the old displayed image first.
-      set old_image $IMAGE_DISP
+      set IMAGE_PREV $IMAGE_DISP
       GetSec $IMSEC_REQ IMAGE_DISP section0
       set section0 [ScreenSec $section0]
 
@@ -2324,7 +2437,7 @@ proc DrawGwm {} {
 # If we are viewing the unzoomed images, or if this is the first image 
 # to be displayed, display the whole image as supplied (i.e unzoomed), 
 # and clear the section stack. 
-      if { $VIEW == "Unzoomed" || $old_image == "" } {
+      if { $VIEW == "Unzoomed" || $IMAGE_PREV == "" } {
          set SECTION_REQ $section0 
          set SECTION_STACK ""
 
@@ -2397,15 +2510,14 @@ proc DrawGwm {} {
 
       } {
          if { [Obey kappa stats "ndf=$data"] } {
-            regsub -nocase D [GetParam kappa stats:mean] E mean
-            regsub -nocase D [GetParam kappa stats:sigma] E sigma
+            regsub -nocase D [GetParam kappa stats:maximum] E maxm
+            regsub -nocase D [GetParam kappa stats:minimum] E minm
 
-            if { $sigma == 0.0 || (
-                 $mean != 0.0 && [expr abs($sigma/$mean)] < 1.0E-4
-                 ) } {
+            if { abs( $maxm/2.0 - $minm/2.0 ) < 
+                 2.0E-4 * ( abs($maxm)/2.0 + abs($minm)/2.0 ) } {
                set pars "mode=flash"
-               regsub -nocase D [GetParam kappa stats:minimum] E scalow
-               regsub -nocase D [GetParam kappa stats:maximum] E scahigh
+               set scalow $minm
+               set scahigh $maxm
             } {
                set pars "mode=perc percentiles=\[$PLO_REQ,$PHI_REQ\]"
             }
@@ -2762,9 +2874,12 @@ proc DrawCur {} {
 # the mask exists. If a mask does not already exist, then an attempt is
 # made to create one from the other defined masks and mappings, on the
 # assumption that all masks should be roughly the same.
-   if { $CUROBJ_REQ == $O_RAY_SKY || $CUROBJ_REQ == $E_RAY_SKY ||
-        $CUROBJ_REQ == $O_RAY_MASK || $CUROBJ_REQ == $E_RAY_MASK } {
+   if { $CUROBJ_REQ == $O_RAY_MASK || $CUROBJ_REQ == $E_RAY_MASK } {
       CreateMask $IMAGE_DISP $CUROBJ_REQ
+   }
+
+   if { $CUROBJ_REQ == $O_RAY_SKY || $CUROBJ_REQ == $E_RAY_SKY } {
+      CreateSky $IMAGE_DISP $CUROBJ_REQ
    }
 
 # Only draw the objects if the type is not "None".
@@ -2836,13 +2951,16 @@ proc DrawRef {} {
          $REDRAW configure -state disabled
       }
 
-# If a reference mask (O, E or sky) has been requested, endeavour to ensure that
-# the mask exists. If a mask does not already exist, then an attempt is
+# If a reference mask (O, E or sky) has been requested, endeavour to ensure 
+# that the mask exists. If a mask does not already exist, then an attempt is
 # made to create one from the other defined masks and mappings, on there
 # assumption that all masks should be roughly the same.
-      if { $REFOBJ_REQ == $O_RAY_SKY || $REFOBJ_REQ == $E_RAY_SKY || 
-           $REFOBJ_REQ == $O_RAY_MASK || $REFOBJ_REQ == $E_RAY_MASK } {
+      if { $REFOBJ_REQ == $O_RAY_MASK || $REFOBJ_REQ == $E_RAY_MASK } {
          CreateMask $REFIM_REQ $REFOBJ_REQ
+      }
+
+      if { $REFOBJ_REQ == $O_RAY_SKY || $REFOBJ_REQ == $E_RAY_SKY } {
+         CreateSky $REFIM_REQ $REFOBJ_REQ
       }
 
 # Draw the markers.
@@ -5265,7 +5383,12 @@ proc GetFeature {cx cy rlabel} {
 #        If this is not null, then it is used as the label for the new
 #        feature (and the user is not prompted for a label). Also, this
 #        suppresses the warning messages which are otherwise displayed if 
-#        a position already exists at the supplied position.
+#        a position already exists at the supplied position, or if a
+#        position cannot be centroided.
+#
+#  Returned Value:
+#      Zero if the position could not be found (i.e. if the centroiding
+#      failed), and one otherwise.
 #
 #  Globals:
 #     CAN (Read)
@@ -5294,6 +5417,9 @@ proc GetFeature {cx cy rlabel} {
    global TEST_PX
    global TEST_PY
 
+# Assume success.
+   set ok 1
+
 # Get the NDF pixel coordinates at the position where the button was 
 # pressed.
    set pxy [CanToNDF $cx $cy]
@@ -5308,22 +5434,30 @@ proc GetFeature {cx cy rlabel} {
       set isize [expr 2 * $PSF_SIZE]
       set maxsh [expr 4 * $PSF_SIZE]
 
-# Attempt to centroid it.
+# Attempt to centroid it. Do not report an error if the centrodibng fails 
+# if we are finding features automatically.
+      if { $rlabel == "" } {
+         set norep ""
+      } {
+         set norep "noreport"
+      }
       set imsec "[Top IMAGE_STACK($IMAGE_DISP)]$SECTION_DISP"
-      if { [Obey polpack polcent "ndf=\"$imsec\" maxshift=$maxsh isize=$isize xin=$px yin=$py"] } {
+      if { [Obey polpack polcent "ndf=\"$imsec\" maxshift=$maxsh isize=$isize xin=$px yin=$py" $norep] } {
 
 # If succesful, read the accurate feature coordinates from the output
 # parameters.
          regsub -nocase D [GetParam polpack polcent:xyout] E pxy
          scan $pxy "' %f %f '" px py
 
-# If the position could not be centroided, report an error.
+# If the position could not be centroided, report an error if required.
       } {
-         Message "Failed to find centroid. Ignoring this position. Centroiding can be switched off by setting the Feature Size to zero in the \"Options\" menu."
+         if { $rlabel == "" } {
+            Message "Failed to find centroid. Ignoring this position. Centroiding can be switched off by setting the Feature Size to zero in the \"Options\" menu."
+         }
          set px ""
          set py ""
+         set ok 0
       }
-
    }
 
 # If we have a position...
@@ -5371,6 +5505,8 @@ proc GetFeature {cx cy rlabel} {
          }
       }
    }   
+
+   return $ok
 }
 
 proc GetItems {} {
@@ -6337,7 +6473,7 @@ proc HelpArea {} {
    }
 }
 
-proc Helper {x y} {
+proc Helper {} {
 #+
 #  Name:
 #     Helper
@@ -6346,8 +6482,7 @@ proc Helper {x y} {
 #     Selects the text to display in the help area. 
 #
 #  Arguments:
-#     x y
-#        The root X and Y coordinates of the pointer.
+#     None.
 #
 #  Globals:
 #     HELPS (Read)
@@ -6360,7 +6495,15 @@ proc Helper {x y} {
    global HELPS
    global HELP
 
+# This function is usually invoked when the pointer enters or leaves a
+# widget. The identification of the widget is not reliable if the pointer
+# is on the boundary, so pause for 10 milliseconds to allow the pointer
+# to get away from the boundary.
+   after 10
+
 # Find the lowest level widget under the pointer.
+   set x [winfo pointerx .] 
+   set y [winfo pointery .]
    set w [winfo containing $x $y]
 
 # Check all the ancestors of this widget. This loop will be broken out of when
@@ -6573,7 +6716,9 @@ proc ImageMapping {image} {
 #     ImageMapping
 #
 #  Purpose:
-#     Return the mapping from the supplied image to the first (reference)
+#     Return the mapping which transforms the pixel coordinates of a
+#     certain position on the sky in the supplied image, into the pixel
+#     coordinates of the same sky position in the first (reference)
 #     image. If an up-to-date mapping is already available, then it is 
 #     returned. Otherwise, an attempt is made to determine a new mapping.
 #     If no mapping can be created for the specified image (for
@@ -7388,6 +7533,7 @@ proc MapRefs {px_name py_name} {
 #-
    global CUROBJ_REQ
    global IMAGE_DISP
+   global E_RAY_MASK
    global O_RAY_FEATURES
    global O_RAY_MASK
    global O_RAY_SKY
@@ -7422,6 +7568,14 @@ proc MapRefs {px_name py_name} {
       set ref_ray "E"
    }
 
+# See if the reference object is a mask.
+   if { $REFOBJ_REQ == $E_RAY_MASK ||
+        $REFOBJ_REQ == $O_RAY_MASK } {
+      set ref_mask 1
+   } {
+      set ref_mask 0
+   }
+
 # If the reference objects are E-ray objects, the first mapping maps them 
 # into the O-ray frame.
    if { $ref_ray == "E" } {
@@ -7430,14 +7584,25 @@ proc MapRefs {px_name py_name} {
       set m1 "ref"
    }
 
-# Get the mapping from the reference image to the first image.
-   set m2 [ImageMapping $REFIM_REQ]
+# Get the mapping from the reference image to the first image. Masks are
+# assumed to be aligned in all images, so use a unit ("ref") mapping if
+# we are drawing a reference mask.
+   if { $ref_mask } {
+      set m2 "ref"
+   } {
+      set m2 [ImageMapping $REFIM_REQ]
+   }
 
-# Combine it with the first mapping.
+# Combine it with the first mapping. This gives the mapping from the 
+# reference frame (E or O) to the O-ray frame of the first image.
    set m21 [ConcMap $m1 0 $m2 0]
 
 # Get the mapping from the current image to the first image.
-   set m3 [ImageMapping $IMAGE_DISP]
+   if { $ref_mask } {
+      set m3 "ref"
+   } {
+      set m3 [ImageMapping $IMAGE_DISP]
+   }
 
 # Combine this with the total mapping so far, to get the mapping from the 
 # reference frame to the O-ray frame in the current image.
@@ -7452,7 +7617,7 @@ proc MapRefs {px_name py_name} {
    }
    set map [ConcMap $m321 0 $m4 1]
 
-# Initialise the returned positions to be the supplied positions.
+# Initialise the returned positiosn to equal the supplied positions.
    set lpx $PNTPX($REFIM_REQ,$REFOBJ_REQ)
    set lpy $PNTPY($REFIM_REQ,$REFOBJ_REQ)
 
@@ -7462,9 +7627,10 @@ proc MapRefs {px_name py_name} {
       set REFALN 0
       $REDRAW configure -state disabled
 
-# If the mapping is a unit mapping, leave the supplied positions unchanged.
-   } elseif { $map != "ref" } {
-      TranList $map 0 $lpx $lpy lpx lpy
+# Otherwise, if the mapping is a unit mapping, leave the supplied positions 
+# unchanged. 
+   } elseif { $map != "ref" } { 
+      TranList $map 0 $lpx $lpy lpx lpy 
    }
 
 # Cancel the informative text set earlier in this procedure.
@@ -7801,6 +7967,7 @@ proc MotionBind {x y} {
       if { $j != -1 } {
          $LB selection clear 0 end
          $LB selection set $j                         
+         $LB see $j
       }
    }
 }
@@ -7969,7 +8136,7 @@ proc Obey {task action params args} {
 #       then the variable is assumed to be a 1-D array, indexed by A-task
 #       parameter name. The associated values are the values to supply for 
 #       the A-task's parameters if they are prompted for. 
-#       o  The presence of any other value after "params" causes
+#       o  The presence of any other non-blank value after "params" causes
 #       the whole TCL application to abort if the specified action
 #       does not complete succesfully.
 #
@@ -8032,7 +8199,7 @@ proc Obey {task action params args} {
          set report 0
 
 # Otherwise, abort on an error.         
-      } else {
+      } elseif { [lindex $args 0] != "" } { 
          set abort 1
       }
    }
@@ -8118,8 +8285,10 @@ proc OEMapping {image args} {
 #     OEMapping
 #
 #  Purpose:
-#     Return the mapping from E to O ray for the specified image. If an
-#     up-to-date mapping is already available, then it is returned.
+#     Return the mapping which transforms the pixel coordinates of a
+#     given sky position in the E ray area, into the pixel coordinates
+#     of the same sky positions within the O ray area of the specified image. 
+#     If an up-to-date mapping is already available, then it is returned.
 #     Otherwise, an attempt is made to determine a new OE mapping.
 #     If no OE mapping can be created for the specified image (for
 #     instance, if the required image features have not yet been given by
@@ -8232,28 +8401,11 @@ proc OEMapping {image args} {
       } {
          set OEMAP($image) $ret
 
-# If the first image does not yet have an OE mapping we may be able to 
-# give it the OE mapping just created. 
+# If the first image does not yet have an OE mapping we give it the OE 
+# mapping just created. 
          if { $image != $im0 } {
             set oe0 [OEMapping $im0 1]
-            if { $oe0 == "" } {
-
-# To do this, we need to modify the OE mapping just created to take account
-# of the mapping between this image and the first image. See if there is
-# am image mapping available.
-               set immap [ImageMapping $image]
-               if { $immap != "" } {
-
-# To use the OE mapping just created for the first image, we would need
-# to map the first image E positions into the current image, then use the
-# OE mapping to get O positions in the current image, and then map them
-# back into the first image. Find the single mapping which this is
-# equivalent to, and store it in global.
-                  set m1 [ConcMap $immap 1 $OEMAP($image) 0]
-                  set m2 [ConcMap $m1 0 $immap 0] 
-                  if { $m2 != "" } { set OEMAP($im0) $m2 }
-               }
-            }
+            if { $oe0 == "" } { set OEMAP($im0) $ret }
          }
       }
 
@@ -8286,27 +8438,13 @@ proc OEMapping {image args} {
          if { $im != $image } {
             OEMapping $im 1
 
-# See if the first image now has an OE mapping.
+# See if the first image now has an OE mapping, if so use it as the mapping
+# for the required image.
             set oe0 [OEMapping $im0 1]
             if { $oe0 != "" } {
-
-# To use this OE mapping the current image must have an image mapping.
-               set immap [ImageMapping $image]
-               if { $immap != "" } {
-
-# To use the OE mapping from the first image, we would need to map the 
-# current image E positions into the first image, then use the first image 
-# OE mapping to get O positions in the first image, and then map them back 
-# into the current image. Find the single mapping which this is equivalent 
-# to, and store it in global.
-                  set m1 [ConcMap $immap 0 $oe0 0]
-                  set m2 [ConcMap $m1 0 $immap 1] 
-                  if { $m2 != "" } { 
-                     set OEMAP($image) $m2 
-                     set ret $m2
-                     break
-                  }
-               }
+               set OEMAP($image) $oe0
+               set ret $oe0
+               break
             }
          }
       }
@@ -8937,6 +9075,7 @@ proc Save {} {
    global RESAVE
    global SAFE
    global S_FONT
+   global SIMAGE
    global SKYOFF
    global SKY_AREA
    global SKY_METHOD
@@ -8978,7 +9117,7 @@ proc Save {} {
 
 # If the sky to be subtracted is defined within the object frames, 
 # ensure that sky areas have been defined.
-      } elseif { $SKYOFF && $SKY_METHOD == $SKY_AREA && ![CreateMask $im0 $O_RAY_SKY] } {
+      } elseif { $SKYOFF && $SKY_METHOD == $SKY_AREA && ![CreateSky $im0 $O_RAY_SKY] } {
          Message "The areas containing sky have not yet been supplied."
 
 # Otherwise, process each image section in turn...
@@ -9004,7 +9143,7 @@ proc Save {} {
          pack $imlist $pfrm -side left -fill both -padx 4m -pady 4m
 
          foreach image $IMAGES {
-            regsub -all "." $image "" ni
+            regsub -all {\.} $image "" ni
             set fr [frame $imlist.$ni -background $back]
             pack $fr -side top -fill x
 
@@ -9021,7 +9160,7 @@ proc Save {} {
          set fr1 [frame $pfrm.fr1]
          pack $fr1 -side top -anchor w -fill both -expand 1
          set l1 [label $fr1.l1 -text "Doing image: " -font $S_FONT]
-         set l2 [label $fr1.l2 -textvariable image]
+         set l2 [label $fr1.l2 -textvariable SIMAGE]
          pack $l1 $l2 -side left -padx 6m 
 
          set fr234 [frame $pfrm.fr234 -background $back -bd 2 -relief raised]
@@ -9136,6 +9275,7 @@ proc Save {} {
 
 # Extract the image name section string from the image-section string.
             GetSec $imsec image section
+            set SIMAGE $image
 
 # Do the sky subtraction.
             set image2 [SkySub $imsec $image 1 $selab $setick(O) $setick(E) \
@@ -9207,7 +9347,7 @@ proc Save {} {
                Wop $metick($ray) configure -foreground black
                Wop $ialab configure -foreground red 
 
-# Get the name of a tempotrary file to hold the output image in NDF format.
+# Get the name of a temporary file to hold the output image in NDF format.
                set outndf [UniqueFile]
 
 # Determine the output image name.
@@ -10028,7 +10168,7 @@ proc SetHelp {widget help args} {
    }
 
 # Ensure that the displayed help text is up-to-date. 
-   Helper [winfo pointerx .] [winfo pointery .]
+   Helper 
    
 }
 
@@ -11034,7 +11174,7 @@ proc SkySub {data image sub args} {
          Wop $selab configure -foreground red
 
 # Issue a warning if the sky areas have not been identified.
-         if { ![CreateMask $image $skyobj] } {
+         if { ![CreateSky $image $skyobj] } {
             Message "The ${ray}-ray areas containing sky have not been identified."
             set ok 0
             break
