@@ -704,7 +704,7 @@ display will not."
    set DOING ""
 
 # Re-size the image display if the top-level window is resized.
-   bind . <Configure> {Resize}
+   bind . <Configure> {Resize 0}
 
    wm deiconify .
 

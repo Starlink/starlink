@@ -23,7 +23,7 @@ demo v1.0 {
       command {exec echo "Label(1)=" >> nullstyle.tmp}
       command {exec echo "LabelUnits=0" >> nullstyle.tmp}
       command {exec echo "TextLabGap(1)=0.05" >> nullstyle.tmp}
-      command {exec echo "Size(TextLab)=8" >> nullstyle.tmp}
+      command {exec echo "Size(TextLab)=2" >> nullstyle.tmp}
       command {exec echo "Width(TextLab)=2" >> nullstyle.tmp}
       command {exec echo "Colour(TextLab)=silver" >> nullstyle.tmp}
       command {exec echo "Colour(Border)=black" >> nullstyle.tmp}
