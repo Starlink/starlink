@@ -375,7 +375,7 @@ package hdstools {
             type _INTEGER
             position 2
             prompt {New dimensions}
-            help "eg [256 256 5] - number of dimensions must be the same"
+            help "Number of dimensions must be the same"
             helpkey *
           }
 

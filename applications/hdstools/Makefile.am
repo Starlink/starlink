@@ -21,7 +21,7 @@ hmodify hread hrename hreset hreshape hretype htab hwrite
 
 FSRC = aio_assoco.f aio_blnk.f aio_cancl.f aio_close.f aio_ctoc.f \
          aio_fopen.f aio_iwrite.f aio_open.f aio_readf.f \
-         aio_rewrite.f aio_setdext.f aio_setpath.f aio_setwrap.f aio_title.f \
+         aio_setdext.f aio_setpath.f aio_setwrap.f aio_title.f \
          aio_write.f \
          ast_rexit.f \
          ar7_pad.f \
