@@ -110,6 +110,7 @@
       REAL              NSNORM                 ! # source >= SNORM in AREA
       REAL              PSIZE                  ! Pixel size - quantum of lists
       REAL              SPOS(MAXSRC*2)         ! Source positions
+      REAL			TEFF			! Model exposure time
       REAL              TOR                    ! Radian conversion factor
       REAL              WIDS(MAXSRC)           ! Source widths
       REAL              XPOS(MAXSRC),YPOS(MAXSRC)
@@ -156,6 +157,7 @@
       INTEGER           SEED                   ! Random number seed
 
       LOGICAL           ANYBAD                 ! Any bad model points?
+      LOGICAL			ECORR			! Model is corrected?
       LOGICAL           LOGNS                  ! Work in Log NS mode for sources
       LOGICAL           MOK                    ! Using a model?
       LOGICAL           MORE_OK                ! MORE box present in model?
