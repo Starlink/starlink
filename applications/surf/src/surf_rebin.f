@@ -1,11 +1,10 @@
-      SUBROUTINE REDS_WTFN_REBIN (METHOD, TSKNAME, STATUS)
+      SUBROUTINE REDS_REBIN (TSKNAME, STATUS)
 *+
 *  Name:
-*     (BOL)REBIN
+*     (BOL|INT)REBIN
 
 *  Purpose:
 *     routine to rebin demodulated SCUBA data onto output map
-*     by convolution with a weighting function.
 
 *  Language:
 *     Starlink Fortran 77
@@ -17,10 +16,9 @@
 *     CALL REDS_WTFN_REBIN (METHOD, STATUS)
 
 *  Arguments:
-*     METHOD = CHARACTER * ()  (Given)
-*        The rebin method (BESSEL or LINEAR)
 *     TSKNAME = CHARACTER * () (Given)
 *        Name of task so that I can distinguish REBIN, BOLREBIN and INTREBIN
+*        and EXTRACT_DATA
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
@@ -54,10 +52,6 @@
 *     of integrations added into the final data point. For weight function
 *     regridding the situation is more complicated.
 
-*     This task can not be fully automated since the INPUT parameters
-*     are reused for each dataset. Datasets are entered until a null parameter
-*     value (!) is returned for IN.
-
 *     If this task is invoked as BOLREBIN then a separate map will be made
 *     of each bolometer. The output file will contain an NDF for each 
 *     bolometer.
@@ -72,16 +66,23 @@
 
 *  ADAM parameters:
 *     REF = NDF (Read)
-*        The name of the first NDF to be rebinned.
+*        The name of the first NDF to be rebinned. The name may also be the
+*        name of an ASCII text file containing NDF and parameter values.
+*        See the notes. REF can be a SCUBA section.
 *     IN = NDF (Read)
 *        The name of the input file to be rebinned. This parameter is requested
-*        repeatedly until a NULL value (!) is supplied.
+*        repeatedly until a NULL value (!) is supplied. LOOP must be TRUE.
+*        IN can be a SCUBA section.
+*        Like the REF parameter this parameter accepts a text file.
 *     LAT_OUT = _CHAR (Read)
 *        The latitude of the output map centre. The supplied default value
 *        is that of the map centre of the first map.
 *     LONG_OUT = _CHAR (Read)
 *        The longitude of the output map centre. The supplied default value 
 *        is that of the map centre of the first map.
+*     LOOP = LOGICAL (Read)
+*        Task will ask for multiple input files if true. Only REF is read
+*        if noloop.
 *     OUT = NDF (Write)
 *        For REBIN this is the name of the NDF that will contain the rebinned 
 *        map. For BOLREBIN this is the name of the HDS container file.
@@ -139,6 +140,20 @@
 *     - The output map will be large enough to include all data points.
 *     - Spline regridding may have problems with SCAN/MAP (since integrations
 *     contain lots of overlapping data points).
+*     - The REF and IN parameters accept ASCII text files as input. These
+*     text files may contain comments (signified by a #), NDF names,
+*     values for the parameters WEIGHT, SHIFT_DX, SHIFT_DY and USE_SECTION,
+*     and names of other ASCII files. There is one data file per line.
+*     An example entry is:
+*
+*         file1{b5}   1.0   0.5   0.0  YES
+*         # This is file2
+*         file2       0.9   0.0   0.0  # No section needed
+*
+*     Note that the parameters are position dependent and are not necessary.
+*     Missing parameters are requested. This means it is not possible to
+*     specify SHIFT_DX (position 3) without specifying the WEIGHT.
+*     Also note that SCUBA sections can be specified with any input NDF.
 
 
 *  Authors :
@@ -149,6 +164,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.33  1997/05/22 01:12:36  timj
+*     Merge with REDS_REBIN.
+*     Support weights in EXTRACT_DATA.
+*
 *     Revision 1.32  1997/05/22 00:20:50  timj
 *     Move NDF reading routine into subroutines REDS_RECURSE_READ and
 *     REDS_READ_REBIN_NDF.
@@ -249,7 +268,6 @@ c
 
 * Arguments Given:
       CHARACTER * (*)  TSKNAME
-      CHARACTER * (*)  METHOD
 
 * Status:
       INTEGER STATUS
@@ -364,6 +382,7 @@ c
       INTEGER          LBND (MAX_DIM)  ! pixel indices of bottom left 
                                        ! corner of output image
       CHARACTER * (5)  MAPNAME         ! Name of each bolometer
+      CHARACTER* (15)  METHOD          ! rebinning method
       DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs
                                        ! of all
                                        ! measured positions are calculated
@@ -446,7 +465,10 @@ c
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-* Initialize
+* Start up the error system
+      CALL ERR_BEGIN(STATUS)
+
+*     Initialize
       INTREBIN = .FALSE.
       BOLREBIN = .FALSE.
 
@@ -458,10 +480,6 @@ c
          INTREBIN = .TRUE.
       END IF
 
-
-* Start up the error system
-      CALL ERR_BEGIN(STATUS)
-
 * Make sure the Pointers really are 0
 
       DO I = 1, MAX_FILE
@@ -471,40 +489,51 @@ c
 *     Set the MSG output level (for use with MSG_OUTIF)
       CALL MSG_IFGET('MSG_FILTER', STATUS)
 
-* Read in the weighting function
+* Read in the rebin method if necessary
 
-      IF (TSKNAME .NE. 'EXTRACT_DATA') THEN
-      IF (METHOD.EQ.'BESSEL') THEN
-*   Bessel
-         CALL MSG_SETC('PKG',PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
-     :        '^PKG: Initialising BESSEL weighting functions',
-     :        STATUS)
-         WEIGHTSIZE = WTFNRAD
-         CALL SCULIB_BESSEL_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
-      ELSE IF (METHOD.EQ.'LINEAR') THEN
-*   Linear
-         CALL MSG_SETC('PKG',PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
-     :        '^PKG: Initialising LINEAR weighting functions',
-     :        STATUS)
-         WEIGHTSIZE = 1
-         CALL SCULIB_LINEAR_WTINIT(WTFN, WTFNRES, STATUS)
+      IF (TSKNAME .EQ. 'EXTRACT_DATA') THEN
 
-      ELSE IF (METHOD(1:6) .EQ. 'SPLINE') THEN
-*     Do nothing
-         CALL MSG_SETC('PKG',PACKAGE)
-         CALL MSG_OUTIF(MSG__NORM, ' ', 
-     :        '^PKG: Spline interpolation selected',
-     :        STATUS)
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUTIF(MSG__NORM, ' ', '^PKG: Extracting data and'//
+     :        ' position information', STATUS)
 
       ELSE
-         STATUS = SAI__ERROR
-         CALL MSG_SETC('METHOD', METHOD)
-         CALL MSG_SETC('PKG', PACKAGE)
-         CALL ERR_REP(' ','^PKG: Rebin type ^METHOD unavailable',
-     :        STATUS)
-      END IF
+
+         CALL PAR_CHOIC('REBIN_METHOD', 'Linear', 
+     :        'Linear,Bessel,Spline1,Spline2,Spline3', .TRUE.,
+     :        METHOD, STATUS)
+
+         IF (METHOD.EQ.'BESSEL') THEN
+*     Bessel
+            CALL MSG_SETC('PKG',PACKAGE)
+            CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :           '^PKG: Initialising BESSEL weighting functions',
+     :           STATUS)
+            WEIGHTSIZE = WTFNRAD
+            CALL SCULIB_BESSEL_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
+         ELSE IF (METHOD.EQ.'LINEAR') THEN
+*     Linear
+            CALL MSG_SETC('PKG',PACKAGE)
+            CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :           '^PKG: Initialising LINEAR weighting functions',
+     :           STATUS)
+            WEIGHTSIZE = 1
+            CALL SCULIB_LINEAR_WTINIT(WTFN, WTFNRES, STATUS)
+            
+         ELSE IF (METHOD(1:6) .EQ. 'SPLINE') THEN
+*     Do nothing
+            CALL MSG_SETC('PKG',PACKAGE)
+            CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :           '^PKG: Spline interpolation selected',
+     :           STATUS)
+
+         ELSE
+            STATUS = SAI__ERROR
+            CALL MSG_SETC('METHOD', METHOD)
+            CALL MSG_SETC('PKG', PACKAGE)
+            CALL ERR_REP(' ','^PKG: Rebin type ^METHOD unavailable',
+     :           STATUS)
+         END IF
       END IF
 
 *  get the output coordinate system and set the default centre of the
@@ -848,8 +877,26 @@ c
 
 *     Write out a small header
 
+         CALL FIO_WRITE(FD,
+     :        '       Delta X (Radians)      Delta Y(Radians) '//
+     :        '        Data         Variance',
+     :        STATUS)
+
 *     Write out the good numbers
          DO I = 1, FILE
+
+*     Multiply all the data by the weight and variance by weight squared
+            IF (STATUS .EQ. SAI__OK) THEN
+               CALL SCULIB_MULCAR(N_POS(I) * N_BOL(I),
+     :              %VAL(IN_DATA_PTR(I)), WEIGHT(I), 
+     :              %VAL(IN_DATA_PTR(I)))
+
+               CALL SCULIB_MULCAR(N_POS(I) * N_BOL(I),
+     :              %VAL(IN_VARIANCE_PTR(I)), WEIGHT(I)**2, 
+     :              %VAL(IN_VARIANCE_PTR(I)))
+            END IF
+
+*     Write out the data
             CALL REDS_WRITE_DATA( FD, N_POS(I) * N_BOL(I), 
      :           %VAL(IN_DATA_PTR(I)), %VAL(IN_VARIANCE_PTR(I)),
      :           %VAL(BOL_RA_PTR(I)), %VAL(BOL_DEC_PTR(I)),
