@@ -22,6 +22,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/ams \
 	$(MANIFEST)/ard \
 	$(MANIFEST)/ast \
+	$(MANIFEST)/astrom \
 	$(MANIFEST)/atimer \
 	$(MANIFEST)/cat \
         $(MANIFEST)/ccdpack \
@@ -68,6 +69,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/ref \
 	$(MANIFEST)/sae \
 	$(MANIFEST)/sgs \
+	$(MANIFEST)/shl \
 	$(MANIFEST)/sla \
 	$(MANIFEST)/sock \
 	$(MANIFEST)/sst \

@@ -87,6 +87,7 @@ $(MANIFEST)/ard: \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/ard \
@@ -106,9 +107,17 @@ $(MANIFEST)/ary: \
 
 $(MANIFEST)/ast: \
 		$(MANIFEST)/messgen \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/sst \
 		$(MANIFEST)/star2html
 	cd libraries/ast \
+	    && make>make.log && make install>>make.log
+
+$(MANIFEST)/astrom: \
+		$(MANIFEST)/cfitsio \
+		$(MANIFEST)/sla \
+		$(MANIFEST)/star2html
+	cd applications/astrom \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/atimer: \
@@ -150,6 +159,7 @@ $(MANIFEST)/atools: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/sst \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
@@ -202,21 +212,10 @@ $(MANIFEST)/cat: \
 		$(MANIFEST)/par \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/cat \
-	    && make>make.log && make install>>make.log
-
-$(MANIFEST)/ccdgen:
-	cd applications/ccdpack/gen \
-	    && make>make.log && make install>>make.log
-
-$(MANIFEST)/ccdhelp:
-	cd applications/ccdpack/help \
-	    && make>make.log && make install>>make.log
-
-$(MANIFEST)/ccdmain:
-	cd applications/ccdpack/main \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/ccdpack: \
@@ -234,6 +233,9 @@ $(MANIFEST)/ccdpack: \
 		$(MANIFEST)/fio \
 		$(MANIFEST)/generic \
 		$(MANIFEST)/gks \
+		$(MANIFEST)/gkspar \
+		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
@@ -255,10 +257,16 @@ $(MANIFEST)/ccdpack: \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pda \
+		$(MANIFEST)/pgp \
 		$(MANIFEST)/pgplot \
+		$(MANIFEST)/pgppar \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sgs \
+		$(MANIFEST)/sgspar \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/sock \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/startcl \
@@ -270,10 +278,6 @@ $(MANIFEST)/ccdpack: \
 		$(MANIFEST)/tk \
 		$(MANIFEST)/trn
 	cd applications/ccdpack \
-	    && make>make.log && make install>>make.log
-
-$(MANIFEST)/ccdtasks:
-	cd applications/ccdpack/tasks \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/cfitsio: \
@@ -318,6 +322,7 @@ $(MANIFEST)/convert: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
@@ -351,6 +356,7 @@ $(MANIFEST)/cursa: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
@@ -381,6 +387,7 @@ $(MANIFEST)/daophot: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
@@ -421,6 +428,7 @@ $(MANIFEST)/dipso: \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
@@ -472,6 +480,7 @@ $(MANIFEST)/extractor: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/extractor \
@@ -504,6 +513,7 @@ $(MANIFEST)/figaro: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
@@ -556,6 +566,7 @@ $(MANIFEST)/gaia: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
@@ -811,6 +822,7 @@ $(MANIFEST)/img: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
@@ -863,6 +875,7 @@ $(MANIFEST)/kaplibs: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
@@ -903,6 +916,7 @@ $(MANIFEST)/kappa: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
@@ -941,6 +955,7 @@ $(MANIFEST)/kaprh: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
@@ -1072,6 +1087,7 @@ $(MANIFEST)/ndf: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html
 	cd libraries/ndf \
 	    && make>make.log && make install>>make.log
@@ -1093,6 +1109,7 @@ $(MANIFEST)/ndg: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/ndg \
@@ -1250,6 +1267,7 @@ $(MANIFEST)/photom: \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
@@ -1283,6 +1301,7 @@ $(MANIFEST)/pisa: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/pisa \
@@ -1321,6 +1340,7 @@ $(MANIFEST)/polpack: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
@@ -1402,6 +1422,30 @@ $(MANIFEST)/sgspar: \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd libraries/graphpar/sgspar \
+	    && make>make.log && make install>>make.log
+
+$(MANIFEST)/shl: \
+		$(MANIFEST)/adam \
+		$(MANIFEST)/ams \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/fio \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
+		$(MANIFEST)/lex \
+		$(MANIFEST)/mers \
+		$(MANIFEST)/messys \
+		$(MANIFEST)/misc \
+		$(MANIFEST)/one \
+		$(MANIFEST)/par \
+		$(MANIFEST)/parsecon \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/string \
+		$(MANIFEST)/subpar
+	cd libraries/shl \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/sla: \

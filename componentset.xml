@@ -2,6 +2,36 @@
 <componentset>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="astrom">
+  <version>3.8</version>
+  <path>applications/astrom</path>
+  <description>Basic astrometry package</description>
+  <abstract><p>ASTROM performs ``plate reductions''.  You supply star
+  positions from a catalogue and the (x,y) ccoordinates of the
+  corresponding star images.  ASTROM uses this information to
+  establish the relationship between (x,y) and (ra,dec) enabling the
+  coordinates of ``unknown stars'' to be determined.</p></abstract>
+  <dependencies >
+    <build>sla</build><build>cfitsio</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P T Wallace</name>
+      <uname>ptw</uname>
+      <email>P.T.Wallace@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun5</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="atools">
   <version>1.6-3</version>
   <path>applications/atools</path>
@@ -55,7 +85,7 @@ high-level interface to the AST library.
     </p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><sourceset>messgen</sourceset><build>chr</build><build>agi</build><build>ard</build><build>ast</build><build>chr</build><build>fio</build><build>ndf</build><build>pgplot</build><build>prm</build><build>psx</build><build>trn</build><build>pda</build><build>ndg</build><build>tcl</build><build>tk</build><build>itcl</build><build>startcl</build><build>ifd</build><build>img</build><build>generic</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><sourceset>messgen</sourceset><build>chr</build><build>agi</build><build>ard</build><build>ast</build><build>chr</build><build>fio</build><build>ndf</build><build>pgplot</build><build>prm</build><build>psx</build><build>trn</build><build>pda</build><build>ndg</build><build>tcl</build><build>tk</build><build>itcl</build><build>startcl</build><build>ifd</build><build>img</build><build>generic</build><build>sla</build><build>ref</build><build>graphpar</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -69,106 +99,6 @@ high-level interface to the AST library.
     </person>
   </developers>
   <!-- <documentation> sun139</documentation> -->
-  <bugreports>ccdpack@starlink.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
-<component id="ccdgen">
-  <version>4.0-16</version>
-  <path>applications/ccdpack/gen</path>
-  <description>Generic library subsystem for CCDPACK</description>
-  <!-- <abstract><p></p></abstract> -->
-  <dependencies >
-    
-  </dependencies>
-  <developers>
-    <person>
-      <name>Mark Taylor</name>
-      <uname>mbt</uname>
-      <email>m.b.taylor@bristol.ac.uk</email>
-    </person>
-    <person>
-      <name>Peter Draper</name>
-      <uname>pwd</uname>
-    </person>
-  </developers>
-  <!-- <documentation></documentation> -->
-  <bugreports>ccdpack@starlink.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
-<component id="ccdhelp">
-  <version>4.0-16</version>
-  <path>applications/ccdpack/help</path>
-  <description>Help library subsystem for CCDPACK</description>
-  <!-- <abstract><p></p></abstract> -->
-  <dependencies >
-    
-  </dependencies>
-  <developers>
-    <person>
-      <name>Mark Taylor</name>
-      <uname>mbt</uname>
-      <email>m.b.taylor@bristol.ac.uk</email>
-    </person>
-    <person>
-      <name>Peter Draper</name>
-      <uname>pwd</uname>
-    </person>
-  </developers>
-  <!-- <documentation></documentation> -->
-  <bugreports>ccdpack@starlink.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
-<component id="ccdmain">
-  <version>4.0-16</version>
-  <path>applications/ccdpack/main</path>
-  <description>Main subroutine library for CCDPACK</description>
-  <!-- <abstract><p></p></abstract> -->
-  <dependencies >
-    
-  </dependencies>
-  <developers>
-    <person>
-      <name>Mark Taylor</name>
-      <uname>mbt</uname>
-      <email>m.b.taylor@bristol.ac.uk</email>
-    </person>
-    <person>
-      <name>Peter Draper</name>
-      <uname>pwd</uname>
-    </person>
-  </developers>
-  <!-- <documentation></documentation> -->
-  <bugreports>ccdpack@starlink.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
-<component id="ccdtasks">
-  <version>4.0-16</version>
-  <path>applications/ccdpack/tasks</path>
-  <description>Tasks library subsystem for CCDPACK</description>
-  <!-- <abstract><p></p></abstract> -->
-  <dependencies >
-    
-  </dependencies>
-  <developers>
-    <person>
-      <name>Mark Taylor</name>
-      <uname>mbt</uname>
-      <email>m.b.taylor@bristol.ac.uk</email>
-    </person>
-    <person>
-      <name>Peter Draper</name>
-      <uname>pwd</uname>
-    </person>
-  </developers>
-  <!-- <documentation></documentation> -->
   <bugreports>ccdpack@starlink.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -321,6 +251,43 @@ variety of formats.
   </developers>
   <documentation> sun226</documentation>
   <bugreports>extractor@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="scb">
+  <version>0.1-1</version>
+  <path>applications/extreme</path>
+  <description>Handling Extreme Data Sets</description>
+  <abstract>
+  <p>This package provides some utilities, background documentation,
+  and associated files for adapting the Starlink Software Collection,
+  and software which uses it, to handle very large data sets.
+  The principal focus of this is to move to use of 64 bits of address
+  space on 64-bit operating systems.</p>
+
+  <p>This document (SSN/73) is squarely aimed at the problem of adapting the
+  Starlink Software Collection, and consequently focuses on
+  the three operating systems (Solaris, Linux and Tru64) supported by Starlink,
+  the compiled languages Fortran 77 and ANSI C,
+  and Starlink's somewhat idiosyncratic build mechanisms.
+  However, some of the discussion here may be of interest or use to
+  people who are considering the change from 32 to 64 bits for
+  software in other contexts.
+  </p>
+  </abstract>
+  <dependencies >
+    <build>sst</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+  </developers>
+  <!-- <documentation> ssn73</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
@@ -1140,7 +1107,7 @@ display of vector maps.
       is portable and environment-independent.</p>
   </abstract>
   <dependencies >
-    <sourceset>sst</sourceset><use>sla</use><sourceset>messgen</sourceset>
+    <sourceset>sst</sourceset><build>sla</build><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1168,7 +1135,7 @@ CAT is the Starlink Fortran subroutine library for manipulating
 astronomical catalogues and similar tabular datasets.
 </p></abstract>
   <dependencies >
-    <build>ast</build><build>sae</build><build>par</build><build>prm</build><link>cfitsio</link><link>par</link><link>err</link><link>sla</link><link>chr</link><link>ast</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>ast</build><build>sae</build><build>par</build><build>prm</build><link>cfitsio</link><link>par</link><link>mers</link><link>sla</link><link>chr</link><link>ast</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <!--
   <developers>
@@ -1388,7 +1355,7 @@ No longer under active control.
   package.
   </p></abstract>
   <dependencies >
-    <build>gkspar</build><build>pgppar</build><build>sgspar</build><sourceset>star2html</sourceset>
+    <build>gkspar</build><build>pgppar</build><build>sgspar</build><build>gns</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2491,7 +2458,7 @@ Ultrix and for SunOS and may still work for them.
   GKS implementation of the PGPLOT graphics library.
   </p></abstract>
   <dependencies >
-    <build>sae</build><build>gks</build><link>gks</link><link>gns</link><link>psx</link><link>err</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>gks</build><link>gks</link><link>gns</link><link>psx</link><link>mers</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2657,6 +2624,40 @@ Ultrix and for SunOS and may still work for them.
   <documentation> sun85</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="shl">
+  <version>1.0-1</version>
+  <path>libraries/shl</path>
+  <description>SHL -- Support for HLP Library access</description>
+  <abstract><p>The Starlink HLP system allows an application program
+      to retrieve named items from a hierarchically-arranged library
+      of text.  The facility resembles VAX/VMS HELP.  It consists of a
+      library plus utility programs for creating, listing and reading
+      help libraries.</p>
+     <p>Since each application needs its own help system, it made little
+     sense to rewrite a help browser for each application independently.
+     Over the years Starlink applications have switched to using the
+     standard KAPPA help application code. Implemented by copying
+     the kappa files to each application in turn. Now that all the
+     applications are in a single location, the kappa help infrastructure
+     has been factored out into the SHL library.</p>
+     <p>In addition to the KAPPA fortran infrastructure, a C implementation
+     of a help browser has also been integrated (from figaro) into
+     SHL.</p>
+  </abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>fio</build><build>cnf</build><build>hlp</build><build>mers</build><build>one</build><link>fio</link><link>cnf</link><link>hlp</link><link>par</link><link>mers</link><link>one</link>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Malcolm Currie</name>
+      <uname>mjc</uname>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
