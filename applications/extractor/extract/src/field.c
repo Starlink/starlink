@@ -6,12 +6,18 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*                       A.J.CHIPPERFIELD (STARLINK)
+*                       P.W.DRAPER (STARLINK & Durham University)
 *
 *	Contents:	Handling of field structures.
 *
 *	Last modify:	02/02/98
 *                       27/10/98 (AJC)
 *                          Use AFPRINTF not fprintf
+*                       06/01/99 (PWD)
+*                          Changed use of field->file member. This is
+*                          used differently in NDF interface (was
+*                          being closed!). 
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -212,7 +218,7 @@ picstruct	*inheritfield(picstruct *infield, int flags)
   field->copystrip = infield->strip;
   field->compress_buf = NULL;
   field->compress_type = COMPRESS_NONE;
-  field->file = NULL;
+  field->file = 0;            /*  PWD: was NULL, file reused as position;*/
 
 /* Allocate space for the frame-buffer */
   if (flags ^ FLAG_FIELD)
@@ -241,8 +247,8 @@ Free and close everything related to a field structure.
 void	endfield(picstruct *field)
 
   {
-  if (field->file)
-    fclose(field->file);
+    /*  if (field->file)
+        fclose(field->file);  PWD:  file not opened, using NDF instead*/
 
   free(field->fitshead);
   free(field->strip);
