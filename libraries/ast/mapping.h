@@ -164,6 +164,8 @@
 
 *  Macros:
 *     Public:
+*        AST__BLOCKAVE
+*           Block averaging interpolation.
 *        AST__LINEAR
 *           Simple linear interpolation.
 *        AST__NEAREST
@@ -211,6 +213,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     MBT: Mark Taylor (Starlink)
 
 *  History:
 *     30-JAN-1996 (RFWS):
@@ -228,6 +231,8 @@
 *        Added the astMapBox method.
 *     12-NOV-1998 (RFWS):
 *        Added astResample<X> and associated code.
+*     24-NOV-2000 (MBT):
+*        Added AST__BLOCKAVE interpolation scheme.
 *--
 */
 
@@ -273,6 +278,7 @@
 #define AST__SINCSINC (7)        /* sinc(pi*x)*sinc(k*pi*x) interpolation */
 #define AST__SINCCOS (8)         /* sinc(pi*x)*cos(k*pi*x) interpolation */
 #define AST__SINCGAUSS (9)       /* sinc(pi*x)*exp(-k*x*x) interpolation */
+#define AST__BLOCKAVE (10)       /* Block averaging interpolation */
 
 /* Type Definitions. */
 /* ================= */
