@@ -46,30 +46,31 @@
 *
 *    Local variables :
 *
-      CHARACTER*200       FILE                ! File name of object
-      CHARACTER*200       PATH                ! Path name of object
-      CHARACTER*40        PARNAME             ! Name of parameter
-      CHARACTER           PLOC*(DAT__SZLOC)   ! Parameter locator
-      CHARACTER*140       WORK(30)            ! Work space
+      CHARACTER*200       	FILE                	! File name of object
+      CHARACTER*200       	PATH                	! Path name of object
+      CHARACTER*40        	PARNAME             	! Name of parameter
+      CHARACTER           	PLOC*(DAT__SZLOC)   	! Parameter locator
+      CHARACTER*140       	WORK(30)            	! Work space
 
-      INTEGER             CODE                ! Internal parameter code
-      INTEGER             I                   ! Counter
-      INTEGER             IP                  ! Parameter counter
-      INTEGER             LBRACKPOS           ! Position of a "{"
-      INTEGER             LEVELS              ! Levels of object
-      INTEGER             MAXLINES            ! Max no. of output lines
-      INTEGER             RBRACKPOS           ! Position of a "}"
-      INTEGER             USE                 ! Current line
-      INTEGER             SLEN, WLEN          ! String lengths
-      INTEGER		L1, L2
+      INTEGER             	CODE                	! Internal parameter code
+      INTEGER             	I                   	! Counter
+      INTEGER             	IP                  	! Parameter counter
+      INTEGER             	LBRACKPOS           	! Position of a "{"
+      INTEGER             	LEVELS              	! Levels of object
+      INTEGER             	MAXLINES            	! Max # of output lines
+      INTEGER			PID			! ADI identifier
+      INTEGER             	RBRACKPOS           	! Position of a "}"
+      INTEGER             	USE                 	! Current line
+      INTEGER             	SLEN, WLEN          	! String lengths
+      INTEGER			L1, L2
 
-      LOGICAL             PVALID              ! Valid parameter found?
+      LOGICAL             	PVALID              	! Valid parameter?
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Check number of input lines
+*  Check number of input lines
       MAXLINES = OUTLINES
       IF (( MAXLINES .LT. 1 ) .OR. (MAXLINES.LT.INLINES) ) THEN
         STATUS = SAI__ERROR
@@ -77,7 +78,7 @@
         GOTO 99
       END IF
 
-*    Skip over input text looking for parameter references
+*  Skip over input text looking for parameter references
       USE = 0
       DO I = 1, INLINES
         LBRACKPOS = INDEX( TEXT(I), '{' )
@@ -114,7 +115,11 @@
             IF ( CODE .NE. 0 ) THEN
 
 *            Parameter name is ok - get locator
-              PLOC = DS(CODE).LOC
+              IF ( DS(CODE).ADIFPN ) THEN
+                PID = DS(CODE).ADI_ID
+              ELSE
+                PLOC = DS(CODE).LOC
+              END IF
               IF ( STATUS .NE. SAI__OK)  THEN
                 CALL ERR_FLUSH( STATUS )
                 PVALID=.FALSE.
@@ -127,7 +132,11 @@
             IF ( PVALID ) THEN
 
 *            Do an HDS trace on the object
-              CALL HDS_TRACE( PLOC, LEVELS, PATH, FILE, STATUS )
+              IF ( DS(CODE).ADIFPN ) THEN
+                CALL HDS_TRACE( PLOC, LEVELS, PATH, FILE, STATUS )
+              ELSE
+                CALL ADI_FTRACE( PID, LEVELS, PATH, FILE, STATUS )
+              END IF
               IF ( STATUS .NE. SAI__OK ) GOTO 99
                 USE = USE + 1
                 WORK(USE) = TEXT(I)(1:(LBRACKPOS-1))//'File : '
@@ -164,20 +173,20 @@
 
       END DO
 
-*    Generate output text
+*  Generate output text
       IF ( USE .GT. MAXLINES ) THEN
         CALL MSG_PRNT( 'WARNING : Text overfilled array in USI_TEXT' )
       END IF
       OUTLINES = MIN(USE,MAXLINES)
 
-*    Copy to buffer
+*  Copy to buffer
       DO I = 1, OUTLINES
         TEXT(I)=WORK(I)(:CHR_LEN(WORK(I)))
       END DO
 
-*    Tidy up
+*  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', '...from USI_TEXT', STATUS )
+        CALL AST_REXIT( 'USI_TEXT', STATUS )
       END IF
 
       END
