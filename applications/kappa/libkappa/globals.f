@@ -219,19 +219,6 @@
      :  'The current interaction mode is      : ^GLOVAL', STATUS )
       CALL ERR_RLSE
 
-*    The co-ordinate system.
-      CALL ERR_MARK
-      CALL CMP_GET0C( LOC, 'COORD_SYSTEM', GLOVAL, STATUS )
-      IF ( STATUS .EQ. DAT__OBJNF ) THEN
-         CALL ERR_ANNUL( STATUS )
-         CALL MSG_SETC( 'GLOVAL', '<undefined>' )
-      ELSE
-         CALL MSG_SETC( 'GLOVAL', GLOVAL )
-      END IF
-      CALL MSG_OUT( 'GLOBAL8',
-     :  'The current co-ordinate system is    : ^GLOVAL', STATUS )
-      CALL ERR_RLSE
-
 *  Close the global file.
 *  =====================
       CALL HDS_CLOSE( LOC, STATUS )
