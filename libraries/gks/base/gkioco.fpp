@@ -139,10 +139,10 @@
 	ENDIF
 
 *       ... then flush the unit.
-#if HAVE_INTRINSIC_FLUSH	
+#if HAVE_INTRINSIC_FLUSH || HAVE_FLUSH
 	CALL FLUSH(LUN)
 #else
-# error "Do not know how to flush output buffer"
+ error 'Do not know how to flush output buffer'
 #endif
 	KB(KWKIX) = KBB(KWKIX)
 

@@ -32,10 +32,10 @@
       INTEGER LNBLNK, IOS, LDIR, I1, I2
 
 *  See if there is a translation for GKS_DIR
-#if HAVE_INTRINSIC_GETENV
+#if HAVE_INTRINSIC_GETENV || HAVE_GETENV
       CALL GETENV('GKS_DIR', TRANS)
 #else
-# error "Do not know how to get enironment variables"      
+ error 'Do not know how to get enironment variables'
 #endif
       IF (LNBLNK(TRANS).EQ.0) THEN
          TRANS = '/star/etc'

@@ -58,7 +58,7 @@
 *-
       FD = -1
 
-#if HAVE_INTRINSIC_GETFD
+#if HAVE_INTRINSIC_GETFD || HAVE_GETFD
 
 *     Need to get the unix file descriptor using builtin
       FD = GETFD( LUN )

@@ -41,19 +41,19 @@
 *
 * -------------------------------------------------------------
 
-#if HAVE_INTRINSIC_ITIME
+#if HAVE_INTRINSIC_ITIME || HAVE_ITIME
       CALL ITIME(IARRAY)
       IHOURS = IARRAY(1)
       IMINS = IARRAY(2)
       ISECS = IARRAY(3)
-#elif HAVE_INTRINSIC_CLOCK
+#elif HAVE_INTRINSIC_CLOCK || HAVE_CLOCK
 *     Cray version. Untested
       WRITE (CTIME,100) CLOCK()
  100  FORMAT (A8)
       READ (CTIME,101) IHOURS, IMINS, ISECS
  101  FORMAT (I2,1X,I2,1X,I2)
 #else
-#   error "Do not know how to tell the time"
+ error 'Do not know how to tell the time'
 #endif
 
       RETURN

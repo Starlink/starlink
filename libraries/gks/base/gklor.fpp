@@ -41,12 +41,12 @@
 *
 *-----------------------------------------------------------------------
 
-#if HAVE_INTRINSIC_OR
+#if HAVE_INTRINSIC_OR || HAVE_OR
       GKLOR = OR(IOP1, IOP2)
-#elif HAVE_INTRINSIC IOR
+#elif HAVE_INTRINSIC_IOR || HAVE_IOR 
       GKLOR = IOR(IOP1, IOP2)
 #else
-#  error "Unable to implement logical OR"
+ error 'Unable to implement logical OR'
 #endif
 
       END

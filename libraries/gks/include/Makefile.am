@@ -18,7 +18,7 @@ PUBLIC_INCLUDES = GKSE_PAR GKS_PAR
 
 
 # dependencies
-gkmc.par:	gkmc.par.fpp
+#gkmc.par.fpp:	gkmc.par
 
 
 # These files should be run through the C pre processor

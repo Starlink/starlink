@@ -117,10 +117,10 @@
 	    GOTO 30
 	  ENDIF
 10      CONTINUE
-#if HAVE_INTRINSIC_FLUSH
+#if HAVE_INTRINSIC_FLUSH || HAVE_FLUSH
 	CALL FLUSH(OUTLUN)
 #else
-# error "Do not know how to flush output buffer"
+  error 'Do not know how to flush output buffer'
 #endif
       ENDIF
 

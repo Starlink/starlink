@@ -40,11 +40,11 @@
 *     This routine is SYSTEM DEPENDENT.
 *
 *-----------------------------------------------------------------------
-#if HAVE_INTRINSIC_AND
+#if HAVE_INTRINSIC_AND || HAVE_AND
       GKLAND = AND(IOP1, IOP2)
-#elif HAVE_INTRINSIC IAND
+#elif HAVE_INTRINSIC_IAND || HAVE_IAND
       GKLAND = IAND(IOP1, IOP2)
 #else
-#  error "Unable to implement logical AND"
+ error 'Unable to implement logical AND'
 #endif
       END

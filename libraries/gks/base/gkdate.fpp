@@ -45,7 +45,7 @@
 *
 *-----------------------------------------------------------------------
 
-#if HAVE_INTRINSIC_IDATE
+#if HAVE_INTRINSIC_IDATE || HAVE_IDATE
 
 * On MIPS systems the order of arguments to IDATE is MONTH, DAY, YEAR
 * but ignore that for now.
@@ -90,7 +90,7 @@
 
       END IF
 
-#elif HAVE_INTRINSIC_DATE
+#elif HAVE_INTRINSIC_DATE || HAVE_DATE
 
 * g77 DATE function returns a string of the form 06-JUN-04
 * Cray DATE function returns a string of the form 06-06-04
@@ -98,12 +98,12 @@
 * and try determine the format.
 * Note that we only get here if IDATE is missing
 
-# error "Have not yet implemented DATE() functionality"
+*     error "Have not yet implemented DATE() functionality"
 
 *     This is the code from the Cray implementation
       WRITE (CDATE,100) DATE()
  100  FORMAT ( A8 )
-      READ (CDATE,101) IMONTH, IDAY, IYEAR
+      READ (CDATE,101) MONTH, IDAY, IYEAR
  101  FORMAT (I2,1X,I2,1X,I2)
       RETURN
 
@@ -112,12 +112,12 @@
 * Do not have an intrinsic date function
 * We could use PSX_LOCALTIME instead
 
-# warn "No date implementation discovered. Using constant"
+ warning 'No date implementation discovered. To use constant remove this line'
 
 *     Beginning of unix epoch!
       IYEAR = 70
       IDAY  = 1
-      IMONTH = 1
+      MONTH = 1
 
 #endif
 
