@@ -1,0 +1,106 @@
+.help copybad Starlink kappa
+.nf
+Copies bad pixels from one NDF file to another.
+
+Usage:
+
+   copybad in ref out title
+
+Description:
+
+   This application copies bad pixels from one NDF file to another. It
+   takes in two NDFs (parameters IN and REF), and creates a third
+   (parameter OUT) which is a copy of IN, except that any pixel which
+   is set bad in the DATA array of REF, is also set bad in the DATA
+   and VARIANCE (if available) arrays in OUT.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+IN
+
+IN = NDF (Read)
+   NDF containing the data to be copied to OUT.
+
+REF
+
+REF = NDF (Read)
+   NDF containing the bad pixels to be copied to OUT.
+
+OUT
+
+OUT = NDF (Write)
+   The output NDF.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Value for the title of the output NDF.  A null value will cause
+   the title of the NDF supplied for parameter IN to be used
+   instead. [!]
+
+Examples
+
+copybad in=a ref=b out=c title="New image"
+   This creates a NDF called c, which is a copy of the NDF called a.
+   Any bad pixels present in the NDF called b are copied into the
+   corresponding positions in c (non-bad pixels in b are ignored).
+   The title of c is "New image".
+
+Notes
+
+- If the two input NDFs have different pixel-index bounds, then
+they will be trimmed to match before being processed.  An error
+will result if they have no pixels in common.
+
+Related_Applications
+
+   KAPPA: SUBSTITUTE, NOMAGIC, FILLBAD, PASTE, GLITCH
+
+Authors
+
+TDCA: Tim D.C. Ash(STARLINK)
+   DSB: David S. Berry (STARLINK)
+
+History
+
+ 10-OCT-1998 (TDCA):
+    Original version, partially based on the KAPPA routine ADD
+
+ 13-OCT-1998 (DSB):
+    - Tidied up the prologue and code a touch.
+
+    - Corrected distinction between the data type in which values are
+      processed, and the data type in which values are stored in the
+      output NDF.
+
+    - Use ERR_REP in place of MSG_OUT to report an error if an
+      unrecognised data type is obtained. Also reformat the error
+      report to include the unrecognised data type, and a friendly
+      message to explain to the user that the problem is not of their
+      doing.
+
+    - Changes the KPS routine names to use a consistent root
+      ("kps1_cpb").
+
+    - Replaced the message which reports the number of bad pixels
+      copied, with a message reporting the number of bad pixels in
+      the output NDF. This is easier for a user to understand.
+
+    - Removed un-required initialisation of NBAD.
+
+    - Make the grammar of the NBAD message dependant on the value of
+      NBAD, and include the name of the output NDF.
+
+    - Sort local variable declarations into alphabetical order.
+
+Implementation_Status
+
+   -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,
+   LABEL, TITLE, HISTORY, and VARIANCE components of an NDF data
+   structure and propagates all extensions.
+
+   -  All non-complex numeric data types can be handled.
+
+.endhelp

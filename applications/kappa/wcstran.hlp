@@ -1,0 +1,135 @@
+.help wcstran Starlink kappa
+.nf
+Transform a position from one NDF co-ordinate Frame to another.
+
+Usage:
+
+   wcstran ndf posin framein [frameout]
+
+Description:
+
+   This application transforms a position from one NDF co-ordinate Frame
+   to another. The input and output Frames may be chosen freely from the
+   Frames available in the WCS component of the supplied NDF. The
+   transformed position is formatted for display and written to the screen
+   and also to an output parameter.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+EPOCHIN
+
+EPOCHIN = _DOUBLE (Read)
+   If a "Sky Co-ordinate System" specification is supplied (using
+   parameter FRAMEIN) for a celestial co-ordinate system, then an epoch
+   value is needed to qualify it. This is the epoch at which the
+   supplied sky position was determined. It should be given as a
+   decimal years value, with or without decimal places  ("1996.8" for
+   example). Such values are interpreted as a Besselian epoch if less
+   than 1984.0 and as a Julian epoch otherwise.
+
+EPOCHOUT
+
+EPOCHOUT = _DOUBLE (Read)
+   If a "Sky Co-ordinate System" specification is supplied (using
+   parameter FRAMEOUT) for a celestial co-ordinate system, then an epoch
+   value is needed to qualify it. This is the epoch at which the
+   transformed sky position is required. It should be given as a
+   decimal years value, with or without decimal places  ("1996.8" for
+   example). Such values are interpreted as a Besselian epoch if less
+   than 1984.0 and as a Julian epoch otherwise.
+
+FRAMEIN
+
+FRAMEIN = LITERAL (Read)
+   A string specifying the co-ordinate Frame in which the input
+   position is supplied (see parameter POSIN). If a null parameter
+   value is supplied, then the current Frame in the NDF is used. The
+   string can be one of the following:
+
+   - A domain name such as SKY, AXIS, PIXEL, etc. The two
+   "pseudo-domains" WORLD and DATA may be supplied and will be
+   translated into PIXEL and AXIS respectively, so long as the WCS
+   component of the NDF does not contain Frames with these domains.
+
+   - An integer value giving the index of the required Frame within
+   the WCS component.
+
+   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
+   section "Sky Co-ordinate Systems" in SUN/95).
+
+FRAMEOUT
+
+FRAMEOUT = LITERAL (Read)
+   A string specifying the co-ordinate Frame in which the transformed
+   position is required. If a null parameter value is supplied, then
+   the current Frame in the NDF is used. The string can be one of the
+   following:
+
+   - A domain name such as SKY, AXIS, PIXEL, etc. The two
+   "pseudo-domains" WORLD and DATA may be supplied and will be
+   translated into PIXEL and AXIS respectively, so long as the WCS
+   component of the NDF does not contain Frames with these domains.
+
+   - An integer value giving the index of the required Frame within
+   the WCS component.
+
+   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
+   section "Sky Co-ordinate Systems" in SUN/95). [!]
+
+NDF
+
+NDF = NDF (Read and Write)
+   The NDF data structure containing the required co-ordinate Frames.
+
+POSIN
+
+POSIN = LITERAL (Read)
+   The co-ordinates of the position to be transformed, in the
+   co-ordinate Frame specified by parameter FRAMEIN (supplying
+   a colon ":" will display details of the required co-ordinate Frame).
+   The position should be supplied as a list of formatted axis values
+   separated by spaces or commas.
+
+POSOUT
+
+POSOUT = LITERAL (Write)
+   The formatted co-ordinates of the transformed position, in the
+   co-ordinate Frame specified by parameter FRAMEOUT. The position
+   will be stored as a list of formatted axis values separated by
+   spaces or commas.
+
+QUIET
+
+QUIET = _LOGICAL (Read)
+   If TRUE, the transformed position is not written to the screen
+   (it is still written to the output parameter POSOUT). [FALSE]
+
+Examples
+
+wcstran m51 "100.1 21.5" pixel
+   This transforms the pixel position "100.1 21.5" into the current
+   co-ordinate Frame of the NDF m51. The results are displayed on
+   the screen and written to the output parameter POSOUT.
+
+wcstran m51 "1:00:00 -12:30" equ(B1950) pixel quiet
+   This transforms the RA/DEC position "1:00:00 -12:30" (referred
+   (to the J2000 equinox) into pixel co-ordinates within the NDF m51.
+   The results are written to the output parameter POSOUT, but are
+   not displayed on the screen.
+
+Related_Applications
+
+   KAPPA: LISTMAKE, LISTSHOW, WCSFRAME, NDFTRACE, WCSATTRIB
+
+Authors
+
+DSB: David Berry (STARLINK)
+
+History
+
+ 4-NOV-1998 (DSB):
+    Original version.
+
+.endhelp
