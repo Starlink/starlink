@@ -104,8 +104,10 @@ INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
 
 CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
 
-# these objects are only needed to make the gaia_wish binary for the demos
-OBJECTS      = gaia_swish.o gaia_stcl.o tkAppInit.o 
+#  List of all object files and intermediary sources (used to clean)
+OBJECTS      = mktclapp.o gaia_swish.o gaia_stcl.o tkAppInit.o tclAppInit.o
+SOURCES      = gaia_swish.c gaia_stcl.c gaia_swish.mta gaia_stcl.mta \
+	       gaia_swish.h gaia_stcl.h
 
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -156,10 +158,10 @@ install-bin:
 	$(INSTALL) $(PROG) $(BINDIR)
 
 clean:
-	$(RM) $(OBJECTS) $(PROG) $(MKTCLAPP)
+	$(RM) $(OBJECTS) $(TKPROG) $(TCLPROG) $(MKTCLAPP) $(SOURCES)
 
 distclean: clean
-	$(RM) Makefile
+	$(RM) Makefile library/gaia_swish.tcl library/gaia_stcl.tcl
 
 depend:
 
