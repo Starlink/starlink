@@ -116,16 +116,23 @@
       CHARACTER ASTCOD( DEFNCD )*8 ! The non-native AST encoding names
       INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
       INTEGER FC2                ! AST identifier for temporary FitsChan 
+      INTEGER I                  ! Axis count
       INTEGER IBASE              ! Index of the Base Frame.
       INTEGER ICURR              ! Index of Current Frame 
       INTEGER IENCOD             ! Index of the current encoding
+      INTEGER INPRM( NDF__MXDIM )! Indices of corresponding o/p axis
       INTEGER IWCS               ! AST identifier for NDF's WCS information
       INTEGER MAP                ! AXIS -> Current Mapping
       INTEGER NATOBJ             ! AST identifier for the native FrameSet
       INTEGER NDIM               ! Dimensionality of the NDF
+      INTEGER NDIMF              ! Dimensionality of the FITS Base Frame
+      INTEGER NEWBASE            ! The Frame to become the new Base Frame
       INTEGER NFRAME             ! Total no. of Frames to be written out
       INTEGER OBJ                ! AST identifier for the new FrameSet
-      INTEGER TMPF                ! Template 2D Frame
+      INTEGER OUTPRM( NDF__MXDIM )! Indices of corresponding i/p axis
+      INTEGER PMAP               ! PermMap connecting NDF to Fits Base Frame 
+      INTEGER TMAP               ! Unused mapping
+      INTEGER TMPF               ! Template 2D Frame
 
 *  Store names of non-native AST encodings to use.
       DATA ASTCOD / 'DSS', 'FITS-WCS' /
@@ -266,6 +273,62 @@
 
 *  Get the dimensionality of the NDF.
          CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS )
+
+*  Get the number of dimensions in the Base Frame of the FrameSet read
+*  from the FITS file.
+         NDIMF = AST_GETI( OBJ, 'NIN', STATUS )
+
+*  If there are more axes in the FITS file than in the NDF (for instance,
+*  if any dummy axes have been thrown away in the NDF), then re-map the
+*  Base Frame in the FITS FrameSet so that the constant value 1.0 is used
+*  for any missing axes.
+         IF( NDIMF .GT. NDIM ) THEN
+
+*  Set up an array holding the index of each input (FITS) axis to assign to
+*  each output (NDF) axis. 
+            DO I = 1, NDIM
+               OUTPRM( I ) = I
+            END DO
+   
+*  Set up an array holding the index of each output (NDF) axis to assign to
+*  each input (FITS) axis. Use -1 for any unassigned axis (this causes the 
+*  first CONSTANTS value supplied to AST_PERMMAP to be used - 1.0 in this 
+*  case).
+            DO I = 1, NDIMF
+               INPRM( I ) = -1
+            END DO
+   
+            DO I = 1, NDIM
+               INPRM( I ) = I
+            END DO
+   
+*  Create the PermMap.
+            PMAP = AST_PERMMAP( NDIMF, INPRM, NDIM, OUTPRM, 1.0, ' ',
+     :                          STATUS )
+
+*  Create a new Base Frame by picking the required axes from the existing 
+*  Base Frame.
+            NEWBASE = AST_PICKAXES( OBJ, NDIM, OUTPRM, TMAP, STATUS )
+
+*  Save the index of the Current Frame.
+            ICURR = AST_GETI( OBJ, 'Current', STATUS )
+
+*  Add the new Frame into the FrameSet, using the the above PermMap to
+*  connect it to the existing Base Frame. The new Frame is made the Current 
+*  Frame.
+            CALL AST_ADDFRAME( OBJ, AST__BASE, PMAP, NEWBASE, STATUS )
+
+*  Remove the old Base Frame.
+            CALL AST_REMOVEFRAME( OBJ, AST__BASE, STATUS )
+
+*  Make the new Frame (which is the Current Frame at the moment), the 
+*  Base Frame.
+            CALL AST_SETI( OBJ, 'Base', AST__CURRENT, STATUS )
+
+*  Re-instate the original Current Frame.
+            CALL AST_SETI( OBJ, 'Current', ICURR, STATUS )
+
+         END IF
 
 *  Create a Frame which can be used as a template when searching for
 *  other Frames. 

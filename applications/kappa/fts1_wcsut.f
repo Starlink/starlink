@@ -64,7 +64,6 @@
       DOUBLE PRECISION EPS       ! Max. relative error for equivalence
       PARAMETER ( EPS = 1.0D-6 )
 
-
 *  Local Variables:
       DOUBLE PRECISION A1        ! First AXIS coordinate
       DOUBLE PRECISION A2        ! Last AXIS coordinate
@@ -90,8 +89,10 @@
       CALL NDF_GTWCS( INDF, IWCS, STATUS )
 
 *  Check that no value has been set for the Current Frame's Domain
-*  attribute.
-      IF( .NOT. AST_TEST( IWCS, 'DOMAIN', STATUS ) ) THEN
+*  attribute, and that the number of axes in it is the same as the NDF.
+      IF( .NOT. AST_TEST( IWCS, 'DOMAIN', STATUS ) .AND.
+     :    AST_GETI( IWCS, 'Nin', STATUS ) .EQ. 
+     :    AST_GETI( IWCS, 'Nout',STATUS ) ) THEN
 
 *  Note the index of the Current Frame so that it can be re-instated later.
          ICURR = AST_GETI( IWCS, 'Current', STATUS )
