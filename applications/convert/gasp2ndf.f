@@ -59,7 +59,7 @@
 *     abort.
 
 *  Related Applications:
-*     NDF2GASP
+*     CONVERT: NDF2GASP.
 
 *  Implementation Deficiencies:
 *     -  Does not support wildcards.

@@ -67,7 +67,7 @@
 *     -  All other NDF components are ignored.
 
 *  Related Applications:
-*     IRAF2NDF
+*     CONVERT: IRAF2NDF.
 
 *  Pitfalls:
 *     The IMFORT routines refuse to overwrite an IRAF image if an image

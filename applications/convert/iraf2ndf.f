@@ -55,7 +55,7 @@
 *     name of the image and the date of the format conversion.
 
 *  Related Applications:
-*     NDF2IRAF
+*     CONVERT: NDF2IRAF.
 
 *  Pitfalls:
 *     -  Bad pixels in the IRAF image are not replaced.

@@ -43,7 +43,7 @@ extracted and added to the NDF's FITS extension as FITS HISTORY
 lines.  Two extra HISTORY lines are added to record the original
 name of the image and the date of the format conversion.
 2 Related_Applications
-   NDF2IRAF
+   CONVERT: NDF2IRAF.
 2 Pitfalls
    -  Bad pixels in the IRAF image are not replaced.
 

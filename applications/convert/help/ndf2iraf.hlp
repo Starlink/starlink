@@ -57,7 +57,7 @@ NDF2IRAF.
 
 -  All other NDF components are ignored.
 2 Related_Applications
-   IRAF2NDF
+   CONVERT: IRAF2NDF.
 2 Pitfalls
    The IMFORT routines refuse to overwrite an IRAF image if an image
    with the same name exists.  The application then aborts.

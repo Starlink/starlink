@@ -46,7 +46,7 @@ offending ".hdr" file or specify the shape of the GASP image on
 the command line, otherwise the application will continually
 abort.
 2 Related_Applications
-   NDF2GASP
+   CONVERT: NDF2GASP.
 2 References
    GASP documentation (MUD/66).
 2 Keywords

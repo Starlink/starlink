@@ -63,7 +63,7 @@
 *     -  All other NDF components are ignored.
 
 *  Related Applications:
-*     GASP2NDF
+*     CONVERT: GASP2NDF.
 
 *  Implementation Status:
 *     -  The GASP image produced has by definition type SIGNED WORD.

@@ -51,7 +51,7 @@ header file.
 
 -  All other NDF components are ignored.
 2 Related_Applications
-   GASP2NDF
+   CONVERT: GASP2NDF.
 2 References
    GASP documentation (MUD/66).
 2 Keywords
