@@ -67,6 +67,8 @@
 *        If an attempt is made to remove the Base Frame, WCSREMOVE now 
 *        refuses and continues to remove any other specified frames,
 *        rather than simply reporting an error.
+*     20-SEP-2000 (DSB):
+*        Check STATUS before main loop.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -127,6 +129,9 @@
 
 *  Get a list of Frame index specifications.
       CALL PAR_GET1C( 'FRAMES', MXSPEC, SPECS, NSPEC, STATUS )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Initialise the number of indices given so far.
       NGIVE = 0
