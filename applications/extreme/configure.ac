@@ -65,11 +65,11 @@ dnl   We set it to "INTEGER * 8" for systems with a 64-bit pointer type
 dnl   and "INTEGER    " for systems with a 32-bit pointer type.
 dnl   If other possibilities emerge, write a new condition here.
 AC_MSG_CHECKING([type for large FORTRAN integer])
-if test "$ac_cv_sizeof_int_p" == "8"
+if test "$ac_cv_sizeof_int_p" = "8"
 then
    integer8="INTEGER * 8"
 else
-   if test "$ac_cv_sizeof_int_p" == "4"
+   if test "$ac_cv_sizeof_int_p" = "4"
    then
        integer8="INTEGER    "
    else
