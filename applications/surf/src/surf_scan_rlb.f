@@ -290,15 +290,9 @@
          ABORTED = .TRUE.
       END IF
 
-*  map the various components of the data array and check the data dimensions 
+*  check the data dimensions 
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
-      CALL NDF_MAP (INDF, 'QUALITY', '_UBYTE', 'READ',
-     :     IN_QUALITY_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (INDF, 'DATA', '_REAL', 'READ', IN_DATA_PTR,
-     :     ITEMP, STATUS)
-      CALL NDF_MAP (INDF, 'VARIANCE', '_REAL', 'READ', IN_VARIANCE_PTR,
-     :     ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF ((NDIM .NE. 2) .OR.
@@ -316,6 +310,16 @@
 
       N_BOL = DIM (1)
       N_POS = DIM (2)
+
+*     map the input arrays
+
+      CALL NDF_MAP (INDF, 'QUALITY', '_UBYTE', 'READ',
+     :     IN_QUALITY_PTR, ITEMP, STATUS)
+      CALL NDF_MAP (INDF, 'DATA', '_REAL', 'READ', IN_DATA_PTR,
+     :     ITEMP, STATUS)
+      CALL NDF_MAP (INDF, 'VARIANCE', '_REAL', 'READ', IN_VARIANCE_PTR,
+     :     ITEMP, STATUS)
+
 
 *  map the DEM_PNTR array and check its dimensions
 
