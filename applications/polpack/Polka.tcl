@@ -57,6 +57,8 @@
 #        Fixed a bug which caused the names of the output NDFs to get out
 #        of sync by 1 with the names of the input NDFs, when the first
 #        input image is used for reference only.
+#     24-APR-2000 (DSB):
+#        Check that the right versions of CCDPACK and KAPPA are available.
 #-
 
 # Uncomment this section to see the names of all procedure as they are 
@@ -555,6 +557,22 @@
 # previous ones have finished.
       set SAFE [frame $TOP.dummy ]
       pack $SAFE
+
+# Check we have the right version of KAPPA.
+      Obey kappa kapversion "compare=\"0.15\"" 1
+      if { [GetParam kappa kapversion:result] == "1" } {
+         set vers [exec cat $KAPPA_DIR/version.dat]
+         Message "KAPPA version $vers found. This version of Polka requires at least version 0.15"
+         exit 1
+      }
+
+# Check we have the right version of CCDPACK. We need at least CCDPACK
+# version 3, so check for the astexp.ifc file which was introduced in that
+# release.
+      if { ![file exists $CCDPACK_DIR/astexp.ifc] } {
+         Message "This version of Polka requires CCDPACK version 3.0 or later."
+         exit 1
+      }
 
 # Divide the top window into four horizontal frames. The top one is the
 # menu bar. The next contains the GWM canvas and controls. The next displays
