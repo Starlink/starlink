@@ -70,7 +70,7 @@ STAR_LATEX_DOCUMENTATION(sun143)
 #   fio1_serr.f has significant platform dependencies, and
 #   can't be easily handled through this sort of configuration.
 STAR_PLATFORM_SOURCES([fio1_serr.f],
-                      [_dec_osf _pc_linux _sun_solaris _sun mips vax _apple_darwin _pc_cygwin])
+                      [_dec_osf _pc_linux _sun_solaris _sun mips vax _apple_darwin _pc_cygwin _linux_gnu])
 #   The sun options require a sun_iosdef file, but if neither of these
 #   two matches, that's OK -- presumably we're not on a Sun.
 STAR_PLATFORM_SOURCES([sun_iosdef], [_sun_solaris _sun NONE])
