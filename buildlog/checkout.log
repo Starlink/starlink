@@ -5670,6 +5670,7 @@ cvs checkout: Updating java/source/frog/src/main/uk/ac/starlink/frog/fit
 U java/source/frog/src/main/uk/ac/starlink/frog/fit/LeastSquaresFitPoly.java
 U java/source/frog/src/main/uk/ac/starlink/frog/fit/LeastSquaresFitSin.java
 cvs checkout: Updating java/source/frog/src/main/uk/ac/starlink/frog/gram
+U java/source/frog/src/main/uk/ac/starlink/frog/gram/BestPeriod.java
 U java/source/frog/src/main/uk/ac/starlink/frog/gram/ChisqPeriodogram.java
 U java/source/frog/src/main/uk/ac/starlink/frog/gram/FourierTransform.java
 cvs checkout: Updating java/source/frog/src/main/uk/ac/starlink/frog/iface
@@ -5677,6 +5678,7 @@ U java/source/frog/src/main/uk/ac/starlink/frog/iface/AboutFrame.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/ArithmeticDialog.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/ColourIconLine.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/CombineSeriesDialog.java
+U java/source/frog/src/main/uk/ac/starlink/frog/iface/CopyFitToSeriesDialog.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/DebugConsole.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/DecimalComboBoxEditor.java
 U java/source/frog/src/main/uk/ac/starlink/frog/iface/DetrendDataDialog.java
