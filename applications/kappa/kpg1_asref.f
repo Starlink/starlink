@@ -150,12 +150,12 @@
             CALL MSG_OUT( 'KPG1_ASREF_REFOBJ', 'The displayed NDF '//
      :                    'cannot be accessed. Please supply an '//
      :                    'alternative NDF.', STATUS )
-            CALL NDF_ASSOC( PNNDF, MODE, NDF, STATUS )
+            CALL NDG_ASSOCL( PNNDF, MODE, NDF, STATUS )
          END IF
 
 *  Obtain the identifier of the NDF by association.
       ELSE
-         CALL NDF_ASSOC( PNNDF, MODE, NDF, STATUS )
+         CALL NDG_ASSOCL( PNNDF, MODE, NDF, STATUS )
       END IF
 
   999 CONTINUE

@@ -615,7 +615,7 @@
 
 *  Create the output NDF, based upon the input NDF, and map its DATA
 *  array.
-      CALL NDF_PROP( INDF1, 'WCS,Axis,Quality,Units', 'OUT', INDF4,
+      CALL NDG_PROPL( INDF1, 'WCS,Axis,Quality,Units', 'OUT', INDF4,
      :               STATUS )
       CALL KPG1_MAP( INDF4, 'Data', '_REAL', 'WRITE', IPN4, NEL4,
      :              STATUS )

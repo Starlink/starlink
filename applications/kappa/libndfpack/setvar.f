@@ -142,7 +142,7 @@
 
 *  Obtain the NDF structure to be modified and determine the numeric
 *  type of its data component.
-      CALL NDF_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'UPDATE', INDF, STATUS )
       CALL NDF_TYPE( INDF, 'Data', TYPE, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 

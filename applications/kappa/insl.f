@@ -1081,7 +1081,7 @@
 
 *       Create a new NDF.
 
-         CALL NDF_CREP( PNNAME, '_REAL', 1, NPTS, NDFO, STATUS )
+         CALL NDG_CREPL( PNNAME, '_REAL', 1, NPTS, NDFO, STATUS )
 
 *       Map the data array.
 

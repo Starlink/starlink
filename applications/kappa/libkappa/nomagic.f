@@ -257,7 +257,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the identifier of the NDF to be displayed.
-      CALL NDF_ASSOC( 'IN', 'READ', NDFI, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', NDFI, STATUS )
 
 *  Find which component(s) to alter.
 *  =================================
@@ -344,7 +344,7 @@
 *  Propagate the QUALITY, UNITS and AXIS components from the input NDF
 *  to the output, and the arrays not to be processed.
       IF ( PROCES( 1 ) .AND. PROCES( 2 ) ) THEN
-         CALL NDF_PROP( NDFI, 'Quality,Units,Axis,WCS', 'OUT', NDFO,
+         CALL NDG_PROPL( NDFI, 'Quality,Units,Axis,WCS', 'OUT', NDFO,
      :                  STATUS )
 
 *  This application supports all the non-complex numeric types
@@ -359,7 +359,7 @@
          CALL NDF_STYPE( DTYPE, NDFO, 'Data,Variance', STATUS )
 
       ELSE IF ( PROCES( 1 ) ) THEN
-         CALL NDF_PROP( NDFI, 'Variance,Quality,Units,Axis,WCS', 'OUT',
+         CALL NDG_PROPL( NDFI, 'Variance,Quality,Units,Axis,WCS', 'OUT',
      :                  NDFO, STATUS )
 
          CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
@@ -367,7 +367,7 @@
      :                   DTYPE, STATUS )
 
       ELSE IF ( PROCES( 2 ) ) THEN
-         CALL NDF_PROP( NDFI, 'Data,Quality,Units,Axis,WCS', 'OUT', 
+         CALL NDG_PROPL( NDFI, 'Data,Quality,Units,Axis,WCS', 'OUT', 
      :                  NDFO, STATUS )
 
          CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/

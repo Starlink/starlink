@@ -367,8 +367,8 @@
       CALL NDF_BEGIN
 
 *  Get NDF identifiers for the two input NDFs.
-      CALL NDF_ASSOC( 'IN1', 'READ', NDF1S, STATUS )
-      CALL NDF_ASSOC( 'IN2', 'READ', NDF2S, STATUS )
+      CALL NDG_ASSOCL( 'IN1', 'READ', NDF1S, STATUS )
+      CALL NDG_ASSOCL( 'IN2', 'READ', NDF2S, STATUS )
 
 *  If an error occurred, abort.
       IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -376,7 +376,7 @@
 *  Get an NDF identifier for the output NDF. The output is based on IN1
 *  and inherits all the components of IN1 except the data and variance
 *  arrays.
-      CALL NDF_PROP( NDF1S, 'WCS,Axis,Quality,Units', 'OUT', NDFOUT,
+      CALL NDG_PROPL( NDF1S, 'WCS,Axis,Quality,Units', 'OUT', NDFOUT,
      :               STATUS )
 
 *  If an output NDF was obtained successfully...

@@ -128,15 +128,15 @@
       CALL NDF_BEGIN
 
 *  Obtain identifiers for the two input NDFs.
-      CALL NDF_ASSOC( 'IN1', 'READ', NDF1, STATUS )
-      CALL NDF_ASSOC( 'IN2', 'READ', NDF2, STATUS )
+      CALL NDG_ASSOCL( 'IN1', 'READ', NDF1, STATUS )
+      CALL NDG_ASSOCL( 'IN2', 'READ', NDF2, STATUS )
 
 *  Trim the input pixel-index bounds to match.
       CALL NDF_MBND( 'TRIM', NDF1, NDF2, STATUS )
 
 *  Create a new output NDF based on the first input NDF. Propagate the
 *  WCS, axis and quality components.
-      CALL NDF_PROP( NDF1, 'WCS,Axis,Quality', 'OUT', NDF3, STATUS )
+      CALL NDG_PROPL( NDF1, 'WCS,Axis,Quality', 'OUT', NDF3, STATUS )
 
 *  See whether a variance component is defined in both the input NDFs
 *  and set the list of components to be processed accordingly.

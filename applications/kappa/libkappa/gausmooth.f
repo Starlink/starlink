@@ -277,7 +277,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the input NDF.
-      CALL NDF_ASSOC( 'IN', 'READ', NDF1, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', NDF1, STATUS )
 
 *  Find whether or not there are no more than two significant
 *  dimensions and which ones they are.
@@ -414,7 +414,7 @@
 
 *  Create an output NDF based on the input one.  Set an appropriate
 *  numeric type for the output arrays.
-      CALL NDF_PROP( NDF1, 'WCS,Axis,Quality,Units', 'OUT', NDF2, 
+      CALL NDG_PROPL( NDF1, 'WCS,Axis,Quality,Units', 'OUT', NDF2, 
      :               STATUS )
       CALL NDF_STYPE( DTYPE, NDF2, COMP, STATUS )
 
@@ -554,7 +554,7 @@
       END IF
 
 *  Obtain a new title for the output NDF.  The input NDF's title was
-*  already propagated by the NDF_PROP call and so a null value will
+*  already propagated by the NDG_PROPL call and so a null value will
 *  leave it unaltered.
       CALL NDF_CINP( 'TITLE', NDF2, 'Title', STATUS )
 

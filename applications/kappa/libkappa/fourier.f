@@ -498,7 +498,7 @@
 *  ====================================================
 
 *  Get the (purely real) input image.
-         CALL NDF_ASSOC( 'IN', 'READ', NDFRS, STATUS )
+         CALL NDG_ASSOCL( 'IN', 'READ', NDFRS, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Find whether or not there are no more than two significant
@@ -596,7 +596,7 @@
 *
 *  1st: Hermitian output
             HERMO = .FALSE.
-            CALL NDF_PROP( NDFS, ' ', 'HERMOUT', NDFHO, STATUS )
+            CALL NDG_PROPL( NDFS, ' ', 'HERMOUT', NDFHO, STATUS )
 
             IF ( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -609,7 +609,7 @@
 
 *  2nd: real part of complex output.
             REALO = .FALSE.
-            CALL NDF_PROP( NDFS, ' ', 'REALOUT', NDFRO, STATUS )
+            CALL NDG_PROPL( NDFS, ' ', 'REALOUT', NDFRO, STATUS )
 
             IF ( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -622,7 +622,7 @@
 
 *  3nd: imaginary part of complex output.
             IMAGO = .FALSE.
-            CALL NDF_PROP( NDFS, ' ', 'IMAGOUT', NDFIO, STATUS )
+            CALL NDG_PROPL( NDFS, ' ', 'IMAGOUT', NDFIO, STATUS )
 
             IF ( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -635,7 +635,7 @@
 
 *  4th: power.
             POWERO = .FALSE.
-            CALL NDF_PROP( NDFS, ' ', 'POWEROUT', NDFPO, STATUS )
+            CALL NDG_PROPL( NDFS, ' ', 'POWEROUT', NDFPO, STATUS )
 
             IF ( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -648,7 +648,7 @@
 
 *  5th: phase.
             PHASEO = .FALSE.
-            CALL NDF_PROP( NDFS, ' ', 'PHASEOUT', NDFZO, STATUS )
+            CALL NDG_PROPL( NDFS, ' ', 'PHASEOUT', NDFZO, STATUS )
 
             IF ( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -969,7 +969,7 @@
          IF ( HERMI ) THEN
 
 *  Get the `Hermitian' input NDF.
-            CALL NDF_ASSOC( 'HERMIN', 'READ', NDFHI, STATUS )
+            CALL NDG_ASSOCL( 'HERMIN', 'READ', NDFHI, STATUS )
 
 *  Check whether or not an NDF was given.
             IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -1010,7 +1010,7 @@
          IF ( RORI .AND. ACTREA .EQ. PAR__ACTIVE ) THEN
 
 *  Associate the real image.
-            CALL NDF_ASSOC( 'REALIN', 'READ', NDFRI, STATUS )
+            CALL NDG_ASSOCL( 'REALIN', 'READ', NDFRI, STATUS )
 
 *  Check whether or not a NDF was given.
             IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -1030,7 +1030,7 @@
          IF ( RORI .AND. ACTIMA .EQ. PAR__ACTIVE ) THEN
 
 *  Obtain the imaginary NDF.
-            CALL NDF_ASSOC( 'IMAGIN', 'READ', NDFII, STATUS )
+            CALL NDG_ASSOCL( 'IMAGIN', 'READ', NDFII, STATUS )
 
 *  Check whether or not a NDF was given.
             IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -1055,7 +1055,7 @@
          IF ( PORP .AND. ACTPOW .EQ. PAR__ACTIVE ) THEN
 
 *  Associate the input power.
-            CALL NDF_ASSOC( 'POWERIN', 'READ', NDFPI, STATUS )
+            CALL NDG_ASSOCL( 'POWERIN', 'READ', NDFPI, STATUS )
 
 *  Check whether or not an NDF was given.
             IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -1076,7 +1076,7 @@
          IF ( PORP .AND. ACTPHA .EQ. PAR__ACTIVE ) THEN
       
 *  Next get the phase NDF.
-            CALL NDF_ASSOC( 'PHASEIN', 'READ', NDFZI, STATUS )
+            CALL NDG_ASSOCL( 'PHASEIN', 'READ', NDFZI, STATUS )
 
 *  Check whether or not an NDF was given.
             IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -1588,10 +1588,10 @@
 *  QUALITY and VARIANCE cannot be defined and so will not be
 *  propagated.
                   IF ( HERMI .OR. REALI .OR. POWERI ) THEN
-                     CALL NDF_PROP( NDFS, ' ', 'OUT', NDFRS, STATUS )
+                     CALL NDG_PROPL( NDFS, ' ', 'OUT', NDFRS, STATUS )
 
                   ELSE
-                     CALL NDF_PROP( NDFSI, ' ', 'OUT', NDFRS, STATUS )
+                     CALL NDG_PROPL( NDFSI, ' ', 'OUT', NDFRS, STATUS )
 
                   END IF
 

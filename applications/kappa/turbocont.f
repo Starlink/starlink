@@ -684,7 +684,7 @@
 
 *    Obtain the identifier of the NDF to be contoured.
 
-      CALL NDF_ASSOC( 'NDF', 'READ', NDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'READ', NDF, STATUS )
 
 *    There must be a data array, but for other components check that
 *    requested component is present.

@@ -215,7 +215,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the identifier of the NDF to be displayed.
-      CALL NDF_ASSOC( 'IN', 'READ', NDFI, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', NDFI, STATUS )
 
 *  There must be a data array, but for variance check that it is
 *  present.

@@ -152,7 +152,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the input NDF.
-      CALL NDF_ASSOC( 'IN', 'READ', NDFI, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', NDFI, STATUS )
 
 *  Inquire the dimensions of the NDF.
       CALL NDF_DIM( NDFI, NDF__MXDIM, IDIMS, NDIM, STATUS )
@@ -238,7 +238,7 @@
 *  components and axes will be processed individually, but this enables
 *  the LABEL, HISTORY, AXIS character components, and extensions to be
 *  propagated.  The axis arrays will be changed later.
-      CALL NDF_PROP( NDFS, 'Axis,Units', 'OUT', NDFO, STATUS )
+      CALL NDG_PROPL( NDFS, 'Axis,Units', 'OUT', NDFO, STATUS )
 
 *  Obtain a title and assign it to the output NDF.  A null results in
 *  the output title being the same as the input title.

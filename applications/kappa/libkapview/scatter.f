@@ -287,8 +287,8 @@
       CALL NDF_BEGIN
 
 *  Get NDF identifiers for the two input NDFs.
-      CALL NDF_ASSOC( 'IN1', 'READ', INDF1, STATUS )
-      CALL NDF_ASSOC( 'IN2', 'READ', INDF2, STATUS )
+      CALL NDG_ASSOCL( 'IN1', 'READ', INDF1, STATUS )
+      CALL NDG_ASSOCL( 'IN2', 'READ', INDF2, STATUS )
 
 *  Find which components to plot.
       CALL KPG1_ARCOG( 'COMP1', INDF1, MCOMP1, COMP1, STATUS )

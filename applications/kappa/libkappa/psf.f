@@ -518,7 +518,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the identifier of the NDF to be displayed.
-      CALL NDF_ASSOC( 'IN', 'READ', NDF, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', NDF, STATUS )
 
 *  This application can only process non-complex types. Therefore for
 *  the given type of the image find in which type it should be
@@ -937,7 +937,7 @@
       CALL NDF_BEGIN
 
 *  Create a new primitive NDF.
-      CALL NDF_CREP( 'OUT', '_REAL', NDIM, PSFDIM, NDFO, STATUS )
+      CALL NDG_CREPL( 'OUT', '_REAL', NDIM, PSFDIM, NDFO, STATUS )
 
 *  Map it for write access.
       CALL NDF_MAP( NDFO, 'Data', '_REAL', 'WRITE', PSFPTR, EL, STATUS )

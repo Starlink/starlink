@@ -708,7 +708,7 @@
 
 *    Obtain the identifier of the NDF to be displayed.
 
-      CALL NDF_ASSOC( 'IN', 'READ', NDF, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', NDF, STATUS )
 
 *    There must be a data array, but for other components check that
 *    requested component is present.
@@ -2300,7 +2300,7 @@
 
 *       Create the output NDF structure based on the input NDF.
 
-         CALL NDF_PROP( NDF, 'AXIS,NOHISTORY,NOQUALITY,NOVARIANCE,'/
+         CALL NDG_PROPL( NDF, 'AXIS,NOHISTORY,NOQUALITY,NOVARIANCE,'/
      :                  /'NOEXTENSION(),WCS', 'OUT', NDFO, STATUS )
 
          IF ( STATUS .EQ. PAR__NULL ) THEN

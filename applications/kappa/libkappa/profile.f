@@ -271,7 +271,7 @@
 *  Access the data to be displayed, and get its main parameters.
 *  =============================================================
 *  Obtain the identifier of the NDF to be displayed.
-      CALL NDF_ASSOC( 'IN', 'READ', INDF1, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', INDF1, STATUS )
 
 *  Get an AST pointer to a FrameSet describing the co-ordinate Frames
 *  present in the NDF's WCS component. 
@@ -522,7 +522,7 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Create the NDF.
-      CALL NDF_CREAT( 'OUT', TYPE, 1, 1, NP, INDF2, STATUS )
+      CALL NDG_CREATL( 'OUT', TYPE, 1, 1, NP, INDF2, STATUS )
 
 *  Map the DATA and (if required) variance components.
       CALL NDF_MAP( INDF2, 'DATA', '_DOUBLE', 'WRITE', IPDOUT, EL, 

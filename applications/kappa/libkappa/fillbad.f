@@ -364,14 +364,14 @@
 
 *  Create a new output NDF to contain the cleaned image, which
 *  inheriting all the attributes of the input NDF.
-      CALL NDF_PROP( NDFI, 'WCS,Axis,Units,Quality', 'OUT', NDFO, 
+      CALL NDG_PROPL( NDFI, 'WCS,Axis,Units,Quality', 'OUT', NDFO, 
      :               STATUS )
 
 *  Set an appropriate numeric type for the output arrays.
       CALL NDF_STYPE( DTYPE, NDFO, COMP, STATUS )
 
 *  Get the new title for the output image and insert it into the output
-*  NDF.  The input NDF's title was already propagated by the NDF_PROP
+*  NDF.  The input NDF's title was already propagated by the NDG_PROPL
 *  call and so a null value will leave it unaltered.
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
 

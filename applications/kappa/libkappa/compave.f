@@ -294,7 +294,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the input NDF.
-      CALL NDF_ASSOC( 'IN', 'READ', NDFI, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', NDFI, STATUS )
 
 *  Inquire the bounds and dimensions of the NDF.
       CALL NDF_BOUND( NDFI, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
@@ -420,7 +420,7 @@
 *  and axes will be processed individually, but this enables the LABEL,
 *  UNITS, HISTORY, AXIS character components, and extensions to be
 *  propagated.
-      CALL NDF_PROP( NDFS, 'Axis,Units', 'OUT', NDFO, STATUS )
+      CALL NDG_PROPL( NDFS, 'Axis,Units', 'OUT', NDFO, STATUS )
 
 *  Set its bounds to those found above.
       CALL NDF_SBND( NDIMI, LBNDO, UBNDO, NDFO, STATUS )      

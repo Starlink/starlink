@@ -118,14 +118,14 @@
       CALL NDF_BEGIN
 
 *  Obtain an identifier for the input NDF.
-      CALL NDF_ASSOC( 'IN', 'READ', NDF1, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', NDF1, STATUS )
 
 *  Obtain the scalar value for multiplication.
       CALL PAR_GET0D( 'SCALAR', CONST, STATUS )
 
 *  Create a new output NDF based on the input NDF.  Propagate the WCS, axis,
 *  quality and units components.
-      CALL NDF_PROP( NDF1, 'WCS,Axis,Quality,Units', 'OUT', NDF2, 
+      CALL NDG_PROPL( NDF1, 'WCS,Axis,Quality,Units', 'OUT', NDF2, 
      :               STATUS )
 
 *  See if the input NDF has a variance component and set the list of

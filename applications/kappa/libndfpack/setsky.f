@@ -362,7 +362,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the NDF.
-      CALL NDF_ASSOC( 'NDF', 'UPDATE', NDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'UPDATE', NDF, STATUS )
 
 *  The astrometry expects a two-dimensional NDF.  It cannot handle
 *  planes from higher dimensions.  So first check that the

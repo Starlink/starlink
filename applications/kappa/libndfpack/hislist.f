@@ -101,7 +101,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Obtain the NDF.
-      CALL NDF_ASSOC( 'NDF', 'READ', INDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'READ', INDF, STATUS )
 
 *  See if a brief history listing is required.
       CALL PAR_GET0L( 'BRIEF', BRIEF, STATUS )

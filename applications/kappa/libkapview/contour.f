@@ -572,7 +572,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the identifier of the NDF to be contoured.
-      CALL NDF_ASSOC( 'NDF', 'READ', INDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'READ', INDF, STATUS )
 
 *  Find which component to contour.
       CALL KPG1_ARCOG( 'COMP', INDF, MCOMP, COMP, STATUS )

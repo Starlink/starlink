@@ -232,7 +232,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the input NDF.
-      CALL NDF_ASSOC( 'IN', 'READ', NDF1, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', NDF1, STATUS )
 
 *  Find whether or not there are no more than two significant
 *  dimensions and which ones they are.
@@ -307,7 +307,7 @@
 
 *  Create an output NDF based on the input one.  Set an appropriate
 *  numeric type for the output arrays.
-      CALL NDF_PROP( NDF1, 'WCS,Axis,Quality,Units', 'OUT', NDF2, 
+      CALL NDG_PROPL( NDF1, 'WCS,Axis,Quality,Units', 'OUT', NDF2, 
      :               STATUS )
       CALL NDF_STYPE( DTYPE, NDF2, COMP, STATUS )
 

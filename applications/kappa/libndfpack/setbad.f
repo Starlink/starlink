@@ -206,9 +206,9 @@
 
 *  Obtain the NDF with the appropriate access mode.
       IF ( MODIFY ) THEN
-         CALL NDF_ASSOC( 'NDF', 'UPDATE', NDF, STATUS )
+         CALL NDG_ASSOCL( 'NDF', 'UPDATE', NDF, STATUS )
       ELSE
-         CALL NDF_ASSOC( 'NDF', 'READ', NDF, STATUS )
+         CALL NDG_ASSOCL( 'NDF', 'READ', NDF, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 

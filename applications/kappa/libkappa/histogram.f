@@ -330,7 +330,7 @@
       LOGFIL = .FALSE.
 
 *  Obtain the NDF to be analysed.
-      CALL NDF_ASSOC( 'IN', 'READ', NDF, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', NDF, STATUS )
 
 *  Determine which array component is to be analysed.
       CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Error,Quality,Variance',
@@ -1081,7 +1081,7 @@
       CALL NDF_BEGIN
 
 *  Create a new NDF.
-      CALL NDF_CREAT( 'OUT', '_INTEGER', 1, 1, NUMBIN, NDFO, STATUS )
+      CALL NDG_CREATL( 'OUT', '_INTEGER', 1, 1, NUMBIN, NDFO, STATUS )
 
 *  Map the data array.
       CALL KPG1_MAP( NDFO, 'Data', '_INTEGER', 'WRITE', OUTPTR,

@@ -262,7 +262,7 @@
 *  Propagate the output NDF from the input array NDF, copying WCS, UNITS,
 *  AXIS and QUALITY components (the default components HISTORY, TITLE
 *  and LABEL and all extensions are also copied).
-      CALL NDF_PROP( INDF1, 'WCS,UNITS,AXIS,QUALITY', 'OUT', INDF3, 
+      CALL NDG_PROPL( INDF1, 'WCS,UNITS,AXIS,QUALITY', 'OUT', INDF3, 
      :               STATUS )
       
 *  Map the required components of the output array.

@@ -21,7 +21,7 @@
 *     This routine saves a maximum-entropy reconstruction to an NDF.
 *     If a new output NDF is to be created (MODE=WRITE), then a new
 *     NDF is created based on the input NDF.  If the output NDF is to be
-*     updated (MODE=UPDATE), then a call to NDF_ASSOC is made which
+*     updated (MODE=UPDATE), then a call to NDG_ASSOCL is made which
 *     should return the same NDF that was used on the last call to
 *     this routine (so long as the ADAM parameter has not been cancelled
 *     between the two calls).
@@ -165,11 +165,11 @@
 
 *  Either create a new NDF or access an existing NDF for update.
       IF ( MODE .EQ. 'WRITE' ) THEN
-         CALL NDF_PROP( INDF, 'WCS,AXIS,QUALITY,UNITS', PARAM, ONDF,
+         CALL NDG_PROPL( INDF, 'WCS,AXIS,QUALITY,UNITS', PARAM, ONDF,
      :                  STATUS )
 
       ELSE
-         CALL NDF_ASSOC( PARAM, 'UPDATE', ONDF, STATUS )
+         CALL NDG_ASSOCL( PARAM, 'UPDATE', ONDF, STATUS )
 
       END IF
 

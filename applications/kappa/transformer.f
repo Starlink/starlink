@@ -526,7 +526,7 @@
       CALL NDF_BEGIN
 
 *  Open the input NDF.
-      CALL NDF_ASSOC( 'IN', 'READ', NDFI, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', NDFI, STATUS )
 
 *  Obtain the dimensions of the NDF.
       CALL NDF_DIM( NDFI, NDF__MXDIM, IDIMS, NDIMI, STATUS )
@@ -988,7 +988,7 @@
 
 *  Create the output NDF.
 *  ======================
-      CALL NDF_PROP( NDFI, 'Units', 'OUT', NDFO, STATUS )
+      CALL NDG_PROPL( NDFI, 'Units', 'OUT', NDFO, STATUS )
 
 *  Change its shape where required.
       IF ( .NOT. SAME ) THEN

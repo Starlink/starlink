@@ -645,7 +645,7 @@
       CALL NDF_BEGIN
 
 *  Create the output NDF structure.
-      CALL NDF_CREAT( 'NDF', DTYPE, NDIMS, OLBND, OUBND, NDFOUT,
+      CALL NDG_CREATL( 'NDF', DTYPE, NDIMS, OLBND, OUBND, NDFOUT,
      :                STATUS )
 
 *  Set the initialisation control string.  Set the (NDF) bad-pixel

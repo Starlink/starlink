@@ -426,7 +426,7 @@
 
 *  Create the surface-fit NDF, propagating the WCS, AXIS, UNITS, LABEL,
 *  TITLE, HISTORY and extensions from the input NDF.
-      CALL NDF_PROP( NDFI, 'WCS,Axis,Units', 'OUT', NDFO, STATUS )
+      CALL NDG_PROPL( NDFI, 'WCS,Axis,Units', 'OUT', NDFO, STATUS )
 
 *  Obtain a new title for the output NDF.
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )

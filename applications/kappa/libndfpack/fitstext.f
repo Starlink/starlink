@@ -141,7 +141,7 @@
       CALL NDF_BEGIN
 
 *  Access the NDF.
-      CALL NDF_ASSOC( 'NDF', 'UPDATE', NDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'UPDATE', NDF, STATUS )
 
 *  Look for an existing FITS extension.
       THERE = .FALSE.

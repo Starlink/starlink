@@ -110,7 +110,7 @@
  
 *    Create a new NDF.
  
-      CALL NDF_CREP( PNNDF, '_UBYTE', NDIM, DIMS, NDFO, STATUS )
+      CALL NDG_CREPL( PNNDF, '_UBYTE', NDIM, DIMS, NDFO, STATUS )
  
 *    Map the data array.  Wrap to prevent line overflow when the token
 *    is expanded.

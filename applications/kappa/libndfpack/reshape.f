@@ -138,7 +138,7 @@
       CALL NDF_BEGIN
       
 *  Get the input NDF.
-      CALL NDF_ASSOC( 'IN', 'READ', NDFI, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', NDFI, STATUS )
 
 *  Determine which array components are present.
       CALL NDF_STATE( NDFI, 'Variance', VARPRS, STATUS )
@@ -177,7 +177,7 @@
 
 *  Create the output NDF.
 *  ======================
-      CALL NDF_PROP( NDFI, 'UNITS', 'OUT', NDFO, STATUS )
+      CALL NDG_PROPL( NDFI, 'UNITS', 'OUT', NDFO, STATUS )
 
 *  Change to the desired shape.
       CALL NDF_SBND( NDIMS, LBND, UBND, NDFO, STATUS )
@@ -186,7 +186,7 @@
 *  ===============================================
 
 *  A null results in the output title being the same as the input
-*  title because the title was already propagated by NDF_PROP above.
+*  title because the title was already propagated by NDG_PROPL above.
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
 
 *  Reshape the data component.

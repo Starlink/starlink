@@ -1406,7 +1406,7 @@
 *       Create a new NDF of the section, propagating all other
 *       components.
 
-         CALL NDF_PROP( NDFR, 'Data,Quality,Variance,Axis,Units,WCS',
+         CALL NDG_PROPL( NDFR, 'Data,Quality,Variance,Axis,Units,WCS',
      :                  'OUT', NDFO, STATUS )
 
 *       Get the title for the NDF.

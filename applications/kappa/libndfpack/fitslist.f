@@ -101,7 +101,7 @@
 
 *    Obtain an identifier for the input NDF.
 
-      CALL NDF_ASSOC( 'IN', 'READ', NDF, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', NDF, STATUS )
 
 *    Obtain a locator to the FITS extension.
 

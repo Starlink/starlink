@@ -355,7 +355,7 @@
 *  Create a new NDF using the supplied template, propagating the data
 *  and axis arrays, the title, label and history but NOT the SURFACEFIT
 *  extension.
-                     CALL NDF_PROP( LIKEID, 'DATA,UNITS,AXIS,TITLE,'/
+                     CALL NDG_PROPL( LIKEID, 'DATA,UNITS,AXIS,TITLE,'/
      :                              /'LABEL,HISTORY,WCS,'/
      :                              /'NOEXTENSION(SURFACEFIT)',
      :                              'OUT', NDFO, STATUS )
@@ -444,7 +444,7 @@
                      YDIM = UBND( 2 ) - LBND( 2 ) + 1
 
 *  Create a new NDF of the right type and size from scratch.
-                     CALL NDF_CREAT( 'OUT', TYPE, MAXDIM, LBND, UBND,
+                     CALL NDG_CREATL( 'OUT', TYPE, MAXDIM, LBND, UBND,
      :                               NDFO, STATUS )
 
 *  Initialise the axis system.

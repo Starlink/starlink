@@ -552,7 +552,7 @@
 *  =============================================
 
 *  Obtain the identifier of the NDF to be ploted.
-      CALL NDF_ASSOC( 'NDF', 'READ', INDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'READ', INDF, STATUS )
 
 *  Find which component to plot.
       CALL KPG1_ARCOG( 'COMP', INDF, MCOMP, COMP, STATUS )

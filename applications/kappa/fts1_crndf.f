@@ -145,7 +145,7 @@
 
 *       Create the NDF obtaining the name via the parameter system.
 
-         CALL NDF_CREP( PNNDF, FORMAT, NDIM, DIMS, NDF, STATUS )
+         CALL NDG_CREPL( PNNDF, FORMAT, NDIM, DIMS, NDF, STATUS )
 
          IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -191,7 +191,7 @@
 
 *       Create the new NDF using the supplied name.
 
-         CALL NDF_CREP( PNNDF, FORMAT, NDIM, DIMS, NDF, STATUS )
+         CALL NDG_CREPL( PNNDF, FORMAT, NDIM, DIMS, NDF, STATUS )
 
 *       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

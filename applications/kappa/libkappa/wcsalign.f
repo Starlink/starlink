@@ -318,7 +318,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the reference image.
-      CALL NDF_ASSOC( 'REF', 'READ', INDFR, STATUS )
+      CALL NDG_ASSOCL( 'REF', 'READ', INDFR, STATUS )
 
 *  If a null value was supplied, annul the error and use the first NDF
 *  supplied for IN.

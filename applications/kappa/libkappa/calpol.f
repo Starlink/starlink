@@ -240,7 +240,7 @@
 *  Attempt to get the first input NDF . This contains the intensity
 *  which passes through the polariser when oriented at 0 degrees to the
 *  reference direction.
-      CALL NDF_ASSOC( 'IN1', 'READ', NDFIN( 1 ), STATUS )
+      CALL NDG_ASSOCL( 'IN1', 'READ', NDFIN( 1 ), STATUS )
 
 *  See if the VARIANCE component is defined.
       CALL NDF_STATE( NDFIN( 1 ), 'VARIANCE', VAR, STATUS )
@@ -248,7 +248,7 @@
 *  Attempt to get the second input NDF.  This contains the intensity
 *  which passes through the polariser when oriented at 45 degrees to the
 *  reference direction.
-      CALL NDF_ASSOC( 'IN2', 'READ', NDFIN( 2 ), STATUS )
+      CALL NDG_ASSOCL( 'IN2', 'READ', NDFIN( 2 ), STATUS )
 
 *  If necessary, see if the VARIANCE component is defined.  If not, it
 *  overrides the use-variance flag.
@@ -257,7 +257,7 @@
 *  Attempt to get the third input NDF.  This contains the intensity
 *  which passes through the polariser when oriented at 90 degrees to the
 *  reference direction.
-      CALL NDF_ASSOC( 'IN3', 'READ', NDFIN( 3 ), STATUS )
+      CALL NDG_ASSOCL( 'IN3', 'READ', NDFIN( 3 ), STATUS )
 
 *  If necessary, see if the VARIANCE component is defined.  If not, it
 *  overrides the use-variance flag.
@@ -266,7 +266,7 @@
 *  Attempt to get the fourth input NDF.  This contains the intensity
 *  which passes through the polariser when oriented at 135 degrees to
 *  the reference direction.
-      CALL NDF_ASSOC( 'IN4', 'READ', NDFIN( 4 ), STATUS )
+      CALL NDG_ASSOCL( 'IN4', 'READ', NDFIN( 4 ), STATUS )
 
 *  If necessary, see if the VARIANCE component is defined.  If not, it
 *  overrides the use-variance flag.
@@ -299,7 +299,7 @@
 *  ===============================
 
 *  Attempt to get an output NDF to hold total intensity.
-      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'I', NDFI, 
+      CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'I', NDFI, 
      :               STATUS )
 
 *  If successful, set a flag indicating that a total-intensity NDF is to
@@ -331,7 +331,7 @@
 
 *  Attempt to get an output NDF to hold the normalised Q Stokes
 *  parameter.
-      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'Q', NDFQ, STATUS )
+      CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'Q', NDFQ, STATUS )
 
 *  If successful, set a flag indicating that a
 *  normalised-Q-Stokes-parameter NDF is to be produced.
@@ -362,7 +362,7 @@
 
 *  Attempt to get an output NDF to hold the normalised U Stokes
 *  parameter.
-      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'U', NDFU, STATUS )
+      CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'U', NDFU, STATUS )
 
 *  If successful, set a flag indicating that a U NDF is to be produced.
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -391,7 +391,7 @@
 *  ===========================================
 
 *  Attempt to get an output NDF to hold percentage polarisation.
-      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'P', NDFP, STATUS )
+      CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'P', NDFP, STATUS )
 
 *  If successful, set a flag indicating that a percent-polarisation NDF
 *  is to be produced.
@@ -426,7 +426,7 @@
 *  ======================================
 
 *  Attempt to get an output NDF to hold polarisation angle.
-      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'THETA', NDFT, 
+      CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'THETA', NDFT, 
      :               STATUS )
 
 *  If successful, set a flag indicating that an angle NDF is to
@@ -460,7 +460,7 @@
 *  =======================================
 
 *  Attempt to get an output NDF to hold polarised intensity.
-      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IP', NDFIP, 
+      CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IP', NDFIP, 
      :               STATUS )
 
 *  If successful, set a flag indicating that a polarised-intensity NDF
@@ -492,7 +492,7 @@
 
 *  Attempt to get an output NDF to hold total-intensity estimate based
 *  on the first and third input NDFs.
-      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IA', NDFIA, 
+      CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IA', NDFIA, 
      :               STATUS )
 
 *  If successful, set a flag indicating that this total-intensity NDF is
@@ -524,7 +524,7 @@
 
 *  Attempt to get an output NDF to hold total-intensity estimate based
 *  on the second and fourth input NDFs.
-      CALL NDF_PROP( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IB', NDFIB, 
+      CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'IB', NDFIB, 
      :               STATUS )
 
 *  If successful, set a flag indicating that this total intensity NDF is

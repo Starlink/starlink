@@ -170,7 +170,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Obtain the NDF to be updated.
-      CALL NDF_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'UPDATE', INDF, STATUS )
 
 *  Find the FITS extension and map it.
       CALL NDF_XLOC( INDF, 'FITS', 'READ', LOC, STATUS )

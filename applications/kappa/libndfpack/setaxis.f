@@ -284,7 +284,7 @@
       CALL NDF_BEGIN
 
 *  Obtain an identifier for the NDF to be modified.
-      CALL NDF_ASSOC( 'NDF', 'UPDATE', NDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'UPDATE', NDF, STATUS )
 
 *  Find the number of dimensions, and bounds in the NDF.
       CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )

@@ -671,7 +671,7 @@
 *    This is initially a copy of the input NDF, which will then be
 *    altered.
 
-      CALL NDF_PROP( NDF, 'WCS,Data,Variance,Quality,Axis,Units', 'OUT',
+      CALL NDG_PROPL( NDF, 'WCS,Data,Variance,Quality,Axis,Units', 'OUT',
      :               NDFO, STATUS )
 
 *    The input NDF is no longer required so annul its identifier.

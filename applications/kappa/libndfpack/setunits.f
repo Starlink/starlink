@@ -91,7 +91,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Obtain an identifier for the NDF to be modified.
-      CALL NDF_ASSOC( 'NDF', 'UPDATE', NDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'UPDATE', NDF, STATUS )
 
 *  Reset any existing units component.
       CALL NDF_RESET( NDF, 'Units', STATUS )

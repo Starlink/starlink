@@ -597,7 +597,7 @@
 *  Get the main parameters of the data to be displayed.
 *  =====================================================
 *  Obtain the identifier of the NDF to be displayed.
-      CALL NDF_ASSOC( 'IN', 'READ', INDF1, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', INDF1, STATUS )
 
 *  Find which component to display. MCOMP is for use with NDF_MAP and may
 *  be set to 'Error'. COMP is for use with all other NDF routines (which
@@ -1020,7 +1020,7 @@
 
 *  Create the output NDF structure based on the displayed section of the
 *  input NDF.
-         CALL NDF_PROP( INDF2, 'AXIS,NOQUALITY,NOHISTORY,NOVARIANCE,'//
+         CALL NDG_PROPL( INDF2, 'AXIS,NOQUALITY,NOHISTORY,NOVARIANCE,'//
      :                  'NOEXTENSION(),WCS', 'OUT', INDF3, STATUS )
 
          IF ( STATUS .EQ. PAR__NULL ) THEN

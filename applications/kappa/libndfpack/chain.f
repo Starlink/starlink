@@ -156,7 +156,7 @@
 *  ======================
 
 *  First the principal NDF.
-      CALL NDF_ASSOC( 'IN', 'READ', NDFI( 1 ), STATUS )
+      CALL NDG_ASSOCL( 'IN', 'READ', NDFI( 1 ), STATUS )
 
 *  Make a loop to input the NDFs, via parameters C1, C2,...  Start an
 *  error context because a null is used to end the list of NDFs.  Since
@@ -168,7 +168,7 @@
          I = I + 1
          CALL CHR_ITOC( I, CIN, NC )
          PNIN = 'C'//CIN( :NC )
-         CALL NDF_ASSOC( PNIN, 'READ', NDFI( I + 1 ), STATUS )
+         CALL NDG_ASSOCL( PNIN, 'READ', NDFI( I + 1 ), STATUS )
       END DO
 
 *  Look for the expected null.  Note the first pasted NDF may not be
@@ -241,7 +241,7 @@
 *  At this point any of array of identifiers or the principal NDF will
 *  have the bounds of the output pasted NDF.  Want to propagate from
 *  the principal array.
-      CALL NDF_PROP( NDFI( 1 ), 'UNITS', 'OUT', NDFO, STATUS )
+      CALL NDG_PROPL( NDFI( 1 ), 'UNITS', 'OUT', NDFO, STATUS )
 
 *  Set the array types.
       CALL NDF_STYPE( DTYPE, NDFO, 'Data', STATUS )
@@ -254,7 +254,7 @@
 *  ===============================================
 
 *  A null results in the output title being the same as the input
-*  title because the ttitle was already propagated by NDF_PROP above.
+*  title because the ttitle was already propagated by NDG_PROPL above.
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
 
 *  Map the output data array component.

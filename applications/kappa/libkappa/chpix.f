@@ -173,7 +173,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the input NDF.
-      CALL NDF_ASSOC( 'IN', 'Read', NDFI, STATUS )
+      CALL NDG_ASSOCL( 'IN', 'Read', NDFI, STATUS )
 
 *  Determine which array component is to be modified.
       CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Error,Quality,Variance',
@@ -206,7 +206,7 @@
 *  Create the output NDF.
 *  ======================
 *  Obtain an output NDF and propagate the whole of the input NDF to it.
-      CALL NDF_PROP( NDFI, 'WCS,Data,Variance,Quality,Axis,Units', 
+      CALL NDG_PROPL( NDFI, 'WCS,Data,Variance,Quality,Axis,Units', 
      :               'OUT', NDFO, STATUS )
 
 *  Get the title for the output NDF.

@@ -164,7 +164,7 @@
 
 *  Create a new output NDF based on the first input NDF.  Propagate the
 *  axis, quality, WCS and units components.
-      CALL NDF_PROP( NDFI, 'Axis,Quality,Units,WCS', 'OUT', NDFO, 
+      CALL NDG_PROPL( NDFI, 'Axis,Quality,Units,WCS', 'OUT', NDFO, 
      :               STATUS )
 
 *  Determine which data type to use to process the input data/variance

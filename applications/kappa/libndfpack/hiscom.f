@@ -162,7 +162,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Obtain the NDF.
-      CALL NDF_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'UPDATE', INDF, STATUS )
 
 *  Determine the mode to be used.
       CALL PAR_CHOIC( 'MODE', 'Interface', 'File,Interface', .FALSE.,

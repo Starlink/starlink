@@ -105,7 +105,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
       
 *  Get the NDF containing the input data.
-      CALL NDF_ASSOC( PARAM, MODE, INDF, STATUS )
+      CALL NDG_ASSOCL( PARAM, MODE, INDF, STATUS )
 
 *  Find whether or not there are exactly the required number of
 *  significant dimensions and which ones they are.

@@ -334,7 +334,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Obtain an identifier for the NDF structure to be examined.
-      CALL NDF_ASSOC( 'NDF', 'READ', INDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'READ', INDF, STATUS )
 
 *  See if full axis information is to be obtained.
       CALL PAR_GET0L( 'FULLAXIS', FULLAX, STATUS )

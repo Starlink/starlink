@@ -231,7 +231,7 @@
 
 *  If no catalogue was supplied, get an NDF identifier.
       IF( IAST .EQ. AST__NULL ) THEN
-         CALL NDF_ASSOC( 'NDF', ACCESS, INDF, STATUS )
+         CALL NDG_ASSOCL( 'NDF', ACCESS, INDF, STATUS )
       ELSE
          INDF = NDF__NOID
       END IF

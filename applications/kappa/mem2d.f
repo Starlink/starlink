@@ -373,7 +373,7 @@
 *        MEM2D extension from 40 to 132.
 *     22-FEB-1995 (DSB):
 *        Comments re-formatted to edstar style.  Replace AIF VM routines
-*        with PSX.  Replaced calls to NDF_ASSOC, KPG1_SGDIM, etc. with a
+*        with PSX.  Replaced calls to NDG_ASSOCL, KPG1_SGDIM, etc. with a
 *        single call to KPG1_GTNDF.  "Usage" and "Examples" commands
 *        in the prologue converted to lower case.  Removed calls to
 *        FTSIZE since the FFTPACK routines can handled images of any
@@ -603,7 +603,7 @@
 
 *  Get an NDF holding the analysis mask, and create a section from it 
 *  matching the input NDF. Map the data array of the section.
-         CALL NDF_ASSOC( 'MASK', 'READ', MNDF, STATUS )
+         CALL NDG_ASSOCL( 'MASK', 'READ', MNDF, STATUS )
          CALL NDF_SECT( MNDF, NDIMS, LBNDIN, UBNDIN, MSNDF, STATUS )
          CALL KPG1_MAP( MSNDF, 'DATA', '_REAL', 'READ', IPMASK, NEL, 
      :                 STATUS )
@@ -691,7 +691,7 @@
 *  Attempt to get an image is to use for the default model.
       CALL ERR_MARK
 
-      CALL NDF_ASSOC( 'MODEL', 'READ', MODNDF, STATUS )
+      CALL NDG_ASSOCL( 'MODEL', 'READ', MODNDF, STATUS )
 
 *  If a null value was given, use a constant default model.
       IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -977,7 +977,7 @@
 *  NDF is based on the input NDF.
       CALL ERR_MARK
 
-      CALL NDF_PROP( INDF, 'WCS,AXIS,QUALITY,UNITS', 'MODELOUT', NMDNDF,
+      CALL NDG_PROPL( INDF, 'WCS,AXIS,QUALITY,UNITS', 'MODELOUT', NMDNDF,
      :               STATUS )
 
 *  If an NDF was given, store the new model in it.

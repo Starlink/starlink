@@ -724,7 +724,7 @@
      :                %VAL( IP2 ), %VAL( IP5 ), %VAL( IP7 ), STATUS )
 
 *  Create the output NDF, and map the DATA array.
-      CALL NDF_PROP( INDF1, 'WCS,AXIS,QUALITY,UNITS', 'OUT', INDF5,
+      CALL NDG_PROPL( INDF1, 'WCS,AXIS,QUALITY,UNITS', 'OUT', INDF5,
      :               STATUS )
       CALL KPG1_MAP( INDF5, 'DATA', '_REAL', 'WRITE', IPN5, NEL5,
      :              STATUS )

@@ -253,7 +253,7 @@
 *  ==========================
 
 *  Obtain the NDF to be updated.
-      CALL NDF_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'UPDATE', INDF, STATUS )
       
 *  See whether or not there is a FITS extension.
       CALL NDF_XSTAT( INDF, 'FITS', THERE, STATUS )

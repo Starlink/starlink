@@ -290,7 +290,7 @@
 *  ===================================================================
 
 *  Get the NDF which defines the available co-ordinate Frames.
-      CALL NDF_ASSOC( 'NDF', 'READ', INDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'READ', INDF, STATUS )
 
 *  If an NDF was supplied, get its WCS FrameSet.
       IF( STATUS .EQ. SAI__OK ) THEN

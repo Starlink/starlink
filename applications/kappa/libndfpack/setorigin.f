@@ -132,7 +132,7 @@
       CALL NDF_BEGIN
 
 *  Obtain the NDF to be modified and determine its pixel-index bounds.
-      CALL NDF_ASSOC( 'NDF', 'UPDATE', NDF1, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'UPDATE', NDF1, STATUS )
       CALL NDF_BOUND( NDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Defer error reporting and attempt to obtain a second NDF to act as a
@@ -140,7 +140,7 @@
       LIKE = .TRUE.
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL ERR_MARK
-         CALL NDF_ASSOC( 'LIKE', 'READ', NDF2, STATUS )
+         CALL NDG_ASSOCL( 'LIKE', 'READ', NDF2, STATUS )
 
 *  If a null NDF was specified, then annul the error and note that a
 *  template was not provided.

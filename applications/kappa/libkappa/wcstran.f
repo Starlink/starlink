@@ -165,7 +165,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Obtain an identifier for the NDF.
-      CALL NDF_ASSOC( 'NDF', 'READ', INDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'READ', INDF, STATUS )
 
 *  Create an AST FrameSet from the WCS component of the NDF.
       CALL KPG1_GTWCS( INDF, IWCS, STATUS )

@@ -257,7 +257,7 @@
 *  Open the NDF context and open the NDF for UPDATE access.  (The NDF
 *  must already exist or an error will result).
       CALL NDF_BEGIN
-      CALL NDF_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'UPDATE', INDF, STATUS )
 
 *  Find whether or not to loop.
       CALL PAR_GET0L( 'LOOP', LOOP, STATUS )

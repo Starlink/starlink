@@ -102,7 +102,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Obtain an identifier for the NDF to be modified.
-      CALL NDF_ASSOC( 'NDF', 'UPDATE', NDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'UPDATE', NDF, STATUS )
 
 *  Find the number of dimensions in the NDF.
       CALL NDF_DIM( NDF, NDF__MXDIM, DIMS, NDIM, STATUS )

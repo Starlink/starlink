@@ -378,14 +378,14 @@
 *  rotation) needs the array components to be copied.  Axes will be
 *  overwritten later for right-angle multiples.
       IF ( NUMRA .EQ. 2 ) THEN
-         CALL NDF_PROP( NDFS, 'AXIS,DATA,VARIANCE,QUALITY,UNITS', 'OUT',
+         CALL NDG_PROPL( NDFS, 'AXIS,DATA,VARIANCE,QUALITY,UNITS', 'OUT',
      :                  NDFO, STATUS )
 
       ELSE IF ( NUMRA .EQ. 1 .OR. NUMRA .EQ. 3 ) THEN
-         CALL NDF_PROP( NDFS, 'AXIS,UNITS', 'OUT', NDFO, STATUS )
+         CALL NDG_PROPL( NDFS, 'AXIS,UNITS', 'OUT', NDFO, STATUS )
 
       ELSE
-         CALL NDF_PROP( NDFS, 'UNITS', 'OUT', NDFO, STATUS )
+         CALL NDG_PROPL( NDFS, 'UNITS', 'OUT', NDFO, STATUS )
       END IF
 
 *  Obtain a new title for the output NDF.

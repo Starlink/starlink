@@ -144,7 +144,7 @@
       CALL NDF_BEGIN
 
 *  Obtain an NDF identifier.
-      CALL NDF_ASSOC( 'NDF', 'UPDATE', NDF, STATUS )
+      CALL NDG_ASSOCL( 'NDF', 'UPDATE', NDF, STATUS )
 
 *  Obtain the NDF's current numeric array type as the default.
       CALL NDF_TYPE( NDF, 'Data,Variance', TYPE, STATUS )

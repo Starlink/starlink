@@ -272,7 +272,7 @@
 
 *  Create the output NDF to hold the mean data values.  It will be
 *  changed later to a suitable 1-dimensional shape.
-      CALL NDF_PROP( INDF1, 'UNITS', 'OUT', INDF2, STATUS )
+      CALL NDG_PROPL( INDF1, 'UNITS', 'OUT', INDF2, STATUS )
 
 *  Find the dimensions of the input image.
       NX = SUBND( 1 ) - SLBND( 1 ) + 1
@@ -556,7 +556,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
       
 *  Get an NDF in which to store the mask.
-      CALL NDF_PROP( INDF1, ' ', 'MASK', INDF3, STATUS )
+      CALL NDG_PROPL( INDF1, ' ', 'MASK', INDF3, STATUS )
 
 *  If a null value was given, annul the error and continue.
       IF ( STATUS .EQ. PAR__NULL ) THEN
