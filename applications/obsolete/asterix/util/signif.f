@@ -31,6 +31,7 @@
 *     23 Aug 89 : V1.0-2 Quality handling now included. Output variances
 *                        are set to unity (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     12 Jan 95 : V1.8-1 Use new data interfaces (DJA)
 *
 *    Type Definitions :
 *
@@ -39,7 +40,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -47,39 +48,39 @@
 *
 *    Local Constants :
 *
-      INTEGER INVAR  			      ! algorithm number
-         PARAMETER (INVAR=1)
+      INTEGER 			INVAR  			! Algorithm number
+        PARAMETER 		( INVAR = 1 )
 
-      CHARACTER*22           VERSION
-         PARAMETER ( VERSION = 'SIGNIF Version 1.8-0' )
-
-      INTEGER                MAXLINES
-         PARAMETER           (MAXLINES = 10 )
+      INTEGER                	MAXLINES
+        PARAMETER           	( MAXLINES = 10 )
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) ILOC	      ! input object locator
-      CHARACTER*(DAT__SZLOC) OLOC	      ! output object locator
-      CHARACTER*(DAT__SZLOC) WLOC   	      ! SIGNIF data locator
+      CHARACTER*80           	ACTION(MAXLINES) 	! History records
 
-      CHARACTER*80           ACTION(MAXLINES) ! History records
+      INTEGER                	DIMS(ADI__MXDIM) 	! Input data dimensions
 
-      INTEGER                DIMS(DAT__MXDIM) ! Sizes of each dimension
+      INTEGER			IFID			! I/p file identifier
+      INTEGER                	NDIM             	! Dimensionality of object
+      INTEGER	             	NELM	      		! Size of input data
+      INTEGER                	NREC             ! Number of history records written
+      INTEGER			OFID			! O/p file identifier
+      INTEGER	             	OPTR	      ! pointer to output data
+      INTEGER	             	QPTR	      ! pointer to quality data
+      INTEGER	             	WEIGHT_NELM      	! Size of SIGNIF data
+      INTEGER			WFID			! Weights data file
+      INTEGER	             	WPTR	      		! pointer to SIGNIF data
 
-      INTEGER	             WEIGHT_NELM      ! size of SIGNIF data
-      INTEGER                NDIM             ! Dimensionality of object
-      INTEGER	             NELM	      ! size of input data
-      INTEGER                NREC             ! Number of history records written
-      INTEGER	             OPTR	      ! pointer to output data
-      INTEGER	             QPTR	      ! pointer to quality data
-      INTEGER	             WPTR	      ! pointer to SIGNIF data
+      LOGICAL                	ANYBAD           	! Are there any bad quality data?
+      LOGICAL	             	OK		      	! Data present and valid?
+      LOGICAL                	OVERWRITE        	! Overwriting?
+      LOGICAL                	PRIM             	! Input is primitive data?
+      LOGICAL		     	Q_OK	      		! Quality present and valid?
+      LOGICAL		     	V_OK	      		! Variance present and valid?
 
-      LOGICAL                ANYBAD           ! Are there any bad quality data?
-      LOGICAL	             OK		      ! data present and valid?
-      LOGICAL                OVERWRITE        ! Overwriting?
-      LOGICAL                PRIM             ! input is primitive data?
-      LOGICAL		     Q_OK	      ! quality present and valid?
-      LOGICAL		     V_OK	      ! variance present and valid?
+*  Version id:
+      CHARACTER*22           VERSION
+         PARAMETER ( VERSION = 'SIGNIF Version 1.8-1' )
 *-
 
 *    Check status
@@ -96,25 +97,27 @@
 
 *    Obtain data object, access and check it
       IF ( OVERWRITE ) THEN
-        CALL USI_ASSOCI( 'INP', 'UPDATE', OLOC, PRIM, STATUS )
+        CALL USI_TASSOCI( 'INP', '*', 'UPDATE', OFID, STATUS )
+        CALL USI_PRIM( OFID, PRIM, STATUS )
       ELSE
-        CALL USI_ASSOC2( 'INP', 'OUT', 'READ', ILOC, OLOC,PRIM, STATUS )
+        CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
+        CALL USI_PRIM( IFID, PRIM, STATUS )
         IF ( .NOT. PRIM ) THEN
           CALL USI_SHOW( 'Output data {OUT}', STATUS )
-          CALL HDX_COPY( ILOC, OLOC, STATUS )
+          CALL ADI_FCOPY( IFID, OFID, STATUS )
         END IF
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    The input must not be primitive
       IF ( PRIM ) THEN
-        CALL MSG_PRNT( 'ERROR : Input must not be primitive.' )
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Input must not be primitive', STATUS )
         GOTO 99
       END IF
 
 *    Get size of data array
-      CALL BDA_CHKDATA( OLOC, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( OFID, OK, NDIM, DIMS, STATUS )
       IF ( OK ) THEN
 	CALL ARR_SUMDIM( NDIM, DIMS, NELM )
       ELSE
@@ -124,26 +127,26 @@
       END IF
 
 *    See if we have quality data in input object
-      CALL BDA_CHKQUAL( OLOC, Q_OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKQUAL( OFID, Q_OK, NDIM, DIMS, STATUS )
       IF ( Q_OK ) THEN
 
 *      Map it - are there any bad quality points
-        CALL BDA_MAPLQUAL( OLOC, 'READ', ANYBAD, QPTR, STATUS )
+        CALL BDI_MAPLQUAL( OFID, 'READ', ANYBAD, QPTR, STATUS )
         IF ( .NOT. ANYBAD ) THEN
-          CALL BDA_UNMAPLQUAL( OLOC, STATUS )
+          CALL BDI_UNMAPLQUAL( OFID, STATUS )
           Q_OK = .FALSE.
         END IF
 
       END IF
 
 *    See if we have error data in input object
-      CALL BDA_CHKVAR( OLOC, V_OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKVAR( OFID, V_OK, NDIM, DIMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    If variance is present, map it as error. If not then get a weights array
 *    from the user
       IF ( V_OK ) THEN
-	CALL BDA_MAPERR( OLOC, 'UPDATE', WPTR, STATUS )
+	CALL BDI_MAPERR( OFID, 'UPDATE', WPTR, STATUS )
       ELSE
 
 *      We don't so try for a weights data array
@@ -151,39 +154,39 @@
         CALL MSG_SETI( 'N', NELM )
 	CALL MSG_PRNT( 'Data has ^N values' )
 
-        CALL USI_ASSOCI( 'WEIGHT_DATA', WLOC, PRIM, STATUS )
+        CALL USI_ASSOCI( 'WEIGHT_DATA', '*', 'READ', WFID, STATUS )
 	IF ( STATUS .NE. SAI__OK ) GOTO 99
-
+        CALL USI_PRIM( WFID, STATUS )
         IF ( .NOT. PRIM ) THEN
-          CALL MSG_PRNT( 'A numeric data object is required.' )
-	  CALL DAT_CANCL( 'WEIGHT_DATA', STATUS )
 	  STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'A numeric data object is required.',
+     :                  STATUS )
           GOTO 99
 	END IF
 
-        CALL BDA_CHKDATA( WLOC, OK, NDIM, DIMS, STATUS )
+        CALL BDI_CHKDATA( WFID, OK, NDIM, DIMS, STATUS )
         IF ( .NOT. OK ) THEN
-          CALL MSG_PRNT( 'ERROR : Weights data invalid' )
           STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Weights data invalid', STATUS )
         END IF
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
         CALL ARR_SUMDIM( NDIM, DIMS, WEIGHT_NELM )
 
 	IF ( NELM .NE. WEIGHT_NELM ) THEN
-          CALL MSG_PRNT( 'Sizes of input data and weights arrays '/
-     :                                            /'don''t match' )
 	  STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Sizes of input data and weights arrays '/
+     :                                        /'don''t match', STATUS )
 	END IF
 
-        CALL BDA_MAPDATA( WLOC, 'READ', WPTR, STATUS )
+        CALL BDI_MAPDATA( WFID, 'READ', WPTR, STATUS )
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map output data. Since we've copied the data over to the output if
 *    we're not overwriting, we just overwrite the output data.
-      CALL BDA_MAPDATA( OLOC, 'UPDATE', OPTR, STATUS )
+      CALL BDI_MAPDATA( OFID, 'UPDATE', OPTR, STATUS )
       IF ( Q_OK ) THEN
         CALL UTIL_WEIGHTQ( INVAR, NELM, %VAL(OPTR), %VAL(QPTR),
      :                         %VAL(WPTR), %VAL(OPTR), STATUS )
@@ -195,11 +198,11 @@
 *    Set output VARIANCE array to unity if present
       IF ( V_OK ) THEN
         CALL ARR_INIT1R( 1.0, NELM, %VAL(WPTR), STATUS )
-        CALL BDA_UNMAPERR( OLOC, STATUS )
+        CALL BDI_UNMAPERR( OFID, STATUS )
       END IF
 
 *    History file entry
-      CALL HIST_ADD( OLOC, VERSION, STATUS)
+      CALL HSI_ADD( OFID, VERSION, STATUS)
       ACTION(1)='Input data {INP}'
       IF ( V_OK ) THEN
         ACTION(2)='Weight data was variance array'
@@ -213,7 +216,7 @@
       END IF
       NREC = MAXLINES
       CALL USI_TEXT( 3, ACTION, NREC, STATUS )
-      CALL HIST_PTXT( OLOC, NREC, ACTION, STATUS )
+      CALL HSI_PTXT( OFID, NREC, ACTION, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE()
