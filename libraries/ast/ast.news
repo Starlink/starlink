@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V<VERSION_NUMBER>) of the Starlink AST (astrometry) library is
+   A new release (V3.4) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,15 +15,21 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
-o  A change has been made to the interpretation of Format strings which
-specify how celestial axis values should be formatted for display. If
-no precision specifier is included to specify the number of trailing
-decimal places, then a default precision is now used which results in the
-total number of digits being equal to the value of the Digits attribute.
-Previously, zero decimal places were produced if the Format string
-did not include a precision specifier. To get zero decimal places in the
-new scheme, the Format value must specify explicitly that no decimal
-places are required (e.g. "dms.0" rather than "dms").
+o  The Format attribute for simple Frames and SkyFrames has been extended.
+It has always been possible, in both classes, to specify a precision by
+including a dot in the Format value followed by an integer (e.g. "dms.1"
+for a SkyFrame, or "%.10g" for a simple Frame). The precision can now
+also be specified using an asterisk in place of the integer (e.g. "dms.*" 
+or "%.*g"). This causes the precision to be derived on the basis of the
+Digits attribute value.  
+
+o The Plot class has been changed so that the default value used for the
+Digits attribute is chosen to be the smallest value which results in no
+pair of adjacent labels being identical. For instance, if an annotated grid 
+is being drawn describing a SkyFrame, and the Format(1) value is set to
+"hms.*g" (the "g" causes field delimiters to be drawn as superscripts), and 
+the Digits(1) value is unset, then the seconds field will have a number of 
+decimal places which results in no pair of labels being identical.
 
 o  Addition of a new FITS encoding, "FITS-CLASS", which uses the
 conventions of the CLASS package (see

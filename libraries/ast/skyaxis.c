@@ -20,7 +20,7 @@ f     only within textual output (e.g. from AST_WRITE).
 *     The SkyAxis class inherits from the Axis class.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
@@ -76,10 +76,8 @@ f     only within textual output (e.g. from AST_WRITE).
 *        case that the first and only field begins with a minus sign.
 *     15-SEP-2004 (DSB):
 *        Modified ParseDHmsFormat so that the number of decimal places
-*        is specified by Digits if the given format string does not include 
-*        an explicit precision. To get the old interpretation of a
-*        precision-less format string effect (i.e. no decimal places), the
-*        format string should now explicitly include ".0" (i.e. "dms.0").
+*        is specified by Digits if the given format string include a ".*"
+*        precision (e.g. "dms.*").
 *class--
 */
 
@@ -1158,11 +1156,10 @@ static const char *DHmsFormat( const char *fmt, int digs, double value ) {
 *        specifier.
 *     digs 
 *        The default number of digits of precision to use. This is used
-*        if the given format specifier does not specify the number of decimal 
-*        places to attach to the final field. In this case, the returned
-*        value for "ndp" will be set to produce the number of digits of
-*        precision given by "digs". To produce no decimal places, the
-*        format specifier should include ".0" explicitly.
+*        if the given format specifier indicates the number of decimal
+*        places to use with the string ".*". In this case, the number of
+*        decimal places produced will be chosen so that the total number 
+*        of digits of precision is equal to "digs". 
 *     double
 *        The value to be formatted (in radians).
 
@@ -1225,9 +1222,11 @@ static const char *DHmsFormat( const char *fmt, int digs, double value ) {
 *     '.'
 *        Indicates that decimal places are to be given for the final
 *        field in the formatted string (whichever field this is). The
-*        '.' should be followed immediately by a positive integer
-*        which gives the number of decimal places required. By
-*        default, no decimal places are given.
+*        '.' should be followed immediately by a zero or positive integer
+*        which gives the number of decimal places required. The '.' may
+*        also be followed by asterisk (i.e. '.*') which causes the number 
+*        of decimal places to be chosen so that the total number of digits 
+*        is equal to the value of Digits.
 *
 *     Format specifiers are not case sensitive. If several characters
 *     make conflicting requests (e.g. if both 'i' and 'l' appear in a
@@ -1560,11 +1559,10 @@ static double DHmsGap( const char *fmt, int digs, double gap, int *ntick ) {
 *        values.
 *     digs 
 *        The default number of digits of precision to use. This is used
-*        if the given format specifier does not specify the number of decimal 
-*        places to attach to the final field. In this case, the returned
-*        value for "ndp" will be set to produce the number of digits of
-*        precision given by "digs". To produce no decimal places, the
-*        format specifier should include ".0" explicitly.
+*        if the given format specifier indicates the number of decimal
+*        places to use with the string ".*". In this case, the number of
+*        decimal places produced will be chosen so that the total number 
+*        of digits of precision is equal to "digs". 
 *     gap
 *        The target gap size.
 *     ntick
@@ -1867,11 +1865,10 @@ static const char *DHmsUnit( const char *fmt, int digs, int output ) {
 *        the syntax of this string, see the DHmsFormat function.
 *     digs 
 *        The default number of digits of precision to use. This is used
-*        if the given format specifier does not specify the number of decimal 
-*        places to attach to the final field. In this case, the returned
-*        value for "ndp" will be set to produce the number of digits of
-*        precision given by "digs". To produce no decimal places, the
-*        format specifier should include ".0" explicitly.
+*        if the given format specifier indicates the number of decimal
+*        places to use with the string ".*". In this case, the number of
+*        decimal places produced will be chosen so that the total number 
+*        of digits of precision is equal to "digs". 
 *     output
 *        If non-zero, the returned string will be in a form suitable
 *        for describing the units/format of output produced using
@@ -2389,15 +2386,15 @@ static const char *GetAxisFormat( AstAxis *this_axis ) {
    appropriate Format string and obtain a pointer to it. */
          if ( as_time ) {
             if ( digits <= 2 ) {
-               result = "h.0";
+               result = "h";
 	    } else if ( digits == 3 ) {
-               result = "hm.0";
+               result = "hm";
 	    } else if ( digits == 4 ) {
-               result = "hm.0";
+               result = "hm";
 	    } else if ( digits == 5 ) {
-               result = "hms.0";
+               result = "hms";
 	    } else if ( digits == 6 ) {
-               result = "hms.0";
+               result = "hms";
 
 /* Construct the Format string in a buffer if necessary. */
             } else {
@@ -2408,15 +2405,15 @@ static const char *GetAxisFormat( AstAxis *this_axis ) {
 /* Similarly, select a Format for expressing an angle if necessary. */
          } else {
             if ( digits <= 3 ) {
-               result = "d.0";
+               result = "d";
    	    } else if ( digits == 4 ) {
-               result = "dm.0";
+               result = "dm";
    	    } else if ( digits == 5 ) {
-               result = "dm.0";
+               result = "dm";
    	    } else if ( digits == 6 ) {
-               result = "dms.0";
+               result = "dms";
    	    } else if ( digits == 7 ) {
-               result = "dms.0";
+               result = "dms";
             } else {
                (void) sprintf( buff, "dms.%d", digits - 7 );
                result = buff;
@@ -2838,11 +2835,10 @@ static void ParseDHmsFormat( const char *fmt, int digs, char *sep, int *plus,
 *        DHmsFormat function.
 *     digs 
 *        The default number of digits of precision to use. This is used
-*        if the given format specifier does not specify the number of decimal 
-*        places to attach to the final field. In this case, the returned
+*        if the given format specifier indicates the number of decimal
+*        places to use with the string ".*". In this case, the returned
 *        value for "ndp" will be set to produce the number of digits of
-*        precision given by "digs". To produce no decimal places, the
-*        format specifier should include ".0" explicitly.
+*        precision given by "digs". 
 *     sep
 *        Pointer to a location in which a single character will be
 *        returned to indicate which separator should be used to
@@ -2987,24 +2983,29 @@ static void ParseDHmsFormat( const char *fmt, int digs, char *sep, int *plus,
    This is the number which will be used if the format specifier does not 
    indicate how many decimal places should be produced. It is shosen to
    produce the requested total number of digits of precision. */
-   *ndp = digs;
-   if( *as_time ) {
-      *ndp = ( digs > 2 ) ? digs : 2;
-      if( *dh ) *ndp -= 2;
-   } else {
-      *ndp = ( digs > 3 ) ? digs : 3;
-      if( *dh ) *ndp -= 3;
-   }
-   if( *min ) *ndp -= 2;
-   if( *sec ) *ndp -= 2;
-   if( *ndp < 0 ) *ndp = 0;
 
 /* If decimal places are required, attempt to read the integer value
    following the decimal point which specifies how many. If successful, 
-   and a valid (positive or zero) result was obtained, note its value. */
+   and a valid (positive or zero) result was obtained, note its value. If
+   an asterisk follows the decimal point, use a value determined by the
+   supplied "digs" value. */
    if ( ( decpos >= 0 ) && ( decpos < ( i - 1 ) ) ) {
+
       if ( astSscanf( fmt + decpos + 1, "%d", &ndpval ) == 1 ) {
          if ( ndpval >= 0 ) *ndp = ndpval;
+
+      } else if ( fmt[ decpos + 1 ] == '*' ) {
+         *ndp = digs;
+         if( *as_time ) {
+            *ndp = ( digs > 2 ) ? digs : 2;
+            if( *dh ) *ndp -= 2;
+         } else {
+            *ndp = ( digs > 3 ) ? digs : 3;
+            if( *dh ) *ndp -= 3;
+         }
+         if( *min ) *ndp -= 2;
+         if( *sec ) *ndp -= 2;
+         if( *ndp < 0 ) *ndp = 0;
       }
    }
 }

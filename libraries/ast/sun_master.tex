@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.17}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {15th September 2004}
+\newcommand{\stardocdate}      {16th September 2004}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -6741,14 +6741,14 @@ effect of the Frame's main Digits value for that axis.
 f-
 
 c+
-Even finer control is possible by setting the (character string)
-Format attribute for a Frame axis. The string given should contain a C
+Even finer control is possible by setting the (character string) Format
+attribute for a Frame axis. The string given should contain a C
 {\em{format specifier}} which explicitly determines how the values on
 that axis should be formatted. This will over-ride the effects of any
-Digits value\footnote{The exception to this rule is that if the Format value 
-does include a precision, then Digits will be used to determine the default 
-precision.}. Any valid ``printf'' format specifier may be used so
-long as it consumes exactly one double value.
+Digits value\footnote{The exception to this rule is that if the Format
+value includes a precision of ``\verb+.*+'', then Digits will be used to
+determine the actual precision used.}. Any valid ``printf'' format
+specifier may be used so long as it consumes exactly one double value.
 c-
 f+
 Even finer control is possible by setting the (character string)
@@ -6756,9 +6756,9 @@ Format attribute for a Frame axis. The string given should contain a
 {\em{format specifier}} which explicitly determines how the values on
 that axis should be formatted. This will over-ride the effects of any
 Digits value\footnote{The exception to this rule is that if the Format value 
-does include a precision, then Digits will be used to determine the default 
-precision.}.  Unfortunately for Fortran programmers, this must be a C
-language format specifier,\footnote{This is a consequence of
+includes a precision of ``\verb+.*+'', then Digits will be used to determine 
+the actual precision used.}.  Unfortunately for Fortran programmers, this must 
+be a C language format specifier,\footnote{This is a consequence of
 implementing the AST library in C.} so you might find the Digits
 approach preferable.
 f-
@@ -6771,11 +6771,13 @@ specifiers itself.
 c-
 f+
 The simplest type of format specifier takes the form ``\%m.nG'', where
-``m'' and ``n'' are integers giving the minimum field width in
-characters and the number of significant digits to display
-({\em{e.g.}}\ ``\%10.5G''). Other formatting options are also possible
-and if you need to use them you may wish to consult a book on C (see
-the ``printf'' function), remembering that you want to format a double
+``m'' and ``n'' are integers giving the minimum field width in characters
+and the number of significant digits to display ({\em{e.g.}}\
+``\%10.5G''). The ''n'' value may be replaced by an asterisk, in which
+case the value of the Digits attribute is used to determine the number of
+significant digits to display. Other formatting options are also possible
+and if you need to use them you may wish to consult a book on C (see the
+``printf'' function), remembering that you want to format a double
 precision (C double) value.
 f-
 
@@ -8704,15 +8706,15 @@ of field separators is also available, as the following examples show:
 \hline
 {\bf{Format Specifier}} & {\bf{Example Formatted Value}}\\
 \hline \hline
-{\tt{d.0}} & {\tt{219}}\\
+{\tt{d}} & {\tt{219}}\\
 {\tt{d.3}} & {\tt{219.123}}\\
-{\tt{dm.0}} & {\tt{219:05}}\\
+{\tt{dm}} & {\tt{219:05}}\\
 {\tt{dm.2}} & {\tt{219:05.44}}\\
-{\tt{dms.0}} & {\tt{219:05:42}}\\
+{\tt{dms}} & {\tt{219:05:42}}\\
 {\tt{hms.1}} & {\tt{15:44:13.8}}\\
 {\tt{bdms.2}} & {\tt{219 05 42.81}}\\
 {\tt{lhms.3}} & {\tt{15h44m13.88s}}\\
-{\tt{+zlhms.0}} & {\tt{+06h10m44s}}\\
+{\tt{+zlhms}} & {\tt{+06h10m44s}}\\
 {\tt{ms.1}} & {\tt{13145:42.8}}\\
 {\tt{lmst.3}} & {\tt{876m22.854s}}\\
 {\tt{s.2}} & {\tt{788742.81}}\\
@@ -8732,11 +8734,10 @@ formatted as an angle (in degrees) or a time (in hours).
 between angle and time may be made by including ``t'' to request time.
 
 \item The number of decimal places (for the final field) is indicated
-using ``{\tt{.}}'' followed by an integer. If this is omitted, then a
-default number of decimal places will be used which results in the total
-number of digits being equal to the value of the Digits(axis) attribute.
-So to supress all decimal places, it is necessary to include ``.0'' 
-explicitly in the format specifier.
+using ``{\tt{.}}'' followed by an integer. An asterisk can be used in
+place of an integer, in which case the number of decimal places is 
+chosen so that the total number of digits in the formatted value is equal 
+to the value of the Digits attribute.
 
 \item ``b'' causes fields to be separated by blanks, while ``l''
 causes them to be separated by the appropriate letters (the default
@@ -20507,15 +20508,22 @@ current version):
 
 \begin{enumerate}
 
-\item A change has been made to the interpretation of Format strings which
-specify how celestial axis values should be formatted for display. If
-no precision specifier is included to specify the number of trailing
-decimal places, then a default precision is now used which results in the
-total number of digits being equal to the value of the Digits attribute.
-Previously, zero decimal places were produced if the Format string
-did not include a precision specifier. To get zero decimal places in the
-new scheme, the Format value must specify explicitly that no decimal
-places are required (\emph{e.g.} ``dms.0'' rather than ``dms'').
+\item The Format attribute for simple Frames and SkyFrames has been extended.
+It has always been possible, in both classes, to specify a precision by
+including a dot in the Format value followed by an integer (\emph{e.g.}
+``\verb+dms.1+'' for a SkyFrame, or ``\verb+%.10g+'' for a simple Frame).
+The precision can now also be specified using an asterisk in place of the
+integer (\emph{e.g.} ``\verb+dms.*+'' or ``\verb+%.*g+''). This causes the
+precision to be derived on the basis of the Digits attribute value.
+
+\item The Plot class has been changed so that the default value used for the
+Digits attribute is chosen to be the smallest value which results in no
+pair of adjacent labels being identical. For instance, if an annotated
+grid is being drawn describing a SkyFrame, and the Format(1) value is set
+to ``\verb+hms.*g+'' (the ``g'' causes field delimiters to be drawn as
+superscripts), and the Digits(1) value is unset, then the seconds field
+will have a number of decimal places which results in no pair of labels
+being identical.
 
 \item Addition of a new class classed DSBSpecFrame. This is a 
 sub-class of SpecFrame which can be used to describe spectral axes

@@ -20,7 +20,7 @@ f     only within textual output (e.g. from AST_WRITE).
 *     The Axis class inherits from the Object class.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
@@ -50,9 +50,11 @@ f     only within textual output (e.g. from AST_WRITE).
 *        - Added "log" formatting using the "&" flag character in the
 *        Format string.  
 *     15-SEP-2004 (DSB):
-*        - If a format string is set which does not include an explicit
-*        precision value, then use the Digits value to determine the precision 
+*        - If a format string is set which includes a wildcard precision
+*        value (".*"), then use the Digits value to determine the precision 
 *        to be used.
+*        - If the conversion code is of integer type (e.g. "%d") cast value 
+*        to integer before printing. 
 *class--
 */
 
@@ -634,9 +636,9 @@ static const char *AxisFormat( AstAxis *this, double value ) {
    the graphical escape sequences defined within the Plot class to produce 
    "x" as a superscript of "10", "sign" which is used with log to indicate 
    if a sign should always be included infront of the "10", and "space"
-   which indicates if a leading space should be included infronyt of "10" if
-   no sign is included. It also ensures that the format specifier
-   includes an explicit precision field. */
+   which indicates if a leading space should be included infronyt of "10"
+   if no sign is included. It also modifies ".*" precision fields by
+   replacing the "*" by the current vale of the Digits attribute. */
       fmt = ParseAxisFormat( fmt0, astGetAxisDigits( this ), &log, &sign, 
                              &space, &integ );
       if( astOK ) {
@@ -1469,8 +1471,8 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
 *        The value of the Format attribute.
 *     digs 
 *        The default number of digits of precision to use. This is used
-*        if the given format specifier does not specify the precision. In 
-*        this case, the returned format specifier will be modified to
+*        if the given format specifier includes a wildcard precision (".*").
+*        In this case, the returned format specifier will be modified to
 *        include an explicit precision value equal to the supplied value
 *        of "digs".
 *     log
@@ -1497,7 +1499,7 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
 *        "lspace" will be returned if the supplied Format string has a ' ' 
 *        character in its printf <flags> field (that is, between the leading 
 *        '%' sign and the optional printf field width).
-*     lspace
+*     integ
 *        Pointer to an integer in which to store a flag indicating if the
 *        returned format specifier includes an integer conversion code
 *        (e.g. %d) or floating point conversion code (e.g. "%.7G").
@@ -1507,8 +1509,8 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
 *     the modified Format string. This will be a copy of the supplied
 *     Format string, but with any '&' flag removed. Any '+' or ' ' flag will
 *     also be removed if "log" is returned as non-zero. An explicit
-*     precision field will be included if the supplied format does not
-*     include one.
+*     precision field will be included if the supplied format includes a
+*     ".*" precision field.
 
 *  Notes:
 *     - A NULL pointer will be returned if this function is invoked
@@ -1597,8 +1599,8 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
       }
    }
 
-/* If the format specifier being returned does not include a precision,
-   add one now. */
+/* If the format specifier being returned does include a ".*" precision,
+   replace the "*" with the value of the Digits attribute. */
    if( result ) {
 
 /* Find the first percent sign. Do nothing if none is found. */
@@ -1628,23 +1630,22 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
             }
          }
 
-/* Go back to the end of the field width. If the next character is a "." the 
-   format specifier already includes a precision and so we do not need to 
-   modify it. */
-         if( *a != '.' ) {
+/* Go back to the end of the field width. If the next two characters are
+   "." and "*", change the asterisk to the supplied "digs" value. */
+         if( a[ 0 ] == '.' && a[ 1 ] == '*' ) {
 
-/* Otherwise, allocate memory to hold the extended format string (allowing 
+/* Allocate memory to hold the extended format string (allowing 
    20 characters for formatting the digs value - just in case something like
    INT_MAX is supplied by mistake), and store the existing string in it. */
             new = astStore( NULL, result, strlen( result ) + 22 );
 
-/* Put the precision into the new string, following thre field width. */
+/* Put the precision into the new string, following the field width. */
             b = new + ( a - result );
             b += sprintf( b, ".%d", digs );
 
 /* Copy the remainder of the original format string to the new format
    string. */
-            strcpy( b, a );
+            if( a[ 2 ] != 0 ) strcpy( b, a + 2 );
 
 /* Use the new format string in place of the old.*/
             astFree( result );
@@ -1652,7 +1653,6 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
          }
       }
    }
-
 
 /* Return the result. */
    return result;

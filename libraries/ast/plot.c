@@ -190,7 +190,7 @@ c     - Title: The Plot title drawn using astGrid
 f     - Title: The Plot title drawn using AST_GRID
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     DSB: D.S. Berry (Starlink)
@@ -511,10 +511,11 @@ f     - Title: The Plot title drawn using AST_GRID
 *        point numerical values. Fixes a bug reported by Micah Johnson.
 *        - TickMarks re-structured to optimise the precision (no. of digits) 
 *        even if a value has been assigned for the Format attribute, but only 
-*        if the format specifier does include an explicit precision. For 
+*        if the format specifier includes a wildcard precision specifier. For 
 *        instance, to get graphical separators a format must be specified 
 *        which included the "g" flag. As things were, this would prevent 
-*        the optimisation of the digits value.
+*        the optimisation of the digits value. Can now use "dms.*g" to
+*        allow the number of digits to be optimised.
 *class--
 */
 
@@ -23120,7 +23121,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    double used_gap;    /* The gap size actually used */
    int bot_digits;     /* Digits value which makes labels as short as possible */
    int digits;         /* New Digits value */
-   int digset;         /* Did the format string include a precision specifier? */
+   int digset;         /* Did the format string fix the no. of digits to use? */
    int fmtset;         /* Was a format set? */
    int i;              /* Tick index. */
    int nc[ MAXFLD ];   /* Lengths of fields in a label */
@@ -23212,14 +23213,16 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    }
 
 /* If a value has been set for the axis Format, see if the format string 
-   contains a precision specifier (assumed to be a dot followed by a digit). */
-   digset = 0;
+   contains a wildcard precision specifier ".*". If so, we are free to
+   vary the number of digits used in the label in order to produce
+   distinct labels. */
+   digset = 1;
    if( fmtset ) {
       fmt = astGetFormat( frame, axis );
       a = fmt;
       while( (a = strchr( a, '.' )) ){
-         if( isdigit( *(++a) ) ) {
-            digset = 1;
+         if( *(++a) == '*' ) {
+            digset = 0;
             break;
          }
       }
