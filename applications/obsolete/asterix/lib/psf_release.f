@@ -7,7 +7,8 @@
 *
 *    History :
 *
-*      1 Nov 89 : Original (DJA)
+*      1 Nov 1989 : Original (DJA)
+*      9 Jan 1996 : Added call to closure routine if present (DJA)
 *
 *    Type declarations :
 *
@@ -18,7 +19,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :
@@ -39,15 +39,58 @@
         CALL ERR_REP( ' ', 'Invalid slot identifier', STATUS )
       ELSE
 
-*      Mark slot as free
+*    Invoke psf close routine if present
+        IF ( L_MOD_C(P_MODID(SLOT),P_LIBID(SLOT)) .NE. 0 ) THEN
+
+        CALL PSF_REL_EXEC( %VAL(L_MOD_C(P_MODID(SLOT),P_LIBID(SLOT))),
+     :                     SLOT, STATUS )
+
+*    Mark slot as free
         P_USED(SLOT) = .FALSE.
 
-*      Free model data
+*    Free model data
         IF ( P_MODEL(SLOT) .AND. SM_GOTDATA(SLOT) ) THEN
           CALL DYN_UNMAP( SM_FLAG(SLOT), STATUS )
           CALL DYN_UNMAP( SM_DATA(SLOT), STATUS )
         END IF
 
       END IF
+
+      END
+
+
+
+*+  PSF_REL_EXEC - Invoke a psf closure routine
+      SUBROUTINE PSF_REL_EXEC( ROUTINE, SLOT, STATUS )
+*
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*
+*     David J. Allan (BHVAD::DJA)
+*
+*    History :
+*
+*     30 Oct 89 : Original (DJA)
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+*
+*    Import :
+*
+      INTEGER                  SLOT                    ! The PSF to use
+      EXTERNAL                 ROUTINE                 ! The _CLOSE routine
+*
+*    Status :
+*
+      INTEGER                  STATUS
+*-
+
+      CALL ROUTINE( SLOT, STATUS )
 
       END

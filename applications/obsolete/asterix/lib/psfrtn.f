@@ -2897,6 +2897,56 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       END
 
+
+
+*+  PSF_RESPFILE_CLOSE - Delete a psf handle
+      SUBROUTINE PSF_RESPFILE_CLOSE( SLOT, STATUS )
+*
+*    Description :
+*
+*     Gets a user defined PSF and associates it with a PSF slot.
+*
+*    Environment parameters :
+*
+*    Method :
+*    Deficiencies :
+*    Authors :
+*
+*     David J. Allan (ROSAT, University of Birmingham)
+*
+*    History :
+*
+*     10 Jan 96 : Original (DJA)
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PSF_PAR'
+      INCLUDE 'PSF_RESPFILE_CMN'
+*
+*    Import :
+*
+      INTEGER			SLOT			! Psf slot number
+*
+*    Status :
+*
+      INTEGER STATUS
+*-
+
+*  Check status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Release dynamic data
+      CALL DYN_UNMAP( RF_IPTR(SLOT), STATUS )
+      CALL DYN_UNMAP( RF_DPTR(SLOT), STATUS )
+
+      END
+
+
 *+  PSF_RESPFILE_INIT - Response defined PSF initialisation
       SUBROUTINE PSF_RESPFILE_INIT( SLOT, FID, INST, STATUS )
 *
@@ -2930,7 +2980,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_RESPFILE_CMN'
 *
@@ -3026,13 +3075,17 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       RF_DIMS(1,SLOT) = DX
       RF_DIMS(2,SLOT) = DY
 
-*  Map the index
-      CALL CMP_MAPV( SLOC, 'INDEX', '_INTEGER', 'READ',
-     :               RF_IPTR(SLOT), NELM, STATUS )
+*  Load index into memory
+      CALL CMP_SIZE( SLOC, 'INDEX', NELM, STATUS )
+      CALL DYN_MAPI( 1, NELM, RF_IPTR(SLOT), STATUS )
+      CALL CMP_GETVI( SLOC, 'INDEX', NELM, %VAL(RF_IPTR(SLOT)),
+     :                NELM, STATUS )
 
-*  Map the data
-      CALL CMP_MAPV( SLOC, 'DATA_ARRAY', '_REAL', 'READ',
-     :               RF_DPTR(SLOT), NELM, STATUS )
+*  Load the response into memory
+      CALL CMP_SIZE( SLOC, 'DATA_ARRAY', NELM, STATUS )
+      CALL DYN_MAPR( 1, NELM, RF_DPTR(SLOT), STATUS )
+      CALL CMP_GETVI( SLOC, 'DATA_ARRAY', NELM, %VAL(RF_DPTR(SLOT)),
+     :                NELM, STATUS )
 
 *  Is it compressed?
       CALL CMP_GET0L( SLOC, 'COMPRESSED', RF_PIXCENT(SLOT), STATUS )
@@ -3509,21 +3562,21 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       LOGICAL                 VALID             ! Have we a valid dataset?
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Get user's choice of table
+*  Get user's choice of table
       CALL USI_PROMT( 'MASK', 'Name of a 2D dataset containing psf',
      :                                                      STATUS )
       CALL USI_GET0C( 'MASK', TNAME, STATUS )
       CALL USI_CANCL( 'MASK', STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Try to open file
+*  Try to open file
       CALL ADI_FOPEN( TNAME(:CHR_LEN(TNAME)), 'BinDS', 'READ', TFID,
      :                STATUS )
 
-*    Check the data
+*  Check the data
       CALL BDI_CHK( TFID, 'Data', VALID, STATUS )
       CALL BDI_GETSHP( TFID, 2, DIMS, NDIM, STATUS )
       IF ( VALID ) THEN
@@ -3533,10 +3586,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
           STATUS = SAI__ERROR
         END IF
 
-*      Map if ok
+*    Map if ok
         CALL BDI_MAPR( TFID, 'Data', 'READ', DPTR, STATUS )
 
-*      Get axis units
+*    Get axis units
         CALL BDI_AXGET0C( TFID, 1, 'Units', UNITS, STATUS )
         CALL CONV_UNIT2R( UNITS, TB_TOR(SLOT), STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
