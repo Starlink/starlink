@@ -357,7 +357,9 @@
                   ROTAX( ADIM ) = ABS( AXROT ) .GT. VAL__EPSR
                ELSE
 
-*  Write the header card.
+*  Write the header card, replacing any non-printing characters
+*  with blanks (yes people do this).
+                  CALL CHR_CLEAN( FITSTR )
                   CALL RTD1_WRCRD( FITSTR, IPHEAD, NHEAD, AVAIL, 
      :                             STATUS )
                END IF
