@@ -215,6 +215,7 @@
       INTEGER			FSTAT			! FITSIO status
       INTEGER			IKEY			! Loop over keys
       INTEGER			IVALUE			! Keyword value
+      INTEGER			KCID			! Keyword container
       INTEGER			KID			! Keyword object
       INTEGER			LUN			! Logical unit number
       INTEGER			NKEY			! # of keywords
@@ -229,10 +230,13 @@
 *  Extract logical unit
       CALL ADI2_GETLUN( FID, LUN, STATUS )
 
+*  Locate keyword container
+      CALL ADI_FIND( HID, 'Keys', KCID, STATUS )
+
 *  Get number of keywords
-      CALL ADI_NCMP( HID, NKEY, STATUS )
+      CALL ADI_NCMP( KCID, NKEY, STATUS )
       DO IKEY = 1, NKEY
-        CALL ADI_INDCMP( HID, IKEY, KID, STATUS )
+        CALL ADI_INDCMP( KCID, IKEY, KID, STATUS )
         CALL ADI_THERE( KID, '.COMMITTED', COMIT, STATUS )
         IF ( .NOT. COMIT ) THEN
           CALL ADI_NAME( KID, KEY, STATUS )
@@ -267,6 +271,9 @@
         END IF
         CALL ADI_ERASE( KID, STATUS )
       END DO
+
+*  Free keyword contrainer
+      CALL ADI_ERASE( KCID, STATUS )
 
 *  Report any errors
  99   IF ( STATUS .NE. SAI__OK ) THEN
