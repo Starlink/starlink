@@ -30,9 +30,10 @@
 *     Richard Saxton
 *    History :
 *
-*      5 May 88 : V1.0-2  Original (LTVAD::RDS)
-*     28 Feb 94 : V1.7-0  Quality handling updated (DJA)
+*      5 May 88 : V1.0-2 Original (LTVAD::RDS)
+*     28 Feb 94 : V1.7-0 Quality handling updated (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     13 Apr 95 : V1.8-1 New data interfaces (DJA)
 *
 *    Type Definitions :
 *
@@ -41,7 +42,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Status :
@@ -61,10 +61,6 @@
 *
 *    Local variables :
 *
-      CHARACTER*25 VERSION                      !Version of the software
-      CHARACTER*(DAT__SZLOC) LOC_IN             !Locator to the input datafile
-      CHARACTER*(DAT__SZLOC) LOC_OUT            !Locator to the output datafile
-
       INTEGER NDIM                              !Number of dims. of the data
       INTEGER DIM(MAXDIM)                       !Dimensions of the input data
       INTEGER TDIM(MAXDIM)                      !Dimensions of the temp arrays
@@ -113,65 +109,72 @@
       INTEGER FIXTOT                            !Total no of interpolated pnts.
       LOGICAL LAX                               !Is axis info present
       LOGICAL LREG                              !Is axis regularly spaced
-      INTEGER NFAIL                             !Number of failures in SPLREC
-      LOGICAL OVER                              !Overwrite input file ?
-      LOGICAL INPRIM                            !Is input primitive ?
+
       CHARACTER*80 PATH(5)                      !Input data path
       CHARACTER*6 TOTCHAR                       !No pixels replaced (char form)
       CHARACTER*2 CLP                           !Loop number as a character
-      INTEGER NCHAR
-      INTEGER NLINES                            !No of lines of text
-      INTEGER IDUM
 
-      BYTE MASKOUT                              !The output quality mask
+      INTEGER			IFID			! I/p dataset id
+      INTEGER 			IDUM
+      INTEGER 			NCHAR
+      INTEGER 			NFAIL                   ! # failures in SPLREC
+      INTEGER 			NLINES                  ! No of lines of text
+      INTEGER			OFID			! O/p dataset id
+
+      LOGICAL 			OVER                    ! Overwrite input file?
+
+      BYTE 			MASKOUT                 ! O/p quality mask
+
+*  Version:
+      CHARACTER*30		VERSION
+	PARAMETER		( VERSION = 'INTERP Version 1.8-1' )
 *-
 
-*    Check status :
-      IF (STATUS .NE. SAI__OK) RETURN
-*
-      VERSION='INTERP Version 1.8-0'
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Announce version
       CALL MSG_PRNT( VERSION )
-*
-* Initialise the Asterix common blocks.
+
+*  Initialise the Asterix common blocks.
       CALL AST_INIT
-*
-* Set data dimensions to one.
-*
-      DO LP=1,4
-         DIM(LP)=1
-         TDIM(LP)=1
-      ENDDO
-*
-* Ask for input and output filename
-*   Should the input file be overwritten ?
+
+*  Set data dimensions to one.
+      DO LP = 1, 4
+        DIM(LP) = 1
+        TDIM(LP) = 1
+      END DO
+
+*  Ask for input and output filename
+*  Should the input file be overwritten ?
       CALL USI_GET0L('OVER',OVER,STATUS)
 *
       IF (OVER) THEN
 *
-         CALL USI_ASSOCI('INP','UPDATE',LOC_IN,INPRIM,STATUS)
+         CALL USI_TASSOCI('INP','*','UPDATE',ILOC,STATUS)
 *
 *   Clone an output locator
-         CALL DAT_CLONE(LOC_IN,LOC_OUT,STATUS)
+         CALL ADI_CLONE( IFID, OFID, STATUS )
 *
       ELSE
 *
-         CALL USI_ASSOC2('INP','OUT','READ',LOC_IN,LOC_OUT,
-     :                                                INPRIM,STATUS)
+         CALL USI_TASSOC2('INP','OUT','READ',IFID, OFID, STATUS )
+
 *   Copy all components from old file into new file
-         CALL HDX_COPY(LOC_IN,LOC_OUT,STATUS)
+         CALL ADI_FCOPY(IFID,OFID,STATUS)
 *
       ENDIF
 *
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 *
 * Trace path of input data.
       CALL USI_NAMEI(NLINES,PATH,STATUS)
 *
 * Check components in this file and get dimensions
 *
-      CALL BDA_CHKDATA(LOC_OUT,LDARRAY,NDIM,DIM,STATUS)
-      CALL BDA_CHKQUAL(LOC_OUT,LDQUAL,NQDIM,QDIM,STATUS)
-      CALL BDA_CHKVAR (LOC_OUT,LDVAR,NVDIM,VDIM,STATUS)
+      CALL BDI_CHKDATA(OFID,LDARRAY,NDIM,DIM,STATUS)
+      CALL BDI_CHKQUAL(OFID,LDQUAL,NQDIM,QDIM,STATUS)
+      CALL BDI_CHKVAR (OFID,LDVAR,NVDIM,VDIM,STATUS)
 *
       IF (.NOT.LDARRAY) THEN
           STATUS=SAI__ERROR
@@ -189,25 +192,25 @@
      :                     ' it will have to be binned up *',STATUS)
       ENDIF
 *
-      IF (STATUS.NE.SAI__OK) GOTO 999
+      IF (STATUS.NE.SAI__OK) GOTO 99
 *
 *  Go thru each axis in turn.
       DO LP=1,NDIM
 *
-         CALL BDA_CHKAXVAL(LOC_OUT,LP,LAX,LREG,DIM(LP),STATUS)
+         CALL BDI_CHKAXVAL(OFID,LP,LAX,LREG,DIM(LP),STATUS)
 *
 * If axis info present
          IF (LAX) THEN
 *
 *  Map the axis array
-           CALL BDA_MAPAXVAL(LOC_OUT,'READ',LP,AXPNTR(LP),STATUS)
+           CALL BDI_MAPAXVAL(OFID,'READ',LP,AXPNTR(LP),STATUS)
 *
 *  Get label
-           CALL BDA_GETAXLABEL(LOC_OUT,LP,LABEL(LP),STATUS)
+           CALL BDI_GETAXLABEL(OFID,LP,LABEL(LP),STATUS)
 *
            IF (STATUS .NE. SAI__OK) THEN
               CALL MSG_PRNT('Error getting axis values')
-              GOTO 999
+              GOTO 99
            ENDIF
 *
 *  Calculate MAX and MIN axis values
@@ -234,73 +237,62 @@
 *
       ENDDO
 *
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 *
 * Set mins and maxs to 1
       DO LP=1,4
          AMIN(LP)=1
          AMAX(LP)=1
       ENDDO
-*
-* Ask the user which ranges are required.
-*
-      CALL USI_RANGES ( NDIM,LABEL,START,STOP,WIDTH,APP_DIM,
+
+*  Ask the user which ranges are required.
+      CALL USI_RANGES( NDIM,LABEL,START,STOP,WIDTH,APP_DIM,
      :                            AMIN,AMAX,STATUS )
-*
-      IF (STATUS .NE. SAI__OK) GOTO 999
-*
+      IF (STATUS .NE. SAI__OK) GOTO 99
+
 *  Want to create a temporary array containing the subset of the data array
-* given by the user limits AMIN and AMAX.
+*  given by the user limits AMIN and AMAX.
 *  Order this array so that the axis being fitted APP_DIM comes first,
-* for efficiency.
-*
+*  for efficiency.
       ORDER(1)=APP_DIM
-*
       COUNT=2
-*
       DO LP=1,4
-*
          IF (LP .NE. APP_DIM) THEN
              ORDER(COUNT)=LP
              COUNT=COUNT+1
-         ENDIF
-*
-      ENDDO
-*
-* Find the dimensions of this new array. Dimensions between NDIM and 4 will
+         END IF
+      END DO
+
+*  Find the dimensions of this new array. Dimensions between NDIM and 4 will
 *  have been set to 1 at the start of this code.
-*
       DO LP=1,NDIM
          TDIM(LP)=AMAX(ORDER(LP)) - AMIN(ORDER(LP)) + 1
       ENDDO
-*
-* Create temporary data,variance,quality arrays to hold the data subset
-*
+
+*  Create temporary data,variance,quality arrays to hold the data subset
       CALL DYN_MAPR(4,TDIM,TDATA_PNTR,STATUS)
       CALL DYN_MAPB(4,TDIM,TQUAL_PNTR,STATUS)
       IF (LDVAR) CALL DYN_MAPR(4,TDIM,TVAR_PNTR,STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error creating temporary space')
-         GOTO 999
+         GOTO 99
       ENDIF
-*
-* Map the input data,variance,quality arrays
-*
-      CALL BDA_MAPDATA(LOC_OUT,'UPDATE',D_PNTR,STATUS)
-      CALL BDA_MAPQUAL(LOC_OUT,'UPDATE',Q_PNTR,STATUS)
-      IF (LDVAR) CALL BDA_MAPVAR(LOC_OUT,'UPDATE',V_PNTR,STATUS)
-*
+
+*  Map the input data,variance,quality arrays
+      CALL BDI_MAPDATA(OFID,'UPDATE',D_PNTR,STATUS)
+      CALL BDI_MAPQUAL(OFID,'UPDATE',Q_PNTR,STATUS)
+      IF (LDVAR) CALL BDI_MAPVAR(OFID,'UPDATE',V_PNTR,STATUS)
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error mapping input arrays')
-         GOTO 999
+         GOTO 99
       ENDIF
 
-*    Get the BADBITS mask
-      CALL BDA_GETMASK(LOC_OUT,BADBITS,STATUS)
+*  Get the BADBITS mask
+      CALL BDI_GETMASK(OFID,BADBITS,STATUS)
 
-*    If badbits mask not found set to QUAL__MASK
-      IF (STATUS .NE. SAI__OK) THEN
+*  If badbits mask not found set to QUAL__MASK
+      IF ( STATUS .NE. SAI__OK ) THEN
         BADBITS = QUAL__MASK
         CALL ERR_ANNUL( STATUS )
       ENDIF
@@ -311,7 +303,7 @@
            STATUS=SAI__ERROR
            CALL ERR_REP(' ',
      :      'Quality and data arrays have different dimensions',STATUS)
-           GOTO 999
+           GOTO 99
          ENDIF
       ENDDO
 
@@ -331,52 +323,44 @@
      :                                                %VAL(TVAR_PNTR) )
 *
       ENDIF
-*
-* Create temp arrays to hold an array of "good" and "bad" X and Y values
+
+*  Create temp arrays to hold an array of "good" and "bad" X and Y values
 *  where "X" stands for the dimension being fitted i.e. APP_DIM, and
 *  "Y" means the counts in that array element.
-*
       CALL DYN_MAPR(1,TDIM(1),GOODX_PNTR,STATUS)
       CALL DYN_MAPR(1,TDIM(1),GOODY_PNTR,STATUS)
       CALL DYN_MAPR(1,TDIM(1),BADX_PNTR,STATUS)
       CALL DYN_MAPR(1,TDIM(1),BADY_PNTR,STATUS)
-*
-* Also create arrays to hold the integer bin positions of the good and bad
+
+*  Also create arrays to hold the integer bin positions of the good and bad
 *  pixels.
       CALL DYN_MAPI(1,TDIM(1),GOODBIN_PNTR,STATUS)
       CALL DYN_MAPI(1,TDIM(1),BADBIN_PNTR,STATUS)
-*
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error creating temporary space')
-         GOTO 999
+         GOTO 99
       ENDIF
-*
-* Ask user for the distance in bins between the knots in the spline.
+
+*  Ask user for the distance in bins between the knots in the spline.
 *  Must be greater than four.
-*
       JUMPOUT=.FALSE.
-*
       DO WHILE ( .NOT. JUMPOUT)
-*
-         CALL USI_GET0I('KWIDTH',KWIDTH,STATUS)
-*
-         IF (KWIDTH.GT.4) THEN
-             JUMPOUT=.TRUE.
-         ELSE
-             CALL MSG_OUT(' ','Width must be greater than 4 bins',
+        CALL USI_GET0I('KWIDTH',KWIDTH,STATUS)
+        IF (KWIDTH.GT.4) THEN
+          JUMPOUT=.TRUE.
+        ELSE
+          CALL MSG_OUT(' ','Width must be greater than 4 bins',
      :                                   STATUS)
-             CALL USI_CANCL('KWIDTH',STATUS)
-         ENDIF
-*
-      ENDDO
-*
+          CALL USI_CANCL('KWIDTH',STATUS)
+        END IF
+      END DO
       RWIDTH=REAL(KWIDTH)*WIDTH(ORDER(1))
 
 *    Create a temporary mapped area for the weights on each good point
       CALL DYN_MAPD(1,TDIM(1),WEIGHT_PNTR,STATUS)
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error creating temporary space')
-         GOTO 999
+         GOTO 99
       ENDIF
 
 *    If there is no variance array then do an unweighted fit i.e. set weights
@@ -396,7 +380,7 @@
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error creating temporary space')
-         GOTO 999
+         GOTO 99
       ENDIF
 *
       FIXTOT=0
@@ -442,14 +426,14 @@
      :                  %VAL(WORK_PNTR),RWIDTH,N7,KNOT,COEFF,SS,STATUS)
 *
 * Check status returned by NAG routine
-              IF (STATUS .NE. SAI__OK) GOTO 999
+              IF (STATUS .NE. SAI__OK) GOTO 99
 *
 * Use the spline coefficients to interpolate the BAD points.
 *
               CALL MATH_SPLREC(NBAD,%VAL(BADX_PNTR),N7,KNOT,COEFF,
      :                                  %VAL(BADY_PNTR),NFAIL,STATUS)
 *
-              IF (STATUS .NE. SAI__OK) GOTO 999
+              IF (STATUS .NE. SAI__OK) GOTO 99
 *
 * Bad points at the edge of a slice get set to zero by MATH_SPLREC
 *  Set these to the closest 'good' value.
@@ -481,9 +465,9 @@
         ENDDO
 *
       ENDDO
-*
-* Write the temporary arrays back into the relevant slice of the original
-*  arays.
+
+*  Write the temporary arrays back into the relevant slice of the original
+*  arrays.
       CALL DTA_WRITESLICER (TDIM(1),TDIM(2),TDIM(3),TDIM(4),
      :              %VAL(TDATA_PNTR),AMIN,AMAX,ORDER,DIM(1),
      :                      DIM(2),DIM(3),DIM(4),%VAL(D_PNTR))
@@ -497,27 +481,26 @@
      :                 %VAL(TVAR_PNTR),AMIN,AMAX,ORDER,DIM(1),
      :                       DIM(2),DIM(3),DIM(4),%VAL(V_PNTR))
       ENDIF
-*
-*    Change the badbits value so that the PATCHED bit is zero (ie. patched
-*    points will be treated as good). We do this by ANDing the existing mask
-*    with the inverse of the PATCH bit pattern.
+
+*  Change the badbits value so that the PATCHED bit is zero (ie. patched
+*  points will be treated as good). We do this by ANDing the existing mask
+*  with the inverse of the PATCH bit pattern.
       MASKOUT = BIT_ANDUB(BADBITS,BIT_NOTUB(QUAL__PATCHED))
-*
-      CALL BDA_PUTMASK(LOC_OUT, MASKOUT, STATUS)
+      CALL BDI_PUTMASK( OFID, MASKOUT, STATUS )
 
-*    Update history record
-      CALL HIST_ADD(LOC_OUT,VERSION,STATUS)
+*  Update history record
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
-*    Add action record
-      CALL CHR_ITOC (FIXTOT,TOTCHAR,NCHAR)
-      PATH(NLINES+1)=TOTCHAR//' bad quality pixels replaced'
-      CALL HIST_PTXT(LOC_OUT,NLINES+1,PATH,STATUS)
+*  Add action record
+      CALL CHR_ITOC( FIXTOT, TOTCHAR, NCHAR )
+      PATH(NLINES+1) = TOTCHAR//' bad quality pixels replaced'
+      CALL HSI_PTXT(OFID,NLINES+1,PATH,STATUS)
 
       CALL MSG_SETI( 'NFIX', FIXTOT )
       CALL MSG_PRNT( '^NFIX points have been replaced' )
 
 *    Unmap and annul all locators
- 999  CALL AST_CLOSE()
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
@@ -557,8 +540,9 @@
       AVGE = TOTAL / REAL(NPTS)
 *
       END
-*
-*+INTERP_EDGE     Updates data array with interpolated values.
+
+
+*+  INTERP_EDGE - Updates data array with interpolated values.
       SUBROUTINE INTERP_EDGE(NBAD,BADX,NGOOD,GOODX,GOODY,BADY)
 * Description :
 *     This sets BAD points which are outside the range of points used
