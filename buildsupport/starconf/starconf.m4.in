@@ -255,7 +255,7 @@ AC_DEFUN([STAR_MESSGEN],
 # ---------------------------
 #
 # Tests if the Fortran compiler supports the READONLY option on the
-# OPEN command.
+# OPEN command.  If it does, it defines HAVE_FC_OPEN_READONLY to 1.
 AC_DEFUN([STAR_HAVE_FC_OPEN_READONLY],
          [AC_REQUIRE([AC_PROG_FC])dnl
           AC_CACHE_CHECK([whether OPEN has the READONLY specifier],
@@ -544,7 +544,7 @@ AC_DEFUN([STAR_DOC_FILES],
 # ---------------------------------------------------
 #
 # Declare dependencies of this component.  The TYPE is one of
-# `sourceset', `build', `link' or `use', and the DEPLIST is a space
+# `sourceset', `build', `link', `use' or `test', and the DEPLIST is a space
 # separated list of component names, which this component depends on in
 # the given way.
 #
@@ -577,7 +577,16 @@ AC_DEFUN([STAR_DOC_FILES],
 # component to be used by something else, after it has been built and
 # installed.  For example a library which called another application
 # as part of its functionality would have only a use dependency on the
-# component which contained that application.
+# component which contained that application.  If no use dependencies
+# are declared, we take the use dependencies to be the same as the
+# link dependencies.
+#
+# -- Test dependencies are those which are required in order to run
+# any regression tests which come with the component.  It's generally
+# a good idea to avoid making this a larger set than the use
+# dependencies, but sometimes this is unavoidable.  If no test
+# dependencies are declared, we take the test dependencies to be the
+# same as the use dependencies.
 #
 # The point of this is that different dependencies are required at
 # different times.  The set of dependencies in the master makefile is
@@ -608,10 +617,10 @@ AC_DEFUN([STAR_DOC_FILES],
 AC_DEFUN([STAR_DECLARE_DEPENDENCIES],
          [m4_ifval([$1], [], [AC_FATAL([$0: no type given])])dnl
           m4_if(m4_bregexp([$1], 
-                           [^\(sourceset\|build\|link\|use\)$]),
+                           [^\(sourceset\|build\|link\|use\|test\)$]),
                 [0],
                 [],
-                [AC_FATAL([$0: unrecognised type $1])])dnl
+                [AC_FATAL([$0: unrecognised dependency type: $1])])dnl
           m4_ifval([$2], [], [AC_FATAL([$0: no deplist given])])dnl
           for _star_tmp in $2
           do

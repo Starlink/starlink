@@ -96,11 +96,12 @@
      elements within <dependencies>.
 
 -->
-<!ELEMENT dependencies  (sourceset | build | link | use)*>
+<!ELEMENT dependencies  (sourceset | build | link | use | test)*>
 <!ELEMENT sourceset     (#PCDATA)>
 <!ELEMENT build         (#PCDATA)>
 <!ELEMENT link          (#PCDATA)>
 <!ELEMENT use           (#PCDATA)>
+<!ELEMENT test          (#PCDATA)>
 <!ATTLIST sourceset     option CDATA #IMPLIED>
 <!ATTLIST build         option CDATA #IMPLIED>
 <!ATTLIST link          option CDATA #IMPLIED>
