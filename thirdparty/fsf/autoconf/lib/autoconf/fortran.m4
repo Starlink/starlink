@@ -49,6 +49,37 @@
 # Franc,ois Pinard, Karl Berry, Richard Pixley, Ian Lance Taylor,
 # Roland McGrath, Noah Friedman, david d zuhn, and many others.
 
+#
+#
+# Hacked at by Norman Gray, to add fpp support, adapting the autoconf
+# patches submitted to autoconf-patches@gnu.org by Martin Wilck (see
+# <http://sources.redhat.com/ml/autoconf-patches/2000-07/msg00287.html>
+# and the following thread).
+#
+# The modifications are as follows:
+#
+# - Change define to m4_define, to match newer (post 2.50) versions of autoconf
+# - Change .F to .fpp (on case-insensitive filesystems such as HFS+,
+#   file.f and file.F are the same file)
+# - Added second, optional, FPP-SRC-EXT parameter to AC_PROG_FPP, to set the
+#   extension expected, in case you (persistent!) want to use .F
+#   instead of .fpp
+# - Slight changes to tests, following comments by Akim Demaille
+#   on the mailing list (including Martin's cunning
+#   _AC_SHELL_POSITIONAL).
+# - renamed $ac_gnu_compiler to $ac_compiler_gnu
+# - Added _AC_LANG_ABBREV(Preprocessed Fortran), and a few other
+#   functions which match the support apparatus seems to want
+# - Added AC_LANG_PREPROC and AC_LANG_COMPILER
+# - Added AC_REQUIRE of _AC_PROG_FC_CPP to _AC_PROG_FPP
+# - In test of how to run the preprocessor alone, check that our tests
+#   don't produce a a.out file -- if they do, that counts as a
+#   failure, even with a zero exit status
+# - Removed _AC_ECHO calls -- were always internal, now disappeared
+# - Changed old >&AC_FD_LOG to >&AS_MESSAGE_LOG_FD
+# - Based on "Fortran" language, rather than "Fortran 77"
+
+
 # Fortran vs. Fortran 77:
 #   This file contains macros for both "Fortran 77" and "Fortran", where
 # the former is the "classic" autoconf Fortran interface and is intended
@@ -155,6 +186,23 @@ ac_link='$FC -o conftest$ac_exeext $FCFLAGS $LDFLAGS $FCFLAGS_SRCEXT conftest.$a
 ac_compiler_gnu=$ac_cv_fc_compiler_gnu
 ])
 
+# AC_LANG(Preprocessed Fortran)
+# --------------------------------
+# We need a separate `preprocessed' language, because not all Fortran 
+# compilers have a preprocessor built in.  Therefore we may need to
+# resort to an `indirect' compilation, .fpp->.f->.o, including the
+# generation of a suitable extra build rule.  The language extension
+# is set in macro AC_PROG_FPP, to $FPP_SRC_EXT.
+m4_define([AC_LANG(Preprocessed Fortran)],
+[ac_ext=$FPP_SRC_EXT
+# We need to use variables because compilation depends on whether 
+# $F77 supports direct compilation of source with cpp directives
+ac_compile=$ac_fpp_compile
+ac_link=$ac_fpp_link
+ac_compiler_gnu=$ac_cv_fc_compiler_gnu
+])
+
+
 # AC_LANG_FORTRAN77
 # -----------------
 AU_DEFUN([AC_LANG_FORTRAN77], [AC_LANG(Fortran 77)])
@@ -162,11 +210,13 @@ AU_DEFUN([AC_LANG_FORTRAN77], [AC_LANG(Fortran 77)])
 
 # _AC_FORTRAN_ASSERT
 # ------------------
-# Current language must be Fortran or Fortran 77.
+# Current language must be Fortran, Fortran 77, or preprocessed Fortran.
+# FIXME: is there any reason why this can't be AC_LANG_CASE?
 m4_defun([_AC_FORTRAN_ASSERT],
 [m4_if(_AC_LANG, [Fortran], [],
        [m4_if(_AC_LANG, [Fortran 77], [],
-              [m4_fatal([$0: current language is not Fortran: ] _AC_LANG)])])])
+              [m4_if(_AC_LANG, [Preprocessed Fortran], []
+                     [m4_fatal([$0: current language is not Fortran: ] _AC_LANG)])])])])
 
 
 # _AC_LANG_ABBREV(Fortran 77)
@@ -177,6 +227,10 @@ m4_define([_AC_LANG_ABBREV(Fortran 77)], [f77])
 # ------------------------
 m4_define([_AC_LANG_ABBREV(Fortran)], [fc])
 
+# _AC_LANG_ABBREV(Preprocessed Fortran)
+# -------------------------------------
+m4_define([_AC_LANG_ABBREV(Preprocessed Fortran)], [fpp])
+
 
 # _AC_LANG_PREFIX(Fortran 77)
 # ---------------------------
@@ -186,14 +240,19 @@ m4_define([_AC_LANG_PREFIX(Fortran 77)], [F])
 # ------------------------
 m4_define([_AC_LANG_PREFIX(Fortran)], [FC])
 
+# _AC_LANG_PREFIX(Preprocessed Fortran)
+# -------------------------------------
+m4_define([_AC_LANG_PREFIX(Preprocessed Fortran)], [FPP])
+
 
 # _AC_FC
 # ------
-# Return F77 or FC, depending upon the language.
+# Return F77, FC or PPFC, depending upon the language.
 AC_DEFUN([_AC_FC],
 [_AC_FORTRAN_ASSERT()dnl
-AC_LANG_CASE([Fortran 77], [F77],
-             [Fortran],    [FC])])
+AC_LANG_CASE([Fortran 77],           [F77],
+             [Fortran],              [FC],
+             [Preprocessed Fortran], [PPFC])])
 
 
 ## ---------------------- ##
@@ -214,6 +273,8 @@ AC_LANG_CASE([Fortran 77], [F77],
 m4_define([AC_LANG_SOURCE(Fortran 77)],
 [$1])
 m4_define([AC_LANG_SOURCE(Fortran)],
+[$1])
+m4_define([AC_LANG_SOURCE(Preprocessed Fortran)],
 [$1])
 
 
@@ -239,9 +300,20 @@ $2
       end])
 
 
+# AC_LANG_PROGRAM(Preprocessed Fortran)([PROLOGUE], [BODY])
+# ---------------------------------------------------------
+# FIXME: can the PROLOGUE be used?
+m4_define([AC_LANG_PROGRAM(Preprocessed Fortran)],
+[$1
+      program main
+$2
+      end])
+
+
 # AC_LANG_CALL(Fortran 77)(PROLOGUE, FUNCTION)
 # --------------------------------------------
 # FIXME: This is a guess, help!
+# FIXME: ...but it's a good guesss -- what's the problem?
 m4_define([AC_LANG_CALL(Fortran 77)],
 [AC_LANG_PROGRAM([$1],
 [      call $2])])
@@ -251,6 +323,14 @@ m4_define([AC_LANG_CALL(Fortran 77)],
 # --------------------------------------------
 # FIXME: This is a guess, help!
 m4_define([AC_LANG_CALL(Fortran)],
+[AC_LANG_PROGRAM([$1],
+[      call $2])])
+
+
+# AC_LANG_CALL(Preprocessed Fortran)(PROLOGUE, FUNCTION)
+# ------------------------------------------------------
+# FIXME: This is a guess, help!
+m4_define([AC_LANG_CALL(Preprocessed Fortran)],
 [AC_LANG_PROGRAM([$1],
 [      call $2])])
 
@@ -280,6 +360,12 @@ AC_DEFUN([AC_LANG_PREPROC(Fortran)],
 [m4_warn([syntax],
          [$0: No preprocessor defined for ]_AC_LANG)])
 
+# AC_LANG_PREPROC(Preprocessed Fortran)
+# -------------------------------------
+# Find the Fortran preprocessor.  Must be AC_DEFUN'd to be AC_REQUIRE'able.
+AC_DEFUN([AC_LANG_PREPROC(Preprocessed Fortran)],
+[AC_REQUIRE([AC_PROG_FPP])])
+
 
 # AC_LANG_COMPILER(Fortran 77)
 # ----------------------------
@@ -289,10 +375,17 @@ AC_DEFUN([AC_LANG_COMPILER(Fortran 77)],
 [AC_REQUIRE([AC_PROG_F77])])
 
 # AC_LANG_COMPILER(Fortran)
-# ----------------------------
+# -------------------------
 # Find the Fortran compiler.  Must be AC_DEFUN'd to be
 # AC_REQUIRE'able.
 AC_DEFUN([AC_LANG_COMPILER(Fortran)],
+[AC_REQUIRE([AC_PROG_FC])])
+
+# AC_LANG_COMPILER(Preprocessed Fortran)
+# --------------------------------------
+# Find the Fortran compiler.  Must be AC_DEFUN'd to be
+# AC_REQUIRE'able.
+AC_DEFUN([AC_LANG_COMPILER(Preprocessed Fortran)],
 [AC_REQUIRE([AC_PROG_FC])])
 
 
@@ -399,7 +492,8 @@ AC_LANG_POP(Fortran 77)dnl
 # COMPILERS is a space separated list of Fortran 77 compilers to search
 # for, and [DIALECT] is an optional dialect.  See also _AC_PROG_FC.
 AC_DEFUN([AC_PROG_FC],
-[AC_LANG_PUSH(Fortran)dnl
+[# AC_BEFORE([$0], [AC_PROG_FPP])dnl
+AC_LANG_PUSH(Fortran)dnl
 AC_ARG_VAR([FC],    [Fortran compiler command])dnl
 AC_ARG_VAR([FCFLAGS], [Fortran compiler flags])dnl
 _AC_ARG_VAR_LDFLAGS()dnl
@@ -1209,3 +1303,736 @@ else
   $1
 fi
 ])# AC_FC_FREEFORM
+
+
+# -------------------------------------- #
+# Feature tests for Preprocessed Fortran #
+# -------------------------------------- #
+# fpptests
+
+
+# ------------------------------------------#
+# Some test programs for different features #
+# ------------------------------------------#
+
+# _AC_LANG_PROGRAM_FPP_SIMPLE
+# ---------------------------
+# The minimum test program - any compiler supporting
+# preprocessing should handle this
+AC_DEFUN([_AC_LANG_PROGRAM_FPP_SIMPLE],
+         [AC_LANG_PROGRAM([@%:@define OK], [dnl
+#ifndef OK
+      syntax error
+#endif
+])])#_AC_LANG_PROGRAM_FPP_SIMPLE
+
+
+# _AC_LANG_PROGRAM_FPP_ONLY
+# ---------------------------
+# Test program for pure preprocessing
+AC_DEFUN([_AC_LANG_PROGRAM_FPP_ONLY],
+         [AC_LANG_PROGRAM([@%:@define OK], [dnl
+#ifdef OK
+      REAL A
+#else
+      syntax error
+#endif
+])])#_AC_LANG_PROGRAM_FPP_ONLY
+
+
+# _AC_LANG_PROGRAM_FPP_D
+# ---------------------------
+# Like _AC_LANG_PROGRAM_FPP_SIMPLE, but OK is passed via -D switch
+AC_DEFUN([_AC_LANG_PROGRAM_FPP_D],
+[AC_LANG_PROGRAM([],[
+#ifndef OK
+      syntax error
+#endif
+])])#_AC_LANG_PROGRAM_FPP_D
+
+
+# _AC_LANG_PROGRAM_FPP_I
+# ---------------------------
+# Test for #include statement
+# If unsupported, this should give a type error
+AC_DEFUN([_AC_LANG_PROGRAM_FPP_I],
+[AC_LANG_PROGRAM([],[
+      IMPLICIT CHARACTER (c)
+c conftest.inc contains the Fortran statement "REAL cc"
+#include "conftest.inc"
+      cc=1.
+])])#_AC_LANG_PROGRAM_FPP_I
+
+
+# _AC_LANG_PROGRAM_FPP_SUBS
+# ---------------------------
+# Test whether cpp symbols are expanded in Fortran code lines
+# If not, this should give a type error
+AC_DEFUN([_AC_LANG_PROGRAM_FPP_SUBS],
+[AC_LANG_PROGRAM([
+#define NM xxxx
+], [      IMPLICIT CHARACTER (n)
+      REAL xxxx
+      NM=1.
+])])#_AC_LANG_PROGRAM_FPP_SUBS
+
+
+# _AC_LANG_PROGRAM_FPP_WRAP
+# ---------------------------
+# Test whether preprocessor breaks lines that become too long due
+# to macro substitution. 
+# If not, this gives an "unterminated character constant" error
+AC_DEFUN([_AC_LANG_PROGRAM_FPP_WRAP],
+[AC_LANG_PROGRAM([
+#define LONG '901234567890123456789012345678901234567890123456789012345678901234567890'
+],[      CHARACTER*80 A
+      A=LONG
+])])#_AC_LANG_PROGRAM_FPP_WRAP
+
+
+# _AC_LANG_PROGRAM_FPP_CSTYLE
+# ---------------------------
+# Test program for C style comments
+AC_DEFUN([_AC_LANG_PROGRAM_FPP_CSTYLE],
+[AC_LANG_PROGRAM([],[
+      A=1. /* C-style comment */
+])])#_AC_LANG_PROGRAM_FPP_CSTYLE
+
+
+# ----------------#
+# Internal macros #
+# ----------------#
+
+
+# _AC_PROG_FPP_FEATURES ([feature list])
+# --------------------------------------
+# Parse the feature list from configure.in
+AC_DEFUN([_AC_PROG_FPP_FEATURES],
+[# defaults for needed features
+ac_fpp_need_d=yes
+ac_fpp_need_i=yes
+ac_fpp_need_subs=yes
+ac_fpp_need_wrap=no
+ac_fpp_need_cstyle=no
+ac_fpp_need_CSTYLE=no
+for _t in $1 nil
+do
+    case $_t in
+        d*)    ac_fpp_need_d=yes    ;;
+        nod*)  ac_fpp_need_d=no     ;;
+        i*)    ac_fpp_need_i=yes    ;;   
+        noi*)  ac_fpp_need_i=no     ;;
+        s*)    ac_fpp_need_subs=yes    ;;   
+        nos*)  ac_fpp_need_subs=no     ;;
+        w*)    ac_fpp_need_wrap=yes   ;;   
+        now*)  ac_fpp_need_wrap=no    ;;   
+        c*)    ac_fpp_need_cstyle=yes ;;   
+        noc*)  ac_fpp_need_cstyle=no  ;;   
+        C*)    ac_fpp_need_CSTYLE=yes ;;   
+        noC*)  ac_fpp_need_CSTYLE=no  ;;   
+        nil)   ;;
+    esac
+done
+# Wrapping requires substitution
+test $ac_fpp_need_wrap = yes && ac_fpp_need_subs=yes
+# Both CSTYLE and cstyle cannot be requested
+# CSTYLE has precedence, since if it is not fulfilled,
+# compile errors may arise
+test $ac_fpp_need_CSTYLE = yes && ac_fpp_need_cstyle=no
+])# _AC_PROG_FPP_FEATURES
+
+
+# _AC_TEST_FPP ([command])
+# ------------------------
+# A helper macro to test correct fpp behaviour
+# It sets ac_cv_prog_fpp and ac_fpp_out
+AC_DEFUN([_AC_TEST_FPP],
+[cat >conftest.$ac_ext <<EOF
+_AC_LANG_PROGRAM_FPP_ONLY
+EOF
+ac_fpp_command=$1
+if eval '$ac_fpp_command conftest.$ac_ext > conftest.log 2>/dev/null'; then
+  test -f conftest.f &&
+      cat conftest.f | grep '^      REAL A' >/dev/null 2>&1 &&
+      cat conftest.f | grep 'syntax error' >/dev/null 2>&1  ||
+    ac_cv_prog_fpp=$ac_fpp_command; ac_fpp_out=
+  test -f conftest.log &&
+      cat conftest.log | grep '^      REAL A' >/dev/null 2>&1 &&
+      cat conftest.log | grep 'syntax error' >/dev/null 2>&1  ||
+    ac_cv_prog_fpp=$ac_fpp_command; ac_fpp_out=' > conftest.f'
+fi
+rm -f conftest*
+])# _AC_TEST_FPP
+
+
+# _AC_PROG_FPP
+# ------------
+# Try to figure out how to preprocess .fpp files for use with the selected
+# Fortran compiler
+#
+# Must be run after _AC_PROG_FC_CPP
+AC_DEFUN([_AC_PROG_FPP],
+[AC_REQUIRE([_AC_PROG_FC_CPP])dnl
+AC_CACHE_CHECK([how to preprocess Fortran files], ac_cv_prog_fpp,
+[ac_cv_prog_fpp=
+dnl AC_LANG_PUSH(Preprocessed Fortran)
+AC_LANG_ASSERT(Preprocessed Fortran)
+
+# Let the user specify FPP
+if test -n "$FPP"; then
+  _AC_TEST_FPP([$FPP])
+  if test -z "$ac_cv_prog_fpp"; then
+    AC_MSG_WARN([user-specified \$FPP ($FPP) does not work])
+    FPP=
+  fi
+fi # test -n "$FPP"
+
+if test -z "$ac_cv_prog_fpp" && test $ac_fpp_ok = yes; then
+# We know that the Fortran compiler can directly preprocess and compile.
+# All that remains is to find out how to run only the preprocessor.
+# We check that the compiler does not compile as well as
+# preprocessing, by looking for the file a.out (is this portable?  The
+# single-unix spec says that cc produces an a.out if no -o is given).
+# If we don't do this, and the compiler doesn't recognise, and
+# ignores, one of the options (for example g77 ignores -F
+# and returns without error), then the test appears to succeed.
+#
+# We only know the following methods of invocation: -F and -E
+  for ac_j in "$FC -F" "$FC -E"; do
+    rm -f a.out
+    _AC_TEST_FPP([$ac_j])
+    if test -e a.out; then
+        rm -f a.out
+        ac_cv_prog_fpp=  # discard any value there
+    else
+        test -n "$ac_cv_prog_fpp" && break;
+    fi
+  done
+fi
+
+if test -z "$ac_cv_prog_fpp"; then
+# Either the Fortran compiler can't handle cpp, or doesn't have all the
+# features, or can't be used for pure preprocessing.
+# We must find another way for preprocessing.
+# We try the "best" preprocessors first. At this point, F77 has already
+# proven that it is insufficient, so use it as a last resort only.
+# Again, test that no ...?
+# XXX: is there a more up-to-date list?
+  for ac_j in 'fpp' "$CPP" 'g77 -E' '$CC -E' 'cpp' '/lib/cpp' \
+              '/usr/ccs/lib/cpp' "$F77 -F" "$F77 -E"; do
+    _AC_TEST_FPP([$ac_j])
+    test -n "$ac_cv_prog_fpp" && break;
+  done
+fi # test -z "$ac_cv_prog_fpp"
+
+if test -z "$ac_cv_prog_fpp"; then
+# This is only fatal if direct compilation doesn't work either
+  if test $ac_cv_prog_fc_cpp = no; then
+    AC_MSG_ERROR([cannot find a working Fortran preprocessor])
+  else
+    AC_MSG_WARN([cannot find a working Fortran preprocessor])
+  fi
+fi
+dnl AC_LANG_POP()dnl
+])
+AC_CACHE_CHECK([how to redirect $ac_cv_prog_fpp output],
+  ac_cv_fpp_out, 
+  [ac_cv_fpp_out=$ac_fpp_out])
+FPP=$ac_cv_prog_fpp
+ac_fpp_out=$ac_cv_fpp_out
+])# _AC_PROG_FPP
+
+
+# _AC_PROG_FPP_P
+# --------------
+# Check whether we need to give FPP the -P option, to get it to
+# produce code which FC can read.
+AC_DEFUN([_AC_PROG_FPP_P],
+[AC_CACHE_CHECK([whether $FPP needs the -P option],
+ac_cv_prog_fpp_p,
+[ac_cv_prog_fpp_p=unknown
+dnl AC_LANG_PUSH(Preprocessed Fortran)
+AC_LANG_ASSERT(Preprocessed Fortran)
+# Note we force extension .fpp here and in the ac_cmd lines below, to
+# make sure that we don't use the default extension for the language.
+cat > conftest.fpp << EOF
+_AC_LANG_PROGRAM_FPP_ONLY
+EOF
+dnl AC_LANG_POP(Preprocessed Fortran)dnl
+
+AC_LANG_PUSH(Fortran)
+ac_cmd='$FPP $FPPFLAGS conftest.fpp '"$ac_fpp_out"
+if AC_TRY_EVAL(ac_cmd) &&
+     AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+   ac_cv_prog_fpp_p=
+else
+   ac_save_FPPFLAGS=$FPPFLAGS
+   FPPFLAGS="$FPPFLAGS -P"
+   ac_cmd='$FPP $FPPFLAGS conftest.fpp '"$ac_fpp_out"
+   if AC_TRY_EVAL(ac_cmd) &&
+       AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
+     ac_cv_prog_fpp_p=-P
+   fi
+   FPPFLAGS=$ac_save_FPPFLAGS   
+fi
+rm -f conftest*
+AC_LANG_POP(Fortran)dnl
+])
+if test "x$ac_cv_prog_fpp_p" = "xunknown"; then
+   AC_MSG_ERROR([$FPP cannot produce code that $FC compiles])
+else
+   FPPFLAGS="$FPPFLAGS $ac_cv_prog_fpp_p"
+fi
+])# _AC_PROG_FPP_P
+
+# _AC_PROG_FPP_CSTYLE
+# -------------------
+# Check whether FPP lets C-style options through to FC
+AC_DEFUN([_AC_PROG_FPP_CSTYLE],
+[AC_CACHE_CHECK([how to pass C-style comments to $FC], 
+   ac_cv_prog_fpp_cstyle,
+[ac_cv_prog_fpp_cstyle=unknown
+dnl AC_LANG_PUSH(Preprocessed Fortran)
+AC_LANG_ASSERT(Preprocessed Fortran)
+cat > conftest.$ac_ext << EOF
+_AC_LANG_PROGRAM_FPP_CSTYLE
+EOF
+dnl AC_LANG_POP()dnl
+
+AC_LANG_PUSH(Fortran)
+ac_cmd='$FPP $FPPFLAGS conftest.$ac_ext '"$ac_fpp_out"
+if AC_TRY_EVAL(ac_cmd) &&
+   cat conftest.f | grep '[[*]]/.*[[*]]/' >/dev/null 2>&1; then
+   ac_cv_prog_fpp_cstyle=
+else
+   ac_save_FPPFLAGS=$FPPFLAGS
+   ac_name=`expr "x$FPP" : 'x\(fpp\)'` 
+   if test "x$ac_name" = xfpp; then
+     ac_flag="-c_com=no"
+   else
+     ac_flag="-C"
+   fi
+   FPPFLAGS="$FPPFLAGS $ac_flag"
+   ac_cmd='$FPP $FPPFLAGS conftest.$ac_ext '"$ac_fpp_out"
+   if AC_TRY_EVAL(ac_cmd) &&
+     cat conftest.f | grep '/[[*]].*[[*]]/' >/dev/null 2>&1; then
+     ac_cv_prog_fpp_cstyle=$ac_flag
+   fi
+   FPPFLAGS=$ac_save_FPPFLAGS   
+fi
+rm -f conftest*
+AC_LANG_POP(Fortran)dnl
+])
+if test "x$ac_cv_prog_fpp_cstyle" = "xunknown"; then
+  AC_MSG_WARN([cannot find a way to make $FPP pass C-style comments])
+else
+  FPPFLAGS="$FPPFLAGS $ac_cv_prog_fpp_cstyle"
+fi
+])# _AC_PROG_FPP_CSTYLE
+
+# _AC_PROG_FC_CPP
+# ----------------
+# Test whether compilation of Fortan code with preprocessor directives
+# succeeds, and check for supported features
+# 
+# Sets ac_fpp_ok to "no" if a requested feature is unavailable
+#
+AC_DEFUN([_AC_PROG_FC_CPP],
+[ac_fpp_ok=yes
+ac_prog_fc_cpp=no
+ac_prog_fc_cpp_d=no
+ac_prog_fc_cpp_i=no
+ac_prog_fc_cpp_subs=no
+ac_prog_fc_cpp_wrap=no
+ac_prog_fc_cpp_CSTYLE=no
+
+dnl AC_LANG_PUSH(Preprocessed Fortran)
+AC_LANG_ASSERT(Preprocessed Fortran)
+AC_MSG_CHECKING([for Fortran preprocessor features])
+# We must use AC_LINK_IFELSE because Lahey Fortran (and maybe others) have
+# broken exit status when compiling
+AC_LINK_IFELSE([_AC_LANG_PROGRAM_FPP_SIMPLE], 
+   [ac_prog_fc_cpp=yes],
+   [ac_fpp_ok=no]) 
+
+if test $ac_prog_fc_cpp = yes; then
+
+    if test $ac_fpp_need_d = yes; then
+       ac_prog_fc_cpp_d=no
+       ac_save_FPPFLAGS=$FPPFLAGS
+       FPPFLAGS="$FPPFLAGS -DOK"
+       AC_LINK_IFELSE([_AC_LANG_PROGRAM_FPP_D],
+         [ac_prog_fc_cpp_d=yes], 
+         [ac_fpp_ok=no])
+       FPPFLAGS=$ac_save_FPPFLAGS
+    fi
+
+    if test $ac_fpp_need_i = yes; then
+       mkdir conftst
+       cat > conftst/conftest.inc <<EOF
+c This statement overrides the IMPLICIT statement in the program
+      REAL cc
+EOF
+       ac_save_FPPFLAGS=$FPPFLAGS
+       FPPFLAGS="$FPPFLAGS -Iconftst"
+       AC_LINK_IFELSE([_AC_LANG_PROGRAM_FPP_I],
+         [ac_prog_fc_cpp_i=yes],
+         [ac_fpp_ok=no])
+       rm -rf conftst
+       FPPFLAGS=$ac_save_FPPFLAGS
+    fi
+
+    if test $ac_fpp_need_subs = yes; then
+        AC_LINK_IFELSE([_AC_LANG_PROGRAM_FPP_SUBS],
+           [ac_prog_fc_cpp_subs=yes], 
+           [ac_fpp_ok=no])
+    fi
+
+    if test $ac_fpp_need_wrap = yes; then
+        AC_LINK_IFELSE([_AC_LANG_PROGRAM_FPP_WRAP],
+           [ac_prog_fc_cpp_wrap=yes], 
+           [ac_fpp_ok=no])
+    fi
+
+    if test $ac_fpp_need_CSTYLE = yes; then
+        AC_LINK_IFELSE([_AC_LANG_PROGRAM_FPP_CSTYLE],
+           [ac_prog_fc_cpp_CSTYLE=yes], 
+           [ac_fpp_ok=no])
+    fi
+
+fi
+AC_MSG_RESULT([done.])
+dnl AC_LANG_POP()dnl
+])#_AC_PROG_FC_CPP
+
+
+# _AC_FPP_BUILD_RULE
+# ------------------
+# Figure out how to build from cpp/Fortran sources
+#
+# If we need to use a separate preprocessor, we must override make's
+# `direct' .fpp.o rule in order to do `indirect' compilation
+# (.fpp -> .f then .f -> .o).
+#
+# It's up to Autoconf to decide whether indirect or direct compilation
+# works better; it does this by setting a number of configure-time
+# variables, and the rules we emit here depend on these variables (in
+# some cases becoming no-ops).  See the macros in Autoconf's
+# fortran.m4 for details.
+#
+# Configure variables set here:
+#
+#   FPP_SRC_EXT
+#     This is the file extension (without a dot) of preprocessable
+#     Fortran files; by default this is `fpp', but `F' is also
+#     common. [set in AC_PROG_FPP, but documented here for consistency]
+#
+#   FPP_COMPILE_EXT
+#     This contains the file extension which the Fortran compiler will
+#     accept.  It is $FPP_SRC_EXT if the compiler itself can do
+#     preprocessing (`direct' compilation), or a dummy value (not .f,
+#     since that would conflict with the pre-existing rule for
+#     compiling Fortran) if it cannot, and the file must be
+#     preprocessed separately (`indirect').
+#
+#   FPP_PREPROCESS_EXT
+#     The partner of FPP_COMPILE_EXT.  This is $FPP_SRC_EXT for
+#     indirect compilation, or a dummy value for direct compilation,
+#     when the corresponding separate-processing generated rule should
+#     be ignored.
+#
+#   FPP_MAKE_FLAGS
+#     This is used to include CPP/FPP related flags into the compiler
+#     call if we compile directly, and leave them out otherwise.
+#
+#   FPP_OUTPUT
+#     This is used to redirect FPP output to the .f file in those
+#     cases where FPP writes to stdout rather than to a file.
+#
+# These are used in Automake's lang_ppfc_finish subroutine.
+#
+# FIXME: Martin Wilck's original version of these macros noted that it
+# was necessary to generate explicit rules for .fpp -> .o compilations
+# in order to override make's builtin rules in a portable manner
+# (i.e. without using make extensions).  Is this true?
+# POSIX/Single-Unix states that inference rules can be redefined, and
+# there's no warning against this in Autoconf's section on
+# `Limitations of Make'.
+#
+AC_DEFUN([_AC_FPP_BUILD_RULE],
+[AC_CACHE_CHECK([how to build from preprocessed Fortran sources],
+  ac_cv_fpp_build_rule,
+[ac_cv_fpp_build_rule=
+if test $ac_cv_prog_fc_cpp_ok = yes; then
+   ac_cv_fpp_build_rule=direct
+   ac_fpp_status=ok
+elif test $ac_cv_prog_fpp_ok = yes; then
+   ac_cv_fpp_build_rule=indirect
+   ac_fpp_status=ok
+elif test $ac_cv_prog_fc_cpp = no && $ac_cv_prog_fpp = no; then
+   ac_cv_fpp_build_rule=
+   ac_fpp_status=fatal
+elif test $ac_cv_prog_fc_cpp = no; then
+   ac_cv_fpp_build_rule=indirect
+   ac_fpp_status=fail
+elif test -z "$ac_cv_prog_fpp"; then
+   ac_cv_fpp_build_rule=direct
+   ac_fpp_status=fail
+elif test $ac_fpp_equals_fc = yes; then
+   ac_cv_fpp_build_rule=direct
+   ac_fpp_status=fail
+else   
+   ac_fpp_status=fail
+# Both methods - direct and indirect - fail to meet some requirements
+# We use a simple approach to choose the best alternative
+   ac_fc_score=0
+   ac_fpp_score=0
+   for ac_i in d i subs wrap cstyle CSTYLE; do
+      ac_tmp="\$ac_fpp_need_$ac_i"
+      ac_need=`eval echo $ac_tmp`
+      if test $ac_need = yes; then
+        ac_tmp="\$ac_cv_prog_fc_cpp_$ac_i"
+        ac_v_fc=`eval echo $ac_tmp`
+        ac_tmp="\$ac_cv_prog_fpp_$ac_i"
+        ac_v_fpp=`eval echo $ac_tmp`
+        test "x$ac_v_fc" = xyes && ac_fc_score=`expr $ac_fc_score + 1`
+        test "x$ac_v_fpp" = xyes && ac_fpp_score=`expr $ac_fpp_score + 1`
+      fi
+   done
+   if test $ac_fpp_score -gt $ac_fc_score; then
+     ac_cv_fpp_build_rule=indirect
+   else
+     ac_cv_fpp_build_rule=direct
+   fi
+fi   
+])
+
+if test $ac_fpp_status = fatal; then
+
+  AC_MSG_ERROR([cannot find a valid build rule for Fortran/cpp source: consider installing the free Fortran preprocessor fpp from ftp.netlib.org])
+	
+elif test $ac_fpp_status = fail; then
+
+  AC_MSG_WARN([cannot find a build rule for Fortran/cpp source that fulfills all requirements.  The compilation may fail or run time errors may arise.  Consider installing the free Fortran preprocessor fpp from ftp.netlib.org])
+
+fi
+
+# FIXME: Are DEFAULT_INCLUDES and AM_CPPFLAGS the right set of
+# variables to be including here?  I confess (NG) to being somewhat
+# confused about which one's which (same applies to rules in lang-compile.am).
+if test $ac_cv_fpp_build_rule = direct; then
+    FPP_COMPILE_EXT=$FPP_SRC_EXT
+    FPP_PREPROCESS_EXT=DUMMY$FPP_SRC_EXT
+    FPP_MAKE_FLAGS='$(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS)'
+else
+    FPP_COMPILE_EXT=DUMMYf
+    FPP_PREPROCESS_EXT=$FPP_SRC_EXT
+    FPP_MAKE_FLAGS=""
+fi
+if test -z "$ac_fpp_out"; then
+   FPP_OUTPUT=" "
+else
+   FPP_OUTPUT=">\[$]@"
+fi
+])# _AC_FPP_BUILD_RULE
+
+
+# -----------------------
+# User macros (only one!) 
+# -----------------------
+
+
+# AC_PROG_FPP([required features], [FPP-SRC-EXT=.fpp])
+# --------------------------------------------------
+#
+# [required features] is a space-separated list of features that the Fortran
+# preprocessor must have for the code to compile.
+#
+# [FPP-SRC-EXT] is an optional specification of the file extension for
+# preprocessable Fortran source files (without a leading dot).  It
+# defaults to `fpp', which is better than .F in general, since .F and
+# .f are indistinguishable on case-insensitive filesystems (such as
+# HFS+ on MacOS X).
+#
+# It is up to the package maintainer to properly set these requirements.
+#
+# Supported features are:
+#
+# include   : correctly process #include directives and -I
+# define    : correctly process -D
+# substitute: substitute macros in Fortran code 
+#             (some preprocessors touch only lines starting with #)
+# wrap      : wrap lines that become too long through macro substitution  
+#             fpp is probably the only preprocessor that does this.
+# cstyle    : Do not suppress C style comments (-C option in cpp)
+# CSTYLE    : *Do* suppress C style comments
+#             (e.g. code contains C-style comments, and compiler may not
+#             know how to handle them)
+# 
+# Features can be abbreviated: i, in, inc etc. are equivalent to include.
+# Features can be deselected (feature not needed) by prepending "no", 
+#   e.g. nodef (=nodefine), now (=nowrap).
+#
+# Default for the feature list is 
+#       [include define substitute nowrap nocstyle noCSTYLE]
+# Feature requirements corresponding to the defaults may be omitted
+#
+# Note that "wrap" implies "substitute", and CSTYLE and cstyle cannot
+# be requested at the same time. The macro adjusts this automatically. 
+#
+# This macro sets and substitutes the variables FPP and FPPFLAGS, and
+# causes to be set FPP_OUTPUT, FPP_MAKE_FLAGS, and FPP_COMPILE_EXT
+# (actually set in macro _AC_FPP_BUILD_RULE)
+#
+# The macro depends on both FC and CPP, because we must possibly fall 
+# back on CPP for preprocessing.
+#
+AC_DEFUN([AC_PROG_FPP],
+[AC_REQUIRE([AC_PROG_FC])dnl
+AC_REQUIRE([AC_PROG_CPP])dnl
+
+# Prefer AC_PROG_FC to AC_PROG_F77
+if test "X$F77" != X; then
+    dnl Need to add spurious space after AC below: how should I quote this?
+    AC_MSG_WARN([Use AC _PROG_FC with AC _PROG_FPP, instead of AC _PROG_F77])
+fi
+
+AC_ARG_VAR([FPP], [Command to preprocess Fortran code])
+AC_ARG_VAR([FPPFLAGS], [Flags for the Fortran preprocessor])
+_AC_PROG_FPP_FEATURES([$1])
+
+# Default optional second argument to fpp
+FPP_SRC_EXT=m4_if([$2], [$2], [fpp])
+
+# We first try to use FC for compiling the source directly
+# into object files
+ac_fpp_compile='${FC-fc} -c $FPPFLAGS $FFLAGS conftest.$ac_ext >&AS_MESSAGE_LOG_FD'
+ac_fpp_link='${FC-fc} -o conftest${ac_exeext} $FPPFLAGS $FFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&AS_MESSAGE_LOG_FD'
+
+AC_LANG_PUSH(Preprocessed Fortran)
+
+# _AC_PROG_FC_CPP stores results of the feature checks in non-cv variables,
+# which we copy to cv variables afterwards.
+# The reason for that is reusability of the macro for other cv variables (see below)
+_AC_PROG_FC_CPP
+
+AC_CACHE_CHECK([whether $FC compiles programs with cpp directives], 
+   ac_cv_prog_fc_cpp, 
+  [ac_cv_prog_fc_cpp=$ac_prog_fc_cpp])
+
+if test $ac_fpp_need_d = yes; then
+  AC_CACHE_CHECK([whether $FC accepts -D], 
+     ac_cv_prog_fc_cpp_d, 
+    [ac_cv_prog_fc_cpp_d=$ac_prog_fc_cpp_d])
+fi
+
+if test $ac_fpp_need_i = yes; then
+  AC_CACHE_CHECK([whether $FC accepts -I], 
+     ac_cv_prog_fc_cpp_i,
+    [ac_cv_prog_fc_cpp_i=$ac_prog_fc_cpp_i])
+fi
+
+if test $ac_fpp_need_subs = yes; then
+  AC_CACHE_CHECK([whether $FC substitutes macros in Fortran code], 
+     ac_cv_prog_fc_cpp_subs,
+    [ac_cv_prog_fc_cpp_subs=$ac_prog_fc_cpp_subs])
+fi
+
+if test $ac_fpp_need_wrap = yes; then 
+  AC_CACHE_CHECK([whether $FC wraps long lines automatically], 
+     ac_cv_prog_fc_cpp_wrap,
+    [ac_cv_prog_fc_cpp_wrap=$ac_prog_fc_cpp_wrap])
+fi
+
+if test $ac_fpp_need_CSTYLE = yes; then 
+  AC_CACHE_CHECK([whether $FC handles C-style comments], 
+     ac_cv_prog_fc_cpp_CSTYLE,
+    [ac_cv_prog_fc_cpp_CSTYLE=$ac_prog_fc_cpp_CSTYLE])
+fi
+
+AC_CACHE_CHECK([whether $FC fulfills requested features],
+  ac_cv_prog_fc_cpp_ok,
+  [ac_cv_prog_fc_cpp_ok=$ac_fpp_ok])
+
+# Now we check how to invoke a preprocessor that outputs Fortran code
+# that FC can understand
+# The next macro sets FPP (unless already set by the user)
+_AC_PROG_FPP
+_AC_PROG_FPP_P
+
+# Now, we check the features of the preprocessor/compiler combination
+# It only makes sense to carry out further tests if FPP is a different
+# program than FC
+ac_fpp_name=`expr "x$FPP" : "x\([[^ ]]*\)"`
+ac_fc_name=`expr "x$FC" : "x\([[^ ]]*\)"`
+if test "x$ac_fc_name" != "x$ac_fpp_name"; then
+  ac_fpp_equals_fc=no
+
+# Redefine the compile and link commands for indirect compilation
+  ac_fpp_compile='${FPP-fpp} $FPPFLAGS conftest.$ac_ext '"$ac_fpp_out"' && ${FC-fc} -c $FFLAGS conftest.f >&AS_MESSAGE_LOG_FD'
+  ac_fpp_link='${FPP-fpp} $FPPFLAGS conftest.$ac_ext '"$ac_fpp_out"' && ${FC-fc} -o conftest${ac_exeext} $FFLAGS $LDFLAGS conftest.f $LIBS >&AS_MESSAGE_LOG_FD'
+
+# Redo all the feature checks for indirect compilation: perhaps we have an
+# external preprocessor that does a better job than FC
+  _AC_PROG_FC_CPP
+
+else
+  ac_fpp_equals_fc=yes
+fi
+
+if test $ac_fpp_need_d = yes; then
+  AC_CACHE_CHECK([whether $FPP accepts -D], 
+     ac_cv_prog_fpp_d, 
+    [ac_cv_prog_fpp_d=$ac_prog_fc_cpp_d])
+fi
+
+if test $ac_fpp_need_i = yes; then
+  AC_CACHE_CHECK([whether $FPP accepts -I], 
+     ac_cv_prog_fpp_i,
+    [ac_cv_prog_fpp_i=$ac_prog_fc_cpp_i])
+fi
+
+if test $ac_fpp_need_subs = yes; then
+  AC_CACHE_CHECK([whether $FPP substitutes macros in Fortran code], 
+     ac_cv_prog_fpp_subs,
+    [ac_cv_prog_fpp_subs=$ac_prog_fc_cpp_subs])
+fi
+
+if test $ac_fpp_need_wrap = yes; then 
+  AC_CACHE_CHECK([whether $FPP wraps long lines automatically], 
+     ac_cv_prog_fpp_wrap,
+    [ac_cv_prog_fpp_wrap=$ac_prog_fc_cpp_wrap])
+fi
+
+if test $ac_fpp_need_CSTYLE = yes; then 
+  AC_CACHE_CHECK([whether $FPP suppresses C-style comments], 
+     ac_cv_prog_fpp_CSTYLE,
+    [ac_cv_prog_fpp_CSTYLE=$ac_prog_fc_cpp_CSTYLE])
+
+elif test $ac_fpp_need_cstyle = yes; then 
+# It makes only sense to test this for indirect compilation, 
+# i.e. if .f files are generated
+    _AC_PROG_FPP_CSTYLE
+fi
+
+AC_CACHE_CHECK([whether $FPP fulfills requested features],
+  ac_cv_prog_fpp_ok,
+  [ac_cv_prog_fpp_ok=$ac_fpp_ok])
+
+# We have all necessary information.
+# It remains to construct optimal build rules 
+# (direct: .fpp.o or indirect: .fpp.f)
+# and carry out the substitutions
+_AC_FPP_BUILD_RULE
+
+AC_SUBST(FPP)
+AC_SUBST(FPPFLAGS)
+AC_SUBST(FPP_OUTPUT)
+AC_SUBST(FPP_MAKE_FLAGS)
+AC_SUBST(FPP_COMPILE_EXT) 
+AC_SUBST(FPP_PREPROCESS_EXT) 
+AC_SUBST(FPP_SRC_EXT) 
+
+AC_LANG_POP(Preprocessed Fortran)
+
+])# AC_PROG_FPP
