@@ -49,3 +49,5 @@ start: start.in
 	    -e 's,@edited_input\@,start: produced from start.in by Makefile.am,' \
 	    $(srcdir)/start.in >start.tmp
 	mv start.tmp start
+
+EXTRA_DIST = start.in $(sstsupport_DATA)

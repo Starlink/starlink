@@ -40,12 +40,10 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-DIST_COMMON = $(am__configure_deps) $(srcdir)/../config.guess \
-	$(srcdir)/../config.sub $(srcdir)/../depcomp \
-	$(srcdir)/../install-sh $(srcdir)/../ltmain.sh \
-	$(srcdir)/../missing $(srcdir)/Makefile.am \
+DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/component.xml.in \
-	$(srcdir)/config.h.in $(top_srcdir)/configure forstats.ifl \
+	$(srcdir)/config.h.in $(top_srcdir)/configure config.guess \
+	config.sub depcomp forstats.ifl install-sh ltmain.sh missing \
 	procvt.ifl prohlp.ifl prohtml.ifl prolat.ifl propak.ifl
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -96,7 +94,7 @@ INSTALL_MONOLITH_ENV = $(INSTALL_PROGRAM_ENV)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
-depcomp = $(SHELL) $(top_srcdir)/../depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/find_file.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -285,6 +283,7 @@ edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
 	-e 's,@VERSION\@,$(VERSION),g'
 
+EXTRA_DIST = start.in $(sstsupport_DATA)
 sst_mon_LDFLAGS = @LDFLAGS@
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -584,7 +583,7 @@ install-manifest: install-manifest.xml
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/..
+	$(mkdir_p) $(distdir)/.
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
