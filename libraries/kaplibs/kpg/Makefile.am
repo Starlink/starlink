@@ -34,7 +34,7 @@ kpg1_csub.gn
 
 # Double and REAL
 KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr \
-kpg1_mixv.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_ssaz.gdr
+kpg1_mixv.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_ssaz.gdr kpg1_ainb.gdr
 
 KPG_DIR_GEN = kpg1_mul.gdir
 
@@ -43,7 +43,7 @@ bad2dr.f bad2dub.f bad2duw.f bad2dw.f chvalb.f chvali.f \
 chvalr.f chvalw.f copad.f copai.f copar.f copy1d.f copy2d.f copy3d.f \
 cpsecr.f creout.f dimlst.f elnmbi.f elnmbr.f \
 exparr.f gethlp.f gthlpi.f icmmm.f inset.f kpg1_abset.f kpg1_agatc.f kpg1_agfnd.f \
-kpg1_agref.f kpg1_ainbd.f kpg1_ainbr.f kpg1_aindd.f kpg1_aindr.f \
+kpg1_agref.f kpg1_aindd.f kpg1_aindr.f \
 kpg1_akerd.f kpg1_akerr.f kpg1_arcol.f kpg1_asref.f \
 kpg1_avlut.f kpg1_axano.f kpg1_axbnd.f kpg1_axbnr.f kpg1_axcod.f \
 kpg1_axcor.f kpg1_axexd.f kpg1_axexr.f kpg1_axgvd.f kpg1_axgvr.f \

@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_AINBR( LBND, UBND, AXIS, EL, VALUE, INDEX,
+      SUBROUTINE KPG1_AINB<T>( LBND, UBND, AXIS, EL, VALUE, INDEX,
      :                        STATUS )
 *+
 *  Name:
@@ -84,12 +84,12 @@
      :  UBND,
      :  EL
  
-      REAL
+      <TYPE>
      :  AXIS( LBND:UBND ),
      :  VALUE( EL )
  
 *  Arguments Returned:
-      REAL
+      <TYPE>
      :  INDEX( EL )
  
 *  Status:
@@ -136,7 +136,7 @@
  
       DO WHILE ( ABS( INCREM ) .LT. VAL__EPSD .AND.
      :           ( UBND - LBC ) .GT. 0 )
-         INCREM = NUM_RTOD( AXIS( UBND ) - AXIS( LBC ) )
+         INCREM = NUM_<T>TOD( AXIS( UBND ) - AXIS( LBC ) )
          IF ( ABS( INCREM ) .LT. VAL__EPSD ) LBC = LBC + 1
       END DO
  
@@ -156,8 +156,8 @@
          SLOPE = INCREM
  
 *  Look for bad input data.  Just make the output indices bad too.
-         IF ( VALUE( I ) .EQ. VAL__BADR ) THEN
-            INDEX( I ) = VAL__BADR
+         IF ( VALUE( I ) .EQ. VAL__BAD<T> ) THEN
+            INDEX( I ) = VAL__BAD<T>
  
 *  Check that the value lies within bounds.
          ELSE IF ( ( ( VALUE( I ) .GT. AXIS( LBC ) .OR.
@@ -167,7 +167,7 @@
      :          VALUE( I ) .GT. AXIS( UBND ) ) ) ) THEN
  
 *  Set the index value to be bad.
-            INDEX( I ) = VAL__BADR
+            INDEX( I ) = VAL__BAD<T>
          ELSE
  
 *  Initialise bounds of the search for the "loop until".
@@ -182,7 +182,7 @@
 *  Find the slope of the axis, assuming approximately linear
 *  co-ordinates.
  
-               SLOPE = NUM_RTOD( AXIS( UB ) - AXIS( LB ) ) /
+               SLOPE = NUM_<T>TOD( AXIS( UB ) - AXIS( LB ) ) /
      :                 DBLE( UB - LB )
  
 *  Obtain a guess at the pixel index.
@@ -202,17 +202,17 @@
 *  rather than the difference in axis values.
                IF ( RESID / SLOPE .LT. 0.0D0 ) THEN
                   UB = MAX( LBND, MIN( CINDEX + 1, UBND ) )
-                  DIFF = NUM_RTOD( AXIS( UB - 1 ) - AXIS( UB ) )
-                  IF ( ABS( DIFF ) .LT. NUM_RTOD( VAL__EPSR ) ) THEN
+                  DIFF = NUM_<T>TOD( AXIS( UB - 1 ) - AXIS( UB ) )
+                  IF ( ABS( DIFF ) .LT. NUM_<T>TOD( VAL__EPS<T> ) ) THEN
                      DIFF = SLOPE
                   END IF
-                  FRAC = NUM_RTOD( VALUE( I ) - AXIS( UB ) ) / DIFF
+                  FRAC = NUM_<T>TOD( VALUE( I ) - AXIS( UB ) ) / DIFF
  
                   LOOP = NINT( ABS( FRAC ) ) .GE. 2
  
 *  Evaluate the required index.
                   IF ( .NOT. LOOP )
-     :              INDEX( I ) = NUM_DTOR( FRAC ) + NUM_ITOR( UB )
+     :              INDEX( I ) = NUM_DTO<T>( FRAC ) + NUM_ITO<T>( UB )
  
 *  Alter the lower bound.   Form the new loop criterion.  Determine
 *  whether or not the required value lies between the lower bound and
@@ -222,17 +222,17 @@
 *  rather than the difference in axis values.
                ELSE
                   LB = MIN( UBND, MAX( CINDEX, LBND ) )
-                  DIFF = NUM_RTOD( AXIS( LB + 1 ) - AXIS( LB ) )
-                  IF ( ABS( DIFF ) .LT. NUM_RTOD( VAL__EPSR ) ) THEN
+                  DIFF = NUM_<T>TOD( AXIS( LB + 1 ) - AXIS( LB ) )
+                  IF ( ABS( DIFF ) .LT. NUM_<T>TOD( VAL__EPS<T> ) ) THEN
                      DIFF = SLOPE
                   END IF
-                  FRAC = NUM_RTOD( VALUE( I ) - AXIS( LB ) ) / DIFF
+                  FRAC = NUM_<T>TOD( VALUE( I ) - AXIS( LB ) ) / DIFF
  
                   LOOP = NINT( ABS( FRAC ) ) .GE. 2
  
 *  Evaluate the required index.
                   IF ( .NOT. LOOP )
-     :              INDEX( I ) = NUM_DTOR( FRAC ) + NUM_ITOR( LB )
+     :              INDEX( I ) = NUM_DTO<T>( FRAC ) + NUM_ITO<T>( LB )
                END IF
             END DO
          END IF
