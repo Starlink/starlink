@@ -3,7 +3,7 @@
 bin_SCRIPTS = start pisa.icl pisa_demo pisa_demo.icl pisa_proc.icl \
  pisahelp.ifc
 
-nodist_bin_SCRIPTS = pisa_link_adam
+noinst_SCRIPTS = pisa_link_adam
 
 bin_MONOLITHS = pisa_mon pisa_mon4
 
@@ -61,3 +61,25 @@ HELPSRC = gethlp.f gthlpi.f kpg1_scrsz.f pthlpo.f sread.f
 
 pisahelp: pisahelp.f $(HELPSRC)
 	@ALINK@ pisahelp.o -o pisahelp $(HELPSRC:.f=.o)
+
+##  The on-line help.
+HELP_SOURCES = pisahelp.hlp
+starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
+
+#  Rule for building the help library from the help source.
+.hlp.shl:
+	@HLIB@ $<
+
+##  Additional files. These have traditionally gone into bindir. 
+##  Not having frame.sdf there would be an issue. Use a trick to get these
+##  installed. 
+
+pisasupportdir = $(bindir)
+pisasupport_DATA = frame.sdf frame_stars.acc clustan.dat findinfo.dat \
+ sizeinfo.dat peakinfo.dat
+
+##  Any misc PISA files that have no where else.
+dist_pkgdata_DATA = pisa.news
+
+##  Things for distribution that are not picked up otherwise.
+EXTRA_DIST = $(pisasupport_DATA) $(HELP_SOURCES)
