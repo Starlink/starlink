@@ -41,6 +41,9 @@
 #     12-NOV-1997 (TIMJ):
 #        Add new commands for release v1.1
 #          extract_flat, scuclip, despike, despike2, scan_rlb, scushift
+#     30-NOV-1997 (TIMJ):
+#        Add some more commands for release 1.1: pltbol, rlinplot,
+#        scuplot and dspbol
 #     {enter_changes_here}
 #
 #-
@@ -150,9 +153,19 @@ endif
 # csh scripts
 alias scupa       ${SURF_DIR}/scupa.csh
 alias sdip        ${SURF_DIR}/sdip.csh
+alias dspbol      ${SURF_DIR}/dspbol
+alias pltbol      ${SURF_DIR}/pltbol
+alias rlinplot    ${SURF_DIR}/rlinplot
+alias scuplot     ${SURF_DIR}/scuplot.csh
+
 
 alias surf_scupa       ${SURF_DIR}/scupa.csh
 alias surf_sdip        ${SURF_DIR}/sdip.csh
+alias surf_dspbol      ${SURF_DIR}/dspbol
+alias surf_pltbol      ${SURF_DIR}/pltbol
+alias surf_rlinplot    ${SURF_DIR}/rlinplot
+alias surf_scuplot     ${SURF_DIR}/scuplot.csh
+
 
 # Announce the availability of the SURF commands
 
