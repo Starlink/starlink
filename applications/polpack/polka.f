@@ -247,11 +247,11 @@
 *        from the supplied object frames before the output images are created. 
 *        If only one sky frame is supplied, then it is used for all the object
 *        frames. Otherwise, the number of sky frames must equal the number of 
-*        supplied object frames, and must be given in the same order. If a 
-*        null value (!) is given for SKYFRAMES, then the sky background to be 
-*        subtracted from each output image is determined by fitting a surface 
-*        to sky areas identified by the user within the supplied object 
-*        frames. [!]
+*        object frames supplied using parameter IN, and must be given in the 
+*        same order. If a null value (!) is given for SKYFRAMES, then the sky 
+*        background to be subtracted from each output image is determined by 
+*        fitting a surface to sky areas identified by the user within the 
+*        supplied object frames. [!]
 *     SKYPAR = _INTEGER (Update)
 *        If no sky frames are supplied using parameter SKYFRAMES, then
 *        the sky in each output image will be fitted using a polynomial 
