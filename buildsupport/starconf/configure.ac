@@ -1,7 +1,7 @@
 dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(starconf, 1.0-1, ussc@star.rl.ac.uk)
+AC_INIT(starconf, 1.0-2, ussc@star.rl.ac.uk)
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([starconf.m4.in])
@@ -29,11 +29,12 @@ dnl   current value of $DEFAULT_STARLINK, $STARLINK or "/star"
 dnl   (whichever is non-empty)
 AC_ARG_VAR(DEFAULT_STARLINK,
            [Default location of a currently installed Starlink tree])
+AC_MSG_CHECKING([for a defined or defaulted DEFAULT_STARLINK])
 for s in "$DEFAULT_STARLINK" "$STARLINK" /star
 do
-        echo "default_starlink=$s ???"
     test -n "$s" && DEFAULT_STARLINK=$s && break
 done
+AC_MSG_RESULT($DEFAULT_STARLINK)
 
 dnl   Specify the default intallation prefix of components configured
 dnl   by this tool.  This can be specified either by giving
@@ -44,10 +45,12 @@ dnl   need not be the same as the definition of AC_PREFIX_DEFAULT
 dnl   above.
 AC_ARG_VAR(DEFAULT_PREFIX,
            [Default installation directory of components])
+AC_MSG_CHECKING([for a defined or defaulted DEFAULT_PREFIX])
 for s in "$DEFAULT_PREFIX" "$DEFAULT_STARLINK" "$STARLINK" /star
 do
     test -n "$s" && DEFAULT_PREFIX="$s" && break
 done
+AC_MSG_RESULT($DEFAULT_PREFIX)
 
 dnl   Find working tools
 AC_PROG_INSTALL
