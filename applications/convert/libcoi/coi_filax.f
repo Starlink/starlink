@@ -78,13 +78,19 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN            ! Length of a character string less
+                                 ! trailing blanks
+
 *  Local Constants:
       INTEGER MAXWRD             ! Maximum number of words
       PARAMETER( MAXWRD = 16 )
 
 *  Local Variables:
+      INTEGER CEND               ! Length of the VALUE string
       INTEGER CPOS               ! Current column position
       INTEGER CSTAT              ! CHR status
+      INTEGER CUPP               ! Upper column position
       INTEGER END( MAXWRD )      ! End column of each word
       INTEGER I                  ! Loop counter
       INTEGER J                  ! Loop counter
@@ -109,6 +115,10 @@
 *  find the number of loops using the finite size of word buffer.
       NLOOP = ( NVALUE - 1 ) / MAXWRD + 1
 
+*  Find the number of used characters to save time searching through the
+*  the list every time in CHR_DCWRD.
+      CEND = CHR_LEN( VALUE )
+
 *  Set the initial position and pixel index.
       CPOS = 1
       NX = 0
@@ -122,7 +132,9 @@
 *  Split the axis values into words.  Length is at least 8 characters
 *  fewer than the concatenated header value.  Use a local status as we
 *  expect more words in the buffer than elements of the WORDS array.
-         CALL CHR_DCWRD( VALUE( CPOS: ), MWORD, NWORD, START, END,
+*  Try to reduce the amount of text to process for efficiency.
+         CUPP = MIN( CEND, MWORD * ( VAL__SZD + 1 ) )
+         CALL CHR_DCWRD( VALUE( CPOS:CUPP ), MWORD, NWORD, START, END,
      :                   WORDS, CSTAT )
 
 *  Convert each word.
