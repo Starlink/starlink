@@ -132,6 +132,7 @@
      :        TEMP,              ! Temporary value
      :        UALPHA             ! Line parameter at array upper bound
 
+      integer mm
 *.
 
 *  Check inherited global status.

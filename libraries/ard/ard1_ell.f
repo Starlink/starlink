@@ -128,7 +128,9 @@
      :  COSP,                    ! Cosine of central latitude
      :  D2,                      ! Modified coefficient
      :  D5,                      ! Modified coefficient
+     :  F,                       ! Ratio of axis scales
      :  P( 2 ),                  ! Test point
+     :  SDIST,                   ! Corresponding increment along the other axis
      :  SINA,                    ! Sine of supplied orientation
      :  T,                       ! Temporary real storage.
      :  X0,                      ! X pixel co-ordinate at ellipse centre
@@ -144,6 +146,7 @@
      :  YRANGE                   ! Half range of Y pixel co-ordinates
 
       INTEGER
+     :  AXIS,                    ! Index of axis used to measure distances
      :  IX,                      ! X pixel index of current column
      :  IX1,                     ! Lower X pixel index limit
      :  IX2,                     ! Upper X pixel index limit
@@ -189,22 +192,28 @@
       X0 = D( 1 ) + D( 2 )*PAR( 1 ) + D( 3 )*PAR( 2 )
       Y0 = D( 4 ) + D( 5 )*PAR( 1 ) + D( 6 )*PAR( 2 )
 
-*  If the user coord Frame is a SkyFrame, we have to take account of the 
-*  fact that the longitude axis is on a different scale to the latitude axis. 
-*  Since the user->pixel mapping is linear, we can assume that the scales
-*  of the two axes are effectively constant over the mask. This constant is 
-*  given by cos(latitude). Modify the D( 2 ) and D( 5 ) terms to describe
-*  a coord system in which the first axis is on the same scale as the
-*  second axis.
-      D2 = D( 2 )
-      D5 = D( 5 )
-      IF( AST_ISASKYFRAME( FRM, STATUS ) ) THEN
-         COSP = COS( PAR( 2 ) )
-         IF( COSP .NE. 0.0 ) THEN 
-            D2 = D( 2 )/COSP
-            D5 = D( 5 )/COSP
-         END IF
+*  We need to take account of any difference in the scales of the axes in 
+*  the user coordinate system (eg if users coords are RA/DEC, then a given 
+*  arc-distance will in general correspond to different increments along
+*  the RA and DEC axes). Find the axis along which distances are specified
+*  in keyword argument lists.
+      CALL ARD1_DSTAX( FRM, AXIS, STATUS )
+
+*  Find the increment along the other axis which corresponds to the
+*  length of the first or second ellipse axis. The conversion is performed 
+*  at the ellipse centre. Find the ratio of the axis scales.
+      IF( PAR( 3 ) .NE. 0.0 ) THEN
+         CALL ARD1_SCALE( FRM, PAR, PAR( 3 ), 3 - AXIS, SDIST, STATUS )
+         F = SDIST/PAR( 3 )
+      ELSE
+         CALL ARD1_SCALE( FRM, PAR, PAR( 4 ), 3 - AXIS, SDIST, STATUS )
+         F = SDIST/PAR( 4 )
       END IF
+
+*  Modify the D( 2 ) and D( 5 ) terms to describe a coord system in which 
+*  the first axis is on the same scale as the second axis.
+      D2 = D( 2 )*F
+      D5 = D( 5 )*F
 
 *  Store the sine and cosine of the orientation of the ellipse in user 
 *  co-ordinates.

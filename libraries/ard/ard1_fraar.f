@@ -104,13 +104,8 @@
          GO TO 999
       END IF
 
-*  If he Frame is a SkyFrame the border width is given as an increment
-*  in latitude. Otherwise, it is given as an increment along axis 1.
-      IF( AST_ISASKYFRAME( CFRM, STATUS ) ) THEN
-         AXIS = AST_GETI( CFRM, 'LATAXIS', STATUS )
-      ELSE
-         AXIS = 1
-      END IF
+*  Find the index of the axis along which distances are measured.
+      CALL ARD1_DSTAX( CFRM, AXIS, STATUS )
 
 *  Attempt to read argument value from the current element until the
 *  end of the element, or the end of the argument list is encountered.

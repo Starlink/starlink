@@ -15,9 +15,11 @@
 *                      STATUS )
 
 *  Description:
-*     The user co-ordinates of each corner of the box are found. These
-*     are transformed into pixel indices and the supplied bounds of the
-*     internal bounding box are updated to include all the corners.
+*     The user co-ordinates of the intersection of the sphere with each
+*     each axis of the user coordinate system are found (this allows for
+*     different axis scales, e.g. for RA/DEC). These are transformed into 
+*     pixel indices and the supplied bounds of the internal bounding box 
+*     are updated to include all the corners.
 
 *  Arguments:
 *     FRM = INTEGER (Given)

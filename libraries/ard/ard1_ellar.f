@@ -118,16 +118,12 @@
          ELSE IF( NARG .EQ. 1 ) THEN
             AXIS = 2
 
-*  Third and fourth arguments, refer to axis 1 - unless the Frame is a
-*  SkyFrame in which case it refers to the latitude-like axis.
+*  Third and fourth arguments are distances. Find the index of the axis 
+*  along which they are measured.
          ELSE IF( NARG .LT. 4 ) THEN
-            IF( AST_ISASKYFRAME( CFRM, STATUS ) ) THEN
-               AXIS = AST_GETI( CFRM, 'LATAXIS', STATUS )
-            ELSE
-               AXIS = 1
-            END IF
+            CALL ARD1_DSTAX( CFRM, AXIS, STATUS )
 
-*  Any other axes are interpreted as simple floating point values.
+*  The fifth argument is interpreted as a simple floating point value.
          ELSE 
             AXIS = 0
          END IF

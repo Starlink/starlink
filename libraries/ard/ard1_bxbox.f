@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_BXBOX( NDIM, LBND, UBND, MSKSIZ, VALUE, LBOX,
+      SUBROUTINE ARD1_BXBOX( NDIM, FRM, LBND, UBND, MSKSIZ, VALUE, LBOX,
      :                       UBOX, NPAR, D, PAR, B, STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_BXBOX( NDIM, LBND, UBND, MSKSIZ, VALUE, LBOX, UBOX, 
+*     CALL ARD1_BXBOX( NDIM, FRM, LBND, UBND, MSKSIZ, VALUE, LBOX, UBOX, 
 *                      NPAR, D, PAR, B, STATUS )
 
 *  Description:
@@ -23,6 +23,8 @@
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        The number of dimensions in the array.
+*     FRM = INTEGER (Given)
+*        An AST pointer to the user coord Frame.
 *     LBND( NDIM ) = INTEGER (Given)
 *        The lower pixel index bounds of the array.
 *     UBND( NDIM ) = INTEGER (Given)
@@ -76,11 +78,13 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'ARD_CONST'        ! ARD private constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
 
 *  Arguments Given:
       INTEGER NDIM
+      INTEGER FRM
       INTEGER LBND( NDIM )
       INTEGER UBND( NDIM )
       INTEGER MSKSIZ
@@ -117,8 +121,7 @@
       DOUBLE PRECISION 
      :        C( ARD__MXDIM*(1+ARD__MXDIM) ),! Inverse transformation
      :        PCO(ARD__MXDIM),   ! Pixel coordinates
-     :        UBLBND(ARD__MXDIM),! User box lower bounds (user coords)
-     :        UBUBND(ARD__MXDIM),! User box upper bounds (user coords)
+     :        HW(ARD__MXDIM),    ! Signed half-widths of box on each axis 
      :        UCO(ARD__MXDIM)    ! User coordinates
 
 *.
@@ -133,12 +136,11 @@
 *  user co-ordinates).
          CALL ARD1_INVRS( NDIM, D, C, STATUS )
 
-*  Store the upper and lower bounds (in user co-ordinates) of the user
-*  box. At the same time, take a copy of the pixel co-ordinate bounds.
-*  If the box is infinite, use the bounds of the mask.
+*  Store the half widths (in user co-ordinates) of the user box. At the 
+*  same time, take a copy of the pixel co-ordinate bounds. If the box is 
+*  infinite, use the bounds of the mask.
          DO I = 1, NDIM
-            UBLBND( I ) = PAR( I ) - 0.5*PAR( NDIM + I )
-            UBUBND( I ) = PAR( I ) + 0.5*PAR( NDIM + I )
+            HW( I ) = 0.5*ABS( PAR( NDIM + I ) )
 
             IF( LBOX( 1 ) .NE. VAL__MAXI ) THEN
                LLBOX( I ) = LBOX( I )
@@ -235,12 +237,11 @@
             INSIDE = .TRUE.
 
             DO I = 1, NDIM
-
-               IF( UCO( I ) .LT. UBLBND( I ) .OR.
-     :             UCO( I ) .GT. UBUBND( I ) ) INSIDE = .FALSE.
-
+               IF( ABS( AST_AXDISTANCE( FRM, I, PAR( I ), UCO( I ), 
+     :                                  STATUS ) ) .GT. HW( I ) ) THEN
+                  INSIDE = .FALSE.
+               END IF
             END DO
-
 
 *  If the pixel is inside the user box, assign the value to the
 *  current pixel. 

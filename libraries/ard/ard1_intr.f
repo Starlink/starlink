@@ -98,6 +98,8 @@
      :      P1( 2 ),             ! Position at end of ellipse 1st axis
      :      R,                   ! Distance from test point to ellipse centre
      :      U                    ! Angle from 1st ellipse axis to test point
+
+      SAVE P1
 *.
 
 *  Check inherited global status.
@@ -107,17 +109,18 @@
 *  region.
       ARD1_INTR = .TRUE.
 
-*  Call a separate suboutine to handle each type of region.
-
 *  BOX: Parameters are the supplied user co-ordinates of the box 
 *  centre, followed by the lengths of the box sides in user co-ordinates. 
 *  Box edges are always considered to be lines of constant axis values.
-*  These are not necessarily geodesics.
+*  These are not necessarily geodesics. If a side length is negative, the
+*  axis value must lie outside the specified range. This becuase (for
+*  instance), and RA range from 359 degs to 1 deg *includes values less
+*  than 1 and greater than 359.
       IF( TYPE .EQ. ARD__BOX ) THEN
          DO I = 1, NDIM
-            HW = ABS( 0.5*PAR( I + NDIM ) )
-            IF( UC( I ) .LT. PAR( I ) - HW .OR.
-     :          UC( I ) .GT. PAR( I ) + HW ) THEN
+            IF( ABS( AST_AXDISTANCE( FRM, I, PAR( I ), UC( I ), 
+     :                               STATUS ) ) .GT. 
+     :          0.5*ABS( PAR( I + NDIM ) ) ) THEN
                ARD1_INTR = .FALSE.
                GO TO 999
             END IF
@@ -183,14 +186,14 @@
          IF( INIT ) THEN
 
 *  Find the position, P1, at the end of the 1st axis of the ellipse.
-*  Do this by offsetting away from the ellipse centre by the length of
+*  Do this by offsetting away from the ellipse centre by half the length of
 *  the 1st axis, along a geodesic which is at the given angle to the 1st
 *  axis.
             A1 = AST_OFFSET2( FRM, PAR, ARD__DTOR*( 90.0 - PAR( 5 ) ),
-     :                        PAR( 3 ), P1, STATUS )
+     :                        0.5*PAR( 3 ), P1, STATUS )
          END IF
 
-*  Find the distance the test point to the ellipse centre.
+*  Find the distance of the test point to the ellipse centre.
          R = AST_DISTANCE( FRM, UC, PAR, STATUS )
 
 *  If co-incident, the point is inside.
@@ -207,7 +210,7 @@
 *  Do the test.
             ARD1_INTR = ( ( COS( U )/PAR( 3 ) )**2 + 
      :                    ( SIN( U )/PAR( 4 ) )**2 .LE. 
-     :                    1.0/R**2 )
+     :                    0.25/R**2 )
          END IF
 
 *  Report an error and abort for any other keyword.

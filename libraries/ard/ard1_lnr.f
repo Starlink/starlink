@@ -188,7 +188,7 @@
 *  BOX keywords...
       ELSE IF( TYPE .EQ. ARD__BOX ) THEN
          IF( NPAR .GT. 0  ) THEN
-            CALL ARD1_BOX( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR,
+            CALL ARD1_BOX( RINDEX, NDIM, FRM, LBND, UBND, MSKSIZ, NPAR,
      :                     D, PAR, B, LBEXTB, UBEXTB,
      :                     LBINTB, UBINTB, STATUS )
          ELSE
@@ -198,7 +198,7 @@
 *  RECT keywords...
       ELSE IF( TYPE .EQ. ARD__REC ) THEN
          IF( NPAR .GT. 0  ) THEN
-            CALL ARD1_REC( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR,
+            CALL ARD1_REC( RINDEX, NDIM, FRM, LBND, UBND, MSKSIZ, NPAR,
      :                     D, PAR, B, LBEXTB, UBEXTB,
      :                     LBINTB, UBINTB, STATUS )
          ELSE

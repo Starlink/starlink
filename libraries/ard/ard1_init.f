@@ -205,6 +205,7 @@
       DATA CMN_STSYM( ARD__TWI ) /'TWIST'/
       DATA CMN_STSYM( ARD__STR ) /'STRETCH'/
       DATA CMN_STSYM( ARD__WCS ) /'WCS'/
+      DATA CMN_STSYM( ARD__COF ) /'COFRAME'/
 
 *  The actual length of each statement.
       DATA CMN_STLEN( ARD__DIM ) /9/
@@ -214,6 +215,7 @@
       DATA CMN_STLEN( ARD__TWI ) /5/
       DATA CMN_STLEN( ARD__STR ) /7/
       DATA CMN_STLEN( ARD__WCS ) /3/
+      DATA CMN_STLEN( ARD__COF ) /7/
 
 *  The number of arguments taken by each statement. -1 is used if
 *  the number of arguments is variable.
@@ -224,6 +226,7 @@
       DATA CMN_STARG( ARD__TWI ) /1/
       DATA CMN_STARG( ARD__STR ) /-1/
       DATA CMN_STARG( ARD__WCS ) /-1/
+      DATA CMN_STARG( ARD__COF ) /-1/
 
 *  The number of arguments taken by each keyword. -1 is used if
 *  the number of arguments is variable.

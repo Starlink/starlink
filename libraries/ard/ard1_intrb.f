@@ -127,9 +127,11 @@
      :     V1,              ! fractional number of sides moved
      :     W,               ! Sub-offset
      :     XH,              ! Upper X on box
+     :     XW,              ! Width of X on box
      :     XL,              ! Lower X on box
      :     YH,              ! Upper Y on box
-     :     YL               ! Lower Y on box
+     :     YL,              ! Lower Y on box
+     :     YW               ! Width of Y on box
 
       INTEGER
      :     IV1,             ! Index at start of side
@@ -145,10 +147,12 @@
 
 *  Calculate common values.
       IF( TYPE .EQ. ARD__BOX ) THEN
-         XL = PAR( 1 ) - 0.5*PAR( 3 )
-         XH = PAR( 1 ) + 0.5*PAR( 3 )
-         YL = PAR( 2 ) - 0.5*PAR( 4 )
-         YH = PAR( 2 ) + 0.5*PAR( 4 )
+         XW = ABS( PAR( 3 ) )
+         XL = PAR( 1 ) - 0.5*XW
+         XH = PAR( 1 ) + 0.5*XW
+         YW = ABS( PAR( 4 ) )
+         YL = PAR( 2 ) - 0.5*YW
+         YH = PAR( 2 ) + 0.5*YW
 
       ELSE IF( TYPE .EQ. ARD__POL ) THEN
          NV = NPAR/2
@@ -174,22 +178,22 @@
 *  followed by the lengths of the box sides in user co-ordinates. 
             IF( TYPE .EQ. ARD__BOX ) THEN
 
-*  Corners of the box occur at offsets 0, 0.5, 0.5, 0.75 and 1.0. The edge
+*  Corners of the box occur at offsets 0, 0.25, 0.5, 0.75 and 1.0. The edge
 *  from 0 to 0.25 is parallel to the second axis.
                IF( D .LE. 0.25 ) THEN
                   OUT( POINT, 1 ) = XL
-                  OUT( POINT, 2 ) = YL + 4.0*D*PAR( 4 )
+                  OUT( POINT, 2 ) = YL + 4.0*D*YW
 
                ELSE IF( D .LE. 0.5 ) THEN
-                  OUT( POINT, 1 ) = XL + 4.0*( D - 0.25 )*PAR( 3 )
+                  OUT( POINT, 1 ) = XL + 4.0*( D - 0.25 )*XW
                   OUT( POINT, 2 ) = YH
 
                ELSE IF( D .LE. 0.75 ) THEN
                   OUT( POINT, 1 ) = XH
-                  OUT( POINT, 2 ) = YH - 4.0*( D - 0.5 )*PAR( 4 )
+                  OUT( POINT, 2 ) = YH - 4.0*( D - 0.5 )*YW
 
                ELSE 
-                  OUT( POINT, 1 ) = XH - 4.0*( D - 0.75 )*PAR( 3 )
+                  OUT( POINT, 1 ) = XH - 4.0*( D - 0.75 )*XW
                   OUT( POINT, 2 ) = YL
 
                END IF
@@ -276,7 +280,7 @@
             ELSE
                STATUS = ARD__INTER
                CALL MSG_SETI( 'TYPE', TYPE )
-               CALL ERR_REP( 'ARD1_UBBOX_ERR3', 'Illegal keyword '//
+               CALL ERR_REP( 'ARD1_INTRB_ERR1', 'Illegal keyword '//
      :                       'identifier (^TYPE) encountered in '//
      :                       'routine ARD1_INTRB (programming error).', 
      :                       STATUS )

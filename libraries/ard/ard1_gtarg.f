@@ -90,9 +90,15 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER
+     :  ATTR*20,                ! AST attribute name
+     :  DOM*80,                 ! Domain 
+     :  LAB*80                  ! Axis label
+
       INTEGER
      :  DELIM,                   ! Offset from I to the next delimiter
      :  END,                     ! Offset from I to end of argument
+     :  IAT,                     ! Used length fo a string
      :  J,                       ! Index of last character in argument
      :  NC,                      ! Number of characters read
      :  PAREN                    ! Offset from I to next ")" character
@@ -175,9 +181,18 @@
 
 *  Otherwise, use the Unformat method of the supplied Frame.
                   ELSE
-                      NC = AST_UNFORMAT( FRM, AXIS, ELEM( I : J ), 
+                     NC = AST_UNFORMAT( FRM, AXIS, ELEM( I : J ), 
      :                                   VALUE, STATUS )
-                      IF( NC .EQ. 0 ) STATUS = ARD__BADAR
+                     IF( NC .NE. J - I + 1 .AND. 
+     :                   STATUS .EQ. SAI__OK ) THEN
+                        ATTR = 'Label('
+                        IAT = 6
+                        CALL CHR_PUTI( AXIS, ATTR, IAT )
+                        CALL CHR_APPND( ')', ATTR, IAT )
+                        LAB = AST_GETC( FRM, ATTR( : IAT ), STATUS )
+                        DOM = AST_GETC( FRM, 'DOMAIN', STATUS )
+                        IF( STATUS .EQ. SAI__OK ) STATUS = ARD__BADAR
+                     END IF
                   END IF
 
 *  Set the OK flag if a vlaue was obtained succesfully.
@@ -185,9 +200,24 @@
 
 *  If the value was bad, display it.
                   IF( STATUS .NE. SAI__OK ) THEN
+
+                     IF( AXIS .GE. 1 ) THEN
+                        CALL MSG_SETC( 'L', '''' );
+                        CALL MSG_SETC( 'L', DOM )
+                        CALL MSG_SETC( 'L', ' '//LAB )
+                        CALL MSG_SETC( 'L', '''' );
+                     ELSE
+                        CALL MSG_SETC( 'L', '''Axis' );
+                        CALL MSG_SETC( 'L', ' ' );
+                        CALL MSG_SETI( 'L', AXIS )
+                        CALL MSG_SETC( 'L', '''' );
+                     END IF
+
                      CALL MSG_SETC( 'DESC', ELEM( I : J ) )
-                     CALL ERR_REP( 'ARD1_GTARG_ERR1', 'Bad value '//
-     :                             '''^DESC''', STATUS )
+                     CALL ERR_REP( 'ARD1_GTARG_ERR1', 'The string '//
+     :                             '''^DESC'' cannot be interpreted '//
+     :                             'as a ^L value.', STATUS )
+
                   END IF
 
 *  Return the index of the next following the end of the argument value.

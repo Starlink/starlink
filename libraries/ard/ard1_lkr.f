@@ -296,16 +296,16 @@
 *  16 parameters.
       ELSE IF( NPAR .GE. 16 ) THEN
          CALL ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR, 
-     :                   OPRNDS( IPAR ), IAST(1), DPP, IPB, LBEXTB, 
-     :                   UBEXTB, LBINTB, UBINTB, STATUS )
+     :                   OPRNDS( IPAR ), IAST(1), DPP, IPB, 
+     :                   LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
       ELSE
          DO I = 1, NPAR
             PAR( I ) = OPRNDS( IPAR + I - 1 )
          END DO
          CALL ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR, 
-     :                   PAR, IAST(1), DPP, IPB, LBEXTB, UBEXTB, LBINTB, 
-     :                   UBINTB, STATUS )
+     :                   PAR, IAST(1), DPP, IPB, LBEXTB, UBEXTB, 
+     :                   LBINTB, UBINTB, STATUS )
 
       END IF
 

@@ -354,7 +354,7 @@ anti-clockwise).
 
 \small
 \begin{verbatim}
-      CIR( 0, 0, 10 ) .AND. .NOT. ( COL( 10 ) .OR. ROW( 5 ) )
+      CIR( 0, 0, 10 ) .AND. .NOT. ( COLUMN( 10 ) .OR. ROW( 5 ) )
 \end{verbatim}
 \normalsize
 
@@ -1837,15 +1837,20 @@ each line of the dump on a separate line in the file:
 
 \small
 \begin{verbatim}
-   WCS(Begin FrameSet 
+   WCS(<!!
+       Begin FrameSet 
        IsA Frame      
        Nframe = 6  
        ...
        ...
        End FrameSet
-   )
+   !!>)
 \end{verbatim}
 \normalsize
+
+The ``<!!'' and ``!!>'' strings tell GRP to treat the enclosed text as
+verbatim text. That is, any GRP control characters found within the
+body of the FrameSet dump are treated as literal characters.
 
 \end{description}
 

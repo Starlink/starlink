@@ -81,23 +81,12 @@
 *  External References:
       INTEGER CHR_LEN            ! Significant length of a string
 
-*  Local Constants:
-      INTEGER EMPTY              ! Empty character buffer
-      PARAMETER ( EMPTY = -1 )
-      INTEGER SZTEXT             ! Size of text buffer
-      PARAMETER ( SZTEXT = ( GRP__SZNAM - 1 ) * ( ARD__MXACL + 1 ) )
-
 *  Local Variables:
-      CHARACTER * ( SZTEXT ) NEXT ! Buffer for input text
-      CHARACTER * ( SZTEXT ) TEXT ! Buffer for AST_ text
+      CHARACTER TEXT*( GRP__SZNAM ) ! Buffer for AST_ text
       INTEGER DIM                 ! Size of GRP group
       INTEGER L                   ! Number of characters in AST_ text
-      INTEGER LENGTH              ! Length if HDS object in characters
-      INTEGER NDIM                ! Number of HDS object dimensions
-      LOGICAL AGAIN               ! Loop to read another line?
 
       SAVE DIM      
-      SAVE LENGTH
 *.
 
 *  Check inherited global status.
@@ -107,73 +96,24 @@
 *  group being read from.
       IF ( CMN_NXTLN .EQ. 1 ) CALL GRP_GRPSZ( CMN_IGRP, DIM, STATUS )
 
-*  Loop to extract lines (including continuation lines) from the
-*  group and to re-assemble them into a single line.
-      L = EMPTY
-      IF ( STATUS .EQ. SAI__OK ) THEN
-         AGAIN = .TRUE.
- 1       CONTINUE                ! Start of "DO WHILE" loop
-         IF ( AGAIN .AND. ( STATUS .EQ. SAI__OK ) ) THEN
+*  If any elements are left in the group, get the next one.
+      IF ( CMN_NXTLN .LE. DIM ) THEN
+         CALL GRP_GET( CMN_IGRP, CMN_NXTLN, 1, TEXT, STATUS )
 
-*  Check that we have not reached the end of the group. If not, obtain
-*  the contents of the next element.
-            IF ( CMN_NXTLN .LE. DIM ) THEN
-               CALL GRP_GET( CMN_IGRP, CMN_NXTLN, 1, 
-     :                       NEXT( : GRP__SZNAM ), STATUS )
+*  Store its used length.
+         L = CHR_LEN( TEXT )
 
-*  If this is the first element read, insert it at the start of the
-*  text buffer (minus the first character, which is a flag) and update
-*  the count of characters in this buffer. Also update the group
-*  element number.
-               IF ( STATUS .EQ. SAI__OK ) THEN
-                  IF ( L .EQ. EMPTY ) THEN
-                     TEXT( : GRP__SZNAM - 1 ) = NEXT( 2 : GRP__SZNAM )
-                     L = GRP__SZNAM - 1
-                     CMN_NXTLN = CMN_NXTLN + 1
+*  Increment the index of the next element to read.
+         CMN_NXTLN = CMN_NXTLN + 1
 
-*  If it is a continuation line, check whether its contents can be
-*  appended to the text buffer without exceeding its length. If not,
-*  then report an error.
-                  ELSE IF ( NEXT( 1 : 1 ) .EQ. '+' ) THEN
-                     IF ( ( L + GRP__SZNAM - 1 ) .GT. LEN( TEXT ) ) THEN
-                        STATUS = ARD__BADAR
-                        CALL MSG_SETI( 'LEN', LEN( TEXT ) )
-                        CALL ERR_REP( 'ARD1_SRCTA_CONT',
-     :                       'Too many input continuation lines; ' //
-     :                       'internal buffer length of ^LEN ' //
-     :                       'characters exceeded.', STATUS )
-
-*  Otherwise, append its contents to the text buffer and advance the
-*  input group element.
-                     ELSE
-                        TEXT( L + 1 : L + GRP__SZNAM - 1 ) =
-     :                     NEXT( 2 : GRP__SZNAM )
-                        L = L + GRP__SZNAM - 1
-                        CMN_NXTLN = CMN_NXTLN + 1
-                     END IF
-
-*  Quit looping if we have read all the continuation lines.
-                  ELSE
-                     AGAIN = .FALSE.
-                  END IF
-               END IF
-
-*  Also quit looping if the input group is exhausted.
-            ELSE
-               AGAIN = .FALSE.
-            END IF
-            GO TO 1              ! End of "DO WHILE" loop
-         END IF
+*  If no elements are left to read, set L to -1 to indicate this.
+      ELSE
+         L = -1
       END IF
 
-*  Remove any trailing blanks from the text buffer.
-      IF ( L .GT. 0 ) L = CHR_LEN( TEXT( : L ) )
-
-*  If there has been an error, set the number of characters to EMPTY
-*  (-1) to indicate no more data. If no text has been read (e.g. the
-*  input group is exhausted), then this value will still be
-*  set to EMPTY anyway.
-      IF ( STATUS .NE. SAI__OK ) L = EMPTY
+*  If there has been an error, set the number of characters to -1
+*  to indicate no more data. 
+      IF ( STATUS .NE. SAI__OK ) L = -1
 
 *  Send the text to the AST_ library for interpretation.
       CALL AST_PUTLINE( TEXT, L, STATUS )

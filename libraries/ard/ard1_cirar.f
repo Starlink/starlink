@@ -104,15 +104,10 @@
 *  If another argument is obtained, which axis will it refer to?
          AXIS = NARG + 1
 
-*  The last argument is a radius, measured on axis 1 unless the Frame is
-*  a SkyFrame, in which case it is measured on the latitude axis.
-         IF( AXIS .GT. NDIM ) THEN
-            IF( AST_ISASKYFRAME( CFRM, STATUS ) ) THEN
-               AXIS = AST_GETI( CFRM, 'LATAXIS', STATUS )
-            ELSE
-               AXIS = 1
-            END IF
-         END IF            
+
+*  The last argument is a radius. Find the index of the axis along which 
+*  the radius is measured.
+         IF( AXIS .GT. NDIM ) CALL ARD1_DSTAX( CFRM, AXIS, STATUS )
 
 *  Read the next argument.
          CALL ARD1_GTARG( CFRM, AXIS, ELEM, L, I, OK, KEYW, VALUE, 

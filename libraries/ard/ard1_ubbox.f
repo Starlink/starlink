@@ -1,4 +1,4 @@
-      SUBROUTINE ARD1_UBBOX( NDIM, TYPE, NPAR, PAR, UBXLB, UBXUB, 
+      SUBROUTINE ARD1_UBBOX( NDIM, FRM, TYPE, NPAR, PAR, UBXLB, UBXUB, 
      :                       STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_UBBOX( NDIM, TYPE, NPAR, PAR, UBXLB, UBXUB, STATUS )
+*     CALL ARD1_UBBOX( NDIM, FRM, TYPE, NPAR, PAR, UBXLB, UBXUB, STATUS )
 
 *  Description:
 *     The user coordinate bounds of an n-D box enclosing the supplied 
@@ -21,6 +21,8 @@
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        The number of dimensions in the array.
+*     FRM = INTEGER (Given)
+*        The user cooridnate Frame.
 *     TYPE = INTEGER (Given)
 *        The identifier for the region type.
 *     NPAR = INTEGER (Given)
@@ -65,6 +67,7 @@
 
 *  Arguments Given:
       INTEGER NDIM
+      INTEGER FRM
       INTEGER TYPE
       INTEGER NPAR
       DOUBLE PRECISION PAR( NPAR )
@@ -122,8 +125,10 @@
          ELSE
             DO I = 1, NDIM
                HW = ABS( 0.5*PAR( I + NDIM ) )
-               UBXUB( I ) = PAR( I ) + HW
-               UBXLB( I ) = PAR( I ) - HW
+               UBXUB( I ) = AST_AXOFFSET( FRM, I, PAR( I ), HW, 
+     :                                    STATUS )
+               UBXLB( I ) = AST_AXOFFSET( FRM, I, PAR( I ), -HW, 
+     :                                    STATUS )
             END DO
          END IF
 

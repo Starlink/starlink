@@ -256,7 +256,8 @@
 
 *  Do not report an error if the keyword or statement does not need an
 *  argument list and no argument list has been started.
-                  IF( ( NOARGS.AND.NARG.GE.0 ) .OR. .NOT. NOARGS ) THEN
+                  IF( ( ( NOARGS.AND.NARG.GE.0 ) .OR. .NOT. NOARGS ) 
+     :                .AND. STATUS .EQ. SAI__OK ) THEN 
                      STATUS = ARD__ARGS
                      CALL MSG_SETC( 'DESC', ELEM )
                      CALL ERR_REP( 'ARD1_ADANL_ERR1', 'Missing or '//
@@ -306,9 +307,9 @@
 *  is complete, make any modifications to the current transformations,
 *  etc, specified by the statement.
          ELSE IF( STAT ) THEN
-            CALL ARD1_STAT( TYPE, ELEM, L, NDIM, AWCS, DLBND, DUBND, 
-     :                      NEEDIM, NARG, I, UWCS, MAP, STAT, IWCS, 
-     :                      WCSDAT, STATUS )
+            CALL ARD1_STAT( TYPE, ELEM, L, NDIM, AWCS, DLBND, 
+     :                      DUBND, NEEDIM, NARG, I, UWCS, MAP, STAT, 
+     :                      IWCS, WCSDAT, STATUS )
 
 *  Update the current Frame pointer.
             CALL AST_ANNUL( CFRM, STATUS )
@@ -399,7 +400,7 @@
       END DO
 
 *  Report an error and abort if a null ARD description was supplied.
-      IF( IEXPR .EQ. 1 ) THEN
+      IF( IEXPR .EQ. 1 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = ARD__BADDM
          CALL ERR_REP( 'ARD1_ADANL_ERR2', 'Null ARD description '//
      :                 'supplied.', STATUS )

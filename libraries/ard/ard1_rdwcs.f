@@ -107,16 +107,18 @@
       IF( STATUS .EQ. SAI__OK ) THEN
          IF( IWCS .EQ. AST__NULL ) THEN
             STATUS = ARD__BADAR
-            CALL ERR_REP( 'ARD1_RDWCS_ERR1', 'No AST Object could '//
-     :                    'be read', STATUS )      
+            CALL ERR_REP( 'ARD1_RDWCS_ERR1', 'The WCS argument list '//
+     :                    'does not describe a valid AST Object.', 
+     :                    STATUS )      
 
 *  Report an error if a non-FrameSet was read.
          ELSE IF( .NOT. AST_ISAFRAMESET( IWCS, STATUS ) ) THEN
             CALL AST_ANNUL( IWCS, STATUS )
             STATUS = ARD__BADAR
             CALL MSG_SETC( 'CL', AST_GETC( IWCS, 'CLASS', STATUS ) )
-            CALL ERR_REP( 'ARD1_RDWCS_ERR2', 'An AST ^CL was read but'//
-     :                    ' a FrameSet is required.', STATUS )      
+            CALL ERR_REP( 'ARD1_RDWCS_ERR2', 'An AST ^CL was read '//
+     :                    'from the WCS argument list but a FrameSet '//
+     :                    'is required.', STATUS )      
 
 *  Report an error if the Current Frame has the wrong number of axes.
          ELSE IF( AST_GETI( IWCS, 'NAXES', STATUS ) .NE. NDIM ) THEN
@@ -134,7 +136,7 @@
             END IF
 
             CALL ERR_REP( 'ARD1_RDWCS_ERR3', 'The current Frame in '//
-     :                    'the FrameSet has ^NAX axes, but ^NDIM '//
+     :                    'the WCS FrameSet has ^NAX axes, but ^NDIM '//
      :                    'required.', STATUS )
          END IF
 

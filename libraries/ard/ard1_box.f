@@ -1,5 +1,5 @@
-      SUBROUTINE ARD1_BOX( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D, 
-     :                     PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
+      SUBROUTINE ARD1_BOX( RINDEX, NDIM, FRM, LBND, UBND, MSKSIZ, NPAR, 
+     :                     D, PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
      :                     STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_BOX( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D, PAR, B,
+*     CALL ARD1_BOX( RINDEX, NDIM, FRM, LBND, UBND, MSKSIZ, NPAR, D, PAR, B,
 *                    LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
@@ -29,6 +29,8 @@
 *        The value to use to represent interior points.
 *     NDIM = INTEGER (Given)
 *        The number of dimensions in the B array.
+*     FRM = INTEGER (Given)
+*        An AST pointer to the user coords Frame.
 *     LBND( NDIM ) = INTEGER (Given)
 *        The lower pixel index bounds of the B array.
 *     UBND( NDIM ) = INTEGER (Given)
@@ -97,6 +99,7 @@
 *  Arguments Given:
       INTEGER RINDEX
       INTEGER NDIM
+      INTEGER FRM
       INTEGER LBND( NDIM )
       INTEGER UBND( NDIM )
       INTEGER MSKSIZ
@@ -147,7 +150,7 @@
 *  Call a routine to assign an interior value to every pixel inside
 *  the interior bounding box which is also inside the specified user
 *  box.
-      CALL ARD1_BXBOX( NDIM, LBND, UBND, MSKSIZ, RINDEX, LBINTB,
+      CALL ARD1_BXBOX( NDIM, FRM, LBND, UBND, MSKSIZ, RINDEX, LBINTB,
      :                 UBINTB, NPAR, D, PAR, B, STATUS )
 
 *  If the interior bounding box is null, return the usual value

@@ -94,7 +94,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get a bounding box for the region in user coords. 
-      CALL ARD1_UBBOX( 2, TYPE, NPAR, PAR, UBXLB, UBXUB, STATUS )
+      CALL ARD1_UBBOX( 2, FRM, TYPE, NPAR, PAR, UBXLB, UBXUB, STATUS )
 
 *  Find the corresponding bounding box in pixel indices. 
       DO I = 1, 2

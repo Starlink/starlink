@@ -1,5 +1,5 @@
-      SUBROUTINE ARD1_REC( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D,
-     :                     PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
+      SUBROUTINE ARD1_REC( RINDEX, NDIM, FRM, LBND, UBND, MSKSIZ, NPAR,
+     :                     D, PAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB, 
      :                     STATUS )
 *+
 *  Name:
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ARD1_REC( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D, PAR, 
+*     CALL ARD1_REC( RINDEX, NDIM, FRM, LBND, UBND, MSKSIZ, NPAR, D, PAR, 
 *                    B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Description:
@@ -25,6 +25,8 @@
 *        The value to use to represent interior points.
 *     NDIM = INTEGER (Given)
 *        The number of dimensions in the B array.
+*     FRM = INTEGER (Given)
+*        An AST pointer to the user coord Frame.
 *     LBND( NDIM ) = INTEGER (Given)
 *        The lower pixel index bounds of the B array.
 *     UBND( NDIM ) = INTEGER (Given)
@@ -88,10 +90,12 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ARD_CONST'        ! ARD_ private constants
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
+      INCLUDE 'AST_PAR'          ! AST_ constants and functions
 
 *  Arguments Given:
       INTEGER RINDEX
       INTEGER NDIM
+      INTEGER FRM
       INTEGER LBND( NDIM )
       INTEGER UBND( NDIM )
       INTEGER MSKSIZ
@@ -114,6 +118,7 @@
      :        I                  ! Loop count
 
       DOUBLE PRECISION 
+     :        HW,                 ! Axis half width
      :        LPAR( ARD__MXDIM*2 )! Local parameters
 
 *.
@@ -135,20 +140,22 @@
 *  Loop round each dimension.
       DO I = 1, NDIM
 
-*  Find the center of the box on this axis, and store in the local
-*  parameter array.
-         LPAR( I ) = 0.5*( PAR( I ) + PAR( I + NDIM ) )
+*  Find the half width of the box on this axis.
+         HW = 0.5*AST_AXDISTANCE( FRM, I, PAR( I ), PAR( I + NDIM ), 
+     :                            STATUS )
 
-*  Find the length of the box on this axis, and store in the local
-*  parameter array.
-         LPAR( I + NDIM ) = ABS( PAR( I ) - PAR( I + NDIM ) )
+*  Find the centre of the box on this axis.
+         LPAR( I ) = AST_AXOFFSET( FRM, I, PAR( I ), HW, STATUS )
+
+*  Store the full width of the box on this axis.
+         LPAR( I + NDIM ) = 2*ABS( HW )
 
       END DO
 
 *  The parameters are now in the same format as those for a BOX region.
 *  Call the subroutine used to load a BOX region.
-      CALL ARD1_BOX( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, D, LPAR,
-     :               B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
+      CALL ARD1_BOX( RINDEX, NDIM, FRM, LBND, UBND, MSKSIZ, NPAR, D, 
+     :               LPAR, B, LBEXTB, UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  Jump here if an error occurs.
  999  CONTINUE

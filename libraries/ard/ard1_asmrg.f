@@ -127,9 +127,9 @@
 *  Issue a fatal error if alignment was not possible in any Domain.
       IF( TEMP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = ARD__NOTAL
-         CALL ERR_REP( 'ARD1_ASMRG_2', 'Could not align the '//
-     :                 'positions in the supplied ARD expression '//
-     :                 'with the pixel data.', STATUS )
+         CALL ERR_REP( 'ARD1_ASMRG_2', 'Could not find any way to '//
+     :                 'align the positions in the supplied ARD '//
+     :                 'expression with the pixel data.', STATUS )
          GO TO 999
       END IF
 

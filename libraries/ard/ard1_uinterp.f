@@ -173,6 +173,8 @@
      :        I,                 ! Point index
      :        J                  ! Axis index
 
+      integer k
+
       LOGICAL
      :        BAD                ! Is the user position good?
 
@@ -206,6 +208,8 @@
 *  assign an interior value to the output value. If not, assign the
 *  exterior value (zero).
          ELSE 
+            CALL AST_NORM( CMN_FRMC, UC, STATUS )
+
             IF( ARD1_INTR( CMN_FRMC, CMN_TYPEC, NDIM_IN, CMN_NPARC, 
      :                     PARAMS, UC, CMN_INIT, STATUS ) ) THEN
                OUT( 1 + OFF ) = CMN_RNDXC
@@ -215,10 +219,10 @@
 
          END IF
 
-      END DO
-
 *  Indicate that any require initialization has now been done, and so
 *  should not be done again.
-      CMN_INIT = .FALSE.
+         CMN_INIT = .FALSE.
+
+      END DO
 
       END

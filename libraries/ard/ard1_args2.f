@@ -80,7 +80,7 @@
       CHARACTER CC*1             ! Next character
       INTEGER DEPTH              ! Depth of parenthesis nesting
       INTEGER START              ! Start of the text to be stored
-
+      INTEGER J                  ! ENd of the text to be stored
       SAVE DEPTH
 *.
 
@@ -146,11 +146,18 @@
             I = I + 1
          END DO            
 
+*  Determine the index of the last usable character.
+         IF( MORE ) THEN
+            J = I - 1
+         ELSE
+            J = J - 2
+         END IF
+
 *  Store the string as a new element in the returned group.
-         IF( START .LE. I ) THEN
-            IF( ELEM( START : I ) .NE. ' ' ) THEN 
+         IF( START .LE. J ) THEN
+            IF( ELEM( START : J ) .NE. ' ' ) THEN 
                NARG = NARG + 1
-               CALL GRP_PUT( IGRP, 1, ELEM( START : I ), 0, STATUS )
+               CALL GRP_PUT( IGRP, 1, ELEM( START : J ), 0, STATUS )
             END IF
          END IF
 

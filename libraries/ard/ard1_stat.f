@@ -318,9 +318,14 @@
       IF( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'ELEM', ELEM )
          CALL MSG_SETC( 'ST', CMN_STSYM( TYPE ) )
-         CALL ERR_REP( 'ARD1_STAT_ERR6', 'Error processing ^ST '//
-     :                 'statement in ARD description ''^ELEM''.',
-     :                 STATUS )
+         IF( TYPE .NE. ARD__WCS ) THEN 
+            CALL ERR_REP( 'ARD1_STAT_ERR6', 'Error processing ^ST '//
+     :                    'statement in ARD description ''^ELEM''.',
+     :                    STATUS )
+         ELSE
+            CALL ERR_REP( 'ARD1_STAT_ERR7', 'Error processing ^ST '//
+     :                    'statement.', STATUS )
+         END IF
       END IF
       
       END

@@ -1,5 +1,5 @@
       SUBROUTINE ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, 
-     :                      NPAR, PAR, CFRM, IWCS, DPP, IPB, LBEXTB, 
+     :                      NPAR, PAR, IWCS, DPP, IPB, LBEXTB, 
      :                      UBEXTB, LBINTB, UBINTB, STATUS )
 *+
 *  Name:
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     CALL ARD1_NLNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR,
-*                     PAR, CFRM, IWCS, DPP, IPB, LBEXTB, UBEXTB, LBINTB, 
+*                     PAR, IWCS, DPP, IPB, LBEXTB, UBEXTB, LBINTB, 
 *                     UBINTB, STATUS )
 
 *  Description:
@@ -42,8 +42,6 @@
 *     PAR( * ) = DOUBLE PRECISION (Given)
 *        The region parameters, as supplied in the ARD expression. The
 *        length of this array should be MAX( 16, NPAR ).
-*     CFRM = INTEGER (Given)
-*        Pointer to a Frame describing user coordinates.
 *     IWCS = INTEGER (Given)
 *        An AST FrameSet. The Base Frame should be pixel coords within
 *        the B array, and the Current Frame should be used cords.
@@ -127,7 +125,6 @@
       INTEGER MSKSIZ
       INTEGER NPAR
       DOUBLE PRECISION PAR( * )
-      INTEGER CFRM
       INTEGER IWCS
       DOUBLE PRECISION DPP
       INTEGER IPB
@@ -168,6 +165,7 @@
      :      XU( ARD__MXDIM )     ! User coords at axis upper bound
 
       INTEGER
+     :        CFRM,              ! Pointer to current Frame
      :        GMAP,              ! Mapping from grixel to user
      :        I,                 ! Loop count
      :        LBIN( ARD__MXDIM ),! Lower bounds for pretend input image
@@ -224,14 +222,18 @@
 *  Begin an AST context.
          CALL AST_BEGIN( STATUS )
 
+*  Get a pointer to the user coordinate Frame.
+         CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )  
+
 *  We can simplify some regions...
 
 *  Convert RECT regions into BOX regions.
          IF( TYPE .EQ. ARD__REC ) THEN
             DO I = 1, NDIM
-               HW = 0.5*ABS( PAR( I ) - PAR( I + NDIM ) )
-               PAR( I ) = 0.5*( PAR( I ) + PAR( I + NDIM ) )
-               PAR( I + NDIM ) = 2*HW
+               HW = 0.5*AST_AXDISTANCE( CFRM, I, PAR( I ), 
+     :                                  PAR( I + NDIM ), STATUS )
+               PAR( I ) = AST_AXOFFSET( CFRM, I, PAR( I ), HW, STATUS )
+               PAR( I + NDIM ) = 2*ABS( HW )
             END DO
             TYPE = ARD__BOX
 
@@ -301,7 +303,7 @@
          IF( CLASS .EQ. 'Frame' ) THEN
 
 *  Get a bounding box for the region in user coords. 
-            CALL ARD1_UBBOX( NDIM, TYPE, NPAR, PAR, UBXLB, UBXUB, 
+            CALL ARD1_UBBOX( NDIM, CFRM, TYPE, NPAR, PAR, UBXLB, UBXUB, 
      :                       STATUS )
 
 *  Find the corresponding bounding box in pixel indices. 
@@ -333,10 +335,13 @@
      :                       UBINTB, %VAL( IPB ), STATUS )
 
 *  Extend the bounding box by a safety margin of 2 pixels.
-            LBINTB( 1 ) = LBINTB( 1 ) - 2
-            UBINTB( 1 ) = UBINTB( 1 ) + 2
-            LBINTB( 2 ) = LBINTB( 2 ) - 2
-            UBINTB( 2 ) = UBINTB( 2 ) + 2
+            IF( LBINTB( 1 ) .NE. VAL__MINI .AND. 
+     :          LBINTB( 1 ) .NE. VAL__MAXI ) THEN 
+               LBINTB( 1 ) = LBINTB( 1 ) - 2
+               UBINTB( 1 ) = UBINTB( 1 ) + 2
+               LBINTB( 2 ) = LBINTB( 2 ) - 2
+               UBINTB( 2 ) = UBINTB( 2 ) + 2
+            END IF
 
 *  For any other class of user coords, we cannot confidently find a
 *  bounding box, so use the entire image.
