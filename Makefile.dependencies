@@ -276,7 +276,8 @@ $(MANIFEST)/ccdtasks:
 	cd applications/ccdpack/tasks \
 	    && make>make.log && make install>>make.log
 
-$(MANIFEST)/cfitsio:
+$(MANIFEST)/cfitsio: \
+		$(MANIFEST)/star2html
 	cd thirdparty/heasarc/cfitsio \
 	    && make>make.log && make install>>make.log
 
@@ -421,6 +422,7 @@ $(MANIFEST)/dipso: \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
 		$(MANIFEST)/snx \
+		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
 		$(MANIFEST)/tcl
@@ -475,6 +477,39 @@ $(MANIFEST)/extractor: \
 	cd applications/extractor \
 	    && make>make.log && make install>>make.log
 
+$(MANIFEST)/figaro: \
+		$(MANIFEST)/adam \
+		$(MANIFEST)/agi \
+		$(MANIFEST)/ams \
+		$(MANIFEST)/ary \
+		$(MANIFEST)/ast \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/fio \
+		$(MANIFEST)/gks \
+		$(MANIFEST)/grp \
+		$(MANIFEST)/gwm \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
+		$(MANIFEST)/lex \
+		$(MANIFEST)/mers \
+		$(MANIFEST)/messys \
+		$(MANIFEST)/misc \
+		$(MANIFEST)/ndf \
+		$(MANIFEST)/par \
+		$(MANIFEST)/parsecon \
+		$(MANIFEST)/pda \
+		$(MANIFEST)/prm \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html \
+		$(MANIFEST)/string \
+		$(MANIFEST)/subpar
+	cd applications/figaro \
+	    && make>make.log && make install>>make.log
+
 $(MANIFEST)/fio: \
 		$(MANIFEST)/adam \
 		$(MANIFEST)/ams \
@@ -521,6 +556,7 @@ $(MANIFEST)/gaia: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd applications/gaia \
@@ -781,7 +817,8 @@ $(MANIFEST)/img: \
 	cd libraries/img \
 	    && make>make.log && make install>>make.log
 
-$(MANIFEST)/init:
+$(MANIFEST)/init: \
+		$(MANIFEST)/hlp
 	cd etc/init \
 	    && make>make.log && make install>>make.log
 
@@ -1059,6 +1096,11 @@ $(MANIFEST)/ndg: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/ndg \
+	    && make>make.log && make install>>make.log
+
+$(MANIFEST)/news: \
+		$(MANIFEST)/star2html
+	cd applications/news \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/one: \
