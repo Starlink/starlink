@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/pcs/misc</path>
+  <description>Miscellaneous routines required for the Unix build of
+    ADAM/HDS</description>
+  <dependencies>
+    <build>@STAR_BUILD_DEPENDENCIES@</build>
+    <use>@STAR_USE_DEPENDENCIES@</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <notes><p>Documented in SUN/144 in PCS</p></notes>
+</component>

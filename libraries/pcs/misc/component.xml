@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="misc">
+  <version>1.4</version>
+  <path>libraries/pcs/misc</path>
+  <description>Miscellaneous routines required for the Unix build of
+    ADAM/HDS</description>
+  <dependencies>
+    <build> cnf</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Documented in SUN/144 in PCS</p></notes>
+</component>
