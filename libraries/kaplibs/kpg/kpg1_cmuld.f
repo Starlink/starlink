@@ -45,6 +45,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
  
 *  History:
@@ -58,6 +59,8 @@
 *        arrays.
 *     1996 May 20 (MJC):
 *        Replaced LIB$ESTABLISH and LIB$REVERT calls.
+*     2004 Oct 1 (TIMJ):
+*        No longer use NUM_ERROR directly
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -73,7 +76,6 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
  
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Numerical error flag
  
 *  Arguments Given:
       LOGICAL BAD
@@ -91,7 +93,9 @@
 *  External References:
       EXTERNAL NUM_TRAP
       INTEGER NUM_TRAP           ! Numerical error handler
- 
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
+
 *  Local Variables:
       INTEGER I                  ! Loop counter for array elements
  
@@ -103,7 +107,7 @@
 *  Establish a numerical error handler and initialise the error flag
 *  and error count.
       CALL NUM_HANDL( NUM_TRAP )
-      NUM_ERROR = SAI__OK
+      CALL NUM_CLEARERR()
       NBAD = 0
  
 *  No bad values present:
@@ -117,10 +121,10 @@
 *  Check for numerical errors (i.e. overflow). If present, then assign
 *  a bad value to the output array element and count the error. Reset
 *  the numerical error flag.
-            IF ( NUM_ERROR .NE. SAI__OK ) THEN
+            IF ( .NOT. NUM_WASOK() ) THEN
                B( I ) = VAL__BADD
                NBAD = NBAD + 1
-               NUM_ERROR = SAI__OK
+               CALL NUM_CLEARERR()
             END IF
  1       CONTINUE
  
@@ -138,10 +142,10 @@
 *  errors.
             ELSE
                B( I ) = CONST * A( I )
-               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+               IF ( .NOT. NUM_WASOK() ) THEN
                   B( I ) = VAL__BADD
                   NBAD = NBAD + 1
-                  NUM_ERROR = SAI__OK
+                  CALL NUM_CLEARERR()
                END IF
             END IF
  2       CONTINUE
