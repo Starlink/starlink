@@ -748,7 +748,7 @@
          ndfsetname = ndfset->content.ndfs[ 0 ]->name;
          nleng = strlen( ndfsetname );
       }
-      ndfset->name = malloc( nleng );
+      ndfset->name = malloc( nleng + 1 );
       if ( tclmemok( interp, ndfset->name ) != TCL_OK ) {
          return TCL_ERROR;
       }
