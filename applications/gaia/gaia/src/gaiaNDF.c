@@ -396,7 +396,7 @@ int gaiaFreeNDF( int ndfid )
  *      allocated memory. The routine uses NDF chunking to minimize
  *      the total memory footprint.
  */
-int gaiaCopyNDF( int ndfid, void **data, const char* component,
+int gaiaCopyComponent( int ndfid, void **data, const char* component,
                  char **error_mess )
 {
    char dtype[NDF__SZTYP+1];
@@ -509,7 +509,7 @@ int gaiaCopyNDF( int ndfid, void **data, const char* component,
 
 /*
  *   Name:
- *      gaiaMapNDF
+ *      gaiaMapComponent
  *
  *   Purpose:
  *      Map an NDF data component for READ access, returning a pointer
@@ -521,7 +521,7 @@ int gaiaCopyNDF( int ndfid, void **data, const char* component,
  *      If the data values require modification, then a copy should be
  *      made instead.
  */
-int gaiaMapNDF( int ndfid, void **data, const char* component,
+int gaiaMapComponent( int ndfid, void **data, const char* component,
                 char **error_mess )
 {
    char dtype[NDF__SZTYP+1];
@@ -856,6 +856,7 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
 
          /*  Attempt to open NDF to see if it exists (could check for
              DATA_ARRAY component) */
+         emess = NULL;
          if ( gaiaAccessNDF( ndffile, &type, &width, &height, &header, &hlen,
                              &ndfid, &emess ) ) {
 
@@ -885,6 +886,9 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
                  setState( state, ndfid, path, type, width, height, header,
                            hlen, &status );
              }
+         }
+         if ( emess != NULL ) {
+             free( emess );
          }
          datAnnul( newloc, &status );
       }
@@ -982,6 +986,22 @@ int gaiaCheckMNDF( const void *handle, int index, const char *component )
 
 /*
  *  Name:
+ *     gaiaGetIdMNDF
+ *
+ *  Purpose:
+ *     Get NDF identifier for a particular NDF.
+ */
+void gaiaGetIdMNDF( const void *handle, int index, int *ndfid )
+{
+   NDFinfo *current = NULL;
+   current = getNDFInfo( handle, index );
+   if ( current ) {
+      *ndfid = current->ndfid;
+   }
+}
+
+/*
+ *  Name:
  *     gaiaGetInfoMNDF
  *
  *  Purpose:
@@ -1034,11 +1054,10 @@ int gaiaGetMNDF( const void *handle, int index, const char *component,
       /*  Either copy the data or obtained a mapped pointer according
        *  to the readonly status */
       if ( current->readonly ) {
-         return gaiaMapNDF( current->ndfid, data, component,
+         return gaiaMapComponent( current->ndfid, data, component,
                             error_mess );
-      }
-      else {
-         return gaiaCopyNDF( current->ndfid, data, component,
+      } else {
+         return gaiaCopyComponent( current->ndfid, data, component,
                              error_mess );
       }
    }
@@ -1116,14 +1135,20 @@ int gaiaCountMNDFs( const void *handle )
 void gaiaReleaseMNDF( const void *handle )
 {
    NDFinfo *current = (NDFinfo *) handle;
-   if ( current ) {
-      for ( ; current; current = current->next ) {
+   NDFinfo *next = NULL;
+   do {
+       /* Free NDF and header block */
          gaiaFreeNDF( current->ndfid );
+       cnf_free( current->header );
 
-         /*  Free the headers that remain allocated for each query */
-         cnf_free( current->header ); /*  Memory allocated by PSX_ routines */
-      }
+       /* Free the NDFinfo structure that stored these */
+       next = current->next;
+       free( current );
+       
+       /* And process next in chain */
+       current = next;
    }
+   while( current != NULL );
 }
 
 /*
@@ -1144,6 +1169,56 @@ void gaiaFreeMNDF( void *handle, int index )
       ndfUnmap( current->ndfid, "*", &status );
       emsRlse();
    }
+}
+
+/*
+ *  Name:
+ *     gaiaCloneMNDF
+ *
+ *  Purpose:
+ *     Create a copy of an NDFinfo handle structure with cloned NDF
+ *     identifiers and header copy. Use this when independent access
+ *     of the container file is required (i.e. when you need to map in
+ *     more than one NDF in a single container file at a time).
+ *
+ *     Obviously you should avoid mixed mode access to this file
+ *     otherwise treat it as independent (i.e. close it sometime).
+ */
+void *gaiaCloneMNDF( void *handle )
+{
+    NDFinfo *current = (NDFinfo *) handle;
+    NDFinfo *newInfo = NULL;
+    NDFinfo *newState = NULL;
+    NDFinfo *lastState = NULL;
+    int first = 1;
+    int status = SAI__OK;
+
+    if ( current ) {
+        for ( ; current; current = current->next ) {
+
+            //  Make a copy of the current NDFinfo structure.
+            newState = (NDFinfo *) malloc( sizeof( NDFinfo ) );
+            memcpy( newState, current, sizeof( NDFinfo ) );
+
+            //  Clone it's NDF identifier.
+            ndfClone( current->ndfid, &(newState->ndfid), &status );
+
+            //  And copy the headers.
+            newState->header = cnfCreat( current->hlen * 80 );
+            memcpy( newState->header, current->header, 
+                    current->hlen * 80 );
+
+            //  And add this to the new super structure.
+            if ( first ) {
+                newInfo = newState;
+                first = 0;
+            } else {
+                lastState->next = newState;
+            }
+            lastState = newState;
+        }
+    }
+    return newInfo;
 }
 
 /*  ============ */

@@ -147,7 +147,7 @@ StarWCS::StarWCS( const char *header )
                         
                         //  If an error occurs with a card, just
                         //  continue, it's almost certainly something
-                        //  trivial like a formatting probelm.
+                        //  trivial like a formatting problem.
                         astClearStatus;
                     }
                 } else {
