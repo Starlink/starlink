@@ -154,14 +154,12 @@
          END DO
 
 *  In READ mode, unmap the converted arrays, and then re-map them in READ 
-*  mode so that they cannot be accessed. Also, unmap the original NDF
-*  components.
+*  mode so that they cannot be accessed. 
          IF( MMOD( 1 : 1 ) .NE. 'U' .AND. 
      :       MMOD( 1 : 1 ) .NE. 'u' ) THEN
 
             CALL NDF_UNMAP( INDFT, '*', STATUS )
             CALL NDF_MAP( INDFT, COMP, TYPE, 'READ', PNTR, EL, STATUS )
-            CALL NDF_UNMAP( INDF, COMP, STATUS )
 
          END IF
 
