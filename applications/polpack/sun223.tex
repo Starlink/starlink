@@ -840,8 +840,7 @@ command:
 \end{myquote}
 
 This command must be issued before attempting to use any POLPACK
-applications. POLPACK is also available from the \xref{ICL}{sg5}{}
-\latexonly{(see SG/5)} command language, and the IRAF CL.
+applications. 
 
 \subsection{\label{SEC:IMPORT}Importing Header Information}
 POLPACK needs to know certain items of header information about each of
@@ -1728,87 +1727,6 @@ line. If necessary, you can still access the hypertext help using the
 \texttt{Help} menu button at the top right corner of the POLKA interface.
 
 \end{description}
-
-\section{Running POLPACK from the IRAF CL}
-POLPACK is written for the \xref{Starlink software environment}{sg5}{},
-but may also be run from the \htmladdnormallink{IRAF}{\IRAFURL} CL,
-reading and writing IRAF \texttt{.imh} image files using the `on-the-fly'
-data-conversion facilities described \hyperref{here} {in section }{}
-{SEC:CONVERT}.
-
-Assuming that all the \htmlref{required software}{required_software}
-has been installed in the \xref{recommended way}{sun217}
-{installing_the_starlink_software} and IRAF initialised as usual, the 
-POLPACK may be loaded at the cl prompt by:
-
-\begin{myquote} 
-\begin{verbatim}
-cl> polpack
-\end{verbatim} 
-\end{myquote}
-
-the menu of commands will be displayed as for normal IRAF packages and
-applications are invoked and help obtained in the normal way. However,
-the IRAF Cl is not the Starlink software environment, and you will find
-some differences in the way POLPACK behaves when run from the two
-environments (other than the obvious ones like the way parameters are
-prompted for). These include:
-
-\begin{itemize}
-
-\item The \htmlref{POLHELP}{POLHELP} command is not available. Use the
-IRAF help system instead.
-
-\item In transforming data from NDF to IRAF format, some information may
-be lost. In particular, any VARIANCE component in an NDF will be lost and
-so variance estimates will not be made by POLPACK. Also, bad pixels
-within NDFs will be replaced by the value zero when converted to IRAF
-format.
-
-\item Some of the Starlink packages which you may be used to using with
-POLPACK may not be available under IRAF. For instance, at the moment the
-\xref{CURSA}{sun190}{} package which can be used to manipulate catalogues of
-polarization vectors is not available under IRAF.
-
-\end{itemize}
-
-The experienced IRAF user will also detected some differences between the
-way POLPACK runs under CL and the way standard IRAF packages run under CL
-\dash\ in the area of graphics for instance. Some general guidance on running
-Starlink applications from IRAF CL is given in \xref{SUN/217}{sun217}{}.
-A description, intended for programmers, of the way Starlink packages are
-set up for use with IRAF, and some technical detail about how the system
-works is in \xref{SSN/35}{ssn35}{}.
-
-\subsection{Required Software}
-To run POLPACK applications from IRAF CL you will require the following
-Starlink software items in addition to POLPACK:
-
-\begin{description}
-
-\item[\xref{IRAFSTAR}{ssn35}{}] The IRAF/Starlink inter-operability 
-infrastructure.
-
-\item[\xref{TCLSYS}{sun200}{}] The Starlink distribution of 
-\htmladdnormallink{Tcl}{\TCLURL} and associated items. 
-
-\item[\xref{STARTCL}{sun186}{}] Starlink extensions to Tcl \dash\ including
-the TCL/GWM Xdisplay Widget.
-
-\item[RUNTIME] Miscellaneous items of software required by most applications
-at runtime.
-
-\item[\xref{CONVERT}{sun55}{}] The data-conversion software required if the 
-automatic data-conversion facilities are to be used.
-
-\item[\xref{HTX}{sun188}{}] Document cross-referencing software required during 
-installation of Starlink software.
-
-\end{description}
-
-More details on this, including how to obtain and install the software are in
-\xref{SUN/217}{sun217}{installing_the_starlink_software}
-\latexonly{ Appendix A}.
 
 \section{Acknowledging this Software}
 Please acknowledge the use of this software in any publications arising

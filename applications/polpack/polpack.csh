@@ -62,6 +62,7 @@
 #
       alias polcal    INSTALL_BIN/polcal
       alias polhelp   INSTALL_BIN/polhelp 
+      alias polext    INSTALL_BIN/polext
       alias polexp    INSTALL_BIN/polexp
       alias polimp    INSTALL_BIN/polimp
       alias polmap    INSTALL_BIN/polmap
