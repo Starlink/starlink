@@ -64,7 +64,7 @@
       follows:
       \vspace{-\parskip}
       \begin{center}
-      \begin{tabular}{|lcl|p{47mm}|}
+      \begin{tabular}{|lcl|p{43mm}|}
       \hline 
       \multicolumn{1}{|c}{Figaro file} & & \multicolumn{1}{c}{NDF} &
       \multicolumn{1}{|c|}{Comments} \\ \hline
@@ -80,15 +80,8 @@
       .Z.IMAGINARY & $\Rightarrow$ & .DATA\_ARRAY.IMAGINARY\_DATA & \\
       .Z.MAGFLAG & $\Rightarrow$ & .MORE.FIGARO.MAGFLAG & \\
       .Z.RANGE  & $\Rightarrow$ & .MORE.FIGARO.RANGE & \\
-      .Z.xxxx   & $\Rightarrow$ & .MORE.FIGARO.Z.xxxx & \\ \hline
-      \end{tabular}
-      \end{center}
-
-      \begin{center}
-      \begin{tabular}{|lcl|p{43.7mm}|}
-      \hline 
-      \multicolumn{1}{|c}{Figaro file} & & \multicolumn{1}{c}{NDF} &
-      \multicolumn{1}{|c|}{Comments} \\ \hline
+      .Z.xxxx   & $\Rightarrow$ & .MORE.FIGARO.Z.xxxx & \\ 
+      & & & \\
       .X.DATA   & $\Rightarrow$ & .AXIS(1).DATA\_ARRAY & \\ 
       .X.ERRORS & $\Rightarrow$ & .AXIS(1).VARIANCE & after processing \\
       .X.WIDTH  & $\Rightarrow$ & .AXIS(1).WIDTH & \\
@@ -114,7 +107,16 @@
          part of the string \\
       .FITS.xxxx.yyyy & $\Rightarrow$ & .MORE.FITS($n$) & into blank-keyword
          comment containing {\tt yyyy=value} \\
-      & & & \\
+      & & & \\ \hline
+      \end{tabular}
+      \end{center}
+
+      \vspace{-\parskip}
+      \begin{center}
+      \begin{tabular}{|lcl|p{43mm}|}
+      \hline 
+      \multicolumn{1}{|c}{Figaro file} & & \multicolumn{1}{c}{NDF} &
+      \multicolumn{1}{|c|}{Comments} \\ \hline
       .MORE.xxxx& $\Rightarrow$ & .MORE.xxxx & \\
       & & & \\
       .TABLE    & $\Rightarrow$ & .MORE.FIGARO.TABLE & \\
@@ -127,7 +129,7 @@
       such an axis array, it processes the array using the following
       rules, rather than those given above.
       \begin{center}
-      \begin{tabular}{|lcl|p{51mm}|}
+      \begin{tabular}{|lcl|p{48mm}|}
       \hline 
       \multicolumn{1}{|c}{Figaro file} & & \multicolumn{1}{c}{NDF} &
       \multicolumn{1}{|c|}{Comments} \\ \hline
@@ -148,7 +150,7 @@
    \sstdiytopic{
       Related Applications
    }{
-      \CONVERT: NDF2DST.
+      \CONVERT: \htmlref{NDF2DST}{NDF2DST}.
    }
    \sstdiytopic{
    Bad-pixel handling
@@ -162,3 +164,4 @@
       The maximum number of dimensions is 6.
    }
 }
+

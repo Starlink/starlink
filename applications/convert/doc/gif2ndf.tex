@@ -9,8 +9,8 @@
       (GIF) file into an unsigned-byte (256 grey-level) NDF format file.
       It handles one- or two-dimensional images.  The script uses
       various PBMPLUS utilities to produce a FITS file, flipped top
-      to bottom, and then FITS2NDF to produce the final NDF.  Error
-      messages are converted into Starlink style (preceded by !).
+      to bottom, and then \htmlref{FITS2NDF}{FITS2NDF} to produce the final NDF. 
+      Error messages are converted into Starlink style (preceded by {\tt{!}}).
    }
    \sstusage{
       gif2ndf in [out]
@@ -47,12 +47,15 @@
 
    \sstnotes{ 
       The following points should be remembered:
-      \sstitemlist{ 
+      \ssthitemlist{ 
+
          \sstitem
             This initial version of the script generates images with at most
             256 grey levels.  It does not use the image colour lookup table.
+
          \sstitem
             Input image filenames must have the file extension {\tt .gif}.
+
          \sstitem
             The PBMPLUS utilities {\tt giftopnm}, {\tt ppmtopgm} and
             {\tt pgmtofits} must be available on your PATH.
@@ -61,7 +64,7 @@
    \sstdiytopic{
       Related Applications
    }{
-      \CONVERT: NDF2GIF.
+      \CONVERT: \htmlref{NDF2GIF}{NDF2GIF}.
    }
 }
 

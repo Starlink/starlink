@@ -195,7 +195,6 @@
          FITS header of the corresponding FITS file.
       }
    }
-   \newpage
    \sstnotes{
       The rules for the conversion are as follows:
       \ssthitemlist{
@@ -359,7 +358,7 @@
          to the second binary table in the FITS file (the NDF\_CLASS
          extension appears in the first).
 
-         To propagate the OBJECT substructure NDF2FITS creates a binary
+         To propagate the OBJECT substructure, NDF2FITS creates a binary
          table of constant width (210 bytes) with one row per fibre.  The
          total number of rows is obtained from component NUM\_FIBRES.  If a
          possible OBJECT component is missing from the NDF, a null column
@@ -394,7 +393,8 @@
    \sstdiytopic{
       Related Applications
    }{
-      \CONVERT: FITS2NDF; \KAPPA: FITSDIN, FITSIN.
+      \CONVERT: \htmlref{FITS2NDF}{FITS2NDF};
+      \KAPPA: \xref{FITSDIN}{sun95}{FITSDIN}, \xref{FITSIN}{sun95}{FITSIN}.
    }
    \sstimplementationstatus{
       \sstitemlist{

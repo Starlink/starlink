@@ -103,9 +103,9 @@
    }
    \sstnotes{
       The rules for the conversion of the various components are as
-      follows:
+      follows: \vspace*{-\medskipamount}
       \begin{center}
-      \begin{tabular}{|lcl|p{35mm}|}
+      \begin{tabular}{|lcl|p{37mm}|}
       \hline 
       \multicolumn{1}{|l}{IRCAM file} & & \multicolumn{1}{l}{NDF} &
       \multicolumn{1}{|c|}{Comments} \\ \hline
@@ -123,11 +123,18 @@
       .OBS.TITLE              & $\Rightarrow$ &  .TITLE &
           If .OBS.TITLE is a blank string, OBS.DATA\_OBJECT is copied
           to the NDF title instead. \\
-      & & & \\
       .OBS.AXIS1\_LABEL       & $\Rightarrow$ &  .AXIS(1).LABEL & \\
       .OBS.AXIS2\_LABEL       & $\Rightarrow$ &  .AXIS(2).LABEL & \\
       .OBS.AXIS1\_UNITS       & $\Rightarrow$ &  .AXIS(1).UNITS & \\
-      .OBS.AXIS2\_UNITS       & $\Rightarrow$ &  .AXIS(2).UNITS & \\
+      .OBS.AXIS2\_UNITS       & $\Rightarrow$ &  .AXIS(2).UNITS & \\ \hline
+      \end{tabular}
+      \end{center}
+
+      \begin{center}
+      \begin{tabular}{|lcl|p{35mm}|}
+      \hline 
+      \multicolumn{1}{|l}{IRCAM file} & & \multicolumn{1}{l}{NDF} &
+      \multicolumn{1}{|c|}{Comments} \\ \hline
       \multicolumn{3}{|p{111mm}|}{
       .GENERAL.INSTRUMENT.PLATE\_SCALE 
           becomes the increment between the axis centres, with co-ordinate
@@ -149,8 +156,8 @@
          \sstitem
          The data types of the IRCAM GENERAL structures have not been
          propagated to the NDF IRCAM extensions, because it would violate
-         the rules of SGP/38.  In the IRCAM file these all have the same
-         type STRUCTURE.  The new data types are as follows:
+         the rules of \xref{SGP/38}{sgp38}{}.  In the IRCAM file these all
+         have the same type STRUCTURE.  The new data types are as follows:
 
       \begin{center}
       \begin{tabular}{|l|l|}

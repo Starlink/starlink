@@ -8,10 +8,10 @@
       This Bourne-shell script converts an NDF into a 256 grey-level
       Graphics Interchange Format (GIF) file.  One- or two-dimensional
       images can be handled.  The script uses the CONVERT utility
-      NDF2TIFF to produce a TIFF file and then various PBMPLUS utilities
-      to convert the TIFF file into a GIF file. 
+      \htmlref{NDF2TIFF}{NDF2TIFF} to produce a TIFF file and then
+      various PBMPLUS utilities to convert the TIFF file into a GIF file. 
 
-      Error messages are converted into Starlink style (preceded by {\tt !}).
+      Error messages are converted into Starlink style (preceded by {\tt{!}}).
    }
    \sstusage{
       ndf2gif in [out]
@@ -40,7 +40,7 @@
    }
    \sstnotes{
       The following points should be remembered:
-      \sstitemlist{
+      \ssthitemlist{
 
          \sstitem
             This initial version of the script generates only 256 grey 
@@ -53,15 +53,15 @@
 
          \sstitem
          At the time of writing, this utility uses a special Netpbm version
-         of {\bf tifftopnm} on alpha OSF/1 due to a problem with tifftopnm in the
-         standard release of PBMPLUS.  Netpbm is based on PBMPLUS but
+         of {\bf tifftopnm} on alpha OSF/1 due to a problem with {\bf tifftopnm}
+         in the standard release of PBMPLUS.  Netpbm is based on PBMPLUS but
          contains many improvements and additions.
       }
    }
    \sstdiytopic{
       Related Applications
    }{
-      \CONVERT: GIF2NDF.
+      \CONVERT: \htmlref{GIF2NDF}{GIF2NDF}.
    }
 }
 
