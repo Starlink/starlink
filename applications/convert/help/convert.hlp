@@ -1,6 +1,32 @@
 1 CONVERT
-CONVERT is a package for converting common image formats to and from
-the Starlink standard data format---the NDF.  CONVERT commands are
-available from ICL and DCL.
+ The CONVERT package contains some of the numerous format-conversion
+ routines which are necessary to translate data files to and from the
+ Starlink standard n-Dimensional-data format--the NDF---described in
+ SUN/33 and SGP/38.
 
-Type <CR> ? to see the main help topics.
+ The commands available are:
+
+     ASCII2NDF -- Converts an ASCII file to an NDF.
+     BDF2NDF   -- Converts a Starlink Interim BDF file to an NDF.
+     DIPSO2NDF -- Converts a DIPSO file to an NDF.
+     DST2NDF   -- Converts a Figaro (Version 2) DST file to an NDF.
+     NDF2ASCII -- Converts an NDF to an ASCII file.
+     NDF2BDF   -- Converts an NDF to a Starlink Interim BDF file.
+     NDF2DIPSO -- Converts an NDF to a DIPSO-format file.
+     NDF2DST   -- Converts an NDF to a Figaro (Version 2) DST file.
+     NDF2IRAF  -- Converts an NDF to an IRAF (OIF) image.
+     NDF2UNF   -- Converts an NDF to a sequential unformatted file.
+     UNF2NDF   -- Converts a sequential unformatted file to an NDF.
+
+ Full details can be found in SUN/55.
+
+ To make all the format-conversion routines available, type
+
+     ICL> CONVERT
+
+ from ICL, or 
+
+     $ CONVERTSTART
+
+ from DCL.  Then type the appropriate command to perform the
+ conversion.
