@@ -240,7 +240,7 @@
         CALL MSG_SETR('XC',XC)
         CALL MSG_SETR('YC',YC)
         CALL MSG_SETR('RAD',RAD)
-        CALL MSG_MAKE(TEXT(L+1:),' ^XC , ^YC , ^RAD ',L)
+        CALL MSG_MAKE(TEXT(L+1:)//' ^XC , ^YC , ^RAD ',TEXT,L)
         IF (EXCLUDE) THEN
           TEXT(L:)='))'
           L=L+1
