@@ -1,4 +1,4 @@
-<!doctype ssn public "-//Starlink//DTD Starlink SSN 0.3//EN" [
+<!doctype ssn public "-//Starlink//DTD Starlink SSN 0.4//EN" [
   <!entity sgp28
 	public "-//Starlink//DOCUMENT Summary SGP/28//EN" subdoc
 	-- How to write good documents for Starlink -->
@@ -9,8 +9,8 @@
 	public "-//Starlink//DOCUMENT Summary SUN/199//EN" subdoc
 	-- Star2HTML -->
   <!entity sgmlsystem.eps system 'SGMLsystem.eps' ndata eps>
-  <!entity sgmlsystem.gif system 'SGMLsystem.gif' ndata gif87a>
-  <!entity starlinkdtddoc system '../dtd2sgml/starlink-0.3.sgmltext'>
+  <!entity sgmlsystem.gif system 'SGMLsystem.gif' ndata gif89a>
+  <!entity starlinkdtddoc system '../dtd2sgml/starlink-0.4.sgmltext'>
   <!entity programcodedtddoc system '../dtd2sgml/programcode-0.2.sgmltext'>
   <!entity % Feature.Routinelist 'include'>
   <!entity rsqbrack ']'	-- needed in order to describe marked sections -->
@@ -23,7 +23,7 @@
 	system "../../dsssl/sl/common/slcommon.dsl" subdoc>
   <!entity dsssl.params
 	system "../../dsssl/sl/common/slparams.sgml" subdoc>
-  <!entity release.notes 
+  <!entity release.notes-0.4
 	system "../../ReleaseNotes">
   <!entity release.notes-0.3
 	system "ReleaseNotes-0.3">
@@ -60,15 +60,18 @@ More substantial release, CD candidate.
 Assorted tweaks, introduced since the release.
 </change>
 
+<distribution string="DR-0.4" date="10-SEP-1999" author="ng" versionid=v04>
+Smallish DTD and DC changes, arising from the programmers' meeting and
+discussion with Mark Taylor.
+</distribution>
+
 </history>
 
 <coverimage>
-<figurecontent alt="">
 <px>An SGML Application Conforming to International Standard ISO 8879
 -- Standard Generalized Markup Language
 <px>A HyTime application conforming to International Standard ISO/IEC
 10744 -- Hypermedia/Time-based Structuring Language
-</figurecontent>
 </coverimage>
 
 <copyright>
@@ -273,11 +276,10 @@ of course, be further processed to a final document.  The SGML parser
 and whichever editor you use are both quite generic, but the formatter
 is tied to a particular DTD.  There is a diagram of this system in
 <ref id=fig.sgml>.
-<figure id=fig.sgml float>
+<figure id=fig.sgml float alt="An SGML system">
 <caption>An SGML system
-<figurecontent
-	image="sgmlsystem.eps sgmlsystem.gif"
-	alt="An SGML system">
+<figurecontent image="sgmlsystem.eps">
+<figurecontent image="sgmlsystem.gif">
 </figure>
 
 <p>For further information on SGML, see <ref id=appx.sgml>.  For other
@@ -344,9 +346,9 @@ incomprehensible) documentation, the SGML standard
 <subsect id=markup.intro export>Sample document, and overview
 
 <p>A sample SUN is illustrated in <ref id=fig.simplesun>.
-<figure id=fig.simplesun export float>
-<caption>A simple sample SUN
-<figurecontent alt="Simple SUN document">
+<figure id=fig.simplesun export float alt="Simple SUN document">
+<caption>A simple sample SUN</caption>
+<px>
 <verbatim><![ cdata [
 <!doctype sun public "-//Starlink//DTD Starlink SUN//EN">
 <title>The Starlink SGML set
@@ -366,7 +368,6 @@ incomprehensible) documentation, the SGML standard
 <sect id=intro export>Introduction
 <p>Starlink SUNs are easy to write.
 ]]></verbatim>
-</figurecontent>
 </figure>
 <p>Features to note:
 <ul>
@@ -414,10 +415,10 @@ can be allow certain <em/opening/ tags to be omitted, too.  In fact,
 the full structure of this document is as seen in <ref
 id=fig.simplesun2>.
 </ul>
-<figure float id="fig.simplesun2" export>
+<figure float id="fig.simplesun2" export alt="Normalised SUN document">
 <caption>A SUN document with all tags in place, the normalised version
-of the document in <ref id=fig.simplesun>.
-<figurecontent alt="Normalised SUN document">
+of the document in <ref id=fig.simplesun>.</caption>
+<px>
 <verbatim><![ cdata [
 <SUN>
 <DOCINFO>
@@ -451,7 +452,6 @@ ID="NG">Norman Gray</AUTHOR>
 </DOCBODY>
 </SUN>
 ]]></verbatim>
-</figurecontent>
 </figure>
 
 <p>In <ref id=fig.simplesun2>, note that the actual content of
@@ -505,6 +505,7 @@ given in <ref id=table.entities>.
 
 <table id="table.entities">
 <caption>Entities predefined in the Starlink general DTD.</caption>
+<tabular>
 <tgroup cols="3">
 <thead>
 <row><entry>Entity reference<entry>Replacement<entry>Description
@@ -528,6 +529,7 @@ given in <ref id=table.entities>.
 </row>
 </tbody>
 </tgroup>
+</tabular>
 </table>
 
 <p>For more details on entities, see <ref id=sgml.entities>.
@@ -794,7 +796,7 @@ only in webpages. &rsqbrack;&rsqbrack;>
 <p>It is, I hope, clear that you could get yourself in a terrible mess
 here, and create a document which is only valid for some settings of
 the entities.  Take care that your document remains valid for all
-settings, including the case where both entities are set to `ignore'.
+settings, <em/including/ the case where both entities are set to `ignore'.
 
 
 <subsect id=markup.try export>Try it yourself -- running the SGML parser
@@ -868,6 +870,7 @@ document by including as much element and attribute detail as you can.
 <px>DTD elements, grouped by type.
 <px>Note that a few elements appear in more than one group.
 </caption>
+<tabular>
 <tgroup cols="2">
 <thead><row><entry>Group<entry>Elements
 <tbody>
@@ -880,6 +883,7 @@ document by including as much element and attribute detail as you can.
 <ref id='el.sun.author' text='author'>,
 <ref id='el.sun.authorlist' text='authorlist'>,
 <ref id='el.sun.copyright' text='copyright'>,
+<ref id='el.sun.coverimage' text='coverimage'>,
 <ref id='el.sun.docbody' text='docbody'>,
 <ref id='el.sun.docinfo' text='docinfo'>,
 <ref id='el.sun.docnumber' text='docnumber'>,
@@ -958,6 +962,7 @@ document by including as much element and attribute detail as you can.
 <ref id='el.sun.entry' text='entry'>,
 <ref id='el.sun.row' text='row'>,
 <ref id='el.sun.table' text='table'>,
+<ref id='el.sun.tabular' text='tabular'>,
 <ref id='el.sun.tbody' text='tbody'>,
 <ref id='el.sun.tgroup' text='tgroup'>,
 <ref id='el.sun.thead' text='thead'>
@@ -977,6 +982,8 @@ document by including as much element and attribute detail as you can.
 <ref id='el.sun.em' text='em'>,
 <ref id='el.sun.kbd' text='kbd'>,
 <ref id='el.sun.li' text='li'>,
+<ref id='el.sun.line' text='line'>,
+<ref id='el.sun.linespecific' text='linespecific'>,
 <ref id='el.sun.ol' text='ol'>,
 <ref id='el.sun.p' text='p'>,
 <ref id='el.sun.px' text='px'>,
@@ -991,10 +998,13 @@ document by including as much element and attribute detail as you can.
 <entry>
 <ref id='el.sun.m' text='m'>,
 <ref id='el.sun.meqnarray' text='meqnarray'>,
-<ref id='el.sun.mequation' text='mequation'>
+<ref id='el.sun.mequation' text='mequation'>,
+<ref id='el.sun.mlabel' text='mlabel'>,
+<ref id='el.sun.mline' text='mline'>
 
 </tbody>
 </tgroup>
+</tabular>
 </table>
 
 <subsect id=str.structure export>Overall structure
@@ -1008,6 +1018,7 @@ appropriate for the document type), which contains
 <ref id='el.sun.author' text='author'>,
 <ref id='el.sun.authorlist' text='authorlist'>,
 <ref id='el.sun.copyright' text='copyright'>,
+<ref id='el.sun.coverimage' text='coverimage'>,
 <ref id='el.sun.docnumber' text='docnumber'>,
 <ref id='el.sun.editors' text='editors'>,
 <ref id='el.sun.keyword' text='keyword'>,
@@ -1038,6 +1049,7 @@ id=table.dtdfeatures>.
 <caption>
 Starlink DTD feature summary
 </caption>
+<tabular>
 <tgroup cols="6">
 <thead>
 <row>
@@ -1067,6 +1079,7 @@ Starlink DTD feature summary
 <entry>opt'l<entry>no<entry>yes<entry>no<entry>no
 </tbody>
 </tgroup>
+</tabular>
 </table>
 
 <p>The table headings in <ref id=table.dtdfeatures> are as follows:
@@ -1380,6 +1393,7 @@ paper version of the document.  I don't imagine that the docxref
 element would often be useful here, but url and webref might be.
 
 <subsect id=str.figures export>Figures
+<update versionid=v04>Rewrote section to match new figures structure</update>
 
 <p>Includes
 <ref id='el.sun.figure' text='figure'>,
@@ -1387,17 +1401,24 @@ element would often be useful here, but url and webref might be.
 <ref id='el.sun.figurecontent' text='figurecontent'>.
 
 <p>You may include images and other figures within your document using
-the figure element.  A figure consists of a caption and a
-figurecontent element.  The figurecontent may contain paragraphs of
-text containing the material to be displayed, but if (as will be true
-in the majority of cases) you wish to display an image of some type,
-then you can list candidate entities in the `image' attribute.  These
-entities are distinguished by their declaration as being in a
-particular `notation' -- the current possibilities are `eps', `gif87a'
-and `jpeg' -- and the processing system selects the most suitable one
-to use.  See <ref id=el.sun.figure> for more details.
+the figure element.  A figure consists of a caption, optionally
+followed by a sequence of figurecontent elements, optionally followed
+by a single block of PX elements.  You provide a figurecontent element
+for each alternative figure format you provide.  The processing system
+selects a usable format from; not all processors can use all formats,
+so that it would be desirable to provide an image in both EPS and GIF
+format, if you can.  The currently recognised figure formats are
+<code/JPEG/, <code/GIF/, <code/EPS/, <code/metapost/ and
+<code/latexgraphics/.  The last two are text formats, and can be
+provided inline as the content of the element.
+
+<p>You can provide paragraphs of text (perhaps containing a <ref
+id=el.sun.verbatim text='verbatim'> element) as figure content.
+
+<p>For details, and an example, see <ref id=el.sun.figurecontent>.
 
 <subsect id=str.tables export>Tables
+<update versionid="v04">Include description of new tabular element</update>
 
 <p>Includes
 <ref id='el.sun.caption' text='caption'>,
@@ -1405,9 +1426,16 @@ to use.  See <ref id=el.sun.figure> for more details.
 <ref id='el.sun.entry' text='entry'>,
 <ref id='el.sun.row' text='row'>,
 <ref id='el.sun.table' text='table'>,
+<ref id='el.sun.tabular' text='tabular'>,
 <ref id='el.sun.tbody' text='tbody'>,
 <ref id='el.sun.tgroup' text='tgroup'>,
 <ref id='el.sun.thead' text='thead'>.
+
+<p>The table element contains a tabular element.  The distinction
+between the two is that the tabular is the object which contains data
+lined up in columns, whilst the table is an object which might float
+from its declared position, which has a caption, and
+which can be referred to from elsewhere.
 
 <p><update versionid="post-0.2">Corrected Oasis URL</update>
 The Starlink DTDs use the <webref
@@ -1429,16 +1457,18 @@ given priority.
 <verbatim><![cdata[
 <table id="table.entities">
 <caption>Entities predefined in the Starlink general DTD.</caption>
+<tabular>
 <tgroup cols="3">
 <thead>
 <row><entry>Entity reference<entry>Replacement<entry>Description
 <tbody>
 <row><entry><code>&amp;copy;</code><entry>&copy<entry>Copyright symbol
 <row><entry><code>&amp;amp;</code><entry><code>&amp</code><entry>ampersand
+</tabular>
 </table>
 ]]></verbatim>
 You specify an ID for the table, and optionally also the `export'
-attribute, in the table start tag.  A table can have a number of
+attribute, in the table start tag.  A tabular can have a number of
 groups of rows, specified by tgroup elements, and it is in the
 start-tag of that element that you specify the number of columns in
 rows in that group.  A group of rows consists of an optional group of
@@ -1471,8 +1501,10 @@ which should be prominently displayed in some way.
 <p>Verbatim text
 (<ref id='el.sun.code' text='code'>,
 <ref id='el.sun.verbatim' text='verbatim'>,
-<ref id='el.sun.kbd' text='kbd'>):
-code and kbd are verbatim text, displayed using a fixed-width font in
+<ref id='el.sun.kbd' text='kbd'>,
+<ref id='el.sun.linespecific' text='linespecific'>):
+The `code' and `kbd' elements are verbatim text, displayed using a
+fixed-width font in 
 the line of a paragraph; the distinction is that kbd text might be
 displayed in some way which indicated that it is text a user should
 type.  Verbatim content is displayed in a fixed-width font, respecting
@@ -1489,6 +1521,11 @@ Here is some &lt;em>marked-up&lt/em> text
 which will be skipped &amp; ignored
 &rsqbrack;&rsqbrack>&lt;/verbatim>
 </verbatim>
+
+<p>The `linespecific' element is slightly different.  It is intended to
+mark up a block of text where the linebreaks are significant, but the
+text is not otherwise verbatim; the canonical example is that of
+verse.  It consists of a sequence of `line' elements.
 
 <p>Quotations
 (<ref id='el.sun.quote' text='quote'>,
@@ -1509,19 +1546,30 @@ description lists familiar from HTML.  Unlike HTML, however, the dt
 and dd elements within the description list must be paired.
 
 <subsect id=str.maths export>Maths
+<update versionid="v04">Slight edit to discuss new mline and mlabel
+elements</update>
 
 <p>Includes
 <ref id='el.sun.m' text='m'>,
 <ref id='el.sun.mequation' text='mequation'>,
-<ref id='el.sun.meqnarray' text='meqnarray'>.
+<ref id='el.sun.meqnarray' text='meqnarray'>,
+<ref id='el.sun.mlabel' text='mlabel'>,
+<ref id='el.sun.mline' text='mline'>.
 
 <p>All the maths in Starlink documents uses &latex;
 notation.<note>MathML was considered, but is neither well-supported in
-browsers, nor designed to be easily written by hand</note>  The m
-element is equivalent to <code/&dollar;...&dollar/, mequation is
-equivalent to <code>\\begin{equation} ... \\end{equation}</code> and
-meqnarray is equivalent to <code>\\begin{eqnarray}
-... \\end{eqnarray}</code>.
+browsers, nor designed to be easily written by hand</note>  The `m'
+element is equivalent to <code/&dollar;...&dollar/, `mequation' is
+equivalent to <code>\begin{equation} ... \end{equation}</code> and
+`meqnarray' is equivalent
+to <code>\begin{eqnarray} ... \end{eqnarray}</code>,
+with the exception that the `meqnarray' elements contains a sequence
+of `mline' elements, rather than having the equation lines separated
+by <code>\\</code> commands.
+
+<p>Within the `mequation' and `mline' elements, you may have a single
+`mlabel' element.  If this is present, the equation is numbered, and
+if you give it an ID, you can refer to that equation number from elsewhere.
 
 <p>Note that, although the parser `knows'
 that the content of these elements is in &latex notation there is no
@@ -1542,7 +1590,7 @@ or less-than symbol is immediately followed by a name-start character
 reference or element start-tag.  Thus the following element is
 correctly formed (with <code>&lt!entity dec "\delta"></code>):
 <verbatim><![cdata[
-<meqnarray>\alpha&<& x\\&dec&=&amp;4< x\\</meqnarray>
+<meqnarray><mline>\alpha&<& x<mline>&dec&=&amp;4< x</meqnarray>
 ]]></verbatim>
 I do, however, advise you against typing anything so wilfully obscure.
 The best practice when typing meqnarray
@@ -1678,9 +1726,9 @@ elements to <ref id=appx.programcode.dtd>.
 programcode DTD.  The syntax is that of a DTD -- see <ref id=sgml.dtd>
 for brief notes on this.
 
-<figure id=figure.programcode>
+<figure id=figure.programcode alt="programcode DTD element structure">
 <caption>Element structure of the programcode DTD</caption>
-<figurecontent alt="programcode DTD element structure">
+<px>
 <!-- This was extracted from the dtd with the sed script
   /^<!element/{\n :again\n /> *$/b nextel\n p\n n\n b again\n :nextel\n p\n }
   ...then reordered for documentation purposes, and the <ref> elements
@@ -1731,7 +1779,6 @@ for brief notes on this.
 &lt;!element <ref id=el.programcode.ul text='ul'>            - - (li+)>
 &lt;!element <ref id=el.programcode.li text='li'>            - o (#pcdata)>
 </verbatim>
-</figurecontent>
 </figure>
 
 <p>Below, I describe these elements group-by-group.  This description
@@ -2540,7 +2587,10 @@ Corp</webref>.
 url="http://nwalsh.com/docbook/dsssl/" >DocBook
 DSSSL stylesheets</webref>.
 
-<p>Mark Taylor read and commented on early versions of the documentation.
+<p>Mark Taylor provided a great deal of elaborate criticism of the DTD
+structure.  Though I haven't agreed with all his suggestions, future
+users of this kit have a lot to thank him for in terms of the
+flexibility and usability of the DTD.
 
 <appendices>
 
@@ -2863,7 +2913,7 @@ but are very frequently used within DTDs, particularly the
 
 <p>About the only use of the <code/ignore/ and <code/include/ marked
 sections in documents is to delimit variant sections of text (see <ref
-id=markup.ms.variants>).  They are, however, very common within DTD.
+id=markup.ms.variants>).  They are, however, very common within DTDs.
 
 <p>Why on earth would you want to include or exclude text in DTDs?
 Because the ignore/include 
@@ -2879,7 +2929,7 @@ HTML-like document type as follows:
 &lt;!entity % html.model &quot;head, body&quot;>
 &lt;!element html    o o (%html.model;)>
 </verbatim>
-This looks very strange, but it is a common idiom in DTDs.  
+This looks very strange, but it is a common idiom.  
 
 <p>The entity reference <code/&percent;allow.copyright;/ is a
 `parameter entity reference' (see section <ref id=sgml.entities>),
@@ -3461,6 +3511,10 @@ collapse during the installation).
 As noted in <ref id=proc.setup>, you prepare the set for use by
 sourcing one of two scripts.
 
+<p>This will also install a patched version of Jade.
+
+<!-- Keep old Jade build instructions for the moment -->
+<![ ignore [
 <p>The SGML set does not have Jade packaged up within it, largely
 because it's rather difficult to build.  I hope to work on this, but
 at present, you will need to obtain, patch, and build Jade yourself.
@@ -3499,6 +3553,7 @@ The stylesheets need Jade patched to version
 place as this package installs its binaries -- the installation script
 for the SGML set assumes it has complete control over that
 subdirectory, and will squash anything else it finds there.
+]]>
 
 <p>The application <code/dvi2bitmap/ is also required.  This is
 distributed separately.  Until it finds its way onto the Starlink CD,
@@ -3546,7 +3601,7 @@ See <ref id=doccode.languages> for details.
 
 <sect id=appx.releasenotes export>Release Notes
 
-&release.notes;
+&release.notes-0.4;
 
 &release.notes-0.3;
 
