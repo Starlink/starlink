@@ -237,257 +237,6 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
 /*
 *++
 *  Name:
-c     astInterpolate
-f     AST_INTERPOLATE
-
-*  Purpose:
-*     Perform sub-pixel interpolation on a grid of data.
-
-*  Type:
-*     Dummy function.
-
-*  Synopsis:
-c     #include "mapping.h"
-c     int astInterpolate( int ndim_in,
-c                         const int lbnd_in[], const int ubnd_in[],
-c                         const <Xtype> in[], const <Xtype> in_var[],
-c                         int npoint, const int offset[],
-c                         const double *const coords[], const double params[],
-c                         int flags, <Xtype> badval,
-c                         <Xtype> out[], <Xtype> out_var[] )
-f     RESULT = AST_INTERPOLATE( NDIM_IN, LBND_IN, UBND_IN,
-f                               IN, IN_VAR, NPOINT, OFFSET, COORDS, PARAMS,
-f                               FLAGS, BADVAL, OUT, OUT_VAR, STATUS )
-
-*  Class Membership:
-*     Mapping member function.
-
-*  Description:
-*     This is a dummy function, which does not actually
-*     exist. Instead, this description forms a template so that you
-*     may implement a function with this interface for yourself (and
-c     give it any name you wish). A pointer to such a function may be
-c     passed via the "interp" parameter of the astResample<X> functions
-f     give it any name you wish). Such a function may be
-f     passed as the UINTERP argument to the AST_RESAMPLE<X> functions
-*     (q.v.) in order to perform sub-pixel interpolation during
-*     resampling of gridded data. This allows you to use your own
-*     interpolation algorithms in addition to those which are
-*     pre-defined.
-*
-*     The function interpolates an input grid of data (and,
-*     optionally, processes associated statistical variance estimates)
-*     at a specified set of points.
-
-*  Parameters:
-c     ndim_in
-f     NDIM_IN = INTEGER (Given)
-*        The number of dimensions in the input grid. This will be at
-*        least one.
-c     lbnd_in
-f     LBND_IN( NDIM_IN ) = INTEGER (Given)
-c        Pointer to an array of integers, with "ndim_in" elements,
-f        An array
-*        containing the coordinates of the centre of the first pixel
-*        in the input grid along each dimension.
-c     ubnd_in
-f     UBND_IN( NDIM_IN ) = INTEGER (Given)
-c        Pointer to an array of integers, with "ndim_in" elements,
-f        An array
-*        containing the coordinates of the centre of the last pixel in
-*        the input grid along each dimension.
-*
-c        Note that "lbnd_in" and "ubnd_in" together define the shape,
-f        Note that LBND_IN and UBND_IN together define the shape,
-*        size and coordinate system of the input grid in the same
-c        way as they do in astResample<X>.
-f        way as they do in AST_RESAMPLE<X>.
-c     in
-f     IN( * ) = <Xtype> (Given)
-c        Pointer to an array, with one element for each pixel in the
-f        An array, with one element for each pixel in the
-*        input grid, containing the input data. This will be the same
-c        array as was passed to astResample<X> via the "in" parameter.
-f        array as was passed to AST_RESAMPLE<X> via the IN argument.
-*        The numerical type of this array should match that of the
-*        data being processed.
-c     in_var
-f     IN_VAR( * ) = INTEGER (Given)
-c        Pointer to an optional second array with the same size and
-c        type as the "in" array. If given, this will contain the set
-c        of variance values associated with the input data and will be
-c        the same array as was passed to astResample<X> via the
-c        "in_var" parameter.
-f        An optional second array with the same size and type as the
-f        IN array. This will only be given if the AST__USEVAR flag is
-f        set via the FLAGS argument (below). If given, it will contain
-f        the set of variance values associated with the input data and
-f        will be the same array as was passed to AST_RESAMPLE<X> via
-f        the IN_VAR argument.
-*
-c        If no variance values are being processed, this will be a
-c        NULL pointer.
-f        If the AST__USEVAR flag is not set, then no variance values
-f        are being processed. In this case, this array of variance
-f        values may be a dummy (e.g. one-element) array and should not
-f        be used.
-c     npoint
-f     NPOINT = INTEGER (Given)
-*        The number of points at which the input grid is to be
-*        interpolated. This will be at least one.
-c     offset
-f     OFFSET( NPOINT ) = INTEGER (Given)
-c        Pointer to an array of integers with "npoint" elements. For
-c        each interpolation point, this will contain the zero-based
-c        index in the "out" (and "out_var") array(s) at which the
-c        interpolated value (and its variance, if required) should be
-c        stored. For example, the interpolated value for point number
-c        "point" should be stored in "out[offset[point]]" (assuming
-c        the index "point" is zero-based).
-f        For each interpolation point, this array will contain the
-f        offset from the start of the OUT (and OUT_VAR) array(s) at
-f        which the interpolated value (and its variance, if required)
-f        should be stored. For example, the interpolated value for
-f        point number POINT should be stored in OUT(1+OFFSET(POINT)).
-c     coords
-f     COORDS( NPOINT, NDIM_IN ) = DOUBLE PRECISION (Given)
-c        An array of pointers to double, with "ndim_in"
-c        elements. Element "coords[coord]" will point at the first
-c        element of an array of double (with "npoint" elements) which
-c        contains the values of coordinate number "coord" for each
-c        interpolation point. The value of coordinate number "coord"
-c        for interpolation point number "point" is therefore given by
-c        "coords[coord][point]" (assuming both indices are
-c        zero-based).
-f        A 2-dimensional array containing the coordinates of the
-f        points at which interpolation should be performed. These will
-f        be stored so that coordinate number COORD for interpolation
-f        point number POINT is found in element COORDS(POINT,COORD).
-*
-*        If any interpolation point has any of its coordinates equal
-c        to the value AST__BAD (as defined in the "ast.h" header
-f        to the value AST__BAD (as defined in the AST_PAR include
-*        file), then the corresponding output data (and variance)
-c        should be set to the value given by "badval" (see below).
-f        should be set to the value given by BADVAL (see below).
-c     params
-f     PARAMS( * ) = DOUBLE PRECISION (Given)
-c        A pointer to the array given via the "params"
-c        parameter of astResample<X>. You may use this to pass any
-f        The array given for the PARAMS argument of
-f        AST_RESAMPLE<X>. You may use this to pass any
-*        additional parameter values required by your interpolation
-*        algorithm.
-c     flags
-f     FLAGS = INTEGER (Given)
-c        The value given via the "flags" parameter of
-c        astResample<X>. You may test this value in order to provide
-f        The value given for the FLAGS argument of
-f        AST_RESAMPLE<X>. You may test this value in order to provide
-*        detailed control over the operation of your resampling
-*        algorithm. Note that the special flag values AST__UINTERP1,
-*        2, 3 & 4 are reserved for you to use for your own purposes
-c        (see astResample<X>).
-f        (see AST_RESAMPLE<X>).
-c     badval
-f     BADVAL = <Xtype> (Given)
-c        The value given via the "badval" parameter of astResample<X>.
-c        This will have the same numerical type as the data being
-c        processed (i.e. as elements of the "in" array).  It should be
-c        used to test for bad pixels in the input grid (but only if
-c        the AST__USEBAD flag is set via the "flags" parameter) and
-c        for identifying bad output values in the "out" (and
-c        "out_var") array(s).
-f        The value given for the BADVAL argument of AST_RESAMPLE<X>.
-f        This will have the same numerical type as the data being
-f        processed (i.e. as elements of the IN array).  It should be
-f        used to test for bad pixels in the input grid (but only if
-f        the AST__USEBAD flag is set via the FLAGS argument) and for
-f        identifying bad output values in the OUT (and OUT_VAR)
-f        array(s).
-c     out
-f     OUT( * ) = <Xtype> (Returned)
-c        Pointer to an array with the same numerical type as the "in"
-f        An array with the same numerical type as the IN
-*        array, into which the interpolated data values should be
-*        returned.  Note that details of the storage order and number
-*        of dimensions of this array are not required, since the
-c        "offset" array contains all necessary information about where
-f        OFFSET array contains all necessary information about where
-*        each returned value should be stored.
-*
-c        In general, not all elements of this array (or the "out_var"
-f        In general, not all elements of this array (or the OUT_VAR
-*        array below) may be used in any particular invocation of the
-*        function. Those which are not used should be returned
-*        unchanged.
-c     out_var
-f     OUT_VAR( * ) = <Xtype> (Returned)
-c        Pointer to an optional array with the same type and size as
-c        the "out" array, into which variance estimates for the
-c        resampled values should be returned.  This array will only be
-c        given if the "in_var" array has also been given.
-f        An optional array with the same type and size as the OUT
-f        array, into which variance estimates for the resampled values
-f        should be returned. This array will only be given if the
-f        AST__USEVAR flag is set via the FLAGS argument.
-*
-c        If given, it is addressed in exactly the same way (via the
-c        "offset" array) as the "out" array. The values returned
-c        should be estimates of the statistical variance of the
-c        corresponding values in the "out" array, on the assumption
-c        that all errors in input data values are statistically
-c        independent and that their variance estimates may simply be
-c        summed (with appropriate weighting factors).
-f        If given, it is addressed in exactly the same way (via the
-f        OFFSET array) as the OUT array. The values returned should be
-f        estimates of the statistical variance of the corresponding
-f        values in the OUT array, on the assumption that all errors in
-f        input data values are statistically independent and that
-f        their variance estimates may simply be summed (with
-f        appropriate weighting factors).
-*
-c        If no output variance estimates are required, a NULL pointer
-c        will be given.
-f        If the AST__USEVAR flag is not set, then variance values are
-f        not being processed.  In this case, this array may be a dummy
-f        (e.g. one-element) array and should not be used.
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
-
-*  Returned Value:
-c     astInterpolate()
-f     AST_INTERPOLATE = INTEGER
-*        The number of interpolation points at which an output data
-c        value (and/or a variance value if relevant) equal to "badval"
-f        value (and/or a variance value if relevant) equal to BADVAL
-*        has been assigned because no valid interpolated value could be
-*        obtained.  The maximum value that should be returned is
-c        "npoint", and the minimum is zero (indicating that all output
-f        NPOINT, and the minimum is zero (indicating that all output
-*        values were successfully obtained).
-
-*  Notes:
-*     - The data type <Xtype> indicates the numerical type of the data
-c     being processed, as for astResample<X>.
-f     being processed, as for AST_RESAMPLE<X>.
-*     - This function will typically be invoked more than once for each
-c     invocation of astResample<X>.
-f     invocation of AST_RESAMPLE<X>.
-c     - If an error occurs within this function, it should use
-c     astSetStatus to set the AST error status to an error value. It
-c     should then return the value zero. This action will cause an
-c     immediate return from astResample<X>.
-f     - If an error occurs within this function, it should set the
-f     STATUS argument to an error value and return a function result
-f     of zero. This action will cause an immediate return from
-f     AST_RESAMPLE<X>.
-*--
-*/
-
-/*
-*++
-*  Name:
 c     astResample<X>
 f     AST_RESAMPLE<X>
 
@@ -1077,26 +826,30 @@ static int Resample##X( AstMapping *this, int ndim_in, \
    nout = astGetNin( this ); \
 \
 /* If OK, check that the number of input grid dimensions matches the \
-   number required by the Mapping. Report an error if these numbers do \
-   not match. */ \
-   if ( astOK && ( ndim_in != nin ) ) { \
+   number required by the Mapping and is at least 1. Report an error \
+   if necessary. */ \
+   if ( astOK && ( ( ndim_in != nin ) || ( ndim_in < 1 ) ) ) { \
       astError( AST__NGDIN, "astResample"#X"(%s): Bad number of input grid " \
                 "dimensions (%d).", astGetClass( this ), ndim_in ); \
-      astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
-                "to specify an input position.", astGetClass( this ), nin, \
-                ( nin == 1 ) ? "" : "s" ); \
+      if ( ndim_in != nin ) { \
+         astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
+                   "to specify an input position.", astGetClass( this ), nin, \
+                   ( nin == 1 ) ? "" : "s" ); \
+      } \
    } \
 \
 /* If OK, also check that the number of output grid dimensions matches \
-   the number required by the Mapping. Report an error if these \
-   numbers do not match. */ \
-   if ( astOK && ( ndim_out != nout ) ) { \
+   the number required by the Mapping and is at least 1. Report an \
+   error if necessary. */ \
+   if ( astOK && ( ( ndim_out != nout ) || ( ndim_out < 1 ) ) ) { \
       astError( AST__NGDIN, "astResample"#X"(%s): Bad number of output grid " \
                 "dimensions (%d).", astGetClass( this ), ndim_out ); \
-      astError( AST__NGDIN, "The %s given generates %s%d coordinate value%s " \
-                "for each output position.", astGetClass( this ), \
-                ( nout < ndim_out ) ? "only " : "", nout, \
-                ( nout == 1 ) ? "" : "s" ); \
+      if ( ndim_out != nout ) { \
+         astError( AST__NGDIN, "The %s given generates %s%d coordinate " \
+                   "value%s for each output position.", astGetClass( this ), \
+                   ( nout < ndim_out ) ? "only " : "", nout, \
+                   ( nout == 1 ) ? "" : "s" ); \
+      } \
    } \
 \
 /* Check that the lower and upper bounds of the input grid are \
@@ -1148,7 +901,7 @@ static int Resample##X( AstMapping *this, int ndim_in, \
       } \
    } \
 \
-/* Similarly check the bounds of the outout section. */ \
+/* Similarly check the bounds of the output section. */ \
    if ( astOK ) { \
       for ( idim = 0; idim < ndim_out; idim++ ) { \
          if ( lbnd[ idim ] > ubnd[ idim ] ) { \
@@ -1164,6 +917,7 @@ static int Resample##X( AstMapping *this, int ndim_in, \
    } \
 \
 /* If OK, loop to determine how many pixels require resampled values. */ \
+   simple = NULL; \
    if ( astOK ) { \
       npix = 1; \
       for ( idim = 0; idim < ndim_out; idim++ ) { \
@@ -2370,6 +2124,259 @@ static void InitVtab( AstMappingVtab *vtab ) {
    astSetCopy( vtab, Copy );
    astSetDump( vtab, Dump, "Mapping", "Mapping between coordinate systems" );
 }
+
+/*
+*++
+*  Name:
+c     astInterpolate
+f     AST_INTERPOLATE
+
+*  Purpose:
+*     Perform sub-pixel interpolation on a grid of data.
+
+*  Type:
+*     Dummy function.
+
+*  Synopsis:
+c     #include "mapping.h"
+c     int astInterpolate( int ndim_in,
+c                         const int lbnd_in[], const int ubnd_in[],
+c                         const <Xtype> in[], const <Xtype> in_var[],
+c                         int npoint, const int offset[],
+c                         const double *const coords[], const double params[],
+c                         int flags, <Xtype> badval,
+c                         <Xtype> out[], <Xtype> out_var[] )
+f     RESULT = AST_INTERPOLATE( NDIM_IN, LBND_IN, UBND_IN,
+f                               IN, IN_VAR, NPOINT, OFFSET, COORDS, PARAMS,
+f                               FLAGS, BADVAL, OUT, OUT_VAR, STATUS )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This is a dummy function, which does not actually
+*     exist. Instead, this description forms a template so that you
+*     may implement a function with this interface for yourself (and
+c     give it any name you wish). A pointer to such a function may be
+c     passed via the "interp" parameter of the astResample<X> functions
+f     give it any name you wish). Such a function may be
+f     passed as the UINTERP argument to the AST_RESAMPLE<X> functions
+*     (q.v.) in order to perform sub-pixel interpolation during
+*     resampling of gridded data. This allows you to use your own
+*     interpolation algorithms in addition to those which are
+*     pre-defined.
+*
+*     The function interpolates an input grid of data (and,
+*     optionally, processes associated statistical variance estimates)
+*     at a specified set of points.
+
+*  Parameters:
+c     ndim_in
+f     NDIM_IN = INTEGER (Given)
+*        The number of dimensions in the input grid. This will be at
+*        least one.
+c     lbnd_in
+f     LBND_IN( NDIM_IN ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ndim_in" elements,
+f        An array
+*        containing the coordinates of the centre of the first pixel
+*        in the input grid along each dimension.
+c     ubnd_in
+f     UBND_IN( NDIM_IN ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ndim_in" elements,
+f        An array
+*        containing the coordinates of the centre of the last pixel in
+*        the input grid along each dimension.
+*
+c        Note that "lbnd_in" and "ubnd_in" together define the shape,
+f        Note that LBND_IN and UBND_IN together define the shape,
+*        size and coordinate system of the input grid in the same
+c        way as they do in astResample<X>.
+f        way as they do in AST_RESAMPLE<X>.
+c     in
+f     IN( * ) = <Xtype> (Given)
+c        Pointer to an array, with one element for each pixel in the
+f        An array, with one element for each pixel in the
+*        input grid, containing the input data. This will be the same
+c        array as was passed to astResample<X> via the "in" parameter.
+f        array as was passed to AST_RESAMPLE<X> via the IN argument.
+*        The numerical type of this array should match that of the
+*        data being processed.
+c     in_var
+f     IN_VAR( * ) = INTEGER (Given)
+c        Pointer to an optional second array with the same size and
+c        type as the "in" array. If given, this will contain the set
+c        of variance values associated with the input data and will be
+c        the same array as was passed to astResample<X> via the
+c        "in_var" parameter.
+f        An optional second array with the same size and type as the
+f        IN array. This will only be given if the AST__USEVAR flag is
+f        set via the FLAGS argument (below). If given, it will contain
+f        the set of variance values associated with the input data and
+f        will be the same array as was passed to AST_RESAMPLE<X> via
+f        the IN_VAR argument.
+*
+c        If no variance values are being processed, this will be a
+c        NULL pointer.
+f        If the AST__USEVAR flag is not set, then no variance values
+f        are being processed. In this case, this array of variance
+f        values may be a dummy (e.g. one-element) array and should not
+f        be used.
+c     npoint
+f     NPOINT = INTEGER (Given)
+*        The number of points at which the input grid is to be
+*        interpolated. This will be at least one.
+c     offset
+f     OFFSET( NPOINT ) = INTEGER (Given)
+c        Pointer to an array of integers with "npoint" elements. For
+c        each interpolation point, this will contain the zero-based
+c        index in the "out" (and "out_var") array(s) at which the
+c        interpolated value (and its variance, if required) should be
+c        stored. For example, the interpolated value for point number
+c        "point" should be stored in "out[offset[point]]" (assuming
+c        the index "point" is zero-based).
+f        For each interpolation point, this array will contain the
+f        offset from the start of the OUT (and OUT_VAR) array(s) at
+f        which the interpolated value (and its variance, if required)
+f        should be stored. For example, the interpolated value for
+f        point number POINT should be stored in OUT(1+OFFSET(POINT)).
+c     coords
+f     COORDS( NPOINT, NDIM_IN ) = DOUBLE PRECISION (Given)
+c        An array of pointers to double, with "ndim_in"
+c        elements. Element "coords[coord]" will point at the first
+c        element of an array of double (with "npoint" elements) which
+c        contains the values of coordinate number "coord" for each
+c        interpolation point. The value of coordinate number "coord"
+c        for interpolation point number "point" is therefore given by
+c        "coords[coord][point]" (assuming both indices are
+c        zero-based).
+f        A 2-dimensional array containing the coordinates of the
+f        points at which interpolation should be performed. These will
+f        be stored so that coordinate number COORD for interpolation
+f        point number POINT is found in element COORDS(POINT,COORD).
+*
+*        If any interpolation point has any of its coordinates equal
+c        to the value AST__BAD (as defined in the "ast.h" header
+f        to the value AST__BAD (as defined in the AST_PAR include
+*        file), then the corresponding output data (and variance)
+c        should be set to the value given by "badval" (see below).
+f        should be set to the value given by BADVAL (see below).
+c     params
+f     PARAMS( * ) = DOUBLE PRECISION (Given)
+c        A pointer to the array given via the "params"
+c        parameter of astResample<X>. You may use this to pass any
+f        The array given for the PARAMS argument of
+f        AST_RESAMPLE<X>. You may use this to pass any
+*        additional parameter values required by your interpolation
+*        algorithm.
+c     flags
+f     FLAGS = INTEGER (Given)
+c        The value given via the "flags" parameter of
+c        astResample<X>. You may test this value in order to provide
+f        The value given for the FLAGS argument of
+f        AST_RESAMPLE<X>. You may test this value in order to provide
+*        detailed control over the operation of your resampling
+*        algorithm. Note that the special flag values AST__UINTERP1,
+*        2, 3 & 4 are reserved for you to use for your own purposes
+c        (see astResample<X>).
+f        (see AST_RESAMPLE<X>).
+c     badval
+f     BADVAL = <Xtype> (Given)
+c        The value given via the "badval" parameter of astResample<X>.
+c        This will have the same numerical type as the data being
+c        processed (i.e. as elements of the "in" array).  It should be
+c        used to test for bad pixels in the input grid (but only if
+c        the AST__USEBAD flag is set via the "flags" parameter) and
+c        for identifying bad output values in the "out" (and
+c        "out_var") array(s).
+f        The value given for the BADVAL argument of AST_RESAMPLE<X>.
+f        This will have the same numerical type as the data being
+f        processed (i.e. as elements of the IN array).  It should be
+f        used to test for bad pixels in the input grid (but only if
+f        the AST__USEBAD flag is set via the FLAGS argument) and for
+f        identifying bad output values in the OUT (and OUT_VAR)
+f        array(s).
+c     out
+f     OUT( * ) = <Xtype> (Returned)
+c        Pointer to an array with the same numerical type as the "in"
+f        An array with the same numerical type as the IN
+*        array, into which the interpolated data values should be
+*        returned.  Note that details of the storage order and number
+*        of dimensions of this array are not required, since the
+c        "offset" array contains all necessary information about where
+f        OFFSET array contains all necessary information about where
+*        each returned value should be stored.
+*
+c        In general, not all elements of this array (or the "out_var"
+f        In general, not all elements of this array (or the OUT_VAR
+*        array below) may be used in any particular invocation of the
+*        function. Those which are not used should be returned
+*        unchanged.
+c     out_var
+f     OUT_VAR( * ) = <Xtype> (Returned)
+c        Pointer to an optional array with the same type and size as
+c        the "out" array, into which variance estimates for the
+c        resampled values should be returned.  This array will only be
+c        given if the "in_var" array has also been given.
+f        An optional array with the same type and size as the OUT
+f        array, into which variance estimates for the resampled values
+f        should be returned. This array will only be given if the
+f        AST__USEVAR flag is set via the FLAGS argument.
+*
+c        If given, it is addressed in exactly the same way (via the
+c        "offset" array) as the "out" array. The values returned
+c        should be estimates of the statistical variance of the
+c        corresponding values in the "out" array, on the assumption
+c        that all errors in input data values are statistically
+c        independent and that their variance estimates may simply be
+c        summed (with appropriate weighting factors).
+f        If given, it is addressed in exactly the same way (via the
+f        OFFSET array) as the OUT array. The values returned should be
+f        estimates of the statistical variance of the corresponding
+f        values in the OUT array, on the assumption that all errors in
+f        input data values are statistically independent and that
+f        their variance estimates may simply be summed (with
+f        appropriate weighting factors).
+*
+c        If no output variance estimates are required, a NULL pointer
+c        will be given.
+f        If the AST__USEVAR flag is not set, then variance values are
+f        not being processed.  In this case, this array may be a dummy
+f        (e.g. one-element) array and should not be used.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astInterpolate()
+f     AST_INTERPOLATE = INTEGER
+*        The number of interpolation points at which an output data
+c        value (and/or a variance value if relevant) equal to "badval"
+f        value (and/or a variance value if relevant) equal to BADVAL
+*        has been assigned because no valid interpolated value could be
+*        obtained.  The maximum value that should be returned is
+c        "npoint", and the minimum is zero (indicating that all output
+f        NPOINT, and the minimum is zero (indicating that all output
+*        values were successfully obtained).
+
+*  Notes:
+*     - The data type <Xtype> indicates the numerical type of the data
+c     being processed, as for astResample<X>.
+f     being processed, as for AST_RESAMPLE<X>.
+*     - This function will typically be invoked more than once for each
+c     invocation of astResample<X>.
+f     invocation of AST_RESAMPLE<X>.
+c     - If an error occurs within this function, it should use
+c     astSetStatus to set the AST error status to an error value. It
+c     should then return the value zero. This action will cause an
+c     immediate return from astResample<X>.
+f     - If an error occurs within this function, it should set the
+f     STATUS argument to an error value and return a function result
+f     of zero. This action will cause an immediate return from
+f     AST_RESAMPLE<X>.
+*--
+*/
+/* Note the above is just a description to act as a template. The
+   function does not actually exist. */
 
 /*
 *  Name:
