@@ -17,11 +17,13 @@
 *       2/12/91: v1.0-5  indexing added (RJV)
 *       23/3/92: v1.0-6  ERR_ANNUL used (RJV)
 *       11/1/93: V1.7-0  all multi-dataset handling included (RJV)
+*      12 Sep 95 : V2.0-0 ADI port (DJA)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
 *    Import :
 *    Import-export :
@@ -33,26 +35,29 @@
       INCLUDE 'GMD_CMN'
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='GMULTI Version 1.7-0')
+      PARAMETER (VERSION='GMULTI Version 2.0-0')
       INTEGER MAXGRAF
       PARAMETER (MAXGRAF=24)
 *    Local variables :
-      CHARACTER*20 SWITCH
-      CHARACTER*(DAT__SZLOC) LOC         ! locator to multiple graph dataset
-      CHARACTER*(DAT__SZLOC) GLOC        ! locator to dataset to be added
-      CHARACTER*(DAT__SZLOC) CLOC        ! locator to individual graph
+      CHARACTER*20		SWITCH
       CHARACTER*132 ENTRY
       CHARACTER*5 GRAFPAR                ! parameter name assoc with each graph
       CHARACTER*2 ICHAR                  ! integer stored as characters
+
       INTEGER NCHAR                      ! number of characters in above
       INTEGER NGRAF                      ! number of graphs
       INTEGER IGRAF                      ! graph number
       INTEGER JGRAF
-      INTEGER NDIM,DIMS(DAT__MXDIM)
+      INTEGER NDIM,DIMS(ADI__MXDIM)
       INTEGER L
+
+      INTEGER			CFID			! M/g component id
+      INTEGER			FID			! Input file identifier
+      INTEGER			GFID			! Input graph file id
+      INTEGER			MOBJ			! New multi-graph d/s
+
       LOGICAL OK
       LOGICAL NEW,ADD,DEL,SPLIT,SHOW,LAYOUT,COMBINE,HELP
-      LOGICAL PRIM
       LOGICAL MULTI
 *-
       CALL MSG_PRNT(VERSION)
@@ -113,14 +118,16 @@
 *  get locator to multiple dataset - creating if necessary
       IF (STATUS.EQ.SAI__OK) THEN
         IF (NEW.OR.SPLIT) THEN
-          CALL USI_ASSOCO('OUT','GRAFIX',LOC,STATUS)
+          CALL ADI_NEW0( 'MultiGraph', MOBJ, STATUS )
+          CALL USI_CREAT( 'OUT', MOBJ, FID, STATUS )
+
         ELSE
-          IF (G_OPEN) THEN
-            LOC=G_MLOC
-            MULTI=G_MULTI
+          IF ( G_OPEN ) THEN
+            FID = G_MFID
+            MULTI = G_MULTI
           ELSE
-            CALL USI_ASSOCI('INOUT','UPDATE',LOC,PRIM,STATUS)
-            CALL GMD_QMULT(LOC,MULTI,STATUS)
+            CALL USI_ASSOC( 'INOUT','MultiGraph','UPDATE',FID,STATUS)
+            CALL GMI_QMULT( FID, MULTI, STATUS )
             IF (.NOT.MULTI) THEN
               CALL MSG_PRNT('AST_ERR: not a multiple dataset')
               STATUS=SAI__ERROR
@@ -129,6 +136,7 @@
         ENDIF
       ENDIF
 
+*  New file, or extending existing file
       IF (NEW.OR.ADD.AND.STATUS.EQ.SAI__OK) THEN
 
         IGRAF=1
@@ -136,34 +144,43 @@
           CALL CHR_ITOC(IGRAF,ICHAR,NCHAR)
 *  construct parameter name
           GRAFPAR='INP'//ICHAR(:NCHAR)
-*  get locator to dataset to be added
-          CALL USI_DASSOC(GRAFPAR,'READ',GLOC,STATUS)
-          CALL GMD_QMULT(GLOC,MULTI,STATUS)
+
+*  get identifier to dataset to be added
+          CALL USI_ASSOC( GRAFPAR, 'MultiGraph|BinDS', 'READ',
+     :                    GFID, STATUS )
+
+*      Is input a multi-grpah itself?
+          CALL GMI_QMULT( GFID,MULTI,STATUS)
           IF (.NOT.MULTI) THEN
-            CALL GFX_NDFTYPE(GLOC,STATUS)
+            CALL GFX_NDFTYPE( GFID,STATUS)
           ENDIF
+
           IF (STATUS.EQ.SAI__OK) THEN
 *  add an individual graph
-            IF (G_NDF1.OR.G_NDF2) THEN
-              CALL STR_OBNAME(GLOC,ENTRY,L,STATUS)
-              CALL MSG_SETC('DS',ENTRY)
+            IF ( G_NDF1 .OR. G_NDF2 ) THEN
+
+              CALL ADI_FOBNAM( GFID, ENTRY, L, STATUS )
+              CALL MSG_SETC('DS',ENTRY(:L) )
               CALL MSG_PRNT('  Copying....^DS')
-              CALL GMD_ADDNDF(LOC,GLOC,STATUS)
-              CALL GMD_PUTINDEX(LOC,0,ENTRY,STATUS)
-              CALL DAT_ANNUL(GLOC,STATUS)
+              CALL GMI_ADDNDF( FID, GFID,STATUS)
+              CALL GMI_PUTINDEX( FID,0,ENTRY,STATUS)
+              CALL USI_CANCL( GRAFPAR, STATUS )
+
 *  merge another multiple dataset
-            ELSEIF (MULTI) THEN
-              CALL STR_OBNAME(GLOC,ENTRY,L,STATUS)
+            ELSE IF (MULTI) THEN
+
+              CALL ADI_FOBNAM( GFID, ENTRY, L, STATUS )
               CALL MSG_SETC('DS',ENTRY)
               CALL MSG_PRNT('  Merging....^DS')
-              CALL GMD_QNDF(GLOC,NGRAF,STATUS)
-              DO JGRAF=1,NGRAF
-                CALL GMD_LOCNDF(GLOC,JGRAF,CLOC,STATUS)
-                CALL GMD_GETINDEX(GLOC,JGRAF,ENTRY,STATUS)
-                CALL GMD_ADDNDF(LOC,CLOC,STATUS)
-                CALL GMD_PUTINDEX(LOC,0,ENTRY,STATUS)
-                CALL DAT_ANNUL(CLOC,STATUS)
-              ENDDO
+              CALL GMI_QNDF( GFID, NGRAF, STATUS )
+              DO JGRAF = 1, NGRAF
+                CALL GMI_LOCNDF(GFID,JGRAF,'*',CFID,STATUS)
+                CALL GMI_GETINDEX(GFID,JGRAF,ENTRY,STATUS)
+                CALL GMI_ADDNDF(FID,CFID,STATUS)
+                CALL GMI_PUTINDEX(FID,0,ENTRY,STATUS)
+                CALL ADI_ERASE(CFID,STATUS)
+              END DO
+
             ELSE
               CALL MSG_PRNT('AST_ERR: invalid dataset')
               STATUS=SAI__ERROR
@@ -178,14 +195,15 @@
 *  delete mode
       ELSEIF (DEL.AND.STATUS.EQ.SAI__OK) THEN
         CALL USI_GET0I('NDF',IGRAF,STATUS)
-        CALL GMD_DELNDF(LOC,IGRAF,STATUS)
+        CALL GMI_DELNDF( FID, IGRAF,STATUS)
 
 *  split mode
       ELSEIF (SPLIT.AND.STATUS.EQ.SAI__OK) THEN
-        CALL USI_DASSOC('INP1','READ',GLOC,STATUS)
-        CALL BDA_CHKDATA(GLOC,OK,NDIM,DIMS,STATUS)
+        CALL USI_ASSOC( 'INP1','BinDS', 'READ', GFID, STATUS )
+        CALL BDI_CHK( GFID, 'Data', OK, STATUS )
+        CALL BDI_GETSHP( GFID, ADI__MXDIM, DIMS, NDIM, STATUS )
         IF (OK.AND.NDIM.EQ.2) THEN
-          CALL GMULTI_SPLIT(GLOC,DIMS(1),DIMS(2),LOC,STATUS)
+          CALL GMULTI_SPLIT( GFID, NDIM, DIMS, FID, STATUS )
         ELSEIF (OK.AND.NDIM.NE.2) THEN
           CALL MSG_PRNT('AST_ERR: can only split 2D dataset')
           STATUS=SAI__ERROR
@@ -195,21 +213,21 @@
         ENDIF
 
       ELSEIF (SHOW) THEN
-        CALL GMULTI_SHOW(LOC,STATUS)
+        CALL GMULTI_SHOW(FID,STATUS)
 
       ELSEIF (LAYOUT) THEN
-        CALL GMULTI_LAYOUT(LOC,STATUS)
+        CALL GMULTI_LAYOUT(FID,STATUS)
 
       ELSEIF (COMBINE) THEN
-        CALL GMULTI_COMBINE(LOC,STATUS)
+        CALL GMULTI_COMBINE(FID,STATUS)
 
       ENDIF
 
       IF (.NOT.G_OPEN) THEN
-        IF ( NEW.OR.SPLIT ) THEN
-          CALL USI_ANNUL('OUT',STATUS)
+        IF ( NEW .OR. SPLIT ) THEN
+          CALL USI_ANNUL( 'OUT',STATUS)
         ELSE
-          CALL USI_ANNUL('INOUT',STATUS)
+          CALL USI_ANNUL( 'INOUT',STATUS)
         END IF
         CALL AST_CLOSE()
       ENDIF
@@ -219,18 +237,18 @@
       END
 
 
-      SUBROUTINE GMULTI_SPLIT(ILOC,NVAL,NSET,OLOC,STATUS)
+*+
+      SUBROUTINE GMULTI_SPLIT(IFID,NDIM,DIMS,OFID,STATUS)
 *    Description :
 *    Method :
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
+      INCLUDE 'ADI_PAR'
 *    Import :
-      CHARACTER*(*) ILOC,OLOC
-      INTEGER NSET,NVAL
+      INTEGER IFID,NDIM,DIMS(*),OFID
 *    Import-Export :
 *    Export :
 *    Status :
@@ -239,107 +257,112 @@
       INTEGER CHR_LEN
 *    Local constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
-      CHARACTER*(DAT__SZLOC) DLOC,VLOC,QLOC
-      CHARACTER*(DAT__SZLOC) SDLOC,SVLOC,SQLOC
-      CHARACTER*75 NAME
-      CHARACTER*80 LABEL
-      CHARACTER*20 ASTR
-      REAL AVAL
-      BYTE MASK
-      INTEGER NDIM,DIMS(DAT__MXDIM)
-      INTEGER ISET
-      INTEGER NEL
-      INTEGER DIML(2),DIMU(2)
-      INTEGER IDPTR,IQPTR,IVPTR
-      INTEGER ODPTR,OQPTR,OVPTR
-      INTEGER APTR
+      CHARACTER*20 		ASTR
+      CHARACTER*75 		NAME
+      CHARACTER*80 		LABEL
+
+      REAL 			AVAL			! Slice axis value
+
+      INTEGER			GFID
+      INTEGER			QMASK			! Input quality mask
+
+      INTEGER 			APTR			! Input axis data
+      INTEGER 			ISET			! Loop over sets
+      INTEGER 			DIML(2),DIMU(2)		! Slicing bounds
+      INTEGER 			IDPTR,IQPTR,IVPTR	! Input data
+      INTEGER 			ODPTR,OQPTR,OVPTR	! Output slice data
       INTEGER L,L1,L2
-      LOGICAL VOK,QOK
+
+      LOGICAL 			VOK,QOK			! Variance/quality ok?
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
-*  create  multiple dataset
-        CALL GMD_CREMULT(OLOC,NSET,STATUS)
+*    Create  multiple dataset
+        CALL GMI_CREMULT( OFID, DIMS(2), STATUS )
 
-*  get locators etc to relevant bits of input
-        CALL BDA_LOCDATA(ILOC,DLOC,STATUS)
-        CALL BDA_CHKVAR(ILOC,VOK,NDIM,DIMS,STATUS)
-        IF (VOK) THEN
-          CALL BDA_LOCVAR(ILOC,VLOC,STATUS)
-        ENDIF
-        CALL BDA_CHKQUAL(ILOC,QOK,NDIM,DIMS,STATUS)
-        IF (QOK) THEN
-          CALL BDA_LOCQUAL(ILOC,QLOC,STATUS)
-          CALL BDA_GETMASK(ILOC,MASK,STATUS)
-        ENDIF
-        CALL BDA_MAPAXVAL(ILOC,'R',2,APTR,STATUS)
-        CALL BDA_GETAXLABEL(ILOC,2,LABEL,STATUS)
+*    Check bits of input
+        CALL BDI_CHK( IFID, 'Variance', VOK, STATUS )
+        CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
+        CALL BDI_AXMAPR( IFID, 2, 'READ', APTR, STATUS )
+        CALL BDI_AXGET0C( IFID, 2, 'Label', LABEL,STATUS)
         L1=CHR_LEN(LABEL)+1
 
-*  get name of donator dataset
-        CALL STR_OBNAME(ILOC,NAME,L,STATUS)
+*    Get name of donator dataset
+        CALL ADI_FOBNAM( IFID, NAME, L, STATUS )
         NAME=NAME(:L)//' '//LABEL(:L1)//'='
         L=L+L1+2
 
-        DIML(1)=1
-        DIMU(1)=NVAL
+        DIML(1) = 1
+        DIMU(1) = DIMS(1)
 
-        DO ISET=1,NSET
+*    Map the input data, and the variance and quality if present
+        CALL BDI_MAPR( IFID, 'Data', 'READ', IDPTR, STATUS )
+        IF ( VOK ) THEN
+          CALL BDI_MAPR( IFID, 'Variance', 'READ', IVPTR, STATUS )
+        END IF
+        IF ( QOK ) THEN
+          CALL BDI_MAP( IFID, 'Quality', 'UBYTE', 'READ', IQPTR,
+     :                  STATUS )
+          CALL BDI_GET0I( IFID, 'QualityMask', QMASK, STATUS )
+        END IF
 
-*  locate graph component
-          CALL GMD_LOCNDF(OLOC,ISET,GLOC,STATUS)
+*    Loop over sets
+        DO ISET = 1, DIMS(2)
 
-*  take slice of input data and copy to output
-          DIML(2)=ISET
-          DIMU(2)=ISET
-          CALL DAT_SLICE(DLOC,2,DIML,DIMU,SDLOC,STATUS)
-          CALL DAT_MAPV(SDLOC,'_REAL','R',IDPTR,NEL,STATUS)
-          CALL BDA_CREDATA(GLOC,1,NVAL,STATUS)
-          CALL BDA_MAPDATA(GLOC,'W',ODPTR,STATUS)
-          CALL ARR_COP1R(NVAL,%VAL(IDPTR),%VAL(ODPTR),STATUS)
-          CALL DAT_ANNUL(SDLOC,STATUS)
-          CALL BDA_COPTEXT(ILOC,GLOC,STATUS)
-          CALL ARR_ELEM1R(APTR,NSET,ISET,AVAL,STATUS)
+*      Define bounds in 2nd dimension of array to be copied
+          DIML(2) = ISET
+          DIMU(2) = ISET
+
+*      Locate graph component
+          CALL GMI_LOCNDF( OFID, ISET, 'BinDS', GFID, STATUS )
+
+*      Copy input data slice to output
+          CALL BDI_MAPR( GFID, 'Data', 'WRITE', ODPTR, STATUS )
+          CALL ARR_SLCOPR( NDIM, DIMS, %VAL(IDPTR), DIML, DIMU,
+     :                     %VAL(ODPTR), STATUS )
+          CALL BDI_UNMAP( GFID, 'Data', ODPTR, STATUS )
+
+*      Copy input variance slice to output, if present
+          IF ( VOK ) THEN
+            CALL BDI_MAPR( GFID, 'Variance', 'WRITE', OVPTR, STATUS )
+            CALL ARR_SLCOPR( NDIM, DIMS, %VAL(IVPTR), DIML, DIMU,
+     :                       %VAL(OVPTR), STATUS )
+            CALL BDI_UNMAP( GFID, 'Variance', ODPTR, STATUS )
+          END IF
+
+*      Copy input quality slice to output, if present
+          IF ( QOK ) THEN
+            CALL BDI_MAP( GFID, 'Quality', 'UBYTE', 'WRITE',
+     :                    OQPTR, STATUS )
+            CALL ARR_SLCOPB( NDIM, DIMS, %VAL(IQPTR), DIML, DIMU,
+     :                       %VAL(OQPTR), STATUS )
+            CALL BDI_UNMAP( GFID, 'Quality', ODPTR, STATUS )
+            CALL BDI_PUT0I( IFID, 'QualityMask', QMASK, STATUS )
+          END IF
+
+*      Copy ancillaries
+          CALL BDI_COPY( IFID, 'Label,Units', GFID, STATUS )
+
+*      Construct new title
+          CALL ARR_ELEM1R( APTR, DIMS(2), ISET, AVAL, STATUS )
           CALL CHR_RTOC(AVAL,ASTR,L2)
-          CALL BDA_PUTTITLE(GLOC,LABEL(:L1)//ASTR(:L2),STATUS)
-          NAME=NAME(:L)//ASTR(:L2)
+          CALL BDI_PUT0C( GFID, 'Title', LABEL(:L1)//ASTR(:L2), STATUS )
+          NAME = NAME(:L)//ASTR(:L2)
 
-*  Variance if there
-          IF (VOK) THEN
-            CALL DAT_SLICE(VLOC,2,DIML,DIMU,SVLOC,STATUS)
-            CALL DAT_MAPV(SVLOC,'_REAL','R',IVPTR,NEL,STATUS)
-            CALL BDA_CREVAR(GLOC,1,NVAL,STATUS)
-            CALL BDA_MAPVAR(GLOC,'W',OVPTR,STATUS)
-            CALL ARR_COP1R(NVAL,%VAL(IVPTR),%VAL(OVPTR),STATUS)
-            CALL DAT_ANNUL(SVLOC,STATUS)
-          ENDIF
-*  QUALITY if there
-          IF (QOK) THEN
-            CALL DAT_SLICE(QLOC,2,DIML,DIMU,SQLOC,STATUS)
-            CALL DAT_MAPV(SQLOC,'_UBYTE','R',IQPTR,NEL,STATUS)
-            CALL BDA_CREQUAL(GLOC,1,NVAL,STATUS)
-            CALL BDA_PUTMASK(GLOC,MASK,STATUS)
-            CALL BDA_MAPQUAL(GLOC,'W',OQPTR,STATUS)
-            CALL ARR_COP1B(NVAL,%VAL(IQPTR),%VAL(OQPTR),STATUS)
-            CALL DAT_ANNUL(SQLOC,STATUS)
-          ENDIF
-*  copy axis data
-          CALL BDA_COPAXIS(ILOC,GLOC,1,1,STATUS)
+*      Copy axis data
+          CALL BDI_COPY( IFID, 'Axis_1', GFID, STATUS )
 
-*  update index
-          CALL GMD_PUTINDEX(OLOC,ISET,NAME,STATUS)
+*      Update index
+          CALL GMI_PUTINDEX( OFID, ISET, NAME, STATUS )
 
-*  finished with this graph
-          CALL BDA_RELEASE(GLOC,STATUS)
-          CALL DAT_ANNUL(GLOC,STATUS)
+*      Finished with this graph
+          CALL ADI_ERASE( GFID, STATUS )
 
+*    Next set
         ENDDO
 
-        CALL BDA_UNMAP(ILOC,STATUS)
-
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GMULTI_SPLIT',STATUS)
+          CALL AST_REXIT('GMULTI_SPLIT',STATUS)
         ENDIF
 
       ENDIF
@@ -348,7 +371,7 @@
 
 
 *+
-      SUBROUTINE GMULTI_SHOW(LOC,STATUS)
+      SUBROUTINE GMULTI_SHOW(FID,STATUS)
 *    Description :
 *    Method :
 *    Type definitions :
@@ -357,7 +380,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Import :
-      CHARACTER*(*) LOC
+      INTEGER	FID
 *    Import-Export :
 *    Export :
 *    Status :
@@ -375,16 +398,16 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        CALL GMD_QNDF(LOC,NGRAF,STATUS)
+        CALL GMI_QNDF(FID,NGRAF,STATUS)
 
         CALL MSG_BLNK()
-        CALL STR_OBNAME(LOC,LINE,L,STATUS)
+        CALL ADI_FOBNAM( FID, LINE, L, STATUS )
         CALL MSG_PRNT('Content of '//LINE(:L))
         CALL MSG_BLNK()
         CALL MSG_PRNT('NDF   Source dataset')
         DO IGRAF=1,NGRAF
 
-          CALL GMD_GETINDEX(LOC,IGRAF,LINE(6:),STATUS)
+          CALL GMI_GETINDEX(FID,IGRAF,LINE(6:),STATUS)
           LINE(:5)=' '
           IF (IGRAF.LT.10) THEN
             WRITE(LINE(2:2),'(I1)') IGRAF
@@ -399,7 +422,7 @@
         CALL MSG_BLNK()
         CALL MSG_BLNK()
 
-        CALL GMD_QPLOTS(LOC,NPLOT,STATUS)
+        CALL GMI_QPLOTS(FID,NPLOT,STATUS)
         IF (NPLOT.EQ.0) THEN
           CALL MSG_PRNT(' No plots defined:')
           CALL MSG_PRNT('   - will default to one plot per dataset')
@@ -407,7 +430,7 @@
           CALL MSG_PRNT(' The following plots are defined:')
           CALL MSG_PRNT('  Plot  Base  Overlays')
           DO IPLOT=1,NPLOT
-            CALL GMD_GETPLOT(LOC,IPLOT,BASE,OVLY,STATUS)
+            CALL GMI_GETPLOT(FID,IPLOT,BASE,OVLY,STATUS)
             IF (OVLY.EQ.'0'.OR.OVLY.EQ.' ') THEN
               OVLY='none'
             ENDIF
@@ -422,7 +445,7 @@
         CALL MSG_BLNK()
         CALL MSG_BLNK()
 
-        CALL GMD_GETLAYOUT(LOC,XOK,NX,YOK,NY,STATUS)
+        CALL GMI_GETLAYOUT(FID,XOK,NX,YOK,NY,STATUS)
         IF (XOK.AND.YOK) THEN
           CALL MSG_SETI('NX',NX)
           CALL MSG_SETI('NY',NY)
@@ -446,17 +469,16 @@
 
 
 *+
-      SUBROUTINE GMULTI_LAYOUT(LOC,STATUS)
+      SUBROUTINE GMULTI_LAYOUT(FID,STATUS)
 *    Description :
 *    Method :
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Import :
-      CHARACTER*(*) LOC
+      INTEGER			FID
 *    Import-Export :
 *    Export :
 *    Status :
@@ -478,7 +500,7 @@
         CALL USI_GET0L('CANCEL',CANCEL,STATUS)
 * cancel ?
         IF (CANCEL) THEN
-          CALL GMD_CANLAYOUT(LOC,STATUS)
+          CALL GMI_CANLAYOUT(FID,STATUS)
         ELSE
 *  otherwise get x by y
           CALL USI_GET0I('NX',NX,STATUS)
@@ -493,12 +515,12 @@
           ENDIF
 
 *  write out values
-          CALL GMD_SETLAYOUT(LOC,SETX,NX,SETY,NY,STATUS)
+          CALL GMI_SETLAYOUT( FID, SETX,NX,SETY,NY,STATUS)
 
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GMULTI_LAYOUT',STATUS)
+          CALL AST_REXIT( 'GMULTI_LAYOUT',STATUS)
         ENDIF
 
       ENDIF
@@ -508,7 +530,7 @@
 
 
 *+
-      SUBROUTINE GMULTI_COMBINE(LOC,STATUS)
+      SUBROUTINE GMULTI_COMBINE(FID,STATUS)
 *    Description :
 *    Method :
 *    Type definitions :
@@ -518,7 +540,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Import :
-      CHARACTER*(*) LOC
+      INTEGER			FID
 *    Import-Export :
 *    Export :
 *    Status :
@@ -537,10 +559,10 @@
 
         CALL USI_GET0L('CANCEL',CANCEL,STATUS)
         IF (CANCEL) THEN
-          CALL GMD_CANPLOTS(LOC,STATUS)
+          CALL GMI_CANPLOTS(FID,STATUS)
         ELSE
 
-          CALL GMD_QPLOTS(LOC,NPLOT,STATUS)
+          CALL GMI_QPLOTS(FID,NPLOT,STATUS)
 
 *  get plot number
           CALL USI_GET0I('PLOT',PLOT,STATUS)
@@ -561,12 +583,12 @@
           ENDIF
 
 *  write it out
-          CALL GMD_SETPLOT(LOC,PLOT,BASE,OVLY,STATUS)
+          CALL GMI_SETPLOT(FID,PLOT,BASE,OVLY,STATUS)
 
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GMULTI_COMBINE',STATUS)
+          CALL AST_REXIT( 'GMULTI_COMBINE',STATUS)
         ENDIF
 
       ENDIF
@@ -582,7 +604,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
 *    Import-Export :
 *    Export :
