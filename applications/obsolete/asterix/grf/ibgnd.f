@@ -2142,6 +2142,8 @@
 *      Store sample mean
           SAMM(S) = MEAN
 
+	print *,'Sample ',s, 'mean=',samm(s),' +- ',samem(s), ' (',
+     :  samnp(s),' points)'
         END DO
 
       END IF
@@ -2198,18 +2200,20 @@
         END DO
 
 *    Set default axis ranges
-C        I_X1_1D=0.0
-C        I_X2_1D=ABS(I_XSCALE)*REAL(I_N_1D)/REAL(I_OSAMPLE)
-C        CALL ARR_RANG1R(I_N_1D,%VAL(I_DPTR_1D),I_Y1_1D,I_Y2_1D,STATUS)
-C        I_Y2_1D=I_Y2_1D+0.1*(I_Y2_1D-I_Y1_1D)
+        I_X1_1D=0.0
+        I_X2_1D = ABS(I_XSCALE)*REAL(I_N_1D)
+        CALL ARR_RANG1R(I_N_1D,%VAL(I_DPTR_1D),I_Y1_1D,I_Y2_1D,STATUS)
+        I_Y2_1D = I_Y2_1D + 0.1*(I_Y2_1D-I_Y1_1D)
 
 *    Set default plotting style
         CALL IMG_1DGCB(STATUS)
-        CALL GCB_SETL('ERR_FLAG',.TRUE.,STATUS)
-        CALL GCB_SETL('STEP_FLAG',.FALSE.,STATUS)
-        CALL GCB_SETL('POLY_FLAG',.FALSE.,STATUS)
-        CALL GCB_SETL('POINT_FLAG',.FALSE.,STATUS)
+        CALL GCB_SETL( 'ERR_FLAG', .TRUE., STATUS )
+        CALL GCB_SETL( 'STEP_FLAG', .FALSE., STATUS )
+        CALL GCB_SETL( 'POLY_FLAG', .FALSE., STATUS )
+        CALL GCB_SETL( 'POINT_FLAG', .FALSE., STATUS )
 
+*    Cache the GCB
+        CALL GCB_CACHE( I_CACHE_1D, STATUS )
 
       ELSE IF ( I_BGM_AREA .EQ. 'BOX' ) THEN
 

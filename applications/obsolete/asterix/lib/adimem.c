@@ -361,6 +361,7 @@ void ADImemAllocBlock( ADIclassDef *cdef, ADIblock **newb,
       bptr->next = cdef->alloc.f_block;
       bptr->master = ADI__nullid;
       bptr->vdat.std.used = NULL;
+      bptr->nfree = 0;
       cdef->alloc.f_block = jblk;
 
 /* Set return values */
@@ -743,7 +744,9 @@ void ADImemFreeBlock( int iblk, ADIstatus status )
 /* Loop over slaves, freeing 'em */
     while ( nslave-- ) {
       ADIblock	*sbptr = ADI_G_blks[next];
+#ifdef MEMORY_TRACING
       printf( "Deleting slave block %d\n",next);fflush(stdout);
+#endif
 
 /* Reset block store */
       ADI_G_blks[next] = NULL;
