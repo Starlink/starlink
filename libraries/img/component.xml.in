@@ -6,15 +6,14 @@
   <version>@PACKAGE_VERSION@</version>
   <path>libraries/img</path>
   <description>IMG - Simple Image Data Access</description>
-  <!-- <abstract><p>
+  <abstract><p>
 IMG is a subroutine library for accessing astronomical image data and
 associated header information. It is designed to be easy to use and
 understand.
-</p></abstract> -->
+</p></abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
-  <!--
   <developers>
     <person>
       <name>Peter W. Draper</name>
@@ -22,8 +21,7 @@ understand.
       <email>p.w.draper@durham.ac.uk</email>
     </person>
   </developers>
-  -->
-  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
