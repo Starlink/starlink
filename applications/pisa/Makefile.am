@@ -1,0 +1,63 @@
+## Process this file with automake to produce Makefile.in
+
+bin_SCRIPTS = start pisa.icl pisa_demo pisa_demo.icl pisa_proc.icl \
+ pisahelp.ifc
+
+nodist_bin_SCRIPTS = pisa_link_adam
+
+bin_MONOLITHS = pisa_mon pisa_mon4
+
+pisa_mon_SOURCES = \
+        pisa_mon.f \
+	$(pisa_mon_TASKS:=.f) \
+	$(SUBSRC) \
+	$(PRIVATE_INCLUDES)
+
+pisa_mon_LDADD = $(LDADD) `pisa_link_adam`
+
+pisa_mon_TASKS = pisafind pisaplot pisafit pisapeak pisamatch pisacut \
+ pisagen pisaknn addnoise pisagrey pisa2ard pisa2cat
+
+pisa_mon4_SOURCES = \
+        pisa_mon4.f \
+	$(pisa_mon4_TASKS:=.f) \
+	$(SUBSRC) \
+	$(PRIVATE_INCLUDES)
+
+pisa_mon4_LDADD = $(LDADD) `pisa_link_adam`
+
+pisa_mon4_TASKS = pisafind4 pisafit4
+
+bin_PROGRAMS = pisahelp
+
+SUBSRC = addmod.f func.f analys.f anoise.f checkp.f dchole.f \
+         ellpse.f extend.f featur.f fitplo.f gtmlim.f \
+         histat.f median.f overlp.f parbol.f peakn.f pgextr.f \
+         pgintr.f pgvclr.f phopt.f phopt2.f polynm.f pqsort.f psa1_clwo.f \
+         psa1_exss.f psa1_mkhis.f psa1_mnmax.f psa1_ndfin.f pxyget.f \
+         pxygt2.f ranorm.f raprof.f rdpifd.f rdpiin.f \
+         rdpipd.f rdpipe.f rdpisd.f scllim.f solve.f sorti3.f sortin.f \
+         sortm.f super.f update.f psa1_asfio.f psa1_lasto.f \
+         psa1_rminv.f \
+         analys4.f overlp4.f psa1_mkhii.f sortm4.f extend4.f \
+         phopt24.f psa1_clwo4.f psa1_ndfin4.f super4.f featur4.f \
+         phopt4.f  psa1_exss4.f sorti34.f median4.f psa1_iminv.f \
+         sortin4.f pqsort4.f psa1_ccatf.f psa1_ccats.f psa1_ccatp.f \
+         dchole4.f psa1_fitfn.f \
+         pda_qsiar.f pda_rinpi.f pda_drnor.f
+
+PRIVATE_INCLUDES = PSA1_PAR hlpcmd.inc
+
+HELPSRC = gethlp.f gthlpi.f kpg1_scrsz.f pthlpo.f sread.f
+
+##  Link the pisahelp program as an atask. Note this isn't a monolith so
+##  we cannot use the MONOLITH builtin rules.
+##  Not a monolith pisahelp
+##pisahelp_SOURCES = \
+##        pisahelp.f \
+##        $(HELPSRC)
+##
+##pisahelp_TASKS = pisahelp
+
+pisahelp: pisahelp.f $(HELPSRC)
+	@ALINK@ pisahelp.o -o pisahelp $(HELPSRC:.f=.o)

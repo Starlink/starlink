@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="pisa">
+  <version>2.4-5</version>
+  <path>applications/pisa</path>
+  <description>PISA - Position Intensity and Shape Analysis</description>
+  <abstract><p>
+      
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>agi</build><build>cat</build><build>chr</build><build>fio</build><build>ndf</build><build>par</build><build>pda</build><build>prm</build><build>sae</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <uname>pwd</uname>
+      <name>Peter W. Draper</name>
+      <email>p.w.draper@durham.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun109</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
