@@ -5,7 +5,7 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP/Leiden.
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	handling of "check-images".
 *
@@ -16,9 +16,16 @@
 *                       22/10/99 (PWD):
 *                          Added initialisation of overlay, this fixes
 *                          a problem with aperture display.
+*	Last modify:	15/12/2002
+*                          (EB): 2.3
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
+
 #include	<math.h>
 #include	<stdio.h>
 #include	<stdlib.h>
@@ -26,7 +33,7 @@
 
 #include	"define.h"
 #include	"globals.h"
-#include	"fitscat.h"
+#include	"fits/fitscat.h"
 #include	"astrom.h"
 #include	"check.h"
 
@@ -146,11 +153,25 @@ void	blankcheck(checkstruct *check, PIXTYPE *mask, int w,int h,
 /*
 initialize check-image.
 */
-checkstruct	*initcheck( picstruct *field, char *filename,
-                            checkenum check_type)
-
+checkstruct	*initcheck(char *filename, checkenum check_type, int next)
 {
+  catstruct	*fitscat;
   checkstruct	*check;
+
+  QCALLOC(check, checkstruct, 1);
+
+  strcpy(check->filename, filename);
+  check->type = check_type;
+
+  return check;
+}
+
+/******************************** reinitcheck ********************************/
+/*
+initialize check-image (for subsequent writing).
+*/
+void	reinitcheck(picstruct *field, checkstruct *check)
+{
   char		*buf;
   int		i, ival;
   size_t	padsize;
@@ -163,11 +184,6 @@ checkstruct	*initcheck( picstruct *field, char *filename,
   int 		ndim;
   int          status = SAI__OK;
   
-  QCALLOC(check, checkstruct, 1);
-
-  strcpy(check->filename, filename);
-  check->type = check_type;
-
   ndfOpen( DAT__ROOT, check->filename, "WRITE", "UNKNOWN",
            &check->ndf, &placehldr, &status );
   if ( status != SAI__OK ) 
@@ -189,7 +205,7 @@ checkstruct	*initcheck( picstruct *field, char *filename,
 
 /* Create an NDF of the required type and size */
   lbnd[0]=lbnd[1]=1;
-  switch(check_type)
+  switch(check->type)
   {
   case CHECK_BACKRMS:
   case CHECK_SUBOBJECTS:
@@ -241,7 +257,7 @@ checkstruct	*initcheck( picstruct *field, char *filename,
 
 /* Now map and initialise appropriately */
   check->pix = NULL;
-  switch (check_type)
+  switch (check->type)
   {
   case CHECK_IDENTICAL:
   case CHECK_BACKGROUND:
@@ -300,7 +316,7 @@ checkstruct	*initcheck( picstruct *field, char *filename,
   if ( status != SAI__OK )
     error(EXIT_FAILURE, "*Error*: Creating check image ", check->filename);
 
-  return check;
+  return;
   }
 
 
@@ -345,11 +361,11 @@ void	writecheck(checkstruct *check, PIXTYPE *data, int w)
   }
 
 
-/********************************* endcheck **********************************/
+/********************************* reendcheck **********************************/
 /*
-close check-image.
+ Finish current check-image.
 */
-void	endcheck(picstruct *field, checkstruct *check)
+void	reendcheck(picstruct *field, checkstruct *check)
   {
    char		*buf;
    size_t	padsize;
@@ -404,6 +420,15 @@ void	endcheck(picstruct *field, checkstruct *check)
       error(EXIT_FAILURE, "*Internal Error* in ", "endcheck()!");
     }
 
+  return;
+  }
+
+/********************************* endcheck **********************************/
+/*
+close check-image.
+*/
+void	endcheck(checkstruct *check)
+  {
   free(check);
   ndfAnnul( &check->ndf, &status );
   return;
