@@ -18,9 +18,8 @@ figaro5_LDADD = $(LDADD) \
 ../twoutil/libtwoutil.la \
 ../graph/libgraph.la \
 ../unix/libunix.la \
-../fda/libfda.la \
-../dta/libdta.la \
 ../fibre/libfibre.la \
+../fda/libfda.la \
 ../fig/libfig.la \
 ../par/libfigpar.la \
 ../gen/libgen.la \
