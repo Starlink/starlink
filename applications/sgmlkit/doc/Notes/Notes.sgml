@@ -219,7 +219,7 @@ probably need some substantial rewriting of the
 
 <p>I've added a maths stylesheet, which uses <webref
 url="http://hutchinson.belmont.ma.us/tth/">tth</webref> to transform
-&LaTeX equations into HTML.
+&latex equations into HTML.
 
 
 <subsect id=nextver>For the future
