@@ -1,0 +1,303 @@
+\documentclass[11pt,twoside]{article}
+
+%%% XXX Comment out before submission!!!
+\def\RCS$#1: #2 ${\expandafter\def\csname RCS#1\endcsname{#2}}
+\RCS$Revision$
+
+\usepackage{adassconf}
+
+% NB: wierdo conference style has \title and co typeset material,
+% rather than store it, so \begin{document} must go here, and there's no
+% \maketitle
+\begin{document}
+
+\paperID{P2.1.10}
+\contact{Norman Gray}
+\email{norman@astro.gla.ac.uk}
+
+\title{Porting the Starlink Software Collection to GNU Autoconf}
+% XXX Comment out
+\marginpar{[v\RCSRevision]}
+\titlemark{Starlink/GNU Autoconf}
+
+\author{Norman Gray\altaffilmark{1}}
+\affil{Starlink Project,
+        Rutherford Appleton Laboratory,
+        Chilton,
+        Didcot,
+        OX11 0QX,
+        UK}
+\author{Tim Jenness}
+\affil{Joint Astronomy Centre,
+       660 North A'ohoku Place
+       University Park
+       Hilo, HI 96720,
+       USA}
+\author{Alasdair Allan\altaffilmark{1},
+        David S. Berry\altaffilmark{1},
+        Malcolm J. Currie,
+        Peter W. Draper\altaffilmark{1},
+        Mark B. Taylor\altaffilmark{1}}
+\affil{Starlink}
+\author{Brad Cavanagh}
+\affil{Joint Astronomy Centre}
+
+\altaffiltext{1}{Alternate affiliations:
+NG,
+%        Department of Physics and Astronomy,
+        University of Glasgow%,
+%        Glasgow,
+%        G12 8QQ, 
+%        UK%
+;
+AA, University of Exeter,
+DSB,
+%        Centre for Astrophysics,
+        University of Central Lancashire%,
+%        Preston,
+%        PR1 2HE,
+%        UK%
+;
+PWD,
+%        Department of Physics, 
+        University of Durham%, 
+        %Rochester Building, 
+        %Science Laboratories, 
+        %South Road, 
+%        Durham, DH1 3LE, 
+%        UK%
+;
+MBT,
+%        Department of Physics,
+        University of Bristol%,
+%        %Tyndall Avenue,
+%        Bristol,
+%        BS8 1TL,
+%        UK%
+        }
+
+\paindex{Gray, N.}
+\aindex{Jenness, T.}
+\aindex{Allan, A.}
+\aindex{Berry, D. S.}
+\aindex{Currie, M. J.}
+\aindex{Draper, P. W.}
+\aindex{Taylor, M. B.}
+\aindex{Cavanagh, B.}
+
+\authormark{Gray, Jenness, Allan, Berry, Currie, Draper, Taylor \& Cavanagh}
+
+
+
+\keywords{lkajsfs}
+
+\begin{abstract}
+
+The Classic Starlink Software Collection (aka `USSC', see below)
+currently runs on three different Unix platforms and contains
+approximately 130 separate software items, totalling millions of lines
+of code, in a mix of Fortran, C, C++, Tcl, Perl and others.  We get requests
+to port to an increasing range of platforms, while suffering a
+decrease in the funding support for the classic collection.  We have
+therefore changed the build system from a hand-maintained collection
+of makefiles with hard-wired OS configurations to a scheme involving
+feature-discovery via GNU Autoconf.
+
+As a result of this work, we have already ported the USSC to Mac OSX
+and Cygwin.  This had some unexpected benefits and costs, and
+valuable lessons.
+\end{abstract}
+
+\section{The Problems}
+
+\begin{itemize}
+\item It's Big!  About 130 items, with around 1700 kSLOC of our
+  multi-language legacy code, 300 kSLOC of Java (not included in
+  this build system), plus another 600 kSLOC of thirdparty code, some
+  tweaked, and all built at the same time.
+
+\item According to David A Wheeler's SLOCCount,
+  that's \$110M worth, by the way.  And it works out larger than
+  everything in the RH7.1 distribution except the kernel, Mozilla and XFree86
+  \htmladdURL{http://www.dwheeler.com/sloc/redhat71-v1/redhat71sloc.html}.
+  Busy types, aren't we?
+
+\item It (was) weird!  Our legacy build system was idiosyncratic.  It
+  worked, but was unusual both in the way the code was distributed and
+  built.  This presented a barrier to potential developers and
+  maintainers, and an ongoing and unsustainable cost.
+
+\item It's Crusty!  Some of that code dates back quite a long way, and
+  some of it comes from community donations.  While the majority of it
+  is well-written, there are a few\dots gems in there.
+
+%\item It (was) Scattered!  For historical reasons, the master copies
+%  of all our code weren't kept in the one place.  Simply
+%  \emph{finding} all our code was slightly harder than we expected.
+
+\item Did I mention funding problems?
+
+\end{itemize}
+
+\section{History}
+
+
+Starlink was set up originally in the late seventies, as a way of
+supplying UK astronomy with hardware (`astronomers will never need
+more than six VAXes\dots'), naturally along with the data-analysis
+software to go with them, and the system management to make it all
+work smoothly.
+
+We switched the hardware to Unix in the early nineties -- ending up
+supporting specifically SunOS and Ultrix.  We then shifted to Solaris
+and Digital Unix (our first 64-bit OS), and ended up, last year,
+working with Solaris, Alpha and RedHat, at which point we had managed
+to drop dependence on NAG.  We also ported the software
+collection then, renamed to the USSC, the `Unix Starlink Software
+Collection'.  That meant that some software was dropped, and the rest
+preened quite extensively.  The build system we are now moving away
+from was designed in this period.
+
+In the late nineties, Starlink slimmed down, dropped the hardware and
+management provision, and focused on maintaining and developing the
+large legacy codebase.
+
+Now we're concentrating on new software, we need to make the classic
+software as accessible and maintainable as possible, since we expect
+the community will have to take a larger role in its curation.
+
+
+\section{The Outcome}
+
+
+\begin{itemize}
+\item The project now uses `standard' tools for all its source code
+  maintainance and distribution.  This makes the code much more
+  maintainable by community developers.
+
+\item As of October 2004, we have 2300kSLOC building unattended on
+  Linux (RHEL), Solaris, Cygwin (incomplete), and OSX (almost).  Other
+  platforms should be easy (but we can only cope with so much pain at
+  one time).
+
+\item All available in one place for the first time, via anonymous CVS
+  (see `Contacts' box).
+
+\item Unexpected but valuable preening, refactoring, bugfixing.
+
+\item We extended the autoconf support for Fortran, and this will be
+  offered back to the autoconf mainline.
+
+\item GPLed wherever possible.
+
+\item The project has always obsessed about coding standards and
+  coding discipline.  This concern paid off, with interest, here.
+
+\end{itemize}  
+
+
+\section{Patching autoconf and automake}
+
+We have a number of project-specific code and installation
+conventions, which we wanted to preserve, and a few build tools which
+need special makefile rules.  This is what \texttt{automake} is for.
+
+We tried doing everything with autoconf macros, but that quickly
+became far too precarious -- this route isn't suitable for more than
+light customisation.
+
+Since, for safety, we had to have \texttt{autoconf}, \texttt{automake}
+and \texttt{libtool} snapshots in our repository in any case, it was a
+natural (though nerve-wracking) move to start using patched versions
+of those tools.
+
+We needed more Fortran support (checking for open specifiers,
+intrinsics, record lengths and the like) than was 
+available in standard \texttt{autoconf}.  This group of modifications
+are due to be contributed back to the \texttt{autoconf} maintainers.
+
+The \texttt{automake} source code isn't an easy read, but it's pretty
+well written, and reasonably easy to patch.  The result is robust and
+portable distributed Makefiles.
+
+
+
+\section{Lessons and Warnings}
+
+\begin{itemize}
+\item The Fortran support in autoconf is rather slim.
+
+\item The port to OSX was easier, in some ways, than we expected,
+  partly because the OSX system compiler is a modified GCC.  We needed
+  the Fink/OpenDarwin port of \texttt{g77}, and that causes lots of
+  linking problems (the whole \texttt{restFP/saveFP} saga).  Be
+  warned: the OSX linker has some very fixed ideas about things.
+
+\item Let's say that again.  The OSX linker will find more duplicated
+  symbols than you thought you had symbols.  It doesn't like common
+  blocks at all.  And it has very certain opinions about how libraries
+  should be put together.  GNU \texttt{libtool} can hide many of the
+  details from you, but be prepared to spend time tweaking your library code.
+
+\item We couldn't automatically convert our old build system to the
+  new one, because it was mostly hand-maintained.  But that turned out
+  not to be a problem in fact: disciplined coding in the past meant
+  that packages could
+  generally be ported to the new system with little thought, and this
+  turned out to be a small part of the effort.
+
+\item The original plan was to autoconf everything with only necessary
+  code changes.  However it was impossible to stop ourselves
+  refactoring and tidying, sometimes rather extensively.  This is
+  both a warning to other projects that they won't be able to stop
+  developers doing this, and a benefit, in the sense that a lot of
+  code-hygiene tasks which have been too boring, confusing or risky in
+  the past, become a lot less so when you're adjusting everything
+  anyway.
+
+\item Simply finding all our code turned out to be tricky.  For
+  historical reasons, including the fact that CVS wasn't really around
+  ten years ago, the master copies of code were held by the
+  (distributed) developers.  Collecting all the code into one
+  repository was a valuable exercise, making better curation easy.
+  This also meant that we separated out generated code and sources, and
+  rescued some code from oblivion, as developers retired or left the
+  project.
+
+\item We should have bowed to the inevitable, and started tweaking the
+  autotools earlier.  Delaying this meant some functionality had to be
+  implemented twice.
+
+\item GPLing was harder than we expected.  This is largely because of
+  the donations in the past, of code written in gentler times, with
+  bizarre `licences'.
+
+\item It tool a \emph{lot} longer than we expected (surprise!).  Around 6
+  person-months to get the initial system up and running, and then
+  another 6 to put the remainder into the system.
+
+\end{itemize}
+
+
+
+\section{Contacts}
+
+\begin{itemize}
+\item Norman Gray: \texttt{norman@astro.gla.ac.uk},
+  \htmladdURL{http://www.astro.gla.ac.uk/users/norman/}
+
+\item Tim Jenness: \texttt{t.jenness@jach.hawaii.edu},
+  \htmladdURL{http://www.jach.hawaii.edu/~timj/}
+
+\item Starlink: \htmladdURL{http://www.starlink.ac.uk} and
+  \htmladdURL{http://dev.starlink.ac.uk}
+
+\item AnonCVS: access at
+  \texttt{:pserver:anonymous@cvs.starlink.ac.uk:/cvs} 
+  with password `starlink'
+
+\item CVS browser: \htmladdURL{http://cvsweb.starlink.ac.uk}
+\end{itemize}
+
+
+\end{document}
