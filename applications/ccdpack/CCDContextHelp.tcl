@@ -49,7 +49,7 @@
 
 #  Get the name of the window that the event occurred over.
       set seehelp 1
-      set eventwindow [winfo containing [CCDPathOf $X] [CCDPathOf $Y]]
+      set eventwindow [winfo containing $X $Y]
       set Eventwindow [CCDCmdOf $eventwindow]
       if { "$eventwindow" != "" } { 
 

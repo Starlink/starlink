@@ -467,6 +467,7 @@
 #  Look for top-level help (default for this form).
                set top [winfo toplevel $oldthis]
                if { $top != "" } {
+                  set Top [CCDCmdOf $top]
                   if { [info exists helpinfo($Top)] } {
                      return "$helpinfo($Top)"
                   }
