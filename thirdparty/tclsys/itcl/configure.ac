@@ -28,9 +28,8 @@ dnl    To configure iTcl, run ./configure in the subdirectories.
     for d in $itcl_subdirs
     do
        ( cd $d; \
-         echo; \
-         ./configure --prefix=$prefix --cache-file=config.cache; \
-         ./configure --prefix=$prefix --cache-file=config.cache )
+         echo ./configure --prefix=$prefix --srcdir=. --cache-file=config.cache; \
+         ./configure --prefix=$prefix --srcdir=. --cache-file=config.cache )
     done
 )
 
