@@ -117,13 +117,14 @@ class PkFont {
     static void setFontPath(string fp) { fontpath_ = fp; }
     static void setFontPath(char  *fp) { fontpath_ = fp; }
     static void setResolution(int res) { resolution_ = res; }
+    static void setMissingFontMode(string mode) { missingFontMode_ = mode; }
     static void setMakeFonts(bool doit) { makeMissingFonts_ = doit; }
     string name() const { return name_; }
     string fontFilename() const { return path_; }
     int magnification() const { return dvimag_; }
     int dpi() const { return static_cast<int>(resolution_
 					      * (double)dvimag_ / 1000.0); }
-    int dpiBase() const { return static_cast<int>(resolution_); }
+    static int dpiBase() { return resolution_; }
     int dpiScaled() const {
 	return static_cast<int>(resolution_
 				* ((double)font_header_.s * (double)dvimag_)
@@ -184,6 +185,7 @@ class PkFont {
     static string fontpath_;	// colon-separated list of directories
     static int resolution_;
     static bool makeMissingFonts_;	// automatically make fonts
+    static string missingFontMode_;
 };
 
 #endif // #ifndef PK_FONT_HEADER_READ
