@@ -142,7 +142,7 @@
       CALL AST_INIT()
 
 *  Open the file
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', '*', 'READ', IFID, STATUS )
 
 *  Get item to be displayed
       CALL USI_GET0C( 'ITEM', ITEM, STATUS )
