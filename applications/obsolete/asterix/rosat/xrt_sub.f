@@ -791,7 +791,7 @@ C         ENDIF
       END
 
 *+XRT_GETSORT  - Gets sort parameters from a file
-      SUBROUTINE XRT_GETSORT(LOCIN, HEAD, STATUS)
+      SUBROUTINE XRT_GETSORT( IFID, HEAD, STATUS)
 *    Description :
 *      Gets sorting ranges from an XRT SORT box
 *    Environment parameters :
@@ -811,7 +811,7 @@ C         ENDIF
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOCIN               ! Locator to input file
+      INTEGER			IFID	      		! Input file id
 *    Import-Export :
       RECORD /CORR/ HEAD
 *    Status :
@@ -832,10 +832,10 @@ C         ENDIF
 *    Local data :
 *-
       IF (STATUS .NE. SAI__OK) RETURN
-*
+
 * Get locator to the instrument box
-      CALL BDA_LOCINSTR(LOCIN, ILOC, STATUS)
-*
+      CALL ADI1_LOCINSTR( IFID, .FALSE,. ILOC, STATUS )
+
 * Get detector type i.e. PSPC or HRI
       CALL CMP_GET0C(ILOC, 'DETECTOR', HEAD.DET, STATUS)
 *
@@ -852,9 +852,9 @@ C         ENDIF
      &       (INDEX(HEAD.DET, 'PSPCB') .EQ. 0) .AND.
      &           (INDEX(HEAD.DET, 'PSPCC') .EQ. 0) ) THEN
 *
-*      Get the observation date as an MJD (use MJDs to compare dates)
-         CALL BDA_LOCHEAD(LOCIN, HLOC, STATUS)
-*
+* Get locator to the instrument box
+        CALL ADI1_LOCHEAD( IFID, .FALSE,. ILOC, STATUS )
+
          CALL CMP_GET0I(HLOC, 'BASE_MJD', MDATE, STATUS)
 *
          IF (STATUS .NE. SAI__OK) THEN
@@ -995,9 +995,8 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *
       END
 
-*
-******************************************************************
-*+XRT_GETSORT_NEWSPACE - reads new style spatial sort info.
+
+*+ XRT_GETSORT_NEWSPACE - reads new style spatial sort info.
       SUBROUTINE XRT_GETSORT_NEWSPACE(SLOC, HEAD, STATUS)
 *    Description :
 *      Reads spatial sort infotmation from the SORT box. Uses the
@@ -1100,9 +1099,8 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *
       END
 
-*
-******************************************************************
-*+XRT_GETSORT_OLDSPACE - reads old style spatial sort info.
+
+*+ XRT_GETSORT_OLDSPACE - reads old style spatial sort info.
       SUBROUTINE XRT_GETSORT_OLDSPACE(SLOC, HEAD, STATUS)
 *    Description :
 *      Reads spatial sort infotmation from the SORT box. Uses the
