@@ -49,6 +49,9 @@ f     The CmpFrame class does not define any new routines beyond those
 *        Over-ride the astUnformat method.
 *     6-APR-1998 (RFWS):
 *        Fixed bug in returned value of GenAxisSelection.
+*     22-SEP-1998 (RFWS):
+*        Fixed bug in Match function - was not checking Domain values
+*        for equality.
 *class--
 */
 
@@ -2064,6 +2067,9 @@ static int Match( AstFrame *template_frame, AstFrame *target,
 
 /* Local Variables: */
    AstCmpFrame *template;        /* Pointer to template CmpFrame structure */
+   char *template_domain;        /* Pointer to copy of template domain */
+   const char *ptr;              /* Pointer to domain string */
+   const char *target_domain;    /* Pointer to target domain string */
    int *axes1;                   /* Pointer to axis selection 1 */
    int *axes2;                   /* Pointer to axis selection 2 */
    int *used;                    /* Pointer to flags array */
@@ -2114,9 +2120,36 @@ static int Match( AstFrame *template_frame, AstFrame *target,
    naxes = astGetNaxes( target );
    match = ( naxes >= ( minax1 + minax2 ) && naxes <= ( maxax1 + maxax2 ) );
 
-/* If a match appears possible, determine the minimum number of target
-   axes that will have to match the first component Frame of the
-   template CmpFrame. */
+/* The next requirement is that if the template CmpFrame has its
+   Domain attribute defined, then the target Frame must also have the
+   same Domain (although it need not be set - the default will
+   do). First check if the template has a domain. */
+   if ( astOK && match ) {
+      if ( astTestDomain( template ) ) {
+
+/* Obtain a pointer to the template domain. Then allocate memory and
+   make a copy of it (this is necessary as we will next inquire the
+   domain of the target and may over-write the buffer holding the
+   template's domain). */
+         ptr = astGetDomain( template );
+         if ( astOK ) {
+            template_domain = astStore( NULL, ptr,
+                                        strlen( ptr ) + (size_t) 1 );
+
+/* Obtain a pointer to the target domain. */
+            target_domain = astGetDomain( target );
+            
+/* Compare the domain strings for equality. Then free the memory
+   allocated above. */
+            match = astOK && !strcmp( template_domain, target_domain );
+            template_domain = astFree( template_domain );
+         }
+      }
+   }
+
+/* If a match still appears possible, determine the minimum number of
+   target axes that will have to match the first component Frame of
+   the template CmpFrame. */
    if ( astOK && match ) {
       naxes_min1 = minax1;
       naxes_min2 = naxes - maxax2;
