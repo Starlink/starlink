@@ -65,7 +65,7 @@ AC_CHECK_FUNCS([nint rint])
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 # Link against fortran libraries
-STAR_FC_LIBRARY_LDFLAGS
+AC_FC_LIBRARY_LDFLAGS
 
  
 dnl    Documentation is in the parent directory
