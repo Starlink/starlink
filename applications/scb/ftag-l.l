@@ -28,22 +28,6 @@
 *     The space pointed to by yylvals has been malloc'd.  It should be
 *     freed by the parser or memory will leak.
 *
-*     Additionally, the first line_leng characters of the static buffer 
-*     line_text contains all the text so far encountered since the last
-*     LINE_START token.  This is required by the parser for proper
-*     error recovery.
-*
-*  Timing:
-*     Probably the C output by lex would be considerably smaller, and 
-*     perhaps more efficient, if the BLANKs were not scooped up as part
-*     of each matched pattern.  lex doesn't seem to do this in a very
-*     efficient way, it would likely be better to match the tokens 
-*     without blanks and match the blanks separately adding these into
-*     the yylval without the pattern-matching machine's knowledge. 
-*     This would (I think) require matching blanks before, not after,
-*     each pattern, and hence some restructuring.  See the C lexer
-*     (ctag-l.l) for an example of this approach.
-*
 *  Bugs:
 *     Blanks within, for instance, reserved words are not ignored as
 *     they really should be within Fortran 77 (except in cases where 
@@ -180,16 +164,19 @@ SPACE			[ \t]*
 *
 *  Description:
 *     This routine has to return 1 to the caller (yylex) to indicate that
-*     there is no further text to come.  Additionally here, we output
-*     directly any text in preval, since if it hasn't yet been returned
-*     to the parser, it won't be returned at all.
+*     there is no further text to come.  Housekeeping may also be done.
 *-
 */
+
+/* If there is any text which has been encountered but not yet associated
+   with a token, add it to the encountered text string, since if it hasn't
+   been associated with a token yet it will never be. */
       if ( preleng > 0 ) {
          uadd( preval );
          preleng = 0;
          prealloc = 0;
       }
+/* Return 1 to the caller. */
       return(1);
    }
 
@@ -209,7 +196,8 @@ SPACE			[ \t]*
 *     since the last token was passed back.  Note that it mallocs storage
 *     for this purpose, so this must be free'd at some point by the parser.
 *
-*     SGML-like entity references are substituted in where necessary.
+*     It also registers that the text has been encountered with the list
+*     of unoutput strings.
 *-
 */
 
@@ -247,6 +235,11 @@ SPACE			[ \t]*
 *
 *  Purpose:
 *     Set yylval substituting entity references.
+*
+*  Description:
+*     This does exactly the same as the count() function, but any of the
+*     characters which need to be replaced by HTML entity references
+*     ('<', '>' and '&') are thus substituted.
 *-
 */
       int i;

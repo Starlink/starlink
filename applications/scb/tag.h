@@ -1,3 +1,23 @@
+/*
+*+
+*  Name:
+*     tag.h
+*
+*  Purpose:
+*     Include file for tagging routines.
+*
+*  Description:
+*     This include file contains the shared declarations for the C code
+*     which forms the lex/yacc based source code parsers.
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     10-DEC-1999 (MBT):
+*        Initial revision.
+*-
+*/
 
 /* Functions for keeping track of allocated strings in the current unit. */
       void uclear();
@@ -48,9 +68,10 @@
    int preleng;
    int prealloc;
 
-#define BUFINC 1024      /* Amount by which to increase buffer each time.
-                            Affects only time/memory efficiency. */
+/* Amount by which to increase the preval buffer each time it needs
+   increasing.  Its value affects only time/memory efficiency. */
 
+#define BUFINC 1024
 
 
 /* $Id$ */

@@ -34,6 +34,32 @@
 *     as the text of the tokens in question, all intervening whitespace,
 *     comments, preprocessor directives etc.
 *
+*  Algorithm:
+*     The basic idea is that the return value of each element is a string
+*     which contains the text of the token itself as well as any 
+*     surrounding syntactically insignificant text (e.g. whitespace) in
+*     such a way that concatenating the return values of all the elements 
+*     passed to the parser by the lexer is identical to the original 
+*     source file.  Each of these strings has been malloc'd.
+*
+*     Each rule generates a new malloc'd string which is the concatenation
+*     of its component parts, possibly adding tags where appropriate,
+*     and free's the memory associated with the component parts.
+*     So by the time we reach a rule near the top level, all that
+*     remains to be done is to output the return value and free it.
+*
+*     Matters are complicated somewhat by the need to do error recovery:
+*     because yacc throws away a lot of things when it encounters an
+*     error we need to keep the text in another place too; this is
+*     handled by the uadd function and friends.
+*
+*  Bugs:
+*     Since tokens are popped off the stack by yacc without offering us
+*     the chance of intervention, and processing the tokens is normally
+*     how we free up memory which has been allocated by inferior levels
+*     of token processing, there is a memory leak which occurs every
+*     time there is an error.
+*
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
 *
@@ -456,13 +482,6 @@ token_brac
 *        "<a attrib='refname( text )'>text</a> trailing-spaces".
 *        This is malloc'd by this routine so should subsequently be free'd.
 *
-*  Bugs:
-*     Since tokens are popped off the stack by yacc without offering us
-*     the chance of intervention, and processing the tokens is normally
-*     how we free up memory which has been allocated by inferior levels
-*     of token processing, there is a memory leak which occurs every
-*     time there is an error.
-*
 *  Description:
 *     This routine generates an SGML tag surrounding the text given
 *     by the name argument.  The value of the attribute named by the
@@ -549,13 +568,6 @@ token_brac
 *        will be free'd by this function, so must previously have been
 *        malloc'd.
 *
-*  Bugs:
-*     Since tokens are popped off the stack by yacc without offering us
-*     the chance of intervention, and processing the tokens is normally
-*     how we free up memory which has been allocated by inferior levels
-*     of token processing, there is a memory leak which occurs every
-*     time there is an error.
-*
 *  Return value:
 *     string = char *
 *        Text tagged with an SGML A tag.  This is malloc'd by this 
@@ -605,6 +617,11 @@ token_brac
 *
 *  Purpose:
 *     Find out whether the word is a fortran reserved word.
+*
+*  Description:
+*     This routine just goes through a list of reserved words to see
+*     if the given parameter is in it.  This is not the most efficient
+*     way to go about it, but it probably doesn't dominate run time.
 *
 *  Return value:
 *     found = int
@@ -661,6 +678,12 @@ token_brac
 *
 *  Purpose:
 *     Check whether a name is in a linked list.
+*
+*  Description:
+*     This routine just works through a linked list to see if the given
+*     name appears as the text element of any of the items.
+*     This is not the most efficient way to go about it, but it probably 
+*     doesn't dominate run time.
 *
 *  Parameters:
 *     name = char *
@@ -794,7 +817,24 @@ token_brac
    }
 
 
-   void tagwrap() { module_start(); }
+   void tagwrap() { 
+/*
+*+
+*  Name:
+*     tagwrap
+*
+*  Purpose:
+*     Tidy up at the end of parsing.
+*
+*  Description:
+*     This routine will be called after yyparse() has returned.  It can
+*     be used for any required housekeeping tasks.
+*-
+*/
+
+/* Reclaim memory from the list of declared arrays. */
+      module_start(); 
+   }
 
 
    void handle_error() {

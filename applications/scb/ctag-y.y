@@ -29,6 +29,48 @@
 *     to char, which must be output in order.  These contain, as well
 *     as the text of the tokens in question, all intervening whitespace,
 *     comments, preprocessor directives etc.
+*
+*  Algorithm:
+*     The basic idea is that the return value of each element is a string
+*     which contains the text of the token itself as well as any 
+*     surrounding syntactically insignificant text (e.g. whitespace) in
+*     such a way that concatenating the return values of all the elements
+*     passed to the parser by the lexer is identical to the original 
+*     source file.  Each of these strings has been malloc'd.
+*
+*     Each rule generates a new malloc'd string which is the concatenation
+*     of its component parts, possibly adding tags where appropriate,
+*     and free's the memory associated with the component parts.
+*     So by the time we reach a rule near the top level, all that 
+*     remains to be done is to output the return value and free it.
+*
+*     Matters are complicated somewhat by the need to do error recovery:
+*     because yacc throws away a lot of things when it encounters an
+*     error we need to keep the text in another place too; this is
+*     handled by the uadd function and friends.
+*  
+*  Bugs:
+*     Since tokens are popped off the stack by yacc without offering us
+*     the chance of intervention, and processing the tokens is normally
+*     how we free up memory which has been allocated by inferior levels
+*     of token processing, there is a memory leak which occurs every
+*     time there is an error.
+*
+*     As observed above, the parsing is a best guess, and can't be perfect.
+*
+*     For similar reasons, it can get very confused by conditional
+*     compilation directives since it ignores them, so for instance
+*     a sequence like
+*        #ifdef X
+*           signed char func() {
+*        #else
+*           unsigned char func() {
+*        #endif
+*
+*     will look like two nested open braces to the parser, which will 
+*     quite likely never recover and fail to tag any of the rest of
+*     the file.  It would be possible, but difficult, to patch it up
+*     to work round this sort of thing.
 * 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -38,9 +80,6 @@
 *        Initial version.
 *-
 */
-
-
-
 
 
 %token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
@@ -276,7 +315,24 @@ identifier
 
    yyerror(char *s) { /* No action */ }
 
-   void tagwrap() { /* No action */ }
+   void tagwrap() { 
+/*
+*+
+*  Name: 
+*     tagwrap
+*
+*  Purpose:
+*     Tidy up at the end of parsing.
+*
+*  Description:
+*     This routine will be called after yyparse() has returned.  It can
+*     be used for any required housekeeping tasks.
+*-
+*/
+
+/* No action. */ 
+   }
+
 
    char *canchor( char *attrib, char *fname, int f77flag ) {
 /*+
@@ -348,7 +404,7 @@ identifier
                ( f77flag ? "<a %s='%s_'>%s</a>" : "<a %s='%s'>%s</a>" ), 
                attrib, vname, vname );
 
-/* Reclaim space from arguments, which may not be used after this call. */
+/* Reclaim space from arguments, which will not be used after this call. */
       free( fname );
 
 /* Return. */

@@ -49,6 +49,8 @@ int yydebug;
 *        Debugging.  It may be followed immediately by the letters 'l',
 *        'y' or both.  This turns on the debugging messages in the lex
 *        part and/or the yacc part of the processor respectively.
+*        This will only work if lex and yacc have been compiled to 
+*        enable debugging reports.
 *
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -78,6 +80,8 @@ int yydebug;
       strict = 0;
       while ( argc > 0 && **argv == '-' ) {
          switch( *(++(*argv)) ) {
+
+/* Debugging output flag. */
             case 'd':
                while ( c = *(++(*argv)) )
                   switch( c ) {
@@ -89,9 +93,13 @@ int yydebug;
                         break;
                   };
                break;
+
+/* Strict error handling flag. */
             case 's':
                strict = 1;
                break;
+
+/* Reply to any other flag (including -h) with a usage message. */
             default:
                printf( usagef, name );
                exit( 1 );
@@ -101,7 +109,7 @@ int yydebug;
       }
    
 /* Open standard input and output appropriately according to command line
-   arguments. */
+   arguments, in the normal filter-type way. */
       switch( argc ) {
          case 2:
             if ( freopen( argv[ 1 ], "w", stdout ) == NULL ) {
@@ -215,6 +223,13 @@ int yydebug;
 *     gets free'd by this routine, so they must have been malloc'd (probably
 *     by this routine) in the past, and must not be referred to again after
 *     calling this routine.
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     10-DEC-1999 (MBT):
+*        Initial revision.
 *-
 */
 
@@ -251,11 +266,45 @@ int yydebug;
    }
 
 
+/*
+*  Define the elements of the list of as-yet unoutput strings. 
+*  This list is maintained so that if there is an error in the yacc
+*  grammar parsing, in which case yacc throws away all the tokens
+*  back to the end of the last unerroneous unit, we can output
+*  the text which has been omitted.  Under normal (non-error) 
+*  circumstances however this list is simply discarded at the end of
+*  each correctly parsed unit at the same time that the unit is output.
+*
+*  The routines following this are to be used to manipulate this list.
+*/
    static ELEMENT ubase = { "", (ELEMENT *) NULL };
    static ELEMENT *ufirst, *ulast;
 
+
    void uclear() {
+/*
+*+
+*  Name:
+*     uclear
+*
+*  Purpose:
+*     Clear the list of unoutput strings.
+*
+*  Description:
+*     This routine reclaims the memory used by the list of unoutput 
+*     strings and initialises the values of the start and end pointers.
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     10-DEC-1999 (MBT):
+*        Initial revision.
+*-
+*/
       ELEMENT *i, *j;
+
+/* Reclaim memory. */
       i = ufirst->next;
       while ( i != NULL ) {
          j = i->next;
@@ -264,10 +313,31 @@ int yydebug;
          free( i );
          i = j;
       }
+
+/* Reset pointers. */
       unew();
    }
 
    void unew() {
+/*
+*+
+*  Name:
+*     unew
+*
+*  Purpose:
+*     Initialise list of unoutput strings.
+*
+*  Description:
+*     This resets the pointers for the list of unoutput strings.
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     10-DEC-1999 (MBT):
+*        Initial revision.
+*-
+*/
       ufirst = &ubase;
       ulast = &ubase;
       ubase.text = "";
@@ -275,6 +345,31 @@ int yydebug;
    }
 
    void uadd( char *item ) {
+/*
+*+
+*  Name:
+*     uadd
+*
+*  Purpose:
+*     Add a string to the list of unoutput strings.
+*
+*  Description:
+*     This routine adds a string to the list of unoutput strings.  Every
+*     character encountered by the lexer should be added to this list
+*     as it is encountered.
+*
+*  Parameters:
+*     item = char *
+*        The string to be added.
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     10-DEC-1999 (MBT):
+*        Initial revision.
+*-
+*/
       ulast->next = (ELEMENT *) memok( malloc( sizeof( ELEMENT ) ) );
       ulast = ulast->next;
       ulast->next = NULL;
@@ -283,6 +378,27 @@ int yydebug;
    }
 
    char *ucontent() {
+/*
+*+
+*  Name:
+*     ucontent
+*
+*  Purpose:
+*     Get unoutput string.
+*
+*  Description:
+*     This routine returns a string which consists of all the strings 
+*     which have had uadd() called on them since the last call to 
+*     unew().
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     10-DEC-1999 (MBT):
+*        Initial revision.
+*-
+*/
       ELEMENT *i;
       char *text;
       int j, leng;
@@ -322,6 +438,13 @@ int yydebug;
 *     This routine appends a string to the preval string.  If the preval
 *     string is not long enough to hold the new one, then more space
 *     is allocated for it.
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     10-DEC-1999 (MBT):
+*        Initial revision.
 *-
 */
 
@@ -348,6 +471,7 @@ int yydebug;
       preleng += leng;
    }
 
+
    void cappend( char c ) {
 /*
 *+
@@ -361,6 +485,13 @@ int yydebug;
 *     This routine appends a single character to the preval string.
 *     If the character is '<', '>' or '&', then it is replaced in the
 *     preval string by the appropriate HTML entity reference.
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     10-DEC-1999 (MBT):
+*        Initial revision.
 *-
 */
 
