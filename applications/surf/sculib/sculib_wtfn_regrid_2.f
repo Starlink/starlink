@@ -81,7 +81,7 @@
 
 *  Arguments Given:
       REAL DIAMETER
-      REAL RES
+      INTEGER RES
       INTEGER NPIX
       REAL IN_DATA (NPIX)
       REAL IN_VARIANCE (NPIX)
@@ -134,7 +134,7 @@
       REAL    YINC                               ! y-axis pixel increment
       REAL    YPIX                               ! y offset of output pixel
       
-      REAL FILTER1_SQ
+      INTEGER FILTER1_SQ
       INTEGER  FILTER_RAD_SQ
       REAL SCALE
       REAL SCALESQ
@@ -168,8 +168,8 @@
 
       SCALESQ = SCALE * SCALE
       
-      RAD_OV_SCAL = FILTER_RAD_SQ / SCALESQ
-      RES_SCAL = FILTER1_SQ * SCALESQ
+      RAD_OV_SCAL = REAL(FILTER_RAD_SQ) / SCALESQ
+      RES_SCAL = REAL(FILTER1_SQ) * SCALESQ
 
 
       RTEMP = REAL(WEIGHTSIZE) * RES_ELEMENT / PIXSPACE
@@ -225,8 +225,8 @@
                         WT = WTFN(ICPIX+1)
                      END IF
 
-* Change INEAR,JNEAR to IOUT,JOUT for TOTAL_WEIGHT
-                     WWEIGHT = WT * WEIGHT / TOTAL_WEIGHT (IOUT,JOUT)
+* Change INEAR,JNEAR to IOUT,JOUT for TOTAL_WEIGHT?
+                     WWEIGHT = WT * WEIGHT / TOTAL_WEIGHT (INEAR,JNEAR)
 
                      CONV_WEIGHT (IOUT,JOUT) = CONV_WEIGHT(IOUT,JOUT) + 
      :                    WWEIGHT
