@@ -8806,8 +8806,12 @@ cvs checkout: Updating java/source/topcat/src
 cvs checkout: Updating java/source/topcat/src/docs
 U java/source/topcat/src/docs/JEL-licence
 U java/source/topcat/src/docs/Ptplot-licence
+U java/source/topcat/src/docs/avalon-framework-cvs-20020806.jar
+U java/source/topcat/src/docs/batik.jar
 U java/source/topcat/src/docs/docs.dtd
+U java/source/topcat/src/docs/fop.jar
 U java/source/topcat/src/docs/sun253.xml
+U java/source/topcat/src/docs/toFo.xslt
 U java/source/topcat/src/docs/toHTML.xslt
 U java/source/topcat/src/docs/toHTML1.xslt
 U java/source/topcat/src/docs/toHelp.xslt

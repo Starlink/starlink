@@ -433,11 +433,8 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1958 files to /apps/cvsbuild/java/source/build/java
-     [copy] Copied 5 empty directories to /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
-      [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
-   [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
-BUILD SUCCESSFUL
-Total time: 26 seconds
+BUILD FAILED
+file:/apps/cvsbuild/java/source/build.xml:538: No supported regular expression matcher found
+
+Total time: 20 seconds
