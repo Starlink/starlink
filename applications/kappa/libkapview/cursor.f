@@ -184,6 +184,24 @@
 *        position. Parameters MARKER, GEODESIC and CLOSE are used to
 *        specify the symbols and lines to use.
 *
+*        - "Box" -- A rectangular box with edges parallel to the edges of
+*        the graphics device is drawn with the specified position at one
+*        corner, and the previously specified position at the diagonally 
+*        opposite corner.
+*
+*        - "Vline" -- A vertial line is drawn through each specified
+*        position, extending the entire height of the selected picture.
+*
+*        - "Hline" -- A horizontal line is drawn through each specified
+*        position, extending the entire width of the selected picture.
+*
+*        - "Cross" -- A combination of "Vline" and "Hline".
+*
+*        - "Text" -- A text string is used to mark each position. The string 
+*        is drawn horizontally and is centred on the specified position.
+*        The strings to use for each position are specified using parameter 
+*        STRINGS.
+*
 *        [current value]
 *     QUIET = _LOGICAL (Read)
 *        If TRUE then positions are not reported on the screen. Output 
@@ -196,6 +214,23 @@
 *        using parameter FRAME. If pixel co-ordinates are being displayed
 *        anyway (see parameter FRAME) then a value of FALSE is used for. 
 *        SHOWPIXEL. [current value]
+*     STRINGS = LITERAL (Read)
+*        A group of text strings which are used to mark the supplied positions 
+*        if parameter PLOT is set to "TEXT". The first string in the
+*        group is used to mark the first position, the second string is
+*        used to mark the second position, etc. If more positions are
+*        given than there are strings in the group, then the extra
+*        positions will be marked with an integer value indicating the
+*        index within the list of supplied positions. If a null value (!)
+*        is given for the parameter, then all positions will be marked
+*        with integer indices, starting at 1.
+*
+*        A comma-separated list should be given in which each element is
+*        either a marker string, or the name of a text file preceded by an 
+*        up-arrow character "^". Such text files should contain further 
+*        comma-separated lists which will be read and interpreted in the 
+*        same manner. Note, strings within text files can be separated by
+*        new lines as well as commas.
 *     STYLE = LITERAL (Read)
 *        A group of attribute settings describing the plotting style to use 
 *        when drawing the graphics specified by parameter PLOT. The format 
@@ -257,6 +292,14 @@
 *        the current graphics device.  The style to use is read from
 *        text file mystyle, but is then modified so that 5 digits are used
 *        to format axis 1 values, and 7 to format axis 2 values. 
+*     cursor plot=box style="width=3,colour=red" maxpos=2 minpos=2 
+*        Exactly two positions must be given using the cursor, and a red box
+*        is drawn joining the two positions. The lines making up the box
+*        are three times the default width.
+*     cursor plot=text style="size=2,textbackcolour=clear" 
+*        Positions are marked using integer values, starting at 1 for the
+*        first position. The text drawn is twice as large as normal, and
+*        the background is not cleared before drawing the text.
 
 *  Notes:
 *     -  The unformatted values stored in the output parameter LASTPOS, 
@@ -359,6 +402,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS constants
+      INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
@@ -401,6 +445,8 @@
       CHARACTER PLOT*15          ! Nature of required graphics
       CHARACTER PNAME*( DAT__SZNAM )! Name for the latest picture
       CHARACTER PURP*80          ! Purpose for using cursor
+      CHARACTER TEXT*80          ! Marker text
+      DOUBLE PRECISION ATTR( 20 )! Saved graphics attribute values
       DOUBLE PRECISION CXY( NDF__MXDIM )! Current Frame position
       DOUBLE PRECISION FINISH( NDF__MXDIM )! Position at end of polygon edge
       DOUBLE PRECISION GXY( 2 )  ! Graphics position
@@ -421,7 +467,8 @@
       INTEGER IAGDAT             ! Index of AGI_DATA Frame
       INTEGER IAT                ! No. of characters in the string
       INTEGER ICURR              ! Original Current Frame index
-      INTEGER IGRP               ! GRP identifier for group of formatted posns
+      INTEGER IGRP1              ! GRP identifier for group of formatted posns
+      INTEGER IGRP2              ! GRP identifier for group of text strings
       INTEGER IMARK              ! PGPLOT marker type
       INTEGER IMODE              ! Mode of operation
       INTEGER IPIC               ! AGI id for current picture
@@ -448,6 +495,7 @@
       INTEGER NOUTPS             ! No. of positons in first selected picture
       INTEGER NP                 ! The number of positions selected
       INTEGER NPNT               ! No. of cursor positions supplied 
+      INTEGER NSTR               ! No. of marker strings supplied 
       INTEGER OLDCOL             ! Original marker colour index
       INTEGER RBMODE             ! PGPLOT rubber band mode
       LOGICAL CLOSE              ! Close the polygon?
@@ -510,27 +558,41 @@
       CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
 
 *  See what type of graphics are required. 
-      CALL PAR_CHOIC( 'PLOT', 'None', 'Poly,Mark,Chain,None', .TRUE., 
-     :                PLOT, STATUS )
+      CALL PAR_CHOIC( 'PLOT', 'None', 'Poly,Mark,Chain,Box,None,'//
+     :                'Vline,Hline,Cross,Text', .TRUE., PLOT, STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the other parameter values needed to describe the graphics, and 
-*  set the rubber band mode to use (none, unless linear "Poly" graphics are
-*  being produced, in which case use a straight line rubber band).
+*  set the rubber band mode to use (none, unless linear "Poly" or "Chain"
+*  graphics are being produced, in which case use a straight line rubber band).
       RBMODE = 0
 
+*  Get the PGPLOT marker type for CHAIN and MARKER graphics.
       IF( PLOT .EQ. 'MARK' .OR. PLOT .EQ. 'CHAIN' ) THEN
          CALL PAR_GDR0I( 'MARKER', 2, -31, 10000, .FALSE., IMARK, 
      :                   STATUS )
       END IF
 
+*  For POLY and CHAIN graphics, see if the polygons or chains should be
+*  closed, and whether the lines segments should be geodesic curves.
       IF( PLOT .EQ. 'POLY' .OR. PLOT .EQ. 'CHAIN' ) THEN
          CALL PAR_GET0L( 'CLOSE', CLOSE, STATUS )
          CALL PAR_GET0L( 'GEODESIC', GEO, STATUS )
          IF( .NOT. GEO ) RBMODE = 1
+      END IF
 
+*  For text graphics, get a group of strings to be displayed. If a null 
+*  value is supplied, annul the error and store a null GRP identifier to
+*  indicate that integers starting at 1 should be used to mark each position.
+      IGRP2 = GRP__NOID
+      IF( PLOT .EQ. 'TEXT' .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL KPG1_GTGRP( 'STRINGS', IGRP2, NSTR, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            IGRP2 = GRP__NOID
+         END IF
       END IF
 
 *  Abort if an error has occurred.
@@ -552,7 +614,7 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Create a GRP group to store the formatted positions.
-      CALL GRP_NEW( 'Positions', IGRP, STATUS )
+      CALL GRP_NEW( 'Positions', IGRP1, STATUS )
 
 *  Set up the graphics system.
 *  ===========================
@@ -950,7 +1012,7 @@
 
 *  Append the formatted values to the GRP group which will be written out
 *  to the log file at the end.
-            CALL GRP_PUT( IGRP, 1, LOGLIN( : JAT ), 0, STATUS ) 
+            CALL GRP_PUT( IGRP1, 1, LOGLIN( : JAT ), 0, STATUS ) 
 
 *  If required, show the corresponding pixel co-ordinates. Do not display
 *  them if pixel co-ords are already being displayed.
@@ -973,11 +1035,11 @@
                END IF
 
 *  Append it to the current line in the log file.
-               CALL GRP_GRPSZ( IGRP, GRPSIZ, STATUS )
-               CALL GRP_GET( IGRP, GRPSIZ, 1, LOGLIN, STATUS ) 
+               CALL GRP_GRPSZ( IGRP1, GRPSIZ, STATUS )
+               CALL GRP_GET( IGRP1, GRPSIZ, 1, LOGLIN, STATUS ) 
                IAT = CHR_LEN( LOGLIN ) + 3
                CALL CHR_APPND( LINE, LOGLIN, IAT )
-               CALL GRP_PUT( IGRP, 1, LOGLIN( : IAT ), GRPSIZ, STATUS ) 
+               CALL GRP_PUT( IGRP1, 1, LOGLIN( : IAT ), GRPSIZ, STATUS ) 
 
             END IF
 
@@ -1015,48 +1077,24 @@
 
                END IF                
 
-*  Produce any required graphics. First deal with markers.
-               IF( PLOT .EQ. 'MARK' .OR. PLOT .EQ. 'CHAIN' ) THEN               
-                  START( 1 ) = XB                 
-                  START( 2 ) = YB                 
-                  CALL AST_MARK( IPLOTB, 1, 2, 1, START, IMARK, STATUS )
-               END IF
-
-*  Now deal with polygons. Do not draw anything until the second position
-*  is given. 
-               IF( NP .GT. 1 .AND. ( PLOT .EQ. 'POLY' .OR. 
-     :                               PLOT .EQ. 'CHAIN' ) ) THEN
-
-*  Select the required Plot. For linear Polygons, draw in the current
-*  Frame of the BASE picture. For geodesic polygons, draw in the current
-*  Frame of the current picture.
-                  IF( .NOT. GEO ) THEN
-                     IPLOTP = IPLOTB
-                     NAXP = 2
+*  If text is being used to mark each position, extract the string for
+*  this position from the GRP group. If no group was supplied, or if the
+*  group has been exhausted, format the position index.
+               IF( PLOT .EQ. 'TEXT' ) THEN
+                  IF( IGRP2 .NE. GRP__NOID .AND. NP .LE. NSTR ) THEN
+                     CALL GRP_GET( IGRP2, NP, 1, TEXT, STATUS )
                   ELSE
-                     IPLOTP = IPLOT
-                     NAXP = NAX
+                     TEXT = ' '
+                     IAT = 0
+                     CALL CHR_PUTI( NP, TEXT, IAT )
                   END IF
+               END IF                        
 
-*  Transform the previous GRAPHICS position into the current Frame. This
-*  is the starting position for the next edge of the polygon.
-                  GXY( 1 ) = DBLE( XAC( NP - 1 ) )
-                  GXY( 2 ) = DBLE( YAC( NP - 1 ) )
-                  CALL AST_TRANN( IPLOTP, 1, 2, 1, GXY, .TRUE., NAXP, 1, 
-     :                            START, STATUS )
-
-*  Transform the current GRAPHICS position into the current Frame. This
-*  is the finishing position for the next edge of the polygon.
-                  GXY( 1 ) = DBLE( XC )
-                  GXY( 2 ) = DBLE( YC )
-                  CALL AST_TRANN( IPLOTP, 1, 2, 1, GXY, .TRUE., NAXP, 1, 
-     :                            FINISH, STATUS )
-
-*  Draw the curve.
-                  CALL AST_CURVE( IPLOTP, START, FINISH, STATUS ) 
-
-               END IF
-
+*  Mark the GRAPHICS position in the manner specified by parameter PLOT.
+               GXY( 1 ) = DBLE( XC )
+               GXY( 2 ) = DBLE( YC )
+               CALL KPG1_MKPOS( 2, GXY, IPLOT, .FALSE., PLOT, IMARK, 
+     :                          GEO, .FALSE., .FALSE., TEXT, STATUS )
             END IF
 
 *  Leave the loop if the maximum number of positions have been supplied.
@@ -1078,7 +1116,7 @@
 
 *  Tell the user if there is a position to forget.
             ELSE
-               CALL GRP_GET( IGRP, NP, 1, LINE, STATUS )
+               CALL GRP_GET( IGRP1, NP, 1, LINE, STATUS )
                CALL MSG_SETC( 'POS', LINE )
                CALL MSG_OUT( ' ', 'Forgetting the previous position '//
      :                       '(^POS).', STATUS )
@@ -1091,13 +1129,6 @@
 *  If Graphics are being drawn, display an "erased" symbol at the position
 *  which has just been forgotten.
                IF( PLOT .NE. 'NONE' ) THEN
-
-*  Temporarily make the GRAPHICS (Base) Frame current so that we can give
-*  the position in GRAPHICS co-ordinates.
-                  ICURR = AST_GETI( IPLOTB, 'CURRENT', STATUS )
-                  CALL AST_SETI( IPLOTB, 'CURRENT',
-     :                           AST_GETI( IPLOTB, 'BASE', STATUS ),
-     :                           STATUS )
 
 *  If markers are being drawn, temporarily increase the marker size.
                   IF( PLOT .EQ. 'MARK' .OR. PLOT .EQ. 'CHAIN' ) THEN
@@ -1127,9 +1158,13 @@
                   START( 2 ) = REAL( YC )          
 
                   IF( IMARK .NE. 8 ) THEN
-                     CALL AST_MARK( IPLOTB, 1, 2, 1, START, 8, STATUS )
+                     CALL KPG1_MKPOS( 2, START, IPLOTB, .FALSE., 'MARK',
+     :                                8, .FALSE., .FALSE., .FALSE., 
+     :                                ' ', STATUS )
                   ELSE
-                     CALL AST_MARK( IPLOTB, 1, 2, 1, START, 10, STATUS )
+                     CALL KPG1_MKPOS( 2, START, IPLOTB, .FALSE., 'MARK',
+     :                                10, .FALSE., .FALSE., .FALSE., 
+     :                                ' ', STATUS )
                   END IF
 
 *  Re-instate the original Plot attributes.
@@ -1140,15 +1175,13 @@
      :                              STATUS )
                   END IF
 
-                  CALL AST_SETI( IPLOTB, 'CURRENT', ICURR, STATUS )
-
                END IF
 
 *  Reduce the number of positions stored by one.
                NP = NP - 1
 
 *  Reduce the size of the group to remove the last entry.
-               CALL GRP_SETSZ( IGRP, NP, STATUS )
+               CALL GRP_SETSZ( IGRP1, NP, STATUS )
 
 *  We now need to decide whether the position should also be removed from 
 *  the list of positions to write to the ouptput positions list. This is 
@@ -1206,37 +1239,9 @@
 *  ========
       CALL MSG_BLANK( STATUS )
 
-*  Close any polygons being drawn (if requested)
-      IF( NP .GT. 2 .AND. CLOSE .AND. ( PLOT .EQ. 'POLY' .OR. 
-     :                                  PLOT .EQ. 'CHAIN' ) ) THEN
-
-*  Select the required Plot. For linear Polygons, draw in the current
-*  Frame of the BASE picture. For geodesic polygons, draw in the current
-*  Frame of the current picture.
-         IF( .NOT. GEO ) THEN
-            IPLOTP = IPLOTB
-         ELSE
-            IPLOTP = IPLOT
-         END IF
-
-*  Transform the last GRAPHICS position into the current Frame. This
-*  is the starting position for the next edge of the polygon.
-         GXY( 1 ) = DBLE( XAC( NP ) )
-         GXY( 2 ) = DBLE( YAC( NP ) )
-         CALL AST_TRANN( IPLOTP, 1, 2, 1, GXY, .TRUE., NAX, 1, 
-     :                   START, STATUS )
-
-*  Transform the first GRAPHICS position into the current Frame. This
-*  is the finishing position for the next edge of the polygon.
-         GXY( 1 ) = DBLE( XAC( 1 ) )
-         GXY( 2 ) = DBLE( YAC( 1 ) )
-         CALL AST_TRANN( IPLOTP, 1, 2, 1, GXY, .TRUE., NAX, 1, 
-     :                   FINISH, STATUS )
-
-*  Draw the curve.
-         CALL AST_CURVE( IPLOTP, START, FINISH, STATUS ) 
-
-      END IF 
+*  Close any polygons or chains being drawn.
+      CALL KPG1_MKPOS( 2, GXY, IPLOT, .FALSE., PLOT, IMARK, GEO, .TRUE.,
+     :                 CLOSE, TEXT, STATUS )
 
 *  Store the number of valid positions given in the output parameter
 *  NUMBER.
@@ -1257,7 +1262,7 @@
          CALL PAR_PUT0I( 'LASTDIM', NAX, STATUS )
 
 *  Create a a logfile containing formatted values if required.
-         CALL GRP_LIST( 'LOGFILE', 0, 0, ' ', IGRP, STATUS ) 
+         CALL GRP_LIST( 'LOGFILE', 0, 0, ' ', IGRP1, STATUS ) 
 
 *  The Plot stored in the output positions list must not have an AGI_DATA 
 *  Frame since there is no guarantee that the correct AGI picture will be 
@@ -1284,8 +1289,9 @@
 *  ===================
   999 CONTINUE
 
-*  Delete the GRP group holding formatted positions.
-      CALL GRP_DELET( IGRP, STATUS )
+*  Delete the GRP groups.
+      IF( IGRP1 .NE. GRP__NOID ) CALL GRP_DELET( IGRP1, STATUS )
+      IF( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, STATUS )
 
 *  Shutdown PGPLOT and the graphics database.
       CALL ERR_BEGIN( STATUS )

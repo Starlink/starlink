@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_LSHPL( IPLOT, NPOS, NAX, POS, PLOT, GEO, IMARK, 
-     :                       CLOSE, LABEL, IDS, WORK, STATUS )
+     :                       CLOSE, LABEL, IGRP, IDS, WORK, STATUS )
 *+
 *  Name:
 *     KPS1_LSHFM
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL KPS1_LSHPL( IPLOT, NPOS, NAX, POS, PLOT, GEO, IMARK, CLOSE, 
-*                      LABEL, IDS, WORK, STATUS )
+*                      LABEL, IGRP, IDS, WORK, STATUS )
 
 *  Description:
 *     This routine plots the supplied positions on the currently
@@ -26,15 +26,9 @@
 *     NAX = INTEGER (Given)
 *        The number of axes for the supplied positions.
 *     POS( NPOS, NAX ) = DOUBLE PRECISION (Given)
-*        The supplied positions.
+*        The supplied positions (in the Current Frame of IPLOT).
 *     PLOT = CHARACTER * ( * ) (Given)
-*        The type of plotting required. This can be:
-*
-*        MARK      - Each position is marked by symbol given by IMARK.
-*        POLY      - Causes each position to be joined by a line
-*                    (specified by GEO) to the previous position.  
-*        CHAIN     - Each position is marked by symbol and joined to the
-*                    previous position.
+*        The type of plotting required (see KPG1_MKPOS).
 *     GEO = LOGICAL (Given)
 *        Should geodesic polygons be drawn?
 *     IMARK = INTEGER (Given)
@@ -43,6 +37,8 @@
 *        Should polygons be closed?
 *     LABEL = LOGICAL (Given)
 *        Should positions be labelled?
+*     IGRP = INTEGER (Given)
+*        A GRP group holding the strings to use if PLOT=TEXT.
 *     IDS( NPOS ) = INTEGER (Given)
 *        Array of position identifiers.
 *     WORK( NPOS, 2 ) = DOUBLE PRECISION (Given and Returned)
@@ -70,6 +66,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Arguments Given:
@@ -82,6 +79,7 @@
       INTEGER IMARK
       LOGICAL CLOSE
       LOGICAL LABEL
+      INTEGER IGRP
       INTEGER IDS( NPOS )
 
 *  Arguments Given and Returned:
@@ -92,9 +90,10 @@
 
 *  Local Variables:
       CHARACTER ID*6               ! Formatted identifier
+      CHARACTER TEXT*80            ! Marker text
       DOUBLE PRECISION DX          ! X position offset to label centre
       DOUBLE PRECISION DY          ! Y position offset to label centre
-      DOUBLE PRECISION FINISH( NDF__MXDIM )! End of closing curve
+      DOUBLE PRECISION LPOS( NDF__MXDIM )! Local copy of a position
       DOUBLE PRECISION NLG1        ! NumLabGap(1)
       DOUBLE PRECISION NLG2        ! NumLabGap(2)
       DOUBLE PRECISION SIZE        ! Size for numerical labels
@@ -103,12 +102,12 @@
       DOUBLE PRECISION WD0         ! Original width for strings
       INTEGER CL0                  ! Original colour index for strings
       INTEGER FN0                  ! Original font for strings
-      INTEGER FRM                  ! Pointer to current Frame
       INTEGER I                    ! Loop count
       INTEGER IAT                  ! No. of characters in a string
       INTEGER ICURR0               ! Index of original current frame
       INTEGER ICURR                ! Index of new current frame
       INTEGER J                    ! Axis index
+      INTEGER NSTR                 ! Number of marker strings supplied
       INTEGER ST0                  ! Original style for strings
       REAL UP(2)                   ! Up vector
       REAL X1, X2, Y1, Y2          ! Bounds of PGPLOT window (millimetres)
@@ -130,66 +129,50 @@
 *  Save the index of the new Current Frame.
       ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
 
-*  Map the supplied positions into the GRAPHICS Frame.
-      CALL AST_TRANN( IPLOT, NPOS, NAX, NPOS, POS, .FALSE., 2,
-     :                NPOS, WORK, STATUS ) 
-
-*  Now draw any required polygons.
-      IF( PLOT .EQ. 'POLY' .OR. PLOT .EQ. 'CHAIN' ) THEN
-
-*  For linear polygons, draw the poly-curve using the GRAPHICS co-ordinates 
-*  stored in the work array.
-         IF( .NOT. GEO ) THEN
-
-*  Make the GRAPHICS (Base) Frame the Current Frame. Geodesics in this
-*  Frame are straight lines on the screen.
-            CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE',
-     :                                                 STATUS ),
-     :                     STATUS )
-
-*  Draw the curve joining the GRAPHICS Frame positions.
-            CALL AST_POLYCURVE( IPLOT, NPOS, 2, NPOS, WORK, STATUS )
-
-*  If required, close the polygon.
-            IF( CLOSE ) THEN
-   
-               DO I = 1, 2
-                  START( I ) = WORK( NPOS, I )
-                  FINISH( I ) = WORK( 1, I )
-               END DO
-   
-               CALL AST_CURVE( IPLOT, START, FINISH, STATUS ) 
-   
-            END IF
-
-*  Re-instate the Current Frame. 
-            CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
-
-*  For geodesic polygons, draw the poly-curve using the supplied Current 
-*  Frame positions.
-         ELSE 
-
-*  Draw the poly-curve.
-            CALL AST_POLYCURVE( IPLOT, NPOS, NAX, NPOS, POS, STATUS )
-
-*  If required, close the polygon.
-            IF( CLOSE ) THEN
-   
-               DO I = 1, NAX
-                  START( I ) = POS( NPOS, I )
-                  FINISH( I ) = POS( 1, I )
-               END DO
-   
-               CALL AST_CURVE( IPLOT, START, FINISH, STATUS ) 
-   
-            END IF
-   
-         END IF
-
+*  Get the number of strings supplied in IGRP group.
+      IF( IGRP .NE. GRP__NOID ) THEN
+         CALL GRP_GRPSZ( IGRP, NSTR, STATUS )
+      ELSE
+         NSTR = 0
       END IF
+
+*  Loop round each position.
+      DO I = 1, NPOS
+
+*  Extract the position from the supplied array.
+         DO J = 1, NAX
+            LPOS( J ) = POS( I, J )
+         END DO
+
+*  If text is being used to mark each position, extract the string for
+*  this position from the GRP group. If no group was supplied, or if the
+*  group has been exhausted, format the position index.
+         IF( PLOT .EQ. 'TEXT' ) THEN
+            IF( I .LE. NSTR ) THEN
+               CALL GRP_GET( IGRP, I, 1, TEXT, STATUS )
+            ELSE
+               TEXT = ' '
+               IAT = 0
+               CALL CHR_PUTI( I, TEXT, IAT )
+            END IF
+         END IF                        
+
+*  Draw the position.
+         CALL KPG1_MKPOS( NAX, LPOS, IPLOT, .TRUE., PLOT, IMARK, GEO, 
+     :                    .FALSE., CLOSE, TEXT, STATUS )
+
+      END DO
+
+*  Complete any polygons.
+      CALL KPG1_MKPOS( NAX, LPOS, IPLOT, .TRUE., PLOT, IMARK, GEO, 
+     :                 .TRUE., CLOSE, TEXT, STATUS )
 
 *  If required, add labels.
       IF( LABEL .AND. STATUS .EQ. SAI__OK ) THEN
+
+*  Map the supplied positions into the GRAPHICS Frame.
+         CALL AST_TRANN( IPLOT, NPOS, NAX, NPOS, POS, .FALSE., 2,
+     :                   NPOS, WORK, STATUS ) 
 
 *  Make the GRAPHICS (Base) Frame the Current Frame. 
          CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE',
@@ -274,22 +257,6 @@
          CALL AST_SETD( IPLOT, 'WIDTH(STRINGS)', WD0, STATUS )
          CALL AST_SETI( IPLOT, 'STYLE(STRINGS)', ST0, STATUS )
          CALL AST_SETI( IPLOT, 'FONT(STRINGS)', FN0, STATUS )
-
-*  Re-instate the Current Frame. 
-         CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
-
-      END IF
-
-*  Finally draw any required markers using the GRAPHICS Frame positions.
-      IF( PLOT .EQ. 'MARK' .OR. PLOT .EQ. 'CHAIN' ) THEN               
-
-*  Make the GRAPHICS (Base) Frame the Current Frame. 
-         CALL AST_SETI( IPLOT, 'CURRENT', AST_GETI( IPLOT, 'BASE',
-     :                                              STATUS ),
-     :                  STATUS )
-
-*  Draw the Markers.
-         CALL AST_MARK( IPLOT, NPOS, 2, NPOS, WORK, IMARK, STATUS ) 
 
 *  Re-instate the Current Frame. 
          CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )

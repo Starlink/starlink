@@ -189,7 +189,7 @@ kpg1_rdast.f kpg1_rdlst.f kpg1_short.f kpg1_verb.f \
 kpg1_wrast.f kpg1_wread.f kpg1_wrls2.f kpg1_wrlst.f kpg1_wwrt.f \
 kpg1_tkast.c kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f \
 kpg1_snkta.f kpg1_wcatw.f kpg1_srcta.f kpg1_ctass.f kpg1_ctcre.f \
-kpg1_plsav.f kpg1_pllod.f kpg1_plput.f kpg1_plget.f
+kpg1_plsav.f kpg1_pllod.f kpg1_plput.f kpg1_plget.f kpg1_mkpos.f
 
 # The contents of the kappa_iraf.tar file:
 KAPPA_IRAF = doc fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl \

@@ -18,7 +18,7 @@
 *     Plot. The attribute setting should be of the form "name=value" where
 *     "name" is an AST attribute name or a synonym for an AST attribute
 *     name established by a call to KPG1_ASPSY, and "value" is the value
-*     to assign to the attribute. If the attribute name starts with COLOR
+*     to assign to the attribute. If the attribute name contains either COLOR
 *     or COLOUR then the value string is checked to see if it is the name
 *     of a colour, and if so, the corresponding colour index is used
 *     instead. The resulting setting, after translation of synonyms and
@@ -86,10 +86,13 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
+      LOGICAL CHR_SIMLR          ! Strings equal apart from case?
 
 *  Local Variables:
       CHARACTER NAME*(GRP__SZNAM)  ! Attribute name
       CHARACTER VALUE*(GRP__SZNAM) ! Attribute value
+      INTEGER ISTAT                ! CHR status value
+      INTEGER IVAL                 ! Integer value read from string
 *.
 
 *  Initialise.
@@ -105,11 +108,43 @@
 *  or any colour names.
          CALL KPG1_ASSTY( SETTNG, NAME, VALUE, STATUS )
 
+*  First check for KAPPA "pseudo-attributes". These are implememted by KAPPA
+*  rather than AST...
+
+*  TEXTBACKCOLOUR: specifies the colour index for the background when text
+*  strings are drawn. A negative value results in the background being
+*  clear.
+         IF( CHR_SIMLR( NAME, 'TEXTBACKCOLOUR' ) ) THEN
+
+*  Allow the string CL(EAR) to indicate a clear background. Set the text
+*  background colour index used by the grf_kappa.c module to -1.
+            IF( CHR_SIMLR( VALUE( : 2 ), 'CL' ) ) THEN
+               CALL GRF_SETTBG( -1 )
+
+*  For any other value attempt to extract a colour index. Colour names
+*  will have been converted to colour indices by KPG1_ASSTY.
+            ELSE
+               ISTAT = STATUS 
+               CALL CHR_CTOI( VALUE, IVAL, ISTAT )
+
+*  If a valid integer value was supplied, set it as the colour index.
+               IF( ISTAT .EQ. SAI__OK ) THEN
+                  CALL GRF_SETTBG( IVAL )
+               END IF
+
+            END IF
+
+*  If the attribute is not a KAPPA pseudo-attribute, assume it is a
+*  genuine AST attribute.
+         ELSE
+
 *  Set the attribute in the Plot. If required, check that the attribute 
 *  is not already set in the Plot.
-         IF( OVER .OR. .NOT. AST_TEST( IPLOT, NAME, STATUS ) ) THEN
-            CALL AST_SETC( IPLOT, NAME( : CHR_LEN( NAME ) ), 
-     :                     VALUE( : CHR_LEN( VALUE ) ), STATUS )
+            IF( OVER .OR. .NOT. AST_TEST( IPLOT, NAME, STATUS ) ) THEN
+               CALL AST_SETC( IPLOT, NAME( : CHR_LEN( NAME ) ), 
+     :                        VALUE( : CHR_LEN( VALUE ) ), STATUS )
+            END IF
+
          END IF
 
 *  If AST_SETC or AST_TESTC returned an error indicating that the setting 

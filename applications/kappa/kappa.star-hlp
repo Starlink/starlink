@@ -7348,6 +7348,24 @@ PLOT = LITERAL (Read)
    position. Parameters MARKER, GEODESIC and CLOSE are used to
    specify the symbols and lines to use.
 
+   - "Box" -- A rectangular box with edges parallel to the edges of
+   the graphics device is drawn with the specified position at one
+   corner, and the previously specified position at the diagonally
+   opposite corner.
+
+   - "Vline" -- A vertial line is drawn through each specified
+   position, extending the entire height of the selected picture.
+
+   - "Hline" -- A horizontal line is drawn through each specified
+   position, extending the entire width of the selected picture.
+
+   - "Cross" -- A combination of "Vline" and "Hline".
+
+   - "Text" -- A text string is used to mark each position. The string
+   is drawn horizontally and is centred on the specified position.
+   The strings to use for each position are specified using parameter
+   STRINGS.
+
    [current value]
 3 QUIET
 QUIET = _LOGICAL (Read)
@@ -7362,6 +7380,24 @@ SHOWPIXEL = _LOGICAL (Read)
    using parameter FRAME. If pixel co-ordinates are being displayed
    anyway (see parameter FRAME) then a value of FALSE is used for.
    SHOWPIXEL. [current value]
+3 STRINGS
+STRINGS = LITERAL (Read)
+   A group of text strings which are used to mark the supplied positions
+   if parameter PLOT is set to "TEXT". The first string in the
+   group is used to mark the first position, the second string is
+   used to mark the second position, etc. If more positions are
+   given than there are strings in the group, then the extra
+   positions will be marked with an integer value indicating the
+   index within the list of supplied positions. If a null value (!)
+   is given for the parameter, then all positions will be marked
+   with integer indices, starting at 1.
+
+   A comma-separated list should be given in which each element is
+   either a marker string, or the name of a text file preceded by an
+   up-arrow character "^". Such text files should contain further
+   comma-separated lists which will be read and interpreted in the
+   same manner. Note, strings within text files can be separated by
+   new lines as well as commas.
 3 STYLE
 STYLE = LITERAL (Read)
    A group of attribute settings describing the plotting style to use
@@ -7427,6 +7463,16 @@ cursor name=data style="^mystyle,digits(1)=5,digits(2)=7"
    the current graphics device.  The style to use is read from
    text file mystyle, but is then modified so that 5 digits are used
    to format axis 1 values, and 7 to format axis 2 values.
+
+cursor plot=box style="width=3,colour=red" maxpos=2 minpos=2
+   Exactly two positions must be given using the cursor, and a red box
+   is drawn joining the two positions. The lines making up the box
+   are three times the default width.
+
+cursor plot=text style="size=2,textbackcolour=clear"
+   Positions are marked using integer values, starting at 1 for the
+   first position. The text drawn is twice as large as normal, and
+   the background is not cleared before drawing the text.
 2 Notes
 -  The unformatted values stored in the output parameter LASTPOS,
 may not be in the same units as the formatted values shown on
@@ -7438,6 +7484,11 @@ celestial co-ordinate values are stored in radians.
 -  In DYNAMIC and ANCHOR modes, if the cursor is situated at a
 position where there are no pictures of the selected name, the
 co-ordinates in the BASE picture are reported.
+
+-  Pixel co-ordinates are formatted with 1 decimal place unless a
+format has already been specified by setting the Format attributes
+for the axes of the PIXEL co-ordinate Frame (eg using application
+WCSATTRIB).
 
 -  Positions can be removed (the instructions state how), starting
 from the most-recent one.  Such positions are excluded from the
@@ -17195,8 +17246,24 @@ PLOT = LITERAL (Read)
    position. Parameters MARKER, GEODESIC and CLOSE are used to
    specify the symbols and lines to use.
 
-   Each position may also be labelled with its integer identifier value
-   by giving a TRUE value for parameter LABEL. [None]
+   - "Box" -- A rectangular box with edges parallel to the edges of
+   the graphics device is drawn between each pair of positions.
+
+   - "Vline" -- A vertial line is drawn through each position,
+   extending the entire height of the selected picture.
+
+   - "Hline" -- A horizontal line is drawn through each position,
+   extending the entire width of the selected picture.
+
+   - "Cross" -- A combination of "Vline" and "Hline".
+
+   - "Text" -- A text string is used to mark each position. The string
+   is drawn horizontally and is centred on the specified position.
+   The strings to use for each position are specified using parameter
+   STRINGS.
+
+   Each position may also be separately labelled with its integer
+   identifier value by giving a TRUE value for parameter LABEL. [None]
 3 POSNS
 POSNS() = _DOUBLE (Write)
    The unformatted co-ordinates of the positions selected by
@@ -17216,6 +17283,26 @@ QUIET = LOGICAL (Read)
    parameters and files are still created. The dynamic default is
    to run quietly if any graphics or labels are being plotted (see
    parameters PLOT and LABEL). []
+3 STRINGS
+STRINGS = LITERAL (Read)
+   A group of text strings which are used to mark the supplied positions
+   if parameter PLOT is set to "TEXT". The first string in the
+   group is used to mark the first position, the second string is
+   used to mark the second position, etc (note, these integers may
+   be different to the position identifiers in the supplied positions
+   list - if you want to see the position identifiers, use parameter
+   LABEL). If more positions are given than there are strings in the
+   group, then the extra positions will be marked with an integer value
+   indicating the index within the list of supplied positions. If a
+   null value (!) is given for the parameter, then all positions will
+   be marked with integer indices, starting at 1.
+
+   A comma-separated list should be given in which each element is
+   either a marker string, or the name of a text file preceded by an
+   up-arrow character "^". Such text files should contain further
+   comma-separated lists which will be read and interpreted in the
+   same manner. Note, strings within text files can be separated by
+   new lines as well as commas.
 3 STYLE
 STYLE = LITERAL (Read)
    The name of a text file containing a description of a plotting

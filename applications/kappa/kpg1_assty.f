@@ -275,10 +275,13 @@
 *  Replace colour names in the attribute value
 *  ===========================================
 
-*  This setting sets a colour attribute if the name/qualifier starts with 
-*  COLOR or COLOUR.
-      IF( NAME( : 5 ) .EQ. 'COLOR' .OR. 
-     :    NAME( : 6 ) .EQ. 'COLOUR' ) THEN
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999    
+
+*  This setting sets a colour attribute if the name/qualifier contains 
+*  either of the strings COLOR or COLOUR.
+      IF( INDEX( NAME, 'COLOR' ) .NE. 0 .OR.
+     :    INDEX( NAME, 'COLOUR') .NE. 0 )  THEN
 
 *  See if PGPLOT is currently active. Assume a colour index of zero if not.
          CALL PGQID( ID )
@@ -295,12 +298,12 @@
      :                       STATUS )
          END IF
 
-*  If the colour was not known, flush the error. The calling routine will then
+*  If the colour was not known, annul the error. The calling routine will then
 *  continue in an attempt to use the colour as an AST attribute value and
-*  will fail. Another error will then be reported including the whole
+*  will fail. An error will then be reported including the whole
 *  attribute string.
          IF( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_FLUSH( STATUS )
+            CALL ERR_ANNUL( STATUS )
    
 *  If the colour was found, replace its name with the colour index.
          ELSE

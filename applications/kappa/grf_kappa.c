@@ -28,6 +28,9 @@
 *        a multiple of the default line width (1/500 of the view surface
 *        diagonal).
 *        o  Wrapper for pgplot F77 subroutine PGQVSZ added.
+*     18-NOV-1998 (DSB):
+*        Added grf_settbg to allow the text background colour to be set
+*        from Fortran.
 */
 
 /* Macros */
@@ -51,6 +54,11 @@
 #include <float.h>
 #include <math.h>
 #include <string.h>
+
+/* Function Prototypes. */
+/* ==================== */
+/* The colour index for the background of text strings. */
+static int textbg = 0;
 
 /* Function Prototypes. */
 /* ==================== */
@@ -377,7 +385,7 @@ int astGText( const char *text, float x, float y, const char *just,
 
 /* Display the text, erasing any graphics. */
       ccpgqtbg( &tbg );
-      ccpgstbg( 0 );
+      ccpgstbg( textbg );
       ccpgptxt( x, y, angle, fjust, (char *) text ); 
       ccpgstbg( tbg );
    }
@@ -1242,4 +1250,10 @@ F77_SUBROUTINE(grf_gattr)( INTEGER(ATTR), LOGICAL(USE), DOUBLE(VALUE),
    } else {
       *ISTAT = astGAttr( *ATTR, AST__BAD, OLDVAL, *PRIM );
    }
+}
+
+F77_SUBROUTINE(grf_settbg)( INTEGER(TBG) ) {
+   GENPTR_INTEGER(TBG)
+
+   textbg = (int) *TBG;
 }

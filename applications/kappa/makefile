@@ -638,7 +638,7 @@ kpg1_zones.f kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f ncropn.f \
 normal.f nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f \
 kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f kpg1_snkta.f \
 kpg1_wcatw.f kpg1_srcta.f kpg1_ctass.f kpg1_ctcre.f \
-kpg1_pllod.f kpg1_plsav.f kpg1_plget.f kpg1_plput.f
+kpg1_pllod.f kpg1_plsav.f kpg1_plget.f kpg1_plput.f kpg1_mkpos.f
 
 KAPVIEW_F_ROUTINES = \
 contour.f contover.f \
@@ -3247,6 +3247,7 @@ kps1_memnm.o:	 SAE_PAR C1_COM ME_COM
 kps1_memou.o:	 SAE_PAR PRM_PAR C1_COM
 kps1_memsa.o:	 SAE_PAR DAT_PAR C1_COM ME_COM
 kps1_memsy.o:	 SAE_PAR ME_COM
+kps1_mkpos.o:	 SAE_PAR NDF_PAR AST_PAR
 kps1_mlcof.o:	 SAE_PAR PRM_PAR
 kps1_mlgof.o:	 SAE_PAR
 kps1_mlofl.o:	 SAE_PAR PRM_PAR

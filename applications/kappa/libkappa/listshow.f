@@ -157,8 +157,24 @@
 *        position. Parameters MARKER, GEODESIC and CLOSE are used to
 *        specify the symbols and lines to use.
 *
-*        Each position may also be labelled with its integer identifier value 
-*        by giving a TRUE value for parameter LABEL. [None]
+*        - "Box" -- A rectangular box with edges parallel to the edges of
+*        the graphics device is drawn between each pair of positions.
+*
+*        - "Vline" -- A vertial line is drawn through each position, 
+*        extending the entire height of the selected picture.
+*
+*        - "Hline" -- A horizontal line is drawn through each position, 
+*        extending the entire width of the selected picture.
+*
+*        - "Cross" -- A combination of "Vline" and "Hline".
+*
+*        - "Text" -- A text string is used to mark each position. The string 
+*        is drawn horizontally and is centred on the specified position.
+*        The strings to use for each position are specified using parameter 
+*        STRINGS.
+*
+*        Each position may also be separately labelled with its integer 
+*        identifier value by giving a TRUE value for parameter LABEL. [None]
 *     POSNS() = _DOUBLE (Write)
 *        The unformatted co-ordinates of the positions selected by
 *        parameters FIRST and LAST, in the co-ordinate Frame selected by
@@ -176,6 +192,25 @@
 *        parameters and files are still created. The dynamic default is
 *        to run quietly if any graphics or labels are being plotted (see
 *        parameters PLOT and LABEL). []
+*     STRINGS = LITERAL (Read)
+*        A group of text strings which are used to mark the supplied positions 
+*        if parameter PLOT is set to "TEXT". The first string in the
+*        group is used to mark the first position, the second string is
+*        used to mark the second position, etc (note, these integers may
+*        be different to the position identifiers in the supplied positions 
+*        list - if you want to see the position identifiers, use parameter 
+*        LABEL). If more positions are given than there are strings in the 
+*        group, then the extra positions will be marked with an integer value 
+*        indicating the index within the list of supplied positions. If a 
+*        null value (!) is given for the parameter, then all positions will 
+*        be marked with integer indices, starting at 1.
+*
+*        A comma-separated list should be given in which each element is
+*        either a marker string, or the name of a text file preceded by an 
+*        up-arrow character "^". Such text files should contain further 
+*        comma-separated lists which will be read and interpreted in the 
+*        same manner. Note, strings within text files can be separated by
+*        new lines as well as commas.
 *     STYLE = LITERAL (Read)
 *        The name of a text file containing a description of a plotting 
 *        style. It is used only to control the labels and format for the 
@@ -262,7 +297,8 @@
       INTEGER I                  ! Loop count
       INTEGER IBASE              ! Index of Base Frame in IWCS
       INTEGER IFRM               ! Index of Frame  for positions 
-      INTEGER IGRP               ! GRP identifier for formatted co-ordinate values
+      INTEGER IGRP1              ! GRP identifier for formatted co-ordinate values
+      INTEGER IGRP2              ! GRP identifier for marker strings group
       INTEGER IMARK              ! PGPLOT marker type
       INTEGER IPIC               ! AGI id for selected picture
       INTEGER IPIC0              ! Current (input) picture identifier
@@ -283,6 +319,7 @@
       INTEGER NINVAL             ! No. of invalid identifiers
       INTEGER NPOS               ! Total number of positions
       INTEGER NRAX               ! No. of axes in requested Frame
+      INTEGER NSTR               ! No. of marker strings supplied
       INTEGER SIZE               ! No. of elements in group
       LOGICAL CLOSE              ! Close the polygon?
       LOGICAL DESC               ! Describe each Coordinate Frame?
@@ -300,27 +337,41 @@
       IPW0 = 0
       IPW1 = 0
       IPW2 = 0
-      IGRP = GRP__NOID
+      IGRP1 = GRP__NOID
+      IGRP2 = GRP__NOID
 
 *  Start a new AST context.
       CALL AST_BEGIN( STATUS )
 
 *  See what type of graphics are required. 
-      CALL PAR_CHOIC( 'PLOT', 'None', 'Poly,Mark,Chain,None', .TRUE., 
-     :                PLOT, STATUS )
+      CALL PAR_CHOIC( 'PLOT', 'None', 'Poly,Mark,Chain,Box,None,'//
+     :                'Vline,Hline,Cross,Text', .TRUE., PLOT, STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Get the other parameter values needed to describe the graphics.
+*  Get the PGPLOT marker type for CHAIN and MARKER graphics.
       IF( PLOT .EQ. 'MARK' .OR. PLOT .EQ. 'CHAIN' ) THEN
          CALL PAR_GDR0I( 'MARKER', 2, -31, 10000, .FALSE., IMARK, 
      :                   STATUS )
       END IF
 
+*  For POLY and CHAIN graphics, see if the polygons or chains should be
+*  closed, and whether the lines segments should be geodesic curves.
       IF( PLOT .EQ. 'POLY' .OR. PLOT .EQ. 'CHAIN' ) THEN
          CALL PAR_GET0L( 'CLOSE', CLOSE, STATUS )
          CALL PAR_GET0L( 'GEODESIC', GEO, STATUS )
+      END IF
+
+*  For text graphics, get a group of strings to be displayed. If a null 
+*  value is supplied, annul the error and store a null GRP identifier to
+*  indicate that integers starting at 1 should be used to mark each position.
+      IF( PLOT .EQ. 'TEXT' .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL KPG1_GTGRP( 'STRINGS', IGRP2, NSTR, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            IGRP2 = GRP__NOID
+         END IF
       END IF
 
 *  See if positions are to be labelled on the graphics device.
@@ -461,21 +512,21 @@
 *  Set the Style of the FrameSet using the STYLE parameter. This is done so
 *  that the Format of each axis value (for instance) can be controlled 
 *  using STYLE.
-      CALL KPG1_ASSET( 'KAPPA_LISTSHOW', 'STYLE', IWCS, STATUS )
+      CALL KPG1_ASSET( 'LISTSHOW', 'STYLE', IWCS, STATUS )
 
 *  See if Frame descriptions are required.
       CALL PAR_GET0L( 'DESCRIBE', DESC, STATUS )
 
 *  Create a GRP Group to hold the formatted positions.
-      CALL GRP_NEW( 'Formatted positions', IGRP, STATUS )
+      CALL GRP_NEW( 'Formatted positions', IGRP1, STATUS )
 
 *  Format the positions and identifiers, and store them in the group.
       CALL KPS1_LSHFM( AST_GETFRAME( IWCS, AST__CURRENT, STATUS ), 
-     :                 NDISP, NRAX, %VAL( IPW0 ), %VAL( IPW2 ), IGRP,
+     :                 NDISP, NRAX, %VAL( IPW0 ), %VAL( IPW2 ), IGRP1,
      :                 STATUS )
 
 *  Save the number of positions in the list.
-      CALL GRP_GRPSZ( IGRP, SIZE, STATUS )
+      CALL GRP_GRPSZ( IGRP1, SIZE, STATUS )
 
 *  Produce any requestd scren output.
       IF( .NOT. QUIET ) THEN
@@ -499,7 +550,7 @@
          CALL MSG_BLANK( STATUS )
 
          DO I = 1, SIZE
-            CALL GRP_GET( IGRP, I, 1, TEXT, STATUS ) 
+            CALL GRP_GET( IGRP1, I, 1, TEXT, STATUS ) 
             CALL MSG_SETC( 'TEXT', TEXT )
             CALL MSG_OUT( 'LISTSHOW_MSG4', '  ^TEXT', STATUS )
          END DO
@@ -566,11 +617,11 @@
          CALL KPG1_ASMRG( IPLOT, IWCS, 'PIXEL', QUIET, 2, STATUS )
 
 *  Set the plotting style.
-         CALL KPG1_ASSET( 'KAPPA_LISTSHOW', 'STYLE', IPLOT, STATUS )
+         CALL KPG1_ASSET( 'LISTSHOW', 'STYLE', IPLOT, STATUS )
 
 *  Produce the graphics.
          CALL KPS1_LSHPL( IPLOT, NDISP, NRAX, %VAL( IPW2 ), PLOT,
-     :                    GEO, IMARK, CLOSE, LABEL, %VAL( IPID ), 
+     :                    GEO, IMARK, CLOSE, LABEL, IGRP2, %VAL( IPID ), 
      :                    %VAL( IPW3 ), STATUS )
 
 *  Free work space used by KPS1_LSHPL.
@@ -589,7 +640,7 @@
 *  remove the "#" from the position identifiers. Also add some leading
 *  spaces.
       DO I = 1, SIZE
-         CALL GRP_GET( IGRP, I, 1, TEXT, STATUS ) 
+         CALL GRP_GET( IGRP1, I, 1, TEXT, STATUS ) 
 
          IF( TEXT .NE. ' ' ) THEN
             CALL CHR_FANDL( TEXT, F, L )
@@ -601,14 +652,14 @@
                CALL CHR_PREFX( '#  ', TEXT, L ) 
             END IF
 
-            CALL GRP_PUT( IGRP, 1, TEXT( : L ), I, STATUS ) 
+            CALL GRP_PUT( IGRP1, 1, TEXT( : L ), I, STATUS ) 
 
          END IF
 
       END DO
 
 *  Now create the log file.      
-      CALL GRP_LIST( 'LOGFILE', 0, 0, ' ', IGRP, STATUS ) 
+      CALL GRP_LIST( 'LOGFILE', 0, 0, ' ', IGRP1, STATUS ) 
 
 *  Shutdown procedure.
 *  ===================
@@ -619,8 +670,9 @@
       IF( IPW1 .NE. 0 ) CALL PSX_FREE( IPW1, STATUS )
       IF( IPW2 .NE. 0 ) CALL PSX_FREE( IPW2, STATUS )
 
-*  Delete the GRP group holding formatted positions.
-      IF( IGRP .NE. GRP__NOID ) CALL GRP_DELET( IGRP, STATUS )
+*  Delete the GRP groups.
+      IF( IGRP1 .NE. GRP__NOID ) CALL GRP_DELET( IGRP1, STATUS )
+      IF( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )
