@@ -1,0 +1,108 @@
+*+
+*  Name:
+*     SPD_WFCM
+
+*  Purpose:
+*     Common block include file, internal to WORK library.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'SPD_WFCM'
+
+*  Description:
+*     This file declares the common block used by the line fit routines
+*     in the WORK library to transfer information through the NAG
+*     minimisation routine to its objective function. "Line" fit here
+*     means anything of which up to 6 entities are guessed and fitted.
+*     One group of routines achieves a fit of diluted Planck functions.
+*
+*     This file should be used only internally by the SPD_WF* routines,
+*     other routines are not supposed to access the common block
+*     directly.
+
+*  Constants:
+*     MAXCMP = INTEGER
+*        The number of line components provided for.
+
+*  Variables:
+*     DCONT = DOUBLE PRECISION
+*        The constant continuum underlying the line profiles.
+*     FSCALE = DOUBLE PRECISION
+*        Scaling factor. The objective function is proportional to
+*        1/FSCALE. FSCALE should be such that the objective function is
+*        of order unity near its minimum.
+*     PARNO( 3*MAXCMP ) = INTEGER
+*        Permutation vector for parameters.
+*        PAR1(PARNO(I)) corresponds to PAR0(I). PAR1 is not part of this
+*        COMMON block.
+*        First in the array PAR1 come all the free line centres in
+*        ascending order of component number. Then come all free line
+*        peaks in ascending order of component number. Then come all
+*        free line dispersions.
+*        Last in the array PAR1 come all fixed or tied or unused centres
+*        in descending order of component number. Before that come all
+*        fixed or tied or unused peaks in descending order of component
+*        number. Before that come all fixed or tied of unused line
+*        dispersions in descending order of component number.
+*     PARFLG( 3*MAXCMP ) = INTEGER
+*        A packed version of the fit flags:
+*        PARFLG={CFLAGS(1) ... CFLAGS(NCOMP),NCOMP+1,...,MAXCMP,
+*                PFLAGS(1) ... PFLAGS(NCOMP),NCOMP+1,...,MAXCMP,
+*                SFLAGS(1) ... SFLAGS(NCOMP),NCOMP+1,...,MAXCMP}
+*        For each component I a value e.g. CFLAGS(I)=0 indicates
+*        that CENTRE(I) holds a guess which is free to be fitted.
+*        A positive value CFLAGS(I)=I indicates that CENTRE(I) is fixed.
+*        A positive value CFLAGS(I)=J<I indicates that CENTRE(I) has to
+*        keep a fixed offset from CENTRE(J). A positive value PFLAGS(I)
+*        or SFLAGS(I)=J<I indicates that PEAK(I) or SIGMA(I) has to keep
+*        a fixed ratio to PEAK(J) or SIGMA(J).
+*        Deviating from CFLAGS etc., unused components' parameters are
+*        flagged as fixed.
+*     PAR0( 3*MAXCMP ) = DOUBLE PRECISION
+*        A packed version of the unscaled guess parameters:
+*        PAR0={CENTRE(1) ... CENTRE(NCOMP),0,0,...,0,
+*                PEAK(1) ...   PEAK(NCOMP),0,0,...,0,
+*               SIGMA(1) ...  SIGMA(NCOMP),1,1,...,1}
+*        Deviating from CENTRE etc., unused components' parameters are
+*        set to 0 or 1, whichever causes less harm.
+*     NCOMP = INTEGER
+*        Number of line components.
+*     NDATA = INTEGER
+*        Number of data points in spectrum. This is the dimension of
+*        each of the four vectors behind the pointer DATAP.
+*     DATAP = INTEGER
+*        Pointer to a packed array of four vectors of length NDATA. That
+*        is to say, %VAL(DATAP) is a REAL array DATA(4*NDATA).
+
+*  Authors:
+*     hme: Horst Meyerdierks (UoE, Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     25 Nov 1994 (hme):
+*        Original version.
+*     15 Mar 1995 (hme):
+*        Replace E04DGF/E04DKF with UNCMND.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
+      INTEGER MAXCMP
+      PARAMETER ( MAXCMP = 6 )
+
+*  Global Variables:
+      DOUBLE PRECISION DCONT
+      DOUBLE PRECISION FSCALE
+      INTEGER          PARNO(  3*MAXCMP )
+      INTEGER          PARFLG( 3*MAXCMP )
+      DOUBLE PRECISION PAR0(   3*MAXCMP )
+      INTEGER          NCOMP
+      INTEGER          NDATA, DATAP
+      COMMON / SPD_WFCM / DCONT, FSCALE, PARNO, PARFLG, PAR0, NCOMP,
+     :   NDATA, DATAP
