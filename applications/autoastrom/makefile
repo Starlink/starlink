@@ -410,7 +410,7 @@ CATLIBINSTALLDIR=catlib-install
 PUBLIC_SCRIPTS = autoastrom autoastrom.pm
 
 #  List of other library files which will be installed.
-LIBRARY_FILES = moggy/Moggy.pm misc/extractor.config
+LIBRARY_FILES = moggy/Moggy.pm misc/extractor.config misc/extractor.param
 
 #  List of documentation files.
 DOCUMENTATION = $(PKG_NAME).news sun242.tar-htx sun242.tar-tex sun242.xml
@@ -562,10 +562,9 @@ build:
         fi
 
 #  The .BUILT target records the time of the most recent build which
-#  modified any of the built files.  It depends on all the built files
-#  being up to date (which causes them to be built).
-
-.BUILT: $(BUILT_FILES)
+#  modified any of the built files.  It depends on the fake target
+#  build-subdirs, which invokes make in the moggy and astrom directories.
+.BUILT: build-subdirs
 #
 #  Enter information about the current machine and build environment
 #  into the date stamp file.
@@ -730,11 +729,14 @@ install:
 # points to exists.  Only ever used by the developer, so it's brutish 
 # when it fails.
 test-install:
+	@ test -n "$$AUTOASTROM_DIR" || (echo "Define AUTOASTROM_DIR" && false)
+	@ echo "TEST-INSTALL in $$AUTOASTROM_DIR..."
 	test -n "$$AUTOASTROM_DIR" && test -d "$$AUTOASTROM_DIR"
-	for f in $(BUILT_FILES) $(PUBLIC_SCRIPTS) $(LIBRARY_FILES); do \
+	@ for f in $(BUILT_FILES) $(PUBLIC_SCRIPTS) $(LIBRARY_FILES); do \
 		DEST=$$AUTOASTROM_DIR/`echo $$f|sed s+.*/++`; \
 		if test -n "$$f"; then \
 			cp -p $$f $$DEST; \
+			echo $$DEST; \
 			chmod 755 $$DEST; \
 		else :; fi; \
 	done
@@ -893,7 +895,7 @@ pretest:
 	@ echo "Testing astrom"
 	cd astrom/t && ../mk
 	@ echo "Testing autoastrom"
-	cd t && ./runtests
+	cd t && ../mk
 
 
 #  export: Export the installed system.
@@ -1082,10 +1084,15 @@ sun242.xml: doc/sun242.xml
 # confused with the conventional meaning of that variable (indicating
 # an installation program).
 
-# First configure and build the moggy package.
-moggy/moggy: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a
+# Make sure the subdirectories are up-to-date.  The files
+# moggy/Makefile.in and astrom/astrom.f are pseudo-dependencies: if
+# these don't exist, they're created by unpacking the source tarball.
+# The file build-subdirs must not exist at any time.
+build-subdirs: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a astrom/astrom.f
 	cd moggy && unset INSTALL; make
+	cd astrom && ./mk build
 
+# Creating moggy/Makefile configures the moggy package
 moggy/Makefile: moggy/Makefile.in $(CATLIBINSTALLDIR)/stamp
 	INST=`cd $(CATLIBINSTALLDIR);pwd`; cd moggy && unset INSTALL; CXX=$(CXX) CC=$(CC) ./configure --with-catlib=$$INST
 
@@ -1111,9 +1118,6 @@ $(CATLIBINSTALLDIR)/stamp:
 	done
 	touch $(CATLIBINSTALLDIR)/stamp
 
-astrom/astrom.x: astrom/astrom.f
-	cd astrom && ./mk build
-
 #  Unpack the source tarball.  The extra test is because the makefile
 #  (always/sometimes?) wants to execute this twice.  Things get
 #  circular if this depends explicitly on the source tarball
@@ -1125,8 +1129,8 @@ moggy/Makefile.in astrom/astrom.f:
 	test -d moggy -a -d astrom || $(TAR_OUT) $(PKG_NAME)_source.tar
 
 #  Propagate the version number
-autoastrom.news makefile moggy/Moggy.pm: VERSION
-	support/propagate-version autoastrom.news makefile moggy/Moggy.pm
+autoastrom autoastrom.news makefile moggy/Moggy.pm: VERSION
+	support/propagate-version autoastrom autoastrom.news makefile moggy/Moggy.pm
 
 
 #------------------------------------------------------------------------------
