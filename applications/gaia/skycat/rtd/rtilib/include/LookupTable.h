@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: LookupTable.h,v 1.4 1998/07/23 23:37:55 abrighto Exp $" 
+ * "@(#) $Id: LookupTable.h,v 1.6 1999/03/22 21:41:53 abrighto Exp $" 
  *
  * LookupTable.h - declarations for class LookupTable, a class for managing
  *                 an image color lookup table used to convert image pixel
@@ -66,9 +66,7 @@ public:
 		     int* histogram, int area);
 
     // reset to given color
-    void reset(int color) {
-	if (lookup_) memset(lookup_, color, sizeof(unsigned long) * size_);
-    }
+    void reset(unsigned long color);
     
     // set the color value for a specific pixel value (blank pixel, for example)
     void setPixelColor(int pixval, unsigned long color);
@@ -127,7 +125,7 @@ public:
     }
 
     // reset to given color
-    void reset(int color) {
+    void reset(unsigned long color) {
 	if (rep_) rep_->reset(color);
     }
     

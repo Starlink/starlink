@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageData.h,v 1.22 1998/11/16 21:25:42 abrighto Exp $"
+ * "@(#) $Id: ImageData.h,v 1.24 1999/03/22 21:41:53 abrighto Exp $"
  *
  * Image.h - class definitions for drawing images in Tk/Tcl
  *
@@ -93,15 +93,11 @@ protected:
     // (used later for calculating  cut levels)
     int x0_, y0_, x1_, y1_;
     
-    // due to padding or different display modes, the actual XImage dimensions
-    // may be different than the image dimensions. These values are set from
-    // the XImage values by the caller (see inline methods with similar names
-    // below) and kept here for reference.
-    int xImageWidth_;
-    int xImageHeight_;
-    int xImageSize_;   // width*height*nbytes
-    int xImageBytes_;  // Number of bytes per pixel in xImage (1 for 8
-                       // bit displays).
+    // XImage info
+    int xImageBytesPerLine_;
+    int xImageSize_;		// size in bytes = width*height*bytesPerPixel
+    int xImageBytesPerPixel_;	// Number of bytes per pixel in xImage (1 for 8
+				// bit displays).
 
     // max x image x,y coords scaled to image coords
     int xImageMaxX_, xImageMaxY_;

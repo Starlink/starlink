@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: tkCanvasPsImage.c,v 1.2 1998/12/24 00:37:55 abrighto Exp $" 
+ * "@(#) $Id: tkCanvasPsImage.c,v 1.4 1999/03/22 21:42:24 abrighto Exp $" 
  *
  * TkCanvasPsImage.C -  Implement Tk postscript output for images
  *
@@ -24,7 +24,7 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  19/06/98  Created
  */
-static char* rcsId="@(#) $Id: tkCanvasPsImage.c,v 1.2 1998/12/24 00:37:55 abrighto Exp $";
+static char* rcsId="@(#) $Id: tkCanvasPsImage.c,v 1.4 1999/03/22 21:42:24 abrighto Exp $";
 
 
 #include <stdio.h>
@@ -535,4 +535,35 @@ TkCanvasPsImage_Init()
 {
     extern Tk_ItemType tkImageType;
     tkImageType.postscriptProc = ImageToPostscript;
+}
+
+
+/*
+ * XXX - allan: same as Tk_CanvasWindowCoords, but with no clipping
+ */
+void
+Tk_CanvasWindowCoordsNoClip(canvas, x, y, screenXPtr, screenYPtr)
+    Tk_Canvas canvas;			/* Token for the canvas. */
+    double x, y;			/* Coordinates in canvas space. */
+    int *screenXPtr, *screenYPtr;	/* Screen coordinates are stored
+					 * here. */
+{
+    TkCanvas *canvasPtr = (TkCanvas *) canvas;
+    double tmp;
+
+    tmp = x - canvasPtr->xOrigin;
+    if (tmp > 0) {
+	tmp += 0.5;
+    } else {
+	tmp -= 0.5;
+    }
+    *screenXPtr = tmp;
+
+    tmp = y  - canvasPtr->yOrigin;
+    if (tmp > 0) {
+	tmp += 0.5;
+    } else {
+	tmp -= 0.5;
+    }
+    *screenYPtr = tmp;
 }

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageData.C,v 1.33 1998/12/03 22:11:15 abrighto Exp $" 
+ * "@(#) $Id: ImageData.C,v 1.36 1999/03/22 21:42:02 abrighto Exp $" 
  *
  * ImageData.C - member functions for class ImageData
  *
@@ -40,7 +40,7 @@
  *
  * Peter W. Draper 13/01/99  Merged my changes into SkyCat 2.2.
  */
-static const char* const rcsId="@(#) $Id: ImageData.C,v 1.33 1998/12/03 22:11:15 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ImageData.C,v 1.36 1999/03/22 21:42:02 abrighto Exp $";
 
 
 #include <string.h>
@@ -98,10 +98,9 @@ ImageData::ImageData(const char* imageName, const ImageIO& image,
   area_(width_*height_),
   xImage_(NULL),
   xImageData_(NULL),
-  xImageWidth_(width_),
-  xImageHeight_(height_),
-  xImageSize_(width_*height_),
-  xImageBytes_(1),
+  xImageBytesPerLine_(0),
+  xImageSize_(0),
+  xImageBytesPerPixel_(1),
   xImageMaxX_(width_-1),
   xImageMaxY_(height_-1),
   colorScaleType_(LINEAR_SCALE),
@@ -153,12 +152,11 @@ ImageData::ImageData(const ImageData& im)
   area_(im.area_),
   xImage_(NULL),		// will be set later
   xImageData_(NULL),
-  xImageWidth_(0),
-  xImageHeight_(0),
+  xImageBytesPerLine_(0),
   xImageSize_(0),
   xImageMaxX_(0),
   xImageMaxY_(0),
-  xImageBytes_(1),
+  xImageBytesPerPixel_(1),
   colorScaleType_(im.colorScaleType_),
   haveBlank_(im.haveBlank_),
   lowCut_(im.lowCut_),
@@ -227,18 +225,21 @@ void ImageData::setColors(int ncolors, unsigned long* colors)
  */
 void ImageData::setXImage(ImageDisplay* xImage)
 {
+    // save XImage info
     xImage_ = xImage;
     xImageData_ = xImage_->data();
-    xImageWidth_ = xImage_->bytesPerLine();
-    xImageHeight_ = xImage_->height();
-    xImageBytes_ = xImage_->depth()/8;   //  Used to control speedup code.
+    xImageBytesPerPixel_ = xImage_->depth()/8;
+    xImageBytesPerLine_ = xImage_->bytesPerLine();
 
-    double x = xImageWidth_, y = xImageHeight_;
+    // get XImage size in bytes
+    xImageSize_ = xImageBytesPerLine_ * xImage_->height() * xImageBytesPerPixel_;
+
+    // get the highest x,y indexes in the XImage
+    double x = xImage_->width();
+    double y = xImage_->height();
     undoTrans(x, y, 1);
-    xImageMaxX_ = int(x)-1;		// should be highest index in raw data
+    xImageMaxX_ = int(x)-1;
     xImageMaxY_ = int(y)-1;
-
-    xImageSize_ = xImageWidth_ * xImageHeight_;
 
     update_pending_++;
 }
@@ -623,10 +624,13 @@ void ImageData::rotate(int angle)
  */
 void ImageData::flip(double& x, double& y, int width, int height)
 {
-    if (!flipY_)		// raw image has y axis reversed
-	y = ((height ? height : height_)) - y;
+    int c = (xScale_ > 1) ? 0 : 1; 
+    
+    if (!flipY_) 		// raw image has y axis reversed
+	y = ((height ? height : height_) - c) - y;
+
     if (flipX_) 
-	x = ((width ? width : width_)) - x;
+	x = ((width ? width : width_) - c) - x;
 }
 
 
@@ -636,15 +640,17 @@ void ImageData::flip(double& x, double& y, int width, int height)
  */
 void ImageData::flip(int& x0, int& y0, int& x1, int& y1)
 {
+    int c = (xScale_ > 1) ? 0 : 1; 
+
     if (!flipY_) {		// raw image has y axis reversed
-	int y = y0;
-	y0 = height_ - 1 - y1;  // PWD: integer coordinates are 0->N-1
-	y1 = height_ - 1 - y;   // 0 is centre of first pixel
+	int y = y0, h = height_ - c;
+	y0 = h - y1;
+	y1 = h - y;
     }
     if (flipX_) {
-	int x = x0;
-	x0 = width_ - 1 - x1;
-	x1 = width_ - 1 - x;
+	int x = x0, w = width_ - c;
+	x0 = w - x1;
+	x1 = w - x;
     }
 }
 
@@ -818,34 +824,6 @@ int ImageData::getIndex(double x, double y, int& ix, int& iy)
     else {
 	ix = int(x-1.0);
 	iy = int(y-1.0);
-
-	// XXX hack to fix a probable "off-by-one" bug ?
-	switch (flipX_<<2|flipY_<<1|rotate_) {
-	case 0: // none
-	    break;
-	case 1: // rotate
-	    ix--;
-	    iy--;
-	    break;
-	case 2: // flipY
-	    iy--;
-	    break;
-	case 3: // flipY + rotate
-	    ix--;
-	    break;
-	case 4: // flipX
-	    ix--;
-	    break;
-	case 5: // flipX + rotate
-	    iy--;
-	    break;
-	case 6: // flipX + flipY
-	    ix--;
-	    iy--;
-	    break;
-	case 7: // flipX + flipY + rotate
-	    break;
-	}
     }
 
     // return 0 if in range, otherwise 1
@@ -1037,7 +1015,7 @@ void ImageData::updateOffset(double x, double y)
 	return;
 
     if (clear_) {		// temp clear image
-	memset(xImageData_, color0_, xImageSize_);
+	xImage_->clear(color0_);
 	clear_ = 0;
 	return;
     }
@@ -1064,7 +1042,7 @@ void ImageData::updateOffset(double x, double y)
     if (dest_x || dest_y || x1-x0 < xImageMaxX_ || y1-y0 < xImageMaxY_) {
 	// if (verbose_)
 	//    printf("%s: clear ximage before update\n", name_);
-	memset(xImageData_, color0_, xImageSize_);
+	xImage_->clear(color0_);
     }
 
     // copy raw to X image while doing transformations

@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: ShortImageData.h,v 1.9 1998/07/23 23:37:55 abrighto Exp $" 
+ * "@(#) $Id: ShortImageData.h,v 1.10 1999/03/19 20:10:01 abrighto Exp $" 
  *
  * ShortImageData.h - class definitions for class ShortImageData
  *

@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: LookupTable.C,v 1.8 1998/07/28 21:23:46 abrighto Exp $" 
+ * "@(#) $Id: LookupTable.C,v 1.10 1999/03/22 21:42:02 abrighto Exp $" 
  *
  * LookupTable.C - method definitions for class LookupTable, managing image
  *                 pixel lookup tables for converting pixel values to 
@@ -21,7 +21,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  09 Aug 96  Created
  */
-static const char* const rcsId="@(#) $Id: LookupTable.C,v 1.8 1998/07/28 21:23:46 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: LookupTable.C,v 1.10 1999/03/22 21:42:02 abrighto Exp $";
 
 
 #include <math.h>
@@ -111,6 +111,17 @@ LookupTableRep::~LookupTableRep()
 }
 
 
+/*
+ * reset to given color
+ */
+void LookupTableRep::reset(unsigned long color) 
+{
+    if (lookup_) {
+	for(int i = 0; i < size_; i++)
+	    lookup_[i] = color;
+    }
+}
+    
 /* -------------- color scaling -------------------- */
 
 

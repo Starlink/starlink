@@ -1,6 +1,6 @@
  /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: Mem_Map.C,v 1.2 1998/02/09 08:03:12 abrighto Exp $
+ * $Id: Mem_Map.C,v 1.4 1999/03/19 20:10:43 abrighto Exp $
  *
  * Mem_Map.C - method definitions for class Mem_Map
  * Author:     Doug Schmidt - ripped from ACE_wrappers by K. Gillies.
@@ -12,8 +12,7 @@
  *                 21 Nov 97 Added fix for OSF/1 problems with statvfs
  *                           include.
  */
-static const char* const rcsId="@(#) $Id: Mem_Map.C,v 1.2 1998/02/09 08:03:12 abrighto Exp $";
-
+static const char* const rcsId="@(#) $Id: Mem_Map.C,v 1.4 1999/03/19 20:10:43 abrighto Exp $";
 
 #include <unistd.h>
 #include <sys/types.h>

@@ -2,7 +2,7 @@
 #
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.13 1998/07/28 21:23:47 abrighto Exp $" 
+# "@(#) $Id: Makefile.in,v 1.15 1999/03/22 21:42:03 abrighto Exp $" 
 #
 # Makefile.in"
 # 
@@ -33,6 +33,9 @@ OBJS 		=  LookupTable.o ImageData.o ByteImageData.o XImageData.o ShortImageData.
 
 libname  	= ../lib/librti.a
 
+# X11 include dir
+X_INCLUDE     	= @XINCSW@
+
 # Take include files from the build dirs, if present
 BUILD_INCLUDES  = @TCLUTIL_BUILD_INCLUDES@ \
 		  @ASTROTCL_BUILD_INCLUDES@ 
@@ -42,7 +45,8 @@ INCLUDES	= -I../include \
 		  -I../../rtdimg/include \
 		  $(BUILD_INCLUDES) \
 		  -I$(TOPDIR)/include/astrotcl \
-		  -I$(TOPDIR)/include/tclutil
+		  -I$(TOPDIR)/include/tclutil \
+		   $(X_INCLUDE)
 
 CC_SWITCHES	= @SHLIB_CFLAGS@ $(CFLAGS) $(DEFINES) $(INCLUDES)
 DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@

@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: ByteImageData.h,v 1.8 1998/02/02 20:20:02 abrighto Exp $" 
+ * "@(#) $Id: ByteImageData.h,v 1.10 1999/03/19 20:10:01 abrighto Exp $" 
  *
  * ByteImageData.h - class definitions for class ByteImageData
  *

@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: util.C,v 1.1 1997/11/28 01:39:05 abrighto Exp $" 
+ * "@(#) $Id: util.C,v 1.3 1999/03/19 20:10:43 abrighto Exp $" 
  *
  * util.C - utility routines
  * 
@@ -13,7 +13,7 @@
  *                            the beginning of string if no '/'
  *                            available, rather than just last '.'. 
  */
-static const char* const rcsId="@(#) $Id: util.C,v 1.1 1997/11/28 01:39:05 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: util.C,v 1.3 1999/03/19 20:10:43 abrighto Exp $";
 
 
 #include <string.h>

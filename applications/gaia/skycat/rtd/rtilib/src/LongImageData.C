@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: LongImageData.C,v 1.9 1998/03/23 00:47:02 abrighto Exp $" 
+ * "@(#) $Id: LongImageData.C,v 1.10 1999/03/19 20:10:09 abrighto Exp $" 
  *
  * LongImageData.C - member functions for class LongImageData
  *

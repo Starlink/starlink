@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.5 1998/10/28 17:47:31 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.7 1999/03/19 20:10:39 abrighto Exp $"
 #
 # ------------------------------------------------------------------------
 # 	Makefile
@@ -9,6 +9,8 @@
 # Modified:
 #
 #    Peter W. Draper: Added TCL_EXEC_DIR macro to locate itclsh2.2 binary
+#    Allan Brighton:  changed to tclsh@TCL_VERSION@ (but don't assume it is
+#                     in $(DESTDIR))
 # ------------------------------------------------------------------------
 
 # C compiler
@@ -108,7 +110,7 @@ $(OBJS): ../../config.status
 tixUnixSam.c: tixSamLib.c
 
 tixSamLib.c:
-	$(TCL_EXEC_DIR)/itclsh3.0 ../tools/tclc.tcl \
+	tclsh@TCL_VERSION@ ../tools/tclc.tcl \
 	  ../library/pref/*.fsc \
 	  ../library/pref/*.csc \
 	  ../library/*.tcl > tixSamLib.c

@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: ImageTemplates.C,v 1.22 1998/11/16 21:26:02 abrighto Exp $" 
+ * "@(#) $Id: ImageTemplates.C,v 1.26 1999/03/22 21:42:02 abrighto Exp $" 
  *
  * ImageTemplates.C - template member functions for classes derived from
  *                    class ImageData (not C++ templates, uses cpp macros)
@@ -469,11 +469,9 @@ void CLASS_NAME::rawToXImage(int x0, int y0, int x1, int y1,
 
     // row/col increments
     register int src_x_inc, src_y_inc;
-    register int dest_x_inc, dest_y_inc;
 
     // source/dest images
     register DATA_TYPE* src = (DATA_TYPE*)image_.dataPtr();
-    register byte* dest = xImageData_;
 
     // width of image area to update
     int w = x1 - x0 + 1;
@@ -504,18 +502,21 @@ void CLASS_NAME::rawToXImage(int x0, int y0, int x1, int y1,
 
     // need to take care with non-byte depths, so branch according to
     // this
-    if ( xImageBytes_ == 1 ) {
+    if ( xImageBytesPerPixel_ == 1 ) {
+
+	register byte* dest = xImageData_;
+	register int dest_x_inc, dest_y_inc;
 
       // set args for rotate in dest image
       if (rotate_) {
-	dest_x_inc = xImageWidth_;
-	dest_y_inc = -(w * xImageWidth_ - 1);
-	dest += xImageWidth_ * dest_x  + dest_y;
+	dest_x_inc = xImageBytesPerLine_;
+	dest_y_inc = -(w * xImageBytesPerLine_ - 1);
+	dest += xImageBytesPerLine_ * dest_x  + dest_y;
       } 
       else {
 	dest_x_inc = 1;
-	dest_y_inc = xImageWidth_ - w;
-	dest += xImageWidth_ * dest_y  + dest_x;
+	dest_y_inc = xImageBytesPerLine_ - w;
+	dest += xImageBytesPerLine_ * dest_y  + dest_x;
       }
 
       // copy the raw data to the X image...
@@ -569,19 +570,12 @@ void CLASS_NAME::grow(int x0, int y0, int x1, int y1,
 
     // row/col increments
     register int src_x_inc, src_y_inc;
-    register int dest_x_inc, dest_y_inc;
 
     // source/dest images
     register DATA_TYPE* src = (DATA_TYPE*)image_.dataPtr();
-    register byte* dest = xImageData_;
-    register byte* end = xImageData_ + xImageSize_;
 
     // width of image area to update
     int w = x1 - x0 + 1;
-
-    // if (verbose_)
-    //	printf("%s: grow: %d,%d  %d,%d +(%d,%d)\n", 
-    //	       name_, x0, y0, x1, y1, dest_x, dest_y);
 
     // set loop increments based on current transformations
     switch (flipX_<<1|flipY_) {
@@ -609,82 +603,86 @@ void CLASS_NAME::grow(int x0, int y0, int x1, int y1,
 
     // need to take care with non-byte depths, so branch according to
     // this
-    if ( xImageBytes_ == 1 ) {
+    if ( xImageBytesPerPixel_ == 1 ) {
 
-      // set args for rotate in dest image
-      if (rotate_) {
-	dest_x_inc = xImageWidth_ * xs;
-	dest_y_inc = -(w * xs * xImageWidth_ - ys);
-	dest += xImageWidth_ * xs * dest_x + dest_y * ys;
-      } 
-      else {
-	dest_x_inc = xs;
-	dest_y_inc = xImageWidth_ * ys  -  w * xs;
-	dest += xImageWidth_ * ys * dest_y + dest_x * xs;
+	register byte* dest = xImageData_;
+	register byte* end = xImageData_ + xImageSize_;
+	register int dest_x_inc, dest_y_inc;
+
+	// set args for rotate in dest image
+	if (rotate_) {
+	    dest_x_inc = xImageBytesPerLine_ * xs;
+	    dest_y_inc = -(w * xs * xImageBytesPerLine_ - ys);
+	    dest += xImageBytesPerLine_ * xs * dest_x + dest_y * ys;
+	} 
+	else {
+	    dest_x_inc = xs;
+	    dest_y_inc = xImageBytesPerLine_ * ys  -  w * xs;
+	    dest += xImageBytesPerLine_ * ys * dest_y + dest_x * xs;
         
-      }
-      
-      // copy the raw data to the X image...
-      for (i=y0; i<=y1; i++) {
-	for (j=x0; j<=x1; j++) {
-          c = lookup(NTOH(*src)); 
-          q = p = dest;
-          src += src_x_inc;
-          dest += dest_x_inc;
-          // replicate the source pixel to an xs x ys box in the dest
-          for (n=0; n<ys; n++) {
-            for (m=0; m<xs; m++) {
-              if (p >= end) {
-                break;
-              }
-              *p++ = c;
-            }
-            p = q += xImageWidth_;
-          }
 	}
-	src += src_y_inc;
- 	dest += dest_y_inc;
-      }
+      
+	// copy the raw data to the X image...
+	for (i=y0; i<=y1; i++) {
+	    for (j=x0; j<=x1; j++) {
+		c = lookup(NTOH(*src)); 
+		q = p = dest;
+		src += src_x_inc;
+		dest += dest_x_inc;
+		// replicate the source pixel to an xs x ys box in the dest
+		for (n=0; n<ys; n++) {
+		    for (m=0; m<xs; m++) {
+			if (p >= end) {
+			    break;
+			}
+			*p++ = c;
+		    }
+		    p = q += xImageBytesPerLine_;
+		}
+	    }
+	    src += src_y_inc;
+	    dest += dest_y_inc;
+	}
     } 
     else {
 
-      //  XImage has depth greater than a byte. Need to take care with
-      //  these (byte swapping etc. to server format, if really
-      //  pushed for performance could use ImageByteOrder() and wing it).
-      int k = dest_x * xs;
-      int l = dest_y * ys;
-      unsigned long cl;
-      int width;
-      int height;
-      if ( rotate_ ) {
-        height = xImage_->width();
-        width = xImage_->height();
-      } 
-      else {
-        width = xImage_->width();
-        height = xImage_->height();
-      }
-      for ( i = y0; i <= y1; i++ ) {
-        for ( j = x0; j <= x1; j++ ) {
-          cl = llookup(NTOH(*src));
-          // replicate the source pixel to an xs x ys box
-          for ( n = l; n < min(l+ys,height); n++ ) {
-            for ( m = k; m < min(k+xs,width); m++ ) {
-              if ( rotate_ ) {
-                xImage_->putpixel( n, m, cl );
-              } 
-              else {
-                xImage_->putpixel( m, n, cl );
-              }
-            }
-          }
-          k += xs;
-          src += src_x_inc;
-        }
-        k = dest_x * xs;
-        l += ys;
-        src += src_y_inc;
-      }
+	//  XImage has depth greater than a byte. Need to take care with
+	//  these (byte swapping etc. to server format, if really
+	//  pushed for performance could use ImageByteOrder() and wing it).
+	int k = dest_x * xs;
+	int l = dest_y * ys;
+	unsigned long cl;
+	int width;
+	int height;
+	if ( rotate_ ) {
+	    height = xImage_->width();
+	    width = xImage_->height();
+	} 
+	else {
+	    width = xImage_->width();
+	    height = xImage_->height();
+	}
+	for ( i = y0; i <= y1; i++ ) {
+	    for ( j = x0; j <= x1; j++ ) {
+		cl = llookup(NTOH(*src));
+		// replicate the source pixel to an xs x ys box
+		for ( n = l; n < min(l+ys,height); n++ ) {
+		    for ( m = k; m < min(k+xs,width); m++ ) {
+			if ( rotate_ ) {
+			    xImage_->putpixel( n, m, cl );
+			} 
+			else {
+			    xImage_->putpixel( m, n, cl );
+			}
+		    }
+		}
+		k += xs;
+		src += src_x_inc;
+	    }
+	    k = dest_x * xs;
+	    l += ys;
+	    src += src_y_inc;
+	}
     }
 }
 
@@ -714,25 +712,15 @@ void CLASS_NAME::shrink(int x0, int y0, int x1, int y1, int dest_x, int dest_y)
 
     // row/col increments
     register int src_x_inc, src_y_inc;
-    register int dest_x_inc, dest_y_inc;
 
     // source/dest images
     register DATA_TYPE* src = (DATA_TYPE*)image_.dataPtr();
-    register byte* dest = xImageData_;
-    register byte* end = xImageData_ + xImageSize_ - 1;
-
     register DATA_TYPE maxval = 0;
    
-    // if (verbose_)
-    //	printf("%s: shrink: %d,%d  %d,%d  +(%d,%d)  dispWidth=%d (%d), subsample=%d\n", 
-    //	       name_, x0, y0, x1, y1, dest_x, dest_y,
-    //	       dispWidth_, xImageWidth_, subsample_);
-
     // set loop increments based on current transformations
     switch (flipX_<<1|flipY_) {
     case 0: // none
-	// src +=  (height_ - 1 - y0) * width_ + x0; 
-	src +=  (height_ - ys - y0) * width_ + x0; // 14.2.96: use fix from Dave Terrett
+	src +=  (height_ - ys - y0) * width_ + x0; 
 	src_x_inc = xs;
 	src_y_inc = -width_ * ys - w;
 	break;
@@ -742,8 +730,7 @@ void CLASS_NAME::shrink(int x0, int y0, int x1, int y1, int dest_x, int dest_y)
 	src_y_inc = width_ * ys - w;
 	break;
     case 2: // flipX
-	// src +=  (height_ - 1 - y0) * width_ + (width_ - 1 - x0);
-	src +=  (height_ - ys - y0) * width_ + (width_ - xs - x0); // 14.2.96: use fix from Dave Terrett
+	src +=  (height_ - ys - y0) * width_ + (width_ - xs - x0); 
 	src_x_inc = -xs;
 	src_y_inc = -(width_ * ys - w);
 	break;
@@ -754,112 +741,115 @@ void CLASS_NAME::shrink(int x0, int y0, int x1, int y1, int dest_x, int dest_y)
 	break;
     }
 
-    if ( xImageBytes_ == 1 ) {
-      //  use old (fast) methods.
+    if ( xImageBytesPerPixel_ == 1 ) {
+	//  use faster methods for byte xImages
 
-      // set args for rotate in dest image
-      if (rotate_) {
-	dest_x_inc = xImageWidth_;
-	dest_y_inc = -(w/xs * xImageWidth_ - 1);
-	dest += xImageWidth_ * (dest_x/xs) + (dest_y/ys);
-      } 
-      else {
-	dest_x_inc = 1;
-	dest_y_inc = xImageWidth_ - w/xs;
-	dest += xImageWidth_ * (dest_y/ys) + (dest_x/xs);
-      }
-      
-      
-      // copy the raw data to the X image...
-      if (subsample_) {
-	// use faster "subsample" algorithm
-	for (i=y0; i<=y1; i+=ys) {
-          for (j=x0; j<=x1; j+=xs) {
-            if (dest > end) {
-              break;
-            }
-            *dest = lookup(NTOH(*src));
-            dest += dest_x_inc;
-            src += src_x_inc;
-          }
-          src += src_y_inc;
-          dest += dest_y_inc;
+	register byte* dest = xImageData_;
+	register byte* end = xImageData_ + xImageSize_ - 1;
+	register int dest_x_inc, dest_y_inc;
+
+	// set args for rotate in dest image
+	if (rotate_) {
+	    dest_x_inc = xImageBytesPerLine_;
+	    dest_y_inc = -(w/xs * xImageBytesPerLine_ - 1);
+	    dest += xImageBytesPerLine_ * (dest_x/xs) + (dest_y/ys);
+	} 
+	else {
+	    dest_x_inc = 1;
+	    dest_y_inc = xImageBytesPerLine_ - w/xs;
+	    dest += xImageBytesPerLine_ * (dest_y/ys) + (dest_x/xs);
 	}
-      }
-      else {
-	// don't subsample: take max pixel
-	for (i=y0; i<=y1; i+=ys) {
-          for (j=x0; j<=x1; j+=xs) {
-            if (dest > end) {
-              break;
-            }
-            q = p = src;
-            for (n=0; n<ys; n++) {
-              for (m=0; m<xs; m++, p++) {
-                if (NTOH(*p) > maxval)
-                  maxval = NTOH(*p);
-              }
-              p = q += width_;
-            }
-            *dest = lookup(maxval);
-            maxval = 0;
-            dest += dest_x_inc;
-            src += src_x_inc;
-          }
-          src += src_y_inc;
-          dest += dest_y_inc;
+      
+	// copy the raw data to the X image...
+	if (subsample_) {
+	    // use faster "subsample" algorithm
+	    for (i=y0; i<=y1; i+=ys) {
+		for (j=x0; j<=x1; j+=xs) {
+		    if (dest > end) {
+			break;
+		    }
+		    *dest = lookup(NTOH(*src));
+		    dest += dest_x_inc;
+		    src += src_x_inc;
+		}
+		src += src_y_inc;
+		dest += dest_y_inc;
+	    }
 	}
-      }
+	else {
+	    // don't subsample: take max pixel
+	    for (i=y0; i<=y1; i+=ys) {
+		for (j=x0; j<=x1; j+=xs) {
+		    if (dest > end) {
+			break;
+		    }
+		    q = p = src;
+		    for (n=0; n<ys; n++) {
+			for (m=0; m<xs; m++, p++) {
+			    if (NTOH(*p) > maxval)
+				maxval = NTOH(*p);
+			}
+			p = q += width_;
+		    }
+		    *dest = lookup(maxval);
+		    maxval = 0;
+		    dest += dest_x_inc;
+		    src += src_x_inc;
+		}
+		src += src_y_inc;
+		dest += dest_y_inc;
+	    }
+	}
     } 
     else {
-      //  XImage depth greater than a byte. Use careful methods to 
-      //  keep byte order etc. correct for server.
-      int k = dest_x / xs;
-      int l = dest_y / ys;
-      unsigned long cl;
-      if (subsample_) {
-        // use faster "subsample" algorithm
-        for (i=y0; i<=y1; i+=ys) {
-          for (j=x0; j<=x1; j+=xs) {
-            if ( rotate_ ) {
-              xImage_->putpixel( l, k, llookup(NTOH(*src)));
-            } else {
-              xImage_->putpixel( k, l, llookup(NTOH(*src)));
-            }
-            k++; 
-            src += src_x_inc;
-          }
-          src += src_y_inc;
-          k = dest_x / xs;
-          l++;
-        }
-      }
-      else {
-        // don't subsample: take max pixel
-        for (i=y0; i<=y1; i+=ys) {
-          for (j=x0; j<=x1; j+=xs) {
-            q = p = src;
-            maxval = NTOH(*p);
-            for (n=0; n<ys; n++) {
-              for (m=0; m<xs; m++, p++) {
-                if (NTOH(*p) > maxval)
-                  maxval = NTOH(*p);
-              }
-              p = q += width_;
-            }
-            if ( rotate_ ) {
-              xImage_->putpixel( l, k, llookup(maxval));
-            } else {
-              xImage_->putpixel( k, l, llookup(maxval));
-            }
-            k++; 
-            src += src_x_inc;
-          }
-          src += src_y_inc;
-          k = dest_x / xs;
-          l++;
-        }
-      }
+	//  XImage depth greater than a byte. Use careful methods to 
+	//  keep byte order etc. correct for server.
+	int k = dest_x / xs;
+	int l = dest_y / ys;
+	unsigned long cl;
+	if (subsample_) {
+	    // use faster "subsample" algorithm
+	    for (i=y0; i<=y1; i+=ys) {
+		for (j=x0; j<=x1; j+=xs) {
+		    if ( rotate_ ) {
+			xImage_->putpixel( l, k, llookup(NTOH(*src)));
+		    } else {
+			xImage_->putpixel( k, l, llookup(NTOH(*src)));
+		    }
+		    k++; 
+		    src += src_x_inc;
+		}
+		src += src_y_inc;
+		k = dest_x / xs;
+		l++;
+	    }
+	}
+	else {
+	    // don't subsample: take max pixel
+	    for (i=y0; i<=y1; i+=ys) {
+		for (j=x0; j<=x1; j+=xs) {
+		    q = p = src;
+		    maxval = NTOH(*p);
+		    for (n=0; n<ys; n++) {
+			for (m=0; m<xs; m++, p++) {
+			    if (NTOH(*p) > maxval)
+				maxval = NTOH(*p);
+			}
+			p = q += width_;
+		    }
+		    if ( rotate_ ) {
+			xImage_->putpixel( l, k, llookup(maxval));
+		    } else {
+			xImage_->putpixel( k, l, llookup(maxval));
+		    }
+		    k++; 
+		    src += src_x_inc;
+		}
+		src += src_y_inc;
+		k = dest_x / xs;
+		l++;
+	    }
+	}
     }
 }
 
@@ -874,7 +864,7 @@ void CLASS_NAME::medianFilter()
     getMinMax();		// get min/max pixel estimate for visible area
     DATA_TYPE *rawImage = (DATA_TYPE*)image_.dataPtr(); // image data
     DATA_TYPE *end = rawImage + area_; // end of image data
-    const nmed = 7;		   // length of median filter
+    const int nmed = 7;		   // length of median filter
     int xskip = nmed*3, yskip = 3; // skip pixels for speed 
     int x0 = x0_ + 10;		   // ignore outside areas
     int y0 = y0_ + 10;

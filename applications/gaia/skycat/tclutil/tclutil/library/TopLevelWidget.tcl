@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: TopLevelWidget.tcl,v 1.26 1998/11/26 22:39:09 abrighto Exp $"
+# "@(#) $Id: TopLevelWidget.tcl,v 1.28 1999/03/19 20:10:25 abrighto Exp $"
 #
 # TopLevelWidget.tcl - Itk base class for popup windows
 #
@@ -202,7 +202,8 @@ itcl::class util::TopLevelWidget {
 
     public method quit {} {
 	if {$itk_option(-standalone)} {
-	    destroy $w_
+	    delete object $this
+	    # destroy $w_
 	} else {
 	    wm withdraw $w_
 	}

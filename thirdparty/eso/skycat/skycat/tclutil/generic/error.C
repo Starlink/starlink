@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: error.C,v 1.2 1998/02/18 11:33:05 abrighto Exp $"
+ * "@(#) $Id: error.C,v 1.4 1999/03/19 20:10:43 abrighto Exp $"
  *
  * error.C - error reporting routines
  * 
@@ -12,7 +12,7 @@
  *                           under RH5 and glibc.
  *                 08/12/98  Changed for egcs compiler 
  */
-static const char* const rcsId="@(#) $Id: error.C,v 1.2 1998/02/18 11:33:05 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: error.C,v 1.4 1999/03/19 20:10:43 abrighto Exp $";
 
 
 #include <stdarg.h>
