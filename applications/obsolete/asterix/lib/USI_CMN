@@ -94,12 +94,13 @@
 
 *    Context storage
       INTEGER			USI_ICTX		! Current context
+      INTEGER			USI_CTX_PST(USI__MXCTX)	!
       RECORD /USI_CONTEXT/	USI_CTX(USI__MXCTX)	! Contexts
 
 *    Common block definitions
       COMMON /USI_CMN_I/        USI_ICTX,USI_NPSYS,USI_SYINIT,
      :                           USI_LOGGING, USI_LOGIMODE, USI_LOGFID,
-     :                           USI_N_P, USI_N_T
+     :                           USI_N_P, USI_N_T, USI_CTX_PST
 
       COMMON /USI_CMN_R1/       USI_CTX,USI_PSYS
       COMMON /USI_CMN_R2/       USI_P, USI_T
