@@ -161,6 +161,9 @@
       PARAMETER( MAXCOM = 200 )
       INTEGER                MAXHIS ! Maximum number of history images
       PARAMETER( MAXHIS = 100 )
+      INTEGER                MINFCV ! Minimum number of characters in a
+                                    ! FITS character value
+      PARAMETER( MINFCV = 8 )
 
 *  Local Variables:
       CHARACTER*1 AXNAME(6)         ! Axis names
@@ -234,6 +237,8 @@
                                     ! character value
       INTEGER                NCDQ   ! Column of FITS double quote for
                                     ! character value
+      INTEGER                NCFD   ! Column position in output FITS
+                                    ! character value
       INTEGER                NCOMS  ! Column from where to start search
                                     ! for FITS comment delimiter
       INTEGER                NCSTQ  ! Column from where to start search
@@ -259,6 +264,7 @@
       CHARACTER*(NDF__SZTYP) TYPE   ! Data type
       CHARACTER*80           UNITS  ! Units
       CHARACTER*80           XNAME  ! Extension name
+      LOGICAL                VALDEF ! FITS value defined if true
 
 *  Local Data:
       DATA AXNAME/'X','Y','T','U','V','W'/
@@ -846,13 +852,21 @@
 *            First 8 characters contain the keyword.
                FITNAM = STRING( 1:8 )
 
+*            The value is not defined yet.
+               VALDEF = .FALSE.
+
 *            The FITS object string the value and comments uses the
 *            FITS keyword for their names.  Since there can only be one
 *            object of a given name in a structure and that Figaro DSA
 *            does not support arrays of values for a given FITS keyword
 *            we must determine whether or not the HDS object already
-*            exists.
-               CALL DAT_THERE( LFFT, FITNAM, HUSED, STATUS )
+*            exists.  Allow for the case where there is a blank card,
+*            i.e. the name is blank.
+               IF ( FITNAM .NE. ' ' ) THEN
+                  CALL DAT_THERE( LFFT, FITNAM, HUSED, STATUS )
+               ELSE
+                  HUSED = .TRUE.
+               END IF
 
 *            Look for a blank keyword.  Skip the card image if there
 *            is no keyword present.  Note that this cannot handle
@@ -887,31 +901,74 @@
 *                  logical.  Character values may extend to column 80.
 *                  Search for the leading quote.
                      IF ( STRING( 11:11 ) .EQ. '''' ) THEN
-                        FITDAT = STRING( 11:80 )
+
+*                     Initialise the character value.
+                        FITDAT = ' '
 
 *                     Determine where the trailing blank is located.
-*                     First look for any double quotes.  Prevent the
-*                     search extending beyond the end of the value.
+*                     ==============================================
+
+*                     First look for any double quotes.  These mean a
+*                     single quote, so O'Hara appears as O''Hara in a
+*                     FITS card image.  Start the search from column
+*                     12, i.e. after the leading quote, and
+*                     subsequently immediately following a double
+*                     quote.  Prevent the search extending beyond the
+*                     end of the value.  Keep a count of the absolute
+*                     column.
                         NCDQ = 1
+                        NCSTQ = 12
+                        NCFD = 1
                         DO WHILE ( NCDQ .NE. 0 )
-                           NCSTQ = MIN( NCDQ, 66 )
-                           NCDQ = INDEX( FITDAT( NCSTQ+2: ), '''''' )
+                           NCDQ = INDEX( STRING( NCSTQ: ), '''''' )
+
+*                         If there is no double quote no action is
+*                         necessary.  When there is we form part of the
+*                         value, removing the second quote.
+                           IF ( NCDQ .GT. 0 ) THEN
+                              FITDAT( NCFD: NCFD + NCDQ - 1 ) =
+     :                                STRING( NCSTQ: NCSTQ + NCDQ - 1 )
+
+*                            Increment the counter to where to append to
+*                            the value.
+                              NCFD = NCFD + NCDQ
+
+*                            Increment the counter in the FITS card,
+*                            skipping over the double quote.
+                              NCSTQ = NCSTQ + NCDQ + 1
+                           END IF
                         END DO
 
 *                     Closing quote must occur in or after column 10
 *                     (20 in the card).
-                        NCCQ = INDEX( FITDAT( MIN( 10, NCSTQ+2 ): ),
-     :                         '''' )
+                        NCCQ = INDEX( STRING( MAX( 12, NCSTQ ): ),
+     :                                '''' )
 
-*                     Use last quote as delimiter.
-                        IF ( NCCQ .EQ. 0 ) NCCQ = MIN( 8, NCSTQ + 2 )
+*                     There is no trailing quote so assume that the
+*                     character value extends to the end of the card
+*                     image.  Copy the value.
+                        IF ( NCCQ .EQ. 0 ) THEN
+                           FITDAT = STRING( NCSTQ: )
 
-*                     Extract the value.
-                        FITDAT = STRING( 12: NCCQ + 11 )
+*                     Set the position as if the quote were at the end
+*                     of the card.
+                           NCCQ = 67
+
+*                     Append the remainder or all of the value (the
+*                     latter when there is no double quote in the FITS
+*                     card image) to the value
+                        ELSE
+                           FITDAT( NCFD:NCFD + NCCQ - 2 ) =
+     :                             STRING( NCSTQ:NCSTQ + NCCQ - 2 )
+                        END IF
+
+*                     The value is defined.
+                        VALDEF = .TRUE.
 
 *                     Define the column from which to look for a
-*                     comment.
-                        NCOMS = NCCQ + 12
+*                     comment, i.e. two columns after the trailing
+*                     quote.
+                        NCOMS = NCCQ + 13
 
 *                  Straightforward for other types.
                      ELSE
@@ -951,59 +1008,84 @@
 *                  value extends no further than column 30 of the FITS
 *                  card-image.
 
-*                  First, check for an INTEGER.
-                     CSTAT = 0
-                     CLEN = CHR_LEN( FITDAT )
-                     CALL CHR_CTOI( FITDAT, IVAL, CSTAT )
-                     IF ( CSTAT .EQ. 0 .AND. CLEN .GT. 0 ) THEN
+*                  Look to see if it's already been identified as a
+*                  string.
+                     IF ( VALDEF ) THEN
 
-*                     Create the integer object and give it the value.
-                        TYPE = '_INT'
-                        CALL DAT_NEW0I( LFFT, FITNAM, STATUS )
+*                     Find the length of the string.  This must have
+*                     at least the minimum number of characters, even it
+*                     is blank.
+                        NCCOM = MAX( MINFCV, CHR_LEN( FITDAT ) )
+
+*                     Create the object and a locator to it.
+                        CALL DAT_NEWC( LFFT, FITNAM, NCCOM, 0, 0,
+     :                                 STATUS )
                         CALL DAT_FIND( LFFT, FITNAM, LFFTD, STATUS )
-                        CALL DAT_PUTI( LFFTD, 0, 0, IVAL, STATUS )
-                    ELSE
 
-*                     Check for a REAL.
+*                     Write the value to the FITS structure.
+                        CALL DAT_PUTC( LFFTD, 0, 0, FITDAT( :NCCOM ),
+     :                                 STATUS )
+                     ELSE
+
+*                     Check for an INTEGER.
                         CSTAT = 0
-                        CALL CHR_CTOR( FITDAT, RVAL, CSTAT )
-                        IF (CSTAT .EQ. 0 .AND. CLEN.GT.0) THEN
+                        CLEN = CHR_LEN( FITDAT )
+                        CALL CHR_CTOI( FITDAT, IVAL, CSTAT )
+                        IF ( CSTAT .EQ. 0 .AND. CLEN .GT. 0 ) THEN
 
-*                        Create the real object and give it the value.
-                           TYPE = '_REAL'
-                           CALL DAT_NEW0R( LFFT, FITNAM, STATUS )
+*                        Create the integer object and give it the
+*                        value.
+                           TYPE = '_INT'
+                           CALL DAT_NEW0I( LFFT, FITNAM, STATUS )
                            CALL DAT_FIND( LFFT, FITNAM, LFFTD, STATUS )
-                           CALL DAT_PUTR( LFFTD, 0, 0, RVAL, STATUS )
+                           CALL DAT_PUTI( LFFTD, 0, 0, IVAL, STATUS )
                         ELSE
 
-*                        Check for a logical.  Note it must be T or F in
-*                        the header column 30 (20 in in the data value).
+*                        Check for a REAL.
                            CSTAT = 0
-                           CALL CHR_CTOL( FITDAT(20:20), LVAL, CSTAT )
-                           IF ( CSTAT .EQ. 0 .AND. CLEN .GT. 0 .AND.
-     :                          FITDAT(1:19) .EQ. ' ' ) THEN
+                           CALL CHR_CTOR( FITDAT, RVAL, CSTAT )
+                           IF ( CSTAT .EQ. 0 .AND. CLEN.GT.0 ) THEN
 
-*                           Create the logical object and give it the
+*                           Create the real object and give it the
 *                           value.
-                              TYPE = '_LOGICAL'
-                              CALL DAT_NEW0L( LFFT, FITNAM, STATUS )
+                              TYPE = '_REAL'
+                              CALL DAT_NEW0R( LFFT, FITNAM, STATUS )
                               CALL DAT_FIND( LFFT, FITNAM, LFFTD,
      :                                       STATUS )
-                              CALL DAT_PUTL( LFFTD, 0, 0, LVAL, STATUS )
+                              CALL DAT_PUTR( LFFTD, 0, 0, RVAL, STATUS )
                            ELSE
 
-*                           Assume it's just a character string.  If it
-*                           is a correctly formatted string, the
-*                           surrounding quotes have already been
-*                           stripped from it.  Make the size equal to
-*                           the length of the character string.  Create
-*                           the object and write the character value.
-                              CALL DAT_NEWC( LFFT, FITNAM, NCOMS-12,
-     :                                       0, 0, STATUS )
-                              CALL DAT_FIND( LFFT, FITNAM, LFFTD,
-     :                                       STATUS )
-                              CALL DAT_PUTC( LFFTD, 0, 0, FITDAT,
-     :                                       STATUS )
+*                           Check for a logical.  Note it must be T or
+*                           F in the header column 30 (20 in in the
+*                           data value).
+                              CSTAT = 0
+                              CALL CHR_CTOL( FITDAT(20:20), LVAL,
+     :                                       CSTAT )
+                              IF ( CSTAT .EQ. 0 .AND. CLEN .GT. 0 .AND.
+     :                             FITDAT(1:19) .EQ. ' ' ) THEN
+
+*                              Create the logical object and give it the
+*                              value.
+                                 TYPE = '_LOGICAL'
+                                 CALL DAT_NEW0L( LFFT, FITNAM, STATUS )
+                                 CALL DAT_FIND( LFFT, FITNAM, LFFTD,
+     :                                          STATUS )
+                                 CALL DAT_PUTL( LFFTD, 0, 0, LVAL,
+     :                                          STATUS )
+                              ELSE
+
+*                              Assume it's just a character string
+*                              without quotes.  Make the size equal to
+*                              the length of the character string.
+*                              Create the object and write the
+*                              character value.
+                                 CALL DAT_NEWC( LFFT, FITNAM, NCOMS-11,
+     :                                          0, 0, STATUS )
+                                 CALL DAT_FIND( LFFT, FITNAM, LFFTD,
+     :                                          STATUS )
+                                 CALL DAT_PUTC( LFFTD, 0, 0, FITDAT,
+     :                                          STATUS )
+                              END IF
                            END IF
                         END IF
                      END IF
