@@ -4,6 +4,7 @@
 *  CFLAGS should be set appropriately (usually -I$(INSTALL_INC)).
 *  Also we include both files to check the #ifdef mechanism.
 */
+#include <stdio.h>
 #include <f77.h>                 /* CNF macros and prototypes               */
 #include  <cnf.h>                 /* CNF macros and prototypes               */
 

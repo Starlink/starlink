@@ -1,3 +1,4 @@
+#include <string.h>
 #include "f77.h"
 #include "cnf.h"
 
