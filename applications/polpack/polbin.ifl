@@ -1,0 +1,80 @@
+#  Name:
+#     POLBIN.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     24-FEB-1998 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface POLBIN
+
+   helplib        'POLPACK_HELP:'
+
+   parameter      BOX          
+      type        '_REAL'
+      ppath       'CURRENT'
+      prompt      'Bin size'
+      helpkey     '*'
+   endparameter
+
+   parameter      IN
+      position    1
+      type        LITERAL
+      ppath       'CURRENT'
+      prompt      'Input catalogue'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT
+      position    2
+      type        LITERAL
+      prompt      'Output catalogue'
+      helpkey     '*'
+   endparameter
+
+   parameter      DEBIAS         
+      type        _LOGICAL
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     !
+      prompt      'Remove statistical bias?'
+      helpkey     '*'
+   endparameter
+
+   parameter      METHOD         
+      type        'LITERAL'
+      vpath       'PROMPT,CURRENT,DEFAULT'
+      ppath       'CURRENT,DEFAULT '
+      default     'MEDIAN'
+      prompt      'Binning method'
+      helpkey     '*'
+   endparameter
+
+   parameter      MINVAL         
+      type        '_INTEGER'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     1
+      prompt      'Min. number of good input values per bin'
+      helpkey     '*'
+   endparameter
+
+   parameter      SIGMAS         
+      type        _REAL
+      vpath       'PROMPT,CURRENT,DEFAULT '
+      ppath       'CURRENT,DEFAULT '
+      default     4.0
+      prompt      'Clipping limit (standard deviations)'
+      helpkey     '*'
+   endparameter
+
+endinterface
