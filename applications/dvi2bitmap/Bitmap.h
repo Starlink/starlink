@@ -41,7 +41,8 @@ class Bitmap {
  public:
     Bitmap (const int width, const int height, const int bpp=1,
 	    bool expandable=true,
-	    const int maxwidth=-1, const int maxheight=-1);
+	    const int maxwidth=-1, const int maxheight=-1)
+	    throw (BitmapError);
     ~Bitmap();
 
     // make sure Left..Bottom are 0..3 (I should use an iterator, I know...)

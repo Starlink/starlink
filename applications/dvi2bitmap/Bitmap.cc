@@ -103,14 +103,20 @@ Bitmap::const_iterator Bitmap::endIterator_;
  * <code>maxheight</code> is less than <code>h</code> (which includes
  * negative, the default), the maximum vertical size will be such that
  * <code>maxheight/h==maxwidth/w</code>
+ *
+ * @throws BitmapError if the arguments are inconsistent
  */
 Bitmap::Bitmap (const int w, const int h, const int bpp,
 		bool expandable,
 		const int maxwidth, const int maxheight)
+    throw (BitmapError)
     : W(w), H(h), isExpandable_(expandable),
       frozen_(false), transparent_(false),
       customRGB_(false), bpp_(bpp), mark_(0)
 {
+    if (W <= 0 || H <= 0)
+	throw BitmapError("Bitmap constructor called with negative size!");
+
     B = new Byte[W*H];
 
     clear();
@@ -228,6 +234,7 @@ void Bitmap::usesBitmapArea_(const int ulx, const int uly,
     int tW = W;
     if (lrx > W) {
 	float tWf = tW;
+	assert (tWf > 0 && magfactor > 1);
 	while (tWf<lrx && tWf<maxW_)
 	    tWf *= magfactor;
 	tW = static_cast<int>(ceil(tWf));
@@ -238,6 +245,7 @@ void Bitmap::usesBitmapArea_(const int ulx, const int uly,
     int tH = H;
     if (lry > H) {
 	float tHf = tH;
+	assert (tHf > 0 && magfactor > 1);
 	while (tHf<lry && tHf<maxH_)
 	    tHf *= magfactor;
 	tH = static_cast<int>(ceil(tHf));
