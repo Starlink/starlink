@@ -1,5 +1,0 @@
-FACILITY ONE
-1,NOFILES,No more files
-2,PIPEERR,Pipe Error
-3,LENERR,Name Length Error
-4,MALLOCERR,Malloc error
