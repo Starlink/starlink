@@ -109,7 +109,8 @@
  
       PARAMETER POINT_LST
          TYPE    '_CHAR'
-         PROMPT  'The sidereal time of the pointing offset (hh mm ss.ss)'
+         PROMPT  'The sidereal time of the pointing offset (hh mm ss.ss), -1 to exit'
+	DEFAULT '-1'
 	HELPKEY '*'
       ENDPARAMETER
  
