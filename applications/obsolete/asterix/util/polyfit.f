@@ -143,7 +143,11 @@
         CALL USI_TASSOCI( 'INP', 'UPDATE', IFID, STATUS )
         OFID = IFID
       ELSE
-        CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
+        IF (SUPER) THEN
+          CALL USI_TASSOC2( 'INP', 'OUT', 'UPDATE', IFID, OFID, STATUS )
+        ELSE
+          CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
+        ENDIF
       END IF
 
 *    Check status
