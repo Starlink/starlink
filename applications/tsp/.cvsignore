@@ -1,3 +1,4 @@
+*.ifl
 *.ifc
 *.lo
 Makefile
