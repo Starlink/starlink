@@ -9,6 +9,7 @@
 F77_SUBROUTINE(psx_remove)( CHARACTER(pathname), INTEGER(status) 
 			    TRAIL(pathname) ){
 /*
+*+
 *  Name:
 *     PSX_REMOVE
 
@@ -24,13 +25,23 @@ F77_SUBROUTINE(psx_remove)( CHARACTER(pathname), INTEGER(status)
 *  Description:
 *     This C function calls the "remove" RTL function to remove a specified
 *     file or directory. It is equivalent to "unlink" for files and "rmdir"
-*     for directories. A directory must be empty.
+*     for directories. A directory must be empty. On error, STATUS is set
+*     to PSX__ERRNO and the error message will contain the system error
+*     message.
 
 *  Arguments:
 *     PATHNAME = CHARACTER * ( * ) (Given)
 *        The path to the file.
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
+
+*  Examples:
+*     CALL PSX_REMOVE( 'tmp.dat', STATUS )
+*        This will remove the file tmp.dat
+
+*  External Routines Used:
+*     cnf: cnfImprt
+*     ems: emsSyser
 
 *  References:
 *     - POSIX standard, IEEE Std 1003.1
@@ -53,6 +64,7 @@ F77_SUBROUTINE(psx_remove)( CHARACTER(pathname), INTEGER(status)
 *  Bugs:
 *     {note_any_bugs_here}
 
+*-
 */
 
    GENPTR_CHARACTER(pathname)
@@ -69,7 +81,7 @@ F77_SUBROUTINE(psx_remove)( CHARACTER(pathname), INTEGER(status)
    if ( file ) {
 
 /* Copy the blank padded fortran file name to a null terminated C string. */
-      cnf_imprt( pathname, pathname_length, file );
+      cnfImprt( pathname, pathname_length, file );
 
 /* Remove the file. */
       rstatus = remove( file );

@@ -1,63 +1,64 @@
 /*
- *+
- *  Name:
- *    PSX_PUTENV
+*+
+*  Name:
+*    PSX_PUTENV
 
- *  Purpose:
- *    Set a new environment variable value
+*  Purpose:
+*    Set a new environment variable value
 
- *  Invocation:
- *    CALL PSX_PUTENV( NAME, VALUE, STATUS )
+*  Invocation:
+*    CALL PSX_PUTENV( NAME, VALUE, STATUS )
 
- *  Description:
- *    The routine sets the specified environment variable to the 
- *    supplied value. If it fails it sets STATUS to SAI__ERROR.
+*  Description:
+*    The routine sets the specified environment variable to the 
+*    supplied value. If it fails it sets STATUS to SAI__ERROR.
 
- *  Arguments:
- *     NAME = CHARACTER * ( * ) (Given)
- *        Name of the environment variable to be modified
- *     VALUE = CHARACTER * ( * ) (Given)
- *        The new value of the environment variable.
- *     STATUS = INTEGER (Given and Returned)
- *        The global status.
+*  Arguments:
+*     NAME = CHARACTER * ( * ) (Given)
+*        Name of the environment variable to be modified
+*     VALUE = CHARACTER * ( * ) (Given)
+*        The new value of the environment variable.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
- *  Examples:
- *    CALL PSX_PUTENV( 'DATADIR', DIR, STATUS )
- *       Set the DATADIR environment variable to the value stored
- *       in the DIR character string.
+*  Examples:
+*    CALL PSX_PUTENV( 'DATADIR', DIR, STATUS )
+*       Set the DATADIR environment variable to the value stored
+*       in the DIR character string.
 
- *  External Routines Used:
- *    cnf: cndCreim, cnfFree
+*  External Routines Used:
+*    cnf: cnfCreim, cnfFree
 
- *  References:
- *    POSIX
- *    SVID 3
- *    BSD 4.3
+*  References:
+*    POSIX
+*    SVID 3
+*    BSD 4.3
 
- *  Copyright:
- *    Copyright (C) 2003 Particle Physics and Astronomy Research Council
+*  Copyright:
+*    Copyright (C) 2003 Particle Physics and Astronomy Research Council
 
- *  Authors:
- *    TIMJ: Tim Jenness (JAC, Hilo)
- *    AJC: Alan Chipperfield (Starlink)
+*  Authors:
+*    TIMJ: Tim Jenness (JAC, Hilo)
+*    AJC: Alan Chipperfield (Starlink)
 
- *  History
- *    04-MAR-2003 (TIMJ):
- *      First version.
- *    10-APR-2003 (AJC):
- *      Cosmetic changes
- *      Improved error reporting - PSX status etc
+*  History
+*    04-MAR-2003 (TIMJ):
+*      First version.
+*    10-APR-2003 (AJC):
+*      Cosmetic changes
+*      Improved error reporting - PSX status etc
 
- *  Notes:
- *    Uses the setenv() function where available. If setenv()
- *    is not available defaults to using the putenv() function.
- *    Use of putenv() will result in memory leaks since the putenv
- *    string is not freed by the system and can not be freed
- *    by the call to PSX_PUTENV. 
+*  Notes:
+*    Uses the setenv() function where available. If setenv()
+*    is not available defaults to using the putenv() function.
+*    Use of putenv() will result in memory leaks since the putenv
+*    string is not freed by the system and can not be freed
+*    by the call to PSX_PUTENV. 
 
- *  CPP Flags:
- *    Recognizes the HAVE_SETENV CPP definition.
+*  CPP Flags:
+*    Recognizes the HAVE_SETENV CPP definition.
 
+*-
 */
 
 #include <config.h>
