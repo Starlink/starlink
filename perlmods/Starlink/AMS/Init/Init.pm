@@ -34,6 +34,8 @@ The following methods are available:
 use strict;
 use Carp;
 
+use base qw/Exporter/;  # So that version checking is available
+
 use vars qw/$VERSION $AMSRUNNING $debug $NOBJECTS $AMS_OBJECT/;
 
 $VERSION = '1.00';
