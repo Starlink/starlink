@@ -3581,7 +3581,7 @@ c        REAL XX,XP,YP
 
 
 *+ IMG_SETELLIPSE
-	SUBROUTINE IMG_SETELLIPSE(XC,YC,MAJOR,MINOR,EXCLUDE,ANGLE,
+	SUBROUTINE IMG_SETELLIPSE(XC,YC,MAJOR,MINOR,ANGLE,EXCLUDE,
      :                                                      STATUS)
 
         IMPLICIT NONE
@@ -3868,15 +3868,13 @@ c        REAL XX,XP,YP
 	REAL PI, DTOR
 	PARAMETER (PI = 3.141592, DTOR = PI/180.0)
 *    Local variables :
-      REAL XP,YP,XPC,YPC,X,Y
+      REAL XP,YP,XPC,YPC
       REAL AP,BP
-      REAL XMIN,XMAX,YMIN,YMAX
       REAL ANG,SANG,CANG,SA,CA
       INTEGER IA
 *-
         IF (STATUS.NE.SAI__OK) RETURN
 
-	print *,xc,yc,major,minor,angle
 
         CALL IMG_WORLDTOPIX(XC,YC,XPC,YPC,STATUS)
         AP=MAJOR/ABS(I_XSCALE)
@@ -3885,10 +3883,10 @@ c        REAL XX,XP,YP
         CANG=COS(ANGLE*DTOR)
         SANG=SIN(ANGLE*DTOR)
 
-        XMIN=XC
-        XMAX=XC
-        YMIN=YC
-        YMAX=YC
+        I1=INT(XPC)
+        I2=NINT(XPC)
+        J1=INT(YPC)
+        J2=INT(YPC)
 
         DO IA=0,360
 
@@ -3899,27 +3897,19 @@ c        REAL XX,XP,YP
 
           XP=XPC + AP*CA*CANG - BP*SA*SANG
           YP=YPC + AP*CA*SANG + BP*SA*CANG
-          CALL IMG_PIXTOWORLD(XP,YP,X,Y,STATUS)
-          XMIN=MIN(XMIN,X)
-          XMAX=MAX(XMAX,X)
-          YMIN=MIN(YMIN,Y)
-          YMAX=MAX(YMAX,Y)
+          I1=MIN(I1,INT(XP))
+          I2=MAX(I2,NINT(XP))
+          J1=MIN(J1,INT(YP))
+          J2=MAX(J2,NINT(YP))
 
         ENDDO
 
-        CALL IMG_WORLDTOPIX(XMIN,YMIN,XP,YP,STATUS)
-        I2=NINT(XP)
-        J1=INT(YP)
-        CALL IMG_WORLDTOPIX(XMAX,YMAX,XP,YP,STATUS)
-        I1=INT(XP)
-        J2=NINT(YP)
 
         I1=MAX(1,I1)
         I2=MIN(I_NX,I2)
         J1=MAX(1,J1)
         J2=MIN(I_NY,J2)
 
-	print *,i1,i2,j1,j2
 
 	END
 
