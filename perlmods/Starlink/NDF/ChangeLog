@@ -1,3 +1,7 @@
+2003-03-07  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.xs: dat_cell had a return value that was marked for input.
+
 2001-03-21  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.pm: Increase version number since we have improved fits IO

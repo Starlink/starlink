@@ -1,9 +1,9 @@
 /*
 
 
-    NDF.xs v1.2
+    NDF.xs v1.45
 
-       Copyright (C) 1996-2000 Tim Jenness, Frossie Economou and the UK
+       Copyright (C) 1996-2003 Tim Jenness, Frossie Economou and the UK
                                Particle Physics and Astronomy Research
                                Council. All Rights Reserved.
 
@@ -2123,7 +2123,7 @@ dat_cell(loc1, ndim, sub, loc2, status)
   locator * loc1
   ndfint &ndim
   ndfint * sub
-  locator * loc2
+  locator * loc2 = NO_INIT
   ndfint &status
  PROTOTYPE: $$\@$$
  PREINIT:
