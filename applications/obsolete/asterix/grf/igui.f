@@ -21,7 +21,7 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*132 ACTION,VALUE
-      INTEGER ID,SID,ITEMID
+      INTEGER ID,SID,ITEMID,GCBID
 *    Version :
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IGUI Version 1.8-0')
