@@ -1383,8 +1383,8 @@ c     #include "permmap.h"
 c     AstPermMap *astPermMap( int nin, const int inperm[], int nout,
 c                             const int outperm[], double constant[],
 c                             const char *options, ... )
-f     RESULT = AST_PERMAP( NIN, INPERM, NOUT, OUTPERM, CONSTANT, OPTIONS,
-f                          STATUS )
+f     RESULT = AST_PERMMAP( NIN, INPERM, NOUT, OUTPERM, CONSTANT, OPTIONS,
+f                           STATUS )
 
 *  Class Membership:
 *     PermMap constructor.
