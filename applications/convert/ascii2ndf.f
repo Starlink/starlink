@@ -35,7 +35,7 @@
 *        or "Variance".  To create a variance or quality array the NDF
 *        must already exist. ["Data"]
 *     FITS = _LOGICAL (Read)
-*        If true, the initial records of the formatted file are
+*        If TRUE, the initial records of the formatted file are
 *        interpreted as a FITS header (with one card image per record)
 *        from which the shape, data type, and axis centres are derived.
 *        The last record of the FITS-like header must be terminated by
@@ -46,6 +46,11 @@
 *        have variable-length records when there is a header, but
 *        always fixed-length records when there is no header.  The
 *        maximum record length allowed is 512 bytes.
+*     MAXLEN = _INTEGER (Read)
+*        The maximum record length in bytes of records within the input
+*        text file.  Unless the records are longer than 512 bytes, you
+*        can use the default value.  The suggested value is the current
+*        value. [512]
 *     OUT = NDF (Read and Write)
 *        Output NDF data structure.  When COMP is not "Data" the NDF
 *        is modified rather than a new NDF created.   It becomes the
@@ -89,11 +94,11 @@
 *        NDF.  The shape of the NDF is controlled by the mandatory FITS
 *        keywords NAXIS, AXIS1, ..., AXISn, and the data type by
 *        keywords BITPIX and UNSIGNED.
-*     ascii2ndf type='_uword' in=ngc253.dat out=ngc253 \
+*     ascii2ndf type='_uword' in=ngc253.dat out=ngc253 maxlen=4000 \
 *        This copies a data array from the text file ngc253.dat to the
 *        NDF called ngc253.  The input file does not contain a header
 *        section.  The NDF has the current shape and data type is
-*        unsigned word.
+*        unsigned word.  The maximum record length is 4000 bytes.
 *     ascii2ndf spectrum zz skip=2 shape=200
 *        This copies a data array from the text file spectrum to
 *        the NDF called zz.  The input file contains two header records
@@ -168,6 +173,9 @@
 *     1996 September 16 (MJC):
 *        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
 *        for axis units.
+*     1997 December 2 (MJC):
+*        Added MAXLEN parameter to permit long input records without
+*        impacting the efficiency of processing short records.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -226,6 +234,7 @@
       INTEGER I                  ! Loop counter
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Implementation type for
                                  ! integer array
+      INTEGER MAXLEN             ! Maximum input record length
       INTEGER NCARD              ! Number of cards in the FITS-like
                                  ! header
       INTEGER NDF                ! Identifier for NDF
@@ -247,7 +256,6 @@
       LOGICAL UPDATE             ! True if an NDF is to be modified
       LOGICAL VALID              ! True if it is valid to insert the new
                                  ! array into an existing NDF
-
 *.
 
 *  Check inherited global status.
@@ -267,6 +275,9 @@
 
 *  Find how many records to skip.
       CALL PAR_GDR0I( 'SKIP', 0, 0, VAL__MAXI, .FALSE., SKIP, STATUS )
+
+*  Find the maximum record length.
+      CALL PAR_GDR0I( 'MAXLEN', 512, 1, 32766, .FALSE., MAXLEN, STATUS )
 
 *  Find out which component is to be processed.
 *  ============================================
@@ -453,16 +464,16 @@
 *  unmapped.  This should not generate conversion errors, unless the
 *  type specified by the user is incorrect.
       IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL CON_IAFFI( FD, EL, SKIP, %VAL( PNTR( 1 ) ),
+         CALL CON_IAFFI( FD, EL, SKIP, MAXLEN, %VAL( PNTR( 1 ) ),
      :                   STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL CON_IAFFD( FD, EL, SKIP, %VAL( PNTR( 1 ) ),
+         CALL CON_IAFFD( FD, EL, SKIP, MAXLEN, %VAL( PNTR( 1 ) ),
      :                   STATUS )
 
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL CON_IAFFR( FD, EL, SKIP, %VAL( PNTR( 1 ) ),
+         CALL CON_IAFFR( FD, EL, SKIP, MAXLEN, %VAL( PNTR( 1 ) ),
      :                   STATUS )
 
       END IF

@@ -41,6 +41,14 @@
          maximum record length allowed is 512 bytes.
       }
       \sstsubsection{
+         MAXLEN = INTEGER (Read)
+      }{
+         The maximum record length in bytes of records within the input
+         text file.  Unless the records are longer than 512 bytes, you
+         can use the default value.  The suggested value is the current
+         value.  {\tt [512]}
+      }
+      \sstsubsection{
          OUT = NDF (Read and Write)
       }{
          Output NDF data structure.  When COMP is not {\tt "Data"} the NDF
@@ -106,12 +114,12 @@
          keywords BITPIX and UNSIGNED.
       }
       \sstexamplesubsection{
-         ascii2ndf type="\_uword" in=ngc253.dat out=ngc253 $\backslash$
+         ascii2ndf type="\_uword" in=ngc253.dat out=ngc253 maxlen=4000 $\backslash$
       }{
          This copies a data array from the text file {\tt ngc253.dat} to the
          NDF called ngc253.  The input file does not contain a header
          section.  The NDF has the current shape and data type is
-         unsigned word.
+         unsigned word.  The maximum record length is 4000 bytes.
       }
       \sstexamplesubsection{
          ascii2ndf spectrum ZZ skip=2 shape=200
@@ -198,4 +206,3 @@
       \xref{ASCOUT}{sun140}{ASCOUT}.
    }
 }
-
