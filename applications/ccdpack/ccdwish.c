@@ -100,7 +100,7 @@
       char *ccddir;                  /* CCDPACK_DIR value */
 
 /* Tweak floating point behaviour on linux. */
-      F77_CALL(ccd1_linflt);
+      F77_CALL(ccd1_linflt)();
 
 /* Set the TCL library environment variables to the same value as CCDPACK_DIR.
    This will cause the autoloader to look there for various library files. */
@@ -200,7 +200,7 @@
       int status[ 1 ] = { SAI__OK };
 
 /* Tweak floating point behaviour on linux. */
-      F77_CALL(ccd1_linflt);
+      F77_CALL(ccd1_linflt)();
 
 /* Create a new Tcl interpreter structure. */
       interp = Tcl_CreateInterp();
