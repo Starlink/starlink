@@ -3489,7 +3489,7 @@
      :' SURface  - plot surface      COLours  - set colour table',
      :' GRId     - plot coord grid   KEY      - put key on plot',
      :' POSit    - set position      DEFaults - set default attributes',
-     :' STAmp    - ID stamp',
+     :' STAmp    - ID stamp          FUNction - superimpose function',
      :' ',
      :' *        - wildcard for use with SHOW and CANCEL options'/
 *-
