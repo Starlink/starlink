@@ -64,7 +64,7 @@
       CALL AIO_SETDEXT( '.mnu', STATUS )
 
 *    Access menu file for nested read access
-      CALL AIO_OPEN( MFILE, 'NREAD', MFD, STATUS )
+      CALL AIO_FOPEN( MFILE, 'NREAD', MFD, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL MSG_SETC( 'MFILE', MFILE )
         CALL ERR_REP( ' ', 'Menu file ^MFILE not found', STATUS )

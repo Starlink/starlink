@@ -1468,14 +1468,14 @@
 
 *    Read line from menu file, leave loop if end of menu
       DO WHILE ( STATUS .EQ. SAI__OK )
- 10	CALL FIO_READF( MFD, LINE, STATUS )
+ 10	CALL AFIO_READF( MFD, LINE, STATUS )
 	IF(INDEX(LINE,'endmenu').GT.0) GO TO 99	! Jump to exit
 
 *      Look for 'model' header
 	IF(INDEX(LINE,'  model').EQ.0) GO TO 10		! Read next line
 
 *      Header found - read model key, name & type
-	CALL FIO_READF( MFD, LINE, STATUS )
+	CALL AIO_READF( MFD, LINE, STATUS )
 	N=INDEX(LINE,'key:')
 	IF(N.EQ.0)THEN
 	  STATUS=SAI__ERROR
@@ -1489,7 +1489,7 @@
 	IF(STATUS.NE.SAI__OK) GO TO 99
 	KEY=STRING(1:)
 
-	CALL FIO_READF( MFD, LINE, STATUS )
+	CALL AIO_READF( MFD, LINE, STATUS )
 	N=INDEX(LINE,'mname:')
 	IF(N.EQ.0)THEN
 	  STATUS=SAI__ERROR
@@ -1503,11 +1503,11 @@
 	IF(STATUS.NE.SAI__OK) GO TO 99
 	NAME=STRING(1:40)
 
-	CALL FIO_READF( MFD, LINE, STATUS )
+	CALL AIO_READF( MFD, LINE, STATUS )
 	N=INDEX(LINE,'type:')
 	IF(N.EQ.0)THEN
 	  STATUS=SAI__ERROR
-	  CALL ERR_REP('BADMNU','Error in SPECFIT.MNU',STATUS)
+	  CALL ERR_REP('BADMNU','Error in menu file',STATUS)
 	  GO TO 99
 	ENDIF
 

@@ -41,7 +41,6 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Import :
 *
@@ -145,6 +144,7 @@
 *     29 Mar 94 : Derived from old FIT_PARSET. Checks to see if components
 *                 exist before they are created. Means that that this routine
 *                 can be used to update a existing model. (DJA)
+*     11 Nov 94 : Use AIO to do menu file input (DJA)
 *
 *    Type definitions :
 *
@@ -155,7 +155,6 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Import :
 *
@@ -201,7 +200,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Look for appropriate pmodel (by keyword)
- 10   CALL FIO_READF( MFD, LINE, STATUS )
+ 10   CALL AIO_READF( MFD, LINE, STATUS )
       IF ( INDEX(LINE,'endmenu') .GT. 0 ) THEN
 	STATUS = SAI__ERROR
 	CALL ERR_REP( 'BADMOD', 'Model not found in fit_model file',
@@ -230,7 +229,7 @@
       IF(STATUS.NE.SAI__OK) GOTO 9000
 
 *    Pmodel name
-      CALL FIO_READF( MFD, LINE, STATUS )
+      CALL AIO_READF( MFD, LINE, STATUS )
       N = INDEX(LINE,'mname:')
       IF ( N .EQ. 0 ) THEN
 	STATUS = SAI__ERROR
@@ -245,7 +244,7 @@
       IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
 *    Pmodel type (additive/multiplicative)
-      CALL FIO_READF( MFD, LINE, STATUS )
+      CALL AIO_READF( MFD, LINE, STATUS )
       N = INDEX(LINE,'type:')
       IF ( N .EQ. 0 ) THEN
 	STATUS = SAI__ERROR
@@ -260,7 +259,7 @@
       IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
 *    Number of parameters in pmodel
- 30   CALL FIO_READF( MFD, LINE, STATUS )
+ 30   CALL AIO_READF( MFD, LINE, STATUS )
       N = INDEX(LINE,'npar:')
       IF(INDEX(LINE,'endmodel').GT.0)THEN
 	STATUS=SAI__ERROR
@@ -285,7 +284,7 @@
       DO J = 1, NPAR
 
 *      Look for parameter start
- 50	CALL FIO_READF( MFD, LINE, STATUS )
+ 50	CALL AIO_READF( MFD, LINE, STATUS )
 	IF(INDEX(LINE,' parameter').EQ.0)THEN
 	  IF(INDEX(LINE,'endmodel').GT.0)THEN
 	    STATUS=SAI__ERROR
@@ -298,7 +297,7 @@
 
 *      Parameter name
 	CALL DAT_CELL(MIPLOC,1,J,MIPJLOC,STATUS)
-	CALL FIO_READF( MFD, LINE, STATUS )
+	CALL AIO_READF( MFD, LINE, STATUS )
 	N = INDEX(LINE,'pname:')
 	IF(N.EQ.0)THEN
 	  STATUS=SAI__ERROR
@@ -313,7 +312,7 @@
         IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
 *      Parameter units
-	CALL FIO_READF( MFD, LINE, STATUS )
+	CALL AIO_READF( MFD, LINE, STATUS )
 	N=INDEX(LINE,'units:')
 	IF(N.EQ.0)THEN
 	  STATUS=SAI__ERROR
@@ -328,7 +327,7 @@
         IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
 *      Parameter value
-	CALL FIO_READF( MFD, LINE, STATUS )
+	CALL AIO_READF( MFD, LINE, STATUS )
 	N=INDEX(LINE,'val:')
 	IF(N.EQ.0)THEN
 	  STATUS=SAI__ERROR
@@ -342,7 +341,7 @@
         IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
 *      Frozen flag (menu may contain "frozen" flag after param value)
-	CALL FIO_READF( MFD, LINE, STATUS )
+	CALL AIO_READF( MFD, LINE, STATUS )
 	N=INDEX(LINE,'frozen')
         FROZEN = (N.NE.0)
 	CALL DAT_NEW(MIPJLOC,'FROZEN','_LOGICAL',0,0,STATUS)
@@ -350,7 +349,7 @@
 
 *      Parameter lower bound
 	IF(FROZEN)THEN			! Otherwise line has been
-	  CALL FIO_READF( MFD, LINE, STATUS ) ! read already
+	  CALL AIO_READF( MFD, LINE, STATUS ) ! read already
 	ENDIF
 	N=INDEX(LINE,'low:')
 	IF(N.EQ.0)THEN
@@ -365,7 +364,7 @@
         IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
 *      Parameter upper bound
-	CALL FIO_READF( MFD, LINE, STATUS )
+	CALL AIO_READF( MFD, LINE, STATUS )
 	N=INDEX(LINE,'hi:')
 	IF(N.EQ.0)THEN
 	  STATUS=SAI__ERROR

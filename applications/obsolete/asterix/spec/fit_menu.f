@@ -1,5 +1,5 @@
 *+  FIT_MENU - Displays menu of available primitive spectral models
-      SUBROUTINE FIT_MENU(GENUS,NCIMP,MENU,STATUS)
+      SUBROUTINE FIT_MENU( GENUS, NCIMP, MENU, STATUS )
 *
 *    Description :
 *
@@ -25,6 +25,7 @@
 *     14 Sep 92 : Use FIT_MEN_OPEN to open menu file, and FIO for menu file
 *                 access (DJA)
 *     18 Aug 93 : Handles keys of any length, and does i/o properly (DJA)
+*     11 Nov 94 : Use AIO to do input (DJA)
 *
 *    Type definitions :
 *
@@ -34,33 +35,33 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'FIT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Import :
 *
-	CHARACTER*4 GENUS			! Model genus
+      CHARACTER*(*)		GENUS			! Model genus
 *
 *    Export :
 *
-	INTEGER NCIMP				! No of models supported
-	CHARACTER*(*) MENU(*)			! Menu of model keys
+      INTEGER 			NCIMP			! # models supported
+      CHARACTER*(*)             MENU(*)			! Menu of model keys
 *
 *    Status :
 *
-	INTEGER STATUS
+      INTEGER 			STATUS
 *
 *    Local variables :
 *
-	CHARACTER*79 LINE			! Line from menu file
-	CHARACTER*80 STRING			! String from LINE
-	CHARACTER*(MAXKEYLEN) KEY		! Model keyword
-	CHARACTER*40 NAME			! Model name
-	CHARACTER*14 TYPE			! Model type
+      CHARACTER*79 		LINE			! Line from menu file
+      CHARACTER*80 		STRING			! String from LINE
+      CHARACTER*(MAXKEYLEN) 	KEY			! Model keyword
+      CHARACTER*40 		NAME			! Model name
+      CHARACTER*14 		TYPE			! Model type
 
-      INTEGER        MFD                        ! Menu file descriptor
-      INTEGER        N
+      INTEGER        		MFD                     ! Menu file descriptor
+      INTEGER        		N
 
-      LOGICAL        FINISHED                   ! Finished reading model file?
+      LOGICAL        		FINISHED                ! Finished reading
+							! model file?
 *-
 
 *    Status check
@@ -83,7 +84,7 @@
       FINISHED = .FALSE.
       DO WHILE ( (STATUS .EQ. SAI__OK) .AND. .NOT. FINISHED )
 
-	CALL FIO_READF( MFD, LINE, STATUS )
+	CALL AIO_READF( MFD, LINE, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
 
           CALL MSG_SETC( 'GENUS', GENUS )
@@ -96,7 +97,7 @@
         ELSE IF ( INDEX(LINE,'  model') .GT. 0 ) THEN
 
 *        Header found - read model key, name & type
-	  CALL FIO_READF( MFD, LINE, STATUS )
+	  CALL AIO_READF( MFD, LINE, STATUS )
 	  N=INDEX(LINE,'key:')
 	  IF(N.EQ.0)THEN
 	    STATUS=SAI__ERROR
@@ -110,7 +111,7 @@
 	  IF(STATUS.NE.SAI__OK) GO TO 99
 	  KEY=STRING
 
-	  CALL FIO_READF( MFD, LINE, STATUS )
+	  CALL AIO_READF( MFD, LINE, STATUS )
 	  N=INDEX(LINE,'mname:')
 	  IF(N.EQ.0)THEN
 	    STATUS=SAI__ERROR
@@ -124,7 +125,7 @@
 	  IF(STATUS.NE.SAI__OK) GO TO 99
 	  NAME=STRING(1:40)
 
-	  CALL FIO_READF( MFD, LINE, STATUS )
+	  CALL AIO_READF( MFD, LINE, STATUS )
 	  N=INDEX(LINE,'type:')
 	  IF(N.EQ.0)THEN
 	    STATUS=SAI__ERROR
