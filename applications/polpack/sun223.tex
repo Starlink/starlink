@@ -6727,18 +6727,22 @@ POLPACK.
 \begin{itemize}
 \item Most POLPACK commands have been changed to allow the processing of
 spectropolarimery data. The main exception to this is the POLKA command,
-which cannot be used with spectropolarimetry data. INstead, you should
+which cannot be used with spectropolarimetry data. Instead, you should
 align the data manually, and then use POLCAL directly to create Stokes 
 vectors.
+
+\item Bugs have been fixed which allow catalogues in STL and TST formats 
+to be used (see \xref{SUN/190}{sun190}{FORMAT}).
 
 \item A bug in POLPLOT has been fixed which caused inappropriate
 text to be used for the default key heading.
 
-\item A new hidden commands POLZCONV has been added to transform between 
+\item A new hidden command POLZCONV has been added to transform between 
 calibrated values and pixel values along any spectral channel axis
 present in a vector catalogue. This command is not intended for
 interactive use.
 
+\item Two new hidden commands POLWRTCL and POLRDCL have been added to 
 transfer catalogue data to and from the polarimetry toolbox within
 \xref{GAIA}{sun214}{} \latexonly{(SUN/214)}. These commands are not
 designed for interactive use.
