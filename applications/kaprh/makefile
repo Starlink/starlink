@@ -460,7 +460,7 @@ KAPRH_F_ROUTINES = $(KAPRH_F1_ROUTINES) $(KAPRH_F2_ROUTINES)
 
 KAPSUB_F_ROUTINES = kps1_dsclb.f kps1_dscld.f kps1_dscli.f kps1_dsclr.f \
 kps1_dsclw.f kps1_fainb.f kps1_faind.f kps1_faini.f kps1_fainr.f \
-kps1_fainw.f kps1_imzbo.f ncraxs.f
+kps1_fainw.f kps1_imzbo.f ncraxs.f gethlp.f
 
 MONO_SOURCE = kaprh_mon.f
 
@@ -1696,6 +1696,7 @@ $(PKG_NAME)_ifls.tar:
 #  files.
 
 
+gethlp.o:	 SAE_PAR HLPCMD
 greyplot.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR PRM_PAR NDF_PAR NDF_ERR CTM_PAR GNS_PAR NUM_DEC_CVT NUM_DEF_CVT
 kaprh_mon.o:	 SAE_PAR
 kps1_dsclb.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R

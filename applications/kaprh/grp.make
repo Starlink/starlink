@@ -29,7 +29,7 @@ KAPSUB_SOURCES = $(KAPSUB_NONGEN) $(KAPSUB_GEN)
 # The contents of the kapsub_sub.tar file (including expanded generic
 # files and the generic source files):
 KAPSUB_SUB = $(KAPSUB_SOURCES) kps1_dsclb.f kps1_dscld.f \
-kps1_dscli.f kps1_dsclr.f kps1_dsclw.f
+kps1_dscli.f kps1_dsclr.f kps1_dsclw.f gethlp.f
 
 # Generic source files needed for kapsub_sub.tar:
 KAPSUB_GEN = kps1_dscl.gen
