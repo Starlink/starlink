@@ -7109,15 +7109,12 @@ AstFrame *astLoadFrame_( void *mem, size_t size, int init,
       vtab = &class_vtab;
       name = "Frame";
    }
-printf("Executing Frame loader\n" );
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built Frame. */
-printf("Calling Mapping loader\n" );
    new = astLoadMapping( mem, size, init, (AstMappingVtab *) vtab, name,
                          channel );
-printf("Returned to Frame loader\n" );
 
 /* If required, initialise the part of the virtual function table used
    by this class. */

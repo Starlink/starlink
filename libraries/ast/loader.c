@@ -13,6 +13,7 @@
 #include "mapping.h"
 #include "matrixmap.h"
 #include "object.h"
+#include "pcdmap.h"
 #include "permmap.h"
 #include "plot.h"
 #include "pointset.h"
@@ -43,6 +44,8 @@
 *        Original version.
 *     18-MAR-1998 (RFWS):
 *        Added the IntraMap class.
+*     3-JUN-1999 (RFWS):
+*        Added the PcdMap class.
 *-
 */
 
@@ -65,6 +68,7 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(Mapping);
    LOAD(MatrixMap);
    LOAD(Object);
+   LOAD(PcdMap);
    LOAD(PermMap);
    LOAD(Plot);
    LOAD(PointSet);

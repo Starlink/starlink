@@ -7833,15 +7833,12 @@ AstFrameSet *astLoadFrameSet_( void *mem, size_t size, int init,
       vtab = &class_vtab;
       name = "FrameSet";
    }
-printf("Executing FrameSet loader\n" );
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built FrameSet. */
-printf("Calling Frame loader\n" );
    new = astLoadFrame( mem, size, init, (AstFrameVtab *) vtab, name,
                        channel );
-printf("Returned to FrameSet loader\n" );
 
 /* If required, initialise the part of the virtual function table used
    by this class. */

@@ -1851,7 +1851,6 @@ void astSetDump_( AstObjectVtab *vtab,
       vtab->dump_class[ vtab->ndump ] = class;
       vtab->dump_comment[ vtab->ndump ] = comment;
       vtab->ndump++;
-printf( "Added %s dump function to %s, no=%d\n", class, vtab->class, vtab->ndump );
    }
 }
 
