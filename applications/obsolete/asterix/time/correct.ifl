@@ -2,14 +2,14 @@ INTERFACE CORRECT
 
   PARAMETER INP
     POSITION    1
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     PROMPT      'First input data object'
     HELP        'May be N-d binned dataset, or even a scalar'
   ENDPARAMETER
 
   PARAMETER OUT
     POSITION    2
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     PROMPT      'Output dataset'
     HELP        'This will be a corrected copy of the input'
   ENDPARAMETER
