@@ -90,6 +90,8 @@ f     - AST_TEST: Test if an attribute value is set for an Object
 *        Remove the subversive C "strtok" function.
 *     20-JAN-1998 (RFWS):
 *        Make the astClear and astVSet methods virtual.
+*     29-APR-1998 (RFWS):
+*        Fixed bug in algorithm for encoding Object IDs.
 *class--
 */
 
@@ -3375,7 +3377,7 @@ static AstObject *AssocId( int ihandle ) {
    need higher security than this. We also prevent a count of zero
    being used, as this could result in a zero identifier value (this
    being reserved as the "null" value). */
-      if ( nids++ > 255U ) nids = 1U;
+      if ( ++nids > 255U ) nids = 1U;
       work.u |= nids;
 
 /* Store the value as a check count in the Handle. This will be used
