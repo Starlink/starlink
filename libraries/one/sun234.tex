@@ -17,8 +17,8 @@
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {234.1}
-\newcommand{\stardocauthors}   {R.T.Platon}
+\newcommand{\stardocnumber}    {234.2}
+\newcommand{\stardocauthors}   {R.T.Platon \& T. Jenness}
 \newcommand{\stardocdate}      {22 September 2000}
 \newcommand{\stardoctitle}     {ONE -- Odds and Ends Library}
 \newcommand{\stardocversion}   {Version 1.0}
@@ -564,17 +564,18 @@ The contents of the library are (in alphabetical order):\\
 \noteroutine{ONE\_EXEC( COMMAND, STATUS )}
     {Executes a shell command.
     Extracted from CCDPACK (submitted by P. Draper).}
-\noteroutine{ONE\_FIND\_FILE( FILESPEC, FILENAME, CONTEXT, STATUS )}
+\noteroutine{ONE\_FIND\_FILE( FILESPEC, LISDIR, FILENAME, CONTEXT, STATUS )}
     {Returns successive file names that match a file specification.
-    Taken from FIGARO and CCDPACK.}
+    Taken from FIGARO, SST, CONVERT, KAPPA and CCDPACK.}
 \noteroutine{ONE\_FIND\_FILE\_END( CONTEXT, STATUS )}
     {.Terminate a sequence of FIND\_FILE calls.
-    Taken from FIGARO and CCDPACK.}
+    Taken from FIGARO, SST, CONVERT, KAPPA and CCDPACK.}
 \noteroutine{ONE\_SCRSZ( WIDTH, HEIGHT, STATUS )}
     {A Fortran callable function to obtain the size of the output screen.
     Taken from CONVERT, KAPPA and IRCAMPACK.}
 \section{Routines descriptions}
 There follows a full description of the library routines in alphabetical order:
+
 \sstroutine{
    ONE\_EXEC
 }{
@@ -620,11 +621,10 @@ There follows a full description of the library routines in alphabetical order:
       a blank string as the file name and an error code (an even value)
       as the function value. Finally, a call to ONE\_FIND\_FILE\_END with the
       last returned value of Context will close down any files opened or
-      memory allocated by FIND\_FILE.
+      memory allocated by ONE\_FIND\_FILE.
    }
    \sstinvocation{
-      (from Fortran)
-      FOUND = ONE\_FIND\_FILE (FILESPEC,FILENAME,CONTEXT,STATUS)
+      FOUND = ONE\_FIND\_FILE (FILESPEC,LISDIR,FILENAME,CONTEXT,STATUS)
    }
    \sstarguments{
       \sstsubsection{
@@ -632,6 +632,17 @@ There follows a full description of the library routines in alphabetical order:
       }{
          The file specification to be matched.  May contain wildcards.
          Case sensitive.
+      }
+      \sstsubsection{
+         LISDIR = LOGICAL (Given)
+      }{
+         TRUE if directory contents are to be listed for directories
+         that match the file specification. Should be set to FALSE
+         if matching directory names should be returned without opening the
+         directories themselves. Note that even if true, this routine
+         will not recurse into all subsubdirectories that match. To be
+         more explicit: TRUE is equivalent to {\tt '}ls{\tt '}, FALSE is equivalent to
+         {\tt '}ls -d{\tt '}. Neither is equivalent to {\tt '}find . -name {\tt "}filespec{\tt "}{\tt '}
       }
       \sstsubsection{
          FILENAME = CHARACTER (Returned)
@@ -670,18 +681,24 @@ There follows a full description of the library routines in alphabetical order:
          }
       }
    }
-   \sstdiytopic{
-      Returned Value:                                                             $*$
-   }{
-      ONE\_FIND\_FILE = LOGICAL
+   \sstreturnedvalue{
+      \sstsubsection{
+         ONE\_FIND\_FILE = LOGICAL
+      }{
          TRUE if File Found
          FALSE if error or no more files
+      }
+   }
+   \sstnotes{
+      This routine returns bad status (ONE\_\_NOFILES) even when the
+      status is not technically bad. In general, the caller should
+      annul this particular status condition before proceeding.
    }
    \sstbugs{
       This routine does not provide all the facilities offered by the
       original VAX version; it only accepts the first three arguments as
       listed above, and almost of necessity it uses and expects UNIX syntax
-      for the file specs.  This means that {\tt '}/usr/users/ks/$*$.$*${\tt '} is OK, but
+      for the file specs.  This means that {\tt '}/usr/users/ks/ $*$.$*${\tt '} is OK, but
       {\tt '}[ks]$*$.$*${\tt '} is not. Note that {\tt '}$*${\tt '} and {\tt '}$*$.$*${\tt '} will give quite different
       results under UNIX, whereas under VMS they would be the same. There
       is no way of specifying recursion; {\tt '}/usr/user/ks/...{\tt '} for example
@@ -704,34 +721,31 @@ There follows a full description of the library routines in alphabetical order:
 \sstroutine{
    ONE\_FIND\_FILE\_END
 }{
-   Terminate a sequence of FIND\_FILE calls
+   Terminate a sequence of ONE\_FIND\_FILE calls
 }{
    \sstdescription{
-      This routine should be called after a sequence of calls to FIND\_FILE
-      in order to release any resources used by FIND\_FILE.  It should be
+      This routine should be called after a sequence of calls to ONE\_FIND\_FILE
+      in order to release any resources used by ONE\_FIND\_FILE.  It should be
       passed in its Context argument the value of the Context argument
-      as returned by the FIND\_FILE in the last call in the sequence that
+      as returned by the ONE\_FIND\_FILE in the last call in the sequence that
       is to be closed down.
    }
    \sstinvocation{
-      (from Fortran)
-      CALL ONE\_FIND\_FILE\_END (CONTEXT, STATUS)
+      CALL ONE\_FIND\_FILE\_END (CONTEXT, STATUS )
    }
-   \sstdiytopic{
-      Arguements
-   }{
-      CONTEXT = INTEGER (Given)
-         The context argument returned by the last
-         call to ONE\_FIND\_FILE in the sequence to be closed down.
-      STATUS = INTEGER (Given and Returned)
-         A Status Code (Always SAI\_\_OK)
-   }
-   \sstdiytopic{
-      Authors: K. Shortridge, AAO.
-   }{
-      PDRAPER: P.W. Draper (STARLINK - Durham University)
-      DLT: Dave Terrett (STARLINK)
-      RTP: Roy Platon (STARLINK)
+   \sstarguments{
+      \sstsubsection{
+         CONTEXT = INTEGER (Given)
+      }{
+         The context argument returned by the last call to ONE\_FIND\_FILE
+         in the sequence to be closed down.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         Inherited status. Routine will attempt to free resources even
+         if status is bad on entry.
+      }
    }
 }
 \sstroutine{
@@ -769,6 +783,4 @@ There follows a full description of the library routines in alphabetical order:
       This is the UNIX version.
    }
 }
-
-% ? End of main text
 \end{document}

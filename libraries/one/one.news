@@ -1,13 +1,13 @@
-1 ONE_Version_1.0
+1 ONE_Version_1.1
 
-   The Odds and Ends Library (V1.0) is now released. The full specification
-   can be found in sun234.1.
+   The Odds and Ends Library (V1.1) is now released. The full specification
+   can be found in sun234.
 
    This Library is a set of Fortran and C routines of a general nature and
    usefulness, which are not suitable for inclusion in any other more focussed
    libraries.
 
-   This first release contains the following routines:
+   This release contains the following routines:
 
    - ONE_EXEC: A Fortran callable routine written in C to access the UNIX
    system command.
@@ -21,3 +21,21 @@
    - ONE_SCRSZ: Fortran callable routine written in C to find the width and
    height of the terminal output screen.
 
+2 Changes_in_ONE
+
+3 V1.1
+
+   - An additional argument added to ONE_FIND_FILE to prevent it from
+     opening matching subdirectories. This is a backwards incompatible
+     change that breaks the old API. It has been done to provide
+     compatible functionality with the uses of similar routines in
+     NDG, CTG, GRP, FTS, CCDPACK, CONVERT, SST and Figaro such that
+     the routines in the aforementioned libraries/applications can
+     be replaced.
+
+   - An explicit command for linking ADAM tasks with the ONE 
+     library is now available: one_link_adam
+
+3 V1.0
+
+   - Initial release. Includes ONE_EXEC, ONE_FIND_FILE and ONE_SCRSZ
