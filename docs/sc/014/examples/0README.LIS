@@ -1,0 +1,23 @@
+                       EXAMPLE DATA FILES FOR SC/14
+                       ============================
+
+
+This directory contains the example data files for SC/14 'The Fibre
+Spectroscopy Cookbook'.  The files are arranged in subdirectories, each
+subdirectory corresponding to one of the worked examples.  The
+correspondence between the subdirectories and the examples is:
+
+  flair    -  Reducing FLAIR Data Using IRAF 
+  hydra    -  Reducing Hydra Data Using IRAF
+
+See SC/14 for further details.
+
+
+Clive Davenhall,
+11/6/99.
+
+-----------------------------------------------------------------------------
+Clive Davenhall                                      Institute for Astronomy,
+e-mail (internet, JANET): acd @ roe.ac.uk        Royal Observatory Edinburgh,
+fax from within the UK:   0131-668-8416            Blackford Hill, Edinburgh,
+fax from overseas:     +44-131-668-8416                    EH9 3HJ, Scotland.

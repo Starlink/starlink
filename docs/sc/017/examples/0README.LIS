@@ -1,0 +1,37 @@
+                      EXAMPLE DATA FILES FOR SC/17
+                      ============================
+
+
+This directory contains the example data files for SC/17, `The GAIA
+Cookbook'.  See SC/17 for further details.  The files included are as
+follows.
+
+0README.LIS       - this file.
+
+
+Images and catalogues of the region around NGC 1275
+---------------------------------------------------
+
+ngc1275dss.sdf    - Digitised Sky Survey (DSS) image,
+ngc1275hri.fits   - ROSAT HRI image,
+ngc1275jkt.sdf    - V Band CCD image obtained with the JKT on La Palma.
+
+ngc1275usno.tab   - Objects in the USNO PMM overlaying ngc1275dss.sdf.
+
+
+Example reference star data for the Astrometric Calibration recipe
+------------------------------------------------------------------
+
+refstars.lis      - list of celestial coordinates.
+refstars.prelim   - list of celestial coordinates and pixel positions
+                    (this file can be loaded to make a preliminary fit).
+
+
+Clive Davenhall,
+4/1/02.
+
+-----------------------------------------------------------------------------
+Clive Davenhall                                      Institute for Astronomy,
+e-mail (internet, JANET): acd @ roe.ac.uk        Royal Observatory Edinburgh,
+fax from within the UK:   0131-668-8416            Blackford Hill, Edinburgh,
+fax from overseas:     +44-131-668-8416                    EH9 3HJ, Scotland.

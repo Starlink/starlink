@@ -1,0 +1,71 @@
+              EXAMPLE NETWORKS AND DATA FILES FOR SC/2
+              ========================================
+
+This directory contains the example networks, data files and Fortran
+programs associated with SC/2 'The DX Cookbook'.  See SC/2 for an
+explanation of the various items.
+
+The contents are as follows:-
+
+
+Simple DX Networks:
+------------------
+
+autoslice.net
+histogram.net
+isosurface.net
+particle.net
+simple.net
+slice.net
+
+
+Extended DX networks:
+--------------------
+
+(including the associated configuration files)
+
+jcmtslice.net
+jcmtslice.cfg
+
+jcmtsurface.net
+jcmtsurface.cfg
+
+rosatslice.net
+rosatslice.cfg
+
+
+Gridded data:
+------------
+
+field.general     DX Header file.
+field.lis         Corresponding data file.
+
+field.f           Fortran source to generate data file.
+
+
+Particle data:
+-------------
+
+particle.general  DX Header file.
+particle.lis      Corresponding data file.
+
+particle.f        Fortran source to generate data file.
+
+
+JCMT and ROSAT data:
+-------------------
+
+m82ast.sdf        ROSAT Asterix binned dataset of M82 (NGC 3034).
+l1689b.sdf        JCMT SPECX map of L1689B.
+
+
+Clive Davenhall,
+
+Original:              26/1/96,
+Most recently revised: 23/9/97.
+
+-----------------------------------------------------------------------------
+Clive Davenhall                                      Institute for Astronomy,
+e-mail (internet, JANET): acd @ roe.ac.uk        Royal Observatory Edinburgh,
+fax from within the UK:   0131-668-8356            Blackford Hill, Edinburgh,
+fax from overseas:     +44-131-668-8356                    EH9 3HJ, Scotland.

@@ -1,0 +1,78 @@
+#!/bin/csh
+
+#+
+#  Name:
+#     copy2ddata
+
+#  Purpose:
+#     Copy demonstration 2d data to the working directory.
+
+#  Description:
+#     The script tries to find the example data in the directory
+#     in which this script is stored.  If not present there, the
+#     script looks for the data in the $STAR tree.
+
+#  Authors:
+#     MJC: Martin Clayton (Starlink, UCL)
+#     AJH: Anthony Holloway (Starlink, Manchester)
+#     {add_further_authors_here}
+
+#  History:
+#     10-MAR-1997 (MJC):
+#       Original version.
+#     15-NOV-1998 (AJH):
+#       Converted to copy 2-d data files.
+#     {add_further_changes_here}
+
+#-
+
+#  Directory in which Starlink Software is installed by default.
+    set STAR = '/star';
+
+#  Directory in which Starlink Software examples are installed by default.
+    set EXAMPLES = '/examples';
+
+#  Location of the data, i.e., the document.
+    set DOC = 'sc7';
+
+#  Name of file indicating presence of example data.
+    set TAGFILE = ${DOC}'_examples';
+
+#  Definition of example data files.
+    set DATAFILES = 'object2d.sdf arcframe2d.sdf quartz2dscrunch.sdf';
+
+#  Get the directory in which the data should live.
+    set this_script = ${0};
+    set filename = $this_script:t;
+    set data_expected_in = $this_script:h;
+
+#  Don't allow execution of copydata in its own directory.
+    if ( "$data_expected_in" == "." || \
+         "$data_expected_in" == $filename || \
+         "$data_expected_in" == $cwd || ) then
+       echo "! Cannot copy data onto itself.";
+       exit;
+    endif
+
+#  Look for tag file which indicates presence of example data.
+#  If not found in the path given, try the $STAR tree.
+    if ( ! -e $data_expected_in/$TAGFILE ) then
+       if ( ! -e $STAR/$EXAMPLES/$DOC/$TAGFILE ) then
+          echo "! Example data not found in $data_expected_in/.";
+          exit;
+
+       else
+          set data_expected_in = $STAR/$EXAMPLES/$DOC;
+       endif
+    endif
+
+#  Copy the data across.
+    echo "! Copying $DOC example data from $data_expected_in/.";
+    foreach f ( $DATAFILES )
+      echo -n "${f:r}...";
+      cp $data_expected_in/$f .;
+    end
+    echo "";
+    echo "! Copy completed.";
+
+    exit;

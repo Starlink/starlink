@@ -1,0 +1,27 @@
+                            Scripts for SC/5
+                            ================
+
+
+This directory contains the scripts referred to in SC/5: `The 2-D CCD
+Data Reduction Cookbook'.   The scripts use the C-shell and are intended
+to be run from the Unix command line.  See SC/5 for further details.
+
+The scripts are:
+
+  changetype.csh - convert to a new data format,
+  clipim.csh     - clip an image,
+  doapp.csh      - process compressed files using HISTPEAK in ESP,
+  dostats.csh    - process compressed files using STATS in KAPPA,
+  fitsinfo.csh   - Examine specified FITS keywords,
+  saodisp.csh    - automatically scale an image display with SAOIMAGE,
+  scaledisp.csh  - automatically scale an image display with DISPLAY in KAPPA.
+
+
+Clive Davenhall,
+9/4/99.
+
+-----------------------------------------------------------------------------
+Clive Davenhall                                      Institute for Astronomy,
+e-mail (internet, JANET): acd @ roe.ac.uk        Royal Observatory Edinburgh,
+fax from within the UK:   0131-668-8416            Blackford Hill, Edinburgh,
+fax from overseas:     +44-131-668-8416                    EH9 3HJ, Scotland.

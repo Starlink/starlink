@@ -1,0 +1,6 @@
+file=particle.lis
+points=10000
+format=text
+field=locations, Intensity
+structure=3-vector, scalar
+interleaving=field

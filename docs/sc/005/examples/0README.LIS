@@ -1,0 +1,22 @@
+                     Example Data and Scripts for SC/5
+                     =================================
+
+
+This directory contains the example data and scripts for SC/5: `The 2-D
+CCD Data Reduction Cookbook'.   The data and scripts are kept in
+separate subdirectories:
+
+  data
+  scripts
+
+See SC/5 for further details.
+
+
+Clive Davenhall,
+11/6/99.
+
+-----------------------------------------------------------------------------
+Clive Davenhall                                      Institute for Astronomy,
+e-mail (internet, JANET): acd @ roe.ac.uk        Royal Observatory Edinburgh,
+fax from within the UK:   0131-668-8416            Blackford Hill, Edinburgh,
+fax from overseas:     +44-131-668-8416                    EH9 3HJ, Scotland.

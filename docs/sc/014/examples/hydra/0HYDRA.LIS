@@ -1,0 +1,17 @@
+     Data Files For SC/14 Example: Reducing Hydra Data Using IRAF
+     ============================================================
+
+
+This directory contains the file for example `Reducing Hydra Data
+Using IRAF' in SC/14.  The file, hydrasetup.cl, is an IRAF script to
+configure the procedure dohydra.  See SC/14 for further details.
+
+
+Clive Davenhall,
+29/12/98.
+
+-----------------------------------------------------------------------------
+Clive Davenhall                                      Institute for Astronomy,
+e-mail (internet, JANET): acd @ roe.ac.uk        Royal Observatory Edinburgh,
+fax from within the UK:   0131-668-8416            Blackford Hill, Edinburgh,
+fax from overseas:     +44-131-668-8416                    EH9 3HJ, Scotland.

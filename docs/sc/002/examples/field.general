@@ -1,0 +1,9 @@
+file=field.lis
+format=text
+grid=50x50x50
+majority=row
+interleaving=field
+field=Gaussian, Sloping
+structure=scalar, scalar
+type=float, float
+dependency=positions, positions

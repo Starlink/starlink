@@ -1,0 +1,55 @@
+     Data Files For SC/14 Example: Reducing FLAIR Data Using IRAF
+     ============================================================
+
+
+This directory contains the files for example `Reducing FLAIR Data
+Using IRAF' in SC/14.  It contains the following files:
+
+
+  af.log           Fibre positioning log file.
+  flairheads.txt   Example of header information from FLAIR images.
+  flairsetup.cl    IRAF script to configure dofibers and other tasks.
+
+  ccdproc.lis      Lists of file names given to individual tasks.
+  fits.lis
+  flat.lis
+  obj.lis
+  zero.lis
+
+  image101.fts     FLAIR images formatted as FITS files.
+  image102.fts
+  image103.fts
+  image104.fts
+  image105.fts
+  image106.fts
+  image107.fts
+  image108.fts
+  image109.fts
+  image110.fts
+  image111.fts
+  image112.fts
+  image113.fts
+  image114.fts
+  image115.fts
+  image116.fts
+  image117.fts
+  image118.fts
+  image119.fts
+  image120.fts
+  image121.fts
+  image122.fts
+  image123.fts
+  image124.fts
+
+
+See SC/14 for further details.
+
+
+Clive Davenhall,
+29/12/98.
+
+-----------------------------------------------------------------------------
+Clive Davenhall                                      Institute for Astronomy,
+e-mail (internet, JANET): acd @ roe.ac.uk        Royal Observatory Edinburgh,
+fax from within the UK:   0131-668-8416            Blackford Hill, Edinburgh,
+fax from overseas:     +44-131-668-8416                    EH9 3HJ, Scotland.
