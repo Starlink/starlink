@@ -31,6 +31,7 @@
       INTEGER STOP( MAXWRD )
       INTEGER NUMWRD
       CHARACTER*( STRING_SIZE ) WORDS( MAXWRD )
+      CHARACTER*(NBS_CLEN) CDUMMY
 *-
 
 *    Check status on entry.
@@ -104,6 +105,8 @@
 
 *      Do the DRMASK command
         ELSE IF ( WORDS(1) .EQ. 'DRMASK' ) THEN
+          CALL CHR_FILL( ' ', CDUMMY )
+          CALL NBS_PUT_CVALUE( MASK_ID, 0, CDUMMY(1:LEN(CDUMMY)), STATUS )
           IF ( INDEX( WORDS(2), SEPARATOR ) .EQ. 0 ) 
      :      WORDS(2) = PREFIX // 'CGS4_MASKS' // SEPARATOR // WORDS(2)(1:CHR_LEN(WORDS(2)))
           CALL CHR_RMBLK( WORDS(2) )
@@ -133,7 +136,6 @@
           IF ( STATUS .EQ. SAI__OK ) THEN
             CALL NBS_PUT_VALUE( VARIANCE_WT_ID, 0, VAL__NBI, VARIANCE_WT, STATUS )
             CALL PAR_PUT0L( 'VARIANCE_WT', VARIANCE_WT, STATUS )
-
             IF ( VARIANCE_WT ) THEN
               CALL MSG_OUT( ' ', 'Variance weighting ENABLED', STATUS )
             ELSE
@@ -181,6 +183,10 @@
 *      Ensure that the P4_BUSY flag is now unset (using a dummy status).
         DUMMY_STATUS = SAI__OK
         CALL NBS_PUT_VALUE( P4_BUSY_ID, 0, VAL__NBI, .FALSE., DUMMY_STATUS )
+        DUMMY_STATUS = SAI__OK
+        CALL NBS_PUT_VALUE( RED4_BUSY_ID, 0, VAL__NBI, .FALSE., DUMMY_STATUS )
+        DUMMY_STATUS = SAI__OK
+        CALL NBS_PUT_VALUE( CRED4_BUSY_ID, 0, VAL__NBI, .FALSE., DUMMY_STATUS )
       ELSE
 
         CALL NBS_PUT_VALUE( CRED4_BUSY_ID, 0, VAL__NBI, .FALSE., STATUS )
