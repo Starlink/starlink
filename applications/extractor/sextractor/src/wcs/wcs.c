@@ -350,6 +350,8 @@
 *   $Id: wcs.c,v 2.5 1996/09/10 06:37:10 mcalabre Exp $
 *===========================================================================*/
 
+#include "stdio.h"
+#include "string.h"
 #include "wcs.h"
 
 /* Map error number to error message for each function. */

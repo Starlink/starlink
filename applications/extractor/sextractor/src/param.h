@@ -9,7 +9,7 @@
 *
 *	Contents:	parameter list for catalog data.
 *
-*	Last modify:	11/08/98
+*	Last modify:	29/08/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -102,9 +102,9 @@ keystruct	objkey[] = {
 	&outobj.xmin, H_INT, T_LONG, "%10d", "pixel"},
   {"YMIN_IMAGE", "Minimum y-coordinate among detected pixels",
 	&outobj.ymin, H_INT, T_LONG, "%10d", "pixel"},
-  {"XMAX_IMAGE", "Maximum x-coordinate + 1 among detected pixels",
+  {"XMAX_IMAGE", "Maximum x-coordinate among detected pixels",
 	&outobj.xmax, H_INT, T_LONG, "%10d", "pixel"},
-  {"YMAX_IMAGE", "Maximum y-coordinate + 1 among detected pixels",
+  {"YMAX_IMAGE", "Maximum y-coordinate among detected pixels",
 	&outobj.ymax, H_INT, T_LONG, "%10d", "pixel"},
 
   {"XPEAK_IMAGE", "x-coordinate of the brightest pixel",
@@ -409,6 +409,19 @@ keystruct	objkey[] = {
   {"ERRTHTPSF_B1950", "B1950 PSF error ellipse pos. angle (east of north)",
 	&outobj2.poserrtheta1950_psf, H_FLOAT, T_FLOAT, "%5.1f", "deg"},
 
+  {"X2PC_IMAGE", "PC variance along x",
+	&outobj2.mx2_pc, H_EXPO, T_DOUBLE, "%15e", "pixel**2"},
+  {"Y2PC_IMAGE", "PC variance along y",
+	&outobj2.my2_pc, H_EXPO, T_DOUBLE, "%15e", "pixel**2"},
+  {"XYPC_IMAGE", "PC covariance between x and y",
+	&outobj2.mxy_pc, H_EXPO, T_DOUBLE, "%15e", "pixel**2"},
+
+  {"APC_IMAGE", "PC profile RMS along major axis",
+	&outobj2.a_pc, H_FLOAT, T_FLOAT, "%8.2f", "pixel"},
+  {"BPC_IMAGE", "PC profile RMS along minor axis",
+	&outobj2.b_pc, H_FLOAT, T_FLOAT, "%8.2f", "pixel"},
+  {"THETAPC_IMAGE", "PC position angle (CCW/x)",
+	&outobj2.theta_pc, H_FLOAT, T_FLOAT, "%5.1f", "deg"},
 /*
 	{"RETINOUT", T_FLOAT, &outobj.retinout, "%13g "},
 */

@@ -9,7 +9,7 @@
 *
 *	Contents:	functions dealing with background computation.
 *
-*	Last modify:	09/07/98
+*	Last modify:	28/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -279,7 +279,7 @@ void	backstat(backstruct *backmesh, PIXTYPE *buf, size_t bufsize,
 
   {
    backstruct	*bm;
-   int		i, m,h,x,y, npix, offset, lastbite;
+   int		m,h,x,y, npix, offset, lastbite;
    double	pix, sig, mean, sigma, step;
    PIXTYPE	*buft, *bufpos, lcut, hcut;
 
@@ -353,8 +353,10 @@ void	filterback(picstruct *field)
 
   {
    int		i,px,py, np, nx, npxm,npxp, npym,npyp, dpx,dpy, x,y;
-   float	*back, *mask, *all, *allt;
+   float	*back,*sigma, *back2,*sigma2, *bmask,*smask, *sigmat,
+		fthresh, med;
 
+  fthresh = prefs.backfthresh;
   nx = field->nbackx;
   np = field->nback;
   npxm = field->nbackfx/2;
@@ -364,9 +366,12 @@ void	filterback(picstruct *field)
   npym *= nx;
   npyp *= nx;
 
-  QMALLOC(mask, float, field->nbackfx*field->nbackfy);
-  QMALLOC(all, float, np);
+  QMALLOC(bmask, float, field->nbackfx*field->nbackfy);
+  QMALLOC(smask, float, field->nbackfx*field->nbackfy);
+  QMALLOC(back2, float, np);
+  QMALLOC(sigma2, float, np);
   back = field->back;
+  sigma = field->sigma;
 
   for (py=0; py<np; py+=nx)
     for (px=0; px<nx; px++)
@@ -378,40 +383,37 @@ void	filterback(picstruct *field)
           y = py+dpy;
           x = px+dpx;
           if (y>=0 && y<np && x>=0 && x<nx)
-            mask[i++] = back[x+y];
+            {
+            bmask[i] = back[x+y];
+            smask[i++] = sigma[x+y];
+            }
           }
-      all[px+py] = hmedian(mask, i);
+      if (fabs((med=hmedian(bmask, i))-back[px+py])>=fthresh)
+        {
+        back2[px+py] = med;
+        sigma2[px+py] = hmedian(smask, i);
+        }
+      else
+        {
+        back2[px+py] = back[px+py];
+        sigma2[px+py] = sigma[px+py];
+        }
       }
 
-  memcpy(back, all, np*sizeof(float));
-  field->backmean = hmedian(all, np);
-
-  back = field->sigma;
-  memcpy(all, back, np*sizeof(float));
-  for (py=0; py<np; py+=nx)
-    for (px=0; px<nx; px++)
-      {
-      i=0;
-      for (dpy = -npym; dpy< npyp; dpy+=nx)
-        for (dpx = -npxm; dpx < npxp; dpx++)
-          {
-          y = py+dpy;
-          x = px+dpx;
-          if (y>=0 && y<np && x>=0 && x<nx)
-            mask[i++] = back[x+y];
-          }
-      all[px+py] = hmedian(mask, i);
-      }
-
-  memcpy(back, all, np*sizeof(float));
-  field->backsig = hmedian(all, np);
+  free(bmask);
+  free(smask);
+  memcpy(back, back2, np*sizeof(float));
+  field->backmean = hmedian(back2, np);
+  free(back2);
+  memcpy(sigma, sigma2, np*sizeof(float));
+  field->backsig = hmedian(sigma2, np);
 
   if (field->backsig<=0.0)
     {
-    allt = all+np;
-    for (i=np; i-- && *(--allt)>0.0;);
+    sigmat = sigma2+np;
+    for (i=np; i-- && *(--sigmat)>0.0;);
     if (i>=0 && i<(np-1))
-      field->backsig = hmedian(allt+1, np-1-i);
+      field->backsig = hmedian(sigmat+1, np-1-i);
     else
       {
       if (field->flags&(DETECT_FIELD|MEASURE_FIELD))
@@ -420,8 +422,9 @@ void	filterback(picstruct *field)
       field->backsig = 1.0;
       }
     }
-  free(mask);
-  free(all);
+
+  free(sigma2);
+
 
   return;
   }
@@ -713,7 +716,19 @@ void	subbackline(picstruct *field, int y, PIXTYPE *line)
    int		i,j,x,yl, nbx,nbxm1,nby, nx,width, ystep, changepoint;
    float	dx,dx0,dy,dy3, cdx,cdy,cdy3, temp, xstep,
 		*node,*nodep,*dnode, *blo,*bhi,*dblo,*dbhi, *u;
-   PIXTYPE	*backline;
+   PIXTYPE	*backline, bval;
+
+  width = field->width;
+  backline = field->backline;
+
+  if (field->back_type==BACK_ABSOLUTE)
+    {
+/*-- In absolute background mode, just subtract a cste */
+    bval = field->backmean;
+    for (i=width; i--;)
+      *(line++) -= ((*backline++)=bval);
+    return;
+    }
 
   nbx = field->nbackx;
   nbxm1 = nbx - 1;
@@ -778,8 +793,6 @@ void	subbackline(picstruct *field, int y, PIXTYPE *line)
     }
 
 /*-- Interpolation along x */
-  width = field->width;
-  backline = field->backline;
   if (nbx>1)
     {
     nx = field->backw;

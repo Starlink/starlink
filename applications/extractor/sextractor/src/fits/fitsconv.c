@@ -9,7 +9,7 @@
 *
 *	Contents:	functions for converting LDAC FITS catalogs.
 *
-*	Last modify:	15/01/98
+*	Last modify:	28/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -34,15 +34,15 @@ OUTPUT	RETURN_OK if the ASCII table was transformed, and RETURN_ERROR
 NOTES	This function can be used to stick the binary translation of
         similar ASCII tables.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	04/06/97
+VERSION	28/11/98
  ***/
 tabstruct *asc2bin_tab(catstruct *catin, char *tabinname, catstruct *catout,
 		char *taboutname)
 
   {
    catstruct	*tabcat;
-   keystruct	*key, *okey;
-   tabstruct	*tabin,*tabout, *old_tab;
+   keystruct	*key;
+   tabstruct	*tabin,*tabout;
    static char	comment[82], keyword[16], ptr[82];
    h_type	htype;
    t_type	ttype;

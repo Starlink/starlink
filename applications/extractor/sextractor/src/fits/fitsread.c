@@ -9,7 +9,7 @@
 *
 *	Contents:	low-level functions for reading LDAC FITS catalogs.
 *
-*	Last modify:	13/11/97
+*	Last modify:	28/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -237,14 +237,11 @@ INPUT	Table which will be accessed from disk (provided by init_readobj()),
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	13/11/97
+VERSION	28/11/98
  ***/
 void	end_readobj(tabstruct *keytab, tabstruct *tab)
 
   {
-   keystruct	*key;
-   int		k, pos, size;
-
   if (close_cat(keytab->cat) != RETURN_OK)
     error(EXIT_FAILURE,"*Error*: Problem while closing",keytab->cat->filename);
 

@@ -9,7 +9,7 @@
 *
 *	Contents:	main program.
 *
-*	Last modify:	13/07/98
+*	Last modify:	13/01/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -214,9 +214,13 @@ void	makeit()
         }
    }
 
-/* Initialize PSF workspace */
+/* Initialize PSF contexts and workspace */
+
   if (FLAG(obj2.flux_psf))
+    {
+    psf_readcontext(thepsf, field);
     psf_init(thepsf);
+    }
 
   NFPRINTF(OUTPUT, "Initializing catalog");
   initcat(field);

@@ -9,7 +9,7 @@
 *
 *	Contents:	Functions to handle the configuration file.
 *
-*	Last modify:	29/06/98
+*	Last modify:	19/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -305,6 +305,10 @@ void	useprefs()
    int		i, margin, naper;
    char		*str;
 
+/*-------------------------------- Extracting ------------------------------*/
+  if (prefs.nthresh_type<2)
+    prefs.thresh_type[1] = prefs.thresh_type[0];
+
 /*-------------------------------- Deblending ------------------------------*/
   prefs.deb_maxarea = (prefs.ext_minarea<MAXDEBAREA ?
 		prefs.ext_minarea:MAXDEBAREA);
@@ -373,6 +377,8 @@ void	useprefs()
     prefs.backsize[1] = prefs.backsize[0];
   if (prefs.nbackfsize<2)
     prefs.backfsize[1] = prefs.backfsize[0];
+  if (prefs.nback_type<2)
+    prefs.back_type[1] = prefs.back_type[0];
 
 /*------------------------------ FLAG-images -------------------------------*/
   prefs.nimaisoflag = (prefs.imaflag_size > prefs.imanflag_size) ?
@@ -414,7 +420,7 @@ void	useprefs()
 	|| (prefs.nweight_type>1
 		&& prefs.weight_type[1]!=WEIGHT_FROMBACK
 		&& prefs.weight_type[1]!=WEIGHT_NONE)))
-	|| (prefs.nwimage_name
+	|| (prefs.nwimage_name<2
 	&& prefs.nweight_type>1
 	&& prefs.weight_type[0]!=WEIGHT_FROMBACK
 	&& prefs.weight_type[0]!=WEIGHT_NONE

@@ -9,7 +9,7 @@
 *
 *	Contents:	handling of "check-images".
 *
-*	Last modify:	27/07/98
+*	Last modify:	23/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -203,8 +203,11 @@ checkstruct	*initcheck(picstruct *field, char *filename,
 
     case CHECK_OBJECTS:
     case CHECK_APERTURES:
-    case CHECK_SUBPROTOS:
-    case CHECK_PROTOS:
+    case CHECK_SUBPSFPROTOS:
+    case CHECK_PSFPROTOS:
+    case CHECK_SUBPCPROTOS:
+    case CHECK_PCPROTOS:
+    case CHECK_PCOPROTOS:
       ival = -32;
       fitswrite(check->fitshead, "BITPIX  ", &ival, H_INT, T_LONG);
       check->width = field->width;
@@ -329,7 +332,8 @@ Write ONE line of npix pixels of a check-image.
 void	writecheck(checkstruct *check, PIXTYPE *data, int w)
 
   {
-  if (check->type == CHECK_APERTURES || check->type == CHECK_SUBPROTOS)
+  if (check->type == CHECK_APERTURES || check->type == CHECK_SUBPSFPROTOS
+	|| check->type == CHECK_SUBPCPROTOS || check->type == CHECK_PCOPROTOS)
     {
     memcpy((PIXTYPE *)check->pix + w*(check->y++), data, w*sizeof(PIXTYPE));
     return;
@@ -395,8 +399,11 @@ void	endcheck(picstruct *field, checkstruct *check)
 
     case CHECK_OBJECTS:
     case CHECK_APERTURES:
-    case CHECK_SUBPROTOS:
-    case CHECK_PROTOS:
+    case CHECK_SUBPSFPROTOS:
+    case CHECK_PSFPROTOS:
+    case CHECK_SUBPCPROTOS:
+    case CHECK_PCPROTOS:
+    case CHECK_PCOPROTOS:
     case CHECK_ASSOC:
 #     ifdef BSWAP
       swapbytes(check->pix, sizeof(PIXTYPE), (int)check->npix);
@@ -434,7 +441,6 @@ void	endcheck(picstruct *field, checkstruct *check)
 #     ifdef BSWAP
       swapbytes(check->pix, sizeof(PIXTYPE), (int)check->npix);
 #     endif
-printf("%d\n", check->npix);
       QFWRITE(check->pix,check->npix*sizeof(PIXTYPE),
 		check->file,check->filename);
       free(check->pix);

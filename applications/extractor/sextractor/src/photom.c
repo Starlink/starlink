@@ -9,7 +9,7 @@
 *
 *	Contents:	Compute magnitudes and other photometrical parameters.
 *
-*	Last modify:	11/08/98
+*	Last modify:	28/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -31,7 +31,7 @@ void  computeaperflux(picstruct *field, picstruct *wfield,
 
   {
    float		r2, raper,raper2, rintlim,rintlim2,rextlim2,
-			mx,my, rx,ry,dx,dx1,dy,dy2,
+			mx,my,dx,dx1,dy,dy2,
 			offsetx,offsety,scalex,scaley,scale2, ngamma, locarea;
    double		tv, sigtv, area, pix, var, backnoise2, gain;
    int			x,y, x2,y2, xmin,xmax,ymin,ymax, sx,sy, w,h,
@@ -495,9 +495,6 @@ Compute magnitude parameters.
 void  computemags(picstruct *field, objstruct *obj)
 
   {
-   double	ati,dati, rv,tv, sigtv;
-   int		i;
-
 /* Mag. isophotal */
   if (FLAG(obj2.mag_iso))
     obj2->mag_iso = obj2->flux_iso>0.0?

@@ -3,9 +3,9 @@
 #
 # E.BERTIN 1997
 #
-SEXMACHINE= solaris
-CC    = cc				# the C compiler
-COPTS = -g -DSUN_SOLARIS		# options for the C compiler
+SEXMACHINE = linux
+CC    = egcs				# the C compiler
+COPTS = -g -Wall -DPC_LINUX -DMALLOC_CHECK_=2		# options for the C compiler
 CD    = cd
 CP    = cp
 RM    = rm -f

@@ -9,7 +9,7 @@
 *
 *	Contents:	global declarations.
 *
-*	Last modify:   29/04/98
+*	Last modify:	28/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -30,12 +30,7 @@ char			gstr[MAXCHAR];
 static const char	notokstr[] = {" \t=,;\n\r\""};
 
 /*------------------------------- functions ---------------------------------*/
-extern void    	addimage(picstruct *field, float *psf,
-			int w,int h, int ix,int iy, float amplitude),
-		addimage_center(picstruct *field, float *psf,
-			int w,int h, float x, float y, float amplitude),
-		analyse(picstruct *, picstruct *, int, objliststruct *),
-		blankimage(picstruct *, PIXTYPE *, int,int, int,int, PIXTYPE),
+extern void	analyse(picstruct *, picstruct *, int, objliststruct *),
 		blankit(char *, int),
                 endcat(void),
                 closecheck(void),
@@ -57,7 +52,6 @@ extern void    	addimage(picstruct *field, float *psf,
 		neurinit(void),
 		neurclose(void),
 		neurresp(double *, double *),
-		pasteimage(picstruct *, PIXTYPE *, int ,int, int, int),
 		preanalyse(int, objliststruct *, int),
 		readcatparams(char *),
 		readdata(picstruct *, PIXTYPE *, int),
@@ -80,10 +74,9 @@ extern void    	addimage(picstruct *field, float *psf,
 
 extern float	hmedian(float *, int);
 
-extern int	belong(int, objliststruct *, int, objliststruct *),
+extern int	addobj(int, objliststruct *, objliststruct *),
+		belong(int, objliststruct *, int, objliststruct *),
 		cistrcmp(char *, char *, int),
-		copyimage(picstruct *, PIXTYPE *, int, int, int, int),
-		copyimage_center(picstruct *, PIXTYPE *, int,int, float,float),
 		gatherup(objliststruct *, objliststruct *),
 		parcelout(objliststruct *, objliststruct *);
 

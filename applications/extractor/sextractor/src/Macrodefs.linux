@@ -1,11 +1,29 @@
 #
-# macro definitions for the gcc ANSI-C Compiler on PC-LINUX systems
+# macro default definitions
 #
-# E.BERTIN 1997
+# E.BERTIN 1999
 #
-SEXMACHINE= linux
-CC    = gcc				# the C compiler
-COPTS = -O -DPC_LINUX			# options for the C compiler
+SEXMACHINE=
 CD    = cd
 CP    = cp
 RM    = rm -f
+
+default:
+	@echo
+	@echo "Please use:    make SEXMACHINE=<machine_type>"
+	@echo
+	@echo "Where:  <machine_type> = alpha   (for DEC-ALPHAs with Digital UNIX)"
+	@echo "                         ultrix  (for DEC stations running ULTRIX)"
+	@echo "                         hpux    (for HP/UX systems)"
+	@echo "                         aix     (for IBMs RS6000 running AIX)"
+	@echo "                         linuxpc (for PCs running LINUX, using gcc)"
+	@echo "                         linuxp2 (for Pentium2 PCs running LINUX, using egcs)"
+	@echo "                         solaris (for SUN-Solaris machines)"
+	@echo "                         sunos   (for SUN-OS platforms)"
+	@echo
+	@echo "If your machine doesn't belong yet to the list above,"
+	@echo "please drop me a mail (bertin@iap.fr)"
+	@echo
+	@echo "(Use   make clean   to remove products from a previous compilation)"
+	@echo
+

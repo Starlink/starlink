@@ -9,7 +9,7 @@
 *
 *	Contents:	global type definitions.
 *
-*	Last modify:	11/08/98
+*	Last modify:	20/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -48,11 +48,16 @@ typedef	long		LONG;
 typedef	unsigned long	ULONG;
 #endif
 
+typedef  enum {BACK_RELATIVE, BACK_ABSOLUTE}
+		backenum;				/* BACK_TYPE */
+
 typedef  enum {CHECK_NONE, CHECK_IDENTICAL, CHECK_BACKGROUND,
         CHECK_BACKRMS, CHECK_MINIBACKGROUND, CHECK_MINIBACKRMS,
         CHECK_SUBTRACTED, CHECK_FILTERED, CHECK_OBJECTS, CHECK_APERTURES,
 	CHECK_SEGMENTATION, CHECK_ASSOC, CHECK_SUBOBJECTS,
-	CHECK_SUBPROTOS, CHECK_PROTOS, CHECK_MAPSOM}	checkenum;
+	CHECK_SUBPSFPROTOS, CHECK_PSFPROTOS,
+	CHECK_SUBPCPROTOS, CHECK_PCPROTOS, CHECK_PCOPROTOS,
+		CHECK_MAPSOM}	checkenum;
 	/* CHECK_IMAGE type */
 
 typedef  enum {WEIGHT_NONE, WEIGHT_FROMBACK, WEIGHT_FROMRMSMAP,
@@ -211,6 +216,9 @@ typedef struct
   float		poserrtheta1950_psf;		/* B1950 error pos. angle */
   float		poserrcxxw_psf, poserrcyyw_psf,
 		poserrcxyw_psf;			/* WORLD error ellipse */
+/* ---- PC-fitting */
+  double	mx2_pc,my2_pc,mxy_pc;		/* PC 2nd-order parameters */
+  float		a_pc,b_pc,theta_pc;		/* PC shape parameters */
   }	obj2struct;
 
 /*----------------------------- lists of objects ----------------------------*/
@@ -284,6 +292,7 @@ typedef struct
   PIXTYPE	*backline;		/* current interpolated bkgnd line */
   PIXTYPE	dthresh;		/* detection threshold */
   PIXTYPE	thresh;			/* analysis threshold */
+  backenum	back_type;		/* Background type */
 /* ---- astrometric parameters */
   struct structastrom	*astrom;	/* astrometric data */
   struct structassoc	*assoc;		/* ptr to the assoc-list */
@@ -306,11 +315,13 @@ typedef struct
   int		nimage_name;				/* nb of params */
   char		cat_name[MAXCHAR];			/* catalog filename*/
 /*----- thresholding */
-  enum	{T_SIGMA, T_MAGNITUDE}		threshold_type;	/* threshold unit */
   double	dthresh[2];				/* detect. threshold */
   int		ndthresh;				/* (1 or 2 entries) */
   double	thresh[2];				/* analysis thresh. */
   int		nthresh;				/* (1 or 2 entries) */
+  enum	{THRESH_RELATIVE, THRESH_ABSOLUTE}
+					thresh_type[2];	/* bkgnd type */
+  int		nthresh_type;				/* nb of params */
 /*----- extraction */
   int		dimage_flag;				/* detect. image ? */
   int		ext_minarea;				/* min area in pix. */
@@ -366,10 +377,15 @@ typedef struct
 /*----- background */
   enum	{IMAGE, AFILE}			back_origin;	/* origin of bkgnd */
   char		back_name[MAXCHAR];			/* bkgnd filename */
+  backenum	back_type[2];				/* bkgnd type */
+  int		nback_type;				/* nb of params */
+  int		back_val[2];				/* user-def. bkg */
+  int		nback_val;				/* nb of params */
   int		backsize[2];				/* bkgnd mesh size */
   int		nbacksize;				/* nb of params */
   int		backfsize[2];				/* bkgnd filt. size */
   int		nbackfsize;				/* nb of params */
+  double	backfthresh;				/* bkgnd fil. thresh */
   enum	{GLOBAL, LOCAL}			pback_type;	/* phot. bkgnd type */
   int		pback_size;				/* rect. ann. width */
 /*----- memory */
@@ -395,7 +411,7 @@ typedef struct
   int		nassoc_param;				/* nb of params */
   int		assoc_data[MAXNASSOC];		       	/* ASSOC data cols */
   int		nassoc_data;				/* nb of params */
-  enum	{ASSOC_FIRST, ASSOC_MEAN, ASSOC_MAGMEAN,
+  enum	{ASSOC_FIRST, ASSOC_NEAREST, ASSOC_MEAN, ASSOC_MAGMEAN,
 	 ASSOC_SUM, ASSOC_MAGSUM, ASSOC_MIN, ASSOC_MAX}
 		assoc_type;				/* type of assoc. */
   enum	{ASSOCSELEC_ALL, ASSOCSELEC_MATCHED, ASSOCSELEC_NOMATCHED}

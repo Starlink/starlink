@@ -5,11 +5,11 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	global definitions.
 *
-*	Last modify:	20/08/98
+*	Last modify:	13/01/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -17,7 +17,7 @@
 /*------------------------ what, who, when and where ------------------------*/
 
 #define		BANNER		"SExtractor"
-#define		VERSION		"2.0.15 (August 20, 1998)"
+#define		VERSION		"2.0.19 (January 13, 1999)"
 #define		COPYRIGHT	"Emmanuel BERTIN (bertin@iap.fr)"
 #define		WEBSITE		"http://terapix.iap.fr/sextractor"
 #define	       	MAILINGLIST	"sextractor@iap.fr"
@@ -30,7 +30,7 @@
 #define	DATA_BUFSIZE		262144		/* data buffer size */
 #define	MARGIN_SCALE		2.0		/* Margin / object height */ 
 #define	MAXCHAR			512		/* max. number of characters */
-#define	MAXCHECK		16		/* max. # of CHECKimages */
+#define	MAXCHECK		32		/* max. # of CHECKimages */
 #define	MAXDEBAREA		3		/* max. area for deblending */
 #define	MAXFLAG			4		/* max. # of FLAG-images */
 #define	MAXIMAGE		2		/* max. # of input images */

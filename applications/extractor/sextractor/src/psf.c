@@ -9,7 +9,7 @@
 *
 *	Contents:	Fit the PSF to a detection.
 *
-*	Last modify:	20/07/98
+*	Last modify:	13/01/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -23,14 +23,18 @@
 #include	"globals.h"
 #include	"fitscat.h"
 #include	"check.h"
+#include	"image.h"
 #include	"poly.h"
 #include	"psf.h"
 
 /*------------------------------- variables ---------------------------------*/
 
-static double	*data, *weight, *mat, *vmat, *wmat;
-static PIXTYPE	*datah, *weighth, *checkmask;
-static double	*psfmasks, *psfmaskx,*psfmasky;
+static double	*data, *weight, *mat;
+static PIXTYPE	*datah, *weighth;
+static int	psf_maxwidth,psf_maxheight;
+static double	*psfmasks, *psfmaskx,*psfmasky,
+		psf_fwhm;
+
 extern keystruct	objkey[];
 extern objstruct	outobj;
 extern obj2struct	outobj2;
@@ -41,39 +45,26 @@ Allocate memory and stuff for the PSF-fitting.
 */
 void	psf_init(psfstruct *psf)
   {
-   double	*w, *px,*py, hw,hh, yb;
-   int		width, height, npix, p, x,y;
+   int		npix;
 
-  width = PSF_WIDTH;
-  height = PSF_HEIGHT;
-  npix = width*height;
+  psf_maxwidth = (int)(psf->masksize[0]*psf->pixstep);
+  psf_maxheight = (int)(psf->masksize[1]*psf->pixstep);
+  psf_fwhm = psf->fwhm*psf->pixstep;
+  npix = psf_maxwidth*psf_maxheight;
   QMALLOC(psfmasks, double, npix);
-/* Initialize x-moments, y-moments and weights */
+/* Allocate x-moments, y-moments and weights */
   QMALLOC(weighth, PIXTYPE, npix);
   QMALLOC(weight, double, npix);
   QMALLOC(psfmaskx, double, npix);
   QMALLOC(psfmasky, double, npix);
-  hw = (width-1)/2.0;
-  hh = (height-1)/2.0;
-  w = weight;
-  px = psfmaskx;
-  py = psfmasky;
-  for (y=0; y<height; y++)
-    {
-    yb = y-hh;
-    for (x=0; x<width; x++)
-      {
-      *(w++) = 1.0;
-      *(px++) = x-hw;
-      *(py++) = yb;
-      }
-    }
 
 /* Allocate working space */
   QMALLOC(datah, PIXTYPE, npix);
   QMALLOC(data, double, npix);
   QMALLOC(mat, double, npix*PSF_NA);
-  if (prefs.check[CHECK_SUBPROTOS] || prefs.check[CHECK_PROTOS])
+  if (prefs.check[CHECK_SUBPSFPROTOS] || prefs.check[CHECK_PSFPROTOS]
+	|| prefs.check[CHECK_SUBPCPROTOS] || prefs.check[CHECK_PCPROTOS]
+	|| prefs.check[CHECK_PCOPROTOS])
     QMALLOC(checkmask, PIXTYPE, npix);
 
   return;
@@ -88,6 +79,8 @@ void	psf_end(psfstruct *psf)
   {
    int	d, ndim;
 
+  if (psf->pc)
+    pc_end(psf->pc);
   QFREE(psfmasks);
   QFREE(psfmaskx);
   QFREE(psfmasky);
@@ -97,10 +90,10 @@ void	psf_end(psfstruct *psf)
   QFREE(weight);
   QFREE(data);
   QFREE(mat);	
-  QFREE(vmat);	
-  QFREE(wmat);	
 
-  if (prefs.check[CHECK_SUBPROTOS] || prefs.check[CHECK_PROTOS])
+  if (prefs.check[CHECK_SUBPSFPROTOS] || prefs.check[CHECK_PSFPROTOS]
+	|| prefs.check[CHECK_SUBPCPROTOS] || prefs.check[CHECK_PCPROTOS]
+	|| prefs.check[CHECK_PCOPROTOS])
     QFREE(checkmask);
 
   ndim = psf->poly->ndim;
@@ -131,7 +124,7 @@ psfstruct	*psf_load(char *filename)
    catstruct		*cat;
    tabstruct		*tab;
    keystruct		*key;
-   char			*head, *ci,*co, str[MAXCHAR];
+   char			*head, *ci,*co;
    int			ndim, dim[POLY_MAXDIM],
 			i,k;
 
@@ -148,21 +141,21 @@ psfstruct	*psf_load(char *filename)
   else
     strcpy(psf->name, filename);
 
-/* Look if a polynomial description of the PSF is available */
-  if (tab = name_to_tab(cat, "PSF_POLY", 0))
-    {
-/*-- So we have a variable PSF! */
+  if (!(tab = name_to_tab(cat, "PSF_DATA", 0)))
+    error(EXIT_FAILURE, "*Error*: PSF_DATA table not found in catalog ",
+	filename);
 
-    head = tab->headbuf;
+  head = tab->headbuf;
 
 /*-- Dimension of the polynomial */
-    if (fitsread(head, "POLNAXIS", &ndim, H_INT,T_LONG) != RETURN_OK)
-      goto headerror;
+  if (fitsread(head, "POLNAXIS", &ndim, H_INT,T_LONG) == RETURN_OK)
+    {
+/*-- So we have a polynomial description of the PSF variations */
     if (ndim > POLY_MAXDIM)
         {
-        sprintf(str, "*Error*: The POLNAXIS parameter in %s exceeds %d",
+        sprintf(gstr, "*Error*: The POLNAXIS parameter in %s exceeds %d",
 		psf->name, POLY_MAXDIM);
-        error(EXIT_FAILURE, str, "");
+        error(EXIT_FAILURE, gstr, "");
         }
 
     QMALLOC(psf->contextname, char *, ndim);
@@ -180,52 +173,54 @@ psfstruct	*psf_load(char *filename)
     for (i=0; i<ndim; i++)
       {
 /*---- Polynomial degrees */
-      sprintf(str, "POLAXIS%1d", i+1);
-      if (fitsread(head, str, &dim[i], H_INT,T_LONG) != RETURN_OK)
+      sprintf(gstr, "POLAXIS%1d", i+1);
+      if (fitsread(head, gstr, &dim[i], H_INT,T_LONG) != RETURN_OK)
         goto headerror;
 
 /*---- Contexts */
       QMALLOC(psf->contextname[i], char, 80);
-      sprintf(str, "POLNAME%1d", i+1);
-      if (fitsread(head,str,psf->contextname[i],H_STRING,T_STRING)!=RETURN_OK)
+      sprintf(gstr, "POLNAME%1d", i+1);
+      if (fitsread(head,gstr,psf->contextname[i],H_STRING,T_STRING)!=RETURN_OK)
         goto headerror;
-      if ((k = findkey(psf->contextname[i], (char *)objkey,
-		sizeof(keystruct)))==RETURN_ERROR)
+      if (*psf->contextname[i]==(char)':')
+/*------ It seems we're facing a FITS header parameter */
+        psf->context[i] = NULL;	/* This is to tell we'll have to load */
+				/* a FITS header context later on */
+      else
+/*------ The context element is a dynamic object parameter */
         {
-        sprintf(str, "*Error*: %s CONTEXT parameter in %s unknown",
+        if ((k = findkey(psf->contextname[i], (char *)objkey,
+		sizeof(keystruct)))==RETURN_ERROR)
+          {
+          sprintf(gstr, "*Error*: %s CONTEXT parameter in %s unknown",
 		psf->contextname[i], psf->name);
-        error(EXIT_FAILURE, str, "");
+          error(EXIT_FAILURE, gstr, "");
+          }
+        key = objkey+k;
+        psf->context[i] = key->ptr;
+        psf->contexttyp[i] = key->ttype;
+/*------ Declare the parameter "active" to trigger computation by SExtractor */
+        *((char *)key->ptr) = (char)'\1';
         }
-      key = objkey+k;
-      psf->context[i] = key->ptr;
-      psf->contexttyp[i] = key->ttype;
-/*---- Declare the parameter "active", to trigger computation by SExtractor */
-      *((char *)key->ptr) = (char)'\1';
-
 /*---- Scaling of the context parameter */
-      sprintf(str, "POLZERO%1d", i+1);
-      if (fitsread(head, str, &psf->contextoffset[i], H_EXPO, T_DOUBLE)
+      sprintf(gstr, "POLZERO%1d", i+1);
+      if (fitsread(head, gstr, &psf->contextoffset[i], H_EXPO, T_DOUBLE)
 		!=RETURN_OK)
         goto headerror;
-      sprintf(str, "POLSCAL%1d", i+1);
-      if (fitsread(head, str, &psf->contextscale[i], H_EXPO, T_DOUBLE)
+      sprintf(gstr, "POLSCAL%1d", i+1);
+      if (fitsread(head, gstr, &psf->contextscale[i], H_EXPO, T_DOUBLE)
 		!=RETURN_OK)
         goto headerror;
       }
 
     psf->poly = poly_init(dim, ndim);
-/*-- Load the PSF polynomial data */
-    key = read_key(tab, "POLY_COEFFS");
-    psf->poly->coeff = key->ptr;
-
-/*-- Don't touch my arrays!! */
-    blank_keys(tab);
 
 /*-- Update the permanent FLAG arrays (that is, perform an "OR" on them) */
     for (ci=(char *)&outobj,co=(char *)&flagobj,i=sizeof(objstruct); i--;)
       *(co++) |= *(ci++);
     for (ci=(char *)&outobj2,co=(char *)&flagobj2,i=sizeof(obj2struct); i--;)
       *(co++) |= *(ci++);
+
 /*-- Restore previous outobj contents */
     outobj = saveobj;
     outobj2 = saveobj2;
@@ -237,14 +232,6 @@ psfstruct	*psf_load(char *filename)
     psf->poly = poly_init(dim, 1);
     psf->context = NULL;
     }
-
-/* Now the PSF pixels themselves */
-  if (!(tab = name_to_tab(cat, "PSF_MASK", 0)))
-    error(EXIT_FAILURE, "*Error*: PSF_MASK table not found in catalog ",
-	filename);
-
-/* Load important scalars (which are stored as FITS keywords) */
-  head = tab->headbuf;
 
 /* Dimensionality of the PSF mask */
   if (fitsread(head, "PSFNAXIS", &psf->maskdim, H_INT, T_LONG) != RETURN_OK)
@@ -258,15 +245,25 @@ psfstruct	*psf_load(char *filename)
   psf->masknpix = 1;
   for (i=0; i<psf->maskdim; i++)
     {
-    sprintf(str, "PSFAXIS%1d", i+1);
-    if (fitsread(head, str, &psf->masksize[i], H_INT,T_LONG) != RETURN_OK)
+    sprintf(gstr, "PSFAXIS%1d", i+1);
+    if (fitsread(head, gstr, &psf->masksize[i], H_INT,T_LONG) != RETURN_OK)
       goto headerror;
     psf->masknpix *= psf->masksize[i];
     }
 
+/* PSF FWHM: defaulted to 3 pixels */
+ if (fitsread(head, "PSF_FWHM", &psf->fwhm, H_FLOAT,T_DOUBLE) != RETURN_OK)
+    psf->fwhm = 3.0;
+
+/* PSF oversampling: defaulted to 1 */
+  if (fitsread(head, "PSF_SAMP", &psf->pixstep,H_FLOAT,T_FLOAT) != RETURN_OK)
+    psf->pixstep = 1.0;
+
 /* Load the PSF mask data */
   key = read_key(tab, "PSF_MASK");
   psf->maskcomp = key->ptr;
+
+  psf->pc = pc_load(cat);
 
   QMALLOC(psf->maskloc, double, psf->masksize[0]*psf->masksize[1]);
 
@@ -282,6 +279,34 @@ headerror:
   }
 
 
+/***************************** psf_readcontext *******************************/
+/*
+Read the PSF context parameters in the FITS header.
+*/
+void	psf_readcontext(psfstruct *psf, picstruct *field)
+  {
+   static double	contextval[POLY_MAXDIM];
+   int			i, ndim;
+
+  ndim = psf->poly->ndim;
+  for (i=0; i<ndim; i++)
+    if (!psf->context[i])
+      {
+      psf->context[i] = &contextval[i];
+      psf->contexttyp[i] = T_DOUBLE;
+      if (fitsread(field->fitshead, psf->contextname[i]+1, &contextval[i],
+		H_FLOAT,T_DOUBLE) == RETURN_ERROR)
+        {
+        sprintf(gstr, "*Error*: %s parameter not found in the header of ",
+		psf->contextname[i]+1);
+        error(EXIT_FAILURE, gstr, field->rfilename);
+        }
+      }
+
+  return;
+  }
+
+
 /******************************** psf_fit ***********************************/
 void	psf_fit(psfstruct *psf, picstruct *field, picstruct *wfield,
 		objstruct *obj)
@@ -289,30 +314,63 @@ void	psf_fit(psfstruct *psf, picstruct *field, picstruct *wfield,
    checkstruct		*check;
    static double	x2[PSF_NPSF],y2[PSF_NPSF],xy[PSF_NPSF],sum[PSF_NPSF],
 			deltax[PSF_NPSF],deltay[PSF_NPSF],
-			sol[PSF_NA], covmat[PSF_NA*PSF_NA];
-   double		*d, *m, *w, *ps, *px, *py, *vmat,*wmat,
+			sol[PSF_NA], covmat[PSF_NA*PSF_NA],
+			vmat[PSF_NA*PSF_NA], wmat[PSF_NA];
+   double		*d, *m, *w, *ps, *px, *py,
 			dx,dy, x1,y1, mx2,my2,mxy,m0,pix, wsum,wthresh,val,
 			backnoise2, gain, radmin2,radmax2,satlevel, chi2;
-   float		*dh, *wh;
+   float		*dh, *wh,
+			pixstep;
    PIXTYPE		*cpix;
-   int			i,j,p, npix, ix,iy,niter;
+   int			i,j,p, npix, ix,iy,niter, width, height, hw,hh, x,y,yb;
 
+  pixstep = 1.0/psf->pixstep;
   gain = prefs.gain;
   backnoise2 = field->backsig*field->backsig;
   satlevel = prefs.satur_level - obj->bkg;
   wthresh = wfield?wfield->weight_thresh:BIG;
   radmin2 = PSF_MINSHIFT*PSF_MINSHIFT;
   radmax2 = PSF_MAXSHIFT*PSF_MAXSHIFT;
-  npix = PSF_NPIX;
+
+/* Scale fitting area with object "size" */
+  width = height
+	= (int)(1.0+sqrt((double)(obj->fdnpix>PSF_NA?obj->fdnpix:PSF_NA)));
+
+/* The minimum size is the average PSF FWHM (downsampled) */
+  if (width<psf_fwhm)
+    width = psf_fwhm;
+  if (height<psf_fwhm)
+    height = psf_fwhm;
+/* The maximum size is the downsampled PSF mask size */
+  if (width>psf_maxwidth)
+    width = psf_maxwidth;
+  if (height>psf_maxheight)
+    height = psf_maxheight;
+  npix = width*height;
+
+/* Initialize gradient image */
+  hw = (double)width/2;
+  hh = (double)height/2;
+  px = psfmaskx;
+  py = psfmasky;
+  for (y=0; y<height; y++)
+    {
+    yb = y-hh;
+    for (x=0; x<width; x++)
+      {
+      *(px++) = x-hw;
+      *(py++) = yb;
+      }
+    }
   ix = (int)(obj->mx+0.4999);
   iy = (int)(obj->my+0.4999);
-  copyimage(field, datah, PSF_WIDTH, PSF_HEIGHT, ix, iy);
+  copyimage(field, datah, width, height, ix, iy);
 
 /* Compute weights */
   wsum = 0.0;
   if (wfield)
     {
-    copyimage(wfield, weighth, PSF_WIDTH, PSF_HEIGHT, ix, iy);
+    copyimage(wfield, weighth, width, height, ix, iy);
     for (wh=weighth ,w=weight, p=npix; p--;)
       wsum += (*(w++) = (pix=*(wh++))<wthresh? sqrt(pix): 0.0);
     }
@@ -344,7 +402,10 @@ void	psf_fit(psfstruct *psf, picstruct *field, picstruct *wfield,
 
 /* Initialize PSF shifts */
   for (j=0; j<PSF_NPSF; j++)
-    deltax[j] =deltay[j] = 0.0;
+    {
+    deltax[j] = (obj->mx - ix);
+    deltay[j] = (obj->my - iy);
+    }
 
   niter = 0;
   for (i=0; i<PSF_NITER; i++)
@@ -355,7 +416,9 @@ void	psf_fit(psfstruct *psf, picstruct *field, picstruct *wfield,
       {
       dx = deltax[j];
       dy = deltay[j];
-      psf_shift(psf, psfmasks, PSF_WIDTH, PSF_HEIGHT, dx, dy);
+      vignet_resample(psf->maskloc, psf->masksize[0], psf->masksize[1],
+			psfmasks, width, height, -dx*pixstep, -dy*pixstep,
+			pixstep);
 /*---- 0th order (weighted) */
       ps = psfmasks;
       w = weight;
@@ -390,7 +453,9 @@ void	psf_fit(psfstruct *psf, picstruct *field, picstruct *wfield,
       xy[j] = mxy;
       sum[j] = m0;
       }
-    svdfit(mat, data, npix, PSF_NA, sol, &vmat, &wmat);
+
+    svdfit(mat, data, npix, PSF_NA, sol, vmat, wmat);
+
 /*-- Update the PSF shifts */
     for (j=0; j<PSF_NPSF; j++)
       {
@@ -407,7 +472,8 @@ void	psf_fit(psfstruct *psf, picstruct *field, picstruct *wfield,
 
   dx = deltax[0];
   dy = deltay[0];
-  psf_shift(psf, psfmasks, PSF_WIDTH, PSF_HEIGHT, dx, dy);
+  vignet_resample(psf->maskloc, psf->masksize[0], psf->masksize[1],
+		psfmasks, width, height, -dx*pixstep, -dy*pixstep, pixstep);
   obj2->flux_psf = sol[0];
   obj2->x_psf = ix+dx+1.0;
   obj2->y_psf = iy+dy+1.0;
@@ -488,18 +554,47 @@ void	psf_fit(psfstruct *psf, picstruct *field, picstruct *wfield,
       }
     }
 
-  if (prefs.check[CHECK_SUBPROTOS] || prefs.check[CHECK_PROTOS])
+  if (prefs.check[CHECK_SUBPSFPROTOS] || prefs.check[CHECK_PSFPROTOS])
     for (j=0; j<PSF_NPSF; j++)
       {
       cpix = checkmask;
       ps = psfmasks;
       for (p=npix; p--;)
         *(cpix++) = (PIXTYPE)*(ps++);
-      if (check = prefs.check[CHECK_SUBPROTOS])
-        addcheck(check, checkmask,PSF_WIDTH,PSF_HEIGHT,ix,iy,-obj2->flux_psf);
-      if (check = prefs.check[CHECK_PROTOS])
-        addcheck(check, checkmask,PSF_WIDTH,PSF_HEIGHT,ix,iy,obj2->flux_psf);
+      if (check = prefs.check[CHECK_SUBPSFPROTOS])
+        addcheck(check, checkmask, width,height, ix,iy,-obj2->flux_psf);
+      if (check = prefs.check[CHECK_PSFPROTOS])
+        addcheck(check, checkmask, width,height, ix,iy,obj2->flux_psf);
       }
+
+  if (FLAG(obj2.mx2_pc))
+    {
+    width = psf_maxwidth-1;
+    height = psf_maxheight-1;
+    npix = width*height;
+    copyimage(field, datah, width, height, ix, iy);
+
+/*-- Re-compute weights */
+    if (wfield)
+      {
+      copyimage(wfield, weighth, width, height, ix, iy);
+      for (wh=weighth ,w=weight, p=npix; p--;)
+        *(w++) = (pix=*(wh++))<wthresh? sqrt(pix): 0.0;
+      }
+    else
+      for (w=weight, dh=datah, p=npix; p--;)
+        *(w++) = ((pix = *(dh++))>-BIG && pix<satlevel)?
+		1.0/sqrt(backnoise2+(pix>0.0?pix/gain:0.0))
+		:0.0;
+
+/*-- Weight the data */
+    dh = datah;
+    d = data;
+    w = weight;
+    for (p=npix; p--;)
+      *(d++) = *(dh++)*(*(w++));
+    pc_fit(psf, data, weight, width, height, ix,iy, dx,dy, npix);
+    }
 
   return;
   }
@@ -517,16 +612,16 @@ void	psf_build(psfstruct *psf)
    int		i,n,p, ndim, npix;
 
   npix = psf->masksize[0]*psf->masksize[1];
+
 /* Reset the Local PSF mask */
-  memset(psf->maskloc, 0.0, npix*sizeof(double));
+  memset(psf->maskloc, 0, npix*sizeof(double));
 
 /* Grab the context vector */
   ndim = psf->poly->ndim;
   for (i=0; i<ndim; i++)
-    {
     pos[i] = (*(double *)ttypeconv(psf->context[i],psf->contexttyp[i],T_DOUBLE)
 	- psf->contextoffset[i]) / psf->contextscale[i];
-    }
+
   poly_func(psf->poly, pos);
 
   basis = psf->poly->basis;
@@ -545,188 +640,6 @@ void	psf_build(psfstruct *psf)
   }
 
 
-/******************************* psf_shift **********************************/
-/*
-Shift the PSF from an arbitrary amount.
-*/
-int	psf_shift(psfstruct *psf, double *pix2, int w2, int h2,
-		double dx, double dy)
-  {
-   double	*mask,*maskt, *pix1, *pix12, *pixin,*pixin0, *pixout,*pixout0,
-		xc1,xc2,yc1,yc2, xs1,ys1, x1,y1, x,y, dxm,dym,
-		val,step2;
-   int		i,j,k,n,t, *start,*startt, *nmask,*nmaskt,
-		ixs2,iys2, ix2,iy2, dix2,diy2, nx2,ny2, iys1a, ny1, hmw,hmh,
-		ix,iy, ix1,iy1,w1,h1;
-
-  step2 = 1.0;
-  pix1 = psf->maskloc;
-  w1 = psf->masksize[0];
-  h1 = psf->masksize[1];
-
-  xc1 = (double)((w1-1)/2);	/* Im1 center x-coord*/
-  xc2 = (double)((w2-1)/2);	/* Im2 center x-coord*/
-  xs1 = xc1 - dx - xc2*step2;	/* Im1 start x-coord */
-  if ((int)xs1 >= w1)
-    return RETURN_ERROR;
-  ixs2 = 0;			/* Int part of Im2 start x-coord */
-  if (xs1<0.0)
-    {
-    dix2 = (int)(1-xs1/step2);
-/*-- Simply leave here if the images do not overlap in x */
-    if (dix2 >= w2)
-      return RETURN_ERROR;
-    ixs2 += dix2;
-    xs1 += dix2*step2;
-    }
-  nx2 = (int)((w1-xs1)/step2);/* nb of interpolated Im2 pixels along x */
-  if (nx2>(ix2=w2-ixs2))
-    nx2 = ix2;
-  yc1 = (double)((h1-1)/2);	/* Im1 center y-coord */
-  yc2 = (double)((h2-1)/2);	/* Im2 center y-coord */
-  ys1 = yc1 - dy - yc2*step2;	/* Im1 start y-coord */
-  if ((int)ys1 >= h1)
-    return RETURN_ERROR;
-  iys2 = 0;			/* Int part of Im2 start y-coord */
-  if (ys1<0.0)
-    {
-    diy2 = (int)(1-ys1/step2);
-/*-- Simply leave here if the images do not overlap in y */
-    if (diy2 >= h2)
-      return RETURN_ERROR;
-    iys2 += diy2;
-    ys1 += diy2*step2;
-    }
-  ny2 = (int)((h1-ys1)/step2);/* nb of interpolated Im2 pixels along y */
-  if (ny2>(iy2=h2-iys2))
-    ny2 = iy2;
-
-/* Set the yrange for the x-resampling with some margin for interpolation */
-  iys1a = (int)ys1;		/* Int part of Im1 start y-coord with margin */
-  hmh = INTERPH/2 - 1;		/* Interpolant start */
-  if (iys1a<0 || ((iys1a -= hmh)< 0))
-    iys1a = 0;
-  ny1 = (int)(ys1+ny2*step2)+INTERPW-hmh;	/* Interpolated Im1 y size */
-  if (ny1>h1)					/* with margin */
-    ny1 = h1;
-/* Express everything relative to the effective Im1 start (with margin) */
-  ny1 -= iys1a;
-  ys1 -= (double)iys1a;
-
-/* Allocate interpolant stuff for the x direction */
-  QMALLOC(mask, double, nx2*INTERPW);	/* Interpolation masks */
-  QMALLOC(nmask, int, nx2);		/* Interpolation mask sizes */
-  QMALLOC(start, int, nx2);		/* Int part of Im1 conv starts */
-/* Compute the local interpolant and data starting points in x */
-  hmw = INTERPW/2 - 1;
-  x1 = xs1;
-  maskt = mask;
-  nmaskt = nmask;
-  startt = start;
-  for (j=nx2; j--; x1+=step2)
-    {
-    ix = (ix1=(int)x1) - hmw;
-    dxm = ix1 - x1 - hmw;	/* starting point in the interpolation func */
-    if (ix < 0)
-      {
-      n = INTERPW+ix;
-      dxm -= (double)ix;
-      ix = 0;
-      }
-    else
-      n = INTERPW;
-    if (n>(t=w1-ix))
-      n=t;
-    *(startt++) = ix;
-    *(nmaskt++) = n;
-    for (x=dxm, i=n; i--; x+=1.0)
-      *(maskt++) = INTERPF(x);
-    }
-
-  QCALLOC(pix12, double, nx2*ny1);	/* Intermediary frame-buffer */
-
-/* Make the interpolation in x (this includes transposition) */
-  pixin0 = pix1+iys1a*w1;
-  pixout0 = pix12;
-  for (k=ny1; k--; pixin0+=w1, pixout0++)
-    {
-    maskt = mask;
-    nmaskt = nmask;
-    startt = start;
-    pixout = pixout0;
-    for (j=nx2; j--; pixout+=ny1)
-      {
-      pixin = pixin0+*(startt++);
-      val = 0.0; 
-      for (i=*(nmaskt++); i--;)
-        val += *(maskt++)**(pixin++);
-      *pixout = val;
-      }
-    }
-
-/* Reallocate interpolant stuff for the y direction */
-  QREALLOC(mask, double, ny2*INTERPH);	/* Interpolation masks */
-  QREALLOC(nmask, int, ny2);		/* Interpolation mask sizes */
-  QREALLOC(start, int, ny2);		/* Int part of Im1 conv starts */
-
-/* Compute the local interpolant and data starting points in y */
-  hmh = INTERPH/2 - 1;
-  y1 = ys1;
-  maskt = mask;
-  nmaskt = nmask;
-  startt = start;
-  for (j=ny2; j--; y1+=step2)
-    {
-    iy = (iy1=(int)y1) - hmh;
-    dym = iy1 - y1 - hmh;	/* starting point in the interpolation func */
-    if (iy < 0)
-      {
-      n = INTERPH+iy;
-      dym -= (double)iy;
-      iy = 0;
-      }
-    else
-      n = INTERPH;
-    if (n>(t=ny1-iy))
-      n=t;
-    *(startt++) = iy;
-    *(nmaskt++) = n;
-    for (y=dym, i=n; i--; y+=1.0)
-      *(maskt++) = INTERPF(y);
-    }
-
-/* Initialize destination buffer to zero */
-  memset(pix2, 0, w2*h2*sizeof(double));
-
-/* Make the interpolation in y  and transpose once again */
-  pixin0 = pix12;
-  pixout0 = pix2+ixs2+iys2*w2;
-  for (k=nx2; k--; pixin0+=ny1, pixout0++)
-    {
-    maskt = mask;
-    nmaskt = nmask;
-    startt = start;
-    pixout = pixout0;
-    for (j=ny2; j--; pixout+=w2)
-      {
-      pixin = pixin0+*(startt++);
-      val = 0.0; 
-      for (i=*(nmaskt++); i--;)
-        val += *(maskt++)**(pixin++);
-      *pixout = val;
-      }
-    }
-
-/* Free memory */
-  free(pix12);
-  free(mask);
-  free(nmask);
-  free(start);
-
-  return RETURN_OK;
-  }
-
-
 /******************************** svdfit ************************************/
 /*
 General least-square fit A.x = b, based on Singular Value Decomposition (SVD).
@@ -734,7 +647,7 @@ Loosely adapted from Numerical Recipes in C, 2nd Ed. (p. 671).
 Note: the a and v matrices are transposed with respect to the N.R. convention.
 */
 void svdfit(double *a, double *b, int m, int n, double *sol,
-	double **vout, double **wout)
+	double *vmat, double *wmat)
   {
 #define MAX(a,b) (maxarg1=(a),maxarg2=(b),(maxarg1) > (maxarg2) ?\
         (maxarg1) : (maxarg2))
@@ -745,20 +658,20 @@ void svdfit(double *a, double *b, int m, int n, double *sol,
 #define	TOL		1.0e-11
 
    int			flag,i,its,j,jj,k,l,nm,mmi,nml;
-   static double	rv1[PSF_NA], tmp[PSF_NA], vmat[PSF_NA*PSF_NA],
-			wmat[PSF_NA];
    double		c,f,h,s,x,y,z,
 			anorm, g, scale,
 			at,bt,ct,maxarg1,maxarg2,
 			thresh, wmax,
 			*w,*ap,*ap0,*ap1,*ap10,*rv1p,*vp,*vp0,*vp1,*vp10,
-			*bp,*tmpp;
+			*bp,*tmpp, *rv1,*tmp;
 
   anorm = g = scale = 0.0;
   if (m < n)
     error(EXIT_FAILURE, "*Error*: Not enough rows for solving the system ",
 	"in svdfit()");
   
+  QMALLOC(rv1, double, n);
+  QMALLOC(tmp, double, n);
   for (i=0;i<n;i++)
     {
     l = i+1;
@@ -1045,11 +958,9 @@ void svdfit(double *a, double *b, int m, int n, double *sol,
     sol[j]=s;
     }
 
-/* Return pointers to the vmat and wmat matrices if requested (for covar.) */
-  if (vout)
-    *vout = vmat;
-  if (wout)
-    *wout = wmat;
+/* Free temporary arrays */
+  free(tmp);
+  free(rv1);
 
   return;
   }

@@ -9,7 +9,7 @@
 *
 *	Contents:	functions dealing with the handling of pixel lists.
 *
-*	Last modify:	28/05/98
+*	Last modify:	30/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -30,7 +30,7 @@ INPUT   objlist number,
 OUTPUT  RETURN_OK if success, RETURN_FATAL_ERROR otherwise (memory overflow).
 NOTES   -.
 AUTHOR  E. Bertin (IAP & Leiden & ESO)
-VERSION 21/10/97
+VERSION 30/11/98
  ***/
 int	createblank(objliststruct *objlist, int no)
 
@@ -59,7 +59,10 @@ int	createblank(objliststruct *objlist, int no)
   if (dflag)
     {
     if (!(obj->dblank = dpix = (PIXTYPE *)malloc(n*sizeof(PIXTYPE))))
+      {
+      free(pix);
       return RETURN_FATAL_ERROR;
+      }
     pt = dpix;
     for (i=n; i--;)
       *(pt++) = -BIG;

@@ -9,7 +9,7 @@
 *
 *	Contents:	functions for input of image data.
 *
-*	Last modify:	27/07/98
+*	Last modify:	28/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -37,7 +37,7 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
   {
    checkstruct	*check;
    int		y, w, flags, interpflag;
-   PIXTYPE	*data, *wdata, *rmsdata, *checklinebuf;
+   PIXTYPE	*data, *wdata, *rmsdata;
 
   w = field->width;
   flags = field->flags;
@@ -93,12 +93,18 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
               writecheck(check, data, w);
             if (check = prefs.check[CHECK_APERTURES])
               writecheck(check, data, w);
-            if (check = prefs.check[CHECK_SUBPROTOS])
+            if (check = prefs.check[CHECK_SUBPSFPROTOS])
+              writecheck(check, data, w);
+            if (check = prefs.check[CHECK_SUBPCPROTOS])
+              writecheck(check, data, w);
+            if (check = prefs.check[CHECK_PCOPROTOS])
               writecheck(check, data, w);
             }
-          else if ((check = prefs.check[CHECK_BACKRMS])
-		&& (flags & (WEIGHT_FIELD|VAR_FIELD|RMS_FIELD|BACKRMS_FIELD)))
-            writecheck(check, data, w);
+          else if ((flags&DETECT_FIELD) && (check=prefs.check[CHECK_BACKRMS]))
+            {
+            backrmsline(field, y, (PIXTYPE *)check->pix);
+            writecheck(check, check->pix, w);
+            }
           }
         }
       }
@@ -152,12 +158,18 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
             writecheck(check, data, w);
           if (check = prefs.check[CHECK_APERTURES])
             writecheck(check, data, w);
-          if (check = prefs.check[CHECK_SUBPROTOS])
+          if (check = prefs.check[CHECK_SUBPSFPROTOS])
+            writecheck(check, data, w);
+          if (check = prefs.check[CHECK_SUBPCPROTOS])
+            writecheck(check, data, w);
+          if (check = prefs.check[CHECK_PCOPROTOS])
             writecheck(check, data, w);
           }
-        else if ((check = prefs.check[CHECK_BACKRMS])
-		&& (flags & (WEIGHT_FIELD|VAR_FIELD|RMS_FIELD|BACKRMS_FIELD)))
-          writecheck(check, data, w);
+        else if ((flags&DETECT_FIELD) && (check=prefs.check[CHECK_BACKRMS]))
+          {
+          backrmsline(field, y, (PIXTYPE *)check->pix);
+          writecheck(check, check->pix, w);
+          }
         }
       }
     else
@@ -537,7 +549,7 @@ extract some data from the FITS-file header
 */
 void	readimagehead(picstruct *field)
   {
-   int		i,j,l, n;
+   int		j,l, n;
    char		*buf, st[80], str[80], *point;
 
 /* Open the file */

@@ -9,7 +9,7 @@
 *
 *	Contents:	Polynomial fitting
 *
-*	Last modify:	16/07/98
+*	Last modify:	28/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -154,7 +154,7 @@ double	poly_func(polystruct *poly, double *pos)
 
 
 /****** poly_fit *************************************************************
-PROTO   double poly_fit(polystruct *poly, double *x, double *y, double *w,
+PROTO   void poly_fit(polystruct *poly, double *x, double *y, double *w,
         int ndata, double *extbasis)
 PURPOSE Least-Square fit of a multidimensional polynom to weighted data.
 INPUT   polystruct pointer,
@@ -169,9 +169,9 @@ NOTES   If different from NULL, extbasis can be provided to store the
         precomputed basis functions stored in extbasis are used (which saves
         CPU).
 AUTHOR  E. Bertin (IAP, Leiden observatory & ESO)
-VERSION 03/07/98
+VERSION 28/11/98
  ***/
-double	poly_fit(polystruct *poly, double *x, double *y, double *w, int ndata,
+void	poly_fit(polystruct *poly, double *x, double *y, double *w, int ndata,
 		double *extbasis)
   {
    double	*alpha,*alphat, *beta,*betat, *basis,*basis1,*basis2, *coeff,

@@ -73,7 +73,7 @@ int	get_head(tabstruct *tab)
   }
 
 
-/****** read_fitsbasic *********************************************************
+/****** readbasic_head *********************************************************
 PROTO	void readbasic_head(tabstruct *tab)
 PURPOSE	Read the current FITS header basic keywords.
 INPUT	pointer to catstruct.
