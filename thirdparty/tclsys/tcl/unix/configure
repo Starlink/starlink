@@ -10019,7 +10019,7 @@ fi
 	    SHLIB_LD="${CC} -shared"
 	    DL_OBJS="tclLoadDl.o"
 	    DL_LIBS="-ldl"
-	    LD_FLAGS="${LDFLAGS}-rdynamic"
+	    LD_FLAGS="${LDFLAGS} -rdynamic"
 	    LD_SEARCH_FLAGS=""
 	else
 	    if test "${ac_cv_header_dld_h+set}" = set; then
