@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-dist_bin_SCRIPTS = dcv_link dcv_link_adam generic fgeneric
+dist_bin_SCRIPTS = dcv_link dcv_link_adam generic
 
 lib_LTLIBRARIES = libdcv.la
 nodist_libdcv_la_SOURCES = dcv_ttoub.f dcv_ttouw.f
@@ -34,7 +34,12 @@ DCV_FUN: DCV_FUN.fpp
 
 BUILT_SOURCES = DCV_FUN
 
-# fgeneric needs to be made as a soft link.
-fgeneric: generic
-	  $(LN_S) generic fgeneric
-        
+# fgeneric needs to be made as a soft link to generic on install.
+install-exec-local:
+	cd $(DESTDIR)$(bindir); \
+	rm -f fgeneric; \
+	echo $(LN_S) generic fgeneric; \
+	$(LN_S) generic fgeneric; \
+	if test -n "$$MANIFEST_FD"; then \
+	   echo "$(DESTDIR)$(bindir)/fgeneric" >&$${MANIFEST_FD-0}; \
+	else :; fi;
