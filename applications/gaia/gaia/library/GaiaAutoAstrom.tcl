@@ -95,6 +95,30 @@ itcl::class gaia::GaiaAutoAstromSimple {
          -accelerator {Control-a}
       bind $w_ <Control-a> [code $this accept]
 
+      #  Options menu.
+      set Options [add_menubutton "Options" left]
+      configure_menubutton Options -underline 0
+
+      #  Whether to show verbose output from AUTOASTROM.
+      $Options add checkbutton -label {Verbose log} \
+         -variable [scope values_(verbose)] \
+         -onvalue 1 \
+         -offvalue 0
+      $short_help_win_ add_menu_short_help $Options \
+         {Verbose log} \
+         {Show verbose output from AUTOASTROM}
+      set values_(verbose) 0
+
+      #  Whether to keep any temporary files.
+      $Options add checkbutton -label {Keep temps} \
+         -variable [scope values_(keeptemps)] \
+         -onvalue 1 \
+         -offvalue 0
+      $short_help_win_ add_menu_short_help $Options \
+         {Keep temps} \
+         {Keep temporary files created by AUTOASTROM (debug only)}
+      set values_(keeptemps) 0
+
       #  Add window help.
       add_help_button astrometry "Astrometry Overview..."
       add_help_button autoastromsimple "On Window..."
@@ -372,6 +396,20 @@ itcl::class gaia::GaiaAutoAstromSimple {
             } else {
                set fitopts "--maxfit=9"; # or maybe 7.
             }
+            
+            #  Verbosity
+            if { $values_(verbose) } {
+               set verbosity "--verbose"
+            } else {
+               set verbosity "--noverbose"
+            }
+
+            #  Keep temporary files (debugging).
+            if { $values_(keeptemps) } {
+               set keeptemps "--keeptemps"
+            } else {
+               set keeptemps "--nokeeptemps"
+            }
 
             #  Run program, monitoring output...
 
@@ -379,20 +417,26 @@ itcl::class gaia::GaiaAutoAstromSimple {
                $wcssource \
                --match=match \
                --skycatconfig=$env(CATLIB_CONFIG) \
-               --catalogue=$values_(refcat) \
+               --catalogue=temp.TAB \
                --noinsert \
                --keepfits=$solution_ \
                --temp=autoastrom_tmp \
                --matchcatalogue=$solution_catalogue_ \
                --nomessages \
                $fitopts \
+               $verbosity \
+               $keeptemps \
+               --bestfitlog=$bestfitlog_ \
                $diskimage"
 
+            # --catalogue=$values_(refcat) \
             #  Use local SExtractor catalogue...
             #--xxxccdcat=ngc1275.autoext
             puts "Running: $cmd"
             catch {eval $cmd} msg
-            puts "msg = $msg"
+            if { "$msg" != "" && "$msg" != "0" } { 
+               warning_dialog "$msg"
+            }
          }
       }
    }
@@ -400,6 +444,11 @@ itcl::class gaia::GaiaAutoAstromSimple {
    protected method completed_ {} {
       puts "Completed"
       if { [file exists $solution_] } {
+
+         #  Report the best fit parameters.
+         if { [file exists $bestfitlog_] } {
+            report_bestfit_
+         }
 
          #  Need to read the file to extract the solution so GAIA can
          #  display this. Simplest thing to do is read as a new image
@@ -414,6 +463,64 @@ itcl::class gaia::GaiaAutoAstromSimple {
       } else {
          error_dialog "Failed to determine a solution"
       }
+   }
+
+   #  Make a report about the best fit to the status window.
+   protected method report_bestfit_ {} {
+      $itk_component(status) insert end ""
+      $itk_component(status) insert end "Attempted Solutions"
+      $itk_component(status) insert end "-------------------"
+      set fid [::open $bestfitlog_ "r"]
+      set ok 1
+      set nlines 0
+      while { [::gets $fid line] > -1 && $ok } {
+         if { [string match "ASTROM:*" $line] } {
+            if { [string match "ASTROM: best fit*" $line] } {
+               set ok 0
+            }
+            continue
+         }
+         if { $nlines == 0 } {
+            set t1 "Parameters"
+            set t2 "Plate Centre"
+            set t3 "RMS"
+            set t4 "Q"
+         } else {
+            puts "line = $line"
+            lassign "$line" n t1 ra dec t3 t4 fits
+            puts "n=$n, t1=$t1"
+            puts "ra=$ra, dec=$dec t3=$t3, t4=$t4, fits=$fits"
+            set t2 "$ra $dec"
+
+         }
+
+         if { $t1 != "NO" } {
+            set line [format "%-12s %-20s %-6s %-4s" $t1 $t2 $t3 $t4]
+            $itk_component(status) insert end $line
+         }
+         incr nlines
+      }
+      
+      #  Get rest of file as parsed arrays of parameter names and values.
+      set nlines 0
+      while { [::gets $fid line] > -1 } {
+         set line [clean_ $line]
+         lassign "$line" param delim value
+         set params($param) $value
+      }
+      ::close $fid
+
+      $itk_component(status) insert end ""
+      $itk_component(status) insert end "Best Fit Parameters"
+      $itk_component(status) insert end "-------------------"
+
+      #  Match these against those we can describe and write them out.
+      foreach {name desc} "$pnames_" {
+         if { [info exists params($name)] } {
+            $itk_component(status) insert end "$name = $params($name)  / $desc"
+         }
+      }
+      $itk_component(status) see end
    }
 
    #  Do the notify_cmd option if needed.
@@ -529,6 +636,27 @@ itcl::class gaia::GaiaAutoAstromSimple {
    #  catalogue.
    protected variable astrocatname_ {}
 
+   #  Names of any parameters that we want to report from AUTOASTROM best
+   #  fit log file and their descriptions as pairs (use foreach name desc).
+   protected variable pnames_ { 
+      "nstars"    "no. ref stars"
+      "rrms"      "radial rms, arcsec"
+      "xrms"      "x-axis rms, arcsec"
+      "yrms"      "y-axis, rms arcsec"
+      "plate"     "plate scale (mean), arcsec"
+      "prms"      "radial rms, pixels"
+      "nterms"    "no. terms in fit"
+      "rarad"     "projection pole Dec, radians"
+      "decrad"    "projection pole RA, radians"
+      "rasex"     "projection pole RA, sexagesimal"
+      "decsex"    "projection pole Dec, sexagesimal"
+      "q"         "radial distortion, (rad^{-2})"
+      "deltaq"    "change in radial distortion"
+      "deltaqsd"  "standard deviation of change in radial distortion"
+      "deltapc"   "change in plate centre"
+      "deltapcsd" "standard deviation of change in plate centre"
+   }
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
@@ -537,6 +665,9 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
    #  Name of file to store the catalogue of positions used in fit.
    common solution_catalogue_ GaiaAutoAstSolutionPos.ASC
+
+   #  Name of file to store the best fit parameters.
+   common bestfitlog_ GaiaAutoAstromFit.Log
 
    # C++ astrocat object used here to access catalog entries
    common astrocat_ [astrocat ::gaia::.cat]
