@@ -47,7 +47,7 @@ CSOURCES = spaef.c  spaeh.c  spaej.c  spaek.c
 
 # These are the external include files
 # They will be deleted by make clean (they are soft links).
-EXTERNAL_INCLUDES = FLAGCOMM SAE_PAR
+EXTERNAL_INCLUDES = FLAGCOMM SAE_PAR PSX_ERR
 
 
 # These are the actual private include files that are archived.
@@ -100,6 +100,7 @@ specx_vms.tar: $(SOURCE)
 
 FLAGCOMM:       ${SPX_INC}/flagcomm.inc;   $(LINK) $? $@
 SAE_PAR:        $(STAR_INC)/sae_par;       $(LINK) $? $@
+PSX_ERR:        $(STAR_INC)/psx_err;       $(LINK) $? $@
 
 #  Object file dependencies on include files (or links to those include
 #  files).
@@ -110,4 +111,4 @@ spack.o: SAE_PAR
 spacl.o: SAE_PAR
 spaeg.o: SAE_PAR
 vms_date.o: SAE_PAR
-sysdep.o: SAE_PAR
+sysdep.o: SAE_PAR PSX_ERR
