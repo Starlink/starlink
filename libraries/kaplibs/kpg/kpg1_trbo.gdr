@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_TRBOR( NDIMI, LBND, UBND, TRID, NDIMO, COMIN,
+      SUBROUTINE KPG1_TRBO<T>( NDIMI, LBND, UBND, TRID, NDIMO, COMIN,
      :                         COMAX, STATUS )
 *+
 *  Name:
@@ -94,14 +94,14 @@
  
 *  Arguments Given:
       INTEGER NDIMI
-      REAL LBND( NDIMI )
-      REAL UBND( NDIMI )
+      <TYPE> LBND( NDIMI )
+      <TYPE> UBND( NDIMI )
       INTEGER TRID
       INTEGER NDIMO
  
 *  Arguments Returned:
-      REAL COMIN( NDIMO )
-      REAL COMAX( NDIMO )
+      <TYPE> COMIN( NDIMO )
+      <TYPE> COMAX( NDIMO )
  
 *  Status:
       INTEGER  STATUS          ! Global status
@@ -115,8 +115,8 @@
       PARAMETER ( MAXPTS = NPOINT ** NDF__MXDIM )
  
 *  Local Variables:
-      REAL BOUNDI( MAXPTS, NDF__MXDIM ) ! Input co-ordinates
-      REAL BOUNDO( MAXPTS, NDF__MXDIM ) ! Output co-ordinates
+      <TYPE> BOUNDI( MAXPTS, NDF__MXDIM ) ! Input co-ordinates
+      <TYPE> BOUNDO( MAXPTS, NDF__MXDIM ) ! Output co-ordinates
       INTEGER EL               ! Number of elements in the output array
       LOGICAL END              ! True if a new box has been found
                                ! or there are no more boxes to sum
@@ -130,7 +130,7 @@
                                ! transformation
       INTEGER OFFSET           ! Offset within the first dimension
                                ! of the output array
-      REAL STEP( NDF__MXDIM ) ! Increments of the input co-ordinates
+      <TYPE> STEP( NDF__MXDIM ) ! Increments of the input co-ordinates
       INTEGER STRID( NDF__MXDIM ) ! Dimension strides for co-ords array
  
 *  Internal References:
@@ -174,7 +174,7 @@
 *  ==============================
       DO IAXIS = 1, NDIMI
          STEP( IAXIS ) = ( UBND( IAXIS ) - LBND( IAXIS ) ) /
-     :                   NUM_ITOR( NPOINT - 1 )
+     :                   NUM_ITO<T>( NPOINT - 1 )
       END DO
  
 *  Initialise the input co-ordinates for the first point at the lower
@@ -272,7 +272,7 @@
  
 *   Convert the co-ordinates for those of the output array, to those
 *   of the input array.
-      CALL TRN_TRNR( .FALSE., MAXPTS, NCOUT, EL, BOUNDI,
+      CALL TRN_TRN<T>( .FALSE., MAXPTS, NCOUT, EL, BOUNDI,
      :                 TRID, MAXPTS, NCIN, BOUNDO, STATUS )
  
 *   Might as well exit if something has gone wrong performing the
@@ -284,13 +284,13 @@
       DO IAXIS = 1, NDIMO
  
 *   Initialise the minimum and maximum values to the opposite extremes.
-         COMIN( IAXIS ) = VAL__MAXR
-         COMAX( IAXIS ) = VAL__MINR
+         COMIN( IAXIS ) = VAL__MAX<T>
+         COMAX( IAXIS ) = VAL__MIN<T>
  
 *   Find the minimum and maximum of the test points in the output
 *   co-ordinate system.
          DO I = 1, EL
-            IF ( BOUNDO( I, IAXIS ) .NE. VAL__BADR ) THEN
+            IF ( BOUNDO( I, IAXIS ) .NE. VAL__BAD<T> ) THEN
                COMIN( IAXIS ) = MIN( COMIN( IAXIS ),
      :                               BOUNDO( I, IAXIS ) )
                COMAX( IAXIS ) = MAX( COMAX( IAXIS ),
