@@ -325,8 +325,8 @@ install-exec-local: libast.la
 	cd $(DESTDIR)$(libdir) && \
 		rm -f libast_pass2.a && \
 		$(LN_S) $(DESTDIR)$(libdir)/libast.a libast_pass2.a
-	if test -n "$$MANIFEST_FILE"; then \
-	    echo "$(DESTDIR)$(libdir)/libast_pass2.a" >>$$MANIFEST_FILE; \
+	if test -n "$$MANIFEST_FD"; then \
+	    echo "$(DESTDIR)$(libdir)/libast_pass2.a" >>&$${MANIFEST_FD-0}; \
 	fi
 
 # Make pre-distribution files.  These are files which are required for
