@@ -94,6 +94,7 @@
 
 *  Arguments Given:
       CHARACTER*(*)		NAMES
+      INTEGER			IFIRST, N
 
 *  Status:
       INTEGER 			STATUS             	! Global status
