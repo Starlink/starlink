@@ -97,7 +97,7 @@
 *  Arguments Given:
       INTEGER			NX, NY, KNX, KNY
       REAL			IN(NX,NY),
-     :                          KERN(-KNX/2:KNX/2,-KNY:2,KNY/2)
+     :                          KERN(-KNX/2:KNX/2,-KNY/2:KNY/2)
 
 *  Arguments Returned:
       REAL			OUT(NX,NY)
