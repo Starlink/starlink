@@ -26,7 +26,7 @@
 
       INCLUDE 'grecom.inc'
       INCLUDE 'GKS_PAR'
-      INCLUDE 'grerr'
+      INCLUDE 'PGP_ERR'
 
       
       IF (GRCIDE.LE.0) THEN

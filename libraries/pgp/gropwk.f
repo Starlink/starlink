@@ -34,7 +34,7 @@
 
       INCLUDE 'GKS_ERR'
 
-      INCLUDE 'grerr'
+      INCLUDE 'PGP_ERR'
 
       INCLUDE 'SAE_PAR'
 

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="pgp">
+  <version>5.1.1-9</version>
+  <path>libraries/pgp</path>
+  <description>PGPLOT Graphics Subroutine Library (GKS version)q</description>
+  <abstract><p>
+  GKS implementation of the PGPLOT graphics library.
+  </p></abstract>
+  <dependencies >
+    <build>sae</build><build>gks</build><link>gks</link><link>gns</link><link>psx</link><link>err</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Pearson</name>
+      <uname>tjp</uname>
+    </person>
+    <person>
+      <name>Dave Terrett</name>
+      <uname>dlt</uname>
+    </person>
+  </developers>
+  <documentation> sun15</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

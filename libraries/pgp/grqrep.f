@@ -16,7 +16,7 @@
 *   D.L.Terrett  Starlink  Dec 1990
 *+
       IMPLICIT NONE
-      INCLUDE 'grerr'
+      INCLUDE 'PGP_ERR'
 
 
       CHARACTER*(*) ROUT, GKROU

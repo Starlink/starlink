@@ -46,7 +46,7 @@
 
       INCLUDE 'grecom.inc'
 
-      INCLUDE 'grerr'
+      INCLUDE 'PGP_ERR'
 
       INCLUDE 'SAE_PAR'
 

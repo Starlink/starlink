@@ -18,7 +18,7 @@
 
       INCLUDE 'SAE_PAR'
 
-      INCLUDE 'grerr'
+      INCLUDE 'PGP_ERR'
 
 
       CHARACTER*64 DEV, ETEXT

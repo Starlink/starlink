@@ -36,7 +36,7 @@
 
       INCLUDE 'grecom.inc'
 
-      INCLUDE 'grerr'
+      INCLUDE 'PGP_ERR'
 
       
       REAL X1, X2, Y1, Y2, WINDO(4), VIEWP(4), XSCALE, YSCALE

@@ -33,7 +33,7 @@
       IMPLICIT NONE
       INCLUDE 'grecom.inc'
 
-      INCLUDE 'grerr'
+      INCLUDE 'PGP_ERR'
 
       INCLUDE 'GKS_PAR'
 

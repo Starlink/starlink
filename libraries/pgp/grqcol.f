@@ -29,7 +29,7 @@
       INTEGER ICLOW, ICHIGH
 
       INCLUDE 'grecom.inc'
-      INCLUDE 'grerr'
+      INCLUDE 'PGP_ERR'
       INCLUDE 'GKS_PAR'
 
       INTEGER IERR, MPLBTE, MPMBTE, MTXBTE, MFABTE, MPAI

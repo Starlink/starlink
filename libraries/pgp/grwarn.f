@@ -13,7 +13,7 @@
 *+
       IMPLICIT NONE
       CHARACTER*(*) TEXT
-      INCLUDE 'grerr'
+      INCLUDE 'PGP_ERR'
 
       INTEGER   I
 

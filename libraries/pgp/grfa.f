@@ -36,7 +36,7 @@
 
       INCLUDE 'grecom.inc'
 
-      INCLUDE 'grerr'
+      INCLUDE 'PGP_ERR'
 
       
       INTEGER I

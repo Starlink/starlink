@@ -31,14 +31,15 @@
       IMPLICIT NONE
       INCLUDE 'grecom.inc'
 
-      INCLUDE 'grerr'
+      INCLUDE 'PGP_ERR'
 
   
       INTEGER IDENT
       REAL XSIZE, YSIZE, XSPACE, YSPACE
 
       IF (GRCIDE.LE.0) THEN
-         CALL ERR_REP('GRNODO', 'No PGPLOT device open', GRNODO)
+         CALL ERR_REP('GRNODO', 'GRCHSZ - No PGPLOT device open',
+     : GRNODO)
       ELSE                    
          XSIZE = GRCXSZ * GRCSCL(GRCIDE)
          YSIZE = GRCYSZ * GRCSCL(GRCIDE)

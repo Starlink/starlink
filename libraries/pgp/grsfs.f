@@ -23,13 +23,13 @@
 
       INCLUDE 'grecom.inc'
 
-      INCLUDE 'grerr'
+      INCLUDE 'PGP_ERR'
 
       INCLUDE 'GKS_PAR'
 
 
       IF (GRCIDE.LE.0) THEN
-         CALL ERR_REP('GRNODO', 'GRSFS- No PGPLOT device open',
+         CALL ERR_REP('GRNODO', 'GRSFS - No PGPLOT device open',
      :   GRNODO)
       ELSE
          IF (IS.LT.1.OR.IS.GT.2) THEN

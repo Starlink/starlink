@@ -38,7 +38,7 @@
 
       INCLUDE 'grecom.inc'
 
-      INCLUDE 'grerr'
+      INCLUDE 'PGP_ERR'
 
 
       REAL XT1, XT2, YT1, YT2

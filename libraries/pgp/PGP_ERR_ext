@@ -1,0 +1,104 @@
+*  These codes are provided for backwards compatibility reasons and
+*  should not be used in new code. They are only used in the internal
+*  PGP GKS source code and should be removed as each entry is removed
+*  from the code. This may never happen since GKS/PGPLOT is now obsolete.
+
+      INTEGER GRGQFA
+      PARAMETER ( GRGQFA = PGP__GRGQFA )
+
+      INTEGER GRNODO
+      PARAMETER ( GRNODO = PGP__GRNODO )
+
+      INTEGER GRNOIN
+      PARAMETER ( GRNOIN = PGP__GRNOIN )
+
+      INTEGER GRNOCU
+      PARAMETER ( GRNOCU = PGP__GRNOCU )
+
+      INTEGER GRCUPO
+      PARAMETER ( GRCUPO = PGP__GRCUPO )
+
+      INTEGER GRTMCF
+      PARAMETER ( GRTMCF = PGP__GRTMCF )
+
+      INTEGER GRUACH
+      PARAMETER ( GRUACH = PGP__GRUACH )
+
+      INTEGER GREWT
+      PARAMETER ( GREWT = PGP__GREWT )
+
+      INTEGER GRUNET
+      PARAMETER ( GRUNET = PGP__GRUNET )
+
+      INTEGER GROBRC
+      PARAMETER ( GROBRC = PGP__GROBRC )
+
+      INTEGER GRTMAP
+      PARAMETER ( GRTMAP = PGP__GRTMAP )
+
+      INTEGER GRIWKI
+      PARAMETER ( GRIWKI = PGP__GRIWKI )
+
+      INTEGER GRIWKN
+      PARAMETER ( GRIWKN = PGP__GRIWKN )
+
+      INTEGER GRIWKT
+      PARAMETER ( GRIWKT = PGP__GRIWKT )
+
+      INTEGER GRICAT
+      PARAMETER ( GRICAT = PGP__GRICAT )
+
+      INTEGER GRUOWK
+      PARAMETER ( GRUOWK = PGP__GRUOWK )
+
+      INTEGER GRIPLI
+      PARAMETER ( GRIPLI = PGP__GRIPLI )
+
+      INTEGER GRILCO
+      PARAMETER ( GRILCO = PGP__GRILCO )
+
+      INTEGER GRILLS
+      PARAMETER ( GRILLS = PGP__GRILLS )
+
+      INTEGER GRILLW
+      PARAMETER ( GRILLW = PGP__GRILLW )
+
+      INTEGER GRNOPG
+      PARAMETER ( GRNOPG = PGP__GRNOPG )
+
+      INTEGER GRILFO
+      PARAMETER ( GRILFO = PGP__GRILFO )
+
+      INTEGER GRURFF
+      PARAMETER ( GRURFF = PGP__GRURFF )
+
+      INTEGER GRUGTN
+      PARAMETER ( GRUGTN = PGP__GRUGTN )
+
+      INTEGER GRURT
+      PARAMETER ( GRURT = PGP__GRURT )
+
+      INTEGER GRNOSA
+      PARAMETER ( GRNOSA = PGP__GRNOSA )
+
+      INTEGER GRPGER
+      PARAMETER ( GRPGER = PGP__GRPGER )
+
+      INTEGER GRILFS
+      PARAMETER ( GRILFS = PGP__GRILFS )
+
+      INTEGER GROUON
+      PARAMETER ( GROUON = PGP__GROUON )
+
+      INTEGER GRNOKE
+      PARAMETER ( GRNOKE = PGP__GRNOKE )
+
+      INTEGER GRDYNE
+      PARAMETER ( GRDYNE = PGP__GRDYNE )
+
+      INTEGER GRNOAP
+      PARAMETER ( GRNOAP = PGP__GRNOAP )
+
+      INTEGER GRUNKQ
+      PARAMETER ( GRUNKQ = PGP__GRUNKQ )
+

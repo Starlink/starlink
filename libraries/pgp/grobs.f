@@ -1,5 +1,5 @@
       SUBROUTINE GROBS
-      INCLUDE 'grerr'
+      INCLUDE 'PGP_ERR'
       CHARACTER*8 NAME
 
 *   Obsolete routines
