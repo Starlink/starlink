@@ -147,6 +147,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -157,6 +158,8 @@
 *        KAPPA:DISPLAY dynamic parameters (X/YMAGN and CENTRE) not
 *        updating. This is a problem when using images of differing
 *        sizes.  
+*     1-APR-1999 (MBT):
+*        Modified to use WCS components.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -193,7 +196,7 @@
 
 *  Local Variables:
       CHARACTER * ( 1024 ) LINE ! Output message line (long)
-      CHARACTER * ( 132 ) CMD   ! Command string
+      CHARACTER * ( 256 ) CMD   ! Command string
       CHARACTER * ( 30 ) DEVICE ! The display device
       CHARACTER * ( 30 ) HDEV   ! Hardcopy device
       CHARACTER * ( 30 ) NAMLST ! File name list
@@ -665,7 +668,10 @@ C      CALL SLV_OBEYW( CCDRES, 'ccdndfac', CMD, 'IN<IN', STATUS )
      :      'outlist=*.ext '//
      :      'inext=true '//
      :      'forward=false '//
-     :      'trtype=struct accept'
+     :      'trtype=wcs '//
+     :      'framein=ccd_reg '//
+     :      'frameout=pixel '//
+     :      'accept'
       CALL SLV_OBEYW( CCDREG, 'tranlist', CMD, ' ', STATUS )
       CMD = 'logto=n '//
      :      'ndfnames=true '//
