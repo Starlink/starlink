@@ -1078,7 +1078,7 @@
 
 *  draw box and labels
         IF (RADEC) THEN
-          CALL GFX_RADEC(I_PIXED,I_PRJID,I_SYSID,STATUS)
+          CALL GFX_RADEC(I_PIXID,I_PRJID,I_SYSID,STATUS)
           CALL GFX_LABELS('Right Ascension','Declination',STATUS)
         ELSE
           CALL GFX_AXES(STATUS)
