@@ -11,11 +11,6 @@
         PARAMETER    ( PSF_PSPC__VARP = 4 )
 
       LOGICAL                 RX_INIT 			! System initialised
-      INTEGER                 RX_OPTION(PSF_NMAX)	!
-      REAL                    RX_ENERGY(PSF_NMAX)	!
-      INTEGER                 RX_PHALO(PSF_NMAX)        !
-      INTEGER                 RX_PHAHI(PSF_NMAX)        ! Channel bounds
-      LOGICAL                 RX_PHA_DEF(PSF_NMAX)      ! Channel bounds defined
 
       LOGICAL                 RX_CB_OPEN
       INTEGER			RX_CB_ID		! Cube identifier
@@ -27,8 +22,6 @@
       REAL                    RX_CB_RPMIN               ! Minimum radius > 0
 
       COMMON /PSF_XRT_CMN/    RX_INIT, RX_CB_OPEN,
-     :                        RX_OPTION, RX_ENERGY, RX_PHALO,
-     :                        RX_PHAHI, RX_PHA_DEF,
      :                        RX_CB_PPTR, RX_CB_RPTR, RX_CB_NRBIN,
      :                        RX_CB_NEBIN, RX_CB_NOBIN, RX_CB_EAPTR,
      :                        RX_CB_EWPTR, RX_CB_OBASE, RX_CB_OSCALE,
