@@ -251,6 +251,10 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.13  1998/04/27 20:57:07  timj
+*     Fix bug in CHOP_PA calculation (relevant for SCULIB_ADD_CHOP). Also ensure
+*     that LO chopping is RJ for SCAN/MAP.
+*
 *     Revision 1.12  1998/04/25 03:41:15  timj
 *     Include fix for incorrect header in version 1.0 of SCUCD.
 *
@@ -522,14 +526,19 @@
      :     'CHOP_CRD', CHOP_CRD, STATUS)
       CALL SCULIB_GET_FITS_R (N_FITS, N_FITS, FITS, 
      :     'CHOP_PA', CHOP_PA, STATUS)
-      CHOP_PA = CHOP_PA * REAL(ARCSEC2RAD)
+      CHOP_PA = CHOP_PA * REAL(PI) / 180.0
 
       CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
      :     'CHOP_FUN', CHOP_FUN, STATUS)
 
 *     Translate LO to a real coordinate system
+*     Rembmer that for SCAN map data LO ALWAYS means RJ
       IF (CHOP_CRD .EQ. 'LO') THEN
-         CHOP_CRD = LOCAL_COORDS
+         IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+            CHOP_CRD = 'RJ'
+         ELSE
+            CHOP_CRD = LOCAL_COORDS
+         END IF
       END IF
 
 *     Divide chop throw by two if we are doing a SCAN/MAP
