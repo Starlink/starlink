@@ -265,9 +265,6 @@
 *        and typo's corrected.  Called KPG1_GTNDF.  Constrained ANGROT.
 *        Used modern-style variable declarations.  Added headings to
 *        the commentary.
-*     23-JUN-1998 (DSB):
-*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
-*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:

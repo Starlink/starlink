@@ -172,9 +172,6 @@
 *     1994 September 27 (MJC):
 *        Replaced AIF calls with PAR, FIO, and PSX.  Made messages
 *        conditional and used modern names for subroutines (_$ to 1_).
-*     23-JUN-1998 (DSB):
-*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
-*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:

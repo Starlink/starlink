@@ -41,9 +41,6 @@
 *  History:
 *     1991 April 15 (MJC):
 *        Original version.
-*     23-JUN-1998 (DSB):
-*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
-*        are converted to Starlink BAD values before being used.
 *     {enter_changes_here}
 
 *  Bugs:

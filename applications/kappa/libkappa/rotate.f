@@ -132,9 +132,6 @@
 *     12-JUN-1998 (DSB):
 *        Added propagation of the NDF WCS component. Fixed bug which
 *        prevented 2-D slices from n-D cubes being processed.
-*     23-JUN-1998 (DSB):
-*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
-*        are converted to Starlink BAD values before being used.
 *     {enter_any_changes_here}
 
 *  Bugs:

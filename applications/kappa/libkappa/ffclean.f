@@ -158,9 +158,6 @@
 *        usage.  Added Related Applications and additional commentary.
 *        Changed the default of TITLE to null.  Used PSX to obtain
 *        workspace.
-*     23-JUN-1998 (DSB):
-*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
-*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:

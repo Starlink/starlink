@@ -219,9 +219,6 @@
 *        Works directly on double-precision NDFs.  Replaced old
 *        subroutines.  Use PSX for workspace.  Used modern-style
 *        commenting and variable declarations.
-*     23-JUN-1998 (DSB):
-*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
-*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:

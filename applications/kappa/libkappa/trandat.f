@@ -271,9 +271,6 @@
 *        primitive NDFs.
 *     1996 November 14 (MJC):
 *        Added a final error report, and improved the documentation.
-*     23-JUN-1998 (DSB):
-*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
-*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:

@@ -461,9 +461,6 @@
 *        representations, and do not re-instate original representations
 *        at end. This prevents the screen being cleared when the
 *        workstation is closed.
-*     23-JUN-1998 (DSB):
-*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
-*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:

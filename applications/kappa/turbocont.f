@@ -451,9 +451,6 @@
 *        Improved efficiency by using PSX to obtain workspace.
 *        Increased the maximum thickness from 5 to 10.  Rewrote the
 *        Notes on contour colour and line style.
-*     23-JUN-1998 (DSB):
-*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
-*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:

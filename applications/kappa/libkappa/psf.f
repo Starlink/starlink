@@ -318,9 +318,6 @@
 *        Added ABSLAB, ORDLAB, PLTITL, RADUNITS, SCALE, and MINOR
 *        parameters for adjustment of the plotting style, for scaling
 *        from pixels to physical units, and for minor-axis profiles.
-*     23-JUN-1998 (DSB):
-*        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
-*        are converted to Starlink BAD values before being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
