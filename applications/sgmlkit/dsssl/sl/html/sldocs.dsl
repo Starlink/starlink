@@ -127,8 +127,10 @@ more-or-less as much like the existing star2html output as possible.
           (rel (document-release-info))
           (vers (caddr rel))
           (dotvers (if vers (string-append "." vers) ""))
-          (docwordref 
-             (string-append (getdocnumber (current-node) 'asString) dotvers))
+	  (dn (getdocnumber (current-node) 'asString))
+          (docwordref (if dn
+			  (string-append dn dotvers)
+			  "Version"))
           (docref (string-append (index-file-name) dotvers))
           (manualtype (getdocinfo 'manualtype))
           (softwareversion (getdocinfo 'softwareversion))
