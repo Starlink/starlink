@@ -1,7 +1,7 @@
 dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(starconf, 1.0, ussc@star.rl.ac.uk)
+AC_INIT(starconf, 1.0-1, ussc@star.rl.ac.uk)
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([starconf.m4.in])
@@ -26,15 +26,22 @@ dnl   parameter to the ./configure command, or by letting it be
 dnl   defaulted from the current value of STARLINK.  This need not be
 dnl   the same as the definition of AC_PREFIX_DEFAULT above.
 AC_ARG_VAR(DEFAULT_STARLINK, [Default installation directory of components])
-test -n "$STARLINK" || STARLINK=/star
-test -n "$DEFAULT_STARLINK" || DEFAULT_STARLINK=$STARLINK
+dnl test -n "$STARLINK" || STARLINK=/star
+dnl test -n "$DEFAULT_STARLINK" || DEFAULT_STARLINK=$STARLINK
+if test -z "$DEFAULT_STARLINK"; then
+    if test -n "$STARLINK"; then
+        DEFAULT_STARLINK=$STARLINK
+    else
+        DEFAULT_STARLINK=/star
+    fi
+fi
 
 dnl Find working install and ln programs
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PATH_PROG(PERL, perl)
 
-PACKAGE_VERSIONINT=`echo $PACKAGE_VERSION | sed 's/[^0-9][^0-9]*/ /g' | awk '{print $1*1000000+$2*1000+(NF>2 ? $3 : 0)}'`
+PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION | sed 's/[^0-9][^0-9]*/ /g' | awk '{print $1*1000000+$2*1000+(NF>2 ? $3 : 0)}'`]
 AC_SUBST(PACKAGE_VERSIONINT)
 
 dnl   Note that the make-starconf.in file is _not_ to be
