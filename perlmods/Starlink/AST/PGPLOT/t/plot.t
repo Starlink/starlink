@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 5;
+use Test::More tests => 6;
 use Data::Dumper;
 
 require_ok( "Starlink::AST" );
