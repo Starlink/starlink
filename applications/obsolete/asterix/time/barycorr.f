@@ -84,7 +84,8 @@
       REAL 			SAT_GEOCENTRIC(3)   	! Geocentric XYZ
       REAL 			SATGEO(3)           	! Geographic XYZ
 
-      INTEGER 			UT
+      INTEGER 			UT,IFID,OFID
+
 *-
 *         INTEGER*2 IXRT(3)        ! Restored XRT pointing RA DEC Roll (arcmin)
 *        INTEGER*2 ILONG
@@ -109,7 +110,6 @@
       CHARACTER*(DAT__SZLOC)   ASTLOC         ! loc to .MORE.ASTERIX
       CHARACTER*(DAT__SZLOC)   HEADLOC        ! loc to .MORE.ASTERIX.HEADER
       CHARACTER*(DAT__SZLOC)   INSTRLOC       ! loc to .MORE.ASTERIX.INSTRUMENT
-      CHARACTER*(DAT__SZLOC)   PROCLOC        ! loc to .MORE.ASTERIX.PROCESSING
       CHARACTER*(DAT__SZLOC)   TIMLOC         ! loc to RAW_TIMETAG, TIME*.*
       CHARACTER*(DAT__SZTYP)   TYPE           ! for DAT_TYPE
 
@@ -165,7 +165,6 @@
       INTEGER                  AXN            ! axis index
 
       LOGICAL                  OK,OK1,OK2     ! various checks
-      LOGICAL                  PRIM           ! object primitive? (USI_ASSOC)
       LOGICAL                  VALID_ROSAT    ! file is a ROSAT file
       LOGICAL                  SATCORR        ! do satellite corrections ?
       LOGICAL                  POS_FILE_OK    ! ATT POS OPEN OK
@@ -204,21 +203,21 @@
       CALL AST_INIT()
 
 * get input data
-        CALL USI_ASSOCI('INP', 'READ', INLOC, PRIM, STATUS)
+        CALL USI_TASSOC2('INP', 'OUT','READ', IFID, OFID, STATUS)
         CALL USI_SHOW(' Input data {INP}',status)
+        CALL ADI1_GETLOC( IFID, INLOC, STATUS )
+        CALL ADI1_GETLOC( OFID, OUTLOC, STATUS )
+
+      CALL MSG_PRNT( 'Copying input to output' )
+      CALL ADI_FCOPY( IFID, OFID, STATUS )
+
 * see if file is a valid HDS file
         CALL BDA_CHKAST(INLOC, OK, STATUS)
         IF(.NOT.OK)THEN
          CALL MSG_PRNT(' Input file not a valid HDS file')
          GOTO 999
         ENDIF
-        CALL DAT_TYPE(INLOC, TYPE, STATUS)
-* create a copy
-        CALL USI_ASSOCO('OUT', TYPE, OUTLOC, STATUS)
 
-        CALL MSG_PRNT(' copying input to output ')
-
-        CALL HDX_COPY(INLOC, OUTLOC, STATUS)
 
 * get locators to MORE & ASTERIX etc
 *find MORE -> ASTERIX -> HEADER
@@ -406,23 +405,14 @@
 
 500      CONTINUE
 * if PROCESSING not there then create it.
-        IF(.NOT. POK)THEN
-          CALL MSG_PRNT(' Creating PROCESSING structure')
-          CALL DAT_NEW(ASTLOC, 'PROCESSING', 'EXTENSION', 0, 0,
-     :                                    STATUS)
-        ENDIF
+        CALL PRF_GET( OFID, 'BARY_CORR_DONE', OK2, STATUS )
 
-        CALL DAT_FIND(ASTLOC, 'PROCESSING', PROCLOC, STATUS)
+        IF ( OK2 ) THEN
+          CALL MSG_PRNT(' This file has already been corrected')
+          CALL MSG_PRNT('     exiting....')
+          GOTO 999
+        END IF
 
-        CALL DAT_THERE(PROCLOC, 'BARY_CORR_DONE', OK1, STATUS)
-        IF(OK1)THEN
-          CALL CMP_GET0L(PROCLOC, 'BARY_CORR_DONE', OK2, STATUS)
-          IF(OK2)THEN
-            CALL MSG_PRNT(' This file has already been corrected')
-            CALL MSG_PRNT('     exiting....')
-            GOTO 999
-          ENDIF
-        ENDIF
 * obtain RA DEC of field centre
         CALL CMP_GET0D(HEADLOC, 'FIELD_RA', RA_CENTRE, STATUS)
         CALL CMP_GET0D(HEADLOC, 'FIELD_DEC', DEC_CENTRE, STATUS)
@@ -619,7 +609,7 @@
 * sub routine Barr_corr takes the appropriate action to the time list
 *
 * update HISTORY
-       CALL HIST_ADD(OUTLOC, VERSION, STATUS)
+       CALL HSI_ADD(OFID, VERSION, STATUS)
        IF(POS_FILE_OK)THEN
         HISTXT(1) = ' a valid orbit data file was found and used'
         WRITE ( HISTXT(2), '(A,F9.1,A)')
@@ -658,11 +648,13 @@
         ENDIF
        ENDIF
       ENDIF
-* update the history
-      CALL HIST_PTXT(OUTLOC, N_LINES, HISTXT, STATUS)
-* create new flag in file
-      CALL DAT_NEW0L(PROCLOC, 'BARY_CORR_DONE' ,STATUS)
-      CALL CMP_PUT0L(PROCLOC, 'BARY_CORR_DONE', .TRUE., STATUS)
+
+*  Update the history
+      CALL HSI_PTXT( OFID, N_LINES, HISTXT, STATUS )
+
+*  Create new flag in file
+      CALL PRF_SET( OFID, 'BARY_CORR_DONE', .TRUE., STATUS )
+
 999   CONTINUE
 
 * tidy up and exit
@@ -671,15 +663,14 @@
       ELSEIF(TIME_OK)THEN
         CALL LIST_UNMAP(OUTLOC, 'TIMETAG', STATUS)
       ENDIF
-* Annul input locator
-      CALL BDA_RELEASE(INLOC, STATUS)
-      CALL DAT_ANNUL(INLOC, STATUS)
-*               call nonsense(n_events,%val(timeptr))
 
-*annul output locator
+*  Shut input and output files
+      CALL BDA_RELEASE(INLOC, STATUS)
+      CALL USI_TANNUL( IFID, STATUS )
       CALL BDA_RELEASE(OUTLOC, STATUS)
-*      CALL USI_ANNUL(OUTLOC,STATUS)
-      CALL DAT_ANNUL(OUTLOC, STATUS)
+      CALL USI_TANNUL( OFID, STATUS )
+
+*  Exit point
       CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
