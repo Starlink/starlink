@@ -164,6 +164,371 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/Compression.java:7: package org.apache.tools.bzip2 does not exist
   [javadoc] import org.apache.tools.bzip2.CBZip2InputStream;
   [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:3: package edu.jhu.htm.core does not exist
+  [javadoc] import edu.jhu.htm.core.HTMException;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:4: package edu.jhu.htm.core does not exist
+  [javadoc] import edu.jhu.htm.core.HTMindex;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:5: package edu.jhu.htm.core does not exist
+  [javadoc] import edu.jhu.htm.core.HTMindexImp;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:6: package edu.jhu.htm.core does not exist
+  [javadoc] import edu.jhu.htm.core.HTMrange;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:7: package edu.jhu.htm.core does not exist
+  [javadoc] import edu.jhu.htm.core.HTMrangeIterator;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:8: package edu.jhu.htm.geometry does not exist
+  [javadoc] import edu.jhu.htm.geometry.Circle;
+  [javadoc]                             ^
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:27: cannot resolve symbol
+  [javadoc] symbol  : class HTMindex 
+  [javadoc] location: class uk.ac.starlink.table.join.HTMMatchEngine
+  [javadoc]     private final HTMindex htm;
+  [javadoc]                   ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaMainImageDisplay.java:87: package diva.canvas does not exist
+  [javadoc] import diva.canvas.GraphicsPane;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaGraphicsImageDisplay.java:56: package diva.canvas does not exist
+  [javadoc] import diva.canvas.GraphicsPane;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaGraphicsImageDisplay.java:57: package diva.canvas does not exist
+  [javadoc] import diva.canvas.JCanvas;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaGraphicsImageDisplay.java:76: cannot resolve symbol
+  [javadoc] symbol  : class JCanvas 
+  [javadoc] location: class jsky.image.gui.DivaGraphicsImageDisplay
+  [javadoc] public class DivaGraphicsImageDisplay extends JCanvas implements GraphicsImageDisplay {
+  [javadoc]                                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/NavigatorPane.java:10: package diva.canvas does not exist
+  [javadoc] import diva.canvas.GraphicsPane;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/NavigatorPane.java:11: package diva.canvas does not exist
+  [javadoc] import diva.canvas.CanvasLayer;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/NavigatorPane.java:21: cannot resolve symbol
+  [javadoc] symbol  : class GraphicsPane 
+  [javadoc] location: class jsky.navigator.NavigatorPane
+  [javadoc] public class NavigatorPane extends GraphicsPane {
+  [javadoc]                                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:38: package diva.canvas does not exist
+  [javadoc] import diva.canvas.AbstractFigure;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:39: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.SelectionInteractor;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:40: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.SelectionModel;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:41: package diva.canvas.toolbox does not exist
+  [javadoc] import diva.canvas.toolbox.BasicFigure;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:42: package diva.canvas.toolbox does not exist
+  [javadoc] import diva.canvas.toolbox.LabelFigure;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:43: package diva.util.java2d does not exist
+  [javadoc] import diva.util.java2d.Polygon2D;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:44: package diva.util.java2d does not exist
+  [javadoc] import diva.util.java2d.Polyline2D;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/FITSGraphics.java:42: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.SelectionInteractor;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/FITSGraphics.java:43: package diva.util.java2d does not exist
+  [javadoc] import diva.util.java2d.Polygon2D;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/FITSGraphics.java:44: package diva.util.java2d does not exist
+  [javadoc] import diva.util.java2d.Polyline2D;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaMainImageDisplay.java:318: cannot resolve symbol
+  [javadoc] symbol  : class GraphicsPane 
+  [javadoc] location: class jsky.image.gui.DivaMainImageDisplay
+  [javadoc]     public DivaMainImageDisplay(GraphicsPane pane) {
+  [javadoc]                                 ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaMainImageDisplay.java:330: cannot resolve symbol
+  [javadoc] symbol  : class GraphicsPane 
+  [javadoc] location: class jsky.image.gui.DivaMainImageDisplay
+  [javadoc]     public DivaMainImageDisplay(GraphicsPane pane, ImageProcessor processor) {
+  [javadoc]                                 ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaMainImageDisplay.java:375: cannot resolve symbol
+  [javadoc] symbol  : class GraphicsPane 
+  [javadoc] location: class jsky.image.gui.DivaMainImageDisplay
+  [javadoc]     public DivaMainImageDisplay(GraphicsPane pane, Component parent,
+  [javadoc]                                 ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaMainImageDisplay.java:388: cannot resolve symbol
+  [javadoc] symbol  : class GraphicsPane 
+  [javadoc] location: class jsky.image.gui.DivaMainImageDisplay
+  [javadoc]     public DivaMainImageDisplay(GraphicsPane pane, Component parent) {
+  [javadoc]                                 ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/fits/codec/FITSImage.java:46: package ca.nrc.cadc.arch.io does not exist
+  [javadoc] import ca.nrc.cadc.arch.io.FitsFilterInputStream;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/ImageLayer.java:19: package diva.canvas does not exist
+  [javadoc] import diva.canvas.CanvasLayer;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/ImageLayer.java:20: package diva.canvas does not exist
+  [javadoc] import diva.canvas.VisibleComponent;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/ImageLayer.java:29: cannot resolve symbol
+  [javadoc] symbol  : class CanvasLayer 
+  [javadoc] location: class jsky.image.graphics.ImageLayer
+  [javadoc] public class ImageLayer extends CanvasLayer implements VisibleComponent {
+  [javadoc]                                 ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/ImageLayer.java:29: cannot resolve symbol
+  [javadoc] symbol  : class VisibleComponent 
+  [javadoc] location: class jsky.image.graphics.ImageLayer
+  [javadoc] public class ImageLayer extends CanvasLayer implements VisibleComponent {
+  [javadoc]                                                        ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/DivaGraphicsImageDisplay.java:187: cannot resolve symbol
+  [javadoc] symbol  : class GraphicsPane 
+  [javadoc] location: class jsky.image.gui.DivaGraphicsImageDisplay
+  [javadoc]     public DivaGraphicsImageDisplay(GraphicsPane pane, ImageProcessor imageProcessor, String name) {
+  [javadoc]                                     ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/TablePlotSymbol.java:19: package gnu.jel does not exist
+  [javadoc] import gnu.jel.DVResolver;
+  [javadoc]                ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/TablePlotSymbol.java:33: cannot resolve symbol
+  [javadoc] symbol  : class DVResolver 
+  [javadoc] location: class jsky.catalog.TablePlotSymbol
+  [javadoc] public class TablePlotSymbol implements DVResolver {
+  [javadoc]                                         ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/SymbolLayer.java:10: package diva.canvas does not exist
+  [javadoc] import diva.canvas.CanvasLayer;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/SymbolLayer.java:11: package diva.canvas does not exist
+  [javadoc] import diva.canvas.GraphicsPane;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/SymbolLayer.java:12: package diva.canvas does not exist
+  [javadoc] import diva.canvas.VisibleComponent;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/SymbolLayer.java:20: cannot resolve symbol
+  [javadoc] symbol  : class CanvasLayer 
+  [javadoc] location: class jsky.navigator.SymbolLayer
+  [javadoc] public class SymbolLayer extends CanvasLayer implements VisibleComponent {
+  [javadoc]                                  ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/navigator/SymbolLayer.java:20: cannot resolve symbol
+  [javadoc] symbol  : class VisibleComponent 
+  [javadoc] location: class jsky.navigator.SymbolLayer
+  [javadoc] public class SymbolLayer extends CanvasLayer implements VisibleComponent {
+  [javadoc]                                                         ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:30: package diva.canvas does not exist
+  [javadoc] import diva.canvas.AbstractFigure;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:31: package diva.canvas does not exist
+  [javadoc] import diva.canvas.Figure;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:32: package diva.canvas does not exist
+  [javadoc] import diva.canvas.FigureLayer;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:33: package diva.canvas does not exist
+  [javadoc] import diva.canvas.GraphicsPane;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:34: package diva.canvas.event does not exist
+  [javadoc] import diva.canvas.event.LayerAdapter;
+  [javadoc]                          ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:35: package diva.canvas.event does not exist
+  [javadoc] import diva.canvas.event.LayerEvent;
+  [javadoc]                          ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:36: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.BoundsManipulator;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:37: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.DragInteractor;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:38: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.Interactor;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:39: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.PathManipulator;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:40: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.SelectionEvent;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:41: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.SelectionInteractor;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:42: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.SelectionListener;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:43: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.SelectionModel;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:44: package diva.canvas.toolbox does not exist
+  [javadoc] import diva.canvas.toolbox.BasicHighlighter;
+  [javadoc]                            ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:81: package Polyline2D does not exist
+  [javadoc]     protected Polyline2D.Double polyline;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:84: package Polygon2D does not exist
+  [javadoc]     protected Polygon2D.Double polygon;
+  [javadoc]                        ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:87: package Polyline2D does not exist
+  [javadoc]     protected Polyline2D.Double freehand;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/CanvasDraw.java:90: cannot resolve symbol
+  [javadoc] symbol  : class AbstractFigure 
+  [javadoc] location: class jsky.image.graphics.gui.CanvasDraw
+  [javadoc]     protected AbstractFigure figure;
+  [javadoc]               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/gui/FITSGraphics.java:66: cannot resolve symbol
+  [javadoc] symbol  : class SelectionInteractor 
+  [javadoc] location: class jsky.image.graphics.gui.FITSGraphics
+  [javadoc]     protected SelectionInteractor interactor;
+  [javadoc]               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:10: package gnu.jel does not exist
+  [javadoc] import gnu.jel.CompilationException;
+  [javadoc]                ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:11: package gnu.jel does not exist
+  [javadoc] import gnu.jel.CompiledExpression;
+  [javadoc]                ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:12: package gnu.jel does not exist
+  [javadoc] import gnu.jel.DVResolver;
+  [javadoc]                ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:13: package gnu.jel does not exist
+  [javadoc] import gnu.jel.Evaluator;
+  [javadoc]                ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:14: package gnu.jel does not exist
+  [javadoc] import gnu.jel.Library;
+  [javadoc]                ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:27: cannot resolve symbol
+  [javadoc] symbol  : class DVResolver 
+  [javadoc] location: class jsky.util.JavaExpr
+  [javadoc] public class JavaExpr implements DVResolver {
+  [javadoc]                                  ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:69: cannot resolve symbol
+  [javadoc] symbol  : class GraphicsPane 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     private GraphicsPane _graphicsPane;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:72: cannot resolve symbol
+  [javadoc] symbol  : class FigureLayer 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     private FigureLayer _figureLayer;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:78: cannot resolve symbol
+  [javadoc] symbol  : class SelectionInteractor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     private SelectionInteractor _selectionInteractor;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:81: cannot resolve symbol
+  [javadoc] symbol  : class SelectionInteractor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     private SelectionInteractor _lineInteractor;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:84: cannot resolve symbol
+  [javadoc] symbol  : class DragInteractor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     private DragInteractor _dragInteractor;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:87: cannot resolve symbol
+  [javadoc] symbol  : class SelectionInteractor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     private SelectionInteractor _fixedSelectionInteractor;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:90: cannot resolve symbol
+  [javadoc] symbol  : class SelectionListener 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     private SelectionListener _selectionListener;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:20: package diva.canvas does not exist
+  [javadoc] import diva.canvas.Figure;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:21: package diva.canvas does not exist
+  [javadoc] import diva.canvas.FigureDecorator;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:22: package diva.canvas does not exist
+  [javadoc] import diva.canvas.FigureLayer;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:23: package diva.canvas does not exist
+  [javadoc] import diva.canvas.GeometricSet;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:24: package diva.canvas does not exist
+  [javadoc] import diva.canvas.GraphicsPane;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:25: package diva.canvas does not exist
+  [javadoc] import diva.canvas.OverlayLayer;
+  [javadoc]                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:26: package diva.canvas.event does not exist
+  [javadoc] import diva.canvas.event.EventLayer;
+  [javadoc]                          ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:27: package diva.canvas.event does not exist
+  [javadoc] import diva.canvas.event.LayerEvent;
+  [javadoc]                          ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:28: package diva.canvas.event does not exist
+  [javadoc] import diva.canvas.event.LayerListener;
+  [javadoc]                          ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:29: package diva.canvas.event does not exist
+  [javadoc] import diva.canvas.event.MouseFilter;
+  [javadoc]                          ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:30: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.DragInteractor;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:31: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.Interactor;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:32: package diva.canvas.interactor does not exist
+  [javadoc] import diva.canvas.interactor.SelectionInteractor;
+  [javadoc]                               ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:33: package diva.util does not exist
+  [javadoc] import diva.util.CompoundIterator;
+  [javadoc]                  ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/SelectionDragger.java:48: cannot resolve symbol
+  [javadoc] symbol  : class DragInteractor 
+  [javadoc] location: class jsky.image.graphics.SelectionDragger
+  [javadoc] public class SelectionDragger extends DragInteractor {
+  [javadoc]                                       ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:122: cannot resolve symbol
+  [javadoc] symbol  : class GraphicsPane 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     public GraphicsPane getGraphicsPane() {
+  [javadoc]            ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:274: cannot resolve symbol
+  [javadoc] symbol  : class DragInteractor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     public DragInteractor getDragInteractor() {
+  [javadoc]            ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:279: cannot resolve symbol
+  [javadoc] symbol  : class SelectionInteractor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     public SelectionInteractor getSelectionInteractor() {
+  [javadoc]            ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:284: cannot resolve symbol
+  [javadoc] symbol  : class SelectionInteractor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     public SelectionInteractor getLineInteractor() {
+  [javadoc]            ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:289: cannot resolve symbol
+  [javadoc] symbol  : class SelectionInteractor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]     public SelectionInteractor getFixedSelectionInteractor() {
+  [javadoc]            ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:328: cannot resolve symbol
+  [javadoc] symbol  : class Interactor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]                                           Interactor interactor) {
+  [javadoc]                                           ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:354: cannot resolve symbol
+  [javadoc] symbol  : class Interactor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]                                    Interactor interactor) {
+  [javadoc]                                    ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:404: cannot resolve symbol
+  [javadoc] symbol  : class Interactor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]                                              Interactor interactor) {
+  [javadoc]                                              ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:421: cannot resolve symbol
+  [javadoc] symbol  : class Interactor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]                                       Paint outline, float lineWidth, Interactor interactor) {
+  [javadoc]                                                                       ^
+  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/graphics/DivaImageGraphics.java:440: cannot resolve symbol
+  [javadoc] symbol  : class Interactor 
+  [javadoc] location: class jsky.image.graphics.DivaImageGraphics
+  [javadoc]                                            Interactor interactor) {
+  [javadoc]                                            ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/Compression.java:148: cannot resolve symbol
@@ -419,7 +784,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 89 warnings
+  [javadoc] 188 warnings
 
 install:
 
@@ -707,7 +1072,7 @@ install:
 prepare:
 
 check_packages:
-[available] Jan 23, 2004 5:47:54 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jan 24, 2004 5:19:55 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -853,270 +1218,24 @@ prepare:
 check_packages:
 
 build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/table/lib/table/table.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/table/lib/table/table.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 111 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing NDTools target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/ndtools/lib/ndtools/ndtools.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/ndtools/lib/ndtools/ndtools.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 15 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing HDS target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/hds/lib/hds/hds.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/hds/lib/hds/hds.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 20 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing FITS target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/fits/lib/fits/fits.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/fits/lib/fits/fits.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 23 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing DIVA target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/diva/lib/diva/diva.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/diva/lib/diva/acme.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/diva/lib/diva/aelfred.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/diva/lib/diva/diva.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 1098 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 108 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing JSky target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/jfreechart.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/jcommon.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/log4j.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/dom4j.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/jel.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/hcompress.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 9 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 434 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing Pal target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/pal/lib/pal/pal.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/pal/lib/pal/pal.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 30 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing VOTable target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 29 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing JAIUtil target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 31 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing SOAPSERVER target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 19 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing SOG target: install
-
-prepare:
-
-check_packages:
-
-build:
-    [javac] Compiling 28 source files to /apps/cvsbuild/java/source/sog/build/classes
-    [javac] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOGNavigatorImageDisplay.java:47: cannot resolve symbol
-    [javac] symbol  : class ConfigurationStore 
-    [javac] location: package gui
-    [javac] import uk.ac.starlink.ast.gui.ConfigurationStore;
+    [javac] Compiling 85 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableTransferable.java:13: package uk.ac.starlink.votable does not exist
+    [javac] import uk.ac.starlink.votable.DataFormat;
     [javac]                               ^
-    [javac] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOGNavigatorImageDisplay.java:457: cannot resolve symbol
-    [javac] symbol  : class ConfigurationStore 
-    [javac] location: class uk.ac.starlink.sog.SOGNavigatorImageDisplay
-    [javac]             ConfigurationStore store = new ConfigurationStore( defaultConfig );
-    [javac]             ^
-    [javac] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOGNavigatorImageDisplay.java:457: cannot resolve symbol
-    [javac] symbol  : class ConfigurationStore 
-    [javac] location: class uk.ac.starlink.sog.SOGNavigatorImageDisplay
-    [javac]             ConfigurationStore store = new ConfigurationStore( defaultConfig );
-    [javac]                                            ^
-    [javac] Note: /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/PhotometryWorker.java uses or overrides a deprecated API.
-    [javac] Note: Recompile with -deprecation for details.
-    [javac] 3 errors
+    [javac] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableTransferable.java:14: package uk.ac.starlink.votable does not exist
+    [javac] import uk.ac.starlink.votable.VOTableWriter;
+    [javac]                               ^
+    [javac] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableTransferable.java:65: cannot resolve symbol
+    [javac] symbol: class VOTableWriter 
+    [javac]                     new VOTableWriter( DataFormat.BINARY, true )
+    [javac]                         ^
+    [javac] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableTransferable.java:65: cannot resolve symbol
+    [javac] symbol: variable DataFormat 
+    [javac]                     new VOTableWriter( DataFormat.BINARY, true )
+    [javac]                                        ^
+    [javac] 4 errors
 
 BUILD FAILED
-file:/apps/cvsbuild/java/source/sog/build.xml:416: Compile failed; see the compiler error output for details.
+file:/apps/cvsbuild/java/source/table/build.xml:360: Compile failed; see the compiler error output for details.
 
-Total time: 5 minutes 2 seconds
+Total time: 1 minute 47 seconds

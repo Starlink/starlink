@@ -8406,8 +8406,7 @@ U java/source/table/src/docs/starlinklogo3.gif
 U java/source/table/src/docs/stil.html
 U java/source/table/src/docs/stil_large.gif
 U java/source/table/src/docs/stil_small.gif
-U java/source/table/src/docs/stil_sun.xml
-U java/source/table/src/docs/table.txt
+U java/source/table/src/docs/sun252.xml
 U java/source/table/src/docs/toHTML.xslt
 U java/source/table/src/docs/toHTML1.xslt
 cvs checkout: Updating java/source/table/src/lib
@@ -8443,6 +8442,7 @@ U java/source/table/src/main/uk/ac/starlink/table/RowSubsetStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java
+U java/source/table/src/main/uk/ac/starlink/table/StarTableTransferable.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/TableBuilder.java
 U java/source/table/src/main/uk/ac/starlink/table/TableCopy.java
@@ -8697,6 +8697,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnComboBoxModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnIndexSpinner.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnInfoWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CustomComboBoxRenderer.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/DragListener.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/HelpTransformer.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELRowReader.java
