@@ -43,6 +43,7 @@
 *     ACD: A.C. Davenhall (ROE)
 *     AJC: A.J. Chipperfield (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -76,8 +77,10 @@
 *        Limit number of zeroes in F format fractions
 *      8-MAR-1996 (AJC):
 *        Allow for 3-digit exponent - use E format with e width
-*     22-JAN-1997 (AJC)
+*     22-JAN-1997 (AJC):
 *        Restrict CHR_LEN search to FIELD width (was SIZE)
+*     12-AUG-2004 (TIMJ):
+*        Initialise variables that were generating warnings
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -136,6 +139,12 @@
       CHARACTER * 1 STRCHR       ! String element
 
 *.
+
+*  Initialise variables that might possibly be used
+*  without being intialised otherwise
+      ISNEG = .FALSE.
+      ISFRAC = .FALSE.
+      IPOWER = 0
 
 *  Initialise the returned string.
       STRBUF = ' '

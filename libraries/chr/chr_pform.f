@@ -59,6 +59,7 @@
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
 *     ACC:  A.C. Charles (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -66,6 +67,8 @@
 *        Original version.
 *     10-MAR-1994 (ACC for PCTR):
 *        Modifications to prologue.
+*     12-AUG-2004 (TIMJ):
+*        Initialise variables that were generating warnings
 *     {enter_changes_here}
 
 *  Bugs:
@@ -113,6 +116,18 @@
       CHARACTER * 1 CVALUE       ! Element of PARRAY
 
 *.
+
+*  Initialise variables that might possibly be used
+*  without being intialised otherwise
+      ICH = 0
+      ICWEND = 0
+      ILNP = 0
+      ILWEND = 0
+      IPLEN = 0
+      NPC = 0
+      NPCHLW = 0
+      NPL = 0
+      OPLEN = 0
 
 *  Check the length of the given paragraph array.
       IF ( MXPAR .GT. 0 ) THEN

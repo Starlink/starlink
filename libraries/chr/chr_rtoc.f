@@ -43,6 +43,7 @@
 *     ACD: A.C. Davenhall (ROE)
 *     AJC: A.J. Chipperfield (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -81,6 +82,8 @@
 *        Restore MXE from 13 to 14
 *     22-JAN-1997 (AJC)
 *        Restrict CHR_LEN search to FIELD width (was SIZE)
+*     12-AUG-2004 (TIMJ):
+*        Initialise variables that were generating warnings
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -138,6 +141,12 @@
       CHARACTER * 1 STRCHR       ! String element
 
 *.
+
+*  Initialise variables that might possibly be used
+*  without being intialised otherwise
+      ISNEG = .FALSE.
+      ISFRAC = .FALSE.
+      IPOWER = 0
 
 *  Initialise the returned string.
       STRBUF = ' '

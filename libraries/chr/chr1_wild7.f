@@ -70,6 +70,7 @@
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
 *     ACC: A.C. Charles (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,6 +83,8 @@
 *        at the beginning of the WILDS string.
 *     28-SEP-1993 (ACC):
 *        Subprogram created during modularisation.
+*     12-AUG-2004 (TIMJ):
+*        Initialise variables that were generating warnings
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -125,6 +128,9 @@
       CHARACTER * 1 CHRW         ! WILDS character value
 
 *.
+
+*  Variable initialising
+      ISRCS = 0
 
 *  Set errors found.
       CHR1_WILD7 = .FALSE.
