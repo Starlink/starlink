@@ -35,6 +35,8 @@
 *      1 Jun 92 : V1.6-2 And cured problem with wid=132 caused by above (DJA)
 *      4 May 94 : V1.7-0 Fixed UNIX character problems by using AIO (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*      5 May 95 : V1.8-1 Fixed bug in display of non _INTEGER integer
+*                        types (DJA)
 *
 *    Type Definitions :
 *
@@ -69,7 +71,7 @@
 *    Version :
 *
       CHARACTER*40             VERSION
-        PARAMETER              ( VERSION = 'HDISPLAY Version 1.8-0' )
+        PARAMETER              ( VERSION = 'HDISPLAY Version 1.8-1' )
 *-
 
 *    Version id
