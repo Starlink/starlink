@@ -12665,6 +12665,7 @@ proc StatusArea {on} {
 # containing the GWM image and controls.
          set F3 [frame $TOP.status -relief groove -bd 2]
          pack $F3 -fill x -after $F2
+         SetHelp $F3 ".  An area containing current options values, and other status information." POLKA_STATUS_AREA
 
 # Divide the status area up into two columns.
          set col(0) [frame $F3.scol1]

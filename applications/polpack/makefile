@@ -357,7 +357,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar ndg_source.tar makefile mk $(DOCUMENTATION
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-PUBLIC_SCRIPTS = PolMap.tcl PolMap_procs.tcl Polka.tcl Polka_procs.tcl \
+PUBLIC_SCRIPTS = Polka.tcl Polka_procs.tcl \
 CCDShowHelp.tcl dialog.tcl adamtask.tcl adamMessageRelay irg_wild polimp.csh \
 polexp.csh
 
@@ -418,7 +418,7 @@ ndg_ndfpr.f ndg1_hspec.f ndg1_mspec.f ndg1_match.f ndg1_subst.f
 F_SUB2 =  ccg1_cenr.f ccg1_is4d.f datapic.f gethlp.f gthlpi.f kpg1_chaxd.f \
 kpg1_flcor.f kpg1_rfcor.f kpg1_scrsz.f kps1_flxyr.f kps1_inxyr.f kps1_plcpx.f \
 kps1_plcpy.f kps1_plmsk.f kps1_retr.f kps1_stor.f kps1_xyd2w.f pda_qsiai.f \
-polcent.f polhelp.f polmap.f polka.f pthlpo.f rdndf.f segment.f sread.f \
+polcent.f polhelp.f polka.f pthlpo.f rdndf.f segment.f sread.f \
 wrndf.f polcal.f ndfac.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f \
 ccd1_cmprr.f ccd1_qntlr.f ccd1_qsrtr.f ccd1_skysr.f ccg1_cmltr.f ccg1_is2r.f \
 ccg1_is3r.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f ccd1_asfio.f \
@@ -479,7 +479,7 @@ TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 
 #  List of applications/tasks in monolith.
 
-TASKS = polhelp polmap polka datapic polcent segment polcal polimp \
+TASKS = polhelp polka datapic polcent segment polcal polimp \
 polexp polvec polplot polbin
 
 #  Monolith routine source name.
@@ -496,7 +496,7 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 
 #  List of task interface files.
 
-IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polmap.ifl polka.ifl \
+IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polka.ifl \
 segment.ifl polcal.ifl polimp.ifl polexp.ifl polvec.ifl polplot.ifl \
 polbin.ifl
 
@@ -517,7 +517,7 @@ TEST_SCRIPT = $(PKG_NAME)_test
 
 LATEX_DOCS = sun223.tex
 HYPERTEXT_DOCS = 
-HYPERTEXT_HELP = polka.htx polmap.htx
+HYPERTEXT_HELP = polka.htx 
 FIGURES = sun223_figures
 
 #  List of documentation files.
@@ -1659,8 +1659,6 @@ polka.o:	GRP_PAR
 polka.o:	PAR_ERR     
 polka.o:	PRM_PAR     
 polka.o:	SAE_PAR     
-polmap.o:	PAR_ERR     
-polmap.o:	SAE_PAR     
 polpack_mon.o:	SAE_PAR PAR_PAR
 polvec.o:	NDF_PAR
 polvec.o:	PAR_ERR

@@ -1034,6 +1034,8 @@
    set col2f [frame $col2.f -bd 2 -relief groove]
    pack $col2f -pady 3m -fill y -expand 1 -ipadx 2m -ipady 2m
 
+   SetHelp $col2f ".  Controls for setting the appearance of the displayed image." POLKA_DISPLAY_CONTROLS
+
 # Create and pack the label containing the title.
    pack [label $col2f.clab -text "Display Controls:"] -side top -fill x \
                                                        -pady 1m -expand 1
