@@ -687,13 +687,13 @@ c     RECORD /ADATUM/       DATUM                     ! General data object
 *              Get the value
                 CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J) +
      :                             ((I-1)*FIELD_ENELM(J) +
-     :                             (L-1))*VAL__NBR), DATUM_DVAL, STATUS )
+     :                             (L-1))*VAL__NBR), DATUM_DVAL,STATUS )
                 CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J) +
      :                             ((I-1)*FIELD_ENELM(J) +
-     :                             (L-1))*VAL__NBR), DATUM_RVAL, STATUS )
+     :                             (L-1))*VAL__NBR), DATUM_RVAL,STATUS )
                 CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J) +
      :                             ((I-1)*FIELD_ENELM(J) +
-     :                             (L-1))*VAL__NBR), DATUM_IVAL, STATUS )
+     :                             (L-1))*VAL__NBR), DATUM_IVAL,STATUS )
 
 *              Error item
                 IF ( SYMMETRIC ) THEN
