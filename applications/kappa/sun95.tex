@@ -39203,9 +39203,9 @@ plot (7k).
          should be separated by commas or, if they are supplied in a file,
          new-lines (see SUN/95 section {\tt "}Specifying Groups of Objects{\tt "}
          which is within the section {\tt "}Parameters{\tt "}). The suntax for each
-         expression is fortran-like; see the {\tt "}Examples{\tt "} section below, and
-         the AST\_MATHMAP documentation in SUN/210 for details. Only used
-         when MAPTYPE=MATH.
+         expression is fortran-like; see the {\tt "}Examples{\tt "} section 
+         below, and the Appendix entitled ``\htmlref{Using MathMaps}{ap:MathMaps}''
+         in SUN/95 for details. Only used when MAPTYPE=MATH.
       }
       \sstsubsection{
          FRAME = LITERAL (Read)
@@ -41050,6 +41050,607 @@ Yellow4             & 0.545 & 0.545 & 0.000 & YellowGreen         & 0.604 & 0.80
 \end{tabular}
 \end{center}
 
+\newpage
+\section{\xlabel{ap_MathMaps}Using MathMaps\label{ap:MathMaps}}
+A MathMap is an \xref{AST}{}{sun210} Object which contains a recipe for
+transforming positions from one co-ordinate Frame to another and
+(optionally) back again. These transformations are specified using
+arithmetic operations and mathematical functions similar to those
+available in Fortran. \htmlref{WCSADD}{WCSADD} can be used to create a
+MathMap and store it in a text file, and such text files can then be used
+by applications such as \htmlref{REGRID}{REGRID} which require a mapping.
+
+\subsection{Defining Transformation Functions}
+   A MathMap's transformation functions are defined by a set of
+   character strings holding Fortran-like expressions. If the required
+   Mapping has Nin input axes and Nout output axes, you would normally
+   supply the Nout expressions for the forward transformation. For 
+   instance, if Nout is 2 you might use:
+
+   \begin{verbatim}
+      'R = SQRT( X $*$ X $+$ Y $*$ Y )'
+      'THETA = ATAN2( Y, X )'
+   \end{verbatim}
+
+   which defines a transformation from Cartesian to polar
+   coordinates. Here, the variables that appear on the left of each
+   expression (R and THETA) provide names for the output variables and
+   those that appear on the right (X and Y) are references to input
+   variables.
+
+   To complement this, you must also supply expressions for the inverse
+   transformation.  In this case, the number of
+   expressions given would normally match the number of MathMap input
+   coordinates, Nin.  If Nin is 2, you might use:
+
+   \begin{verbatim}
+      'X = R $*$ COS( THETA )'
+      'Y = R $*$ SIN( THETA )'
+   \end{verbatim}
+
+   which expresses the transformation from polar to Cartesian
+   coordinates. Note that here the input variables (X and Y) are named on
+   the left of each expression, and the output variables (R and THETA)
+   are referenced on the right.
+
+   Normally, you cannot refer to a variable on the right of an expression
+   unless it is named on the left of an expression in the complementary
+   set of functions. Therefore both sets of functions (forward and
+   inverse) must be formulated using the same consistent set of variable
+   names. This means that if you wish to leave one of the transformations
+   undefined, you must supply dummy expressions which simply name each of
+   the output (or input) variables.  For example, you might use:
+
+   \begin{verbatim}
+      'X'
+      'Y'
+   \end{verbatim}
+
+   for the inverse transformation above, which serves to name the input
+   variables but without defining an inverse transformation.
+
+\subsection{Calculating Intermediate Values}
+      It is sometimes useful to calculate intermediate values and then to
+      use these in the final expressions for the output (or input)
+      variables. This may be done by supplying additional expressions for
+      the forward (or inverse) transformation functions. For instance, the
+      following array of five expressions describes 2-dimensional pin-cushion
+      distortion:
+
+      \begin{verbatim}
+         'R = SQRT( XIN $*$ XIN $+$ YIN $*$ YIN )'
+         'ROUT = R $*$ ( 1 $+$ 0.1 $*$ R $*$ R )'
+         'THETA = ATAN2( YIN, XIN )',
+         'XOUT = ROUT $*$ COS( THETA )'
+         'YOUT = ROUT $*$ SIN( THETA )'
+      \end{verbatim}
+
+      Here, we first calculate three intermediate results (R, ROUT
+      and THETA) and then use these to calculate the final results (XOUT
+      and YOUT). The MathMap knows that only the final two results
+      constitute values for the output variables because its Nout attribute
+      is set to 2. You may define as many intermediate variables in this
+      way as you choose. Having defined a variable, you may then refer to it
+      on the right of any subsequent expressions.
+
+      Note that when defining the inverse transformation you may only refer
+      to the output variables XOUT and YOUT. The intermediate variables R,
+      ROUT and THETA (above) are private to the forward transformation and
+      may not be referenced by the inverse transformation. The inverse
+      transformation may, however, define its own private intermediate
+      variables.
+
+\subsection{Expression Syntax}
+      The expressions given for the forward and inverse transformations
+      closely follow the syntax of Fortran (with some extensions for
+      compatibility with the C language). They may contain references to
+      variables and literal constants, together with arithmetic, logical,
+      relational and bitwise operators, and function invocations. A set of
+      symbolic constants is also available. Each of these is described in
+      detail below. Parentheses may be used to over-ride the normal order of
+      evaluation. There is no built-in limit to the length of expressions
+      and they are insensitive to case or the presence of additional white
+      space.
+
+\subsection{Variables}
+      Variable names must begin with an alphabetic character and may contain
+      only alphabetic characters, digits, and the underscore character
+      {\tt{"}}\_{\tt{"}}. There is no built-in limit to the length of variable names.
+
+\subsection{Literal Constants}
+      Literal constants, such as {\tt{"}}0{\tt{"}}, {\tt{"}}1{\tt{"}}, {\tt{"}}0.007{\tt{"}} or {\tt{"}}2.505E-16{\tt{"}} may appear
+      in expressions, with the decimal point and exponent being optional (a
+      {\tt{"}}D{\tt{"}} may also be used as an exponent character). A unary minus {\tt{"}}-{\tt{"}} may
+      be used as a prefix.
+
+\subsection{Arithmetic Precision}
+      All arithmetic is floating point, performed in double precision.
+
+\subsection{Propagation of Missing Data}
+      Unless indicated otherwise, if any argument of a function or operator
+      has a bad value (indicating missing data), then the result of
+      that function or operation is also bad, so that such values are
+      propagated automatically through all operations performed by MathMap
+      transformations.  The special value used to flag bad values can be 
+      represented in expressions by the symbolic constant {\tt{"}}$<$bad$>${\tt{"}}.
+
+      A $<$bad$>$ result is also produced in response
+      to any numerical error (such as division by zero or numerical
+      overflow), or if an invalid argument value is provided to a function
+      or operator.
+
+\subsection{Arithmetic Operators}
+      The following arithmetic operators are available:
+
+      \begin{itemize}
+
+         \item
+         X1 $+$ X2: Sum of X1 and X2.
+
+         \item
+         X1 - X2: Difference of X1 and X2.
+
+         \item
+         X1 $*$ X2: Product of X1 and X2.
+
+         \item
+         X1 / X2: Ratio of X1 and X2.
+
+         \item
+         X1 $*$$*$ X2: X1 raised to the power of X2.
+
+         \item
+         $+$ X: Unary plus, has no effect on its argument.
+
+         \item
+         - X: Unary minus, negates its argument.
+     \end{itemize}
+
+\subsection{Logical Operators}
+      Logical values are represented using zero to indicate .FALSE. and
+      non-zero to indicate .TRUE.. In addition, the bad value is taken to
+      mean {\tt{"}}unknown{\tt{"}}. The values returned by logical operators may therefore
+      be 0, 1 or bad. Where appropriate, {\tt{"}}tri-state{\tt{"}} logic is
+      implemented. For example, A.OR.B may evaluate to 1 if A is non-zero,
+      even if B has the bad value. This is because the result of the
+      operation would not be affected by the value of B, so long as A is
+      non-zero.
+
+      The following logical operators are available:
+      \begin{itemize}
+
+         \item
+         X1 .AND. X2: Logical AND between X1 and X2, returning 1 if both X1
+         and X2 are non-zero, and 0 otherwise. This operator implements
+         tri-state logic. (The synonym {\tt{"}}\&\&{\tt{"}} is also provided for compatibility
+         with C.)
+
+         \item
+         X1 .OR. X2: Logical OR between X1 and X2, returning 1 if either X1
+         or X2 are non-zero, and 0 otherwise. This operator implements
+         tri-state logic. (The synonym {\tt{"}}$|$$|${\tt{"}} is also provided for compatibility
+         with C.)
+
+         \item
+         X1 .NEQV. X2: Logical exclusive OR (XOR) between X1 and X2,
+         returning 1 if exactly one of X1 and X2 is non-zero, and 0
+         otherwise. Tri-state logic is not used with this operator. (The
+         synonym {\tt{"}}.XOR.{\tt{"}} is also provided, although this is not standard
+         Fortran. In addition, the C-like synonym {\tt{"}}$\wedge$$\wedge${\tt{"}} may be used, although
+         this is also not standard.)
+
+         \item
+         X1 .EQV. X2: Tests whether the logical states of X1 and X2
+         (i.e. .TRUE./.FALSE.) are equal. It is the negative of the exclusive OR
+         (XOR) function.  Tri-state logic is not used with this operator.
+
+         \item
+         .NOT. X: Logical unary NOT operation, returning 1 if X is zero, and
+         0 otherwise. (The synonym {\tt{"}}!{\tt{"}} is also provided for compatibility with
+         C.)
+     \end{itemize}
+
+\subsection{Relational Operators}
+      Relational operators return the logical result (0 or 1) of comparing
+      the values of two floating point values for equality or inequality. The
+      bad value may also be returned if either argument is $<$bad$>$.
+
+      The following relational operators are available:
+      \begin{itemize}
+
+         \item
+         X1 .EQ. X2: Tests whether X1 equals X2. (The synonym {\tt{"}}=={\tt{"}} is also
+         provided for compatibility with C.)
+
+         \item
+         X1 .NE. X2: Tests whether X1 is unequal to X2. (The synonym {\tt{"}}!={\tt{"}} is
+         also provided for compatibility with C.)
+
+         \item
+         X1 .GT. X2: Tests whether X1 is greater than X2. (The synonym {\tt{"}}$>${\tt{"}} is
+         also provided for compatibility with C.)
+
+         \item
+         X1 .GE. X2: Tests whether X1 is greater than or equal to X2. (The
+         synonym {\tt{"}}$>$={\tt{"}} is also provided for compatibility with C.)
+
+         \item
+         X1 .LT. X2: Tests whether X1 is less than X2. (The synonym {\tt{"}}$<${\tt{"}} is also
+         provided for compatibility with C.)
+
+         \item
+         X1 .LE. X2: Tests whether X1 is less than or equal to X2. (The synonym
+         {\tt{"}}$<$={\tt{"}} is also provided for compatibility with C.)
+
+     \end{itemize}
+
+      Note that relational operators cannot usefully be used to compare
+      values with the $<$bad$>$ value (representing missing data), because the
+      result is always $<$bad$>$. The ISBAD() function should be used instead.
+
+      Note, also, that because logical operators can operate on floating
+      point values, care must be taken to use parentheses in some cases
+      where they would not normally be required in Fortran. For example,
+      the expresssion:
+
+      \begin{verbatim}
+         .NOT. A .EQ. B
+      \end{verbatim}
+
+      must be written:
+
+      \begin{verbatim}
+         .NOT. ( A .EQ. B )
+      \end{verbatim}
+
+      to prevent the .NOT. operator from associating with the variable A.
+
+\subsection{Bitwise Operators}
+      Bitwise operators are often useful when operating on raw data
+      (e.g. from instruments), so they are provided for use in MathMap
+      expressions. In this case, however, the values on which they operate
+      are floating point values rather than the more usual pure integers. In
+      order to produce results which match the pure integer case, the
+      operands are regarded as fixed point binary numbers (i.e. with the
+      binary equivalent of a decimal point) with negative numbers
+      represented using twos-complement notation. For integer values, the
+      resulting bit pattern corresponds to that of the equivalent signed
+      integer (digits to the right of the point being zero). Operations on
+      the bits representing the fractional part are also possible, however.
+
+      The following bitwise operators are available:
+      \begin{itemize}
+
+         \item
+         X1 $>$$>$ X2: Rightward bit shift. The integer value of X2 is taken
+         (rounding towards zero) and the bits representing X1 are then
+         shifted this number of places to the right (or to the left if the
+         number of places is negative). This is equivalent to dividing X1 by
+         the corresponding power of 2.
+
+         \item
+         X1 $<$$<$ X2: Leftward bit shift. The integer value of X2 is taken
+         (rounding towards zero), and the bits representing X1 are then
+         shifted this number of places to the left (or to the right if the
+         number of places is negative). This is equivalent to multiplying X1
+         by the corresponding power of 2.
+
+         \item
+         X1 \& X2: Bitwise AND between the bits of X1 and those of X2
+         (equivalent to a logical AND applied at each bit position in turn).
+
+         \item
+         X1 $|$ X2: Bitwise OR between the bits of X1 and those of X2
+         (equivalent to a logical OR applied at each bit position in turn).
+
+         \item
+         X1 $\wedge$ X2: Bitwise exclusive OR (XOR) between the bits of X1 and
+         those of X2 (equivalent to a logical XOR applied at each bit
+         position in turn).
+
+     \end{itemize}
+
+      Note that no bit inversion operator is provided. This is
+      because inverting the bits of a twos-complement fixed point binary
+      number is equivalent to simply negating it. This differs from the
+      pure integer case because bits to the right of the binary point are
+      also inverted. To invert only those bits to the left of the binary
+      point, use a bitwise exclusive OR with the value -1 (i.e. X$\wedge$-1).
+
+\subsection{Functions}
+      The following functions are available:
+
+      \begin{itemize}
+
+         \item
+         ABS(X): Absolute value of X (sign removal), same as FABS(X).
+
+         \item
+         ACOS(X): Inverse cosine of X, in radians.
+
+         \item
+         ACOSD(X): Inverse cosine of X, in degrees.
+
+         \item
+         ACOSH(X): Inverse hyperbolic cosine of X.
+
+         \item
+         ACOTH(X): Inverse hyperbolic cotangent of X.
+
+         \item
+         ACSCH(X): Inverse hyperbolic cosecant of X.
+
+         \item
+         AINT(X): Integer part of X (round towards zero), same as INT(X).
+
+         \item
+         ASECH(X): Inverse hyperbolic secant of X.
+
+         \item
+         ASIN(X): Inverse sine of X, in radians.
+
+         \item
+         ASIND(X): Inverse sine of X, in degrees.
+
+         \item
+         ASINH(X): Inverse hyperbolic sine of X.
+
+         \item
+         ATAN(X): Inverse tangent of X, in radians.
+
+         \item
+         ATAND(X): Inverse tangent of X, in degrees.
+
+         \item
+         ATANH(X): Inverse hyperbolic tangent of X.
+
+         \item
+         ATAN2(X1, X2): Inverse tangent of X1/X2, in radians.
+
+         \item
+         ATAN2D(X1, X2): Inverse tangent of X1/X2, in degrees.
+
+         \item
+         CEIL(X): Smallest integer value not less then X (round towards
+           plus infinity).
+
+         \item
+         COS(X): Cosine of X in radians.
+
+         \item
+         COSD(X): Cosine of X in degrees.
+
+         \item
+         COSH(X): Hyperbolic cosine of X.
+
+         \item
+         COTH(X): Hyperbolic cotangent of X.
+
+         \item
+         CSCH(X): Hyperbolic cosecant of X.
+
+         \item
+         DIM(X1, X2): Returns X1-X2 if X1 is greater than X2, otherwise 0.
+
+         \item
+         EXP(X): Exponential function of X.
+
+         \item
+         FABS(X): Absolute value of X (sign removal), same as ABS(X).
+
+         \item
+         FLOOR(X): Largest integer not greater than X (round towards
+           minus infinity).
+
+         \item
+         FMOD(X1, X2): Remainder when X1 is divided by X2, same as
+           MOD(X1, X2).
+
+         \item
+         GAUSS(X1, X2): Random sample from a Gaussian distribution with mean
+           X1 and standard deviation X2.
+
+         \item
+         INT(X): Integer part of X (round towards zero), same as AINT(X).
+
+         \item
+         ISBAD(X): Returns 1 if X has the $<$bad$>$ value, otherwise 0.
+
+         \item
+         LOG(X): Natural logarithm of X.
+
+         \item
+         LOG10(X): Logarithm of X to base 10.
+
+         \item
+         MAX(X1, X2, ...): Maximum of two or more values.
+
+         \item
+         MIN(X1, X2, ...): Minimum of two or more values.
+
+         \item
+         MOD(X1, X2): Remainder when X1 is divided by X2, same as
+           FMOD(X1, X2).
+
+         \item
+         NINT(X): Nearest integer to X (round to nearest).
+
+         \item
+         POISSON(X): Random integer-valued sample from a Poisson
+           distribution with mean X.
+
+         \item
+         POW(X1, X2): X1 raised to the power of X2.
+
+         \item
+         RAND(X1, X2): Random sample from a uniform distribution in the
+           range X1 to X2 inclusive.
+
+         \item
+         SECH(X): Hyperbolic secant of X.
+
+         \item
+         SIGN(X1, X2): Absolute value of X1 with the sign of X2
+           (transfer of sign).
+
+         \item
+         SIN(X): Sine of X in radians.
+
+         \item
+         SINC(X): Sinc function of X [= SIN(X)/X].
+
+         \item
+         SIND(X): Sine of X in degrees.
+
+         \item
+         SINH(X): Hyperbolic sine of X.
+
+         \item
+         SQR(X): Square of X (= X$*$X).
+
+         \item
+         SQRT(X): Square root of X.
+
+         \item
+         TAN(X): Tangent of X in radians.
+
+         \item
+         TAND(X): Tangent of X in degrees.
+
+         \item
+         TANH(X): Hyperbolic tangent of X.
+     \end{itemize}
+
+\subsection{Symbolic Constants}
+
+      The following symbolic constants are available (the enclosing
+      {\tt{"}}$<$$>${\tt{"}} brackets must be included):
+
+      \begin{itemize}
+
+         \item
+         $<$bad$>$: The {\tt{"}}bad{\tt{"}} value used to flag missing data. Note
+         that you cannot usefully compare values with this constant because the
+         result is always $<$bad$>$. The ISBAD() function should be used instead.
+
+         \item
+         $<$dig$>$: Number of decimal digits of precision available in a
+         floating point (double precision) value.
+
+         \item
+         $<$e$>$: \htmlref{Base}{Base} of natural logarithms.
+
+         \item
+         $<$epsilon$>$: Smallest positive number such that 1.0$+$$<$epsilon$>$ is
+         distinguishable from unity.
+
+         \item
+         $<$mant\_dig$>$: The number of base $<$radix$>$ digits stored in the
+         mantissa of a floating point (double precision) value.
+
+         \item
+         $<$max$>$: Maximum representable floating point (double precision) value.
+
+         \item
+         $<$max\_10\_exp$>$: Maximum integer such that 10 raised to that power
+         can be represented as a floating point (double precision) value.
+
+         \item
+         $<$max\_exp$>$: Maximum integer such that $<$radix$>$ raised to that
+         power minus 1 can be represented as a floating point (double precision)
+         value.
+
+         \item
+         $<$min$>$: Smallest positive number which can be represented as a
+         normalised floating point (double precision) value.
+
+         \item
+         $<$min\_10\_exp$>$: Minimum negative integer such that 10 raised to that
+         power can be represented as a normalised floating point (double
+         precision) value.
+
+         \item
+         $<$min\_exp$>$: Minimum negative integer such that $<$radix$>$ raised to
+         that power minus 1 can be represented as a normalised floating point
+         (double precision) value.
+
+         \item
+         $<$pi$>$: Ratio of the circumference of a circle to its diameter.
+
+         \item
+         $<$radix$>$: The radix (number base) used to represent the mantissa of
+         floating point (double precision) values.
+
+         \item
+         $<$rounds$>$: The mode used for rounding floating point results after
+         addition. Possible values include: -1 (indeterminate), 0 (toward
+         zero), 1 (to nearest), 2 (toward plus infinity) and 3 (toward minus
+         infinity). Other values indicate machine-dependent behaviour.
+     \end{itemize}
+
+\subsection{Evaluation Precedence and Associativity}
+
+      Items appearing in expressions are evaluated in the following order
+      (highest precedence first):
+
+      \begin{itemize}
+
+         \item
+         Constants and variables
+
+         \item
+         Function arguments and parenthesised expressions
+
+         \item
+         Function invocations
+
+         \item
+         Unary $+$ - ! .not.
+
+         \item
+         $*$$*$
+
+         \item
+         $*$ /
+
+         \item
+         $+$ -
+
+         \item
+         $<$$<$ $>$$>$
+
+         \item
+         $<$ .lt. $<$= .le. $>$ .gt. $>$= .ge.
+
+         \item
+         == .eq. != .ne.
+
+         \item
+         \&
+
+         \item
+         $\wedge$
+
+         \item
+         $|$
+
+         \item
+         \&\& .and.
+
+         \item
+         $\wedge$$\wedge$
+
+         \item
+         $|$$|$ .or
+
+         \item
+         .eqv. .neqv. .xor.
+
+     \end{itemize}
+
+      All operators associate from left-to-right, except for unary $+$,
+      unary -, !, .not. and $*$$*$ which associate from right-to-left.
+ 
 \newpage
 \section{\xlabel{ap_NDFformat}Standard Components in an NDF
 \label{ap:NDFformat}}
