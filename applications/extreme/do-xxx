@@ -2,30 +2,31 @@
 
 #+
 #  Name:
-#     do_filter
+#     do-filter
 #
 #  Purpose:
 #     Apply source code filter to a set of files
 #
 #  Usage:
-#     do_filter files
+#     do-filter files
 #
 #  Description:
 #     This is a driver script to run one of the filter programs in
 #     the EXTREME package which modifies source code.  It should be 
 #     invoked under the name 'do_xxx' to run the filter 'xxx'.
 #     For each of its command line arguments (files) it:
-#        - Runs the filter xxx
+#        - Runs the filter xxx.
 #        - Writes a line to the file ./xxx.log saying how many lines were
-#          changed
+#          changed.
 #        - If and only if changes were made, it writes the modified file
-#          under the same name into the directory ./xxx.changed
+#          under the same name into the directory ./xxx.changed.
 #        - If the filter or this script thinks there might be something 
 #          which needs human attention, it prints a line to standard output.
 #
-#     It then writes a short summary of the run.
+#     It then writes a short summary of the run, including a report of
+#     whether any files gained new dependencies on include files.
 #
-#     As part of its checking, it invokes a script called cmp_xxx.pl
+#     As part of its checking, it invokes a script called cmp_xxx
 #     on each pair of (original, changed) files; these scripts are 
 #     crude checks that the changes made have not done anything to the
 #     source code to change its intention other than what should have 
@@ -87,6 +88,9 @@
 #  Initialise counters.
       nf="0"
       nc="0"
+      Nextreme="0"
+      Nextpar="0"
+      Ncnfpar="0"
 
 #  Process each file.
       for f in $@
@@ -205,6 +209,31 @@
             :
          fi
 
+#  Maintain count of whether file contains new include dependencies.
+         if [ "$changed" != "0" ]
+         then
+            for incfile in extreme.h EXT_PAR CNF_PAR
+            do
+               if grep "$incfile" "$outfile" >/dev/null
+               then 
+                  if grep "$incfile" "$infile" >/dev/null
+                  then
+                     :
+                  else
+                     case "$incfile" in
+                        extreme.h) Nextreme=`echo $Nextreme + 1 | bc` ;;
+                        EXT_PAR)   Nextpar=`echo $Nextpar + 1 | bc` ;;
+                        CNF_PAR)   Ncnfpar=`echo $Ncnfpar + 1 | bc` ;;
+                     esac
+                  fi
+               else
+                  :
+               fi
+            done
+         else
+            :
+         fi
+
 #  Print any warnings to standard output - no need to repeat the same ones.
          if [ -s $warnfile ]
          then
@@ -230,8 +259,26 @@
 
 #  Summarise to standard output.
       echo " "
-      echo "$nc/$nf modified files written in $destdir"
-      echo "Logfile is $logfile"
+      if [ "$Nextreme" != "0" ]
+      then
+         echo $Nextreme new dependencies on include file '"extreme.h"'.
+      else
+         :
+      fi
+      if [ "$Nextpar" != "0" ]
+      then
+         echo $Nextpar new dependencies on include file "'EXT_PAR'".
+      else
+         :
+      fi
+      if [ "$Ncnfpar" != "0" ]
+      then 
+         echo $Ncnfpar new dependencies on include file "'CNF_PAR'".
+      else
+         :
+      fi
+      echo "$nc/$nf modified files written in $destdir."
+      echo "Logfile is $logfile."
       
 
 
