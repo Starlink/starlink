@@ -874,7 +874,6 @@
                   CALL KPG1_PROWD( EL, %VAL( PNTR1( 2 ) ), J,
      :                             %VAL( PNTRW( 1 ) ), STATUS )
                END IF
-            END IF
 
 *  If necessary, copy the variance values in the same way into the
 *  IVAR'th row of the appropriate work array. Update IVAR to take
@@ -884,6 +883,8 @@
                   CALL KPG1_PROWD( EL, %VAL( PNTR1( 2 ) ), IVAR,
      :                             %VAL( PNTRW( 2 ) ), STATUS )
                END IF
+
+            END IF
 
 *  Unmap the input arrays once their values have been copied.
             CALL NDF_UNMAP( NDF( I ), COMPI( I ), STATUS )
