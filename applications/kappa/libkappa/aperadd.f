@@ -63,14 +63,14 @@
 *        specialist application should as KAPPA:ARDGEN. 
 *
 *        The co-ordinate system in which positions within the ARD file are
-*	 given should be indicated by including suitable COFRAME or WCS
-*	 statements within the file (see SUN/183), but will default to
-*	 pixel co-ordinates in the absence of any such statements. For
-*	 instance, starting the file with a line containing the text
-*	 "COFRAME(SKY,System=FK5)" would indicate that positions are
-*	 specified in RA/DEC (FK5,J2000). The statement "COFRAME(PIXEL)"
-*	 indicates explicitly that positions are specified in pixel
-*	 co-ordinates. [!]
+*        given should be indicated by including suitable COFRAME or WCS
+*        statements within the file (see SUN/183), but will default to
+*        pixel co-ordinates in the absence of any such statements. For
+*        instance, starting the file with a line containing the text
+*        "COFRAME(SKY,System=FK5)" would indicate that positions are
+*        specified in RA/DEC (FK5,J2000). The statement "COFRAME(PIXEL)"
+*        indicates explicitly that positions are specified in pixel
+*        co-ordinates. [!]
 *     CENTRE = LITERAL (Read)
 *        The co-ordinates of the centre of the circular aperture. Only
 *        used if parameter ARDFILE is set to null. The position must be 
