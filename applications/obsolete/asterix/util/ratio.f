@@ -119,38 +119,37 @@
       REAL                   BANDS(4)            ! Axis ranges boundaries
       REAL                   OVAR                ! Output variance if 1D input
       REAL                   LHC, RHC, LHW, RHW  ! Bin centres and widths
-      REAL                   WIDTH1, WIDTH2      ! Band widths
+      REAL                   	WIDTH1, WIDTH2      	! Band widths
 
       INTEGER			AX_PTR(ADI__MXDIM)	! Ptr to axis data
       INTEGER			AX_WPTR(ADI__MXDIM)	! Ptr to axis widths
-      INTEGER                AXIS                ! Axis selected for ratio
-      INTEGER                DUMMY               !
-      INTEGER                I,J                 ! Axis loop counters
-      INTEGER                IDIMS(ADI__MXDIM)   ! Input data dimensions
-      INTEGER                ID_PTR              ! Input data pointer
+      INTEGER                	AXIS                	! Axis selected for ratio
+      INTEGER                	I,J                 	! Axis loop counters
+      INTEGER                	IDIMS(ADI__MXDIM)   	! Input data dimensions
+      INTEGER                	ID_PTR              	! Input data pointer
       INTEGER			IFID			! Input dataset id
-      INTEGER                IQ_PTR              ! Input quality pointer
-      INTEGER                IV_PTR              ! Input variance pointer
-      INTEGER                LOW1,HIGH1          ! Pixel positions of BANDS(1/2)
-      INTEGER                LOW2,HIGH2          ! Pixel positions of BANDS(3/4)
-      INTEGER                NDIM                ! Number of input data dims
-      INTEGER                NELM                ! Total no of input elements
-      INTEGER                NEWBAD              ! New bad points generated
-      INTEGER                NREC                ! Number of history records
-      INTEGER                NRNG                ! Number of ranges entered
-      INTEGER                ODIMS(ADI__MXDIM)   ! Output data dimensions
-      INTEGER                ONDIM               ! Number of output data dims
-      INTEGER                ONELM               ! # output data items
-      INTEGER                OD_PTR              ! Output data pointer
+      INTEGER                	IQ_PTR              	! Input quality pointer
+      INTEGER                	IV_PTR              	! Input variance pointer
+      INTEGER                	LOW1,HIGH1          	! Pixel positions of BANDS(1/2)
+      INTEGER                	LOW2,HIGH2          	! Pixel positions of BANDS(3/4)
+      INTEGER                	NDIM                	! Number of input data dims
+      INTEGER                	NELM                	! # input elements
+      INTEGER                	NEWBAD              	! New bad points generated
+      INTEGER                	NREC                	! Number of history records
+      INTEGER                	NRNG                	! Number of ranges entered
+      INTEGER                	ODIMS(ADI__MXDIM)   	! Output data dimensions
+      INTEGER                	ONDIM               	! Number of output data dims
+      INTEGER                	ONELM               	! # output data items
+      INTEGER                	OD_PTR              	! Output data pointer
       INTEGER			OFID			! Output dataset id
-      INTEGER                OQ_PTR              ! Output quality pointer
-      INTEGER                OV_PTR              ! Output variance pointer
-      INTEGER                OW_PTR              ! Output work quality pointer
-      INTEGER                TLEN                ! Length of a string
-      INTEGER                T_PTR               ! Temporary pointer
-      INTEGER                USE                 ! Number of history elements
-      INTEGER                WD_PTR              ! Workspace data
-      INTEGER                WV_PTR              ! Workspace variance
+      INTEGER                	OQ_PTR              	! Output quality pointer
+      INTEGER                	OV_PTR              	! Output variance pointer
+      INTEGER                	OW_PTR              	! Output work quality pointer
+      INTEGER                	TLEN                	! Length of a string
+      INTEGER                	T_PTR               	! Temporary pointer
+      INTEGER                	USE                 	! Number of history elements
+      INTEGER                	WD_PTR              	! Workspace data
+      INTEGER                	WV_PTR              	! Workspace variance
 
       LOGICAL			AX_DUMMY(ADI__MXDIM)	! Dummy axis values?
       LOGICAL			AX_GOT_WIDS(ADI__MXDIM)	! Got axis widths?
