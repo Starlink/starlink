@@ -96,7 +96,7 @@
           DO JJ = GR_RNG_LO(2), GR_RNG_HI(2)
             PJJ = JJ - GR_RNG_CEN(2)
             DO II = GR_RNG_LO(1), GR_RNG_HI(1)
-              IF ( QUAL(II,JJ) .EQ. QUAL_GOOD ) THEN
+              IF ( QUAL(II,JJ) .EQ. QUAL__GOOD ) THEN
                 PII = II - GR_RNG_CEN(1)
                 CP = CP + 1
                 CX(CP) = II
@@ -298,7 +298,7 @@
             DO JJ = GR_RNG_LO(2), GR_RNG_HI(2)
               IF ( JJ .EQ. GR_RNG_CEN(2) ) CLO = CP
               DO II = GR_RNG_LO(1), GR_RNG_HI(1)
-                IF ( QUAL(II,JJ) .EQ. QUAL_GOOD ) THEN
+                IF ( QUAL(II,JJ) .EQ. QUAL__GOOD ) THEN
                   CP = CP + 1
                   DC_IMD(CP) = IMD(II,JJ)
                   DC_BGND(CP) = BGND(II,JJ)
@@ -329,7 +329,7 @@
             PJJ = JJ - GR_RNG_CEN(2)
             IF ( PJJ .EQ. 0 ) CLO = CP
             DO II = GR_RNG_LO(1), GR_RNG_HI(1)
-              IF ( QUAL(II,JJ) .EQ. QUAL_GOOD ) THEN
+              IF ( QUAL(II,JJ) .EQ. QUAL__GOOD ) THEN
                 PII = II - GR_RNG_CEN(1)
                 CP = CP + 1
                 DC_PSF(CP) = PSFV(PII,PJJ)
