@@ -13,6 +13,7 @@
 *                       28/10/98 (AJC):
 *                          Major remodel to produce NDFs
 *                          N.B. Header information lost.
+*	Last modify:	23/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -200,8 +201,11 @@ checkstruct	*initcheck(picstruct *field, char *filename,
   case CHECK_SUBTRACTED:
   case CHECK_OBJECTS:
   case CHECK_APERTURES:
-  case CHECK_SUBPROTOS:
-  case CHECK_PROTOS:
+  case CHECK_SUBPSFPROTOS:
+  case CHECK_PSFPROTOS:
+  case CHECK_SUBPCPROTOS:
+  case CHECK_PCPROTOS:
+  case CHECK_PCOPROTOS:
   case CHECK_ASSOC:
   case CHECK_MAPSOM:
      ubnd[0] = check->width = field->width;
@@ -247,8 +251,11 @@ checkstruct	*initcheck(picstruct *field, char *filename,
 /*----- Fall through here */
   case CHECK_OBJECTS:
   case CHECK_APERTURES:
-  case CHECK_SUBPROTOS:
-  case CHECK_PROTOS:
+  case CHECK_SUBPSFPROTOS:
+  case CHECK_PSFPROTOS:
+  case CHECK_SUBPCPROTOS:
+  case CHECK_PCPROTOS:
+  case CHECK_PCOPROTOS:
      ndfMap( check->ndf, "DATA", "_REAL", "WRITE/ZERO", 
              pntr, &check->nel, &status );
      check->map = pntr[0];
@@ -300,7 +307,8 @@ Write ONE line of pixels of a check-image.
 void	writecheck(checkstruct *check, PIXTYPE *data, int w)
 
   {
-  if (check->type == CHECK_APERTURES || check->type == CHECK_SUBPROTOS)
+  if (check->type == CHECK_APERTURES || check->type == CHECK_SUBPSFPROTOS
+	|| check->type == CHECK_SUBPCPROTOS || check->type == CHECK_PCOPROTOS)
     {
     memcpy((PIXTYPE *)check->pix + w*(check->y++), data, w*sizeof(PIXTYPE));
     return;
@@ -358,7 +366,11 @@ void	endcheck(picstruct *field, checkstruct *check)
 
     case CHECK_OBJECTS:
     case CHECK_APERTURES:
-    case CHECK_SUBPROTOS:
+    case CHECK_SUBPSFPROTOS:
+    case CHECK_PSFPROTOS:
+    case CHECK_SUBPCPROTOS:
+    case CHECK_PCPROTOS:
+    case CHECK_PCOPROTOS:
     case CHECK_ASSOC:
       break;
 
