@@ -115,8 +115,6 @@
       EXTERNAL			BDI2_IMGET
       EXTERNAL			BDI2_IMMAP
 
-      EXTERNAL			BDI2_UNMAP
-
 *  Local Variables:
       INTEGER			DID			! Dummy identifier
 *.
@@ -217,10 +215,10 @@
      :       'FileItemMap(_Array,_FITSfile,"Data",_CHAR,_CHAR)',
      :                   BDI2_ARMAP, DID, STATUS )
 
-*    All FITS unmapping for BDI goes through BDI2_UNMAP
+*    All FITS unmapping for BDI goes through BDI0_UNMAP
         CALL ADI_DEFFUN(
      :       'FileItemUnmap(_,_FITSfile,_CHAR,_INTEGER)',
-     :                   BDI2_UNMAP, DID, STATUS )
+     :                   BDI0_UNMAP, DID, STATUS )
 
 *    Mark as initialised
         CALL AST_SPKGI( BDI__PKG )
