@@ -126,6 +126,8 @@
 *     10 Dec 1995 V2.0-0 (DJA):
 *        ADI port. Simplify logic by not treating regular axis arrays
 *        explicitly (as they are expanded on output anyhow)
+*     10 Jan 1996 V2.0-1 (DJA):
+*        Use USI_NAMES to write input file name
 *     {enter_changes_here}
 
 *  Bugs:
@@ -151,7 +153,7 @@
       INTEGER			NOBJ			!
         PARAMETER		( NOBJ = 5 )
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'BINSUBSET Version V2.0-0' )
+        PARAMETER		( VERSION = 'BINSUBSET Version V2.0-1' )
 
 *  Local Variables:
       CHARACTER*7 		AXID
@@ -160,7 +162,6 @@
       CHARACTER*6		MTYPE			! Object mapping type
       CHARACTER*6            	PARNAM
       CHARACTER*40           	TEM                	! Dummy string
-      CHARACTER*80           	TEXTI(4)           	! Input file spec
 
       REAL                   	AXLO(ADI__MXDIM)   	! Axis low
       REAL                   	AXHI(ADI__MXDIM)   	! Axis high
@@ -171,8 +172,9 @@
       INTEGER                HU                 ! History lines used
       INTEGER                	IDPTR              	! Pointer to input data
       INTEGER			IFID			! Input dataset id
+      INTEGER			IFILES			! Input file list
       INTEGER                IWPTR(ADI__MXDIM)  ! Pointer to input axis widths
-      INTEGER                NDIM               ! Number of input dimensions
+      INTEGER                	NDIM               	! Input dimensionality
       INTEGER                NRANGE(ADI__MXDIM) ! # item ranges
       INTEGER                ODIMS(ADI__MXDIM)  ! Output DATA_ARRAY dimensions
       INTEGER                	ODPTR              	! Pointer to output data
@@ -183,7 +185,6 @@
       INTEGER                	I, J, K            	! Loop counters
       INTEGER                	NELM               	! Total length of input data
       INTEGER			OFID			! Output dataset id
-      INTEGER                	INLINES            	! Number of TEXTI lines
       INTEGER                AXRANGE(2,DTA__MXRANG,ADI__MXDIM)
 						! Pixel equivalent of RANGES
       INTEGER                IAXPTR(ADI__MXDIM) ! Pointers to input axes
@@ -295,7 +296,7 @@
           CALL CHR_ITOC( DIMS(I), TEM, TLEN )
           CALL MSG_PRNT( 'Axis ^AX has '//TEM(:TLEN)//' elements' )
           CALL USI_DEF0C( PARNAM, '1:'//TEM(:TLEN), STATUS )
-          CALL PRS_GETRANGES (PARNAM, DTA__MXRANG, 1,1.0,
+          CALL PRS_GETRANGES( PARNAM, DTA__MXRANG, 1,1.0,
      :               REAL(DIMS(I)),RANGES(1,1,I),NRANGE(I), STATUS )
           IF ( RANGES(1,1,I) .LT. 1.0 ) THEN
             RANGES(1,1,I) = 1.0
@@ -326,7 +327,7 @@
 
         END IF
 
-*      Write history text
+*    Write history text
         HU = HU + 1
         CALL MSG_SETI( 'AX', I )
         CALL MSG_MAKE( 'Axis ^AX subset', HTEXT(HU), TLEN )
@@ -532,8 +533,8 @@
 *  History component
       CALL HSI_COPY( IFID, OFID, STATUS )
       CALL HSI_ADD( OFID, VERSION, STATUS )
-      CALL USI_NAMEI( INLINES, TEXTI, STATUS )
-      CALL HSI_PTXT( OFID, INLINES, TEXTI, STATUS )
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, STATUS )
       CALL HSI_PTXT( OFID, HU, HTEXT, STATUS )
 
 *  Copy all ancilliary stuff

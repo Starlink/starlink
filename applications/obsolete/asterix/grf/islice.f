@@ -87,7 +87,6 @@
 *  ensure transformations correct
         CALL GTR_RESTORE(STATUS)
         CALL GCB_ATTACH('IMAGE',STATUS)
-        CALL IMG_2DGCB(STATUS)
 
 *  get centre of cut
 
