@@ -22,25 +22,25 @@ AC_SUBST(NOUNDERSCORES)
 NOUNDERSCORES=''
 
 
-dnl  Is gprof available?
+dnl  Is gprof available?  If no value is given, see if we can find
+dnl  gprof, and if so, set PROFILINGOPTION to -pg; otherwise, set it
+dnl  to ""
 AC_ARG_ENABLE(profiling,
 [  --enable-profiling=opt  Give the compiler option to include profiling code],
   PROFILINGOPTION=$enableval,
   AC_CHECK_PROG(PROFILINGOPTION, gprof, -pg, ""))
 
+dnl  If --enable-nounderscore is not present, set it to ""
 AC_ARG_ENABLE(nounderscore,
 [  --enable-nounderscore=opt  
                           Give the compiler option to suppress
                           trailing underscores in symbol names],
-  NOUNDERSCORES=$enableval)
+  NOUNDERSCORES=$enableval,
+  NOUNDERSCORES="")
 
 
-# We know what these options are for GCC/G77:
-dnl if test "$PROFILINGOPTION" != "no"; then
-dnl   if test "$GCC" = "yes" -a -z "$PROFILINGOPTION"; then
-dnl      PROFILINGOPTION='-pg'
-dnl   fi
-dnl fi
+dnl  We know what these options are for gcc/g77, and autoconf makes it
+dnl  easy to test whether it's gcc/g77 we're using, so special-case these:
 if test "$NOUNDERSCORES" != "no"; then
   if test "$G77" = "yes"; then
     if test -z "$PROFILINGOPTION"; then
@@ -52,11 +52,17 @@ if test "$NOUNDERSCORES" != "no"; then
   fi
 fi
 
-dnl echo "PROFILINGOPTION=$PROFILINGOPTION  NOUNDERSCORES=$NOUNDERSCORES"
+echo "PROFILINGOPTION=$PROFILINGOPTION  NOUNDERSCORES=$NOUNDERSCORES"
+dnl  If we haven't set both of PROFILINGOPTION and NOUNDERSCORES by
+dnl  now, then try to guess appropriate values based on the host
+dnl  platform.  This isn't ideal, since it can't tell if you're using
+dnl  a non-default compiler, but we'll try to use the options at the
+dnl  end, and try to give a helpful error message if it doesn't work.
 if test -z "$PROFILINGOPTION" -o -z "$NOUNDERSCORES"; then
-    AC_CANONICAL_SYSTEM
-    echo "Target system $target"
-    case "$target" in
+    AC_CANONICAL_HOST
+    echo "build=$build  host=$host  target=$target"
+    echo "Target system $host"
+    case "$host" in
       sparc-*-*) 
         if test -z "$PROFILINGOPTION" -o "$PROFILINGOPTION" != "no"; then 
             PROFILINGOPTION=-pg
@@ -65,7 +71,6 @@ if test -z "$PROFILINGOPTION" -o -z "$NOUNDERSCORES"; then
             NOUNDERSCORES=-ext_names=plain
         fi
         ;;
-      dnl AC_MSG_ERROR... OR AC_MSG_WARN
       *)
         AC_MSG_WARN([
   I can't work out how to specify the profiling and
@@ -80,6 +85,46 @@ if test -z "$PROFILINGOPTION" -o -z "$NOUNDERSCORES"; then
     esac
 fi
 
+dnl  Now test the options we have set up, by compiling a simple
+dnl  Fortran program
+AC_LANG_FORTRAN77
+echo "CC=$CC  F77=$F77"
+echo "FFLAGS=$FFLAGS"
+dnl   Following triggers a bug in autoconf 2.13 (reported to
+dnl  http://sources.redhat.com/autoconf/).
+dnl
+dnl safe_FFLAGS=$FFLAGS
+dnl FFLAGS="FFLAGS $PROFILINGOPTION $NOUNDERSCORES"
+dnl AC_TRY_COMPILE(,
+dnl       I=1,
+dnl   echo "Fortran flags $FFLAGS work",
+dnl   [AC_MSG_WARN([
+dnl   Oooh-err.  Based on your platform, $host, I thought that the Fortran
+dnl   compiler options $FFLAGS would work, but they don't appear to.
+dnl   Perhaps the Fortran compiler you've selected, $F77, isn't the default
+dnl   one for this platform.  You can force the profiling options and
+dnl   no-underscores options by using the configure flags
+dnl    --enable-profiling=<option> and --enable-nounderscore=<option>])])
+dnl FFLAGS=$safe_FFLAGS
+
+dnl  So do it by hand.
+cat >conftest.f <<EOF
+      PROGRAM SILLY
+      I=1
+      END
+EOF
+$F77 $FFLAGS $PROFILINGOPTION $NOUNDERSCORES conftest.f
+if test $? = 0; then
+    echo "Fortran flags $FFLAGS work"
+else
+    AC_MSG_WARN([
+    Oooh-err.  Based on your platform, $host, I thought that the Fortran
+    compiler options $FFLAGS would work, but they don't appear to.
+    Perhaps the Fortran compiler you've selected, $F77, isn't the default
+    one for this platform.  You can force the profiling options and
+    no-underscores options by using the configure flags
+    --enable-profiling=<option> and --enable-nounderscore=<option>])
+fi
 
 
 AC_OUTPUT(Makefile)
