@@ -2132,10 +2132,9 @@
 
 *               Write current date (should use FTGSTM, but that's not
 *               available in older versions of FITSIO)
-*                  CALL FTGSDT (IUTD,IUTMO,IUTY, FTSTAT)
-*                  WRITE (FTWS, '(I4,"-",I2.2,"-",I2.2)') 
-*     :                 IUTY, IUTMO, IUTD
-                  CALL FTGSTM (FTWS, FTSTAT)
+                  CALL FTGSDT (IUTD,IUTMO,IUTY, FTSTAT)
+                  WRITE (FTWS, '(I4,"-",I2.2,"-",I2.2)') 
+     :                 IUTY, IUTMO, IUTD
                   CALL FTPKYS (FTUNIT, 'DATE', FTWS,
      :                 'Date file was written', FTSTAT)
 
