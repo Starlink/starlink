@@ -20,6 +20,13 @@ sub new {
 
 
 ########################################################################
+sub finish {
+
+   my ($rlocate) = @_;
+   untie %$rlocate;
+}
+
+########################################################################
 sub get {
 
    my ($rlocate, $name, %options) = @_;
@@ -139,7 +146,6 @@ sub each {
 
    if ($package) {
       while (($key, $value) = each %$rlocate) {
-         @loc = split ' ', $value;
          foreach $loc (split ' ', $value) {
             return ($key, $loc) if ((starpack ($loc) || '') eq $package);
          }
@@ -152,6 +158,23 @@ sub each {
          @each_loc = split ' ', $value;
       }
       return $each_key, shift (@each_loc);
+   }
+}
+
+
+########################################################################
+sub delpack {
+
+   my ($rlocate, $package) = @_;
+
+   my ($key, @keys);
+
+   while (($key, $value) = $rlocate->each($package)) {
+      push @keys, $key;
+   }
+
+   foreach $key (@keys) {
+      $rlocate->delete($key, $package);
    }
 }
 
