@@ -83,8 +83,6 @@ using std::vector;
 
 #define DVI2BITMAPURL "http://www.astro.gla.ac.uk/users/norman/star/dvi2bitmap/"
 
-typedef vector<string> string_list;
-
 // bitmap_info keeps together all the detailed information about the
 // bitmap to be written.
 struct bitmap_info {
@@ -105,9 +103,9 @@ void process_dvi_file (DviFile *, bitmap_info&, int resolution,
 		       const PkFont *fallback_font, PageRange&);
 bool process_special (DviFile *, string specialString,
 		      Bitmap*, bitmap_info&);
-string_list& tokenise_string (string s);
 string get_ofn_pattern (string dviname);
-bool parse_boolean_string(char *s);
+bool parse_boolean_string(char *s, bool *ok=0);
+void Usage (const char*);
 void Usage (string msg);
 void Usage (bool);
 void show_help();
@@ -341,7 +339,61 @@ int main (int argc, char **argv)
 	    break;
 
 	  case 'G':		// --font-gen
-	    PkFont::setMakeFonts (parse_boolean_string(optarg));
+	    {
+		// Parse option:
+		// --font-gen=command[=blah]
+		// --font-gen=[boolean]
+		// Can't use getsubopt() since blah will contain spaces
+		bool boolok;
+		if (parse_boolean_string(optarg, &boolok)) {
+		    PkFont::setFontgen(true);
+		} else if (boolok) {
+		    // parse_boolean_string returned false, 
+		    // because it did find a valid boolean
+		    PkFont::setFontgen(false);
+		} else if (strncmp(optarg, "command", 7) == 0) {
+		    char* cmd;
+		    for (cmd=optarg; *cmd!='=' && *cmd!='\0'; cmd++)
+			;		// find equals sign or eos
+		    // 		cerr << "G: optarg=" << optarg << ", cmd="
+		    // 		     << (cmd==0 ? "<NULL>" : cmd) << endl;
+		    if (*cmd == '\0') {	// no cmd
+			// simply enable it, with default cmd
+			PkFont::setFontgen(true);
+		    } else {
+			cmd++;	// was pointing at '='
+			PkFont::setFontgenCommand(cmd);
+		    }
+		} else {
+		    Usage("Unrecognised argument to --font-gen");
+		}
+	    }
+	    
+// 		char *options = optarg;
+// 		char *value;
+// 		char *tokens[] = {
+// 		    (char*)"command",
+// 		    (char*)"none",
+// 		    NULL,
+// 		};
+// 		while (*options) {
+// 		    int suboptch = getsubopt(&options, tokens, &value);
+// 		    cerr << "G: suboptch=" << suboptch << " value=" << value << endl;
+// 		    switch (suboptch) {
+// 		      case 0:	// command
+// 			if (value == 0)	// simply enable it, with default cmd
+// 			    PkFont::setFontgen(true);
+// 			else
+// 			    PkFont::setFontgenCommand(value);
+// 			break;
+// 		      case 1:	// none
+// 			PkFont::setFontgen(false);
+// 			break;
+// 		      default:
+// 			Usage("bad keyword for --font-gen");
+// 			break;
+// 		    }
+//		}
 	    break;
 
 	  case 'g':		// --debug
@@ -415,7 +467,7 @@ int main (int argc, char **argv)
 	  case 'n':		// --preamble-only
 	    // don't actually process the DVI file
 	    processing_ = preamble_only;
-	    PkFont::setMakeFonts(false);
+	    PkFont::setFontgen(false);
 	    break;
 
 	  case 'o':		// --output
@@ -1089,7 +1141,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 bool process_special (DviFile *dvif, string specialString,
 		      Bitmap* bitmap, bitmap_info& b)
 {
-    string_list l = tokenise_string (specialString);
+    string_list l = Util::tokenise_string (specialString);
     string_list::const_iterator s = l.begin();
     bool stringOK = false;
     bool setDefault = false;
@@ -1316,55 +1368,21 @@ string get_ofn_pattern (string dviname)
     return dvirootname + "-page%d";
 }
 
-// Tokenise string at whitespace.  There's a more C++-ish way of doing
-// this, I'm sure....
-string_list& tokenise_string (string str)
-{
-    static bool initialised = false;
-    static string_list *l;
-
-    if (verbosity > normal)
-	cerr << "tokenise_string: string=<" << str << ">" << endl;
-
-    if (! initialised)
-    {
-	l = new string_list();
-	initialised = true;
-    }
-    else
-	l->clear();
-
-    unsigned int i=0;
-
-    // skip leading whitespace
-    while (i < str.length() && isspace(str[i]))
-	i++;
-    while (i < str.length())
-    {
-	unsigned int wstart = i;
-	while (i < str.length() && !isspace(str[i]))
-	    i++;
-	string t = str.substr(wstart,i-wstart);
-	if (verbosity > normal)
-	    cerr << "tokenise:" << t << ":" << endl;
-	l->push_back(t);
-	while (i < str.length() && isspace(str[i]))
-	    i++;
-    }
-    return *l;
-}
-
 // Return true if the string is "yes", "true", "on",
 // false if "no", "false", "off".  
 // Return false if it doesn't match anything.
-bool parse_boolean_string(char *s) 
+// If ok is non-zero, then set it to true if one of the values did match, 
+// and false if none die
+bool parse_boolean_string(char *s, bool *ok) 
 {
+    if (ok != 0) *ok = true;
     if (strcmp(s, "yes") == 0)   return true;
     if (strcmp(s, "no") == 0)    return false;
     if (strcmp(s, "true") == 0)  return true;
     if (strcmp(s, "false") == 0) return false;
     if (strcmp(s, "on") == 0)    return true;
     if (strcmp(s, "off") == 0)   return false;
+    if (ok != 0) *ok = false;
     return false;
 }
 
@@ -1381,7 +1399,7 @@ void show_help()
 "  --font-search=[path|command|kpathsea]=value",
 "  --font-search=[nopath|nocommand|nokpathsea|none]",
 "                                 Control font-searching",
-"  --font-gen=boolean             Generate missing fonts?",
+"  --font-gen=[boolean|command[=cmd]] Generate missing fonts?",
 "  --font-mode=mode               MetaFont mode used when generating fonts",
 "  --height=size, --width=size    Size of output bitmap",
 "  --help                         Show this help",
@@ -1410,6 +1428,11 @@ void show_help()
 }
 
 void Usage (string msg)
+{
+    cerr << "Error: " << msg << endl;
+    Usage(true);
+}
+void Usage (const char* msg)
 {
     cerr << "Error: " << msg << endl;
     Usage(true);
