@@ -74,6 +74,10 @@
        you will still require a system whose virtual memory size is
        bigger than 2Gb.
 
+     - An error in the RMS fitting estimate for the astrometric
+       toolboxes has been corrected. Previous RMS values were all 
+       underestimates by a factor 1/sqrt(number_of_positions).
+
   To try out GAIA for yourself type the following command:
 
       %  gaia [image_file]
