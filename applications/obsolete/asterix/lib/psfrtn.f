@@ -1342,6 +1342,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
+      INCLUDE 'MATH_PAR'
 *
 *    Import :
 *
@@ -1377,6 +1378,12 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
 *      They are energy dependent
         CALL ARR_COP1L( 1, .TRUE., DATA, STATUS )
+
+*  Field size?
+      ELSE IF ( HINT .EQ. PSF_H_FLDSIZ ) THEN
+
+*    Write value
+        CALL ARR_COP1L( 1, 0.5*MATH__DTOR, DATA, STATUS )
 
       ELSE
         STATUS = SAI__ERROR
@@ -4236,6 +4243,7 @@ c     :                           S2 = 4.0419,
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
+      INCLUDE 'MATH_PAR'
 *
 *    Import :
 *
@@ -4266,7 +4274,13 @@ c     :                           S2 = 4.0419,
 *    It is position dependent
         CALL ARR_COP1L( 1, .TRUE., DATA, STATUS )
 
-*  Energy dependent
+*  Field size?
+      ELSE IF ( HINT .EQ. PSF_H_FLDSIZ ) THEN
+
+*    Write value
+        CALL ARR_COP1R( 1, 0.4*MATH__DTOR, DATA, STATUS )
+
+*  Energy dependent?
       ELSE IF ( HINT .EQ. PSF_H_ENDEP ) THEN
 
 *    Doesn't vary with energy
@@ -4931,6 +4945,7 @@ c     :                           S2 = 4.0419,
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
+      INCLUDE 'MATH_PAR'
 *
 *    Import :
 *
@@ -4968,11 +4983,17 @@ c     :                           S2 = 4.0419,
 *    The ONAXIS3 psf isn't position dependent
         CALL ARR_COP1L( 1, (OPT.NE.'ON3'), DATA, STATUS )
 
-*  Energy dependent
+*  Energy dependent?
       ELSE IF ( HINT .EQ. PSF_H_ENDEP ) THEN
 
 *    They all vary with energy
         CALL ARR_COP1L( 1, .TRUE., DATA, STATUS )
+
+*  Field size?
+      ELSE IF ( HINT .EQ. PSF_H_FLDSIZ ) THEN
+
+*    Write value
+        CALL ARR_COP1R( 1, 1.06*MATH__DTOR, DATA, STATUS )
 
       ELSE
         STATUS = SAI__ERROR
