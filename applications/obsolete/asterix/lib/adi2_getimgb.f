@@ -94,6 +94,8 @@
 *  Arguments Given:
       INTEGER			FID
       CHARACTER*(*)		HDU
+      INTEGER			NDIM
+      INTEGER			DIMS(*)
 
 *  Arguments Returned:
       BYTE			DATA(*)
