@@ -16,9 +16,9 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {211.8}
+\newcommand{\stardocnumber}    {211.9}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {12th December 2000}
+\newcommand{\stardocdate}      {4th April 2001}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -4747,10 +4747,11 @@ coordinate systems can be represented by a SkyFrame, as we will see
 shortly.
 
 When it is first created, a SkyFrame's axes are always in the order
-(longitude,~latitude) but this can be changed, if required, by using
-the \htmlref{astPermAxes}{astPermAxes} function (\secref{ss:permutingaxes}). A SkyFrame's
-coordinate values are always stored as angles in (double precision)
-radians.
+(longitude,~latitude) but this can be changed, if required, by using the
+\htmlref{astPermAxes}{astPermAxes} function (\secref{ss:permutingaxes}). The order of the axes
+can be determined at any time using the \htmlref{LatAxis}{LatAxis} and \htmlref{LonAxis}{LonAxis} attributes. A
+SkyFrame's coordinate values are always stored as angles in (double
+precision) radians.
 
 \subsection{Creating a SkyFrame}
 
@@ -4804,6 +4805,11 @@ usually needed.  The values supported are set out in the attribute's
 description in \appref{ss:attributedescriptions} and include a variety
 of equatorial coordinate systems, together with ecliptic and galactic
 coordinates.
+
+General spherical coordinates are supported by specifying
+``System$=$unknown''. You should note, though, that no \htmlref{Mapping}{Mapping} can be 
+created to convert between ``unknown'' coordinates and any of the other 
+celestial coordinate systems (see \secref{ss:introducingconversion} ).
 
 \subsection{Attributes which Qualify Celestial Coordinate Systems}
 
@@ -5490,6 +5496,11 @@ The point to note is that a SkyFrame contains knowledge about how to
 convert to and from other SkyFrames. Since its two axes (longitude and
 latitude) are distinguishable, the conversion is able to take account
 of the axis order.
+
+If you need to identify the axes of a SkyFrame explicitly, taking into
+account any axis permutations, the \htmlref{LatAxis}{LatAxis} and \htmlref{LonAxis}{LonAxis} attributes can be
+used. These are read-only attributes which give the indices of the
+latitude and longitude axes respectively.
 
 \subsection{\label{ss:convertingframes}Converting Between Frames}
 
@@ -7026,9 +7037,10 @@ complicated if some of the Objects are optional and may not always be
 present. It also makes extending your data format in future more
 difficult.
 
-To help with this, every AST \htmlref{Object}{Object} has an \htmlref{ID}{ID} attribute which allows
-you, in effect, to attach a textual identification label to it. You
-simply set the ID attribute before writing the Object:
+To help with this, every AST \htmlref{Object}{Object} has an \htmlref{ID}{ID} attribute and an \htmlref{Ident}{Ident}
+attribute, both of which allows you, in effect, to attach a textual
+identification label to it. You simply set the ID or Ident attribute before
+writing the Object:
 
 \begin{quote}
 \small
@@ -7054,9 +7066,12 @@ if ( !strcmp( astGetC( object, "ID" ), "Calibration" ) ) {
 \normalsize
 \end{quote}
 
-Note that the ID attribute is unique to a particular Object and
-is lost if, for example, you make a copy, so it is safest to set its
-value immediately before you perform the write.
+The only difference between the ID and Ident attributes is that the ID
+attribute is unique to a particular Object and is lost if, for example,
+you make a copy of the Object. The Ident attrubute, on the other hand, is
+transferred to the new Object when a copy is made. Consequently, it is
+safest to set the value of the ID attribute immediately before you
+perform the write.
 
 \subsection{\label{ss:textualoutputformat}The Textual Output Format} 
 
@@ -18592,6 +18607,87 @@ Object            - Base class for all AST Objects
 \section{\label{ss:attributedescriptions}AST Attribute Descriptions}
 \small
 \sstroutine{
+   AllWarnings\sstlabel{AllWarnings}
+}{
+   A list of all currently available condition names
+}{
+   \sstdescription{
+      This read-only attribute is a space separated list of all the conditions
+      names recognized by the \htmlref{Warnings}{Warnings} attribute. The names are listed
+      below.
+   }
+   \sstattributetype{
+      String, read-only
+   }
+   \sstapplicability{
+      \sstsubsection{
+         \htmlref{FitsChan}{FitsChan}
+      }{
+         All FitsChans have this attribute.
+      }
+   }
+   \sstdiytopic{
+      Conditions
+   }{
+      The following conditions are currently recognised (all are
+      case-insensitive):
+
+      \sstitemlist{
+
+         \sstitem
+         {\tt{"}}BadCel{\tt{"}}: This condition arises when reading a \htmlref{FrameSet}{FrameSet} from a
+         non-Native encoded FitsChan if an unknown celestial co-ordinate
+         system is specified by the CTYPE keywords.
+
+         \sstitem
+         {\tt{"}}NoCTYPE{\tt{"}}: This condition arises if a default CTYPE value is used
+         within \htmlref{astRead}{astRead}, due to no value being present in the supplied FitsChan.
+         This condition is only tested for when using non-Native encodings.
+
+         \sstitem
+         {\tt{"}}NoEquinox{\tt{"}}: This condition arises if a default equinox value is used
+         within astRead, due to no value being present in the supplied FitsChan.
+         This condition is only tested for when using non-Native encodings.
+
+         \sstitem
+         {\tt{"}}NoRadesys{\tt{"}}: This condition arises if a default reference frame is
+         used for an equatorial co-ordinate system within astRead, due to no
+         value being present in the supplied FitsChan. This condition is only
+         tested for when using non-Native encodings.
+
+         \sstitem
+         {\tt{"}}NoLonpole{\tt{"}}: This condition arises if a default value is used for
+         the LONPOLE keyword within astRead, due to no value being present
+         in the supplied FitsChan. This condition is only tested for when
+         using non-Native encodings.
+
+         \sstitem
+         {\tt{"}}NoLatpole{\tt{"}}: This condition arises if a default value is used for
+         the LATPOLE keyword within astRead, due to no value being present
+         in the supplied FitsChan. This condition is only tested for when
+         using non-Native encodings.
+
+         \sstitem
+         {\tt{"}}NoMjd-obs{\tt{"}}: This condition arises if a default value is used for
+         the date of observation within astRead, due to no value being present
+         in the supplied FitsChan. This condition is only tested for when using
+         non-Native encodings.
+
+         \sstitem
+         {\tt{"}}Tnx{\tt{"}}: This condition arises if a FrameSet is read from a FITS
+         header containing an IRAF {\tt{"}}TNX{\tt{"}} projection which includes terms
+         not supproted by AST. Such terms are ignored and so the resulting
+         FrameSet may be inaccurate.
+
+         \sstitem
+         {\tt{"}}Zpx{\tt{"}}: This condition arises if a FrameSet is read from a FITS
+         header containing an IRAF {\tt{"}}ZPX{\tt{"}} projection which includes {\tt{"}}lngcor{\tt{"}}
+         or {\tt{"}}latcor{\tt{"}} correction terms. These terms are not supported by AST
+         and are ignored. The resulting FrameSet may therefore be inaccurate.
+      }
+   }
+}
+\sstroutine{
    AsTime(axis)\sstlabel{AsTimeaxis}
 }{
    Format celestal coordinates as times?
@@ -20231,6 +20327,28 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
+   Ident\sstlabel{Ident}
+}{
+   Permanent Object identification string
+}{
+   \sstdescription{
+      This attribute is like the \htmlref{ID}{ID} attribute, in that it contains a
+      string which may be used to identify the \htmlref{Object}{Object} to which it is
+      attached. The only difference between ID and Ident is that Ident
+      is transferred when an Object is copied, but ID is not.
+   }
+   \sstattributetype{
+      String.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         Object
+      }{
+         All Objects have this attribute.
+      }
+   }
+}
+\sstroutine{
    IntraFlag\sstlabel{IntraFlag}
 }{
    IntraMap identification string
@@ -20563,6 +20681,48 @@ Object            - Base class for all AST Objects
          The \htmlref{LabelAt(axis)}{LabelAtaxis} attribute may be used to determine the exact
          placement of labels and tick marks that are drawn inside the
          plotting area.
+      }
+   }
+}
+\sstroutine{
+   LatAxis\sstlabel{LatAxis}
+}{
+   Index of the latitude axis
+}{
+   \sstdescription{
+      This read-only attribute gives the index (1 or 2) of the latitude
+      axis within the \htmlref{SkyFrame}{SkyFrame} (taking into account any current axis
+      permutations).
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         SkyFrame
+      }{
+         All SkyFrames have this attribute.
+      }
+   }
+}
+\sstroutine{
+   LonAxis\sstlabel{LonAxis}
+}{
+   Index of the longitude axis
+}{
+   \sstdescription{
+      This read-only attribute gives the index (1 or 2) of the longitude
+      axis within the \htmlref{SkyFrame}{SkyFrame} (taking into account any current axis
+      permutations).
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         SkyFrame
+      }{
+         All SkyFrames have this attribute.
       }
    }
 }
@@ -21926,6 +22086,11 @@ Object            - Base class for all AST Objects
          \sstitem
          {\tt{"}}SUPERGALACTIC{\tt{"}}: De Vaucouleurs Supergalactic coordinates.
 
+         \sstitem
+         {\tt{"}}UNKNOWN{\tt{"}}: Any other general spherical coordinate system. No
+         \htmlref{Mapping}{Mapping} can be created between a pair of SkyFrames if either of the
+         SkyFrames has System set to {\tt{"}}Unknown{\tt{"}}.
+
       }
       Where more than one alternative System value is shown above, the
       first of these will be returned when an enquiry is made.
@@ -22405,8 +22570,9 @@ Object            - Base class for all AST Objects
       This attribute controls the issuing of warnings about selected
       conditions when an \htmlref{Object}{Object} is read from or written to a \htmlref{FitsChan}{FitsChan}.
       The value supplied for the Warnings attribute should consist of a
-      space separated list of condition names chosen from the list below.
-      Each name indicates a condition which should be reported. The default
+      space separated list of condition names (see the \htmlref{AllWarnings}{AllWarnings}
+      attribute for a list of the currently defined names). Each name
+      indicates a condition which should be reported. The default
       value for Warnings is the string {\tt{"}}Tnx Zpx BadCel{\tt{"}}.
 
       The text of any warning will be stored within the FitsChan in the
@@ -22425,61 +22591,6 @@ Object            - Base class for all AST Objects
          FitsChan
       }{
          All FitsChans have this attribute.
-      }
-   }
-   \sstdiytopic{
-      Conditions
-   }{
-      The following conditions are currently recognised (all are
-      case-insensitive):
-
-      \sstitemlist{
-
-         \sstitem
-         {\tt{"}}BadCel{\tt{"}}: This condition arises when reading a \htmlref{FrameSet}{FrameSet} from a
-         non-Native encoded FitsChan if an unknown celestial co-ordinate
-         system is specified by the CTYPE keywords.
-
-         \sstitem
-         {\tt{"}}NoEquinox{\tt{"}}: This condition arises if a default equinox value is used
-         within astRead, due to no value being present in the supplied FitsChan.
-         This condition is only tested for when using non-Native encodings.
-
-         \sstitem
-         {\tt{"}}NoRadesys{\tt{"}}: This condition arises if a default reference frame is
-         used for an equatorial co-ordinate system within astRead, due to no
-         value being present in the supplied FitsChan. This condition is only
-         tested for when using non-Native encodings.
-
-         \sstitem
-         {\tt{"}}NoLonpole{\tt{"}}: This condition arises if a default value is used for
-         the LONPOLE keyword within astRead, due to no value being present
-         in the supplied FitsChan. This condition is only tested for when
-         using non-Native encodings.
-
-         \sstitem
-         {\tt{"}}NoLatpole{\tt{"}}: This condition arises if a default value is used for
-         the LATPOLE keyword within astRead, due to no value being present
-         in the supplied FitsChan. This condition is only tested for when
-         using non-Native encodings.
-
-         \sstitem
-         {\tt{"}}NoMjd-obs{\tt{"}}: This condition arises if a default value is used for
-         the date of observation within astRead, due to no value being present
-         in the supplied FitsChan. This condition is only tested for when using
-         non-Native encodings.
-
-         \sstitem
-         {\tt{"}}Tnx{\tt{"}}: This condition arises if a FrameSet is read from a FITS
-         header containing an IRAF {\tt{"}}TNX{\tt{"}} projection which includes terms
-         not supproted by AST. Such terms are ignored and so the resulting
-         FrameSet may be inaccurate.
-
-         \sstitem
-         {\tt{"}}Zpx{\tt{"}}: This condition arises if a FrameSet is read from a FITS
-         header containing an IRAF {\tt{"}}ZPX{\tt{"}} projection which includes {\tt{"}}lngcor{\tt{"}}
-         or {\tt{"}}latcor{\tt{"}} correction terms. These terms are not supported by AST
-         and are ignored. The resulting FrameSet may therefore be inaccurate.
       }
    }
 }
@@ -22928,6 +23039,9 @@ Object            - Base class for all AST Objects
       \sstitemlist{
 
          \sstitem
+         \htmlref{AllWarnings}{AllWarnings}: A list of the available conditions
+
+         \sstitem
          Card: Index of current FITS card in a FitsChan
 
          \sstitem
@@ -22940,7 +23054,7 @@ Object            - Base class for all AST Objects
          \htmlref{Ncard}{Ncard}: Number of FITS header cards in a FitsChan
 
          \sstitem
-         \htmlref{Warnings}{Warnings}: Produces warnings about defaulted keywords
+         \htmlref{Warnings}{Warnings}: Produces warnings about selected conditions
       }
    }
    \sstdiytopic{
@@ -23939,6 +24053,15 @@ Object            - Base class for all AST Objects
          Equinox: Epoch of the mean equinox
 
          \sstitem
+         \htmlref{LatAxis}{LatAxis}: Index of the latitude axis
+
+         \sstitem
+         \htmlref{LonAxis}{LonAxis}: Index of the longitude axis
+
+         \sstitem
+         \htmlref{Projection}{Projection}: Sky projection description.
+
+         \sstitem
          System: Celestial coordinate system
       }
    }
@@ -24874,12 +24997,52 @@ current version):
 
 \begin{enumerate}
 
+\item The C interface to several methods (\htmlref{astTranN}{astTranN}, \htmlref{astMark}{astMark} and
+\htmlref{astPolyCurve}{astPolyCurve}) have been changed to make them easier to call from C++.
+Parameters which previously had type ``double (*)[]'' have been changed
+to the simpler ``double *''. Using the old types may result in non-fatal
+compiler warnings, but should not change the behaviour of the methods.
+
+\item A bug has been fixed in the \htmlref{Plot}{Plot} class which could cause groups 
+of tick marks to be skipped when using very small gaps.
+
+\item A bug has been fixed in the Plot class which could cause axes to be
+labeled outside the visible window, resulting in no axes being visible.
+
 \item The FITS-WCS encoding used by the \htmlref{FitsChan}{FitsChan} class now includes the
 WCSNAME keyword. When creating a \htmlref{FrameSet}{FrameSet} from FITS headers, the values of 
 the WCSNAME keywords are now used as the \htmlref{Domain}{Domain} names for the corresponding 
 Frames in the returned FrameSet. When writing a FrameSet to a FITS header
 the Domain names of each \htmlref{Frame}{Frame} are stored in WCSNAME keywords in the
 header. 
+
+\item The FITS-WCS encoding used by the FitsChan class now attempts to
+retain the identification letter associated with multiple axis
+descriptions. When reading a FrameSet from a FITS header, the identification 
+letter is stored in the \htmlref{Ident}{Ident} attribute for each Frame. When writing a
+FrameSet to a FITS header, the identification letter is read from the
+Ident attribute of each Frame. The letter to associate with each Frame
+can be changed by assigning a new value to the Frame's Ident attribute.
+
+\item The FITS-WCS, FITS-PC, FITS-IRAF and FITS-AIPS encodings used by the 
+FitsChan class now create a \htmlref{SkyFrame}{SkyFrame} with the \htmlref{System}{System} attribute set to 
+``Unknown'' if the CTYPE keywords in the supplied header refers to an
+unknown celestial coordinate system. Previously, a Frame was used instead
+of a SkyFrame.
+
+\item The FITS-WCS, FITS-PC, FITS-IRAF and FITS-AIPS encodings used by the 
+FitsChan class no longer report an error if the FITS header contains no
+CTYPE keywords. It is assumed that a missing CTYPE keyword implies that 
+the world coordinate system is linear and identically equal to
+``intermediate world coordinates''.
+
+\item The new value ``noctype'' is now recognized by the \htmlref{Warnings}{Warnings} attribute 
+of the FitsChan class. This value causes warnings to be issued if CTYPE
+keywords are missing from foreign encodings.
+
+\item A new attribute called \htmlref{AllWarnings}{AllWarnings} has been added to the FitsChan 
+class. This is a read-only, space separated list of all the known condition 
+names which can be specified in the Warnings attribute.
 
 \item The FitsChan class now attempts to assigns a \htmlref{Title}{Title} to each Frame in
 a FrameSet read using a foreign encoding. The Title is based on the Domain
@@ -24896,6 +25059,21 @@ comments are identical.
 AST\_\_BLOCKAVE has been added to the AST\_RESAMPLE$<$X$>$ set of
 functions. The new scheme calculates each output pixel value by finding
 the mean of the input pixels in a box centred on the output pixel.
+
+\item The SkyFrame class can now be used to represent an arbitrary spherical
+coordinate system by setting its System attribute to ``Unknown''.
+
+\item The indices of the latitude and longitude axes of a SkyFrame can
+now be found using new read-only attributes \htmlref{LatAxis}{LatAxis} and \htmlref{LonAxis}{LonAxis}. The
+effects of any axis permutation is taken into account.
+
+\item A new attribute called Ident has been added to the \htmlref{Object}{Object} class.
+This serves the same purpose as the existing \htmlref{ID}{ID} attribute, but (unlike ID)
+its value is transferred to the new Object when a copy is made.
+
+\item A bug has been fixed which could prevent complex CmpFrames
+behaving correctly (for instance, resulting in the failure of attempts 
+to find a \htmlref{Mapping}{Mapping} between a \htmlref{CmpFrame}{CmpFrame} and itself).
 
 \end{enumerate}
 
