@@ -112,6 +112,7 @@ OPTIONS=
 DEBUGGING=false
 USEMANIFEST=true
 VERBOSE=true
+NORMTYPE=nonorm  # no normalisation by default
 run=
 runn=
 tempdest=tmp.stamp
@@ -141,7 +142,8 @@ USAGE="Usage: $0 [--latex] [--html] [--htmlsingle]\
 	[--help] [--debug] [--version] [-n]\
 	[--options]\
 	sgml-file\
-    (--latex options: cts-sect, cts-appx, onepass)"
+    (--latex options: cts-sect, cts-appx, onepass)\
+    (--html options: sgmlnorm,simplenorm,nonorm)"
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -156,7 +158,6 @@ while [ $# -gt 0 ]; do
 	--options) OPTIONS=$2; shift ;;
 	--ignore-manifest) USEMANIFEST=false ;;
 	--quiet) VERBOSE=false; DVI2BITMAP="$DVI2BITMAP -q" ;;
-	  # undocumented -- use when manifest-generation is buggy
 	--help) echo $USAGE; exit 0;;
 	--version) echo "$PROGNAME:I:" $ident_string; echo "$PROGNAME:I:" $RCSID; exit 0;;
 	-n) run=echo; runn=: ; tempdest=/dev/stdout; ;;
@@ -236,6 +237,7 @@ if $DEBUGGING; then
     echo "$PROGNAME:I: WORKDIR=$WORKDIR"
     echo "$PROGNAME:I: JADEFLAGS=$JADEFLAGS"
     echo "$PROGNAME:I: TARGETFORMAT=$TARGETFORMAT"
+    echo "$PROGNAME:I: NORMTYPE=$NORMTYPE"
 fi
 
 
@@ -244,6 +246,26 @@ fi
 
 if [ $TARGETFORMAT -eq 0 ]; then
     # Generate HTML
+
+    if [ -n "$OPTIONS" ]; then
+	for o in `echo $OPTIONS | sed 's/,/ /g'`; do
+	    case $o in
+		nonorm|simplenorm|sgmlnorm) NORMTYPE=$o;;
+		*)  echo "$PROGNAME:E: HTML options (nonorm|simplenorm|sgmlnorm)";
+		    exit 1;;
+	    esac
+	done
+	if $DEBUGGING; then
+	    echo "$PROGNAME:I: NORMTYPE (post-options)=$NORMTYPE"
+	fi
+    fi
+
+    if $VERBOSE; then
+	OUTPUTDEST=''
+    else
+	OUTPUTDEST='>> output.log'
+    fi
+
     # generate $ROOT.imgeq.list and convert it to a set of bitmaps
     $VERBOSE && echo "$PROGNAME:I: Pre-processing..."
     $run $JADE -t sgml -iOnly.web $JADEFLAGS \
@@ -252,8 +274,12 @@ if [ $TARGETFORMAT -eq 0 ]; then
 	    > $tempdest
     test -f tmp.stamp && ROOT=`awk -F: '{print $1}' tmp.stamp`
 
-    # If there are no maths-mode elements, there's no list file generated
-    if [ -r "$ROOT.imgeq.list" ]; then
+    # If there are no maths-mode elements, there's no list file generated.
+    # Test if the file is of non-zero size, since <codecollection> is
+    # listed in `maths-element-list' even though it'll produce no
+    # output if there's no maths in the codecollection.  Same goes for
+    # element <mdefs>.
+    if [ -s "$ROOT.imgeq.list" ]; then
 	# Find dvi2bitmap's default format
 	# Default to gif if the dvi2bitmap version doesn't have the -Qt option
 	imgfmt=`($DVI2BITMAP -Qt 2>/dev/null || echo gif) | awk '{print $1}'`
@@ -261,10 +287,10 @@ if [ $TARGETFORMAT -eq 0 ]; then
 	$run $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list
 
 	$VERBOSE && echo "$PROGNAME:I: $LATEX $ROOT.imgeq.tex"
-	$run $LATEX $ROOT.imgeq.tex
+	$run $LATEX $ROOT.imgeq.tex $OUTPUTDEST
 
 	$VERBOSE && echo "$PROGNAME:I: $DVI2BITMAP -m 2 -s 2 -Pt $ROOT.imgeq.dvi"
-	$run $DVI2BITMAP -m 2 -s 2 -Pt $ROOT.imgeq.dvi
+	$run $DVI2BITMAP -m 2 -s 2 -Pt $ROOT.imgeq.dvi $OUTPUTDEST
     fi
 
     # Generate backmatter.  Don't fail if no .aux file was generated
@@ -356,17 +382,31 @@ if [ -r MANIFEST -o -n "$run" ]; then
     for f in `awk 'NF==1 {print $1}' MANIFEST`; do
 	case $f in
 	*.html)
-	    #sed '/<[aA] *$/{:a;N;s/\n>/ >/;t;s/\n/ /;b a;}' $f >$PACKAGEDIR/$f
-	    $run $SGMLNORM -d $DECL $f >$PACKAGEDIR/$f \
-		2>>$PACKAGEDIR/sgmlnorm.errors
+	    case $NORMTYPE in
+		nonorm) 
+		    cp $f $PACKAGEDIR/$f ;;
+		simplenorm)
+		    sed '/<[aA] *$/{:a;N;s/\n>/ >/;t;s/\n/ /;b a;}' $f >$PACKAGEDIR/$f ;;
+		sgmlnorm)
+		    $run $SGMLNORM -d $DECL $f >$PACKAGEDIR/$f \
+			2>>$PACKAGEDIR/sgmlnorm.errors ;;
+		*)
+		    echo "$PROGNAME:W: Impossible normtype=$NORMTYPE.  Doing simple copy"
+		    cp $f $PACKAGEDIR/$f ;;
+	    esac		    
 	    ;;
 	*)
 	    $run mv $f $PACKAGEDIR
 	    ;;
 	esac
     done
-    (cd $SRCDIR; \
-	eval `awk "NF==2 {printf \"$run cp %s $WORKDIR/$PACKAGEDIR/%s\n\","'$2,$1}' $WORKDIR/MANIFEST`)
+    # Now process the list of entities which have to be renamed --
+    # those with two fields in the manifest file.
+    # Use awk to send a stack of cp commands into a new shell (use
+    # this technique rather than eval, so that we avoid
+    # any potential problem with maximum line lengths.  Harmless if
+    # there are no two-entry lines in the file.
+    awk "BEGIN {print \"cd $SRCDIR\"}; NF==2 {printf \"$run cp %s $WORKDIR/$PACKAGEDIR/%s\n\","'$2,$1}' $WORKDIR/MANIFEST | sh
     $run cp MANIFEST $PACKAGEDIR
 
     if [ $TARGETFORMAT -eq 0 ]; then
