@@ -125,7 +125,7 @@ LN 	     = ln -s
 all: $(TKPROG) $(TCLPROG)
 
 $(MKTCLAPP): mktclapp.o
-	$(CC) -o $(MKTCLAPP) mktclapp.o
+	$(CC) $(CFLAGS) -o $(MKTCLAPP) mktclapp.o
 
 gaia_swish.c: $(MKTCLAPP) library/gaia_swish.tcl
 	$(BINDIR)/skycat_tcl library/gaia_swish.tcl gaia_swish.mta

@@ -18,7 +18,7 @@ DEPEND_TARGET	= @DEPEND_TARGET@
 
 FC              = @FC@
 GC              = @STARLINK@/bin/generic
-FFLAGS          = @FFLAGS@
+FFLAGS          = @FFLAGS@ ${FCFLAGS}
 STAR_INC        = @STARLINK@/include
 LINK            = @LINK@
 # ------------------------------------------------------------------------
