@@ -444,7 +444,7 @@ PKG_LINK = ECHOMOP
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 #  %%VERSION%%
-PKG_VERS = 3.3-6b1
+PKG_VERS = 3.3-6b2
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
