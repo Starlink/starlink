@@ -9,6 +9,8 @@ libtask_adam_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
 	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES)
+# We use ../subpar/SUBPAR_PARERR and ../subpar/SUBPAR_SYS
+libtask_adam_la_FCFLAGS = -I../subpar
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 include_MESSAGES = TASK_ERR
