@@ -407,7 +407,7 @@ GRF_C_INCLUDES = grf.h
 SLALIB_C_INCLUDES = slalib.h
 
 #  Define interfaces to the modules used from the wcslib library.
-WCSLIB_C_INCLUDES = proj.h wcstrig.h
+WCSLIB_C_INCLUDES = proj.h wcstrig.h wcsmath.h
 
 #  C routines required for building the package.  This is just a list of
 #  all the C source files.
@@ -1314,7 +1314,7 @@ cmpframe.o: cmpframe.c error.h memory.h object.h channel.h mapping.h \
 cmpmap.o: cmpmap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h cmpmap.h ast_err.h
 dssmap.o: dssmap.c memory.h error.h object.h channel.h pointset.h \
- mapping.h fitschan.h wcsmap.h proj.h wcstrig.h winmap.h dssmap.h \
+ mapping.h fitschan.h wcsmap.h proj.h wcstrig.h wcsmath.h winmap.h dssmap.h \
  ast_err.h
 err_ems.o: err_ems.c err.h ems.h
 err_null.o: err_null.c err.h error.h
@@ -1338,7 +1338,7 @@ fintramap.o: fintramap.c f77.h c2f77.h error.h memory.h intramap.h \
  mapping.h object.h channel.h pointset.h
 fitschan.o: fitschan.c error.h memory.h object.h channel.h pointset.h \
  unitmap.h mapping.h frame.h axis.h frameset.h skyframe.h cmpframe.h \
- wcsmap.h proj.h wcstrig.h dssmap.h fitschan.h winmap.h matrixmap.h \
+ wcsmap.h proj.h wcstrig.h wcsmath.h dssmap.h fitschan.h winmap.h matrixmap.h \
  sphmap.h permmap.h cmpmap.h slalib.h ast_err.h
 flutmap.o: flutmap.c f77.h c2f77.h error.h memory.h lutmap.h mapping.h \
  object.h channel.h pointset.h
@@ -1370,7 +1370,7 @@ fsphmap.o: fsphmap.c f77.h c2f77.h error.h memory.h sphmap.h mapping.h \
 funitmap.o: funitmap.c f77.h c2f77.h error.h memory.h unitmap.h \
  mapping.h object.h channel.h pointset.h
 fwcsmap.o: fwcsmap.c f77.h c2f77.h error.h memory.h wcsmap.h mapping.h \
- object.h channel.h pointset.h proj.h wcstrig.h
+ object.h channel.h pointset.h proj.h wcstrig.h wcsmath.h
 fwinmap.o: fwinmap.c f77.h c2f77.h error.h memory.h winmap.h mapping.h \
  object.h channel.h pointset.h
 fzoommap.o: fzoommap.c f77.h c2f77.h error.h memory.h zoommap.h \
@@ -1384,7 +1384,7 @@ loader.o: loader.c axis.h object.h error.h channel.h cmpframe.h \
  frame.h mapping.h pointset.h frameset.h cmpmap.h dssmap.h fitschan.h \
  intramap.h loader.h lutmap.h mathmap.h matrixmap.h pcdmap.h permmap.h \
  plot.h skyaxis.h skyframe.h slamap.h sphmap.h unitmap.h wcsmap.h \
- proj.h wcstrig.h winmap.h zoommap.h ast_err.h
+ proj.h wcstrig.h wcsmath.h winmap.h zoommap.h ast_err.h
 lutmap.o: lutmap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h winmap.h lutmap.h ast_err.h
 mapping.o: mapping.c error.h memory.h object.h channel.h pointset.h \
@@ -1402,11 +1402,11 @@ permmap.o: permmap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h unitmap.h permmap.h ast_err.h
 plot.o: plot.c channel.h object.h error.h cmpmap.h mapping.h \
  pointset.h frame.h axis.h frameset.h grf.h memory.h plot.h skyaxis.h \
- skyframe.h winmap.h wcsmap.h proj.h wcstrig.h permmap.h ast_err.h
+ skyframe.h winmap.h wcsmap.h proj.h wcstrig.h wcsmath.h permmap.h ast_err.h
 pointset.o: pointset.c error.h memory.h object.h channel.h pointset.h \
  ast_err.h
-proj.o: proj.c proj.h wcstrig.h
-tpn.o: tpn.c proj.h wcstrig.h
+proj.o: proj.c proj.h wcstrig.h wcsmath.h
+tpn.o: tpn.c proj.h wcstrig.h wcsmath.h
 skyaxis.o: skyaxis.c ast_err.h slalib.h error.h memory.h pointset.h \
  object.h channel.h axis.h skyaxis.h
 skyframe.o: skyframe.c error.h memory.h object.h channel.h pointset.h \
@@ -1420,7 +1420,7 @@ sphmap.o: sphmap.c error.h memory.h object.h channel.h pointset.h \
 unitmap.o: unitmap.c error.h object.h channel.h pointset.h mapping.h \
  unitmap.h ast_err.h
 wcsmap.o: wcsmap.c error.h memory.h object.h channel.h pointset.h \
- mapping.h unitmap.h permmap.h wcsmap.h proj.h wcstrig.h slalib.h \
+ mapping.h unitmap.h permmap.h wcsmap.h proj.h wcstrig.h wcsmath.h slalib.h \
  ast_err.h
 wcstrig.o: wcstrig.c wcstrig.h
 winmap.o: winmap.c error.h memory.h object.h channel.h pointset.h \
