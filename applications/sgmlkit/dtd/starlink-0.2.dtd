@@ -561,6 +561,9 @@
 			   text. -->
 
 <!--========== Document body ==========-->
+<![ %Feature.Routinelist [
+  <!entity % body.content '(routinelist | (p | table | figure)*)'>
+]]>
 <!entity % body.content '(p | table | figure)*'>
 
 <!--
@@ -569,9 +572,11 @@
   inferred whenever there are references to material in the body of
   the document.
 -->
+<!--
 <![ %Feature.Routinelist [
   <!entity % appendix.content "routinelist?, sect*">
 ]]>
+-->
 <!entity % appendix.content "sect+">
 
 <!--
@@ -758,9 +763,16 @@
   VERBATIM is part of %structuring, and is for extended blocks of verbatim
   text.  It should be set in a fixed-width font, and preserve line
   ends.  The contents of VERBATIM will possibly need to be enclosed in
-  <![ cdata [...]]>
+  <![ cdata [...]]>.
+
+  Allow %references within verbatim text, allowing us to include
+  <webref> and <ref id=... text=...> within verbatim examples, making
+  the corresponding text `live' in online versions of documents.
 -->
+<!element VERBATIM - - ((#pcdata | %references)*)	-- verbatim text -->
+<![ ignore [
 <!element VERBATIM - - (#pcdata)	-- verbatim text -->
+]]>
 
 <!element BLOCKQUOTE - - (attribution?, px+)	-- extended quotation -->
 <!element QUOTE - - (attribution?, (%phrase)+)	
@@ -930,8 +942,9 @@
 		idref
 		#required
 
-	text			-- optional link text --
-		cdata #implied
+	text			-- optional overriding link text --
+		cdata
+		#implied
 
 	-- following are HyTime attributes --
 	ref-title		-- pointer to title of reference target --
@@ -1007,6 +1020,12 @@
 				   if this is missing --
 		cdata
 		#implied
+
+	-- Hmm, I don't think a text attribute is a great idea - too hackable...
+	text
+		cdata
+		#implied
+	--
 
 	-- following are the HyTime attributes --
 	loctype			-- declare addressing method --
@@ -1118,6 +1137,7 @@
 <!entity % tbl.entry.mdl '(%phrase)*'>
 <!entity % tbl.table.att 
 	'pgwide number	#implied
+	float (float|nofloat) #implied
 	%export.id.optional; '>
 <!entity % calstbls public "-//OASIS//DTD Exchange Table Model 19960430//EN">
 %calstbls;
