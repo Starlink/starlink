@@ -760,7 +760,8 @@ take an optional argument giving the path to an alternative script
 with the same calling interface.
 
 <dt><code/&ddash;enable-png/
-<dd>If you give this option, and if the PNG library is installed, then
+<dd>If you give this option, and if the PNG library is installed
+(needs a version after 0.96), then
 the program will be compiled with support for PNG bitmaps as an output
 format.  You can obtain the PNG library from the 
 <webref url="http://www.libpng.org/pub/png/" >PNG home page</webref>.
