@@ -1016,6 +1016,7 @@ static double DateObs( const char * );
 static double GetItem( double ****, int, int, char, char *, const char *method, const char *class );
 static double NearestPix( AstMapping *, double, int );
 static int *CardFlags( AstFitsChan * );
+static int AddEncodingFrame( AstFitsChan *, AstFrameSet *, int, const char *, const char * );
 static int AIPSFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static int AIPSPPFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static int AddVersion( AstFitsChan *, AstFrameSet *, int, int, FitsStore *, double *, char, const char *, const char * );
@@ -1147,6 +1148,186 @@ static void WriteToSink( AstFitsChan * );
 
 /* Member functions. */
 /* ================= */
+static int AddEncodingFrame( AstFitsChan *this, AstFrameSet *fs, int encoding, 
+                             const char *method, const char *class ){
+/*
+*  Name:
+*     AddEncodingFrame
+
+*  Purpose:
+*     Add a Frame which conforms to the requirements of the specified encoding.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     int AddEncodingFrame( AstFitsChan *this, AstFrameSet *fs, int encoding, 
+*                           const char *method, const char *class )
+
+*  Class Membership:
+*     FitsChan
+
+*  Description:
+*     This function attempts to create a Frame based on the current Frame
+*     of the supplied FrameSet, which conforms to the requirements of the
+*     specified Encoding. If created, this Frame is added into the
+*     FrameSet as the new current Frame, and the index of the original current
+*     Frame is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+*     fs
+*        Pointer to the FrameSet.
+*     encoding
+*        The encoding in use.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*  Returned Value:
+*     The index of the original current Frame in the FrameSet. A value of
+*     AST__NOFRAME is returned if no new Frame is added to the FrameSet,
+*     or if an error occurs.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *cmpfrm;   /* Pointer to spectral cube frame */
+   AstFrame *cfrm;        /* Pointer to original current Frame */
+   AstFrame *newfrm;      /* Frame describing coord system to be used */
+   AstFrame *pfrm;        /* Pointer to primary Frame containing axis */
+   AstFrameSet *fsconv;   /* FrameSet converting what we have to what we want */
+   AstMapping *map;       /* Mapping from what we have to what we want */
+   AstSkyFrame *skyfrm;   /* Pointer to SkyFrame */
+   AstSpecFrame *specfrm; /* Pointer to SpecFrame */
+   AstStdOfRestType sor;  /* Spectral standard of rest */
+   AstSystemType sys;     /* Frame coordinate system */
+   int i;                 /* Axis index */
+   int naxc;              /* No. of axes in original current Frame */
+   int paxis;             /* Axis index in primary frame */
+   int result;            /* Returned value */
+
+/* Initialise */
+   result = AST__NOFRAME;
+
+/* Check the inherited status. */
+   if( !astOK ) return result;
+
+/* Get a pointer to the current Frame and note how many axes it has. */
+   cfrm = astGetFrame( fs, AST__CURRENT );
+   naxc = astGetNaxes( cfrm );   
+
+/* FITS-CLASS */
+/* ========== */
+   if( encoding == FITSCLASS_ENCODING ) {
+
+/* Try to locate a SpecFrame and a SkyFrame in the current Frame. */
+      specfrm = NULL;
+      skyfrm = NULL;
+      for( i = 0; i < naxc; i++ ) {
+         astPrimaryFrame( cfrm, i, &pfrm, &paxis );
+         if( astIsASpecFrame( pfrm ) ) {
+            if( !specfrm ) specfrm = astCopy( pfrm );
+         } else if( astIsASkyFrame( pfrm ) ) {
+            if( !skyfrm ) skyfrm = astCopy( pfrm );
+         } 
+         pfrm = astAnnul( pfrm );
+      }
+
+/* Cannot do anything if either is missing. */
+      if( specfrm && skyfrm ) {
+
+/* If the spectral axis is neither frequency nor radio velocity, set it to
+   frequency. Also set spectral units of "Hz" or "m/s" */
+         sys = astGetSystem( specfrm );
+         if( sys != AST__FREQ && sys != AST__VRADIO ) {
+            astSetSystem( specfrm, AST__FREQ );
+            sys = AST__FREQ;
+         }
+
+/* For frequency axes, ensure the standard of rest is Source and units
+   are "Hz". */       
+         if( sys == AST__FREQ ){
+            astSetUnit( specfrm, 0, "Hz" );
+            astSetStdOfRest( specfrm, AST__SCSOR );
+ 
+/* For radio velocity axes, ensure the standard of rest is one of LSRK, 
+   Heliocentric, Geocentric or Topocentric, and units are "m/s". */
+         } else {
+            astSetUnit( specfrm, 0, "m/s" );
+            sor = astGetStdOfRest( specfrm );
+            if( sor != AST__TPSOR &&
+                sor != AST__GESOR &&
+                sor != AST__HLSOR &&
+                sor != AST__LKSOR ) {
+               sor = AST__LKSOR;
+               astSetStdOfRest( specfrm, sor );
+            }
+         }
+ 
+/* The celestial axes must be either FK4, FK5 or galactic. */
+         sys = astGetSystem( skyfrm );
+         if( sys != AST__FK4 && sys != AST__FK5 && sys != AST__GALACTIC ) {
+            astSetSystem( skyfrm, AST__FK5 );
+            sys = AST__FK5;
+         }
+
+/* FK5 systems must be J2000, and FK4 must be B1950. */
+         if( sys == AST__FK5 ) {
+            astSetC( skyfrm, "Equinox", "J2000.0" );
+         } else if( sys == AST__FK4 ) {
+            astSetC( skyfrm, "Equinox", "B1940.0" );
+         }
+
+/* Combine the spectraland celestial Frames into a single CmpFrame with
+   the spectral axis being the first axis. */
+         cmpfrm = astCmpFrame( specfrm, skyfrm, "" );
+
+/* Attempt to obtain the current Frame of the supplied FrameSet to this
+   new Frame. */
+         fsconv = astConvert( cfrm, cmpfrm, "" );
+         if( fsconv ) {
+
+/* Get the Mapping and current Frame from the rconversion FrameSet. */
+            newfrm = astGetFrame( fsconv, AST__CURRENT );
+            map = astGetMapping( fsconv, AST__BASE, AST__CURRENT );
+
+/* Save the original current Frame index. */
+            result = astGetCurrent( fs );     
+
+/* Add the new Frame into the supplied FrameSet using the above Mapping
+   to connect it to the original current Frame. The new Frame becomes the
+   current Frame. */
+            astAddFrame( fs, AST__CURRENT, map, newfrm );
+
+/* Free resources */
+            map = astAnnul( map );
+            newfrm = astAnnul( newfrm );
+            fsconv = astAnnul( fsconv );
+         }
+
+/* Free resources */
+         cmpfrm = astAnnul( cmpfrm );
+
+      }
+
+/* Release resources. */
+      if( specfrm ) specfrm = astAnnul( specfrm );
+      if( skyfrm ) skyfrm = astAnnul( skyfrm );
+
+   }
+
+/* Free reources. */
+   cfrm = astAnnul( cfrm );
+
+/* Return the result */
+   return result;
+}
+
 static void AddFrame( AstFitsChan *this, AstFrameSet *fset, int pixel, 
                       int npix, FitsStore *store, char s, const char *method, 
                       const char *class ){
@@ -3737,6 +3918,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    double cdl;         /* CDELT term */
    double cdlat_lon;   /* Off-diagonal CD element */
    double cdlon_lat;   /* Off-diagonal CD element */
+   double delta;       /* Spectral axis increment */
    double equ;         /* Epoch of reference equinox */
    double fd;          /* Fraction of a day */
    double latval;      /* CRVAL for latitude axis */
@@ -3758,6 +3940,8 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    int j;              /* Axis index */
    int jj;             /* SlaLib status */
    int naxis;          /* No. of axes */
+   int naxis2;         /* Length of pixel axis 2 */
+   int naxis3;         /* Length of pixel axis 3 */
    int ok;             /* Is FitsSTore OK for IRAF encoding? */
    int prj;            /* Projection type */
 
@@ -3774,7 +3958,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 /* Look for the primary celestial axes. */
    FindLonLatSpecAxes( store, s, &axlon, &axlat, &axspec, method, class );
 
-/* Axis 1 must be spectral and 2 and 3 must be selestial. */
+/* Axis 1 must be spectral and 2 and 3 must be celestial. */
    if( axspec == 0 && ( ( axlon == 1 && axlat == 2 ) ||
                         ( axlon == 2 && axlat == 1 ) ) ) {
       ok = 1;
@@ -3963,23 +4147,31 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    }
 
 /* Check that there is no rotation, and extract the CDELT (diagonal) terms, 
-   etc. */
+   etc. If the spatial axes are degenerate (i.e. cover only a single pixel)
+   then ignore any rotation. */
+   if( !GetValue( this, "NAXIS2", AST__INT, &naxis2, 0, 0, method, class ) ) {
+      naxis2 = 0;
+   }
+   if( !GetValue( this, "NAXIS3", AST__INT, &naxis3, 0, 0, method, class ) ) {
+      naxis3 = 0;
+   }
+
    cdlat_lon = 0.0;
    cdlon_lat = 0.0;
    for( i = 0; i < naxis && ok; i++ ){
       cdl = GetItem( &(store->cdelt), i, 0, s, NULL, method, class );
       if( cdl == AST__BAD ) cdl = 1.0;
-
+   
       for( j = 0; j < naxis && ok; j++ ){
           val = GetItem( &(store->pc), i, j, s, NULL, method, class );
           if( val == AST__BAD ) val = ( i == j ) ? 1.0 : 0.0;
           val *= cdl;
-
+   
           if( i == j ){
              cdelt[ i ] = val;
-
+   
           } else if( val != 0.0 ){
-             ok = 0;
+             if( naxis2 != 1 || naxis3 != 1 ) ok = 0;
           }
       }
    }
@@ -4091,6 +4283,15 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
                    AST__FLOAT, "Pixel size" );
       }
 
+/* Older versions of CLASS require DELTAV to be present if the spectral
+   axis describes anything other than velocity. */
+      if( axspec != -1 ) {
+         if( strncmp( spectype, "VELO", 4 ) ) {
+            delta = -AST__C*cdelt[ axspec ]/rf;
+            SetValue( this, "DELTAV", &delta, AST__FLOAT, "[m/s] Velocity resolution" );
+         }
+      }
+
 /* Reference equinox */
       if( equ != AST__BAD ) SetValue( this, "EQUINOX", &equ, AST__FLOAT, 
                                         "Epoch of reference equinox" );
@@ -4133,6 +4334,16 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
       if( val != AST__BAD ) {
          SetValue( this, "IMAGFREQ", &val, AST__FLOAT, "[Hz] Image frequency" );
       }      
+
+/* Ensure the FitsChan contains OBJECT and LINE headers */
+      if( !SearchCard( this, "OBJECT", method, class ) ) {
+         cval = " ";
+         SetValue( this, "OBJECT", &cval, AST__STRING, NULL );
+      }
+      if( !SearchCard( this, "LINE", method, class ) ) {
+         cval = " ";
+         SetValue( this, "LINE", &cval, AST__STRING, NULL );
+      }
 
    }
 
@@ -29093,6 +29304,7 @@ static int Write( AstChannel *this_channel, AstObject *object ) {
    int comm;                     /* Value of Comm attribute */
    int encoding;                 /* FITS encoding scheme to use */
    int i;                        /* Axis index */
+   int icurr;                    /* Original current Frame index */
    int naxis;                    /* No. of pixel axes */
    int ret;                      /* Number of objects read */
 
@@ -29203,11 +29415,24 @@ static int Write( AstChannel *this_channel, AstObject *object ) {
                                  dim + i ) ) dim[ i ] = AST__BAD;
             }
 
+/* Add a new current Frame into the FrameSet which increases the chances of 
+   the requested encoding being usable. The index of the original current 
+   Frame is returned, or AST__NOFRAME if no new Frame was added. */
+            icurr = AddEncodingFrame( this, (AstFrameSet *) object, 
+                                      encoding, method, class );
+
 /* Extract the required information from the FrameSet into a standard
    intermediary structure called a FitsStore. The indices of any
    celestial axes are returned. */
             store = FsetToStore( this, (AstFrameSet *) object, naxis, dim,
                                  method, class );
+
+/* Remove the Frame (if any) added above, and re-instate the original current 
+   Frame. */
+            if( icurr != AST__NOFRAME ) {
+               astRemoveFrame( (AstFrameSet *) object, AST__CURRENT );
+               astSetCurrent( (AstFrameSet *) object, icurr );
+            }
 
 /* If the FrameSet cannot be described in terms of any of the supported
    FITS encodings, a null pointer will have been returned. */
@@ -30611,15 +30836,44 @@ f     no data will be written to the FitsChan and AST_WRITE will
 *     
 *     http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/node47.html
 *
-*     This encoding is imilar to FITS-AIPS with the following restrictions:
+*     This encoding is similar to FITS-AIPS with the following restrictions:
 *
-*     - Axis 1 must be a linear frequency axis.
-*     - Axis 2 must be a RA or GLON axis
-*     - Axis 3 must be a DEC or GLAT axis
-*     - A limited range of projection codes similar to AIPS may be used.
-*     - No rotation of the celestial axes is allowed.
-*     - The FITS-WCS CRVAL1 value is obtained by adding the values of the
-*     CRVAL1 and RESTFREQ keywords.
+*     - When a SpecFrame is created by reading a FITS-CLASS header, the 
+*       attributes describing the observers position (GeoLat and GeoLon)
+*       are left unset because the CLASS encoding does not specify these
+*       values. Conversions to or from the topocentric standard of rest 
+*       will therefore be inaccurate (typically by up to about 0.5 km/s)
+*       unless suitable values are assigned to these attributes after the
+*       FrameSet has been created.
+*     - Axis 1 must be a linear frequency axis or a linear radio velocity
+*       axis (but note that there is a bug in CLASS version "aug04a" and
+*       earlier which can cause radio velocity axes to be mis-interpreted in 
+*       some situations). 
+*     - Axes 2 and 3 must be a pair of celestial axes - either (RA,Dec) or 
+*       (GLON,GLAT). The order of the axes in this pair can be reversed.
+*       RA and Dec must be either FK4/B1950 or FK5/J2000.
+*     - A limited range of projection codes (TAN, ARC, STG, AIT, SFL, SIN) 
+*       can be used. For AIT and SFL, the reference point must be at the
+*       origin of longitude and latitude. For SIN, the associated projection
+*       parameters must both be zero.
+*     - No rotation of the celestial axes is allowed, unless the spatial
+*       axes are degenerate (i.e. cover only a single pixel).
+*     - For velocity axes, the spectral standard of rest must be one of LSRK, 
+*       Heliocentric, Geocentric or Topocentric. For frequency axes, the 
+*       standard of rest must be Source.
+*     - The source velocity must be defined. In other words, the SpecFrame 
+*       attributes SourceVel and SourceVRF must have been assigned values.
+*     - The frequency axis in a FITS-CLASS header does not represent
+*       absolute frequency, but instead represents offsets from the rest 
+*       frequency in the standard of rest of the source.
+*
+*     When writing a FrameSet out using FITS-CLASS encoding, the current
+*     Frame may be temporarily modified if this will allow the header
+*     to be produced. If this is done, the associated pixel->WCS Mapping will 
+*     also be modified to take account of the changes to the Frame. The
+*     modifications performed include re-ordering axes, changing spectral
+*     coordinate system and standard of rest, changing the celestial
+*     coordinate system and reference equinox, and changing axis units.
 
 *  The NATIVE Encoding:
 *     The NATIVE encoding may be used to store a description of any
@@ -32764,7 +33018,6 @@ static void ListFC( AstFitsChan *this, const char *ttl ) {
    }
    this->card = cardo;
 }*/
-
 
 
 
