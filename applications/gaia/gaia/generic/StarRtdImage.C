@@ -1093,243 +1093,250 @@ int StarRtdImage::usingxshmCmd( int argc, char *argv[] )
 int StarRtdImage::plotgridCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-  cout << "Called StarRtdImage::plotgridCmd" << endl;
+    cout << "Called StarRtdImage::plotgridCmd" << endl;
 #endif
-
-  int inerror = 0;
-  if (!image_) {
-    return error("no image loaded");
-  }
-
-  // Check the list of attributes for the special values pixel, epoch,
-  // equinox, system, gap(1) and gap(2). This section also does the
-  // initial split of the input list. Note we do these always so that
-  // we can check for request for a pixel based system. This is always
-  // available regardless of the existence of a proper WCS system.
-  char *equinox = NULL;
-  char *epoch = NULL;
-  char *system = NULL;
-  char *gap1 = NULL;
-  char *gap2 = NULL;
-  char **listArgv;
-  int listArgc = 0;
-  char **coordArgv;
-  int coordArgc = 0;
-  double region[4];
-  int showpixels = 0;
-  if ( argc != 0 ) {
-    if ( argc > 2 ) {
-      error( "wrong # args: plotgrid options_list canvas_area" );
-      inerror = 1;
-    } else {
-      if ( Tcl_SplitList( interp_, argv[0], &listArgc, &listArgv ) != TCL_OK ) {
-        error( "sorry: failed to decode plotting options (check format)" );
-        inerror = 1;
-      } else {
-        char *string = NULL;
-        for ( int index = 0; index < listArgc; index++ ) {
-          string = listArgv[index];
-
-          //  Check for "epoch", "equinox" or "system" and record
-          //  the value. Note assumes lowercase and no leading blanks.
-          if ( strncmp( string, "equinox=", 8 ) == 0 ) {
-            equinox = string;
-          } else if ( strncmp( string, "epoch=", 6 ) == 0 ) {
-            epoch = string;
-          } else if ( strncmp( string, "system=", 7 ) == 0 ) {
-            system = string;
-            if ( strncmp( system+7, "pixels", 6 ) == 0 ) {
-              // This is a special case, want just pixels
-              // displayed.
-              showpixels = 1;
-            }
-          } else if ( strncmp( string, "gap(1)=", 7 ) == 0 ) {
-            gap1 = string;
-          } else if ( strncmp( string, "gap(2)=", 7 ) == 0 ) {
-            gap2 = string;
-          }
-        }
-      }
-
-      //  Get the canvas coordinate display range if given.
-      if ( argc == 2 ) {
-        if ( Tcl_SplitList( interp_, argv[1], &coordArgc, &coordArgv ) != TCL_OK ) {
-          error( "sorry: failed to decode region of image to grid" );
-          coordArgc = 0;
-          inerror = 1;
-        } else {
-          if ( coordArgc != 4 ) {
-            error( "wrong # of args, should be 4 canvas coordinates" );
+    
+    int inerror = 0;
+    if (!image_) {
+        return error("no image loaded");
+    }
+    
+    // Check the list of attributes for the special values pixel,
+    // epoch, equinox, system, gap(1) and gap(2). This section also
+    // does the initial split of the input list. Note we do these
+    // always so that we can check for request for a pixel based
+    // system. This is always available regardless of the existence of
+    // a proper WCS system.
+    char *equinox = NULL;
+    char *epoch = NULL;
+    char *system = NULL;
+    char *gap1 = NULL;
+    char *gap2 = NULL;
+    char **listArgv;
+    int listArgc = 0;
+    char **coordArgv;
+    int coordArgc = 0;
+    double region[4];
+    int showpixels = 0;
+    if ( argc != 0 ) {
+        if ( argc > 2 ) {
+            error( "wrong # args: plotgrid options_list canvas_area" );
             inerror = 1;
-          } else {
-            for ( int index = 0; index < coordArgc; index++ ) {
-              if ( Tcl_GetDouble(interp_, coordArgv[index],
-                                 &region[index] ) != TCL_OK ) {
-                error( coordArgv[index], "is not a valid number");
+        } else {
+            if ( Tcl_SplitList( interp_, argv[0], &listArgc, &listArgv ) 
+                 != TCL_OK ) {
+                error( "sorry: failed to decode plotting options "
+                       "(check format)" );
                 inerror = 1;
-                break;
-              }
+            } else {
+                char *string = NULL;
+                for ( int index = 0; index < listArgc; index++ ) {
+                    string = listArgv[index];
+                    
+                    //  Check for "epoch", "equinox" or "system" and
+                    //  record the value. Note assumes lowercase and
+                    //  no leading blanks.
+                    if ( strncmp( string, "equinox=", 8 ) == 0 ) {
+                        equinox = string;
+                    } else if ( strncmp( string, "epoch=", 6 ) == 0 ) {
+                        epoch = string;
+                    } else if ( strncmp( string, "system=", 7 ) == 0 ) {
+                        system = string;
+                        if ( strncmp( system+7, "pixels", 6 ) == 0 ) {
+                            // This is a special case, want just pixels
+                            // displayed.
+                            showpixels = 1;
+                        }
+                    } else if ( strncmp( string, "gap(1)=", 7 ) == 0 ) {
+                        gap1 = string;
+                    } else if ( strncmp( string, "gap(2)=", 7 ) == 0 ) {
+                        gap2 = string;
+                    }
+                }
             }
-
-            //  Reorganise these coordinates to the expected order
-            //  (bottom-left, top-right of screen, not canvas).
-            swap( region[1], region[3] );
-          }
-        }
-      }
-    }
-  }
-
-  //  If just showing pixels, then just get a suitable FrameSet.
-  AstFrameSet *wcs = (AstFrameSet *) NULL;
-  if ( showpixels ) {
-    wcs = makeGridWCS();
-  } else {
-
-    //  See if a copy of the current WCS frameset is available (we
-    //  use a copy so we can  modify without changing any other elements).
-    StarWCS* wcsp = getStarWCSPtr();
-    if ( ! wcsp ) {
-      return TCL_ERROR;
-    }
-    wcs = wcsp->astWCSCopy();
-    if ( wcs == (AstFrameSet *) NULL ) {
-
-      //  No WCS, give up.
-      error( "sorry: unable to plot a grid as no world coordinates"
-             " are available, select the system 'pixels' or add a WCS" );
-      inerror = 1;
-    }
-  }
-  if ( wcs != (AstFrameSet *) NULL ) {
-
-    //  If we have an equinox, epoch or system then create a skyframe
-    //  and set this up as the current system (rather than the wcs
-    //  system). Note we create a new skyframe so that we can ensure
-    //  the correct defaults, i.e. anything not set equals the default
-    //  for that system, rather than the existing value.
-    AstSkyFrame *newsky = NULL;
-    if ( equinox || epoch || system ) {
-      if ( ! showpixels ) {
-        newsky = astSkyFrame( "" );
-        if ( equinox ) {
-          astSet( newsky, equinox );
-        }
-        if ( epoch ) {
-          astSet( newsky, epoch );
-        }
-        if ( system ) {
-          astSet( newsky, system) ;
-        }
-      }
-    }
-
-    //  Create an AstPlot that selects the displayed region, or the
-    //  whole of the image. It also incorporates the additional
-    //  SkyFrame that describes a system we want to add. Note wcs is
-    //  inverted so that the conversion goes through the appropriate
-    //  route (SKY to SKY to GRAPHICS, without inversion we just get
-    //  SKY to SKY, as conversion is between the current frames).
-    if ( newsky != (AstSkyFrame *) NULL ) {
-      astInvert( wcs );
-    }
-    AstPlot *plot = createPlot( wcs, (AstFrameSet *) newsky,
-                                (coordArgc == 0), 0, region );
-    inerror = ( inerror || plot == (AstPlot *) NULL );
-    if ( ! inerror ) {
-
-      //  Initialise the interpreter and canvas name for the Tk plotting
-      //  routines.
-      astTk_Init( interp_, canvasName_ );
-
-      //  Define a tag for all items created in the plot.
-      astTk_Tag( ast_tag() );
-
-      //  If we have the values gap1 and gap2 then these are
-      //  actually divisors of the default value which we can only
-      //  actually find out now.
-      float fact;
-      float value;
-      if ( gap1 != NULL ) {
-        sscanf( gap1, "gap(1)=%f", &fact );
-        if ( fact < FLT_EPSILON ) fact = 1.0f;
-        value = astGetF( plot, "gap(1)" );
-        if ( astOK ) {
-          value /= fact;
-          astSetF( plot, "gap(1)", value );
-        }
-      }
-      if ( gap2 != NULL ) {
-        sscanf( gap2, "gap(2)=%f", &fact );
-        if ( fact < FLT_EPSILON ) fact = 1.0f;
-        value = astGetF( plot, "gap(2)" );
-        if ( astOK ) {
-          value /= fact;
-          astSetF( plot, "gap(2)", value );
-        }
-      }
-
-      // Unset the number of digits used in the plot. These are set
-      // elsewhere in GAIA (for WCS decoding) and are not sensible
-      // for this occasion (too much precision leads to bad default
-      // labelling).
-      astClear( plot, "digits(1)" );
-      astClear( plot, "digits(2)" );
-
-      // Set all plot attributes to control the plot appearance.
-      if ( listArgc > 0 ) {
-        char *string = NULL;
-        for ( int index = 0; index < listArgc; index++ ) {
-          string = listArgv[index];
-
-          //  Check for "epoch", "equinox", "system", "gap(1)" and
-          //  "gap(2)" and ignore these.
-          if ( string != equinox && string != epoch &&
-               string != system && string != gap1 &&
-               string != gap2 ) {
-            astSet( plot, string );
-            if ( !astOK ) {
-              (void) error( string, " is not a valid attribute "
-                                    "(check format)" );
-              inerror = 1;
-              break;
+            
+            //  Get the canvas coordinate display range if given.
+            if ( argc == 2 ) {
+                if ( Tcl_SplitList( interp_, argv[1], &coordArgc,
+                                    &coordArgv ) != TCL_OK ) { 
+                    error( "sorry: failed to decode region of image to grid" );
+                    coordArgc = 0;
+                    inerror = 1;
+                } else {
+                    if ( coordArgc != 4 ) {
+                        error( "wrong # of args, should be 4 canvas "
+                               "coordinates" );
+                        inerror = 1;
+                    } else {
+                        for ( int index = 0; index < coordArgc; index++ ) {
+                            if ( Tcl_GetDouble(interp_, coordArgv[index],
+                                               &region[index] ) != TCL_OK ) {
+                                error( coordArgv[index], 
+                                       "is not a valid number");
+                                inerror = 1;
+                                break;
+                            }
+                        }
+                        
+                        //  Reorganise these coordinates to the expected order
+                        //  (bottom-left, top-right of screen, not canvas).
+                        swap( region[1], region[3] );
+                    }
+                }
             }
-          }
         }
-      }
-
-      //  Draw the grid.
-      if ( astOK && ! inerror ) {
-        astGrid( plot );
-      }
-
-      //  Free the plot.
-      plot = (AstPlot *) astAnnul( plot );
-
-      //  Reset the tag associated with AST grid items.
-      astTk_Tag( NULL );
     }
-
-    // Free the WCS copy.
-    wcs = (AstFrameSet *) astAnnul( wcs );
-  }
-
-  // Free the lists.
-  if ( listArgc > 0 ) {
-    Tcl_Free( (char *) listArgv );
-  }
-  if ( coordArgc > 0 ) {
-    Tcl_Free( (char *) coordArgv );
-  }
-
-  //  Do not exit with AST still in error.
-  if ( inerror || ! astOK ) {
-    if ( !astOK ) {
-      astClearStatus;
+    
+    //  If just showing pixels, then just get a suitable FrameSet.
+    AstFrameSet *wcs = (AstFrameSet *) NULL;
+    if ( showpixels ) {
+        wcs = makeGridWCS();
+    } else {
+        
+        //  See if a copy of the current WCS frameset is available (we
+        //  use a copy so we can  modify without changing any other elements).
+        StarWCS* wcsp = getStarWCSPtr();
+        if ( ! wcsp ) {
+            return TCL_ERROR;
+        }
+        wcs = wcsp->astWCSCopy();
+        if ( wcs == (AstFrameSet *) NULL ) {
+            
+            //  No WCS, give up.
+            error( "sorry: unable to plot a grid as no world coordinates"
+                   " are available, select the system 'pixels' or add a WCS" );
+            inerror = 1;
+        }
     }
-    return TCL_ERROR;
-  }
-  return TCL_OK;
+    if ( wcs != (AstFrameSet *) NULL ) {
+        
+        //  If we have an equinox, epoch or system then create a skyframe
+        //  and set this up as the current system (rather than the wcs
+        //  system). Note we create a new skyframe so that we can ensure
+        //  the correct defaults, i.e. anything not set equals the default
+        //  for that system, rather than the existing value.
+        AstSkyFrame *newsky = NULL;
+        if ( equinox || epoch || system ) {
+            if ( ! showpixels ) {
+                newsky = astSkyFrame( "" );
+                if ( equinox ) {
+                    astSet( newsky, equinox );
+                }
+                if ( epoch ) {
+                    astSet( newsky, epoch );
+                }
+                if ( system ) {
+                    astSet( newsky, system) ;
+                }
+            }
+        }
+        
+        //  Create an AstPlot that selects the displayed region, or the
+        //  whole of the image. It also incorporates the additional
+        //  SkyFrame that describes a system we want to add. Note wcs is
+        //  inverted so that the conversion goes through the appropriate
+        //  route (SKY to SKY to GRAPHICS, without inversion we just get
+        //  SKY to SKY, as conversion is between the current frames).
+        if ( newsky != (AstSkyFrame *) NULL ) {
+            astInvert( wcs );
+        }
+        AstPlot *plot = createPlot( wcs, (AstFrameSet *) newsky,
+                                    (coordArgc == 0), 0, region );
+        inerror = ( inerror || plot == (AstPlot *) NULL );
+        if ( ! inerror ) {
+            
+            //  Initialise the interpreter and canvas name for the Tk plotting
+            //  routines.
+            astTk_Init( interp_, canvasName_ );
+            
+            //  Define a tag for all items created in the plot.
+            astTk_Tag( ast_tag() );
+            
+            //  If we have the values gap1 and gap2 then these are
+            //  actually divisors of the default value which we can only
+            //  actually find out now.
+            float fact;
+            float value;
+            if ( gap1 != NULL ) {
+                sscanf( gap1, "gap(1)=%f", &fact );
+                if ( fact < FLT_EPSILON ) fact = 1.0f;
+                value = astGetF( plot, "gap(1)" );
+                if ( astOK ) {
+                    value /= fact;
+                    astSetF( plot, "gap(1)", value );
+                }
+            }
+            if ( gap2 != NULL ) {
+                sscanf( gap2, "gap(2)=%f", &fact );
+                if ( fact < FLT_EPSILON ) fact = 1.0f;
+                value = astGetF( plot, "gap(2)" );
+                if ( astOK ) {
+                    value /= fact;
+                    astSetF( plot, "gap(2)", value );
+                }
+            }
+            
+            // Unset the number of digits used in the plot. These are set
+            // elsewhere in GAIA (for WCS decoding) and are not sensible
+            // for this occasion (too much precision leads to bad default
+            // labelling).
+            astClear( plot, "digits(1)" );
+            astClear( plot, "digits(2)" );
+            
+            // Set all plot attributes to control the plot appearance.
+            if ( listArgc > 0 ) {
+                char *string = NULL;
+                for ( int index = 0; index < listArgc; index++ ) {
+                    string = listArgv[index];
+                    
+                    //  Check for "epoch", "equinox", "system", "gap(1)" and
+                    //  "gap(2)" and ignore these.
+                    if ( string != equinox && string != epoch &&
+                         string != system && string != gap1 &&
+                         string != gap2 ) {
+                        astSet( plot, string );
+                        if ( !astOK ) {
+                            (void) error( string, " is not a valid attribute "
+                                          "(check format)" );
+                            inerror = 1;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            //  Draw the grid.
+            if ( astOK && ! inerror ) {
+                astGrid( plot );
+            }
+            
+            //  Free the plot.
+            plot = (AstPlot *) astAnnul( plot );
+            
+            //  Reset the tag associated with AST grid items.
+            astTk_Tag( NULL );
+        }
+        
+        // Free the WCS copy.
+        wcs = (AstFrameSet *) astAnnul( wcs );
+    }
+    
+    // Free the lists.
+    if ( listArgc > 0 ) {
+        Tcl_Free( (char *) listArgv );
+    }
+    if ( coordArgc > 0 ) {
+        Tcl_Free( (char *) coordArgv );
+    }
+    
+    //  Do not exit with AST still in error.
+    if ( inerror || ! astOK ) {
+        if ( !astOK ) {
+            astClearStatus;
+        }
+        return TCL_ERROR;
+    }
+    return TCL_OK;
 }
 
 //+
@@ -3595,7 +3602,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
 
         //  Create an AstPlot that incorporates an additional FrameSet
         //  that describes an system we want to add.
-        AstPlot *plot = createPlot( wcs, (AstFrameSet *) farwcs, 1, 1, region );
+        AstPlot *plot = createPlot( wcs, farwcs, 1, 1, region );
         inerror = ( inerror || plot == (AstPlot *) NULL );
 
         //  Initialise the interpreter and canvas name for the Tk plotting
@@ -3620,9 +3627,9 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
             contour.setCareful( careful );
 
             //  Tell the contour object if it needs to byte swap the image
-            //  data. This is only necessary if the image is FITS on a non
-            //  bigendian machine.
-            contour.setSwap( swapNeeded() );
+            //  data. This is only necessary if the image being
+            //  contoured is FITS on a non bigendian machine.
+            contour.setSwap( swapNeeded( imageIO ) );
 
             //  Set the region of image to contour (tuned to match grid plots).
             if ( ncoords > 0 ) {
@@ -3786,103 +3793,113 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
                                    double region[] )
 {
 #ifdef _DEBUG_
-  cout << "Called StarRtdImage::createPlot" << endl;
+    cout << "Called StarRtdImage::createPlot" << endl;
 #endif
-  //  Define the limits of the canvas plotting "area" in canvas
-  //  coordinates and current coordinates (the same positions). Use
-  //  the image position on the canvas for this. Note that this also
-  //  reorients the image to the canvas (so any scales, flips, offset
-  //  and interchange are accounted).
-  float gbox[4];
-  double pbox[4];
-  if ( full ) {
+    //  Define the limits of the canvas plotting "area" in canvas
+    //  coordinates and current coordinates (the same positions). Use
+    //  the image position on the canvas for this. Note that this also
+    //  reorients the image to the canvas (so any scales, flips,
+    //  offset and interchange are accounted).
+    float gbox[4];
+    double pbox[4];
+    if ( full ) {
+        
+        //  Using whole of canvas/image.
+        double rw = reqWidth_, rh = reqHeight_;
+        if ( rw == 0 ) rw = (double) image_->width();  // Zero when whole
+        if ( rh == 0 ) rh = (double) image_->height(); // image is displayed.
+        doTrans( rw, rh, 1 );
+        gbox[0] = pbox[0] = 0.0;
+        gbox[1] = pbox[1] = rh;
+        gbox[2] = pbox[2] = rw;
+        gbox[3] = pbox[3] = 0.0;
+    } else {
+        
+        //  Just using part of the canvas.
+        gbox[0] = pbox[0] = region[0];
+        gbox[1] = pbox[1] = region[1];
+        gbox[2] = pbox[2] = region[2];
+        gbox[3] = pbox[3] = region[3];
+    }
+    int rotated = image_->rotate();             // Record if rotated
+    if ( rotated ) {                            // and switch off while
+        image_->rotate(0);                      // getting graphics mapping
+    }
+    canvasToImageCoords( pbox[0], pbox[1], 0 );
+    canvasToImageCoords( pbox[2], pbox[3], 0 );
+    if ( rotated ) {
+        image_->rotate(1);                        // Restore rotation.
+    }
+    
+    //  If an extra FrameSet has been given then try to get a conversion
+    //  which goes from its CURRENT frame to the BASE frame of the WCS
+    //  system. For this reason we need to invert the new FrameSet.
+    AstFrameSet *plotset = NULL;
+    if ( extraset != (AstFrameSet *) NULL ) {
+        astInvert( extraset );
+        plotset = (AstFrameSet *) astConvert( wcs, extraset, 
+                                              "SKY,AXIS,PIXEL,GRID,," );
+        astInvert( extraset );
+        if ( ! astOK || plotset == (AstFrameSet *) NULL ) {
+            more_error ( "sorry: cannot find a way to convert your existing "
+                         "coordinates to the requested system");
+            if ( plotset != (AstFrameSet *) NULL ) {
+                plotset = (AstFrameSet *) astAnnul( plotset );
+            }
+            return (AstPlot *) NULL;
+        }
+        
+        //  Transform region from old image to new image if asked.
+        if ( image ) {
+            double xin[4], yin[4];
+            double xout[4], yout[4];
+            xin[0] = region[0];
+            yin[0] = region[1];
 
-    //  Using whole of canvas/image.
-    double rw = reqWidth_, rh = reqHeight_;
-    if ( rw == 0 ) rw = (double) image_->width();  // Zero when whole image is
-    if ( rh == 0 ) rh = (double) image_->height(); // displayed.
-    doTrans( rw, rh, 1 );
-    gbox[0] = pbox[0] = 0.0;
-    gbox[1] = pbox[1] = rh;
-    gbox[2] = pbox[2] = rw;
-    gbox[3] = pbox[3] = 0.0;
-  } else {
+            xin[1] = region[2];
+            yin[1] = region[1];
 
-    //  Just using part of the canvas.
-    gbox[0] = pbox[0] = region[0];
-    gbox[1] = pbox[1] = region[1];
-    gbox[2] = pbox[2] = region[2];
-    gbox[3] = pbox[3] = region[3];
-  }
-  int rotated = image_->rotate();             // Record if rotated
-  if ( rotated ) {                            // and switch off while
-    image_->rotate(0);                        // getting graphics mapping
-  }
-  canvasToImageCoords( pbox[0], pbox[1], 0 );
-  canvasToImageCoords( pbox[2], pbox[3], 0 );
-  if ( rotated ) {
-    image_->rotate(1);                        // Restore rotation.
-  }
+            xin[2] = region[2];
+            yin[2] = region[3];
 
-  //  If an extra FrameSet has been given then try to get a conversion
-  //  which goes from its CURRENT frame to the BASE frame of the WCS
-  //  system. For this reason we need to invert the new FrameSet.
-  AstFrameSet *plotset = NULL;
-  if ( extraset != (AstFrameSet *) NULL ) {
-    astInvert( extraset );
-    plotset = (AstFrameSet *) astConvert( wcs, extraset, "SKY,AXIS,PIXEL,GRID,," );
-    astInvert( extraset );
-    if ( ! astOK || plotset == (AstFrameSet *) NULL ) {
-      more_error ( "sorry: cannot find a way to convert your existing "
-                   "coordinates to the requested system");
-      if ( plotset != (AstFrameSet *) NULL ) {
+            xin[3] = region[0];
+            yin[3] = region[3];
+
+            astTran2( plotset, 4, xin, yin, 1, xout, yout );
+
+            region[0] = min( xout[0], xout[3] );
+            region[1] = min( yout[0], yout[1] );
+            region[2] = max( xout[1], xout[2] );
+            region[3] = max( yout[2], yout[3] );
+        }
+    } else {
+        
+        //  Just using plain WCS.
+        plotset = wcs;
+    }
+    
+    //  Create the plot frameset.
+    AstPlot *plot = astPlot( plotset, gbox, pbox, "" );
+    if ( extraset != (AstFrameSet *) NULL ) {
         plotset = (AstFrameSet *) astAnnul( plotset );
-      }
-      return (AstPlot *) NULL;
     }
-
-    //  Transform region from old image to new image if asked.
-    if ( image ) {
-      double xin[2], yin[2];
-      double xout[2], yout[2];
-      xin[0] = region[0];
-      yin[0] = region[1];
-      xin[1] = region[2];
-      yin[1] = region[3];
-      astTran2( plotset, 2, xin, yin, 1, xout, yout );
-      region[0] = xout[0];
-      region[1] = yout[0];
-      region[2] = xout[1];
-      region[3] = yout[1];
+    
+    //  If the X and Y axes are interchanged then we need to
+    //  correct the mapping between the pixel frame (image
+    //  coordinates) and the graphics frame.
+    if ( image_->rotate() ) {
+        int inperm[] = {2,1};
+        int outperm[] = {2,1};
+        AstPermMap *perm = astPermMap( 2, inperm, 2, outperm,
+                                       (double *) NULL, "" );
+        astRemapFrame( plot, AST__BASE, perm );
+        perm = (AstPermMap *) astAnnul( perm );
     }
-  } else {
-
-    //  Just using plain WCS.
-    plotset = wcs;
-  }
-
-  //  Create the plot frameset.
-  AstPlot *plot = astPlot( plotset, gbox, pbox, "" );
-  if ( extraset != (AstFrameSet *) NULL ) {
-    plotset = (AstFrameSet *) astAnnul( plotset );
-  }
-
-  //  If the X and Y axes are interchanged then we need to
-  //  correct the mapping between the pixel frame (image
-  //  coordinates) and the graphics frame.
-  if ( image_->rotate() ) {
-    int inperm[] = {2,1};
-    int outperm[] = {2,1};
-    AstPermMap *perm = astPermMap( 2, inperm, 2, outperm,
-                                   (double *) NULL, "" );
-    astRemapFrame( plot, AST__BASE, perm );
-    perm = (AstPermMap *) astAnnul( perm );
-  }
-  if ( astOK ) {
-    return plot;
-  } else {
-    return (AstPlot *) NULL;
-  }
+    if ( astOK ) {
+        return plot;
+    } else {
+        return (AstPlot *) NULL;
+    }
 }
 
 //+
@@ -4441,8 +4458,8 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
 
     //  Just image coordinates.
     double ra0 = x0, dec0 = y0, ra1 = x1, dec1 = y1;
-    if (   canvasToImageCoords(ra0, dec0, 0) != TCL_OK
-           || canvasToImageCoords(ra1, dec1, 0) != TCL_OK ) {
+    if ( canvasToImageCoords( ra0, dec0, 0 ) != TCL_OK
+           || canvasToImageCoords( ra1, dec1, 0 ) != TCL_OK ) {
       return TCL_OK;
     }
     double dist = sqrt(( ra1 - ra0 ) * ( ra1 - ra0 ) +
@@ -5514,6 +5531,21 @@ int StarRtdImage::swapNeeded()
 {
     int swap = 0;
     ImageIO imio = image_->image();
+    return swapNeeded( imio );
+}
+
+//+
+//   StarRtdImage::swapNeeded
+//
+//   Purpose:
+//      Test if the data of a given image needs to be byte swapped.
+//
+//   Return:
+//      1 if swap is need, 0 otherwise.
+//-
+int StarRtdImage::swapNeeded( ImageIO imio )
+{
+    int swap = 0;
     ImageIO *imptr = &imio;
 
     //  Check the ImageIO format. If this is "native" then the data is
