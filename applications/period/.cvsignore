@@ -1,0 +1,14 @@
+*.lo
+*.la
+Makefile
+Makefile.in
+.libs
+aclocal.m4
+autom4te.cache
+config.log
+config.status
+configure
+libtool
+period
+starconf.status
+
