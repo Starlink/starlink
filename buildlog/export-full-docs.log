@@ -18,6 +18,9 @@ javadoc-sources:
      [echo] Executing Jetty target: javadoc-sources
 
 javadoc-sources:
+     [echo] Executing AGLIB target: javadoc-sources
+
+javadoc-sources:
      [echo] Executing UTIL target: javadoc-sources
 
 javadoc-sources:
@@ -64,6 +67,9 @@ javadoc-sources:
 
 javadoc-sources:
      [echo] Executing FITS target: javadoc-sources
+
+javadoc-sources:
+     [echo] Executing AstroGrid target: javadoc-sources
 
 javadoc-sources:
      [echo] Executing JSky target: javadoc-sources
@@ -1569,6 +1575,25 @@ dist:
 install:
 [loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 397 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing AGLIB target: install
+
+jars:
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-resolver-SNAPSHOT.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-store-client-SNAPSHOT.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-registry-client-lite-SNAPSHOT.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-client-SNAPSHOT.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-filestore-client-SNAPSHOT.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-common-SNAPSHOT.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-common-SNAPSHOT.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-registry-common-SNAPSHOT.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/aglib.jar
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 10 files to /apps/cvsbuild/starjava/lib
      [echo] Executing UTIL target: install
 
 prepare:
@@ -1944,6 +1969,30 @@ dist:
 install:
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 23 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing AstroGrid target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/astrogrid/lib/astrogrid/astrogrid.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/astrogrid/lib/astrogrid/astrogrid.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/astrogrid/bin. It is empty.
+
+install:
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 20 files to /apps/cvsbuild/starjava/docs
      [echo] Executing JSky target: install
 
 prepare:
@@ -2168,4 +2217,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:427: Compile failed; see the compiler error output for details.
 
-Total time: 4 minutes 3 seconds
+Total time: 4 minutes 0 seconds

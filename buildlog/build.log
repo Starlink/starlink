@@ -33,6 +33,13 @@ prepare:
 
 build:
      [copy] Copying 5 files to /apps/cvsbuild/java/source/jetty/lib/jetty
+     [echo] Executing AGLIB target: build
+
+prepare:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/aglib/lib/aglib
+     [copy] Copying 8 files to /apps/cvsbuild/java/source/aglib/lib/aglib
      [echo] Executing UTIL target: build
 
 prepare:
@@ -217,6 +224,16 @@ check_packages:
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/classes
     [javac] Compiling 13 source files to /apps/cvsbuild/java/source/fits/build/classes
+     [echo] Executing AstroGrid target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/astrogrid/build/classes
+    [javac] Compiling 5 source files to /apps/cvsbuild/java/source/astrogrid/build/classes
+     [copy] Copying 5 files to /apps/cvsbuild/java/source/astrogrid/build/classes
      [echo] Executing JSky target: build
 
 prepare:

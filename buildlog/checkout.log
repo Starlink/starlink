@@ -12,6 +12,19 @@ U java/source/ant_import
 U java/source/build.xml
 U java/source/keystore
 U java/source/project.dtd
+cvs checkout: Updating java/source/aglib
+U java/source/aglib/.properties
+U java/source/aglib/build.xml
+cvs checkout: Updating java/source/aglib/src
+cvs checkout: Updating java/source/aglib/src/lib
+U java/source/aglib/src/lib/astrogrid-common-SNAPSHOT.jar
+U java/source/aglib/src/lib/astrogrid-community-client-SNAPSHOT.jar
+U java/source/aglib/src/lib/astrogrid-community-common-SNAPSHOT.jar
+U java/source/aglib/src/lib/astrogrid-community-resolver-SNAPSHOT.jar
+U java/source/aglib/src/lib/astrogrid-filestore-client-SNAPSHOT.jar
+U java/source/aglib/src/lib/astrogrid-registry-client-lite-SNAPSHOT.jar
+U java/source/aglib/src/lib/astrogrid-registry-common-SNAPSHOT.jar
+U java/source/aglib/src/lib/astrogrid-store-client-SNAPSHOT.jar
 cvs checkout: Updating java/source/ant
 U java/source/ant/KEYS
 U java/source/ant/LICENSE
@@ -40,17 +53,16 @@ U java/source/ant/bin/runant.pl
 U java/source/ant/bin/runant.py
 cvs checkout: Updating java/source/ant/docs
 U java/source/ant/docs/LICENSE
-U java/source/ant/docs/ant15_todo.html
 U java/source/ant/docs/ant_in_anger.html
 U java/source/ant/docs/ant_task_guidelines.html
 U java/source/ant/docs/antnews.html
 U java/source/ant/docs/appendix_e.pdf
 U java/source/ant/docs/breadcrumbs.js
+U java/source/ant/docs/bylaws.html
 U java/source/ant/docs/contributors.html
 U java/source/ant/docs/cvs.html
 U java/source/ant/docs/external.html
 U java/source/ant/docs/faq.html
-U java/source/ant/docs/guidelines.html
 U java/source/ant/docs/index.html
 U java/source/ant/docs/legal.html
 U java/source/ant/docs/license.html
@@ -76,7 +88,9 @@ U java/source/ant/docs/images/ant_logo_medium.gif
 U java/source/ant/docs/images/ant_logo_small.gif
 U java/source/ant/docs/images/current.gif
 U java/source/ant/docs/images/group-logo.gif
+U java/source/ant/docs/images/jp_rcwinner_2003.gif
 U java/source/ant/docs/images/jw_ec_logo_winner2002.gif
+U java/source/ant/docs/images/jw_ec_logo_winner2003.gif
 U java/source/ant/docs/images/label.gif
 U java/source/ant/docs/images/menu-left.gif
 U java/source/ant/docs/images/menu-right.gif
@@ -507,6 +521,7 @@ U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/XSLTProcess.Outp
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/XSLTProcess.Param.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/XSLTProcess.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/XmlProperty.html
+U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Zip.ArchiveState.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Zip.Duplicate.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Zip.WhenEmpty.html
 U java/source/ant/docs/manual/api/org/apache/tools/ant/taskdefs/Zip.html
@@ -1134,6 +1149,8 @@ U java/source/ant/docs/manual/api/org/apache/tools/zip/ZipShort.html
 U java/source/ant/docs/manual/api/org/apache/tools/zip/package-frame.html
 U java/source/ant/docs/manual/api/org/apache/tools/zip/package-summary.html
 U java/source/ant/docs/manual/api/org/apache/tools/zip/package-tree.html
+cvs checkout: Updating java/source/ant/docs/manual/api/resources
+U java/source/ant/docs/manual/api/resources/inherit.gif
 cvs checkout: Updating java/source/ant/docs/projects
 U java/source/ant/docs/projects/index.html
 cvs checkout: Updating java/source/ant/docs/projects/antidote
@@ -1183,6 +1200,7 @@ cvs checkout: Updating java/source/ant/src/etc/testcases
 U java/source/ant/src/etc/testcases/asf-logo.gif
 cvs checkout: Updating java/source/ant/src/etc/testcases/core
 U java/source/ant/src/etc/testcases/core/immutable.xml
+U java/source/ant/src/etc/testcases/core/taskcontainer.xml
 cvs checkout: Updating java/source/ant/src/etc/testcases/core/include
 cvs checkout: Updating java/source/ant/src/etc/testcases/core/include/basic
 U java/source/ant/src/etc/testcases/core/include/basic/include.inc
@@ -1590,6 +1608,8 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XSLTLiaison.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XSLTLogger.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XSLTLoggerAware.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XSLTProcess.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XSLTProcess.java.orig
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XSLTProcess.java.rej
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/XmlProperty.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/Zip.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/defaults.properties
@@ -1655,6 +1675,7 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/Script.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/StyleBook.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/Test.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/TraXLiaison.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/TraXLiaison.java.orig
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/XMLValidateTask.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/XalanLiaison.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/XslpLiaison.java
@@ -1827,6 +1848,7 @@ U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/net/TelnetTask
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Add.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Base.java
+U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Base.java.orig
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Change.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Counter.java
 U java/source/ant/src/main/org/apache/tools/ant/taskdefs/optional/perforce/P4Delete.java
@@ -1933,6 +1955,8 @@ U java/source/ant/src/main/org/apache/tools/ant/types/XMLCatalog.java
 U java/source/ant/src/main/org/apache/tools/ant/types/ZipFileSet.java
 U java/source/ant/src/main/org/apache/tools/ant/types/ZipScanner.java
 U java/source/ant/src/main/org/apache/tools/ant/types/defaults.properties
+U java/source/ant/src/main/org/apache/tools/ant/types/defaults.properties.orig
+U java/source/ant/src/main/org/apache/tools/ant/types/defaults.properties.rej
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/types/optional
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools/ant/types/optional/depend
 U java/source/ant/src/main/org/apache/tools/ant/types/optional/depend/ClassfileSet.java
@@ -2075,6 +2099,7 @@ U java/source/ant/src/testcases/org/apache/tools/ant/IntrospectionHelperTest.jav
 U java/source/ant/src/testcases/org/apache/tools/ant/MockBuildListener.java
 U java/source/ant/src/testcases/org/apache/tools/ant/ProjectTest.java
 U java/source/ant/src/testcases/org/apache/tools/ant/PropertyExpansionTest.java
+U java/source/ant/src/testcases/org/apache/tools/ant/TaskContainerTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/filters
 U java/source/ant/src/testcases/org/apache/tools/ant/filters/LineContainsTest.java
 cvs checkout: Updating java/source/ant/src/testcases/org/apache/tools/ant/taskdefs
@@ -2380,6 +2405,20 @@ U java/source/astgui/src/main/uk/ac/starlink/ast/gui/package.html
 cvs checkout: Updating java/source/astgui/src/main/uk/ac/starlink/ast/gui/images
 cvs checkout: Updating java/source/astgui/src/testcases
 U java/source/astgui/src/testcases/TestPlotConfigFrame.java
+cvs checkout: Updating java/source/astrogrid
+U java/source/astrogrid/.properties
+U java/source/astrogrid/build.xml
+cvs checkout: Updating java/source/astrogrid/src
+cvs checkout: Updating java/source/astrogrid/src/main
+cvs checkout: Updating java/source/astrogrid/src/main/uk
+cvs checkout: Updating java/source/astrogrid/src/main/uk/ac
+cvs checkout: Updating java/source/astrogrid/src/main/uk/ac/starlink
+cvs checkout: Updating java/source/astrogrid/src/main/uk/ac/starlink/astrogrid
+U java/source/astrogrid/src/main/uk/ac/starlink/astrogrid/LoginDialog.java
+U java/source/astrogrid/src/main/uk/ac/starlink/astrogrid/MyspaceDataSource.java
+U java/source/astrogrid/src/main/uk/ac/starlink/astrogrid/MyspaceSelector.java
+U java/source/astrogrid/src/main/uk/ac/starlink/astrogrid/MyspaceTableLoadDialog.java
+U java/source/astrogrid/src/main/uk/ac/starlink/astrogrid/MyspaceTreeNode.java
 cvs checkout: Updating java/source/axis
 U java/source/axis/.properties
 U java/source/axis/README

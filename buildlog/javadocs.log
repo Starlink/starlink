@@ -39,6 +39,9 @@ javadocs:
      [echo] Executing Jetty target: javadocs
 
 javadocs:
+     [echo] Executing AGLIB target: javadocs
+
+javadocs:
      [echo] Executing UTIL target: javadocs
 
 prepare:
@@ -1635,6 +1638,23 @@ javadocs:
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+     [echo] Executing AstroGrid target: javadocs
+
+prepare:
+
+javadoc_check:
+
+javadocs:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/astrogrid/docs/astrogrid/javadocs
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.astrogrid...
+  [javadoc] Constructing Javadoc information...
+  [javadoc] Standard Doclet version 1.4.1
+
+  [javadoc] Building tree for all the packages and classes...
+  [javadoc] Building index for all the packages and classes...
+  [javadoc] Building index for all classes...
      [echo] Executing JSky target: javadocs
 
 prepare:
@@ -3000,4 +3020,4 @@ javadocs:
   [javadoc] 209 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 17 seconds
+Total time: 3 minutes 23 seconds

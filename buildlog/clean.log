@@ -24,6 +24,10 @@ clean:
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/jetty/lib
+     [echo] Executing AGLIB target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/aglib/lib
      [echo] Executing UTIL target: clean
 
 clean:
@@ -112,6 +116,14 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/fits/build
    [delete] Deleting directory /apps/cvsbuild/java/source/fits/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/fits/docs
+     [echo] Executing AstroGrid target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/astrogrid/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/astrogrid/bin
+   [delete] Deleting directory /apps/cvsbuild/java/source/astrogrid/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/astrogrid/docs
+   [delete] Deleting directory /apps/cvsbuild/java/source/astrogrid/etc
      [echo] Executing JSky target: clean
 
 clean:
@@ -200,4 +212,4 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/frog/docs
 
 BUILD SUCCESSFUL
-Total time: 13 seconds
+Total time: 15 seconds

@@ -35,7 +35,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/ant
      [copy] Copying 9 files to /apps/cvsbuild/starjava/bin
      [copy] Copying 4 files to /apps/cvsbuild/starjava/lib
-     [copy] Copying 1031 files to /apps/cvsbuild/starjava/docs/ant
+     [copy] Copying 1034 files to /apps/cvsbuild/starjava/docs/ant
 
 BUILD SUCCESSFUL
-Total time: 31 seconds
+Total time: 33 seconds

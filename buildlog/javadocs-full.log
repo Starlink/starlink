@@ -20,6 +20,9 @@ javadoc-sources:
      [echo] Executing Jetty target: javadoc-sources
 
 javadoc-sources:
+     [echo] Executing AGLIB target: javadoc-sources
+
+javadoc-sources:
      [echo] Executing UTIL target: javadoc-sources
 
 javadoc-sources:
@@ -98,6 +101,11 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/java
      [copy] Copying 14 files to /apps/cvsbuild/java/source/fits/build/java
+     [echo] Executing AstroGrid target: javadoc-sources
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/astrogrid/build/java
+     [copy] Copying 5 files to /apps/cvsbuild/java/source/astrogrid/build/java
      [echo] Executing JSky target: javadoc-sources
 
 javadoc-sources:
@@ -635,13 +643,14 @@ javadoc-sources:
   [javadoc]  cause a "snap." "
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/BayesClassifier.java:38: warning - The first sentence is interpreted to be:
   [javadoc] "Compute mu's and sigma's for each class, also computes the
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/tutorial/TransformedFigureTutorial.java:213: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/TypedNodeRenderer.java:44: warning - The first sentence is interpreted to be:
   [javadoc]  coefficients (one per class) that are used in the joint
   [javadoc]  p.d.f."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Compute mu's and sigma's for each class, also computes the
   [javadoc]  coefficients (one per class) that are used in the joint
   [javadoc]  p.d.f. calculation."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/tutorial/TransformedFigureTutorial.java:213: warning - The first sentence is interpreted to be:
   [javadoc] "CloudFigure is a class that paints itself as a
   [javadoc]  translucent "cloud."
   [javadoc]  This example figure class illustrates the use of different
@@ -651,7 +660,6 @@ javadoc-sources:
   [javadoc] "CloudFigure is a class that paints itself as a
   [javadoc]  translucent "cloud."
   [javadoc]  "
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/TypedNodeRenderer.java:44: warning - The first sentence is interpreted to be:
   [javadoc] "A typed node renderer with the given node renderer
   [javadoc]  as its default (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -1545,4 +1553,4 @@ javadoc-sources:
   [javadoc] 581 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 7 seconds
+Total time: 1 minute 9 seconds

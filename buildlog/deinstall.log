@@ -30,6 +30,12 @@ deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/jetty/.jetty.install
+     [echo] Executing AGLIB target: deinstall
+
+deinstall:
+
+real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/aglib/.aglib.install
      [echo] Executing UTIL target: deinstall
 
 deinstall:
@@ -114,6 +120,12 @@ deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/fits/.fits.install
+     [echo] Executing AstroGrid target: deinstall
+
+deinstall:
+
+real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/astrogrid/.astrogrid.install
      [echo] Executing JSky target: deinstall
 
 deinstall:
@@ -199,4 +211,4 @@ deinstall:
 real_deinstall:
 
 BUILD SUCCESSFUL
-Total time: 10 seconds
+Total time: 12 seconds

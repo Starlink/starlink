@@ -26,6 +26,11 @@ real_deinstall:
 deinstall:
 
 real_deinstall:
+     [echo] Executing AGLIB target: deinstall
+
+deinstall:
+
+real_deinstall:
      [echo] Executing UTIL target: deinstall
 
 deinstall:
@@ -92,6 +97,11 @@ deinstall:
 
 real_deinstall:
      [echo] Executing FITS target: deinstall
+
+deinstall:
+
+real_deinstall:
+     [echo] Executing AstroGrid target: deinstall
 
 deinstall:
 
@@ -187,6 +197,9 @@ clean:
      [echo] Executing Jetty target: clean
 
 clean:
+     [echo] Executing AGLIB target: clean
+
+clean:
      [echo] Executing UTIL target: clean
 
 clean:
@@ -227,6 +240,9 @@ clean:
 
 clean:
      [echo] Executing FITS target: clean
+
+clean:
+     [echo] Executing AstroGrid target: clean
 
 clean:
      [echo] Executing JSky target: clean
@@ -291,6 +307,9 @@ javadoc-sources:
 
 javadoc-sources:
      [echo] Executing Jetty target: javadoc-sources
+
+javadoc-sources:
+     [echo] Executing AGLIB target: javadoc-sources
 
 javadoc-sources:
      [echo] Executing UTIL target: javadoc-sources
@@ -375,6 +394,11 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/java
      [copy] Copying 14 files to /apps/cvsbuild/java/source/fits/build/java
+     [echo] Executing AstroGrid target: javadoc-sources
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/astrogrid/build/java
+     [copy] Copying 5 files to /apps/cvsbuild/java/source/astrogrid/build/java
      [echo] Executing JSky target: javadoc-sources
 
 javadoc-sources:
@@ -450,11 +474,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 2266 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 2276 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 5 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 29 seconds
+Total time: 34 seconds
