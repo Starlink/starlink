@@ -16,6 +16,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -32,6 +33,8 @@
 *        overflows of stack without error.
 *     9-SEP-1995 (PDRAPER):
 *        Added package version string.
+*     10-FEB-2000 (MBT):
+*        Modified package version string for automatic editing at build time.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -87,6 +90,6 @@
 
 *  Package version.
       CHARACTER * ( 32 ) VERS
-      PARAMETER ( VERS = '(CCDPACK version 3.0-0b)' )
+      PARAMETER ( VERS = '(PKG_VERS)' )
 
 * $Id$

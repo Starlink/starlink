@@ -536,9 +536,14 @@ PRIVATE_SCRIPTS = dgeneric
 #  it, but which are not required by users of it.
 
 PRIVATE_INCLUDES = ccd1_fdcm ccd1_fitcm ccd1_memcm ccd1_moscm \
- ccd1_mospr ccd1_par ccd1_tmpcm fio1_clog hlpcmd.inc ira_err ira_par \
+ ccd1_mospr ccd1_tmpcm fio1_clog hlpcmd.inc ira_err ira_par \
  irg_com irg_err irg_fac irg_par irh_com irh_err irh_par ndf_const \
  user_err irg_err.h slv.h
+
+#  Package include file which will be edited at build time to contain
+#  the package version number.
+
+PKG_INCLUDE = ccd1_par
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -970,6 +975,13 @@ $(IRAF_SCRIPTS) $(IRAF_HELP) helpdb.mip: $(PKG_NAME)_iraf.tar
 	@ if test -f $@; then :;\
 	   else echo $@ is not in the tar file; exit 1; fi
 
+$(PKG_INCLUDE):
+	$(TAR_OUT) $(PKG_NAME)_source.tar $@
+	@ if test -f $@; then :;\
+          else echo $@ is not in the tar file; exit 1; fi
+	sed -e s#PKG_VERS#$(PKG_VERS)# $@ >$@_tmp
+	mv $@_tmp $@
+
 #  Personal rules for building source code archives from RCS and
 #  other places.
 
@@ -980,7 +992,7 @@ CCDPACK_HOME = /mbt/support/ccdpack
 #  Files under RCS control.
 
 RCSFILES = makefile mk $(LATEX_DOCS) $(PKG_NAME).news $(HELPSRC) \
-           $(PRIVATE_INCLUDES) $(MONO_SOURCE) $(HELP_SOURCES) \
+           $(PRIVATE_INCLUDES) $(PKG_INCLUDE) $(MONO_SOURCE) $(HELP_SOURCES) \
            $(IFD_FILES) $(PUBLIC_SCRIPTS) \
            $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
            $(SUBSRC) $(CSUBSRC) $(DGENSRC) $(GENSRC) $(GENRDSRC) \
@@ -1020,11 +1032,12 @@ rcsrevs: RCS
 
 $(PKG_NAME)_source.tar :
 	co $(PRIVATE_INCLUDES)
+	co $(PKG_INCLUDE)
 	co $(MONO_SOURCE)
 	co $(HELP_SOURCES)
 	co $(IFD_FILES)
 	chmod 644 $(HELP_SOURCES) $(MONO_SOURCE) $(PRIVATE_INCLUDES) \
-		  $(IFD_FILES)
+		  $(PKG_INCLUDE) $(IFD_FILES)
 	co $(PUBLIC_SCRIPTS)
 	co $(LINK_SCRIPT1)
 	co $(LINK_SCRIPT2)
@@ -1043,12 +1056,12 @@ $(PKG_NAME)_source.tar :
 	gunzip atclsh.alpha_OSF1.gz
 	gunzip atclsh.sun4_Solaris.gz
 	gunzip atclsh.ix86_Linux.gz
-	$(TAR_IN) $(PKG_NAME)_source.tar $(PRIVATE_INCLUDES) $(MONO_SOURCE) \
-	   $(HELP_SOURCES) $(IFD_FILES) $(PUBLIC_SCRIPTS) \
+	$(TAR_IN) $(PKG_NAME)_source.tar $(PRIVATE_INCLUDES) $(PKG_INCLUDE) \
+	   $(MONO_SOURCE) $(HELP_SOURCES) $(IFD_FILES) $(PUBLIC_SCRIPTS) \
 	   $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
 	   ccdwish.alpha_OSF1 ccdwish.sun4_Solaris ccdwish.ix86_Linux \
 	   atclsh.alpha_OSF1 atclsh.sun4_Solaris atclsh.ix86_Linux
-	@- $(RM) $(PRIVATE_INCLUDES) $(MONO_SOURCE) \
+	@- $(RM) $(PRIVATE_INCLUDES) $(PKG_INCLUDE) $(MONO_SOURCE) \
 		$(HELP_SOURCES) $(IFD_FILES) $(PUBLIC_SCRIPTS) \
 		$(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
 	        ccdwish.alpha_OSF1 ccdwish.sun4_Solaris ccdwish.ix86_Linux \
@@ -2103,7 +2116,8 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #  Remove all intermediate files.  Do not remove built files.
 
 clean:
-	@- $(RM) $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) $(IFL_FILES) \
+	@- $(RM) $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) $(PKG_INCLUDE) \
+	         $(IFL_FILES) \
 		 $(MONO_IFL) $(HELP_SOURCES) $(PLATFORM_F) $(BLOCK_DATA) \
 		 $(C_ROUTINES) $(PRIVATE_SCRIPTS) $(IFD_FILES) \
 	         1>/dev/null 2>/dev/null
