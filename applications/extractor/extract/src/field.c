@@ -5,7 +5,7 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*	Author:		E.BERTIN (IAP)
 *                       A.J.CHIPPERFIELD (STARLINK)
 *                       P.W.DRAPER (STARLINK & Durham University)
 *
@@ -20,9 +20,15 @@
 *                          Changed use of field->file member. This is
 *                          used differently in NDF interface (was
 *                          being closed!). 
+*	Last modify:	14/12/2002
+                           (EB): 2.3
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<math.h>
 #include	<stdio.h>
@@ -31,6 +37,8 @@
 
 #include	"define.h"
 #include	"globals.h"
+#include	"prefs.h"
+#include	"fits/fitscat.h"
 #include	"assoc.h"
 #include	"astrom.h"
 #include	"back.h"
@@ -42,7 +50,7 @@
 /*
 Returns a pointer to a new field, ready to go!
 */
-picstruct	*newfield(char *filename, int flags)
+picstruct	*newfield(char *filename, int flags, int nok)
 
   {
    picstruct	*field;
@@ -70,11 +78,11 @@ picstruct	*newfield(char *filename, int flags)
           field->ident,
           field->width, field->height, field->bytepix*8,
           field->bitpix>0?
-          (field->compress_type!=COMPRESS_NONE?"COMPRESSED":"INTEGER")
+          (field->compress_type!=ICOMPRESS_NONE?"COMPRESSED":"INTEGER")
           :"FLOATING POINT");
 
 /* Provide a buffer for compressed data */
-  if (field->compress_type != COMPRESS_NONE)
+  if (field->compress_type != ICOMPRESS_NONE)
     QMALLOC(field->compress_buf, char, FBSIZE);
 
 /* Check the astrometric system and do the setup of the astrometric stuff */
@@ -150,7 +158,7 @@ picstruct	*inheritfield(picstruct *infield, int flags)
   field->fstrip = NULL;
   field->reffield = infield;
   field->compress_buf = NULL;
-  field->compress_type = COMPRESS_NONE;
+  field->compress_type = ICOMPRESS_NONE;
   field->file = 0;            /*  PWD: was NULL, file reused as position;*/
 
   return field;
