@@ -121,7 +121,6 @@ class DviFileEvent {
     eventTypes type() const { return type_; }
  private:
     DviFile *dviFile_;
-    void *updater_;
     const eventTypes type_;
 };
 class DviFileSetChar : public DviFileEvent {

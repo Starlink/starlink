@@ -71,6 +71,7 @@ DviFileEvent *DviFile::getEvent()
 	    pending_hhupdate_ += current_font_->glyph(opcode)->hEscapement();
 	    pending_hupdate_ += charwidth_(opcode);
 	    gotEvent = new DviFileSetChar(opcode, this);
+	    gotEvent->debug();
 	}
 	else if (opcode >= 171 && opcode <= 234)
 	{
@@ -487,6 +488,8 @@ DviFileEvent *DviFile::getEvent()
 	}
     }
     gotEvent->opcode = opcode;
+    cerr << "getEvent returning event @ " << gotEvent << ":opcode="
+        << static_cast<int>(opcode) << '\n';
     return gotEvent;
 }
 
