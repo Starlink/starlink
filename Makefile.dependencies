@@ -17,6 +17,7 @@ $(MANIFEST)/agi: \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
@@ -36,6 +37,7 @@ $(MANIFEST)/ard: \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/prm \
@@ -158,6 +160,7 @@ $(MANIFEST)/cat: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/par \
@@ -232,6 +235,7 @@ $(MANIFEST)/chart: \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/psx \
@@ -333,6 +337,7 @@ $(MANIFEST)/daophot: \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/ndf \
@@ -563,6 +568,7 @@ $(MANIFEST)/extractor: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/prm \
@@ -603,6 +609,7 @@ $(MANIFEST)/figaro: \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/ndf \
@@ -653,6 +660,7 @@ $(MANIFEST)/fio: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/par \
@@ -729,6 +737,7 @@ $(MANIFEST)/graphpar: \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
@@ -746,6 +755,7 @@ $(MANIFEST)/grp: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/prm \
@@ -807,6 +817,7 @@ $(MANIFEST)/hdstrace: \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/fio \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
@@ -841,6 +852,7 @@ $(MANIFEST)/idi: \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/par \
@@ -865,6 +877,7 @@ $(MANIFEST)/img: \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/generic \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/ndf \
@@ -902,6 +915,7 @@ $(MANIFEST)/iras90: \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/ncar \
@@ -931,6 +945,7 @@ $(MANIFEST)/ircamdr: \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/mag \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/ndf \
@@ -977,6 +992,7 @@ $(MANIFEST)/kaplibs: \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/htx \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/mag \
@@ -1127,6 +1143,7 @@ $(MANIFEST)/mag: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/par \
@@ -1195,6 +1212,7 @@ $(MANIFEST)/ndg: \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/par \
@@ -1227,6 +1245,7 @@ $(MANIFEST)/par: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/pcs \
@@ -1241,6 +1260,7 @@ $(MANIFEST)/pcs: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
@@ -1287,6 +1307,7 @@ $(MANIFEST)/photom: \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/ndf \
@@ -1395,6 +1416,7 @@ $(MANIFEST)/pongo: \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/par \
@@ -1560,6 +1582,7 @@ $(MANIFEST)/startcl: \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/nbs \
 		$(MANIFEST)/pcs \
