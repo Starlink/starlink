@@ -234,6 +234,16 @@ itcl::class gaia::StarAstReference {
       add_short_help $itk_component(coupled) \
 	      {Move markers individually or all together}
 
+      #  Add control for pop-up window that allows the selection of
+      #  reference positions in other images.
+      itk_component add transfer {
+         button $w_.transfer \
+            -text "Transfer" \
+            -command [code $this start_transfer_]
+      }
+      add_short_help $itk_component(transfer) \
+         {Transfer reference RA/Dec positions from other images}
+
       #  Add entry widgets that specify the coordinate types, system
       #  etc. of the table values.
       itk_component add space1 {
@@ -412,6 +422,7 @@ itcl::class gaia::StarAstReference {
 
       #  Pack all other widgets into place.
       pack $itk_component(table) -side top -fill both -expand 1
+      pack $itk_component(transfer) -side top -pady 1 -padx 1
       pack $itk_component(coupled) -side top -fill x -pady 3 -padx 3
       pack $itk_component(space1) -side top -fill x -pady 5 -padx 5
       pack $itk_component(ctype) -side top -pady 2 -padx 2 -anchor w
@@ -438,6 +449,9 @@ itcl::class gaia::StarAstReference {
    destructor  {
       if { [winfo exists $add_] } {
          delete object $add_
+      }
+      if { [winfo exists $trantop_] } {
+         delete object $trantop_
       }
    }
 
@@ -1046,6 +1060,31 @@ itcl::class gaia::StarAstReference {
        $itk_component(table) configure -coupled $values_($this,coupled)
    }
 
+   #  Start transfer dialog.
+   protected method start_transfer_ {} {
+      blt::busy hold $w_
+      if { ! [winfo exists $trantop_] } { 
+         set trantop_ [GaiaAstTransfer $w_.trantop \
+                          -rtdimage $itk_option(-rtdimage) \
+                          -canvas $itk_option(-canvas) \
+                          -image $itk_option(-image) \
+                          -update_cmd [code $this stop_transfer_]]
+      }
+      set content [$itk_component(table) get_contents]
+      if { $content != {} } {
+         $trantop_ set_contents $content
+      }
+   }
+
+   #  Transfer completed.
+   protected method stop_transfer_ {args} {
+      if { $args != {} } { 
+         $itk_component(table) clear_table
+         $itk_component(table) set_contents $args
+      }
+      blt::busy release $w_
+   }
+
    #  Configuration options
    #  =====================
 
@@ -1149,6 +1188,9 @@ itcl::class gaia::StarAstReference {
 
    #  Name of additional toplevel window.
    protected variable add_ {}
+
+   #  Name of RA/Dec transfer window.
+   protected variable trantop_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

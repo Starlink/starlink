@@ -125,8 +125,8 @@ itcl::class gaia::StarAstTable {
           TableList $w_.table \
              -title "Reference positions" \
              -hscroll 1 \
-             -selectmode extended \
-             -exportselection 0 \
+             -selectmode $selectmode_ \
+             -exportselection $exportselection_ \
              -headings {id ra dec x y} \
              -width $itk_option(-width)
        }
@@ -283,6 +283,14 @@ itcl::class gaia::StarAstTable {
    #  Return contents of table.
    public method get_contents {} {
        return [$itk_component(table) get_contents]
+   }
+
+   #  Set the contents of the table.
+   public method set_contents {args} {
+      foreach line {$args} {
+         $itk_component(table) append_row $line
+      }
+      $itk_component(table) new_info
    }
 
    #  Grab a catalogue of objects from an AstroCat window.
@@ -462,6 +470,7 @@ itcl::class gaia::StarAstTable {
    #  Draw or remove the cross representing the rotation/scale centre.
    protected method redraw_cross_ {} {
        set canvas $itk_option(-canvas)
+      if { $canvas == {} } return
        set exists [$canvas gettags $cross_id_]
        if { $itk_option(-coupled) } {
 	   lassign [$itk_option(-rtdimage) scale] xs ys
@@ -555,10 +564,10 @@ itcl::class gaia::StarAstTable {
    }
 
    #  Update the X and Y position of a mark, unless all movements are
-   #  coupled. In which case update all marks. Note effort required to 
+   #  coupled. In which case update all marks. Note effort required to
    #  deal with old_row as a list containing a list.
    protected method update_mark_ {nid} {
-      if { !$itk_option(-coupled) } { 
+      if { !$itk_option(-coupled) } {
          select_row $nid
          set old_row [$itk_component(table) get_selected]
          eval lassign $old_row id ra dec x y
@@ -1114,7 +1123,7 @@ itcl::class gaia::StarAstTable {
       }
       if { [llength [set box [$canvas bbox $tags_($id)]]] } {
          lassign $box x0 y0 x1 y1
-         set x [expr ($x1+$x0)/2.0] 
+         set x [expr ($x1+$x0)/2.0]
          set y [expr ($y1+$y0)/2.0]
 
          set dw [$image dispwidth]
@@ -1124,7 +1133,7 @@ itcl::class gaia::StarAstTable {
          if {$cw != 1 && $dw && $dh} {
             $canvas xview moveto [expr (($x-$cw/2.0)/$dw)]
             $canvas yview moveto [expr (($y-$ch/2.0)/$dh)]
-         } 
+         }
       }
    }
 
@@ -1140,7 +1149,7 @@ itcl::class gaia::StarAstTable {
    #  Name of a menu to add the marker control commands.
    itk_option define -markmenu markmenu MarkMenu {}
 
-   #  Name of starrtdimage widget.
+   #  Name of rtdimage widget.
    itk_option define -rtdimage rtdimage RtdImage {}
 
    #  Name of the canvas holding the starrtdimage widget.
@@ -1315,6 +1324,10 @@ itcl::class gaia::StarAstTable {
    #  Rotation/scaling centre in canvas coordinates.
    protected variable xcen_ 0
    protected variable ycen_ 0
+
+   #  Table configuration (internal).
+   protected variable selectmode_ extended
+   protected variable exportselection_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

@@ -58,7 +58,7 @@ itcl::class util::LabelEntry {
 
     #  called for return or keypress in entry, calls command proc with new value
 
-    private method command_proc_ {cmd} {
+    protected method command_proc_ {cmd} {
 	lappend cmd [$itk_component(entry) get]
 	eval $cmd
     }
