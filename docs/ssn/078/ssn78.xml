@@ -1815,7 +1815,7 @@ AC_PROG_FC([], 77)
           <verbatim>
 AC_PROG_FC
 AC_PROG_FPP
-STAR_HAVE_FC_OPEN_READONLY
+AC_FC_OPEN_SPECIFIERS(readonly)
 </verbatim>
           and have in your <code>my_io.fpp</code> the lines
           <verbatim>
@@ -3124,7 +3124,8 @@ install-exec-local: dtask_main.o
 
               <p>You often need to create links in this situation.  To
                 do that portably (symbolic links are not required by
-                POSIX), put the <code>AC_PROG_LN_S</code> macro in
+                POSIX, and so the autoconf macros are able to emulate
+                them if necessary), put the <code>AC_PROG_LN_S</code> macro in
                 your <code>configure.ac</code>, and use the
                 <code>$(LN_S)</code> macro in your
                 <code>Makefile.am</code>.  Note that the autoconf
@@ -3135,8 +3136,9 @@ install-exec-local: dtask_main.o
                 <code>$(LN_S) /path/to/target/TARGET
                   /path/to/link/LINK</code>, but instead
 <verbatim>
-cd /path/to/link; $(LN_S) /path/to/target/TARGET LINK
-</verbatim></p>
+cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
+</verbatim>
+                The option <code>rm -f</code> is portable.</p>
             </dd>
 
             <dt>I want to do odd things at clean/distribution time.  How?</dt>
@@ -3149,6 +3151,21 @@ cd /path/to/link; $(LN_S) /path/to/target/TARGET LINK
                 <code>EXTRA_DIST</code> in the Automake manual.</p>
             </dd>
 
+            <dt>How do I write portable Makefiles and shell scripts?</dt>
+            <dd>
+              <p>The autoconf manual has a very useful collection of
+                portability advice in its section
+                manual <webref url="&autoconfhtml;/autoconf_114.html"
+                  ><em>Portable Shell Programming</em></webref>.  Also,
+                the <webref
+                  url="http://www.unix.org/version3/"
+                  >Single Unix Specification, version 3</webref>
+                provides standardised specifications of the behaviour
+                of Unix library functions and system utilities.  The
+                Single Unix core specification is identical to POSIX.3
+                (IEEE Std 1003.1) and ISO/IEC 9945:2003.
+              </p>
+            </dd>
           </dl>
         </p>
         
@@ -3419,6 +3436,88 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           <em>need</em> to rely on it, then consult with the starconf
           maintainer to have the documentation changed, and the
           behaviour thus fixed.</p>
+
+        <subsect id="macro-ac-f77-have-open-readonly" export="export">
+          <subhead>
+            <title>AC_F77_HAVE_OPEN_READONLY</title>
+          </subhead>
+
+          <p><strong>AC_F77_HAVE_OPEN_READONLY</strong></p>
+
+          <p>Obsolete -- use <ref id="macro-ac-fc-open-specifiers"
+              ><code>AC_FC_OPEN_SPECIFIERS</code></ref> instead</p>
+
+        </subsect>
+
+        <subsect id="macro-ac-fc-check-intrinsics" export="export">
+          <subhead>
+            <title>AC_FC_CHECK_INTRINSICS</title>
+          </subhead>
+
+          <p><strong>AC_FC_CHECK_INTRINSICS (function...)</strong></p>
+
+          <p>Like <code>AC_CHECK_FUNCS</code>, but instead determine
+            the intrinsics available to the Fortran compiler.  For
+            each intrinsic in the (whitespace-separated and
+            case-insensitive) argument list, define
+            <code>HAVE_INTRINSIC_intrinsic</code> if it is available.
+            For example, <code>AC_FC_CHECK_INTRINSICS(sin)</code>
+            would define <code>HAVE_INTRINSIC_SIN</code> if the `sin'
+            intrinsic function were available (there are probably
+            rather few Fortrans which don't have this function).
+          </p>
+        </subsect>
+
+        <subsect id="macro-ac-fc-open-specifiers" export="export">
+          <subhead>
+            <title>AC_FC_OPEN_SPECIFIERS</title>
+          </subhead>
+
+          <p><strong>AC_FC_OPEN_SPECIFIERS(specifier ...)</strong></p>
+
+          <p>The Fortran OPEN statement is a rich source of
+            portability problems, since there are numerous common
+            extensions which consiste of extra specifiers, several of
+            which are useful when they are available.  For each of the
+            specifiers in the (whitespace-separated) argument list,
+            define <code>HAVE_FC_OPEN_mungedspecifier</code> if the
+            specifier may be given as argument to the OPEN statement.
+            The <code>mungedspecifier</code> is the
+            <code>specifier</code> converted to uppercase and with all
+            characters outside <code>[a-zA-Z0-9_]</code> deleted.
+            Note that this may include `specifiers' such as
+            <code>access=append</code> and
+            <code>[access=sequential,recl=1]</code> (note quoting of
+            comma) to check combinations of specifiers.  You may not
+            include a space in the `specifier', even quoted.  Each
+            argument must be a maximum of 65 characters in length (to
+            abide by Fortran 77 line-length limits).</p>
+
+        </subsect>
+
+        <subsect id="macro-ac-fc-recl-unit" export="export">
+          <subhead>
+            <title>AC_FC_RECL_UNIT</title>
+          </subhead>
+
+          <p><strong>AC_FC_RECL_UNIT</strong></p>
+
+          <p>When opening a file for direct access, you must specify
+            the record length with the <code>OPEN</code> specifier
+            <code>RECL</code>; however in the case of unformatted
+            direct access files, the <em>units</em> of this specifier
+            are processor dependent, and may be words or bytes.  This
+            macro determines the units and defines
+            <code>FC_RECL_UNIT</code> to contain the number of bytes
+            (1, 2, 4, 8, ...) in the processor's unit of measurement.</p>
+
+          <p>Note that unformatted files are not themselves portable,
+            and should only be used as either temporary files, or as
+            data files which will be read by a program or library
+            compiled with the same Fortran processor.  With this
+            macro, however, you can read and write such files in a
+            portable way.</p>
+        </subsect>
 
         <subsect id="macro-ac-prog-fc" export="export">
           <subhead>
@@ -4112,10 +4211,8 @@ AC_SUBST(STAR_MANIFEST_DIR)
           which point the Starlink autoconf will revert to
           being an unmodified one.</p>
 
-        <p>The additions are the two macros <code>AC_PROG_FC</code>
-          and <code>AC_PROG_FPP</code>, described in <ref
-            id="macro-ac-prog-fc"/> and <ref
-            id="macro-ac-prog-fpp"/>.</p>
+        <p>The additions are the macros which start <code>AC_...</code>
+          described in <ref id="starconfmacros"/>.</p>
 
         <p>The Starlink automake is a more heavily modified
           version of automake version 1.8.2.  There are a few
