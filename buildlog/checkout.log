@@ -8372,6 +8372,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecTransferHandler.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecViewerFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecXCoordTypeFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileView.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectrumIO.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplashWindow.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowserMain.java
