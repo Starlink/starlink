@@ -82,12 +82,22 @@ AstHandler::AstHandler (vector<string>serialFrameset,
     channel_source_init (this);
     if (isFits)
     {
-	AstFitsChan *channel_ = astFitsChan
-	    (static_cast<const char *(*)()>(&channel_source_server),
-	     0,
-	     "");
-	astobj_ = static_cast<AstObject*>(astRead (channel_));
-	channel_ = static_cast<AstFitsChan*>(astAnnul (channel_));
+        AstFitsChan *channel_ = astFitsChan(0, 0, "");
+        astClearStatus;
+        for (vector<string>::const_iterator ci = serialFrameset_.begin();
+             ci != serialFrameset_.end();
+             ci++) {
+            astPutFits(channel_, ci->c_str(), 0);
+            if (! astOK) {
+                Util::logstream()
+                    << "moggy: FITS card <" << *ci
+                    << "> is invalid, and will be ignored" << endl;
+                astClearStatus;
+            }
+        }
+        astClear(channel_, "Card"); // rewind the channel
+        astobj_ = static_cast<AstObject*>(astRead(channel_));
+        channel_ = static_cast<AstFitsChan*>(astAnnul(channel_));
     }
     else
     {
@@ -329,22 +339,14 @@ const char *AstHandler::channel_source (bool reset)
 
     if (iter == serialFrameset_.end())
     {
-	more = false;
-	rval = 0;
+        more = false;
+        rval = 0;
     }
     else
     {
-	rval = iter->c_str();
-	iter++;
+        rval = iter->c_str();
+        iter++;
     }
-
-#if 0
-    if (verbosity_ > normal)
-	if (rval != 0)
-	    Util::logstream() << "AstHandler::channel_source: " << rval << endl;
-	else
-	    Util::logstream() << "AstHandler::channel_source: EOD" << endl;
-#endif
 
     return rval;
 }
