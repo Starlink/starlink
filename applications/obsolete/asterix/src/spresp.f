@@ -1208,7 +1208,7 @@
 
 *  Local Variables:
       REAL			SUM			! Psf normalisation
-      REAL			XP,YP,XOLD,YOLD,SCALE,NSUM,SUM
+      REAL			XP,YP,XOLD,YOLD,SCALE,NSUM
       INTEGER                	LCOUNT,I,J,II,JJ,K,KK	       	! Loops over psf
 *.
 

@@ -60,7 +60,7 @@
         ELSEIF (MODE.EQ.'SAV') THEN
           CALL IPOSIT_SAVE(STATUS)
         ELSEIF (MODE.EQ.'CLE') THEN
-          CALL IPOSIT_CLE(STATUS)
+          CALL IPOSIT_CLEAR(STATUS)
         ENDIF
 
 
