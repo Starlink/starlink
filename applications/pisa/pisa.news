@@ -1,12 +1,6 @@
 1 PISA_update
 
- This is a minor upgrade to PISA with the following change:
+ This release has some minor changes to SUN/109, the PISA documentation.
 
-   A workaround for a crash that occurs in PISAFIND when too many
-   pixels are accumulated in a single object has been added. When this
-   occurs the application should now gracefully exit.
-
- PISA is documented in SUN/109 or try the showme sun109 command.
-
- Peter Draper (P.W.Draper@durham.ac.uk)
+ Peter Draper (p.w.draper@durham.ac.uk) 14th September 2001
 
