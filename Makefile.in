@@ -29,6 +29,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/chr \
 	$(MANIFEST)/cnf \
 	$(MANIFEST)/coco \
+	$(MANIFEST)/docfind \
 	$(MANIFEST)/dtask \
 	$(MANIFEST)/ems \
 	$(MANIFEST)/fio \
@@ -44,6 +45,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/hlp \
 	$(MANIFEST)/idi \
 	$(MANIFEST)/img \
+	$(MANIFEST)/info \
 	$(MANIFEST)/init \
         $(MANIFEST)/itcl \
 	$(MANIFEST)/jpl \
