@@ -39,11 +39,12 @@ C_ROUTINES = \
 	dts_chdlr.c \
 	dts_setsig.c
 
+CLEANFILES = alink ilink dtask_libtool
+
 EXTRA_DIST = alink.in ilink.in
+MAINTAINERCLEANFILES =  alink.in ilink.in
 
 BUILT_SOURCES = $(include_MESSAGES)
-
-CLEANFILES = alink alink.in ilink ilink.in dtask_libtool
 
 # The alink and ilink scripts require a dtask_main.o file in $(libdir).
 # Build and install this, taking care to include it in the manifest file, too.
@@ -57,7 +58,11 @@ install-exec-local: dtask_main.o
 # Files alink.in and ilink.in depend on the values of the $(prefix)
 # variable, and so must be substituted at `make' time, rather than
 # `configure' time (see section `Installation Directory Variables' in
-# the autoconf manual).
+# the autoconf manual).  Script dtask_link_adam calls (uninstalled)
+# ../subpar/subpar_link adam internally, so we have to add that to
+# the PATH.
+#
+# Substitute ORIG_AM_FCFLAGS: see notes in ailink.in.m4
 edit = sed \
     -e 's,@staretcdir\@,$(staretcdir),g' \
     -e 's,@bindir\@,$(bindir),g' \
@@ -65,10 +70,13 @@ edit = sed \
     -e 's,@CC\@,$(CC),g' \
     -e 's,@CFLAGS\@,$(CFLAGS),g' \
     -e 's,@FC\@,$(FC),g' \
-    -e 's,@FCFLAGS\@,$(FCFLAGS),g' \
+    -e 's,@ORIG_AM_FCFLAGS\@,@AM_FCFLAGS@,g' \
     -e 's,@FCLIBS\@,$(FCLIBS),g' \
+    -e 's,@C_FC_FCLINK_MAGIC\@,$(C_FC_FCLINK_MAGIC),g' \
+    -e "s,@DTASK_LINK_ADAM\@,`PATH=../subpar:$$PATH ./dtask_link_adam`,g" \
     -e 's,@PACKAGE_NAME\@,$(PACKAGE_NAME),g' \
-    -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g'
+    -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g' \
+    -e '/^\#\#/d'
 
 alink: Makefile $(srcdir)/alink.in
 	rm -f alink alink.tmp
