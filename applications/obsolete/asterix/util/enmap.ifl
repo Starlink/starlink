@@ -1,8 +1,8 @@
-	INTERFACE ENMAP
+INTERFACE ENMAP
 
 	    PARAMETER INP
                POSITION 1
-               TYPE    'UNIV'
+               TYPE    'LITERAL'
                PPATH   'GLOBAL,CURRENT'
                VPATH   'PROMPT'
                ASSOCIATION '<-GLOBAL.BINDS'
@@ -12,7 +12,7 @@
 
 	    PARAMETER OUT
                POSITION 2
-               TYPE    'UNIV'
+               TYPE    'LITERAL'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
                ASSOCIATION '->GLOBAL.BINDS'
@@ -37,4 +37,4 @@
                HELP 'Enter an integer from the above list'
             ENDPARAMETER
 
-	ENDINTERFACE
+ENDINTERFACE
