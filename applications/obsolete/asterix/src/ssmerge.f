@@ -88,9 +88,6 @@
       CHARACTER              OFLOC*(DAT__SZLOC)       ! Output field locator
       CHARACTER*132          SFILE                    ! A signle file to merge
       CHARACTER*80           SPEC(MAXPAR+1)           ! Merge file spec
-      CHARACTER              TYPE*(DAT__SZTYP)        ! Data type
-
-      REAL                   ELEVS(3)                 ! # error levels
 
       INTEGER                CCOMP                    ! Current output book cell
       INTEGER                CSRC                     ! Output source counter
