@@ -123,6 +123,9 @@
 *  History:
 *     9-SEP-1998 (DSB):
 *        Original version.
+*     9-DEC-1998 (DSB):
+*        Check X and Y against AST__BAD before checking that there
+*        is at least one point within the plot.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -221,12 +224,16 @@
 *  PGPLOT window.
       OK = .FALSE.
       DO I = ILO, IHI
-         IF( REAL( X( I ) ) .GT. WX1 .AND.
-     :       REAL( X( I ) ) .LT. WX2 .AND.
-     :       REAL( Y( I ) ) .GT. WY1 .AND.
-     :       REAL( Y( I ) ) .LT. WY2 ) THEN
-            OK = .TRUE.
-            GO TO 10
+         IF( X( I ) .NE. AST__BAD .AND. Y( I ) .NE. AST__BAD ) THEN
+
+            IF( REAL( X( I ) ) .GT. WX1 .AND.
+     :          REAL( X( I ) ) .LT. WX2 .AND.
+     :          REAL( Y( I ) ) .GT. WY1 .AND.
+     :          REAL( Y( I ) ) .LT. WY2 ) THEN
+               OK = .TRUE.
+               GO TO 10
+            ENDIF
+
          END IF
       END DO
 
