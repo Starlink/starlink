@@ -20,6 +20,8 @@
 #        Add GLOBAL associations
 #     1996 November 1 (TIMJ)
 #        Add header and HELPLIB
+#     1997 April 11 (TIMJ)
+#        Make 'NO' the default for REDUCE_SWITCH
 #     {enter_further_changes_here}
 
 #-
@@ -39,7 +41,7 @@
       PARAMETER USE_CALIBRATOR
          POSITION 2
          TYPE     '_LOGICAL'
-	 DEFAULT 'YES'
+	 DEFAULT 'NO'
          PROMPT   'Should the data be divided by the internal calibrator'
 	 HELPKEY  '*'
       ENDPARAMETER
