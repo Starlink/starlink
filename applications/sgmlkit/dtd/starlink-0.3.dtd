@@ -72,26 +72,24 @@
 
 
 <!ATTLIST #NOTATION HyTime	
-	-- cf. 10744:1997 11.1.1, Basic hyperlinking HyTime document --
+	-- cf. 10744:1997 11.1.3, Minimal HyTime document --
 	ArcFormA	NAME	HyTime
 	ArcNamrA	NAME	HyNames
 	ArcSuprA	NAME	sHyTime
 	ArcIgnDA	NAME	HyIgnD
 	ArcDocF		NAME	#fixed	HyDoc
 	ArcDTD		CDATA	"HyTime.DTD"
-	ArcQuant	CDATA	#fixed	"NAMELEN 9"
+	ArcQuant	CDATA	#fixed	"NAMELEN 9 LITLEN 2048"
+		-- rflocatt entity is longer than 1024 --
 	ArcDataF	NAME	#fixed	HyBridN
 	ArcBridF	name	#fixed	HyBrid
 	ArcAuto		(ArcAuto|nArcAuto)	nArcAuto
-	ArcOptSA	NAMES	"GenArc base links locs rend sched"
+	ArcOptSA	NAMES	"GenArc base links locs"
 
 	-- Support attributes for HyTime only --
 	hyqcnt		NUMBER	32
-	GenArc		CDATA	"altreps included superdcn"
-	base		CDATA	"bos"
-	locs		CDATA	
-			"nmsploc multloc refctl referatt refloc queryloc"
-	links		CDATA	#fixed	"hylink clink agglink traverse"
+	locs		CDATA	"refloc"
+	links		CDATA	#fixed	"clink"
 	exrefs		NAME	exrefs
 	manyanch	NUMBER	2
 >
@@ -102,7 +100,12 @@
     the automatic mapping takes care of all of it.  See HyTime
     A.3.6.2, `Architectural markup minimisation'.
 -->
-<!NOTATION documentsummary SYSTEM ''>
+<!NOTATION 
+	documentsummary
+	 	-- A base architecture used in conformance with the
+		   Architectural Form Definition Requirements of
+		   International Standard ISO/IEC 10744. --
+	SYSTEM ''>
 <!ENTITY documentsummary.dtd
 	public "-//Starlink//DTD Document Summary 0.2//EN"
 	cdata AFDRMeta
@@ -355,7 +358,7 @@
   made omissable.
 -->
 <!entity % docinfo.model 
-	'title , authorlist , keyword* %docnumber %history ,
+	'title , subtitle? , authorlist , keyword* %docnumber %history ,
 	coverimage?, copyright?'>
 <!element DOCINFO o o (%docinfo.model)>
 
@@ -852,12 +855,13 @@
 <!--
   REF element is for internal cross-references.  It's empty.
   For a detailed discussion of how to implement this, see Eliot
-  Kimber's 9 March 1998 posting to comp.text.sgml.  The implementation
-  here has only a dummy SDQL query at present.  In future, I want this
-  to use SDQL to include an element 
-  title if present, but otherwise simply construct the link from the
-  referent's section number, or construct some other self-link text.  The
-  element's syntax will not change when I make this improvement.
+  Kimber's 9 March 1998 posting to comp.text.sgml.
+
+  The HyTime shenannigans below says that the element's effective
+  content should be the title of the object it points to, or the
+  caption in the case of figures and tables.  I'm not going to
+  guarantee that this is precisely what the stylesheets do (check
+  them), but this at least documents the intent.
 -->
 <!element REF - o empty 
 				-- Internal cross reference, with
@@ -876,7 +880,13 @@
 	-- following are HyTime attributes --
 	ref-title		-- pointer to title of reference target --
 		cdata
-		#fixed "SDQL query..."
+		#fixed
+		'(case (gi)
+		   (("table" "figure")
+		      (select-elements (children (current-node))
+				       (list "caption")))
+		   (else (select-elements (descendants (current-node))
+					  (list "subhead" "title")))) '
 	loctype			-- declare addressing method --
 		cdata
 		#fixed "ref-title queryloc DSSSL"
@@ -884,7 +894,8 @@
 				   ID attribute, which specifies the
 				   source of the ref-title query --
 		cdata
-		#fixed "ref-title id"
+		#fixed
+		"ref-title id"
 	valueref		-- make the effective content of this
 				   element the resource pointed to by
 				   ref-title --
@@ -931,9 +942,7 @@
   site where the documents are used.
 
   The link's effective content should be whatever corresponds to the title of
-  the object addressed by LOC.  I'm not sure quite how to make this more
-  precise or, equivalently, how to express this within HyTime
-  declarations (Xpointers?).
+  the object addressed by LOC.
 -->
 <!element DOCXREF - O empty
 				-- References to elements and data within other
@@ -948,21 +957,28 @@
 		cdata
 		#implied
 
-	-- Hmm, I don't think a text attribute is a great idea - too hackable...
-	text
-		cdata
-		#implied
-	--
-
 	-- following are the HyTime attributes --
 	loctype			-- declare addressing method --
 		cdata
-		#fixed "loc idloc"
+		#fixed
+		"loc idloc ref-title queryloc DSSSL"
+	ref-title		-- pointer to title of reference
+				   target: extract first child (TITLE)
+				   of element --
+		cdata
+		#fixed
+		'(node-list-first (children (current-node)))'
 	rflocsrc		-- declare that the LOC is a reference
 				   relative to the document addressed by
 				   DOC --
 		cdata
-		#fixed "loc doc"
+		#fixed
+		"loc doc ref-title loc"
+	valueref		-- make the effective content of this
+				   element the resource pointed to by
+				   ref-title --
+		cdata
+		#fixed "#CONTENT ref-title"
 	HyTime			-- bind to HyTime clink form --
 		name
 		#fixed "clink"
