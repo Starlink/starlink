@@ -27,10 +27,10 @@ use vars qw/ @EXPORT_OK %EXPORT_TAGS @ISA $VERSION/;
 use PDL::Core;     # Grab the Core names
 use Carp;
 use strict;
- 
+
 use vars qw/@EXPORT_OK @ISA @EXPORT_STATIC %gsdtypes/;
- 
-$VERSION = '0.91';
+
+$VERSION = '0.92';
 
 
 =head1 FUNCTIONS
@@ -84,7 +84,6 @@ sub PDL::rgsd ($$) {  # Read an GSD format file into a PDL
 
   # Find the item number so that we can skip it later
   my $C13DATitemno = $gsd->Find( 'C13DAT' );
-  print "Item = $C13DATitemno\n";
 
   print "Read primary data header (C13DAT) correctly: ", $pdl->info, "\n"
     if $PDL::verbose;
@@ -115,7 +114,7 @@ sub PDL::rgsd ($$) {  # Read an GSD format file into a PDL
     } else {
 
       $hdr->{$name} = $gsd->GetByNum($i);
-      
+
     }
 
   }
@@ -152,7 +151,7 @@ The perl GSD module must be available.
 
 Tim Jenness, E<lt>t.jenness@jach.hawaii.eduE<gt>
 
-Copyright (C) 1995-2000 Tim Jenness and the UK Particle Physics and
+Copyright (C) 1995-2000,2003 Tim Jenness and the UK Particle Physics and
 Astronomy Research Council. All Rights Reserved.
 
 =head1 SEE ALSO
