@@ -1,4 +1,4 @@
-      SUBROUTINE AFLINK STATUS )
+      SUBROUTINE AFLINK( STATUS )
 *+
 *  Name:
 *     AFLINK

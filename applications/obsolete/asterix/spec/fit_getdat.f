@@ -395,7 +395,7 @@
 	        CALL ERR_ANNUL( STATUS )
 	        BG = .FALSE.
 	      ELSE
-                CALL ADI1_PUTLOC( BLOC(N), BFID(N), STATUS )
+                CALL ADI1_GETLOC( BFID(N), BLOC(N), STATUS )
 	      END IF
             END IF
 
