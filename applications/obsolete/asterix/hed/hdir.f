@@ -21,7 +21,7 @@
 *    Bugs :
 *    Authors :
 *
-*     R.J.Vallance (BHVAD::RJV)
+*     R.J.Vallance (rjv@star.sr.bham.ac.uk)
 *
 *    History :
 *
