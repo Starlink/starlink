@@ -904,9 +904,12 @@
             STATUS = SAI__ERROR
             CALL ERR_REP( 'DISPLAY_ERR4B', 'The Mapping from the '//
      :                    'current WCS co-ordinate Frame to pixel '//
-     :                    'co-ordinates is undefined. Try changing '//
-     :                    'the current Frame to PIXEL using the '//
-     :                    'KAPPA wcsframe command.', STATUS )
+     :                    'co-ordinates is undefined ast the image '//
+     :                    'centre.', STATUS )
+            CALL ERR_REP( 'DISPLAY_ERR4C',  'Try displaying a section'//
+     :                    ' of the image, or changing the current '//
+     :                    'Frame to PIXEL using the KAPPA wcsframe '//
+     :                    'command.', STATUS )
          END IF
          GO TO 999
       END IF
