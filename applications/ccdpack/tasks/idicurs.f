@@ -326,7 +326,8 @@
      :                 STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-         CALL CCD1_MSG( ' ', ' Output lists will not be written', 
+         OLSTGR = GRP__NOID
+         CALL CCD1_MSG( ' ', '  Output lists will not be written', 
      :                  STATUS )
       END IF
 
@@ -392,14 +393,14 @@
             CALL MSG_SETI( 'NPOS', NPOS )
             CALL MSG_SETC( 'ILIST', FNAME )
             CALL CCD1_MSG( ' ', 
-     :      '     Read ^NPOS positions from file ^ILIST.', STATUS )
+     :      '    Read ^NPOS positions from file ^ILIST.', STATUS )
 
 *  If there are too many points in the input position list then prepare
 *  to truncate it.
             IF ( NPOS .GT. MAXPOS ) THEN
                CALL CCD1_MSG( ' ', ' ', STATUS )
                CALL CCD1_MSG( ' ', 
-     :         '     Warning - too many points in input list,', STATUS )
+     :         '    Warning - too many points in input list,', STATUS )
                CALL MSG_SETI( 'NPOS', NPOS )
                CALL MSG_SETI( 'MAX', MAXPOS )
                CALL CCD1_MSG( ' ',
@@ -428,46 +429,48 @@
 
 *  Access the output file in which to store the positions.  The name
 *  of this file is stored in the OLSTGR list of names.
-         CALL GRP_GET( OLSTGR, INDEX, 1, FNAME, STATUS )
-         CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FD, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
-         LOPEN = .TRUE.
+         IF ( OLSTGR .NE. GRP__NOID ) THEN
+            CALL GRP_GET( OLSTGR, INDEX, 1, FNAME, STATUS )
+            CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FD, STATUS )
+            IF ( STATUS .NE. SAI__OK ) GO TO 99
+            LOPEN = .TRUE.
 
 *  Write header to output position list file.
-         CALL CCD1_FIOHD( FD, 'Output from IDICURS', STATUS )
+            CALL CCD1_FIOHD( FD, 'Output from IDICURS', STATUS )
 
 *  Write position data to output list file.
-         CALL CCD1_WRIXY( FD, ID, XPOS, YPOS, NPOS, LINE, CCD1__BLEN,
-     :                    STATUS )
+            CALL CCD1_WRIXY( FD, ID, XPOS, YPOS, NPOS, LINE, CCD1__BLEN,
+     :                       STATUS )
 
 *  Report file used and number of entries.
-         CALL FIO_FNAME( FD, FNAME, STATUS )
-         CALL MSG_SETC( 'FNAME', FNAME )
-         CALL MSG_SETI( 'NPOS', NPOS )
-         CALL CCD1_MSG( ' ', 
-     :                  '     Wrote ^NPOS positions to file ^FNAME.',
-     :                  STATUS )
+            CALL FIO_FNAME( FD, FNAME, STATUS )
+            CALL MSG_SETC( 'FNAME', FNAME )
+            CALL MSG_SETI( 'NPOS', NPOS )
+            CALL CCD1_MSG( ' ', 
+     :                     '    Wrote ^NPOS positions to file ^FNAME.',
+     :                     STATUS )
 
-         IF ( NPOS .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+            IF ( NPOS .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Get an identifier for the NDF.
-            CALL NDG_NDFAS( NDFGR, INDEX, 'UPDATE', INDF, STATUS )
+               CALL NDG_NDFAS( NDFGR, INDEX, 'UPDATE', INDF, STATUS )
 
 *  Update the extension with the name of the list file.
-            CALL CCG1_STO0C( INDF, 'CURRENT_LIST', FNAME, STATUS )
+               CALL CCG1_STO0C( INDF, 'CURRENT_LIST', FNAME, STATUS )
 
 *  Release the NDF.
-            CALL NDF_ANNUL( INDF, STATUS )
+               CALL NDF_ANNUL( INDF, STATUS )
 
 *  If there was a problem (most likely that the NDF was not writable),
 *  warn about this and continue.
-            IF ( STATUS .NE. SAI__OK ) THEN 
-               CALL MSG_SETC( 'NDF', NDFNAM )
-               CALL MSG_SETC( 'FNAME', FNAME )
-               CALL CCD1_ERREP( 'IDICURS_NOUPD', 
+               IF ( STATUS .NE. SAI__OK ) THEN 
+                  CALL MSG_SETC( 'NDF', NDFNAM )
+                  CALL MSG_SETC( 'FNAME', FNAME )
+                  CALL CCD1_ERREP( 'IDICURS_NOUPD', 
      :'IDICURS: Failed to update ^NDF.MORE.CCDPACK.CURRENT_LIST ' //
      :'with value ''^FNAME''.', STATUS )
-               CALL ERR_ANNUL( STATUS )
+                  CALL ERR_ANNUL( STATUS )
+               END IF
             END IF
          END IF
  1    CONTINUE
