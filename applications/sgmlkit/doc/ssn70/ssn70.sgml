@@ -18,7 +18,7 @@
   <!ENTITY sgmlsystem.gif SYSTEM 'ssn70_SGMLsystem.gif' NDATA gif89a>
 
   <!-- Local text files included -->
-  <!ENTITY swversion	SYSTEM '../../VERSION'>
+  <!ENTITY swversion	SYSTEM 'sgmlkit-version-string'>
   <!ENTITY starlinkdtddoc	
 			SYSTEM '../dtd2sgml/starlink-0.7.sgmltext'>
   <!ENTITY programcodedtddoc

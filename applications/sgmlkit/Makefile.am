@@ -73,8 +73,10 @@ SL_TEXML = \
 	dsssl/sl/texml/slsect.dsl \
 	dsssl/sl/texml/sltables.dsl
 
-doc/ssn70/ssn70.htx_tar:
+doc/ssn70/ssn70.htx_tar: doc/ssn70/sgmlkit-version-string
 	cd doc/ssn70 && $(MAKE) ssn70.htx_tar
+doc/ssn70/sgmlkit-version-string: configure.ac
+	echo @PACKAGE_VERSION@ >doc/ssn70/sgmlkit-version-string
 
 # The sgml2docs and sgml2hlp scripts contain references to the
 # installation directories pkglibdir, and so must be substituted here
