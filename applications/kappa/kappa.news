@@ -1,10 +1,9 @@
-1 KAPPA_Version_1.1
+1 KAPPA_Version_1.2
 
-   A new release of KAPPA (v1.1) has been made. The main changes are:
+   A new release of KAPPA (v1.2) has been made. The main changes are:
 
-   - Initial support for spectral world coordinate systems (see WCSADD,
-   LINPLOT, etc). This includes flexible conversion between different
-   units, spectral systems and reference frames.
+   - Modified COLLAPSE so that output variances can be created for any
+   size of input array when using the median estimator.
 
    For complete details of all changes, see the "Release Notes" appendix in 
    SUN/95. 
