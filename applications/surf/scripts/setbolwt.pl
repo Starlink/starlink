@@ -82,7 +82,7 @@ push(@ndfs, @ARGV);
 
 if ($#ndfs == -1) {
   $term = new Term::ReadLine 'bolwt';
-  $prompt = "Please enter name of input NDF: ";
+  $prompt = "Please enter names of input NDFs: ";
   my $ndf = $term->readline($prompt);
   push(@ndfs, $ndf);
 }
@@ -467,3 +467,85 @@ exit;
 
 
 }
+
+
+__END__
+
+
+*+
+*  Name:
+*    SETBOLWT
+ 
+*  Purpose:
+*    Calculate or set bolometer weights
+ 
+*  Language:
+*    Perl 5
+ 
+*  Description:
+*    This routine sets the bolometer weights.
+*    It can do this in two ways:
+*
+*     1. Calculate the statistics for each bolometer then generate the
+*        weights relative to the central pixel. Should not be used when
+*        a strong source is present. The weights are calculated by
+*        using Kappa STATS to calculate the standard deviation of
+*        each bolometer in turn. The weight is defined as the relative
+*        variance between this bolometer and the reference bolometer.
+*
+*     2. Read the weights from a text file using the -wtfile option.    
+*
+*    Writes to the BOLWT extension. This extension is then read by REBIN.
+*
+*    Multiple files can be referenced to the first file by specifying 
+*    multiple files on the command line or by using a REBIN-style input
+*    file and the -filelist option. In conjunction with the -wtfile option
+*    all input files are given the same weights.
+
+*  Usage:
+*    setbolwt [-h] [-wtfile=] [-filelist=] filenames...
+
+*  ADAM Parameters:
+*    -h
+*      Return a usage message.
+*    -wtfile=file
+*      An ASCII text file containing the weights, one weight per line
+*      corresponding to the order of bolometers stored in the file.
+*    -filelist=file
+*      An ASCII text file containing a list of files to be processed.
+*      There must be one file per line and it must be in a form
+*      acceptable to REBIN (ie comments can be included).
+*    filenames
+*      List of filenames to be processed. Wild cards can be used.
+*      eg *_lon_ext.sdf.
+
+*  Examples:
+*    setbolwt 
+*      The user will be prompted for a list of input NDFs. The weights
+*      will be calculated by setbolwt.
+*    setbolwt -wtfile=weights.dat file1
+*      Set the weights in file1.sdf from the list contained in
+*      weights.dat
+*    setbolwt file1 file2 file3 file4
+*      Calculate the weights of each bolometer in all four files
+*      relative to the central pixel in file1.sdf.
+*    setbolwt -wtfile=wt.dat -filelist=rebin.inp
+*      Set the weights of the files listed in rebin.inp to those
+*      stored in wt.dat (same weights for each file).
+
+*  Notes:
+*    - Input files must have been extinction corrected so that only
+*      one sub-instrument is present per file.
+*    - When multiple files are used bolometers are compared to the
+*      central bolometer of the first file.
+*    - If source signal is present in any bolometer at a level
+*      significantly above the noise, the automatic weighting will
+*      be skewed (in fact the bolometer with the source signal will
+*      be down-weighted relative to all the others since the standard
+*      deviation on the bolometer will be much higher.). The weights
+*      must be set via an external file in this case.
+
+*  Related Applications:
+*    SURF: REBIN
+*    KAPPA: STATS
+
