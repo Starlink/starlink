@@ -10,7 +10,7 @@ proc qmanCancelAll {taskname} {
     .qmanDialogue config -cursor {arrow green black}
 
     set label1 [label $frame.lab1 -text "This action will remove all entries from the queue." -width 60]
-    set label2 [label $frame.lab2 -text "Proceed?" -width 60]
+    set label2 [label $frame.lab2 -text "Continue?" -width 60]
     pack $label1 $label2 -in $frame -side top
 
 # Disable all buttons except the interrupt button
