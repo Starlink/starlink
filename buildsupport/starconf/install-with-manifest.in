@@ -1,6 +1,6 @@
 #! /bin/sh -
 #
-# This file part of starconf
+# This file is part of starconf
 # DO NOT EDIT: it may be overwritten when starconf is next run
 #
 # This script wraps a BSD-compatible install program, appending the last
