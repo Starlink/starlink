@@ -199,8 +199,7 @@ are shown at the top of the document.
 	  (empty-sosofo))
       (process-children)
       (if copyright
-	  (make element gi: "p"
-		(process-node-list copyright))
+	  (process-node-list copyright)
 	  (make element gi: "p"
 		(literal %copyright-string%)))
       (if (and %link-extension-list% (not suppress-printable))
