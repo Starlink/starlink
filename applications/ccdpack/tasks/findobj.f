@@ -473,41 +473,9 @@
             PERCEN = ABS( PERCEN * 0.01D0 )
 
 *  Determine what this value is.
-            IF ( ITYPE .EQ. '_BYTE' ) THEN
-               CALL CCG1_FRACB( EL, %VAL( IPIN ), 1, PERCEN, BAD, 
-     :                          CLFRAC, THRESH, STATUS )
+            CALL CCD1_FRA( ITYPE, EL, IPIN, 1, PERCEN, BAD, CLFRAC,
+     :                     THRESH, STATUS )
 
-            ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-               CALL CCG1_FRACUB( EL, %VAL( IPIN ), 1, PERCEN, BAD, 
-     :                           CLFRAC, THRESH, STATUS )
-
-            ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-               CALL CCG1_FRACW( EL, %VAL( IPIN ), 1, PERCEN, BAD, 
-     :                          CLFRAC, THRESH, STATUS )
-
-            ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-               CALL CCG1_FRACUW( EL, %VAL( IPIN ), 1, PERCEN, BAD, 
-     :                           CLFRAC, THRESH, STATUS )
-
-            ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-               CALL CCG1_FRACI( EL, %VAL( IPIN ), 1, PERCEN, BAD, 
-     :                          CLFRAC, THRESH, STATUS )
-
-            ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL CCG1_FRACR( EL, %VAL( IPIN ), 1, PERCEN, BAD, 
-     :                          CLFRAC, THRESH, STATUS )
-
-            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL CCG1_FRACD( EL, %VAL( IPIN ), 1, PERCEN, BAD, 
-     :                          CLFRAC, THRESH, STATUS )
-
-            ELSE
-               STATUS = SAI__ERROR
-               CALL MSG_SETC( 'TYPE', ITYPE )
-               CALL ERR_REP( 'CCD1_MKHIST',
-     :         '  CCD1_MKHIS: Unsupported data type (^TYPE).', STATUS )
-            END IF
-            
 *  Write message about actions.
             CALL MSG_SETD( 'PERCEN', PERCEN * 100.0D0 )
             CALL CCD1_MSG( ' ',
