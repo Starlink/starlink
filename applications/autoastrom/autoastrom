@@ -366,6 +366,37 @@ $helpers{atools} = $atools;
 
 wmessage ('info', "Monoliths OK");
 
+# Search for plugins in $AUTOASTROM_DIR.
+#
+# Plugins are loaded by `require'ing all the files within
+# AUTOASTROM_DIR which have names which match /^plugin-/.  Each such
+# file should define whatever subroutines it likes, and store
+# references to those subroutines in the hash %helpers, under names
+# which routines below to look for.
+#
+# The only routine that takes advantage of this so far is
+# match_positions, which is given a plugin name, say mymatch, and
+# searches for the entry $helpers{plugin-match-mymatch}.  This
+# mechanism stores pointers to the subroutines, but cannot do anything
+# in the way of checking the syntactical correctness of the calls to
+# them -- it is up to the routines which use this array to do that.
+
+# Default match plugin (this can be overridden by a plugin: this may
+# or may not be a good idea).
+$helpers{'plugin-match-findoff'} = \&autoastrom::match_positions_findoff
+  unless defined ($helpers{'plugin-match-findoff'});
+
+my $plugindir = (defined($ENV{AUTOASTROM_DIR}) ? $ENV{AUTOASTROM_DIR} : '.');
+opendir PLUGINDIR, $plugindir;
+my @plugindirents = readdir PLUGINDIR;
+closedir PLUGINDIR;
+foreach my $d (@plugindirents) {
+    if ($d =~ /^plugin-/) {
+	my $reqval = require "$plugindir/$d";
+	wmessage ('info', "Loaded plugin $plugindir/$d");
+    }
+}
+
 
 
 
@@ -689,7 +720,7 @@ while ($iterno < $iterationsleft) {
     # Get matches, returning the names of the two output files.
     wmessage ('info', "Matching position lists...");
     my ($ccdlist, $catlist, $matchworked)
-      = match_positions ($CCDPack,
+      = match_positions (\%helpers,
 			 $CCDcat,
 			 $matchinfile,
 			 { poserr => $CCDcathash->{poserr},
