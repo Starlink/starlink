@@ -1,0 +1,75 @@
+SURF
+
+   This is the SURF root directory.
+   Contains a readme and a makefile. This makefile can be used to
+   build surf in a non-starlink way
+
+  Make targets:
+
+     all (default): build and link surf
+     export:   create tar files required for Starlink distribution
+     clean: clean intermediate files
+     distclean: make really clean (includes built files)
+     
+    The export target does not create the documentation (latex)
+    archives.
+
+
+   Sub directories:
+
+     src
+       This is the basic SURF source code and includes the 
+       surf_*.f|F, IFL files
+       Requires that sculib, surf_kap and surflib have been built
+       before linking
+
+     scripts
+       Contains the perl, icl and csh scripts required by SURF.
+
+     misc
+       Contains the miscellaneous files (such as calibrator signal
+       files) that are not actual source code
+
+     sculib
+       source code for libsculib
+
+     surflib
+       source code for libsurflib
+
+     surf_kap
+       kappa source code required for SURF
+
+     dream
+       DREAM extension to SURF
+
+     docs
+       SURF documentation
+ 
+       sun216
+         documentation for sun216
+
+       sc10
+         docs for photometry cookbook 
+
+       sc11
+         docs for mapping cookbook
+
+       sc11_mini
+         docs for mini cookbook
+
+       hlp
+         Help file source
+
+     starlink
+       Starlink build system (mk and makefile)
+
+
+The targets supporteed by the non-starlink makefile system are:
+
+    default target builds library and links monolith
+    also creates links to necessary include files
+
+    export: creates tar files required by Starlink build system
+
+  Note that there will probably be no install target. The Starlink
+system will be used for that.
