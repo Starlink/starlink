@@ -272,11 +272,7 @@
       $Directory insert 0 $CCDcurrentdirectory
 
 #  Invoke the filter button to get first setup.
-      if { [llength $CCDimportfilter] == 1 } { 
-         $Filefilter insert 0 $CCDimportfilter
-      } else {
-         $Filefilter insert 0 [lindex [lindex $CCDimportfilter 0] 1]
-      }
+      $Filefilter insert 0 [lindex [lindex $CCDimportfilter 0] 1]
       $Choice invoke Filter
 
 #  Wait for an file name to be given or not as the case maybe.

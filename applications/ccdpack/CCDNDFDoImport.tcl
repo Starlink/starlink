@@ -588,11 +588,7 @@
       $Directory insert 0 $CCDcurrentdirectory
 
 #  Set file filter and invoke the filter button.
-      if { [llength $CCDimagefilters] == 1 } { 
-         $FileFilter insert 0 $CCDimagefilters
-      } else {
-         $FileFilter insert 0 [lindex [lindex $CCDimagefilters 0] 1]
-      }
+      $FileFilter insert 0 [lindex [lindex $CCDimagefilters 0] 1]
       $Choice invoke Filter
 
 #  Set the contents of the listboxes etc. To those that already exist,

@@ -339,11 +339,7 @@
       }
 
 #  Invoke the filter button to get first setup.
-      if { [llength $CCDimagefilters] == 1 } { 
-         $Filefilter insert 0 $CCDimagefilters
-      } else {
-         $Filefilter insert 0 [lindex [lindex $CCDimagefilters 0] 1]
-      }
+      $Filefilter insert 0 [lindex [lindex $CCDimagefilters 0] 1]
       $Choice invoke Filter
 
 #  Wait for interaction to end.

@@ -340,11 +340,12 @@ proc CCDNDFOrganize { Top args } {
        global CCDhaveframe
        global CCDfilternames
        global CCDndfs
+       global CCDirflats
        catch { unset CCDsame }
        catch { unset CCDhaveframe }
        catch { unset CCDfilternames }
        catch { unset CCDndfs }
-       catch { unset CCDirflats }
+       set CCDirflats FALSE
        $Top kill $Top
       "
 
