@@ -17,6 +17,9 @@ dnl  ./configure squeal if the package is re-configured with an
 dnl  inconsistent value of this variable.
 AC_ARG_VAR(STARLINK, [Where all the Starlink software lives])
 
+dnl  ...and make sure it does have a value
+test "${STARLINK+set}" = set || STARLINK=/star
+
 dnl  Install in /star by default (this is redundant at present, since
 dnl  the makefile handles its own installation)
 AC_PREFIX_DEFAULT(/star)
