@@ -207,9 +207,9 @@
 *        - "Cross" -- A combination of "Vline" and "Hline".
 *
 *        - "Text" -- A text string is used to mark each position. The string 
-*        is drawn horizontally and is centred on the specified position.
-*        The strings to use for each position are specified using parameter 
-*        STRINGS.
+*        is drawn horizontally with the justification specified by parameter 
+*        JUST.  The strings to use for each position are specified using 
+*        parameter STRINGS.
 *
 *        [current value]
 *     QUIET = _LOGICAL (Read)
