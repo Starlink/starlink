@@ -39,12 +39,13 @@ endif
 setenv KAPPA_DIR $GAIA_DIR/../kappa
 setenv PHOTOM_DIR $GAIA_DIR/../photom
 setenv CONVERT_DIR $GAIA_DIR/../convert
-setenv EXTRACTOR_DIR $EXTRACTOR_DIR/../extractor
+setenv EXTRACTOR_DIR $GAIA_DIR/../extractor
 setenv ESP_DIR $GAIA_DIR/../esp
 
 #  Initialize the CONVERT package.
 alias echo 'echo >/dev/null'
 source $CONVERT_DIR/convert.csh
+setenv CONVERT_DIR $GAIA_DIR/../convert
 unalias echo
 
 #  Now start up the application proper.
