@@ -81,7 +81,7 @@
    In addition to the usual M, L and T, this includes pseudo-dimensions 
    describing strictly dimensionless quantities such as plane angle, 
    magnitude, etc. */
-#define NQUANT 6
+#define NQUANT 9
 
 /* Include files. */
 /* ============== */
@@ -182,7 +182,7 @@ static KnownUnit *GetKnownUnits();
 static Multiplier *GetMultipliers();
 static UnitNode *ConcatTree( UnitNode *, UnitNode * );
 static UnitNode *CopyTree( UnitNode * );
-static UnitNode *CreateTree( const char * );
+static UnitNode *CreateTree( const char *, int );
 static UnitNode *FixUnits( UnitNode *, UnitNode * );
 static UnitNode *FreeTree( UnitNode * );
 static UnitNode *MakeTree( const char *, int );
@@ -205,14 +205,15 @@ static void FindFactors( UnitNode *, UnitNode ***, double **, int *, double * );
 static const char *MakeExp( UnitNode *, int, int );
 static int DimAnal( UnitNode *, double[NQUANT], double * );
 static int Ustrncmp( const char *, const char *, size_t );
+static int Ustrcmp( const char *, const char * );
 static int SplitUnit( const char *, int, const char *, int, Multiplier **, int * );
 
 /*  Debug functions... 
-*/
 static const char *DisplayTree( UnitNode *, int );
 static const char *OpSym( UnitNode * );
 static const char *OpName( Oper );
 static const char *TreeExp( UnitNode * );
+*/
 
 
 /* Function implementations. */
@@ -361,6 +362,15 @@ static const char *CleanExp( const char *exp ) {
 
          } else if( !strcmp( t, "CM" ) ) {
             tok[ i ] = astStore( t, "cm", 3 ) ;
+
+         } else if( !Ustrcmp( t, "ct" ) ) {
+            tok[ i ] = astStore( t, "count", 6 ) ;
+
+         } else if( !Ustrcmp( t, "ph" ) ) {
+            tok[ i ] = astStore( t, "photon", 7 ) ;
+
+         } else if( !Ustrcmp( t, "pix" ) ) {
+            tok[ i ] = astStore( t, "pixel", 6 ) ;
 
          } else if( strstr( t, "jans" ) == t ||
                     strstr( t, "Jans" ) == t ||
@@ -1131,7 +1141,7 @@ static UnitNode *CopyTree( UnitNode *tree ) {
    return result;
 }
 
-static UnitNode *CreateTree( const char *exp ){
+static UnitNode *CreateTree( const char *exp, int basic ){
 /*
 *  Name:
 *     CreateTree
@@ -1144,20 +1154,24 @@ static UnitNode *CreateTree( const char *exp ){
 
 *  Synopsis:
 *     #include "unit.h"
-*     UnitNode *CreateTree( const char *exp )
+*     UnitNode *CreateTree( const char *exp, int basic  )
 
 *  Class Membership:
 *     Unit member function.
 
 *  Description:
 *     This function converts the supplied algebraic units expression into
-*     a tree of UnitNodes in which the "roots" (LDVAR nodes) all refer to
+*     a tree of UnitNodes. The result tree can optionally be expanded to
+*     create a tree in which the "roots" (LDVAR nodes) all refer to
 *     basic units. 
 
 *  Parameters:
 *     exp
 *        The units expression. This should not include any leading or
 *        trailing spaces.
+*     basic
+*        Should the tree created from parsing "exp" be expanded so that
+*        the leaf nodes of the tree are all basic units?
 
 *  Returned Value:
 *     A pointer to a UnitNode which forms the head of a tree of UnitNodes
@@ -1200,7 +1214,7 @@ static UnitNode *CreateTree( const char *exp ){
 /* Now replace each LDVAR node which refers to a known derived unit with
    a sub-tree which defines the derived unit in terms of known basic units.
    The LDVAR nodes in the resulting tree all refer to basic units. */
-      RemakeTree( &result );
+      if( basic ) RemakeTree( &result );
    }
 
 /* Free resources. */
@@ -1241,12 +1255,12 @@ static int DimAnal( UnitNode *node, double powers[NQUANT], double *scale ) {
 *     powers
 *        An array in which are returned the powers for each of the following 
 *        basic units (in the order shown): kilogramme, metre, second, radian, 
-*        Kelvin, magnitude. If the supplied unit does not depend on a given 
-*        basic unit a value of 0.0 will be returned in the array. The
-*        returns values represent a system of units which is a scaled form
-*        of the supplied units, expressed in the basic units of m, kg, s,
-*        rad, K and mag. For instance, a returned array of [1,0,-2,0,0,0]
-*        would represent "m/s**2".
+*        Kelvin, count, photon, magnitude, pixel. If the supplied unit does 
+*        not depend on a given basic unit a value of 0.0 will be returned in 
+*        the array. The returns values represent a system of units which is a 
+*        scaled form of the supplied units, expressed in the basic units of m, 
+*        kg, s, rad, K count,photon, mag and pixel. For instance, a returned 
+*        array of [1,0,-2,0,0,0,0,0,0] would represent "m/s**2".
 *     scale
 *        Pointer to a location at which to return a scaling factor for the 
 *        supplied units. The is the value, in the units represented by the 
@@ -2074,14 +2088,17 @@ static KnownUnit *GetKnownUnits() {
       MakeKnownUnit( "lyr", "light year", "9.460730E15 m" );
       MakeKnownUnit( "pc", "parsec", "3.0867E16 m" );
       MakeKnownUnit( "count", "count", NULL );
+      quant_units[ iq++ ] = known_units;
       MakeKnownUnit( "ct", "count", NULL );
       MakeKnownUnit( "photon", "photon", NULL );
+      quant_units[ iq++ ] = known_units;
       MakeKnownUnit( "ph", "photon", NULL );
       MakeKnownUnit( "Jy", "Jansky", "1.0E-26 W /m**2 /Hz" );
       MakeKnownUnit( "mag", "magnitude", NULL );
       quant_units[ iq++ ] = known_units;
       MakeKnownUnit( "G", "Gauss", "1.0E-4 T" );
       MakeKnownUnit( "pixel", "pixel", NULL );
+      quant_units[ iq++ ] = known_units;
       MakeKnownUnit( "pix", "pixel", NULL );
       MakeKnownUnit( "barn", "barn", "1.0E-28 m**2" );
       MakeKnownUnit( "D", "Debye", "(1.0E-29/3) C.m" );
@@ -2585,8 +2602,8 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
 *        A pointer to the UnitNode at the head of the tree to be converted
 *        into an algebraic expression. 
 *     mathmap
-*        Format as a MathMap expression? Otherwise, it is formated as an
-*        axis label expression.
+*        If zero, format as an axis label expression. If 1, format as a 
+*        MathMap expression. If 2, format as a FITS unit string. 
 *     top
 *        Should be non-zero for a top-level entry to this function, and
 *        zero for a recursive entry.
@@ -2601,17 +2618,19 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
 */
 
 /* Local Variables: */
+   UnitNode *newtree;
    char *a;
+   char *result;
    char buff[200];
    const char *arg0;
    const char *arg1;
-   char *result;
+   const char *mtxt;
    int larg0;
    int larg1;          
    int lbuff;
-   int tlen;
+   int mlen;
    int par;
-   UnitNode *newtree;
+   int tlen;
 
 /* Check inherited status. */
    result = NULL;
@@ -2654,19 +2673,37 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
       result = astStore( NULL, buff, lbuff + 1 );
 
 /* "Load Variable Value" nodes - return the variable name. If this is a
-   recursive call to this function, and we are not formatting a
-   MathMap function, append a single space before and after the name. */
+   recursive call to this function, and we are producing a label, append a 
+   single space before and after the name. */
    } else if( newtree->opcode ==  OP_LDVAR ) {
+      tlen = strlen( newtree->name );
+
       if( !mathmap && !top ){ 
-         tlen = strlen( newtree->name );
          result = astMalloc( tlen + 3 );
          if( result ) {
             result[ 0 ] = ' ';
             memcpy( result + 1, newtree->name, tlen );
             memcpy( result + tlen + 1, " ", 2 );
          }  
+
+      } else if( mathmap == 2 ) {
+
+         if( newtree->mult ) {
+           mlen = newtree->mult->symlen;
+           mtxt = newtree->mult->sym;
+         } else {
+           mlen = 0;
+           mtxt = NULL;
+         }
+
+         result = astMalloc( tlen + 1 + mlen );
+         if( result ) {
+            if( mtxt ) memcpy( result, mtxt, mlen );
+            memcpy( result + mlen, newtree->name, tlen + 1 );
+         }
+
       } else {
-         result = astStore( NULL, newtree->name, strlen( newtree->name) + 1 );
+         result = astStore( NULL, newtree->name, tlen + 1 );
       }
 
 /* Single argument functions... place the argument in parentheses after
@@ -2674,7 +2711,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
    } else if( newtree->opcode ==  OP_LOG ) {  
       arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0 );
       larg0 = strlen( arg0 );
-      if( mathmap ) {
+      if( mathmap == 1 ) {
          result = astMalloc( larg0 + 8 );
          if( result ) memcpy( result, "log10(", 7 );
          a = result + 6;
@@ -2692,7 +2729,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
    } else if( newtree->opcode ==  OP_LN ) {   
       arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0 );
       larg0 = strlen( arg0 );
-      if( mathmap ) {
+      if( mathmap == 1 ) {
          result = astMalloc( larg0 + 6 );
          if( result ) memcpy( result, "log(", 5 );
          a = result + 4;
@@ -2730,12 +2767,11 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
       arg0 = astFree( (void *) arg0 );
 
 /* POW... the exponent (arg[1]) is always a constant and so does not need 
-   to be placed in parentheses. However, the FITS standard requires the
-   constant to be in parentheses... The first argument only needs to be
+   to be placed in parentheses. The first argument only needs to be
    placed in parentheses if it is a two arg node (except we also put it
-   in parentheses if it is an OP_LDVAR node and "mathmap" is false - this is
-   because such OP_LDVAR nodes will correspind to axis labels which will
-   have spaces before and fatre them which would look odd if not encloses
+   in parentheses if it is an OP_LDVAR node and "mathmap" is zero - this is
+   because such OP_LDVAR nodes will correspond to axis labels which will
+   have spaces before and after them which would look odd if not encloses
    in parentheses). */
    } else if( newtree->opcode ==  OP_POW ) {  
       arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0 );
@@ -2760,21 +2796,19 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
          memcpy( a, arg0, larg0 );
          a += larg0;
          if( par ) *(a++) = ')';
-         memcpy( a, "**(", 4 );
-         a += 3;
+         memcpy( a, "**", 3 );
+         a += 2;
          memcpy( a, arg1, larg1 );
          a += larg1;
-         memcpy( a, ")", 2 );
-         a++;
          *a = 0;
       }
 
       arg0 = astFree( (void *) arg0 );
       arg1 = astFree( (void *) arg1 );
 
-/* DIV... the first argument (numerator) never need sto be in parentheses.
+/* DIV... the first argument (numerator) never needs to be in parentheses.
    The second argument (denominator) only needs to be placed in parentheses 
-   if it is a two arg node. */
+   if it is a MULT node. */
    } else if( newtree->opcode ==  OP_DIV ) {  
       arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0 );
       larg0 = strlen( arg0 );
@@ -2782,7 +2816,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
       arg1 = MakeExp( newtree->arg[ 1 ], mathmap, 0 );
       larg1 = strlen( arg1 );
 
-      if( newtree->arg[ 1 ]->narg == 2 ) {
+      if( newtree->arg[ 1 ]->opcode == OP_MULT ) {
          par = 1;
          result = astMalloc( larg0 + larg1 + 4 );
       } else {
@@ -2955,7 +2989,7 @@ static void MakeKnownUnit( const char *sym, const char *label, const char *exp )
 
 /* Create a tree of UnitNodes describing the unit if an expression was
    supplied. */
-      result->head = exp ? CreateTree( exp ) : NULL;
+      result->head = exp ? CreateTree( exp, 1 ) : NULL;
    }
 
 #ifdef DEBUG
@@ -4410,7 +4444,100 @@ static int SimplifyTree( UnitNode **node, int std ) {
 
 }
 
-double astUnitAnalyser_( const char *in, double powers[6] ){
+static int SplitUnit( const char *str, int ls, const char *u, int cs, 
+                      Multiplier **mult, int *l ) {
+/*
+*  Name:
+*     SplitUnit
+
+*  Purpose:
+*     Split a given string into unit name and multiplier.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "unit.h"
+*     int SplitUnit( const char *str, int ls, const char *u, int cs, 
+*                    Multiplier **mult, int *l  ) 
+
+*  Class Membership:
+*     Unit member function.
+
+*  Description:
+*     Returns non-zer0 if the supplied string ends with the supplied unit
+*     name or label, and any leading string is a known multiplier.
+
+*  Parameters:
+*     str
+*        The string to test, typically containing a multiplier and a unit
+*        symbol or label.
+*     ls
+*        Number of characters to use from "str".
+*     u
+*        Pointer to the unit label or symbol string to be searched for.
+*     cs 
+*        If non-zero, the test for "u" is case insensitive.
+*     mult
+*        Address of a location at which to return the multiplier at the
+*        start of the supplied string. NULL is returned if the supplied
+*        string does not match the supplied unit, or if the string
+*        includes no multiplier.
+*     l
+*        Address of an int in which to return the length of "u".
+
+*  Returned Value:
+*     Non-zero if "str" ends with "u" and starts with a null string or a
+*     known multiplier string.
+
+*/
+
+/* Local Variables: */
+   int ret;                
+   int lm;
+   int lu;
+
+/* Initialise */
+   ret = 0;
+   *mult = NULL;
+   *l = 0;
+
+/* Check inherited status. */
+   if( !astOK ) return ret;   
+
+/* Find the number of characters in the supplied unit label or symbol. The 
+   difference between lu and ls must be the length of the multiplier. */
+   lu = strlen( u );
+   lm = ls - lu;
+
+/* Make sure "str" is not shorter than "u" */
+   if( lm >= 0 ) {
+
+/* Compare the end of "str" against "u" */
+      if( cs ? !strncmp( str + lm, u, lu ) : 
+               !Ustrncmp( str + lm, u, lu ) ) {
+         ret = 1;
+
+/* If "str" ends with "u", see if it starts with a known multiplier */
+         if( lm > 0 ) {
+            ret = 0;
+            *mult = GetMultipliers();
+            while( *mult ) {
+               if( (*mult)->symlen == lm && !strncmp( str, (*mult)->sym, lm ) ) {
+                  ret = 1;
+                  break;
+               }
+               *mult = (*mult)->next;
+            }
+         }
+      }
+   }
+
+   *l = lu;
+   return ret;
+} 
+
+double astUnitAnalyser_( const char *in, double powers[9] ){
 /*
 *+
 *  Name:
@@ -4424,7 +4551,7 @@ double astUnitAnalyser_( const char *in, double powers[6] ){
 
 *  Synopsis:
 *     #include "unit.h"
-*     double astUnitAnalyser_( const char *in, double powers[6] )
+*     double astUnitAnalyser_( const char *in, double powers[9] )
 
 *  Class Membership:
 *     Unit member function.
@@ -4440,12 +4567,12 @@ double astUnitAnalyser_( const char *in, double powers[6] ){
 *     powers
 *        An array in which are returned the powers for each of the following 
 *        basic units (in the order shown): kilogramme, metre, second, radian, 
-*        Kelvin, magnitude. If the supplied unit does not depend on a given 
-*        basic unit a value of 0.0 will be returned in the array. The
-*        returns values represent a system of units which is a scaled form
-*        of the supplied units, expressed in the basic units of m, kg, s,
-*        rad, K and mag. For instance, a returned array of [0,1,-2,0,0,0]
-*        would represent "m/s**2".
+*        Kelvin, count, photon, magnitude, pixel. If the supplied unit does 
+*        not depend on a given basic unit a value of 0.0 will be returned in 
+*        the array. The returns values represent a system of units which is a 
+*        scaled form of the supplied units, expressed in the basic units of m, 
+*        kg, s, rad, K count,photon, mag and pixel. For instance, a returned 
+*        array of [1,0,-2,0,0,0,0,0,0] would represent "m/s**2".
 
 *  Returned Value:
 *     A scaling factor for the supplied units. The is the value, in the
@@ -4474,7 +4601,7 @@ double astUnitAnalyser_( const char *in, double powers[6] ){
    represents the input units. A pointer to the UnitNode at the head of
    the tree is returned if succesfull. Report a context message if this 
    fails. */
-   in_tree = CreateTree( in );
+   in_tree = CreateTree( in, 1 );
    if( in_tree ) {
 
 /* Analyse the tree */
@@ -4807,13 +4934,13 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    seconds and grammes), or numerical constants. Thus every leaf node in the 
    returned tree will be a basic unit (i.e. a unit which is not defined in 
    terms of other units), or a numerical constant. */
-   in_tree = CreateTree( in );
+   in_tree = CreateTree( in, 1 );
    if( !astOK ) astError( AST__BADUN, "astUnitMapper: Error parsing input "
                           "units string '%s'.", in );
 
 /* Do the same for the output units. */
    if( astOK ) {   
-      out_tree = CreateTree( out );
+      out_tree = CreateTree( out, 1 );
       if( !astOK ) astError( AST__BADUN, "astUnitMapper: Error parsing output "
                              "units string '%s'.", out );
    } 
@@ -5071,6 +5198,159 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 
 }
 
+const char *astUnitNormaliser_( const char *in ){
+/*
+*+
+*  Name:
+*     astUnitNormalizer
+
+*  Purpose:
+*     Normalise a unit string into FITS-WCS format.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "unit.h"
+*     const char *astUnitNormaliser( const char *in )
+
+*  Class Membership:
+*     Unit member function.
+
+*  Description:
+*     This function returns a standard FITS-WCS form of the supplied unit
+*     string.
+
+*  Parameters:
+*     in
+*        A string representation of the units, for instance "km/h". 
+
+*  Returned Value:
+*     A pointer to a dynamically allocated string holding the normalized
+*     unit string. It should be freed using astFree when no longer needed.
+
+*  Notes:
+*     -  An error will be reported if the units string cannot be parsed.
+*     -  NULL is returned if this function is invoked with the
+*     global error status set or if it should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   UnitNode *in_tree;
+   const char *result;
+
+/* Initialise */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Parse the input units string, producing a tree of UnitNodes which
+   represents the input units. A pointer to the UnitNode at the head of
+   the tree is returned if succesfull. Report a context message if this 
+   fails. */
+   in_tree = CreateTree( in, 0 );
+   if( in_tree ) {
+
+/* Convert the tree into string form. */
+      result = MakeExp( in_tree, 2, 1 );
+
+/* Free the tree. */
+      in_tree = FreeTree( in_tree );
+
+   } else if( astOK ) {
+      astError( AST__BADUN, "astUnitNormaliser: Error parsing input "
+                "units string '%s'.", in );
+   }
+
+/* Return the result */
+   return result;
+}
+
+static int Ustrcmp( const char *a, const char *b ){
+/*
+*  Name:
+*     Ustrcmp
+
+*  Purpose:
+*     A case blind version of strcmp.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     static int Ustrcmp( const char *a, const char *b )
+
+*  Class Membership:
+*     FitsChan member function.
+
+*  Description:
+*     Returns 0 if there are no differences between the two strings, and 1 
+*     otherwise. Comparisons are case blind.
+
+*  Parameters:
+*     a
+*        Pointer to first string.
+*     b
+*        Pointer to second string.
+
+*  Returned Value:
+*     Zero if the strings match, otherwise one.
+
+*  Notes:
+*     -  This function does not consider the sign of the difference between
+*     the two strings, whereas "strcmp" does.
+*     -  This function attempts to execute even if an error has occurred. 
+
+*/
+
+/* Local Variables: */
+   const char *aa;         /* Pointer to next "a" character */
+   const char *bb;         /* Pointer to next "b" character */
+   int ret;                /* Returned value */
+
+/* Initialise the returned value to indicate that the strings match. */
+   ret = 0;
+
+/* Initialise pointers to the start of each string. */
+   aa = a;
+   bb = b;
+
+/* Loop round each character. */
+   while( 1 ){
+
+/* We leave the loop if either of the strings has been exhausted. */
+      if( !(*aa ) || !(*bb) ){
+
+/* If one of the strings has not been exhausted, indicate that the
+   strings are different. */
+         if( *aa || *bb ) ret = 1;
+
+/* Break out of the loop. */
+         break;
+
+/* If neither string has been exhausted, convert the next characters to
+   upper case and compare them, incrementing the pointers to the next
+   characters at the same time. If they are different, break out of the
+   loop. */
+      } else {
+
+         if( toupper( (int) *(aa++) ) != toupper( (int) *(bb++) ) ){
+            ret = 1;
+            break;
+         }
+
+      }
+
+   }
+
+/* Return the result. */
+   return ret;
+
+}
+
 static int Ustrncmp( const char *a, const char *b, size_t n ){
 /*
 *  Name:
@@ -5176,7 +5456,6 @@ static int Ustrncmp( const char *a, const char *b, size_t n ){
 /* The rest of this file contains functions which are of use for debugging 
    this module. They are usually commented out. 
 
-*/
 
 static const char *DisplayTree( UnitNode *node, int ind ) {
    int i;
@@ -5348,100 +5627,5 @@ static const char *TreeExp( UnitNode *node ) {
 }
 
 
-
-
-
-static int SplitUnit( const char *str, int ls, const char *u, int cs, 
-                      Multiplier **mult, int *l ) {
-/*
-*  Name:
-*     SplitUnit
-
-*  Purpose:
-*     Split a given string into unit name and multiplier.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "unit.h"
-*     int SplitUnit( const char *str, int ls, const char *u, int cs, 
-*                    Multiplier **mult, int *l  ) 
-
-*  Class Membership:
-*     Unit member function.
-
-*  Description:
-*     Returns non-zer0 if the supplied string ends with the supplied unit
-*     name or label, and any leading string is a known multiplier.
-
-*  Parameters:
-*     str
-*        The string to test, typically containing a multiplier and a unit
-*        symbol or label.
-*     ls
-*        Number of characters to use from "str".
-*     u
-*        Pointer to the unit label or symbol string to be searched for.
-*     cs 
-*        If non-zero, the test for "u" is case insensitive.
-*     mult
-*        Address of a location at which to return the multiplier at the
-*        start of the supplied string. NULL is returned if the supplied
-*        string does not match the supplied unit, or if the string
-*        includes no multiplier.
-*     l
-*        Address of an int in which to return the length of "u".
-
-*  Returned Value:
-*     Non-zero if "str" ends with "u" and starts with a null string or a
-*     known multiplier string.
-
 */
-
-/* Local Variables: */
-   int ret;                
-   int lm;
-   int lu;
-
-/* Initialise */
-   ret = 0;
-   *mult = NULL;
-   *l = 0;
-
-/* Check inherited status. */
-   if( !astOK ) return ret;   
-
-/* Find the number of characters in the supplied unit label or symbol. The 
-   difference between lu and ls must be the length of the multiplier. */
-   lu = strlen( u );
-   lm = ls - lu;
-
-/* Make sure "str" is not shorter than "u" */
-   if( lm >= 0 ) {
-
-/* Compare the end of "str" against "u" */
-      if( cs ? !strncmp( str + lm, u, lu ) : 
-               !Ustrncmp( str + lm, u, lu ) ) {
-         ret = 1;
-
-/* If "str" ends with "u", see if it starts with a known multiplier */
-         if( lm > 0 ) {
-            ret = 0;
-            *mult = GetMultipliers();
-            while( *mult ) {
-               if( (*mult)->symlen == lm && !strncmp( str, (*mult)->sym, lm ) ) {
-                  ret = 1;
-                  break;
-               }
-               *mult = (*mult)->next;
-            }
-         }
-      }
-   }
-
-   *l = lu;
-   return ret;
-} 
-
 
