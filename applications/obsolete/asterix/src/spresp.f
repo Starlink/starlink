@@ -25,9 +25,6 @@
 *     is stored as a function of X,Y offset from the source position, in
 *     either pixel centred or vertex centred form, as a function of detector
 *     position and/or energy.
-*
-*
-*
 
 *  Usage:
 *     {routine_name} {parameter_usage}
@@ -43,6 +40,8 @@
 *        Psf amplitude at which the psf is cut-off radially
 *     RLIMIT = INTEGER (Read)
 *        Limiting maximum radius of the psf
+*     NEBIN = INTEGER (Read)
+*        Number of samples in energy.
 
 *  Examples:
 *     {routine_example_text}
@@ -107,6 +106,8 @@
 *        V1.8-0  User interface now uses only USI.
 *     25-Apr-95 (DJA):
 *        V1.8-1  New data interfaces.
+*     31-Jul-95 (DJA):
+*        V2.0-0  Allow user to control energy resolution using NEBIN
 *     {enter_changes_here}
 
 *  Bugs:
@@ -140,12 +141,14 @@
       CHARACTER*(DAT__SZLOC) SLOC           	! SPATIAL_RESP object
       CHARACTER*40           UNITS              ! Axis units
 
-      REAL                   CUTOFF		! Cutoff amplitude
-      REAL 		     DX, DY		! Psf data bin widths in radians
-      REAL                   E, R, X, Y         !
-      REAL                   ERES           	! Spectral resolution
-      REAL                   MAXR               ! Maximum off-axis angle
-      REAL                   SRES           	! Spatial resolution
+      REAL                   	CUTOFF			! Cutoff amplitude
+      REAL 		     	DX, DY		! Psf data bin widths in radians
+      REAL                   	E, R, X, Y         	!
+      REAL			EBASE, ESCALE		! Energy axis data
+      REAL                   	ELO, EHI           	! Energy axis extrema
+      REAL                   	ERES           		! Spectral resolution
+      REAL                   	MAXR               	! Maximum off-axis angle
+      REAL                   	SRES           		! Spatial resolution
       REAL                   TOR 		! Units to radians conversion
       REAL                   XBASE, XSCALE      ! X axis attributes
       REAL                   XLO, XHI           ! X axis extrema
@@ -167,7 +170,8 @@
       INTEGER                NDIM           	! Dimensionality of response
       INTEGER                NPSF            	! Number of psfs in response
       INTEGER                NUSED            	! Length of compressed response
-      INTEGER                PSFSIZ		! Psf size in bytes
+      INTEGER			ONEBIN			! O/p # energy bins
+      INTEGER                	PSFSIZ			! Psf size in bytes
       INTEGER 		     RBIN      		! Loop over off-axis angle
       INTEGER                RLIMIT		! Limiting psf radius
       INTEGER			SID			! Response identifier
@@ -186,7 +190,7 @@
 
 *  Version
       CHARACTER*30       VERSION
-        PARAMETER        ( VERSION = 'SPRESP Version 1.8-1' )
+        PARAMETER        ( VERSION = 'SPRESP Version 2.0-0' )
 
 *  Local Data:
       DATA EVDS/.FALSE./
@@ -276,7 +280,29 @@
 
 *      Map energy if defined
         IF ( E_AX .GT. 0 ) THEN
-          CALL BDI_MAPAXVAL( IFID, 'READ', E_AX, EPTR, STATUS )
+
+*        Get number of output energy bins from user
+          CALL USI_DEF0I( 'NEBIN', IDIMS(E_AX), STATUS )
+          CALL USI_GET0I( 'NEBIN', ONEBIN, STATUS )
+          IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*        Ensure number is less than or equal to the number of input energy
+*        bins
+          ONEBIN = MIN( IDIMS(E_AX), ONEBIN )
+
+*        If user is happy with the default energy resolution, just map
+*        the input axis
+          IF ( ONEBIN .EQ. IDIMS(E_AX) ) THEN
+            CALL BDI_MAPAXVAL( IFID, 'READ', E_AX, EPTR, STATUS )
+          ELSE
+
+*          Otherwise extract axis extrema and calculate base and scale
+            CALL PSF_QAXEXT( IPSF, E_AX, ELO, EHI, STATUS )
+            ESCALE = (EHI-ELO) / REAL(ONEBIN)
+            EBASE = ELO + ESCALE/2.0
+
+          END IF
+
         END IF
 
 *      Extract X,Y pixel sizes
@@ -334,7 +360,7 @@
         DIMS(4) = 20
       END IF
       IF ( E_AX .GT. 0 ) THEN
-        DIMS(NDIM) = IDIMS(E_AX)
+        DIMS(NDIM) = ONEDIM
       ELSE
         DIMS(NDIM) = 1
       END IF
@@ -369,7 +395,13 @@
         CALL BDI_COPAXIS( IFID, SID, Y_AX, 4, STATUS )
       END IF
       IF ( E_AX .GT. 0 ) THEN
-        CALL BDI_COPAXIS( IFID, SID, E_AX, NDIM, STATUS )
+        IF ( ONEBIN .EQ. IDIMS(E_AX) ) THEN
+          CALL BDI_COPAXIS( IFID, SID, E_AX, NDIM, STATUS )
+        ELSE
+          CALL BDI_COPAXTEXT( IFID, SID, E_AX, NDIM, STATUS )
+          CALL BDI_CREAXVAL( SID, NDIM, .TRUE., ONEDIM, STATUS )
+          CALL BDI_PUTAXVAL( SID, NDIM, EBASE, ESCALE, ONEDIM, STATUS )
+        END IF
       END IF
 
 *    Map space for expanded spatial response structure
@@ -386,7 +418,11 @@
         IF ( E_AX .GT. 0 ) THEN
 
 *        Extract EBIN'th energy bin
-          CALL ARR_ELEM1R( EPTR, IDIMS(E_AX), EBIN, E, STATUS )
+          IF ( ONEBIN .EQ. IDIMS(E_AX) ) THEN
+            CALL ARR_ELEM1R( EPTR, ONEBIN, EBIN, E, STATUS )
+          ELSE
+            E = EBASE + REAL(EBIN-1)*ESCALE
+          END IF
 
 *        Define this energy band
           CALL PSF_DEF( IPSF, 0.0D0, 0.0D0, NINT(E), NINT(E), 0, 0,
@@ -524,9 +560,6 @@
 *     is stored as a function of X,Y offset from the source position, in
 *     either pixel centred or vertex centred form, as a function of detector
 *     position and/or energy.
-*
-*
-*
 
 *  Usage:
 *     {routine_name} {parameter_usage}
@@ -565,12 +598,6 @@
 
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
-
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
 
 *  References:
 *     {routine_references}...
@@ -761,12 +788,6 @@
 
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
-
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
 
 *  References:
 *     {routine_references}...
