@@ -195,6 +195,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.52  1998/05/05 20:01:45  timj
+*     Use SCUBA__MAX_FITS to specify max size of FITS array when
+*     acessing the FITS array.
+*
 *     Revision 1.51  1998/04/28 20:41:18  timj
 *     Deal with FITS information for each input file.
 *     Default filename is related to input when only one file is
@@ -909,8 +913,8 @@ c
                RASTER = .TRUE.
 
 *     Find CHOP_COORDS
-               CALL SCULIB_GET_FITS_C (N_FITS, N_FITS(I), FITS(1,I), 
-     :              'CHOP_CRD', CHOP_CRD, STATUS)
+               CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(I), 
+     :              FITS(1,I), 'CHOP_CRD', CHOP_CRD, STATUS)
 
                IF (CHOP_CRD .EQ. 'LO') THEN
                   RAS_CHOP_LO = .TRUE.
@@ -948,18 +952,18 @@ c
 *     If we are using RASTER with only LO chopping we need to check that
 *     the chop configurations are acceptable
 
-               CALL SCULIB_GET_FITS_R (N_FITS, N_FITS(1), FITS(1,1), 
-     :              'CHOP_THR', CHOP_THROW, STATUS)
-               CALL SCULIB_GET_FITS_R (N_FITS, N_FITS(1), FITS(1,1), 
-     :              'CHOP_PA', CHOP_PA, STATUS)
+               CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1), 
+     :              FITS(1,1), 'CHOP_THR', CHOP_THROW, STATUS)
+               CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1), 
+     :              FITS(1,1), 'CHOP_PA', CHOP_PA, STATUS)
                OKAY = .TRUE.
                
 *     Loop over files comparing chop config
                DO I = 2, FILE
-                  CALL SCULIB_GET_FITS_R (N_FITS, N_FITS(I), FITS(1,I), 
-     :                 'CHOP_THR', NEWTHROW, STATUS)
-                  CALL SCULIB_GET_FITS_R (N_FITS, N_FITS(I), FITS(1,I), 
-     :                 'CHOP_PA', NEWPA, STATUS)
+                  CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(I), 
+     :                 FITS(1,I), 'CHOP_THR', NEWTHROW, STATUS)
+                  CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(I), 
+     :                 FITS(1,I), 'CHOP_PA', NEWPA, STATUS)
 
                   IF (NEWPA .NE. CHOP_PA .OR. 
      :                 NEWTHROW .NE. CHOP_THROW) THEN
@@ -988,15 +992,15 @@ c
 
          IF (SAMPLE_MODE .EQ. 'RASTER') THEN
 
-            CALL SCULIB_GET_FITS_C (N_FITS, N_FITS(1), FITS(1,1),
-     :           'CHOP_CRD', CHOP_CRD, STATUS)
-
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(1), 
+     :           FITS(1,1), 'CHOP_CRD', CHOP_CRD, STATUS)
+            
             IF (CHOP_CRD .EQ. 'LO') THEN
 
-               CALL SCULIB_GET_FITS_R (N_FITS, N_FITS(1), FITS(1,1), 
-     :              'CHOP_THR', CHOP_THROW, STATUS)
-               CALL SCULIB_GET_FITS_R (N_FITS, N_FITS(1), FITS(1,1), 
-     :              'CHOP_PA', CHOP_PA, STATUS)
+               CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1), 
+     :              FITS(1,1), 'CHOP_THR', CHOP_THROW, STATUS)
+               CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS(1), 
+     :              FITS(1,1), 'CHOP_PA', CHOP_PA, STATUS)
 
                CHOP_CRD = 'RJ' ! Always chop in RJ
                OKAY = .TRUE.
