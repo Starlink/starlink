@@ -265,7 +265,7 @@ close (AL);
 #
 # The content of $cmdlineobsdata is a sequence of keyword=value pairs,
 # separated by commas.
-defined ($cmdlineobsdata) || ($cmdlineobsdata = 'source=AST:FITS'); # default
+defined ($cmdlineobsdata) || ($cmdlineobsdata = ''); # make sure it's defined
 my %obsdata;
 foreach my $p (split (/ *, */, $cmdlineobsdata)) {
     if (my ($k,$v) = ($p =~ /^ *([A-Za-z]+) *= *(\S+) *$/)) {
@@ -275,21 +275,9 @@ foreach my $p (split (/ *, */, $cmdlineobsdata)) {
 	print STDERR "obsdata keyword <$p> malformed (ignored)\n";
     }
 }
-my %goodkws = (
-	    'ra' => '\s*[+-]?\d{1,3}((:\d{1,2}){0,2}(\.\d+)?)\s*',
-	    'dec' => '\s*[+-]?\d{1,2}((:\d{1,2}){0,2}(\.\d+)?)\s*',
-	    'scale' => '\s*\d+(\.\d+)?\s*',
-	    'invert' => '\s*[01]\s*',
-	    'pa' => '\s*[+-]?\d+(\.\d+)?\s*',
-	    'source' => '(AST|FITS|AST:FITS|FITS:AST)',
-	    'time' => '\s*(\d+\.\d+|\d{4}([: ]+\d{1,2}){4}(\.\d+)?|\d{1,2}[: ]+\d{1,2}(\.\d+)?)\s*',
-	    'obs' => '\s*(\w+|([: ]*-?\d+[: ]+\d+(\.\d*)?){2}([: ]*\d*(\.\d*)?)?)\s*',
-	    'met' => '\s*\d+(\.\d+)?([: ]*\d+(\.\d+)?)\s*',
-	    'col' => '\s*\d+\s*'
-	   );
-my $kwcheck = check_kwd_list (\%obsdata, \%goodkws);
-if (defined($kwcheck)) {
-    wmessage ('fatal', "obsdata value $kwcheck unrecognised or malformed");
+my $badkwd = check_obsdata_kwd (%obsdata);
+if (defined($badkwd)) {
+    wmessage ('fatal', "obsdata value <$badkwd> unrecognised or malformed");
 }
 
 
@@ -391,58 +379,61 @@ wmessage ('info', "NDF <$NDF> examined OK");
 # Now select a source for the WCS information, and add this to the
 # NDFinfo hash, with the keyword {wcs}.
 #
-# The default source of wcs data is first AST, then FITS.
-defined($obsdata{source}) || ($obsdata{source} = 'AST:FITS');
+# The default source of wcs data is first user-keywords, then AST,
+# then FITS.
+defined($obsdata{source}) || ($obsdata{source} = 'USER:AST:FITS');
 
-if ($obsdata{source} eq 'AST:FITS') {
-    $NDFinfo->{wcs} = (defined($NDFinfo->{ast}) ?
-		               $NDFinfo->{ast} :
-			       $NDFinfo->{fits});
-} elsif ($obsdata{source} eq 'FITS:AST') {
-    $NDFinfo->{wcs} = (defined($NDFinfo->{fits}) ?
-		               $NDFinfo->{fits} :
-			       $NDFinfo->{ast});
-} elsif ($obsdata{source} eq 'AST') {
-    if (defined($NDFinfo->{ast})) {
-	$NDFinfo->{wcs} = $NDFinfo->{ast};
-	wmessage ('info', "WCS information from AST");
-	print STDERR "WCS information from AST\n"
-	  if $verbose;
-    } else {
-	wmessage ('fatal', "Requested AST-WCS, but no AST information in NDF $NDF");
-    }
-} elsif ($obsdata{source} eq 'FITS') {
-    if (defined($NDFinfo->{fits})) {
-	$NDFinfo->{wcs} = $NDFinfo->{fits};
-	wmessage ('info', "WCS information from FITS extension");
-	print STDERR "WCS information from FITS extension\n"
-	  if $verbose;
-    } else {
-	wmessage ('fatal',
-		  "Requested FITS-WCS, but no FITS information in NDF $NDF");
-    }
-} else {
-    # %obsdata is a hash of keyword/value pairs.  Use values to
-    # construct a FITS file giving the rough astrometry.  The keywords
-    # are (ra, dec, pa, scale, invert): see documentation for
-    # make_pseudo_fits for details.
-    $NDFinfo->{wcs} = make_pseudo_fits (%obsdata, %{$NDFinfo});
-    if ($verbose) {
-	open (PF,">$tempDir/pseudo.fits")
-	  || wmessage ('fatal', "Can't open $tempDir/pseudo.fits to write");
-	foreach my $c (@{$NDFinfo->{wcs}}) {
-	    print PF "$c\n";
+foreach my $wcssource (split(/\s*:\s*/, $obsdata{source})) {
+
+    if ($wcssource eq 'AST') {
+	if (defined($NDFinfo->{ast})) {
+	    $NDFinfo->{wcs} = $NDFinfo->{ast};
+	    wmessage ('info', "WCS information from AST");
+	    print STDERR "WCS info from AST\n" if $verbose;
+	    last;
 	}
-	close (PF);
-	wmessage ('info', "WCS information from command line");
-	print STDERR "WCS information from --wcs commandline\n";
+    } elsif ($wcssource eq 'FITS') {
+	if (defined($NDFinfo->{fits})) {
+	    $NDFinfo->{wcs} = $NDFinfo->{fits};
+	    wmessage ('info', "WCS information from FITS");
+	    print STDERR "WCS info from FITS\n" if $verbose;
+	    last;
+	}
+    } elsif ($wcssource eq 'USER') {
+	# %obsdata is a hash of keyword/value pairs.  Use values to
+	# construct a FITS file giving the rough astrometry.  The keywords
+	# are (ra, dec, pa, scale, invert): see documentation for
+	# make_pseudo_fits for details.
+	#
+	# If there are no appropriate keywords present in %obsdata,
+	# then this routine will return undef.
+	my $pseudofits = make_pseudo_fits (%obsdata, %{$NDFinfo});
+	if (defined($pseudofits)) {
+	    wmessage ('info', "WCS information from command line");
+	    $NDFinfo->{wcs} = $pseudofits;
+	    if ($verbose) {
+		open (PF,">$tempDir/pseudo.fits")
+		  || wmessage ('fatal', "Can't open $tempDir/pseudo.fits to write");
+		foreach my $c (@{$NDFinfo->{wcs}}) {
+		    print PF "$c\n";
+		}
+		close (PF);
+		print STDERR "WCS information from --wcs commandline\n";
+	    }
+	    last;
+	}
+    } else {
+	# Eh?
+	wmessage ('warning', "Unrecognised WCS source <$wcssource>");
     }
 }
+
+
     
 
 
 defined($NDFinfo->{wcs})
-    || wmessage ('fatal', "No WCS information available in NDF $NDF");
+    || wmessage ('fatal', "No WCS information available in NDF <$NDF>");
 
 
 # The following test would be irrelvant or wrong if the calibration is
