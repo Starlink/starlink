@@ -323,16 +323,18 @@
   Includes the three different types of lists.
 
   %special: miscellanea.  The main distinction is that %special aren't
-  allowed in PX
+  allowed in PX.
+
+  %maths: the two `display' maths elements, with M in %simplephrase
 -->
-<!entity % simplephrase	"em | strong | quote | code | kbd | cite">
+<!entity % simplephrase	"em | strong | quote | code | kbd | cite | m">
 <!entity % references	"ref | docxref | webref | url | citation">
 <!entity % special	"index | note | draftnote">
 <!entity % structuring	
 	"blockquote | dl | ul | ol | verbatim | linespecific | tabular">
-<!entity % maths	"m | mequation | meqnarray">
-<!entity % simpletext	"#pcdata | %simplephrase | %maths">
-<!entity % phrase	"%simpletext | %references">
+<!entity % maths	"mequation | meqnarray">
+<!entity % simpletext	"#pcdata | %simplephrase">
+<!entity % phrase	"%simpletext | %references | %maths">
 
 
 <!--========== Overall document structure ==========-->
@@ -410,6 +412,9 @@
 
   As a companion to this, the DISPLAYTITLE element has a full content
   model, and is intended to be used as a presentation title.
+  *** I've presently removed the DISPLAYTITLE element, since there's
+  unlikely to be any need for cross references within titles, and this
+  can add significant complication.
 -->
 <!element TITLE		o o (%simpletext)+
 			-- contains document title.  The opening and
@@ -420,8 +425,10 @@
 			   both have to be omissable if we're to be
 			   able to write section headings as
 			   `<sect>title...' -->
+<![ ignore [
 <!element DISPLAYTITLE	- o (%simpletext | %references | %special)+
 					-- displayable alternative title -->
+]]>
 
 <!element AUTHORLIST	o o (author+, otherauthors?, editors?)
 					-- contains author names -->
@@ -788,7 +795,7 @@
 		-- sequence of lines which should have line-breaks
 		   recognised (the name comes from the similarly-named
 		   notation in the DocBook DTD -->
-<!element LINE - o (%phrase | %special)>
+<!element LINE - o (%phrase | %special)*>
 
 <!element DRAFTNOTE - - (#pcdata)	-- Notes during drafting -->
 
