@@ -220,6 +220,8 @@
 *        Added support for WCS component.
 *     7-SEP-1999 (DSB):
 *        Replaced ERR_MARK/RLSE by ERR_BEGIN/END.
+*     17-MAR-2000 (DSB):
+*        Corrected value written to parameter "WCS".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -884,7 +886,7 @@
 *  PIXEL and AXIS) in the WCS FrameSet, or a listing of all Frames 
 *  has been requested.
       IF ( NFRAME .GT. 3 .OR. FULLWC ) THEN
-
+         
 *  Start an AST context.
          CALL AST_BEGIN( STATUS )
 
@@ -1162,7 +1164,7 @@
       END IF
 
 *  Write out the WCS and NFRAME parameter values.
-      CALL PAR_PUT0L( 'WCS', THERE, STATUS )
+      CALL PAR_PUT0L( 'WCS', (NFRAME .GT. 3 ), STATUS )
       CALL PAR_PUT0I( 'NFRAME', NFRM, STATUS )
 
 *  Extensions:
