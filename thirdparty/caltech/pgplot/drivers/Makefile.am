@@ -2,44 +2,34 @@
 
 SUBDIRS = @subdirs@
 
-# grfont.dat and rgb.txt are not actually programs but they still need to
-# go into bin/
+# To change driver list edit configure.ac
+BUILT_DRIVER_ROUTINES = @BUILT_DRIVERS@
 
 noinst_LTLIBRARIES = libpgplot_drivers.la
-libpgplot_drivers_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES)
+libpgplot_drivers_la_SOURCES = grexec.f
+
+EXTRA_libpgplot_drivers_la_SOURCES = $(DRIVER_ROUTINES)
+libpgplot_drivers_la_LIBADD = $(BUILT_DRIVER_ROUTINES)
+libpgplot_drivers_la_DEPENDENCIES = $(BUILT_DRIVER_ROUINES)
 
 bin_PROGRAMS = pgxwin_server
 pgxwin_server_SOURCES = pgxwin_server.c
 pgxwin_server_LDADD = $(X_LIBS) $(X_EXTRA_LIBS) $(X_PRE_LIBS) -lX11
 
 
-#  List of Fortran routines required for building the package.  This is
-#  just a list of all the Fortran source files (excluding BLOCK DATA
-#  routines, which are treated separately). Keep this list in alphabetical
-#  order so that the subroutine description html comes out in the right 
-#  order.
+grexec.f: $(BUILT_DRIVER_ROUTINES) makegrexec.pl
+	./makegrexec.pl $(BUILT_DRIVER_ROUTINES)
 
-F_ROUTINES = exdriv.f pgdriv.f \
-cadriv.f hgdriv.f 	   \
-lxdriv.f ppdriv.f vtdriv.f gidriv.f	   \
-hidriv.f psdriv.f ttdriv.f cwdriv.f \
-gldriv.f nedriv.f wddriv.f	   \
-hpdriv.f lsdriv.f nudriv.f qmdriv.f vadriv.f
+# These are all the driver routines, even if they do not build
 
-C_ROUTINES = cgdriv.c nexsup.c rvdriv.c x2driv.c     \
-xmdriv.c figdisp_comm.c pgxwin.c pndriv.c tkdriv.c xadriv.c xwdriv.c
+DRIVER_ROUTINES = exdriv.f pgdriv.f cadriv.f hgdriv.f lxdriv.f	     \
+ppdriv.f vtdriv.f gidriv.f hidriv.f psdriv.f ttdriv.f cwdriv.f	     \
+gldriv.f nedriv.f wddriv.f hpdriv.f lsdriv.f nudriv.f qmdriv.f	     \
+vadriv.f cgdriv.c nexsup.c rvdriv.c x2driv.c xmdriv.c figdisp_comm.c \
+pgxwin.c pndriv.c tkdriv.c xadriv.c xwdriv.c bcdriv.f gvdriv.f	     \
+ladriv.f lvdriv.f tfdriv.f xedriv.f gcdriv.f todriv.f zedriv.f	     \
+ccdriv.f ljdriv.f lhdriv.f mfdriv.f hjdriv.f lndriv.f pxdriv.f	     \
+txdriv.f epdriv.f godriv.f wsdriv.f vbdriv.f
 
 AM_CFLAGS = -DPG_PPU
 
-F_ROUTINES_NOTLINUX = bcdriv.f gvdriv.f ladriv.f lvdriv.f tfdriv.f \
-xedriv.f gcdriv.f todriv.f zedriv.f ccdriv.f ljdriv.f lhdriv.f \
-mfdriv.f hjdriv.f lndriv.f pxdriv.f txdriv.f epdriv.f godriv.f wsdriv.f vbdriv.f
-
-## Problems with GRWARN //
-
-## ladriv and lvdriv and tfdriv needs OPEN parameter checks
-## gcdriv todriv mfdriv
-
-## xedriv VMS only
-
-## lndriv uses IIAND

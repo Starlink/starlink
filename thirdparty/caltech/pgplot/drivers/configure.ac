@@ -35,6 +35,15 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 AC_CONFIG_SUBDIRS([xathena xtk xmotif])
 
+dnl   These are the driver files that will actually be built.
+dnl   The intention is for autoconf to generate this list automatically.
+dnl   For now we kluge and hardwire the driver list. Remove items that should
+dnl   not be built.
+
+BUILT_DRIVERS="exdriv.lo pgdriv.lo cadriv.lo hgdriv.lo lxdriv.lo ppdriv.lo vtdriv.lo gidriv.lo hidriv.lo psdriv.lo ttdriv.lo cwdriv.lo gldriv.lo nedriv.lo wddriv.lo hpdriv.lo lsdriv.lo nudriv.lo qmdriv.lo vadriv.lo cgdriv.lo nexsup.lo rvdriv.lo x2driv.lo xmdriv.lo figdisp_comm.lo pgxwin.lo pndriv.lo tkdriv.lo xadriv.lo xwdriv.lo"
+
+AC_SUBST(BUILT_DRIVERS)
+
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES(Makefile)

@@ -68,7 +68,7 @@ my %counts = (
 my @entries;
 my $ndev = 0;
 for my $file (@files) {
-  if ($file =~ /(.*driv)\.[cf]$/) {
+  if ($file =~ /^(.*driv)\./) {
     my $thisdriv = uc($1);
     if (exists $counts{$thisdriv}) {
       print "Found driver $thisdriv\n";
@@ -94,10 +94,10 @@ push(@lines, "          NBUF = 1\n");
 # Now go through the drivers
 my $devnum = 0;
 for my $drv (@entries) {
-  $devnum++;
   my $max = $counts{$drv};
   $max = 1 if $max == 0;
   for my $i (1..$max) {
+    $devnum++;
     my $index = ",$i";
     $index = '' if $max == 1;
     push(@lines, "      ELSE IF (IDEV .EQ. $devnum) THEN\n");
