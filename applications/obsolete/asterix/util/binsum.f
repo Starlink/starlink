@@ -150,7 +150,7 @@
       CALL AST_INIT()
 
 *  Associate input dataset - can be primitive
-      CALL USI_TASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Check data
