@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {223.5}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {16th August 2000}
+\newcommand{\stardocdate}      {19th December 2000}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
-\newcommand{\stardocversion}   {Version 2.1-5}
+\newcommand{\stardocversion}   {Version 2.1-7}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {POLPACK is a package of applications for 
 reducing imaging polarimetry data. They cover registration, sky subtraction, 
@@ -2585,6 +2585,7 @@ The POLPACK routine descriptions are contained in the following pages.
 These descriptions follow the style used in \xref{SUN/95}{sun95}{ap_full}
 for NDF applications.
 
+\newpage
 \sstroutine{
    POLBIN
 }{
@@ -2593,7 +2594,7 @@ for NDF applications.
    \sstdescription{
       This application creates a new catalogue of polarization vectors by
       binning the Stokes parameters in the supplied catalogue. The columns in
-      the supplied catalogue should correspond to those created by \htmlref{POLVEC}{POLVEC}.
+      the supplied catalogue should correspond to those created by POLVEC.
 
       The bins used form a grid of equally sized rectangular cells, the
       dimensions of each cell being specified by the parameter BOX in
@@ -2617,6 +2618,7 @@ for NDF applications.
       }{
          The x and y bin sizes. These values refer to the coordinate Frame
          defined by columns {\tt "}X{\tt "} and {\tt "}Y{\tt "} and will usually be in units of pixels.
+         This parameter is not accessed if parameter INTEGRATE is TRUE.
       }
       \sstsubsection{
          DEBIAS = \_LOGICAL (Read)
@@ -2634,6 +2636,13 @@ for NDF applications.
       }{
          The name of the input catalogue. A file type of .FIT is assumed
          if none is provided.
+      }
+      \sstsubsection{
+         INTEGRATE = LOGICAL\_ (Read)
+      }{
+         If TRUE, then all the input vectors are placed in a single bin.
+         In this case, parameter BOX is not used and the output catalogue
+         will contain only a single vector. [FALSE]
       }
       \sstsubsection{
          METHOD = LITERAL (Read)
@@ -2669,9 +2678,9 @@ for NDF applications.
          RADEC = \_LOGICAL (Read)
       }{
          If TRUE, columns holding the RA and DEC (FK5, J2000) are added
-         to the output catalogue, if the input catalogue contains the 
-         necessary WCS information. If FALSE, no RA and DEC columns are 
-         written. For large catalogues, creating RA and DEC columns can 
+         to the output catalogue, if the input catalogue contains the
+         necessary WCS information. If FALSE, no RA and DEC columns are
+         written. For large catalogues, creating RA and DEC columns can
          cause a significant delay. [current value]
       }
       \sstsubsection{
@@ -2702,12 +2711,16 @@ for NDF applications.
          the reference direction will be the second pixel axis. The POLANAL
          Frame in the WCS information of the output catalogue is updated to
          describe the new reference direction.
+
+         \sstitem
+         The bottom left corner of each bin is chosen so that the origin
+         of the (X,Y) Frame would correspond to a bin corner.
       }
    }
    \sstdiytopic{
       Copyright
    }{
-      Copyright (C) 1999 Central Laboratory of the Research Councils
+      Copyright (C) 1998 Central Laboratory of the Research Councils
    }
 }
 \sstroutine{
@@ -6480,6 +6493,19 @@ The allowed items within the POLPACK extension.}
 \section{\label{APP:HISTORY}History}
 This section describes the major changes introduced at each release of
 POLPACK.
+\subsection{V2.1-7}
+
+\item A new logical-valued parameter called INTEGRATE has been added to 
+\htmlref{POLBIN}{POLBIN}. If set to a true value, the output catalogue
+contains only a single vector formed by binning {\emph all} vectors
+within the input catalogue. Otherwise, the output catalogue contains 
+vectors for a grid of bins determined by the BOX parameter, as before.
+
+\item Two new hidden commands POLWRTCL and POLRDTCL have been added to 
+transfer catalogue data to and from the polarimetry toolbox within
+\xref{GAIA}{sun214}{} \latexonly{(SUN/214)}. These commands are not
+designed for interactive use.
+
 \subsection{V2.1-5}
 
 \begin{itemize}
