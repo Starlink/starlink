@@ -1,8 +1,25 @@
-*+  FREQUENCY - Obtains a frequency distribution
       SUBROUTINE FREQUENCY( STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     FREQUENCY
+
+*  Purpose:
+*     Obtains a frequency distribution, or histogram, of its input
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL FREQUENCY( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Displays the relative frequency of occurrence of items in a data object.
 *     The input data object can be primitive or structured ( an NDF ). Data
 *     items are collected into regular or irregularly spaced bins.
@@ -16,166 +33,220 @@
 *     Data quality is taken into account if present in the input data object -
 *     items in the input object whose quality is not perfect are ignored by
 *     the algorithm.
-*
-*    Parameters :
-*
-*     INP=UNIV(R)
-*           Input data object
-*     REG=LOGICAL(R)
-*           Whether output bins are to be regularly spaced
-*     SPACING=REAL(R)
-*           (Regular) spacing between output bin centres
-*     BOUNDARIES()=REAL(R)
-*           (Irregularly spaced) output bin boundaries
-*     NORMALISE=LOGICAL(R)
-*           Normalisation required (default=.true.)
-*     OUT=UNIV(W)
-*           Output dataset
-*
-*    Method :
-*
+
+*  Usage:
+*     frequency {parameter_usage}
+
+*  Environment Parameters:
+*     INP = CHAR (read)
+*        Input data object
+*     REG = LOGICAL (read)
+*        Whether output bins are to be regularly spaced
+*     SPACING = REAL (read)
+*        (Regular) spacing between output bin centres
+*     BOUNDARIES() = REAL (read)
+*        (Irregularly spaced) output bin boundaries
+*     NORMALISE = LOGICAL (read)
+*        Normalisation required (default=Y)
+*     OUT = CHAR (read)
+*        Output dataset
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
 *     Associate input object
 *     Calculate input object data range
 *     Prompt for (regular) bin spacing
 *     Bin up data
 *     Normalise if required
 *     Tidy up
-*
-*    Deficiencies :
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
 *     Only 2000 irregular output bins are allowed
-*
-*    Bugs :
-*    Authors :
-*
-*     Jim Peden   (BHVAD::JCMP)
-*     David Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     21 Jun 83 : Original (BHVAD::JCMP)
-*     20 Dec 83 : Modified for new SSE (BHVAD::JCMP)
-*     22 Oct 84 : Optional display to ARGS (BHVAD::JCMP)
-*     16 Jan 85 : Max # of lists parameterised (BHVAD::JCMP)
-*      5 Feb 85 : Change to list name output format;
-*                 version id added (BHVAD::JCMP)
-*      4 Sep 85 : V0.3-1 list field range used; check on bin index (BHVAD::JCMP)
-*      7 Nov 85 : V0.4-1 Bin numbering changed; bin descriptors added;
-*                        normalisation option (BHVAD::JCMP)
-*     17 Dec 85 : V0.4-2 ADAM version (BHVAD::JCMP)
-*      1 May 86 : V0.4-3 Better parameter status handling (BHVAD::JCMP)
-*     12 Jun 86 : V1.0-1 Modified from DISTR (BHVAD::JCMP)
-*     24 Jun 86 : V1.0-2 Histogram drawing style (BHVAD::JCMP)
-*     29 Sep 86 : V0.5-1 Bug fix - arguments of CMP_MAPV (BHVAD::JCMP)
-*     23 May 88 : V0.6-1 Bug fix - bins no longer include upper limit (ADM)
-*     30 Aug 88 : V1.0-1 Asterix88 up-grade. Documentation spruced up a bit -
-*                        now uses BDA_ routines for structure access (DJA)
-*     12 Dec 88 : V1.0-2 Code review. USI replacing ASSOC calls (DJA)
-*      6 Jun 89 : V1.0-3 Revised subroutine structure - 2 routine for regular
-*                        and irregular data - fixes bug causing hanging for
-*                        large datasets ( DJA )
-*      8 Dec 89 : V1.0-4 Code tidied up a bit (DJA)
-*     14 Jan 90 : V1.0-5 Bug at BDA_UNMAPLQUAL fixed (DJA)
-*     28 Feb 90 : V1.2-0 Removed _GIRB subroutine - now uses PRS_GETRANGES no
-*                        get bin boundaries. (DJA)
-*     26 Apr 90 : V1.2-1 Bug with irregular bin widths sorted (DJA)
-*     19 Nov 92 : V1.7-0 Corrected upper bin boundary problem (DJA)
-*     14 Apr 93 : V1.7-1 Write data label rather than dataset name to axis
-*                        label (DJA)
-*      9 Feb 94 : V1.7-2 Writes new form GCB attributes (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     26 Mar 95 : V1.8-1 Use new data interface (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE     'SAE_PAR'
-      INCLUDE     'ADI_PAR'
-*
-*    Status :
-*
-      INTEGER      STATUS
-*
-*    Local Constants :
-*
-      INTEGER                  MAXLINES         ! Max no. of history text lines
-        PARAMETER              (MAXLINES=12)
-      INTEGER                  MXBIN		! maximum number of bins
-        PARAMETER	       (MXBIN=2000)
-*
-*    Local variables :
-*
-      CHARACTER     TEXT(MAXLINES)*80           ! History text
-      CHARACTER     LABEL*80	                ! Data label
-      CHARACTER     UNITS*80	                ! Data units
 
-      REAL          BOUNDS(MXBIN+1)             ! bin boundaries
+*  References:
+*     {task_references}...
 
-      REAL          DMIN,DMAX		        ! input object range
-      REAL          MAXSIZ	 	        ! maximum bin size
-      REAL          SPACING                     ! regular bin spacing
+*  Keywords:
+*     frequency, usage:public
 
-      INTEGER 	             APTR	 ! Ptr to output axis data
-      INTEGER 	             AWPTR	 ! Ptr to output axis data
-      INTEGER                BPTR        ! Pointer to output bins
-      INTEGER		     DIMS(ADI__MXDIM)		! Input dimensions
-      INTEGER		     DPTR	 ! Ptr to output data array
-      INTEGER                DUMMY       ! Dummy string length parameter
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     JCMP: Jim Peden (SL2, University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     21 Jun 1983 (JCMP):
+*        Original version.
+*     20 Dec 1983 (JCMP):
+*        Modified for new SSE
+*     22 Oct 1984 (JCMP):
+*        Optional display to ARGS
+*     16 Jan 1985 (JCMP):
+*        Max # of lists parameterised
+*      5 Feb 1985 (JCMP):
+*        Change to list name output format; version id added
+*      4 Sep 1985 V0.3-1 (JCMP):
+*        List field range used; check on bin index
+*      7 Nov 1985 V0.4-1 (JCMP):
+*        Bin numbering changed; bin descriptors added; normalisation option
+*     17 Dec 1985 V0.4-2 (JCMP):
+*        ADAM version
+*      1 May 1986 V0.4-3 (JCMP):
+*        Better parameter status handling
+*     12 Jun 1986 V1.0-1 (JCMP):
+*        Modified from DISTR
+*     24 Jun 1986 V1.0-2 (JCMP):
+*        Histogram drawing style
+*     29 Sep 1986 V0.5-1 (JCMP):
+*        Bug fix - arguments of CMP_MAPV
+*     23 May 1988 V0.6-1 (ADM):
+*        Bug fix - bins no longer include upper limit
+*     30 Aug 1988 V1.0-1 (DJA):
+*        Asterix88 up-grade. Documentation spruced up a bit -
+*        now uses BDA_ routines for structure access
+*     12 Dec 1988 V1.0-2 (DJA):
+*        Code review. USI replacing ASSOC calls
+*      6 Jun 1989 V1.0-3 (DJA):
+*        Revised subroutine structure - 2 routine for regular and irregular
+*        data - fixes bug causing hanging for large datasets
+*      8 Dec 1989 V1.0-4 (DJA):
+*        Code tidied up a bit
+*     14 Jan 1990 V1.0-5 (DJA):
+*        Bug at BDA_UNMAPLQUAL fixed
+*     28 Feb 1990 V1.2-0 (DJA):
+*        Removed _GIRB subroutine - now uses PRS_GETRANGES to get bin bounds
+*     26 Apr 1990 V1.2-1 (DJA):
+*        Bug with irregular bin widths sorted
+*     19 Nov 1992 V1.7-0 (DJA):
+*        Corrected upper bin boundary problem
+*     14 Apr 1993 V1.7-1 (DJA):
+*        Write data label rather than dataset name to axis label
+*      9 Feb 1994 V1.7-2 (DJA):
+*        Writes new form GCB attributes
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     26 Mar 1995 V1.8-1 (DJA):
+*        Use new data interface
+*     12 Sep 1995 V2.0-0 (DJA):
+*        Full ADI port.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
+      INTEGER                   MAXLINES         ! Max no. of history text lines
+        PARAMETER               ( MAXLINES=12 )
+
+      INTEGER                  	MXBIN		! maximum number of bins
+        PARAMETER	        ( MXBIN=2000 )
+
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'FREQUENCY Version V2.0-0' )
+
+*  Local Variables:
+      CHARACTER			TEXT(MAXLINES)*80	! History text
+      CHARACTER*8     		AXTXT(2)                ! O/p axis label,units
+
+      REAL          		BOUNDS(MXBIN+1)         ! Bin boundaries
+      REAL          		DMIN,DMAX		! Input object range
+      REAL          		MAXSIZ	 	        ! Maximum bin size
+      REAL			RAXP(2)			! Spaced array data
+      REAL			SPACING			! Bin spacing
+
+      INTEGER 	             	APTR	 		! Output axis data
+      INTEGER 	             	AWPTR	 		! Output axis widths
+      INTEGER                	BPTR        		! Pointer to output bins
+      INTEGER		     	DIMS(ADI__MXDIM)	! Input dimensions
+      INTEGER		     	DPTR	 		! Output data array
+      INTEGER                   DSID                    ! New output object
+      INTEGER                	DUMMY       		! Dummy string length
       INTEGER			IFID			! Input dataset id
-      INTEGER		     IPTR	 ! pointer to input data
-      INTEGER		     NBIN	 ! required number of bins
-      INTEGER		     NDIM	 ! Dimensionality of input arrays
-      INTEGER		     NELM	 ! # input values
-      INTEGER                NREC        ! Returned from USI_xxxNAME
+      INTEGER		     	IPTR	 		! Input data
+      INTEGER		     	NBIN	 		! Required # bins
+      INTEGER		     	NDIM	 		! Input dimensionality
+      INTEGER		     	NELM	 		! # input values
+      INTEGER                   NREC                    ! Returned from USI_xxxNAME
       INTEGER			OFID			! Output dataset id
       INTEGER		     	QPTR	 		! Quality info
 
-      LOGICAL 	             ANYBAD      ! Any points with bad quality
-      LOGICAL		     DQL	 ! data quality present
-      LOGICAL                INCREASING  ! Bounds increase monotonically
-      LOGICAL		     NORMALISE	 ! norm'n required to unit frequency?
-      LOGICAL		     OK	         ! object there and set
-      LOGICAL 	             REG         ! regular output bins?
-*
-*    Version id :
-*
-      CHARACTER              VERSION*30
-        PARAMETER            (VERSION = 'FREQUENCY Version 1.8-1')
-*-
+      LOGICAL		     	DQL	 		! Data quality present?
+      LOGICAL                	INCREASING  		! Bounds increase
+							! monotonically?
+      LOGICAL		     	NORMALISE	 	! Norm'n required to unit frequency?
+      LOGICAL		     	OK	         	! Object there and set?
+      LOGICAL 	             	REG         		! Regular output bins?
+*.
 
-*    Check status
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Version announcement
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialise ASTERIX common blocks
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-*    Associate input object
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+*  Associate input object
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
 
-*    Check data object
-      CALL BDI_CHKDATA( IFID, OK, NDIM, DIMS, STATUS )
-      CALL ARR_SUMDIM( NDIM, DIMS, NELM )
+*  Check data object
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
       IF ( OK ) THEN
 
-        CALL BDI_MAPDATA( IFID, 'READ', IPTR, STATUS )
+        CALL BDI_MAPR( IFID, 'Data', 'READ', IPTR, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Check for quality
-        CALL BDI_CHKQUAL( IFID, DQL, NDIM, DIMS, STATUS )
-
+*    Check for quality
+        CALL BDI_CHK( IFID, 'Quality', DQL, STATUS )
         IF ( DQL ) THEN
-          CALL BDI_MAPLQUAL( IFID, 'READ', ANYBAD, QPTR, STATUS )
-          IF ( .NOT. ANYBAD ) THEN
-            CALL BDI_UNMAPLQUAL( IFID, STATUS )
-            DQL = .FALSE.
-          END IF
+          CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', QPTR, STATUS )
         END IF
 
       ELSE
@@ -185,6 +256,10 @@
 
       END IF
 
+*  Get number of input points
+      CALL BDI_GETNEL( IFID, NELM, STATUS )
+
+*  Get data range
       IF ( DQL ) THEN
 
 *      Get range subject to quality
@@ -199,26 +274,16 @@
       END IF
       MAXSIZ = DMAX - DMIN
 
-*    Zero the BOUNDS array
+*  Zero the BOUNDS array
       CALL ARR_INIT1R( 0.0, MXBIN, BOUNDS, STATUS )
 
-*    Get data label
-      CALL BDI_GETLABEL( IFID, LABEL, STATUS )
-      IF ((LABEL .LE. ' ') .OR. ( STATUS .NE. SAI__OK )) THEN
-        LABEL = ' '
-        IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
-      END IF
-
-*    Get data units
-      CALL BDI_GETUNITS( IFID, UNITS, STATUS )
-      IF ((UNITS .LE. ' ') .OR. ( STATUS .NE. SAI__OK )) THEN
-        UNITS = 'unitless'
-        IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
-      END IF
+*  Get data label and units
+      CALL BDI_GET0C( IFID, 'Label,Units', AXTXT, STATUS )
+      IF ( AXTXT(2) .LE. ' ' ) AXTXT(2) = 'unitless'
 
 *    Tell user valid regular bin sizes
       CALL MSG_SETR( 'MAXSIZ', MAXSIZ )
-      CALL MSG_SETC( 'UNITS', UNITS )
+      CALL MSG_SETC( 'UNITS', AXTXT(2) )
       CALL MSG_PRNT( 'Regular bin sizes can up to ^MAXSIZ (^UNITS)' )
 
 *    Tell environment what data range is
@@ -282,7 +347,7 @@
 
       END IF
 
-*    Obtain whether normalisation is required
+*  Obtain whether normalisation is required
       CALL USI_DEF0L( 'NORM', .TRUE., STATUS )
       CALL USI_GET0L( 'NORM', NORMALISE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -306,66 +371,63 @@
         CALL ARR_NORM1R( NBIN, %VAL(BPTR), STATUS )
       END IF
 
-*    Create output object
-      CALL USI_TASSOCO( 'OUT', 'DISTRIBUTION', OFID, STATUS )
+*  Create output object
+      CALL BDI_NEW( 'BinDS', 1, NBIN, 'REAL', DSID, STATUS )
+      CALL BDI_SETDST( DSID, 'DISTRIBUTION', STATUS )
 
-*    Create components
-      CALL BDI_CREDATA( OFID, 1, NBIN, STATUS )
-      CALL BDI_CREAXES( OFID, 1, STATUS )
+*  Create output object
+      CALL USI_CREAT( 'OUT', DSID, OFID, STATUS )
 
-*    Fill in component values
-      CALL BDI_MAPDATA( OFID, 'WRITE', DPTR, STATUS )
+*  Fill in component values
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', DPTR, STATUS )
       CALL ARR_COP1R( NBIN, %VAL(BPTR), %VAL(DPTR), STATUS )
 
       IF ( NORMALISE ) THEN
-        CALL BDI_PUTLABEL( OFID, 'Relative Frequency', STATUS )
+        CALL BDI_PUT0C( OFID, 'Label', 'Relative Frequency', STATUS )
       ELSE
-        CALL BDI_PUTLABEL( OFID, 'Frequency', STATUS )
+        CALL BDI_PUT0C( OFID, 'Label', 'Frequency', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Now do axis values.
+*  Now do axis values.
       IF ( REG ) THEN
 
-*      If regularly spaced then set up spaced axis array
-        CALL BDI_PUTAXVAL( OFID, 1, DMIN+SPACING/2.0, SPACING,
-     :                                          NBIN, STATUS )
+*    Set up regular axis data
+        RAXP(1) = DMIN + SPACING/2.0
+        RAXP(2) = SPACING
+        CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, RAXP, STATUS )
 
       ELSE
 
-        CALL BDI_CREAXVAL( OFID, 1, .FALSE., NBIN, STATUS )
-        CALL BDI_CREAXWID( OFID, 1, .FALSE., NBIN, STATUS )
-
-*      Otherwise find bin centres and write to output object
-        CALL BDI_MAPAXVAL( OFID, 'WRITE', 1, APTR, STATUS )
-        CALL BDI_MAPAXWID( OFID, 'WRITE', 1, AWPTR, STATUS )
+*    Otherwise find bin centres and write to output object
+        CALL BDI_AXMAPR( OFID, 1, 'Data', 'WRITE', APTR, STATUS )
+        CALL BDI_AXMAPR( OFID, 1, 'Width', 'WRITE', AWPTR, STATUS )
         CALL AXIS_RNG2VALW( NBIN, BOUNDS, %VAL(APTR), %VAL(AWPTR),
      :                                                    STATUS )
 
       END IF
-      CALL BDI_PUTAXLABEL( OFID, 1, LABEL, STATUS )
-      CALL BDI_PUTAXUNITS( OFID, 1, UNITS, STATUS )
+      CALL BDI_AXPUT0C( OFID, 1, 'Label,Units', AXTXT, STATUS )
 
-*    Set axis normalisation
-      CALL BDI_PUTAXNORM( OFID, 1, NORMALISE, STATUS )
+*  Set axis normalisation
+      CALL BDI_AXPUT0L( OFID, 1, 'Normalised', NORMALISE, STATUS )
 
-*    Copy MORE structure across.
-      CALL BDI_COPMORE( IFID, OFID, STATUS )
+*  Inherit everything bar graphics
+      CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
 
-*    Set up histogram style
+*  Set up histogram style
       CALL GCB_LCONNECT( STATUS )
       CALL GCB_SETL( 'STEP_FLAG', .TRUE., STATUS )
       CALL GCB_FSAVE( OFID, STATUS )
       CALL GCB_DETACH( STATUS )
 
-*    Copy, set up and update history
+*  Copy, set up and update history
       CALL HSI_COPY( IFID, OFID, STATUS )
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
-*    Fancy stuff - put input parameters into HISTORY
+*  Fancy stuff - put input parameters into HISTORY
       TEXT(1) = 'Input dataset {INP}'
 
-*    Do data on bins
+*  Do data on bins
       IF ( REG ) THEN
         CALL MSG_SETR( 'SPACE', SPACING )
         TEXT(2) = 'Bins regularly spaced'
@@ -377,19 +439,14 @@
       NREC = MAXLINES
       CALL USI_TEXT( 3, TEXT, NREC, STATUS )
 
-*    Write this into history structure
+*  Write this into history structure
       CALL HSI_PTXT( OFID, NREC, TEXT, STATUS )
 
-*    Release datasets
-      CALL BDI_RELEASE( IFID, STATUS )
-      CALL BDI_RELEASE( OFID, STATUS )
-
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
-
 
 
 
