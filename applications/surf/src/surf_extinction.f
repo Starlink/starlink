@@ -291,7 +291,6 @@
                                         ! file
       INTEGER          OUT_QUALITY_PTR  ! pointer to quality array in output 
       INTEGER          OUT_VARIANCE_PTR ! pointer to variance array in output
-      INTEGER          POSITION         ! Position in array
       REAL             POINT_DAZ (SCUBA__MAX_POINT)
                                         ! azimuth pointing corrections (arcsec)
       REAL             POINT_DEL (SCUBA__MAX_POINT)
@@ -817,9 +816,11 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
 
-         CALL SCULIB_PROCESS_BOLS(.TRUE., N_BEAM, N_BOL_OUT,
+         CALL SCULIB_PROCESS_BOLS(.TRUE., .FALSE., N_BEAM, N_BOL_OUT,
      :        N_POS, N_SWITCHES, N_EXPOSURES, 
-     :        N_INTEGRATIONS, N_MEASUREMENTS, 1, N_FITS, FITS,
+     :        N_INTEGRATIONS, N_MEASUREMENTS, 
+     :        1, N_EXPOSURES, 1, N_INTEGRATIONS, 1, N_MEASUREMENTS,
+     :        1, N_FITS, FITS,
      :        %VAL(IN_DEM_PNTR_PTR), %VAL(IN_LST_STRT_PTR),
      :        ROTATION, SAMPLE_MODE,
      :        SAMPLE_COORDS, 'RA', JIGGLE_REPEAT,
@@ -827,9 +828,10 @@
      :        RA_CENTRE, DEC_CENTRE,
      :        %VAL(IN_RA1_PTR), %VAL(IN_RA2_PTR), 
      :        %VAL(IN_DEC1_PTR), %VAL(IN_DEC2_PTR), 0.0, 0.0,
+     :        0.0D0, 0.0D0, 0.0D0, 0.0D0, 0.0D0, 0.0D0,
      :        0, POINT_LST, POINT_DAZ, POINT_DEL,
      :        SCUBA__NUM_CHAN, SCUBA__NUM_ADC,OUT_BOL_ADC,OUT_BOL_CHAN,
-     :        BOL_DU3, BOL_DU4, FIRST_LST_RAD, SECOND_LST_RAD,
+     :        BOL_DU3, BOL_DU4, .FALSE., FIRST_LST_RAD, SECOND_LST_RAD,
      :        FIRST_TAU, SECOND_TAU, BOL_RA, BOL_DEC,
      :        %VAL(OUT_DATA_PTR), %VAL(OUT_VARIANCE_PTR),
      :        STATUS)
