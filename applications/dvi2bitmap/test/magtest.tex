@@ -10,20 +10,31 @@
 % think I can claim that I've got fonts licked.
 
 \nopagenumbers
+\parindent=0pt
+\parskip=\bigskipamount
 \magnification \magstep1
 
 %\font\cmcscx=cmcsc10
 \font\cmrvii=cmr7
 \font\cmrx=cmr10
 \font\cmrxreal=cmr10 at 10 true pt
-\font\cmrxbig=cmr10 scaled \magstep1
+\font\cmrxmi=cmr10 scaled \magstep1
+\font\cmrxmii=cmr10 scaled \magstep2
+\font\cmrxmiii=cmr10 scaled \magstep3
+\font\cmrxmiv=cmr10 scaled \magstep4
 \font\cmrxii=cmr12
 
-\halign{\hfil #\quad&{# the quick brown fox jumps over the lazy dog}\hfil\cr
+\halign{\hfil #\quad&{# \unskip the quick brown fox}\hfil\cr
 cmr7			&\cmrvii	\cr
 cmr10			&\cmrx		\cr
 cmr10 at 10 true pt	&\cmrxreal	\cr
-cmr10 scaled magstep1	&\cmrxbig	\cr
+cmr10 scaled magstep1	&\cmrxmi	\cr
+cmr10 scaled magstep2	&\cmrxmii	\cr
+cmr10 scaled magstep3	&\cmrxmiii	\cr
+cmr10 scaled magstep4	&\cmrxmiv	\cr
+%cmr10 scaled magstep2	&\omit \cmrxmii	the quick brown fox\hfil\cr
+%cmr10 scaled magstep3	&\omit \cmrxmiii	the quick brown fox\hfil\cr
+%cmr10 scaled magstep4	&\omit \cmrxmiv	the quick brown fox\hfil\cr
 cmr12			&\cmrxii	\cr
 }
 \bye

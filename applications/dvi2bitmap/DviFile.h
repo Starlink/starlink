@@ -67,7 +67,7 @@ public:
     // Convert a length in points to one in pixels,
     // using the current magnifications, etc
     int pt2px (double npt) const
-	{ return static_cast<int>(px_per_dviu_*dviu_per_pt_*npt+0.5); };
+	    { return static_cast<int>(px_per_dviu_*dviu_per_pt_*magfactor_*npt+0.5); };
     const string *filename () const { return &fileName_; }
 
 private:
@@ -82,8 +82,8 @@ private:
     // DVI units are defined by the numerator and denominator 
     // specified in the DVI preamble.
     // 1dviu = 1/dviu_per_pt_ * 1pt <==> d/dviu = dviu_per_pt * d/pt
-    double true_dviu_per_pt_;	// 1dviu = 1/dviu_per_pt_ * 1pt
-    double dviu_per_pt_;	// ...including magnification
+    // Note dviu_per_pt_ does not include DVI-magnification
+    double dviu_per_pt_;	// 1dviu = 1/dviu_per_pt_ * 1pt
     double px_per_dviu_;	// 1px = px_per_dviu_ * 1dviu
     // resolution is in pixels-per-inch
     const int resolution_;
@@ -119,7 +119,8 @@ private:
     void process_preamble(DviFilePreamble *);
     void check_duplicate_font(int);
     int pixel_round(int);
-    int charwidth_ (int charno);
+    int charWidth_ (int charno);
+    int charEscapement_ (int charno);
     // updateH/V update the horizontal position	by an amount in DVI units
     void updateH_ (int hup, int hhup);
     void updateV_ (int y);

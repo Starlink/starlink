@@ -1,5 +1,5 @@
 // Part of dvi2bitmap.
-// Copyright 1999, 2000 Council for the Central Laboratory of the Research Councils.
+// Copyright 1999, 2000, 2002 Council for the Central Laboratory of the Research Councils.
 // See file LICENCE for conditions.
 //
 // $Id$
@@ -122,8 +122,8 @@ DviFileEvent *DviFile::getEvent()
 	{
 	    if (current_font_ == 0)
 		throw DviError ("current_font undefined");    
-	    pending_hhupdate_ += current_font_->glyph(opcode)->hEscapement();
-	    pending_hupdate_ += charwidth_(opcode);
+	    pending_hhupdate_ += charEscapement_(opcode);
+	    pending_hupdate_ += charWidth_(opcode);
 	    gotEvent = new DviFileSetChar(opcode, this);
 	}
 	else if (opcode >= 171 && opcode <= 234)
@@ -142,36 +142,32 @@ DviFileEvent *DviFile::getEvent()
 		charno = getSIU(1);
 		if (current_font_ == 0)
 		    throw DviError ("current_font undefined");    
-		pending_hhupdate_ +=
-		    current_font_->glyph(charno)->hEscapement();
-		pending_hupdate_ += charwidth_(charno);
+		pending_hhupdate_ += charEscapement_(charno);
+		pending_hupdate_ += charWidth_(charno);
 		gotEvent = new DviFileSetChar (charno, this);
 		break;
 	      case 129:		// set2
 		charno = getSIU(2);
 		if (current_font_ == 0)
 		    throw DviError ("current_font undefined");    
-		pending_hhupdate_ +=
-		    current_font_->glyph(charno)->hEscapement();
-		pending_hupdate_ += charwidth_(charno);
+		pending_hhupdate_ += charEscapement_(charno);
+		pending_hupdate_ += charWidth_(charno);
 		gotEvent = new DviFileSetChar (charno, this);
 		break;
 	      case 130:		// set3
 		charno = getSIU(3);
 		if (current_font_ == 0)
 		    throw DviError ("current_font undefined");    
-		pending_hhupdate_ +=
-		    current_font_->glyph(charno)->hEscapement();
-		pending_hupdate_ += charwidth_(charno);
+		pending_hhupdate_ += charEscapement_(charno);
+		pending_hupdate_ += charWidth_(charno);
 		gotEvent = new DviFileSetChar (charno, this);
 		break;
 	      case 131:		// set4
 		charno = getSIS(4);
 		if (current_font_ == 0)
 		    throw DviError ("current_font undefined");    
-		pending_hhupdate_ +=
-		    current_font_->glyph(charno)->hEscapement();
-		pending_hupdate_ += charwidth_(charno);
+		pending_hhupdate_ += charEscapement_(charno);
+		pending_hupdate_ += charWidth_(charno);
 		gotEvent = new DviFileSetChar (charno, this);
 		break;
 	      case 132:		// set_rule
@@ -559,16 +555,27 @@ int DviFile::pixel_round(int dp)
 }
 
 // Return width of character in DVIUnits
-int DviFile::charwidth_ (int charno)
+int DviFile::charWidth_ (int charno)
 {
     if (current_font_ == 0)
-	throw DviError ("current_font undefined (charwidth)");
+	throw DviError ("current_font undefined (charWidth)");
     return static_cast<int>(current_font_->glyph(charno)->tfmWidth()
+			    * current_font_->magnification()
 			    * dviu_per_pt_);
 #if 0
     return static_cast<int>(floor(current_font_->glyph(charno)->tfmWidth()
 				  * dviu_per_pt_));
 #endif
+}
+
+// Return escapement of character, in pixel units
+int DviFile::charEscapement_ (int charno)
+{
+    if (current_font_ == 0)
+	throw DviError ("current_font undefined (charEscapement)");
+//     return static_cast<int>(current_font_->glyph(charno)->hEscapement()
+// 			    * current_font_->magnification());
+    return static_cast<int>(current_font_->glyph(charno)->hEscapement());
 }
 
 
@@ -713,9 +720,9 @@ void DviFile::read_postamble()
 	    num = getSIU(1);
 	    if (fontMap_[num] != 0)
 		throw DviError ("Font %d defined twice", num);
-	    c = getUIU(4);
-	    s = getUIU(4);
-	    d = getUIU(4);
+	    c = getUIU(4);	// checksum (see DVI std, A.4)
+	    s = getUIU(4);	// scale factor, DVI units
+	    d = getUIU(4);	// design size
 	    fontdir = "";	// to be discarded
 	    fontname = "";
 	    for (int a = getSIU(1); a>0; a--)
@@ -818,8 +825,9 @@ void DviFile::process_preamble(DviFilePreamble* p)
 	magfactor_ = 1.0;
     else
 	magfactor_ = (double)p->mag/1000.0 * magmag_;
-    true_dviu_per_pt_ = ((double)p->den/(double)p->num) * (2.54e7/7227e0);
-    dviu_per_pt_ = true_dviu_per_pt_ * magfactor_;
+    // Note dviu_per_pt_ does not include DVI-magnification
+    // (so `true' dviu_per_pt_ would be this/magfactor_)
+    dviu_per_pt_ = ((double)p->den/(double)p->num) * (2.54e7/7227e0);
     px_per_dviu_ = ((double)p->num/(double)p->den) * (resolution_/254000e0);
     double device_units = 1.0/72.27/magfactor_;
     if (device_units > 0.01)
