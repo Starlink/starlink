@@ -93,6 +93,9 @@ f     The MatrixMap class does not define any new routines beyond those
 *        Increased tolerance on checks for unit matrices within
 *        CompressMatrix. Now uses sqrt(DBL_EPSILON)*diag (previously was 
 *        DBL_EPSILON*DIAG ).
+*     10-NOV-2003 (DSB):
+*        Modified functions which swap a MatrixMap with another Mapping
+*        (e.g. MatSwapPerm, etc), to simplify the returned Mappings.
 *class--
 */
 
@@ -1936,8 +1939,10 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm  ){
 /* Local Variables: */
    AstMatrixMap *mm;         /* Pointer to the supplied MatrixMap */
    AstMatrixMap *mmnew;      /* Pointer to new MatrixMap */
-   AstPermMap *pmnew;        /* Pointer to new PermMap */
+   AstMatrixMap *smmnew;     /* Pointer to new simplified MatrixMap */
    AstPermMap *pm;           /* Pointer to the supplied PermMap */
+   AstPermMap *pmnew;        /* Pointer to new PermMap */
+   AstPermMap *spmnew;       /* Pointer to new simplified PermMap */
    double *consts;           /* Pointer to constants array */
    double *matrix;           /* Supplied array of matrix elements */
    double *out_el;           /* Pointer to next element of new MatrixMap */
@@ -2156,18 +2161,25 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm  ){
 /* Annul the supplied PermMap. */
       (void) astAnnul( pm );
 
+/* Simplify the returned Mappings. */
+      spmnew = astSimplify( pmnew );
+      pmnew = astAnnul( pmnew );
+
+      smmnew = astSimplify( mmnew );
+      mmnew = astAnnul( mmnew );
+
 /* Store a pointer to the new PermMap in place of the supplied MatrixMap. This 
    PermMap should be used in its forward direction. */
-      maps[ imm ] = (AstMapping *) pmnew; 
-      inverts[ imm ] = 0;
+      maps[ imm ] = (AstMapping *) spmnew; 
+      inverts[ imm ] = astGetInvert( spmnew );
 
 /* Annul the supplied matrixMap. */
       (void) astAnnul( mm );
 
 /* Store a pointer to the new MatrixMap. This MatrixMap should be used in
    its forward direction. */
-      maps[ 1 - imm ] = (AstMapping *) mmnew;
-      inverts[ 1 - imm ] = 0;
+      maps[ 1 - imm ] = (AstMapping *) smmnew;
+      inverts[ 1 - imm ] = astGetInvert( smmnew );
    }      
 
 /* Return. */
@@ -2215,10 +2227,12 @@ static void MatWin( AstMapping **maps, int *inverts, int imm  ){
 /* Local Variables: */
    AstMatrixMap *m1;             /* Pointer to Diagonal scale factor MatrixMap */
    AstMatrixMap *m2;             /* Pointer to returned MatrixMap */
+   AstMatrixMap *sm2;            /* Pointer to simplified returned MatrixMap */
    AstMatrixMap *mm;             /* Pointer to the supplied MatrixMap */
    AstPointSet *pset1;           /* Shift terms from supplied WinMap */
    AstPointSet *pset2;           /* Shift terms for returned WinMap */
    AstWinMap *w1;                /* Pointer to the returned WinMap */
+   AstWinMap *sw1;               /* Pointer to the simplified returned WinMap */
    AstWinMap *wm;                /* Pointer to the supplied WinMap */
    double **ptr1;                /* Pointer to pset1 data */
    double **ptr2;                /* Pointer to pset2 data */
@@ -2322,11 +2336,17 @@ static void MatWin( AstMapping **maps, int *inverts, int imm  ){
       (void) astAnnul( maps[ 0 ] );
       (void) astAnnul( maps[ 1 ] );
 
-      maps[ imm ] = (AstMapping *) w1;
-      inverts[ imm  ] = astGetInvert( w1 );
+      sw1 = astSimplify( w1 );
+      w1 = astAnnul( w1 );
 
-      maps[ 1 - imm ] = (AstMapping *) m2;
-      inverts[ 1 - imm  ] = astGetInvert( m2 );
+      maps[ imm ] = (AstMapping *) sw1;
+      inverts[ imm  ] = astGetInvert( sw1 );
+
+      sm2 = astSimplify( m2 );
+      m2 = astAnnul( m2 );
+
+      maps[ 1 - imm ] = (AstMapping *) sm2;
+      inverts[ 1 - imm  ] = astGetInvert( sm2 );
 
    }
 

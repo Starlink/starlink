@@ -29073,11 +29073,17 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
 
 /* Initialise a Channel structure (the parent class) as the first
    component within the FitsChan structure, allocating memory if
-   necessary. */
+   necessary. I am not sure why FitsChan has its own source_wrap and
+   sink_wrap items, rather than just using those inherited from Channel. 
+   It may be possible to do away with the fitschan wrappers and just use
+   the channel wrapper, but I have not yet tried this. Old mail from RFWS 
+   suggests that it may be because the F77 FitsChan source and sink
+   interfaces handle fixed length strings (80 characters), whereas
+   Channel sournce and sink handle variable length strings. This needs
+   investigating. */
    new = (AstFitsChan *) astInitChannel( mem, size, 0,
                                          (AstChannelVtab *) vtab, name,
-                                         NULL, NULL );
-
+                                         NULL, NULL, NULL, NULL );
    if ( astOK ) {
 
 /* Initialise the FitsChan data. */

@@ -33,7 +33,7 @@ f     The WinMap class does not define any new routines beyond those
 *     which are applicable to all Mappings.
 
 *  Copyright:
-*     Copyright (C) 2003 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     DSB: David Berry (Starlink)
@@ -71,6 +71,9 @@ f     The WinMap class does not define any new routines beyond those
 *        method.
 *     8-SEP-2003 (DSB):
 *        Allow WinMaps to swap with WcsMaps if possible.
+*     10-NOV-2003 (DSB):
+*        Modified functions which swap a WinMap with another Mapping
+*        (e.g. WinPerm, etc), to simplify the returned Mappings.
 *class--
 */
 
@@ -1903,10 +1906,12 @@ static void WinMat( AstMapping **maps, int *inverts, int iwm  ){
 /* Local Variables: */
    AstMatrixMap *m1;             /* Pointer to Diagonal scale factor MatrixMap */
    AstMatrixMap *m2;             /* Pointer to returned MatrixMap */
+   AstMatrixMap *sm2;            /* Pointer to simplified returned MatrixMap */
    AstMatrixMap *mm;             /* Pointer to the supplied MatrixMap */
    AstPointSet *pset1;           /* Shift terms from supplied WinMap */
    AstPointSet *pset2;           /* Shift terms for returned WinMap */
    AstWinMap *w1;                /* Pointer to the returned WinMap */
+   AstWinMap *sw1;               /* Pointer to the simplified returned WinMap */
    AstWinMap *wm;                /* Pointer to the supplied WinMap */
    double **ptr1;                /* Pointer to pset1 data */
    double **ptr2;                /* Pointer to pset2 data */
@@ -2010,11 +2015,17 @@ static void WinMat( AstMapping **maps, int *inverts, int iwm  ){
       (void) astAnnul( maps[ 0 ] );
       (void) astAnnul( maps[ 1 ] );
 
-      maps[ 1 - iwm ] = (AstMapping *) w1;
-      inverts[ 1 - iwm  ] = astGetInvert( w1 );
+      sw1 = astSimplify( w1 );
+      w1 = astAnnul( w1 );
 
-      maps[ iwm ] = (AstMapping *) m2;
-      inverts[ iwm  ] = astGetInvert( m2 );
+      maps[ 1 - iwm ] = (AstMapping *) sw1;
+      inverts[ 1 - iwm  ] = astGetInvert( sw1 );
+
+      sm2 = astSimplify( m2 );
+      m2 = astAnnul( m2 );
+
+      maps[ iwm ] = (AstMapping *) sm2;
+      inverts[ iwm  ] = astGetInvert( sm2 );
 
    }
 
@@ -2128,7 +2139,9 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
 /* Local Variables: */
    AstPermMap *pm;               /* Pointer to the supplied PermMap */
    AstPermMap *p1;               /* Pointer to the returned PermMap */
+   AstPermMap *sp1;              /* Pointer to the simplified returned PermMap */
    AstWinMap *w1;                /* Pointer to the returned WinMap */
+   AstWinMap *sw1;               /* Pointer to the simplified returned PermMap */
    AstWinMap *wm;                /* Pointer to the supplied WinMap */
    double *a;                    /* Array of shift terms from supplied WinMap */
    double *aa;                   /* Pointer to next shift term */
@@ -2325,11 +2338,17 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
       (void) astAnnul( wm );
       (void) astAnnul( pm );
 
-      maps[ iwm ] = (AstMapping *) p1;
+      sp1 = astSimplify( p1 );
+      p1 = astAnnul( p1 );
+
+      sw1 = astSimplify( w1 );
+      w1 = astAnnul( w1 );
+
+      maps[ iwm ] = (AstMapping *) sp1;
       inverts[ iwm ] = 0;
 
-      maps[ 1 - iwm ] = (AstMapping *) w1;
-      inverts[ 1 - iwm  ] = astGetInvert( w1 );
+      maps[ 1 - iwm ] = (AstMapping *) sw1;
+      inverts[ 1 - iwm  ] = astGetInvert( sw1 );
    }
 
 /* Free the copies of the scale and shift terms from the supplied WinMap. */
