@@ -415,9 +415,22 @@
       CALL WRNDF( 'OUT_S', GRP__NOID, 1, 0, ' ', IGRP4, SIZEO,
      :             STATUS )
 
-* If we are producing Stokes parameters, check that all of the input
-* object frames hasve POLPACK extensions containing WPLATE values. 
+*  If we are producing Stokes parameters...
       IF( IGRP4 .NE. GRP__NOID ) THEN
+
+*  POLCAL (which calculates the Stokes parameters) does not at the moment 
+*  support single-beam mode, so report an error if single-beam mode has
+*  been selected.
+         IF( .NOT. DBEAM .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'POLKA_ERR2b', 'The facility for creating '//
+     :                    'Stokes paremeters in single beam mode '//
+     :                    'has not yet been implemented.', STATUS )
+            GO TO 999
+         END IF
+
+*  Check that all of the input object frames hasve POLPACK extensions 
+*  containing WPLATE values. 
          IF( SIZEO .GT. 0 ) THEN
             DO I = 1, SIZE
                CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
@@ -592,6 +605,7 @@
       CALL PAR_PUT0I( 'SKYPAR', SKYPAR, STATUS )
 
 *  Delete the groups.
+ 999  CONTINUE
       CALL GRP_DELET( IGRP1, STATUS )
       CALL GRP_DELET( IGRP2, STATUS )
       IF( IGRP3 .NE. GRP__NOID ) CALL GRP_DELET( IGRP3, STATUS )
@@ -607,7 +621,7 @@
 
 *  If any other error occurred, then report a contextual message.
          ELSE
-            CALL ERR_REP( 'POLKA_ERR4', 'POLKA: Unable to register '//
+            CALL ERR_REP( 'POLKA_ERR4', 'POLKA: Unable to process '//
      :                    'dual beam polarisation data.', STATUS )
          END IF
 
