@@ -1,0 +1,4673 @@
+<!AFDR "ISO/IEC 10744:1997">
+
+<!--
+ISO/IEC 10744:1997//DTD AFDR Meta-DTD
+Hypermedia/Time-based Structuring Language
+(HyTime)//EN
+-->
+
+<!--
+
+Option Summary:
+
+[General Architecture]
+
+altreps   Alternative Representation Facility
+dafe      Data Attributes for Elements Facility
+dvlist    Default Value List Facility
+HyLex     HyTime Lexical Model Notation
+HyOrd     HyTime Lexicographic Ordering Notation
+included  Included Entities Facility Facility
+ireftype  Immediate ID Reference Type Facility
+lextype   Lexical Typing Facility
+opacity   Element Opacity Facility
+REGEX     POSIX Regular Expression Notation
+superdcn  Notation Derivation Source Facility
+
+[Base Module]
+
+activity  Activity Policy Association Facility
+actypes   User-defined Activity Type Facility
+bos       HyTime Bounded Object Set Specification Facility
+bosspec   HyTime BOS Exception Specification Facility
+conloc    Content Location Facility
+desctxt   Descriptive Text Facility
+dimspec   Dimension Specification Facility
+HyDimLst  HyTime Dimension List Notation
+HyDimSpc  HyTime Dimension Specification Notation
+HyFunk    HyTime Marker Function Language
+markfun   Marker Function Facility
+valueref  Value Reference Facility
+
+[Location Address Module]
+
+agrovdef  Auxiliary Grove Definition Facility
+bibloc    Bibliographic Location Address Facility
+dataloc   Data Location Address Facility
+datatok   Data Tokenizer Grove Construction Process
+grovedef  Grove Definition Facilities
+grovplan  Grove Plan Specification Facility
+HyLexTok  HyTime Lexical Tokenizer
+listloc   List Location Address Facility
+mixedloc  Mixed Location Address Facility
+multloc   Multiple Location Address Facility
+nameloc   Name Location Address Facility
+nmsploc   Name-space Location Address Facility
+pathloc   Path Location Address Facility
+pgrovdef  Primary Grove Definition Facility
+proploc   Property Location Address Facility
+queryloc  Query Location Address Facility
+refctl    Reference Control Facility
+referatt  Location Source Attribute of Referrer Facility
+refloc    Reference Location Address Facility
+reftype   Reference Typing Facility
+relloc    Relative Location Address Facility
+spanloc   Span Location Address Facility
+treecom   Tree Combination Facility
+treeloc   Tree Location Address Facility
+treetype  Tree Type Specification Facility
+
+[Hyperlink Module]
+
+agglink   Aggregation Hyperlink Facility
+anchloc   Anchor Location Address Facility
+clink     Contextual Hyperlink Facility
+hylink    Hyperlink Relationship Facility
+ilink     Independent Hyperlink Facility
+linkloc   Hyperlink Location Address Facility
+traverse  Hyperlink Traversal Rule Specification Facility
+varlink   Variable Hyperlink Facility
+
+[Scheduling Module]
+
+calibrat  Axis Calibration Facility
+calspec   Calendar Specification Marker Function
+dimref    Dimension Referencing Facility
+fcsloc    Finite Coordinate Space Location Address Facility
+grpdex    Group Derived Extent Specification Facility
+grprepet  Group Repetition Facility
+HyCalSpc  HyTime Calendar Specification Notation
+HyExSpec  HyTime Extent Specification Notation
+HyExtLst  HyTime Extent List Notation
+HyGrand   HyTime Granule Definition Notation
+measure   Measurement Domain Definition Facility
+objalign  Object Alignment Facility
+pulsemap  Pulse Map Specification Facility
+sched     Scheduling Facility
+
+[Rendition Module]
+
+baton     Baton Projection Facility
+batonseq  Baton Sequence Projection Facility
+HyDimPro  HyTime Dimension Projector Notation
+HyExPro   HyTime Extent Projector Notation
+HyPro     HyTime Projector Notation
+modify    Object Modification Facility
+patch     Modifier Patch Facility
+project   Event Projection Facility
+proseq    Projector Sequence Facility
+wand      Wand Modification Facility
+wndpatch  Wand Patch Facility
+
+-->
+
+<?IS10744 USELEX HyTimelx>
+<!entity %
+   HyTimelx        -- HyTime lexical types --
+
+   PUBLIC "ISO/IEC 10744:1997//NONSGML LTDR LEXTYPES
+           HyTime Lexical Types//EN"
+>
+
+                     <!-- Combination options -->
+
+<!entity % grovedef "IGNORE">
+<![ %grovedef; [
+   <!entity % agrovdef "INCLUDE">
+   <!entity % pgrovdef "INCLUDE">
+]]>
+
+          <!-- General Architecture Support Declarations -->
+
+<!-- The following declarations ensure propagation of user-specified
+     General Architecture options. -->
+
+<!entity % altreps "IGNORE">
+<![ %altreps; [
+   <!entity % gaaltrp "altreps">
+]]>
+<!entity % gaaltrp "">
+
+<!entity % dafe "IGNORE">
+<![ %dafe; [
+   <!entity % gadafe "dafe">
+]]>
+<!entity % gadafe "">
+
+<!entity % dvlist "IGNORE">
+<![ %dvlist; [
+   <!entity % gadvl "dvlist">
+]]>
+<!entity % gadvl "">
+
+<!entity % HyLex "IGNORE">
+<![ %dafe; [
+   <!entity % gaHyLex "HyLex">
+]]>
+<!entity % gaHyLex "">
+
+<!entity % HyOrd "IGNORE">
+<![ %dafe; [
+   <!entity % gaHyOrd "HyOrd">
+]]>
+<!entity % gaHyOrd "">
+
+<!entity % included "IGNORE">
+<![ %included; [
+   <!entity % gaincl "included">
+]]>
+<!entity % gaincl "">
+
+<!entity % ireftype "IGNORE">
+<![ %ireftype; [
+   <!entity % gairftp "ireftype">
+]]>
+<!entity % gairftp "">
+
+<!entity % lextype "IGNORE">
+<![ %lextype; [
+   <!entity % galextp "lextype">
+]]>
+<!entity % galextp "">
+
+<!entity % opacity "IGNORE">
+<![ %opacity; [
+   <!entity % gaopaci "opacity">
+]]>
+<!entity % gaopaci "">
+
+<!entity % REGEX "IGNORE">
+<![ %dafe; [
+   <!entity % gaREGEX "REGEX">
+]]>
+<!entity % gaREGEX "">
+
+<!entity % superdcn "IGNORE">
+<![ %superdcn; [
+   <!entity % gaspdcn "superdcn">
+]]>
+<!entity % gaspdcn "">
+
+<?IS10744 ArcBase GenArc>
+
+<!NOTATION GenArc
+   PUBLIC "ISO/IEC 10744:1997//NOTATION AFDR ARCBASE
+           General Architecture//EN"
+>
+<!ATTLIST #NOTATION GenArc
+   ArcFormA NAME     #FIXED GAForm
+   ArcNamrA NAME     #FIXED GANames
+   ArcSuprA NAME     #FIXED GASupr
+   ArcIgnDA NAME     #FIXED GAIgnD
+   ArcDocF  NAME     #FIXED GADoc
+   ArcDTD   CDATA    #FIXED "%GenArc"
+   ArcDataF NAME     #FIXED GABridN
+   ArcBridF NAME     #FIXED GABrid
+   ArcAuto  NMTOKEN  #FIXED ArcAuto
+   ArcOptSA NAMES    #FIXED "commatts dcnatts"
+   commatts CDATA    #FIXED "%gadafe; %gadvl; %gaHyLex; %gaHyOrd;
+                             %gairftp; %galextp; %gaopaci; %gaREGEX;"
+   dcnatts  CDATA    #FIXED "%gaaltrp; %gaincl; %gaspdcn;"
+>
+<!entity % GenArc
+   PUBLIC "ISO/IEC 10744:1997//DTD AFDR Meta-DTD
+           General Architecture//EN"
+>
+
+<!-- This includes the General Architecture meta-DTD, making all of
+     its facilities available through HyTime. -->
+
+%GenArc;
+
+          <!-- HyTime Architecture Support Declarations -->
+
+<!-- These support declarations allow some HyTime forms to be defined
+     in terms of other HyTime forms, saying that, for instance, a
+     "clink" is a kind of "hylink", or that a "nameloc" is a kind of
+     "mixedloc". -->
+
+<!-- The following declarations include the HyBase facilities needed
+     to support specified user options. -->
+
+<!entity % conloc "IGNORE">
+<![ %conloc; [
+   <!entity % hbvalref "valueref">
+   <!entity % HyBase "INCLUDE">
+]]>
+
+<!entity % dimspec "IGNORE">
+<![ %dimspec; [
+   <!entity % hbmrkfun "markfun">
+   <!entity % HyBase "INCLUDE">
+]]>
+
+<!entity % multloc "IGNORE">
+<!entity % nameloc "IGNORE">
+<!entity % HyLexTok "IGNORE">
+<!entity % dataloc "IGNORE">
+<!entity % datatok "IGNORE">
+<!entity % queryloc "IGNORE">
+<!entity % referatt "IGNORE">
+<!entity % spanloc "IGNORE">
+<!entity % treetype "IGNORE">
+<![ %dataloc; [
+   <![ %referatt; [
+      <!entity % hbrefrat "referatt">
+   ]]>
+   <![ %multloc; [
+      <!entity % hbmultlc "multloc">
+   ]]>
+   <![ %spanloc; [
+      <!entity % hbspanlc "spanloc">
+      <![ %treetype; [
+         <!entity % hbtreetp "treetype">
+      ]]>
+   ]]>
+   <![ %HyLexTok; [
+      <!entity % hbhylxtk "HyLexTok">
+   ]]>
+   <!entity % hbdattok "datatok">
+   <!entity % HyBase "INCLUDE">
+]]>
+
+<![ %HyLexTok; [
+   <!entity % hbdattok "datatok">
+   <!entity % HyBase "INCLUDE">
+]]>
+
+<![ %datatok; [
+   <!entity % hbagrvdf "agrovdef">
+   <!entity % HyBase "INCLUDE">
+]]>
+
+<![ %nameloc; [
+   <![ %queryloc; [
+      <!entity % hbqryloc "queryloc">
+   ]]>
+   <![ %referatt; [
+      <!entity % hbrefrat "referatt">
+   ]]>
+   <![ %multloc; [
+      <!entity % hbmultlc "multloc">
+   ]]>
+   <![ %spanloc; [
+      <!entity % hbspanlc "spanloc">
+      <![ %treetype; [
+         <!entity % hbtreetp "treetype">
+      ]]>
+   ]]>
+   <!entity % hbmixloc "mixedloc">
+   <!entity % hbnmsplc "nmsploc">
+   <!entity % HyBase "INCLUDE">
+]]>
+
+<!entity % linkloc "IGNORE">
+<![ %linkloc; [
+   <![ %referatt; [
+      <!entity % hbrefrat "referatt">
+   ]]>
+   <![ %multloc; [
+      <!entity % hbmultlc "multloc">
+   ]]>
+   <![ %spanloc; [
+      <!entity % hbspanlc "spanloc">
+      <![ %treetype; [
+         <!entity % hbtreetp "treetype">
+      ]]>
+   ]]>
+   <!entity % hbqryloc "queryloc">
+   <!entity % HyBase "INCLUDE">
+]]>
+
+<!entity % anchloc "IGNORE">
+<![ %anchloc; [
+   <![ %referatt; [
+      <!entity % hbrefrat "referatt">
+   ]]>
+   <![ %multloc; [
+      <!entity % hbmultlc "multloc">
+   ]]>
+   <![ %spanloc; [
+      <!entity % hbspanlc "spanloc">
+      <![ %treetype; [
+         <!entity % hbtreetp "treetype">
+      ]]>
+   ]]>
+   <!entity % hbqryloc "queryloc">
+   <!entity % HyBase "INCLUDE">
+]]>
+
+<!entity % clink "IGNORE">
+<!entity % traverse "IGNORE">
+<![ %clink; [
+   <![ %traverse; [
+      <!entity % hbtrav "traverse">
+   ]]>
+   <!entity % hbhylink "hylink">
+   <!entity % HyBase "INCLUDE">
+]]>
+
+<!entity % agglink "IGNORE">
+<![ %agglink; [
+   <![ %traverse; [
+      <!entity % hbtrav "traverse">
+   ]]>
+   <!entity % hbhylink "hylink">
+   <!entity % hbrefloc "refloc">
+   <!entity % HyBase "INCLUDE">
+]]>
+
+<!entity % dimref "IGNORE">
+<![ %dimref; [
+   <!entity % hbmrkfun "markfun">
+   <!entity % HyBase "INCLUDE">
+]]>
+
+<!entity % calspec "IGNORE">
+<![ %calspec; [
+   <!entity % hbmrkfun "markfun">
+   <!entity % HyBase "INCLUDE">
+]]>
+
+<!entity % hbmrkfun "">
+<!entity % hbvalref "">
+<!entity %
+   hbbase         -- HyBase base module options --
+
+   '"%hbmrkfun; %hbvalref;"'
+>
+
+<!entity % hbagrvdf "">
+<!entity % hbmixloc "">
+<!entity % hbnmsplc "">
+<!entity % hbhylxtk "">
+<!entity % hbdattok "">
+<!entity % hbqryloc "">
+<!entity % hbrefloc "">
+<!entity % hbrefrat "">
+<!entity % hbmultlc "">
+<!entity % hbspanlc "">
+<!entity % hbtreetp "">
+<!entity %
+   hblocs         -- HyBase location address module options --
+
+   '"%hbagrvdf; %hbmixloc; %hbnmsplc; %hbhylxtk; %hbdattok; %hbqryloc;
+     %hbrefloc; %hbrefrat; %hbmultlc; %hbspanlc; %hbtreetp;"'
+>
+
+<!entity % hbhylink "">
+<!entity % hbtrav "">
+<!entity %
+   hblinks        -- HyBase hyperlinking module options --
+
+   '"%hbhylink; %hbtrav;"'
+>
+
+<!entity % HyBase "IGNORE">
+<![ %HyBase; [
+<?IS10744 ArcBase HyBase>
+
+<!NOTATION HyBase
+   PUBLIC "ISO/IEC 10744:1997//NOTATION AFDR ARCBASE
+           Hypermedia/Time-based Structuring Language (HyTime)//EN"
+>
+<!ATTLIST #NOTATION HyBase
+   ArcFormA NAME     #FIXED HyBase
+   ArcNamrA NAME     #FIXED HyBNames
+   ArcDocF  NAME     #FIXED HyDoc
+   ArcDTD   CDATA    #FIXED "HyBase"
+   ArcDataF NAME     #FIXED HyBridN
+   ArcBridF NAME     #FIXED HyBrid
+   ArcAuto  NMTOKEN  #FIXED nArcAuto
+   ArcOptSA NAMES    #FIXED "GenArc base locs links sched rend"
+   GenArc   CDATA    #IMPLIED
+   base     CDATA    #FIXED %hbbase;
+   locs     CDATA    #FIXED %hblocs;
+   links    CDATA    #FIXED %hblinks;
+   sched    CDATA    #IMPLIED
+   rend     CDATA    #IMPLIED
+>
+
+<!NOTATION AFDRMeta
+   PUBLIC "ISO/IEC 10744:1997//NOTATION AFDR Meta-DTD Notation//EN"
+>
+<!ENTITY HyBase
+   PUBLIC "ISO/IEC 10744:1997//DTD AFDR Meta-DTD
+           Hypermedia/Time-based Structuring Language (HyTime)//EN"
+   CDATA AFDRMeta
+>
+]]><!-- HyBase -->
+
+              <!-- Content model parameter entities -->
+<!entity % GACFC "GABrid" >
+<!entity %
+   HyCFC          -- HyTime context-free content --
+                  -- Note: %loc, %link, %resorce qualify but are used
+                     as meta-inclusions rather than meta-proper-
+                     subelements --
+
+   "%GACFC;|HyBrid|fcs"
+>
+<!entity %
+   loc            -- Location address forms --
+
+   "anchloc|bibloc|dataloc|fcsloc|linkloc|listloc|mixedloc|nameloc|
+    nmsploc|pathloc|proploc|queryloc|relloc|treeloc"
+>
+<!entity %
+   link           -- Hyperlink forms --
+
+   "agglink|clink|hylink|ilink|varlink"
+>
+<!entity %
+   resbase        -- Base module resource forms --
+
+   "actrule|bosspec|desctab"
+>
+<!entity %
+   resloc         -- Location address module resource forms --
+
+   "agrovdef|datatok|grovplan|pgrovdef"
+>
+<!entity %
+   resschd        -- Scheduling module resource forms --
+
+   "calspec|evsched|extent|extlist|measure"
+>
+<!entity %
+   resrend        -- Rendition module resource forms --
+
+   "baton|batrule|batseq|modpatch|modrule|projectr|prorule|proseq|
+    rendrule|wandrule|wand|wndpatch"
+>
+<!entity %
+   resorce        -- All resource architectural forms --
+
+   "%resbase;|%resloc;|%resschd;|%resrend;"
+>
+<!entity %
+   marklist       -- Axis marker list content model --
+                  -- Clause: 6.8.1.1 --
+                  -- Data and elements that resolve to lists of
+                     markers. --
+
+   "#PCDATA|dimref|markfun"
+>
+<!entity %
+   dimlist        -- HyTime Dimension List content --
+                  -- Clause: 6.8.4 --
+   "%marklist;|dimspec"
+>
+
+<!element
+   HyDoc          -- HyTime document element --
+                  -- Clause: 6.4 --
+   - O
+   (%HyCFC;)*
+   +(%link;|%loc;|%resorce;)
+
+-- OptionalAttributes [base]: bos, bosspcat --
+-- OptionalAttributes [locs]: dgrvplan --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id, irefmodl,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+
+            <!-- HyTime Architectural Bridging Element -->
+<!element
+   HyBrid         -- HyTime architectural bridging element --
+                  -- Clause: 6.6 --
+
+   - O
+   (%HyCFC;)*
+
+-- Attributes [base]: HyBrid --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id, irefmodl,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   HyBrid         -- HyTime architectural bridging element --
+                  -- Clause: 6.6 --
+
+   GenArc   NAME     #FIXED GABrid
+>
+
+           <!-- HyTime Architectural Bridging Notation -->
+<!notation
+   HyBridN        -- HyTime architectural bridging notation --
+                  -- Clause: 6.6 --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Architectural Bridging Notation//EN"
+
+-- Attributes [base]: HyBridN --
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!attlist #NOTATION
+   HyBridN        -- HyTime architectural bridging notation --
+                  -- Clause: 6.6 --
+
+   GenArc   NAME     #FIXED GABridN
+>
+
+<!entity % bosspec "IGNORE">
+
+<![ %bosspec; [
+<!attlist
+-- bosspcat --    -- BOS except specification attributes --
+                  -- Clause: 6.5.3 --
+   (HyDoc)
+   bosspec        -- Bounded object set exception specification --
+                  -- Adjustments to be made to the bounded object
+                     set. --
+      IDREFS      -- Reference --
+                  -- Reftype: bosspec+ --
+                  -- Constraint: must be internal reference --
+      #IMPLIED    -- Default: no BOS exception specification --
+>
+]]><!-- bosspec -->
+
+         <!-- Bounded Object Set Exception Specification -->
+<![ %bosspec; [
+<!element
+   bosspec        -- Bounded object set exception specification --
+                  -- Clause: 6.5 --
+                  -- Used to affect the HyTime BOS by overriding the
+                     inclusion or exclusion and priority of the
+                     entities identified by the BOS path or paths
+                     given as content. --
+   - O
+   (#PCDATA)      -- Lextype: ((ENTITY,(csname|literal)*)|
+                               (GRPO,ENTITY,(csname|literal)*,GRPC)+)
+                     --
+                  -- Constraint: If parentheses are used, each
+                     parenthesized list is a separate BOS path. --
+                  -- Constraint: Each word or literal in a BOS path is
+                     the name of an entity declared in the entity
+                     identified by the previous word, literal, or
+                     entity name. --
+
+-- Attributes [base]: bosspec --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id, irefmodl,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [base]: HyDoc:bosspec --
+>
+<!attlist
+   bosspec        -- Bounded object set exception specification --
+                  -- Clause: 6.5 --
+
+   boslevel       -- BOS level --
+                  -- The BOS level from the last entity named in
+                     each specified BOS path to be affected by this
+                     bosspec. --
+      NUMBER      -- Constraint: depth of nested entities to include
+                     in BOS (0=no limit, 1=last entity only) --
+      1
+
+   inbos          -- Include in BOS --
+                  -- Unconditionally include or exclude objects
+                     declared by the last entity named in each BOS
+                     path, to the BOS level specified by this
+                     bosspec's boslevel attribute. --
+      (inbos|notinbos)
+      #IMPLIED    -- Default: BOS unaffected --
+
+   bosprrty       -- Bounded object set priority --
+                  -- Unconditionally specify the BOS priority of
+                     objects declared by the last entity named in each
+                     BOS path, to the BOS level specified by this
+                     bosspec's boslevel attribute. --
+                  -- Note: The semantic of the bosprrty attribute is
+                     not affected by the value of the inbos attribute
+                     (that is, whether it is explicitly "inbos" or the
+                     value is implied). --
+      (foregrnd|backgrnd)
+      #IMPLIED    -- Default: no priority change --
+>
+]]><!-- bosspec -->
+
+<!entity % bos "IGNORE">
+
+<![ %bos; [
+<!attlist
+   -- bos --      -- HyTime bounded object set --
+                  -- Clause: 6.5.1 --
+  (HyDoc)
+
+   maxbos         -- Maximum bounded object set level --
+                  -- Bounding level of HyTime bounded object set when
+                     document is a hub or subhub. --
+      NUMBER      -- Constraint: depth of nested entities to include
+                     in BOS (0=no limit, 1=hub only) --
+      0
+
+   boslevel       -- Bounded object set level --
+                  -- Default BOS level used by data entities declared
+                     in hub document. --
+      NUMBER      -- Constraint: depth of nested entities to include
+                     in BOS (0=no limit, 1=this entity only) --
+      #IMPLIED    -- Default: No HyTime BOS --
+
+>
+]]><!-- bos -->
+
+             <!-- HyTime BOS Control Data Attributes -->
+<![ %bos; [
+<!attlist #NOTATION
+-- bosdatt --     -- HyTime BOS control data attributes --
+                  -- Clause: 6.5.2 --
+   #ALL
+
+   boslevel       -- BOS level --
+                  -- Bounded object set level for the entity --
+      NUMBER      -- Constraint: depth of nested entities to include
+                     in BOS (0=no limit, 1=this entity only) --
+      #IMPLIED    -- Default: value of boslevel attribute of HyDoc
+                     element. --
+
+   inbos          -- Include in BOS --
+                  -- Unconditional include in, or exclude from, BOS --
+      (inbos|notinbos)
+      #IMPLIED    -- Default: inclusion controlled by BOS level --
+
+   bosprrty       -- Bounded object set priority --
+                  -- Default BOS priority of objects in entity tree
+                     rooted at this entity. --
+      (foregrnd|backgrnd)
+      foregrnd
+
+   subhub         -- Is entity a subhub? --
+      (subhub|nosubhub)
+      nosubhub
+>
+]]><!-- bos -->
+
+<!entity % valueref "IGNORE">
+
+             <!-- Value Reference Attribute Namer -->
+<![ %valueref; [
+<!attlist
+-- valueref --    -- Value reference attribute namer --
+                  -- Clause: 6.7.1 --
+   #ALL
+
+   valueref       -- Value reference attribute namer --
+                  -- Associates attributes (or element's content) with
+                     referential attributes (or content) that can be
+                     used to refer to the semantic value of the
+                     attribute or content. --
+      CDATA       -- Lextype: ((ATTORCON|"#ELEMENT"),ATTORCON)+ --
+                  -- Note: The first ATTORCON is the attribute or
+                     content for which the value is to be addressed,
+                     the second ATTORCON is the attribute or content
+                     by which the value reference is made. --
+                  -- Constraint: second attribute in each pair must be
+                     a referential attribute or content defined as
+                     referential by the refloc facility. --
+                  -- Constraint: "#ELEMENT" and "#CONTENT" may only
+                     occur once as first keyword of pair.  "#CONTENT"
+                     may only occur once as second keyword of pair. --
+      #IMPLIED    -- Constant --
+>
+]]><!-- valueref -->
+
+<!entity % HyExSpec "IGNORE">
+
+            <!-- HyTime Extent Specification Notation -->
+<![ %HyExSpec; [
+<!notation
+   HyExSpec       -- HyTime Extent Specification Notation --
+                  -- Clause: 9.4.4 --
+                  -- A list of dimensions (in the HyTime Dimension
+                     List Notation, after resolution of marker
+                     functions) that together specify a single extent
+                     on one or more axes. --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Dimension Specification Notation//EN"
+
+-- Attributes [sched]: HyExSpec --
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!attlist #NOTATION
+   HyExSpec       -- HyTime Extent Specification Notation --
+                  -- Clause: 9.4.4 --
+
+   GenArc   NAME     #FIXED GABridN
+   superdcn NAME     #FIXED HyDimLst
+>
+<!entity % HyDimLst "INCLUDE" >
+<!entity % sched "INCLUDE">
+]]><!-- HyExSpec -->
+
+<!entity % HyExtLst "IGNORE">
+
+                 <!-- HyTime Extent List Notation -->
+<![ %HyExtLst; [
+<!notation
+   HyExtLst       -- HyTime Extent List Notation --
+                  -- A list of extents each of which may be specified
+                     as an extent, part of another extent list, or or
+                     as all or part of a list of axis markers
+                     explicitly entered or returned by a marker
+                     function. --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Extent List Notation//EN"
+
+-- Attributes [sched]: HyExtLst --
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!attlist #NOTATION
+   HyExtLst       -- HyTime Extent List Notation --
+                  -- Clause: 9.4.6 --
+
+   GenArc   NAME     #FIXED GABridN
+   superdcn NAME     #FIXED HyDimLst
+>
+<!entity % HyDimLst "INCLUDE" >
+<!entity % sched "INCLUDE">
+]]><!-- HyExtLst -->
+
+<!entity % HyDimSpc "IGNORE">
+
+                   <!-- Dimension specification -->
+<![ %dimspec; [
+<![ %HyDimSpc; [
+   <!entity % ddimspec "HyDimSpc">
+]]>
+<!entity %
+   ddimspec       -- Default dimension specification notation --
+                  -- Clause: 6.8.3 --
+
+   "#REQUIRED"
+>
+<!element
+   dimspec        -- Dimension specification --
+                  -- Clause: 6.8.3 --
+                  -- A position and quantum count along a single
+                     axis. When used as a marker function, returns a
+                     pair of positive axis markers, the first being
+                     the position of the first quantum of the
+                     dimension and the second being the quantum count
+                     of the dimension. --
+   O O
+   (%HyCFC;|%marklist;)*
+                  -- Constraint: Content must conform to the notation
+                     specified in the dimspec's notation attribute. --
+
+-- Attributes [base]: dimspec --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id, irefmodl,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   dimspec        -- Dimension specification --
+                  -- Clause: 6.8.3 --
+
+   HyBase   NAME     #FIXED markfun
+
+   notation       -- Dimension specification notation --
+      NAME        -- Lextype: NOTATION --
+      %ddimspec;
+>
+]]><!-- dimspec -->
+
+<!entity % fcsloc "IGNORE">
+
+          <!-- Finite coordinate space location address -->
+<![ %fcsloc; [
+<![ %HyExtLst; [
+   <!entity % dfcslcnt "HyExtLst">
+]]>
+<!entity %
+   dfcslcnt       -- Default fcsloc extent list notation --
+                  -- Clause: 9.10 --
+
+   "#REQUIRED"
+>
+<!element
+   fcsloc         -- Finite coordinate space location address --
+                  -- Clause: 7.10.2 --
+                  -- Addresses events, modscopes, and proscopes (or
+                     the objects, modifiers, and projectors they
+                     contain) in finite coordinate spaces. --
+                  -- Constraint: location source must be an FCS, event
+                     schedule, wand, or baton --
+   - O
+   (%dimlist;|extent|extlist)*
+                  -- Constraint: if no extent list notation is
+                     specified, content must consist of only extent
+                     and extlist elements. --
+
+-- Attributes [base]: overrun --
+-- Attributes [locs]: locsrc, impsrc --
+-- Attributes [sched]: fcsloc --
+-- OptionalAttributes [locs]: multloc, referatt, spanloc, treetype --
+-- OptionalAttributes [sched]: rfcsloc --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   fcsloc         -- Finite coordinate space location address --
+                  -- Clause: 9.10 --
+
+   HyBase   NAME     #FIXED queryloc
+
+   notation       -- Extent list notation for selection --
+      NAME        -- Lextype: NOTATION --
+      %dfcslcnt;  -- Default: content must consist of only extent and
+                     extlist elements. --
+
+   select         -- Precision of selection --
+                  -- Description: How much of an event, modscope, or
+                     proscope must appear within the selection
+                     boundary in order for it (or the object,
+                     modifier, or proscope that it schedules) to be
+                     selected. --
+      CDATA       -- Lextype: ("#ALL"|"#ANY"|(unzi,granule?))+ --
+                  -- Constraint: one for each axis of location source
+                     or one for all axes. --
+                  -- Constraint: Precision unzi is specified in terms
+                     of the following granule, if supplied; otherwise
+                     in terms of the axis HMU defined for the schedule. --
+      "#ALL"      -- Default: event, modscope, or proscope must be
+                     entirely within selection boundary in order to be
+                     selected. --
+
+   objects        -- Events or objects? --
+                  -- Node type to select: events, modscopes, or
+                     proscopes (events) or the objects, modifiers, and
+                     projectors that are scheduled by them
+                     (objects)? --
+      (events|objects)
+      events
+
+   dsdtypes       -- Directly scheduled types to select --
+                  -- Types of directly scheduled elements to be
+                     selected. --
+      CDATA       -- Lextype: ("#ALL"|("#EVENT"|"#MODSCOP"|
+                                       "#PROSCOP"|GI)*) --
+                  -- Constraint: Can be any combination of #EVENT,
+                     #MODSCOP, #PROSCOP, and the GIs of event,
+                     modscope or proscope form elements.  Can also be
+                     #ALL. --
+      #IMPLIED    -- Default: For each form of element used as locsrc:
+                       locsrc element:       default value:
+                       - - - - - - -         - - - - - - -
+                         evsched               "#EVENT"
+                         wand                  "#MODSCOP"
+                         baton                 "#PROSCOP"
+                         fcs                   "#ALL"
+                     --
+>
+<!entity % sched "INCLUDE">
+<!entity % locsrc "INCLUDE">
+<!entity % impsrc "INCLUDE">
+<!entity % overrun "INCLUDE">
+]]><!-- fcsloc -->
+
+                   <!-- Calendar Specification -->
+<![ %calspec; [
+<!notation
+   HyCalFun       -- HyTime Calendar Marker Function Notation --
+                  -- Clause: 9.9.2 --
+                  -- A calendar specification is a marker function to
+                     be used to specify a quantum along a coordinate
+                     axis whose measurement domain is real time (that
+                     is, SIsecond) and that has been calibrated using
+                     HyCalSpc notation.  If used as the first marker
+                     of a dimension specification, a positive marker
+                     is returned.  If used as the second marker of a
+                     dimension specification, a negative marker is
+                     returned. --
+                  -- Constraint: highest-order date/time component
+                     specified cannot exceed that specified for axis
+                     calibration. --
+                  -- Constraint: omitted date/time components are
+                     those of previous specified calspec for this
+                     schedule. --
+                  -- Lextype: ((JULDATE|fulldate|monthday|day)?,
+                               (UTCtime|hrminsec|hrmin|minute)?,
+                               timeoff*) --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Calendar Marker Function Notation//EN"
+
+-- Attributes [sched]: HyCalFun --
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!attlist #NOTATION
+   HyCalFun       -- HyTime Calendar Marker Function Notation --
+                  -- Clause: 9.9.2 --
+
+   GenArc   NAME     #FIXED GABridN
+   superdcn NAME     #FIXED HyCalSpc
+
+   GMTorUTC       -- GMT or UTC timescale --
+                  -- Note: (GMT noon = UTC midnight) --
+      (GMT|UTC)
+      UTC
+>
+<!element
+   calspec        -- Calendar Specification --
+                  -- Clause: 9.9.2 --
+   O O
+   (%HyCFC;)*     -- Lextype: ((JULDATE|fulldate|monthday|day)?,
+                               (UTCtime|hrminsec|hrmin|minute)?,
+                               timeoff*) --
+                  -- Constraint: If neither JULDATE nor fulldate is
+                     present, previously specified year and other
+                     larger quanta will be assumed. --
+
+-- Attributes [sched]: calspec --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   calspec        -- Calendar Specification --
+                  -- Clause: 9.9.2 --
+
+   HyBase   NAME     #FIXED markfun
+   notation NOTATION (HyCalFun) #FIXED HyCalFun
+
+   GMTorUTC       -- GMT or UTC timescale --
+                  -- Note: (GMT noon = UTC midnight) --
+      (GMT|UTC)
+      UTC
+>
+<!entity % HyCalSpc "INCLUDE">
+]]><!-- calspec -->
+
+                <!-- Explicit Dimension Reference -->
+<![ %dimref; [
+<!notation
+   dimref         -- Explicit dimension reference marker function
+                     notation --
+                  -- Clause: 9.8.2.1 --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Explicit dimension reference marker function notation//EN"
+
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!element
+   dimref         -- Explicit dimension reference --
+                  -- Clause: 9.8.2.1 --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [sched]: dimref --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   dimref         -- Explicit dimension reference --
+                  -- Clause: 9.8.2.1 --
+
+   HyBase   NAME     #FIXED markfun
+   notation NOTATION (dimref) #FIXED dimref
+
+   elemspec       -- Element specified --
+                  -- Element from which referenced dimension is
+                     derived --
+      CDATA       -- Reference --
+                  -- Reftype: (baton|event|evgrp|evsched|extent|
+                               extlist|fcs|modgrp|modscope|progrp|
+                               proscope|wand) --
+      #REQUIRED
+
+   selcomp        -- Selected component of dimension --
+                  -- Dimension component of specified element to be
+                     referenced.
+                        first:    First or lowest quantum
+                        last:     Last or highest quantum
+                        qcnt:     Quantum count --
+      (first|last|qcnt)
+      qcnt
+
+   flip           -- Flip selected component --
+                  -- Whether or not to invert the referenced dimension
+                     component.  Specifically:
+                        noflip:   First is reported as a positive
+                                  integer corresponding to the number
+                                  of the first quantum counting from
+                                  the beginning of the axis, last is
+                                  reported as a negative integer
+                                  corresponding to the number of the
+                                  last quantum counting from the end of
+                                  the axis, and qcnt is reported as a
+                                  positive integer.
+                        flip:     First is reported as a negative
+                                  integer corresponding to the number
+                                  of first quantum counting from the
+                                  end of the axis, last is reported as
+                                  a positive integer corresponding to
+                                  the number of the last quantum
+                                  counting from the beginning of the
+                                  axis, and qcnt is reported as a
+                                  negative integer. --
+      (flip|noflip)
+      noflip
+
+   schdspec       -- Element with sched attribute form specified --
+                  -- Establishes context in which extents are
+                     interpreted: FCS, axis order, and HMU --
+                  -- Constraint: Ignored if element specified is
+                     evsched, wand, baton or fcs. --
+      CDATA       -- Reference --
+                  -- Reftype: (baton|evsched|wand)? --
+      #IMPLIED    -- Default: dimref is treated as if the containing
+                     element with the sched attribute form is
+                     referenced by schdspec. --
+                  -- Constraint: Required if elemspec is extent or
+                     extlist. --
+
+   axisspec       -- Axis specified --
+                  -- Axis on which referenced dimension occurs --
+      NAME        -- Lextype: AXISNM --
+                  -- Constraint: must be valid axis name of FCS in
+                     which the referenced dimension occurs. --
+      #IMPLIED    -- Default: only axis --
+
+   dimnum         -- Dimension number --
+      NUMBER      -- Constraint: 1 = first dimension in order of
+                     appearance on axis --
+      #IMPLIED    -- Default: smallest dimension encompassing all
+                     dimensions --
+
+   extnum         -- Extent number --
+      NUMBER      -- Constraint: 1 = first or only extent in order of
+                     specification/appearance in document --
+      #IMPLIED    -- Default: combination of all relevant extents --
+
+   granule        -- Granule for reporting --
+                  -- Granule for reporting referenced dimension --
+      CDATA       -- Lextype: granule --
+                  -- Constraint: granule must be defined in terms of
+                     the same SMU as axis --
+      #IMPLIED    -- Default: MDU of axis of referenced dimension --
+
+   roffgran       -- Round off to granule handling --
+                  -- Specifies how to handle roundoff.
+                        roerr:    Report error if rounding is required.
+                        rocmplet: Round off to minimum complete
+                                  dimension; that is, minimum dimension
+                                  expressible in terms of the granule
+                                  specified that completely covers the
+                                  actual dimension.
+                        roscant:  Round off to maximum complete
+                                  dimension; that is, maximum dimension
+                                  expressible in terms of the granule
+                                  specified that is fully occupied by
+                                  the actual dimension
+                        roboundy: Round off to dimension boundaries;
+                                  that is, dimension that places the
+                                  boundaries of the reported dimension
+                                  as close as possible to the
+                                  boundaries of the actual
+                                  dimension. --
+      (roboundy|rocmplet|roerr|roscant)
+      roboundy
+
+   dsdtypes       -- Directly scheduled types for calculating
+                     referenced dimension --
+                  -- Types of directly scheduled elements to be taken
+                     into account when calculating the referenced
+                     dimension. --
+      CDATA       -- Lextype: ("#ALL"|("#BATON"|"#EVENT"|"#EVGRP"|
+                                       "#EVSCHED"|"#EXTENT"|
+                                       "#EXTLIST"|"#FCS"|"#MODGRP"|
+                                       "#MODSCOP"|"#PROGRP"|
+                                       "#PROSCOP"|"#WAND"|GI)*) --
+                  -- Constraint: GIs must be of event, modscope,
+                     proscope, evgrp, modgrp, progrp, evsched, wand,
+                     baton, or fcs form elements. --
+      #IMPLIED    -- Default: Depends on form of element specified, as
+                     follows:
+                      element specified:    default value:
+                      - - - - - - - - -     - - - - - - -
+                      extent                (null string)
+                      extlist, event,
+                      modscope or proscope  "#EXTENT #EXTLIST"
+                      evgrp or evsched      "#EXTENT #EXTLIST #EVENT
+                                             #EVGRP"
+                      modgrp or wand        "#EXTENT #EXTLIST #MODSCOP
+                                             #MODGRP"
+                      progrp or baton       "#EXTENT #EXTLIST #PROSCOP
+                                             #PROGRP"
+                      fcs                   "#ALL" --
+>
+<!entity % sched "INCLUDE">
+]]><!-- dimref -->
+
+              <!-- Hyperlink Anchor Location Address -->
+<![ %anchloc; [
+<!notation
+   HyAncLoc       -- HyTime hyperlink anchor queryloc notation --
+                  -- Clause: 8.3.2 --
+                  -- Constraint: location source objects must be
+                     hyperlinks or documents --
+                  -- Constraint: if implied location source is
+                     "ptreert" or "referrer" (and referrer is not a
+                     hyperlink) location source is document in which
+                     the primary tree root or referrer occur. --
+                  -- Lextype: (csname|literal)* --
+                  -- Constraint: csnames and literals are anchor
+                     role names of links in location source. --
+                  -- Constraint: if no anchor roles specified,
+                     addresses all anchors of links in location
+                     source. --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Hyperlink Anchor Queryloc Notation//EN"
+
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!element
+   anchloc        -- Hyperlink anchor location address --
+                  -- Clause: 8.3.2 --
+                  -- Constraint: location source objects must be
+                     hyperlinks or documents --
+                  -- Constraint: if implied location source is
+                     "ptreert" or "referrer" (and referrer is not a
+                     hyperlink) location source is document in which
+                     the primary tree root or referrer occur. --
+   - O
+   (#PCDATA)      -- Lextype: (csname|literal)* --
+                  -- Constraint: csnames and literals are anchor
+                     role names of links in location source. --
+                  -- Constraint: if no anchor roles specified,
+                     addresses all anchors of links in location
+                     source. --
+
+-- Attributes [locs]: locsrc, impsrc --
+-- Attributes [links]: anchloc --
+-- OptionalAttributes [locs]: multloc, referatt, spanloc, treetype --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   anchloc        -- Hyperlink anchor location address --
+                  -- Clause: 8.3.2 --
+
+   HyBase   NAME     #FIXED queryloc
+   notation NOTATION (HyAncLoc) #FIXED HyAncLoc
+
+   notfound       -- No data found --
+      NAME        -- Lextype: ("ERROR"|"IGNORE") --
+      ERROR
+>
+<!entity % locsrc "INCLUDE">
+<!entity % impsrc "INCLUDE">
+]]><!-- anchloc -->
+
+                 <!-- Hyperlink location address -->
+<![ %linkloc; [
+<!notation
+   HyLnkLoc       -- HyTime hyperlink queryloc notation --
+                  -- Clause: 8.3.1 --
+                  -- Constraint: if implied location source is
+                     "ptreert" or "referrer" location source is
+                     document in which the primary tree root or
+                     referrer occur. --
+                  -- Lextype: (csname|literal)+ --
+                  -- Constraint: csnames and literals must be link
+                     types (GIs) in location source. --
+                  -- Constraint: if no link types specified, addresses
+                     all links in location source. --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Hyperlink Queryloc Notation//EN"
+
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!element
+   linkloc        -- Hyperlink location address --
+                  -- Clause: 8.3.1 --
+                  -- Constraint: if implied location source is
+                     "ptreert" or "referrer" location source is
+                     document in which the primary tree root or
+                     referrer occur. --
+   - O
+   (#PCDATA)      -- Lextype: (csname|literal)+ --
+                  -- Constraint: csnames and literals must be link
+                     types (GIs) in location source. --
+                  -- Constraint: if no link types specified, addresses
+                     all links in location source. --
+
+-- Attributes [locs]: locsrc, impsrc --
+-- Attributes [links]: linkloc --
+-- OptionalAttributes [locs]: multloc, referatt, spanloc, treetype --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   linkloc        -- Hyperlink location address --
+                  -- Clause: 8.3.1 --
+
+   HyBase   NAME     #FIXED queryloc
+   notation NOTATION (HyLnkLoc) #FIXED HyLnkLoc
+
+   notfound       -- No data found --
+      NAME        -- Lextype: ("ERROR"|"IGNORE") --
+      ERROR
+>
+<!entity % locsrc "INCLUDE">
+<!entity % impsrc "INCLUDE">
+]]><!-- linkloc -->
+
+                   <!-- Name List Specification -->
+<![ %nameloc; [
+<!element
+   nmlist         -- Name list specification --
+                  -- Clause: 7.9.6 --
+                  -- Addresses elements or entities in an SGML document --
+   - O
+   (#PCDATA)      -- Reference --
+                  -- Lextype: (IDREF|ENTITY)* --
+
+-- Attributes [locs]: nmlist, proplat, locsrc, impsrc --
+-- OptionalAttributes [locs]: multloc, referatt, spanloc, treetype --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   nmlist         -- Name list specification --
+                  -- Clause: 7.9.6 --
+
+   HyBase   NAME     #FIXED nmsploc
+   impsrc   NAME     #FIXED grovert
+   HyBnames CDATA    #FIXED "locsrc docorsub
+                             namespc nametype
+                                #MAPTOKEN elements element
+                                #MAPTOKEN entities entity"
+
+   nametype       -- Name-space from which nodes are selected --
+      (entity|element)
+      entity
+
+   docorsub       -- Document or subdocument location source --
+      ENTITY
+      #IMPLIED
+
+   notspace       -- If nmspace name is invalid? --
+      NAME        -- Lextype: ("ERROR"|"IGNORE") --
+      ERROR
+
+   notname        -- If name is not valid in nmspace? --
+      NAME        -- Lextype: ("ERROR"|"IGNORE") --
+      ERROR
+>
+<!entity % proplat "INCLUDE">
+<!entity % locsrc "INCLUDE">
+<!entity % impsrc "INCLUDE">
+]]><!-- nameloc -->
+
+              <!-- Name List Query Location Address -->
+<![ %nameloc; %queryloc; [
+<!element
+   nmquery        -- Name list query location address --
+                  -- Clause: 7.11.2 --
+                  -- Locates elements or entities by querying their
+                     properties. --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [locs]: locsrc, nmquery, impsrc --
+-- OptionalAttributes [locs]: multloc, referatt, spanloc, treetype --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   nmquery        -- Name list query location address --
+                  -- Clause: 7.11.2 --
+
+   HyBase   NAME     #FIXED queryloc
+   HyBnames CDATA    #FIXED "locsrc qdomain"
+
+   qdomain        -- Query domain --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: implied as described for impsrc --
+
+   notation       -- Query notation --
+      NAME        -- Lextype: NOTATION --
+      #REQUIRED
+
+   notfound       -- No data found --
+      NAME        -- Lextype: ("ERROR"|"IGNORE") --
+      ERROR
+>
+<!entity % locsrc "INCLUDE">
+<!entity % impsrc "INCLUDE">
+]]><!-- nmquery -->
+
+                   <!-- Named Location Address -->
+<![ %nameloc; [
+<!element
+   nameloc        -- Named Location Address --
+                  -- Clause: 7.9.5 --
+                  -- Assigns a local ID to one or more named objects --
+   - O
+   (nmlist|nmquery)*
+
+-- Attributes [locs]: nameloc --
+-- OptionalAttributes [locs]: multloc, spanloc, treetype --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   nameloc        -- Named Location Address --
+                  -- Clause: 7.9.5 --
+
+   HyBase   NAME     #FIXED mixedloc
+>
+]]><!-- nameloc -->
+
+                       <!-- Contextual Link -->
+<![ %clink; [
+<!element
+   clink          -- Contextual link --
+                  -- Clause: 8.2.2 --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [links]: clink --
+-- OptionalAttributes [links]: clinktra --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   clink          -- Contextual link --
+                  -- Clause: 8.2.2 --
+
+   HyBase   NAME     #FIXED hylink
+   HyBnames CDATA    #FIXED "refsub linkend"
+   anchrole CDATA    #FIXED "refmark refsub #LIST"
+   anchcstr NAMES    "self required"
+
+   linkend        -- Reference subject link end --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: omitted or conditional --
+                  -- Constraint: if left unspecified, must specify
+                     COND in anchcstr --
+>
+]]><!-- clink -->
+
+                      <!-- Aggregation Link -->
+<![ %agglink; [
+<!element
+   agglink        -- Aggregation link --
+                  -- Clause 8.2.3 --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [links]: agglink --
+-- OptionalAttributes [links]: traverse --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   agglink        -- Aggregation link --
+                  -- Clause 8.2.3 --
+
+   HyBase   NAME     #FIXED hylink
+   anchrole CDATA    #FIXED "agg members #LIST"
+   anchcstr NAMES    "self required"
+   loctype  CDATA    "members IDLOC"
+
+   members        -- Members of aggregate --
+      CDATA       -- Reference --
+                  -- Note: Because members is by default given the
+                     location address type IDLOC, its value is
+                     interpreted by default as if it were IDREFS,
+                     though the interpretation can be changed by
+                     specifying a different value for the loctype
+                     attribute. --
+      #IMPLIED    -- Default: omitted or conditional --
+                  -- Constraint: if left unspecified, must specify
+                     COND in anchcstr --
+>
+]]><!-- agglink -->
+
+                    <!-- Data Location Address -->
+<![ %dataloc; [
+<!element
+   dataloc        -- Data location address --
+                  -- Clause: 7.10.2 --
+                  -- Locates string and token data objects in data --
+   - O
+   (%dimlist;)*   -- Constraint: interpreted as a single list of
+                     dimension specifications --
+
+-- Attributes [base]: overrun --
+-- Attributes [locs]: dataloc, locsrc, impsrc --
+-- OptionalAttributes [locs]: dlhylex, multloc, referatt, spanloc,
+   treetype --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   dataloc        -- Data location address --
+                  -- Clause: 7.10.2 --
+
+   HyBase   NAME     #FIXED datatok
+   HyBnames CDATA    #FIXED "HyBase #DEFAULT
+                             #ARCCONT filter
+                             grovesrc locsrc"
+
+   filter         -- Tokenization filter --
+      CDATA       -- Constraint: If no data tokenizer notation
+                     specified, filter must be a single lexical type
+                     name. --
+      "str"
+
+   tokordat        -- Result to return: tokens or source data? --
+      (data|tokens)
+      data
+
+-- Attributes from datatok form --
+   catsrc    CDATA    #IMPLIED
+   cattoken  CDATA    #IMPLIED
+   catres    CDATA    #IMPLIED
+   boundary  (sodeod|sodiec|isceod|isciec|inmodel) isciec
+   maxtoksz  NUMBER   #IMPLIED
+>
+<!entity % locsrc "INCLUDE">
+<!entity % impsrc "INCLUDE">
+<!entity % overrun "INCLUDE">
+]]><!-- dataloc -->
+
+                      <!-- Content Location -->
+<![ %conloc; [
+<!attlist
+-- conloc --      -- Content Location --
+                  -- Clause: 6.7.1 --
+   #ALL
+
+   HyBase   NAME     #FIXED HyBrid
+   valueref CDATA    #FIXED "#CONTENT conloc"
+
+   conloc         -- Content location --
+                  -- Location of the element's semantic content. --
+      CDATA       -- Reference --
+      #CONREF     -- Default: syntactic content --
+>
+]]><!-- conloc -->
+
+<!entity % desctxt "IGNORE">
+
+                 <!-- Descriptive Text Attributes -->
+<![ %desctxt; [
+<!attlist
+-- dtxtatt --     -- Descriptive text attributes --
+                  -- Clause: 6.7.2.1 --
+   #ALL
+
+   desctxt        -- Descriptive text --
+                  -- If specified, its descdef in desctab is treated
+                     by HyTime as the element or as its content. --
+      CDATA       -- Lextype: words --
+      #CONREF     -- Default: syntactic content (and attributes) --
+
+   desctab        -- Description table --
+                  -- Current description tables --
+      CDATA       -- Reference --
+                  -- Reftype: desctab+ --
+                  -- Constraint: searched in order listed --
+      #IMPLIED    -- Default: use previously specified set of
+                     tables --
+>
+]]><!-- desctxt -->
+
+                      <!-- Description Table -->
+<![ %desctxt; [
+<!element
+   desctab        -- Description table --
+                  -- Clause: 6.7.2.2 --
+                  -- Descriptive text definition table --
+   - O
+   (desctxt,descdef)+
+
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id, irefmodl,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [base]: dtxtatt:desctab --
+>
+]]><!-- desctxt -->
+
+                      <!-- Descriptive Text -->
+<![ %desctxt; [
+<!element
+   desctxt        -- Descriptive text --
+                  -- Clause: 6.7.2.3 --
+   O O
+   (#PCDATA)      -- Lextype: words --
+
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id, irefmodl,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+]]><!-- desctxt -->
+
+                 <!-- Descriptive Text Definition -->
+<![ %desctxt; [
+<!element
+   descdef        -- Descriptive text definition --
+                  -- Clause: 6.7.2.4 --
+   O O
+   (%HyCFC;)*
+
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id, irefmodl,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+]]><!-- desctxt -->
+
+<!entity % actypes "IGNORE">
+
+                  <!-- User activity types -->
+<![ %actypes; [
+   <!entity %
+      dactypes    -- Are default activity types fixed? --
+                  -- Clause: 6.7.3 --
+
+      ''          -- Activity types not fixed --
+   >
+   <!ENTITY % activity "INCLUDE" >
+]]><!-- actypes -->
+
+<!entity % activity "IGNORE">
+
+              <!-- Activity Policy Common Attributes -->
+<![ %activity; [
+<!attlist
+-- activity --    -- Activity policy association rules --
+                  -- Clause: 6.7.3 --
+   #ALL
+
+   actrules       -- Activity policy association rules --
+                  -- Activity policy association rules that apply to
+                     this element. --
+      CDATA       -- Reference --
+                  -- Reftype: actrule* --
+      #IMPLIED    -- Default: No activity policy association rule is
+                     specified by this element as governing this
+                     element. --
+>
+]]><!-- activity -->
+
+              <!-- Activity policy association rule -->
+<![ %activity; [
+<!entity %
+   dactypes       -- Are default activity types fixed? --
+                  -- Clause: 6.7.3 --
+
+   '#FIXED'       -- Activity types are fixed --
+>
+<!element
+   actrule        -- Activity policy association rule --
+                  -- Clause: 6.7.3 --
+                  -- Optionally establishes association or
+                     dissociation of activity policies with
+                     information objects, and optionally nullifies
+                     the effectivity of other actrules. --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [base]: actrule --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id, irefmodl,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [base]: activity:actrules, actrule:nullify --
+>
+<!attlist
+   actrule        -- Activity policy association rule --
+                  -- Clause: 6.7.3 --
+
+   governed       -- Governed objects --
+                  -- Object(s) with which are associated or
+                     dissociated the policies specified by the set of
+                     activity type attributes of this actrule. --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: No objects are specified by this rule
+                     as being governed by this rule. --
+
+   associat       -- Associate or dissociate --
+                  -- Specifying "assoc" creates associations, "dissoc"
+                     dissolves associations created by other
+                     actrules. --
+      (assoc|dissoc)
+      assoc
+
+   nullify        -- Nullify activity policy association rules --
+                  -- Nullify the effectivity of the actrules
+                     referenced. --
+      CDATA       -- Reference --
+                  -- Reftype: actrule* --
+      #IMPLIED
+
+   actypes        -- Activity types --
+                  -- List of the names of activity type attributes. --
+                  -- Note: Any, all, or none of the members of the
+                     HyTime default activity type set may be used, in
+                     addition to any application-defined set. --
+                  -- Constraint: Cannot redefine semantics of members
+                     of the HyTime-defined default set. --
+      NAMES       -- Lextype: ATTNAME+ --
+      %dactypes;  -- Note: Will be #FIXED if actypes not supported --
+      "access copy create delete link modify reschdul schdul trnscl
+       unlink unschdul untrnscl"
+                  -- Constant --
+
+-- The following are the twelve HyTime-defined "activity type"
+   attributes.  Use of these names always invokes their
+   HyTime-defined semantics. --
+
+   create         -- Object creation policies --
+                  -- Policies that applied when any of the objects
+                     were originally created. --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: No object creation policies specified --
+
+   copy           -- Object copying policies --
+                  -- Policies that apply when attempts are made to
+                     copy any of the objects. --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: No object copying policies specified --
+
+   delete         -- Object deletion policies --
+                  -- Policies that apply when attempts are made to
+                     delete any of the objects. --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: No object deletion policies specified --
+
+   access         -- Object access policies --
+                  -- Policies that apply when attempts are made to
+                     access any of the objects. --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: No object access policies specified --
+
+   modify         -- Object modification policies --
+                  -- Policies that apply when attempts are made to
+                     modify any of the objects --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: No object modification policies
+                     specified --
+
+   link           -- Object hyperlinking policies --
+                  -- Policies that apply when attempts are made to
+                     make any of the objects the anchor of a
+                     hyperlink. --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: No object hyperlinking policies
+                     specified --
+
+   unlink         -- Object unhyperlinking policies --
+                  -- Policies that apply when attempts are made to
+                     make any of the objects no longer the anchor of a
+                     hyperlink. --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: No object unhyperlinking policies
+                     specified --
+
+   schdul         -- Object scheduling policies --
+                  -- Policies that apply when attempts are made to
+                     schedule any of the objects in an FCS. --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: No object scheduling policies
+                     specified --
+
+   unschdul       -- Object unscheduling policies --
+                  -- Policies that apply when attempts are made to
+                     remove any given appearance of any of the objects
+                     in an FCS. --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: No object unscheduling policies
+                     specified --
+
+   reschdul       -- Object rescheduling policies --
+                  -- Policies that apply when attempts are made to
+                     change the effective extent of any appearance of
+                     any of the objects in an FCS. --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: No object rescheduling policies
+                     specified --
+
+   trnscl         -- Object transclusion policies --
+                  -- Policies that apply when attempts are made to
+                     transclude any of the objects. --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: No object transclusion policies
+                     specified --
+
+   untrnscl       -- Object untransclusion policies --
+                  -- Policies that apply when attempts are made to
+                     make any of the objects no longer transcluded. --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: No object untransclusion policies
+                     specified --
+>
+]]><!-- activity -->
+
+           <!-- HyTime Dimension Specification Notation -->
+<![ %HyDimSpc; [
+<!notation
+   HyDimSpc       -- HyTime Dimension Specification Notation --
+                  -- Clause: 6.8.2 --
+                  -- A pair of axis markers (in the HyTime Axis Marker
+                     List Notation, after resolution of marker
+                     functions) that together specify a position and
+                     quantum count along a single axis. --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Dimension Specification Notation//EN"
+
+-- Attributes [base]: HyDimSpc --
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!attlist #NOTATION
+   HyDimSpc       -- HyTime Dimension Specification Notation --
+                  -- Clause: 6.8.2 --
+
+   GenArc   NAME     #FIXED GABridN
+   superdcn NAME     #FIXED HyMrkLst
+>
+<!entity % HyMrkLst "INCLUDE">
+]]><!-- HyDimSpc -->
+
+<!entity % HyDimLst "IGNORE">
+
+               <!-- HyTime Dimension List Notation -->
+<![ %HyDimLst; [
+<!notation
+   HyDimLst       -- HyTime Dimension List Notation --
+                  -- Clause: 6.8.4 --
+                  -- A list of dimensions each of which may be
+                     specified as either a pair of axis markers (in
+                     the HyTime Marker List Notation), or as all or
+                     part of the list of axis markers returned by a
+                     marker function. --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Dimension List Notation//EN"
+
+-- Attributes [base]: HyDimLst --
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!attlist #NOTATION
+   HyDimLst       -- HyTime Dimension List Notation --
+                  -- Clause: 6.8.4 --
+
+   GenArc   NAME     #FIXED GABridN
+   superdcn NAME     #FIXED HyMrkLst
+>
+<!entity % HyMrkLst "INCLUDE">
+]]><!-- HyDimLst -->
+
+<!entity % HyMrkLst "IGNORE">
+
+              <!-- HyTime Axis Marker List Notation -->
+<![ %HyMrkLst; [
+<!notation
+   HyMrkLst       -- HyTime Axis Marker List Notation --
+                  -- Clause: 6.8.1 --
+                  -- A list of HyTime axis markers (signed non-zero
+                     integers) and marker functions (elements that
+                     conform to the markfun architectural form).
+                     Marker functions are evaluated to lists of
+                     markers. --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Axis Marker List Notation//EN"
+
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+]]><!-- HyMrkLst -->
+
+<!entity % HyFunk "IGNORE">
+
+               <!-- HyTime Marker Function Language -->
+<![ %HyFunk; [
+<!notation
+   HyFunk         -- HyTime Marker Function Language --
+                  -- Clause: 6.8.6 --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Marker Function Language//EN"
+
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+]]><!-- HyFunk -->
+
+<!entity % markfun "IGNORE">
+
+                       <!-- Marker function -->
+<![ %markfun; [
+<![ %HyFunk; [
+   <!entity % dmarkfun "HyFunk">
+]]>
+<!entity %
+   dmarkfun       -- Default marker function notation --
+                  -- Clause: 6.8.1.2 --
+
+   "#REQUIRED"
+>
+<!element
+   markfun        -- Marker function --
+                  -- Clause: 6.8.1.2 --
+                  -- Evaluates to a list of zero or more axis
+                     markers. --
+   O O
+   (%HyCFC;)*     -- Constraint: content must conform to specified
+                     marker function notation. --
+
+-- Attributes [base]: markfun --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id, irefmodl,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   markfun        -- Marker function --
+                  -- Clause: 6.8.1.2 --
+
+   notation       -- Marker function notation --
+      NAME        -- Lextype: NOTATION --
+      %dmarkfun;
+>
+]]><!-- markfun -->
+
+<!entity % listloc "IGNORE">
+
+                    <!-- List Location Address -->
+<![ %listloc; [
+<!element
+   listloc        -- List location address --
+                  -- Clause: 7.10.1.2 --
+                  -- Locates nodes in a node list --
+   - O
+   (%dimlist;)*
+
+-- Attributes [base]: overrun --
+-- Attributes [locs]: locsrc, impsrc --
+-- OptionalAttributes [locs]: multloc, referatt, spanloc, treetype --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!entity % locsrc "INCLUDE">
+<!entity % impsrc "INCLUDE">
+<!entity % overrun "INCLUDE">
+]]><!-- listloc -->
+
+<!entity % pathloc "IGNORE">
+
+                    <!-- Path Location Address -->
+<![ %pathloc; [
+<!element
+   pathloc        -- Path location address --
+                  -- Clause: 7.10.1.5 --
+                  -- Locates nodes in a tree viewed as a path list --
+   - O
+   (%dimlist;)*   -- Constraint: resolved axis markers are interpreted
+                     as a single list of pairs of dimension
+                     specifications. --
+
+-- Attributes [base]: overrun --
+-- Attributes [locs]: locsrc, impsrc --
+
+-- OptionalAttributes [locs]: multloc, referatt, spanloc, treecom,
+   treetype --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!entity % locsrc "INCLUDE">
+<!entity % impsrc "INCLUDE">
+<!entity % overrun "INCLUDE">
+]]><!-- pathloc -->
+
+<!entity % relloc "IGNORE">
+
+                  <!-- Relative Location Address -->
+<![ %relloc; [
+<!element
+   relloc         -- Relative location address --
+                  -- Clause: 7.10.1.6 --
+                  -- Locates nodes in a tree relative to a starting
+                     node --
+   - O
+   (%dimlist;)*   -- Constraint: resolved axis markers are interpreted
+                     as a single list of dimension specifications. --
+
+-- Attributes [base]: overrun --
+-- Attributes [locs]: locsrc, impsrc, relloc --
+-- OptionalAttributes [locs]: multloc, referatt, spanloc, treetype --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   relloc         -- Relative location address --
+                  -- Clause: 7.10.1.6 --
+
+   strtnode       -- Starting node(s) --
+                  -- Starting node(s) whose relatives are to be addressed --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: root(s) of location source tree(s) --
+
+   nostart        -- No start --
+                  -- Expected system behavior if no starting node is addressed
+                     for location source. --
+      NAME        -- Lextype: ("ERROR"|"IGNORE") --
+      ERROR
+
+   relation       -- Relationship to starting node --
+      (anc|children|esib|followng|parent|precedng|ysib)
+      parent
+>
+<!entity % locsrc "INCLUDE">
+<!entity % impsrc "INCLUDE">
+<!entity % overrun "INCLUDE">
+]]><!-- relloc -->
+
+<!entity % treeloc "IGNORE">
+
+                    <!-- Tree Location Address -->
+<![ %treeloc; [
+<!element
+   treeloc        -- Tree location address --
+                  -- Clause: 7.10.1.4 --
+                  -- Locates nodes in a tree by classical method --
+   - O
+   (%marklist;)*  -- Constraint: resolved axis markers are interpreted
+                     as a single list of dimension specifications,
+                     marker1 only; implied marker2 is 1. --
+
+-- Attributes [base]: overrun --
+-- Attributes [locs]: locsrc, impsrc --
+-- OptionalAttributes [locs]: multloc, referatt, spanloc, treecom,
+   treetype --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!entity % locsrc "INCLUDE">
+<!entity % impsrc "INCLUDE">
+<!entity % overrun "INCLUDE">
+]]><!-- treeloc -->
+
+<!entity % calibrat "IGNORE">
+
+                      <!-- Axis calibration -->
+<![ %calibrat; [
+<!attlist
+-- calibrat --    -- Axis calibration --
+                  -- Clause: 9.3.1 --
+   (fcs)
+
+   calibrat       -- Axis calibration --
+                  -- The calibration of an axis is defined by
+                     specifying the name of the axis followed by the
+                     name of an attribute of the client element whose
+                     value determines the position of the axis with
+                     respect to an external context. --
+      CDATA       -- Lextype: (AXISNM,ATTNAME,NOTATION)+ --
+                  -- Constraint: Each axis name may appear only
+                     once. --
+                  -- Constraint: Calibration points should be
+                     expressed in notations which make sense, given
+                     the measurement domains of their corresponding
+                     axes. --
+      #IMPLIED    -- Default: no axis calibration --
+
+-- Attributes named by the axis calibration attributes have an
+   unnormalized lexical type of:
+
+   (s*,granule?,s+,snzi,s+,("STARTS"|"ENDS") #ORDER SGMLCASE,s,char*)
+
+   The first part of the attribute value (up to the last s separator)
+   specifies the calibration point for the axis.  The rest of the
+   value (that which matches char*) is a position within an external
+   context, and is specified in the notation given following the
+   attribute's name in the axis calibration attribute. --
+>
+<!entity % sched "INCLUDE">
+]]><!-- calibrat -->
+
+<!entity % HyCalSpc "IGNORE">
+
+           <!-- HyTime Calendar Specification Notation -->
+<![ %HyCalSpc; [
+<!notation
+   HyCalSpc       -- HyTime Calendar Specification Notation --
+                  -- Clause: 9.9.1 --
+                  -- Specifies a point in real time. The point
+                     specified is that which occurs at the beginning
+                     of the smallest unit of time in terms of which
+                     the point is specified. --
+                  -- Note: For example, the calendar specification
+                     "1996-02-07" identifies the point occurring at
+                     midnight between February 1st and February 2nd of
+                     1996. --
+                  -- Note: Can be used directly for axis calibration
+                     and alignment.  Also used as the basis for a
+                     marker function notation; see HyCalFun. --
+                  -- Lextype: ((JULDATE|fulldate|monthday|day)?,
+                               (UTCtime|hrminsec|hrmin|minute)?,
+                               timeoff*) --
+                  -- Constraint: Date must be valid (e.g. not
+                     "2-30"). --
+                  -- Constraint: Valid time followed by list of
+                     applicable non-conflicting time offsets for
+                     daylight-saving or time zones. --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Calendar Specification Notation//EN"
+
+-- Attributes [sched]: HyCalSpc --
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!attlist #NOTATION
+   HyCalSpc       -- HyTime Calendar Specification Notation --
+                  -- Clause: 9.9.1 --
+
+   GMTorUTC       -- GMT or UTC timescale --
+                  -- Note: (GMT noon = UTC midnight) --
+      (GMT|UTC)
+      UTC
+>
+<!entity % sched "INCLUDE">
+]]><!-- HyCalSpc -->
+
+<!entity % grpdex "IGNORE">
+
+             <!-- Group Derived Extent Specification -->
+<![ %grpdex; [
+<!attlist
+-- grpdex --      -- Group derived extent specification --
+                  -- Clause: 9.4.3 --
+   (evgrp,modgrp,progrp)
+
+   grpdex         -- Group derived extent specification --
+                  -- Use for resizing, rearrangement, repetition.
+                     Group members are given the derived extents.  If
+                     nominal extent is also wanted, it must be
+                     specified as one of the derived extents. --
+      CDATA       -- Reference --
+                  -- Reftype: (extent|extlist)* --
+      #IMPLIED    -- Default: grpdex is same as overall "group scope",
+                     that is, the nominal extents are effective --
+>
+<!entity % sched "INCLUDE">
+]]><!-- grpdex -->
+
+<!entity % grprepet "IGNORE">
+
+               <!-- Group Repetition Specification -->
+<![ %grprepet; [
+<!attlist
+-- grprepet --    -- Group repetition specification --
+                  -- Clause: 9.4.3 --
+   (evgrp,modgrp,progrp)
+
+   repscope       -- Repetition scope --
+                  -- Scope within which the contained events,
+                     modscopes or proscopes are repeated, subject to
+                     additional criteria in the value of each
+                     axis-named attribute, if any.  For each axis,
+                     repetition starts at the first quantum of the
+                     repetition scope and continues until the
+                     repetition scope is exhausted on each axis. --
+       CDATA      -- Reference --
+                  -- Reftype: extent --
+       #IMPLIED   -- Default: The first or only occurrence of the
+                     group is wherever the effective extent of the
+                     group places it, and the number of repetitions is
+                     limited only by the repeat count limit parameters
+                     of the axis-named attributes. --
+
+-- Additional attributes may be defined for client elements, one for
+   each axis of the FCS.  The names of the attributes are the axis
+   names, and the values of the attributes are specifications
+   regarding repetitions of the group and the implicit dimref of the
+   succeeding extent along an axis.  Each of the attributes has the
+   lexical model (uint,(("NOPART"|"PART"),unzi)?,unzi?), which is
+   interpreted as follows:
+
+      "repeat count limit" parameter (uint):
+         If the value is 0, there is no repeat count limit.  The group
+         is repeated on this axis from the beginning to the end of the
+         dimension specified by the repscope attribute.  If no value
+         is specified for the repscope attribute, the 0 value is
+         treated as if it were 1.  If the value of the "repeat count
+         limit" parameter is greater than 0, the number of repetitions
+         is limited to the number specified.  If no value is specified
+         for the repscope attribute, the number of repetitions is
+         limited only by the number of repetitions specified and the
+         remaining length of the axis.  If no value is specified for
+         an axis-named attribute, the "repeat count limit" parameter
+         is treated as if it were 1.
+
+      "allow partial dimensions" parameter ("PART"|"NOPART"):
+         If the value is "PART", partial repetitions at the beginning
+         and/or end of the series on this axis will be used to
+         completely fill the repetition scope.  If the value is
+         "NOPART", partial repetitions do not occur.  (There may be
+         unoccupied space at the beginning and/or end of the series on
+         this axis.)  The default value is "NOPART".
+
+      "start point within pattern" parameter (penultimate unzi):
+         The value is the number of the HMU (where the "first"
+         component of the group's dimension on this axis is 1) at
+         which the first occurrence in the series begins.  If the
+         value is not 1, the remaining partial portion of the group
+         will constitute the first repetition in each series.  This
+         first partial repetition will occur as skipped space if the
+         "allow partial dimensions" parameter's value is "NOPART".
+         The default value is 1.
+
+      "offset to next occurrence" parameter (final unzi):
+         The value is the number of HMUs that will be treated as the
+         qcnt of the group for purposes of determining the location of
+         the next contiguous repetition (or the next dimension with an
+         implicit dimref used as its "first" component).  The default
+         value is the effective qcnt of the group. --
+>
+<!entity % sched "INCLUDE">
+]]><!-- grprepet -->
+
+<!entity % objalign "IGNORE">
+
+                    <!-- Object alignment rule -->
+<![ %objalign; [
+<!attlist
+-- objalign --    -- Object alignment rule --
+                  -- Clause: 9.5.1 --
+   (event)
+
+   align          -- Object alignment rule --
+                  -- The alignment of an object with an event on each
+                     axis can be defined by specifying the name of the
+                     axis followed by one of the keywords #LEFT,
+                     #RIGHT, or #CENTER.  Alternatively, the name of
+                     any axis may be followed by the name of an
+                     attribute of the client element whose value
+                     determines the position of the object with
+                     respect to the event. --
+      CDATA       -- Lextype: (AXISNM,(("#LEFT"|"#RIGHT"|#CENTER)|
+                                       (ATTNAME,NOTATION)))+ --
+                  -- Constraint: Each axis name may appear only
+                     once. --
+      #IMPLIED    -- Default: no explicit alignment --
+
+-- Attributes named by the object alignment rule attribute have
+   an unnormalized lexical type of:
+
+   (s*,granule?,s+,snzi,s+,("STARTS"|"ENDS") #ORDER SGMLCASE,s,char*)
+
+   The first part of the attribute value (up to the last s separator)
+   specifies the calibration point within the event.  The rest of the
+   value (that which matches char*) is a position within the object,
+   and is specified in the notation given following the attribute's
+   name in the object alignment attribute. --
+>
+<!entity % sched "INCLUDE">
+]]><!-- objalign -->
+
+<!entity % pulsemap "IGNORE">
+
+                          <!-- Pulsemaps -->
+<![ %pulsemap; [
+<!attlist
+-- pulsemap --    -- Pulse Maps --
+                  -- Clause: 9.7 --
+   (baton,event,evgrp,evsched,modgrp,modscope,progrp,proscope,wand)
+
+   pulsemap       -- Pulse Maps --
+                  -- Schedules to be used as pulse maps. --
+      CDATA       -- Reference --
+                  -- Reftype: (baton|evsched|wand)* --
+                  -- Constraint: Pulse maps must be in same FCS as
+                     referrer. --
+      #IMPLIED    -- Default: none --
+>
+<!entity % sched "INCLUDE">
+]]><!-- pulsemap -->
+
+<!entity % wndpatch "IGNORE">
+
+                         <!-- Wand Patch -->
+<![ %wndpatch; [
+<!element
+   wndpatch       -- Wand patch --
+                  -- Clause: 10.2.4 --
+   - O
+   (#PCDATA)      -- Reference --
+                  -- Reftype: (wndpatch|wand)* --
+                  -- Constraint: subset of SGML model group with
+                     IDREFs as names and no occurrence indicators or
+                     OR connectors. --
+
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [rend]: wandrule:wand, wndpatch --
+>
+<!entity % wand "INCLUDE">
+]]><!-- wndpatch -->
+
+<!entity % wand "IGNORE">
+
+                          <!-- Wand Rule -->
+<![ %wand; [
+<!element
+   wandrule       -- Wand rule --
+                  -- Clause: 10.2.3.1 --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [rend]: wandrule --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [rend]: rendrule --
+>
+<!attlist
+   wandrule       -- Wand rule --
+                  -- Clause: 10.2.3.1 --
+
+   evscheds       -- Event schedules --
+      CDATA       -- Reference --
+                  -- Reftype: (evsched|wand)* --
+                  -- Constraint: all evscheds and wands must be in
+                     same logical FCS as all of the wands referenced
+                     by the wand attribute. --
+      #REQUIRED
+
+   wand           -- Wand or wand patch --
+      CDATA       -- Reference --
+                  -- Reftype: (wand|wndpatch) --
+      #IMPLIED    -- Default: none --
+>
+<!entity % modify "INCLUDE">
+]]><!-- wand -->
+
+                            <!-- Wand -->
+<![ %wand; [
+<!element
+   wand           -- Wand --
+                  -- Clause: 10.2.3.2 --
+   - O
+   (modgrp|modscope)+
+
+-- Attributes [sched]: sched --
+-- Attributes [rend]: select --
+-- OptionalAttributes [sched]: pulsemap --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [sched]: dimref:elemspec, dimref:schdspec,
+   pdimref:prjtarg, pulsemap:pulsemap, rfcsloc:prjsrc --
+-- Referrers [rend]: batrule:scheds, batrule:targschd,
+   prorule:sources, prorule:targschd, wandrule:wand, wndpatch --
+>
+<!entity % modify "INCLUDE">
+]]><!-- wand -->
+
+                       <!-- Modifier Scope -->
+<![ %wand; [
+<!element
+   modscope       -- Modifier scope --
+                  -- Defines the scope of a modifier as one or more
+                     extents. --
+                  -- Clause: 10.2.3.3 --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [base]: overrun --
+-- Attributes [sched]: exspec --
+-- Attributes [rend]: modscope, select --
+-- OptionalAttributes [sched]: pulsemap --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [sched]: dimref:elemspec, rfcsloc:prjsrc --
+-- Referrers [rend]: prorule:sources --
+>
+<!attlist
+   modscope       -- Modifier scope --
+                  -- Clause: 10.2.3.3 --
+
+   modifier       -- Modifiers and modifier patches to be
+                     applied --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: the modification semantics, if any, are
+                     specified directly by the GI, attributes and/or
+                     content of this element in some
+                     application-defined fashion --
+>
+<!entity % modify "INCLUDE">
+]]><!-- wand -->
+
+                    <!-- Modifier Scope Group -->
+<![ %wand; [
+<!element
+   modgrp         -- Modifier scope group --
+                  -- Clause: 10.2.3.4 --
+   - O
+   (modgrp|modscope)+
+
+-- Attributes [rend]: select --
+-- OptionalAttributes [sched]: grpdex, grprepet, pulsemap --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [sched]: dimref:elemspec, rfcsloc:prjsrc --
+-- Referrers [rend]: prorule:sources --
+>
+<!entity % modify "INCLUDE">
+]]><!-- wand -->
+
+<!entity % patch "IGNORE">
+
+                       <!-- Modifier Patch -->
+<![ %patch; [
+<!element
+   modpatch       -- Modifier patch --
+                  -- Clause: 10.2.4 --
+   - O
+   (#PCDATA)      -- Reference --
+                  -- Note: IDREFs may refer to modpatch
+                     elements. --
+
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [rend]: modpatch, modrule:modpatch --
+>
+<!entity % modify "INCLUDE">
+]]><!-- patch -->
+
+<!entity % modify "IGNORE">
+
+                        <!-- Modifier Rule -->
+<![ %modify; [
+<!element
+   modrule        -- Modifier rule --
+                  -- Clause: 10.2.2 --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [rend]: modrule --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [rend]: rendrule --
+>
+<!attlist
+   modrule        -- Modifier rule --
+                  -- Clause: 10.2.2 --
+
+   events         -- Events and modscopes --
+      CDATA       -- Reference --
+                  -- Reftype:
+                     (event|evgrp|evsched|modscope|modgrp|wand)* --
+      #REQUIRED
+
+   modifier       -- Modifier or modifier patch --
+      CDATA       -- Reference --
+                  -- Constraint: only one modifier or modifier
+                     patch --
+      #REQUIRED
+>
+<!entity % rend "INCLUDE">
+]]><!-- modify -->
+
+<!entity % HyPro "IGNORE">
+
+                  <!-- HyTime Projector Notation -->
+<![ %HyPro; [
+<![ %HyExtLst; [
+   <!entity % dpextlst "HyExtLst">
+]]>
+<!entity %
+   dpextlst       -- Default projector extent list notation --
+                  -- Clause: 10.3.1.1 --
+
+   "#IMPLIED"
+>
+<!notation
+   HyPro          -- HyTime Projector Notation --
+                  -- Clause: 10.3.1.1 --
+                  -- Defines projection functions by deriving linear
+                     relationships between each dimension of each of
+                     the specified extents (in the target FCS) and its
+                     corresponding dimension in the source FCS.
+                     Projector functions for individual extents or
+                     dimensions may also be specified using expro or
+                     dimpro elements. --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Projector Notation//EN"
+
+-- Attributes [rend]: HyPro --
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!attlist #NOTATION
+   HyPro          -- HyTime Projector Notation --
+                  -- Clause: 10.3.1.1 --
+
+   extlistn       -- Extent list notation --
+                  -- Notation used to specify the target extents. --
+      NAME        -- Lextype: NOTATION --
+      %dpextlst;  -- Default: Only expro, dimpro, extent, and extlist
+                     elements allowed. --
+>
+<!entity % project "INCLUDE">
+]]><!-- HyPro -->
+
+<!entity % HyExPro "IGNORE">
+
+              <!-- HyTime Extent Projector Notation -->
+<![ %HyExPro; [
+<![ %HyExSpec; [
+   <!entity % dpexspec "HyExSpec">
+]]>
+<!entity %
+   dpexspec       -- Default projector extent specification
+                     notation --
+                  -- Clause: 10.3.1.3 --
+
+   "#IMPLIED"
+>
+<!notation
+   HyExPro        -- HyTime Extent Projector Notation --
+                  -- Clause: 10.3.1.3 --
+                  -- Defines projection functions by deriving linear
+                     relationships between each dimension of the
+                     specified extent (in the target FCS) and its
+                     corresponding dimension in the source FCS.
+                     Projector functions for particular dimensions may
+                     also be specified using dimension projector
+                     elements. --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Extent Projector Notation//EN"
+
+-- Attributes [rend]: HyExPro --
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!attlist #NOTATION
+   HyExPro        -- HyTime Extent Projector Notation --
+                  -- Clause: 10.3.1.3 --
+
+   exspnot        -- Extent specification notation --
+                  -- Notation used to specify the target extent. --
+      NAME        -- Lextype: NOTATION --
+      %dpexspec;  -- Default: Only dimpro and dimspec elements
+                     allowed. --
+>
+<!entity % project "INCLUDE">
+]]><!-- HyExPro -->
+
+<!entity % HyDimPro "IGNORE">
+
+             <!-- HyTime Dimension Projector Notation -->
+<![ %HyDimPro; [
+<![ %HyDimSpc; [
+   <!entity % dpdimspc "HyDimSpc">
+]]>
+<!entity %
+   dpdimspc       -- Default projector dimension specification
+                     notation --
+                  -- Clause: 10.3.1.5 --
+
+   "#REQUIRED"
+>
+<!notation
+   HyDimPro       -- HyTime Dimension Projector Notation --
+                  -- Clause: 10.3.1.5 --
+                  -- Defines a projection function by deriving a
+                     linear relationship between the specified
+                     dimension (in the target FCS) and its
+                     corresponding dimension in the source FCS. --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Extent Projector Notation//EN"
+
+-- Attributes [rend]: HyDimPro --
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!attlist #NOTATION
+   HyDimPro       -- HyTime Dimension Projector Notation --
+                  -- Clause: 10.3.1.5 --
+
+   dimspnot       -- Dimension specification notation --
+                  -- Notation used to specify the target dimension. --
+      NAME        -- Lextype: NOTATION --
+      %dpdimspc;
+>
+<!entity % project "INCLUDE">
+]]><!-- HyDimPro -->
+
+<!entity % proseq "IGNORE">
+
+                     <!-- Projector sequence -->
+<![ %proseq; [
+<!element
+   proseq         -- Projector sequence --
+                  -- Clause: 10.3.2.3 --
+   - O
+   (#PCDATA)      -- Reference --
+                  -- Reftype: (proseq|projectr)* --
+                  -- Constraint: subset of SGML model group with
+                     IDREFs as names and no occurrence indicators, OR
+                     connectors, or AND connectors. --
+
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [rend]: prorule:proseq, proseq --
+>
+<!entity % project "INCLUDE">
+]]><!-- proseq -->
+
+<!entity % batonseq "IGNORE">
+
+                       <!-- Baton sequences -->
+<![ %batonseq; [
+<!element
+   batonseq       -- Baton sequence --
+                  -- Clause: 10.3.3.5 --
+   - O
+   (#PCDATA)      -- Reference --
+                  -- Reftype: (batonseq|baton)* --
+                  -- Constraint: subset of SGML model group with
+                     IDREFs as names and no occurrence indicators, OR
+                     connectors, or AND connectors. --
+
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [rend]: batonseq, batrule:baton --
+>
+<!entity % baton "INCLUDE">
+]]><!-- batonseq -->
+
+<!entity % baton "IGNORE">
+
+                         <!-- Baton Rule -->
+<![ %baton; [
+<!element
+   batrule        -- Baton rule --
+                  -- Clause: 10.3.3.1 --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [rend]: batrule, modified --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [rend]: rendrule --
+>
+<!attlist
+   batrule        -- Baton rule --
+                  -- Clause: 10.3.3.1 --
+
+   scheds         -- Schedules --
+      CDATA       -- Reference --
+                  -- Reftype: (baton|evsched|wand)* --
+      #REQUIRED
+
+   baton          -- Baton --
+      CDATA       -- Reference --
+                  -- Reftype: (baton|batonseq) --
+      #REQUIRED
+
+   targschd       -- Target schedules --
+      CDATA       -- Reference --
+                  -- Reftype: (baton|evsched|wand)+ --
+      #REQUIRED
+>
+<!entity % project "INCLUDE">
+]]><!-- baton -->
+
+                            <!-- Baton -->
+<![ %baton; [
+<!element
+   baton          -- Baton --
+                  -- Clause: 10.3.3.2 --
+   - O
+   (progrp|proscope)+
+
+-- Attributes [sched]: sched --
+-- Attributes [rend]: select --
+-- OptionalAttributes [sched]: pulsemap --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [sched]: dimref:elemspec, dimref:schdspec, pdimref:prjby,
+   pdimref:prjtarg, pulsemap:pulsemap, rfcsloc:prjby,
+   rfcsloc:prjsrc --
+-- Referrers [rend]: batonseq, batrule:baton, batrule:scheds,
+   batrule:targschd, prorule:sources, prorule:targschd --
+>
+<!entity % project "INCLUDE">
+]]><!-- baton -->
+
+                       <!-- Projector Scope -->
+<![ %baton; [
+<!element
+   proscope       -- Projector scope --
+                  -- Clause: 10.3.3.3 --
+                  -- Defines the scope of a projector as one or more
+                     extents. --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [base]: overrun --
+-- Attributes [sched]: exspec --
+-- Attributes [rend]: proscope, select --
+-- OptionalAttributes [sched]: pulsemap --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [sched]: dimref:elemspec, pdimref:prjby, rfcsloc:prjby,
+   rfcsloc:prjsrc --
+-- Referrers [rend]: prorule:sources --
+>
+<!attlist
+   proscope       -- Projector scope --
+                  -- Clause: 10.3.3.3 --
+
+   projectr       -- Scheduled projectors --
+      CDATA       -- Reference --
+                  -- Reftype: projectr* --
+      #IMPLIED    -- Default: none --
+>
+<!entity % project "INCLUDE">
+]]><!-- baton -->
+
+                    <!-- Projector Scope Group -->
+<![ %baton; [
+<!element
+   progrp         -- Projector scope group --
+                  -- Clause: 10.3.3.4 --
+   - O
+   (progrp|proscope)+
+
+-- Attributes [rend]: select --
+-- OptionalAttributes [sched]: grpdex, grprepet, pulsemap --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [sched]: dimref:elemspec, pdimref:prjby, rfcsloc:prjby,
+   rfcsloc:prjsrc --
+-- Referrers [rend]: prorule:sources --
+>
+<!entity % project "INCLUDE">
+]]><!-- baton -->
+
+<!entity % project "IGNORE">
+
+                          <!-- Projector -->
+<![ %project; [
+<![ %HyPro; [
+   <!entity % dpro "HyPro">
+]]>
+<!entity %
+   dpro           -- Default projector notation --
+                  -- Clause: 10.3.1 --
+
+   "#IMPLIED"
+>
+<!element
+   projectr       -- Projector --
+                  -- Clause: 10.3.1 --
+                  -- Defines a projection function for events,
+                     modscopes, and proscopes in a source FCS. --
+   O O
+   (%HyCFC;|%dimlist;|dimpro|expro|extent|extlist)*
+                  -- Constraint: If no extent projector function
+                     notation is specified, content is restricted to
+                     (expro)* --
+
+-- Attributes [rend]: projectr --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [rend]: prorule:proseq, proscope:projectr, proseq --
+>
+<!attlist
+   projectr       -- Projector --
+                  -- Clause: 10.3.1 --
+
+   notation       -- Projector notation --
+      NAME        -- Lextype: NOTATION --
+      %dpro;      -- Default: Content restricted to (expro)* --
+
+   strict         -- Strictness --
+                  -- Indication of the strictness with which the
+                     projection function is intended to be
+                     executed. --
+      CDATA
+      #IMPLIED    -- Default: No indication --
+>
+<!entity % rend "INCLUDE">
+]]><!-- project -->
+
+                      <!-- Extent Projector -->
+<![ %project; [
+<![ %HyExPro; [
+   <!entity % dexpro "HyExPro">
+]]>
+<!entity %
+   dexpro         -- Default extent projector notation --
+                  -- Clause: 10.3.1.2 --
+
+   "#IMPLIED"
+>
+<!element
+   expro          -- Extent Projector --
+                  -- Clause: 10.3.1.2 --
+                  -- Defines projection functions to a single target
+                     extent for extents in a source FCS. --
+   O O
+   (%HyCFC;|%dimlist;|dimpro)*
+                  -- Constraint: If no extent projector notation is
+                     specified, content is restricted to (dimpro)* --
+
+-- Attributes [rend]: expro --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   expro          -- Extent Projector --
+                  -- Clause: 10.3.1.2 --
+
+   notation       -- Extent projector notation --
+      NAME        -- Lextype: NOTATION --
+      %dexpro;    -- Default: Content restricted to (dimpro)* --
+>
+<!entity % rend "INCLUDE">
+]]><!-- project -->
+
+                     <!-- Dimension Projector -->
+<![ %project; [
+<![ %HyDimPro; [
+   <!entity % ddimpro "HyDimPro">
+]]>
+<!entity %
+   ddimpro        -- Default dimension projector notation --
+                  -- Clause: 10.3.1.4 --
+
+   "#REQUIRED"
+>
+<!element
+   dimpro         -- Dimension projector --
+                  -- Clause: 10.3.1.4 --
+                  -- Defines a projection function for dimensions
+                     along an axis of a source FCS. --
+   O O
+   (%HyCFC;|%marklist;)*
+
+-- Attributes [rend]: dimpro --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   dimpro         -- Dimension projector --
+                  -- Clause: 10.3.1.4 --
+
+   notation       -- Dimension projector notation --
+      NAME        -- Lextype: NOTATION --
+      %ddimpro;
+>
+<!entity % rend "INCLUDE">
+]]><!-- project -->
+
+                       <!-- Projector Rule -->
+<![ %project; [
+<!element
+   prorule        -- Projector rule --
+                  -- Clause: 10.3.2.2 --
+                  -- Direct association between sources, projectors,
+                     and target schedules. --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [rend]: modified, prorule --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [sched]: pdimref:prjby, rfcsloc:prjby --
+-- Referrers [rend]: rendrule --
+>
+<!attlist
+   prorule        -- Projector rule --
+                  -- Clause: 10.3.2.2 --
+
+   sources        -- Projection sources --
+                  -- Sources for projection --
+      CDATA       -- Reference --
+                  -- Reftype: (baton|event|evgrp|evsched|modgrp|
+                               modscope|progrp|proscope|wand)* --
+      #REQUIRED
+
+   projectr       -- Projectors and projector sequences --
+                  -- Projectors and/or projector sequences to be used
+                     for projection from sources to targets. --
+      CDATA       -- Reference --
+                  -- Reftype: (projectr|proseq)* --
+      #REQUIRED
+
+   targschd       -- Target schedules --
+                  -- Schedules onto which sources will be projected by
+                     projectors and/or projector sequences. --
+      CDATA       -- Reference --
+                  -- Reftype: (evsched|wand|baton)+ --
+                  -- Constraint: Only events will be projected onto
+                     event schedule targets; only modscopes will be
+                     projected onto wands, and only proscopes will be
+                     projected onto batons. --
+      #REQUIRED
+>
+<!entity % rend "INCLUDE">
+]]><!-- project -->
+
+<!entity % rend "IGNORE">
+
+                 <!-- Precision of selection -->
+<![ %rend; [
+<!attlist
+-- select --      -- Precision of selection --
+                  -- Clause: 10.1.1 --
+   (baton,modgrp,modscope,progrp,proscope,wand)
+
+   select         -- Precision of selection --
+                  -- How much of the event, modscope or proscope must
+                     lie within the extent of the modifying modscope
+                     or projecting proscope in order for modification
+                     or projection to occur. --
+      CDATA       -- Lextype: ("#ALL"|"#ANY"|(unzi,granule?))+ --
+                  -- Constraint: One specification for each axis or
+                     one for all axes. --
+                  -- Constraint: Precision unzi is specified in terms
+                     of the following granule, if supplied; otherwise
+                     in terms of the axis HMU defined for the schedule. --
+      #IMPLIED    -- Default: when not specified on a wand or baton, #ALL.
+                     When not specified on a modgrp, modscope, progrp, or
+                     proscope inherits effective value of containing wand,
+                     modgrp, baton or progrp. --
+
+   portion        -- Portion modified or projected --
+                  -- Modification or projection applies to entire
+                     event, modscope or proscope (whole), or only to
+                     the portions that are co-located with the
+                     modifying modscope or projecting proscope
+                     (part). --
+      NAMES       -- Lextype: ("WHOLE"|"PART")+ --
+                  -- Constraint: One specification for each axis or
+                     one for all axes. --
+      #IMPLIED    -- Default: when not specified on a wand or baton,
+                     WHOLE. When not specified on a modgrp,
+                     modscope,progrp, or proscope inherits effective
+                     value of containing baton,modgrp, progrp, or
+                     wand. --
+>
+<!entity % sched "INCLUDE">
+]]><!-- rend -->
+
+                       <!-- Rendition Rule -->
+<![ %rend; [
+<!element
+   rendrule       -- Rendition rule --
+                  -- Clause: 10.4 --
+   - O
+   (%ArcCFC;)*    -- Reference --
+                  -- Reftype:
+
+                     (batrule|modrule|prorule|rendrule|wandrule)* --
+
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [rend]: rendrule --
+>
+<!entity % sched "INCLUDE">
+]]><!-- rend -->
+
+<!entity % sched "IGNORE">
+
+                            <!-- Event -->
+<![ %sched; [
+<!element
+   event          -- Scheduled event --
+                  -- Clause: 9.5.1 --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [base]: overrun --
+-- Attributes [sched]: exspec --
+-- OptionalAttributes [sched]: pulsemap, objalign --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [sched]: dimref:elemspec, rfcsloc:prjsrc --
+-- Referrers [rend]: modrule:events, prorule:sources --
+>
+<!attlist
+   event          -- Event --
+                  -- Clause: 9.5.1 --
+
+   object         -- Event objects --
+      CDATA       -- Reference --
+      #IMPLIED    -- Default: Event is the object --
+>
+<!entity % overrun "INCLUDE">
+]]><!-- sched -->
+
+                         <!-- Event Group -->
+<![ %sched; [
+<!element
+   evgrp          -- Event group --
+                  -- Clause: 9.5.2 --
+   - O
+   (event|evgrp)+
+
+-- Attributes [base]: overrun --
+-- OptionalAttributes [sched]: pulsemap, grpdex, grprepet --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [sched]: dimref:elemspec, rfcsloc:prjsrc --
+-- Referrers [rend]: modrule:events, prorule:sources --
+>
+]]><!-- sched -->
+
+<!entity % overrun "IGNORE">
+
+                      <!-- Overrun Handling -->
+<![ %overrun; [
+<!attlist
+-- overrun --     -- Overrun handling --
+                  -- Clause: 6.8.5 --
+   (dataloc,dimref,event,evgrp,fcsloc,listloc,modgrp,modscope,
+    pathloc,progrp,proscope,relloc,treeloc)
+
+   overrun        -- Overrun Handling --
+                  -- Handling of dimension that overruns range --
+      (error|ignore|trunc|wrap)
+      error
+>
+]]><!-- overrun -->
+
+<!entity % grovplan "IGNORE">
+
+                         <!-- Grove Plan -->
+<![ %grovplan; [
+<!element
+   grovplan       -- Grove plan --
+                  -- Clause: 7.1.4.1 --
+                  -- Specifies a subset of a complete grove's address
+                     space. --
+   - O
+   (inclmod?,omitmod?,inclclas?,omitclas?,inclprop?,omitprop?)
+                  -- Constraint: Can include classes and properties
+                     from omitted modules (but not properties from
+                     omitted classes). --
+
+-- Attributes [locs]: grovplan --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [locs]: agrovdef:grovplan, dgrvplan:grovplan,
+   egrovplan:grovplan, lgrvplan:grovplan, pgrovdef:grovplan --
+>
+<!attlist
+   grovplan       -- Grove plan --
+                  -- Clause: 7.1.4.1 --
+
+   propset        -- Property set definition document --
+      ENTITY      -- Constraint: not an error if the property
+                     set document entity is not available. --
+      #REQUIRED
+>
+<!element
+-- inomcomp --    -- Include component/omit component elements --
+                  -- Clause: 7.1.4.1 --
+   (inclclas,inclmod,omitclas,omitmod)
+
+   - O
+   (#PCDATA)      -- Lextype: cnmlist --
+
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!element
+-- inomprop --    -- Include property/omit property --
+                  -- Clause: 7.1.4.1 --
+   (inclprop,omitprop)
+
+   - O
+   (#PCDATA)      -- Lextype: cnmlist --
+
+-- Attributes [locs]: inomprop --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+-- inomprop --    -- Include property/omit property --
+                  -- Clause: 7.1.4.1 --
+   (inclprop,omitprop)
+
+   classes        -- Classes from which to include or omit the named
+                     properties --
+      NAMES
+      #IMPLIED    -- Default: all classes that exhibit the
+                     property. --
+>
+]]><!-- grovplan -->
+
+                 <!-- HyTime Document Grove Plan -->
+<![ %grovplan; [
+<!attlist
+-- dgrvplan --    -- HyTime document grove plan --
+                  -- Clause: 7.1.4.1 --
+   (HyDoc)
+
+   grovplan       -- Grove plan --
+                  -- Grove plan for HyTime extended SGML document
+                     grove --
+      CDATA       -- Reference --
+                  -- Reftype: grovplan --
+      #IMPLIED    -- Default: HyTime default grove plan --
+>
+]]><!-- grovplan -->
+
+                      <!-- Entity Grove Plan -->
+<![ %grovplan; [
+<!attlist #NOTATION
+-- egrvplan --    -- Entity grove plan --
+                  -- Clause: 7.1.4.1 --
+   #ALL
+
+   grovplan       -- Grove plan --
+                  -- Grove plan to use when constructing grove from
+                     entity. --
+      CDATA       -- Reference --
+                  -- Reftype: grovplan --
+      #IMPLIED    -- Default: default grove plan for entity's DCN. --
+>
+]]><!-- grovplan -->
+
+<![ %grovplan; [
+<!attlist
+-- lgrvplan --    -- Location source grove plan --
+                  -- Clause: 7.1.4.1 --
+   (anchloc,dataloc,fcsloc,linkloc,listloc,nmlist,nmquery,nmsploc,
+    pathloc,proploc,queryloc,relloc,treeloc)
+
+    grovplan      -- Grove plans --
+                  -- Grove plans that govern resolution of address --
+
+       CDATA      -- Reference --
+                  -- Reftype: grovplan* --
+       #IMPLIED   -- Default: grove plans of location source groves as
+                     defined by their grove definitions, whether
+                     explicitly specified or implied. --
+>
+]]><!-- grovplan -->
+
+<!entity % pgrovdef "IGNORE">
+
+                  <!-- Primary Grove Definition -->
+<![ %pgrovdef; [
+<!element
+   pgrovdef       -- Primary grove definition --
+                  -- Clause: 7.1.4.4 --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [locs]: pgrovdef --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   pgrovdef       -- Primary grove definition --
+                  -- Clause: 7.1.4.4 --
+
+   grovesrc       -- Grove source --
+      ENTITY
+      #REQUIRED
+
+   grovecon       -- Grove construction process --
+      NAME        -- Lextype: NOTATION --
+      #IMPLIED    -- Default: inherent in notation of grove source --
+
+   grovplan       -- Grove plan --
+      CDATA       -- Reference --
+                  -- Reftype: grovplan --
+      #IMPLIED    -- Default: default grove plan of grove
+                     construction process. --
+>
+]]><!-- pgrovdef -->
+
+<!entity % agrovdef "IGNORE">
+
+                 <!-- Auxiliary Grove Definition -->
+<![ %agrovdef; [
+<!element
+   agrovdef       -- Auxiliary grove definition --
+                  -- Clause: 7.1.4.4 --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [locs]: agrovdef --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   agrovdef       -- Auxiliary grove definition --
+                  -- Clause: 7.1.4.4 --
+
+   grovesrc       -- Grove source --
+      CDATA       -- Reference --
+      #REQUIRED
+
+   grovecon       -- Grove construction process --
+      NAME        -- Lextype: NOTATION --
+      #REQUIRED
+
+   grovplan       -- Grove plan --
+      CDATA       -- Reference --
+                  -- Reftype: grovplan --
+      #IMPLIED    -- Default: default grove plan of grove
+                     construction process. --
+>
+]]><!-- agrovdef -->
+
+<!entity % nmsploc "IGNORE">
+
+                 <!-- Name-Space Location Address -->
+<![ %nmsploc; [
+<!element
+   nmsploc        -- Name-space location address --
+                  -- Clause: 7.9.3 --
+                  -- Addresses objects by name in a name-space --
+                  -- Constraint: location source must be an object that
+                     exhibits a named node list property or whose
+                     additional property source exhibits a named node
+                     list property. --
+   - O
+   (#PCDATA)      -- Lextype: (word|literal)* --
+
+-- Attributes [locs]: nmsploc, proplat, locsrc, impsrc --
+-- OptionalAttributes [locs]: multloc, referatt, spanloc, treetype --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   nmsploc        -- Name-space location address --
+                  -- Clause: 7.9.3 --
+
+   namespc        -- Name-space --
+                  -- Name-space property of location source from which
+                     nodes are selected. --
+      NAME
+      #REQUIRED
+
+   notspace       -- If nmspace name is invalid? --
+      NAME        -- Lextype: ("ERROR"|"IGNORE") --
+      ERROR
+
+   notname        -- If name is not valid in nmspace? --
+      NAME        -- Lextype: ("ERROR"|"IGNORE") --
+      ERROR
+>
+<!entity % proplat "INCLUDE">
+<!entity % locsrc "INCLUDE">
+<!entity % impsrc "INCLUDE">
+]]><!-- nmsploc -->
+
+<!entity % proploc "IGNORE">
+
+                  <!-- Property Location Address -->
+<![ %proploc; [
+<!element
+   proploc        -- Property location address --
+                  -- Clause: 7.9.2 --
+                  -- Locates property of a grove node --
+   - O
+   (#PCDATA)      -- Lextype: compname --
+
+-- Attributes [locs]: proplat, locsrc, impsrc --
+-- OptionalAttributes [locs]: multloc, referatt, spanloc, treetype --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!entity % proplat "INCLUDE">
+<!entity % locsrc "INCLUDE">
+<!entity % impsrc "INCLUDE">
+]]><!-- proploc -->
+
+                   <!-- Query Location Address -->
+<![ %queryloc; [
+<!element
+   queryloc       -- Query location address --
+                  -- Clause: 7.11.1 --
+                  -- Locates objects in a grove using queries against
+                     their properties as defined in the property set
+                     used to construct the grove. --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [locs]: locsrc, queryloc, impsrc --
+-- OptionalAttributes [locs]: multloc, referatt, spanloc, treetype --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   queryloc       -- Query location address --
+                  -- Clause: 7.11.1 --
+
+   notation       -- Query notation --
+      NAME        -- Lextype: NOTATION --
+      #REQUIRED
+
+   notfound       -- No data found --
+      NAME        -- Lextype: ("ERROR"|"IGNORE") --
+      ERROR
+>
+<!entity % locsrc "INCLUDE">
+<!entity % impsrc "INCLUDE">
+]]><!-- queryloc -->
+
+<!entity % locsrc "IGNORE">
+
+                       <!-- Location Source -->
+<![ %locsrc; [
+<!attlist
+-- locsrc --      -- Location source attributes --
+                  -- Clause: 7.2 --
+   (anchloc,dataloc,fcsloc,linkloc,listloc,nmlist,nmquery,nmsploc,
+    pathloc,proploc,queryloc,relloc,treeloc)
+
+   locsrc         -- location source --
+      CDATA       -- Reference --
+                  -- Constraint: References to entities are references
+                     to roots of primary groves constructed from the
+                     entities. --
+      #IMPLIED
+
+   cantcnst       -- Cannot construct grove from located data --
+      NAME        -- Lextype: ("ERROR"|"IGNORE") --
+      ERROR
+>
+]]><!-- locsrc -->
+
+<!entity % impsrc "IGNORE">
+
+            <!-- Implied Location Source -->
+<![ %impsrc; [
+<!attlist
+-- impsrc --      -- Implied location source --
+                  -- Clause: 7.3 --
+   (anchloc,dataloc,fcsloc,linkloc,listloc,nmlist,nmsploc,nmquery,
+    pathloc,proploc,queryloc,relloc,treeloc)
+
+   impsrc         -- Implied location source --
+                  -- Default location source for implied locsrc
+                     attribute.  Possible values are:
+
+                     ptreert   Default location source is node in
+                               default grove that serves as principal
+                               tree root, normally the document
+                               element.
+
+                     grovert   Grove root of document that contains
+                               location address.
+
+                     referrer  Default location source is non-location
+                               address object making direct or
+                               indirect reference to the location
+                               ladder of which this location address
+                               is the top rung.
+
+                     referatt  Default location source is attribute
+                               of referrer named by referatt
+                               attribute.
+                     implicit  Location source is implicit in query.
+                               For queryloc, location source is
+                               implicit in query.  For other location
+                               address forms, same as ptreert.
+                     --
+      (grovert|implicit|ptreert|referatt|referrer)
+                  -- Constraint: referatt allowed only when referatt
+                     option is supported. --
+      ptreert
+>
+]]><!-- impsrc -->
+
+    <!-- Attribute Of Referrer That Addresses Location Source -->
+<![ %referatt; [
+<!attlist
+-- referatt --    -- Attribute of referrer that addresses location
+                     source --
+                  -- Clause: 7.3 --
+   (anchloc,dataloc,fcsloc,linkloc,listloc,nmlist,nmquery,nmsploc,
+    pathloc,proploc,queryloc,relloc,treeloc)
+
+   referatt       -- Attribute of referrer that addresses location
+                     source --
+      CDATA       -- Lextype: ATTORCON --
+      #IMPLIED    -- Constraint: named attribute or content must be
+                     exhibited by referrer and must be referential. --
+>
+]]><!-- referatt -->
+
+                <!-- Multiple Location Attributes -->
+<![ %multloc; [
+<!attlist
+-- multloc --     -- Multiple location attributes --
+                  -- Clause: 7.4 --
+   (anchloc,dataloc,fcsloc,linkloc,listloc,mixedloc,nameloc,nmlist,
+    nmquery,nmsploc,pathloc,proploc,queryloc,relloc,treeloc)
+
+   ordering       -- Is ordering of locations significant? --
+      (noorder|ordered)
+      ordered
+
+   set            -- Make multiple a set by ignoring duplicates --
+      (notset|set)
+      notset
+>
+]]><!-- multloc -->
+
+                     <!-- Tree type attribute -->
+<![ %treetype; [
+<![ %spanloc; [
+   <!entity % treetpel
+      "anchloc,dataloc,fcsloc,linkloc,listloc,mixedloc,nameloc,nmlist,
+       nmquery,nmsploc,pathloc,proploc,queryloc,relloc,treeloc"
+   >
+]]>
+<!entity %
+   treetpel       -- Tree type associated element forms --
+                  -- Clause: 7.5 --
+
+   "pathloc,relloc,treeloc"
+>
+<!attlist
+-- treetype --    -- Tree type --
+                  -- Clause: 7.5 --
+   (%treetpel;)
+
+   treetype       -- Tree type --
+                  -- Type of tree to address as location source --
+      (content|subnode)
+      content
+>
+]]><!-- treetype -->
+
+                        <!-- Span Location -->
+<![ %spanloc; [
+<!attlist
+-- spanloc --     -- Span location attributes --
+                  -- Clause: 7.6 --
+   (anchloc,dataloc,fcsloc,linkloc,listloc,mixedloc,nameloc,nmlist,
+    nmquery,nmsploc,pathloc,proploc,queryloc,relloc,treeloc)
+
+   spanloc        -- Span location --
+                  -- Do multiple locations comprise a span? --
+      (nspan|spanloc)
+      nspan
+
+   limsort        -- Span limits sort --
+                  -- Are limits sorted with span start first? --
+      (limsort|nlimsort)
+      nlimsort
+>
+]]><!-- spanloc -->
+
+<!entity % reftype "IGNORE">
+
+                  <!-- Reference Element Type -->
+<![ %reftype; [
+<!attlist
+-- reftype --     -- Reference type attributes --
+                  -- Clause: 7.7.1 --
+   #ALL
+
+   reftype        -- Reference element type --
+      CDATA       -- Lextype: (("#ALL",(GI|modelgroup|"#ANY"))?,
+                               (ATTORCON,(GI|modelgroup|"#ANY"))*) --
+                  -- Constraint: a given ATTNAME or #CONTENT can occur
+                     only once; types apply to ultimate object of
+                     address, not including any intermediate location
+                     Address elements. --
+                  -- Constraint: model groups limited to repeating
+                     or non-repeating OR groups if refmodel option not
+                     supported. Tokens in model groups must be GIs. --
+      "#ALL #ANY" -- Constant --
+>
+]]><!-- reftype -->
+
+<!entity % refctl "IGNORE">
+
+               <!-- Reference Resolution Control -->
+<![ %refctl; [
+<!attlist
+-- refctl --      -- Reference resolution control attributes --
+                  -- Clause: 7.7.3 --
+   #ALL
+
+   refrange       -- Reference resolution range --
+                  -- Clause: 7.7.2 --
+                  -- B  Backward reference to identified local element
+                     D  Identified local element, before or after
+                     I  Location address allowed
+                     X  Indirect target, may be external to reference
+                     --
+      CDATA       -- Lextype: (("#ALL",("B"|"D"|"I"|"X"))?,
+                               (ATTORCON,("B"|"D"|"I"|"X"))*) --
+                  -- Constraint: a given ATTNAME or #CONTENT
+                     can occur only once. Its declared value
+                     or lextype must contain IDREF. --
+      "#ALL X"    -- Constant --
+
+   reflevel       -- Reference resolution level --
+                  -- Level that IDREF resolution cannot exceed,
+                     relative to this element. --
+      CDATA       -- Lextype: (("#ALL",unzi)?,(ATTORCON,unzi)*) --
+                  -- Constraint: a given ATTNAME or #CONTENT
+                     can occur only once. Its declared value
+                     or lextype must contain IDREF. --
+      #IMPLIED    -- Default: resolve fully --
+>
+]]><!-- refctl -->
+
+<!entity % refloc "IGNORE">
+
+                 <!-- Reference Location Address -->
+<![ %refloc; [
+<!entity % rflocatt '
+-- refloc --      -- Reference Location Address --
+                  -- Clause: 7.8 --
+   #ALL
+
+   loctype        -- Reference location addresses type --
+                  -- Each named attribute treated as if it were an
+                     IDREF to a location address element. --
+                  -- Constraint: The declared values of named
+                     attributes must be lexically compatible with
+                     their specified interpretation. --
+                  -- Note: The declared value CDATA always meets this
+                     requirement. --
+      CDATA       -- Lextype: (ATTORCON,("IDLOC"|"TREELOC"|
+                                         "PATHLOC"|"RELLOC"|
+                                         ("QUERYLOC",NOTATION)))+ --
+      #IMPLIED    -- Constant --
+                  -- Default: all references use SGML IDREFs, and each
+                     IDREF in an IDREFS attribute is considered
+                     separately --
+
+   rflocsrc       -- Reference location source --
+                  -- Associates referential attributes with their
+                     location sources. --
+      CDATA       -- Lextype: (ATTORCON,ATTORCON)+ --
+                  -- Constraint: attributes named must be referential
+                     attributes. --
+      #IMPLIED    -- Constant --
+                  -- Default: all referential attributes have this
+                     element as their location source. --
+'>
+<!attlist %rflocatt; >
+<!attlist #NOTATION %rflocatt; >
+]]><!-- refloc -->
+
+                   <!-- Reference Location Span -->
+<![ %refloc; %spanloc; [
+<!entity % rfspnatt '
+-- rflocspn --    -- Reference location span --
+                  -- Clause: 7.8 --
+   #ALL
+
+   rflocspn       -- Reference location span --
+                  -- Names pairs of referential attributes that
+                     address spans when both attributes are
+                     specified. --
+      CDATA       -- Lextype: (ATTORCON,ATTORCON)+ --
+                  -- Constraint: attributes named must be referential
+                     attributes. --
+      #IMPLIED    -- Constant --
+'>
+<!attlist %rfspnatt; >
+<!attlist #NOTATION %rfspnatt; >
+>
+]]><!-- refloc, spanloc -->
+
+<!entity % proplat "IGNORE">
+
+                <!-- Property Location Attributes -->
+<![ %proplat; [
+<!attlist
+-- proplat --     -- Property location attributes --
+                  -- Clause: 7.9.2 --
+   (nmsploc,proploc)
+
+   apropsrc       -- Use additional property source? --
+      (apropsrc|solesrc)
+      solesrc
+
+   notprop        -- If not a property of locsrc or apropsrc? --
+      NAME        -- Lextype: ("ERROR"|"IGNORE") --
+      ERROR
+
+   direct         -- Direct or indirect value --
+                  -- Constraint: Ignored if no indirect value --
+      (direct|indirect)
+      indirect
+>
+]]><!-- proplat -->
+
+<!entity % mixedloc "IGNORE">
+
+                   <!-- Mixed Location Address -->
+<![ %mixedloc; [
+<!element
+   mixedloc       -- Mixed location address --
+                  -- Clause: 7.9.4 --
+                  -- Groups location addresses together. --
+   - O
+   (%loc;)*
+
+-- OptionalAttributes [locs]: multloc, spanloc, treetype --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+]]><!-- mixedloc -->
+
+<!entity % treecom "IGNORE">
+
+                 <!-- Tree Combination Attributes -->
+<![ %treecom; [
+<!attlist
+-- treecom --     -- Tree combination attributes --
+                  -- Clause: 7.10.1.3 --
+   (pathloc,treeloc)
+
+   treecom        -- Tree combination --
+                  -- Combine multiple source trees --
+      (ntreecom|treecom)
+      ntreecom
+>
+]]><!-- treecom -->
+
+                  <!-- HyTime Lexical Tokenizer -->
+<![ %HyLexTok; [
+<!notation
+   HyLexTok       -- HyTime Lexical Tokenizer --
+                  -- A data tokenizer grove constructor using the
+                     HyLex syntax. --
+                  -- Clause: 7.10.2 --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION HyTime Lexical Tokenizer//EN"
+
+-- Attributes [locs]: HyLexTok --
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!attlist #NOTATION
+   HyLexTok       -- HyTime Lexical Tokenizer --
+                  -- Clause: 7.10.2 --
+
+   HyBase    NAME     #FIXED datatok
+   superdcn  NAME     #FIXED HyLex
+
+-- Attributes from datatok notation --
+   catsrc    CDATA    #IMPLIED
+   cattoken  CDATA    #IMPLIED
+   catres    CDATA    #IMPLIED
+   boundary  (sodeod|sodiec|isceod|isciec|inmodel) isciec
+   maxtoksz  NUMBER   #IMPLIED
+
+-- Attributes from HyLex notation --
+   norm     (norm|unorm) norm
+>
+<!attlist
+-- dlhylex --     -- HyLex attributes for dataloc and datatok --
+                  -- Clause: 7.10.2 --
+   (dataloc,datatok)
+
+-- Attributes from HyLex notation --
+   norm     (norm|unorm) norm
+>
+<!entity % HyLex "INCLUDE">
+]]><!-- HyLexTok -->
+
+               <!-- Data Tokenizer Grove Definition -->
+<![ %datatok; [
+<!notation
+   HyDatTok       -- HyTime Data Tokenizer --
+                  -- A simple data tokenizer grove constructor. --
+                  -- Clause: 7.10.2 --
+                  -- Lextype: ("LINE"|"NAME"|"NORM"|"SINT"|"STR"|
+                               "UTC"|"UTCDATE"|"UTCTIME"|"WORD") --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION HyTime Data Tokenizer//EN"
+
+-- Attributes [locs]: HyDatTok --
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!attlist #NOTATION
+   HyDatTok       -- HyTime Data Tokenizer --
+                  -- Clause: 7.10.2 --
+
+   HyBase    NAME     #FIXED datatok
+
+-- Attributes from datatok form --
+   catsrc    CDATA    #IMPLIED
+   cattoken  CDATA    #IMPLIED
+   catres    CDATA    #IMPLIED
+   boundary  (sodeod|sodiec|isceod|isciec|inmodel) isciec
+   maxtoksz  NUMBER   #IMPLIED
+>
+<![ %HyLexTok; [
+   <!entity % ddattok "HyLexTok">
+]]>
+<!entity %
+   ddattok        -- Default data tokenizer notation --
+                  -- Clause: 7.10.2 --
+
+   "HyDatTok"
+>
+<!element
+   datatok        -- Data tokenizer grove definition --
+                  -- Clause: 7.10.2 --
+                  -- Generates a datatok grove from data in another
+                     grove. --
+   - O
+   (#PCDATA)
+
+-- Attributes [locs]: datatok --
+-- OptionalAttributes [locs]: dlhylex --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   datatok        -- Data location address --
+                  -- Clause: 7.10.2 --
+
+   HyBase   NAME     #FIXED agrovdef
+
+-- Attributes from agrovdef --
+   grovesrc CDATA    #REQUIRED
+   grovecon NOTATION (HyDatTok|HyLexTok) #FIXED %ddattok;
+
+-- Attributes from datatok notation form (via DAFE) --
+   catsrc    CDATA    #IMPLIED
+   cattoken  CDATA    #IMPLIED
+   catres    CDATA    #IMPLIED
+   boundary  (sodeod|sodiec|isceod|isciec|inmodel) isciec
+   maxtoksz  NUMBER   #IMPLIED
+>
+]]><!-- datatok -->
+
+          <!-- Data Tokenizer Grove Construction Process -->
+<![ %datatok; [
+<!notation
+   datatok        -- Data tokenizer grove construction process --
+                  -- Clause: A.4.4.2.2 --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Data Tokenizer Grove Construction Process//EN"
+
+-- Attributes [locs]: datatok --
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!attlist #NOTATION
+   datatok        -- Data tokenizer grove construction process --
+                  -- Clause: A.4.4.2.2 --
+
+   catsrc         -- Source concatenation separator --
+      CDATA
+      #IMPLIED    -- Default: no source concatenation --
+
+   cattoken       -- Token concatentation separator --
+      CDATA
+      #IMPLIED    -- Default: no token concatenation --
+
+   catres         -- Result concatenation separator --
+      CDATA
+      #IMPLIED    -- Default: no result concatenation --
+
+   boundary       -- Hit boundary constraint --
+      (sodeod|sodiec|isceod|isciec|inmodel)
+      isciec
+
+   maxtoksz       -- Maximum token size --
+      NUMBER
+      #IMPLIED    -- Default: system defined --
+>
+]]><!-- datatok -->
+
+<!entity % bibloc "IGNORE">
+
+               <!-- Bibliographic Location Address -->
+<![ %bibloc; [
+<!element
+   bibloc         -- Bibliographic location address --
+                  -- Clause: 7.12 --
+                  -- Bibliographic reference to real object.
+                     Represents an address that is processable only as
+                     data.  Always returns itself (the bibloc
+                     element). --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [locs]: bibloc --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [locs]: bibloc:bibsrc --
+>
+<!attlist
+   bibloc         -- Bibliographic location address --
+                  -- Clause: 7.12 --
+
+   bibsrc         -- Bibliographic source. Another bibloc element that
+                     describes the context to which this bibloc is to
+                     be applied. --
+      CDATA       -- Reference --
+                  -- Reftype: bibloc* --
+      #IMPLIED
+>
+]]><!-- bibloc -->
+
+                    <!-- Traversal Attributes -->
+<![ %traverse; [
+<!attlist
+-- traverse --    -- Traversal attributes --
+                  -- Clause: 8.1.3 --
+   (agglink,hylink,ilink)
+
+   linktrav       -- Hyperlink traversal rules --
+                  -- Traversal between anchors of hyperlinks:
+                       A  any traversal or departure (EID)
+                       D  departure after internal arrival
+                       E  traversal after external arrival
+                       I  traversal after internal arrival
+                       N  no traversal after internal arrival
+                       P  no internal arrival
+                       R  return traversal after internal arrival --
+      NAMES       -- Lextype: ("A"|"EI"|"ER"|"ED"|"EN"|"EP"|"ERD"|
+                               "I"|"ID"|"D"|"N"|"P"|"R"|"RD")+ --
+                  -- Constraint: one per anchor or one for all --
+      A
+
+   listtrav       -- List traversal rules --
+                  -- Traversal between members of list anchors:
+                       A  adjacent (both left and right) traversal
+                       L  left traversal
+                       N  no traversal
+                       R  right traversal
+                       W  wrapping traversal --
+      NAMES       -- Lextype: ("A"|"AW"|"L"|"LW"|"N"|"R"|"RW")+ --
+                  -- Constraint: one per list anchor or one for all
+                     list anchors --
+      N
+>
+]]><!-- traverse -->
+
+<!entity % hylink "IGNORE">
+
+                   <!-- Hyperlink Relationship -->
+<![ %hylink; [
+<!element
+   hylink         -- Hyperlink relationship --
+                  -- Clause: 8.2.1 --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [links]: hylink --
+-- OptionalAttributes [links]: traverse --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id, irefmodl,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   hylink         -- Hyperlink relationship --
+                  -- Clause: 8.2.1 --
+
+   anchrole       -- Anchor roles  --
+      CDATA       -- Lextype: (NAME,("#LIST"|"#CORLIST")?)+ --
+                  -- Constraint: all #CORLIST anchors of a link must
+                     have the same number of members. --
+      #REQUIRED   -- Constant --
+
+   anchcstr       -- Anchor existence constraints --
+      NAMES       -- Lextype: ("REQUIRED"|"SELF"|"OMIT"|"COND")+ --
+                  -- Constraint: one per anchor or one for all --
+      REQUIRED    -- Constant --
+
+   emptyanc       -- Is empty anchor an error? --
+      NAMES       -- Lextype: ("ERROR"|"NOTERROR")+ --
+                  -- Constraint: one per anchor or one for all --
+      ERROR
+
+-- Anchor addressing attributes: one per non-self anchor role, with
+   same name as anchor role (unless remapped by the architectural
+   attribute renamer attribute). --
+>
+]]><!-- hylink -->
+
+                  <!-- Contextual Link Traversal -->
+<![ %clink; %traverse; [
+<!attlist
+-- clinktra --    -- Contextual link traversal --
+                  -- Clause: 8.2.2 --
+   (clink)
+
+   linktrav CDATA    "A ID"
+>
+]]><!-- clink, traverse -->
+
+<!entity % varlink "IGNORE">
+
+            <!-- Variable Link -->
+<![ %varlink; [
+<!element
+   varlink        -- Variable link --
+                  -- Clause: 8.2.4 --
+   - O
+   (anchspec)+
+
+-- Attributes [links]: ancspcat, varlink, vartrav --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!element
+   anchspec       -- Anchor specification --
+                  -- Clause: 8.2.4 --
+   - O
+   (%HyCFC;)*     -- Reference --
+                  -- Note: Use of refloc facility required --
+
+-- Attributes [links]: anchspec, ancspcat, vartrav --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   anchspec       -- Anchor specification --
+                  -- Clause: 8.2.4 --
+
+   multmem        -- May anchor have multiple members? --
+      (single|list|corlist)
+      single
+
+   emptyanc       -- Is empty anchor an error? --
+      (error|noterror)
+      error
+>
+
+<!attlist
+-- ancspcat --    -- Anchor specification attributes --
+                  -- Clause: 8.2.4 --
+   (anchspec,varlink)
+
+   anchrole       -- Anchor role --
+      NAME
+      #IMPLIED    -- Default: for anchspec, anchor role is GI of element --
+                  -- Default: for varlink, varlink is not self anchor --
+>
+<![ %traverse; [
+<!attlist
+-- vartrav --     -- Varlink traversal rules --
+                  -- Constraint: ignored on varlink element if it is
+                     not a self anchor --
+   (anchspec,varlink)
+
+   linktrav       -- Hyperlink traversal rules --
+                  -- Traversal between anchors of hyperlinks:
+                       A  any traversal or departure (EID)
+                       D  departure after internal arrival
+                       E  traversal after external arrival
+                       I  traversal after internal arrival
+                       N  no traversal after internal arrival
+                       P  no internal arrival
+                       R  return traversal after internal arrival --
+      (A|EI|ER|ED|EN|EP|ERD|I|ID|D|N|P|R|RD)
+      A
+
+   listtrav       -- List traversal rules --
+                  -- Traversal between members of list anchors:
+                       A  adjacent (both left and right) traversal
+                       L  left traversal
+                       N  no traversal
+                       R  right traversal
+
+                       W  wrapping traversal --
+      (A|AW|L|LW|N|R|RW)
+                  -- Constraint: ignored if anchor is not a list --
+      N
+>
+]]><!-- traverse -->
+]]><!-- varlink -->
+
+<!entity % ilink "IGNORE">
+
+                      <!-- Independent Link -->
+<![ %ilink; [
+<!element
+   ilink          -- Independent link --
+                  -- Clause: 8.2.5 --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [links]: ilink --
+-- OptionalAttributes [links]: traverse --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   ilink          -- Independent link --
+                  -- Clause: 8.2.5 --
+
+   anchrole       -- Anchor roles --
+      CDATA       -- Lextype: (NAME,("#AGG"|"#LIST"|"#CORLIST")?)+ --
+                  -- Constraint: one per anchor --
+      #REQUIRED   -- Constant --
+
+   linkends       -- Link ends --
+      IDREFS      -- Reference --
+                  -- Constraint: One ID per anchor role, except
+                     that the first ID may be omitted if the first
+                     anchor is the link element itself. --
+      #REQUIRED
+>
+]]><!-- ilink -->
+
+<!entity % HyGrand "IGNORE">
+
+             <!-- HyTime Granule Definition Notation -->
+<![ %HyGrand; [
+<!notation
+   HyGrand        -- HyTime Granule Definition Notation --
+                  -- Clause: 9.2.2 --
+                  -- The mathematical relationship between a granule
+                     and its measurement domain's SMU is specified as
+                     a ratio of the granule being defined to either
+                     the SMU or another granule of the same domain. --
+                  -- Lextype: (ratio,(granule|SMU)) --
+                  -- Constraint: A granule may not be defined in terms of
+                     itself, either directly or indirectly. --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Granule Definition Notation//EN"
+
+-- CommonAttributes [GenArc]: altreps, included, superdcn --
+-- CommonAttributes [base]: bosdatt --
+-- CommonAttributes [locs]: egrvplan --
+>
+<!entity % measure "INCLUDE">
+]]><!-- HyGrand -->
+
+<!entity % measure "IGNORE">
+
+                <!-- Measurement Domain Definition -->
+<![ %measure; [
+<![ %HyGrand; [
+   <!entity % dgdnot "HyGrand">
+]]>
+<!entity %
+   dgdnot         -- Default granule definition notation --
+                  -- Clause: 9.2.1 --
+
+   "#REQUIRED"
+>
+<!element
+   measure        -- Measurement domain definition --
+                  -- Clause: 9.2.1 --
+                  -- Defines a set of granules in terms of a standard
+                     measurement unit (SMU).  Multiple measurement
+                     domain definitions for the same SMU comprise one
+                     domain. --
+   - O
+   (granule+)
+
+-- Attributes [sched]: measure --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   measure        -- Measurement domain definition --
+                  -- Clause: 9.2.1 --
+
+   smu            -- Standard measurement unit --
+                  -- The standard measurement unit for the domain --
+      NAME        -- Lextype: SMU --
+      #REQUIRED
+>
+<!element
+   granule        -- Granule definition --
+                  -- Clause: 9.2.1 --
+                  -- The content of a granule definition element
+                     defines the mathematical relationship between the
+                     granule being defined and the measurement domain's
+                     SMU. --
+                  -- Note: The relationship may be defined in terms of
+                     another granule of the same measurement domain. --
+   - O
+   (%HyCFC;)*
+
+-- Attributes [sched]: granule --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+>
+<!attlist
+   granule        -- Granule definition --
+                  -- Clause: 9.2.1 --
+
+   gn             -- Granule name --
+                  -- The granule name being defined. Granule names are
+                     not normalized as SGML names (that is, they are
+                     case-sensitive). --
+      CDATA       -- Lextype: granule --
+                  -- Constraint: unique within measurement domain --
+                  -- Constraint: cannot be same as SMU name (with case
+                     ignored) --
+      #REQUIRED
+
+   gdnot          -- Granule definition notation --
+                  -- Notation used to specify the relationship between
+                     the granule being defined and the measurement
+                     domain's SMU. --
+      NAME        -- Lextype: NOTATION --
+      %dgdnot;
+>
+]]><!-- measure -->
+
+                      <!-- Measurement Units -->
+<![ %sched; [
+<!notation
+   gQuantum       -- Generic quantum --
+                  -- Reference unit of generic quanta --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Virtual Measurement Unit//EN"
+>
+<!notation
+   SIsecond       -- Systeme International second --
+                  -- Reference unit of real time --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Systeme International second//EN"
+>
+<!notation
+   SImeter        -- Systeme International meter --
+                  -- Reference unit of real length --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Systeme International meter//EN"
+>
+<!notation
+   virTime        -- Virtual Time --
+                  -- Reference unit of virtual time --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Virtual Measurement Unit//EN"
+>
+<!notation
+   virSpace       -- Virtual Space --
+                  -- Reference unit of virtual space --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Virtual Measurement Unit//EN"
+>
+]]><!-- sched -->
+
+<![ %sched; [
+<!notation
+   SIkg           -- Systeme International kilogram --
+                  -- Reference unit of mass --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Systeme International kilogram//EN"
+>
+<!notation
+   SIkelvin       -- Systeme International kelvin --
+                  -- Reference unit of thermodynamic temperature --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Systeme International kelvin//EN"
+>
+<!notation
+   SIcd           -- Systeme International candela --
+                  -- Reference unit of luminous intensity --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Systeme International candela//EN"
+>
+<!notation
+   SIampere       -- Systeme International ampere --
+                  -- Reference unit of electric current --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Systeme International ampere//EN"
+>
+<!notation
+   SImole         -- Systeme International mole --
+                  -- Reference unit of amount of substance --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Systeme International mole//EN"
+>
+<!notation
+   SIradian       -- Systeme International radian --
+                  -- Reference unit of plane angle --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Systeme International radian//EN"
+>
+<!notation
+   SIsr           -- Systeme International steradian --
+                  -- Reference unit of solid angle --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Systeme International steradian//EN"
+>
+]]><!-- sched -->
+
+<![ %sched; [
+<!notation
+   SIC            -- Systeme International degree Celsius --
+                  -- Reference unit of celsius temperature --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Systeme International degree Celsius//EN"
+>
+]]><!-- sched -->
+
+<![ %sched; [
+<!notation
+   CHNYUAN        -- Yuan currency unit of China --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Yuan currency unit of China//EN"
+>
+<!notation
+   GBRPOUND       -- Pound currency unit of United Kingdom --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           Pound currency unit of United Kingdom//EN"
+>
+]]><!-- sched -->
+
+                   <!-- Finite Coordinate Space -->
+<![ %sched; [
+<!element
+   fcs            -- Finite coordinate space --
+                  -- Clause: 9.3 --
+   - O
+   (baton|evsched|wand)*
+
+-- Attributes [sched]: fcs --
+-- OptionalAttributes [sched]: calibrat --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [sched]: dimref:elemspec, pdimref:prjtarg,
+   rfcsloc:prjsrc, sched:fcs --
+>
+<!attlist
+   fcs            -- Finite coordinate space --
+                  -- Clause: 9.3 --
+
+   axes           -- Axis names and measurement domains --
+                  -- The name and measurement domain (SMU) of each
+                     axis. --
+      CDATA       -- Lextype: (AXISNM,SMU)+ --
+                  -- Constraint: Each axis name must be unique
+                     within the list. --
+      #REQUIRED   -- Constant --
+
+-- Each axis name specified in the value of the axes attribute is
+   taken to be the name of an attribute of the client element that
+   specifies the dimension and granularity of the axis.  Each such
+   attribute has the lexical type (NUMBER, granule?, ("#MDU", ratio,
+   granule?)?), where the number is the dimension of the axis,
+   expressed in terms of the following granule, if specified;
+   otherwise the dimension is in terms of the axis SMU.  If a granule
+   is specified, it is both the default base granule and default HMU
+   for the axis; otherwise the default base granule and HMU is the
+   axis SMU.  If #MDU and a ratio is specified, it defines the MDU to
+   SMU ratio for the axis, specified in terms of either the following
+   granule or the default HMU.  All granule names must be defined in
+   terms of the axis SMU. --
+>
+]]><!-- sched -->
+
+                          <!-- Schedule -->
+<![ %sched; [
+<!attlist
+-- sched --       -- Schedule --
+                  -- Clause: 9.4.1 --
+   (baton,evsched,wand)
+
+   fcs            -- Governing finite coordinate space element --
+      CDATA       -- Reference --
+                  -- Reftype: fcs --
+      #IMPLIED    -- Default: containing fcs element --
+                  -- Constraint: required if schedule is not contained
+                     by fcs element. --
+
+   axisord        -- Axis order --
+                  -- The order of axes for extent specification within
+                     schedule.  For each axis name specified, an
+                     attribute of the same name may be used to specify
+                     the HMU for the axis.  The lexical type of such
+                     attributes is (ratio, granule?), where the ratio
+                     is the number of HMUs per base granule, and the
+                     granule, if specified, is the base granule.  If a
+                     granule is not specified, the default base
+                     granule defined by the governing fcs element is
+                     used.  A specified granule must be defined in
+                     terms of the axis SMU.  If a value is not
+                     supplied for an axis HMU specification attribute,
+                     the HMU for that axis is the default HMU defined
+                     by the governing fcs element. --
+      CDATA       -- Lextype: (AXISNM)+ --
+                  -- Constraint: axis names must be defined by
+                     governing fcs element --
+      #IMPLIED    -- Constant --
+                  -- Default: Axis order is unchanged from that
+                     specified by governing fcs element, and each axis
+                     may have an HMU specification attribute. --
+
+   sorted         -- Extent ordering --
+                  -- Ordering of elements with respect to the ordering
+                     of their scheduled extents. --
+      (sorted|unsorted)
+      unsorted
+
+   coverage       -- Extent coverage --
+                  -- Whether or not gaps may occur between the
+                     scheduled extents of elements in the schedule. --
+      (solid|sparse)
+      sparse
+
+   overlap        -- Extent overlap --
+                  -- Whether or not scheduled extents of elements in
+                     the schedule may overlap. --
+                  -- Constraint: If the schedule is a wand, the value
+                     is ignored and is always treated as noverlap. --
+      (overlap|noverlap)
+      #IMPLIED    -- Default: If the schedule is not a wand, the
+                     default value is overlap. --
+>
+]]><!-- sched -->
+
+                    <!-- Extent Specification -->
+<![ %sched; [
+<!attlist
+-- exspec --      -- Nominal extent specification --
+                  -- Clause: 9.4.2 --
+   (event,modscope,proscope)
+
+   exspec         -- Extent specification --
+      CDATA       -- Reference --
+                  -- Reftype: (extent|extlist)+ --
+      #REQUIRED
+>
+]]><!-- sched -->
+
+                           <!-- Extent -->
+<![ %sched; [
+<![ %HyExSpec; [
+   <!entity % dexspec "HyExSpec">
+]]>
+<!entity %
+   dexspec        -- Default extent specification notation --
+                  -- Clause: 9.4.5 --
+   "#IMPLIED"
+>
+<!element
+   extent         -- Extent --
+                  -- Clause: 9.4.4 --
+                  -- A position and quantum count along one or more
+                     axes. --
+   O O
+   (%HyCFC;|%dimlist;)*
+                  -- Constraint: if no extent specification notation
+                     specified, then content is restricted to
+                     (dimspec)* --
+
+-- Attributes [sched]: extent --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [sched]: dimref:elemspec, exspec:exspec, grpdex:grpdex,
+   grprepet:repscope --
+>
+<!attlist
+   extent         -- Extent --
+                  -- Clause: 9.4.4 --
+
+   notation       -- Extent specification notation --
+      NAME        -- Lextype: NOTATION --
+      %dexspec;   -- Default: content is restricted to (dimspec)* --
+>
+]]><!-- sched -->
+
+                         <!-- Extent List -->
+<![ %sched; [
+<![ %HyExtLst; [
+   <!entity % dextlist "HyExtLst">
+]]>
+<!entity %
+   dextlist       -- Default extent list notation --
+                  -- Clause: 9.4.5 --
+
+   "#IMPLIED"
+>
+<!element
+   extlist        -- Extent List --
+                  -- Clause: 9.4.5 --
+                  -- A list of extents on one or more axes. --
+   O O
+   (%HyCFC;|%dimlist;|extent|extlist)*
+                  -- Constraint: if no extent list notation
+                     specified, then content is restricted to
+                     (extent|extlist)* --
+
+-- Attributes [sched]: extlist
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [sched]: dimref:elemspec, exspec:exspec, grpdex:grpdex --
+>
+<!attlist
+   extlist        -- Extent List --
+                  -- Clause: 9.4.5 --
+
+   notation       -- Extent list notation --
+      NAME        -- Lextype: NOTATION --
+      %dextlist;  -- Default: content is restricted to
+                     (extent|extlist)* --
+>
+]]><!-- sched -->
+
+                       <!-- Event Schedule -->
+<![ %sched; [
+<!element
+   evsched        -- Event schedule --
+                  -- Clause: 9.5 --
+   - O
+   (event|evgrp)*
+
+-- Attributes [sched]: sched --
+-- OptionalAttributes [sched]: pulsemap --
+-- CommonAttributes [GenArc]: dafe, dvlatt, etfullnm, id,
+   ireftype, lextype, opacity --
+-- CommonAttributes [base]: activity, conloc, dtxtatt, valueref --
+-- CommonAttributes [locs]: refctl, refloc, reftype, rflocspn --
+-- Referrers [sched]: dimref:elemspec, dimref:schdspec,
+   pdimref:prjtarg, pulsemap:pulsemap, rfcsloc:prjsrc --
+-- Referrers [rend]: batrule:scheds, batrule:targschd, modrule:events,
+   prorule:sources, prorule:targschd, wandrule:evscheds --
+>
+]]><!-- sched -->
+
+                <!-- Projected Dimension Reference -->
+<![ %dimref; %project; [
+<!attlist
+-- pdimref --     -- Projected dimension reference --
+                  -- Clause: 9.8.2.2 --
+                  -- Dimref attributes for references to projected
+                     sets of events, modscopes and/or proscopes --
+   (dimref)
+
+   prjdirct       -- Projected and/or direct --
+                  -- Selection on the basis of whether events,
+                     modscopes, or proscopes were either projected
+                     onto, or directly scheduled in, the specified
+                     element.
+                        drctonly: Direct only
+                        projonly: Projected only
+                        drctproj: Direct and projected --
+                  -- Constraint: Value is ignored if element specified
+                     is not evsched, wand, baton, or fcs. --
+                  -- Constraint: Value is ignored (is, in effect,
+                     drctonly) if a value is specified for extnum. --
+      (drctonly|drctproj|projonly)
+      drctonly
+
+   prjtarg        -- Projected to target --
+                  -- Referenced dimension exists by projection onto
+                     element specified by prjtarg attribute. --
+                  -- Constraint: Value is ignored (and referenced
+                     dimension is not a projected dimension) if
+                     element specified is extent or extlist. --
+      CDATA       -- Reference --
+                  -- Reftype: (baton|evsched|fcs|wand) --
+      #IMPLIED    -- Default: Referenced dimension is unprojected. --
+
+   prjby          -- Projected by --
+                  -- Referenced dimension exists by projection onto
+                     element specified by prjtarg attribute only by
+                     elements specified by prjby attribute. --
+                  -- Constraint: Value is ignored unless prjtarg has
+                     non-ignored value. --
+      CDATA       -- Reference --
+                  -- Reftype: (baton|progrp|prorule|proscope) --
+      #IMPLIED    -- Default: All relevant prorules, batons, progrps,
+                     and proscopes will be taken into account. --
+>
+]]><!-- dimref, project -->
+
+<![ %fcsloc; %project; [
+<!attlist
+-- rfcsloc --     -- Finite coordinate space location address with
+                     rendition module --
+                  -- Clause: 7.10.2 --
+   (fcsloc)
+
+   prjdirct       -- Projected and/or direct --
+                  -- Selection based on how objects were scheduled:
+                      drctonly: (Direct only) Do not select the
+                                events, modscopes, and proscopes
+                                projected onto the element specified.
+                      projonly: (Projected only) Do not select the
+                                events, modscopes, and proscopes
+                                directly scheduled in or by the
+                                element specified.
+                      drctproj: (Direct and projected) Do not exclude
+                                direct or projected events, modscopes,
+                                and proscopes from being selected. --
+      (drctonly|drctproj|projonly)
+      drctonly
+
+   prjsrc         -- Projection sources --
+                  -- Of the events, modscopes and proscopes indirectly
+                     scheduled on the locsrc elements, select only
+                     those that are directly scheduled by or in the
+                     specified elements. --
+      CDATA       -- Reference --
+                  -- Reftype: (baton|event|evgrp|evsched|fcs|modgrp|
+                               modscope|progrp|proscope|wand)* --
+                  -- Constraint: Value is ignored if value of prjdrct
+                     is drctonly. --
+      #IMPLIED    -- Default: No projection sources constraint. --
+
+   prjby          -- Projected by --
+                  -- Of the events, modscopes and proscopes indirectly
+                     scheduled on the locsrc elements, select only
+                     those that are projected there by the specified
+                     projection elements. --
+      CDATA       -- Reference --
+                  -- Reftype: (baton|progrp|prorule|proscope)* --
+                  -- Constraint: Value is ignored if value of prjdrct
+                     is drctonly. --
+      #IMPLIED    -- Default: No projection elements constraint. --
+>
+]]><!-- fcsloc, project -->
+
+            <!-- Project modified or unmodified object -->
+<![ %modify; %project; [
+<!attlist
+-- modified --    -- Project modified or unmodified object --
+                  -- Clause: 10.3.2.1 --
+   (batrule|prorule)
+
+   modified       -- Project event (or modscope) with object (or
+                     modifier) modified or unmodified --
+                  -- Project modified objects (or modifiers)
+                     ("modify"), or project objects (or modifiers)
+                     without the modifications that are applied to
+                     them ("unmodify") in their source schedules. --
+                  -- Constraint: value is ignored for projected
+                     elements that are not events or modscopes. --
+      (modify|unmodify)
+      modify
+>
+]]><!-- modify, project -->

@@ -1,0 +1,59 @@
+
+Files and directories here:
+
+catalog
+
+	This is the catalogue file which associates public text
+	identifiers with system entities.
+
+mud-0.1.dtd
+ssn-0.1.dtd
+sun-0.1.dtd
+starlink-0.1.dtd
+summary-0.1.dtd
+
+	These are the DTDs for Starlink documentation.  The
+	starlink-0.1.dtd DTD is the main `Starlink General DTD'.  The
+	MUD, SSN and SUN DTDs invoke it, after first defining
+	parameter entities to include and exclude parts of the General
+	DTD.  The summary DTD is a hugely cut-down version of the
+	General DTD, used both as an architecture within the General
+	DTD, and as a DTD for summaries of other Starlink documents
+	produced either from Star2HTML source or otherwise.
+
+starlink.decl@
+starlink.decl.linux
+starlink.decl.std
+
+	The SGML declarations appropriate to the DTDs.  There is a
+	slight wrinkle in that there is a special version for Linux
+	(see notes within).  This workaround may no longer be necessary.
+
+entities.sgml
+
+	Miscellaneous entities, for things like &gt and &pound.  These
+	are rather randomly selected, and should probably be
+	rationalised.  As I _now_ understand it, these should probably
+	be specified as SDATA entities (see 8879, clause 10.5.3),
+	probably within the ISOent directory below.
+
+dsssl/
+hytime/
+ISOent/
+
+	The DTDs for DSSSL stylesheets, and the HyTime architectural
+	forms.  As noted in the catalog in this directory, I've had to
+	adjust the hi2mdhty.sgm file to get round an interpretation
+	problem in SP.  The ISOent directory contains an ISO standard
+	set of entities.  These are SDATA entities, which means that
+	they are intended to be system-specific.
+
+docbook/
+html/
+
+	For reference, these are the DocBook and HTML DTDs.  This
+	includes HTML 1, 2 and 3.2, and the DTD and declaration for
+	ISO HTML (15445:1998.  See
+	ftp://ftp.cs.tcd.ie/isohtml/FinalCD.html).  These directories
+	contain their own catalogs -- they are not included in the
+	main catalog.

@@ -1,0 +1,132 @@
+<!-- Copied from the standard, section C.1 -->
+
+
+
+<!--
+This file is identified by the following public identifier:
+
+"ISO/IEC 10744:1997//NONSGML LEXTYPES HyTime Lexical Types//EN"
+-->
+
+<!ENTITY % SGMLlex
+   PUBLIC "ISO/IEC 10744//NONSGML LEXTYPES SGML Lexical Types//EN"
+>
+%SGMLlex;
+
+              <!-- POSIX Regular Expression Notation -->
+
+<!NOTATION REGEX
+   PUBLIC "ISO/IEC 9945-2:1992//NOTATION
+           POSIX Regular Expression Notation//EN">
+<!ATTLIST #NOTATION REGEX
+   case     (case|icase) case
+>
+
+                    <!-- HyTime Lexical Types -->
+
+<!LEXTYPE
+   str            -- Unnormalized string --
+
+   "[char]*"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   norm           -- Normalized text --
+
+   "s*,[(#NOT s)*],(s+,[(#NOT s)*])*,s*"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   word           -- Word --
+
+   "nmchar+"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   words          -- Words --
+
+   "word+"
+   HyLex
+>
+<!LEXTYPE
+   line           -- Line --
+
+   SPEC
+   PUBLIC "ISO/IEC 10744:1997//NOTATION LEXTYPE Line//EN"
+>
+
+<!LEXTYPE
+   ATTORCON       -- Attribute name or content --
+
+   'ATTNAME|"#CONTENT"'
+   HyLex [unorm]
+>
+<!LEXCON
+   SMU            -- Standard measurement unit --
+
+   SPEC
+   PUBLIC "ISO/IEC 10744:1997//NOTATION LEXCON
+           Standard Measurement Unit//EN"
+>
+<!LEXTYPE
+   SMU            -- Standard measurement unit --
+
+   #CHECK SMU
+
+   "NOTATION"
+   HyLex [unorm]
+>
+<!LEXCON
+   AXISNM         -- Axis name --
+
+   SPEC
+   PUBLIC "ISO/IEC 10744:1997//NOTATION LEXCON
+           Axis name//EN"
+>
+<!LEXTYPE
+   AXISNM         -- Axis name --
+
+   #CHECK AXISNM
+
+   "NAME"
+   HyLex [unorm]
+>
+<!LEXCON
+   granule        -- Measurement granule name --
+
+   SPEC
+   PUBLIC "ISO/IEC 10744:1997//NOTATION LEXCON
+           Measurement Granule Name//EN"
+>
+<!LEXTYPE
+   granule        -- Measurement granule name --
+
+   #CHECK granule
+
+   "nmstrt,nmchar*"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   ratio          -- Measurement granule name --
+
+   "unzi,unzi"
+   HyLex
+>
+<!LEXTYPE
+   unzi           -- Unsigned non-zero integer --
+
+   "[1-9][0-9]*"
+   REGEX
+>
+<!LEXTYPE
+   snzi           -- Signed non-zero integer --
+
+   "[+-]?[1-9][0-9]*"
+   REGEX
+>
+<!LEXTYPE
+   marker         -- HyTime Axis marker --
+
+   "snzi"
+   HyLex [unorm]
+>

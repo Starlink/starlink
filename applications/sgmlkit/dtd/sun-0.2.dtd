@@ -1,0 +1,27 @@
+<!--
+	Starlink SUN DTD
+
+	Use with doctype declaration:
+
+	<!doctype sun public '-//Starlink//DTD Starlink SUN 0.2//EN'>
+-->
+
+<!entity % DTD.Version		"DTD Starlink SUN 0.2">
+
+<!entity % DocClass "SUN">
+<!entity % req.abstract "abstract,"	-- require an abstract -->
+
+<!-- 
+  Features: require support for versioning, and allow a list of
+  routine descriptions amongst the backmatter.
+-->
+<!entity % Feature.Versioning	'include'
+		-- Require version tracking in document -->
+<!entity % Feature.Routinelist	'include'
+		-- Support routine descriptions -->
+<!entity % Feature.Docnumber	'include'
+		-- require DOCNUMBER in head -->
+
+<!entity % Starlink.general
+	public "-//Starlink//DTD Starlink General 0.2//EN">
+%Starlink.general;

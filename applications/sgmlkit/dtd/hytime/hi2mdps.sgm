@@ -1,0 +1,262 @@
+<!AFDR "ISO/IEC 10744:1997">
+
+<!--
+"ISO/IEC 10744:1997//DTD AFDR Meta-DTD
+ Property Set//EN"
+-->
+
+                   <!-- Property Set Definition -->
+<!element
+   propset        -- Property set definition --
+                  -- Clause: A.4.2 --
+   - O
+   ((desc|note)*,(classdef|normdef)*,psmodule*)
+
+-- Attributes: clausnot, propset --
+>
+<!attlist
+   propset        -- Property set definition --
+                  -- Clause: A.4.2 --
+
+   nsd            -- Notation specification document --
+      NAME        -- Lextype: NOTATION --
+      #IMPLIED    -- Default: auxiliary property set --
+                  -- Constraint: must be specified for primary
+                     property sets; may not be specified for
+                     auxiliary property sets --
+
+   gcsd           -- Grove construction specification document --
+      NAME        -- Lextype: NOTATION --
+      #IMPLIED    -- Default: nsd --
+                  -- Constraint: must be specified for auxiliary
+                     property sets --
+>
+
+                       <!-- Clause Notation -->
+<!attlist
+-- clausnot --    -- Clause notation --
+                  -- Clause: A.4.2 --
+   (propset,classdef,propdef,normdef)
+
+   clausnot       -- Clause notation --
+      NAME        -- Lextype: NOTATION --
+      #IMPLIED    -- Default: notation described in A.4.2 --
+>
+
+                       <!-- Component Names -->
+<!attlist
+-- rcsnm --       -- Name in RCS --
+                  -- Clause: A.4.2.1.1 --
+   (enumdef,normdef,propdef,psmodule)
+
+   rcsnm          -- Name in RCS --
+      NAME        -- Constraint: unique in component name space --
+      #REQUIRED
+>
+<!attlist
+-- appnm --       -- Application name --
+                  -- Clause: A.4.2.1.1 --
+   (classdef,enumdef,normdef,propdef,psmodule)
+
+   appnm          -- Application name --
+      CDATA       -- Constraint: unique in component name space --
+      #IMPLIED    -- Default: rcsnm --
+>
+<!attlist
+-- fullnm --      -- Full name --
+                  -- Clause: A.4.2.1.1 --
+   (classdef,enumdef,normdef,propdef,psmodule)
+
+   fullnm         -- Full name --
+      CDATA       -- Constraint: unique in component name space --
+      #IMPLIED    -- Default: appnm --
+>
+
+                  <!-- Specification and Clause -->
+<!attlist
+-- spec --        -- Specification and clause --
+                  -- Clause: A.4.2.1.2 --
+   (classdef,propdef,normdef)
+
+   sd             -- Specification document --
+      NAME        -- Lextype: NOTATION --
+      #IMPLIED    -- Default: primary property set's notation
+                     specification document; auxiliary property set's
+                     grove construction specification document. --
+
+   clause         -- Clause of specification document --
+      CDATA       -- Constraint: in notation specified by clausnot --
+      #IMPLIED    -- Default: if propdef, same clause as classdef;
+                     otherwise none --
+>
+
+                    <!-- Descriptive Elements -->
+<!element
+   desc           -- Description of property set component --
+                  -- Clause: A.4.2.1.3 --
+   - O
+   (#PCDATA)
+>
+<!element
+   note           -- Explanatory note --
+                  -- Clause: A.4.2.1.3 --
+   - O
+   (#PCDATA)
+>
+
+                  <!-- Member of default grove plan -->
+<!attlist
+-- default --     -- Member of default grove plan --
+                  -- Clause: A.4.2.1.4 --
+   (psmodule,classdef,propdef)
+
+   default        -- Member of default grove plan --
+      (default|ndefault) 
+      ndefault
+>
+
+                     <!-- Property Set Module -->
+<!element
+   psmodule       -- Property set module --
+                  -- Clause: A.4.2.2 --
+   - O
+   ((desc|note)*,(classdef|propdef|normdef)*)
+
+-- Attributes: appnm, default, fullnm, psmodule, rcsnm --
+>
+<!attlist
+   psmodule       -- Property set module --
+                  -- Clause: A.4.2.2 --
+
+   dependon       -- Modules depended on --
+      NAMES       -- Constraint: RCS names of modules defined in this
+                     property set --
+      #IMPLIED    -- Default: none --
+>
+
+                      <!-- Class Definition -->
+<!element
+   classdef       -- Class definition --
+                  -- Clause: A.4.2.3 --
+   - O
+   ((desc|note)*, propdef*)
+
+-- Attributes: appnm, clausnot, default, fullnm, spec --
+>
+<!attlist
+   classdef       -- Class definition --
+                  -- Clause: A.4.2.3 --
+
+   rcsnm          -- Name in RCS --
+      ID          -- Constraint: unique in component name space --
+      #REQUIRED
+
+   conprop        -- Content property --
+      NAME        -- Constraint: RCS name of nodal property of class
+                     with noderel=subnode, char property, or string --
+      #IMPLIED    -- Default: no content property --
+
+   prune          -- Prune content tree --
+      (prune|nprune)
+                  -- Constraint: can only be nprune if the set of
+                     allowed classes of the content property is
+                     guaranteed to be a subset of that of parent's
+                     content property --
+      prune
+
+   dsepprop       -- Data separator property --
+      NAME        -- Constraint: RCS name of char or string property
+                     of class --
+      #IMPLIED    -- Default: none --
+
+   mayadd         -- May add --
+      (mayadd|mayntadd)
+      mayntadd
+>
+
+                     <!-- Property Definition -->
+<!element
+   propdef        -- Property definition --
+                  -- Clause: A.4.2.4 --
+   - O
+   ((desc|note)*,when?,enumdef*)
+
+-- Attributes: appnm, clausnot, default, fullnm, rcsnm, spec --
+>
+<!attlist
+   propdef        -- Property definition --
+                  -- Clause: A.4.2.4 --
+
+   cn             -- Class name --
+                  -- Provider of property --
+      IDREF       -- Constraint: RCS name of class in property set --
+      #IMPLIED    -- Default: containing classdef --
+                  -- Constraint: must be specified if propdef occurs
+                     outside of a classdef --
+
+   datatype       -- Datatype of property value --
+      (node|nodelist|nmndlist|enum|char|string|strlist|integer|
+       intlist|boolean|compname|cnmlist)
+      #REQUIRED
+
+   noderel        -- Node relationship --
+      (subnode|irefnode|urefnode)
+      #IMPLIED    -- Default: not nodal --
+                  -- Constraint: required if datatype is nodal --
+
+   ac             -- Allowed classes --
+      IDREFS      -- Constraint: RCS names of classes defined in
+                     property set --
+      #IMPLIED    -- Default: not nodal or if noderel=urefnode, any
+                     class in any property set --
+                  -- Constraint: required if datatype is nodal, unless
+                     noderel=urefnode --
+
+   acnmprop       -- Allowed class name properties --
+      NAMES       -- Constraint: one property RCS name for each
+                     allowed class; must be either all string
+                     properties or all node properties of their
+                     respective classes --
+      #IMPLIED    -- Default: not nmndlist --
+                  -- Constraint: required if datatype is nmndlist,
+             otherwise, may not be specified. --
+
+   strnorm        -- String normalization rule --
+       NAME       -- Constraint: RCS name of normdef defined in
+                     property set --
+       #IMPLIED   -- Default: none --
+                  -- Constraint: may be specified only if datatype is
+                     string or strlist --
+
+   vrfytype       -- Verify type --
+       (derived|optional|other)
+       other
+>
+<!element
+   when           -- When property exists --
+                  -- Clause: A.4.2.4 --
+                  -- Condition precedent for a non-null value to be
+                     exhibited --
+   - O
+   (#PCDATA)
+>
+
+                 <!-- Enumerated value definition -->
+<!element
+   enumdef        -- Enumerated value definition --
+                  -- Clause: A.4.2.4.1 --
+   - O
+   (desc|note)*
+
+-- Attributes: appnm, fullnm, rcsnm --
+>
+
+                <!-- Normalization Rule Definition -->
+<!element
+   normdef        -- Normalization rule definition --
+                  -- Clause: A.4.2.5 --
+   - O
+   (desc|note)*
+
+-- Attributes: appnm, clausnot, fullnm, rcsnm, spec --
+>

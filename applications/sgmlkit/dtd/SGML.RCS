@@ -1,0 +1,211 @@
+<!SGML "ISO 8879:1986"
+  CHARSET
+  BASESET "ISO 646:1991//CHARSET IRV//ESC 2/8 4/2"
+  DESCSET
+      0   9 UNUSED
+      9   2   9         -- TAB, LF --
+     11   2 UNUSED
+     13   1  13         -- CR --
+     14  18 UNUSED
+     32  95  32
+    127   1 UNUSED
+  CAPACITY SGMLREF
+    TOTALCAP    35000
+    ENTCAP      35000
+    ENTCHCAP    35000
+    ELEMCAP     35000
+    GRPCAP      35000
+    EXGRPCAP    35000
+    EXNMCAP     35000
+    ATTCAP      35000
+    ATTCHCAP    35000
+    AVGRPCAP    35000
+    NOTCAP      35000
+    NOTCHCAP    35000
+    IDCAP       35000
+    IDREFCAP    35000
+    MAPCAP      35000
+    LKSETCAP    35000
+    LKNMCAP     35000
+  SCOPE DOCUMENT
+  SYNTAX
+    SHUNCHAR NONE       -- do not change this --
+    BASESET "ISO 646:1991//CHARSET IRV//ESC 2/8 4/2"
+    DESCSET 0 128 0
+    FUNCTION
+      RE    13          -- CR  --
+      RS    10          -- LF  --
+      SPACE 32          -- SP  --
+      TAB   SEPCHAR  9  -- TAB --
+    NAMING
+      LCNMSTRT  ""      -- in addition to a..z --
+      UCNMSTRT  ""      -- in addition to A..Z --
+      LCNMCHAR  "-."    -- in addition to 0..9 --
+      UCNMCHAR  "-."    -- in addition to 0..9 --
+      NAMECASE
+        GENERAL YES
+        ENTITY  NO
+    DELIM
+      GENERAL SGMLREF
+      MDO	"<!"	        -- markup decl open --
+      MDC	">"	        -- markup decl close --
+      DSO	"["	        -- declaration subset open --
+      DSC	"]"	        -- declaration subset close --
+      MSC	"]]"	        -- marked section close --
+      COM       "--"	        -- comment --
+      RNI	"#"	        -- reserved name indicator --
+      LIT       "&#34;"         -- literal --
+      LITA	"'"	        -- alternative literal --
+      GRPO	"("	        -- group open --
+      GRPC	")"	        -- group close --
+      AND	"&"	        -- and connector --
+      OR	"|"	        -- or connector --
+      SEQ	","	        -- seq connector --
+      OPT	"?"	        -- opt occurrence indicator --
+      REP	"*"	        -- rep occurrence indicator --
+      PLUS	"+"	        -- plus occ ind, inclusion --
+      MINUS	"-"	        -- exclusion, omission flag --
+      CRO	"&#"	        -- character reference open --
+      ERO	"&"	        -- entity reference open --
+      PERO	"%"	        -- parameter entity reference open --
+      REFC	";"	        -- reference close --
+      PIO	"<?"	        -- processing instruction open --
+      PIC	">"	        -- processing instruction close --
+      STAGO	"<"	        -- start tag open --
+      ETAGO	"</"	        -- end tag open --
+      TAGC	">"	        -- tag close --
+      NET	"/"	        -- null end-tag --
+      VI	"="	        -- value indicator --
+    SHORTREF NONE
+      "&#TAB;"
+      "&#RE;"
+      "&#RS;"
+      "&#RS;B"
+      "&#RS;&#RE;"
+      "&#RS;B&#RE;"
+      "B&#RE;"
+      "&#SPACE;"
+      "BB"
+      "&#34;"
+      "#"
+      "%"
+      "'"
+      "("
+      ")"
+      "*"
+      "+"
+      ","
+      "-"
+      "--"
+      ":"
+      ";"
+      "="
+      "@"
+      "["
+      "]"
+      "^"
+      "_"
+      "{"
+      "|"
+      "}"
+      "~"
+    NAMES SGMLREF
+      -- available names for substitution, grouped by area of use.
+         names marked with (*) are overloaded and must be substituted
+         only once, but the translation needs to fit all uses.
+      DOCTYPE
+        ELEMENT
+          ANY
+          CDATA (*)
+          RCDATA (*)
+          PCDATA
+          EMPTY (*)
+          O
+        ATTLIST
+          ID
+          IDREF
+          IDREFS
+          ENTITY (*)
+          ENTITIES
+          NOTATION (*)
+          NAME
+          NAMES
+          NMTOKEN
+          NMTOKENS
+          NUTOKEN
+          NUTOKENS
+          NUMBER
+          NUMBERS
+          CDATA (*)
+          FIXED
+          CONREF
+          CURRENT
+          REQUIRED
+          IMPLIED (*)
+        ENTITY (*)
+          DEFAULT
+          STARTTAG
+          ENDTAG
+          MD
+          MS
+          PI
+          CDATA (*)
+          SDATA
+          NDATA
+          SUBDOC
+          SYSTEM
+          PUBLIC
+        (marked section keywords)
+          CDATA (*)
+          RCDATA (*)
+          IGNORE
+          INCLUDE
+          TEMP
+        NOTATION (*)
+        SHORTREF
+        USEMAP
+          EMPTY (*)
+        LINKTYPE
+            SIMPLE
+            IMPLIED (*)
+          LINK
+            INITIAL
+          IDLINK
+          USELINK
+            RESTORE
+             EMPTY (*)
+          POSTLINK
+        (named character entity references)
+          RE
+          RS
+          SPACE
+      --
+    QUANTITY SGMLREF
+      NAMELEN     8
+      LITLEN    240
+      PILEN     240
+      TAGLEN    960
+      ATTSPLEN  960
+      TAGLVL     24
+      ENTLVL     16
+      ATTCNT     40
+      GRPCNT     32
+      GRPGTCNT   96
+      GRPLVL     16
+      BSEQLEN   960
+  FEATURES
+    MINIMIZE
+      DATATAG   NO      -- do not change this --
+      OMITTAG   YES
+      RANK      NO      -- do not change this --
+      SHORTTAG  YES
+    LINK
+      SIMPLE    NO      -- YES requires number --
+      IMPLICIT  NO
+      EXPLICIT  NO      -- YES requires number --
+    OTHER
+      CONCUR    NO      -- do not change this --
+      SUBDOC    NO      -- YES requires number --
+      FORMAL    YES     -- do not change this --
+  APPINFO NONE
+>

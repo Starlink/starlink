@@ -1,0 +1,110 @@
+<!-- 
+  DTD for program source code comments.  It's _very_ sketchy at the
+  moment - it's intended just to check I can read the things.
+
+  Invoke with something like:
+
+    <!entity % languagenotation "fortran77">
+
+    <!entity % generalcode.dtd
+	public "-//Starlink//DTD Program Source Code 0.1//EN">
+    %generalcode.dtd;
+
+  This DTD doesn't set a default %languagenotation - this DTD should
+  not be used on its own.
+-->
+
+<!--
+  Collect parameter entities here.  These could be overridden by the
+  invoking DTD.
+-->
+
+<!entity % direction.attr 
+	"direction (given|returned|givenandreturned) #required"
+	-- input or output to function -->
+
+<!entity % language.attr	-- language name --
+	 "language notation (%languagenotation;) #fixed %languagenotation;">
+
+
+<!--
+  Language notations.  See ``ISO/IEC JTC1/WG4 N1958, Information
+  technology - Text and office systems - Using SGML Public Identifiers
+  for Specifying Data Notations'', at
+  http://www.ornl.gov/sgml/wg4/document/1958.htm.  Note I've
+  changed the name of the Fortran notation to Fortran77.
+-->
+<!NOTATION FORTRAN77  PUBLIC "ISO/IEC 1539:1991//NOTATION
+                            Information technology -
+                            Programming languages -
+                            FORTRAN//EN"                           >
+<!NOTATION C        PUBLIC "ISO/IEC 9899:1990//NOTATION
+                            Programming languages - C//EN"         >
+<!NOTATION DSSSL    PUBLIC "ISO/IEC 10179:1996//NOTATION
+                            Information processing -
+                            Text and office systems -
+                            Document Style Semantics and
+                            Specification Language (DSSSL)//EN"    >
+
+
+
+<!element program	o o ((#pcdata | codeprologue)*)>
+<!element codeprologue	- - (routinename & purpose? & description & 
+				returnvalue & argumentlist &
+				authorlist? & history)>
+
+<!element routinename	- o (name, othernames?)>
+<!element name		o o (#pcdata)>
+<!element othernames	- o (name+)>
+<!element purpose	- o (#pcdata)>
+<!element description	- o (p+)>
+<!element argumentlist	- o (p*, parameter*)>
+<!element returnvalue	- o (p*)>
+<!element authorlist	o o (author+)>
+<!element history	o o (change+)>
+
+<!element p		o o (#pcdata)>
+<!element parameter	- o (name, type, description)>
+<!element type		- o (#pcdata)>
+<!element author	- o (#pcdata)>
+<!element change	- o (#pcdata)>
+
+<!attlist author
+	id		-- identify author --
+		id
+		#required
+	attribution	-- where based --
+		cdata
+		#implied
+	>
+<!attlist change
+	author		-- who made this mod? --
+		idref
+		#required
+	date		-- ... and when? --
+		cdata
+		#required
+	>
+
+<!attlist argumentlist
+	none		-- Attribute present if there are no
+			   arguments.  There shouldn't be any
+			   PARAMETER content in this case. --
+		(none)
+		#implied
+	>
+<!attlist returnvalue
+	none		-- Attribute present if there is no
+			   return value. --
+		(none)
+		#implied
+	>
+
+<!attlist parameter
+	%direction.attr;
+	>
+
+<!attlist codeprologue
+	%language.attr
+	>
+

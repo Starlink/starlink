@@ -1,0 +1,14 @@
+<!doctype programcode public "-//Starlink//DTD Fortran Source Code 0.2//EN" [
+	<!entity test.f system "test.f">
+]>
+
+<title>A simple test program
+
+<codegroup>
+<title>A simple test group, with only a single function in it
+<description>A test program, which does nothing except be documented
+<authorlist>
+<author id=ng attribution='Glasgow'>Norman
+
+<func>
+&test.f

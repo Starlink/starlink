@@ -1,0 +1,11 @@
+3c3
+< 	SGML Declaration for Starlink DTDs
+---
+> 	SGML Declaration for Starlink DTDs.
+30c30,33
+<                   160  96    32
+---
+> 		  -- Following line changed for Linux.
+> 		     see http://www.webtechs.com/html-tk/linux.decl.html --
+>                   -- 160  96    32 --
+>                   160  96    UNUSED

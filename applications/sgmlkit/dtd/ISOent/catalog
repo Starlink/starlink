@@ -1,0 +1,37 @@
+PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML"
+							ISOlat1-html.ent
+PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//LATEX"  
+							ISOlat1-latex.ent
+PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//ENT"    
+							ISOlat1-ent.ent
+
+
+PUBLIC 'ISO 8879:1986//ENTITIES Added Math Symbols: Arrow Relations//EN' 
+							ISOamsa.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Added Math Symbols: Binary Operators//EN' 
+							ISOamsb.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Added Math Symbols: Delimiters//EN'
+							ISOamsc.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Added Math Symbols: Negated Relations//EN'
+							ISOamsn.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Added Math Symbols: Ordinary//EN'
+							ISOamso.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Added Math Symbols: Relations//EN'
+							ISOamsr.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Box and Line Drawing//EN'
+							ISObox.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Russian Cyrillic//EN'	ISOcyr1.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Non-Russian Cyrillic//EN'
+							ISOcyr2.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Diacritical Marks//EN'	ISOdia.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Greek Letters//EN' 	ISOgrk1.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Monotoniko Greek//EN'	ISOgrk2.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Greek Symbols//EN'	ISOgrk3.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Alternative Greek Symbols//EN'
+							ISOgrk4.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Added Latin 1//EN'	ISOlat1.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Added Latin 2//EN'	ISOlat2.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Numeric and Special Graphic//EN'
+							ISOnum.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES Publishing//EN'		ISOpub.sdata
+PUBLIC 'ISO 8879:1986//ENTITIES General Technical//EN'	ISOtech.sdata

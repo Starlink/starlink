@@ -1,0 +1,300 @@
+<![ ignore [
+  DTD for program source code structure.
+
+  This DTD was not designed to be used on its own, but instead
+  included at the end of a language-specific DTD, which defines a
+  notation, and sets up shortref maps to make inputting the source
+  file easier - for example, the Fortran DTD makes `^*+' a shortref
+  for the CODEPROLOGUE start tag, and ignores `^*' within the
+  CODEPROLOGUE.  However, since it _is_ intended to be used as an
+  architecture, it _may_ be used on its own, if you have an
+  application which can benefit from that.
+
+  Invoke with something like:
+
+    <!entity % language.attr	-- language name --
+	 "language notation (FORTRAN77) #fixed FORTRAN77">
+    <!entity % generalcode.dtd
+	public "-//Starlink//DTD Program Source Code 0.2//EN">
+    %generalcode.dtd;
+
+  The definition of the %language.attr entity is required.
+  The %direction.attr entity may also be predefined, and if the DTD
+  which calls this one wishes to do other architectural remapping
+  (only the DSSSL one does at present), then it can define further
+  attributes as noted below.
+
+  Author: 
+    NG: Norman Gray (Glasgow)
+
+  History: 
+    March 1999 (NG):
+      Original version
+
+  Copyright 1999, Particle Physics and Astronomy Research Council.
+]]>
+
+<!--============================== Entities ==============================
+  Collect parameter entities here.  These could be overridden by the
+  invoking DTD.
+-->
+
+<!--
+  The %direction.attr entity is attached to function arguments, and
+  indicates which direction the argument is moving.  Calling DTDs may
+  modify this as appropriate, as long as the modified version is a
+  subset of this list.
+-->
+<!entity % direction.attr 
+	"direction (given|returned|givenandreturned) #required"
+	-- input or output to function -->
+
+<!--
+  %language.attr entity must be declared by the DTD which includes
+  this one.  That DTD should declare the entity as something like
+
+    <!entity % language.attr
+	 "language notation (fortran77) #fixed fortran77">
+
+  using one of the notations declared here.
+-->
+<!entity % notationlist "fortran77 | dsssl">
+<!entity % language.attr
+        "language notation (%notationlist;) #required">
+
+<!-- Just for convenience, also define a LT entity -->
+<!entity lt "<">
+
+<!--
+  Language notations are declared here.  The DTDs which include
+  this one may declare attributes to these notations (for example, the
+  DSSSLCODE DTD uses the DSSSL notation to declare the DSSSL DTD as an
+  architecture).  See ``ISO/IEC JTC1/WG4 N1958, Information technology
+  - Text and office systems - Using SGML Public Identifiers for
+  Specifying Data Notations'' <http://www.ornl.gov/sgml/wg4/document/1958.htm>.
+
+  Note that the DSSSL notation declaration mentioned in the above
+  document is different from this (unimportantly, I believe).
+
+  Note also that I've changed the name of the Fortran notation to
+  Fortran77, to support a future distinction of this from Fortran 90.
+-->
+<!notation dsssl      public 
+                      "ISO/IEC 10179:1996//NOTATION
+                         DSSSL Architecture Definition Document//EN"
+                      -- A document architecture conforming to the
+                         Architectural Form Definition Requirements of
+                         ISO/IEC 10744.     --
+	>
+<!NOTATION FORTRAN77  PUBLIC 
+                      "ISO/IEC 1539:1991//NOTATION
+                         Information technology - Programming languages -
+                         FORTRAN//EN"
+	>
+<!NOTATION C		PUBLIC 
+			"ISO/IEC 9899:1990//NOTATION
+                         Programming languages - C//EN"
+	>
+
+<!--==================== Element structure ====================-->
+<!element programcode	o o (docblock, (codegroup | codereference)+)
+		-- Document element -->
+<!element codegroup	- o (docblock, (func | misccode)+)
+		-- A codegroup is a collection of functions or other
+		   code which can sensibly be grouped together.
+		   There's no particular semantics implied by the
+		   grouping, as far as this DTD is (currently)
+		   concerned. -->
+<!element codereference	- o (docblock)
+		-- A codereference is a rather vague thing, at
+		   present.  It's intended to document some
+		   relationship with code in another document.  The
+		   only use I've put it to so far is to have the
+		   DSSSLCODE DTD make this architectural, and map to
+		   the EXTERNAL-SPECIFICATION element in DSSSL.
+		   However, it could sensibly also document the fact
+		   that a fortran file might depend on an include
+		   file.
+
+		   The document referred to should be marked up using
+		   the programcode DTD. -->
+
+<!element docblock	o o (title, description?, authorlist?,
+			     copyright?, history?)>
+
+<!element func		o o (codeprologue, codebody)
+		-- The specification of one function -->
+<!element misccode	o o (miscprologue, codebody)
+		-- Other code, not reasonably
+		   categorised as a function -->
+<!element codebody	o o (#pcdata)
+		-- The actual code -->
+
+<!--
+  Attributes for codegroup and codebody.  Add architectural control
+  attributes here.  If they are defined before this, both
+  %funcbody.arch.atts and %codebody.arch.atts must be set to something
+  sensible.  This isn't terribly flexible as it stands, but that's OK,
+  since it's really only used by the DSSSL programcode DTD.
+  -->
+
+<!entity % codegroup.arch.atts '' >
+<!entity % codebody.arch.atts '' >
+<!entity % codereference.arch.atts ''>
+<!attlist codegroup
+	%language.attr;
+	%codegroup.arch.atts;
+	>
+<!attlist codereference
+	doc	 	-- the document containing the code being
+			   referred to --
+		entity #required
+	%codereference.arch.atts;
+	>
+<!attlist codebody
+	empty		-- Is element empty?  The application
+			   _currently_ ignores the element content,
+			   but if something generates a document
+			   conforming to this DTD directly (as opposed
+			   to one of its clients), then this attribute
+			   should be present (for neatness if nothing
+			   else) if the body doesn't actually contain
+			   anything. --
+		(empty) #implied
+	%codebody.arch.atts;
+	>
+
+
+
+<!--
+  The code prologue is the documentation of the routine.  I'd consider
+  making the connectors here into `&'; that can be done in future if
+  we decide that's necessary
+-->
+<!entity % para.markup 'code | em | url'>
+<!entity % para.content '(#pcdata | %para.markup | ul)*'>
+
+<!element codeprologue	o o (routinename , purpose? , description , 
+				returnvalue , argumentlist ,
+				authorlist? , history?)>
+<!element miscprologue	o o (description, history?)
+				-- content model needs future expansion? -->
+
+<!element routinename	o o (name, othernames?)
+				-- some routines have a generic name
+				   like `proc_<type>', plus other
+				   names like `proc_real'. -->
+<!element name		o o (#pcdata)>
+<!element othernames	- o (name+)>
+
+<!element purpose	- o (%para.content;)
+				-- brief (one line?) description -->
+<!element title		- o (#pcdata)>
+<!element description	- o (p+)
+				-- longer discursive description -->
+<!element returnvalue	- o (%para.content;)
+				-- If there's no return value, there
+				   needn't be any explanatory text -->
+<!-- <!element argumentlist	- o (p*, parameter*)> -->
+<!element argumentlist	o o (parameter*)>
+
+<!attlist argumentlist
+	none		-- Attribute present if there are no
+			   arguments.  There shouldn't be any
+			   PARAMETER content in this case. --
+		(none)
+		#implied
+	>
+<!attlist returnvalue
+	none		-- Attribute present if there is no
+			   return value. --
+		(none)
+		#implied
+	type		-- Type of returned value --
+		cdata
+		#implied
+	>
+
+<!--
+  The AUTHOR element includes full details about an author and has
+  a required ID attribute, the AUTHORREF element simply refers to an
+  AUTHOR element elsewhere using an IDREF.  We need the distinction
+  since it follows that a document can have only one AUTHOR element
+  per author.  If the actual text of a document is scattered amongst
+  several source-code files, then it would be appropriate for the
+  scattered files to have AUTHORREF elements, and for the
+  corresponding AUTHOR element to be in a CODEGROUPHEAD element in a
+  `master' file which collects together the source-code files for
+  documentation purposes.  It might be appropriate to let the
+  AUTHORREF element have some content, so that a suitable note can go
+  in the source-code file, to make it more nearly standalone.
+-->
+<!element authorlist	o o ((author+ | authorref+), otherauthors?)>
+<!element otherauthors	- o (author+ | authorref+)
+				-- other authors who have contributed -->
+<!element history	o o (change+)
+				-- the changes should be in
+				   chronological order, with newest last -->
+<!element copyright	- o (p+)
+				-- Copyright message -->
+
+<!element p		o o (%para.content;)>
+<!element (%para.markup;) - - (#pcdata)>
+<!element ul		- - (li+)>
+<!element li		- o (#pcdata)>
+<!element type		- o (#pcdata)>
+<!element author	- o (name, authornote?)
+				-- name child contains the author name -->
+<!element authornote	- o (p+)
+				-- Other information/notes about this
+				   author -->
+<!element authorref	- o EMPTY>
+<!element change	- o (p+)>
+<!element parameter	- o (name, type, description)>
+
+<!attlist parameter
+	optional 	-- is the parameter optional?  Optional means that
+			   the parameter will be defaulted if omitted,
+			   and keyword means that the parameter is
+			   specified with a keyword.  Both mechanisms
+			   are used in both DSSSL and IDL (for
+			   example). --
+		(optional|keyword) #implied
+	%direction.attr;
+	>
+
+<!attlist author
+	id		-- identify author --
+		id
+		#required
+	attribution	-- where based --
+		cdata
+		#implied
+	-- etc... add further author details --
+	>
+<!attlist authorref
+	id		-- refer to author --
+		idref
+		#required
+	note		-- Author ref's content can be any
+			   note giving further information.
+			   For example, ISO10179 was listed as
+			   an `author' of some of the routines
+			   in the DSSSL stylesheet, and the
+			   authorref note attribute was used to list
+			   the section where the code was
+			   listed there. --
+		cdata
+		#implied
+	>
+<!attlist change
+	author		-- who made this mod? --
+		idref
+		#required
+	date		-- ... and when? --
+		cdata
+		#required
+	>
+
+
+

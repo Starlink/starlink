@@ -1,0 +1,70 @@
+<!doctype documentsummary public "-//Starlink//DTD Document Summary 0.1//EN">
+<documentsummary urllinkpolicy="explicit">
+<docinfo>
+<title>HTX -- Hypertext Cross-Reference Utilities</title>
+<authorlist>
+<author>R.F. Warren-Smith</author>
+<!-- Insert email, webpage, affiliation attributes -->
+</authorlist>
+<docnumber documenttype="SUN">188.3</docnumber>
+</docinfo>
+<docbody>
+<sect id="introduction" export urlpath="sun188.htx/node2.html"><title>INTRODUCTION</title>
+<subsect id="what_does_HTX_do" export urlpath="sun188.htx/node3.html"><title>What Does HTX Do?</title>
+<subsect id="what_is_a_hypertext_document" export urlpath="sun188.htx/node4.html"><title>What is a Hypertext Document?</title>
+<subsect id="why_are_cross_references_a_problem" export urlpath="sun188.htx/node5.html"><title>Why are Cross-References a Problem?</title>
+<subsect id="mixing_local_and_remote_documents" export urlpath="sun188.htx/node6.html"><title>Mixing Local and Remote Documents</title>
+<sect id="document_organisation" export urlpath="sun188.htx/node7.html"><title>DOCUMENT ORGANISATION</title>
+<subsect id="document_directories" export urlpath="sun188.htx/node8.html"><title>Document Directories</title>
+<subsect id="document_libraries" export urlpath="sun188.htx/node9.html"><title>Document Libraries</title>
+<subsect id="multiple_libraries_and_the_library_search_path" export urlpath="sun188.htx/node10.html"><title>Multiple Libraries and the Library Search Path</title>
+<label id="HTX_PATH_search_path" export urlpath="sun188.htx/node10.html">
+<sect id="establishing_cross_references" export urlpath="sun188.htx/node11.html"><title>ESTABLISHING CROSS-REFERENCES</title>
+<subsect id="exporting_targets" export urlpath="sun188.htx/node12.html"><title>Exporting Cross-Reference Targets</title>
+<subsect id="referring_to_targets" export urlpath="sun188.htx/node13.html"><title>Referring to Cross-Reference Targets</title>
+<subsect id="blank_labels" export urlpath="sun188.htx/node14.html"><title>Referring to an Entire Document</title>
+<subsect id="how_to_link" export urlpath="sun188.htx/node15.html"><title>Linking your Hypertext Documents</title>
+<subsect id="using_cross_references_from_latex" export urlpath="sun188.htx/node16.html"><title>Using Cross-References from \LaTeX</title>
+<sect id="how_linking_works" export urlpath="sun188.htx/node17.html"><title>HOW HTX LINKING WORKS</title>
+<subsect id="index_files" export urlpath="sun188.htx/node18.html"><title>Index Files</title>
+<subsect id="link_editing" export urlpath="sun188.htx/node19.html"><title>Link-Editing</title>
+<subsect id="absolute_and_relative_links" export urlpath="sun188.htx/node20.html"><title>Absolute and Relative Links</title>
+<subsect id="references_to_remote_documents" export urlpath="sun188.htx/node21.html"><title>References to Remote Documents</title>
+<sect id="when_to_relink" export urlpath="sun188.htx/node22.html"><title>WHEN TO RE-LINK</title>
+<subsect id="accommodating_normal_document_changes" export urlpath="sun188.htx/node23.html"><title>Accommodating Normal Document Changes</title>
+<subsect id="forcing_a_relink" export urlpath="sun188.htx/node24.html"><title>Forcing a Re-Link</title>
+<subsect id="suppressing_relinking" export urlpath="sun188.htx/node25.html"><title>Suppressing Re-Linking</title>
+<sect id="remote_document_servers" export urlpath="sun188.htx/node26.html"><title>REMOTE DOCUMENT SERVERS</title>
+<subsect id="HTX_SERVER_remote_server_URL" export urlpath="sun188.htx/node27.html"><title>Specifying a Document Server</title>
+<subsect id="the_document_servers_role" export urlpath="sun188.htx/node28.html"><title>The Document Server's Role</title>
+<sect id="gaining_access_to_documents" export urlpath="sun188.htx/node29.html"><title>GAINING ACCESS TO DOCUMENTS</title>
+<subsect id="displaying_documents_by_name" export urlpath="sun188.htx/node30.html"><title>Displaying Documents by Name</title>
+<subsect id="displaying_parts_of_documents" export urlpath="sun188.htx/node31.html"><title>Displaying Parts of Documents by Label</title>
+<sect id="searching_for_information" export urlpath="sun188.htx/node32.html"><title>SEARCHING FOR INFORMATION IN DOCUMENTS</title>
+<subsect id="performing_keyword_searches" export urlpath="sun188.htx/node33.html"><title>Performing Keyword Searches</title>
+<subsect id="controlling_the_depth_of_search" export urlpath="sun188.htx/node34.html"><title>Controlling the Depth of Search</title>
+<subsect id="searching_specific_documents" export urlpath="sun188.htx/node35.html"><title>Searching Specific Documents</title>
+<subsect id="other_search_options_available" export urlpath="sun188.htx/node36.html"><title>Other Search Options Available</title>
+<sect id="using_HTX_from_other_software" export urlpath="sun188.htx/node37.html"><title>USING HTX FACILITIES FROM OTHER SOFTWARE</title>
+<subsect id="providing_hypertext_help" export urlpath="sun188.htx/node38.html"><title>Providing Hypertext Help</title>
+<subsect id="using_HTX_to_control_a_WWW_browser" export urlpath="sun188.htx/node39.html"><title>Using HTX to Control a WWW Browser</title>
+<subsect id="performing_document_searches_from_other_software" export urlpath="sun188.htx/node40.html"><title>Performing Document Searches from Other Software</title>
+<sect id="catalogue_files" export urlpath="sun188.htx/node41.html"><title>CATALOGUE FILES</title>
+<subsect id="catalogue_file_name_and_format" export urlpath="sun188.htx/node42.html"><title>Catalogue File Name and Format</title>
+<subsect id="a_catalogue_file_example" export urlpath="sun188.htx/node43.html"><title>A Catalogue File Example</title>
+<subsect id="how_catalogue_files_are_searched" export urlpath="sun188.htx/node44.html"><title>How Catalogue Files are Searched</title>
+<subsect id="providing_a_local_catalogue_of_remote_documents" export urlpath="sun188.htx/node45.html"><title>Providing a Local Catalogue of Remote Documents</title>
+<sect id="command_descriptions" export urlpath="sun188.htx/node46.html"><title>DESCRIPTIONS OF HTX COMMANDS</title>
+<sect id="using_WWW_browsers" export urlpath="sun188.htx/node50.html"><title>USING WWW BROWSERS WITH HTX</title>
+<subsect id="specifying_a_WWW_browser" export urlpath="sun188.htx/node51.html"><title>Specifying a WWW Browser</title>
+<label id="HTX_BROWSER_browser_command" export urlpath="sun188.htx/node51.html">
+<subsect id="defining_your_X_display" export urlpath="sun188.htx/node52.html"><title>Defining Your X~Display</title>
+<subsect id="WWW_browser_communication" export urlpath="sun188.htx/node53.html"><title>WWW Browser Communication</title>
+<subsubsect><title>Mosaic Behaviour</title>
+<subsubsect><title>Netscape Behaviour</title>
+<subsect id="inter_machine_browser_communication" export urlpath="sun188.htx/node56.html"><title>Inter-Machine Browser Communication</title>
+<sect id="changes_and_new_features" export urlpath="sun188.htx/node57.html"><title>CHANGES AND NEW FEATURES</title>
+<subsect><title>Changes and New Features in V1.1</title>
+<subsect id="list_of_most_recent_changes" export urlpath="sun188.htx/node59.html"><title>Changes and New Features in V1.2</title>
+</docbody>
+</documentsummary>

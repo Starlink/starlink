@@ -1,0 +1,9 @@
+public 
+	"-//Starlink//SUBDOC Starlink General Stylesheet (HTML)//EN"
+	"sl/html/sl.dsl"
+public
+	"-//Starlink//SUBDOC Starlink General Stylesheet (library)//EN"
+	"sl/lib/sllib.dsl"
+public
+	"-//Starlink//SUBDOC Starlink General Stylesheet (common)//EN"
+	"sl/common/slcommon.dsl"

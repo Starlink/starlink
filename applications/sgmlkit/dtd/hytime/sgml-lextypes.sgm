@@ -1,0 +1,710 @@
+<!-- Copied from the HyTime standard, section A.2.3.3 -->
+
+
+
+<!--
+This file is identified by the following public identifier:
+
+"ISO/IEC 10744:1997//NONSGML LTDR LEXTYPES SGML Lexical Types//EN"
+
+Unless otherwise specified, all non-model lexical types and
+lexicographic orderings are relative to the declared concrete syntax
+of the document from which they are referenced.
+-->
+
+                <!-- HyTime Lexical Model Notation -->
+<!NOTATION HyLex
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime lexical model notation (HyLex)//EN"
+>
+<!ATTLIST #NOTATION HyLex
+   norm           -- Normalization --
+      (norm|unorm)
+      norm
+>
+
+                <!-- SGML lexicographic orderings -->
+
+<!-- Note: For case-related ordering, the case rules that apply are
+     the case rules of the document in which the lexicographic
+     ordering (or lexical type that uses the lexicographic ordering)
+     is used. -->
+
+<!LEXORD
+   SGMLCASE       -- SGML namecase substitution --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXORD Namecase substitution//EN"
+>
+<!LEXORD
+   GENERAL        -- SGML general namecase substitution --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXORD
+           General namecase substitution//EN"
+>
+<!LEXORD
+   ENTITY         -- SGML entity namecase substitution --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXORD
+           Entity namecase substitution//EN"
+>
+<!LEXORD
+   RCSGENER       -- SGML reference concrete syntax general namecase
+                     substitution --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXORD
+           Reference concrete syntax general namecase
+           substitution//EN"
+>
+
+                  <!-- SGML lexical constraints -->
+
+<!LEXCON
+   NAMELEN        -- SGML name length constraint --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXCON QUANTITY Name length//EN"
+>
+<!LEXCON
+   PENTLEN        -- SGML parameter entity name length constraint --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXCON
+           QUANTITY Parameter entity name length//EN"
+>
+<!LEXCON
+   DTDORLPD       -- SGML DTD or LPD name --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXCON DTD or LPD name//EN"
+>
+<!LEXCON
+   NOTATION       -- SGML Notation name --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXCON Notation name//EN"
+>
+<!LEXCON
+   PARMENT        -- SGML Parameter entity name --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXCON Parameter entity name//EN"
+>
+<!LEXCON
+   ENTITY         -- SGML General entity name --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXCON General entity name//EN"
+>
+<!LEXCON
+   GI             -- SGML Generic identifier --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXCON Generic Identifier//EN"
+>
+<!LEXCON
+   ID             -- SGML Unique identifier --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXCON Unique Identifier//EN"
+>
+<!LEXCON
+   ATTNAME        -- SGML Attribute name --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXCON Attribute name//EN"
+>
+<!LEXCON
+   compname       -- Property set component name --
+
+   SPEC
+   PUBLIC "ISO/IEC 10744:1997//NOTATION LEXCON
+           Property Set Component Name//EN"
+>
+
+                     <!-- SGML Lexical Types -->
+
+<!LEXTYPE
+   char           -- Character --
+
+   SPEC
+   PUBLIC "ISO/IEC 10744:1997//NOTATION LEXTYPE Character//EN"
+>
+
+               <!-- SGML abstract character classes -->
+
+<!LEXTYPE
+   Digit          -- SGML digit --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE CLASS Digits (Digit)//EN"
+>
+<!LEXTYPE
+   LCLetter       -- SGML lower-case letter --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Lower-case letters (LCLetter)//EN"
+>
+<!LEXTYPE
+   Special        -- SGML special character --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Special minimum data characters (Special)//EN"
+>
+<!LEXTYPE
+   UCLetter       -- SGML upper-case letter --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Upper-case letters (UCLetter)//EN"
+>
+
+               <!-- SGML concrete character classes -->
+
+<!LEXTYPE
+   NONSGML        -- Non-SGML characters --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Non-SGML characters (NONSGML)//EN"
+>
+<!LEXTYPE
+   DATACHAR       -- SGML dedicated data characters --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Dedicated data characters (DATACHAR)//EN"
+>
+<!LEXTYPE
+   DELMCHAR       -- SGML delimiter characters --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Delimiter characters (DELMCHAR)//EN"
+>
+<!LEXTYPE
+   FUNCHAR        -- SGML inert function characters --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Inert function characters (FUNCHAR)//EN"
+>
+<!LEXTYPE
+   LCNMCHAR       -- SGML lower-case name characters --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Lower-case name characters (LCNMCHAR)//EN"
+>
+<!LEXTYPE
+   LCNMSTRT       -- SGML lower-case name start characters --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Lower-case name start characters (LCNMSTRT)//EN"
+>
+<!LEXTYPE
+   MSICHAR        -- SGML markup-scan-in-characters --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Markup-scan-in-characters (MSICHAR)//EN"
+>
+<!LEXTYPE
+   MSOCHAR        -- SGML markup-scan-out-characters --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Markup-scan-out-characters (MSOCHAR)//EN"
+>
+<!LEXTYPE
+   MSSCHAR        -- SGML markup-scan-suppress characters --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Markup-scan-suppress characters (MSSCHAR)//EN"
+>
+<!LEXTYPE
+   RE             -- SGML record end character --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Record end character (RE)//EN"
+>
+<!LEXTYPE
+   RS             -- SGML record start character --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Record start character (RS)//EN"
+>
+<!LEXTYPE
+   SEPCHAR        -- SGML separator characters --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Separator characters (SEPCHAR)//EN"
+>
+<!LEXTYPE
+   SPACE          -- SGML space character --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Space character (SPACE)//EN"
+>
+<!LEXTYPE
+   UCNMCHAR       -- SGML upper-case name characters --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Upper-case name characters (UCNMCHAR)//EN"
+>
+<!LEXTYPE
+   UCNMSTRT       -- SGML upper-case name start characters --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           CLASS Upper-case name start characters (UCNMSTRT)//EN"
+>
+
+                       <!-- SGML delimiters -->
+
+<!LEXTYPE
+   AND            -- SGML and connector --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER And connector (AND)//EN"
+>
+<!LEXTYPE
+   COM            -- SGML comment start or end --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Comment start or end (COM)//EN"
+>
+<!LEXTYPE
+   CRO            -- SGML character reference open --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Character reference open (CRO)//EN"
+>
+<!LEXTYPE
+   DSC            -- SGML character reference open --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Declaration subset close (DSC)//EN"
+>
+<!LEXTYPE
+   DSO            -- SGML declaration subset open --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Declaration subset open (DSO)//EN"
+>
+<!LEXTYPE
+   DTGC           -- SGML data tag group close --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Data tag group close (DTGC)//EN"
+>
+<!LEXTYPE
+   DTGO           -- SGML data tag group open --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Data tag group open (DTGO)//EN"
+>
+<!LEXTYPE
+   ERO            -- SGML entity reference open --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Entity reference open (ERO)//EN"
+>
+<!LEXTYPE
+   ETAGO          -- SGML end-tag open --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER End-tag open (ETAGO)//EN"
+>
+<!LEXTYPE
+   GRPC           -- SGML group close --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Group close (GRPC)//EN"
+>
+<!LEXTYPE
+   GRPO           -- SGML group open --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Group open (GRPO)//EN"
+>
+<!LEXTYPE
+   LIT            -- SGML literal start or end --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Literal start or end (LIT)//EN"
+>
+<!LEXTYPE
+   LITA           -- SGML literal start or end (alternative) --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Literal start or end (alternative) (LITA)//EN"
+>
+<!LEXTYPE
+   MDC            -- SGML markup declaration close --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Markup declaration close (MDC)//EN"
+>
+<!LEXTYPE
+   MDO            -- SGML markup declaration open --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Markup declaration open (MDO)//EN"
+>
+<!LEXTYPE
+   MINUS          -- SGML exclusion --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Exclusion (MINUS)//EN"
+>
+<!LEXTYPE
+   MSC            -- SGML marked section close --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Marked section close (MSC)//EN"
+>
+<!LEXTYPE
+   NET            -- SGML null end-tag --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Null end-tag (NET)//EN"
+>
+<!LEXTYPE
+   OPT            -- SGML optional occurrence indicator --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Optional occurrence indicator (OPT)//EN"
+>
+<!LEXTYPE
+   OR             -- SGML or connector --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Or connector (OR)//EN"
+>
+<!LEXTYPE
+   PERO           -- SGML parameter entity reference open --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Parameter entity reference open (PERO)//EN"
+>
+<!LEXTYPE
+   PIC            -- SGML processing instruction close --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Processing instruction close (PIC)//EN"
+>
+<!LEXTYPE
+   PIO            -- SGML processing instruction open --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Processing instruction open (PIO)//EN"
+>
+<!LEXTYPE
+   PLUS           -- SGML required and repeatable; inclusion --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Required and repeatable; inclusion (PLUS)//EN"
+>
+<!LEXTYPE
+   REFC           -- SGML reference close --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Reference close (REFC)//EN"
+>
+<!LEXTYPE
+   REP            -- SGML optional and repeatable --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Optional and repeatable (REP)//EN"
+>
+<!LEXTYPE
+   RNI            -- SGML reserved name indicator --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Reserved name indicator (RNI)//EN"
+>
+<!LEXTYPE
+   SEQ            -- SGML sequence connector --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Sequence connector (SEQ)//EN"
+>
+<!LEXTYPE
+   SHORTREF       -- SGML short reference --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Short reference (SHORTREF)//EN"
+>
+<!LEXTYPE
+   STAGO          -- SGML start-tag open --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Start-tag open (STAGO)//EN"
+>
+<!LEXTYPE
+   TAGC           -- SGML tag close --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Tag close (TAGC)//EN"
+>
+<!LEXTYPE
+   VI             -- SGML value indicator --
+
+   SPEC
+   PUBLIC "ISO 8879:1986//NOTATION LEXTYPE
+           DELIMITER Value indicator (VI)//EN"
+>
+
+                 <!-- SGML modeled lexical types -->
+
+<!LEXTYPE
+   s              -- SGML "S" separator --
+
+   "RE|RS|SEPCHAR|SPACE"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   mindata        -- SGML minimum data --
+
+   "(Digit|LCLetter|RE|RS|SPACE|Special|UCLetter)+"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   nmchar         -- SGML name character --
+
+   "Digit|LCNMCHAR|UCNMCHAR|nmstrt"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   nmstrt         -- SGML name start character --
+
+   "LCLetter|LCNMSTRT|UCLetter|UCNMSTRT"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   csname         -- Case-sensitive name --
+
+   "nmstrt,nmchar*"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   NAME           -- SGML name --
+
+   #ORDER GENERAL
+   #CHECK NAMELEN
+
+   "csname"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   NAMES          -- SGML names --
+
+   "NAME+"
+   HyLex
+>
+<!LEXTYPE
+   NUMBER         -- SGML number --
+
+   #ORDER GENERAL
+   #CHECK NAMELEN
+
+   "Digit+"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   NUMBERS        -- SGML numbers --
+
+   "NUMBER+"
+   HyLex
+>
+<!LEXTYPE
+   NMTOKEN        -- SGML name token --
+
+   #ORDER GENERAL
+   #CHECK NAMELEN
+
+   "nmchar+"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   NMTOKENS       -- SGML name tokens --
+
+   "NMTOKEN+"
+   HyLex
+>
+<!LEXTYPE
+   NUTOKEN        -- SGML number token --
+
+   #ORDER GENERAL
+   #CHECK NAMELEN
+
+   "Digit,nmchar*"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   NUTOKENS       -- SGML number tokens --
+
+   "NUTOKEN+"
+   HyLex
+>
+
+                <!-- SGML namespace lexical types -->
+
+<!LEXTYPE
+   ATTNAME        -- SGML attribute name --
+
+   #CHECK ATTNAME
+
+   "NAME"
+   HyLex
+>
+<!LEXTYPE
+   DTDORLPD       -- SGML document type or link type --
+
+   #CHECK DTDORLPD
+
+   "NAME"
+   HyLex
+>
+<!LEXTYPE
+   ENTITY         -- SGML entity name --
+
+   #ORDER ENTITY
+   #CHECK NAMELEN
+   #CHECK ENTITY
+
+   "nmstrt,nmchar*"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   ENTITIES       -- SGML entity names --
+
+   "ENTITY+"
+   HyLex
+>
+<!LEXTYPE
+   GI             -- SGML generic identifier --
+
+   #CHECK GI
+
+   "NAME"
+   HyLex
+>
+<!LEXTYPE
+   IDREF          -- SGML unique identifier reference --
+
+   #CHECK ID
+
+   "NAME"
+   HyLex
+>
+<!LEXTYPE
+   IDREFS         -- SGML unique identifier references --
+
+   "IDREF+"
+   HyLex
+>
+<!LEXTYPE
+   NOTATION       -- SGML notation name --
+
+   #CHECK NOTATION
+
+   "NAME"
+   HyLex
+>
+<!LEXTYPE
+   PARMENT        -- SGML parameter entity name --
+
+   #ORDER ENTITY
+   #CHECK PENTLEN
+   #CHECK PARMENT
+
+   "nmstrt,nmchar*"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   PENTITY        -- SGML parameter entity name prefixed by PERO --
+
+   "PERO,PARMENT"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   compname       -- Property set component name --
+
+   #CHECK compname
+
+   "NAME"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   cnmlist        -- Property set component names --
+
+   "compname+"
+   HyLex
+>
+
+                  <!-- Other SGML lexical types -->
+
+<!LEXTYPE
+   fsi            -- Formal System Identifier --
+
+   SPEC
+   PUBLIC "ISO/IEC 10744:1997//NOTATION LEXTYPE
+           Formal System Identifier//EN"
+>
+<!LEXTYPE
+   literal        -- SGML literal --
+
+   "(LIT,[#NOT LIT],LIT)|(LITA,[#NOT LITA],LITA)"
+   HyLex [unorm]
+>
+<!LEXTYPE
+   attspecs       -- Attribute specifications --
+
+   '(NAME,"=",(NMTOKEN|literal))*'
+   HyLex
+>

@@ -1,0 +1,358 @@
+<!AFDR "ISO/IEC 10744:1997">
+
+<!--
+"ISO/IEC 10744:1997//DTD AFDR Meta-DTD
+ General Architecture//EN"
+-->
+
+<!--
+
+Option Summary:
+
+altreps   Alternative Representation Facility
+dafe      Data Attributes for Elements Facility
+dvlist    Default Value List Facility
+HyLex     HyTime Lexical Model Notation
+HyOrd     HyTime Lexicographic Ordering Notation
+included  Included Entities Facility Facility
+ireftype  Immediate ID Reference Type Facility
+lextype   Lexical Typing Facility
+opacity   Element Opacity Facility
+REGEX     POSIX Regular Expression Notation
+superdcn  Notation Derivation Source Facility
+
+-->
+
+<?IS10744 USELEX SGMLlex>
+<!entity %
+   SGMLlex        -- SGML lexical types --
+
+   PUBLIC "ISO/IEC 10744:1997//NONSGML LTDR LEXTYPES
+           SGML Lexical Types//EN"
+>
+
+    <!-- General Architecture Content Model Parameter Entities -->
+<!entity %
+   GACFC          -- General Architecture context-free content --
+   "GABrid"
+>
+<!entity %
+   GAResrc        -- General Architecture resource forms --
+   "dvlist"
+>
+
+            <!-- General Architecture Document Element -->
+<!element
+   GADoc          -- General Architecture document element --
+   - O
+   (%GACFC;)*
+   +(%GAResrc;)
+>
+
+            <!-- General Architecture Bridging Element -->
+<!element
+   GABrid         -- General Architecture bridging element --
+   - O
+   (%GACFC;)*
+>
+
+           <!-- General Architecture Bridging Notation -->
+<!notation
+   GABridN        -- General Architecture bridging notation --
+   PUBLIC
+      "ISO/IEC 10744:1997//NOTATION AFDR ARCDATA
+       General Architecture Bridging Notation//EN"
+>
+                      <!-- Unique Identifier -->
+<!attlist
+-- id --          -- Unique identifier --
+                  -- Clause: A.5.2 --
+   #ALL
+
+   id             -- Unique identifier --
+      ID
+      #IMPLIED    -- Default: none --
+>
+
+                   <!-- Element Type Full Name -->
+<!attlist
+-- etfullnm --    -- Element type full name --
+                  -- Clause: A.5.2 --
+   #ALL
+
+   etfullnm       -- Element type full name --
+     CDATA
+     #IMPLIED     -- Default: generic identifier --
+>
+
+
+<!entity % opacity "IGNORE">
+
+                           <!-- Opacity -->
+<![ %opacity; [
+<!attlist
+-- opacity --     -- Opacity --
+                  -- Clause: A.5.2 --
+   #ALL
+
+   opacity        -- Opacity --
+                  -- Transparent or opaque element --
+      (transpar|opaque)
+      opaque      -- Constant --
+>
+]]><!-- opacity -->
+
+
+<!entity % dafe "IGNORE">
+
+                <!-- Data attributes for elements -->
+<![ %dafe; [
+<!Attlist
+-- dafe --        -- Data attributes for elements --
+                  -- Clause: A.5.3.1 --
+   #ALL
+
+   NotNames       -- Data attributes for elements renamer --
+                  -- Defines user names for data attributes --
+      CDATA       -- Lextype: ((NAME,(ATTORCON|"#DEFAULT"),
+                                ("#MAPTOKEN",NMTOKEN,NMTOKEN)*)|
+                               ("#NOTCONT",ATTNAME))* --
+                  -- Constraint: a given ATTNAME, NAME, #CONTENT, or
+             #NOTCONT can occur only once --
+                  -- Constraint: data attribute name precedes user
+                     name --
+      #IMPLIED    -- Constant --
+                -- Default: no renaming --
+
+   NotSupr        -- Data attributes for elements suppressor --
+                  -- Suppress data attribute for elements
+                     processing --
+      (sNotAll|sNotForm|sNotNone)
+      #IMPLIED    -- Default: inherited --
+>
+]]><!-- dafe -->
+
+
+<!entity % lextype "IGNORE">
+
+                  <!-- Lexical Typing Attribute -->
+<![ %lextype; [
+<!attlist
+-- lextype --     -- Lexical typing attribute --
+                  -- Clause: A.5.4 --
+   #ALL
+
+   lextype        -- Lexical types --
+                  -- Lexical types of attribute values or character
+                     data content --
+      CDATA       -- Lextype: (ATTORCON,NAME)* --
+                  -- Constraint: a given ATTNAME or #CONTENT can occur
+                     only once --
+      #IMPLIED    -- Constant --
+                  -- Default: none --
+>
+]]><!-- lextype -->
+
+
+<!entity % ireftype "IGNORE">
+
+             <!-- ID Immediate Referent Element Type -->
+<![ %ireftype; [
+<!attlist
+-- ireftype --    -- ID immediate referent element type --
+                  -- Clause: A.5.5 --
+   #ALL
+
+   ireftype       -- ID immediate referent element type --
+      CDATA       -- Lextype: (("#ALL",(GI|modelgroup|"#ANY"))?,
+                               (ATTORCON,(GI|modelgroup|"#ANY"))*) --
+                  -- Constraint: a given ATTNAME or #CONTENT can occur
+                     only once; types apply to immediate object of
+                     address. --
+                  -- Constraint: model groups limited to repeating
+                     or non-repeating OR groups if irefmodel option not
+                     supported. Tokens in model groups must be GIs. --
+      "#ALL #ANY" -- Constant --
+>
+]]><!-- ireftype -->
+
+
+<!entity % dvlist "IGNORE">
+
+                <!-- Default Value List Attributes -->
+<![ %dvlist; [
+<!attlist
+-- dvlatt --      -- Default value list attributes --
+                  -- Clause: A.5.6.1 --
+   #ALL
+
+   subdvl         -- Subelement impliable attribute value defaults --
+      IDREFS      -- Reference --
+                  -- Reftype: dvlist+ --
+                  -- Note: Cannot be indirect --
+      #IMPLIED    -- Default: none --
+
+   sibdvl         -- Sibling impliable attribute value defaults --
+      IDREFS      -- Reference --
+                  -- Reftype: dvlist+ --
+                  -- Note: Cannot be indirect --
+      #IMPLIED    -- Default: none --
+
+   selfdvl        -- Self impliable attribute value defaults --
+      IDREFS      -- Reference --
+                  -- Reftype: dvlist+ --
+                  -- Note: Cannot be indirect --
+      #IMPLIED    -- Default: none --
+>
+]]><!-- dvlist -->
+
+                     <!-- Default Value List -->
+<![ %dvlist; [
+<!element
+   dvlist         -- Default value list --
+                  -- Clause: A.5.6.2 --
+   - O
+   (#PCDATA)      -- Ulextype: attspecs --
+
+-- Attributes: dvlist --
+-- CommonAttributes: dafe, dvlist, etfullnm, id, ireftype,
+   lextype, opacity --
+-- Referrers: dvlatt:selfdvl, dvlatt:sibdvl, dvlatt:subdvl --
+>
+<!attlist
+   dvlist         -- Default value list --
+                  -- Clause: A.5.6.2 --
+
+   id             -- Unique identifier --
+      ID
+      #REQUIRED
+
+   dvgi           -- Default value element types --
+                  -- Applies to all elements if omitted --
+      CDATA       -- Lextype: (GI+|(#ALL,GI*)) --
+      #IMPLIED    -- Default: all elements --
+
+   preatts        -- Attributes whose values are to be preempted --
+      NAMES       -- Constraint: must be in dvlist content --
+      #IMPLIED    -- Default: none --
+
+   defatts        -- Attributes whose values become the default value
+                     when specified --
+      NAMES       -- Constraint: must be in dvlist content --
+      #IMPLIED    -- Default: no replaceable defaults --
+>
+]]><!-- dvlist -->
+
+
+<!entity % included "IGNORE">
+
+            <!-- Entities included from notation data -->
+<![ %included; [
+<!attlist #NOTATION
+-- included --    -- Entities included from notation data --
+                  -- Clause: A.5.7.1 --
+   #ALL
+
+   included       -- Entities included from notation data --
+      CDATA       -- Lextype: ENTITIES --
+      #IMPLIED    -- Default: no included entities --
+>
+]]><!-- included -->
+
+
+<!entity % altreps "IGNORE">
+
+                  <!-- Alternate Representations -->
+<![ %altreps; [
+<!attlist #NOTATION
+-- altreps --     -- Alternate representations --
+                  -- Clause: A.5.7.1 --
+   #ALL
+
+   altreps        -- Alternate representations --
+                  -- Alternative representations of this entity --
+      CDATA       -- Lextype: ENTITIES --
+      #IMPLIED    -- Default: none --
+>
+]]><!-- altreps -->
+
+
+<!entity % superdcn "IGNORE">
+
+                 <!-- Notation Derivation Source -->
+<![ %superdcn; [
+<!attlist #NOTATION
+-- superdcn --    -- Notation derivation source --
+                  -- Clause: A.5.7.1 --
+   #ALL
+
+   superdcn       -- Notation derivation source --
+                  -- Notation on which this one is based --
+      NAME        -- Lextype: NOTATION --
+      #IMPLIED    -- Default: none --
+>
+]]><!-- superdcn -->
+
+
+<!entity % HyLex "IGNORE">
+
+                <!-- HyTime Lexical Model Notation -->
+<![ %HyLex; [
+<!notation
+   HyLex          -- HyTime lexical model notation --
+                  -- Clause: A.2.2 --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime lexical model notation (HyLex)//EN"
+
+-- Attributes: HyLex --
+-- CommonAttributes: altreps, included, superdcn --
+>
+<!attlist #NOTATION
+   HyLex          -- HyTime lexical model notation --
+                  -- Clause: A.2.3 --
+
+   norm           -- Normalization --
+      (norm|unorm)
+      norm
+>
+]]><!-- HyLex -->
+
+
+<!entity % HyOrd "IGNORE">
+
+      <!-- HyTime Lexicographic Ordering Definition Notation -->
+<![ %HyOrd; [
+<!notation
+   HyOrd          -- HyTime lexicographic ordering definition
+                     notation --
+
+   PUBLIC "ISO/IEC 10744:1997//NOTATION
+           HyTime Lexicographic Ordering Definition Notation
+           (HyOrd)//EN"
+
+-- CommonAttributes: altreps, included, superdcn --
+>
+]]><!-- HyOrd -->
+
+
+<!entity % REGEX "IGNORE">
+
+              <!-- POSIX Regular Expression Notation -->
+<![ %REGEX; [
+<!notation
+   REGEX          -- POSIX regular expression notation --
+
+   PUBLIC "ISO/IEC 9945-2:1992//NOTATION
+           POSIX Regular Expression Notation//EN"
+>
+<!attlist #NOTATION
+   REGEX          -- POSIX regular expression notation --
+
+   case           -- Case sensitivity --
+                  -- Case sensitive match (case) or case insensitive
+                     match (icase) --
+      (case|icase)
+      case
+>
+]]><!-- REGEX -->

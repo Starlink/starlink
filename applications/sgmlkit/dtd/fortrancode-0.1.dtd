@@ -1,0 +1,73 @@
+<!--
+  DTD for fortran code
+
+  Calls general programcode DTD
+-->
+
+<!entity % languagenotation "fortran77">
+
+<!-- Maps -->
+
+<!--
+  Set up maps, to make typing prologues easier.
+
+  Collect a suitable set of starttag and cdata entities.
+
+  First, arrange that ^*+ and ^*- begin and end the prologue, and that
+  ^* is ignored while within the prologue.
+-->
+<!entity startprologue.ref	starttag "codeprologue">
+<!entity endprologue.ref	endtag "codeprologue">
+<!entity nullentity.ref		cdata "">
+<!entity partype.ref		starttag "type"	>
+<!entity pardesc.ref		starttag "description">
+
+<!shortref	generalmap	"&#RS;*+"	startprologue.ref
+						>
+<!shortref	prologuemap	"&#RS;*-"	endprologue.ref
+				"&#RS;*"	nullentity.ref
+						>
+
+<!--
+  Now some tricksier stuff for documenting routine parameters.
+  Structure is
+
+     <!element parameter - o (name, type, description)>
+
+  Within PARAMETER element, have `=' be a shortref for TYPE (don't
+  have it within NAME, since that element is also used within the
+  ROUTINENAME element) and discard &#RS;* as usual.  Within TYPE, have
+  both `:' and &#RE be shortrefs for DESCRIPTION.  Within the
+  DESCRIPTION, merely discard &#RS;*
+
+  This means that
+
+    <parameter given>
+      <name>Blah
+      <type>float
+      <description>This is a variable
+
+  is contractable to
+
+    <parameter given>
+      Blah = float
+      This is a variable
+
+-->
+<!shortref	parametermap	"="		partype.ref
+				"&#RS;*"	nullentity.ref
+						>
+<!shortref	descriptionmap	"&#RS;*"	nullentity.ref
+						>
+<!shortref	partypemap	"&#RE;"		pardesc.ref
+				":"		pardesc.ref
+						>
+<!usemap	generalmap	program		>
+<!usemap	prologuemap	codeprologue	>
+<!usemap	parametermap	parameter	>
+<!usemap	descriptionmap	description	>
+<!usemap	partypemap	type		>
+
+<!entity % generalcode.dtd
+	public "-//Starlink//DTD Program Source Code 0.1//EN">
+%generalcode.dtd;
