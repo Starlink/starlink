@@ -369,7 +369,7 @@ PRIVATE_INCLUDES = $(PKG_NAME)_const
 #  the files.
 
 EXTERNAL_INCLUDES = DAT_PAR GRP_ERR GRP_PAR NDF_ERR NDF_PAR PAR_ERR \
-PSX_ERR SAE_PAR
+PSX_ERR SAE_PAR PRM_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -389,7 +389,7 @@ ndg1_expan.f ndg1_fpars.f ndg1_fparx.f ndg1_gtyps.f ndg1_hcut.f \
 ndg1_hfind.f ndg1_hsplt.f ndg1_lasto.f ndg1_match.f ndg1_ndfch.f \
 ndg1_ndfdl.f ndg1_pshdb.f ndg1_pshde.f ndg1_pshdf.f ndg1_sdfex.f \
 ndg1_subst.f ndg_gtsup.f ndg_ndfas.f ndg_ndfcp.f ndg_ndfcr.f ndg_ndfpr.f \
-ndg_ptsup.f ndg_setsz.f
+ndg_ptsup.f ndg_setsz.f ndg1_sort.f
 
 #  Additional Fortran routines required for the standalone library.
 
@@ -468,6 +468,7 @@ GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@
 NDF_ERR:   $(STAR_INC)/ndf_err;   $(LINK) $? $@ 
 NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@ 
 PAR_ERR:   $(STAR_INC)/par_err;   $(LINK) $? $@
+PRM_PAR:   $(STAR_INC)/prm_par;   $(LINK) $? $@ 
 PSX_ERR:   $(STAR_INC)/psx_err;   $(LINK) $? $@ 
 SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
 
@@ -1205,6 +1206,7 @@ ndg1_pshdb.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_pshde.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_pshdf.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_sdfex.o:	 SAE_PAR GRP_PAR DAT_PAR
+ndg1_sort.o:	 SAE_PAR GRP_PAR PRM_PAR NDG_CONST
 ndg1_subst.o:	 SAE_PAR
 ndg_asso1.o:	 SAE_PAR GRP_PAR NDF_PAR
 ndg_assoc.o:	 SAE_PAR GRP_PAR GRP_ERR PAR_ERR NDG_ERR
