@@ -1711,41 +1711,33 @@ $(MANIFEST)/trn: \
 	  && $(MAKE_CPT)
 
 $(MANIFEST)/tsp: \
-		$(MANIFEST)/agi \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/figaro \
-		$(MANIFEST)/fio \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
-		$(MANIFEST)/graphpar \
-		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
-		$(MANIFEST)/idi \
 		$(MANIFEST)/ifd \
+		$(MANIFEST)/mag \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
+		$(MANIFEST)/ncar \
 		$(MANIFEST)/ndf \
-		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
-		$(MANIFEST)/pda \
-		$(MANIFEST)/pgp \
-		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
-		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
 		$(MANIFEST)/sla \
+		$(MANIFEST)/snx \
 		$(MANIFEST)/star2html \
-		$(MANIFEST)/starx \
-		$(MANIFEST)/trn
+		$(MANIFEST)/starx
 	cd applications/tsp \
 	  && $(MAKE_CPT)
 
