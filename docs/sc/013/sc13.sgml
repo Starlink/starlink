@@ -143,14 +143,14 @@ comments from others.</px></change>
 <px>Minor edits for clarity, and to restore missing references.</px>
 </distribution>
 
-<distribution string="2-5" date="01-Jan-0000" author="ng" versionid="v2-5">
-<px>Running edits</px>
+<distribution string="2-5" date="10-Mar-2003" author="ng" versionid="v2-5">
+<px>Minor edits, plus repackaging</px>
 </distribution>
 
 </history>
 
 <copyright>
-<p>Copyright 1999, 2001, 2002, Central Laboratories for the Research Councils</p>
+<p>Copyright 1999, 2001--2003, Central Laboratories for the Research Councils</p>
 </copyright>
 
 <docbody>
