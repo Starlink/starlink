@@ -71,13 +71,14 @@
 
 #  Directory locations.
 
-$srcdir = "/local/star/sources";     # head of source tree
+$srcdir = "/local/scratch/sources";  # head of source tree
+$srcdir = "/local/star/src/from-ussc";
 $incdir = "/star/include";           # include directory
 $tmpdir = "/local/junk/scb/index";   # scratch directory
 
 #  Index file location.
 
-$indexfile = "/local/devel/scb/test_index";
+$indexfile = "/local/devel/scb/index";
 $taskfile  = "/local/devel/scb/tasks";
 
 #  Flags.
@@ -103,6 +104,8 @@ sub index_dir;
 sub index_tar;
 sub index_hlp;
 sub index_f;
+sub index_c;
+sub index_h;
 sub index_gen;
 sub indexinc_list;
 sub write_entry;
@@ -113,17 +116,10 @@ print "rm -rf $tmpdir\n";
 system "rm -rf $tmpdir" and die "Couldn't clean out $tmpdir: $?\n";
 system "mkdir -p $tmpdir" and die "Couldn't create $tmpdir: $?\n";
 
-#  Initialise and open index file and tasks file.
+#  Initialise and open index file.
 
-unlink "$indexfile.pag", "$indexfile.dir", "$taskfile.pag", "$taskfile.dir";
+unlink "$indexfile.pag", "$indexfile.dir";
 tie %locate, SDBM_File, $indexfile, O_CREAT | O_RDWR, 0644;
-tie %tasks,  SDBM_File, $taskfile,  O_CREAT | O_RDWR, 0644;
-
-#  Index include files.
-
-chdir $incdir or die "Couldn't enter $incdir\n";
-index_incdir "INCLUDE/", ".";
-write_entry "#INCLUDE", $incdir;
 
 #  Index source files.
 
@@ -131,18 +127,31 @@ chdir $srcdir or die "Couldn't enter $srcdir\n";
 index_dir "SOURCE/", ".";
 write_entry "#SOURCE", $srcdir;
 
-#  Check list of tasks.
+#  Index include files.
 
-# check_tasks;
+chdir $incdir or die "Couldn't enter $incdir\n";
+index_incdir "INCLUDE/", ".";
+write_entry "#INCLUDE", $incdir;
 
-#  Flatten %tasks from a hash of lists to a hash of space-separated strings.
-#  Without this step the only thing written to the DBM file is a set of
-#  references to memory locations, which is useless after the program has
-#  terminated.
+#  Write checked task names out to text file.
 
-while (($key, $value) = each %tasks) {
-   $tasks{$key} = join ' ',@$value;
+open TASKS, ">$taskfile" or die "Couldn't open $taskfile\n";
+foreach $package (sort keys %tasks) {
+   print TASKS "$package:";
+   print "$package:" if $verbose;
+   foreach $task (sort @{$tasks{$package}}) {
+      if ($locate{$task}) {
+         print TASKS " $task";
+      }
+      else {
+         $task =~ tr/A-Z/a-z/;
+      }
+      print " $task" if $verbose;
+   }
+   print TASKS "\n";
+   print "\n" if $verbose;
 }
+close TASKS;
 
 #  Terminate processing.
 
@@ -184,6 +193,12 @@ sub index_list {
       }
       elsif ($file =~ /\.gen$/) {     #  generic fortran source file.
          index_gen $path, $file;
+      }
+      elsif ($file =~ /\.c$/) {       #  C source file.
+         index_c $path, $file;
+      }
+      elsif ($file =~ /\.h$/) {       #  C header file.
+         index_h $path, $file;
       }
       elsif ($file =~ /\.hlp$/) {     #  starlink help file
          index_hlp $path, $file;
@@ -253,7 +268,7 @@ sub index_fortran_file {
 
    open F, $file or die "Couldn't open $file in directory ".cwd."\n";
    while (<F>) {
-      write_entry $name, $path if ($name = module_name $_);
+      write_entry $name, $path if ($name = module_name 'f', $_);
    }
    close F;
 }
@@ -320,10 +335,17 @@ sub index_hlp {
    my $file = shift;      #  .hlp file in current directory to be indexed.
 
    $file =~ m%([^/]*)\.hlp%;
-   my $package = $1;
+   my $package = uc $1;
    open HLP, $file or die "Couldn't open $file in directory ".cwd."\n";
    my ($level, $baselevel);
    while (<HLP>) {
+
+#     Bail out if we've picked up an IRAF help file instead.
+
+      last if (/^\.help/);
+
+#     Identify a header line and store it in the hash of lists %tasks.
+
       next unless (/^([0-9]) *(\S+)/); 
       ($level, $topic) = ($1, $2);
       unless (defined $baselevel) {
@@ -335,6 +357,48 @@ sub index_hlp {
    }
    close HLP;
 }
+
+
+########################################################################
+sub index_h {
+
+#  Examine and index a C header file in the source tree (not include dir).
+
+#  Arguments.
+
+   my $path = shift;      #  Logical pathname of current directory.
+   my $file = shift;      #  .h file in current directory to be indexed.
+
+#  Strip head part of path.
+
+   $file =~ s%^.*/%%;
+
+#  Write to index.
+
+   write_entry $file, "$path$file";
+}
+
+
+########################################################################
+sub index_c {
+
+#  Examine and index a C source file.
+#  This relies on use of the macros in /star/include/f77.h to declare C
+#  functions.
+
+#  Arguments.
+
+   my $path = shift;      #  Logical pathname of current directory.
+   my $file = shift;      #  .c file in current directory to be indexed.
+
+   open C, $file or die "Couldn't open $file in directory ".cwd."\n";
+   while (<C>) {
+      write_entry $name, "$path$file" if ($name = module_name 'c', $_);
+   }
+   close C;
+}
+
+
 
 ########################################################################
 sub index_incdir {
@@ -360,8 +424,6 @@ sub indexinc_list {
 
    my $path = shift;      #  Logical pathname of current directory.
    my @files = @_;        #  Files in current directory to be indexed.
-
-#  Local variables.
 
    foreach $file (@files) {
       if ($file =~ /\.h$/) {              #  C type header file.
@@ -399,6 +461,11 @@ sub write_entry {
    my $name = shift;      #  Name of module.
    my $location = shift;  #  Logical pathname of module.
 
+#  Tidy logical pathname.
+
+   $location =~ s%/./%/%g;
+   $location =~ s%//*%/%g;
+
 #  Optionally log entry to stdout.
 
    printf "%-20s <-  %s\n", $name, $location if ($verbose);
@@ -411,3 +478,9 @@ sub write_entry {
                && tarlevel ($locate{$name}) > tarlevel ($location) );
 }
 
+########################################################################
+sub error {
+   $_ = shift;
+   chomp;
+   die "$_\n";
+}
