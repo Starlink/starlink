@@ -447,7 +447,7 @@ removed from it elements which are expensive to work with.
 ;; time to run (294s runtime with `--jadeflags -Vsuppress-idindex' and
 ;; 759s without), which I just don't understand -- what can be
 ;; happening in there?  I thought it might be due to taking a long
-;; time to find <routine> elements cross-document, so had
+;; time to find routine elements cross-document, so had
 ;; idindex-element-list consist of everything in target-element-list
 ;; except "routine", but that didn't make any difference, so now the
 ;; two are identical.  Tracing the output (by putting (debug)
