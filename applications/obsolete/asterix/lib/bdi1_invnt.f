@@ -180,7 +180,7 @@
       ELSE IF ( ITEM .EQ. 'LogicalQuality' ) THEN
 
 *    Create invented object
-        CALL ADI_NEWN( 'LOGICAL', NDIM, DIMS, ITID, STATUS )
+        CALL ADI_NEW( 'LOGICAL', NDIM, DIMS, ITID, STATUS )
         CALL ADI_MAPL( ITID, 'WRITE', WPTR, STATUS )
 
 *    The size of the invented data
@@ -951,6 +951,110 @@
           ERR(I) = 0.0D0
         END IF
       END DO
+
+      END
+
+
+
+      SUBROUTINE BDI1_INVNT_E2V( BDID, PSID, STATUS )
+*+
+*  Name:
+*     BDI1_INVNT_E2V
+
+*  Purpose:
+*     Invent errors from DOUBLE variances
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL BDI1_INVNT_E2V( BDID, PSID, STATUS )
+
+*  Description:
+
+*  Arguments:
+*     NVAL = INTEGER (given)
+*        Number of axis widths to invent
+*     VAR(*) = DOUBLE PRECISION (given)
+*        Variance values
+*     ERR(*) = DOUBLE PRECISION (returned)
+*        Error values
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
+
+*  Keywords:
+*     package:bdi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     9 Aug 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER                   BDID, PSID
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			I			! Loop over values
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
       END
 

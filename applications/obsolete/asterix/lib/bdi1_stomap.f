@@ -126,7 +126,7 @@
       END IF
       CALL ADI_CNEWV0L( PSID, 'MapSystem', MSYS, STATUS )
       IF ( MSYS .EQ. 'inv' ) THEN
-        CALL ADI_CNEWREF( PSID, 'InvObj', FPTR, STATUS )
+        CALL ADI_CPUTREF( PSID, 'InvObj', FPTR, STATUS )
       ELSE
         CALL ADI_CNEWV0I( PSID, 'FilePtr', FPTR, STATUS )
       END IF
