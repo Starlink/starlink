@@ -90,7 +90,7 @@
 *  Map data
       CALL BDI_MAPR( IFID, 'Data', 'READ', IDPTR, STATUS )
       CALL BDI_MAPR( IFID, 'Variance', 'READ', IVPTR, STATUS )
-      CALL BDI_AXMAPR( IFID, 'Width', 'READ', IWPTR, STATUS )
+      CALL BDI_AXMAPR( IFID, 1, 'Width', 'READ', IWPTR, STATUS )
       CALL BDI_MAPR( BFID, 'Data', 'READ', BDPTR, STATUS )
       CALL BDI_MAPR( BFID, 'Variance', 'READ', BVPTR, STATUS )
 
