@@ -448,6 +448,7 @@
 *  If the input pixel and variance are valid, reset the weighted sums.
                      IF ( INARR( I, J ) .NE. VAL__BADD .AND.
      :                    INVAR( I, J ) .NE. VAL__BADD ) THEN
+     :                    OUTVAR( I, J ) .GT. 0.0D0 ) THEN
                         DLAST( 1 ) = OUTARR( I, J ) / OUTVAR( I, J )
                         WTLAST( 1 ) = 1.0D0 / OUTVAR( I, J )
  
@@ -465,7 +466,8 @@
 *  If this pixel or variance has been replaced before, add it into the
 *  current weighted sums for this line.
                         IF ( OUTARR( I, J ) .NE. VAL__BADD .AND.
-     :                       OUTVAR( I, J ) .NE. VAL__BADD ) THEN
+     :                       OUTVAR( I, J ) .NE. VAL__BADD .AND.
+     :                       OUTVAR( I, J ) .GT. 0.0D0 ) THEN
                            WTLAST( 1 ) = WTLAST( 1 ) + 1.0D0 /
      :                                   OUTVAR( I, J )
                            DLAST( 1 ) = DLAST( 1 ) +
@@ -501,7 +503,8 @@
  
 *  If the input pixel and variance are valid, reset the weighted sums.
                      IF ( OUTARR( I, J ) .NE. VAL__BADD .AND.
-     :                    OUTVAR( I, J ) .NE. VAL__BADD ) THEN
+     :                    OUTVAR( I, J ) .NE. VAL__BADD .AND.
+     :                    OUTVAR( I, J ) .GT. 0.0D0 ) THEN
                         DLAST( I ) = OUTARR( I, J ) / OUTVAR( I, J )
                         WTLAST( I ) = 1.0D0 / OUTVAR( I, J )
  
@@ -518,7 +521,8 @@
 *  If this pixel or variance has been replaced before, add it into the
 *  current weighted sums for this line.
                         IF ( OUTARR( I, J ) .NE. VAL__BADD .AND.
-     :                       OUTVAR( I, J ) .NE. VAL__BADD ) THEN
+     :                       OUTVAR( I, J ) .NE. VAL__BADD .AND.
+     :                       OUTVAR( I, J ) .GT. 0.0D0 ) THEN
                            WTLAST( I ) = WTLAST( I ) + 1.0D0 /
      :                                   OUTVAR( I, J )
                            DLAST( I ) = DLAST( I ) +
