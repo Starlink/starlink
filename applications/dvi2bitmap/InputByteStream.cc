@@ -33,29 +33,25 @@
 #include <fcntl.h>
 
 #ifdef HAVE_CSTD_INCLUDE
-#include <cstdio>
-#include <cstdlib>
-#include <cassert>
+#  include <cstdio>
+#  include <cstdlib>
+#  include <cassert>
+#  include <cerrno>
 #else
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
+#  include <stdio.h>
+#  include <stdlib.h>
+#  include <assert.h>
+#  include <errno.h>
 #endif
 
 #if HAVE_SYS_ERRNO_H
-/* If it's available, use sys/errno.h rather than <cerrno> or <errno.h>.
- * If we're compiling in a strict-ansi mode, these will _not_ have errors
- * which are specific to Unix/POSIX, which are, of course, precisely the
- * ones we're hoping to use.
+/* If it's available, explicitly include sys/errno.h as well as
+ * <cerrno> or <errno.h> above.  If we're compiling in a strict-ansi
+ * mode, the compiler may well have carefully avoided defining errors
+ * which are specific to Unix/POSIX, which are, of course, precisely
+ * the ones we're hoping to use.
  */
 #  include <sys/errno.h>
-#else
-/* what else can we do? */
-#  if HAVE_CSTD_INCLUDE
-#    include <cerrno>
-#  else
-#    include <errno.h>
-#  endif
 #endif
 
 #include <unistd.h>
