@@ -728,7 +728,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
         lfp--;
 
       adic_setecs( ADI__INVARG, "File %*s cannot be opened", status,
-		   flp, fspec );
+		   lfp, fspec );
       }
     }
 
