@@ -30,8 +30,12 @@
 *     command line, or using a suitable header file (extreme.h), which
 *     would sensibly be included immediately after limit.h.
 *
+*     Explicit declarations which are implicitly of type int will have
+*     an INT_BIG token inserted - for instance `static x, y;' will be
+*     changed to `static INT_BIG x, y;'.
+*
 *     The program will write a warning on standard error for certain 
-*     constructinons in the code which are likely to cause trouble after
+*     constructions in the code which are likely to cause trouble after
 *     the mass redeclaration of int as INT_BIG has occurred.
 *     These constructions are:
 *        - Declarations of functions with variable argument lists
@@ -42,6 +46,23 @@
 *     before the format string is used.  The comment will contain the
 *     character string `crepint: '.
 *
+*     The program does not make all changes which are required to effect
+*     this conversion.  The following constructions are likely to cause
+*     trouble, but will not be warned about by the program:
+*        - Use of functions without prototypes.  If header files are 
+*          omitted or old style function declarations are used then the
+*          ANSI C machinery for doing type conversion at function call
+*          time will not work.
+*        - Use of external C libraries apart from the C standard library
+*          which have not been recoded replacing INT_BIG for int.
+*        - Implicit declarations, which are implicitly of type int.
+*          If a name is declared simply by mentioning it without any type
+*          or type qualifiers, it is implicitly of type int, and so 
+*          should become delcared as INT_BIG.  This program does not 
+*          find these.  Such implicit declarations (only?) occur in 
+*          function declarations.  The Tru64 Unix C compiler's "-proto" 
+*          flag is useful for identifying these.
+*       
 *  Notes:
 *     Although this program behaves as a filter, it is written on
 *     the assumption that it will be run on a file of a finite length:
@@ -64,6 +85,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* Local function prototypes. */
    void crepint();
@@ -154,6 +176,50 @@
    }
 
 
+   int tokoneof( struct tokitem *ptok, ... ) {
+/*
+*+
+*  Name:
+*     tokoneof
+*
+*  Purpose:
+*     Check if a token matches one of a list.
+*
+*  Description:
+*     This function checks the token ID value of a token structure
+*     in memory against a list given in the arguments.  The arguments given
+*     are of variable number; the last one should be a zero.
+*     If the given token has the same tokval value as any of the arguments
+*     a true result is returned, otherwise a false result is returned.
+*
+*  Arguments:
+*     ptok = struct tokitem *
+*        Pointer to the tokitem structure whose tokval is to be tested.
+*     ... = int
+*        A variable number of int arguments which are to be matched against
+*        the tokval component of ptok.
+*        at ptok.
+*
+*  Return value:
+*     int
+*        Unity if ptok->tokval matches one of the arguments, zero otherwise.
+*-
+*/
+      va_list ap;
+      int mtok;
+
+      va_start( ap, ptok );
+      while ( mtok = va_arg( ap, int ) ) {
+         if ( mtok == ptok->tokval ) {
+            va_end( ap );
+            return 1;
+         }
+      }
+      va_end( ap );
+      return 0;
+   }
+
+
    char *stlitcat( struct tokitem *ptok, int *nlittok ) {
 /*
 *+
@@ -237,6 +303,7 @@
       int slev = 0;
       int t;
       int trouble;
+      ptok--;
       while( t = (++ptok)->tokval ) {
          trouble = 0;
          switch ( t ) {
@@ -346,6 +413,7 @@
       else
          return 1;
    }
+
 
    void subst( struct tokitem *ptok, char *replace ) {
 /*
@@ -545,9 +613,14 @@
          t = tbuf[ i ].tokval;
          t1 = tbuf[ i + 1 ].tokval;
 
-/* Check for, and mostly change, occurences of 'int'. */
+/* Check for, and mostly change, occurences of 'int'.  
+   NB. this isn't perfect - it will, incorrectly, make a substitution if
+   it finds something like 'short static int'.  Such usages must be pretty 
+   rare. */
          if ( t == INT && tbuf[ i - 1 ].tokval != SHORT 
-                       && tbuf[ i - 1 ].tokval != LONG )
+                       && tbuf[ i + 1 ].tokval != SHORT
+                       && tbuf[ i - 1 ].tokval != LONG 
+                       && tbuf[ i + 1 ].tokval != LONG )
             if ( idmatch( tbuf + i + 1, "argc" ) || 
                  idmatch( tbuf + i + 1, "main" ) ) {
                fprintf( stderr, "%s: Type of %s not changed from int\n", 
@@ -571,6 +644,37 @@
                              name, funcofarg( tbuf + i )->strmat );
          }
 
+/* Set categories of token which will be useful. */
+#define TYPES      VOID, CHAR, SHORT, INT, LONG, FLOAT, DOUBLE, STRUCT, ENUM
+#define TYPEQUALS  AUTO, REGISTER, STATIC, EXTERN, CONST, VOLATILE, SIGNED, \
+                   UNSIGNED, TYPEDEF
+#define AFTERDEC   (int) ';', (int) ',', (int) '[', (int) '(', (int) ')', \
+                   (int) '*'
+
+/* Check for occurrences of int which are implicit in lists of type 
+   qualifiers, e.g. 'static unsigned', which really means 
+   'static unsigned int'. */
+         if ( tokoneof( tbuf + i, TYPEQUALS, 0 ) &&
+            ! tokoneof( tbuf + i + 1, TYPEQUALS, TYPES, 0 ) ) {
+            if ( t1 != IDENTIFIER || tokoneof( tbuf + i + 2, AFTERDEC, 0 ) ) {
+
+/* The token at tbuf[ i ] is the last of a list of known type specifier 
+   tokens.  Now work backwards, skipping over type qualifier tokens. */
+                 for ( j = i - 1; tokoneof( tbuf + j, TYPEQUALS, 0 ); j-- );
+
+/* If the previous token is a known type, then we don't have an implicit
+   int, so we don't need to do nothing.  If it is an identifier, then it
+   might be a typedef'd type, so we don't do anything.  If it's a close
+   brace, then it must(?) be an enum or a struct there.  If it is anything
+   else, we should append an INT_BIG specifier to the end of the list. */
+                 if ( ! tokoneof( tbuf + j, TYPES, IDENTIFIER, 
+                                            (int) '}', 0 ) ) {
+                    tbuf[ i ].interp = " INT_BIG";
+                 }
+            }
+
+         }
+
 /* Check for, and warn about if necessary, printf (etc) format strings.
    This code was written with reference to K&R (2nd Ed.) */
          if ( t1 == '(' && ( idmatch( tbuf + i, "printf" ) 
@@ -587,7 +691,7 @@
                for ( j = 0; stlit[ j ]; j++ ) {
                   if ( stlit[ j ] == '%' ) {
                      done = 0;
-                     while ( stlit[ ++j ] && ! done ) {
+                     while ( ( ! done ) && stlit[ ++j ] ) {
                         switch ( stlit[ j ] ) {
                            case '-': case '+': case ' ': case '0': case '#':
                            case '1': case '2': case '3': case '4': case '5':
