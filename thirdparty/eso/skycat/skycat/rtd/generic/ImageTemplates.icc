@@ -112,7 +112,7 @@ inline DATA_TYPE NTOH(DATA_TYPE x)
 	 * Handle doubles, or any arbitrary type that is 8 bytes.
 	 * Uses same trick to avoid automatic type conversions.
 	 */
-        union { unsigned long raw[2]; DATA_TYPE typed; } ret;
+        union { unsigned FITS_LONG raw[2]; DATA_TYPE typed; } ret;
         unsigned long tmp;
 
         ret.typed = x;
