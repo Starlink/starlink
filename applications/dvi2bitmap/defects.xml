@@ -96,7 +96,7 @@ font-reading, when it always returned 10pt.</p>
 	originatoremail="boehm@isis.wu-wien.ac.at"
 	date="13-Sep-2000">
 
-<title>Horizontal spacing wrong with 11pt option</title>
+<title>Horizontal spacing wrong when used with magnified fonts</title>
 
 <p>The following LaTeX document displays the problem:
 <verbatim>
@@ -122,6 +122,18 @@ or 12pt, then you get cmr10 or cmr12 respectively, in the DVI file;
 but if you use 11pt, LaTeX (or rather the font-selection scheme) uses
 magnified cmr10.  In other words, this appears to be yet another font
 magnification problem!  Grrr -- why is this so hard?</p>
+
+<p>This is displayed even more clearly by the following Plain file (thanks to
+`TenThumbs' at the USNO, noted 2002 July 25):
+<verbatim>
+\font\vlarge = cmr10 scaled\magstep4
+\nopagenumbers
+\vlarge BOLD words indeed
+\bye
+</verbatim>
+which makes it transparently clear that it is specifically font
+magnification that's confused.  Sigh, again.
+</p>
 
 </defect>
 
