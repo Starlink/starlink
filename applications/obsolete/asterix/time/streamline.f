@@ -20,7 +20,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
 *    Status :
       INTEGER STATUS
 *    Local variables :
@@ -68,12 +67,12 @@
 
 *  Write data array into output file
       CALL BDI_CREDATA( OFID, 1, NGOOD, STATUS )
-      CALL BDA_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
+      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
       CALL ARR_COP1R( NGOOD, %VAL(DPNTR), %VAL(ODPTR), STATUS )
 
 *  Write variance into output array if required
       CALL BDI_CREVAR( OFID, 1, NGOOD, STATUS )
-      CALL BDA_MAPVAR( OFID, 'WRITE', OVPTR, STATUS )
+      CALL BDI_MAPVAR( OFID, 'WRITE', OVPTR, STATUS )
       CALL ARR_COP1R( NGOOD, %VAL(VPNTR), %VAL(OVPTR), STATUS )
 
 *  Write axis into output file
