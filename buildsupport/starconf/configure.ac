@@ -18,10 +18,7 @@ dnl   the STARLINK variable (because of the way that m4/autoconf moves
 dnl   text around, it's generally unreliable to have variables in this
 dnl   macro).  If you wish to relocate this starconf package to match
 dnl   STARLINK, do so with --prefix=$STARLINK/buildsupport
-AC_PREFIX_DEFAULT(/star)
-dnl   ...but put the share files into a non-standard directory, along with the
-dnl   other buildsupport tools
-datadir=`echo $datadir | sed s,share,buildsupport/share,`
+AC_PREFIX_DEFAULT(/star/buildsupport)
 
 
 dnl   Specify the default location of a currently installed Starlink
@@ -40,6 +37,10 @@ for s in "$STARCONF_DEFAULT_STARLINK" "$STARLINK" /star
 do
     test -n "$s" && STARCONF_DEFAULT_STARLINK=$s && break
 done
+if expr $STARCONF_DEFAULT_STARLINK : '.*/$'; then
+    echo "STARCONF_DEFAULT_STARLINK=$STARCONF_DEFAULT_STARLINK has trailing slash" >&2
+    exit 1
+fi
 AC_MSG_RESULT($STARCONF_DEFAULT_STARLINK)
 
 
@@ -57,6 +58,10 @@ for s in "$STARCONF_DEFAULT_PREFIX" "$STARCONF_DEFAULT_STARLINK" "$STARLINK" /st
 do
     test -n "$s" && STARCONF_DEFAULT_PREFIX="$s" && break
 done
+if expr $STARCONF_DEFAULT_PREFIX : '.*/$'; then
+    echo "STARCONF_DEFAULT_PREFIX=$STARCONF_DEFAULT_PREFIX has trailing slash" >&2
+    exit 1
+fi
 AC_MSG_RESULT($STARCONF_DEFAULT_PREFIX)
 
 
