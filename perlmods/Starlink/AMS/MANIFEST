@@ -2,8 +2,10 @@ Makefile.PL
 MessageRelay.pl
 Core/Makefile.PL
 Core/Core.pm
+Core/ChangeLog
 Init/Makefile.PL
 Init/Init.pm
+Init/ChangeLog
 Task/Makefile.PL
 Task/Task.pm
-
+Task/ChangeLog
