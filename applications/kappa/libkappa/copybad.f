@@ -91,6 +91,8 @@
 *        - Sort local variable declarations into alphabetical order.
 *     20-SEP-2000 (DSB):
 *        - Correct mapping mode for output NDF from WRITE to UPDATE.
+*     20-MAY-2003 (DSB):
+*        - Set BAD-PIXEL flag in output NDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -201,7 +203,7 @@
       IF( NBAD .EQ. 0 ) THEN
          CALL MSG_OUT( 'COPYBAD_NBAD', '  There are no bad pixels in '//
      :                 'the output NDF ''^NDF''.', STATUS)
-
+         
       ELSE IF( NBAD .EQ. 1 ) THEN
          CALL MSG_OUT( 'COPYBAD_NBAD', '  There is 1 bad pixel in the'//
      :                 ' output NDF ''^NDF''.', STATUS)
@@ -217,6 +219,9 @@
 
 *  Obtain the output title and insert it into the output NDF.
       CALL NDF_CINP( 'TITLE', OUT, 'Title', STATUS )
+
+*  Set the BAD-PIXEL flag in the output NDF.
+      CALL NDF_SBAD( ( NBAD .GT. 0 ), OUT, 'Data,Variance', STATUS )
   
 *  End the NDF context.
       CALL NDF_END( STATUS )
