@@ -442,7 +442,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/java
-     [copy] Copying 30 files to /apps/cvsbuild/java/source/topcat/build/java
+     [copy] Copying 33 files to /apps/cvsbuild/java/source/topcat/build/java
      [echo] Executing Treeview target: javadoc-sources
 
 javadoc-sources:
@@ -463,7 +463,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1268 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1274 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
@@ -647,13 +647,13 @@ javadocs:
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/bin
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/etc
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/util/bin
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/util/bin
      [copy] Copying 1 file to /apps/cvsbuild/java/source/util/etc
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/util
     [mkdir] Created dir: /apps/cvsbuild/star/docs/util
-[loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 3 files to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/etc
 [loggedcopy] Copying 33 files to /apps/cvsbuild/star/docs
@@ -881,7 +881,7 @@ install:
 prepare:
 
 check_packages:
-[available] Jun 4, 2003 4:22:45 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jun 5, 2003 4:23:28 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1821,7 +1821,7 @@ build:
     [javac] Compiling 163 source files to /apps/cvsbuild/java/source/splat/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
-     [copy] Copying 61 files to /apps/cvsbuild/java/source/splat/build/classes
+     [copy] Copying 62 files to /apps/cvsbuild/java/source/splat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/splat
      [copy] Copying 13 files to /apps/cvsbuild/java/source/splat/lib/splat
 
@@ -2732,19 +2732,22 @@ javadocs:
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/bin/splat
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/etc/splat
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/splat/bin/splat
-     [copy] Copying 50 files to /apps/cvsbuild/java/source/splat/etc/splat
-     [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/splat/etc/splat
+     [copy] Copying 24 files to /apps/cvsbuild/java/source/splat/bin/splat
+     [copy] Copying 55 files to /apps/cvsbuild/java/source/splat/etc/splat
+     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copying 3 files to /apps/cvsbuild/java/source/splat/docs/splat
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/bin/splat
     [mkdir] Created dir: /apps/cvsbuild/star/lib/splat
+    [mkdir] Created dir: /apps/cvsbuild/star/etc/splat
     [mkdir] Created dir: /apps/cvsbuild/star/docs/splat
-[loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 24 files to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 10 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 285 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 55 files to /apps/cvsbuild/star/etc
+[loggedcopy] Copied 1 empty directory to /apps/cvsbuild/star/etc
      [echo] Executing Mirage target: install
 
 prepare:
@@ -2791,8 +2794,8 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes
-    [javac] Compiling 30 source files to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 47 files to /apps/cvsbuild/java/source/topcat/build/classes
+    [javac] Compiling 33 source files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 59 files to /apps/cvsbuild/java/source/topcat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
      [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/lib/topcat
 
@@ -2823,7 +2826,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/topcat
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 4 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 43 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 47 files to /apps/cvsbuild/star/docs
      [echo] Executing Treeview target: install
 
 prepare:
@@ -3017,9 +3020,9 @@ execute_mk_script:
      [exec]       fi;\
      [exec] done)
      [exec] Processing 
-     [exec] g77: temp/*.o: No such file or directory
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
+     [exec] g77: temp/*.o: No such file or directory
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
@@ -4233,4 +4236,4 @@ export-full:
      [copy] Copying 2 files to /apps/cvsbuild/export
 
 BUILD SUCCESSFUL
-Total time: 11 minutes 58 seconds
+Total time: 12 minutes 7 seconds

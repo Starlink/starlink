@@ -212,7 +212,7 @@ javadocs:
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/bin
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/etc
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/util/bin
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/util/bin
      [copy] Copying 1 file to /apps/cvsbuild/java/source/util/etc
 
 create_archives:
@@ -258,4 +258,4 @@ create_archives:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/task/build.xml:516: /apps/cvsbuild/java/source/task/bin not found.
 
-Total time: 4 minutes 52 seconds
+Total time: 4 minutes 53 seconds

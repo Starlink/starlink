@@ -134,7 +134,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/java
-     [copy] Copying 30 files to /apps/cvsbuild/java/source/topcat/build/java
+     [copy] Copying 33 files to /apps/cvsbuild/java/source/topcat/build/java
      [echo] Executing Treeview target: javadoc-sources
 
 javadoc-sources:
