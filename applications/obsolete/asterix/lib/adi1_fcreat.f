@@ -85,6 +85,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
@@ -99,8 +100,9 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	FLOC			! File locator
+      CHARACTER*(DAT__SZTYP)    HTYPE			! HDS type
       CHARACTER*(DAT__SZLOC)	LOC			! New object locator
-      CHARACTER*(DAT__SZLOC)	SFLOC			! File object locator
+      CHARACTER*(DAT__SZLOC)	SLOC			! File object locator
       CHARACTER*132		FNAME			! File name
 
       INTEGER			DIMS(DAT__MXDIM)	! Create object dims
