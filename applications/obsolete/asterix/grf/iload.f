@@ -15,6 +15,7 @@
 *      6 Jan 95 : V1.8-0 ARD for regions (RJV)
 *     27 Apr 95 : V1.8-1 SPLIT option added (RJV)
 *     21 Sep 95 : V2.0-0 ADI port (DJA)
+*      1 Apr 96 : V2.0-1 Checks cached image for compatibility (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -31,6 +32,7 @@
       CHARACTER*132		IFILE			! Input file name
       CHARACTER*20 DEV
       INTEGER NX,NY
+      INTEGER MX,MY
       INTEGER IFID
       INTEGER MODE
       LOGICAL DISP
@@ -40,7 +42,7 @@
       LOGICAL FRESH
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ILOAD Version 2.0-0')
+      PARAMETER (VERSION = 'ILOAD Version 2.0-1')
 *-
 *  first invocation do global initialisation
       IF (.NOT.I_OPEN) THEN
@@ -89,6 +91,12 @@
 
         ENDIF
 
+*  if image in cache note size
+        IF (I_MEM) THEN
+          MX=I_NX
+          MY=I_NY
+        ENDIF
+
         CALL MSG_PRNT(' ')
         CALL MSG_PRNT('Checking image...')
         CALL IMG_CHECK(IFID,STATUS)
@@ -103,6 +111,16 @@
           CALL IMG_SETPOS(0.0,0.0,STATUS)
         ENDIF
 
+*  check compatibility with image incache
+        IF (I_MEM.AND.STATUS.EQ.SAI__OK) THEN
+          IF (MX.NE.I_NX.OR.MY.NE.I_NY) THEN
+            CALL MSG_PRNT(
+     :        'AST_ERR: image is different size to cached image - '/
+     :        'deleting cacheds image')
+            CALL IMG_DELCACHE(STATUS)
+            I_MEM=.FALSE.
+          ENDIF
+        ENDIF
 
 *  get graphics device
         CALL GDV_STATUS(ACTIVE,STATUS)
