@@ -712,7 +712,7 @@
 
 *  Start up the graphics system, creating a KEY picture.
          CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPACK_POLPLOT', ' ', 
-     :                   MARGIN, 1, 'KEY', 'R', 0.75, ASPECT, DOMAIN, 
+     :                   MARGIN, 1, 'KEY', 'R', 0.5, ASPECT, DOMAIN, 
      :                   BOX, IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN, 
      :                   STATUS )
 
