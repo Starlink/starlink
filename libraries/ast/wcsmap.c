@@ -96,6 +96,9 @@ f     The WcsMap class does not define any new routines beyond those
 *     20-APR-1998 (DSB):
 *        Modified MapMerge to avoid the possibility of returning an
 *        empty mappings list.
+*     4-SEP-1998 (DSB):
+*        Changed MapMerge to allow WcsMaps to swap with PermMaps in
+*        order to bring mergable WcsMaps closer together.
 *class--
 */
 
@@ -480,6 +483,7 @@ int astTest##attr##_( AstWcsMap *this, int axis ) { \
 #include "pointset.h"            /* Sets of points/coordinates */
 #include "mapping.h"             /* Coordinate mappings (parent class) */
 #include "unitmap.h"             /* Unit mappings */
+#include "permmap.h"             /* Axis permutation mappings */
 #include "wcsmap.h"              /* Interface definition for this class */
 #include "slalib.h"              /* SLALIB function prototypes */
 #include "channel.h"             /* I/O channels */
@@ -582,6 +586,8 @@ static int GetWcsAxis( AstWcsMap *, int );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const PrjData *FindPrjData( int );
 static const char *GetAttrib( AstObject *, const char * );
+static int CanMerge( AstMapping *, int, AstMapping *, int );
+static int CanSwap( AstMapping *, AstMapping * );
 static int Map( AstWcsMap *, int, int, double *, double *, double *, double *);
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
@@ -589,10 +595,249 @@ static void ClearAttrib( AstObject *, const char * );
 static void Dump( AstObject *, AstChannel * );
 static void InitVtab( AstWcsMapVtab * );
 static void LongRange( const PrjData *, struct prjprm *, double *, double *);
+static void PermGet( AstPermMap *, int **, int **, double ** );
 static void SetAttrib( AstObject *, const char * );
+static void WcsPerm( AstMapping **, int *, int );
 
 /* Member functions. */
 /* ================= */
+static int CanMerge( AstMapping *map1, int inv1, AstMapping *map2, int inv2 ){
+/*
+*
+*  Name:
+*     CanMerge
+
+*  Purpose:
+*     Checks if two WcsMaps can be merged.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "wcsmap.h"
+*     int CanMerge( AstMapping *map1, int inv1, AstMapping *map2, int inv2 )
+
+*  Class Membership:
+*     WcsMap internal utility function.
+
+*  Description:
+*     This function checks the two supplied Mappings to see if they are
+*     two WcsMaps which can be merged. This is only possible if they
+*     form an inverse pair.
+
+*  Parameters:
+*     map1
+*        A pointer to the first mapping.
+*     map2
+*        A pointer to the second mapping.
+*     inv1
+*        The invert flag to use with the first mapping.
+*     inv2
+*        The invert flag to use with the second mapping.
+
+*  Returned Value:
+*     1 if the WcsMaps can be merged, zero otherwise.
+
+*/
+
+/* Local Variables: */
+   AstWcsMap *wcs1;               /* Pointer to first WcsMap */
+   AstWcsMap *wcs2;               /* Pointer to second WcsMap */
+   int ip;                        /* Projection parameter index */
+   int ret;                       /* Can the Mappings be merged? */
+
+/* Initialise the returned value. */
+   ret = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return ret;
+
+/* Both Mappings must be WcsMaps to merge. */
+   if( !strcmp( "WcsMap", astGetClass( map1 ) ) &&
+       !strcmp( "WcsMap", astGetClass( map2 ) ) ) {
+
+/* Get pointers to the WcsMaps. */
+       wcs1 = (AstWcsMap *) map1;
+       wcs2 = (AstWcsMap *) map2;
+
+/* Check that the two WcsMaps performs the same sort of projection. */
+       if( astGetWcsType( wcs1 ) == astGetWcsType( wcs2 ) ) {
+
+/* Check that the Mappings are applied in opposite senses. */
+          if( inv1 != inv2 ) {
+
+/* Check that all projection parameters are equal. */
+            ret = 1;
+            for( ip = 0; ip < AST__WCSMX; ip++ ){
+               if( astGetProjP( wcs1, ip ) != 
+                   astGetProjP( wcs2, ip ) ) {
+                  ret = 0;
+                  break;
+               }
+            }
+         }
+      }
+   }
+
+/* Return the answer. */
+   return ret;
+}
+
+static int CanSwap( AstMapping *map1, AstMapping *map2 ){
+/*
+*  Name:
+*     CanSwap
+
+*  Purpose:
+*     Determine if two Mappings could be swapped.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "wcsmap.h"
+*     int CanSwap( AstMapping *map1, AstMapping *map2 )
+
+*  Class Membership:
+*     WcsMap member function 
+
+*  Description:
+*     This function returns a flag indicating if the pair of supplied
+*     Mappings could be replaced by an equivalent pair of Mappings from the 
+*     same classes as the supplied pair, but in reversed order. Each pair
+*     of Mappings is considered to be compunded in series. The supplied 
+*     Mapings are not changed in any way.
+
+*  Parameters:
+*     map1
+*        The Mapping to be applied first.
+*     map2
+*        The Mapping to be applied second.
+
+*  Returned Value:
+*     1 if the Mappings could be swapped, 0 otherwise.
+
+*  Notes:
+*     -  One of the supplied pair of Mappings must be a WcsMap.
+*     -  A value of 0 is returned if the two Mappings could be merged into
+*     a single Mapping.
+*     -  A value of 0 is returned if an error has already occurred, or if
+*     this function should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstMapping *nowcs;        /* Pointer to non-WcsMap Mapping */
+   AstWcsMap  *wcs;          /* Pointer to WcsMap Mapping */
+   const char *class1;       /* Pointer to map1 class string */
+   const char *class2;       /* Pointer to map2 class string */
+   const char *nowcs_class;  /* Pointer to non-WcsMap class string */
+   double *consts;           /* Pointer to constants array */
+   int *inperm;              /* Pointer to input axis permutation array */
+   int *outperm;             /* Pointer to output axis permutation array */
+   int i;                    /* Loop count */
+   int latax;                /* Index of latitude axis in WcsMap */
+   int lonax;                /* Index of longitude axis in WcsMap */
+   int nin;                  /* No. of input coordinates for the PermMap */
+   int nout;                 /* No. of output coordinates for the PermMap */
+   int ret;                  /* Returned flag */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Initialise */
+   ret = 0;
+
+/* Get the classes of the two mappings. */
+   class1 = astGetClass( map1 );
+   class2 = astGetClass( map2 );
+   if( astOK ){
+
+/* Get a pointer to the non-WcsMap Mapping. */
+      if( !strcmp( class1, "WcsMap" ) ){
+         wcs = (AstWcsMap *) map1;
+         nowcs = map2;
+         nowcs_class = class2;
+      } else {
+         nowcs = map1;
+         wcs = (AstWcsMap *) map2;
+         nowcs_class = class1;
+      }
+
+/* If it is a PermMap, the Mappings can be swapped so long as:
+   1) all links between input and output axes in the PermMap are 
+   bi-directional. This does not preclude the existence of unconnected axes, 
+   which do not have links (bi-directional or otherwise). 
+   2) The PermMap passesd though both the longitude and latitude axes of
+   the WcsMap */
+      if( !strcmp( nowcs_class, "PermMap" ) ){
+
+/* Get the number of input and output coordinates. */
+         nin = astGetNin( nowcs );
+         nout = astGetNout( nowcs );
+
+/* We need to know the axis permutation arrays and constants array for
+   the PermMap. */
+         PermGet( (AstPermMap *) nowcs, &outperm, &inperm, &consts );
+         if( astOK ) {
+
+/* Indicate we can swap with the PermMap. */
+            ret = 1;
+
+/* Check each output axis. If any links between axes are found which are
+   not bi-directional, indicate that we cannot swap with the PermMap. */
+            for( i = 0; i < nout; i++ ){
+               if( outperm[ i ] >= 0 && outperm[ i ] < nin ) {
+                  if( inperm[ outperm[ i ] ] != i ) {
+                     ret = 0;
+                     break;
+                  }
+               }
+            }
+
+/* Check each input axis. If any links between axes are found which are
+   not bi-directional, indicate that we cannot swap with the PermMap. */
+            for( i = 0; i < nin; i++ ){
+               if( inperm[ i ] >= 0 && inperm[ i ] < nout ) {
+                  if( outperm[ inperm[ i ] ] != i ) {
+                     ret = 0;
+                     break;
+                  }
+               }
+            }
+
+/* Check that the longitude and latitude axes both have bi-directional
+   links in the PermMap. Get the indices of the longitude and latitude
+   axes in the WcsMap */
+            lonax = astGetWcsAxis( wcs, 0 );
+            latax = astGetWcsAxis( wcs, 1 );
+
+/* If the WcsMap is applied first... */
+            if( wcs == (AstWcsMap *) map1 ) {
+               if( inperm[ lonax ] < 0 || inperm[ lonax ] >= nout ||
+                   inperm[ latax ] < 0 || inperm[ latax ] >= nout ) {
+                  ret = 0;
+               } 
+
+/* If the WcsMap is applied second ... */
+            } else {
+               if( outperm[ lonax ] < 0 || outperm[ lonax ] >= nin ||
+                   outperm[ latax ] < 0 || outperm[ latax ] >= nin ) {
+                  ret = 0;
+               } 
+            }
+
+/* Free the axis permutation and constants arrays. */
+            outperm = (int *) astFree( (void *) outperm );
+            inperm = (int *) astFree( (void *) inperm );
+            consts = (double *) astFree( (void *) consts );
+         }
+      }
+   }
+
+/* Return the answer. */
+   return astOK ? ret : 0;
+}
+
 static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -1322,15 +1567,23 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 */
 
 /* Local Variables: */
+   AstMapping *mc[2];    /* Copies of supplied Mappings to swap */
    AstMapping *neighbour; /* Pointer to neighbouring Mapping */
-   int nin;              /* Number of coordinates for WcsMap */
-   int type;             /* Projection type */
-   int result;           /* Result value to return */
-   int merge;            /* Can WcsMap merge with a neighbour? */
+   const char *nclass;   /* Pointer to neighbouring Mapping class */
+   const char *class1;   /* Pointer to first Mapping class string */
+   const char *class2;   /* Pointer to second Mapping class string */
    int i1;               /* Lower index of the two WcsMaps being merged */
    int i2;               /* Upper index of the two WcsMaps being merged */
    int i;                /* Mapping index */
-   int ip;               /* Projection parameter index */
+   int ic[2];            /* Copies of supplied invert flags to swap */
+   int merge;            /* Can WcsMap merge with a neighbour? */
+   int nin;              /* Number of coordinates for WcsMap */
+   int nstep1;           /* No. of Mappings backwards to next mergable Mapping */
+   int nstep2;           /* No. of Mappings forward to next mergable Mapping */
+   int result;           /* Result value to return */
+   int swaphi;           /* Can WcsMap be swapped with higher neighbour? */
+   int swaplo;           /* Can WcsMap be swapped with lower neighbour? */
+   int type;             /* Projection type */
 
 /* Initialise. */
    result = -1;
@@ -1365,6 +1618,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* ===================================================================== */
    } else if( series ) {
 
+/* Store the classes of the neighbouring Mappings in the list. */
+    class1 = ( where > 0 ) ? astGetClass( ( *map_list )[ where - 1 ] ) : NULL;
+    class2 = ( where < *nmap - 1 ) ? astGetClass( ( *map_list )[ where + 1 ] ) : NULL;
+
 /* A WcsMap can only combine with its own inverse. Set a flag indicating
    that we have not yet found a neighbour with which the WcsMap can be
    merged. */
@@ -1375,29 +1632,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          i1 = where - 1;
          i2 = where;
          neighbour = ( *map_list )[ i1 ];
-
-/* Check that the neighbour has Class "WcsMap". */
-         if( !strcmp( "WcsMap", astGetClass( neighbour ) ) ){
-
-/* Check that the neighbour performs the same sort of projection. */
-            if( type == astGetWcsType( neighbour ) ) {
-
-/* Check that the neighbouring Mapping is applied in the opposite sense
-   to the one being checked. */
-               if( invert_list[ i2 ] != invert_list[ i1 ] ) {
-
-/* Check that all projection parameters are equal. */
-                  merge = 1;
-                  for( ip = 0; ip < AST__WCSMX; ip++ ){
-                     if( astGetProjP( this, ip ) != 
-                         astGetProjP( neighbour, ip ) ) {
-                        merge = 0;
-                        break;
-                     }
-                  }
-               }
-            }
-         }
+         merge = CanMerge( ( *map_list )[ i1 ], (* invert_list)[ i1 ],
+                           ( *map_list )[ i2 ], (* invert_list)[ i2 ] );
       }
 
 /* If the WcsMap can not be merged with its lower neighbour, check its
@@ -1406,29 +1642,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          i1 = where;
          i2 = where + 1;
          neighbour = ( *map_list )[ i2 ];
-
-/* Check that the neighbour has Class "WcsMap". */
-         if( !strcmp( "WcsMap", astGetClass( neighbour ) ) ){
-
-/* Check that the neighbour performs the same sort of projection. */
-            if( type == astGetWcsType( neighbour ) ) {
-
-/* Check that the neighbouring Mapping is applied in the opposite sense
-   to the one being checked. */
-               if( invert_list[ i2 ] != invert_list[ i1 ] ) {
-
-/* Check that all projection parameters are equal. */
-                  merge = 1;
-                  for( ip = 0; ip < AST__WCSMX; ip++ ){
-                     if( astGetProjP( this, ip ) != 
-                         astGetProjP( neighbour, ip ) ) {
-                        merge = 0;
-                        break;
-                     }
-                  }
-               }
-            }
-         }
+         merge = CanMerge( ( *map_list )[ i1 ], (* invert_list)[ i1 ],
+                           ( *map_list )[ i2 ], (* invert_list)[ i2 ] );
       }
 
 /* If either neighbour has passed these checks, it is the inverse of the 
@@ -1440,9 +1655,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          (void) astAnnul( ( *map_list )[ i1 ] );
          (void) astAnnul( ( *map_list )[ i2 ] );
 
-/* Create a 2-D UnitMap, and store a pointer for it in place of the first 
+/* Create a UnitMap, and store a pointer for it in place of the first 
    WcsMap. */
-         ( *map_list )[ i1 ] = (AstMapping *) astUnitMap( 2, "" );
+         ( *map_list )[ i1 ] = (AstMapping *) astUnitMap( nin, "" );
          ( *invert_list )[ i1 ] = 0;
 
 /* Shuffle down the remaining Mappings to fill the hole left by the
@@ -1460,11 +1675,326 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    modified element. */
          (*nmap)--;
          result = i1;
+
+/* If the WcsMap could not merge directly with either of its neighbours,
+   we consider whether it would be worthwhile to swap the WcsMap with
+   either of its neighbours. This can only be done for certain PermMaps, 
+   and will usually require both Mappings to be modified (unless they are 
+   commutative). The advantage of swapping the order of the Mappings is that 
+   it may result in the WcsMap being adjacent to a Mapping with which it can 
+   merge directly on the next invocation of this function, thus reducing the 
+   number of Mappings in the list. */
+      } else {
+
+/* Step through each of the Mappings which follow the WcsMap, looking for 
+   a Mapping with which the WcsMap could merge directly. Stop when such a
+   Mapping is found, or when a Mapping is found with which the WcsMap
+   cannot swap. Note the number of Mappings which separate the WcsMap
+   from the Mapping with which it could merge (if any). */
+         swaphi = 0;
+         nstep2 = -1;
+         for( i2 = where + 1; i2 < *nmap; i2++ ){
+
+            if( CanMerge( ( *map_list )[ i2 ], ( *invert_list )[ i2 ],
+                          ( *map_list )[ where ], ( *invert_list )[ where ]  ) ) {
+               nstep2 = i2 - where - 1;
+               break;
+            }
+
+/* If we cannot swap with this Mapping, leave the loop. */
+            if( !CanSwap(  ( *map_list )[ where ], 
+                           ( *map_list )[ i2 ] ) ) {
+               break;
+
+/* Otherwise, set a flag to indicate that we could swap the WcsMap with its 
+   higher neighbour if needed. */
+            } else {
+               swaphi = 1;
+            }
+         }
+
+/* Do the same working forward from the WcsMap towards the start of the map
+   list. */
+         swaplo = 0;
+         nstep1 = -1;
+         for( i1 = where - 1; i1 >= 0; i1-- ){
+
+            if( CanMerge( ( *map_list )[ i1 ], ( *invert_list )[ i1 ],
+                          ( *map_list )[ where ], ( *invert_list )[ where ]  ) ) {
+               nstep1 = where - 1 - i1;
+               break;
+            }
+
+            if( !CanSwap(  ( *map_list )[ where ], 
+                           ( *map_list )[ i1 ] ) ) {
+               break;
+            } else {
+               swaplo = 1;
+            }
+         }
+
+/* Choose which neighbour to swap with so that the WcsMap moves towards the
+   nearest Mapping with which it can merge. */
+         if( nstep1 != -1 && ( nstep2 == -1 || nstep2 > nstep1 ) ){
+            nclass = class1;
+            i1 = where - 1;
+            i2 = where;
+         } else if( nstep2 != -1 ){
+            nclass = class2;
+            i1 = where;
+            i2 = where + 1;
+         } else {
+            nclass = NULL;
+         }
+
+/* If there is a target Mapping in the list with which the WcsMap could 
+   merge, replace the supplied Mappings with swapped Mappings to bring a
+   WcsMap closer to the target Mapping. */
+         if( nclass ){
+
+            WcsPerm( (*map_list) + i1, (*invert_list) + i1, where - i1 );
+
+/* Store the index of the first modified Mapping. */
+            result = i1;
+
+/* If there is no Mapping available for merging, it may still be
+   advantageous to swap with a neighbour because the swapped Mapping may
+   be simpler than the original Mappings. */
+         } else if( swaphi || swaplo ) {
+
+/*  Choose a neightbour to swap with. If both are suitable for swapping,
+    swap with the lower. */
+            if( swaplo ){
+               nclass = class1;
+               i1 = where - 1;
+               i2 = where;
+            } else {
+               nclass = class2;
+               i1 = where;
+               i2 = where + 1;
+            }
+
+/* Take copies of the Mapping and Invert flag arrays so we do not change 
+   the supplied values. */
+            mc[ 0 ] = (AstMapping *) astCopy( ( (*map_list) + i1 )[0] );
+            mc[ 1 ] = (AstMapping *) astCopy( ( (*map_list) + i1 )[1] );
+            ic[ 0 ] = ( (*invert_list) + i1 )[0];
+            ic[ 1 ] = ( (*invert_list) + i1 )[1];
+
+/* Swap these Mappings. */
+            WcsPerm( mc, ic, where - i1 );
+
+/* If neither of the swapped Mappings can be simplified further, then there
+   is no point in swapping the Mappings, so just annul the map copies. */
+            if( astGetClass( astSimplify( mc[0] ) ) == 
+                astGetClass( mc[0] ) &&
+                astGetClass( astSimplify( mc[1] ) ) == 
+                astGetClass( mc[1] ) ) {
+
+               mc[ 0 ] = (AstMapping *) astAnnul( mc[ 0 ] );
+               mc[ 1 ] = (AstMapping *) astAnnul( mc[ 1 ] );
+
+/* If one or both of the swapped Mappings could be simplified, then annul
+   the supplied Mappings and return the swapped mappings, storing the index 
+   of the first modified Mapping. */
+            } else {
+               (void ) astAnnul( ( (*map_list) + i1 )[0] );
+               (void ) astAnnul( ( (*map_list) + i1 )[1] );
+
+               ( (*map_list) + i1 )[0] = mc[ 0 ];
+               ( (*map_list) + i1 )[1] = mc[ 1 ];
+
+               ( (*invert_list) + i1 )[0] = ic[ 0 ];
+               ( (*invert_list) + i1 )[1] = ic[ 1 ];
+
+               result = i1;
+
+            }
+         }
       }
    }
 
 /* Return the result. */
    return result;
+}
+
+static void PermGet( AstPermMap *map, int **outperm, int **inperm, 
+                     double **consts ){
+/*
+*  Name:
+*     PermGet
+
+*  Purpose:
+*     Get the axis permutation and constants array for a PermMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "wcsmap.h"
+*     void PermGet( AstPermMap *map, int **outperm, int **inperm, 
+*                   double **const )
+
+*  Class Membership:
+*     WcsMap member function 
+
+*  Description:
+*     This function returns axis permutation and constants arrays which can
+*     be used to create a PermMap which is equivalent to the supplied PermMap.
+
+*  Parameters:
+*     map
+*        The PermMap.
+*     outperm
+*        An address at which to return a popinter to an array of ints
+*        holding the output axis permutation array. The array should be
+*        released using astFree when no longer needed.
+*     inperm
+*        An address at which to return a popinter to an array of ints
+*        holding the input axis permutation array. The array should be
+*        released using astFree when no longer needed.
+*     consts
+*        An address at which to return a popinter to an array of doubles
+*        holding the constants array. The array should be released using 
+*        astFree when no longer needed.
+
+*  Notes:
+*     -  NULL pointers are returned if an error has already occurred, or if
+*     this function should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPointSet *pset1;       /* PointSet holding input positions for PermMap */
+   AstPointSet *pset2;       /* PointSet holding output positions for PermMap */
+   double **ptr1;            /* Pointer to pset1 data */
+   double **ptr2;            /* Pointer to pset2 data */
+   double *cnst;             /* Pointer to constants array */
+   double cn;                /* Potential new constant value */
+   double ip;                /* Potential output axis index */
+   double op;                /* Potential input axis index */
+   int *inprm;               /* Pointer to input axis permutation array */
+   int *outprm;              /* Pointer to output axis permutation array */
+   int i;                    /* Axis count */
+   int nc;                   /* Number of constants stored so far */
+   int nin;                  /* No. of input coordinates for the PermMap */
+   int nout;                 /* No. of output coordinates for the PermMap */
+
+/* Initialise. */
+   if( outperm ) *outperm = NULL;
+   if( inperm ) *inperm = NULL;
+   if( consts ) *consts = NULL;
+
+/* Check the global error status and the supplied pointers. */
+   if ( !astOK || !outperm || !inperm || !consts ) return;
+
+/* Get the number of input and output axes for the supplied PermMap. */
+   nin = astGetNin( map );
+   nout = astGetNout( map );
+
+/* Allocate the memory for the returned arrays. */
+   outprm = (int *) astMalloc( sizeof( int )* (size_t) nout );
+   inprm = (int *) astMalloc( sizeof( int )* (size_t) nin );
+   cnst = (double *) astMalloc( sizeof( double )* (size_t) ( nout + nin ) );
+
+/* Returned the pointers to these arrays.*/
+   *outperm = outprm;
+   *inperm = inprm;
+   *consts = cnst;
+
+/* Create two PointSets, each holding two points, which can be used for
+   input and output positions with the PermMap. */
+   pset1 = astPointSet( 2, nin, "" );
+   pset2 = astPointSet( 2, nout, "" );
+
+/* Set up the two input positions to be [0,1,2...] and [-1,-1,-1,...]. The
+   first position is used to enumerate the axes, and the second is used to 
+   check for constant axis values. */
+   ptr1 = astGetPoints( pset1 );
+   if( astOK ){
+      for( i = 0; i < nin; i++ ){
+         ptr1[ i ][ 0 ] = ( double ) i;
+         ptr1[ i ][ 1 ] = -1.0;
+      }
+   }
+
+/* Use the PermMap to transform these positions in the forward direction. */
+   (void) astTransform( map, pset1, 1, pset2 );
+
+/* Look at the mapped positions to determine the output axis permutation
+   array. */
+   ptr2 = astGetPoints( pset2 );
+   if( astOK ){
+
+/* No constant axis valeus found yet. */
+      nc = 0;
+
+/* Do each output axis. */
+      for( i = 0; i < nout; i++ ){
+
+/* If the output axis value is copied from an input axis value, the index
+   of the appropriate input axis will be in the mapped first position. */
+         op = ptr2[ i ][ 0 ];
+
+/* If the output axis value is assigned a constant value, the result of 
+   mapping the two different input axis values will be the same. */
+         cn = ptr2[ i ][ 1 ];
+         if( op == cn ) {
+
+/* We have found another constant. Store it in the constants array, and
+   store the index of the constant in the output axis permutation array. */
+            cnst[ nc ] = cn;
+            outprm[ i ] = -( nc + 1 );
+            nc++;
+
+/* If the output axis values are different, then the output axis value 
+   must be copied from the input axis value. */
+         } else {
+            outprm[ i ] = (int) ( op + 0.5 );
+         }
+      }
+   }
+    
+/* Now do the same thing to determine the input permutation array. */
+   if( astOK ){
+      for( i = 0; i < nout; i++ ){
+         ptr2[ i ][ 0 ] = ( double ) i;
+         ptr2[ i ][ 1 ] = -1.0;
+      }
+   }
+
+   (void) astTransform( map, pset2, 0, pset1 );
+
+   if( astOK ){
+
+      for( i = 0; i < nin; i++ ){
+
+         ip = ptr1[ i ][ 0 ];
+         cn = ptr1[ i ][ 1 ];
+         if( ip == cn ) {
+
+            cnst[ nc ] = cn;
+            inprm[ i ] = -( nc + 1 );
+            nc++;
+
+         } else {
+            inprm[ i ] = (int) ( ip + 0.5 );
+         }
+      }
+   }
+
+/* Annul the PointSets. */
+   pset1 = astAnnul( pset1 );
+   pset2 = astAnnul( pset2 );
+
+/* If an error has occurred, attempt to free the returned arrays. */
+   if( !astOK ) {
+      *outperm = (int *) astFree( (void *) *outperm );
+      *inperm = (int *) astFree( (void *) *inperm );
+      *consts = (double *) astFree( (void *) *consts );
+   }
+
+/* Return. */
+   return;
 }
 
 static void SetAttrib( AstObject *this_object, const char *setting ) {
@@ -1925,6 +2455,135 @@ const char *PrjDesc_( int type ){
    data = PrjInfo;
    while( data->prj != AST__WCSBAD && data->prj != type ) data ++;
    return data->desc;
+}
+
+static void WcsPerm( AstMapping **maps, int *inverts, int iwm  ){
+/*
+*  Name:
+*     WcsPerm
+
+*  Purpose:
+*     Swap a WcsMap and a PermMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "wcsmap.h"
+*     void WcsPerm( AstMapping **maps, int *inverts, int iwm )
+
+*  Class Membership:
+*     WcsMap member function 
+
+*  Description:
+*     A list of two Mappings is supplied containing a WcsMap and a
+*     PermMap. These Mappings are annulled, and replaced with 
+*     another pair of Mappings consisting of a WcsMap and a PermMap
+*     in the opposite order. These Mappings are chosen so that their
+*     combined effect is the same as the original pair of Mappings. 
+
+*  Parameters:
+*     maps
+*        A pointer to an array of two Mapping pointers.
+*     inverts
+*        A pointer to an array of two invert flags.
+*     iwm
+*        The index within "maps" of the WcsMap.
+
+*  Notes:
+*     -  All links between input and output axes in the PermMap must 
+*     be bi-directional, but there can be unconnected axes, and there
+*     need not be the same number of input and output axes. Both
+*     longitude and latitude axes must be passed by the PermMap.
+
+*/
+
+/* Local Variables: */
+   AstPermMap *pm;               /* Pointer to the supplied PermMap */
+   AstWcsMap *w1;                /* Pointer to the returned WcsMap */
+   AstWcsMap *wm;                /* Pointer to the supplied WcsMap */
+   double *consts;               /* Pointer to constants array */
+   int *inperm;                  /* Pointer to input axis permutation array */
+   int *outperm;                 /* Pointer to output axis permutation array */
+   int ip;                       /* Index of projection parameter */
+   int latax;                    /* Index of latitude axis */
+   int lonax;                    /* Index of longitude axis */
+   int npin;                     /* No. of input axes in supplied PermMap */
+   int npout;                    /* No. of output axes in supplied PermMap */
+   int old_pinv;                 /* Invert value for the supplied PermMap */
+   int type;                     /* Projection type */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Store pointers to the supplied WcsMap and the PermMap. */
+   wm = (AstWcsMap *) maps[ iwm ];
+   pm = (AstPermMap *) maps[ 1 - iwm ];
+
+/* Temporarily set the Invert attribute of the supplied PermMap to the
+   supplied values. */
+   old_pinv = astGetInvert( pm );
+   astSetInvert( pm, inverts[ 1 - iwm ] );
+
+/* Get the projection type of the supplied WcsMap and the indices of the
+   longitude and latitude axes. */
+   type = astGetWcsType( wm );
+   lonax = astGetWcsAxis( wm, 0 );
+   latax = astGetWcsAxis( wm, 1 );
+
+/* Get the axis permutation and constants arrays representing the
+   PermMap. Note, no constants are used more than once in the returned
+   arrays (i.e. duplicate constants are returned in "consts" if more than
+   one axis uses a given constant). */
+   PermGet( pm, &outperm, &inperm, &consts );
+
+   if( astOK ) {
+
+/* Get the number of input and output axes in the PermMap. */
+      npin = astGetNin( pm );
+      npout = astGetNout( pm );
+
+/* Create the new WcsMap with permuted longitude and latitude axes. Note,
+   the private interface to astWcsMap uses 1-based axis indices. */
+      if( iwm == 0 ) {
+         w1 = astWcsMap( npout, type, inperm[ lonax ] + 1, 
+                         inperm[ latax ] + 1, "" );
+      } else {
+         w1 = astWcsMap( npin, type, outperm[ lonax ] + 1, 
+                         outperm[ latax ] + 1, "" );
+      }
+
+/* Copy the projection parameters. */
+      for( ip = 0; ip < AST__WCSMX; ip++ ){
+         astSetProjP( w1, ip, astGetProjP( wm, ip ) );
+      }
+
+/* Set the invert flag. */
+      astSetInvert( w1, inverts[ iwm ] );
+
+/* Free the axis permutation and constants arrays. */
+      outperm = (int *) astFree( (void *) outperm );
+      inperm = (int *) astFree( (void *) inperm );
+      consts = (double *) astFree( (void *) consts );
+   }
+
+/* Re-instate the original value of the Invert attribute of the supplied 
+   PermMap. */
+   astSetInvert( pm, old_pinv );
+
+/* Replace the supplied WcsMap with the one created above, swapping the
+   order. */
+   if( astOK ){
+      (void) astAnnul( wm );
+      maps[ 1 - iwm ] = (AstMapping *) w1;
+
+      maps[ iwm ] = (AstMapping *) pm;
+      inverts[ iwm ] = old_pinv;
+
+   }
+
+/* Return. */
+   return;
 }
 
 /* Functions which access class attributes. */
