@@ -192,8 +192,8 @@
                 CALL IMG_ECLTOWORLD(ELON,ELAT,X,Y,STATUS)
 
               ELSEIF (FRAME.EQ.4) THEN
-                CALL USI_GET0D('PAR_R1',L,STATUS)
-                CALL USI_GET0D('PAR_R2',B,STATUS)
+                CALL IMG_NBGET0D('PAR_R1',L,STATUS)
+                CALL IMG_NBGET0D('PAR_R2',B,STATUS)
                 CALL IMG_GALTOWORLD(L,B,X,Y,STATUS)
 
               ENDIF
