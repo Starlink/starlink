@@ -170,7 +170,6 @@ static void sinkWrap( void (*sink)(const char *), const char *line ) {
 
   perl_call_sv( SvRV(cb), G_DISCARD | G_VOID );
 
-  PUTBACK;
   FREETMPS;
   LEAVE;
 
@@ -293,15 +292,6 @@ astClearStatus()
   ASTCALL(
    astClearStatus;
   )
-
-bool
-astOK()
- CODE:
-  ASTCALL(
-   RETVAL = astOK;
-  )
- OUTPUT:
-  RETVAL
 
 void
 astSetStatus( status )
