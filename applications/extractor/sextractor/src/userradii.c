@@ -114,7 +114,7 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
             for ( i = 1; i < NRAD; i++ ) {
                threshs[i] = field->thresh * pow( 2, i + 2 );
             }
-            thresh[0] = field->thresh;
+            threshs[0] = field->thresh;
 
          } else if ( prefs.nrad == 1 ) {
 
