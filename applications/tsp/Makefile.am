@@ -21,6 +21,11 @@ tsp_mon_TASKS = $(TSP_F_ROUTINES:.f=)
 TESTS = tsp_test
 check_SCRIPTS = tsp_test
 
+IFL_FILES = tsp_mon.ifl $(TSP_F_ROUTINES:.f=.ifl)
+
+$(IFL_FILES): tsp.ifd
+	$(IFD2STAR) tsp
+
 TSP_F_ROUTINES = build3d.f calfit.f calfitpa.f calib.f calpa.f	       \
 ccd2pol.f ccd2stokes.f ccdphot.f ccdpol.f cgs4pol.f cmult.f combine.f  \
 display.f divide.f dstokes.f eplot.f extin.f flconv.f flip.f fplot.f   \

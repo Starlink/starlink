@@ -19,6 +19,7 @@ STAR_MONOLITHS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_FPP
+STAR_CHECK_PROGS([ifd2star])
 
 dnl    Use libtool for linking since it will try to use the -rpath option
 AC_PROG_LIBTOOL
@@ -35,7 +36,7 @@ STAR_LATEX_DOCUMENTATION(sun66)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile component.xml tsp.ifd)
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

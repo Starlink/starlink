@@ -1,0 +1,4241 @@
+package tsp {
+   version @PACKAGE_VERSION@
+   prefix tsp
+
+   executable tsp_mon {
+      action build3d {
+
+         parameter figaro {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {FIGARO format Input file }
+          }
+
+         parameter frame {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 2
+            default 1
+            prompt {Frame number to insert at}
+          }
+
+         parameter new {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            default FALSE
+            prompt {Create new time series dataset}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {Output Dataset}
+          }
+
+         parameter frames {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Number of Frames}
+          }
+
+         parameter utdate {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            prompt {UT data of frame (e.g. 1988 Nov 30)}
+          }
+
+         parameter ut {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            prompt {UT of frame (e.g. 22 33 44)}
+          }
+
+      }
+      action calfit {
+
+         parameter input {
+            type NDF
+            prompt {Stokes data to fit}
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+          }
+
+         parameter degree {
+            type _INTEGER
+            prompt {Degree of Polynomial}
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+          }
+
+         parameter output {
+            type NDF
+            prompt {Fitted dataset}
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+          }
+
+
+      }
+      action calfitpa {
+
+         parameter input {
+            type NDF
+            prompt {Stokes data to fit}
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+          }
+
+         parameter degree {
+            type _INTEGER
+            prompt {Degree of Polynomial}
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+          }
+
+         parameter pa {
+            type _REAL
+            prompt {Position angle of data}
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+          }
+
+         parameter output {
+            type NDF
+            prompt {Fitted dataset}
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+          }
+
+
+      }
+      action calib {
+
+         parameter input {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Spectrum to be calibrated }
+          }
+
+         parameter calib {
+            type NDF
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Calibration Spectrum }
+          }
+
+         parameter output {
+            type NDF
+            position 3
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+      }
+      action calpa {
+
+         parameter input {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Spectrum to be PA calibrated }
+          }
+
+         parameter calib {
+            type NDF
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Calibration Spectrum }
+          }
+
+         parameter output {
+            type NDF
+            position 3
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+      }
+      action ccd2pol {
+
+         parameter pos1 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {FIGARO Input file for 0.0 degrees}
+          }
+
+         parameter pos2 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {FIGARO Input file for 45.0 degrees}
+          }
+
+         parameter pos3 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {FIGARO Input file for 22.5 degrees}
+          }
+
+         parameter pos4 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {FIGARO Input file for 67.5 degrees}
+          }
+
+         parameter astart {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Start of Aperture A }
+          }
+
+         parameter bstart {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 3
+            prompt {Start of Aperture B }
+          }
+
+         parameter oesep {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Separation of O and E spectra }
+          }
+
+         parameter width {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Width of A and B spectra }
+          }
+
+         parameter aperture {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default A
+            prompt {Aperture containing star }
+          }
+
+         parameter bias {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0.0
+            prompt {CCD Bias level}
+          }
+
+         parameter readnoise {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 5.0
+            prompt {CCD readout noise (electrons)}
+          }
+
+         parameter photadu {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 3.25
+            prompt {Photons per ADU}
+          }
+
+         parameter algorithm {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Data reduction algorithm}
+            default RATIO
+            help "Algorithm used to derive stokes parameters (RATIO or OLD)"
+          }
+
+         parameter output {
+            type ENDIF
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Output Dataset}
+          }
+                   
+      }
+      action ccd2stokes {
+
+         parameter afigaro {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {A-state FIGARO Input file }
+          }
+
+         parameter bfigaro {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {B-state FIGARO Input file }
+          }
+
+         parameter astart {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Start of Aperture A }
+          }
+
+         parameter bstart {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 3
+            prompt {Start of Aperture B }
+          }
+
+         parameter oesep {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Separation of O and E spectra }
+          }
+
+         parameter width {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Width of A and B spectra }
+          }
+
+         parameter aperture {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default A
+            prompt {Aperture containing star }
+          }
+
+         parameter bias {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0.0
+            prompt {CCD Bias level}
+          }
+
+         parameter readnoise {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 5.0
+            prompt {CCD readout noise (electrons)}
+          }
+
+         parameter photadu {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 3.25
+            prompt {Photons per ADU}
+          }
+
+         parameter stokespar {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Stokes Parameter (Q,U or V) }
+            default Q
+          }
+
+         parameter algorithm {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Data reduction algorithm}
+            default RATIO
+            help "Algorithm used to derive stokes parameters (RATIO or OLD)"
+          }
+
+         parameter output {
+            type ENDIF
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Output Dataset}
+          }
+                   
+      }
+      action ccdphot {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Input Time series image}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Output Photometry Dataset}
+          }
+
+         parameter x {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {X position of centre of star}
+          }
+
+         parameter y {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {Y position of centre of star}
+          }
+
+         parameter radius {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 5
+            prompt {Radius of aperture (pixels)}
+          }
+
+         parameter weight {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            position 6
+            prompt {Use Weighted Pixel Sum (rather than aperture photometry)}
+          }
+
+         parameter lambda {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 5500
+            position 7
+            prompt {Wavelength of observation (Angstroms)}
+          }
+
+         parameter fluxcal {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1.0
+            position 8
+            prompt {Counts per Jansky}
+          }
+
+      }
+      action ccdpol {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Input Time series image}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Output Photometry Dataset}
+          }
+
+         parameter xe {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {X position of centre of E image}
+          }
+
+         parameter ye {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {Y position of centre of E image}
+          }
+
+         parameter radius {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 5
+            prompt {Radius of aperture (pixels)}
+          }
+
+         parameter xo {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 6
+            prompt {X position of centre of O image}
+          }
+
+         parameter yo {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 7
+            prompt {Y position of centre of O image}
+          }
+
+         parameter lambda {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 5500
+            position 8
+            prompt {Wavelength of observation (Angstroms)}
+          }
+
+         parameter stokespar {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default V
+            position 9
+            prompt {Stokes Parameter (Q,U or V)}
+          }
+
+         parameter offset {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0.0
+            position 10
+            prompt {Offset to polarization level (%)}
+          }
+
+         parameter fluxcal {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1.0
+            position 11
+            prompt {Counts per Jansky}
+          }
+
+      }
+      action cgs4pol {
+
+         parameter pos1 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {FIGARO Input file for 0.0 degrees}
+          }
+
+         parameter pos2 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {FIGARO Input file for 45.0 degrees}
+          }
+
+         parameter pos3 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {FIGARO Input file for 22.5 degrees}
+          }
+
+         parameter pos4 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {FIGARO Input file for 67.5 degrees}
+          }
+
+         parameter astart {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Start of Aperture A }
+          }
+
+         parameter bstart {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 3
+            prompt {Start of Aperture B }
+          }
+
+         parameter width {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Width of A and B spectra }
+          }
+
+         parameter aperture {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default A
+            prompt {Aperture containing star }
+          }
+
+         parameter output {
+            type ENDIF
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Output Dataset}
+          }
+                   
+      }
+      action cmult {
+
+         parameter input {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Spectrum to be scaled }
+          }
+
+         parameter factor {
+            type _REAL
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Factor to multiply by}
+            default 1
+          }
+
+         parameter output {
+            type NDF
+            position 3
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+      }
+      action combine {
+
+         parameter input1 {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {First Dataset }
+          }
+
+         parameter input2 {
+            type NDF
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Second Dataset }
+          }
+
+         parameter output {
+            type NDF
+            position 3
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+      }
+      action display {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Dataset to display}
+          }
+
+         parameter device {
+            type DEVICE
+            vpath PROMPT
+            ppath CURRENT GLOBAL
+            position 2
+            association <-GLOBAL.DEVICE
+            prompt {Plot Device}
+          }
+
+         parameter high {
+            type _REAL
+            vpath PROMPT
+            ppath DYNAMIC
+            position 3
+            prompt {Upper Scaling Level}
+          }
+
+         parameter low {
+            type _REAL
+            vpath PROMPT
+            ppath DYNAMIC
+            position 4
+            prompt {Lower Scaling Level}
+          }
+
+         parameter first {
+            type _INTEGER
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {First Frame for Movie}
+          }
+
+         parameter last {
+            type _INTEGER
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Last Frame for Movie}
+          }
+
+         parameter command {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Frame, Movie, Cursor, Quit}
+            help "Enter one of the listed commands, only the first letter is recognized"
+          }
+
+         parameter frame {
+            type _INTEGER
+            vpath PROMPT
+            ppath DYNAMIC DEFAULT
+            default 1
+            prompt {Frame number}
+          }
+
+      }
+      action divide {
+
+         parameter input1 {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Spectrum to be divided}
+          }
+
+         parameter input2 {
+            type NDF
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Spectrum to divide by}
+          }
+
+         parameter output {
+            type NDF
+            position 3
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+      }
+      action dstokes {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Dataset to delete from}
+          }
+
+         parameter stokespar {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Stokes parameter to delete (Q,U or V)}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Output Dataset}
+          }
+
+      }
+      action eplot {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Polarization Spectrum to Plot }
+            help "The name of the file containing the Stokes data to be plotted - This must contain both Q and U stokes parameters"
+          }
+
+         parameter device {
+            type DEVICE
+            vpath PROMPT
+            ppath CURRENT GLOBAL
+            position 2
+            association <-GLOBAL.DEVICE
+            prompt {Plot Device}
+          }
+
+         parameter label {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 3
+            prompt {Label for plot }
+            default { }
+          }
+
+         parameter auto {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Autoscale Plot}
+          }
+
+         parameter imin {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Intensity Level to Plot}
+          }
+
+         parameter imax {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Intensity Level to Plot}
+          }
+
+         parameter pmin {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Polarization Level to Plot}
+          }
+
+         parameter pmax {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Polarization Level to Plot}
+          }
+
+           
+         parameter theta {
+            type _REAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Angle Shift for Theta plot}
+            default 0.0
+          }
+
+      }
+      action extin {
+
+         parameter input {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Spectrum to be corrected}
+          }
+
+         parameter coeff {
+            type _CHAR
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Extinction Coefficient Spectrum }
+          }
+                               
+         parameter airmass {
+            type _REAL
+            position 3
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Air-mass of observation}
+            default 1.0
+          }
+
+         parameter output {
+            type NDF
+            position 4
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+      }
+      action flconv {
+
+         parameter input {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Spectrum to be converted}
+          }
+
+         parameter output {
+            type NDF
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+      }
+      action flip {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Dataset to correct}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Corrected Dataset}
+          }
+
+      }
+      action fplot {
+
+         parameter input {
+            type ENDIF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Stokes Data to Plot }
+          }
+
+         parameter binsize {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 2
+            prompt {Number of spectral channels per bin }
+            default 10
+          }
+
+         parameter device {
+            type DEVICE
+            vpath PROMPT
+            ppath CURRENT GLOBAL
+            position 3
+            association <-GLOBAL.DEVICE
+            prompt {Plot Device}
+          }
+
+         parameter label {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 4
+            prompt {Label for plot }
+            default { }
+          }
+
+         parameter auto {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Autoscale Plot}
+          }
+
+         parameter imin {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Intensity Level to Plot}
+          }
+
+         parameter imax {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Intensity Level to Plot}
+          }
+
+         parameter pmin {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Polarization Level to Plot}
+          }
+
+         parameter pmax {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Polarization Level to Plot}
+          }
+
+      }
+
+      action imotion {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Input Time series image}
+          }
+
+         parameter template {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Template image}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Output Image Motion Time Series}
+          }
+
+         parameter x {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {X position of centre of star}
+          }
+
+         parameter y {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 5
+            prompt {Y position of centre of star}
+          }
+
+         parameter radius {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 6
+            prompt {Radius of aperture (pixels)}
+          }
+
+         parameter bpixel {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default FALSE
+            position 7
+            prompt {Use brightest pixel (rather than centroid)}
+          }
+
+      }
+      action impol {
+
+         parameter pos1 {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Input file for 0.0 degrees}
+          }
+
+         parameter pos2 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Input file for 45.0 degrees}
+          }
+
+         parameter pos3 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Input file for 22.5 degrees}
+          }
+
+         parameter pos4 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {Input file for 67.5 degrees}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 5
+            prompt {Output Dataset}
+          }
+
+      }
+      action ipcs2stokes {
+
+         parameter figaro {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {FIGARO Input file }
+          }
+
+         parameter astart {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Start of Aperture A }
+          }
+
+         parameter bstart {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 3
+            prompt {Start of Aperture B }
+          }
+
+         parameter oesep {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Separation of O and E spectra }
+          }
+
+         parameter width {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Width of A and B spectra }
+          }
+
+         parameter aperture {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default A
+            prompt {Aperture containing star }
+          }
+
+         parameter stokespar {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 2
+            prompt {Stokes Parameter (Q,U or V) }
+            default Q
+          }
+
+         parameter output {
+            type ENDIF
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Output Dataset}
+          }
+                   
+      }
+      action irflux {
+
+         parameter input {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Spectrum to be flux calibrated }
+          }
+
+         parameter calspect {
+            type NDF
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Calibration (standard star) Spectrum }
+          }
+                               
+         parameter temp {
+            type _REAL
+            position 3
+            ppath CURRENT DEFAULT
+            vpath PROMPT
+            default 10000
+            prompt {Black Body Temperature (K)}
+          }
+
+         parameter caltype {
+            type _CHAR
+            position 4
+            ppath CURRENT DEFAULT
+            vpath PROMPT
+            default K
+            prompt {Type of calibration data}
+            help "J,H,K,L,M to specify broad band mag, F to specify flux"
+          }
+
+         parameter mag {
+            type _REAL
+            position 5
+            ppath CURRENT DEFAULT
+            vpath PROMPT
+            default 0.0
+            prompt {Standard Magnitude}
+          }
+
+         parameter flux {
+            type _REAL
+            ppath CURRENT DEFAULT
+            vpath PROMPT
+            default 1.0
+            prompt {Flux at Calibration Wavelength (mJy)}
+          }
+
+         parameter wave {
+            type _REAL
+            ppath CURRENT DEFAULT
+            vpath PROMPT
+            default 2.2
+            prompt {Calibration wavelength (microns)}
+          }
+
+         parameter output {
+            type NDF
+            position 6
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+      }
+      action irisap {
+
+         parameter pos1 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {FIGARO Input file for 0.0 degrees}
+          }
+
+         parameter pos2 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {FIGARO Input file for 45.0 degrees}
+          }
+
+         parameter pos3 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {FIGARO Input file for 22.5 degrees}
+          }
+
+         parameter pos4 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {FIGARO Input file for 67.5 degrees}
+          }
+
+         parameter x {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {X position of centre of aperture}
+          }
+
+         parameter y {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Y position of centre of aperture}
+          }
+
+         parameter r {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 5
+            prompt {Radius of aperture }
+          }
+
+         parameter xsep {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 31
+            prompt {Separation in X}
+          }
+
+         parameter ysep {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0
+            prompt {Separation in Y}
+          }
+
+      }
+      action irisapc {
+
+         parameter pos1 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {FIGARO Input file for 0.0 degrees}
+          }
+
+         parameter pos2 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {FIGARO Input file for 90.0 degrees}
+          }
+
+
+         parameter x {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {X position of centre of aperture}
+          }
+
+         parameter y {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Y position of centre of aperture}
+          }
+
+         parameter r {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 5
+            prompt {Radius of aperture }
+          }
+
+         parameter xsep {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 31
+            prompt {Separation in X}
+          }
+
+         parameter ysep {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0
+            prompt {Separation in Y}
+          }
+
+      }
+      action irispol {
+
+         parameter pos1 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {FIGARO Input file for 0.0 degrees}
+          }
+
+         parameter pos2 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {FIGARO Input file for 45.0 degrees}
+          }
+
+         parameter pos3 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {FIGARO Input file for 22.5 degrees}
+          }
+
+         parameter pos4 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {FIGARO Input file for 67.5 degrees}
+          }
+
+         parameter x1 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {X position of bottom left corner}
+          }
+
+         parameter y1 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Y position of bottom left corner}
+          }
+
+         parameter width {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 50
+            prompt {Width of block }
+          }
+
+         parameter height {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 128
+            prompt {Height of block}
+          }
+
+         parameter xsep {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 31
+            prompt {Separation in X}
+          }
+
+         parameter ysep {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -0.5
+            prompt {Separation in Y}
+          }
+
+         parameter algorithm {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Data reduction algorithm}
+            default RATIO
+            help "Algorithm used to derive stokes parameters (RATIO or OLD)"
+          }
+
+         parameter output {
+            type ENDIF
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Output Dataset}
+          }
+                   
+      }
+      action irispolc {
+
+         parameter pos1 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {FIGARO Input file for 0.0 degrees}
+          }
+
+         parameter pos2 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {FIGARO Input file for 90.0 degrees}
+          }
+
+         parameter x1 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {X position of bottom left corner}
+          }
+
+         parameter y1 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Y position of bottom left corner}
+          }
+
+         parameter width {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 50
+            prompt {Width of block }
+          }
+
+         parameter height {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 128
+            prompt {Height of block}
+          }
+
+         parameter xsep {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 31
+            prompt {Separation in X}
+          }
+
+         parameter ysep {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -0.5
+            prompt {Separation in Y}
+          }
+
+         parameter algorithm {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Data reduction algorithm}
+            default RATIO
+            help "Algorithm used to derive stokes parameters (RATIO or OLD)"
+          }
+
+         parameter output {
+            type ENDIF
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Output Dataset}
+          }
+                   
+      }
+      action lhatpol {
+
+         parameter figaro {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Hatfield FIGARO format Input file }
+          }
+
+         parameter file {
+            type FILE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default HATPOL.LIS
+            prompt {Listing File}
+          }
+
+      }
+      action lmerge {
+
+         parameter input1 {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {1st Dataset }
+          }
+
+         parameter input2 {
+            type NDF
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {2nd Dataset }
+          }
+
+         parameter output {
+            type NDF
+            position 3
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Merged Dataset}
+          }
+
+      }
+      action ltcorr {
+
+         parameter input {
+            type NDF
+            prompt {Dataset to Correct}
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+          }
+           
+         parameter output {
+            type NDF
+            prompt {Corrected Dataset}
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+          }
+
+         parameter ra {
+            type _CHAR
+            vpath PROMPT
+            prompt {1950 RA of Object}
+            ppath CURRENT
+            position 3
+          }
+
+         parameter dec {
+            type _CHAR
+            vpath PROMPT
+            prompt {1950 DEC of Object}
+            ppath CURRENT
+            position 4
+          }
+
+         parameter bary {
+            type _LOGICAL
+            vpath PROMPT
+            prompt {Correct to Solar System Barycentre}
+            ppath CURRENT DEFAULT
+            default FALSE
+            help "If FALSE correction is Heliocentric"
+          }
+
+         parameter single {
+            type _LOGICAL
+            vpath PROMPT
+            prompt {Perform Single Correction for all data points}
+            ppath CURRENT DEFAULT
+            default FALSE
+            help "If FALSE the correction is recalculated for each data point"
+          }
+
+         parameter reverse {
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Apply a reverse correction}
+            ppath DEFAULT
+            default FALSE
+          }
+
+      }
+      action phaseplot {
+
+         parameter input {
+            type NDF
+            position 1
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Dataset to be plotted}
+          }
+
+         parameter nplots {
+            type _INTEGER
+            position 2
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Number of Items to Plot}
+          }
+
+         parameter device {
+            type DEVICE
+            vpath PROMPT
+            ppath CURRENT GLOBAL
+            position 3
+            association <-GLOBAL.DEVICE
+            prompt {Plot Device}
+          }
+
+         parameter epoch {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0.0
+            prompt {Epoch of Zero Phase (JD)}
+          }
+
+         parameter period {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1.0
+            prompt {Period (days)}
+          }
+
+
+         parameter phstart {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0.0
+            prompt {Starting Phase to plot}
+          }
+
+         parameter phend {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1.0
+            prompt {End Phase to plot}
+          }
+
+         parameter chan1 {
+            type _INTEGER
+            position 4
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Channel for 1st Plot}
+          }
+                                   
+         parameter item1 {
+            type _CHAR
+            position 5
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default I
+            prompt {Item to Plot (I,FLUX,MAG,Q,U,V,P,THETA)}
+          }
+
+         parameter label {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Diagram}
+          }
+
+         parameter auto1 {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default FALSE
+            prompt {Autoscale Plot}
+          }
+
+         parameter bin1 {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -1.0
+            prompt {Bin size (negative for no binning)}
+          }
+
+         parameter plabel1 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Plot 1}
+          }
+
+         parameter min1 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Data Level to Plot}
+          }
+
+         parameter max1 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Data Level to Plot}
+          }
+                
+
+         parameter chan2 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Channel for 2nd Plot}
+          }
+                                   
+         parameter item2 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default I
+            prompt {Item to Plot (I,FLUX,MAG,Q,U,V,P,THETA)}
+          }
+
+         parameter auto2 {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default FALSE
+            prompt {Autoscale Plot}
+          }
+
+         parameter bin2 {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -1.0
+            prompt {Bin size (negative value for no binning)}
+          }
+
+         parameter plabel2 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Plot 2}
+          }
+
+
+         parameter min2 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Data Level to Plot}
+          }
+
+         parameter max2 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Data Level to Plot}
+          }
+
+         parameter chan3 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Channel for 3rd Plot}
+          }
+                                   
+         parameter item3 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default I
+            prompt {Item to Plot (I,FLUX,MAG,Q,U,V,P,THETA)}
+          }
+
+         parameter auto3 {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default FALSE
+            prompt {Autoscale Plot}
+          }
+
+         parameter bin3 {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -1.0
+            prompt {Bin size (negative value for no binning)}
+          }
+
+         parameter plabel3 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Plot 3}
+          }
+
+
+         parameter min3 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Data Level to Plot}
+          }
+
+         parameter max3 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Data Level to Plot}
+          }
+
+         parameter chan4 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Channel for 4th Plot}
+          }
+                                   
+         parameter item4 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default I
+            prompt {Item to Plot (I,FLUX,MAG,Q,U,V,P,THETA)}
+          }
+
+         parameter auto4 {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default FALSE
+            prompt {Autoscale Plot}
+          }
+
+         parameter bin4 {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -1.0
+            prompt {Bin size (negative value for no binning)}
+          }
+
+         parameter plabel4 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Plot 4}
+          }
+
+
+         parameter min4 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Data Level to Plot}
+          }
+
+         parameter max4 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Data Level to Plot}
+          }
+
+         parameter chan5 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Channel for 5th Plot}
+          }
+                                   
+         parameter item5 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default I
+            prompt {Item to Plot (I,FLUX,MAG,Q,U,V,P,THETA)}
+          }
+
+         parameter auto5 {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default FALSE
+            prompt {Autoscale Plot}
+          }
+
+         parameter bin5 {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -1.0
+            prompt {Bin size (negative value for no binning)}
+          }
+
+         parameter plabel5 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Plot 5}
+          }
+
+
+         parameter min5 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Data Level to Plot}
+          }
+
+         parameter max5 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Data Level to Plot}
+          }
+
+         parameter chan6 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Channel for 6th Plot}
+          }
+                                   
+         parameter item6 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default I
+            prompt {Item to Plot (I,FLUX,MAG,Q,U,V,P,THETA)}
+          }
+
+         parameter auto6 {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default FALSE
+            prompt {Autoscale Plot}
+          }
+
+         parameter bin6 {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -1.0
+            prompt {Bin size (negative value for no binning)}
+          }
+
+         parameter plabel6 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Plot 6}
+          }
+
+         parameter min6 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Data Level to Plot}
+          }
+
+         parameter max6 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Data Level to Plot}
+          }
+
+              
+         parameter whole {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default FALSE
+            prompt {Plot whole of time series}
+          }
+
+         parameter errors {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Plot Error Bars}
+          }
+
+         parameter xstart {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {First X value (JD) to Plot}
+          }
+
+         parameter xend {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Last X value (JD) to Plot}
+          }
+                
+         parameter line {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Plot as Continuous Line}
+          }
+
+         parameter pen {
+            type _INTEGER
+            vpath DEFAULT
+            ppath DEFAULT
+            default 1
+            prompt {SGS Pen to Plot In}
+          }
+            
+         parameter size {
+            type _REAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default 1.0
+            prompt {Character Size Factor}
+          }
+
+         parameter ptop {
+            type _REAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.90
+            prompt {Coordinates of top of plot}
+          }
+                
+         parameter pbottom {
+            type _REAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.10
+            prompt {Coordinates of bottom of plot}
+          }
+
+         parameter file {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Output data to text file}
+          }
+
+         parameter filename {
+            type FILE
+            vpath DEFAULT
+            ppath DEFAULT
+            default PHASEPLOT.DAT
+            prompt {Name of Text File}
+          }
+                
+      }
+      action pplot {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Stokes Data to Plot }
+            help "The name of the file containing the Stokes data to be plotted - This must contain both Q and U stokes parameters"
+          }
+
+         parameter binerr {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 2
+            prompt {Error per bin (per cent) }
+            default 0.1
+          }
+
+         parameter device {
+            type DEVICE
+            vpath PROMPT
+            ppath CURRENT GLOBAL
+            position 3
+            association <-GLOBAL.DEVICE
+            prompt {Plot Device}
+          }
+
+         parameter label {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 4
+            prompt {Label for plot }
+            default { }
+          }
+
+         parameter auto {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Autoscale Plot}
+          }
+
+         parameter imin {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Intensity Level to Plot}
+          }
+
+         parameter imax {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Intensity Level to Plot}
+          }
+
+         parameter pmin {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Polarization Level to Plot}
+          }
+
+         parameter pmax {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Polarization Level to Plot}
+          }
+
+           
+         parameter tmin {
+            type _REAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Minimum Position angle to plot}
+            default 0.0
+          }
+
+         parameter tmax {
+            type _REAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Maximum Position angle to plot}
+            default 180.0
+          }
+
+      }
+      action ptheta {
+
+         parameter input {
+            type ENDIF
+            position 1
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Polarization Spectrum}
+          }
+
+         parameter lstart {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {First Wavelength to Use}
+          }
+
+         parameter lend {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Last Wavelength to Use}
+          }
+
+      }
+      action qplot {
+
+         parameter input {
+            type NDF
+            position 1
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Dataset to be plotted}
+          }
+
+         parameter device {
+            type DEVICE
+            vpath PROMPT
+            ppath CURRENT GLOBAL
+            position 2
+            association <-GLOBAL.DEVICE
+            prompt {Plot Device}
+          }
+
+         parameter chan {
+            type _INTEGER
+            position 3
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Channel for 1st Plot}
+          }
+                                   
+         parameter item {
+            type _CHAR
+            position 4
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default I
+            prompt {Item to Plot (I,Q,U,V)}
+          }
+
+         parameter label {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Diagram}
+          }
+
+         parameter auto {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default TRUE
+            prompt {Autoscale Plot}
+          }
+
+         parameter min {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Data Level to Plot}
+          }
+
+         parameter max {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Data Level to Plot}
+          }
+
+         parameter whole {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default TRUE
+            prompt {Plot whole of time series}
+          }
+
+
+         parameter xstart {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {First X value (JD) to Plot}
+          }
+
+         parameter xend {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Last X value (JD) to Plot}
+          }
+                
+         parameter line {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Plot as Continuous Line}
+          }
+            
+         parameter errors {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Plot Error Bars}
+          }
+
+         parameter pen {
+            type _INTEGER
+            vpath DEFAULT
+            ppath DEFAULT
+            default 1
+            prompt {SGS Pen to Plot In}
+          }
+              
+                
+      }
+      action qumerge {
+
+         parameter qq {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Q Dataset }
+          }
+
+         parameter u {
+            type NDF
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {U Dataset }
+          }
+
+         parameter output {
+            type NDF
+            position 3
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+      }
+                   
+      action quplot {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Stokes Data to Plot }
+          }
+
+         parameter binerr {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 2
+            prompt {Error per bin (per cent) }
+            default 0.1
+          }
+
+         parameter device {
+            type DEVICE
+            vpath PROMPT
+            ppath CURRENT GLOBAL
+            position 3
+            association <-GLOBAL.DEVICE
+            prompt {Plot Device}
+          }
+
+         parameter label {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 4
+            prompt {Label for plot }
+            default { }
+          }
+
+         parameter auto {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Autoscale Plot}
+          }
+
+         parameter qmin {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Q Level to Plot}
+          }
+
+         parameter qmax {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Q Level to Plot}
+          }
+
+         parameter umin {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum U Level to Plot}
+          }
+
+         parameter umax {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum U Level to Plot}
+          }
+
+      }
+
+      action qusub {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Dataset to correct}
+          }
+
+         parameter qval {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 2
+            prompt {Q value (per cent) }
+            default 0.0
+          }
+
+         parameter uval {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 3
+            prompt {U value (per cent) }
+            default 0.0
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {Corrected Dataset}
+          }
+
+      }
+      action rccdts {
+
+         parameter figaro {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {FIGARO format Input file }
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Output Dataset}
+          }
+ 
+         parameter period {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Period (seconds)}
+          }
+
+      }
+      action rcgs2 {
+
+         parameter figaro {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {FIGARO format Input file }
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Output Dataset}
+          }
+
+         parameter nsigma {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Despiking cutoff}
+            help "Multiple of sigma which will be treated as a spike"
+          }
+
+      }
+
+      action reverse {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Dataset to reverse}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Reversed Dataset}
+          }
+
+      }
+      action rfigaro {
+
+         parameter figaro {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {FIGARO Input file }
+          }
+
+         parameter stokespar {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 2
+            prompt {Stokes Parameter (Q,U or V) }
+            default Q
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Output Dataset}
+          }
+                   
+      }
+      action rhathsp {
+
+         parameter figaro {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {HATPOL FIGARO format Input file }
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Output Dataset}
+          }
+                   
+      }
+      action rhatpol {
+
+         parameter figaro {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Hatfield FIGARO format Input file }
+          }
+
+         parameter npts {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 2
+            default 1
+            prompt {Number of points per cycle (1,2)}
+          }
+
+         parameter linear {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 3
+            default TRUE
+            prompt {Linear Polarization Data}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {Output Dataset}
+          }
+
+         parameter cfile {
+            type FILE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default CALIB.CAL
+            prompt {Calibration File}
+          }
+
+         parameter channel {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Name of Channel}
+          }
+
+         parameter wavelength {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Wavelength of Channel}
+          }
+
+      }
+      action rhdsplot {
+
+         parameter filename {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            default { }
+            position 1
+            prompt {HDSPLOT File to convert}
+          }
+
+         parameter nchans {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 6
+            position 2
+            prompt {Number of Channels}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Output Dataset}
+          }
+
+         parameter channel {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Name of Channel}
+          }
+
+         parameter wavelength {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Wavelength of Channel}
+          }
+
+      }
+      action rhsp3 {
+
+         parameter drive {
+            ptype DEVICE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default MTA0
+            prompt {Tape Drive}
+          }
+
+         parameter mjdzero {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {MJD (JD-2400000.5) at 0H U.T.}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Output File}
+          }
+
+      }
+      action rirps {
+
+         parameter figaro {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {IRPS FIGARO format Input file }
+          }
+
+         parameter ndwells {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 2
+            default 4
+            prompt {Number of Dwells per data point (1,2,4)}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Output Dataset}
+          }
+                   
+         parameter zeropt {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 0.0
+            prompt {Magnitude zero point}
+          }
+
+      }
+      action rotpa {
+
+         parameter input {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Spectrum to be PA rotated }
+          }
+
+         parameter theta {
+            type _REAL
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Angle to rotate through }
+          }
+
+         parameter output {
+            type NDF
+            position 3
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+      }
+      action rturku {
+
+         parameter cirlin {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT
+            default TRUE
+            position 1
+            prompt {Circular + Linear Data?}
+          }
+
+
+         parameter linfile {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            default { }
+            position 2
+            prompt {Linear data file}
+          }
+
+         parameter cirfile {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT
+            default { }
+            position 3
+            prompt {Circular data file}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {Output Dataset}
+          }
+
+         parameter star {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            position 5
+            prompt {Star Number to Copy}
+          }
+      }
+      action scrunch {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Dataset to scrunch}
+          }
+
+         parameter wstart {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            position 2
+            prompt {Starting Wavelength}
+          }
+
+         parameter wend {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            position 3
+            prompt {End Wavelength (or increment)}
+          }
+
+         parameter bins {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            position 4
+            prompt {Number of bins for scrunched spectrum}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 5
+            prompt {Output Scrunched Spectrum}
+          }
+
+         parameter log {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Scrunch to logarithmic bins}
+            default FALSE
+          }
+
+         parameter mean {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Conserve mean data value (rather than flux)}
+            default TRUE
+          }
+
+         parameter quad {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Use quadratic (rather than linear) interpolation}
+            default TRUE
+          }
+
+      }
+      action shiftadd {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Input Time series image}
+          }
+
+         parameter motion {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Image motion time series}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Output Image}
+          }
+
+         parameter interp {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 4
+            prompt {Interpolation factor}
+          }
+
+      }
+      action skysub {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Input Time series dataset}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Output Dataset}
+          }
+
+         parameter y1 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Lowest Y value to use}
+          }
+
+         parameter y2 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {Highest Y value to use}
+          }
+
+         parameter xl1 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            position 5
+            prompt {Lowest X value for left sky region}
+          }
+
+         parameter xl2 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            position 6
+            prompt {Highest X value for left sky region}
+          }
+
+         parameter xr1 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            position 7
+            prompt {Lowest X value for right sky region}
+          }
+
+         parameter xr2 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            position 8
+            prompt {Highest X value for right sky region}
+          }
+
+         parameter median {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            position 9
+            prompt {Use median (rather than mean) of sky area}
+          }
+
+      }
+      action slist {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Dataset to delete from}
+          }
+
+         parameter file {
+            type FILE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default SLIST.DAT
+            position 2
+            prompt {Name of Text File}
+          }
+                
+      }
+
+      action spflux {
+
+         parameter input {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Spectrum to be flux calibrated }
+          }
+
+         parameter calspect {
+            type _CHAR
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Figaro Calibration Spectrum }
+          }
+                               
+         parameter time {
+            type _REAL
+            position 3
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Integration time for Spectrum to be calibrated}
+            default 1
+          }
+
+         parameter output {
+            type NDF
+            position 4
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+      }
+      action splot {
+
+         parameter input {
+            type ENDIF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Stokes Data to Plot }
+          }
+
+         parameter binerr {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 2
+            prompt {Error per bin (per cent) }
+            default 0.1
+          }
+
+         parameter device {
+            type DEVICE
+            vpath PROMPT
+            ppath CURRENT GLOBAL
+            position 3
+            association <-GLOBAL.DEVICE
+            prompt {Plot Device}
+          }
+
+         parameter label {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            position 4
+            prompt {Label for plot }
+            default { }
+          }
+
+         parameter stokespar {
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default Q
+            prompt {Stokes Parameter to plot}
+          }
+
+         parameter auto {
+            type _LOGICAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Autoscale Plot}
+          }
+
+         parameter imin {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Intensity Level to Plot}
+          }
+
+         parameter imax {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Intensity Level to Plot}
+          }
+
+         parameter pmin {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Polarization Level to Plot}
+          }
+
+         parameter pmax {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Polarization Level to Plot}
+          }
+
+      }
+
+      action subset {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Dataset to subset}
+          }
+
+         parameter lstart {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Starting Wavelength for subset}
+          }
+
+         parameter lend {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Ending Wavelength for Subset}
+          }
+
+         parameter tstart {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Starting Time for Subset}
+          }
+
+         parameter tend {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Ending Time for Subset}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {Output Dataset}
+          }
+
+      }
+      action subtract {
+
+         parameter input1 {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Spectrum to subtract from }
+          }
+
+         parameter input2 {
+            type NDF
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Spectrum to be subtracted }
+          }
+
+         parameter output {
+            type NDF
+            position 3
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+      }
+      action tbin {
+
+         parameter input {
+            type NDF
+            position 1
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Dataset to be binned}
+          }
+
+         parameter bin {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -1.0
+            prompt {Bin size (negative for no binning)}
+          }
+
+              
+         parameter whole {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default TRUE
+            prompt {Use whole of time series}
+          }
+
+
+         parameter xstart {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {First X value (JD) to Use}
+          }
+
+         parameter xend {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Last X value (JD) to Use}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Output Dataset}
+          }
+                
+      }
+      action tcadd {
+
+         parameter input {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Dataset to sum channels for}
+          }
+
+         parameter output {
+            type NDF
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+         parameter first {
+            type _INTEGER
+            vpath PROMPT
+            prompt {First Channel to sum}
+            ppath CURRENT
+            default 1
+            position 3
+          }
+
+         parameter last {
+            type _INTEGER
+            vpath PROMPT
+            prompt {Last channel to sum}
+            ppath CURRENT
+            default 1
+            position 4
+          }
+
+      }
+      action tderiv {
+
+         parameter input {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Input Dataset}
+          }
+
+         parameter npoints {
+            type _INTEGER
+            position 2
+            ppath CURRENT DEFAULT
+            vpath PROMPT
+            prompt {Number of points to use for slope}
+          }
+
+         parameter output {
+            type NDF
+            position 3
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+      }
+      action textin {
+
+         parameter input {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Dataset to be extinction corrected}
+          }
+
+         parameter output {
+            type NDF
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+         parameter ra {
+            type _CHAR
+            vpath PROMPT
+            prompt {1950 RA of Object}
+            ppath CURRENT
+            position 3
+          }
+
+         parameter dec {
+            type _CHAR
+            vpath PROMPT
+            prompt {1950 DEC of Object}
+            ppath CURRENT
+            position 4
+          }
+
+         parameter obs {
+            type _CHAR
+            vpath PROMPT
+            prompt {Observing site (HELP for list, NO to enter lat,long)}
+            default AAT
+            ppath CURRENT DEFAULT
+            position 5
+          }
+
+         parameter long {
+            type _DOUBLE
+            vpath PROMPT
+            prompt {Longitude of site (degrees, W +ve)}
+            ppath CURRENT
+          }
+
+         parameter lat {
+            type _DOUBLE
+            vpath PROMPT
+            prompt {Geodetic latitude of site (degrees, N +ve)}
+            ppath CURRENT
+          }
+
+         parameter extcoef {
+            type _REAL
+            vpath PROMPT
+            prompt {Extinction coefficent (mag/airmass)}
+            ppath CURRENT
+          }
+
+      }
+      action tlist {
+
+         parameter input {
+            type NDF
+            position 1
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Dataset to be listed}
+          }
+
+         parameter chan {
+            type _INTEGER
+            position 2
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Channel to list}
+          }
+                                   
+         parameter whole {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default TRUE
+            prompt {Plot whole of time series}
+          }
+
+
+         parameter xstart {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {First X value (JD) to Plot}
+          }
+
+         parameter xend {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Last X value (JD) to Plot}
+          }
+
+         parameter file {
+            type _FILE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Name of listing file}
+          }
+              
+                
+      }
+      action tmerge {
+
+         parameter input1 {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {1st Dataset }
+          }
+
+         parameter input2 {
+            type NDF
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {2nd Dataset }
+          }
+
+         parameter output {
+            type NDF
+            position 3
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Merged Dataset}
+          }
+
+      }
+      action tsetbad {
+
+         parameter input {
+            type NDF
+            prompt {Dataset to Correct}
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+          }
+           
+         parameter output {
+            type NDF
+            prompt {Corrected Dataset}
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+          }
+
+         parameter chan {
+            type _INTEGER
+            vpath PROMPT
+            prompt {Channel number (zero to end)}
+            ppath CURRENT
+          }
+
+         parameter x {
+            type _INTEGER
+            vpath PROMPT
+            prompt {Time bin number (zero to end)}
+            ppath CURRENT
+          }
+
+      }
+      action tsextract {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Input Time series image}
+          }
+
+         parameter profile {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Profile Time series image}
+          }
+
+         parameter output {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Output Photometry Dataset}
+          }
+
+         parameter lambda {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 5500
+            position 4
+            prompt {Wavelength of observation (Angstroms)}
+          }
+
+         parameter fluxcal {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1.0
+            position 5
+            prompt {Counts per Jansky}
+          }
+
+      }
+      action tshift {
+
+         parameter input {
+            type NDF
+            prompt {Dataset to Correct}
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+          }
+
+         parameter shift {
+            type _DOUBLE
+            prompt {Time Shift to Apply}
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+          }
+
+         parameter output {
+            type NDF
+            prompt {Corrected Datatset}
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+          }
+
+
+      }
+      action tsplot {
+
+         parameter input {
+            type NDF
+            position 1
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Dataset to be plotted}
+          }
+
+         parameter nplots {
+            type _INTEGER
+            position 2
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Number of Items to Plot}
+          }
+
+         parameter device {
+            type DEVICE
+            vpath PROMPT
+            ppath CURRENT GLOBAL
+            position 3
+            association <-GLOBAL.DEVICE
+            prompt {Plot Device}
+          }
+
+         parameter chan1 {
+            type _INTEGER
+            position 4
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Channel for 1st Plot}
+          }
+                                   
+         parameter item1 {
+            type _CHAR
+            position 5
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default I
+            prompt {Item to Plot (I,FLUX,MAG,Q,U,V,P,THETA)}
+          }
+
+         parameter label {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Diagram}
+          }
+
+         parameter auto1 {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default TRUE
+            prompt {Autoscale Plot}
+          }
+
+         parameter bin1 {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -1.0
+            prompt {Bin size (negative for no binning)}
+          }
+
+         parameter plabel1 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Plot 1}
+          }
+
+         parameter min1 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Data Level to Plot}
+          }
+
+         parameter max1 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Data Level to Plot}
+          }
+                
+
+         parameter chan2 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Channel for 2nd Plot}
+          }
+                                   
+         parameter item2 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default I
+            prompt {Item to Plot (I,FLUX,MAG,Q,U,V,P,THETA)}
+          }
+
+         parameter auto2 {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default TRUE
+            prompt {Autoscale Plot}
+          }
+
+         parameter bin2 {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -1.0
+            prompt {Bin size (negative value for no binning)}
+          }
+
+         parameter plabel2 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Plot 2}
+          }
+
+
+         parameter min2 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Data Level to Plot}
+          }
+
+         parameter max2 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Data Level to Plot}
+          }
+
+         parameter chan3 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Channel for 3rd Plot}
+          }
+                                   
+         parameter item3 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default I
+            prompt {Item to Plot (I,FLUX,MAG,Q,U,V,P,THETA)}
+          }
+
+         parameter auto3 {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default TRUE
+            prompt {Autoscale Plot}
+          }
+
+         parameter bin3 {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -1.0
+            prompt {Bin size (negative value for no binning)}
+          }
+
+         parameter plabel3 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Plot 3}
+          }
+
+
+         parameter min3 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Data Level to Plot}
+          }
+
+         parameter max3 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Data Level to Plot}
+          }
+
+         parameter chan4 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Channel for 4th Plot}
+          }
+                                   
+         parameter item4 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default I
+            prompt {Item to Plot (I,FLUX,MAG,Q,U,V,P,THETA)}
+          }
+
+         parameter auto4 {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default TRUE
+            prompt {Autoscale Plot}
+          }
+
+         parameter bin4 {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -1.0
+            prompt {Bin size (negative value for no binning)}
+          }
+
+         parameter plabel4 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Plot 4}
+          }
+
+
+         parameter min4 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Data Level to Plot}
+          }
+
+         parameter max4 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Data Level to Plot}
+          }
+
+         parameter chan5 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Channel for 5th Plot}
+          }
+                                   
+         parameter item5 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default I
+            prompt {Item to Plot (I,FLUX,MAG,Q,U,V,P,THETA)}
+          }
+
+         parameter auto5 {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default TRUE
+            prompt {Autoscale Plot}
+          }
+
+         parameter bin5 {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -1.0
+            prompt {Bin size (negative value for no binning)}
+          }
+
+         parameter plabel5 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Plot 5}
+          }
+
+
+         parameter min5 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Data Level to Plot}
+          }
+
+         parameter max5 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Data Level to Plot}
+          }
+
+         parameter chan6 {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Channel for 6th Plot}
+          }
+                                   
+         parameter item6 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default I
+            prompt {Item to Plot (I,FLUX,MAG,Q,U,V,P,THETA)}
+          }
+
+         parameter auto6 {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default TRUE
+            prompt {Autoscale Plot}
+          }
+
+         parameter bin6 {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default -1.0
+            prompt {Bin size (negative value for no binning)}
+          }
+
+         parameter plabel6 {
+            type _CHAR
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default { }
+            prompt {Label for Plot 6}
+          }
+
+         parameter min6 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Minimum Data Level to Plot}
+          }
+
+         parameter max6 {
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Maximum Data Level to Plot}
+          }
+
+              
+         parameter whole {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            default TRUE
+            prompt {Plot whole of time series}
+          }
+
+
+         parameter xstart {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {First X value (MJD) to Plot}
+          }
+
+         parameter xend {
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Last X value (MJD) to Plot}
+          }
+                
+         parameter line {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Plot as Continuous Line}
+          }
+            
+         parameter errors {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Plot Error Bars}
+          }
+
+         parameter pen {
+            type _INTEGER
+            vpath DEFAULT
+            ppath DEFAULT
+            default 1
+            prompt {SGS Pen to Plot In}
+          }
+              
+         parameter size {
+            type _REAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default 1.0
+            prompt {Character Size Factor}
+          }
+
+         parameter ptop {
+            type _REAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.90
+            prompt {Coordinates of top of plot}
+          }
+                
+         parameter pbottom {
+            type _REAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.10
+            prompt {Coordinates of bottom of plot}
+          }
+
+         parameter file {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Output data to text file}
+          }
+
+         parameter filename {
+            type FILE
+            vpath DEFAULT
+            ppath DEFAULT
+            default PHASEPLOT.DAT
+            prompt {Name of Text File}
+          }
+                
+                
+      }
+      action tsprofile {
+
+         parameter input {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 1
+            prompt {Input Time series image}
+          }
+
+         parameter profile {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 2
+            prompt {Output Profile Dataset}
+          }
+
+         parameter residuals {
+            type NDF
+            vpath PROMPT
+            ppath CURRENT
+            position 3
+            prompt {Output Residual Dataset}
+          }
+
+         parameter x {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            position 4
+            prompt {X position of centre of star}
+          }
+
+         parameter y {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            position 5
+            prompt {Y position of centre of star}
+          }
+
+         parameter size {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT
+            position 6
+            prompt {Size of box (pixels)}
+          }
+
+         parameter degree {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 3
+            position 7
+            prompt {Degree of polynomial}
+          }
+
+      }
+      action xcopy {
+
+         parameter input {
+            type NDF
+            position 1
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Spectrum to receive Wavelength Data }
+          }
+
+         parameter arc {
+            type _CHAR
+            position 2
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Figaro Spectrum containing Wavelength Data }
+          }
+
+         parameter output {
+            type NDF
+            position 3
+            ppath CURRENT
+            vpath PROMPT
+            prompt {Output Dataset}
+          }
+
+      }
+   }
+
+   display {
+
+     TSP commands are now available -- (Version @PACKAGE_VERSION@)
+
+     Type "showme sun66" to browse the hypertext documentation.
+
+   }
+
+
+}
