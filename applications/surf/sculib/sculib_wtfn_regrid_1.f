@@ -1,5 +1,6 @@
-      SUBROUTINE SCULIB_WTFN_REGRID_1 (WAVELENGTH, WEIGHT, X, Y, NPIX, 
-     :   PIXSPACE, NI, NJ, ICEN, JCEN, AV_WEIGHT, SCRATCH, STATUS)
+      SUBROUTINE SCULIB_WTFN_REGRID_1 (DIAMETER, WAVELENGTH, WEIGHT,
+     :     IN_DATA, X, Y, NPIX, 
+     :     PIXSPACE, NI, NJ, ICEN, JCEN, AV_WEIGHT, SCRATCH, STATUS)
 *+
 *  Name:
 *     SCULIB_WTFN_REGRID_1
@@ -20,6 +21,8 @@
 *        Wavelength of the observation
 *     WEIGHT = REAL (Given)
 *        The weight of the input dataset.
+*     IN_DATA (NPIX)                   = REAL (Given)
+*        The input data values. (Used to define quality)
 *     X( NPIX ) = DOUBLE PRECISION (Given)
 *        The x coordinates of the input pixels
 *     Y( NPIX ) = DOUBLE PRECISION (Given)
@@ -57,11 +60,13 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'                          ! Bad values
 
 *  Arguments Given:
       REAL DIAMETER
       REAL WEIGHT
       INTEGER NPIX
+      REAL IN_DATA(NPIX)
       DOUBLE PRECISION X(NPIX)
       DOUBLE PRECISION Y(NPIX)
       DOUBLE PRECISION PIXSPACE
@@ -119,25 +124,27 @@
       END DO
 
 *  go through the input pixels of this dataset, set all elements of
-*  the scratch array to zero that lie within one pixel space of an input 
+*  the scratch array to zero that lie within one res element of an input 
 *  point. 
 
       DO PIX = 1, NPIX
-         IOUT = NINT (X(PIX)/XINC) + ICEN
-         JOUT = NINT (Y(PIX)/YINC) + JCEN
-         DO J = -PIX_RANGE, PIX_RANGE
-            IF ((JOUT+J .GE. 1) .AND. (JOUT+J .LE. NJ)) THEN
-               DO I = -PIX_RANGE, PIX_RANGE
-                  IF ((IOUT+I .GE. 1) .AND. (IOUT+I .LE. NI)) THEN
+         IF (IN_DATA(PIX) .NE. VAL__BADR) THEN
+            IOUT = NINT (X(PIX)/XINC) + ICEN
+            JOUT = NINT (Y(PIX)/YINC) + JCEN
+            DO J = -PIX_RANGE, PIX_RANGE
+               IF ((JOUT+J .GE. 1) .AND. (JOUT+J .LE. NJ)) THEN
+                  DO I = -PIX_RANGE, PIX_RANGE
+                     IF ((IOUT+I .GE. 1) .AND. (IOUT+I .LE. NI)) THEN
 *                  Is this closer than  RDIST
-                     DISTSQ = I**2 + J**2
-                     IF (DISTSQ .LE. RDIST_SQ) THEN
-                        SCRATCH (IOUT+I, JOUT+J) = 0
+                        DISTSQ = I**2 + J**2
+                        IF (DISTSQ .LE. RDIST_SQ) THEN
+                           SCRATCH (IOUT+I, JOUT+J) = 0
+                        END IF
                      END IF
-                  END IF
-               END DO
-            END IF
-         END DO
+                  END DO
+               END IF
+            END DO
+         END IF
       END DO
  
 *  go through the scratch array and, where it's pixels are  0, increment
