@@ -221,17 +221,4 @@ are shown at the top of the document.
 	  (empty-sosofo))
       (process-backmatter))))
 
-(element abstract
-  (make sequence
-    (make empty-element gi: "hr")
-    (make element
-      gi: "P"
-      (make element
-	gi: "STRONG"
-	(literal "Abstract: ")))
-    (make element
-      gi: "BLOCKQUOTE"
-      (process-children))
-    (make empty-element gi: "hr")))
-
 
