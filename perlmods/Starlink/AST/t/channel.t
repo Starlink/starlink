@@ -13,7 +13,7 @@ ok(1, "Write complete");
 
 # Try again, but storing to an array
 my @cards;
-my $ch = new Starlink::AST::Channel ( sink => sub {push(@cards, $_[0]) } );
+$ch = new Starlink::AST::Channel ( sink => sub {push(@cards, $_[0]) } );
 $ch->Write( $obj );
 
 for (@cards) {
