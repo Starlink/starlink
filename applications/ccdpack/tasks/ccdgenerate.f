@@ -34,6 +34,14 @@
 *        If the values for any or all of the sequences are missing they 
 *        are assumed to be zero. 
 *        [0]
+*     CONTAINER = _LOGICAL (Read)
+*        If true, then all the output frames of each type will be
+*        written into a single HDS container file (data files into
+*        one called 'data', flat fields into one called 'ff' and
+*        bias frames into one called 'bias').  If false they will
+*        be written into multiple separate files, called data1, data2...
+*        ff1, ff2,... and bias1, bias2,....
+*        [FALSE]
 *     FILE = LITERAL (Read)
 *        Name of a text file which contains the object identifiers,
 *        X and Y positions (pixel coordinates), total intensities
@@ -99,8 +107,10 @@
 *     application, just enough to monitor progress is given.
 *
 *     - The output NDFs are named, dataN, ffN and biasN (or just dataN if
-*     REDUCED is TRUE), where N is the current sequence number. All 
-*     output data is of type _REAL.
+*     REDUCED is TRUE), where N is the current sequence number. 
+*     If CONTAINER is true though, they will be written into multiple-
+*     NDF HDS container files called just data, ff, and bias.
+*     All output data is of type _REAL.
 
 *  Examples:
 *     ccdgenerate nseq=4 file=test.obj pixels=[128,128]
@@ -154,6 +164,8 @@
 *        WCS component in output data frames.
 *     26-APR-1999 (MBT):
 *        Added REDUCED parameter.
+*     21-FEB-2001 (MBT):
+*        Added CONTAINER parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -184,6 +196,9 @@
       CHARACTER * ( 80 ) BLOCK( 16 ) ! FITS block.
       CHARACTER * ( CCD1__BLEN ) LINE ! Read input data.
       CHARACTER * ( DAT__SZLOC ) LOCEXT ! Locators to NDF extensions
+      CHARACTER * ( DAT__SZLOC ) LOCBIA ! Locator for bias container file
+      CHARACTER * ( DAT__SZLOC ) LOCDAT ! Locator for data container file
+      CHARACTER * ( DAT__SZLOC ) LOCFF ! Locator for flatfile container file
       INTEGER DIMS( 2 )         ! Dimensions of NDF
       INTEGER EL                ! Number of data elements
       INTEGER FDIN              ! Input file identifier
@@ -220,6 +235,7 @@
       INTEGER PLACE             ! Place to hold NDF
       INTEGER WID1              ! Width of bias strip
       INTEGER WID2              ! Width of bias strip
+      LOGICAL CNTNR             ! Use HDS container file?
       LOGICAL FOPEN             ! Input file is open
       LOGICAL REDUCE            ! Is data to be pre-reduced
       DOUBLE PRECISION ANGLE( CCD1__MXNDF ) ! Orientation of output frames
@@ -339,6 +355,24 @@
 *  See if we are to write flat fields and bias frames too.
       CALL PAR_GET0L( 'REDUCED', REDUCE, STATUS )
 
+*  See if we are going to write into container files.
+      CALL PAR_GET0L( 'CONTAINER', CNTNR, STATUS )
+
+*  If so, construct them.
+      LOCDAT = DAT__ROOT
+      LOCFF = DAT__ROOT
+      LOCBIA = DAT__ROOT
+      IF ( CNTNR ) THEN
+         CALL HDS_NEW( 'data', 'DATA', 'NDF_CONTAINER', 0, 0, LOCDAT,
+     :                 STATUS )
+         IF ( .NOT. REDUCE ) THEN
+            CALL HDS_NEW( 'ff', 'FF', 'NDF_CONTAINER', 0, 0, LOCFF,
+     :                    STATUS )
+            CALL HDS_NEW( 'bias', 'BIAS', 'NDF_CONTAINER', 0, 0, LOCBIA,
+     :                    STATUS )
+         END IF
+      END IF
+
 *  Zero any angles not explicitly set.
       DO I = 1, NLOOP
          IF ( I .GT. NRET ) ANGLE( I ) = 0D0
@@ -376,8 +410,7 @@
 *  Get the object frame.
          CALL CHR_ITOC( I, COUNT, NCHAR )
          FNAME = 'data'//COUNT( :NCHAR )//TYPE
-         CALL NDF_OPEN( DAT__ROOT, FNAME(:CHR_LEN(FNAME)),
-     :                  'WRITE', 'NEW', IDO, PLACE, STATUS )
+         CALL NDF_PLACE( LOCDAT, FNAME, PLACE, STATUS )
          CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDO, STATUS )
 
 *  Generate mapping into image generation frame.
@@ -428,9 +461,9 @@
 *  Bias frame.
             CALL CHR_ITOC( I, COUNT, NCHAR )
             FNAME = 'bias'//COUNT( :NCHAR )//TYPE
-            CALL NDF_OPEN( DAT__ROOT, FNAME( :CHR_LEN( FNAME ) ),
-     :                     'WRITE', 'NEW', IDB, PLACE, STATUS )
+            CALL NDF_PLACE( LOCBIA, FNAME, PLACE, STATUS )
             CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDB, STATUS )
+            CALL NDF_PTWCS( IWCS, IDB, STATUS )
 
 *  Map the data in.
             CALL NDF_MAP( IDB, 'DATA', '_REAL', 'WRITE', IPBIA, EL,
@@ -443,9 +476,9 @@
 *  Flatfield frame.
             CALL CHR_ITOC( I, COUNT, NCHAR )
             FNAME = 'ff'//COUNT( :NCHAR )//TYPE
-            CALL NDF_OPEN( DAT__ROOT, FNAME(:CHR_LEN(FNAME)),
-     :                     'WRITE', 'NEW', IDF, PLACE, STATUS )
+            CALL NDF_PLACE( LOCFF, FNAME, PLACE, STATUS )
             CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDF, STATUS )
+            CALL NDF_PTWCS( IWCS, IDF, STATUS )
 
 *  Map the data in.
             CALL NDF_MAP( IDF, 'DATA', '_REAL', 'WRITE', IPFF, EL,
@@ -519,6 +552,15 @@
 
 *  Close position files.
       IF ( FOPEN ) CALL FIO_CLOSE( FDIN, STATUS )
+
+*  Release HDS locators.
+      IF ( CNTNR ) THEN
+         CALL DAT_ANNUL( LOCDAT, STATUS )
+         IF ( .NOT. REDUCE ) THEN
+            CALL DAT_ANNUL( LOCBIA, STATUS )
+            CALL DAT_ANNUL( LOCFF, STATUS )
+         END IF
+      END IF
 
 *  Release AST context.
       CALL AST_END( STATUS )
