@@ -75,7 +75,7 @@
 
 *  Create a 1D Frame representing the new Stokes axis.
       STFRM = AST_FRAME( 1, 'LABEL(1)=Stokes parameters,'//
-     :                   'SYMBOL(1)=STOKES', STATUS )
+     :                   'SYMBOL(1)=STOKES,DOMAIN=STOKES', STATUS )
 
 *  Create a PermMap which has 2 input and 3 outputs, Axes 1 and 2 are
 *  just copied between input and output. Output axis 3 is set to a
@@ -115,7 +115,7 @@
             CALL CHR_APPND( '-', DOM, IAT )
             CALL CHR_APPND( AST_GETC( STFRM, 'DOMAIN', STATUS ), DOM, 
      :                      IAT )
-            CALL AST_SETC( CMPFRM, 'DOMAIN', DOM( : IAT ) )
+            CALL AST_SETC( CMPFRM, 'DOMAIN', DOM( : IAT ), STATUS )
 
 *  We now need the Mapping which connects this new 3D CmpFrame to the 3D Base
 *  Frame in the FrameSet. This is based on the Mapping from the Base
