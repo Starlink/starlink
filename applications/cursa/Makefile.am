@@ -60,6 +60,7 @@ edit = sed \
         -e 's,@EXPECTK\@,$(EXPECTK),g' \
         -e 's,@PERL\@,$(PERL),g' \
         -e 's,@AWISH\@,$(AWISH),g' \
+        -e 's,@ATCLSH\@,$(ATCLSH),g' \
         -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g' \
         -e 's,@NETWORKED\@,$(NETWORKED),g'
 
