@@ -100,13 +100,14 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTENRAL			CHR_LEN
+      EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
 
 *  Local Variables:
       CHARACTER*200		FNAME			! Input object
 
       INTEGER			EP, PPOS		! Character pointers
+      INTEGER			IFID			! INP's ADI identifier
 *.
 
 *  Check inherited global status.
