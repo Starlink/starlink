@@ -269,7 +269,6 @@ F77_SUBROUTINE(ast_putcards)( INTEGER(THIS),
                               TRAIL(CARDS) ) {
    GENPTR_INTEGER(THIS)
    GENPTR_CHARACTER(CARDS)
-   int overwrite;
    char *cards;
 
    astAt( "AST_PUTCARDS", NULL, 0 );

@@ -1450,7 +1450,7 @@ int nkeys, status;
 /* Obtain all the cards in the header concatenated into a single dynamically 
    allocated null-terminated character string. Note, we do not exclude
    any cards since we may later modify the WCS information within the
-   header and consequentlywant to write the entire header out again. */
+   header and consequently want to write the entire header out again. */
    if( fits_hdr2str( fptr, 0, NULL, 0, &header, &nkeys, &status ) )
           printf(" Error getting header\n");
    ...
