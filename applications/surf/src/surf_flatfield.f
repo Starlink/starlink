@@ -20,7 +20,8 @@
 *        The global status
 
 *  Description:
-*     This routine flatfields SCUBA demodulated data. 
+*     This routine flatfields SCUBA demodulated data. The data must previously
+*     have been processed by REDUCE_SWITCH.
 *
 
 *  Usage:
@@ -31,14 +32,11 @@
 *        The name of the NDF containing the demodulated data to be flatfielded.
 *        This should already have been run through the REDUCE_SWITCH application.
 *     OUT = NDF (Write)
-*        The name of the NDF the flatfielded data are to be written to.
+*        The name of the NDF to which the flatfielded data are to be written.
 
 *  Examples:
 *     flatfield redsw flat
 *        This will flatfield the data from redsw.sdf and write it to flat.sdf
-
-*  Notes:
-*     The input data must have been REDUCE-SWITCHed.
 
 *  Algorithm:
 *        The data array of the IN file should have dimensions (N_BOLS,N_POS) 
@@ -57,9 +55,6 @@
 *     been processed by the REDUCE_SWITCH application or which have already
 *     had FLATFIELD run on them.
 
-*  Implementation Status:
-*     -Bad pixel handling is performed.
-
 *  Authors:
 *     JFL: J.Lightfoot (ROE)
 *     TIMJ: T. Jenness (JACH)
@@ -68,9 +63,12 @@
 *     $Id$
 *     18-JUN-1996: Original version.
 *     $Log$
-*     Revision 1.7  1996/11/02 01:39:40  timj
-*     Remove space from History : header
+*     Revision 1.8  1997/03/06 20:03:05  timj
+*     tweak header
 *
+c Revision 1.7  1996/11/02  01:39:40  timj
+c Remove space from History : header
+c
 c Revision 1.6  1996/11/02  01:23:28  timj
 c Change name to FLATFIELD
 c
