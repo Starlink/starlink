@@ -784,7 +784,16 @@ int nexts;
 
          } else {  
 /*               Failed getting filenames */
+#ifdef GLOB_NOMATCH
             if ( status == GLOB_NOMATCH ) printf("\nNo match.\n");
+#else
+            /* If GLOB_NOMATCH is not defined assume that we get
+               good status even when match count is zero. This
+               branch then only hits if no matches and status is good.
+             */
+            if ( status == 0 && filelist.gl_pathc == 0) 
+                  printf("\nNo match.\n");
+#endif
             ringbell();
          } 
          globfree( &filelist );
