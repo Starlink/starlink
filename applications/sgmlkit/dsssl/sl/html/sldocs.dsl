@@ -177,6 +177,13 @@ more-or-less as much like the existing star2html output as possible.
          (if (not suppress-banner)
              (%starlink-banner%)
              (empty-sosofo))
+	 (if copyright
+	     (make element gi: "p"
+		   (process-node-list copyright))
+	     (if %copyright-string%
+		 (make element gi: "p"
+		       (literal %copyright-string%))
+		 (empty-sosofo)))
          (if (not suppress-printable)
              (make element gi: "p"
                 (make element gi: "a"

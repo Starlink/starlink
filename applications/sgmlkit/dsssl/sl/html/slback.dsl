@@ -375,7 +375,8 @@ update elements which refer to them.
 				(attribute-string (normalize "author"))))
 	    (literal ", "
 		     (format-date (attribute-string (normalize "date")))))
-      (process-children)))
+      (process-children)
+      (collect-updates (literal "Changes in this version"))))
   (element distribution
     (collect-updates (literal "Distribution "
 			      (attribute-string (normalize "string")))))
