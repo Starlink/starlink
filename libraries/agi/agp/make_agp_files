@@ -1,0 +1,341 @@
+#!/bin/csh
+#+
+#  Name:
+#     make_agp_files
+
+#  Purpose:
+#     Creates AGP source files defining the available graphics devices
+
+#  Type of Module:
+#     C-shell script
+
+#  Description:
+#     This file is run by the AGP makefile as part of the build target.
+#     It reads the file pgnames.txt and creates the following sources files 
+#     which embody the information read from pgnames.txt:
+#
+#        AGP_CONST
+#        AGP_COM
+#        agp1_init.f
+
+#  Authors:
+#     DSB: D.S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     31-OCT-2001 (DSB):
+#        Original version.
+
+#-
+
+#  Extract the columns from the pgnames.txt file into separate shell
+#  variables.
+   set gtype = `awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $1}' pgnames.txt `
+   set ptype = `awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $2}' pgnames.txt | tr \[a-z\] \[A-Z\]`
+   set pfile = `awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $3}' pgnames.txt `
+   set aname = `awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $4}' pgnames.txt | tr \[a-z\] \[A-Z\]`
+   set desc  = `awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $5}' pgnames.txt | tr " /" "_"`
+
+#  Save the number of devices
+   set ndev = $#gtype
+
+#  Save the maximum string length in each column.
+   set dsclen = 0
+   foreach v ($desc)
+      set l = `echo $v | awk '{print length($0)}'`
+      if( $l > $dsclen ) then
+         set dsclen = $l
+      endif
+   end
+
+   set anmlen = 0
+   foreach v ($aname)
+      set l = `echo $v | awk '{print length($0)}'`
+      if( $l > $anmlen ) then
+         set anmlen = $l
+      endif
+   end
+
+   set pfnlen = 0
+   foreach v ($pfile)
+      set l = `echo $v | awk '{print length($0)}'`
+      if( $l > $pfnlen ) then
+         set pfnlen = $l
+      endif
+   end
+
+   set gtylen = 0
+   foreach v ($gtype)
+      set l = `echo $v | awk '{print length($0)}'`
+      if( $l > $gtylen ) then
+         set gtylen = $l
+      endif
+   end
+
+   set ptylen = 0
+   foreach v ($ptype)
+      set l = `echo $v | awk '{print length($0)}'`
+      if( $l > $ptylen ) then
+         set ptylen = $l
+      endif
+   end
+
+#  AGP_CONST...
+#  ------------
+#  Write out the prologue.
+   cat <<FOO > AGP_CONST
+*+
+*  Name:
+*     AGP_CONST
+
+*  Purpose:
+*     Define private (internal) constants for the AGP_ system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file contains definitions of global constants which are used
+*     internally by the AGP_ system for translating graphics device names 
+*     between the GNS, AGI and native PGPLOT systems.
+*
+*     This file is generated automatically at build time using the 
+*     make_agp_const script. The contents are defined in the pgnames.txt 
+*     file. Both make_agp_const and pgnames.txt are part of the AGP source 
+*     distribution.
+
+*  Authors:
+*     DSB: D.S. Berry (STARLINK)
+
+*  History:
+FOO
+echo "*    " `date "+%d-%b-%Y"` | tr \[a-z\] \[A-Z\] >> AGP_CONST
+cat <<FOO >> AGP_CONST
+*        Built from pgnames.txt
+
+*-
+
+FOO
+
+#  Write out the Fortan code.
+   echo "*  Global Constants:" >> AGP_CONST
+   echo "      INTEGER AGP__NDEV          ! Number of known devices" >> AGP_CONST
+   echo "      PARAMETER ( AGP__NDEV = $ndev)" >> AGP_CONST
+   echo "" >> AGP_CONST
+   echo "      INTEGER AGP__SZGTY          ! Size of a GNS device type" >> AGP_CONST
+   echo "      PARAMETER ( AGP__SZGTY = $gtylen )" >> AGP_CONST
+   echo "" >> AGP_CONST
+   echo "      INTEGER AGP__SZPTY          ! Size of a PGPLOT device type" >> AGP_CONST
+   echo "      PARAMETER ( AGP__SZPTY = $ptylen )" >> AGP_CONST
+   echo "" >> AGP_CONST
+   echo "      INTEGER AGP__SZPFN          ! Size of a PGPLOT file name" >> AGP_CONST
+   echo "      PARAMETER ( AGP__SZPFN = $pfnlen )" >> AGP_CONST
+   echo "" >> AGP_CONST
+   echo "      INTEGER AGP__SZANM          ! Size of an AGI device name" >> AGP_CONST
+   echo "      PARAMETER ( AGP__SZANM = $anmlen )" >> AGP_CONST
+   echo "" >> AGP_CONST
+   echo "      INTEGER AGP__SZDSC          ! Size of a device descriptions" >> AGP_CONST
+   echo "      PARAMETER ( AGP__SZDSC = $dsclen )" >> AGP_CONST
+   echo "" >> AGP_CONST
+   echo "      INTEGER AGP__SZUSP          ! Max size of a full device spec" >> AGP_CONST
+   echo "      PARAMETER ( AGP__SZUSP = 255 )" >> AGP_CONST
+   echo "" >> AGP_CONST
+
+#  AGP_COM... 
+#  ------------
+#  Write out the prologue.
+   cat <<FOO > AGP_COM
+*+
+*  Name:
+*     AGP_COM
+
+*  Purpose:
+*     Define AGP_ common block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines global variables which are used internally by the 
+*     AGP_ system for translating graphics device names between the GNS, 
+*     AGI and native PGPLOT systems.
+*
+*     This file is generated automatically at build time using the 
+*     make_agp_const script. The contents are defined in the pgnames.txt 
+*     file. Both make_agp_const and pgnames.txt are part of the AGP source 
+*     distribution.
+
+*  Prior Requirements:
+*     The AGP_CONST include files should be included before this file, in 
+*     order to define constants used here.
+
+*  Authors:
+*     DSB: D.S. Berry (STARLINK)
+
+*  History:
+FOO
+echo "*    " `date "+%d-%b-%Y"` | tr \[a-z\] \[A-Z\] >> AGP_COM
+cat <<FOO >> AGP_COM
+*        Built from pgnames.txt
+
+*-
+
+FOO
+
+#  Write out the Fortan code.
+   echo "*  AGI name of currently opened PGPLOT device" >> AGP_COM
+   echo "      CHARACTER AGP_CRAWN*(AGP__SZANM)" >> AGP_COM
+   echo "" >> AGP_COM
+   echo "*  GNS device type" >> AGP_COM
+   echo "      CHARACTER AGP_GTY(AGP__NDEV)*(AGP__SZGTY)" >> AGP_COM
+   echo "" >> AGP_COM
+   echo "*  PGPLOT device type" >> AGP_COM
+   echo "      CHARACTER AGP_PTY(AGP__NDEV)*(AGP__SZPTY)" >> AGP_COM
+   echo "" >> AGP_COM
+   echo "*  PGPLOT default file names" >> AGP_COM
+   echo "      CHARACTER AGP_PFN(AGP__NDEV)*(AGP__SZPFN)" >> AGP_COM
+   echo "" >> AGP_COM
+   echo "*  AGI device names" >> AGP_COM
+   echo "      CHARACTER AGP_ANM(AGP__NDEV)*(AGP__SZANM)" >> AGP_COM
+   echo "" >> AGP_COM
+   echo "*  Device descriptions" >> AGP_COM
+   echo "      CHARACTER AGP_DSC(AGP__NDEV)*(AGP__SZDSC)" >> AGP_COM
+   echo "" >> AGP_COM
+   echo "*  Declare the common block /AGP_C1/, to hold character variables." >> AGP_COM
+   echo "      COMMON /AGP_C1/ AGP_CRAWN, AGP_GTY, AGP_PTY, AGP_PFN, AGP_ANM," >> AGP_COM
+   echo "     :                AGP_DSC" >> AGP_COM
+   echo "" >> AGP_COM
+   echo "*  Ensure that common blocks are saved." >> AGP_COM
+   echo "      SAVE /AGP_C1/" >> AGP_COM
+   echo "" >> AGP_COM
+
+
+#  AGP1_INIT...
+#  ------------
+#  Write out the prologue.
+   echo "      BLOCK DATA AGP1_INIT" > agp1_init.f
+   cat <<FOO >> agp1_init.f
+*+
+*  Name:
+*     AGP1_INIT
+
+*  Purpose:
+*     Initialise the AGP common blocks.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     BLOCK DATA
+
+*  Description:
+*     The contents of the AGP common blocks are initialized by this module.
+*
+*     This file is generated automatically at build time using the 
+*     make_agp_const script. The contents are defined in the pgnames.txt 
+*     file. Both make_agp_const and pgnames.txt are part of the AGP source 
+*     distribution.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+
+*  History:
+FOO
+echo "*    " `date "+%d-%b-%Y"` | tr \[a-z\] \[A-Z\] >> agp1_init.f
+cat <<FOO >> agp1_init.f
+*        Built from pgnames.txt
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'AGP_CONST'        ! AGP private constants.
+
+*  Global Variables:
+      INCLUDE 'AGP_COM'          ! AGP common blocks.
+
+*  Global Data:
+
+FOO
+
+#  Write out the Fortan code.
+   echo "*  AGI name of current PGPLOT device" >> agp1_init.f
+   echo "      DATA AGP_CRAWN / ' ' /" >> agp1_init.f
+   echo "" >> agp1_init.f
+
+   echo "*  GNS device type" >> agp1_init.f
+   echo "      DATA AGP_GTY / '$gtype[1]'," >> agp1_init.f
+   shift gtype 
+   while ( $#gtype > 1 ) 
+   echo "     :               '$gtype[1]'," >> agp1_init.f
+      shift gtype 
+   end 
+   echo "     :               '$gtype[1]'/" >> agp1_init.f
+   echo "" >> agp1_init.f
+
+
+   echo "*  PGPLOT device type" >> agp1_init.f
+   echo "      DATA AGP_PTY / '$ptype[1]'," >> agp1_init.f
+   shift ptype
+   while ( $#ptype > 1 )
+   echo "     :               '$ptype[1]'," >> agp1_init.f
+      shift ptype
+   end
+   echo "     :               '$ptype[1]'/" >> agp1_init.f
+   echo "" >> agp1_init.f
+
+   echo "*  PGPLOT default file names" >> agp1_init.f
+   if( "$pfile[1]" != "-" ) then
+      set pf = $pfile[1]
+   else
+      set pf = " "
+   endif
+   echo "      DATA AGP_PFN / '$pf'," >> agp1_init.f
+   shift pfile
+   while ( $#pfile > 1 )
+      if( "$pfile[1]" != "-" ) then
+         set pf = $pfile[1]
+      else
+         set pf = " "
+      endif
+      echo "     :               '$pf'," >> agp1_init.f
+      shift pfile
+   end
+   if( "$pfile[1]" != "-" ) then
+      set pf = $pfile[1]
+   else
+      set pf = " "
+   endif
+   echo "     :               '$pf'/" >> agp1_init.f
+   echo "" >> agp1_init.f
+
+
+   echo "*  AGI device names" >> agp1_init.f
+   echo "      DATA AGP_ANM / '$aname[1]'," >> agp1_init.f
+   shift aname
+   while ( $#aname > 1 )
+   echo "     :               '$aname[1]'," >> agp1_init.f
+      shift aname
+   end
+   echo "     :               '$aname[1]'/" >> agp1_init.f
+   echo "" >> agp1_init.f
+
+
+   echo "*  Device descriptions" >> agp1_init.f
+   echo "      DATA AGP_DSC /"  >> agp1_init.f
+   while ( $#desc > 1 )
+   echo "     :  '$desc[1]'," | tr "_" " " >> agp1_init.f
+      shift desc
+   end
+   echo "     :  '$desc[1]'/" | tr "_" " " >> agp1_init.f
+   echo "" >> agp1_init.f
+   echo "      END" >> agp1_init.f
+

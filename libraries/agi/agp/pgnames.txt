@@ -1,0 +1,33 @@
+#
+# GNS        PGPLOT    PGPLOT       AGI        Desc
+# type       type      file        name 
+#----------------------------------------------------------
+#
+
+#  PGPLOT device which are not supported by GKS.
+gif_l/        GIF/         -/    AGI_GIF/ GIF-format file, landscape/
+gif_p/       VGIF/         -/   AGI_VGIF/ GIF-format file, portrait/
+hpgl_l/      HPGL/         -/   AGI_HPGL/ Hewlett-Packard HP-GL plotters, landscape/
+hpgl_p/     VHPGL/         -/   AGI_HPGL/ Hewlett-Packard HP-GL plotters, portrait/
+hpgl2/      HPGL2/         -/  AGI_HPGL2/ Hewlett-Packard graphics language/
+xterm/      XTERM/         -/  AGI_XTERM/ Tektronix terminal emulator/
+wd_l/          WD/         -/     AGI_WD/ X Window dump file, landscape/
+wd_p/         VWD/         -/    AGI_VWD/ X Window dump file, portrait/
+xserve/    XSERVE/         -/ AGI_XSERVE/ PGPLOT X window server/
+
+
+#  PGPLOT device which are supported by GKS.
+tek_4010/ TEK4010/         -/  AGI_201_0/ Tektronix 4006-4010 storage-tube terminal/
+tek_4107/ TEK4100/         -/  AGI_221_0/ Tektronix 4100-series terminals/
+ps_p/         VPS/         -/ AGI_2700_0/ Postscript printers, monochrome, portrait/
+ps_l/          PS/         -/ AGI_2701_0/ Postscript printers, monochrome, landscape/
+epsf_p/       VPS/         -/ AGI_2702_0/ Encapsulated postscript, portrait/
+epsf_l/        PS/         -/ AGI_2703_0/ Encapsulated postscript, landscape/
+pscol_p/     VCPS/         -/ AGI_2720_0/ PostScript printers, color, portrait/
+pscol_l/      CPS/         -/ AGI_2721_0/ PostScript printers, color, landscape/
+epsfcol_p/   VCPS/         -/ AGI_2722_0/ Colour encapsulated postscript, portrait/
+epsfcol_l/    CPS/         -/ AGI_2723_0/ Colour encapsulated postscript, landscape/
+xwindows/     GWM/  xwindows/ AGI_3800_1/ Starlink GWM xwindow/
+x2windows/    GWM/ xwindows2/ AGI_3801_2/ Starlink GWM xwindow/
+x3windows/    GWM/ xwindows3/ AGI_3802_3/ Starlink GWM xwindow/
+x4windows/    GWM/ xwindows4/ AGI_3803_4/ Starlink GWM xwindow/

@@ -1,0 +1,57 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     agp_link
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against native-PGPLOT
+#     based AGI (AGP). The existing standalone AGI (libagi.a) uses GKS
+#     to enquire the size of a device BASE picture. This version uses
+#     native PGPLOT to do this.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building standalone
+#     applications which use non-GKS (PGPLOT) AGI in order to generate the 
+#     correct arguments for the compiler (or ld) command. The arguments
+#     generated are written to the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        f77 -o program -L/star/lib `agp_link` program.f
+
+#  Copyright:
+#     Copyright (C) 1995 Rutherford Appleton Laboratory
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     BLY:  M.J. Bly (Starlink, RAL)
+#     DLT:  D.L. Terrett (Starlink, RAL)
+#     BKM:  B.K. McIlwrath (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-JUL-1995 (DLT):
+#        Original version created from template.
+#     23-SEP-1998 (BLY):
+#        Changed pgplot_link to pgp_link for Starlink-PGPLOT.
+#     14-DEC-1999 (BKM):
+#        Derive agp_link from agi_link (change AGI->AGP, PGP->PGPLOT).
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+      echo -lagp -lgns `ref_link` `trn_link` `pgplot_link`  \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.
