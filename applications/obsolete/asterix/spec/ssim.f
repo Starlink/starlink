@@ -119,7 +119,6 @@
       LOGICAL 			FROZEN(NPAMAX)		! Frozen parameter flag
       LOGICAL 			OK			! Data OK?
       LOGICAL 			POISS			! Poisson errors required?
-      LOGICAL 			THERE			! Component present?
 
 *  Version :
       CHARACTER*30 		VERSION
