@@ -1,0 +1,68 @@
+\newpage
+\sstroutine{
+   GIF2NDF
+}{
+   Converts a GIF file into an NDF. 
+}{
+   \sstdescription{
+      This Bourne shell script converts a Graphics Interchange Format file 
+      into a Starlink NDF image format file. 
+      One or two-dimensional images can be handled.
+      The script uses various PBMPLUS utilities to produce a FITS file 
+      and then KAPPA applications FITSDIN, MATHS and FLIP to produce the
+      final NDF. Error messages are converted into Starlink style (preceded
+      by !).
+   }
+   \sstusage{
+      gif2ndf in [out]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = FILENAME (Read)
+      }{
+         The name of the GIF file to be converted (without the {\tt .gif}
+         extension, which is assumed).
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The name of the NDF to be generated (without the {\tt .sdf} extension).
+         If the OUT parameter is omitted, the value of the IN parameter
+         is used.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         gif2ndf old new
+      }{
+         This converts the GIF file {\tt old.gif} into an NDF called new
+         (in file {\tt new.sdf}).
+      }
+      \sstexamplesubsection{
+         gif2ndf horse
+      }{
+         This converts the GIF file {\tt horse.gif} into an NDF called horse
+         (in file {\tt horse.sdf}).
+      }
+   }
+
+   \sstnotes{ 
+      The following points should be remembered:
+      \sstitemlist{ 
+         \sstitem
+            This initial version of the script generates images with at most
+            256 grey levels. It does not use the image colour lookup table.
+         \sstitem
+            Input image filenames must have the file extension {\tt .gif}.
+         \sstitem
+            The PBMPLUS utilities {\tt giftopnm}, {\tt ppmtopgm} and
+            {\tt pgmtofits} must be available on your PATH.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      \CONVERT: NDF2GIF.
+   }
+}
+
