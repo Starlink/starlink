@@ -18,7 +18,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 AC_CHECK_LIB(jpeg,jpeg_start_compress)
 
-STAR_DECLARE_DEPENDENCIES(build, [starx pcs ems gwm mers tcl tk nbs sae])
+STAR_DECLARE_DEPENDENCIES(build, [starx adam ams dtask ems gwm messys mers tcl tk nbs sae])
 
 STAR_LATEX_DOCUMENTATION(sun186)
 STAR_LATEX_DOCUMENTATION(sun219)
