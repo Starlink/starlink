@@ -9,6 +9,7 @@ cvs checkout: Updating java/pal/src/main/uk/ac/starlink/pal
 cvs checkout: Updating java/source
 U java/source/ant_import
 U java/source/build.xml
+U java/source/keystore
 U java/source/project.dtd
 cvs checkout: Updating java/source/ant
 U java/source/ant/KEYS
@@ -1417,6 +1418,15 @@ U java/source/ant/src/etc/testcases/types/gold/filterset1.txt
 U java/source/ant/src/etc/testcases/types/gold/filterset2.txt
 U java/source/ant/src/etc/testcases/types/gold/filterset3.txt
 cvs checkout: Updating java/source/ant/src/main
+cvs checkout: Updating java/source/ant/src/main/com
+cvs checkout: Updating java/source/ant/src/main/com/roxes
+cvs checkout: Updating java/source/ant/src/main/com/roxes/tools
+cvs checkout: Updating java/source/ant/src/main/com/roxes/tools/ant
+U java/source/ant/src/main/com/roxes/tools/ant/JNLPTask.java
+U java/source/ant/src/main/com/roxes/tools/ant/JStubTask.java
+U java/source/ant/src/main/com/roxes/tools/ant/PreferencesTask.java
+U java/source/ant/src/main/com/roxes/tools/ant/SFXTask.java
+U java/source/ant/src/main/com/roxes/tools/ant/stub.java
 cvs checkout: Updating java/source/ant/src/main/org
 cvs checkout: Updating java/source/ant/src/main/org/apache
 cvs checkout: Updating java/source/ant/src/main/org/apache/tools
@@ -8239,21 +8249,26 @@ U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/TickControls.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/TitleControls.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/XMLEncodeAndDecode.java
 cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink/splat/util
+U java/source/splat/src/main/uk/ac/starlink/splat/util/AkimaSplineInterp.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AsciiFileParser.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AvailableLocales.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AverageFilter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/CrossCorrelate.java
+U java/source/splat/src/main/uk/ac/starlink/splat/util/CubicSplineInterp.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/ExceptionDialog.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/FitVoigt.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/FunctionFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/FuzzyBoolean.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/GaussianFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/GaussianGenerator.java
+U java/source/splat/src/main/uk/ac/starlink/splat/util/HermiteSplineInterp.java
+U java/source/splat/src/main/uk/ac/starlink/splat/util/Interpolator.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/JPEGUtilities.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/KernelFactory.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/KernelFilter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/LevMarq.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/LevMarqFunc.java
+U java/source/splat/src/main/uk/ac/starlink/splat/util/LinearInterp.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/LorentzFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/LorentzGenerator.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/MedianFilter.java
@@ -8304,6 +8319,8 @@ cvs checkout: Updating java/source/src/docs
 cvs checkout: Updating java/source/src/docs/javaapi
 U java/source/src/docs/javaapi/README
 U java/source/src/docs/javaapi/package-list
+cvs checkout: Updating java/source/src/docs/webstart
+U java/source/src/docs/webstart/README
 cvs checkout: Updating java/source/src/etc
 U java/source/src/etc/LICENCE.txt
 U java/source/src/etc/README
