@@ -148,6 +148,11 @@
 *  Locate the main HDU for this input. This is the primary HDU for file
 *  level input, or the user specified HDU otherwise.
       CALL ADI2_FNDHDU( ARGS(2), 'PRIMARY', .FALSE., PHDU, STATUS )
+      IF ( PHDU .EQ. ADI__NULLID .OR. STATUS .EQ. SAI__ERROR ) THEN
+        PHDU = ADI__NULLID
+        CALL ERR_ANNUL( STATUS )
+        GOTO 99
+      END IF
 
 *  If the user has specified the HDU we can't move outside it
       IF ( UIHDU .GT. 0 ) THEN
@@ -313,7 +318,7 @@
       END IF
 
 *  Switch on the supported dataset types. First images
-      IF ( ISIMAG ) THEN
+ 99   IF ( ISIMAG ) THEN
 
 *    New model object
         CALL ADI_NEW0( 'XYimage', OARG, STATUS )
