@@ -3,7 +3,7 @@ Converts a Figaro (Version 2) DST file to an NDF.
 
 Usage:
 
-   dst2ndf in out
+   dst2ndf in out [form]
 
 Description:
 
@@ -14,6 +14,17 @@ Description:
    little or no information lost.
 2 Parameters
 For information on individual parameters, select from the list below:
+3 FORM
+FORM = LITERAL (Read)
+   The storage form of the NDF's data and variance arrays.
+   FORM = "Simple" gives the simple form, where the array of data
+   and variance values is located in an ARRAY structure.  Here it
+   can have ancillary data like the origin.  This is the normal
+   form for an NDF.  FORM = "Primitive" offers compatibility with
+   earlier formats, such as IMAGE.  In the primitive form the
+   data and variance arrays are primitive components at the top
+   level of the NDF structure, and hence it cannot have
+   ancillary information. ["Simple"]
 3 IN
 IN = Figaro file (Read)
    The file name of the version 2 file.  A file extension must
@@ -29,11 +40,11 @@ OUT = NDF (Write)
 2 Examples
 dst2ndf old new
    This converts the Figaro file old.dst to the NDF called new
-   (in file new.sdf).
+   (in file new.sdf).  The NDF has the simple form.
 
-dst2ndf horse horse
+dst2ndf horse horse p
    This converts the Figaro file horse.dst to the NDF called
-   horse (in file HORSE.SDF).
+   horse (in file HORSE.SDF).  The NDF has the primitive form.
 2 Notes
 The rules for the conversion of the various components are as
 follows:
@@ -41,8 +52,13 @@ _________________________________________________________________
        Figaro file          NDF
 
 -----------------------------------------------------------------
-       .Z.DATA         ->   .DATA_ARRAY
-       .Z.ERRORS       ->   .VARIANCE (after processing)
+       .Z.DATA         ->   .DATA_ARRAY.DATA (when FORM =
+                            "SIMPLE")
+       .Z.DATA         ->   .DATA_ARRAY (when FORM = "PRIMITIVE")
+       .Z.ERRORS       ->   .VARIANCE.DATA (after processing when
+                            FORM = "SIMPLE")
+       .Z.ERRORS       ->   .VARIANCE (after processing when
+                            FORM = "PRIMITIVE")
        .Z.QUALITY      ->   .QUALITY.QUALITY (must be BYTE array)
                             (see Bad-pixel handling below).
 
@@ -98,9 +114,7 @@ rules, rather than those given above.
    The QUALITY array is only copied if the bad-pixel flag
    (.Z.FLAGGED) is false or absent.  A simple NDF with the bad-pixel
    flag set to false (meaning that there are no bad-pixels present)
-   is created when .Z.FLAGGED is absent or false.  Otherwise a
-   primitive NDF, where the data array is at the top level of the
-   data structure, is produced.
+   is created when .Z.FLAGGED is absent or false and FORM = "SIMPLE".
 2 Authors
 JM: Jo Murray (STARLINK)
 
@@ -156,7 +170,9 @@ MJC: Malcolm J. Currie (STARLINK)
     structure, and an axis array that is missing from the first or
     second axis, the corresponding NDF axis-centre array is given
     a dimension equal to the number of FITS headers.
-2 Implementation_Status
-   -  Note the data array in the NDF is of the primitive form.
 
-   -  The maximum number of dimensions is 7.
+ 1993 October 25 (MJC):
+    Added FORM parameter to control the NDF's storage form rather
+    than use the value of the bad-pixel flag to decide.
+2 Implementation_Status
+   -  The maximum number of dimensions is 6.

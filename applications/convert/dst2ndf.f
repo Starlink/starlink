@@ -27,9 +27,19 @@
 *      little or no information lost.
 
 *   Usage:
-*      dst2ndf in out
+*      dst2ndf in out [form]
 
-*   ADAM Parameters:       
+*   ADAM Parameters:
+*      FORM = LITERAL (Read)
+*         The storage form of the NDF's data and variance arrays.
+*         FORM = "Simple" gives the simple form, where the array of data
+*         and variance values is located in an ARRAY structure.  Here it
+*         can have ancillary data like the origin.  This is the normal
+*         form for an NDF.  FORM = "Primitive" offers compatibility with
+*         earlier formats, such as IMAGE.  In the primitive form the
+*         data and variance arrays are primitive components at the top
+*         level of the NDF structure, and hence it cannot have
+*         ancillary information. ["Simple"]
 *      IN = Figaro file (Read)
 *         The file name of the version 2 file.  A file extension must
 *         not be given after the name, since ".dst" is appended by the
@@ -44,10 +54,10 @@
 *  Examples:
 *     dst2ndf old new
 *        This converts the Figaro file old.dst to the NDF called new
-*        (in file new.sdf).
-*     dst2ndf horse horse
+*        (in file new.sdf).  The NDF has the simple form.
+*     dst2ndf horse horse p
 *        This converts the Figaro file horse.dst to the NDF called
-*        horse (in file HORSE.SDF).
+*        horse (in file HORSE.SDF).  The NDF has the primitive form.
 
 *  Notes:
 *     The rules for the conversion of the various components are as
@@ -55,8 +65,13 @@
 *     _________________________________________________________________
 *            Figaro file          NDF
 *     -----------------------------------------------------------------
-*            .Z.DATA         ->   .DATA_ARRAY
-*            .Z.ERRORS       ->   .VARIANCE (after processing)
+*            .Z.DATA         ->   .DATA_ARRAY.DATA (when FORM =
+*                                 "SIMPLE")
+*            .Z.DATA         ->   .DATA_ARRAY (when FORM = "PRIMITIVE")
+*            .Z.ERRORS       ->   .VARIANCE.DATA (after processing when
+*                                 FORM = "SIMPLE")
+*            .Z.ERRORS       ->   .VARIANCE (after processing when
+*                                 FORM = "PRIMITIVE")
 *            .Z.QUALITY      ->   .QUALITY.QUALITY (must be BYTE array)
 *                                 (see Bad-pixel handling below).
 *                            ->   .QUALITY.BADBITS = 255
@@ -112,13 +127,10 @@
 *     The QUALITY array is only copied if the bad-pixel flag
 *     (.Z.FLAGGED) is false or absent.  A simple NDF with the bad-pixel
 *     flag set to false (meaning that there are no bad-pixels present)
-*     is created when .Z.FLAGGED is absent or false.  Otherwise a
-*     primitive NDF, where the data array is at the top level of the
-*     data structure, is produced.
+*     is created when .Z.FLAGGED is absent or false and FORM = "SIMPLE".
 
 *  Implementation Status:
-*     -  Note the data array in the NDF is of the primitive form.
-*     -  The maximum number of dimensions is 7.
+*     -  The maximum number of dimensions is 6.
 
 *  Authors:
 *     JM: Jo Murray (STARLINK)
@@ -168,6 +180,9 @@
 *        structure, and an axis array that is missing from the first or
 *        second axis, the corresponding NDF axis-centre array is given
 *        a dimension equal to the number of FITS headers.
+*     1993 October 25 (MJC):
+*        Added FORM parameter to control the NDF's storage form rather
+*        than use the value of the bad-pixel flag to decide.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -187,6 +202,7 @@
       INTEGER CHR_LEN                ! Get effective length of string
 
 *  Local Variables:
+      CHARACTER FORM * ( 9 )         ! NDF storage form
       INTEGER   IMCODE               ! ADAM internal parameter pointer
       INTEGER   NCF                  ! Length of the Figaro file name
       INTEGER   NCN                  ! Length of the NDF file name
@@ -197,6 +213,11 @@
 
 *   Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*   Get the form of the output NDF.  A null value will choose the simple
+*   form.
+      CALL PAR_CHOIC( 'FORM', 'Simple', 'Simple,Primitive', .TRUE.,
+     :                FORM, STATUS )
 
 *   Get the input file name.
       CALL PAR_GET0C( 'IN', FIGFIL, STATUS )
@@ -220,7 +241,8 @@
          CALL CHR_APPND( '.sdf', NDFFIL, NCN )
 
 *   Call the conversion subroutine.
-         CALL CON_DST2N( FIGFIL ( :NCF ), NDFFIL ( :NCN ), STATUS )
+         CALL CON_DST2N( FIGFIL ( :NCF ), NDFFIL ( :NCN ), FORM,
+     :                   STATUS )
 
       END IF
       

@@ -16,6 +16,19 @@
    }
    \sstparameters{
       \sstsubsection{
+         FORM = LITERAL (Read)
+      }{
+         The storage form of the NDF's data and variance arrays.
+         FORM = {\tt "Simple"} gives the simple form, where the array of data
+         and variance values is located in an ARRAY structure.  Here it
+         can have ancillary data like the origin.  This is the normal
+         form for an NDF.  FORM = {\tt "Primitive"} offers compatibility with
+         earlier formats, such as IMAGE.  In the primitive form the
+         data and variance arrays are primitive components at the top
+         level of the NDF structure, and hence it cannot have
+         ancillary information. {\tt ["Simple"]}
+      }
+      \sstsubsection{
          IN = Figaro file (Read)
       }{
          The file name of the version 2 file.  A file extension must
@@ -37,25 +50,28 @@
          dst2ndf old new
       }{
          This converts the Figaro file old.dst to the NDF called new
-         (in file new.sdf).
+         (in file new.sdf).  The NDF has the simple form.
       }
       \sstexamplesubsection{
-         dst2ndf horse horse
+         dst2ndf horse horse p
       }{
          This converts the Figaro file horse.dst to the NDF called
-         horse (in file horse.sdf).
+         horse (in file horse.sdf).  The NDF has the primitive form.
       }
    }
    \sstnotes{
       The rules for the conversion of the various components are as
       follows:
+      \vspace{-\parskip}
       \begin{center}
       \begin{tabular}{|lcl|p{47mm}|}
       \hline 
       \multicolumn{1}{|c}{Figaro file} & & \multicolumn{1}{c}{NDF} &
       \multicolumn{1}{|c|}{Comments} \\ \hline
-      .Z.DATA   & $\Rightarrow$ & .DATA\_ARRAY & \\
-      .Z.ERRORS & $\Rightarrow$ & .VARIANCE & after processing \\
+      .Z.DATA   & $\Rightarrow$ & .DATA\_ARRAY.DATA & when FORM = {\tt "SIMPLE"}\\
+      .Z.DATA   & $\Rightarrow$ & .DATA\_ARRAY & when FORM = {\tt "PRIMITIVE"} \\
+      .Z.ERRORS & $\Rightarrow$ & .VARIANCE.DATA & after processing when FORM = {\tt "SIMPLE"} \\
+      .Z.ERRORS & $\Rightarrow$ & .VARIANCE & after processing when FORM = {\tt "PRIMITIVE"} \\
       .Z.QUALITY & $\Rightarrow$ & .QUALITY.QUALITY & must be BYTE array
                                   (see Bad-pixel handling below) \\
       & $\Rightarrow$ & .QUALITY.BADBITS = 255 & \\
@@ -64,17 +80,7 @@
       .Z.IMAGINARY & $\Rightarrow$ & .DATA\_ARRAY.IMAGINARY\_DATA & \\
       .Z.MAGFLAG & $\Rightarrow$ & .MORE.FIGARO.MAGFLAG & \\
       .Z.RANGE  & $\Rightarrow$ & .MORE.FIGARO.RANGE & \\
-      .Z.xxxx   & $\Rightarrow$ & .MORE.FIGARO.Z.xxxx & \\
-      & & & \\
-      .X.DATA   & $\Rightarrow$ & .AXIS(1).DATA\_ARRAY & \\ 
-      .X.ERRORS & $\Rightarrow$ & .AXIS(1).VARIANCE & after processing \\
-      .X.WIDTH  & $\Rightarrow$ & .AXIS(1).WIDTH & \\
-      .X.LABEL  & $\Rightarrow$ & .AXIS(1).LABEL & \\
-      .X.UNITS  & $\Rightarrow$ & .AXIS(1).UNITS & \\
-      .X.LOG    & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.LOG & \\
-      .X.xxxx   & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.xxxx & \\
-      & & & (Similarly for .Y .T .U .V or .W structures which are
-             renamed to AXIS(2), \ldots, AXIS(6) in the NDF.) \\ \hline
+      .Z.xxxx   & $\Rightarrow$ & .MORE.FIGARO.Z.xxxx & \\ \hline
       \end{tabular}
       \end{center}
 
@@ -83,6 +89,16 @@
       \hline 
       \multicolumn{1}{|c}{Figaro file} & & \multicolumn{1}{c}{NDF} &
       \multicolumn{1}{|c|}{Comments} \\ \hline
+      .X.DATA   & $\Rightarrow$ & .AXIS(1).DATA\_ARRAY & \\ 
+      .X.ERRORS & $\Rightarrow$ & .AXIS(1).VARIANCE & after processing \\
+      .X.WIDTH  & $\Rightarrow$ & .AXIS(1).WIDTH & \\
+      .X.LABEL  & $\Rightarrow$ & .AXIS(1).LABEL & \\
+      .X.UNITS  & $\Rightarrow$ & .AXIS(1).UNITS & \\
+      .X.LOG    & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.LOG & \\
+      .X.xxxx   & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.xxxx & \\
+      & & & (Similarly for .Y .T .U .V or .W structures which are
+             renamed to AXIS(2), \ldots, AXIS(6) in the NDF.) \\
+      & & & \\
       .OBS.OBJECT & $\Rightarrow$ & .TITLE & \\
       .OBS.SECZ & $\Rightarrow$ & .MORE.FIGARO.SECZ & \\
       .OBS.TIME & $\Rightarrow$ & .MORE.FIGARO.TIME & \\
@@ -125,22 +141,12 @@
    \sstdiytopic{
    Bad-pixel handling
    }{
-The QUALITY array is only copied if the bad-pixel flag
-(.Z.FLAGGED) is false or absent.  A simple NDF with the bad-pixel
-flag set to false (meaning that there are no bad-pixels present)
-is created when .Z.FLAGGED is absent or false.  Otherwise a
-primitive NDF, where the data array is at the top level of the
-data structure, is produced.
+   The QUALITY array is only copied if the bad-pixel flag
+   (.Z.FLAGGED) is false or absent.  A simple NDF with the bad-pixel
+   flag set to false (meaning that there are no bad-pixels present)
+   is created when .Z.FLAGGED is absent or false and FORM = {\tt "SIMPLE"}.
    }
    \sstimplementationstatus{
-      \sstitemlist{
-
-      \sstitem
-      Note the data array in the NDF is of the primitive form.
-
-      \sstitem
-      The maximum number of dimensions is 7.
-      }
+      The maximum number of dimensions is 6.
    }
 }
-

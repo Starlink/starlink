@@ -23,6 +23,8 @@
 #     	 Made the output NDF the current data-array.
 #     1992 September 28 (MJC):
 #     	 Made OUT have type NDF and WRITE access.
+#     1993 October 25 (MJC):
+#     	 Added FORM.
 #     {enter_further_changes_here}
 
 #-
@@ -30,6 +32,16 @@
 interface DST2NDF
 
    helplib        'CONVERT_HELP:'
+
+   parameter      FORM           # NDF storage form
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT'
+      prompt      'Storage form of the NDF data and variance arrays'
+      default     'Simple'
+      helpkey     '*'
+   endparameter
 
    parameter      IN             # Name of Figaro file
       position    1
