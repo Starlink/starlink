@@ -4395,8 +4395,6 @@ void adix_primth( int narg, int farg, int nmth,
 
 /* Order the list of classes appearing in mclist into ascending priority. */
 /* If there are no direct superclasses, then the ordering is moot */
-	ADIstrmPrintf( ADIcvStdOut, "Ordering %O and %O\n", status, mclist, dslist );
-	ADIstrmFlush( ADIcvStdOut, status );
       if ( _valid_q(dslist) ) {
 	rlist = adix_estab_ord( mclist, dslist, status );
 
@@ -4408,8 +4406,6 @@ void adix_primth( int narg, int farg, int nmth,
 	}
       else
 	rlist = mclist;
-	ADIstrmPrintf( ADIcvStdOut, "Gives %O\n", status, rlist );
-	ADIstrmFlush( ADIcvStdOut, status );
 
 /* Now process the list of methods. Start at the beginning of the ranked
  * list and shuffle the remaining methods with this class to the head of the
