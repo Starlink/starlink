@@ -131,7 +131,7 @@ if <code/docnumber/ isn't defined.
 
 <routine>
 <routinename>getdocdate
-<description>Return the docment's release date as a string.
+<description>Return the document's release date as a string.
 <argumentlist>
 <parameter optional default='(current-node)'>
   <name>nd
