@@ -18,6 +18,7 @@
 *     11 Dec 92 : Original. Extracted from SFIT (DJA)
 *     12 Jul 94 : Increased number of figures output to 15.8 (DJA)
 *     25 Jul 94 : Converted to use AIO system (DJA)
+*     12 Feb 1996 : Corrected bug formatting equivalent normal Z (DJA)
 *
 *    Type definitions :
 *
@@ -61,7 +62,7 @@
 *      And unit normal deviate
         IF ( NDOF .GT. 0 ) THEN
           CALL AIO_BLNK( OCI, STATUS )
-          CALL MSG_SETR( 'Z', SQRT(2*STAT)-SQRT(2*NDOF-1.0) )
+          CALL MSG_SETD( 'Z', DBLE(SQRT(2*STAT)-SQRT(2*NDOF-1.0)) )
           CALL AIO_WRITE( OCI, 'Equivalent unit normal deviation = ^Z',
      :                    STATUS )
         END IF
