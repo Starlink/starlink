@@ -30,7 +30,9 @@ verbosities InputByteStream::verbosity_ = normal;
 
 // Open the requested file.  If preload is true, then open the file and
 // read it entire into memory, since the client will be seeking a lot.
-InputByteStream::InputByteStream (string s, bool preload, string tryext)
+// If the file can't be opened, then try adding tryext to the end of
+// it.  If this succeeds in opening the file, then modify the filename.
+InputByteStream::InputByteStream (string& s, bool preload, string tryext)
     : eof_(true), preloaded_(preload)
 {
     string fname = s;
@@ -39,6 +41,8 @@ InputByteStream::InputByteStream (string s, bool preload, string tryext)
     {
 	fname += tryext;
 	fd_ = open (fname.c_str(), O_RDONLY);
+	if (fd_ >= 0)
+	    s = fname;		// modify the input filename
     }
     if (fd_ < 0)
 	throw InputByteStreamError ("can\'t open file " + s + " to read");
