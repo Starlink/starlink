@@ -3428,6 +3428,64 @@ configure.ac: installing `./missing'
 
       </subsect>
 
+<subsect id="buildsystem-interface" export="export">
+<subhead>
+<title>The build system `interface'</title>
+</subhead>
+
+<p>The previous section describes the steps required to bring a
+component into the build system.  This section makes reasonably
+explicit what was implicit in that previous section, by describing the
+`interface' between the build system and a particular component.  The
+word `interface' is in scare-quotes there because this interface isn't
+formal and isn't enforced, but it should be useful as a check-list and
+as an overview.</p>
+
+<p>1. <code>component.xml</code>: every component has to have an
+XML-valid instance of this, as defined by
+<code>componentinfo.dtd</code> with element
+<code>&lt;component&gt;</code> at the root level.</p>
+
+<p>2. A Makefile which implements most/all of the GNU standard
+targets.  I think we actually use `all' (default), `install', `check'
+and `dist' as part of the build system, and I've mentioned `clean',
+`distclean', and `maintainer-clean' elsewhere in this document.  The GNU coding
+standards add `uninstall', `install-strip', `mostlyclean', `TAGS',
+`info', `dvi', none of which we probably care much about
+(uninstalling should probably be handled by whatever
+package-management tool we settle on, rather than a makefile).  The
+build system does <code>cd xxx; make; make install</code> for
+component <code>cpt</code>, where <code>xxx</code> is the contents of
+<code>/componentset/component[@id='cpt']/path</code> in the
+<code>componentset.xml</code> file.  This requirement comes for free,
+given that you use a <code>Makefile.am</code> file and automake, and
+this requirement is mentioned only for completeness.</p>
+
+<p>3. Doing `make install' additionally installs a
+<code>$prefix/manifests/cpt</code> manifest, which is a valid instance
+of the <code>componentinfo.dtd</code> DTD with the
+<code>&lt;manifest&gt;</code> element at the root level.  Again, this
+step comes for free when you use the automake system.</p>
+
+<p>4. Bootstrapping: the top-level bootstrap script includes a call to
+`autoreconf'.  This configures the whole tree, using autoconf's
+built-in support for recursing, based around the macro
+<code>AC_CONFIG_SUBDIRS</code>, and you should make sure that any new
+components are pulled in to this mechanism.  Apart from that,
+the behaviour of the <code>./configure</code> scripts isn't really
+part of this `interface', except that components are linked in to the
+tree-wide configure by virtue of being mentioned in the
+<code>configure.ac</code> scripts in their parent (see the `bridging'
+scripts in <code>applications/configure.ac</code> and
+<code>libraries/configure.ac</code>).  If, for some reason, you wished
+to incorporate a large number of components in a new tree (perhaps you
+want to include some complicated tree of Perl modules, for example),
+then you would similarly hand-write some `bridging' scripts, which
+preserve the property that your new tree is configured (doing whatever
+is required in a particular situation) when its parent is.</p>
+
+</subsect>
+
       <subsect id="autodistrib" export="export" indexkey="distribution">
         <subhead>
           <title>Distribution of components</title>
