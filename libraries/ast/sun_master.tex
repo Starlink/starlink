@@ -6746,7 +6746,7 @@ attribute for a Frame axis. The string given should contain a C
 {\em{format specifier}} which explicitly determines how the values on
 that axis should be formatted. This will over-ride the effects of any
 Digits value\footnote{The exception to this rule is that if the Format
-value includes a precision of ``\verb+.*+'', then Digits will be used to
+value includes a precision of ``$.*$'', then Digits will be used to
 determine the actual precision used.}. Any valid ``printf'' format
 specifier may be used so long as it consumes exactly one double value.
 c-
@@ -6756,7 +6756,7 @@ Format attribute for a Frame axis. The string given should contain a
 {\em{format specifier}} which explicitly determines how the values on
 that axis should be formatted. This will over-ride the effects of any
 Digits value\footnote{The exception to this rule is that if the Format value 
-includes a precision of ``\verb+.*+'', then Digits will be used to determine 
+includes a precision of ``$.*$'', then Digits will be used to determine 
 the actual precision used.}.  Unfortunately for Fortran programmers, this must 
 be a C language format specifier,\footnote{This is a consequence of
 implementing the AST library in C.} so you might find the Digits
