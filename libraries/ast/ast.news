@@ -3,71 +3,52 @@ AST Library
    A new release (V<VERSION_NUMBER>) of the Starlink AST (astrometry) library is
 now available.
 
-   AST may be used for attaching world coordinate systems (such as
-RA/Dec) to astronomical data, for retrieving and interpreting that
-information and for generating graphical output based on it.
+   AST provides a comprehensive range of facilities for attaching
+world coordinate systems (such as RA/Dec) to astronomical data, for
+retrieving and interpreting that information and for generating
+graphical output based on it.
 
    The library should be of interest to anyone writing astronomical
 software which needs to manipulate coordinate system data, especially
 celestial coordinate systems. AST is portable and
 environment-independent.
 
-Changes in this Version
------------------------
-o  A new "How To..." section has been added to the documentation (SUN/210
-   and SUN/211). It contains simple recipies for performing
-   commonly-required operations using AST.
+Main Changes in this Version
+----------------------------
+o  A new astPolyCurve function has been added for drawing multiple
+   geodesic curves end-to-end.
+ 
+o  The "ast_link" command has changed so that the options "-pgp" and
+   "-pgplot" now link against the Starlink and "Native" versions of
+   PGPLOT respectively. Previously these options were synonymous and
+   used whichever version was installed.
 
-o  A new routine has been provided to perform free-format input of
-   coordinate values, including celestial coordinate.
+o  A new "FITS-IRAF" encoding has been added as an interim method
+   of encoding world coordinate system information in FITS headers,
+   until the proposed official FITS-WCS standard becomes more stable.
 
-o  Celestial coordinates may now be formatted in (arc)minutes and/or
-   (arc)seconds, without a leading degrees or hours field.
+o  The astMapBox function's efficiency has been improved.
 
-o  A new routine has been provided to find the extent of a "bounding
-   box".  A typical use might be to calculate the size of an image after
-   geometrical transformation.
+o  Other improvements have been made to the efficiency and
+   friendliness of various algorithms, particularly in the areas of
+   reading FITS header data and simplification of Mappings.
 
-o  A new class of Object, the IntraMap, has been introduced to
-   encapsulate privately-defined coordinate transformation routines
-   written in Fortran or C.  This allows you to create private Mappings
-   that perform any conceivable coordinate transformation.
-
-o  The internal integrity of a FrameSet is now automatically preserved
-   whenever changes are made to any attributes which affect the current
-   Frame.
-
-o  The internal structure of a FrameSet is now automatically tidied
-   whenever any of its Frames is removed or re-mapped. This prevents the
-   accumulation of unnecessary structure in FrameSets which are
-   repeatedly modified.
-
-o  Some improvements have been made to the algorithms for simplifying
-   compound Mappings.
-
-o  The textual representation used for some Objects has changed slightly,
-   but remains compatible with earlier versions of AST.
-
-o  Interfaces to the internal routines and macros used by AST for
-   handling memory and error conditions are now provided via the C
-   interface.  This is for the benefit of those writing (e.g.) new
-   graphics interfaces for AST.
-
-o  A number of minor bugs have been fixed.
-
+o  A few minor bugs have been fixed.
 
    For further details of these changes, see the final appendix of
 Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).
 These are available on the WWW at:
 
       http://star-www.rl.ac.uk/cgi-bin/htxserver/sun210.htx/
-   and
+
+and
       http://star-www.rl.ac.uk/cgi-bin/htxserver/sun211.htx/
 
 Alternatively, on Starlink systems, type:
 
       showme sun210 changes
-   or
+
+or
       showme sun211 changes
 
-9/6/98
+13/11/98
