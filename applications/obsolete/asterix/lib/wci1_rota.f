@@ -90,6 +90,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          		! Standard SAE constants
+      INCLUDE 'MATH_PAR'
 
 *  Global Variables:
       INCLUDE 'WCI_CMN'				! ASTERIX WCI common block
