@@ -86,6 +86,10 @@ be generated at the wrong sizes, and to be spaced incorrectly.
 Minor changes to the configuration options, plus a couple of
 documentation tidyups.
 
+<distribution string="0.9-6" date="12-Jan-2001" author="ng" versionid="v0-9-6">
+Took opportunity of a bug-fix release of the software to make
+miscellaneous minor edits to the documentation.
+
 </history>
 
 <copyright>
@@ -730,7 +734,7 @@ should be.  There are (at least) three possible reasons for this.
 <p>If you are using the <code/kpathsea> library, there might be some
 misconfiguration which is confusing it.  You can trace
 <code/kpathsea>'s deliberations in great detail by giving the option
-<code/-ggp> (<ref id=usage.options.g>).
+<code/-ggp> (<ref id=usage.options.g/>).
 
 <p>Perhaps you do not have the <code/kpathsea> library installed, or
 have disabled it, but you <em/have> requested that font-generation be
@@ -853,51 +857,13 @@ which is more usual for network-distributed software.
 
 <p>When you unpack the distribution tarball, you should find at least
 the files <code/dvi2bitmap_source.tar>, <code/Makefile.starlink> and
-<code/mk>.  You can build the software the Starlink way, using the
-<code/mk> script (see <ref id=install.starlink/>), or unpack the
-<code/dvi2bitmap_source.tar> file, and build it the other way (see
-<ref id=install.nonstarlink/>).  Since the <code/mk> script is really
-just a driver for the Makefile within the tar file, you should get the
-same results both ways.
-
-<subsect id=install.starlink export>Starlink nodes
-<update versionid=v0-9-4>Added a note discussing the <code/export_run>
-distribution bundle, and possible problems with it.</update>
-
-<p>If you are on a Starlink node, then you
-should be able to use the usual <code/mk> script.  Define the
-environment variables <code/INSTALL> and <code/SYSTEM> as usual.
-<code/SYSTEM> can be any one of the Starlink-supported platforms
-<code/ix86_Linux>, <code/alpha_OSF1> or <code/sun4_Solaris>.  Then
-give the commands
-<verbatim>
-% ./mk build
-% ./mk install
-</verbatim>
-
-<p>This build configures support for GIFs, plus support for the
-<code/kpathsea> library if that library is present on the system (it
-is not distributed with this package and not present by default on all
-project machines).
-
-<p>There are some issues involved in creating, and hence in
-installing, an <code/export_run> distribution.  Part of the
-configuration of <code/dvi2bitmap> involves establishing the location,
-on the build system, of font-building scripts and TeX configuration
-files.  However, the point of the <code/export_run> distributions is
-that it should run on systems <em/other> than the build system.  We
-deal with this by (a) configuring <code/dvi2bitmap> to use a custom
-font-building script, which is distributed and installed with the
-package, and which is simply an interface to whichever of the real
-font-builders is available on the target system, and (b) configuring
-it with <code/--disable-texmfcnf>.  The former should be OK as long as
-one of <code/mktexpk> and <code/MakeTeXPK> is in the path after
-installation.  The latter, however will cause a problem if
-<code/kpathsea> is enabled (which may or may not be the case for the
-<code/export_run> system), since this will probably <em/fail> unless
-the environment variable <code/TEXMFCNF> is defined (see
-<kbd/kpsewhich cnf texmf.cnf>).  You can see what features are enabled
-with the command <kbd/dvi2bitmap -V>.
+<code/mk>.  If you're on a Starlink machine, you can, and should,
+build the software the Starlink way, using the <code/mk> script (see
+<ref id=install.starlink/>); but if you're not, you should unpack the
+<code/dvi2bitmap_source.tar> file, and build it the conventional way
+(see <ref id=install.nonstarlink/>).  Since the Starlink <code/mk>
+script is really just a driver for the Makefile within the tar file,
+you should get the same results both ways.
 
 <subsect id=install.nonstarlink export>General installation and configuration
 <update versionid="upd1">
@@ -916,6 +882,7 @@ kpathsea option to &ddash;disable-kpathsea.  Addition of
 and new default setting.</update>
 <update versionid="v0-9-5-1">
 Changed the disable-kpathsea configuration option to without-kpathsea
+(see also release notes for this version).</update>
 
 
 <p>To configure and build:
@@ -928,7 +895,7 @@ but see the configuration options below.
 <p>It's a good idea to run `<code/make test>' as well.  See <ref
 id=usage.fonts.finding/>.
 
-<p>To install, just copy the executable dvi2bitmap wherever you want it
+<p>To install, just copy the executable <code/dvi2bitmap> wherever you want it
 to live.
 
 <p>You can customise the program using flags to the
@@ -1081,22 +1048,28 @@ equivalent to <code>./configure --with-kpathsea --enable-png
 --enable-mktexpk</code> (meaning that kpathsea and PNG output will be
 enabled if library support for them is found).
 
-<p>The program builds successfully on (at least):
+<p><update versionid=v0-9-6 >Added `version' column to table, noting
+which version was actually tested.</update>The program builds
+successfully on (at least):
 <blockquote>
 <tabular>
-<tgroup cols="2">
+<tgroup cols="3">
 <thead>
-<row><entry>Platform<entry>Compiler
+<row><entry>Platform<entry>Version<entry>Compiler
 <tbody>
-<row><entry>i686-pc-linux-gnu (RedHat 6.0)<entry>egcs-2.91.66
-<row><entry>powerpc-unknown-linux-gnu (Mac mklinux DR-0.3?)<entry>egcs-2.90.25 980302 (egcs-1.0.2 prerelease)
-<row><entry>sparc-sun-solaris2.7<entry>egcs-2.91.66
-<row><entry>sparc-sun-solaris2.7<entry>gcc 2.8.1
-<row><entry>sparc-sun-solaris2.7<entry>WorkShop Compilers 5.0 98/12/15 C++ 5.0
-<row><entry>alpha-dec-osf4.0f<entry>Compaq C++ V6.2-024 for Digital UNIX V4.0F
+<row><entry>i686-pc-linux-gnu (RedHat 6.0)<entry>0.9-6<entry>egcs-2.91.66
+<row><entry>powerpc-unknown-linux-gnu (Mac mklinux DR-0.3?)<entry>0.9<entry>egcs-2.90.25 980302 (egcs-1.0.2 prerelease)
+<row><entry>sparc-sun-solaris2.7<entry>0.9<entry>egcs-2.91.66
+<row><entry>sparc-sun-solaris2.7<entry>0.9<entry>gcc 2.8.1
+<row><entry>sparc-sun-solaris2.7<entry>0.9<entry>WorkShop Compilers 5.0 98/12/15 C++ 5.0
+<row><entry>alpha-dec-osf4.0f<entry>0.9<entry>Compaq C++ V6.2-024 for Digital UNIX V4.0F
 </tabular>
 </blockquote>
-It should be written in
+The `version' column is the last version which was actually tested on
+that platform.  Reports of compilations on other platform/compiler
+combinations gratefully received.
+
+<p>It should be written in
 standards-conforming C++, so if it doesn't build then (1) it's not as
 conformant as I think it is (in which case please tell me), (2) your
 compiler is not as conformant as you think it is (in which case please
@@ -1128,11 +1101,56 @@ can obtain and build it yourself.  The library is distributed as part
 of the <code/web2c> (Unix &tex; source) distribution, which you can
 find at <url>ftp://ftp.tug.org/tex/web2c.tar.gz</url>, or mirrored on
 CTAN sites (for example at <url>http://www.tex.ac.uk</url> in
-directory <code fspath>systems/web2c</code>).  Take a copy of the
-library (this is a <em/big> distribution), unpack it, and delete the
-web2c directory (which is the bulk of the distribution).  Configure
+directory <code fspath>systems/web2c</code>).  
+
+<p>Take a copy of the
+library (this is a <em/big> distribution), and unpack it.  Go into the 
+<code/kpathsea> directory and do the usual
+`<code>./configure; make; make install</code>' routine.  With (some?)
+older distributions of the library this appeared not to work, and you
+had to go to the parent of the <code/kpathsea> directory, delete the
+web2c directory (which is the bulk of the distribution), then configure
 and build it as usual, ignoring the warnings about the missing main
 <code/texmf> tree.
+
+<subsect id=install.starlink export>Starlink nodes
+<update versionid=v0-9-4>Added a note discussing the <code/export_run>
+distribution bundle, and possible problems with it.</update>
+
+<p>If you are on a Starlink node, then you
+should be able to use the usual <code/mk> script.  Define the
+environment variables <code/INSTALL> and <code/SYSTEM> as usual.
+<code/SYSTEM> can be any one of the Starlink-supported platforms
+<code/ix86_Linux>, <code/alpha_OSF1> or <code/sun4_Solaris>.  Then
+give the commands
+<verbatim>
+% ./mk build
+% ./mk install
+</verbatim>
+
+<p>This build configures support for GIFs, plus support for the
+<code/kpathsea> library if that library is present on the system (it
+is not distributed with this package and not present by default on all
+project machines).
+
+<p>There are some issues involved in creating, and hence in
+installing, an <code/export_run> distribution.  Part of the
+configuration of <code/dvi2bitmap> involves establishing the location,
+on the build system, of font-building scripts and TeX configuration
+files.  However, the point of the <code/export_run> distributions is
+that it should run on systems <em/other> than the build system.  We
+deal with this by (a) configuring <code/dvi2bitmap> to use a custom
+font-building script, which is distributed and installed with the
+package, and which is simply an interface to whichever of the real
+font-builders is available on the target system, and (b) configuring
+it with <code/--disable-texmfcnf>.  The former should be OK as long as
+one of <code/mktexpk> and <code/MakeTeXPK> is in the path after
+installation.  The latter, however will cause a problem if
+<code/kpathsea> is enabled (which may or may not be the case for the
+<code/export_run> system), since this will probably <em/fail> unless
+the environment variable <code/TEXMFCNF> is defined (see
+<kbd/kpsewhich cnf texmf.cnf>).  You can see what features are enabled
+with the command <kbd/dvi2bitmap -V>.
 
 <sect id=developments export>Bugs, extras, and further developments
 <update versionid=v0-7-1>Added bugreport address</update>
@@ -1192,7 +1210,7 @@ let me know.
 
 <p>Thanks for bug reports and other suggestions to <webref
 url="http://www.cis.ohio-state.edu/~gurari/" >Eitan Gurari</webref>
-(heroic tester) and Oliver Schurr.
+(heroic tester), Oliver Schurr and Oleg Bartunov (<code/oleg@sai.msu.su>).
 
 
 <appendices>
@@ -1267,14 +1285,15 @@ There's an alternative location for TeX4ht
 	>tth: TeX to HTML translator</webref> 
 (<webref url="http://hutchinson.belmont.ma.us/tth/manual.cgi"
 >manual</webref>).  <code/tth> translates &latex; maths directly to HTML,
-with remarkable success, and with good failure strategies.  It works
+with remarkable success and astonishing speed, and with good failure
+strategies.  It works
 very sweetly, but (a) requires you to tweak your browser to have it
 map the symbol font appropriately, and (b) the resulting HTML can't be
 printed legibly.  From the same source is 
 <webref url='http://hutchinson.belmont.ma.us/tth/mml/'
 	>TtHMML</webref>, which translates (La)&tex; to HTML plus MathML.
 
-<p><webref url='http://norma.nikhef.nl/~t16/ndvi_doc.html'
+<p><update versionid=v0-9-6>Updated nDVI URL</update><webref url='http://www.nikhef.nl/~t16/public/ndvi/ndvi_doc.html'
 	>nDVI</webref> is a DVI viewer plugin for Unix Netscape.  This
 addresses the problem at the client end.
 

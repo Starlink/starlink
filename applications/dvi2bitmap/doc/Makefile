@@ -6,15 +6,15 @@
 
 DOCTARBALLS=doc.tar-htx doc.tar-latex doc.tar-htxsingle
 
-doc.tar-htx: dvi2bitmap.sgml
+doc.tar-htx: dvi2bitmap.sgml ReleaseNotes ../VERSION
 	$(STARLINK_SGML_DIR)/bin/sgml2docs --html \
 		--packagedir ssn71.htx --tarball $@ $<
 
-doc.tar-latex: dvi2bitmap.sgml
+doc.tar-latex: dvi2bitmap.sgml ReleaseNotes ../VERSION
 	$(STARLINK_SGML_DIR)/bin/sgml2docs --latex \
 		--packagedir ssn71.latex --tarball $@ $<
 
-doc.tar-htxsingle: dvi2bitmap.sgml
+doc.tar-htxsingle: dvi2bitmap.sgml ReleaseNotes ../VERSION
 	$(STARLINK_SGML_DIR)/bin/sgml2docs --htmlsingle \
 		--packagedir ssn71.htxsingle --tarball $@ $<
 

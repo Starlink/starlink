@@ -1,3 +1,4 @@
+<!--
 <subsect id=rn-0.10 export>Release 0.10???
 
 <p>Slight changes in functionality (enough that scripts might
@@ -13,6 +14,19 @@ with the <code/-P> option.
 consistency, option <code/-Qt> no longer automatically exits.
 
 </ul>
+-->
+
+<subsect id=rn-0.9-6 export>Release 0.9-6
+
+<p>Fixed a character-handling bug.  Oleg Bartunov (<code/oleg@sai.msu.su>)
+identified an error in the handling of some of the opcodes in the DVI
+file, which meant that only 7-bit fonts were being set correctly (how
+parochial of me!).  He also sent me the fix -- many thanks to him.
+
+<p>Also made a change to the options of the configuration script,
+turning <code/&ddash;enable-kpathsea> back to
+<code/&ddash;with-kpathsea>, which is more sensible, in retrospect (I
+think the processing of this was rather garbled in the previous version).
 
 <subsect id=rn-0.9-5 export>Release 0.9-5
 
