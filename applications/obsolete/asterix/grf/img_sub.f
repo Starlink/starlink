@@ -5583,13 +5583,13 @@ c        REAL XX,XP,YP
             I_FORM=.FALSE.
             XC=I_X
             YC=I_Y
-            CALL MSG_PRNT('Select centre...')
+            CALL IMG_NBPUT0C('HELP','Select centre',STATUS)
             CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
             IF (FLAG.EQ.1) THEN
               CALL PGPOINT(1,XC,YC,2)
               XR=XC
               YR=YC
-              CALL MSG_PRNT('Select radius...')
+              CALL IMG_NBPUT0C('HELP','Select radius',STATUS)
               CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
               IF (FLAG.EQ.1) THEN
                 RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
@@ -6233,6 +6233,100 @@ c        REAL XX,XP,YP
       ENDIF
 
       END
+
+
+*+ IMG_NBPUT0R
+      SUBROUTINE IMG_NBPUT0R(NAME,VAL,STATUS)
+
+      IMPLICIT NONE
+
+*  Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Import :
+      CHARACTER*(*) NAME
+      REAL VAL
+*  Export :
+*  Status :
+      INTEGER STATUS
+*  Local constants :
+*  Local variables :
+      INTEGER ID
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
+        CALL NBS_PUT_VALUE(ID,0,VAL__NBR,VAL,STATUS)
+
+
+      ENDIF
+
+      END
+
+
+*+ IMG_NBPUT0I
+      SUBROUTINE IMG_NBPUT0I(NAME,VAL,STATUS)
+
+      IMPLICIT NONE
+
+*  Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Import :
+      CHARACTER*(*) NAME
+      INTEGER VAL
+*  Export :
+*  Status :
+      INTEGER STATUS
+*  Local constants :
+*  Local variables :
+      INTEGER ID
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
+        CALL NBS_PUT_VALUE(ID,0,VAL__NBI,VAL,STATUS)
+
+
+      ENDIF
+
+      END
+
+
+*+ IMG_NBPUT0C
+      SUBROUTINE IMG_NBPUT0C(NAME,CVAL,STATUS)
+
+      IMPLICIT NONE
+
+*  Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Import :
+      CHARACTER*(*) NAME
+      CHARACTER*(*) CVAL
+*  Export :
+*  Status :
+      INTEGER STATUS
+*  Local constants :
+*  Local variables :
+      INTEGER ID,NB
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
+        CALL NBS_PUT_CVALUE(ID,0,CVAL,STATUS)
+
+
+      ENDIF
+
+      END
+
 
 
 *+ IMG_FORMOK
