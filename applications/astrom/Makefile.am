@@ -17,8 +17,6 @@ F_ROUTINES = \
 	cocomo.f cocoom.f cocomm.f wfwcs0.f \
 	opw.f opr.fpp
 
-opr.f: opr.o
-
 BLOCK_DATA_FILES = params.f
 
 PRIVATE_INCLUDES = params.inc
