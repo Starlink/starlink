@@ -105,6 +105,7 @@
 *    Local variables :
       INTEGER ID,SID,ITEMID
       INTEGER GCBID
+      INTEGER I
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
