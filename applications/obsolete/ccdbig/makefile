@@ -928,11 +928,29 @@ do_test:
 #  Note the test has not yet succeeded.
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
 #
-#  I'll fix this up later.
-	@ echo; echo 'test target not prepared yet.'; echo
-#
-#  Note the test has been run.
-	@ touch .TESTED_$(SYSTEM)
+#  Try to run the ccdbig script with one set of small frames.
+	if test ! -n "$$CCDBIG_TEST_DIR"; then \
+           echo " "; \
+           echo " **** Set CCDBIG_TEST_DIR to a directory with >20Mbyte free"; \
+           echo "      and re-run 'mk test'."; \
+           echo " "; \
+           exit 1; \
+        else \
+           echo " "; \
+           echo " Running ccdbig script with 400x400 frames in $CCDBIG_TEST_DIR"; \
+           echo " "; \
+           cd $$CCDBIG_TEST_DIR; \
+           CCDBIG_DIR=$(INSTALL_BIN); \
+           export CCDBIG_DIR; \
+           sed -e '/^ *set *image_sizes/s/(.*)/(400)/' <$$CCDBIG_DIR/ccdbig >./ccdbig; \
+           chmod 755 ./ccdbig; \
+           ./ccdbig; \
+           echo " "; \
+           echo " Log file contents follow:"; \
+           echo " "; \
+           cat ccdbig_res.log; \
+        fi
+	touch .TESTED_$(SYSTEM)
 
 #  export: Export the installed system.
 #  -----------------------------------
@@ -1083,4 +1101,4 @@ ccdbgen.o: SAE_PAR DAT_PAR CCD1_PAR NDF_PAR
 #
 #  End of makefile.
 #.
-# $Id: ccdbig_link_adam,v 1.2 1998/07/01 16:46:44 mbt Exp $
+# $Id: makefile,v 2.11 1998/07/06 14:25:48 mbt Exp $
