@@ -276,7 +276,7 @@ protected:
 
   //  Create AST plot for drawing grids and contours to canvas.
   AstPlot* createPlot( AstFrameSet *wcs, AstFrameSet *extraset, 
-                       int full, double pbox[] );
+                       int full, int image, double region[] );
  private:
 
   // Copy constructor -- not defined.

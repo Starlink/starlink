@@ -681,7 +681,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
     if ( result == TCL_OK ) {
       if ( ! saved && native ) {
         return error( "information: WCS could only be saved"
-                      " as an AST native representation");  
+                      " as an AST native representation");
       } else if ( !saved && !native ) {
         return error( "Failed to save WCS information");
       }
@@ -1039,7 +1039,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
   if ( showpixels ) {
     wcs = makePixelWCS();
   } else {
-    
+
     //  See if a copy of the current WCS frameset is available (we
     //  use a copy so we can  modify without changing any other elements).
     StarWCS* wcsp = getStarWCSPtr();
@@ -1049,7 +1049,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
     wcs = wcsp->astWCSCopy();
     if ( wcs == (AstFrameSet *) NULL ) {
 
-      //  No WCS, give up. 
+      //  No WCS, give up.
       error( "sorry: unable to plot a grid as no world coordinates"
              " are available, select the system 'pixels' or add a WCS" );
       inerror = 1;
@@ -1087,7 +1087,8 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
     if ( newsky != (AstSkyFrame *) NULL ) {
       astInvert( wcs );
     }
-    AstPlot *plot = createPlot( wcs, (AstFrameSet *) newsky, (coordArgc == 0), region );
+    AstPlot *plot = createPlot( wcs, (AstFrameSet *) newsky,
+                                (coordArgc == 0), 0, region );
     inerror = ( inerror || plot == (AstPlot *) NULL );
     if ( ! inerror ) {
 
@@ -3158,7 +3159,7 @@ int StarRtdImage::get_compass(double x, double y, const char* xy_units,
 //           {colour(curve)=4,width(curve)=0.010}
 //           {colour(curve)=5,width(curve)=0.008}
 //           {colour(curve)=6,width(curve)=0.005} }
-//       
+//
 //       For 5 contours. Note that the style attribute is currently
 //       ignored by the Tk canvas AST interface.
 //
@@ -3190,11 +3191,11 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
       error( "sorry: failed to decode the contour levels (check format)" );
       inerror = 1;
     }
-    
+
     //  Convert these into doubles.
     levels = new double[nlevels];
     for ( int index = 0; index < nlevels; index++ ) {
-      if ( Tcl_GetDouble( interp_, levelsArgv[index], 
+      if ( Tcl_GetDouble( interp_, levelsArgv[index],
                           &levels[index] ) != TCL_OK ) {
         error( levelsArgv[index], "is not a valid number");
         inerror = 1;
@@ -3235,9 +3236,9 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
       inerror = 1;
     }
   }
-  
+
   //  Get the region coordinates. Note just use Contour native
-  //  facilities for this, not the plot (this potentially much 
+  //  facilities for this, not the plot (this potentially much
   //  more efficient).
   char **coordArgv;
   int ncoords = 0;
@@ -3261,10 +3262,11 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
             break;
           }
         }
-        
-        //  Reorganise these coordinates to the expected order
-        //  (bottom-left, top-right of screen, not canvas).
+
+        //  Transform these positions into image coordinates.
         swap( region[1], region[3] );
+        canvasToImageCoords( region[0], region[1], 0 );
+        canvasToImageCoords( region[2], region[3], 0 );
       }
     }
   }
@@ -3317,24 +3319,31 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
 
     //  Create an AstPlot that incorporates an additional FrameSet
     //  that describes an system we want to add.
-    AstPlot *plot = createPlot( wcs, (AstFrameSet *) farwcs, 1, region );
+    AstPlot *plot = createPlot( wcs, (AstFrameSet *) farwcs, 1, 1, region );
     inerror = ( inerror || plot == (AstPlot *) NULL );
 
     //  Initialise the interpreter and canvas name for the Tk plotting
     //  routines.
     astTk_Init( interp_, canvasName_ );
-    
+
     //  Define a tag for all items created in the plot.
     astTk_Tag( grid_tag() );
-    
+
     if ( astOK && !inerror ) {
 
       //  Create a contour object, setting the contour levels, and
       //  line attributes.
       Contour contour( imageIO, plot, levels, nlevels, prefs, nprefs );
-      
+
       //  Establish if plotting is careful or fast.
       contour.setCareful( careful );
+
+      //  Set the region of image to contour (tuned to match grid plots).
+      if ( ncoords > 0 ) {
+        contour.setRegion( (int) (region[0] + 1), (int)(region[1] + 1),
+                           (int)(region[2] - region[0] + 1 ),
+                           (int)(region[3] - region[1] + 1 ) );
+      }
 
       //  Draw the contour.
       if ( ! contour.drawContours() ) {
@@ -3473,6 +3482,12 @@ AstFrameSet* StarRtdImage::makePixelWCS( ImageData *image )
 //       drawn, rather than the full canvas, otherwise this parameter
 //       will not be used.
 //
+//       If full is true then the region array can be used to
+//       transform image coordinates from the original WCS system into
+//       the new coordinates (this supplies a region of coordinates in
+//       the new image that correspond to a region in the old image,
+//       useful for clipping).
+//
 //    Return:
 //       An AstPlot, or NULL if failed.
 //
@@ -3480,7 +3495,8 @@ AstFrameSet* StarRtdImage::makePixelWCS( ImageData *image )
 //-
 AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
                                    AstFrameSet *extraset,
-                                   int full, double region[] )
+                                   int full, int image,
+                                   double region[] )
 {
 #ifdef _DEBUG_
   cout << "Called StarRtdImage::createPlot" << endl;
@@ -3536,6 +3552,21 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
         plotset = (AstFrameSet *) astAnnul( plotset );
       }
       return (AstPlot *) NULL;
+    }
+
+    //  Transform region from old image to new image if asked.
+    if ( image ) {
+      double xin[2], yin[2];
+      double xout[2], yout[2];
+      xin[0] = region[0];
+      yin[0] = region[1];
+      xin[1] = region[2];
+      yin[1] = region[3];
+      astTran2( plotset, 2, xin, yin, 1, xout, yout );
+      region[0] = xout[0];
+      region[1] = yout[0];
+      region[2] = xout[1];
+      region[3] = yout[1];
     }
   } else {
 

@@ -418,7 +418,6 @@ itcl::class gaia::GaiaContour {
 
          #  Check the image to be contoured.
          set rtdimage [get_rtdimage_]
-         puts "Using rtdimage: $rtdimage ($target_)"
 
          #  Clear existing contours.
          if { $drawn_ } {
@@ -432,12 +431,30 @@ itcl::class gaia::GaiaContour {
          #  Get the attributes.
          set atts [get_attributes_]
 
+         #  If requested just display over the visible canvas +/- a little.
+         set frac 0.80
+         set xf [expr 0.5*(1.0-$frac)]
+         set yf [expr 0.5*(1.0-$frac)]
+         set w [winfo width $itk_option(-canvas)]
+         set h [winfo height $itk_option(-canvas)]
+         set x0 [$itk_option(-canvas) canvasx 0]
+         set y0 [$itk_option(-canvas) canvasy 0]
+         set dw [expr $w*$xf]
+         set dh [expr $h*$yf]
+         set x1 [expr $x0+$w-$dw]
+         set y1 [expr $y0+$h-$dh]
+         set x0 [expr $x0+$dw]
+         set y0 [expr $y0+$dh]
+         set bounds [list $x0 $y0 $x1 $y1]
+         puts "region set to: $x0 $y0 $x1 $y1"
+         
          #  Set the tag used to control clear etc.
          $itk_option(-rtdimage) configure -grid_tag $itk_option(-contour_tag)
 
          #  Draw the contours.
          set drawn_ 1
-         $itk_option(-rtdimage) contour $levels $rtdimage $careful_ $atts
+         $itk_option(-rtdimage) contour \
+            $levels $rtdimage $careful_ $atts $bounds
       }
    }
 
@@ -534,7 +551,7 @@ itcl::class gaia::GaiaContour {
    itk_option define -filter_types filter_types Filter_Types {} {}
 
    #  Whether contours are plotted carefully (slow, but precise) or not.
-   itk_option define -careful careful Careful 1 {
+   itk_option define -careful careful Careful 0 {
       set careful_ $itk_option(-careful)
    }
 
@@ -554,7 +571,7 @@ itcl::class gaia::GaiaContour {
    #  Protected variables: (available to instance)
    #  --------------------
    #  Whether contours are plotted carefully, used for checkbutton var.
-   protected variable careful_ 1
+   protected variable careful_ 0
 
    #  Name of rtdimage that we are contouring or the filename to use.
    protected variable target_ {}
