@@ -317,15 +317,15 @@ mode, separate sky areas must be identified for the $O$ and $E$ ray
 pictures. In single-beam mode, only $O$-ray sky areas need be supplied.}
 Upon completion, these sky areas are extracted and cleaned by removing
 any small bright features. The KAPPA application SURFIT is then used to
-fit a bi-cubic spline surface to the sky areas for each ray (the
-flexibility of this surface may be controlled by the user), and
+fit a polynomial surface to the sky areas for each ray (the
+order of this surface may be controlled by the user), and
 extrapolated to cover the rest of the output image. Finally, this fitted
 surface is subtracted from the output image.
 
 \end{enumerate}
 
 The effect of sky subtraction on an image can be previewed using the
-\htmlref{{\em Sky Subtraction}}{POLREG_SKYSUB_EFFECT} item in the 
+\htmlref{{\em Fit Sky}}{POLREG_FITSKY_EFFECT} item in the 
 \htmlref{{\em Effects}}{POLREG_EFFECTS_MENU} menu.
 
 \section {\mylabel{POLREG_TUTORIAL}Tutorial}
@@ -571,12 +571,35 @@ be estimated.\footnote{This tutorial assumes that the input object frames
 contain some suitable sky areas. If this is not the case, then you may
 wish to supply separate sky frames instead. To do this, you should assign
 the list of sky frames to the SKYFRAMES parameter when starting {\tt
-polreg}. If this is done you need not identify any sky areas.} 
-To do this, click on the {\em O-ray sky area} button in the box
-labelled \htmlref{{\em Current:}}{POLREG_CURRENT}. Sky areas within
-the $O$-ray picture should then be identified using the cursor in just the 
-same way as the $O$-ray mask. More than one polygon may be supplied if
-necessary. 
+polreg}. If this is done you need not identify any sky areas manually.}
+To do this, click on the {\em O-ray sky area} button in the box labelled
+\htmlref{{\em Current:}}{POLREG_CURRENT}. You then identify sky areas
+within the $O$-ray picture using the cursor in just the same way as the
+$O$-ray mask. More than one polygon may be supplied if necessary. If you
+do not wish to subtract any sky background, then clear the
+\htmlref{{\em Remove Sky}}{POLREG_REMOVE_SKY} box in the
+\htmlref{{\em Options}}{POLREG_OPTIONS_MENU} menu.
+
+By default, a flat surface will be fitted to these sky areas and
+subtracted from the corresponding output images upon completion. However,
+a varying polynomial surface can also be fitted by selecting a value
+greater than zero for the \htmlref{{\em Sky Order}}{POLREG_SKYORDER} item
+in the \htmlref{{\em Options}}{POLREG_OPTIONS_MENU} menu. Larger values
+allow more flexibility in the fitted surface. In this case, you should
+try to give sky areas at several widely spaced positions within the image
+in order to constrain the fitted surface. For instance, if you only gave
+one small sky area near a corner of the image, then the fitted surface
+would be poorly constrained in the opposite corner. This could easily
+result in the surface being be a very bad estimate of the sky background
+there! You can check that the fitted surface is reasonable by clicking on
+the \htmlref{{\em Fit Sky}}{POLREG_FITSKY_EFFECT} item in the
+\htmlref{{\em Effects}}{POLREG_EFFECTS_MENU} menu. This will perform
+the fit to the sky background in the currently displayed image, using the
+current sky areas, and will display either the sky fit itself, or the sky
+subtracted data. Click on the 
+\htmlref{{\em Undo All}}{POLREG_UNDO_ALL_EFFECTS} item in the 
+\htmlref{{\em Effects}}{POLREG_EFFECTS_MENU} menu to restore the original
+displayed image.
 
 Once the $O$-ray sky areas have been identified, you can click on the
 {\em E-ray sky areas} button in the box labelled \htmlref{{\em
@@ -586,16 +609,6 @@ mapping between the $O$ and $E$ ray pictures. You can then edit these
 areas, if necessary. Note, default sky areas are created using the
 current mappings. No attempt is made to modify these areas to take
 account of any subsequently changes in the mappings.
-
-By default, a flat surface equal to the mean value in these sky areas
-will be subtracted from the corresponding output images upon completion.
-The flexibility of the fitted surfaces may be controlled using the
-\htmlref{{\em Sky}}{POLREG_SKY} item in the 
-\htmlref{{\em Options}}{POLREG_OPTIONS_MENU} menu.
-
-If you do not wish to subtract any sky background, then clear the 
-\htmlref{{\em Remove Sky}}{POLREG_REMOVE_SKY} box in the 
-\htmlref{{\em Options}}{POLREG_OPTIONS_MENU} menu.
 
 \subsubsection {Identifying $O$-ray features in the next input image.}
 Now, you need to supply features which allow the next image to be
@@ -716,17 +729,13 @@ This section gives detailed descriptions of each control in the PolReg
 Graphical User Interface. The controls are divided up into groups on the
 basis of their purpose and position with the interface.
 
-\subsection {\mylabel{POLREG_MENUS}The Menu Bar}
-The following menus are available in the menu bar (the horizontal strip 
-along the top of the GUI):
+xxx
 
-\subsubsection {\mylabel{POLREG_FILE_MENU}The {\em File} Menu}
+\subsection {\mylabel{POLREG_FILE_MENU}The {\em File} Menu}
 The {\em File} menu provides access to commands which control
 termination of PolReg, and the creation of the output images. They are:
 
-\begin{description}
-
-\item [\mylabel{POLREG_SAVE}{\em Save}] - Causes the output images to be
+\subsubsection {\mylabel{POLREG_SAVE}{\em Save}} Causes the output images to be
 created, based on the current set of image feature positions and area masks. If
 these have not changed since the last time the output images were saved,
 no new images are created. If the required features and masks have not
@@ -734,28 +743,24 @@ yet been supplied, then a warning message is displayed, and no images are
 created. Unlike the {\em Exit} command, the {\em Save} command does not
 cause PolReg to close down.
 
-\item  [\mylabel{POLREG_EXIT}{\em Exit}] - Creates the output images by executing
+\subsubsection {\mylabel{POLREG_EXIT}{\em Exit}} Creates the output images by executing
 the \htmlref{{\em Save}}{POLREG_SAVE} command, and then closes down
 PolReg. The user is asked to confirm the operation once the output images
 have been saved.
 
-\item  [\mylabel{POLREG_QUIT}{\em Quit}] - Closes down PolReg without first saving the output
+\subsubsection {\mylabel{POLREG_QUIT}{\em Quit}} Closes down PolReg without first saving the output
 images. The user is asked to confirm the operation.
 
-\end{description}
-
-\subsubsection {\mylabel{POLREG_EDIT_MENU}The {\em Edit} Menu}
+\subsection {\mylabel{POLREG_EDIT_MENU}The {\em Edit} Menu}
 The {\em Edit} menu provides access to commands which relate to
 the changing of information stored within PolReg. They are:
 
-\begin{description}
-
-\item [\mylabel{POLREG_CLEAR_ALL}{\em Clear All}] - Causes all currently defined information to be
+\subsubsection {\mylabel{POLREG_CLEAR_ALL}{\em Clear All}} Causes all currently defined information to be
 erased. This includes all feature positions, masks and mappings. Use it
 if you make a real mess of things! It is equivalent to closing down PolReg 
 and starting it up again with the same options and input images.
 
-\item [\mylabel{POLREG_CLEAR_CURRENT}{\em Clear Current}] - Causes the
+\subsubsection {\mylabel{POLREG_CLEAR_CURRENT}{\em Clear Current}} Causes the
 current objects associated with the displayed image to be erased. The
 current objects are selected using the buttons in the box labelled
 ``\htmlref{{\em Current:}}{POLREG_CURRENT}''. For instance, if the the
@@ -763,18 +768,18 @@ current objects are selected using the buttons in the box labelled
 will result in all $O$-ray feature positions being cleared from the
 currently displayed image.
 
-\item [\mylabel{POLREG_CLEAR_IMAGE}{\em Clear Image}] - Causes the
+\subsubsection {\mylabel{POLREG_CLEAR_IMAGE}{\em Clear Image}} Causes the
 currently defined information relating to the displayed image to be
 erased. This includes all feature positions, masks and mappings.
 
-\item [\mylabel{POLREG_DELETE_FEATURES}{\em Delete}] - Deletes any features
+\subsubsection {\mylabel{POLREG_DELETE_FEATURES}{\em Delete}} Deletes any features
 or mask vertices contained within the currently selected area on the
 displayed image. See \hyperref{here}{section }{}{POLREG_AREA_SELECTION}
 for details of how to select an area. This menu item performs an
 identical function to the \htmlref{{\em Delete}}{POLREG_DELETE} button in
 the \htmlref{{\em Display Controls}}{ POLREG_DISPLAY_CONTROLS} box.
 
-\item [\mylabel{POLREG_EDIT_MAPPINGS}{\em Mappings}] - Allows the current
+\subsubsection {\mylabel{POLREG_EDIT_MAPPINGS}{\em Mappings}} Allows the current
 mappings associated with a particular image to be examined and optionally
 modified. This facility may be used to enforce particular values for the
 mapping parameters, rather than allowing their values to be determined by
@@ -782,17 +787,13 @@ the identified image features. Selecting this item will display a sub-menu conta
 images. Clicking on the required image will cause the ``\htmlref{{\em Edit
 a mapping}}{POLREG_EDIT_MAPPING_DIALOG}'' dialog box to be displayed.
 
-\end{description}
-
-\subsubsection {\mylabel{POLREG_OPTIONS_MENU}The {\em Options} Menu}
+\subsection {\mylabel{POLREG_OPTIONS_MENU}The {\em Options} Menu}
 The {\em Options} menu provides access to commands which control the
 various options which are available to customise the operation of PolReg.
 These options may also be set on the command line used to activate 
 {\tt polreg}. The menu items are:
 
-\begin{description} 
-
-\item [\mylabel{POLREG_COLOURS}{\em Colours}] - 
+\subsubsection {\mylabel{POLREG_COLOURS}{\em Colours}} 
 This allows control of the colours used to represent various objects in
 the PolReg GUI. Upon selection, a menu of objects appear including:
 
@@ -828,7 +829,7 @@ When one of these items is selected, a menu of colours appears from which
 a selection may be made. The available colours are red, blue, green,
 cyan, magenta, yellow, black.
 
-\item [\mylabel{POLREG_FEATURE_SIZE}{\em Feature Size}] - This option
+\subsubsection {\mylabel{POLREG_FEATURE_SIZE}{\em Feature Size}} This option
 controls the centroiding process which is used to find accurate image
 feature positions from the initial guesses supplied by the user. It
 should be set to an estimate of the typical width (in pixels) of the
@@ -845,7 +846,7 @@ after the application of any effects selected using the \htmlref{{\em
 Effects}}{POLREG_EFFECTS_MENU} menu}, and assumes that the image features
 are positive.
 
-\item [\mylabel{POLREG_INTERPOLATION_METHOD}{\em Interpolation Method}] -
+\subsubsection {\mylabel{POLREG_INTERPOLATION_METHOD}{\em Interpolation Method}}
 This determines the method to use when interpolating between the pixel
 values in the input images to determine the pixel values in the output
 images. It can be either:
@@ -856,7 +857,7 @@ input pixels.
 \item [Nearest Neighbour] - Use the value of the closest input pixel.
 \end{description}
 
-\item [\mylabel{POLREG_MAP_TYPES}{\em Mapping Types}] - This displays a list of
+\subsubsection {\mylabel{POLREG_MAP_TYPES}{\em Mapping Types}} This displays a list of
 the types of mappings which can be used to align the input images.
 Selecting the {\em O-E Mapping Type} entry (at the bottom of the menu)
 causes a similar menu to be posted which allows the selection of the
@@ -918,19 +919,26 @@ marked as being out-of-date and will subsequently be re-calculated using
 the new mapping type when they are next accessed (eg when displaying
 aligned reference features or creating the output images).
 
-\item [\mylabel{POLREG_SKY}{\em Sky}] - This is used to control the form
-of the sky background subtracted from the output images. It is disabled
-unless the sky background is being estimated on the basis of identified
-sky areas within the input object frames.
+\subsubsection {\mylabel{POLREG_SKYORDER}{\em Sky Order}} This is used to control
+the flexibility of the surfaces fitted to the sky background areas. It is
+an integer which gives the order of the polynomial fit along each axis
+(the same value is used for both axes). It is disabled unless the sky
+background is being estimated on the basis of identified sky areas within
+the input object frames. A value of zero results in a constant sky
+background value being used. A value of 1 results in a linear fit, etc.
+Higher values allow more flexibility in the fitted surface. The effect of
+using a particular order with the current sky areas can be previewed
+using the 
+\htmlref{{\em Fit Sky}}{POLREG_FITSKY_EFFECT} item in the 
+\htmlref{{\em Effects}}{POLREG_EFFECTS_MENU} menu.
 
-
-\item [\mylabel{POLREG_STATUS_ITEMS}{\em Status Items}] - This is used to
+\subsubsection {\mylabel{POLREG_STATUS_ITEMS}{\em Status Items}} This is used to
 customise the contents of the \htmlref{status area}{POLREG_STATUS_AREA}
 shown below the image display area. Selecting this item will result in the 
 \htmlref{{\em Select status items}}{POLREG_STATUS_ITEMS_DIALOG} dialog
 box appearing.
 
-\item [\mylabel{POLREG_VIEW}{\em View}] - Determines how to display new
+\subsubsection {\mylabel{POLREG_VIEW}{\em View}} Determines how to display new
 images selected using the \htmlref{{\em Images}}{POLREG_IMAGES_MENU}
 menu. It may take one of the values:
 
@@ -947,18 +955,27 @@ be used to unzoom the image manually so that it fills the display.
 
 \end{description}
 
-\item [\mylabel{POLREG_USE_CROSS_HAIR}{\em Use Cross-hair}] -
+\subsubsection {\mylabel{POLREG_USE_CROSS_HAIR}{\em Use Cross-hair}}
 If this button is selected then a cross-hair will be used instead of a
 pointer within the \htmlref{image display area}{POLREG_IMAGE_DISPLAY}.
 The default is to use a cross-hair.
 
-\item [\mylabel{POLREG_DISPLAY_HELP_AREA}{\em Display Help Area}] - 
+\subsubsection {\mylabel{POLREG_REMOVE_SKY}{\em Remove Sky}}
+If this button is selected then the sky background will be estimated and
+subtracted from the output images upon completion. The estimation will be
+based on the supplied sky frames, or on the identified sky areas if no
+sky frames were supplied. If the button is cleared then no sky background
+will be subtracted from the output images, and the
+\htmlref{{\em Fit Sky}}{POLREG_FITSKY_EFFECT} item in the
+\htmlref{{\em Effects}}{POLREG_EFFECTS_MENU} menu is inoperative.
+
+\subsubsection {\mylabel{POLREG_DISPLAY_HELP_AREA}{\em Display Help Area}} 
 If this button is selected, then the PolReg GUI will include a
 \htmlref{help area}{POLREG_HELP_AREA} in which dynamic help information
 on the control under the pointer is displayed. Otherwise, the help area
 is not displayed.
 
-\item [\mylabel{POLREG_DISPLAY_STATUS_AREA}{\em Display Status Area}] - 
+\subsubsection {\mylabel{POLREG_DISPLAY_STATUS_AREA}{\em Display Status Area}} 
 If this button is selected, then the PolReg GUI will include a
 \htmlref{status area}{POLREG_HELP_AREA} in which information
 describing the current state (such as image names, options values, 
@@ -967,7 +984,7 @@ status area is not displayed. The contents of this area may be customised
 using the \htmlref{{\em Status Items}}{POLREG_STATUS_ITEMS} entry in the
 \htmlref{{\em Options}}{POLREG_OPTIONS_MENU} menu.
 
-\item [\mylabel{POLREG_SAVE_OPTIONS}{\em Save Options}] - 
+\subsubsection {\mylabel{POLREG_SAVE_OPTIONS}{\em Save Options}} 
 If this menu item is selected, the current option values (together with
 the values shown in the \htmlref{{\em \% not white}}{POLREG_NOT_WHITE}
 and \htmlref{{\em \% black}}{POLREG_BLACK} controls) will be saved so that
@@ -975,9 +992,7 @@ they become the default values for future invocations of
 PolReg.\footnote{The current values are passed back to the {\tt polreg} A-task 
 upon completion, and they are then stored in the A-tasks parameter file.}
 
-\end{description} 
-
-\subsubsection {\mylabel{POLREG_IMAGES_MENU}The {\em Images} Menu}
+\subsection {\mylabel{POLREG_IMAGES_MENU}The {\em Images} Menu}
 This is a menu of the input images supplied when {\tt polreg} was
 activated. When an image is selected from this menu, it is displayed in
 the \htmlref{image display area}{POLREG_IMAGE_DISPLAY} in the manner
@@ -986,7 +1001,7 @@ effects have previously been applied to the image using the \htmlref{{\em
 Effects}}{POLREG_EFFECTS_MENU} menu, then the displayed image will
 include these effects.
 
-\subsubsection {\mylabel{POLREG_EFFECTS_MENU}The {\em Effects} Menu}
+\subsection {\mylabel{POLREG_EFFECTS_MENU}The {\em Effects} Menu}
 This menu allows several special effects to be applied to the displayed
 image. The purpose of these effects is to enable the image features to be
 found more easily. For instance, if you have a negative image you should
@@ -1011,24 +1026,20 @@ if some effects are applied to an image and then a different input image
 is selected (using the \htmlref{{\em Images}}{POLREG_IMAGES_MENU} menu), 
 the effects will still be in place when the original image is re-selected.
 
-\begin{description}
+\subsubsection {\mylabel{POLREG_ALIGN_EFFECT}{\em Align} } To be written.
+\subsubsection {\mylabel{POLREG_FILL_EFFECT}{\em Fill} } To be written.
+\subsubsection {\mylabel{POLREG_FILTER_EFFECT}{\em Filter} } To be written.
+\subsubsection {\mylabel{POLREG_FITSKY_EFFECT}{\em Fit Sky} } To be written.
+\subsubsection {\mylabel{POLREG_LOG_EFFECT}{\em Log} } To be written.
+\subsubsection {\mylabel{POLREG_MATHS_EFFECT}{\em Maths} } To be written.
+\subsubsection {\mylabel{POLREG_NEGATE_EFFECT}{\em Negate} } To be written.
+\subsubsection {\mylabel{POLREG_SMOOTH_EFFECT}{\em Smooth} } To be written.
+\subsubsection {\mylabel{POLREG_THRESHOLD_EFFECT}{\em Threshold} } To be written.
+\subsubsection {\mylabel{POLREG_SHOW_EFFECTS}{\em Show Effects} } To be written.
+\subsubsection {\mylabel{POLREG_UNDO_EFFECT}{\em Undo} } To be written.
+\subsubsection {\mylabel{POLREG_UNDO_ALL_EFFECTS}{\em Undo All} } To be written.
 
-\item [\mylabel{POLREG_ALIGN_EFFECT}{\em Align} ] - To be written.
-\item [\mylabel{POLREG_FILL_EFFECT}{\em Fill} ] - To be written.
-\item [\mylabel{POLREG_FILTER_EFFECT}{\em Filter} ] - To be written.
-\item [\mylabel{POLREG_LOG_EFFECT}{\em Log} ] - To be written.
-\item [\mylabel{POLREG_MATHS_EFFECT}{\em Maths} ] - To be written.
-\item [\mylabel{POLREG_NEGATE_EFFECT}{\em Negate} ] - To be written.
-\item [\mylabel{POLREG_SKYSUB_EFFECT}{\em Sky Subtraction} ] - To be written.
-\item [\mylabel{POLREG_SMOOTH_EFFECT}{\em Smooth} ] - To be written.
-\item [\mylabel{POLREG_THRESHOLD_EFFECT}{\em Threshold} ] - To be written.
-\item [\mylabel{POLREG_SHOW_EFFECTS}{\em Show Effects} ] - To be written.
-\item [\mylabel{POLREG_UNDO_EFFECT}{\em Undo} ] - To be written.
-\item [\mylabel{POLREG_UNDO_ALL_EFFECTS}{\em Undo All} ] - To be written.
-
-\end{description}
-
-\subsubsection {\mylabel{POLREG_HELP_MENU}The {\em Help} Menu}
+\subsection {\mylabel{POLREG_HELP_MENU}The {\em Help} Menu}
 This menu provides access to the PolReg hyper-text help information. 
 \hyperref{Go here}{See section }{}{POLREG_USING_HELP} for more information
 on selecting which browser is to be used. This menu provides several preset
@@ -1288,8 +1299,16 @@ $E$-ray areas of the input image. These are also used to derive the mappings
 needed to align the output images.
 \item [$O$-ray mask] - This consists of one or more closed polygonal curves
 containing all the $O$-ray areas in the input image. 
-\item [$E$-ray mask] - This consists of one or more closed polygonal curves
+\item [$E$-ray mask] - One or more closed polygonal curves
 containing all the $E$-ray areas in the input image. 
+\item [$O$-ray sky area] - This consists of one or more closed polygonal curves
+containing the regions within the $O$-ray area in which the sky
+background is to be estimated. This button will be disabled if 
+separate sky frames were supplied when {\tt polreg} was run, or if the
+\htmlref{{\em Remove Sky}}{POLREG_REMOVE_SKY} entry in the \htmlref{{\em
+Options}}{POLREG_OPTIONS_MENU} menu is not selected.
+\item [$E$-ray sky area] - The $E$-ray sky areas - equivalent to the ``{\em O-ray
+sky}'' button.
 \end{description}
 
 \subsection {\mylabel{POLREG_REFERENCE}The ``{\em Reference:}'' Box}
@@ -1301,11 +1320,9 @@ and labelling of the current objects selected in the box labelled
 shown in a different colour, and use a different marker to the current
 objects.
 
-The top five buttons have the following effects:
+The top seven buttons have the following effects:
 
 \begin{description}
-
-\item [None] - Causes no reference objects to be displayed.
 
 \item [$O$-ray features] - Causes the $O$-ray features from the image
 selected using the \htmlref{{\em Ref. Image}}{POLREG_REF_IMAGE} menu to
@@ -1322,6 +1339,16 @@ be displayed as reference object.
 \item [$E$-ray mask] - Causes the $E$-ray mask from the image
 selected using the \htmlref{{\em Ref. Image}}{POLREG_REF_IMAGE} menu to
 be displayed as reference object.
+
+\item [$O$-ray sky area] - Causes the $O$-ray sky areas from the image
+selected using the \htmlref{{\em Ref. Image}}{POLREG_REF_IMAGE} menu to
+be displayed as reference object.
+
+\item [$E$-ray sky area] - Causes the $E$-ray sky areas from the image
+selected using the \htmlref{{\em Ref. Image}}{POLREG_REF_IMAGE} menu to
+be displayed as reference object.
+
+\item [None] - Causes no reference objects to be displayed.
 
 \end{description}
 
