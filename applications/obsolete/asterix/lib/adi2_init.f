@@ -111,7 +111,7 @@
 *  File system methods
       CALL ADI_DEFMTH( 'FileClose(_FITSfile)', ADI2_FCLOSE, DID,
      :                   STATUS )
-      CALL ADI_DEFMTH( 'FileComit(_FITSfile)', ADI2_FCOMIT, DID,
+      CALL ADI_DEFMTH( 'FileCommit(_FITSfile)', ADI2_FCOMIT, DID,
      :                   STATUS )
       CALL ADI_DEFMTH( 'FileTrace(_FITSfile)', ADI2_FTRACE, DID,
      :                   STATUS )
