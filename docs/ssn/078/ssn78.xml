@@ -140,7 +140,8 @@
         scratch is described in <ref id="bootstrapping"/>, and the
         procedure to build a single component, though little more
         complicated than described here, is discussed in more detail
-        in <ref id="buildingcomponents"/>.</p>
+        in <ref id="buildingcomponents"/>.  You should read both of
+        these sections before trying the commands above.</p>
 
       <p>Secondly, the build system handles the construction of
         portable source-code sets -- distribution tarballs -- so that
@@ -1496,7 +1497,8 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             <dd>
               <p>The most straightforward way is to update your
                 checkout of the component in question, then invoke
-                <kbd>./configure; make; make install-manifest</kbd></p>
+                <kbd>./configure; make; make install-manifest</kbd>
+                within that checkout directory.</p>
               <p>Alternatively, and much as described above, you could
                 update your checkout of the component in question,
                 then delete its manifest file and run <kbd>make
@@ -1809,6 +1811,95 @@ STAR_HAVE_FC_OPEN_READONLY
 
       </subsect>
 
+      <subsect id="tool-cvs" export="export">
+        <subhead>
+          <title>CVS</title>
+        </subhead>
+
+        <p>There is a compact CVS Primer on the web at
+          <url>http://www.astro.gla.ac.uk/users/norman/note/2003/cvsprimer/</url>,
+          and that includes pointers to fuller documentation.  This
+          section includes a few tips on using CVS which go beyond
+          that document, or which are more specific to the Starlink
+          CVS repository.</p>
+
+        <subsubsect id="tool-cvs-tagging">
+          <subhead>
+            <title>CVS and tagging</title>
+          </subhead>
+
+          <p>Tagging is very important, as it is through tagging that
+            you create branches, and mark certain sets of files as a
+            set, so that they can be recovered as a set in future.  The
+            current tagging policy is at
+            <url>http://wiki.starlink.ac.uk/twiki/bin/view/Starlink/CvsTagging</url>.</p>
+
+          <p>You make a tag with the <kbd>cvs tag</kbd> command, while
+            you are in a directory with a part of the repository checked
+            out:
+            <verbatim>
+cvs tag &lt;tag-name&gt;
+</verbatim>
+            This applies the tag to the repository versions indicated by
+            the files in the current directory.  In the most common
+            case, you have just finished preparing the set of files for
+            a release, so all the files in the directory are as you want
+            them to be, and committed.  There's a slight trap here: if
+            there are any files which are <em>not</em> committed, then
+            it is the repository version which corresponds to the
+            modified file which is tagged, not the
+            modified file itself (this is never useful; it is simply a
+            warning to use the <code>tag</code> command only in a
+            fully-committed directory).  If you tag a set of files which
+            are on a branch, then it is (probably unsurprisingly) the
+            branched files which are tagged.</p>
+
+          <p>There is also a <kbd>cvs rtag</kbd> command which is
+            similar, but operates only on the repository.  You won't
+            need to use <code>rtag</code>; don't confuse the two.</p>
+
+        </subsubsect>
+
+        <subsubsect id="tool-cvs-recursion">
+          <subhead>
+            <title>CVS and recursion -- checking out only a subtree</title>
+          </subhead>
+          
+          <p>There are two traps in the way that CVS recurses into
+            subdirectories.  The first is that if a subdirectory is
+            present in the repository but not in your checkout (most
+            commonly because it has been recently added to the repository
+            by someone else), then CVS will not by default add that
+            subdirectory when you do an update, and will give no
+            indication that it is there.  It is not clear to me why this is
+            a sensible default, but it is the case nonetheless.  Only if
+            the <code>-d</code> option is present on the <kbd>cvs
+              update</kbd> command will the `missing' directory
+            appear.</p>
+
+          <p>The other `trap' is that CVS does recurse by default when
+            you do a checkout.  This is almost always the right thing, but
+            it can be inconvenient when you want just the top level of the
+            repository.  If you wanted to check out only the top level, or
+            only the buildsupport tools, then the command <kbd>cvs -d ??? 
+              checkout .</kbd> would not be the right thing, since it would
+            check out the top level and everything underneath it.
+            A better set of commands would be
+            <verbatim>
+cvs -d username@cvs.starlink.ac.uk:/cvs co -l .
+cvs -d username@cvs.starlink.ac.uk:/cvs co buildsupport
+cvs -d username@cvs.starlink.ac.uk:/cvs co thirdparty/fsf
+</verbatim>
+            The first line checks out the top level directory but,
+            because of the <code>-l</code> (`local') flag, does
+            <em>not</em> recurse and check out the complete repository.
+            The following lines check out particular directories,
+            usefully recursing into their children.</p>
+
+        </subsubsect>
+
+      </subsect>
+
     </sect>
 
     <sect id="building" export="export">
@@ -1847,6 +1938,15 @@ STAR_HAVE_FC_OPEN_READONLY
       <p>Only rather few users are concerned with building the entire
         tree, for example for the nightly build: this is dealt with in
         <ref id="bootstrapping"/>.</p>
+
+      <p><strong>Note</strong>: In all cases, you should <em>not</em>
+        have the <code>INSTALL</code> environment variable defined.
+        In old-style Starlink makefiles this indicated the install
+        location; in the new-style build system, this location is
+        indicated by the `prefix' described above abd elsewhere, and
+        the generated Makefiles take the <code>INSTALL</code> variable
+        to be the name of a program to use to perform the actual
+        installation.</p>
 
       <subsect id="top-level-makefile" export="export">
         <subhead>
@@ -1948,7 +2048,7 @@ STAR_HAVE_FC_OPEN_READONLY
           <code>/local/star</code>; explanations follow.
           <verbatim>
 1% cvs -d :ext:username@cvs.starlink.ac.uk:/cvs checkout .
-2% unset STARLINK
+2% unset STARLINK INSTALL
 3% export STARCONF_DEFAULT_STARLINK=/local/star
 4% export STARCONF_DEFAULT_PREFIX=/local/star
 5% rm -Rf /local/star
@@ -1968,23 +2068,24 @@ autoconf  dtask     hdspar  mers     msp      psx       sst   subpar
 </verbatim></p>
 
         <p>Line 1: check out the entire collection from the
-          repository.  A combination of commands like
-          <verbatim>
-% cvs -d :ext:username@cvs.starlink.ac.uk:/cvs checkout -l .
-% cvs -d :ext:username@cvs.starlink.ac.uk:/cvs checkout buildsupport
-</verbatim>
-          would allow you to be more distriminating in what you
-          retrieve, and this may be desirable, since not everything in
-          the repository is controlled by this bootstrapping build,
-          most notably the contents of the <code>java</code> directory.</p>
+          repository.  See <ref id="tool-cvs-recursion"/> for hints on
+          how to be more discriminating, which may be desirable, since
+          not everything in the repository is controlled by this
+          bootstrapping build, most notably the contents of the
+          <code>java</code> directory.</p>
 
-        <p>Lines 2-4: unset the <code>STARLINK</code> variable, and
+        <p>Lines 2-4: unset the <code>STARLINK</code> and
+          <code>INSTALL</code> variables, and
           set the two starconf variables as shown.  For a whole-tree
           build, these two should have the same value, to ensure that
           the build uses only tools and libraries which have been
           built at an earlier point in the build.  For fuller details
           of these variables, and more information about controlling
-          the bootstrapping process, see <ref id="bootstrappingonly"/>.</p>
+          the bootstrapping process, see <ref
+            id="bootstrappingonly"/>.  This example shows sh-style
+          commands for manipulating the environment; you will of
+          course use the csh-style <code>setenv</code> and
+          <code>unsetenv</code> if you're using that shell.</p>
 
         <p>Line 5: the directory where the components are to be
           installed can be empty, and need not exist at the
@@ -2171,11 +2272,8 @@ autoconf (GNU Autoconf) 2.59
           standard autotools will not work.</p>
 
         <p>The most straightforward way of doing this is to make sure
-          you have the required components checked out (<kbd>cvs -d
-            username@cvs.starlink.ac.uk:/cvs 
-          checkout -l .</kbd> plus similar checkouts of
-          <code>buildsupport</code> and <code>thirdparty/fsf</code>
-          should be sufficient), then go to the
+          you have the required components checked out (see <ref
+            id="tool-cvs-recursion"/>), then go to the
           top of the tree and give the command
           <verbatim>
 % ./bootstrap --buildsupport-only
@@ -2324,8 +2422,9 @@ Directory /cvs/libraries/pcs/adam added to the repository
           or RCS repository holding the sources, and in that case you
           should follow the CVS manual's instructions on importing such
           repositories (in the CVS case, just place the new CVS tree in
-          your target repository, and for RCS, use the <kbd>cvs
-            import</kbd> command).</p>
+          your target repository, and for RCS, create the appropriate
+          hierarchy by hand in the CVS repository and place the RCS
+          files there).</p>
 
         <p>Add <em>all</em> of the source files, including files like
           the <code>mk</code> script and the old <code>makefile</code>,
@@ -3186,8 +3285,8 @@ file.f: file.$(FPP_SRC_EXT)
           <p><strong><code>STAR_DECLARE_DEPENDENCIES(type, deplist, [option=''])</code></strong></p>
 
           <p>Declare dependencies of this component.  The
-            <code>TYPE</code> is one of `sourceset', `build', `link'
-            or `use', and the <code>DEPLIST</code> is a space
+            <code>TYPE</code> is one of `sourceset', `build', `link',
+            `use' or `test', and the <code>DEPLIST</code> is a space
             separated list of component names, which this component
             depends on in the given way.
             <ul>
