@@ -98,7 +98,7 @@ if (-e ${file}.sdf) then
 
 # And overlay the bolometer names
 
-   scuover msg_filter=quiet device=xwindows col=white name
+   scuover msg_filter=quiet device=xwindows style='colour(bol)=white' name
 endif
 
 # Remove some of the intermediate files if necessary
