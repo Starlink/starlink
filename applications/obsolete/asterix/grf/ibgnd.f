@@ -169,8 +169,8 @@
 *        last restart (eg. in regions)
             IF ( I_BGM_ON ) THEN
 
-*          Redo the quality
-              CALL IBGND_SETQ( STATUS )
+*          Redefine samples
+              CALL IBGND_SETSAMP( I_BGM_AREA, I_BGM_MEAN, STATUS )
 
 *          Recompute the samples and surface
               CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
@@ -1378,9 +1378,6 @@
         I_BGM_NELM = I_NX*I_NY
       END IF
 
-*  Update quality array
-      CALL IBGND_SETQ( STATUS )
-
 *  Set the sample mode to the whole image, simple mean and compute the samples
       CALL IBGND_SETSAMP( 'WHOLE', 'MEAN', STATUS )
 
@@ -1492,9 +1489,25 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Call internal routine
+*  Call internal routine to set sampling array according to data quality
+*  and sources
       CALL IBGND_SETQ_INT( I_NX, I_NY, %VAL(I_QPTR),
      :                     %VAL(I_BGM_SAMIDX), STATUS )
+
+*  Single sample per image?
+      IF ( I_BGM_AREA(1:3) .EQ. 'WHO' ) THEN
+
+*    The quality routine sets up the sampling array for the single sample case
+
+*  Annular sampling?
+      ELSE IF ( I_BGM_AREA(1:3) .EQ. 'ANN' ) THEN
+
+*    Compute sample index
+        CALL IBGND_SETSAMP_RIDX( I_NX, I_NY, I_BGM_X0, I_BGM_Y0,
+     :                  I_BGM_RBIN, %VAL(I_BGM_SAMIDX), STATUS )
+
+      ELSE IF ( AREA(1:3) .EQ. 'BOX' ) THEN
+      END IF
 
       END
 
@@ -1823,7 +1836,6 @@
 
 *    Trivial case of one sample per image
         I_BGM_NSAMP = 1
-        CALL ARR_INIT1I( 1, I_NX*I_NY, %VAL(I_BGM_SAMIDX), STATUS )
 
       ELSE IF ( AREA(1:3) .EQ. 'ANN' ) THEN
 
@@ -1846,12 +1858,11 @@
         CALL USI_GET0R( 'RBIN', I_BGM_RBIN, STATUS )
         I_BGM_NSAMP =  INT(MAXR / I_BGM_RBIN) + 1
 
-*    Compute sample index
-        CALL IBGND_SETSAMP_RIDX( I_NX, I_NY, I_BGM_X0, I_BGM_Y0,
-     :                  I_BGM_RBIN, %VAL(I_BGM_SAMIDX), STATUS )
-
       ELSE IF ( AREA(1:3) .EQ. 'BOX' ) THEN
       END IF
+
+*  Compute indices
+      CALL IBGND_SETQ( STATUS )
 
 *  Allocate space for information needed per sample
       DO I = 1, I__NSAMATT
@@ -2001,6 +2012,7 @@
       END
 
 
+
       SUBROUTINE IBGND_RECALC( SAMP, SURF, STATUS )
 *+
 *  Name:
@@ -2109,6 +2121,7 @@
 
 *  Compute the samples
       IF ( SAMP ) THEN
+
         CALL IBGND_SAMP_COMP( I_NX, I_NY, %VAL(I_DPTR),
      :                      %VAL(I_BGM_SAMIDX), %VAL(I_BGM_DPTR),
      :                      I_BGM_NSAMP, %VAL(I_BGM_SAMPTR(1)),
