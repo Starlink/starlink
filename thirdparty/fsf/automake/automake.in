@@ -2352,7 +2352,8 @@ sub handle_monoliths
 
   my $seen_global_libobjs = var ('LDADD') && &handle_lib_objects ('', 'LDADD');
 
-  my @all_tasks;
+  # All the .ifc files which are to be generated
+  my @all_ifcs;
 
   # @task_monolith_pairs is a list of task:monolith pairs, so that
   # each installed task .ifc file can be linked with the correct
@@ -2456,6 +2457,10 @@ sub handle_monoliths
             }
         }
 
+      # Set the {compifl} key in %starlink_seen_features, so that
+      # handle_starlink adds the right rules.
+      $starlink_seen_features{compifl} = 1;
+
       # Now handle the list of tasks associated with this monolith.
       # We want to express that: (1) there is a .ifl file for each of
       # the tasks; (2) there is a rule for compiling .ifl to .ifc; (3)
@@ -2465,95 +2470,75 @@ sub handle_monoliths
       my $tasklist = var ($xname . '_TASKS');
       if ($tasklist)
         {
-          # Set the {compifl} key in %starlink_seen_features, so that
-          # handle_starlink adds the right rules.
-          $starlink_seen_features{compifl} = 1;
-
           # Define a variable $xname_IFC which contains the names of
           # each of the .ifc files.  As a side-effect, add each of the
           # .ifl files to the dist_common list.  $resvar is returned
           # as the $xname_IFC variable.
+          my $ntasks = 0;
+          my @ifls;
           my $resvar =
             transform_variable_recursively
                ($xname . '_TASKS', $xname . '_IFC', 'star__ifc', 0, $where,
                # The transform code to run on each filename.
                sub {
                  my ($subvar, $task, $cond, $full_cond) = @_;
+                 ($task ne $xname) || do {
+                   # bad -- there should be no mention of a monolith.ifl file
+                   # Perhaps the user wants to make an ATASK and hasn't
+                   # read the documentation.  Also, we mustn't have
+                   # monolith:monolith in task_monolith_pairs, as that would
+                   # cause the monolith to be linked to itself (bad!).
+                   err_am ("${xname}_TASKS includes monolith name (if you are making an ATASK, simply omit this variable)");
+                 };
                  my @r;
                  push (@r, $task . '.ifc');
-                 push_dist_common ($task . '.ifl');
+                 push (@ifls, $task . '.ifl');
                  push (@task_monolith_pairs, "$task:$xname");
+                 $ntasks++;
                  return @r;
                });
-          push (@all_tasks, $resvar);
+          ($ntasks > 0) || do {
+            err_am ("${xname}_TASKS empty (if you are making an ATASK, simply omit this variable");
+          };
 
-          my @task_names = $tasklist->value_as_list_recursive;
-          # If the list of tasks is non-null, then make the
-          # monolith.ifl file by concatenating the .ifl files of all
-          # the tasks; if it is null, then there must be a
-          # monolith.ifl file present.
-          my $monoifl = $xname . '.ifl';
-          if (@task_names)
-            {
-              my @ifls = map { $_.'.ifl' } @task_names;
-              &pretty_print_rule ($monoifl . ':', "\t\t", @ifls);
-              $output_rules .= "\trm -f \$\@\n";
-              $output_rules .= "\techo 'monolith $xname' >\$\@\n";
-              $output_rules .= makefile_wrap ("\t", "\t\t",
-                                              ('cat', @ifls, '>>$@'));
-              $output_rules .= "\techo 'endmonolith' >>\$\@\n";
-              $output_rules .= "\n";
-            }
-          else
-            {
-              # monolith _TASKS variable has no entries -- we must have a
-              # file $monoifl present, or else the $monoifl must be
-              # listed explicitly in BUILT_SOURCES.  It is not enough
-              # for a rule to be present, since we have no access to
-              # the content or targets of user rules.
-              my $iflok;
-              $iflok = -f $monoifl;
-              if (! $iflok)
-                {
-                  my $builtsources = var('BUILT_SOURCES');
-                  if ($builtsources)
-                    {
-                      foreach my $s ($builtsources->value_as_list_recursive)
-                        {
-                          if ($s eq $monoifl)
-                            {
-                              $iflok = 1;
-                              last;
-                            }
-                        }
-                    }
-                }
-              unless ($iflok)
-                {
-                  err_am ("Variable " . $xname . "_TASKS is null: "
-                          . "file $monoifl should either exist, or be "
-                          . "mentioned explicitly in BUILT_SOURCES");
-                }
-            }
+          push (@all_ifcs, $resvar);
 
-          # Append the <monolith>.ifc file to this $xname_IFC (since
-          # this is a make target, it doesn't matter if it's (accidentally)
-          # there already.
-          Automake::Variable::define ($xname . '_IFC', VAR_MAKEFILE,
-                                      '+', TRUE, # append in all conditions
-                                      $xname . '.ifc',
-                                      '', INTERNAL, VAR_ASIS);
-          # Do NOT add $xname:$xname to @task_monolith_pairs, since
-          # this would cause the monolith to be linked to itself (bad).
+          &pretty_print_rule ($xname . '.ifl:', "\t\t", @ifls);
+          $output_rules .= "\trm -f \$\@\n";
+          $output_rules .= "\techo 'monolith $xname' >\$\@\n";
+          $output_rules .= makefile_wrap ("\t", "\t\t",
+                                          ('cat', @ifls, '>>$@'));
+          $output_rules .= "\techo 'endmonolith' >>\$\@\n";
+          $output_rules .= "\n";
+
+          # distribute all task ifls, but not the monolith ifl,
+          # which is generated (using the rule above) at build time
+          push_dist_common (@ifls);
         }
       else 
         {
-          err_am "$xname declared as a _MONOLITH, but there is no ${xname}_TASKS variable";
+          # That's OK -- we're building an ATASK.
+          # Distribute the monolith .ifl
+          push_dist_common ($xname . '.ifl');
         }
+
+      # Declare that the monolith .ifc file is a dependency of the
+      # monolith.  This may be generated or (more commonly if this is an
+      # ATASK) it will exist already.  Add this to the monolith
+      # dependencies variable (am I misusing this variable?)
+      my $monoifc = $xname . '.ifc';
+      push (@all_ifcs, $monoifc); # include this in the full list of ifc files
+
+      my $gotdeps = var ($xname . '_DEPENDENCIES');
+      Automake::Variable::define ($xname . '_DEPENDENCIES', VAR_MAKEFILE,
+                                  ($gotdeps ? '+' : ''), TRUE,
+                                  $monoifc,
+                                  '', INTERNAL, VAR_ASIS);
+      set_seen ($xname . '_DEPENDENCIES');
     }
 
   Automake::Variable::define ('bin_MONOLITH_IFCS', VAR_AUTOMAKE, '', TRUE,
-                              "@all_tasks",
+                              "@all_ifcs",
                               '', INTERNAL, VAR_PRETTY);
   # These .ifc files should be built at 'make all' time
   push (@all, '$(bin_MONOLITH_IFCS)');
@@ -4296,6 +4281,8 @@ sub handle_messgen
                            'include',
                            'noinst');
 
+  return if ! @r;
+
   $starlink_seen_features{messgen} || do {
     err_am("have _MESSAGES primary, but no STAR_MESSGEN in configure.ac");
   };
@@ -4415,6 +4402,11 @@ sub handle_messgen
       $clean_files{$facfile}  = MAINTAINER_CLEAN;
     }
 
+  # The analogous INSTALL_HEADER is defined in lib/header-vars.am,
+  # but it seems neater to define this here.
+  Automake::Variable::define ('INSTALL_MESSAGE', VAR_AUTOMAKE, '', TRUE,
+                              '$(INSTALL_DATA)',
+                              '', INTERNAL, VAR_PRETTY);
 }
   
 
