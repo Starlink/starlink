@@ -1,0 +1,287 @@
+\documentstyle{article}
+\pagestyle{myheadings}
+
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\renewcommand{\_}{{\tt\char'137}}
+
+\begin{document}
+%+
+%  Name:
+%     LAYOUT.TEX
+
+%  Purpose:
+%     Define Latex commands for laying out documentation produced by PROLAT.
+
+%  Language:
+%     Latex
+
+%  Type of Module:
+%     Data file for use by the PROLAT application.
+
+%  Description:
+%     This file defines Latex commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by Latex. The
+%     contents of this file should be included in the source presented to
+%     Latex in front of any output from PROLAT. By default, this is done
+%     automatically by PROLAT.
+
+%  Notes:
+%     The definitions in this file should be included explicitly in any file
+%     which requires them. The \include directive should not be used, as it
+%     may not then be possible to process the resulting document with Latex
+%     at a later date if changes to this definitions file become necessary.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     10-DEC-1991 (RFWS):
+%        Refer to font files in lower case for UNIX compatibility.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a \tt font of the required size.
+\font\ssttt=cmtt10 scaled 1095
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  End of LAYOUT.TEX layout definitions.
+%.
+\newpage
+\sstroutine{
+   DA2NDF
+}{
+   Converts a direct-access unformatted file to an NDF
+}{
+   \sstdescription{
+      This application converts a direct-access (fixed-length records)
+      unformatted file to an NDF.  It can therefore also process
+      unformatted data files generated by C routines.  Only one of the
+      array components may be created from the input file.   The shape
+      of the NDF has be to be supplied.
+   }
+   \sstusage{
+      da2ndf in out [comp] noperec shape [type]
+   }
+   \sstparameters{
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The NDF component to be copied.  It may be {\tt "Data"},
+         {\tt "Quality"}
+         or {\tt "Variance"}.  To create a variance or quality array the NDF
+         must already exist. {\tt ["Data"]}
+      }
+      \sstsubsection{
+         IN = FILENAME (Read)
+      }{
+         Name of the input direct-access unformatted file.
+      }
+      \sstsubsection{
+         NOPEREC = \_INTEGER (Read)
+      }{
+         The number of data values per record of the input file.  It
+         must be positive.  The suggested default is the size of the
+         first dimension of the array.  A null ({\tt !}) value for NOPEREC
+         causes the size of first dimension to be used.
+      }
+      \sstsubsection{
+         OUT = NDF (Read and Write)
+      }{
+         Output NDF data structure.  When COMP is not {\tt "Data"} the NDF
+         is modified rather than a new NDF created.  It becomes the new
+         current NDF.  Unusually for an output NDF, there is a suggested
+         default---the current value---to facilitate the inclusion of
+         variance and quality arrays.
+      }
+      \sstsubsection{
+         SHAPE = \_INTEGER (Read)
+      }{
+         The shape of the NDF to be created.  For example, {\tt [40,30,20]}
+         would create 40 columns by 30 lines by 10 bands.
+      }
+      \sstsubsection{
+         TYPE = LITERAL (Read)
+      }{
+         The data type of the direct-access file and the NDF.  It must
+         be one of the following HDS types: {\tt "\_BYTE"}, {\tt"\_WORD"},
+         {\tt "\_REAL"}, {\tt "\_INTEGER"}, {\tt "\_DOUBLE"},
+         {\tt "\_UBYTE"}, {\tt "\_UWORD"} corresponding to
+         signed byte, signed word, real, integer, double precision,
+         unsigned byte, and unsigned word respectively.  See SUN/92 for
+         further details.  An unambiguous abbreviation may be given.
+         TYPE is ignored when COMP = {\tt "Quality"} since the QUALITY
+         component must comprise unsigned bytes (equivalent to TYPE =
+         {\tt "\_UBYTE"}) to be a valid NDF. The suggested default is the
+         current value. {\tt ["\_REAL"]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         da2ndf ngc253.dat ngc253 shape=[100,60] noperec=8
+      }{
+         This copies a data array from the direct-access file {\tt ngc253.dat}
+         to the NDF called ngc253.  The NDF is two-dimensional: 100
+         elements in $x$ by 60 in $y$.  Its data array has type \_REAL.  The
+         data records each have 8 real values.
+      }
+      \sstexamplesubsection{
+         da2ndf ngc253q.dat ngc253 q 100 [100,60]
+      }{
+         This copies a quality array from the direct-access file
+         {\tt ngc253q.dat} to an existing NDF called ngc253 (such as created
+         in the first example).  The NDF is two-dimensional: 100
+         elements in $x$ by 60 in $y$.  Its data array has type \_UBYTE.
+         The data records each have 100 unsigned-byte values.
+      }
+      \sstexamplesubsection{
+         da2ndf type="\_uword" in=ngc253.dat out=ngc253 $\backslash$
+      }{
+         This copies a data array from the direct-access file
+         {\tt ngc253.dat}
+         to the NDF called ngc253.  The NDF has the current shape and
+         data type is unsigned word.  The current number of values per
+         record is used.
+      }
+   }
+   \sstnotes{
+      The details of the conversion are as follows:
+      \sstitemlist{
+
+         \sstitem
+            the direct-access file{\tt '}s array is written to the NDF array
+            as selected by COMP.  When the NDF is being modified, the
+            shape of the new component must match that of the NDF.  This
+            enables more than one array (input file) to be used to form an
+            NDF.  Note that the data array must be created first to make a
+            valid NDF.  Indeed the application prevents you from doing
+            otherwise.
+
+         \sstitem
+            Other data items such as axes are not supported, because of
+            the direct-access file{\tt '}s simple structure.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: NDF2DA.
+   }
+}
+\end{document}

@@ -1,0 +1,85 @@
+## DA2NDF - Converts a direct-access unformatted file to an NDF.
+
+#+
+#  Name:
+#     DA2NDF.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1996 October 19 (MJC):
+#	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface DA2NDF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      COMP           # Data, quality or variance?
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Array component to copy from the unformatted file'
+      helpkey     '*'
+#     in          'Data', 'Quality', 'Variance'
+      default     'Data'
+   endparameter
+
+   parameter      IN             # Input direct-aceess unformatted file
+      position    1
+      type        'FILENAME'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Direct-access unformatted file'
+      helpkey     '*'
+   endparameter
+
+   parameter      NOPEREC        # Number of values per input record
+      position    4
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'DYNAMIC'
+      prompt      'Number of data values per unformatted record'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output NDF
+      position    2
+      type        'NDF'
+      access      'UPDATE'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF data structure'
+      helpkey     '*'
+   endparameter
+
+   parameter      SHAPE          # Shape of the output NDF
+      position    5
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Shape of the output NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter      TYPE           # Output data type
+      position    6
+      type        'LITERAL'
+      vpath       'DYNAMIC'
+      ppath       'CURRENT,DYNAMIC'
+      default     'R'
+      prompt      'NDF data type required'
+      helpkey     '*'
+   endparameter
+
+endinterface
