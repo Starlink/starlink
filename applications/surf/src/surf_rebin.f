@@ -119,10 +119,6 @@
 *     SHIFT_DY = REAL (Read)
 *        The pointing shift (in Y) to be applied that would bring the
 *        maps in line. This is a shift in the output coordinate frame.
-*     USE_SECTION = LOGICAL (Read)
-*        If you wish to discard the data specified by the SCUBA Section
-*        then select 'no'. If you wish to rebin a map using only
-*        the specified section select 'yes'.
 *     WEIGHT = REAL (Read)
 *        The relative weight that should be assigned to each dataset.
 
@@ -155,13 +151,16 @@
 
 *     The REF and IN parameters accept ASCII text files as input. These
 *     text files may contain comments (signified by a #), NDF names,
-*     values for the parameters WEIGHT, SHIFT_DX, SHIFT_DY and USE_SECTION,
+*     values for the parameters WEIGHT, SHIFT_DX and SHIFT_DY,
 *     and names of other ASCII files. There is one data file per line.
-*     An example entry is:
+*     An example file is:
 *    
-*         file1{b5}   1.0   0.5   0.0  YES
-*         # This is file2
-*         file2       0.9   0.0   0.0  # No section needed
+*         file1{b5}   1.0   0.5   0.0  # Read bolometer 5 from file1.sdf
+*         file2                        # Read file 2 but you will still be
+*                                      # prompted fro WEIGHT, and shifts.
+*         file3{i3}-  1.0   0.0   0.0  # Use everything except int 3
+*         test.bat                     # Read in another text file
+
 *
 *     Note that the parameters are position dependent and are not necessary.
 *     Missing parameters are requested. This means it is not possible to
@@ -182,6 +181,11 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.37  1997/06/27 23:31:05  timj
+*     Change to support '-' negation of sections.
+*     Support passing of WAVELENGTH to WRITE_MAP_INFO.
+*     Fix bug causing maximum of 15 characters for HDS names.
+*
 *     Revision 1.36  1997/06/12 23:53:28  timj
 *     Change name to SURF (and calls to SURF_)
 *     Update documentation
@@ -372,6 +376,7 @@ c
       INTEGER          FILE            ! number of input files read
       CHARACTER*40     FILENAME (MAX_FILE)
                                        ! names of input files read
+      CHARACTER*(DAT__SZNAM) HDSNAME   ! Name of the container (not the fname)
       INTEGER          HMSF (4)        ! holds converted angle information from
                                        ! SLA routine
       LOGICAL          HOURS           ! .TRUE. if the angle being read in is
@@ -451,7 +456,6 @@ c
       INTEGER          OUT_WEIGHT_NDF  ! NDF identifier for weight array
       INTEGER          OUT_WEIGHT_PTR  ! Pointer to mapped weights array
       REAL             PARS(3)         ! Dummy array of parameter values
-      LOGICAL          PAR4            ! 4th dummy parameter fro SURF_RECURSE
       CHARACTER * (PAR__SZNAM) PARAM   ! Name of input parameter
       INTEGER          PLACE           ! Place holder for output NDF
       LOGICAL          READING         ! .TRUE. while reading input files
@@ -673,7 +677,7 @@ c
      :           BOL_DEC_END, IN_DATA_PTR, IN_DATA_END, 
      :           IN_VARIANCE_PTR, IN_VARIANCE_END,
      :           INT_LIST, WEIGHT, SHIFT_DX, 
-     :           SHIFT_DY, NPARS, PARS, PAR4,
+     :           SHIFT_DY, NPARS, PARS,
      :           STATUS)
 
 *     Check error return
@@ -960,7 +964,10 @@ c
 *  create the output file that will contain the reduced data in NDFs
  
          CALL PAR_GET0C ('OUT', OUT, STATUS)
-         CALL HDS_NEW (OUT, OUT, 'SURF_BOLMAPS', 0, 0, OUT_LOC, STATUS)
+
+         HDSNAME = OUT(1:DAT__SZNAM)
+         CALL HDS_NEW (OUT, HDSNAME, 'SURF_BOLMAPS', 0, 0, OUT_LOC, 
+     :        STATUS)
 
       END IF
 
@@ -1280,7 +1287,7 @@ c
                   CALL SURF_WRITE_MAP_INFO (OUT_NDF, OUT_COORDS, 
      :                 OUT_TITLE, MJD_STANDARD, FILE, FILENAME, 
      :                 OUT_LONG, OUT_LAT, OUT_PIXEL, I_CENTRE, J_CENTRE, 
-     :                 NX_OUT, NY_OUT, STATUS )
+     :                 NX_OUT, NY_OUT, WAVELENGTH, STATUS )
                   
 *     Tidy up each loop
 
