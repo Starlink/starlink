@@ -113,7 +113,7 @@
  20   FORMAT( I2.2, ':', I2.2, ':', I2.2 )
 
 *  Write strings
-      CALL SLA_DJCAL( MJD, IY, IM, ID, FD, JSTAT )
+      CALL SLA_DJCL( MJD, IY, IM, ID, FD, JSTAT )
       WRITE( DSTR, 10, IOSTAT=JSTAT ) ID, IM, IY
       CALL SLA_DD2TF( 0, FD, SIGN, IHMSF )
       WRITE( TSTR, 20, IOSTAT=JSTAT ) IHMSF(1), IHMSF(2), IHMSF(3)
