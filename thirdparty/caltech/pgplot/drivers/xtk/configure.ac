@@ -45,7 +45,7 @@ AC_ARG_WITH([tk],
 AC_CHECK_HEADER([tk.h], set have_tkheader = "yes" ) 
 AC_CHECK_LIB(tk, Tk_DisplayName, set have_tklib = "yes" )
 AM_CONDITIONAL( HAVE_TK, \
-   [test "$have_tkheader" = "yes" && test "$test_tklib" = "yes"] )
+   [test "$have_tkheader" = "yes" && test "$have_tklib" = "yes"] )
      
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot

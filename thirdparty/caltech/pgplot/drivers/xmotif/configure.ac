@@ -45,7 +45,7 @@ AC_ARG_WITH([motif],
 AC_CHECK_HEADER([Xm/XmP.h], set have_xmheader = "yes" ) 
 AC_CHECK_LIB(Xm, xmp_PrependWidget, set have_xmlib = "yes" )
 AM_CONDITIONAL( HAVE_XMOTIF, \
-   [test "$have_xmheader" = "yes" && test "$test_xmlib" = "yes"] )
+   [test "$have_xmheader" = "yes" && test "$have_xmlib" = "yes"] )
      
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
