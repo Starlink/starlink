@@ -1,0 +1,199 @@
+.main
+
+                  TCL/GWM image display & plotting widget
+                  ---------------------------------------
+
+  This is the STARTCL TCL/GWM image display and plotting widget.  It is
+  designed to be used instead of the ordinary GWM `xwindows' X-display window
+  normally used with GKS or PGPLOT, and has several features that the older
+  system doesn't.
+
+  The Buttons along the bottom of the widget will select or toggle the new
+  features:
+
+    Exit:    Press this and the widget will exit.
+
+    Colours: Displays a dialog box which allows you to manipulate the colours
+             on the plotting surface of the widget, including the foreground,
+             background, overlay and crosshair cursor. 
+
+    Clear:   Wipes the plotting surface clean.
+
+    Capture: Displays a dialog box which allows you to dump the current plot
+             to a JPEG file.
+
+    Print:   Displays a dialog box which allows you to dump the current plot
+             to a print file in a number of formats, including PostScript.
+
+
+    Help:    Displays this help text.
+
+.print
+
+ TCL/GWM widget `Gwm Print' (Print) Help
+ ---------------------------------------
+
+  This the help for the `Gwm Print' dialog box.  You get to the 
+  `Gwm Print' screen by selecting `Print' from the main widget.
+
+  The `Gwm Print' dialog allows you to create a print file in a specified
+  format with a chosen filename.   The file can be printed later on an 
+  appropriate printer.
+
+    Menu:
+
+      Format:
+        The format menu gives a choice of various print formats:  
+        B/W (greyscale) and colour PostScript,  B/W (greyscale) and 
+        colour Encapsulated PostScript, and HP InkJet.
+
+    Checkbuttons:
+
+      As Window: / Colour:
+        The two checkbuttons control the background colour of the image
+        as printed.  You can chose either the background colour of the
+        image on the plotting surface, or define the colour yourself
+        using the `Colour:' checkbutton, and selecting the required colour
+        in the entry window below.  White is the default colour.
+
+    Entry:
+
+      Filename:
+        You can choose the filename to which the print image is dumped.
+        There is no default file extension for any of the Formats - 
+        you have complete control of the full filename.  The convention
+        is that standard PostScript files are given a `.ps' extension and
+        Encapsulated PostScript files are given a `.eps' extension.  HP
+        InkJet dump files may be given a `.dat' extension.
+
+    Buttons:
+
+      OK:
+        Closes the `Gwm Print' dialogue box.
+
+      Cancel:
+        Exits from the `Gwm Print' dialog box without creating a print
+        file.
+
+      Help:
+        Displays this help text.
+
+  To create a print file, select a format, background colour and filename,
+  then select the `OK' button.  The dump will be started  and the control 
+  returned to the `TCL/GWM' widget.  While the print is being captured,
+  the `Capture' and `Print' buttons on the `TCL/GWM' widget are greyed out,
+  indicating that the functions are unavailable.  When the print capture 
+  and dump has completed, the buttons return to normal and it is then OK 
+  to send more plotting commands to the widget.
+
+.colour
+
+ TCL/GWM widget `Gwm Colours' (Colours) Help
+ -------------------------------------------
+
+  This the help for the `Gwm Colours' dialog box.  You get to the 
+  `Gwm Colours' screen by selecting `Colours' from the main widget.
+
+  The `Gwm Colours' dialog box provides a mechanism to allow you to alter the 
+  colours on the plotting surface.  You can change the colours using the Red,
+  Green and Blue sliders, and you can select which `colour' or pixel value to
+  alter by selecting the appropriate button.
+
+    Checkbuttons: 
+
+      Background: 
+        Colour (pixel value) 0 - this is the background colour of the 
+        plotting surface.
+
+      Foreground:
+        Colour (pixel value) 1 - this is the foreground colour of the 
+        plotting surface.
+  
+      Other:
+        This option toggles the `Pixel value' slider which enables you to
+        select any of the `Colours' or pixels to change, including 0 
+        (background), 1 (foreground) and the overlay (if you have one
+        enabled).
+
+      Overlay:
+        If you have generated a TCL/GWM widget with an overlay for plotting
+        contours on an image, you can change the colour used for the overlay
+        by selecting the `Overlay' button.
+
+      Crosshair:
+        This button allows you to modify the colour used to display the
+        crosshair cursor.  You don't have to have the crosshair cursor
+        enabled to set the colour.
+
+    Buttons:
+
+      OK:
+        Closes the `Gwm Colour' dialogue box.
+
+      Help:
+        Displays this help text.
+
+    Sliders:
+
+      Pixel value: 
+        When you have the `Other' button selected, this slider selects 
+        which `Colour' or pixel value is to be modified.
+
+      Red, Green, Blue: 
+        These control the intensity of the red, green and blue colour for 
+        any given `Colour' (pixel) previously selected.  
+
+  The `Gwm Colours' dialog box can be left on screen while plots are being
+  made to the TCL/GWM widget.
+
+.capture
+
+ TCL/GWM widget `Gwm JPEG' (Capture) Help
+ ----------------------------------------
+
+  This the help for the `Gwm JPEG' dialog box.  You get to the 
+  `Gwm JPEG' screen by selecting `Capture' from the main widget.
+
+  The `Gwm JPEG' box allows you to dump the plot currently on the plotting 
+  surface to a named JPEG file.  You can also select the image quality.
+
+    Slider:
+
+      Image quality: 
+        Selects the quality of the image produced in the JPEG compression.  
+        You can vary the quality from 50% to 95% with 95% being the highest
+        quality and therefore largest file.
+
+    Checkbutton:
+
+      Progressive: 
+        A `progressive' image is an image that, when loaded by a JPEG 
+        viewing program, will be displayed in increasing quality as the 
+        viewer program reads more of the file.  This is the option to 
+        select if the JPEG image is to be used on the World Wide Web.
+
+    Entry:
+ 
+      Filename: You should type in the name of the file you want to dump 
+        into, including the file extension if you want one.  JPEG files
+        traditionally have the extension `.jpg' but this widget does NOT 
+        supply any default extension.
+
+    Buttons:
+
+      OK:
+        Start the dump.  When the dump is complete, the `Gwm JPEG' dialog box
+        exits and control is returned to the GWM/TCL widget.
+
+      Cancel:
+        Abandons the `Gwm JPEG' dialog without dumping to file.
+
+      Help:
+        Displays this help text.
+
+  The `Filename' is the only box you must fill in, there is no default file
+  name for the dump.
+
+  When you have chosen and entered a filename, select the `OK' button to
+  capture the plot and complete the dump to JPEG file.
+

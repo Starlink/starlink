@@ -1,0 +1,29 @@
+#+
+# This is a simple test of the adam tcl/tk extension. It just execs another
+# tclsh script and exchanges some adam messages with it.
+#-
+lappend auto_path .
+adam_start test
+for {set i 0} {$i<10} {incr i} {
+    if {[adam_path test2] == 1} break
+    exec sleep 1
+}
+adam_send test2 "" obey ""
+for {} {1} {} {
+    set message [adam_receive]
+    switch [lindex $message 0] {
+	actstart
+	{
+	    puts "actstart received"
+	}
+	endmsg
+	{
+	    puts "actcomplete received: test successful"
+	    break
+	}
+	inform
+	{
+	    puts "inform received \"[lindex $message 6]\""
+	}
+    }
+}

@@ -1,0 +1,479 @@
+#!/bin/sh
+# the next line restarts using wish \
+exec wish "$0" "$@"
+
+#+
+# This script is a simple testbed for loading adam tasks and sending them
+# messages of various sorts.
+#-
+
+# Add the location of the startcl library files to the auto load path.
+    lappend auto_path .
+
+# Build the menu bar and menus.
+    set f [frame .menubar -relief raised -bd 2]
+    pack $f -fill x
+    set file [menubutton $f.file -text File -menu $f.file.menu -underline 0]
+    set Task [
+	menubutton $f.task -text Task -menu $f.task.menu -state disabled \
+	    -underline 0
+    ]
+    set FileMenu [menu $file.menu]
+    set TaskMenu [menu $Task.menu]
+
+# Add menu items to file menu.
+    $FileMenu add command -label "Load task..." -command loadTask \
+	-underline 0
+    $FileMenu add command -label "Attach to task..." -command attachTask \
+	-underline 0
+    $FileMenu add command -label "Kill current task" -command killTask \
+	-state disabled -underline 0
+    $FileMenu add command -label Exit -command "shutdown" -underline 1
+    pack $file $Task -side left
+
+#  Create buttons for sending message to tasks.
+    set frame [frame .f6]
+
+    set Set [button $frame.set -text Set -width 6 -command {
+	$CurrentTask set [$Parameter get] [$Value get] \
+	    -inform "showMessage %T %V"
+    } -state disabled]
+
+    set Get [button $frame.get -text Get -width 6 -command {
+	$CurrentTask get [$Parameter get] \
+	    -getresponse {showParam %T %N %V %S} \
+	    -inform "showMessage %T %V"
+    } -state disabled]
+
+    set Obey [button $frame.obey -text Obey -width 6 -command {
+	$CurrentTask obey [$Action get] [$Arguments get] -paramreq \
+	    {prompt %T %R %n %p %d} -inform "showMessage %T %V" \
+	    -endmsg {obeyFinish %T %N %S}
+    } -state disabled]
+
+    set Cancel [button $frame.cancel -text Cancel -width 6 -command {
+	$CurrentTask cancel [$Action get] [$Arguments get] -paramreq \
+	{prompt %T %R %n %p %d} -inform "showMessage %T %V"
+    } -state disabled]
+
+    set Control [button $frame.control -text Control -width 6 -command {
+	$CurrentTask control [$Action get] [$Arguments get] -inform \
+	"showMessage %T %V"
+    } -state disabled]
+
+    pack $frame -fill x -expand yes -side bottom
+    pack $Set $Get $Obey $Cancel $Control -padx 10 -pady 5 -fill x -side left \
+	-expand yes
+
+# Create widgets for entering action name, parameters, etc.
+    set frame [frame .f1 -bd 5]
+    set label [label $frame.l -text Action: -width 10 -anchor e]
+    set Action [entry $frame.action -relief sunken -bd 2]
+    pack $frame -expand y -fill x
+    pack $label -side left
+    pack $Action -side left -fill x -expand yes
+
+    set frame [frame .f2 -bd 5]
+    set label [label $frame.l -text Arguments: -width 10 -anchor e]
+    set Arguments [entry $frame.arguments -relief sunken -bd 2]
+    pack $frame -expand y -fill x
+    pack $label -side left
+    pack $Arguments -side left -fill x -expand yes
+
+    set frame [frame .f3 -bd 5]
+    set label [label $frame.l -text Parameter: -width 10 -anchor e]
+    set Parameter [entry $frame.parameter -relief sunken -bd 2]
+    pack $frame -expand y -fill x
+    pack $label -side left
+    pack $Parameter -side left -fill x -expand yes
+
+    set frame [frame .f4 -bd 5]
+    set label [label $frame.l -text Value: -width 10 -anchor e]
+    set Value [entry $frame.value -relief sunken -bd 2]
+    pack $frame -expand y -fill x
+    pack $label -side left
+    pack $Value -side left -fill x -expand yes
+
+# Bind the return key in each entry widget to activation of the appropriate
+# command button.
+    bind $Action <Return> "$Obey invoke"
+    bind $Arguments <Return> "$Obey invoke"
+    bind $Parameter <Return> "$Get invoke"
+    bind $Value <Return> "$Set invoke"
+
+# Create scrolling region for output. The width of the text widget is set to
+# zero so that it expands to width of the top panel when it is packed.
+    set frame [frame .f5]
+
+# Frame for vertical scroll bar.
+    set vframe [frame $frame.vframe]
+    pack $vframe -side right -fill y
+
+# Pack a scroll bar into the frame, find its width and unpack it again.
+    set yscrollbar [
+        scrollbar $vframe.yscrollbar -orient vertical -relief sunken -bd 2
+    ]
+    pack $yscrollbar -side right 
+    set sw [$yscrollbar cget -width]
+    pack forget $yscrollbar
+
+# Put a frame widget at the bottom of the frame to fill the corner so that
+# the scroll bars don't overlap.
+    set dummy [
+	frame $vframe.dummy -width [expr $sw+4] -height [expr $sw+8]
+    ]
+    pack $dummy -side bottom
+
+
+# Re-pack the vertical scroll bar.
+    pack $yscrollbar -side right -fill y
+
+# Create and pack the horizontal scroll bar.
+    set xscrollbar [
+        scrollbar $frame.scrollbar -orient horizontal -relief sunken -bd 2
+    ]
+
+    set Output [
+        text $frame.text -state disabled -relief sunken -wrap none\
+        -width 0 -height 12
+    ]
+    pack $frame -fill both -expand yes
+    $yscrollbar configure -command "$Output yview"
+    $xscrollbar configure -command "$Output xview"
+    $Output configure -yscroll "$yscrollbar set"
+    $Output configure -xscroll "$xscrollbar set"
+
+    pack $yscrollbar -side right -fill y
+    pack $xscrollbar -side bottom -fill x -expand yes
+    pack $Output -side bottom -fill both -expand yes
+
+# Create a tag for underlining the task name.
+    $Output tag configure taskname -underline yes
+    $Output tag configure alert -foreground red
+
+# Trace changes to the current task in order to enable or disable controls
+# according to whether there are any tasks loaded.
+    trace variable CurrentTask w setState
+
+# Initialise the list of known tasks
+    set TaskList {}
+
+# Disable adjustment of the main window size.
+    update
+    wm maxsize . [winfo width .] [winfo height .]
+    wm minsize . [winfo width .] [winfo height .]
+    wm title . Adamtest
+
+
+proc loadTask {} {
+#+
+# Displays a dialog box for inputing the task name and file name and
+# creates the task.
+#-
+    set mframe [dialogStart .load "Load Task" 0 OK Cancel]
+    pack $mframe
+
+# Widget for entering the task name.
+    set frame [frame $mframe.f1]
+    pack $frame
+    set label [label $frame.label -bd 5 -text "Task name:" -width 10 -anchor e]
+    global NameEntry
+    set NameEntry [entry $frame.entry -bd 2 -relief sunken]
+    pack $label $NameEntry -side left
+
+# Widget for entering the task file name.
+    set frame [frame $mframe.f2]
+    pack $frame
+    set label [label $frame.label -bd 5 -text "File name:" -width 10 -anchor e]
+    global FileEntry
+    set FileEntry [entry $frame.entry -bd 2 -relief sunken]
+    pack $label $FileEntry -side left
+
+# Show the dialog box.
+    dialogShow .load $NameEntry loadOk
+    destroy .load
+}
+
+proc loadOk {button} {
+#+
+# This procedure is called when one of the buttons in the task load
+# dialog box is pressed and loads the requested task.
+#-
+   set title "Task Load Error"
+
+# Button 0 is the OK button.
+   if {$button == 0} {
+
+#    Check that the task name is reasonable.
+	global NameEntry
+	set name [string trim [$NameEntry get]]
+	if {$name == ""} {
+	    tk_dialog .loadError $title "You must specify a task name" \
+		error 0 OK
+	    return 1
+	}
+	global TaskList
+	if {[lsearch -exact $TaskList $name] != -1} {
+	    tk_dialog .loadError $title \
+		"The task name \"$name\" is already in use" error 0 OK
+	    return 1
+	}
+
+#    Check that the file name is reasonable.
+	global FileEntry
+	set file [string trim [$FileEntry get]]
+	if {$file == ""} {
+	    tk_dialog .loadError $title "You must specify a file name" \
+		error 0 OK
+	    return 1
+	}
+
+#    Try loading the task.
+	set taskload [list adamtask $name $file]
+	if {[catch $taskload error] != 0} {
+	    tk_dialog .loadError $title $error error 0 OK
+	    return 1
+	}
+
+# Poll for the task to attach to the message system.
+	set count 0
+	while {[$name path] == 0} {
+	    after 100
+	    incr count
+	    if {$count > 100} {
+	        tk_dialog .loadError $title \
+		    "Timed out waiting for task \"$name\" to start" error 0 OK
+		$name kill
+	        return 1
+	    }
+	}
+
+#    Success. Add the new task to the task list and make it the current
+#    task.
+	global TaskMenu
+	$TaskMenu add command -label $name -command "set CurrentTask \{$name\}"
+	global TaskList
+	lappend TaskList $name
+	global CurrentTask
+	set CurrentTask $name
+	return 0
+   } {
+
+#    The Cancel button was pressed.
+	return 0
+   }
+}
+
+proc attachTask {} {
+#+
+# Displays a dialog box for inputing the task name and attaches to the task.
+#-
+    set mframe [dialogStart .attach "Attach Task" 0 OK Cancel]
+    pack $mframe
+
+# Widget for entering the task name.
+    set frame [frame $mframe.f1]
+    pack $frame
+    set label [label $frame.label -bd 5 -text "Task name:" -width 10 -anchor e]
+    global NameEntry
+    set NameEntry [entry $frame.entry -bd 2 -relief sunken]
+    pack $label $NameEntry -side left
+
+# Show the dialog box.
+    dialogShow .attach $NameEntry attachOk
+    destroy .attach
+}
+
+proc attachOk {button} {
+#+
+# This procedure is called when one of the buttons in the task load
+# dialog box is pressed and loads the requested task.
+#-
+   set title "Task Attach Error"
+
+# Button 0 is the OK button.
+   if {$button == 0} {
+
+#    Check that the task name is reasonable.
+	global NameEntry
+	set name [string trim [$NameEntry get]]
+	if {$name == ""} {
+	    tk_dialog .loadError $title "You must specify a task name" \
+		error 0 OK
+	    return 1
+	}
+	global TaskList
+	if {[lsearch -exact $TaskList $name] != -1} {
+	    tk_dialog .loadError $title \
+		"The task name \"$name\" is already in use" error 0 OK
+	    return 1
+	}
+
+#    Try getting a path to the task.
+	adamtask $name
+	if {[$name path] == 0} {
+	    tk_dialog .loadError $title \
+	        "Task \"$name\" does not exist" error 0 OK
+		$name kill
+	    return 1
+	}
+
+#    Success. Add the new task to the task list and make it the current
+	global TaskMenu
+	$TaskMenu add command -label $name -command "set CurrentTask \{$name\}"
+	global TaskList
+	lappend TaskList $name
+	global CurrentTask
+	set CurrentTask $name
+	return 0
+   } {
+
+#    The Cancel button was pressed.
+	return 0
+   }
+}
+
+proc killTask {} {
+#+
+# Kills the current task
+#-
+
+# Kill the task.
+    global CurrentTask
+    $CurrentTask kill
+
+# Remove it from the task menu and task list.
+    global TaskMenu
+    $TaskMenu delete $CurrentTask $CurrentTask
+    global TaskList
+    set i [lsearch -exact $TaskList $CurrentTask]
+    set TaskList [lreplace $TaskList $i $i]
+
+# Set the current task to "none"
+    set CurrentTask ""
+}
+
+proc shutdown {} {
+#+
+#  Asks the user whether each known task should be killed or not and then
+#  exits.
+#-
+    global TaskList
+    global CurrentTask
+    foreach task $TaskList {
+	set reply [tk_dialog .kill "kill confirmation" "kill $task ?" \
+	    questhead 0 Yes No]
+        switch $reply {
+	    0 {
+		set CurrentTask $task
+		killTask
+	    }
+	    1 {$task forget}
+	}
+    }
+    exit
+}
+
+
+proc prompt {task reptok param string default} {
+#+
+# Handles a prompt request from a task.
+#-
+
+# Create dialog box to display the prompt an receive the user's reply.
+    set main [dialogStart .${task}_prompt Prompt 0 OK]
+
+# Create the dialog box layout.
+    label $main.label -bd 5 -text \
+	"$task requires a value for $param"
+    label $main.prompt -text $string -bd 5
+    entry $main.entry -bd 2 -relief sunken
+    $main.entry insert end $default
+    pack $main.label
+    pack $main.prompt $main.entry -side left
+
+# Show the dialog.
+    dialogShow .${task}_prompt $main.entry
+    $task paramreply $reptok [$main.entry get]
+    destroy .${task}_prompt
+}
+
+proc showParam {task param value status} {
+#+
+# Displays the result of a parameter GET in the parameter value entry widget.
+#-
+    global Value
+    $Value delete 0 end
+    if {[lindex $status 0] == "SAI__OK" } {
+	$Value insert end $value
+    }
+}
+
+proc setState {name element op} {
+#+
+# Called whenever the current task changes and disables/enables the widgets
+# that only make sense when there is a current task.
+#-
+    global CurrentTask
+    global Get
+    global Set
+    global Obey
+    global Cancel
+    global Control
+    global FileMenu
+    global Task
+    if {$CurrentTask==""} {
+	$Set configure -state disabled
+	$Get configure -state disabled
+	$Obey configure -state disabled
+	$Cancel configure -state disabled
+	$Control configure -state disabled
+	$FileMenu entryconfigure Kill* -state disabled
+	wm title . Adamtest
+	global TaskList
+	if {[llength $TaskList] == 0} {
+	    $Task configure -state disabled
+	}
+    } {
+	$Set configure -state normal
+	$Get configure -state normal
+	$Obey configure -state normal
+	$Cancel configure -state normal
+	$Control configure -state normal
+	$FileMenu entryconfigure Kill* -state normal
+	$Task configure -state normal
+	wm title . "Adamtest($CurrentTask)"
+    }
+}
+
+proc showMessage {task message} {
+#+
+# Displays a message from a task in a scrolling text widget.
+#-
+    global Output
+    $Output configure -state normal
+
+# If the first character in the message is "!" then it is part of an error
+# message.
+    if {[string range $message 0 0] == "!"} {
+	$Output insert end $task "taskname alert"
+    } {
+	$Output insert end $task taskname
+    }
+    $Output insert end " $message\n"
+    $Output yview -pickplace end
+    $Output configure -state disabled
+    update idletasks
+}
+
+proc obeyFinish {task name status} {
+#+
+# Checks the status from an endmsg message and displays the status text
+# in a dialog box if the status isn't SAI__OK.
+#-
+    if {[lindex $status 0] != "DTASK__ACTCOMPLETE" } {
+	tk_dialog .error \
+"Task error" "Action \"$name\" in task \"$task\" failed with \"[lindex $status 1]\"" \
+	    error 0 OK
+    }
+}

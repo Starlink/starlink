@@ -1,0 +1,36 @@
+#!/bin/sh
+# the next line restarts using atclsh \
+exec atclsh "$0" "$@"
+
+#+
+#  This script demonstrates how the nbs info and nbs get commands can be
+#  used to trace the contents of a noticeboard. Supply a noticeboard name
+#  as an argument.
+#-
+
+proc showNbs {item} {
+#+
+#  Lists the structure of a noticeboard item.
+#-
+
+# Get the information list for this item.
+    set info [nbs info $item]
+
+# The first element of the list is 1 if the item is a structure and 0 if it
+# is a primitive.
+    if {[lindex $info 0]} {
+
+#     Print the type, length and dimensions.
+        puts "$item: ([lindex $info 1]*[lindex $info 2]) \
+	    [lindex $info 3] [nbs get $item]"
+    } {
+
+#     Print information for each child item.
+        for {set i 1} {$i < [llength $info]} {incr i} {
+           showNbs $item.[lindex $info $i]
+        }
+    }
+}
+
+showNbs [lindex $argv 0]
+exit

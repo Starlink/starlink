@@ -1,0 +1,101 @@
+#!/bin/sh
+# the next line restarts using wish \
+exec wish "$0" "$@"
+
+#
+# gwmXrefresh:
+#
+# Emulates the behavour of of the gwmXrefresh program so that we can use
+# a wish script that creates a gwm widget instead.
+#
+# Put this file somewhere in your path to use a wish script as your
+# gwm server.
+
+# The name of the wish script to run: this assumes that it is called gwm and
+# is in the same location as this script.
+#
+# change this if you want to use your own script.
+
+    set gwmscript [file dirname [info script]]/gwm
+
+# Some processing of the argument list needs to be done:
+#
+# 1) The window name must be preceeded by -gwmname.
+#
+# 2) -overlay must be followed by "yes".
+#
+# 3) -nooverlay must be change to "-overlay no".
+#
+# 4) -title must be changed to -name
+
+    list newargs {}
+    set opt 0
+    set winname ""
+
+    for {set i 0} { $i < $argc} {incr i} {
+	set thisarg [lindex $argv $i]
+	if {$thisarg == "-overlay"} {
+	    lappend newargs $thisarg
+	    lappend newargs yes
+	    set opt 0
+	} else {
+	    if {$thisarg == "-nooverlay"} {
+                lappend newargs -overlay
+		lappend newargs no
+        	set opt 0
+	    } else {
+                if {$thisarg == "-title"} {
+                    incr i
+                    wm title . [lindex $argv $i]
+                    set opt 0
+                 } else {
+                    if {$thisarg == "-gwmname"} {
+                        incr i
+                        set winname [lindex $argv $i]
+                        set opt 0
+                    } else {
+		        if {[string index $thisarg 0] == "-"} {
+		            lappend newargs $thisarg
+		            set opt 1
+		        } else {
+		            if {!$opt} {
+			        lappend newargs -gwmname
+			        set winname $thisarg
+		            }
+		            lappend newargs $thisarg
+        	            set opt 0
+		        }
+                    }
+	        }
+            }
+        }
+    }
+# Trap some common errors
+    if {$winname == ""} {
+	puts stderr "GWM 14"
+        exit
+    }
+
+# Set the application name to gwm name.
+    tk appname $winname
+
+# Load Application specific resources.
+    if [file exists ~/.Gwm] {
+       if {[catch {option readfile ~/.Gwm userDefault} msg]} {
+          puts "Syntax error in initialisation file \"$msg\""
+       }
+    }
+
+# Replace the argument list and count with the new values.
+    set argv $newargs
+    set argc [llength $newargs]
+
+    if [file exists ~/.awishrc] {source ~/.awishrc}
+
+# Execute the script.
+    if [catch {source $gwmscript}] {
+	puts stderr "GWM 4"
+	exit
+    } else {
+	puts stderr "GWM 0 $env(DISPLAY) [wm title .]"
+    }

@@ -1,0 +1,11 @@
+#+
+#  This is a simple adam task implemented in tcl.
+#-
+lappend auto_path .
+adam_start test2
+set message [adam_receive]
+set path [lindex $message 3]
+set messid [lindex $message 4]
+adam_reply $path $messid actstart "" ""
+adam_reply $path $messid inform "" "test2 running..."
+adam_reply $path $messid actcomplete "" ""
