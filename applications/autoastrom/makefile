@@ -339,14 +339,14 @@ LINK = ln
 #  null command.
 RANLIB = :
 
-#  Commands for adding to and extracting from an archive file (.tar).
-#  We depend on the `h' option here, since the catlib source file
-#  $(CATLIB_DISTRIBUTION) is included in the tarred up source
-#  directory as a link (note that pax can't do this, and
-#  single-unix tar doesn't have this option; all the platforms we
-#  support do have it, however).
-TAR_IN = tar chf
-TAR_OUT = tar xf
+##  Commands for adding to and extracting from an archive file (.tar).
+##  We depend on the `h' option here, since the catlib source file
+##  $(CATLIB_DISTRIBUTION) is included in the tarred up source
+##  directory as a link (note that pax can't do this, and
+##  single-unix tar doesn't have this option; all the platforms we
+##  support do have it, however).
+#TAR_IN = tar chf
+#TAR_OUT = tar xf
 
 #  Commands for adding, deleting and extracting files to/from an object 
 #  archive (.a).
@@ -395,10 +395,10 @@ PKG_LINK = AUTOASTROM
 # %%VERSION%%
 PKG_VERS = 0.3
 
-#  Catlib distribution is originally from
-#  ftp://ftp.eso.org/pub/archive/skycat/README.html  
-#  If this is a path, it must be relative to the unpacked source directory.
-CATLIB_DISTRIBUTION = catlib.tar.gz
+##  Catlib distribution is originally from
+##  ftp://ftp.eso.org/pub/archive/skycat/README.html  
+##  If this is a path, it must be relative to the unpacked source directory.
+#CATLIB_DISTRIBUTION = catlib.tar.gz
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -406,8 +406,12 @@ CATLIB_DISTRIBUTION = catlib.tar.gz
 #  script and any documentation files).
 
 #  List of the source files bundled into the export_source distribution
-SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk \
-		$(CATLIB_DISTRIBUTION) VERSION $(DOCUMENTATION)
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk VERSION $(DOCUMENTATION)
+
+#  Source directory for catlib is ./catlib; the directory it's
+#  installed into is CATLIBINSTALLDIR.  May be relative to current
+#  directory or an absolute path.
+CATLIBINSTALLDIR=catlib-install
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -1010,10 +1014,11 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 # remember to delete autoastrom_source.tar when it's no longer needed.
 $(PKG_NAME)_source.tar:
 	cd astrom && ./mk unbuild
-	cd moggy && test ! -f Makefile || make distclean
+	cd moggy && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
 	cd moggy && make -f Makefile.in configure
+	cd catlib && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
 	test ! -f $(PKG_NAME)_source.tar || $(RMF) $(PKG_NAME)_source.tar
-	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) astrom moggy misc
+	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) astrom moggy misc catlib
 
 #  clean: Clean up the source directory.
 #  ------------------------------------
@@ -1042,9 +1047,10 @@ clean:
 #  (if the directory hasn't been configured, then there's probably not
 #  much to clean out, in fact).
 unbuild: clean
-	-cd astrom && ./mk unbuild
-	-cd moggy && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
-	-cd doc && make unbuild
+	cd astrom && ./mk unbuild
+	cd moggy && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
+	cd catlib && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
+	cd doc && make unbuild
 	@- $(RMF) $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
 	@ echo
@@ -1075,23 +1081,38 @@ sun242.xml: doc/sun242.xml
 # an installation program).
 
 # First configure and build the moggy package.
-moggy/moggy: moggy/Makefile
+moggy/moggy: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a
 	cd moggy && unset INSTALL; make
 
 moggy/Makefile: moggy
-	@ if test ! -r $(CATLIB_DISTRIBUTION); then \
-		echo "Can't find catlib distribution"; \
-		echo "    (expected in $(CATLIB_DISTRIBUTION))"; \
-		false; \
-	fi
-	cd moggy && unset INSTALL; CXX=$(CXX) CC=$(CC) ./configure --with-catlib=../$(CATLIB_DISTRIBUTION)
+	INST=`cd $(CATLIBINSTALLDIR);pwd`; cd moggy && unset INSTALL; CXX=$(CXX) CC=$(CC) ./configure --with-catlib=$$INST
+
+#  Build and install the SkyCat cat library.  We install it into the
+#  directory $(CATLIBINSTALLDIR), which moggy knows about.  We have to 
+#  create the installation directories `by hand', since the catlib
+#  installation script is a bit stupid.
+$(CATLIBINSTALLDIR)/lib/libcat.a:
+	test -d $(CATLIBINSTALLDIR) || mkdir $(CATLIBINSTALLDIR)
+	for dir in include lib man man/man3; \
+	do \
+		test -d $(CATLIBINSTALLDIR)/$$dir || \
+			mkdir $(CATLIBINSTALLDIR)/$$dir; \
+	done
+	INST=`cd $(CATLIBINSTALLDIR);pwd`; cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) ./configure --prefix=$$INST --with-notcl
+	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make
+	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make install
 
 astrom/astrom.x: astrom
 	cd astrom && ./mk build
 
 #  Unpack the source tarball.  The extra test is because the makefile
-#  (always/sometimes?) wants to execute this twice.
-moggy astrom: $(PKG_NAME)_source.tar
+#  (always/sometimes?) wants to execute this twice.  Things get
+#  circular if this depends explicitly on the source tarball
+moggy astrom:
+	if test ! -f $(PKG_NAME)_source.tar; then \
+		echo "Eh!? Don't have source, and don't have source tarball"; \
+		exit 1;
+	fi
 	test -d moggy -a -d astrom || $(TAR_OUT) $(PKG_NAME)_source.tar
 
 #  Propagate the version number
