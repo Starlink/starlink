@@ -72,11 +72,15 @@
 
 *  Authors:
 *     WG: Wei Gong (IPMAF)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     12-FEB-1991 (WG):
 *        Original version.
+*     27-APR-1998 (DSB)
+*        Corrected use of Starlink STATUS within call to GQPLR (where GKS 
+*        LSTAT should have been used).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -227,7 +231,7 @@
       MCM_AXPN = LINCOL
 
 *  Check the existance of the pen number for tick marks.
-      CALL GQPLR( IWKID, TCKPEN, GSET, STATUS, LNTYPE, LWIDTH,
+      CALL GQPLR( IWKID, TCKPEN, GSET, LSTAT, LNTYPE, LWIDTH,
      :            LINCOL )
 
 *  If the pen number does not exist, exit.
