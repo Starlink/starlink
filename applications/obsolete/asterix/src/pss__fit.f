@@ -603,12 +603,11 @@
      :                         /DECSTR, STATUS )
 
 *    Create data, quality and axis
-        CALL BDI_PUT( SID, 'QualityMask', 'UBYTE', 0, 0,
-     :                QUAL__MASK, STATUS )
+        CALL BDI_PUT0UB( SID, 'QualityMask', QUAL__MASK, STATUS )
 
 *    Map the 3 arrays
         CALL BDI_MAPR( SID, 'Data', 'WRITE', DPTR, STATUS )
-        CALL BDI_MAP( SID, 'Quality', 'UBYTE', 'WRITE', QPTR, STATUS )
+        CALL BDI_MAPUB( SID, 'Quality', 'WRITE', QPTR, STATUS )
         CALL BDI_AXMAPR( SID, 1, 'Data', 'WRITE', APTR, STATUS )
 
 *    Axis attributes
@@ -1591,7 +1590,7 @@
 
 *  Map arrays
       CALL BDI_MAPR( GID, 'Data', 'WRITE', DPTR, STATUS )
-      CALL BDI_MAP( GID, 'Quality', 'UBYTE', 'WRITE', QPTR, STATUS )
+      CALL BDI_MAPUB( GID, 'Quality', 'WRITE', QPTR, STATUS )
 
 *  Find product of dimensions
       CALL ARR_SUMDIM( NAX, DIMS, NELM )
@@ -1632,7 +1631,7 @@
      :               PARAM, STATMIN, DPTR, %VAL(QPTR), GQMASK, STATUS )
 
 *  Write quality mask
-      CALL BDI_PUT( GID, 'QualityMask', 'UBYTE', 0, 0, GQMASK, STATUS )
+      CALL BDI_PUTUB( GID, 'QualityMask', GQMASK, STATUS )
 
 *  Convert to probability if needed
       IF ( GPAR .EQ. -1 ) THEN

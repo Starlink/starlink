@@ -148,8 +148,8 @@
 *  Look for quality
       CALL BDI_CHK( IM_ID, 'Quality', BDS_QUAL_OK, STATUS )
       IF ( BDS_QUAL_OK ) THEN
-        CALL BDI_MAP( IM_ID, 'MaskedQuality', 'UBYTE', 'READ',
-     :                BDS_QUAL_PTR, STATUS )
+        CALL BDI_MAPUB( IM_ID, 'MaskedQuality', 'READ',
+     :                  BDS_QUAL_PTR, STATUS )
 
 *    Which way to use quality if present?
         IF ( BDS_QUAL_OK ) THEN

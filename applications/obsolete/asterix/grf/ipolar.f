@@ -202,7 +202,6 @@
       INTEGER			BINID			! O/p BinDS object
       INTEGER       		DIMS(3)    		! Input dimensions
       INTEGER       		IDPTR               	! Input data
-      INTEGER			IDUM			! BDI_GET dummy arg
       INTEGER			IFID			! Input dataset id
       INTEGER       		IVPTR               	! input variance
       INTEGER       		IQPTR               	! Input quality
@@ -280,15 +279,14 @@
 *  Map quality array - if not present all qualities are set good
       CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
       IF ( QOK ) THEN
-        CALL BDI_MAP( IFID, 'Quality', 'UBYTE', 'READ', IQPTR, STATUS )
+        CALL BDI_MAPUB( IFID, 'Quality', 'READ', IQPTR, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL MSG_PRNT( 'Error mapping input quality array' )
           GOTO 99
         END IF
 
 *    Attempt to get badbits value
-        CALL BDI_GET( IFID, 'QualityMask', 'UBYTE', 0, 0, BADBITS,
-     :                IDUM, STATUS )
+        CALL BDI_GET0UB( IFID, 'QualityMask', BADBITS, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           BADBITS = QUAL__MASK
@@ -439,11 +437,10 @@
 *  Create and map output arrays
       CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
       CALL BDI_MAPR( OFID, 'Variance', 'WRITE', OVPTR, STATUS )
-      CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', OQPTR, STATUS )
+      CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
 
 *  Write in badbits mask
-      CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0, BADBITS,
-     :              STATUS )
+      CALL BDI_PUT0UB( OFID, 'QualityMask', BADBITS, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
         CALL MSG_PRNT('Error creating output data, variance'/
      :                   /' and quality')

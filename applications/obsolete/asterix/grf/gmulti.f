@@ -263,7 +263,6 @@
       REAL 			AVAL			! Slice axis value
 
       INTEGER			GFID
-      INTEGER			QMASK			! Input quality mask
 
       INTEGER 			APTR			! Input axis data
       INTEGER 			ISET			! Loop over sets
@@ -271,6 +270,8 @@
       INTEGER 			IDPTR,IQPTR,IVPTR	! Input data
       INTEGER 			ODPTR,OQPTR,OVPTR	! Output slice data
       INTEGER L,L1,L2
+
+      BYTE			QMASK			! Input quality mask
 
       LOGICAL 			VOK,QOK			! Variance/quality ok?
 *-
@@ -300,9 +301,8 @@
           CALL BDI_MAPR( IFID, 'Variance', 'READ', IVPTR, STATUS )
         END IF
         IF ( QOK ) THEN
-          CALL BDI_MAP( IFID, 'Quality', 'UBYTE', 'READ', IQPTR,
-     :                  STATUS )
-          CALL BDI_GET0I( IFID, 'QualityMask', QMASK, STATUS )
+          CALL BDI_MAPUB( IFID, 'Quality', 'READ', IQPTR, STATUS )
+          CALL BDI_GET0UB( IFID, 'QualityMask', QMASK, STATUS )
         END IF
 
 *    Loop over sets
@@ -331,12 +331,11 @@
 
 *      Copy input quality slice to output, if present
           IF ( QOK ) THEN
-            CALL BDI_MAP( GFID, 'Quality', 'UBYTE', 'WRITE',
-     :                    OQPTR, STATUS )
+            CALL BDI_MAPUB( GFID, 'Quality', 'WRITE', OQPTR, STATUS )
             CALL ARR_SLCOPB( NDIM, DIMS, %VAL(IQPTR), DIML, DIMU,
      :                       %VAL(OQPTR), STATUS )
             CALL BDI_UNMAP( GFID, 'Quality', ODPTR, STATUS )
-            CALL BDI_PUT0I( IFID, 'QualityMask', QMASK, STATUS )
+            CALL BDI_PUT0UB( IFID, 'QualityMask', QMASK, STATUS )
           END IF
 
 *      Copy ancillaries

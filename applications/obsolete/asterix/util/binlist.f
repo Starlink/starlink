@@ -211,7 +211,7 @@
 *    Quality
         CALL BDI_CHK( FID, 'Quality', QOK, STATUS )
         IF ( QOK ) THEN
-          CALL BDI_MAP( FID, 'Quality', 'UBYTE', 'READ', QPTR, STATUS )
+          CALL BDI_MAPUB( FID, 'Quality', 'READ', QPTR, STATUS )
         END IF
 
 *    Get slice of dataset

@@ -192,7 +192,7 @@
 *  Quality
       CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
       IF ( QOK .AND. .NOT. SWAP_1D ) THEN
-        CALL BDI_MAP( IFID, 'Quality', 'UBYTE', 'READ', IQPTR, STATUS )
+        CALL BDI_MAPUB( IFID, 'Quality', 'READ', IQPTR, STATUS )
       END IF
 
 *  Get new axis order if NDIM > 2
@@ -336,8 +336,7 @@
           CALL BDI_MAPR( OFID, 'Variance', 'WRITE', OVPTR, STATUS )
         END IF
         IF ( QOK ) THEN
-          CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', OQPTR,
-     :                  STATUS )
+          CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
         END IF
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 

@@ -187,7 +187,7 @@
       CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
       IF ( QOK ) THEN
         CALL BDI_GET0I( IFID, 'QualityMask', IMASK, STATUS )
-        CALL BDI_MAP( IFID, 'Quality', 'UBYTE', 'READ', QPTR, STATUS )
+        CALL BDI_MAPUB( IFID, 'Quality', 'READ', QPTR, STATUS )
       END IF
 
 *  Check VARIANCE

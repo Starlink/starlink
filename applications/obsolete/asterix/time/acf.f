@@ -328,9 +328,8 @@
 
       IF ( USEWT ) THEN
         CALL BDI_MAPR( OFID, 'Variance', 'WRITE', OVPTR, STATUS )
-        CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', OQPTR, STATUS )
-        CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0,
-     :                QUAL__MASK, STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
+        CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
       END IF
 
 *  Copy ancillaries

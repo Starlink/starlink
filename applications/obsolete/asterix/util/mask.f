@@ -107,7 +107,6 @@
 *  Local Variables:
       CHARACTER*8 		MSTR                    ! Char value of MASK
 
-      INTEGER                   IDUM                    ! Unused from BDI_GET
       INTEGER			OFID			! File identifier
 
       BYTE 			BMASK                   ! The mask value
@@ -126,8 +125,7 @@
       CALL USI_ASSOC( 'INP', 'BinDS', 'UPDATE', OFID, STATUS )
 
 *  Get current mask and use as default
-      CALL BDI_GET( OFID, 'QualityMask', 'UBYTE', 0, 0, BMASK, IDUM,
-     :              STATUS )
+      CALL BDI_GET0UB( OFID, 'QualityMask', BMASK, STATUS )
       CALL STR_BTOC( BMASK, MSTR, STATUS )
       CALL USI_DEF0C( 'MASK', MSTR, STATUS )
 
@@ -136,7 +134,7 @@
 
 *  Set the new mask
       CALL STR_CTOB( MSTR, BMASK, STATUS )
-      CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0, BMASK, STATUS )
+      CALL BDI_PUT0UB( OFID, 'QualityMask', BMASK, STATUS )
 
 *  Tidy up
       CALL AST_CLOSE()

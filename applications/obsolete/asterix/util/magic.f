@@ -110,7 +110,6 @@
       REAL                      MAGVAL			! Magic value
 
       INTEGER 			DPTR,QPTR		! Mapped iinput data
-      INTEGER			IDUM			! Unnused BDI_GET data
       INTEGER                   IFID                    ! Input dataset id
       INTEGER 			LEN			! # data elements
       INTEGER                   OFID                    ! Output dataset id
@@ -159,8 +158,7 @@
         END IF
 
 *    Allow user to change the mask
-        CALL BDI_GET( OFID, 'QualityMask', 'UBYTE', 0, 0,
-     :                MASK, IDUM, STATUS )
+        CALL BDI_GET0UB( OFID, 'QualityMask', MASK, STATUS )
         CALL STR_BTOC( MASK, MSTR, STATUS )
         CALL USI_DEF0C( 'MASK', MSTR, STATUS )
         CALL USI_GET0C( 'MASK', MSTR, STATUS )
@@ -168,8 +166,7 @@
 
 *    Map data to be updated, and the quality
         CALL BDI_MAPR( OFID, 'Data', 'UPDATE', DPTR, STATUS )
-        CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'READ', QPTR,
-     :                STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'READ', QPTR, STATUS )
 
 *    Set the magic values
         CALL MAGIC_WRITE( OFID, MASK, MAGVAL, LEN, %VAL(QPTR),
