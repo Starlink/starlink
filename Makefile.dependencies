@@ -974,6 +974,7 @@ $(MANIFEST)/ircamdr: \
 		$(MANIFEST)/fio \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
@@ -982,12 +983,13 @@ $(MANIFEST)/ircamdr: \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
+		$(MANIFEST)/pda \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
-		$(MANIFEST)/sla \
-		$(MANIFEST)/star2html
+		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx
 	cd applications/obsolete/ircamdr \
 	  && $(MAKE_CPT)
 
