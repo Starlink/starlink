@@ -119,9 +119,16 @@ VARIN           <variable name invalid>
 WRNFA           <wrong number of function arguments in expression>
 
 ! New codes introduced for V2.0.
-BADUN           <Invalid units specification>
-NORSF           <No rest frequency is defined>
-NOSOR           <No standard of rest is defined>
-SPCIN           <Invalid SpecMap>
+BADUN           <invalid units specification>
+NORSF           <no rest frequency is defined>
+NOSOR           <no standard of rest is defined>
+SPCIN           <invalid SpecMap>
+
+! New codes introduced for V3.1
+XMLNM           <invalid XML name or prefix>
+XMLCM           <invalid XML comment text>
+XMLPT           <invalid XML processing instruction target text>
+XMLIT           <invalid XML content item index>
+XMLWF           <supplied XML document is not well formed>
 
 .END
