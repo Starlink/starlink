@@ -15688,7 +15688,7 @@ iraf! {
             vpath PROMPT
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
-            prompt {NDF in which values are to be flagged bad}
+            prompt {NDF in which values are to be substituted}
             helpkey *
           }
 
@@ -15698,7 +15698,7 @@ iraf! {
             access WRITE
             vpath PROMPT
             association ->GLOBAL.DATA_ARRAY
-            prompt {NDF containing flagged values}
+            prompt {NDF containing substituted values}
             helpkey *
           }
 
