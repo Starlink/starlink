@@ -147,7 +147,7 @@
 
 *    Count non-zeros
         CCOUNT = 0
-        DO I = 1, EVENTS
+        DO I = BSTART, BEND
           IF ( SEL(I) .NE. 0 ) CCOUNT = CCOUNT + 1
         END DO
         CALL ARR_SELEM1I( CBPTR, NBLK, IBLOCK, CCOUNT, STATUS )
