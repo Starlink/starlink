@@ -604,23 +604,23 @@ D	        type*,'  energy bounds values dont agree'
        INTEGER STATUS
 
 *     Local constants :
-      REAL SZ2                          ! sum Z*Z*N(Z)/N(e)
-      PARAMETER (SZ2=1.258)             ! as used in SPEC_BR
-      REAL EM10				! EM of 1E60 cm**-3 at 10 kpc in
-      PARAMETER (EM10=8.35774E13)	! units of cm**-6*cm**3/cm**2
+       REAL SZ2                          ! sum Z*Z*N(Z)/N(e)
+       PARAMETER (SZ2=1.258)             ! as used in SPEC_BR
+       REAL EM10				! EM of 1E60 cm**-3 at 10 kpc in
+       PARAMETER (EM10=8.35774E13)	! units of cm**-6*cm**3/cm**2
 *-
 
-* Abundance/scaling correction
-     ABCOR=((1+0.34+0.113*PARAM(3)))/SZ2
+*  Abundance/scaling correction
+      ABCOR=((1+0.34+0.113*PARAM(3)))/SZ2
 
-     DO I = 1, NEN
-        BREMS(I)=BREMS(I)*ABCOR*1E23/(PARAM(1)*EM10)
-     END DO
+      DO I = 1, NEN
+         BREMS(I)=BREMS(I)*ABCOR*1E23/(PARAM(1)*EM10)
+      END DO
 
-*  Exit
-     IF(STATUS.NE.SAI__OK) CALL AST_REXIT( 'SPEC_RZ_CORRBR', STATUS )
+*   Exit
+      IF(STATUS.NE.SAI__OK) CALL AST_REXIT( 'SPEC_RZ_CORRBR', STATUS )
 
-     END
+      END
 
 
 
