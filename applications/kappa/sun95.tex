@@ -10444,6 +10444,13 @@ default value.
       \sstitemlist{
 
          \sstitem
+         The compression is centred on the origin of the pixel co-ordinate
+         Frame. That is, if a position has a value $p(i)$ on the $i$'th pixel 
+         co-ordinate axis of the input NDF, then it will have position 
+         $p(i)/COMPRESS(i)$ on the corresponding axis of the output NDF. The
+         pixel index bounds of the output NDF are chosen accordingly.
+
+         \sstitem
          The axis centres and variances are averaged, whilst the widths
          are summed and always normalised for bad values.
       }
@@ -10622,6 +10629,13 @@ default value.
       \sstitemlist{
 
          \sstitem
+         The compression is centred on the origin of the pixel co-ordinate
+         Frame. That is, if a position has a value $p(i)$ on the $i$'th pixel 
+         co-ordinate axis of the input NDF, then it will have position 
+         $p(i)/COMPRESS(i)$ on the corresponding axis of the output NDF. The
+         pixel index bounds of the output NDF are chosen accordingly.
+
+         \sstitem
          The axis centres and variances are averaged, whilst the widths
          are summed and always normalised for bad values.
       }
@@ -10738,9 +10752,14 @@ default value.
       }
    }
    \sstnotes{
-      Each output dimension is calculated to give the most elements
-      possible given the compression factor.  It is evaluated from the
-      expression (input dimension - \%ORIGIN) / \%COMPRESS + 1.
+      \sstitemlist{
+         \sstitem
+         The compression is centred on the origin of the pixel co-ordinate
+         Frame. That is, if a position has a value $p(i)$ on the $i$'th pixel 
+         co-ordinate axis of the input NDF, then it will have position 
+         $p(i)/COMPRESS(i)$ on the corresponding axis of the output NDF. The
+         pixel index bounds of the output NDF are chosen accordingly.
+      }
    }
    \sstdiytopic{
       Related Applications
@@ -38133,6 +38152,30 @@ plotting application.
 
 \subsection{Modified applications}
    \begin{description}
+
+      \item [\htmlref{COMPADD}{COMPADD}] \mbox{}
+         \begin{itemize}
+            \item The way in which the pixel index bounds of the output
+                  NDF are chosen has been changed in order to retain the
+                  pixel origin. The compression is now centred on the
+                  origin of pixel co-ordinates (previously the lower left
+                  corner of the output NDF was assigned the arbitrary
+                  pixel indices \[1,1,..\] irrespective of the origin of
+                  the supplied NDF).
+         \end{itemize}
+
+      \item [\htmlref{COMPAVE}{COMPAVE}] \mbox{}
+         \begin{itemize}
+            \item The choice of origin for the output NDF has been changed.
+                  See COMPADD above.
+         \end{itemize}
+
+      \item [\htmlref{COMPICK}{COMPICK}] \mbox{}
+         \begin{itemize}
+            \item The choice of origin for the output NDF has been changed.
+                  See COMPADD above.
+         \end{itemize}
+
       \item [\htmlref{CONTOUR}{CONTOUR}] \mbox{}
          \begin{itemize}
             \item Information describing the co-ordinate Frames available

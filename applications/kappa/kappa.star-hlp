@@ -5132,6 +5132,12 @@ compadd in=arp244 compress=[1,1,3] out=arp244cs
    This command compresses arp244 in the spectral dimension,
    adding every three pixels to form the NDF called arp244cs.
 2 Notes
+-  The compression is centred on the origin of the pixel co-ordinate
+Frame. That is, if a position has a value p(i) on the i'th pixel 
+co-ordinate axis of the input NDF, then it will have position 
+p(i)/COMPRESS(i) on the corresponding axis of the output NDF. The
+pixel index bounds of the output NDF are chosen accordingly.
+
 -  The axis centres and variances are averaged, whilst the widths
 are summed and always normalised for bad values.
 2 Related_Applications
@@ -5282,6 +5288,12 @@ compave in=arp244 compress=[1,1,3] out=arp244cs
    This command compresses arp244 in the spectral dimension,
    averaging every three pixels to form the NDF called arp244cs.
 2 Notes
+-  The compression is centred on the origin of the pixel co-ordinate
+Frame. That is, if a position has a value p(i) on the i'th pixel 
+co-ordinate axis of the input NDF, then it will have position 
+p(i)/COMPRESS(i) on the corresponding axis of the output NDF. The
+pixel index bounds of the output NDF are chosen accordingly.
+
 -  The axis centres and variances are averaged, whilst the widths
 are summed and always normalised for bad values.
 2 Related_Applications
@@ -5385,9 +5397,11 @@ compick in=arp244 compress=[1,1,3] out=arp244cs
    sampling every third pixel, starting from the first wavelength
    at each image position, to form the NDF called arp244cs.
 2 Notes
-Each output dimension is calculated to give the most elements
-possible given the compression factor.  It is evaluated from the
-expression (input dimension - %ORIGIN) / %COMPRESS + 1.
+-  The compression is centred on the origin of the pixel co-ordinate
+Frame. That is, if a position has a value p(i) on the i'th pixel 
+co-ordinate axis of the input NDF, then it will have position 
+p(i)/COMPRESS(i) on the corresponding axis of the output NDF. The
+pixel index bounds of the output NDF are chosen accordingly.
 2 Related_Applications
    KAPPA: BLOCK, COMPADD, COMPAVE, PIXDUPE, SQORST, TRANSFORMER;
    Figaro: ISTRETCH.
