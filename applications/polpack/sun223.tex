@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {223.3}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {24 March 1999}
+\newcommand{\stardocdate}      {19th April 1999}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
 \newcommand{\stardocversion}   {Version 2.0}
@@ -918,7 +918,7 @@ ideas in practice are given in later sections of this document.
 \item [Detector corrections] - The objective is to correct your data values
 so that they are proportional to the combined sky and object intensity
 transmitted by the analyser (plus noise). The details will depend on your
-detector. Ideally, the noise in each data value should be independant of
+detector. Ideally, the noise in each data value should be independent of
 the noise in the neighbouring data values. 
 
 \item [Image alignment] - The images need to be aligned so that a given
@@ -1373,7 +1373,7 @@ calibrated and imported. The list may be supplied in several forms
 (described \hyperref{here}{in section }{}{SEC:GRPEXP}).
 \item [MODE]	- Indicates what sort of polarization you are measuring. It 
 can be ``CIRCULAR'' or ``LINEAR''.
-\item [OUT]	- If you have single-beam, or non-polarimetrix data, this
+\item [OUT]	- If you have single-beam, or non-polarimetric data, this
 parameter is used to obtain a list of the output images to receive the 
 aligned, sky-subtracted images. If a null value (!) is supplied, these 
 images are not saved. For dual-beam data, parameters OUT\_E and OUT\_O
@@ -2228,14 +2228,14 @@ line. If necessary, you can still access the hypertext help using the
 
 \item [``The catalogue produced by POLVEC has lots of zero polarized
 intensity values in it''] - POLVEC can apply a correction to to the values
-of percentage polarisation and polarized intensity to remove statistical
+of percentage polarization and polarized intensity to remove statistical
 bias introduced by the squaring and adding of the Stokes parameters $Q$ and
 $U$ (see \htmlref{POLVEC}{POLVEC} parameter DEBIAS). This can result in 
 corrected percentage polarization values which are identically equal to zero
-if the original percentage polarisations are small and the corresponding 
+if the original percentage polarizations are small and the corresponding 
 variances are large. These zero percentage polarization values then result in
 zero polarized intensity values. Note, the $Q$ and $U$ values are
-\emph{not} corrected in any way, since they already give unbiassed
+\emph{not} corrected in any way, since they already give unbiased
 estimates of the required quantities.
 
 \end{description}
@@ -2854,7 +2854,7 @@ for NDF applications.
          analysed intensity and analyser position, or from its deviation
          from its local neighbours. The second method requires a spatial
          smoothing to be performed, the size of which is specified by
-         SMBOX. However, spatial smothing can introduce problems because
+         SMBOX. However, spatial smoothing can introduce problems because
          it can cause spatial structure in the image to be interpreted as
          noise, resulting in over-estimates of the input variances. For
          this reason it is best to use a small smoothing size. If you
@@ -3267,8 +3267,8 @@ for NDF applications.
          EPS = \_REAL (Read)
       }{
          The analyser efficiency. This gives the efficiency with which the
-         analyser rejects light polarised across its axis. A perfect
-         polariser has a value of 1.0. A perfect piece of glass would have
+         analyser rejects light polarized across its axis. A perfect
+         pol-ariser has a value of 1.0. A perfect piece of glass would have
          a value of 0.0. The stored value is used only when processing
          single-beam data. The given value is stored in all supplied data
          files. If a null (!) value is supplied, any image which already
@@ -3343,7 +3343,7 @@ for NDF applications.
          T = \_REAL (Read)
       }{
          The analyser transmission. This gives the transparency of the
-         analyser to unpolarised light. A perfect polariser has a value of
+         analyser to unpolarized light. A perfect polarizer has a value of
          1.0. A perfect piece of glass would have a value of 2.0. The
          stored value is only used when processing single-beam data. The
          given value is stored in all supplied data files. If a null (!)
@@ -3893,7 +3893,7 @@ for NDF applications.
 
       Which results in the IMGID extension item being set to the
       concatenation of the values of the FITS keywords OBSNUM and
-      IDATE (you can concatentate more than two values). Note, conversion
+      IDATE (you can concatenate more than two values). Note, conversion
       of numeric values to character strings occurs automatically.
 
       In the second special form, the name of the destination extension item
@@ -3901,7 +3901,7 @@ for NDF applications.
       to be translated. This is then followed by statements which translate
       an {\tt "}input{\tt "} string into an {\tt "}output{\tt "} string. So for instance if you
       were doing circular polarimetry, and wanted to translate quarter
-      waveplate positions to the equivalent strings recognised by POLPACK
+      wave-plate positions to the equivalent strings recognised by POLPACK
       you might use something like:
 
 \begin{tabbing}
@@ -3923,7 +3923,7 @@ for NDF applications.
       If a control table contains more than one line for an extension
       item, then each line is processed in turn, replacing any value
       established by earlier lines. Thus the final value of the extension
-      item will be given by the last line in the table refering to the
+      item will be given by the last line in the table referring to the
       extension item.
 
       If it is not known in advance if the FITS extension will contain the
@@ -5393,7 +5393,7 @@ $s_{2}$ are the flat-fielded $O$ and $E$ ray signals from exposure
 $T_{0}$, and $s_{3}$ and $s_{4}$ are the corresponding signals from
 exposure $T_{45}$. In order to calculate the polarization we need signals
 which are proportional to the incoming intensities, with a common
-constant of proportionality. In order to achive this, we need to
+constant of proportionality. In order to achieve this, we need to
 estimate the ratio of the exposure factors, $E_{0}$ and $E_{90}$, and the 
 ``F-factor'', $F$, where:
 
@@ -5486,7 +5486,7 @@ mv on the command line. For instance,
 \end{verbatim}
 
 will start up GAIA, displaying the image in file \texttt{fred.sdf}. If you 
-are using non-NDF images, include the file type (eg ``\texttt{fred.fit}'').
+are using non-NDF images, include the file type (\emph{e.g.} ``\texttt{fred.fit}'').
 
 \item Press the \emph{Image-Analysis} menu button. Select the
 \emph{Astrometry calibration} item from the displayed menu, then select 
@@ -5580,7 +5580,7 @@ object picker dialogue box
 \item Raise the dialogue box shown in Figure~\ref{fig:gaia2}. You should
 find that the pixel co-ordinates of the star have been copied into the
 X and Y fields. Click in the \emph{ra} field, and enter the RA of the 
-star (eg "12:23:34.1"). Then do the same with the \emph{dec} field. Then
+star (\emph{e.g.} "12:23:34.1"). Then do the same with the \emph{dec} field. Then
 click in the \emph{id} field, and enter an integer value which can be
 used to identify the star (for instance, use 1 for your first star, 2 for
 your second, \emph{etc}). The star is now fully specified, so press the
@@ -5788,7 +5788,7 @@ being performed.
 As mentioned above, the likely error in a set of observed intensity
 values can be estimated by comparing them with the best fitting sine
 curve defined by the current Stokes vectors. This estimation can be
-performed independantly for each pixel. However, unless your images are
+performed independently for each pixel. However, unless your images are
 badly under-sampled, it is also reasonable in the absence of noise to
 expect each image to be spatially smooth over some small scale. So we
 could also estimate the noise by spatially smoothing each image and
@@ -5855,7 +5855,7 @@ illustrated in Figure~\ref{fig:quadfit}.
 values which would be expected on the basis of the smoothed Stokes vectors.
 
 \item For each input image, the residuals between these expected intensity 
-values and the corresonding observed intensity values are found, and squared.
+values and the corresponding observed intensity values are found, and squared.
 
 \item The images containing the squared residuals are stacked together
 into a single image holding the mean squared residual at each input pixel.
@@ -5920,7 +5920,7 @@ The \htmlref{POLSIM}{POLSIM} application is a useful tool for
 investigating the noise within a set of observed intensity images. It
 takes in a cube of Stokes vectors as produced by \htmlref{POLCAL}{POLCAL},
 together with a set of template intensity images, and creates a set of
-intensity images analagous to the templates, but filled with the expected
+intensity images analogous to the templates, but filled with the expected
 intensity values given by equation \ref{EQN:IEXP}. The analyser properties
 (angle, efficiency and transmission) are defined by the templates, as are
 the required pixel positions.
@@ -5952,7 +5952,7 @@ This gave the anti-clockwise angle from the first image axis to the
 reference direction. POLPACK will still read these ANGROT values if they exist,
 but will no longer write them. As of V2.0 the orientation of the reference
 direction is specified instead by the POLANAL Frame added to the NDF WCS
-component by POLIMP or POLEXT. If data written by POLACK V2.0 or later 
+component by POLIMP or POLEXT. If data written by POLPACK V2.0 or later 
 is read by an earlier version of POLPACK. A default value of zero will be
 adopted for the missing ANGROT extension item (\emph{i.e.} it will be
 assumed that the reference direction is parallel to the first image axis).

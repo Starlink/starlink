@@ -150,7 +150,7 @@
 *        analysed intensity and analyser position, or from its deviation
 *        from its local neighbours. The second method requires a spatial
 *        smoothing to be performed, the size of which is specified by
-*        SMBOX. However, spatial smothing can introduce problems because
+*        SMBOX. However, spatial smoothing can introduce problems because
 *        it can cause spatial structure in the image to be interpreted as
 *        noise, resulting in over-estimates of the input variances. For
 *        this reason it is best to use a small smoothing size. If you
