@@ -743,8 +743,12 @@
 
       IF( POL ) THEN
          CALL PAR_PUT0I( 'OEFITTYPE', OEFIT, STATUS )
+
          CALL CHR_UCASE( MODE )
-         CALL PAR_PUT0C( 'PMODE', MODE, STATUS )
+         IF( MODE .EQ. 'LINEAR' .OR. MODE .EQ. 'CIRCULAR' ) THEN
+            CALL PAR_PUT0C( 'PMODE', MODE, STATUS )
+         END IF
+
       END IF
 
 *  Delete the groups.

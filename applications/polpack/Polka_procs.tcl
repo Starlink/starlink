@@ -8015,11 +8015,14 @@ proc LoadTask {task file} {
    global ADAM_USER
    global RENDEVOUS
    global TASK_FILE
+   global env
 
 # Load the task.
    set taskload [list adamtask $task $file ]
    if {[catch $taskload error] != 0} {
-      puts "Error loading task $task (file $file): \"$error\". Aborting..."
+      if { ![info exists env(ICL_TASK_NAME)] } { 
+         puts "Error loading task $task (file $file): \"$error\". Aborting..."
+      }
       Message "Error loading task $task (file $file): \"$error\". Aborting..."
       exit 1
    }
@@ -8030,7 +8033,9 @@ proc LoadTask {task file} {
       after 100
       incr count
       if {$count > 100} {
-         puts "Timed out waiting for task \"$task\" (file $file) to start. Aborting..." 
+         if { ![info exists env(ICL_TASK_NAME)] } { 
+            puts "Timed out waiting for task \"$task\" (file $file) to start. Aborting..." 
+         }
          Message "Timed out waiting for task \"$task\" (file $file) to start. Aborting..." 
          $task kill
          exit 1
@@ -8049,7 +8054,9 @@ proc LoadTask {task file} {
    }
 
    if { ![info exists RENDEVOUS($task)] } {
-      puts "Cannot find the rendevous file for $task."
+      if { ![info exists env(ICL_TASK_NAME)] } { 
+         puts "Cannot find the rendevous file for $task."
+      }
       Message "Cannot find the rendevous file for $task."
       exit 1
    }
@@ -11485,6 +11492,11 @@ proc Segment {indata outdata image obj} {
       }
    }
 
+#  Supply a null value for the next polygon parameter to indicate the end
+#  of the polygon files.
+   incr npoly
+   append polys "POLY${npoly}=!"
+
 # Get the name of the output image in which to store the extracted mask
 # area.
    set maskarea [UniqueFile]
@@ -12755,7 +12767,7 @@ proc SkySub {data image sub args} {
 # If the sky background has been supplied in a separate image, subtract
 # it from the object frame.
    if { $SKY_METHOD == $SKY_FRAME && $SKYOFF } {
-
+   
 # Indicate that the sky areas have been extracted, and highlight the 
 # "sky subraction" label to indicate that the sky is being subtracted.
       Wop $setick(O) configure -foreground black
@@ -12877,10 +12889,12 @@ proc SkySub {data image sub args} {
          }
       }
 
+
 # Subtract the sky image from the supplied data.
       if { $ok } {
          if { $sub } {
             set ssimage [UniqueFile]
+
             if { ![Obey kappa maths "exp=ia-ib ia=$data ib=$sky out=$ssimage"] } {
                set ok 0
             }
