@@ -172,7 +172,7 @@ AC_ARG_ENABLE(png,
         AC_DEFINE(ENABLE_PNG)
         PNGOBJ="PNGBitmap.o"
         LIBS="$LIBS -lpng -lz",
-      echo "png library not found, or too old -- not including PNG support",
+      echo "png library not found or too old -- not including PNG support",
       -lz)))
 
 dnl   Specify support for GIF output
