@@ -26,8 +26,8 @@ This module provides wrapper routines for common HDS manipulations.
 Functions are provided for copying data structures between locations,
 deleting structures and creating structures/primitives.
 
-Two interfacese are provided. The first mirrors the Figaro routines
-COPOBJ, CREOBJ and DELOBJ and use Starlink inherited status.
+Two interfaces are provided. The first mirrors the Figaro routines
+SETOBJ, COPOBJ, CREOBJ and DELOBJ and use Starlink inherited status.
 The more verbose functions provide wrappers that assume good status
 on input and return perl status (either true or false).
 
@@ -92,7 +92,7 @@ Set the value of an HDS object within an HDS structure.
 
   set_hdsobj( $path, $value );
 
-Returns 1 if successful, false otherwise. See C<creobj>
+Returns 1 if successful, false otherwise. See C<setobj>
 for more details on the arguments.
 
 Scalar values can be stored in scalar items and individual
