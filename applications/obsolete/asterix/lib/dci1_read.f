@@ -58,12 +58,6 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
 *     DCI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/dci.html
 
@@ -104,6 +98,10 @@
 
 *  Status:
       INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			CHR_LEN
+        INTEGER			CHR_LEN
 
 *  Local Variables:
       CHARACTER*20		DET			! Detector name
@@ -148,16 +146,20 @@
 
 *    Write its member values
         IF ( MOK ) THEN
-          CALL ADI_CPUT0C( OARG, 'Mission', MISSION, STATUS )
+          CALL ADI_CPUT0C( OARG, 'Mission',
+     :                     MISSION(:CHR_LEN(MISSION)), STATUS )
         END IF
         IF ( IOK ) THEN
-          CALL ADI_CPUT0C( OARG, 'Instrument', INSTRUM, STATUS )
+          CALL ADI_CPUT0C( OARG, 'Instrument',
+     :                     INSTRUM(:CHR_LEN(INSTRUM)), STATUS )
         END IF
         IF ( DOK ) THEN
-          CALL ADI_CPUT0C( OARG, 'Detector', DET, STATUS )
+          CALL ADI_CPUT0C( OARG, 'Detector', DET(:CHR_LEN(DET)),
+     :                       STATUS )
         END IF
         IF ( FOK ) THEN
-          CALL ADI_CPUT0C( OARG, 'Filter', FILT, STATUS )
+          CALL ADI_CPUT0C( OARG, 'Filter', FILT(:CHR_LEN(FILT)),
+     :                       STATUS )
         END IF
 
       END IF
