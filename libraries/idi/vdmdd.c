@@ -250,8 +250,6 @@ int                nitems;
 
 int            screen;
 
-char   *display = "";         /* XWindows unit searched in environment */
-
 char   wind0[4], lname[32], geom[32], cols[32], *argv[5];
 char   *getdev();
 int    col, i, j, jstat, ncolors, newwin, nit, wfree;
@@ -268,7 +266,7 @@ unsigned long *pixels, *pix;
 strcpy( wind0, "WI " );
 if (virgin == 1)
    { 
-   if (!(display_id = XOpenDisplay(display)))
+   if (!(display_id = XOpenDisplay(NULL)))
       {
       *status = VD_XCONNERR;
       return;
