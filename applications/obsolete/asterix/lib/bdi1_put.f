@@ -197,7 +197,6 @@
 
 *      Rename
           CALL DAT_RENAM( DLOC, 'DATA_ARRAY', STATUS )
-          CALL DAT_ANNUL( DLOC, STATUS )
           CLOC = DLOC
 
         END IF

@@ -168,7 +168,7 @@
 
 *    Map data to be updated, and the quality
         CALL BDI_MAPR( OFID, 'Data', 'UPDATE', DPTR, STATUS )
-        CALL BDI_MAP( OFID, 'Quality', 'READ', 'UBYTE', QPTR,
+        CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'READ', QPTR,
      :                STATUS )
 
 *    Set the magic values
