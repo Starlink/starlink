@@ -12,9 +12,8 @@
       The utility program CREMSG can be used to produce
       source files for MESSGEN.</p>
   </abstract>
-  <dependencies>
-    <build></build>
-    <use></use>
+  <dependencies >
+    
   </dependencies>
   <developers>
     <person>
@@ -31,13 +30,16 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="starconf">
+<component id="starconf" buildsupport="yes">
   <description>Starlink autoconf support</description>
   <path>buildsupport/starconf</path>
-  <dependencies/>  <!-- none -->
+  <dependencies>
+    <build>automake</build>
+  </dependencies>
   <developers>
     <person>
       <name>Norman Gray</name>
+      <uname>nxg</uname>
       <email>norman@astro.gla.ac.uk</email>
     </person>
   </developers>
@@ -57,9 +59,8 @@
       for building text strings for interactive applications or as a
       basis for more complex text processing applications.
     </p></abstract>
-  <dependencies>
-    <build> sae cnf</build>
-    <use></use>
+  <dependencies >
+    <build>sae</build><build>cnf</build>
   </dependencies>
   <developers>
     <person>
@@ -92,9 +93,8 @@
       of functions to handle the difference between FORTRAN and C
       character strings, logical values and pointers to dynamically
       allocated memory.</p></abstract>
-  <dependencies>
-    <build></build>
-    <use></use>
+  <dependencies >
+    
   </dependencies>
   <developers>
     <person>
@@ -127,9 +127,8 @@
       ERR without the binding to any software environment (e.g., for
       message output or access to the parameter and data
       systems).</p></abstract>
-  <dependencies>
-    <build> sae cnf messgen</build>
-    <use> cnf ems</use>
+  <dependencies >
+    <build>sae</build><build>cnf</build><link>cnf</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -156,9 +155,8 @@
       alone FIO and RIO routines, which can be used independently of
       the Starlink software environment, plus routines to interface to
       the Starlink parameter system.</abstract>
-  <dependencies>
-    <build> sae par messgen</build>
-    <use> chr ems mers subpar</use>
+  <dependencies >
+    <build>sae</build><build>par</build><link>chr</link><link>ems</link><link>mers</link><link>subpar</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -202,9 +200,8 @@
       therefore invoked indirectly by many other items of Starlink
       software.</p>
   </abstract>
-  <dependencies>
-    <build> sae cnf ems messgen</build>
-    <use> chr</use>
+  <dependencies >
+    <build>sae</build><build>cnf</build><build>ems</build><link>chr</link><link>cnf</link><link>ems</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -232,9 +229,8 @@
       non-error information and the Error Reporting System, ERR, is
       used specifically for reporting error messages.</p>
   </abstract>
-  <dependencies>
-    <build> ems sae cnf messgen messgen</build>
-    <use> chr psx subpar</use>
+  <dependencies >
+    <build>cnf</build><build>ems</build><build>sae</build><link>chr</link><link>ems</link><link>psx</link><link>subpar</link><sourceset>messgen</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -269,9 +265,8 @@
     <p>This document also introduces a preliminary C interface for the PAR
       library -- this may be subject to change in the light of experience.</p>
   </abstract>
-  <dependencies>
-    <build> cnf sae mers subpar messgen</build>
-    <use> chr</use>
+  <dependencies >
+    <build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><link>chr</link><link>mers</link><link>subpar</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -295,9 +290,8 @@
   <path>libraries/pcs/adam</path>
   <description>ADAM -- The Control Subsystem</description>
   <!-- <abstract><p></p></abstract> -->
-  <dependencies>
-    <build> sae messys</build>
-    <use> chr psx ems messys mers</use>
+  <dependencies >
+    <build>sae</build><build>messys</build><link>chr</link><link>psx</link><link>ems</link><link>messys</link>
   </dependencies>
   <developers>
     <person>
@@ -321,9 +315,8 @@
   <path>libraries/pcs/lex</path>
   <description>SUBPAR lexical analyser</description>
   <!-- <abstract><p></p></abstract> -->
-  <dependencies>
-    <build> sae messgen</build>
-    <use> ems</use>
+  <dependencies >
+    <build>sae</build><link>ems</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -345,43 +338,13 @@
   <notes><p>Part of the PCS package</p></notes>
 </component>
 
-<component id="pcs">
-  <version>4.1-1</version>
-  <path>libraries/pcs</path>
-  <description>The Parameter and Communication Subsystems</description>
-  <abstract><p>Application programs often need to obtain parameter
-      values from a variety of sources and to communicate with other
-      programs. The Parameter and Communication Subsystems (PCS) are a
-      set of closely-related subroutine libraries which provide these
-      facilities for many Starlink applications and the associated
-      user-interfaces.</p>
-    <p>The PCS libraries will not generally be called directly by
-      application programs, but form a basic part of the Starlink
-      Software Environment</p></abstract>
-  <dependencies>
-    <build> adam ams dtask hdspar lex messys misc msp parsecon sock string subpar task</build>
-    <use></use>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>A.J.Chipperfield@rl.ac.uk</email>
-    </person>
-  </developers>
-  <documentation> ssn29 ssn77 sun115 sun134 sun144 sun224 sun241</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-
 <component id="messys">
   <version>3.0</version>
   <path>libraries/pcs/messys</path>
   <description>Message system</description>
   <!-- <abstract><p></p></abstract> -->
-  <dependencies>
-    <build> sae messgen</build>
-    <use> mers ams</use>
+  <dependencies >
+    <build>sae</build><link>ams</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -401,9 +364,8 @@
   <path>libraries/pcs/subpar</path>
   <description>Parameter subsystem</description>
   <!-- <abstract><p></p></abstract> -->
-  <dependencies>
-    <build> sae messys chr adam lex ems hds messgen</build>
-    <use> chr dat ems ams hds hlp icl lex parsecon psx</use>
+  <dependencies >
+    <build>adam</build><build>chr</build><build>hds</build><build>ems</build><build>lex</build><build>messys</build><build>sae</build><link>ams</link><link>chr</link><link>ems</link><link>hds</link><link>hlp</link><link>lex</link><link>misc</link><link>parsecon</link><link>psx</link><link>string</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -422,9 +384,8 @@
   <path>libraries/pcs/ams</path>
   <description>ADAM Message System</description>
   <!-- <abstract><p></p></abstract> -->
-  <dependencies>
-    <build> sae cnf dtask atimer messys msp adam</build>
-    <use></use>
+  <dependencies >
+    <build>sae</build><build>cnf</build><build>dtask</build><build>atimer</build><build>messys</build><build>msp</build><build>adam</build>
   </dependencies>
   <developers>
     <person><name>Ian Jenkins (IRJ)</name></person>
@@ -443,9 +404,8 @@
   <path>libraries/pcs/dtask</path>
   <description>DTASK linking library</description>
   <abstract><p>ADD DETAILS!</p></abstract>
-  <dependencies>
-    <build> sae cnf psx subpar messys adam messgen</build>
-    <use> chr ams hds msg psx atimer string</use>
+  <dependencies >
+    <build>adam</build><build>cnf</build><build>messys</build><build>psx</build><build>sae</build><build>subpar</build><link>chr</link><link>ems</link><link>mers</link><link>ams</link><link>atimer</link><link>hds</link><link>psx</link><link>subpar</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -466,9 +426,8 @@
   the ADAM intertask communication software on unix to TCP/IP, thereby
   allowing ADAM tasks on different machines to communicate with one
   another. </description>
-  <dependencies>
-    <build> sae messys adam ams msp sock messgen</build>
-    <use></use>
+  <dependencies >
+    <build>sae</build><build>messys</build><build>adam</build><build>ams</build><build>msp</build><build>sock</build><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -488,9 +447,8 @@
   <path>libraries/pcs/hdspar</path>
   <description>Part of the HDS system.  HDSPAR declares bulk data
     parameters.</description>
-  <dependencies>
-    <build> sae</build>
-    <use> subpar</use>
+  <dependencies >
+    <build>sae</build><link>subpar</link>
   </dependencies>
   <developers>
     <person>
@@ -516,9 +474,8 @@
       directly from a Unix shell and others provide a Fortran
       interface into the C library for platforms (notably Linux) which
       do not include them as part of the system.</p></abstract>
-  <dependencies>
-    <build> cnf</build>
-    <use></use>
+  <dependencies >
+    <build>cnf</build>
   </dependencies>
   <developers>
     <person>
@@ -541,9 +498,8 @@
       messages. Messages on the sockets specify a `queue' in the
       receiving task for which they are intended and a queue in the
       sending task to which replies should be sent.</p></abstract>
-  <dependencies>
-    <build> sae sock messgen</build>
-    <use></use>
+  <dependencies >
+    <build>sae</build><build>sock</build><link>sock</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -567,9 +523,8 @@
   <abstract><p>Parsing of the interface files associated with SUBPAR.
       The package also includes the interface file compiler,
       COMPIFL.</p></abstract>
-  <dependencies>
-    <build> sae hds hlp subpar ems chr string messgen</build>
-    <use> chr ems string subpar</use>
+  <dependencies >
+    <build>chr</build><build>hds</build><build>ems</build><build>sae</build><build>subpar</build><build option='link'>string</build><link>chr</link><link>ems</link><link>string</link><link>subpar</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -590,9 +545,8 @@
   <path>libraries/pcs/sock</path>
   <description>Provides a Unix-socket-based message transport system
     for the MSP system</description>
-  <dependencies>
-    <build> sae messgen</build>
-    <use></use>
+  <dependencies >
+    <build>sae</build><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -615,9 +569,8 @@
       message protocol and includes subroutines for encoding and
       decoding data values in messages.  For examples of use, see
       SUN/134.</p></abstract>
-  <dependencies>
-    <build> sae adam dtask messys subpar messgen</build>
-    <use> chr dtask ems mers string subpar</use>
+  <dependencies >
+    <build>adam</build><build>dtask</build><build>messys</build><build>sae</build><build>subpar</build><link>ams</link><link>chr</link><link>dtask</link><link>ems</link><link>mers</link><link>string</link><link>subpar</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -641,9 +594,8 @@
       subroutines are also used by software items outside the
       parameter system, but the library has no published
       interface</p></abstract>
-  <dependencies>
-    <build> sae chr</build>
-    <use> chr ems</use>
+  <dependencies >
+    <build>sae</build><build>chr</build><link>chr</link><link>ems</link>
   </dependencies>
   <developers>
     <person>
@@ -665,9 +617,8 @@
       associated handler which is invoked when the timer expires.  The
       library is written in C but a Fortran interface, FATIMER, is
       provided.</p></abstract>
-  <dependencies>
-    <build> sae cnf messgen</build>
-    <use></use>
+  <dependencies >
+    <build>sae</build><build>cnf</build><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -680,6 +631,34 @@
   <notes><p>Described in SSN/29</p></notes>
 </component>
 
+<component id="pcs">
+  <version>4.1-1</version>
+  <path>libraries/pcs</path>
+  <description>The Parameter and Communication Subsystems</description>
+  <abstract><p>Application programs often need to obtain parameter
+      values from a variety of sources and to communicate with other
+      programs. The Parameter and Communication Subsystems (PCS) are a
+      set of closely-related subroutine libraries which provide these
+      facilities for many Starlink applications and the associated
+      user-interfaces.</p>
+    <p>The PCS libraries will not generally be called directly by
+      application programs, but form a basic part of the Starlink
+      Software Environment</p></abstract>
+  <dependencies >
+    <build>adam</build><build>ams</build><build>dtask</build><build>hdspar</build><build>lex</build><build>messys</build><build>misc</build><build>msp</build><build>parsecon</build><build>sock</build><build>string</build><build>subpar</build><build>task</build>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> ssn29 ssn77 sun115 sun134 sun144 sun224 sun241</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+
 <component id="sae">
   <version>1.0</version>
   <path>libraries/sae</path>
@@ -689,9 +668,8 @@
       error file and a shell script needed for development of software
       in the Starlink environment, and for building the USSC.</p>
   </abstract>
-  <dependencies>
-    <build> messgen</build>
-    <use></use>
+  <dependencies >
+    <sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -714,9 +692,8 @@
       X/OPEN libraries. The use of this library will enable
       programmers to make use of operating system facilities in a
       machine independent way.</p></abstract> 
-  <dependencies>
-    <build> sae messgen</build>
-    <use></use>
+  <dependencies >
+    <build>sae</build><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -741,9 +718,8 @@
       of text.  The facility resembles VAX/VMS HELP.  It consists of a
       library plus utility programs for creating, listing and reading
       help libraries.</p></abstract>
-  <dependencies>
-    <build></build>
-    <use></use>
+  <dependencies >
+    
   </dependencies>
   <developers>
     <person>
@@ -765,9 +741,8 @@
       routines are concerned with astronomical position and time, but
       a number have wider trigonometrical, numerical or general
       applications.</p></abstract>
-  <dependencies>
-    <build></build>
-    <use></use>
+  <dependencies >
+    
   </dependencies>
   <developers>
     <person>
@@ -780,15 +755,12 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="autoconf">
+<component id="autoconf" buildsupport="yes">
   <version>2.59</version>
   <path>thirdparty/fsf/autoconf</path>
   <description>GNU autoconf</description>
   <!-- <abstract><p></p></abstract> -->
-  <dependencies>
-    <build></build>
-    <use></use>
-  </dependencies>
+  <dependencies/>
   <developers>
     <!-- Cast of thousands, but locally to Starlink... -->
     <person>
@@ -804,13 +776,14 @@
       examined after that.</p></notes>
 </component>
 
-<component id="automake">
+<component id="automake" buildsupport="yes">
   <version>1.8.2-starlink</version>
   <path>thirdparty/fsf/automake</path>
   <description>GNU automake, patched</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies>
-    <build>autoconf libtool</build>
+    <build>autoconf</build>
+    <build>libtool</build>
   </dependencies>
   <developers>
     <!-- Cast of thousands, but locally to Starlink... -->
@@ -828,15 +801,12 @@
       examined after that.</p></notes>
 </component>
 
-<component id="libtool">
+<component id="libtool" buildsupport="yes">
   <version>1.5</version>
   <path>thirdparty/fsf/libtool</path>
   <description>GNU libtool</description>
   <!-- <abstract><p></p></abstract> -->
-  <dependencies>
-    <build></build>
-    <use></use>
-  </dependencies>
+  <dependencies/>
   <developers>
     <!-- Cast of thousands, but locally to Starlink... -->
     <person>
