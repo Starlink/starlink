@@ -41,7 +41,13 @@ DIST_COMMON = $(dist_pkgvdata_DATA) $(dist_script_DATA) \
 	elisp-comp install-sh mdate-sh missing mkinstalldirs \
 	py-compile texinfo.tex ylwrap
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/amversion.m4 \
+	$(top_srcdir)/m4/auxdir.m4 $(top_srcdir)/m4/init.m4 \
+	$(top_srcdir)/m4/install-sh.m4 $(top_srcdir)/m4/lead-dot.m4 \
+	$(top_srcdir)/m4/missing.m4 $(top_srcdir)/m4/mkdirp.m4 \
+	$(top_srcdir)/m4/options.m4 $(top_srcdir)/m4/runlog.m4 \
+	$(top_srcdir)/m4/sanity.m4 $(top_srcdir)/m4/strip.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/lib/mkinstalldirs
@@ -60,11 +66,6 @@ dist_scriptDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(dist_pkgvdata_DATA) $(dist_script_DATA)
 ETAGS = etags
 CTAGS = ctags
-# Templates to generate documentation
-SUFFIXES = .tex .dvi .ps .htx .htx_tar
-PRECIOUS = .htx
-install_with_manifest = $(SHELL) \
-	$(top_srcdir)/lib/install-with-manifest
 INSTALL_STARDATA = $(INSTALL_DATA)
 DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
@@ -103,6 +104,7 @@ PATH_SEPARATOR = @PATH_SEPARATOR@
 PERL = @PERL@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
 STRIP = @STRIP@
 TEX = @TEX@
 VERSION = @VERSION@
@@ -145,7 +147,6 @@ dist_script_DATA = config.guess config.sub install-sh mdate-sh missing \
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .tex .dvi .ps .htx .htx_tar
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -341,8 +342,7 @@ install-manifest.xml: all-am
 	echo "<manifest component='$(PACKAGE)'>"                >>$@
 	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
 	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=$@ $(MAKE) install
-#	env REAL_INSTALL='$(INSTALL)' INSTALL='$(install_with_manifest)' MANIFEST_FILENAME=$@ $(MAKE) -e install
+	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
 	echo "</files>"                                         >>$@
 	echo "</manifest>"                                      >>$@
 
@@ -355,14 +355,6 @@ install-manifest: install-manifest.xml
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
 		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-.tex.dvi:
-	latex $<
-.dvi.ps:
-	dvips -o $@ $<
-.tex.htx:
-	star2html $<
-.htx.htx_tar:
-	tar cf $@ $<
 
 distdir: $(DISTFILES)
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
