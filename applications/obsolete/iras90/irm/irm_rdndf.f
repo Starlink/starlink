@@ -142,7 +142,7 @@
 *  and IGRP is returned holding a valid group identifier.  On successive
 *  passes, new names are appended to the group created on the first
 *  pass.
-         CALL NDG_ASSOC( PARAM, IGRP, NEWSIZ, FLAG, STATUS )
+         CALL NDG_ASSOC( PARAM, .TRUE., IGRP, NEWSIZ, FLAG, STATUS )
 
 *  If no error occured, save the new group size.
          IF( STATUS .EQ. SAI__OK ) THEN
