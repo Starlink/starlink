@@ -122,9 +122,13 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.6  1996/11/02 01:43:25  timj
-*     Fix bug in history header
+*     Revision 1.7  1996/12/10 02:12:43  timj
+*     Fix for non-square jiggles.
+*     Change 'ANALYSIS' to PAR_CHOIC.
 *
+c Revision 1.6  1996/11/02  01:43:25  timj
+c Fix bug in history header
+c
 c Revision 1.5  1996/11/02  01:25:10  timj
 c Change Naem: to SCUPHOT from REDS_SCUPHOT in header.
 c
@@ -452,7 +456,8 @@ c
                   REDUCE_SWITCH = .TRUE.
                ELSE IF (STEMP .EQ. 'EXTINCTION') THEN
                   EXTINCTION = .TRUE.
-               ELSE IF (STEMP .EQ. 'SKY_ERROR') THEN
+               ELSE IF (STEMP .EQ. 'SKY_ERROR' .OR. 
+     :                 STEMP .EQ. 'REMSKY') THEN
                   SKY_ERROR = .TRUE.
                ELSE IF (STEMP .EQ. 'PHOTOM') THEN
                   PHOTOM = .TRUE.
@@ -737,6 +742,13 @@ c
 
 	       N_OBSDIM = 1
 	       UBND (1) = JIGGLE_COUNT
+               UBND(2) = 1
+*     Reset jiggle positions for unpack_jiggle_separates
+               DO I = 1, JIGGLE_COUNT
+                  IPOS(I) = I
+                  JPOS(I) = 1
+               END DO
+
 	       CALL MSG_OUT (' ', 'REDS: the jiggle pattern does '//
      :           'not fit a rectangular mesh, no images will be '//
      :           'stored', STATUS)
@@ -795,7 +807,9 @@ c
 
 *  Ask for the reduction method
 
-      CALL PAR_GET0C ('ANALYSIS', ANALYSIS, STATUS)
+      CALL PAR_CHOIC('ANALYSIS', 'AVERAGE','Average,Parabola', .TRUE.,
+     :     ANALYSIS, STATUS)
+
 
 *  create the output file that will contain the reduced data in NDFs
 
@@ -808,7 +822,6 @@ c
 
          DO BEAM = 1, SCUBA__MAX_BEAM
 	    MEAS_1_Q (BEAM) = 1
-
 	    MEAS_2_N (BEAM) = 0
 
 	    DO POS = 1, SCUBA__MAX_JIGGLE
@@ -945,11 +958,12 @@ c
                CALL NDF_CPUT(OBJECT, IPEAK, 'Title', STATUS)
                CALL NDF_CPUT('Fitted peak',IPEAK, 'LAB', STATUS)
 
-
-               CALL NDF_ACPUT('X-offset',IBEAM,'LABEL',1,STATUS)
-               CALL NDF_ACPUT('Y-offset',IBEAM,'LABEL',2,STATUS)
-               CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',1,STATUS)
-               CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',2,STATUS)
+               IF (N_OBSDIM.GT.1) THEN
+                  CALL NDF_ACPUT('X-offset',IBEAM,'LABEL',1,STATUS)
+                  CALL NDF_ACPUT('Y-offset',IBEAM,'LABEL',2,STATUS)
+                  CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',1,STATUS)
+                  CALL NDF_ACPUT('arcsec',IBEAM,'UNITS',2,STATUS)
+               END IF
                CALL NDF_CPUT(OBJECT, IBEAM, 'Title', STATUS)
                CALL NDF_CPUT('Coadd jiggle map',IBEAM, 'LAB', STATUS)
 
@@ -1050,8 +1064,8 @@ c
                CALL NDF_SBAD(ISBAD, IPEAK, 'Data', STATUS)
 
 *  close the ndfs opened in this ndf context
-
 	       CALL NDF_END (STATUS)
+
             END IF
          END DO
       END IF
@@ -1083,7 +1097,6 @@ c
       END DO
 
 *  close the input file
-
       CALL DAT_ANNUL (IN_SCUBAX_LOC, STATUS)
       CALL DAT_ANNUL (IN_SCUCDX_LOC, STATUS)
       CALL DAT_ANNUL (IN_REDSX_LOC, STATUS)
