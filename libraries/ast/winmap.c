@@ -54,6 +54,10 @@ f     The WinMap class does not define any new routines beyond those
 *     9-APR-1998 (DSB):
 *        MapMerge modified to allow merging of WinMaps with ZoomMaps and 
 *        and UnitMaps in parallel.
+*     4-SEP-1998 (DSB):
+*        Improved MapMerge so that WinMaps can change places with a wider
+*        range of PermMaps, allowing them to approach closer to a Mapping
+*        with which they can merge.
 *class--
 */
 
@@ -117,6 +121,7 @@ AstWinMap *astWinMapId_( int, const double [], const double [],
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstWinMap *WinUnit( AstWinMap *, AstUnitMap *, int, int );
 static AstWinMap *WinWin( AstMapping *, AstMapping *, int, int, int );
@@ -131,6 +136,7 @@ static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void InitVtab( AstWinMapVtab * );
+static void PermGet( AstPermMap *, int **, int **, double ** );
 static void SetAttrib( AstObject *, const char * );
 static void WinMat( AstMapping **, int *, int );
 static void WinPerm( AstMapping **, int *, int );
@@ -192,12 +198,12 @@ static int CanSwap( AstMapping *map1, AstMapping *map2 ){
 
 /* Local Variables: */
    AstMapping *nowin;        /* Pointer to non-WinMap Mapping */
-   AstPointSet *pset1;       /* PointSet holding input positions for PermMap */
-   AstPointSet *pset2;       /* PointSet holding output positions for PermMap */
    const char *class1;       /* Pointer to map1 class string */
    const char *class2;       /* Pointer to map2 class string */
    const char *nowin_class;  /* Pointer to non-WinMap class string */
-   double **ptr1;            /* Pointer to pset1 data */
+   double *consts;           /* Pointer to constants array */
+   int *inperm;              /* Pointer to input axis permutation array */
+   int *outperm;             /* Pointer to output axis permutation array */
    int i;                    /* Loop count */
    int nin;                  /* No. of input coordinates for the PermMap */
    int nout;                 /* No. of output coordinates for the PermMap */
@@ -227,54 +233,50 @@ static int CanSwap( AstMapping *map1, AstMapping *map2 ){
       if( !strcmp( nowin_class, "MatrixMap" ) ){
          ret = 1;
 
-/* If it is a PermMap, the Mappings can be swapped so long as the PermMap 
-   has consistent forward and inverse transformations. */
+/* If it is a PermMap, the Mappings can be swapped so long as all links 
+   between input and output axes in the PermMap are bi-directional. This
+   does not preclude the existence of unconnected axes, which do not 
+   have links (bi-directional or otherwise). */
       } else if( !strcmp( nowin_class, "PermMap" ) ){
 
-/* The PermMap must have the same number of input and output coordinates. */
+/* Get the number of input and output coordinates. */
          nin = astGetNin( nowin );
          nout = astGetNout( nowin );
-         if( nin == nout ){
 
-/* Create two PointSets, each holding two points, which can be used for
-   the input and output positions with the PermMap. */
-            pset1 = astPointSet( 2, nin, "" );
-            pset2 = astPointSet( 2, nout, "" );
+/* We need to know the axis permutation arrays and constants array for
+   the PermMap. */
+         PermGet( (AstPermMap *) nowin, &outperm, &inperm, &consts );
+         if( astOK ) {
 
-/* Set up the two input positions to be [1,2,3...] and [0,-1,-2,...] */
-            ptr1 = astGetPoints( pset1 );
-            if( astOK ){
-               for( i = 0; i < nin; i++ ){
-                  ptr1[ i ][ 0 ] = ( double )( i + 1 );
-                  ptr1[ i ][ 1 ] = ( double )( -i );
-               }
-            }
+/* Indicate we can swap with the PermMap. */
+            ret = 1;
 
-/* Use the PermMap to transform these positions in the forward direction. */
-            astTransform( nowin, pset1, 1, pset2 );
-
-/* Now transform the results back again using the inverse PermMap. */
-            astTransform( nowin, pset2, 0, pset1 );
-
-/* See if the input positions have changed. If they have, then the PermMap
-   does not have a consistent pair of transformations. If they have not,
-   then the transformations must be consistent because we used two
-   different input positions and only one could come out unchanged by
-   chance. */
-            if( astOK ){
-               ret = 1;
-               for( i = 0; i < nin; i++ ){
-                  if( ptr1[ i ][ 0 ] != ( double )( i + 1 ) ||
-                      ptr1[ i ][ 1 ] != ( double )( -i ) ){
+/* Check each output axis. If any links between axes are found which are
+   not bi-directional, indicate that we cannot swap with the PermMap. */
+            for( i = 0; i < nout; i++ ){
+               if( outperm[ i ] >= 0 && outperm[ i ] < nin ) {
+                  if( inperm[ outperm[ i ] ] != i ) {
                      ret = 0;
                      break;
                   }
                }
             }
 
-/* Annul the PointSets. */
-            pset1 = astAnnul( pset1 );
-            pset2 = astAnnul( pset2 );
+/* Check each input axis. If any links between axes are found which are
+   not bi-directional, indicate that we cannot swap with the PermMap. */
+            for( i = 0; i < nin; i++ ){
+               if( inperm[ i ] >= 0 && inperm[ i ] < nout ) {
+                  if( outperm[ inperm[ i ] ] != i ) {
+                     ret = 0;
+                     break;
+                  }
+               }
+            }
+
+/* Free the axis permutation and constants arrays. */
+            outperm = (int *) astFree( (void *) outperm );
+            inperm = (int *) astFree( (void *) inperm );
+            consts = (double *) astFree( (void *) consts );
          }
       }
    }
@@ -611,6 +613,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 */
 
 /* Local Variables: */
+   AstMapping *map2;     /* Pointer to replacement Mapping */
+   AstMapping *mc[2];    /* Copies of supplied Mappings to swap */
    AstWinMap *newwm;     /* Pointer to replacement WinMap */
    AstMatrixMap *mtr;    /* Pointer to replacement MatrixMap */
    const char *class1;   /* Pointer to first Mapping class string */
@@ -621,12 +625,16 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int i1;               /* Index of first WinMap to merge */
    int i2;               /* Index of last WinMap to merge */
    int i;                /* Loop counter */
+   int ic[2];            /* Copies of supplied invert flags to swap */
    int invert;           /* Should the inverted Mapping be used? */
+   int neighbour;        /* Index of Mapping with which to swap */
    int nin;              /* Number of coordinates for WinMap */
    int nstep1;           /* No. of Mappings backwards to next mergable Mapping */
    int nstep2;           /* No. of Mappings forward to next mergable Mapping */
    int old_winv;         /* original Invert value for supplied WinMap */
    int result;           /* Result value to return */
+   int swaphi;           /* Can WinMap be swapped with higher neighbour? */
+   int swaplo;           /* Can WinMap be swapped with lower neighbour? */
 
 /* Initialise. */
    result = -1;
@@ -787,6 +795,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    Mapping is found, or when a Mapping is found with which the WinMap
    cannot swap. Note the number of Mappings which separate the WinMap
    from the Mapping with which it could merge (if any). */
+            swaphi = 0;
             nstep2 = -1;
             for( i2 = where + 1; i2 < *nmap; i2++ ){
 
@@ -798,13 +807,21 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                   break;
                }
 
+/* If we cannot swap with this Mapping, leave the loop. */
                if( !CanSwap(  ( *map_list )[ where ], 
-                              ( *map_list )[ i2 ] ) ) break;
+                              ( *map_list )[ i2 ] ) ) {
+                  break;
 
+/* Otherwise, set a flag to indicate that we could swap the WinMap with its 
+   higher neighbour if needed. */
+               } else {
+                  swaphi = 1;
+               }
             }
 
 /* Do the same working forward from the WinMap towards the start of the map
    list. */
+            swaplo = 0;
             nstep1 = -1;
             for( i1 = where - 1; i1 >= 0; i1-- ){
 
@@ -817,7 +834,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                }
 
                if( !CanSwap(  ( *map_list )[ where ], 
-                              ( *map_list )[ i1 ] ) ) break;
+                              ( *map_list )[ i1 ] ) ) {
+                  break;
+               } else {
+                  swaplo = 1;
+               }
             }
 
 /* Choose which neighbour to swap with so that the WinMap moves towards the
@@ -826,10 +847,12 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                nclass = class1;
                i1 = where - 1;
                i2 = where;
+               neighbour = i1;
             } else if( nstep2 != -1 ){
                nclass = class2;
                i1 = where;
                i2 = where + 1;
+               neighbour = i2;
             } else {
                nclass = NULL;
             }
@@ -838,13 +861,104 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    merge, replace the supplied Mappings with swapped Mappings to bring a
    WinMap closer to the target Mapping. */
             if( nclass ){
-               if( !strcmp( nclass, "MatrixMap" ) ){
-                  WinMat( (*map_list) + i1, (*invert_list) + i1, where - i1 );
-                  result = i1;
 
-               } else if( !strcmp( nclass, "PermMap" ) ){
-                  WinPerm( (*map_list) + i1, (*invert_list) + i1, where - i1 );
+/* It is possible that the neighbouring Mapping with which we are about to 
+   swap could also merge with the target Mapping. When the neighbouring
+   Mapping is reconsidered it may well swap the pair back to put itself nearer 
+   the target Mapping. We need to be careful not to end up in an infinite loop 
+   in which the pair of neighbouring Mappings are constantly swapped backwards 
+   and forwards as each attempts to put itself closer to the target Mapping.
+   To prevent this, we only swap the pair of Mappings if the neighbouring
+   Mapping could not itself merge with the target Mapping. Check to see
+   if this is the case by attempting to merge the neighbouring Mapping. */
+               map2 = astClone( (*map_list)[ neighbour ] );
+               result = astMapMerge( map2, neighbour, series, nmap, map_list, 
+                                     invert_list );
+               map2 = astAnnul( map2 );
+
+/* Only proceed if the above call produced no change in the  Mapping list. */
+               if( result == -1 ){
+
+                  if( !strcmp( nclass, "MatrixMap" ) ){
+                     WinMat( (*map_list) + i1, (*invert_list) + i1, where - i1 );
+
+                  } else if( !strcmp( nclass, "PermMap" ) ){
+                     WinPerm( (*map_list) + i1, (*invert_list) + i1, where - i1 );
+                  }
+
+/* Store the index of the first modified Mapping. */
                   result = i1;
+               }
+
+/* If there is no Mapping available for merging, it may still be
+   advantageous to swap with a neighbour because the swapped Mapping may
+   be simpler than the original Mappings. For instance, a PermMap may
+   strip axes of the WinMap leaving only a UnitMap. */
+            } else if( swaphi || swaplo ) {
+
+/* Try swapping with each possible neighbour in turn. */
+               for( i = 0; i < 2; i++ ) {
+
+/*  Set up the class and pointers for the mappings to be swapped, first
+    the lower neighbour, then the upper neighbour. */
+                  if( i == 0 && swaplo ){
+                     nclass = class1;
+                     i1 = where - 1;
+                     i2 = where;
+
+                  } else if( i == 1 && swaphi ){
+                     nclass = class2;
+                     i1 = where;
+                     i2 = where + 1;
+
+                  } else {
+                     nclass = NULL;
+                  }
+
+/* If we have a Mapping to swap with... */
+                  if( nclass ) {
+
+/* Take copies of the Mapping and Invert flag arrays so we do not change 
+   the supplied values. */
+                     mc[ 0 ] = (AstMapping *) astCopy( ( (*map_list) + i1 )[0] );
+                     mc[ 1 ] = (AstMapping *) astCopy( ( (*map_list) + i1 )[1] );
+                     ic[ 0 ] = ( (*invert_list) + i1 )[0];
+                     ic[ 1 ] = ( (*invert_list) + i1 )[1];
+
+/* Swap these Mappings. */
+                     if( !strcmp( nclass, "MatrixMap" ) ){
+                        WinMat( mc, ic, where - i1 );
+                     } else if( !strcmp( nclass, "PermMap" ) ){
+                        WinPerm( mc, ic, where - i1 );
+                     }
+
+/* If neither of the swapped Mappings can be simplified further, then there
+   is no point in swapping the Mappings, so just annul the map copies. */
+                     if( astGetClass( astSimplify( mc[0] ) ) == 
+                         astGetClass( mc[0] ) &&
+                         astGetClass( astSimplify( mc[1] ) ) == 
+                         astGetClass( mc[1] ) ) {
+      
+                        mc[ 0 ] = (AstMapping *) astAnnul( mc[ 0 ] );
+                        mc[ 1 ] = (AstMapping *) astAnnul( mc[ 1 ] );
+
+/* If one or both of the swapped Mappings could be simplified, then annul
+   the supplied Mappings and return the swapped mappings, storing the index 
+   of the first modified Mapping. */
+                     } else {
+                        (void ) astAnnul( ( (*map_list) + i1 )[0] );
+                        (void ) astAnnul( ( (*map_list) + i1 )[1] );
+      
+                        ( (*map_list) + i1 )[0] = mc[ 0 ];
+                        ( (*map_list) + i1 )[1] = mc[ 1 ];
+      
+                        ( (*invert_list) + i1 )[0] = ic[ 0 ];
+                        ( (*invert_list) + i1 )[1] = ic[ 1 ];
+      
+                        result = i1;
+                        break;
+                     }
+                  }
                }
             }
          }
@@ -946,6 +1060,185 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Return the result. */
    return result;
+}
+
+static void PermGet( AstPermMap *map, int **outperm, int **inperm, 
+                     double **consts ){
+/*
+*  Name:
+*     PermGet
+
+*  Purpose:
+*     Get the axis permutation and constants array for a PermMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     void PermGet( AstPermMap *map, int **outperm, int **inperm, 
+*                   double **const )
+
+*  Class Membership:
+*     WinMap member function 
+
+*  Description:
+*     This function returns axis permutation and constants arrays which can
+*     be used to create a PermMap which is equivalent to the supplied PermMap.
+
+*  Parameters:
+*     map
+*        The PermMap.
+*     outperm
+*        An address at which to return a popinter to an array of ints
+*        holding the output axis permutation array. The array should be
+*        released using astFree when no longer needed.
+*     inperm
+*        An address at which to return a popinter to an array of ints
+*        holding the input axis permutation array. The array should be
+*        released using astFree when no longer needed.
+*     consts
+*        An address at which to return a popinter to an array of doubles
+*        holding the constants array. The array should be released using 
+*        astFree when no longer needed.
+
+*  Notes:
+*     -  NULL pointers are returned if an error has already occurred, or if
+*     this function should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPointSet *pset1;       /* PointSet holding input positions for PermMap */
+   AstPointSet *pset2;       /* PointSet holding output positions for PermMap */
+   double **ptr1;            /* Pointer to pset1 data */
+   double **ptr2;            /* Pointer to pset2 data */
+   double *cnst;             /* Pointer to constants array */
+   double cn;                /* Potential new constant value */
+   double ip;                /* Potential output axis index */
+   double op;                /* Potential input axis index */
+   int *inprm;               /* Pointer to input axis permutation array */
+   int *outprm;              /* Pointer to output axis permutation array */
+   int i;                    /* Axis count */
+   int nc;                   /* Number of constants stored so far */
+   int nin;                  /* No. of input coordinates for the PermMap */
+   int nout;                 /* No. of output coordinates for the PermMap */
+
+/* Initialise. */
+   if( outperm ) *outperm = NULL;
+   if( inperm ) *inperm = NULL;
+   if( consts ) *consts = NULL;
+
+/* Check the global error status and the supplied pointers. */
+   if ( !astOK || !outperm || !inperm || !consts ) return;
+
+/* Get the number of input and output axes for the supplied PermMap. */
+   nin = astGetNin( map );
+   nout = astGetNout( map );
+
+/* Allocate the memory for the returned arrays. */
+   outprm = (int *) astMalloc( sizeof( int )* (size_t) nout );
+   inprm = (int *) astMalloc( sizeof( int )* (size_t) nin );
+   cnst = (double *) astMalloc( sizeof( double )* (size_t) ( nout + nin ) );
+
+/* Returned the pointers to these arrays.*/
+   *outperm = outprm;
+   *inperm = inprm;
+   *consts = cnst;
+
+/* Create two PointSets, each holding two points, which can be used for
+   input and output positions with the PermMap. */
+   pset1 = astPointSet( 2, nin, "" );
+   pset2 = astPointSet( 2, nout, "" );
+
+/* Set up the two input positions to be [0,1,2...] and [-1,-1,-1,...]. The
+   first position is used to enumerate the axes, and the second is used to 
+   check for constant axis values. */
+   ptr1 = astGetPoints( pset1 );
+   if( astOK ){
+      for( i = 0; i < nin; i++ ){
+         ptr1[ i ][ 0 ] = ( double ) i;
+         ptr1[ i ][ 1 ] = -1.0;
+      }
+   }
+
+/* Use the PermMap to transform these positions in the forward direction. */
+   (void) astTransform( map, pset1, 1, pset2 );
+
+/* Look at the mapped positions to determine the output axis permutation
+   array. */
+   ptr2 = astGetPoints( pset2 );
+   if( astOK ){
+
+/* No constant axis valeus found yet. */
+      nc = 0;
+
+/* Do each output axis. */
+      for( i = 0; i < nout; i++ ){
+
+/* If the output axis value is copied from an input axis value, the index
+   of the appropriate input axis will be in the mapped first position. */
+         op = ptr2[ i ][ 0 ];
+
+/* If the output axis value is assigned a constant value, the result of 
+   mapping the two different input axis values will be the same. */
+         cn = ptr2[ i ][ 1 ];
+         if( op == cn ) {
+
+/* We have found another constant. Store it in the constants array, and
+   store the index of the constant in the output axis permutation array. */
+            cnst[ nc ] = cn;
+            outprm[ i ] = -( nc + 1 );
+            nc++;
+
+/* If the output axis values are different, then the output axis value 
+   must be copied from the input axis value. */
+         } else {
+            outprm[ i ] = (int) ( op + 0.5 );
+         }
+      }
+   }
+    
+/* Now do the same thing to determine the input permutation array. */
+   if( astOK ){
+      for( i = 0; i < nout; i++ ){
+         ptr2[ i ][ 0 ] = ( double ) i;
+         ptr2[ i ][ 1 ] = -1.0;
+      }
+   }
+
+   (void) astTransform( map, pset2, 0, pset1 );
+
+   if( astOK ){
+
+      for( i = 0; i < nin; i++ ){
+
+         ip = ptr1[ i ][ 0 ];
+         cn = ptr1[ i ][ 1 ];
+         if( ip == cn ) {
+
+            cnst[ nc ] = cn;
+            inprm[ i ] = -( nc + 1 );
+            nc++;
+
+         } else {
+            inprm[ i ] = (int) ( ip + 0.5 );
+         }
+      }
+   }
+
+/* Annul the PointSets. */
+   pset1 = astAnnul( pset1 );
+   pset2 = astAnnul( pset2 );
+
+/* If an error has occurred, attempt to free the returned arrays. */
+   if( !astOK ) {
+      *outperm = (int *) astFree( (void *) *outperm );
+      *inperm = (int *) astFree( (void *) *inperm );
+      *consts = (double *) astFree( (void *) *consts );
+   }
+
+/* Return. */
+   return;
 }
 
 static void SetAttrib( AstObject *this_object, const char *setting ) {
@@ -1436,8 +1729,6 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
 *     another pair of Mappings consisting of a WinMap and a PermMap
 *     in the opposite order. These Mappings are chosen so that their
 *     combined effect is the same as the original pair of Mappings. 
-*     The returned PermMap is unchanged (i.e. all the changed are made
-*     to the WinMap).
 
 *  Parameters:
 *     maps
@@ -1448,27 +1739,33 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
 *        The index within "maps" of the WinMap.
 
 *  Notes:
-*     -  The PermMap must have a consistent pair of forward and inverse
-*     transformations.
+*     -  All links between input and output axes in the PermMap must 
+*     be bi-directional, but there can be unconnected axes, and there
+*     need not be the same number of input and output axes.
 
 */
 
 /* Local Variables: */
    AstPermMap *pm;               /* Pointer to the supplied PermMap */
-   AstPointSet *pset1;           /* Shift & scale terms from supplied WinMap */
-   AstPointSet *pset2;           /* Permuted shift & scale terms */
+   AstPermMap *p1;               /* Pointer to the returned PermMap */
    AstWinMap *w1;                /* Pointer to the returned WinMap */
    AstWinMap *wm;                /* Pointer to the supplied WinMap */
-   double **ptr1;                /* Pointer to pset1 data */
-   double **ptr2;                /* Pointer to pset2 data */
    double *a;                    /* Array of shift terms from supplied WinMap */
    double *aa;                   /* Pointer to next shift term */
    double *b;                    /* Array of scale terms from supplied WinMap */
    double *bb;                   /* Pointer to next scale term */
+   double *consts;               /* Pointer to constants array */
+   double c;                     /* A constant value */
+   int *inperm;                  /* Pointer to input axis permutation array */
+   int *outperm;                 /* Pointer to output axis permutation array */
    int i;                        /* Axis count */
+   int j;                        /* Axis index */
    int nin;                      /* No. of axes in supplied WinMap */
+   int npin;                     /* No. of input axes in supplied PermMap */
+   int npout;                    /* No. of output axes in supplied PermMap */
    int old_pinv;                 /* Invert value for the supplied PermMap */
    int old_winv;                 /* Invert value for the supplied WinMap */
+
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1489,40 +1786,152 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
    also returns the number of axes in the WinMap. */
    nin = astWinTerms( wm, &a, &b );   
 
-/* Create two PointSets, each holding two points, which can be used for
-   input and output positions with the PermMap. */
-   pset1 = astPointSet( 2, nin, "" );
-   pset2 = astPointSet( 2, nin, "" );
+/* Get the axis permutation and constants arrays representing the
+   PermMap. Note, no constants are used more than once in the returned
+   arrays (i.e. duplicate constants are returned in "consts" if more than
+   one axis uses a given constant). */
+   PermGet( pm, &outperm, &inperm, &consts );
 
-/* Store the WinMap shift terms as the first position, and the WinMap
-   scale terms as the second position. */
-   ptr1 = astGetPoints( pset1 );
-   if( astOK ){
-      bb = b;
-      aa = a;
-      for( i = 0; i < nin; i++ ){
-         ptr1[ i ][ 1 ] = *(bb++);
-         ptr1[ i ][ 0 ] = *(aa++);
+   if( astOK ) {
+
+/* Get the number of input and output axes in the PermMap. */
+      npin = astGetNin( pm );
+      npout = astGetNout( pm );
+
+/* First consider cases where the WinMap is applied first, followed by the
+   PermMap. */
+      if( iwm == 0 ) {
+
+/* Create the new WinMap, initially with undefined corners. Its number 
+   of axes will equal the number of output axes of the PermMap. */
+         w1 = astWinMap( npout, NULL, NULL, NULL, NULL, "" );
+
+/* Get pointers to the scale and shift terms for the new WinMap. */
+         bb = w1->b;
+         aa = w1->a;
+
+/* Thinking of the forward CmpMap first, consider each of the output axes of 
+   the PermMap. */
+         for( i = 0; i < npout; i++ ){
+
+/* If the value for this output axis is derived from an input axis, copy the 
+   scale and shift terms from the corresponding input axis to the new 
+   WinMap. */
+            j = outperm[ i ];
+            if( j >= 0 && j < nin ) {
+               aa[ i ] = a[ j ];
+               bb[ i ] = b[ j ];
+
+/* If this output axis is assigned a constant value, use zero and one for
+   the shift and scale in order to preserve the constant value produced
+   by the PermMap. */
+            } else {
+               aa[ i ] = 0.0;
+               bb[ i ] = 1.0;
+            }
+
+         }
+
+/* Now consider the inverse CmpMap. Any constants produced by the inverse 
+   PermMap would previously have been scaled by the inverse WinMap. Since
+   there will be no inverse WinMap to perform this scaling in the returned
+   Mappings, we need to change the constant values to be the values after
+   the scaling which would have been applied by the WinMap. Consider each 
+   of the input axes of the PermMap.*/
+         for( i = 0; i < npin; i++ ){
+
+/* Skip axes which are not assigned a constant value. */
+            if( inperm[ i ] < 0 ) {
+
+/* Scale the constant term associated with this input axis using the
+   inverse WinMap unless it is AST__BAD. */
+               c = consts[ -inperm[ i ] - 1 ];
+               if( c != AST__BAD ) {
+
+                  if( a[ i ] != AST__BAD && b[ i ] != AST__BAD &&
+                      b[ i ] != 0.0 ) {
+                     consts[ -inperm[ i ] - 1 ] = ( c - a[ i ] )/b[ i ];
+                  } else {
+                     consts[ -inperm[ i ] - 1 ] = AST__BAD;
+                  }
+
+               }
+
+            }
+
+         }
+
+/* Now consider cases where the PermMap is applied first, followed by the
+   WinMap. */
+      } else {
+
+/* Create the new WinMap, initially with undefined corners. Its number 
+   of axes will equal the number of input axes of the PermMap. */
+         w1 = astWinMap( npin, NULL, NULL, NULL, NULL, "" );
+
+/* Get pointers to the scale and shift terms for the new WinMap. */
+         bb = w1->b;
+         aa = w1->a;
+
+/* Thinking first about the inverse CmpMap, consider each of the input axes 
+   of the PermMap. */
+         for( i = 0; i < npin; i++ ){
+
+/* If the value for this input axis is derived from an output axis, copy the 
+   scale and shift terms from the corresponding output axis to the new 
+   WinMap. */
+            j = inperm[ i ];
+            if( j >= 0 && j < nin ) {
+               aa[ i ] = a[ j ];
+               bb[ i ] = b[ j ];
+
+/* If this input axis is assigned a constant value, use zero and one for
+   the shift and scale in order to preserve the constant value produced
+   by the PermMap. */
+            } else {
+               aa[ i ] = 0.0;
+               bb[ i ] = 1.0;
+            }
+
+         }
+
+/* Now consider the forward CmpMap. Any constants produced by the forward
+   PermMap would previously have been scaled by the forward WinMap. Since
+   there will be no forward WinMap to perform this scaling in the returned
+   Mappings, we need to change the constant values to be the values after
+   the scaling which would have been applied by the WinMap. Consider each 
+   of the output axes of the PermMap.*/
+         for( i = 0; i < npout; i++ ){
+
+/* Skip axes which are not assigned a constant value. */
+            if( outperm[ i ] < 0 ) {
+
+/* Scale the constant term associated with this input axis using the
+   forward WinMap unless it is AST__BAD. */
+               c = consts[ -outperm[ i ] - 1 ];
+               if( c != AST__BAD ) {
+
+                  if( a[ i ] != AST__BAD && b[ i ] != AST__BAD ) {
+                     consts[ -outperm[ i ] - 1 ] = a[ i ] + c*b[ i ];
+                  } else {
+                     consts[ -outperm[ i ] - 1 ] = AST__BAD;
+                  }
+
+               }
+
+            }
+
+         }
+
       }
-   }
 
-/* Use the PermMap to permute these scale and shift terms. If the WinMap
-   is applied before the PermMap, use the forward permutation, otherwise use
-   the reverse permutation. */
-   astTransform( pm, pset1, 1 - iwm, pset2 );
+/* Create a new PermMap (since the constants may have changed). */
+      p1 = astPermMap( npin, inperm, npout, outperm, consts, "" );
 
-/* Create the returned WinMap, initially with undefined corners. */
-   w1 = astWinMap( nin, NULL, NULL, NULL, NULL, "" );
-
-/* Store the permuted scale and shift terms in the new WinMap. */   
-   ptr2 = astGetPoints( pset2 );
-   if( astOK ){
-      bb = w1->b;
-      aa = w1->a;
-      for( i = 0; i < nin; i++ ){
-         *(bb++) = ptr2[ i ][ 1 ];
-         *(aa++) = ptr2[ i ][ 0 ];
-      }
+/* Free the axis permutation and constants arrays. */
+      outperm = (int *) astFree( (void *) outperm );
+      inperm = (int *) astFree( (void *) inperm );
+      consts = (double *) astFree( (void *) consts );
    }
 
 /* Re-instate the original value of the Invert attributes of the supplied 
@@ -1530,21 +1939,18 @@ static void WinPerm( AstMapping **maps, int *inverts, int iwm  ){
    astSetInvert( wm, old_winv );
    astSetInvert( pm, old_pinv );
 
-/* Replace the supplied WinMap with the one found above, swapping the
-   order of the Mappings. The PermMap is retained unchanged. */
+/* Replace the supplied Mappings with the ones created above, swapping the
+   order. */
    if( astOK ){
-      (void) astAnnul( maps[ iwm ] );
+      (void) astAnnul( wm );
+      (void) astAnnul( pm );
 
-      maps[ iwm ] = maps[ 1 - iwm ];
-      inverts[ iwm ] = inverts[ 1 - iwm ];
+      maps[ iwm ] = (AstMapping *) p1;
+      inverts[ iwm ] = 0;
 
       maps[ 1 - iwm ] = (AstMapping *) w1;
       inverts[ 1 - iwm  ] = astGetInvert( w1 );
    }
-
-/* Annul the PointSets. */
-   pset1 = astAnnul( pset1 );
-   pset2 = astAnnul( pset2 );
 
 /* Free the copies of the scale and shift terms from the supplied WinMap. */
    b = (double *) astFree( (void *) b );
