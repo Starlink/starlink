@@ -1,0 +1,62 @@
+Interface GROWY
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Spectrum to be "grown" into image'
+      helpkey '*'
+   EndParameter
+
+   Parameter IMAGE
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image to grow spectrum into'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XSTART'
+      Prompt '(XStart) First cross-section to copy spectrum into'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XEND'
+      Prompt '(XEnd) Last cross-section to copy spectrum into'
+      helpkey '*'
+   EndParameter
+
+   Parameter NEW
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NEw) Force creation of a new image?'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSIZE
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(XSIze) X-dimension of new image'
+      helpkey '*'
+   EndParameter
+
+EndInterface
