@@ -1,12 +1,13 @@
 #  A list of .f files not to be included in sun238, which otherwise would
 #  be included.
-EXCLUDE = ctg_test.f lpg_test.f
+EXCLUDE = ctg_test.f lpg_test.f kaplibs_test.f 
 
 # The names of all the tar files containing system-independant files:
 TAR_FILES_A = kaplibs_source ira_source aif_source fts_source
 
 # The contents of the ira_source.tar file:
-KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev fac_1522_err kplsearch
+KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev fac_1522_err kplsearch \
+kaplibs_test.f kaplibs_test.ifl
 
 # The contents of the fts_source.tar file:
 FTS_SOURCE = fts_par fts1_axis.f fts1_blcar.f fts1_bswap.f fts1_comnt.f fts1_crndf.f \

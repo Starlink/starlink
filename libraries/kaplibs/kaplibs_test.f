@@ -1,26 +1,27 @@
       SUBROUTINE KAPLIBS_TEST( STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INTEGER STATUS, OK
+      INTEGER STATUS
+      LOGICAL OK
       CHARACTER LIST*80
       
       IF( STATUS .NE. SAI__OK ) RETURN
-      OK = 0
+      OK = .TRUE.
       
       CALL IRA_IPROJ( LIST, STATUS )
-      IF( INDEX( LIST, 'AITOFF' ) .EQ. 0 ) GO TO 999
-      
+      IF( INDEX( LIST, 'AITOFF' ) .EQ. 0 ) THEN
+         OK = .FALSE.
+         GO TO 999
+      END IF      
       
 *  Add other tests here...
 
-      
-      OK = 1
 
  999  CONTINUE
 
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_FLUSH( STATUS )
-         OK = 0
+         OK = .FALSE.
       END IF
 
       CALL MSG_BLANK( STATUS )

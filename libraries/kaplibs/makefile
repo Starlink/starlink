@@ -1220,6 +1220,7 @@ do_test: $(EXTERNAL_INCLUDES)
 #  Extract the test program from the archive and set up new links for
 #  the include files which point at the installed versions.  Remove any
 #  pre-existing links first if necessary.
+	$(TAR_OUT) $(PKG_NAME)_source.tar $(PKG_NAME)_test.ifl
 	$(TAR_OUT) $(PKG_NAME)_source.tar $(PKG_NAME)_test.f
 	@ if test -f $(PKG_NAME)_test.f; then :;\
            else echo $(PKG_NAME)_test.f is not in the tar file; exit 1; fi
@@ -1228,7 +1229,7 @@ do_test: $(EXTERNAL_INCLUDES)
 #
 #  Build the test program, ensuring that the installed version of the library
 #  and link files are used.
-	$(FC) $(FFLAGS) $(PKG_NAME)_test.f -L$(INSTALL_LIB) -L$(STAR_LIB) \
+	alink $(PKG_NAME)_test.f -L$(INSTALL_LIB) -L$(STAR_LIB) \
               `$(INSTALL_BIN)/$(PKG_NAME)_link_adam` -o $(PKG_NAME)_test
 #
 #  Remove the test program source and the include file links used to
@@ -1240,7 +1241,7 @@ do_test: $(EXTERNAL_INCLUDES)
 #  that any external mechanism for locating shareable libraries (e.g. a
 #  search path) must previously have been set up.
 	./$(PKG_NAME)_test
-	rm -f $(PKG_NAME)_test
+	rm -f $(PKG_NAME)_test $(PKG_NAME)_test.ifl
 #
 #  Note the test has been run.
 	@ touch .TESTED_$(SYSTEM)
