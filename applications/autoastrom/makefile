@@ -403,6 +403,47 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk VERSION $(DOCUMENTATION)
 #  directory or an absolute path.
 CATLIBINSTALLDIR=catlib-install
 
+## WCSLIB: we do not at present need to build and link against wcslib.
+## There are versions of wcslib within both lib(sky)cat and
+## libast_wcslib, and it did seem at one point that the best way out of the
+## linking confusion that this caused was to link against a separate
+## wcslib.  This is avoidable however, and the makefile and configure
+## script do not do this at present.
+##
+## The libcat wcslib code has been ripped from some
+## unknown version of the Calabretta distribution -- if it becomes
+## necessary to fix this, then the best way would probably be to
+## delete the wcslib portions from catlib/astrotcl/wcslib and link
+## against the Calabretta wcslib explicitly.  So this stuff might need
+## reanimated. 
+##
+## Uses
+## WCSLIBDIR=wcslib/C
+## Dependency of build-subdirs on $(WCSLIBDIR)/libwcs.a
+## --with-wcslib (or something like it) in moggy/Makefile call to configure
+## a dependency of $(WCSLIBDIR)/Makefile on the source tarball
+## a target $(WCSLIBDIR)/libwcs.a, such as:
+###  Build the wcslib.  Translate the value of $SYSTEM
+###  into one of the `FLAVOUR's which the wcslib Makefile uses.
+##$(WCSLIBDIR)/libwcs.a: $(WCSLIBDIR)/Makefile
+##	if test -z "$$SYSTEM"; then \
+##		echo "Eh!? SYSTEM is undefined"; \
+##		exit 1; \
+##	fi
+##	case $$SYSTEM in \
+##		alpha*) FLAVOUR=DEC/Alpha;; \
+##		sun*) FLAVOUR=SUN/ANSI;; \
+##		ix86*|i686*) FLAVOUR=Linux;; \
+##		*) FLAVOUR=X;; \
+##	esac; \
+##	if test $$FLAVOUR = X; then \
+##		echo "I can't recognise platform $$SYSTEM"; \
+##		exit 1; \
+##	else \
+##		cd $(WCSLIBDIR); make FLAVOUR=$$FLAVOUR; \
+##	fi
+##	cd $(WCSLIBDIR); $(LINK) libwcs_c.a libwcs.a
+
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
 #  installed in the $(INSTALL_BIN) directory with execute permission
@@ -1094,7 +1135,10 @@ build-subdirs: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a astrom/astrom.f
 
 # Creating moggy/Makefile configures the moggy package
 moggy/Makefile: moggy/Makefile.in $(CATLIBINSTALLDIR)/stamp
-	INST=`cd $(CATLIBINSTALLDIR);pwd`; cd moggy && unset INSTALL; CXX=$(CXX) CC=$(CC) ./configure --with-catlib=$$INST
+	CLDIR=`cd $(CATLIBINSTALLDIR);pwd`; \
+		cd moggy && unset INSTALL; \
+		CXX=$(CXX) CC=$(CC) ./configure \
+			--with-catlib=$$CLDIR
 
 #  Build and install the SkyCat cat library.  We install it into the
 #  directory $(CATLIBINSTALLDIR), which moggy knows about.
