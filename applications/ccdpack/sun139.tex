@@ -9722,13 +9722,13 @@ FTYPE \> \_CHAR \> OBSTYPE  OBJECT=TARGET -\\
       However, there is one special case: if the value of a FITS
       header is known to be a string of the form '[A:B,C:D]' the 
       numbers A, B, C and D may be extracted individually by appending
-      '(X1)', '(X1)', '(Y1)' or '(Y2)' respectively to the name of
+      '<X1>', '<X2>', '<Y1>' or '<Y2>' respectively to the name of
       the keyword.  Hence:
       \begin{myquote}
       \begin{tabbing}
 xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-EXTENT.MINX \> TRIMSEC(X1) \\
-EXTENT.MAXX \> TRIMSEC(X2)
+EXTENT.MINX \> TRIMSEC<X1> \\
+EXTENT.MAXX \> TRIMSEC<X2>
       \end{tabbing}
       \end{myquote}
       would set the extents from the first two fields of a suitably 

@@ -49,8 +49,8 @@
 *        any FITS items whose values will be used in contructing
 *        extension item values.  The members of the first group will
 *        be normal (though possibly hierarchical) FITS keyword names, 
-*        except that they may contain one of the strings "(X1)", "(X2)",
-*        "(Y1)" or "(Y2)" to indicate indexing into a header value
+*        except that they may contain one of the strings "<X1>", "<X2>",
+*        "<Y1>" or "<Y2>" to indicate indexing into a header value
 *        of the form [X1:X2,Y1:Y2].
 *     DESGRP( 3 ) = INTEGER (Returned)
 *        Three groups which on exit will contain the extension item

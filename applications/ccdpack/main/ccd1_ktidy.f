@@ -21,7 +21,7 @@
 *     In fact it makes two related sets of substitutions: if it finds
 *     either a character which is legal in a FITS header but not a 
 *     TRANSFORM token ('.'), or one of the special strings 
-*     '(X1)', '(X2)', '(Y1)' or '(Y2)', then it replaces them by 
+*     '<X1>', '<X2>', '<Y1>' or '<Y2>', then it replaces them by 
 *     something identifiable but palatable to TRANSFORM.  
 *     Additionally, if exactly one substitution of the X1,X2,Y1,Y2 type
 *     has been made, the returned INDXY argument will indicate which
@@ -46,19 +46,19 @@
 
 *  Arguments:
 *     TOTRN = LOGICAL (Given)
-*        If TRUE, then the strings '(X1)', '(X2)', '(Y1)' and '(Y2)'
+*        If TRUE, then the strings '<X1>', '<X2>', '<Y1>' and '<Y2>'
 *        will be turned into something identifiable and the returned
 *        string will be legal as a TRANSFORM token.  If FALSE, then
-*        the strings '(X1)', '(X2)', '(Y1)' and '(Y2)' will be 
+*        the strings '<X1>', '<X2>', '<Y1>' and '<Y2>' will be 
 *        removed, and the returned string will be legal as a FITS
 *        header keyword.
 *     TEXT = CHARACTER * ( * ) (Given and Returned)
 *        On entry a FITS header-like keyword, which may contain 
-*        substrings of the form "(X1)" etc.  On exit, such strings
+*        substrings of the form "<X1>" etc.  On exit, such strings
 *        will be removed or converted as described above.  The string
 *        must be long enough to accommodate such substitutions.
 *     INDXY = INTEGER (Returned)
-*        Indicates which of '(X1)', '(X2)', '(Y1)' or '(Y2)' has
+*        Indicates which of '<X1>', '<X2>', '<Y1>' or '<Y2>' has
 *        been found in TEXT.  If exactly one of these has been found,
 *        INDXY will be 1, 2, 3 or 4 respectively.  If more than one
 *        was found it will be -1, and if none has been found it 
@@ -129,7 +129,7 @@
       CHARACTER * ( GRP__SZNAM ) WORK ! Output string
       
 *  Local Data:
-      DATA TOKEN / '(X1)', '(X2)', '(Y1)', '(Y2)' /
+      DATA TOKEN / '<X1>', '<X2>', '<Y1>', '<Y2>' /
       DATA REPLC / '___X1___', '___X2___', '___Y1___', '___Y2___' /
       DATA DOTREP / '___DT___' /
       
