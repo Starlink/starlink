@@ -110,7 +110,7 @@
 
 *  Extract the link data
       CALL FRI_GET( ID, NAME, FILE, STATUS )
-
+	print *,'Got : ',file
 *  Open the file
       CALL ADI_FOPEN( FILE, CLASS, MODE, LID, STATUS )
 
