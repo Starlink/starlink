@@ -451,7 +451,7 @@ export_source:
 #  Rules to set up links to locate each of the include files.
 
 SAE_PAR:   $(STAR_INC)/sae_par;     $(LINK) $? $@
-DTA_CODES: $(FIG_INC)/dtacodes.inc; $(LINK) $? $@
+DTA_CODES: $(FIG_INC)/dtacodes;     $(LINK) $? $@
 ASTRO_PAR: astro_par.inc;           $(LINK) $? $@
 
 #  Object file dependencies on include files.
