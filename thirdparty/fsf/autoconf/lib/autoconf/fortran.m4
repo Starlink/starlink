@@ -1547,7 +1547,7 @@ dnl  FIXME: Move/copy this macro to the dev-nxg-20040116-add-fpp-support branch
 # ---------------------
 # Test whether the FC compiler has the %VAL extension.  If so, define
 # the preprocessor variable HAVE_PERCENTVAL to be 1.  If the compiler
-# has %VAL, it presumably has %LOC also.  If 
+# has %VAL, it presumably has %LOC also.
 AC_DEFUN([AC_FC_HAVE_PERCENTVAL],
          [AC_REQUIRE([AC_PROG_FC])dnl
           AC_CACHE_CHECK([whether ${FC} has the %VAL extension],
@@ -1555,12 +1555,12 @@ AC_DEFUN([AC_FC_HAVE_PERCENTVAL],
                          [AC_LANG_PUSH([Fortran])
                           AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
       i=1
-      call t1(%valx(i))
+      call t1(%val(i))
 ])],
-                          ac_cv_fc_have_val=yes,
-                          ac_cv_fc_have_val=no)
+                          ac_cv_fc_have_percentval=yes,
+                          ac_cv_fc_have_percentval=no)
                           AC_LANG_POP([Fortran])])
-          if test $ac_cv_Fc_have_val = yes; then
+          if test $ac_cv_fc_have_percentval = yes; then
               AC_DEFINE([HAVE_PERCENTVAL], 1,
                         [Define to 1 if the Fortran compiler supports the VAX %VAL and %LOC extensions])
           fi
