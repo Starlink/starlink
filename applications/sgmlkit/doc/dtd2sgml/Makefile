@@ -128,6 +128,17 @@ general-0.6.html: starlink-0.6.description
 	CLASSPATH=$(CLASSPATH) $(JAVA) com.jclark.xsl.sax.Driver \
 		$< dtddoc.xslt $@ listprefix=general-0.6
 
+
+# This dependence on general-0.6 is WRONG, since it fails if the
+# directory general-0.6 isn't present (which is OK, because it
+# indicates there's nothing in there to merge).  Also, this merging is
+# only needed when you're maintaining the DTD-commentary elements, and
+# NOT when you're building the documentation (which is a time when
+# there'll very probably not be a general-0.6 directory, because
+# you're working in an exported copy of the CVS repository, rather
+# than the `live' copy of the description file).  This step should
+# be taken out of the Makefile and handed over to the script
+# which invokes it.
 starlink-0.6.description: general-0.6
 	for f in `./splice.pl $@ tmp-$@ general-0.6`; do\
 		rm $$f; \
