@@ -182,27 +182,31 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*  Tell user about different axes
-      IF ( ISDS ) THEN
-        CALL MSG_PRNT( 'Axes present in dataset are:' )
-        CALL MSG_BLNK()
-        CALL AXIS_TLIST( IFID, NDIM, STATUS )
-      ELSE
-        CALL MSG_BLNK()
-        CALL MSG_SETI( 'N', NDIM )
-        CALL MSG_PRNT( 'There are ^N dimensions in this primitive'/
-     :                                                 /' object' )
-      END IF
-      CALL MSG_BLNK()
-
 *  Select axes to flip if NDIM > 1
       IF ( NDIM .GT. 1 ) THEN
+
+*    Tell user about different axes
+        IF ( ISDS ) THEN
+          CALL MSG_PRNT( 'Axes present in dataset are:' )
+          CALL MSG_BLNK()
+          CALL AXIS_TLIST( IFID, NDIM, STATUS )
+        ELSE
+          CALL MSG_BLNK()
+          CALL MSG_SETI( 'N', NDIM )
+          CALL MSG_PRNT( 'There are ^N dimensions in this primitive'/
+     :                                                   /' object' )
+        END IF
+        CALL MSG_BLNK()
+
+*    Select axes
         NSEL = 0
         CALL PRS_GETLIST( 'SELAX', NDIM, SELAX, NSEL, STATUS )
         IF ( ( STATUS .NE. SAI__OK ) .OR. ( NSEL .EQ. 0 ) ) GOTO 99
+
       ELSE
         NSEL = 1
         SELAX(1) = 1
+
       END IF
 
 *  Set up the FLIP array
@@ -318,7 +322,7 @@
       END DO
 
 *  Copy other bits and bobs
-      CALL BDI_COPY( IFID, 'Text,Label,Units,QualityMask', OFID,
+      CALL BDI_COPY( IFID, 'Title,Label,Units,QualityMask', OFID,
      :               ' ', STATUS )
 
 *  Copy ancillary stuff
