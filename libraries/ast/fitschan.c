@@ -547,6 +547,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        to the number of pixel axes. 
 *        - Handling of OBSGEO-X/Y/Z corrected again.
 *        - WCSFromStore modified to avouid writing partial axis descriptions.
+*     26-APR-2004 (DSB):
+*        - Corrected text of output SPECSYS keyword values.
 *class--
 */
 
@@ -1061,7 +1063,7 @@ static void ReadFromSource( AstFitsChan * );
 static void RoundFString( char *, int );
 static void SetAttrib( AstObject *, const char * );
 static void SetItem( double ****, int, int, char, double );
-static void SetItemC( char ****, int, char, char * );
+static void SetItemC( char ****, int, char, const char * );
 static void SetValue( AstFitsChan *, char *, void *, int, char * );
 static void SinkWrap( void (*)( const char * ), const char * );
 static void SkyPole( AstWcsMap *, AstMapping *, int, int, int *, char, FitsStore *, const char *, const char * );
@@ -18029,7 +18031,7 @@ static void SetItem( double ****item, int i, int jm, char s, double val ){
    }
 }
 
-static void SetItemC( char ****item, int i, char s, char *val ){
+static void SetItemC( char ****item, int i, char s, const char *val ){
 /*
 *  Name:
 *     SetItemC
@@ -18043,7 +18045,7 @@ static void SetItemC( char ****item, int i, char s, char *val ){
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     void SetItemC( char ****item, int i, char s, char *val )
+*     void SetItemC( char ****item, int i, char s, const char *val )
 
 *  Class Membership:
 *     FitsChan member function.
@@ -19816,7 +19818,29 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
                }
 
                if( astTestStdOfRest( specfrm ) ) {
-                  SetItemC( &(store->specsys), 0, s, (char *) astGetC( specfrm, "StdOfRest" ) );
+                  cval = astGetC( specfrm, "StdOfRest" );
+                  if( !strcmp( cval, "Topocentric" ) ){
+                     cval = "TOPOCENT";
+                  } else if( !strcmp( cval, "Geocentric" )){
+                     cval = "GEOCENTR";
+                  } else if( !strcmp( cval, "Barycentric" )){
+                     cval = "BARYCENT";
+                  } else if( !strcmp( cval, "Heliocentric" )){
+                     cval = "HELIOCEN";
+                  } else if( !strcmp( cval, "LSRK" )){
+                     cval = "LSRK";
+                  } else if( !strcmp( cval, "LSRD" )){
+                     cval = "LSRD";
+                  } else if( !strcmp( cval, "Galactic" )){
+                     cval = "GALACTOC";
+                  } else if( !strcmp( cval, "Local_group" )){
+                     cval = "LOCALGRP";
+                  } else if( !strcmp( cval, "Source" )){
+                     cval = "SOURCE";
+                  } else {
+                     cval = NULL;
+                  }
+                  if( cval ) SetItemC( &(store->specsys), 0, s, cval );
                }                  
 
                if( astTestSourceVel( specfrm ) ) {
