@@ -45,7 +45,7 @@
 *    Function declarations :
         REAL*8 ST_FUNCT                  ! Does most of the work
         REAL*8 ST_GAMMA                   ! Checks the input parameter for S14AAF
-        REAL*8 S14AAF                   ! NAG routine to evaluate Gamma function
+c       REAL*8 S14AAF                   ! NAG routine to evaluate Gamma function
 *    Local variables :
         INTEGER I,J
         INTEGER IFAIL                   ! NAG error parameter
@@ -113,7 +113,8 @@
 * Calculate Gamma functions
         GAMPAR=ST_GAMMA(A)
         IFAIL=1
-        G1=S14AAF(GAMPAR,IFAIL)
+        G1=1.0D0
+c       G1=S14AAF(GAMPAR,IFAIL)
         IF (IFAIL .NE. 0) THEN
           PRINT *, ' IFAIL = ',IFAIL,' in S14AAF - parameter = G1 '
           STATUS=USER__001
@@ -121,7 +122,8 @@
 *
         GAMPAR=ST_GAMMA(-3.0D0-A)
         IFAIL=1
-        G2=S14AAF(GAMPAR,IFAIL)
+        G2=1.0D0
+c       G2=S14AAF(GAMPAR,IFAIL)
         IF (IFAIL .NE. 0) THEN
           PRINT *, ' IFAIL = ',IFAIL,' in S14AAF - parameter = G2 '
           STATUS=USER__001
@@ -129,7 +131,8 @@
 *
         GAMPAR=ST_GAMMA(2.0D0*A+4.0D0)
         IFAIL=1
-        G3=S14AAF(GAMPAR,IFAIL)
+        G3=1.0D0
+c       G3=S14AAF(GAMPAR,IFAIL)
         IF (IFAIL .NE. 0) THEN
           PRINT *, ' IFAIL = ',IFAIL,' in S14AAF - parameter = G3 '
           STATUS=USER__001
@@ -137,7 +140,8 @@
 *
         GAMPAR=ST_GAMMA(-2.0D0*A-2.0D0)
         IFAIL=1
-        G4=S14AAF(GAMPAR,IFAIL)
+        G4=1.0D0
+c       G4=S14AAF(GAMPAR,IFAIL)
         IF (IFAIL .NE. 0) THEN
           PRINT *, ' IFAIL = ',IFAIL,' in S14AAF - parameter = G4 '
           STATUS=USER__001

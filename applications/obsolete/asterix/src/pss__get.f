@@ -202,7 +202,7 @@
 *
 *    Functions :
 *
-      DOUBLE PRECISION           S15ABF
+c     DOUBLE PRECISION           S15ABF
       LOGICAL                    STR_ABBREV
 *
 *    Local constants :
@@ -287,7 +287,8 @@
             CALL CHR_FIWE( TEXT, I, ISTAT )
             IF ( STR_ABBREV( TEXT(BEG:I), 'SIGMAS')  ) THEN
               ACTLEV = ACTLEV + 1
-              LEVS(ACTLEV) = 100.0d0*(2.0D0*S15ABF(VAL,ISTAT) - 1.0D0)
+              LEVS(ACTLVE) = 0.0D0
+c             LEVS(ACTLEV) = 100.0D0*(2.0D0*S15ABF(VAL,ISTAT) - 1.0D0)
             ELSE
               CALL MSG_PRNT( '! Error reading confidence levels' )
               GOTO 10

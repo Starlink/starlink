@@ -987,8 +987,8 @@
 *    Functions :
 *
       DOUBLE PRECISION  IMSIM_RNS
-      DOUBLE PRECISION  G05CAF
-      INTEGER           G05EYF
+c     DOUBLE PRECISION  G05CAF
+c     INTEGER           G05EYF
 *
 *    Local variables :
 *
@@ -1021,20 +1021,21 @@
       LNS_RK = 1.0
       LNS_RK = DBLE(NSNORM)/IMSIM_RNS(DBLE(SNORM))
       RNMEAN = (IMSIM_RNS(SMIN)-IMSIM_RNS(SMAX))*AREA
-      CALL G05CCF
+c     CALL G05CCF
       IFAIL = 0
       NERRE = 20+20*INT(SQRT(RNMEAN))
-      CALL G05ECF( RNMEAN, ERRE, NERRE, IFAIL )
-      NSRC = G05EYF( ERRE, NERRE )
+c     CALL G05ECF( RNMEAN, ERRE, NERRE, IFAIL )
+      NSRC = 0
+c     NSRC = G05EYF( ERRE, NERRE )
 
 *    Get a flux for each source
       DO I = 1, NSRC
-	LNS_F = G05CAF( XX )
+c      	LNS_F = G05CAF( XX )
 	SSMAX = SMAX
 	SSMIN = SMIN
 	IFAIL = 0
-	CALL C05ADF( SSMIN, SSMAX, 1.0D-6, 1.0D-6,
-     :                   IMSIM_FUNRNS, SS, IFAIL )
+c      	CALL C05ADF( SSMIN, SSMAX, 1.0D-6, 1.0D-6,
+c    :                   IMSIM_FUNRNS, SS, IFAIL )
 	FLUX(I) = NINT(SS)
       END DO
 

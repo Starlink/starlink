@@ -57,7 +57,7 @@
 *
 *    Function declarations :
 *
-	DOUBLE PRECISION S15ABF
+c       DOUBLE PRECISION S15ABF
 *
 *    Local constants :
 *
@@ -112,7 +112,8 @@
       IF(Z.LT.-SIGMAX)THEN
 	CUM1=0.0D0
       ELSE
-	CUM1=S15ABF(Z,IFAIL)
+        CUM1=0.0D0
+c       CUM1=S15ABF(Z,IFAIL)
       END IF
       IF(IFAIL.NE.0)THEN
 	STATUS=SAI__ERROR
@@ -126,7 +127,8 @@
 	IF(Z.LT.-SIGMAX)THEN
 	  FLUX(I)=0.0
         ELSE
-	  CUM2=S15ABF(Z,IFAIL)
+          CUM2=0.0D0
+c 	  CUM2=S15ABF(Z,IFAIL)
 	  IF(IFAIL.NE.0)THEN
 	    STATUS=SAI__ERROR
 	    CALL ERR_REP(' ','Bad IFAIL from NAG routine S15ABF',STATUS)

@@ -31,7 +31,7 @@
 *
 *    Function declarations :
 *
-      DOUBLE PRECISION S18ACF                    ! NAG subroutine
+c     DOUBLE PRECISION S18ACF                    ! NAG subroutine
 *
 *    Local variables :
 *
@@ -56,7 +56,8 @@
 
         LAST_A = A
         FAIL=0
-        LAST_K0 = S18ACF(A,FAIL)
+        LAST_K0 = 0.0D0
+c       LAST_K0 = S18ACF(A,FAIL)
         IF ( FAIL .NE. 0 ) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ',

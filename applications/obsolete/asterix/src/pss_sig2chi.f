@@ -48,7 +48,7 @@
 *
 *    Function declarations :
 *
-      DOUBLE PRECISION             S15ABF
+c     DOUBLE PRECISION             S15ABF
 *
 *    Local constants :
 *
@@ -69,7 +69,8 @@
 *    Convert to a change in Cash statistic
       IF ( SIG .LE. 5.0 ) THEN
         ISTAT = 1
-        PROB = 2.0D0 * S15ABF( DBLE(SIG), ISTAT) - 1.0D0
+        PROB = 0.0D0
+c       PROB = 2.0D0 * S15ABF( DBLE(SIG), ISTAT) - 1.0D0
         CALL MATH_CHISQD( REAL(1.0D0-PROB), NDOF, DC, STATUS )
 
       ELSE
