@@ -518,10 +518,11 @@ TEST_SCRIPT = $(PKG_NAME)_test
 LATEX_DOCS = sun223.tex
 HYPERTEXT_DOCS = 
 HYPERTEXT_HELP = polka.htx polmap.htx
+FIGURES = sun223_figures
 
 #  List of documentation files.
 
-DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
+DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(FIGURES) \
                 $(HYPERTEXT_HELP:.htx=.htx_tar) $(PKG_NAME).news
 ################################################################################
 #-------------------------------------------------------------------------------
@@ -985,12 +986,15 @@ install:
             chmod 755 $(INSTALL_BIN)/$(ICL_SCRIPT) ;\
          else :; fi
 #
-#  Install the Latex documentation, giving it world read permission,
-#  leaving the source copy in place.
-	for f in $(LATEX_DOCS) ""; do \
+#  Install the Latex documentation (and associated figures), giving it world 
+#  read permission, leaving the source copy in place.
+        for f in $(LATEX_DOCS:.tex=) ""; do \
            if test -n "$$f"; then \
-              cp -p $$f $(INSTALL_DOCS);\
-              chmod 644 $(INSTALL_DOCS)/$$f;\
+              cp -p $${f}.tex $(INSTALL_DOCS);\
+              chmod 644 $(INSTALL_DOCS)/$${f}.tex;\
+              $(TAR_IN) - $${f}_figures | (cd $(INSTALL_DOCS); $(TAR_OUT) -);\
+              chmod 644 $(INSTALL_DOCS)/$${f}_figures/*;\
+              chmod 755 $(INSTALL_DOCS)/$${f}_figures;\
            else :; fi;\
         done
 #
@@ -1162,9 +1166,14 @@ do_deinstall:
          else :; fi
 #
 #  Deinstall the Latex documentation, if installed versions exist.
-	- for f in $(LATEX_DOCS) ""; do \
-           if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
-              rm -f $(INSTALL_DOCS)/$$f;\
+        - for f in $(LATEX_DOCS:.tex=) ""; do \
+           if test -n "$$f"; then \
+              if test -f $(INSTALL_DOCS)/$${f}.tex; then \
+                 rm -f $(INSTALL_DOCS)/$${f}.tex;\
+              else :; fi;\
+              if test -d $(INSTALL_DOCS)/$${f}_figures; then \
+                 rm -f -r $(INSTALL_DOCS)/$${f}_figures;\
+              else :; fi;\
            else :; fi;\
         done
 #
