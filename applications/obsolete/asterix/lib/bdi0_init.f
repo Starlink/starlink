@@ -197,17 +197,17 @@
      :                   BDI2_TIMAP, DID, STATUS )
 
 *    FITS image interface
-c        CALL ADI_DEFFUN(
-c     :       'FileItemChk(_XYimage,_FITSfile,_CHAR)',
-c     :                   BDI2_IMCHK, DID, STATUS )
-c
-c        CALL ADI_DEFFUN(
-c     :       'FileItemGet(_XYimage,_FITSfile,_CHAR)',
-c     :                   BDI2_IMGET, DID, STATUS )
-c
-c        CALL ADI_DEFFUN(
-c     :       'FileItemMap(_XYimage,_FITSfile,_CHAR,_CHAR,_CHAR)',
-c     :                   BDI2_IMMAP, DID, STATUS )
+        CALL ADI_DEFFUN(
+     :       'FileItemChk(_XYimage,_FITSfile,_CHAR)',
+     :                   BDI2_IMCHK, DID, STATUS )
+
+        CALL ADI_DEFFUN(
+     :       'FileItemGet(_XYimage,_FITSfile,_CHAR)',
+     :                   BDI2_IMGET, DID, STATUS )
+
+        CALL ADI_DEFFUN(
+     :       'FileItemMap(_XYimage,_FITSfile,_CHAR,_CHAR,_CHAR)',
+     :                   BDI2_IMMAP, DID, STATUS )
 
 *    FITS general binned interface
         CALL ADI_DEFFUN(
