@@ -39,9 +39,7 @@ libjpl_la_SOURCES = $(BLOCK_DATA_ROUTINES) $(F_ROUTINES) $(FPP_ROUTINES)
 F_ROUTINES = const.f ctoj.f interp.f jtoc.f pleph.f \
              rci.f split.f state.f
 
-FPP_ROUTINES = ephopn.fpp
-
-ephopn.f: ephopn.fpp
+FPP_ROUTINES = ephopn.F
 
 #  List of Fortran BLOCK DATA routines
 BLOCK_DATA_ROUTINES = comdat.f
