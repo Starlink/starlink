@@ -21067,15 +21067,25 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
                    "is not a Frame.", name, astGetClass( frame ) );
       }
 
-/* Also report an error if the supplied object is a Plot or an object 
-   derived from a Plot (a Plot is a sort of Frame and so will pass the 
-   above test). */
+/* If the supplied object is a Plot or an object derived from a Plot (a Plot 
+   is a sort of Frame and so will pass the above test), extract a
+   FrameSet from the Plot, and clear the Domain attribute for any existing 
+   Frames which have Domain GRAPHICS. */
    } else if( astIsAPlot( frame ) ){
-      if( astOK ){
-         astError( AST__BDOBJ, "astInitPlot(%s): Supplied Object (class '%s') "
-                   "cannot be included in a %s.", name, astGetClass( frame ), 
-                   name );
+      fset0 = astFrameSet( frame, "" );
+      fset = astCopy( fset0 );
+      fset0 = astAnnul( fset0 );
+
+      for( i = 0; i < astGetNframe( fset ); i++ ) {
+         graphicsframe = astGetFrame( fset, i );
+         if( !strcmp( astGetDomain( graphicsframe ), "GRAPHICS" ) ) {
+            astClearDomain( graphicsframe );
+         }
+         graphicsframe = astAnnul( graphicsframe );
       }
+
+      baseframe = astGetFrame( fset, astGetBase( fset ) );
+      mess = "base Frame of the supplied Plot";
    
 /* If the object is not a FrameSet, create a FrameSet holding the 
    supplied Frame. If the Frame is not 2D, an extra 2D Frame is 
