@@ -1,4 +1,10 @@
 <!-- $Id$ -->
+
+<!-- Following entity protects declaration of notation attributes.
+     Define as INCLUDE if this is processed in the context of full
+     SGML. -->
+<!ENTITY % Full.SGML.Only 'IGNORE'>
+
 <!--========== Notations ==========
 
   The notation declarations are broken off into this separate file, with
@@ -33,6 +39,10 @@
 <!NOTATION XML PUBLIC
   "+//IDN www.w3.org/TR/1998/REC-xml-19980210//NOTATION XML//EN">
 
+<!NOTATION URL 
+	PUBLIC '-//IETF/RFC1738//NOTATION Uniform Resource Locator//EN'
+	"http://sunsite.org.uk/rfc/rfc1738.txt"
+	>
 <!NOTATION texmaths   PUBLIC
   "+//ISBN 0-201-13447//NOTATION The TeXBook//EN">
 <!NOTATION latexmaths PUBLIC
@@ -48,6 +58,8 @@
   "+//ISBN 0-201-18127::Adobe//NOTATION PostScript Language Ref. Manual//EN">
 <!NOTATION gif89a   PUBLIC
   "-//CompuServe//NOTATION Graphics Interchange Format 89a//EN">
+<!NOTATION png PUBLIC
+  "+//IDN www.cdrom.com/pub/png//NOTATION Portable Network Graphics//EN">
 <!NOTATION linespecific SYSTEM
   "line ends and leading white space must be preserved in output">
 

@@ -405,10 +405,6 @@
      note 177.  Note, however, that there's no NAME defined here, and the
      URL is required.  See also RFC1808, Relative URLs
      -->
-<!NOTATION URL 
-	PUBLIC '-//IETF/RFC1738//NOTATION Uniform Resource Locator//EN'
-	"http://sunsite.org.uk/rfc/rfc1738.txt"
-	>
 
 <!ELEMENT webref %MXX; (%simpletext;)*>
 <!ATTLIST webref
