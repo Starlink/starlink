@@ -3,51 +3,48 @@
   $Id$
 -->
 
-<subsect id=release-0.4 export>Release Notes, version DR-0.4
+<subsect id=release-0.5 export>Release Notes, version DR-0.5
 
-<p>This is developers' release 0.4.
+<p>This is developers' release 0.5.
 
 <subsubsect>New in this release
 
-<p>After a long discussion at the August programmers' meeting, and a
-detailed discussion with Mark Taylor, there have been numerous changes
-of detail, but few substantial additions.
+<p>Prior to the SGML meeting scheduled for Friday 24 September, I've
+made assorted further changes of detail, mostly to the Programcode
+DTD, as agreed at the last programmers' meeting.  These have been
+implemented in both the HTML and &latex; down-converters, but not yet
+documented.
 
 <subsubsect>Changes
 
-<p>The following are the changes agreed after the last meeting.
+<p>The following are the changes to the Programcode DTD agreed after
+the last meeting. 
 <dl>
 
-<dt>Equations
-<dd>Equations are now numbered, and can be referred to.  The
-definition of the equation elements has changed slightly, with the
-addition of the MLINE content to MEQNARRAY and the addition of the
-MLABEL element.  Generation of the GIF versions of the equations is
-smoother (well, should be -- I'm still unsure how sensitive the
-dvi2bitmap program is to its &tex; environment).
+<dt>CODEPROLOGUE content model
+<dd>The CODEPROLOGUE element has changed to ROUTINEPROLOGUE, and
+almost all of its contents are now optional, as well as being in any
+order.  As a result, the MISCCODE element is redundant, and has been
+removed.
 
-<dt>Tables
-<dd>There is now a TABULAR element for tablar material, which sits
-within the TABLE element, which is responsible for matters such as
-captioning and floating the result.  This orthogonality means that
-TABULAR is now a `structuring' element, at the same level as elements
-like BLOCKQUOTE and lists, so it can appear within paragraphs.
+<dt>Paragraph content
+<dd>The paragraph content model has been substantially enlarged, and
+is now identical with that of the General DTD, with the exception of
+the cross-reference elements.  As part of this, the General DTD was
+substantially restructured, to extract the paragraph-content elements
+into a separate DTD fragment, which the two DTDs share.
 
-<dt>Cross references
-<dd>The DOCXREF element now has a title attribute, allowing you to
-override the generation of the link text.  Also, I've added a
-<code/%short-crossrefs%/ parameter to the DSSSL stylesheets (set true
-buy default), which allows you to control whether you get short or
-long generated text.
+<dt>The changes are implemented in the down-converters
+<dd>&ellip; though not very prettily.  They <em/should/ be robust
+enough that trial documents conforming to the updated DTDs should be
+testable.
 
-<dt>Figure notations
-<dd>The set of figure notations has expanded, now including (after
-much debate) arbitrary &latex; as an acceptable notation.  At the same
-time, the content model for the FIGURE element has changed, so that
-each FIGURECONTENT element now specifies a single alternative.
+<dt>Defects list added
+<dd>The `defects list' is now part of the maintained code, and
+included in the distribution.  This is the (supposedly authoritative)
+list of what changes have been suggested, and comments on their
+implementation.
 
-<dt>Assorted bug-fixing
-<dd>Includes wrinkles in the DTD as well as in the down-converters.
 
 </dl>
 
@@ -59,7 +56,7 @@ unresolvable just now.  For more wishful thinking, see <ref
 id=final.development>.
 
 <p>This is more-or-less the same to-do list as in the previous release
-(see <ref id=release-0.3> for details).  This release has concentrated
+(see <ref id=release-0.4> for details).  This release has concentrated
 on the issues arising from the last programmers' meeting.
 
 <dl>
@@ -80,9 +77,9 @@ build on other platforms.
 <dd>Since I've had no objections to this structure, I'll include DTD
 and down-converter support for this anon.
 
-<dt>Development of the programcode DTD
-<dd>There was discussion of this at the programmers' meeting, and
-there will be developments before the next release.
+<dt>Development of the down-converters for the programcode DTD
+<dd>These currently work, but the results are hideously ugly.  The
+changes also need to be documented.
 
 <dt>Bugs in Jade's LaTeX back-end
 <dd>I've since discovered that my identification of these as bugs was
@@ -92,14 +89,12 @@ correctly barfing on it, and my `fix' was a dirty rotten hack;
 unfortunately, Jade doesn't yet seem to support the correct approach,
 but OpenJade might soon.
 
-<dt>DTD and down-converter changes forthcoming
-<dd>Assorted changes to the programcode DTD were mooted and disputed;
-I'll add these.  The HTML down-converter should be extended to process
-&latex; code in the `latexgraphics' notation.  Clive suggested the
-addition of hours and degrees elements.
-
 <dt>OpenJade
 <dd>I'll see if it's sensible to shift to OpenJade away from Clark's
 distribution.
+
+<dt>Defects list
+<dd>There are a variety of more-or-less urgent issues notes in the
+Defects list.
 
 </dl>
