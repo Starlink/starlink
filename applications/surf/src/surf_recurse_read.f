@@ -306,7 +306,7 @@
             CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, 
      :           NSPEC, DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
      :           N_BOL(N_FILE), N_POS(N_FILE), N_INTS(N_FILE),
-     :           IN_UT1(1), IN_UT1(N_FILE), IN_RA_CEN(N_FILE), 
+     :           1, IN_UT1(1), IN_UT1(N_FILE), IN_RA_CEN(N_FILE), 
      :           IN_DEC_CEN(N_FILE), WAVELENGTH, SUB_INSTRUMENT, 
      :           OBJECT(N_FILE), UTDATE(N_FILE), UTSTART(N_FILE), 
      :           BOL_ADC, BOL_CHAN, BOL_RA_PTR(N_FILE),
@@ -314,7 +314,8 @@
      :           BOL_DEC_END(N_FILE), DATA_PTR(N_FILE), 
      :           DATA_END(N_FILE), VARIANCE_PTR(N_FILE),
      :           VARIANCE_END(N_FILE), QMF, QUALITY_PTR(N_FILE),
-     :           QUALITY_END(N_FILE), QBITS(N_FILE), INT_LIST, STATUS)
+     :           QUALITY_END(N_FILE), QBITS(N_FILE), 
+     :           .FALSE., 0, INT_LIST, STATUS)
 
             CALL MSG_BLANK(STATUS)
 
