@@ -15787,6 +15787,24 @@ Object            - Base class for all AST Objects
          of the input data. However, there does not seem to be any theoretical
          reason for this.
 
+         \sstitem
+         AST\_\_BLOCKAVE: This scheme simply takes an average of all the
+         pixels on the input grid in a cube centred on the interpolation
+         point.  The number of pixels in the cube is determined by the
+         value of the first element of the PARAMS array, which gives
+         the number of pixels in each dimension on either side of the
+         central point.  Hence a block of (2 $*$ PARAMS(1) $+$ 1)$*$$*$NDIM\_IN
+         pixels in the input grid will be examined to determine the
+         value of the output pixel.  If the variance is not being used
+         (USEVAR = .FALSE.) then all valid pixels in this cube
+         will be averaged in to the result with equal weight.
+         If variances are being used, then each input pixel will be
+         weighted proportionally to the reciprocal of its variance; any
+         pixel without a valid variance will be discarded.  This scheme
+         is suitable where the output grid is much coarser than the
+         input grid; if the ratio of pixel sizes is R then a suitable
+         value of PARAMS(1) may be (R - 1)/2.
+
       }
       Finally, supplying the following values for INTERP allows you to
       implement your own sub-pixel interpolation scheme by means of
@@ -15806,24 +15824,6 @@ Object            - Base class for all AST Objects
          value (in the same way as for the pre-defined interpolation
          schemes described above). Other elements of the PARAMS array
          are available to pass values to your interpolation routine.
-
-         \sstitem
-         AST\_\_BLOCKAVE: This scheme simply takes an average of all the
-         pixels on the input grid in a cube centred on the interpolation
-         point.  The number of pixels in the cube is determined by the
-         value of the first element of the PARAMS array, which gives
-         the number of pixels in each dimension on either side of the
-         central point.  Hence a block of (2 $*$ PARAMS(1) $+$ 1)$*$$*$NDIM\_IN
-         pixels in the input grid will be examined to determine the
-         value of the output pixel.  If the variance is not being used
-         (USEVAR = .FALSE.) then all valid pixels in this cube
-         will be averaged in to the result with equal weight.
-         If variances are being used, then each input pixel will be
-         weighted proportionally to the reciprocal of its variance; any
-         pixel without a valid variance will be discarded.  This scheme
-         is suitable where the output grid is much coarser than the
-         input grid; if the ratio of pixel sizes is R then a suitable
-         value of PARAMS(1) may be (R - 1)/2.
 
          \sstitem
          AST\_\_UINTERP: This is a completely general scheme, in which
@@ -24182,12 +24182,11 @@ a CD matrix and a PC matrix are erroneously present in a FITS header.
 \item A small number of documentation errors have been corrected.
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V1.5}
+\subsection{Changes Introduced in V1.5}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V1.4 and V1.5 (the
-current version):
+occurred in the AST library between versions V1.4 and V1.5 (not the most
+recent version):
 
 \begin{enumerate}
 
@@ -24284,6 +24283,22 @@ the latitude axis.
 \item The GLS projection projection has been renamed as SFL, but the 
 AST\_\_GLS type has been retained as an alias for AST\_\_SFL.
 \end{itemize}
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V1.6}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.5 and V1.6 (the
+current version):
+
+\begin{enumerate}
+
+\item A new ``interpolation'' scheme identified by the symbolic constant
+AST__BLOCKAVE has been added to the \htmlref{AST\_RESAMPLE$<$X$>$}{AST_RESAMPLEX} set of
+functions. The new scheme calculates each output pixel value by finding
+the mean of the input pixels in a box centred on the output pixel.
 
 \end{enumerate}
 
