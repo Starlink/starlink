@@ -2,7 +2,7 @@ INTERFACE RATIO
 
   PARAMETER INP
     POSITION    1
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     PPATH       'GLOBAL'
     ASSOCIATION '<-GLOBAL.BINDS'
     PROMPT      'Input dataset'
@@ -26,7 +26,7 @@ INTERFACE RATIO
 
   PARAMETER OUT
     POSITION    4
-    TYPE        'UNIV'
+    TYPE        'LITERAL'
     PROMPT      'Output dataset'
     ASSOCIATION '->GLOBAL.BINDS'
     HELP        'Enter null (!) if you dont want to create a dataset'
