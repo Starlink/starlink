@@ -6,12 +6,12 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {109.9}
+\newcommand{\stardocnumber}    {109.10}
 \newcommand{\stardocauthors}   {Peter W. Draper and Nicholas Eaton}
-\newcommand{\stardocdate}      {8 April 1998}
+\newcommand{\stardocdate}      {10 December 1998}
 \newcommand{\stardoctitle}     { {\Huge PISA} \\ [2.5ex]
-                      {\huge Position Intensity and Shape Analysis}}
-\newcommand{\stardocversion}   {2.4-1}
+                  {\huge Position Intensity and Shape Analysis}}
+\newcommand{\stardocversion}   {2.4-2}
 \newcommand{\stardocmanual}    {[manual-type]}
 \newcommand{\stardocabstract}  {[Text of abstract]}
 % ? End of document identification
@@ -195,12 +195,14 @@
 %  ==========================
 \begin{htmlonly}
    \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
+   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
       \stardoctitle
    \begin{rawhtml} </H1> \end{rawhtml}
 
 % ? Add picture here if required.
+   \begin{center}
    \htmladdimg{main.gif}
+   \end{center}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
@@ -487,21 +489,20 @@ eleven columns in the output file containing the following information
 :-
 
 \begin{center}
-\begin{tabbing}
-xxxxx \= xxxxxxxx \= xxxxxxxxxxxxx \= \kill
-\> Column \> Name  \> Description \\
-\> 1 \> INDEX \> Index number of object.\\
-\> 2 \> XPOS \> X position of object in pixels.\\
-\> 3 \> YPOS \> Y position of object in pixels.\\
-\> 4 \> INTENSITY \> Integrated intensity of object.\\
-\> 5 \> NPIX \> Number of pixels above threshold.\\
-\> 6 \> PEAK \> Peak intensity of object in one pixel.\\
-\> 7 \> ELLIPT \> Ellipticity of object.\\
-\> 8 \> ANGLE \> Orientation of object, anti-clockwise from y-axis.\\
-\> 9 \> SXX \> Second moment of data in x.\\
-\> 10 \> SYY \> Second moment of data in y.\\
-\> 11 \> SXY \> Cross moment of data in x and y.\\
-\end{tabbing}
+\begin{tabular}{lll}
+Column & Name  & Description \\
+1 & INDEX & Index number of object.\\
+2 & XPOS & X position of object in pixels.\\
+3 & YPOS & Y position of object in pixels.\\
+4 & INTENSITY & Integrated intensity of object.\\
+5 & NPIX & Number of pixels above threshold.\\
+6 & PEAK & Peak intensity of object in one pixel.\\
+7 & ELLIPT & Ellipticity of object.\\
+8 & ANGLE & Orientation of object, anti-clockwise from y-axis.\\
+9 & SXX & Second moment of data in x.\\
+10 & SYY & Second moment of data in y.\\
+11 & SXY & Cross moment of data in x and y.\\
+\end{tabular}
 \end{center}
 
 The SXX, SYY and SXY moments are defined as:
@@ -560,19 +561,18 @@ where $I_{t}$ is the threshold intensity and $I_{i}$ is the object
 intensity above the threshold :-
 
 \begin{center}
-\begin{tabbing}
-xxxxx\=xxxxxxxx \= xxxxxxxxxxxxx \= \kill
-\>Column \> Name  \> Description \\
-\> 1 \> INDEX \> Index number of object.\\
-\> 2 \> A1 \> Number of object pixels within threshold.\\
-\> 3 \> A2 \> Number of object pixels within i=2 threshold.\\
-\> 4 \> A3 \> Number of object pixels within i=3 threshold.\\
-\> 5 \> A4 \> Number of object pixels within i=4 threshold.\\
-\> 6 \> A5 \> Number of object pixels within i=5 threshold.\\
-\> 7 \> A6 \> Number of object pixels within i=6 threshold.\\
-\> 8 \> A7 \> Number of object pixels within i=7 threshold.\\
-\> 9 \> A8 \> Number of object pixels within i=8 threshold.\\
-\end{tabbing}
+\begin{tabular}{lll}
+Column & Name  & Description \\
+ 1 & INDEX & Index number of object.\\
+ 2 & A1 & Number of object pixels within threshold.\\
+ 3 & A2 & Number of object pixels within i=2 threshold.\\
+ 4 & A3 & Number of object pixels within i=3 threshold.\\
+ 5 & A4 & Number of object pixels within i=4 threshold.\\
+ 6 & A5 & Number of object pixels within i=5 threshold.\\
+ 7 & A6 & Number of object pixels within i=6 threshold.\\
+ 8 & A7 & Number of object pixels within i=7 threshold.\\
+ 9 & A8 & Number of object pixels within i=8 threshold.\\
+\end{tabular}
 \end{center}
 
 The RESULTS output of \iref{PISAFIND} can be used as input to the
@@ -1993,38 +1993,40 @@ the original version of \iref{PISAPLOT}.
          \sstitem
          The output in the RESULTS file contains the following
          information:
-\begin{tabbing}
-xxxxx \= xxxxxxxx \= xxxxxxxxxxxxx \= \kill
-\> Column \> Name  \> Description \\
-\> 1 \> INDEX \> Index number of object.\\
-\> 2 \> XPOS \> X position of object in pixels.\\
-\> 3 \> YPOS \> Y position of object in pixels.\\
-\> 4 \> INTENSITY \> Integrated intensity of object.\\
-\> 5 \> NPIX \> Number of pixels above threshold.\\
-\> 6 \> PEAK \> Peak intensity of object in one pixel.\\
-\> 7 \> ELLIPT \> Ellipticity of object.\\
-\> 8 \> ANGLE \> Orientation of object, anti-clockwise from y-axis.\\
-\> 9 \> SXX \> Second moment of data in x.\\
-\> 10 \> SYY \> Second moment of data in y.\\
-\> 11 \> SXY \> Cross moment of data in x and y.\\
-\end{tabbing}
+\begin{center}
+\begin{tabular}{lll}
+ Column & Name  & Description \\
+ 1 & INDEX & Index number of object.\\
+ 2 & XPOS & X position of object in pixels.\\
+ 3 & YPOS & Y position of object in pixels.\\
+ 4 & INTENSITY & Integrated intensity of object.\\
+ 5 & NPIX & Number of pixels above threshold.\\
+ 6 & PEAK & Peak intensity of object in one pixel.\\
+ 7 & ELLIPT & Ellipticity of object.\\
+ 8 & ANGLE & Orientation of object, anti-clockwise from y-axis.\\
+ 9 & SXX & Second moment of data in x.\\
+ 10 & SYY & Second moment of data in y.\\
+ 11 & SXY & Cross moment of data in x and y.\\
+\end{tabular}
+\end{center}
 
          \sstitem
          The output in the RESULTS file contains the following
          information:
-\begin{tabbing}
-xxxxx\=xxxxxxxx \= xxxxxxxxxxxxx \= \kill
-\>Column \> Name  \> Description \\
-\> 1 \> INDEX \> Index number of object.\\
-\> 2 \> A1 \> Number of object pixels within threshold.\\
-\> 3 \> A2 \> Number of object pixels within i=2 threshold.\\
-\> 4 \> A3 \> Number of object pixels within i=3 threshold.\\
-\> 5 \> A4 \> Number of object pixels within i=4 threshold.\\
-\> 6 \> A5 \> Number of object pixels within i=5 threshold.\\
-\> 7 \> A6 \> Number of object pixels within i=6 threshold.\\
-\> 8 \> A7 \> Number of object pixels within i=7 threshold.\\
-\> 9 \> A8 \> Number of object pixels within i=8 threshold.\\
-\end{tabbing}
+\begin{center}
+\begin{tabular}{lll}
+Column & Name  & Description \\
+ 1 & INDEX & Index number of object.\\
+ 2 & A1 & Number of object pixels within threshold.\\
+ 3 & A2 & Number of object pixels within i=2 threshold.\\
+ 4 & A3 & Number of object pixels within i=3 threshold.\\
+ 5 & A4 & Number of object pixels within i=4 threshold.\\
+ 6 & A5 & Number of object pixels within i=5 threshold.\\
+ 7 & A6 & Number of object pixels within i=6 threshold.\\
+ 8 & A7 & Number of object pixels within i=7 threshold.\\
+ 9 & A8 & Number of object pixels within i=8 threshold.\\
+\end{tabular}
+\end{center}
 
       The SIZES thresholds are determined by the equation. \\
       \begin{displaymath}
@@ -3187,6 +3189,15 @@ this package.
     object ellipse (these were incorrectly shown as $a$ and $b$,
     rather than $a^{2}$ and $b^{2}$). Formulae have also been added 
     showing how to calculate these values out to the detection isophote.
+\end{itemize}
+
+\section{Changes in release: 2.4-2}
+
+\begin{itemize}
+    \item 
+      A workaround for a crash that occurs in PISAFIND when too many
+      pixels are accumulated in a single object has been added. When this
+      occurs the application should now gracefully exit.
 \end{itemize}
 
 \end{document}

@@ -277,6 +277,9 @@
 *     9-FEB-1995 (PDRAPER):
 *        ISMOO behaviour now correct. Detection always used smoothed
 *        data previous to this.
+*     30-NOV-1998 (PDRAPER):
+*        Added test to stop the number of pixels in ILIST from 
+*        being exceeded.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -758,7 +761,7 @@ c  *** reset appropriate pointer
 *   If there is enough pixel storage for at least one more line
 *   then analyse next line
       ISET = 0
-      IF( IJC .LT. IMLIM - NRANGE ) GOTO 250
+      IF( IJC .LT. IMLIM - NRANGE - 1 ) GOTO 250
 
       ijcbot=0
       ipt=0
@@ -1091,7 +1094,18 @@ c  *** end of writing out loop
  600  continue
 c  *** end of pixel loop
  660  continue
-      if(irec.lt.istop-1)goto 250
+      if(irec.lt.istop-1) then
+C  PWD: more lines for this object???. Stop if not enough data left to
+C  process another line.
+         IF( IJC .LT. IMLIM - NRANGE - 1 ) THEN 
+            GOTO 250
+         ELSE
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 
+     :'Internal storage space exhausted -- objects too large', STATUS )
+            GO TO 900
+         END IF
+      end if
       if(ipass.eq.1)then
          NNEG=MMM
          goto 225

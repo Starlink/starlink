@@ -382,7 +382,7 @@ PKG_LINK = PSA1
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 2.4-1
+PKG_VERS = 2.4-2
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
