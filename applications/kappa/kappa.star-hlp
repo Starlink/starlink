@@ -3434,6 +3434,9 @@ structures. Currently, this support only includes:
 
 The applications affected by these, and any other, changes are:
 
+  o  COMPAVE, COMPADD and COMPICK now correctly process NDFs with more
+     than 2 dimensions.
+
   o  DISPLAY changed to avoid a spurious error previously reported if 
      double precision data is displayed which requires compression to fit 
      in the display.
@@ -3467,10 +3470,11 @@ The applications affected by these, and any other, changes are:
 The following applications now propagate the WCS component of an NDF
 structure: 
 
-   ADD ARDMASK BLOCK CADD CALPOL CDIV CHPIX CMULT CONVOLVE CSUB DISPLAY
-   ERRCLIP FFCLEAN FILLBAD GAUSMOOTH GREYPLOT HISTEQ INSPECT DIV LUCY
-   MAKESURFACE MATHS MEDIAN MEM2D MULT NDFCOPY NOMAGIC NORMALIZE PASTE RIFT
-   SEGMENT SETMAGIC SHADOW SUB SUBSTITUTE SURFIT THRESH WIENER ZAPLIN
+   ADD ARDMASK BLOCK CADD CALPOL CDIV CHPIX CMULT COMPADD COMPAVE COMPICK
+   CONVOLVE CSUB DISPLAY ERRCLIP FFCLEAN FILLBAD GAUSMOOTH GREYPLOT HISTEQ 
+   INSPECT DIV LUCY MAKESURFACE MATHS MEDIAN MEM2D MULT NDFCOPY NOMAGIC 
+   NORMALIZE PASTE RIFT SEGMENT SETMAGIC SHADOW SUB SUBSTITUTE SURFIT 
+   THRESH WIENER ZAPLIN
 
 1 CHPIX
 Replaces the values of selected pixels in an NDF.
@@ -5069,6 +5073,8 @@ are summed and always normalised for bad values.
    Figaro: ISTRETCH, YSTRACT.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1991 November 30 (MJC):
     Original version.
@@ -5076,9 +5082,16 @@ MJC: Malcolm J. Currie (STARLINK)
  1995 January 11 (MJC):
     Made TITLE propagate from the input NDF.  Used PSX for
     workspace.
+
+ 27-FEB-1998 (DSB):
+    Type of local variable AXWT corrected from INTEGER to LOGICAL.
+
+ 10-JUN-1998 (DSB):
+    Propagate WCS component. Ensure each output dimension is at least
+    one pixel long.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, VARIANCE,
-   LABEL, TITLE, UNITS, and HISTORY components of the input NDF and
+   LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF and
    propagates all extensions.  QUALITY is not processed since it is
    a series of flags, not numerical values.
 
@@ -5210,6 +5223,8 @@ are summed and always normalised for bad values.
    Figaro: ISTRETCH.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1991 November 27 (MJC):
     Original version.
@@ -5218,9 +5233,17 @@ MJC: Malcolm J. Currie (STARLINK)
     Made TITLE propagate from the input NDF.  Used PSX for
     workspace.
 
+ 27-FEB-1998 (DSB):
+    Type of local variable AXWT corrected from INTEGER to LOGICAL.
+
+ 10-JUN-1998 (DSB):
+    Propagate WCS component. Ensure each output dimension is at least
+    one pixel long.
+
+ {enter_further_changes}
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, VARIANCE,
-   LABEL, TITLE, UNITS, and HISTORY components of the input NDF and
+   LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF and
    propagates all extensions.  QUALITY is not processed since it is
    a series of flags, not numerical values.
 
@@ -5304,15 +5327,21 @@ expression (input dimension - %ORIGIN) / %COMPRESS + 1.
    Figaro: ISTRETCH.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1991 November 27 (MJC):
     Original version.
 
  1995 January 11 (MJC):
     Made TITLE propagate from the input NDF.
+
+ 10-JUN-1998 (DSB):
+    Propagate WCS component. Ensure each output dimension is at least
+    one pixel long.
 2 Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are

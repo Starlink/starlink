@@ -154,7 +154,7 @@
      :  COMPRS( NDF__MXDIM ),  ! Compression factors
      :  EL,                    ! Number of elements in mapped array
      :  ELA,                   ! Number of elements in input axis array
-     :  I,                     ! Loop counter for the dimensions
+     :  I, J,                  ! Loop counter for the dimensions
      :  IAXIS,                 ! Loop counter for the axis-array
                                ! components
      :  IDIMS( NDF__MXDIM ),   ! Dimensions of input NDF
@@ -164,8 +164,7 @@
      :  NDFO,                  ! Identifier to the output NDF
      :  NDFS,                  ! Identifier to the section of the input
                                ! NDF
-     :  NDIM,                  ! Padded dimensionality of the NDF
-     :  NDIMI                  ! Actual dimensionality of the NDF 
+     :  NDIM                   ! Dimensionality of the NDF
 
       INTEGER
      :  ODIMS( NDF__MXDIM ),   ! Dimensions of output array
@@ -628,18 +627,18 @@
 *  Propagate the WCS component, incorporating a linear mapping between
 *  pixel coordinates. This mapping is described by a matrix and an offset
 *  vector. Set these up. 
-      DO I = 1, NDIMI*NDIMI
+      DO I = 1, NDIM*NDIM
          MATRIX( I ) = 0.0
       END DO
 
-      DO J = 1, NDIMI
+      DO J = 1, NDIM
          OFFSET( J ) = DBLE( LBNDO( J ) - 1 ) - 
      :                 DBLE( ORIGN0( J ) - 1 )/DBLE( COMPRS( J ) )
-         MATRIX( NDIMI*( J - 1 ) + J ) = 1.0D0/DBLE( COMPRS( J ) )
+         MATRIX( NDIM*( J - 1 ) + J ) = 1.0D0/DBLE( COMPRS( J ) )
       END DO
 
 *  Propagate the WCS component.
-      CALL KPG1_ASPRP( NDIMI, NDFI, NDFO, MATRIX, OFFSET, STATUS )
+      CALL KPG1_ASPRP( NDIM, NDFI, NDFO, MATRIX, OFFSET, STATUS )
 
 *  Come here if something has gone wrong.
   999 CONTINUE

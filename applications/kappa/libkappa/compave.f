@@ -228,7 +228,7 @@
                                ! workspace
      :  ELWS2,                 ! Number of elements in counting
                                ! workspace
-     :  I,                     ! Loop counter for the dimensions
+     :  I, J,                  ! Loop counter for the dimensions
      :  IAXIS,                 ! Loop counter for the axis-array
                                ! components
      :  IDIMS( NDF__MXDIM ),   ! Dimensions of input NDF
