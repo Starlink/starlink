@@ -261,6 +261,8 @@
 	INTEGER MAXDATASET 	        ! highest dataset yet used
 	DATA MAXDATASET /0/
 
+        INTEGER L
+
 *    Global variables :
         INCLUDE 'SPEC_CMN_RZ'
 *-
