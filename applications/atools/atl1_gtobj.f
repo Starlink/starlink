@@ -4,8 +4,8 @@
 *     ATL1_GTOBJ
 
 *  Purpose:
-*     Get an AST Object from an NDF or text file using an environment 
-*     parameter.
+*     Get an AST Object from an NDF, FITS file or text file using an 
+*     environment parameter.
 
 *  Language:
 *     Starlink Fortran 77

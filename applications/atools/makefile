@@ -394,7 +394,7 @@ PKG_LINK = ATOOLS
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.1
+PKG_VERS = 1.1-1
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -448,7 +448,7 @@ I_SUB2 =
 #  the files.
 
 EXTERNAL_INCLUDES = SAE_PAR GRP_PAR DAT_PAR DAT_ERR NDF_PAR NDF_ERR \
-PAR_ERR FIO_ERR AST_PAR
+PAR_ERR PAR_PAR FIO_ERR AST_PAR CNF_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -462,7 +462,7 @@ atl1_setop.f astcmpframe.f astcmpmap.f astframe.f astgetframe.f astfindframe.f \
 astskyframe.f astgetmapping.f astunitmap.f atlhelp.f astframeset.f astpermaxes.f \
 astpermmap.f astremoveframe.f astremapframe.f astmatrixmap.f astconvert.f \
 atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f astpcdmap.f astwinmap.f \
-astpickaxes.f astsimplify.f
+astpickaxes.f astsimplify.f asttran2.f
 
 F_SUB2 = 
 
@@ -499,7 +499,8 @@ C_SUB2 =
 TASKS = astcopy astaddframe astclear astget astset asttest astcmpframe \
 astcmpmap astframe astgetframe astgetmapping astunitmap atlhelp astskyframe \
 astframeset astpermmap astremoveframe astremapframe astmatrixmap astconvert \
-astlutmap astpcdmap astwinmap astfindframe astpermaxes astpickaxes astsimplify
+astlutmap astpcdmap astwinmap astfindframe astpermaxes astpickaxes \
+astsimplify asttran2
 
 #  Monolith routine source name.
 
@@ -583,6 +584,8 @@ PAR_ERR:   $(STAR_INC)/par_err;   $(LINK) $? $@
 FIO_ERR:   $(STAR_INC)/fio_err;   $(LINK) $? $@
 SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
 AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
+PAR_PAR:   $(STAR_INC)/par_par;   $(LINK) $? $@
+CNF_PAR:   $(STAR_INC)/cnf_par;   $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
@@ -1382,6 +1385,7 @@ astfindframe.o : SAE_PAR AST_PAR PAR_ERR
 astpermaxes.o  : SAE_PAR AST_PAR NDF_PAR
 astpickaxes.o  : SAE_PAR AST_PAR NDF_PAR PAR_ERR
 astsimplify.o  : SAE_PAR AST_PAR 
+asttran2.o     : SAE_PAR NDF_PAR AST_PAR PAR_PAR PAR_ERR CNF_PAR
 astmatrixmap.o : SAE_PAR NDF_PAR AST_PAR
 astlutmap.o    : SAE_PAR AST_PAR
 astpcdmap.o    : SAE_PAR AST_PAR

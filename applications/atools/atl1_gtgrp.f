@@ -13,8 +13,11 @@
 *     CALL ATL1_GTGRP( PARAM, IGRP, STATUS )
 
 *  Description:
-*     Currently this routine expects the parameter to be associated with
-*     a text file, and the returned group contains the lines of the file.
+*     Currently this routine expects the parameter to be associated with:
+*
+*     1 - a text file (the returned group contains the lines of the file).
+*     2 - a FITS file (the returned group contains the FITS headers).
+*
 *     In future it may be possible to add other ways of using the
 *     parameter (i.e. by associating it with objects other than text
 *     files).
@@ -29,11 +32,16 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     NG: Norman Gray (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     12-JAN-2001 (DSB):
 *        Original version.
+*     19-JUN-2001 (NG):
+*        Added option to read FITS file headers.
+*     19-JUN-2001 (DSB):
+*        Re-formatted NGs changes to use ATOOLS coding style.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -57,14 +65,27 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      LOGICAL CHR_SIMLR
+
 *  Local Variables:
       CHARACTER FNAME*120
+      CHARACTER FTCARD*80
       CHARACTER GRPEXP*(GRP__SZGEX)
       INTEGER ADDED
+      INTEGER FTBKSZ
+      INTEGER FTCNUM
+      INTEGER FTSTAT
+      INTEGER FTUNIT
+      INTEGER I
       INTEGER IAT
+      INTEGER IDX      
       INTEGER IPAR
       INTEGER SIZE
       LOGICAL FLAG
+      LOGICAL FTMORE
+      LOGICAL ISFITS
+
 *.
 
 *  Initialise.
@@ -73,28 +94,84 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Create a new group. 
+      CALL GRP_NEW( ' ', IGRP, STATUS )
+
 *  Get the value of the parameter using SUBPAR to avoid interpretation of
 *  the string by the parameter system.
       CALL SUBPAR_FINDPAR( PARAM, IPAR, STATUS )
       CALL SUBPAR_GETNAME( IPAR, FNAME, STATUS )
+      
+*  Work out if the file is a FITS file, by seeing if it has a
+*  .fit or .fits or .fits-and-anything extension
+      ISFITS = .FALSE.
+      IDX = 0
+
+*  Find last dot in filename
+      DO I = 1, LEN( FNAME )
+         IF( FNAME( I : I ) .EQ. '.' ) IDX = I
+      END DO
+
+*  Check the string following the last dot.
+      IF( IDX .GT. 0 .AND. IDX .LT. LEN( FNAME ) ) THEN
+         ISFITS = CHR_SIMLR( FNAME( IDX : IDX + 3 ), '.FIT' )
+      END IF
+
+*  Create a new group, filling it with the contents of the file header.
+      IF( ISFITS ) THEN
+
+*  Open the FITS file.
+         FTBKSZ = 1
+         FTSTAT = 0
+         CALL FTGIOU( FTUNIT, FTSTAT )
+         CALL FTOPEN( FTUNIT, FNAME, 0, FTBKSZ, FTSTAT ) 
+      
+*  There was an error opening the file -- perhaps it isn't a FITS
+*  file after all.  So set ISFITS to false, so we have another
+*  go with the other method.
+         IF( FTSTAT .NE. 0 ) THEN
+            FTMORE = .FALSE.
+            ISFITS = .FALSE.
+         END IF
+
+*  Read the header into the GRP group.
+         FTCNUM = 1
+         DO WHILE( FTMORE )
+            CALL FTGREC( FTUNIT, FTCNUM, FTCARD, FTSTAT )
+            FTCNUM = FTCNUM + 1
+            IF( FTSTAT .NE. 0 ) FTMORE = .FALSE.
+            IF( FTCARD( 1 : 3 ) .EQ. 'END' ) FTMORE = .FALSE.
+            CALL GRP_PUT( IGRP, 1, FTCARD, 0, STATUS )
+            IF( STATUS .NE. SAI__OK ) FTMORE = .FALSE.
+         END DO
+
+         CALL FTCLOS( FTUNIT, FTSTAT )
+
+      END IF
+
+*  Rather than an else, here, test ISFITS again, in case it was reset
+*  within the previous block.
+      IF( .NOT. ISFITS ) THEN
+
+*  Ensure the group is empty.
+         CALL GRP_SETSZ( IGRP, 0, STATUS )
 
 *  Form a group expression containing an indirection element which will
 *  cause GRP to read the specified file.
-      GRPEXP = '^'
-      IAT = 1
-      CALL CHR_APPND( FNAME, GRPEXP, IAT )
-
-*  Create a new group. 
-      CALL GRP_NEW( ' ', IGRP, STATUS )
+         GRPEXP = '^'
+         IAT = 1
+         CALL CHR_APPND( FNAME, GRPEXP, IAT )
 
 *  Switch off all control characters so that nothing gets interpreted by
 *  GRP.
-      CALL GRP_SETCC( IGRP, 'COM,DEL,NAM,SEP,OPEN_N,CLOSE_N,FL,'//
-     :                'OPEN_K,CLOSE_K', '%%%%%%%%%', STATUS ) 
+         CALL GRP_SETCC( IGRP, 'COM,DEL,NAM,SEP,OPEN_N,CLOSE_N,FL,'//
+     :                   'OPEN_K,CLOSE_K', '%%%%%%%%%', STATUS ) 
 
 *  Read the file into the group.
-      CALL GRP_GRPEX( GRPEXP( : IAT ), GRP__NOID, IGRP, SIZE, ADDED,
-     :                FLAG, STATUS )     
+         CALL GRP_GRPEX( GRPEXP( : IAT ), GRP__NOID, IGRP, SIZE, ADDED,
+     :                   FLAG, STATUS )     
+         
+      ENDIF
 
 *  Delete the group if an error occurred.
       IF( STATUS .NE. SAI__OK ) CALL GRP_DELET( IGRP, STATUS )
