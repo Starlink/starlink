@@ -189,9 +189,9 @@
 *    Report error and return should the maximum and minimum be the same
 
       IF ( MAXV .EQ. MINV ) THEN
+         STATUS = SAI__ERROR
          CALL ERR_REP( 'ERR_HSTEQP_EQL',
      :     'HSTEQP: Maximum and minimum are equal', STATUS )
-         STATUS = SAI__ERROR
          GOTO 999
       END IF
 
@@ -253,11 +253,11 @@
 *    If there are more than 20 points then do the fit.
 
       IF ( UPPER-LOWER .LT. 20 ) THEN
+         STATUS = SAI__ERROR
          CALL MSG_SETI( 'FITPOINTS', UPPER-LOWER )
          CALL ERR_REP( 'ERR_HSTEQP_ISFP',
      :     'HSTEQP: Insufficient points ( ^FITPOINTS ) to do the fit. '/
      :     /'Choose a smaller dynamic range.', STATUS )
-         STATUS = SAI__ERROR
          GOTO 999
       END IF
 
@@ -331,9 +331,9 @@
 *       results are going to be very inaccurate.
 
          IF ( MAXVAL .LT. 1.0D-10 ) THEN
+            STATUS = SAI__ERROR
             CALL ERR_REP( 'ERR_HSTEQP_INAF',
      :        'HSTEQP: Inaccurate fit', STATUS )
-            STATUS = SAI__ERROR
             GOTO 999
          END IF
 
