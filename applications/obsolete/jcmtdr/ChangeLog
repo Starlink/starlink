@@ -1,5 +1,7 @@
 2000-10-25  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* makefile: No longer need -lucb on Solaris
+
 	* subs/jcmt_fakdat.f: Use PDA bessel
 
 	* subs/jcmt_bessl3.f: Use PDA bessel

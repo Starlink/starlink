@@ -642,7 +642,7 @@ $(MONOLITH): $(MONOLITH).f $(OBJECT_LIBRARIES) $(INCLUDE_LINKS)
 	      $(ALINK) $(MONOLITH).o $(OBJECT_LIBRARIES) $(LINK_OPTIONS) \
 	      ;;\
 	   sun4_Solaris) \
-	      $(ALINK) $(MONOLITH).o $(OBJECT_LIBRARIES) $(LINK_OPTIONS) -lucb \
+	      $(ALINK) $(MONOLITH).o $(OBJECT_LIBRARIES) $(LINK_OPTIONS) \
 	      ;;\
 	   *) \
 	      $(ALINK) $(MONOLITH).o $(OBJECT_LIBRARIES) $(LINK_OPTIONS) \
