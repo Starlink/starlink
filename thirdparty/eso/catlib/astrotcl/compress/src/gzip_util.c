@@ -162,7 +162,7 @@ int		copy
 
     return OK;
 }
-#endif omit
+#endif /* omit */
 
 
 /* ===========================================================================
@@ -270,7 +270,7 @@ void 		flush_outbuf
     outcnt = 0;
 }
 
-#endif omit
+#endif /* omit */
 
 
 /*+

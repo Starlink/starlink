@@ -229,7 +229,8 @@ int	status;
 va_list	args;
 {
     void	msg_append();
-    static char	*msg_find();
+    /* static ??  Can't have static functions within a block */
+    char	*msg_find();
 
     char	*errno_arg;
     char	*format;
@@ -275,7 +276,7 @@ va_list	args;
 	    errno = 0;
 	}
 
-#endif VMS
+#endif /* VMS */
 
     }
     else
