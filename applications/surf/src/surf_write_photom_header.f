@@ -153,8 +153,8 @@
       INTEGER       MAX_INT
       INTEGER       N_INTEGRATIONS
 *    Import-Export :
-      INTEGER            FD              ! FIO file identifier
 *    Export :
+      INTEGER            FD              ! FIO file identifier
 *    Status :
       INTEGER STATUS
 *    External references :
@@ -175,6 +175,8 @@
 *  open the file
 
       CALL FIO_ASSOC ('FILE', 'WRITE', 'LIST', 0, FD, STATUS)
+
+      IF (STATUS .NE. SAI__OK) RETURN
 
 *  write header information
 
