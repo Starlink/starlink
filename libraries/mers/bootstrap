@@ -1,5 +1,5 @@
 #! /bin/sh -
-# original bootstrap file, installed by starconf 1.0-4, rnum=1000004
+# original bootstrap file, installed by starconf 1.0-5, rnum=1000005
 # If you _need_ to change this file, delete or replace `original' above
 # or else starconf may overwrite it with an updated version
 
@@ -29,14 +29,18 @@ echorun() { echo $*; eval $* || exit 1; }
 if test -z "$STARCONF_BUILDSUPPORT"; then
     # Use a default.  We don't normally refer to the STARLINK
     # variable, but we've little choice here.  Try it, but don't fail
-    # if it's not there -- that simply means we won't default
-    # STARCONF_BUILDSUPPORT and we'll take other actions below.
-    if test -n "$STARLINK"; then
+    # if it's not there -- we have other defaults.
+    if test -n "$STARLINK" -a -d $STARLINK/buildsupport; then
         STARCONF_BUILDSUPPORT=$STARLINK/buildsupport
         echo "Defaulting STARCONF_BUILDSUPPORT to $STARCONF_BUILDSUPPORT"
     fi
 fi
 if test -z "$STARCONF_BUILDSUPPORT"; then
+    # Still nothing.  See if `starconf' is in the path
+    STARCONF_BUILDSUPPORT=`starconf --show buildsupport 2>/dev/null`
+fi
+if test -z "$STARCONF_BUILDSUPPORT"; then
+    # Give up!
     echo "STARCONF_BUILDSUPPORT is empty -- hope that's OK"
 fi
 
@@ -69,11 +73,15 @@ do
     fi
 done
 
-# If STAR_SUPPRESS_AUTORECONF is true, then we suppress the call
-# of `autoreconf'.  This is here _only_ so that the top-level bootstrap file can 
-# suppress multiple calls of this in bootstrap files in its children.
+# If STAR_SUPPRESS_AUTORECONF is true in the environment, then we
+# suppress the call of `autoreconf'.  This is here _only_ so that the top-level
+# bootstrap file can suppress multiple calls of this in bootstrap scripts
+# in its children.
 : ${STAR_SUPPRESS_AUTORECONF=false}
-
-$STAR_SUPPRESS_AUTORECONF || echorun autoreconf
+if $STAR_SUPPRESS_AUTORECONF; then
+    echo "Suppressing autoreconf"
+else
+    echorun autoreconf
+fi
 
 exit 0
