@@ -2,6 +2,8 @@
 *  Name:
 *     TIO_EOF, TIO_ERR, TIO_GETMSG, TIO_MARK,
 *        TIO_READ, TIO_SKIP, TIO_WRITE
+*        TIO_OPEN, TIO_MOUNT, TIO_REWIND, TIO_SETDEN
+*        TIO_DISMT, TIO_SENSE, TIO_CLOSE
 
 *  Purpose:
 *     Mock routines for absent TIO library.
@@ -34,6 +36,7 @@
 *  Authors:
 *     Horst Meyerdierks: hme (UoE, Starlink)
 *     A C Davenhall: acd (UoE, Starlink)
+*     Tim Jenness: timj (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -41,6 +44,10 @@
 *        Original version.
 *     23 Feb 2001 (acd):
 *        Added return values for the functions TIO_EOF and TIO_ERR.
+*     16 Jul 2004 (timj):
+*        Attempt to add more missing routines:
+*        TIO_OPEN, TIO_MOUNT, TIO_REWIND, TIO_SETDEN
+*        TIO_DISMT, TIO_SENSE, TIO_CLOSE
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -131,3 +138,86 @@
      :   'Programming error: TIO is not installed.', IGNORE )
       STOP
       END
+
+      SUBROUTINE TIO_OPEN( TAPE, MTUNIT, STATUS)
+      IMPLICIT NONE
+      CHARACTER *(*) TAPE
+      INTEGER MTUNIT
+      INTEGER STATUS
+      INTEGER IGNORE
+      IGNORE = 0
+      CALL MSG_OUT( 'TIO_NXST',
+     :   'Programming error: TIO is not installed.', IGNORE )
+      STOP
+      END
+
+      SUBROUTINE TIO_MOUNT( TAPE, STATUS)
+      IMPLICIT NONE
+      CHARACTER *(*) TAPE
+      INTEGER STATUS
+      INTEGER IGNORE
+      IGNORE = 0
+      CALL MSG_OUT( 'TIO_NXST',
+     :   'Programming error: TIO is not installed.', IGNORE )
+      STOP
+      END
+
+      SUBROUTINE TIO_SETDEN( MTUNIT, TDENS, STATUS)
+      IMPLICIT NONE
+      INTEGER MTUNIT
+      INTEGER TDENS
+      INTEGER STATUS
+      INTEGER IGNORE
+      IGNORE = 0
+      CALL MSG_OUT( 'TIO_NXST',
+     :   'Programming error: TIO is not installed.', IGNORE )
+      STOP
+      END
+
+      SUBROUTINE TIO_SENSE( TAPE, POSN, STATUS)
+      IMPLICIT NONE
+      CHARACTER * (*) TAPE
+      CHARACTER * (*) POSN
+      INTEGER STATUS
+      INTEGER IGNORE
+      IGNORE = 0
+      CALL MSG_OUT( 'TIO_NXST',
+     :   'Programming error: TIO is not installed.', IGNORE )
+      STOP
+      END
+
+      SUBROUTINE TIO_CLOSE( MTUNIT, STATUS)
+      IMPLICIT NONE
+      INTEGER MTUNIT
+      INTEGER STATUS
+      INTEGER IGNORE
+      IGNORE = 0
+      CALL MSG_OUT( 'TIO_NXST',
+     :   'Programming error: TIO is not installed.', IGNORE )
+      STOP
+      END
+
+      SUBROUTINE TIO_REWIND( MTUNIT, STATUS)
+      IMPLICIT NONE
+      INTEGER MTUNIT
+      INTEGER STATUS
+      INTEGER IGNORE
+      IGNORE = 0
+      CALL MSG_OUT( 'TIO_NXST',
+     :   'Programming error: TIO is not installed.', IGNORE )
+      STOP
+      END
+
+      SUBROUTINE TIO_DISMT( DEVICE, LOG, STATUS)
+      IMPLICIT NONE
+      CHARACTER * (*) DEVICE
+      LOGICAL LOG
+      INTEGER STATUS
+      INTEGER IGNORE
+      IGNORE = 0
+      CALL MSG_OUT( 'TIO_NXST',
+     :   'Programming error: TIO is not installed.', IGNORE )
+      STOP
+      END
+
+
