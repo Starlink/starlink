@@ -22,15 +22,14 @@ AC_PROG_LN_S
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+dnl   Check if BSD bcopy function is available, if not should use memmove.
+AC_CHECK_FUNCS(memmove bcopy)
+
 dnl   This package has no dependencies
 
-STAR_LATEX_DOCUMENTATION(sun209)
+STAR_LATEX_DOCUMENTATION(sun209, [sun209.tex sun209.ps sun209.htx_tar])
 
-dnl   Header checks.  There are no such explicit checks at present,
-dnl   only the implicit ones.  Also config.h is not at present
-dnl   included by anything.  However we might as well include this
-dnl   stanza here, to support that in future, but also to keep down
-dnl   the length of generated command lines.
+dnl   Header checks.  
 AM_CONFIG_HEADER(config.h)
 
 AC_CONFIG_FILES(Makefile component.xml)

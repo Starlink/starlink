@@ -1,5 +1,8 @@
 #include <string.h>
 #include "f77.h"                 /* CNF macros and prototypes               */
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
 void cnfImpch( const char *source_f, int nchars, char *dest_c )
 
@@ -52,6 +55,10 @@ void cnfImpch( const char *source_f, int nchars, char *dest_c )
 *        Correct include file
 *     24-SEP-1998 (AJC):
 *        Specify const char * for input strings
+*     19-JUL-2004 (PWD):
+*        Changed to use memmove when bcopy isn't available. Also to 
+*        just do the straight copy when neither is available (very unlikely). 
+*        Note that bcopy is deprecated in POSIX.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -70,5 +77,17 @@ void cnfImpch( const char *source_f, int nchars, char *dest_c )
 /* Copy the characters of the input C array to the output FORTRAN string.  */
 
    bcopy( (const void *)source_f, (void *)dest_c, (size_t)nchars );
+
+#if HAVE_BCOPY
+   bcopy( (const void *)source_f, (void *)dest_c, (size_t)nchars );
+#elif HAVE_MEMMOVE
+   memmove( (void *)dest_c, (const void *)source_f, (size_t)nchars );
+#else
+/* Do this by hand, note no overlaps allowed */
+   for ( i = 0; i < nchars; i++ ) {
+       dest_c[i] = source_f[i];
+   }
+#endif
+
 
 }
