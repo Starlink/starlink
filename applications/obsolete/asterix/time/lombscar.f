@@ -1,4 +1,4 @@
-*+LOMBSCAR  -  Calculates power spectrum with associated error estimate
+*+  LOMBSCAR  -  Calculates power spectrum with associated error estimate
       SUBROUTINE LOMBSCAR(STATUS)
 *    Description :
 *
@@ -130,7 +130,7 @@
      &         %val(W3PNTR), %val(PPNTR), DF, NOUT, PROB)
 *
 * Save the result
-      CALL TIM_OUTPUT('OUTPUT', TYPE, NOUT, %val(PPNTR), DF/2.0,
+      CALL TIM_OUTPUT( 'OUT', TYPE, NOUT, %val(PPNTR), DF/2.0,
      &                                             DF, LOCO, STATUS)
 *
 * Add axis label and units

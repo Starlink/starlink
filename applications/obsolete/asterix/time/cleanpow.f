@@ -380,7 +380,7 @@ C        IF(LGXFL.EQ.1)XMIN =0.5*NUFREQ(1)
         FINC = (FMAX - FMIN) / REAL (NPOI-1)
 *
 * Write the HDS file. Periodogram
-        CALL TIM_OUTPUT('OUTPUT', 'POWER_SPECTRUM', NPOI,
+        CALL TIM_OUTPUT('OUT', 'POWER_SPECTRUM', NPOI,
      &                  %val(SPPTR), FMIN, FINC, LOCO, STATUS)
 *
 *   Add axis label
