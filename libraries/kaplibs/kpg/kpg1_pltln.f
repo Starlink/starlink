@@ -136,6 +136,8 @@
 *     17-JUL-2001 (DSB):
 *        Draw the error bars before the data points, rather than after
 *        them, to avoid the data points being obscured by the error bars.
+*     18-SEP-2001 (DSB):
+*        Make bad error bars extend to the corresponding edge of the plot.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -341,15 +343,18 @@
                IF( XERROR ) THEN
 
                   ERR = XBAR( I, 1 )
-                  IF( ERR .NE. AST__BAD ) THEN
-                      XHI = MAX( XHI, REAL( ERR ) )
-                      XLO = MIN( XLO, REAL( ERR ) )
-                  END IF
+                  IF( ERR .EQ. AST__BAD ) ERR = WX1
+                  XHI = MAX( XHI, REAL( ERR ) )
+                  XLO = MIN( XLO, REAL( ERR ) )
 
                   ERR = XBAR( I, 2 )
-                  IF( ERR .NE. AST__BAD ) THEN
-                      XHI = MAX( XHI, REAL( ERR ) )
-                      XLO = MIN( XLO, REAL( ERR ) )
+                  IF( ERR .EQ. AST__BAD ) ERR = WX2
+                  XHI = MAX( XHI, REAL( ERR ) )
+                  XLO = MIN( XLO, REAL( ERR ) )
+
+                  IF( XHI .EQ. WX2 .AND. XHI .EQ. WX1 ) THEN
+                     XLO = RX
+                     XHI = RX
                   END IF
 
                END IF
@@ -360,15 +365,18 @@
                IF( YERROR ) THEN
 
                   ERR = YBAR( I, 1 )
-                  IF( ERR .NE. AST__BAD ) THEN
-                      YHI = MAX( YHI, REAL( ERR ) )
-                      YLO = MIN( YLO, REAL( ERR ) )
-                  END IF
+                  IF( ERR .EQ. AST__BAD ) ERR = WY1
+                  YHI = MAX( YHI, REAL( ERR ) )
+                  YLO = MIN( YLO, REAL( ERR ) )
 
                   ERR = YBAR( I, 2 )
-                  IF( ERR .NE. AST__BAD ) THEN
-                      YHI = MAX( YHI, REAL( ERR ) )
-                      YLO = MIN( YLO, REAL( ERR ) )
+                  IF( ERR .EQ. AST__BAD ) ERR = WY2
+                  YHI = MAX( YHI, REAL( ERR ) )
+                  YLO = MIN( YLO, REAL( ERR ) )
+
+                  IF( YHI .EQ. WY2 .AND. XHI .EQ. WY1 ) THEN
+                     YLO = RY
+                     YHI = RY
                   END IF
 
                END IF
@@ -394,21 +402,29 @@
                   IF( XERROR ) THEN
                      CALL PGMOVE( XLO, RY )
                      CALL PGDRAW( XHI, RY )
-   
-                     CALL PGMOVE( XLO, RY - SERIF )
-                     CALL PGDRAW( XLO, RY + SERIF )
-                     CALL PGMOVE( XHI, RY - SERIF )
-                     CALL PGDRAW( XHI, RY + SERIF )
+
+                     IF( XLO .NE. WX1 ) THEN
+                        CALL PGMOVE( XLO, RY - SERIF )
+                        CALL PGDRAW( XLO, RY + SERIF )
+                     END IF
+                     IF( XHI .NE. WX2 ) THEN
+                        CALL PGMOVE( XHI, RY - SERIF )
+                        CALL PGDRAW( XHI, RY + SERIF )
+                     END IF
                   END IF
 
                   IF( YERROR ) THEN
                      CALL PGMOVE( RX, YLO )
                      CALL PGDRAW( RX, YHI )
    
-                     CALL PGMOVE( RX - SERIF, YLO )
-                     CALL PGDRAW( RX + SERIF, YLO )
-                     CALL PGMOVE( RX - SERIF, YHI )
-                     CALL PGDRAW( RX + SERIF, YHI )
+                     IF( YLO .NE. WY1 ) THEN
+                        CALL PGMOVE( RX - SERIF, YLO )
+                        CALL PGDRAW( RX + SERIF, YLO )
+                     END IF
+                     IF( YHI .NE. WY2 ) THEN
+                        CALL PGMOVE( RX - SERIF, YHI )
+                        CALL PGDRAW( RX + SERIF, YHI )
+                     END IF
                   END IF
 
 *  If ERSHAP specifies a diamond, draw a poly line around the error box.

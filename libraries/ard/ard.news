@@ -8,4 +8,8 @@ than prevously. For instance, if there is an RA/DEC calibration
 associated with the pixel array, then the ARD description can contain
 positions in any of the common celestial coordinate systems. 
 
+A new routine ARD_PLOT has been added which will draw a curve on a
+graphics device around the boundary of a supplied 2-dimensional ARD 
+description.
+
 Full details are available in SUN/183.
