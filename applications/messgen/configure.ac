@@ -19,9 +19,6 @@ dnl   Checks for programs
 AC_PROG_CC
 AC_PROG_LIBTOOL
 
-dnl   Make a manifest file when we install the software
-STAR_MAKE_MANIFEST
-
 dnl   Documentation is uncomplicated
 STAR_LATEX_DOCUMENTATION(sun185)
 
