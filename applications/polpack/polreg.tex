@@ -570,9 +570,11 @@ this is done, press the \htmlref{{\em Re-draw}}{POLREG_REDRAW} button to
 re-estimate the mapping and re-draw the reference markers using the new
 mapping.
 
-Once the green markers are correctly positioned, go through each one
-identifying the corresponding feature in the new image. Once they have
-all been identified, you should press the \htmlref{{\em
+Once the green markers are correctly positioned, press the
+\htmlref{{\em Accept}}{POLREG_ACCEPT} button to identify the features
+automatically. Pressing this button is equivalent to going
+through each of the reference features, identifying the corresponding
+feature by hand in the new image. You should then press the \htmlref{{\em
 Re-draw}}{POLREG_REDRAW} button again, to check that the final mapping
 looks reasonable.
 
@@ -1263,11 +1265,22 @@ be re-drawn using the new mappings. This button should be pressed after
 adding or deleting image features which may have changed the current
 mappings.
 
-
 \subsubsection {\mylabel{POLREG_REF_IMAGE}The {\em Ref. Image} Button}
 This button displays a menu of the supplied input images. The selected
 image becomes the source of the reference objects selected by the other
 controls in the ``{\em Reference} box.
+
+\subsubsection {\mylabel{POLREG_ACCEPT}The {\em Accept} Button}
+Pressing this button causes an image feature to be identified for each
+of the displayed reference features. For each reference position, a search 
+is made for a corresponding image feature, taking the displayed position of the
+reference feature as the initial guess. This is equivalent to the user
+positioning the pointer over each reference feature in turn and pressing
+the left hand mouse button. The label for each new image feature is
+inherited from the reference feature.
+
+This button is disabled unless both current and reference object type
+are $O$ or $E$ ray features.
 
 \subsection {\mylabel{POLREG_STATUS_AREA}The Status Area}
 This is the area underneath the displayed image and is used to display

@@ -841,9 +841,14 @@
    set REDRAW [button $ref.redraw -text "Re-draw" -width 10 -relief raised -bd 2 -command DrawRef -state disabled]
    SetHelp $REDRAW ".  Click to re-draw the reference objects, taking into account any changes in the mappings since they were last drawn." POLREG_REDRAW
 
-# Pack the "Draw Aligned", "Re-Draw" and "Ref. Image" buttons. Add
+# Create the button which searches for current features at the positions
+# of the reference features.
+   set ACCEPT [button $ref.accept -text "Accept" -width 10 -relief raised -bd 2 -command Accept -state disabled]
+   SetHelp $ACCEPT ".  Click to search for image features at the positions of the displayed reference features." POLREG_ACCEPT
+
+# Pack the "Draw Aligned", "Re-Draw", "Ref. Image" and "Accept" buttons. Add
 # spacers above and below them to padd the items out a bit.
-   pack [Spacer $ref.sp1 2m 1m] $REFALIGN $REDRAW $refim \
+   pack [Spacer $ref.sp1 2m 1m] $REFALIGN $REDRAW $refim $ACCEPT \
         [Spacer $ref.sp2 2m 1m] -side top -pady 1m -fill y 
 
 # Create the second column...

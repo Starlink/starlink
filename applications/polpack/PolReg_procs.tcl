@@ -1,93 +1,42 @@
-
+proc Accept {} {
 #+
 #  Name:
-#     
+#     Accept
 #
 #  Purpose:
-#     
+#     Searches for current features at the canvas coordinates at which
+#     the reference features are drawn.
 #
 #  Arguments:
-#     
-#
-#  Returned Value:
-#     
+#     None.
 #
 #  Globals:
-#     
+#     REFIM_DISP (Read)
+#        The image in which the reference features were defined.
+#     REFOBJ_DISP
+#        The type of reference features (should be $O_RAY_FEATURES or
+#        $E_RAY_FEATURES).
 #
-#  Notes:
-#    - 
 #-
+   global REFIM_DISP
+   global REFOBJ_DISP
 
-proc StackDump {} {
-   for {set i 1} { $i < [info level] } { incr i} {
-      puts [info level $i]
-   }
-   puts " "
-}
+# Loop round each of the displayed reference features.
+   set size [NumPosn "" $REFIM_DISP $REFOBJ_DISP]
+   for {set i 0} {$i < $size} {incr i} {
 
-proc Watch {name} {
-   global $name
-   trace variable $name w pp
-}
+# Get the canvas coordinates at which this reference feature is displayed,
+# together with its label.
+      set cx [GetPosn $i CX $REFIM_DISP $REFOBJ_DISP]
+      set cy [GetPosn $i CY $REFIM_DISP $REFOBJ_DISP]
+      set lab [GetPosn $i LBL $REFIM_DISP $REFOBJ_DISP]
 
-proc pp {a b c} {
-   upvar #0 $a x
-   puts "\n------------------------"
-   puts "Variable $a set to $x"
-   StackDump
-   puts "++++++++++++++++++++++++\n"
-}
+# Search for an image feature at these canvas coordinates. If one is
+# found, give it the same label as the reference feature.
+      GetFeature $cx $cy $lab
 
-proc Dump {text im obj} {
-   global PNTCY
-   global PNTCX
-   global PNTID
-   global PNTLBL
-   global PNTNXT
-   global PNTPY
-   global PNTPX
-   global PNTVID
-   global LABELS
-   global NLAB
-   global CAN
-   global V0
+   }
 
-   puts $text
-   puts "V0 is $V0"
-   if { [info exists PNTCX($im,$obj)] } {
-      puts "   CX $PNTCX($im,$obj)"
-   }
-   if { [info exists PNTCY($im,$obj)] } {
-      puts "   CY $PNTCY($im,$obj)"
-   }
-   if { [info exists PNTPX($im,$obj)] } {
-      puts "   PX $PNTPX($im,$obj)"
-   }
-   if { [info exists PNTPY($im,$obj)] } {
-      puts "   PY $PNTPY($im,$obj)"
-   }
-   if { [info exists PNTID($im,$obj)] } {
-      puts "   ID $PNTID($im,$obj)"
-   }
-   if { [info exists PNTVID($im,$obj)] } {
-      puts "   VID $PNTVID($im,$obj)"
-      foreach vid $PNTVID($im,$obj) {
-         puts "$vid: [$CAN coords $vid]"
-      }
-   }
-   if { [info exists PNTLBL($im,$obj)] } {
-      puts "   LBL $PNTLBL($im,$obj)"
-   }
-   if { [info exists PNTNXT($im,$obj)] } {
-      puts "   NXT $PNTNXT($im,$obj)"
-   }
-   if { [info exists LABELS] } {
-      puts "   LABELS $LABELS"
-      foreach lab $LABELS {
-         puts "      $lab $NLAB($lab)"
-      }
-   }
 }
 
 proc AllMappings {} {
@@ -573,7 +522,7 @@ proc CancelArea {} {
    }
 }
 
-proc CanToNDF { cx cy args} {
+proc CanToNDF {cx cy} {
 #+
 #  Name:
 #    CanToNDF
@@ -708,9 +657,12 @@ proc CheckRef {} {
 #    RRB_DISABLED (Read and Write)
 #       The name of the disabled "Reference:" radiobutton (if any).
 #-
+   global ACCEPT
    global CUROBJ_DISP
+   global E_RAY_FEATURES
    global IMAGE_DISP
    global NONE
+   global O_RAY_FEATURES
    global RB_REF
    global REFIM_DISP
    global REFOBJ_DISP
@@ -745,6 +697,17 @@ proc CheckRef {} {
          $RRB_DISABLED configure -state normal
          set RRB_DISABLED ""
       }
+   }
+
+# Also set the state of the "Accept" button, which can only be used if
+# both current and reference objects are image features (i.e. not masks).
+   if { ( $REFOBJ_DISP == $O_RAY_FEATURES ||
+          $REFOBJ_DISP == $E_RAY_FEATURES ) && 
+        ( $CUROBJ_DISP == $O_RAY_FEATURES ||
+          $CUROBJ_DISP == $E_RAY_FEATURES ) } {
+      $ACCEPT configure -state normal
+   } {
+      $ACCEPT configure -state disabled
    }
 }
 
@@ -4283,8 +4246,6 @@ proc Message {message} {
       set F_OWNER $old_f_owner
    }
 
-   StackDump
-
 }
 
 proc exit {args} {
@@ -5084,7 +5045,7 @@ proc Fit1234 {lxy gx gy luv gu gv fittype} {
    return $ret
 }
 
-proc GetFeature {} {
+proc GetFeature {cx cy rlabel} {
 #+
 #  Name:
 #     GetFeature
@@ -5094,17 +5055,20 @@ proc GetFeature {} {
 #     and if so, add the feature to the list of current features.
 #
 #  Arguments:
-#     None
+#     cx, cy
+#        The canvas coordinates of the initial guess at the feature
+#        position.
+#     rlabel
+#        If this is not null, then it is used as the label for the new
+#        feature (and the user is not prompted for a label). Also, this
+#        suppresses the warning messages which are otherwise displayed if 
+#        a position already exists at the supplied position.
 #
 #  Globals:
 #     CAN (Read)
 #        Path to the canvas containing the GWM image display.
 #     IMAGE_DISP (Read)
 #        The displayed image (without section).
-#     ROOTX (Read)
-#        The canvas X coordinate at which the button was pressed.
-#     ROOTY (Read)
-#        The canvas Y coordinate at which the button was pressed.
 #     PSF_SIZE (Read)
 #        The typical size of a feature in pixel.
 #     SECTION_DISP (Read)
@@ -5121,8 +5085,6 @@ proc GetFeature {} {
    global CURCOL
    global IMAGE_DISP
    global IMAGE_STACK
-   global ROOTX
-   global ROOTY
    global SECTION_DISP
    global PSF_SIZE
    global TEST_ID
@@ -5131,7 +5093,7 @@ proc GetFeature {} {
 
 # Get the NDF pixel coordinates at the position where the button was 
 # pressed.
-   set pxy [CanToNDF $ROOTX $ROOTY raw]
+   set pxy [CanToNDF $cx $cy]
    if { $pxy == "" } { return } 
    set px [lindex $pxy 0]
    set py [lindex $pxy 1]
@@ -5166,19 +5128,29 @@ proc GetFeature {} {
 
 # See if a feature already exists at these pixel coordinates.
       if { [ FindPosn "PX PY" [list $px $py] ] != "" } {
-         Message "An image feature already exists at the specified position."
+
+# If so then warn the user and ignore the position. The warning is not
+# issued if this procedure has been entered as a result of the "Accept"
+# button being pressed (as shown by "rlabel" not being blank).
+         if { $rlabel == "" } {
+            Message "An image feature already exists at the specified position."
+         }
                
 # If there is no existing feature at this position, create a circle on the 
 # canvas at the accurate position. This is a temporary marker used to 
 # indicate that we have a "candidate feature". TestFea returns a list
-# holding the X and Y canvas coiordinates at the feature.
+# holding the X and Y canvas coordinates at the feature.
       } {
          set TEST_PX $px
          set TEST_PY $py
          TestFea
 
 # Get a label for this position, if required.
-         set lab [GetLabel]
+         if { $rlabel == "" } {
+            set lab [GetLabel]
+         } {
+            set lab $rlabel
+         }
 
 # Delete the temporary circle used to mark the candidate feature.
          $CAN delete $TEST_ID
@@ -8516,7 +8488,7 @@ proc ReleaseBind {x y} {
 
 # Get the pixel coordinates of the feature at the pointer position, and
 # store and mark it as a new position.
-         GetFeature
+         GetFeature $ROOTX $ROOTY ""
 
 # Mode 1 - "Edit an existing mask polygon"
       } elseif { $MODE == 1 } {
@@ -11738,4 +11710,48 @@ proc Xhair {cx cy} {
       }
    }
 }
+
+#-------------------------------------------------------------------
+#  The following procedures are for debugging purposes.
+
+proc StackDump {} {
+   for {set i 1} { $i < [info level] } { incr i} {
+      puts [info level $i]
+   }
+   puts " "
+}
+
+proc Watch {name} {
+   global $name
+   trace variable $name w pp
+}
+
+proc pp {a b c} {
+   upvar #0 $a x
+   puts "\n------------------------"
+   puts "Variable $a set to $x"
+   StackDump
+   puts "++++++++++++++++++++++++\n"
+}
+
+
+#+
+#  Name:
+#     
+#
+#  Purpose:
+#     
+#
+#  Arguments:
+#     
+#
+#  Returned Value:
+#     
+#
+#  Globals:
+#     
+#
+#  Notes:
+#    - 
+#-
 
