@@ -190,7 +190,6 @@
       INTEGER   NCHAR            ! Length of a character string
       INTEGER   NCOMP            ! No. of components
       INTEGER   NDIM             ! Number of dimensions
-      LOGICAL   ORIPRE           ! Starlink origin header present?
       LOGICAL   PRORIG           ! True if to use supplied ORIGIN
                                  ! argument
       LOGICAL   ROTAX( DAT__MXDIM ) ! True if an axis is rotated in the
@@ -356,13 +355,15 @@
 
 *  Use an intermediate variable to reduce the number of continuation
 *  lines in the test.  This tests for the ORIGIN card.
-            ORIPRE = KEYWRD .EQ. 'ORIGIN' .AND. PRORIG
-*            ORIPRE = ( KEYWRD .EQ. 'ORIGIN' ) .AND. 
-*     :               ( VALUE( 2:23 ) .EQ. 'Starlink Project, U.K.' )
+            IF ( KEYWRD .EQ. 'ORIGIN' .AND. PRORIG ) THEN
+
+*  Overwrite the ORIGIN card written by COF_WNDFH rather than making a
+*  second card.
+               CALL FTMCRD( FUNIT, 'ORIGIN', FITSTR, FSTAT )
 
 *  Do the test whether to copy the FITS extension header into the output
 *  FITS file's header.
-            IF ( MANDAT .AND. .NOT. BANNER .AND. ORIPRE .AND.
+            ELSE IF ( MANDAT .AND. .NOT. BANNER .AND.
      :        ( KEYWRD .NE. 'DATE' ) .AND.
      :        ( KEYWRD .NE. 'BLANK' ) .AND.
      :        ( KEYWRD .NE. 'BSCALE' ) .AND.
@@ -393,11 +394,6 @@
                   CALL CHR_CTOI( KEYWRD( 6: ), ADIM, STATUS )
                   CALL CHR_CTOR( VALUE( :SZNVAL ), AXROT, STATUS )
                   ROTAX( ADIM ) = ABS( AXROT ) .GT. VAL__EPSR
-
-*  Overwrite the ORIGIN card written by COF_WNDFH rather than making a
-*  second card.
-               ELSE IF ( KEYWRD .EQ. 'ORIGIN' ) THEN
-                  CALL FTMCRD( FUNIT, 'ORIGIN', FITSTR, FSTAT )
 
                ELSE
 
