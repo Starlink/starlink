@@ -2,7 +2,15 @@
 
 lib_LTLIBRARIES = libopt.la
 
-libopt_la_SOURCES = $(F_ROUTINES) 
+libopt_la_SOURCES = \
+     $(PRIVATE_INCLUDES) \
+     $(C_ROUTINES) \
+     $(F_ROUTINES) 
+
+PRIVATE_INCLUDES = \
+fit_coding_inc opt_cmn arc_dims gr_inc status_inc
+         
+C_ROUTINES = perform_fit.c
 
 F_ROUTINES = \
 agfun.f agfun_sub.f aic_d.f all_gauss.f alter_guess.f bfbnds.f bget.f bimodf.f \
