@@ -68,14 +68,18 @@ dnl   strstream
 AC_CHECK_HEADERS(sstream)
 
 dnl   Checks for library functions
-AC_CHECK_FUNCS(popen getopt)
+AC_CHECK_FUNCS(popen)
+dnl   getopt_long.c uses (and provides a replacement for)
+dnl   this glibc utility function
+AC_CHECK_FUNCS(__strchrnul)
 
-dnl We ought not to have to worry about getopt.h, getopt{,1}.c, since they can always
-dnl be unconditionally compiled and linked.  See
+dnl We ought not to have to worry about getopt.h, getopt{,1}.c,
+dnl since they can always be unconditionally compiled and linked.  See
 dnl http://mail.gnu.org/archive/html/autoconf/2000-12/msg00049.html
 dnl and surrounding thread for discussion.  However that doesn't
 dnl appear to work in fact, and the function in getopt_long.c has
 dnl different magic to avoid getting horribly tangled up.
+AC_CHECK_FUNCS(getopt)
 AC_CHECK_DECLS([getopt,getsubopt])
 AC_SUBST(GETOPT_LONG_OBJ)
 AC_REPLACE_FUNCS(getopt_long getsubopt)
