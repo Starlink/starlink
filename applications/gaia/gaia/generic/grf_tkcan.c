@@ -31,7 +31,7 @@
  *       is reset at each astTk_Init invocation to "".
 
  *  Copyright:
- *     Copyright (C) 1997-2001 Central Laboratory of the Research Councils
+ *     Copyright (C) 1997-2004 Central Laboratory of the Research Councils
 
  *  Authors:
  *     PWD: Peter W. Draper (STARLINK - Durham University)
@@ -47,6 +47,8 @@
  *        astTk_Tag.
  *     03-APR-2001 (PWD):
  *        Added facility to change the colour list.
+ *     09-FEB-2004 (PWD):
+ *        Added GCap and renamed GAxScale to GScales for AST 3.2 Grf mods.
  *     {enter_changes_here}
  *-
  */
@@ -117,9 +119,6 @@ static int NewSegment = 1;         /* True when a new line segment is
                                     * needed (at first call to create
                                     * a line and after the default tag
                                     * is changed) */
-static int HaveScale = 0;          /* True after pixel scale is
-                                    * initialised */
-static float Scale = 1.0;          /* Pixels per millimetre */
 static int Plotted = 0;            /* Number of segments plotted */
 static int LineType = SEGMENTS;    /* Type of line to draw */
 
@@ -1027,7 +1026,7 @@ int astGQch( float *chv, float *chh ){
     if ( ! textBBox ( 0.0, 0.0, "ABCD", "c", 0.0, xbox, ybox ) ) {
         return 0;
     } else {
-        *chh = xbox[1] - xbox[0];
+        *chh = ybox[3] - ybox[0];
         if ( *chh < 0 ) *chh = -(*chh);
     }
     
@@ -1035,7 +1034,7 @@ int astGQch( float *chv, float *chh ){
     if ( ! textBBox ( 0.0, 0.0, "ABCD", "c", 90.0, xbox, ybox ) ) {
         return 0;
     } else {
-        *chv = ybox[3] - ybox[0];
+        *chv = xbox[3] - xbox[0];
         if ( *chv < 0 ) *chv = -(*chv);
     }
     
@@ -1182,18 +1181,18 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
     return 1;
 }
 
-int astGAxScale( float *alpha, float *beta ){
+int astGScales( float *alpha, float *beta ){
 /*
  *+
  *  Name:
- *     astGAxScale
+ *     astGScales
 
  *  Purpose:
  *     Get the axis scales.
 
  *  Synopsis:
  *     #include "grf.h"
- *     int astGAxScale( float *alpha, float *beta )
+ *     int astGScales( float *alpha, float *beta )
 
  *  Description:
  *     This function returns two values (one for each axis) which scale
@@ -1218,34 +1217,79 @@ int astGAxScale( float *alpha, float *beta ){
 
  *-
  */
-    /*  Local variables */
-    char buffer[CMDLEN];
-    double s1, s2;
-    
-    /*  For a Tk canvas the Y axis runs from upper left to lower left
-     *  and the X axis from upper left to upper right. The scales are
-     *  always square. So we determine these just once and make
-     *  speedup assumptions. */
-    if ( ! HaveScale ) {
-        HaveScale = 1;
-        
-        /* Get the pixels per MM figure by offsetting from 10m to 20m
-         * along the X axis */
-        (void) sprintf ( buffer, "%s canvasx 10m \n", Canvas );
-        if ( Tcl_Eval( Interp, buffer ) == TCL_OK ) {
-            s1 = atof( Interp->result );
-            (void) sprintf ( buffer, "%s canvasx 20m \n", Canvas );
-            if ( Tcl_Eval( Interp, buffer ) == TCL_OK ) {
-                s2 = atof( Interp->result );
-                Scale = (float)( ( MAX( s2, s1 ) - MIN( s2, s1 ) ) / 10.0 );
-            }
-        }
-    }
-    *alpha = Scale;
-    *beta = -Scale;
+    /*  For a Tk canvas the scales are required to be square and fixed, so we
+     *  cannot work out better values than 1, -1 */
+    *alpha = 1.0f;
+    *beta = -1.0f;
     return 1;
 }
 
+int astGCap( int cap, int value ){
+/*
+ *+
+ *  Name:
+ *     astGCap
+ 
+ *  Purpose:
+ *     Indicate if this grf module has a given capability.
+ 
+ *  Synopsis:
+ *     #include "grf.h"
+ *     int astGCap( int cap, int value )
+ 
+ *  Description:
+ *     This function is called by the AST Plot class to determine if the
+ *     grf module has a given capability, as indicated by the "cap"
+ *     argument.
+ 
+ *  Parameters:
+ *     cap
+ *        The capability being inquired about. This will be one of the
+ *        following constants defined in grf.h:
+ *        
+ *        GRF__SCALES: This function should return a non-zero value if 
+ *        it implements the astGScales function, and zero otherwise. The 
+ *        supplied "value" argument should be ignored.
+ *
+ *        GRF__MJUST: This function should return a non-zero value if 
+ *        the astGText and astGTxExt functions recognise "M" as a 
+ *        character in the justification string. If the first character of
+ *        a justification string is "M", then the text should be justified
+ *        with the given reference point at the bottom of the bounding box. 
+ *        This is different to "B" justification, which requests that the
+ *        reference point be put on the baseline of the text, since some 
+ *        characters hang down below the baseline. If the astGText or
+ *        astGTxExt function cannot differentiate between "M" and "B",
+ *        then this function should return zero, in which case "M"
+ *        justification will never be requested by Plot. The supplied
+ *        "value" argument should be ignored.
+ *
+ *        GRF__ESC: This function should return a non-zero value if the
+ *        astGText and astGTxExt functions can recognise and interpret
+ *        graphics escape sequences within the supplied string. These
+ *        escape sequences are described below. Zero should be returned 
+ *        if escape sequences cannot be interpreted (in which case the
+ *        Plot class will interpret them itself if needed). The supplied
+ *        "value" argument should be ignored only if escape sequences cannot 
+ *        be interpreted by astGText and astGTxExt. Otherwise, "value"
+ *        indicates whether astGText and astGTxExt should interpret escape
+ *        sequences in subsequent calls. If "value" is non-zero then
+ *        escape sequences should be interpreted by astGText and
+ *        astGTxExt. Otherwise, they should be drawn as literal text.
+ 
+ *  Returned Value:
+ *     The return value, as described above. Zero should be returned if
+ *     the supplied capability is not recognised.
+ 
+ *  The escape sequences etc. are documented in AST SUN/211.
+ 
+ *-
+ */
+    if ( cap == GRF__SCALES ) {
+        return 1;
+    }
+    return 0;
+}
 
 /*  Local functions. */
 /*  ================ */

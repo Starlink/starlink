@@ -223,7 +223,8 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Create the tab notebook for containing each page of options.
       itk_component add TabNoteBook {
-         ::iwidgets::tabnotebook $w_.tab -angle 30 -tabpos w -width 350 -height 530
+         ::iwidgets::tabnotebook $w_.tab -angle 30 -tabpos w \
+            -width 350 -height 550
       }
       pack $itk_component(TabNoteBook) -fill both -expand 1
 
@@ -521,11 +522,19 @@ itcl::class gaia::GaiaAstGrid {
       
       #  Add any new labels. Note these are formatted so that
       #  non-keyboard characters can be used (i.e. \000 type
-      #  numbers)
+      #  numbers). AST formatting may also be present and introduce 
+      #  percent characters. These should be protected.
       foreach {sname lname} $labelattrib_ {
          if { $label_($this,$sname) != "" } {
-            eval set value [format \"$label_($this,$sname)\"]
-               lappend options "$sname=$value"
+            regsub -all {%} "$label_($this,$sname)" {%%} value
+            eval set value [format \"$value\"]
+
+            regsub -all {%s} "$value" {%%s} value
+            regsub -all {%f} "$value" {%%f} value
+            regsub -all {%c} "$value" {%%c} value
+            regsub -all {%t} "$value" {%%t} value
+            regsub -all {%w} "$value" {%%w} value
+            lappend options "$sname=$value"
          }
       }
       
@@ -1544,7 +1553,7 @@ itcl::class gaia::GaiaAstGrid {
          set Xformat_($this,sep) b
       }
       if { [info exists Xformat_($this,l)] } {
-         set Xformat_($this,sep) l
+         set Xformat_($this,sep) g ; # was l
       }
 
       set format [$itk_option(-rtdimage) astget "format(2)"]
@@ -1565,7 +1574,7 @@ itcl::class gaia::GaiaAstGrid {
          set Yformat_($this,sep) b
       }
       if { [info exists Xformat_($this,l)] } {
-         set Yformat_($this,sep) l
+         set Yformat_($this,sep) g ;# was l
       }
 
       #  And set the widgets to the correct values if necessary.
@@ -1863,7 +1872,8 @@ itcl::class gaia::GaiaAstGrid {
       {{Plus Sign} {+} {Leading Zeros} z {Degrees} d {Hours} h
        {Minutes} m {Seconds} s}
    protected variable sepmap_ \
-      { {:} i  {blank} b {h/dms} l}
+      { {:} i  {blank} b {h/dms} g}
+      #{ {:} i  {blank} b {h/dms} l}
 
    #  Width of labels & value fields.
    protected variable lwidth_ 17
