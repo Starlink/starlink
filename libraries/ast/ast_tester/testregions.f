@@ -807,10 +807,10 @@
       include 'PRM_PAR'
 
       integer status, box1, frm1, i, fc, fs, map1, perm(3), frm2,
-     :                box2, frm3, map2, res, j
+     :                box2, frm3, map2, res, j, bfrm, cfrm, reg1, map
       double precision p1(3), p2(3), v2, xin(9), yin(9), xout(9), 
      :                 yout(9),in(4,3),out(4,3),matrix(9)
-      character*(AST__SZCHR) t1, t2, cards(8)*80
+      character*(AST__SZCHR) t1, t2, cards(9)*80
       logical hasframeset
 
       integer lbnd_in(2), ubnd_in(2)
@@ -824,6 +824,7 @@
      :            'CRPIX2  = 100',
      :            'CRVAL1  = 71.619724',
      :            'CRVAL2  = 42.971835',
+     :            'CROTA1  = 0.0',
      :            'CDELT1  = 0.6',
      :            'CDELT2  = 0.6' /
 
@@ -832,7 +833,7 @@
       call ast_begin( status )
 
       fc = ast_fitschan( ast_null, ast_null, ' ', status )
-      do i = 1, 8
+      do i = 1, 9
          call ast_putfits( fc, cards(i), .false., status )
       end do
       call ast_clear( fc, 'card', status )
@@ -1414,11 +1415,12 @@ C
       cards(4) = 'CRPIX2  = 20'
       cards(5) = 'CRVAL1  = 0.0'
       cards(6) = 'CRVAL2  = 0.0'
-      cards(7) = 'CDELT1  = 1.6'
-      cards(8) = 'CDELT2  = 1.6'
+      cards(7) = 'CROTA1  = 0.0'
+      cards(8) = 'CDELT1  = 1.6'
+      cards(9) = 'CDELT2  = 1.6'
 
       fc = ast_fitschan( ast_null, ast_null, ' ', status )
-      do i = 1, 8
+      do i = 1, 9
          call ast_putfits( fc, cards(i), .false., status )
       end do
       call ast_clear( fc, 'card', status )
@@ -1713,10 +1715,36 @@ C
       if( xout( 6 ) .ne. xin( 6 ) ) call stopit( status, 'Box: pc 47')
       if( yout( 6 ) .ne. yin( 6 ) ) call stopit( status, 'Box: pc 48')
 
+      cards(1) = 'CTYPE1  = ''RA---TAN'''
+      cards(2) = 'CTYPE2  = ''DEC--TAN'''
+      cards(3) = 'CRPIX1  = 20'
+      cards(4) = 'CRPIX2  = 20'
+      cards(5) = 'CRVAL1  = 0.0'
+      cards(6) = 'CRVAL2  = 0.0'
+      cards(7) = 'CROTA1  = 30.0'
+      cards(8) = 'CDELT1  = 1.6'
+      cards(9) = 'CDELT2  = 1.6'
 
+      fc = ast_fitschan( ast_null, ast_null, ' ', status )
+      do i = 1, 9
+         call ast_putfits( fc, cards(i), .false., status )
+      end do
+      call ast_clear( fc, 'card', status )
+      fs = ast_read( fc, status )
 
+      p1( 1 ) = 100.0; /* Pix_X at centre /
+      p1( 2 ) = 150.0; /* Pix_Y at centre /
+      p2( 1 ) = 150.0; /* Pix_X at corner /
+      p2( 2 ) = 170.0; /* Pix_Y at corner /
 
+      bfrm = ast_getFrame( fs, AST__BASE, status )
+      box1 = ast_box( bfrm, 0, p1, p2, AST__NULL, ' ', status )
 
+      cfrm = ast_getFrame( fs, AST__CURRENT, status )
+      map = ast_getmapping( fs, AST__BASE, AST__CURRENT, status )
+      reg1 = ast_mapregion( box1, map, cfrm, status )
+      
+      call ast_show( reg1, status )
 
 
       call ast_end( status )
