@@ -1767,18 +1767,8 @@ D          WRITE(1,*)HEAD.OFFAX
 *    Functions :
       INTEGER CHR_LEN
 *    Local constants :
-      INTEGER NQEMAX
-      PARAMETER (NQEMAX=25)
-      REAL OFFMAX
-      PARAMETER (OFFMAX=22.0)
 *    Local variables :
-      CHARACTER*132 QEFILE
-      CHARACTER*(DAT__SZLOC) QLOC
       INTEGER XLP,YLP
-      INTEGER NQE
-      INTEGER L
-      INTEGER I
-      REAL ANGLE(NQEMAX),FACTOR(NQEMAX)
       REAL VTOT
       REAL XCENT,YCENT,XSCALE,YSCALE,OFFAX
       REAL XOFF,YOFF
@@ -1794,20 +1784,6 @@ D          WRITE(1,*)HEAD.OFFAX
 *
       VTOT=0.0
 
-* Get values from QE file
-      CALL PSX_GETENV('XRTCAL',QEFILE,STATUS)
-      L=CHR_LEN(QEFILE)
-      QEFILE=QEFILE(:L)//'/hri_qe_rad'
-      CALL HDS_OPEN(QEFILE,'READ',QLOC,STATUS)
-      CALL CMP_GET1R(QLOC,'ANGLE',NQEMAX,ANGLE,NQE,STATUS)
-      CALL CMP_GET1R(QLOC,'FACTOR',NQEMAX,FACTOR,NQE,STATUS)
-      CALL CMP_SIZE(QLOC,'ANGLE',NQE,STATUS)
-      CALL HDS_CLOSE(QLOC,STATUS)
-
-      IF (STATUS.NE.SAI__OK) THEN
-        CALL MSG_PRNT('AST_ERR: unable to open HRI QE file')
-        GOTO 999
-      ENDIF
 
 * Loop over each image pixel
       DO XLP=1,NX
@@ -1817,28 +1793,12 @@ D          WRITE(1,*)HEAD.OFFAX
           XOFF = XCENT + (REAL(XLP)-REAL(NX)/2.0) * XSCALE
           YOFF = YCENT + (REAL(YLP)-REAL(NY)/2.0) * YSCALE
           OFFAX = SQRT(XOFF*XOFF + YOFF*YOFF) * 60.0
-*  limit radial extent to prevent silly values
-          OFFAX=MIN(OFFAX,OFFMAX)
-*
-*    Set vignetting correction according to formula in HRI calibration
-*    report  (December 93)
-          VIG=1.0 - 1.49E-3*OFFAX -3.07E-4*OFFAX**2
-*    Get quantum efficiency factor
-          IF (OFFAX.LE.ANGLE(1)) THEN
-            QE=FACTOR(1)
-          ELSEIF (OFFAX.LT.ANGLE(NQE)) THEN
-            I=1
-            DO WHILE (OFFAX.GT.ANGLE(I))
-              I=I+1
-            ENDDO
-            QE=FACTOR(I-1)+(OFFAX-ANGLE(I-1))/(ANGLE(I)-ANGLE(I-1))*
-     :                                          (FACTOR(I)-FACTOR(I-1))
-          ELSE
-            QE=FACTOR(NQE)-(OFFAX-ANGLE(NQE))*
-     :                           (FACTOR(NQE-1)-FACTOR(NQE))/
-     :                              (ANGLE(NQE)-ANGLE(NQE-1))
 
-          ENDIF
+*    get vignetting factor
+          CALL XRT_HRIVIG(OFFAX,VIG)
+
+*    Get quantum efficiency factor
+          CALL XRT_HRIQE(OFFAX,QE)
 *
           VCORR(XLP,YLP)=1.0/(VIG*QE)
 
@@ -1977,6 +1937,105 @@ D          WRITE(1,*)HEAD.OFFAX
       ENDIF
 *
       END
+
+
+*+XRT_HRIQE  -   gets quantum efficiency factor for HRI
+      SUBROUTINE XRT_HRIQE(OFFAX,QE)
+*    Description :
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Structure definitions :
+*    Import :
+      REAL OFFAX		! off axis angle (arc min)
+*    Import-Export :
+*    Export :
+      REAL QE			! QE factor
+*    Status :
+      INTEGER STATUS
+*    Functions :
+*    Local constants :
+      REAL OFFMAX
+      PARAMETER (OFFMAX=25.0)
+      INTEGER NQE
+      PARAMETER (NQE=9)
+*    Local variables :
+      REAL ANGLE(NQE),FACTOR(NQE)
+      REAL OFF
+      INTEGER I
+*    Data :
+      DATA ANGLE/1.066666,3.200001,5.333333,7.466668,9.600001,
+     :           11.73333,13.86666,16.00000,18.13334/
+      DATA FACTOR/1.027776,1.026845,1.013261,1.001316,0.9795799,
+     :            0.9516422,0.9307627,0.8949695,0.6786818/
+*-
+
+*  limit radial extent to prevent silly values
+      OFF=MIN(OFFAX,OFFMAX)
+*
+
+*  on-axis
+      IF (OFF.LE.ANGLE(1)) THEN
+        QE=FACTOR(1)
+*  off-axis
+      ELSEIF (OFF.LT.ANGLE(NQE)) THEN
+        I=1
+        DO WHILE (OFF.GT.ANGLE(I))
+          I=I+1
+        ENDDO
+        QE=FACTOR(I-1)+(OFF-ANGLE(I-1))/(ANGLE(I)-ANGLE(I-1))*
+     :                                          (FACTOR(I)-FACTOR(I-1))
+*  right on edge
+      ELSE
+        QE=FACTOR(NQE)-(OFF-ANGLE(NQE))*
+     :                           (FACTOR(NQE-1)-FACTOR(NQE))/
+     :                              (ANGLE(NQE)-ANGLE(NQE-1))
+
+      ENDIF
+*
+
+      END
+
+
+*+XRT_HRIVIG  -   gets vignetting factor for HRI
+      SUBROUTINE XRT_HRIVIG(OFFAX,VIG)
+*    Description :
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Structure definitions :
+*    Import :
+      REAL OFFAX		! off axis angle (arc min)
+*    Import-Export :
+*    Export :
+      REAL VIG			! VIG factor
+*    Status :
+      INTEGER STATUS
+*    Functions :
+*    Local constants :
+      REAL OFFMAX
+      PARAMETER (OFFMAX=25.0)
+*    Local variables :
+      REAL OFF
+*-
+
+*  limit radial extent to prevent silly values
+      OFF=MIN(OFFAX,OFFMAX)
+*
+*    Set vignetting correction according to formula in HRI calibration
+*    report  (December 93)
+      VIG=1.0 - 1.49E-3*OFF -3.07E-4*OFF**2
+
+
+      END
+
+
 
 *+XRT_LIVEWIND - puts live time data into a single array
       SUBROUTINE XRT_LIVEWIND(NLIVE, ON, OFF, LIV_TIM)
@@ -3485,70 +3544,22 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 *    Status :
       INTEGER STATUS
 *    Local constants :
-      INTEGER NQEMAX
-      PARAMETER (NQEMAX=25)
-      REAL OFFMAX
-      PARAMETER (OFFMAX=22.0)
 *    Functions :
       INTEGER CHR_LEN
 *    Local variables :
-      CHARACTER*132 QEFILE
-      CHARACTER*(DAT__SZLOC) QLOC
-      REAL OFF
-      INTEGER NQE
-      INTEGER L
-      INTEGER I
-      REAL ANGLE(NQEMAX),FACTOR(NQEMAX)
       REAL VIG,QE
 *-
       IF (STATUS.NE.SAI__OK) RETURN
 
-* Get values from QE file
-      CALL PSX_GETENV('XRTCAL',QEFILE,STATUS)
-      L=CHR_LEN(QEFILE)
-      QEFILE=QEFILE(:L)//'/hri_qe_rad'
-      CALL HDS_OPEN(QEFILE,'READ',QLOC,STATUS)
-      CALL CMP_GET1R(QLOC,'ANGLE',NQEMAX,ANGLE,NQE,STATUS)
-      CALL CMP_GET1R(QLOC,'FACTOR',NQEMAX,FACTOR,NQE,STATUS)
-      CALL CMP_SIZE(QLOC,'ANGLE',NQE,STATUS)
-      CALL HDS_CLOSE(QLOC,STATUS)
+*  get vignetting factor
+      CALL XRT_HRIVIG(OFFAX,VIG)
 
-      IF (STATUS.NE.SAI__OK) THEN
-        CALL MSG_PRNT('AST_ERR: unable to open HRI QE file')
-        GOTO 999
-      ENDIF
-
-*  limit radial extent to prevent silly values
-      OFF=MIN(OFFAX,OFFMAX)
-
-*
-*    Set vignetting correction according to formula in HRI calibration
-*    report  (December 93)
-      VIG=1.0 - 1.49E-3*OFF -3.07E-4*OFF**2
-
-*    Get quantum efficiency factor
-      IF (OFF.LE.ANGLE(1)) THEN
-
-        QE=FACTOR(1)
-      ELSEIF (OFF.LT.ANGLE(NQE)) THEN
-        I=1
-        DO WHILE (OFF.GT.ANGLE(I))
-          I=I+1
-        ENDDO
-        QE=FACTOR(I-1)+(OFF-ANGLE(I-1))/(ANGLE(I)-ANGLE(I-1))*
-     :                                          (FACTOR(I)-FACTOR(I-1))
-      ELSE
-        QE=FACTOR(NQE)-(OFF-ANGLE(NQE))*
-     :                           (FACTOR(NQE-1)-FACTOR(NQE))/
-     :                              (ANGLE(NQE)-ANGLE(NQE-1))
-
-      ENDIF
+*  Get quantum efficiency factor
+      CALL XRT_HRIQE(OFFAX,QE)
 *
       VCORR=1.0/(VIG*QE)
       VSING=VCORR
 
-
- 999  CONTINUE
 
       END
 
