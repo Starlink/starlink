@@ -71,6 +71,7 @@ INCLUDES	= -I../include  \
                   -I../../skycat/rtd/rtdstar/include \
                   -I../../skycat/rtd/rtilib/include \
                   -I../../skycat/rtd/rtdutl/include \
+                  -I../../skycat/rtd/rtdevt/include \
                   -I../../skycat/tclutil/util/include \
                   -I../../skycat/tclutil/tclutil/include \
                   -I../../skycat/astrotcl/imageio/include \
