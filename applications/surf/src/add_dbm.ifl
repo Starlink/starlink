@@ -11,6 +11,8 @@
 #     Tim Jenness (JACH) 
 
 #  History:
+#     13-JUL-1999 (TIMJ)
+#       Add NBEAMS
 #     {enter_further_changes_here}
  
 #-
@@ -41,6 +43,13 @@
          PROMPT  'Chop position angle (degrees)'
       ENDPARAMETER
 
+      PARAMETER NBEAMS
+         POSITION 5
+         TYPE    '_INTEGER'
+         PPATH 'Current' 
+         PROMPT  'Number of chopped beams (2 or 3)'
+      ENDPARAMETER
+
       PARAMETER IN
          TYPE NDF
          POSITION 1
@@ -63,7 +72,7 @@
 
       PARAMETER PIXSIZE
         TYPE    '_REAL'
-        POSITION 5
+        POSITION 6
         PPATH 'Current' 
         PROMPT  'Pixel size in arcsec'
       ENDPARAMETER
