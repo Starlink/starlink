@@ -444,7 +444,7 @@ PKG_VERS = 0.15-4
 
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
                aif_sub.tar fts_sub.tar ira_sub.tar kapgen_sub.tar \
-               kappa_sub.tar kapsub_sub.tar kapview_sub.tar \
+               kappa_sub.tar kapsub_sub.tar kappa_ccdpack.tar kapview_sub.tar \
                ndfpack_sub.tar $(PKG_NAME)_ifls.tar $(PKG_NAME)_iraf.tar \
                ctg_source.tar lpg_source.tar \
                $(PKG_NAME)_data_alpha_OSF1.tar \
@@ -484,7 +484,7 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = $(I_KAPPA) $(I_CTG) $(I_LPG)
+PRIVATE_INCLUDES = $(I_KAPPA) $(I_CTG) $(I_LPG) $(I_CCDPACK)
 
 I_KAPPA = c1_com me_com ira_par ira_com ira_err ctm_com \
           ctm_par fts_par hlpcmd sft_com kpg_ast kpg_par \
@@ -492,6 +492,7 @@ I_KAPPA = c1_com me_com ira_par ira_com ira_err ctm_com \
 
 I_CTG = ctg_const ctg_err
 I_LPG = lpg_com lpg_const 
+I_CCDPACK = ccd1_par
 
 #  List of external include files. These are files which are required
 #  in order to build the package but form part of other, externally
@@ -514,7 +515,7 @@ EXTERNAL_INCLUDES = SAE_PAR AGI_ERR CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
 #  routines and the main routine, which are treated separately).
 
 F_ROUTINES = $(AIF_F_ROUTINES) $(FITS_F_ROUTINES) $(F_CTG) $(F_LPG) \
-             $(IRA_F_ROUTINES) $(KAPGEN_F_ROUTINES) \
+             $(IRA_F_ROUTINES) $(KAPGEN_F_ROUTINES) $(CCDPACK_F_ROUTINES) \
              $(KAPPA_F_ROUTINES) $(KAPPA_F2_ROUTINES) $(KAPSUB_F_ROUTINES) \
              $(KAPVIEW_F_ROUTINES) $(MEM_F_ROUTINES) \
              $(NDFPACK_F_ROUTINES) $(KAPVIEW_MONO_SOURCE) \
@@ -723,6 +724,22 @@ listmake.f listshow.f profile.f wcsalign.f wcstran.f kapversion.f
 #  kappa routines for which the atask action name can be derived from the 
 #  the f file name by remving the .f file suffix.
 KAPPA_F_ROUTINES = $(KAPPA_F1_ROUTINES) $(KAPPA_F3_ROUTINES)
+
+CCDPACK_F_ROUTINES = \ 
+ccd1_orvar.f ccg1_bmd1d.f ccg1_bmd3d.f ccg1_bmr1r.f ccg1_bmr3r.f \
+ccg1_clipd.f ccg1_clipr.f ccg1_cm1dd.f ccg1_cm1rr.f ccg1_cm3dd.f \
+ccg1_cm3rr.f ccg1_fmd1d.f ccg1_fmd3d.f ccg1_fmr1r.f ccg1_fmr3r.f \
+ccg1_is2d.f ccg1_is2r.f ccg1_is3d.f ccg1_is3r.f ccg1_kthd.f ccg1_kthr.f \
+ccg1_mdd1d.f ccg1_mdd3d.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_med1d.f \
+ccg1_med3d.f ccg1_mer1r.f ccg1_mer3r.f ccg1_mmd1d.f ccg1_mmd3d.f \
+ccg1_mmr1r.f ccg1_mmr3r.f ccg1_mod1d.f ccg1_mod3d.f ccg1_mor1r.f \
+ccg1_mor3r.f ccg1_scd1d.f ccg1_scd3d.f ccg1_scr1r.f ccg1_scr3r.f \
+ccg1_smd1d.f ccg1_smd3d.f ccg1_smr1r.f ccg1_smr3r.f ccg1_tcd1d.f \
+ccg1_tcd3d.f ccg1_tcr1r.f ccg1_tcr3r.f ccg1_tmd1d.f ccg1_tmd3d.f \
+ccg1_tmn2d.f ccg1_tmn2r.f ccg1_tmn3d.f ccg1_tmn3r.f ccg1_tmr1r.f \
+ccg1_tmr3r.f ccg1_trm2d.f ccg1_trm2r.f ccg1_trm3d.f ccg1_trm3r.f \
+ccg1_wmd2d.f ccg1_wmd2r.f ccg1_wmd3d.f ccg1_wmd3r.f ccg1_wtm2d.f \
+ccg1_wtm2r.f ccg1_wtm3d.f ccg1_wtm3r.f ccg1_wtm4d.f ccg1_wtm4r.f
 
 KAPSUB_F_ROUTINES = \
 apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f ftsize.f ftsizt.f \
@@ -1026,7 +1043,7 @@ BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MEMTASKS) \
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) C1_COM ME_COM CTM_COM CTM_PAR \
                 FTS_PAR HLPCMD SFT_COM IRA_COM IRA_PAR \
-                IRA_ERR CTG_ERR CTG_CONST \
+                IRA_ERR CTG_ERR CTG_CONST CCD1_PAR \
                 LPG_CONST LPG_COM KPG_PAR KPG_AST
 
 #
@@ -1039,6 +1056,7 @@ AST_ERR:     $(STAR_INC)/ast_err;     $(LINK) $? $@
 C1_COM:      c1_com;                  $(LINK) $? $@
 CAT_ERR:     $(STAR_INC)/cat_err;     $(LINK) $? $@
 CAT_PAR:     $(STAR_INC)/cat_par;     $(LINK) $? $@
+CCD1_PAR:    ccd1_par;                $(LINK) $? $@
 CHR_ERR:     $(STAR_INC)/chr_err;     $(LINK) $? $@
 CTM_COM:     ctm_com;                 $(LINK) $? $@
 CTM_PAR:     ctm_par;                 $(LINK) $? $@
@@ -1153,6 +1171,11 @@ $(KAPSUB_F_ROUTINES) :
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
+$(I_CCDPACK) $(CCDPACK_F_ROUTINES) :
+	$(TAR_OUT) kappa_ccdpack.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
 $(KAPVIEW_F_ROUTINES) :
 	$(TAR_OUT) kapview_sub.tar $@
 	@ if test -f $@; then :;\
@@ -1200,7 +1223,7 @@ $(IRAF_DEMO) :
 
 OBJECT_FILES = $(AIF_OBJECT_FILES) $(FITS_OBJECT_FILES) $(O_CTG) \
                $(O_LPG) $(IRA_OBJECT_FILES) $(KAPGEN_OBJECT_FILES) \
-               $(KAPPA_OBJECT_FILES) $(KAPSUB_OBJECT_FILES) \
+               $(KAPPA_OBJECT_FILES) $(KAPSUB_OBJECT_FILES) $(CCDPACK_OBJECT_FILES) \
                $(KAPVIEW_OBJECT_FILES) $(NDFPACK_OBJECT_FILES)
 
 AIF_OBJECT_FILES = $(AIF_F_ROUTINES:.f=.o) 
@@ -1221,6 +1244,8 @@ KAPPA_OBJECT_FILES = $(KAPPA_F_ROUTINES:.f=.o) $(KAPPA_F2_ROUTINES:.f=.o) $(MEM_
 
 KAPSUB_OBJECT_FILES = $(KAPSUB_F_ROUTINES:.f=.o)
 
+CCDPACK_OBJECT_FILES = $(CCDPACK_F_ROUTINES:.f=.o)
+
 KAPVIEW_OBJECT_FILES = $(KAPVIEW_F_ROUTINES:.f=.o)
 
 NDFPACK_OBJECT_FILES = $(NDFPACK_F_ROUTINES:.f=.o)
@@ -1236,7 +1261,7 @@ NDFPACK_OBJECT_FILES = $(NDFPACK_F_ROUTINES:.f=.o)
 
 OBJECT_LIBRARIES = \
 libkappa.a libkapview.a libndfpack.a libkapsub.a libkapgen.a libfits.a \
-libaif.a libira.a liblpg.a libctg.a 
+libaif.a libira.a liblpg.a libctg.a libccdpack.a
 
 #
 libaif.a: $(AIF_OBJECT_FILES)
@@ -1268,6 +1293,10 @@ libkappa.a: $(KAPPA_OBJECT_FILES)
 	$(RANLIB) $@
 #
 libkapsub.a: $(KAPSUB_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+#
+libccdpack.a: $(CCDPACK_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 #
@@ -1383,7 +1412,7 @@ $(INSTALL_DIRS):
 
 archive: $(PKG_NAME)_source.tar aif_sub.tar fts_sub.tar \
          kapgen_sub.tar kappa_sub.tar kapsub_sub.tar kapview_sub.tar \
-         ndfpack_sub.tar $(PKG_NAME)_ifls.tar ira_sub.tar \
+         ndfpack_sub.tar $(PKG_NAME)_ifls.tar ira_sub.tar kappa_ccdpack.tar \
          ctg_source.tar lpg_source.tar $(PKG_NAME)_data_alpha_OSF1.tar \
          $(PKG_NAME)_data_sun4_Solaris.tar
 #
@@ -2399,6 +2428,9 @@ kappa_sub.tar:
 kapsub_sub.tar:
 	$(TAR_IN) kapsub_sub.tar $(KAPSUB_F_ROUTINES)
 
+kappa_ccdpack.tar:
+	$(TAR_IN) kappa_ccdpack.tar $(CCDPACK_F_ROUTINES) $(I_CCDPACK)
+
 kapview_sub.tar:
 	$(TAR_IN) kapview_sub.tar $(KAPVIEW_F_ROUTINES)
 
@@ -2422,6 +2454,7 @@ $(PKG_NAME)_data_sun4_Solaris.tar:
 #  Object file dependencies on include files (or links to those include
 #  files). These are normally generated automatically from the source
 #  files.
+
 
 add.o:	         SAE_PAR NDF_PAR
 aif_antmp.o:	 SAE_PAR DAT_PAR
@@ -2450,6 +2483,77 @@ bttn3.o:	 SAE_PAR
 cadd.o:	         SAE_PAR NDF_PAR
 calc.o:	         SAE_PAR DAT_PAR PRM_PAR
 calpol.o:	 SAE_PAR PAR_ERR
+ccd1_orvar.o:	 SAE_PAR CCD1_PAR
+ccg1_bmd1d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_bmd3d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_bmr1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_bmr3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_clipd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_D NUM_DEF_CVT NUM_DEF_D
+ccg1_clipr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
+ccg1_cm1dd.o:	 SAE_PAR
+ccg1_cm1rr.o:	 SAE_PAR
+ccg1_cm3dd.o:	 SAE_PAR
+ccg1_cm3rr.o:	 SAE_PAR
+ccg1_fmd1d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_fmd3d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_fmr1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_fmr3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_is2d.o:	 SAE_PAR
+ccg1_is2r.o:	 SAE_PAR
+ccg1_is3d.o:	 SAE_PAR
+ccg1_is3r.o:	 SAE_PAR
+ccg1_kthd.o:	 SAE_PAR
+ccg1_kthr.o:	 SAE_PAR
+ccg1_mdd1d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mdd3d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mdr1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mdr3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_med1d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_med3d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mer1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mer3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mmd1d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mmd3d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mmr1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mmr3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mod1d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mod3d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mor1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_mor3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_scd1d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_scd3d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_scr1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_scr3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_smd1d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_smd3d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_smr1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_smr3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_tcd1d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_tcd3d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_tcr1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_tcr3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_tmd1d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_tmd3d.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_tmn2d.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_tmn2r.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_tmn3d.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_tmn3r.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_tmr1r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_tmr3r.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+ccg1_trm2d.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_trm2r.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_trm3d.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_trm3r.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_wmd2d.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_wmd2r.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_wmd3d.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_wmd3r.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_wtm2d.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_wtm2r.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_wtm3d.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_wtm3r.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_wtm4d.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+ccg1_wtm4r.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 cdiv.o:	         SAE_PAR NDF_PAR
 centroid.o:	 SAE_PAR DAT_PAR AST_PAR NDF_PAR SUBPAR_PAR PAR_ERR 
 chain.o:	 SAE_PAR NDF_PAR PAR_ERR
@@ -2677,6 +2781,7 @@ kap_div.o:	 SAE_PAR NDF_PAR
 kap_pow.o:	 SAE_PAR DAT_PAR PAR_ERR
 kaphelp.o:	 SAE_PAR PAR_ERR
 kappa_mon.o:	 SAE_PAR
+kapversion.o:	 SAE_PAR PAR_ERR
 kapview_mon.o:	 SAE_PAR
 kpg1_abset.o:	 SAE_PAR PAR_ERR
 kpg1_agatc.o:	 SAE_PAR DAT_PAR
@@ -3162,7 +3267,6 @@ kps1_agndr.o:	 SAE_PAR PRM_PAR
 kps1_agnls.o:	 SAE_PAR GRP_PAR HLPCMD
 kps1_agnms.o:	 SAE_PAR
 kps1_agnst.o:	 SAE_PAR
-kps1_zpdec.o:	 SAE_PAR AST_PAR
 kps1_ardmb.o:	 SAE_PAR PRM_PAR
 kps1_ardmd.o:	 SAE_PAR PRM_PAR
 kps1_ardmi.o:	 SAE_PAR PRM_PAR
@@ -3172,7 +3276,6 @@ kps1_ardmuw.o:	 SAE_PAR PRM_PAR
 kps1_ardmw.o:	 SAE_PAR PRM_PAR
 kps1_bafid.o:	 SAE_PAR PRM_PAR MSG_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_bafir.o:	 SAE_PAR PRM_PAR MSG_PAR NUM_DEC_CVT NUM_DEF_CVT
-
 kps1_ccmpp.o:	 SAE_PAR PRM_PAR
 kps1_ccmqn.o:	 SAE_PAR PRM_PAR
 kps1_cenab.o:	 SAE_PAR
@@ -3468,6 +3571,7 @@ kps1_wltrn.o:	 SAE_PAR DAT_PAR TRN_PAR
 kps1_wptrn.o:	 SAE_PAR DAT_PAR TRN_PAR
 kps1_zpabd.o:	 SAE_PAR
 kps1_zpabr.o:	 SAE_PAR
+kps1_zpdec.o:	 SAE_PAR AST_PAR
 kps1_zprep.o:	 SAE_PAR
 kps1_zprgb.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_zprgd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
@@ -3640,7 +3744,6 @@ turbocont.o:	 SAE_PAR DAT_PAR PRM_PAR NDF_PAR NDF_ERR PAR_ERR GKS_PAR
 uget.o:          ME_COM C1_COM
 uput.o:	         ME_COM C1_COM
 vecplot.o:	 SAE_PAR PRM_PAR NDF_PAR CTM_PAR GKS_PAR
-kapversion.o:	 SAE_PAR PAR_ERR
 wcsadd.o:	 SAE_PAR NDF_PAR PAR_ERR AST_PAR
 wcsalign.o:	 SAE_PAR PRM_PAR PAR_ERR GRP_PAR
 wcsattrib.o:	 SAE_PAR NDF_PAR PAR_ERR AST_PAR
