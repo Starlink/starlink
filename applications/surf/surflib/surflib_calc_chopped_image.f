@@ -64,6 +64,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1999/07/15 01:45:33  timj
+*     Correct check at subroutine entry
+*
 *     Revision 1.1  1999/07/14 21:52:58  timj
 *     First version
 *
@@ -122,7 +125,7 @@
       IF (STATUS .NE. SAI__OK) RETURN
 
 *     Check that NBEAMS is in range
-      IF (NBEAMS .NE. 2 .OR. NBEAMS .NE. 3) THEN
+      IF (NBEAMS .NE. 2 .AND. NBEAMS .NE. 3) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI('NB', NBEAMS)
          CALL ERR_REP(' ','SURFLIB_CALC_CHOPPED_IMAGE: Number of '//
