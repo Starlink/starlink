@@ -58,8 +58,8 @@
 #include <stddef.h>
 
 #define MAXNEST 100                     /* Deepest level of bracket nesting  */
-#define LBUFSIZ 2000                    /* Longest source line               */
-#define MAXCONT 20                      /* Maximum continuation lines        */
+#define LBUFSIZ 4000                    /* Longest source line               */
+#define MAXCONT 100                     /* Maximum continuation lines        */
 
 
 /* Local function prototypes. */
@@ -68,6 +68,7 @@
 
 /* Global variables. */
    char *name;                          /* Name of the program               */
+   int tabwarn = 0;                     /* Dangerous tab characters found    */
 
 
    int main( int argc, char **argv ) {
@@ -87,11 +88,13 @@
 */
 
 /* Declare local variables. */
+      char *pc;                         /* Pointer to character              */
       char *usagef;                     /* Usage format string               */
 
 /* Get name of program etc. */
       name = *(argv++);
       argc--;
+      if ( ( pc = strrchr( name, '/' ) ) != NULL ) name = pc + 1;
       usagef = "Usage: %s [-s] [ in [ out ] ]\n";
    
 /* Open standard input and output appropriately according to command line
@@ -155,12 +158,10 @@
       int flush;                        /* Is it time to process buffer?     */
       int leng;                         /* Length of buffer                  */
       int level;                        /* Level of bracket nesting          */
-      int rfound = 0;                   /* Number of \r characters found     */
       int scase;                        /* Apparent case of source code      */
       int sspace;                       /* Apparent spacing convention       */
       int spotcpv;                      /* Have we found CNF_PVAL string?    */
       int spotval;                      /* Have we found %VAL string?        */
-      int tfound = 0;                   /* Number of \t characters found     */
       int valat[ MAXNEST ];             /* Nesting level of %VAL start       */
 
 /* Set up strings for output. */
@@ -195,20 +196,6 @@
 /* Copy character to output buffer. */
          buffer[ leng - 1 ] = c;
          interp[ leng - 1 ] = NULL;
-
-/* Strip trailing whitespace from lines, since it can complicate matters
-   later. */
-         if ( c == '\n' ) {
-            while ( leng > 1 && buffer[ leng - 2 ] == ' ' ) {
-               leng--;
-               column--;
-               buffer[ leng - 1 ] = c;
-            }
-         }
-
-/* Warn about dangerous characters. */
-         if ( c == '\r' ) rfound++;
-         if ( c == '\t' ) tfound++;
 
 /* Work out whether this is a suitable time to process the current contents
    of the buffer.  Suitable is when it contains a whole source line, give
@@ -257,7 +244,7 @@
                      interp[ valat[ level ] - 1 ] = cpo[ scase | sspace ];
                      interp[ leng - 1 ] = cpc[ scase | sspace ];
                   }
-                  level--;
+                  if ( level > 0 ) level--;
                   spotval = spotcpv = 0;
                   break;
                case '%':
@@ -316,22 +303,18 @@
                   spotval = spotcpv = 0;
             }
          }
-         if ( c == '\n' || c == '\r' ) column = 0;
          lastc = c;
+         if ( c == '\n' || c == '\r' ) column = 0;
       }
 
 /* Flush any remaining text in buffer. */
       outbuf( buffer, interp, leng );
 
 /* Warn about dangerous characters. */
-      if ( tfound )
+      if ( tabwarn )
          fprintf( stderr, 
-                  "%s: Warning - %d '%s' characters may have caused errors.\n", 
-                  name, "\\t", tfound );
-      if ( rfound )
-         fprintf( stderr,
-                  "%s: Warning - %d '%s' characters may have caused errors.\n",
-                  name, "\\r", rfound );
+                  "%s: Warning - %d '%s's in modified lines.\n", 
+                  name, tabwarn, "\\t" );
    }
 
 
@@ -389,6 +372,7 @@
       int eleng;                        /* Length of ebuf                    */
       int i;                            /* Loop counter                      */
       int isinterp[ MAXCONT ];          /* Does line contain interpolations? */
+      int istab[ MAXCONT ];             /* Does line contain tab characters? */
       int indent;                       /* Characters of indent              */
       int j;                            /* Loop counter                      */
       int lcol;                         /* Temporary column counter          */
@@ -405,6 +389,7 @@
       line = 0;
       qc = ebuf;
       isinterp[ line ] = 0;
+      istab[ line ] = 0;
       ls[ line ] = ebuf;
       ll[ line ] = 0;
       for ( i = 0; i < leng; i++ ) {
@@ -414,14 +399,35 @@
             for ( pc = interp[ i ]; *pc; pc++ )
                *(qc++) = *pc;
          }
+         if ( buffer[ i ] == '\t' ) {
+            istab[ line ] = 1;
+         }
          if ( buffer[ i ] == '\n' || i == leng - 1 ) {
+
+/* If there are any interpolations on this line, strip trailing whitespace
+   to simplify matters later on. */
+            if ( isinterp[ line ] && buffer[ i ] == '\n' ) {
+               while ( qc[ -1 ] == ' ' && qc > ls[ line ] ) {
+                  qc[ -1 ] = '\n';
+                  qc--;
+               }
+            }
+            if ( isinterp[ line ] && istab[ line ] ) {
+               tabwarn++;
+            }
             ll[ line ] = qc - ls[ line ];
             line++;
+            if ( line >= MAXCONT - 1 ) {
+               fprintf( stderr, "%s: ERROR - too many continuation lines.\n",
+                        name );
+               exit( 1 );
+            }
             isinterp[ line ] = 0;
+            istab[ line ] = 0;
             ls[ line ] = qc;
             ll[ line ] = 0;
          }
-         if ( ( qc - ebuf ) > LBUFSIZ ) {
+         if ( ( qc - ebuf ) >= LBUFSIZ ) {
             fprintf( stderr, "%s: ERROR - buffer too small.\n", name );
             exit( 1 );
          }
@@ -498,7 +504,9 @@
                            break;
                         case ' ':
                         case ',':
+                           break;
                         case '\n':
+                           done = 1;
                            break;
                         default:
                            done = ( started && level <= 0 );
@@ -509,7 +517,7 @@
                   }
                   if ( done ) break;
                }
-               for ( we = qc; *we == ' ' && we > pc; we-- );
+               for ( we = qc; isspace( *we ) && we > pc; we-- );
 
 /* If this word won't fit on the current line, output a line break now. */
                if ( we - pc + col > 73 ) {
