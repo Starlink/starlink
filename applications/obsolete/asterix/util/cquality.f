@@ -47,7 +47,8 @@
 *     19 Nov 92 : V1.7-0  Updated call to AXIS_VAL2PIX (DJA)
 *     25 Feb 94 : V1.7-1  Use BIT_ routines to do bit manipulations (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
-*      6 Dec 94 : V1.8-1  Use updsated QUALITY routines (DJA)
+*      6 Dec 94 : V1.8-1  Use updated QUALITY routines (DJA)
+*     21 Feb 95 : V1.8-2  Don't die if axes unrecognised (DJA)
 *
 *    Type Definitions :
 *
@@ -207,6 +208,17 @@
 *    Check axes
       CALL AXIS_GETORD( OLOC, 'X,Y', MOVE_AXES, AORDER,
      :                            NDIM, TDIMS, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+        CALL MSG_PRNT( 'Axes are not recognisable as X and Y, '/
+     :                 /'using axes 1 and 2' )
+        AORDER(1) = 1
+        AORDER(1) = 2
+        MOVE_AXES = .FALSE.
+        DO I = 1, NDIM
+          TDIMS(I) = DIMS(I)
+        END DO
+      END IF
 
 *    Find length of array
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
