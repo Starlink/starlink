@@ -214,11 +214,13 @@ if (Starlink::Versions::starversion_lt('ccdpack', '4.0-1')) {
       .Starlink::Versions::starversion_string('ccdpack')
       .", but we need 4.0-1 or better\n";
 }
-# And we need ATOOLS 1.3 or better, to get asttrann
-if (Starlink::Versions::starversion_lt('atools', '1.3')) {
+# And we need ATOOLS 1.3 or better, to get asttrann.  And we appear to
+# need v 1.5 or better, otherwise we have some mysterious problem
+# reading epochs with large numbers of decimal places (it seems)
+if (Starlink::Versions::starversion_lt('atools', '1.5')) {
     wmessage 'fatal', "We have ATOOLS version "
       .Starlink::Versions::starversion_string('atools')
-      .", but we need 1.3 or better\n";
+      .", but we need 1.5 or better\n";
 }
 
 # Useful values
@@ -372,7 +374,7 @@ defined ($cmdlineobsdata) || ($cmdlineobsdata = ''); # make sure it's defined
 my %obsdata;
 foreach my $p (split (/ *, */, $cmdlineobsdata)) {
     if (my ($k,$v) = ($p =~ /^ *([A-Za-z]+) *= *(\S+) *$/)) {
-	print STDERR "obsdata{$k}=$v\n";
+	print STDERR "obsdata{$k}=$v\n" if $verbose;
 	$obsdata{$k} = $v;
     } else {
 	print STDERR "obsdata keyword <$p> malformed (ignored)\n";
@@ -472,6 +474,11 @@ wmessage ('info', "Monoliths OK");
 # in the way of checking the syntactical correctness of the calls to
 # them -- it is up to the routines which use this array to do that.
 #
+# The plugin script should return 1 to indicate to Perl that it has
+# been successfully loaded (that is, it should end in `1;'.  The
+# plugin script should set $helpers{'plugin-status'} to 1 on success,
+# and 0 on error.
+#
 # First, define the default match plugin (first, so that it can be
 # overridden by a plugin: this may or may not be a good idea).
 $helpers{'plugin-match-findoff'} = \&autoastrom::match_positions_findoff
@@ -481,21 +488,18 @@ my $plugindir = (defined($ENV{AUTOASTROM_DIR}) ? $ENV{AUTOASTROM_DIR} : '.');
 opendir PLUGINDIR, $plugindir;
 my @plugindirents = readdir PLUGINDIR;
 closedir PLUGINDIR;
-print STDERR "plugindir=$plugindir  ents=@plugindirents\n";
+print STDERR "plugin directory is $plugindir\n" if $verbose;
 foreach my $d (@plugindirents) {
     if ($d =~ /^plugin-.*\.pl$/) {
-	print STDERR "Found plugin $d\n";
+	print STDERR "Loading plugin $d...\n" if $verbose;
 	my $reqval = require "$plugindir/$d";
-	wmessage ('info', "Loaded plugin $plugindir/$d");
+        if ($helpers{'plugin-status'} == 1) {
+            wmessage ('info', "Loaded plugin $plugindir/$d");
+        } else {
+            wmessage('warning', "Failed to load plugin $plugindir/$d");
+        }
     }
 }
-
-
-foreach my $h (keys %helpers) {
-    print STDERR "helpers{$h} = $helpers{$h}\n";
-}
-defined ($helpers{'plugin-match-match'})
-  || die "plugin-match-match not defined";
 
 
 
@@ -518,7 +522,7 @@ my $NDFinfo = ndf_info ($NDF, \%helpers, \%obsdata, $tempDir);
 wmessage ('info', "NDF <$NDF> examined OK");
 
 
-# Allow the NDFinfo fields to be overridden.  This is only for
+# Allow the NDFinfo fields to be overridden.  This is ONLY for
 # debugging and testing.
 if (defined($NDFoverrides)) {
     foreach my $ndfkw (split(',',$NDFoverrides)) {
@@ -849,30 +853,14 @@ while ($iterno < $iterationsleft) {
  			     $tfile);
      }
 
-    if (! $matchworked) {
+    ($matchworked && $#{$ccdlist} >= 0 && $#{$catlist} >= 0)
+      || do {
 	# Nahhh, something more substantial is wrong.  Give up.
 	wmessage ('warning', "I can't match position lists.  Giving up.");
 	print STDERR "I can't match position lists.  Giving up.\n" if $verbose;
 	$iterationsleft = 0;	# Redundant (given `last' below), but neat.
 	last;			# JUMP OUT of the loop
-    }
-
-#    open (FOFFOUT, ">$tempDir/foffdump") || die "Can't create foffdump";
-#    print FOFFOUT "ccdlist...\n";
-#    foreach my $t (@$ccdlist) {
-#	foreach my $l (keys(%$t)) {
-#	    printf FOFFOUT ("%s=%s ", $l, $t->{$l});
-#	}
-#	print FOFFOUT "\n";
-#    }
-#    print FOFFOUT "catlist...\n";
-#    foreach my $t (@$catlist) {
-#	foreach my $l (keys(%$t)) {
-#	    printf FOFFOUT ("%s=%s ", $l, $t->{$l});
-#	}
-#	print FOFFOUT "\n";
-#    }
-#    close (FOFFOUT);
+    };
 
 
     # Generate the ASTROM input file.  Returns hash with keys
@@ -901,8 +889,9 @@ while ($iterno < $iterationsleft) {
     }
 
     wmessage ('info', "Fitting astrometry");
-    my @fitdetails = run_astrom ($astromparams->{filename}, $tfile);
-    @fitdetails || wmessage ('fatal', "run_astrom failed");
+    my $fitdetailsref = run_astrom ($astromparams->{filename}, $tfile);
+    defined($fitdetailsref) || wmessage ('fatal', "run_astrom failed");
+    my @fitdetails = @$fitdetailsref;
 
     # Summarise the fits we obtained.
     if ($verbose) {
@@ -990,7 +979,7 @@ while ($iterno < $iterationsleft) {
     }
     my $status = $helpers{atools}->obeyw ("asttrann", $asttrannarg);
     ($status == &Starlink::ADAM::DTASK__ACTCOMPLETE)
-      || wmessage ('fatal', "Error getting atools/asttrann");
+      || wmessage ('fatal', "Error calling atools/asttrann (need atools 1.5)");
 
 
     # Now turn $refstarndf (the best-so-far pixel coordinates of the
