@@ -19,13 +19,18 @@ BLOCKDATA_ROUTINES = gks1_blk.f
 # Testing
 # Need to know how to build adam applications
 
-# magtest is ADAM monolith
+# gks_test is ADAM monolith
 
-TESTS = gks_test
+TESTS = gkspar_test gks_test
 
-check_PROGRAMS = gks_test
-#check_MONOLITHS = gks_test
+check_PROGRAMS = gkspar_test
+check_MONOLITHS = gks_test
 
-gks_test_SOURCES = gks_test.f
-gks_test_LDADD = `gks_link_adam` `par_link_adam`
+# Not sure why pthread is needed on linux. Need to investigate
 gks_test_TASKS =
+gks_test_SOURCES = gks_test.f
+gks_test_LDADD = $(LDADD) `$(srcdir)/gks_link_adam` `par_link_adam` -lpthread
+
+
+gkspar_test_SOURCES = gkspar_test.f
+gkspar_test_LDADD = libgkspar_adam.la `gks_link_adam` `par_link_adam` `err_link_adam`
