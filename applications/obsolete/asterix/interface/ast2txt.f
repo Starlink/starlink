@@ -396,7 +396,7 @@
       LOGICAL                 AWOK(ADI__MXDIM)       ! Axis width present?
       INTEGER                 AWPTR(ADI__MXDIM)      ! Axis width vals
       LOGICAL                 DOK, QOK, GOK, VOK          ! Items there?
-      INTEGER		      GRPL1,L2,L3,L4,      	! Group values
+      INTEGER		      GRP(L1,L2,L3,L4,      	! Group values
      :                                L5,L6,L7)
       REAL                    DATA(L1,L2,L3,L4,      ! Data values
      :                                L5,L6,L7)
