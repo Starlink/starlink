@@ -1,38 +1,71 @@
-*+  REDS_RESTORE - remove the chopped beam response from MAP/RASTER scans
       SUBROUTINE REDS_RESTORE (STATUS)
-*    Description :
-*     <description of what the subroutine does>
-*    Invocation :
-*     CALL REDS_RESTORE (STATUS)
-*    Parameters :
-*     STATUS           = INTEGER (Given and returned)
-*           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     J.Lightfoot (jfl@roe.ac.uk)
+*+
+*  Name:
+*     RESTORE
+
+*  Purpose:
+*     remove the chopped beam response from SCAN/MAP observations
+
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Type of Module:
+*     ADAM A-task
+ 
+*  Invocation:
+*     CALL REDS_RESTORE( STATUS )
+ 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status
+ 
+*  Description:
+*     This routine removes the chopped beam response from SCAN/MAP 
+*     observations.
+
+*  Usage:
+*     restore IN OUT
+
+*  ADAM Parameters:
+*     IN = NDF (Read)
+*        The name of the input file containing demodulated SCUBA data.
+*     OUT = NDF (Write)
+*        The name of the output file to contain the processed data.
+
+*  Authors:
+*     JFL: John Lightfoot (jfl@roe.ac.uk)
+*     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+*     {enter_new_authors_here}
+
 *    History :
 *     $Id$
 *     21-SEP-1995: original version.
-*    endhistory
-*    Type Definitions :
+*     {enter_further_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+
+*    Type Definitions:
       IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
+
+*    Global constants:
+      INCLUDE 'SAE_PAR'                 ! SSE global definitions
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'REDS_SYS'                ! REDS constants
-*    Import :
-*    Import-Export :
-*    Export :
-*    Status :
+
+*    Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*    Local Constants:
       INTEGER MAXDIM
       PARAMETER (MAXDIM = 4)
-*    Local variables :
+      CHARACTER * 10 TSKNAME            ! Name of task
+      PARAMETER (TSKNAME = 'RESTORE')
+
+*    Local variables:
       LOGICAL      ABORTED              ! .TRUE. if observation was
                                         ! aborted
       CHARACTER*15 CHOP_COORDS          ! coordinate system of chop
@@ -50,7 +83,6 @@
       INTEGER      INTEGRATION          ! integration index in DO loop
       INTEGER      ITEMP                ! scratch integer
       INTEGER      IN_DATA_PTR          ! pointer to data array of input file
-      INTEGER      IN_DEM_PNTR_ARY      ! array identifer to .SCUBA.DEM_PNTR
       INTEGER      IN_DEM_PNTR_PTR      ! pointer to input .SCUBA.DEM_PNTR
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC
                                         ! locator to FITS extension in input
@@ -90,9 +122,7 @@
       CHARACTER*80 STATE                ! 'state' of SCUCD at end of
                                         ! observation
       CHARACTER*80 STEMP                ! scratch string
-*    Internal References :
-*    Local data :
-*-
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
@@ -112,7 +142,8 @@
       IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_RESTORE: input file '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: input file '//
      :        'contains too many FITS items', STATUS)
          END IF
       END IF
@@ -139,22 +170,26 @@
       IF (STATUS .EQ. SAI__OK) THEN
          IF (OBSERVING_MODE .NE. 'MAP') THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_RESTORE: file does not contain '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: file does not contain '//
      :        'data for a MAP observation', STATUS)
          ELSE IF (SAMPLE_MODE .NE. 'RASTER') THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_RESTORE: map was not obtained '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: map was not obtained '//
      :        'with RASTER sampling', STATUS)
          ELSE IF (CHOP_COORDS .NE. 'SC') THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_RESTORE: the secondary was not '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: the secondary was not '//
      :        'chopping along the direction of scan', STATUS)
          END IF
       END IF
 
       CALL MSG_SETC ('OBJECT', OBJECT)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
-      CALL MSG_OUT (' ', 'REDS: run ^RUN was a MAP observation '//
+      CALL MSG_SETC ('PKG', PACKAGE)
+      CALL MSG_OUT (' ', '^PKG: run ^RUN was a MAP observation '//
      :  'of object ^OBJECT', STATUS)
 
 *  check that the history of the input file is OK
@@ -184,14 +219,16 @@
          IF (STATUS .EQ. SAI__OK) THEN
             IF (.NOT. REDUCE_SWITCH) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_RESTORE: the '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: the '//
      :           'REDUCE_SWITCH application has not been run '//
      :           'on the input file', STATUS)
             END IF
 
             IF (EXTINCTION) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_RESTORE: the '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: the '//
      :           'EXTINCTION application has already been run '//
      :           'on the input file. RESTORE should be run before '//
      :           'EXTINCTION', STATUS)
@@ -222,12 +259,12 @@
 *  map the various components of the data array and check the data dimensions 
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
+      CALL NDF_MAP (INDF, 'QUALITY', '_INTEGER', 'READ',
+     :  IN_QUALITY_PTR, ITEMP, STATUS)
       CALL NDF_MAP (INDF, 'DATA', '_REAL', 'READ', IN_DATA_PTR,
      :  ITEMP, STATUS)
       CALL NDF_MAP (INDF, 'VARIANCE', '_REAL', 'READ', IN_VARIANCE_PTR,
      :  ITEMP, STATUS)
-      CALL NDF_MAP (INDF, 'QUALITY', '_INTEGER', 'READ',
-     :  IN_QUALITY_PTR, ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF ((NDIM .NE. 2) .OR.
@@ -237,7 +274,8 @@
             CALL MSG_SETI ('NDIM', NDIM)
             CALL MSG_SETI ('DIM1', DIM(1))
             CALL MSG_SETI ('DIM2', DIM(2))
-            CALL ERR_REP (' ', 'REDS_RESTORE: main data '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: main data '//
      :        'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2', STATUS)
          END IF
       END IF
@@ -247,52 +285,17 @@
 
 *  map the DEM_PNTR array and check its dimensions
 
-      CALL ARY_FIND (IN_SCUBAX_LOC, 'DEM_PNTR', IN_DEM_PNTR_ARY, STATUS)
-      CALL ARY_DIM (IN_DEM_PNTR_ARY, MAXDIM, DIM, NDIM, STATUS)
-      CALL ARY_MAP (IN_DEM_PNTR_ARY, '_INTEGER', 'READ', 
-     :  IN_DEM_PNTR_PTR, ITEMP, STATUS)
-
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF (NDIM .NE. 3) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI ('NDIM', NDIM)
-            CALL ERR_REP (' ', 'REDS_RESTORE: .SCUBA.DEM_PNTR '//
-     :        'array has bad number of dimensions', STATUS)
-         ELSE 
-            IF (DIM(1) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM1', DIM(1))
-               CALL ERR_REP (' ', 'REDS_RESTORE: '//
-     :           '.SCUBA.DEM_PNTR array contains bad number of '//
-     :           'exposures - ^DIM1', STATUS) 
-            END IF
-            IF (DIM(2) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM2', DIM(2))
-               CALL ERR_REP (' ', 'REDS_RESTORE: '//
-     :           '.SCUBA.DEM_PNTR array contains bad number of '//
-     :           'integrations - ^DIM2', STATUS)
-            END IF
-            IF (DIM(3) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM3', DIM(3))
-               CALL ERR_REP (' ', 'REDS_RESTORE: '//
-     :           '.SCUBA.DEM_PNTR array contains bad number of '//
-     :           'measurements - ^DIM3', STATUS)
-            END IF
-         END IF
-      END IF
-
-      N_EXPOSURES = DIM (1)
-      N_INTEGRATIONS = DIM (2)
-      N_MEASUREMENTS = DIM (3)
+      CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
+     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS, 
+     :     N_MEASUREMENTS, STATUS)
 
       CALL MSG_SETI ('N_E', N_EXPOSURES)
       CALL MSG_SETI ('N_I', N_INTEGRATIONS)
       CALL MSG_SETI ('N_M', N_MEASUREMENTS)
+      CALL MSG_SETC ('PKG', PACKAGE)
 
       IF (.NOT. ABORTED) THEN
-         CALL MSG_OUT (' ', 'REDS: file contains data for ^N_E '//
+         CALL MSG_OUT (' ', '^PKG: file contains data for ^N_E '//
      :     'exposure(s) in ^N_I integration(s) in '//
      :     '^N_M measurement(s)', STATUS)
       ELSE
@@ -307,7 +310,7 @@
          CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'MEAS_NO', LAST_MEAS, STATUS)
 
-         CALL MSG_OUT (' ', 'REDS: the observation should have '//
+         CALL MSG_OUT (' ', '^PKG: the observation should have '//
      :     'had ^N_E exposure(s) in ^N_I integrations in ^N_M '//
      :     'measurement(s)', STATUS)
          CALL MSG_SETI ('N_E', LAST_EXP)
@@ -343,6 +346,7 @@
 *  function used
 
                   IF ((CHOP_FUN .EQ. 'SQUARE')    .OR.
+     :                (CHOP_FUN .EQ. 'SCUBAWAVE')  .OR.
      :                (CHOP_FUN .EQ. 'RAMPWAVE')) THEN
                      CALL SCULIB_2POS_DECONV (N_EXPOSURES,
      :                 N_INTEGRATIONS, N_MEASUREMENTS, 
@@ -371,7 +375,7 @@
 
 *  tidy up
 
-      CALL ARY_ANNUL (IN_DEM_PNTR_ARY, STATUS)
+      CALL CMP_UNMAP (IN_SCUBAX_LOC, 'DEM_PNTR', STATUS)
 
       CALL DAT_ANNUL (IN_SCUBAX_LOC, STATUS)
       CALL DAT_ANNUL (IN_SCUCDX_LOC, STATUS)
