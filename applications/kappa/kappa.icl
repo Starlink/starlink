@@ -46,7 +46,7 @@
 {        IDVISIBLE.
 {     7-OCT-1998 (DSB):
 {        Added PROFILE, LISTSHOW, LISTMAKE, WCSALIGN, WCSADD, WCSATTRIB, 
-{        WCSCOPY, WCSFRAME, WCSSHOW, COPYBAD and WCSREMOVE for V0.13.
+{        WCSCOPY, WCSFRAME, WCSSHOW, WCSTRAN, COPYBAD and WCSREMOVE for V0.13.
 {     {enter_further_changes_here}
 {
 {  Bugs:
@@ -144,6 +144,7 @@ define   trans(former) $KAPPA_DIR/kappa_mon
 define   trant(race) $KAPPA_DIR/kappa_mon
 define   trig       $KAPPA_DIR/kappa_mon
 define   wcsalign   $KAPPA_DIR/kappa_mon
+define   wcstran    $KAPPA_DIR/kappa_mon
 define   wien(er)   $KAPPA_DIR/kappa_mon
 define   zapl(in)   $KAPPA_DIR/kappa_mon
 
@@ -473,6 +474,7 @@ defhelp  wcscopy    $KAPPA_HELP
 defhelp  wcsframe   $KAPPA_HELP
 defhelp  wcsremove  $KAPPA_HELP
 defhelp  wcsshow    $KAPPA_HELP
+defhelp  wcstran    $KAPPA_HELP
 defhelp  wiener     $KAPPA_HELP
 defhelp  zaplin     $KAPPA_HELP
 
@@ -577,6 +579,7 @@ define   kap_trans(former) $KAPPA_DIR/kappa_mon transformer
 define   kap_trant(race) $KAPPA_DIR/kappa_mon trantrace
 define   kap_trig       $KAPPA_DIR/kappa_mon trig
 define   kap_wcsalign   $KAPPA_DIR/kappa_mon wcsalign
+define   kap_wcstran    $KAPPA_DIR/kappa_mon wcstran
 define   kap_wien(er)   $KAPPA_DIR/kappa_mon wiener
 define   kap_zapl(in)   $KAPPA_DIR/kappa_mon zaplin
 
@@ -907,6 +910,7 @@ defhelp  kap_wcsattrib  $KAPPA_HELP wcsattrib
 defhelp  kap_wcsframe   $KAPPA_HELP wcsframe
 defhelp  kap_wcsremove  $KAPPA_HELP wcsremove
 defhelp  kap_wcsshow    $KAPPA_HELP wcsshow
+defhelp  kap_wcstran    $KAPPA_HELP wcstran
 defhelp  kap_wiener     $KAPPA_HELP wiener
 defhelp  kap_zaplin     $KAPPA_HELP zaplin
 

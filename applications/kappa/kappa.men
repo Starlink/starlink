@@ -250,6 +250,7 @@ selecting_graphics_devices -
       wcsframe - Change the current co-ordinate Frame in an NDF.
      wcsremove - Remove co-ordinate Frames from an NDF.
        wcsshow - Display internal details of a WCS FrameSet.
+       wcstran - Transform a position between two WCS co-ordinate Frames.
         wiener - Apply a Wiener filter to a 1- or 2-d array.
         zaplin - Replace regions in a 2-d NDF by bad values or by linear
                   interpolation.

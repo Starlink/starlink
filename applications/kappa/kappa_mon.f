@@ -47,7 +47,7 @@
 *     1997 May 31 (MJC):
 *        Added KSTEST and SUBSTITUTE for V0.10.
 *     7-OCT-1998 (DSB):
-*        Added COPYBAD PROFILE LISTSHOW LISTMAKE WCSALIGN for V0.13
+*        Added COPYBAD PROFILE LISTSHOW LISTMAKE WCSALIGN WCSTRAN for V0.13
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -440,6 +440,10 @@
 *  Align a group of NDFs using the WCS components.
       ELSE IF ( NAME .EQ. 'WCSALIGN' ) THEN
          CALL WCSALIGN ( STATUS )
+
+*  Transforms positions between NDF WCS Frames.
+      ELSE IF ( NAME .EQ. 'WCSTRAN' ) THEN
+         CALL WCSTRAN ( STATUS )
 
 *  Applies a Wiener filter to a 1- or 2-dimensional array.
       ELSE IF ( NAME .EQ. 'WIENER' ) THEN

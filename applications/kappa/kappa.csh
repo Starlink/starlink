@@ -61,8 +61,9 @@
 #        KSTEST, and SUBSTITUTE.  Also withdrew BLINK, IDUNZOOM,
 #        IDVISIBLE.
 #     7-OCT-1998 (DSB):
-#        Added WCSSHOW, PROFILE, LISTSHOW, LISTMAKE, WCSALIGN, WCSADD, WCSATTRIB, 
-#        WCSCOPY, WCSFRAME, CHAIN, RESHAPE, COPYBAD and WCSREMOVE for V0.13.
+#        Added WCSSHOW, PROFILE, LISTSHOW, LISTMAKE, WCSALIGN, WCSADD, 
+#        WCSATTRIB, WCSCOPY, WCSFRAME, CHAIN, RESHAPE, COPYBAD, WCSTRAN 
+#        and WCSREMOVE for V0.13.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -280,6 +281,7 @@ alias wcscopy   $KAPPA_DIR/wcscopy
 alias wcsframe  $KAPPA_DIR/wcsframe
 alias wcsremove $KAPPA_DIR/wcsremove
 alias wcsshow   $KAPPA_DIR/wcsshow
+alias wcstran   $KAPPA_DIR/wcstran
 alias wiener    $KAPPA_DIR/wiener
 alias zaplin    $KAPPA_DIR/zaplin
 
@@ -490,6 +492,7 @@ alias kap_wcscopy   $KAPPA_DIR/wcscopy
 alias kap_wcsframe  $KAPPA_DIR/wcsframe
 alias kap_wcsremove $KAPPA_DIR/wcsremove
 alias kap_wcsshow   $KAPPA_DIR/wcsshow
+alias kap_wcstran   $KAPPA_DIR/wcstran
 alias kap_wiener    $KAPPA_DIR/wiener
 alias kap_zaplin    $KAPPA_DIR/zaplin
 

@@ -166,6 +166,8 @@ set OutputParList(trig) {}
 set DynParList(trig) {}
 set OutputParList(wcsalign) {}
 set DynParList(wcsalign) {}
+set OutputParList(wcstran) {posout}
+set DynParList(wcstran) {}
 set OutputParList(wiener) {}
 set DynParList(wiener) {}
 set OutputParList(zaplin) {}
