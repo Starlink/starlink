@@ -1,0 +1,66 @@
+      SUBROUTINE sla_WAIT (DELAY)
+*+
+*     - - - - -
+*      W A I T
+*     - - - - -
+*
+*  Interval wait
+*
+*  !!! PC only - Microsoft Fortran specific !!!
+*
+*  Given:
+*     DELAY     real      delay in seconds
+*
+*  A delay of up to 10000 seconds occurs.
+*
+*  Called:  GETTIM (Microsoft Fortran run-time library)
+*
+*  P.T.Wallace   Starlink   14 October 1991
+*
+*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*-
+
+      IMPLICIT NONE
+
+      REAL DELAY
+
+      INTEGER IDELAY,IH,IM,IS,I,IT,IT0,IDT
+      LOGICAL FIRST,LOOP
+
+
+
+
+*  Convert requested delay to 0.01 second ticks
+      IDELAY=NINT(MAX(MIN(DELAY,1E4),0.0)*1E2)
+
+*  Set "note start time" flag
+      FIRST=.TRUE.
+
+*  Set "wait in progress" flag
+      LOOP=.TRUE.
+
+*  Main loop
+      DO WHILE (LOOP)
+
+*     Get the current time and convert to 0.01 second ticks
+         CALL GETTIM(IH,IM,IS,I)
+         IT=((IH*60+IM)*60+IS)*100+I
+
+*     First time through the loop?
+         IF (FIRST) THEN
+
+*        Yes: note the time and reset the flag
+            IT0=IT
+            FIRST=.FALSE.
+         ELSE
+
+*        No: subtract the start time, handling 0 hours wrap
+            IDT=IT-IT0
+            IF (IDT.LT.0) IDT=IDT+8640000
+
+*        If the requested delay has elapsed, stop looping
+            LOOP=IDT.LT.IDELAY
+         END IF
+      END DO
+
+      END

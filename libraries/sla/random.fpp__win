@@ -1,0 +1,42 @@
+      REAL FUNCTION sla_RANDOM (XSEED)
+*+
+*     - - - - - - -
+*      R A N D O M
+*     - - - - - - -
+*
+*  Generate pseudo-random real number in the range 0 <= X < 1.
+*
+*  (single precision)
+*
+*  !!!  Microsoft Fortran dependent  !!!
+*
+*  Given (but used first time only):
+*     XSEED    real     an arbitrary real number
+*
+*  The value returned is a pseudo-random number such that
+*  0 <= sla_RANDOM < 1.
+*
+*  Called:  RANDOM (Microsoft run-time library)
+*
+*  P.T.Wallace   Starlink   28 February 1993
+*
+*+
+
+      IMPLICIT NONE
+
+      REAL XSEED
+
+      REAL X
+      LOGICAL FIRST
+      SAVE FIRST
+      DATA FIRST /.TRUE./
+
+
+      IF (FIRST) THEN
+         CALL SEED(NINT(MOD(XSEED*1.234E7,32E3)))  ! Microsoft Fortran
+         FIRST=.FALSE.
+      END IF
+      CALL RANDOM(X)                               ! Microsoft Fortran
+      sla_RANDOM=X
+
+      END

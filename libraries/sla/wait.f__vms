@@ -1,0 +1,43 @@
+      SUBROUTINE sla_WAIT (DELAY)
+*+
+*     - - - - -
+*      W A I T
+*     - - - - -
+*
+*  Interval wait
+*
+*  !!! VAX/VMS specific !!!
+*
+*  Given:
+*     DELAY     real      delay in seconds
+*
+*  A delay 100ns < DELAY < 200s is requested.
+*
+*  P.T.Wallace   Starlink   14 October 1991
+*-
+
+      IMPLICIT NONE
+
+      REAL DELAY
+
+      INTEGER JSTAT
+      INTEGER SYS$SCHDWK,SYS$HIBER
+
+      INTEGER IDT(2)
+      DATA IDT(2)/-1/
+
+
+
+*  Encode delta time
+      IDT(1)=-NINT(MAX(1.0,1E7*MIN(200.0,DELAY)))
+
+
+*  Schedule a wakeup
+      JSTAT=SYS$SCHDWK(,,IDT,)
+      IF (.NOT.JSTAT) CALL LIB$STOP(%VAL(JSTAT))
+
+*  Hibernate
+      JSTAT=SYS$HIBER()
+      IF (.NOT.JSTAT) CALL LIB$STOP(%VAL(JSTAT))
+
+      END

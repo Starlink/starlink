@@ -9,12 +9,12 @@ lib_LTLIBRARIES = libsla.la
 libsla_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(FPP_ROUTINES)
+libsla_la_LIBADD = $(LTLIBOBJS)
 
-FPP_ROUTINES = 
-#FPP_ROUTINES = \
-#        gresid.f \
-#        random.f \
-#        wait.f
+FPP_ROUTINES = \
+	random.fpp \
+	gresid.fpp
+.fpp.f:
 
 F_ROUTINES = \
         addet.f  \
@@ -203,5 +203,6 @@ F_ROUTINES = \
         vdv.f    \
         vn.f     \
         vxv.f    \
+	wait.f	 \
         xy2xy.f  \
         zd.f

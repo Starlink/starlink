@@ -1,0 +1,73 @@
+      REAL FUNCTION sla_GRESID (S)
+*+
+*     - - - - - - -
+*      G R E S I D
+*     - - - - - - -
+*
+*  Generate pseudo-random normal deviate ( = 'Gaussian residual')
+*  (single precision)
+*
+*  Given:
+*     S      real     standard deviation
+*
+*  The results of many calls to this routine will be
+*  normally distributed with mean zero and standard deviation S.
+*
+*  The Box-Muller algorithm is used.  This is described in
+*  Numerical Recipes, section 7.2.
+*
+*  !!!  Microsoft Fortran dependent - calls the RAN routine   !!!
+*  !!!  To seed the random-number generator, either call the  !!!
+*  !!!  Microsoft SEED routine specifying some INTEGER*2      !!!
+*  !!!  seed or call the function sla_RANDOM specifying some  !!!
+*  !!!  REAL seed.                                            !!!
+*
+*  P.T.Wallace   Starlink   1 April 1993
+*
+*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*-
+
+      IMPLICIT NONE
+
+      REAL S
+
+      REAL X,Y,RV,R,W,GNEXT,G
+      LOGICAL FIRST
+
+      SAVE GNEXT,RV,FIRST
+      DATA FIRST / .TRUE. /
+
+
+
+*  Second normal deviate of the pair available?
+      IF (FIRST) THEN
+
+*     No - generate two random numbers in range +/- 1
+ 1       CONTINUE
+         CALL RANDOM(RV)               !!! PC
+         X = 2.0*RV-1.0
+         CALL RANDOM(RV)               !!! PC
+         Y = 2.0*RV-1.0
+
+*     Try again if not in unit circle
+         R = X*X+Y*Y
+         IF (R.GE.1.0) GO TO 1
+
+*     Box-Muller transformation, generating two deviates
+         W = SQRT(-2.0*LOG(R)/MAX(R,1E-20))
+         GNEXT = X*W
+         G = Y*W
+
+*     Set flag to indicate availability of next deviate
+         FIRST = .FALSE.
+      ELSE
+
+*     Return second deviate of the pair & reset flag
+         G = GNEXT
+         FIRST = .TRUE.
+      END IF
+
+*  Scale the deviate by the required standard deviation
+      sla_GRESID = G*S
+
+      END
