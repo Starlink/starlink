@@ -1,0 +1,11 @@
+#
+# macro definitions for the DEC-Alpha ANSI-C Compiler
+#
+# E.BERTIN 1997
+#
+SEXMACHINE= alpha
+CC    = cc				# the C compiler
+COPTS = -O -DDEC_ALPHA			# options for the C compiler
+CD    = cd
+CP    = cp
+RM    = rm -f
