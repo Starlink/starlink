@@ -134,23 +134,23 @@
       CALL ADI_EXEC( 'ReadWCS', 1, ID, RESID, STATUS )
 
 *  If ok, extract results
-      IF ( STATUS .EQ. SAI__OK ) THEN
+      IF ( (STATUS .EQ. SAI__OK) .AND. (RESID.NE.ADI__NULLID) ) THEN
 
 *    Store the returned object on the property list of the object
         CALL ADI_CPUTID( ID, '.WCS', RESID, STATUS )
 
 *    Locate sub-components for callee
-        CALL ADI_THERE( ID, 'Pix', THERE, STATUS )
+        CALL ADI_THERE( RESID, 'Pix', THERE, STATUS )
         IF ( THERE ) THEN
-          CALL ADI_FIND( ID, 'Pix', PIXID, STATUS )
+          CALL ADI_FIND( RESID, 'Pix', PIXID, STATUS )
         END IF
-        CALL ADI_THERE( ID, 'Proj', THERE, STATUS )
+        CALL ADI_THERE( RESID, 'Proj', THERE, STATUS )
         IF ( THERE ) THEN
-          CALL ADI_FIND( ID, 'Proj', PRJID, STATUS )
+          CALL ADI_FIND( RESID, 'Proj', PRJID, STATUS )
         END IF
-        CALL ADI_THERE( ID, 'Sys', THERE, STATUS )
+        CALL ADI_THERE( RESID, 'Sys', THERE, STATUS )
         IF ( THERE ) THEN
-          CALL ADI_FIND( ID, 'Sys', SYSID, STATUS )
+          CALL ADI_FIND( RESID, 'Sys', SYSID, STATUS )
         END IF
 
       ELSE

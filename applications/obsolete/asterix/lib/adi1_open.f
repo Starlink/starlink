@@ -129,7 +129,7 @@
       IF ( EP .EQ. 0 ) THEN
 
 *      Try to open top level file
-        CALL HDS_OPEN( FSPEC, MODE, FLOC, STATUS )
+        CALL HDS_OPEN( FSPEC(:FLEN), MODE, FLOC, STATUS )
 
 *    Components or slicing specified?
       ELSE
@@ -139,7 +139,7 @@
         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *        Locate sub-component
-          CALL ADI1_FIND( TLOC, FSPEC(EP+1:), FLOC, STATUS )
+          CALL ADI1_FIND( TLOC, FSPEC(EP+1:FLEN), FLOC, STATUS )
 
 *        If successful promote the derived locator to that the file will be
 *        closed when FLOC is annulled
