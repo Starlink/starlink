@@ -238,6 +238,11 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	LOC			! Dataset locator
       CHARACTER*(DAT__SZLOC)	TYP			! Top-level type
+
+      INTEGER			NDIM			! Object dimensionality
+      INTEGER			NFILE			! # book components
+
+      LOGICAL			OK			! Object exists?
 *.
 
 *  Check inherited global status.
@@ -255,6 +260,18 @@
 *  Correct type?
       IF ( TYP .EQ. 'SSDS_SET' ) THEN
         CALL ADI_SETLNK( ARGS(1), ARGS(2), STATUS )
+
+*    Determine how many files contributed to this set
+*    BOOK exists?
+        CALL DAT_THERE( LOC, 'BOOK', OK, STATUS )
+
+*    Get size
+        IF ( OK ) THEN
+          CALL CMP_SHAPE( LOC, 'BOOK', 1, NFILE, NDIM, STATUS )
+        ELSE
+          NFILE = 0
+        END IF
+        CALL ADI_CPUT0I( ARGS(1), 'NFILE', NFILE, STATUS )
 
       ELSE
 
