@@ -226,7 +226,7 @@ All the source code is now conveniently available in a single CVS
 repository, with anonymous access
 (\texttt{:pserver:anonymous@cvs.starlink.ac.uk:/cvs} with password `starlink').
 
-The code now uses the GNU autotools throughout.  Libtool handles the
+The collection now uses the GNU autotools throughout.  Libtool handles the
 mind-bending details of building static and shared libraries, with the
 result that the collection now builds and installs the shared
 libraries that were too much trouble before.  Automake generates the
@@ -241,10 +241,11 @@ the amount of text we have to put into a \texttt{Makefile.am} is
 substantially reduced, with very little cut-and-pasted boilerplate.
 
 As a result of using the autotools, the entire 2.5\,MSLOC collection
-now builds successfully on Linux (RHEL is our current test platform), Solaris,
-Windows (using Cygwin), and Mac\,OS\,X, even though the latter two
-were not explicit goals of this porting project.  It should work on
-other platforms also, but we have not yet tested it there.
+now builds successfully on Linux (RHEL is our current test platform),
+Solaris, Windows (using Cygwin), and Mac\,OS\,X, even though the
+latter two were not explicit goals of this porting project.  It should
+be portable to other Unix-like systems, and in particular
+\textsc{posix} systems which include an X~server.
 
 
 
