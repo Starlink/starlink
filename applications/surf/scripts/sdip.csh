@@ -64,7 +64,7 @@ endif
 # Work out whether we are using the new (STYLE parameter) kappa
 # or the old (pre 0.13 is old)
 
-if (-e $KAPPA_DIR/style.def) then
+if (-e $KAPPA_DIR/style.def || -e $KAPPA_DIR/kappa_style.def) then
   set newkappa = 1
 else
   set newkappa = 0

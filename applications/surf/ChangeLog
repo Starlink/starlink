@@ -1,3 +1,11 @@
+1999-11-03  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/scuplot.csh: Update for new mlinplot.
+
+	* scripts/sdip.csh: Recognise kappa 0.14
+
+	* scripts/qdraw: Convert to kappa 0.14 support
+
 1999-09-24  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* scripts/sculog: Major rewrite to sort by ut date and data directory.

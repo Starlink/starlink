@@ -27,6 +27,15 @@ if (defined $ENV{"KAPPA_DIR"}) {
 
 $newkappa = ( -e "$kappa/style.def" ? 1 : 0);
 
+# Even newer versions (>= 0.14) call this kappa_style.def
+
+$newerkappa = (-e "$kappa/kappa_style.def" ? 1 : 0);
+
+# Set the ADAM_EXIT environment variable that converts monolith status
+# to csh status
+$ENV{'ADAM_EXIT'}  = 1;
+
+
 # Global status
 $status = &NDF::SAI__OK;
 $good = &NDF::SAI__OK;
@@ -37,7 +46,7 @@ $good = &NDF::SAI__OK;
  
 @ndfs = ();
 %params = ();
- 
+
 foreach $arg (@ARGV) {
  
   $arg =~ /=/ && do {
@@ -135,7 +144,7 @@ $min = $mean - ($nsig * $sigma);
 
 # Run linplot
 
-if ($newkappa) {
+if ($newkappa || $newerkappa) {
   @parlist = ('DEVICE', 'MODE', 'MARKER', 'COMP','STYLE','ERRBAR');
 } else {
   @parlist = ('DEVICE','MODE','ERRBAR','PLTTITL','COMP','LINCOL','SYMCOL',
@@ -148,7 +157,7 @@ foreach $par (@parlist) {
   if ($params{$par} =~ /./);
 }
 
-if ($newkappa) {
+if ($newkappa || $newerkappa) {
   $args = "ytop=$max ybot=$min $modpars";
 } else {
   $args = "axlim=true ordlim='[$min,$max]' abslim=! $modpars";
@@ -166,21 +175,35 @@ die "LINPLOT finished abnormally...stopping (status = $exstat)\n"
 
 &bad_status if ($status != $good);
 
-# Run drawsig and draw line at 3 sigma
+# Run drawsig and draw line at 3 sigma - new version for KAPPA 0.14
 
-@parlist = ('SIGCOL','LINESTYLE','AXIS','COMP');
+unless ($noline) {
 
-undef $modpars;
-foreach $par (@parlist) {
-  $modpars = $modpars." $par=".$params{$par} 
-  if ($params{$par} =~ /./);
+  # Now decide on the allowed overrides
+  if ($newerkappa) {
+    @parlist = ('AXIS', 'COMP');
+  } else {
+    @parlist = ('SIGCOL','LINESTYLE','AXIS','COMP');
+  }
+
+  undef $modpars;
+  foreach $par (@parlist) {
+    $modpars = $modpars." $par=".$params{$par} 
+    if ($params{$par} =~ /./);
+  }
+
+  # Construct kappa specific arguments
+  if ($newerkappa) {
+    $args = " style='\"colour(curve)=red,style(curve)=2\"'";
+  } else {
+    $args = "linestyle=2 sigcol=red";
+  }
+
+  $exstat = system("$kappa/drawsig nsigma='[0,3]' device=$device $args $modpars");
+  die "DRAWSIG finished abnormally...stopping (status = $exstat)\n"
+    if ($exstat != 0);
+
 }
-
-$exstat = 
-  system("$kappa/drawsig linestyle=2 sigcol=red nsigma='[0,3]' device=$device")
-  unless ($noline);
-die "DRAWSIG finished abnormally...stopping (status = $exstat)\n"
-  if ($exstat != 0 && $noline);
 
 exit;
 

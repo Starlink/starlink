@@ -27,7 +27,7 @@ else
 endif
 
 # Check for the new kappa
-if (-e $KAPPA_DIR/style.def) then
+if (-e $KAPPA_DIR/style.def || -e $KAPPA_DIR/kappa_style.def) then
   set newkappa = 1
   # Store the original style before we mangle it
   set old_style = `${kap}/parget style linplot`
@@ -35,7 +35,12 @@ else
   set newkappa = 0
 endif
 
-
+# Check for even newer kappa 0.14
+if (-e $KAPPA_DIR/kappa_style.def) then
+  set newerkappa = 1
+else
+  set newerkappa = 0
+endif
 
 set prog = `echo $0 | awk -F\/ '{print $NF}' | tr '[A-Z]' '[a-z]'`
 set mode = `echo $prog | cut -c1`
@@ -275,11 +280,21 @@ while (${iset} < ${nsets})
   REDRAW:
 
   if ( "$mode" == "r" ) then
-    ${kap}/mlinplot "${sdf}${phsec}" device=xwindows cosys=world \
-                   absaxs=2 ylimit=\[${ymn},${ymx}\] "lnindx=${bolset}"
-    if ( "$ddf" != "" ) then
-      ${kap}/mlinplot "${ddf}${phsec}" device=x2windows cosys=world \
-                     absaxs=2 ylimit=\[${ymn},${ymx}\] "lnindx=${bolset}"
+    if ( $newerkappa == 0 ) then
+	${kap}/mlinplot "${sdf}${phsec}" device=xwindows cosys=world \
+		    absaxs=2 ylimit=\[${ymn},${ymx}\] "lnindx=${bolset}"
+	if ( "$ddf" != "" ) then
+	${kap}/mlinplot "${ddf}${phsec}" device=x2windows cosys=world \
+			absaxs=2 ylimit=\[${ymn},${ymx}\] "lnindx=${bolset}"
+	endif
+    else
+       ${kap}/mlinplot "${sdf}${phsec}" device=xwindows  \
+		    absaxs=2 ybot=${ymn} ytop=${ymx} "lnindx=${bolset}"
+	if ( "$ddf" != "" ) then
+	${kap}/mlinplot "${ddf}${phsec}" device=x2windows  \
+			absaxs=2 ybot{ymn} ytop=${ymx} "lnindx=${bolset}"
+	endif
+
     endif
   else
     if ($newkappa == 0) then
@@ -746,6 +761,9 @@ exit
 
 *  History:
 *     $Log$
+*     Revision 1.8  1999/11/04 04:36:16  timj
+*     Update for Kappa 0.14
+*
 *     Revision 1.7  1999/08/03 19:32:34  timj
 *     Add copyright message to header.
 *

@@ -118,6 +118,10 @@ if ($use_ams) {
 my $newkappa;
 $newkappa = ( -e "$ENV{KAPPA_DIR}/style.def" ? 1 : 0);
 
+# For kappa 14 this changed to kappa_style.def
+unless ($newkappa) {
+  $newkappa = ( -e "$ENV{KAPPA_DIR}/kappa_style.def" ? 1 : 0);
+}
 
 # Setup default output filename
 
