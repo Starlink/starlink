@@ -53,6 +53,8 @@
 *        of KAPPA.
 *     30-AUG-1999 (DSB):
 *        Added multiple invocation of applications using LPG looping.
+*     16-MAR-2004 (DSB):
+*        Added call to LPG_REPLA.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -76,6 +78,7 @@
       CHARACTER NAME * ( 15 )     ! Task name from the command
       LOGICAL DISAB               ! Disable looping?
       LOGICAL VERB                ! Run in verbose mode?
+      LOGICAL REPL                ! Replace input NDFs?
       REAL DELAY                  ! Delay between loops in seconds
 *.
 
@@ -113,6 +116,10 @@
 *  Initialise the common blocks used to control multiple invocation of
 *  applications to process lists of NDFs.
       CALL LPG_START( VERB, DELAY, DISAB, STATUS )
+
+*  See if input NDFs are allowed to be over-written by output NDFs.
+      CALL KPG1_ENVDF( 'KAPPA_REPLACE', REPL, STATUS )
+      CALL LPG_REPLA( REPL, STATUS )
 
 *  Loop round invoking the task for each set of NDFs specified by the user.
       DO WHILE( LPG_AGAIN( STATUS ) )

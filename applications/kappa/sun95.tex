@@ -11,12 +11,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.25}
-\newcommand{\stardocnumber}    {95.25}
+\newcommand{\stardocsource}    {sun95.26}
+\newcommand{\stardocnumber}    {95.26}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {24th February 2004}
+\newcommand{\stardocdate}      {16th March 2004}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.2}
+\newcommand{\stardocversion}   {1.3}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -4826,6 +4826,32 @@ processing will occur in \_REAL.
 
 In {\footnotesize KAPPA} the elements of the data array are often called 
 {\em pixels}, even if the NDF is not two-dimensional.
+
+\subsection{Restrictions on the Usage of Data Structures}
+
+By default, {\footnotesize KAPPA} plays safe and will not allow you to 
+use the same data structure as both input and output for a command. This
+is to minimise the risks of accidentally over-writing valuable data. So,
+for instance, if you try the following command:
+
+\small
+\begin{verbatim}
+   % cadd in=m31 scalar=10 out=m31
+\end{verbatim}
+\normalsize
+
+you will find that the value of ``m31'' for parameter OUT is rejected with a 
+message indicating that the data structure is already in use, and you
+will be prompted for an alternative value.
+
+However, {\footnotesize KAPPA} does allow you to ``live on the edge'' if
+you prefer---if you define the environment variable KAPPA\_REPLACE before
+running a command, then {\footnotesize KAPPA} will happily over-write the
+input data structure if requested to do so. You can assign any value you
+like to this environment variable, since its mere existence is the trigger
+for this optional behaviour. Note, this facility is only available in
+those commands which access the input data structures \emph{before} the
+output data structures (the vast majority).
 
 \subsection{Looking at the Data Structures}
 
@@ -47176,7 +47202,7 @@ The following applications have been modified:
 \end{description}
 
 
-\section{\xlabel{se_changes}Release Notes---V1.2\label{se:changes}}
+\section{Release Notes---V1.2}
 
 \begin{itemize}
 
@@ -47243,6 +47269,20 @@ The following applications have been modified:
 
 \end{description}
 
+
+\section{\xlabel{se_changes}Release Notes---V1.3\label{se:changes}}
+
+\begin{itemize}
+
+\item An option now exists to allow the same NDF to be used both as input and 
+output for a command, in which case the original contents of the NDF will be
+over-written by the output of th ecommand when the command terminates. This 
+option is disabled by default so that past behaviour is unchanged (i.e. an 
+error is reported if the same NDF is specified as both input and output). To
+enable this facility define the environment variable KAPPA\_REPLACE,
+giving it any arbitrary value.
+ 
+\end{itemize}
 
 \begin{latexonly}
 \newpage
