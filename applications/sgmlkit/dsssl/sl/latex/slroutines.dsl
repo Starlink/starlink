@@ -200,7 +200,28 @@ $Id$
 				    (make environment name: "description"
 					  (process-authorlist allauthors)))))))
 		(empty-sosofo))))
-	(empty-sosofo)))
+	;; Only the mdefs children need to be processed in other
+	;; cases, since they're likely to be used in the documented routine
+	(process-matching-children 'mdefs)
+	;(empty-sosofo)
+	))
+  (element codegroup
+    ;; Put the contents of a codegroup inside brackets, to contain the
+    ;; effect of any mdefs elements.
+    (make environment brackets: '("%
+%% codegroup...
+{" "%
+%% ...codegroup
+}")
+	  (process-children)))
+  (element codereference
+    ;; as with codegroup...
+    (make environment brackets: '("%
+%% codereference...
+{" "%
+%% ...codereference
+}")
+	  (process-children)))
   (element routine
     (process-matching-children 'routineprologue))
   (element routineprologue
@@ -220,9 +241,13 @@ $Id$
 			(if purp
 			    (process-node-list (cdr purp))
 			    (if (assoc (normalize "description") kids)
+				;; No `purpose' element, instead
+				;; process first paragraph of description 
 				(process-node-list
-				 (cdr (assoc (normalize "description")
-					     kids)))
+				 (node-list-first
+				  (children
+				   (cdr (assoc (normalize "description")
+					       kids)))))
 				(empty-sosofo) ;shouldn't happen
 				))))
 		;; environment contents -- description, etc
@@ -258,13 +283,13 @@ $Id$
 			    kids))))
 	(make empty-command name: "clearpage"))))
   (element routinename
-    (process-children))
+    (process-matching-children 'name))
   (element name
     (process-children))
-;  (element name
-;    (make command name: "Code"
-;	  (process-children)))
   (element othernames
+    ;; Since routinename only processes its `name' children, there
+    ;; currently seems to be no element which processes `othernames'.
+    ;; This bit would do it, though, if it were ever called.
     (let* ((names (children (current-node)))
 	   (namelist (node-list-reduce
 		      names
@@ -453,133 +478,6 @@ $Id$
 ; 	(process-children))))
   )
 
-;;; Simpler routine-ref mode which doesn't use SST.  Very ugly!
-(mode routine-ref
-  (element codegroup
-    (make sequence
-      (make command name: "subsection"
-	    (literal "Code group: ")
-	    (with-mode routine-ref-get-reference
-	      (process-children)))
-      (process-children)))
-  (element codereference
-    (let ((ref-docelem (document-element-from-entity
-			(attribute-string (normalize "doc")))))
-      ;; possibly make this a link, in future
-      (make sequence
-	(make command name: "subsection"
-	      (literal "Code reference"))
-	(literal "Refers to ")
-	(make command name: "textit"
-	      (with-mode routine-ref-get-reference
-		(process-node-list ref-docelem)))
-	(process-children))))
-  (element docblock
-    (process-children))
-  (element title
-    (make command name: "section"
-	  (process-children)))
-  (element (codereference docblock title) ; discard, in this mode
-    (empty-sosofo))			; (see mode routine-ref-get-reference)
-  (element (codegroup docblock title)	; discard, in this mode
-    (empty-sosofo))			; (see mode routine-ref-get-reference)
-  (element authorlist
-    (make sequence
-      (make command name: "subsubsection"
-	    (literal "Authors"))
-      (make environment name: "itemize"
-	    (process-children))))
-  (element author
-    (let ((affil (attribute-string (normalize "affiliation")))
-	  (id (attribute-string (normalize "id"))))
-      (make sequence
-	(make empty-command name: "item")
-	(process-children)
-	(if affil
-	    (literal (string-append " (" affil ")"))
-	    (empty-sosofo)))))
-  (element authorref
-    (let* ((aut-id (attribute-string (normalize "id")))
-	   (aut-el (and aut-id
-			(element-with-id aut-id)))
-	   (note (attribute-string (normalize "note"))))
-      (if (and (not (node-list-empty? aut-el))
-	       (string=? (gi aut-el) (normalize "author")))
-	  (make sequence
-	    (with-mode routine-ref-get-reference
-	      (process-node-list aut-el))
-	    (if note
-		(literal (string-append " (" note ")"))
-		(empty-sosofo)))
-	  (error (string-append "ID " aut-id " is not an AUTHOR element")))))
-  (element authornote
-    (make sequence
-      (literal " --- ")
-      (process-children)))
-  (element otherauthors
-    (make sequence
-      (make empty-command name: "item")
-      (make paragraph (literal "Other contributors"))
-      (make environment name: "itemize"
-	    (process-children))))
-  (element copyright
-    (make sequence
-      (make command name: "subsection"
-	    (literal "Copyright"))
-      (process-children)))
-  (element history
-    (make sequence
-      (make command name: "subsection"
-	    (literal "Change history"))
-      (make environment name: "description"
-	    (process-children))))
-  (element change
-    (let ((auth-id (attribute-string (normalize "author")))
-	  (date-str (attribute-string (normalize "date"))))
-      (make sequence
-	(make empty-command name: "item"
-	      parameters: (list
-			   (string-append "?" ; optional arg
-					  (trim-data (element-with-id auth-id))
-					  ", "
-					  (format-date date-str))))
-	(process-children))))
-  (element routine
-    (let* ((rp (select-elements (children (current-node)) 'routineprologue))
-	   (rn (and (not (node-list-empty? rp))
-		    (select-elements (children rp) 'routinename)))
-	   (id (or (attribute-string (normalize "id") (current-node))
-		   (attribute-string (normalize "id") rn))))
-      (make sequence
-	(make command name: "subsection"
-	      (if id
-		  ;(make empty-command name: "label"
-			;parameters: `(,(string-append "R" id)))
-		  (make command name: "label"
-			(literal (gen-label)))
-		  (empty-sosofo))
-	      (if (node-list-empty? rn)
-		  (literal "Anonymous routine")
-		  (with-mode routine-ref-get-reference
-		    (process-node-list rn))))
-	(process-node-list rp))))
-  (element routineopener
-    (empty-sosofo))
-  (element description
-    (process-children))
-  
-  ;; The funcname element could be made more sophisticated, so that
-  ;; it includes a link (possibly using the source-code browser) to
-  ;; the function definition/documentation.
-  (element funcname
-    (make command name: "texttt"
-          (literal (string-append "(" (data (current-node)) ")"))))
-  ;; discard the following elements, at present
-  (element codebody
-    (empty-sosofo))
-  ;;(element misccode
-  ;;  (empty-sosofo))
-  )
 
 
 ;; Mode which includes assorted variants of the handlers above, designed
@@ -607,7 +505,8 @@ $Id$
   (element routineprologue
     (process-matching-children 'routinename))
   (element routinename
-    (process-children))
+    (make command name: "Code"
+	  (process-matching-children 'name)))
   (element name
     (process-children)))
 
