@@ -16,7 +16,8 @@
 *  Description:
 *     Locate HDS component for a given item, creating if required. If the
 *     object does not exist and creation is not allowed then CLOC is set
-*     to a flag value.
+*     to a flag value. The routine returns the shape of the object, whether
+*     or not it is created, which is defined by the NDF data model.
 
 *  Arguments:
 *     MID = INTEGER (given)
@@ -92,6 +93,8 @@
 *     18 Jan 1996 (DJA):
 *        Make sure axis values/widths and error quantities are expressed
 *        in max( REAL, dataset preferred type )
+*     22 Feb 1996 (DJA):
+*        Changes in string concatenation for Linux port
 *     {enter_changes_here}
 
 *  Bugs:
@@ -156,7 +159,8 @@
 *  with nulls in the hope that we can get away with it! These nulls
 *  must be trapped by BDI1_CFIND1
       IF ( CREATE ) THEN
-        CALL BDI_GETTYP( MID, TYPE, STATUS )
+        TYPE(1:1) = '_'
+        CALL BDI_GETTYP( MID, TYPE(2:), STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           TYPE = '*unknown*'
@@ -168,7 +172,7 @@
         IF ( TYPE .EQ. 'DOUBLE' ) THEN
           RTYPE = TYPE
         ELSE
-          RTYPE = 'REAL'
+          RTYPE = '_REAL'
         END IF
 
       END IF
@@ -185,7 +189,7 @@
 *    Should create structure array object depending on presence
 *    of magic flag
         IF ( ISBIND ) THEN
-          CALL BDI1_CFIND1( LOC, 'DATA_ARRAY', CREATE, '_'//TYPE,
+          CALL BDI1_CFIND1( LOC, 'DATA_ARRAY', CREATE, TYPE,
      :                      NDIM, DIMS, THERE, CLOC, STATUS )
         ELSE
           CALL DAT_CLONE( LOC, CLOC, STATUS )
@@ -209,7 +213,7 @@
 *    Define dimensions
         CALL BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
 
-        CALL BDI1_CFIND1( LOC, 'VARIANCE', CREATE, '_'//RTYPE, NDIM,
+        CALL BDI1_CFIND1( LOC, 'VARIANCE', CREATE, RTYPE, NDIM,
      :                    DIMS, THERE, CLOC, STATUS )
 
 *  Axis container
@@ -257,10 +261,10 @@
 *    If present, look for lower or upper component
         IF ( THERE ) THEN
           IF ( ITEM .EQ. 'LoError' ) THEN
-            CALL BDI1_CFIND1( ELOC, 'LOWER', CREATE, '_'//RTYPE, NDIM,
+            CALL BDI1_CFIND1( ELOC, 'LOWER', CREATE, RTYPE, NDIM,
      :                        DIMS, THERE, CLOC, STATUS )
           ELSE
-            CALL BDI1_CFIND1( ELOC, 'UPPER', CREATE, '_'//RTYPE, NDIM,
+            CALL BDI1_CFIND1( ELOC, 'UPPER', CREATE, RTYPE, NDIM,
      :                        DIMS, THERE, CLOC, STATUS )
           END IF
           CALL DAT_ANNUL( ELOC, STATUS )
@@ -310,7 +314,7 @@
 *        Define dimensions
             CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
 
-            CALL BDI1_CFIND1( ALOC, 'DATA_ARRAY', CREATE, '_'//RTYPE,
+            CALL BDI1_CFIND1( ALOC, 'DATA_ARRAY', CREATE, RTYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'Width' ) THEN
@@ -318,7 +322,7 @@
 *        Define dimensions
             CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
 
-            CALL BDI1_CFIND1( ALOC, 'WIDTH', CREATE, '_'//RTYPE,
+            CALL BDI1_CFIND1( ALOC, 'WIDTH', CREATE, RTYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'LoWidth' ) THEN
@@ -326,7 +330,7 @@
 *        Define dimensions
             CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
 
-            CALL BDI1_CFIND1( ALOC, 'LWIDTH', CREATE, '_'//RTYPE,
+            CALL BDI1_CFIND1( ALOC, 'LWIDTH', CREATE, RTYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'HiWidth' ) THEN
@@ -334,7 +338,7 @@
 *        Define dimensions
             CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
 
-            CALL BDI1_CFIND1( ALOC, 'HWIDTH', CREATE, '_'//RTYPE,
+            CALL BDI1_CFIND1( ALOC, 'HWIDTH', CREATE, RTYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .LE. ' ' ) THEN
@@ -613,8 +617,9 @@
 
 *    Make sure type and dimensionality are specified
         IF ( (TYPE.EQ.'*unknown*') .OR. (NDIM.EQ.-1) ) THEN
+          CALL MSG_SETC( 'N', NAME )
           CALL ERR_REP( ' ', 'Insufficient type or dimensions '/
-     :          /'information to create object '//NAME, STATUS )
+     :              /'information to create object ^N', STATUS )
         ELSE
           DOCRE = .TRUE.
         END IF
