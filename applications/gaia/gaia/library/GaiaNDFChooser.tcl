@@ -6,13 +6,12 @@
 #     [incr Tk] class
 
 #  Purpose:
-#     Provides a toolbox for selecting an NDF stored in a container
-#     file.
+#     Provides a toolbox for displaying NDFs and their components, 
+#     stored in a single container file
 
 #  Description:
-
-#     This class provides a selection chooser for picking an NDF
-#     stored in a container file. It is different from just a plain
+#     This class provides a selection chooser for picking NDFs
+#     stored in a container file. It is different from a plain
 #     file chooser in that is understands multiple NDFs stored in the
 #     same container file, and also allows the selection of a
 #     "displayable" component (these are the NDF data, variance and
@@ -52,6 +51,8 @@
 #  History:
 #     17-JAN_2000 (PWD):
 #        Original version.
+#     29-NOV-2001 (PWD):
+#        Refitted from 2.7 development tree to show image table.
 #     {enter_further_changes_here}
 
 #-
@@ -72,6 +73,7 @@ itcl::class gaia::GaiaNDFChooser {
 
       #  Evaluate any options.
       eval itk_initialize $args
+      wm protocol $w_ WM_DELETE_WINDOW [code $this quit]
    }
 
    #  Destructor:
@@ -92,12 +94,16 @@ itcl::class gaia::GaiaNDFChooser {
 
       #  Create the interface.
       make_table_
-      make_image_table_
       make_buttons_
       make_short_help_
 
       #  And start it up.
       show_hdu_list
+   }
+
+   # Quit this widget
+   public method quit { } {
+      destroy $w_
    }
 
    # Make the table component for displaying the NDF info
@@ -118,18 +124,21 @@ itcl::class gaia::GaiaNDFChooser {
    }
 
    #  Make a subwindow for displaying miniature versions of image
-   #  extensions (XXX inefficient?).
+   #  extensions.
    protected method make_image_table_ {} {
 
       # Frame (BLT table) used to display images in NDF components
       itk_component add image_table {
-         set imagetab_ [frame $w_.imagetab]
+         frame $w_.imagetab
       }
+      set imagetab_ $w_.imagetab
       pack $itk_component(image_table) -side top -fill x
    }
 
    #  Buttons to control NDF display.
    protected method make_buttons_ {} {
+      global $w_.show
+      set $w_.show $itk_option(-show_images)
 
       # Button frame at bottom of window
       itk_component add buttons {
@@ -152,6 +161,17 @@ itcl::class gaia::GaiaNDFChooser {
             -text Quality \
             -command [code $this set_ndf_ quality]
       }
+      itk_component add show {
+         checkbutton $w_.buttons.show \
+            -text "Show NDF images" \
+            -variable $w_.show \
+            -onvalue 1 \
+            -offvalue 0 \
+            -relief raised \
+            -pady 0 \
+            -highlightthickness 0 \
+            -command [code $this show_images]
+      }
       itk_component add close {
          button $w_.buttons.close \
             -text Close \
@@ -161,22 +181,66 @@ itcl::class gaia::GaiaNDFChooser {
       pack $itk_component(data) -side left -expand 1
       pack $itk_component(var) -side left -expand 1
       pack $itk_component(qual) -side left -expand 1
+      pack $itk_component(show) -side left -fill y -expand 1 
       pack $itk_component(close) -side left -expand 1
       pack $itk_component(buttons) -side top -fill x -expand 1
    }
 
+   # Set the cut levels for the image extensions to the given percent
+   method auto_set_cut_levels {{percent 99}} {
+      busy {
+         for {set i 0} {$i < $num_images_} {incr i} {
+            $ext_($i,image) autocut -percent $percent
+            update idletasks
+         }
+      }
+   }
+
+   # Set the cut levels and colormap for the image extensions to the ones
+   # used in the main image
+   method use_settings_from_main_image {} {
+      # return if no image
+      if {! [info exists ext_(0,image)]} {
+         return
+      }
+      
+      lassign [$image_ cut] low high
+      if { "$low" == "" || "$high" == "" || [$image_ isclear] } {
+         return
+      }
+      set cmap [$image_ cmap file]
+      set itt [$image_ itt file]
+      set colorscale [$image_ colorscale]
+      busy {
+         for {set i 0} {$i < $num_images_} {incr i} {
+            $ext_($i,image) cut $low $high
+            $ext_($i,image) colorscale $colorscale
+            $ext_($i,image) cmap file $cmap
+            $ext_($i,image) itt file $itt
+            update idletasks
+         }
+      }
+   }
+   
    #  Add a short help window
    protected method make_short_help_ {} {
       TopLevelWidget::make_short_help
 
       add_short_help $itk_component(table) \
          {Table: Click to select NDF, double-click to display image}
-      add_short_help $itk_component(buttons).data \
+
+      add_short_help $itk_component(data) \
          {Open and display the selected NDF data component}
-      add_short_help $itk_component(buttons).var \
+
+      add_short_help $itk_component(var) \
          {Open and display the selected NDF variance component}
-      add_short_help $itk_component(buttons).qual \
+
+      add_short_help $itk_component(qual) \
          {Open and display the selected NDF quality component}
+
+      add_short_help $itk_component(buttons).show \
+         {Show/Hide the display of the miniature versions of the image extensions}
+
       add_short_help $itk_component(buttons).close {Close window}
    }
 
@@ -194,10 +258,12 @@ itcl::class gaia::GaiaNDFChooser {
          return
       }
 
+      #  Initially we don't show the small image, until we know we
+      #  have more than one. 
+      $w_.buttons.show config -state disabled
+
       #  Delete old images
-      set w $imagetab_.f
-      catch {destroy $w}
-      pack [frame $w] -fill x -expand 1
+      show_images
       if {"$filename_" == ""} {
          return
       }
@@ -215,79 +281,149 @@ itcl::class gaia::GaiaNDFChooser {
          return
       }
 
-      #  Put the images in the table
-      if { $itk_option(-display_images) } {
-         blt::table $w
-         for {set i 0} {$i < $num_images_} {incr i} {
-            set f [frame $w.f$i -borderwidth 5 -relief raised]
-            set im [RtdImage $f.im \
-                       -graphics 0 \
-                       -file $filename_ \
-                       -canvaswidth 100 \
-                       -canvasheight 100 \
-                       -fitwidth 100 \
-                       -fitheight 100]
-            pack $im -fill x -expand 1
-
-            #  Save widget names for later reference
-            set ext_($i,frame) $f
-            set ext_($i,RtdImage) $im
-            set ext_($i,image) [$im get_image]
-            set ext_($i,canvas) [$im get_canvas]
-
-            set ndf $ext_($i,ndf)
-            set name $ext_($i,name)
-
-            #  Use after to override default bindings, etc.
-            after 0 [code $this add_image_bindings_ $im $ndf $name]
-
-            #  Position the image in the table.
-            blt::table $w $f 0,$i -fill both
+      #  Arrange ordering of images.
+      set num_cols 4
+      set num_rows [expr $num_images_/$num_cols+$num_cols]
+      set max_row_ 0
+      set n 0
+      for {set row 0} {$row < $num_rows} {incr row} {
+         for {set col 0} {$col < $num_cols} {incr col} {
+            if {$n == $num_images_} {
+               break
+            }
+            set ext_($n,row) $row
+            set ext_($n,col) $col
+            incr n
+            set max_row_ [max $max_row_ $row]
          }
+      }
+
+      #  Enabled show image buttons, if more than one.
+      if { $num_images_ > 1 } {
+         $w_.buttons.show config -state normal
       }
 
       # Select the NDF being displayed, if any
       select_image_ndf_ [$image_ hdu]
    }
 
+
+   # Remove all image minature versions
+   public method delete_images {} {
+      global $w_.show
+      set $w_.show 0
+      
+      if {[info exists imagetab_]} {
+         # delete old images
+         destroy $imagetab_
+         unset imagetab_
+      }
+   }
+
+   # Show all image minature versions (called by checkbutton)
+   protected method show_images {} {
+      global $w_.show
+      if { [set $w_.show] } {
+         create_images
+      } else {
+         delete_images
+      }
+   }
+
+   # Put the images in the table
+   protected method create_images {} {
+      make_image_table_
+      
+      set w $imagetab_
+      for {set i 0} {$i < $num_images_} {incr i} {
+         set f [frame $w.f$i -borderwidth 2 -relief raised]
+         set im [RtdImage $f.im \
+		    -graphics 0 \
+		    -displaymode 0 \
+		    -canvaswidth 100 \
+		    -canvasheight 100 \
+		    -fitwidth 100 \
+		    -fitheight 100]
+         pack $im -fill both -expand 1
+         
+         # save widget names for later reference
+         set ext_($i,frame) $f
+         set ext_($i,RtdImage) $im
+         set ext_($i,image) [$im get_image]
+         set ext_($i,canvas) [$im get_canvas]
+         
+         #  Add the image to the table
+         set row [expr $max_row_-$ext_($i,row)]
+         set col $ext_($i,col)
+         blt::table $w $f ${row},${col} -fill both
+      }
+      
+      frame $w.buttons2 -borderwidth 2
+      pack [button $w.buttons2.settings \
+               -text "Use Settings from Main Image" \
+               -command [code $this use_settings_from_main_image]]
+      
+      add_short_help $w.buttons2.settings \
+         {Set the cut levels and colormap for the preview images to the one used in the main image}
+      
+      blt::table $w \
+         $w.buttons2 [expr $max_row_ + 1],0 -fill x -columnspan [min 4 $num_images_]
+      
+      update  ; # wait until images are displayed (needed !)
+      
+      # configure the images
+      lassign [$image_ cut] low high
+      busy {
+         for {set i 0} {$i < $num_images_} {incr i} {
+            $ext_($i,image) config -file $filename_
+            add_image_bindings_ $ext_($i,RtdImage) $ext_($i,ndf) $ext_($i,name)
+            $ext_($i,image) cut $low $high
+            update idletasks
+         }
+      }
+   }
+
    #  This method is called when the user clicks on an image NDF icon.
    #  Display the selected image.
    protected method select_image_ndf_ {ndf {component "data"}} {
-      busy {
-         $image_ hdu $ndf $component
-         $itk_option(-image) configure -component $component
-         $itk_option(-image) update_title
-
-         for {set i 0} {$i < $num_images_} {incr i} {
-            if {[info exists ext_($i,frame)]} {
-               if {"$ext_($i,ndf)" == "$ndf"} {
-                  $ext_($i,frame) configure -relief sunken
-               } else {
-                  $ext_($i,frame) configure -relief raised
+      catch {
+         busy {
+            $image_ hdu $ndf $component
+            $itk_option(-image) configure -component $component
+            $itk_option(-image) update_title
+            
+            for {set i 0} {$i < $num_images_} {incr i} {
+               if {[info exists ext_($i,frame)]} {
+                  if {"$ext_($i,ndf)" == "$ndf"} {
+                     $ext_($i,frame) configure -relief sunken
+                  } else {
+                     $ext_($i,frame) configure -relief raised
+                  }
                }
             }
+            catch "$table_ select_row [expr $ndf-1]"
+            select_ndf_
          }
-         catch "$table_ select_row [expr $ndf-1]"
-         select_ndf_
       }
    }
 
    #  Add bindings to the given RtdImage itcl class object and set it to
    #  display the given NDF when clicked on. Note this always displays
-   #  the "data" component.
-   protected method add_image_bindings_ {im ndf name} {
+   #  the "data" component by default and does the initial selection
+   #  of the hdu component.
+   protected method add_image_bindings_ {im ndf name {component "data"}} {
       set image [$im get_image]
       set canvas [$im get_canvas]
 
       #  Set the NDF for the image
       busy {
          $image hdu $ndf "data"
-         $itk_option(-image) configure -component "data"
-         $im update_title
+         $itk_option(-image) configure -component $component
+         $itk_option(-image) update_title
       }
 
       #  Need to add 2 bindings: one for the image, one for the background
-      bind $canvas <1> [code $this select_image_ndf_ $ndf "data"]
+      bind $canvas <1> [code $this select_image_ndf_ $ndf $component]
 
       #  Set up a resize handler to change the image size
       bind $canvas <Configure> [code $this resize_ $im %w %h]
@@ -322,7 +458,7 @@ itcl::class gaia::GaiaNDFChooser {
    protected method select_ndf_ {} {
       set sel [$table_ get_selected]
       if {[llength $sel]} {
-         lassign [lindex $sel 0] number name naxis1 naxis2 havvar havqual
+         lassign [lindex $sel 0] number type name naxis1 naxis2 havvar havqual
          if { "$havvar" == "true" } {
             $itk_component(var) configure -state normal
          } else {
@@ -349,6 +485,16 @@ itcl::class gaia::GaiaNDFChooser {
       }
    }
 
+   #  Flag: if true, images are "subsampled" when shrinking, 
+   #  otherwise the pixels are averaged
+   itk_option define -subsample subsample Subsample 1
+    
+   #  Default: show image extensions, bool
+   itk_option define -show_images show_images Show_images {0}
+
+   #  Optionally specify TopLevelWidget to display short help messages
+   itk_option define -shorthelpwin shortHelpWin ShortHelpWin {}
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -369,6 +515,9 @@ itcl::class gaia::GaiaNDFChooser {
 
    #  Array(ndf,keyword) of image keyword and widget info
    protected variable ext_
+
+   #  Max row.
+   protected variable max_row_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------
