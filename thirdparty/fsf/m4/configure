@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS PRODUCT VERSION AWK CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE RANLIB ac_ct_RANLIB CPP EGREP U ANSI2KNR ALLOCA LIBOBJS STACKOVF LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS PRODUCT VERSION AWK CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE RANLIB ac_ct_RANLIB CPP EGREP U ANSI2KNR ALLOCA LIBOBJS STACKOVF STAR_MANIFEST_DIR LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -5060,6 +5060,13 @@ else
 echo "${ECHO_T}no" >&6
 fi;
 
+# Set the STAR_MANIFEST_DIR variable, defaulting it from the environment.
+# If we were using Starlink automake, this would cause the
+# `install-manifest' target to be included in Makefile.in; but instead
+# this simply propagates the variable into the Makefile
+: ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
+
+
                                                                       ac_config_files="$ac_config_files Makefile doc/Makefile lib/Makefile src/Makefile checks/Makefile examples/Makefile component.xml"
           ac_config_commands="$ac_config_commands default"
 cat >confcache <<\_ACEOF
@@ -5707,6 +5714,7 @@ s,@ANSI2KNR@,$ANSI2KNR,;t t
 s,@ALLOCA@,$ALLOCA,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@STACKOVF@,$STACKOVF,;t t
+s,@STAR_MANIFEST_DIR@,$STAR_MANIFEST_DIR,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
 
