@@ -104,21 +104,19 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      COSYS          
-      type        'LITERAL'
-      ppath       'DEFAULT'
-      vpath       'DEFAULT'
-      prompt      'Co-ordinate system'
-      helpkey     '*'
-      default     !
-   endparameter
-
    parameter      DEVICE         
       ptype       'DEVICE'
       vpath       'GLOBAL,PROMPT'
       ppath       'GLOBAL,CURRENT'
       association '<-GLOBAL.GRAPHICS_DEVICE'
       prompt      'Name of graphics device'
+      helpkey     '*'
+   endparameter
+
+   parameter      EPOCH
+      type        '_DOUBLE'
+      ppath       'DYNAMIC,CURRENT'
+      prompt      'Epoch of observation'
       helpkey     '*'
    endparameter
 
@@ -129,6 +127,15 @@ interface POLPLOT
       ppath       'DEFAULT'
       default     N
       helpkey     '*'
+   endparameter
+
+   parameter      FRAME
+      type        'LITERAL'
+      ppath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Required co-ordinate Frame'
+      helpkey     '*'
+      default     !
    endparameter
 
    parameter      JUST           
