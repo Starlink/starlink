@@ -33,6 +33,8 @@ ALL_TARGETS = \
 	$(MANIFEST)/dtask \
 	$(MANIFEST)/ems \
 	$(MANIFEST)/fio \
+        $(MANIFEST)/figaro \
+        #(MANIFEST)/findcoords \
 	$(MANIFEST)/gaia \
 	$(MANIFEST)/gks \
 	$(MANIFEST)/gns \
