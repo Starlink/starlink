@@ -144,8 +144,7 @@
 *    Precess to required epoch
         OUT(1) = INP(1)
         OUT(2) = INP(2)
-        CALL SLA_PRECES( 'FK5', 2000D0, SLA_EPCO('J',EFORM,EPOCH),
-     :                   OUT(1), OUT(2) )
+        CALL SLA_PRECES( 'FK5', 2000D0, EQNX, OUT(1), OUT(2) )
 
 *    The old system
       ELSE IF ( N3 .EQ. 'FK4' ) THEN
