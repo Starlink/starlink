@@ -1412,13 +1412,13 @@ C     CALL BDA_ANNUL(LIV, STATUS)
 	print*,offset
       XMIN=BASE(1) +OFFSET -HX
       OFFSET=REAL(IXMAX-1)*SCALE(1)
-	print*,offset,base(1),base(1)+offset
+	print*,offset,base(1),hx,base(1)+offset+hx
       XMAX=BASE(1)+ OFFSET +HX
       OFFSET=REAL(IYMIN-1)*SCALE(2)
 	print*,offset
       YMIN=BASE(2)+ OFFSET -HY
       OFFSET=REAL(IYMAX-1)*SCALE(2)
-	print*,offset,base(2),base(2)+offset
+	print*,offset,base(2),hy,base(2)+offset+hy
       XMAX=BASE(2)+ OFFSET +HY
 
 	print*,xmin,xmax,ymin,ymax
