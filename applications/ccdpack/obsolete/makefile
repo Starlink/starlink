@@ -627,7 +627,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_cat.f ccd1_ggeom.f ccd1_sdect.f ccd1_setpa.f ccd1_wrtpa.f \
  kpg1_asfrm.f kpg1_asffr.f kpg1_isscs.f kpg1_assir.f \
  ira1_chscs.f ira_seteq.f ira_iscs.f \
- ccd1_box.f ccd1_dodiz.f ccd1_gszff.f ccd1_sgare.f ccd1_tran.f 
+ ccd1_box.f ccd1_gszff.f ccd1_sgare.f ccd1_tran.f 
 
 IRGSRC = irg1_axlim.f irg1_brack.f irg1_check.f irg1_fspec.f \
  irg1_lasto.f irg1_ncut.f irg1_ndfch.f irg1_slice.f \
@@ -678,7 +678,7 @@ GENSRC = ccg1_add.gen ccg1_bext.gen ccg1_bl.gen ccg1_bmd1.gen \
  ccg1_wtm4.gen ccg1_smr1.gen ccg1_smd2.gen ccg1_smr2.gen \
  ccg1_smd3.gen ccg1_smr3.gen ccg1_fmr1.gen ccg1_fmr2.gen \
  ccg1_fmr3.gen ccg1_fmd1.gen ccg1_fmd2.gen ccg1_fmd3.gen \
- ccg1_kthx.gen ccg1_asli.gen ccg1_odiz.gen
+ ccg1_kthx.gen ccg1_asli.gen ccg1_dodiz.gen
 
 #  Routines which may be real or double precision
 GENRDSRC = ccg1_ffrj.grd kpg1_bloc.grd ccg1_axin.grd \
@@ -695,7 +695,8 @@ GENLRDICSRC = ccg1_fch0.glrdic ccg1_sto0.glrdic ccg1_fch1.glrdic \
 GENLRDISRC = fts1_gkey.glrdi
 
 #  Doubly generic source that need running though dgeneric
-DGENSRC = ccg1_xcly.dgen ccg1_xcsy.dgen ccg1_xffy.dgen ccg1_xfsy.dgen
+DGENSRC = ccg1_xcly.dgen ccg1_xcsy.dgen ccg1_xffy.dgen ccg1_xfsy.dgen \
+ ccg1_odxy.dgen
 
 #  List of platform specific Fortran routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
@@ -2195,7 +2196,6 @@ ccd1_dlcat.o: SAE_PAR
 ccd1_dmprg.o: AST_PAR SAE_PAR
 ccd1_docmd.o: SAE_PAR
 ccd1_docmp.o: DAT_PAR NDF_PAR SAE_PAR USER_ERR
-ccd1_dodiz.o: AST_PAR DAT_PAR NDF_PAR PRM_PAR SAE_PAR
 ccd1_domos.o: NDF_PAR SAE_PAR
 ccd1_dqeds.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
 ccd1_drawi.o: IDI_ERR SAE_PAR
@@ -2420,6 +2420,7 @@ ccg1_cpb.o: PRM_PAR SAE_PAR
 ccg1_crdt.o: PRM_PAR SAE_PAR
 ccg1_dcn.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_debi.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
+ccg1_dodiz.o: AST_PAR DAT_PAR NDF_PAR PRM_PAR SAE_PAR
 ccg1_evar.o: SAE_PAR PRM_PAR
 ccg1_fch0.o: DAT_PAR PRM_PAR SAE_PAR
 ccg1_fch1.o: DAT_PAR PRM_PAR SAE_PAR
