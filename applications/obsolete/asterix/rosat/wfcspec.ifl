@@ -1,0 +1,55 @@
+INTERFACE WFCSPEC
+
+  PARAMETER INP
+    POSITION 1
+    TYPE    'UNIV'
+    PROMPT  'Input dataset name'
+    PPATH   'GLOBAL,CURRENT'
+    ASSOCIATION '<-GLOBAL.BINDS'
+    VPATH   'PROMPT'
+    HELP    'Can be a one-element NDF or source search results file'
+  ENDPARAMETER
+
+  PARAMETER AUX
+    TYPE    'UNIV'
+    PROMPT  'Dataset which was searched to create results file'
+    PPATH   'GLOBAL,CURRENT'
+    VPATH   'PROMPT'
+  ENDPARAMETER
+
+  PARAMETER OUT
+    POSITION 2
+    TYPE    'UNIV'
+    PROMPT  'Output dataset name'
+    PPATH   'CURRENT'
+    VPATH   'PROMPT'
+    ASSOCIATION '->GLOBAL.BINDS'
+    HELP    'Enter dataset name without an extension'
+  ENDPARAMETER
+
+  PARAMETER SRC
+    TYPE    '_INTEGER'
+    PROMPT  'Source number within SSDS'
+    VPATH   'PROMPT'
+    PPATH   'DYNAMIC'
+    HELP    'A spectral file will be created for the source chosen'
+  ENDPARAMETER
+
+  PARAMETER OVERRIDE
+    TYPE    '_LOGICAL'
+    DEFAULT N
+    PPATH   'DEFAULT'
+    VPATH   'DEFAULT'
+    PROMPT  'Override observation date in dataset'
+    HELP    'Use this keyword if you are interested in variation of the response with time'
+  ENDPARAMETER
+
+  PARAMETER OBSMJD
+    TYPE    '_DOUBLE'
+    PPATH   'DYNAMIC'
+    VPATH   'PROMPT'
+    PROMPT  'MJD of observation'
+    HELP    'Default is that present in the dataset'
+  ENDPARAMETER
+
+ENDINTERFACE
