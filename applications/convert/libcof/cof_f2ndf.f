@@ -42,7 +42,9 @@
 *        argument FDL is ignored. 
 *     FDL = INTEGER (Given)
 *        The file descriptor for the log file.  This is ignored when
-*        LOGHDR is .FALSE..
+*        LOGHDR is .FALSE..  The file should be formatted and have
+*        a record length of at least 80 characters.  There is no
+*        validation because the record length is machine dependent.
 *     FMTCNV = LOGICAL (Given)
 *        This specifies whether or not format conversion will occur.
 *        The conversion applies the values of the FITS keywords BSCALE
@@ -214,6 +216,8 @@
 *        Original version.
 *     1997 November 16 (MJC):
 *        Filter out NDF-style HISTORY.
+*     1998 January 6 (MJC):
+*        Removed the validation of the log file.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -357,28 +361,6 @@
      :     'COF_F2NDF: The identifier to the output NDF is invalid. '/
      :     /'(Probable programming error.)', STATUS )
          GOTO 999
-      END IF
-
-*  Validate the logfile.
-*  =====================
-
-*  Get the record length of the file.
-      IF ( LOGHDR ) THEN
-         CALL FIO_UNIT( FDL, LUNIT, STATUS )
-         INQUIRE ( UNIT = LUNIT, RECL = RECLEN )
-
-*  Check that the headers can be written to the file.
-         IF ( RECLEN .LT. 80 ) THEN
-            STATUS = SAI__ERROR
-            INQUIRE ( UNIT = LUNIT, NAME = LOGNAM )
-            CALL MSG_SETC( 'LF', LOGNAM )
-            CALL MSG_SETI( 'RL', RECLEN )
-            CALL ERR_REP( 'COF_F2NDF_LFRECL',
-     :        'File ^LF has recordlength ^RL; it must be at least 80 '/
-     :        /'to report the FITS headers (probable programming '/
-     :        /'error).', STATUS )
-            GOTO 999
-         END IF
       END IF
 
 *  Special sources of FITS files.
