@@ -27,6 +27,12 @@ to me: there's a much fuller account of the whole sorry business in
 the comp.graphics.misc FAQ at, for example,
 <http://www.lib.ox.ac.uk/internet/news/faq/archive/graphics.fileformats-faq.part1.html>
 
+The program can work with the kpathsea library.  This is the same
+path-searching library which several TeX implementations use to find
+fonts (and more).  If you wish to use this, then give the option
+`--with-kpathsea' to the configure command, and if the library is
+installed on your machine, the program will use it.
+
 The program builds successfully on (at least) egcs-2.90, Sun Workshop
 C++ 5.0, and Alpha Digital C++ 6.0.  It should be written in
 standards-conforming C++, so if it doesn't build then (1) it's not as
@@ -40,6 +46,8 @@ I can do in the autoconfigure script).
 Documentation
 -------------
 
-...is in dvi2bitmap.1  Not much at present, I'm afraid.
+See doc.tar -- there are fuller installation instructions there.
+There's also a man-page in dvi2bitmap.1, but this is not necessarily
+as up-to-date as the main documentation.
 
 

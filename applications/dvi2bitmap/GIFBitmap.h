@@ -59,5 +59,47 @@ class GIFBitmap : public BitmapImage {
     void char_init(void);
     void char_out( int c );
     void flush_char();
+
+    // remainder are the static globals which were in
+    // the original GIFENCOD routine
+    int Width, Height;
+    int curx, cury;
+    long CountDown;
+    int Pass;
+    int Interlace;
+
+    const int BITS = 12;
+    const int HSIZE = 5003;	/* 80% occupancy */
+ 
+    int n_bits;			/* number of bits/code */
+    int maxbits;                /* user settable max # bits/code */
+    code_int maxcode;		/* maximum code, given n_bits */
+    code_int maxmaxcode;	/* should NEVER generate this code */ 
+
+    count_int htab [HSIZE];
+    unsigned short codetab [HSIZE];    
+    code_int hsize;		/* for dynamic table sizing */
+
+    code_int free_ent;		/* first unused entry */
+
+    int clear_flg;
+
+    int offset;
+    long int in_count;		/* length of input */
+    long int out_count;		/* # of codes output (for debugging) */
+
+    int g_init_bits;
+    FILE* g_outfile;
+
+    int ClearCode;
+    int EOFCode;
+
+    unsigned long cur_accum;
+    int cur_bits;
+
+    int a_count;
+    char accum[ 256 ];
+
+    static const unsigned long masks[];
 };
 #endif // #ifndef GIFBITMAP_HEADER_READ

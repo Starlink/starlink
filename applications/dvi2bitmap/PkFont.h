@@ -147,9 +147,9 @@ class PkFont {
     bool loaded() const { return font_loaded_; }
 
  private:
-    static const int nglyphs_ = 256;
-    static const int two20_ = 1048576; // 2^20
-    static const int two16_ = 65536; // 2^16
+    static const unsigned int nglyphs_ = 256;
+    static const unsigned int two20_ = 1048576; // 2^20
+    static const unsigned int two16_ = 65536; // 2^16
 
     string name_;
     string path_;

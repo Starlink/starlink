@@ -22,6 +22,10 @@ XBMBitmap::XBMBitmap (const int w, const int h)
 {
 }
 
+XBMBitmap::~XBMBitmap ()
+{
+}
+
 void XBMBitmap::write (const string filename)
 {
     FILE *op;

@@ -4,7 +4,7 @@
 //
 // $Id$
 
-#include <iostream>
+//#include <iostream>
 
 #include <string>
 #include "BitmapImage.h"

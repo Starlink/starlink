@@ -125,20 +125,24 @@ private:
 };
 
 
-// DviFileEvent is what is returned to the client from the DVI reading class.
-// Declare one derived class for each type of event.
-//
-// This is rather bad design - these classes should be subclasses of DviFile
-// above.
+/* DviFileEvent is what is returned to the client from the DVI reading class.
+ * Declare one derived class for each type of event.
+ *
+ * This is rather bad design - these classes should be subclasses of DviFile
+ * above.
+ * DviFileEvent is a virtual class, so these derived classes should have
+ * non-virtual destructors.
+ */
 class DviFileEvent {
  public:
     enum eventTypes { setchar, setrule, fontchange, special,
 		      page, preamble, postamble };
     DviFileEvent(eventTypes t, DviFile *dp=0)
-	: type_(t), dviFile_(dp) { }
-    unsigned char opcode;
+	: dviFile_(dp), type_(t) { }
+    ~DviFileEvent () { };
     virtual void debug() const;
     eventTypes type() const { return type_; }
+    unsigned char opcode;
  private:
     DviFile *dviFile_;
     const eventTypes type_;
@@ -147,57 +151,54 @@ class DviFileSetChar : public DviFileEvent {
  public:
     DviFileSetChar(int charno, DviFile *dptr)
 	: DviFileEvent(setchar,dptr), charno(charno) { }
-    const int charno;
+    DviFileSetChar::~DviFileSetChar () { };
     void debug() const;
+    const int charno;
 };
 class DviFileSetRule: public DviFileEvent {
  public:
     const int h, w;
     DviFileSetRule(DviFile *dptr, int h, int w)
 	: DviFileEvent(setrule,dptr), h(h), w(w) { }
+    DviFileSetRule::~DviFileSetRule () { };
     void debug() const;
 };
-/*
-class DviFileFontDef : public DviFileEvent {
- public:
-    int number;
-    unsigned int checksum, scale, size;
-    string fontdir, fontname;
-    DviFileFontDef() : DviFileEvent(fontdef) { }
-    void debug() const;
-};
-*/
 class DviFileFontChange : public DviFileEvent {
  public:
     DviFileFontChange(PkFont *f) : DviFileEvent(fontchange), font(f) { }
-    const PkFont *font;
+    DviFileFontChange::~DviFileFontChange () { };
     void debug() const;
+    const PkFont *font;
 };
 class DviFileSpecial : public DviFileEvent {
  public:
-    const string specialString;
     DviFileSpecial(string str)
 	: DviFileEvent(special), specialString(str) { }
+    DviFileSpecial::~DviFileSpecial () { };
+    const string specialString;
     void debug() const;
 };
 class DviFilePage : public DviFileEvent {
  public:
+    DviFilePage(bool isStart) : DviFileEvent(page), isStart(isStart) { }
+    DviFilePage::~DviFilePage () { };
+    void debug() const;
     const bool isStart;		// true/false if this is a bop/eop
     signed int count[10];
     signed int previous;
-    DviFilePage(bool isStart) : DviFileEvent(page), isStart(isStart) { }
-    void debug() const;
 };
 class DviFilePreamble : public DviFileEvent {
  public:
+    DviFilePreamble() : DviFileEvent(preamble) { }
+    DviFilePreamble::~DviFilePreamble () { };
+    void debug() const;
     unsigned int dviType, num, den, mag;
     string comment;
-    DviFilePreamble() : DviFileEvent(preamble) { }
-    void debug() const;
 };
 class DviFilePostamble : public DviFileEvent {
  public:
     DviFilePostamble() : DviFileEvent(postamble) { }
+    DviFilePostamble::~DviFilePostamble () { };
 };
 
 #endif //#ifndef DVI_FILE_HEADER_READ

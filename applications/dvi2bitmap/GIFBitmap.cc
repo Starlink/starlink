@@ -46,11 +46,25 @@ using std::fclose;
 using std::fflush;
 #endif
 
+const unsigned long GIFBitmap::masks[] 
+	= { 0x0000,
+	    0x0001, 0x0003, 0x0007, 0x000F,
+	    0x001F, 0x003F, 0x007F, 0x00FF,
+	    0x01FF, 0x03FF, 0x07FF, 0x0FFF,
+	    0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF };
+
 
 GIFBitmap::GIFBitmap (const int w, const int h, const int bpp)
-    : BitmapImage (w, h), bpp_(bpp)
+    : BitmapImage (w, h), bpp_(bpp),
+      Pass(0), maxbits(BITS), hsize(HSIZE), free_ent(0), clear_flg(0),
+      in_count(1), out_count(0), cur_accum(0), cur_bits(0)
 {
-    fprintf (stderr, "GIFBitmap: w=%d  h=%d\n", w, h);
+    maxmaxcode = (code_int)1 << BITS;
+    //fprintf (stderr, "GIFBitmap: w=%d  h=%d\n", w, h);
+}
+
+GIFBitmap::~GIFBitmap()
+{
 }
 
 void GIFBitmap::write (const string filename)
@@ -65,7 +79,7 @@ void GIFBitmap::write (const string filename)
     const int step = 256 >> bpp_;
 
     int *CT = new int[ncolours];
-    int val;
+    //int val;
     for (int i=0, val=255; i<ncolours-1; i++, val-=step)
 	CT[i] = val;
     CT[ncolours-1] = 0;
@@ -83,7 +97,7 @@ void GIFBitmap::write (const string filename)
 	throw BitmapError ("can't open GIF file "+filename+" to write");
     GIFEncode (F,		// open file
 	       w_, h_,		// width and height of bitmap
-	       0,		// interlace?
+	       1,		// interlace?
 	       0,		// which CT entry is the background?
 	       (isTransparent_ ? 0 : -1), // make entry 0 transparent, if req'd
 	       bpp_,		// bits-per-pixel
@@ -109,11 +123,11 @@ void GIFBitmap::write (const string filename)
 #define TRUE 1
 #define FALSE 0
 
-static int Width, Height;
-static int curx, cury;
-static long CountDown;
-static int Pass = 0;
-static int Interlace;
+//static int Width, Height;
+//static int curx, cury;
+//static long CountDown;
+//static int Pass = 0;
+//static int Interlace;
 
 /*
  * Bump the 'curx' and 'cury' to point to the next pixel
@@ -176,13 +190,6 @@ void GIFBitmap::BumpPixel(void)
 int GIFBitmap::GIFNextPixel(void)
 {
         int r;
-	/*
-	static FILE *echo = NULL;
-	if (echo == NULL)
-	{
-	    echo = fopen ("echo.txt", "w");
-	    if (echo == NULL)
-	*/
 
         if( CountDown == 0 )
                 return EOF;
@@ -191,9 +198,10 @@ int GIFBitmap::GIFNextPixel(void)
 
         //r = ( * getpixel )( curx, cury );
 	r = static_cast<int>(bitmap_[cury*w_+curx]);
-	fputc ((bitmap_[cury*w_+curx] ? '*' : '.'), stderr);
-	if (curx == w_-1)
-	    fputc ('\n', stderr);
+
+	//fputc ((bitmap_[cury*w_+curx] ? '*' : '.'), stderr);
+	//if (curx == w_-1)
+	//    fputc ('\n', stderr);
 
         BumpPixel();
 
@@ -386,9 +394,9 @@ void GIFBitmap::Putword(int w, FILE* fp)
  * General DEFINEs
  */
 
-#define BITS    12
-
-#define HSIZE  5003            /* 80% occupancy */
+// These #defines moved to class constants
+//#define BITS    12
+//#define HSIZE  5003            /* 80% occupancy */
 
 #ifdef NO_UCHAR
  typedef char   char_type;
@@ -414,22 +422,22 @@ void GIFBitmap::Putword(int w, FILE* fp)
 
 #define ARGVAL() (*++(*argv) || (--argc && *++argv))
 
-static int n_bits;                        /* number of bits/code */
-static int maxbits = BITS;                /* user settable max # bits/code */
-static code_int maxcode;                  /* maximum code, given n_bits */
-static code_int maxmaxcode = (code_int)1 << BITS; /* should NEVER generate this code */
+//static int n_bits;                        /* number of bits/code */
+//static int maxbits = BITS;                /* user settable max # bits/code */
+//static code_int maxcode;                  /* maximum code, given n_bits */
+//static code_int maxmaxcode = (code_int)1 << BITS; /* should NEVER generate this code */
 #ifdef COMPATIBLE               /* But wrong! */
 # define MAXCODE(n_bits)        ((code_int) 1 << (n_bits) - 1)
 #else /*COMPATIBLE*/
 # define MAXCODE(n_bits)        (((code_int) 1 << (n_bits)) - 1)
 #endif /*COMPATIBLE*/
 
-static count_int htab [HSIZE];
-static unsigned short codetab [HSIZE];
+//static count_int htab [HSIZE];
+//static unsigned short codetab [HSIZE];
 #define HashTabOf(i)       htab[i]
 #define CodeTabOf(i)    codetab[i]
 
-static code_int hsize = HSIZE;                 /* for dynamic table sizing */
+//static code_int hsize = HSIZE;                 /* for dynamic table sizing */
 
 /*
  * To save much memory, we overlay the table used by compress() with those
@@ -444,17 +452,17 @@ static code_int hsize = HSIZE;                 /* for dynamic table sizing */
 #define tab_suffixof(i)        ((char_type*)(htab))[i]
 #define de_stack               ((char_type*)&tab_suffixof((code_int)1<<BITS))
 
-static code_int free_ent = 0;                  /* first unused entry */
+//static code_int free_ent = 0;                  /* first unused entry */
 
 /*
  * block compression parameters -- after all codes are used up,
  * and compression rate changes, start over.
  */
-static int clear_flg = 0;
+//static int clear_flg = 0;
 
-static int offset;
-static long int in_count = 1;            /* length of input */
-static long int out_count = 0;           /* # of codes output (for debugging) */
+//static int offset;
+//static long int in_count = 1;            /* length of input */
+//static long int out_count = 0;           /* # of codes output (for debugging) */
 
 /*
  * compress stdin to stdout
@@ -472,11 +480,11 @@ static long int out_count = 0;           /* # of codes output (for debugging) */
  * questions about this implementation to ames!jaw.
  */
 
-static int g_init_bits;
-static FILE* g_outfile;
+//static int g_init_bits;
+//static FILE* g_outfile;
 
-static int ClearCode;
-static int EOFCode;
+//static int ClearCode;
+//static int EOFCode;
 
 void GIFBitmap::compress(int init_bits, FILE* outfile)
 {
@@ -590,13 +598,13 @@ nomatch:
  * code in turn.  When the buffer fills up empty it and start over.
  */
 
-static unsigned long cur_accum = 0;
-static int cur_bits = 0;
+    //static unsigned long cur_accum = 0;
+    //static int cur_bits = 0;
 
-static unsigned long masks[] = { 0x0000, 0x0001, 0x0003, 0x0007, 0x000F,
-                                  0x001F, 0x003F, 0x007F, 0x00FF,
-                                  0x01FF, 0x03FF, 0x07FF, 0x0FFF,
-                                  0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF };
+    //static unsigned long masks[] = { 0x0000, 0x0001, 0x0003, 0x0007, 0x000F,
+    //                               0x001F, 0x003F, 0x007F, 0x00FF,
+    //                              0x01FF, 0x03FF, 0x07FF, 0x0FFF,
+    //                              0x1FFF, 0x3FFF, 0x7FFF, 0xFFFF };
 
 void GIFBitmap::output(code_int  code)
 {
@@ -719,7 +727,7 @@ writeerr()
 /*
  * Number of characters so far in this 'packet'
  */
-static int a_count;
+//static int a_count;
 
 /*
  * Set up the 'byte output' routine
@@ -732,7 +740,7 @@ void GIFBitmap::char_init()
 /*
  * Define the storage for the packet accumulator
  */
-static char accum[ 256 ];
+//static char accum[ 256 ];
 
 /*
  * Add a character to the end of the current packet, and if it is 254

@@ -43,13 +43,14 @@ struct bitmap_info {
     string ofile_type;
 };
 
-void process_dvi_file (DviFile *, bitmap_info&, int resolution);
+void process_dvi_file (DviFile *, bitmap_info&, int resolution,
+		       const PkFont *fallback_font);
 string_list *tokenise_string (string s);
 string get_ofn_pattern (string dviname);
 void Usage (void);
 char *progname;
 
-int verbosity = 1;
+unsigned int verbosity = 1;
 
 main (int argc, char **argv)
 {
@@ -59,7 +60,7 @@ main (int argc, char **argv)
     int show_font_list = 0;
     bitmap_info bm;
     bool do_process_file = true; // if true, then process DVI file
-    bool all_fonts_present = false; // set at end of preamble
+    bool all_fonts_present = true;
 
     //DviFile::verbosity(2);
     //PkFont::verbosity(2);
@@ -217,12 +218,23 @@ main (int argc, char **argv)
 	}
 
 	all_fonts_present = true;
+	bool one_font_present = false;
+	const PkFont *fallback_font = 0;
+
 	for (PkFont *f = dvif->firstFont();
 	     f != 0;
 	     f = dvif->nextFont())
 	{
 	    string unk = "unknown";
-	    if (!f->loaded())	// flag at least one missing
+	    if (f->loaded())
+	    {
+		one_font_present = true;
+		// Set the fallback font to be the first loaded font.
+		// Could be more sophisticated - first cmr10?
+		if (fallback_font == 0)
+		    fallback_font = f;
+	    }
+	    else		// flag at least one missing
 		all_fonts_present = false;
 	    if (show_font_list > 0)
 		if (show_font_list > 1 || !f->loaded())
@@ -240,8 +252,14 @@ main (int argc, char **argv)
 		}
 	}
 
+
 	if (do_process_file)
-	    process_dvi_file (dvif, bm, resolution);
+	{
+	    if (!one_font_present) // give up!
+		cerr << progname << ": no fonts found!  Giving up\n";
+	    else
+		process_dvi_file (dvif, bm, resolution, fallback_font);
+	}
 
     }
     catch (DviBug& e)
@@ -255,116 +273,128 @@ main (int argc, char **argv)
 
     // Exit non-zero if we were just checking the pre- and postambles,
     // and we found some missing fonts
-    if (!do_process_file && !all_fonts_present)
+    if (!one_font_present || (!do_process_file && !all_fonts_present))
 	exit (1);
     else
 	exit (0);
 }
 
-void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution)
+void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
+		       const PkFont *fallback_font)
 {
-	DviFilePostamble *post;
-	DviFileEvent *ev;
-	const PkFont *curr_font;
-	int pagenum = 0;
-	string output_filename = "";
-	do
-	{
-	    PkGlyph *glyph;
-	    Bitmap *bitmap;
+    DviFileEvent *ev;
+    const PkFont *curr_font = 0;
+    int pagenum = 0;
+    string output_filename = "";
+    Bitmap *bitmap = 0;
+    bool end_of_file = false;
 
-	    ev = dvif->getEvent();
-	    if (verbosity > 2)
-		ev->debug();
-	    if (DviFilePage *page = dynamic_cast<DviFilePage*>(ev))
-		if (page->isStart)
-		    bitmap = new Bitmap (dvif->hSize(), dvif->vSize());
-		else
-		{
-		    pagenum++;
-		    if (bitmap->empty())
-		    {
-			if (verbosity > 0)
-			    cerr << "Warning: page " << pagenum
-				 << " empty: nothing written\n";
-		    }
-		    else
-		    {
-			bitmap->crop();
-			if (b.blur_bitmap)
-			    bitmap->blur();
-			if (b.make_transparent)
-			    bitmap->setTransparent(true);
-			if (b.bitmap_scale_factor != 1)
-			    bitmap->scaleDown (b.bitmap_scale_factor);
-			if (output_filename.length() == 0)
-			{
-			    char fn[100];
-			    sprintf (fn, b.ofile_pattern.c_str(), pagenum);
-			    output_filename = fn;
-			}
-			bitmap->write (output_filename, b.ofile_type);
-		    }
-		    output_filename = "";
+    while (! end_of_file)
+    {
+	PkGlyph *glyph;
 
-		    delete bitmap;
-		    bitmap = 0;
-		}
-	    else if (DviFileSetChar *sc = dynamic_cast<DviFileSetChar*>(ev))
+	ev = dvif->getEvent();
+	if (verbosity > 2)
+	    ev->debug();
+
+	if (DviFilePage *page = dynamic_cast<DviFilePage*>(ev))
+	    if (page->isStart)
+		bitmap = new Bitmap (dvif->hSize(), dvif->vSize());
+	    else
 	    {
-		glyph = curr_font->glyph(sc->charno);
-		if (verbosity > 1)
+		if (bitmap == 0)
+		    throw DviBug ("bitmap uninitialised at page end");
+		pagenum++;
+		if (bitmap->empty())
 		{
-		    cerr << "glyph `" << glyph->characterChar()
-			 << "\' (" << glyph->characterCode() << ')';
-		    if (verbosity > 2)
-			cerr << " size " << glyph->w() << 'x' << glyph->h()
-			     << " at position ("
-			     << dvif->currH() << ',' << dvif->currV() << ')';
-		    cerr << '\n';
-		}
-		// calculate glyph positions, taking into account the
-		// offsets for the bitmaps, and the (1in,1in)=(72pt,72pt)
-		// = (resolution px,resolution px) offset of the TeX origin.
-		int x = dvif->currH() + glyph->hoff() + resolution;
-		int y = dvif->currV() + glyph->voff() + resolution;
-		bitmap->paint (x, y,
-			       glyph->w(), glyph->h(),
-			       glyph->bitmap());
-	    }
-	    else if (DviFileSetRule *sr = dynamic_cast<DviFileSetRule*>(ev))
-	    {
-		int x = dvif->currH() + resolution;
-		int y = dvif->currV() + resolution;
-		bitmap->rule (x,y,sr->w, sr->h);
-	    }
-	    else if (DviFileFontChange *fc =
-		     dynamic_cast<DviFileFontChange*>(ev))
-		curr_font = fc->font;
-	    else if (DviFileSpecial* special =
-		     dynamic_cast<DviFileSpecial*>(ev))
-	    {
-		string_list *l = tokenise_string (special->specialString);
-		if (l->size() > 2
-		    && (*l)[0] == "dvi2bitmap"
-		    && (*l)[1] == "outputfile")
-		{
-		    output_filename = (*l)[2];
-		    if (verbosity > 1)
-			cerr << "special: outputfile="
-			     << output_filename << '\n';
-		}
-		else
 		    if (verbosity > 0)
-			cerr << "Warning: unrecognised special: "
-			     << special->specialString
-			     << '\n';
-		delete l;
-	    }
+			cerr << "Warning: page " << pagenum
+			     << " empty: nothing written\n";
+		}
+		else
+		{
+		    bitmap->crop();
+		    if (b.blur_bitmap)
+			bitmap->blur();
+		    if (b.make_transparent)
+			bitmap->setTransparent(true);
+		    if (b.bitmap_scale_factor != 1)
+			bitmap->scaleDown (b.bitmap_scale_factor);
+		    if (output_filename.length() == 0)
+		    {
+			char fn[100];
+			sprintf (fn, b.ofile_pattern.c_str(), pagenum);
+			output_filename = fn;
+		    }
+		    bitmap->write (output_filename, b.ofile_type);
+		}
+		output_filename = "";
 
-	    delete ev;
+		delete bitmap;
+		bitmap = 0;
+	    }
+	else if (DviFileSetChar *sc = dynamic_cast<DviFileSetChar*>(ev))
+	{
+	    if (curr_font == 0 || bitmap == 0)
+		throw DviBug ("curr_font or bitmap not initialised setting char");
+	    glyph = curr_font->glyph(sc->charno);
+	    if (verbosity > 1)
+	    {
+		cerr << "glyph `" << glyph->characterChar()
+		     << "\' (" << glyph->characterCode() << ')';
+		if (verbosity > 2)
+		    cerr << " size " << glyph->w() << 'x' << glyph->h()
+			 << " at position ("
+			 << dvif->currH() << ',' << dvif->currV() << ')';
+		cerr << '\n';
+	    }
+	    // calculate glyph positions, taking into account the
+	    // offsets for the bitmaps, and the (1in,1in)=(72pt,72pt)
+	    // = (resolution px,resolution px) offset of the TeX origin.
+	    int x = dvif->currH() + glyph->hoff() + resolution;
+	    int y = dvif->currV() + glyph->voff() + resolution;
+	    bitmap->paint (x, y,
+			   glyph->w(), glyph->h(),
+			   glyph->bitmap());
 	}
-	while (!(post = dynamic_cast<DviFilePostamble*>(ev)));
+	else if (DviFileSetRule *sr = dynamic_cast<DviFileSetRule*>(ev))
+	{
+	    int x = dvif->currH() + resolution;
+	    int y = dvif->currV() + resolution;
+	    bitmap->rule (x,y,sr->w, sr->h);
+	}
+	else if (DviFileFontChange *fc =
+		 dynamic_cast<DviFileFontChange*>(ev))
+	{
+	    const PkFont *f = fc->font;
+	    curr_font = (f->loaded() ? f : fallback_font);
+	}
+	else if (DviFileSpecial* special =
+		 dynamic_cast<DviFileSpecial*>(ev))
+	{
+	    string_list *l = tokenise_string (special->specialString);
+	    if (l->size() > 2
+		&& (*l)[0] == "dvi2bitmap"
+		&& (*l)[1] == "outputfile")
+	    {
+		output_filename = (*l)[2];
+		if (verbosity > 1)
+		    cerr << "special: outputfile="
+			 << output_filename << '\n';
+	    }
+	    else
+		if (verbosity > 0)
+		    cerr << "Warning: unrecognised special: "
+			 << special->specialString
+			 << '\n';
+	    delete l;
+	}
+	else if (DviFilePostamble *post
+		 = dynamic_cast<DviFilePostamble*>(ev))
+	    end_of_file = true;
+
+	delete ev;
+    }
 }
 
 DviError::DviError(const char *fmt,...)
@@ -415,7 +445,7 @@ string_list *tokenise_string (string str)
     if (verbosity > 1)
 	cerr << "tokenise_string: string=<" << str << ">\n";
     string_list *l = new string_list();
-    int i=0, wstart;
+    int unsigned i=0, wstart;
     // skip leading whitespace
     while (i < str.length() && isspace(str[i]))
 	i++;

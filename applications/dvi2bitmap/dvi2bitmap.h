@@ -16,7 +16,7 @@ class DviError {
  public:
     DviError(const string s) : problem_(s) { }
     DviError(const char *fmt, ...);
-    virtual void print() const;
+    void print() const;
     string problem() const { return problem_; }
  protected:
     DviError() { };

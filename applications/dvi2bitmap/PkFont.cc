@@ -39,7 +39,7 @@ PkFont::PkFont(unsigned int dvimag,
 	       unsigned int s,
 	       unsigned int d,
 	       string name)
-    : font_loaded_(false), seen_in_doc_(false), pkf_(0)
+    : pkf_(0), font_loaded_(false), seen_in_doc_(false)
 {
     font_header_.c = c;
     font_header_.s = s;
@@ -57,7 +57,7 @@ PkFont::PkFont(unsigned int dvimag,
 	path_ = pk_file_path;
 
 	pkf_ = new InputByteStream (path_, true);
-	for (int i=0; i<nglyphs_; i++)
+	for (unsigned int i=0; i<nglyphs_; i++)
 	    glyphs_[i] = 0;
 	read_font (*pkf_);
 	delete pkf_;		// don't need the file any more
@@ -419,7 +419,7 @@ PkGlyph::PkGlyph(unsigned int cc,
 		 PkRasterdata *rasterdata,
 		 PkFont *f) 
     : cc_(cc), w_(w), h_(h),
-      hoff_(hoff), voff_(voff), rasterdata_(rasterdata), font_(f),
+      hoff_(hoff), voff_(voff), font_(f), rasterdata_(rasterdata),
       longform_(false), bitmap_(0) 
 {
     tfmwidth_ = (double)tfmwidth/two20_ * f->designSize();
@@ -438,7 +438,7 @@ PkGlyph::PkGlyph(unsigned int cc,
 		 PkRasterdata *rasterdata,
 		 PkFont *f)
     : cc_(cc), w_(w), h_(h),
-      hoff_(hoff), voff_(voff), rasterdata_(rasterdata), font_(f),
+      hoff_(hoff), voff_(voff), font_(f), rasterdata_(rasterdata),
       longform_(true), bitmap_(0)
 {
     tfmwidth_ = (double)tfmwidth/(double)two20_ * f->designSize();
@@ -473,7 +473,7 @@ PkRasterdata::PkRasterdata(Byte opcode,
 			   const Byte *rasterdata, unsigned int len,
 			   unsigned int w, unsigned int h)
     : len_(len), w_(w), h_(h),
-      highnybble_(false), bitmap_(0)
+      bitmap_(0), highnybble_(false)
 {
     dyn_f_ = opcode >> 4;
     start_black_ = opcode&8;

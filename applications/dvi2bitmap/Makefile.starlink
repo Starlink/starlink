@@ -369,14 +369,14 @@ PKG_NAME = dvi2bitmap
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.0-1
+PKG_VERS = 1.0-2
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
 #  package from source (including this makefile, the associated mk
 #  script and any documentation files).
 
-SOURCE_FILES = $(PKG_NAME)_source.tar Makefile.starlink mk
+SOURCE_FILES = $(PKG_NAME)_source.tar Makefile.starlink mk README.distrib
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -388,7 +388,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar Makefile.starlink mk
 #  List of documentation files.
 #FIXME documentation is included within SGML source tree - OK?
 
-NEWS = $(PKG_NAME).news
+#NEWS = $(PKG_NAME).news
 
 ################################################################################
 #-------------------------------------------------------------------------------

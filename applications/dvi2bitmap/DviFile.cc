@@ -22,13 +22,13 @@
 int DviFile::verbosity_ = 1;
 
 DviFile::DviFile (string s, int res, double magmag)
-    : fileName_(s), resolution_(res), magmag_(magmag)
+    : fileName_(s), resolution_(res), magmag_(magmag), magfactor_(1.0)
 {
     PkFont::setResolution(res);
 
     try
     {
-	dvif_ = new InputByteStream (s);
+	dvif_ = new InputByteStream (s, false, ".dvi");
 	read_postamble();
 	//posStack_ = new PosStateStack(postamble_.s);
 	dvif_->seek(0);		// return to beginning
@@ -47,21 +47,17 @@ DviFile::~DviFile()
 // This is the routine which does most of the actual work.  It scans
 // through the file reading opcodes.  Most of these it handles itself,
 // but certain ones it handles by returning an event to the calling routine.
+// The last event it'll return is a DviFilePostamble event, and it'll return
+// 0 if called afterwards.
 DviFileEvent *DviFile::getEvent()
 {
-    /*
-    static DviFileSetChar setChar(this);
-    static DviFileSetRule setRule;
-    //static DviFileFontDef fontDef;
-    static DviFileFontChange fontChange;
-    static DviFileSpecial special;
-    static DviFilePage page;
-    static DviFilePreamble preamble;
-    static DviFilePostamble postamble;
-    */
     DviFileEvent *gotEvent = 0;	// non-zero when we've got an event
-    Byte opcode;
-    int i1, i2;
+    Byte opcode = 255;		// illegal opcode
+    int i1;
+    bool end_of_file = false;
+
+    if (end_of_file)
+	return 0;
 
     // Add in any pending update of the horizontal position.
     if (pending_hupdate_ != 0)
@@ -470,7 +466,9 @@ DviFileEvent *DviFile::getEvent()
 		}
 		break;
 	      case 248:		// post
+		// don't process it in any way
 		gotEvent = new DviFilePostamble();
+		end_of_file = true;
 		break;
 	      case 249:		// post_post
 		// This shouldn't happen within getEvent
@@ -809,7 +807,7 @@ void DviFile::check_duplicate_font (int ksize)
     else
 	number = getSIU(ksize);
 
-    unsigned int int4 = getUIU(4); // c
+    unsigned int unused_int4 = getUIU(4); // c
     unsigned int s = getUIU(4);	// s
     unsigned int d = getUIU(4);	// d
     int namelen = getSIU(1);	// a
@@ -846,14 +844,6 @@ const
 {
     cerr << 'R' << h << 'x' << w << '\n';
 }
-/*
-void DviFileFontDef::debug()
-const
-{
-    cerr << 'F' << number << ' ' << scale << '/' << size << ' '
-	 << fontdir << '/' << fontname << '\n';
-}
-*/
 void DviFileFontChange::debug()
 const
 {

@@ -26,10 +26,16 @@ int InputByteStream::verbosity_ = 1;
 
 // Open the requested file.  If preload is true, then open the file and
 // read it entire into memory, since the client will be seeking a lot.
-InputByteStream::InputByteStream (string s, bool preload)
+InputByteStream::InputByteStream (string s, bool preload, string tryext)
     : eof_(true), preloaded_(preload)
 {
-    fd_ = open (s.c_str(), O_RDONLY);
+    string fname = s;
+    fd_ = open (fname.c_str(), O_RDONLY);
+    if (fd_ < 0 && tryext.length() > 0)
+    {
+	fname += tryext;
+	fd_ = open (fname.c_str(), O_RDONLY);
+    }
     if (fd_ < 0)
 	throw InputByteStreamError ("can\'t open file " + s + " to read");
 
@@ -44,7 +50,7 @@ InputByteStream::InputByteStream (string s, bool preload)
     {
 	buflen_ = filesize_;
 	buf_ = new Byte[buflen_];
-	int bufcontents = read (fd_, buf_, buflen_);
+	unsigned int bufcontents = read (fd_, buf_, buflen_);
 	if (bufcontents != buflen_)
 	    throw InputByteStreamError ("Couldn't preload file");
 	eob_ = buf_ + bufcontents;

@@ -18,7 +18,7 @@ class InputByteStreamError : public DviError {
 
 class InputByteStream {
  public:
-    InputByteStream (string s, bool preload=false);
+    InputByteStream (string s, bool preload=false, string tryext="");
     ~InputByteStream();
     bool eof();
     Byte getByte(int n=1);
@@ -34,8 +34,8 @@ class InputByteStream {
     static void verbosity (int level) { verbosity_ = level; }
  private:
     int fd_;
-    int filesize_;
-    int buflen_;
+    unsigned int filesize_;
+    unsigned int buflen_;
     Byte *buf_;			// buffer
     Byte *p_;			// current position in buffer 
     Byte *eob_;			// end of buffer
