@@ -26,7 +26,8 @@ ira1_lamb.f ira1_orth.f ira1_prec.f ira_annul.f ira_close.f ira_convt.f \
 ira_creat.f ira_ctod.f ira_ctod1.f ira_dtoc.f ira_dtoc1.f ira_exprt.f \
 ira_find.f ira_geteq.f ira_init.f \
 ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f ira_seteq.f ira_trans.f \
-ira_write.f ira_read.f
+ira_write.f ira_read.f ira_idscs.f ira_idprojn.f ira_idepoch.f \
+ira_idprojp.f 
 
 ADAM_F_ROUTINES = \
 ira1_igtc1.f \
