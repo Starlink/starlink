@@ -1975,7 +1975,7 @@ sub handle_lib_objects
 	     }
 	   return ();
 	 }
-       elsif ($val =~ /^`[a-z_]*_link(_adam)?`$/)
+       elsif ($val =~ m{^`(\$\(srcdir\)/)?[a-z_]*_link(_adam)?`$})
          {
            # This is a Starlink extension.  It is common for Starlink
            # libraries to provide a short script, with a name matching
@@ -1987,6 +1987,12 @@ sub handle_lib_objects
            # of library options.  That may not even be feasible, since
            # we are quite possibly running automake before the library
            # in question has been installed.
+           #
+           # We don't want to open the door to any sort of scripts
+           # here, so have a very restrictive regexp.  We allow
+           # `X_link`, `X_link_adam` (where "X" is any sequence of
+           # letters and underscores), and either of these preceded by
+           # precisely "$(srcdir)/", which can be useful for testing targets.
            return ();
          }
        elsif ($val !~ /^\@.*\@$/)
