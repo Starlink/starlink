@@ -802,6 +802,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -881,6 +882,7 @@
       INCLUDE 'FIO_PAR'          ! FIO_ constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
       INCLUDE 'GRP_PAR'          ! GRP_ constants
+      INCLUDE 'ONE_ERR'          ! ONE_ constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -888,11 +890,9 @@
 *  External References:
       CHARACTER * ( 2 ) CHR_NTH  ! Ordinal abbreviation
 
-      INTEGER CON_FINDF          ! Find file from wildcarded list
-      INTEGER CON_FINDE          ! Routine for closing the file search
+      LOGICAL ONE_FIND_FILE      ! Find file from wildcarded list
 
-      EXTERNAL CON_FINDF
-      EXTERNAL CON_FINDE
+      EXTERNAL ONE_FIND_FILE
 
 *  Local Constants:
       INTEGER BLOCKF             ! Blocking factor
@@ -916,6 +916,7 @@
       CHARACTER * ( 5 ) FMTCON   ! Character form of a FMTCNV value
       CHARACTER * ( 255 ) FSPEC  ! File specification
       INTEGER FLEN               ! Length of filename part of FSPEC
+      LOGICAL FOUND              ! Found a wildcarded file?
       INTEGER EXTLEN             ! Length extension part of FSPEC
       CHARACTER * ( 255 ) IFSPEC ! Individual File specification
       INTEGER IPOSN              ! String index
@@ -1033,10 +1034,11 @@
          DO WHILE ( .NOT. LEAVE )
 
 *  Get a single FITS file that matches this specification.
-            ISTAT = CON_FINDF( FSPEC(1:FLEN), INFILE, IWILD )
+            FOUND = ONE_FIND_FILE( FSPEC(1:FLEN), .TRUE., INFILE, IWILD,
+     :           STATUS )
 
-*  Check if a file has been found.  Odd status is good, even is bad.
-            IF ( MOD( ISTAT, 2 ) .EQ. 1 ) THEN
+*  Check if a file has been found. Status can tell us this.
+            IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Inquire whether the file exists or not.  Since the wild carding has
 *  obtained the files, a non-existent file indicates that the file name
@@ -1068,7 +1070,10 @@
             ELSE
 
 *  Tidy up the file system when the list of files is exhausted.
-               ISTAT = CON_FINDE( IWILD )
+               CALL ONE_FIND_FILE_END( IWILD, STATUS )
+
+*  No files bad status should now be reset to good
+               IF (STATUS .EQ. ONE__NOFILES ) CALL ERR_ANNUL(STATUS)
 
 *  Go to the next GRP expression.
                LEAVE = .TRUE.

@@ -69,6 +69,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'FIO_PAR'          ! FIO_ public constants
+      INCLUDE 'ONE_ERR'          ! ONE_ public constants
 
 *  Arguments Given:
       INTEGER NSPEC
@@ -84,10 +85,8 @@
 *  External References:
       EXTERNAL CHR_LEN
       INTEGER CHR_LEN            ! Significant length of a string
-      EXTERNAL FIND_FILE
-      INTEGER FIND_FILE          ! Wild card file search routine
-      EXTERNAL FIND_FILE_END
-      INTEGER FIND_FILE_END      ! End wild card file search
+      EXTERNAL ONE_FIND_FILE
+      LOGICAL ONE_FIND_FILE          ! Wild card file search routine
 
 *  Local Constants:
       CHARACTER * ( 8 ) UNIX     ! Name of UNIX temporary file
@@ -103,9 +102,9 @@
       INTEGER IOERR              ! I/O error status
       INTEGER IOS                ! INQUIRE error status
       INTEGER ISPEC              ! Loop counter for file specifications
-      INTEGER ISTAT              ! Wild card search status
       INTEGER NC                 ! No. characters in file name
       LOGICAL OPENED             ! Has a file been opened?
+      LOGICAL FOUND              ! We have found a file
 
 *.
 
@@ -156,11 +155,11 @@
 
 *  Loop to obtain file names until no more are found.
 2        CONTINUE                ! Start of 'DO WHILE' loop
-         ISTAT = FIND_FILE( SSPEC, FNAME, ICONTX )
-         IF ( ISTAT .NE. 98692 ) THEN
+         FOUND = ONE_FIND_FILE( SSPEC, .TRUE.,FNAME, ICONTX, STATUS )
+         IF ( STATUS .EQ. SAI__OK) THEN
 
 *  When a file name is found, write it to the output unit.
-            IF ( ISTAT .EQ. 1 ) THEN
+            IF ( FOUND ) THEN
                NC = MAX( 1, CHR_LEN( FNAME ) )
                WRITE( UNIT, '( A )', IOSTAT = IOERR ) FNAME( : NC )
 
@@ -186,11 +185,15 @@
          END IF
 
 *  End the file search.
-         ISTAT = FIND_FILE_END( ICONTX )
+         CALL ONE_FIND_FILE_END( ICONTX, STATUS )
+
+*  Clear status if no more files
+         IF (STATUS .EQ. ONE__NOFILES) CALL ERR_ANNUL( STATUS )
+
 1     CONTINUE
 
 *  Arrive here if an error occurs.
 99    CONTINUE
 
-* @(#)sst_fwild.f   1.4   95/03/06 10:56:43   96/07/05 10:27:25
+* $Id$
       END

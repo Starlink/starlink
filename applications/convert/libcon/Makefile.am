@@ -18,7 +18,7 @@ F_ROUTINES = \
  con_wgasp.f con_wgrid.f con_wrpgm.f con_wrtif.f
 
 C_ROUTINES = con_cclos.c con_copen.c con_cwrit.c con_cwri2.c \
- con_findf.c bit_andub_c.c
+ bit_andub_c.c
 
 GEN_ROUTINES = $(DR_GEN_ROUTINES) $(WR_GEN_ROUTINES) $(DIR_GEN_ROUTINES) \
  $(DRLI_GEN_ROUTINES) $(N_GEN_ROUTINES) $(DL_GEN_ROUTINES) \
