@@ -134,7 +134,7 @@ void ITTInfo::interpolate(XColor* src, XColor* dest, int colorCount)
     int index, value;
     
     for (int i=0; i<colorCount; i++) {
-	index = (i * (MAX_ITT - 1))/(colorCount-1);
+	index = (i * (MAX_ITT - 1))/c;
         // PWD: modify to pick up last value.
 	value = (unsigned char)((value_[index]*c)+0.5);
 	dest[i].red = src[value].red;

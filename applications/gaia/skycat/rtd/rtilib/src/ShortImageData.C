@@ -33,7 +33,7 @@ void ShortImageData::initShortConversion()
     scaledLowCut_ = (short)lowCut_;
     scaledHighCut_ = (short)highCut_;
     if (haveBlank_)
-	scaledBlankPixelValue_ = blank_;
+      scaledBlankPixelValue_ = LOOKUP_BLANK; // PWD: use last bin
 }
 
 

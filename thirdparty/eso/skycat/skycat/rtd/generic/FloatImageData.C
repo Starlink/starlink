@@ -11,6 +11,7 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
+ * Peter W. Draper 15/03/99  Modified to use LOOKUP_BLANK for blank pixels.
  */
 
 #include <string.h>
@@ -29,7 +30,15 @@
 short FloatImageData::scaleToShort(float d) 
 {
     if (isnan(d))
-	return scaledBlankPixelValue_;
+	return LOOKUP_BLANK;
+
+    //  Blank pixel value is is special lookup table position. Note
+    //  Starlink uses a special value for floating point too (not a NaN).
+    if ( haveBlank_ ) {
+        if ( blank_ == d ) {
+            return LOOKUP_BLANK;
+        }
+    }
 
     short s;
     d = (d + bias_) * scale_;
@@ -69,7 +78,7 @@ void FloatImageData::initShortConversion()
     scaledLowCut_ = scaleToShort(lowCut_);
     scaledHighCut_ = scaleToShort(highCut_);
     if (haveBlank_)
-	scaledBlankPixelValue_ = scaleToShort(blank_);
+	scaledBlankPixelValue_ = LOOKUP_BLANK;
 }
 
 

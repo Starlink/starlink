@@ -11,6 +11,7 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
+ * Peter W. Draper 15/03/99  Blank bin is always 128
  */
 static const char* const rcsId="@(#) $Id: ByteImageData.C,v 1.8 1998/01/28 22:06:19 abrighto Exp $";
 
@@ -36,7 +37,7 @@ void ByteImageData::initShortConversion()
     scaledLowCut_ = (int)lowCut_;
     scaledHighCut_ = (int)highCut_;
     if (haveBlank_)
-	scaledBlankPixelValue_ = blank_;
+	scaledBlankPixelValue_ = 128;
 }
 
 

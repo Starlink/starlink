@@ -390,7 +390,6 @@ itcl::class rtd::RtdImage {
 	set ch [winfo height $canvas_]
 	set dw [$image_ dispwidth]
 	set dh [$image_ dispheight]
-
 	if {$cw != 1} {
 	    if {$dw < $cw && $dw} {
 		set x [expr (($dw-$cw)/2.0)/$dw]

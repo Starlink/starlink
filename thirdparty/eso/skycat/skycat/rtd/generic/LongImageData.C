@@ -15,8 +15,17 @@
  *                           Changed to use macro FITS_LONG as long is 
  *                           64 bit on alphas and the "long" integers
  *                           read in from FITS files are 32 bit.
+ *                 12/06/98  Modified derivation of scaled blank value
+ *                           to avoid problems with bias
+ *                           over/underflowing the value, when at an 
+ *                           extreme (I set this to -MIN_LONG_INT,
+ *                           minus the bias and it underflows).
+ *                 10/07/98  Stopped convertToShort. Still problems
+ *                           with blank pixels that I'm able to
+ *                           resolve. The scaled variant works fine.
+ *                 14/07/98  Added checks for blanks in convert and
+ *                           scale ToShort.
  */
-
 
 #include <string.h>
 #include <stdlib.h>
@@ -33,11 +42,23 @@
  */
 short LongImageData::convertToShort(FITS_LONG l) 
 {
-    register int s = l + bias_;
-    if (s < LOOKUP_MIN)
+    register FITS_LONG v = l + bias_;
+    short s;
+
+    //  If have blank pixels then test for this as cannot deal with
+    //  pixel values at extremes (these wrap and come out in strange
+    //  places).
+    if ( haveBlank_ ) {
+        if ( blank_ == l ) {
+            return LOOKUP_BLANK;
+        }
+    }
+    if (v < LOOKUP_MIN )
 	s = LOOKUP_MIN;
-    else if (s > LOOKUP_MAX)
+    else if (v > LOOKUP_MAX )
 	s = LOOKUP_MAX;
+    else 
+        s = (short) v;
     return s;
 }
 
@@ -48,6 +69,15 @@ short LongImageData::convertToShort(FITS_LONG l)
  */
 short LongImageData::scaleToShort(FITS_LONG l) 
 {
+    //  If have blank pixels then test for this as cannot deal with
+    //  pixel values at extremes (these wrap and come out in strange
+    //  places).
+    if ( haveBlank_ ) {
+        if ( blank_ == l ) {
+            return LOOKUP_BLANK;
+        }
+    }
+
     short s;
     double d = (l + dbias_) * scale_;
     if (d < 0.0 ) {
@@ -81,24 +111,26 @@ short LongImageData::scaleToShort(FITS_LONG l)
  */
 void LongImageData::initShortConversion() 
 {
-    if ((highCut_ - lowCut_) <= (LOOKUP_WIDTH)) {
-	// if a simple offset suffices 
-	scale_ = 1.0;
-	if ((lowCut_ >= LOOKUP_MIN) && (highCut_ <= LOOKUP_MAX)) {
-	    // if possible to truncate to short without bias, do so. 
-	    bias_ = 0;
-	} 
-	else {
-	    // offset by average to center within range 
-	    bias_ = (int)(-((lowCut_ + highCut_) / 2.0));
-	}
-	dbias_ = bias_;
-	scaledLowCut_ = convertToShort((FITS_LONG)lowCut_);
-	scaledHighCut_ = convertToShort((FITS_LONG)highCut_);
-	if (haveBlank_)
-	    scaledBlankPixelValue_ = convertToShort(blank_);
-    } 
-    else {
+//  PWD: removed this code as under/overflow problems lead to 
+//       occasionally strange images.
+//     if ((highCut_ - lowCut_) <= (LOOKUP_WIDTH)) {
+// 	// if a simple offset suffices 
+// 	scale_ = 1.0;
+// 	if ((lowCut_ >= LOOKUP_MIN) && (highCut_ <= LOOKUP_MAX)) {
+// 	    // if possible to truncate to short without bias, do so. 
+// 	    bias_ = 0;
+// 	} 
+// 	else {
+// 	    // offset by average to center within range 
+// 	    bias_ = (int)(-((lowCut_ + highCut_) / 2.0));
+// 	}
+// 	dbias_ = bias_;
+// 	scaledLowCut_ = convertToShort((FITS_LONG)lowCut_);
+// 	scaledHighCut_ = convertToShort((FITS_LONG)highCut_);
+// 	if (haveBlank_)
+// 	    scaledBlankPixelValue_ = convertToShort(blank_);
+//     } 
+//     else {
 	// full-up scaling required. (+/- (tmax-tmin)/2) 
 	// offset values to be zero centered 
 	scale_ = LOOKUP_WIDTH / (highCut_ - lowCut_);
@@ -107,8 +139,8 @@ void LongImageData::initShortConversion()
 	scaledLowCut_ = scaleToShort((FITS_LONG)lowCut_);
 	scaledHighCut_ = scaleToShort((FITS_LONG)highCut_);
 	if (haveBlank_)
-	    scaledBlankPixelValue_ = scaleToShort(blank_);
-    }
+	    scaledBlankPixelValue_ = LOOKUP_BLANK;
+ //    }
     // set int flag for later quick check if scale_ != 1.0
     scaled_ = (scale_ != 1.0);  // Sense inverted - PWD
 }
