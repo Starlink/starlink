@@ -53,6 +53,9 @@ install-%DIR%LIBRARIES: $(%DIR%_LIBRARIES)
 ?!BASE?	    f="$$p"; \
 	    echo " $(%DIR%LIBRARIES_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
 	    $(%DIR%LIBRARIES_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f; \
+	    if test -n "$$MANIFEST_FILE"; then \
+		echo "$(DESTDIR)$(%NDIR%dir)/$$f" >>$$MANIFEST_FILE; \
+	    else :; fi; \
 	  else :; fi; \
 	done
 ## We do two loops here so that $(POST_INSTALL) can be empty.  If we

@@ -47,6 +47,27 @@ install-%DIR%LTLIBRARIES: $(%DIR%_LTLIBRARIES)
 ?LIBTOOL?	    $(LIBTOOL) --mode=install $(%DIR%LTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(%NDIR%dir)/$$f; \
 ?!LIBTOOL?	    echo " $(%DIR%LTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
 ?!LIBTOOL?	    $(%DIR%LTLIBRARIES_INSTALL) $(INSTALL_STRIP_FLAG) $$p $(DESTDIR)$(%NDIR%dir)/$$f; \
+## Install the .la file, then use its contents to determine the names of
+## the files which were installed.  The .la file consists of a sequence of
+## variable settings.  Is this part of the published interface of libtool?
+## The libtool manual suggests searching for the string "dlname='<dlname>'"
+## at one point, so presumably it is to some extent.  I think we can 
+## guarantee that the $p are all .la files -- so fail noisily if this isn't
+## the case.
+	    if test -n "$$MANIFEST_FILE"; then \
+		    echo "$(DESTDIR)$(%NDIR%dir)/$$f" >>$$MANIFEST_FILE; \
+	    else :; fi; \
+	    expr $$p : '.*\.la$$' >/dev/null || \
+		{ echo "Installing non-la file!"; exit 1; }; \
+	    (. $$p; \
+		  if test -n "$$library_names"; then \
+		      for l in $$library_names; do \
+		          echo "$$libdir/$$l" >>$$MANIFEST_FILE; \
+		      done; \
+		  else :; fi; \
+		  if test -n "$$old_library"; then \
+		      echo "$$libdir/$$old_library" >>$$MANIFEST_FILE; \
+		  else :; fi; ); \
 	  else :; fi; \
 	done
 endif %?INSTALL%
