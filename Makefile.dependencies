@@ -243,15 +243,19 @@ $(MANIFEST)/chart: \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/ifd \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/pcs \
+		$(MANIFEST)/pda \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
-		$(MANIFEST)/star2html
+		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx
 	cd applications/obsolete/chart \
 	  && $(MAKE_CPT)
 
