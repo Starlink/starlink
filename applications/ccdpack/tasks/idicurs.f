@@ -92,13 +92,20 @@
 *        This list will become associated with the named NDF, and
 *        may use modifications of the input NDF name.
 *        [*.lis]
-*     PERCENTILES( 2 ) = _DOUBLE (Read and Write)
+*     PERCENTILES( 2 ) = DOUBLE (Read and Write)
 *        The low and high percentiles of the data range to use when 
 *        displaying the images; any pixels with a value lower than 
 *        the first value will have the same colour, and any with a value
 *        higher than the second will have the same colour.  Must be in
 *        the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) <= 100.
 *        [2,98]
+*     SHOWIND = LOGICAL (Read)
+*        If true, then the index numbers will be displayed on the image
+*        for each point marked, and it will be possible to choose 
+*        the index number for each point.  If false, points will not
+*        be numbered on the display, and will be written to the 
+*        position list in (roughly) the order in which they are entered.
+*        [FALSE]
 *     WINX = INTEGER (Read and Write)
 *        The width in pixels of the window to display the image and
 *        associated controls in.  If the image is larger than the area
@@ -217,6 +224,7 @@
       INTEGER NNDF               ! Number of NDFs in group
       INTEGER WINDIM( 2 )        ! Dimensions of display window
       LOGICAL LOPEN              ! True if output file is open
+      LOGICAL SHOIND             ! True if index numbers are to be plotted
       DOUBLE PRECISION PERCNT( 2 ) ! Low and high percentiles for display
       DOUBLE PRECISION XPOS( MAXPOS ) ! X coordinates of positions in list
       DOUBLE PRECISION YPOS( MAXPOS ) ! Y coordinates of positions in list
@@ -238,11 +246,12 @@
       CALL NDF_BEGIN
 
 *  Get display preference parameters from the parameter system.
+      CALL PAR_GET0L( 'SHOWIND', SHOIND, STATUS )
+      CALL PAR_EXACD( 'PERCENTILES', 2, PERCNT, STATUS )
       CALL PAR_GET0D( 'ZOOM', ZOOM, STATUS )
       CALL PAR_GET0I( 'MAXCANV', MAXCNV, STATUS )
       CALL PAR_GET0I( 'WINX', WINDIM( 1 ), STATUS )
       CALL PAR_GET0I( 'WINY', WINDIM( 2 ), STATUS )
-      CALL PAR_EXACD( 'PERCENTILES', 2, PERCNT, STATUS )
 
 *  Get a group of NDFs from the parameter system.
       CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, NDFGR, NNDF, STATUS )
@@ -274,9 +283,9 @@
          IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Invoke the Tcl code to do the work.
-         CALL CCD1_TCURS( NDFNAM( 1:CHR_LEN( NDFNAM ) ), MAXPOS, PERCNT,
-     :                    ZOOM, MAXCNV, WINDIM, XPOS, YPOS, NPOS, 
-     :                    STATUS )
+         CALL CCD1_TCURS( NDFNAM( 1:CHR_LEN( NDFNAM ) ), MAXPOS, SHOIND, 
+     :                    PERCNT, ZOOM, MAXCNV, WINDIM, ID, XPOS, YPOS,
+     :                    NPOS, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Access the output file in which to store the positions.  The name
@@ -288,9 +297,6 @@
 
 *  Write header to output position list file.
          CALL CCD1_FIOHD( FD, 'Output from IDICURS', STATUS )
-
-*  Initialise list of postion identifiers.
-         CALL CCD1_GISEQ( 1, 1, NPOS, ID, STATUS )
 
 *  Write position data to output list file.
          CALL CCD1_WRIXY( FD, ID, XPOS, YPOS, NPOS, LINE, CCD1__BLEN,

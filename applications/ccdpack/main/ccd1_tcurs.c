@@ -9,9 +9,10 @@
 
 
    F77_SUBROUTINE(ccd1_tcurs)( CHARACTER(ndfnam), INTEGER(maxpos), 
-                               DOUBLE_ARRAY(percnt), DOUBLE(zoom), 
-                               INTEGER(maxcanv), INTEGER(windim),
-                               DOUBLE(xpos), DOUBLE(ypos), INTEGER(npos), 
+                               LOGICAL(shoind), DOUBLE_ARRAY(percnt), 
+                               DOUBLE(zoom), INTEGER(maxcanv), INTEGER(windim),
+                               INTEGER_ARRAY(id), DOUBLE_ARRAY(xpos), 
+                               DOUBLE_ARRAY(ypos), INTEGER(npos), 
                                INTEGER(status)
                                TRAIL(ndfnam) ) {
 /*
@@ -26,8 +27,8 @@
 *     ANSI C.
 
 *  Invocation:
-*     CALL CCD1_TCURS( NDFNAM, MAXPOS, PERCNT, ZOOM, MAXCANV, WINDIM, 
-*                      XPOS, YPOS, NPOS, STATUS )
+*     CALL CCD1_TCURS( NDFNAM, MAXPOS, SHOIND, PERCNT, ZOOM, MAXCANV,
+*                      WINDIM, XPOS, YPOS, NPOS, STATUS )
 
 *  Description:
 *     This routine calls a Tcl script which displays an NDF in a window
@@ -44,6 +45,8 @@
 *        Name of an NDF to use.
 *     MAXPOS = INTEGER (Given)
 *        The size of the XPOS and YPOS arrays.
+*     SHOIND = LOGICAL (Given)
+*        True if index numbers are to be plotted along with the points.
 *     PERCNT( 2 ) = DOUBLE PRECISION (Given and Returned)
 *        Lower and higher percentiles to use in displaying the images.
 *        They should satisfy 0 <= PERCNT( 0 ) <= PERCNT( 1 ) <= 100.
@@ -55,6 +58,8 @@
 *        is to be displayed (if zero there is no limit).
 *     WINDIM( 2 ) = INTEGER (Given and Returned)
 *        Dimensions of the window used for display.
+*     ID( MAXPOS ) = INTEGER (Returned)
+*        The index idenfiers for the positions selected.
 *     XPOS( MAXPOS ) = DOUBLE PRECISION (Returned)
 *        X coordinates of the positions selected.
 *     YPOS( MAXPOS ) = DOUBLE PRECISION (Returned)
@@ -85,10 +90,12 @@
 /* Arguments. */
       GENPTR_CHARACTER(ndfnam)
       GENPTR_INTEGER(maxpos)
+      GENPTR_LOGICAL(shoind)
       GENPTR_DOUBLE(zoom)
       GENPTR_DOUBLE_ARRAY(percnt)
       GENPTR_INTEGER(maxcanv)
       GENPTR_INTEGER_ARRAY(windim)
+      GENPTR_INTEGER_ARRAY(id)
       GENPTR_DOUBLE_ARRAY(xpos)
       GENPTR_DOUBLE_ARRAY(ypos)
       GENPTR_INTEGER(npos)
@@ -110,6 +117,7 @@
       cnfImprt( ndfnam, ndfnam_length, ndfnam );
       ccdTclSetC( cinterp, "NDFNAME", ndfnam, status );
       ccdTclSetI( cinterp, "MAXPOS", *maxpos, status );
+      ccdTclSetI( cinterp, "SHOWIND", F77_ISTRUE(*shoind) ? 1 : 0, status );
       ccdTclSetD( cinterp, "ZOOM", *zoom, status );
       ccdTclSetD( cinterp, "PERCLO", percnt[ 0 ], status );
       ccdTclSetD( cinterp, "PERCHI", percnt[ 1 ], status );
@@ -126,8 +134,10 @@
          char *fmt = "lindex [ lindex $POINTS %d ] %d";
          for ( i = 0; i < *npos && i < *maxpos; i++ ) {
             sprintf( buffer, fmt, i, 0 );
-            ccdTclGetD( cinterp, buffer, xpos + i, status );
+            ccdTclGetI( cinterp, buffer, id + i, status );
             sprintf( buffer, fmt, i, 1 );
+            ccdTclGetD( cinterp, buffer, xpos + i, status );
+            sprintf( buffer, fmt, i, 2 );
             ccdTclGetD( cinterp, buffer, ypos + i, status );
          }
          ccdTclGetD( cinterp, "set ZOOM", zoom, status );

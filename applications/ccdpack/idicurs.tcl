@@ -29,6 +29,10 @@
 #     POINTS = list of pairs (Returned)
 #        A list of the pixel coordinates indicated by the user on the NDF.
 #        Each element of the list is of the form {X Y}.
+#     SHOWIND = integer (Given)
+#        If true (non-zero), then the index numbers of each point will be
+#        displayed.  Otherwise only markers representing the points 
+#        themselves will be plotted.
 #     WINX = integer (Given and Returned)
 #        X dimension of the window used for NDF display.
 #     WINY = integer (Given and Returned)
@@ -60,7 +64,7 @@
                       -percentiles [ list $PERCLO $PERCHI ] \
                       -watchstate viewstate \
                       -zoom $ZOOM \
-                      -uselabels 0 \
+                      -uselabels $SHOWIND \
                       -maxpoints $MAXPOS
       .viewer configure -geometry ${WINX}x${WINY}
 
@@ -81,10 +85,19 @@
       set PERCLO [ lindex [ .viewer cget -percentiles ] 0 ]
       set PERCHI [ lindex [ .viewer cget -percentiles ] 1 ]
 
-#  Set the return variable to contain the list of points selected.
-      set POINTS {} 
-      foreach point [ .viewer points ] {
-         lappend POINTS [ lrange $point 1 2 ]
+#  Set the return variable to contain the list of points selected.  If 
+#  If we were displaying the indices then return the list with the indices
+#  as plotted, otherwise return the list with indices starting from unity
+#  and increasing to the number of points plotted.
+      if { $SHOWIND } {
+         set POINTS [ .viewer points ]
+      } else {
+         set POINTS {}
+         set i 0
+         foreach point [ .viewer points ] {
+            lappend POINTS [ list [ incr i ] [ lindex $point 1 ] \
+                                             [ lindex $point 2 ] ]
+         }
       }
 
 #  Free resources.

@@ -61,6 +61,17 @@
             size *
          }
 
+         parameter showind {
+                            # Show point index numbers
+            type _LOGICAL
+            access UPDATE
+            vpath CURRENT PROMPT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Display index numbers for marked points?}
+            helpkey *
+         }
+
          parameter zoom {
                          # Zoom factor
             type _DOUBLE
