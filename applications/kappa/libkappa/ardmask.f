@@ -86,7 +86,7 @@
 *     -  All non-complex numeric data types can be handled.
 
 *  Related Applications:
-*     KAPPA: ARDGEN.
+*     KAPPA: ARDGEN, ARDQUAL.
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
@@ -109,6 +109,9 @@
 *        TITLE a parameter.
 *     1996 July 31 (MJC):
 *        Made ARDFILE have type FILENAME for IRAF usage.
+*     1997 December 12 (MJC):
+*        Sets the bad-pixel flag to indicate the possible presence of
+*        bad pixels in the output dataset.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
 *     {enter_further_changes_here}
@@ -348,13 +351,16 @@
 
       END IF
 
-*   Free the dynamic array space of the logical mask.
+*  Set the bad-pixel flag.
+      CALL NDF_SBAD( .TRUE., NDFO, 'Data', STATUS )
+
+*  Free the dynamic array space of the logical mask.
       CALL PSX_FREE( POINT2( 1 ), STATUS )
 
 *  Close down the group used to hold the pixel mask.
       CALL GRP_DELET( IGRP, STATUS )
 
-*   End the NDF context.
+*  End the NDF context.
       CALL NDF_END( STATUS )                              
 
       END
