@@ -62,6 +62,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,6 +71,8 @@
 *     1995 April 11 (MJC):
 *        Made generic, n-dimensional, and renamed from KPS1_FLXYR.
 *        Added POSCOD and bounds arguments, and message reporting. 
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -86,6 +89,7 @@
       INCLUDE 'MSG_PAR'          ! MSG_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'FIO_ERR'          ! FIO_ error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) PNAME
@@ -183,7 +187,8 @@
 *  Read positions from the input list, starting at the beginning and
 *  reading them all.
       COUNT = 1
-      CALL KPG1_RFCO<T>( FD, NDIM, NPOINT, POSCOD, COUNT, %VAL( IPCO ),
+      CALL KPG1_RFCO<T>( FD, NDIM, NPOINT, POSCOD, COUNT, 
+     :                   %VAL( CNF_PVAL( IPCO ) ),
      :                   LBND, UBND, CMPLET, STATUS )
 
 *  Report the number of positions read and the file name.
