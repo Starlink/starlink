@@ -9,10 +9,9 @@ INTERFACE HWRITE
       help 'Full name of data object for data to be written from'
    endparameter
 
-   parameter FILNAM
+   parameter FILE
       position 2
       type '_CHAR'
-      keyword 'FILE'
       prompt 'Filename'
       help 'The name of the ASCII file that the data values are to be read from'
    endparameter

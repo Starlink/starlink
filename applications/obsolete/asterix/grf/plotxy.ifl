@@ -92,7 +92,6 @@
    endparameter
    parameter PRINT
      type '_LOGICAL'
-     keyword 'PRINT'
      vpath 'DEFAULT'
      default N
      prompt 'Print out plot'
@@ -100,7 +99,6 @@
    endparameter
    parameter DELETE
      type '_LOGICAL'
-     keyword 'DELETE'
      vpath 'DEFAULT'
      default Y
      prompt 'Delete bit-file'

@@ -7,10 +7,9 @@
       help 'Full path name of object to be modified'
       association '<->GLOBAL.HDSOBJ' 
    endparameter                      
-   parameter VALUES                  
+   parameter VAL
      type 'UNIV'                     
      position 2                      
-     keyword 'VAL'                   
      prompt 'New values'             
      help 'Values to be assigned to object' 
    endparameter                             

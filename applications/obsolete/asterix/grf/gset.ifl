@@ -9,7 +9,6 @@ interface GSET
      position 2
      type 'UNIV'
      ppath 'GLOBAL'
-     keyword 'INP'
      prompt 'Dataset'
      association '<->GLOBAL.BINDS'
    endparameter
@@ -176,7 +175,6 @@ interface GSET
      help 'Do you wish to use the colour table screen editor'
    endparameter
    parameter LEVELS
-     keyword 'LEVELS'
      type '_REAL'
      default !
      prompt 'Levels'
