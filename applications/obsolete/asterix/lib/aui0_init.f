@@ -78,17 +78,15 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'AUI_CMN'                                 ! TCI globals
-*        AUI_INIT = LOGICAL (given and returned)
-*           AUI definitions load attempted?
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'AST_PKG'
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
       EXTERNAL			AUI1_WRITE
 
 *  Local Variables:
@@ -99,13 +97,14 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check not already initialised?
-      IF ( .NOT. AUI_INIT ) THEN
+      IF ( .NOT. AST_QPKGI( AUI__PKG ) ) THEN
 
 *  Define methods to write auxilliary data
         CALL ADI_DEFMTH( 'WriteAux(_HDSfile,_CHAR,_)', AUI1_WRITE, DID,
      :                   STATUS )
 
-        AUI_INIT = .TRUE.
+*  Flag as initialised
+        CALL AST_SPKGI( AUI__PKG )
 
       END IF
 

@@ -88,17 +88,12 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          			! SAE constants
-
-*  Global Variables:
-      INCLUDE 'AUI_CMN'                 ! ASTERIX AUI common block
-*       AUI_INIT = LOGICAL (given)
-*         AUI class definitions loaded?
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
-      INTEGER			ID			! Dataset identifier
-      CHARACTER*(*)		NAME			! Attribute name
-      INTEGER			VID			! Attribute value
+      INTEGER			ID, VID
+      CHARACTER*(*)		NAME
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -112,7 +107,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. AUI_INIT ) CALL AUI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( AUI__PKG ) ) CALL AUI0_INIT( STATUS )
 
 *  First method argument is the base file of the input dataset
       CALL ADI_GETFILE( ID, ARGS(1), STATUS )
