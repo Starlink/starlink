@@ -416,9 +416,10 @@
 	      CALL MSG_PRNT('Effective exposure time not found - '//
      :          'using EXPOSURE_TIME value of ^TEFF')
             ELSE
-	      CALL ERR_REP(' ','No exposure times found in dataset',
-     :          STATUS)
-	      GOTO 99
+              CALL ERR_ANNUL( STATUS )
+              CALL MSG_PRNT( 'WARNING : No exposure times found in'/
+     :                   /' dataset, exposure of 1 second assumed' )
+              TEFF = 1.0
 	    END IF
           END IF
 
