@@ -1008,14 +1008,16 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
      :        .AND. ( QX .EQ. 0.0 ) .AND. ( QY .EQ. 0.0 ) )
 
 *    Defined energy band?
-      IF ( RX_PHA_DEF(SLOT) ) THEN
+      IF ( AS_PHA_DEF(SLOT) ) THEN
         IF ( AS_INSTR(SLOT) .EQ. 'SIS' ) THEN
-          ENERGY = REAL(RX_PHALO(SLOT)) * SIS_GAIN
+          ENERGY = (REAL(AS_PHALO(SLOT)) + REAL(AS_PHAHI(SLOT)))*
+     :              SIS_GAIN/2.0
         ELSE
-          ENERGY = REAL(RX_PHALO(SLOT)) * GIS_GAIN
+          ENERGY = (REAL(AS_PHALO(SLOT)) + REAL(AS_PHAHI(SLOT)))*
+     :              GIS_GAIN/2.0
         END IF
       ELSE
-        ENERGY = RX_ENERGY(SLOT)
+        ENERGY = AS_ENERGY(SLOT)
       END IF
 
 *    SIS detector?
@@ -1026,13 +1028,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       ELSE
 
         SIS = .FALSE.
-
-*      Defined energy band?
-        IF ( AS_PHA_DEF(SLOT) ) THEN
-          ENERGY = REAL(AS_PHALO(SLOT))
-        ELSE
-          ENERGY = AS_ENERGY(SLOT)
-        END IF
 
 *      Use energy value to choose number of GIS evaluations.
         IF ( ENERGY .LE. 2.0 ) THEN
