@@ -15,12 +15,16 @@ use FileHandle;
 # Unbuffered
 $| = 1;
 
+# Good status
+$SAI__OK = &Starlink::ADAM::SAI__OK;
+
 # Setup a signal handler.
 # We need this in order to shut down the relay cleanly if 
 # we are not sent a proper shutdown request
 
 $SIG{'TERM'} = \&shutdown;
 $SIG{'INT'}  = \&shutdown;
+$SIG{'HUP'}  = \&shutdown;
 
 
 # Open a log
@@ -36,12 +40,15 @@ $name = shift;
 $myname = $name . "_relay";
 
 #print LOG "Starting ADAM\n";
-adam_start $myname;
+$status = adam_start $myname;
+die "Error starting AMS" if $status != $SAI__OK;
 
 # Send an initial OBEY to perl
 
 #print LOG "Sending obey to parent\n";
-($path, $messid) = adam_send($name, action, "OBEY", "");
+($path, $messid, $status) = adam_send($name, action, "OBEY", "");
+
+\&shutdown if $status != $SAI__OK;
 
 # Fetch the reply to the obey
 #print LOG "Waiting for reply from parent\n";
