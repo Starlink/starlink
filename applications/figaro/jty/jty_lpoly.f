@@ -1,0 +1,13 @@
+      REAL FUNCTION JTY_LPOLY(X,SCALE,NCOEFF,COEFF)
+
+      REAL*8 COEFF(1)
+      REAL*8 TEMP, Z, JTY_LPI
+      REAL*4 SCALE(1)
+
+      Z = SCALE(1) * (X - SCALE(2))
+      TEMP = 0
+      DO 10 I = 1,NCOEFF
+10    TEMP = TEMP + COEFF(I) * JTY_LPI(I,Z)
+      JTY_LPOLY = TEMP
+      RETURN
+      END
