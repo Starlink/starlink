@@ -11,8 +11,21 @@
 #source /star/bin/kappa/kappa.csh >& /dev/null
 #set kap = ""
 #set sur = ""
-set kap = /star/bin/kappa/
-set sur = /star/bin/surf/
+#set kap = /star/bin/kappa/
+#set sur = /star/bin/surf/
+
+# Check that a STARLINK login has been completed
+# Can do this simply by checking $SURF_DIR exists
+# This will stop us hardwiring path to kappa and surf
+
+if ($?SURF_DIR) then
+   set sur = ${SURF_DIR}
+   set kap = ${KAPPA_DIR}
+else
+  echo 'Error: Starlink system has not been initialised.'
+  exit
+endif
+
 
 set prog = `echo $0 | awk -F\/ '{print $NF}' | tr '[A-Z]' '[a-z]'`
 set mode = `echo $prog | cut -c1`
@@ -667,6 +680,9 @@ exit
 *
 *  History:
 *     $Log$
+*     Revision 1.3  1998/06/15 20:22:30  timj
+*     Use $SURF_DIR and $KAPPA_DIR
+*
 *     Revision 1.2  1998/06/15 20:18:27  timj
 *     Fix -h option (RPT)
 *
