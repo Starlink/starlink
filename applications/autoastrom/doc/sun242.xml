@@ -31,6 +31,9 @@
       <distribution string="v0-4" date="5-Nov-2001" author="ng">
 	<px>Release of v0.4, tagged autoastrom-0-4.</px>
       </distribution>
+      <distribution string="v0-5-1" date="20-Feb-2003" author="ng">
+        <px>Release of v0.5-1</px>
+      </distribution>
     </history>
   </docinfo>
 

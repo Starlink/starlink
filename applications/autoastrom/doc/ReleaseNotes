@@ -1,6 +1,20 @@
 <!-- $Id$ -->
 
 
+<subsect id="release-0.5-1" export="export">
+<subhead><title>Version 0.5-1</title></subhead>
+
+<p>Changes since version 0.5:
+<ul>
+  <li>Fixed typo in function name which made some informational
+    messages fatal.</li>
+  <li>Extractor sometimes claims to detect objects with a negative flux
+    -- such objects are now silently ignored.</li>
+  <li>Assorted changes to configuration to make it more robust.</li>
+</ul>
+</p>
+</subsect>
+
 <subsect id="release-0.5" export="export">
 <subhead><title>Version 0.5</title></subhead>
 
