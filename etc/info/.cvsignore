@@ -1,0 +1,15 @@
+Makefile
+Makefile.in
+acinclude.m4
+aclocal.m4
+adam_packages.shl
+autom4te.cache
+config.log
+config.status
+configure
+cshrc
+login
+starconf.m4
+starconf.status
+starconf.status.local
+
