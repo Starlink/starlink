@@ -60,8 +60,11 @@
 *          or type qualifiers, it is implicitly of type int, and so 
 *          should become delcared as INT_BIG.  This program does not 
 *          find these.  Such implicit declarations (only?) occur in 
-*          function declarations.  The Tru64 Unix C compiler's "-proto" 
+*          function declarations.  The Tru64 Unix C compiler's "-protois" 
 *          flag is useful for identifying these.
+*
+*     The program tries to adjust spacing so that the output looks OK.
+*     It currently does not cope will with tab characters however.
 *       
 *  Notes:
 *     Although this program behaves as a filter, it is written on
@@ -645,11 +648,11 @@
          }
 
 /* Set categories of token which will be useful. */
-#define TYPES      VOID, CHAR, SHORT, INT, LONG, FLOAT, DOUBLE, STRUCT, ENUM
+#define TYPES      VOID, CHAR, SHORT, INT, LONG, FLOAT, DOUBLE, \
+                   STRUCT, UNION, ENUM
 #define TYPEQUALS  AUTO, REGISTER, STATIC, EXTERN, CONST, VOLATILE, SIGNED, \
                    UNSIGNED, TYPEDEF
-#define AFTERDEC   (int) ';', (int) ',', (int) '[', (int) '(', (int) ')', \
-                   (int) '*'
+#define AFTERDEC   (int) ';', (int) ',', (int) '[', (int) '(', (int) ')'
 
 /* Check for occurrences of int which are implicit in lists of type 
    qualifiers, e.g. 'static unsigned', which really means 
@@ -662,13 +665,15 @@
    tokens.  Now work backwards, skipping over type qualifier tokens. */
                  for ( j = i - 1; tokoneof( tbuf + j, TYPEQUALS, 0 ); j-- );
 
-/* If the previous token is a known type, then we don't have an implicit
-   int, so we don't need to do nothing.  If it is an identifier, then it
-   might be a typedef'd type, so we don't do anything.  If it's a close
-   brace, then it must(?) be an enum or a struct there.  If it is anything
-   else, we should append an INT_BIG specifier to the end of the list. */
+/* If the previous token is one of the following:
+      known type:   type declaration is explicit
+      identifier:   might be a typedef'd type
+      close brace:  must(?) be an enum or a struct
+      asterisk:     part of a complicated pointer declaration
+   we don't have implicit int, so we don't have to do anything.
+   Otherwise, we should append an INT_BIG specifier to the end of the list. */
                  if ( ! tokoneof( tbuf + j, TYPES, IDENTIFIER, 
-                                            (int) '}', 0 ) ) {
+                                            (int) '}', (int) '*', 0 ) ) {
                     tbuf[ i ].interp = " INT_BIG";
                  }
             }
