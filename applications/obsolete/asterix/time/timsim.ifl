@@ -1,6 +1,6 @@
  INTERFACE TIMSIM
     PARAMETER OUT
-       TYPE      '_UNIVERSAL'
+       TYPE      'LITERAL'
        POSITION  1
        PROMPT    'Enter name of output file'
        HELP      'No file name extension (e.g. .sdf) is needed'
@@ -20,7 +20,7 @@
     ENDPARAMETER
 
     PARAMETER INP
-       TYPE      '_UNIVERSAL'
+       TYPE      'LITERAL'
        PROMPT    'Enter name of input file containing axis required'
        HELP      'No file name extension (e.g. .sdf) is needed'
        PPATH     'CURRENT'
