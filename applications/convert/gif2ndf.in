@@ -1,0 +1,135 @@
+
+#  The line above is intentionally blank
+#+
+#  Name:
+#     gif2ndf
+ 
+#  Purpose:
+#     Converts a GIF-format file into an NDF 
+ 
+#  Type of Module:
+#     Bourne shell script
+  
+#  Usage:
+#     gif2ndf in [out]
+
+#  Parameters:
+#     IN = FILENAME (Read)
+#        The name of the GIF file to be converted (without the .gif extension
+#        which is assumed).
+#
+#     OUT = NDF (Write)
+#        The name of the NDF to be generated (without the .sdf extension).
+#        If the OUT parameter is omitted, the value of the IN parameter
+#        is used.
+
+#  Description:
+#     This Bourne shell script converts a Graphics Interchange Format (GIF)
+#     file into a 256 grey-level Starlink NDF image format file.
+#     One or two-dimensional images can be handled
+#     The script uses various PBMPLUS utilities to produce a FITS file 
+#     and then KAPPA applications FITSDIN, MATHS and FLIP to produce the
+#     final NDF. Error messages are converted into Starlink style (preceded
+#     by !).
+ 
+#  Examples:
+#     gif2ndf old new
+#        This converts the GIF file old.gif into an NDF called new
+#        (in file new.sdf).
+#     gif2ndf horse
+#        This converts the GIF file horse.gif into an NDF called horse
+#        (in file horse.sdf).
+
+#  Related Applications:
+#     CONVERT: NDF2GIF
+
+#  Notes:
+#     This initial version of the script generates images with at most
+#     256 grey levels. It does not use the image colour lookup table.
+#
+#     Input image filenames must have the extension .gif.
+#
+#     The PBMPLUS utilities giftopnm, ppmtopgm and pgmtofits 
+#     must be available on your PATH.
+ 
+#  Authors:
+#     MJC: M.J.Currie (Starlink - RAL)
+#     GJP: G.J.Privett (Starlink - UWCC)
+#     AJC: A.J.Chipperfield (Starlink - RAL)
+#     {enter_new_authors_here}
+ 
+#  History:
+#     28-NOV-1995 (AJC):
+#        Original version
+#        Based on work by MJC and GJP
+
+#  Bugs:
+#     None known.
+#     {note_any_bugs_here}
+ 
+#-
+
+# Find the required output filename
+#
+#     The PMBPLUS utilities giftopnm, ppmtopgm and pgmtofits must be
+#     available on your path.
+out=${2:-$1}
+name=`basename $1`
+
+# Convert the image removing temporary files at each stage.
+
+# Convert image from GIF format to FITS.
+giftoppm $1.gif 2> convert_err1_$name.lis | \
+ppmtopgm 2> convert_err2_$name.lis | \
+pgmtofits 2> convert_err3_$name.lis > convert_temp_$name.fit || \
+  { sed 's/^/!  GIF2NDF:/' convert_err?_$name.lis 1>&2
+    rm -f convert_err?_$name.lis convert_temp_$name.fit
+    exit 1
+  }
+  rm -f convert_err?_$name.lis
+ 
+# Convert image to an NDF. 
+$KAPPA_DIR/fitsdin files=convert_temp_$name.fit out=convert_temp_$name fmtcnv \
+  </dev/null  2>&1 | \
+  sed 's/^\!\!/\! /' | \
+  awk \
+'BEGIN{err=0}\
+/^\!/{if(err==0){err=1;print "!! GIF2NDF: Error reports from KAPPA:FITSDIN"}};\
+{print}\
+END{if(err==1){exit 1}}' || \
+  (rm -f convert_temp_$name.fit
+   echo "!  GIF2NDF: Abandoned at FITSDIN"
+   exit 1
+  ) || exit 1
+  rm -f convert_temp_$name.fit
+ 
+# Convert image values to 8 bits.
+$KAPPA_DIR/maths exp="ia+max(0,-sign(255,IA))" ia=convert_temp_$name \
+  out=convert_temp_u$name \
+  </dev/null  2>&1 | \
+  sed 's/^\!\!/\! /' | \
+  awk \
+'BEGIN{err=0}\
+/^\!/{if(err==0){err=1;print "!! GIF2NDF: Error reports from KAPPA:MATHS"}};\
+{print}\
+END{if(err==1){exit 1}}' || \
+  (rm -f convert_temp_$name.sdf
+   echo "!  GIF2NDF: Abandoned at MATHS"
+   exit 1
+  ) || exit 1
+  rm -f convert_temp_$name.sdf 
+ 
+# Invert the image.
+$KAPPA_DIR/flip in=convert_temp_u$name out=$out dim=2
+  </dev/null  2>&1 | \
+  sed 's/^\!\!/\! /' | \
+  awk \
+'BEGIN{err=0}\
+/^\!/{if(err==0){err=1;print "!! GIF2NDF: Error reports from KAPPA:FLIP"}};\
+{print}\
+END{if(err==1){exit 1}}' || \
+  (rm -f convert_temp_u$name.sdf
+   echo "!  GIF2NDF: Abandoned at FLIP"
+   exit 1
+  ) || exit 1
+  rm -f convert_temp_u$name.sdf 
