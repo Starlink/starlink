@@ -59,7 +59,12 @@
 # error "Unable to locate curses installation"
 #endif
 
+#include <stdlib.h>
+#if HAVE_TERM_H
 #include <term.h>
+#elif HAVE_NCURSES_TERM_H
+#include <ncurses/term.h>
+#endif
 #include <termios.h>
 #ifndef TIOCGWINSZ
 #include <sys/ioctl.h>
@@ -68,7 +73,6 @@
 #include <sys/time.h>
 #include <string.h>
 #include <signal.h>
-#include <stdlib.h>
 #include <errno.h>
 #include <setjmp.h>
 #include <glob.h>
@@ -2408,7 +2412,7 @@ struct sigaction act;
  * (by simulating a '\n' typed on the terminal) and transfer the characters to
  * our own type-ahead buffer
  */
-#if HAVE_DECL_TIOCSTI
+#ifdef TIOCSTI
 /* Firstly turn off echo so our additional newline is not visible */
         init_tty.c_lflag &= ~ECHO;
         tcsetattr(fileno(stdin), TCSANOW, &init_tty);

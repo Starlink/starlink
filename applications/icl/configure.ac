@@ -30,6 +30,10 @@ AC_CHECK_FUNCS([atexit on_exit])
 # icl_io.c
 AC_CHECK_HEADERS([curses.h cursesX.h])
 
+# icl_io.c
+dnl    Or ncurses term.h in /usr/include.
+AC_CHECK_HEADERS([term.h ncurses/term.h])
+
 # unix.c should be tweaked to not use environ
 AC_CHECK_FUNCS([setenv putenv])
 
@@ -48,11 +52,6 @@ AC_CHECK_DECLS([finite],,,[#include <math.h>])
 # carith.c - first add libm to search path with easy function
 AC_CHECK_LIB([m],[sin])
 AC_CHECK_FUNCS([nint rint])
-
-dnl   TIOCSTI terminal function
-AC_CHECK_DECLS([TIOCSTI],,,[#include <termio.h>
-])
-
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
