@@ -178,9 +178,9 @@
 
 *    Initialise
       NUNFROZEN=0
-      DO J=1,NPAR
+      DO J = 1, NPAR
 	FPEGGED(J) = PEGGED(J)
-	FFROZEN(J) = LFROZEN(J)
+	FROZEN(J) = LFROZEN(J)
 	IF ( .NOT. LFROZEN(J) ) NUNFROZEN = NUNFROZEN + 1
 	FPAR(J) = PARAM(J)
       END DO
@@ -206,7 +206,7 @@
 	IF ( .NOT. LFROZEN(J) ) THEN
 
 *        Freeze parameter to test statistic at offsets
-	  FFROZEN(J)=.TRUE.
+	  FFROZEN(J) = .TRUE.
 
 *        Lower error
 	  IF ( OPCHAN .GT. 0 ) THEN
@@ -414,8 +414,8 @@ D	      print *,'new le: ',le(j)
 	    ENDIF
 
 *        Reset for next pass through loop
-	  FFROZEN(J)=LFROZEN(J)
-	  FPAR(J)=PARAM(J)
+	  FFROZEN(J) = FROZEN(J)
+	  FPAR(J) = PARAM(J)
 
 *      End of frozen check
 	END IF

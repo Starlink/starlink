@@ -405,6 +405,11 @@
         CALL AIO_WRITE( OCH, ' ^NB points excluded by bad data quality',
      :                  STATUS )
         CALL AIO_BLNK( OCH, STATUS )
+        IF ( NBAD .EQ. N ) THEN
+          STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'No good data values', STATUS )
+          GOTO 99
+        END IF
       END IF
 
 *    Any big weights

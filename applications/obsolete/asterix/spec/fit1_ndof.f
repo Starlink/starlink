@@ -89,7 +89,6 @@
 
 *  Local Variables:
       INTEGER			J			! Loop over parameters
-      INTEGER			ITIE			! Loop over ties
 *.
 
 *    Check inherited global status.
