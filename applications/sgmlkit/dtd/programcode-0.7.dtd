@@ -161,9 +161,10 @@
 		   the programcode DTD. -->
 
 <!ELEMENT docblock	O O (title, description?,
+ 			     authorlist?,
 			     userkeywords?, softwarekeywords?,
-			     copyright?, history?) 			     -- authorlist?, --
->
+			     copyright?, history?)
+	>
 
 <!ELEMENT routine	O O (codeopener?, routineprologue, codebody)
 		-- The specification of one function, or procedure or
