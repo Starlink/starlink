@@ -184,6 +184,7 @@
       INTEGER WMAP                 ! GRAPHICS->BASEPIC WinMap
       INTEGER BPIC                 ! BASEPIC Frame
       INTEGER IBPIC                ! Index of BASEPIC Frame
+      INTEGER ICURR                ! Index of original current Frame
       INTEGER IPICL                ! AGI identifier for picture to use
       INTEGER IWOCO                ! Index of AGI world co-ordinates Frame
       INTEGER MAP                  ! Pointer to WORLD -> DATA Mapping
@@ -323,10 +324,10 @@
 *  ====================================================================
 
 *  See if the Plot already contains a BASEPIC Frame.
-      CALL KPG1_ASFFR( IPLOT, 'BASEPIC', IBFRM, STATUS )
+      CALL KPG1_ASFFR( IPLOT, 'BASEPIC', IBPIC, STATUS )
 
 *  If not, add one into the Plot now.
-      IF( IBFRM .EQ. AST__NOFRAME ) THEN
+      IF( IBPIC .EQ. AST__NOFRAME ) THEN
 
 *  Get the bounds of the entire view surface in millimetres.
          CALL PGQVSZ( 2, BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
@@ -339,7 +340,8 @@
 
 *  We now find the bounds of the view surface in BASEPIC co-ordinates (i.e.
 *  co-ordinates normalised so that the shorter axis has length 1.0).
-         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT. ABS( BX( 4 ) - BX( 2 ) ) ) THEN
+         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT. 
+     :       ABS( BX( 4 ) - BX( 2 ) ) ) THEN
             OUTA( 1 ) = 0.0D0
             OUTA( 2 ) = 0.0D0
             OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) / 
@@ -361,8 +363,14 @@
      :                     'co-ordinates in the AGI BASE picture.',
      :                     STATUS )
 
+*  Save the original current Frame index.
+         ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
+
 *  Add the BASEPIC Frame into the Plot.      
          CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, BPIC, STATUS )
+
+*  Re-instate the original current Frame index.
+         CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 
       END IF
 
