@@ -65,7 +65,7 @@ F77_SUBROUTINE(hdrlist)(INTEGER(istat))
       if ( type == PLAIN ) {
 
         /*  It's just an ordinary header item, so get it's value. */
-        hdrInc( "IN", source, item, 1, value, 80, istat );
+        hdrInC( "IN", source, item, 1, value, 80, istat );
         printf( "%s = %s \n", item, value );
 
       } else {
@@ -86,7 +86,7 @@ F77_SUBROUTINE(hdrlist)(INTEGER(istat))
         if ( list ) { 
           hdrNumb( "IN", source, item, &ncomp, istat );
           for( j=1; j <= ncomp; j++ ) { 
-            hdrInc( "IN", source, item, j, value, 80, istat );
+            hdrInC( "IN", source, item, j, value, 80, istat );
             printf( "%s = %s \n", item, value );
           }
         }
