@@ -21,7 +21,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
-STAR_DECLARE_DEPENDENCIES(build, [sae mers subpar ndf psx chr agi])
+STAR_DECLARE_DEPENDENCIES(build, [sae mers subpar ndf psx chr agi gks])
 STAR_LATEX_DOCUMENTATION(sun42)
 
 AC_CONFIG_FILES([Makefile component.xml daophot.csh])
