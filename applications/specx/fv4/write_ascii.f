@@ -44,6 +44,8 @@ C-----------------------------------------------------------------------
       LOGICAL*4 DOQUAD
       INTEGER*4 NTOT
       INTEGER*4 IGETLUN, IFREELUN
+      INTEGER*4 GEN_ILEN
+      EXTERNAL GEN_ILEN, IFREELUN, IGETLUN
 
 *  We want the previous filename to be remembered
       SAVE FILENAME
