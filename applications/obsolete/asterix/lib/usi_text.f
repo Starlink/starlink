@@ -20,6 +20,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Import :
 *
@@ -35,11 +36,6 @@
 *
       INTEGER STATUS
 *
-*    Function declarations :
-*
-      INTEGER             CHR_LEN
-      LOGICAL			CHR_SIMLR
-*
 *    Local variables :
 *
       CHARACTER*200       	FILE                	! File name of object
@@ -47,9 +43,7 @@
       CHARACTER*40        	PARNAME             	! Name of parameter
       CHARACTER*140       	WORK(30)            	! Work space
 
-      INTEGER             	CODE                	! Internal parameter code
       INTEGER             	I                   	! Counter
-      INTEGER             	IP                  	! Parameter counter
       INTEGER             	LBRACKPOS           	! Position of a "{"
       INTEGER             	LEVELS              	! Levels of object
       INTEGER             	MAXLINES            	! Max # of output lines
@@ -57,9 +51,6 @@
       INTEGER             	RBRACKPOS           	! Position of a "}"
       INTEGER             	USE                 	! Current line
       INTEGER             	SLEN, WLEN          	! String lengths
-      INTEGER			L1, L2
-
-      LOGICAL             	PVALID              	! Valid parameter?
 *-
 
 *  Check status
