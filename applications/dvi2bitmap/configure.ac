@@ -46,8 +46,9 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_LIBTOOL
 
-dnl   use C++ to compile test programs
-AC_LANG([C++])
+dnl  Use C to compile the AC_CHECK_FUNCS tests (using C++ can cause
+dnl  spurious linking errors on, for example, Solaris)
+AC_LANG([C])
 
 AC_PATH_PROG(PERL, perl)
 
@@ -66,6 +67,23 @@ AC_CHECK_FUNCS(pipe snprintf setenv putenv)
 dnl   getopt_long.c uses (and provides a replacement for)
 dnl   this glibc utility function
 AC_CHECK_FUNCS(__strchrnul)
+
+dnl   We ought not to have to worry about getopt.h, getopt{,1}.c,
+dnl   since they can always be unconditionally compiled and linked.  See
+dnl   http://mail.gnu.org/archive/html/autoconf/2000-12/msg00049.html
+dnl   and surrounding thread for discussion.  However that doesn't
+dnl   appear to work in fact, and the function in getopt_long.c has
+dnl   different magic to avoid getting horribly tangled up.
+dnl
+dnl   Note that the getopt checks must appear _after_ the checks for
+dnl   kpathsea.  This is because the kpathsea library provides an
+dnl   implementation for getopt so that, if kpathsea is included, we
+dnl   must make sure that we pick up that one.  If this test is
+dnl   placed before kpathsea, we can end up defining getopt twice.
+AC_CHECK_FUNCS(getopt)
+AC_CHECK_DECLS([getopt,getsubopt,getopt_long])
+AC_REPLACE_FUNCS(getopt_long getsubopt)
+
 
 dnl   What type of system are we on?
 dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with 
@@ -86,6 +104,9 @@ dnl AC_CANONICAL_HOST
 case "$host" in
   alpha*) test "$CXX" = "cxx" && AC_DEFINE(__USE_STD_IOSTREAM) ;;
 esac
+
+dnl   use C++ to compile the remaining test programs
+AC_LANG([C++])
 
 dnl   Do we have (standard) <cname> for C libraries, or just <name.h>?
 AC_MSG_CHECKING(whether compiler has <cname> instead of just <name.h>)
@@ -167,23 +188,6 @@ AC_ARG_WITH(fontfinder,
 dnl   Test whether we have the kpse* commands, by searching through the path
 dnl   for kpsewhich
 AC_PATH_PROG(KPSEWHICH, kpsewhich)
-
-dnl   We ought not to have to worry about getopt.h, getopt{,1}.c,
-dnl   since they can always be unconditionally compiled and linked.  See
-dnl   http://mail.gnu.org/archive/html/autoconf/2000-12/msg00049.html
-dnl   and surrounding thread for discussion.  However that doesn't
-dnl   appear to work in fact, and the function in getopt_long.c has
-dnl   different magic to avoid getting horribly tangled up.
-dnl
-dnl   Note that the getopt checks must appear _after_ the checks for
-dnl   kpathsea.  This is because the kpathsea library provides an
-dnl   implementation for getopt so that, if kpathsea is included, we
-dnl   must make sure that we pick up that one.  If this test is
-dnl   placed before kpathsea, we can end up defining getopt twice.
-AC_CHECK_FUNCS(getopt)
-AC_CHECK_DECLS([getopt,getsubopt,getopt_long])
-AC_REPLACE_FUNCS(getopt_long getsubopt)
-
 
 dnl   If we're not using the kpselib, and we haven't specified a
 dnl   fontfinder script, then use kpsewhich
