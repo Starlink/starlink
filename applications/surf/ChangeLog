@@ -1,3 +1,31 @@
+1999-02-26  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_mon.f (SURF_MON): Add REMIP abd polarimeter support
+
+1999-02-25  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_rebin.f (SURF_REBIN): Make sure that OUT_LOC is
+	annulled when running INTREBIN/BOLREBIN
+
+1999-01-28  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_spline_regrid.f (SCULIB_SPLINE_REGRID): Initialise 
+	NCOADD array to 0
+
+	* src/bolrebin.ifl: Add SFACTOR parameter
+
+	* src/intrebin.ifl: Add SFACTOR parameter
+
+1999-01-26  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/makefile: Add targets for making executable links
+
+	* src/surf_rebin.f (SURF_REBIN): Propogate input file from output
+	when rebinning a single input file
+
+	* src/surf_extinction.f (SURF_EXTINCTION): Make sure that
+	EXTINCTION can process a FAST_AXIS array in the REDS extension.
+
 1999-01-22  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* scripts/scusetenv.csh: First version

@@ -1,6 +1,10 @@
 TO DO List
 ==========
 
+- Add SFACTOR parameter to documentation of *REBIN
+  Add SFACTOR parameter to IFL files for INT/BOLREBIN
+
+
 - Add note to docs to explciitly state that REMSKY averages over
   1 second for JIGGLE and 0.125 for SCAN -- after confusion over
   how long a 'jiggle' is.
@@ -10,7 +14,6 @@ TO DO List
   that the bounds are less than 1 for the second dim. (since EXP_POINTER
   is one and EXP_POINTER-1 is 0)
 
-- surf_write_map_info does not check status on entry,
 
 - Add note to documentation to point out that zero level in scan maps
   is suspect.
@@ -30,7 +33,6 @@ TO DO List
 
 3. Allow DESPIKE to interpolate rather than mark bad.
 
-4. Propogate HISTORY to REBIN output when only regridding one file. 
 
 6. Change SCUOVER to PGPLOT and extract into a separate monolith.
      - difficult to remove SGS without dropping the Kappa 
@@ -60,20 +62,30 @@ TO DO List
 20. SCULIB_CALC_BOL_COORDS should deal with all the offsetting
     issues.
 
-21  SCULOG sometimes prints a HST time in the wrong format
 
 
 24 Do threshold clipping for individual bolometers (rather than clipping based on 
    STATS)
 
-25. Generate stats on each bolometer in turn.
-     (shell script)
 
 26. Change pointsum so that it doesn't show Uaz,Uel for DEM files.
 
 
 DONE
 ====
+
+4. Propogate HISTORY to REBIN output when only regridding one file. 
+
+
+21  SCULOG sometimes prints a HST time in the wrong format
+
+
+25. Generate stats on each bolometer in turn.
+     (shell script)
+
+
+- surf_write_map_info does not check status on entry,
+
 
 15. Don't do third regrid phase for LINEAR rebin [optional]
 
