@@ -342,6 +342,8 @@
 *        Rewrote to use Tcl for the GUI instead of IDI.
 *     16-JAN-2001 (MBT):
 *        Added OVERRIDE parameter.
+*     29-JAN-2001 (MBT):
+*        Changed call parameters for modified CCD1_GMMP.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -385,6 +387,9 @@
       INTEGER IPGRA             ! Pointer to graph
       INTEGER IPID( CCD1__MXNDF ) ! Pointer to output identifiers
       INTEGER IPQUE             ! Pointer to workspace
+      INTEGER IPRAN( CCD1__MXNDF ) ! Pointer to workspace
+      INTEGER IPRAN1( CCD1__MXNDF * CCD1__MXNDF ) ! Pointer to workspace
+      INTEGER IPRAN2( CCD1__MXNDF * CCD1__MXNDF ) ! Pointer to workspace
       INTEGER IPSUB             ! Pointer to sub-graph (spanning)
       INTEGER IPX1( CCD1__MXNDF * CCD1__MXNDF ) ! Pointers to X position lists
       INTEGER IPX2( CCD1__MXNDF * CCD1__MXNDF ) ! Pointers to X position lists
@@ -551,9 +556,9 @@
 
 *  Generate the ID's for the output lists. Matching positions between
 *  the lists and final merging all positions for each node.
-      CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, TOTNOD, IPX1, IPY1, IPX2,
-     :                IPY2, NMAT, OFFS, IPXO, IPYO, IPID, NOUT,
-     :                STATUS )
+      CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, TOTNOD, IPX1, IPY1, IPRAN1,
+     :                IPX2, IPY2, IPRAN2, NMAT, OFFS, IPXO, IPYO, IPRAN,
+     :                IPID, NOUT, STATUS )
 
 
 *=======================================================================
