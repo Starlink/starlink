@@ -52,7 +52,7 @@ my $NDF = undef;		# Name of the NDF to be processed
                                 # (with or without the .sdf
                                 # extension) 
 
-my $keeptemps = 1;		# Keep temporary files for later debugging.
+my $deletetemps = 1;		# Keep/delete temporary files for later debugging.
 
 my $tempDir = undef;		# Allow this to be forced on the
                                 # commandline.  This is presently for
@@ -249,7 +249,7 @@ if (defined($optionset{help}) && $optionset{help}) {
     print "\thelp          Print this help\n";
     print "\tinsert        Insert WCS info into NDF at end? [", ($insertwcs ? "true" : "false"), "]\n";
     print "\tkeepfits      Retain WCS in specified file (default if empty) ['']\n";
-    print "\tkeeptemps     Keep temporary files? [", ($keeptemps ? "true" : "false"), "]\n";
+    print "\tkeeptemps     Keep temporary files? [", ($deletetemps ? "false" : "true"), "]\n";
     print "\tmatch         Name of plugin to do matching [", (defined($matchplugin) ? $matchplugin : ''), "]\n";    
     print "\tmaxobj        Maximum number of objects to process [$maxobj]\n";
     print "\tmessages      Show messages from monoliths? [", ($monolithMessages ? "true" : "false"), "]\n";
@@ -274,7 +274,7 @@ $NDF =~ s/\.sdf$//;		# remove any .sdf extension
 $esocatname = $optionset{catalogue}	if defined ($optionset{catalogue});
 $insertwcs = $optionset{insert}		if defined ($optionset{insert});
 $retainwcs = $optionset{keepfits}	if defined ($optionset{keepfits});
-$keeptemps = $optionset{keeptemps}	if defined ($optionset{keeptemps});
+$deletetemps = (!$optionset{keeptemps})	if defined ($optionset{keeptemps});
 $matchplugin = $optionset{match}	if defined ($optionset{match});
 $maxobj = $optionset{maxobj}		if defined ($optionset{maxobj});
 $monolithMessages = $optionset{messages} if defined ($optionset{messages});
@@ -598,7 +598,7 @@ if ($dumpstatefile) {
     printf D ("NDF=%s\n",
 	      (defined($NDF) ? $NDF : "<UNDEF>"));
     printf D ("keeptemps=%s\n",
-	      (defined($keeptemps) ? $keeptemps : "<UNDEF>"));
+	      (defined($deletetemps) ? !$deletetemps : "<UNDEF>"));
     printf D ("tempDir=%s\n",
 	      (defined($tempDir) ? $tempDir : "<UNDEF>"));
     printf D ("insertwcs=%s\n",
@@ -1033,7 +1033,7 @@ if (defined($retainwcs)) {
 }
 
 
-if ($keeptemps) {
+if (! $deletetemps) {
     # Deleting is done in tidy_and_shutdown
     wmessage ('info', "Retaining temporary files in directory $tempDir");
     print STDERR "Retaining temporary files in directory $tempDir\n"
@@ -1045,84 +1045,22 @@ exit 0;
 
 # Tidy-up routine, used as signal and exit handler
 sub tidy_and_shutdown {
-    #my $sig = shift;
-    #print "Received signal $sig\n";
-
-    # Shut down applications mentioned in %helpers, and exit.  This
-    # isn't necessary for the exit handler, since the AMS system is
-    # run down gracefully when Perl exits normally, but it seems
-    # neater to keep the tidyup functions together.
-    #
-    # This works, in the sense that, with this signal handler, you can
-    # issue ^C and not leave defunct monolith processes hanging
-    # around, but it doesn't appear to do it very neatly, and it
-    # leaves error messages on stderr reporting problems shutting down
-    # the message relay.  I don't understand why it's happening like this,
-    # (or why I don't seem to be able to get any output from this
-    # routine (it's not guaranteed from a signal handler, but it
-    # _should_ work)), but I'm happy enough that it works.
+    # Handle the signal by (a) deleting the temporary files, and (b)
+    # converting this into an ordinary exit.  All the monoliths will
+    # be run down when $ams is run down.  There's no point in trying
+    # to run it down explicitly (though the $ams->shutdown() method
+    # tempts one to do that) because -- I dunno -- something goes
+    # wrong, no matter how you dance around.
 
     # Shutting down the monoliths can cause broken-pipe errors, so
     # ignore these.
     local $SIG{PIPE} = 'IGNORE';
 
-    # XXX No, the following isn't necessary, and probably best handled
-    # by $ams->shutdown().
-    #
-    # We test whether something needs shut down by its presence in
-    # %helpers, so it should undef() tested entries when it's done.
-#    if (%helpers) {
-#	# Shut down ADAM monoliths.  There is no `terminate' method in
-#	# Starlink::AMS::Task, but objects are destroyed when the last
-#	# reference to them is removed.  Therefore simply undefining
-#	# the %helpers hash entries should cause them to go.  And moggy?
-#	foreach my $h (qw( kappa ndfpack ccdpack extractor atools)) {
-#	    if (defined($helpers{$h})) {
-#		print "Helper $h: pid=", $helpers{$h}->pid->{pid}, "\n";
-#		undef $helpers{$h};
-#		print "Undefined helpers{$h}\n";
-#	    }
-##	    undef $helpers{$h} if defined($helpers{$h});
-##	    print  "Undefined helpers{$h}\n" if $verbose;
-#	}
-#    }
-
-#     if (defined($ams)) {
-# 	# If the shutdown of $ams causes any further signals, we would
-# 	# be in trouble.  So ignore all signals while we're doing
-# 	# this.  Also, undefine $ams _before_ calling shutdown()
-# 	# (using temporary $tempams), so that we don't come back into
-# 	# this block if or when the handler is called again within
-# 	# shutdown().  Since we're ignoring all the signals which are
-# 	# assigned to this handler, I would have thought this would
-# 	# happen only when we call exit() (this handler is also the
-# 	# exit handler), but it does!  I think there's some
-# 	# asynchronicity here which I'm not fully aware of, which
-# 	# means that this apparent belt-and-braces is required (it's
-# 	# probably appropriately paranoid behaviour for a signal
-# 	# handler, anyway).
-# 	#
-# 	# Unfortunately, I can't seem to get rid of the message
-# 	# `MESSYS__NONEXIST: non-existent path pointer'
-# 	print STDERR "Shutting down ams\n";
-# 	local $SIG{HUP}  = 'IGNORE';
-# 	local $SIG{INT}  = 'IGNORE';
-# 	local $SIG{PIPE} = 'IGNORE';
-# 	local $SIG{TERM} = 'IGNORE';
-# 	my $tempams = $ams;
-# 	undef ($ams);
-# 	$tempams->stdout(\*STDERR); # make sure all messages go to stderr
-# 	$tempams->stderr(\*STDERR); # make sure all messages go to stderr
-# 	$tempams->errors(0);	# suppress monolith errors
-# 	$tempams->messages(0);	# suppress monolith messages
-# 	$tempams->shutdown();
-# 	undef($tempams);	# destroy it
-#     }
-
     # Get rid of all the temporary files we've accumulated.
-    if (! $keeptemps && -d $tempDir && -w $tempDir) {
+    if ($deletetemps && -d $tempDir && -w $tempDir) {
 	print STDERR "Getting rid of temporary files\n";
 	system "rm -Rf $tempDir";
+	$deletetemps = 0;	# don't come here again
     }
 
     exit 0;
