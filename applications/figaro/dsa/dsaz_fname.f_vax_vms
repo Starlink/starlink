@@ -1,0 +1,328 @@
+C+
+C                      D S A Z _ F N A M E _ V A X
+C
+C  Routine name:
+C     DSAZ_FNAME
+C
+C  Function:
+C     Splits an object name into a full filename and a structure part.
+C
+C  Description:
+C     This is the system-dependent part of the routine DSA_FNAME, which
+C     takes an object name and splits it up into a full unambiguous
+C     filename and, if specified, the hierarchical name of a data object 
+C     held in that file.  This involves an intimate knowledge of the
+C     file name syntax of the machine in question, and ambiguities may
+C     need to be resolved by looking at the existence of actual files
+C     which may also be a system-dependent operation.
+C
+C  Language:
+C     FORTRAN
+C
+C  Call:
+C     CALL DSAZ_FNAME (OBJECT,NEW,DEFEXTS,NEXTS,FILENAME,STRUCT,
+C                                                      ALTFILE,STATUS)
+C
+C  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
+C
+C     (>) OBJECT       (Chcracter*(*)) The name of the data object.
+C     (>) NEW          (Logical)  True if it is intended that a new file
+C                      will eventually be created.  
+C     (>) DEFEXTS      (Character(NEXTS)*(*)) The possible default 
+C                      file extensions, in order of priority. Each array
+C                      element should be a character string giving the 
+C                      extension preceded by a '.'. The case of DEFEXTS
+C                      is left unchanged by this routine, and whether it 
+C                      is respected or not depends on the Operating system.
+C     (>) NEXTS        (Integer) The number of possible default extensions.
+C     (<) FILENAME     (Character*(*)) The full file specification.
+C     (<) STRUCT       (Character*(*)) The structure part of the name,
+C                      including the initial '.' STRUCT will be returned
+C                      in upper case.
+C     (<) ALTFILE      (Character*(*)) If there is any ambiguity in the
+C                      name of the data file, an alternate file name is
+C                      returned in ALTFILE. (This is intended to be used only
+C                      to generate a warning message).If STATUS is returned
+C                      indicating an error, ALTFILE is used to return a more
+C                      informative error message.
+C     (!) STATUS       (Integer) Status code.  If a bad status value
+C                      (non-zero) is passed to it, this routine will return 
+C                      immediately.
+C
+C  External variables used:  None.
+C
+C  Prior requirements:  None.
+C
+C  Support: Keith Shortridge, AAO
+C
+C  Version date: 7th September 1992
+C-
+C  System:
+C     This is the VAX/VMS version of DSAZ_FNAME.
+C
+C  Syntax accepted:
+C     The object name can be specified as a filename (in any format
+C     VMS will accept) followed optionally by the name of an object in
+C     that file in a hierarchical form with the various level names
+C     all prefaced by a '.'. So in 'DISK$DATA:[DIR.SUBDIR]FILE.X.DATA'
+C     the file is 'DISK$DATA:[DIR.SUBDIR]FILE' and the object name
+C     within the file is '.X.DATA'. 
+C
+C     The file extension is assumed to be the current default extension
+C     recognised by Figaro (.DST or .SDF, depending on the logical name
+C     FIGARO_FORMATS). If both extensions are recognised, then for a
+C     new file the one that has priority is used, for an existing file 
+C     the program looks to see if a file with either extension exists.
+C     If such a file does exist it assumes that is the file that is
+C     to be used. If files with the same name but both extensions exist,
+C     then the extension with priority is used, but the ambiguity is
+C     signalled.
+C
+C     The only problem comes from the ambiguity between the first component 
+C     of the name of the object within the file and a possible file 
+C     extension (both of which have used the 'dot' syntax for too long to 
+C     be changed). Generally, this routine will assume that the object name 
+C     starts at the first '.' within the filename (dots within any directory 
+C     name, as in '[DIR.SUBDIR]' being recognised properly). The only exception
+C     is when what would then be the first level of the object name is
+C     the same as a default file extension currently being recognised.
+C     (These are often typed in by mistake and should be spotted.) So if
+C     .SDF is the default file extension, 'FILE.SDF.X.DATA' will be taken
+C     as '.X.DATA' within the file 'FILE.SDF' (But if only .SDF is being
+C     recognised as a default extension, 'FILE.DST' will be assumed to be
+C     the object .DST within the file 'FILE.SDF'.)
+C
+C     If an explicit file extension that is not a recognised default extension
+C     is to be specified, it can be either enclosed in parentheses or can
+C     be followed by a ';'. So 'FILE.EXT;.X.DATA' and 'FILE(.EXT).X.DATA'
+C     both refer to the object '.X.DATA' within the file 'FILE.EXT'. An
+C     explicit version number may also be specified after the colon, so
+C     'FILE.EXT;3.X.DATA' is the object '.X.DATA' in the file 'FILE.EXT;3'.
+C
+C  External subroutines / functions used:
+C     DSA_DEFEXT, DSA_WRUSER, GEN_FORTERR, ICH_CI, ICH_FOLD, ICH_LEN,
+C
+C  Subroutine / function details:
+C     DSA_DEFEXTS    Returns default file extensions.
+C     DSA_WRUSER     Output string to user.
+C     GEN_FORTERR    Get error message describing Fortran error code.
+C     ICH_CI         Returns integer formatted into character string.
+C     ICH_FOLD       Convert string to upper case.
+C     ICH_LEN        Return position of last non-blank char in string.
+C
+C  History:
+C     28th Aug  1992   Original version, although based on the original
+C                      VAX version of DSA_FNAME.  KS / AAO.
+C     29th Aug  1992   "INCLUDE" filenames now upper case. KS/AAO
+C     31st Aug  1992   ALTFILE now used to return error message. KS/AAO.
+C      4th Sep  1992   Now recognises default file extensions at the start
+C                      of object names. Comments improved. KS/AAO.
+C      7th Sep  1992   Wasn't returning an extension when a file didn't exist.
+C                      Now fixed. KS/AAO.
+C     16th Jun  1993   When only second-choice format existed, the
+C                      ALTFILE string would not be cleared.
+C                      HME/UoE, Starlink.
+C+
+      SUBROUTINE DSAZ_FNAME (OBJECT,NEW,DEFEXTS,NEXTS,FILENAME,STRUCT,
+     :                                                  ALTFILE,STATUS)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      LOGICAL NEW
+      INTEGER NEXTS, STATUS
+      CHARACTER*(*) OBJECT, DEFEXTS(*), FILENAME, STRUCT, ALTFILE
+C
+C     Functions used
+C
+      CHARACTER ICH_CI*8
+      INTEGER   ICH_FOLD, ICH_LEN
+C
+C     DSA_ system error codes
+C
+      INCLUDE 'DSA_ERRORS'
+C
+C     Local variables
+C
+      LOGICAL   EXIST                      ! True if file exists already
+      LOGICAL   EXIST2                     ! File with alternative .ext exists 
+      CHARACTER EXT_UC*16                  ! Upper case default extension
+      CHARACTER FILE*256                   ! Filename generated from OBJECT
+      INTEGER   I                          ! Loop variable through OBJECT
+      INTEGER   ICOLON                     ! Posn of any ';' after parse ends
+      INTEGER   IDOT                       ! Posn of any '.' after ICOLON
+      INTEGER   IEND                       ! Char posn after end of filename
+      INTEGER   INVOKE                     ! Dummy function reference
+      INTEGER   IPEND                      ! Character at which parse ends
+      INTEGER   ISTAT                      ! I/O error code
+      INTEGER   ISTEXT                     ! Position of '(' at start of ext.
+      INTEGER   ITYPE                      ! Character classification
+      INTEGER   IVER                       ! Start of version number in file
+      INTEGER   IVERNO                     ! File version number
+      INTEGER   LEXT                       ! Significant characters in extension
+      INTEGER   STATE                      ! State of parse of OBJECT
+C
+C     Parser states are as follows - the values are chosen arbitrary,
+C     but if they are changed note that the way TABLE is set up will
+C     have to be changed, since it assumes the values here.
+C
+      INTEGER   START                      ! At start of string
+      INTEGER   DIR                        ! Within a directory spec.
+      INTEGER   INFILE                     ! In a file spec following DIR
+      INTEGER   STEXT                      ! At the '(' before EXT
+      INTEGER   EXT                        ! Within an extension spec
+      INTEGER   ENDEXT                     ! At the ')' after EXT
+      INTEGER   STRDOT                     ! Start of structure - ie at '.'
+      INTEGER   END                        ! Finished 
+      INTEGER   ERR                        ! Error
+C
+      PARAMETER (START=1,DIR=2,INFILE=3,STEXT=4,EXT=5,ENDEXT=6,STRDOT=7,
+     :           END=8,ERR=9)
+C
+C     State transition table for the parser.  Note STRDOT, END, ERR all
+C     result in immediate exit from the parsing loop, so do not need
+C     table entries.
+C
+      BYTE TABLE(7,6)
+      DATA TABLE/
+     :      START,  END,     DIR,    ERR,   STEXT, ERR,    STRDOT,    ! Start
+     :      DIR,    ERR,     ERR,    INFILE,ERR,   ERR,    DIR,       ! Dir
+     :      INFILE, END,     ERR,    ERR,   STEXT, ERR,    STRDOT,    ! Infile
+     :      EXT,    ERR,     ERR,    ERR,   ERR,   ERR,    EXT,       ! Stext
+     :      EXT,    ERR,     ERR,    ERR,   ERR,   ENDEXT, EXT,       ! Ext
+     :      INFILE, END,     ERR,    ERR,   ERR,   ERR,    STRDOT/    ! Endext
+C           ------  ------   ------  ------ ------ ------  ------
+C           Char    Blank    [       ]      (      )       . 
+C
+C     Special characters recognised by the parser.  Note that the order
+C     of the chars in this string is important, since it gives the column
+C     values for TABLE.
+C
+      CHARACTER*6 CHARS
+      DATA CHARS/' []().'/
+C
+C     Split OBJECT into its component parts.  The STRDOT state has us at
+C     the first dot outside either a [directory spec] or an (extension spec).
+C     After that we explicitly test for a ';' in the rest of the string,
+C     which would indicate a syntax with an extension and version number
+C     not enclosed in parentheses.
+C
+      ALTFILE=' '
+      ISTEXT=0
+      STRUCT=' '
+      STATE=START
+      DO I=1,LEN(OBJECT)
+         ITYPE=INDEX(CHARS,OBJECT(I:I))+1
+         STATE=TABLE(ITYPE,STATE)
+         IF (STATE.EQ.STEXT) THEN
+            ISTEXT=I
+         ELSE IF (STATE.EQ.ENDEXT) THEN
+            FILE=OBJECT(:ISTEXT-1)//OBJECT(ISTEXT+1:I-1)
+         ELSE IF ((STATE.EQ.STRDOT).OR.(STATE.EQ.END)) THEN
+            IEND=I
+            IF (STATE.EQ.STRDOT) THEN
+               ICOLON=INDEX(OBJECT(I:),';')
+               IF (ICOLON.NE.0) THEN
+                  IDOT=INDEX(OBJECT(ICOLON+I-1:),'.')
+                  IF (IDOT.EQ.0) THEN
+                     IEND=LEN(OBJECT)
+                  ELSE
+                     IEND=I+ICOLON+IDOT-2
+                  END IF
+               END IF
+            END IF
+            IF (IEND.LT.LEN(OBJECT)) STRUCT=OBJECT(IEND:)
+            IF (ISTEXT.EQ.0) FILE=OBJECT(:IEND-1)
+            STATE=END
+         END IF
+         IF ((STATE.EQ.END).OR.(STATE.EQ.ERR)) THEN
+            IPEND=I
+            GO TO 340     ! Break out of loop
+         END IF
+      END DO
+      IF (ISTEXT.EQ.0) FILE=OBJECT
+  340 CONTINUE
+C
+C     Check that parse went OK - it won't pick all the errors; we let
+C     the system do that when it tries to use the results.
+C
+      IF (STATE.EQ.ERR) THEN
+         STATUS=DSA__OBJINV
+         ALTFILE='Unable to parse "'//OBJECT(:IPEND)//'??'
+     :                           //OBJECT(IPEND:ICH_LEN(OBJECT))//'"'
+      ELSE
+C
+C        Object looks OK, and we have the filename.  See if the apparent
+C        structure name starts with a recognised extension. If it does,
+C        assume that this is actually an extension (usually specified
+C        accidentally) and modify both accordingly.
+C
+C        First, ensure we have upper case versions of STRUCT & FILE
+C
+         INVOKE=ICH_FOLD(FILE)
+         INVOKE=ICH_FOLD(STRUCT)
+         IF ((ISTEXT.EQ.0).AND.(INDEX(FILE,';').EQ.0)) THEN
+            DO I=1,NEXTS
+               EXT_UC=DEFEXTS(I)
+               LEXT=ICH_FOLD(EXT_UC)
+               IF (STRUCT(1:LEXT).EQ.EXT_UC) THEN
+                  IF ((STRUCT(LEXT+1:LEXT+1).EQ.'.').OR.
+     :                   (STRUCT(LEXT+1:LEXT+1).EQ.' ')) THEN
+                     FILE=FILE(:ICH_LEN(FILE))//EXT_UC
+                     STRUCT=STRUCT(LEXT+1:)
+                  END IF
+               END IF
+            END DO
+         END IF
+C
+C        See if such a file exists, and see what the full file spec is.  
+C        We allow here for the possibility that more than one file 
+C        extension is in use, but force a new file to the main default 
+C        extension.
+C
+         INQUIRE (FILE=FILE(:ICH_LEN(FILE)),
+     :                  DEFAULTFILE=DEFEXTS(1)(:ICH_LEN(DEFEXTS(1))),
+     :                          NAME=FILENAME,EXIST=EXIST,IOSTAT=ISTAT)
+         IF (.NOT.EXIST) THEN
+            FILENAME=FILE
+            IF (ISTEXT.EQ.0) FILENAME(ICH_LEN(FILE)+1:)=DEFEXTS(1)
+         END IF
+         IF ((ISTAT.EQ.0).AND.(.NOT.NEW).AND.(NEXTS.GT.1)) THEN
+            INQUIRE (FILE=FILE(:ICH_LEN(FILE)),
+     :                  DEFAULTFILE=DEFEXTS(2)(:ICH_LEN(DEFEXTS(2))),
+     :                          NAME=ALTFILE,EXIST=EXIST2,IOSTAT=ISTAT)
+            IF (ISTAT.EQ.0) THEN
+               IF (EXIST2.AND.(.NOT.EXIST)) THEN
+                  FILENAME=ALTFILE
+                  ALTFILE=' '
+                  EXIST=.TRUE.
+               END IF
+               IF (.NOT.EXIST2) ALTFILE=' '
+            END IF
+         END IF
+         IF (ISTAT.NE.0) THEN
+            ALTFILE='Error inquiring about file "'//
+     :                              FILE(:ICH_LEN(FILE))//'"'
+            STATUS=DSA__OBJINV
+         ELSE
+C
+C           If the file exists, it will have a version number in the
+C           filename.  If a new file is to be created, increase this
+C           by 1.  If it does not exist, and has no version number,
+C           force a version number of 1.
+C
+            IVER=INDEX(FILENAME,';')+1
+            IF (EXIST) THEN
+               IF (NEW) THEN
+                  READ (FILENAME(IVER:),*,IOSTAT=ISTAT) IVERNO
+                  FILENAME(IVER:)=ICH_CI(IVERNO+1)
+               END IF
+            ELSE
+               IF (FILENAME(IVER:).EQ.' ') FILENAME(IVER:)='1'
+            END IF
+         END IF
+C
+      END IF
+C
+      END
