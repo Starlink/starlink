@@ -2212,8 +2212,11 @@ itcl::class gaia::GaiaSextractor {
    protected method completed_ {} {
 
       #  Now display the catalogue overlaid on the image.
-      display_cat [get_catname_]
+      catch { display_cat [get_catname_] } msg
       blt::busy release $w_
+      if { "$msg" != "" } { 
+         error "$msg"
+      }
    }
 
 
