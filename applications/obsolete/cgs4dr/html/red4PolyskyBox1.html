@@ -1,0 +1,52 @@
+<HEAD><TITLE>red4Polysky</TITLE></HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="red4ReadObsBox1.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="red4IarithBox6.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+
+<H1>polysky_reduced_observation_or_group</H1><P>
+<P><CENTER><IMG ALIGN=CENTER SRC=red4Polysky.gif><P>
+Figure 12.29: Polysky Dialogue Box </CENTER><P>
+<!-- START
+<dir>
+ <dt><strong>Title: </strong> 
+  <dd> polysky_reduced_observation_or_group
+ <dt><strong>Description: </strong> 
+  <dd> Enhanced sky subtraction from image using polysky routine
+ <dt><strong>Script(s): </strong> 
+  <dd> red4Polysky	
+ <dt><strong>Dialogue Box Parameter(s): </strong> 
+  <dd> Filename - file from which to extract spectrum input via entry widget
+  <dd> None / RGs / Obj / Obj-Sky - data type input via radiobutton
+  <dd> Degree - degree of polynomial to fit input using entry widget
+  <dd> Nreject - number of points to reject from fit input via entry widget
+  <dd> Weight - Apply weighting algorithm input via checkbutton
+  <dd> Sky Area 1 Start / End - start / end of first sky area input via entry widget
+  <dd> Sky Area 2 Start / End - start / end of second sky area input via entry widget
+  <dd> Sky Area 3 Start / End - start / end of third sky area input via entry widget
+  <dd> Sky Area 4 Start / End - start / end of fourth sky area input via entry widget
+ <dt><strong>Mouse Button(s): </strong> 
+  <dd> MB1 - Invokes dialogue box on double-click
+  <dd> MB2 - Sets the following defaults <dir>
+   <dd> Filename = $RGDIR/rgyymmdd_gggg for given UT-date
+   <dd> None / RGs / Obj / Obj-Sky = NONE
+   <dd> Degree = 1.0
+   <dd> Nreject = 0
+   <dd> Weight = TRUE
+   <dd> Sky Area 1 Start / End = 20 / 25
+   <dd> Sky Area 2 Start / End = 35 / 40
+   <dd> Sky Area 3 Start / End = -1 / -1
+   <dd> Sky Area 4 Start / End = -1 / -1 </dir>
+  <dd> MB3 - Invokes help window on single-click for the high-lighted text 
+</dir>
+<!-- END
+<P><HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>
