@@ -24,3 +24,13 @@
 # character to interpose another module into the current module.  This
 # can be useful for creating a module that consists of many directories
 # spread out over the entire source repository.
+#
+#
+# The application autoastrom (currently) needs to be defined as a module,
+# so it can have modules astrom and catlib checked out beneath it.
+# This is probably not an ideal mechanism in general. [nxg, 2003-08-25]
+autoastrom	applications/autoastrom &astrom &catlib
+astrom		applications/astrom
+#
+# External/third-party code
+catlib		thirdparty/eso/catlib
