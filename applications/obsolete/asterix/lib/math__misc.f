@@ -308,7 +308,7 @@
       DO J = 1, MNY
 
 *      Find Y sub-pixelling
-        YSUB = SPIX2( YP0 + DY*REAL(J-1), DY )
+        YSUB = SPIX2( YP0 + DY*REAL(J-1), DY, RC )
         SDY = DY / YSUB
 
         DO I = 1, MNX
@@ -317,7 +317,7 @@
           SUM = 0.0
 
 *        Find X sub-pixelling
-          XSUB = SPIX2( XP0 + DX*REAL(I-1), DX )
+          XSUB = SPIX2( XP0 + DX*REAL(I-1), DX, RC )
           SDX = DX / XSUB
 
 *        X contribution to normalisation - hence total normalisation
@@ -463,9 +463,9 @@
 
 
 
-      INTEGER FUNCTION SPIX2( DEL, PIX )
+      INTEGER FUNCTION SPIX2( DEL, PIX, RC )
 
-      REAL                     DEL,PIX
+      REAL                     DEL, PIX, RC
 
       SPIX2 = MAX( 1,
      :            NINT( ABS( 10.0 * PIX ) /
