@@ -1,0 +1,118 @@
+      SUBROUTINE CCG1_KPPT<T>( PARAM, NDIM, DIMS, VALUES, KEY, SLOC,
+     :                         STATUS )
+*+
+*  Name:
+*     CCG1_KPPT<T>
+
+*  Purpose:
+*     Put a keyed array of values into the GLOBAL parameter file.
+
+*  Language:
+*     Starlink Fortran 77.
+
+*  Invocation:
+*     CALL CCG1_KPPT<T>( PARAM, NDIM, DIMS, VALUES, KEY, SLOC, STATUS )
+
+*  Description:
+*     This routine writes a keyed array or scalar of type 
+*     <COMM> as a parameter value directly into the HDS 
+*     structure in the ADAM GLOBAL parameter file used for storing 
+*     keyed values.
+*
+*     This keyed value structure can be accessed using the CCD1_KPLD
+*     routine to replace the global parameters known about by the
+*     PAR system by those corresponding to a particular key
+*     (intended to be a Set Index value).
+
+*  Arguments:
+*     PARAM = CHARACTER * ( * ) (Given)
+*        The name of the global parameter whose value is to be stored.
+*     NDIM = INTEGER (Given)
+*        The number of dimensions of the array to be written (use 0
+*        for a scalar value).
+*     DIMS( NDIM ) = INTEGER (Given)
+*        The dimensions of the value to be written.
+*     VALUES( * ) = <TYPE> (Given)
+*        The values to be written into the parameter file (as a vector).
+*     KEY = INTEGER (Given)
+*        The key value under which the value should be stored.
+*     SLOC = CHARACTER * ( * ) (Given)
+*        An HDS locator for the structure storing keyed parameters.
+*        Should be opened for UPDATE access.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2001 Central Laboratory of the Research Councils
+
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2-JUL-2001 (MBT):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! Standard HDS constants
+      
+*  Arguments Given:
+      CHARACTER * ( * ) PARAM
+      INTEGER NDIM
+      INTEGER DIMS( NDIM )
+      <TYPE> VALUES( * )
+      INTEGER KEY
+      CHARACTER * ( * ) SLOC
+      
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      CHARACTER * ( DAT__SZTYP ) HTYPE ! HDS type of values
+      PARAMETER ( HTYPE = '<HTYPE>' )
+      
+*  Local Variables:
+      CHARACTER * ( DAT__SZLOC ) ALOC ! HDS locator for keyed parameter
+      CHARACTER * ( DAT__SZNAM ) KEYNAM ! Name of key component
+      INTEGER LENG               ! Length of string
+      LOGICAL THERE              ! Does HDS component exist?
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+      
+*  Get a locator for the component of the keyed parameters structure 
+*  representing the parameter we are interested in; if none exists,
+*  create one.
+      CALL DAT_THERE( SLOC, PARAM, THERE, STATUS )
+      IF ( .NOT. THERE ) THEN
+         CALL DAT_NEW( SLOC, PARAM, 'KEYED_PARAMETER', 0, 0, STATUS )
+      END IF
+      CALL DAT_FIND( SLOC, PARAM, ALOC, STATUS )
+
+*  Generate the name of the component of this structure corresponding 
+*  to the key we are going to save.
+      CALL MSG_SETI( 'KEY', KEY )
+      CALL MSG_LOAD( ' ', 'KEY_^KEY', KEYNAM, LENG, STATUS )
+
+*  Now write a new component with the key corresponding to this key and
+*  the requested value.
+      CALL CMP_MOD( ALOC, KEYNAM, HTYPE, NDIM, DIMS, STATUS )
+      CALL CMP_PUTN<T>( ALOC, KEYNAM, NDIM, DIMS, VALUES, DIMS, STATUS )
+
+*  Release locators.
+      CALL DAT_ANNUL( ALOC, STATUS )
+
+      END
+* $Id$
