@@ -497,7 +497,9 @@ sub creobj {
   # If we have no locators, assume we have to create a top level
   my $nloc;
   if (scalar(@locs) == 0) {
-    hds_new( $new, $new, $type, $ndims, @dims, $nloc, $status );
+    # The HDS component name has a size limit
+    hds_new( $new, substr($new, 0, &NDF::DAT__SZNAM),
+	     $type, $ndims, @dims, $nloc, $status );
   } else {
     dat_new($locs[-1], $new, $type, $ndims, @dims, $status);
   }
