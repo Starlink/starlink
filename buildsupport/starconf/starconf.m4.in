@@ -1230,6 +1230,29 @@ dnl    AC_DEFINE_UNQUOTED([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
 dnl                       $star_cv_initialise_fortran)
 ])# STAR_INITIALISE_FORTRAN
 
+# STAR_SUPPRESS_BUILD_IF(test, message)
+# -------------------------------------
+# Call once at the end of the configure script.
+#
+# If the given shell test evaluates to true, then suppress the build,
+# without having ./configure fail.  The test is any command which
+# returns true if the build should be suppressed, and may be shell
+# commands `true' or `false', or might be a more complicated test,
+# such as `test -n "$SOMEENV"'.
+#
+# The macro communicates with the generated Makefile.in by creating a file
+# STAR_SUPPRESS_BUILD if the test evaluates to true.  The file contains
+# the text of the explanation.
+AC_DEFUN([STAR_SUPPRESS_BUILD_IF],
+   [m4_ifval([$1], [], [AC_FATAL([$0: needs two arguments])])dnl
+    m4_ifval([$2], [], [AC_FATAL([$0: needs two arguments])])dnl
+    rm -f STAR_[]SUPPRESS_BUILD
+    if [$1]; then
+        AC_MSG_WARN([Build inhibited: $2])
+        echo "$2" >STAR_[]SUPPRESS_BUILD
+    fi
+])# STAR_SUPPRESS_BUILD_IF
+
 
 # starconf internal macros
 
