@@ -1,4 +1,4 @@
-#!/star/Perl/bin/perl -w
+#!/stardev/Perl/bin/perl -w
 # $Id$
 
 #+
@@ -243,7 +243,7 @@
 
 #  Output initial information.
       print( 
-         "<!doctype documentsummary public '$dtdname'>\n",
+         "<!DOCTYPE documentsummary PUBLIC '$dtdname'>\n",
          "<documentsummary urlpath='$urlprefix$topfile' ",
                           "urllinkpolicy='explicit'>\n",
          "<docinfo>\n",

@@ -1,0 +1,29 @@
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD Program Source Code 0.7//EN" [
+<!ENTITY img-eqlist SYSTEM 'img-eqlist.pl.sgml'>
+]>
+
+<!-- Programcode file which is the container for the documentation of
+     the various support programs.
+
+     $Id$
+     -->
+
+<programcode>
+
+<docblock>
+<title>Supporting library programs</title>
+
+<authorlist>
+
+<author id=ng affiliation='Starlink, Glasgow' email='norman@astro.gla.ac.uk'>
+Norman Gray
+<author id=mbt affiliation='Starlink, Institute of Astronomy, Cambridge'
+	email='mbt@ast.cam.ac.uk'>
+Mark Taylor
+
+<codegroup>Supporting library programs
+
+<routine>
+&img-eqlist;
+<codebody empty>
+
