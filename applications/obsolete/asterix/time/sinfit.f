@@ -57,7 +57,6 @@
       CHARACTER*80           DUNITS        ! Data units
       CHARACTER*80           TUNITS        ! Time units
       CHARACTER*80           TEXT(5)       ! For history record
-      CHARACTER*80           TITLE         ! of data file.
 
       REAL                   	BASEFREQ      		! Base freq.
       REAL                   	FCHNG         		! The frequency at which SINFIT_PGRAM changes algorithm.
