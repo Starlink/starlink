@@ -54,6 +54,15 @@
 *     object destroy
 *        Releases all resources associated with the object.
 *
+*     object display device loval hival frame options
+*        Plots the NDF on the named PGPLOT device, with colour cutoffs
+*        given by the loval and hival arguments, and axes drawn according
+*        to the frame argument.  The options string may contain any 
+*        plotting options desired, in astSet format.
+*
+*        The may be specified either as a numerical frame index, as a 
+*        domain name, or as one of the special strings "BASE" or "CURRENT".
+*
 *     object fitshead ?key? ...
 *        This method allows access to any FITS headers contained in the 
 *        .MORE.FITS extension of the NDF.  If any optional key arguments
@@ -170,6 +179,7 @@
 #include "cnf.h"
 #include "tclndf.h"
 #include "ast.h"
+#include "cpgplot.h"
 
 
 /* Unions for use with the Tcl hashes which store calculated percentiles.
@@ -403,6 +413,127 @@
          Tcl_DeleteCommand( interp, Tcl_GetString( objv[ 0 ] ) );
 
 /* Set result. */
+         result = Tcl_NewStringObj( "", 0 );
+      }
+
+
+/**********************************************************************/
+/* "display" command                                                  */
+/**********************************************************************/
+      else if ( ! strcmp( command, "display" ) ) {
+         int const badcolour = 0;
+         int ifrm;
+         int locolour;
+         int hicolour;
+         int ofrm;
+         int xpix;
+         int ypix;
+         int *pixbloc;
+         char *device;
+         char *settings;
+         float factor;
+         float gbox[ 4 ];
+         float xplo;
+         float xphi; 
+         float yplo;
+         float yphi;
+         double bbox[ 4 ];
+         double loval;
+         double hival;
+         double zoom;
+         AstPlot *plot;
+
+/* Check syntax. */
+         if ( objc != 7 ) {
+            Tcl_WrongNumArgs( interp, 2, objv, 
+                              "device loval hival frame options" );
+                            /* 1      2     3     4     5        */
+            return TCL_ERROR;
+         }
+
+/* Get string arguments. */
+         device = Tcl_GetString( objv[ 2 ] );
+         settings = Tcl_GetString( objv[ 6 ] );
+
+/* Get numeric arguments. */
+         if ( Tcl_GetDoubleFromObj( interp, objv[ 3 ], &loval ) != TCL_OK ||
+              Tcl_GetDoubleFromObj( interp, objv[ 4 ], &hival ) != TCL_OK ) {
+            return TCL_ERROR;
+         }
+           
+/* Get frame argument. */
+         if ( NdfGetIframeFromObj( interp, objv[ 5 ], ndf->wcs, &ifrm ) 
+              != TCL_OK ) {
+            return TCL_ERROR;
+         }
+
+/* Open the PGPLOT plotting device. */
+         if ( cpgopen( device ) < 0 ) {
+            result = Tcl_NewStringObj( "Failed to open plotting device", -1 );
+            Tcl_SetObjResult( interp, result );
+            return TCL_ERROR;
+         }
+
+/* Query the plotting device for highest and lowest available colour indices. */
+         cpgqcir( &locolour, &hicolour );
+
+/* Set the plotting coordinate limits. */
+         gbox[ 0 ] = bbox[ 0 ] = 0.0;
+         gbox[ 1 ] = bbox[ 1 ] = 0.0;
+         gbox[ 2 ] = bbox[ 2 ] = ndf->ubnd[ 0 ] - ndf->lbnd[ 0 ];
+         gbox[ 3 ] = bbox[ 3 ] = ndf->ubnd[ 1 ] - ndf->lbnd[ 1 ];
+
+/* Set the viewport to use all of the available surface, within the 
+   constraint that the correct aspect ratio is retained. */
+         cpgsvp( 0.0, 1.0, 0.0, 1.0 );
+         cpgwnad( gbox[ 0 ], gbox[ 2 ], gbox[ 1 ], gbox[ 3 ] );
+
+/* Get the viewport size in pixels. */
+         cpgqvp( 3, &xplo, &xphi, &yplo, &yphi );
+
+/* Set the zoom factor so that PGPLOT can optimise the plotting.  Basically
+   this entails making the pixel array the same shape as the plotting 
+   surface.  However, making it a lot bigger than the plotting surface
+   would be a waste of memory. */
+         factor = 1.0;
+         zoom = 10.0;
+         while ( zoom > 2.0 ) {
+            zoom = ( xphi - xplo ) / ( bbox[ 2 ] - bbox[ 0 ] ) / factor++;
+            printf( "zoom: %f\n", zoom );
+         }
+
+/* Prepare the image in a PGPLOT-friendly form. */
+         STARCALL(
+            pixbloc = getpixbloc( ndf, 1, zoom, loval, hival, locolour,
+                                  hicolour, badcolour, status );
+         )
+         xpix = ndf->plotarray.xdim;
+         ypix = ndf->plotarray.ydim;
+
+/* Begin PGPLOT buffering. */
+         cpgbbuf();
+
+/* Plot the image. */
+         cpgpixl( pixbloc, xpix, ypix, 1, xpix, 1, ypix, 
+                  gbox[ 0 ], gbox[ 2 ], gbox[ 1 ], gbox[ 3 ] );
+
+/* Get AST to plot the axes etc. */
+         ASTCALL(
+            ofrm = astGetI( ndf->wcs, "Current" );
+            astSetI( ndf->wcs, "Current", ifrm );
+            plot = astPlot( ndf->wcs, gbox, bbox, settings );
+            astSetI( ndf->wcs, "Current", ofrm );
+            astGrid( plot );
+            astAnnul( plot );
+         )
+
+/* End PGPLOT buffering. */
+         cpgebuf();
+
+/* Close the plotting device. */
+         cpgclos();
+
+/* No result is returned. */
          result = Tcl_NewStringObj( "", 0 );
       }
 
@@ -877,7 +1008,7 @@
             ndfValid( ndf->identifier, &valid, status );
          )
 
-/* Set result value and return. */
+/* Set result value. */
          result = Tcl_NewBooleanObj( F77_ISTRUE(valid) );
       }
 
