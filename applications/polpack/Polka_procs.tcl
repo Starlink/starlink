@@ -5793,7 +5793,7 @@ proc GetFeature {cx cy rlabel} {
 #  Write out the initiali pixel coordinates to a text file to be passed 
 #  to POLCENT.
       set tfile [UniqueFile]
-      set ifile_id [open $tfile w]
+      set tfile_id [open $tfile w]
 
       for {set i 0} {$i < $np} {incr i} {
          puts $tfile_id "[lindex $px $i] [lindex $py $i]"

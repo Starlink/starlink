@@ -240,10 +240,6 @@
 *  Annul the NDF identifier.
  999  CALL NDF_ANNUL( INDF, STATUS )
 
-*  Release the memory holding the input guesses.
-      CALL PSX_FREE( IPINX, STATUS )
-      CALL PSX_FREE( IPINY, STATUS )
-
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
 
