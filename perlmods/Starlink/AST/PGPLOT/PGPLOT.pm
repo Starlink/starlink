@@ -694,7 +694,62 @@ sub _GAttr {
    # Return. 
    return ( 1, $old_value );
 
-}   
+}
+
+=item B<_GCap>
+
+This function is called by the AST Plot class to determine if the
+grf module has a given capability, as indicated by the "cap"
+argument.
+
+  $has_cap = _GCap( $cap, $value );
+
+The capability string should be one of the following constants
+provided in the Starlink::AST::Grf namespace:
+
+GRF__SCALES: This function should return a non-zero value if
+it implements the astGScales function, and zero otherwise. The
+supplied "value" argument should be ignored.
+
+GRF__MJUST: This function should return a non-zero value if
+the astGText and astGTxExt functions recognise "M" as a
+character in the justification string. If the first character of
+a justification string is "M", then the text should be justified
+with the given reference point at the bottom of the bounding box.
+This is different to "B" justification, which requests that the
+reference point be put on the baseline of the text, since some
+characters hang down below the baseline. If the astGText or
+astGTxExt function cannot differentiate between "M" and "B",
+then this function should return zero, in which case "M"
+justification will never be requested by Plot. The supplied
+"value" argument should be ignored.
+
+GRF__ESC: This function should return a non-zero value if the
+astGText and astGTxExt functions can recognise and interpret
+graphics escape sequences within the supplied string. These
+escape sequences are described below. Zero should be returned
+if escape sequences cannot be interpreted (in which case the
+Plot class will interpret them itself if needed). The supplied
+"value" argument should be ignored only if escape sequences cannot
+be interpreted by astGText and astGTxExt. Otherwise, "value"
+indicates whether astGText and astGTxExt should interpret escape
+sequences in subsequent calls. If "value" is non-zero then
+escape sequences should be interpreted by astGText and
+astGTxExt. Otherwise, they should be drawn as literal text.
+
+Zero should be returned if the supplied capability is not recognised.
+
+=cut
+
+sub _GCap {
+  my $cap = shift;
+  my $value = shift;
+
+  if ($cap == &Starlink::AST::Grf::GRF__SCALES) {
+    return 1;
+  }
+  return 0;
+}
 
 
 # Internal error setting routine
