@@ -1,0 +1,171 @@
+#!/bin/csh
+#+
+#  Name:
+#     POLSMOOTH
+
+#  Purpose:
+#     Apply Gaussian smoothing to 4 supplied images
+
+#  Language:
+#     C shell
+
+#  Description:
+#     The user supplies the FWHM in units of pixels for the Gaussian 
+#     PSF, and the size of the box (in pixels) over which the PSF should
+#     be applied at each point. The supplied images are smoothed and 
+#     placed in output NDFs with names derived from the input NDF 
+#     names by appending the string supplied for parameter SUFFIX to 
+#     them.
+
+#  Usage:
+#     POLSMOOTH IN1 IN2 IN3 IN4 FWHM BOX SUFFIX
+
+#  Parameters:
+#     IN1 = NDF (Read)
+#        The NDF holding observed intensity with the waveplate at 0 degrees.
+#     IN2 = NDF (Read)
+#        The NDF holding observed intensity with the waveplate at 45 degrees.
+#     IN3 = NDF (Read)
+#        The NDF holding observed intensity with the waveplate at 22.5 degrees.
+#     IN4 = NDF (Read)
+#        The NDF holding observed intensity with the waveplate at 67.5 degrees.
+#     FWHM = _REAL (Read)
+#        Full width at half maximum of the Gaussian PSF, in pixels. 
+#     BOX = _REAL (Read)
+#        Size (in pixels) of the square region over which the Gaussian
+#        PSF should be applied at each point. The smoothing PSF will be
+#        set to zero outside this square. The value given will be 
+#        rounded up to a positive odd integer. 
+#     SUFFIX = LITERAL (Read)
+#        A string to append to the end of the supplied NDF names to 
+#        get the output NDF names.
+
+#  Notes:
+#     - This is a script and so command line parameters can be 
+#     specified by position only, not by keyword.
+#     - This script uses the KAPPA application GAUSMOOTH to perform
+#     the smoothing.
+#     - The suggested defaults for the four input NDFs are the
+#     output NDFS from the previous application or script. 
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     28-SEP-1993 (DSB):
+#        Original version.
+#     {enter_changes_here}
+#-
+
+#  Store the name of the current command.
+      set IRCCOM = "polsmooth"
+ 
+#  Ensure IRCAMPACK and KAPPA commands are available
+      alias echo 'echo >/dev/null'
+      kappa
+      ircampack
+      unalias echo
+
+#  Obtain the current set of values for the IRCAM global parameters.
+      set GLOBPAR = `ircamset`
+
+#  Get the 0 degree input NDF. First establish any command line value
+#  as the primary value
+      if( $#argv > 0 ) then
+         set DEF1 = $argv[1]
+      endif
+
+#  Now establish any defined global value as the suggested default.
+      set DEF2 = $GLOBPAR[1]
+      if( $DEF2 == 'undefined' ) unset DEF2
+
+#  Now set the prompt.
+      set PROM = "IN1 - NDF obtained with waveplate at 0 degrees"
+
+#  Now get the NDF. Abort if requested.
+      ircamndf
+      if( $?NDFNAM == 0 ) exit
+
+#  Save the NDF name. If a parameter abort was requested the NDFNAM variable
+#  will be undefined and the script will consequently abort.
+      set IN1 = $NDFNAM
+
+#  Now do the same for the 45 degree input NDF. 
+      if( $#argv > 1 ) then
+         set DEF1 = $argv[2]
+      endif
+      set DEF2 = $GLOBPAR[2]
+      if( $DEF2 == 'undefined' ) unset DEF2
+      set PROM = "IN2 - NDF obtained with waveplate at 45 degrees"
+      ircamndf
+      if( $?NDFNAM == 0 ) exit
+      set IN2 = $NDFNAM
+
+#  Now do the same for the 22.5 degree input NDF. 
+      if( $#argv > 2 ) then
+         set DEF1 = $argv[3]
+      endif
+      set DEF2 = $GLOBPAR[3]
+      if( $DEF2 == 'undefined' ) unset DEF2
+      set PROM = "IN3 - NDF obtained with waveplate at 22.5 degrees"
+      ircamndf
+      if( $?NDFNAM == 0 ) exit
+      set IN3 = $NDFNAM
+
+#  Now do the same for the 67.5 degree input NDF. 
+      if( $#argv > 3 ) then
+         set DEF1 = $argv[4]
+      endif
+      set DEF2 = $GLOBPAR[4]
+      if( $DEF2 == 'undefined' ) unset DEF2
+      set PROM = "IN4 - NDF obtained with waveplate at 67.5 degrees"
+      ircamndf
+      if( $?NDFNAM == 0 ) exit
+      set IN4 = $NDFNAM
+
+#  Obtain the FWHM for the Gaussian PSF.
+      if( $#argv > 4 ) then
+         set DEF1 = $argv[5]
+      endif
+      set DEF2 = $GLOBPAR[8]
+      if( $DEF2 == 'undefined' ) set DEF2 = "2.4"
+      set PROM = "FWHM - FWHM (in pixels) for the Gaussian PSF"
+      ircamstr
+      if( $?STRING == 0 ) exit
+      set FWHM = $STRING
+
+#  Obtain the box size over which the PSF is to operate.
+      if( $#argv > 5 ) then
+         set DEF1 = $argv[6]
+      endif
+      set DEF2 = $GLOBPAR[9]
+      if( $DEF2 == 'undefined' ) set DEF2 = "3.0"
+      set PROM = "BOX - Box size (in pixels) containing non-zero PSF values"
+      ircamstr
+      if( $?STRING == 0 ) exit
+      set BOX = $STRING
+
+#  Obtain the suffix for the output NDFs.
+      if( $#argv > 6 ) then
+         set DEF1 = $argv[7]
+      endif
+      set PROM = "SUFFIX - Suffix for output NDF names"
+      ircamstr
+      if( $?STRING == 0 ) exit
+      set SUFFIX = $STRING
+
+#  Loop round each of the input images.
+      foreach IN ($IN1 $IN2 $IN3 $IN4)
+
+#  Smooth the image.
+         gausmooth ${IN} ${IN}${SUFFIX} ${FWHM} BOX=${BOX}
+
+#  Do the next input NDF.
+      end
+
+#  Store the new IRCAM global parameters.
+      ircamset ${IN1}${SUFFIX} ${IN2}${SUFFIX} ${IN3}${SUFFIX} ${IN4}${SUFFIX} FWHM=${FWHM} BOX=${BOX} >/dev/null
+
+#  Finish
+      exit

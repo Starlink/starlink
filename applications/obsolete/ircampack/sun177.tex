@@ -1,0 +1,2605 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {177.1}
+\newcommand{\stardocauthors}   {David S. Berry}
+\newcommand{\stardocdate}      {27th September 1994}
+\newcommand{\stardoctitle}     {IRCAMPACK --- IRCAM Data Reduction on Starlink}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+
+% degrees symbol
+\newcommand{\dgs}{\hbox{$^\circ$}} 
+% centre an asterisk
+\newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
+% A kind of list item, like description, but with an easily adjustable
+% item separation.
+\newcommand{\menuitem}[2]
+  {{\bf #1}: \addtolength{\baselineskip}{-0.4ex}
+  \parbox[t]{128mm}{#2} \addtolength{\baselineskip}{0.4ex} \\ \hspace{-5pt}}
+% an environment for references
+\newenvironment{refs}{\goodbreak
+                      \vspace{3ex}
+                      \begin{list}{}{\setlength{\topsep}{0mm}
+                                     \setlength{\partopsep}{0mm}
+                                     \setlength{\itemsep}{0mm}
+                                     \setlength{\parsep}{0mm}
+                                     \setlength{\leftmargin}{1.5em}
+                                     \setlength{\itemindent}{-\leftmargin}
+                                     \setlength{\labelsep}{0mm}
+                                     \setlength{\labelwidth}{0mm}}
+                    }{\end{list}}
+
+% SST definitions
+% ---------------
+
+%+
+%  Name:
+%     LAYOUT.TEX
+
+%  Purpose:
+%     Define Latex commands for laying out documentation produced by PROLAT.
+
+%  Language:
+%     Latex
+
+%  Type of Module:
+%     Data file for use by the PROLAT application.
+
+%  Description:
+%     This file defines Latex commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by Latex. The
+%     contents of this file should be included in the source presented to
+%     Latex in front of any output from PROLAT. By default, this is done
+%     automatically by PROLAT.
+
+%  Notes:
+%     The definitions in this file should be included explicitly in any file
+%     which requires them. The \include directive should not be used, as it
+%     may not then be possible to process the resulting document with Latex
+%     at a later date if changes to this definitions file become necessary.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a \tt font of the required size.
+\font\ssttt=cmtt10 scaled 1095
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the output results parameters section (for an application).
+\newcommand{\sstresparameters}[1]{
+   \item[Results Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the graphics style parameters section (for an application).
+\newcommand{\sstgraphparameters}[1]{
+   \item[Graphics-style Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  End of LAYOUT.TEX layout definitions.
+%.
+
+% End of SST definitions
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+DRAL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+{\large Particle Physics \& Astronomy Research Council}\\
+{\large Starlink Project\\}
+{\large \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm} \tableofcontents
+\setlength{\parskip}{\medskipamount} \markright{\stardocname} \newpage 
+
+\section{Introduction}
+
+{\small IRCAMPACK} is a package of applications which provides extra
+facilities for the processing of {\small IRCAM} data. It is expected
+that the {\small CCDPACK} and {\small KAPPA} packages will be used to
+perform the bulk of the processing of such data, with {\small
+IRCAMPACK} providing certain specialised functions not provided by
+{\small CCDPACK} or {\small KAPPA}. In particular, {\small IRCAMPACK}
+contains applications which interpret and process the {\small
+IRCAM}-specific header information stored within {\small IRCAM} data
+files. {\small CCDPACK} is described in SUN/139, and {\small KAPPA} is
+described in SUN/95.
+
+At the moment, {\small IRCAMPACK} provides the following facilities:
+
+\begin{itemize}
+
+\item Normalisation of frames to unit total exposure time.
+
+\item A simple imaging polarimetry reduction procedure.
+
+\end{itemize}
+
+{\small IRCAMPACK} runs under the Starlink {\small ADAM} environment,
+on {\small UNIX} operating systems, and uses the ``Extensible
+N-dimensional data format'' ({\small NDF}) for storing data in {\small
+HDS} files. {\small IRCAMPACK} uses an {\small NDF} ``extension'' named
+``{\small IRCAM}'' to store {\small IRCAM}-specific information within
+each data file. SG/4 gives an overview of {\small ADAM}, {\small NDF}
+and {\small HDS} concepts.
+
+\section{Converting IRCAM data into NDF format}
+
+The {\small IRCAM} data files obtained at the telescope must be
+converted into the {\small NDF} format before they can be used by
+{\small IRCAMPACK, CCDPACK} or {\small KAPPA}. This can be achieved
+using the {\small IRCAM2NDF} application within the {\small CONVERT}
+package (see SUN/55). This application converts each frame into an NDF
+structure and places each in a separate file (with suffix ``{\em
+.sdf}''). It also copies all the {\small IRCAM} header information
+(filter, exposure time, camera mode, etc) into each {\small NDF}
+structure, placing the information in an extension named ``{\small
+IRCAM}''.
+
+\section{Starting up IRCAMPACK}
+
+Before using any {\small IRCAMPACK} commands, enter the command:
+
+\small
+\begin{verbatim}
+      % ircampack
+\end{verbatim}
+\normalsize
+
+This executes a script setting up aliases for {\small IRCAMPACK}'s
+command names. You will see a message telling you which version of
+{\small IRCAMPACK} is ready for use. The {\small KAPPA} and {\small
+CCDPACK} packages can be started in a similar way using the commands
+\verb+kappa+ and \verb+ccdpack+.
+
+\section{Getting Help}
+
+{\small IRCAMPACK} includes an on-line help library which contains much
+of the information contained in this document, in a hierarchical
+VMS-like form. It can be accessed in several ways:
+
+\begin {itemize} 
+
+\item The command \verb+irchelp+ will put you into the help library at
+the top level. You can then navigate through the help library.
+
+\item When an {\small IRCAMPACK} application or script issues a prompt,
+you can respond with a single or double question mark (``?'' or
+``??''). The former displays the description of the current parameter
+from the help library and then re-issues the prompt for the parameter.
+The latter displays the same information, but leaves you in the help
+library, thus allowing other information to be examined. The parameter
+prompt is re-issued when the help library is finally exited.
+
+\end{itemize}
+
+\section{General Data Reduction}
+\label{SEC:GEN}
+
+This section contains examples of how {\small CCDPACK}, {\small KAPPA}
+and {\small IRCAMPACK} commands can be used to perform some of the more
+common steps required to reduce {\small IRCAM} data. It is not intended
+to be a complete or definitive guide, but to provide some ideas which
+can be developed further to meet your own particular requirements. The
+Starlink User Notes associated with {\small CCDPACK} and {\small KAPPA}
+should be read, together with appendix \ref{APP:FULL} of this document,
+for full descriptions of the available commands.
+
+\subsection{Identifying Bad Pixels}
+
+Bad pixels are identified by unusually high values in dark frames, or
+unusually low values in flatfield frames. Bad pixels in flatfields can
+be located when the master flatfield is created (see section
+\ref{SEC:FLAT} below). Bad pixels in dark frames can be found using
+{\small KAPPA} application {\small CLEANER}\footnote{The command
+CLEANER is going to be renamed as FFCLEAN at the next release (V0.9) of
+KAPPA.}. This application automatically identifies pixels with values
+which differ significantly from the local mean value. Once found, such
+pixels are flagged by replacing the data value with a standard ``bad
+value''.  Pixels with this standard bad value are automatically
+excluded from all processing by later applications. For instance if the
+file \verb+f123.sdf+ contains a dark frame, then the command:
+
+\small
+\begin{verbatim}
+      % cleaner in=f123 out=f123c clip="[4,4,4]" box="[5,5]" 
+\end{verbatim}
+\normalsize
+
+will create a new file \verb+f123c.sdf+ containing a copy of the dark
+frame in which bad pixels have been flagged with the standard bad
+value. The level of significance required to reject a pixel is
+controlled by {\small CLEANER} parameters {\small CLIP} and {\small
+BOX}. See SUN/95 for more information about these and other
+parameters.
+
+\subsection{Calculation of Variances}
+
+Each application not only processes the data values of the frame, but
+can also process associated variance information (this information is
+stored in the same file as the data values). The {\small CCDPACK}
+application {\small DEBIAS} creates such variance values, and also
+scales the data values from ``data numbers'' into photoelectron counts.
+The variance values are based on Poissonian statistics in the
+photoelectron counts, together with a specified read-out noise. As its
+name implies, {\small DEBIAS} is primarily intended for de-biassing
+{\small CCD} data. De-biassing is usually not necessary for {\small
+IRCAM} data because of the Non-Destructive Read ({\small NDR}) scheme.
+In this, the array is read twice for each frame, once at the start and
+once at the end of the chosen exposure time, and the difference between
+the two is stored as the final frame. This effectively corresponds to
+de-biassing, and so no further de-biassing is needed\footnote{Explicit
+de-biassing could be needed if the NDR scheme is not used.}. To prevent
+{\small DEBIAS} from de-biassing the data, parameters {\small USECON}
+and {\small ZERO} can be set so that a constant bias value of zero is
+used.
+
+In common with most other {\small CCDPACK} applications, {\small
+DEBIAS} allows many frames to be processed using a single invocation of
+the application. The various forms of syntax for specifying lists of
+frames are described in SUN/139.  The following commands assume that
+the names of all the input frames have been stored in the text file
+\verb+inputs.lis+:
+
+\small
+\begin{verbatim}
+      % debias in=^inputs.lis out="*b" adc=30 usecon zero=0 rnoise=11.7
+\end{verbatim}
+\normalsize
+
+The name of each output {\small NDF} is derived from the name of the
+corresponding input {\small NDF} by appending the letter ``b'' to it
+(the quotes round the value for parameter {\small OUT} are required to
+prevent the shell from expanding the asterisk into a list of file
+names). A constant bias value of zero is used, which means that the
+debiassing has no effect on the data. The data number to photoelectron
+conversion factor is given as 30 electrons per data number, and the
+read-out noise is given as 11.7 data numbers (i.e. $\sim350$
+electrons). The read-out noise is included in the variance estimation.
+
+\subsection{Normalisation to Unit Exposure Time}
+
+The {\small IRCAMPACK} application {\small TNORM} can be used to
+normalise frames to a total exposure time of one second. It divides the
+data values by the total exposure time (i.e. the product of the number
+of coadds in the frame and the exposure time per coadd), and divides
+the variances by the square of the total exposure time. The total
+exposure time is calculated from the information stored in the
+``{\small IRCAM}'' extension within each {\small NDF}. In common with
+{\small CCDPACK, IRCAMPACK} applications allow multiple frames to be
+processed by a single invocation. The following command processes all
+{\small NDF}s with names ending with the letter ``b'':
+
+\small
+\begin{verbatim}
+      % tnorm in="*b" out="*n"
+\end{verbatim}
+\normalsize
+
+Each output {\small NDF} is stored in a file with a name derived from
+the corresponding input {\small NDF} by appending the letter ``n'' to
+it.
+
+\subsection{Dark Current Subtraction}
+
+Individual dark frames can be combined into a single master dark frame
+(or ``calibration'' frame) using {\small CCDPACK} application {\small
+MAKECAL}.  Note, if the dark frames have not been debiased, then they
+should only be combined together if the individual coadds within each
+dark frame have the same exposure time. The following command combines
+the dark frames stored within files \verb+f123c.sdf+, \verb+f124c.sdf+
+and \verb+f125c.sdf+ into a single master dark frame in file
+\verb+dark.sdf+:
+
+\small
+\begin{verbatim}
+      % makecal in="f123c,f124c,f125c" out=dark expose=1 method=mean
+\end{verbatim}
+\normalsize
+
+The value given for parameter {\small EXPOSE} indicates that all the
+inputs are normalised to the same total exposure time (this could be
+ensured by using {\small TNORM} for instance). Each output pixel value
+is obtained by taking the mean of the three corresponding input pixel
+values (the need for a robust method such as the median is reduced
+because of the fact that bad pixels will previously have been removed
+using {\small CLEANER}, see above). Pixel values are set bad in the
+output if all of the three input pixel values are bad.
+
+Having created a master dark frame, it can be subtracted from the
+object frames and the flatfield frames using {\small CCDPACK}
+application {\small CALCOR}:
+
+\small
+\begin{verbatim}
+      % calcor in=^frames.lis out="*d" cal=dark expose=1
+\end{verbatim}
+\normalsize
+
+Here, it is assumed that the text file \verb+frames.lis+ contains a
+list of all the flatfield and object frames (after processing by
+{\small DEBIAS}, see above). The names of the output {\small NDF}s are
+derived from the input {\small NDF} names by appending the letter
+``d''. The file \verb+dark.sdf+ contains the master dark frame created
+by {\small MAKECAL}. All the input frames should have been normalised
+to a common exposure time using {\small TNORM} and so the {\small
+EXPOSE} parameter is given a value of 1. The bad pixels flagged in the
+master dark frame are propagated into the output {\small NDF}s.
+
+\subsection{Flatfield Correction}
+\label{SEC:FLAT}
+
+Individual flatfield frames can be combined into a single master
+flatfield frame using {\small CCDPACK} application {MAKEFLAT}. This
+application identifies bad pixels within each individual flatfield
+frame using a similar method to the {\small KAPPA} application {\small
+CLEANER}, and then combines the input pixel values together to get the
+output pixel values. The following command reads the names of the input
+{\small NDF}s from text file \verb+flats.lis+:
+
+\small
+\begin{verbatim}
+      % makeflat in=^flats.lis out=flat method=mean
+\end{verbatim}
+\normalsize
+
+The master flatfield is written to file \verb+flat.sdf+. Each value in
+the master flatfield is the mean of the corresponding input values
+(after rejection of any bad pixels present in the inputs).
+
+The object frames can now be flatfielded using the master flatfield
+frame just created. This is done using {\small CCDPACK} application
+{\small FLATCOR}:
+
+\small
+\begin{verbatim}
+      % flatcor in=^object.lis out="*f" flat=flat
+\end{verbatim}
+\normalsize
+
+The names of the {\small NDF}s holding the object frames are assumed to
+be contained in text file \verb+object.lis+. The output {\small NDF}s
+have names derived from the input {\small NDF} names by appending the
+letter ``f''. The master flatfield contained in the file
+\verb+flat.sdf+ is used.
+
+\subsection{Frame Alignment}
+
+This is performed in two stages; firstly the transformations required
+to align the frames must be found, and secondly, each frame must be
+resampled using these transformations. {\small CCDPACK} provides
+various facilities for performing both of these stages. There are at
+least two different requirements for frame alignment:
+
+\begin{enumerate}
+
+\item If a number of partially overlapping --offset-- frames containing
+a reasonable number of point sources are to be combined together into a
+mosaic, then the  applications {\small FINDOBJ} and {\small FINDOFF}
+can be used to find and  match objects ``automatically'' within a group
+of frames. The application {\small PAIRNDF} performs the same task
+interactively (and needs fewer common objects). {\small REGISTER} can
+then be used to evaluate transformations which map positions in each
+frame onto the equivalent positions in a template frame. These
+transformations can combine shift, stretch, shear and rotation
+(depending on the number of objects available), but are limited to
+shifts when using the routine described above. {\small TRANNDF} can
+then be used to resample each frame according to these transformations,
+and finally {\small MAKEMOS} can be used to stack the aligned frames
+together. {\small MAKEMOS} can optionally evaluate and correct for
+differences in transparency and base level offsets to produce a
+photometrically smooth mosaic.
+
+\item If a set of frames covering the same area of the sky need to be
+aligned using transformations not limited to shifts (say if they have
+been rotated or magnified) then it is necessary to use the {\small
+CCDALIGN} procedure. {\small CCDALIGN} displays the first frame and
+asks the user to identify features using a cursor. The accurate
+positions of the features are found using a centroiding technique. A
+search is then made for objects at approximately the same positions
+within the other frames. The accurate positions of these objects are
+found and a transformation is derived for each frame which maps these
+positions to the corresponding positions in the first frame. These
+transformations are recorded for later use within an extension of the
+{\small NDF} structure. A typical use of {\small CCDALIGN} is
+illustrated in Appendix \ref{APP:CCDAL}.  {\small TRANNDF} can then be
+used to resample the frames according to this transformation.
+
+\end{enumerate}
+
+\section{Polarimetry}
+
+The current verion of {\small IRCAMPACK} contains several applications
+which enable polarisation maps to be created from a set of four
+intensity images analysed at 45\dgs \hspace*{0.1mm} intervals (i.e.
+22.5\dgs \hspace*{0.1mm} half-wave plate intervals):
+
+\begin{description}
+
+\item [CALPOL] - Calculates Stokes parameters, percentage polarisation,
+position angle, polarised intensity, etc, from a set of four intensity
+images. If the input {\small NDF}s contain variance information, then
+variances are created for the output values. Correction for the
+statistical bias caused by the asymmetric distribution of percentage
+polarisation and polarised intensity (i.e. shot-noise correction) can
+be applied if required.
+
+\item [ERRCLIP] - Sets pixels bad within an {\small NDF} if the pixel's
+variance (or standard deviation) is greater than a given absolute
+value, or a given fraction of the data value. This is useful for
+removing unreliable vectors from a polarisation map.
+
+\item [VECPLOT] - Plots a vector map given two input images containing
+corresponding values of vector magnitude (percentage polarisation for
+instance) and vector orientation. The vectors can be rotated by a fixed
+angle prior to display.
+
+\end{description}
+
+\begin{quote}
+\begin{center}
+
+{\em These are general purpose applications which are in no way
+specific to {\small IRCAM} data. It is intended to move them (together
+with the upgraded version of the {\small KAPPA} application {\small
+SEGMENT} which is included in {\small IRCAMPACK}) from {\small
+IRCAMPACK} to {\small KAPPA} when the next release (V0.9) of {\small
+KAPPA} is made, at which time they will be removed from {\small
+IRCAMPACK}.}
+
+\end{center}
+\end{quote}
+
+A set of easy-to-use scripts has been produced as part of the {\small
+IRCAMPACK} package which implement a simple procedure for using these
+applications (see below). They are quicker to use than the ``raw''
+applications, but don't give as much versatility. The next section
+describes the use of the ``raw'' applications. If it all sounds too
+involved, try looking at the following section which describes the use
+of the easy-to-use scripts.
+
+\subsection{Using the Polarimetry Applications Directly}
+
+In general, the steps involved in producing a polarisation map using
+the ``raw'' polarimetry applications listed above are:
+
+\begin{enumerate}
+
+\item Ensure that the four intensity frames have been dark subtracted,
+flatfielded and aligned as described in section \ref{SEC:GEN}. This
+will result in each frame having associated variance values.
+
+\item Inspect each frame for obvious blemishes or bad pixels. Frames
+can be displayed using {\small KAPPA} application {\small DISPLAY}, and
+blemishes can then be removed manually using {\small KAPPA} application
+{\small ZAPLIN}.
+
+\item Sky subtraction. One method, for instance, is to display one of
+the frames and then use {\small IRCAMPACK} application {\small SEGMENT}
+to identify a polygonal region of the frame containing sky. {\small
+STATS} can then be used to find the mean value of this region (an
+option exists for rejecting aberrant points from the statistics), and
+{\small CSUB} can be used to subtract the mean value from the original
+frame. Other methods are possible.
+
+\item Smoothing. {\small GAUSS}\footnote{The command GAUSS is going to
+be renamed as GAUSMOOTH at the next release (V0.9) of KAPPA.} can be
+used to apply a light Gaussian smoothing to the four intensity frames
+(for instance, an {\small FWHM} of $\sim2.3$ pixels over a three pixel
+square box).
+
+\item {\small CALPOL} should then be used to obtain the percentage
+polarisation and position angle (and any other required parameters) at
+each pixel.
+
+\item {\small ERRCLIP} can then be used to remove unreliable vectors,
+for instance by removing all pixels from the percentage polarisation
+image which have a standard deviation greater than 1 \%. The position
+angle image can also be clipped to remove values with large errors.
+
+\item {\small VECPLOT} can now be used to display the map, rotating the
+vectors by a given amount so that they refer to north rather than to an
+axis determined by the instrument. This angle can be determined from
+observations of standard polarised sources. If required, the vector map
+may be overlayed on top of a previously displayed greyscale image or
+contour map.
+
+\end{enumerate}
+
+\subsection{Easy-to-use Scripts Within IRCAMPACK}
+
+Scripts are provided within {\small IRCAMPACK} to perform a quick and
+easy reduction of {\small IRCAM} polarimetry data, suitable for an
+initial look at the data (the extra versatility provided by using the
+raw polarimetry applications directly may be needed to meet your
+requirements for a complete analysis of the data). Before using these
+scripts you should dark subtract, flatfield and align the four
+intensity frames as described in section \ref{SEC:GEN}. The following
+commands should then be issued in the order indicated (they are
+described further below):
+
+\small
+\begin{verbatim}
+      % polzap
+      % polsky
+      % polsmooth
+      % polcal
+      % polmapd (or polmapc)
+\end{verbatim}
+\normalsize
+
+\begin{description}
+
+\item [POLZAP] - Removes any remaining blemishes from all four
+intensity frames.  Such pixels are replaced by the standard ``bad''
+value. You will be prompted for the four input frames, and for a suffix
+for the output frames. The names of the four output frames are formed
+by appending the supplied suffix to the corresponding input name. If
+you have not established a default graphics device already (for
+instance using {\small KAPPA} command {\small GDSET}), you will also be
+prompted for the name of a graphics device. The specified device will
+become the current default graphics device. Each of the four input
+frames will then be processed in turn. The current frame is displayed,
+and you are prompted for parameter {\small LINCOL} (this is actually a
+parameter of the {\small KAPPA ZAPLIN} command). If there are no
+obvious blemishes on the frame then a null value (``!'') should be
+supplied for {\small LINCOL}, in which case processing will continue
+with the next input frame. If there {\em are} any blemishes, then
+supply one of the strings ``lines'', ``columns'', or ``region'' for
+{\small LINCOL}. These strings define the shape of the area to be
+removed; ``lines'' causes a set of lines to be removed from the frame,
+``columns'' causes a set of columns to be removed, and ``region''
+causes a rectangular region to be removed.  A cursor is then displayed,
+and you should use it to indicate the bounds of the area to be removed
+by selecting two points, one on either side of the blemish (or at
+opposite corners if a rectangular region is being used). The specified
+pixels are removed from the output frame, but the image display is {\em
+not} updated to reflect this. Another prompt for {\small LINCOL} is
+then issued. At this point you can either give a null value if there
+are no more blemishes, or specify the shape of the next blemish to be
+removed.
+
+\item [POLSKY] - Subtracts a constant sky value from all four intensity
+frames.  As with {\small POLZAP} you will be prompted for the names of
+the input frames, and a suffix for the output frames. The suggested
+defaults for the input frames (i.e. the values which will be used if
+\verb+<RETURN>+ is entered to each prompt) are the outputs from the
+previous script (usually {\small POLZAP}). This cuts down the amount of
+typing needed. The graphics device used by the previous script will be
+used again unless another default graphics device has since been
+established by running {\small KAPPA GDSET}. The first of the four
+input frames is displayed on the graphics device, and you are asked to
+identify a polygonal region of the frame containing sky. The colour
+table used to display the frame is chosen to emphasize structure in the
+faint regions of the frame. A region devoid of significant structure
+should be identified by positioning the cursor in turn at each vertex
+of a polygon enclosing the area.  The mean value in the region is then
+found (after rejection of aberrant values) and displayed. This value is
+subtracted from the first input frame. The mean value in the same
+region of each of the other three input frames is then found and
+subtracted off the input frame. The user only has to specify the region
+once; the same region is used for all input frames.
+
+\item [POLSMOOTH] - Applies Gaussian smoothing to all four intensity
+frames.  Again, you will be prompted for the names of the input frames,
+with the output frames from the previous script suggested as default
+values. You are then asked for the Full Width at Half Maximum of the
+Gaussian smoothing function, and the size of the box over which the
+smoothing function is to extend. Finally, you are prompted for a suffix
+for the output frames.
+
+\item [POLCAL] - Calculates the total intensity, percentage
+polarisation and position angle at each pixel, rejecting unreliable
+values. Again, you will be prompted for the names of the four input
+intensity frames, with the output frames from the previous script
+suggested as default values. You are then asked for output frames to
+hold percentage polarisation, position angle, and total intensity. You
+are then asked for the maximum acceptable standard deviation in the
+percentage polarisation values (in units of percent), and in the
+position angle (in units of degrees). Any pixels for which either of
+the two standard deviation limits is exceeded are set bad in the
+relevant output frame. No correction is made for shot-noise (use
+{\small CALPOL} directly if shot-noise correction is required).
+
+\item [POLMAPD] - Displays the polarisation map overlayed on a
+greyscale image of the total intensity. It uses {\small VECPLOT} to
+plot the vectors.  You are issued with prompts for three frames holding
+percentage polarisation, position angle, and total intensity. The most
+recent output frames created by {\small POLCAL} will be presented as
+suggested defaults. A prompt is then issued for an angle through which
+all vectors are to be rotated before display. A suitable angle should
+be specified to convert the supplied instrumental position angles into
+true position angles. The display will be produced on the current
+graphics device. If there is no current graphics device then you will
+be prompted for one. The display is annotated with axis values derived
+from the {\small IRCAM} header information and a key to the vector
+scale is produced. On a colour device, bad pixels are highlighted in
+blue, and vectors are displayed in green. These colours can
+subsequently be changed by setting new colours for pallette entries two
+and three using {\small KAPPA PALENTRY}.
+
+\item [POLMAPC] - Displays the polarisation map overlayed on a contour
+plot of the total intensity. It issues the same prompts as {\small
+POLMAPD}, and behaves in a similar way. The contour heights are
+selected automatically, and are displayed on the terminal from which
+the command was issued; they are not displayed on the polarisation map.
+No colour is used.
+
+\end{description}
+
+\appendix
+\newpage
+
+\section{An Alphabetical Summary of IRCAMPACK Commands}
+
+\begin{description}
+\item [IRCHELP] - Gives help about {\small IRCAMPACK}
+\item [TNORM] - Normalises a group of frames to unit total exposure time
+\item [IRCAMSET] - Displays and sets global parameters used by {\small 
+IRCAMPACK}
+\item [POLZAP] - Manually removes blemishes from four intensity frames
+\item [POLSKY] - Subtracts constant sky backgrounds from four intensity frames
+\item [POLSMOOTH] - Applies Gaussian smoothing to four intensity frames
+\item [POLCAL] - Calculates polarisation parameters from four intensity frames
+\item [POLMAPC] - Overlays a polarisation map on a total intensity contour plot
+\item [POLMAPD] - Overlays a polarisation map on a total intensity greyscale 
+image
+\end{description}
+
+The following commands are included in the first release of {\small
+IRCAMPACK} but will be moved to {\small KAPPA} in the near future (with
+release V0.9 of {\small KAPPA}). Their use gives greater versatility
+than the easy-to-use scripts listed above.
+
+\begin{description}
+\item [CALPOL] - Calculates polarisation parameters from four intensity images.
+\item [ERRCLIP] - Removes pixels which have errors larger than a given limit.
+\item [SEGMENT] - Copies polygonal segments from one NDF into another.
+\item [VECPLOT] - Plots vectors specified by magnitude and orientation.
+image
+\end{description}
+
+\newpage
+\section{Specifications of IRCAMPACK Commands}
+\label{APP:FULL}
+
+\begin{small}
+
+\sstroutine{
+   CALPOL
+}{
+   Calculate polarisation parameters
+}{
+   \sstdescription{
+      This routine calculates various parameters describing the
+      polarisation described by four intensity arrays analysed at 0, 45
+      90, and 135 degrees to a reference direction. Variance values are
+      stored in the output NDFs if all the input NDFs have variances and
+      if the user gives a true value for parameter VAR.
+
+      By default, three output NDFs are created holding percentage
+      polarisation, polarisation angle and total intensity. However,
+      NDFs holding other quantities can also be produced by over-riding
+      the default null values associated with the corresponding
+      parameters. The creation of any output NDF can be supressed by
+      supplying a null value for the corresponding parameter.
+
+      There is an option to correct the calculated values of percentage
+      polarisation and polarised intensity to take account of the
+      statistical bias introduced by the asymetric distribution of
+      percentage polarisation (see parameter DEBIAS). This correction
+      subtracts the variance of the percentage polarisation from the
+      squared percentage polarisation, and uses the square root of this
+      as the corrected percentage polarisation. The corresponding
+      polarised intensity is then found by multiply the corrected
+      percentage polarisation by the total intensity. Returned variance
+      values take no account of this correction.
+   }
+   \sstusage{
+      CALPOL IN1 IN2 IN3 IN4 P T I
+   }
+   \sstparameters{
+      \sstsubsection{
+         DEBIAS = LOGICAL (Read)
+      }{
+         True if a correction for statistical bias is to be made to
+         percentage polarisation and polarised intensity. This
+         correction cannot be used if any of the input NDFs do not
+         contain variance values, or if the user supplies a false value
+         for parameter VAR. [NO]
+      }
+      \sstsubsection{
+         I = NDF (Write)
+      }{
+         An output NDF holding the total intensity derived from all four
+         input NDFs.
+      }
+      \sstsubsection{
+         I1 = NDF (Read)
+      }{
+         An NDF holding the measured intensity analysed at an angle of 0
+         degrees to the reference direction.
+      }
+      \sstsubsection{
+         I2 = NDF (Read)
+      }{
+         An NDF holding the measured intensity analysed at an angle of
+         45 degrees to the reference direction.
+      }
+      \sstsubsection{
+         I3 = NDF (Read)
+      }{
+         An NDF holding the measured intensity analysed at an angle of
+         90 degrees to the reference direction.
+      }
+      \sstsubsection{
+         I4 = NDF (Read)
+      }{
+         An NDF holding the measured intensity analysed at an angle of
+         135 degrees to the reference direction.
+      }
+      \sstsubsection{
+         IA = NDF (Write)
+      }{
+         An output NDF holding the total intensity derived from input
+         NDFs I1 and I3. [!]
+      }
+      \sstsubsection{
+         IB = NDF (Write)
+      }{
+         An output NDF holding the total intensity derived from input
+         NDFs I2 and I4. [!]
+      }
+      \sstsubsection{
+         IP = NDF (Write)
+      }{
+         An output NDF holding the polarised intensity. [!]
+      }
+      \sstsubsection{
+         P = NDF (Write)
+      }{
+         An output NDF holding percentage polarisation.
+      }
+      \sstsubsection{
+         Q = NDF (Write)
+      }{
+         An output NDF holding the normalised Stokes parameter, Q. [!]
+      }
+      \sstsubsection{
+         U = NDF (Write)
+      }{
+         An output NDF holding the normalised Stokes parameter, U. [!]
+      }
+      \sstsubsection{
+         THETA = NDF (Write)
+      }{
+         An output NDF holding the polarisation angle in degrees.
+      }
+      \sstsubsection{
+         VARIANCE = LOGICAL (Read)
+      }{
+         True if output variances are to be calculated. This parameter
+         is only accessed if all input NDFs contain variances, otherwise
+         no variances are generated.  [YES]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         CALPOL M51\_0 M51\_45 M51\_90 M51\_135 M51\_P M51\_T M51\_I IP=M51\_IP
+      }{
+         This example produces NDFs holding percentage polarisation,
+         polarisation angle, total intensity and polarised intensity,
+         based on the four NDFs M51\_0, M51\_45, M51\_90 and M51\_135.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   ERRCLIP
+}{
+   Remove pixels with large errors from an NDF
+}{
+   \sstdescription{
+      This application produces a copy of the input NDF in which pixels
+      with errors greater than a specified limit are set invalid in
+      both DATA and VARIANCE components. The error limit may be
+      specified as the maximum acceptable standard deviation (or
+      variance), or the minimum acceptable signal to noise ratio.
+   }
+   \sstusage{
+      ERRCLIP IN OUT LIMIT [TYPE]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The input NDF. An error is reported if it contains no VARIANCE
+         component.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output NDF.
+      }
+      \sstsubsection{
+         LIMIT = REAL (Read)
+      }{
+         Either the maximum acceptable standard deviation or variance
+         value, or the minimum acceptable signal to noise ratio
+         (depending on the value given for TYPE).
+      }
+      \sstsubsection{
+         TYPE = LITERAL (Read)
+      }{
+         Determines how the value supplied for LIMIT is to be
+         interpreted; {\tt "}SIGMA{\tt "}, {\tt "}VARIANCE{\tt "} or {\tt "}SNR{\tt "}. [SIGMA]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ERRCLIP M51 M51\_GOOD 2.0
+      }{
+         The NDF M51\_SIG is created holding a copy of M51 in which all
+         pixels with standard deviation greater than 2 are set invalid.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The output NDF has the same numeric type as the input NDF.
+         However, all internal calculations are performed in double
+         precision.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   IRCAMSET
+}{
+   Set or display the IRCAMPACK global parameters
+}{
+   \sstdescription{
+      This routine displays the current values of the IRCAMPACK globals
+      parameters, and optionally sets up new values. It is intended for
+      use within procedures. The value of each parameter is displayed
+      on a separate line without any extra text, in the order listed
+      under {\tt "}Usage{\tt "}. If the parameter does not currently have a valid
+      value, the string {\tt "}undefined{\tt "} is displayed. The display may be
+      logged to a text file.
+   }
+   \sstusage{
+      IRCAMSET IN1 IN2 IN3 IN4 I P THETA FWHM BOX ANGROT
+               MAXPERR MAXTERR
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN1 = NDF (Read)
+      }{
+         The NDF holding the current 0 degrees waveplate position
+         intensity image.  [!]
+      }
+      \sstsubsection{
+         IN2 = NDF (Read)
+      }{
+         The NDF holding the current 45 degrees waveplate position
+         intensity image.  [!]
+      }
+      \sstsubsection{
+         IN3 = NDF (Read)
+      }{
+         The NDF holding the current 22.5 degrees waveplate position
+         intensity image.  [!]
+      }
+      \sstsubsection{
+         IN4 = NDF (Read)
+      }{
+         The NDF holding the current 67.5 degrees waveplate position
+         intensity image.  [!]
+      }
+      \sstsubsection{
+         I = NDF (Read)
+      }{
+         The NDF holding the current total intensity image. [!]
+      }
+      \sstsubsection{
+         P = NDF (Read)
+      }{
+         The NDF holding the current percentage polarisation image. [!]
+      }
+      \sstsubsection{
+         THETA = NDF (Read)
+      }{
+         The NDF holding the polarisation angle image. [!]
+      }
+      \sstsubsection{
+         FWHM = LITERAL (Read)
+      }{
+         The current FWHM of the PSF used by procedure POLSMOOTH. [!]
+      }
+      \sstsubsection{
+         BOX = LITERAL (Read)
+      }{
+         The current box size used by procedure POLSMOOTH. [!]
+      }
+      \sstsubsection{
+         ANGROT = LITERAL (Read)
+      }{
+         The current value of the rotation to be apply to vectors before
+         being displayed by procedures POLMAPD and POLMAPC. [!]
+      }
+      \sstsubsection{
+         MAXPERR = LITERAL (Read)
+      }{
+         The current value of the maximum acceptable error in percentage
+         polarisation used by procedure POLCAL. [!]
+      }
+      \sstsubsection{
+         MAXTERR = LITERAL (Read)
+      }{
+         The current value of the maximum acceptable error in
+         polarisation angle used by procedure POLCAL. [!]
+      }
+      \sstsubsection{
+         LOGFILE = FILENAME (Write)
+      }{
+         The name of a file to which the current global parameter values
+         will be written. [!]
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If a null value is supplied for any parameter (except LOGFILE)
+         the current value of the corresponding global parameter is
+         displayed but no new value is assigned.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   IRCHELP
+}{
+   Gives help about IRCAMPACK
+}{
+   \sstdescription{
+      This routine displays help information, containing classified and
+      alphabetical lists of commands, general information and related
+      material; it describes individual commands in detail.
+
+      Here are some of the main options:
+
+         IRCHELP
+
+            No parameter is given so the introduction and the top-level
+            help index is displayed.
+
+         IRCHELP application/topic
+
+            This gives help about the specified application or topic.
+
+         IRCHELP application/topic subtopic
+
+            This lists help about a subtopic of the specified
+            application or topic. The hierarchy of topics has a maximum
+            of four levels.
+
+      Once in the help library, it can be navigated in the same way
+      as VMS help libraries.  CTRL/D to exit from any level, and 
+      $<$RET$>$ to move up a level in the hierarchy.
+   }
+   \sstusage{
+      IRCHELP [TOPIC] [SUBTOPIC] [SUBSUBTOPIC] [SUBSUBSUBTOPIC]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INTER = LOGICAL (Read)
+      }{
+         If a true value is supplied, then an interactive help session
+         is entered in which the user can navigate through the help library.
+         Otherwise, the requested information is displayed and the application
+         immediately terminates. [YES]
+      }
+      \sstsubsection{
+         LIBRARY = LITERAL (Read)
+      }{
+         The Starlink help library from which help text is to be
+         obtained.                                     [\$IRCAMPACK\_HELP]
+      }
+      \sstsubsection{
+         SUBSUBSUBTOPIC = LITERAL (Read)
+      }{
+         Subsubsubtopic for which help is to be given.             [{\tt "} {\tt "}]
+      }
+      \sstsubsection{
+         SUBSUBTOPIC = LITERAL (Read)
+      }{
+         Subsubtopic for which help is to be given.                [{\tt "} {\tt "}]
+      }
+      \sstsubsection{
+         SUBTOPIC = LITERAL (Read)
+      }{
+         Subtopic for which help is to be given.                   [{\tt "} {\tt "}]
+      }
+      \sstsubsection{
+         TOPIC = LITERAL (Read)
+      }{
+         Topic for which help is to be given.                      [{\tt "} {\tt "}]
+      }
+   }
+}
+\newpage
+\sstroutine{
+   POLCAL
+}{
+   Produce NDFs containing polarisation parameters
+}{
+   \sstdescription{
+      The user supplies four input intensity images at half-wave plate
+      intervals of 22.5\dgs. Images are created holding total intensity, 
+      percentage polarisation and polarisation angle. Pixels are set bad 
+      in these images if the standard deviation of the pixel value is 
+      greater than the limits supplied by parameters MAXPERR and MAXTERR.
+   }
+   \sstusage{
+      POLCAL IN1 IN2 IN3 IN4 P THETA I MAXPERR MAXTERR
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN1 = NDF (Read)
+      }{
+         NDF obtained with the waveplate at 0 degrees.
+      }
+      \sstsubsection{
+         IN2 = NDF (Read)
+      }{
+         NDF obtained with the waveplate at 45 degrees.
+      }
+      \sstsubsection{
+         IN3 = NDF (Read)
+      }{
+         NDF obtained with the waveplate at 22.5 degrees.
+      }
+      \sstsubsection{
+         IN4 = NDF (Read)
+      }{
+         NDF obtained with the waveplate at 67.5 degrees.
+      }
+      \sstsubsection{
+         P = NDF (Write)
+      }{
+         An NDF to hold the percentage polarisation image.
+      }
+      \sstsubsection{
+         THETA = NDF (Write)
+      }{
+         An NDF to hold the polarisation angle image.
+      }
+      \sstsubsection{
+         I = NDF (Write)
+      }{
+         An NDF to hold the total intensity image.
+      }
+      \sstsubsection{
+         MAXPERR = \_REAL (Read)
+      }{
+         The limit to place on the error in percentage polarisation.
+         Any pixels with standard deviations larger than this value
+         are set bad. The value should be given in units of percent.
+      }
+      \sstsubsection{
+         MAXTERR = \_REAL (Read)
+      }{
+         The limit to place on the error in polarisation angle. Any
+         pixels with standard deviations larger than this value are
+         set bad. The value should be given in units of degrees.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This is a script and so command line parameters can be
+         specified by position only, not by keyword.
+
+         \sstitem
+         The input NDFs should all contain variance values, otherwise
+         the clipping of values with large errors cannot be performed.
+
+         \sstitem
+         This script is an easy-to-use interface to the 
+         applications CALPOL and ERRCLIP. More versatility is available
+         by using CALPOL and ERRCLIP directly.
+
+         \sstitem
+         The suggested defaults for the four input NDFs are the
+         output NDFS from the previous application or script.
+
+         \sstitem
+         No correction is performed for statistical bias introduced
+         by the asymmetry of the noise in the percentage polarisation.
+         If such a correction is required, application CALPOL
+         should be used instead of this script.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   POLMAPC
+}{
+   Display a polarisation map on top of a total intensity contour
+   plot
+}{
+   \sstdescription{
+      The specified graphics device is cleared and a contour plot of
+      the total intensity NDF is displayed. A vector plot is overlayed
+      on top of this image, with annotations and a key to the vector
+      scale. The vectors are drawn using pen 2 from the KAPPA pallette
+      which is initially set to white. The colour of the vectors can
+      subsequently be changed using the KAPPA application PALENTRY.
+   }
+   \sstusage{
+      POLMAPC P THETA I ANGROT DEVICE
+   }
+   \sstparameters{
+      \sstsubsection{
+         P = NDF (Read)
+      }{
+         NDF holding percentage polarisation.
+      }
+      \sstsubsection{
+         THETA = NDF (Read)
+      }{
+         NDF holding polarisation angle.
+      }
+      \sstsubsection{
+         I = NDF (Read)
+      }{
+         NDF holding total intensity.
+      }
+      \sstsubsection{
+         ANGROT = \_REAL (Read)
+      }{
+         Angle by which to rotate the vectors before displaying them (in
+         degrees).
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         Name of the graphics device to use. [Current graphics device]
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This is a script and so command line parameters can be
+         specified by position only, not by keyword.
+
+         \sstitem
+         The suggested defaults for the three input NDFs are the
+         output NDFS from a previous application or script.
+
+         \sstitem
+         This routine is based on applications TURBOCONT (in KAPPA) 
+         and VECPLOT.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   POLMAPD
+}{
+   Display a polarisation map on top of a total intensity image
+}{
+   \sstdescription{
+      The current graphics device is cleared and a greyscale image of
+      the total intensity NDF is displayed. A vector plot is overlayed
+      on top of this image, with annotations and a key to the vector
+      scale. The bad pixels in the intensity image are coloured using
+      palette entry number 2 (set to {\tt "}blue2{\tt "} by this script), and the
+      vectors are coloured using pallette entry number 3 (set to
+      {\tt "}green{\tt "} by this script). These colours can later be changed
+      using the KAPPA application PALENTRY.
+   }
+   \sstusage{
+      POLMAPD P THETA I ANGROT DISPLAY
+   }
+   \sstparameters{
+      \sstsubsection{
+         P = NDF (Read)
+      }{
+         NDF holding percentage polarisation.
+      }
+      \sstsubsection{
+         THETA = NDF (Read)
+      }{
+         NDF holding polarisation angle.
+      }
+      \sstsubsection{
+         I = NDF (Read)
+      }{
+         NDF holding total intensity.
+      }
+      \sstsubsection{
+         ANGROT = \_REAL (Read)
+      }{
+         Angle by which to rotate the vectors before displaying them (in
+         degrees).
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         Name of the graphics device to use. [Current graphics device]
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This is a script and so command line parameters can be
+         specified by position only, not by keyword.
+
+         \sstitem
+         The suggested defaults for the three input NDFs are the
+         output NDFS from a previous application or script.
+
+         \sstitem
+         This routine is based on applications DISPLAY (in KAPPA)
+         and VECPLOT.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   POLSKY
+}{
+   Subtract constant sky backgrounds from 4 images
+}{
+   \sstdescription{
+      The NDF supplied for parameter IN1 is displayed on the specified
+      graphics device (bad pixels are shown blue). The user then uses a
+      cursor to indicate an area which is to be used to define the sky
+      background in each image. The mean value is found (after rejection
+      of aberrant values) within the same sub-region in each image and this
+      value is subtracted from the corresponding image. The name of the
+      output NDFs are derived from the input NDF names by appending the
+      string supplied for parameter SUFFIX to them.
+   }
+   \sstusage{
+      POLSKY IN1 IN2 IN3 IN4 SUFFIX DEVICE
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN1 = NDF (Read)
+      }{
+         NDF obtained with the waveplate at 0 degrees.
+      }
+      \sstsubsection{
+         IN2 = NDF (Read)
+      }{
+         NDF obtained with the waveplate at 45 degrees.
+      }
+      \sstsubsection{
+         IN3 = NDF (Read)
+      }{
+         NDF obtained with the waveplate at 22.5 degrees.
+      }
+      \sstsubsection{
+         IN4 = NDF (Read)
+      }{
+         NDF obtained with the waveplate at 67.5 degrees.
+      }
+      \sstsubsection{
+         SUFFIX = LITERAL (Read)
+      }{
+         A string to append to the end of the supplied NDF names to
+         get the output NDF names.
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         Name of the graphics device to use [Current graphics device]
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         It is assumed that the four input images are aligned.
+
+         \sstitem
+         This is a script and so command line parameters can be
+         specified by position only, not by keyword.
+
+         \sstitem
+         The suggested defaults for the four input NDFs are the
+         output NDFS from the previous application or script.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   POLSMOOTH
+}{
+   Apply Gaussian smoothing to 4 supplied images
+}{
+   \sstdescription{
+      The user supplies the FWHM in units of pixels for the Gaussian
+      PSF, and the size of the box (in pixels) over which the PSF should
+      be applied at each point. The supplied images are smoothed and
+      placed in output NDFs with names derived from the input NDF
+      names by appending the string supplied for parameter SUFFIX to
+      them.
+   }
+   \sstusage{
+      POLSMOOTH IN1 IN2 IN3 IN4 FWHM BOX SUFFIX
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN1 = NDF (Read)
+      }{
+         The NDF holding observed intensity with the waveplate at 0 degrees.
+      }
+      \sstsubsection{
+         IN2 = NDF (Read)
+      }{
+         The NDF holding observed intensity with the waveplate at 45 degrees.
+      }
+      \sstsubsection{
+         IN3 = NDF (Read)
+      }{
+         The NDF holding observed intensity with the waveplate at 22.5 degrees.
+      }
+      \sstsubsection{
+         IN4 = NDF (Read)
+      }{
+         The NDF holding observed intensity with the waveplate at 67.5 degrees.
+      }
+      \sstsubsection{
+         FWHM = \_REAL (Read)
+      }{
+         Full width at half maximum of the Gaussian PSF, in pixels.
+      }
+      \sstsubsection{
+         BOX = \_REAL (Read)
+      }{
+         Size (in pixels) of the square region over which the Gaussian
+         PSF should be applied at each point. The smoothing PSF will be
+         set to zero outside this square. The value given will be
+         rounded up to a positive odd integer.
+      }
+      \sstsubsection{
+         SUFFIX = LITERAL (Read)
+      }{
+         A string to append to the end of the supplied NDF names to
+         get the output NDF names.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This is a script and so command line parameters can be
+         specified by position only, not by keyword.
+
+         \sstitem
+         This script uses the KAPPA application GAUSS to perform
+         the smoothing.
+
+         \sstitem
+         The suggested defaults for the four input NDFs are the
+         output NDFS from the previous application or script.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   POLZAP
+}{
+   Manually remove blemishes or bad pixels from 4 images
+}{
+   \sstdescription{
+      The NDFs supplied for parameters IN1 to IN4 are displayed in turn on
+      the specified graphics device (bad pixels are shown blue). The user
+      can then inspect the image for blemishes or bad pixels. If any are
+      found, a cursor is used to identify the area containing the blemish
+      and the pixels within the area are set bad. The names of the
+      output NDFs are derived from the input NDF names by appending the
+      string supplied for parameter SUFFIX to them.
+
+      The cursor should be used to give two points. The area removed is then
+      either the range of lines spanned by the two points, the range of columns
+      spanned by the two points, or a rectangular region with opposite corners
+      at the two points. The user indicates which sort of area to use in
+      response to prompts for parameter LINCOL made immediately prior to
+      displaying the cursor. If a null value is given for LINCOL then no
+      further regions are removed.
+   }
+   \sstusage{
+      POLZAP IN1 IN2 IN3 IN4 SUFFIX DEVICE
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN1 = NDF (Read)
+      }{
+         NDF obtained with the waveplate at 0 degrees.
+      }
+      \sstsubsection{
+         IN2 = NDF (Read)
+      }{
+         NDF obtained with the waveplate at 45 degrees.
+      }
+      \sstsubsection{
+         IN3 = NDF (Read)
+      }{
+         NDF obtained with the waveplate at 22.5 degrees.
+      }
+      \sstsubsection{
+         IN4 = NDF (Read)
+      }{
+         NDF obtained with the waveplate at 67.5 degrees.
+      }
+      \sstsubsection{
+         SUFFIX = LITERAL (Read)
+      }{
+         A string to append to the end of the supplied NDF names to
+         get the output NDF names.
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         Name of the graphics device to use [Current graphics device]
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This is a script and so command line parameters can be
+         specified by position only, not by keyword.
+
+         \sstitem
+         The suggested defaults for the four input NDFs are the
+         output NDFS from the previous application or script.
+
+         \sstitem
+         This script is based on KAPPA applications DISPLAY and ZAPLIN.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   SEGMENT
+}{
+   Copies polygonal segments from one NDF to another
+}{
+   \sstdescription{
+      This routine extracts polygonal segments from an NDF, and
+      optionally pastes them into the corresponding positions within
+      another NDF. The application is intended to allow regions of an
+      NDF to be removed to another for separate processing.  It may
+      also be used to copy bad pixels into a NDF in order to delete a
+      region which is not required.
+
+      The vertices of polygonal segments are defined by lists of x,y
+      positions. Polygons are completed by connecting the last
+      position in the list to the first.  Pixels within each polygonal
+      segment are copied from the first NDF (IN1) to the corresponding
+      position in the second NDF (IN2). A sequence of polygons may be
+      supplied, and each is copied in turn. If a null value is given for
+      either NDF, the routine behaves as if an NDF full of bad pixels
+      had been specified. Thus if IN1 is given a null value the inside
+      of each polygonal segment will be filled with bad values, and if
+      IN2 is given a null value the region outside the polygonal
+      segments will be filled with bad values.
+
+      The x,y positions may be specified in three ways:
+
+      1) From the parameter system ,usually in response to prompting.
+
+      2) Within text files (one for each polygon). The files are free
+      format with x co-ordinates in column one and y co-ordinates in
+      column two. (This is the format produced by other KAPPA
+      applications such as CURSOR.)
+
+      3) Using a graphics cursor of a nominated device. An NDF must
+      already have been displayed on the device.
+
+      The x,y co-ordinates may be given as either data or pixel
+      (={\tt "}world{\tt "}) co-ordinates. If data co-ordinates are given, the input
+      NDFs must contain appropriate AXIS structures to allow the
+      corresponding pixel co-ordinates to be found.
+
+      The routine can handle NDFs of arbitrary dimensionality. If
+      either input has 3 or more dimensions then all planes in the NDF
+      are processed in the same way, that is the same polygonal regions
+      are extracted from each plane and copied to the corresponding
+      plane of the output NDF. The polygon is usually presumed to lie
+      in the XY plane (i.e. the plane spanned by the first two axes of
+      the NDF), but this can be changed by assigning appropriate values
+      to parameter AXES so that for instance the polygon lies in the YZ
+      plane (i.e the plane spanned by axes 2 and 3).
+   }
+   \sstusage{
+      SEGMENT IN1 IN2 OUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         AXES = \_INTEGER (Read)
+      }{
+         The indices of the axes which span the plane containing the
+         polygon. Two values should be given, each less than or equal
+         to the minimum of the number of dimensions in the two input
+         NDFs. [1,2]
+      }
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
+         Whether or not the image display device should be cleared
+         before opening it. [NO]
+      }
+      \sstsubsection{
+         COLOUR = LITERAL (Read)
+      }{
+         The colour to in which to draw any graphics specified by
+         parameter PLOT. The options are:
+
+           {\tt "}MAX{\tt "}          - The maximum colour index used for the
+                            display of the image.
+           {\tt "}MIN{\tt "}          - The minimum colour index used for the
+                            display of the image.
+           An integer     - The actual colour index. It is constrained
+                            between 0 and the maximum colour index
+                            available on the device.
+           A named colour - Uses the named colour from the palette, and
+                            if it is not present, the nearest colour
+                            from the palette is selected.
+
+         If the colour is to remain unaltered as the lookup table is
+         manipulated choose an integer between 0 and 15, or a named
+         colour.  The suggested default is the current value. [The
+         current value, but equals {\tt "}MIN{\tt "} if there is no current value.]
+      }
+      \sstsubsection{
+         COSYS = LITERAL (Read)
+      }{
+         The co-ordinate system in which the polygon vertices are
+         specified. This can be either {\tt "}WORLD{\tt "} or {\tt "}DATA{\tt "}. If COSYS =
+         {\tt "}DATA{\tt "} is given, the input co-ordinates (however obtained) are
+         presumed to be data co-ordinates (as defined by AXIS structures
+         within the NDFs). Otherwise, they are presumed to be world (or
+         {\tt "}pixel{\tt "}) co-ordinates. [Current co-ordinate system]
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The name of the graphics device on which an image is
+         displayed. This is only used if parameter MODE is given the
+         value CURSOR. Any graphics specified by parameter PLOT will be
+         produced on this device. [Current image-display-overlay device]
+      }
+      \sstsubsection{
+         IN1 = NDF (Read)
+      }{
+         The input NDF containing the data to be copied to the inside of
+         the supplied polygonal segments. If a null value is supplied,
+         the inside of the polygonal segments will be filled with bad
+         values.
+      }
+      \sstsubsection{
+         IN2 = NDF (Read)
+      }{
+         The input NDF containing the data to be copied to the outside
+         of the supplied polygonal segments. If a null value is
+         supplied, the outside of the polygonal segments will be filled
+         with bad values.
+      }
+      \sstsubsection{
+         LOGFILE = FILENAME (Write)
+      }{
+         The name of an ASCII file in which the coordinates of the
+         polygon vertices are to be stored. A null value (!) means that
+         no file is created. [!]
+      }
+      \sstsubsection{
+         MODE  =  LITERAL (Read)
+      }{
+         The mode by which the vertices of the polygonal segments are
+         to be obtained.  The options are as follows: {\tt "}Interface{\tt "}
+         defines via the parameter system, {\tt "}Cursor{\tt "} enables selection
+         by graphics cursor, and {\tt "}File{\tt "} reads them from an ASCII file.
+         [Current interaction mode]
+      }
+      \sstsubsection{
+         MAXPOLY = INTEGER (Read)
+      }{
+         The maximum number of polygons which can be used. For
+         instance, this can be set to 1 to ensure that no more than 1
+         polygon is used (this sort of thing can be useful when writing
+         procedures or scripts). A null value causes no limit to be
+         imposed (unless MODE=FILE in which case a limit of 20 is
+         imposed). [!]
+      }
+      \sstsubsection{
+         MINPOLY = INTEGER (Read)
+      }{
+         The minimum number of polygons which can be used. For
+         instance, this can be set to 2 to ensure that at least 2
+         polygons are used. The supplied value must be less than the
+         value given for MAXPOLY and must be greater than zero. [1]
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output NDF.
+      }
+      \sstsubsection{
+         PLOT = LITERAL (Read)
+      }{
+         The type of graphics to be used to mark the position of each
+         selected vertex. It is only used if parameter MODE is given the
+         value CURSOR. PLOT can take any of the following values:
+
+         POLY - Causes each vertex to be joined by a straight line to
+         the previous vertex. The last vertex is joined to the first
+         vertex.
+
+         CROSS - Each vertex is marked by a cross.
+
+         NONE - No graphics are produced.
+                                                         [Current value]
+      }
+      \sstsubsection{
+         POLY1-POLY20 = FILENAME (Read)
+      }{
+         Each of the parameters POLY1 to POLY20 are used to access text
+         files containing the x,y coordinates of the vertices of a
+         single polygon. If a value is assigned to POLY1 on the command
+         line then only a single polygonal segment is copied, and the
+         user is not prompted for any of the remaining parameters in
+         this group. Otherwise, the user is prompted for POLY1, then
+         POLY2, etc, until a null value is given or POLY20 is reached.
+      }
+      \sstsubsection{
+         QUALITY = \_LOGICAL (Read)
+      }{
+         If a true value is supplied for parameter QUALITY then quality
+         information is copied from the input NDFs to the output NDFs.
+         Otherwise, the quality information is not copied. This
+         parameter is only accessed if all supplied input NDFs have
+         defined QUALITY components. If any of the supplied input NDFs
+         do not have defined QUALITY components, then no quality is
+         copied. Note, if a null input NDF is given then the
+         corresponding output QUALITY values are set to zero. [YES]
+      }
+      \sstsubsection{
+         VARIANCE = \_LOGICAL (Read)
+      }{
+         If a true value is supplied for parameter VARIANCE then
+         variance information is copied from the input NDFs to the
+         output NDFs.  Otherwise, the variance information is not
+         copied. This parameter is only accessed if all supplied input
+         NDFs have defined VARIANCE components. If any of the supplied
+         input NDFs do not have defined VARIANCE components, then no
+         variances are copied. Note, if a null input NDF is given then
+         the corresponding output VARIANCE values are set bad. [YES]
+      }
+      \sstsubsection{
+         XY = \_REAL (Read)
+      }{
+         A pair of x,y coordinates representing a single vertex. Only
+         used if parameter MODE is given the value INTERFACE. A null
+         value should be given when the final vertex has been specified.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         SEGMENT IN1=M51A IN2=M51B OUT=M51\_COMP POLY1=COORDS.LIS MODE=FILE
+      }{
+         Copys a region of the NDF M51A to the corresponding position
+         in the output NDF M51\_COMP. The region is defined by the list
+         of vertex co-ordinates held in text file COORDS.LIS. All pixels
+         in the output NDF which fall outside this region are given
+         the corresponding pixel values from NDF M51B.
+      }
+      \sstexamplesubsection{
+         SEGMENT IN1=M51A OUT=M51\_CUT MODE=CURSOR PLOT=POLY ACCEPT
+      }{
+         Copys a region of the NDF M51A to the corresponding position
+         in the output NDF M51\_CUT. The region is defined by selecting
+         vertices using a graphics cursor. The image M51A should
+         previously have been displayed. Each vertex is joined to the
+         previous vertex by a green line on the graphics device. The
+         ACCEPT keyword causes the suggested null default value for IN2
+         to be accepted. This means that all pixels outside the region
+         identified using the cursor will be set bad in the output NDF.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine will propagate VARIANCE component values so long
+         as all supplied input NDFs have defined VARIANCE components, and
+         the user has not supplied a false value for parameter VARIANCE.
+
+         \sstitem
+         This routine will propagate QUALITY component values so long
+         as all supplied input NDFs have defined QUALITY components, and
+         the user has not supplied a false value for parameter QUALITY.
+
+         \sstitem
+         The UNITS, AXIS, LABEL, TITLE and HISTORY components are
+         propagated from the first supplied input NDF, together with all
+         extensions.
+
+         \sstitem
+         The following data types are processed directly: \_WORD,
+         \_INTEGER, \_REAL, \_DOUBLE.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   TNORM
+}{
+   Normalise a group of frames to unit exposure time
+}{
+   \sstdescription{
+      This routine normalises the input frames to an exposure time of
+      one second by dividing the DATA values by the total exposure time
+      (in seconds), and the VARIANCE values by the square of the total
+      exposure time.
+   }
+   \sstusage{
+      TNORM IN OUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         A group of input NDFs. This should be in the form of a group
+         expression (see help on {\tt "}Group\_expressions{\tt "}).
+      }
+      \sstsubsection{
+         OUT = NDF (Read)
+      }{
+         A group of output NDFs corresponding one-for-one with the list
+         of input NDFs given by parameter IN. This should be in the
+         form of a group expression. Expressions such as {\tt "}$*$\_NEW{\tt "} are
+         expanded by replacing the {\tt "}$*${\tt "} character with each input NDF in
+         turn (see help on {\tt "}Group\_expressions{\tt "}).
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         TNORM \^{}FILES.LIS $*$\_N
+      }{
+         This example normalises all the frames listed in text file
+         FILES.LIS, putting the output NDFs in files with the same
+         names, extended with the string {\tt "}\_N{\tt "}.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The total exposure time is determined from the information
+         stored in the IRCAM extensions of the input NDFs and is the
+         product of the number of coadds (NUMBER\_COADDS) and the exposure
+         time per coadd (EXPOSURE\_TIME).  The value of EXPOSURE\_TIME is
+         divided by 1000 before use to convert it from milliseconds to
+         seconds. An error is reported if any input NDFs do not contain an
+         IRCAM extension.
+
+         \sstitem
+         A new component called TNORM is written to the IRCAM extensions
+         of the output NDFs to indicate that the output frames are
+         normalised to an exposure time of one second. TNORM is a \_REAL
+         value holding the total exposure time by which the frame has been
+         divided. An error is reported if any of the input NDFs already
+         contain this component (i.e. have already been normalised).
+
+         \sstitem
+         The TITLE, LABEL, QUALITY and AXIS components are propagated to
+         the output NDFs without change.
+
+         \sstitem
+         The UNITS components of the output NDFs are derived from the
+         input UNITS components by appending the string {\tt "} per second{\tt "}.
+
+         \sstitem
+         The output NDFs have the same numeric type as the input NDFs.
+         However, all internal calculations are done in double precision.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   VECPLOT
+}{
+   Plots a 2-d vector map
+}{
+   \sstdescription{
+      This application plots vectors defined by the values contained
+      within a pair of 2-d NDFs, the first holding the magnitude of the
+      vector quantity at each pixel, and the second holding the
+      corresponding vector orientations. The number of vectors in the
+      plot is kept to a managable value by only plotting vectors for
+      pixels on a sparse regular matrix. The increment (in pixels)
+      between plotted vectors is given by parameter STEP. Zero
+      orientation may be fixed at any position angle within the plot by
+      specifying an appropriate value for parameter ANGROT. Each vector
+      may be represented either by an arrow or by a simple line, as
+      selected by parameter VTYPE.
+
+      The plot is situated within the current graphics-database
+      picture, and may reside within optional, annotated and enumerated
+      axes.  An optional, but recommended, key may be drawn to the
+      right of the plot.  It reports the data units if there are any
+      (taken from the NDF associated with parameter NDF1) and gives the
+      scale used for drawing the vectors in data units per centimetre.
+      It also displays a typical vector and the corresponding data
+      value. The justification of the vector is indicated by a small
+      circle placed at the position of the corresponding pixel centre.
+
+      If the current graphics-database picture is a DATA picture or
+      contains a DATA picture (such as created by the applications
+      DISPLAY, CONTOUR, etc), then the vector plot is overlayed on
+      top of the existing DATA plot. In this case any requested
+      annotation and key are drawn outside the DATA picture but within
+      the current picture. If there is insufficient room within the
+      currrent picture, then the annotation and/or key may not be
+      drawn. The user is warned if this happens but the application
+      continues. If no DATA picture can be found within the current
+      picture then the user specifies ther total size of the plot frame
+      using parameters PXSIZE and PYSIZE, but the application itself
+      chooses how to position the vector plot and key within this
+      frame.
+   }
+   \sstusage{
+      VECPLOT NDF1 NDF2 [COMP] [STEP] [VSCALE] [VTYPE] [JUST] [KEY]
+              [DEVICE]
+   }
+   \sstparameters{
+      \sstsubsection{
+         ABSLAB  =  LITERAL (Read)
+      }{
+         Label for the plot abscissa, in which NCAR fancy founts may be
+         embedded when FONT = {\tt "}NCAR{\tt "}.  If axis information is present
+         in NDF1 the suggested default is the axis label from NDF1
+         followed by the units, in parentheses.  If an error occurs
+         obtaining the label the suggested default is {\tt "}X{\tt "}. []
+      }
+      \sstsubsection{
+         ANGROT = \_REAL (Read)
+      }{
+         A rotation angle in degrees to be added to each vector
+         orientation before plotting the vectors (see parameter NDF2).
+         [0.0]
+      }
+      \sstsubsection{
+         AXES = \_LOGICAL (Read)
+      }{
+         True if labelled and annotated axes are to be drawn around the
+         plot.  The annotations are either the data co-ordinates from
+         the axis components of NDF1, provided these are present and
+         linear and COSYS = {\tt "}DATA{\tt "}; otherwise pixel co-ordinates are
+         used.
+      }
+      \sstsubsection{
+         BORDER = \_LOGICAL (Read)
+      }{
+         True if a box is to be drawn about the plot. This is only
+         accessed if no axes are drawn. [TRUE]
+      }
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
+         True if the graphics device is to be cleared before display
+         of the array. [TRUE]
+      }
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The component of NDF1 which is to be used to define the vector
+         magnitudes. It may be {\tt "}Data{\tt "}, or {\tt "}Variance{\tt "}. The vector
+         orientations are always defined by the {\tt "}Data{\tt "} component of
+         NDF2. [{\tt "}Data{\tt "}]
+      }
+      \sstsubsection{
+         COSYS = LITERAL (Read)
+      }{
+         The co-ordinate system to be used.  This can be either {\tt "}WORLD{\tt "}
+         or {\tt "}DATA{\tt "}.  {\tt "}WORLD{\tt "} makes pixel co-ordinates to appear on axes.
+         If COSYS = {\tt "}DATA{\tt "} the axis information from NDF1 is used to
+         annotate axes (if it exists).  [Current co-ordinate system]
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The plotting device. [Current image-display device]
+      }
+      \sstsubsection{
+         FONT = LITERAL (Read)
+      }{
+         The fount to be used for the line graphics.  It can be either
+         {\tt "}NCAR{\tt "} for the NCAR fancy characters and {\tt "}GKS{\tt "} for the standard
+         GKS san-serif fount.   The former is intended for hardcopy
+         publication-quality plots, since it is relatively slow; the
+         latter is intended for normal interactive graphics requiring
+         rapid plotting, and it is clearer on small plots. The
+         suggested default is the current value. [{\tt "}GKS{\tt "}]
+      }
+      \sstsubsection{
+         JUST = LITERAL (Read)
+      }{
+         The justification for each vector; can take any of the
+         following values:
+
+          {\tt "}Centre{\tt "} - The vectors are drawn centred on the
+                     corresponding pixel.
+
+          {\tt "}Start{\tt "}  - The vectors are drawn starting at the
+                     corresponding pixel
+
+          {\tt "}End{\tt "}    - The vectors are drawn ending at the corresponding
+                     pixel.  [{\tt "}CENTRE{\tt "}]
+      }
+      \sstsubsection{
+         KEY = \_LOGICAL (Read)
+      }{
+         True if a key is to be produced. [TRUE]
+      }
+      \sstsubsection{
+         KEYVEC = \_REAL (Read)
+      }{
+         Length of the vector to be displayed in the key, in data units.
+         A default value is generated based on the spread of vector
+         lengths in the plot. []
+      }
+      \sstsubsection{
+         MAJTIC( 2 ) = \_REAL (Read)
+      }{
+         The parameter controlling the numbers of major tick marks
+         for the x and y axes.  (Number used is between MAJTIC$+$2 and
+         5$*$MAJTIC/2$+$4.) [3.,3.]
+      }
+      \sstsubsection{
+         MINTIC( 2 ) = \_REAL (Read)
+      }{
+         The number of minor tick marks between each major tick mark
+         for the x and y axes.  A negative value forces the graphics
+         package to compute appropriate values. [-1.,-1.]
+      }
+      \sstsubsection{
+         NDF1 = NDF (Read)
+      }{
+         NDF structure containing the 2-d image giving the vector
+         magnitudes.
+      }
+      \sstsubsection{
+         NDF2 = NDF (Read)
+      }{
+         NDF structure containing the 2-d image giving the vector
+         orientations.The values are considered to be in units of
+         degrees unless the {\tt "}UNITS{\tt "} component of the NDF has the value
+         {\tt "}Radians{\tt "} (case insensitive). The positive y axis defines zero
+         orientation, and rotation from the x axis to the y axis is
+         considered positive.
+      }
+      \sstsubsection{
+         ORDLAB  =  LITERAL (Read)
+      }{
+         Label for the plot ordinate, in which NCAR fancy founts may be
+         embedded when FONT = {\tt "}NCAR{\tt "}.  If axis information is present
+         in NDF1 the suggested default is the axis label from NDF1
+         followed by the units, in parentheses.  If an error occurs
+         obtaining the label the suggested default is {\tt "}Y{\tt "}. []
+      }
+      \sstsubsection{
+         OUTTIC = \_LOGICAL (Read)
+      }{
+         True if the axis tick marks are to appear on the outside of
+         the axes instead of inside. By default, the tick marks are
+         drawn outside the plotting region to eliminate
+         intersections of ticks with the vectors. [TRUE]
+      }
+      \sstsubsection{
+         PLTITL = LITERAL (Read)
+      }{
+         The title of the plot.  Up to about 40 characters can be
+         accommodated, and NCAR fancy founts may be embedded when FONT =
+         {\tt "}NCAR{\tt "}. If an error occurs obtaining the title, it is
+         defaulted to {\tt "}VECPLOT map{\tt "}.  [The title from NDF1]
+      }
+      \sstsubsection{
+         PXSIZE = \_REAL (Read)
+      }{
+         The length (x axis) of the plot in metres. [Maximum that can
+         fit in the current picture whilst preserving square pixels]
+      }
+      \sstsubsection{
+         PYSIZE = \_REAL (Read)
+      }{
+         The length (y axis) of the plot in metres. [Maximum that can
+         fit in the current picture whilst preserving square pixels]
+      }
+      \sstsubsection{
+         STEP = \_INTEGER (Read)
+      }{
+         The number of pixels between adjacent displayed vectors (along
+         both axes). Increasing this value reduces the number of
+         displayed vectors. The default value gives about 30 vectors
+         along the longest axis of the plot. []
+      }
+      \sstsubsection{
+         THICK = \_REAL (Read)
+      }{
+         The thickness of the axes and annotations in the plot, where
+         1.0 is the normal thickness. Currently, this is only available
+         on a few devices.  It must take a value in the range 0.5--5.0.
+         [1.0]
+      }
+      \sstsubsection{
+         VECCOL = LITERAL (Read)
+      }{
+         The colour for the vectors. The options are:
+           {\tt "}MAX{\tt "}          - The maximum colour index in the image
+                            display colour lookup table.
+           {\tt "}MIN{\tt "}          - The minimum (non-reserved) colour index in
+                            the image display colour lookup table.
+           An integer     - The actual colour index. It is constrained
+                            between 0 and the maximum colour index
+                            available on the device.
+           A named colour - Uses the named colour from the palette, and
+                            if it is not present, the nearest colour
+                            from the palette is selected.
+         The suggested default is the current value. [The current value,
+         but equals {\tt "}MIN{\tt "} if there is no current value.]
+      }
+      \sstsubsection{
+         VSCALE = \_REAL (Given)
+      }{
+         The scale to be used for the vectors. The supplied value
+         should give the data value corresponding to a vector length of
+         one centimetre. The default makes 5\% of all displayed vectors
+         larger than the interval between adjacent vectors. []
+      }
+      \sstsubsection{
+         VTYPE = LITERAL (Read)
+      }{
+         The type of vector to be plotted; can take the value {\tt "}Arrow{\tt "}
+         or {\tt "}Line{\tt "}. Vectors are drawn as arrows or lines accordingly.
+         [{\tt "}LINE{\tt "}]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         VECPLOT POLINT POLANG
+      }{
+         Produces a vector map on the current graphics device with
+         vector magnitude taken from POLINT and vector orientation
+         taken from POLANG.  All other settings are defaulted, so
+         for example about 20 vectors are displayed along the longest
+         axis, and a key is plotted.
+      }
+      \sstexamplesubsection{
+         VECPLOT POLINT POLANG ANGROT=23.4
+      }{
+         Produces a vector map in which the primary axis of the vectors
+         (as defined by the value zero in the NDF {\tt "}POLANG{\tt "}) is at the
+         position angle 23.4 degrees (measured anti-clockwise from the
+         positove Y axis) in the displayed map.
+      }
+      \sstexamplesubsection{
+         VECPLOT STACK(,,2) STACK(,,1) VTYPE=ARROW JUST=START NOKEY
+      }{
+         Produces a vector map in which the vectors are defined by two
+         planes in the 3-d NDF {\tt "}STACK{\tt "}. There is no need to copy the
+         two planes into two separate NDFs before running VECPLOT.
+         Each vector is represented by an arrow, starting at the
+         position of the corresponding pixel. No key to the vector scale
+         and justification is produced.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The application stores a number of pictures in the graphics
+         database in the following order: a FRAME of the specified size
+         containing the title, annotated axes, vector map and key; a DATA
+         picture which is stored with world co-ordinates in units of data
+         pixels; and a KEY picture to store the key if present.  The DATA
+         picture may also have double-precision data co-ordinates derived
+         from the axis components of NDF1 provided these are linear and
+         different from pixel co-ordinates; the data co-ordinates are
+         stored via a linear transformation.  A reference to NDF1 is
+         stored with the DATA picture.  On exit the current database
+         picture for the chosen device reverts to the input picture.
+      }
+   }
+}
+\end{small}
+
+
+\newpage
+\section{An Example Use of CCDALIGN}
+\label{APP:CCDAL}
+
+This appendix illustrates a typical use of {\small CCDALIGN} to align
+accurately the four frames \verb+f80bndf+, \verb+f81bndf+,
+\verb+f82bndf+ and \verb+f83bndfr+. The numbers in boxes refer to the
+notes which follow below.
+
+\small
+\begin{quote}
+\begin{tabbing} % Not clear why this is needed, but leading spaces get
+                % lost otherwise.
+\verb#% ccdalign #\\
+\verb##\\
+\verb#    CCDALIGN#\\
+\verb#    ========#\\
+\verb##\\
+\verb#  An interactive aid for aligning groups of NDFs.#\\
+\verb##\\
+\verb#  Give the name of an image display device#\\
+\verb##\\
+\verb#DEVICE - Image display device > xwindows# \fbox{1}\\
+\verb##\\
+\verb##\\
+\verb#  Give the names of a series of groups of NDFs whose positions#\\
+\verb#  have not been moved on the sky. If all NDFs have been moved#\\
+\verb#  then give a single NDF at each prompt. When all NDF groups/NDFs#\\
+\verb#  have been given respond with a ! (null)#\\
+\verb##\\
+\verb#IN - List of NDFs /!/ > *bndf# \fbox{2}\\
+\verb#  4 input NDFs accessed using parameter IN#\\
+\verb#   #\\
+\verb#  1) f80bndf#\\
+\verb#  2) f81bndf#\\
+\verb#  3) f82bndf#\\
+\verb#  4) f83bndf#\\
+\verb#IN - List of NDFs /!/ > !# \fbox{3}\\
+\verb##\\
+\verb#  If you have a reference image to which the other NDFs are to#\\
+\verb#  aligned then give its name at the next prompt. If no reference#\\
+\verb#  NDF is specified (signified by a ! response) then the first NDF#\\
+\verb#  of the first group will be used.#\\
+\verb##\\
+\verb#IN - List of NDFs /!/ > !# \fbox{4}\\
+\verb##\\
+\verb#  Using reference NDF f80bndf#\\
+\verb##\\
+\verb#  Displaying NDF f80bndf#\\
+\verb##\\
+\verb#  Use the cursor to mark the image features. Remember the order#\\
+\verb#  as this is important for later identifications.#\\
+\verb##\\
+\verb##\\
+\verb#    IDICURS#\\
+\verb#    =======#\\
+\verb#  4 input NDFs accessed using parameter IN# \fbox{5}\\
+\verb##\\
+\verb##\\
+\verb#      Use of Buttons:#\\
+\verb#         Press_Mouse_left       - record position#\\
+\verb#         Press_Mouse_middle     - increase zoom#\\
+\verb#         Press_Mouse_right      - decrease zoom#\\
+\verb#      Press_Mouse_right once in unzoomed state to re-centre#\\
+\verb##\\
+\verb#      The following options are also available on this device:#\\
+\verb#         Move_Mouse             - scroll memory#\\
+\verb#         Press_Keyb_c           - to cancel zoom and scroll#\\
+\verb#         Press_Keyb_q           - to exit#\\
+\verb##\\
+\verb##\\
+\verb#  Position 1: located at 58.69287 , 40.49902#\\
+\verb##\\
+\verb#  1 entries written to file /scratch/dsb/ircam_data/f80bndfr.fea#\\
+\verb##\\
+\verb##\\
+\verb#  Do you want a hardcopy of the image display#\\
+\verb##\\
+\verb#HARDCOPY - produce hardcopy of display /TRUE/ > NO# \fbox{6}\\
+\verb##\\
+\verb#  Now the first member of each NDF group or each NDF will be#\\
+\verb#  displayed. You will then be given the opportunity to use the#\\
+\verb#  cursor to mark the image features which correspond to those#\\
+\verb#  which you marked on the first (reference) NDF. The order in#\\
+\verb#  which you identify the image features must be the same. If an#\\
+\verb#  image feature does not exist mark a position off the frame.#\\
+\verb#  You may extend the complete set of positions by indicating#\\
+\verb#  image features after the last one in the reference set.#\\
+\verb##\\
+\verb##\\
+\verb#  Centroiding the image feature positions.#\\
+\verb##\\
+\verb##\\
+\verb#    FINDCENT#\\
+\verb#    ========#\\
+\verb#  4 input NDFs accessed using parameter IN#\\
+\verb##\\
+\verb#    Centroid parameters#\\
+\verb#    -------------------#\\
+\verb#  Search box side: 9#\\
+\verb#  Maximum shift allowed in position: 5.5#\\
+\verb#  Maximum number of iterations: 3#\\
+\verb#  Minimum tolerance: 5.E-02#\\
+\verb#  Locating positive features#\\
+\verb##\\
+\verb#  +++ Processing NDF: /scratch/dsb/ircam_data/f80bndfr#\\
+\verb#  (Number 1 of 4)#\\
+\verb##\\
+\verb#  Associated positions list: /scratch/dsb/ircam_data/f80bndfr.fea#\\
+\verb#  Number of input positions: 1#\\
+\verb#  Output positions list: f80bndfr.acc#\\
+\verb#  Number of output positions: 1#\\
+\verb#  ---#\\
+\verb##\\
+\verb#  +++ Processing NDF: /scratch/dsb/ircam_data/f81bndfr#\\
+\verb#  (Number 2 of 4)#\\
+\verb##\\
+\verb#  Associated positions list: /scratch/dsb/ircam_data/f80bndfr.fea#\\
+\verb#  Number of input positions: 1#\\
+\verb#  Output positions list: f81bndfr.acc#\\
+\verb#  Number of output positions: 1#\\
+\verb#  ---#\\
+\verb##\\
+\verb#  +++ Processing NDF: /scratch/dsb/ircam_data/f82bndfr#\\
+\verb#  (Number 3 of 4)#\\
+\verb##\\
+\verb#  Associated positions list: /scratch/dsb/ircam_data/f80bndfr.fea#\\
+\verb#  Number of input positions: 1#\\
+\verb#  Output positions list: f82bndfr.acc#\\
+\verb#  Number of output positions: 1#\\
+\verb#  ---#\\
+\verb##\\
+\verb#  +++ Processing NDF: /scratch/dsb/ircam_data/f83bndfr#\\
+\verb#  (Number 4 of 4)#\\
+\verb##\\
+\verb#  Associated positions list: /scratch/dsb/ircam_data/f80bndfr.fea#\\
+\verb#  Number of input positions: 1#\\
+\verb#  Output positions list: f83bndfr.acc#\\
+\verb#  Number of output positions: 1#\\
+\verb#  ---#\\
+\verb##\\
+\verb##\\
+\verb#  You may stop processing at this point if all you require are#\\
+\verb#  labelled position lists associated with NDFs. If you want to#\\
+\verb#  determine the NDF registrations, then this procedure will aid#\\
+\verb#  this but only for linear transformations#\\
+\verb##\\
+\verb#CONTINUE - continue processing /TRUE/ > YES# \fbox{7}\\
+\verb##\\
+\verb#  Ok will continue processing which type of transformation do#\\
+\verb#  you require?#\\
+\verb##\\
+\verb#     1 = shift of origin only#\\
+\verb#     2 = shift of origin and rotation#\\
+\verb#     3 = shift of origin and magnification#\\
+\verb#     4 = shift of origin rotation and magnification#\\
+\verb#     5 = full six parameter fit#\\
+\verb##\\
+\verb#FITTYPE - transformation type (1-5) /5/ > 1# \fbox{8}\\
+\verb##\\
+\verb#   Determining initial transformations.#\\
+\verb##\\
+\verb##\\
+\verb#    REGISTER#\\
+\verb#    ========#\\
+\verb#  4 input NDFs accessed using parameter INLIST#\\
+\verb##\\
+\verb#    Input lists:#\\
+\verb#    ------------#\\
+\verb#  f80bndfr.acc (reference)#\\
+\verb#  f81bndfr.acc#\\
+\verb#  f82bndfr.acc#\\
+\verb#  f83bndfr.acc#\\
+\verb##\\
+\verb#  Position list names extracted from NDF extensions.#\\
+\verb##\\
+\verb#    Associated NDFs:#\\
+\verb#    ----------------#\\
+\verb#  1) f80bndfr#\\
+\verb#  2) f81bndfr#\\
+\verb#  3) f82bndfr#\\
+\verb#  4) f83bndfr#\\
+\verb##\\
+\verb##\\
+\verb#    Initial parameters:#\\
+\verb#    -------------------#\\
+\verb#  Registering using a shift of origin only#\\
+\verb#  Transformation structures will be written to NDF extensions#\\
+\verb#  Maximum change in positions is 1.E-03#\\
+\verb##\\
+\verb#    Transformation coefficients#\\
+\verb#    ---------------------------#\\
+\verb#  f80bndfr.acc:#\\
+\verb#    C1 =  0.E00                       C2 =    1#\\
+\verb#    C3 =  0.E00                       C4 =    0.E00#\\
+\verb#    C5 =  0.E00                       C6 =    1#\\
+\verb##\\
+\verb#  f81bndfr.acc:#\\
+\verb#    C1 =  -5.84502509799734E-03       C2 =    1#\\
+\verb#    C3 =  0.E00                       C4 =    -5.8012193266002E-02#\\
+\verb#    C5 =  0.E00                       C6 =    1#\\
+\verb##\\
+\verb#  f82bndfr.acc:#\\
+\verb#    C1 =  -7.20303993399796E-03       C2 =    1#\\
+\verb#    C3 =  0.E00                       C4 =    1.6610189169981E-03#\\
+\verb#    C5 =  0.E00                       C6 =    1#\\
+\verb##\\
+\verb#  f83bndfr.acc:#\\
+\verb#    C1 =  5.95285384001443E-04        C2 =    1#\\
+\verb#    C3 =  0.E00                       C4 =    2.46099260998278E-04#\\
+\verb#    C5 =  0.E00                       C6 =    1#\\
+\verb##\\
+\verb#  Extended reference positions written to file#\\
+\verb#/scratch/dsb/ircam_data/ccdalign_ref.ext#\\
+\verb##\\
+\verb#  4 input NDFs accessed using parameter IN#\\
+\verb#  1 name accessed using parameter INLIST#\\
+\verb#  4 input NDFs accessed using parameter INLIST#\\
+\verb#  4 input NDFs accessed using parameter IN#\\
+\verb##\\
+\verb#   Determining final transformations.#\\
+\verb##\\
+\verb##\\
+\verb#    REGISTER#\\
+\verb#    ========#\\
+\verb#  4 input NDFs accessed using parameter INLIST#\\
+\verb##\\
+\verb#    Input lists:#\\
+\verb#    ------------#\\
+\verb#  f80bndfr.acc (reference)#\\
+\verb#  f81bndfr.acc#\\
+\verb#  f82bndfr.acc#\\
+\verb#  f83bndfr.acc#\\
+\verb##\\
+\verb#  Position list names extracted from NDF extensions.#\\
+\verb##\\
+\verb#    Associated NDFs:#\\
+\verb#    ----------------#\\
+\verb#  1) f80bndfr#\\
+\verb#  2) f81bndfr#\\
+\verb#  3) f82bndfr#\\
+\verb#  4) f83bndfr#\\
+\verb##\\
+\verb##\\
+\verb#    Initial parameters:#\\
+\verb#    -------------------#\\
+\verb#  Registering using a shift of origin only#\\
+\verb#  Transformation structures will be written to NDF extensions#\\
+\verb#  Maximum change in positions is 1.E-03#\\
+\verb##\\
+\verb#    Transformation coefficients#\\
+\verb#    ---------------------------#\\
+\verb#  f80bndfr.acc:#\\
+\verb#    C1 =  0.E00                       C2 =    1#\\
+\verb#    C3 =  0.E00                       C4 =    0.E00#\\
+\verb#    C5 =  0.E00                       C6 =    1#\\
+\verb##\\
+\verb#  f81bndfr.acc:#\\
+\verb#    C1 =  -5.84502509799734E-03       C2 =    1#\\
+\verb#    C3 =  0.E00                       C4 =    -5.8012193266002E-02#\\
+\verb#    C5 =  0.E00                       C6 =    1#\\
+\verb##\\
+\verb#  f82bndfr.acc:#\\
+\verb#    C1 =  -7.20303993399796E-03       C2 =    1#\\
+\verb#    C3 =  0.E00                       C4 =    1.6610189169981E-03#\\
+\verb#    C5 =  0.E00                       C6 =    1#\\
+\verb##\\
+\verb#  f83bndfr.acc:#\\
+\verb#    C1 =  5.95285384001443E-04        C2 =    1#\\
+\verb#    C3 =  0.E00                       C4 =    2.46099260998278E-04#\\
+\verb#    C5 =  0.E00                       C6 =    1#\\
+\verb##\\
+\verb#  Extended reference positions written to file#\\
+\verb#/scratch/dsb/ircam_data/ccdalign_ref.ext#\\
+\end{tabbing}
+\end{quote}
+\normalsize
+
+\newpage
+
+{\bf Notes:}
+\begin{enumerate}
+
+\item Enter the name of the image display device on which to display
+the reference image.
+
+\item Enter an expression identifying all the frames which are to be
+aligned.  The example used above (``\verb+*bndf+'') causes all {\small
+NDF}s within the current directory which have names ending with the
+string ``bndf'' to be used.  These frames should all be approximately
+aligned already.
+
+\item At the next prompt for IN give a null value (``!''). This
+indicates that all the frames to be aligned have been specified at the
+first prompt for IN.
+
+\item At the third prompt for IN give a null value again. This causes
+the first frame in the group (alphabetically) to be used as the
+reference frame (i.e. all other frames are aligned with the first
+frame).
+
+\item At this point a cursor will appear on the image display. Any
+bright compact sources in the field should be identified using the
+cursor. At least one point must be given.
+
+\item Enter NO or FALSE unless you want a hardcopy of the image display
+(in which case enter YES or TRUE).
+
+\item Enter YES or TRUE if you want the procedure to find the
+transformations which map each frame onto the reference frame (this
+will usually be the case). These transformations will be stored with
+each frame when the procedure terminates. {\small TRANNDF} can be used
+subsequently to resample the frames according to these
+transformations.
+
+\item FITTYPE determines what sort of transformation is to be used to
+align the images. The list immediately above the prompt for FITTYPE
+gives the available options. The full six parameter fit allows shift of
+origin, rotation, magnification and shear. Some of the options will not
+be available if you have identified only a few objects using the
+cursor. For instance, if you have identified only one object, then
+there is insufficient information to evaluate anything other than a
+simple shift of origin, and so FITTYPE should be given a value of one.
+
+\end{enumerate}
+
+\end{document}

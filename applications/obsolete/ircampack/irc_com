@@ -1,0 +1,47 @@
+*  Purpose:
+*     Declares common block used to communicate the IRCAMPACK global
+*     variables.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     13-OCT-1993 (DSB): 
+*        Original version, derived from IRAS90 module IRM_COM
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*
+* 1. Global variables for controlling paged output on terminal screen.
+*
+
+*  Text entered in response to the "Press RETURN to continue..."
+*  prompt.
+      CHARACTER IRC_CMD*80
+
+*  Lines of text output this screenful
+      INTEGER IRC_LTEXT
+
+*  Text output enable/disable
+      LOGICAL IRC_TXTON
+
+*  Top and bottom line numbers for scrolling region
+      INTEGER IRC_LTOP,IRC_LBOT
+
+*  Flag: .TRUE. = ANSI terminal in use
+      LOGICAL IRC_ANSI
+
+*  Command input
+      INTEGER IRC_LUCMD
+
+*  Terminal output
+      INTEGER IRC_LUTER
+
+      COMMON /IRM_PAGE1/ IRC_CMD
+      COMMON /IRM_PAGE2/ IRC_LTEXT, IRC_TXTON, IRC_LTOP, IRC_LBOT,
+     :                   IRC_ANSI, IRC_LUCMD, IRC_LUTER
+*
+

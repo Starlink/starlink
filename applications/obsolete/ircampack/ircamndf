@@ -1,0 +1,245 @@
+#!/bin/csh
+#+
+#  Name:
+#     IRCAMNDF
+
+#  Purpose:
+#     Obtain the name of an NDF from the user.
+
+#  Language:
+#     C shell
+
+#  Description:
+#     A text string is obtained from the user (unless a value is 
+#     supplied in DEF1 in which case the supplied value is used). If 
+#     the user gives a blank value, the value supplied in DEF2 is used 
+#     (if any). If the value thus obtained is a single or double 
+#     exclamation mark, the shell is exited. If a question mark is 
+#     obtained, the IRCAMPACK help command is used to give help on the
+#     parameter. If a blank value is obtained the user is re-prompted. 
+#     Otherwise a check is made that a readable file with file type .sdf exists.
+#     If this is not the case, an error message is displayed and the 
+#     user is re-prompted.
+
+#  Usage:
+#     source ircamndf
+
+#  Shell Variables: 
+#     PROM = LITERAL (Read)
+#        The text of the prompt string.
+#     DEF1 = LITERAL (Read and Write)
+#        A default value which will be returned as the required value
+#        unless it is invalid, in which case the user will be prompted.
+#        The variable is unset on return.
+#     DEF2 = LITERAL (Read and Write)
+#        A value to use as the suggested default (i.e the value which 
+#        will be returned if the user gives a blank value at a prompt).
+#        It is displayed between "/" characters at the end of the
+#        prompt. The variable is unset on return.
+#     ACCEPT = LITERAL (Read and Write)
+#        If a variable of this name exists, any suggested default given
+#        by DEF2 is used without prompting the user. If the value 
+#        obtained for the NDF is "ACCEPT", "accept" or "\" then a
+#        variable ACCEPT is defined with the value YES. This will cause
+#        future suggested defaults to be acccepted.
+#     NDFNAM = LITERAL (Write)
+#        The name of the NDF is returned in this variable.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     29-SEP-1993 (DSB):
+#        Original version.
+#     {enter_changes_here}
+#-
+
+
+
+#  If the supplied default is accept or ACCEPT or \, then create a variable
+#  called ACCEPT and unset the default value. This causes the suggested
+#  default values to be accepted without prompting the user.
+      if( $?DEF1 == 1 ) then
+	 if( "$DEF1" == ACCEPT || "$DEF1" == accept || "$DEF1" == \\ ) then 
+	    set ACCEPT = "YES"
+	    unset DEF1
+         endif
+      endif
+
+#  Check the supplied default NDF names. Report an error and abort if they
+#  cannot be accessed.
+      if( $?DEF1 != 1 ) goto 1
+         set FULLNAME = `check_ndfname "@$DEF1"`
+         if( "$FULLNAME" == "++++++" || $#FULLNAME != 1 ) then
+            echo "\!\! Cannot access specified default NDF - '$DEF1'"
+            if( $?NDFNAM == 1 ) unset NDFNAM
+            exit
+         else
+            set DEF1 = "$FULLNAME"
+         endif
+1:
+
+      if( $?DEF2 != 1 ) goto 2
+         set FULLNAME = `check_ndfname "@$DEF2"`
+         if( "$FULLNAME" == "++++++" || $#FULLNAME != 1 ) then
+            echo "\!\! Cannot access specified default NDF - '$DEF2'"
+            if( $?NDFNAM == 1 ) unset NDFNAM
+            exit
+         else
+            set DEF2 = "$FULLNAME"
+         endif
+2:
+
+
+#  The supplied definition of variable PROM may have been defined as a
+#  single word (by enclosing it in double quotes). We need to be able to
+#  index the first word of the prompt, so ensure that it is recognised as a
+#  list of separate words.
+      set PROM = `echo $PROM`
+
+#  Ensure that the NOMORE variable is undefined.
+      if( ${?NOMORE} == 1 ) unset NOMORE
+
+#  Loop until a good name has been obtained for the NDF.
+      while( ${?NOMORE} == 0 )
+
+#  If a default NDF is available, use it. Unset the local
+#  variable holding the default value once it has been used so that
+#  subsequent passes through the loop will not re-use it. The use of
+#  goto statements is a result of C shells amazing inability to handle
+#  nested if-then-else statements correctly (at least on Sun systems).
+         if( $?DEF1 != 1 ) goto 10
+            set FULLNAME = $DEF1
+            set NDFNAM = "$FULLNAME"
+            unset DEF1
+            goto 100
+
+#  Otherwise see if a suggested default is available.
+10:
+         if( $?DEF2 != 1 || $?ACCEPT != 1 ) goto 20
+
+#  If so, accept it without prompting the user if the ACCEPT variable 
+#  is defined. Unset the suggested default so that it cannot be used 
+#  again by mistake (for instance if the suggested default cannot be 
+#  accessed).
+            set FULLNAME = $DEF2
+            set NDFNAM = "$FULLNAME"
+            unset DEF2
+            goto 100
+
+#  Otherwise get the name of an NDF from the user, using the supplied
+#  suggested default value...
+20:
+         if( $?DEF2 != 1 || $?ACCEPT != 0 ) goto 30
+
+#  If the suggested default is in the current directory (determined by 
+#  comparing the inode numbers of the current directory and the directory 
+#  containing the NDF), don't display the full directory path.
+            set SDFNAM = `basename $DEF2`
+            set DIRNAM = `dirname $DEF2`
+            set PWDINO = `ls -id $PWD`
+            set DIRINO = `ls -id $DIRNAM`
+            if( $PWDINO[1] == $DIRINO[1] ) set DEF2=$SDFNAM
+
+#  Give the prompt, and then obtain a value from standard input.
+            echo -n "$PROM /${DEF2}/ > "
+            set NDFNAM = "$<"
+
+#  If a null string was given use the suggested default.
+            if( "$NDFNAM" == "" ) then
+               set NDFNAM = $DEF2
+
+#  If a "null" or "abort" has been given, unset the NDF name and exit.
+            else if( "$NDFNAM" == "\!\!" || "$NDFNAM" == "\!" ) then
+               echo "\!\! Parameter abort requested"
+               unset NDFNAM
+               exit
+
+#  If help was requested, display the help for this parameter, and then set 
+#  the NDF name blank to force a further prompt.
+
+            else if( "$NDFNAM" == \? ) then
+               if( $?IRCCOM == 1 ) set HELP_ARGS = "$IRCCOM para ${PROM[1]}"
+               if( $?IRCCOM == 0 ) set HELP_ARGS = " "
+               irchelp nointer $HELP_ARGS
+               set NDFNAM = ""
+
+#  If interactive help was requested, put the user into the help
+#  library, and then set the NDF name blank.
+            else if( "$NDFNAM" == \?\? ) then
+               if( $?IRCCOM == 1 ) set HELP_ARGS = "$IRCCOM para ${PROM[1]}"
+	       if( $?IRCCOM == 0 ) set HELP_ARGS = " "
+               irchelp $HELP_ARGS
+               set NDFNAM = ""
+
+            endif
+
+#  Get the full NDF name.
+            set FULLNAME = `check_ndfname "@$NDFNAM"`
+
+#  If the suggested default value was used, unset it.
+            if( "$FULLNAME" == $DEF2 ) unset DEF2
+
+            goto 100
+
+#  If no suggested default was supplied, get a value without 
+#  suggesting any default value. 
+30:
+#         else
+            echo -n "$PROM > "
+            set NDFNAM = "$<"
+
+            if( "$NDFNAM" == "\!\!" || "$NDFNAM" == "\!" ) then
+               echo "\!\! Parameter abort requested"
+               unset NDFNAM
+               exit
+
+            else if( "$NDFNAM" == \? ) then
+               if( $?IRCCOM == 1 ) set HELP_ARGS = "$IRCCOM para ${PROM[1]}"
+               if( $?IRCCOM == 0 ) set HELP_ARGS = " "
+               irchelp nointer $HELP_ARGS
+               set NDFNAM = ""
+
+            else if( "$NDFNAM" == \?\? ) then
+               if( $?IRCCOM == 1 ) set HELP_ARGS = "$IRCCOM para ${PROM[1]}"
+	       if( $?IRCCOM == 0 ) set HELP_ARGS = " "
+               irchelp $HELP_ARGS
+               set NDFNAM = ""
+
+            endif
+
+            set FULLNAME = `check_ndfname "@$NDFNAM"`
+100:
+#         endif
+
+
+#  If the value "ACCEPT", "accept" or "\" cause all future suggested 
+#  defaults to be accepted without prompting.
+         if( "$NDFNAM" == accept || "$NDFNAM" == ACCEPT || "$NDFNAM" == \\ ) then
+            set ACCEPT = "YES"
+
+
+#  If a blank value was obtained, a new NDF name is required.
+         else if( "$NDFNAM" == "" ) then
+
+#  Otherwise, check that an NDF of the given name exists.
+         else if( "$FULLNAME" == "++++++" || $#FULLNAME != 1 ) then
+            echo "\!\! Error accessing '$NDFNAM' - No such NDF or NDF protected"
+
+#  If the NDF name has passed all these tests, indicate that no more prompting
+#  is required.
+         else
+            set NDFNAM = "$FULLNAME"
+            set NOMORE = TRUE
+         endif
+
+#  Loop back for a new NDF name if necessary.
+      end   
+
+#  If a suggested default is still defined, unset it.
+      if( $?DEF2 == 1 ) unset DEF2
+
+#  If an NDF name is being returned, make it starts with an "@" character.
+      if( $?NDFNAM == 1 ) set NDFNAM = @$NDFNAM
+

@@ -1,0 +1,37 @@
+#!/bin/csh
+#+
+#  Name:
+#     ircampack_test
+#
+#  Purpose:
+#     Test the installation of the ircampack package.
+#
+#  Type of Module:
+#     C shell script.
+#
+#  Invocation:
+#     ircampack_test
+#
+#  Description:
+#     Starts up the IRCAMPACK package and runs the IRCAMSET application.
+#     This should display the current values of the IRCAMPACK global  
+#     parameters, or display "undefined" for each undefined parameter.
+#
+#  Authors:
+#     DSB: D.S. Berry (Starlink)
+#     BLY: M.J. Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+#
+#  History:
+#     13-OCT-1993 (DSB):
+#       Original Version based on IRAS90 equivalent
+#     19-MAR-1997 (BLY):
+#        Revised for general installation.
+#     {enter_changes_here}
+#
+#-
+#
+source INSTALL_BIN/ircampack.csh
+ircamset
+echo "  IRCAMPACK test script completed."
+#      End of shell script.

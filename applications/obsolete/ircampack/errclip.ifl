@@ -1,0 +1,57 @@
+#+
+#  Name:
+#     ERRCLIP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-SEP-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface ERRCLIP
+
+   helplib ' '
+
+   parameter IN                  # Input NDF
+      position 1
+      type     NDF
+      access   READ
+      ppath    'GLOBAL '
+      association <-GLOBAL.DATA_ARRAY
+      prompt   'The input NDF'
+   endparameter
+
+   parameter OUT                 # Output NDF
+      position 2
+      type     NDF
+      access   WRITE
+      association ->GLOBAL.DATA_ARRAY
+      prompt   'The output NDF'
+   endparameter
+
+   parameter LIMIT
+      position 3
+      type     _DOUBLE
+      access   READ
+      prompt   'Limiting value'
+   endparameter
+
+   parameter TYPE                #  Limit type
+      position 4
+      type     LITERAL
+      access   READ
+      vpath    DEFAULT
+      ppath    DEFAULT
+      default  'SIGMA'
+      prompt   'Quantity to limit'
+   endparameter
+
+endinterface

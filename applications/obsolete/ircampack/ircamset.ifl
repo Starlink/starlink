@@ -1,0 +1,177 @@
+#+
+#  Name:
+#     IRCAMSET.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     28-SEP-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface IRCAMSET
+
+   helplib '$IRCAMPACK_HELP'
+
+   parameter IN1
+      position 1
+      type     NDF
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_INT1
+      prompt   'NDF holding waveplate 0 degree intensity'
+      helpkey  '*'
+   endparameter
+
+   parameter IN2
+      position 2
+      type     NDF
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_INT2
+      prompt   'NDF holding waveplate 45 degree intensity'
+      helpkey  '*'
+   endparameter
+
+   parameter IN3
+      position 3
+      type     NDF
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_INT3
+      prompt   'NDF holding waveplate 22.5 degree intensity'
+      helpkey  '*'
+   endparameter
+
+   parameter IN4
+      position 4
+      type     NDF
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_INT4
+      prompt   'NDF holding waveplate 67.5 degree intensity'
+      helpkey  '*'
+   endparameter
+
+   parameter I
+      position 5
+      type     NDF
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_I
+      prompt   'NDF holding total intensity'
+      helpkey  '*'
+   endparameter
+
+   parameter P
+      position 6
+      type     NDF
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_P
+      prompt   'NDF holding percentage polarisation'
+      helpkey  '*'
+   endparameter
+
+   parameter THETA
+      position 7
+      type     NDF
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_THETA
+      prompt   'NDF holding polarisation angle'
+      helpkey  '*'
+   endparameter
+
+   parameter FWHM
+      position 8
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_FWHM
+      prompt   'FWHM of Gaussian PSF'
+      helpkey  '*'
+   endparameter
+
+   parameter BOX
+      position 9
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_BOX
+      prompt   'Box size of Gaussian PSF'
+      helpkey  '*'
+   endparameter
+
+   parameter ANGROT
+      position 10
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_ANGROT
+      prompt   'Angle by which to rotate displayed vectors'
+      helpkey  '*'
+   endparameter
+
+   parameter MAXPERR
+      position 11
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_PERR
+      prompt   'Max. acceptable percent polarisation error'
+      helpkey  '*'
+   endparameter
+
+   parameter MAXTERR
+      position 12
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_TERR
+      prompt   'Max. acceptable polarisation angle error'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFILE
+      type     FILENAME
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Name of log file'
+      helpkey  '*'
+   endparameter
+
+endinterface

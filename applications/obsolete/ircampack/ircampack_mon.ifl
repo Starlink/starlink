@@ -1,0 +1,1161 @@
+monolith ircampack_mon
+
+#+
+#  Name:
+#     CALPOL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     23-SEP-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface CALPOL
+
+   helplib ' '
+
+   parameter DEBIAS		 # Remove statistical bias?
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  NO
+      prompt   'Remove statistical bias?'
+      helpkey  '*'
+   endparameter
+
+   parameter I                   # Total intensity
+      position 7
+      type     NDF
+      access   WRITE
+      prompt   'Total intensity '
+      association ->GLOBAL.POL_I
+      helpkey  '*'
+   endparameter
+
+   parameter IN1                  # 0 degrees input
+      position 1
+      type     NDF
+      access   READ
+      ppath    'GLOBAL '
+      association <->GLOBAL.POL_0
+      prompt   '0 degrees intensity map'
+      helpkey  '*'
+   endparameter
+
+   parameter IN2                  # 45 degrees input
+      position 2
+      type     NDF
+      access   READ
+      prompt   '45 degrees intensity map'
+      association <->GLOBAL.POL_45
+      helpkey  '*'
+   endparameter
+
+   parameter IN3                  # 90 degrees input
+      position 3
+      type     NDF
+      access   READ
+      prompt   '90 degrees intensity map'
+      association <->GLOBAL.POL_90
+      helpkey  '*'
+   endparameter
+
+   parameter IN4                  # 135 degrees input
+      position 4
+      type     NDF
+      access   READ
+      prompt   '135 degrees intensity map'
+      association <->GLOBAL.POL_135
+      helpkey  '*'
+   endparameter
+
+   parameter IA			 # 1st total intensity 
+      type     NDF
+      access   WRITE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Total intensity from 0 and 90 degrees intensities'
+      helpkey  '*'
+   endparameter
+
+   parameter IB			 # 2nd total intensity 
+      type     NDF
+      access   WRITE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Total intensity from 0 and 90 degrees intensities'
+      helpkey  '*'
+   endparameter
+
+   parameter IP			 # polarised intensity 
+      type     NDF
+      access   WRITE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Polarised intensity '
+      helpkey  '*'
+   endparameter
+
+   parameter P			 # percent polarisation
+      position 5
+      type     NDF
+      access   WRITE
+      association ->GLOBAL.POL_P
+      prompt   'Percentage polarisation'
+      helpkey  '*'
+   endparameter
+
+   parameter Q			 # Q
+      type     NDF
+      access   WRITE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Normalise Stokes parameter Q'
+      helpkey  '*'
+   endparameter
+
+   parameter THETA		 # polarisation angle
+      position 6
+      type     NDF
+      access   WRITE
+      prompt   'Polarisation angle'
+      association ->GLOBAL.POL_THETA
+      helpkey  '*'
+   endparameter
+
+   parameter U			 # U
+      type     NDF
+      access   WRITE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Normalised Stokes parameter U'
+      helpkey  '*'
+   endparameter
+
+   parameter VARIANCE		 # Variances required?
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  YES
+      prompt   'Are variance values to be generated?'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CHECK_NDFNAME.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     3-FEB-1994 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface CHECK_NDFNAME
+
+   helplib ' '
+
+   parameter NDF
+      position 1
+      type     NDF
+      vpath    'noprompt'
+      access   READ
+      prompt   'The name of an NDF to be checked'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     ERRCLIP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-SEP-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface ERRCLIP
+
+   helplib ' '
+
+   parameter IN                  # Input NDF
+      position 1
+      type     NDF
+      access   READ
+      ppath    'GLOBAL '
+      association <-GLOBAL.DATA_ARRAY
+      prompt   'The input NDF'
+   endparameter
+
+   parameter OUT                 # Output NDF
+      position 2
+      type     NDF
+      access   WRITE
+      association ->GLOBAL.DATA_ARRAY
+      prompt   'The output NDF'
+   endparameter
+
+   parameter LIMIT
+      position 3
+      type     _DOUBLE
+      access   READ
+      prompt   'Limiting value'
+   endparameter
+
+   parameter TYPE                #  Limit type
+      position 4
+      type     LITERAL
+      access   READ
+      vpath    DEFAULT
+      ppath    DEFAULT
+      default  'SIGMA'
+      prompt   'Quantity to limit'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     IRCAMSET.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     28-SEP-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface IRCAMSET
+
+   helplib '$IRCAMPACK_HELP'
+
+   parameter IN1
+      position 1
+      type     NDF
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_INT1
+      prompt   'NDF holding waveplate 0 degree intensity'
+      helpkey  '*'
+   endparameter
+
+   parameter IN2
+      position 2
+      type     NDF
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_INT2
+      prompt   'NDF holding waveplate 45 degree intensity'
+      helpkey  '*'
+   endparameter
+
+   parameter IN3
+      position 3
+      type     NDF
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_INT3
+      prompt   'NDF holding waveplate 22.5 degree intensity'
+      helpkey  '*'
+   endparameter
+
+   parameter IN4
+      position 4
+      type     NDF
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_INT4
+      prompt   'NDF holding waveplate 67.5 degree intensity'
+      helpkey  '*'
+   endparameter
+
+   parameter I
+      position 5
+      type     NDF
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_I
+      prompt   'NDF holding total intensity'
+      helpkey  '*'
+   endparameter
+
+   parameter P
+      position 6
+      type     NDF
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_P
+      prompt   'NDF holding percentage polarisation'
+      helpkey  '*'
+   endparameter
+
+   parameter THETA
+      position 7
+      type     NDF
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_THETA
+      prompt   'NDF holding polarisation angle'
+      helpkey  '*'
+   endparameter
+
+   parameter FWHM
+      position 8
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_FWHM
+      prompt   'FWHM of Gaussian PSF'
+      helpkey  '*'
+   endparameter
+
+   parameter BOX
+      position 9
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_BOX
+      prompt   'Box size of Gaussian PSF'
+      helpkey  '*'
+   endparameter
+
+   parameter ANGROT
+      position 10
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_ANGROT
+      prompt   'Angle by which to rotate displayed vectors'
+      helpkey  '*'
+   endparameter
+
+   parameter MAXPERR
+      position 11
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_PERR
+      prompt   'Max. acceptable percent polarisation error'
+      helpkey  '*'
+   endparameter
+
+   parameter MAXTERR
+      position 12
+      type     LITERAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  !
+      association <->GLOBAL.IRCAM_TERR
+      prompt   'Max. acceptable polarisation angle error'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFILE
+      type     FILENAME
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Name of log file'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     IRCHELP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-OCT-1993 (DSB):
+#     	 Original version based on equivalent IRAS90 file
+#     {enter_changes_here}
+
+#-
+
+interface IRCHELP
+
+   helplib '$IRCAMPACK_HELP'
+
+   parameter      INTER  
+      type        _LOGICAL
+      access      'READ'
+      default     'YES'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      prompt      'Is an interactive help session required?'
+      helpkey     '*'
+   endparameter
+
+   parameter      LIBRARY
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help library'
+      default     '$IRCAMPACK_HELP'
+      helpkey  '*'
+   endparameter
+
+   parameter      SUBSUBSUBTOPIC
+      position    4
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubsubtopic'
+      default     '         '
+      helpkey  '*'
+   endparameter
+
+   parameter      SUBSUBTOPIC
+      position    3
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubtopic'
+      default     '         '
+      helpkey  '*'
+   endparameter
+
+   parameter      SUBTOPIC
+      position    2
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subtopic'
+      default     '         '
+      helpkey  '*'
+   endparameter
+
+   parameter      TOPIC
+      position    1
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help topic'
+      default     '         '
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     SEGMENT.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     20-OCT-1993 (DSB):
+#        Original NDF version.
+#     {enter_further_changes_here}
+
+#-
+
+interface SEGMENT
+
+   helplib        'KAPPA_HELP:'
+
+   parameter AXES
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      prompt      'Indices of the axes spanning the polygon plane'
+      helpkey     '*'
+   endparameter
+
+   parameter CLEAR
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     'NO'
+      prompt      'Should the graphics device be cleared?'
+      helpkey     '*'
+   endparameter
+
+   parameter      COLOUR        # Graphics colour
+      type        'LITERAL'
+      prompt      'Colour of graphics'
+      vpath       'CURRENT,DEFAULT'
+      ppath       'CURRENT'
+      helpkey     '*'
+      default     'GREEN'
+   endparameter
+ 
+   parameter      COSYS          # Co-ordinate system
+      type        'LITERAL'
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,DYNAMIC'
+      prompt      'Co-ordinate system'
+      association '<->GLOBAL.COORD_SYSTEM'
+      helpkey     '*'
+      default     'World'
+   endparameter
+
+   parameter      DEVICE         # Graphics device
+      ptype       'DEVICE'
+      vpath       'GLOBAL,PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<-GLOBAL.GRAPHICS_DEVICE'
+      prompt      'Name of graphics device'
+      helpkey     '*'
+   endparameter
+
+   parameter      IN1            # First input NDF 
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL'
+      association '<-GLOBAL.DATA_ARRAY'
+      prompt      'NDF holding data to be put inside the polygon'
+      helpkey     '*'
+   endparameter
+
+   parameter      IN2            # Second input NDF 
+      position    2
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'DEFAULT'
+      prompt      'NDF holding data to be put outside the polygon'
+      default     !
+      helpkey     '*'
+   endparameter
+
+   parameter      LOGFILE        # Name of log file
+      type        'FILENAME'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      prompt      'File to store co-ordinates of polygon vertices'
+      default     !
+      helpkey     '*'
+   endparameter
+
+   parameter MAXPOLY
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      prompt      'Maximum number of polygons'
+      default     !
+      helpkey     '*'
+   endparameter
+
+   parameter MINPOLY
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      prompt      'Minimum number of polygons'
+      default     1
+      helpkey     '*'
+   endparameter
+
+   parameter      MODE           # Interaction mode
+      type        'LITERAL'
+      vpath       'GLOBAL'
+      ppath       'GLOBAL,DYNAMIC,DEFAULT'
+      prompt      'Mode to obtain polygon vertices'
+      association '<->GLOBAL.INTERACTIONMODE'
+      default     'Interface'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output NDF
+      position    3
+      type        'NDF'
+      access      'WRITE'
+      vpath       'PROMPT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter PLOT  
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     'POLY'
+      prompt      'What sort of graphics should be used?'
+      helpkey     '*'
+   endparameter
+
+   parameter      POLY1
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 1'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY2
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 2'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY3
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 3'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY4
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 4'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY5
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 5'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY6
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 6'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY7
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 7'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY8
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 8'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY9
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 9'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY10
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 10'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY11
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 11'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY12
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 12'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY13
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 13'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY14
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 14'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY15
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 15'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY16
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 16'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY17
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 17'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY18
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 18'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY19
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 19'
+      helpkey     '*'
+   endparameter
+              
+   parameter      POLY20
+      type        'FILENAME'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'File holding coordinates defining polygon 20'
+      helpkey     '*'
+   endparameter
+              
+   parameter QUALITY
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     'YES'
+      prompt      'Should quality values be copied to the output NDF?'
+      helpkey     '*'
+   endparameter
+
+   parameter VARIANCE
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     'YES'
+      prompt      'Should variance values be copied to the output NDF?'
+      helpkey     '*'
+   endparameter
+
+   parameter XY
+      type        '_REAL'
+      access      'READ'
+      prompt      'Co-ordinates of next polygon vertex'
+      helpkey     '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     TNORM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-SEP-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface TNORM
+
+   helplib '$IRCAMPACK_HELP'
+
+   parameter IN                  # Input NDFs.
+      position 1
+      type     NDF
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association <-GLOBAL.DATA_ARRAY
+      prompt   'Input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter NDFLIST             # Group expression defining created
+      type     NDF    		 # NDFs.
+      access   WRITE
+      ppath    DYNAMIC
+      vpath    'DYNAMIC,NOPROMPT'
+      association ->GLOBAL.DATA_ARRAY
+      prompt   'Group expression giving sucessfully created output NDFs'
+   endparameter
+
+   parameter OUT                 # Output NDFs.
+      position 2
+      type     NDF
+      access   WRITE
+      vpath    'PROMPT '
+      prompt   'Output NDFs'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     VECPLOT.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     12-AUG-1993 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface VECPLOT
+
+   helplib        'KAPPA_HELP:'
+
+   parameter      ABSLAB         # Abscissa label
+      type        'LITERAL'
+      prompt      'The label for the abscissa axis'
+      vpath       'DYNAMIC,DEFAULT'
+      ppath       'DYNAMIC,CURRENT'
+      helpkey     '*'
+      default     'X'
+   endparameter
+
+   parameter      ANGROT         # Angle to add on to vector orientations
+      type        '_REAL'
+      prompt      'Angle by which to rotate the vectors (in degrees)'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      helpkey     '*'
+      default     0.0
+   endparameter
+
+   parameter      AXES           # Axes or no axes?
+      type        '_LOGICAL'
+      prompt      'Are annotated axes to be drawn?'
+      vpath       'DEFAULT'
+      default     T
+      helpkey     '*'
+   endparameter
+
+   parameter      BORDER         # Border when no axes?
+      type        '_LOGICAL'
+      prompt      'Is a border to be drawn about the plot?'
+      vpath       'DEFAULT'
+      default     T
+      helpkey     '*'
+   endparameter
+
+   parameter      CLEAR          # Clear before plotting?
+      type        '_LOGICAL'
+      vpath       'DEFAULT'
+      prompt      'Is the current picture to be cleared before plotting?'
+      helpkey     '*'
+      default     Y
+   endparameter
+
+   parameter      COMP           # Data or variance?
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Component to contour'
+      helpkey     '*'
+#     in          'Data', 'Variance'
+      default     'Data'
+   endparameter
+
+   parameter      COSYS          # Co-ordinate system
+      type        'LITERAL'
+      vpath       'GLOBAL,DEFAULT'
+      ppath       'GLOBAL,DYNAMIC'
+      prompt      'Co-ordinate system'
+      association '<->GLOBAL.COORD_SYSTEM'
+      helpkey     '*'
+      default     'Data'
+#     in          'Data', 'World'
+   endparameter
+
+   parameter      DEVICE         # Graphics device
+      position    9
+      ptype       'DEVICE'
+      vpath       'GLOBAL,PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<-GLOBAL.GRAPHICS_DEVICE'
+      prompt      'Name of graphics device'
+      helpkey     '*'
+   endparameter
+
+   parameter      FONT           # Text fount
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Fount type?'
+      default     'GKS'
+      helpkey     '*'
+#     in          'GKS', 'NCAR'
+   endparameter
+
+
+   parameter      JUST           # Vector justification
+      position    7
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Vector justification'
+      default     'CENTRE'
+      helpkey     '*'
+#     in          'CENTRE', 'START', 'END'
+   endparameter
+
+   parameter      KEY            # Plot a key?
+      position    8
+      type        '_LOGICAL'
+      prompt      'Do you want a key showing the vector scale?'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      default     Y
+      helpkey     '*'
+   endparameter
+
+   parameter      KEYVEC        # Key vector magnitude
+      type        '_REAL'
+      prompt      'Key vector magnitude'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      MAJTIC         # Major-tick-mark control
+      type        '_REAL'
+      prompt      'Parameter controlling the numbers of major ticks for the x and y axes'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      helpkey     '*'
+      default     3.,3.
+   endparameter
+
+   parameter      MINTIC         # Minor-tick-mark control
+      type        '_REAL'
+      prompt      'Numbers of minor tick marks between major ticks for x and y axes'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      helpkey     '*'
+      default     -1.,-1.
+   endparameter
+
+   parameter      NDF1            # Input NDF giving vector magnitudes
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt      'NDF giving vector magnitudes'
+      helpkey     '*'
+   endparameter
+
+   parameter      NDF2            # Input NDF giving vector orientations
+      position    2
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'NDF giving vector orientations'
+      helpkey     '*'
+   endparameter
+
+   parameter      ORDLAB         # Ordinate label
+      type        'LITERAL'
+      prompt      'Label for the ordinate axis'
+      vpath       'DYNAMIC,DEFAULT'
+      ppath       'DYNAMIC,CURRENT'
+      helpkey     '*'
+      default     'Y'
+   endparameter
+
+   parameter      OUTTIC         # Inward or outward ticks?
+      type        '_LOGICAL'
+      prompt      'Do you want the axis tick marks on the outside of the axes?'
+      vpath       'DEFAULT'
+      default     YES
+      helpkey     '*'
+   endparameter
+
+   parameter      PLTITL         # Title of the plot
+      type        'LITERAL'
+      prompt      'Title for the plot'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      PXSIZE         # x size of plot
+      type        '_REAL'
+      prompt      'Size of the plot in the x-direction in metres'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      PYSIZE         # y size of plot
+      type        '_REAL'
+      prompt      'Size of the plot in the y-direction in metres'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      STEP           # Interval between vectors
+      position    4
+      type        '_INTEGER'
+      prompt      'Increment in pixels between adjacent vectors'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      THICK          # Thickness of lines
+      type        '_REAL'
+      prompt      'Relative thickness of plotted axis lines and annotations'
+      vpath       'DEFAULT'
+      default     1.0
+      helpkey     '*'
+   endparameter
+
+   parameter      VECCOL        # vector colour
+      type        'LITERAL'
+      prompt      'Colour of vectors'
+      vpath       'CURRENT,DEFAULT'
+      ppath       'CURRENT'
+      helpkey     '*'
+      default     'MIN'
+   endparameter
+
+   parameter      VSCALE         # Vector scale, millimetres per data unit
+      position    5
+      type        '_REAL'
+      prompt      'Data value for a 1 centimetre vector'
+      ppath       'DYNAMIC'
+      vpath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      VTYPE          # Type of vector to plot
+      position    6
+      type        'LITERAL'
+      prompt      'Type of vector to plot'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     'Line'
+      helpkey     '*'
+#     in          'Line', 'Arrow'
+   endparameter
+
+endinterface
+
+endmonolith

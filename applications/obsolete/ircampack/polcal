@@ -1,0 +1,206 @@
+#!/bin/csh
+#+
+#  Name:
+#     POLCAL
+
+#  Purpose:
+#     Produce NDFs containing polarisation parameters. 
+
+#  Language:
+#     C shell
+
+#  Description:
+#     The user supplies four input intensity images at half-wave plate
+#     intervals of 22.5 degrees. Images are created holding total intensity, 
+#     percentage polarisation and polarisation angle. Pixels are set bad 
+#     in these images if the standard deviation of the pixel value is 
+#     greater than the limits supplied by parameters MAXPERR and MAXTERR. 
+
+#  Usage:
+#     POLCAL IN1 IN2 IN3 IN4 P THETA I MAXPERR MAXTERR
+
+#  Parameters:
+#     IN1 = NDF (Read)
+#        NDF obtained with the waveplate at 0 degrees.
+#     IN2 = NDF (Read)
+#        NDF obtained with the waveplate at 45 degrees.
+#     IN3 = NDF (Read)
+#        NDF obtained with the waveplate at 22.5 degrees.
+#     IN4 = NDF (Read)
+#        NDF obtained with the waveplate at 67.5 degrees.
+#     P = NDF (Write)
+#        An NDF to hold the percentage polarisation image.
+#     THETA = NDF (Write)
+#        An NDF to hold the polarisation angle image.
+#     I = NDF (Write)
+#        An NDF to hold the total intensity image.
+#     MAXPERR = _REAL (Read)
+#        The limit to place on the error in percentage polarisation.
+#        Any pixels with standard deviations larger than this value 
+#        are set bad. The value should be given in units of percent.
+#     MAXTERR = _REAL (Read)
+#        The limit to place on the error in polarisation angle. Any 
+#        pixels with standard deviations larger than this value are 
+#        set bad. The value should be given in units of degrees.
+
+#  Notes:
+#     - This is a script and so command line parameters can be 
+#     specified by position only, not by keyword.
+#     - The input NDFs should all contain variance values, otherwise
+#     the clipping of values with large errors cannot be performed.
+#     - This script is an easy-to-use interface to the KAPPA 
+#     applications CALPOL and ERRCLIP. More versatility is available 
+#     by using CALPOL and ERRCLIP directly.
+#     - The suggested defaults for the four input NDFs are the
+#     output NDFS from the previous application or script. 
+#     - No correction is performed for statistical bias introduced 
+#     by the asymetry of the noise in the percentage polarisation.
+#     If such a correction is required, KAPPA application CALPOL
+#     should be used instead of this script.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     28-SEP-1993 (DSB):
+#        Original version.
+#     {enter_changes_here}
+#-
+
+#  Store the name of the current command.
+      set IRCCOM = "polcal"
+
+#  Ensure IRCAMPACK and KAPPA commands are available
+      alias echo 'echo >/dev/null'
+      kappa
+      ircampack
+      unalias echo
+
+#  Obtain the current set of values for the IRCAM global parameters.
+      set GLOBPAR = `ircamset`
+
+#  Get the 0 degree input NDF. First establish any command line value
+#  as the primary value
+      if( $#argv > 0 ) then
+         set DEF1 = $argv[1]
+      endif
+
+#  Now establish any defined global value as the suggested default.
+      set DEF2 = $GLOBPAR[1]
+      if( $DEF2 == 'undefined' ) unset DEF2
+
+#  Now set the prompt.
+      set PROM = "IN1 - NDF obtained with waveplate at 0 degrees"
+
+#  Now get the NDF. Abort if requested.
+      ircamndf
+      if( $?NDFNAM == 0 ) exit
+
+#  Save the NDF name. If a parameter abort was requested the NDFNAM variable
+#  will be undefined and the script will consequently abort.
+      set IN1 = $NDFNAM
+
+#  Now do the same for the 45 degree input NDF. 
+      if( $#argv > 1 ) then
+         set DEF1 = $argv[2]
+      endif
+      set DEF2 = $GLOBPAR[2]
+      if( $DEF2 == 'undefined' ) unset DEF2
+      set PROM = "IN2 - NDF obtained with waveplate at 45 degrees"
+      ircamndf
+      if( $?NDFNAM == 0 ) exit
+      set IN2 = $NDFNAM
+
+#  Now do the same for the 22.5 degree input NDF. 
+      if( $#argv > 2 ) then
+         set DEF1 = $argv[3]
+      endif
+      set DEF2 = $GLOBPAR[3]
+      if( $DEF2 == 'undefined' ) unset DEF2
+      set PROM = "IN3 - NDF obtained with waveplate at 22.5 degrees"
+      ircamndf
+      if( $?NDFNAM == 0 ) exit
+      set IN3 = $NDFNAM
+
+#  Now do the same for the 67.5 degree input NDF. 
+      if( $#argv > 3 ) then
+         set DEF1 = $argv[4]
+      endif
+      set DEF2 = $GLOBPAR[4]
+      if( $DEF2 == 'undefined' ) unset DEF2
+      set PROM = "IN4 - NDF obtained with waveplate at 67.5 degrees"
+      ircamndf
+      if( $?NDFNAM == 0 ) exit
+      set IN4 = $NDFNAM
+
+#  Now obtain the name of the output NDF to hold percentage 
+#  polarisation. Ensure the string does not with an "@" character.
+      if( $#argv > 4 ) then
+         set DEF1 = $argv[5]
+      endif
+      set PROM = "P - NDF to hold percentage polarisation"
+      ircamstr
+      if( $?STRING == 0 ) exit
+      set P = `expr "$STRING" : "@*\(.*\)"`
+
+#  Now obtain the name of the output NDF to hold polarisation angle.
+      if( $#argv > 5 ) then
+         set DEF1 = $argv[6]
+      endif
+      set PROM = "THETA - NDF to hold polarisation angle"
+      ircamstr
+      if( $?STRING == 0 ) exit
+      set THETA = `expr "$STRING" : "@*\(.*\)"`
+
+#  Now obtain the name of the output NDF to hold total intensity.
+      if( $#argv > 6 ) then
+         set DEF1 = $argv[7]
+      endif
+      set PROM = "I - NDF to hold total intensity"
+      ircamstr
+      if( $?STRING == 0 ) exit
+      set I = `expr "$STRING" : "@*\(.*\)"`
+
+#  Now obtain the maximum precentage polarisation error.
+      if( $#argv > 7 ) then
+         set DEF1 = $argv[8]
+      endif
+      set DEF2 = $GLOBPAR[11]
+      if( $DEF2 == 'undefined' ) set DEF2 = "1.0"
+      set PROM = "MAXPERR - Max. acceptable error in percentage polarisation (%)"
+      ircamstr
+      if( $?STRING == 0 ) exit
+      set MAXPERR = $STRING
+
+#  Now obtain the maximum polarisation angle error.
+      if( $#argv > 8 ) then
+         set DEF1 = $argv[9]
+      endif
+      set DEF2 = $GLOBPAR[12]
+      if( $DEF2 == 'undefined' ) set DEF2 = "5.0"
+      set PROM = "MAXTERR - Max. acceptable error in polarisation angle (degrees)"
+      ircamstr
+      if( $?STRING == 0 ) exit
+      set MAXTERR = $STRING
+
+#  Calculate the polarisation parameters.
+      calpol ${IN1} ${IN2} ${IN3} ${IN4} @${P} @${THETA} @${I}
+
+#  Clip the percentage polarisation image.
+      errclip @${P} POLCAL_PT ${MAXPERR} sigma | awk '{if($1!="Applying")print $0}'
+
+#  Clip the polarisation angle image.
+      errclip @${THETA} POLCAL_TT ${MAXTERR} sigma | awk '{if($1!="Applying")print $0}'
+
+#  Move the temporary NDFs to the output NDFs.
+      rm -f ${P}.sdf ${THETA}.sdf
+      mv POLCAL_PT.sdf ${P}.sdf
+      mv POLCAL_TT.sdf ${THETA}.sdf
+
+#  Store the new IRCAM global parameters.
+      ircamset ${IN1} ${IN2} ${IN3} ${IN4} I=@${I} P=@${P} THETA=@${THETA} MAXPERR=${MAXPERR} MAXTERR=${MAXTERR} >/dev/null
+
+#  Finish
+      echo " "
+      exit

@@ -1,0 +1,82 @@
+#+
+#  Name:
+#     IRCHELP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-OCT-1993 (DSB):
+#     	 Original version based on equivalent IRAS90 file
+#     {enter_changes_here}
+
+#-
+
+interface IRCHELP
+
+   helplib '$IRCAMPACK_HELP'
+
+   parameter      INTER  
+      type        _LOGICAL
+      access      'READ'
+      default     'YES'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      prompt      'Is an interactive help session required?'
+      helpkey     '*'
+   endparameter
+
+   parameter      LIBRARY
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help library'
+      default     '$IRCAMPACK_HELP'
+      helpkey  '*'
+   endparameter
+
+   parameter      SUBSUBSUBTOPIC
+      position    4
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubsubtopic'
+      default     '         '
+      helpkey  '*'
+   endparameter
+
+   parameter      SUBSUBTOPIC
+      position    3
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubtopic'
+      default     '         '
+      helpkey  '*'
+   endparameter
+
+   parameter      SUBTOPIC
+      position    2
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subtopic'
+      default     '         '
+      helpkey  '*'
+   endparameter
+
+   parameter      TOPIC
+      position    1
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help topic'
+      default     '         '
+      helpkey  '*'
+   endparameter
+
+endinterface

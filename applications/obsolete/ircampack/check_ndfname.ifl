@@ -1,0 +1,31 @@
+#+
+#  Name:
+#     CHECK_NDFNAME.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     3-FEB-1994 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface CHECK_NDFNAME
+
+   helplib ' '
+
+   parameter NDF
+      position 1
+      type     NDF
+      vpath    'noprompt'
+      access   READ
+      prompt   'The name of an NDF to be checked'
+   endparameter
+
+endinterface

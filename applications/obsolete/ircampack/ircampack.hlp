@@ -1,0 +1,1289 @@
+0 IRCAMPACK
+For information on individual subjects, select from the list 
+below:
+
+1 Application_parameters
+Each application has an entry in this help library which
+describes the processing performed by the application, and the
+parameters which are available to modify the behaviour of the
+application. Parameters fall into two classes; those for which
+values must be supplied by the user, and those which will take a
+default value unless the user specifies an alternative value on
+the command line. Prompts are not normally issued for the second
+class. The default values used by this class are indicated by
+placing them inside a pair of square brackets at the end of the
+parameter description. If a parameter description does not end
+with a pair of square brackets, then a value must be supplied for
+the parameter by the user. If the square brackets are empty, then
+the parameter is defaulted, but the default value used depends on
+the values supplied for other parameters and so cannot be
+specified in the documentation. In these cases, the choice of
+default value is described in the parameter description. 
+
+1 Group_expressions
+A "group expression" is a string which identifies a group of
+objects (eg numerical values, NDFs, etc). A group expression can 
+specify a group of such objects in several ways: 
+
+  o  As a comma separated list ( e.g. "12.1, 23.2, 1.3" or 
+     "HH1_FRAME1,HH1_FRAME2" ). 
+
+  o  By reading them from a text file (see "Indirection).
+
+  o  By modifying an existing group of objects using editing 
+     specified by the user (see "Modification").
+
+If the supplied group expression is terminated with a minus
+sign, the user is re-prompted for another group expression. The
+objects specified by this second group expression are added to
+those specified by the first. This re-prompting continues until
+a group expression is supplied which does not end with a minus
+sign. 
+
+Certain classes of objects have additional features, for 
+instance if the objects are NDF names, then wild-card characters 
+are allowed in the supplied values (see "NDF_groups").
+
+2 Indirection
+It is sometimes convenient to store strings specifying the
+objects to be used in a text file. The name of the text file can
+then be given in response to a prompt for a group expression,
+rather than giving a long list of explicit values. This is done
+by preceeding the name of the text file with an up-arrow ("^")
+character. For instance, the group expression "^VALUES.DAT"
+would result in the file VALUES.DAT being opened and the strings
+read from the file. Each line within the file is considered to
+be a group expression, and is processed in the same way as a
+group expression supplied directly. In particular, a text file
+may contain references to other text files. If the file
+VALUES.DAT contained the following two lines: 
+
+A,B,C
+D,^NEWFILE.DAT
+
+The the strings A, B, C and D would be returned to the 
+application, and in addition the file NEWFILE.DAT would be 
+searched for further strings. This nesting of text file can go
+down to seven levels. Text files may also contain comments. 
+Anything occurring after an # character is ignored. To ignore
+an entire line the # character must be in column 1 (any blanks in 
+front of the # character are considered to be significant).
+
+2 Modification
+A group of objects can be given by specifying some editing to
+apply to another already existing group of objects. For instance,
+if the string NEW_*B|_DS|_IM| was given in response to a request
+for a group expression, then the following steps occur: 
+
+  o  Each element in some existing group of objects (described in 
+     the help information for the parameter concerned) is substituted 
+     in turn for the "*" character.
+  o  Any occurrences of the string "_DS" is replaced by the string 
+     "_IM".
+  o  The string "B" is added to the end of the string.
+  o  The string "NEW_" is added to the start of the string.
+
+Thus if the existing group contained the strings FILE1_DS and
+FILE2_DS, the resulting group would be NEW_FILE1_IMB and
+NEW_FILE2_IMB. 
+
+2 NDF_groups
+If a group expression is used to specify a list of input NDFs,
+then NDF names may be specified which contain wild card
+characters ("*" and "?" on UNIX). These will be expanded into a
+list of explicit NDF names before returning the group to the
+application. Note, on UNIX systems group expressions containing
+wild-cards must be enclosed in quotes if they are supplied on the
+command line (this prevents the shell from expanding the
+wild-cards itself). 
+
+If the final character in a group expression is a colon (:), then
+a list of the NDFs represented by the group expression (minus the
+colon) is displayed, but no NDFs are actually added to the group
+of NDFs to be processed. The user is then re-prompted for another
+group expression. Note, this facility only applies to group
+expressions representing existing NDFs, not NDFs which are to be
+created by the application. 
+
+At the moment group expressions may only be used to specify NDFs 
+which are stored at the top level of the container file.
+
+3 Communication_between_applications
+If an IRCAMPACK application creates more than one output NDF, it
+will also create an output text file containing the names of the
+output NDFs in a form which can be used to specify the NDFs as
+input to another IRCAMPACK application. The text file is called
+ircampack_ndfs.lis and is located in the users home directory.
+Successive IRCAMPACK applications will over-write such text files
+created by previous applications. If such a file is created, then
+the global parameter DATA_ARRAY will be modified so that the
+suggested default for the input NDFs to the next application
+becomes an indirection element specifying the output NDFs from
+the previous application. 
+
+2 Examples
+If an application asks for a group of input NDFs, the following 
+are all possible responses:
+
+  b1,b2,b3,b4  - Use b1.sdf, b2.sdf, b3.sdf and b4.sdf. It is 
+                 assumed that the NDFs are the top level objects 
+                 within the .sdf files.
+  cena_b1-     - Uses cena_b1.sdf and then asks the user for 
+                 more NDFs.
+  *            - Uses all .sdf files in the current directory. 
+  hh1_f*       - Uses all .sdf files beginning with "hh1_f".
+  ^files.lis   - Reads the names of NDFs from the text file files.lis.
+  ../data/*    - Uses all .sdf files contained in the UNIX directory 
+                 ../data
+
+If an application asks for a group of output NDFs, the following 
+are possible responses:
+
+  file1,file2,file3 - Create file1.sdf, file2.sdf and file3.sdf.
+  ^out.dat          - Read the names of the output NDFs from 
+                      text file out.dat.
+  *_ds              - Append the string "_ds" to the end of all 
+                      the input NDF names.
+  ../bk/*|_ds|_bk|  - Substitute the string "_bk" for all 
+                      occurrences of the string "_ds" in the 
+                      input NDF names, and put the files in UNIX 
+                      directory ../bk
+
+Group expressions can be used to specify objects other than NDFs.
+For instance, if an application asks for a group of pixels to be
+specified by their X and Y pixel indices, then the pixels (1,1),
+(21,-10) and (0,0) could be specified in any of the following ways: 
+
+  10,11,21,-10,0,0  - Gives the indices as a comma separated 
+                      list.
+
+  10,11 -           - Ending each line with a minus sign causes 
+  21,-10 -            the user to be re-prompted for more values.
+  0,0
+
+  ^pixels.dat       - The file pixels.dat is read.
+                      
+In the last example the file pixels.dat could contain the 
+following four lines:
+
+#  Approximate star centres.
+10,11
+21,-10
+0,0
+
+1 Getting_help_at_a_parameter_prompt
+When prompted for a parameter the user may reply with a question 
+mark ("?"), in which case information will be displayed 
+describing the parameter. The user will then be asked for a  new
+value for the parameter. The user may also respond with a  double
+question mark ("??"), in which case the same information  is
+displayed but the user is left in the IRCAMPACK help library and 
+is free to navigate through the library in the usual way in 
+order to obtain help on other IRCAMPACK topics. When the help 
+library is finally exited, the user is prompted again for a new 
+value for the parameter.
+
+Note, these facilities may not be available on all operating 
+systems.
+
+1 IRCHELP
+Gives help about IRCAMPACK.
+
+Usage:
+
+   IRCHELP [TOPIC] [SUBTOPIC] [SUBSUBTOPIC] [SUBSUBSUBTOPIC]
+
+Description:
+
+   This routine displays help information, containing classified and
+   alphabetical lists of commands, general information and related
+   material; it describes individual commands in detail.
+
+   Here are some of the main options:
+
+      IRCHELP
+
+         No parameter is given so the introduction and the top-level
+         help index is displayed.
+
+      IRCHELP application/topic
+
+         This gives help about the specified application or topic.
+
+      IRCHELP application/topic subtopic
+
+         This lists help about a subtopic of the specified
+         application or topic. The hierarchy of topics has a maximum
+         of four levels.
+
+   Once in the help library, it can be navigated in the same way
+   as VMS help libraries.  CTRL/D to exit from any level, and <RET> 
+   to move up a level in the hierarchy.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 INTER
+INTER = LOGICAL (Read)
+   If a true value is supplied, then an interactive help session is
+   entered in which the user can navigate through the help library.
+   Otherwise, the requested information is displayed and the
+   application immediately terminates. [YES]
+3 LIBRARY
+LIBRARY = LITERAL (Read)
+   The Starlink help library from which help text is to be
+   obtained.                              [$IRCAMPACK_HELP]
+3 SUBSUBSUBTOPIC
+SUBSUBSUBTOPIC = LITERAL (Read)
+   Subsubsubtopic for which help is to be given.             [" "]
+3 SUBSUBTOPIC
+SUBSUBTOPIC = LITERAL (Read)
+   Subsubtopic for which help is to be given.                [" "]
+3 SUBTOPIC
+SUBTOPIC = LITERAL (Read)
+   Subtopic for which help is to be given.                   [" "]
+3 TOPIC
+TOPIC = LITERAL (Read)
+   Topic for which help is to be given.                      [" "]
+2 Authors
+DSB: David S. Berry (STARLINK)
+2 History
+ 13-OCT-1993 (DSB):
+    Original version, derived from equivalent IRAS90 routine.
+
+1 CALPOL
+Calculate polarisation parameters
+
+Usage:
+
+   CALPOL IN1 IN2 IN3 IN4 P T I
+
+Description:
+
+   This routine calculates various parameters describing the
+   polarisation described by four intensity arrays analysed at 0, 45
+   90, and 135 degrees to a reference direction. Variance values are
+   stored in the output NDFs if all the input NDFs have variances and
+   if the user gives a true value for parameter VAR.
+
+   By default, three output NDFs are created holding percentage
+   polarisation, polarisation angle and total intensity. However,
+   NDFs holding other quantities can also be produced by over-riding
+   the default null values associated with the corresponding
+   parameters. The creation of any output NDF can be supressed by
+   supplying a null value for the corresponding parameter.
+
+   There is an option to correct the calculated values of percentage
+   polarisation and polarised intensity to take account of the
+   statistical bias introduced by the asymetric distribution of
+   percentage polarisation (see parameter DEBIAS). This correction
+   subtracts the variance of the percentage polarisation from the
+   squared percentage polarisation, and uses the square root of this
+   as the corrected percentage polarisation. The corresponding
+   polarised intensity is then found by multiply the corrected
+   percentage polarisation by the total intensity. Returned variance
+   values take no account of this correction.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 DEBIAS
+DEBIAS = LOGICAL (Read)
+   True if a correction for statistical bias is to be made to
+   percentage polarisation and polarised intensity. This
+   correction cannot be used if any of the input NDFs do not
+   contain variance values, or if the user supplies a false value
+   for parameter VAR. [NO]
+3 I
+I = NDF (Write)
+   An output NDF holding the total intensity derived from all four
+   input NDFs.
+3 I1
+I1 = NDF (Read)
+   An NDF holding the measured intensity analysed at an angle of 0
+   degrees to the reference direction.
+3 I2
+I2 = NDF (Read)
+   An NDF holding the measured intensity analysed at an angle of
+   45 degrees to the reference direction.
+3 I3
+I3 = NDF (Read)
+   An NDF holding the measured intensity analysed at an angle of
+   90 degrees to the reference direction.
+3 I4
+I4 = NDF (Read)
+   An NDF holding the measured intensity analysed at an angle of
+   135 degrees to the reference direction.
+3 IA
+IA = NDF (Write)
+   An output NDF holding the total intensity derived from input
+   NDFs I1 and I3. [!]
+3 IB
+IB = NDF (Write)
+   An output NDF holding the total intensity derived from input
+   NDFs I2 and I4. [!]
+3 IP
+IP = NDF (Write)
+   An output NDF holding the polarised intensity. [!]
+3 P
+P = NDF (Write)
+   An output NDF holding percentage polarisation.
+3 Q
+Q = NDF (Write)
+   An output NDF holding the normalised Stokes parameter, Q. [!]
+3 U
+U = NDF (Write)
+   An output NDF holding the normalised Stokes parameter, U. [!]
+3 THETA
+THETA = NDF (Write)
+   An output NDF holding the polarisation angle in degrees.
+3 VARIANCE
+VARIANCE = LOGICAL (Read)
+   True if output variances are to be calculated. This parameter
+   is only accessed if all input NDFs contain variances, otherwise
+   no variances are generated.  [YES]
+2 Examples
+CALPOL M51_0 M51_45 M51_90 M51_135 M51_P M51_T M51_I IP=M51_IP
+   This example produces NDFs holding percentage polarisation,
+   polarisation angle, total intensity and polarised intensity,
+   based on the four NDFs M51_0, M51_45, M51_90 and M51_135.
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 23-SEP-1993 (DSB):
+    Original version.
+1 ERRCLIP
+Remove pixels with large errors from an NDF
+
+Usage:
+
+   ERRCLIP IN OUT LIMIT [TYPE]
+
+Description:
+
+   This application produces a copy of the input NDF in which pixels
+   with errors greater than a specified limit are set invalid in
+   both DATA and VARIANCE components. The error limit may be
+   specified as the maximum acceptable standard deviation (or
+   variance), or the minimum acceptable signal to noise ratio.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   The input NDF. An error is reported if it contains no VARIANCE
+   component.
+3 OUT
+OUT = NDF (Write)
+   The output NDF.
+3 LIMIT
+LIMIT = REAL (Read)
+   Either the maximum acceptable standard deviation or variance
+   value, or the minimum acceptable signal to noise ratio
+   (depending on the value given for TYPE).
+3 TYPE
+TYPE = LITERAL (Read)
+   Determines how the value supplied for LIMIT is to be
+   interpreted; "SIGMA", "VARIANCE" or "SNR". [SIGMA]
+2 Examples
+ERRCLIP M51 M51_GOOD 2.0
+   The NDF M51_SIG is created holding a copy of M51 in which all
+   pixels with standard deviation greater than 2 are set invalid.
+2 Notes
+-  The output NDF has the same numeric type as the input NDF.
+However, all internal calculations are performed in double
+precision.
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 16-SEP-1993 (DSB):
+    Original version.
+
+1 POLCAL
+Produce NDFs containing polarisation parameters. 
+
+Usage:
+
+   POLCAL IN1 IN2 IN3 IN4 P THETA I MAXPERR MAXTERR
+
+Description:
+
+   The user supplies four input intensity images at half-wave plate 
+   intervals of 22.5 degrees. Images are created holding total intensity, 
+   percentage polarisation and polarisation angle. Pixels are set bad in
+   these images if the standard deviation of the pixel value is greater 
+   than the limits supplied by parameters MAXPERR and MAXTERR. 
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN1 
+IN1 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  0 degrees.
+3 IN2
+IN2 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  45 degrees.
+3 IN3 
+IN3 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  22.5 degrees.
+3 IN4 
+IN4 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  67.5 degrees.
+3 P 
+P = NDF (Write)
+  The NDF to hold the created percentage polarisation image.
+3 THETA
+THETA = NDF (Write)
+  The NDF to hold the created polarisation angle image.
+3 I
+I = NDF (Write)
+  THE NDF to hold the created total intensity image.
+3 MAXPERR 
+MAXPERR = _REAL (Read)
+  The limit to place on the error in percentage polarisation. Any 
+  pixels with standard deviations larger than this value are set bad. 
+  The value should be given in units of percent.
+3 MAXTERR
+MAXTERR = _REAL (Read)
+  The limit to place on the error in polarisation angle. Any pixels 
+  with standard deviations larger than this value are set bad. The 
+  value should be given in units of degrees.
+
+2 Notes
+- This is a script and so command line parameters can be specified 
+by position only, not by keyword.
+
+- The input NDFs should all contain variance values, otherwise
+the clipping of values with large errors cannot be performed.
+
+- This script is an easy-to-use interface to the KAPPA applications 
+CALPOL and ERRCLIP. More versatility is available by using CALPOL 
+and ERRCLIP directly.
+
+- The suggested defaults for the four input NDFs are the output NDFs 
+from the previous application or script. 
+
+- No correction is performed for statistical bias introduced by the 
+asymmetry of the noise in the percentage polarisation. If such a
+correction is required, KAPPA application CALPOL should be used
+instead of this script.
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 28-SEP-1993 (DSB):
+    Original version.
+
+1 POLMAPC
+Display a polarisation map on top of a total intensity contour
+plot
+
+Usage:
+
+   POLMAPC P THETA I ANGROT DEVICE
+
+Description:
+
+   The specified graphics device is cleared and a contour plot of
+   the total intensity NDF is displayed. A vector plot is overlayed
+   on top of this image, with annotations and a key to the vector
+   scale. The vectors are drawn using pen 2 from the KAPPA pallette
+   which is initially set to white. The colour of the vectors can
+   subsequently be changed using the KAPPA application PALENTRY.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 P
+P = NDF (Read)
+   NDF holding percentage polarisation.
+3 THETA
+THETA = NDF (Read)
+   NDF holding polarisation angle.
+3 I
+I = NDF (Read)
+   NDF holding total intensity.
+3 ANGROT
+ANGROT = _REAL (Read)
+   Angle by which to rotate the vectors before displaying them (in
+   degrees).
+3 DEVICE
+DEVICE = DEVICE (Read)
+   Name of the graphics device to use. [Current graphics device]
+
+2 Notes
+- This is a script and so command line parameters can be specified 
+by position only, not by keyword.
+
+- The suggested defaults for the three input NDFs are the output NDFs 
+from a previous application or script.
+
+- This routine is based on KAPPA applications TURBOCONT and VECPLOT.
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 30-SEP-1993 (DSB):
+    Original version.
+
+1 POLMAPD
+Display a polarisation map on top of a total intensity image
+
+Usage:
+
+   POLMAPD P THETA I ANGROT DEVICE
+
+Description:
+
+   The specified graphics device is cleared and a greyscale image of
+   the total intensity NDF is displayed. A vector plot is overlayed
+   on top of this image, with annotations and a key to the vector
+   scale. The bad pixels in the intensity image are coloured using
+   palette entry number 2 (set to "blue2" by this script), and the 
+   vectors are coloured using pallette entry number 3 (set to "green" 
+   by this script). These colours can later be changed using the KAPPA 
+   application PALENTRY.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 P
+P = NDF (Read)
+   NDF holding percentage polarisation.
+3 THETA
+THETA = NDF (Read)
+   NDF holding polarisation angle.
+3 I
+I = NDF (Read)
+   NDF holding total intensity.
+3 ANGROT
+ANGROT = _REAL (Read)
+   Angle by which to rotate the vectors before displaying them (in
+   degrees).
+3 DEVICE
+DEVICE = DEVICE (Read)
+   Name of the graphics device to use. [Current graphics device]
+2 Notes
+- This is a script and so command line parameters can be
+specified by position only, not by keyword.
+
+- The suggested defaults for the three input NDFs are the output 
+NDFs from a previous application or script.
+
+- This routine is based on KAPPA applications DISPLAY and VECPLOT.
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 28-SEP-1993 (DSB):
+    Original version.
+
+1 POLSKY
+Subtract constant sky backgrounds from 4 images
+
+Usage:
+
+   POLSKY IN1 IN2 IN3 IN4 BOUNDS SUFFIX DEVICE
+
+Description:
+   The NDF supplied for parameter IN1 is displayed on the specified
+   graphics device (bad pixels are shown blue). The user then uses a
+   cursor to indicate an area which is to be used to define the sky
+   background in each image. The mean value is found (after rejection
+   of aberrant values) within the same sub-region in each image and this
+   value is subtracted from the corresponding image. The name of the
+   output NDFs are derived from the input NDF names by appending the
+   string supplied for parameter SUFFIX to them.
+
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN1
+IN1 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  0 degrees.
+3 IN2
+IN2 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  45 degrees.
+3 IN3 
+IN3 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  22.5 degrees.
+3 IN4 
+IN4 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  67.5 degrees.
+3 SUFFIX
+SUFFIX = LITERAL (Read)
+   A string to append to the end of the supplied NDF names to
+   get the output NDF names.
+3 DEVICE
+DEVICE = DEVICE (Read)
+   Name of the graphics device to use [Current graphics device]
+2 Notes
+- It is assumed that the four input images are aligned.
+
+- This is a script and so command line parameters can be
+specified by position only, not by keyword.
+
+- The suggested defaults for the four input NDFs are the
+output NDFs from the previous application or script.
+
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 28-SEP-1993 (DSB):
+    Original version.
+
+1 POLSMOOTH
+Apply Gaussian smoothing to 4 supplied images
+
+Usage:
+
+   POLSMOOTH IN1 IN2 IN3 IN4 FWHM BOX SUFFIX
+
+Description:
+
+   The user supplies the FWHM in units of pixels for the Gaussian
+   PSF, and the size of the box (in pixels) over which the PSF should
+   be applied at each point. The supplied images are smoothed and
+   placed in output NDFs with names derived from the input NDF
+   names by appending the string supplied for parameter SUFFIX to
+   them.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN1
+IN1 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  0 degrees.
+3 IN2
+IN2 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  45 degrees.
+3 IN3 
+IN3 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  22.5 degrees.
+3 IN4 
+IN4 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  67.5 degrees.
+3 FWHM
+FWHM = _REAL (Read)
+   Full width at half maximum of the Gaussian PSF, in pixels.
+3 BOX
+BOX = _REAL (Read)
+   Size (in pixels) of the square region over which the Gaussian
+   PSF should be applied at each point. The smoothing PSF will be
+   set to zero outside this square. The value given will be
+   rounded up to a positive odd integer.
+3 SUFFIX
+SUFFIX = LITERAL (Read)
+   A string to append to the end of the supplied NDF names to
+   get the output NDF names.
+2 Notes
+- This is a script and so command line parameters can be
+specified by position only, not by keyword.
+
+- This script uses the KAPPA application GAUSMOOTH to perform
+the smoothing.
+
+- The suggested defaults for the four input NDFs are the
+output NDFs from the previous application or script.
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 28-SEP-1993 (DSB):
+    Original version.
+
+1 POLZAP
+Manually remove blemishes or bad pixels from 4 images
+
+Usage:
+
+   POLZAP IN1 IN2 IN3 IN4 BOUNDS SUFFIX DEVICE
+
+Description:
+   The NDFs supplied for parameters IN1 to IN4 are displayed in turn on
+   the specified graphics device (bad pixels are shown blue). The user
+   can then inspect the image for blemishes or bad pixels. If any are
+   found, a cursor is used to identify the area containing the blemish
+   and the pixels within the area are set bad. The names of the
+   output NDFs are derived from the input NDF names by appending the
+   string supplied for parameter SUFFIX to them.
+
+   The cursor should be used to give two points. The area removed is then
+   either the range of lines spanned by the two points, the range of columns
+   spanned by the two points, or a rectangular region with opposite corners
+   at the two points. The user indicates which sort of area to use in
+   response to prompts for parameter LINCOL made immediately prior to
+   displaying the cursor. If a null value is given for LINCOL then no
+   further regions are removed.
+
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN1
+IN1 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  0 degrees.
+3 IN2
+IN2 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  45 degrees.
+3 IN3 
+IN3 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  22.5 degrees.
+3 IN4 
+IN4 = NDF (Read)
+  The NDF containing the intensity observed with the waveplate at 
+  67.5 degrees.
+3 SUFFIX
+SUFFIX = LITERAL (Read)
+   A string to append to the end of the supplied NDF names to
+   get the output NDF names.
+3 DEVICE
+DEVICE = DEVICE (Read)
+   Name of the graphics device to use [Current graphics device]
+2 Notes
+- This is a script and so command line parameters can be
+specified by position only, not by keyword.
+
+- The suggested defaults for the four input NDFs are the
+output NDFs from the previous application or script.
+
+- This script is based on KAPPA applications DISPLAY and ZAPLIN.
+
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 15-DEC-1993 (DSB):
+    Original version.
+
+1 SEGMENT
+Copies polygonal segments from one NDF to another.
+
+Usage:
+
+   SEGMENT IN1 IN2 OUT
+
+Description:
+
+   This routine extracts polygonal segments from an NDF, and
+   optionally pastes them into the corresponding positions within
+   another NDF. The application is intended to allow regions of an
+   NDF to be removed to another for separate processing.  It may
+   also be used to copy bad pixels into a NDF in order to delete a
+   region which is not required.
+
+   The vertices of polygonal segments are defined by lists of x,y
+   positions. Polygons are completed by connecting the last
+   position in the list to the first.  Pixels within each polygonal
+   segment are copied from the first NDF (IN1) to the corresponding
+   position in the second NDF (IN2). A sequence of polygons may be
+   supplied, and each is copied in turn. If a null value is given for
+   either NDF, the routine behaves as if an NDF full of bad pixels
+   had been specified. Thus if IN1 is given a null value the inside
+   of each polygonal segment will be filled with bad values, and if
+   IN2 is given a null value the region outside the polygonal
+   segments will be filled with bad values.
+
+   The x,y positions may be specified in three ways:
+
+   1) From the parameter system ,usually in response to prompting.
+
+   2) Within text files (one for each polygon). The files are free
+   format with x co-ordinates in column one and y co-ordinates in
+   column two. (This is the format produced by other KAPPA
+   applications such as CURSOR.)
+
+   3) Using a graphics cursor of a nominated device. An NDF must
+   already have been displayed on the device.
+
+   The x,y co-ordinates may be given as either data or pixel
+   (="world") co-ordinates. If data co-ordinates are given, the input
+   NDFs must contain appropriate AXIS structures to allow the
+   corresponding pixel co-ordinates to be found.
+
+   The routine can handle NDFs of arbitrary dimensionality. If
+   either input has 3 or more dimensions then all planes in the NDF
+   are processed in the same way, that is the same polygonal regions
+   are extracted from each plane and copied to the corresponding
+   plane of the output NDF. The polygon is usually presumed to lie
+   in the XY plane (i.e. the plane spanned by the first two axes of
+   the NDF), but this can be changed by assigning appropriate values
+   to parameter AXES so that for instance the polygon lies in the YZ
+   plane (i.e the plane spanned by axes 2 and 3).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 AXES
+AXES = _INTEGER (Read)
+   The indices of the axes which span the plane containing the
+   polygon. Two values should be given, each less than or equal
+   to the minimum of the number of dimensions in the two input
+   NDFs. [1,2]
+3 CLEAR
+CLEAR = _LOGICAL (Read)
+   Whether or not the image display device should be cleared
+   before opening it. [NO]
+3 COLOUR
+COLOUR = LITERAL (Read)
+   The colour to in which to draw any graphics specified by
+   parameter PLOT. The options are:
+
+     "MAX"          - The maximum colour index used for the
+                      display of the image.
+     "MIN"          - The minimum colour index used for the
+                      display of the image.
+     An integer     - The actual colour index. It is constrained
+                      between 0 and the maximum colour index
+                      available on the device.
+     A named colour - Uses the named colour from the palette, and
+                      if it is not present, the nearest colour
+                      from the palette is selected.
+
+   If the colour is to remain unaltered as the lookup table is
+   manipulated choose an integer between 0 and 15, or a named
+   colour.  The suggested default is the current value. [The
+   current value, but equals "MIN" if there is no current value.]
+3 COSYS
+COSYS = LITERAL (Read)
+   The co-ordinate system in which the polygon vertices are
+   specified. This can be either "WORLD" or "DATA". If COSYS =
+   "DATA" is given, the input co-ordinates (however obtained) are
+   presumed to be data co-ordinates (as defined by AXIS structures
+   within the NDFs). Otherwise, they are presumed to be world (or
+   "pixel") co-ordinates. [Current co-ordinate system]
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The name of the graphics device on which an image is
+   displayed. This is only used if parameter MODE is given the
+   value CURSOR. Any graphics specified by parameter PLOT will be
+   produced on this device. [Current image-display-overlay device]
+3 IN1
+IN1 = NDF (Read)
+   The input NDF containing the data to be copied to the inside of
+   the supplied polygonal segments. If a null value is supplied,
+   the inside of the polygonal segments will be filled with bad
+   values.
+3 IN2
+IN2 = NDF (Read)
+   The input NDF containing the data to be copied to the outside
+   of the supplied polygonal segments. If a null value is
+   supplied, the outside of the polygonal segments will be filled
+   with bad values.
+3 LOGFILE
+LOGFILE = FILENAME (Write)
+   The name of an ASCII file in which the coordinates of the
+   polygon vertices are to be stored. A null value (!) means that
+   no file is created. [!]
+3 MODE
+MODE  =  LITERAL (Read)
+   The mode by which the vertices of the polygonal segments are
+   to be obtained.  The options are as follows: "Interface"
+   defines via the parameter system, "Cursor" enables selection
+   by graphics cursor, and "File" reads them from an ASCII file.
+   [Current interaction mode]
+3 MAXPOLY
+MAXPOLY = INTEGER (Read)
+   The maximum number of polygons which can be used. For
+   instance, this can be set to 1 to ensure that no more than 1
+   polygon is used (this sort of thing can be useful when writing
+   procedures or scripts). A null value causes no limit to be
+   imposed (unless MODE=FILE in which case a limit of 20 is
+   imposed). [!]
+3 MINPOLY
+MINPOLY = INTEGER (Read)
+   The minimum number of polygons which can be used. For
+   instance, this can be set to 2 to ensure that at least 2
+   polygons are used. The supplied value must be less than the
+   value given for MAXPOLY and must be greater than zero. [1]
+3 OUT
+OUT = NDF (Write)
+   The output NDF.
+3 PLOT
+PLOT = LITERAL (Read)
+   The type of graphics to be used to mark the position of each
+   selected vertex. It is only used if parameter MODE is given the
+   value CURSOR. PLOT can take any of the following values:
+
+   POLY - Causes each vertex to be joined by a straight line to
+   the previous vertex. The last vertex is joined to the first
+   vertex.
+
+   CROSS - Each vertex is marked by a cross.
+
+   NONE - No graphics are produced.
+                                                   [Current value]
+3 POLY1-POLY20
+POLY1-POLY20 = FILENAME (Read)
+   Each of the parameters POLY1 to POLY20 are used to access text
+   files containing the x,y coordinates of the vertices of a
+   single polygon. If a value is assigned to POLY1 on the command
+   line then only a single polygonal segment is copied, and the
+   user is not prompted for any of the remaining parameters in
+   this group. Otherwise, the user is prompted for POLY1, then
+   POLY2, etc, until a null value is given or POLY20 is reached.
+3 QUALITY
+QUALITY = _LOGICAL (Read)
+   If a true value is supplied for parameter QUALITY then quality
+   information is copied from the input NDFs to the output NDFs.
+   Otherwise, the quality information is not copied. This
+   parameter is only accessed if all supplied input NDFs have
+   defined QUALITY components. If any of the supplied input NDFs
+   do not have defined QUALITY components, then no quality is
+   copied. Note, if a null input NDF is given then the
+   corresponding output QUALITY values are set to zero. [YES]
+3 VARIANCE
+VARIANCE = _LOGICAL (Read)
+   If a true value is supplied for parameter VARIANCE then
+   variance information is copied from the input NDFs to the
+   output NDFs.  Otherwise, the variance information is not
+   copied. This parameter is only accessed if all supplied input
+   NDFs have defined VARIANCE components. If any of the supplied
+   input NDFs do not have defined VARIANCE components, then no
+   variances are copied. Note, if a null input NDF is given then
+   the corresponding output VARIANCE values are set bad. [YES]
+3 XY
+XY = _REAL (Read)
+   A pair of x,y coordinates representing a single vertex. Only
+   used if parameter MODE is given the value INTERFACE. A null
+   value should be given when the final vertex has been specified.
+2 Examples
+SEGMENT IN1=M51A IN2=M51B OUT=M51_COMP POLY1=COORDS.LIS MODE=FILE
+   Copys a region of the NDF M51A to the corresponding position
+   in the output NDF M51_COMP. The region is defined by the list
+   of vertex co-ordinates held in text file COORDS.LIS. All pixels
+   in the output NDF which fall outside this region are given
+   the corresponding pixel values from NDF M51B.
+
+SEGMENT IN1=M51A OUT=M51_CUT MODE=CURSOR PLOT=POLY ACCEPT
+   Copys a region of the NDF M51A to the corresponding position
+   in the output NDF M51_CUT. The region is defined by selecting
+   vertices using a graphics cursor. The image M51A should
+   previously have been displayed. Each vertex is joined to the
+   previous vertex by a green line on the graphics device. The
+   ACCEPT keyword causes the suggested null default value for IN2
+   to be accepted. This means that all pixels outside the region
+   identified using the cursor will be set bad in the output NDF.
+2 Notes
+-  This routine will propagate VARIANCE component values so long
+as all supplied input NDFs have defined VARIANCE components, and
+the user has not supplied a false value for parameter VARIANCE.
+
+-  This routine will propagate QUALITY component values so long
+as all supplied input NDFs have defined QUALITY components, and
+the user has not supplied a false value for parameter QUALITY.
+
+-  The UNITS, AXIS, LABEL, TITLE and HISTORY components are
+propagated from the first supplied input NDF, together with all
+extensions.
+
+-  The following data types are processed directly: _WORD,
+_INTEGER, _REAL, _DOUBLE.
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 9-NOV-1993 (DSB):
+    Original version.
+
+1 TNORM
+Normalise a group of frames to unit exposure time
+
+Usage:
+
+   TNORM IN OUT
+
+Description:
+
+   This routine normalises the input frames to an exposure time of
+   one second by dividing the DATA values by the total exposure time
+   (in seconds), and the VARIANCE values by the square of the total
+   exposure time.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   A group of input NDFs. This should be in the form of a group
+   expression (see help on "Group_expressions").
+3 OUT
+OUT = NDF (Read)
+   A group of output NDFs corresponding one-for-one with the list
+   of input NDFs given by parameter IN. This should be in the
+   form of a group expression. Expressions such as "*_NEW" are
+   expanded by replacing the "*" character with each input NDF in
+   turn (see help on "Group_expressions").
+2 Examples
+TNORM ^FILES.LIS *_N
+   This example normalises all the frames listed in text file
+   FILES.LIS, putting the output NDFs in files with the same
+   names, extended with the string "_N".
+2 Notes
+- The total exposure time is determined from the information
+stored in the IRCAM extensions of the input NDFs and is the
+product of the number of coadds (NUMBER_COADDS) and the exposure
+time per coadd (EXPOSURE_TIME).  The value of EXPOSURE_TIME is
+divided by 1000 before use to convert it from milliseconds to
+seconds. An error is reported if any input NDFs do not contain an
+IRCAM extension.
+
+- A new component called TNORM is written to the IRCAM extensions
+of the output NDFs to indicate that the output frames are
+normalised to an exposure time of one second. TNORM is a _REAL
+value holding the total exposure time by which the frame has been
+divided. An error is reported if any of the input NDFs already
+contain this component (i.e. have already been normalised).
+
+-  The TITLE, LABEL, QUALITY and AXIS components are propagated to
+the output NDFs without change.
+
+-  The UNITS components of the output NDFs are derived from the
+input UNITS components by appending the string " per second".
+
+-  The output NDFs have the same numeric type as the input NDFs.
+However, all internal calculations are done in double precision.
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 15-SEP-1993 (DSB):
+    Original version.
+
+1 VECPLOT
+Plots a 2-d vector map
+
+Usage:
+
+   VECPLOT NDF1 NDF2 [COMP] [STEP] [VSCALE] [VTYPE] [JUST] [KEY]
+           [DEVICE]
+
+Description:
+
+   This application plots vectors defined by the values contained
+   within a pair of 2-d NDFs, the first holding the magnitude of the
+   vector quantity at each pixel, and the second holding the
+   corresponding vector orientations. The number of vectors in the
+   plot is kept to a managable value by only plotting vectors for
+   pixels on a sparse regular matrix. The increment (in pixels)
+   between plotted vectors is given by parameter STEP. Zero
+   orientation may be fixed at any position angle within the plot by
+   specifying an appropriate value for parameter ANGROT. Each vector
+   may be represented either by an arrow or by a simple line, as
+   selected by parameter VTYPE.
+
+   The plot is situated within the current graphics-database
+   picture, and may reside within optional, annotated and enumerated
+   axes.  An optional, but recommended, key may be drawn to the
+   right of the plot.  It reports the data units if there are any
+   (taken from the NDF associated with parameter NDF1) and gives the
+   scale used for drawing the vectors in data units per centimetre.
+   It also displays a typical vector and the corresponding data
+   value. The justification of the vector is indicated by a small
+   circle placed at the position of the corresponding pixel centre.
+
+   If the current graphics-database picture is a DATA picture or
+   contains a DATA picture (such as created by the applications
+   DISPLAY, CONTOUR, etc), then the vector plot is overlayed on
+   top of the existing DATA plot. In this case any requested
+   annotation and key are drawn outside the DATA picture but within
+   the current picture. If there is insufficient room within the
+   currrent picture, then the annotation and/or key may not be
+   drawn. The user is warned if this happens but the application
+   continues. If no DATA picture can be found within the current
+   picture then the user specifies ther total size of the plot frame
+   using parameters PXSIZE and PYSIZE, but the application itself
+   chooses how to position the vector plot and key within this
+   frame.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ABSLAB
+ABSLAB  =  LITERAL (Read)
+   Label for the plot abscissa, in which NCAR fancy founts may be
+   embedded when FONT = "NCAR".  If axis information is present
+   in NDF1 the suggested default is the axis label from NDF1
+   followed by the units, in parentheses.  If an error occurs
+   obtaining the label the suggested default is "X". []
+3 ANGROT
+ANGROT = _REAL (Read)
+   A rotation angle in degrees to be added to each vector
+   orientation before plotting the vectors (see parameter NDF2).
+   [0.0]
+3 AXES
+AXES = _LOGICAL (Read)
+   True if labelled and annotated axes are to be drawn around the
+   plot.  The annotations are either the data co-ordinates from
+   the axis components of NDF1, provided these are present and
+   linear and COSYS = "DATA"; otherwise pixel co-ordinates are
+   used.
+3 BORDER
+BORDER = _LOGICAL (Read)
+   True if a box is to be drawn about the plot. This is only
+   accessed if no axes are drawn. [TRUE]
+3 CLEAR
+CLEAR = _LOGICAL (Read)
+   True if the graphics device is to be cleared before display
+   of the array. [TRUE]
+3 COMP
+COMP = LITERAL (Read)
+   The component of NDF1 which is to be used to define the vector
+   magnitudes. It may be "Data", or "Variance". The vector
+   orientations are always defined by the "Data" component of
+   NDF2. ["Data"]
+3 COSYS
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "WORLD"
+   or "DATA".  "WORLD" makes pixel co-ordinates to appear on axes.
+   If COSYS = "DATA" the axis information from NDF1 is used to
+   annotate axes (if it exists).  [Current co-ordinate system]
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The plotting device. [Current image-display device]
+3 FONT
+FONT = LITERAL (Read)
+   The fount to be used for the line graphics.  It can be either
+   "NCAR" for the NCAR fancy characters and "GKS" for the standard
+   GKS san-serif fount.   The former is intended for hardcopy
+   publication-quality plots, since it is relatively slow; the
+   latter is intended for normal interactive graphics requiring
+   rapid plotting, and it is clearer on small plots. The
+   suggested default is the current value. ["GKS"]
+3 JUST
+JUST = LITERAL (Read)
+   The justification for each vector; can take any of the
+   following values:
+
+    "Centre" - The vectors are drawn centred on the
+               corresponding pixel.
+
+    "Start"  - The vectors are drawn starting at the
+               corresponding pixel
+
+    "End"    - The vectors are drawn ending at the corresponding
+               pixel.  ["CENTRE"]
+3 KEY
+KEY = _LOGICAL (Read)
+   True if a key is to be produced. [TRUE]
+3 KEYVEC
+KEYVEC = _REAL (Read)
+   Length of the vector to be displayed in the key, in data units.
+   A default value is generated based on the spread of vector
+   lengths in the plot. []
+3 MAJTIC
+MAJTIC( 2 ) = _REAL (Read)
+   The parameter controlling the numbers of major tick marks
+   for the x and y axes.  (Number used is between MAJTIC+2 and
+   5*MAJTIC/2+4.) [3.,3.]
+3 MINTIC
+MINTIC( 2 ) = _REAL (Read)
+   The number of minor tick marks between each major tick mark
+   for the x and y axes.  A negative value forces the graphics
+   package to compute appropriate values. [-1.,-1.]
+3 NDF1
+NDF1 = NDF (Read)
+   NDF structure containing the 2-d image giving the vector
+   magnitudes.
+3 NDF2
+NDF2 = NDF (Read)
+   NDF structure containing the 2-d image giving the vector
+   orientations.The values are considered to be in units of
+   degrees unless the "UNITS" component of the NDF has the value
+   "Radians" (case insensitive). The positive y axis defines zero
+   orientation, and rotation from the x axis to the y axis is
+   considered positive.
+3 ORDLAB
+ORDLAB  =  LITERAL (Read)
+   Label for the plot ordinate, in which NCAR fancy founts may be
+   embedded when FONT = "NCAR".  If axis information is present
+   in NDF1 the suggested default is the axis label from NDF1
+   followed by the units, in parentheses.  If an error occurs
+   obtaining the label the suggested default is "Y". []
+3 OUTTIC
+OUTTIC = _LOGICAL (Read)
+   True if the axis tick marks are to appear on the outside of
+   the axes instead of inside. By default, the tick marks are
+   drawn outside the plotting region to eliminate
+   intersections of ticks with the vectors. [TRUE]
+3 PLTITL
+PLTITL = LITERAL (Read)
+   The title of the plot.  Up to about 40 characters can be
+   accommodated, and NCAR fancy founts may be embedded when FONT =
+   "NCAR". If an error occurs obtaining the title, it is
+   defaulted to "VECPLOT map".  [The title from NDF1]
+3 PXSIZE
+PXSIZE = _REAL (Read)
+   The length (x axis) of the plot in metres. [Maximum that can
+   fit in the current picture whilst preserving square pixels]
+3 PYSIZE
+PYSIZE = _REAL (Read)
+   The length (y axis) of the plot in metres. [Maximum that can
+   fit in the current picture whilst preserving square pixels]
+3 STEP
+STEP = _INTEGER (Read)
+   The number of pixels between adjacent displayed vectors (along
+   both axes). Increasing this value reduces the number of
+   displayed vectors. The default value gives about 30 vectors
+   along the longest axis of the plot. []
+3 THICK
+THICK = _REAL (Read)
+   The thickness of the axes and annotations in the plot, where
+   1.0 is the normal thickness. Currently, this is only available
+   on a few devices.  It must take a value in the range 0.5--5.0.
+   [1.0]
+3 VECCOL
+VECCOL = LITERAL (Read)
+   The colour for the vectors. The options are:
+     "MAX"          - The maximum colour index in the image
+                      display colour lookup table.
+     "MIN"          - The minimum (non-reserved) colour index in
+                      the image display colour lookup table.
+     An integer     - The actual colour index. It is constrained
+                      between 0 and the maximum colour index
+                      available on the device.
+     A named colour - Uses the named colour from the palette, and
+                      if it is not present, the nearest colour
+                      from the palette is selected.
+   The suggested default is the current value. [The current value,
+   but equals "MIN" if there is no current value.]
+3 VSCALE
+VSCALE = _REAL (Given)
+   The scale to be used for the vectors. The supplied value
+   should give the data value corresponding to a vector length of
+   one centimetre. The default makes 5% of all displayed vectors
+   larger than the interval between adjacent vectors. []
+3 VTYPE
+VTYPE = LITERAL (Read)
+   The type of vector to be plotted; can take the value "Arrow"
+   or "Line". Vectors are drawn as arrows or lines accordingly.
+   ["LINE"]
+2 Examples
+CONTOUR POLINT POLANG
+   Produces a vector map on the current graphics device with
+   vector magnitude taken from POLINT and vector orientation
+   taken from POLANG.  All other settings are defaulted, so
+   for example about 20 vectors are displayed along the longest
+   axis, and a key is plotted.
+
+CONTOUR POLINT POLANG ANGROT=23.4
+   Produces a vector map in which the primary axis of the vectors
+   (as defined by the value zero in the NDF "POLANG") is at the
+   position angle 23.4 degrees (measured anti-clockwise from the
+   positove Y axis) in the displayed map.
+
+CONTOUR STACK(,,2) STACK(,,1) VTYPE=ARROW JUST=START NOKEY
+   Produces a vector map in which the vectors are defined by two
+   planes in the 3-d NDF "STACK". There is no need to copy the
+   two planes into two separate NDFs before running VECPLOT.
+   Each vector is represented by an arrow, starting at the
+   position of the corresponding pixel. No key to the vector scale
+   and justification is produced.
+2 Notes
+-  The application stores a number of pictures in the graphics
+database in the following order: a FRAME of the specified size
+containing the title, annotated axes, vector map and key; a DATA
+picture which is stored with world co-ordinates in units of data
+pixels; and a KEY picture to store the key if present.  The DATA
+picture may also have double-precision data co-ordinates derived
+from the axis components of NDF1 provided these are linear and
+different from pixel co-ordinates; the data co-ordinates are
+stored via a linear transformation.  A reference to NDF1 is
+stored with the DATA picture.  On exit the current database
+picture for the chosen device reverts to the input picture.
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 16-AUG-1993 (DSB):
+    Original version.
+
+ 21-SEP-1993 (DSB):
+    Modified to overlay the vector plot on any existing DATA plot
+    contained within the current picture.
+

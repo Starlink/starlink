@@ -1,0 +1,145 @@
+#!/bin/csh
+#+
+#  Name:
+#     IRCAMSTR
+
+#  Purpose:
+#     Obtain a string from the user.
+
+#  Language:
+#     C shell
+
+#  Description:
+#     A text string is obtained from the user (unless a value is 
+#     supplied in DEF1 in which case the supplied value is used). If 
+#     the user gives a blank value, the value supplied in DEF2 is used 
+#     (if any). If the value thus obtained is a single or double 
+#     exclamation mark, the shell is exited. If a question mark is 
+#     obtained, the IRCAMPACK help command is used to display help. If a 
+#     blank value is obtained the user is re-prompted. 
+
+#  Usage:
+#     source ircamstr
+
+#  Shell Variables: 
+#     PROM = LITERAL (Read)
+#        The text of the prompt string.
+#     DEF1 = LITERAL (Read and Write)
+#        A default value which will be returned as the required value
+#        unless it is invalid, in which case the user will be prompted.
+#        The variable is unset on return.
+#     DEF2 = LITERAL (Read and Write)
+#        A value to use as the suggested default (i.e the value which 
+#        will be returned if the user gives a blank value at a prompt).
+#        It is displayed between "/" characters at the end of the
+#        prompt. The variable is unset on return.
+#     ACCEPT = LITERAL (Read and Write)
+#        If a variable of this name exists, any suggested default given
+#        by DEF2 is used without prompting the user. If the value 
+#        obtained for the string is "ACCEPT", "accept" or "\" then a
+#        variable ACCEPT is defined with the value YES. This will cause
+#        future suggested defaults to be acccepted.
+#     STRING = LITERAL (Write)
+#        The string is returned in this variable.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     29-SEP-1993 (DSB):
+#        Original version.
+#     {enter_changes_here}
+#-
+
+#  The supplied definition of variable PROM may have been defined as a
+#  single word (by enclosing it in double quotes). We need to be able to
+#  index the first word of the prompt, so ensure that it is recognised
+#  as a list of separate words.
+      set PROM = `echo $PROM`
+
+#  If the supplied default value is "ACCEPT" or "accept" or "/" cause
+#  the suggested default (if any) to be accepted without prompting.
+      if( $?DEF1 ) then
+         if( "$DEF1" == accept || "$DEF1" == ACCEPT || "$DEF1" == \\ ) then
+            set ACCEPT = "YES"
+            unset DEF1
+         endif
+      endif
+
+#  Ensure that the NOMORE variable is undefined.
+      if( ${?NOMORE} ) unset NOMORE
+
+#  Loop until a good string has been obtained.
+      while( ${?NOMORE} == 0 )
+
+#  If a default string is available, use it. Unset the local
+#  variable holding the default value once it has been used so that
+#  subsequent passes through the loop will not re-use it.
+         if( $?DEF1 ) then
+            set STRING = $DEF1
+            unset DEF1
+
+#  Otherwise see if a suggested default is available.
+         else if( $?DEF2 == 1 && $?ACCEPT == 1 ) then
+
+#  If so, accept it without prompting the user if the ACCEPT variable 
+#  is defined. Unset the suggested default so that it cannot be used 
+#  again by mistake (for instance if the suggested default is invalid).
+            set STRING = $DEF2
+            unset DEF2
+
+#  Otherwise get string from the user, using the supplied
+#  suggested default value. Only unset the suggested default if it
+#  is actually used.
+         else if( $?DEF2 == 1 && $?ACCEPT == 0 ) then
+            echo -n "$PROM /$DEF2/ > "
+            set STRING = "$<"
+            if( "$STRING" == "" ) set STRING = $DEF2
+            if( "$STRING" == $DEF2 ) unset DEF2
+
+#  If no suggested default was supplied, get a value without 
+#  suggesting any default value.
+         else
+            echo -n "$PROM > "
+            set STRING = "$<"
+         endif
+
+#  If a "null" or "abort" has been given, unset the string and exit.
+         if( "$STRING" == "\!\!" || "$STRING" == "\!" ) then
+            echo "\!\! Parameter abort requested"
+            unset STRING
+            exit
+
+#  If the value "ACCEPT", "accept" or "\" cause all future suggested 
+#  defaults to be accepted without prompting.
+         else if( "$STRING" == accept || "$STRING" == ACCEPT || "$STRING" == \\ ) then
+            set ACCEPT = "YES"
+
+#  If help was requested, display the help for this parameter.
+         else if( "$STRING" == \? ) then
+            if( $?IRCCOM == 1 ) set HELP_ARGS = "$IRCCOM para ${PROM[1]}"
+            if( $?IRCCOM == 0 ) set HELP_ARGS = " "
+	    irchelp nointer $HELP_ARGS
+
+#  If interactive help was requested, put the user into the help
+#  library. 
+	 else if( "$STRING" == \?\? ) then
+            if( $?IRCCOM == 1 ) set HELP_ARGS = "$IRCCOM para ${PROM[1]}"
+	    if( $?IRCCOM == 0 ) set HELP_ARGS = " "
+            irchelp $HELP_ARGS
+
+#  If a blank value was obtained, a new string is required.
+         else if( "$STRING" == "" ) then
+
+#  If the string has passed all these tests, indicate that no more prompting
+#  is required.
+         else
+            set NOMORE = TRUE
+         endif
+
+#  Loop back for a new string if necessary.
+      end   
+
+#  If a suggested default is still defined, unset it.
+      if( $?DEF2 ) unset DEF2

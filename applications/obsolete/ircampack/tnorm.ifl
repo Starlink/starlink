@@ -1,0 +1,52 @@
+#+
+#  Name:
+#     TNORM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-SEP-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface TNORM
+
+   helplib '$IRCAMPACK_HELP'
+
+   parameter IN                  # Input NDFs.
+      position 1
+      type     NDF
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association <-GLOBAL.DATA_ARRAY
+      prompt   'Input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter NDFLIST             # Group expression defining created
+      type     NDF    		 # NDFs.
+      access   WRITE
+      ppath    DYNAMIC
+      vpath    'DYNAMIC,NOPROMPT'
+      association ->GLOBAL.DATA_ARRAY
+      prompt   'Group expression giving sucessfully created output NDFs'
+   endparameter
+
+   parameter OUT                 # Output NDFs.
+      position 2
+      type     NDF
+      access   WRITE
+      vpath    'PROMPT '
+      prompt   'Output NDFs'
+      helpkey  '*'
+   endparameter
+
+endinterface

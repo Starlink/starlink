@@ -1,0 +1,157 @@
+#+
+#  Name:
+#     CALPOL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     23-SEP-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface CALPOL
+
+   helplib ' '
+
+   parameter DEBIAS		 # Remove statistical bias?
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  NO
+      prompt   'Remove statistical bias?'
+      helpkey  '*'
+   endparameter
+
+   parameter I                   # Total intensity
+      position 7
+      type     NDF
+      access   WRITE
+      prompt   'Total intensity '
+      association ->GLOBAL.POL_I
+      helpkey  '*'
+   endparameter
+
+   parameter IN1                  # 0 degrees input
+      position 1
+      type     NDF
+      access   READ
+      ppath    'GLOBAL '
+      association <->GLOBAL.POL_0
+      prompt   '0 degrees intensity map'
+      helpkey  '*'
+   endparameter
+
+   parameter IN2                  # 45 degrees input
+      position 2
+      type     NDF
+      access   READ
+      prompt   '45 degrees intensity map'
+      association <->GLOBAL.POL_45
+      helpkey  '*'
+   endparameter
+
+   parameter IN3                  # 90 degrees input
+      position 3
+      type     NDF
+      access   READ
+      prompt   '90 degrees intensity map'
+      association <->GLOBAL.POL_90
+      helpkey  '*'
+   endparameter
+
+   parameter IN4                  # 135 degrees input
+      position 4
+      type     NDF
+      access   READ
+      prompt   '135 degrees intensity map'
+      association <->GLOBAL.POL_135
+      helpkey  '*'
+   endparameter
+
+   parameter IA			 # 1st total intensity 
+      type     NDF
+      access   WRITE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Total intensity from 0 and 90 degrees intensities'
+      helpkey  '*'
+   endparameter
+
+   parameter IB			 # 2nd total intensity 
+      type     NDF
+      access   WRITE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Total intensity from 0 and 90 degrees intensities'
+      helpkey  '*'
+   endparameter
+
+   parameter IP			 # polarised intensity 
+      type     NDF
+      access   WRITE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Polarised intensity '
+      helpkey  '*'
+   endparameter
+
+   parameter P			 # percent polarisation
+      position 5
+      type     NDF
+      access   WRITE
+      association ->GLOBAL.POL_P
+      prompt   'Percentage polarisation'
+      helpkey  '*'
+   endparameter
+
+   parameter Q			 # Q
+      type     NDF
+      access   WRITE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Normalise Stokes parameter Q'
+      helpkey  '*'
+   endparameter
+
+   parameter THETA		 # polarisation angle
+      position 6
+      type     NDF
+      access   WRITE
+      prompt   'Polarisation angle'
+      association ->GLOBAL.POL_THETA
+      helpkey  '*'
+   endparameter
+
+   parameter U			 # U
+      type     NDF
+      access   WRITE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Normalised Stokes parameter U'
+      helpkey  '*'
+   endparameter
+
+   parameter VARIANCE		 # Variances required?
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  YES
+      prompt   'Are variance values to be generated?'
+      helpkey  '*'
+   endparameter
+
+endinterface
