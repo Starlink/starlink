@@ -5862,6 +5862,7 @@ AstSpecFrame *astLoadSpecFrame_( void *mem, size_t size,
    char *sval;                   /* Pointer to string value */
    int i;                        /* Loop count */
    int j;                        /* Loop count */
+   int nc;                       /* String length */
    int sys;                      /* System value */
 
 /* Initialise. */
@@ -6011,8 +6012,8 @@ AstSpecFrame *astLoadSpecFrame_( void *mem, size_t size,
       new->nuunits = 0;
       new->usedunits = NULL;
       for( sys = FIRST_SYSTEM; sys <= LAST_SYSTEM; sys++ ) {
-         sprintf( buff, "u%s", astSystemString( new, (AstSystemType) sys ));
-         for( j = 0; j < strlen( buff ); j++ ) buff[ j ] = tolower( buff[ j ] );
+         nc = sprintf( buff, "u%s", astSystemString( new, (AstSystemType) sys ));
+         for( j = 0; j < nc; j++ ) buff[ j ] = tolower( buff[ j ] );
          sval = astReadString( channel, buff, NULL );
          if( sval ) {
             if( (int) sys >= new->nuunits ) {
@@ -6029,6 +6030,7 @@ AstSpecFrame *astLoadSpecFrame_( void *mem, size_t size,
                new->usedunits[ sys ] = astStore( new->usedunits[ sys ],
                                                  sval, strlen( sval ) + 1 );
             }
+            sval = astFree( sval);
          }
       }
 

@@ -104,6 +104,7 @@ typedef struct AstRegionVtab {
    int (* DumpUnc)( AstRegion * );
    int (* GetBounded)( AstRegion * );
    int (* TestUnc)( AstRegion * );
+   int (* RegDummyFS)( AstRegion * );
    int (* RegPins)( AstRegion *, AstPointSet *, AstRegion *, int **);
    AstPointSet *(* RegMesh)( AstRegion * );
    AstPointSet *(* RegGrid)( AstRegion * );
@@ -212,6 +213,7 @@ void astRegOverlay_( AstRegion *, AstRegion * );
 int astDumpUnc_( AstRegion * );
 int astGetBounded_( AstRegion * );
 int astTestUnc_( AstRegion * );
+int astRegDummyFS_( AstRegion * );
 int astRegPins_( AstRegion *, AstPointSet *, AstRegion *, int **);
 AstPointSet *astRegMesh_( AstRegion * );
 AstPointSet *astRegGrid_( AstRegion * );
@@ -346,6 +348,7 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astRegGrid(this) astINVOKE(O,astRegGrid_(astCheckRegion(this)))
 #define astRegMesh(this) astINVOKE(O,astRegMesh_(astCheckRegion(this)))
 #define astRegOverlay(this,that) astINVOKE(V,astRegOverlay_(astCheckRegion(this),astCheckRegion(that)))
+#define astRegDummyFS(this) astINVOKE(V,astRegDummyFS_(astCheckRegion(this)))
 #define astRegPins(this,pset,unc,mask) astINVOKE(V,astRegPins_(astCheckRegion(this),astCheckPointSet(pset),astCheckRegion(unc),mask))
 #define astRegTranPoint astRegTranPoint_
 #define astSetRegFS(this,frm) astINVOKE(V,astSetRegFS_(astCheckRegion(this),astCheckFrame(frm)))

@@ -293,6 +293,110 @@ static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
    return result;
 }
 
+AstInterval *astBoxInterval_( AstBox *box ) {
+/*
+*+
+*  Name:
+*     astBoxInterval
+
+*  Purpose:
+*     Create an Interval corresponding to the given Box.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "interval.h"
+*     AstInterval *astBoxInterval( AstBox *box )
+
+*  Class Membership:
+*     Interval member function.
+
+*  Description:
+*     This function create a new Interval which is equivalent to the
+*     given Box.
+
+*  Parameters:
+*     box
+*        Pointer to a Box.
+
+*  Returned Value:
+*     A pointer to a new Interval. 
+
+*-
+*/
+
+/* Local Variables: */
+   AstFrame *frm;            /* Pointer to Frame for "result" */
+   AstInterval *new;         /* Pointer to new Interval in base Frame */
+   AstInterval *result;      /* Pointer to returned Interval in current Frame */
+   AstMapping *map;          /* Base->current Mapping for "result" */
+   AstRegion *unc;           /* Uncertainty Region for "result" */
+   double *lbnd;             /* Array to hold lower axis bounds */
+   double *ubnd;             /* Array to hold upper axis bounds */
+   int nax;                  /* Number of axes in "result" */
+
+/* Initialise */
+   result = NULL;
+
+/* Check the local error status. */
+   if ( !astOK ) return result;
+
+/* Get the number of axes in the supplied Box. */
+   nax = astGetNaxes( box );
+
+/* Allocate memory to store the bounds of the returned Interval. */
+   nax = nax;
+   lbnd = astMalloc( sizeof( double )*(size_t) nax );
+   ubnd = astMalloc( sizeof( double )*(size_t) nax );
+
+/* Check pointers can be used safely. */
+   if( ubnd ) {
+
+/* Get the base Frame bounds for "box". */
+      astRegBaseBox( box, lbnd, ubnd );
+
+/* Get the base Frame from the Box. */
+      frm = astGetFrame( ((AstRegion *) box )->frameset, AST__BASE );
+
+/* If the supplied Box has a set uncertainty, get it in its base Frame. */
+      unc = astTestUnc( box ) ? astGetUnc( box, AST__BASE ) : NULL;
+
+/* Create the Interval representing an area within the base Frame of the 
+   supplied Box. */
+      new = astInterval( frm, lbnd, ubnd, unc, "" );
+      frm = astAnnul( frm );
+      if( unc ) unc = astAnnul( unc );
+
+/* Copy attributes from the original Box. */
+      astRegOverlay( new, box );
+
+/* Map the new Interval from the base Frame by the supplied Box to its 
+   current Frame. First obtain and combine the base->current
+   Mappings from the two supplied Regions. Then obtain and combine the 
+   current Frames from the two supplied Regions. Then remap the new
+   Interval. */
+      map = astGetMapping( ((AstRegion *) box )->frameset, AST__BASE, AST__CURRENT );
+      frm = astGetFrame( ((AstRegion *) box )->frameset, AST__CURRENT );
+      result = astMapRegion( new, map, frm );
+
+/* Free remaining resources. */
+      frm = astAnnul( frm );
+      map = astAnnul( map );
+      new = astAnnul( new );
+   }
+
+/* Free resources. */
+   lbnd = astFree( lbnd );
+   ubnd = astFree( ubnd );
+
+/* If an error has occurred, annul the returned pointer. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
+}
+
 static void Cache( AstInterval *this ){
 /*
 *  Name:
@@ -632,15 +736,14 @@ static AstInterval *MergeInterval( AstInterval *this, AstRegion *reg ) {
 *  Description:
 *     This function attempts to combine the supplied Regions together
 *     into an Interval of higher dimensiomality. This is only possible if
-*     "reg" is a Box or Interval and if both have the same value for
-*     their Negated attribute. Otherwise a NULL pointer is returned
-*     without error.
+*     "reg" is a Box, a NullRegion or an Interval. Otherwise a NULL pointer 
+*     is returned without error.
 
 *  Parameters:
 *     this
 *        Pointer to an Interval.
 *     reg
-*        Pointer to a Box or Interval.
+*        Pointer to a Box, negated NullRegion or Interval.
 
 *  Returned Value:
 *     A pointer to a new Interval. The number of axes spanned by this
@@ -674,6 +777,7 @@ static AstInterval *MergeInterval( AstInterval *this, AstRegion *reg ) {
    double ub;                /* Upper axis bound */
    int closed;               /* Closed attribute value for returned Interval */
    int i;                    /* Loop count */
+   int isnull;               /* Is "reg" a NullRegion? */
    int msz_reg;              /* Original MeshSize for "reg" */
    int msz_reg_set;          /* Was MeshSize originally set for "reg"? */
    int msz_this;             /* Original MeshSize for "this" */
@@ -700,11 +804,12 @@ static AstInterval *MergeInterval( AstInterval *this, AstRegion *reg ) {
    ubnd = astMalloc( sizeof( double )*(size_t) nax );
 
 /* Check pointers can be used safely. */
-   if( astOK ) {
+   if( ubnd ) {
 
 /* Get the base Frame bounds for "reg". How this is done depends on whether 
    "reg" is an Interval or a Box. */
-      ok =1;
+      ok = 1;
+      isnull = 0;
 
       if( astIsAInterval( reg ) ) {
          for( i = 0; i < nax_reg; i++ ) {
@@ -719,16 +824,28 @@ static AstInterval *MergeInterval( AstInterval *this, AstRegion *reg ) {
       } else if( astIsABox( reg ) ) {
          astRegBaseBox( reg, lbnd, ubnd );
 
+      } else if( astIsANullRegion( reg ) ) {
+         for( i = 0; i < nax_reg; i++ ) {
+            lbnd[ i ] = AST__BAD;
+            ubnd[ i ] = AST__BAD;
+         }
+         isnull = 1;
+
       } else {
          ok = 0;
       }
 
-/* Check they have the same Negated and Closed value.·*/
+/* If "reg" is a NullRegion check it is negated. Otherwise, check the two
+   Regions have the same Negated and Closed value.·*/
       neg = astGetNegated( this );
-      if( neg != astGetNegated( reg ) ) ok = 0;
-
       closed = astGetClosed( this );
-      if( closed != astGetClosed( reg ) ) ok = 0;
+
+      if( isnull ) {
+         if( ok ) ok = astGetNegated( reg );
+      } else {
+         if( neg != astGetNegated( reg ) ) ok = 0;
+         if( closed != astGetClosed( reg ) ) ok = 0;
+      }
 
 /* If OK, append the axis limits for "this". */
       if( ok ) {
@@ -3072,4 +3189,9 @@ AstInterval *astMergeInterval_( AstInterval *this, AstRegion *reg ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Interval,MergeInterval))( this, reg );
 }
+
+
+
+
+
 

@@ -55,7 +55,6 @@
 
 #if defined(astCLASS)            /* Protected */
 #include "channel.h"             /* I/O channels */
-#include "interval.h"            /* Axis intervals */
 #endif
 
 /* C header files. */
@@ -119,7 +118,7 @@ AstPrism *astPrismId_( void *, void *, const char *, ... );
 
 /* Initialiser. */
 AstPrism *astInitPrism_( void *, size_t, int, AstPrismVtab *,
-                     const char *, AstRegion *, AstInterval * );
+                     const char *, AstRegion *, AstRegion * );
 
 /* Vtab initialiser. */
 void astInitPrismVtab_( AstPrismVtab *, const char * );

@@ -6017,6 +6017,8 @@ double astReadDateTime_( const char *value ) {
 *     Gregorian Date and Time
 *        Any calendar date (as above) but with a fraction of a day expressed
 *        as hours, minutes and seconds ("1996-Oct-2 12:13:56.985" for example).
+*        The date and time can be separated by a space or by a "T" (as used 
+*        by ISO8601).
 
 *  Notes:
 *     -  The date/time value is interpreted as a calendar date and time, not
@@ -6035,7 +6037,9 @@ double astReadDateTime_( const char *value ) {
    char sep2[ 2 ];               /* Month/day separator string */
    char sep3[ 2 ];               /* Hour/minute separator string */
    char sep4[ 2 ];               /* Minute/second separator string */
+   char *cc;                     /* Pointer to copy of remaining text */
    const char *v;                /* Pointer into value string */
+   const char *p;                /* Pointer to date/time separator */
    double day;                   /* Day number plus fraction of whole day */
    double epoch;                 /* Epoch stored as decimal years */
    double hms;                   /* Hours, min & sec as fraction of a day */
@@ -6168,6 +6172,18 @@ double astReadDateTime_( const char *value ) {
          v += nc;
          l -= nc;
 
+/* ISO8601 format uses the litter T as a delimiter between the date and time. 
+   If there is a T in the remaining string, take a copy and change the T to 
+   a space. */
+         p = strchr( v, 'T' );
+         if( p ) {
+            cc = astStore( NULL, v, l + 1 );
+            cc[ p - v ] = ' ';
+            v = cc;
+         } else {
+            cc = NULL;
+         }                     
+
 /* We now try to match the following characters but without reading
    any values.  This is done to ensure the string has the correct form
    (e.g. exclude "-" signs and exponents in numbers, which are
@@ -6253,6 +6269,10 @@ double astReadDateTime_( const char *value ) {
                }
             }
          }
+
+/* Free resources */
+         if( cc ) cc = astFree( cc );
+
       }
 
 /* Interpret the values that were read. */
@@ -8697,9 +8717,6 @@ static int ValidateAxis( AstFrame *this, int axis, const char *method ) {
 /* Initialise. */
    result = 0;
 
-/* Check the global error status. */
-   if ( !astOK ) return result;
-
 /* Determine the number of Frame axes. */
    naxes = astGetNaxes( this );
    if ( astOK ) {
@@ -8722,7 +8739,7 @@ static int ValidateAxis( AstFrame *this, int axis, const char *method ) {
    use this to generate the permuted axis value. */
       } else {
          perm = astGetPerm( this );
-         if ( astOK ) result = perm[ axis ];
+         if( perm ) result = perm[ axis ];
       }
    }
 
@@ -9025,7 +9042,8 @@ MAKE_TEST(Direction)
 *
 *     - Gregorian Date and Time: Any calendar date (as above) but with
 *     a fraction of a day expressed as hours, minutes and seconds
-*     ("1996-Oct-2 12:13:56.985" for example).
+*     ("1996-Oct-2 12:13:56.985" for example). The date and time can be 
+*     separated by a space or by a "T" (as used by ISO8601 format).
 
 *  Output Format:
 *     When enquiring Epoch values, the format used is the "Year"

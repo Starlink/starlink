@@ -12,12 +12,13 @@ f     AST_PRISM
 
 *  Description:
 *     A Prism is a Region which represents an extrusion of an existing Region 
-*     into one or more orthogonal dimensions (specified by an Interval). If 
-*     the Region to be extruded has N axes, and the Interval defining the 
-*     extrusion has M axes, then the resulting Prism will have (M+N) axes. A 
-*     point is inside the Prism if the first N axis values correspond to a 
-*     point which is inside the Region being extruded, and the remaining M 
-*     axis values correspond to a point which inside the supplied Interval.
+*     into one or more orthogonal dimensions (specified by an Interval or
+*     Box). If the Region to be extruded has N axes, and the Interval or Box 
+*     defining the extrusion has M axes, then the resulting Prism will have 
+*     (M+N) axes. A point is inside the Prism if the first N axis values 
+*     correspond to a point which is inside the Region being extruded, and the 
+*     remaining M axis values correspond to a point which inside the supplied 
+*     Interval or Box.
 *
 *     As an example, a cylinder can be represented by extruding an existing 
 *     Circle. In this case the supplied Interval would have a single axis and 
@@ -73,6 +74,7 @@ f     The Prism class does not define any new routines beyond those
 #include "cmpmap.h"              /* Compound Mappings */
 #include "cmpframe.h"            /* Compound Frames */
 #include "unitmap.h"             /* Unit Mappings */
+#include "interval.h"            /* Axis intervals */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -1632,11 +1634,16 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
       newreg2 = astMapRegion( reg2, nmap2, newfrm2 );
       snewreg2 = astSimplify( newreg2 );      
 
-/* If either component Region was simplified, and if the simplified
-   second Region is an Interval, then create a new Prism from the 
+/* If the simplified second component is no longer an Interval or Box, revert 
+   to the original Interval. */
+      if( !astIsAInterval( snewreg2 ) && !astIsABox( snewreg2 ) ) {
+         astAnnul( snewreg2 );
+         snewreg2 = astClone( newreg2 );
+      }
+
+/* If either component Region was simplified, create a new Prism from the 
    simplified Regions. */
-      if( ( snewreg1 != newreg1 || snewreg2 != newreg2 ) &&
-          astIsAInterval( snewreg2 ) ) { 
+      if( snewreg1 != newreg1 || snewreg2 != newreg2 ) {
          astAnnul( new );
          new = astPrism( snewreg1, snewreg2, "" );
 
@@ -1664,8 +1671,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    }
 
 /* The second component Region in the Prism is known to be an Interval. 
-   If the first component Region is also an Interval, or is a Box, we
-   can replace the Prism by a single Interval defined within a CmpFrame.
+   If the first component Region is also an Interval, a Box, or a NullRegion 
+   we can replace the Prism by a single Interval defined within a CmpFrame.
    Attempt to do this. If succesful, attempt to simplify the new Region
    and use it in place of the original. */
    new2 = astMergeInterval( new->region2, new->region1 );
@@ -1689,6 +1696,11 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    if( axout2 ) axout2 = astFree( axout2 );
    if( nmap1 ) nmap1 = astAnnul( nmap1 );
    if( nmap2 ) nmap2 = astAnnul( nmap2 );
+
+/* If any simplification could be performed, copy Region attributes from 
+   the supplied Region to the returned Region, and return a pointer to it.
+   Otherwise, return a clone of the supplied pointer. */
+   if( result != this_mapping ) astRegOverlay( result, (AstRegion *) this_mapping );
 
 /* If an error occurred, annul the returned Mapping. */
    if ( !astOK ) result = astAnnul( result );
@@ -2150,7 +2162,7 @@ AstPrism *astPrism_( void *region1_void, void *region2_void,
 /* Local Variables: */
    AstPrism *new;                  /* Pointer to new Prism */
    AstRegion *region1;             /* Pointer to first Region structure */
-   AstInterval *region2;           /* Pointer to second Region structure */
+   AstRegion *region2;             /* Pointer to second Region structure */
    va_list args;                   /* Variable argument list */
 
 /* Initialise. */
@@ -2161,7 +2173,7 @@ AstPrism *astPrism_( void *region1_void, void *region2_void,
 
 /* Obtain and validate pointers to the Region structures provided. */
    region1 = astCheckRegion( region1_void );
-   region2 = astCheckInterval( region2_void );
+   region2 = astCheckRegion( region2_void );
    if ( astOK ) {
 
 /* Initialise the Prism, allocating memory and initialising the
@@ -2206,7 +2218,7 @@ f     AST_PRISM
 
 *  Synopsis:
 c     #include "prism.h"
-c     AstPrism *astPrism( AstRegion *region1, AstInterval *region2, 
+c     AstPrism *astPrism( AstRegion *region1, AstRegion *region2, 
 c                         const char *options, ... )
 f     RESULT = AST_PRISM( REGION1, REGION2, OPTIONS, STATUS )
 
@@ -2218,12 +2230,13 @@ f     RESULT = AST_PRISM( REGION1, REGION2, OPTIONS, STATUS )
 *     its attributes.
 *
 *     A Prism is a Region which represents an extrusion of an existing Region 
-*     into one or more orthogonal dimensions (specified by an Interval). If 
-*     the Region to be extruded has N axes, and the Interval defining the 
-*     extrusion has M axes, then the resulting Prism will have (M+N) axes. A 
-*     point is inside the Prism if the first N axis values correspond to a 
-*     point which is inside the Region being extruded, and the remaining M 
-*     axis values correspond to a point which inside the supplied Interval.
+*     into one or more orthogonal dimensions (specified by an Interval or
+*     Box). If the Region to be extruded has N axes, and the Interval or Box 
+*     defining the extrusion has M axes, then the resulting Prism will have 
+*     (M+N) axes. A point is inside the Prism if the first N axis values 
+*     correspond to a point which is inside the Region being extruded, and the 
+*     remaining M axis values correspond to a point which inside the supplied 
+*     Interval or Box.
 *
 *     As an example, a cylinder can be represented by extruding an existing 
 *     Circle. In this case the supplied Interval would have a single axis and 
@@ -2236,7 +2249,7 @@ f     REGION1 = INTEGER (Given)
 *        Pointer to the Region to be extruded.
 c     region2
 f     REGION2 = INTEGER (Given)
-*        Pointer to the Interval defining the extent of the extrusion.
+*        Pointer to the Interval or Box defining the extent of the extrusion.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
 c        Pointer to a null-terminated string containing an optional
@@ -2293,7 +2306,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Local Variables: */
    AstPrism *new;                  /* Pointer to new Prism */
    AstRegion *region1;             /* Pointer to first Region structure */
-   AstInterval *region2;           /* Pointer to second Region structure */
+   AstRegion *region2;             /* Pointer to second Region structure */
    va_list args;                   /* Variable argument list */
 
 /* Initialise. */
@@ -2305,7 +2318,7 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Obtain the Region pointers from the ID's supplied and validate the
    pointers to ensure they identify valid Regions. */
    region1 = astCheckRegion( astMakePointer( region1_void ) );
-   region2 = astCheckInterval( astMakePointer( region2_void ) );
+   region2 = astCheckRegion( astMakePointer( region2_void ) );
    if ( astOK ) {
 
 /* Initialise the Prism, allocating memory and initialising the
@@ -2335,7 +2348,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 AstPrism *astInitPrism_( void *mem, size_t size, int init,
                          AstPrismVtab *vtab, const char *name,
-                         AstRegion *region1, AstInterval *region2 ) {
+                         AstRegion *region1, AstRegion *region2 ) {
 /*
 *+
 *  Name:
@@ -2351,7 +2364,7 @@ AstPrism *astInitPrism_( void *mem, size_t size, int init,
 *     #include "prism.h"
 *     AstPrism *astInitPrism_( void *mem, size_t size, int init,
 *                              AstPrismVtab *vtab, const char *name,
-*                              AstRegion *region1, AstInterval *region2 )
+*                              AstRegion *region1, AstRegion *region2 )
 
 *  Class Membership:
 *     Prism initialiser.
@@ -2393,7 +2406,7 @@ AstPrism *astInitPrism_( void *mem, size_t size, int init,
 *     region1
 *        Pointer to the first Region.
 *     region2
-*        Pointer to the second Region (must be an Interval).
+*        Pointer to the second Region (must be an Box or Interval).
 
 *  Returned Value:
 *     A pointer to the new Prism.
@@ -2422,9 +2435,24 @@ AstPrism *astInitPrism_( void *mem, size_t size, int init,
 /* Initialise. */
    new = NULL;
 
-/* Take copies of the supplied Regions. */
+/* Take a copy of the first supplied Region. */
    reg1 = astCopy( region1 );
-   reg2 = astCopy( region2 );
+
+/* If the second Region is Box, create a corresponding Interval from it. */
+   if( astIsABox( region2 ) ) {
+      reg2 = astBoxInterval( region2 );
+
+/* If the second Region is an Interval, use a copy of it. */
+   } else if( astIsAInterval( region2 ) ) {
+      reg2 = astCopy( region2 );
+
+/* Otherwise, report an error. */
+   } else if( astOK ) {
+      astError( AST__BADIN, "astInitPrism(%s): Bad extrusion Region "
+                "class (%s) supplied.", name, astGetClass( region2 ) );
+      astError( AST__NCPIN, "The extrusion Region must be a Box or "
+                "Interval." );
+   }
 
 /* Form a CmpFrame representing the combined Frame of these two Regions. */
    frm1 = astRegFrame( reg1 );
@@ -2613,21 +2641,21 @@ AstPrism *astLoadPrism_( void *mem, size_t size, AstPrismVtab *vtab,
 /* --------------- */
       new->region2 = astReadObject( channel, "regionb", NULL );
 
-/* If either component Region has a zero value for its RegionFS attribute,
-   it will currently contain a dummy FrameSet rather than the correct
-   FrameSet. In this case, the correct FrameSet will have copies of
-   selected axes from the base Frame of the new Prism as both its current 
-   and base Frames, and these are connected by a UnitMap (this is equivalent 
-   to a FrameSet containing a single Frame). However if the new Prism being 
-   loaded has itself got a dummy FrameSet, then we do not do this since we do 
-   not yet know what the correct FrameSet is. In this case we wait until the
-   parent Region invokes the astSetRegFS method on the new Prism. */
-      if( astGetRegionFS( (AstRegion *) new ) ) {
+/* Either component Region may currently contain a dummy FrameSet rather than 
+   the correct FrameSet (see the Dump function for this class). In this case, 
+   the correct FrameSet will have copies of selected axes from the base Frame 
+   of the new Prism as both its current and base Frames, and these are 
+   connected by a UnitMap (this is equivalent to a FrameSet containing a 
+   single Frame). However if the new Prism being loaded has itself got a dummy 
+   FrameSet, then we do not do this since we do not yet know what the correct 
+   FrameSet is. In this case we wait until the parent Region invokes the 
+   astSetRegFS method on the new Prism. */
+      if( !astRegDummyFS( new ) ) {
          f1 = astGetFrame( ((AstRegion *) new)->frameset, AST__BASE );
 
          creg = new->region1;
          nax1 = astGetNaxes( creg );
-         if( !astGetRegionFS( creg ) ) {
+         if( astRegDummyFS( creg ) ) {
             axes = astMalloc( sizeof( int )*(size_t) nax1 );
             if( astOK ) for( i = 0; i < nax1; i++ ) axes[ i ] = i;
             cfrm = astPickAxes( f1, nax1, axes, NULL );
@@ -2637,7 +2665,7 @@ AstPrism *astLoadPrism_( void *mem, size_t size, AstPrismVtab *vtab,
          }
 
          creg = new->region2;
-         if( !astGetRegionFS( creg ) ) {
+         if( astRegDummyFS( creg ) ) {
             nax2 = astGetNaxes( creg );
             axes = astMalloc( sizeof( int )*(size_t) nax2 );
             if( astOK ) for( i = 0; i < nax2; i++ ) axes[ i ] = nax1 + i;

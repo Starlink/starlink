@@ -121,10 +121,9 @@ static AstMapping *(* parent_simplify)( AstMapping * );
 static int (* parent_equal)( AstObject *, AstObject * );
 static void (* parent_setclosed)( AstRegion *, int );
 static void (* parent_setmeshsize)( AstRegion *, int );
-static void (* parent_setfillfactor)( AstRegion *, double );
 static void (* parent_clearclosed)( AstRegion * );
 static void (* parent_clearmeshsize)( AstRegion * );
-static void (* parent_clearfillfactor)( AstRegion * );
+static double (*parent_getfillfactor)( AstRegion * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -140,6 +139,7 @@ static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstRegion *GetUnc( AstRegion *, int );
 static AstRegion *MatchRegion( AstRegion *, int, AstRegion *, const char * );
+static double GetFillFactor( AstRegion * );
 static int Equal( AstObject *, AstObject * );
 static int GetBounded( AstRegion * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
@@ -151,10 +151,8 @@ static void Dump( AstObject *, AstChannel * );
 static void GetRegions( AstCmpRegion *, AstRegion **, AstRegion **, int *, int *, int *);
 static void RegBaseBox( AstRegion *, double *, double * );
 static void SetRegFS( AstRegion *, AstFrame * );
-static void SetFillFactor( AstRegion *, double );
 static void SetClosed( AstRegion *, int );
 static void SetMeshSize( AstRegion *, int );
-static void ClearFillFactor( AstRegion * );
 static void ClearClosed( AstRegion * );
 static void ClearMeshSize( AstRegion * );
 
@@ -342,9 +340,7 @@ static void Set##attribute( AstRegion *this_region, type value ) { \
    astSet##attribute( this->region2, value ); \
 }
 
-/* Use the above macro to create accessors for the MeshSize, Closed and
-   FillFactor attributes. */
-MAKE_SET(FillFactor,fillfactor,double)
+/* Use the above macro to create accessors for the MeshSize and Closed attributes. */
 MAKE_SET(MeshSize,meshsize,int)
 MAKE_SET(Closed,closed,int)
 
@@ -403,9 +399,7 @@ static void Clear##attribute( AstRegion *this_region ) { \
    astClear##attribute( this->region2 ); \
 }
 
-/* Use the above macro to create accessors for the MeshSize, Closed and
-   FillFactor attributes. */
-MAKE_CLEAR(FillFactor,fillfactor)
+/* Use the above macro to create accessors for the MeshSize and Closed attributes. */
 MAKE_CLEAR(MeshSize,meshsize)
 MAKE_CLEAR(Closed,closed)
 
@@ -536,6 +530,70 @@ static int GetBounded( AstRegion *this_region ) {
    if( !astOK ) result = 0;
 
 /* Return the required pointer. */
+   return result;
+}
+
+static double GetFillFactor( AstRegion *this_region ) {
+/*
+*  Name:
+*     GetFillFactor
+
+*  Purpose:
+*     Obtain the value of the FillFactor attribute for a CmpRegion.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpregion.h"
+*     double GetFillFactor( AstRegion *this )
+
+*  Class Membership:
+*     CmpRegion member function (over-rides the astGetFillFactor method inherited
+*     from the Region class).
+
+*  Description:
+*     This function returns the value of the FillFactor attribute for a
+*     CmpRegion.  A suitable default value is returned if no value has
+*     previously been set.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpRegion.
+
+*  Returned Value:
+*     The FillFactor value to use.
+
+*/
+
+/* Local Variables: */
+   AstCmpRegion *this;
+   double result; 
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Obtain a pointer to the CmpRegion structure. */
+   this = (AstCmpRegion *) this_region;
+
+/* See if a FillFactor value has been set. If so, use the parent
+   astGetFillFactor  method to obtain it. */
+   if ( astTestFillFactor( this ) ) {
+      result = (*parent_getfillfactor)( this_region );
+
+/* Otherwise, we will generate a default value equal to the FillFactor values 
+   of the first component Region. */
+   } else {
+      result = astGetFillFactor( this->region1 );
+   }
+
+/* If an error occurred, clear the returned value. */
+   if ( !astOK ) result = AST__BAD;
+
+/* Return the result. */
    return result;
 }
 
@@ -866,17 +924,14 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name ) {
    parent_clearmeshsize = region->ClearMeshSize;
    region->ClearMeshSize = ClearMeshSize;
 
-   parent_clearfillfactor = region->ClearFillFactor;
-   region->ClearFillFactor = ClearFillFactor;
-
    parent_setclosed = region->SetClosed;
    region->SetClosed = SetClosed;
 
    parent_setmeshsize = region->SetMeshSize;
    region->SetMeshSize = SetMeshSize;
 
-   parent_setfillfactor = region->SetFillFactor;
-   region->SetFillFactor = SetFillFactor;
+   parent_getfillfactor = region->GetFillFactor;
+   region->GetFillFactor = GetFillFactor;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -2781,9 +2836,6 @@ AstCmpRegion *astInitCmpRegion_( void *mem, size_t size, int init,
 
 /* Copy attribute values from the first component Region to the parent
    Region. */
-      if( astTestFillFactor( new->region1 ) ) {
-         astSetFillFactor( new,  astGetFillFactor( new->region1 ) );
-      }
       if( astTestMeshSize( new->region1 ) ) {
          astSetMeshSize( new,  astGetMeshSize( new->region1 ) );
       }
@@ -2944,21 +2996,20 @@ AstCmpRegion *astLoadCmpRegion_( void *mem, size_t size,
 /* --------------- */
       new->region2 = astReadObject( channel, "regionb", NULL );
 
-/* If either component Region has a zero value for its RegionFS attribute,
-   it will currently contain a dummy FrameSet rather than the correct
-   FrameSet. In this case, the correct FrameSet will have copies of the 
-   base Frame of the new CmpRegion as both its current and base Frames, and 
-   these are connected by a UnitMap (this is equivalent to a FrameSet 
-   containing a single Frame). However if the new CmpRegion being loaded has
-   itself got a dummy FrameSet, then we do not do this since we do not
-   yet know what the correct FrameSet is. In this case we wait until the
-   parent Region invikes the astSetRegFS method ton the new CmpRegion. */
-      if( astGetRegionFS( (AstRegion *) new ) ) {
+/* If either component Region has a dummy FrameSet rather than the correct
+   FrameSet, the correct FrameSet will have copies of the base Frame of the 
+   new CmpRegion as both its current and base Frames, connected by a UnitMap 
+   (this is equivalent to a FrameSet containing a single Frame). However if 
+   the new CmpRegion being loaded has itself got a dummy FrameSet, then we do 
+   not do this since we do not yet know what the correct FrameSet is. In this 
+   case we wait until the parent Region invokes the astSetRegFS method on the 
+   new CmpRegion. */
+      if( !astRegDummyFS( new ) ) {
          f1 = astGetFrame( ((AstRegion *) new)->frameset, AST__BASE );
          creg = new->region1;
-         if( !astGetRegionFS( creg ) ) astSetRegFS( creg, f1 );
+         if( astRegDummyFS( creg ) ) astSetRegFS( creg, f1 );
          creg = new->region2;
-         if( !astGetRegionFS( creg ) ) astSetRegFS( creg, f1 );
+         if( astRegDummyFS( creg ) ) astSetRegFS( creg, f1 );
          f1 = astAnnul( f1 );
       }
 

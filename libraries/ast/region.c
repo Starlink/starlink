@@ -150,6 +150,10 @@ f     - AST_SETUNC: Associate a new uncertainty with a Region
    exceptions, so bad values are dealt with explicitly. */
 #define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
 
+/* Value for Ident attribute of of an encapsulated FrameSet which
+   indicates that it is a dummy FrameSet (see astRegDummy). */
+#define DUMMY_FS "ASTREGION-DUMMY"
+
 /*
 *  Name:
 *     MAKE_CLEAR
@@ -782,6 +786,7 @@ static int IsUnitFrame( AstFrame * );
 static int Match( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
 static int Overlap( AstRegion *, AstRegion * );
 static int OverlapX( AstRegion *, AstRegion * );
+static int RegDummyFS( AstRegion * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
 static int ResetCache( AstRegion *, int );
 static int SubFrame( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
@@ -3492,6 +3497,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    vtab->RegCurBox = RegCurBox;
    vtab->RegOverlay = RegOverlay;
    vtab->RegFrame = RegFrame;
+   vtab->RegDummyFS = RegDummyFS;
    vtab->RegPins = RegPins;
    vtab->RegTransform = RegTransform;
    vtab->SetRegFS = SetRegFS;
@@ -5816,6 +5822,72 @@ static AstPointSet *RegMesh( AstRegion *this ){
    return result;
 }
 
+static int RegDummyFS( AstRegion *this ){
+/*
+*+
+*  Name:
+*     astRegDummyFS
+
+*  Purpose:
+*     Check if a Region has a dummy FrameSet.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "region.h"
+*     int astRegDummyFS( AstRegion *this )
+
+*  Class Membership:
+*     Region virtual function.
+
+*  Description:
+*     This function returns a flag indicating if the supplied Region has
+*     a dummy FrameSet.
+*
+*     The astDump method for a Region may choose not to include the
+*     Region's FrameSet in the dump, depending on the value of the
+*     RegionFS attribute and the nature of the FrameSet. If the FrameSet
+*     is omitted from the Dump, then special action has to be taken when
+*     the dump is subsequently read in and used to re-create the Region. 
+*     On encounterting such a dump, the astLoadRegion function will create 
+*     a dummy FrameSet and associate it with the reconstructed  Region. 
+*     The new Region should not be used however until this dummy FrameSet 
+*     has been replaced by the correct FrameSet. Performing this replacement 
+*     is the responsibility of the parent class (i.e. the class which choose 
+*     to omit the FrameSet from the dump). These will usually be Region 
+*     classes which encapsulate other Regions, such as CmpRegion, Prism, 
+*     Stc, etc.
+*
+*     This function can be used by astLoad... methods in sub-classes to 
+*     determine if a newly loaded component Region has a dummy FrameSet. If 
+*     so the astLoad function should either use the astSetRegFS method to 
+*     store a new FrameSet in the component Region. If the parent Region 
+*     itself has a dummy FrameSet (i.e. is a component Region contained
+*     within a higher level Region) then it cannot do this and should
+*     ignore the presence of the dummy FrameSet (it then becomes the
+*     responsibility of hte parent Region to load appropriate FrameSets 
+*     into all its components).
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+
+*  Returned Value:
+*     Non-zero if the points all fall on the boundary of the given
+*     Region, to within the tolerance specified. Zero otherwise.
+
+*-
+*/
+
+/* Check the inherited status. */
+   if( !astOK ) return 0;
+
+/* The Ident attribute of the FrameSet will be set to DUMMY_FS if the
+   FrameSet is a dummy. */
+   return !strcmp( astGetIdent( this->frameset ), DUMMY_FS );
+}
+
 static int RegPins( AstRegion *this, AstPointSet *pset, AstRegion *unc, 
                     int **mask ){
 /*
@@ -6023,10 +6095,12 @@ static void RegOverlay( AstRegion *this, AstRegion *that ){
    if( !astOK ) return;
 
 /* Copy the required attribute values. */
-   this->meshsize = that->meshsize;
    this->negated = that->negated;
    this->closed = that->closed;
    this->regionfs = that->regionfs;
+
+   if( astTestMeshSize( that ) ) astSetMeshSize( this, astGetMeshSize( that ) );
+   if( astTestFillFactor( that ) ) astSetFillFactor( this, astGetFillFactor( that ) );
 
 /* If the uncertainty Region in "that" is a default, erase any uncertainty 
    information in "this". Otherwise, simplify it (this may result in the
@@ -8094,20 +8168,28 @@ astMAKE_TEST(Region,Negated,( this->negated != -INT_MAX ))
 *     Region should be included in the dump produced by the Dump function.
 *
 *     If set to a non-zero value (the default), the FrameSet in the Region 
-*     will be included in the dump as usual. If set to zero, the FrameSet 
-*     will not be included in the dump. In this case, if the dump is 
+*     will always be included in the dump as usual. If set to zero, the 
+*     FrameSet will only be included in the dump if the Mapping from base
+*     to current Frame is not a UnitMap. If the base->current Mapping is
+*     a UnitMap, the FrameSet is omitted from the dump. If the dump is 
 *     subsequently used to re-create the Region, the new Region will have a 
 *     default FrameSet containing a single default Frame with the appropriate 
 *     number of axes. 
 *
 *     This facility is indended to reduce the size of textual dumps of
 *     Regions in situations where the Frame to which the Region refers can
-*     be implied by the context in which the Region is used. This is often the
-*     case for instance when dumping the uncertainty Region encapsulated
-*     by another parent Region - if the base Frame in the uncertainty Region 
-*     is the same as the base Frame of the parent Region then there is no 
-*     need to include a dump of the FramesSet when dumping the uncertainty 
-*     Region.
+*     be implied by the context in which the Region is used. This is
+*     often the case when a Region is encapsulated within another Region.
+*     In such cases the current Frame of the encapsulated Region will
+*     usually be equivalent to the base Frame of the parent Region
+*     structure, and so can be re-instated (by calling the astSetRegFS
+*     method) even if the FrameSet is omitted from the dump of the
+*     encapsulated Region. Note if the base->current Mapping in the FrameSet 
+*     in the encapsulated Region is not a UnitMap, then we should always
+*     dump the FrameSet regardless of the setting of RegionFS. This is because 
+*     the parent Region structure will not know how to convert the PointSet 
+*     stored in the encapsulated Region into its own base Frame if the
+*     FrameSet is not available.
 
 *  Applicability:
 *     Region
@@ -8549,32 +8631,50 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* FrameSet */
 /* -------- */
-/* We do not dump the FrameSet if the RegionFS attribute is zero. */
-   if( astGetRegionFS( this ) ) {
 
 /* If the vertices are the same in both base and current Frames (i.e. 
    if the Frames are connected by a UnitMap), then just dump the current 
-   Frame. Otherwise, dump the whole FrameSet. */
-      smap = RegMapping( this );
-      if( ( unit = astIsAUnitMap( smap ) ) ){
+   Frame (unless the RegionFS attribute is zero, in which case the
+   current Frame can be determined from the higher level context of the
+   Region and so does not need to be dumped- e.g. if the Region is contained 
+   within another Region the parent Region will define the current Frame).
+   Otherwise, dump the whole FrameSet. */
+   ival = astGetRegionFS( this );
+   smap = RegMapping( this );
+   if( ( unit = astIsAUnitMap( smap ) ) ){
+      set = 0;
+      if( ival ) {
          fr = astGetFrame( this->frameset, AST__CURRENT );
          astWriteObject( channel, "Frm", 1, 1, fr, "Coordinate system" );
          fr = astAnnul( fr );
-
-      } else {
-         astWriteObject( channel, "FrmSet", 1, 1, this->frameset, 
-                         "Original & current coordinate systems" );
       }
+   } else {
+      set = ( ival == 0 );
+      astWriteObject( channel, "FrmSet", 1, 1, this->frameset, 
+                      "Original & current coordinate systems" );
+   }
 
 /* Annul the Mapping pointers */
-      smap = astAnnul( smap );
-   }
+   smap = astAnnul( smap );
+
+/* RegionFS */
+/* -------- */
+   astWriteInt( channel, "RegFS", set, 0, ival,
+                ival ? "Include Frame in dump" : "Do not include Frame in dump" );
 
 /* Points */
 /* ------ */
    if( this->points ) {
       astWriteObject( channel, "Points", 1, 1, this->points, 
                       "Points defining the shape" );
+
+/* If the FrameSet was not included in the dump, then the loaded will use
+   the PointSet to determine the number of axes in the frame spanned by
+   the Region. If there is no PointSet, then we must explicitly include
+   an item giving the number of axes.*/
+   } else {
+      astWriteInt( channel, "RegAxes", 1, 1, astGetNaxes( this ),
+                   "Number of axes spanned by the Region" );
    }
 
 /* Uncertainty */
@@ -8927,7 +9027,6 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
 
 /* If some points were found, ensure that they are in a PointSet and get
    the number of axis values per point. */
-      naxpt = 0;
       if( new->points ){
          if( astIsAPointSet( new->points) ) {
             naxpt = astGetNcoord( new->points );
@@ -8936,6 +9035,11 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
                       "using a %s (should be a PointSet).", astGetClass( new ),
                       astGetClass( new ), astGetClass( new->points ) );
          }
+
+/* If no PointSet was loaded, attempt to determine the number of axes
+   spanned by the Region by reading the RegAxes value. */
+      } else {
+         naxpt = astReadInt( channel, "regaxes", 0 );
       }
 
 /* FrameSet */
@@ -8944,9 +9048,9 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
    FrameSet from it and a copy of itself, using a UnitMap to connect the
    two. */
       new->frameset = NULL;
-      new->regionfs = 1;
       f1 = astReadObject( channel, "frm", NULL );
       if( f1 ) {
+         new->regionfs = 1;
          nax = astGetNaxes( f1 );
          astSetRegFS( new, f1 );
          f1 = astAnnul( f1 );
@@ -8956,6 +9060,12 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
          new->frameset = astReadObject( channel, "frmset", NULL );
          if( new->frameset ) {
             nax = astGetNaxes( new->frameset );
+
+/* If a FrameSet was found, the value of the RegionFS attribute is still
+   unknown and so we must read it from an attribute as normal. */
+            new->regionfs = astReadInt( channel, "regfs", 1 );
+            if ( TestRegionFS( new ) ) SetRegionFS( new, new->regionfs );
+
          } else {
             nax = 0;
          }
@@ -8968,6 +9078,7 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
          nax = naxpt ? naxpt : 1;
          f1 = astFrame( nax, "" );
          new->frameset = astFrameSet( f1, "" );
+         astSetIdent( new->frameset, DUMMY_FS );
          f1 = astAnnul( f1 );
          new->regionfs = 0;
       }
@@ -8982,7 +9093,6 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
                    "for each point.", astGetClass( new ), nax );
       }
    
-
 /* Uncertainty */
 /* ----------- */
       unc = astReadObject( channel, "unc", NULL );
@@ -9067,6 +9177,10 @@ int astRegPins_( AstRegion *this, AstPointSet *pset, AstRegion *unc, int **mask 
    if( mask ) *mask = NULL;
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Region,RegPins))( this, pset, unc, mask );
+}
+int astRegDummyFS_( AstRegion *this ){
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Region,RegDummyFS))( this );
 }
 int astDumpUnc_( AstRegion *this ){
    if ( !astOK ) return 0;

@@ -133,6 +133,7 @@ AstInterval *astLoadInterval_( void *, size_t, AstIntervalVtab *,
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
 AstInterval *astMergeInterval_( AstInterval *, AstRegion * );
+AstInterval *astBoxInterval_( AstBox * );
 #endif
 
 /* Function interfaces. */
@@ -182,5 +183,6 @@ astINVOKE(O,astLoadInterval_(mem,size,vtab,name,astCheckChannel(channel)))
 
 #if defined(astCLASS)            /* Protected */
 #define astMergeInterval(this,reg) astINVOKE(O,astMergeInterval_(astCheckInterval(this),astCheckRegion(reg)))
+#define astBoxInterval(box) astINVOKE(O,astBoxInterval_(astCheckBox(box)))
 #endif
 #endif
