@@ -1,5 +1,5 @@
 #! /bin/sh -
-# original bootstrap file, installed by starconf 1.0-8, rnum=1000008
+# original bootstrap file, installed by starconf 1.0-10, rnum=1000010
 # If you _need_ to change this file, delete or replace `original' above
 # or else starconf may overwrite it with an updated version
 
@@ -30,7 +30,7 @@ else
     # this, however: we don't want to be too clever, and it's better
     # to be consistent with the way the autotools behave (the first
     # one in your path is the one that works, and they don't have this
-    # sort of `phone home' cleverness in them.
+    # sort of `phone home' cleverness in them).
 
     echo "In directory " `pwd` " :"
     echo "The starconf application doesn't appear to be in your path"
@@ -45,12 +45,23 @@ else
 fi
 
 
-# Bootstrap any child directories
+# Bootstrap any child directories mentioned in AC_CONFIG_SUBDIRS.
+# These bootstrap files must exist, so that starconf is run in each
+# subdirectory, creating the correct acinclude.m4, so that the
+# STAR_DEFAULTS in the directory's configure.ac does indeed have a
+# definition.
 for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` DUMMY
 do
     if test -n "$d" -a -d "$d"; then
         echo "Bootstrapping $d..."
-        (cd $d; ./bootstrap)
+        if test -x $d/bootstrap; then
+            # good...
+            (cd $d; ./bootstrap)
+        else
+            echo "bootstrap: no file $d/bootstrap -- run starconf in $d"
+            echo "bootstrap: no file $d/bootstrap -- run starconf in $d" >&2
+            exit 1
+        fi
     fi
 done
 
@@ -62,7 +73,7 @@ done
 # likely to change without warning.
 : ${STAR_SUPPRESS_AUTORECONF=false}
 if $STAR_SUPPRESS_AUTORECONF; then
-    echo "Suppressing autoreconf"
+    echo "Suppressing autoreconf in" `pwd`
 else
     echorun autoreconf --install --symlink
 fi
