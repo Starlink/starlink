@@ -503,7 +503,7 @@ EXTERNAL_INCLUDES = SAE_PAR AGI_ERR CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
                     NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PAR_PAR \
                     PAR_ERR PRM_PAR SUBPAR_PAR TRN_PAR AST_PAR PSX_ERR \
                     AST_ERR AGI_PAR CAT_PAR CAT_ERR NDG_ERR \
-                    IRA_PAR IRA_ERR CTG_ERR CTM_PAR KPG_AST
+                    IRA_PAR IRA_ERR CTG_ERR CTM_PAR KPG_AST HLPCMD
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -911,6 +911,7 @@ IRA_ERR:     $(STAR_INC)/ira_err;     $(LINK) $? $@
 IRA_PAR:     $(STAR_INC)/ira_par;     $(LINK) $? $@
 CTM_PAR:     $(STAR_INC)/ctm_par;     $(LINK) $? $@
 KPG_AST:     $(STAR_INC)/kpg_ast;     $(LINK) $? $@
+HLPCMD:      $(STAR_INC)/hlpcmd;     $(LINK) $? $@
 MAG_ERR:     $(STAR_INC)/mag_err;     $(LINK) $? $@
 ME_COM:      me_com;                  $(LINK) $? $@
 MSG_PAR:     $(STAR_INC)/msg_par;     $(LINK) $? $@
@@ -2890,7 +2891,7 @@ wcsattrib.o:	 SAE_PAR NDF_PAR PAR_ERR AST_PAR
 wcscopy.o:	 SAE_PAR NDF_PAR PAR_ERR AST_PAR
 wcsframe.o:	 SAE_PAR PAR_PAR
 wcsremove.o:	 SAE_PAR AST_PAR
-wcsshow.o:	 SAE_PAR DAT_PAR PAR_ERR GRP_PAR PRM_PAR AST_PAR 
+wcsshow.o:	 SAE_PAR DAT_PAR PAR_ERR GRP_PAR PRM_PAR AST_PAR KPG_AST
 wcstran.o:	 SAE_PAR NDF_PAR AST_PAR
 wiener.o:	 SAE_PAR DAT_PAR PRM_PAR MSG_PAR NDF_PAR PAR_ERR
 zaplin.o:	 SAE_PAR DAT_PAR NDF_PAR NDF_ERR SUBPAR_PAR PAR_ERR FIO_ERR
