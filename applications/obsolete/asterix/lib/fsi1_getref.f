@@ -114,10 +114,10 @@
       OARG = ADI__NULLID
 
 *  Extract locator
-      CALL ADI1_GETLOC( ARGS(1), TLOC, STATUS )
+      CALL ADI1_GETLOC( ARGS(2), TLOC, STATUS )
 
 *  Create reference name
-      CALL FRI1_NAME( ARGS(2), 'REF', CNAM, STATUS )
+      CALL FRI1_NAME( ARGS(3), 'REF', CNAM, STATUS )
 
 *  Reference exists?
       CALL DAT_THERE( TLOC, CNAM, THERE, STATUS )
@@ -129,7 +129,7 @@
         CALL DAT_ANNUL( RLOC, STATUS )
 
 *    Extract class argument
-        CALL ADI_GET0C( ARGS(3), CLASS, STATUS )
+        CALL ADI_GET0C( ARGS(4), CLASS, STATUS )
 
 *    Try to open file
         CALL ADI_FOPEN( FILE, CLASS, 'READ', OARG, STATUS )

@@ -95,7 +95,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      INTEGER			ARGS(3)			! Method arguments
+      INTEGER			ARGS(4)			! Method arguments
       INTEGER			OARG			! Method return data
 *.
 
@@ -104,15 +104,16 @@
 
 *  Construct selection object
       ARGS(1) = FID
-      CALL ADI_NEWV0I( IDX, ARGS(2), STATUS )
-      CALL ADI_NEWV1I( NSEL, SEL, ARGS(3), STATUS )
+      CALL ADI_GETLINK( FID, ARGS(2), STATUS )
+      CALL ADI_NEWV0I( IDX, ARGS(3), STATUS )
+      CALL ADI_NEWV1I( NSEL, SEL, ARGS(4), STATUS )
 
 *  Invoke method
-      CALL ADI_EXEC( 'WriteSel', 3, ARGS, OARG, STATUS )
+      CALL ADI_EXEC( 'WriteSel', 4, ARGS, OARG, STATUS )
 
 *  Destroy selections
-      CALL ADI_ERASE( ARGS(2), STATUS )
       CALL ADI_ERASE( ARGS(3), STATUS )
+      CALL ADI_ERASE( ARGS(4), STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'FSI_PUTSEL', STATUS )
