@@ -90,8 +90,8 @@
      :                 'Object to file ''$^P''.', STATUS )
 
       ELSE
-         CALL MSG_SETC( 'P', PARAM )
-         CALL MSG_OUT( ' ', 'AST data written to text file ''$^P''.', 
+         CALL MSG_SETC( 'F', FNAME )
+         CALL MSG_OUT( ' ', 'AST data written to text file ''^F''.', 
      :                 STATUS )
       END IF
 

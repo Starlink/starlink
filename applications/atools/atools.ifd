@@ -1191,6 +1191,91 @@ iraf! {
           }
       }
 
+      action astspecframe {
+         helplib {$ATOOLS_HELP}
+         parameter options {
+            position 1
+            type LITERAL
+            prompt {Options for the SpecFrame}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+         parameter result {
+            position 2
+            type LITERAL
+            prompt {Name of file in which to store the SpecFrame}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+      }
+
+      action astgetrefpos {
+         helplib {$ATOOLS_HELP}
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input SpecFrame}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter frm {
+            position 2
+            type LITERAL
+            prompt {The input SkyFrame}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+      }
+
+      action astsetrefpos {
+         helplib {$ATOOLS_HELP}
+         parameter result {
+            position 5
+            type LITERAL
+            prompt {Name of file in which to store the modified SpecFrame}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input SpecFrame}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter frm {
+            position 2
+            type LITERAL
+            prompt {The input SkyFrame}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+         parameter lon {
+            position 3
+            type LITERAL
+            prompt {The formatted celestial longitude}
+            ppath CURRENT DEFAULT
+            default {0 0 0}
+            helpkey *
+          }
+         parameter lat {
+            position 4
+            type LITERAL
+            prompt {The formatted celestial latitude}
+            ppath CURRENT DEFAULT
+            default {0 0 0}
+            helpkey *
+          }
+      }
+
+
    }
 
    command astshow {
