@@ -12,6 +12,8 @@ libccdpack_gen_la_SOURCES = $(GENSRC:.gen=.f) \
 #  some problems.
 SUFFIXES = .o .c .gen .grd .glrdi .glrdic .gln .dgen .f .h
 
+AM_FCFLAGS = -I../
+
 #  Suffix rules.
 .gen.f:
 	$(FGENERIC) -t n $< 
