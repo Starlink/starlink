@@ -152,6 +152,12 @@
 *
 *	adi_reqpkg	- Load a package from the search path
 *
+*      Data system :
+*
+*       adi_fclose	- Close a file system object
+*       adi_fcreat	- Create a new file system object
+*       adi_fopen	- Open existing file system object
+*
 *      Miscellaneous :
 *
 *	adi_link	- Link an identifier to a name group
@@ -2099,6 +2105,65 @@ F77_SUBROUTINE(adifn(reqpkg))( CHARACTER(pkg), INTEGER(status) TRAIL(pkg) )
 
 
 /* -------------------------------------------------------------------------
+ * Data system routines
+ * -------------------------------------------------------------------------
+ */
+
+F77_SUBROUTINE(adifn(fclose))( INTEGER(id), INTEGER(status) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(status)
+
+  _chk_init; _chk_stat;			/* Check initialised and ok */
+
+  _ERR_IN("ADI_FCLOSE");		/* Mark routine for error reporting */
+
+/* Invoke kernel routine to close file */
+  adix_fclose( (ADIobj) *id, status );
+
+  _ERR_OUT;
+  }
+
+F77_SUBROUTINE(adifn(fcreat))( CHARACTER(fspec), INTEGER(id), INTEGER(status)
+                               TRAIL(fspec) )
+  {
+  GENPTR_CHARACTER(fspec)
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(status)
+
+  _chk_init; _chk_stat;			/* Check initialised and ok */
+
+  _ERR_IN("ADI_FCREAT");		/* Mark routine for error reporting */
+
+/* Invoke kernel routine to create file */
+  adix_fcreat( fspec, fspec_length, (ADIobj) *id, status );
+
+  _ERR_OUT;
+  }
+
+F77_SUBROUTINE(adifn(fopen))( CHARACTER(fspec), CHARACTER(cls),
+                              CHARACTER(mode), INTEGER(id), INTEGER(status)
+                              TRAIL(fspec) TRAIL(cls) TRAIL(mode) )
+  {
+  GENPTR_CHARACTER(fspec)
+  GENPTR_CHARACTER(cls)
+  GENPTR_CHARACTER(mode)
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(status)
+
+  _chk_init; _chk_stat;			/* Check initialised and ok */
+
+  _ERR_IN("ADI_FOPEN");			/* Mark routine for error reporting */
+
+  adix_fopen( fspec, fspec_length,	/* Invoke kernel routine */
+	      cls, cls_length,
+              mode, mode_length,
+              (ADIobj *) id, status );
+
+  _ERR_OUT;
+  }
+
+/* -------------------------------------------------------------------------
  * Miscellaneous
  * -------------------------------------------------------------------------
  */
@@ -2221,28 +2286,6 @@ F77_SUBROUTINE(adifn(locrcb))( INTEGER(rid), CHARACTER(name),
 
   adix_locrcb( *rid, name, name_length,
 	       (ADIobj *) rtn, status );
-
-  _ERR_OUT;
-  }
-
-F77_SUBROUTINE(adifn(fopen))( CHARACTER(fspec), CHARACTER(cls),
-                              CHARACTER(mode), INTEGER(id), INTEGER(status)
-                              TRAIL(fspec) TRAIL(cls) TRAIL(mode) )
-  {
-  GENPTR_CHARACTER(fspec)
-  GENPTR_CHARACTER(cls)
-  GENPTR_CHARACTER(mode)
-  GENPTR_INTEGER(id)
-  GENPTR_INTEGER(status)
-
-  _chk_init; _chk_stat;			/* Check initialised and ok */
-
-  _ERR_IN("ADI_FOPEN");			/* Mark routine for error reporting */
-
-  adix_fopen( fspec, fspec_length,	/* Invoke kernel routine */
-	      cls, cls_length,
-              mode, mode_length,
-              (ADIobj *) id, status );
 
   _ERR_OUT;
   }
