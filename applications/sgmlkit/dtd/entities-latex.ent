@@ -9,24 +9,24 @@
   $Id$
 -->
 
-<!entity copy   SDATA "\copyright{}"	-- copyright sign	-->
-<!entity amp    SDATA "\&"		-- ampersand		-->
-<!entity gt     SDATA ">"		-- greater than		-->
-<!entity lt     SDATA "<"		-- less than		-->
-<![ ignore [
-<!entity quot   SDATA '\dquote{}'	-- double quote		-->
+<!ENTITY copy   SDATA "\copyright{}"	-- copyright sign	-->
+<!ENTITY amp    SDATA "\&"		-- ampersand		-->
+<!ENTITY gt     SDATA ">"		-- greater than		-->
+<!ENTITY lt     SDATA "<"		-- less than		-->
+<![ IGNORE [
+<!ENTITY quot   SDATA '\dquote{}'	-- double quote		-->
 ]]>
-<!entity quot   SDATA '"'		-- double quote		-->
-<!entity nbsp   SDATA "~"		-- non breaking space	-->
-<!entity hash	SDATA "\#"		-- hash sign		-->
-<!entity pounds	SDATA "{\normalfont\pounds{}}" -- pound sign	-->
-<!entity dollar SDATA "\$"		-- dollar sign		-->
-<!entity ellip  SDATA "\dots{}"		-- ellipses		-->
-<!entity emdash SDATA "---"		-- em dash 		-->
-<!entity endash SDATA "--"		-- en dash		-->
-<!entity percent SDATA "\%"		-- percent sign		-->
-<!entity deg    SDATA "\ensuremath{{}^\circ}"	-- degree	-->
-<!entity tilde	CDATA "~"		-- tilde		-->
-<!entity underscore SDATA "\Underscore{}" -- underscore		-->
-<!entity latex  SDATA "\LaTeX{}"	-- might as well...	-->
-<!entity tex	SDATA "\TeX{}"		-- might as well...	-->
+<!ENTITY quot   SDATA '"'		-- double quote		-->
+<!ENTITY nbsp   SDATA "~"		-- non breaking space	-->
+<!ENTITY hash	SDATA "\#"		-- hash sign		-->
+<!ENTITY pounds	SDATA "{\normalfont\pounds{}}" -- pound sign	-->
+<!ENTITY dollar SDATA "\$"		-- dollar sign		-->
+<!ENTITY ellip  SDATA "\dots{}"		-- ellipses		-->
+<!ENTITY emdash SDATA "---"		-- em dash 		-->
+<!ENTITY endash SDATA "--"		-- en dash		-->
+<!ENTITY percent SDATA "\%"		-- percent sign		-->
+<!ENTITY deg    SDATA "\ensuremath{{}^\circ}"	-- degree	-->
+<!ENTITY tilde	CDATA "~"		-- tilde		-->
+<!ENTITY underscore SDATA "\Underscore{}" -- underscore		-->
+<!ENTITY latex  SDATA "\LaTeX{}"	-- might as well...	-->
+<!ENTITY tex	SDATA "\TeX{}"		-- might as well...	-->

@@ -3,21 +3,21 @@
   (when?).
 -->
 
-<!entity copy   CDATA "(c)"	-- copyright sign	-->
-<!entity amp    CDATA "&"	-- ampersand		-->
-<!entity gt     CDATA ">"	-- greater than		-->
-<!entity lt     CDATA "<"	-- less than		-->
-<!entity quot   CDATA '"'	-- double quote		-->
-<!entity nbsp   CDATA " "	-- non breaking space	-->
-<!entity hash	CDATA "#"	-- hash sign		-->
-<!entity pounds	CDATA "GBP"	-- pound sign		-->
-<!entity dollar CDATA "$"	-- dollar sign		-->
-<!entity ellip  CDATA "..."	-- ellipses		-->
-<!entity emdash CDATA "---"	-- em dash 		-->
-<!entity endash CDATA "--"	-- en dash		-->
-<!entity percent CDATA "%"	-- percent sign		-->
-<!entity deg    CDATA "^o"	-- degree		-->
-<!entity tilde	CDATA "~"	-- tilde		-->
-<!entity underscore CDATA "_"	-- underscore		-->
-<!entity latex  CDATA "LaTeX"	-- might as well...	-->
-<!entity tex	CDATA "TeX"	-- might as well...	-->
+<!ENTITY copy   CDATA "(c)"	-- copyright sign	-->
+<!ENTITY amp    CDATA "&"	-- ampersand		-->
+<!ENTITY gt     CDATA ">"	-- greater than		-->
+<!ENTITY lt     CDATA "<"	-- less than		-->
+<!ENTITY quot   CDATA '"'	-- double quote		-->
+<!ENTITY nbsp   CDATA " "	-- non breaking space	-->
+<!ENTITY hash	CDATA "#"	-- hash sign		-->
+<!ENTITY pounds	CDATA "GBP"	-- pound sign		-->
+<!ENTITY dollar CDATA "$"	-- dollar sign		-->
+<!ENTITY ellip  CDATA "..."	-- ellipses		-->
+<!ENTITY emdash CDATA "---"	-- em dash 		-->
+<!ENTITY endash CDATA "--"	-- en dash		-->
+<!ENTITY percent CDATA "%"	-- percent sign		-->
+<!ENTITY deg    CDATA "^o"	-- degree		-->
+<!ENTITY tilde	CDATA "~"	-- tilde		-->
+<!ENTITY underscore CDATA "_"	-- underscore		-->
+<!ENTITY latex  CDATA "LaTeX"	-- might as well...	-->
+<!ENTITY tex	CDATA "TeX"	-- might as well...	-->

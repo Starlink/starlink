@@ -8,36 +8,36 @@
   $Id$
 -->
 
-<!entity amp    CDATA "&"	-- ampersand		-->
-<!entity gt     CDATA ">"	-- greater than		-->
-<!entity lt     CDATA "<"	-- less than		-->
-<!entity quot   CDATA '"'	-- double quote		-->
+<!ENTITY amp    CDATA "&"	-- ampersand		-->
+<!ENTITY gt     CDATA ">"	-- greater than		-->
+<!ENTITY lt     CDATA "<"	-- less than		-->
+<!ENTITY quot   CDATA '"'	-- double quote		-->
 
-<![ include [
-<!entity nbsp   SDATA "&#160;"  -- non breaking space	-->
-<!entity pounds SDATA "&#163;" -- pound sign	-->
-<!entity deg    SDATA "&#176;"	-- degree	-->
-<!entity copy	SDATA "&#169;"	-- copyright -->
+<![ INCLUDE [
+<!ENTITY nbsp   SDATA "&#160;"  -- non breaking space	-->
+<!ENTITY pounds SDATA "&#163;" -- pound sign	-->
+<!ENTITY deg    SDATA "&#176;"	-- degree	-->
+<!ENTITY copy	SDATA "&#169;"	-- copyright -->
 ]]>
-<!entity nbsp   CDATA " " 	-- non breaking space	-->
-<!entity pounds CDATA "UKP" 	-- pound sign		-->
-<!entity deg    CDATA "(deg)"	-- degree		-->
-<!entity copy   CDATA "(c)"	-- copyright sign	-->
+<!ENTITY nbsp   CDATA " " 	-- non breaking space	-->
+<!ENTITY pounds CDATA "UKP" 	-- pound sign		-->
+<!ENTITY deg    CDATA "(deg)"	-- degree		-->
+<!ENTITY copy   CDATA "(c)"	-- copyright sign	-->
 
-<!entity emdash CDATA "--"	-- em dash 		-->
-<!entity endash CDATA "-"	-- en dash		-->
-<!entity hash   CDATA "#"	-- hash sign		-->
-<!entity dollar CDATA "$"	-- dollar sign		-->
-<!entity ellip  CDATA "..."	-- ellipses		-->
-<!entity percent CDATA "%"	-- percent sign		-->
-<!entity tilde	CDATA "~"	-- tilde		-->
-<!entity underscore CDATA "_"	-- underscore		-->
+<!ENTITY emdash CDATA "--"	-- em dash 		-->
+<!ENTITY endash CDATA "-"	-- en dash		-->
+<!ENTITY hash   CDATA "#"	-- hash sign		-->
+<!ENTITY dollar CDATA "$"	-- dollar sign		-->
+<!ENTITY ellip  CDATA "..."	-- ellipses		-->
+<!ENTITY percent CDATA "%"	-- percent sign		-->
+<!ENTITY tilde	CDATA "~"	-- tilde		-->
+<!ENTITY underscore CDATA "_"	-- underscore		-->
 
-<![ include [
-<!entity latex	SDATA "L<sup>a</sup>T<small>E</small>X" >
-<!entity tex	SDATA "T<small>E</small>X" >
-<!-- <!entity tex	SDATA "T<sub><big>E</big></sub>X" > -->
+<![ INCLUDE [
+<!ENTITY latex	SDATA "L<sup>a</sup>T<small>E</small>X" >
+<!ENTITY tex	SDATA "T<small>E</small>X" >
+<!-- <!ENTITY tex	SDATA "T<sub><big>E</big></sub>X" > -->
 ]]>
-<!entity latex	CDATA "LaTeX"	-- might as well...	-->
-<!entity tex    CDATA "TeX"	-- might as well...	-->
+<!ENTITY latex	CDATA "LaTeX"	-- might as well...	-->
+<!ENTITY tex    CDATA "TeX"	-- might as well...	-->
 
