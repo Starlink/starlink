@@ -1,0 +1,14 @@
+BEGIN {out=0}
+/^\!/  {if(out==0)
+          {out=1
+           print ""
+           print "!! ** Error converting", fmt
+           }
+        print
+       }
+END    {if(out==1)
+          {print "!  ** Returning to main application"
+           print
+           exit 1
+          }
+       }
