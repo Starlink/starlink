@@ -3031,14 +3031,14 @@ int PrjType_( const char *ctype ){
 */
 
    PrjData *data;
-   char buffer[21];
+   char buffer[81];
    const char *a;
    char *b;
 
 /* Remove leading and trailing blanks from the supplied string. */
    a = ctype;
    b = buffer;
-   while( *a && (b - buffer) < 20 ){
+   while( *a && (b - buffer) < 80 ){
       if( !isspace( (int) *a ) ) {
          *(b++) = *a;
       }
@@ -3048,7 +3048,7 @@ int PrjType_( const char *ctype ){
 
 /* Search for the projection in the list of available projectons. */
    data = PrjInfo;
-   while( data->prj != AST__WCSBAD && strcmp( data->ctype, ctype ) ) data ++;
+   while( data->prj != AST__WCSBAD && strcmp( data->ctype, buffer ) ) data ++;
 
    return data->prj;
 }
