@@ -698,6 +698,7 @@ itcl::class gaia::GaiaArd {
       set file ""
       if { ! [file readable $tmpimage_] } {
          if { ! [file readable ${tmpimage_}.sdf] } {
+            blt::busy release $w_
             return
          }
          set file ${tmpimage_}.sdf
