@@ -128,6 +128,8 @@
 *        explicitly (as they are expanded on output anyhow)
 *     10 Jan 1996 V2.0-1 (DJA):
 *        Use USI_NAMES to write input file name
+*      6 Mar 1996 V2.0-2 (DJA):
+*        Subset the grouping info
 *     {enter_changes_here}
 
 *  Bugs:
@@ -151,9 +153,9 @@
       INTEGER                   MX__HTEXT
         PARAMETER               ( MX__HTEXT = ADI__MXDIM )
       INTEGER			NOBJ			!
-        PARAMETER		( NOBJ = 5 )
+        PARAMETER		( NOBJ = 6 )
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'BINSUBSET Version V2.0-1' )
+        PARAMETER		( VERSION = 'BINSUBSET Version V2.0-2' )
 
 *  Local Variables:
       CHARACTER*7 		AXID
@@ -207,7 +209,7 @@
 *  Local Data:
       CHARACTER*10		OBJ(NOBJ)
       DATA			OBJ/'Data','Variance','Quality',
-     :                              'LoError','HiError'/
+     :                              'LoError','HiError','Grouping'/
 *.
 
 *  Check inherited global status.
@@ -454,6 +456,8 @@
           IF ( OBJ(I) .EQ. 'Quality' ) THEN
             MTYPE = 'UBYTE'
             CALL BDI_COPY( IFID, 'QualityMask', OFID, ' ', STATUS )
+          ELSE IF ( OBJ(I) .EQ. 'Grouping' ) THEN
+            MTYPE = 'INTEGER'
           ELSE
             MTYPE = 'REAL'
           END IF
@@ -465,6 +469,9 @@
 *      Copy from input to output
           IF ( MTYPE .EQ. 'REAL' ) THEN
             CALL ARR_CCOP1R( NELM, %VAL(IDPTR), %VAL(TPTR), %VAL(ODPTR),
+     :                       STATUS )
+          ELSE IF ( MTYPE .EQ. 'INTEGER' ) THEN
+            CALL ARR_CCOP1I( NELM, %VAL(IDPTR), %VAL(TPTR), %VAL(ODPTR),
      :                       STATUS )
           ELSE
             CALL ARR_CCOP1B( NELM, %VAL(IDPTR), %VAL(TPTR), %VAL(ODPTR),
@@ -538,7 +545,7 @@
       CALL HSI_PTXT( OFID, HU, HTEXT, STATUS )
 
 *  Copy all ancilliary stuff
-      CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
+      CALL UDI_COPANC( IFID, 'grf,grp', OFID, STATUS )
 
 *  Clean up
  99   CALL AST_CLOSE()
