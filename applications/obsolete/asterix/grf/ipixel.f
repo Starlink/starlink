@@ -10,6 +10,7 @@
 *       1 Jul 94: V1.7-1 screen clearing more intelligent (RJV)
 *       1 Sep 94: V1.7-2 QUALITY option added (RJV)
 *       7 Sep 94: V1.7-3 OFF option added (RJV)
+*      15 Dec 94: V1.8-0 REG option added (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -24,11 +25,11 @@
 *    Local constants :
 *    Local variables :
       LOGICAL FRESH
-      LOGICAL QUAL
+      LOGICAL QUAL,REG
       LOGICAL OFF
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IPIXEL Version 1.7-3')
+      PARAMETER (VERSION = 'IPIXEL Version 1.8-0')
 *-
       CALL USI_INIT()
 
@@ -43,12 +44,21 @@
 
         IF (OFF) THEN
           QUAL=.FALSE.
+          REG=.FALSE.
         ELSE
           CALL USI_GET0L('QUAL',QUAL,STATUS)
+          IF (QUAL) THEN
+            REG=.FALSE.
+          ELSE
+            CALL USI_GET0L('REG',REG,STATUS)
+          ENDIF
         ENDIF
 
         IF (QUAL.AND..NOT.I_QOK) THEN
           CALL MSG_PRNT('AST_ERR: no QUALITY available for plotting')
+
+        ELSEIF (REG.AND.I_REG_TYPE.EQ.'NONE') THEN
+          CALL MSG_PRNT('AST_ERR: no region currently defined')
 
         ELSE
 
@@ -70,6 +80,8 @@
             CALL IMG_WINDOW(STATUS)
             IF (QUAL) THEN
               CALL IMG_QPIXEL(STATUS)
+            ELSEIF (REG) THEN
+              CALL IMG_RPIXEL(STATUS)
             ELSE
               CALL IMG_PIXEL(STATUS)
             ENDIF
