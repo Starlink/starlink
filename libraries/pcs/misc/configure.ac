@@ -27,6 +27,12 @@ dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [cnf])
 dnl    No use dependencies
 
+dnl    Function check
+AC_CHECK_FUNCS([atexit on_exit])
+
+# Check for curses.h
+AC_CHECK_HEADERS([curses.h cursesX.h])
+
 dnl    Or ncurses term.h in /usr/include.
 AC_CHECK_HEADERS([term.h ncurses/term.h])
 

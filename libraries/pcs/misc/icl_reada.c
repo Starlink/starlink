@@ -38,10 +38,17 @@
  */
 /* System includes */
 
-#if defined(ultrix)
-#include <cursesX.h>
+/* Autoconf output */
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
+#if HAVE_CURSES_H
+# include <curses.h>
+#elif HAVE_CURSESX_H
+# include <cursesX.h>
 #else
-#include <curses.h>
+# error "Unable to locate curses installation"
 #endif
 
 #include <stdlib.h>
@@ -1661,10 +1668,12 @@ F77_SUBROUTINE(icl_reada)( CHARACTER(fpr1), INTEGER(len1),
        blankline[inpl_cpos] = '\0';
        
 /* Set exit handler to restore terminal state */
-#ifndef USE_ON_EXIT
-       atexit(exit_handler);			/* ANSI C/POSIX */
+#if HAVE_ATEXIT
+	atexit(exit_handler);		       /* ANSI C/POSIX */
+#elif HAVE_ON_EXIT
+	on_exit(exit_handler, 0);		/* SunOS	*/
 #else
-       on_exit(exit_handler, 0);		/* SunOS	*/
+# error "Do not know how to register an exit handler"
 #endif
     }
     initscreen(-1);
