@@ -59,3 +59,17 @@ dist_pkgdata_DATA = atools.news
 
 ##  Things for distribution that are not picked up otherwise.
 EXTRA_DIST = $(HELP_SOURCES)
+
+##  Simple check.
+TESTS = asttest.sh
+
+check_SCRIPTS = asttest.sh
+
+check_MONOLITHS = asttest
+asttest_SOURCES = asttest.f \
+	$(FSRC) \
+	$(CSRC) \
+	$(PRIVATE_INCLUDES)
+
+asttest_TASKS =
+asttest_LDADD = $(LDADD) `atools_link_adam`

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!@PERL@
 #
 #  Creates a new version of the file history.help containing an entry for 
 #  the ATOOLS on-line help file describing changes in each new version of 

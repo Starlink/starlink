@@ -1,0 +1,22 @@
+ Begin SkyFrame 	# Description of celestial coordinate system
+#   Title = "FK5 equatorial coordinates; mean equinox J2000.0" 	# Title of coordinate system
+    Naxes = 2 	# Number of coordinate axes
+#   Domain = "SKY" 	# Coordinate system domain
+#   Epoch = 2000 	# Julian epoch of observation
+#   Lbl1 = "Right ascension" 	# Label for axis 1
+#   Lbl2 = "Declination" 	# Label for axis 2
+    System = "FK5" 	# Coordinate system type
+#   Uni1 = "hh:mm:ss.s" 	# Units for axis 1
+#   Uni2 = "ddd:mm:ss" 	# Units for axis 2
+#   Dir1 = 0 	# Plot axis 1 in reverse direction
+#   Bot2 = -1.5707963267949 	# Lowest legal axis value
+#   Top2 = 1.5707963267949 	# Highest legal axis value
+    Ax1 = 	# Axis number 1
+       Begin SkyAxis 	# Celestial coordinate axis
+       End SkyAxis
+    Ax2 = 	# Axis number 2
+       Begin SkyAxis 	# Celestial coordinate axis
+       End SkyAxis
+ IsA Frame 	# Coordinate system description
+#   Eqnox = 2000 	# Julian epoch of mean equinox
+ End SkyFrame
