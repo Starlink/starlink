@@ -226,7 +226,7 @@ c	From INTEGER to improve exposure time evaluation
       END IF
 
 *    Open good times file
-      CALL PAR_GET0C( 'TIMRANGE', TIMEFILE, STATUS )
+      CALL USI_GET0C( 'TIMRANGE', TIMEFILE, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
 
 *      No good time slots
@@ -269,7 +269,7 @@ c	From INTEGER to improve exposure time evaluation
       END IF
 
 *    Select map
-      CALL PAR_GET0I( 'IFILE', IFILE, STATUS )
+      CALL USI_GET0I( 'IFILE', IFILE, STATUS )
 
 *    Get directory containing detector map files
       CALL PSX_GETENV( 'XRTEXPMAP_DIR', DETDIR, STATUS )

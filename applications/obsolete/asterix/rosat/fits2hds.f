@@ -124,7 +124,7 @@
       S_EXTNAME = ' '
 
 ***   Get Input FITS fIle name
-      CALL PAR_GET0C('INPUT',FNAME, STATUS)
+      CALL USI_GET0C('INPUT',FNAME, STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 999
 
 ***   Open the FITS fIle
@@ -137,18 +137,18 @@
       ENDIF
 
 ***   is header info required
-      CALL PAR_GET0L('ASTERIX',ASTERIX,STATUS)
+      CALL USI_GET0L('ASTERIX',ASTERIX,STATUS)
 
 ***   Read Image header InformatIon for image data
       CALL FTGKYJ(IUNIT,'NAXIS',NAXIS,CDUM,ISTATUS)
       IF (ASTERIX.AND.NAXIS.NE.0) THEN
-         CALL PAR_GET0C('ORIGIN',ORIGIN,STATUS)
+         CALL USI_GET0C('ORIGIN',ORIGIN,STATUS)
          CALL CHR_UCASE(ORIGIN)
 *
 *        Auto detect data origins
          IF (ORIGIN.EQ.'AUTO') THEN
             CALL RAT_FITSSTYLE(IUNIT,ORIGIN,STATUS)
-            CALL PAR_PUT0C('ORIGIN',ORIGIN,STATUS)
+            CALL USI_PUT0C('ORIGIN',ORIGIN,STATUS)
          ENDIF
 *
 *        is header information of a known type
@@ -175,11 +175,11 @@
       CALL FTMAHD(IUNIT,1,HTYPE,ISTATUS)
 
 ***   Get the generIc output fIlename
-      CALL PAR_GET0C('OUTPUT',HNAME,STATUS)
+      CALL USI_GET0C('OUTPUT',HNAME,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 999
 
 ***   Get action required for joining similar tables
-      CALL PAR_GET0L('JOIN',JOIN,STATUS)
+      CALL USI_GET0L('JOIN',JOIN,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 999
 
 ***   Loop for each header

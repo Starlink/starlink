@@ -179,7 +179,7 @@
       ENDIF
 *
 *   Get the minimum interval allowed for a good time window
-      CALL PAR_GET0R('INTERVAL', INTERVAL, STATUS)
+      CALL USI_GET0R('INTERVAL', INTERVAL, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -230,7 +230,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
       CALL RAT_HDLOOKUP(HEAD,'EVRATE','MVRATE',COL,STATUS)
       IF (COL.EQ.' ')
      &    CALL RAT_HDLOOKUP(HEAD,'ASPECT','ASPERR',COL,STATUS)
-      CALL PAR_DEF0C('HKPAR1',COL,STATUS)
+      CALL USI_DEF0C('HKPAR1',COL,STATUS)
 *   Loop over parameter selection
       DO PLP = 1,10
 *
@@ -243,7 +243,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
             PARAM = 'HKPAR' // CPLP
 *
 *         Get house keeping parameter name
-            CALL PAR_GET0C(PARAM(1:5+NCHAR), HKNAME, STATUS)
+            CALL USI_GET0C(PARAM(1:5+NCHAR), HKNAME, STATUS)
 *
 *         Check if PAR_NULL has been entered indicating a break out of the loop
             IF (STATUS .EQ. PAR__NULL) THEN
@@ -253,7 +253,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
                GOTO 999
             ENDIF
 *
-            CALL PAR_CANCL(PARAM(1:5+NCHAR), STATUS)
+            CALL USI_CANCL(PARAM(1:5+NCHAR), STATUS)
 *
 *         Attempt to find SASS selection criteria for this parameter if the
 *         QUALITY_limits file has been opened. The quality file seems to be
@@ -338,14 +338,14 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *
 *      Set up parameter defaults
          PARMIN = 'PMIN' // CPLP
-         CALL PAR_DEF0R(PARMIN(1:4+NCHAR), RMIN, STATUS)
+         CALL USI_DEF0R(PARMIN(1:4+NCHAR), RMIN, STATUS)
 *
          PARMAX = 'PMAX' // CPLP
-         CALL PAR_DEF0R(PARMAX(1:4+NCHAR), RMAX, STATUS)
+         CALL USI_DEF0R(PARMAX(1:4+NCHAR), RMAX, STATUS)
 *
 *      Ask for minimum and maximum values
-         CALL PAR_GET0R(PARMIN(1:4+NCHAR), HKMIN, STATUS)
-         CALL PAR_GET0R(PARMAX(1:4+NCHAR), HKMAX, STATUS)
+         CALL USI_GET0R(PARMIN(1:4+NCHAR), HKMIN, STATUS)
+         CALL USI_GET0R(PARMAX(1:4+NCHAR), HKMAX, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -384,7 +384,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
      &                               EXPO_TIM, NGOOD, TGOOD)
 *
 * Get a filename from the parameter system
-      CALL PAR_GET0C('FNAME', FNAME, STATUS)
+      CALL USI_GET0C('FNAME', FNAME, STATUS)
 *
 * Get logical unit for the output times file
       CALL FIO_GUNIT(MUNIT, STATUS)

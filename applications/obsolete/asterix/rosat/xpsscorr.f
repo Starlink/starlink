@@ -271,11 +271,11 @@
       ELSE
 
 *    Ask if a correction for the wires is required
-         CALL PAR_GET0L('WIRES', LWIRE, STATUS)
+         CALL USI_GET0L('WIRES', LWIRE, STATUS)
 *
 *    Get operation mode from the user. 'C' to calculate the exposure
 *    from the vignetting and 'E' to use the exposure map
-         CALL PAR_GET0C('MODE', MODE, STATUS)
+         CALL USI_GET0C('MODE', MODE, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -285,7 +285,7 @@
          IF (MODE .EQ. 'C') THEN
 *
 *      Ask user which energy was used in PSS
-            CALL PAR_GET0R( 'ENERGY', MEAN_EN, STATUS )
+            CALL USI_GET0R( 'ENERGY', MEAN_EN, STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *      Locate HEADER object to get exposure time
@@ -304,10 +304,10 @@
               CALL ERR_ANNUL( STATUS )
             ENDIF
             RFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'drmpspc'
-            CALL PAR_DEF0C('RESPFILE', RFILE, STATUS)
+            CALL USI_DEF0C('RESPFILE', RFILE, STATUS)
 
 *     Get detector response matrix name
-            CALL PAR_GET0C('RESPFILE', RFILE, STATUS)
+            CALL USI_GET0C('RESPFILE', RFILE, STATUS)
 *
             IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -363,14 +363,14 @@
 *
             IF (INDEX(DET, 'PSPCB') .NE. 0) THEN
                EFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'pspcb_eff'
-               CALL PAR_DEF0C('EFFILE', EFILE, STATUS)
+               CALL USI_DEF0C('EFFILE', EFILE, STATUS)
             ELSEIF (INDEX(DET, 'PSPCC') .NE. 0) THEN
                EFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'pspcc_eff'
-               CALL PAR_DEF0C('EFFILE', EFILE, STATUS)
+               CALL USI_DEF0C('EFFILE', EFILE, STATUS)
             ENDIF
 *
 *     Get effective area filename from the user
-            CALL PAR_GET0C('EFFILE', EFILE, STATUS)
+            CALL USI_GET0C('EFFILE', EFILE, STATUS)
 *
 *     Open effective areas file
             CALL HDS_OPEN(EFILE, 'READ', ELOC, STATUS)
@@ -393,7 +393,7 @@
          ELSEIF (MODE .EQ. 'E') THEN
 *
 *      Get exposure map filename from the user
-            CALL PAR_GET0C('EXPMAP', EXPFIL, STATUS)
+            CALL USI_GET0C('EXPMAP', EXPFIL, STATUS)
 *
 *     Open effective areas file
             CALL HDS_OPEN(EXPFIL, 'READ', EXLOC, STATUS)

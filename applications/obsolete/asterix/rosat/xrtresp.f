@@ -94,10 +94,10 @@
       ENDIF
 *
       RFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'drmpspc'
-      CALL PAR_DEF0C('RESPFILE', RFILE, STATUS)
+      CALL USI_DEF0C('RESPFILE', RFILE, STATUS)
 *
 *   Get detector response matrix name
-      CALL PAR_GET0C('RESPFILE', RFILE, STATUS)
+      CALL USI_GET0C('RESPFILE', RFILE, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -147,7 +147,7 @@
          CALL MSG_PRNT(' Warning: the output file will be ^SIZ blocks')
 *
 *    Ask if user wants to continue
-         CALL PAR_GET0L('CONTINUE', LCONT, STATUS)
+         CALL USI_GET0L('CONTINUE', LCONT, STATUS)
 *
          IF (STATUS .NE. SAI__OK .OR. .NOT. LCONT) GOTO 999
 *
@@ -712,7 +712,7 @@
       IF (THERE) THEN
 *
          CALL MSG_PRNT( 'Energy response structure already exists' )
-         CALL PAR_GET0L('ERASE',ERASE,STATUS)
+         CALL USI_GET0L('ERASE',ERASE,STATUS)
 *
 *   Delete it?
          IF (ERASE) THEN

@@ -47,7 +47,7 @@
       CALL MSG_PRNT(VERSION)
 *
 *     Get input fits hotspot filename
-      CALL PAR_GET0C('INPUT',FNAME,STATUS)
+      CALL USI_GET0C('INPUT',FNAME,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 999
 *
 *     Open fits file
@@ -72,7 +72,7 @@
       ENDIF
 *
 *     get the header file/rootname
-      CALL PAR_GET0C('ROOTNAME',RTNAME,STATUS)
+      CALL USI_GET0C('ROOTNAME',RTNAME,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 999
 *
 *     read the header infotmation

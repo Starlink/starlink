@@ -38,7 +38,7 @@
 *
 * Code :
 * Get off-axis angle
-        CALL PAR_GET0R('OFFAX', THETA, STATUS)
+        CALL USI_GET0R('OFFAX', THETA, STATUS)
 *
         IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -48,7 +48,7 @@
         IF (STATUS .NE. SAI__OK) GOTO 999
 *
 * Display the result ?
-        CALL PAR_GET0L('DISP', LDISP, STATUS)
+        CALL USI_GET0L('DISP', LDISP, STATUS)
 *
         IF (LDISP) THEN
            CALL MSG_SETR('RAD', PSF)
@@ -57,7 +57,7 @@
         ENDIF
 *
 * Write result to output parameter
-        CALL PAR_PUT0R('PSFRAD', PSF, STATUS)
+        CALL USI_PUT0R('PSFRAD', PSF, STATUS)
 *
 999     CONTINUE
 *

@@ -19,7 +19,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER              DIMS(DAT__MXDIM)
       BYTE                 IN(*)
@@ -61,7 +60,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER              DIMS(DAT__MXDIM)
       INTEGER              L1,L2,L3,L4,L5,L6,L7
@@ -124,7 +122,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER              DIMS(DAT__MXDIM)
       REAL                 IN(*)
@@ -165,7 +162,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER              DIMS(DAT__MXDIM)
       INTEGER              L1,L2,L3,L4,L5,L6,L7
@@ -323,7 +319,6 @@
       INTEGER STATUS
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'AST_SYS_PAR'
 *    Global variables :
 *    Structure definitions :
@@ -432,7 +427,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Structure definitions :
 *    Import :
@@ -711,7 +705,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
 *     <global variables held in named COMMON>
 *    Import :
@@ -968,7 +961,6 @@ C         ENDIF
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
@@ -1182,11 +1174,6 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
-*    Global variables :
-*     <global variables held in named COMMON>
-*     <specification of FORTRAN structures>
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
 *    Import :
@@ -1292,8 +1279,6 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Global variables :
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
 *    Import :
@@ -1535,9 +1520,6 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Global variables :
-*     <global variables held in named COMMON>
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
 *    Status :
@@ -1839,11 +1821,6 @@ D          WRITE(1,*)HEAD.OFFAX
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
-*    Global variables :
-*     <global variables held in named COMMON>
-*    Structure definitions :
 *     <specification of FORTRAN structures>
 *    Local constants :
       INTEGER MAXANG                   !Max. no. of off-axis angles
@@ -2271,11 +2248,11 @@ D          WRITE(1,*)HEAD.OFFAX
             CALL MSG_PRNT('Error opening header file ^HFILE')
 *
 *      Ask user for another .HDR file
-            CALL PAR_CANCL('HDRFIL', STATUS)
+            CALL USI_CANCL('HDRFIL', STATUS)
 *
-            CALL PAR_DEF0C('HDRFIL', HFILE, STATUS)
+            CALL USI_DEF0C('HDRFIL', HFILE, STATUS)
 *
-            CALL PAR_GET0C('HDRFIL', HFILE, STATUS)
+            CALL USI_GET0C('HDRFIL', HFILE, STATUS)
 *
             IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -2805,7 +2782,6 @@ C fill in target if blank
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *     <any INCLUDE files containing global constant definitions>
 *    Global variables :
 *     <global variables held in named COMMON>
@@ -2883,9 +2859,6 @@ C fill in target if blank
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
-*    Global variables :
 *    Structure definitions :
 *     <specification of FORTRAN structures>
 *    Import :
@@ -3194,9 +3167,6 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Global variables :
-*     <global variables held in named COMMON>
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
 *    Status :

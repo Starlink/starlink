@@ -86,10 +86,10 @@
       CALL MSG_PRNT(VERSION)
 *
 *     Enquire whether a new ARD file is to be created
-      CALL PAR_GET0L('NEW', LNEW, STATUS)
+      CALL USI_GET0L('NEW', LNEW, STATUS)
 *
 *     Get name of ARD file
-      CALL PAR_GET0C('ARDFILE', SFILE, STATUS)
+      CALL USI_GET0C('ARDFILE', SFILE, STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *
@@ -112,7 +112,7 @@
       IF (LNEW) WRITE(SUNIT,*)' UNITS = DEGREES '
 *
 *     see if user wants to define the pixels interactively
-      CALL PAR_GET0C('MODE', MODE, STATUS)
+      CALL USI_GET0C('MODE', MODE, STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *     Convert the mode to uppercase
@@ -120,14 +120,14 @@
 *
 *     Ask if user wants the area outside the circular field
 *     of view setting bad
-      CALL PAR_GET0L('OUTSIDE', LOUT, STATUS)
+      CALL USI_GET0L('OUTSIDE', LOUT, STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *     Find if plotting required in Calculate mode, should be yes by default
       IF (MODE .EQ. 'C') THEN
 *        plot is image processing system active
-         CALL PAR_DEF0L('DOPLOT', I_OPEN, STATUS)
-         CALL PAR_GET0L('DOPLOT', LPLOT, STATUS)
+         CALL USI_DEF0L('DOPLOT', I_OPEN, STATUS)
+         CALL USI_GET0L('DOPLOT', LPLOT, STATUS)
       ELSE
          LPLOT = .TRUE.
       ENDIF
@@ -137,7 +137,7 @@
       IF (LOUT) THEN
 *
 *        Get the radius of the circle from the parameter system
-         CALL PAR_GET0R('TRAD', TRAD, STATUS)
+         CALL USI_GET0R('TRAD', TRAD, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -157,7 +157,7 @@
       IF (MODE .EQ. 'C') THEN
 *
 *        find the name for the attitude file
-         CALL PAR_GET0C('ROOTNAME', ROOTNAME, STATUS)
+         CALL USI_GET0C('ROOTNAME', ROOTNAME, STATUS)
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *        Open the header file to get the origins of the data
@@ -168,8 +168,8 @@
          ATTFIL = ROOTNAME(1:CHR_LEN(ROOTNAME))//EXT
 *
 *        set the default filename
-         CALL PAR_DEF0C('ATTFIL', ATTFIL, STATUS)
-         CALL PAR_GET0C('ATTFIL', ATTFIL, STATUS)
+         CALL USI_DEF0C('ATTFIL', ATTFIL, STATUS)
+         CALL USI_GET0C('ATTFIL', ATTFIL, STATUS)
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *
@@ -253,7 +253,7 @@
       ENDIF
 *
 *  Allow the user to add a constant onto the width value
-      CALL PAR_GET0R('EXTRA_WIDTH', EXTRA, STATUS)
+      CALL USI_GET0R('EXTRA_WIDTH', EXTRA, STATUS)
 *
 *  calculate inner and outer radius of central ring
 *  Set circle width - assuming image is in degrees.
@@ -379,8 +379,8 @@
       CALL CHR_DTOC(START, C1, K1)
       CALL CHR_DTOC(STOP, C2, K2)
       TIMSTRING = C1(1:K1) // ':' // C2(1:K2)
-      CALL PAR_DEF0C('TIMRANGE', TIMSTRING, STATUS)
-      CALL PAR_GET0C('TIMRANGE',TIMSTRING,STATUS)
+      CALL USI_DEF0C('TIMRANGE', TIMSTRING, STATUS)
+      CALL USI_GET0C('TIMRANGE',TIMSTRING,STATUS)
 *
 *     Decode the timestring into a sequence of start and stop times
       CALL UTIL_TDECODE(TIMSTRING, HEAD.BASE_MJD, MXTIME,

@@ -71,10 +71,10 @@
       ENDIF
 
 *   Produce an observation summary ?
-      CALL PAR_GET0L('SHOWOBS', LSHOW, STATUS)
+      CALL USI_GET0L('SHOWOBS', LSHOW, STATUS)
 
 *   Produce a list of ON/OFF times ?
-      CALL PAR_GET0L('TIMLIST', LTIME, STATUS)
+      CALL USI_GET0L('TIMLIST', LTIME, STATUS)
 
 *   Write observation description
       CALL SHOWXRT_OUT(LSHOW, LTIME, HEAD, STATUS)
