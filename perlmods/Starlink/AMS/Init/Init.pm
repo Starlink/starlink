@@ -31,11 +31,14 @@ The following methods are available:
 
 =cut
 
-use vars qw/$VERSION $AMSRUNNING $debug $NOBJECTS/;
+use strict;
+use Carp;
 
-$VERSION = undef;
+use vars qw/$VERSION $AMSRUNNING $debug $NOBJECTS $AMS_OBJECT/;
+
 $VERSION = '0.01';
 $debug = 0;
+$AMS_OBJECT = undef;
 
 use IO::Pipe;         # Open pipe to RELAY
 use Starlink::ADAM;   # We do some communication
@@ -61,20 +64,7 @@ use Starlink::ADAM;   # We do some communication
 
 use Starlink::AMS::Core; 
 
-# Initialise the AMSRUNNING flag
-# This variable can be used to make sure that we don't try to start
-# up more than one ADAM environment.
 
-$AMSRUNNING = 0;
-
-# Keep track of the number of objects that are created.
-# We only want to shut down the message system when this
-# count hits 0
-
-$NOBJECTS = 0;
-
-use strict;
-use Carp;
 
 =item new
 
@@ -91,19 +81,12 @@ sub new {
   my $proto = shift;
   my $class = ref($proto) || $proto;
 
-  my $task = {};  # Anon hash
+  # Check whether we currently have an AMS object
+  return $AMS_OBJECT if defined $AMS_OBJECT;
 
-  $task->{Running} = undef;       # Just a flag to see if we are runnning
-  $task->{Relay}   = undef;       # File handle to the Relay
-  $task->{Relay_Name} = undef;    # The name of the relay
-  $task->{Relay_Path} = undef;    # The path to the relay
-  $task->{Relay_Messid} = undef;  # The message id of the relay
-  $task->{Messages} = 1;          # Print all messages
-  $task->{Errors} = 1;            # Print all errors
-  $task->{ParamRepSub} = undef;   # Code reference for all
-  $task->{Timeout} = 30;          # Timeour time
-  $task->{StdOut} = *STDOUT;     # Default filehandle for messages
-  $task->{StdErr} = *STDERR;     # Default filehandle for Errors
+  # Could be done with a scalar object
+  my $task = {};  # Anon hash
+  $task->{Running} = 0;
 
   # Bless this ams into class
   bless($task, $class);
@@ -114,14 +97,17 @@ sub new {
     my $value = shift;
     if ($value) {
       my $status = $task->init;
-      my $errhand = $task->stderr;
-      print $errhand "Error initialising messaging system\n"
-	unless $status == &Starlink::ADAM::SAI__OK;
+
+      unless ($status == &Starlink::ADAM::SAI__OK) {
+	my $errhand = $task->stderr;
+	print $errhand "Error initialising messaging system\n";
+	return undef;
+      }
     }
   }
 
-  # Increment object count
-  $NOBJECTS++;
+  # Set the object name
+  $AMS_OBJECT = $task;
 
   # Return to caller
   return $task;
@@ -130,40 +116,40 @@ sub new {
 
 # Methods to access instance data
 
-# Set the running flag
 sub running {
   my $self = shift;
-  if (@_) { $self->{Running} = shift; }
+  if (@_) { $self->{Running} = shift; };
   return $self->{Running};
 }
+
 
 # Get/Set the relay file handle
 
 sub relay {
   my $self = shift;
-  if (@_) { $self->{Relay} = shift; }
-  return $self->{Relay};
+  if (@_) { $Starlink::AMS::Core::RELAY = shift; }
+  return $Starlink::AMS::Core::RELAY;
 }
 
 # The relay name
 sub relay_name {
   my $self = shift;
-  if (@_) { $self->{Relay_Name} = shift; }
-  return $self->{Relay_Name};
+  if (@_) { $Starlink::AMS::Core::RELAY_NAME = shift; }
+  return $Starlink::AMS::Core::RELAY_NAME;
 }
 
 # Path to relay
 sub relay_path {
   my $self = shift;
-  if (@_) { $self->{Relay_Path} = shift; }
-  return $self->{Relay_Path};
+  if (@_) { $Starlink::AMS::Core::RELAY_PATH = shift; }
+  return $Starlink::AMS::Core::RELAY_PATH;
 }
 
 # Messid of relay
 sub relay_messid {
   my $self = shift;
-  if (@_) { $self->{Relay_Messid} = shift; }
-  return $self->{Relay_Messid};
+  if (@_) { $Starlink::AMS::Core::RELAY_MESSID = shift; }
+  return $Starlink::AMS::Core::RELAY_MESSID;
 }
 
 # Messages on or off
@@ -185,18 +171,18 @@ Default is to print all messages.
 sub messages {
   my $self = shift;
   if (@_) { 
-    $self->{Messages} = shift; 
+    my $arg = shift;
     # also need to set the flag in the Core module
     # This is the inverse to Messages since
     # true means I want messages.
-    if ($self->{Messages}) {
+    if ($arg) {
       $Starlink::AMS::Core::msg_hide = 0;
     } else {
       $Starlink::AMS::Core::msg_hide = 1;
     }
 
   }
-  return $self->{Messages};
+  return $Starlink::AMS::Core::msg_hide;
 }
 
 =item errors
@@ -218,18 +204,18 @@ Default is to print all messages.
 sub errors {
   my $self = shift;
   if (@_) { 
-    $self->{Errors} = shift; 
+    my $arg = shift;
     # also need to set the flag in the Core module
     # This is the inverse to Messages since
     # true means I want messages.
-    if ($self->{Errors}) {
+    if ($arg) {
       $Starlink::AMS::Core::err_hide = 0;
     } else {
       $Starlink::AMS::Core::err_hide = 1;
     }
 
   }
-  return $self->{Messages};
+  return $Starlink::AMS::Core::err_hide;
 }
 
 # Set the timeout
@@ -248,11 +234,10 @@ Default is 30 seconds.
 sub timeout {
   my $self = shift;
   if (@_) { 
-    $self->{Timeout} = shift; 
     # also need to set the flag in the Core module
-    $Starlink::AMS::Core::TIMEOUT = $self->{Timeout};
+    $Starlink::AMS::Core::TIMEOUT = shift();
   }
-  return $self->{Timeout};
+  return $Starlink::AMS::Core::TIMEOUT;
 }
 
 # Set the filehandle for error messages. Default is STDERR
@@ -268,12 +253,11 @@ sub stderr {
   my $self = shift;
 
   if (@_) {
-    $self->{StdErr} = shift; 
     # also need to set the flag in the Core module
-    *Starlink::AMS::Core::ERRHAND = $self->{StdErr};
+    *Starlink::AMS::Core::ERRHAND = shift;
   }
 
-  return $self->{StdErr};
+  return *Starlink::AMS::Core::ERRHAND;
 
 }
 
@@ -291,12 +275,11 @@ sub stdout {
   my $self = shift;
 
   if (@_) {
-    $self->{StdOut} = shift; 
     # also need to set the flag in the Core module
-    $Starlink::AMS::Core::MSGHAND = $self->{StdOut};
+    $Starlink::AMS::Core::MSGHAND = shift;
   }
 
-  return $self->{StdOut};
+  return *Starlink::AMS::Core::MSGHAND;
 }
 
 # Parameter reqquests
@@ -331,12 +314,10 @@ sub paramrep {
     croak "Supplied argument is not a code reference (is $ref)" 
       unless $ref eq "CODE";
 
-    $self->{ParamRep} = $coderef; 
-    # also need to set the value in the Core module
-    $Starlink::AMS::Core::PARAMREP_SUB = $self->{ParamRep};
+    $Starlink::AMS::Core::PARAMREP_SUB = $coderef;
   }
 
-  return $self->{ParamRep};
+  return $Starlink::AMS::Core::PARAMREP_SUB;
 
 
 }
@@ -366,24 +347,14 @@ sub init {
   my $self = shift;
   my $status = &Starlink::ADAM::SAI__ERROR;
 
-  print "AMSRUNNING is $AMSRUNNING\n" if $debug;
-
   # Start up ADAM as long as one is not already active
   # Should be able to check by trying to contact the relay
   # for now just keep a state variable
-  if (! $AMSRUNNING) {
+  unless ($Starlink::AMS::Core::adam_started) {
+    print "Running init adam\n" if $debug;
 
-    $status = $self->__adamtask_init;
-
-    # Set up default options
-    # Messages on
-    $self->messages(1);
-
-    # Errors on
-    $self->errors(1);
-
-    # 30 second timeout
-    $self->timeout(30);
+    # Run the init routine
+    $status = &Starlink::AMS::Core::adamtask_init;
     
     # If Status is good; set up the running flags
     if ($status == &Starlink::ADAM::SAI__OK) {
@@ -391,17 +362,42 @@ sub init {
       # Set up the running flag
       $self->running(1);
 
-      # Set the AMSRUNNING flag
-      $AMSRUNNING = 1;
-      print "AMSRUNNING set to true\n" if $debug;
+      # Set up default options
+      # Messages on
+      $self->messages(1);
+      
+      # Errors on
+      $self->errors(1);
+      
+      # 30 second timeout
+      $self->timeout(30);
+
     }
-
-  } else {
-    carp "AMS already running. Can not start more than one instance";
-  }
-  return $status;
-
+    return $status;
+  } 
+  return &Starlink::ADAM::SAI__OK;
 }
+
+=item shutdown
+
+This method forces the Adam messaging system to be shutdown.
+(It runs the adamtask_exit routine in Starlink::AMS::Core).
+
+Returns the status.
+
+=cut
+
+sub shutdown {
+  my $self = shift;
+  
+  my $status = &Starlink::AMS::Core::adamtask_exit;
+
+  # Reset adam_started
+  $self->running(0);
+
+  return $status;
+}
+
 
 =item DESTROY
 
@@ -416,22 +412,22 @@ required).
 
 
 # This is the crucial bit that shuts ams down at the end of the program
-sub DESTROY {   
-  my $self = shift;
+#sub DESTROY {   
+#  my $self = shift;
 
-  $NOBJECTS--;
+#  $NOBJECTS--;
 
   # No point killing messaging if it was never initialised
   # Also only kill if $NOBJECTS hits zero
 
-  if ($NOBJECTS < 1) {
-    my $status = $self->__adamtask_exit if $self->running;
-    carp "Error shutting down AMS: Status = $status\n"
-      unless $status == &Starlink::ADAM::SAI__OK;
-  }
+#  if ($NOBJECTS < 1) {
+#    my $status = $self->__adamtask_exit if $self->running;
+#    carp "Error shutting down AMS: Status = $status\n"
+#      unless $status == &Starlink::ADAM::SAI__OK;
+#  }
 
-  print "Returning from adamtask_exit\n" if $debug;
-}
+#  print "Returning from adamtask_exit\n" if $debug;
+#}
 
 
 ########### HIDDEN FUNCTIONS #############
@@ -547,9 +543,6 @@ sub __adamtask_exit {
 
   # Reset adam_started
   $self->running(0);
-
-  print "Resetting AMSRUNNING\n" if $debug;
-  $AMSRUNNING = 0;
 
   return $status;
 
