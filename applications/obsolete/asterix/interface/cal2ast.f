@@ -24,7 +24,7 @@
 
 *  Local constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'CAL2AST Version 2.3-0' )
+        PARAMETER		( VERSION = 'CAL2AST Version 2.2-0' )
 
 *  Status:
       INTEGER			STATUS
