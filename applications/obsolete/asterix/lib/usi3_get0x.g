@@ -145,14 +145,19 @@
           STATUS = PAR__NULL
 
         ELSE
-          CALL CHR_CT0<T>( CVAL, VALUE, STATUS )
+          CALL CHR_CTO<T>( CVAL, VALUE, CSTAT )
+          IF ( (CT.NE.'C') .AND. (CSTAT.NE.0) ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'Conversion error from '/
+     :                  /'character to <COMM>', STATUS )
+          END IF
+
         END IF
 
 *    Duff status? Try again unless too many times already
         IF ( (STATUS.NE.SAI__OK) .AND. (STATUS.NE.PAR__NULL) .AND.
      :       (STATUS.NE.PAR__ABORT) .AND. (NTRY .LT. MAXTRY) ) THEN
           CALL ERR_FLUSH( STATUS )
-          CLEN = 0
         ELSE
           OK = .TRUE.
         END IF
