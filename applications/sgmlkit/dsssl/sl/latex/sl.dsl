@@ -9,6 +9,7 @@
 <!entity slparams.dsl		system "slparams.dsl" subdoc>
 <!entity sllinks.dsl		system "sllinks.dsl" subdoc>
 <!entity sltables.dsl		system "sltables.dsl" subdoc>
+<!entity slback.dsl		system "slback.dsl" subdoc>
 ]>
 
 <![ ignore [ $Id$ ]]>
@@ -53,8 +54,12 @@ Code which parameterises the code in this stylesheet
 <description>
 This provides simple (ie, incomplete) support for the table model.
 
+<codereference doc="slback.dsl" id=code.back>
+<title>Back-matter
+<description>Handles notes, bibliography and indexing
+
 <codegroup
-  use="code.lib code.common code.params code.links code.tables"
+  use="code.lib code.common code.params code.links code.tables code.back"
   id=latex>
 <title>Conversion to LaTeX
 
