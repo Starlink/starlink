@@ -149,7 +149,6 @@
           CALL MSG_PRNT( '!  Object is not primitive' )
         ENDIF
 
-        CALL DAT_ANNUL(OBJLOC,STATUS)
       ENDIF
 
 *    Close ASTERIX
