@@ -14,3 +14,16 @@ DEV-nxg-20040830-ast-timeframe
 Branch created on 2004 August 30, to support Norman's TimeFrame work.
 Should probably have the trunk merged to it at some point, before much
 more work is done on TimeFrame.
+
+DEV-dsb-20041123-ast-stc
+------------------------
+
+Branch created on "23rd November 2004" to support DSB's STC work. This is
+a branch off dev-dsb-20040406. Once I've got something worth using, I'll
+create a similar branch of the trunk.  Need to think carefully about how
+to distribute AST-with-STC since AST is starting to look a bit bloated,
+and the majority of AST users won't be interested in STC.
+
+
+
+
