@@ -76,10 +76,9 @@ SYNTAX
                   NAMECASE GENERAL NO
                            ENTITY  NO
          DELIM    GENERAL  SGMLREF
-                  --
+                  -- NET hack, to make empty entities <name/> --
                   NESTC "/"
                   NET ">"
-                  --
                   SHORTREF SGMLREF
 		"&#RS;*+"
 		"&#RS;*-"
