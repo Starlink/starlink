@@ -28,7 +28,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Status :
       INTEGER STATUS
 *    Function declarations :

@@ -32,7 +32,7 @@
       INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'XRTLIB(INC_XRTSRT)'
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Status :
       INTEGER                 STATUS
 *    Functions :
@@ -94,7 +94,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Import :
       LOGICAL LSHOW                      ! Produce an observation summary ?
       LOGICAL LTIME                      ! Produce a list of On/OFF times ?

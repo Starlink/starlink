@@ -27,7 +27,7 @@
 *     <global variables held in named COMMON>
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_XRTSRT)'
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -445,7 +445,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *    Global constants :
       INCLUDE 'SAE_PAR'
 *    Structure definition :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Status :
       INTEGER STATUS
 *    Import :
@@ -621,7 +621,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *    Global constants :
       INCLUDE 'SAE_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Status :
 *    Import :
       RECORD /XRT_HEAD/ HEAD                     ! Header records
@@ -727,7 +727,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *    Global constants :
       INCLUDE 'SAE_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Status :
 *    Import :
       RECORD /XRT_HEAD/ HEAD                     ! Header records
@@ -792,7 +792,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *    Global constants :
       INCLUDE 'SAE_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Status :
 *    Import :
       RECORD /XRT_HEAD/ HEAD                     ! Header records

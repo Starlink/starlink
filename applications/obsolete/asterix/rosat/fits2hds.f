@@ -48,7 +48,7 @@
       INCLUDE 'PAR_ERR'
 *     <any INCLUDE files containing global constant defInitions>
 *    Global variables :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
       Include 'XRTLIB(INC_XRTSRT)'
 *    Structure definitions :
 *     <specification of FORTRAN structures>

@@ -24,7 +24,7 @@
 *    Global variables :
 *     <global variables held in named COMMON>
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Status :
       INTEGER STATUS
 *    Function declarations :

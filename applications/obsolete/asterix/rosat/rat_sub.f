@@ -355,7 +355,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Include files
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Parameters :
       CHARACTER*(*) RTNAME		! Rootname of files
       RECORD /XRT_HEAD/ HEAD 		! Structure to hold header information
@@ -401,7 +401,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Include files
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Parameters :
       CHARACTER*(DAT__SZLOC)   LOC                   ! Start locator
       CHARACTER*(*)            OBJECT                ! Structured name
@@ -501,7 +501,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Include files
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Parameters :
       CHARACTER*(DAT__SZLOC)   LOC                   ! Start locator
       CHARACTER*(*)            OBJECT                ! Structured name
@@ -817,7 +817,7 @@
 * Global constants :
       INCLUDE 'SAE_PAR'
 * Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 * Import :
       RECORD /XRT_HEAD/ HEAD          ! Header structure for subsequent use
       CHARACTER*(*) TABLE             ! Table name
@@ -856,7 +856,7 @@
 * Global constants :
       INCLUDE 'SAE_PAR'
 * Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 * Import :
       CHARACTER*(*) DATE_OBS          ! Date of observation start
       CHARACTER*(*) TIME_OBS          ! Time of observation start
@@ -1133,7 +1133,7 @@
 * Global constants :
       INCLUDE 'SAE_PAR'
 * Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 * Import :
       CHARACTER*(*) RTNAME             ! Rootname of datafiles
 * Import-Export :
@@ -1192,7 +1192,7 @@
       INCLUDE 'PAR_ERR'
 *     <any INCLUDE files containing global constant definitions>
 *    Global variables :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Global parameters
       RECORD /XRT_HEAD/ HEAD 		! Structure to hold header information
       INTEGER IUNIT			! Open FITS IO unit
@@ -1238,7 +1238,7 @@
       INCLUDE 'PAR_ERR'
 *     <any INCLUDE files containing global constant definitions>
 *    Global variables :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Global parameters
       RECORD /XRT_HEAD/ HEAD 		! Structure to hold header information
       INTEGER IUNIT			! Open FITS IO unit
@@ -1392,7 +1392,7 @@ C - CHECK NUMBER OF TIME RANGES DOESN'T EXCEED MAXIMUM
       INCLUDE 'PAR_ERR'
 *     <any INCLUDE files containing global constant definitions>
 *    Global variables :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Global parameters
       RECORD /XRT_HEAD/ HEAD 		! Structure to hold header information
       INTEGER IUNIT			! Open FITS IO unit
@@ -1616,7 +1616,7 @@ C -   CHECK STATUS
 * Global constants :
       INCLUDE 'SAE_PAR'
 * Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 * Parameters :
       INTEGER IUNIT			! Logical unit for FITS file
       RECORD /XRT_HEAD/ HEAD		! Header structure
@@ -1828,7 +1828,7 @@ C -   CHECK STATUS
       INCLUDE 'PAR_ERR'
 *     <any INCLUDE files containing global constant definitions>
 *    Global variables :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Global parameters
       RECORD /XRT_HEAD/ HEAD 		! Structure to hold header information
       INTEGER IUNIT			! Open FITS IO unit
@@ -1872,7 +1872,7 @@ C -   CHECK STATUS
       INCLUDE 'PAR_ERR'
 *     <any INCLUDE files containing global constant definitions>
 *    Global variables :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Global parameters
       RECORD /XRT_HEAD/ HEAD 		! Structure to hold header information
       INTEGER IUNIT			! Open FITS IO unit
@@ -1972,7 +1972,7 @@ C - CONVERT TIME FORMATS
       INCLUDE 'PAR_ERR'
 *     <any INCLUDE files containing global constant definitions>
 *    Global variables :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Global parameters
       RECORD /XRT_HEAD/ HEAD 		! Structure to hold header information
       INTEGER IUNIT			! Open FITS IO unit
@@ -2094,7 +2094,7 @@ C - CONVERT TIME FORMATS
 * Global constants :
       INCLUDE 'SAE_PAR'
 * Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 * Parameters :
       INTEGER IUNIT			! Logical unit for FITS file
       RECORD /XRT_HEAD/ HEAD		! Header structure
@@ -2289,7 +2289,7 @@ C - CONVERT TIME FORMATS
       INTEGER STATUS
 *    Structures :
       INCLUDE 'XRTLIB(INC_XRTSRT)'
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_HEAD/ HEAD                      ! Header values
 *
@@ -2577,7 +2577,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'XRTLIB(INC_XRTSRT)'
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_HEAD/ HEAD            ! HEADER values
       RECORD /XRT_SCFDEF/ SRT, BSRT     ! Sort parameters
@@ -2905,7 +2905,7 @@ C      ENDIF
       INTEGER STATUS
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_XRTSRT)'
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_SCFDEF/ SRT,BSRT                ! Sort control structures
       RECORD /XRT_HEAD/ HEAD
@@ -3074,7 +3074,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       IMPLICIT NONE
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_XRTSRT)'
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_HEAD/ HEAD                      ! Header values
       RECORD /XRT_SCFDEF/ SRT                     ! Source sorting parameters
@@ -3375,7 +3375,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 *    Status :
       INTEGER STATUS
 *    Structures :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Import :
       CHARACTER*(DAT__SZLOC) LOCA(7)     ! Locator to event data
       CHARACTER*(*) OPER                 ! Operating mode

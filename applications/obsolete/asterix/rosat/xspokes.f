@@ -36,7 +36,7 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -384,7 +384,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'PAR_ERR'
 *    Structure definitions:
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_HEAD/ HEAD
       INTEGER NVALS

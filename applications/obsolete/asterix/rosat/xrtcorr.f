@@ -660,7 +660,7 @@
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
       INCLUDE 'XRTLIB(INC_XRTSRT)'
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /CORR/ HEAD                 !Source file header info
       INTEGER NT                         !Number of time bins
@@ -792,7 +792,7 @@ D            WRITE(3,*)EXPOS(TLP)
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
       INCLUDE 'XRTLIB(INC_XRTSRT)'
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Status :
       INTEGER STATUS
 *    Import :
@@ -1086,7 +1086,7 @@ D            WRITE(3,*)EXPOS(TLP)
 *    Structure definitions :
       INCLUDE 'XRTLIB(INC_CORR)'
       INCLUDE 'XRTLIB(INC_XRTSRT)'
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Status :
       INTEGER STATUS
 *    Import :

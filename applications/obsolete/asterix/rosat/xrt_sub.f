@@ -1470,7 +1470,7 @@ C      HEAD.PSCALE = (HEAD.PMAX - HEAD.PMIN + 1) / NBIN
 *    Global constants :
       INCLUDE 'SAE_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)' ! Header variables
+      INCLUDE 'INC_XRTHEAD' ! Header variables
 *    Import :
       RECORD /XRT_HEAD/ HEAD        ! Header info
       INTEGER XEV,YEV               ! Detector coordinates of event
@@ -2185,7 +2185,7 @@ D          WRITE(1,*)HEAD.OFFAX
 * Global constants :
       INCLUDE 'SAE_PAR'
 * Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'   ! Gets the max time ranges constant
+      INCLUDE 'INC_XRTHEAD'   ! Gets the max time ranges constant
 * Import :
       CHARACTER*(*) RTNAME            ! Rootname for cal files
 * Import-Export :
@@ -2366,7 +2366,7 @@ D          WRITE(1,*)HEAD.OFFAX
       INCLUDE 'SAE_PAR'
 * Structure definitions :
       INCLUDE 'XRTLIB(INC_XRTSRT)'
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 * Import :
       LOGICAL DISP                    ! Display observation info ?
       RECORD /XRT_SCFDEF/ SRT         ! Sort control structure
@@ -2776,7 +2776,7 @@ C fill in target if blank
 *    Global variables :
 *     <global variables held in named COMMON>
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTHEAD)'
+      INCLUDE 'INC_XRTHEAD'
 *    Import :
       CHARACTER*(*) RTNAME                     ! Rootname of data files
 *    Import-Export :
