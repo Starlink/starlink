@@ -1,6 +1,6 @@
-*+  SPLOT_CMN - common blocks for SPLOT
+*+  SPLOT_CMN - common block for SPLOT
+      INTEGER			DSID			! Current dataset id
 
-      CHARACTER*(DAT__SZLOC) DSLOC
       INTEGER NDS				! number of datasets
       INTEGER NVAL,NFIT				! num. data and model values
       INTEGER IDPTR				! pointer to input data
@@ -30,12 +30,11 @@
       LOGICAL MPLOT,EAXIS,LOGAX,OVERLAY
       BYTE MASK
 
-      COMMON /SPLOT_CMN/ NDS,NVAL,NFIT,DDPTR,DVPTR,DXPTR,DWPTR,DQPTR,
-     :                   DFDPTR,DRDPTR,PDPTR,PVPTR,PXPTR,PWPTR,
+      COMMON /SPLOT_CMN/ DSID,NDS,NVAL,NFIT,DDPTR,DVPTR,DXPTR,DWPTR,
+     :                   DQPTR,DFDPTR,DRDPTR,PDPTR,PVPTR,PXPTR,PWPTR,
      :                   PFDPTR,PFXPTR,PIDPTR,PRDPTR,PRVPTR,PRQPTR,
      :                   MCXPTR,MCDPTR,MTDPTR,ELPTR,EUPTR,
      :                   IDPTR,IVPTR,IFPTR,VOK,QOK,
      :                   DPLOT,PPLOT,DRPLOT,PRPLOT,MPLOT,EAXIS,
      :                   LOGAX,OVERLAY,
      :                   MASK
-      COMMON /SPLOT_CMN_C/ DSLOC
