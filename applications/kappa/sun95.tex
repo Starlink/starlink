@@ -30820,7 +30820,7 @@ plot (9k).
    Copies an NDF (or NDF section) to a new location
 }{
    \sstdescription{
-      This application copies an NDF to a new location. By supplying an
+      This application copies an NDF to a new location.  By supplying an
       NDF section as input it may be used to extract a subset, or to
       change the size or dimensionality of an NDF. A second NDF may
       also be supplied to act as a shape template, and hence to define
@@ -30830,7 +30830,7 @@ plot (9k).
       performed by this routine, so it may be used as a way of
       compressing NDF structures from which components have been
       deleted.  This ability also makes NDFCOPY a useful alternative to
-      SETBOUND in cases where an NDF's size is to be reduced.
+      SETBOUND in cases where an NDF{\tt '}s size is to be reduced.
    }
    \sstusage{
       ndfcopy in out
@@ -30845,7 +30845,7 @@ plot (9k).
          LIKE = NDF (Read)
       }{
          This parameter may be used to supply an NDF to be used as a
-         shape template during the copying operation. If such a
+         shape template during the copying operation.  If such a
          template is supplied, then its shape will be used to select a
          matching section from the input NDF before copying takes
          place.  By default, no template will be used and the shape of
@@ -30860,9 +30860,61 @@ plot (9k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         A title for the output NDF. A null value (the default) will
+         A title for the output NDF.  A null value (the default) will
          cause the title of the NDF supplied for parameter IN to be
          used instead. {\tt [!]}
+      }
+      \sstsubsection{
+         TRIM = \_LOGICAL (Read)
+      }{
+         If TRUE, then the number of pixel axes in the output NDF will be
+         reduced if necessary to remove any pixel axes which span only a
+         single pixel. For instance if {\tt "}stokes{\tt "} is a 3D data cube with
+         pixel bounds (1:100,-50:40,1:3), and the parameter IN is given the
+         value {\tt "}stokes(,,2){\tt "}, then the dimensionality of the output depends
+         on the setting of TRIM: if TRIM=NO the output is 3D with pixel
+         bounds (1:100,-50:40,2:2) and if TRIM=YES the output is 2D with
+         pixel bounds (1:100,-50:40). In this example, the third pixel
+         axis spans only a single pixel and is consequently removed if
+         TRIM=YES.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         TRIMWCS = \_LOGICAL (Read)
+      }{
+         This parameter is only accessed if parameter TRIM is TRUE. It
+         controls the number of axes in the current WCS co-ordinate Frame
+         of the output NDF. If TRIMWCS=YES, then the current Frame in the
+         output NDF will have the same number of axes as there are pixel
+         axes in the output NDF. If this involves removing axes, then the
+         axes to retain are specified by parameter USEAXIS. If TRIMWCS=NO
+         then all axes are retained in the current WCS Frame of the
+         output NDF. Using the example in the description of the TRIM
+         parameter, if the input NDF {\tt "}stokes{\tt "} has a 3D current WCS Frame
+         with axes (Ra,Dec,Stokes) and TRIMWSC=YES, then an axis will be
+         removed from the current Frame to make it 2 dimensional (that
+         is, to match the number of pixel axes remaining after the
+         removal of insignificant pixel axes). The choice of which two
+         axes to retain is controlled by parameter USEAXIS. If, on the
+         other hand, TRIMWCS was set to FALSE, then the output NDF would
+         still have two pixel axes, but the current WCS Frame would retain
+         all three axes from the input NDF. If one or more current Frame
+         axes are removed, the transformation from the current Frame to
+         pixel Frame may become undefined resulting in some WCS operations
+         being unusable. The inverse of this transformation (from pixel
+         Frame to current Frame) is unchanged however. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         USEAXIS = LITERAL (Read)
+      }{
+         This parameter is only accessed if TRIM and TRIMWCS are both TRUE
+         and some axes need to be removed from the current WCS Frame of
+         the output NDF. It gives the axes which are to be retained in
+         the current WCS Frame of the output NDF. Each axis can be
+         specified either by giving its index within the Current Frame
+         of the input NDF in the range 1 to the number of axes in the Frame,
+         or by giving its symbol. The dynamic default selects the axes with
+         the same indices as the pixel axes being copied. The value should
+         be given as a comma separated list. {\tt []}
       }
    }
    \sstexamples{
@@ -30870,35 +30922,35 @@ plot (9k).
          ndfcopy infile outfile
       }{
          Copies the contents of the NDF structure infile to the new
-         structure outfile. Any unused space will be eliminated during
+         structure outfile.  Any unused space will be eliminated during
          the copying operation.
       }
       \sstexamplesubsection{
-         ndfcopy in=data1(3:40,-3:17) out=data2 title="Extracted section"
+         ndfcopy in=data1(3:40,-3:17) out=data2 title={\tt "}Extracted section{\tt "}
       }{
          Copies the section (3:40,-3:17) of the NDF called data1 to a
-         new NDF called data2. The output NDF is assigned the new title
-         {\tt "Extracted section"}, which replaces the title derived from the
+         new NDF called data2.  The output NDF is assigned the new title
+         {\tt "}Extracted section{\tt "}, which replaces the title derived from the
          input NDF.
       }
       \sstexamplesubsection{
          ndfcopy galaxy newgalaxy like=oldgalaxy
       }{
          Copies a section of the NDF called galaxy to form a new NDF
-         called newgalaxy. The section which is copied will correspond
-         in shape with the template oldgalaxy. Thus, after the copying
+         called newgalaxy.  The section which is copied will correspond
+         in shape with the template oldgalaxy.  Thus, after the copying
          operation, both newgalaxy and oldgalaxy will have the same
          pixel-index bounds.
       }
       \sstexamplesubsection{
          ndfcopy aa(20$\sim$11,20$\sim$11) bb like=aa
       }{
-         Copies from the NDF section consisting of an 11$\times$11-pixel
-         region of aa centred on pixel (20,20), into a new NDF called bb.
-         The shape of the region copied is made to match the original
-         shape of aa.  The effect is to extract the selected square
-         region of pixels into a new NDF of the same shape as the
-         original, setting the surrounding region to the bad-pixel
+         Copies from the NDF section consisting of an 11x11 pixel
+         region of aa centred on pixel (20,20), into a new NDF called
+         bb.  The shape of the region copied is made to match the
+         original shape of aa.  The effect is to extract the selected
+         square region of pixels into a new NDF of the same shape as
+         the original, setting the surrounding region to the bad-pixel
          value.
       }
    }
@@ -30908,9 +30960,9 @@ plot (9k).
       KAPPA: SETBOUND; Figaro: ISUBSET.
    }
    \sstimplementationstatus{
-      If present, an NDF's TITLE, LABEL, UNITS, DATA, VARIANCE,
+      If present, an NDF{\tt '}s TITLE, LABEL, UNITS, DATA, VARIANCE,
       QUALITY, AXIS WCS and HISTORY components are copied by this routine,
-      together with all extensions. The output NDF's title may be
+      together with all extensions.  The output NDF{\tt '}s title may be
       modified, if required, by specifying a new value via the TITLE
       parameter.
    }
@@ -45241,6 +45293,16 @@ The following applications have been modified:
 
    \item [\htmlref{IDSTATE}{IDSTATE}] The changes made to GDCLEAR have
    also been made to IDCLEAR.
+
+   \item [\htmlref{NDFCOPY}{NDFCOPY}] \mbox{}
+      \begin{itemize}
+         \item New parameters TRIM, TRIMWCS and USEAXIS control the
+         removal of output axes which span only a single pixel. Thus,
+         NDFCOPY can now be used to extract a single plane from a cube
+         and create a genuinely 2 dimensional output image (previously,
+         the third pixel axis was retain with bounds spanning a single
+         pixel). 
+      \end{itemize}
 
    \item [\htmlref{SEGMENT}{SEGMENT}] \mbox{}
       \begin{itemize}
