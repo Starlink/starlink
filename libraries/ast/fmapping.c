@@ -14,6 +14,7 @@
 *     a public FORTRAN 77 interface to the Mapping class.
 
 *  Routines Defined:
+*     AST_DECOMPOSE
 *     AST_INVERT
 *     AST_ISAMAPPING
 *     AST_RESAMPLE<X>
@@ -44,6 +45,8 @@
 *     9-JAN-2001 (DSB):
 *        Changed in and out arguments for TranN from type "double (*)[]"
 *        to "double *".
+*     26-SEP-2001 (DSB):
+*        Added AST_DECOMPOSE.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -161,6 +164,33 @@ static void ast_resample_ukern1( double offset, const double params[],
 /* FORTRAN interface functions. */
 /* ============================ */
 /* These functions implement the remainder of the FORTRAN interface. */
+
+F77_SUBROUTINE(ast_decompose)( INTEGER(THIS),
+                               INTEGER(MAP1), 
+                               INTEGER(MAP2), 
+                               LOGICAL(SERIES), 
+                               INTEGER(INVERT1), 
+                               INTEGER(INVERT2), 
+                               INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(MAP1)
+   GENPTR_INTEGER(MAP2)
+   GENPTR_LOGICAL(SERIES)
+   GENPTR_INTEGER(INVERT1)
+   GENPTR_INTEGER(INVERT2)
+   AstMapping *map1;
+   AstMapping *map2;
+   int series;
+
+   astAt( "AST_DECOMPOSE", NULL, 0 );
+   astWatchSTATUS(
+      astDecompose( astI2P( *THIS ), &map1, &map2, &series, INVERT1, INVERT2 );
+      *MAP1 = astP2I( map1 );
+      *MAP2 = astP2I( map2 );
+      *SERIES = ( series )?F77_TRUE:F77_FALSE;
+   )
+}
+
 F77_SUBROUTINE(ast_invert)( INTEGER(THIS),
                             INTEGER(STATUS) ) {
    GENPTR_INTEGER(THIS)

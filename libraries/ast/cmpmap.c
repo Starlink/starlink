@@ -62,6 +62,8 @@ f     The CmpMap class does not define any new routines beyond those
 *        Improved the MapMerge method to allow parallel combinations
 *        of series CmpMaps to be replaced by series combinations of
 *        parallel CmpMaps, and vice versa.
+*     26-SEP-2001 (DSB):
+*        Over-ride the astDecompose method.
 *class--
 */
 
@@ -119,6 +121,7 @@ static AstMapping *Simplify( AstMapping * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void Copy( const AstObject *, AstObject * );
+static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void InitVtab( AstCmpMapVtab * );
@@ -274,6 +277,120 @@ static AstMapping *CombineMaps( AstMapping *mapping1, int invert1,
    return result;
 }
 
+static void Decompose( AstMapping *this_mapping, AstMapping **map1, 
+                       AstMapping **map2, int *series, int *invert1, 
+                       int *invert2 ) {
+/*
+*
+*  Name:
+*     Decompose
+
+*  Purpose:
+*     Decompose a Mapping into two component Mappings.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void Decompose( AstMapping *this, AstMapping **map1, 
+*                     AstMapping **map2, int *series,
+*                     int *invert1, int *invert2 )
+
+*  Class Membership:
+*     CmpMap member function (over-rides the protected astDecompose
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns pointers to two Mappings which, when applied
+*     either in series or parallel, are equivalent to the supplied Mapping.
+*
+*     Since the Frame class inherits from the Mapping class, Frames can
+*     be considered as special types of Mappings and so this method can
+*     be used to decompose either CmpMaps or CmpFrames.
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping.
+*     map1
+*        Address of a location to receive a pointer to first component
+*        Mapping. 
+*     map2
+*        Address of a location to receive a pointer to second component
+*        Mapping. 
+*     series
+*        Address of a location to receive a value indicating if the
+*        component Mappings are applied in series or parallel. A non-zero
+*        value means that the supplied Mapping is equivalent to applying map1 
+*        followed by map2 in series. A zero value means that the supplied
+*        Mapping is equivalent to applying map1 to the lower numbered axes
+*        and map2 to the higher numbered axes, in parallel.
+*     invert1
+*        The value of the Invert attribute to be used with map1. 
+*     invert2
+*        The value of the Invert attribute to be used with map2. 
+
+*  Notes:
+*     - Any changes made to the component Mappings using the returned
+*     pointers will be reflected in the supplied Mapping.
+
+*-
+*/
+
+
+/* Local Variables: */
+   AstCmpMap *this;              /* Pointer to CmpMap structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpMap structure. */
+   this = (AstCmpMap *) this_mapping;
+
+/* First deal with series mappings. */
+   if( this->series ) {
+      if( series ) *series = 1;
+
+/* If the CmpMap has been inverted, return the Mappings in reverse
+   order with inverted Invert falgs. */
+      if( astGetInvert( this ) ) {
+         if( map1 ) *map1 = astClone( this->map2 );
+         if( map2 ) *map2 = astClone( this->map1 );
+         if( invert1 ) *invert1 = this->invert2 ? 0 : 1;
+         if( invert2 ) *invert2 = this->invert1 ? 0 : 1;
+
+/* If the CmpMap has not been inverted, return the Mappings in their
+   original order with their original Invert flags. */
+      } else {
+         if( map1 ) *map1 = astClone( this->map1 );
+         if( map2 ) *map2 = astClone( this->map2 );
+         if( invert1 ) *invert1 = this->invert1;
+         if( invert2 ) *invert2 = this->invert2;
+      }
+
+/* Now deal with parallel mappings. */
+   } else {
+      if( series ) *series = 0;
+
+/* The mappings are returned in their original order whether or not the
+   CmpMap has been inverted. */
+      if( map1 ) *map1 = astClone( this->map1 );
+      if( map2 ) *map2 = astClone( this->map2 );
+
+/* If the CmpMap has been inverted, return inverted Invert flags. */
+      if( astGetInvert( this ) ) {
+         if( invert1 ) *invert1 = this->invert1 ? 0 : 1;
+         if( invert2 ) *invert2 = this->invert2 ? 0 : 1;
+
+/* If the CmpMap has not been inverted, return the original Invert flags. */
+      } else {
+         if( invert1 ) *invert1 = this->invert1;
+         if( invert2 ) *invert2 = this->invert2;
+      }
+      
+   }
+}
+
 static void InitVtab( AstCmpMapVtab *vtab ) {
 /*
 *  Name:
@@ -332,6 +449,7 @@ static void InitVtab( AstCmpMapVtab *vtab ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   mapping->Decompose = Decompose;
    mapping->MapMerge = MapMerge;
    mapping->Simplify = Simplify;
 

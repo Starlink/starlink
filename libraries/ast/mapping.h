@@ -96,6 +96,8 @@
 
 *  New Methods Defined:
 *     Public:
+*        astDecompose
+*           Decompose a Mapping into two component Mappings.
 *        astInvert
 *           Invert a Mapping.
 *        astMapBox
@@ -346,6 +348,7 @@ typedef struct AstMappingVtab {
    int (* TestReport)( AstMapping * );
    void (* ClearInvert)( AstMapping * );
    void (* ClearReport)( AstMapping * );
+   void (* Decompose)( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
    void (* Invert)( struct AstMapping * );
    void (* MapBox)( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
    void (* MapList)( AstMapping *, int, int, int *, AstMapping ***, int ** );
@@ -403,8 +406,10 @@ void astTranN_( AstMapping *, int, int, int, const double *, int, int, int, doub
 void astTranP_( AstMapping *, int, int, const double *[], int, int, double *[] );
 
 #if defined(astCLASS)            /* Protected */
+void astDecompose_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 void astMapBox_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
 #else
+void astDecomposeId_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 void astMapBoxId_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
 #endif
 
@@ -501,9 +506,13 @@ astINVOKE(V,astTranN_(astCheckMapping(this),npoint,ncoord_in,indim,in,forward,nc
 astINVOKE(V,astTranP_(astCheckMapping(this),npoint,ncoord_in,ptr_in,forward,ncoord_out,ptr_out))
 
 #if defined(astCLASS)            /* Protected */
+#define astDecompose(this,map1,map2,series,inv1,inv2) \
+astINVOKE(V,astDecompose_(astCheckMapping(this),(AstMapping **)(map1),(AstMapping **)(map2),series,inv1,inv2))
 #define astMapBox(this,lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu) \
 astINVOKE(V,astMapBox_(astCheckMapping(this),lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu))
 #else
+#define astDecompose(this,map1,map2,series,inv1,inv2) \
+astINVOKE(V,astDecomposeId_(astCheckMapping(this),(AstMapping **)(map1),(AstMapping **)(map2),series,inv1,inv2))
 #define astMapBox(this,lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu) \
 astINVOKE(V,astMapBoxId_(astCheckMapping(this),lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu))
 #endif

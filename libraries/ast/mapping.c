@@ -41,6 +41,7 @@ c     following functions may also be applied to all Mappings:
 f     In addition to those routines applicable to all Objects, the
 f     following routines may also be applied to all Mappings:
 *
+c     - astDecompose: Decompose a Mapping into two component Mappings
 c     - astInvert: Invert a Mapping
 c     - astMapBox: Find a bounding box for a Mapping
 c     - astResample<X>: Resample a region of a data grid
@@ -49,6 +50,7 @@ c     - astTran1: Transform 1-dimensional coordinates
 c     - astTran2: Transform 2-dimensional coordinates
 c     - astTranN: Transform N-dimensional coordinates
 c     - astTranP: Transform N-dimensional coordinates held in separate arrays
+f     - AST_DECOMPOSE: Decompose a Mapping into two component Mappings
 f     - AST_INVERT: Invert a Mapping
 f     - AST_MAPBOX: Find a bounding box for a Mapping
 f     - AST_RESAMPLE<X>: Resample a region of a data grid
@@ -195,6 +197,7 @@ static int InterpolateNearestLD( int, const int *, const int *, const long doubl
 static int ResampleLD( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
 #endif
 
+static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );
@@ -367,6 +370,105 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else {
       (*parent_clearattrib)( this_object, attrib );
    }
+}
+
+static void Decompose( AstMapping *this, AstMapping **map1, AstMapping **map2, 
+                       int *series, int *invert1, int *invert2 ) {
+/*
+*+
+*  Name:
+*     astDecompose
+
+*  Purpose:
+*     Decompose a Mapping into two component Mappings.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void astDecompose( AstMapping *this, AstMapping **map1, 
+*                        AstMapping **map2, int *series, int *invert1, 
+*                        int *invert2  ) 
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+*     This function returns pointers to two Mappings which, when applied
+*     either in series or parallel, are equivalent to the supplied Mapping.
+*
+*     Since the Frame class inherits from the Mapping class, Frames can
+*     be considered as special types of Mappings and so this method can
+*     be used to decompose either CmpMaps or CmpFrames.
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping.
+*     map1
+*        Address of a location to receive a pointer to first component
+*        Mapping. 
+*     map2
+*        Address of a location to receive a pointer to second component
+*        Mapping. 
+*     series
+*        Address of a location to receive a value indicating if the
+*        component Mappings are applied in series or parallel. A non-zero
+*        value means that the supplied Mapping is equivalent to applying map1 
+*        followed by map2 in series. A zero value means that the supplied
+*        Mapping is equivalent to applying map1 to the lower numbered axes
+*        and map2 to the higher numbered axes, in parallel.
+*     invert1
+*        The value of the Invert attribute to be used with map1. 
+*     invert2
+*        The value of the Invert attribute to be used with map2. 
+
+*  Applicability:
+*     CmpMap
+*        If the supplied Mapping is a CmpMap, then map1 and map2 will be
+*        returned holding pointers to the component Mappings used to
+*        create the CmpMap, either in series or parallel.
+*     Mapping
+*        For any class of Mapping other than a CmpMap, map1 will be
+*        returned holding a clone of the supplied Mapping pointer, and map2
+*        will be returned holding a NULL pointer.
+*     CmpFrame
+*        If the supplied Mapping is a CmpFrame, then map1 and map2 will be
+*        returned holding pointers to the component Frames used to
+*        create the CmpFrame. The component Frames are considered to be in
+*        applied in parallel.
+*     Frame
+*        For any class of Frame other than a CmpFrame, map1 will be 
+*        returned holding a clone of the supplied Frame pointer, and map2
+*        will be returned holding a NULL pointer.
+
+*  Notes:
+*     - Any changes made to the component Mappings using the returned
+*     pointers will be reflected in the supplied Mapping.
+*     - The returned Invert values should be used in preference to the 
+*     current values of the Invert attribute in map1 and map2. This is
+*     because the attributes may have changed value since the Mappings 
+*     were combined.
+
+*  Implementation Notes:
+*     - This function implements the basic astDecompose method
+*     available via the protected interface to the Frame class. The
+*     public interface to this method is provided by the
+*     astDecomposeId_ function.
+
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* The basic Mapping class returns a clone of the supplied Mapping as
+   map1 and a NULL pointer as map2. */
+   if( map1 ) *map1 = astClone( this );
+   if( map2 ) *map2 = NULL;
+   if( series ) *series = 1;
+   if( invert1 ) *invert1 = astGetInvert( this );
+   if( invert2 ) *invert2 = 0;
 }
 
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
@@ -1387,6 +1489,7 @@ static void InitVtab( AstMappingVtab *vtab ) {
 #endif
    vtab->ClearInvert = ClearInvert;
    vtab->ClearReport = ClearReport;
+   vtab->Decompose = Decompose;
    vtab->GetInvert = GetInvert;
    vtab->GetNin = GetNin;
    vtab->GetNout = GetNout;
@@ -12170,6 +12273,11 @@ AstMapping *astLoadMapping_( void *mem, size_t size, int init,
    it may have been over-ridden by a derived class. However, it should
    still have the same interface. */
 
+void astDecompose_( AstMapping *this, AstMapping **map1, AstMapping **map2, 
+                    int *series, int *invert1, int *invert2 ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Mapping,Decompose))( this, map1, map2, series, invert1, invert2 );
+}
 int astGetNin_( AstMapping *this ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Mapping,GetNin))( this );
@@ -12293,10 +12401,156 @@ void astTranP_( AstMapping *this, int npoint,
 /* The following functions have public prototypes only (i.e. no
    protected prototypes), so we must provide local prototypes for use
    within this module. */
+void DecomposeId_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 void MapBoxId_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
 
 /* Special interface function implementations. */
 /* ------------------------------------------- */
+void astDecomposeId_( AstMapping *this, AstMapping **map1, 
+                      AstMapping **map2, int *series, int *invert1, 
+                      int *invert2  ) {
+/*
+*++
+*  Name:
+c     astDecompose
+f     AST_DECOMPOSE
+
+*  Purpose:
+*     Decompose a Mapping into two component Mappings.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "mapping.h"
+c     void astDecompose( AstMapping *this, AstMapping **map1, 
+c                        AstMapping **map2, int *series, int *invert1, 
+c                        int *invert2  ) 
+f     CALL AST_DECOMPOSE( THIS, MAP1, MAP2, SERIES, INVERT1, INVERT2, STATUS )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+c     This function returns pointers to two Mappings which, when applied
+f     This routine returns pointers to two Mappings which, when applied
+*     either in series or parallel, are equivalent to the supplied Mapping.
+*
+*     Since the Frame class inherits from the Mapping class, Frames can
+*     be considered as special types of Mappings and so this method can
+*     be used to decompose either CmpMaps or CmpFrames.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Mapping.
+c     map1
+f     MAP1 = INTEGER (Returned)
+c        Address of a location to receive a pointer to first component
+f        A pointer to first component
+*        Mapping. 
+c     map2
+f     MAP2 = INTEGER (Returned)
+c        Address of a location to receive a pointer to second component
+f        A pointer to second component
+*        Mapping. 
+c     series
+f     SERIES = LOGICAL (Returned)
+c        Address of a location to receive a value indicating if the
+c        component Mappings are applied in series or parallel. A non-zero
+c        value means that the supplied Mapping is equivalent to applying map1 
+c        followed by map2 in series. A zero value means that the supplied
+c        Mapping is equivalent to applying map1 to the lower numbered axes
+c        and map2 to the higher numbered axes, in parallel.
+f        Indicates if the
+f        component Mappings are applied in series or parallel. A .TRUE.
+f        value means that the supplied Mapping is equivalent to applying MAP1 
+f        followed by MAP2 in series. A zero value means that the supplied
+f        Mapping is equivalent to applying MAP1 to the lower numbered axes
+f        and MAP2 to the higher numbered axes, in parallel.
+c     invert1
+f     INVERT1 = INTEGER (Returned)
+c        The value of the Invert attribute to be used with map1. 
+f        The value of the Invert attribute to be used with MAP1. 
+c     invert2
+f     INVERT2 = INTEGER (Returned)
+c        The value of the Invert attribute to be used with map2. 
+f        The value of the Invert attribute to be used with MAP2. 
+
+*  Applicability:
+*     CmpMap
+c        If the supplied Mapping is a CmpMap, then map1 and map2 will be
+f        If the supplied Mapping is a CmpMap, then MAP1 and MAP2 will be
+*        returned holding pointers to the component Mappings used to
+*        create the CmpMap, either in series or parallel. Note, changing
+*        the Invert attribute of either of the component Mappings using
+*        the returned pointers will have no effect on the supplied CmpMap.
+*        This is because the CmpMap remembers and uses the original settings 
+*        of the Invert attributes (that is, the values of the Invert
+*        attributes when the CmpMap was first created). These are the
+c        Invert values which are returned in invert1 and invert2.
+f        Invert values which are returned in INVERT1 and INVERT2.
+*     Mapping
+c        For any class of Mapping other than a CmpMap, map1 will be
+c        returned holding a clone of the supplied Mapping pointer, and map2
+c        will be returned holding a NULL pointer. Invert1 will be returned
+c        holding the current value of the Invert attribute for the supplied 
+c        Mapping, and invert2 will be returned holding zero.
+f        For any class of Mapping other than a CmpMap, MAP1 will be
+f        returned holding a clone of the supplied Mapping pointer, and MAP2
+f        will be returned holding AST__NULL. INVERT1 will be returned
+f        holding the current value of the Invert attribute for the supplied 
+f        Mapping, and INVERT2 will be returned holding zero.
+*     CmpFrame
+c        If the supplied Mapping is a CmpFrame, then map1 and map2 will be
+f        If the supplied Mapping is a CmpFrame, then MAP1 and MAP2 will be
+*        returned holding pointers to the component Frames used to
+*        create the CmpFrame. The component Frames are considered to be in
+*        applied in parallel.
+*     Frame
+c        For any class of Frame other than a CmpFrame, map1 will be 
+c        returned holding a clone of the supplied Frame pointer, and map2
+c        will be returned holding a NULL pointer.
+f        For any class of Frame other than a CmpFrame, MAP1 will be 
+f        returned holding a clone of the supplied Frame pointer, and MAP2
+f        will be returned holding AST__NULL.
+
+*  Notes:
+*     - The returned Invert values should be used in preference to the 
+*     current values of the Invert attribute in map1 and map2. This is
+*     because the attributes may have changed value since the Mappings 
+*     were combined.
+*     - Any changes made to the component Mappings using the returned
+*     pointers will be reflected in the supplied Mapping. 
+
+*--
+
+*  Implementation Notes:
+*     This function implements the public interface for the
+*     astDecompose method. It is identical to astDecompose_ except for
+*     the following:
+*
+*     - ID values are returned via the "map1" and "map2" parameters
+*     instead of true C pointers. This is required because this
+*     conversion cannot be performed by the macro that invokes the
+*     function.
+*/
+
+/* Local Variables: */
+   int invert;                   /* New Invert attribute value */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Invoke the normal astDecompose_ function to decompose the Mapping. */
+      astDecompose_( this, map1, map2, series, invert1, invert2 );
+
+/* If required, return ID values for the component Mappings. */
+   if ( map1 ) *map1 = astMakeId( *map1 );
+   if ( map2 ) *map2 = astMakeId( *map2 );
+
+}
+
 void astMapBoxId_( AstMapping *this,
                    const double lbnd_in[], const double ubnd_in[],
                    int forward, int coord_out,

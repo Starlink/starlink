@@ -66,6 +66,8 @@ f     The CmpFrame class does not define any new routines beyond those
 *        Added astAngle.
 *     7-SEP-2001 (DSB):
 *        Added astResolve.
+*     26-SEP-2001 (DSB):
+*        Over-ride the astDecompose method.
 
 *class--
 */
@@ -514,6 +516,7 @@ static void ClearMinAxes( AstFrame * );
 static void ClearSymbol( AstFrame *, int );
 static void ClearUnit( AstFrame *, int );
 static void Copy( const AstObject *, AstObject * );
+static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void InitVtab( AstCmpFrameVtab * );
@@ -1024,6 +1027,97 @@ static void ClearMinAxes( AstFrame *this_frame ) {
 */
 
 /* Do nothing. */
+}
+
+static void Decompose( AstMapping *this_cmpframe, AstMapping **map1, 
+                       AstMapping **map2, int *series, int *invert1, 
+                       int *invert2 ) {
+/*
+*
+*  Name:
+*     Decompose
+
+*  Purpose:
+*     Decompose a CmpFrame into two component CmpFrames.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void Decompose( AstMapping *this, AstMapping **map1, 
+*                     AstMapping **map2, int *series,
+*                     int *invert1, int *invert2 )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the protected astDecompose
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns pointers to two Mappings which, when applied
+*     either in series or parallel, are equivalent to the supplied Mapping.
+*
+*     Since the Frame class inherits from the Mapping class, Frames can
+*     be considered as special types of Mappings and so this method can
+*     be used to decompose either CmpMaps or CmpFrames.
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping.
+*     map1
+*        Address of a location to receive a pointer to first component
+*        Mapping. 
+*     map2
+*        Address of a location to receive a pointer to second component
+*        Mapping. 
+*     series
+*        Address of a location to receive a value indicating if the
+*        component Mappings are applied in series or parallel. A non-zero
+*        value means that the supplied Mapping is equivalent to applying map1 
+*        followed by map2 in series. A zero value means that the supplied
+*        Mapping is equivalent to applying map1 to the lower numbered axes
+*        and map2 to the higher numbered axes, in parallel.
+*     invert1
+*        The value of the Invert attribute to be used with map1. 
+*     invert2
+*        The value of the Invert attribute to be used with map2. 
+
+*  Notes:
+*     - Any changes made to the component rames using the returned
+*     pointers will be reflected in the supplied CmpFrame.
+
+*-
+*/
+
+
+/* Local Variables: */
+   AstCmpFrame *this;              /* Pointer to CmpMap structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpMap structure. */
+   this = (AstCmpFrame *) this_cmpframe;
+
+/* The components Frames of a CmpFrame are considered to be parallel
+   Mappings. */
+   if( series ) *series = 0;
+
+/* The Frames are returned in their original order whether or not the
+   CmpFrame has been inverted. */
+   if( map1 ) *map1 = astClone( this->frame1 );
+   if( map2 ) *map2 = astClone( this->frame2 );
+
+/* If the CmpFrame has been inverted, return inverted Invert flags. */
+   if( astGetInvert( this ) ) {
+      if( invert1 ) *invert1 = astGetInvert( this->frame1 ) ? 0 : 1;
+      if( invert2 ) *invert2 = astGetInvert( this->frame2 ) ? 0 : 1;
+
+/* If the CmpFrame has not been inverted, return the current Invert flags. */
+   } else {
+      if( invert1 ) *invert1 = astGetInvert( this->frame1 );
+      if( invert2 ) *invert2 = astGetInvert( this->frame2 );
+   }
 }
 
 static double Distance( AstFrame *this_frame,
@@ -2034,6 +2128,7 @@ static void InitVtab( AstCmpFrameVtab *vtab ) {
 
 /* Local Variables: */
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
+   AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
@@ -2052,6 +2147,7 @@ static void InitVtab( AstCmpFrameVtab *vtab ) {
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
    frame = (AstFrameVtab *) vtab;
+   mapping = (AstMappingVtab *) vtab;
 
    parent_getdomain = frame->GetDomain;
    frame->GetDomain = GetDomain;
@@ -2072,6 +2168,7 @@ static void InitVtab( AstCmpFrameVtab *vtab ) {
    frame->ClearMinAxes = ClearMinAxes;
    frame->ClearSymbol = ClearSymbol;
    frame->ClearUnit = ClearUnit;
+   mapping->Decompose = Decompose;
    frame->Distance = Distance;
    frame->Format = Format;
    frame->Gap = Gap;
