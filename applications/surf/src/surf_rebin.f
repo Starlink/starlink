@@ -93,7 +93,10 @@
       INTEGER          DIMX (MAX_DIM)  ! expected array dimensions
       DOUBLE PRECISION DTEMP           ! scratch double
       DOUBLE PRECISION DTEMP1          ! scratch double
-      INTEGER          DUMMY_PTR       ! Dummy pointer
+      INTEGER          DUMMY_VARIANCE_PTR(MAX_FILE) ! Pointer to dummy variance
+      INTEGER          DUMMY_ENDVAR_PTR(MAX_FILE) ! Pointer to end of dummy var
+      INTEGER          DUMMY_QUALITY_PTR(MAX_FILE)  ! Pointer to dummy quality
+      INTEGER          DUMMY_ENDQUAL_PTR(MAX_FILE) ! Pointer to end of quality
       INTEGER          EXPOSURE        ! exposure index in DO loop
       INTEGER          EXP_END         ! end index of data for an exposure
       DOUBLE PRECISION EXP_LST         ! sidereal time at which exposure
@@ -330,6 +333,13 @@
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
+
+* Make sure the Pointers really are 0
+
+      DO I = 1, MAX_FILE
+         DUMMY_VARIANCE_PTR(I) = 0
+         DUMMY_QUALITY_PTR(I) = 0
+      END DO
 
 *  start up the NDF system and read in the input demodulated files
 
@@ -714,11 +724,13 @@
      :              'Variance array is missing. Using dummy array',
      :              STATUS)
                CALL SCULIB_MALLOC(DIM(1)*DIM(2)*VAL__NBR,
-     :              FILE_VARIANCE_PTR, DUMMY_PTR, STATUS)
+     :              DUMMY_VARIANCE_PTR(FILE), DUMMY_ENDVAR_PTR(FILE),
+     :              STATUS)
                ITEMP = DIM(1) * DIM(2)
                RTEMP = 1.0e-6
-               CALL SCULIB_ENTER_DUMMY_DATA_R(%VAL(FILE_VARIANCE_PTR),
-     :              ITEMP, RTEMP, STATUS)
+               CALL SCULIB_VFILLR(ITEMP, RTEMP,
+     :              %VAL(DUMMY_VARIANCE_PTR(FILE)))
+               FILE_VARIANCE_PTR = DUMMY_VARIANCE_PTR(FILE)
             END IF
  
                
@@ -733,11 +745,12 @@
      :              'Quality array is missing. Unflagging all data',
      :              STATUS)
                CALL SCULIB_MALLOC(DIM(1)*DIM(2)*VAL__NBI,
-     :              FILE_QUALITY_PTR, DUMMY_PTR, STATUS)
+     :              DUMMY_QUALITY_PTR(FILE), DUMMY_ENDQUAL_PTR(FILE),
+     :              STATUS)
                ITEMP = DIM(1) * DIM(2)
-               RTEMP = 0
-               CALL SCULIB_ENTER_DUMMY_DATA_I(%VAL(FILE_QUALITY_PTR),
-     :              ITEMP, ITEMPB, STATUS)
+               CALL SCULIB_VFILLI(ITEMP, ITEMPB,
+     :              %VAL(DUMMY_QUALITY_PTR(FILE)))
+               FILE_QUALITY_PTR = DUMMY_QUALITY_PTR(FILE)
             END IF
  
                
@@ -1794,15 +1807,22 @@
 
       DO I = 1, MAX_FILE
          CALL SCULIB_FREE ('IN_DATA', IN_DATA_PTR(I),
-     :     IN_DATA_END(I), STATUS)
+     :        IN_DATA_END(I), STATUS)
          CALL SCULIB_FREE ('IN_VARIANCE', IN_VARIANCE_PTR(I),
-     :     IN_VARIANCE_END(I), STATUS)
+     :        IN_VARIANCE_END(I), STATUS)
          CALL SCULIB_FREE ('IN_QUALITY', IN_QUALITY_PTR(I),
-     :     IN_QUALITY_END(I), STATUS)
+     :        IN_QUALITY_END(I), STATUS)
          CALL SCULIB_FREE ('BOL_RA', BOL_RA_PTR(I),
-     :     BOL_RA_END(I), STATUS)
+     :        BOL_RA_END(I), STATUS)
          CALL SCULIB_FREE ('BOL_DEC', BOL_DEC_PTR(I),
-     :     BOL_DEC_END(I), STATUS)
+     :        BOL_DEC_END(I), STATUS)
+
+         CALL SCULIB_FREE ('DUMMY_VAR', DUMMY_VARIANCE_PTR(I),
+     :        DUMMY_ENDVAR_PTR(I), STATUS)
+         CALL SCULIB_FREE ('DUMMY_QUAL', DUMMY_QUALITY_PTR(I),
+     :        DUMMY_ENDQUAL_PTR(I), STATUS)
+
+
       END DO
 
       CALL SCULIB_FREE ('TOTAL WEIGHT', TOTAL_WEIGHT_PTR,
@@ -1816,46 +1836,4 @@
  
       END
 
-
-
-      SUBROUTINE SCULIB_ENTER_DUMMY_DATA_R(ARRAY, NUM, VALUE, STATUS)
-
-      IMPLICIT NONE
-      INCLUDE 'SAE_PAR'
-
-      INTEGER STATUS          ! Global status
-
-      INTEGER I
-      INTEGER NUM             ! Number of elements in array
-      REAL    VALUE           ! Values to be entered in array
-      REAL    ARRAY(NUM)      ! Data array
-
-      IF (STATUS .NE. SAI__OK) RETURN
-
-      DO I = 1, NUM
-         ARRAY(I) = VALUE
-      END DO
-
-      END
-
-
-      SUBROUTINE SCULIB_ENTER_DUMMY_DATA_I(ARRAY, NUM, VALUE, STATUS)
-
-      IMPLICIT NONE
-      INCLUDE 'SAE_PAR'
-
-      INTEGER STATUS          ! Global status
-
-      INTEGER I
-      INTEGER NUM             ! Number of elements in array
-      INTEGER VALUE           ! Values to be entered in array
-      INTEGER ARRAY(NUM)      ! Data array
-
-      IF (STATUS .NE. SAI__OK) RETURN
-
-      DO I = 1, NUM
-         ARRAY(I) = VALUE
-      END DO
-
-      END
 
