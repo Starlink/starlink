@@ -537,7 +537,7 @@ TEST_FILES =
 
 LATEX_DOCS = sun226.tex sun226fig.ps
 HYPERTEXT_DOCS = sun226.htx
-MUD_DOCS = mud165.ps sex1_doc.ps.gz sexpaper.ps.gz
+MUD_DOCS = mud165.ps 
 
 #  List of documentation files.
 
