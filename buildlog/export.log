@@ -503,7 +503,7 @@ export:
 prepare:
 
 check_packages:
-[available] Nov 30, 2003 4:26:24 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Dec 1, 2003 4:26:09 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1772,8 +1772,8 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "CloudFigure is a class that paints itself as a
   [javadoc]  translucent "cloud."
-  [javadoc]  "
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/compat/trace/TraceRenderer.java:21: warning - @rating is an unknown tag.
+  [javadoc]  "
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/compat/trace/BasicTraceRenderer.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/compat/trace/TraceModel.java:20: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/compat/trace/TracePane.java:18: warning - @rating is an unknown tag.
@@ -3983,4 +3983,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.1a.tar
 
 BUILD SUCCESSFUL
-Total time: 18 minutes 6 seconds
+Total time: 17 minutes 21 seconds
