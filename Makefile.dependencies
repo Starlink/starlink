@@ -480,10 +480,13 @@ $(MANIFEST)/echomop: \
 	  && $(MAKE_CPT)
 
 $(MANIFEST)/echwind: \
+		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/gwm \
+		$(MANIFEST)/mers \
 		$(MANIFEST)/pgplot \
+		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd applications/echwind \
@@ -997,7 +1000,8 @@ $(MANIFEST)/kaplibs: \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/sst \
 		$(MANIFEST)/star2html \
-		$(MANIFEST)/starx
+		$(MANIFEST)/starx \
+		$(MANIFEST)/trn
 	cd libraries/kaplibs \
 	  && $(MAKE_CPT)
 
@@ -1291,9 +1295,12 @@ $(MANIFEST)/pgp: \
 	  && $(MAKE_CPT)
 
 $(MANIFEST)/pgplot: \
+		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/gwm \
+		$(MANIFEST)/mers \
+		$(MANIFEST)/psx \
 		$(MANIFEST)/sae
 	cd thirdparty/caltech/pgplot \
 	  && $(MAKE_CPT)
