@@ -48,8 +48,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     3-OCT-2001 (MJC):
+*     3-OCT-2001 (DSB):
 *        Original version.
+*     14-NOV-2001 (DSB):
+*        Only normalize the LUT if the max value is greater than 1.0
 *     {enter_changes_here}
 
 *  Bugs:
@@ -96,8 +98,9 @@
          TOP = MAX( COLS( 1, J ), MAX( COLS( 2, J ), COLS( 3, J ) ) )
       END DO
 
-*  Set up the normalization factor which scales the TOP value to unity.
-      IF( TOP .NE. 0. ) THEN
+*  If this is larger than 1, set up the normalization factor which 
+*  scales the TOP value to unity.
+      IF( TOP .NE. 0 .AND. TOP .GT. 1.0 ) THEN
          NORM = 1.0/TOP
       ELSE
          NORM = 1.0
