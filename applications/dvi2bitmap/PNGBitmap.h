@@ -27,6 +27,8 @@ class PNGBitmap : public BitmapImage {
  private:
     static png_structp png_ptr_;
     static png_infop info_ptr_;
+    static png_color* palettes_[];
+    static png_byte* trans_[];
 };
 
 

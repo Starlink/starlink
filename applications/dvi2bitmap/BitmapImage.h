@@ -18,6 +18,14 @@ class BitmapImage {
     void setBitmapRow (const Byte *B);
     //virtual void setColourTable (???) = 0;
     void setTransparent (const bool sw) { isTransparent_ = sw; };
+    void setRGB (const bool fg, const Byte r, const Byte g, const Byte b) {
+	if (fg)
+	{
+	    fg_red_ = r; fg_green_ = g; fg_blue_ = b;
+	} else {
+	    bg_red_ = r; bg_green_ = g; bg_blue_ = b;
+	}
+    };
     virtual void write (const string filename) = 0;
     virtual string fileExtension() const = 0;
 
@@ -43,6 +51,7 @@ class BitmapImage {
     bool myBitmap_;
     int bitmapRows_;
     bool isTransparent_;
+    Byte fg_red_, fg_green_, fg_blue_, bg_red_, bg_green_, bg_blue_;
 
     static const string *softwareversion;
     static const string *inputfilename;

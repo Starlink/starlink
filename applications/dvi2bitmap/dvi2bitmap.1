@@ -6,7 +6,7 @@ dvi2bitmap
 .B dvi2bitmap 
     [\-r resolution] [\-m magnification] 
     [\-fp font-path] [\-fm mfmode] [\-fg] [\-fG]
-    [\-P[bt]] [\-s scalefactor] [\-t png|gif|xbm] [\-o output]
+    [\-P[BbTt]] [\-s scalefactor] [\-t png|gif|xbm] [\-o output]
     [\-b(h|w) size] [\-c[lrtb] dimen] [\-C[lrtb] dimen]
     [\-nqV] [\-Q[fFt]] [\-p num] [\-l num] [\-pp ranges]
     dvi-file
@@ -198,9 +198,9 @@ process only pages where
 .I "\ecount2"
 was 1.
 .TP
-.I "\-P[bt]"
+.I "\-P[BbTt]"
 Specifies processing of the output bitmap.
-.I "\-Pb"
+.I "\-PB"
 blurs the bitmap, making a half-hearted attempt to make a
 low-resolution bitmap look better.  This really isn't up to much -- if
 you have the fonts available, or are prepared to wait for them to be
@@ -209,10 +209,17 @@ generated, a better way is to use the
 option to magnify the DVI file, and then the
 .I "\-s"
 option to scale it back down to the correct size.
-.I "\-Pt"
+.I "\-PT"
 makes the output bitmap have a transparent background, if
 that's supported by the particular format you choose using option
 .I "\-t"
+The options
+.I "\-Pb"
+and
+.I "\-Pt"
+disable blurring and
+transparency, respectively.  By default, bitmaps are not blurred, but
+are transparent if possible.
 .TP
 .I "\-q"
 Quiet mode -- suppress some chatter.
@@ -348,6 +355,15 @@ specify
 clear that this is setting a default format rather than setting the
 format only for the next image (that's not implemented at present, but
 could be added).
+.TP
+.I "default foreground|background red green blue"
+.IP
+Sets the (default) foreground and background colours for text.
+This works, as long as you specify the colour change before any text
+is output, since you can't, at present, change the colours after
+that.  Specifically, you can't change the colours for a fragment of
+text in the middle of a page.  The colours are specified as a set of
+three integers in the (inclusive) range 0--255.
 
 .PP
 For example, the pair of commands

@@ -40,6 +40,8 @@
 #include "Bitmap.h"		// for BitmapError exception class
 #include "GIFBitmap.h"
 
+#include <math.h>		// for floor() and ceil() in iround
+
 #if ! NO_CSTD_INCLUDE		// ie, there _is_ a <cstdio>
 using std::fopen;
 using std::fwrite;
@@ -69,6 +71,11 @@ GIFBitmap::~GIFBitmap()
 {
 }
 
+inline int iround (float f)
+{
+    return static_cast<int>(f>0 ? floor(f+0.5) : ceil(f-0.5));
+}
+
 void GIFBitmap::write (const string filename)
 {
     if (bitmapRows_ != h_)
@@ -78,21 +85,26 @@ void GIFBitmap::write (const string filename)
     if (bpp_ > 8)
 	throw DviBug ("max of 8 bits-per-pixel");
     const int ncolours = 1<<bpp_;
-    const int step = 256 >> bpp_;
 
-    int *CT = new int[ncolours];
-    //int val;
-    for (int i=0, val=255; i<ncolours-1; i++, val-=step)
-	CT[i] = val;
-    CT[ncolours-1] = 0;
-    //cerr << "GIFBitmap: " << ncolours << " colours:\n";
-    //for (int i=0; i<ncolours; i++)
-    //	cerr << CT[i] << ' ';
-    //cerr << '\n';
+    int *RedCT   = new int[ncolours];
+    int *GreenCT = new int[ncolours];
+    int *BlueCT  = new int[ncolours];
+    int diffred   = fg_red_  -bg_red_;
+    int diffgreen = fg_green_-bg_green_;
+    int diffblue  = fg_blue_ -bg_blue_;
+    for (int i=0; i<ncolours; i++)
+    {
+	float rat = static_cast<float>(i)/(ncolours-1);
+	RedCT[i]   = bg_red_   + iround(rat*diffred);
+	GreenCT[i] = bg_green_ + iround(rat*diffgreen);
+	BlueCT[i]  = bg_blue_  + iround(rat*diffblue);
+    }
 
-    //int Red[]   = { 255, 0 };
-    //int Green[] = { 255, 0 };
-    //int Blue[]  = { 255, 0 };
+    //const int step = 256 >> bpp_;
+    //int *CT = new int[ncolours];
+    //for (int i=0, val=255; i<ncolours-1; i++, val-=step)
+    //CT[i] = val;
+    //CT[ncolours-1] = 0;
 
     FILE *F = fopen (filename.c_str(), "wb");
     if (F == 0)
@@ -103,10 +115,13 @@ void GIFBitmap::write (const string filename)
 	       0,		// which CT entry is the background?
 	       (isTransparent_ ? 0 : -1), // make entry 0 transparent, if req'd
 	       bpp_,		// bits-per-pixel
-	       CT, CT, CT	// colour tables
+	       //CT, CT, CT	// colour tables
+	       RedCT, GreenCT, BlueCT
 	       );
     // GIFEncode closes the stream when it's finished
-    delete[] CT;
+    delete[] RedCT;
+    delete[] GreenCT;
+    delete[] BlueCT;
 }
 
 

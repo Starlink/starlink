@@ -31,6 +31,14 @@
 verbosities Bitmap::verbosity_ = normal;
 int  Bitmap::cropMarginDefault[4] = { 0, 0, 0, 0 };
 bool Bitmap::cropMarginAbsDefault[4] = {false, false, false, false };
+Byte Bitmap::def_fg_red_   = 0;
+Byte Bitmap::def_fg_green_ = 0;
+Byte Bitmap::def_fg_blue_  = 0;
+Byte Bitmap::def_bg_red_   = 255;
+Byte Bitmap::def_bg_green_ = 255;
+Byte Bitmap::def_bg_blue_  = 255;
+bool Bitmap::def_customRGB_ = false;
+
 
 
 // Indecision: Within scaleDown, it seems sensible to average the
@@ -43,7 +51,8 @@ bool Bitmap::cropMarginAbsDefault[4] = {false, false, false, false };
 // Coordinates on the bitmap run from 0 to W-1, and 0 to H-1,
 // with point (0,0) in the top left corner.
 Bitmap::Bitmap (const int w, const int h, const int bpp)
-    : W(w), H(h), frozen_(false), transparent_(false), bpp_(bpp)
+    : W(w), H(h), frozen_(false), transparent_(false), bpp_(bpp),
+      customRGB_(false)
 {
     B = new Byte[W*H];
     memset ((void*)B, 0, W*H);
@@ -63,6 +72,24 @@ Bitmap::Bitmap (const int w, const int h, const int bpp)
     cropMarginAbs[Right]  = cropMarginAbsDefault[Right];
     cropMarginAbs[Top]    = cropMarginAbsDefault[Top];
     cropMarginAbs[Bottom] = cropMarginAbsDefault[Bottom];
+
+    if (def_customRGB_)
+    {
+	fg_red_   = def_fg_red_;
+	fg_green_ = def_fg_green_;
+	fg_blue_  = def_fg_blue_;
+	bg_red_   = def_bg_red_;
+	bg_green_ = def_bg_green_;
+	bg_blue_  = def_bg_blue_;
+	cerr << "Bitmap constructor: Custom RGB:"
+	     << static_cast<int>(fg_red_) << ','
+	     << static_cast<int>(fg_green_) << ','
+	     << static_cast<int>(fg_blue_) << '/'
+	     << static_cast<int>(bg_red_) << ','
+	     << static_cast<int>(bg_green_) << ','
+	     << static_cast<int>(bg_blue_) << '\n';
+	customRGB_ = true;
+    }
 
     cropped_ = false;
     if (bpp_ > 8)
@@ -419,7 +446,22 @@ void Bitmap::write (const string filename, const string format)
 	    bi->setBitmapRow(&B[row*W+cropL]);
     else
 	bi->setBitmap (B);
+    if (verbosity_ > normal)
+	cerr << "Bitmap: transparent=" << transparent_ << '\n';
     bi->setTransparent (transparent_);
+    if (customRGB_)
+    {
+	if (verbosity_ > normal)
+	    cerr << "Bitmap: custom RGB: "
+		 << static_cast<int>(fg_red_) << ','
+		 << static_cast<int>(fg_green_) << ','
+		 << static_cast<int>(fg_blue_) << '/'
+		 << static_cast<int>(bg_red_) << ','
+		 << static_cast<int>(bg_green_) << ','
+		 << static_cast<int>(bg_blue_) << '\n';
+	bi->setRGB (true,  fg_red_, fg_green_, fg_blue_);
+	bi->setRGB (false, bg_red_, bg_green_, bg_blue_);
+    }
     string fileext = bi->fileExtension();
     string outfilename = filename;
     if (fileext.length() != 0)
@@ -434,3 +476,32 @@ void Bitmap::write (const string filename, const string format)
     delete bi;
 }
 
+
+void Bitmap::setRGB (const bool def, const bool fg,
+		     const Byte r, const Byte g, const Byte b) {
+    cerr << "setRGB: "
+	 << "def=" << def
+	 << " fg=" << fg
+	 << "RGB="
+	 << static_cast<int>(r) << ','
+	 << static_cast<int>(g) << ','
+	 << static_cast<int>(b) << '\n';
+    if (def)
+    {
+	if (fg)
+	{
+	    def_fg_red_ = r; def_fg_green_ = g; def_fg_blue_ = b;
+	} else {
+	    def_bg_red_ = r; def_bg_green_ = g; def_bg_blue_ = b;
+	}
+	def_customRGB_ = true;
+    }
+
+    if (fg)
+    {
+	fg_red_ = r; fg_green_ = g; fg_blue_ = b;
+    } else {
+	bg_red_ = r; bg_green_ = g; bg_blue_ = b;
+    }
+    customRGB_ = true;
+}

@@ -16,6 +16,7 @@
 
 #include <time.h>
 #include <assert.h>
+#include <math.h>		// for floor()
 
 #include "Bitmap.h"		// for BitmapError exception class
 #include "PNGBitmap.h"
@@ -30,6 +31,10 @@ using std::fclose;
 
 png_structp PNGBitmap::png_ptr_ = 0;
 png_infop PNGBitmap::info_ptr_ = 0;
+// Following two must have indexes 1..8 (for up to 8 bpp bit depth),
+// be initialised to zero, and have the same length.
+png_color *PNGBitmap::palettes_[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+png_byte *PNGBitmap::trans_[]     = { 0, 0, 0, 0, 0, 0, 0, 0, 0  };
 
 static void png_error_fn (png_structp png_ptr, png_const_charp error_msg);
 static void png_warning_fn (png_structp png_ptr, png_const_charp warning_msg);
@@ -47,10 +52,39 @@ PNGBitmap::~PNGBitmap()
 {
     if (png_ptr_ != 0)
 	png_destroy_write_struct (&png_ptr_, (!info_ptr_ ? 0 : &info_ptr_));
+    int npalettes = sizeof(palettes_)/sizeof(palettes_[0]);
+    for (int i=0; i<npalettes; i++)
+    {
+	if (palettes_[i] != 0)
+	    delete[] palettes_[i];
+	if (trans_[i] != 0)
+	    // Won't necessarily be non-zero when palettes_[i] is, if
+	    // isTransparent_ is true.
+	    delete[] trans_[i];
+    }
+}
+
+inline int iround (float f)
+{
+    return static_cast<int>(f>0 ? floor(f+0.5) : ceil(f-0.5));
 }
 
 void PNGBitmap::write (const string filename)
 {
+    // Write out bitmaps using a palette.  A greyscale is more
+    // obvious, since the smoothed bit values are essentially
+    // monochrome, but using a palette (a) makes it very easy to use
+    // colours different from black in the future, and (b) allows us
+    // to use a tRNS chunk to include transparency information,
+    // without the overhead of a full alpha channel.  Palettes are
+    // limited to 8 bits of colour table.
+
+    // This routine can cope with only these two types
+    int colour_type = PNG_COLOR_TYPE_PALETTE;
+#if 0
+    int colour_type = PNG_COLOR_TYPE_GRAY;
+#endif
+
     if (bitmapRows_ != h_)
 	throw BitmapError ("attempt to PNGBitmap::write with incomplete bitmap");
 
@@ -91,7 +125,8 @@ void PNGBitmap::write (const string filename)
 	// to invert the greyscale on output.  This function is not
 	// present in libpng 0.96 -- should I work around this or just
 	// require newer versions?
-	png_set_write_user_transform_fn (png_ptr_, &png_invert_greyscale);
+	if (colour_type == PNG_COLOR_TYPE_GRAY)
+	    png_set_write_user_transform_fn (png_ptr_, &png_invert_greyscale);
 
 	/* not needed since I use custom error functions above
 	if (setjmp (png_ptr_->jmpbuf))
@@ -120,9 +155,85 @@ void PNGBitmap::write (const string filename)
 	     << "\n";
 
     png_set_IHDR (png_ptr_, info_ptr_, w_, h_, png_bitdepth,
-		  PNG_COLOR_TYPE_GRAY, PNG_INTERLACE_ADAM7,
+		  colour_type,
+		  PNG_INTERLACE_ADAM7,
 		  PNG_COMPRESSION_TYPE_BASE,
 		  PNG_FILTER_TYPE_BASE);
+
+    if (colour_type & PNG_COLOR_MASK_PALETTE)
+    {
+	if (palettes_[bpp_] == 0
+	    || (isTransparent_ && trans_[bpp_] == 0))
+	{
+	    // Create and set palette, making a smooth palette between
+	    // 0..(2^bpp_-1).  Note that the input bitmap is coded in
+	    // terms of high=black, so invert this in this palette.
+	    int maxcolour = (1<<bpp_)-1;
+	    /*
+	    png_color fgpx;
+	    png_color bgpx;
+	    fg_red_   = fg_red_;
+	    fg_green_ = fg_green_;
+	    fg_blue_  = fg_blue_;
+	    bg_red_   = bg_red_;
+	    bg_green_ = bg_green_;
+	    bg_blue_  = bg_blue_;
+	    */
+	    int diffred   = fg_red_   - bg_red_;
+	    int diffgreen = fg_green_ - bg_green_;
+	    int diffblue  = fg_blue_  - bg_blue_;
+
+	    palettes_[bpp_] = new png_color[maxcolour+1];
+
+	    if (isTransparent_)
+		trans_[bpp_] = new png_byte[maxcolour+1];
+
+	    for (int i=0; i<=maxcolour; i++)
+	    {
+		float rat = static_cast<float>(i)/maxcolour;
+		if (isTransparent_)
+		    trans_[bpp_][i] = iround (rat*255);
+		palettes_[bpp_][i].red
+		    = bg_red_   + iround(rat*diffred);
+		palettes_[bpp_][i].green
+		    = bg_green_ + iround(rat*diffgreen);
+		palettes_[bpp_][i].blue
+		    = bg_blue_  + iround(rat*diffblue);
+	    }
+	    if (verbosity_ > normal)
+	    {
+		cerr << "Allocated palette for bitdepth " << bpp_
+		     << "...\n";
+		for (int i=0; i<=maxcolour; i++)
+		    cerr << '\t' << i
+			 << '\t'
+			 << static_cast<int>(palettes_[bpp_][i].red)
+			 << '\t'
+			 << static_cast<int>(palettes_[bpp_][i].green)
+			 << '\t'
+			 << static_cast<int>(palettes_[bpp_][i].blue)
+			 << '\t'
+			 << static_cast<int>(isTransparent_
+					     ? trans_[bpp_][i]
+					     : -1)
+			 << '\n';
+	    }
+	}
+	assert (palettes_[bpp_] != 0);
+	assert (!isTransparent_ || (trans_[bpp_] != 0));
+
+	png_set_PLTE (png_ptr_, info_ptr_,
+		      palettes_[bpp_], (1<<bpp_));
+
+	if (isTransparent_)
+	    png_set_tRNS (png_ptr_, info_ptr_,
+			  trans_[bpp_], (1<<bpp_),
+			  0);
+
+	png_color_16 white;
+	white.index = 0;
+	png_set_bKGD (png_ptr_, info_ptr_, &white);
+    }
 
     time_t sectime = time(0);
     if (sectime >= 0)
@@ -186,7 +297,15 @@ void PNGBitmap::write (const string filename)
     if (png_bitdepth != bpp_)
     {
 	png_color_8 sigbit;
-	sigbit.gray = bpp_;
+	if (colour_type & PNG_COLOR_MASK_COLOR)
+	    sigbit.red
+		= sigbit.green
+		= sigbit. blue
+		= bpp_;
+	else
+	    sigbit.gray = bpp_;
+	if (colour_type & PNG_COLOR_MASK_ALPHA)
+	    sigbit.alpha = bpp_;
 	png_set_sBIT (png_ptr_, info_ptr_, &sigbit);
 	png_set_shift (png_ptr_, &sigbit);
     }
@@ -219,6 +338,23 @@ void PNGBitmap::write (const string filename)
     }
     for (int r=0; r<h_; r++)
 	rows[r] = &bitmap_[r*w_];
+
+
+#if 0
+    cerr << "row 5:\n";
+    int rowcount = 0;
+    for (int p=0; p<w_; p++)
+    {
+	cerr << static_cast<int>(bitmap_[5*w_+p]) << '\t';
+	if (++rowcount >= 0)
+	{
+	    cerr << '\n';
+	    rowcount = 0;
+	}
+    }
+    cerr << '\n';
+#endif
+
 
     png_write_image (png_ptr_, const_cast<Byte**>(rows));
 

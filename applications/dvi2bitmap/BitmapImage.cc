@@ -4,6 +4,10 @@
 //
 // $Id$
 
+// FIXME: I think I should make this class a subclass of Bitmap, so it can
+// share things like isTransparent_ and the foreground and background
+// colours.
+
 //#include <iostream>
 
 #ifdef HAVE_CONFIG_H
@@ -20,7 +24,8 @@
 #endif
 #include "XBMBitmap.h"
 
-// define and initialise static strings
+// Define and initialise static strings.  
+// FIXME: This is a very untidy mechanism!  
 const string *BitmapImage::softwareversion = 0;
 const string *BitmapImage::inputfilename = 0;
 const string *BitmapImage::furtherinfo = 0;
@@ -44,7 +49,10 @@ verbosities BitmapImage::verbosity_ = normal;
 BitmapImage::BitmapImage(const int w, const int h, const int bpp)
     : w_(w), h_(h), bpp_(bpp),
       bitmap_(0), allocBitmap_(0), myBitmap_(false), bitmapRows_(0),
-      isTransparent_(false)
+      isTransparent_(false),
+      fg_red_(0), fg_green_(0), fg_blue_(0),
+      bg_red_(255), bg_green_(255), bg_blue_(255)
+
 {
 }
 

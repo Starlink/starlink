@@ -267,11 +267,17 @@ int main (int argc, char **argv)
 		while (*++*argv != '\0')
 		    switch (**argv)
 		    {
-		      case 'b':	// blur bitmap
-			bm.blur_bitmap = !bm.blur_bitmap;
+		      case 'B':	// blur bitmap
+			bm.blur_bitmap = true;
 			break;
-		      case 't':	// make bitmap transparent
-			bm.make_transparent = !bm.make_transparent;
+		      case 'b':	// don't
+			bm.blur_bitmap = false;
+			break;
+		      case 'T':	// make bitmap transparent
+			bm.make_transparent = true;
+			break;
+		      case 't':	// don't
+			bm.make_transparent = false;
 			break;
 		      default:
 			Usage();
@@ -840,6 +846,33 @@ bool process_special (string specialString, Bitmap* bitmap, bitmap_info& b)
 		    b.ofile_type = *s;
 		    if (!setDefault)
 			cerr << "Warning: imageformat special should be prefixed with `default'\n";
+		}
+	    }
+	    else if (*s == "foreground" || *s == "background")
+	    {
+		bool isfg = (*s == "foreground");
+		Byte r, g, b;
+		s++;
+		if (s == l.end()) { stringOK = false; break; }
+		r = static_cast<Byte>(atoi (s->c_str()));
+		s++;
+		if (s == l.end()) { stringOK = false; break; }
+		g = static_cast<Byte>(atoi (s->c_str()));
+		s++;
+		if (s == l.end()) { stringOK = false; break; }
+		b = static_cast<Byte>(atoi (s->c_str()));
+
+		if (stringOK)
+		{
+		    if (verbosity > normal)
+			cerr << "Set "
+			     << (setDefault ? "(default) " : "")
+			     << (isfg ? "foreground" : "background")
+			     << " to "
+			     << static_cast<int>(r) << ','
+			     << static_cast<int>(g) << ','
+			     << static_cast<int>(b) << '\n';
+		    bitmap->setRGB (setDefault, isfg, r, g, b);
 		}
 	    }
 	    else
