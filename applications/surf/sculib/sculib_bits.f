@@ -9,6 +9,9 @@
 *     T. Jenness (timj@jach.hawaii.edu)
 *    History:
 *     $Log$
+*     Revision 1.4  1997/05/29 20:50:17  timj
+*     Remove SCULIB_BTOI (use NUM_UBTOI instead)
+*
 *     Revision 1.3  1997/05/01 22:22:46  timj
 *     Add SCULIB_BTOI to convert BYTE to INTEGER*4
 *
@@ -136,33 +139,5 @@ c
 *-
 
       SCULIB_BITAND = IIAND(IZEXT(VAL1), IZEXT(VAL2))
-
-      END
-
-*** INTEGER FUNCTIONS
-
-*+ SCULIB_BTOI - Convert BYTE to INTEGER*4
-      INTEGER FUNCTION SCULIB_BTOI (VAL)
-*    Description:
-*     Converts a BYTE to an INTEGER*4
-*    Invocation:
-*     IVAL = SCULIB_BTOI(VAL)
-*    Parameters:
-*     VAL              = BYTE (Given)
-*           Input byte
-*    Type Definitions:
-      IMPLICIT NONE
-*    Global constants :
-*    Import :
-      BYTE VAL
-*    Export:
-*    Status :
-*    External references :
-*    Global variables :
-*    Local Constants :
-*    Local variables :
-*-
-
-      SCULIB_BTOI = JZEXT(VAL)
 
       END
