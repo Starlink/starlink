@@ -701,7 +701,6 @@ display will not."
    Obey kapview paldef "device=$DEVICE" 1
    Obey kapview gdclear "device=$DEVICE" 1
    Obey kapview gdset "device=$DEVICE" 1
-   Obey kapview idset "device=$DEVICE" 1
    set DOING ""
 
 # Re-size the image display if the top-level window is resized.
