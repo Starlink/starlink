@@ -5,6 +5,9 @@
 #
 #           Fri Jul 18 14:17:30 BST 1997
 
+#  .eps files holding figures used in sun223
+FIGS = grids.eps
+
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.
 USER_TASKS = polcal.f polexp.f polhelp.f polimp.f polka.f polmap.f \
@@ -55,10 +58,11 @@ UNIX_OTHERS = polpack.news mk makefile polka.tex polmap.tex sun223.tex
 
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
-UNIX_RELEASE =  $(UNIX_SOURCE) $(UNIX_OTHERS)
+UNIX_RELEASE =  $(UNIX_SOURCE) $(UNIX_OTHERS) $(FIGS)
 
 #  The contents of polpack.tar.
-UNIX_TOTAL = polka.htx_tar polmap.htx_tar ndg_source.tar polpack_source.tar $(UNIX_OTHERS)
+UNIX_TOTAL = polka.htx_tar polmap.htx_tar ndg_source.tar polpack_source.tar \
+$(UNIX_OTHERS) sun223_figures
 
 #  Target for use by the grp command.
 $(action)
