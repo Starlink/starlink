@@ -445,6 +445,7 @@
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
       INCLUDE 'FIO_PAR'          ! FIO parameterisations
       INCLUDE 'AST_PAR'          ! Standard AST constants
+      INCLUDE 'GRP_PAR'          ! GRP stysem constants
       INCLUDE 'PAR_ERR'          ! PAR system error constants
 
 *  Status:

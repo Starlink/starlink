@@ -273,6 +273,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
       INCLUDE 'FIO_PAR'          ! FIO parameters
+      INCLUDE 'GRP_PAR'          ! GRP system constants
 
 *  Status:
       INTEGER STATUS             ! Global status

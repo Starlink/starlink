@@ -297,6 +297,7 @@
       INCLUDE 'DAT_PAR'         ! HDS/DAT parameterisations
       INCLUDE 'NDF_PAR'         ! NDF parameterisations
       INCLUDE 'FIO_PAR'         ! FIO system parameters
+      INCLUDE 'GRP_PAR'         ! GRP system constants
       INCLUDE 'CCD1_PAR'        ! CCDPACK parameterisations
 
 *  Status:
