@@ -339,9 +339,9 @@
 *  History
       IF ( .NOT. PRIM ) THEN
         CALL HSI_ADD( OFID, VERSION, STATUS )
-        CALL HSI_PTXTI( OFID, IFILES, STATUS )
+        CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
         IF ( .NOT. OVER ) THEN
-          CALL HSI_PTXTI( OFID, OFILES, STATUS )
+          CALL HSI_PTXTI( OFID, OFILES, .TRUE., STATUS )
         END IF
         CALL HSI_PTXT( OFID, 1, 'Operator = '//OPER, STATUS )
       END IF
