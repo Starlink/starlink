@@ -28,8 +28,14 @@ DVI2BITMAP = ../dvi2bitmap
 	dt2dv $< $@ >$@.log 2>&1
 
 check_PROGRAMS = $(TESTS)
-# t6.test forks and execs itself, so it must be linked statically
-t6_test_LDFLAGS = -static
+# t6.test forks and execs itself, so the libtool trick of creating a shell
+# script with the same name, which resolves the shared library dependencies,
+# won't work.  Instead link it statically.  Note that this fails on Tru64
+# because of some as-yet unintelligible linking problem [FIXME: why doesn't
+# it work on Tru64 -- I can't see the problem in the ld messages]
+t6_test_LDFLAGS = -all-static
+t5_test_LDFLAGS = -lm
+t7_test_LDFLAGS = -lm
 LDADD = ../libdvi2bitmap.la
 CPPFLAGS = -I..
 t1_test_SOURCES = t1.cc
@@ -88,12 +94,12 @@ sampler: sampler.html modetest-sampler.html modetest-maths-sampler.html modetest
 	mv modetest*.png sampler
 	cp sampler.html sampler
 
-BUILT_SOURCES = t6.data
 
 
 MOSTLYCLEANFILES = \
+	t6.data \
 	*~ *.o *.lo *.test *.stderr \
-	*.log *.aux *.dvi *.pdf \
+	*.log *.aux *.pdf \
 	test-output* temp* \
 	modetest*sampler*
 
