@@ -35,7 +35,7 @@ dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun95 sun221)
 
-AC_CONFIG_SUBDIRS([kapsub ccdpack atools])
+AC_CONFIG_SUBDIRS([kapsub ccdpack atools libndfpack libkapview libkappa])
 
 AC_CONFIG_FILES(Makefile component.xml kappa_mon.f ndfpack_mon.f kapview_mon.f kappa.ifd lutedit.tcl stardemo.tcl adamMessageRelay, [chmod +x lutedit.tcl adamMessageRelay stardemo.tcl])
 
