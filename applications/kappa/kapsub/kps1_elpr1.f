@@ -104,6 +104,9 @@
 *        lines, and used a modern-style variable declaration.
 *     3-AUG-1998 (DSB):
 *        Corrected logic for creating sectors of larger than 180 degrees.
+*     6-DEC-2004 (DSB):
+*        Write first polgon vertex out on same line as the POLY keyword 
+*        (this is a work around for a bug in ARD).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -203,12 +206,9 @@
             LPA2 = LPA2 + TWOPI
          END DO
 
-*  Start a Polygon ARD region.
-         CALL GRP_PUT( IGRP, 1, 'POLY(', 0, STATUS )         
-
-*  The sector polygon starts at the profile centre.
-         WRITE( TEXT, * ) '0.0, 0.0'
-         CALL GRP_PUT( IGRP, 1, TEXT, 0, STATUS )
+*  Start a Polygon ARD region. The sector polygon starts at the profile
+*   centre.
+         CALL GRP_PUT( IGRP, 1, 'POLY( 0.0, 0.0', 0, STATUS )         
 
 *  Next point is the end of radius number 1 .
          WRITE( TEXT, * ) R*COS( PA1 ), ',', R*SIN( PA1 )
