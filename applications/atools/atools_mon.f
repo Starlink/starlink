@@ -114,6 +114,9 @@
       ELSE IF ( NAME .EQ. 'REMAPFRAME' ) THEN
          CALL REMAPFRAME( STATUS )
 
+      ELSE IF ( NAME .EQ. 'MATRIXMAP' ) THEN
+         CALL MATRIXMAP( STATUS )
+
 *  If the action name is not recognised, then report an error.
       ELSE
          STATUS = SAI__ERROR
