@@ -265,7 +265,7 @@ $CANEXIT = 1;
 
 #  Sort out how we are going to get the current directory name.
 use Cwd;
-$DEFAULTDIR = &getcwd;
+$DEFAULTDIR = getcwd();
 
 #  Locate the Star2HTML latex2html script. This should be in the same
 #  directory as this file.
@@ -612,7 +612,7 @@ sub edit_main {
 
 #  Generate the names of the dummy style files we require (needed to make
 #  sure their perl equivalents are loaded), and create them.
-   $cwd = &getcwd;
+   $cwd = getcwd();
    $starsty = "$cwd" . '/star2html.sty';
    system ( "touch $starsty" );
 
@@ -1154,9 +1154,9 @@ sub get_absolute_directory {
     local($directory) = @_;
     local($orig_cwd);
     if (! ( $directory =~ /^\// ) ) { # $directory doesn't start with '/'
-        $orig_cwd = &getcwd;
+        $orig_cwd = getcwd();
         chdir $directory;
-        $directory = &getcwd;
+        $directory = getcwd();
         chdir $orig_cwd;
     }
     $directory;
