@@ -5,8 +5,10 @@
  * $Id$
  */
 
-/* leave `everything' as the last in this enum */
+/* Since this is a server, normal is pretty silent anyway.
+ * Leave `everything' as the last in this enum.
+ */
 #ifndef VERBOSITY_HEADER_READ
 #define VERBOSITY_HEADER_READ 1
-enum verbosities { silent, quiet, normal, debug, everything };
+enum verbosities { silent, normal, debug, everything };
 #endif

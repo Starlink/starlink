@@ -22,7 +22,10 @@ use IPC::Open2;
 
 my $DefaultCatalogue = 'usno@eso';
 my $MoggyCommand = '$AUTOASTROM_DIR/moggy';
-my $MoggyPmVersion = '$Id$ ';
+#my $MoggyCommand = '$AUTOASTROM_DIR/test/dummy-slave.pl';
+my $MoggyRCSId = '$Id$ ';
+# %%VERSION%%
+my $VERSION = '0.1';
 
 #+
 #  <routinename>new
@@ -55,6 +58,14 @@ sub new {
 
     defined($catname) || return undef;
 
+    #print STDERR "Moggy::new\n";
+    #print STDERR "\tcatname="
+    #  . (defined ($catname) ? $catname : "<undef>") . "\n";
+    #print STDERR "\tconfname="
+    #  . (defined ($confname) ? $confname : "<undef>") . "\n";
+    #print STDERR "\tmoggycmd="
+    #  . (defined ($moggycmd) ? $moggycmd : "<undef>") . "\n";
+
     # Instance variables relevant to the catalogue.  These have
     # get/set methods with the same names.
     $self->{CATNAME} = $catname;
@@ -65,6 +76,8 @@ sub new {
     $self->{MAXROW} = undef;	# Maximum number of rows to return
     $self->{POINT} = undef;	# reference to six-element array
     $self->{OTHERPOINT} = undef;# reference to six-element array
+    $self->{ASTINFORMATION} = undef;
+    $self->{ASTDOMAIN} = undef;
 
     # Query result
     $self->{RESULT} = undef;	# result of query (reference to array
@@ -84,7 +97,7 @@ sub new {
     $self->{MOGGYVERSION} = undef;
     # `Globals'
     $self->{_MOGGYCMD} = (defined($moggycmd) ? $moggycmd : \$MoggyCommand);
-    $self->{_MOGGYPMVERSION} = \$MoggyPmVersion;
+    $self->{_MOGGYPMVERSION} = \$MoggyRCSId;
 
     bless ($self, $class);
 
@@ -301,6 +314,69 @@ sub searchtype {
     return $self->{SEARCHTYPE};
 }
 
+#+ <routinename>astinformation
+# <description>Gets or, with an argument, sets the AST information.
+# <argumentlist>
+#   <parameter optional>
+#     <name>domain
+#     <type>string
+#     <description>A string giving the domain in which later coordinates will
+#       be quoted, and which is the base frame of the AST SkyFrame to follow.
+#   <parameter optional>
+#     <name>astarray
+#     <type>array of strings
+#     <description>An array of strings, each element of which represents
+#       a line of WCS information as serialised by AST.
+# <returnvalue>The current value, as a reference to an array of strings,
+#  or undef on error.
+#-
+sub astinformation {
+    my $self = shift;
+    my $domain = shift;
+    my @astarray = (@_ ? @_ : undef);
+
+    if (defined($domain)) {
+	if (defined(@astarray)) {
+	    $self->send_command_to_slave_ ("AST FRAMESET", $domain);
+
+	    $self->status_continue() || return undef;
+
+	    my $i;
+	    print STDERR "astinformation: sending\n";
+	    for ($i=0; $i<3; $i++) {
+		print STDERR "  $astarray[$i]\n";
+	    }
+	    print STDERR "  [...]\n";
+	    for ($i=$#astarray-3; $i<=$#astarray; $i++) {
+		print STDERR "  $astarray[$i]\n";
+	    }
+	    print STDERR "!!!\n";
+
+	    $self->send_input_to_slave_ (\@astarray);
+
+	    $self->status_ok() || return undef;
+
+	    $self->{ASTINFORMATION} = \@astarray;
+	    $self->{ASTDOMAIN} = $domain;
+	} else {
+	    # Must have two arguments or none
+	    return undef;
+	}
+    }
+
+    return $self->{ASTINFORMATION};
+}
+
+#+
+# <routinename>astdomain
+# <description>Returns the current domain, as set by routine astinformation().
+# <returnvalue type=string>Name of current domain
+#-
+sub astdomain {
+    my $self = shift;
+    return $self->{ASTDOMAIN};
+}
+
 #+
 # <routinename>query
 # <description>Perform the query which has been set up by calls to other
@@ -432,7 +508,32 @@ sub version {
     $self->{MOGGYVERSION} = $self->send_command_to_slave_ ("VERSION")
       unless (defined($self->{MOGGYVERSION}));
 
-    return "${$self->{_MOGGYPMVERSION}}, moggy version $self->{MOGGYVERSION}";
+    return "$VERSION, ${$self->{_MOGGYPMVERSION}}, moggy version $self->{MOGGYVERSION}";
+}
+
+# Debugging method -- send the debug string to moggy.
+sub debug {
+    my $self = shift;
+    my $dbgstring = shift;
+
+    my %kwdtomask = ( "moggy" => 1 ,
+		      "commandparse" => 2,
+		      "asthandler" => 4,
+		      "cataloguehandler" => 8
+		      );
+
+    if (defined($dbgstring)) {
+	$dbgstring = lc($dbgstring);
+	my $mask = 0;
+	my $kwd;
+	foreach $kwd (split (' ', $dbgstring)) {
+	    $mask += $kwdtomask{$kwd} if (defined($kwdtomask{$kwd}));
+	}
+	print STDERR "Debugging: <$dbgstring> -> $mask\n";
+	$self->send_command_to_slave_("DEBUG", $mask);
+    }
+
+    return "debug";
 }
 
 # Start the slave.  Nilpotent -- if the slave is already running, then
@@ -521,6 +622,69 @@ sub send_command_to_slave_ {
     return $self->{SLAVEMESSAGE};
 }
 
+# Send a multi-line command to the slave, and receive a one-line string
+# response.  If the current status is not OK, then do nothing, and
+# silently return undef.  If a command fails, then set {FAILEDCOMMAND}
+# and return the message.
+#
+# The argument must be a reference to an array of strings.  If there is
+# no argument, nothing happens and the method returns undef;
+#
+# This means that this method may be called repeatedly, without
+# checking the status.  If something goes wrong in a sequence of
+# commands (as determined by the result code returned), then the
+# subsequent commands will not be executed, the status and message
+# operated on or returned by status_ok(), current_status(),
+# current_statusmessage() and failed_command() will be those corresponding
+# to the failed command, and not any subsequent ones.
+sub send_input_to_slave_ {
+    my $self = shift;
+    my $strings = shift;
+
+    defined ($strings) || return undef;
+    $self->status_ok() || $self->status_continue() || return undef;
+
+    # Start the slave if it's not already running.
+    $self->{MOGGYPID} || $self->start_slave_ ();
+
+    print STDERR "send_input_to_slave_: $#$strings elements...\n";
+
+    if ($self->{MOGGYPID}) {
+	my $WTR = $self->{SLAVEWRITER};
+	my $RDR = $self->{SLAVEREADER};
+	my $line;
+
+#open (SL, ">slavelog") || die "Can't open slavelog to write";
+my $i=0;
+	foreach $line (@$strings) {
+	    $i++;
+	    if (($i < 4) || ($i >= $#$strings-4)) {
+		print STDERR "slave_: <$line>\n";
+		$i++;
+	    }
+	    print $WTR "$line\r\n";
+	}
+	print $WTR ".\r\n";
+	print STDERR "slave_: !!FINISHED!!\n";
+	my $responseline = <$RDR>;
+
+	$responseline =~ s/\s*$//;
+	#print STDERR "send_command_to_slave_: read $responseline\n";
+	($self->{SLAVESTATUS}, $self->{SLAVEMESSAGE})
+	  = ($responseline =~ /^\s*(\w*)\s*(.*)/);
+	#print STDERR "read_slave_status_: <".$self->{SLAVESTATUS}.">  <".$self->{SLAVEMESSAGE}.">\n";
+
+	$self->status_ok() || ($self->{FAILEDCOMMAND} = '<input>');
+    } else {
+	# Slave didn't start up properly
+	$self->{SLAVESTATUS} = "5--"; # so status_ok() returns false
+	$self->{SLAVEMESSAGE} = '<Unable to start slave>';
+	$self->{FAILEDCOMMAND} = '<Unable to start slave>';
+    }
+
+    return $self->{SLAVEMESSAGE};
+}
+
 ## Read the status line which is sent as the response to each
 ## command. If status_ok is false, then the recent call to
 ## `send_command_to_slave_' will have done nothing, so there is no
@@ -551,6 +715,8 @@ sub send_command_to_slave_ {
 #     if the status is bad, then they correspond to the command which
 #     failed, which can be examined using `failed_command()'.
 #   <p>You can clear the status with a call to the `status_clear()' method.
+#   <p>Status codes starting `3', generated in response to the AST command,
+#     are not counted as success codes -- use status_continue() to test that.
 # <argumentlist none>
 # <returnvalue>True if the status is good; false if bad
 #-
@@ -559,6 +725,24 @@ sub status_ok {
     # OK -- ie, if the {SLAVESTATUS} started with `2'.
     my $self = shift;
     return ($self->{SLAVESTATUS} =~ /^2/);
+}
+
+#+
+# <routinename>status_continue
+# <description>Report on the error status of the moggy program.
+#   <p>Much as status_ok(), except that this tests whether the current status
+#     is a continue status, with a status code starting with digit three.
+#   <p>You can clear the status with a call to the `status_clear()' method.
+#   <p>Status codes starting `3', generated in response to the AST command,
+#     are not counted as success codes -- use status_continue() to test that.
+# <argumentlist none>
+# <returnvalue>True if the status is good; false if bad
+#-
+sub status_continue {
+    # Examine the current {SLAVESTATUS} and return true if the slave process
+    # is expecting more input -- ie, if the {SLAVESTATUS} started with `3'.
+    my $self = shift;
+    return ($self->{SLAVESTATUS} =~ /^3/);
 }
 
 #+

@@ -51,19 +51,23 @@ static const char RCSID[] =
 #include "moggy.h"
 #include "CommandParse.h"
 #include "CatalogueHandler.h"
+#include "AstHandler.h"
+#include "stringstream.h"
 #include "util.h"
+#include "verbosity.h"
 
 const char *progname;
 
 const string crlf = "\r\n";
 
+verbosities verbosity = normal;
+
 void dumpCatalogue (ostream& o);
-string processCommand (CommandParse *t, bool& keepGoing);
+string processCommand (CommandParse *t, istream& cin, bool& keepGoing);
 void Usage ();
 
 int main (int argc, char **argv)
 {
-    ofstream logfile;		// For debugging only.
     bool errorExit = true;	// Initialise to true, and clear it if 
 				// we exit normally from the loop
 				// below.  Exceptions don't clear it,
@@ -76,6 +80,7 @@ int main (int argc, char **argv)
 	if (**argv == '-')
 	    switch (*++*argv)
 	    {
+#if 0
 	      case 'l':		// log file
 		++*argv;
 		if (**argv == '\0')
@@ -86,6 +91,7 @@ int main (int argc, char **argv)
 		// it, and it won't cause problems below, since we
 		// always test (logfile) before writing to it.
 		break;
+#endif
 	      default:
 		Usage();
 	    }
@@ -115,15 +121,15 @@ int main (int argc, char **argv)
 	{
 	    CommandParse* cmd = new CommandParse (commandline);
 
-	    if (logfile)
+	    if (verbosity > normal)
 	    {
 		vector<string> arglist = cmd->arguments();
-		logfile << "Command :";
+		cerr << "Moggy:dialogue:Command :";
 		for (vector<string>::const_iterator p=arglist.begin();
 		     p != arglist.end();
 		     ++p)
-		    logfile << ' ' << *p;
-		logfile << endl;
+		    cerr << ' ' << *p;
+		cerr << endl;
 	    }
 
 	    // Process the parsed command obtained from the input.  If 
@@ -131,14 +137,14 @@ int main (int argc, char **argv)
 	    // then that is written to cout and an empty response
 	    // returned.  Otherwise, this returns a one-line response, 
 	    // which we write to cout below.
-	    string response = processCommand (cmd, keepGoing);
+	    string response = processCommand (cmd, cin, keepGoing);
 
 	    if (response.length() > 0)
 	    {
 		cout << response << crlf;
 
-		if (logfile)
-		    logfile << "Response: " << response << endl;
+		if (verbosity > normal)
+		    cerr << "Moggy:dialogue:Response: " << response << endl;
 	    }
 
 	    // Flush the output, since this program will be used inside a pipe.
@@ -185,16 +191,94 @@ int main (int argc, char **argv)
 // Since this is the routine where all this program's processing
 // happens, we won't give an exception-specification, but assume it
 // can throw anything.
-string processCommand (CommandParse *cmd, bool& keepGoing)
+string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 {
     vector<string> arglist = cmd->arguments();
     string response;
     static CatalogueHandler cat;
+    static AstHandler *ast;
+    static enum { ALL, SELECTED } columnstyle = ALL;
+    static string OPseparator = " ";
 
     switch (cmd->type())
     {
       case CommandParse::INVALID:
 	response = "500 Unknown command";
+	break;
+
+      case CommandParse::AST:
+	if (arglist.size() == 2)
+	{
+	    string upar = arglist[1];
+	    Util::uppercaseString(upar);
+	    if (upar == "NONE")
+	    {
+		// OK
+		if (ast != 0)
+		{
+		    delete ast;
+		    ast = 0;
+		}
+		response = "250 Frameset deleted";
+	    }
+	    else
+		response = "501 Wrong number or type of parameters";
+	}
+	else if (arglist.size() == 3)
+	{
+	    string upar = arglist[1];
+	    Util::uppercaseString(upar);
+	    if (upar == "FRAMESET")
+	    {
+		// OK.  First delete any old AST information
+		if (ast != 0)
+		    delete ast;
+
+		// Send back the reply requesting the frameset
+		cout << "350 Command accepted -- send frameset"
+		     << crlf << flush;
+
+		if (verbosity > normal)
+		    cerr << "Moggy:dialogue:Response:"
+			 << "350 Command accepted -- send frameset" << endl;
+
+		// ... and read the frameset
+
+		vector<string> frameset;
+		string astlinein;
+		while (getline (instream, astlinein))
+		{
+		    // top and tail whitespace from the string
+		    string::size_type startpos
+			= astlinein.find_first_not_of (" \t\r\n");
+		    string::size_type endpos
+			= astlinein.find_last_not_of (" \t\n\r");
+
+		    if (verbosity > normal)
+			cerr << "Moggy:dialogue:Input   :"
+			     << astlinein << endl;
+
+		    if (startpos < astlinein.npos)
+		    {
+			// The string is not solely whitespace
+			string astline = astlinein.substr (startpos,
+							   endpos-startpos+1);
+
+			if (astline == ".")
+			    break;
+
+			frameset.push_back(astline);
+		    }
+		}
+
+		ast = new AstHandler (frameset, arglist[2]);
+		response = "250 Frameset created successfully";
+	    }
+	    else
+		response = "501 Syntax error -- unrecognised keyword";
+	}
+	else
+	    response = "501 Syntax error -- wrong number of parameters";
 	break;
 
       case CommandParse::CATCONFIG:
@@ -210,9 +294,20 @@ string processCommand (CommandParse *cmd, bool& keepGoing)
       case CommandParse::COLUMNS:
 	if (arglist.size() == 2)
 	{
-	    cerr << "COLUMNS=<"<<arglist[1]<<">"<<endl;
-	    if (cat.setResultCols (arglist[1]))
+	    if (verbosity > normal)
+		cerr << "moggy: COLUMNS=<"<<arglist[1]<<">"<<endl;
+	    string kwd = arglist[1];
+	    Util::uppercaseString(kwd);
+	    if (kwd == "ALL")
+	    {
+		columnstyle = ALL;
 		response = "250 Parameter set successfully";
+	    }
+	    else if (kwd == "SIMPLE")
+	    {
+		columnstyle = SELECTED;
+		response = "250 Parameter set successfully";
+	    }
 	    else
 		response = "550 Error setting columns";
 	}
@@ -235,28 +330,157 @@ string processCommand (CommandParse *cmd, bool& keepGoing)
 
       case CommandParse::COORD1:
       case CommandParse::COORD2:
-	if (arglist.size() == 7 || arglist.size() == 8)
 	{
 	    int rah, ramin, decdeg, decmin;
-	    double rasec, decsec, equinox;
+	    double rasec=0, decsec=0; // initialise, to suppress warning
 
-	    bool convok;
-	    equinox = 2000; // default
-	    convok = Util::stringToInteger (arglist[1], rah);
-	    if (convok)
-		convok = Util::stringToInteger (arglist[2], ramin);
-	    if (convok)
-		convok = Util::stringToDouble  (arglist[3], rasec);
-	    if (convok)
-		convok = Util::stringToInteger (arglist[4], decdeg);
-	    if (convok)
-		convok = Util::stringToInteger (arglist[5], decmin);
-	    if (convok)
-		convok = Util::stringToDouble  (arglist[6], decsec);
-	    if (convok && arglist.size() == 8)
-		convok = Util::stringToDouble (arglist[7], equinox);
+	    double equinox=2000.0; // default equinox
+	    double radouble, decdouble;
+	    enum { badcoords, sexagesimal, decdegrees } coordsok = badcoords;
 
-	    if (convok)
+	    // We haven't yet included the case of sky coordinates as
+	    // input to an AST transformation, so object to that first
+	    if (ast != 0 && ast->inputSkyDomain())
+		throw MoggyException
+		    ("Can't yet accept input sky coordinates plus AST");
+
+	    // Possibilities:
+	    //   if ast
+	    //      x/pix y/pix
+	    //   else
+	    //      ra/double-deg  dec/double-deg  ?equinox/double
+	    //      OR
+	    //      ra/int-hrs ramin/min rasec/sec ...
+	    //          ...dec/int-deg decmin/min decsec/sec ?equinox/double
+
+	    // First, convert all the numbers in the argument list,
+	    // and only then worry about the above parsing.
+	    double param[8];	// param[0] unused
+	    int nargs = arglist.size() - 1;
+	    if (nargs > 7)
+	    {
+		response = "501 Wrong number of parameters";
+		break;
+	    }
+
+	    bool convok = false;
+	    for (int i=1; i<=nargs; i++)
+		if (! (convok = Util::stringToDouble(arglist[i], param[i])))
+		    break;
+
+	    if (! convok)
+	    {
+		response = "501 Error parsing parameters";
+		break;
+	    }
+
+	    switch (nargs)
+	    {
+	      case 2:
+		if (ast)
+		{
+		    // These are pixel coordinates, which need to be
+		    // converted to Sky coordinates
+		    if (ast->transToSky (param[1], param[2],
+					 radouble, decdouble))
+			coordsok = decdegrees;
+
+		    if (verbosity > normal)
+			if (coordsok == decdegrees)
+			    cerr << "moggy: transPair ("
+				 << param[1] << ',' << param[2]
+				 << ") --> ("
+				 << radouble << ',' << decdouble
+				 << ')' << endl;
+			else
+			    cerr << "moggy: transPair ("
+				 << param[1] << ',' << param[2]
+				 << ") failed!" << endl;
+		}
+		else
+		{
+		    // These must already be decimal degrees
+		    radouble = param[1];
+		    decdouble = param[2];
+		    coordsok = decdegrees;
+		}
+		break;
+
+	      case 3:
+		if (ast)
+		    // Nope -- can't give an equinox for device
+		    // coordinates
+		    response = "501 Can't give equinox for device coordinates";
+		else
+		{
+		    radouble = param[1];
+		    decdouble = param[2];
+		    equinox = param[3];
+		    coordsok = decdegrees;
+		}
+		break;
+
+	      case 7:
+		equinox = param[7];
+		// FALL THROUGH
+	      case 6:
+		if (ast)
+		    // Nope -- if there's an AST mapping, we'll only
+		    // accept device coordinates
+		    response = "501 AST information present -- can't accept sky coordinates";
+		else
+		{
+		    bool convok = true;
+		    convok &= Util::stringToInteger (arglist[1], rah);
+		    convok &= Util::stringToInteger (arglist[2], ramin);
+		    rasec =                          param[3];
+		    convok &= Util::stringToInteger (arglist[4], decdeg);
+		    convok &= Util::stringToInteger (arglist[5], decmin);
+		    decsec =                         param[6];
+		    coordsok = (convok ? sexagesimal : badcoords);
+		}
+		break;
+
+	      default:
+		response = "501 Wrong number of parameters";
+		break;
+	    }
+
+	    if (verbosity > normal)
+	    {
+		cerr << "moggy: " << nargs << " arguments:" << endl;
+		for (int i=1; i<=nargs; i++)
+		    cerr << "    " << i << ':' << param[i] << endl;
+		switch (coordsok)
+		{
+		  case badcoords:
+		    cerr << "    type=bad" << endl;
+		    break;
+		  case sexagesimal:
+		    cerr << "    type=sexagesimal "
+			 << rah << ':' << ramin << ':' << rasec
+			 << ' '
+			 << decdeg << ':' << decmin << ':' << decsec
+			 << endl;
+		    break;
+		  case decdegrees:
+		    cerr << "    type=dec. degrees "
+			 << radouble << ',' << decdouble
+			 << endl;
+		    break;
+		  default:
+		    cerr << "    type=IMPOSSIBLE" << endl;
+		    break;
+		}			 
+	    }
+
+	    switch (coordsok)
+	    {
+	      case badcoords:
+		// response is already set -- nothing else to do
+		break;
+
+	      case sexagesimal:
 		if (cat.setPos (cmd->type()==CommandParse::COORD1 ?1:2,
 				rah, ramin, rasec,
 				decdeg, decmin, decsec,
@@ -264,12 +488,122 @@ string processCommand (CommandParse *cmd, bool& keepGoing)
 		    response = "250 Parameter set successfully";
 		else
 		    response = "501 Error setting coordinates";
+		break;
+
+	      case decdegrees:
+		if (cat.setPos (cmd->type()==CommandParse::COORD1 ?1:2,
+				radouble, decdouble, 
+				equinox))
+		    response = "250 Parameter set successfully";
+		else
+		    response = "501 Error setting coordinates";
+		break;
+
+	      default:
+		throw MoggyException ("Impossible value for coordsok");
+		break;
+	    }
+
+#if 0
+	    if (ast != 0)
+	    {
+		if (ast->inputSkyFrame())
+		else
+		{
+		    // There must be two parameters
+		    if (arglist.size() == 3)
+		    {
+			bool convok;
+			double x, y;
+			convok = Util::stringToDouble (arglist[1], x);
+			if (convok)
+			    convok = Util::stringToDouble (arglist[2], y);
+
+			if (convok)
+			{
+			    // Convert to Sky coordinates
+			}
+			else
+			    response = "501 Error parsing parameters";
+		    }
+		    else
+			response = "501 Wrong number of parameters";
+		}
+	    }
 	    else
-		response = "501 Error parsing parameters";
+		// Input Sky coordinates -- no AST information.
+		// There must be either three or four or seven or
+		// eight parameters given, either RA and Dec in
+		// decimal degrees, or RA and Dec in H:M:S, D:M:S,
+		// followed by an optional equinox.
+		if (arglist.size() == 3 || arglist.size() == 4)
+		{
+		    bool convok;
+		    equinox = 2000; // default
+
+		    convok = Util::stringToDouble (arglist[1], radouble);
+		    if (convok)
+			convok = Util::stringToDouble (arglist[2], decdouble);
+		    if (convok && arglist.size() == 4)
+			convok = Util::stringToDouble (arglist[2], equinox);
+
+		    if (convok)
+			coordsok = 2;
+		    else
+			response = "501 Error parsing parameters";
+		}
+		else if (arglist.size() == 7 || arglist.size() == 8)
+		{
+		    bool convok;
+		    equinox = 2000; // default
+
+		    convok = Util::stringToInteger (arglist[1], rah);
+		    if (convok)
+			convok = Util::stringToInteger (arglist[2], ramin);
+		    if (convok)
+			convok = Util::stringToDouble  (arglist[3], rasec);
+		    if (convok)
+			convok = Util::stringToInteger (arglist[4], decdeg);
+		    if (convok)
+			convok = Util::stringToInteger (arglist[5], decmin);
+		    if (convok)
+			convok = Util::stringToDouble  (arglist[6], decsec);
+		    if (convok && arglist.size() == 8)
+			convok = Util::stringToDouble  (arglist[7], equinox);
+
+		    if (convok)
+			coordsok = 1;
+		    else
+			response = "501 Error parsing parameters";
+		}
+		else
+		    response = "501 Wrong number of parameters";
+#endif
+	}
+
+	break;
+
+      case CommandParse::DEBUG:
+	// Switch on verbose mode in selected modules.  Undocumented elsewhere.
+	if (arglist.size() == 2)
+	{
+	    int convok;
+	    int flags = 0;
+	    convok = Util::stringToInteger (arglist[1], flags);
+	    SSTREAM msg;
+	    /* moggy */ verbosity =     ( flags & 1 ? debug : normal );
+	    CommandParse::verbosity     ( flags & 2 ? debug : normal );
+	    AstHandler::verbosity       ( flags & 4 ? debug : normal );
+	    CatalogueHandler::verbosity ( flags & 8 ? debug : normal );
+	    msg << "250 Debugging:";
+	    if (flags & 1) msg << " moggy";
+	    if (flags & 2) msg << " CommandParse";
+	    if (flags & 4) msg << " AstHandler";
+	    if (flags & 8) msg << " CatalogueHandler";
+	    response = SS_STRING(msg);
 	}
 	else
-	    response = "501 Wrong number of parameters";
-
+	    response = "250 Parameter set successfully";
 	break;
 
       case CommandParse::NAME:
@@ -320,23 +654,67 @@ string processCommand (CommandParse *cmd, bool& keepGoing)
 	    int nrows = cat.doSearch();
 	    if (nrows >= 0)
 	    {
-		vector<string> names = cat.getColnames();
-		if (names.size() == 0)
-		    response = "550 Can't obtain column names";
-		else
+		if (ast)
+		    // Silently override any other choice
+		    columnstyle = SELECTED;
+
+		if (columnstyle == ALL)
 		{
+		    vector<string> names = cat.getColnames();
+		    if (names.size() == 0)
+			response = "550 Can't obtain column names";
+		    else
+		    {
+			cout << "210 Catalogue follows" << crlf << flush;
+			// Write out the number of columns, followed
+			// by the column names each on a separate row.
+			cout << names.size() << crlf;
+			for (vector<string>::const_iterator n=names.begin();
+			     n != names.end();
+			     ++n)
+			    cout << *n << crlf;
+			// Write out the number of catalogue rows, 
+			// followed by the catalogue.
+			cout << nrows << crlf;
+			for (CatalogueHandler::const_iterator p = cat.begin();
+			     p != cat.end();
+			     ++p)
+			{
+			    const CatalogueHandler::CatalogueRow& r = *p;
+			    cout << r << crlf;
+			}
+			response = ""; // no further response required
+		    }
+		}
+		else if (columnstyle == SELECTED)
+		{
+		    vector<string> colname;
+		    bool got_id, got_ra, got_dec, got_mag;
+		    if (got_id = cat.has_id())
+			colname.push_back("ID");
+		    if (got_ra = cat.has_ra())
+			colname.push_back("RA");
+		    if (got_dec = cat.has_dec())
+			colname.push_back("DEC");
+		    if (got_mag = cat.has_mag())
+			colname.push_back("MAG");
+		    if (ast)
+		    {
+			colname.push_back("X");
+			colname.push_back("Y");
+		    }
+
+		    if (!(got_ra && got_dec))
+		    {
+			// Not prepared to deal with such catalogues, yet
+			throw MoggyException
+			   ("Can't yet deal with catalogues without RA & Dec");
+		    }
+
 		    cout << "210 Catalogue follows" << crlf << flush;
-		    // Write out the number of columns, and a
-		    // row for each one.
-		    //
-		    // Should we make this more robust, so
-		    // that it _always_ returns the number of
-		    // rows it promised to, even if there's
-		    // some problem within the iterator,
-		    // signalled by a thrown MoggyException?
-		    cout << names.size() << crlf;
-		    for (vector<string>::const_iterator n=names.begin();
-			 n != names.end();
+		    cout << colname.size() << crlf;
+		    for (vector<string>::const_iterator n=colname.begin();
+			 n != colname.end();
 			 ++n)
 			cout << *n << crlf;
 		    // Write out the number of catalogue rows, 
@@ -345,9 +723,24 @@ string processCommand (CommandParse *cmd, bool& keepGoing)
 		    for (CatalogueHandler::const_iterator p = cat.begin();
 			 p != cat.end();
 			 ++p)
-			cout << *p << crlf;
+		    {
+			const CatalogueHandler::CatalogueRow& r = *p;
+			if (got_id)  cout << r.id() << OPseparator;
+			if (got_ra)  cout << r.ra() << OPseparator;
+			if (got_dec) cout << r.dec() << OPseparator;
+			if (got_mag) cout << r.mag() << OPseparator;
+			if (ast)
+			{
+			    double x, y;
+			    ast->transFromSky (r.ra(), r.dec(), x, y);
+			    cout << x << OPseparator << y << OPseparator;
+			}
+			cout << crlf;
+		    }
 		    response = ""; // no further response required
 		}
+		else
+		    throw MoggyException ("Impossible columnstyle");
 	    }
 	    else
 		response = "503 Out of order: "
@@ -433,6 +826,7 @@ void dumpCatalogue (ostream& o)
 
 void Usage ()
 {
-    cerr << "Usage: " << progname << " [-llogfilename]" << endl;
+    cerr << "Usage: " << progname << endl;
+    //cerr << "Usage: " << progname << " [-llogfilename]" << endl;
     exit (1);
 }

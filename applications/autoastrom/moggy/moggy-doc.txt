@@ -15,59 +15,24 @@ Connection establishment
   s: 220 OK
   f: 420 Can't start up
 
-CONF
-         [ Send configuration file ]
-  s: 210 Configuration file follows, terminated by <CRLF>.<CRLF>
-         Like the message says, the configuration file appears on stdout.
-  e: 551 Unspecified problem obtaining configuration     
-     501 Wrong number or type of parameters
-  f: 450 Can't connect to server, or otherwise can't generate config file
-
-SEARCH
-	 [ Perform catalogue search. ]
-  s: 210 Catalogue follows.
-         Next line contains a number giving the number of columns, then
-         that number of rows containing the column names, then a
-         line containing the number of rows, then that number of
-         catalogue rows with no further termination.
-  e: 501 Wrong number or type of parameters.
-     503 Out of order: not all required information has been supplied
-  f: 451 Can't connect to catalogue
-
-TYPE <type>
-         [ Type can be `BOX', `RADIUS' or
-         `RADIUS2', which mean, in turn, that the search should be
-         in the box between the points COORD1 and COORD2, within a
-         circle centred on COORD1 with radius given by the RADIUS
-         command, or a circle centred on COORD1 with radius given by
-         COORD1-COORD2.  ]
-  s: 250 Parameter set successfully.
-  e: 501 Wrong number or type of parameters.
-  e: 502 Unrecognised search type
-
-NAME <string>
-	 [ Specify name of catalogue to search ]
-  s: 250 Parameter set successfully
-  e: 501 Wrong number or type of parameters.
-     552 Unknown catalogue
-
-NROW <int>
-         [ limit number of rows to return ]
-  s: 250 Parameter set successfully
-  e: 501 Syntax error: missing parameter or can't convert to positive integer
-
-COORD1 <int> <int> <float> <int> <int> <float> <float>
-COORD2 <int> <int> <float> <int> <int> <float> <float>
-	 [ See the first and second coordinate positions. Parameters are
-         <ra-h> <ra-min> <ra-sec> <dec-deg> <dec-min> <dec-sec>
-	 <equinox>, with equinox being optional (default=J2000). ]
-  s: 250 Parameter set successfully
-  e: 501 Wrong number or type of parameters.
-
-RADIUS <float>
-	 [ Set the search radius.  Parameter is in arcmin. ]
-  s: 250 Parameter set successfully
-  e: 501 Wrong number or type of parameters.
+AST FRAMESET <domain>
+AST NONE
+	 [ Set up AST mapping information.  In the first case, the
+	   command specifies the name of an AST domain.  The reply
+	   from moggy is 350; this is followed on stdin by the contents
+	   of an AST serialisation of a FrameSet (ie, the `Begin
+	   FrameSet ... End FrameSet'), followed by `<CRLF>.<CRLF>';
+	   moggy replies with 250.  The domain given is the domain in
+	   which COORD1 and COORD2 positions will be supplied, and in
+	   which SEARCH results will be returned.  The command `AST
+	   NONE' turns off the AST capabilities, so that coordinates
+	   must again be supplied in RA-Dec. ]
+  s: 350 Command accepted -- send frameset
+     250 Frameset created successfully
+     250 Frameset deleted
+  e: 501 Wrong number or type of parameters
+     501 Syntax error -- unrecognised keyword
+     504 Unrecognised domain
 
 CATCONFIG string
 	 [ Set the URL of a catalogue configuration file ]
@@ -82,21 +47,78 @@ COLUMNS string
   e: 501 Wrong number or type of parameters
      503 Out of order: not all required information has been supplied
 
-STATUS
-         [ Show status.  Mostly for debugging ]
-  s: 210 Status follows, terminated by <CRLF>.<CRLF>
-  e: 501 Syntax error
+CONF
+         [ Send configuration file ]
+  s: 210 Configuration file follows, terminated by <CRLF>.<CRLF>
+         Like the message says, the configuration file appears on stdout.
+  e: 551 Unspecified problem obtaining configuration     
+     501 Wrong number or type of parameters
+  f: 450 Can't connect to server, or otherwise can't generate config file
 
-VERSION
-	 [ Write version ]
-  s: 250 version string
-  e: 501 Wrong number or type of parameters
+COORD1 <int> <int> <float> <int> <int> <float> <float>?
+COORD1 <float> <float>
+COORD2 <int> <int> <float> <int> <int> <float> <float>?
+COORD2 <float> <float>
+	 [ See the first and second coordinate positions. Parameters are
+           <ra-h> <ra-min> <ra-sec> <dec-deg> <dec-min> <dec-sec>
+	   <equinox>, with equinox being optional (default=J2000).  If
+	   the AST command has been supplied, then the coordinates are 
+	   in the specified domain. ]
+  s: 250 Parameter set successfully
+  e: 501 Wrong number or type of parameters.
+
+NAME <string>
+	 [ Specify name of catalogue to search ]
+  s: 250 Parameter set successfully
+  e: 501 Wrong number or type of parameters.
+     552 Unknown catalogue
+
+NROW <int>
+         [ limit number of rows to return ]
+  s: 250 Parameter set successfully
+  e: 501 Syntax error: missing parameter or can't convert to positive integer
 
 QUIT
          [ Exit ]
   s: 220 Goodbye
   e: 500 Syntax error
 
+RADIUS <float>
+	 [ Set the search radius.  Parameter is in arcmin. ]
+  s: 250 Parameter set successfully
+  e: 501 Wrong number or type of parameters.
+
+SEARCH
+	 [ Perform catalogue search. ]
+  s: 210 Catalogue follows.
+         Next line contains a number giving the number of columns, then
+         that number of rows containing the column names, then a
+         line containing the number of rows, then that number of
+         catalogue rows with no further termination.
+  e: 501 Wrong number or type of parameters.
+     503 Out of order: not all required information has been supplied
+  f: 451 Can't connect to catalogue
+
+STATUS
+         [ Show status.  Mostly for debugging ]
+  s: 210 Status follows, terminated by <CRLF>.<CRLF>
+  e: 501 Syntax error
+
+TYPE <type>
+         [ Type can be `BOX', `RADIUS' or
+         `RADIUS2', which mean, in turn, that the search should be
+         in the box between the points COORD1 and COORD2, within a
+         circle centred on COORD1 with radius given by the RADIUS
+         command, or a circle centred on COORD1 with radius given by
+         COORD1-COORD2.  ]
+  s: 250 Parameter set successfully.
+  e: 501 Wrong number or type of parameters.
+  e: 502 Unrecognised search type
+
+VERSION
+	 [ Write version ]
+  s: 250 version string
+  e: 501 Wrong number or type of parameters
 
 other command
   f: 500 Unknown command

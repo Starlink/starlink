@@ -11,16 +11,20 @@
 
 #include "stringstream.h"
 
-//#include "moggy.h"
 #include "CatalogueHandler.h"
 #include "util.h"
 
 #include <cat/error.h>		// for set_error_handler
 void skycatErrorHandler_ (const char* msg) throw (MoggyException);
 
+// Class variables
+verbosities CatalogueHandler::verbosity_ = normal;
+string CatalogueHandler::CatalogueRow::sep_ = " ";
+
+
 CatalogueHandler::CatalogueHandler ()
     : searchType_(UNSPECIFIED), nrows_(0), equinox_(2000.0),
-      valid_(fieldflags(0)), returnCols_(0)
+      valid_(fieldflags(0))
 {
     // Set the skycat error handler
     set_error_handler (&skycatErrorHandler_);
@@ -28,8 +32,6 @@ CatalogueHandler::CatalogueHandler ()
 
 CatalogueHandler::~CatalogueHandler ()
 {
-    if (returnCols_ != 0)
-	delete[] returnCols_;
 }
 
 // Do the search.  Returns negative if not all required
@@ -43,24 +45,11 @@ int CatalogueHandler::doSearch ()
     if (! isValid_(fieldflags(SEARCHTYPE | CATNAME | POS1 | NROWS)))
 	return -1;
 
+    assert (cat_ != 0);
+
     int rowsreturned = 0;
 
-    // First, try to find out which column is the magnitude column.
-    // There's no standardisation mentioned in the documentation, so
-    // the best we can do, I think, is search through the list of
-    // column titles until we find one which include a substring `mag'.
-    int magcol;
-    for (magcol=0; magcol<cat_->numCols(); magcol++)
-    {
-	string ucol(cat_->colName(magcol));
-	Util::uppercaseString(ucol);
-	if (ucol.find("MAG") != string::npos)
-	    break;
-    }
-    if (magcol >= cat_->numCols())
-	// not found
-	magcol = -1;
-
+    int magcol = mag_col();
 
     if (searchType_ == RADIUSSEARCH || searchType_ == RADIUSPOINTSEARCH)
     {
@@ -137,9 +126,14 @@ CatalogueHandler::const_iterator CatalogueHandler::begin()
 {
     checkQueryStatus_();
 
-    return const_iterator(this);
+    if (queryResult_.numRows() == 0)
+	// nothing to return
+	return end();
+    else
+	return const_iterator(this);
 }
 
+#if 0
 string& CatalogueHandler::const_iterator::operator*()
     throw (MoggyException)
 {
@@ -186,6 +180,28 @@ string& CatalogueHandler::const_iterator::operator*()
     iterLine_ = SS_STRING(sb);
     return iterLine_;
 }
+#endif
+
+const CatalogueHandler::CatalogueRow
+	CatalogueHandler::const_iterator::operator*()
+    throw (MoggyException)
+{
+    parent_->checkQueryStatus_();
+    if (idx_ < 0 || idx_ >= parent_->queryResult_.numRows())
+    {
+	SSTREAM sb;
+	sb << "iterator out of bounds in *: " << idx_ << '/'
+	   << parent_->queryResult_.numRows();
+	throw MoggyException (SS_STRING(sb));
+    }
+
+    if (verbosity_ > normal)
+	cerr << "CatalogueHandler::* idx_=" << idx_
+	     << '/' << parent_->queryResult_.numRows() << endl;
+
+    return CatalogueRow (*parent_, idx_);
+}
+
 
 // const_iterator::operator++ : increment the iterator.  When we run
 // out of rows, set the idx_ to -1, as this compares equal to end().
@@ -248,9 +264,46 @@ void CatalogueHandler::checkQueryStatus_()
 }
 
 bool CatalogueHandler::setPos (int num,
+			       double radeg,
+			       double decdeg,
+			       double equinox)
+{
+    if (num < 1 || num > 2)
+	return false;
+
+    int posindex = num-1;
+    equinox_ = equinox;
+    pos_[posindex] = WorldCoords (radeg, decdeg, equinox_);
+    // Status is 0 for OK
+    if (pos_[posindex].status()==0)
+    {
+	if (verbosity_ > normal)
+	    cerr << "CatalogueHandler::setPos(" << num << "): ("
+		 << radeg << ", " << decdeg << " [" << equinox_ << "]) -->"
+		 << endl
+		 << "    "
+		 << pos_[posindex] << " = ("
+		 << pos_[posindex].ra().val()*15
+		 << " , "
+		 << pos_[posindex].dec().val()
+		 << ')' << endl;
+
+	setValid_(num==1 ? POS1 : POS2);
+	return true;
+    }
+    else
+    {
+	if (verbosity_ > normal)
+	    cerr << "CatalogueHandler::setPos(dec): (" << num
+		 << ") failed" << endl;
+	return false;
+    }
+}
+
+bool CatalogueHandler::setPos (int num,
 			       int rah,  int ramin,  double rasec,
 			       int degh, int degmin, double degsec,
-			       double equinox=2000.0)
+			       double equinox)
 {
     if (num < 1 || num > 2)
 	return false;
@@ -263,11 +316,28 @@ bool CatalogueHandler::setPos (int num,
     // Status is 0 for OK
     if (pos_[posindex].status()==0)
     {
+	if (verbosity_ > normal)
+	    cerr << "CatalogueHandler::setPos(" << num << "): ("
+		 << rah << ',' << ramin << ',' << rasec << ", "
+		 << degh << ',' << degmin << ',' << degsec
+		 << " [" << equinox_ << "]) --> " << endl
+		 << "    "
+		 << pos_[posindex] << " = ("
+		 << pos_[posindex].ra().val()*15
+		 << " , "
+		 << pos_[posindex].dec().val()
+		 << ')' << endl;
+
 	setValid_(num==1 ? POS1 : POS2);
 	return true;
     }
     else
+    {
+	if (verbosity_ > normal)
+	    cerr << "CatalogueHandler::setPos(hmsdms): (" << num
+		 << ") failed" << endl;
 	return false;
+    }
 }
 
 bool CatalogueHandler::setRadius (double radius)
@@ -310,46 +380,19 @@ bool CatalogueHandler::setSearchtype (string type)
 
 bool CatalogueHandler::setConfig (string URL)
 {
-    if (setenv ("CATLIB_CONFIG", URL.c_str(), 1) == 0)
-	return true;
-    else
-	return false;
+    return (setenv ("CATLIB_CONFIG", URL.c_str(), 1) == 0);
 }
 
 // setResultCols: this could (fairly easily, with
 // Util::tokeniseString) be made more sophisticated, and take a list
 // of column names as argument.
+//
+// This function was deleted (after CatalogueHandler.C,v 1.3) -- if
+// you want to select which columns are returned to the user, do it in 
+// the caller, using the ra(), dec() functions.
 bool CatalogueHandler::setResultCols (string cols)
 {
-    if (! isValid_(CATNAME))
-	return false;
-
-    Util::uppercaseString(cols);
-
-    if (cols == "SIMPLE")
-    {
-	if (returnCols_ != 0)
-	    delete[] returnCols_;
-	// allocate space for three column numbers, plus terminator
-	returnCols_ = new int[3+1];
-	returnCols_[0] = cat_->id_col();
-	returnCols_[1] = cat_->ra_col();
-	returnCols_[2] = cat_->dec_col();
-	returnCols_[3] = -1;
-
-	return true;
-    }
-    else if (cols == "ALL")
-    {
-	if (returnCols_ != 0)
-	{
-	    delete[] returnCols_;
-	    returnCols_ = 0;
-	}
-	return true;
-    }
-    else			// eh?
-	return false;
+    throw MoggyException ("Can't select columns using setResultCols");
 }
 
 string CatalogueHandler::getPos (int num) const throw (MoggyException)
@@ -404,6 +447,23 @@ bool CatalogueHandler::setCatname (string name)
 	if (cat_)
 	{
 	    setValid_(CATNAME);
+
+	    if (verbosity_ > normal)
+	    {
+		cerr << "CatalogueHandler::setCatname: "
+		     << " longName=" << cat_->longName()
+		     << " searchCols=" << cat_->searchCols()
+		     << " sortCols=" << cat_->sortCols()
+		     << " sortOrder=" << cat_->sortOrder()
+		     << " showCols=" << cat_->showCols()
+		     << " id_col=" << cat_->id_col()
+		     << " ra_col=" << cat_->ra_col()
+		     << " dec_col=" << cat_->dec_col()
+		     << " x_col=" << cat_->x_col()
+		     << " y_col=" << cat_->y_col()
+		     << " equinox=" << cat_->equinox()
+		     << endl;
+ 	    }
 	    return true;
 	}
 	else
@@ -430,12 +490,8 @@ vector<string> CatalogueHandler::getColnames () const
     vector<string> colnames;
 
     if (isValid_(CATNAME))
-	if (returnCols_ == 0)
-	    for (int i=0; i<cat_->numCols(); i++)
-		colnames.push_back(cat_->colName(i));
-	else
-	    for (int i=0; returnCols_[i]>=0; i++)
-		colnames.push_back(cat_->colName(returnCols_[i]));
+	for (int i=0; i<cat_->numCols(); i++)
+	    colnames.push_back(cat_->colName(i));
     // if RESULT isn't valid, then a vecetor of length zero will be returned
 
     return colnames;
@@ -455,13 +511,112 @@ void CatalogueHandler::printStatus (ostream& o, string lineend)
 	o << "SEARCH " << getSearchtype() << lineend;
     if (isValid_(NROWS))
 	o << "NROW " << nrows_ << lineend;
-    o << "COLUMNS " << (returnCols_ == 0 ? "ALL" : "SIMPLE") << lineend;
     string conf = getConfig();
     if (conf.length() > 0)
 	o << "CATCONFIG " << conf << lineend;
 
     return;
 }
+
+int CatalogueHandler::mag_col()
+    const
+    throw (MoggyException)
+{
+    static int magcol = -2;	// -2 means uninitialised
+
+    if (! isValid_(CATNAME))
+	throw MoggyException ("mag_col() out of order");
+
+    if (magcol < -1)		// uninitialised
+    {
+	// Try to find out which column is the magnitude column.
+	// There's no standardisation mentioned in the documentation, so
+	// the best we can do, I think, is search through the list of
+	// column titles until we find one which include a substring `mag'.
+	for (magcol=0; magcol<cat_->numCols(); magcol++)
+	{
+	    string ucol(cat_->colName(magcol));
+	    Util::uppercaseString(ucol);
+	    if (ucol.find("MAG") != string::npos)
+		break;
+	}
+	if (magcol >= cat_->numCols())
+	    // not found
+	    magcol = -1;
+    }
+    return magcol;
+}
+
+string CatalogueHandler::CatalogueRow::id ()
+    const
+    throw (MoggyException)
+{
+     char *value;
+     string rval;
+     if (parent_.queryResult_.get(num_, parent_.queryResult_.id_col(), value))
+	 throw MoggyException ("Can't get id for row");
+     rval = value;
+     return rval;
+}
+
+double CatalogueHandler::CatalogueRow::ra ()
+    const
+    throw (MoggyException)
+{
+    double value;
+    if (!parent_.has_ra())
+	throw MoggyException ("No RA for row");
+    if (parent_.queryResult_.get(num_, parent_.queryResult_.ra_col(), value))
+	throw MoggyException ("Can't get RA for row");
+    return value;
+}
+
+double CatalogueHandler::CatalogueRow::dec ()
+    const
+    throw (MoggyException)
+{
+    double value;
+    if (!parent_.has_dec())
+	throw MoggyException ("No DEC for row");
+    if (parent_.queryResult_.get(num_, parent_.queryResult_.dec_col(), value))
+	throw MoggyException ("Can't get DEC for row");
+    return value;
+}
+
+double CatalogueHandler::CatalogueRow::mag()
+    const
+    throw (MoggyException)
+{
+    double value;
+    if (!parent_.has_mag())
+	throw MoggyException ("No MAG for row");
+    if (parent_.queryResult_.get(num_, parent_.mag_col(), value))
+	throw MoggyException ("Can't get MAG for row");
+    return value;
+}
+
+ostream& operator<< (ostream& o, const CatalogueHandler::CatalogueRow& row)
+{
+    return row.put(o);
+}
+
+ostream& CatalogueHandler::CatalogueRow::put (ostream& o)
+    const
+{
+    for (int i=0; i<parent_.queryResult_.numCols(); i++)
+    {
+	if (i > 0)
+	    o << sep_;
+	char *value;
+	if (parent_.queryResult_.get(num_, i, value))
+	    throw MoggyException ("can't get line of query result");
+	o << value;
+    }
+
+    return o;
+}
+
+
 
 // Convert skycat errors into exceptions
 void skycatErrorHandler_ (const char* msg)

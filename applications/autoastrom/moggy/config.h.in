@@ -24,4 +24,7 @@
    <strstream>).  Define as 0 otherwise. */
 #define HAVE_SSTREAM 0
 
+/* Define as 1 if we have <map>.  Define as 0 otherwise. */
+#define HAVE_MAP 1
+
 #endif /* CONFIG_H_LOADED */

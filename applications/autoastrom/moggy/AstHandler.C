@@ -1,0 +1,311 @@
+// Part of moggy
+// Copyright 2001 Council for the Central Laboratory of the Research Councils.
+// See file LICENCE for conditions.
+//
+// $Id$
+
+// AstManager manages the conversion between coordinates in some 2-d
+// system and SKY coordinates.  It learns about the transformation by
+// being given a serialised AST frameset on construction.
+//
+// It always reports SKY coordinates in decimal degrees, in the FK-5
+// coordinate system with equinox J2000.  At present, it demands that
+// the input frameset has a SkyFrame with this System and Equinox, but
+// it could pretty easily be generalised in future to silently add an
+// appropriate further mapping to this system.
+
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "AstHandler.h"
+#include "stringstream.h"
+#include "util.h"
+
+// Class variables
+AstHandler* AstHandler::channel_source_currenthandler_;
+verbosities AstHandler::verbosity_ = normal;
+const double AstHandler::DegreesPerRadian = 360.0/2/3.141592653589793238;
+
+// Parameter frameset is a vector of strings, each of which is a line
+// of an AST channel output.  Parameter fromdomain is
+// the names of the domain from which it will convert coordinates:
+// this routine will extract from the proffered frameset a mapping
+// between these domains.
+AstHandler::AstHandler (vector<string>serialFrameset,
+			string fromdomain)
+    throw (MoggyException)
+    : serialFrameset_(serialFrameset),
+      fromdomain_(fromdomain)
+{
+    Util::uppercaseString (fromdomain_);
+    todomain_ = "SKY";		// always
+
+
+    // begin an AST context
+    astBegin;
+
+    channel_source (true);	// reset the stream, just in case
+    channel_source_init (this);
+    AstChannel *channel_ = astChannel
+	(static_cast<const char *(*)()>(&channel_source_server),
+	 0,
+	 "");
+    astobj_ = static_cast<AstObject*>(astRead (channel_));
+    channel_ = static_cast<AstChannel*>(astAnnul (channel_));
+
+    if (verbosity_ > normal)
+    {
+	cerr << "AstHandler: read a " << astGetC(astobj_, "Domain") << endl;
+	// Should check here that this is indeed a FrameSet.
+	// Alternatively (for the future) we could accept a mapping.
+	// In that case, we'd have to adjust inputSkyDomain, since
+	// astobj_ would no longer, then, be a FrameSet
+	if (astIsAFrameSet (astobj_))
+	    cerr << "    IsA FrameSet!" << endl;
+    }
+
+    fromDomainIndex_ = toDomainIndex_ = 0;
+    nframes_ = astGetI (astobj_, "Nframe");
+    if (verbosity_ > normal)
+	cerr << "AstHandler: FrameSet has " << nframes_ << " frames" << endl;
+
+    for (int i=1; i<=nframes_; i++)
+    {
+	AstFrame *f = static_cast<AstFrame*>(astGetFrame (astobj_, i));
+	if (f == AST__NULL)	// error of some type
+	    throw MoggyException ("failed to astGetFrame");
+
+	const char *domain = astGetC (f, "Domain");
+	astAnnul (f);		// decrement reference count,
+				// incremented by astGetFrame
+
+	if (verbosity_ > normal)
+	    cerr << "AstHandler: domain " << i << "=" << domain << endl;
+	if (domain == fromdomain_)
+	{
+	    if (verbosity_ > normal)
+		cerr << "  (fromdomain)" << endl;
+	    fromDomainIndex_ = i;
+	}
+	if (domain == todomain_)
+	{
+	    if (verbosity_ > normal)
+		cerr << "  (todomain)" << endl;
+	    toDomainIndex_ = i;
+	}
+    }
+
+    // Check we did in fact find the from/input domain we were
+    // promised.  We check the to/output domain below.
+    if (verbosity_ > normal)
+	cerr << "AstHandler::AstHandler: from "
+	     << fromdomain_ << '=' << fromDomainIndex_
+	     << " to "
+	     << todomain_ << '=' << toDomainIndex_ << endl;
+    if (fromDomainIndex_ == 0)
+    {
+	SSTREAM msg;
+	msg << "can't find input domain " << fromdomain_;
+	throw MoggyException (SS_STRING(msg));
+    }
+
+    // Check that
+    //
+    //   1. toDomainIndex_ is defined and does point to a SkyFrame;
+    //   2. this SkyFrame has System=FK5 and Equinox=J2000.
+    //
+    // Fail noisily if either is false.  As noted above, it might be
+    // desirable, in future, to accept a Mapping as serialised input,
+    // rather than a FrameSet, but then we can't necessarily make
+    // check 2 (though we could just abandon check 2 in that case, and 
+    // explicitly trust the caller to get things right).  It almost
+    // certainly _will_ be desirable to allow SkyFrames with other
+    // coordinate systems, and simply and silently add a further
+    // mapping from the given coordinate system to J2000 (see section
+    // `Converting between Celestial Coordinate Systems' in SUN/211).
+    if (toDomainIndex_ == 0)
+    {
+	SSTREAM msg;
+	msg << "input FrameSet has no " << todomain_;
+	throw MoggyException (SS_STRING(msg));
+    }
+    if (astIsASkyFrame (astGetFrame(astobj_, toDomainIndex_)))
+    {
+	string System = astGetC(astobj_, "System");
+	double Equinox = astGetD(astobj_, "Equinox");
+	if (System != "FK5" || Equinox != 2000.0)
+	{
+	    SSTREAM msg;
+	    msg << "input SkyFrame has System=" << System
+		<< ", Equinox=" << Equinox
+		<< " -- require FK5(J2000)";
+	    throw MoggyException (SS_STRING(msg));
+	}
+    }
+    else
+	throw MoggyException ("input FrameSet does not have a SkyFrame");
+
+    // At this point, we know that the SKY domain that's about to be
+    // made the target of the mapping has a FK5(J2000) System.
+    // Therefore, further, its axes are always in the order
+    // (longitude, latitude) in double-precision radians (see SUN/211,
+    // Sect. 8.1, `The SkyFrame Model').
+
+    // Extract the mapping from the FrameSet, and perform any
+    // simplifications.
+    astmap_ = static_cast<AstMapping*>(astGetMapping (astobj_,
+						      fromDomainIndex_,
+						      toDomainIndex_));
+    astmap_ = static_cast<AstMapping*>(astSimplify (astmap_));
+
+    // Quick sanity-check: We _do_ have 2 input and 2 output axes,
+    // don't we?
+    int Nin  = astGetI (astmap_, "Nin");
+    int Nout = astGetI (astmap_, "Nout");
+    if (Nin != 2 || Nout != 2)
+    {
+	SSTREAM msg;
+	msg << "mapping has unexpected dimensionality: Nin=" << Nin
+	    << ", Nout=" << Nout;
+	throw MoggyException (SS_STRING(msg));
+    }
+
+    if (verbosity_ > normal)
+	cerr << "AstHandler::AstHandler: successfully constructed astmap_"
+	     << endl;
+}
+
+AstHandler::~AstHandler ()
+{
+    // End the AST context
+    astEnd;
+}
+
+bool AstHandler::transToSky (const double xpix, const double ypix,
+			     double& radeg, double& decdeg)
+{
+    astTran2 (astmap_, 1, &xpix, &ypix, 1, &radeg, &decdeg);
+    if (verbosity_ > normal)
+	cerr << "AstHandler::transToSky: (" << xpix << ',' << ypix
+	     << ") --> ("
+	     << astFormat (astobj_, 1, radeg)
+	     << ','
+	     << astFormat (astobj_, 2, decdeg)
+	     << ")rad";
+
+    // These coordinates are in radians (by the definition of the
+    // SkyFrame).  Convert them to decimal degrees and normalise them
+    // to [0,360[.
+    radeg *= DegreesPerRadian;
+    while (radeg < 0) radeg += 360.0;
+    while (radeg >= 360) radeg -= 360.0;
+    decdeg *= DegreesPerRadian;
+    while (decdeg < 0) decdeg += 360.0;
+    while (decdeg >= 360) decdeg -= 360.0;
+
+    if (verbosity_ > normal)
+	cerr << " = (" << radeg << ',' << decdeg << ")deg" << endl;
+
+    return true;		// astTran2 does not indicate errors
+}
+
+
+
+bool AstHandler::transFromSky (double radeg, double decdeg,
+			       double& xpix, double& ypix)
+{
+    // Transform RA and Dec coordinates from decimal degrees to
+    // radians -- no need to worry about normalisation, since AST
+    // takes care of everything.
+    radeg  /= DegreesPerRadian;
+    decdeg /= DegreesPerRadian;
+    astTran2 (astmap_, 1, &radeg, &decdeg, 0, &xpix, &ypix);
+    if (verbosity_ > normal)
+	cerr << "AstHandler::transFromSky: (" << radeg << ',' << decdeg
+	     << ")rad = (" << xpix << ',' << ypix << ')' << endl;
+
+    return true;		// astTran2 does not indicate errors
+}
+
+// channel_source supplies lines of serialFrameset_ one at a time.
+// This is the required behaviour for the function passed to
+// astRead.  However, we cannot use a member function for that
+// purpose, but have to use a static function instead (or use global
+// data, and deal with the corresponding mess).  Call
+// channel_source_init first, then use channel_source_server as the
+// astRead function.
+//
+// This does _not_ handle multiple AstHandler objects, so you can't
+// presently call this sequence more than once in a program.  However, 
+// it is written to _fail_ noisily in this case, so it won't fail
+// without you getting to hear about it.
+void AstHandler::channel_source_init (AstHandler *h)
+    throw (MoggyException)
+{
+    if (channel_source_currenthandler_ != 0)
+	throw MoggyException ("channel_source_init called more than once.  FIXME");
+
+    channel_source_currenthandler_ = h;
+}
+const char *AstHandler::channel_source_server(void)
+    throw (MoggyException)
+{
+    if (channel_source_currenthandler_ == 0)
+	throw MoggyException ("channel_source_server not initialised");
+    
+    return channel_source_currenthandler_->channel_source();
+}
+const char *AstHandler::channel_source (bool reset)
+{
+    static bool more = false;	// Initial state.
+				// more<-true when started;
+				// then more<-false when exhausted.
+    static vector<string>::const_iterator iter;
+
+    const char *rval;
+
+    if (reset)
+    {
+	// reset the stream and return immediately
+	more = false;
+	return 0;
+    }
+
+    if (!more)
+    {
+	iter = serialFrameset_.begin();
+	more = true;
+    }
+    assert (more == true);
+
+    if (iter == serialFrameset_.end())
+    {
+	more = false;
+	rval = 0;
+    }
+    else
+    {
+	rval = iter->c_str();
+	iter++;
+    }
+
+    if (verbosity_ > normal)
+	if (rval != 0)
+	    cerr << "AstHandler::channel_source: " << rval << endl;
+	else
+	    cerr << "AstHandler::channel_source: EOD" << endl;
+
+    return rval;
+}
+
+// Return true if the input domain is a sky frame
+bool AstHandler::inputSkyDomain (void)
+    throw (MoggyException)
+{
+    if (! astIsAFrameSet (astobj_))
+	throw MoggyException ("Ast object was expected to be a FrameSet");
+
+    return astIsASkyFrame (astGetFrame (astobj_, fromDomainIndex_));
+}

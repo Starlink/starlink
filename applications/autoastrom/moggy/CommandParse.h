@@ -17,6 +17,10 @@
 #include "moggy.h"
 #include "verbosity.h"
 
+#if HAVE_MAP
+#include <map>
+#endif
+
 class CommandParse {
  public:
     CommandParse (string);
@@ -24,7 +28,7 @@ class CommandParse {
 
     enum token_value {
 	INVALID,
-	CONF, SEARCH, NAME, NROW, COORD1, COORD2, RADIUS, VERSION,
+	AST, CONF, DEBUG, SEARCH, NAME, NROW, COORD1, COORD2, RADIUS, VERSION,
 	STATUS, TYPE, CATCONFIG, COLUMNS, QUIT
     };
 
@@ -36,11 +40,17 @@ class CommandParse {
 	BadCommandParse (string s) { msg = s; };
     };	/* exception class */
 
+    static void verbosity (const verbosities level) { verbosity_ = level; }
+
  private:
     token_value cmdcode_;
     vector<string> args_;
-    verbosities verbosity_;
-
+    static verbosities verbosity_;
+#if HAVE_MAP
+    typedef map<string,token_value> CmdMap;
+    static CmdMap command_table_;
+    static bool command_table_init_;
+#endif
 };
 
 #endif /* COMMANDPARSE_H_LOADED */

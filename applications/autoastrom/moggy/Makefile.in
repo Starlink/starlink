@@ -9,18 +9,35 @@
 #  g++ -Wall  (GNU)
 #  CC +w2     (Sun Workshop compilers)
 #  cxx -w0    (Compaq compilers)
+#
+# Don't make any provision for the Starlink directories, or the
+# ast_link and cnf_link commands, _not_ being there -- we have
+# established in the configure script that /star, or something like
+# it, is present.
+#
+SLASHSTAR=@SLASHSTAR@
 DEFS=@DEFS@
-CPPFLAGS=@CPPFLAGS@
+CPPFLAGS=@CPPFLAGS@ -ISkyCat/include -I$(SLASHSTAR)/include
 CXX=@CXX@
 CXXFLAGS=-g -Wall @CXXFLAGS@ $(CPPFLAGS) $(DEFS)
-LIBS=-lm @LIBS@
+LIBS=-lm @LIBS@ -LSkyCat/lib -lskycat -L$(SLASHSTAR)/lib `ast_link` `cnf_link`
+
+# CATLIBINSTALLDIR is the directory that SkyCat is temporarily installed
+# it.  This is not the directory we link against -- see the
+# SkyCat/libskycat.a target below.
+CATLIBSRCDIR=@CATLIBSRCDIR@
+CATLIBINSTALLDIR=@CATLIBINSTALLDIR@
+CATLIBTOP=@CATLIBTOP@
+
+RANLIB=@RANLIB@
+
 
 
 
 # Use suffix rules for stupid makes (hello, Tru64)
 .SUFFIXES: .o .C
 .c.o:
-	$(CC) -I$$STARLINK/include -c $< -o $@
+	$(CC)  $(CPPFLAGS) -c $< -o $@
 
 .C.o:
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
@@ -38,10 +55,43 @@ LIBS=-lm @LIBS@
 
 
 EXEC=moggy
-OBJS=moggy.o CommandParse.o CatalogueHandler.o util.o
+OBJS=moggy.o CommandParse.o CatalogueHandler.o AstHandler.o util.o SkyCatHoles.o
 
-$(EXEC): $(OBJS)
+$(EXEC): $(OBJS) SkyCat
 	$(CXX) $(OBJS) $(LIBS) -o $@
+
+#AstHandler.o: AstHandler.C
+#	$(CXX) $(CXXFLAGS) -c -o $@ -I$(SLASHSTAR)/include $<
+#
+#CatalogueHandler.o: CatalogueHandler.C SkyCat
+#	$(CXX) $(CXXFLAGS) -c -o $@ -ISkyCat/include $<
+#
+#moggy.o: moggy.C SkyCat
+
+# The skycat library will have been configured at the ./configure
+# stage, and will have beein installed in $(CATLIBINSTALLDIR) by the
+# dependency on libcat.a.  Copy the required parts of this library to
+# the SkyCat subdirectory, and remove problematic modules from the library.
+# This target can also be used to express a dependency on the SkyCat includes.
+SkyCat: $(CATLIBINSTALLDIR)/lib/libcat.a
+	test -d SkyCat || mkdir SkyCat
+	test -d SkyCat/lib || mkdir SkyCat/lib
+	cp $(CATLIBINSTALLDIR)/lib/libcat.a SkyCat/lib/libskycat.a
+	ar -d SkyCat/lib/libskycat.a proj.o slasubs.o
+	$(RANLIB) SkyCat/lib/libskycat.a
+	(cd $(CATLIBINSTALLDIR); tar cf - include) | (cd SkyCat; tar xf -)
+
+# Make the SkyCat libraries, and install them in $(CATLIBINSTALLDIR).
+# Make the target directories by hand, because the SkyCat install
+# script is a bit stupid.
+$(CATLIBINSTALLDIR)/lib/libcat.a:
+	test -d $(CATLIBINSTALLDIR) || mkdir -p $(CATLIBINSTALLDIR)
+	for dir in include lib man man/man3; \
+	do \
+		test -d $(CATLIBINSTALLDIR)/$$dir || \
+			mkdir $(CATLIBINSTALLDIR)/$$dir; \
+	done
+	cd $(CATLIBTOP); make; make install
 
 test: $(EXEC)
 	cd test; $(MAKE) test
@@ -56,34 +106,46 @@ tags:
 
 clean:
 	rm -f $(EXEC)
+	rm -Rf SkyCat
 	rm -f *~ *.o core
 
 distclean: clean
-	rm -f config.cache config.log config.status config.h
+	rm -f config.cache config.log config.status config.h Makefile
 
 # Dependencies
+#
+# moggy.h doesn't really depend on SkyCat, but the two modules which
+# do, moggy.C and CatalogueHandler.C, do depend on moggy.h, so this
+# will ensure that the SkyCat includes are built and installed in the
+# correct order.
+moggy.h: SkyCat
+
+# Because of the #include <cat/...> dependencies in some files, this
+# depend target only works after SkyCat/include has been built.
 depend:
 	echo '# DO NOT DELETE THIS LINE (it is used by make depend)' >depend.tmp
-	for i in *.C; do \
-		echo `echo $$i|sed 's/\.C/.o/'`: $$i `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $$i` >>depend.tmp; \
+	for c in *.C *.c; do \
+		gcc -MM -I/stardev/include -ISkyCat/include $c >>depend.tmp; \
 	done
-	for i in *.h; do \
-		echo "$$i:" `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $$i` >>depend.tmp;\
-	done
+#	for i in *.C; do \
+#		echo `echo $$i|sed 's/\.C/.o/'`: $$i `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $$i` >>depend.tmp; \
+#	done
+#	for i in *.h; do \
+#		echo "$$i:" `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $$i` >>depend.tmp;\
+#	done
 	sed -e '/^# DO NOT DELETE/,$$d' -e '$$r depend.tmp' Makefile.in >Makefile.tmp
 	mv Makefile.tmp Makefile.in
 	rm -f depend.tmp
 
 
 # DO NOT DELETE THIS LINE (it is used by make depend)
-CatalogueHandler.o: CatalogueHandler.C config.h stringstream.h CatalogueHandler.h util.h
-CommandParse.o: CommandParse.C config.h CommandParse.h util.h
-moggy.o: moggy.C config.h moggy.h CommandParse.h CatalogueHandler.h util.h
+AstHandler.o: AstHandler.C AstHandler.h moggy.h verbosity.h \
+ stringstream.h util.h
+CatalogueHandler.o: CatalogueHandler.C stringstream.h \
+ CatalogueHandler.h moggy.h verbosity.h util.h
+CommandParse.o: CommandParse.C CommandParse.h config.h moggy.h \
+ verbosity.h util.h
+moggy.o: moggy.C moggy.h CommandParse.h config.h verbosity.h \
+ CatalogueHandler.h AstHandler.h stringstream.h util.h
 util.o: util.C util.h
-CatalogueHandler.h: moggy.h
-CommandParse.h: config.h moggy.h verbosity.h
-config.h:
-moggy.h:
-stringstream.h:
-util.h:
-verbosity.h:
+SkyCatHoles.o: SkyCatHoles.c
