@@ -16,6 +16,7 @@ ccdnote        hlp = doc$ccdnote.hlp, src = ccdnote.f
 ccdsetup        hlp = doc$ccdsetup.hlp, src = ccdsetup.f
 ccdshow        hlp = doc$ccdshow.hlp, src = ccdshow.f
 debias        hlp = doc$debias.hlp, src = debias.f
+drizzle       hlp = doc$drizzle.hlp, src = drizzle.f
 findcent        hlp = doc$findcent.hlp, src = findcent.f
 findobj        hlp = doc$findobj.hlp, src = findobj.f
 findoff        hlp = doc$findoff.hlp, src = findoff.f
