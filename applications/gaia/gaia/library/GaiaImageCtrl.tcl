@@ -221,6 +221,25 @@ itcl::class gaia::GaiaImageCtrl {
       }
    }
 
+   #  Display a dialog for selecting objects in the image and
+   #  displaying information about the selected area of the
+   #  image. Override to use GaiaImagePick, which adds the ability to
+   #  save the information into a disk file (GaiaPick.dat).
+   public method pick_dialog {{command ""}} {
+      if {[$image_ isclear]} {
+         warning_dialog "No image is currently loaded" $w_
+         return
+      }
+      utilReUseWidget gaia::GaiaImagePick $w_.pick \
+         -target_image $this \
+         -command $command \
+         -verbose $itk_option(-verbose) \
+         -orient $itk_option(-pickobjectorient) \
+         -debug $itk_option(-debug) \
+         -shorthelpwin $itk_option(-shorthelpwin)
+      $w_.pick pick_object
+   }
+
    #  Make a hard copy of the image display, just override to remove 
    #  ESO references and reduce the page width slightly (not A4?).
    public method print {} {
