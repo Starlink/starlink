@@ -96,7 +96,7 @@
       CALL NDF_XSTAT( INDF, 'FITS', THERE, STATUS )
       IF ( .NOT. THERE ) THEN
          STATUS = SAI__ERROR
-         CALL NDF_ACMSG( 'NDF', INDF )
+         CALL NDF_MSG( 'NDF', INDF )
          CALL CCD1_ERREP( ' ', '  No FITS extension in ^NDF', STATUS )
          GO TO 99
       END IF
