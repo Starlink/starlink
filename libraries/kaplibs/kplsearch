@@ -247,7 +247,7 @@ proc search {test words} {
 #  Store a list of the routine names to be searched. 
    if { $prefs == "" } { 
       set routines [array names purpose]
-   } else 
+   } else {
       foreach rout [array names purpose] {
          foreach pref $prefs { 
             if { [string match "$pref*" $rout] } {
@@ -296,7 +296,7 @@ proc search {test words} {
 #  If no matching routines were found, say so.
    if { $names == "" } {
       puts ""
-      puts "  No matching KAPLIBS routines found."
+      puts "  No matching routines found."
       puts ""
    } else {
 
