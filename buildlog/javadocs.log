@@ -1729,6 +1729,9 @@ javadocs:
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VODocument.java:59: warning - Tag @see cannot be used in inline documentation.  It can only be used in the following types of documentation: overview, package, class/interface, constructor, field, method.
+  [javadoc] Generating /apps/cvsbuild/java/source/votable/docs/votable/javadocs/stylesheet.css...
+  [javadoc] 1 warning
      [echo] Executing VO target: javadocs
 
 prepare:
@@ -2808,4 +2811,4 @@ javadocs:
   [javadoc] 205 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 32 seconds
+Total time: 3 minutes 44 seconds
