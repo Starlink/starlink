@@ -54,7 +54,7 @@ Changes_to_existing_tasks
   - SCAN_RLB: Area to use for baseline removal can now be specified
     as a SCUBA section.
 
-  - REMDBM: The -filter option will filter out how frequencies
+  - REMDBM: The -filter option will filter out high frequencies
            before inverting the Fourier transform.
 
   - REBIN: Add TRIM parameter to trim edge regions from rebinned
