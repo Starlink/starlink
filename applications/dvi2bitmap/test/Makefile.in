@@ -19,6 +19,7 @@ all: test
 test: regression pathtest
 
 regression:
+	cd ..; $(MAKE) libdvi2bitmap.a
 	PERLBIN=$(PERLBIN) ./runtests
 
 #pathtest: ../dvi2bitmap hello.dvi
@@ -48,11 +49,12 @@ modetest.dvi: modetest.tex
 # directory.  That directory doesn't use it, but we need it here,
 # otherwise linking all the tests is too complicated to deal with happily.
 # Add a suffix rule for stupid makes (hello, Tru64...)
-.SUFFIXES: .o .cc
+.SUFFIXES: .o .cc .run
 .cc.o:
 	$(CXX) $(CXXFLAGS) -c $<
 
-%.run: %.o ../libdvi2bitmap.a
+#%.run: %.o ../libdvi2bitmap.a
+.o.run:
 	cd ..; $(MAKE) libdvi2bitmap.a
 	$(CXX) $(CXXFLAGS) -o $@ $< -L.. -ldvi2bitmap
 
