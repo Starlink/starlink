@@ -162,11 +162,11 @@
       END IF
 
 *  Polarisation angle (degrees).
-      CALL CAT_CNEWS( CI, 'THETA', CAT__TYPER, 0, 'Degrees', 'F6.2', 
+      CALL CAT_CNEWS( CI, 'ANG', CAT__TYPER, 0, 'Degrees', 'F6.2', 
      :                'Polarisation angle', II, STATUS )
 
       IF( VAR ) THEN
-         CALL CAT_CNEWS( CI, 'DTHETA', CAT__TYPER, 0, 'Degrees', 'F6.3', 
+         CALL CAT_CNEWS( CI, 'DANG', CAT__TYPER, 0, 'Degrees', 'F6.3', 
      :                   'Standard deviation on polarisation angle',
      :                   II, STATUS )
          CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )

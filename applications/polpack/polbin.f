@@ -21,13 +21,8 @@
 
 *  Description:
 *     This application creates a new catalogue of polarisation vectors by
-*     binning the Stokes vectors in the supplied catalogue. The input
-*     catalogue should contain columns with the same names and meanings
-*     as those produced by POLVEC. In particularly, the bin sizes are 
-*     given as increments within the coordinate Frame implied by the
-*     columns with names "X" and "Y". If the original catalogue was
-*     created by POLVEC, then "X" and "Y" will be pixel coordinates within 
-*     the cube supplied as input to POLVEC.
+*     binning the Stokes vectors in the supplied catalogue. The columns in
+*     the supplied catalogue should correspond to those created by POLVEC.
 *
 *     The bins used form a grid of equal sized rectangular cells, the
 *     dimensions of each cell being specified by the user. The grid contains 

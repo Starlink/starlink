@@ -1,7 +1,7 @@
-      SUBROUTINE POL1_PLVEC( TR, NPIX, NROW, NPLANE, STOKE, VSTOKE, ANG,
-     :                       STKID, DEBIAS, VAR, MAKEI, MAKEP, MAKET, 
-     :                       MAKEIP, MAKECT, CI, AI, AP, AT, AIP, AIV, 
-     :                       APV, ATV, AIPV, STATUS )
+      SUBROUTINE POL1_PLVEC( TR, NPIX, NROW, NPLANE, STOKE, VSTOKE, 
+     :                       ANGROT, STKID, DEBIAS, VAR, MAKEI, MAKEP, 
+     :                       MAKET, MAKEIP, MAKECT, CI, AI, AP, AT, AIP, 
+     :                       AIV, APV, ATV, AIPV, STATUS )
 *+
 *  Name:
 *     POL1_PLVEC
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_PLVEC( TR, NPIX, NROW, NPLANE, ANG, STOKE, VSTOKE, ANG, 
+*     CALL POL1_PLVEC( TR, NPIX, NROW, NPLANE, ANG, STOKE, VSTOKE, ANGROT, 
 *                     STKID, DEBIAS, VAR, MAKEI, MAKEP, MAKET, MAKEIP, MAKECT, 
 *                     CI, AI, AP, AT, AIP, AIV, APV, ATV, AIPV, STATUS )
 
@@ -38,7 +38,7 @@
 *     VSTOKE( NPIX, NROW, NPLANE ) = REAL (Given)
 *        The variance on the Stokes parameters. It is ignored if VAR is 
 *        .FALSE..
-*     ANG = REAL (Given)
+*     ANGROT = REAL (Given)
 *        ACW angle in degrees from pixel X axis to analyser angle.
 *     STKID = CHARACTER * ( * ) (Given)
 *        A string of characters identifying each plane of the input arrays.
@@ -112,7 +112,7 @@
       INTEGER NPLANE
       REAL STOKE( NPIX, NROW, NPLANE )
       REAL VSTOKE( NPIX, NROW, NPLANE )
-      REAL ANG
+      REAL ANGROT
       CHARACTER STKID*(*)
       LOGICAL DEBIAS
       LOGICAL VAR
@@ -177,8 +177,8 @@
       REAL VVIN                  ! Input V variance
 
 *  CAT identifiers for catalogue columns.
-      INTEGER XCAT, YCAT, ICAT, PCAT, THCAT, PICAT, VCAT, QCAT, UCAT,
-     :        DICAT, DPCAT, DTHCAT, DPICAT, DVCAT, DQCAT, DUCAT
+      INTEGER XCAT, YCAT, ICAT, PCAT, ANCAT, PICAT, VCAT, QCAT, UCAT,
+     :        DICAT, DPCAT, DANCAT, DPICAT, DVCAT, DQCAT, DUCAT
 
 *.
 
@@ -228,7 +228,7 @@
          CALL CAT_TIDNT( CI, 'Y', YCAT, STATUS )
          CALL CAT_TIDNT( CI, 'I', ICAT, STATUS )
          CALL CAT_TIDNT( CI, 'P', PCAT, STATUS )
-         CALL CAT_TIDNT( CI, 'THETA', THCAT, STATUS )
+         CALL CAT_TIDNT( CI, 'ANG', ANCAT, STATUS )
          CALL CAT_TIDNT( CI, 'PI', PICAT, STATUS )
 
          IF( CIRC ) THEN
@@ -241,7 +241,7 @@
          IF( VAR ) THEN
             CALL CAT_TIDNT( CI, 'DI', DICAT, STATUS )
             CALL CAT_TIDNT( CI, 'DP', DPCAT, STATUS )
-            CALL CAT_TIDNT( CI, 'DTHETA', DTHCAT, STATUS )
+            CALL CAT_TIDNT( CI, 'DANG', DANCAT, STATUS )
             CALL CAT_TIDNT( CI, 'DPI', DPICAT, STATUS )
 
             IF( CIRC ) THEN
@@ -403,7 +403,7 @@
 
                IF ( MAKET ) THEN
                   IF( T .NE. VAL__BADR ) THEN
-                     AT( PIX, ROW ) = ANG - T
+                     AT( PIX, ROW ) = ANGROT - T
                   ELSE
                      AT( PIX, ROW ) = VAL__BADR
                   END IF
@@ -442,10 +442,10 @@
      :                            STATUS )
 
                   IF( T .NE. VAL__BADR ) THEN
-                     CALL CAT_PUT0R( THCAT,  ANG - T, .FALSE., 
+                     CALL CAT_PUT0R( ANCAT,  ANGROT - T, .FALSE., 
      :                               STATUS )
                   ELSE
-                     CALL CAT_PUT0R( THCAT,  VAL__BADR, .TRUE., 
+                     CALL CAT_PUT0R( ANCAT,  VAL__BADR, .TRUE., 
      :                               STATUS )
                   END IF
 
@@ -487,10 +487,10 @@
                      END IF
 
                      IF( VT .NE. VAL__BADR ) THEN
-                        CALL CAT_PUT0R( DTHCAT, SQRT( MAX( 0.0, VT ) ), 
+                        CALL CAT_PUT0R( DANCAT, SQRT( MAX( 0.0, VT ) ), 
      :                                  .FALSE., STATUS )
                      ELSE
-                        CALL CAT_PUT0R( DTHCAT, VAL__BADR, .TRUE., 
+                        CALL CAT_PUT0R( DANCAT, VAL__BADR, .TRUE., 
      :                                  STATUS )
                      END IF
 
@@ -656,7 +656,7 @@
      :                            STATUS )
                   CALL CAT_PUT0R( PCAT,   P, ( P .EQ. VAL__BADR ), 
      :                            STATUS )
-                  CALL CAT_PUT0R( THCAT,  T, ( T .EQ. VAL__BADR ), 
+                  CALL CAT_PUT0R( ANCAT,  T, ( T .EQ. VAL__BADR ), 
      :                            STATUS )
                   CALL CAT_PUT0R( PICAT, IP, ( IP .EQ. VAL__BADR ), 
      :                            STATUS )
@@ -687,10 +687,10 @@
                      END IF
 
                      IF( VT .NE. VAL__BADR ) THEN
-                        CALL CAT_PUT0R( DTHCAT, SQRT( MAX( 0.0, VT ) ), 
+                        CALL CAT_PUT0R( DANCAT, SQRT( MAX( 0.0, VT ) ), 
      :                                  .FALSE., STATUS )
                      ELSE
-                        CALL CAT_PUT0R( DTHCAT, VAL__BADR, .TRUE., 
+                        CALL CAT_PUT0R( DANCAT, VAL__BADR, .TRUE., 
      :                                  STATUS )
                      END IF
 

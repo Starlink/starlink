@@ -1695,7 +1695,7 @@ interface POLVEC
       helpkey     '*'
    endparameter
 
-   parameter      THETA          # Polarisation angle
+   parameter      ANG            # Polarisation angle
       position    5
       type        NDF
       access      WRITE

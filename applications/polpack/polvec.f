@@ -28,7 +28,7 @@
 *     examined and manipulated using the CURSA package (see SUN/190).
 
 *  Usage:
-*     polvec in cat [p] [theta] [i] [ip]
+*     polvec in cat [p] [ang] [i] [ip]
 
 *  ADAM Parameters:
 *     BOX( 2 ) = _INTEGER (Read)
@@ -61,7 +61,7 @@
 *           Q     : The Stokes Q parameter.
 *           U     : The Stokes U parameter.
 *           P     : The percentage polarisation.
-*           THETA : The polarisation angle (anti-clockwise from the X axis
+*           ANG   : The polarisation angle (anti-clockwise from the X axis
 *                   to the plane of polarisation - in degrees).
 *           PI    : The polarised intensity.
 *
@@ -73,13 +73,13 @@
 *
 *        When measuring circular polarisation, the columns describing Q
 *        and U will be replaced by equivalent columns describing V; and
-*        the THETA value will be zero if the normalised Stokes parameter V 
+*        the ANG value will be zero if the normalised Stokes parameter V 
 *        is positive, and 90 otherwise. 
 *
 *        The coordinates contained in columns X and Y refer to pixel
 *        coordinates after any binning (i.e. to the pixel coordinate
 *        Frames of the output NDFs associated with parameters I, P,
-*        THETA, etc). For this reason it is usually better to avoid
+*        ANG, etc). For this reason it is usually better to avoid
 *        binning the Stokes vectors in this application (see parameter BOX).
 *        Information describing the mappings between pixel coordinates and 
 *        any other known coordinate Frames will be stored in the catalogue
@@ -127,7 +127,7 @@
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Only used if
 *        METHOD is set to "SIGMA". [4.0]
-*     THETA = NDF (Write)
+*     ANG = NDF (Write)
 *        An output NDF holding the polarisation angle (anti-clockwise from 
 *        the pixel X axis to the plane of polarisation - in degrees). In the
 *        the case of circular polarisation, a value of zero is stored 
@@ -458,7 +458,7 @@
 *  ======================================
 
 *  Attempt to get an output NDF to hold polarisation angle.
-      CALL NDF_CREAT( 'THETA', '_REAL', 2, LBND, UBND, INDFT, STATUS ) 
+      CALL NDF_CREAT( 'ANG', '_REAL', 2, LBND, UBND, INDFT, STATUS ) 
 
 *  If successful, set a flag indicating that an angle NDF is to
 *  be produced.

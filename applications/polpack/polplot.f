@@ -74,7 +74,7 @@
 *        insensitive).  The positive Y axis defines zero orientation, and 
 *        rotation from the X axis to the Y axis is considered positive. 
 *        A list of available column names is displayed if a non-existent
-*        column name is given. [THETA]
+*        column name is given. [ANG]
 *     COLMAG = LITERAL (Read)
 *        The name of the catalogue column holding the magnitude of each 
 *        vector. A list of available column names is displayed if a 
@@ -205,15 +205,15 @@
 *        one centimetre.  []
 
 *  Examples:
-*     polplot poltab x y p theta 
+*     polplot poltab x y p ang
 *        Produces a vector map on the current graphics device with
 *        vectors defined in the FITS binary table "poltab". The magnitudes
-*        are taken from column P, the orientations from column THETA, and
+*        are taken from column P, the orientations from column ANG and
 *        the coordinates of each vector from columns X and Y. All 
 *        other settings are defaulted, so for example a key is plotted.
-*     polplot poltab ra dec p theta angrot=23.4 cosys=eq(B1950)
+*     polplot poltab ra dec p ang angrot=23.4 cosys=eq(B1950)
 *        Produces a vector map in which the primary axis of the vectors
-*        (as defined by the value zero in the column THETA) is at the
+*        (as defined by the value zero in the column ANG) is at the
 *        position angle 23.4 degrees (measured anti-clockwise from the
 *        positive y axis) in the displayed map. The position of each vector
 *        is specified by columns "ra" and "dec". The annotated axes give
@@ -225,7 +225,7 @@
 *        Frame). If this is not possible, then the vector map will be
 *        aligned in pixel or grid coordinates. A message is displayed
 *        indicating the domain in which alignment took place.
-*     polplot poltab x y p theta arrow=0.01 just=start nokey
+*     polplot poltab x y p ang arrow=0.01 just=start nokey
 *        Produces a vector map in which each vector is represented by an 
 *        arrow, starting at the position of the corresponding pixel.  No key
 *        to the vector scale and justification is produced.
