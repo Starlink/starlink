@@ -37,7 +37,8 @@
 *        must be between 0 and 1. A negative value allows this parameter
 *        to be free.
 *     ETA_TEL = REAL (Read)
-*        The telescope efficiency. Must be between 0 and 1.0. 
+*        The telescope efficiency. If available the current telescope value 
+*        is used as the default.  Values must be between 0 and 1.0. 
 *        A negative value allows this parameter to be free.
 *     MODEL_OUT = CHAR (Write)
 *        The name of the output file that contains the fitted sky
@@ -109,6 +110,9 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.21  1997/07/28 20:58:23  timj
+*     Add support for the presence of ETATEL in the FITS header.
+*
 *     Revision 1.20  1997/07/19 02:41:47  timj
 *     Add header information to describe SCUBA_PREFIX.
 *
@@ -249,6 +253,7 @@ c
       REAL             BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                         ! dU4 Nasmyth coord of bolometers
       INTEGER DIM (MAXDIM)              ! the dimensions of an array
+      REAL    DEFAULT_ETA_TEL           ! Eta tel read from FITS header
       INTEGER DREF                      ! Pointer to output data
       INTEGER DUM_DATA_PTR_END          ! Scratch space end
       INTEGER DUM_DATA_PTR              ! Scratch space 
@@ -853,6 +858,28 @@ c
      :  T_AMB, STATUS)
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'T_TEL',
      :  T_TEL, STATUS)
+
+*     As of 19970728 Skydip data contains the suggested ETATEL values
+*     in the FITS header. We should provide these as the default if it is
+*     there. Have to make sure that we have good status before proceeding.
+
+      IF (STATUS .EQ. SAI__OK) THEN
+         STEMP = 'ETATEL_'
+         ITEMP = 7
+         CALL CHR_PUTI(SUB_POINTER, STEMP, ITEMP)
+         CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, STEMP,
+     :        DEFAULT_ETA_TEL, STATUS)
+
+*     Check to see that the entry was found okay.
+*     If so we will set the dynamic default
+*     Else we do nothing and allow the default to be used from the IFL file
+         IF (STATUS .EQ. SAI__OK) THEN
+            CALL PAR_DEF0R('ETA_TEL', DEFAULT_ETA_TEL, STATUS)
+         ELSE
+            CALL ERR_ANNUL(STATUS)
+         END IF
+
+      END IF
 
 *     Get the fit parameters
 
