@@ -1413,7 +1413,7 @@ static int GetNP( AstWcsMap *this, int j ) {
    if ( !astOK ) return ret; 
 
 /* Validate the axis index, and get the count. */ 
-   if( j >= 0 && j < astGetNin( this ) ) ret = this->np[ j ];
+   if( j >= 0 && this->np && j < astGetNin( this ) ) ret = this->np[ j ];
 
    return ret;
 
