@@ -333,7 +333,7 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
 * map QUALITY if present
       CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
       IF ( QOK ) THEN
-        CALL BDI_MAP( IFID, 'Quality', 'UBYTE', 'READ', QPTR, STATUS )
+        CALL BDI_MAPUB( IFID, 'Quality', 'READ', QPTR, STATUS )
       ENDIF
 
 * map VARIANCE if present
@@ -416,9 +416,10 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
       CALL BDI_MAPR( OFID, 'Data', 'WRITE', DPTRO, STATUS )
 
 * QUALITY
-      CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', QPTRO, STATUS )
+      CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', QPTRO, STATUS )
       IF ( QOK ) THEN
-        CALL BDI_COPY( IFID, 'QualityMask', OFID, ' ', STATUS )
+        CALL BDI_GET0UB( IFID, 'QualityMask', MASK, STATUS )
+        CALL BDI_PUT0UB( OFID, 'QualityMask', MASK, STATUS )
       ENDIF
 
 *  VARIANCE if required
