@@ -1,0 +1,61 @@
+interface HGET
+
+   helplib '$HDSTOOLS_HELP'
+
+   parameter INP
+      position 1
+      type UNIV
+      vpath 'PROMPT'
+      ppath 'GLOBAL'
+      prompt 'Object name'
+      help 'Full path name of object to be displayed'
+      helpkey '*'
+      association '<->GLOBAL.HDSOBJ'
+   endparameter
+
+   parameter ITEM
+      position 2
+      type '_CHAR'
+      default 'VALUE'
+      vpath 'PROMPT'
+      ppath 'DEFAULT'
+      prompt 'ATTRIBUTE'
+      help 'Enter one of PRIM, STRUC, NDIM, DIMS, NELM, TYP, VAL, MIN or MAX'
+      helpkey '*'
+   endparameter
+
+   parameter ATTR
+      type '_CHAR'
+      position 3
+      vpath 'INTERNAL,NOPROMPT'
+      helpkey '*'
+   endparameter
+
+   parameter INDEX
+      type '_INTEGER'
+      position 4
+      vpath 'INTERNAL,NOPROMPT'
+      helpkey '*'
+   endparameter
+
+   parameter ECHO 
+      type '_LOGICAL'
+      default Y
+      vpath 'DEFAULT,PROMPT'
+      ppath 'DEFAULT'
+      prompt 'Echo attribute value to console?'
+      help 'Useful in scripts'
+      helpkey '*'
+   endparameter
+
+   parameter VERSION
+      type '_LOGICAL'
+      default N
+      vpath 'DEFAULT,PROMPT'
+      ppath 'DEFAULT'
+      prompt 'Output version number?'
+      help 'Useful in scripts'
+      helpkey '*'
+   endparameter
+
+endinterface

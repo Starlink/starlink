@@ -1,0 +1,26 @@
+1 HDSTOOLS
+
+  Version 1.0 of the HDSTOOLS package is released.
+
+  This consists of a number tools for inspecting and editing HDS files.
+  They are slight modifications of the tools available in the Asterix
+  package, which is no longer supported.
+
+  The tools are:
+
+  HCOPY    - Copy HDS data objects.
+  HCREATE  - Create an HDS data object of specified type and dimensions.
+  HDELETE  - Delete an HDS object.
+  HDIR     - Produce a simple summary of an HDS object.
+  HDISPLAY - Display the contents of a primitive HDS object.
+  HFILL    - Fill an HDS data object with a specified value.
+  HGET     - Return information about an object.
+  HHELP    - Obtain HELP on the HDSTOOLS package.
+  HMODIFY  - Modify the value of an HDS object.
+  HREAD    - Read a file into an HDS object.
+  HRENAME  - Rename an HDS data object.
+  HRESET   - Change state of a primitive HDS object to undefined.
+  HRESHAPE - Reshape an HDS object.
+  HRETYPE  - Change the type of an HDS structure object.
+  HTAB     - Display one or more vector objects in table form.
+  HWRITE   - Write an HDS object into formatted/unformatted file.

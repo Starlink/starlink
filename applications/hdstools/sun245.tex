@@ -1,0 +1,1923 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+\newcommand{\stardoccopyright} 
+{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {245.0}
+\newcommand{\stardocauthors}   {A. J. Chipperfield}
+\newcommand{\stardocdate}      {21 Jan 2002}
+\newcommand{\stardoctitle}     {HDSTOOLS\\Tools To Display and Edit HDS Objects}
+\newcommand{\stardocversion}   {Version 1.0}
+\newcommand{\stardocmanual}    {User's manual}
+\newcommand{\stardocabstract}  {The HDSTOOLS package contains a number of tools
+to edit and display HDS objects. The tools originated in the ASTERIX package
+but have now been modified to run as normal Starlink tasks.}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%+
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2html. The contents of this file should be included in the
+%     source prior to any statements that make of the sst commnds.
+
+%  Notes:
+%     The style file html.sty provided with LaTeX2html needs to be used.
+%     This must be before this file.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-5.0pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\\[1.3ex]{\raggedright \ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[2]{\sloppy
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
+\\ #2 }
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+\mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%% Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+\begin{htmlonly}
+
+%  sstroutine.
+   \newcommand{\sstroutine}[3]{
+      \subsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  sstdescription
+   \newcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstusage
+   \newcommand{\sstusage}[1]{\item[Usage:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstinvocation
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstarguments
+   \newcommand{\sstarguments}[1]{
+      \item[Arguments:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstreturnedvalue
+   \newcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstparameters
+   \newcommand{\sstparameters}[1]{
+      \item[Parameters:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstexamples
+   \newcommand{\sstexamples}[1]{
+      \item[Examples:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstsubsection
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  sstexamplesubsection
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
+
+%  sstnotes
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
+
+%  sstdiytopic
+   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
+
+%  sstimplementationstatus
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
+   }
+
+%  sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+      \\
+   }
+%  sstitem
+   \newcommand{\sstitem}{\item}
+
+\end{htmlonly}
+
+%  End of "sst.tex" layout definitions.
+%.
+
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+   {\Huge\textbf{\stardocmanual}}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex Copyright Statement
+%  =========================
+\begin{latexonly}
+\newpage
+\vspace*{\fill}
+\stardoccopyright
+\end{latexonly}
+% ? End of Latex copyright statement
+
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+% ? Main text
+\section{Introduction}
+The Starlink Hierarchical Data System,
+\xref{HDS}{sun92}{},
+allows data files to be constructed with structured and primitive components.
+They are usually written and read by scientific application programs but it is
+sometimes useful to create or edit them by hand or to inspect them with no
+meaning attached to the components.
+
+The HDSTOOLS package contains a number of generally useful tools for this
+purpose. The tools originated in the Asterix package, which was written at
+Leicester and Birmingham Universities for analysis of X-Ray data.
+Asterix is no longer supported so the tools have been extracted to form the
+HDSTOOLS package, which will be supported by Starlink.
+\xref{HDSTRACE}{sun102}{} remains the program of choice for displaying the
+content of HDS objects.
+
+The applications should run as before but the underlying parameter system has
+been simplified (to the normal Starlink parameter system) and some bugs have 
+been fixed and deficiencies addressed.
+
+\section{Running the Applications}
+Startup scripts are provided to define commands for running HDSTOOLS programs
+direct from the Unix shell or from
+\xref{ICL}{sg5}{}.
+The following instructions assume your site has been set up in the standard
+Starlink way.
+
+To initialise the HDSTOOLS package for running from the Unix shell, type:
+\begin{quote}
+\texttt{\% hdstools}
+\end{quote}
+This will \texttt{source} the file \texttt{/star/bin/hdstools/hdstools.csh}
+to set up aliases for the tools.
+
+Similarly, to run from ICL, type:
+\begin{quote}
+\texttt{ICL> hdstools}
+\end{quote}
+This will `load' the ICL script \texttt{/star/bin/hdstools/hdstools.icl}
+to `define' the required commands.
+
+In both cases you may also want to set up the environment variables
+AST\_LIST\_SPOOL, OLDFILE and/or NEWFILE (see
+\htmlref{HDSTOOLS Output Devices}{hdstools_output_devices}\latex{, Section \ref{hdstools_output_devices}}).
+
+In addition to the normal commands, \texttt{hcopy}, \texttt{hcreate}
+\textit{etc.}, commands with `\texttt{hdt\_}' replacing the initial
+`\texttt{h}' (\texttt{hdt\_copy}. \textit{hdt\_create} \textit{etc.}) are
+defined to allow for the possibility of name conflict with other packages.
+
+\section{Supplying Parameters}
+
+\subsection{Command Line Parameters}
+The Starlink (ADAM) parameter system used by the HDSTOOLS application programs
+allows parameter values to be specified on the command line by `positional' or
+`keyword' parameter specifiers. 
+
+Keyword parameter specifiers have the syntax
+\texttt{keyword=value} where \texttt{name} is the parameter keyword.
+(For HDSTOOLS the keyword is always the same as the parameter name.)
+Keyword specifiers may appear in any order on the command line and the case of
+the keyword is not significant. 
+
+Parameter specifiers which are not keyword specifiers are positional -- the
+first of them applies to the parameter whose position is defined as 1, 
+the second to the parameter whose position is defined as 2 \textit{etc.}
+For example:
+\begin{quote}
+\texttt{\% hcreate file dims=10 \_REAL}
+\end{quote}
+The parameter whose position is 1 takes the value \texttt{file}, the parameter
+whose keyword is DIMS takes the value \texttt{10} and the parameter whose
+position is 2 takes the value \texttt{\_REAL}. Precisely how the values are
+interpreted depends upon the type of the parameter.
+
+Parameters of type \_CHAR take a character string as their value. If a string
+containing space or comma is specified on the command line, the parameter
+system requires that it is enclosed in double quotes. (Positional specifiers
+must also be quoted if they contain`='.)
+
+Parameters of type \_LOGICAL take the value YES, Y, NO, N, TRUE, T, FALSE or F
+(regardless of case). Alternatively the keyword specifiers `\textit{KEYWORD}'
+or `NO\textit{KEYWORD}', where \textit{KEYWORD} is the parameter's keyword
+may be given to set TRUE or FALSE respectively.
+
+Note that when programs are run from the Unix shell and values are specified
+on the command line, it is often necessary to protect characters from the
+shell by inserting $\backslash$ or enclosing them in single quotes.
+Characters which are likely to cause trouble are: ()[]*!".
+This is not a problem when replying to prompts or when running from ICL.
+
+\subsection{Vpaths and Prompts}
+If a parameter value is not specified on the command line, its value may be
+obtained by following a `value-path' (known as the vpath) until a value is
+found. The path consists of a list of possible `default' sources, including
+prompting the user (which will always produce a value). 
+
+Prompts may include a `suggested value' obtained by
+following a `ppath' similar to the vpath. 
+In response to a prompt, you can type in a value, terminated by the
+$<$return$>$ key, or the suggested value may be used by just
+hitting the $<$return$>$ key, or placed in the input area by hitting the
+$<$tab$>$
+key. The input area may be edited (see 
+\xref{SUN/144}{sun144}{input_line_editing}
+for details).
+
+Other possible responses to a prompt are:\\
+%\begin{tabular}{p{2em}p{35emin}}
+\begin{tabular}{p{.25in}p{5.25in}}
+! & The `null' response. This will usually terminate the program but has a
+special meaning for some parameters (see the program description).\\
+!! & The `abort' response. This will invariably abort an HDSTOOLS program.\\
+? & The `help' response. This will display a one-line help message about
+the parameter and then re-prompt.\\
+?? & The `fullhelp' response. This will put the user into the full help
+system, displaying the help for the parameter. On exit from the help system
+the user will be re-prompted.
+\end{tabular}
+
+\subsection{\label{specifying_hds_objects}Specifying HDS Objects}
+An HDS object is specified as a pathname comprising a 'container file' 
+optionally followed by a number of component names separated by `.' -- all but
+the last component must be structures. For example:
+\begin{quote}
+image.data\_array.data
+\end{quote}
+specifies component DATA of a structured component DATA\_ARRAY of the
+container file \texttt{image.sdf}. Note that the file extension (\texttt{.sdf}
+is not given and the case of component names is not significant.
+
+Usually, where an object is required, a cell or slice of an array object may be
+specified instead. Cells and slices are specified in parentheses after the
+component name and consist of ranges for each dimension, separated by `,'.
+Ranges take the form: \textit{ll:ul}, where \textit{ll} and \textit{ul} are
+lower and upper limits. Either limit may be omitted implying the beginning or
+end. If the `:' is also omitted the upper and lower limits will be the same
+\textit{i.e.} the one number given.
+
+For example:
+\begin{quote}
+\texttt{container(2).data\_array.data(:50,100:150)}
+\end{quote}
+specifies elements 1 to 50 in the first dimension and 100 to 150 in the second
+the DATA component of the DATA\_ARRAY structure of the second structure in the
+top-level structure array in container file \texttt{container.sdf}.
+
+Note that when running direct from the Unix shell, the parentheses will need
+protecting.
+
+\subsection{`Special' Keywords}
+In addition to the parameter keywords, there are several `special keywords'.
+You may find the following two useful:
+
+\begin{tabular}[t]{p{0.8in}p{5in}}
+PROMPT & Forces a prompt for any values not defined on the command
+line, regardless of what is on the vpath. \\
+ACCEPT & Forces the suggested value to be used if a prompt would
+otherwise occur.
+\end{tabular}
+
+For example:
+\begin{quote}
+\texttt{\% hcreate prompt}
+\end{quote}
+will cause a prompt for all the parameters of \texttt{hcreate}, including
+the dimensions which would otherwise be defaulted to produce a scalar.
+
+\subsection{Global Parameters}
+Parameters may be `associated' with a `global' parameter and thus values
+may be shared between different programs. The association may be to write the
+parameter's value on successful completion and/or use its value on the vpath
+or ppath. Several HDSTOOLS programs use the global parameter HDSOBJ to
+remember the last-used HDS object and/or offer it as a suggested value at a
+prompt. In this way a sequence of operations may be easily performed on the
+same object.
+
+\subsection{Interface Files}
+Each program's parameters and their positions, keywords, vpaths, ppaths and
+associations \textit{etc.} are defined in an 
+\xref{`Interface File'}{sun115}{}\latex{ (see SUN/115)}
+
+Interface files are provided for each program but it is possible to use
+private customised files instead.
+
+\section{\label{hdstools_output_devices}HDSTOOLS Output Devices}
+The HDSTOOLS programs for displaying objects require an output device to be
+specified.
+The value of the device parameter may be set to one of the following values:
+
+\begin{tabular}{p{1.25in}p{4.5in}}
+TERMINAL & The user terminal. \\
+PRINTER  & The printer. Output is written to a temporary file,
+   \texttt{ast\_io.temp\textit{nn}} (where \texttt{\textit{nn}} are two digits
+   to provide a unique name) and then spooled using the command specified
+   in environment variable AST\_LIST\_SPOOL (which must be set).\\
+NEWFILE[=\textit{fnm}] & Write to a new file whose name is specified by the
+   environment variable NEWFILE (default \textit{fnm} else 
+   \texttt{ast\_print.lis}). \\
+OLDFILE[=\textit{fnm}] & Append to the file whose name is specified by the
+   environment variable OLDFILE (default \textit{fnm} else
+   \texttt{ast\_print.lis}). \\
+other    & Anything else is taken to be a new filename to be written.
+\end{tabular}
+
+CONSOLE, STDOUT and blank are synonyms for TERMINAL. The case of the value is
+not significant and it may be abbreviated (except for filenames).
+When a new file is to be written, any existing file of the same name will
+be saved as its filename with \texttt{$\sim$} appended. Any existing 
+\texttt{filename$\sim$} will be overwritten.
+
+If the NEWFILE or OLDFILE=filename form is used on the command line,
+the `=' must be protected from the parameter system which would
+assume you were trying to specify a parameter called NEWFILE or OLDFILE. 
+There are two ways to do this:
+\begin{itemize}
+\item Enclose it all in double quotes \texttt{"NEW=filename"} (but note that
+the quotes will need protecting from the shell so you end up with
+\texttt{'"NEW=filename"'}, for example).
+\item Use the parameter keyword form \texttt{DEV=NEW=filename}.
+\end{itemize}
+
+\section{MSG Tuning}
+HDSTOOLS applications output messages to the user via the Starlink
+\xref{MSG}{sun104}{}
+library and interrogate the environment variables to determine any 
+\xref{MSG tuning parameters}{sun104}{MSG_TUNE}\latex{ (see SUN/104)}.
+
+For example, on Unix,
+\begin{quote}
+\% setenv MSG\_FILTER 1
+\end{quote}
+will cause the application to run in `QUIET' mode and output of the application
+version number and other purely informational messages will be prevented.
+
+\section{Acknowledgements}
+The following people from the University of Birmingham were involved in
+producing the original Asterix tools: David Allan, Bob Vallance, Richard Beard,
+Jim Peden, Trevor Ponman, Dick Willingale, Ray Forbes.
+
+\section{Specifications of the HDSTOOLS Applications}
+\subsection{General Notes}
+\subsubsection{The Usage Section}
+The command name and parameters are listed using the following conventions:
+\begin{description}
+\item[\textit{par}] Positional parameter specifier for parameter \textit{par}, 
+in position order -- a prompt will be issued if it is not specified,
+\item[\texttt{[\textit{par}]}] Optional positional parameter specifier for
+parameter \textit{par}, in position order -- a default will be used if it is
+not specified.
+\item[\texttt{[\textit{par=}]}] Optional keyword parameter specifier -- a
+default will be used if it is not specified.
+\end{description}
+Note that the order of keyword specifiers is not significant. Positional
+parameters may also be specified in keyword form but that precludes the use of
+positional parameter specifications for parameters with a higher position.
+
+\subsubsection{The Parameters Section}
+Each parameter is listed in the form
+\begin{quote}
+\textit{PAR} = \textit{TYPE} (\textit{access})
+\begin{quote}
+Description
+\end{quote}
+\end{quote}
+\textit{PAR} is the parameter name -- this also serves as the keyword for
+HDSTOOLS parameters.
+
+\textit{TYPE} is the parameter type. Type UNIV means that the type of the
+parameter will depend on the type of the argument given -- an unquoted string
+is assumed to be an HDS object name (except for `INTERNAL' parameters). 
+If you want the type to be a string, you must enclose it in double quotes (and
+possibly protect them from the shell with further single quotes -- HCOPY has
+an example of this). Conversely, if the parameter type is '\_CHAR' and you want
+to specify an HDS object containing the value, you must force the string to be
+interpreted as an object name by preceding it with @ (HGET has an example of
+this).
+
+(In fact the parameter system treats all parameters as HDS objects. If you
+specify a primitive value on the command line, an HDS object is created to
+hold the value and that object is used by the parameter system.)
+
+\textit{Access} is 'Read' or 'Write' (HDSTOOLS does not use 'Update'). Note
+that this refers to the access made to the parameter and not to the access to
+any file or object represented by the value. For example the OUT parameter of
+HCOPY is read but its value is the name of an object which is written, whilst
+HGET actually writes a value to its ATTR parameter.
+
+The parameter description gives a simple description of the parameter.
+(More information may be provided in the description of the application.)
+If there is an association with a global parameter, this is indicated by the
+global parameter name preceded by $<$ if it is used as a suggested value, and
+followed by $>$ if the global parameter value updated with this parameter's
+value on successful completion.
+If a default will be used without prompting, the default is appended enclosed
+in [ ].
+These defaults will be given as the suggested value if prompting is forced.
+
+\subsubsection{The Examples Section}
+Examples are given, in most cases assuming the command is run from the Unix
+shell -- the \% represents the Unix prompt and is not typed by the user.
+Running from ICL will be similar but quotes, parentheses and square brackets
+\textit{etc.} do not need special protection.
+\newpage
+\sstroutine{
+   HCOPY
+}{
+   Copy HDS data objects
+}{
+   \sstdescription{
+      Copies a data object from one place to another. The copy is
+      recursive, so if a structure is specified as input then
+      everything below that level will be copied to the output
+      destination.
+
+      A suitable output object will be created if necessary (replacing
+      any existing unsuitable one of the same name) but any structure
+      above the specified object must already exist. Any content of an
+      existing component is lost.
+   }
+   \sstusage{
+      hcopy in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         INP=UNIV (Read)
+      }{
+         Object being copied from, structured or primitive.
+      }
+      \sstsubsection{
+         OUT=CHAR (Read)
+      }{
+         Object being copied to - takes shape and type of input.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \% hcopy file1 file2
+      }{
+         Copy complete container file.
+      }
+      \sstexamplesubsection{
+         \% hcopy file.more.asterix.grafix.coltab tab1
+      }{
+         Extract an object into its own container file.
+      }
+      \sstexamplesubsection{
+         \% hcopy file1.data\_array file2.data\_array
+      }{
+         Copy the component DATA\_ARRAY in file1
+         to DATA\_ARRAY in file2. The DATA\_ARRAY component of file2
+         will be created, but file2 must already exist.
+      }
+      \sstexamplesubsection{
+         \% hcopy {\tt '}[1 2 3 4 5]{\tt '} file.array
+      }{
+         Copy the explicit values given into a component ARRAY within file.
+      }
+      \sstexamplesubsection{
+         \% hcopy {\tt '}{\tt "}Counts/sec{\tt "}{\tt '} {\tt '}file.axis(2).units{\tt '}
+      }{
+         A more practical example of the above.
+      }
+      \sstexamplesubsection{
+         \% hcopy {\tt '}file.axis(1){\tt '} {\tt '}file.axis(2){\tt '}
+      }{
+         Copy the first element of the AXIS array to the second - works for
+         structure or primitive arrays.
+      }
+   }
+   \sstdiytopic{
+      Deficiencies
+   }{
+      Error reporting could be more helpful.
+   }
+}
+\newpage
+\sstroutine{
+   HCREATE
+}{
+   Create an HDS data object of specified type and dimensions
+}{
+   \sstdescription{
+      Creates an HDS data object of specified type and dimensions.  It
+      will either create a completely new container file or a new object
+      within an existing structure. An existing container file will be
+      overwritten but an existing component within a file will not.
+
+      By default the object created will be a scalar (dimension 0). If
+      you want to create an object of different shape then either
+      supply the dimensions on the command line or force prompting with
+      the PROMPT keyword.
+
+      Primitives are not given values and this action must be
+      performed subsequently by HMODIFY, HFILL or HCOPY.
+   }
+   \sstusage{
+      hcreate inp type [dims]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INP  = UNIV (Read)
+      }{
+         Name of object.  GLOBAL.HDSOBJ$>$
+      }
+      \sstsubsection{
+         TYPE = CHAR (Read)
+      }{
+         Type of object to be created.
+      }
+      \sstsubsection{
+         DIMS$*$($*$) = INTEGER (Read)
+      }{
+         Dimensions of object, comma or space separated and enclosed in [ ]
+         if more than one ([ ] optional in response to a prompt). [0]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \% hcreate file1 \_integer {\tt '}[10,25]{\tt '}
+      }{
+         Creates an HDS container file, file1, containing a 10x25 \_INTEGER
+         array. (Note that the square brackets have to be protected from the
+         shell.)
+      }
+      \sstexamplesubsection{
+         \% hcreate file1 struc
+      }{
+         Creates an HDS container file, file1, containing a structure of
+         type STRUC.
+      }
+      \sstexamplesubsection{
+         \% hcreate file1.array \_real {\tt '}[10,25]{\tt '}
+      }{
+         Creates a 10x25 array named ARRAY of type \_REAL in the HDS
+         structure created in the previous example
+      }
+   }
+   \sstdiytopic{
+      Valid Types
+   }{
+      HDS divides objects into two classes, primitive and structured.
+      The former contain simple data such as numbers or characters,
+      whereas the latter contain collections of other objects, structured
+      or primitive.
+      The valid primitive types recognised by HDS are:
+
+      \begin{tabular}{lll}
+      Type         & Equiv Fortran     & Range \\
+      \\
+      \_LOGICAL     & LOGICAL$*$4         & .TRUE., .FALSE. \\
+      \_UBYTE       & not supported     & 0..255 \\
+      \_BYTE        & BYTE              & -128..127 \\
+      \_UWORD       & not supported     & 0..65535 \\
+      \_WORD        & INTEGER$*$2         & -32768..32767 \\
+      \_INTEGER     & INTEGER$*$4 \\
+      \_REAL        & REAL$*$4 \\
+      \_DOUBLE      & DOUBLE PRECISION \\
+      \_CHAR$*$n      & CHARACTER$*$(n)
+      \end{tabular}
+
+      Any type not in the above list will be assumed to be a structured
+      type.
+   }
+}
+\newpage
+\sstroutine{
+   HDELETE
+}{
+   Delete an HDS object
+}{
+   \sstdescription{
+      Deletes a named HDS data object.  Everything below the level
+      of the object specified is also deleted.
+   }
+   \sstusage{
+      hdelete inp
+   }
+   \sstparameters{
+      \sstsubsection{
+         INP = UNIV (Read)
+      }{
+         Name of object to be deleted.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \% hdelete file1.data
+      }{
+         Deletes component {\tt '}data{\tt '} from the container file{\tt '}s top-level
+         structure.
+      }
+      \sstexamplesubsection{
+         \% hdelete file1
+      }{
+         Deletes container file file1.sdf
+      }
+   }
+}
+\newpage
+\sstroutine{
+   HDIR
+}{
+   Produce a simple summary of an HDS object
+}{
+   \sstdescription{
+      Produces a simple summary of a named HDS data object to a selected
+      output. For a primitive object the name, type and value are given if
+      scalar, or dimensions if non-scalar.  For a structure the components
+      are listed.
+   }
+   \sstusage{
+      hdir inp [dev]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INP = UNIV (Read)
+      }{
+         HDS data object object to be summarized. $<$GLOBAL.HDSOBJ$>$
+      }
+      \sstsubsection{
+         DEV = \_CHAR (Read)
+      }{
+         Output device (TERMINAL, PRINTER, OLDFILE, NEWFILE etc.).
+         [TERMINAL]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \% hdir file1
+      }{
+         Produces a summary of file1.sdf on the terminal.
+      }
+      \sstexamplesubsection{
+         \% hdir file1 summary.lis
+      }{
+         Produces a summary of file1.sdf in text file summary.lis.
+      }
+      \sstexamplesubsection{
+         \% hdir file2 {\tt '}{\tt "}O=summary.lis{\tt "}{\tt '}
+      }{
+         Appends a summary of file2.sdf to text file summary.lis.
+      }
+      \sstexamplesubsection{
+         \% hdir file1.array O
+      }{
+         Appends a summary of component ARRAY of file1.sdf to text file
+         ast\_print.lis, assuming environment variable OLDFILE is not set.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   HDISPLAY
+}{
+   Display the contents of a primitive HDS object
+}{
+   \sstdescription{
+      This application outputs the contents of a specified primitive HDS
+      data object of up to 7 dimensions, to a selected output.
+
+      A subset of the object (which may itself be a subset) may be specified.
+      For integer data hex, octal or decimal formats may be chosen.
+   }
+   \sstusage{
+      hdisplay inp [dev] [slice=] [fmt=] [width=]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INP = UNIV
+      }{
+         HDS data object to be displayed. $<$GLOBAL.HDSOBJ$>$
+      }
+      \sstsubsection{
+         DEV = \_CHAR (Read)
+      }{
+         Output device (TERMINAL, PRINTER, OLDFILE, NEWFILE etc.).
+         [TERMINAL]
+      }
+      \sstsubsection{
+         SLICE = \_CHAR
+      }{
+         Description of data subset (range in 1st dimension \{,range in 2nd
+         dimension\},\{...\}) eg. 5:10,1:5 for 2-D, 10:20 for 1-D. The range
+         specifier for each dimension follows the same convention as the
+         FORTRAN substring specifier so {\tt "}:50{\tt "} {\tt "}20:{\tt "} {\tt "}5:10,:{\tt "} are all valid.
+         [$*$ (whole object)]
+      }
+      \sstsubsection{
+         FMT = \_CHAR
+      }{
+         A Fortran FORMAT string to be used for formatting numbers.
+         [! (use an appropriate general format for the type)]
+      }
+      \sstsubsection{
+         WIDTH = \_INTEGER
+      }{
+         Output page width.
+         [! (Use width appropriate for device)]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \% hdisplay file.data\_array
+      }{
+         Display whole of specified array on terminal with default format.
+      }
+      \sstexamplesubsection{
+         \% hdisplay img.quality dev=p slice=`{\tt "}100:120,250:300{\tt "}{\tt '} fmt=z1
+      }{
+         Outputs the specified slice of a quality array in hex format to the
+         printer.
+      }
+      \sstexamplesubsection{
+         \% hdisplay accept width=132
+      }{
+         Outputs the current HDS object to the terminal with page width 132.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   HFILL
+}{
+   Fill an HDS data object with a specified value
+}{
+   \sstdescription{
+      This application allows primitive data object of any shape and size to
+      be filled with a single specified value.
+
+      Every effort is made to convert the value to the required type,
+      using HDS rules. Error DAT\_\_CONER is reported if this is not possible.
+
+      The defined object may be a slice of a larger array. If the array was
+      previously undefined, it becomes defined - other elements are initialised
+      to zero (or blank for type \_CHAR).
+   }
+   \sstusage{
+      \% hfill inp value
+   }
+   \sstparameters{
+      \sstsubsection{
+         INP = UNIV (Read)
+      }{
+         Name of object. $<$GLOBAL.HDSOBJ$>$
+      }
+      \sstsubsection{
+         VALUE = UNIV (Read)
+      }{
+         The value to be used.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \% hfill cfile.real 0
+      }{
+         Puts the value 0.0 into every element of component REAL of
+         container file cfile.sdf.
+      }
+      \sstexamplesubsection{
+         \% hfill {\tt '}cfile.real(2,1:){\tt '} 5.5
+      }{
+         Puts value 5.5 in each element of the specified slice of OBJECT
+         (assuming the slice specification is valid for OBJECT).
+      }
+      \sstexamplesubsection{
+         \% hfill cfile.real {\tt '}{\tt "}a{\tt "}{\tt '}
+      }{
+         Fails as the value {\tt '}a{\tt '} cannot be converted to \_REAL.
+      }
+      \sstexamplesubsection{
+         \% hfill cfile.chars {\tt '}{\tt "} {\tt "}{\tt '}
+      }{
+         Writes a blank string into every element of component CHARS
+         of container file cont.sdf
+      }
+   }
+   \sstdiytopic{
+      Deficiencies
+   }{
+      There is a limit of 80 characters on the size of a character value which
+      may be given. A value larger than this will cause a DAT\_\_TRUNC error.
+      A smaller value too large to fit in the specified object{\tt '}s elements will
+      be silently truncated.
+   }
+}
+\newpage
+\sstroutine{
+   HGET
+}{
+   Return information about an object
+}{
+   \sstdescription{
+      This application returns many different pieces of information
+      depending on the value of the ITEM parameter.
+
+      \begin{tabular}{lll}
+        Item code   & Returned type  & Description \\
+        \\
+        PRIMITIVE   & \_LOGICAL       & True if Object primitive \\
+        STRUCTURED  & \_LOGICAL       & True if Object structured \\
+        NDIM        & \_INTEGER       & Dimensionality \\
+        DIMS        & \_CHAR          & Dimensions separated by commas \\
+        NELM        & \_INTEGER       & Total number of elements \\
+        TYPE        & \_CHAR          & Object type \\
+        VALUE       & Object type    & Object value (primitive scalar only) \\
+        MIN, MAX    & \_REAL          & Min,max values in numeric array
+      \end{tabular}
+
+      The {\tt '}internal{\tt '} parameter ATTR is set to the requested value and, if
+      ECHO is TRUE, the value is displayed on the user{\tt '}s terminal.
+
+      For items MIN and MAX, internal parameter INDEX is also set (but not
+      displayed).
+
+      The application is particularly useful from ICL, where the values of
+      the ATTR and INDEX parameters can be returned into ICL variables and
+      thus used to control applications. Note however that a character value
+      cannot be returned into a variable that has already been defined as
+      a numeric type.
+   }
+   \sstusage{
+      hget inp item [attr] [index] [echo=] [version=]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INP = UNIV (Read)
+      }{
+         Object to be interrogated. $<$GLOBAL.HDSOBJ$>$
+      }
+      \sstsubsection{
+         ITEM = \_CHAR (Read)
+      }{
+         Item wanted (see Description). Case is not significant and the
+         value may be abbreviated. $<$VALUE$>$
+      }
+      \sstsubsection{
+         ATTR = UNIV (Write)
+      }{
+         Attribute value.
+      }
+      \sstsubsection{
+         INDEX = \_INTEGER (Write)
+      }{
+         The index position of the max or min value (treating arrays as
+         vectors).
+      }
+      \sstsubsection{
+         ECHO = \_LOGICAL (Read)
+      }{
+         Echo attribute value to standard output stream? [TRUE]
+      }
+      \sstsubsection{
+         VERSION = \_LOGICAL (Read)
+      }{
+         Whether application version number is to be output. If the MSG\_FILTER
+         environment variable is set to 1, output will not occur anyway.
+         [FALSE]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \% hget {\tt '}numvec(2){\tt '} value
+      }{
+         Displays the value of the second element of object numvec
+      }
+      \sstexamplesubsection{
+         \% hget file.data\_array.data max attr=@info.max noecho
+      }{
+         Writes the maximum value of the DATA component of the DATA\_ARRAY
+         component of file into the MAX component of file info. The value
+         will not be displayed.
+      }
+      \sstexamplesubsection{
+         ICL$>$ hget numvec min (minval) (index) echo=f
+      }{
+      }
+      \sstexamplesubsection{
+         ICL$>$ =index
+      }{
+         Sets the ICL variable minval to the minimum value in vector numvec,
+         and variable index to the position of the minimum value within
+         numvec. The minimum value will not be displayed but the second
+         ICL command will display the index.
+      }
+   }
+   \sstnotes{
+      Internal parameters (ATTR and INDEX) are not saved in the task{\tt '}s
+      parameter file. Their values can be written to HDS objects by
+      specifying the name of an existing object of a suitable type on the
+      command line. The object name must be preceded by @ for the ATTR
+      parameter but this is not necessary for INDEX (see Example 2).
+   }
+}
+\newpage
+\sstroutine{
+   HHELP
+}{
+   Gives help about HDSTOOLS
+}{
+   \sstdescription{
+      Displays help about HDSTOOLS.  It describes individual commands in
+      detail.
+
+      See the Section {\tt "}Navigating the Help Library{\tt "} for details how to
+      move around the help information, and to select the topics you
+      want to view.
+   }
+   \sstusage{
+      hhelp [topic] [subtopic] [subsubtopic] [subsubsubtopic]
+   }
+   \sstparameters{
+      \sstsubsection{
+         TOPIC = LITERAL (Read)
+      }{
+         Topic for which help is to be given. [{\tt "} {\tt "}]
+      }
+      \sstsubsection{
+         SUBTOPIC = LITERAL (Read)
+      }{
+         Subtopic for which help is to be given. [{\tt "} {\tt "}]
+      }
+      \sstsubsection{
+         SUBSUBTOPIC = LITERAL (Read)
+      }{
+         Subsubtopic for which help is to be given. [{\tt "} {\tt "}]
+      }
+      \sstsubsection{
+         SUBSUBSUBTOPIC = LITERAL (Read)
+      }{
+         Subsubsubtopic for which help is to be given. [{\tt "} {\tt "}]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         hhelp
+      }{
+         No parameter is given so the introduction and the top-level
+         help index is displayed.
+      }
+      \sstexamplesubsection{
+         hhelp application
+      }{
+         This gives help about the specified application.
+      }
+      \sstexamplesubsection{
+         hhelp application subtopic
+      }{
+         This lists help about a subtopic of the specified
+         application or topic. The hierarchy of topics has a maximum
+         of four levels.
+      }
+   }
+   \sstdiytopic{
+      Navigating the Help Library
+   }{
+      The help information is arranged hierarchically.  You can move
+      around the help information whenever HHELP prompts.  This
+      occurs when it has either presented a screen{\tt '}s worth of text or
+      has completed displaying the previously requested help.  The
+      information displayed by HHELP on a particular topic includes a
+      description of the topic and a list of subtopics that further
+      describe the topic.
+
+      At a prompt you may enter:
+      \sstitemlist{
+
+         \sstitem
+            a topic and/or subtopic name(s) to display the help for that
+               topic or subtopic, so for example, {\tt "}hdisplay parameters dev{\tt "}
+               gives help on DEV, which is a subtopic of Parameters, which
+               in turn is a subtopic of HDISPLAY;
+
+         \sstitem
+            a $<$RETURN$>$ to see more text at a {\tt "}Press RETURN to continue ...{\tt "}
+               request;
+
+         \sstitem
+            a $<$RETURN$>$ at topic and subtopic prompts to move up one level
+               in the hierarchy, and if you are at the top level it will
+               terminate the help session;
+
+         \sstitem
+            a CTRL/D (pressing the CTRL and D keys simultaneously) in
+               response to any prompt will terminate the help session;
+
+         \sstitem
+            a question mark {\tt "}?{\tt "} to redisplay the text for the current
+               topic, including the list of topic or subtopic names; or
+
+         \sstitem
+            an ellipsis {\tt "}...{\tt "} to display all the text below the
+               current point in the hierarchy.  For example, {\tt "}HDISPLAY...{\tt "}
+               displays information on the HDISPLAY topic as well as
+               information on all the subtopics under HDISPLAY.
+
+      }
+      You can abbreviate any topic or subtopic using the following
+      rules.
+      \sstitemlist{
+
+         \sstitem
+            Just give the first few characters, e.g. {\tt "}PARA{\tt "} for
+               Parameters.
+
+         \sstitem
+            Some topics are composed of several words separated by
+               underscores.  Each word of the keyword may be abbreviated,
+               e.g. {\tt "}Colour\_Set{\tt "} can be shortened to {\tt "}C\_S{\tt "}.
+
+         \sstitem
+            The characters {\tt "}\%{\tt "} and {\tt "}$*${\tt "} act as wildcards, where the
+               percent sign matches any single character, and asterisk
+               matches any sequence of characters.  Thus to display
+               information on all available topics, type an asterisk in
+               reply to a prompt.
+
+         \sstitem
+            If a word contains, but does end with an asterisk wildcard,
+               it must not be truncated.
+
+         \sstitem
+            The entered string must not contain leading or embedded
+               spaces.
+
+      }
+      Ambiguous abbreviations result in all matches being displayed.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         Uses the portable help system.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   HMODIFY
+}{
+   Modify the value of an HDS object
+}{
+   \sstdescription{
+      Allows the value of an HDS primitive data object to be changed.
+      The new value(s) may be entered directly at the terminal or may
+      be taken from another HDS object. Information about the object is
+      displayed.
+
+      Every effort is made to convert the value(s) to the required type,
+      using HDS rules. Error DAT\_\_CONER is reported if this is not possible.
+
+      For \_CHAR values, the character length of the value object need not
+      match that of the object to be updated. If the used length of any
+      element of the given value exceeds that of the output object, it will
+      be truncated and a warning message displayed, trailing spaces will be
+      silently truncated.
+   }
+   \sstusage{
+      hmodify inp value
+   }
+   \sstparameters{
+      \sstsubsection{
+         INP=UNIV (Read)
+      }{
+         Name of object to be modified - must be primitive.
+         $<$GLOBAL.HDSOBJ$>$
+      }
+      \sstsubsection{
+         VAL=UNIV (Read)
+      }{
+         Value to be given to object - this can be an explicit value
+         (including an array) entered at at the terminal or the name of
+         another object. The value must be of the same size and shape as the
+         object to be modified but will be converted to the correct type
+         if possible. Character values must be quoted.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \% hmodify spectrum.data.temp 20000
+      }{
+         Writes the value 20000 into the specified component
+      }
+      \sstexamplesubsection{
+         \% hmodify {\tt '}ds.axis(1).units{\tt '} {\tt '}{\tt "}Counts/s{\tt "}{\tt '}
+      }{
+         Writes the value {\tt "}Counts/s{\tt "} into the UNITS component of first element
+         of the AXIS array of structures in container file ds.sdf.
+      }
+      \sstexamplesubsection{
+         \% hmodify {\tt '}ds.data\_array(1:5){\tt '} {\tt '}[1 2 3 4 5]{\tt '}
+      }{
+         Writes the given values into the specified slice of component
+         DATA\_ARRAY in container file ds.sdf.
+      }
+      \sstexamplesubsection{
+         \% hmodify ds.data\_array  ds2.data\_array
+      }{
+         Replace the values of the first DATA\_ARRAY with those in the second.
+         They must be the same size.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   HREAD
+}{
+   Read a file into an HDS object
+}{
+   \sstdescription{
+      Values are read, one per record, from the file and written to the
+      specified HDS object. The number of values to be read is calculated
+      from the size of the HDS object. If fewer values are found in the file,
+      an error is reported but the given values will have been written, with
+      the remainder unspecified.
+      If the file is ASCII, it is read using a general format appropriate
+      for the type of the specified object. The HDS object must exist and be
+      primitive - it is written as if it were a vector.
+   }
+   \sstusage{
+      hread file out [binary=]
+   }
+   \sstparameters{
+      \sstsubsection{
+         FILE = \_CHAR (Read)
+      }{
+         Name of file to be read.
+      }
+      \sstsubsection{
+         OUT = UNIV (Read)
+      }{
+         HDS object to receive data. $<$GLOBAL.HDSOBJ$>$
+      }
+      \sstsubsection{
+         BINARY = \_LOGICAL (Read)
+      }{
+         Whether file is binary. [NO]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \% hread values.dat cfile.structure.data
+      }{
+         Reads values from ASCII file values.dat and writes them to object
+         STRUCTURE.DATA in file cfile.sdf.
+      }
+      \sstexamplesubsection{
+         \% hread values.dat cfile.structure.data binary
+      }{
+         Reads values from binary file values.dat and writes them to object
+         STRUCTURE.DATA in file cfile.sdf.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   HRENAME
+}{
+   Rename an HDS data object
+}{
+   \sstdescription{
+      The object is renamed.
+
+      Note that if INP is specified only as a container filename, the name of
+      the top-level object contained will be changed but not the name of the
+      file.
+
+      If the new name is too long, DAT\_\_TRUNC is reported and a new value
+      requested.
+   }
+   \sstusage{
+      hrename inp to
+   }
+   \sstparameters{
+      \sstsubsection{
+         INP = UNIV (Read)
+      }{
+         The object to be renamed.
+      }
+      \sstsubsection{
+         TO = \_CHAR (Read)
+      }{
+         The new name - must be a valid HDS component name (not a pathname).
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \% rename cfile.structure.data array
+      }{
+         Component STRUCTURE.DATA becomes STRUCTURE.ARRAY
+      }
+      \sstexamplesubsection{
+         \% rename cfile container
+      }{
+         The top-level component of container file cfile.sdf (probably named
+         CFILE) is renamed to CONTAINER
+      }
+   }
+   \sstdiytopic{
+      Method
+   }{
+      Uses subroutine DAT\_RENAME.
+   }
+}
+\newpage
+\sstroutine{
+   HRESET
+}{
+   Change state of a primitive HDS object to undefined
+}{
+   \sstdescription{
+      The state of the specified object is set to {\tt '}undefined{\tt '}. All subsequent
+      read operations will fail until the object is written to (re-defined).
+      An attempt to reset a slice of an object will reset the whole object,
+      an attempt to reset a structure object will have no effect.
+   }
+   \sstusage{
+      hreset inp
+   }
+   \sstparameters{
+      \sstsubsection{
+         INP  = UNIV (Read)
+      }{
+         The name of a primitive object.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \% hreset cfile.data\_array.data
+      }{
+         Resets the DATA component of structure DATA\_ARRAY in file cfile.
+      }
+      \sstexamplesubsection{
+         \% hreset {\tt '}cfile.data\_array.data(1:10,1:10){\tt '}
+      }{
+         Resets the whole of object cfile.data\_array.data
+      }
+      \sstexamplesubsection{
+         \% hreset cfile.data\_array
+      }{
+         No effect if DATA\_ARRAY is a structure
+      }
+   }
+   \sstdiytopic{
+      Method
+   }{
+      Calls HDS subroutine DAT\_RESET
+   }
+}
+\newpage
+\sstroutine{
+   HRESHAPE
+}{
+   Reshape an HDS object
+}{
+   \sstdescription{
+      Changes the dimensions of the specified object. The number of dimensions
+      may be decreased but the total number of elements must remain the same
+      unless only the length of the last (or only) dimension is changed. If
+      the size is decreased, elements will be discarded; if it is increased,
+      the value of additional elements is not defined. The operation will fail
+      if the object is a structure array and any truncated elements contain
+      components.
+   }
+   \sstusage{
+      hreshape inp dims
+   }
+   \sstparameters{
+      \sstsubsection{
+         INP = CHAR  (Read)
+      }{
+         The name of the object to be re-shaped. $<$GLOBAL.HDSOBJ$>$
+      }
+      \sstsubsection{
+         DIMS$*$($*$) = INTEGER (Read)
+      }{
+         New dimensions of object, comma or space separated and enclosed in [ ]
+         if more than one ([ ] optional in response to a prompt).
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         Assuming numarr is a 50x100 array of numbers:
+      }{
+      }
+      \sstexamplesubsection{
+         \% hreshape numarr 5000
+      }{
+         Changes  numvarr to a 5000 element vector.
+      }
+      \sstexamplesubsection{
+         \% hreshape numarr {\tt '}[50,50]{\tt '}
+      }{
+         Produces a 50x50 array of numbers. Elements [:50-100] are discarded.
+      }
+      \sstexamplesubsection{
+         \% hreshape numarr {\tt '}[50,100]{\tt '}
+      }{
+         After the last example this would restore the original shape of
+         numarr but the previously discarded values may be lost.
+      }
+   }
+   \sstdiytopic{
+      Method
+   }{
+      Uses HDS subroutines DAT\_ALTER or DAT\_MOULD as appropriate.
+   }
+}
+\newpage
+\sstroutine{
+   HRETYPE
+}{
+   Change the type of an HDS structure object
+}{
+   \sstdescription{
+      Changes the type of an HDS structure object - the type of a primitive
+      object cannot be changed.
+   }
+   \sstusage{
+      hretype inp newtype
+   }
+   \sstparameters{
+      \sstsubsection{
+         INP  = UNIV (Read)
+      }{
+         The name of the object. $<$GLOBAL.HDSOBJ$>$
+      }
+      \sstsubsection{
+         TYPE = CHAR (Read)
+      }{
+         New type - a valid HDS non-primitive type.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \% hretype cfile.structure data\_array
+      }{
+         Sets the type of cfile.structure to DATA\_ARRAY
+      }
+      \sstexamplesubsection{
+         \% hretype cfile.structure.data \_REAL
+      }{
+         Error - cannot change the type of a primitive object.
+      }
+   }
+   \sstdiytopic{
+      Method
+   }{
+      CALLS DAT\_RETYPE
+   }
+}
+\newpage
+\sstroutine{
+   HTAB
+}{
+   Display one or more vector objects in table form
+}{
+   \sstdescription{
+      Provides the facility to display vector HDS data objects
+      simultaneously in a tabular form on a selected output. The range
+      to be output is selectable but by default the whole of each object
+      is output.
+
+      Note that the input object names must either be given on the
+      command line or the PROMPT keyword must be used.
+   }
+   \sstusage{
+      htab in1 in2 ... [dev=] [slice=] [width=]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPn = UNIV (Read)
+      }{
+         nth object in table. Up to six objects may be specified,
+         $<$GLOBAL.HDSOBJ$>$ for INP1, [! (no more objects)] for INP2 - 6.
+      }
+      \sstsubsection{
+         DEV = \_CHAR (Read)
+      }{
+         Output device (TERMINAL, PRINTER, OLDFILE, NEWFILE etc.).
+         [TERMINAL]
+      }
+      \sstsubsection{
+         SLICE = \_CHAR (Read)
+      }{
+         Range of data to be output in form {\tt "}n1:n2{\tt "} {\tt "}:n2{\tt "} or {\tt "}n1:{\tt "}.
+         [$*$ (whole object)]
+      }
+      \sstsubsection{
+         WIDTH = \_INTEGER (Read)
+      }{
+         Output page width. A null (!) will result in a width appropriate
+         for the chosen text output device. [!]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \% htab vec1 vec2 vec3 dev=n=vec.lis
+      }{
+         Tabulate the three vectors to file vec.lis
+      }
+      \sstexamplesubsection{
+         \% htab vec1 vec2 vec3 dev=printer slice=1:10
+      }{
+         Tabulate the first ten elements of the given vectors on printer,
+      }
+      \sstexamplesubsection{
+         \% htab vec1 vec2 vec3 vec4 vec5 vec6 width=132
+      }{
+         Tabulate six vectors to terminal in 132 column mode
+      }
+   }
+}
+\newpage
+\sstroutine{
+   HWRITE
+}{
+   Write an HDS object into formatted/unformatted file
+}{
+   \sstdescription{
+      Writes values from an HDS primitive object into an ASCII (default)
+      or binary file. One value is written per record.
+
+      For ASCII file output a default format is used unless explicitly
+      overridden.
+   }
+   \sstusage{
+      hwrite inp file [binary=] [fmt=]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INP = UNIV (Read)
+      }{
+         Object to be input and read. $<$GLOBAL.HDSOBJ$>$
+      }
+      \sstsubsection{
+         FILE = \_CHAR (Read)
+      }{
+         Output filename.
+      }
+      \sstsubsection{
+         BINARY = \_LOGICAL (Read)
+      }{
+         Whether file to be binary (Fortran unformatted). [NO]
+      }
+      \sstsubsection{
+         FMT = \_CHAR (Read)
+      }{
+         Output format for ASCII file. If null (!) is specified, a default
+         format is used for each different data type. [!]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \% hwrite cfile.structure.data values.dat
+      }{
+         Write component DATA to ASCII file values.dat with default format
+      }
+      \sstexamplesubsection{
+         \% hwrite cfile.structure.data values.dat fmt=F12.6
+      }{
+         As above but with specified format
+      }
+      \sstexamplesubsection{
+         \% hwrite cfile.structure.data values.dat binary
+      }{
+         Write component DATA in binary form into sequential, unformatted
+         file.
+      }
+   }
+}
+\end{document}

@@ -1,0 +1,23 @@
+interface HRETYPE
+
+   helplib '$HDSTOOLS_HELP'
+
+   parameter INP
+      type UNIV
+      position 1
+      ppath 'GLOBAL'
+      association '<->GLOBAL.HDSOBJ'
+      prompt 'Object name'
+      help 'Name of object to be retyped e.g. TOP.NEXT.BOTTOM'
+      helpkey '*'
+   endparameter
+
+   parameter TYPE
+      type '_CHAR'
+      position 2
+      prompt 'New type'
+      help 'New type of object eg _INTEGER'
+      helpkey '*'
+   endparameter
+
+endinterface

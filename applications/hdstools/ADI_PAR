@@ -1,0 +1,8 @@
+      INTEGER			ADI__NULLID
+        PARAMETER	        ( ADI__NULLID = -1 )
+
+      INTEGER                   ADI__MXDIM
+        PARAMETER               ( ADI__MXDIM = 7 )
+
+      INTEGER                   ADI__SZTYP
+        PARAMETER               ( ADI__SZTYP = 15 )
