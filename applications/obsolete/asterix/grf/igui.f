@@ -55,6 +55,12 @@
 
         I_GUI=(STATUS.EQ.SAI__OK)
 
+      ELSEIF (ACTION.EQ.'DESTROY') THEN
+
+*  destroy noticeboard
+        CALL NBS_LOSE_NOTICEBOARD(I_NBID,'FORCE',STATUS)
+        I_GUI=.FALSE.
+
 *  update noticeboard with current GCB
       ELSEIF (ACTION.EQ.'UPDATE') THEN
 
