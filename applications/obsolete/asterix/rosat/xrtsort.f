@@ -4053,6 +4053,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       PARAMETER (DTOR=3.14159265/180.,RTOD=1.0/DTOR)
 *    Local variables :
       REAL U(3),V(3)
+      INTEGER J
 *-
       IF (STATUS .NE. SAI__OK) RETURN
 
@@ -4099,6 +4100,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       PARAMETER (DTOR=3.14159265/180.,RTOD=1.0/DTOR)
 *    Local variables :
       REAL U(3),V(3)
+      INTEGER J
 *-
       IF (STATUS .NE. SAI__OK) RETURN
 
