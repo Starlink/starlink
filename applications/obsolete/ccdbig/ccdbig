@@ -10,7 +10,7 @@
 #     C shell
 
 #  Description:
-#     The script creates a series of test frames using CCDGENERATE. It
+#     The script creates a series of test frames using CCDBGEN. It
 #     then executes various of the CCDPACK Atasks, as well as a few 
 #     KAPPA ones, simulating a data reduction sequence. 
 #     Intermediary results are displayed (if requested).
@@ -190,7 +190,7 @@
                         / 1000
             if ( $objects < $min_objects ) set objects = $min_objects
 
-#  Generate file containing objects for use by ccdgenerate:
+#  Generate file containing objects for use by ccdbgen:
 #  First strip comments and blank lines,
 #  then select fields and scale by image size.
             rm -f ccdtest_obj.dat
@@ -199,7 +199,7 @@
           > ccdtest_obj.dat
 
 #  Set up geometry of CCD.
-#  This matches (and must match) the prescription used in ccdgenerate.
+#  This matches (and must match) the prescription used in ccdbgen.
             set minlobias = 3
             @   maxhibias = $frame_pixels - 5 + 1
             @   lobias = ($frame_pixels * 5) / 100
@@ -280,14 +280,14 @@
             @ x2hi = $x2lo + $frame_pixels - 1
             @ y1hi = $y1lo + $frame_pixels - 1
             @ y2hi = $y2lo + $frame_pixels - 1
-            log_start ccdgenerate
-            ccdgenerate \
+            log_start ccdbgen
+            ccdbgen \
                nseq=2 \
                ubnds="[$x1hi,$y1hi,$x2hi,$y2hi]" \
                lbnds="[$x1lo,$y1lo,$x2lo,$y2lo]" \
      	       file=ccdtest_obj.dat \
      	       accept
-#           end ccdgenerate
+#           end ccdbgen
 
 #  Delete bias frames if we don't need them.
             if ($biasframe == "FALSE") rm bias?.sdf
