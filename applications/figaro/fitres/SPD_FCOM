@@ -1,0 +1,155 @@
+*+
+*  Name:
+*     SPD_FCOM
+
+*  Purpose:
+*     Common block include file, internal to FITRES library.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE SPD_FCOM
+
+*  Description:
+*     This file declares the common block used by the FITRES library to
+*     store information on accessed results structures in Specdre
+*     Extensions of NDFs.
+*
+*     This file should be used only internally by the FITRES library,
+*     other routines are not supposed to access the common block
+*     directly.
+
+*  Variables:
+*     The number of results structures that can be accessed
+*     simultaneously is SPD__FMXR. For each of these slots MNDF(I) is
+*     valid or NDF__NOID, telling whether that slot is in use.
+*
+*     There are XC9NC component-related vectors:
+*        -  1  LINENAME ( _CHAR*32 )
+*        -  2  LABFREQ  ( TYPE(2)  )
+*        -  3  COMPTYPE ( _CHAR*32 )
+*        -  4  NPARA    ( _INTEGER )
+*        -  5  MASKL    ( TYPE(3)  )
+*        -  6  MASKR    ( TYPE(3)  )
+*
+*     There are XC9NP parameter-related vectors:
+*        -  1  PARATYPE ( _CHAR*32 )
+*
+*     MNDF( SPD__FMXR ) = INTEGER
+*        The identifier of the main NDF that the results structure is
+*        associated with. This is NDF__NOID while no results structure
+*        is accessed. This is used to identify the results structure in
+*        question, i.e. to search for the right slot in the common
+*        block.
+*     RNDF( SPD__FMXR ) = INTEGER
+*        The identifier of the results NDF.
+*     DNELM( SPD__FMXR ) = INTEGER
+*        The size of the RNDF.
+*     MNDIM( SPD__FMXR ) = INTEGER
+*        The dimensionality of the MNDF.
+*     RNDIM( SPD__FMXR ) = INTEGER
+*        The dimensionality of the RNDF.
+*     MLBND( NDF__MXDIM, SPD__FMXR ) = INTEGER
+*        The lower bounds of the MNDF.
+*     MUBND( NDF__MXDIM, SPD__FMXR ) = INTEGER
+*        The upper bounds of the MNDF.
+*     RLBND( NDF__MXDIM, SPD__FMXR ) = INTEGER
+*        The lower bounds of the RNDF.
+*     RUBND( NDF__MXDIM, SPD__FMXR ) = INTEGER
+*        The upper bounds of the RNDF.
+*     NCOMP( SPD__FMXR ) = INTEGER
+*        The number of components present in the results structure. Also
+*        the size of the component-related vectors.
+*     TNPAR( SPD__FMXR ) = INTEGER
+*        The total number of parameters present in the results
+*        structure. Also the size of the parameter-related vectors.
+*     DPNTR( 2, SPD__FMXR ) = INTEGER
+*        The pointers to which the RNDF data and variance components are
+*         mapped.
+*     CPNTR( XC9NC, SPD__FMXR ) = INTEGER
+*        The pointers to component-related vectors. The vectors are of
+*        length NCOMP.
+*     PPNTR( XC9NP, SPD__FMXR ) = INTEGER
+*        The pointer(s) to parameter-related vector(s). The vectors are
+*        of length TNPAR.
+*     XLOC( SPD__FMXR ) = CHARACTER * ( DAT__SZLOC )
+*        The locator to the Specdre Extension of the main NDF, i.e. the
+*        structure that hosts the results structure. This is accessed
+*        and annulled internally and only for use internal to the FITRES
+*        library.
+*     ACCESS( SPD__FMXR ) = CHARACTER * ( NDF__SZACC )
+*        The access mode, 'READ', 'WRITE', or 'UPDATE'.
+*     TYPE( 3, SPD__FMXR ) = CHARACTER * ( NDF__SZTYP )
+*        The data type used for mapping (1) data and variance from the
+*        results NDF, (2) the laboratory frequencies, (3) the mask
+*        vectors.
+*     CLOC( XC9NC, SPD__FMXR ) = CHARACTER * ( DAT__SZLOC )
+*        The locators of component-related vectors. These locate
+*        vectores that are extensions to the RNDF, i.e. structures in
+*        the result NDF's structure MORE.
+*     PLOC( XC9NP, SPD__FMXR ) = CHARACTER * ( DAT__SZLOC )
+*        The locator(s) of parameter-related vector(s). These locate
+*        vectors that are extensions to the RNDF, i.e. structures in the
+*        result NDF's structure MORE.
+
+*  Prior Requirements:
+*     The following files must be included before this one:
+*     SAE_PAR, DAT_PAR, NDF_PAR, SPD_EPAR.
+
+*  Authors:
+*     hme: Horst Meyerdierks (UoE, Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     25 Feb 1994 (hme):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
+      INTEGER SPD__FMXR          ! The number of slots
+      PARAMETER ( SPD__FMXR = 2 )
+
+*  Global Variables:
+      INTEGER MNDF(  SPD__FMXR )
+      INTEGER RNDF(  SPD__FMXR )
+      INTEGER DNELM( SPD__FMXR )
+      INTEGER MNDIM( SPD__FMXR )
+      INTEGER RNDIM( SPD__FMXR )
+      INTEGER MLBND( NDF__MXDIM, SPD__FMXR )
+      INTEGER MUBND( NDF__MXDIM, SPD__FMXR )
+      INTEGER RLBND( NDF__MXDIM, SPD__FMXR )
+      INTEGER RUBND( NDF__MXDIM, SPD__FMXR )
+      INTEGER NCOMP( SPD__FMXR )
+      INTEGER TNPAR( SPD__FMXR )
+      INTEGER DPNTR(     2, SPD__FMXR )
+      INTEGER CPNTR( XC9NC, SPD__FMXR )
+      INTEGER PPNTR( XC9NP, SPD__FMXR )
+
+      CHARACTER * ( DAT__SZLOC ) XLOC(        SPD__FMXR )
+      CHARACTER * ( NDF__SZACC ) ACCESS(      SPD__FMXR )
+      CHARACTER * ( NDF__SZTYP ) TYPE(     3, SPD__FMXR )
+      CHARACTER * ( DAT__SZLOC ) CLOC( XC9NC, SPD__FMXR )
+      CHARACTER * ( DAT__SZLOC ) PLOC( XC9NP, SPD__FMXR )
+
+      COMMON / SPD_FCOMI /
+     :   MNDF,  RNDF,
+     :   DNELM, MNDIM, RNDIM,
+     :   MLBND, MUBND, RLBND, RUBND,
+     :   NCOMP, TNPAR,
+     :   DPNTR, CPNTR, PPNTR
+
+      COMMON / SPD_FCOMC /
+     :   XLOC,
+     :   ACCESS, TYPE,
+     :   CLOC,   PLOC
+
+      SAVE / SPD_FCOMI /
+      SAVE / SPD_FCOMC /
+
+*.
