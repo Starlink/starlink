@@ -44,7 +44,7 @@ qlim.f qmult.f range.f recall.f roll.f setx.f solve4.f \
 specx_reorder.f spliceq.f storex.f su.f swap2.f \
 swap8.f swap_arr.f tran_date.f tran_time.f uread.f \
 uwrite.f vm_hndl.f xcopy.f xsnart.f xsnart8.f xtrans.f \
-xtrans8.f xtrctq.f xy.f
+xtrans8.f xtrctq.f xy.f parse_date_obs.f
 
 CSOURCES = 
 
