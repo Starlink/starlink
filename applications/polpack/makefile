@@ -157,6 +157,7 @@
 #        Original version.
 #     7-DEC-1998 (DSB):
 #        Corrected TCL linking, and updated libraries to Tcl V7.6 and Tk V4.2.
+#        Use the KAPPA grf module.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -390,7 +391,7 @@ PRIVATE_INCLUDES = $(I_SUB1) $(I_SUB2)
 
 I_SUB1 = ndg_com ndg_const ndg_err
 
-I_SUB2 = hlpcmd ccd1_par ccd1_memcm grf.h
+I_SUB2 = hlpcmd ccd1_par ccd1_memcm 
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -598,7 +599,7 @@ $(F_SUB1) $(I_SUB1) $(C_SUB1):
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB2) $(I_SUB2) $(C_SUB2) $(GENLRDICSRC) grf_polpack.c:
+$(F_SUB2) $(I_SUB2) $(C_SUB2) $(GENLRDICSRC):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -618,7 +619,7 @@ $(PLATFORM_C) dummy_target1:
 #  List of object files produced by compiling the source code and rules
 #  for performing the compilations.
 
-OBJECT_FILES = $(O_SUB1) $(O_SUB2) $(MONO_OBJECT) grf_polpack.o
+OBJECT_FILES = $(O_SUB1) $(O_SUB2) $(MONO_OBJECT) 
 
 O_SUB1 = $(F_SUB1:.f=.o) $(C_SUB1:.c=.o)
 
@@ -659,7 +660,7 @@ libpolpack.a: $(O_SUB2)
 
 #  Rule and dependencies for building the monolith.
 
-$(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT) grf_polpack.o
+$(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT) 
 	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
             -L$(KAPPA_SOURCE) $(ADDLIBS) \
             `./$(LINK_SCRIPT)` $(TCLLIBS) $(LDFLAGS)
@@ -1430,7 +1431,6 @@ ccg1_wtm3r.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 datapic.o:	 SAE_PAR
 gethlp.o:	 SAE_PAR HLPCMD
 gthlpi.o:	 SAE_PAR HLPCMD
-grf_polpack.o:   grf.h
 ndfac.o:	 SAE_PAR
 ndg1_expan.o:    SAE_PAR GRP_PAR DAT_PAR NDG_CONST NDG_ERR
 ndg1_hspec.o:    SAE_PAR GRP_PAR
