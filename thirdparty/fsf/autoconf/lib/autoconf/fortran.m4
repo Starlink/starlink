@@ -341,37 +341,45 @@ m4_define([AC_LANG_CALL(Preprocessed Fortran)],
 # Note that the generic AC_LANG_FUNC_LINK_TRY macro is deemed severely
 # broken, and is deprecated.  The macro still currently exists, however,
 # and so if macros like AC_CHECK_FUNCS are to work with
-# AC_LANG(Fortran) (and friends), then these macros have to be defined.
+# AC_LANG(Fortran) (and friends), then these macros have to be
+# defined.
+#
+# FIXME: This is a severely broken implementation.
+# It does not distinguish between functions and subroutines, and it
+# ignores any arguments.  We don't attempt to cope with argument $1
+# being somethine weird -- either already declared as a Fortran keyword
+# or something needing quoting -- if the user wants to ask dumb
+# questions, they'll get dumb answers.
 m4_define([AC_LANG_FUNC_LINK_TRY(Fortran)],
 [AC_LANG_SOURCE(
-[      PROGRAM TEST
-      INTEGER $1, X
-      X=$1()
-      END
-])])
-
-
-# AC_LANG_FUNC_LINK_TRY(Preprocessed Fortran)(FUNCTION)
-# -----------------------------------------------------
-# Ditto, for Preprocessed Fortran
-m4_define([AC_LANG_FUNC_LINK_TRY(Preprocessed Fortran)],
-[AC_LANG_SOURCE(
-[      PROGRAM TEST
-      INTEGER $1, X
-      X=$1()
-      END
+[      Program Test
+      External $1
+      Call $1
+      End
 ])])
 
 
 # AC_LANG_FUNC_LINK_TRY(Fortran 77)(FUNCTION)
 # -------------------------------------------
-# Ditto, for Fortran 77
+# Ditto, for language `Fortran 77'
 m4_define([AC_LANG_FUNC_LINK_TRY(Fortran 77)],
 [AC_LANG_SOURCE(
-[      PROGRAM TEST
-      INTEGER $1, X
-      X=$1()
-      END
+[      Program Test
+      External $1
+      Call $1
+      End
+])])
+
+
+# AC_LANG_FUNC_LINK_TRY(Preprocessed Fortran)(FUNCTION)
+# -----------------------------------------------------
+# Ditto, for language `Preprocessed Fortran'
+m4_define([AC_LANG_FUNC_LINK_TRY(Preprocessed Fortran)],
+[AC_LANG_SOURCE(
+[      Program Test
+      External $1
+      Call $1
+      End
 ])])
 
 
