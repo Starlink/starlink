@@ -140,6 +140,10 @@
          ELSE IF ( NAME .EQ. 'DISPLAY' ) THEN
             CALL DISPLAY( STATUS )
 
+*  Draws north/east arrows.
+         ELSE IF ( NAME .EQ. 'DRAWNORTH' ) THEN
+            CALL DRAWNORTH( STATUS )
+
 *  Draws +/-n standard-deviation lines on a line plot.
          ELSE IF ( NAME .EQ. 'DRAWSIG' ) THEN
             CALL DRAWSIG( STATUS )
