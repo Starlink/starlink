@@ -1222,38 +1222,75 @@ bool process_special (DviFile *dvif, string specialString,
 	while (s != l.end() && stringOK) {
 	    if (*s == "default")
 		setDefault = true;
+
 	    else if (*s == "absolute")
 		absolute = true;
+
 	    else if (*s == "outputfile") {
 		s++;
 		if (s == l.end())
 		    stringOK = false;
-		else
-		    if (setDefault) {
-			bool seenHash = false;
-			b.ofile_pattern = "";
-			for (unsigned int i=0; i<s->length(); i++)
-			{
-			    char c;
-			    if ((c=(*s)[i]) == '#') {
-				if (! seenHash) {
-				    b.ofile_pattern += '%';
-				    b.ofile_pattern += 'd';
-				    seenHash = true;
-				}
-			    } else
-				b.ofile_pattern += c;
-			}
-			if (!seenHash) {
-			    b.ofile_pattern += '%';
-			    b.ofile_pattern += 'd';
-			}
-			if (verbosity > normal)
-			    cerr << "special: ofile_pattern="
-				 << b.ofile_pattern << endl;
-		    }
-		    else
-			b.ofile_name = *s;
+		else {
+                    if (setDefault) {
+                        bool seenPageCount = false; // seen %d or #
+                        b.ofile_pattern = "";
+                        int imax = s->length()-1;
+                        for (unsigned int i=0; i<=imax; i++) {
+                            char c = (*s)[i];
+                            if (seenPageCount) {
+                                if (c == '%')
+                                    b.ofile_pattern += '%';
+                                b.ofile_pattern += c;
+                            } else {
+                                // Support "#" for the page number,
+                                // rather than just "%d", since it's
+                                // tricky to get an unadorned percent
+                                // into a TeX special, unless you play
+                                // catcode tricks.  Since it's also
+                                // tricky to get just one "#" into the
+                                // string, allow any number of them.
+                                if (c == '#') {
+                                    b.ofile_pattern += '%';
+                                    b.ofile_pattern += 'd';
+                                    seenPageCount = true;
+                                    // absorb any number of # characters
+                                    while (i+1 <= imax && (*s)[i+1] == '#')
+                                        i++;
+                                } else if (c == '%') {
+                                    i++;
+                                    if (i > imax && verbosity >= normal) {
+                                        cerr << "Warning: found descriptor %"
+                                            " at end of output string -- "
+                                            "replaced by %d" << endl;
+                                    } else if ((*s)[i] != 'd'
+                                               && verbosity >= normal) {
+                                        cerr << "Warning: found descriptor %"
+                                             << (*s)[i]
+                                             << " in output string: "
+                                            "replaced by %d"
+                                             << endl;
+                                    }
+                                    b.ofile_pattern += '%';
+                                    b.ofile_pattern += 'd';
+                                    seenPageCount = true;
+                                } else {
+                                    b.ofile_pattern += c;
+                                }
+                            }
+                        }
+                        
+                        if (!seenPageCount) {
+                            b.ofile_pattern += '%';
+                            b.ofile_pattern += 'd';
+                        }
+                        if (verbosity > normal)
+                            cerr << "special: ofile_pattern="
+                                 << b.ofile_pattern << endl;
+                    } else {
+                        b.ofile_name = *s;
+                    }
+                }
+
 	    } else if (*s == "crop") {
 		s++;
 		if (s == l.end()) { stringOK = false; break; }

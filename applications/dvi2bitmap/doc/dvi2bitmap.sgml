@@ -379,14 +379,18 @@ if any fonts were missing (see also <ref id=usage.exit/>).  The
 behaviour can be alternatively specified as
 <code>&ddash;process=nodvi</code></p></dd>
 
-<dt><code>-o, &ddash;output=[filename-pattern]</code></dt>
+<dt id=usage.options.output><code>-o, &ddash;output=[filename-pattern]</code></dt>
 
 <dd><p>Choose the output filename pattern.  The value is a `printf'
 formatting string, with a single <code>%d</code> formatting
 descriptor, which will be replaced in output filenames with the page
-number.  This can be overridden on a per-page basis by a TeX
+number.  If there is no such descriptor, the filename `pattern' is
+used as-is for the first filename output, after which the program
+reverts to the default filename pattern.  The filename pattern can be
+overridden on a per-page basis by a TeX 
 <code>\special</code> embedded in the DVI file (see <ref
-id=usage.special.opf/> in <ref id=usage.special/>).  If there is no
+id=usage.special.opf>the <code>outputfile</code> special</ref> in <ref
+id=usage.special/>).  If there is no
 file extension, or if it does not match the output type, a suitable
 file extension will be added.</p></dd>
 
@@ -654,14 +658,34 @@ recognises are:
 <dd>Makes other special-commands in this same special affect
 defaults.  See those commands for details.
 
-<dt id=usage.special.opf><code>outputfile &lt;filename&gt;</code>
-<dd>The output file used for the current page will be named
-<code/filename.gif> (if the output type were `gif').  A filename
-extension will be added if none is 
-present, or if it does not match the output type selected.  If the
-<code/default> command has been given, then this instead specifies the
-default filename pattern, and the `filename' should contain a single
-<code/#>-sign.
+<dt id=usage.special.opf><code>outputfile &lt;filename&gt;</code></dt>
+<dd><p>The output file used for the current page will be named
+<code>filename.gif</code> (if the output type were `gif').  A filename
+extension will be added if none is present, or if it does not match
+the output type selected.</p>
+
+<p>If the <code>default</code> command has been given, then this
+instead specifies the default filename pattern, and the `filename'
+should contain a single instance of either <code>%d</code> or
+<code>#</code>; if there is no such instance, one will be implicitly
+added at the end.</p>
+
+<p>The <code>%d</code> is precisely analogous to the behaviour of the
+<ref id="usage.options.output">&ddash;output</ref> option.  However it
+is actually rather tricky to get an unadorned percent character into a
+TeX special, unless you play catcode tricks, and this is why you may
+alternatively include a <code>#</code> character to indicate where the
+page number should go.  In fact, since it is <em>also</em> rather
+tricky to get a single <code>#</code> character in a special, any
+immediately following <code>#</code> characters are ignored.  Thus the
+recommended way of specifying this special is through something of the
+form
+<verbatim>
+\special{dvi2bitmap default outputfile myfile-#}
+</verbatim>
+using the <code>#</code> form, and letting the file extension be
+controlled by the output type which is actually used.</p>
+</dd>
 
 <dt><code/absolute>
 <dd>Affects the <code/crop> command.
@@ -693,8 +717,8 @@ clear that this is setting a default format rather than setting the
 format only for the next image (that's not implemented at present, but
 could be added).
 
-<dt id=usage.special.fg><code>default foreground|background red green
-blue</code> 
+<dt id=usage.special.fg><code>default foreground|background
+  &lt;red&gt; &lt;green&gt; &lt;blue&gt;</code> 
 <dd><p><update versionid="v0-8">
 Added foreground and background specials, to set foreground and
 background colours.
@@ -708,7 +732,7 @@ you should at present always include the <code/default> keyword when
 using this special.    The integers must be in the range [0,255], and can
 be specified in decimal, octal or hex (ie, <code/127=0177=0x7f>).
 
-<dt><code>strut left right top bottom</code>
+<dt><code>strut &lt;left&gt; &lt;right&gt; &lt;top&gt; &lt;bottom&gt;</code>
 <dd><p><update versionid="v0-8">
 Added strut special.
 </update>
@@ -769,10 +793,16 @@ that the baseline of this text is 10 pixels from the top of the
 bitmap;  this latter information might be useful when working out how
 to position this bitmap within a generated HTML file.
 </p>
+
+<p>Both here
+and in the support for the `strut' special, there is a great deal of
+scope for off-by-one errors; also it's unclear what is the best
+interface to this functionality, so it's possible that this might
+change in subsequent versions.  The author welcomes comments.</p>
+
 </dd>
 
-<dt id="usage.special.unit"><code>unit u</code>, <code>default unit
-u</code></dt>
+<dt id="usage.special.unit"><code>unit &lt;u&gt;</code></dt>
 
 <dd><p>
 The units in the `strut' and `crop' specials are by default in TeX
@@ -788,7 +818,7 @@ to subsequent special strings as well.
 
 <p>For example, the pair of commands
 <verbatim>
-\special{dvi2bitmap default outputfile trial-#.gif unit pc crop all 5}
+\special{dvi2bitmap default outputfile trial-# unit pc crop all 5}
 \special{dvi2bitmap absolute crop left 5}
 </verbatim>
 will change the output filename pattern for the rest of the DVI file,
@@ -797,12 +827,6 @@ however, will have a left-hand crop five points in from the left hand
 side.  Remember that &tex;'s origin is one inch from the left and the
 top of the paper, and it is with respect to this origin that the
 program reckons the absolute distances for the cropping.</p>
-
-<p>Both here
-and in the support for the `strut' special, there is a great deal of
-scope for off-by-one errors; also it's unclear what is the best
-interface to this functionality, so it's possible that this might
-change in subsequent versions.  The author welcomes comments.</p>
 
 <subsect id=usage.exit export>Exit value
 

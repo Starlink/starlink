@@ -219,8 +219,9 @@ be alternatively specified as
 .TP
 .I "-o, --output=[filename-pattern]"
 Choose the output filename pattern.  If there is a 
-.I "%d" string within the pattern, then this pattern will be used for
-each output file name, with the 
+.I "%d"
+string within the pattern, then this pattern will be used for each
+output file name, with the 
 .I "%d"
 replaced by the page number.  If there is no such string, then this
 will be taken to be the name of the 
@@ -571,12 +572,40 @@ The output file used for the current page will be named
 .I "filename.gif"
 (if the output type were `gif').
 A filename extension will be added if none is
-present, or if it does not match the output type selected.  If the
-.I "default"
-command has been given, then this instead specifies the
-default filename pattern, and the `filename' should contain a single
-.I "#"
--sign.
+present, or if it does not match the output type selected. 
+.IP
+If the
+.I default
+command has been given, then this instead specifies the default
+filename pattern, and the `filename' should contain a single instance
+of either
+.I %d
+or
+.I #
+; if there is no such instance, one will be implicitly added at the end.
+.IP
+The
+.I %d
+is precisely analogous to the behaviour of the
+.I --output
+option.  However it
+is actually rather tricky to get an unadorned percent character into a
+TeX special, unless you play catcode tricks, and this is why you may
+alternatively include a
+.I #
+character to indicate where the
+page number should go.  In fact, since it is also rather
+tricky to get a single
+.I #
+character in a special, any immediately following
+.I #
+characters are ignored.  Thus the recommended way of specifying this
+special is through something of the form
+  \f(CR\especial{dvi2bitmap default outputfile myfile-#}\fP
+using the
+.I #
+form, and letting the file extension be controlled by the output type
+which is actually used.
 .TP
 .I "absolute"
 Affects the
@@ -633,14 +662,16 @@ Sets the (default) foreground and background colours for text.
 This works, as long as you specify the colour change before any text
 is output, since you can't, at present, change the colours after
 that.  Specifically, you can't change the colours for a fragment of
-text in the middle of a page; for this reason, and as with <code/imageformat>
-you should at present always include the <code/default> keyword when
-using this special.  The integers must be in the range [0,255], and can
-be specified in decimal, octal or hex (ie, 
+text in the middle of a page; for this reason, and as with
+.I imageformat
+you should at present always include the 
+.I default
+keyword when using this special.  The integers must be in the range
+[0,255], and can be specified in decimal, octal or hex (ie, 
 .I "127=0177=0x7f"
 ).
 .TP
-.I "strut left right top bottom"
+.I "strut <left> <right> <top> <bottom>"
 .IP
 This places a `strut' in the generated file.  Using the usual TeX
 .I "\estrut"
@@ -710,9 +741,14 @@ the `H' probably has some negative offset), and the `10' indicates
 that the baseline of this text is 10 pixels from the top of the
 bitmap;  this latter information might be useful when working out how
 to position this bitmap within a generated HTML file.
+.IP
+Both here
+and in the support for the `strut' special, there is a great deal of
+scope for off-by-one errors; also it's unclear what is the best
+interface to this functionality, so it's possible that this might
+change in subsequent versions.  The author welcomes comments.
 .TP
-.I "unit u",
-.I "default unit u"
+.I "unit <u>"
 .IP
 The units in the `strut' and `crop' specials are by default in TeX
 points.  You may switch to a different unit with the `unit' special.
@@ -732,12 +768,6 @@ however, will have a left-hand crop five points in from the left hand
 side.  Remember that TeX's origin is one inch from the left and the
 top of the paper, and it is with respect to this origin that the
 program reckons the absolute distances for the cropping.
-.PP
-Both here
-and in the support for the `strut' special, there is a great deal of
-scope for off-by-one errors; also it's unclear what is the best
-interface to this functionality, so it's possible that this might
-change in subsequent versions.  The author welcomes comments.
 .SH "EXIT VALUE"
 Exits with a non-zero status if there were any processing errors.
 Having
