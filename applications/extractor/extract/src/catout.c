@@ -495,9 +495,6 @@ void	endcat()
       fprintf(ascfile, skycattail);
       if (!prefs.pipe_flag)
         fclose(ascfile);
-      objtab->key = NULL;
-      objtab->nkey = 0;
-      free_tab(objtab);
       break;
 
     case FITS_LDAC:
