@@ -1,0 +1,18 @@
+
+
+gk3cwd.f  - required fix conccerning a warning about the arguments
+            (1.0 vs 1 and 10.0 vs 10)
+
+Linux can not do
+
+   PARAMETER ( XXX = CHAR(27) )
+
+so replace with 
+
+   XXX = CHAR(27)
+
+Note that linux code in here used
+
+   PARAMETER ( XXX = 27 )
+
+but this triggers a typecast warning with g77
