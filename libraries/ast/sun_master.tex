@@ -17974,32 +17974,32 @@ f-
 \newpage
 \section{\label{ss:fitswcscoverage}FITS-WCS Coverage}
 
-This appendix gives details of the \htmlref{FitsChan}{FitsChan} class
+This appendix gives details of the FitsChan class
 implementation of the conventions described in the FITS-WCS papers
 available at
 \htmladdnormallink{http://fits.gsfc.nasa.gov/fits\_wcs.html}
 {http://fits.gsfc.nasa.gov/fits_wcs.html}. These conventions are
-used only if the \htmlref{Encoding}{Encoding} attribute of the FitsChan
+used only if the Encoding attribute of the FitsChan
 has the value ``FITS-WCS'' (whether set explicitly or defaulted). It
-should always be possible for a \htmlref{FrameSet}{FrameSet} to be read
+should always be possible for a FrameSet to be read
 (using the 
 c+
-\htmlref{astRead}{astRead}
+astRead
 c-
 f+
-\htmlref{AST\_READ}{AST_READ}
+AST\_READ
 f-
 function) from a FitsChan containing a header which conforms to these 
 conventions. However, only those FrameSets which are compatible with the
 FITS-WCS model can be \emph{written} to a FitsChan using the
 c+
-\htmlref{astWrite}{astWrite}
+astWrite
 c-
 f+
-\htmlref{AST\_WRITE}{AST_WRITE}
+AST\_WRITE
 f-
-function. For instance, if the current \htmlref{Frame}{Frame} of a
-FrameSet is re-mapped using, say, an arbitrary \htmlref{MathMap}{MathMap}
+function. For instance, if the current Frame of a
+FrameSet is re-mapped using, say, an arbitrary MathMap
 then the FrameSet will no longer be compatible with the FITS-WCS model,
 and so will not be written out successfully to a FitsChan.
 
@@ -18012,13 +18012,12 @@ system; and the term ``WCS axes'' is used to refer to the axes of the final
 physical coordinate system described by the CTYPE\emph{i} keywords.
 
 \subsection{Paper I - General Linear Coordinates}
-When reading a \htmlref{FrameSet}{FrameSet} from a \htmlref{FitsChan}
-{FitsChan}, these conventions are used if the CTYPE\emph{i} keyword
+When reading a FrameSet from a FitsChan, these conventions are used if the CTYPE\emph{i} keyword
 values within the FitsChan do not conform to the conventions described in
 later papers, in which case the axes are assumed to be linear. When
 writing a FrameSet to a FitsChan, these conventions are used for axes
-which are described by a simple \htmlref{Frame}{Frame} (\emph{i.e.} not a 
-\htmlref{SkyFrame}{SkyFrame}, \htmlref{SpecFrame}{SpecFrame}, \emph{etc.}).
+which are described by a simple Frame (\emph{i.e.} not a 
+SkyFrame, SpecFrame, \emph{etc.}).
 
 The following table describes the use made by AST of each keyword
 defined by FITS-WCS paper I.
@@ -18033,14 +18032,14 @@ defined by FITS-WCS paper I.
 Frame - only written if different to NAXIS.}
 
 \fitskey{CRVAL\emph{ia}}{Used to create the pixel to WCS
-\htmlref{Mapping}{Mapping}.}{Always written (see ``Choice of Reference
+Mapping.}{Always written (see ``Choice of Reference
 Point'' below).}
 
 \fitskey{CRPIX\emph{ja}}{Used to create the pixel to WCS Mapping.}{Always
 written (see ``Choice of Reference Point'' below).}
 
 \fitskey{CDELT\emph{ia}}{Used to create the pixel to WCS Mapping.}{Only
-written if the \htmlref{CDMatrix}{CDMatrix} attribute of the FitsChan is 
+written if the CDMatrix attribute of the FitsChan is 
 set to zero.}
 
 \fitskey{CROTA\emph{i}}{Used to create the pixel to WCS Mapping.}{Only
@@ -18051,7 +18050,7 @@ WCS Frame, and to create the pixel to WCS Mapping (note, ``STOKES'' and
 ``COMPLEX'' axes are treated as unknown linear axes).}{Always written
 (see ``Use and Choice of CTYPE keywords'' below).}
 
-\fitskey{CUNIT\emph{ia}}{Used to set the \htmlref{Units}{Units} attributes
+\fitskey{CUNIT\emph{ia}}{Used to set the Units attributes
 of the WCS Frame.}{Only written if the Units attribute of the WCS Frame
 has been set explicitly. If so, the Units value for each axis is used as
 the CUNIT value.}
@@ -18069,7 +18068,7 @@ are linear.}
 
 \fitskey{PS\emph{i\_ma}}{Ignored.}{Not used.}
 
-\fitskey{WCSNAME\emph{a}}{Used to set the \htmlref{Domain}{Domain} attribute
+\fitskey{WCSNAME\emph{a}}{Used to set the Domain attribute
 of the WCS Frame.}{Only written if the Domain attribute of the WCS Frame
 has been set explicitly. If so, the Domain value is used as the WCSNAME
 value.}
@@ -18083,17 +18082,15 @@ value.}
 \end{center}
 
 \subsubsection{Requirements for a Successful Write Operation}
-When writing a \htmlref{FrameSet}{FrameSet} in which the WCS
-\htmlref{Frame}{Frame} is a simple Frame to a \htmlref{FitsChan}{FitsChan},
-success depends on the \htmlref{Mapping}{Mapping} from pixel coordinates
+When writing a FrameSet in which the WCS
+Frame is a simple Frame to a FitsChan,
+success depends on the Mapping from pixel coordinates
 (the base Frame in the FrameSet) to the WCS Frame being linear. The write
 operation will fail if this is not the case.
 
 \subsubsection{Use and Choice of CTYPE\emph{i} keywords}
-When reading a \htmlref{FrameSet}{FrameSet} from a \htmlref{FitsChan}
-{FitsChan} the CTYPE\emph{i} values in the FitsChan are used to set the
-\htmlref{Symbol}{Symbol} attributes of the corresponding WCS \htmlref{Frame}
-{Frame}. The \htmlref{Label}{Label} attributes of the WCS Frame are set from 
+When reading a FrameSet from a FitsChan the CTYPE\emph{i} values in the FitsChan are used to set the
+Symbol attributes of the corresponding WCS Frame. The Label attributes of the WCS Frame are set from 
 the CNAME\emph{i} keywords, if present in the header. Otherwise they are set
 from the CTYPE\emph{i} comments strings in the header, so long as each
 axis has a unique non-blank comment. Otherwise, the Label attributes are
@@ -18107,14 +18104,14 @@ being written. If a value has been set explicitly for the axis Label
 attribute, it is used as the axis comment (except that any existing
 comments in the FitsChan take precedence if the keyword value has not
 changed). The above procedure is over-ridden if the Frame is a
-\htmlref{SkyFrame}{SkyFrame} or a \htmlref{SpecFrame}{SpecFrame}, in which
-case the CTYPE\emph{i} value is derived from the \htmlref{System}{System}
+SkyFrame or a SpecFrame, in which
+case the CTYPE\emph{i} value is derived from the System
 attribute of the Frame and the nature of the pixel to WCS Mapping
 according to the conventions of papers II and III, as described below.
 
 \subsubsection{Choice of Reference Point}
-When writing a \htmlref{FrameSet}{FrameSet} to a
-\htmlref{FitsChan}{FitsChan}, the pixel coordinates of the 
+When writing a FrameSet to a
+FitsChan, the pixel coordinates of the 
 reference point for linear axes (i.e. the CRPIX\emph{j} values) are 
 chosen as follows:
 
@@ -18122,7 +18119,7 @@ chosen as follows:
 \item If the FrameSet is being written to a FitsChan which previously
 contained a set of axis descriptions with the same identifying letter, 
 then the previous CRVAL\emph{j}values are converted into the coordinate system 
-of the \htmlref{Frame}{Frame} being written (if possible). These values are then
+of the Frame being written (if possible). These values are then
 transformed into the pixel Frame, and the closest integer pixel values
 are used as the CRPIX keywords.
 \item If the above step could not be performed for any reason, the
@@ -18137,14 +18134,14 @@ The pixel to WCS Mapping is then used to find the corresponding
 CRVAL\emph{j}values.
 
 Again, the above procedure is over-ridden if the Frame is a
-\htmlref{SkyFrame}{SkyFrame} or a \htmlref{SpecFrame}{SpecFrame}, in which 
+SkyFrame or a SpecFrame, in which 
 case the conventions of papers II and III are used as described below.
 
 
 \subsubsection{Choice of Axis Ordering}
-When reading a \htmlref{FrameSet}{FrameSet} from a
-\htmlref{FitsChan}{FitsChan}, WCS axis $i$ in the current
-\htmlref{Frame}{Frame} of the
+When reading a FrameSet from a
+FitsChan, WCS axis $i$ in the current
+Frame of the
 resulting FrameSet corresponds to axis $i$ in the FITS header.
 
 When writing a FrameSet to a FitsChan, the axis ordering for the FITS
@@ -18153,12 +18150,11 @@ predominately diagonal. This means that the axis numbering in the FITS
 header will not necessarily be the same as that in the AST Frame.
 
 \subsubsection{Alternate Axis Descriptions}
-When reading a \htmlref{FrameSet}{FrameSet} from a
-\htmlref{FitsChan}{FitsChan} which contains alternate axis descriptions,
-each complete set of axis descriptions results in a single \htmlref{Frame} 
-{Frame} being added to the final FrameSet, connected via an appropriate 
-\htmlref{Mapping} {Mapping} to the base pixel Frame. The \htmlref{Ident}
-{Ident} attribute of the Frame is set to hold the single alphabetical 
+When reading a FrameSet from a
+FitsChan which contains alternate axis descriptions,
+each complete set of axis descriptions results in a single Frame being added 
+to the final FrameSet, connected via an appropriate 
+Mapping to the base pixel Frame. The Ident attribute of the Frame is set to hold the single alphabetical 
 character which is used to identify the set of axis descriptions within 
 the FITS header (a single space is used for the primary axis descriptions).
 
@@ -18178,10 +18174,10 @@ together with any other alternate axis descriptions which can be produced
 successfully.
 
 \subsection{Paper II - Celestial Coordinates}
-These conventions are used when reading a \htmlref{FrameSet}{FrameSet}
-from a \htmlref{FitsChan}{FitsChan} containing appropriate CTYPE\emph{i} 
-values, and when writing a FrameSet in which the WCS \htmlref{Frame}{Frame}
-is a \htmlref{SkyFrame}{SkyFrame}.
+These conventions are used when reading a FrameSet
+from a FitsChan containing appropriate CTYPE\emph{i} 
+values, and when writing a FrameSet in which the WCS Frame
+is a SkyFrame.
 
 The following table describes the use made by AST of each keyword
 whose meaning is defined or extended by FITS-WCS paper II. 
@@ -18194,9 +18190,9 @@ whose meaning is defined or extended by FITS-WCS paper II.
 
 \fitskey{CTYPE\emph{ia}}{All coordinate systems and projection types
 listed in paper II are supported (note, ``CUBEFACE'' axes are treated as
-unknown linear axes).}{Determined by the \htmlref{System}{System} attribute 
-of the SkyFrame and the \htmlref{WcsType}{WcsType} attribute of the
-\htmlref{WcsMap}{WcsMap} within the FrameSet.}
+unknown linear axes).}{Determined by the System attribute 
+of the SkyFrame and the WcsType attribute of the
+WcsMap within the FrameSet.}
 
 \fitskey{CUNIT\emph{ia}}{Ignored (assumed to be 'degrees').}{Not written.}
 
@@ -18205,7 +18201,7 @@ are stored as attributes of a WcsMap within this Mapping).}{Values are
 obtained from the WcsMap in the pixel to WCS Mapping.}
 
 \fitskey{LONPOLE\emph{a}}{Used to create the pixel to WCS Mapping. Also
-stored as a \htmlref{PV}{PVi_m} attribute for the longitude axis of the WcsMap.}{Only
+stored as a PVi\_m attribute for the longitude axis of the WcsMap.}{Only
 written if not equal to the default value defined in paper II (see
 ``Choice of LONPOLE/LATPOLE'' below).}
 
@@ -18219,7 +18215,7 @@ values supported except that ecliptic coordinates are currently always
 assumed to be FK5.}{Always written. Determined by the System attribute of
 the SkyFrame.}
 
-\fitskey{EQUINOX\emph{a}}{Used to set the \htmlref{Equinox}{Equinox} attribute 
+\fitskey{EQUINOX\emph{a}}{Used to set the Equinox attribute 
 of the SkyFrame.}{Written if relevant. Determined by the Equinox attribute of
 the SkyFrame.}
 
@@ -18227,7 +18223,7 @@ the SkyFrame.}
 written if using FITS-AIPS encoding. Determined by the Equinox attribute
 of the SkyFrame.}
 
-\fitskey{MJD-OBS}{Used to set the \htmlref{Epoch}{Epoch} attribute of the 
+\fitskey{MJD-OBS}{Used to set the Epoch attribute of the 
 SkyFrame. DATE-OBS is used if MJD-OBS is not present. A default value based on
 RADESYS and EQUINOX is used if used if DATE-OBS is not present
 either.}{Determined by the Epoch attribute of the SkyFrame. Only written
@@ -18239,14 +18235,14 @@ DATE-OBS is also written).}
 \end{center}
 
 \subsubsection{Requirements for a Successful Write Operation}
-When writing a \htmlref{FrameSet}{FrameSet} in which the WCS
-\htmlref{Frame}{Frame} is a \htmlref{SkyFrame}{SkyFrame} to a
-\htmlref{FitsChan}{FitsChan}, success depends on the following conditions 
+When writing a FrameSet in which the WCS
+Frame is a SkyFrame to a
+FitsChan, success depends on the following conditions 
 being met:
 
 \begin{enumerate}
-\item The \htmlref{Mapping}{Mapping} from pixel coordinates (the base Frame 
-in the FrameSet) to the WCS SkyFrame includes a \htmlref{WcsMap}{WcsMap}.
+\item The Mapping from pixel coordinates (the base Frame 
+in the FrameSet) to the WCS SkyFrame includes a WcsMap.
 \item The Mapping prior to the WcsMap (\emph{i.e.} from pixel to IWC) is linear. 
 \item The Mapping after the WcsMap (\emph{i.e.} from native spherical to
 celestial coordinates) is a spherical rotation for the
@@ -18257,13 +18253,13 @@ If any of the above conditions do not hold, the write operation will be
 unsuccessful.
 
 \subsubsection{Choice of LONPOLE/LATPOLE}
-When writing a \htmlref{FrameSet}{FrameSet} to a \htmlref{FitsChan}{FitsChan}, 
+When writing a FrameSet to a FitsChan, 
 the choice of LONPOLE and LATPOLE values is determined as follows:
 
 \begin{enumerate}
 
-\item If the projection represented by the \htmlref{WcsMap}{WcsMap} is 
-azimuthal, then any values set for attributes ``\htmlref{PV\emph{i}\_3}{PVi_m}'' 
+\item If the projection represented by the WcsMap is 
+azimuthal, then any values set for attributes ``PV\emph{i}\_3'' 
 and ``PV\emph{i}\_4'' (where ``\emph{i}'' is the index of the longitude axis) 
 within the WcsMap are used as the LONPOLE and LATPOLE values. Reading a 
 FrameSet from a FITS-WCS header
@@ -18293,14 +18289,14 @@ the Mapping which follows the WcsMap.
 \end{enumerate}
 
 \subsubsection{User Defined Fiducial Points}
-When reading a \htmlref{FrameSet}{FrameSet} from a \htmlref{FitsChan}{FitsChan}, projection parameters
+When reading a FrameSet from a FitsChan, projection parameters
 PV\emph{i}\_0, PV\emph{i}\_1 and PV\emph{i}\_2 (for longitude axis
 ``\emph{i}'') are used to indicate a user-defined fiducial point as
 described in section 2.5 of paper II. This results in a shift of IWC
-origin being applied \emph{before} the \htmlref{WcsMap}{WcsMap} which converts 
+origin being applied \emph{before} the WcsMap which converts 
 IWC into
 native spherical coordinates. The values of these projection parameters,
-if supplied, are stored as the corresponding \htmlref{PV}{PVi_m} attributes 
+if supplied, are stored as the corresponding PVi\_m attributes 
 of the WcsMap.
 
 When writing a FrameSet to a FitsChan, the PV attributes of the WcsMap
@@ -18313,7 +18309,7 @@ keywords.
 
 \subsubsection{Common Non-Standard Features}
 A collection of common non-standard features are supported when reading a
-\htmlref{FrameSet}{FrameSet} from a \htmlref{FitsChan}{FitsChan}, in addition 
+FrameSet from a FitsChan, in addition 
 to those embodied within the
 available encodings of the FitsChan class. These are translated into the
 equivalent standard features before being used to create a FrameSet.
@@ -18330,14 +18326,14 @@ by the letter B or J (\emph{e.g.} ``B1995.0'').
 B1950). 
 
 \item The IRAF ``ZPX'' projection is represented by a
-\htmlref{WcsMap}{WcsMap} with type of
+WcsMap with type of
 AST\_\_ZPN. Projection parameter values are read from any WAT\emph{i\_nnn}
-keywords, and corresponding \htmlref{PV}{PVi_m} attributes are set in the 
+keywords, and corresponding PVi\_m attributes are set in the 
 WcsMap. The WAT\emph{i\_nnn} keywords may specify corrections to the basic 
 ZPN projection by including ``lngcor'' or ``latcor'' terms. There is no 
 direct equivalent in FITS-WCS to these terms and so they are ignored. If 
 these correction terms are found, ASTWARN keywords are added to the FitsChan 
-containing a warning message (but only if the \htmlref{Warnings}{Warnings}
+containing a warning message (but only if the Warnings
 attribute of the FitsChan is set appropriately). 
 
 \item The IRAF ``TNX'' projection is represented by a WcsMap with type of
@@ -18356,10 +18352,10 @@ are renamed to the equivalent ``PV'' parameters.
 \end{itemize}
 
 \subsection{Paper III - Spectral Coordinates}
-These conventions are used when reading a \htmlref{FrameSet}{FrameSet} 
-from a \htmlref{FitsChan}{FitsChan} which includes appropriate 
+These conventions are used when reading a FrameSet 
+from a FitsChan which includes appropriate 
 CTYPE\emph{i} values, and when writing a FrameSet in which
-the WCS \htmlref{Frame}{Frame} is a \htmlref{SpecFrame}{SpecFrame}.
+the WCS Frame is a SpecFrame.
 
 The following table describes the use made by AST of each keyword
 whose meaning is defined or extended by FITS-WCS paper III. 
@@ -18373,43 +18369,43 @@ whose meaning is defined or extended by FITS-WCS paper III.
 \fitskey{CTYPE\emph{ia}}{All coordinate systems and projection types
 listed in paper III are supported, except for the ``-TAB''
 algorithm (the ``-LOG'' algorithm may also be applied to non-spectral linear 
-axes).}{Determined by the \htmlref{System}{System} attribute of the 
+axes).}{Determined by the System attribute of the 
 SpecFrame and the nature of the pixel to SpecFrame
-\htmlref{Mapping}{Mapping}.}
+Mapping.}
 
-\fitskey{CUNIT\emph{ia}}{Used to set the \htmlref{Units}{Units} attribute of 
+\fitskey{CUNIT\emph{ia}}{Used to set the Units attribute of 
 the SpecFrame (note, SpecFrames always have an ``active'' Units attribute
-(see \htmlref{astSetActiveUnit}{astSetActiveUnit}).}{Always written.}
+(see astSetActiveUnit).}{Always written.}
 
 \fitskey{PV\emph{i\_ma}}{Used to create the pixel to WCS Mapping (values
-are stored as attributes of a \htmlref{GrismMap}{GrismMap}).}
+are stored as attributes of a GrismMap).}
 {Set from the attributes of the GrismMap, if present, and if set explicitly.}
 
-\fitskey{SPECSYS\emph{a}}{Used to set the \htmlref{StdOfRest}{StdOfRest}
+\fitskey{SPECSYS\emph{a}}{Used to set the StdOfRest
 attribute of the SpecFrame (all systems are supported except CMBDIPOL).}
 {Set from the StdOfRest attribute of the SpecFrame, but only if it has been 
 set explicitly.}
 
 \fitskey{SSYSOBS\emph{a}}{Ignored.}{Never written.}
 
-\fitskey{OBSGEO-X/Y/Z}{Used to set the \htmlref{GeoLon}{GeoLon} and
-\htmlref{GeoLat}{GeoLat} attributes of the SpecFrame (the observers
+\fitskey{OBSGEO-X/Y/Z}{Used to set the GeoLon and
+GeoLat attributes of the SpecFrame (the observers
 height above sea level is ignored).}{Set from the GeoLon and GeoLat 
 attributes of the SpecFrame, if they have been set explicitly (it is
 assumed that the observer is at sea level).}
 
-\fitskey{MJD-AVG}{Used to set the \htmlref{Epoch}{Epoch} attributes of
+\fitskey{MJD-AVG}{Used to set the Epoch attributes of
 the SpecFrame.}{Set from the Epoch attribute of the SpecFrame, if it has
 been set explicitly.}
 
-\fitskey{VSOURCE\emph{a}}{Used to set the \htmlref{SourceVel}{SourceVel}
-attribute of the SpecFrame (the \htmlref{SourceVRF}{SourceVRF} attribute
+\fitskey{VSOURCE\emph{a}}{Used to set the SourceVel
+attribute of the SpecFrame (the SourceVRF attribute
 is first set to ``Topocentric'').}{Set from the SourceVel attribute of
 the SpecFrame, if it has been set explicitly (the SourceVRF
 attribute is set to ``Topocentric'' before getting the value of
 SourceVel).}
 
-\fitskey{ZSOURCE\emph{a}}{Used to set the \htmlref{SourceVel}{SourceVel}
+\fitskey{ZSOURCE\emph{a}}{Used to set the SourceVel
 attribute of the SpecFrame (the SourceVRF attribute
 is first set to ``Topocentric'' and the ZSOURCE value is converted to a
 topocentric apparent radial velocity).}{Never written (VSOURCE is written
@@ -18427,19 +18423,19 @@ instead).}
 \multicolumn{1}{|c|}{{\bf Keyword}} & \multicolumn{1}{c|}{{\bf Read}} 
 & \multicolumn{1}{c|}{{\bf Write}} \\ \hline
 
-\fitskey{RESTFRQ\emph{a}}{Used to set the \htmlref{RestFreq}{RestFreq}
+\fitskey{RESTFRQ\emph{a}}{Used to set the RestFreq
 attribute of the SpecFrame.}{Set from the RestFreq attribute of the
-SpecFrame, but only if the \htmlref{System}{System} attribute is not set to 
+SpecFrame, but only if the System attribute is not set to 
 ``WAVE'', ``VOPT'', ``ZOPT'' or ``AWAV'', and only if RestFreq has been set 
 explicitly.}
 
-\fitskey{RESTWAV\emph{a}}{Used to set the \htmlref{RestFreq}{RestFreq}
+\fitskey{RESTWAV\emph{a}}{Used to set the RestFreq
 attribute of the SpecFrame (after conversion from wavelength to frequency).}
 {Set from the RestFreq attribute of the SpecFrame (after conversion), but only if the 
-\htmlref{System}{System} attribute is set to ``WAVE'', ``VOPT'', ``ZOPT'' or 
+System attribute is set to ``WAVE'', ``VOPT'', ``ZOPT'' or 
 ``AWAV'', and only if RestFreq has been set explicitly.}
 
-\fitskey{CNAME\emph{ia}}{Used to set the \htmlref{Label}{Label} attributes of 
+\fitskey{CNAME\emph{ia}}{Used to set the Label attributes of 
 the WCS Frame keywords.}{Set from the Label attributes of the WCS Frame,
 if they have been set explicitly.}
 \hline
@@ -18447,10 +18443,9 @@ if they have been set explicitly.}
 \end{center}
 
 \subsubsection{Requirements for a Successful Write Operation}
-When writing a \htmlref{FrameSet}{FrameSet} in which the WCS
-\htmlref{Frame}{Frame} is a \htmlref{SpecFrame}{SpecFrame} to a 
-\htmlref{FitsChan}{FitsChan}, the write operation is successful only if
-the \htmlref{Mapping}{Mapping} from pixel coordinates (the base Frame 
+When writing a FrameSet in which the WCS Frame is a SpecFrame to a 
+FitsChan, the write operation is successful only if
+the Mapping from pixel coordinates (the base Frame 
 in the FrameSet) to the SpecFrame satisfies one of the following conditions:
 
 \begin{enumerate}
@@ -18458,8 +18453,7 @@ in the FrameSet) to the SpecFrame satisfies one of the following conditions:
 \item It is logarithmic.
 \item It is linear if the SpecFrame were to be re-mapped into one of the
 other spectral systems supported by FITS-WCS paper III.
-\item It contains a \htmlref{GrismMap}{GrismMap}, and the Mapping before the 
-GrismMap (from
+\item It contains a GrismMap, and the Mapping before the GrismMap (from
 pixel coordinates to grism parameter) is linear, and the Mapping after the 
 GrismMap is either null or represents a change of spectral system from wavelength (air or
 vacuum) to one of the supported spectral systems.
@@ -18474,10 +18468,10 @@ This paper proposes that an additional 4 character code be appended to
 the end of the CTYPE\emph{i} keyword to specify the nature of any
 distortion away from the basic algorithm described by the first 8
 characters of the CTYPE\emph{i} value. Currently AST ignores all such
-codes when reading a \htmlref{FrameSet}{FrameSet} from a
-\htmlref{FitsChan}{FitsChan} (except for the ``-SIP'' code
+codes when reading a FrameSet from a
+FitsChan (except for the ``-SIP'' code
 defined by the SIRTF project - see below). This means that a FrameSet can
-still be read from such headers, but the \htmlref{Mapping}{Mapping} which 
+still be read from such headers, but the Mapping which 
 gives the WCS
 position associated with a given pixel position will reflect only the
 basic algorithm and will not include the effects of the distortion.
@@ -18501,12 +18495,12 @@ which is applied to the pixel coordinates, after subtraction of the
 CRPIX\emph{j} values.
 
 This system is a strictly 2 dimensional system. When reading a
-\htmlref{FrameSet}{FrameSet} from a \htmlref{FitsChan}{FitsChan} which 
+FrameSet from a FitsChan which 
 includes the ``-SIP'' distortion code, AST assumes that it
 is only applied to the first 2 WCS axes in a FITS header (i.e.
 CTYPE1 and CTYPE2). If the ``-SIP'' distortion code is attached to other
 axes, it will be ignored. The distortion itself is represented by a
-\htmlref{PolyMap}{PolyMap} within the resulting FrameSet.
+PolyMap within the resulting FrameSet.
 
 If a FrameSet is read from a FitsChan which includes ``-SIP''
 distortion, and an attempt is then made to write this FrameSet out to a
