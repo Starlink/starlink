@@ -205,7 +205,7 @@ fitswrite.par flip.par fourier.par gausmooth.par gdclear.par gdnames.par \
 gdset.par gdstate.par glitch.par globals.par greyplot.par hiscom.par \
 hislist.par hisset.par histat.par histeq.par histogram.par idclear.par \
 idinvisible.par idpazo.par idset.par idstate.par inspect.par div.par \
-log10.par pow.par kaphelp.par kappa.par kstest.par laplace.par \
+log10.par pow.par kappa.par kstest.par laplace.par \
 linplot.par logar.par loge.par look.par lucy.par lutable.par lutflip.par \
 luthilite.par lutread.par lutrot.par lutsave.par luttweak.par lutview.par \
 makesurface.par manic.par maths.par median.par mem2d.par mlinplot.par \
