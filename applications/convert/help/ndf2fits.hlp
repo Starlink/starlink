@@ -283,7 +283,7 @@ to the binary-table header.
    to the second binary table in the FITS file (the NDF_CLASS
    extension appears in the first).
 
-   To propagate the OBJECT substructure NDF2FITS creates a binary
+   To propagate the OBJECT substructure, NDF2FITS creates a binary
    table of constant width (210 bytes) with one row per fibre.  The
    total number of rows is obtained from component NUM_FIBRES.  If a
    possible OBJECT component is missing from the NDF, a null column
