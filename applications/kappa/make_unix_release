@@ -57,7 +57,7 @@
 #  process groups of NDFs).
       set n = `grep -il "PAR_STATE\|NDF_ASSOC\|NDF_PROP\|NDF_CREAT\|NDF_CREP" *.f`
       if( "$n" != "" ) then
-         set ans = `confirm "The following files contain references to NDF parameter routines or to PAR_STATE. Shouldn't these be replaced by equivalent LPG routines?\n$n"`
+         set ans = `confirm "The following files contain references to NDF\nparameter routines or to PAR_STATE. May be these should be\nreplaced by equivalent LPG routines... Continue?\n\n$n"`
          if( "$ans" == "n" || "$ans" == "N" ) then
             exit
          endif
@@ -156,7 +156,7 @@ FOO4
       rm kapiraf 
 
 #  Ask the user to execute the script on sa1. Why wont rsh do this?
-      alert "\n  Now log into sa1 and do 'source kapiraf'\nPress OK to continue ..."
+      alert "\nNow log into sa1 and do 'source kapiraf'\nPress OK when done ..."
 
 #  Now FTP the helpdb.mip file back from sa1.
       ftp -v sa1 << FOO5
