@@ -135,4 +135,17 @@
 *  End the AST context.
       CALL AST_END( STATUS )
 
+*  Report an error if anything went wrong.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL NDF_MSG( 'NDF', INDF2 )
+         CALL ERR_REP( 'KPG1_ASPRP_1', 'Failed to propagate WCS '//
+     :                 'information to ''^NDF''.', STATUS )
+
+      ELSE IF( IWCS .EQ. AST__NULL ) THEN
+         STATUS = SAI__ERROR
+         CALL NDF_MSG( 'NDF', INDF2 )
+         CALL ERR_REP( 'KPG1_ASPRP_2', 'Failed to propagate WCS '//
+     :                 'information to ''^NDF''.', STATUS )
+      END IF
+
       END
