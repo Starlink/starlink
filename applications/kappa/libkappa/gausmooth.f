@@ -196,6 +196,8 @@
 *        Added propagation of the WCS component.
 *     13-APR-2000 (DSB):
 *        Corrected argument list for KPS1_PSEVL.
+*     19-APR-2000 (DSB):
+*        Increased upper limit on FWHM from 100 to 10000.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -302,12 +304,12 @@
 *  function (PSF) to be applied.  Suggest a default of 2.0 and
 *  constrain it to lie within sensible limits.
       IF ( CIRCUL ) THEN
-         CALL PAR_GDR0R( 'FWHM', 2.0, 0.1, 100.0, .FALSE., FWHM( 1 ),
+         CALL PAR_GDR0R( 'FWHM', 2.0, 0.1, 10000.0, .FALSE., FWHM( 1 ),
      :                   STATUS )
          NOFWHM = 1
       ELSE
          CALL PAR_DEF1R( 'FWHM', 1, 2.0, STATUS )      
-         CALL PAR_GDRVR( 'FWHM', NDIM, 0.1, 100.0, FWHM, NOFWHM,
+         CALL PAR_GDRVR( 'FWHM', NDIM, 0.1, 10000.0, FWHM, NOFWHM,
      :                   STATUS )
 
 *  Find whether two different values have been given, and hence whether
