@@ -213,8 +213,50 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 }               
 
 int astGAttr( int attr, double value, double *old_value, int prim ){
-   Report( "astGAttr" );
-   return 0;
+  dSP;
+  SV * cb;
+  int retval;
+
+  if (!astOK) return 0;
+  if (CurrentPlot == NULL ) {
+    astError( AST__GRFER, "No Plot object stored. Should not happen." );
+    return 0;
+  }
+
+  cb = Perl_getcb( "_gline" );
+ 
+  if ( cb != NULL ) {
+    int count;
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(sp);
+    
+    XPUSHs( sv_2mortal(newSViv(attr) ) );
+    XPUSHs( sv_2mortal(newSVnv(value) ) );
+    XPUSHs( sv_2mortal(newSViv(prim) ) );
+    
+    PUTBACK;
+
+    count = perl_call_sv( SvRV(cb), G_ARRAY );
+
+    SPAGAIN;
+
+    if (count != 2) 
+      Perl_croak(aTHX_ "Must return 2 args from GAttr callback\n");
+
+    retval = POPi;
+    *old_value = POPn;
+
+    PUTBACK;
+
+    FREETMPS;
+    LEAVE;
+  } else {
+    retval = 0;
+    Report("astGAttr");
+  }
+  return retval;
 }
 
 static void Report( const char *name ){
