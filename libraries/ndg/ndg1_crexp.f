@@ -62,6 +62,8 @@
 *        Modified to allow the basis group to be created directly by GRP,
 *        as well as by NDF (i.e. cater for possibility that no slave groups 
 *        exist).
+*     21-DEC-1999 (DSB):
+*        Modified to avoid copying structure from basis HDS files.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -74,7 +76,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'          ! DAT constants.
       INCLUDE 'GRP_PAR'          ! GRP constants.
       INCLUDE 'NDG_CONST'        ! NDG constants.
       INCLUDE 'PSX_ERR'          ! PSX error constants
@@ -109,12 +110,9 @@
       CHARACTER DIR*(GRP__SZNAM)   ! Directory path 
       CHARACTER DIR1*(GRP__SZFNM)  ! Supplied directory path 
       CHARACTER FMTOUT*(NDG__SZFMT)! List of output NDF formats
-      CHARACTER LOC*(DAT__SZLOC)   ! Locator to top-level HDS object
-      CHARACTER NAM*(GRP__SZNAM)   ! Basis name
       CHARACTER NAME*(GRP__SZNAM)  ! Current name
       CHARACTER PATH*(GRP__SZNAM)  ! HDS component path 
       CHARACTER SEC1*50            ! Supplied NDF section (ignored)
-      CHARACTER SPEC*(GRP__SZNAM)  ! Basis container file spec
       CHARACTER SUF1*100           ! Supplied file suffix
       CHARACTER TYP*(GRP__SZNAM)   ! File type 
       CHARACTER TYPS( MXTYP )*(SZTYP)! Known foreign file types
@@ -124,10 +122,8 @@
       INTEGER IAT2               ! Index of last non-blank character
       INTEGER IGRPB              ! Group of file base names
       INTEGER IGRPD              ! Group of directories
-      INTEGER IGRPF              ! Group of initialised HDS files
-      INTEGER IGRPH              ! Group of HDS paths
+      INTEGER IGRPH              ! Group of full HDS paths
       INTEGER IGRPT              ! Group of file types
-      INTEGER IND                ! Index of matching group element
       INTEGER MODIND             ! Index of basis spec
       INTEGER NTYP               ! No. of known foreign data formats
       INTEGER SIZE0              ! Size of group on entry.
@@ -220,10 +216,6 @@
 *  the group holding the file base names.
       CALL GRP_GRPEX( GRPEXP, IGRPB, IGRP, SIZE, ADDED, FLAG, STATUS )
 
-*  Create a group to hold the names of HDS container files which have
-*  been initialised to hold NDFs within them.
-      CALL GRP_NEW( 'Initialised HDS files', IGRPF, STATUS )
-
 *  Go through each new name in the group.
       DO I = SIZE0 + 1, SIZE
 
@@ -246,6 +238,7 @@
 
 *  If there is no directory specification in the supplied string, prefix
 *  it with the directory spec from the basis group.
+            IAT = 0
             IF( DIR1 .EQ. ' ' .AND. IGRPD .NE. GRP__NOID ) THEN
                CALL GRP_GET( IGRPD, MODIND, 1, DIR, STATUS )
                IF( DIR .NE. ' ' ) THEN
@@ -285,86 +278,11 @@
 *  If the file type is ".sdf"...
                IF( TYP .EQ. NDG__NDFTP ) THEN
 
-*  See if the HDS structure within the output file has already been
-*  initialised. If it has, the output container file spec (without the
-*  .sdf file type) will be somewhere in the IGRPF group. IND will be
-*  returned as zero if the structure has not been initialised.
-                  CALL GRP_INDEX( NAME, IGRPF, 1, IND, STATUS )
-
-*  See if any HDS path was included in the basis NDF spec.
+*  Append any HDS path from the basis element to the output NDF spec.
                   IF( IGRPH .NE. GRP__NOID ) THEN
                      CALL GRP_GET( IGRPH, MODIND, 1, PATH, STATUS )
-                  ELSE
-                     PATH = ' '
-                  END IF
-
-                  IF( PATH .NE. ' ' ) THEN
-
-*  We get here if the output is a native NDF for which no HDS component
-*  path was explicitly given, but which has inherited a non-blank component 
-*  path from the basis NDF. The NDF library will only create an NDF within
-*  an HDS container file if all the parent components already exist in
-*  the container file. In the particular case of an output NDF specified
-*  by a modification element, we create the required parent structures
-*  now by copying the basis container file to the output container file.
-*  If the structure of the output file has already been initialised, 
-*  do not initialise it again.
-                     IF( IND .EQ. 0 ) THEN
-
-*  Get the directory, base name and file type for the basis NDF.
-                        CALL GRP_GET( IGRPB, MODIND, 1, NAM, STATUS )
-                        IF( IGRPD .NE. GRP__NOID ) THEN
-                           CALL GRP_GET( IGRPD, MODIND, 1, DIR, STATUS )
-                           CALL GRP_GET( IGRPT, MODIND, 1, TYP, STATUS )
-                        ELSE
-                           DIR = ' '
-                           TYP = ' '   
-                        END IF
-
-*  If the basis file is a .sdf file, form the full spec for the container 
-*  file.
-                        IF( TYP .EQ. '.sdf' ) THEN
-                           SPEC = ' '
-                           IAT2 = 0
-                           CALL CHR_APPND( DIR, SPEC, IAT2 )
-                           CALL CHR_APPND( NAM, SPEC, IAT2 )
-                           CALL CHR_APPND( TYP, SPEC, IAT2 )
-
-*  Open it.
-                           CALL HDS_OPEN( SPEC( : IAT2 ), 'READ', LOC, 
-     :                                    STATUS ) 
-
-*  Create the output container file, and copy the contents of basis container 
-*  file to it. The file base name is used as the HDS top-level object name.
-                           CALL HDS_COPY( LOC, NAME, NAME( IAT + 1 : ), 
-     :                                    STATUS )
-
-*  Close the input container file.
-                           CALL DAT_ANNUL( LOC, STATUS )
-
-*  Open the output container file.
-                           CALL HDS_OPEN( NAME, 'UPDATE', LOC, STATUS ) 
-
-*  Now go through the output container file, deleting all existing NDFs.
-*  This needs to be done sine the NDF library will not create an NDF if
-*  there is an existing NDF with the same HDS path.
-                           CALL NDG1_NDFDL( LOC, STATUS )
-
-*  Close the output container file.
-                           CALL DAT_ANNUL( LOC, STATUS )
-
-*  Put the spec of this output file into the group of files which have
-*  had their structure initialised.
-                           CALL GRP_PUT( IGRPF, 1, NAME, 0, STATUS )
-
-                        END IF
-
-                     END IF
-
-*  Append the HDS path from the basis element to the output NDF spec.
                      IAT = CHR_LEN( NAME )
                      CALL CHR_APPND( PATH, NAME, IAT )
-
                   END IF
 
 *  For any non-HDS file, just append the file type.
@@ -372,6 +290,7 @@
                   IAT = CHR_LEN( NAME )
                   CALL CHR_APPND( TYP, NAME, IAT )
                END IF
+
             END IF
 
 *  If the name was not specified by a modification element, we use the
@@ -399,9 +318,6 @@
          CALL GRP_PUT( IGRP, 1, NAME, I, STATUS )
 
       END DO
-
-*  Delete the group holding initialised HDS files.
-      CALL GRP_DELET( IGRPF, STATUS )
 
 *  If an error occured, reset the group back to its original size if a 
 *  group was supplied, or delete the group if no group was supplied.

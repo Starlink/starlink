@@ -110,8 +110,7 @@
       END IF
 
 *  Create the NDF place holder.
-      CALL NDF_OPEN( DAT__ROOT, NAME, 'WRITE', 'NEW', INDF2, PLACE, 
-     :               STATUS )
+      CALL NDG1_OPEN( NAME, PLACE, STATUS )
 
 * Copy the required components.
       CALL NDF_SCOPY( INDF1, CLIST, PLACE, INDF2, STATUS )

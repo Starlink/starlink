@@ -6,6 +6,7 @@
                               ! converted to upper case.
       CHARACTER NDG__WILD1*1  ! Single-character wildcard.
       CHARACTER NDG__WILD2*1  ! Multi-character wildcard.
+      CHARACTER NDG__STRUC*9  ! HDS type for structures created by NDG
 
       PARAMETER (
      :            NDG__MAXIL = 100,
@@ -13,4 +14,5 @@
      :            NDG__SZFMT = 1024,
      :            NDG__UCASE = .false.,
      :            NDG__WILD1 = '?',
-     :            NDG__WILD2 = '*' )
+     :            NDG__WILD2 = '*',
+     :            NDG__STRUC = 'STRUCTURE' )

@@ -18,8 +18,9 @@
 *     The supplied HDS object is searched for NDFs, and the paths to any 
 *     NDFs found within it are appended to the end of group IGRP.
 *     Here, an NDF is defined as an HDS structure containing a component 
-*     called DATA_ARRAY. NDFs within NDFs (i.e. contained within an NDF 
-*     extension) are not included in the returned group.
+*     called DATA_ARRAY. Note, only NDFs stored explicitly within the
+*     supplied object are included in the returned group (i.e. NDFs
+*     within sub-components are ignored).
 *
 *     The supplied fields are stored in the other groups for each found
 *     NDF.
@@ -68,6 +69,10 @@
 *  History:
 *     15-FEB-1999 (DSB):
 *        Original version.
+*     21-DEC-1999 (DSB):
+*        Changed to remove recursive searching through components of the
+*        supplied object. Only NDFs stored directly within the supplied
+*        object are now returned.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -125,6 +130,7 @@
       INTEGER NLOC               ! No. of locators in group IGRP2
       LOGICAL ISANDF             ! Is object an NDF?
       LOGICAL STRUCT             ! Is object a structure?
+      LOGICAL SUPPLD             ! Is supplied object currently being checked?
       INTEGER IPATH              ! Index of start of HDS component path
       INTEGER IAT                ! Index of end of directory field
       INTEGER DOT                ! Index of first "."
@@ -149,6 +155,9 @@
 
 *  Initialise the number of locators checked so far.
       ILOC = 0
+
+*  Indicate that we are about to check the supplied object.
+      SUPPLD = .TRUE.
 
 *  Loop until the last locator in the group has been checked.
       DO WHILE( ILOC .LT. NLOC .AND. STATUS .EQ. SAI__OK )
@@ -212,13 +221,14 @@
                CALL GRP_PUT( IGRP1, 1, PATH( : LPATH ), 0, STATUS )
                FOUND = .TRUE.      
 
-*  If the object is not an NDF...
-            ELSE
+*  If this is the supplied object, and it is not an NDF, we search it for
+*  NDF components.
+            ELSE IF( SUPPLD ) THEN
 
 *  See if it is a scalar or an array.
                CALL DAT_SHAPE( XLOC, DAT__MXDIM, DIM, NDIM, STATUS ) 
 
-*  If it is a scalar...
+*  Ignore arrays...
                IF( NDIM .EQ. 0 ) THEN
 
 *  Find the number of components in the object.
@@ -234,27 +244,8 @@
 *  Increment the number of locators in the group.
                   NLOC = NLOC + NCOMP
 
-*  If it is an array...
-               ELSE
-
-*  Get a vectorised (i.e. 1-d) version of the array.
-                  CALL DAT_VEC( XLOC, VLOC, STATUS )
-                    
-*  Get the length of the vectorized array.
-                  CALL DAT_SIZE( VLOC, NCELL, STATUS ) 
-
-*  Add a locator for each cell of the array to the end of the group of locators
-*  to be checked.
-                  DO ICELL = 1, NCELL
-                     CALL DAT_CELL( VLOC, 1, ICELL, CLOC, STATUS )
-                     CALL GRP_PUT( IGRP2, 1, CLOC, 0, STATUS )
-                  END DO
-
-*  Increment the number of locators in the group.
-                  NLOC = NLOC + NCELL
-
-*  Annul the locator to the vectorised array.
-                  CALL DAT_ANNUL( VLOC, STATUS )
+*  Indicate we are no longer checking the supplied object.
+                  SUPPLD = .FALSE.
 
                END IF
  

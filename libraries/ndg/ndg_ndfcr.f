@@ -106,8 +106,7 @@
       END IF
 
 *  Create the NDF place holder.
-      CALL NDF_OPEN( DAT__ROOT, NAME, 'WRITE', 'NEW', INDF, PLACE, 
-     :               STATUS )
+      CALL NDG1_OPEN( NAME, PLACE, STATUS )
 
 *  Create the NDF.
       CALL NDF_NEW( FTYPE, NDIM, LBND, UBND, PLACE, INDF, STATUS)
