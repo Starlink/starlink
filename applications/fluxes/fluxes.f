@@ -1262,7 +1262,7 @@ C  GET UT in an array
       HLAT  =19.8258333D0
 
 *   Calculate the modified time.     
-      TDB=RJD-2400000.5d0
+      TDB=RJD
 	 
 *   Calculate approximate topographical positions.
       NP=LUP(NOPL)
@@ -1325,7 +1325,7 @@ C  GET UT in an array
        CHARACTER *1 SIGN
  
 *   External function.
-       DOUBLE PRECISION SLA_EPJ
+       DOUBLE PRECISION SLA_EPJ, SLALAST
 
 *   Data:
       DATA PI/3.141592654D0/
@@ -1378,12 +1378,12 @@ C  GET UT in an array
 *   Create substrings. 
       TEMPI=IH-10
       IF (TEMPI.LT.0) TEMPI=TEMPI+24
-      CALL MSG_FMTI('P1','I2',ID)
+      CALL MSG_FMTI('P1','I2.2',ID)
       CALL MSG_FMTC('P2','A3',CMON)
       CALL MSG_FMTI('P3','I4',IY)
-      CALL MSG_FMTI('P4','I2',IH)
-      CALL MSG_FMTI('P5','I2',IM)
-      CALL MSG_FMTI('P6','I2',IS)
+      CALL MSG_FMTI('P4','I2.2',IH)
+      CALL MSG_FMTI('P5','I2.2',IM)
+      CALL MSG_FMTI('P6','I2.2',IS)
       CALL MSG_FMTI('P7','I2',TEMPI)
  
 *   Create header string.
@@ -1414,8 +1414,9 @@ C  GET UT in an array
 *   Set Mauna Kea altitude value.
       HEIGHT=4506.D0
  
-*   Calculate the modified time.     
-      TDB=RJD-2400000.5D0
+*   Calculate the modified time.[RJD now is the MJD]
+      TDB=RJD
+*   And a time 1 second into the future
       TDB2=TDB+1.D0/86400.0D0
 	 
 *   Convert lat and long to radians.
@@ -1426,16 +1427,11 @@ C  GET UT in an array
       EPOCH=SLA_EPJ(TDB)
      
 *   Call the slalib jpl routines to get the local sid. time. 
-      CALL SLAJPL(TDB,1,LONGR,LATR,HEIGHT,
-     :            RAV1,DECV1,DIST,STL,AIRM)
-
-      IF (STL .LT. 0) STL = STL + (2.0D0 * PI)
-
-      CALL SLA_DR2TF(4,STL,SIGN,IVR1)
+      CALL SLA_DR2TF(4,SLALAST(TDB,LONGR),SIGN,IVR1)
      
 *   Create output strings.      
-      CALL MSG_FMTI('P1','I2',IVR1(1)) 
-      CALL MSG_FMTI('P2','I2',IVR1(2))
+      CALL MSG_FMTI('P1','I2.2',IVR1(1)) 
+      CALL MSG_FMTI('P2','I2.2',IVR1(2))
       FRAC1=IVR1(3)+DBLE(IVR1(4))/10000.D0         
       CALL MSG_FMTD('P3','F7.4',FRAC1)
       CALL MSG_FMTD('P4','F12.3',RJD)
@@ -1539,9 +1535,12 @@ C  GET UT in an array
      
 *     Purpose:
 *     To calculate real top Julian date from Gregorian date.
+*     Returned as a modified Julian date.
+*     Values are returned in TT rather than UT since this is the most common
+*     usage in the FLUXES program.
 
 *     Note:
-*     Don't trust this in 1582
+*     Now uses SLA_CALDJ
      
 ************************************************************************
      
@@ -1551,32 +1550,29 @@ C  GET UT in an array
       DOUBLE PRECISION DAY, S
       INTEGER I, ID, IH,IM,IY,IS, IYEAR, J, K, L, M, MONTH
       CHARACTER*3 CMON
+      DOUBLE PRECISION FDUTC
+
+*   External Functions
+      DOUBLE PRECISION SLA_EPJ,SLA_DT,SLA_DTT
 
 *   Common blocks:
       COMMON /TIMEBLK/IY,M,ID,IH,IM,IS
       COMMON /TIMEBLK2/S
-      COMMON /TIMEBLK3/CMON
-	   
       
-      IYEAR = IY
-      MONTH = M
-      DAY = DBLE(ID) + (DBLE(IH)/24.0D0) + (DBLE(IM)/60.0D0/24.0D0) + 
-     :     (S/60.0D0/60.0D0/24.0D0)
-      IF((MONTH.EQ.1).OR.(MONTH.EQ.2)) THEN
-	 IYEAR = IYEAR - 1
-	 MONTH = MONTH + 12
-      ENDIF
-     
-      IF(IYEAR.LT.1582) J=0
-      IF((IYEAR.EQ.1582).AND.(MONTH.LE.10).AND.(DAY.LE.DBLE(15))) THEN
-	 J=0
-      ELSE 
-	 I = INT(FLOAT(IYEAR)/100.)
-	 J = 2 - I + INT(FLOAT(I)/4.)
-      ENDIF
-      K = INT(365.25 * FLOAT(IYEAR))
-      L = INT(30.6001 * FLOAT(MONTH+1))
-      RJDATE = DBLE(J + K + L) + DAY + 1720994.5D0
+      CALL SLA_CALDJ(IY,M,ID,RJDATE,J)
+      CALL SLA_DTF2D(IH,IM,IS,FDUTC,J)
+      RJDATE = RJDATE + FDUTC
+
+*     In principal S contains the double precision seconds so
+*     we need to add on the difference between S and IS
+      RJDATE = RJDATE + (S-DBLE(IS)/86500.D0)
+
+*     Correct to TT [older than 1960 we need to guess]
+      IF (RJDATE > 36934.0D0) THEN
+         RJDATE = RJDATE + (SLA_DTT(RJDATE) / 86400.D0)
+      ELSE
+         RJDATE = RJDATE + (SLA_DT(SLA_EPJ(RJDATE)) / 86400.D0)
+      END IF
 
       END
 
@@ -1782,7 +1778,7 @@ C  GET UT in an array
 *     calls to the routines sla_EVP, sla_DMOON and sla_PLANET.
 
 *  Called: sla_GMST, sla_DT, sla_EPJ, sla_PVOBS, sla_PRENUT,
-*          sla_DMXV, sla_DCC2S, sla_DRANRM, pleph
+*          sla_DMXV, sla_DCC2S, sla_DRANRM, pleph, sla_EQEQX
 
 *  Based on sla_rdplan             P.T.Wallace  Starlink 30 November 1994
 *  Modified to use JPL ephemeris   G.J.Privett  Starlink 02 September 1996
@@ -1800,13 +1796,13 @@ C  GET UT in an array
       DOUBLE PRECISION AIRM,STL,VGM(6),V(6),RMAT(3,3)
       DOUBLE PRECISION VSE(6),VSG(6),VSP(6),VGO(6)
       DOUBLE PRECISION DX,DY,DZ,R,TL
-      
+
 *   External functions.
-      DOUBLE PRECISION SLA_GMST,SLA_DT,SLA_EPJ,SLA_DRANRM
+      DOUBLE PRECISION SLA_DRANRM,SLALAST
       DOUBLE PRECISION SLA_ZD,SLA_AIRMAS
 
-*   Approximate local ST
-      STL=SLA_GMST(DATE-SLA_DT(SLA_EPJ(DATE))/86400.D0)+ELONG
+*   Calculate Local Apparent Sidereal Time
+      STL = SLALAST( DATE, ELONG)
 
 *   Geocentric Moon position.
       CALL PLEPH(DATE,10,3,V,OK)
@@ -1959,10 +1955,10 @@ C  GET UT in an array
       DOUBLE PRECISION DX,DY,DZ,R,TL
       
 *   External functions.
-      DOUBLE PRECISION SLA_GMST,SLA_DT,SLA_EPJ,SLA_DRANRM
+      DOUBLE PRECISION SLALAST,SLA_DRANRM
 
 *   Approximate local ST
-      STL=SLA_GMST(DATE-SLA_DT(SLA_EPJ(DATE))/86400.D0)+ELONG
+      STL = SLALAST( DATE, ELONG )
 
 *   Geocentric Moon position.
       CALL PLEPH(DATE,10,3,V,OK)
@@ -2042,7 +2038,32 @@ C  GET UT in an array
 
       END
 
+      DOUBLE PRECISION FUNCTION SLALAST( DATE, ELONG )
+*+
+*     Calculate Local Apparent Sidereal time given the DATE
+*     (MJD TT) and the longitude (radians, east +ve).
+*     Returns the LAST in radians.
+*-
+      DOUBLE PRECISION DATE
+      DOUBLE PRECISION ELONG
 
+      DOUBLE PRECISION UTDATE
+
+      DOUBLE PRECISION SLA_DTT,SLA_DT,SLA_EPJ,SLA_GMST,
+     :     SLA_EQEQX, SLA_DRANRM
+
+*     Need UT for GMST calculation. Note the break at epoch 1960.0
+      IF (DATE > 36934.0) THEN
+         UTDATE = DATE - (SLA_DTT( DATE ) / 86400.D0)
+      ELSE
+         UTDATE = DATE - (SLA_DT(SLA_EPJ(DATE)) / 86400.D0)
+      END IF
+
+*   Note that DATE is UT despite what it says on the packet.
+*   It is not in TT.
+      SLALAST = SLA_DRANRM(SLA_GMST(UTDATE) + ELONG + SLA_EQEQX(DATE))
+
+      END
 
       SUBROUTINE FLU_AIF_ASFIO (PNFILE,ACMODE,FORM,RECSZ,FD,OPEN,
      :                           EXCLAIM,STATUS)
