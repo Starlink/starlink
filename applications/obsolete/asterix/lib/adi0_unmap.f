@@ -106,7 +106,12 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get mode
-      CALL ADI_CGET0C( PSID, 'Mode', MODE, STATUS )
+      CALL ADI_THERE( PSID, 'Mode', THERE, STATUS )
+      IF ( THERE ) THEN
+        CALL ADI_CGET0C( PSID, 'Mode', MODE, STATUS )
+      ELSE
+        MODE = 'READ'
+      END IF
 
 *  Has a WriteBack function been provided?
       CALL ADI_THERE( PSID, 'WriteBack', THERE, STATUS )
