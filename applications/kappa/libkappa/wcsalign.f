@@ -288,6 +288,8 @@
 *        Make N-dimensional.
 *     12-NOV-2004 (DSB):
 *        Add INSITU and ABORT parameters.
+*     19-NOV-2004 (DSB):
+*        Corrected AST__BAD to be VAL__BADI.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -522,7 +524,7 @@
 *  not need to do a full resampling. However,if the output bounds have
 *  been specified explcitly, then we cannotm simply shift the input pixel
 *  origin. 
-         IF( ORIGIN( 1 ) .NE. AST__BAD .AND. AUTOBN ) THEN
+         IF( ORIGIN( 1 ) .NE. VAL__BADI .AND. AUTOBN ) THEN
 
 *  If the alignment is being performed in-situ, get a clone of the input
 *  NDF identifier. Otherwise take a copy of the input NDF.
