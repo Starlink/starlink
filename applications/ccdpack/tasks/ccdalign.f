@@ -237,6 +237,10 @@
 *        meant that it simply didn't do the alignment properly, because
 *        it was getting confused about what position lists were in
 *        what coordinates.
+*     5-APR-2001 (MBT):
+*        Changed the parameter usage around quite a bit so that EXTRAS
+*        and MORE are used rather than overloading the IN parameter for
+*        everything which limits the potential use of wildcards.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -253,6 +257,8 @@
       INCLUDE 'FIO_PAR'         ! FIO system constants
       INCLUDE 'GRP_PAR'         ! Standard GRP system constants
       INCLUDE 'PSX_ERR'         ! PSX error codes
+      INCLUDE 'PAR_ERR'         ! PAR system error codes
+      INCLUDE 'CCD1_PAR'        ! CCDPACK private constants
 
 *  Arguments Given
       CHARACTER * ( * ) PID     ! Parent process id as string
@@ -282,8 +288,8 @@
       CHARACTER * ( 132 ) MSTYLE ! Marker style string
       CHARACTER * ( 5 ) NULL    ! Parameter NULL symbol
       CHARACTER * ( 30 ) LISTID ! Identifier in filename for list
+      CHARACTER * ( GRP__SZNAM ) SNAME ! Name of Set
       CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
-      CHARACTER * ( GRP__SZNAM ) REFNAM ! Name of reference NDF
       CHARACTER * ( GRP__SZNAM ) REGNAM ! Name of reference NDF for REGISTER
       CHARACTER * ( FIO__SZFNM ) FNAME ! Name of position list file
       CHARACTER * ( FIO__SZFNM ) NAMLST ! File name list
@@ -293,27 +299,45 @@
       INTEGER FD                ! File identifier
       INTEGER FDOUT             ! File identifier
       INTEGER FITTYP            ! Transformation type
-      INTEGER GRPOFF            ! Offset in NDF list group
       INTEGER I                 ! Loop variable
       INTEGER INDEX( MAXPOS )   ! Identifiers for points in position list
       INTEGER IPIND             ! Pointer to identifiers for list positions
       INTEGER IPXPOS            ! Pointer to X coordinates of list positions
       INTEGER IPYPOS            ! Pointer to Y coordinates of list positions
+      INTEGER ISET( CCD1__MXNDF ) ! Set membership of group leader NDFs
+      INTEGER J                 ! Loop variable
+      INTEGER LDRGR             ! GRP identifier for group leader NDFs
       INTEGER LENG              ! Returned length of string
+      INTEGER LMEM( CCD1__MXNDF ) ! Leader NDF indices in Set order
+      INTEGER LMEMOF( CCD1__MXNDF + 1 ) ! Pointers into LMEM
+      INTEGER MAPSET( CCD1__MXNDF ) ! Workspace
       INTEGER MAXCNV            ! Initial maximum dimension of display region
+      INTEGER MORGR             ! GRP identifier for more NDF names
       INTEGER NDFLEN            ! length of NDF name
-      INTEGER NGROUP            ! Number of file groups
-      INTEGER NGNDF             ! Number of NDFs in a group
+      INTEGER NGOT              ! Number of NDFs already got
       INTEGER NL                ! Length of NULL string
+      INTEGER NLDR              ! Number of NDFs in group leader group
+      INTEGER NMOR              ! Number of extra NDFs in group
       INTEGER NNDF              ! Number of NDFs passed to GUI script
       INTEGER NPOINT( MAXGRP )  ! Number of positions marked for each NDF
+      INTEGER NREF              ! Number of reference NDFs
+      INTEGER NSET              ! Number of Sets represented in input
+      INTEGER NTRY              ! Number of tries at getting variable
       INTEGER OPLEN             ! String length
-      INTEGER REFLEN            ! Length of reference NDF name
+      INTEGER REFGR             ! GRP identifier for reference NDF names
       INTEGER REFPOS            ! Position of the reference NDF in the list
+      INTEGER RISET( CCD1__MXNDF ) ! Set membership of group leader ref NDF
+      INTEGER RMEM( CCD1__MXNDF ) ! Reference NDF indices in Set order
+      INTEGER RMEMOF( CCD1__MXNDF + 1 ) ! Pointers into RMEM
+      INTEGER RNAMGR            ! Reference NDF Set name group
+      INTEGER RNSET             ! Number of reference NDF Sets
+      INTEGER SNAMGR            ! Set Name group
       INTEGER WINDIM( 2 )       ! Window dimensions for display
       LOGICAL CONT              ! Continue processing
+      LOGICAL EXTRAS            ! Whether to solicit more NDF names per group
       LOGICAL HAVREF            ! Have a reference NDF
-      LOGICAL OK                ! OK to loop
+      LOGICAL US                ! Temporary USESET variable
+      LOGICAL USESET            ! Use Set headers if available?
       DOUBLE PRECISION PERCNT( 2 ) ! The display percentiles
       DOUBLE PRECISION XPOS( MAXPOS ) ! X coordinates of positions in list
       DOUBLE PRECISION YPOS( MAXPOS ) ! Y coordinates of positions in list
@@ -339,106 +363,169 @@
 *  Get a default percentile range for displaying the images.
       CALL PAR_EXACD( 'PERCENTILES', 2, PERCNT, STATUS )
 
-*  Write a message indicating that the user should return lists of
-*  all the NDFs to process. Each group contains NDFs which have not
-*  been moved on the sky.
-      CALL MSG_BLANK( STATUS )
-      LINE = 'Give the names of a series of groups of NDFs '//
-     :       'whose positions have not been moved on the sky. '//
-     :       'If all NDFs have been moved then give a single '//
-     :       'NDF at each prompt. When all NDF groups/NDFs have '//
-     :       'been given respond with a '//NULL(:NL)//' (null).'
-      CALL CCD1_WRTPA( LINE, 72, 3, .FALSE., STATUS )
-      CALL MSG_BLANK( STATUS )
+*  Get a list of NDF group leaders.
+      CALL CCD1_NDFGL( 'IN', 2, CCD1__MXNDF, LDRGR, NLDR, STATUS )
+
+*  See whether we are using Set headers.
+      CALL PAR_GET0L( 'USESET', USESET, STATUS )
+
+*  Sort the group leaders according to Set membership.
+      CALL CCD1_SETSW( LDRGR, NLDR, USESET, ISET, NSET, LMEM, LMEMOF,
+     :                 SNAMGR, MAPSET, STATUS )
+
+*  Check that we do not have too many groups.
+      IF ( NSET .GT. MAXGRP ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'NUM', NSET )
+         CALL MSG_SETI( 'MAX', MAXGRP )
+         CALL ERR_REP( 'CCDALIGN_TOOMANY', 
+     :'CCDALIGN: ^NUM supplied groups exceeds maximum (^MAX)', STATUS )
+         GO TO 99
+      END IF
+
+*  See whether to solicit extra members of each group apart from the 
+*  leaders.
+      CALL PAR_GET0L( 'EXTRAS', EXTRAS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
-*  Get the lists of NDFs. This continues until no output file list is
-*  created.
-      OK = .TRUE.
-      NGROUP = 1
- 1    CONTINUE
-      IF ( OK .AND. STATUS .EQ. SAI__OK ) THEN
-         CALL MSG_SETI( 'NGROUP', NGROUP )
+*  Write the names to lists.
+      DO I = 1, NSET
+
+*  Write the names for this group to a file.
+         CALL MSG_SETI( 'NGROUP', I )
          CALL MSG_LOAD( ' ', 'ccdalign_ndf^NGROUP.list', NAMLST,
      :                  OPLEN, STATUS )
+         CALL CCD1_OPFIO( NAMLST, 'WRITE', 'LIST', 0, FD, STATUS )
+         DO J = LMEMOF( I ), LMEMOF( I + 1 ) - 1
+            CALL GRP_GET( LDRGR, LMEM( J ), 1, NDFNAM, STATUS )
+            CALL FIO_WRITE( FD, NDFNAM( : CHR_LEN( NDFNAM ) ), STATUS )
+         END DO
+            
+*  If requested, get the extra members.
+         IF ( EXTRAS ) THEN
 
-*  Get a list of NDFs from the user which constitute this group.
-         CALL PAR_CANCL( 'IN', STATUS )
-         CALL CCD1_NGLIS( 'IN', NAMLST, 100, .TRUE., NGNDF, STATUS )
-
-*  Bump the group number if the user gave some NDF names this time.
-         IF ( STATUS .EQ. SAI__OK ) THEN
-            IF ( NGNDF .GT. 0 ) THEN
-               NGROUP = NGROUP + 1
+            CALL MSG_OUT( ' ', ' ', STATUS )
+            IF ( USESET ) THEN
+               CALL GRP_GET( SNAMGR, I, 1, SNAME, STATUS )
+               CALL MSG_SETC( 'SETNAM', SNAME )
+               CALL MSG_OUT( ' ', 
+     :'Enter extra NDFs in the same sky position as Set "^SETNAM":',
+     :                       STATUS )
+               LINE = 'Member NDFs are:'
+               DO J = 1, LMEMOF( I ), LMEMOF( I + 1 ) - 1
+                  CALL GRP_GET( LDRGR, LMEM( J ), 1, LINE( 18: ),
+     :                          STATUS )
+                  CALL MSG_SETC( 'LINE', LINE )
+                  CALL CCD1_MSG( ' ', '^LINE', STATUS )
+                  LINE = ' '
+               END DO
             ELSE
-               OK = .FALSE.
+               CALL GRP_GET( LDRGR, I, 1, NDFNAM, STATUS )
+               CALL MSG_SETC( 'NAME', NDFNAM )
+               CALL MSG_OUT( ' ', 
+     :'Enter extra NDFs in the same sky position as NDF "^NAME"',
+     :                       STATUS )
             END IF
+            CALL PAR_CANCL( 'MORE', STATUS )
+            NGOT = LMEMOF( I + 1 ) - LMEMOF( I )
+            IF ( STATUS .NE. SAI__OK ) GO TO 99
+            CALL CCD1_NDFGL( 'MORE', 0, CCD1__MXNDF - NGOT, MORGR, NMOR,
+     :                       STATUS )
+            IF ( STATUS .EQ. PAR__NULL ) THEN
+               CALL ERR_ANNUL( STATUS )
+               NMOR = 0
+            END IF
+            DO J = 1, NMOR
+               CALL GRP_GET( MORGR, J, 1, NDFNAM, STATUS )
+               CALL FIO_WRITE( FD, NDFNAM( : CHR_LEN( NDFNAM ) ),
+     :                         STATUS )
+            END DO
+            CALL CCD1_GRDEL( MORGR, STATUS )
+         END IF
+         CALL FIO_CLOSE( FD, STATUS )
+      END DO
 
-*  Check if we have reached the limit of number of groups we can handle.
-            IF ( NGROUP .EQ. MAXGRP .AND. OK ) THEN
-               CALL CCD1_MSG( ' ', ' ', STATUS )
+*  See if the user is supplying a reference NDF.
+      HAVREF = .FALSE.
+      IF ( USESET ) THEN
+         NTRY = 0
+ 4       CONTINUE
+         CALL CCD1_NDFGL( 'REFNDF', 0, CCD1__MXNDF, REFGR, NREF,
+     :                    STATUS )
+         US = .TRUE.
+         RNSET = 0
+         CALL CCD1_SETSW( REFGR, NREF, US, RISET, RNSET, RMEM, RMEMOF,
+     :                    RNAMGR, MAPSET, STATUS )
+         IF ( STATUS .EQ. SAI__OK .AND. RNSET .NE. 1 ) THEN
+            NTRY = NTRY + 1
+            IF ( NTRY .LT. 5 ) THEN
                CALL CCD1_MSG( ' ', 
-     :         ' The maximum number of groups has been entered.', 
+     :'The REFNDF parameter must only comprise members of a single Set',
      :                        STATUS )
-               CALL CCD1_MSG( ' ', ' ', STATUS )
-               OK = .FALSE.
-            END IF
-
-*  Trap the condition when no groups have been given.
-            IF ( NGROUP .EQ. 1 ) THEN
+               CALL PAR_CANCL( 'REFNDF', STATUS )
+               GO TO 4
+            ELSE
                STATUS = SAI__ERROR
-               CALL ERR_REP( 'NOGROUPS', 'No groups of NDFs were given'
-     :                     ,STATUS )
+               CALL ERR_REP( 'CCDALIGN_REFNDF', 
+     :'CCDALIGN: Failed to get value for REFNDF parameter', STATUS )
                GO TO 99
             END IF
          END IF
-
-*  Return to the start of the loop to get some more NDFs if necessary.
-         GO TO 1
-      END IF
-
-*  See if a reference NDF is available.
-      CALL MSG_BLANK( STATUS )
-      LINE = 'If you have a reference image to which the other NDFs '//
-     :       'are to be aligned then give its name at the next '//
-     :       'prompt. If no reference NDF is specified (signified '//
-     :       'by a '//NULL(:NL)//' response) then the first NDF of '//
-     :       'the first group will be used.'
-      CALL CCD1_WRTPA( LINE, 72, 3, .FALSE., STATUS )
-      CALL MSG_BLANK( STATUS )
-      CALL PAR_CANCL( 'IN', STATUS )
-      CALL CCD1_NGLIS( 'IN', 'ccdalign_ref.list', 100, .TRUE., NGNDF,
-     :                 STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
-      HAVREF = ( NGNDF .GT. 0 )
-
-*  Get the names of the NDFs to be displayed (one from each group).
-      DO 3 I = 1, NGROUP - 1
-         CALL MSG_SETI( 'IGROUP', I ) 
-         CALL MSG_LOAD( ' ', 'ccdalign_ndf^IGROUP.list', NAMLST,
-     :                  OPLEN, STATUS )
-         CALL CCD1_OPFIO( NAMLST, 'READ', 'LIST', 0, FD, STATUS )
-         CALL FIO_READ( FD, NDFNMS( I ), NDFLEN, STATUS )
-         CALL FIO_CLOSE( FD, STATUS )
- 3    CONTINUE        
-
-*  Get the name of the reference NDF if there is one.
-      IF ( HAVREF ) THEN
-         CALL CCD1_OPFIO( 'ccdalign_ref.list', 'READ', 'LIST', 0,
-     :                    FD, STATUS )
-         CALL FIO_READ( FD, REFNAM, REFLEN, STATUS )
-         CALL FIO_CLOSE( FD, STATUS )
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL MSG_SETC( 'REFNDF', REFNAM( :REFLEN ) )
-         CALL CCD1_MSG( ' ', '  Using reference NDF ^REFNDF', STATUS )
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         NDFNMS( NGROUP ) = REFNAM
-         REFPOS = NGROUP
-         NNDF = NGROUP
       ELSE
-         REFPOS = 1
-         NNDF = NGROUP - 1
+         CALL CCD1_NDFGL( 'REFNDF', 0, 1, REFGR, NREF, STATUS )
       END IF
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         HAVREF = .FALSE.
+         CALL ERR_ANNUL( STATUS )
+      ELSE IF ( STATUS .EQ. SAI__OK .AND. NREF .GE. 1 ) THEN
+         HAVREF = .TRUE.
+      ELSE ! should not happen
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'CCDALIGN_BADREF', 
+     :                 'CCDALIGN: Error getting REFNDF value', STATUS )
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+*  If there is a reference image group, write its name(s) to a file.
+      IF ( HAVREF ) THEN
+         CALL CCD1_OPFIO( 'ccdalign_ref.list', 'WRITE', 'LIST', 0, FD,
+     :                    STATUS )
+         CALL GRP_GET( REFGR, 1, 1, NDFNAM, STATUS )
+         CALL FIO_WRITE( FD, NDFNAM( : CHR_LEN( NDFNAM ) ), STATUS )
+
+         IF ( EXTRAS ) THEN
+            CALL MSG_OUT( ' ', 
+     :'Enter extra NDFs in the same sky position as the reference NDF',
+     :                    STATUS )
+            CALL PAR_CANCL( 'MORE', STATUS )
+            CALL CCD1_NDFGL( 'MORE', 0, CCD1__MXNDF - NREF, MORGR, NMOR,
+     :                       STATUS )
+            DO J = 1, NMOR
+               CALL GRP_GET( MORGR, J, 1, NDFNAM, STATUS )
+               CALL FIO_WRITE( FD, NDFNAM( : CHR_LEN( NDFNAM ) ),
+     :                         STATUS )
+            END DO
+            CALL CCD1_GRDEL( MORGR, STATUS )
+         END IF
+         CALL FIO_CLOSE( FD, STATUS )
+      END IF
+
+*  Get the number and list of NDFs.
+      IF ( HAVREF ) THEN
+         NNDF = NLDR + 1
+         CALL GRP_GET( REFGR, 1, 1, NDFNAM, STATUS )
+         CALL GRP_PUT( LDRGR, 1, NDFNAM, NNDF, STATUS )
+         REFPOS = NNDF
+      ELSE
+         NNDF = NLDR
+         REFPOS = 1
+      END IF
+      CALL GRP_GET( LDRGR, 1, NNDF, NDFNMS, STATUS )
+
+*  Allocate memory for coordinates of position lists.
+      CALL CCD1_MALL( MAXPOS * NNDF, '_INTEGER', IPIND, STATUS )
+      CALL CCD1_MALL( MAXPOS * NNDF, '_DOUBLE', IPXPOS, STATUS )
+      CALL CCD1_MALL( MAXPOS * NNDF, '_DOUBLE', IPYPOS, STATUS )
 
 *  Get values of display preferences from parameter system.
       CALL PAR_GET0D( 'ZOOM', ZOOM, STATUS )
@@ -446,11 +533,6 @@
       CALL PAR_GET0I( 'WINX', WINDIM( 1 ), STATUS )
       CALL PAR_GET0I( 'WINY', WINDIM( 2 ), STATUS )
       CALL PAR_GET0C( 'MARKSTYLE', MSTYLE, STATUS )
-
-*  Allocate memory for coordinates of position lists.
-      CALL CCD1_MALL( MAXPOS * NNDF, '_INTEGER', IPIND, STATUS )
-      CALL CCD1_MALL( MAXPOS * NNDF, '_DOUBLE', IPXPOS, STATUS )
-      CALL CCD1_MALL( MAXPOS * NNDF, '_DOUBLE', IPYPOS, STATUS )
 
 *  Call the routine which will do the graphical user interaction to
 *  obtain the position lists for each group of NDFs.
@@ -536,10 +618,9 @@
       CALL MSG_OUT( ' ',  '  Centroiding the image feature positions.',
      :              STATUS )
       CALL MSG_BLANK( STATUS )
-      GRPOFF = 1
- 5    CONTINUE
-      IF ( GRPOFF .NE. NGROUP .AND. STATUS .EQ. SAI__OK ) THEN 
-         CALL MSG_SETI( 'NGROUP', GRPOFF ) 
+      DO I = 1, NLDR
+         IF ( STATUS .NE. SAI__OK ) GO TO 99
+         CALL MSG_SETI( 'NGROUP', I ) 
          CALL MSG_LOAD( ' ', 'ccdalign_ndf^NGROUP.list', NAMLST,
      :                  OPLEN, STATUS )
          CMD = 'in=^'//NAMLST( :OPLEN )//' '//
@@ -547,9 +628,7 @@
      :         'outlist=*.acc '//
      :         'autoscale=true accept'
          CALL SLV_OBEYW( CCDREG, 'findcent', CMD, ' ', STATUS )
-         GRPOFF = GRPOFF + 1
-         GO TO 5
-      END IF
+      END DO
 
 *  See if the user wants to continue past this point.
       CALL MSG_BLANK( STATUS )
@@ -585,7 +664,7 @@
       REGNAM = ' '
       CALL CCD1_OPFIO( 'ccdalign_ndfs.list', 'WRITE', 'LIST', 0, FDOUT, 
      :                 STATUS )
-      DO 6 I = 1, NGROUP - 1
+      DO 6 I = 1, NNDF
          CALL MSG_SETI( 'I', I ) 
          CALL MSG_LOAD( ' ', 'ccdalign_ndf^I.list', NAMLST,
      :                  OPLEN, STATUS )
@@ -616,7 +695,9 @@
      :              STATUS )
       CALL MSG_BLANK( STATUS )
       CALL MSG_SETI( 'FITTYP', FITTYP ) 
-      CALL MSG_LOAD( ' ', 'fittype=^FITTYP ', CMD, OPLEN, STATUS )
+      CALL MSG_SETL( 'USESET', USESET )
+      CALL MSG_LOAD( ' ', 'fittype=^FITTYP useset=^USESET ', CMD,
+     :               OPLEN, STATUS )
       CMD( OPLEN + 1: ) = ' ndfnames=true '//
      :      'inlist=^ccdalign_ndfs.list '//
      :      'refpos=1 '//
@@ -681,7 +762,9 @@
      :              STATUS )
       CALL MSG_BLANK( STATUS )
       CALL MSG_SETI( 'FITTYP', FITTYP ) 
-      CALL MSG_LOAD( ' ', 'fittype=^FITTYP ', CMD, OPLEN, STATUS )
+      CALL MSG_SETL( 'USESET', USESET )
+      CALL MSG_LOAD( ' ', 'fittype=^FITTYP useset=^USESET ', CMD,
+     :               OPLEN, STATUS ) 
       CMD( OPLEN + 1: ) = ' ndfnames=true '//
      :      'inlist=^ccdalign_ndfs.list '//
      :      'refpos=1 '//
