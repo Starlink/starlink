@@ -890,7 +890,7 @@ itcl::class rtd::RtdImage {
 	    set h [$image_ dispheight]
 	    set_scrollregion 0 0 $w $h
 	} else {
-	    error_dialog "warning: '$itk_option(-file)' does not exist" $w_
+	    error_dialog "'$itk_option(-file)' does not exist" $w_
 	    set file ""
 	    clear
 	}
