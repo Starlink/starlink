@@ -40,6 +40,7 @@ in mode make-manifest-mode in sl.dsl
       (html-document (with-mode section-reference
 		       (process-node-list (current-node)))
 		     (make sequence
+		       (make-contents-backmatter)
 		       (make-notecontents)
 		       (make-bibliography)
 		       (make-updatelist)))
@@ -66,12 +67,13 @@ in mode make-manifest-mode in sl.dsl
 			  (literal "Bibliography")))
 	      #f))
 	 (updateslist
-	  (if (get-updates)
+	  (if (hashistory?) ;(get-updates)
 	      (make element gi: "li"
 		    (make element gi: "a"
 			  attributes: (list (list "href" (updatelist-sys-id)))
 			  (literal "Changes")))
-	      #f))
+	      #f
+	      ))
 	 (contentslist (if (or noteslist biblist updateslist)
 			   (sosofo-append (or noteslist (empty-sosofo))
 					  (or biblist (empty-sosofo))
@@ -198,7 +200,7 @@ the data of the CITATION element.
 	(cit-data (trim-data (current-node))))
     (if bib-name
 	(make element gi: "a"
-	      attributes: (list (list "href" (string-append
+`	      attributes: (list (list "href" (string-append
 					      (bibliography-sys-id)
 					      "#"
 					      cit-data)))
