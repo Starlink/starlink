@@ -164,11 +164,8 @@
 *    Opened ok?
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*      Instantiate an HDSfile
-        CALL ADI_NEW0( 'HDSfile', ID, STATUS )
-
 *      Store the locator
-        CALL ADI_CPUT0C( ID, 'Locator', FLOC, STATUS )
+        CALL ADI1_PUTLOC( FLOC, ID, STATUS )
 
 *    End opened ok test
       END IF

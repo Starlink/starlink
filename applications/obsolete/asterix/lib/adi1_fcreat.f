@@ -198,10 +198,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *    Create new instance of a FITSfile object
-        CALL ADI_NEW0( 'HDSfile', FID, STATUS )
-
-*    Write the locator
-        CALL ADI_CPUT0C( FID, '.Locator', LOC, STATUS )
+        CALL ADI1_PUTLOC( LOC, FID, STATUS )
 
       END IF
 
