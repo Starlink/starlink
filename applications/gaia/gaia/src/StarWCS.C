@@ -1316,25 +1316,3 @@ char *StarWCS::getDomains()
     }
     return namelist;
 }
-
-//
-//  Define dummy calls for glsset, glsfwd and glsrev. These are replaced
-//  by the equivalent SFL projection in AST.
-//
-extern "C" {
-    int sflset(struct prjprm *);
-    int sflfwd(double, double, struct prjprm *, double *, double *);
-    int sflrev(double, double, struct prjprm *, double *, double *);
-    
-    int glsset( struct prjprm *prj ) {
-        return sflset( prj );
-    }
-    int glsfwd( double phi, double theta, struct prjprm *prj, double *x,
-                double *y ) {
-        return sflfwd( phi, theta, prj, x, y );
-    }
-    int glsrev( double x, double y, struct prjprm *prj, double *phi,
-                double *theta ) {
-        return sflrev( x, y, prj, phi, theta );
-    }
-}
