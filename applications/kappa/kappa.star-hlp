@@ -30420,6 +30420,12 @@ expressions actually define a pair of complementary mappings.
 -  On completion, the destination structure for the
 transformation information equates to the current transformation
 global parameter.
+
+-  Expressions supplied for parameters FOR1-FOR7 and INV1-INV7 
+should be enclosed in double quotes (even when given in response 
+to a prompt) to protect the equals sign from interpretation by 
+the shell or parameter system.
+
 2 Related_Applications
    KAPPA: FLIP, ROTATE, SLIDE, TRANINVERT, TRANJOIN, TRANSFORMER,
    TRANTRACE; CCDPACK: CCDEDIT, TRANLIST, TRANNDF.

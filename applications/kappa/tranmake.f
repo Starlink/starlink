@@ -295,6 +295,10 @@
 *     -  On completion, the destination structure for the
 *     transformation information equates to the current transformation
 *     global parameter.
+*     -  Expressions supplied for parameters FOR1-FOR7 and INV1-INV7 
+*     should be enclosed in double quotes (even when given in response 
+*     to a prompt) to protect the equals sign from interpretation by 
+*     the shell or parameter system.
 
 *  Related Applications:
 *     KAPPA: FLIP, ROTATE, SLIDE, TRANINVERT, TRANJOIN, TRANSFORMER,
@@ -306,6 +310,7 @@
 *  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -314,6 +319,12 @@
 *     1995 February (MJC):
 *        Included tokens for constants and expressions, and the
 *        two-dimensional linear fit.
+*     2-JUN-1998 (DSB):
+*        Corrected status check after call to TRN_NEW. Previously
+*        an error was reported saying that the expression failed 
+*        to compile if no classifications were given (even if in fact it
+*        had compiled succesfully). Also, added a note to the prologue
+*        telling the user to encloise expressions in double quotes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -588,11 +599,23 @@
      :                 PREC( :NCPREC )//':', COMM, PARLOC, NAME, LOCTR,
      :                 STATUS )
 
+*  Give some help. if the transformation did not compile.
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL MSG_SETI( 'NVIN', NVIN )
+            CALL MSG_SETI( 'NVOUT', NVOUT )
+            CALL ERR_REP( 'TRANMAKE_NOCOMP',
+     :        'The transformation does not compile.  Check the '/
+     :        /'forward and inverse expressions.  There should be '/
+     :        /'^NVIN distinct input variables and ^NVOUT distinct '/
+     :        /'output variables.  See SUN/61 for details of the '/
+     :        /'permitted operators and functions.', STATUS )
+      
+
 *  Assign classifications to the transformation.
 *  =============================================
 
 *  Check whether or not we need to enter any classifications.
-         IF ( STATUS .EQ. SAI__OK .AND. NCLASS .GT. 0 ) THEN
+         ELSE IF ( NCLASS .GT. 0 ) THEN
 
 *  Initialise the logical array of classifications.
             DO I = 1, TRN__MXCLS
@@ -631,17 +654,6 @@
 *  Enter the classification information.
             CALL TRN_PTCL( CLASS, LOCTR, STATUS )
 
-*  Give some help. if the transformation did not compile.
-         ELSE
-            CALL MSG_SETI( 'NVIN', NVIN )
-            CALL MSG_SETI( 'NVOUT', NVOUT )
-            CALL ERR_REP( 'TRANMAKE_NOCOMP',
-     :        'The transformation does not compile.  Check the '/
-     :        /'forward and inverse expressions.  There should be '/
-     :        /'^NVIN distinct input variables and ^NVOUT distinct '/
-     :        /'output variables.  See SUN/61 for details of the '/
-     :        /'permitted operators and functions.', STATUS )
-      
          END IF
       END IF
 
