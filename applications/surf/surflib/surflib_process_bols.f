@@ -267,6 +267,9 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.3  1999/07/13 20:55:58  timj
+*     Pass ra/dec centre to SCULIB_ADD_CHOP
+*
 *     Revision 1.2  1999/07/13 06:31:23  timj
 *     Correct for CHOP TRACKING problem.
 *     Pass in LAT_OBS to some routines.
@@ -1019,10 +1022,10 @@
                         IF (BEAMS(BM) .NE. 'M') THEN
 
                            CALL SCULIB_ADD_CHOP(
-     :                          BEAMS(BM), ARRAY_RA_CENTRE,
-     :                          ARRAY_DEC_CENTRE, CHOP_CRD, CHOP_PA,
-     :                          CHOP_FUN, CHOP_THROW, LST, IN_UT1,
-     :                          LAT_OBS,
+     :                          BEAMS(BM), RA_CEN, DEC_CEN,
+     :                          ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE, 
+     :                          CHOP_CRD, CHOP_PA, CHOP_FUN, CHOP_THROW, 
+     :                          LST, IN_UT1, LAT_OBS,
      :                          RA_START, RA_END, DEC_START, DEC_END,
      :                          NEW_ARRAY_RA, NEW_ARRAY_DEC, 
      :                          STATUS)
