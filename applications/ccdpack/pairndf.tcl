@@ -400,7 +400,7 @@
                      set xo [ expr 0 - $xoff ]
                      set yo [ expr 0 - $yoff ]
                      set mp {}
-                     foreach $pt $matchpts {
+                     foreach pt $matchpts {
                         lappend mp [ list [ lindex $pt 2 ] [ lindex $pt 3 ] \
                                           [ lindex $pt 0 ] [ lindex $pt 1 ] ]
                      }
