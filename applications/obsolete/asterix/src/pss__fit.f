@@ -264,7 +264,7 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
       END IF
 
 *    Find optimum fit
-      CALL FIT_MIN( 1, IMOD, MCTRL, .FALSE., 0,
+      CALL FIT_MIN( 1, IMOD, MCTRL, 0, .FALSE.,
      :              PSS__FITNPAR, LB, UB, FROZEN, PSCALE, LNDFAC,
      :              ISTAT, PSS_FIT_GENMODEL, PARAM, DPAR,
      :              PEGGED, STATMIN, FINISHED, FITERR, STATUS )
