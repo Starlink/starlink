@@ -10,7 +10,7 @@
   GKS implementation of the PGPLOT graphics library.
   </p></abstract>
   <dependencies >
-    <build>sae</build><build>gks</build><link>gks</link><link>gns</link><link>psx</link><link>mers</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>gks</build><link>gks</link><link>gns</link><link>graphpar</link><link>psx</link><link>mers</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
