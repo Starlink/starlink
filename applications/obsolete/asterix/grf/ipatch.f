@@ -300,7 +300,7 @@
                 IF (PATCHED) THEN
                   CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,II,II,J,J,
      :                .TRUE.,%VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
-     :                           D,Q,MASK2,I_PMIN,I_PMAX,STATUS)
+     :                           D,I_PMIN,I_PMAX,Q,MASK2,STATUS)
                 ENDIF
 
               ENDDO
@@ -457,7 +457,7 @@
 
           CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,II1,II2,JJ1,JJ2,
      :                .TRUE.,%VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
-     :                             D,Q,MASK,I_PMIN,I_PMAX,STATUS)
+     :                             D,I_PMIN,I_PMAX,Q,MASK,STATUS)
 
 
 
