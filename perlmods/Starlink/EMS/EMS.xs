@@ -8,6 +8,11 @@ extern "C" {
 }
 #endif
 
+/* SAI defines -- more for testing than anything else */
+
+#include "sae_par.h"
+
+
 /* Pre-allocated space */
 
 #define FCHAR 512       /* Size of Fortran character string */
@@ -16,40 +21,10 @@ static char str2[FCHAR];
 static char str3[FCHAR];
 
 
-
-static int
-not_here(s)
-char *s;
-{
-    croak("%s not implemented on this architecture", s);
-    return -1;
-}
-
-static double
-constant(name, arg)
-char *name;
-int arg;
-{
-    errno = 0;
-    switch (*name) {
-    }
-    errno = EINVAL;
-    return 0;
-
-not_there:
-    errno = ENOENT;
-    return 0;
-}
-
-
 MODULE = Starlink::EMS		PACKAGE = Starlink::EMS		
 
 
-double
-constant(name,arg)
-	char *		name
-	int		arg
-
+# Main routine
 
 void
 ems1_get_facility_error(inmsg_status, facility, ident, text)
@@ -66,5 +41,29 @@ ems1_get_facility_error(inmsg_status, facility, ident, text)
   facility
   ident
   text
+
+# Simple error codes so that the conversion facility can be tested
+
+int
+SAI__OK()
+ CODE:
+  RETVAL = SAI__OK;
+ OUTPUT:
+  RETVAL
+
+int
+SAI__ERROR()
+ CODE:
+  RETVAL = SAI__ERROR;
+ OUTPUT:
+  RETVAL
+
+int
+SAI__WARN()
+ CODE:
+  RETVAL = SAI__WARN;
+ OUTPUT:
+  RETVAL
+
 
   
