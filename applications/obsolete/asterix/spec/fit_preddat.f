@@ -137,9 +137,12 @@ c      END IF
 
 *  Scale up by TEFF and add background if count model is required
       IF ( COUNTMODEL ) THEN
-	CALL ARR_MULTR( DATASET_TEFF(N), DATASET_NDAT(N), PRED, STATUS )
+	CALL ARR_MULTR( DATASET_TEFF(N)*DATASET_SCALE(N),
+     :                       DATASET_NDAT(N), PRED, STATUS )
 	CALL VEC_ADDR( .FALSE., DATASET_NDAT(N), %VAL(DATASET_BPTR(N)),
      :                 PRED, PRED, IERR, NERR, STATUS )
+      ELSE
+        CALL ARR_MULTR( DATASET_SCALE(N), DATASET_NDAT(N), PRED, STATUS)
       END IF
 
 *  Exit
