@@ -4,7 +4,6 @@ $doc = "./doc/"
 
 ccdpack        hlp = doc$ccdpack.hlp, src = ccdpack.f
 command_descriptions        hlp = doc$command_descriptions.hlp, src = command_descriptions.f
-changes_this_release        hlp = doc$changes_this_release.hlp, src = changes_this_release.f
 calcor        hlp = doc$calcor.hlp, src = calcor.f
 ccdalign        hlp = doc$ccdalign.hlp, src = ccdalign.f
 ccdclear        hlp = doc$ccdclear.hlp, src = ccdclear.f
@@ -31,6 +30,7 @@ present        hlp = doc$present.hlp, src = present.f
 reduce        hlp = doc$reduce.hlp, src = reduce.f
 register        hlp = doc$register.hlp, src = register.f
 schedule        hlp = doc$schedule.hlp, src = schedule.f
+use_globals     hlp = doc$use_globals.hlp, src = use_globals.f
 tranlist        hlp = doc$tranlist.hlp, src = tranlist.f
 tranndf        hlp = doc$tranndf.hlp, src = tranndf.f
 xreduce        hlp = doc$xreduce.hlp, src = xreduce.f
