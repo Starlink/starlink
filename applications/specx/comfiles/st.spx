@@ -1,5 +1,6 @@
 !SPECX COMMAND FILE TO PLOT STANDARD AND REFERENCE SPECTRA
 ! L.AVERY, Feb 15,1996
+! Tim Jenness, 19 Oct 2004 (change path)
 !
 declare snum I4
 declare source_nam C10
@@ -160,7 +161,7 @@ print ' '
 write full_name 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 ! char count     123456789012345678901234567890123456789412345678951234
 full_name = ' '
-write full_name '/home/lwa/devel/',source_nam,'_',line_nam
+write full_name '/jcmt_sw/SpecStand/specxFiles/',source_nam,'_',line_nam
 print full_name 
 !
 ! Open the relevant file and plot the spectrum
