@@ -248,6 +248,7 @@
       makebias \
          in='bias*' \
 	 out=master_bias \
+         reset \
 	 accept
 #     end makebias
 
@@ -553,6 +554,7 @@
       astexp \
          in='reduced_data?' \
          astfile=ccdexercise.ast \
+         idtype=fitsid \
          fitsid=ISEQ \
          outdomain=matched \
          accept
