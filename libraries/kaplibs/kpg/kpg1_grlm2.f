@@ -88,11 +88,14 @@
 
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     28-SEP-1999 (DSB):
 *        Original version.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -106,6 +109,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -263,7 +267,8 @@
 
 *  Copy the data values to the work array, applying the bad value mask
 *  supplied in D2 at the same time.      
-            CALL KPG1_CPBDD( N, D1, D2, %VAL( IPW1 ), STATUS )
+            CALL KPG1_CPBDD( N, D1, D2, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                       STATUS )
 
 *  Implement defaults for any missing numerical parameter values. 
             IF( V1 .EQ. VAL__BADD ) V1 = 5.0
@@ -275,12 +280,14 @@
 
 *  Obtain the maximum and minimum values to define the bounds of the 
 *  histogram.
-            CALL KPG1_MXMND( .TRUE., N, %VAL( IPW1 ), NINVAL, DMAX, 
+            CALL KPG1_MXMND( .TRUE., N, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                       NINVAL, DMAX,
      :                       DMIN, MAXPOS, MINPOS, STATUS )
 
 *  Generate the histogram between those bounds. The number of bad pixels 
 *  has been counted so it might be possible to save future processing.
-            CALL KPG1_GHSTD( ( NINVAL .EQ. 0 ), N, %VAL( IPW1 ), HISTSZ, 
+            CALL KPG1_GHSTD( ( NINVAL .EQ. 0 ), N, 
+     :                       %VAL( CNF_PVAL( IPW1 ) ), HISTSZ,
      :                       DMAX, DMIN, HIST, STATUS )
 
 *  Estimate the values at the percentiles. On exit, the values in FRAC

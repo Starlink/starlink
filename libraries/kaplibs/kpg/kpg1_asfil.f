@@ -52,6 +52,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,6 +60,8 @@
 *        Original version.
 *     17-SEP-1999 (DSB):
 *        Added arguments PARAM2 and FNAME.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -74,6 +77,7 @@
       INCLUDE 'FIO_ERR'          ! FIO error constants
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER PARAM1*(*)
@@ -154,7 +158,8 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Read the positions from the group into the array allocated above.
-         CALL KPG1_ASGRP( PARAM2, FRM, IGRP, NP, NAX, %VAL( IPOUT ), 
+         CALL KPG1_ASGRP( PARAM2, FRM, IGRP, NP, NAX, 
+     :                    %VAL( CNF_PVAL( IPOUT ) ),
      :                    STATUS )
 
       END IF

@@ -36,11 +36,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     30-OCT-1998 (DSB):
 *        Original version.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -56,6 +59,7 @@
       INCLUDE 'CTM_PAR'          ! Colout Table Management constants
       INCLUDE 'DAT_PAR'          ! DAT constants
       INCLUDE 'DAT_ERR'          ! DAT error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -193,7 +197,8 @@
             CALL DAT_MAPV( PLOC, '_REAL', 'READ', PNTR, EL, STATUS ) 
 
 *  Load the palette into the colour table.
-            CALL KPG1_PLGET( CI1, CI2, %VAL( PNTR ), STATUS )
+            CALL KPG1_PLGET( CI1, CI2, %VAL( CNF_PVAL( PNTR ) ), 
+     :                       STATUS )
 
 *  Release the component locator.
             CALL DAT_ANNUL( PLOC, STATUS )

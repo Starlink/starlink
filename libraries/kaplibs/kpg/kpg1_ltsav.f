@@ -30,11 +30,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     3-OCT-2001 (DSB):
 *        Original version.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -50,6 +53,7 @@
       INCLUDE 'CTM_PAR'          ! Colout Table Management constants
       INCLUDE 'DAT_PAR'          ! DAT constants
       INCLUDE 'DAT_ERR'          ! DAT error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -163,7 +167,8 @@
          CALL DAT_MAPV( PLOC, '_REAL', 'WRITE', PNTR, EL, STATUS ) 
 
 *  Store the required section of the colour table in the array.
-         CALL KPG1_PLPUT( LP, UP, LP, UP, %VAL( PNTR ), STATUS )
+         CALL KPG1_PLPUT( LP, UP, LP, UP, %VAL( CNF_PVAL( PNTR ) ), 
+     :                    STATUS )
  
 *  Annul the locator.
          CALL DAT_ANNUL( PLOC, STATUS )

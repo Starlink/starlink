@@ -77,6 +77,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -85,6 +86,8 @@
 *     10-DEC-2001 (DSB):
 *        Modified to use a default FrameSet if he catalogue does not
 *        contain a FrameSet.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -101,6 +104,7 @@
       INCLUDE 'CAT_ERR'          ! CAT error constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -429,7 +433,8 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Copy the axis values from the catalogue columns into this array.
-      CALL KPG1_CTCPD( CI, NAX, GAXIS, NPOS, %VAL( IPPOS ), STATUS )
+      CALL KPG1_CTCPD( CI, NAX, GAXIS, NPOS, %VAL( CNF_PVAL( IPPOS ) ), 
+     :                 STATUS )
 
 *  Get the Mapping from the Frame in which the positions are stored in
 *  the catalogue, to the Frame requested by argument CURFRM. Store a
@@ -475,8 +480,9 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
          
 *  Map the positions.
-         CALL AST_TRANN( MAP, NPOS, NAXCAT, NPOS, %VAL( IPCAT ), .TRUE., 
-     :                   NAX, NPOS, %VAL( IPPOS ), STATUS ) 
+         CALL AST_TRANN( MAP, NPOS, NAXCAT, NPOS, 
+     :                   %VAL( CNF_PVAL( IPCAT ) ), .TRUE.,
+     :                   NAX, NPOS, %VAL( CNF_PVAL( IPPOS ) ), STATUS )
 
 *  Free the memory holding thre positions read from the catalogue.
          CALL PSX_FREE( IPCAT, STATUS )
@@ -516,7 +522,8 @@
 
 *  Store the positions identifiers. Monotonic identifiers starting at 1
 *  are stored if no suitable PIDENT column was found in the catalogue.
-      CALL KPG1_CTCPI( CI, 1, GID, NPOS, %VAL( IPID ), STATUS )
+      CALL KPG1_CTCPI( CI, 1, GID, NPOS, %VAL( CNF_PVAL( IPID ) ), 
+     :                 STATUS )
 
 *  Get an identifier for the TITLE parameter in the catalogue.
       CALL CAT_TIDNT( CI, 'TITLE', GTTL, STATUS )

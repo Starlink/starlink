@@ -94,6 +94,7 @@
 
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -101,6 +102,8 @@
 *        Original version.
 *     5-SEP-2000 (DSB):
 *        Replaced calls to KPG1_GHSTx/KPG1_HSTFx with KPG1_FRACx.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -114,6 +117,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -264,7 +268,8 @@
 
 *  Copy the data values to the work array, applying the bad value mask
 *  supplied in D2 at the same time.      
-            CALL KPG1_CPBDR( N, D1, D2, %VAL( IPW1 ), STATUS )
+            CALL KPG1_CPBDR( N, D1, D2, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                       STATUS )
 
 *  Implement defaults for any missing numerical parameter values. 
             IF( V1 .EQ. VAL__BADR ) V1 = 5.0
@@ -275,7 +280,8 @@
             FRAC( 2 ) = V2*0.01
 
 *  Estimate the values at the percentiles. 
-            CALL KPG1_FRACR( N, %VAL( IPW1 ), 2, FRAC, .TRUE., CLPVAL,
+            CALL KPG1_FRACR( N, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                       2, FRAC, .TRUE., CLPVAL,
      :                       PERVAL, STATUS )
 
 *  Swap the percentiles back if they were flipped.

@@ -39,6 +39,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -53,6 +54,8 @@
 *     13-DEC-2003 (DSB):
 *        Use KPG1_D2NAG in stead of PDA_D2NAG. KPG1_D2NAG uses workspace
 *        to achieve greater speed.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -65,6 +68,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER M
@@ -108,7 +112,7 @@
 *  the equivalent NAG format.
       DO J = 1, N
          CALL PDA_DRFFTF( M, OUT( 1, J ), WORK )
-         CALL KPG1_DR2NAG( M, OUT( 1, J ), %VAL( IPW ) )
+         CALL KPG1_DR2NAG( M, OUT( 1, J ), %VAL( CNF_PVAL( IPW ) ) )
       END DO
 
 *  Re-initialise the work array to hold trig. functions used to form
@@ -129,7 +133,7 @@
 
 *  Transform the copy of this column.
          CALL PDA_DRFFTF( N, WORK( IW + 1 ), WORK )
-         CALL KPG1_DR2NAG( N, WORK( IW + 1 ), %VAL( IPW ) )
+         CALL KPG1_DR2NAG( N, WORK( IW + 1 ), %VAL( CNF_PVAL( IPW ) ) )
 
 *  Copy the transformed column back to the output array.
          DO  J = 1, N

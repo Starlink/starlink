@@ -34,11 +34,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     3-OCT-2001 (DSB):
 *        Original version.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -53,6 +56,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CTM_PAR'          ! Colout Table Management constants
       INCLUDE 'DAT_PAR'          ! DAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -92,7 +96,8 @@
          CALL DAT_MAPV( PLOC, '_REAL', 'READ', PNTR, EL, STATUS ) 
 
 *  Load the LUT into the colour table.
-         CALL KPG1_PGLUT( EL/3, %VAL( PNTR ), LP, UP, .FALSE., STATUS )
+         CALL KPG1_PGLUT( EL/3, %VAL( CNF_PVAL( PNTR ) ), 
+     :                    LP, UP, .FALSE., STATUS )
 
 *  If no error has occurred, indicate that the LUT is loaded.
          IF( STATUS .EQ. SAI__OK ) DONE = .TRUE.

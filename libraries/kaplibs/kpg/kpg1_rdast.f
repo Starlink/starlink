@@ -47,11 +47,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     16-FEB-1998 (DSB):
 *        Original version, based on NDF1_RDAST.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -70,6 +73,7 @@
       
 *  Global Variables:
       INCLUDE 'KPG_AST'          ! KPG AST common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        ASTLC = CHARACTER * ( DAT__SZLOC ) (Read)
 *           Locator to HDS _CHAR array holding AST_ data.
 *        ASTLN = INTEGER (Read and Write)
@@ -138,7 +142,7 @@
 *  Check that we have not reached the end of the array. If not, obtain
 *  the contents of the next element.
             IF ( ASTLN .LE. DIM( 1 ) ) THEN
-               CALL KPG1_H2AST( %VAL( ASTPT ), ASTLN,
+               CALL KPG1_H2AST( %VAL( CNF_PVAL( ASTPT ) ), ASTLN,
      :                          NEXT( : LENGTH ), STATUS,
      :                          %VAL( LENGTH ) )
 

@@ -43,6 +43,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
  
 *  History:
@@ -53,6 +54,8 @@
 *        the prologue.  Called renamed retrieval routine.  Corrected
 *        typo's and made minor stylistic changes.  Used linear increment
 *        to enlarge workspace.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -68,6 +71,7 @@
       INCLUDE 'DAT_PAR'          ! DAT_ constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
  
 *  Arguments Given:
       CHARACTER * ( * ) PNAME
@@ -124,7 +128,8 @@
 *  Store the supplied co-ordinates in the workspace.
          DO I = 1, NDIM
             CALL KPG1_STORD( WSIZE, ( NPOINT - 1 ) * NDIM + I,
-     :                         COORD( I ), %VAL( IPCO ), STATUS )
+     :                         COORD( I ), %VAL( CNF_PVAL( IPCO ) ), 
+     :                       STATUS )
          END DO
  
 *  Cancel the current value of the parameter.

@@ -65,6 +65,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -78,6 +79,8 @@
 *        not allow a catalogue to be opened more than once. This gave
 *        problems when using ICL due to FITS files not being closed
 *        properly.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -92,6 +95,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
       INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -200,10 +204,11 @@
 *  Transform the supplied positions into the Base Frame, storing them
 *  in the workspace.
          CALL AST_TRANN( MAP, NPOS, NAX, ARRDIM, POS, .TRUE., NBAX, 
-     :                   NPOS, %VAL( IPW ), STATUS ) 
+     :                   NPOS, %VAL( CNF_PVAL( IPW ) ), STATUS )
 
 *  Put the stored Frame positions into the file.
-         CALL KPG1_WRLS2( PARAM, NPOS, NPOS, NBAX, %VAL( IPW ), IWCS,
+         CALL KPG1_WRLS2( PARAM, NPOS, NPOS, NBAX, 
+     :                    %VAL( CNF_PVAL( IPW ) ), IWCS,
      :                    TITLE, ID0, IDENTS, STATUS )
 
 *  Free the workspace.

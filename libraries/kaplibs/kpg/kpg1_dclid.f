@@ -62,6 +62,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
  
 *  History:
@@ -75,6 +76,8 @@
 *        Allowed axes to be insignificant by passing a negative NDIM,
 *        calling KPG1_SDIMP instead of KPG1_SGDIM, and setting the scale
 *        and offset.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -129,6 +132,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
  
 *.
  
@@ -174,7 +178,8 @@
  
 *  Find the range of the axis co-ordinates and whether or not the axis
 *  is linear.
-            CALL KPG1_AXLID( AEL, %VAL( AXPNTR( 1 ) ), DALBND( I ),
+            CALL KPG1_AXLID( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                       DALBND( I ),
      :                         DAUBND( I ), AXLIN( I ), STATUS )
  
 *  Let the application complete without an error if the world
@@ -215,7 +220,8 @@
 *  the data-co-ordinate value of the single axis position, obtained by
 *  the bounds-finding routine.
          ELSE
-            CALL KPG1_AXBND( AEL, %VAL( AXPNTR( 1 ) ), DALBND( I ),
+            CALL KPG1_AXBND( AEL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                       DALBND( I ),
      :                         DAUBND( I ), STATUS )
             SCALE( I ) = 0.0D0
             OFFSET( I ) = DALBND( I )

@@ -40,6 +40,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -48,6 +49,8 @@
 *     9-DEC-1998 (DSB):
 *        Modified to ignore un-usable WCS information read from an IRAS90 
 *        astrometry structure, or a FITS extension.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -64,6 +67,7 @@
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'PSX_ERR'          ! PSX ERROR constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER INDF
@@ -298,7 +302,8 @@
                IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Attempt to create a WCS component within the NDF selected above. 
-                  CALL FTS1_FTWCS( NCARD, %VAL( PNTR ), 1, INDFC, 
+                  CALL FTS1_FTWCS( NCARD, %VAL( CNF_PVAL( PNTR ) ), 
+     :                             1, INDFC,
      :                             NENCOD, ENCODS, STATUS, %VAL( 80 ) )
 
 *  If an error occurred reading the FITS WCS information, annul or flush it

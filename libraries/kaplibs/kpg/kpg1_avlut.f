@@ -36,11 +36,14 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1991 April 15 (MJC):
 *        Original version.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -53,6 +56,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! Global SSE definitions
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * )
@@ -152,7 +156,8 @@
 
 *    Obtain the maximum and minimum values.
 
-      CALL KPG1_MXMNR( .FALSE., EL, %VAL( PNTRI( 1 ) ), NINVAL,
+      CALL KPG1_MXMNR( .FALSE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                 NINVAL,
      :                 RMAXV, RMINV, MAXPOS, MINPOS, STATUS )
 
 *    To be a valid LUT, the values must lie in the range 0.0--1.0.

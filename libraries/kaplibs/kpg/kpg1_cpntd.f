@@ -54,11 +54,14 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
  
 *  History:
 *     1991 June 28 (MJC):
 *        Original version.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
  
 *  Bugs:
@@ -72,6 +75,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_ERR'          ! Parameter-system error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
  
 *  Arguments Given:
       CHARACTER * ( * ) PNNDF
@@ -125,7 +129,7 @@
 *    Write the array to the file's data array.  There can be no
 *    conversion errors so they are not checked.
  
-      CALL VEC_DTOD( .FALSE., EL, ARRAY, %VAL( OPNTR( 1 ) ),
+      CALL VEC_DTOD( .FALSE., EL, ARRAY, %VAL( CNF_PVAL( OPNTR( 1 ) ) ),
      :                   IERR, NERR, STATUS )
  
 *    Handle the null case invisibly.

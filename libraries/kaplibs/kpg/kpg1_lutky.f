@@ -78,6 +78,7 @@
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -85,6 +86,8 @@
 *        Original version.
 *     23-OCT-2001 (DSB):
 *        Added histogram and graph forms for key.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,6 +101,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IPIC
@@ -327,10 +331,11 @@
 
 *  Produce the histogram.
          CALL KPG1_GHSTI( .FALSE., NEL, COLDAT, NPEN, UP, LP, 
-     :                    %VAL( IPHIST ), STATUS ) 
+     :                    %VAL( CNF_PVAL( IPHIST ) ), STATUS )
 
 *  Find the maximum and minimum count in any bin.
-         CALL KPG1_MXMNI( .FALSE., NPEN, %VAL( IPHIST ), NINVAL, MAXPOP,
+         CALL KPG1_MXMNI( .FALSE., NPEN, %VAL( CNF_PVAL( IPHIST ) ), 
+     :                    NINVAL, MAXPOP,
      :                    MINPOP, MAXPOS, MINPOS, STATUS )
 
 *  Store the axis 2 (count or log(count)) bounds of the key. Also store the 
@@ -485,7 +490,8 @@
 *  Create a Mapping from pen number to RGB intensities (1 input, 3
 *  outputs).
       CALL PSX_CALLOC( 3*NPEN, '_DOUBLE', IPWORK, STATUS )
-      CALL KPG1_LUTK4( LP, UP, %VAL( IPWORK ), MAP3C, STATUS )
+      CALL KPG1_LUTK4( LP, UP, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                 MAP3C, STATUS )
       CALL PSX_FREE( IPWORK, STATUS )
 
 *  Add it to the parallel compound Mapping.
@@ -629,8 +635,9 @@
 *  Allocate work space and create the graph key.
          CALL PSX_CALLOC( 2*NPEN, '_DOUBLE', IPX, STATUS )
          CALL PSX_CALLOC( 3*NPEN, '_DOUBLE', IPRGB, STATUS )
-         CALL KPG1_LUTK3( IPLOT, PARAM, APP, LP, UP, %VAL( IPX ), 
-     :                    %VAL( IPRGB ), STATUS )
+         CALL KPG1_LUTK3( IPLOT, PARAM, APP, LP, UP, 
+     :                    %VAL( CNF_PVAL( IPX ) ),
+     :                    %VAL( CNF_PVAL( IPRGB ) ), STATUS )
          CALL PSX_FREE( IPX, STATUS )
          CALL PSX_FREE( IPRGB, STATUS )
 
@@ -664,23 +671,27 @@
          IF( UPDATA ) THEN
 
 *  Fill the colour table array.
-            CALL KPG1_LUTK2( FORM, 2, 1, NZ, LP, UP, %VAL( IPHIST ), 
-     :                       MAXPOP, LOGPOP, %VAL( IPWORK ), STATUS )
+            CALL KPG1_LUTK2( FORM, 2, 1, NZ, LP, UP, 
+     :                       %VAL( CNF_PVAL( IPHIST ) ),
+     :                       MAXPOP, LOGPOP, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                       STATUS )
 
 *  Display it.
             CALL KPG1_PGPIX( IPLOT, 'PEN-Y', LBND, UBND, NZ, NPEN, 
-     :                       %VAL( IPWORK ), STATUS )
+     :                       %VAL( CNF_PVAL( IPWORK ) ), STATUS )
 
 *  If the data axis is horiontal...
          ELSE
 
 *  Fill the colour table array.
-            CALL KPG1_LUTK2( FORM, 1, LP, UP, 1, NZ, %VAL( IPHIST ), 
-     :                       MAXPOP, LOGPOP, %VAL( IPWORK ), STATUS )
+            CALL KPG1_LUTK2( FORM, 1, LP, UP, 1, NZ, 
+     :                       %VAL( CNF_PVAL( IPHIST ) ),
+     :                       MAXPOP, LOGPOP, %VAL( CNF_PVAL( IPWORK ) ), 
+     :                       STATUS )
 
 *  Display it.
             CALL KPG1_PGPIX( IPLOT, 'PEN-Y', LBND, UBND, NPEN, NZ,
-     :                       %VAL( IPWORK ), STATUS )
+     :                       %VAL( CNF_PVAL( IPWORK ) ), STATUS )
          END IF
 
 *  Free the work array.

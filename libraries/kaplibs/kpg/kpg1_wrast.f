@@ -51,11 +51,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     16-FEB-1998 (DSB):
 *        Original version, based on NDF1_WRAST.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -74,6 +77,7 @@
       
 *  Global Variables:
       INCLUDE 'KPG_AST'          ! KPG AST common blocks 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        ASTLC = CHARACTER * ( DAT__SZLOC ) (Read)
 *           Locator to HDS _CHAR array holding AST_ data.
 *        ASTLN = INTEGER (Read and Write)
@@ -165,7 +169,7 @@
                   I2 = MIN( I1 + LENGTH - 2, L )
 
 *  Write the line, prefixed by the flag character.
-                  CALL KPG1_AST2H( %VAL( ASTPT ), ASTLN,
+                  CALL KPG1_AST2H( %VAL( CNF_PVAL( ASTPT ) ), ASTLN,
      :                             FLAG // TEXT( I1 : I2 ),
      :                             STATUS, %VAL( LENGTH ) )
 

@@ -39,6 +39,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,6 +57,8 @@
 *     13-DEC-2003 (DSB):
 *        Use KPG1_DNAG2R in stead of PDA_DNAG2R. KPG1_DNAG2R uses workspace
 *        to achieve greater speed.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -68,6 +71,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER M
@@ -121,7 +125,7 @@
 
 *  Convert this column from NAG's Hermitian format to FFTPACK format,
 *  and then transform the copy of this column using an FFTPACK routine.
-         CALL KPG1_DNAG2R( N, WORK( IW + 1 ), %VAL( IPW ) )
+         CALL KPG1_DNAG2R( N, WORK( IW + 1 ), %VAL( CNF_PVAL( IPW ) ) )
          CALL PDA_DRFFTB( N, WORK( IW + 1 ), WORK )
 
 *  Copy the transformed column back to the output array.
@@ -137,7 +141,7 @@
 
 *  Transform each row of the output array. 
       DO J = 1, N
-         CALL KPG1_DNAG2R( M, OUT( 1, J ), %VAL( IPW ) )
+         CALL KPG1_DNAG2R( M, OUT( 1, J ), %VAL( CNF_PVAL( IPW ) ) )
          CALL PDA_DRFFTB( M, OUT( 1, J ), WORK )
       END DO
 

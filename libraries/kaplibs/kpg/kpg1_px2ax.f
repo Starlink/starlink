@@ -36,11 +36,14 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     28-MAR-1991 (RFWS):
 *        Original version.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -54,6 +57,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDIM
@@ -100,7 +104,8 @@
      :                  EL, STATUS )
 
 *  Extract the element's value and unmap the array.
-         CALL VEC_DTOD( .FALSE., 1, %VAL( PNTR( 1 ) ), AX( I ), IERR,
+         CALL VEC_DTOD( .FALSE., 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                  AX( I ), IERR,
      :                  NERR, STATUS )
          CALL NDF_AUNMP( INDFS, 'Centre', I, STATUS )
  2    CONTINUE

@@ -63,6 +63,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
  
 *  History:
@@ -72,6 +73,8 @@
 *        Made generic and n-dimensional.  Corrected evaluation of
 *        scale and offset for approximation to linear data co-ordinates.
 *        Used modern-style variable declarations.  Fixed typo's.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -114,6 +117,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
  
 *.
  
@@ -140,7 +144,8 @@
 *  be issued so that the application can continue using world
 *  co-ordinates.
                CALL ERR_MARK
-               CALL KPG1_MONOD( .TRUE., AEL, %VAL( APNTR ), MONOTO,
+               CALL KPG1_MONOD( .TRUE., AEL, %VAL( CNF_PVAL( APNTR ) ), 
+     :                          MONOTO,
      :                           STATUS )
  
                IF ( STATUS .NE. SAI__OK ) THEN

@@ -55,6 +55,7 @@
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -62,6 +63,8 @@
 *        Original version.
 *     26-JUL-1999 (TDCA):
 *        Converted to PGPLOT.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -77,6 +80,7 @@
       INCLUDE 'CTM_PAR'          ! Colout Table Management constants
       INCLUDE 'DAT_PAR'          ! DAT constants
       INCLUDE 'DAT_ERR'          ! DAT error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER CI1
@@ -216,7 +220,7 @@
 *  If the array was created in this routine, or if a reset has been
 *  requested, initialise it to hold -1 at every element.
       IF( .NOT. THERE .OR. RESET ) THEN
-         CALL KPG1_FILLR( -1.0, EL, %VAL( PNTR ), STATUS )
+         CALL KPG1_FILLR( -1.0, EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
       END IF
 
 *  Find the usable range of colour indices.
@@ -228,7 +232,8 @@
       END IF
 
 *  Store the required section of the colour table in the array.
-      CALL KPG1_PLPUT( LCI1, LCI2, 0, LCI2, %VAL( PNTR ), STATUS )
+      CALL KPG1_PLPUT( LCI1, LCI2, 0, LCI2, %VAL( CNF_PVAL( PNTR ) ), 
+     :                 STATUS )
 
 *  Tidy up.
 *  ========

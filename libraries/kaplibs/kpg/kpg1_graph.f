@@ -121,6 +121,7 @@
 
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -128,6 +129,8 @@
 *        Original version.
 *     1-OCT-1999 (DSB):
 *        Added argument LMODE. 
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,6 +143,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER N
@@ -190,8 +194,9 @@
 *  Draw the graph.
       CALL KPG1_GRPHW( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
      :                 XSYM, YSYM, MODE, NULL, XL, XR, YB, YT, APP, 
-     :                 QUIET, LMODE, %VAL( IPW1 ), %VAL( IPW2 ), 
-     :                 %VAL( IPW3 ), IPLOT, STATUS )
+     :                 QUIET, LMODE, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                 %VAL( CNF_PVAL( IPW2 ) ),
+     :                 %VAL( CNF_PVAL( IPW3 ) ), IPLOT, STATUS )
 
 *  Free the work space.
       CALL PSX_FREE( IPW1, STATUS )

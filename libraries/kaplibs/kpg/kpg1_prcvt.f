@@ -34,6 +34,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -43,6 +44,8 @@
 *        Check _REAL and _DOUBLE objects for IEEE NaN and Inf values, 
 *        converting them to the appropriate Starlink bad value if any
 *        are found.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -56,6 +59,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given and Returned:
       CHARACTER * ( DAT__SZLOC ) LOC
@@ -150,7 +154,8 @@
 *  original object into it (thus performing the conversion).
                   CALL DAT_MAPV( LOCSCR, TYPE, 'WRITE', PNTR, SIZE( 1 ),
      :                           STATUS )
-                  CALL KPG1_NAGTC( %VAL( PNTR ), LOC, NDIM, DIM, STATUS,
+                  CALL KPG1_NAGTC( %VAL( CNF_PVAL( PNTR ) ), 
+     :                             LOC, NDIM, DIM, STATUS,
      :                             %VAL( LENGTH ) )
 
 *  If it is not a character object, then allocate memory for the
@@ -158,7 +163,8 @@
 *  performing the conversion).
                ELSE
                   CALL PSX_MALLOC( LENGTH * SIZE( 1 ), PNTR, STATUS )
-                  CALL DAT_GET( LOC, TYPE, NDIM, DIM, %VAL( PNTR ),
+                  CALL DAT_GET( LOC, TYPE, NDIM, DIM, 
+     :                          %VAL( CNF_PVAL( PNTR ) ),
      :                          STATUS )
                END IF
 
@@ -192,7 +198,8 @@
 *  the new object, annul the scratch object locator and erase the
 *  associated object.
                IF ( TYPE( : 5 ) .EQ. '_CHAR' ) THEN
-                  CALL KPG1_NAPTC( %VAL( PNTR ), LOC, NDIM, DIM, STATUS,
+                  CALL KPG1_NAPTC( %VAL( CNF_PVAL( PNTR ) ), 
+     :                             LOC, NDIM, DIM, STATUS,
      :                             %VAL( LENGTH ) )
                   CALL DAT_ANNUL( LOCSCR, STATUS )
                   CALL DAT_ERASE( LOCTMP, 'SCRATCH', STATUS )
@@ -200,7 +207,8 @@
 *  If it is not a character object, then write the converted values and
 *  free the allocated memory.
                ELSE
-                  CALL DAT_PUT( LOC, TYPE, NDIM, DIM, %VAL( PNTR ),
+                  CALL DAT_PUT( LOC, TYPE, NDIM, DIM, 
+     :                          %VAL( CNF_PVAL( PNTR ) ),
      :                          STATUS )
                   CALL PSX_FREE( PNTR, STATUS )
                END IF
@@ -219,9 +227,11 @@
 
 *  Do the conversion.
                IF( TYPE( : 5 ) .EQ. '_REAL' ) THEN
-                  CALL FTS1_RNANR( SIZE( 1 ), %VAL( PNTR ), STATUS )
+                  CALL FTS1_RNANR( SIZE( 1 ), %VAL( CNF_PVAL( PNTR ) ), 
+     :                             STATUS )
                ELSE
-                  CALL FTS1_RNAND( SIZE( 1 ), %VAL( PNTR ), STATUS )
+                  CALL FTS1_RNAND( SIZE( 1 ), %VAL( CNF_PVAL( PNTR ) ), 
+     :                             STATUS )
                END IF
 
 *  Unmap the object.
