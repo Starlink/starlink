@@ -105,7 +105,7 @@ else
 
 	# Get just the first fontname, in case there's more than one
 	fontname=`$d2bpath -QF -n $infile -q | \
-	    awk '/^Qf/{printf "%s.%spk",$2,$3; exit}'`
+	    awk '/^Q[fF]/{printf "%s.%spk",$2,$3; exit}'`
 	echo
 	echo "Looking for font $fontname..."
 	fontnamepath=`$KPW pk $fontname`
@@ -150,7 +150,7 @@ else
 	if [ -s $tfile ]; then
 	    echo "For dvi2bitmap to work, you need to (somehow)"
 	    echo "generate the following fonts:"
-	    awk '{printf "%s.%spk", $2, $3}' $tfile
+	    awk '{printf "%s.%spk\n", $2, $3}' $tfile
 	    echo "Then point dvi2bitmap to the directory containing"
 	    echo "those fonts, using either the environment variable"
 	    echo "DVI2BITMAP_PK_PATH, or the -fp option."
