@@ -1,0 +1,255 @@
+      SUBROUTINE KPG1_HSTA<T>( BAD, EL, DATA, NUMPER, PERCNT,
+     :                         NGOOD, IMIN, DMIN, IMAX, DMAX, SUM, MEAN,
+     :                         MEDIAN, MODE, PERVAL, STATUS )
+*+
+*  Name:
+*     KPG1_HSTAx
+
+*  Purpose:
+*     Compute simple ordered statistics for an array via an histogram.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_HSTAX( BAD, EL, DATA, NUMPER, PERCNT, NGOOD, IMIN,
+*                      DMIN, IMAX, DMAX, SUM, MEAN, MEDIAN, MODE,
+*                      PERVAL, STATUS )
+
+*  Description:
+*     This routine computes simple ordered statistics for an array,
+*     namely: the number of valid pixels, the minimum and maximum pixel
+*     values (and their positions), the pixel sum, the mean, the mode,
+*     the median, and selected percentiles.  For efficiency reasons
+*     the routine computes an histogram, rather than completely
+*     sorting the data.  The accuracy of the statistics therefore
+*     depends inversely on the number of bins.
+
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        Whether checks for bad pixels should be performed on the array
+*        being analysed.
+*     EL = INTEGER (Given)
+*        Number of pixels in the array.
+*     DATA( EL ) = ? (Given)
+*        Array to be analysed.
+*     NUMPER = INTEGER (Given)
+*        Number of percentiles to evaluate.
+*     PERCNT( NUMPER ) = REAL (Given and Returned)
+*        The array of percentiles to evaluate.  They must in the range
+*        0.0 to 100.0.  If there are none to calculate, set NUMPER to 1
+*        and pass the bad value in PERCNT( 1 ).  On exit these are
+*        placed in ascending order.
+*     NGOOD = INTEGER (Returned)
+*        Number of valid pixels in the array.
+*     IMIN = INTEGER (Returned)
+*        Index where the pixel with the lowest value was (first) found.
+*     DMIN = DOUBLE PRECISION (Returned)
+*        Minimum pixel value in the array.
+*     IMAX = INTEGER (Returned)
+*        Index where the pixel with the highest value was (first) found.
+*     DMAX = DOUBLE PRECISION (Returned)
+*        Maximum pixel value in the array.
+*     SUM = DOUBLE PRECISION (Returned)
+*        Sum of the valid pixels.
+*     MEAN = DOUBLE PRECISION (Returned)
+*        Mean of the valid pixels.
+*     MEDIAN = DOUBLE PRECISION (Returned)
+*        Median of the valid pixels.
+*     MODE = DOUBLE PRECISION (Returned)
+*        Mode of the valid pixels.
+*     PERVAL( NUMPER ) = DOUBLE PRECISION (Returned)
+*        Percentile values of the valid pixels.  These correspond to the
+*        ordered fractions returned in PERCNT.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each of the standard numeric types.
+*     Replace "x" in the routine name by D, R, I, W, UW, B or UB as
+*     appropriate. The data type of the array being analysed must match
+*     the particular routine used.
+*     -  If NGOOD is zero, then the values of all the derived
+*     statistics will be undefined and will be set to the "bad" value
+*     appropriate to their data type (except for the pixel sum, which
+*     will be zero).
+*     - The median and percentiles are derived by linear interpolation
+*     within histogram bins, after clipping of outliers if the
+*     histogram is sparse.  The mode is estimated from 3*median -
+*     2*mean, which is only valid for moderately skew distributions.
+
+*  References:
+*     Moroney, M.J., 1957, "Facts from Figures" (Pelican)
+*     Goad, L.E. 1980, in "Applications of Digital Image Processing to
+*       Astronomy", SPIE 264, 139.
+
+*  Deficiencies:
+*     -  Does not compute the median and any percentiles in a single
+*     invocation of KPG1_FRACx.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1991 November 13 (MJC):
+*        Original version
+*     1994 September 27 (MJC):
+*        Used modern subroutine prefixes, standardised comment
+*        alignment, and sorted the variables.
+*     2000 June 13 (MJC):
+*        Removed NUMBIN and HIST arguments.  No longer computes the
+*        histogram itself.  Does not call KPG1_HSSTP and KPG1_HSTFD,
+*        but uses KPG1_STATx and KPG1_FRACx to find the statistics,
+*        apart from the mode, which is now derived by this routine.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
+
+*  Arguments Given:
+      LOGICAL BAD
+      INTEGER EL
+      INTEGER NUMPER
+      REAL PERCNT( NUMPER )
+      <TYPE> DATA( EL )
+
+*  Arguments Returned:
+      INTEGER NGOOD
+      INTEGER IMIN
+      DOUBLE PRECISION DMIN
+      INTEGER IMAX
+      DOUBLE PRECISION DMAX
+      DOUBLE PRECISION SUM
+      DOUBLE PRECISION MEAN
+      DOUBLE PRECISION MEDIAN
+      DOUBLE PRECISION MODE
+      DOUBLE PRECISION PERVAL( NUMPER )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      REAL MEDFRA                ! Median fraction
+      PARAMETER( MEDFRA = 0.5 )
+
+*  Local Variables:
+      LOGICAL BAD2               ! There are bad pixels in the array or
+                                 ! not
+      REAL CLMEDF                ! Clipped median fraction
+      DOUBLE PRECISION DMAXC     ! Maximum value after clipping (not
+                                 ! used)
+      DOUBLE PRECISION DMINC     ! Minimum value after clipping (not
+                                 ! used)
+      INTEGER FPNTR              ! Pointer to work array
+      INTEGER I                  ! Loop counter
+      INTEGER IMAXC              ! Index of maximum value after clipping
+                                 ! (not used)
+      INTEGER IMINC              ! Clipped index, minimum value (not
+                                 ! used)
+      DOUBLE PRECISION MEANC     ! Clipped mean of array
+      INTEGER NGOODC             ! Clipped number of good values (not
+                                 ! used)
+      INTEGER NINVAL             ! Number of bad values in the array
+      DOUBLE PRECISION STDEV     ! Standard deviation of array
+      DOUBLE PRECISION STDEVC    ! Clipped standard deviation (not used)
+      DOUBLE PRECISION SUMC      ! Clipped sum of array (not used)
+
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM_ definitions for type conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM_ declarations for type
+                                 ! conversions
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+* Initialise the statistics to the bad values, particularly in case
+* there are no good values within the array.
+      SUM = 0.0D0
+      MEAN = VAL__BADD
+      MEDIAN = VAL__BADD
+      MODE = VAL__BADD
+      DMAX = VAL__BADD
+      DMIN = VAL__BADD
+      IMAX = VAL__BADI
+      IMIN = VAL__BADI
+      DO I = 1, NUMPER
+         PERVAL( I ) = VAL__BADD
+      END DO
+
+*  Find the mean and standard deviation, without clipping.  This is
+*  a change from the original where a histogram was used.  Given modern
+*  processors might as well compute an accurate mean at some small
+*  loss of efficiency.  Also the ainm was to remove the histogram
+*  creation from this routine.
+      CALL KPG1_STAT<T>( BAD, EL, DATA, 0, 0.0, NGOOD, IMIN, DMIN,
+     :                   IMAX, DMAX, SUM, MEAN, STDEV, NGOODC, IMINC,
+     :                   DMINC, IMAXC, DMAXC, SUMC, MEANC, STDEVC,
+     :                   STATUS )
+
+*  Derive the number of good pixels.
+      NINVAL = EL - NGOOD
+      IF ( NGOOD .GT. 0 ) THEN
+
+*  The number of bad pixels has been counted so it might be possible to
+*  save future processing.
+         BAD2 = NINVAL .NE. 0
+
+*  Obtain the median using a fine histogram, iterating the histogram
+*  limits if there are extreme outliers.  A merger with the percentiles,
+*  if any, would improve efficiency.
+         CALL KPG1_FRAC<T>( EL, DATA, 1, MEDFRA, BAD2, CLMEDF,
+     :                      MEDIAN, STATUS )
+
+*  The mode will be calculated from the approximation:
+*     mode = 3*median - 2*mean
+*  which assumes only slightly skewed distributions.
+         IF ( STATUS .EQ. SAI__OK ) THEN
+            MODE = ( 3.0 * MEDIAN ) - ( 2.0 * MEAN )
+
+*  The mode is clearly undefined when it lies outside the range of the
+*  histogram.
+            IF ( MODE .LT. NUM_DTO<T>( DMIN ) .OR.
+     :           MODE .GT. NUM_DTO<T>( DMAX ) ) MODE = VAL__BADD
+         END IF
+
+*  If there are percentiles to evaluate call a routine to do it,
+*  temporarily converting to fractions, as required by the routine.
+*  Otherwise return a flagged value.
+         IF ( NUMPER .EQ. 1 .AND. PERCNT( 1 ) .EQ. VAL__BADR ) THEN
+            PERVAL( 1 ) = VAL__BADD
+         ELSE
+            DO  I = 1, NUMPER
+               PERCNT( I ) = PERCNT( I ) * 0.01
+            END DO
+
+*  Obtain workspace for the clipped fractions.
+            CALL PSX_MALLOC( NUMPER * 4, FPNTR, STATUS )
+
+*  Obtain the percentiles using a fine histogram, iterating the
+*  histogram limits if there are extreme outliers.
+            CALL KPG1_FRAC<T>( EL, DATA, NUMPER, PERCNT, BAD, 
+     :                         %VAL( FPNTR ), PERVAL, STATUS )
+
+*  Release the workspace.
+            CALL PSX_FREE( FPNTR, STATUS )
+
+            DO  I = 1, NUMPER
+               PERCNT( I ) = PERCNT( I ) * 100.0
+            END DO
+         END IF
+      END IF
+
+      END
