@@ -22,4 +22,8 @@ v1.1-0 (December 1999):
    that is certain things which the previous parser got right the new one
    doesn't, and vice versa.
 
+   The indexer program may now be invoked with the flag '-update', in which
+   case it will only perform indexing for files which do not appear to have
+   up to date indexes already.
+
 # $Id$
