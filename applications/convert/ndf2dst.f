@@ -205,6 +205,7 @@
       CHARACTER*(DAT__SZLOC) LF     ! Figaro output structure locator
       CHARACTER*(DAT__SZLOC) LFAX   ! A Figaro axis locator
       CHARACTER*(DAT__SZLOC) LFAXD  ! Figaro AXIS DATA locator
+      CHARACTER*(DAT__SZLOC) LFAXDA ! Figaro AXIS DATA_ARRAY locator
       CHARACTER*(DAT__SZLOC) LFAXL  ! Figaro AXIS LABEL  locator
       CHARACTER*(DAT__SZLOC) LFAXU  ! Figaro AXIS UNITS locator
       CHARACTER*(DAT__SZLOC) LFAXV  ! Figaro AXIS VARIANCE locator
@@ -657,7 +658,7 @@
 *               top-level axis centres.  Therefore we have to check for
 *               the existence of the axis centres, variances, and
 *               widths.
-                  CALL DAT_THERE( LOCF, 'DATA', AXDATA, STATUS )
+                  CALL DAT_THERE( LOCF, 'DATA_ARRAY', AXDATA, STATUS )
                   CALL DAT_THERE( LOCF, 'VARIANCE', AXVAR, STATUS )
                   CALL DAT_THERE( LOCF, 'WIDTH', AXWIDT, STATUS )
 
@@ -685,8 +686,14 @@
 *         components will be lost.
 
 *         First the (1-dimensional) data array if there is not an
-*         axis-centre array already.
-            IF ( .NOT. AXDATA ) THEN
+*         axis-centre array already, otherwise just use the existing
+*         array after renaming from NDF STANDARD to DST nomenclature.
+            IF ( AXDATA ) THEN
+               CALL DAT_FIND( LFAX, 'DATA_ARRAY', LFAXDA, STATUS )
+               CALL DAT_RENAM( LFAXDA, 'DATA', STATUS )
+               CALL DAT_ANNUL( LFAXDA, STATUS )
+
+            ELSE
 
 *            Map the axis data array with the appropriate type.
                CALL NDF_ATYPE( NDF, 'Centre', IAXIS, TYPE, STATUS )
