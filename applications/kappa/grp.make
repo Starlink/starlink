@@ -300,10 +300,10 @@ sun95_agi7.eps sun95_ardwork.eps kappa.news
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
 UNIX_RELEASE =  $(UNIX_OTHERS) \
-$(kappa_source) $(aif_sub) $(fts_sub) $(irm_sub) $(kapgen_sub) \
-$(kappa_data_alpha_OSF1) $(kappa_data_ix86_Linux) $(kappa_data_sun4_Solaris) \
-$(kappa_ifls) $(kappa_source) $(kappa_sub) $(kapsub_sub) $(kapview_sub) \
-$(ndfpack_sub) 
+$(KAPPA_SOURCE) $(AIF_SUB) $(FTS_SUB) $(IRM_SUB) $(KAPGEN_SUB) \
+$(KAPPA_DATA_ALPHA_OSF1) $(KAPPA_DATA_IX86_LINUX) $(KAPPA_DATA_SUN4_SOLARIS) \
+$(KAPPA_IFLS) $(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SUB) $(KAPVIEW_SUB) \
+$(NDFPACK_SUB) 
 
 #  The contents of kappa.tar.
 UNIX_TOTAL = kappa_source.tar makefile mk sun95.tex sun95_agi1.eps \
