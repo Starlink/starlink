@@ -642,7 +642,7 @@
       DOUBLE PRECISION WORK(MAXRAN*2)    !Workspace array
 *    Import-Export :
       DOUBLE PRECISION START(NT),END(NT) !Start and end time of a time bin
-      REAL EXPOS(NT)                     !Exposure in each time bin
+      DOUBLE PRECISION EXPOS(NT)         !Exposure in each time bin
 *    Export :
 *     <declarations and descriptions for exported arguments>
 *    Status :
@@ -655,7 +655,7 @@
       RECORD /XRT_SCFDEF/ SRT            !Sort control structure
       RECORD /XRT_HEAD/ RAWHD            !Raw data header structure
 *
-      REAL TBIT
+      DOUBLE PRECISION TBIT
       INTEGER TLP,LP2
       CHARACTER*50 VERS                  !SASS processing version date
       INTEGER SPTR,UPTR                  !Pointers to time arrays
@@ -720,7 +720,7 @@
 * Calculate the exposure time in each bin
          DO TLP=1,NT
 *
-            EXPOS(TLP) = 0.0
+            EXPOS(TLP) = 0.0D0
 *
 *    Find upper and lower values of this time bin
             START(TLP) = HEAD.TMIN(1) + HEAD.TSCALE(1) * (TLP-1)
@@ -1423,7 +1423,7 @@ D        WRITE(*,*) RLP
       REAL VIMCOR(NX,NY,NP)           ! IMAGE vignetting correction
       REAL VCORR(NR)                  ! Non-image vignetting correction
       REAL WCORR(NWIRE)               ! Wires correction
-      REAL EXPOS(NT)                  ! Exposure times
+      DOUBLE PRECISION EXPOS(NT)      ! Exposure times
 *    Import-Export :
       REAL DATA(NX,NY,NT,NP,NR)       ! Data array
       REAL VAR(NX,NY,NT,NP,NR)        ! Variance array
@@ -1433,7 +1433,7 @@ D        WRITE(*,*) RLP
 *    Local variables :
       CHARACTER*(DAT__SZLOC) HLOC     ! Locator to header block
       REAL TOT_CORR                   ! Total correction factor for this bin
-      REAL EFF_EXPOS		      ! Effective exposure
+      DOUBLE PRECISION EFF_EXPOS      ! Effective exposure
       INTEGER PLP,TLP,XLP,YLP,RLP
 
 *-
@@ -1451,7 +1451,7 @@ D        WRITE(*,*) RLP
                   IF (NX .GT. 1) VCORR(RLP) = VIMCOR(XLP,YLP,PLP)
 *
 *       Check exposure time is non-zero
-                  IF (EXPOS(TLP) .GT. 0.0 .AND.
+                  IF (EXPOS(TLP) .GT. 0.0D0 .AND.
      &               QUAL(XLP,YLP,TLP,PLP,RLP) .EQ. QUAL__GOOD) THEN
 *
                      TOT_CORR = DCORR(TLP) * TCORR(1) * PCORR *
@@ -1488,7 +1488,7 @@ D        WRITE(*,*) RLP
       IF (NT.EQ.1) THEN
         EFF_EXPOS=EXPOS(1)/DCORR(1)
         CALL ADI1_LOCHEAD( FID, .FALSE., HLOC, STATUS)
-        CALL HDX_PUTR( HLOC, 'EFF_EXPOSURE', 1, EFF_EXPOS, STATUS )
+        CALL HDX_PUTD( HLOC, 'EFF_EXPOSURE', 1, EFF_EXPOS, STATUS )
       ENDIF
 
  999  IF (STATUS .NE. SAI__OK) THEN
@@ -2094,7 +2094,7 @@ D        WRITE(*,*) RLP
       CALL DAT_ANNUL(PLOC, STATUS)
 *
 * Get exposure time
-      CALL CMP_GET0R(HLOC, 'EXPOSURE_TIME', HEAD.EXPOS, STATUS)
+      CALL CMP_GET0D(HLOC, 'EXPOSURE_TIME', HEAD.EXPOS, STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error obtaining exposure time from datafile')

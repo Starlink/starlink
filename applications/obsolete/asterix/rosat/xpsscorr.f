@@ -83,7 +83,7 @@
       CHARACTER*1 MODE               ! Operation mode 'C' or 'E'
 
       REAL        MEAN_EN            ! Photon energy used in PSS (keV)
-      REAL        EXPOS              ! Exposure time of searched image
+      DOUBLE PRECISION       EXPOS   ! Exposure time of searched image
 
       INTEGER     CFPTR, ECFPTR      ! Pointers to corrected flux and errors
       INTEGER     FPTR, EFPTR        ! Pointers to flux and errors
@@ -114,7 +114,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'XPSSCORR Version 2.2-0' )
+        PARAMETER 		( VERSION = 'XPSSCORR Version rbtest' )
 *-
 
 *    Check status
@@ -258,7 +258,7 @@
       IF ( INDEX(DET, 'HRI') .NE. 0) THEN
 
 *    Get raw exposure time
-        CALL ADI_CGET0R( TIMID, 'Exposure', EXPOS, STATUS )
+        CALL ADI_CGET0D( TIMID, 'Exposure', EXPOS, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP( ' ', 'Error reading exposure time', STATUS )
           GOTO 999
@@ -290,7 +290,7 @@
             IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *      Get exposure time
-            CALL ADI_CGET0R( TIMID, 'Exposure', EXPOS, STATUS )
+            CALL ADI_CGET0D( TIMID, 'Exposure', EXPOS, STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
               CALL ERR_REP( ' ', 'Error reading exposure time', STATUS )
               GOTO 999
@@ -463,7 +463,7 @@
       INTEGER NED                 ! Flux error items per source
       REAL EFLUX(NED,*)           ! Flux errors
       REAL MEAN_EN                ! Energy used in source search (keV)
-      REAL EXPOS                  ! Exposure time (seconds)
+      DOUBLE PRECISION EXPOS      ! Exposure time (seconds)
       LOGICAL LWIRE               ! Correct for wire absorption ?
 *    Import-Export :
 *    Export :
@@ -585,7 +585,7 @@
       INTEGER NED                 ! Flux error items per source
       REAL EFLUX(NED,*)           ! Flux errors
       REAL MEAN_EN                ! Energy used in source search (keV)
-      REAL EXPOS                  ! Exposure time (seconds)
+      DOUBLE PRECISION EXPOS      ! Exposure time (seconds)
       LOGICAL LWIRE               ! Correct for the wires ?
 *    Import-Export :
 *    Export :
@@ -607,7 +607,7 @@
       REAL PSF                    ! 90% radius (degs)
       REAL PIXRAD                 !    "       (EXPO MAP PIXELS)
       REAL SUM                    ! Total exposure in source pixels
-      REAL EXPO_TIM               ! Mean exposure time for source
+      DOUBLE PRECISION EXPO_TIM   ! Mean exposure time for source
       REAL WFACTOR                ! Correction factor for the thin/thick wires
       REAL XSTART,YSTART          ! Start of exposure map axes
 *    Local data :
@@ -678,10 +678,10 @@
             ENDDO
           ENDDO
         END IF
-        EXPO_TIM = SUM / REAL(CNT)
+        EXPO_TIM = SUM / DBLE(CNT)
 
 *      Find corrected flux, assuming exposure time none zero
-        IF (EXPO_TIM .GT. 0.0) THEN
+        IF (EXPO_TIM .GT. 0.0D0) THEN
           CFLUX(SLP) = FLUX(SLP) * WFACTOR / EXPO_TIM
         ELSE
           CFLUX(SLP) = -9999.0
@@ -690,7 +690,7 @@
 *      Set errors if present
         IF ( GOT_ERRORS ) THEN
           DO ELP = 1, NED
-            IF (EXPO_TIM.GT.0.0) THEN
+            IF (EXPO_TIM.GT.0.0D0) THEN
               ECFLUX(ELP,SLP) = EFLUX(ELP,SLP) * WFACTOR / EXPO_TIM
             ELSE
               ECFLUX(ELP,SLP) = -9999.0
@@ -732,7 +732,7 @@
       LOGICAL GOT_ERRORS          ! Flux errors there
       INTEGER NED                 ! Flux error items per source
       REAL EFLUX(NED,*)           ! Flux errors
-      REAL EXPOS                  ! Exposure time (seconds)
+      DOUBLE PRECISION EXPOS      ! Exposure time (seconds)
 *    Import-Export :
 *    Export :
       REAL CFLUX(NSRC)            ! Flux conversion factors
