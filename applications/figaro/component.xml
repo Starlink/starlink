@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="figaro">
+  <version>5.6-2</version>
+  <path>applications/figaro</path>
+  <description>FIGARO general data-reduction system</description>
+  <abstract><p>
+Figaro is a general-purpose data reduction package.
+The programs it contains can be used to process a
+wide range of images and spectra.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build>pda</build><build>agi</build><build>grp</build><build>ndf</build><build>fio</build><build>idi</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Keith Shortridge</name>
+    </person>
+    <person>
+      <name>Horst Meyerdierks</name>
+    </person>
+    <person>
+      <name>Martin Clayton</name>
+    </person>
+    <person>
+      <name>Jon Lockley</name>
+    </person>
+    <person>
+      <name>Anne Charles</name>
+    </person>
+    <person>
+      <name>Clive Davenhall</name>
+    </person>
+    <person>
+      <name>Malcolm Currie</name>
+      <uname>mjc</uname>
+    </person>
+    <person>
+      <name>Mark Taylor</name>
+    </person>
+    <person>
+      <name>Tim Ash</name>
+    </person>
+    <person>
+      <name>Tim Wilkins</name>
+    </person>
+    <person>
+      <name>Dave Axon</name>
+    </person>
+    <person>
+      <name>John Palmer</name>
+    </person>
+    <person>
+      <name>Anthony Holloway</name>
+    </person>
+    <person>
+      <name>Vito Graffagnino</name>
+    </person>
+  </developers>
+  <documentation> sun86</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
