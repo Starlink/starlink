@@ -2,7 +2,7 @@ package PDL::IO::GSD;
 
 =head1 NAME
 
-  PDL::IO::GSD - PDL module for reading JCMT GSD format files
+PDL::IO::GSD - PDL module for reading JCMT GSD format files
 
 =head1 SYNOPSIS
 
