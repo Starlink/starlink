@@ -21,7 +21,7 @@ lpg_crep.f lpg_state.f
 C_FILES = lpg1_rm.c lpg1_sleep.c
 
 #  Text files destined for UNIX release lpg_source.tar.
-OTHER_UNIX_SOURCES = lpg_dev lpg_link lpg_link_adam lpg_test.f 
+OTHER_UNIX_SOURCES = lpg_dev lpg_link lpg_link_adam lpg_test.f lpg_test.ifl
 
 #  Documentation files.
 DOCUMENTATION = lpg.news 
