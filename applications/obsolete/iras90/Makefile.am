@@ -60,6 +60,31 @@ data/psf61.sdf data/psf62.sdf data/newspfarch.sdf data/profiles.sdf
 DATA_FILES = specresp12.sdf specresp25.sdf \
 specresp60.sdf specresp100.sdf
 
+# Makeresp needs to be done as a soft link prior to install
+makeresp: iras90_pm
+	$(LN_S) iras90_pm makeresp
+
+
+# DATA files are generated
+specresp12.sdf: makeresp makeresp.ifc
+	./makeresp specresp12 12
+
+specresp25.sdf: makeresp makeresp.ifc
+	./makeresp specresp25 25
+
+specresp60.sdf: makeresp makeresp.ifc
+	./makeresp specresp60 60
+
+specresp100.sdf: makeresp makeresp.ifc
+	./makeresp specresp100 100
+
+
+# Define the help source file.
+starhelp_DATA = iras90_help.shl
+
+.hlp.shl:
+	@HLIB@ $<
+
 
 # Fixup scripts with bin location
 # The scripts needs to have installation locations edited into them
