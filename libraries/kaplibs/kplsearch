@@ -5,14 +5,14 @@
 #     kplsearch
 
 #  Purpose:
-#     Display names of kaplibs routines (see SUN/238) which contain
+#     Display names of KAPLIBS routines (see SUN/238) which contain
 #     a given search phrase in their short description.
 
 #  Language:
 #     tcl
 
 #  Description:
-#     This script displays names of kaplibs routines which contain
+#     This script displays names of KAPLIBS routines which contain
 #     a given search phrase (or any of its sub-strings) in their 
 #     short description ("Purpose"). By default, routines from all the 
 #     KAPLIBS libraries are included, but the search can be restricted 
@@ -219,7 +219,7 @@ proc search {test words} {
 #  display help and abort.
    if { !$ok || ![info exists phrase] } {
       puts ""
-      puts "Displays names of kaplibs routines (see SUN/238) which contain"
+      puts "Displays names of KAPLIBS routines (see SUN/238) which contain"
       puts "a given search phrase (or any of its sub-strings) in their"
       puts "short descriptions, or names. By default, routines from all the"
       puts "KAPLIBS libraries are included, but the search can be restricted"
