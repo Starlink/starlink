@@ -12,6 +12,7 @@
 *
 *	Last modify:	20/07/99
 *                       20/03/00 (PWD): Added RAD0-RAD15 parameters.
+*                       19/07/01 (PWD): Added BKGSIG parameter for GIM2D.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -134,6 +135,8 @@ keystruct	objkey[] = {
 	&outobj2.kronfactor, H_FLOAT, T_FLOAT, "%5.2f", ""},
   {"BACKGROUND", "Background at centroid position",
 	&outobj.bkg, H_FLOAT, T_FLOAT, "%12g", "count"},
+  {"BKGSIG", "Local background standard deviation",
+	&outobj.sigbkg, H_FLOAT, T_FLOAT, "%12g", "count"},
   {"THRESHOLD", "Detection threshold above background",
 	&outobj.dthresh, H_FLOAT, T_FLOAT, "%12g", "count"},
   {"FLUX_MAX", "Peak flux above background",

@@ -7,9 +7,12 @@
  The output format for the X_WORLD and Y_WORLD fields has been 
  changed to always give at least 0.01 arcsecond accuracy.
 
+ EXTRACTOR and SExtractor have modified to offer the BKGSIG parameter
+ (local background sigma) option used by GIM2D.
+
  EXTRACTOR is described in SUN/226, which can be viewed on-line by the
  command:
 
     % showme sun226
 
- Peter W. Draper 12th June 2001 (extractor@star.rl.ac.uk).
+ Peter W. Draper 19th July 2001 (extractor@star.rl.ac.uk).

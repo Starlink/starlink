@@ -15,6 +15,7 @@
 *                       units, coordinate outputs to use format "%15.8g"
 *                       (from %15e). This gets to 0.01 precision in
 *                       arcsec.
+*                       19/07/01 PWD: added BKGSIG for GIM2D people.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 
@@ -136,6 +137,8 @@ keystruct	objkey[] = {
 	&outobj2.kronfactor, H_FLOAT, T_FLOAT, "%5.2f", ""},
   {"BACKGROUND", "Background at centroid position",
 	&outobj.bkg, H_FLOAT, T_FLOAT, "%12g", "count"},
+  {"BKGSIG", "Local background standard deviation",
+        &outobj.sigbkg, H_FLOAT, T_FLOAT, "%12g", "count"},
   {"THRESHOLD", "Detection threshold above background",
 	&outobj.dthresh, H_FLOAT, T_FLOAT, "%12g", "count"},
   {"FLUX_MAX", "Peak flux above background",
