@@ -37,6 +37,7 @@ _________________________________________________________________
 
 -----------------------------------------------------------------
      Main data array     -> .Z.DATA
+     Imaginary array     -> .Z.IMAGINARY
      Bad-pixel flag      -> .Z.FLAGGED
      Units               -> .Z.UNITS
      Label               -> .Z.LABEL
@@ -145,3 +146,7 @@ MJC: Malcolm J. Currie (STARLINK)
     Checked whether or not AXIS().MORE.FIGARO.WIDTH is primitive.
     If it is, its DATA component becomes the new n-D axis-width
     array in the Figaro file.
+
+ 1996 July 17 (MJC):
+    Transfers the DATA_ARRAY.IMAGINARY_DATA component to
+    .Z.IMAGINARY

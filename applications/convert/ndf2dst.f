@@ -51,6 +51,7 @@
 *          NDF                   Figaro file
 *     -----------------------------------------------------------------
 *          Main data array     -> .Z.DATA
+*          Imaginary array     -> .Z.IMAGINARY
 *          Bad-pixel flag      -> .Z.FLAGGED
 *          Units               -> .Z.UNITS
 *          Label               -> .Z.LABEL
@@ -152,6 +153,9 @@
 *        Checked whether or not AXIS().MORE.FIGARO.WIDTH is primitive.
 *        If it is, its DATA component becomes the new n-D axis-width
 *        array in the Figaro file.
+*     1996 July 17 (MJC):
+*        Transfers the DATA_ARRAY.IMAGINARY_DATA component to
+*        .Z.IMAGINARY
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -193,22 +197,27 @@
       LOGICAL                BADPIX ! True if bad values may be present
                                     ! in the main data array
       INTEGER                CLEN   ! String length
+      LOGICAL                CMPLEX ! True if complex data array present
       INTEGER                CSTAT  ! Status value in CHR calls
       INTEGER                DIM(NDF__MXDIM)  ! Dimensions
       CHARACTER*(DAT__SZTYP) EXTTYP ! Extension type
       LOGICAL                EXIST  ! True if  a component is there
       INTEGER                FAXPTR ! Pointers to Figaro axis data
       INTEGER                FDPTR  ! Pointer to Figaro main data array
+
       INTEGER                FEPTR  ! Pointer to Figaro error array
-      LOGICAL                FLPRES ! Value of the .Z.FLAGGED component
-                                    ! in the DST
       CHARACTER*(FIO__SZFNM) FIGEXT ! Figaro extension
       CHARACTER*(FIO__SZFNM) FIGFIL ! Figaro filename
       LOGICAL                FIGMOR ! True if Figaro .MORE created
       LOGICAL                FIGOBS ! True if Figaro .OBS created
+      INTEGER                FIPTR  ! Pointer to Figaro imaginary array      LOGICAL                FLPRES ! Value of the .Z.FLAGGED component
+                                    ! in the DST
       CHARACTER*48           FITCOM ! FITS comment         
       CHARACTER*70           FITDAT ! FITS value
       CHARACTER*8            FITNAM ! FITS keyword          
+      LOGICAL                FLPRES ! Value of the .Z.FLAGGED component
+                                    ! in the DST
+      CHARACTER*(NDF__SZFTP) FTYPE  ! Full data type
       LOGICAL                HUSED  ! FITS header already exists if true
       INTEGER                I      ! Loop variable
       INTEGER                IAXIS  ! Axis number
@@ -237,6 +246,7 @@
       CHARACTER*(DAT__SZLOC) LFZ    ! Figaro '.Z' locator
       CHARACTER*(DAT__SZLOC) LFZD   ! Figaro '.Z.DATA' locator
       CHARACTER*(DAT__SZLOC) LFZE   ! Figaro '.Z.ERRORS' locator
+      CHARACTER*(DAT__SZLOC) LFZI   ! Figaro '.Z.IMAGINARY' locator
       CHARACTER*(DAT__SZLOC) LFZL   ! Figaro '.Z.LABEL' locator
       CHARACTER*(DAT__SZLOC) LFZU   ! Figaro '.Z.UNITS' locator
       CHARACTER*(DAT__SZLOC) LOCA   ! NDF axis-structure locator
@@ -269,6 +279,8 @@
       INTEGER                NELM   ! Number of elements
       INTEGER                NERR   ! Number of numerical errors
       INTEGER                NEXT   ! Counter for NDF extensions
+      INTEGER                NIPTR  ! Pointer to NDF imaginary data
+                                    ! array
       INTEGER                NVPTR  ! Pointer to NDF variance array
       CHARACTER*(DAT__SZLOC) NXFIG  ! NDF FIGARO extension locator
       CHARACTER*(DAT__SZLOC) NXFIGI ! NDF FIGARO.something locator
@@ -454,11 +466,21 @@
 *   ==============================
 *
 *   NDF data array -> OUTPUT.Z.DATA
+*   NDF imaginary component of data array -> OUTPUT.Z.IMAGINARY
+
+*  Obtain the full type of the data component.
+      CALL NDF_FTYPE( NDF, 'Data', FTYPE, STATUS )
+      CMPLEX = INDEX( FTYPE, 'COMPLEX' ) .NE. 0
 
 *   Map the NDF data array with the appropriate type.
-      CALL NDF_TYPE( NDF, 'DATA', TYPE, STATUS )
+      CALL NDF_TYPE( NDF, 'Data', TYPE, STATUS )
       CALL NDF_DIM( NDF, NDF__MXDIM, DIM, NDIM, STATUS )
-      CALL NDF_MAP( NDF, 'DATA', TYPE, 'READ', NDPTR, NELM, STATUS )
+      IF ( CMPLEX ) THEN
+         CALL NDF_MAPZ( NDF, 'Data', TYPE, 'READ', NDPTR, NIPTR, NELM,
+     :                  STATUS )
+      ELSE
+         CALL NDF_MAP( NDF, 'Data', TYPE, 'READ', NDPTR, NELM, STATUS )
+      END IF
 
 *   Create .Z structure in the Figaro file, if it does not exist, and
 *   get a locator to it.
@@ -477,13 +499,34 @@
 
 *   Find the number of bytes per value for the data type.  Move data
 *   into the Figaro data array.
-      CALL CON_TYPSZ (TYPE, NBYTES, STATUS )         
-      IF ((STATUS .EQ. SAI__OK) .AND. (NBYTES .GT. 0)) THEN
+      CALL CON_TYPSZ( TYPE, NBYTES, STATUS )
+      IF ( (STATUS .EQ. SAI__OK) .AND. (NBYTES .GT. 0) ) THEN
          CALL CON_MOVE( NBYTES*NELM, %VAL(NDPTR), %VAL(FDPTR), STATUS )
       END IF
-         
+
 *   Unmap .Z.DATA.
       CALL DAT_ANNUL( LFZD, STATUS )
+
+*   Now deal with any imaginary part of complex data.
+      IF ( CMPLEX ) THEN
+
+*   Create .Z.IMAGINARY in the Figaro file and get a locator to it.
+         CALL DAT_NEW( LFZ, 'IMAGINARY', TYPE, NDIM, DIM, STATUS )
+         CALL DAT_FIND( LFZ, 'IMAGINARY', LFZI, STATUS )
+
+*   Map .Z.IMAGINARY
+         CALL DAT_MAP( LFZI, TYPE, 'WRITE', NDIM, DIM, FIPTR, STATUS )
+
+*   Move imaginary data into the Figaro data array.
+         IF ( (STATUS .EQ. SAI__OK) .AND. (NBYTES .GT. 0) ) THEN
+            CALL CON_MOVE( NBYTES*NELM, %VAL(NIPTR), %VAL(FIPTR),
+     :                     STATUS )
+         END IF
+
+*   Unmap .Z.IMAGINARY
+         CALL DAT_ANNUL( LFZI, STATUS )
+
+      END IF
 
 *   Unmap NDF mapped arrays.
       CALL NDF_UNMAP( NDF, 'Data', STATUS )
