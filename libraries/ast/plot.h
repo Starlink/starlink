@@ -138,6 +138,11 @@ f        (i.e. "Gap" instead of "Gap(1)" or "Gap(2)") AST_SET sets the
 f        attribute for both axes to the supplied value, AST_CLEAR clears the 
 f        attributes for both axes, AST_TEST tests the attribute for axis 1, 
 f        and AST_GET gets the value for axis 1.
+*     Grf (int)
+*        This attribute, if non-zero, indicates that the graphics
+*        functions registered using astGrfFun are to be used to draw 
+*        graphics. Otherwise, the graphics interface selected at
+*        link-time (using ast_link options) is used.
 *     Grid (int)
 c        This attribute controls whether or not function astGrid should draw
 f        This attribute controls whether or not routine AST_GRID should draw
@@ -513,6 +518,8 @@ f     - Strings: Text strings drawn using AST_TEXT
 *     9-JAN-2001 (DSB):
 *        Change argument "in" for astMark and astPolyCurve from type
 *        "const double (*)[]" to "const double *".
+*     13-JUN-2001 (DSB):
+*        Added function astGrfFun, and attribute Grf.
 *-
 */
 
@@ -528,10 +535,20 @@ f     - Strings: Text strings drawn using AST_TEXT
 
 /* Macros. */
 /* ======= */
-#define AST__NPID   10           /* No. of different plot object id's */
+#define AST__NPID           10 /* No. of different plot object id's */
 
-#if defined(astCLASS)            /* Protected */
-#define AST__MXBRK 100           /* Max. no. of breaks in a drawn curve */
+
+#define AST__GATTR	0   /* Identifiers for GRF functions */
+#define AST__GAXSCALE	1
+#define AST__GFLUSH	2
+#define AST__GLINE	3
+#define AST__GMARK	4
+#define AST__GQCH	5
+#define AST__GTEXT	6
+#define AST__GTXEXT	7
+
+#if defined(astCLASS)          /* Protected */
+#define AST__MXBRK         100 /* Max. no. of breaks in a drawn curve */
 #endif
 
 /* Type Definitions */
@@ -578,6 +595,7 @@ typedef struct AstPlot {
    int drawtitle;
    int edge[ 2 ];
    int font[ AST__NPID ];
+   int grf;
    int grid;
    int labelling;
    int labelunits[ 2 ];
@@ -597,6 +615,16 @@ typedef struct AstPlot {
    int xrev;
    int yrev;      
    int ink;
+   void (* grffun[8])();
+   int (* GAttr)( struct AstPlot *, int, double, double *, int );
+   int (* GAxScale)( struct AstPlot *, float *, float * );
+   int (* GFlush)( struct AstPlot * );
+   int (* GLine)( struct AstPlot *, int, const float *, const float * );
+   int (* GMark)( struct AstPlot *, int, const float *, const float *, int );
+   int (* GQch)( struct AstPlot *, float *, float *);
+   int (* GText)( struct AstPlot *, const char *, float, float, const char *, float, float );
+   int (* GTxExt)( struct AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
+
 } AstPlot;
 
 /* Virtual function table. */
@@ -620,6 +648,8 @@ typedef struct AstPlotVtab {
    void (* GridLine)( AstPlot *, int, const double [], double );
    void (* Curve)( AstPlot *, const double [], const double [] );
    void (* PolyCurve)( AstPlot *, int, int, int, const double * );
+   void (* GrfFun)( AstPlot *, const char *, void (*)() );
+   void (* GrfWrapper)( AstPlot *, const char *, void (*)() );
    void (* Grid)( AstPlot * ); 
    void (* Mark)( AstPlot *, int, int, int, const double *, int  ); 
    void (* Text)( AstPlot *, const char *, const double [], const float [2], const char * );
@@ -643,6 +673,10 @@ typedef struct AstPlotVtab {
    int (* TestClipOp)( AstPlot * );
    void (* SetClipOp)( AstPlot *, int );
    void (* ClearClipOp)( AstPlot * );
+   int (* GetGrf)( AstPlot * );
+   int (* TestGrf)( AstPlot * );
+   void (* SetGrf)( AstPlot *, int );
+   void (* ClearGrf)( AstPlot * );
    int (* GetDrawTitle)( AstPlot * );
    int (* TestDrawTitle)( AstPlot * );
    void (* SetDrawTitle)( AstPlot *, int );
@@ -775,8 +809,12 @@ AstPlot *astLoadPlot_( void *, size_t, int, AstPlotVtab *,
    void astCurve_( AstPlot *, const double [], const double [] );
    void astGrid_( AstPlot * );
    void astMark_( AstPlot *, int, int, int, const double *, int  ); 
+   void astGrfFun_( AstPlot *, const char *, void (*)() );
    void astPolyCurve_( AstPlot *, int, int, int, const double * );
    void astText_( AstPlot *, const char *, const double [], const float [2], const char * );
+
+   void astGrfWrapper_( AstPlot *, const char *, void (*)() );
+   int astGrfFunID_( const char *, const char *, const char *  );
 
 #if defined(astCLASS)            /* Protected */
    int astCvBrk_( AstPlot *, int, double *, double *, double * );
@@ -805,6 +843,11 @@ AstPlot *astLoadPlot_( void *, size_t, int, AstPlotVtab *,
    int astTestClipOp_( AstPlot * );
    void astSetClipOp_( AstPlot *, int );
    void astClearClipOp_( AstPlot * );
+
+   int astGetGrf_( AstPlot * );
+   int astTestGrf_( AstPlot * );
+   void astSetGrf_( AstPlot *, int );
+   void astClearGrf_( AstPlot * );
 
    int astGetDrawTitle_( AstPlot * );
    int astTestDrawTitle_( AstPlot * );
@@ -993,6 +1036,14 @@ astINVOKE(V,astCurve_(astCheckPlot(this),start,finish))
 #define astPolyCurve(this,npoint,ncoord,dim,in) \
 astINVOKE(V,astPolyCurve_(astCheckPlot(this),npoint,ncoord,dim,in))
 
+#define astGrfFun(this,name,fun) \
+astINVOKE(V,astGrfFun_(astCheckPlot(this),name,fun))
+
+
+#define astGrfFunID astGrfFunID_
+
+#define astGrfWrapper(this,name,wrapper) \
+astINVOKE(V,astGrfWrapper_(astCheckPlot(this),name,wrapper))
 
 #if defined(astCLASS)            /* Protected */
 
@@ -1052,6 +1103,15 @@ astINVOKE(V,astGetClipOp_(astCheckPlot(this)))
 astINVOKE(V,astSetClipOp_(astCheckPlot(this),clipop))
 #define astTestClipOp(this) \
 astINVOKE(V,astTestClipOp_(astCheckPlot(this)))
+
+#define astClearGrf(this) \
+astINVOKE(V,astClearGrf_(astCheckPlot(this)))
+#define astGetGrf(this) \
+astINVOKE(V,astGetGrf_(astCheckPlot(this)))
+#define astSetGrf(this,grf) \
+astINVOKE(V,astSetGrf_(astCheckPlot(this),grf))
+#define astTestGrf(this) \
+astINVOKE(V,astTestGrf_(astCheckPlot(this)))
 
 #define astClearDrawTitle(this) \
 astINVOKE(V,astClearDrawTitle_(astCheckPlot(this)))

@@ -24,6 +24,7 @@
 *     AST_PLOT
 *     AST_POLYCURVE
 *     AST_TEXT   
+*     AST_GRFFUN
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -46,6 +47,8 @@
 *     9-JAN-2001 (DSB):
 *        Change argument "in" for astMark and astPolyCurve from type
 *        "const double (*)[]" to "const double *".
+*     13-JUN-2001 (DSB):
+*        Modified to add support for astGrfFun and EXTERNAL grf functions.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -54,13 +57,32 @@
    not be useful). */
 #define astFORTRAN77
 
+#define MXSTRLEN 80              /* String length at which truncation starts
+                                    within pgqtxt and pgptxt. */
 /* Header files. */
 /* ============= */
+#include "ast_err.h"             /* AST error codes */
 #include "f77.h"                 /* FORTRAN <-> C interface macros (SUN/209) */
 #include "c2f77.h"               /* F77 <-> C support functions/macros */
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Memory handling facilities */
 #include "plot.h"                /* C interface to the Plot class */
+#include "grf.h"                 /* Low-level graphics interface */
+
+/* Prototypes for external functions. */
+/* ================================== */
+/* This is the null function defined by the FORTRAN interface in
+fobject.c. */
+F77_SUBROUTINE(ast_null)( void );
+
+static int FGAttrWrapper( AstPlot *, int, double, double *, int );
+static int FGAxScaleWrapper( AstPlot *, float *, float * );
+static int FGFlushWrapper( AstPlot * );
+static int FGLineWrapper( AstPlot *, int, const float *, const float * );
+static int FGMarkWrapper( AstPlot *, int, const float *, const float *, int );
+static int FGQchWrapper( AstPlot *, float *, float *);
+static int FGTextWrapper( AstPlot *, const char *, float, float, const char *, float, float );
+static int FGTxExtWrapper( AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
 
 F77_LOGICAL_FUNCTION(ast_isaplot)( INTEGER(THIS),
                                    INTEGER(STATUS) ) {
@@ -194,6 +216,25 @@ F77_SUBROUTINE(ast_mark)( INTEGER(THIS),
    )
 }
 
+F77_SUBROUTINE(ast_polycurve)( INTEGER(THIS),
+                               INTEGER(NPOINT),
+                               INTEGER(NCOORD),
+                               INTEGER(INDIM),
+                               DOUBLE_ARRAY(IN),
+                               INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(NPOINT)
+   GENPTR_INTEGER(NCOORD)
+   GENPTR_INTEGER(INDIM)
+   GENPTR_DOUBLE_ARRAY(IN)
+
+   astAt( "AST_POLYCURVE", NULL, 0 );
+   astWatchSTATUS(
+      astPolyCurve( astI2P( *THIS ), *NPOINT, *NCOORD, *INDIM,
+                (const double *)IN );
+   )
+}
+
 F77_SUBROUTINE(ast_text)( INTEGER(THIS),
                           CHARACTER(TEXT), 
                           DOUBLE_ARRAY(POS),
@@ -219,21 +260,175 @@ F77_SUBROUTINE(ast_text)( INTEGER(THIS),
    )
 }
 
-F77_SUBROUTINE(ast_polycurve)( INTEGER(THIS),
-                               INTEGER(NPOINT),
-                               INTEGER(NCOORD),
-                               INTEGER(INDIM),
-                               DOUBLE_ARRAY(IN),
-                               INTEGER(STATUS) ) {
+F77_SUBROUTINE(ast_grffun)( INTEGER(THIS), CHARACTER(NAME), 
+                            void (* FUN)(), INTEGER(STATUS)
+                            TRAIL(NAME) ) {
    GENPTR_INTEGER(THIS)
-   GENPTR_INTEGER(NPOINT)
-   GENPTR_INTEGER(NCOORD)
-   GENPTR_INTEGER(INDIM)
-   GENPTR_DOUBLE_ARRAY(IN)
+   GENPTR_CHARACTER(NAME)
+   char *name;
+   void (* fun)();
+   const char *class;      /* Object class */
+   const char *method;     /* Current method */
+   int ifun;               /* Index into grf function list */
+   void (* wrapper)();     /* Wrapper function for C Grf routine*/
 
-   astAt( "AST_POLYCURVE", NULL, 0 );
+   method = "AST_GRFFUN";
+   class = "Plot";
+
+   astAt( "AST_GRFFUN", NULL, 0 );
    astWatchSTATUS(
-      astPolyCurve( astI2P( *THIS ), *NPOINT, *NCOORD, *INDIM,
-                (const double *)IN );
+
+/* Set the function pointer to NULL if a pointer to
+   the null routine AST_NULL has been supplied. */
+      fun = FUN;
+      if ( fun == (void (*)()) F77_EXTERNAL_NAME(ast_null) ) {
+         fun = NULL;
+      }
+
+      name = astString( NAME, NAME_length );
+      astGrfFun( astI2P( *THIS ), name, fun );
+
+      ifun = astGrfFunID( name, method, class );
+
+      if( ifun == AST__GATTR ) {
+         wrapper = (void (*)()) FGAttrWrapper;
+      } else if( ifun == AST__GAXSCALE ) {
+         wrapper = (void (*)()) FGAxScaleWrapper;
+      } else if( ifun == AST__GFLUSH ) {
+         wrapper = (void (*)()) FGFlushWrapper;
+      } else if( ifun == AST__GLINE ) {
+         wrapper = (void (*)()) FGLineWrapper;
+      } else if( ifun == AST__GMARK ) {
+         wrapper = (void (*)()) FGMarkWrapper;
+      } else if( ifun == AST__GQCH ) {
+         wrapper = (void (*)()) FGQchWrapper;
+      } else if( ifun == AST__GTEXT ) {
+         wrapper = (void (*)()) FGTextWrapper;
+      } else if( ifun == AST__GTXEXT ) {
+         wrapper = (void (*)()) FGTxExtWrapper;
+      } else if( astOK ) {
+         astError( AST__INTER, "%s(%s): AST internal programming error - "
+                   "Grf function id %d not yet supported.", method, class,
+                   ifun );
+      }
+      astGrfWrapper( astI2P( *THIS ), name, wrapper );
    )
 }
+
+static int FGAttrWrapper( AstPlot *this, int attr, double value, 
+                          double *old_value, int prim ) {
+   if ( !astOK ) return 0;
+   return ( *(int (*)( INTEGER(attr), DOUBLE(value), DOUBLE(old_value),
+                       INTEGER(prim) ))
+                  this->grffun[ AST__GATTR ])(  INTEGER_ARG(&attr),
+                                                DOUBLE_ARG(&value), 
+                                                DOUBLE_ARG(old_value),  
+                                                INTEGER_ARG(&prim) );
+}
+
+static int FGAxScaleWrapper( AstPlot *this, float *alpha, float *beta ) {
+   if ( !astOK ) return 0;
+   return ( *(int (*)( REAL(alpha), REAL(beta) ))
+                  this->grffun[ AST__GAXSCALE ])( REAL_ARG(alpha),
+                                                  REAL_ARG(beta) );
+}
+
+static int FGFlushWrapper( AstPlot *this ) {
+   if ( !astOK ) return 0;
+   return ( *(int (*)()) this->grffun[ AST__GFLUSH ])();
+}
+
+static int FGLineWrapper( AstPlot *this, int n, const float *x, 
+                          const float *y ) {
+   if ( !astOK ) return 0;
+   return ( *(int (*)( INTEGER(n), REAL_ARRAY(x), REAL_ARRAY(y) ))
+                  this->grffun[ AST__GLINE ])(  INTEGER_ARG(&n),
+                                                REAL_ARRAY_ARG(x), 
+                                                REAL_ARRAY_ARG(y) );
+}
+
+static int FGMarkWrapper( AstPlot *this, int n, const float *x, 
+                          const float *y, int type ) {
+   if ( !astOK ) return 0;
+   return ( *(int (*)( INTEGER(n), REAL_ARRAY(x), REAL_ARRAY(y),
+                       INTEGER(type) ))
+                  this->grffun[ AST__GMARK ])(  INTEGER_ARG(&n),
+                                                REAL_ARRAY_ARG(x), 
+                                                REAL_ARRAY_ARG(y),
+                                                INTEGER_ARG(&type) );
+}
+
+static int FGQchWrapper( AstPlot *this, float *chv, float *chh ) {
+   if ( !astOK ) return 0;
+   return ( *(int (*)( REAL(chv), REAL(chh) ))
+                  this->grffun[ AST__GQCH ])( REAL_ARG(chv),
+                                              REAL_ARG(chh) );
+}
+
+static int FGTextWrapper( AstPlot *this, const char *text, float x, float y,
+                          const char *just, float upx, float upy ) {
+
+   DECLARE_CHARACTER(LTEXT,MXSTRLEN);
+   DECLARE_CHARACTER(LJUST,MXSTRLEN);
+   int ftext_length;
+   int fjust_length;
+
+   if ( !astOK ) return 0;
+
+   ftext_length = strlen( text );
+   if( ftext_length > LTEXT_length ) ftext_length = LTEXT_length;
+   astStringExport( text, LTEXT, ftext_length );
+
+   fjust_length = strlen( just );
+   if( fjust_length > LJUST_length ) fjust_length = LJUST_length;
+   astStringExport( just, LJUST, fjust_length );
+
+   return ( *(int (*)( CHARACTER(LTEXT), REAL(x), REAL(y),
+                       CHARACTER(LJUST), REAL(upx), REAL(upy)
+                       TRAIL(ftext) TRAIL(fjust) ) )
+                  this->grffun[ AST__GTEXT ])( 
+                                      CHARACTER_ARG(LTEXT),
+                                      REAL_ARG(&x),
+                                      REAL_ARG(&y), 
+                                      CHARACTER_ARG(LJUST),
+                                      REAL_ARG(&upx), 
+                                      REAL_ARG(&upy) 
+                                      TRAIL_ARG(ftext) 
+                                      TRAIL_ARG(fjust) );
+}
+
+static int FGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
+                           const char *just, float upx, float upy, float *xb, 
+                           float *yb ) {
+   DECLARE_CHARACTER(LTEXT,MXSTRLEN);
+   DECLARE_CHARACTER(LJUST,MXSTRLEN);
+   int ftext_length;
+   int fjust_length;
+
+   if ( !astOK ) return 0;
+
+   ftext_length = strlen( text );
+   if( ftext_length > LTEXT_length ) ftext_length = LTEXT_length;
+   astStringExport( text, LTEXT, ftext_length );
+
+   fjust_length = strlen( just );
+   if( fjust_length > LJUST_length ) fjust_length = LJUST_length;
+   astStringExport( just, LJUST, fjust_length );
+
+   return ( *(int (*)( CHARACTER(LTEXT), REAL(x), REAL(y),
+                       CHARACTER(LJUST), REAL(upx), REAL(upy),
+                       REAL_ARRAY(xb), REAL_ARRAY(yb) TRAIL(ftext) 
+                       TRAIL(fjust) ) )
+                  this->grffun[ AST__GTXEXT ])( 
+                                                CHARACTER_ARG(LTEXT),
+                                                REAL_ARG(&x),
+                                                REAL_ARG(&y), 
+                                                CHARACTER_ARG(LJUST),
+                                                REAL_ARG(&upx), 
+                                                REAL_ARG(&upy),
+                                                REAL_ARRAY_ARG(xb),
+                                                REAL_ARRAY_ARG(yb)
+                                                TRAIL_ARG(ftext) 
+                                                TRAIL_ARG(fjust) );
+}
+

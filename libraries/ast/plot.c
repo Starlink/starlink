@@ -77,6 +77,7 @@ f     AST_CLIP) to limit the extent of any plotting you perform, and
 *     - Edge(axis): Which edges to label in a Plot
 *     - Font(element): Character font for a Plot element
 *     - Gap(axis): Interval between major axis values of a Plot
+*     - Grf: Select the graphics interface to use.
 *     - Grid: Draw grid lines for a Plot?
 *     - LabelAt(axis): Where to place numerical labels for a Plot
 *     - LabelUnits(axis): Use axis unit descriptions in a Plot?
@@ -272,6 +273,8 @@ f     using AST_GRID
 *     22-MAY-2001 (DSB):
 *        Added a check when using interior labelling, to ensure that the
 *        most appropriate edges are used for text labels.
+*     13-JUN-2001 (DSB):
+*        Added public method astGrfFun.
 *class--
 */
 
@@ -1162,6 +1165,7 @@ static const char *xlbling[2] = { "interior", "exterior" };
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+
 static double GetTol( AstPlot * );
 static int TestTol( AstPlot * );
 static void ClearTol( AstPlot * );
@@ -1191,6 +1195,11 @@ static int GetClipOp( AstPlot * );
 static int TestClipOp( AstPlot * );
 static void ClearClipOp( AstPlot * );
 static void SetClipOp( AstPlot *, int );
+
+static int GetGrf( AstPlot * );
+static int TestGrf( AstPlot * );
+static void ClearGrf( AstPlot * );
+static void SetGrf( AstPlot *, int );
 
 static int GetDrawTitle( AstPlot * );
 static int TestDrawTitle( AstPlot * );
@@ -1312,6 +1321,12 @@ static int TestAttrib( AstObject *, const char * );
 static void ClearAttrib( AstObject *, const char * );
 static void SetAttrib( AstObject *, const char * );
 
+#if 0
+/* ENABLE-ESCAPE - Add the following prototype when escape sequences
+   are enabled. */
+static int DrawText( AstPlot *, int, const char *, float, float, const char *, float, float, const char *, const char * );
+#endif
+
 static AstFrameSet *Fset2D( AstFrameSet *, int );
 static AstPointSet *DefGap( AstPlot *, double *, int *, double *, int *, const char *, const char * );
 static AstPointSet *Trans( AstPlot *, AstFrame *, AstMapping *, AstPointSet *, int, AstPointSet *, int, const char *, const char * );
@@ -1331,6 +1346,14 @@ static int Border( AstPlot * );
 static int Boundary( AstPlot *, const char *, const char * );
 static int BoxCheck( float *, float *, float *, float * );
 static int BoxText( AstPlot *, int, const char *, float, float, const char *, float, float, float *, float *, const char *, const char * );
+static int CGAttrWrapper( AstPlot *, int, double, double *, int );
+static int CGAxScaleWrapper( AstPlot *, float *, float * );
+static int CGFlushWrapper( AstPlot * );
+static int CGLineWrapper( AstPlot *, int, const float *, const float * );
+static int CGMarkWrapper( AstPlot *, int, const float *, const float *, int );
+static int CGQchWrapper( AstPlot *, float *, float *);
+static int CGTextWrapper( AstPlot *, const char *, float, float, const char *, float, float );
+static int CGTxExtWrapper( AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
 static int CheckLabels( AstFrame *, int, double *, int, char ** );
 static int ChrLen( const char * );
 static int Compare_LL( const void *, const void * );
@@ -1338,39 +1361,44 @@ static int Compared( const void *, const void * );
 static int CountGood( int, double * );
 static int Cross( float, float, float, float, float, float, float, float );
 static int CvBrk( AstPlot *, int, double *, double *, double * );
-#if 0
-/* ENABLE-ESCAPE - Add the following prototype when escape sequences
-   are enabled. */
-static int DrawText( AstPlot *, int, const char *, float, float, const char *, float, float, const char *, const char * );
-#endif
 static int EdgeCrossings( AstPlot *, int, int, double, double *, double **, const char *, const char * );
 static int EdgeLabels( AstPlot *, int, TickInfo **, CurveData **, const char *, const char * );
 static int FindMajTicks( AstFrame *, int, double, double , double *, int, double *, double ** );
 static int FindMajTicks2( int, double, double, int, double *, double ** );
-static int FullForm( const char *, const char *, const char *, const char *, const char * );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
+static int FullForm( const char *, const char *, const char *, const char *, const char * );
 static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **, AstPointSet **, double *, double *, double *, double *, int *, const char *, const char *);
 static int GrText( AstPlot *, int, const char *, int, int, float, float, float, float, float *, float *, const char *, const char * );
 static int Inside( int, float *, float *, float, float);
 static int Overlap( AstPlot *, int, const char *, float, float, const char *, float, float, float **, const char *, const char *);
-static int swapEdges( AstPlot *, TickInfo **, CurveData ** );
 static int Ustrcmp( const char *, const char * );
 static int Ustrncmp( const char *, const char *, size_t );
+static int swapEdges( AstPlot *, TickInfo **, CurveData ** );
 static void AddCdt( CurveData *, CurveData *, const char *, const char * );
-static void Apoly( float, float, const char *, const char * );
+static void Apoly( AstPlot *, float, float, const char *, const char * );
 static void AxPlot( AstPlot *, int, const double *, double, int, CurveData *, int, const char *, const char * );
-static void Bpoly( float, float, const char *, const char * );
+static void Bpoly( AstPlot *, float, float, const char *, const char * );
 static void Clip( AstPlot *, int, const double [], const double [] );
 static void Copy( const AstObject *, AstObject * );
-static void Crv( double *, double *, double *, const char *, const char * );
-static void CrvLine( double, double, double, double, const char *, const char * );
+static void Crv( AstPlot *this, double *, double *, double *, const char *, const char * );
+static void CrvLine( AstPlot *this, double, double, double, double, const char *, const char * );
 static void Curve( AstPlot *, const double [], const double [] );
 static void CurvePlot( AstPlot *, const double *, const double *, int , CurveData *, const char *, const char * );
 static void Delete( AstObject * );
 static void DrawAxis( AstPlot *, TickInfo **, double *, double *, const char *, const char *);
 static void DrawTicks( AstPlot *, TickInfo **, int, double *, double *, const char *, const char * );
 static void Dump( AstObject *, AstChannel * );
+static void GAttr( AstPlot *, int, double, double *, int, const char *, const char * );
+static void GAxScale( AstPlot *, float *, float *, const char *, const char * );
+static void GFlush( AstPlot *, const char *, const char * );
+static void GLine( AstPlot *, int, const float *, const float *, const char *, const char * );
+static void GMark( AstPlot *, int, const float *, const float *, int, const char *, const char * );
+static void GQch( AstPlot *, float *, float *, const char *, const char * );
+static void GText( AstPlot *, const char *, float, float, const char *, float, float, const char *, const char * );
+static void GTxExt( AstPlot *, const char *, float , float, const char *, float, float, float *, float *, const char *, const char * );
 static void GraphGrid( int, double, double, double, double, double ** );
+static void GrfFun( AstPlot *, const char *,  void (*)() );
+static void GrfWrapper( AstPlot *, const char *,  void (*)() );
 static void Grid( AstPlot * );
 static void GridLine( AstPlot *, int, const double [], double );
 static void InitVtab( AstPlotVtab * );
@@ -1381,7 +1409,7 @@ static void Map1( int, double *, double *, double *, const char *, const char * 
 static void Map2( int, double *, double *, double *, const char *, const char * );
 static void Map3( int, double *, double *, double *, const char *, const char * );
 static void Mark( AstPlot *, int, int, int, const double *, int );
-static void Opoly( const char *, const char * );
+static void Opoly( AstPlot *, const char *, const char * );
 static void PlotLabels( AstPlot *, AstFrame *, int, LabelList *, char *, int, float **, const char *, const char *);
 static void PolyCurve( AstPlot *, int, int, int, const double * );
 static void PurgeCdata( CurveData * );
@@ -1389,8 +1417,8 @@ static void RemoveFrame( AstFrameSet *, int );
 static void Text( AstPlot *, const char *, const double [], const float [2], const char *);
 static void TextLabels( AstPlot *, int, int *, const char *, const char *);
 static void Ticker( AstPlot *, int, int, double, double *, double, const char *, const char *);
-static void TraceBorder( double **, double **, int, int *, const char *, const char * );
-void GrfAttrs( AstPlot *, int, int, int );
+static void TraceBorder( AstPlot *, double **, double **, int, int *, const char *, const char * );
+void GrfAttrs( AstPlot *, int, int, int, const char *, const char * );
 
 /* Functions which access class attributes. */
 /* =======================================  */
@@ -1628,6 +1656,61 @@ astMAKE_CLEAR(Plot,ClipOp,clipop,-1)
 astMAKE_GET(Plot,ClipOp,int,0,(this->clipop == -1 ? 0 : this->clipop))
 astMAKE_SET(Plot,ClipOp,int,clipop,( value ? 1 : 0 ))
 astMAKE_TEST(Plot,ClipOp,( this->clipop != -1 ))
+
+/* Grf. */
+/* ---- */
+/*
+*att++
+*  Name:
+*     Grf
+
+*  Purpose:
+c     Use Grf functions registered through astGrfFun?
+f     Use Grf routines registered through AST_GRFFUN?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+c     This attribute selects the functions which are used to draw graphics by 
+c     the Plot class. If it is zero, then the functions in the graphics 
+c     interface selected at link-time are used (see the ast_link script). 
+c     Otherwise, functions registered using astGrfFun are used. In this
+c     case, if a function is needed which has not been registered,
+c     then the function in the graphics interface selected at link-time is 
+c     used.
+f     This attribute selects the routines which are used to draw graphics by 
+f     the Plot class. If it is zero, then the routines in the graphics 
+f     interface selected at link-time are used (see the ast_link script). 
+f     Otherwise, routines registered using AST_GRFFUN are used. In this
+f     case, if a routine is needed which has not been registered,
+f     then the routine in the graphics interface selected at link-time is 
+f     used.
+
+*     The default is to use the graphics interface 
+
+*  Applicability:
+*     Plot
+*        All Plots have this attribute.
+
+*  Notes:
+*     - The value of this attribute is not saved when the Plot is written
+*     out through a Channel to an external data store. On re-loading such
+c     a Plot using astRead, the attribute will be cleared, resulting in the 
+f     a Plot using AST_READ, the attribute will be cleared, resulting in the 
+*     graphics interface selected at link-time being used.
+
+*att--
+*/
+/* Use Grf routines registered using astGrfFun? Has a 
+value of -1 when not set yielding a default of 0. */
+astMAKE_CLEAR(Plot,Grf,grf,-1)
+astMAKE_GET(Plot,Grf,int,0,(this->grf == -1 ? 0 : this->grf))
+astMAKE_SET(Plot,Grf,int,grf,( value ? 1 : 0 ))
+astMAKE_TEST(Plot,Grf,( this->grf != -1 ))
 
 /* DrawTitle */
 /* --------- */
@@ -2986,7 +3069,7 @@ static void AddCdt( CurveData *cdt1, CurveData *cdt2, const char *method,
 
 }
 
-static void Apoly( float x, float y, const char *method, const char *class ){
+static void Apoly( AstPlot *this, float x, float y, const char *method, const char *class ){
 /*
 *  Name:
 *     Apoly
@@ -2999,7 +3082,7 @@ static void Apoly( float x, float y, const char *method, const char *class ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     void Apoly( float x, float y, const char *method, const char *class )
+*     void Apoly( AstPlot *this, float x, float y, const char *method, const char *class )
 
 *  Class Membership:
 *     Plot member function.
@@ -3029,7 +3112,7 @@ static void Apoly( float x, float y, const char *method, const char *class ){
 /* If the buffer is already full, output it to the screen and re-initialise 
    it to hold just the final point. */      
    if( Poly_n == POLY_MAX ){
-      Opoly( method, class );
+      Opoly( this, method, class );
       Poly_x[ 0 ] = Poly_x[ POLY_MAX - 1 ];
       Poly_y[ 0 ] = Poly_y[ POLY_MAX - 1 ];
       Poly_n = 1;
@@ -3212,7 +3295,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-      GrfAttrs( this, GRIDLINE_ID, 1, GRF__LINE );
+      GrfAttrs( this, GRIDLINE_ID, 1, GRF__LINE, method, class );
 
 /* Set up the externals used to communicate with the Map1 function...
    The number of axes in the physical coordinate system (i.e. the current
@@ -3266,10 +3349,10 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
       Map1( CRV_NPNT, d, x, y, method, class );
 
 /* Use Crv and Map1 to draw the curve. */
-      Crv( d, x, y, method, class );
+      Crv( this, d, x, y, method, class );
 
 /* End the current poly line. */
-      Opoly( method, class );
+      Opoly( this, method, class );
 
 /* Tidy up the static data used by Map1. */
       Map1( 0, NULL, NULL, NULL, method, class );
@@ -3309,7 +3392,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
       Map1_map = astAnnul( Map1_map );
 
 /* Re-establish the original graphical attributes. */
-      GrfAttrs( this, GRIDLINE_ID, 0, GRF__LINE );
+      GrfAttrs( this, GRIDLINE_ID, 0, GRF__LINE, method, class );
 
    }
 
@@ -3629,7 +3712,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
 /* If this cell is a boundary cell with the current flag value, trace the 
    boundary through it using the refined grid. */
                      if( *( flag++ ) == flag_value ){
-                        TraceBorder( ptr3b, ptr4b, rdim, edge, method, class );
+                        TraceBorder( this, ptr3b, ptr4b, rdim, edge, method, class );
 
 /* Increment the pointers to the next values to be read from the PointSet
    arrays. */
@@ -3809,7 +3892,7 @@ f     with STATUS set to an error value, or if it should fail for any
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-   GrfAttrs( this, BORDER_ID, 1, GRF__LINE );
+   GrfAttrs( this, BORDER_ID, 1, GRF__LINE, method, class );
 
 /* We first draw the intersections of the regions containing valid
    physical coordinates with the edges of the plotting area. First do
@@ -3834,7 +3917,7 @@ f     with STATUS set to an error value, or if it should fail for any
    inval = Boundary( this, method, class );
 
 /* Re-establish the original graphical attributes. */
-   GrfAttrs( this, BORDER_ID, 0, GRF__LINE );
+   GrfAttrs( this, BORDER_ID, 0, GRF__LINE, method, class );
 
 /* Annul the 2d plot. */
    this = astAnnul( this );
@@ -4184,7 +4267,7 @@ static int BoxText( AstPlot *this, int esc, const char *text, float x, float y,
 
 }
 
-static void Bpoly( float x, float y, const char *method, const char *class ){
+static void Bpoly( AstPlot *this, float x, float y, const char *method, const char *class ){
 /*
 *  Name:
 *     Bpoly
@@ -4197,7 +4280,7 @@ static void Bpoly( float x, float y, const char *method, const char *class ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     void Bpoly( float x, float y, const char *method, const char *class )
+*     void Bpoly( AstPlot *this, float x, float y, const char *method, const char *class )
 
 *  Class Membership:
 *     Plot member function.
@@ -4224,11 +4307,401 @@ static void Bpoly( float x, float y, const char *method, const char *class ){
    if( !astOK ) return;
 
 /* Draw any existing poly line. */
-   Opoly( method, class );
+   Opoly( this, method, class );
 
 /* Add the supplied point into the buffer. */
-   Apoly( x, y, method, class );
+   Apoly( this, x, y, method, class );
 
+}
+
+static int CGAttrWrapper( AstPlot *this, int attr, double value, 
+                          double *old_value, int prim ) {
+/*
+*
+*  Name:
+*     CGAttrWrapper
+
+*  Purpose:
+*     Call a C implementation of the GAttr Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int CGAttrWrapper( AstPlot *this, int attr, double value, 
+*                        double *old_value, int prim )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function is a wrapper for a C implementation of the GAttr
+*     grf function to enquire or set a graphics attribute value. 
+
+*  Parameters:
+*     this
+*        The Plot.
+*     attr
+*        An integer value identifying the required attribute. The
+*        following symbolic values are defined in grf.h:
+*
+*           GRF__STYLE  - Line style.
+*           GRF__WIDTH  - Line width.
+*           GRF__SIZE   - Character and marker size scale factor.
+*           GRF__FONT   - Character font.
+*           GRF__COLOUR - Colour index.
+*     value 
+*        A new value to store for the attribute. If this is AST__BAD
+*        no value is stored.
+*     old_value 
+*        A pointer to a double in which to return the attribute value.
+*        If this is NULL, no value is returned.
+*     prim
+*        The sort of graphics primitive to be drawn with the new attribute.
+*        Identified by the following values defined in grf.h:
+*           GRF__LINE
+*           GRF__MARK
+*           GRF__TEXT
+
+*/
+   if ( !astOK ) return 0;
+   return ( *(int (*)( int, double, double *, int ))
+                  this->grffun[ AST__GATTR ])( attr, value, old_value, prim );
+}
+
+static int CGAxScaleWrapper( AstPlot *this, float *alpha, float *beta ) {
+/*
+*
+*  Name:
+*     CGAxScaleWrapper
+
+*  Purpose:
+*     Call a C implementation of the GAxScale Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int CGAxScaleWrapper( AstPlot *this, float *alpha, float *beta )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function is a wrapper for a C implementation of the 
+*     GAxScale grf function to get the axis scales.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     alpha
+*        A pointer to the location at which to return the scale for the
+*        X axis (i.e. Xnorm = alpha*Xworld).
+*     beta
+*        A pointer to the location at which to return the scale for the
+*        Y axis (i.e. Ynorm = beta*Yworld).
+
+*/
+   if ( !astOK ) return 0;
+   return ( *(int (*)( float *, float * ))
+                  this->grffun[ AST__GAXSCALE ])( alpha, beta );
+}
+
+static int CGFlushWrapper( AstPlot *this ) {
+/*
+*
+*  Name:
+*     CGFlushWrapper
+
+*  Purpose:
+*     Call a C implementation of the GFlush Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int CGFlushWrapper( AstPlot *this ) {
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function is a wrapper for a C implementation of the GFlush
+*     grf function to flush graphics.
+
+*  Parameters:
+*     this
+*        The Plot.
+
+*/
+   if ( !astOK ) return 0;
+   return ( *(int (*)()) this->grffun[ AST__GFLUSH ])();
+}
+
+static int CGLineWrapper( AstPlot *this, int n, const float *x, 
+                          const float *y ) {
+/*
+*
+*  Name:
+*     CGLineWrapper
+
+*  Purpose:
+*     Call a C implementation of the GLine Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int CGLineWrapper( AstPlot *this, int n, const float *x, 
+*                        const float *y )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function is a wrapper for a C implementation of the GLine
+*     grf function to draw a polyline.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     n
+*        The number of positions to be joined together.
+*     x 
+*        A pointer to an array holding the "n" x values.
+*     y 
+*        A pointer to an array holding the "n" y values.
+
+*/
+   if ( !astOK ) return 0;
+   return ( *(int (*)( int, const float *, const float * ))
+                  this->grffun[ AST__GLINE ])( n, x, y );
+}
+
+static int CGMarkWrapper( AstPlot *this, int n, const float *x, 
+                          const float *y, int type ) {
+/*
+*
+*  Name:
+*     CGMarkWrapper
+
+*  Purpose:
+*     Call a C implementation of the GMark Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int CGMarkWrapper( AstPlot *this, int n, const float *x, 
+*                        const float *y, int type ) {
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function is a wrapper for a C implementation of the GMark grf 
+*     function to draw markers.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     n
+*        The number of positions to be joined together.
+*     x 
+*        A pointer to an array holding the "n" x values.
+*     y 
+*        A pointer to an array holding the "n" y values.
+*     type
+*        An integer which can be used to indicate the type of marker symbol
+*        required.
+
+*/
+   if ( !astOK ) return 0;
+   return ( *(int (*)( int, const float *, const float *, int ))
+                  this->grffun[ AST__GMARK ])( n, x, y, type );
+
+}
+
+static int CGQchWrapper( AstPlot *this, float *chv, float *chh ) {
+/*
+*
+*  Name:
+*     CGQchWrapper
+
+*  Purpose:
+*     Call a C implementation of the GQch Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int CGQchWrapper( AstPlot *this, float *chv, float *chh )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function is a wrapper for a C implementation of the CGQch grf 
+*     function to get character heights.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     chv
+*        A pointer to the double which is to receive the height of
+*        characters drawn with a vertical baseline . This will be an 
+*        increment in the X axis.
+*     chh
+*        A pointer to the double which is to receive the height of
+*        characters drawn with a horizontal baseline. This will be an 
+*        increment in the Y axis.
+
+*/
+   if ( !astOK ) return 0;
+   return ( *(int (*)( float *, float * ))
+                  this->grffun[ AST__GQCH ])( chv, chh );
+}
+
+static int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
+                          const char *just, float upx, float upy ) {
+/*
+*
+*  Name:
+*     CGTextWrapper
+
+*  Purpose:
+*     Call a C implementation of the GText Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
+*                        const char *just, float upx, float upy )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function is a wrapper for a C implementation of the GText grf 
+*     function to draw a text string.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     text 
+*        Pointer to a null-terminated character string to be displayed.
+*     x 
+*        The reference x coordinate.
+*     y 
+*        The reference y coordinate.
+*     just
+*        A character string which specifies the location within the
+*        text string which is to be placed at the reference position
+*        given by x and y. The first character may be 'T' for "top",
+*        'C' for "centre", or 'B' for "bottom", and specifies the
+*        vertical location of the reference position. Note, "bottom"
+*        corresponds to the base-line of normal text. Some characters 
+*        (eg "y", "g", "p", etc) descend below the base-line. The second 
+*        character may be 'L' for "left", 'C' for "centre", or 'R' 
+*        for "right", and specifies the horizontal location of the 
+*        reference position. If the string has less than 2 characters
+*        then 'C' is used for the missing characters. 
+*     upx
+*        The x component of the up-vector for the text, in graphics world
+*        coordinates. If necessary the supplied value should be negated
+*        to ensure that positive values always refer to displacements from 
+*        left to right on the screen.
+*     upy
+*        The y component of the up-vector for the text, in graphics world
+*        coordinates. If necessary the supplied value should be negated
+*        to ensure that positive values always refer to displacements from 
+*        bottom to top on the screen.
+
+*/
+   if ( !astOK ) return 0;
+   return ( *(int (*)( const char *, float, float, const char *, float, float ))
+                  this->grffun[ AST__GTEXT ])( text, x, y, just, upx, upy );
+}
+
+static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
+                           const char *just, float upx, float upy, float *xb, 
+                           float *yb ) {
+/*
+*
+*  Name:
+*     CGTxExtWrapper
+
+*  Purpose:
+*     Call a C implementation of the GTxExt Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
+*                         const char *just, float upx, float upy, float *xb, 
+*                         float *yb )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function is a wrapper for a C implementation of the GTxExt
+*     grf function to find the extent of a text string.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     text 
+*        Pointer to a null-terminated character string to be displayed.
+*     x 
+*        The reference x coordinate.
+*     y 
+*        The reference y coordinate.
+*     just
+*        A character string which specifies the location within the
+*        text string which is to be placed at the reference position
+*        given by x and y. The first character may be 'T' for "top",
+*        'C' for "centre", or 'B' for "bottom", and specifies the
+*        vertical location of the reference position. Note, "bottom"
+*        corresponds to the base-line of normal text. Some characters 
+*        (eg "y", "g", "p", etc) descend below the base-line. The second 
+*        character may be 'L' for "left", 'C' for "centre", or 'R' 
+*        for "right", and specifies the horizontal location of the 
+*        reference position. If the string has less than 2 characters
+*        then 'C' is used for the missing characters. 
+*     upx
+*        The x component of the up-vector for the text, in graphics world
+*        coordinates. If necessary the supplied value should be negated
+*        to ensure that positive values always refer to displacements from 
+*        left to right on the screen.
+*     upy
+*        The y component of the up-vector for the text, in graphics world
+*        coordinates. If necessary the supplied value should be negated
+*        to ensure that positive values always refer to displacements from 
+*        bottom to top on the screen.
+*     xb
+*        An array of 4 elements in which to return the x coordinate of
+*        each corner of the bounding box.
+*     yb
+*        An array of 4 elements in which to return the y coordinate of
+*        each corner of the bounding box.
+
+*/
+   if ( !astOK ) return 0;
+   return ( *(int (*)( const char *, float , float, const char *, float,
+                       float, float *, float * ))
+                  this->grffun[ AST__GTXEXT ])( text, x, y, just, upx, upy,
+                                                xb, yb );
 }
 
 static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks, 
@@ -4968,10 +5441,15 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "border" ) ) {
       astClearBorder( this );
 
-/* ClipOp. */
+/* OuClipOp. */
 /* ------- */
    } else if ( !strcmp( attrib, "clipop" ) ) {
       astClearClipOp( this );
+
+/* Grf. */
+/* ---- */
+   } else if ( !strcmp( attrib, "grf" ) ) {
+      astClearGrf( this );
 
 /* DrawTitle. */
 /* ---------- */
@@ -5502,7 +5980,7 @@ static int Cross( float ax, float ay, float bx, float by,
    return ret;
 }
 
-static void Crv( double *d, double *x, double *y, const char *method, 
+static void Crv( AstPlot *this, double *d, double *x, double *y, const char *method, 
                  const char *class ){
 /*
 *  Name:
@@ -5516,7 +5994,7 @@ static void Crv( double *d, double *x, double *y, const char *method,
 
 *  Synopsis:
 *     #include "plot.h"
-*     void Crv( double *d, double *x, double *y, const char *method, 
+*     void Crv( AstPlot *this, double *d, double *x, double *y, const char *method, 
 *               const char *class  )
 
 *  Class Membership:
@@ -5912,7 +6390,7 @@ static void Crv( double *d, double *x, double *y, const char *method,
    unit vector along the line in the appropriate external variables for
    use by the next invocation of this function. */
          if( seg_ok[ i ] ){
-            CrvLine( x[ i ], y[ i ], x[ i + 1 ], y[ i + 1 ], method, class );   
+            CrvLine( this, x[ i ], y[ i ], x[ i + 1 ], y[ i + 1 ], method, class );   
             dl = sqrt( dl2[ i ] );
             Crv_ux0 = dx[ i ]/dl;
             Crv_uy0 = dy[ i ]/dl; 
@@ -5923,7 +6401,7 @@ static void Crv( double *d, double *x, double *y, const char *method,
    point to the start of the subsegment information for the next segment
    to be subdivided. */
          } else if( subdivide ){             
-            Crv( pd, px, py, method, class );
+            Crv( this, pd, px, py, method, class );
             pd += CRV_NSEG + 1;
             px += CRV_NSEG + 1;
             py += CRV_NSEG + 1;
@@ -6080,7 +6558,7 @@ static int CvBrk( AstPlot *this, int ibrk, double *brk, double *vbrk,
    
 }
 
-static void CrvLine( double xa, double ya, double xb, double yb,
+static void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
                      const char *method, const char *class ){
 /*                     
 *  Name:
@@ -6094,7 +6572,7 @@ static void CrvLine( double xa, double ya, double xb, double yb,
 
 *  Synopsis:
 *     #include "plot.h"
-*     void CrvLine( double xa, double ya, double xb, double yb,
+*     void CrvLine( AstPlot *this, double xa, double ya, double xb, double yb,
 *                   const char *method, const char *class )
 
 *  Class Membership:
@@ -6332,7 +6810,7 @@ static void CrvLine( double xa, double ya, double xb, double yb,
          Crv_len = (float) dl;
 
 /* Start a poly line. */
-         if( Crv_ink ) Bpoly( (float) xam,  (float) yam, method, class );
+         if( Crv_ink ) Bpoly( this, (float) xam,  (float) yam, method, class );
 
 /* If this is not the first line to be plotted... */
       } else {
@@ -6363,12 +6841,12 @@ static void CrvLine( double xa, double ya, double xb, double yb,
             }
 
 /* Start a poly line. */
-            if( Crv_ink ) Bpoly( (float) xam,  (float) yam, method, class );
+            if( Crv_ink ) Bpoly( this, (float) xam,  (float) yam, method, class );
           }
       }
 
 /* Append a section to the current poly line. */
-      if( Crv_ink ) Apoly( (float) xbm,  (float) ybm, method, class );
+      if( Crv_ink ) Apoly( this, (float) xbm,  (float) ybm, method, class );
 
 /* Save the position and vector at the end of the current line. */
       Crv_xl = xbm;
@@ -6583,7 +7061,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-      GrfAttrs( this, CURVE_ID, 1, GRF__LINE );
+      GrfAttrs( this, CURVE_ID, 1, GRF__LINE, method, class );
 
 /* Set up the externals used to communicate with the Map3 function...
    The number of axes in the physical coordinate system (i.e. the current
@@ -6633,10 +7111,10 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
       Map3( CRV_NPNT, d, x, y, method, class );
 
 /* Use Crv and Map3 to draw the curve. */
-      Crv( d, x, y, method, class );
+      Crv( this, d, x, y, method, class );
 
 /* End the current poly line. */
-      Opoly( method, class );
+      Opoly( this, method, class );
 
 /* Tidy up the static data used by Map3. */
       Map3( 0, NULL, NULL, NULL, method, class );
@@ -6676,7 +7154,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
       Map3_map = astAnnul( Map3_map );
 
 /* Re-establish the original graphical attributes. */
-      GrfAttrs( this, CURVE_ID, 0, GRF__LINE );
+      GrfAttrs( this, CURVE_ID, 0, GRF__LINE, method, class );
 
    }
 
@@ -6922,7 +7400,7 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-   GrfAttrs( this, AXIS_ID, 1, GRF__LINE );
+   GrfAttrs( this, AXIS_ID, 1, GRF__LINE, method, class );
 
 /* Consider drawing a curve parallel to each axis in turn. */
    for( axis = 0; axis < 2; axis++ ){
@@ -6953,7 +7431,7 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
    }
 
 /* Re-establish the original graphical attributes. */
-   GrfAttrs( this, AXIS_ID, 0, GRF__LINE );
+   GrfAttrs( this, AXIS_ID, 0, GRF__LINE, method, class );
 
 /* Return. */
    return;
@@ -7191,7 +7669,7 @@ static int DrawText( AstPlot *this, int esc, const char *text, float x, float y,
 *     gives the correct positioning. This causes problems in GAIA when 
 *     zooming. This is because GAIA zooms the reference positions but not the 
 *     text size, resulting in the text drifting to the bottom left. For
-*     this reason, astGText is currently used instead of this function 
+*     this reason, GText is currently used instead of this function 
 *     (DrawText) throughout the Plot class.
 *     -  The "B" option for the justification in the "up" direction refers
 *     to the base-line on which the text is written. Some characters
@@ -7465,7 +7943,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-   GrfAttrs( this, TICKS_ID, 1, GRF__LINE );
+   GrfAttrs( this, TICKS_ID, 1, GRF__LINE, method, class );
 
 /* If ticks are to be put round the edges of the plotting area... */
 /* ============================================================== */
@@ -7848,9 +8326,9 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
                      }
 
 /* Draw the tick mark. */
-                     Bpoly( (float) x0, (float) y0, method, class );
-                     Apoly( (float) x1, (float) y1, method, class );
-                     Opoly( method, class );
+                     Bpoly( this, (float) x0, (float) y0, method, class );
+                     Apoly( this, (float) x1, (float) y1, method, class );
+                     Opoly( this, method, class );
 
                   }
 
@@ -7881,7 +8359,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
    }
 
 /* Re-establish the original graphical attributes. */
-   GrfAttrs( this, TICKS_ID, 0, GRF__LINE );
+   GrfAttrs( this, TICKS_ID, 0, GRF__LINE, method, class );
 
 /* Return. */
    return;
@@ -9699,6 +10177,663 @@ static int FullForm( const char *list, const char *test, const char *text,
    return ret;
 }
 
+static void GAttr( AstPlot *this, int attr, double value, double *old_value, 
+                   int prim, const char *method, const char *class ) {
+/*
+*
+*  Name:
+*     GAttr
+
+*  Purpose:
+*     Call the GAttr Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void GAttr( AstPlot *this, int attr, double value, double *old_value, 
+*                 int prim, const char *method, const char *class )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function calls the GAttr grf function to enquire or set a 
+*     graphics attribute value. It either calls the version registered using 
+*     astGrfFun, or the version in the linked grf module. The linked version 
+*     is used if the Grf attribute is zero, or if no function has been 
+*     registered for GAttr using astGrfFun.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     attr
+*        An integer value identifying the required attribute. The
+*        following symbolic values are defined in grf.h:
+*
+*           GRF__STYLE  - Line style.
+*           GRF__WIDTH  - Line width.
+*           GRF__SIZE   - Character and marker size scale factor.
+*           GRF__FONT   - Character font.
+*           GRF__COLOUR - Colour index.
+*     value 
+*        A new value to store for the attribute. If this is AST__BAD
+*        no value is stored.
+*     old_value 
+*        A pointer to a double in which to return the attribute value.
+*        If this is NULL, no value is returned.
+*     prim
+*        The sort of graphics primitive to be drawn with the new attribute.
+*        Identified by the following values defined in grf.h:
+*           GRF__LINE
+*           GRF__MARK
+*           GRF__TEXT
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*/
+
+/* Local Variables: */
+   int status;          /* Status retruned from Grf function */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* If the Grf attribute is set to a non-zero value, use the Grf function
+   registered using astGrfFun (so long as a function has been supplied).
+   This called via a wrapper which adapts the interface to suit the
+   language in which the function is written. */
+   if( astGetGrf( this ) && this->grffun[ AST__GATTR ] ) {
+      status = ( *( this->GAttr ) )( this, attr, value, old_value, prim );
+
+/* Otherwise, use the function in the external Grf module, selected at
+   link-time using ast_link options.*/
+   } else {
+      status = astGAttr( attr, value, old_value, prim );
+   }
+
+/* Report an error if anything went wrong. */
+   if( !status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGAttr. ", method, 
+                class );
+   }
+
+}
+
+static void GAxScale( AstPlot *this, float *alpha, float *beta, 
+                      const char *method, const char *class ) {
+/*
+*
+*  Name:
+*     GAxScale
+
+*  Purpose:
+*     Call the GAxScale Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void GAxScale( AstPlot *this, float *alpha, float *beta,
+*                    const char *method, const char *class )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function calls the GAxScale grf function to get the axis scales,
+*     either calling the version registered using astGrfFun, or the version 
+*     in the linked grf module. The linked version is used if the Grf 
+*     attribute is zero, or if no function has been registered for GAxScale 
+*     using astGrfFun.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     alpha
+*        A pointer to the location at which to return the scale for the
+*        X axis (i.e. Xnorm = alpha*Xworld).
+*     beta
+*        A pointer to the location at which to return the scale for the
+*        Y axis (i.e. Ynorm = beta*Yworld).
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*/
+
+/* Local Variables: */
+   int status;          /* Status retruned from Grf function */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* If the Grf attribute is set to a non-zero value, use the Grf function
+   registered using astGrfFun (so long as a function has been supplied).
+   This called via a wrapper which adapts the interface to suit the
+   language in which the function is written. */
+   if( astGetGrf( this ) && this->grffun[ AST__GAXSCALE ] ) {
+      status = ( *( this->GAxScale ) )( this, alpha, beta );
+
+/* Otherwise, use the function in the external Grf module, selected at
+   link-time using ast_link options.*/
+   } else {
+      status = astGAxScale( alpha, beta );
+   }
+
+/* Report an error if anything went wrong. */
+   if( !status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGAxScale. ", method, 
+                class );
+   }
+
+}
+
+static void GFlush( AstPlot *this, const char *method, 
+                   const char *class ) {
+/*
+*
+*  Name:
+*     GFlush
+
+*  Purpose:
+*     Call the Gflush Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void GFlush( AstPlot *this, const char *method, 
+*                  const char *class ) {
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function calls the Gflush grf function to flush graphics, either
+*     calling the version registered using astGrfFun, or the version in the
+*     linked grf module. The linked version is used if the Grf attribute
+*     is zero, or if no function has been registered for Gflush using
+*     astGrfFun.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*/
+
+/* Local Variables: */
+   int status;          /* Status retruned from Grf function */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* If the Grf attribute is set to a non-zero value, use the Grf function
+   registered using astGrfFun (so long as a function has been supplied).
+   This called via a wrapper which adapts the interface to suit the
+   language in which the function is written. */
+   if( astGetGrf( this ) && this->grffun[ AST__GFLUSH ] ) {
+      status = ( *( this->GFlush ) )( this );
+
+/* Otherwise, use the function in the external Grf module, selected at
+   link-time using ast_link options.*/
+   } else {
+      status = astGFlush();
+   }
+
+/* Report an error if anything went wrong. */
+   if( !status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGFlush. ", method, 
+                class );
+   }
+
+}
+
+static void GLine( AstPlot *this, int n, const float *x, 
+                   const float *y, const char *method, 
+                   const char *class ) {
+/*
+*
+*  Name:
+*     GLine
+
+*  Purpose:
+*     Call the Gline Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void GLine( AstPlot *this, int n, const float *x, 
+*                 const float *y, const char *method, 
+*                 const char *class ) {
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function calls the Gline grf function to draw a polyline, either
+*     calling the version registered using astGrfFun, or the version in the
+*     linked grf module. The linked version is used if the Grf attribute
+*     is zero, or if no function has been registered for Gline using
+*     astGrfFun.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     n
+*        The number of positions to be joined together.
+*     x 
+*        A pointer to an array holding the "n" x values.
+*     y 
+*        A pointer to an array holding the "n" y values.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*/
+
+/* Local Variables: */
+   int status;          /* Status retruned from Grf function */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* If the Grf attribute is set to a non-zero value, use the Grf function
+   registered using astGrfFun (so long as a function has been supplied).
+   This is called via a wrapper which adapts the interface to suit the
+   language in which the function is written. */
+   if( astGetGrf( this ) && this->grffun[ AST__GLINE ] ) {
+      status = ( *( this->GLine ) )( this, n, x, y );
+
+/* Otherwise, use the function in the external Grf module, selected at
+   link-time using ast_link options.*/
+   } else {
+      status = astGLine( n, x, y );
+   }
+
+/* Report an error if anything went wrong. */
+   if( !status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGLine. ", method, 
+                class );
+   }
+
+}
+
+static void GMark( AstPlot *this, int n, const float *x, 
+                   const float *y, int type, const char *method, 
+                   const char *class ) {
+/*
+*
+*  Name:
+*     GMark
+
+*  Purpose:
+*     Call the GMark Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void GMark( AstPlot *this, int n, const float *x, 
+*                 const float *y, int type, const char *method, 
+*                 const char *class ) {
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function calls the GMark grf function to draw markers, either
+*     calling the version registered using astGrfFun, or the version in the
+*     linked grf module. The linked version is used if the Grf attribute
+*     is zero, or if no function has been registered for GMark using
+*     astGrfFun.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     n
+*        The number of positions to be joined together.
+*     x 
+*        A pointer to an array holding the "n" x values.
+*     y 
+*        A pointer to an array holding the "n" y values.
+*     type
+*        An integer which can be used to indicate the type of marker symbol
+*        required.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*/
+
+/* Local Variables: */
+   int status;          /* Status retruned from Grf function */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* If the Grf attribute is set to a non-zero value, use the Grf function
+   registered using astGrfFun (so long as a function has been supplied).
+   This is called via a wrapper which adapts the interface to suit the
+   language in which the function is written. */
+   if( astGetGrf( this ) && this->grffun[ AST__GMARK ] ) {
+      status = ( *( this->GMark ) )( this, n, x, y, type );
+
+/* Otherwise, use the function in the external Grf module, selected at
+   link-time using ast_link options.*/
+   } else {
+      status = astGMark( n, x, y, type );
+   }
+
+/* Report an error if anything went wrong. */
+   if( !status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGMark. ", method, 
+                class );
+   }
+
+}
+
+static void GQch( AstPlot *this, float *chv, float *chh,
+                  const char *method, const char *class ) {
+/*
+*
+*  Name:
+*     GQch
+
+*  Purpose:
+*     Call the GQch Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void GQch( AstPlot *this, float *chv, float *chh,
+*                const char *method, const char *class )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function calls the GQch grf function to get character heights, 
+*     either calling the version registered using astGrfFun, or the version
+*     in the linked grf module. The linked version is used if the Grf 
+*     attribute is zero, or if no function has been registered for GQch 
+*     using astGrfFun.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     chv
+*        A pointer to the double which is to receive the height of
+*        characters drawn with a vertical baseline . This will be an 
+*        increment in the X axis.
+*     chh
+*        A pointer to the double which is to receive the height of
+*        characters drawn with a horizontal baseline. This will be an 
+*        increment in the Y axis.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*/
+
+/* Local Variables: */
+   int status;          /* Status retruned from Grf function */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* If the Grf attribute is set to a non-zero value, use the Grf function
+   registered using astGrfFun (so long as a function has been supplied).
+   This is called via a wrapper which adapts the interface to suit the
+   language in which the function is written. */
+   if( astGetGrf( this ) && this->grffun[ AST__GQCH ] ) {
+      status = ( *( this->GQch ) )( this, chv, chh );
+
+/* Otherwise, use the function in the external Grf module, selected at
+   link-time using ast_link options.*/
+   } else {
+      status = astGQch( chv, chh );
+   }
+
+/* Report an error if anything went wrong. */
+   if( !status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGQch. ", method, 
+                class );
+   }
+
+}
+
+static void GText( AstPlot *this, const char *text, float x, float y,      
+                   const char *just, float upx, float upy,
+                   const char *method, const char *class ) {
+/*
+*
+*  Name:
+*     GText
+
+*  Purpose:
+*     Call the GText Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void GText( AstPlot *this, const char *text, float x, float y,      
+*                 const char *just, float upx, float upy,
+*                 const char *method, const char *class ) {
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function calls the GText grf function to draw a text string, either
+*     calling the version registered using astGrfFun, or the version in the
+*     linked grf module. The linked version is used if the Grf attribute
+*     is zero, or if no function has been registered for GText using
+*     astGrfFun.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     text 
+*        Pointer to a null-terminated character string to be displayed.
+*     x 
+*        The reference x coordinate.
+*     y 
+*        The reference y coordinate.
+*     just
+*        A character string which specifies the location within the
+*        text string which is to be placed at the reference position
+*        given by x and y. The first character may be 'T' for "top",
+*        'C' for "centre", or 'B' for "bottom", and specifies the
+*        vertical location of the reference position. Note, "bottom"
+*        corresponds to the base-line of normal text. Some characters 
+*        (eg "y", "g", "p", etc) descend below the base-line. The second 
+*        character may be 'L' for "left", 'C' for "centre", or 'R' 
+*        for "right", and specifies the horizontal location of the 
+*        reference position. If the string has less than 2 characters
+*        then 'C' is used for the missing characters. 
+*     upx
+*        The x component of the up-vector for the text, in graphics world
+*        coordinates. If necessary the supplied value should be negated
+*        to ensure that positive values always refer to displacements from 
+*        left to right on the screen.
+*     upy
+*        The y component of the up-vector for the text, in graphics world
+*        coordinates. If necessary the supplied value should be negated
+*        to ensure that positive values always refer to displacements from 
+*        bottom to top on the screen.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*/
+
+/* Local Variables: */
+   int status;          /* Status retruned from Grf function */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* If the Grf attribute is set to a non-zero value, use the Grf function
+   registered using astGrfFun (so long as a function has been supplied).
+   This is called via a wrapper which adapts the interface to suit the
+   language in which the function is written. */
+   if( astGetGrf( this ) && this->grffun[ AST__GTEXT ] ) {
+      status = ( *( this->GText ) )( this, text, x, y, just, upx, upy );
+
+/* Otherwise, use the function in the external Grf module, selected at
+   link-time using ast_link options.*/
+   } else {
+      status = astGText( text, x, y, just, upx, upy );
+   }
+
+/* Report an error if anything went wrong. */
+   if( !status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGText. ", method, 
+                class );
+   }
+
+}
+
+static void GTxExt( AstPlot *this, const char *text, float x, float y,      
+                    const char *just, float upx, float upy, float *xb, 
+                    float *yb, const char *method, const char *class ) {
+/*
+*
+*  Name:
+*     GTxExt
+
+*  Purpose:
+*     Call the GTxExt Grf function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void GTxExt( AstPlot *this, const char *text, float x, float y,      
+*                 const char *just, float upx, float upy, float *xb, 
+*                 float *yb, const char *method, const char *class )
+
+*  Class Membership:
+*     Plot private function.
+
+*  Description:
+*     This function calls the GTxExt grf function to find the extent
+*     of a text string, either calling the version registered using 
+*     astGrfFun, or the version in the linked grf module. The linked 
+*     version is used if the Grf attribute is zero, or if no function 
+*     has been registered for GTxExt using astGrfFun.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     text 
+*        Pointer to a null-terminated character string to be displayed.
+*     x 
+*        The reference x coordinate.
+*     y 
+*        The reference y coordinate.
+*     just
+*        A character string which specifies the location within the
+*        text string which is to be placed at the reference position
+*        given by x and y. The first character may be 'T' for "top",
+*        'C' for "centre", or 'B' for "bottom", and specifies the
+*        vertical location of the reference position. Note, "bottom"
+*        corresponds to the base-line of normal text. Some characters 
+*        (eg "y", "g", "p", etc) descend below the base-line. The second 
+*        character may be 'L' for "left", 'C' for "centre", or 'R' 
+*        for "right", and specifies the horizontal location of the 
+*        reference position. If the string has less than 2 characters
+*        then 'C' is used for the missing characters. 
+*     upx
+*        The x component of the up-vector for the text, in graphics world
+*        coordinates. If necessary the supplied value should be negated
+*        to ensure that positive values always refer to displacements from 
+*        left to right on the screen.
+*     upy
+*        The y component of the up-vector for the text, in graphics world
+*        coordinates. If necessary the supplied value should be negated
+*        to ensure that positive values always refer to displacements from 
+*        bottom to top on the screen.
+*     xb
+*        An array of 4 elements in which to return the x coordinate of
+*        each corner of the bounding box.
+*     yb
+*        An array of 4 elements in which to return the y coordinate of
+*        each corner of the bounding box.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*/
+
+/* Local Variables: */
+   int status;          /* Status retruned from Grf function */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* If the Grf attribute is set to a non-zero value, use the Grf function
+   registered using astGrfFun (so long as a function has been supplied).
+   This is called via a wrapper which adapts the interface to suit the
+   language in which the function is written. */
+   if( astGetGrf( this ) && this->grffun[ AST__GTXEXT ] ) {
+      status = ( *( this->GTxExt ) )( this, text, x, y, just, upx, upy,
+                                      xb, yb );
+
+/* Otherwise, use the function in the external Grf module, selected at
+   link-time using ast_link options.*/
+   } else {
+      status = astGTxExt( text, x, y, just, upx, upy, xb, yb );
+   }
+
+/* Report an error if anything went wrong. */
+   if( !status ) {
+      astError( AST__GRFER, "%s(%s): Graphics error in astGTxExt. ", method, 
+                class );
+   }
+
+}
+
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -9833,6 +10968,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* ------- */
    } else if ( !strcmp( attrib, "clipop" ) ) {
       ival = astGetClipOp( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* Grf. */
+/* ---- */
+   } else if ( !strcmp( attrib, "grf" ) ) {
+      ival = astGetGrf( this );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -10824,6 +11968,410 @@ static void GraphGrid( int dim, double xlo, double xhi, double ylo,
 
 }
 
+static void GrfFun( AstPlot *this, const char *name, void (* fun)() ){
+/*
+*++
+*  Name:
+c     astGrfFun
+f     AST_GRFFUN
+
+*  Purpose:
+c     Register a graphics function for use by the Plot class.
+f     Register a graphics routine for use by the Plot class.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "plot.h"
+c     void astGrfFun( AstPlot *this, const char *name, void (* fun)() )
+f     CALL AST_GRFFUN( THIS, NAME, FUN, STATUS )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+c     This function can be used to select the underlying graphics 
+c     functions to be used when the Plot class produces graphical output.
+c     If this function is not called prior to producing graphical
+c     output, then the underlying graphics functions selected at
+c     link-time (using the ast_link command) will be used. To use
+c     alternative graphics functions, call this function before
+c     the graphical output is created, specifying the graphics
+c     functions to be used. This will register the function for future
+c     use, but the function will not actually be used until the Grf 
+c     attribute is given a non-zero value.
+f     This routine can be used to select the underlying graphics 
+f     routines to be used when the Plot class produces graphical output.
+f     If this routine is not called prior to producing graphical
+f     output, then the underlying graphics routines selected at
+f     link-time (using the ast_link command) will be used. To use
+f     alternative graphics routines, call this routine before
+f     the graphical output is created, specifying the graphics
+f     routines to be used. This will register the routine for future
+f     use, but the routine will not actually be used until the Grf 
+f     attribute is given a non-zero value.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Plot.
+c     name 
+f     NAME = CHARACTER * ( * ) (Given)
+c        A name indicating the graphics function to be replaced.
+c        Eight graphics functions are used in total by the
+c        Plot class, and any combination of them may be supplied by calling
+c        this function once for each function to be replaced. If any of the 
+c        eight graphics functions are not replaced in this way, the 
+c        corresponding functions in the graphics interface selected at 
+c        link-time (using the ast_link command) are used. The allowed
+c        names are: 
+f        A name indicating the graphics routine to be replaced.
+f        Eight graphics routines are used in total by the
+f        Plot class, and any combination of them may be supplied by calling
+f        this routine once for each routine to be replaced. If any of the 
+f        eight graphics routines are not replaced in this way, the 
+f        corresponding routines in the graphics interface selected at 
+f        link-time (using the ast_link command) are used. The allowed
+f        names are: 
+*
+*        - Attr -  Enquire or set a graphics attribute value
+*        - AxScale - Get the axis scales
+*        - Flush - Flush all pending graphics to the output device
+*        - Line - Draw a polyline (i.e. a set of connected lines)
+*        - Mark -  Draw a set of markers
+*        - Qch - Get the character height in world coordinates
+*        - Text - Draw a character string
+*        - TxExt -  Get the extent of a character string
+*        
+*        The string is case insensitive. For details of the interface 
+*        required for each, see the sections below.
+*     fun
+*     FUN = INTEGER FUNCTION (Given)
+c        A Pointer to the function to be used to provide the
+c        functionality indicated by parameter name.
+f        The name of the routine to be used to provide the
+f        functionality indicated by parameter name (the name
+f        should also appear in a Fortran EXTERNAL statement in the
+f        routine which invokes AST_GRFFUN). 
+*
+c        Once a function has been provided, a null pointer can be supplied 
+c        in a subsequent call to astGrfFun to reset the function to the 
+c        corresponding function in the graphics interface selected at
+c        link-time.
+f        Once a routine has been provided, the "null" routine AST_NULL can 
+f        be supplied in a subsequent call to astGrfFun to reset the routine 
+f        to the corresponding routine in the graphics interface selected at
+f        link-time. AST_NULL is defined in the AST_PAR include file.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Function Interfaces:
+*     All the functions listed below should return an integer value of
+*     0 if an error occurs, and 1 otherwise. All x and y values refer
+f     to "graphics cordinates" as defined by the GRAPHBOX parameter of
+f     the AST_PLOT call which created the Plot.
+c     to "graphics cordinates" as defined by the graphbox parameter of
+c     the astPlot call which created the Plot.
+
+*  Attr:
+*     The "Attr" function returns the current value of a specified graphics
+*     attribute, and optionally establishes a new value. The supplied
+*     value is converted to an integer value if necessary before use.
+*     It requires the following interface:
+*
+c     int Attr( int attr, double value, double *old_value, int prim )
+f     INTEGER FUNCTION ATTR( ATT, VAL, OLDVAL, PRIM )
+*
+c     - attr - An integer value identifying the required attribute. 
+c       The following symbolic values are defined in grf.h:
+f     - ATT = INTEGER (Given) - An integer identifying the required attribute. 
+f       The following symbolic values are defined in GRF_PAR:
+*
+*       - GRF__STYLE  - Line style.
+*       - GRF__WIDTH  - Line width.
+*       - GRF__SIZE   - Character and marker size scale factor.
+*       - GRF__FONT   - Character font.
+*       - GRF__COLOUR - Colour index.
+*
+c     - value - 
+f     - VAL = DOUBLE PRECISION (Given) - 
+c       A new value to store for the attribute. If this is AST__BAD
+*       no value is stored.
+c     - old_value - A pointer to a double in which to return 
+f     - OLDVAL = DOUBLE PRECISION (Returned) - Returned holding
+*       the attribute value.
+c       If this is NULL, no value is returned.
+c     - prim -
+f     - PRIM = INTEGER (Given) -
+*        The sort of graphics primitive to be drawn with the new attribute.
+c        Identified by the following values defined in grf.h:
+f        Identified by the following values defined in GRF_PAR:
+*
+*        - GRF__LINE
+*        - GRF__MARK
+*        - GRF__TEXT
+*
+*  AxScale:
+*     The "AxScale" function returns two values (one for each axis) which 
+*     scale increments on the corresponding axis into a "normal" coordinate
+*     system in which:
+*     - The axes have equal scale in terms of (for instance) millimetres 
+*       per unit distance.
+*     - X values increase from left to right.
+*     - Y values increase from bottom to top.
+*     It requires the following interface:
+*
+*     int AxScale( float *alpha, float *beta )
+*     INTEGER FUNCTION AXSCALE( ALPHA, BETA )
+*
+c     - alpha - A pointer to the location at which to return the scale for the
+f     - ALPHA = REAL (Returned) - Returned holding the scale for the
+*        X axis (i.e. Xnorm = alpha*Xworld).
+c     - beta - A pointer to the location at which to return the scale for the
+f     - BETA = REAL (Returned) - Returned holding the scale for the
+*        Y axis (i.e. Ynorm = beta*Yworld).
+
+*  Flush:
+*     The "Flush" function ensures that the display device is up-to-date,
+*     by flushing any pending graphics to the output device. It
+*     requires the following interface:
+*
+c     int Flush()
+f     INTEGER FUNCTION FLUSH()
+
+*  Line:
+*     The "Line" function displays lines joining the given positions and 
+*     requires the following interface:
+*
+c     int Line( int n, const float *x, const float *y )
+f     INTEGER FUNCTION LINE( N, X, Y )
+*
+c     - n - The number of positions to be joined together.
+f     - N = INTEGER (Given) - The number of positions to be joined together.
+c     - x - A pointer to an array holding the "n" x values.
+f     - X( N ) = REAL (Given) - An array holding the "n" x values.
+c     - y - A pointer to an array holding the "n" y values.
+f     - Y( N ) = REAL (Given) - An array holding the "n" y values.
+     
+*  Mark:
+*     The "Mark" function displays markers at the given positions. It 
+*     requires the following interface:
+*
+c     int Mark( int n, const float *x, const float *y, int type )
+f     INTEGER FUNCTION MARK( N, X, Y, TYPE )
+*
+c     - n - The number of positions to be marked.
+f     - N = INTEGER (Given) - The number of positions to be marked.
+c     - x - A pointer to an array holding the "n" x values.
+f     - X( N ) = REAL (Given) - An array holding the "n" x values.
+c     - y - A pointer to an array holding the "n" y values.
+f     - Y( N ) = REAL (Given) - An array holding the "n" y values.
+c     - type - An integer which can be used to indicate the type of marker
+c       symbol required.
+f     - TYPE = INTEGER (Given) - An integer which can be used to indicate 
+f       the type of marker symbol required.
+
+*  Qch:
+*     The "Qch" function returns the heights of characters drawn vertically 
+*     and horizontally. It requires the following interface:
+*
+*     int Qch( float *chv, float *chh )
+*     int QCH( CHV, CHH )
+*
+c     - chv- A pointer to the double which is to receive the height of
+f     - CHV = REAL (Returned) - Returned holding the height of
+*        characters drawn with a vertical baseline. This will be an 
+*        increment along the X axis, in X axis units.
+c     - chh - A pointer to the double which is to receive the height of
+f     - CHH = REAL (Returned) - Returned holding the height of
+*        characters drawn with a horizontal baseline. This will be an 
+*        increment along the Y axis, in Y axis units.
+
+*  Text:
+*     The "Text" function displays a character string at a given
+*     position using a specified justification and up-vector. It 
+*     requires the following interface:
+*
+c     int Text( const char *text, float x, float y, const char *just,
+c               float upx, float upy )
+f     INTEGER FUNCTION TEXT( TEXT, X, Y, JUST, UPX, UPY )
+*
+c     - text - Pointer to a null-terminated character string to be displayed.
+f     - TEXT = CHARACTER * ( * ) (Given) - The string to be displayed.
+c     - x - The reference x coordinate.
+f     - X = REAL (Given) - The reference x coordinate.
+c     - y - The reference y coordinate.
+f     - Y = REAL (Given) - The reference y coordinate.
+c     - just - A character string which specifies the location within the
+f     - JUST = CHARACTER * ( * ) (Given ) - A string which specifies the 
+f        location within the
+*        text string which is to be placed at the reference position
+*        given by x and y. The first character may be 'T' for "top",
+*        'C' for "centre", or 'B' for "bottom", and specifies the
+*        vertical location of the reference position. Note, "bottom"
+*        corresponds to the base-line of normal text. Some characters 
+*        (eg "y", "g", "p", etc) descend below the base-line. The second 
+*        character may be 'L' for "left", 'C' for "centre", or 'R' 
+*        for "right", and specifies the horizontal location of the 
+*        reference position. If the string has less than 2 characters
+*        then 'C' is used for the missing characters. 
+c     - upx - The x component of the up-vector for the text.
+f     - UPX = REAL (Given) - The x component of the up-vector for the text.
+*        If necessary the supplied value should be negated
+*        to ensure that positive values always refer to displacements from 
+*        left to right on the screen.
+c     - upy - The y component of the up-vector for the text.
+f     - UPX = REAL (Given) - The y component of the up-vector for the text.
+*        If necessary the supplied value should be negated
+*        to ensure that positive values always refer to displacements from 
+*        bottom to top on the screen.
+
+*  TxExt:
+*     The "TxExt" function returns the corners of a box which would enclose
+*     the supplied character string if it were displayed using the
+*     Text function described above. The returned box includes any leading 
+*     or trailing spaces. It requires the following interface:
+*
+c     int TxExt( const char *text, float x, float y, const char *just,
+c                float upx, float upy, float *xb, float *yb )
+f     INTEGER FUNCTION TXEXT( TEXT, X, Y, JUST, UPX, UPY, XB, YB )
+*
+c     - text - Pointer to a null-terminated character string to be displayed.
+f     - TEXT = CHARACTER * ( * ) (Given) - The string to be displayed.
+c     - x - The reference x coordinate.
+f     - X = REAL (Given) - The reference x coordinate.
+c     - y - The reference y coordinate.
+f     - Y = REAL (Given) - The reference y coordinate.
+c     - just - A character string which specifies the location within the
+f     - JUST = CHARACTER * ( * ) (Given ) - A string which specifies the 
+f        location within the
+*        text string which is to be placed at the reference position
+*        given by x and y. See "Text" above.
+c     - upx - The x component of the up-vector for the text.
+f     - UPX = REAL (Given) - The x component of the up-vector for the text.
+*        See "Text" above.
+c     - upy - The y component of the up-vector for the text.
+f     - UPX = REAL (Given) - The y component of the up-vector for the text.
+*        See "Text" above.
+c     - xb - An array of 4 elements in which to return the x coordinate of
+f     - XB( 4 ) = REAL (Returned) - Returned holding the x coordinate of
+*        each corner of the bounding box.
+c     - yb - An array of 4 elements in which to return the y coordinate of
+f     - YB( 4 ) = REAL (Returned) - Returned holding the y coordinate of
+*        each corner of the bounding box.
+
+*--
+*/
+
+/* Local Variables: */
+   const char *class;      /* Object class */
+   const char *method;     /* Current method */
+   int ifun;               /* Index into grf function list */
+   void (* wrapper)();     /* Wrapper function for C Grf routine*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Store the current method and class for inclusion in error messages
+   generated by lower level functions. */
+   method = "astGrfFun";
+   class = astClass( this );
+
+/* Identify the supplied function name and get its integer index into the
+   list of grf functions. */
+   ifun = astGrfFunID( name, method, class );
+
+/* Store the pointer. */
+   if( astOK ) {
+      this->grffun[ifun] = fun;
+
+/* In general, the interface to each Grf function will differ for
+   different languages. So we need a wrapper function with a known fixed
+   interface which can be used to invoke the actual Grf function with 
+   an interface suited to the language in use. Call astGrfWrapper to store 
+   a wrapper to a suitable function which can invoke the supplied
+   grf function. Here, we assume that the supplied function has a C
+   interface, so we set up a C wrapper. If this function is being called
+   from another language, then the interface for this function within
+   that language should set up an appropriate wrapper after calling this
+   function, thus over-riding the C wrapper set up here. */
+      if( ifun == AST__GATTR ) {
+         wrapper = (void (*)()) CGAttrWrapper;
+
+      } else if( ifun == AST__GAXSCALE ) {
+         wrapper = (void (*)()) CGAxScaleWrapper;
+
+      } else if( ifun == AST__GFLUSH ) {
+         wrapper = (void (*)()) CGFlushWrapper;
+
+      } else if( ifun == AST__GLINE ) {
+         wrapper = (void (*)()) CGLineWrapper;
+
+      } else if( ifun == AST__GMARK ) {
+         wrapper = (void (*)()) CGMarkWrapper;
+
+      } else if( ifun == AST__GQCH ) {
+         wrapper = (void (*)()) CGQchWrapper;
+
+      } else if( ifun == AST__GTEXT ) {
+         wrapper = (void (*)()) CGTextWrapper;
+
+      } else if( ifun == AST__GTXEXT ) {
+         wrapper = (void (*)()) CGTxExtWrapper;
+
+      } else if( astOK ) {
+         astError( AST__INTER, "%s(%s): AST internal programming error - "
+                   "Grf function id %d not yet supported.", method, class,
+                   ifun );
+      }
+      astGrfWrapper( this, name, wrapper );
+   }
+}
+
+int astGrfFunID_( const char *name, const char *method, const char *class ) {
+/*
+*  Name:
+*     astGrfFunID
+
+*  Purpose:
+*     Return the integer identifier for a given GRF routine.
+
+*  Type:
+*     Hidden public function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int astGrfFunID( const char *name, const char *method, 
+*                      const char *class )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function returns an integer identifying the named grf function.
+*     An error is reported if the named function is unknown. This function
+*     is used by non-class modules within AST (e.g. fplot.c) which is why
+*     it is public. It is not intended to be used by the public.
+
+*  Parameters:
+*     name 
+*        The grf function name. Any unambiguous abbreviation will do.
+*        Case is ignored. The full list of grf function names is:
+*        "Attr AxScale Flush Line Mark Qch Text TxExt". See grf_pgplot.c
+*        for details of these functions.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*/
+   return FullForm( "Attr AxScale Flush Line Mark Qch Text TxExt", name, 
+                    "Grf function name (programming error)", method, class );
+}
+
 static char *GrfItem( int item, const char *text ){
 /*
 *  Name:
@@ -10928,6 +12476,96 @@ static char *GrfItem( int item, const char *text ){
 
 /* Return the answer. */
    return ret;
+}
+
+static void GrfWrapper( AstPlot *this, const char *name, void (* wrapper)() ) {
+/*
+*+
+*  Name:
+*     astGrfWrapper
+
+*  Purpose:
+*     Register a wrapper function for a F77 or C Grf function.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void astGrfWrapper( AstPlot *this, const char *name, void (* wrapper)() )
+
+*  Description:
+*     This function stores a pointer to the supplied wrapper function
+*     within the plot, associating it with the grf function indicated by
+*     the "name" parameter. The supplied wrapper function should call the 
+*     named grf function, using an interface appropriate to the language
+*     in which the grf function is written.
+
+*  Parameters:
+*     this
+*        The plot.
+*     name
+*        A name indicating the graphics function which is called by the
+*        supplied wrapper function. See astGrfFun for details.
+*     wrapper
+*        A pointer to the wrapper function. This will be cast to an
+*        appropriate type for the named grf function before being store 
+*        in the Plot.
+*-
+*/
+
+/* Local Variables: */
+   const char *class;      /* Object class */
+   const char *method;     /* Current method */
+   int ifun;               /* Index into grf function list */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Store the current method and class for inclusion in error messages
+   generated by lower level functions. */
+   method = "astGrfWrapper";
+   class = astClass( this );
+
+/* Identify the supplied function name and get its integer index into the
+   list of grf functions. */
+   ifun = astGrfFunID( name, method, class );
+
+/* Cast the wrapper to an interface appropriate for the wrapped grf
+   function, and store it in the appropriate component of the Plot. */
+   if( ifun == AST__GATTR ) {
+      this->GAttr = (int (*)( AstPlot *, int, double, double *, int )) wrapper;
+
+   } else if( ifun == AST__GAXSCALE ) {
+      this->GAxScale = (int (*)( AstPlot *, float *, float * )) wrapper;
+
+   } else if( ifun == AST__GFLUSH ) {
+      this->GFlush = (int (*)( AstPlot *)) wrapper; 
+
+   } else if( ifun == AST__GLINE ) {
+      this->GLine = (int (*)( AstPlot *, int, const float *, 
+                               const float *)) wrapper; 
+
+   } else if( ifun == AST__GMARK ) {
+      this->GMark = (int (*)( AstPlot *, int , const float *, const float *, int )) wrapper;
+
+   } else if( ifun == AST__GQCH ) {
+      this->GQch = (int (*)( AstPlot *, float *, float * )) wrapper;
+
+   } else if( ifun == AST__GTEXT ) {
+      this->GText = (int (*)( AstPlot *, const char *, float, float, 
+                              const char *, float, float )) wrapper;
+
+   } else if( ifun == AST__GTXEXT ) {
+      this->GTxExt = (int (*)( AstPlot *, const char *, float, float, 
+                               const char *, float, float, float *, 
+                               float * )) wrapper;
+
+   } else if( astOK ) {
+      astError( AST__INTER, "%s(%s): AST internal programming error - "
+                "Grf function id %d not yet supported.", method, class,
+                ifun );
+   }
 }
 
 static void Grid( AstPlot *this_nd ){
@@ -11507,7 +13145,7 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
 
 }
 
-void GrfAttrs( AstPlot *this, int id, int set, int prim ){
+void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, const char *class ){
 /*
 *  Name:
 *     GrfAttrs
@@ -11520,7 +13158,7 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     void GrfAttrs( AstPlot *this, int id, int set, int prim )
+*     void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, const char *class )
 
 *  Class Membership:
 *     Plot member function.
@@ -11532,7 +13170,7 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim ){
 *     re-establish the original graphics attributes.
 *
 *     NOTE, each type of graphical object identified by "id" should be
-*     drawn entirely by calls to just one of astGMark, astGText or astGLine
+*     drawn entirely by calls to just one of GMark, GText or GLine
 *     as indicated by argument "prim".
 
 *  Parameters:
@@ -11564,6 +13202,12 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim ){
 *           GRF__LINE
 *           GRF__MARK
 *           GRF__TEXT
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
 
 *  Notes:
 *     -  This function should always be called in pairs with set=1 on the
@@ -11605,7 +13249,8 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim ){
          ival = astGetStyle( this, id );      
 
 /* Save the current value, and establish the new value. */
-         astGAttr( GRF__STYLE, (double) ival, attr++, prim );
+         GAttr( this, GRF__STYLE, (double) ival, attr++, prim, method,
+                class );
 
 /* If no style was specified, retain the current value. Indicate that no
    new value has been established by setting the old value bad. */
@@ -11616,7 +13261,7 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim ){
 /* Do the same for the line width attribute. */
       if( astTestWidth( this, id ) ){
          dval = astGetWidth( this, id );      
-         astGAttr( GRF__WIDTH, dval, attr++, prim );
+         GAttr( this, GRF__WIDTH, dval, attr++, prim, method, class );
       } else {
          *(attr++) = AST__BAD;
       }
@@ -11624,7 +13269,7 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim ){
 /* Do the same for the character size attribute. */
       if( astTestSize( this, id ) ){
          dval = astGetSize( this, id );      
-         astGAttr( GRF__SIZE, dval, attr++, prim );
+         GAttr( this, GRF__SIZE, dval, attr++, prim, method, class );
       } else {
          *(attr++) = AST__BAD;
       }
@@ -11632,7 +13277,7 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim ){
 /* Do the same for the character font attribute. */
       if( astTestFont( this, id ) ){
          ival = astGetFont( this, id );      
-         astGAttr( GRF__FONT, (double) ival, attr++, prim );
+         GAttr( this, GRF__FONT, (double) ival, attr++, prim, method, class );
       } else {
          *(attr++) = AST__BAD;
       }
@@ -11640,7 +13285,8 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim ){
 /* Do the same for the colour attribute. */
       if( astTestColour( this, id ) ){
          ival = astGetColour( this, id );      
-         astGAttr( GRF__COLOUR, (double) ival, attr++, prim );
+         GAttr( this, GRF__COLOUR, (double) ival, attr++, prim, method,
+                class );
       } else {
          *(attr++) = AST__BAD;
       }
@@ -11651,11 +13297,11 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim ){
    previous call to this function. Only do this if we are at nesting
    level zero. */
    if( !set && !nesting ){
-      astGAttr( GRF__STYLE, *(attr++), NULL, prim );
-      astGAttr( GRF__WIDTH, *(attr++), NULL, prim );
-      astGAttr( GRF__SIZE, *(attr++), NULL, prim );
-      astGAttr( GRF__FONT, *(attr++), NULL, prim );
-      astGAttr( GRF__COLOUR, *(attr++), NULL, prim );
+      GAttr( this, GRF__STYLE, *(attr++), NULL, prim, method, class );
+      GAttr( this, GRF__WIDTH, *(attr++), NULL, prim, method, class );
+      GAttr( this, GRF__SIZE, *(attr++), NULL, prim, method, class );
+      GAttr( this, GRF__FONT, *(attr++), NULL, prim, method, class );
+      GAttr( this, GRF__COLOUR, *(attr++), NULL, prim, method, class );
    }
 
 /* Return. */
@@ -11877,10 +13523,7 @@ static int GrText( AstPlot *this, int esc, const char *text, int ink,
          beta = 1.0;
 
 /*
-      if( !astGAxScale( &alpha, &beta ) ) {
-         ret = 0;
-         astError( AST__GRFER, "%s(%s): Graphics error in astGAxScale. ", 
-                   method, class );
+      GAxScale( this, &alpha, &beta, method, class );
 */
 
 
@@ -11925,15 +13568,15 @@ static int GrText( AstPlot *this, int esc, const char *text, int ink,
       y0 = ybase;
 
 /* Get the attributes for "normal" characters. */
-      astGAttr( GRF__SIZE, AST__BAD, &nsize, GRF__TEXT );
-      astGAttr( GRF__WIDTH, AST__BAD, &nwidth, GRF__TEXT );
-      astGAttr( GRF__FONT, AST__BAD, &nfont, GRF__TEXT );
-      astGAttr( GRF__STYLE, AST__BAD, &nstyle, GRF__TEXT );
-      astGAttr( GRF__COLOUR, AST__BAD, &ncolour, GRF__TEXT );
+      GAttr( this, GRF__SIZE, AST__BAD, &nsize, GRF__TEXT, method, class );
+      GAttr( this, GRF__WIDTH, AST__BAD, &nwidth, GRF__TEXT, method, class );
+      GAttr( this, GRF__FONT, AST__BAD, &nfont, GRF__TEXT, method, class );
+      GAttr( this, GRF__STYLE, AST__BAD, &nstyle, GRF__TEXT, method, class );
+      GAttr( this, GRF__COLOUR, AST__BAD, &ncolour, GRF__TEXT, method, class );
 
 /* Find the height in "standard" coordinates of "normal" text draw with the 
    requested up-vector. */
-      astGQch( &chv, &chh );
+      GQch( this, &chv, &chh, method, class );
       a = beta*chh*ux;
       b = alpha*chv*uy;
       nl = sqrt( a*a + b*b );
@@ -12054,19 +13697,11 @@ static int GrText( AstPlot *this, int esc, const char *text, int ink,
 
 /* Draw the sub-string (if required). */
             if( ink ) {
-               if( !astGText( p, xr, yr, "BL", upx, upy ) ) {
-                  ret = 0;
-                  astError( AST__GRFER, "%s(%s): Graphics error in astGText. ", 
-                            method, class );
-                  break;
-               }
+               GText( this, p, xr, yr, "BL", upx, upy, method, class );
             }
 
 /* Find the bounding box of the sub-string. */
-            if( !astGTxExt( p, xr, yr, "BL", upx, upy, txbn, tybn ) ){
-               astError( AST__GRFER, "%s(%s): Graphics error in astGTxExt.", 
-                         method, class );
-            } 
+            GTxExt( this, p, xr, yr, "BL", upx, upy, txbn, tybn, method, class );
 
 /* Convert the bounding box positions into "standard" coordinates
    relative to the left hand end of the text base-line. */
@@ -12165,41 +13800,41 @@ static int GrText( AstPlot *this, int esc, const char *text, int ink,
 /* For size changes, set the new size as a fraction of the normal size. */
          } else if( et == 's' ) {         
             if( dd != INT_MAX ) {
-               astGAttr( GRF__SIZE, ((double) dd/100.0)*nsize, NULL, GRF__TEXT );
+               GAttr( this, GRF__SIZE, ((double) dd/100.0)*nsize, NULL, GRF__TEXT, method, class );
             } else {
-               astGAttr( GRF__SIZE, nsize, NULL, GRF__TEXT );
+               GAttr( this, GRF__SIZE, nsize, NULL, GRF__TEXT, method, class );
             }
 
 /* For width changes, set the new width as a fraction of the normal width. */
          } else if( et == 'w' ) {         
             if( dd != INT_MAX ) {
-               astGAttr( GRF__WIDTH, ((double) dd/100.0)*nwidth, NULL, GRF__TEXT );
+               GAttr( this, GRF__WIDTH, ((double) dd/100.0)*nwidth, NULL, GRF__TEXT, method, class );
             } else {
-               astGAttr( GRF__WIDTH, nwidth, NULL, GRF__TEXT );
+               GAttr( this, GRF__WIDTH, nwidth, NULL, GRF__TEXT, method, class );
             }
 
 /* For font changes, set the new font. */
          } else if( et == 'f' ) {         
             if( dd != INT_MAX ) {
-               astGAttr( GRF__FONT, (double) dd, NULL, GRF__TEXT );
+               GAttr( this, GRF__FONT, (double) dd, NULL, GRF__TEXT, method, class );
             } else {
-               astGAttr( GRF__FONT, nfont, NULL, GRF__TEXT );
+               GAttr( this, GRF__FONT, nfont, NULL, GRF__TEXT, method, class );
             }
 
 /* For colour changes, set the new colour. */
          } else if( et == 'c' ) {         
             if( dd != INT_MAX ) {
-               astGAttr( GRF__COLOUR, (double) dd, NULL, GRF__TEXT );
+               GAttr( this, GRF__COLOUR, (double) dd, NULL, GRF__TEXT, method, class );
             } else {
-               astGAttr( GRF__COLOUR, ncolour, NULL, GRF__TEXT );
+               GAttr( this, GRF__COLOUR, ncolour, NULL, GRF__TEXT, method, class );
             }
 
 /* For style changes, set the new style. */
          } else if( et == 't' ) {         
             if( dd != INT_MAX ) {
-               astGAttr( GRF__STYLE, (double) dd, NULL, GRF__TEXT );
+               GAttr( this, GRF__STYLE, (double) dd, NULL, GRF__TEXT, method, class );
             } else {
-               astGAttr( GRF__STYLE, nstyle, NULL, GRF__TEXT );
+               GAttr( this, GRF__STYLE, nstyle, NULL, GRF__TEXT, method, class );
             }
 
 /* Reset everything if required. */
@@ -12207,11 +13842,11 @@ static int GrText( AstPlot *this, int esc, const char *text, int ink,
             off = 0.0;
             x0 = xbase;
             y0 = ybase;
-            astGAttr( GRF__SIZE, nsize, NULL, GRF__TEXT );
-            astGAttr( GRF__WIDTH, nwidth, NULL, GRF__TEXT );
-            astGAttr( GRF__COLOUR, ncolour, NULL, GRF__TEXT );
-            astGAttr( GRF__FONT, nfont, NULL, GRF__TEXT );
-            astGAttr( GRF__STYLE, nstyle, NULL, GRF__TEXT );
+            GAttr( this, GRF__SIZE, nsize, NULL, GRF__TEXT, method, class );
+            GAttr( this, GRF__WIDTH, nwidth, NULL, GRF__TEXT, method, class );
+            GAttr( this, GRF__COLOUR, ncolour, NULL, GRF__TEXT, method, class );
+            GAttr( this, GRF__FONT, nfont, NULL, GRF__TEXT, method, class );
+            GAttr( this, GRF__STYLE, nstyle, NULL, GRF__TEXT, method, class );
          }
       }
 
@@ -12244,11 +13879,11 @@ static int GrText( AstPlot *this, int esc, const char *text, int ink,
       }
 
 /* Ensure any future text comes out with "normal" attributes. */
-      astGAttr( GRF__SIZE, nsize, NULL, GRF__TEXT );
-      astGAttr( GRF__WIDTH, nwidth, NULL, GRF__TEXT );
-      astGAttr( GRF__COLOUR, ncolour, NULL, GRF__TEXT );
-      astGAttr( GRF__FONT, nfont, NULL, GRF__TEXT );
-      astGAttr( GRF__STYLE, nstyle, NULL, GRF__TEXT );
+      GAttr( this, GRF__SIZE, nsize, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__WIDTH, nwidth, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__COLOUR, ncolour, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__FONT, nfont, NULL, GRF__TEXT, method, class );
+      GAttr( this, GRF__STYLE, nstyle, NULL, GRF__TEXT, method, class );
 
 /* Free the local copy of the supplied string. */
       ltext = (char *) astFree( (void *) ltext );
@@ -12257,19 +13892,11 @@ static int GrText( AstPlot *this, int esc, const char *text, int ink,
    the text as supplied. */
    } else {
       if( ink ) {
-         if( !astGText( text, x, y, "BL", upx, upy ) ) {
-            ret = 0;
-            astError( AST__GRFER, "%s(%s): Graphics error in astGText. ", 
-                      method, class );
-         }
+         GText( this, text, x, y, "BL", upx, upy, method, class );
       }
 
 /* Find the bounding box of the text. */
-      if( !astGTxExt( text, x, y, "BL", upx, upy, xbn, ybn ) ){
-         astError( AST__GRFER, "%s(%s): Graphics error in astGTxExt.", 
-                   method, class );
-
-      } 
+      GTxExt( this, text, x, y, "BL", upx, upy, xbn, ybn, method, class );
    }
 
 /* Return the status. */
@@ -12623,6 +14250,8 @@ static void InitVtab( AstPlotVtab *vtab ) {
    vtab->Clip = Clip; 
    vtab->GridLine = GridLine;
    vtab->Curve = Curve;
+   vtab->GrfFun = GrfFun;
+   vtab->GrfWrapper = GrfWrapper;
    vtab->PolyCurve = PolyCurve;
    vtab->CvBrk = CvBrk;
    vtab->Grid = Grid; 
@@ -12650,6 +14279,10 @@ static void InitVtab( AstPlotVtab *vtab ) {
    vtab->SetClipOp = SetClipOp;
    vtab->GetClipOp = GetClipOp;
    vtab->TestClipOp = TestClipOp;
+   vtab->ClearGrf = ClearGrf;
+   vtab->SetGrf = SetGrf;
+   vtab->GetGrf = GetGrf;
+   vtab->TestGrf = TestGrf;
    vtab->ClearDrawTitle = ClearDrawTitle;
    vtab->SetDrawTitle = SetDrawTitle;
    vtab->GetDrawTitle = GetDrawTitle;
@@ -13229,7 +14862,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-   GrfAttrs( this, NUMLABS_ID, 1, GRF__TEXT );
+   GrfAttrs( this, NUMLABS_ID, 1, GRF__TEXT, method, class );
 
 /* If required, draw the labels around the edges of the plotting area. */
    if( labelat[ 0 ] == AST__BAD || labelat[ 1 ] == AST__BAD ){
@@ -13491,7 +15124,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
    }
 
 /* Re-establish the original graphical attributes. */
-   GrfAttrs( this, NUMLABS_ID, 0, GRF__TEXT );
+   GrfAttrs( this, NUMLABS_ID, 0, GRF__TEXT, method, class );
 
 /* Return. */
    return;
@@ -13628,10 +15261,10 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 
 /* Use Crv and Map2 to draw the intersection of the straight line with
    the region containing valid physical coordinates. */
-   Crv( d, x, y, method, class );
+   Crv( this, d, x, y, method, class );
 
 /* End the current poly line. */
-   Opoly( method, class );
+   Opoly( this, method, class );
 
 /* Tidy up the static data used by Map2. */
    Map2( 0, NULL, NULL, NULL, method, class );
@@ -14474,7 +16107,7 @@ f     - If any marker position is clipped (see AST_CLIP), then the
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-   GrfAttrs( this, MARKS_ID, 1, GRF__MARK );
+   GrfAttrs( this, MARKS_ID, 1, GRF__MARK, method, class );
 
 /* Create a PointSet to hold the supplied physical coordinates. */
    pset1 = astPointSet( nmark, ncoord, "" );
@@ -14534,10 +16167,7 @@ f     - If any marker position is clipped (see AST_CLIP), then the
       }
 
 /* Draw the remaining markers. */
-      if( astOK && !astGMark( nn, x, y, type ) ){
-         astError( AST__GRFER, "%s(%s): Graphics error in astGMark. ", 
-                   method, class );
-      }
+      GMark( this, nn, x, y, type, method, class );
 
    }
 
@@ -14553,13 +16183,13 @@ f     - If any marker position is clipped (see AST_CLIP), then the
    ptr1 = (const double **) astFree( (void *) ptr1 );
 
 /* Re-establish the original graphical attributes. */
-   GrfAttrs( this, MARKS_ID, 0, GRF__MARK );
+   GrfAttrs( this, MARKS_ID, 0, GRF__MARK, method, class );
 
 /* Return */
    return;
 }
 
-static void Opoly( const char *method, const char *class ){
+static void Opoly( AstPlot *this, const char *method, const char *class ){
 /*
 *  Name:
 *     Opoly
@@ -14572,7 +16202,7 @@ static void Opoly( const char *method, const char *class ){
 
 *  Synopsis:
 *     #include "plot.h"
-*     void Opoly( const char *method, const char *class )
+*     void Opoly( AstPlot *this, const char *method, const char *class )
 
 *  Class Membership:
 *     Plot member function.
@@ -14593,12 +16223,8 @@ static void Opoly( const char *method, const char *class ){
 /* Check the global status. */
    if( !astOK ) return;
 
-/* Call a function in the low level graphics module GRF to draw the 
-   poly-line. Report an error if anything goes wrong. */
-   if( !astGLine( Poly_n, Poly_x, Poly_y ) ){
-      astError( AST__GRFER, "%s(%s): Graphics error in astGLine. ", method, 
-                class );
-   }
+/* Draw the poly-line. */
+   GLine( this, Poly_n, Poly_x, Poly_y, method, class );
 
 /* Indicate that the poly-line buffer is now empty. */
    Poly_n = 0;
@@ -14858,10 +16484,10 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
                     list->just, (float) list->upx, (float) list->upy, box, 
                     method, class ) ) {
 
-         astGText( list->text, (float) list->x, (float) list->y, list->just, 
-                   (float) list->upx, (float) list->upy );
+         GText( this, list->text, (float) list->x, (float) list->y, list->just, 
+                   (float) list->upx, (float) list->upy, method, class );
 
-/* ENABLE-ESCAPE - Replace the above call to astGText with the call to
+/* ENABLE-ESCAPE - Replace the above call to GText with the call to
    DrawText below when escape sequences are enabled.
          DrawText( this, esc, list->text, (float) list->x, (float) list->y,
                    list->just, (float) list->upx, (float) list->upy, method, 
@@ -14933,10 +16559,10 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
                        method, class ) ) {
 
 /* If not, draw this "root" label without any abbreviation. */
-            astGText( ll->text, (float) ll->x, (float) ll->y, ll->just, 
-                      (float) ll->upx, (float) ll->upy );
+            GText( this, ll->text, (float) ll->x, (float) ll->y, ll->just, 
+                      (float) ll->upx, (float) ll->upy, method, class );
 
-/* ENABLE-ESCAPE - Replace the above call to astGText with the call to
+/* ENABLE-ESCAPE - Replace the above call to GText with the call to
    DrawText below when escape sequences are enabled.
             DrawText( this, esc, ll->text, (float) ll->x, (float) ll->y,
                       ll->just, (float) ll->upx, (float) ll->upy, method, 
@@ -14993,9 +16619,10 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
             }
 
 /* Draw the label. */
-            astGText( atext, (float) ll->x, (float) ll->y, ll->just, 
-                      (float) ll->upx, (float) ll->upy );
-/* ENABLE-ESCAPE - Replace the above call to astGText with the call to
+            GText( this, atext, (float) ll->x, (float) ll->y, ll->just, 
+                      (float) ll->upx, (float) ll->upy, method, class );
+
+/* ENABLE-ESCAPE - Replace the above call to GText with the call to
    DrawText below when escape sequences are enabled.
             DrawText( this, esc, atext, (float) ll->x, (float) ll->y,
                       ll->just, (float) ll->upx, (float) ll->upy, method, 
@@ -15044,9 +16671,10 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
             }
 
 /* Draw the label. */
-            astGText( atext, (float) ll->x, (float) ll->y, ll->just, 
-                      (float) ll->upx, (float) ll->upy );
-/* ENABLE-ESCAPE - Replace the above call to astGText with the call to
+            GText( this, atext, (float) ll->x, (float) ll->y, ll->just, 
+                      (float) ll->upx, (float) ll->upy, method, class );
+
+/* ENABLE-ESCAPE - Replace the above call to GText with the call to
    DrawText below when escape sequences are enabled.
             DrawText( this, esc, atext, (float) ll->x, (float) ll->y,
                       ll->just, (float) ll->upx, (float) ll->upy, method, 
@@ -15247,7 +16875,7 @@ f        The global status.
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-         GrfAttrs( this, CURVE_ID, 1, GRF__LINE );
+         GrfAttrs( this, CURVE_ID, 1, GRF__LINE, method, class );
 
 /* Loop round each curve segment. */
          for( i = 1 ; i < npoint; i++ ) {
@@ -15306,7 +16934,7 @@ f        The global status.
                Map3( CRV_NPNT, d, x, y, method, class );
 
 /* Use Crv and Map3 to draw the curve segment. */
-               Crv( d, x, y, method, class );
+               Crv( this, d, x, y, method, class );
 
 /* If no part of the curve could be drawn, set the number of breaks and the 
    length of the drawn curve to zero. */
@@ -15339,13 +16967,13 @@ f        The global status.
          }
 
 /* End the last poly line. */
-         Opoly( method, class );
+         Opoly( this, method, class );
 
 /* Tidy up the static data used by Map3. */
          Map3( 0, NULL, NULL, NULL, method, class );
 
 /* Re-establish the original graphical attributes. */
-         GrfAttrs( this, CURVE_ID, 0, GRF__LINE );
+         GrfAttrs( this, CURVE_ID, 0, GRF__LINE, method, class );
 
       }
 
@@ -15534,6 +17162,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         ( 1 == sscanf( setting, "clipop= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetClipOp( this, ival );
+
+/* Grf. */
+/* ---- */
+   } else if ( nc = 0,
+        ( 1 == sscanf( setting, "grf= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetGrf( this, ival );
 
 /* DrawTitle. */
 /* ---------- */
@@ -16079,6 +17714,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "clipop" ) ) {
       result = astTestClipOp( this );
 
+/* Grf. */
+/* ---- */
+   } else if ( !strcmp( attrib, "grf" ) ) {
+      result = astTestGrf( this );
+
 /* DrawTitle. */
 /* ---------- */
    } else if ( !strcmp( attrib, "drawtitle" ) ) {
@@ -16424,7 +18064,7 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-   GrfAttrs( this, TEXT_ID, 1, GRF__TEXT );
+   GrfAttrs( this, TEXT_ID, 1, GRF__TEXT, method, class );
 
 /* Get the number of coordinates in the physical coordinate frame. */
    ncoord = astGetNout( this );   
@@ -16477,10 +18117,10 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
       if( ptr2[0][0] != AST__BAD && ptr2[1][0] != AST__BAD ){
 
 /* Draw the text string. */
-         astGText( ltext, (float) ptr2[0][0], (float) ptr2[1][0], ljust, 
-                   up[ 0 ], up[ 1 ] );
+         GText( this, ltext, (float) ptr2[0][0], (float) ptr2[1][0], ljust, 
+                   up[ 0 ], up[ 1 ], method, class );
 
-/* ENABLE-ESCAPE - Replace the above call to astGText with the call to
+/* ENABLE-ESCAPE - Replace the above call to GText with the call to
    DrawText below when escape sequences are enabled.
          DrawText( this, astGetEscape( this ), ltext, (float) ptr2[0][0],
                    (float) ptr2[1][0], ljust, up[ 0 ], up[ 1 ], method, 
@@ -16501,7 +18141,7 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
    ptr1 = (const double **) astFree( (void *) ptr1 );
 
 /* Re-establish the original graphical attributes. */
-   GrfAttrs( this, TEXT_ID, 0, GRF__TEXT );
+   GrfAttrs( this, TEXT_ID, 0, GRF__TEXT, method, class );
 
 /* Return */
    return;
@@ -16586,7 +18226,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-   GrfAttrs( this, TEXTLABS_ID, 1, GRF__TEXT );
+   GrfAttrs( this, TEXTLABS_ID, 1, GRF__TEXT, method, class );
    
 /* Take a copy of the bounding box which encloses all other parts of the
    annotated grid. If nothing has been plotted, use an area 20 % smaller
@@ -16746,9 +18386,9 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
          }
 
 /* Display the label. */
-         astGText( text, xref, yref, just, upx, upy );
+         GText( this, text, xref, yref, just, upx, upy, method, class );
 
-/* ENABLE-ESCAPE - Replace the above call to astGText with the call to
+/* ENABLE-ESCAPE - Replace the above call to GText with the call to
    DrawText below when escape sequences are enabled.
          DrawText( this, esc, text, xref, yref, just,
                    upx, upy, method, class );
@@ -16777,7 +18417,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
    }
 
 /* Re-establish the original graphical attributes. */
-   GrfAttrs( this, TEXTLABS_ID, 0, GRF__TEXT );
+   GrfAttrs( this, TEXTLABS_ID, 0, GRF__TEXT, method, class );
 
 /* See if the title is to be drawn. */
    if( astOK && astGetDrawTitle( this ) ){
@@ -16793,7 +18433,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
  
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
-      GrfAttrs( this, TITLE_ID, 1, GRF__TEXT );
+      GrfAttrs( this, TITLE_ID, 1, GRF__TEXT, method, class );
 
 /* Take a copy of the bounding box which encloses all other parts of the
    annotated grid (this may have been extended by the above code). If 
@@ -16827,16 +18467,16 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 
 /* Display the title. Justify the bottom of the whole bounding box (not 
    just the text base-line). */
-      astGText( text, xref, yref, "BC", 0.0F, 1.0F );
+      GText( this, text, xref, yref, "BC", 0.0F, 1.0F, method, class );
 
-/* ENABLE-ESCAPE - Replace the above call to astGText with the call to
+/* ENABLE-ESCAPE - Replace the above call to GText with the call to
    DrawText below when escape sequences are enabled.
       DrawText( this, esc, text, xref, yref, "DC", 0.0F, 1.0F,
                 method, class );
 */
 
 /* Re-establish the original graphical attributes. */
-      GrfAttrs( this, TITLE_ID, 0, GRF__TEXT );
+      GrfAttrs( this, TITLE_ID, 0, GRF__TEXT, method, class );
 
 /* Release the memory allocated to store the title. */
       new_text = (char *) astFree( (void *) new_text );
@@ -16958,10 +18598,10 @@ static void Ticker( AstPlot *this, int edge, int axis, double value,
             if( this->yrev ) *vy = -*vy;
 
 /* Draw the tick mark as a straight line of the specified length. */
-            Bpoly( (float) *x, (float) *y, method, class );
-            Apoly( (float)( *x + tklen*(*vx) ), (float)( *y + tklen*(*vy) ), 
+            Bpoly( this, (float) *x, (float) *y, method, class );
+            Apoly( this, (float)( *x + tklen*(*vx) ), (float)( *y + tklen*(*vy) ), 
                    method, class );
-            Opoly( method, class );
+            Opoly( this, method, class );
                
 /* Move on to the next crossing. */
             x += 4;
@@ -17342,7 +18982,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 
 }
 
-static void TraceBorder( double **ptr1, double **ptr2, int dim, int *edge,
+static void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, int *edge,
                          const char *method, const char *class ){
 /*
 *  Name:
@@ -17357,7 +18997,7 @@ static void TraceBorder( double **ptr1, double **ptr2, int dim, int *edge,
 
 *  Synopsis:
 *     #include "plot.h"
-*     void TraceBorder( double **ptr1, double **ptr2, int dim, int *edge,
+*     void TraceBorder( AstPlot *this, double **ptr1, double **ptr2, int dim, int *edge,
 *                      const char *method, const char *class )
 
 *  Class Membership:
@@ -17644,7 +19284,7 @@ static void TraceBorder( double **ptr1, double **ptr2, int dim, int *edge,
    if( ed0 != -1 ){
 
 /* Start the polyline at the recorded edge crossing. */
-      Bpoly( (float) x0, (float) y0, method, class );
+      Bpoly( this, (float) x0, (float) y0, method, class );
 
 /* Initialise the row and column of the starting cell, and the edge
    through which the curve enters the starting cell. */
@@ -17699,7 +19339,7 @@ static void TraceBorder( double **ptr1, double **ptr2, int dim, int *edge,
    ignore the edge through which the curve entered the cell). Add a section 
    to the polyline which ends at the mid point of the edge. */
             if( lbad != bad && test_edge != ed ){
-               Apoly( (float) ( 0.5*( *( gx[ ca ] ) + *( gx[ cb ] ) ) ),
+               Apoly( this, (float) ( 0.5*( *( gx[ ca ] ) + *( gx[ cb ] ) ) ),
                       (float) ( 0.5*( *( gy[ ca ] ) + *( gy[ cb ] ) ) ),
                       method, class );
 
@@ -17763,7 +19403,7 @@ static void TraceBorder( double **ptr1, double **ptr2, int dim, int *edge,
 
 /* We have now reached the edge of the grid, or the curve has been lost.
    In either case end the poly line. */
-      Opoly( method, class );
+      Opoly( this, method, class );
 
    }
 
@@ -19278,6 +20918,25 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    cause a default value of 0 (no, i.e. a logical AND) to be used. */
       new->clipop = -1;
 
+/* Is the graphics interface registered using astGrfFun to be used?
+   Store a value of -1 to indicate that no value has yet been set. This will 
+   cause a default value of 0 (no, i.e. use the graphics interface
+   selected at link-time) to be used. */
+      new->grf = -1;
+
+/* Wrapper functions to call the drawing routines. These are the 
+   default wrappers which call GRF routines written in C. Alternative
+   wrappers are defined in fplot.c for use with GRF routines written in 
+   F77. */
+      new->GAttr = CGAttrWrapper;
+      new->GAxScale = CGAxScaleWrapper;
+      new->GFlush = CGFlushWrapper;
+      new->GLine = CGLineWrapper;
+      new->GMark = CGMarkWrapper;
+      new->GQch = CGQchWrapper;
+      new->GText = CGTextWrapper;
+      new->GTxExt = CGTxExtWrapper;
+
 /* Is a title to be added to an annotated grid? Store a value of -1 to 
    indicate that no value has yet been set. This will cause a default value 
    of 1 (yes) to be used. */
@@ -19565,6 +21224,10 @@ AstPlot *astLoadPlot_( void *mem, size_t size, int init,
 /* ------- */
       new->clipop = astReadInt( channel, "clpop", -1 );
       if ( TestClipOp( new ) ) SetClipOp( new, new->clipop );
+
+/* Grf. */
+/* ---- */
+      new->grf = -1;
 
 /* DrawTitle. */
 /* --------- */
@@ -19908,6 +21571,16 @@ void astPolyCurve_( AstPlot *this, int npoint, int ncoord, int dim,
    (**astMEMBER(this,Plot,PolyCurve))(this,npoint,ncoord,dim,in);
 }
 
+void astGrfFun_( AstPlot *this, const char *name, void (* fun)() ){
+   if( !astOK ) return;
+   (**astMEMBER(this,Plot,GrfFun))(this,name,fun);
+}
+
+void astGrfWrapper_( AstPlot *this, const char *name, void (* wrapper)() ){
+   if( !astOK ) return;
+   (**astMEMBER(this,Plot,GrfWrapper))(this,name,wrapper);
+}
+
 /* Special public interface functions. */
 /* =================================== */
 /* These provide the public interface to certain special functions
@@ -20159,8 +21832,4 @@ f     function is invoked with STATUS set to an error value, or if it
    return astMakeId( new );
 
 }
-
-
-
-
 

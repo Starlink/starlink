@@ -748,12 +748,12 @@ int astGQch( float *chv, float *chh ){
 *  Parameters:
 *     chv
 *        A pointer to the double which is to receive the height of
-*        characters drawn vertically. This will be an increment in the X
-*        axis.
+*        characters drawn with a vertical baseline . This will be an 
+*        increment in the X axis.
 *     chh
 *        A pointer to the double which is to receive the height of
-*        characters drawn vertically. This will be an increment in the Y
-*        axis.
+*        characters drawn with a horizontal baseline. This will be an 
+*        increment in the Y axis.
 
 *  Returned Value:
 *     A value of 0 is returned if an error occurs, and 1 is returned
