@@ -250,6 +250,8 @@
      :                                                   SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_R5','_REAL',0,VAL__NBR,
      :                                                   SID,STATUS)
+*  help string
+        CALL NBS_DEFINE_PRIMITIVE(ID,'HELP','_CHAR',0,80,SID,STATUS)
 
 *  colour table
         CNAME='DATA'
