@@ -30,6 +30,7 @@
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     ACD:  A.C. Davenhall (Starlink, ROE)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -46,6 +47,8 @@
 #     29-NOV-1999 (ACD):
 #        Added link to NDF library.  Removed links to FITSIO, FIO and
 #        CHR (which are included in the link to CAT).
+#     23-FEB-2005 (TIMJ):
+#        Switch from GKS PGPLOT to Native PGPLOT
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -53,7 +56,7 @@
 
 #-
 
-      echo `cat_link_adam` `pgp_link_adam` `pda_link` `ndf_link_adam` \
+      echo `cat_link_adam` `pgplot_link_adam` `pda_link` `ndf_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
