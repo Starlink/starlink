@@ -43,7 +43,7 @@
 *     frames with this domain will be removed.  
 *
 *     For the reference NDF, there is a unit mapping between the new
-*     frame and its initial Current frame.  For each other NDF, the
+*     frame and its PIXEL-domain frame.  For each other NDF, the
 *     program attempts to find a mapping from the reference NDF to it.
 *     If it and the reference NDF do not share frames in any of the
 *     domains given by the DOMAINS parameter, it will try to use the 
@@ -125,7 +125,7 @@
 *     REFPOS = _INTEGER (Read)
 *        The position within the IN list which corresponds to the 
 *        reference NDF.  The registration frame is a copy of (and 
-*        unitmapped to) the Current frame of the reference NDF,
+*        unitmapped to) the pixel frame of the reference NDF,
 *        and for each other NDF the program tries to find a path from
 *        it to the reference NDF going from one NDF to another only
 *        when they both have frames in the same one of the entries in
@@ -316,8 +316,8 @@
       END IF
 
 *  Set the index of the reference frame in the reference WCS frameset.
-*  It takes the value of the frameset's initial Current frame.
-      JREF = AST_GETI( IWCS( REFPOS ), 'Current', STATUS )
+*  It takes the value of the frameset's initial PIXEL-domain frame.
+      CALL CCD1_FRDM( IWCS( REFPOS ), 'PIXEL', JREF, STATUS )
 
 *  Construct the output registration frame as a doctored copy of the 
 *  Current frame of the reference NDF.
@@ -407,7 +407,7 @@
          CALL CCD1_MSG( ' ', '  ^I) ^NDF:', STATUS )
 
 *  Find the best path through the graph from the Current frame of this
-*  frameset to the reference (Current) frame in the reference frameset.
+*  frameset to the reference frame in the reference frameset.
          CALL CCD1_GRPTH( %VAL( IPGRA ), NEDGE, I, REFPOS, WORK, WORK2,
      :                    PATH, NSTEP, STATUS )
 
