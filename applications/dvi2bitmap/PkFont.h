@@ -7,23 +7,42 @@
 #include <string>
 #include "InputByteStream.h"
 
+class PkRasterdata {
+ public:
+    PkRasterdata(Byte opcode,
+		 const Byte *rasterdata, unsigned int len,
+		 unsigned int w, unsigned int h);
+    const Byte *bitmap()
+	{ if (bitmap_ == 0) construct_bitmap(); return bitmap_; }
+    static debug (bool sw) { debug_ = sw; }
+ private:
+    const Byte *rasterdata_, *eob_;
+    const unsigned int len_, w_, h_;
+    Byte dyn_f_;
+    bool start_black_;
+    Byte *bitmap_;
+    bool highnybble_;
+    unsigned int repeatcount_;
+    unsigned int unpackpk();
+    Byte nybble();
+    void construct_bitmap ();
+    static bool debug_;
+};
+
 class PkGlyph {
  public:
-    PkGlyph(Byte dyn_f,
-	    unsigned int cc,
+    PkGlyph(unsigned int cc,
 	    unsigned int tfmwidth,
 	    unsigned int dm,
 	    unsigned int w,
 	    unsigned int h,
 	    int hoff,
 	    int voff,
-	    const Byte *rasterdata)
-	: dyn_f_(dyn_f),
-	cc_(cc), tfmwidth_(tfmwidth), dm_(dm), w_(w), h_(h),
+	    PkRasterdata *rasterdata)
+	: cc_(cc), tfmwidth_(tfmwidth), dm_(dm), w_(w), h_(h),
 	hoff_(hoff), voff_(voff), rasterdata_(rasterdata),
 	longform_(false), bitmap_(0) { };
-    PkGlyph(Byte dyn_f,
-	    unsigned int cc,
+    PkGlyph(unsigned int cc,
 	    unsigned int tfmwidth,
 	    unsigned int dx,
 	    unsigned int dy,
@@ -31,35 +50,23 @@ class PkGlyph {
 	    unsigned int h,
 	    unsigned int hoff,
 	    unsigned int voff,
-	    const Byte *rasterdata)
-	: dyn_f_(dyn_f),
-	cc_(cc), tfmwidth_(tfmwidth), dx_(dx), dy_(dy), w_(w), h_(h),
+	    PkRasterdata *rasterdata)
+	: cc_(cc), tfmwidth_(tfmwidth), dx_(dx), dy_(dy), w_(w), h_(h),
 	hoffu_(hoff), voffu_(voff), rasterdata_(rasterdata),
 	longform_(true), bitmap_(0) { };
     const Byte *bitmap();
     inline unsigned int w() const { return w_; }
     inline unsigned int h() const { return h_; }
+    static debug (bool sw) { debug_ = sw; }
  private:
-    Byte dyn_f_;
     unsigned int cc_, tfmwidth_, dm_, dx_, dy_, w_, h_;
     int hoff_, voff_;
     unsigned int hoffu_, voffu_;
-    const Byte *rasterdata_;
+    PkRasterdata *rasterdata_;
     bool longform_;
-    Byte *bitmap_;
-    void construct_bitmap ();
-    // PKDecodeState keeps state for nybble, unpackpk and construct_bitmap
-    struct PKDecodeState {
-	const Byte *rasterp;
-	bool highnybble;
-	unsigned int repeatcount;
-    };
-    unsigned int unpackpk(PKDecodeState &);
-    inline static Byte nybble(PKDecodeState & s) {
-	s.highnybble = !s.highnybble;
-	return (s.highnybble ? (*s.rasterp)>>4 : (*s.rasterp++)&0xf);
-    }
-};
+    const Byte *bitmap_;
+    static bool debug_;
+ };
 
 class PkFont {
  public:
@@ -69,7 +76,7 @@ class PkFont {
 	    string name);
     ~PkFont();
     PkGlyph *glyph (unsigned int i) const { return glyphs_[i]; }
-    
+    static debug (bool sw) { debug_ = sw; }
  private:
     unsigned int checksum_, scalefactor_, designsize_;
     string name_;
@@ -79,6 +86,7 @@ class PkFont {
     const nglyphs_ = 256;
     PkGlyph *glyphs_[nglyphs_];
     void read_font(InputByteStream&);
+    static bool debug_;
 };
 
 #endif // #ifndef PK_FONT_HEADER_READ

@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <cstdio>
 #include "dvi2bitmap.h"
 #include "InputByteStream.h"
 
@@ -57,9 +58,9 @@ Byte InputByteStream::getByte()
 	return 0;
 
     if (p_ < buf_)
-	throw DviBug ("InputByteStream pointer before buffer start");
+	throw DviBug ("InputByteStream: pointer before buffer start");
     if (p_ > eob_)
-	throw DviBug ("InputByteStream pointer beyond EOF");
+	throw DviBug ("InputByteStream: pointer beyond EOF");
 
     if (p_ == eob_)
     {
@@ -76,16 +77,29 @@ Byte InputByteStream::getByte()
     return eof_ ? 0 : *p_++;
 }
 
-const Byte *InputByteStream::getBlock (unsigned int pos)
+const Byte *InputByteStream::getBlock (unsigned int pos, unsigned int length)
 {
     if (eof_)
 	return 0;
 
-    Byte *blockp = p_ + pos;
+    Byte *blockp = buf_ + pos;
     if (blockp < buf_)
-	throw DviBug ("InputByteStream pointer before buffer start");
+	throw DviBug ("InputByteStream: pointer before buffer start");
     if (blockp > eob_)
-	throw DviBug ("InputByteStream pointer beyond EOF");
+    {
+	char buf[100];
+	sprintf (buf, "InputByteStream::getBlock: pointer beyond EOF (%d,%d)",
+		 pos, length);
+	throw DviBug (buf);
+    }
+    if (blockp+length > eob_)
+    {
+	char buf[100];
+	sprintf (buf,
+		"InputByteStream::getBlock: requested block too large (%d,%d)",
+		 pos,length);
+	throw DviBug (buf);
+    }
 
     return blockp;
 }

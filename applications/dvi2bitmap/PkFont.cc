@@ -1,9 +1,15 @@
 // part of dvi2bitmap
 // $Id$
 
+#include <cstring>
 #include "dvi2bitmap.h"
 #include "InputByteStream.h"
 #include "PkFont.h"
+
+// initialise class static variables
+bool PkRasterdata::debug_;
+bool PkFont::debug_;
+bool PkGlyph::debug_;
 
 PkFont::PkFont(unsigned int c,
 	       unsigned int s,
@@ -43,12 +49,13 @@ void PkFont::read_font (InputByteStream& ibs)
     vppp_ = ibs.getUIU(4);
 
 
-    cout << "PK file " << name_ << " '" << comment_ << "\'\n"
-	 << "ds="  << ds_
-	 << " cs=" << cs_
-	 << " hppp=" << hppp_
-	 << " vppp=" << vppp_
-	 << '\n';
+    if (debug_)
+	cerr << "PK file " << name_ << " '" << comment_ << "\'\n"
+	     << "ds="  << ds_
+	     << " cs=" << cs_
+	     << " hppp=" << hppp_
+	     << " vppp=" << vppp_
+	     << '\n';
 
     // Now scan through the file, reporting opcodes and character definitions
     bool end_of_scan = false;
@@ -57,8 +64,6 @@ void PkFont::read_font (InputByteStream& ibs)
 	Byte opcode = ibs.getByte();
 	if (opcode <= 239)	// character definition
 	{
-	    Byte dyn_f = opcode >> 4;
-	    bool black_count = opcode & 8;
 	    bool two_byte = opcode & 4;
 	    Byte pl_prefix = opcode & 3;
 	    unsigned int packet_length;
@@ -85,11 +90,15 @@ void PkFont::read_font (InputByteStream& ibs)
 			    ("PK file has out-of-range character code");
 
 		    pos = ibs.pos();
-		    glyphs_[g_cc] = new PkGlyph (dyn_f,
-						 g_cc, g_tfmwidth, g_dx, g_dy, 
+		    packet_length -= 7*4;
+		    PkRasterdata *rd
+			= new PkRasterdata (opcode,
+					    ibs.getBlock(pos,packet_length),
+					    packet_length, g_w, g_h);
+		    glyphs_[g_cc] = new PkGlyph (g_cc, g_tfmwidth, g_dx, g_dy, 
 						 g_w, g_h, g_hoffu, g_voffu,
-						 ibs.getBlock(pos));
-		    ibs.skip (packet_length - 7*4);
+						 rd);
+		    ibs.skip (packet_length);
 		}
 		else		// extended short form character preamble
 		{
@@ -109,11 +118,15 @@ void PkFont::read_font (InputByteStream& ibs)
 			    ("PK file has out-of-range character code");
 
 		    pos = ibs.pos();
-		    glyphs_[g_cc] = new PkGlyph (dyn_f,
-						 g_cc, g_tfmwidth, g_dm,
+		    packet_length -= 3 + 5*2;
+		    PkRasterdata *rd
+			= new PkRasterdata (opcode,
+					    ibs.getBlock(pos,packet_length),
+					    packet_length, g_w, g_h);
+		    glyphs_[g_cc] = new PkGlyph (g_cc, g_tfmwidth, g_dm,
 						 g_w, g_h, g_hoff, g_voff,
-						 ibs.getBlock(pos));
-		    ibs.skip (packet_length - 3 - 5*2);
+						 rd);
+		    ibs.skip (packet_length);
 		}
 	    else		// short form character preamble
 	    {
@@ -133,19 +146,24 @@ void PkFont::read_font (InputByteStream& ibs)
 			("PK file has out-of-range character code");
 
 		pos = ibs.pos();
-		glyphs_[g_cc] = new PkGlyph (dyn_f,
-					     g_cc, g_tfmwidth, g_dm,
+		packet_length -= 8;
+		PkRasterdata *rd
+		    = new PkRasterdata (opcode,
+					ibs.getBlock(pos,packet_length),
+					packet_length, g_w, g_h);
+		glyphs_[g_cc] = new PkGlyph (g_cc, g_tfmwidth, g_dm,
 					     g_w, g_h, g_hoff, g_voff,
-					     ibs.getBlock(pos));
-		ibs.skip(packet_length - 8);
+					     rd);
+		ibs.skip(packet_length);
 	    }
-	    cout << "Char " << g_cc
-		 << " tfm=" << g_tfmwidth
-		 << " w="   << g_w
-		 << " h="   << g_h
-		 << " off=(" << g_hoff << ',' << g_voff
-		 << ")\n\tat " << pos
-		 << '(' << packet_length << ")\n";
+	    if (debug_)
+		cerr << "Char " << g_cc
+		     << " tfm=" << g_tfmwidth
+		     << " w="   << g_w
+		     << " h="   << g_h
+		     << " off=(" << g_hoff << ',' << g_voff
+		     << ")\n\tat " << pos
+		     << '(' << packet_length << ")\n";
 	}
 	else			// opcode is command
 	{
@@ -166,7 +184,8 @@ void PkFont::read_font (InputByteStream& ibs)
 			 special_len > 0;
 			 special_len--)
 			special += static_cast<char>(ibs.getByte());
-		    cout << "Special \'" << special << "\'\n";
+		    if (debug_)
+			cerr << "Special \'" << special << "\'\n";
 		}
 		break;
 	      case 244:		// pk_yyy
@@ -188,50 +207,82 @@ void PkFont::read_font (InputByteStream& ibs)
     }
 }
 
-unsigned int PkGlyph::unpackpk (PKDecodeState& s)
+const Byte *PkGlyph::bitmap()
+{
+    if (bitmap_ == 0)
+	bitmap_ = rasterdata_->bitmap();
+    return bitmap_;
+}
+
+PkRasterdata::PkRasterdata(Byte opcode,
+			   const Byte *rasterdata, unsigned int len,
+			   unsigned int w, unsigned int h)
+    : len_(len), w_(w), h_(h),
+      highnybble_(false), bitmap_(0)
+{
+    dyn_f_ = opcode >> 4;
+    start_black_ = opcode&8;
+    rasterdata_ = new Byte[len];
+    (void) memcpy ((void*)rasterdata_, (void*)rasterdata, len);
+    eob_ = rasterdata_+len_;
+};
+
+unsigned int PkRasterdata::unpackpk ()
 {
     unsigned int res = 0;
     
-    Byte n = nybble(s);
+    Byte n = nybble();
     if (n == 0)
     {
 	// it's a 'large' number
-	int nn = 1;
-	while ((n = nybble(s)) == 0)
-	    nn++;
+	int nzero = 1;
+	while ((n = nybble()) == 0)
+	    nzero++;
 	res = n;
-	for (nn--; nn>0; nn--)
-	    res = res<<4 + nybble(s);
-	res = res - (13-dyn_f_)*16 - dyn_f_ + 15;
+	for (; nzero>0; nzero--)
+	    res = res*16 + nybble();
+	res = res + (13-dyn_f_)*16 + dyn_f_ - 15;
     }
     else if (n <= dyn_f_)
 	res = n;
     else if (n < 14)
-	res = (n-dyn_f_-1)*16+(dyn_f_+1) + nybble(s);
+	res = (n-dyn_f_-1)*16+(dyn_f_+1) + nybble();
     else
     {
 	// it's a repeatcount
-	if (s.repeatcount != 0)
+	if (repeatcount_ != 0)
 	    throw DviError ("found double repeatcount in unpackpk");
 	if (n == 15)
-	    s.repeatcount = 1;
+	    repeatcount_ = 1;
 	else
-	    s.repeatcount = unpackpk (s);
-	res = unpackpk(s);	// get the following runcount
+	    repeatcount_ = unpackpk ();
+	res = unpackpk();	// get the following runcount
     }
+    if (debug_)
+	cerr << '=' << res
+	     << ' ' << static_cast<int>(repeatcount_) << '\n';
     return res;
 }
 
-const Byte *PkGlyph::bitmap()
-{
-    if (bitmap_ == 0)
-	construct_bitmap();
-    return bitmap_;
+Byte PkRasterdata::nybble() {
+    highnybble_ = !highnybble_;
+    Byte res;
+    if (highnybble_)
+    {
+	if (rasterdata_ == eob_)
+	    throw DviBug ("Run out of nybbles (snackattack!)");
+	res = (*rasterdata_)>>4;
+    }
+    else
+	res = (*rasterdata_++)&0xf;
+    if (debug_)
+	cerr << '<' << static_cast<int>(res) << '\n';
+    return res;
 }
 
 // Construct a bitmap from the provided rasterinfo, which has come from
 // the PK file.  Place the resulting bitmap in bitmap_
-void PkGlyph::construct_bitmap()
+void PkRasterdata::construct_bitmap()
 {
     bitmap_ = new Byte[w_ * h_];
 
@@ -263,22 +314,27 @@ void PkGlyph::construct_bitmap()
     {
 	// decode the rasterinfo
 
-	// highnybble_ , rasterp_ and repeatcount_ are class variables
-	// shared between construct_bitmap, nybble and unpackpk
-	struct PKDecodeState pkds;
-	pkds.highnybble = false;
-	pkds.rasterp = rasterdata_;
-	pkds.repeatcount = 0;
-
 	Byte *rowp = bitmap_;
 	Byte *rowstart = bitmap_;
 	unsigned int nrow = 0;
 	unsigned int ncol = 0;
-	Byte pixelcolour = 1;	// start off black
+	Byte pixelcolour = start_black_;
+
+	repeatcount_ = 0;
+	if (debug_)
+	{
+	    cerr << "dyn_f=" << static_cast<int>(dyn_f_)
+		 << " h=" << h_
+		 << " w=" << w_
+		 << "\nrasterdata=" << hex;
+	    for (const Byte *p=rasterdata_; p<eob_; p++)
+		cerr << static_cast<int>(*p) << ' ';
+	    cerr << dec << '\n';
+	}
 
 	while (nrow < h_)
 	{
-	    unsigned int runcount = unpackpk(pkds);
+	    unsigned int runcount = unpackpk();
 	    for (; runcount>0; runcount--)
 	    {
 		*rowp++ = pixelcolour;
@@ -287,10 +343,17 @@ void PkGlyph::construct_bitmap()
 		{
 		    ncol = 0;
 		    nrow++;
-		    if (pkds.repeatcount > 0)
+		    if (debug_)
+		    {
+			cerr << nrow << ':';
+			for (const Byte *p=rowstart; p<rowp; p++)
+			    cerr << (*p ? '*' : '.');
+			cerr << '+' << repeatcount_ << '\n';
+		    }
+		    if (repeatcount_ > 0)
 		    {
 			Byte *rowend=rowp;
-			for (; pkds.repeatcount>0; pkds.repeatcount--)
+			for (; repeatcount_>0; repeatcount_--)
 			{
 			    Byte *pt=rowstart;
 			    while (pt < rowend)

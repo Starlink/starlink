@@ -9,17 +9,16 @@ typedef unsigned char Byte;
 
 class DviError {
  public:
-    string problem;
-    DviError(string s)
-	: problem(s)
-	{ }
+    DviError(string s) : problem_(s) { }
+    virtual void print() const { cerr << "DVI error: " << problem_ << '\n'; }
+    string problem() const { return problem_; }
+ protected:
+    string problem_;
 };
-class DviBug {
+class DviBug : DviError {
  public:
-    string problem;
-    DviBug(string s)
-	: problem(s)
-	{ }
+    DviBug(string s) : DviError(s) { }
+    void print() const { cerr << "BUG: " << problem_ << '\n'; }
 };
 #endif // #ifdef DVI2GIF_HEADER_READ
 

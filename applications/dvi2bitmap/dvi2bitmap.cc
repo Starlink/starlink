@@ -27,6 +27,9 @@ main (int argc, char **argv)
 	std::exit(1);
     }
 
+    PkFont::debug(true);
+    PkRasterdata::debug(false);
+
     try
     {
 	DviFileEvent *ev;
@@ -34,7 +37,6 @@ main (int argc, char **argv)
 	do
 	{
 	    ev = dvif->getEvent();
-	    //cout << "Event " << ev->type << '\n';
 	    ev->debug();
 	    if (DviFileFontDef *fd = dynamic_cast<DviFileFontDef*>(ev))
 	    {
@@ -42,30 +44,35 @@ main (int argc, char **argv)
 				       fd->scale,
 				       fd->size,
 				       fd->fontname);
-		PkGlyph *g = f->glyph(';');
-		const Byte *b = g->bitmap();
-		cout << ('\n');
-		for (int i=0; i<g->h(); i++)
+		for (int gnum=0; gnum<=255; gnum++)
 		{
-		    for (int j=0; j<g->w(); j++)
+		    PkGlyph *g = f->glyph(gnum);
+		    if (g == 0)
+			continue;
+		    const Byte *b = g->bitmap();
+		    cout << "\n\nCharacter " << gnum << '\n';
+		    for (int i=0; i<g->h(); i++)
 		    {
-			cout << (*b ? '*' : ' ');
-			b++;
+			for (int j=0; j<g->w(); j++)
+			{
+			    cout << (*b ? '*' : ' ');
+			    b++;
+			}
+			cout << '\n';
 		    }
-		    cout << '\n';
 		}
 	    }
 
 	}
 	while (!(post = dynamic_cast<DviFilePostamble*>(ev)));
     }
-    catch (DviError e)
+    catch (DviError& e)
     {
-	cerr << "DVI error: " << e.problem << '\n';
+	e.print();
     }
-    catch (DviBug e)
+    catch (DviBug& e)
     {
-	cerr << "BUG: " << e.problem << '\n';
+	e.print();
     }
 
     exit (0);
