@@ -134,15 +134,17 @@ foreach $package (sort keys %tasks) {
    print "$package:" if $verbose;
    foreach $task (sort @{$tasks{$package}}) {
       if ($locate{$task}) {
-         print TASKS " $task";
+         foreach $path (split ' ', $locate{$task}) {
+            if (starpack ($path) eq $package) {
+               print TASKS " $task";
+               print       " $task" if $verbose;
+               next;
+            }
+         }
       }
-      else {
-         $task =~ tr/A-Z/a-z/;
-      }
-      print " $task" if $verbose;
    }
    print TASKS "\n";
-   print "\n" if $verbose;
+   print       "\n" if $verbose;
 }
 close TASKS;
 
@@ -170,10 +172,19 @@ sub index_list {
    my $path = shift;      #  Logical pathname of current directory.
    my @files = @_;        #  Files in current directory to be indexed.
 
-#  Local variables.
+#  Rephrase logical path as a package reference if it looks it needs doing,
+#  i.e. if it starts off with the literal 'SOURCE#' followed by a tarfile
+#  or a directory.
+
+   local $package;
+   $path =~ s%([/#>])./%$1%g;    #  Tidy it up.
+   $path =~ s%//*%/%g;           #
+   if ($path =~ s%^SOURCE#([^./>]+)(.tar.Z>|.tar.gz>|.tar>|/)$% 
+              ($package = uc $1) . '#' %e) {
+      $tasks{$package} ||= [];
+   }
 
    my $file;
-
    foreach $file (@files) {
       if (-d $file) {                 #  directory.
          index_dir $path, $file; 
@@ -327,8 +338,7 @@ sub index_hlp {
    my $path = shift;      #  Logical pathname of current directory.
    my $file = shift;      #  .hlp file in current directory to be indexed.
 
-   $file =~ m%([^/]*)\.hlp%;
-   my $package = uc $1;
+   my $package = starpack $path;
    open HLP, $file or die "Couldn't open $file in directory ".cwd."\n";
    my ($level, $baselevel);
    while (<HLP>) {
@@ -438,19 +448,6 @@ sub write_entry {
 
    my $name = shift;      #  Name of module.
    my $location = shift;  #  Logical pathname of module.
-
-#  Tidy logical pathname.
-
-   $location =~ s%([/#>])./%$1%g;
-   $location =~ s%//*%/%g;
-
-#  If logical path looks like it starts with a package reference,
-#  rephrase it as a logical reference to the package.
-
-   $location =~ 
-      s%^SOURCE#([^./]+)(.tar.Z>|.tar.gz>|.tar>|/)(.*)$% 
-         ($package = uc $1) . "#$3" %e;
-   $tasks{$package} = [] unless (defined $tasks{$package});
 
 #  Write entry to database (hash of hashes %locate); if no identifiable 
 #  package the hash key is ''.
