@@ -109,13 +109,16 @@
 *    External references :
 *    Global variables :
 *    Local Constants :
+      REAL         ALLOWED_BAD_FRAC     ! Fraction of bad data allowed
+      PARAMETER (ALLOWED_BAD_FRAC = 0.3)! in a AVERAGE jiggle
       INTEGER      MAX_JIGGLE           ! max number of jiggle positions
       PARAMETER (MAX_JIGGLE = 512)  
 *    Local variables :
-      LOGICAL      ALLGOOD              ! Check for Bad pix
       CHARACTER*80 ANALYSIS             ! an uppercase copy of 
                                         ! PHOTOM_ANALYSIS
+      REAL         GOODFRAC             ! Fraction of good data
       INTEGER      J                    ! jiggle number in DO loop
+      INTEGER      N_GOOD               ! Number of good jiggle points
       REAL         T_DATA (MAX_JIGGLE)  ! data for a particular bolometer
       BYTE         T_QUALITY (MAX_JIGGLE)
                                         ! quality for a particular bolometer
@@ -144,35 +147,33 @@
 
          IF (ANALYSIS .EQ. 'AVERAGE') THEN
 
-*  First have to check that all points are good
-*  If any of the jiggle points are bad the entire jiggle is suspect
+*  Calculate the mean of the data keeping track of bad data points
 
-            ALLGOOD = .TRUE.
+            RESULT_D = 0.0
+            RESULT_V = 0.0
+            N_GOOD    = 0
+
             DO J = 1, J_COUNT
-               IF (JDATA(BOL,J) .EQ. VAL__BADR .OR. 
-     :              .NOT.NDF_QMASK(QUALITY(BOL,J), BADBIT)) THEN
-                  ALLGOOD = .FALSE.
+               IF (JDATA(BOL,J) .NE. VAL__BADR .AND. 
+     :              NDF_QMASK(QUALITY(BOL,J), BADBIT)) THEN
+                  N_GOOD = N_GOOD + 1
+                  RESULT_D = RESULT_D + JDATA (BOL,J)
+                  RESULT_V = RESULT_V + VARIANCE (BOL,J)
                END IF
+
             END DO
 
+* The entire jiggle is bad if the fraction of good data points in the
+* jiggle is smaller than 1-ALLOWED_BAD_FRAC
 
-*  just calculate the mean of the data, using the quality variable
-*  to keep count of the number of coadds
+            GOODFRAC = REAL(N_GOOD) / REAL(J_COUNT)
 
-            IF (ALLGOOD) THEN
+            IF (GOODFRAC .GE. 1.0-ALLOWED_BAD_FRAC) THEN
 
-               RESULT_D = 0.0
-               RESULT_V = 0.0
-
-               DO J = 1, J_COUNT
-                     RESULT_D = RESULT_D + JDATA (BOL,J)
-                     RESULT_V = RESULT_V + VARIANCE (BOL,J)
-               END DO
-               
-               RESULT_D = RESULT_D / REAL (J_COUNT)
-               RESULT_V = RESULT_V / REAL (J_COUNT * J_COUNT)
+               RESULT_D = RESULT_D / REAL (N_GOOD)
+               RESULT_V = RESULT_V / REAL (N_GOOD * N_GOOD)
                RESULT_Q = 0
-
+               
             ELSE
 
                RESULT_D = VAL__BADR
