@@ -163,7 +163,7 @@
 
 *    Check data object
       CALL BDA_CHKDATA( LOC, OK, NDIM, DIMS, STATUS )
-      CALL ARR_SUMDIM( NDIM, DIMS, NELM, STATUS )
+      CALL ARR_SUMDIM( NDIM, DIMS, NELM )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
       IF ( OK ) THEN
