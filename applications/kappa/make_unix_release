@@ -118,10 +118,10 @@
          set hfile = `basename $file .ifl`.help
          prohlp in=$ffile out=$hfile
       end
-      rm *_mon.help
+      /bin/rm *_mon.help
       cat kappa.star-hlp *.help > new.hlp
       mv new.hlp kappa.hlp
-      rm *.help
+      /bin/rm *.help
       mv lutedit.gui-help lutedit.help 
 
 #  Generate the IRAF documentation.
@@ -133,7 +133,7 @@
 
 #  Copy files to iraf directory.
       set kiraf = "$HOME/iraf/kappa"
-      rm -rf $kiraf
+      /bin/rm -rf $kiraf
       mkdir $kiraf
       cp root.hd $kiraf
       cp _kappa.hd $kiraf
@@ -160,7 +160,7 @@ FOO
          chmod 644 `grp ${file}`
          chmod 755 `find . -type d`
          tar -cvh -f ${TEMPDIR}/${file}.tar `grp ${file}`
-         rm -f `grp ${file}`
+         /bin/rm -f `grp ${file}`
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
       end
 
@@ -174,9 +174,9 @@ FOO
       chmod 755 `find . -type d`
       chmod 755 mk
       tar -cvh -f ${TEMPDIR}/kappa.tar `grp unix_total` 
-      rm `grp unix_total` 
+      /bin/rm `grp unix_total` 
       mv ${TEMPDIR}/kappa.tar ${REL_DIR}
-      rm -rf doc kappa.ifd
+      /bin/rm -rf doc kappa.ifd
 
 #  Compress it.
       echo "Compressing kappa.tar"
@@ -184,6 +184,6 @@ FOO
 
 # Remove any spare .f files created by the expansion of generic source
 # files but not included in the release. Also remove grp.make.
-      rm -f *.f grp.make
+      /bin/rm -f *.f grp.make
 
       exit
