@@ -21,8 +21,8 @@
 *     preceded with the letter B or J to indicate a Besselian epoch or
 *     a Julian epoch (eg "EQUAT(J2000.0)", "ECLIPT(B1983.3)" ). If the
 *     epoch is not preceded with either B or J, a Besselian epoch is
-*     assumed (unless the epoch is exactly 2000, in which case a Julian
-*     epoch is assumed).  If no equinox specifier is included in the input 
+*     assumed if the date is less than 1984.0, and a Julian epoch is assumed
+*     otherwise.  If no equinox specifier is included in the input 
 *     SCS name, a value of B1950.0 is assumed (if required). If the SCS is
 *     not referred to the equinox, any equinox specifier is ignored.
 *
@@ -67,6 +67,9 @@
 *        Modified for IRA version 2.
 *     22-AUG-1994 (DSB):
 *        Assume Julian default for epoch 2000.
+*     3-DEC-1998 (DSB):
+*        Assume Julian epoch if date is >= 1984.0 (unless a specific B or J
+*        is included to indicate otherwise).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -147,18 +150,12 @@
 *  Copy the BJ specifier to argument BJ.
          BJ = TSCS( ESPECS + 1 : ESPECS + 1 )
 
-*  If a numeric character was found, assume a value of B and modify the
-*  start of the actual epoch string to take account of the absence of a
-*  BJ specifier in the input string. "J" is assumed if the epoch string 
-*  is "2000" (with no decimal point).
+*  If a numeric character was found, defer the decision about the type of
+*  epoch until the numerical epoch value has been determined. Re-wind the
+*  pointer by one character so that he digit is included in the date value.
          IF( CHR_ISDIG( BJ ) ) THEN
-            IF( TSCS( ESPECS + 1 : EEND ) .NE. '2000' ) THEN
-               BJ = 'B'
-            ELSE
-               BJ = 'J'
-            END IF
-
             ESTART = ESTART - 1
+            BJ = ' '
 
 *  If any non-numeric character other than B or J was found, report an
 *  error.
@@ -188,6 +185,16 @@
 
 *  Round the date to 4 decimal places.
          EQU = 1.0D-4*NINT( EQU*1.0D4 )
+
+*  If the decision about the type of epoch has been deferred, make the
+*  decision now using the IAU 1984.0 rule.
+         IF( BJ .EQ. ' ' ) THEN
+            IF( EQU .LT. 1984.0 ) THEN
+               BJ = 'B'
+            ELSE
+               BJ = 'J'
+            END IF
+         END IF
 
 *  If no equinox specifier was found, set the default value. This will
 *  later be changed to VAL__BADD if the SCS is not referred to the

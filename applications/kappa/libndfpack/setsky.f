@@ -59,7 +59,8 @@
 *        parentheses, for example, "Equatorial(1994.5)".  The epoch may
 *        be preceded by a single character, "B" or "J", indicating that
 *        the epoch is Besselian or Julian respectively.  If this letter
-*        is missing, a Besselian epoch is assumed.
+*        is missing, a Besselian epoch is assumed if the epoch is less
+*        than 1984.0, and a Julian epoch is assumed otherwise.
 *     EPOCH = DOUBLE PRECISION (Read)
 *        The Julian epoch at which the observation was made (e.g.
 *        "1994.0").

@@ -30,7 +30,8 @@
 *     examples of legal SCS values; EQUATORIAL(B1950), EQUAT(J2000),
 *     ECLIP, ECLIP(1983.2534), etc. If the date is not preceded with
 *     either B or J (as in the last example), a Besselian epoch is
-*     assumed.
+*     assumed if the date is less than 1984.0, and a Julian epoch is 
+*     assumed otherwise.
 *
 *     The currently supported sky coordinate systems are:
 *

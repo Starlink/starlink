@@ -33,7 +33,8 @@
 *        Determines if the epoch specified by argument EQU is a
 *        Besselian or Julian epoch. BJ should have the value "B" or "J".
 *        Any other value causes an error report (except that a blank
-*        value causes "B" to be used).
+*        value causes "B" to be used if EQU is less than 1984.0 and "J"
+*        otherwise).
 *     SCS = CHARACTER * ( * ) (Given and Returned)
 *        On entry, SCS should contain an unambiguous abbreviation of a
 *        supported Sky Coordinate System (see routine IRA_ISCS), with or
@@ -54,6 +55,8 @@
 *  History:
 *     29-APR-1991 (DSB):
 *        Original version.
+*     3-DEC-1998 (DSB):
+*        Determine default BJ using IAU 1984 rule.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -126,9 +129,16 @@
 *  Otherwise,
       ELSE
 
-*  If BJ is blank, use "B".
+*  Round the given date to 4 decimal places.
+         NEWEQU = 1.0D-4*NINT( EQU*1.0D4 )
+
+*  If BJ is blank, use "B" or "J" depending on the value of NEWEQU
          IF( BJ .EQ. ' ' ) THEN
-            NEWBJ = 'B'
+            IF( NEWEQU .LT. 1984.0 ) THEN
+               NEWBJ = 'B'
+            ELSE
+               NEWBJ = 'J'
+            END IF
 
 *  Otherwise, convert the BJ argument to upper case and remove leading blanks.
          ELSE
@@ -147,9 +157,6 @@
      :                    STATUS )
             GO TO 999
          END IF
-
-*  Round the given date to 4 decimal places.
-         NEWEQU = 1.0D-4*NINT( EQU*1.0D4 )
 
 *  Append the equinox identifier to the end of the SCS name. First
 *  append the opening paranethesis and epoch type specifier to the end
