@@ -1564,6 +1564,9 @@ C  GET UT in an array
      
       SUBROUTINE TB350(RJD,TBAR,STATUS)
      
+*     26 Apr01        : TIMJ - Extend model for until 2011 using
+*                              numbers posted on Wright's web page
+*                              http://www.astro.ucla.edu/~wright/old_mars.txt
 *     26 Oct95        :  HEM - add in simplified model to extend MJD range
 *     Original version:  Unknown origin
      
@@ -1590,13 +1593,15 @@ C  GET UT in an array
 *     TBAR   - M.350.TB. calculated by interpolation for RJD
 *     IERR   - Error condition (0 = OK; 1 = MJD out of valid range)
      
+*     On error TBAR is set to 
+
 ************************************************************************
      
       IMPLICIT NONE       
       
 *   Variables:
       REAL*8 DAT1I,DAT1I1,RJD,TBAR,TB1I,TB1I1,
-     :     TB1AR(100),TBWRIGHT(232)   
+     :     TB1AR(100),TBWRIGHT(327)
       INTEGER I,IERR
      
 *   Data:
@@ -1645,7 +1650,19 @@ C  GET UT in an array
      :     216.0, 223.0, 229.0, 230.0, 228.0, 224.0, 220.0, 217.0, 
      :     215.0, 213.0, 212.0, 212.0, 213.0, 217.0, 212.0, 205.0, 
      :     204.0, 206.0, 210.0, 217.0, 221.0, 221.0, 220.0, 217.0, 
-     :     215.0, 214.0, 214.0, 214.0, 214.0, 213.0, 211.0, 214.0/
+     :     215.0, 214.0, 214.0, 214.0, 214.0, 213.0, 211.0, 214.0,
+     :     224.0, 212.0, 206.0, 206.0, 211.0, 212.0, 212.0, 211.0,
+     :     209.0, 209.0, 211.0, 213.0, 214.0, 215.0, 215.0, 214.0,
+     :     216.0, 220.0, 227.0, 234.0, 235.0, 220.0, 211.0, 207.0,
+     :     204.0, 202.0, 202.0, 204.0, 207.0, 211.0, 214.0, 217.0,
+     :     218.0, 219.0, 222.0, 226.0, 229.0, 230.0, 229.0, 229.0,
+     :     228.0, 212.0, 201.0, 196.0, 196.0, 199.0, 204.0, 209.0,
+     :     213.0, 218.0, 221.0, 224.0, 229.0, 233.0, 234.0, 232.0,
+     :     225.0, 219.0, 219.0, 220.0, 208.0, 196.0, 193.0, 195.0,
+     :     201.0, 206.0, 212.0, 217.0, 222.0, 228.0, 234.0, 237.0,
+     :     237.0, 233.0, 225.0, 219.0, 216.0, 215.0, 215.0, 207.0,
+     :     196.0, 195.0, 199.0, 204.0, 210.0, 216.0, 222.0, 228.0,
+     :     235.0, 237.0, 236.0, 231.0, 224.0, 219.0/
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
@@ -1663,7 +1680,7 @@ C  GET UT in an array
       DAT1I = 2442760.5D0 + ((I-1) * 40.0D0)
       DAT1I1 = DAT1I + 40.0D0
       IERR=0
-      IF ((I.LE.0).OR.(I.GE.232)) THEN
+      IF ((I.LE.0).OR.(I.GE.327)) THEN
 	 IERR=1
       ELSEIF ((I.LE.82).OR.(I.GE.183)) THEN
 	 TB1I = TBWRIGHT(I)-2.56
@@ -1672,10 +1689,13 @@ C  GET UT in an array
       ENDIF
     
       I=I+1
-      IF ((I.LE.0).OR.(I.GT.232)) THEN
+      IF ((I.LE.0).OR.(I.GT.327)) THEN
 	 IERR=1
 	 CALL MSG_OUT(' ',
      :        'Interpolation problem in subroutine TB350!',
+     :        STATUS)
+	 CALL MSG_OUT(' ',
+     :        'Mars fluxes will be incorrect!',
      :        STATUS)
       ELSEIF ((I.LE.82).OR.(I.GE.183)) THEN
 	 TB1I1 = TBWRIGHT(I)-2.56
@@ -1684,8 +1704,12 @@ C  GET UT in an array
       ENDIF
      
 *     Do linear interpolation between two points.
-     
-      TBAR = TB1I + (TB1I1-TB1I)*(RJD-DAT1I)/(DAT1I1-DAT1I)
+
+      IF (IERR .EQ. 0) THEN
+         TBAR = TB1I + (TB1I1-TB1I)*(RJD-DAT1I)/(DAT1I1-DAT1I)
+      ELSE
+         TBAR = 0.0
+      END IF
 
       END
 
