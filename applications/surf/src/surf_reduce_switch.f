@@ -112,6 +112,10 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.14  1997/04/01 22:46:01  timj
+*     Use SCULIB_GET_DEM_PNTR
+*     Use PKG and TASK for package name.
+*
 *     Revision 1.13  1997/03/21 20:35:43  jfl
 *     modified to handle aborted observations
 *
@@ -162,6 +166,9 @@ c
       PARAMETER (MAXDIM = 4)
       BYTE BADBIT                      ! Bad bits mask
       PARAMETER (BADBIT = 7)
+      CHARACTER * 15 TSKNAME           ! Name of task
+      PARAMETER (TSKNAME = 'REDUCE_SWITCH')
+
 *    Local variables :
       LOGICAL      ABORTED             ! .TRUE. if observation was aborted
       INTEGER      BEAM                ! beam index in DO loop
@@ -201,13 +208,12 @@ c
                                        ! array of FITS keyword lines
       CHARACTER*(DAT__SZLOC) FITS_LOC  ! HDS locator to FITS structure
       INTEGER I                        ! DO loop index
-      INTEGER      IARY1               ! ARY array identifier
-      INTEGER      IARY2               ! ARY array identifier
       INTEGER      IERR                ! Location of error returned from VEC_ITOI
       INTEGER      IN_NDF              ! NDF identifier of input file
       INTEGER      INTEGRATION         ! integration index in DO loop
       INTEGER      IN_DATA_PTR         ! pointer to data array of input file
       INTEGER      IN_DEM_PNTR_PTR     ! pointer to input .SCUBA.DEM_PNTR array
+      CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC ! Locator to .SCUBA extension
       INTEGER      ISTAT               ! temporary status
       INTEGER      ITEMP               ! scratch integer
       INTEGER      LAST_EXP            ! the last exposure number in
@@ -217,8 +223,6 @@ c
       INTEGER      LAST_MEAS           ! the last measurement number in
                                        ! an aborted observation
       INTEGER      LBND (MAXDIM)       ! lower bounds of array
-      CHARACTER*(DAT__SZLOC) LOC1      !
-      CHARACTER*(DAT__SZLOC) LOC2      !
       INTEGER      MEASUREMENT         ! measurement index in DO loop
       LOGICAL      MISSING_SWITCH      ! .TRUE. if any switches are
                                        ! missing in an exposure
@@ -242,6 +246,7 @@ c
                                        ! HDS locator of REDS extension in 
                                        ! output file
       INTEGER      OUT_QUALITY_PTR     ! pointer to quality array in output 
+      CHARACTER*(DAT__SZLOC) OUT_SCUBAX_LOC ! Locator .SCUBA output
       INTEGER      OUT_VARIANCE_PTR    ! pointer to variance array in output
       LOGICAL      REDUCE_SWITCH       ! .TRUE. if REDUCE_SWITCH has already
                                        ! been run on the file
@@ -301,7 +306,8 @@ c
 
         IF (TRYING) THEN
             CALL ERR_ANNUL(STATUS)
-            CALL MSG_OUT(' ','REDS_REDUCE_SWITCH: Failed to'//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL MSG_OUT(' ','^TASK: Failed to'//
      :           ' find requested file in CWD and DATADIR',
      :           STATUS)
             CALL PAR_CANCL('IN', STATUS)
@@ -321,7 +327,8 @@ c
       IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_REDUCE_SWITCH: input file '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: input file '//
      :        'contains too many FITS items', STATUS)
          END IF
       END IF
@@ -341,12 +348,14 @@ c
       CALL MSG_SETC ('OBJECT', OBJECT)
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
-      CALL MSG_OUT (' ', 'REDS: run ^RUN was a ^MODE observation '//
+      CALL MSG_SETC('PKG', PACKAGE)
+      CALL MSG_OUT (' ', '^PKG: run ^RUN was a ^MODE observation '//
      :  'of object ^OBJECT', STATUS)
 
       IF (OBSERVING_MODE .EQ. 'SKYDIP') THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP (' ','REDS: REDUCE_SWITCH can not be run on '//
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL ERR_REP (' ','^PKG: REDUCE_SWITCH can not be run on '//
      :        '^MODE observations', STATUS)
       ENDIF
 
@@ -375,7 +384,8 @@ c
          IF (REDUCE_SWITCH) THEN
             IF (STATUS .EQ. SAI__OK) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_REDUCE_SWITCH: REDUCE_SWITCH '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: REDUCE_SWITCH '//
      :           'has already been run on the input data', STATUS)
             END IF
          END IF
@@ -389,7 +399,8 @@ c
       IF (INDEX(DATA_KEPT,'DEMOD') .EQ. 0) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_REDUCE_SWITCH: DATA_KEPT was '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: DATA_KEPT was '//
      :        'not set to DEMOD for the observation, the file does '//
      :        'not contain all the demodulated data', STATUS)
          END IF
@@ -431,13 +442,15 @@ c
      :       (CHOP_FUNCTION .NE. 'TRIPOS')) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC ('CHOP', CHOP_FUNCTION)
-            CALL ERR_REP (' ', 'REDS_REDUCE_SWITCH: invalid chop '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: invalid chop '//
      :        'function - ^CHOP', STATUS)
          END IF
 
          IF (USE_CALIBRATOR .AND. .NOT. CALIBRATOR) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_REDUCE_SWITCH: USE_CALIBRATOR '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: USE_CALIBRATOR '//
      :        'is .TRUE. but the calibrator was not turned on '//
      :        'during this observation', STATUS)
          END IF
@@ -451,7 +464,8 @@ c
          ELSE
             STATUS = SAI__ERROR
             CALL MSG_SETC ('SWITCH', SWITCH_MODE)
-            CALL ERR_REP (' ', 'REDS_REDUCE_SWITCH: the switch mode '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: the switch mode '//
      :        '- ^SWITCH is invalid', STATUS)
          END IF
       END IF
@@ -481,7 +495,8 @@ c
             CALL MSG_SETI ('DIM1', DIM(1))
             CALL MSG_SETI ('DIM2', DIM(2))
             CALL MSG_SETI ('DIM3', DIM(3))
-            CALL ERR_REP (' ', 'REDS_REDUCE_SWITCH: main data '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: main data '//
      :        'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2 ^DIM3',
      :        STATUS)
          END IF
@@ -491,67 +506,25 @@ c
 
 *  map the DEM_PNTR array and check its dimensions
 
-      CALL NDF_XLOC (IN_NDF, 'SCUBA', 'READ', LOC1, STATUS)
-      CALL ARY_FIND (LOC1, 'DEM_PNTR', IARY1, STATUS)
-      CALL ARY_DIM (IARY1, MAXDIM, DIM, NDIM, STATUS)
-      CALL ARY_MAP (IARY1, '_INTEGER', 'READ', IN_DEM_PNTR_PTR, ITEMP,
-     :  STATUS)
+      CALL NDF_XLOC (IN_NDF, 'SCUBA', 'READ', IN_SCUBAX_LOC, STATUS)
 
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF (NDIM .NE. 4) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI ('NDIM', NDIM)
-            CALL ERR_REP (' ', 'REDS_REDUCE_SWITCH: .SCUBA.DEM_PNTR '//
-     :        'array has bad number of dimensions', STATUS)
-         ELSE 
-            IF (DIM(1) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM1', DIM(1))
-               CALL ERR_REP (' ', 'REDS_REDUCE_SWITCH: '//
-     :           '.SCUBA.DEM_PNTR array contains bad number of '//
-     :           'switches - ^DIM1', STATUS)
-            END IF
-            IF (DIM(2) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM2', DIM(2))
-               CALL ERR_REP (' ', 'REDS_REDUCE_SWITCH: '//
-     :           '.SCUBA.DEM_PNTR array contains bad number of '//
-     :           'exposures - ^DIM2', STATUS) 
-            END IF
-            IF (DIM(3) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM3', DIM(3))
-               CALL ERR_REP (' ', 'REDS_REDUCE_SWITCH: '//
-     :           '.SCUBA.DEM_PNTR array contains bad number of '//
-     :           'integrations - ^DIM3', STATUS)
-            END IF
-            IF (DIM(4) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM4', DIM(4))
-               CALL ERR_REP (' ', 'REDS_REDUCE_SWITCH: '//
-     :           '.SCUBA.DEM_PNTR array contains bad number of '//
-     :           'measurements - ^DIM4', STATUS)
-            END IF
-         END IF
-      END IF
+      CALL SCULIB_GET_DEM_PNTR(4, IN_SCUBAX_LOC,
+     :     IN_DEM_PNTR_PTR, N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, 
+     :     N_MEASUREMENTS, STATUS)
 
 *  check that the number of switches matches the SWITCH_MODE
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (DIM(1) .NE. SWITCHES) THEN
+         IF (N_SWITCHES .NE. SWITCHES) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC ('SWITCH_MODE', SWITCH_MODE)
-            CALL MSG_SETI ('N_S', DIM(1))
-            CALL ERR_REP (' ', 'REDS_REDUCE_SWITCH: number '//
+            CALL MSG_SETI ('N_S', N_SWITCHES)
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: number '//
      :        'of switches in .SCUBA.DEM_PNTR (^N_S) does not '//
      :        'match SWITCH_MODE (^SWITCH_MODE)', STATUS)
          END IF
       END IF
-
-      N_SWITCHES = DIM (1)
-      N_EXPOSURES = DIM (2)
-      N_INTEGRATIONS = DIM (3)
-      N_MEASUREMENTS = DIM (4)
 
       CALL MSG_SETI ('N_S', N_SWITCHES)
       CALL MSG_SETI ('N_E', N_EXPOSURES)
@@ -559,7 +532,8 @@ c
       CALL MSG_SETI ('N_M', N_MEASUREMENTS)
 
       IF (.NOT. ABORTED) THEN
-         CALL MSG_OUT (' ', 'REDS: file contains data for ^N_S '//
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUT (' ', '^PKG: file contains data for ^N_S '//
      :     'switch(es) in ^N_E exposure(s) in ^N_I integration(s) '//
      :     'in ^N_M measurement(s)', STATUS)
       ELSE
@@ -574,7 +548,8 @@ c
          CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'MEAS_NO', LAST_MEAS, STATUS)
 
-         CALL MSG_OUT (' ', 'REDS: the observation should have '//
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUT (' ', '^PKG: the observation should have '//
      :     'had ^N_S switch(es) in ^N_E exposure(s) in ^N_I '//
      :     'integration(s) in ^N_M measurement(s)', STATUS)
          CALL MSG_SETI ('N_E', LAST_EXP)
@@ -583,6 +558,7 @@ c
          CALL MSG_OUT (' ', ' - However, the observation was '//
      :     'ABORTED during exposure ^N_E of integration ^N_I '//
      :     'of measurement ^N_M', STATUS)
+
       END IF 
 
 *  Ask for the level at switch spikes should be removed
@@ -643,19 +619,15 @@ c
 
 *  find the .SCUBA.DEM_PNTR array, change its bounds and map it
 
-      CALL NDF_XLOC (OUT_NDF, 'SCUBA', 'UPDATE', LOC2, STATUS)
-      CALL ARY_FIND (LOC2, 'DEM_PNTR', IARY2, STATUS)
       NDIM = 3
-      LBND (1) = 1
-      LBND (2) = 1
-      LBND (3) = 1
       UBND (1) = N_EXPOSURES
       UBND (2) = N_INTEGRATIONS
       UBND (3) = N_MEASUREMENTS
-      CALL ARY_SBND (NDIM, LBND, UBND, IARY2, STATUS)
-      CALL ARY_MAP (IARY2, '_INTEGER', 'WRITE', OUT_DEM_PNTR_PTR, ITEMP,
-     :  STATUS)
-
+      CALL NDF_XLOC (OUT_NDF, 'SCUBA', 'UPDATE', OUT_SCUBAX_LOC, STATUS)
+      CALL CMP_MOD(OUT_SCUBAX_LOC, 'DEM_PNTR', '_INTEGER', NDIM, UBND, 
+     :     STATUS)
+      CALL CMP_MAPV(OUT_SCUBAX_LOC, 'DEM_PNTR', '_INTEGER', 'WRITE',
+     :     OUT_DEM_PNTR_PTR, ITEMP, STATUS)
 
 *  now got through the various exposures in the observation, reducing the
 *  component switches into the output array
@@ -680,7 +652,8 @@ c
                      CALL MSG_SETI ('E', EXPOSURE)
                      CALL MSG_SETI ('I', INTEGRATION)
                      CALL MSG_SETI ('M', MEASUREMENT)
-                     CALL MSG_OUT (' ', 'REDS: no data for '//
+                     CALL MSG_SETC('PKG', PACKAGE)
+                     CALL MSG_OUT (' ', '^PKG: no data for '//
      :                 'switch 1 in exp ^E, int ^I, meas ^M',
      :                 STATUS)
                      MISSING_SWITCH = .TRUE.
@@ -697,7 +670,8 @@ c
                         CALL MSG_SETI ('E', EXPOSURE)
                         CALL MSG_SETI ('I', INTEGRATION)
                         CALL MSG_SETI ('M', MEASUREMENT)
-                        CALL MSG_OUT (' ', 'REDS: no data for '//
+                        CALL MSG_SETC('PKG', PACKAGE)
+                        CALL MSG_OUT (' ', 'PKG: no data for '//
      :                    'switch 2 in exp ^E, int ^I, meas ^M',
      :                    STATUS)
                         MISSING_SWITCH = .TRUE.
@@ -717,7 +691,8 @@ c
                         CALL MSG_SETI ('E', EXPOSURE)
                         CALL MSG_SETI ('I', INTEGRATION)
                         CALL MSG_SETI ('M', MEASUREMENT)
-                        CALL MSG_OUT (' ', 'REDS: no data for '//
+                        CALL MSG_SETC('PKG', PACKAGE)
+                        CALL MSG_OUT (' ', '^PKG: no data for '//
      :                    'switch 3 in exp ^E, int ^I, meas ^M',
      :                    STATUS)
                         MISSING_SWITCH = .TRUE.
@@ -897,9 +872,13 @@ c
       CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
 
 * Unmap and annul
-      CALL ARY_UNMAP (IARY1, STATUS)
+      CALL CMP_UNMAP (IN_SCUBAX_LOC, 'DEM_PNTR', STATUS)
+      CALL CMP_UNMAP (OUT_SCUBAX_LOC, 'DEM_PNTR', STATUS)
+      
+      CALL DAT_ANNUL (IN_SCUBAX_LOC, STATUS)
+      CALL DAT_ANNUL (OUT_SCUBAX_LOC, STATUS)
+
       CALL NDF_ANNUL (IN_NDF, STATUS)
-      CALL ARY_UNMAP (IARY2, STATUS)
       CALL NDF_ANNUL (OUT_NDF, STATUS)
 
       CALL NDF_END (STATUS)
