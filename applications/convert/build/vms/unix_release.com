@@ -173,9 +173,11 @@ $!
 $!  Help source files.
 $!  ==================
 $!
-$!  Assembly and compile the portable help library.
+$!  Assembly and compile the portable help library.  Delete the VMS
+$!  procedure once's its job is done.
 $!
 $    @[]HLP_UNIX_RELEASE 'P1'
+$    DELETE HLP_UNIX_RELEASE.COM;0
 $!
 $!  C-shell scripts.
 $!  ================
