@@ -99,11 +99,14 @@
       INCLUDE 'SAE_PAR'          		! Standard SAE constants
       INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'PRM_PAR'
 
 *  Global Variables:
       INCLUDE 'DYN_CMN'                                 ! DYN common block
 *       DYN_ISINIT = LOGICAL (given)
 *         DYN class definitions loaded?
+*       DYS_ISEQ = INTEGER (given and returned)
+*         File name sequence number
 
 *  Arguments Given:
       INTEGER			NDIM			! See above
@@ -220,7 +223,8 @@
           END IF
 
 *      Create unique filename
-          CALL MSG_FMTI( 'N', 'I4.4', NPTR+1 )
+          CALL MSG_FMTI( 'N', 'I4.4', DYS_ISEQ )
+          DYS_ISEQ = DYS_ISEQ + 1
           CALL MSG_SETC( 'PID', HPID//'_' )
           CALL MSG_MAKE( 'DYN_^PID^N.TMP', FNAME, FLEN )
           IF ( SDIR .GT. ' ' ) THEN

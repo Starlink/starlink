@@ -54,10 +54,13 @@
 *         DYN system is initialised?
 *       DYS_PTR = INTEGER (returned)
 *         Mapped section memory addresses
+*       DYS_ISEQ = INTEGER (returned)
+*         File sequence number
 
 *  Global Data:
       DATA DYN_ISINIT / .FALSE. /
       DATA DYS_PTR / DYN__NMAX*0 /
+      DATA DYS_ISEQ / 1 /
 *.
 
       END
