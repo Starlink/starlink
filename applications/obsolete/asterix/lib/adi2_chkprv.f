@@ -212,7 +212,8 @@ c	    CALL FTRDEF( LUN, FSTAT )
             END IF
 
 *        Write the keywords
-            CALL ADI2_FCOMIT_HDU( FID, .TRUE., LUN, IHDU, LUN, OHID, STATUS )
+            CALL ADI2_FCOMIT_HDU( FID, .TRUE., LUN, IHDU, LUN, OHID,
+     :                            STATUS )
 
           END IF
 
