@@ -41,15 +41,16 @@
 KAPPA
 
 {  Prompt for and read the name of an image display device.
-INPUT "Image display name: " (IDNAME)
+INPUT "Image display name: " (GDNAME)
    
 {  Set the image display using KAPPA and clear the display.
-IDSET (IDNAME&'') ACCEPT
-IDCLEAR ACCEPT
+GDSET (GDNAME&'') ACCEPT
+GDCLEAR ACCEPT
 LUTGREY
 
 {  Go into PONGO and define a suitable viewport.
-BEGPLOT (IDNAME&'') ACTION=B
+BEGPLOT (GDNAME) ACTION=B
+RESETPONGO
 VPORT 0.1 0.5 0.1 0.95
 ENDPLOT
 
@@ -59,16 +60,16 @@ DISPLAY @PONGO_EXAMPLES@/dor MODE=PERC PERCENTILES=[3,99.9]
 LUTHEAT
 
 {  Go into PONGO and draw a box around the image.
-BEGPLOT (IDNAME&'') OVERLAY NOCLEAR ACTION=C
+BEGPLOT (GDNAME) OVERLAY NOCLEAR ACTION=C
 BOX BCNST BCNST
 
 {  Draw a box around the subsection of the image to be displayed later.
 PEN 7
 MOVE 401 101
-DRAW 600 101
-DRAW 600 300
-DRAW 401 300
-DRAW 401 101
+PRIM D 600 101
+PRIM D 600 300
+PRIM D 401 300
+PRIM D 401 101
 PEN 1
 
 {  Set the viewport for a subsection of the plotted image.
@@ -82,7 +83,7 @@ NDF='@@PONGO_EXAMPLES@/dor(401:600,101:300)'
 DISPLAY (NDF) MODE=PERC PERCENTILES=[3,99.9] ACCEPT
 
 {  Use PONGO to draw a perimeter around the second image.
-BEGPLOT (IDNAME&'') OVERLAY NOCLEAR ACTION=C
+BEGPLOT (GDNAME) OVERLAY NOCLEAR ACTION=C
 DLIMITS 1.478621998 1.4789335396 -1.2063764659004 -1.2060661463594
 { Hours & degrees -5.64792 -5.64911 -69.12028 -69.10250
 EXPAND 0.55

@@ -32,3 +32,14 @@ icl/cover.icl icl/figures.icl icl/radec.icl icl/vector.icl
 EXAMPLE_DATA_FILES = data/dor.sdf data/cljon.dat data/ellipses.dat \
 data/ppdot.dat data/tutorial.dat data/swp3196.lap data/highppm.dat \
 data/gridlabels.dat
+
+## All examples files need to be edited on installation.
+
+edit = sed \
+        -e 's,@PONGO_EXAMPLES\@,$(pkgdatadir),g'
+
+%.icl: %.icl.in
+	rm -f $@.tmp $@
+	$(edit) \
+	    $(srcdir)/$< > $(srcdir)/$@.tmp
+	mv $(srcdir)/$@.tmp $(srcdir)/$@
