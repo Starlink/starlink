@@ -58,6 +58,81 @@ parent of the node.
 			       (node-list cur result)))))
 		 nl))
 
+<![ IGNORE [
+<!-- Don't need these after all -->
+<routine>
+<routinename>node-list-contains?
+<description>
+Returns <code>#t</> if nl contains a node equal to the member of snl,
+and otherwise returns <code>#f</>.
+<returnvalue type=boolean>True if the node-list contains the specified element
+<argumentlist>
+<parameter>
+  <name>nl
+  <type>node-list
+  <description>Node-list to be tested
+<parameter>
+  <name>snl
+  <type>singleton-node-list
+  <description>node to be tested against
+<authorlist>
+<authorref id=iso10179 note='10.2.2'>
+<codebody>
+(define (node-list-contains? nl snl)
+  (node-list-reduce nl
+		    (lambda (result i)
+		      (or result
+			  (node-list=? snl i)))
+		    #f))
+
+<routine>
+<routinename>node-list-remove-duplicates
+<description>
+Returns a node-list which is the same as nl except that any member of
+nl which is equal to a preceding member of nl is removed.
+<returnvalue type=node-list>Filtered node-list
+<argumentlist>
+<parameter>
+  <name>nl
+  <type>node-list
+  <description>node-list to be filtered
+<authorlist>
+<authorref id=iso10179 note='10.2.2'>
+<codebody>
+(define (node-list-remove-duplicates nl)
+  (node-list-reduce nl
+		    (lambda (result snl)
+		      (if (node-list-contains? result snl)
+			  result
+			  (node-list result snl)))
+		    (empty-node-list)))
+
+<routine>
+<routinename>node-list-difference
+<description>
+Returns a node-list containing the set deifference of all the
+arguments, which shall be node-lists.  The set difference is defined
+to be those members of the first argument that are not members of any
+of the other arguments.  The result shall contain no duplicates.  With
+no arguments, an empty node-list shall be returned.
+<returnvalue type=node-list>List of nodes
+<authorlist>
+<authorref id=iso10179 note='10.2.2'>
+<codebody>
+(define (node-list-difference #!rest args)
+  (if (null? args)
+      (empty-node-list)
+      (node-list-reduce (cdr args)
+	      (lambda (nl1 nl2)
+		(node-list-reduce nl1
+				  (lambda (result snl)
+				    (if (node-list-contains? nl2 snl)
+					result
+					(node-list result snl)))
+				  (empty-node-list)))
+	      (node-list-remove-duplicates (car args)))))
+]]>
+
 <routine>
 <routinename>node-list-filter
 <description>
