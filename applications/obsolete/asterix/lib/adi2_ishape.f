@@ -115,7 +115,8 @@
      :                STATUS )
       ELSE
         DO IAX = 1, NDIM
-          CALL ADI2_HGKYII( HDUID, 'NAXIS', IAX, DIMS(IAX), CMNT, STATUS )
+          CALL ADI2_HGKYII( HDUID, 'NAXIS', IAX, DIMS(IAX), CMNT,
+     :                      STATUS )
         END DO
 
       END IF
