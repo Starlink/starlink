@@ -1,3 +1,6 @@
+// part of dvi2bitmap
+// $Id$
+
 #define NULL 0
 #include <iostream>
 #include <stdio.h>

@@ -1,3 +1,6 @@
+// part of dvi2bitmap
+// $Id$
+
 #ifndef DVI_FILE_HEADER_READ
 #define DVI_FILE_HEADER_READ 1
 

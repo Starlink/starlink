@@ -1,3 +1,6 @@
+// part of dvi2bitmap
+// $Id$
+
 #ifndef DVI2GIF_HEADER_READ
 #define DVI2GIF_HEADER_READ 1
 #include <string>

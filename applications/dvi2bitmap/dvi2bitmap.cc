@@ -1,3 +1,6 @@
+// part of dvi2bitmap
+// $Id$
+
 // For some reason which I don't understand (am I not including a
 // required library?), streambuf.h and iostream.h complain about NULL
 // being defined wrongly (as void*), unless I define it to be zero here.
