@@ -12,37 +12,74 @@ CURRENT_DIR = .
 RM = /bin/rm
 CP = cp
 
+# Variables sent to recursive makefiles
+STAR_INC = /star/include
+CFLAGS = -I${STAR_INC}
+
+# For Solaris
+FFLAGS = -g -C
+FCPPFLAGS = -DUSESH -DSUN4
+
+# For Linux
+#FFLAGS = -g -C -fno-second-underscore
+#FCPPFLAGS = -DUSESH
+
 # This is the list of sub-directories to loop over
 
-SUBDIRS = astro command exprt external fitting fv4 gen graph gsd \
-mapdis4 misc mv4 plots reduce scl tek term util vms src
+SUBDIRS = astro command inc exprt external fitting fv4 gen graph \
+mapdis4 mv4 plots reduce scl tek term util vms getaline
 
-# This is the files required to complete surf_source.tar
+# This is the files required to complete specx_source.tar
 # for the Starlink distribution
-DIST = src/surf_mon.f src/surf_mon.ifl src/surf_par src/surf_link_adam \
-docs/hlp/surf.hlp \
-scripts/surf.csh scripts/surf.icl \
-scripts/sculog scripts/scuquick scripts/sigclip scripts/qdraw \
-scripts/sdip.csh scripts/scupa.csh scripts/scuplot.csh scripts/scusetenv.csh \
-scripts/remdbm.pl scripts/setbolwt.pl scripts/change_nacentre.pl \
-scripts/scunoise scripts/scushift \
-misc/calsig_450_850_photom.sdf \
-misc/calsig_450_850_bp2.sdf     \
-misc/calsig_450_map.sdf \
-misc/calsig_450_850_map.sdf \
-misc/calsig_850_map.sdf \
-misc/ipfile.dat \
-misc/polimp.scuba \
-surf_kap/ctm_com \
-surf_kap/ctm_par \
-surf_kap/hlpcmd
+DIST = \
+misc/graphcap.txt \
+misc/graphcap.txt.native \
+misc/graphcap.txt.stlink \
+misc/init.spx \
+misc/specx_init.dat \
+misc/specx_welcome.txt \
+misc/specxstart \
+misc/test.log \
+misc/test.spx \
+data/l483cmap.map \
+data/l483core.dat \
+data/obs_das_0011.dat \
+data/scan_0043.dat \
+src/helpc.c \
+src/helpm.c \
+src/run_specx.c \
+src/scl_main.f \
+src/specx_help_link \
+src/specx_link \
+src/title.inc
+
 
 # This is a list of tar files created by other makefiles
 # I make it the responsibility of this makefile to copy them
 # to the Starlink directory
 
-SURF_TAR = sculib/surf_sculib.tar src/surf_sub.tar src/surf_ifls.tar \
-surflib/surf_surflib.tar surf_kap/surf_kap.tar
+SPECX_TAR = \
+astro/specx_astro.tar \
+comfiles/specx_comfiles.tar \
+command/specx_command.tar \
+exprt/specx_exprt.tar \
+external/specx_external.tar \
+fitting/specx_fitting.tar \
+fv4/specx_fv4.tar \
+gen/specx_gen.tar \
+getaline/specx_getaline.tar \
+graph/specx_graph.tar \
+inc/specx_inc.tar \
+mapdis4/specx_mapdis4.tar \
+mv4/specx_mv4.tar \
+plots/specx_plots.tar \
+reduce/specx_reduce.tar \
+scl/specx_scl.tar \
+tek/specx_tek.tar \
+term/specx_term.tar \
+util/specx_util.tar \
+vms/specx_vms.tar
+
 
 # Targets
 
@@ -51,7 +88,8 @@ all:
 	for i in $(SUBDIRS) ;\
 	do \
 	(cd $$i ; echo "making" all "in $(CURRENT_DIR)/$$i..."; \
-	$(MAKE) $(MFLAGS) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' all); \
+	$(MAKE) $(MFLAGS) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' 'FLAGS=$(FLAGS)' \
+	 'CFLAGS=$(CFLAGS)' 'FCPPFLAGS=$(FCPPFLAGS)' all); \
 	done
 
 # The export target creates the tar files necessary for 
@@ -67,9 +105,9 @@ export: specx_source.tar
 	(cd $$i ; echo "making" all "in $(CURRENT_DIR)/$$i..."; \
 	$(MAKE) $(MFLAGS) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' export); \
 	done; \
-	$(CP) $(SURF_TAR) starlink/ ;
+	$(CP) $(SPECX_TAR) starlink/ ;
 
-surf_source.tar: ${DIST}
+specx_source.tar: ${DIST}
 	mkdir tartmp; \
 	$(CP) $(DIST) tartmp/ ; \
 	(cd tartmp; tar cf ../starlink/$@ *;); \

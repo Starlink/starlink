@@ -84,10 +84,10 @@ HOBJS = ${HELPSOURCE:.c=.o}
 .f.o:
 	${FC} ${FFLAGS} -c $<
 
-specx: ${OBJS}
+$(PKG): ${OBJS}
 	${FC} ${CFLAGS} ${SPXLIBS} ${EXTLIBS} ${OBJS} -o $@
 
-specx_help: ${HOBJS}
+$(PKG)_help: ${HOBJS}
 	${FC} ${CFLAGS} ${HOBJS} ${HEXTLIBS} -o $@
 
 all: specx specx_help
@@ -100,8 +100,9 @@ clean:
 
 # Remove everything
 distclean: clean
-	rm -f lib${LIB}.a 1>/dev/null 2>/dev/null; \
+	rm -f $(PKG) $(PKG)_help 1>/dev/null 2>/dev/null; \
 	rm -f ${PKG}_${LIB}.tar 1>/dev/null 2>/dev/null;
+
 
 
 install: lib${LIB}
