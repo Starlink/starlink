@@ -33,7 +33,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="atools">
-  <version>1.6-3</version>
+  <version>1.7</version>
   <path>applications/atools</path>
   <description>ATOOLS - AST applications</description>
   <abstract><p>
@@ -320,7 +320,7 @@ proposal, or before or during an observing run.
   Gaussian profiles to galaxies,  generate  pie slice cross-sections
   of galaxies and display profiling results.</p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>agi</build><build>ast</build><build>cat</build><build>chr</build><build>fio</build><build>grp</build><build>hds</build><build>ndf</build><build>par</build><build>mers</build><build>pda</build><build>prm</build><build>psx</build><build>sae</build><build>sgs</build><build>subpar</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>ast</build><build>cat</build><build>chr</build><build>fio</build><build>grp</build><build>hds</build><build>ndf</build><build>par</build><build>mers</build><build>pda</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>sgs</build><build>subpar</build><build option='link'>agi</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -809,7 +809,7 @@ them.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="chart">
+<component id="chart" status="obsolete">
   <version>4.0-1</version>
   <path>applications/obsolete/chart</path>
   <description>CHART - Finding chart and stellar data system</description>
@@ -849,9 +849,9 @@ or perform astrometric reductions.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="email">
+<component id="email" status="obsolete">
   <version>1.4-1</version>
-  <path>applications/email</path>
+  <path>applications/obsolete/email</path>
   <description>Astronomy email address searching</description>
   <abstract><p>
 One of the most common activities on networked computers is the sending
@@ -870,6 +870,15 @@ and astronomy groups in the UK and the rest of the world.
     <person>
       <name>G R Mellor</name>
     </person>
+    <person>
+      <name>Chris Benn</name>
+    </person>
+    <person>
+      <name>Adrian Fish</name>
+    </person>
+    <person>
+      <name>Phil Hill</name>
+    </person>
   </developers>
   <documentation> sun182</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
@@ -877,7 +886,7 @@ and astronomy groups in the UK and the rest of the world.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="iras90">
+<component id="iras90" status="obsolete">
   <version>1.1-2</version>
   <path>applications/obsolete/iras90</path>
   <description>IRAS90 - IRAS data processing</description>
@@ -908,9 +917,9 @@ IRAS90 is a suite of programs for processing IRAS data.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ircamdr">
+<component id="ircamdr" status="obsolete">
   <version>1.1-2</version>
-  <path>applications/obsolete/iras90</path>
+  <path>applications/obsolete/ircamdr</path>
   <description>IRCAMDR - IRCAM3 Data Reduction Software</description>
   <abstract><p>
 The IRCAM3 data reduction and analysis software package,
@@ -1319,7 +1328,7 @@ UNIX).
 
 <component id="ssn78">
   <version>0.1</version>
-  <path>docs/ssn78</path>
+  <path>docs/ssn/078</path>
   <description>Description of the build system</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
@@ -1388,7 +1397,7 @@ UNIX).
   <description>Applications Graphics Interface Library</description>
   <abstract><p>AGI and AGP interface.</p></abstract>
   <dependencies >
-    <build>cnf</build><build>psx</build><build>gks</build><build>sae</build><build>hds</build><build>par</build><link>ref</link><link>trn</link><link>sgs</link><link>pgp</link><link>idi</link><link>hds</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>psx</build><build>gks</build><build>sae</build><build>hds</build><build>par</build><link>ref</link><link>trn</link><link>sgs</link><link>pgp</link><link>idi</link><link>hds</link><link>graphpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <!--
   <developers>
@@ -1575,7 +1584,7 @@ No longer under active control.
       character strings, logical values and pointers to dynamically
       allocated memory.</p></abstract>
   <dependencies >
-    
+    <sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1664,7 +1673,7 @@ No longer under active control.
   <description>The tarlink RAL/ICL GKS graphics package.</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
-    <build>cnf</build><build>gwm</build><link>gwm</link><link>ems</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>gwm</build><link>ems</link><link>gwm</link><link>starx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <!--
   <developers>
@@ -1926,7 +1935,7 @@ No longer under active control.
   (A&amp;AS, 76, 263).
     </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>cnf</build><build>ems</build><link>starx</link><link>ems</link><link>cnf</link><link>gwm</link><link>gns</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>cnf</build><build>ems</build><build option='link'>gwm</build><link>cnf</link><link>ems</link><link>gwm</link><link>gns</link><link>starx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2009,7 +2018,7 @@ KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
 independently of KAPPA.</p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><build>gks</build><build>gns</build><build>idi</build><build>agi</build><build>ast</build><build>cat</build><build>ndg</build><build>hds</build><build>chr</build><build>fio</build><build>grp</build><build>ndf</build><build>prm</build><build>par</build><build>psx</build><build>tcl</build><link>cat</link><link>mers</link><link>pcs</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><build>gks</build><build>gns</build><build>idi</build><build>agi</build><build>ast</build><build>cat</build><build>ndg</build><build>hds</build><build>chr</build><build>fio</build><build>grp</build><build>ndf</build><build>prm</build><build>par</build><build>psx</build><build>tcl</build><build>tk</build><build>snx</build><link>cat</link><link>mers</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link><link>tcl</link><link>tk</link><link>snx</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
