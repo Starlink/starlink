@@ -79,7 +79,7 @@
 *.
 
 *  Shutdown resources system
-      CALL AST_RESEND()
+C      CALL AST_RESEND()
 
 *  User interface
       CALL USI_CLOSE()

@@ -19,6 +19,6 @@
       CALL DYN_INIT()
 
 *    Start resources
-      CALL AST_RESBEG()
+C      CALL AST_RESBEG()
 
       END
