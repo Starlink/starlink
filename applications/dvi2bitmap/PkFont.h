@@ -191,6 +191,11 @@ class PkFont {
 	    unsigned int d,
 	    string name);
     ~PkFont();
+    /**
+     * Returns the glyph at a given position in this font.  If the
+     * font has not been loaded, it returns a dummy glyph.
+     * @return the numbered glyph from the font
+     */
     PkGlyph *glyph (unsigned int i) const {
 	if (font_loaded_)
 	{
