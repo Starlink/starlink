@@ -553,8 +553,10 @@ $Id$
       (make sequence
 	(make command name: "subsection"
 	      (if id
-		  (make empty-command name: "label"
-			parameters: `(,(string-append "R" id)))
+		  ;(make empty-command name: "label"
+			;parameters: `(,(string-append "R" id)))
+		  (make command name: "label"
+			(literal (gen-label)))
 		  (empty-sosofo))
 	      (if (node-list-empty? rn)
 		  (literal "Anonymous routine")
