@@ -2,19 +2,43 @@
 dvi2bitmap
 ==========
 
-%%VERSION%% 0.10
+%%VERSION%% 0.11b1
 
 dvi2bitmap is a utility to convert TeX DVI files directly to bitmaps,
 without going through the complicated (and slow!) route of conversion
 via PostScript and PNM.  The prime motivation for this is to prepare
-mathematical equations for inclusion in HTML files, but I expect there
-are plenty of uses beyond that.  It can generate XBM, XPM and GIF
-bitmaps, plus PNG, if you have the libpng library installed.  It uses
-the same kpathsea font-searching library as other TeX programs, again
-as long as you have the appropriate library installed.
+mathematical equations for inclusion in HTML files, but there are
+plenty of uses beyond that.  It uses the same kpathsea font-searching
+library as other TeX programs, again as long as you have the
+appropriate library installed.
 
-The program is written in C++, and incidentally provides a reasonably
-good (I think) object interface for DVI and PK files.
+Features:
+
+  * Written in C++.
+
+  * The program is a wrapper for libdvi2bitmap, a library which abstracts
+    DVI and PK files, Bitmaps, and various other objects supporting
+    these.
+
+  * Supports GIF, XBM, XPM bitmaps as output, plus PNG if libpng is
+    installed.
+
+  * Can read DVI files from a non-seekable stream such as a pipe.
+
+  * Internally constructed bitmap is expandable.
+
+  * Integrated with the kpathsea path-searching algorithm, as used by other
+    TeX and DVI programs.  It is not, however, dependent on it, so it
+    will still work happily if you don't have the library installed.
+    Can use a pre-set search path, or scripts, to find fonts instead.
+
+  * Can generate fonts on the fly.
+
+  * Highly configurable, and fast.  Designed for use in a batch
+    production mode.
+
+  * Released under the GPL.
+
 
 See <http://www.astro.gla.ac.uk/users/norman/star/dvi2bitmap/>
 
@@ -25,13 +49,12 @@ To configure and build:
 
     ./configure
     make
+    make install
 
 You can override the C++ compiler the configure script will choose by
 setting the environment variable CXX, either via `CXX=cxx ./configure'
-or `env CXX=cxx ./configure', depending on your shell.
-
-To install, just copy the executable dvi2bitmap wherever you want it
-to live.
+or `env CXX=cxx ./configure', depending on your shell.  Choose the
+install location with the argument --prefix.
 
 Since this program uses `standard' TeX fonts, but at resolutions
 appropriate for screens rather than paper, there is a certain fuss
@@ -41,7 +64,7 @@ Failing that, you might have to set an environment variable.  See the
 section of the manual entitled `Finding fonts' for some discussion of
 this.  As well, it's a good idea to give the command
 
-    make test
+    (cd test; make)
 
 after you've built the distribution.  As well as testing the program,
 this attempts to give you some advice about what you need to do on
@@ -108,14 +131,15 @@ Documentation
 -------------
 
 See directory doc/ -- there are fuller installation instructions
-there.  There's also a man-page in dvi2bitmap.1, but this is not
+there.  Full library documentation in directory doc_libdvi2bitmap/.
+There's also a man-page in dvi2bitmap.1, but this is not 
 necessarily as up-to-date as the main documentation.
 
 
 Copyright
 ---------
 
-Copyright 1999--2002, Council for the Central Laboratories of the
+Copyright 1999--2003, Council for the Central Laboratories of the
 Research Councils.  Released under the terms of the GPL, a copy of
 which is included in the file LICENCE.
 
