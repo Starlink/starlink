@@ -1562,7 +1562,7 @@ itcl::class gaia::GaiaContour {
             -command [code $this set_display_frac_ yfrac_]
       }
       pack $itk_component(yfrac) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(xfrac) \
+      add_short_help $itk_component(yfrac) \
          {Y fraction of visible region to contour}
 
       #  Do the initialisation of the fraction widget states.
