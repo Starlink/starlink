@@ -238,6 +238,11 @@ AC_SUBST(PREDIST)
 # then important targets might be commented out by mistake.
 STAR_PREDIST_SOURCES(starconf.status)
 
+# pax and/or tar are used in some install targets.
+# Note: value-if-not-found should be blank, so this can be tested for.
+AC_PATH_PROG(PAX, pax)
+AC_PATH_PROGS(TAR, [gnutar tar])
+
 # Default $prefix.  This is done by the standard autoconf configure, but at
 # a slightly later stage than this.  Doing it here, as part of STAR_[]DEFAULTS
 # means that the defaulted value of $prefix can be used within the body of
@@ -787,7 +792,7 @@ AC_DEFUN([STAR_CHECK_PROGS],
 AC_DEFUN([STAR_SPECIAL_INSTALL_COMMAND],
    [AC_REQUIRE([AC_PROG_LN_S])dnl
     AC_PATH_PROG(CP, cp)dnl
-    AC_PATH_PROG(PAX, pax)dnl
+dnl    AC_PATH_PROG(PAX, pax)dnl
     AC_CACHE_CHECK([how to do a recursive directory copy],
                    [star_cv_cp_r],
                    [rm -Rf conftest*
@@ -800,7 +805,7 @@ AC_DEFUN([STAR_SPECIAL_INSTALL_COMMAND],
                         star_cv_cp_r="$CP -R"
                     else
                         star_cv_cp_r=
-                        for try in "$CP -R -P -p" "$CP -R -p" "$PAX -r -w -p e"
+                        for try in "$CP -R -P -p" "$CP -R -p" "${PAX-false} -r -w -p e"
                         do
                             rm -Rf conftest-d2/*
                             if (cd conftest-d1; $try . ../conftest-d2 2>/dev/null); then
