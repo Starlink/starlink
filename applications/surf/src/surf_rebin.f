@@ -127,7 +127,7 @@
 *        This parameter sets the size of the output grid in pixels. The default
 *        values are the minimum dimensions required to display the entirety
 *        of the mapped area.
-*     USEGRD = LOGICAL (Read)
+*     GUARD = LOGICAL (Read)
 *        Determines whether a guard ring of bolometers should be used
 *        during the weight function regridding. A guard ring simulates
 *        a ring of bolometers at the edge of the supplied data containing
@@ -207,6 +207,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.60  1998/12/10 19:58:07  timj
+*     Rename parameter USEGRD to GUARD
+*
 *     Revision 1.59  1998/12/08 21:34:39  timj
 *     Add USEGRD parameter and make the default value be TRUE
 *
@@ -634,7 +637,7 @@ c
       INTEGER          TOTAL_BOLS      ! Number of bolometers
       INTEGER          UBND (MAX_DIM)  ! pixel indices of top right corner
                                        ! of output image
-      LOGICAL          USEGRD          ! Use guard ring in wt regrid?
+      LOGICAL          GUARD           ! Use guard ring in wt regrid?
       CHARACTER*15     UTDATE(MAX_FILE)! date of first observation
       CHARACTER*15     UTSTART(MAX_FILE)! UT of start of first observation
       REAL             WAVELENGTH      ! the wavelength of the map (microns)
@@ -1588,7 +1591,7 @@ c
      :           '^PKG: Initialising BESSEL weighting functions',
      :           STATUS)
             CALL SCULIB_BESSEL_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
-            USEGRD = .TRUE.
+            GUARD = .TRUE.
 
          ELSE IF (METHOD.EQ.'LINEAR') THEN
 *     Linear
@@ -1597,7 +1600,7 @@ c
      :           '^PKG: Initialising LINEAR weighting functions',
      :           STATUS)
             CALL SCULIB_LINEAR_WTINIT(WTFN, WTFNRES, STATUS)
-            USEGRD = .TRUE.
+            GUARD = .TRUE.
 
          ELSE IF (METHOD.EQ.'GAUSSIAN') THEN
 *     Gaussian
@@ -1606,14 +1609,14 @@ c
      :           '^PKG: Initialising GAUSSIAN weighting functions',
      :           STATUS)
             CALL SCULIB_GAUSS_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
-            USEGRD = .TRUE.
+            GUARD = .TRUE.
          ENDIF
 
 *     Allow my decision for the Guard ring to be overridden with a
-*     parameter USEGRD
+*     parameter GUARD
 
-         CALL PAR_DEF0L('USEGRD', USEGRD, STATUS)
-         CALL PAR_GET0L('USEGRD', USEGRD, STATUS)
+         CALL PAR_DEF0L('GUARD', GUARD, STATUS)
+         CALL PAR_GET0L('GUARD', GUARD, STATUS)
 
       END IF
 
@@ -1934,7 +1937,7 @@ c
      :                 (METHOD .EQ. 'GAUSSIAN')) THEN
 
 *     Rebin the data using weighting function
-                     CALL SCULIB_WTFN_REGRID( USEGRD, NFILES, N_PTS,
+                     CALL SCULIB_WTFN_REGRID( GUARD, NFILES, N_PTS,
      :                    WTFN_MAXRAD, WTFNRES, WEIGHTSIZE, SCALE, 
      :                    DIAMETER, WAVELENGTH,  OUT_PIXEL, MAP_SIZE(1), 
      :                    MAP_SIZE(2), I_CENTRE, J_CENTRE, WTFN, WEIGHT,
