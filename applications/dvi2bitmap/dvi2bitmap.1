@@ -12,6 +12,9 @@ dvi2bitmap processes a DVI file produced by the TeX typesetting
 system, converting each page to a single bitmap.
 .PP
 This program is intended to conform to the DVI processing standard.
+.PP
+The principal documentation for this package is in the HTML document
+distributed with it.  This man-page may differ from the documentation there.
 .SS OPTIONS
 .TP
 .I "\-bh size, \-bw size"
@@ -177,12 +180,24 @@ dvi2bitmap environment variable is set correctly.
 .SH ENVIRONMENT
 The 
 .B DVI2BITMAP_PK_PATH
-environment variable gives the directory which is to be searched for
-PK files.  Note that, although the variable name refers to a
-`path', you may specify only one directory.  I may make this
-marginally more sophisticated in future versions, but probably not:
-the correct thing to do here is to use the same Kpathsearch library
-that the rest of the TeX system uses.
+environment variable gives a colon-separated list of directories which
+are to be searched for PK files.  If the required font is not found in
+the directories specified in this list, then the kpathsea library is
+used, if support for that was available at compile-time.
+.PP
+This variable is overridden by the 
+.I "\-f"
+option.
+.PP
+If the program was compiled with support for the kpathsea library,
+then it will use that library to find fonts.  For this to work, the
+.I dvi2bitmap
+program must either be installed with the other TeXware, or else the 
+.B TEXMFCNF
+environment variable must be defined to point to the directory which
+contains the kpathsea configuration file.  You can find this location
+with the command
+.I "kpsewhich cnf texmf.cnf"
 .SH "SEE ALSO"
 DVItype and PKtoPX: Knuth programs intended as model DVI and PK file
 readers, and as containers for the canonical documentation of the DVI
@@ -199,9 +214,6 @@ This incorporates sections of the DVItype documentation.
 .SH BUGS
 If the program doesn't conform to the DVI Driver Standard, please let
 me know.
-.PP
-As noted above, the PK path searching should be changed to use the
-Kpathsearch library.
 .PP
 It would be nice to output a greater range of bitmap types.  Sometime....
 .SH AUTHOR
