@@ -1,0 +1,86 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ccdpack_link
+
+#  Purpose:
+#     Link a standalone binary with the CCDPACK libraries.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script is invoked to print on standard output all the arguments
+#     required for a compilation command.  By default
+#     no graphics capability is provided, but if one of the flags
+#     '-pgp' or '-pgplot' is given, then Starlink or Native PGPLOT
+#     graphics will be linked in.
+
+#  Authors:
+#     PWD: Peter Draper (Starlink)
+#     MBT: Mark Taylor (Starlink)
+
+#  History:
+#     11-JAN-2001:
+#        Rewrote combining ccdpack_link_adam and 
+#        ccdpack_graphics_link_adam into the same script, and added
+#        flags for graphics system selection.
+#-
+
+#  Initialise link options - default is no graphics linking.
+      pgptype=''
+
+#  Handle command line options.
+      while :; do
+         case "${1}" in
+
+#  -pgp - Requests Starlink PGPLOT
+         -pgp)
+            pgptype='starlink'
+            shift;;
+
+#  -pgplot - Requests Native PGPLOT
+         -pgplot)
+            pgptype='native'
+            shift;;
+
+#  Once all switches have been read, continue with the rest of the script.
+         '')
+            break;;
+
+#  Catch unrecognised switches and report an error.
+         *)
+            echo >&2 "ccdpack_link: unknown argument \""${1}"\" given"
+            exit 1;;
+         esac
+      done
+
+#  Generate strings for linking graphics.
+      case "${pgptype}" in
+
+      starlink)
+         graphargs="`agi_link` `ast_link -mygrf` grf_ccdpack.o \
+                    `pgp_link`"
+         ;;
+
+      native)
+         graphargs="`agp_link` `ast_link -mygrf` grf_ccdpack.o \
+                    -lcpgplot `pgplot_link`"
+         ;;
+
+      esac
+
+#  Generate the final argument list and pass it through an awk script 
+#  which eliminates all except the last reference to each library.
+      echo "`fio_link` `trn_link` \
+            `chr_link` `prm_link` `psx_link` \
+            `ard_link` `ndg_link` `grp_link` \
+            `ams_link_adam` \
+            $graphargs -lpda" \
+          | sed 's/-lpgplot /-lpgplot_adam /g' \
+          | awk 'BEGIN{RS=" ";FS="\n"}
+                        {f[i++]=$1}
+                        END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+# $Id$

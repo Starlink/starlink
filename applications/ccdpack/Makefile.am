@@ -21,8 +21,7 @@ STARTCL_OBJ = $(libdir)/tkGwm.o $(libdir)/tkGwmCanv.o \
               $(libdir)/tkGwmPrint.o $(libdir)/tclAdam.o
 
 ccdwish_LDADD = $(LDADD) $(CCDPACK_LIBS) $(STARTCL_OBJ) \
-                `$(srcdir)/pgp_ccdpack_link_adam` \
-                -lpar_adam `dtask_link_adam` -ljpeg @FCLIBS@
+                `$(srcdir)/pgp_ccdpack_link` -ljpeg @FCLIBS@
 
 bin_MONOLITHS = ccdpack_red ccdpack_reg ccdpack_res ccdpack_scr \
                 ccdhelp

@@ -1,0 +1,14 @@
+
+#  Name:
+#     pgp_ccdpack_link
+
+#  Purpose:
+#     Link against CCDPACK libraries and plotting.
+
+#  Description:
+#     This invokes ccdpack_link_adam with one of the flags '-pgp' or 
+#     '-pgplot' (GKS or native PGPLOT respectively).  It's necessary
+#     because automake won't allow you to invoke a link script 
+#     with a flag (doesn't like spaces).
+
+./ccdpack_link -pgplot
