@@ -21,20 +21,7 @@
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {POLPACK is a package of applications for 
 reducing imaging polarimetry data. They cover registration, sky subtraction, 
-calculation of Stokes parameters, and display of vector maps.
-\newpage
-\begin{center}
-\vspace*{3in}
-\parbox{5in}{
-{\large
-\emph{The polarization map on the front cover shows 850 $\mu$m dust grain 
-emission in the cloud core W3. The map shows large scale magnetic fields
-in this region of high-mass star-formation. The data were obtained with
-the SCUBA polarimeter on the James Clerk Maxwell Telescope  (operated by 
-the Joint Astronomy Centre in Hawaii), and reduced using SURF and POLPACK.
-}}}
-\end{center}
-}
+calculation of Stokes parameters, and display of vector maps.}
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -569,7 +556,12 @@ the Joint Astronomy Centre in Hawaii), and reduced using SURF and POLPACK.
       \stardocmanual
    \begin{rawhtml} </H1> <HR> \end{rawhtml}
 
-   \htmlfig{map2}{fig.gif}{}
+   \htmlfig{map2}{fig.gif}{The above polarization map shows 
+   850 micron dust grain emission in the cloud core W3. The map shows large 
+   scale magnetic fields in this region of high-mass star-formation. The 
+   data were obtained with the SCUBA polarimeter on the James Clerk Maxwell 
+   Telescope  (operated by the Joint Astronomy Centre in Hawaii), and 
+   reduced using SURF and POLPACK.}
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
    \stardoccategory\ \stardocnumber \\
@@ -608,6 +600,23 @@ the Joint Astronomy Centre in Hawaii), and reduced using SURF and POLPACK.
 % ? Document Abstract. (if used)
 %  ==================
 \stardocabstract
+
+% Caption for front cover picture.
+\begin{latexonly}
+\newpage
+\begin{center}
+\vspace*{3in}
+\parbox{5in}{
+{\large
+\emph{The polarization map on the front cover shows 850 $\mu$m dust grain 
+emission in the cloud core W3. The map shows large scale magnetic fields
+in this region of high-mass star-formation. The data were obtained with
+the SCUBA polarimeter on the James Clerk Maxwell Telescope  (operated by 
+the Joint Astronomy Centre in Hawaii), and reduced using SURF and POLPACK.
+}}}
+\end{center}
+\end{latexonly}
+
 % ? End of document abstract
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
@@ -4168,10 +4177,10 @@ for NDF applications.
       \sstsubsection{
          IN = NDF (Read)
       }{
-         A group of 2-d input intensity frames. This may take the form of a
-         comma separated list of file names, or any of the other forms
-         described in the help on {\tt "}Group Expressions{\tt "}. Note, the input frames
-         cannot be specified within the GUI.
+         A group of 2-d input intensity frames. This may take the form of a 
+         comma separated list of file names, or any of the other forms 
+         described in the help on "Group Expressions". Note, the input frames 
+         cannot be specified within the GUI. See also parameter REFIN.
       }
       \sstsubsection{
          LOGFILE = LITERAL (Read)
@@ -4275,6 +4284,19 @@ for NDF applications.
          a smaller value should be supplied. If it is set to zero, then
          no centroiding is performed, and the raw feature positions are
          used as supplied. [3]
+      }
+      \sstsubsection{
+         REFIN = NDF (Read)
+      }{
+         An intensity frame defining the reference co-ordinate system.
+         The images specified by parameter IN will be aligned with this
+         image. If a null (!) value is supplied, the first image in the
+         group supplied for parameter IN is used as the reference image.
+         If the reference image is specified using paremeter IN, it will be
+         processed like the other images. If the reference image is
+         specified using parameter REFIN, it will not be processed. No
+         aligned, extracted images will be created from it, and it will
+         not be included in the calculation of the Stokes parameters. [!]
       }
       \sstsubsection{
          REFCOL = LITERAL (Update)
@@ -6018,6 +6040,11 @@ single-beam mode.
 
 \item POLPACK (including \htmlref{POLKA}{POLKA}) may now be used from the
 ICL and IRAF cl command languages.
+
+\item \htmlref{POLKA}{POLKA}) now has a REFIN parameter which may be used
+to specify a reference image to which the other images should be aligned.
+A reference image specified in this way will not be processed to create
+any output files.
 
 \item The NEWCOLMAP parameter has been removed from \htmlref{POLKA}{POLKA}.
 POLKA will now use a private colour map automatically when necessary.
