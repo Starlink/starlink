@@ -46,5 +46,3 @@ TEST_ROUTINES = case.f compare.f decode.f edit.f \
         test_scomp.f test_simlr.f test_size.f  test_skchr.f test_sort.f \
         test_swap.f  test_term.f  test_tochr.f test_trchr.f test_trunc.f \
         test_ucase.f test_upper.f test_wild.f 
-
-BUILT_SOURCES = CHR_ERR
