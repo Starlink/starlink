@@ -125,6 +125,8 @@
 *        Updated data interface
 *     18 Aug 1995 V2.0-0 (DJA):
 *        ADI port of event handling
+*     21 Feb 1996 V2.0-1 (DJA):
+*        Removed ATAN2D for Linux port
 *     {enter_changes_here}
 
 *  Bugs:
@@ -155,7 +157,7 @@
       INTEGER                   MXTEXT
          PARAMETER             (MXTEXT = 7)
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'EVPOLAR Version V2.0-0' )
+        PARAMETER		( VERSION = 'EVPOLAR Version V2.0-1' )
 
 *  Local Variables:
       CHARACTER*20              BNAME(2)         ! List names
@@ -517,6 +519,7 @@ C        END IF
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'MATH_PAR'
 *
 *    Import :
 *
@@ -546,7 +549,7 @@ C        END IF
           DX = XV(I) - X0
           DY = YV(I) - Y0
           POL(1,I) = SQRT(DX*DX+DY*DY)
-          POL(2,I) = ATAN2D(DX,DY)
+          POL(2,I) = ATAN2(DX,DY)*MATH__RTOD
           IF ( POL(2,I) .LT. 0 ) POL(2,I) = POL(2,I) + 360.0
           IF ( POL(1,I) .GT. MAXR ) MAXR = POL(1,I)
         END DO
