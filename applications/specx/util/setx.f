@@ -16,6 +16,10 @@
 *     20 July 2000 (ajc):
 *        Change TYPE * to PRINT *
 *        Remove escapes from WRITE statement
+*     16 May 2003 (timj):
+*        Prevent warnings from valgrind. Only need to copy the actual
+*        number of quadrants to XFAC. Note the maximum number (since
+*        we do not initialize all 8).
 C-----------------------------------------------------------------------
 
       SUBROUTINE SETXNEW (XSCALE, ISTAT)
@@ -277,7 +281,7 @@ C----------------
         END DO
       END IF
 
-      DO NQ = 1, 8
+      DO NQ = 1, NQUAD
         XFAC(NQ) = SNGL(XFAC8 (NQ))
       END DO
 
