@@ -29,13 +29,13 @@ f     AST_PLOT
 *     may often be non-linear, or even discontinuous, most plotting
 *     does not result in simple straight lines. The basic plotting
 *     element is therefore not a straight line, but a geodesic curve
-c     (see astCurve). A Plot also provides facilities for drawing
-c     markers or symbols (astMark), text (astText) and grid lines
+c     (see astCurve and astPolyCurve). A Plot also provides facilities for 
+c     drawing markers or symbols (astMark), text (astText) and grid lines
 c     (astGridLine). It is also possible to draw curvilinear axes with
 c     optional coordinate grids (astGrid).
-f     (see AST_CURVE). A Plot also provides facilities for drawing
-f     markers or symbols (AST_MARK), text (AST_TEXT) and grid lines
-f     (AST_GRIDLINE). It is also possible to draw curvilinear axes
+f     (see AST_CURVE and AST_POLYCURVE). A Plot also provides facilities 
+f     for drawing markers or symbols (AST_MARK), text (AST_TEXT) and grid 
+f     lines (AST_GRIDLINE). It is also possible to draw curvilinear axes
 f     with optional coordinate grids (AST_GRID).
 *     A range of Plot attributes is available to allow precise control
 *     over the appearance of graphical output produced by these
@@ -108,6 +108,7 @@ c     - astCurve: Draw a geodesic curve
 c     - astGrid: Draw a set of labelled coordinate axes
 c     - astGridLine: Draw a grid line (or axis) for a Plot
 c     - astMark: Draw a set of markers for a Plot
+c     - astPolyCurve: Draw a series of connected geodesic curves
 c     - astText: Draw a text string for a Plot
 f     - AST_BORDER: Draw a border around valid regions of a Plot
 f     - AST_CLIP: Set up or remove clipping for a Plot
@@ -115,6 +116,7 @@ f     - AST_CURVE: Draw a geodesic curve
 f     - AST_GRID: Draw a set of labelled coordinate axes
 f     - AST_GRIDLINE: Draw a grid line (or axis) for a Plot
 f     - AST_MARK: Draw a set of markers for a Plot
+f     - AST_POLYCURVE: Draw a series of connected geodesic curves
 f     - AST_TEXT: Draw a text string for a Plot
 
 *  Graphical Elements:
@@ -131,8 +133,8 @@ c     - Border: The Plot border drawn using astBorder or astGrid
 f     - Border: The Plot border drawn using AST_BORDER or AST_GRID
 c     - Grid: Grid lines drawn using astGridLine or astGrid
 f     - Grid: Grid lines drawn using AST_GRIDLINE or AST_GRID
-c     - Curves: Geodesic curves drawn using astCurve
-f     - Curves: Geodesic curves drawn using AST_CURVE
+c     - Curves: Geodesic curves drawn using astCurve or astPolyCurve
+f     - Curves: Geodesic curves drawn using AST_CURVE or AST_POLYCURVE
 c     - NumLab: Numerical axis labels drawn using astGrid
 f     - NumLab: Numerical axis labels drawn using AST_GRID
 c     - TextLab: Descriptive axis labels drawn using astGrid
@@ -227,6 +229,18 @@ f     using AST_GRID
 *        Modify DrawTicks so that ticks are drawn closer to singularities
 *        than previously. Also normalise this constraint to the screen size
 *        rather than the length of a major tick mark.
+*     28-OCT-1998 (DSB):
+*        o  Added method astPolyCurve. 
+*        o  Extract the Current Frame from the Plot prior to using Frame 
+*        methods such as astOffset, astNorm, etc.
+*        o  PlotLabel modified to ensure labels are abbreviated even if
+*        they are next to the "root" label (i.e. the label with most
+*        trailing zeros).
+*        o  Modified description of Width attribute. Width no longer gives
+*        the absolute line width in inches. Instead it is a scale factor,
+*        where 1.0 corresponds to a "typical thin line" on the device.
+*        o  Modified LabelUnits attribute so that the default value is zero
+*        for SkyAxes and non-zero for other Axes.
 *class--
 */
 
@@ -256,7 +270,7 @@ f     using AST_GRID
 #define EDGETICKS_DIM 100 /* No. of edge samples used to find tick marks */
 #define BORDER_ID       0 /* Id for astBorder curves */
 #define GRIDLINE_ID     1 /* Id for astGridLine curves */
-#define CURVE_ID        2 /* Id for astCurve curves */
+#define CURVE_ID        2 /* Id for astCurve or astPolyCurve curves */
 #define NUMLABS_ID      3 /* Id for numerical labels */
 #define TEXTLABS_ID     4 /* Id for textual axis labels */
 #define TITLE_ID        5 /* Id for textual title */
@@ -996,7 +1010,8 @@ typedef struct LabelList {
    double val;
 } LabelList;
 
-/* Structure holding information about curves drawn by astGridLine and astCurve. */
+/* Structure holding information about curves drawn by astGridLine and 
+   astCurve. */
 typedef struct CurveData{
    int out;          /* Was the curve completely outside the clipping area? */
    int nbrk;         /* The number of breaks in the curve. */
@@ -1075,6 +1090,7 @@ static int   Poly_n;
 static int           Map1_ncoord;       
 static AstPlot      *Map1_plot = NULL; 
 static AstMapping   *Map1_map = NULL; 
+static AstFrame     *Map1_frame = NULL; 
 static const double *Map1_origin = NULL; 
 static double        Map1_scale;
 static int           Map1_axis;
@@ -1093,6 +1109,7 @@ static double        Map2_deltay;
 static int           Map3_ncoord;       
 static AstPlot      *Map3_plot = NULL; 
 static AstMapping   *Map3_map = NULL; 
+static AstFrame     *Map3_frame = NULL; 
 static const double *Map3_origin = NULL; 
 static const double *Map3_end = NULL; 
 static double        Map3_scale;
@@ -1266,7 +1283,7 @@ static void SetAttrib( AstObject *, const char * );
 
 static AstFrameSet *Fset2D( AstFrameSet *, int );
 static AstPointSet *DefGap( AstPlot *, double *, int *, double *, int *, const char *, const char * );
-static AstPointSet *Trans( AstPlot *, AstMapping *, AstPointSet *, int, AstPointSet *, int, const char *, const char * );
+static AstPointSet *Trans( AstPlot *, AstFrame *, AstMapping *, AstPointSet *, int, AstPointSet *, int, const char *, const char * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static CurveData **CleanCdata( CurveData ** );
 static CurveData **DrawGrid( AstPlot *, TickInfo **, int, const char *, const char * );
@@ -1276,7 +1293,7 @@ static TickInfo *TickMarks( AstPlot *, int, double *, double *, int *, const cha
 static char **CheckLabels2( AstFrame *, int, double *, int, char ** );
 static char *FindWord( char *, const char *, const char ** );
 static char *GrfItem( int, const char * );
-static double **MakeGrid( AstPlot *, AstMapping *, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char * );
+static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char * );
 static double GetTicks( AstPlot *, int, double *, double, double **, int *, int *, int, int *, const char *, const char * );
 static double GoodGrid( AstPlot *, int *, AstPointSet **, AstPointSet **, const char *, const char * );
 static int Border( AstPlot * );
@@ -1333,6 +1350,7 @@ static void Map3( int, double *, double *, double *, const char *, const char * 
 static void Mark( AstPlot *, int, int, int, const double (*)[], int );
 static void Opoly( const char *, const char * );
 static void PlotLabels( AstPlot *, AstFrame *, int, LabelList *, char *, int, float **, const char *, const char *);
+static void PolyCurve( AstPlot *, int, int, int, const double (*)[] );
 static void RemoveFrame( AstFrameSet *, int );
 static void Text( AstPlot *, const char *, const double [], const float [2], const char *);
 static void TextLabels( AstPlot *, int, int *, const char *, const char *);
@@ -2557,6 +2575,10 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 *     "LabelUnits(2)"), then a "set" or "clear" operation will affect
 *     the attribute value of all the Plot axes, while a "get" or
 *     "test" operation will use just the LabelUnits(1) value.
+*     - If the current Frame of the Plot is not a SkyFrame, but includes
+*     axes which were extracted from a SkyFrame, then the default behaviour
+*     is to include a unit description only for those axes which were not
+*     extracted from a SkyFrame.
 *att--
 */
 /* Are textual labels to include a string describing the axis units? Has a 
@@ -2734,16 +2756,19 @@ MAKE_SET(Colour,int,colour,value,AST__NPID)
 
 *  Description:
 *     This attribute determines the line width used when drawing each
-*     element of graphical output produced by a Plot, and is given in
-*     inches. It takes a separate value for each graphical element so 
-*     that, for instance, the setting "Width(border)=0.1" causes the 
-*     Plot border to be drawn using a line width of 0.1 inch.
+*     element of graphical output produced by a Plot.  It takes a
+*     separate value for each graphical element so that, for instance,
+*     the setting "Width(border)=2.0" causes the Plot border to be
+*     drawn using a line width of 2.0. A value of 1.0 results in a
+*     line thickness which is approximately 0.0005 times the length of
+*     the diagonal of the entire display surface.
 *
-*     The actual appearance of lines drawn with any particular width, 
-*     and the range of available widths, is determined by the underlying 
-*     graphics system.  The default behaviour is for all graphical 
-*     elements to be drawn using the default line width supplied by this 
-*     graphics system.
+*     The actual appearance of lines drawn with any particular width,
+*     and the range of available widths, is determined by the
+*     underlying graphics system.  The default behaviour is for all
+*     graphical elements to be drawn using the default line width
+*     supplied by this graphics system. This will not necessarily
+*     correspond to a Width value of 1.0.
 
 *  Applicability:
 *     Plot
@@ -3080,8 +3105,9 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
    Frame). */
       Map1_ncoord = naxes;
 
-/* A pointer to the Plot, and Mapping. */
+/* A pointer to the Plot, the Current Frame and the Mapping. */
       Map1_plot = this;
+      Map1_frame = astGetFrame( this, AST__CURRENT );
       Map1_map = astGetMapping( this, AST__BASE, AST__CURRENT );
 
 /* The physical coordinates at the start of the curve. */
@@ -3162,7 +3188,8 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
          cdata->nbrk = Crv_nbrk;
       }
 
-/* Annul the Mapping. */
+/* Annul the Frame and Mapping. */
+      Map1_frame = astAnnul( Map1_frame );
       Map1_map = astAnnul( Map1_map );
 
 /* Re-establish the original graphical attributes. */
@@ -3299,7 +3326,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
    if( dim > 400 ) dim = 400;
 
 /* Create the grid. */
-   ptr2 = MakeGrid( this, map, dim, this->xlo, this->xhi, this->ylo, 
+   ptr2 = MakeGrid( this, NULL, map, dim, this->xlo, this->xhi, this->ylo, 
                     this->yhi, 2, &pset1, &pset2, 0, method, class );
 
 /* Store the number of cells along each edge of the grid. */
@@ -3449,7 +3476,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
 
 /* Transform the graphics coordinates to get the corresponding physical
    coordinates. */
-            (void) Trans( this, map, pset3, 1, pset4, 0, method, class ); 
+            (void) Trans( this, NULL, map, pset3, 1, pset4, 0, method, class ); 
 
 /* Get a pointer to the physical coordinate PointSet data array. */
             ptr4 = astGetPoints( pset4 );         
@@ -5844,6 +5871,8 @@ static int CvBrk( AstPlot *this, int ibrk, double *brk, double *vbrk,
 *        The number of breaks which occurred in the curve.
 
 *  Notes:
+*     -  Currently, this function may not be used to return information
+*     about curves drawn using astPolyCurve.
 *     -  All curves contain at least two breaks; one at the start and one 
 *     at the end. This is true even if the start and end of the curve are
 *     coincident. However, if the entire curve was outside the plotting area
@@ -6262,6 +6291,13 @@ f     the AST_DISTANCE function for the current Frame of the Plot).
 *     Mapping between physical and graphical coordinates are
 c     catered for, as is any clipping established using astClip.
 f     catered for, as is any clipping established using AST_CLIP.
+*
+c     If you need to draw many geodesic curves end-to-end, then the
+c     astPolyCurve function is equivalent to repeatedly using
+c     astCurve, but will usually be more efficient.
+f     If you need to draw many geodesic curves end-to-end, then the
+f     AST_POLYCURVE routine is equivalent to repeatedly calling
+f     AST_CURVE, but will usually be more efficient.
 
 *  Parameters:
 c     this
@@ -6419,8 +6455,9 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
    Frame). */
       Map3_ncoord = naxes;
 
-/* A pointer to the Plot, and Mapping. */
+/* A pointer to the Plot, the Curretn Frame, and and Mapping. */
       Map3_plot = this;
+      Map3_frame = astGetFrame( this, AST__CURRENT );
       Map3_map = astGetMapping( this, AST__BASE, AST__CURRENT );
 
 /* The physical coordinates at the start of the curve. */
@@ -6430,7 +6467,7 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
       Map3_end = finish;
 
 /* The scale factor to convert "dist" values into physical offset values. */
-      Map3_scale = astDistance( this, start, finish );
+      Map3_scale = astDistance( Map3_frame, start, finish );
 
 /* Convert the tolerance from relative to absolute graphics coordinates. */
       tol = astGetTol( this )*MAX( this->xhi - this->xlo, 
@@ -6497,7 +6534,8 @@ static void CurvePlot( AstPlot *this, const double *start, const double *finish,
          cdata->nbrk = Crv_nbrk;
       }
 
-/* Annul the Mapping. */
+/* Annul the Frame and Mapping. */
+      Map3_frame = astAnnul( Map3_frame );
       Map3_map = astAnnul( Map3_map );
 
 /* Re-establish the original graphical attributes. */
@@ -7537,7 +7575,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
          ptr2 = astGetPoints( pset2 );
 
 /* Transform them again this time with clipping. */
-         pset3 = Trans( this, mapping, pset1, 0, NULL, 0, method, class );
+         pset3 = Trans( this, NULL, mapping, pset1, 0, NULL, 0, method, class );
          ptr3 = astGetPoints( pset3 );
 
 /* Check the pointers can be used.*/
@@ -8376,7 +8414,7 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
 
 /* Transform the graphics coordinates to physical coordinates,
    normalising them into their normal ranges. */
-      (void) Trans( this, mapping, pset1a, 1, pset2a, 1, method, class );
+      (void) Trans( this, frame, mapping, pset1a, 1, pset2a, 1, method, class );
 
 /* Find the RMS step size along the axis. This is used to locate
    discontinuities along the edge.  Do three rejection iterations. */
@@ -8443,7 +8481,7 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
          }
 
 /* Transform the physical coordinates to graphics coordinates. */
-         (void) Trans( this, mapping, pset3, 0, pset4a, 0, method, class );
+         (void) Trans( this, NULL, mapping, pset3, 0, pset4a, 0, method, class );
 
 /* Check they can be used. */
          if( astOK ){
@@ -10275,6 +10313,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
 */
 
 /* Local Variables: */
+   AstFrame *frm;     /* Pointer to the Current Frame in the Plot */
    AstMapping *map;   /* Pointer to "graphics to physical" mapping */
    double **ptr1;     /* Pointer to physical axis value data */
    double **ptr2;     /* Pointer to graphics axis value data */
@@ -10303,6 +10342,9 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
    supplied Plot. */
    map = astGetMapping( this, AST__BASE, AST__CURRENT );
 
+/* Get a pointer to the Current Frame in the Plot. */
+   frm = astGetFrame( this, AST__CURRENT );
+
 /* Initialise the grid dimension. */
    *dim = 8;
 
@@ -10324,7 +10366,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
    and the other holding the corresponding physical coordinates. The grid
    covers the entire plotting area with the current grid dimension. A
    pointer to the physical axis values is returned. */
-      ptr2 = MakeGrid( this, map, *dim, this->xlo, this->xhi, this->ylo, 
+      ptr2 = MakeGrid( this, frm, map, *dim, this->xlo, this->xhi, this->ylo, 
                        this->yhi, 2, pset1, pset2, 1, method, class );
 
 /* Get a pointer to the graphics axis values. */
@@ -10363,8 +10405,6 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
       }
    }
 
-
-
 /* Store approximate fraction of the plotting area containing good
    physical cooridnates. */
    if( astOK ) {
@@ -10399,13 +10439,15 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
 
 /* Create the new grid covering the region containing good physical
    coordinates. */
-         (void) MakeGrid( this, map, *dim, xmin, xmax, ymin, ymax, 2,
+         (void) MakeGrid( this, frm, map, *dim, xmin, xmax, ymin, ymax, 2,
                           pset1, pset2, 1, method, class );
       }
    }
 
-/* Annul the Mapping from base to current Frame. */
+/* Annul the Mapping from base to current Frame, and the pointer to the
+   Current Frame. */
    map = astAnnul( map );
+   frm = astAnnul( frm );
 
 /* If an error has occurred, annul the two pointsets and indicate that
    there are no good points in the plotting area. */
@@ -10666,6 +10708,7 @@ f        The global status.
 */
 
 /* Local Variables: */
+   AstAxis *ax;            /* Pointer to an axis of the current Frame */
    AstPlot *this;          /* Plot with 2d current Frame */
    AstFrame *fr;           /* Pointer to the current Frame */
    CurveData **cdata;      /* Pointer to info. about breaks in curves */
@@ -10686,7 +10729,6 @@ f        The global status.
    int naxes;              /* No. of axes in the base or current Frame */
    int oldedge0;           /* Default value for Edge(1) */
    int oldedge1;           /* Default value for Edge(2) */
-   int skyframe;           /* Is current Frame a skyframe? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -10817,19 +10859,21 @@ f        The global status.
    }
 
 /* See if the Units string is to be inluded in the label. If no value has
-   been set for LabelUnits, assume not if the current frame in the Plot is a 
-   skyframe, and yes otherwise. */
+   been set for LabelUnits, assume no for any SkyAxis axes within the 
+   current frame of the Plot, and yes for other axes. */
    fr = astGetFrame( this, AST__CURRENT );
-   skyframe =  astIsASkyFrame( fr );
-   fr = astAnnul( fr );
 
    for( axis = 0; axis < 2; axis++ ) {
       if( astTestLabelUnits( this, axis ) ){
          dounits[ axis ] = astGetLabelUnits( this, axis );
       } else {
-         dounits[ axis ] =  skyframe ? 0 : 1 ;
+         ax = astGetAxis( fr, axis );
+         dounits[ axis ] =  astIsASkyAxis( ax ) ? 0 : 1 ;
+         ax = astAnnul( ax );
       }
    }
+
+   fr = astAnnul( fr );
 
 /* The rest is not done if no output is required. */
    if( ink ) {
@@ -11217,7 +11261,7 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim ){
 *
 *        BORDER_ID   - The boundary curve drawn by astBorder.
 *        GRIDLINE_ID - Curves drawn by astGridLine.
-*        CURVE_ID    - Curves drawn by astCurve.
+*        CURVE_ID    - Curves drawn by astCurve or astPolyCurve.
 *        NUMLABS_ID  - Numerical labels.
 *        TEXTLABS_ID - Textual axis labels (not the title).
 *        TITLE_ID    - The grid title.
@@ -12119,7 +12163,7 @@ static int GVec( AstPlot *this, AstMapping *mapping, double *phy,
       }
 
 /* Find the corresponding graphics coordinates. */
-      (void) Trans( this, mapping, *pset1, 0, *pset2, 0, method, class );
+      (void) Trans( this, NULL, mapping, *pset1, 0, *pset2, 0, method, class );
 
 /* Check the central position is OK. */
       *gx = ptr2[ 0 ][ 1 ];
@@ -12296,6 +12340,7 @@ static void InitVtab( AstPlotVtab *vtab ) {
    vtab->Clip = Clip; 
    vtab->GridLine = GridLine;
    vtab->Curve = Curve;
+   vtab->PolyCurve = PolyCurve;
    vtab->CvBrk = CvBrk;
    vtab->Grid = Grid; 
    vtab->ClearTol = ClearTol;
@@ -13233,10 +13278,11 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 
 }
 
-static double **MakeGrid( AstPlot *this, AstMapping *map, int dim, double xlo, 
-                          double xhi, double ylo, double yhi, int nphy,
-                          AstPointSet **pset1, AstPointSet **pset2, 
-                          int norm, const char *method, const char *class ){
+static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map, 
+                          int dim, double xlo, double xhi, double ylo, 
+                          double yhi, int nphy, AstPointSet **pset1, 
+                          AstPointSet **pset2, int norm, const char *method, 
+                          const char *class ){
 /*
 *  Name:
 *     MakeGrid
@@ -13250,10 +13296,11 @@ static double **MakeGrid( AstPlot *this, AstMapping *map, int dim, double xlo,
 
 *  Synopsis:
 *     #include "plot.h"
-*     double **MakeGrid( AstPlot *this, AstMapping *map, int dim, double xlo, 
-*                        double xhi, double ylo, double yhi, int nphy,
-*                        AstPointSet **pset1, AstPointSet **pset2, 
-*                        int norm, const char *method, const char *class )
+*     double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map, 
+*                        int dim, double xlo, double xhi, double ylo, 
+*                        double yhi, int nphy, AstPointSet **pset1, 
+*                        AstPointSet **pset2, int norm, const char *method, 
+*                        const char *class ){
 
 *  Class Membership:
 *     Plot member function.
@@ -13270,6 +13317,10 @@ static double **MakeGrid( AstPlot *this, AstMapping *map, int dim, double xlo,
 *  Parameters:
 *     this
 *        The Plot.
+*     frm
+*        A pointer to the Current Frame in the Plot. If this is supplied
+*        NULL, then a pointer is found within this function if required (i.e. 
+*        if "norm" is non-zero).
 *     map
 *        The Mapping from graphics to physical coordinates, extracted from
 *        the Plot.
@@ -13341,7 +13392,7 @@ static double **MakeGrid( AstPlot *this, AstMapping *map, int dim, double xlo,
    GraphGrid( dim, xlo, xhi, ylo, yhi, ptr1 );
 
 /* Transform these graphics positions to physical coordinates. */
-   Trans( this, map, *pset1, 1, *pset2, norm, method, class ); 
+   Trans( this, frm, map, *pset1, 1, *pset2, norm, method, class ); 
 
 /* If an error has occurred, annul the two pointsets. */
    if( !astOK ){
@@ -13423,6 +13474,8 @@ static void Map1( int n, double *dist, double *x, double *y,
 *     Map1_map = AstMapping * (Read)
 *        A pointer to the mapping from graphics cordinates to physical 
 *        coordinates extracted from the Plot.
+*     Map1_frame = AstFrame * (Read)
+*        A pointer to the Current Frame in the Plot.
 *     Map1_norm = int (Read)
 *        A flag indicating if physical coordinate values which are not in
 *        the normal ranges of the corresponding axes should be considered
@@ -13528,7 +13581,7 @@ static void Map1( int n, double *dist, double *x, double *y,
    normalised values are different, set the physical coordinates bad. */
          if( Map1_norm ){
             *wax = axval;
-            astNorm( Map1_plot, work );
+            astNorm( Map1_frame, work );
 
             if( !EQUAL( *wax, axval ) ) {
                axval = AST__BAD;
@@ -13547,7 +13600,7 @@ static void Map1( int n, double *dist, double *x, double *y,
       astSetPoints( pset2, ptr2 );
 
 /* Map all the positions into graphics coordinates. */
-      (void) Trans( Map1_plot, Map1_map, pset1, 0, pset2, 1, method, class );
+      (void) Trans( Map1_plot, NULL, Map1_map, pset1, 0, pset2, 1, method, class );
     }
    
 /* Return. */
@@ -13702,7 +13755,7 @@ static void Map2( int n, double *dist, double *x, double *y,
       }
 
 /* Map all the positions into physical coordinates. */
-      (void) Trans( Map2_plot, Map2_map, pset1, 1, pset2, 0, method, class );
+      (void) Trans( Map2_plot, NULL, Map2_map, pset1, 1, pset2, 0, method, class );
 
 /* Check the physical coordinates for bad values, setting the corresponding
    graphics coordinates bad. */
@@ -13795,6 +13848,8 @@ static void Map3( int n, double *dist, double *x, double *y,
 *     Map3_map = AstMapping * (Read)
 *        A pointer to the mapping from graphics cordinates to physical 
 *        coordinates extracted from the Plot.
+*     Map3_frame = AstFrame * (Read)
+*        A pointer to the Current Frame in the Plot.
 
 *  Notes:
 *     -  On the first call, this function allocates static resources which 
@@ -13866,7 +13921,7 @@ static void Map3( int n, double *dist, double *x, double *y,
    in the range [0,1] to a physical offset, and then into a physical
    position, and store in PointSet 1. */
       for( i = 0; i < n; i++){
-         astOffset( Map3_plot, Map3_origin, Map3_end, Map3_scale*dist[ i ],
+         astOffset( Map3_frame, Map3_origin, Map3_end, Map3_scale*dist[ i ],
                     pos );
 
          for( j = 0; j < Map3_ncoord; j++ ){
@@ -13881,7 +13936,7 @@ static void Map3( int n, double *dist, double *x, double *y,
       astSetPoints( pset2, ptr2 );
 
 /* Map all the positions into graphics coordinates. */
-      (void) Trans( Map3_plot, Map3_map, pset1, 0, pset2, 1, method, class );
+      (void) Trans( Map3_plot, NULL, Map3_map, pset1, 0, pset2, 1, method, class );
    }
    
 /* Return. */
@@ -14046,7 +14101,7 @@ f     - If any marker position is clipped (see AST_CLIP), then the
    coordinates) to the base frame (i.e. graphics coordinates) using 
    the inverse Mapping defined by the Plot. */
    mapping = astGetMapping( this, AST__BASE, AST__CURRENT );
-   pset2 = Trans( this, mapping, pset1, 0, NULL, 0, method, class );
+   pset2 = Trans( this, NULL, mapping, pset1, 0, NULL, 0, method, class );
    mapping = astAnnul( mapping );
 
 /* Get pointers to the graphics coordinates. */
@@ -14371,11 +14426,6 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 *     class 
 *        Pointer to a string holding the name of the supplied object class.
 *        This is only for use in constructing error messages.
-
-*  Notes:
-*     -  No curve is draw if any of the start or end positions are bad
-*     (i.e. equal to AST__BAD), or if a NULL pointer is supplied for "cdata". 
-*     No errors are reported in these cases.
 */
 
 /* Local Constants: */
@@ -14514,14 +14564,9 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
             text = ll->text;
 
 /* Select the comparison text to be used when abbreviating redundant
-   leading fields. If this label is next to the root label, always
-   compare it with the root label. */
-            if( i == root - 1 ) {
-               ctext = (ll + 1)->text;
-
-/* Otherwise compare it with which ever neighbour has the smaller
-   absolute value. */
-            } else if( fabs( ll->val ) < fabs( (ll + 1)->val ) ) {
+   leading fields. Compare the current field with which ever neighbour 
+   has the smaller absolute value. */
+            if( fabs( ll->val ) < fabs( (ll + 1)->val ) ) {
                if( i > 0 ) {
                   ctext = (ll - 1)->text;
                } else {
@@ -14571,14 +14616,9 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
             text = ll->text;
 
 /* Select the comparison text to be used when abbreviating redundant
-   leading fields. If this label is next to the root label, always
-   compare it with the root label. */
-            if( i == root + 1 ) {
-               ctext = (ll - 1)->text;
-
-/* Otherwise compare it with which ever neighbour has the smaller
-   absolute value. */
-            } else if( fabs( ll->val ) > fabs( (ll - 1)->val ) ) {
+   leading fields. Compare the current field with which ever neighbour 
+   has the smaller absolute value. */
+            if( fabs( ll->val ) > fabs( (ll - 1)->val ) ) {
                if( i > 0 ) {
                   ctext = (ll - 1)->text;
                } else {
@@ -14620,6 +14660,281 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 
 /* Undefine macros local to this function. */
 #undef MAXFLD
+
+}
+
+static void PolyCurve( AstPlot *this, int npoint, int ncoord, int indim, 
+                       const double (*in)[] ){
+/*
+*++
+*  Name:
+c     astPolyCurve
+f     AST_POLYCURVE
+
+*  Purpose:
+*     Draw a series of connected geodesic curves.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "plot.h"
+c     void astPolyCurve( AstPlot *this, int npoint, int ncoord, int indim, 
+c                        const double (*in)[] )
+f     CALL AST_POLYCURVE( THIS, NPOINT, NCOORD, INDIM, IN, STATUS )
+
+*  Class Membership:
+*     Plot method.
+
+*  Description:
+c     This function joins a series of points specified in the physical
+c     coordinate system of a Plot by drawing a sequence of geodesic
+c     curves.  It is equivalent to making repeated use of the astCurve
+c     function (q.v.), except that astPolyCurve will generally be more
+c     efficient when drawing many geodesic curves end-to-end. A
+c     typical application of this might be in drawing contour lines.
+f     This routine joins a series of points specified in the physical
+f     coordinate system of a Plot by drawing a sequence of geodesic
+f     curves.  It is equivalent to making repeated calls to the
+f     AST_CURVE routine (q.v.), except that AST_POLYCURVE will
+f     generally be more efficient when drawing many geodesic curves
+f     end-to-end. A typical application of this might be in drawing
+f     contour lines.
+*
+c     As with astCurve, full account is taken of the Mapping between
+c     physical and graphical coordinate systems. This includes any
+c     discontinuities and clipping established using astClip.
+f     As with AST_CURVE, full account is taken of the Mapping between
+f     physical and graphical coordinate systems. This includes any
+f     discontinuities and clipping established using AST_CLIP.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Plot.
+c     npoint
+f     NPOINT = INTEGER (Given)
+*        The number of points between which geodesic curves are to be drawn.
+c     ncoord
+f     NCOORD = INTEGER (Given)
+*        The number of coordinates being supplied for each point (i.e.
+*        the number of axes in the current Frame of the Plot, as given
+*        by its Naxes attribute).
+c     indim
+f     INDIM = INTEGER (Given)
+c        The number of elements along the second dimension of the "in"
+f        The number of elements along the first dimension of the IN
+*        array (which contains the input coordinates). This value is
+*        required so that the coordinate values can be correctly
+*        located if they do not entirely fill this array. The value
+c        given should not be less than "npoint".
+f        given should not be less than NPOINT.
+c     in
+f     IN( INDIM, NCOORD ) = DOUBLE PRECISION (Given)
+c        A 2-dimensional array, of shape "[ncoord][indim]" giving the
+c        physical coordinates of the points which are to be joined in
+c        sequence by geodesic curves. These should be stored such that
+c        the value of coordinate number "coord" for point number
+c        "point" is found in element "in[coord][point]".
+f        A 2-dimensional array giving the physical coordinates of the
+f        points which are to be joined in sequence by geodesic
+f        curves. These should be stored such that the value of
+f        coordinate number COORD for input point number POINT is found
+f        in element IN(POINT,COORD).
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - No curve is drawn on either side of any point which has any
+*     coordinate equal to the value AST__BAD.
+*     - An error results if the base Frame of the Plot is not
+*     2-dimensional.
+*     - An error also results if the transformation between the
+*     current and base Frames of the Plot is not defined (i.e. the
+*     Plot's TranInverse attribute is zero).
+*--
+*/
+/* Local Variables: */
+   const char *class;      /* Object class */
+   const char *method;     /* Current method */
+   const double **in_ptr;  /* Pointer to array of data pointers */
+   double *finish;         /* Pointer to array holding segment end position */
+   double *start;          /* Pointer to array holding segment start position */
+   double d[ CRV_NPNT ];   /* Offsets to evenly spaced points along curve */
+   double tol;             /* Absolute tolerance value */
+   double x[ CRV_NPNT ];   /* X coords at evenly spaced points along curve */
+   double y[ CRV_NPNT ];   /* Y coords at evenly spaced points along curve */
+   int coord;              /* Loop counter for coordinates */
+   int i;                  /* Loop count */
+   int naxes;              /* No. of Frame axes */
+   int ok;                 /* Are all start and end coords good? */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Store the current method, and the class of the supplied object for use 
+   in error messages.*/
+   method = "astPolyCurve";
+   class = astGetClass( this );
+
+/* Check the base Frame of the Plot is 2-D. */
+   naxes = astGetNin( this );
+   if( naxes != 2 && astOK ){
+      astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the base "
+                "Frame of the supplied %s is invalid - this number should "
+                "be 2.", method, class, naxes, class );
+   } 
+
+/* Check the current Frame of the Plot has ncoord axes. */
+   naxes = astGetNout( this );
+   if( naxes != ncoord && astOK ){
+      astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the current "
+                "Frame of the supplied %s is invalid - this number should "
+                "be %d (possible programming error).", method, class, naxes,
+                class, ncoord );
+   } 
+
+/* Check the array dimension argument. */
+   if ( astOK && ( indim < npoint ) ) {
+      astError( AST__DIMIN, "%s(%s): The array dimension value "
+                "(%d) is invalid.", method, class, indim );
+      astError( AST__DIMIN, "This should not be less than the number of "
+                "points being drawn (%d).", npoint );
+   }
+
+/* Allocate memory to hold the array of data pointers, the start position,
+   and the end position. */
+   if ( astOK ) {
+      in_ptr = (const double **) astMalloc( sizeof( const double * ) *
+                                            (size_t) ncoord );
+      start = (double *) astMalloc( sizeof( double ) * (size_t) ncoord );
+      finish = (double *) astMalloc( sizeof( double ) * (size_t) ncoord );
+      
+/* Set up externals used to communicate with the Map3 function...
+   The number of axes in the physical coordinate system (i.e. the current
+   Frame). */
+      Map3_ncoord = ncoord;
+
+/* A pointer to the Plot, the Current Frame, and and Mapping. */
+      Map3_plot = this;
+      Map3_frame = astGetFrame( this, AST__CURRENT );
+      Map3_map = astGetMapping( this, AST__BASE, AST__CURRENT );
+
+/* Convert the tolerance from relative to absolute graphics coordinates. */
+      tol = astGetTol( this )*MAX( this->xhi - this->xlo, 
+                                   this->yhi - this->ylo );
+
+/* Now set up the external variables used by the Crv and CrvLine function. */
+      Crv_tol = tol;
+      Crv_limit = 0.5*tol*tol;
+      Crv_map = Map3;
+      Crv_ink = 1;
+      Crv_xlo = this->xlo;
+      Crv_xhi = this->xhi;
+      Crv_ylo = this->ylo;
+      Crv_yhi = this->yhi;
+
+/* Set up a list of points spread evenly over each curve segment. */
+      for( i = 0; i < CRV_NPNT; i++ ){
+        d[ i ] = ( (double) i)/( (double) CRV_NSEG );
+      }
+
+/* Initialise the data pointers to locate the coordinate data in
+   the "in" array. */
+      if ( astOK ) {
+         for ( coord = 0; coord < ncoord; coord++ ) {
+            in_ptr[ coord ] = *in + coord * indim;
+         }
+
+/* Establish the correct graphical attributes as defined by attributes
+   with the supplied Plot. */
+         GrfAttrs( this, CURVE_ID, 1, GRF__LINE );
+
+/* Loop round each curve segment. */
+         for( i = 1 ; i < npoint; i++ ) {
+
+/* Store the start position and check it for bad values. Increment the
+   pointers to the next position on each axis, so that they refer to the
+   finish point of the current curve segment. */
+            ok = 1;
+            for( coord = 0; coord < ncoord; coord++ ) {
+               if( *( in_ptr[coord] ) == AST__BAD ){
+                  ok = 0;
+               } else {
+                  start[ coord ] = *( in_ptr[coord] );
+               }
+               ( in_ptr[coord] )++;
+            }
+
+/* Store the end position and check it for bad values. Do not increment
+   the axis pointers. This means that they will refer to the start position
+   of the next curve segment on the next pass through this loop. */
+            for( coord = 0; coord < ncoord; coord++ ) {
+               if( *( in_ptr[coord] ) == AST__BAD ){
+                  ok = 0;
+               } else {
+                  finish[ coord ] = *( in_ptr[coord] );
+               }
+            }
+
+/* Pass on to the next curve segment if either the start or finish position
+   was bad. */
+            if( ok ) {
+
+/* Set up the remaining externals used to communicate with the Map3
+   function... */
+
+/* The physical coordinates at the start of the curve. */
+               Map3_origin = start;
+
+/* The physical coordinates at the end of the curve. */
+               Map3_end = finish;
+
+/* The scale factor to convert "dist" values into physical offset values. */
+               Map3_scale = astDistance( Map3_frame, start, finish );
+
+/* Now set up the remaining external variables used by the Crv and CrvLine 
+   function. */
+               Crv_ux0 = AST__BAD;    
+               Crv_out = 1;
+               Crv_xbrk = Curve_data.xbrk;
+               Crv_ybrk = Curve_data.ybrk;
+               Crv_vxbrk = Curve_data.vxbrk;
+               Crv_vybrk = Curve_data.vybrk;
+
+/* Map the evenly spread distances between "start" and "finish" into graphics 
+   coordinates. */
+               Map3( CRV_NPNT, d, x, y, method, class );
+
+/* Use Crv and Map3 to draw the curve segment. */
+               Crv( d, x, y, method, class );
+
+            }
+         }
+
+/* End the last poly line. */
+         Opoly( method, class );
+
+/* Tidy up the static data used by Map3. */
+         Map3( 0, NULL, NULL, NULL, method, class );
+
+/* Re-establish the original graphical attributes. */
+         GrfAttrs( this, CURVE_ID, 0, GRF__LINE );
+
+      }
+
+/* Annul the Frame and Mapping. */
+      Map3_frame = astAnnul( Map3_frame );
+      Map3_map = astAnnul( Map3_map );
+
+/* Free the memory used for the data pointers, and start and end positions. */
+      in_ptr = (const double **) astFree( (void *) in_ptr );
+      start = (double *) astFree( (void *) start );
+      finish = (double *) astFree( (void *) finish ); 
+   }
+
+/* Return. */
+   return;
 
 }
 
@@ -15558,7 +15873,7 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
    coordinates) to the base frame (i.e. graphics coordinates) using 
    the inverse Mapping defined by the Plot. */
    mapping = astGetMapping( this, AST__BASE, AST__CURRENT );
-   pset2 = Trans( this, mapping, pset1, 0, NULL, 0, method, class );
+   pset2 = Trans( this, NULL, mapping, pset1, 0, NULL, 0, method, class );
    mapping = astAnnul( mapping );
 
 /* Get pointers to the graphics coordinates. */
@@ -16458,7 +16773,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
             labels[ i ] = (char *) astFree( (void *) labels[ i ] );
          }
          labels = (char **) astFree( (void *) labels );
-         (void ) astFree( (void *) ret->fmt );
+         if( ret ) (void ) astFree( (void *) ret->fmt );
       }
       ret = (TickInfo *) astFree( (void *) ret );
    }
@@ -16898,9 +17213,9 @@ static void TraceBorder( double **ptr1, double **ptr2, int dim, int *edge,
 
 }
 
-static AstPointSet *Trans( AstPlot *this, AstMapping *mapping, AstPointSet *in,
-                           int forward, AstPointSet *out, int norm, 
-                           const char *method, const char *class ) {
+static AstPointSet *Trans( AstPlot *this, AstFrame *frm, AstMapping *mapping, 
+                           AstPointSet *in, int forward, AstPointSet *out, 
+                           int norm, const char *method, const char *class ) {
 /*
 *  Name:
 *     Trans
@@ -16913,7 +17228,7 @@ static AstPointSet *Trans( AstPlot *this, AstMapping *mapping, AstPointSet *in,
 
 *  Synopsis:
 *     #include "plot.h"
-*     AstPointSet *Trans( AstPlot *this, AstMapping *mapping, 
+*     AstPointSet *Trans( AstPlot *this, AstFrame *frm, AstMapping *mapping, 
 *                         AstPointSet *in, int forward, AstPointSet *out,
 *                         int norm, const char *method, const char *class )
 
@@ -16931,6 +17246,10 @@ static AstPointSet *Trans( AstPlot *this, AstMapping *mapping, AstPointSet *in,
 *     this
 *        Pointer to the Plot (only used to access clipping attributes and
 *        other methods).
+*     frm
+*        Pointer to the Current Frame in the Plot. If this is NULL, then
+*        a pointer for the Current Frame is found within this function if
+*        required (i.e. if "forward" and "norm" are both non-zero).
 *     mapping
 *        Pointer to the Mapping extracted from the Plot.
 *     in
@@ -16972,6 +17291,7 @@ static AstPointSet *Trans( AstPlot *this, AstMapping *mapping, AstPointSet *in,
 */
 
 /* Local Variables: */
+   AstFrame *cfr;                /* Pointer to the Current Frame */
    AstFrame *fr;                 /* Pointer to the clipping Frame */
    AstMapping *map;              /* Pointer to output->clip mapping */
    AstPointSet *clip;            /* Positions in clipping Frame */
@@ -17010,6 +17330,14 @@ static AstPointSet *Trans( AstPlot *this, AstMapping *mapping, AstPointSet *in,
    positions if required using the astNorm method for the supplied object. */
    if( forward && norm ){
 
+/* If no Frame was supplied, get a pointer to the Current Frame. Otherwise,
+   use the supplied pointer. */
+      if( !frm ) {
+         cfr = astGetFrame( this, AST__CURRENT );
+      } else {
+         cfr = frm;
+      }      
+
 /* Get work space to hold a single positions. */
       work = (double *) astMalloc( sizeof(double)*(size_t)ncoord_out );
 
@@ -17021,13 +17349,18 @@ static AstPointSet *Trans( AstPlot *this, AstMapping *mapping, AstPointSet *in,
    PointSet. */
          for( i = 0; i < npoint; i++ ){
             for( j = 0; j < ncoord_out; j++ ) work[ j ] = ptr_out[ j ][ i ];
-            astNorm( this, work );
+            astNorm( cfr, work );
             for( j = 0; j < ncoord_out; j++ ) ptr_out[ j ][ i ] = work[ j ];
          }
       }
       
 /* Free the work space. */
       work = (double *) astFree( (void *) work );
+
+/* Annul the pointer to the Current Frame if it was obtained in this
+   function. */
+      if( !frm ) cfr = astAnnul( cfr );
+
    }
 
 /* Clipping is only performed if the bounds of a clipping region are
@@ -17284,7 +17617,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    map = astGetMapping( plot, AST__BASE, AST__CURRENT );
 
 /* Do the transformation. */
-   result = Trans( plot, map, in, forward, out, 1, "astTransform",
+   result = Trans( plot, NULL, map, in, forward, out, 1, "astTransform",
                    astGetClass( this ) );
 
 /* Annul the mapping. */
@@ -18973,7 +19306,14 @@ void astCurve_( AstPlot *this, const double start[], const double finish[] ){
    if( !astOK ) return;
    (**astMEMBER(this,Plot,Curve))(this,start,finish);
 }
-  /* Special public interface functions. */
+
+void astPolyCurve_( AstPlot *this, int npoint, int ncoord, int dim, 
+                    const double (*in)[] ){
+   if( !astOK ) return;
+   (**astMEMBER(this,Plot,PolyCurve))(this,npoint,ncoord,dim,in);
+}
+
+/* Special public interface functions. */
 /* =================================== */
 /* These provide the public interface to certain special functions
    whose public interface cannot be handled using macros (such as
