@@ -372,26 +372,35 @@
 *  Delete the group.
       IF( IGRP1 .NE. GRP__NOID ) CALL GRP_DELET( IGRP1, STATUS )
 
-*  Set some message tokens for use in the following error messages.
-      CALL MSG_SETC( 'PARAM', PARAM )
-      CALL MSG_SETC( 'CLASS', CLASS )
-      IF( INDEX( 'AEIOUaeiou', CLASS( 1 : 1 ) ) .GT. 0 ) THEN
-         CALL MSG_SETC( 'ART', 'an' )
-      ELSE
-         CALL MSG_SETC( 'ART', 'a' )
-      END IF         
-
 *  If a parameter abort value was supplied, re-report the error with
 *  a more appropriate message.
       IF( STATUS .EQ. PAR__ABORT ) THEN
          CALL ERR_ANNUL( STATUS )
          STATUS = PAR__ABORT
+
+         CALL MSG_SETC( 'PARAM', PARAM )
+         CALL MSG_SETC( 'CLASS', CLASS )
+         IF( INDEX( 'AEIOUaeiou', CLASS( 1 : 1 ) ) .GT. 0 ) THEN
+            CALL MSG_SETC( 'ART', 'an' )
+         ELSE
+            CALL MSG_SETC( 'ART', 'a' )
+         END IF         
+
          CALL ERR_REP( 'KPG1_ASSET_3', 'Aborted attempt to set the '//
      :                 'attributes of ^ART ^CLASS using parameter '//
      :                 '%^PARAM.', STATUS )
 
 *  Add a context message to any other error.
       ELSE IF( STATUS .NE. SAI__OK ) THEN
+
+         CALL MSG_SETC( 'PARAM', PARAM )
+         CALL MSG_SETC( 'CLASS', CLASS )
+         IF( INDEX( 'AEIOUaeiou', CLASS( 1 : 1 ) ) .GT. 0 ) THEN
+            CALL MSG_SETC( 'ART', 'an' )
+         ELSE
+            CALL MSG_SETC( 'ART', 'a' )
+         END IF         
+
          CALL ERR_REP( 'KPG1_ASSET_3', 'Failed to set the '//
      :                 'attributes of ^ART ^CLASS using parameter '//
      :                 '%^PARAM.', STATUS )
