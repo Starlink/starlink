@@ -107,7 +107,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get locator and use HDS version
-      CALL ADI_CGET0C( IFID, 'LOCATOR', ILOC, STATUS )
+      CALL ADI_CGET0C( IFID, '.LOCATOR', ILOC, STATUS )
       CALL HIST_ADD( ILOC, NAME, STATUS )
 
 *  Report any errors

@@ -12,6 +12,7 @@
 *      16 Sep 94: V1.7-3 data min/max updated (RJV)
 *      30 Sep 94: V1.7-4 slight rationalisation (RJV)
 *       5 Jan 95: V1.8-0 new ARD (RJV)
+*      12 Jan 95: V1.8-1 option to use current region (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -28,7 +29,7 @@
       CHARACTER*10 MODE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IEXCLUDE Version 1.8-0')
+      PARAMETER (VERSION = 'IEXCLUDE Version 1.8-1')
 *-
       CALL USI_INIT()
 
@@ -1016,8 +1017,11 @@
       INTEGER DIMS(2)
       INTEGER IPTR
       LOGICAL DAT
+      LOGICAL CURR
 *-
       IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL USI_GET0L('CURR',CURR,STATUS)
 
 *  are data to be altered
         CALL USI_GET0R('DVAL',DVAL,STATUS)
@@ -1028,9 +1032,14 @@
           DAT=.TRUE.
         ENDIF
 
+*  use current region
+        IF (CURR) THEN
+          GRPID=I_ARD_ID
+        ELSE
+*  or get spatial description (ARD) file
+          CALL ARX_OPEN('READ',GRPID,STATUS)
+        ENDIF
 
-*  get spatial description (ARD) file
-        CALL ARX_OPEN('READ',GRPID,STATUS)
         CALL ARX_READ('FILE',GRPID,STATUS)
 
         DIMS(1)=I_NX
@@ -1051,7 +1060,9 @@
 
         CALL DYN_UNMAP(IPTR,STATUS)
 
-        CALL ARX_CLOSE(GRPID,STATUS)
+        IF (.NOT.CURR) THEN
+          CALL ARX_CLOSE(GRPID,STATUS)
+        ENDIF
 
       ENDIF
 

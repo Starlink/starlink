@@ -109,8 +109,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Simply extract locators and invoke HDS version for the momemnt
-      CALL ADI_CGET0C( IFID, 'LOCATOR', ILOC, STATUS )
-      CALL ADI_CGET0C( OFID, 'LOCATOR', OLOC, STATUS )
+      CALL ADI_CGET0C( IFID, '.LOCATOR', ILOC, STATUS )
+      CALL ADI_CGET0C( OFID, '.LOCATOR', OLOC, STATUS )
       CALL HIST_COPY( ILOC, OLOC, STATUS )
 
 *  Report any errors

@@ -104,7 +104,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Extract locator and call HDS routine
-      CALL ADI_CGET0C( FID, 'LOCATOR', LOC, STATUS )
+      CALL ADI_CGET0C( FID, '.LOCATOR', LOC, STATUS )
       CALL GCB_SAVE( LOC, STATUS )
 
 *  Report any errors

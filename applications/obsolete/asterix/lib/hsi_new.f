@@ -103,7 +103,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      CALL ADI_CGET0C( IFID, 'LOCATOR', ILOC, STATUS )
+      CALL ADI_CGET0C( IFID, '.LOCATOR', ILOC, STATUS )
       CALL HIST_NEW( ILOC, STATUS )
 
 *  Report any errors
