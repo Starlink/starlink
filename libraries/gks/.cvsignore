@@ -1,3 +1,6 @@
+.deps
+.libs
+*.la
 Makefile
 Makefile.in
 acinclude.m4
@@ -14,6 +17,7 @@ starconf.m4
 starconf.status
 starconf.status.local
 sun83.aux
+sun83.dvi
 sun83.htx
 sun83.htx_tar
 sun83.log
