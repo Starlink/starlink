@@ -254,6 +254,18 @@ interface SECTOR
     helpkey '*'
   endparameter
  
+  # The origin point from which the sector extends, in pixel units.
+  # This parameter is present to aid the interface with the GAIA system.
+  # It should be regarded as an `internal' parameter, and may disappear
+  # or change without notice.
+  parameter PORIGIN
+    type '_REAL'
+    access 'read'
+    prompt 'Co-ordinates of the origin (pixel coordinates)'
+    vpath 'noprompt'
+    helpkey '*'
+  endparameter
+ 
  parameter OUT       # The name of the text file to contain the profile.
     type '_CHAR'
     access 'read'

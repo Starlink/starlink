@@ -1349,27 +1349,18 @@ Description:
    the user.
 
    The user may also supply some indication of the number of pixels
-   that must be used to create the pixel value histogram. This
-   value may be supplied as the width of the square area around the
-   co-ordinates that will be used, or alternatively the number of
-   contiguous data points believed to be present in the object at
-   the image location specified.
+   that must be used to create the pixel value histogram.  This value
+   may be supplied as a number pixels around the given co-ordinates
+   (ie, an area), or alternatively the number of contiguous data
+   points believed to be present in the object at the image location
+   specified.  The latter method is intended specifically for use
+   with RGASP's IMAGES or IRAF's FOCAS output files.
 
-   The latter method is intended specifically for use with RGASP's
-   IMAGES or IRAF's FOCAS output files.
-
-   All co-ordinates are read from a two or three columns
-   ASCII text file. If two columns are present then these are
-   taken as representing the image co-ordinates required for the
-   regions of the image to be considered.  Co-ordinates are in
-   the Current coordinate system of the NDF. If three columns are
-   present the third column respresents the width of the area
-   to be sampled or the number of contiguous pixels detected there
-   by FOCAS or IMAGES.
-
-   The selection of the number of pixels to used in the histogram is
-   defined by the user subject to a lower limit of 1024 pixels
-   (32x32).
+   All co-ordinates are read from the
+   ASCII text file given in the parameter INFILE.
+   The selection of the number of pixels to be used in constructing
+   the histogram is defined by the user, subject to a lower limit of
+   1024 pixels (32x32).
 2 Parameters
 For information on individual parameters, select from the list below:
 3 IN
@@ -1383,6 +1374,14 @@ INFILE = _CHAR (Read)
    or the number of contiguous pixels found there by FOCAS or
    IMAGES.  Co-ordinates are in the Current co-ordinate system
    of IN.
+
+   If two columns are present then these are
+   taken as representing the image co-ordinates required for the
+   regions of the image to be considered.  Co-ordinates are in
+   the Current coordinate system of the NDF.  If there is a third
+   column, it represents the area, in pixels, of a square
+   centred on the co-ordinates (but see the documentation for the
+   parameters THIRD and WIDTH below).
 3 OUT
 OUT = _CHAR (Read)
    The file name in which the results are stored in text form.
@@ -1401,32 +1400,24 @@ SFACT = _INTEGER (Read)
    The value returned is that employed. Units counts.
 3 THIRD
 THIRD = _LOGICAL (Read)
-   Determines whether or not the third column found in
-   the text file specified using INFILE, contains the number
-   of contiguous image pixels believed to be at that image
-   location, (THIRD = TRUE), or the number of screen pixels to be
-   taken from the image around the required location
-   (THIRD=FALSE).
-
-    The value supplied via the third text column is used to
-    determine how big an area of image must be used when
-    calculating the background. This is done by assuming
-    that all the pixels in the object are in a square
-    area and then determining the width of that area.
-    The width used in the end is 3 times that of the
-    object.
-
-   However, the WIDTH parameter
-   overrides this if less than 32x32 pixels (as defined by the
-   WIDTH parameter limits in the LOBACK.IFL file) are to be used.
-   This ensures that the histogram employed is reasonably well
-   filled under most circumstances.
+   Determines whether or not the third column found in the INFILE
+   contains the number of contiguous image pixels believed to be
+   at that image location (THIRD=TRUE), or the number of screen
+   pixels to be taken from the image around the required location
+   (THIRD=FALSE).  Specifically, if THIRD=TRUE then the width
+   obtained from the pixel-area in the file is multiplied by three.
 3 WIDTH
 WIDTH = _INTEGER (Read)
-   The width of the square area of the image from which pixel
-   values will be taken to construct the histogram. The minimum
-   permitted value is 32 (as defined in the LOBACK.IFL file).
-   Units pixels.
+   This parameter constrains any area obtained from the third
+   column of the input file, and acts as a default if no such
+   value exists.  If the width implied by that column value (that
+   is, its square-root, with any adjustment implied by the value
+   of the parameter THIRD) is less than WIDTH, then that
+   width is replaced by WIDTH.  The default value for this
+   parameter, and its minimum permitted value, is 32, giving a
+   minimum pixel count of 1024 (32x32).  This ensures that the
+   histogram employed is reasonably well filled under most
+   circumstances.  Units pixels.
 2 Examples
 loback in=p2 infile=coords.dat sfact=0 third=true
        out=backs.dat width=64
@@ -1461,18 +1452,21 @@ images.
 GJP: Grant Privett (STARLINK)
 
 MBT: Mark Taylor (STARLINK)
+
+NG:  Norman Gray (Starlink, Glasgow)
 2 History
  14-Jun-1993 (GJP)
-
- (Original version)
+    (Original version)
 
  26-OCT-1999 (MBT):
-
- Modified to cope with COSYS=C.
+    Modified to cope with COSYS=C.
 
  8-NOV-1999 (MBT):
+    Removed COSYS altogether.
 
- Removed COSYS altogether.
+ 28-Nov-1999 (NG):
+    Severe edit of documentation for third input column (which
+    involves also parameters `third' and `width'), to match code.
 1 MASK
 Uses an ARD file to set some pixels of a given image to bad.
 
@@ -1652,9 +1646,16 @@ MIRROR = _LOGICAL (Read)
    sectors/wedges/slices of the same size, but on
    diametrically opposite sides of the galaxy origin.
 3 ORIGIN
-ORIGIN = _REAL (Read)
+ORIGIN = _CHAR (Read)
    Image indices for the origin point to be used. Given in the
    Current coordinate system of the WCS component of IN.
+3 PORIGIN
+PORIGIN = _CHAR (Read)
+   Image indices for the origin point to be used, in pixel units.
+   This parameter is present to aid the interface with the GAIA system.
+   It should be regarded as an `internal' parameter, and may disappear
+   or change without notice.  If present, the value of this parameter
+   overrides any value specified by the ORIGIN parameter.
 3 OUT
 OUT = _CHAR (Read)
    File name for the output text file containing the

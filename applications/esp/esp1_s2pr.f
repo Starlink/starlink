@@ -104,6 +104,7 @@
       XMAX=DBLE(DIM(1))
       YMAX=DBLE(DIM(2))
 
+
 *   Get the World Coordinate System component of the NDF.
       CALL NDF_GTWCS(INDF,IWCS,STATUS)
 
@@ -138,31 +139,37 @@
 
 *   Transform from Current frame to Base frame coordinates.
       CALL AST_TRAN2(CMAP,1,X1,Y1,.TRUE.,X2,Y2,STATUS)
+      
 
-*   Check that the coordinates given fall within the bounds of the NDF.
-*   Note this check restricts the coordinates to be between the centre
-*   of the lowest pixel and the centre of the highest pixel in each 
-*   dimension, i.e. not within half a pixel of the edge of the array.
-*   It's not clear to me (MBT) that this is correct, but I'm
-*   re-implementing the constraints in the same way that they have been 
-*   previously operating within ESP.
-      IF (X2.LT.XMIN.OR.X2.GT.XMAX.OR.Y2.LT.YMIN.OR.Y2.GT.YMAX) THEN
-         STATUS=SAI__ERROR
-         CALL MSG_SETR ('X', X2)
-         CALL MSG_SETR ('Y', Y2)
-         CALL MSG_SETR ('XMIN', XMIN)
-         CALL MSG_SETR ('XMAX', XMAX)
-         CALL MSG_SETR ('YMIN', YMIN)
-         CALL MSG_SETR ('YMAX', YMAX)
-         CALL ERR_REP(' ','s2pr: coords (^X,^Y)'//
-     :        ' outside NDF (^XMIN,^YMIN)..(^XMAX,^YMAX).',
-     :        STATUS)
-         GO TO 99
-      END IF
+      IF (STATUS.EQ.SAI__OK) THEN
+*      If something went wrong with the conversion, then
+*      skip the check below, since it may just (further) confuse things.
 
-*   Do type conversions.
-      XB=REAL(X2)
-      YB=REAL(Y2)
+*      Check that the coordinates given fall within the bounds of the NDF.
+*      Note this check restricts the coordinates to be between the centre
+*      of the lowest pixel and the centre of the highest pixel in each 
+*      dimension, i.e. not within half a pixel of the edge of the array.
+*      It's not clear to me (MBT) that this is correct, but I'm
+*      re-implementing the constraints in the same way that they have been 
+*      previously operating within ESP.
+         IF (X2.LT.XMIN.OR.X2.GT.XMAX.OR.Y2.LT.YMIN.OR.Y2.GT.YMAX) THEN
+            STATUS=SAI__ERROR
+            CALL MSG_SETD ('X', X2)
+            CALL MSG_SETD ('Y', Y2)
+            CALL MSG_SETD ('XMIN', XMIN)
+            CALL MSG_SETD ('XMAX', XMAX)
+            CALL MSG_SETD ('YMIN', YMIN)
+            CALL MSG_SETD ('YMAX', YMAX)
+            CALL ERR_REP(' ','converted coords (^X,^Y)'//
+     :           ' outside NDF (^XMIN,^YMIN)..(^XMAX,^YMAX).',
+     :           STATUS)
+            GO TO 99
+         END IF
+
+*      Do type conversions.
+         XB=REAL(X2)
+         YB=REAL(Y2)
+      ENDIF
  
 *   Error exit label.
  99   CONTINUE

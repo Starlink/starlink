@@ -84,9 +84,15 @@
 *        Whether the summation is to be taken from two 
 *        sectors/wedges/slices of the same size, but on 
 *        diametrically opposite sides of the galaxy origin.
-*     ORIGIN = _REAL (Read)
+*     ORIGIN = _CHAR (Read)
 *        Image indices for the origin point to be used. Given in the
 *        Current coordinate system of the WCS component of IN.
+*     PORIGIN = _CHAR (Read)
+*        Image indices for the origin point to be used, in pixel units.
+*        This parameter is present to aid the interface with the GAIA system.
+*        It should be regarded as an `internal' parameter, and may disappear
+*        or change without notice.  If present, the value of this parameter
+*        overrides any value specified by the ORIGIN parameter.
 *     OUT = _CHAR (Read)
 *        File name for the output text file containing the 
 *        profile data.
@@ -931,7 +937,7 @@
 *+
 *  Name:
 *     SEC1_KMODE
-
+*
 *  Purpose:
 *     May be used to display the average pixel values within a wedge shaped 
 *     sector of the image. The sector is in the form of a wedge (of user 
@@ -947,17 +953,17 @@
 *     origin if required, automatic selection of the maximum radius out 
 *     from the origin to be considered and the use of a graphics cursor 
 *     to select the image object to be examined.
-
+*
 *  Language:
 *     Starlink Fortran 77
-
+*
 *  Invocation:
 *     CALL SEC1_KMODE(STATUS)
-
+*
 *  Arguments:   
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-
+*
 *  Description: 
 *     Allows the pixels count values within a wedge/sector drawn from a
 *     user specified point(s) to be plotted as a function of distance
@@ -982,21 +988,21 @@
 *     accuracy) estimate of the location of the weighted intensity maximum. 
 *
 *     This routine operates by keyboard inputs exclusively.
-
+*
 *  Implementation Status:
 *     Under development
-
+*
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     {enter_new_authors_here}
-
+*
 *  History:
 *     16-Nov-1992 (GJP)
-*     (Original version)
-
+*       (Original version)
+*
 *  Bugs:
 *     None known.
-
+*
 *-
 
 *  Type Definitions:                  ! No implicit typing
@@ -1015,7 +1021,7 @@
 *  Local Variables:      
       CHARACTER *(256) RADISP         ! Option choice defining how the
                                       ! radius data is to be displayed
-      CHARACTER *(256) STRINP(2)      ! String array for character input
+*      CHARACTER *(256) STRINP         ! String array for character input
       LOGICAL AGAIN                   ! Look at another part of the image?
       LOGICAL AUTOL                   ! Is an estimate of the galaxy centre
                                       ! position to be made?
@@ -1032,7 +1038,7 @@
       INTEGER ELEMS                   ! Total number of pixels in the NDF
       INTEGER FIOD2                   ! Output file identifier
       INTEGER FLAG                    ! Can the central pixel value be found?
-      INTEGER IND                     ! The number of origin indices to
+*      INTEGER IND                     ! The number of origin indices to
                                       ! be input at one go i.e. 2
       INTEGER IND2                    ! Number of indices returned
       INTEGER LBND(NDF__MXDIM)        ! Lower limit for image index
@@ -1097,8 +1103,16 @@
       AGAIN=.TRUE.
       DO WHILE (AGAIN.AND.(STATUS.EQ.SAI__OK))
 
-*      Get the pixel to be used as the galaxy centre.
-         CALL ESP1_INPOS(NDF1,'ORIGIN',XCO,YCO,STATUS)
+*      Get the pixel to be used as the galaxy centre.  Try the PORIGIN
+*      parameter first.
+         CALL PAR_GET1R('PORIGIN',2,INP,IND2,STATUS)
+         IF (STATUS .EQ. SAI__OK) THEN
+            XCO=INP(1)
+            YCO=INP(2)
+         ELSE
+*         Parameter wasn't present -- use ORIGIN instead
+            CALL ESP1_INPOS(NDF1,'ORIGIN',XCO,YCO,STATUS)
+         ENDIF
 
 *      Get the position angle for the sector.
          CALL PAR_GET0R('POSANG',POSANG,STATUS)
@@ -1258,7 +1272,8 @@
                DO WHILE ((.NOT.INOKAY).AND.(STATUS.EQ.SAI__OK))
 
 *               Get the two values from the keyboard
-                  CALL PAR_GET1R('FITLIM',IND,INP,IND2,STATUS)
+*                  CALL PAR_GET1R('FITLIM',IND,INP,IND2,STATUS)
+                  CALL PAR_GET1R('FITLIM',2,INP,IND2,STATUS)
 
 *               Check that the values were not inadvertantly reversed 
 *               and swop them round so that the result can be sensible.
@@ -1878,6 +1893,7 @@
       INTEGER YMAX                    ! Highest image pixel Y index examined
       INTEGER YMIN                    ! Lowest image pixel Y index examined
       INTEGER Y                       ! Current Y index
+      INTEGER ARRAYIDX                ! Array index
       REAL MAX                        ! Maximum weighted average pixel value
       REAL NEWX                       ! X value of pixel with highest
                                       ! weighted surrounding values
@@ -1897,14 +1913,14 @@
 *   Set a flag to indicate if the pixel count value could be determined.
       FLAG=0
  
+*   Set up the minimum and maximum image limits.
+      XMIN=1
+      XMAX=PRANGE(1)
+      YMIN=1
+      YMAX=PRANGE(2)
+
 *   Use autolocation if selected.
       IF (AUTOL) THEN
-
-*      Set up the minimum and maximum image limits.
-         XMIN=1
-         XMAX=PRANGE(1)
-         YMIN=1
-         YMAX=PRANGE(2)
 
 *      Set up the initial indices for the pixel with the highest weighted value. 
          NEWX=XCO
@@ -1993,7 +2009,19 @@
 
 *      Obtain the value of the pixel at XCO,YCO if autolocate 
 *      is not selected.
-         OCOUNT=ARRAY((NINT(YCO-1))*XMAX+NINT(XCO))
+         ARRAYIDX=(NINT(YCO-1))*XMAX+NINT(XCO)
+         IF (ARRAYIDX .GT. ELEMS) THEN
+            STATUS=SAI__ERROR
+            CALL MSG_SETR('XCO',XCO)
+            CALL MSG_SETR('YCO',YCO)
+            CALL MSG_SETI('ELEMS',ELEMS)
+            CALL ERR_REP(' ','AUTOL: pixel (^XCO,^YCO) out of range'
+     :           //' for array size ^ELEMS',STATUS)
+            GOTO 9999
+            OCOUNT=VAL__BADR
+         ELSE
+            OCOUNT=ARRAY(ARRAYIDX)
+         ENDIF
 
 *      Correct and issue warning if the value is bad.
          IF (OCOUNT.EQ.VAL__BADR) THEN

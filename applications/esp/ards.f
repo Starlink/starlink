@@ -3,34 +3,39 @@
 *+
 *  Name:
 *     ESP_ARD_DRIVER
- 
+*
 *  Purpose:
 *     Looks after reading the ARD file and masking the image.
- 
+*
 *  Language:
 *     Starlink Fortran 77
- 
+*
 *  Invocation:
 *      CALL ESP_ARD_DRIVER(NDIM,ELEMS,LBND,UBND,POINT1,POINT4,STATUS)
- 
+*
 *  Description:
 *     Determines the name of the ARD file to be used. Then creates an
 *     integer mask containing information describing where the bad pixels
 *     are. This information (and the image) are passed to ARD_DRIVE
 *     which sets to bad the appropriate pixels on the output image.
- 
+*
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
- 
+*     NG:  Norman Gray (Starlink, Glasgow)
+*
 *  History:
 *     12-JUN-1994 (GJP)
-*     (Original version)
+*       (Original version)
 *     24-FEB-1997 (GJP)
-*     Modified use of pointers slightly.
- 
+*       Modified use of pointers slightly.
+*     29-Nov-1999 (NG)
+*       Adjusted call to PAR system, so that it only annuls PAR__NULL.
+*       Other non-normal statuses from the PAR system (specifically
+*       including PAR__ANNUL) are passed back.
+*
 *  Bugs:
 *     None known.
- 
+*
 *-
 
   
@@ -42,6 +47,7 @@
       INCLUDE 'GRP_PAR'                 ! GRP constants
       INCLUDE 'PRM_PAR'                 ! Primdat constants
       INCLUDE 'NDF_PAR'                 ! NDF constants
+      INCLUDE 'PAR_ERR'			! Constants for the PAR system
       
 *   Arguments Given:
       INTEGER ELEMS                     ! Number of pixels in the image
@@ -75,20 +81,22 @@
 *   Identify the ARD file name.
       ARDINP=.TRUE.
       CALL ERR_MARK
-      CALL PAR_CANCL('ARDFIL',STATUS)
+*   I think it is incorrect to call PAR_CANCL here, since we're not in a
+*   loop or anything.  It's possible, however, that removing this
+*   behaviour could break something, so leave this note and comment.
+*      CALL PAR_CANCL('ARDFIL',STATUS)
       CALL PAR_GET0C('ARDFIL',ARDN,STATUS)
       CALL ARD_GROUP('ARDFIL',GRP__NOID,IGRP,STATUS)
       IF (STATUS.NE.SAI__OK) THEN
-     
 *      Set the 'no ARD file' flag.
-         CALL GRP_DELET(IGRP,STATUS)
          ARDINP=.FALSE.
-*         CALL ERR_ANNUL(STATUS)
-         CALL ERR_FLUSH(STATUS)
-         STATUS=SAI__OK
-         CALL MSG_OUT(' ','WARNING! - ARD file not used.',STATUS)
-
-      END IF  
+         IF (STATUS.EQ.PAR__NULL) THEN
+*         That's OK, we don't want an ARD file
+            CALL GRP_DELET(IGRP,STATUS)
+            CALL ERR_ANNUL(STATUS)
+            CALL MSG_OUT(' ','WARNING! - ARD file not used.',STATUS)
+         ENDIF  
+      ENDIF
       CALL ERR_RLSE
     
 *   Only process an ARD file if the name was sensible.

@@ -1168,9 +1168,7 @@ c$$$      endif
       
 *   Switch off printing altogether - set printing unit iv(prunit)=iv(21)
 *   to zero, see NSG p9.
-      if (gau2par(gau2debug) .gt. 1) then
-         iv(21) = 1
-      else
+      if (gau2par(gau2debug) .le. 1) then
          iv(21) = 0
       endif
 
@@ -1341,6 +1339,9 @@ c$$$      endif
 
 *   Local variables
       integer i
+      doubleprecision vt        ! temp real
+      character line*80         ! output line
+      character remark*40       ! variable remark
 
       if (status .ne. sai__ok) return
       
@@ -1375,14 +1376,30 @@ c$$$      endif
 *      what's going on here, and see if we can accomodate the user's
 *      value in a statistically legitimate way.  See NSG sect. 10 for
 *      notes about (simple) rescaling of this value. 
-      call msg_setr ('SIGMA', real(sqrt(2*v(10)/(n-p))))
-      call msg_out  (' ', '  Effective data s.d.: ^SIGMA', status)
+      write (line,100) 'Effective data s.d:',
+     :     real(sqrt(2*v(10)/(n-p))),'Check reasonable'
+      call msg_out (' ',line,status)
+ 100  format ('   ',a25,g12.3,'  ',a)
+*      call msg_setr ('SIGMA', real(sqrt(2*v(10)/(n-p))))
+*      call msg_out  (' ', '  Effective data s.d.: ^SIGMA', status)
 *      Also write out the condition number from v(rcond)=v(53) (`the
 *      reciprocal of the square-root of a lower bound on the
 *      Euclidean condition number of the final Hessian
 *      \nabla^2f(x^{final})', see NSG p18).
-      call msg_setr ('COND', real(1/v(53)**2))
-      call msg_out  (' ', '  Condition number:    >^COND', status)
+      vt = real(1./v(53)**2)
+      if (vt .lt. 1e3) then
+         remark = 'good'
+      else
+         if (vt .lt. 1e6) then
+            remark = 'poor -- uncertainties plausible'
+         else
+            remark = 'not good -- uncertainties unreliable'
+         endif
+      endif
+      write (line,100) 'Condition number:',vt,remark
+      call msg_out (' ',line,status)
+*      call msg_setr ('COND', real(1/v(53)**2))
+*      call msg_out  (' ', '  Condition number:    >^COND', status)
 
 *   Calculate a metric to measure how well the assumptions in the calls 
 *   in mrnsg to calcada are being satisfied.  
@@ -1399,10 +1416,22 @@ c$$$      endif
 *   that gau2calcda=0 is 1 (meaning ideal optimisation) and
 *   gau2calcda=iv(30) is 0 (meaning that the `optimisation' saved
 *   nothing).  Turns out, when you do that, that the metric is...
-      call msg_setr ('OPT',      
-     :     1.0 - real(gau2par(gau2calcda)) / real(iv(30)))
+      vt = 1.0 - real(gau2par(gau2calcda)) / real(iv(30))
 *   ...which is what you might have guessed.
-      call msg_out (' ', '  Optimisation metric: ^OPT', status)
+      if (vt .gt. 0.95) then
+         remark = 'Excellent!'
+      else
+         if (vt .gt. 0.25) then ! fairly arbitrary cut-off
+            remark = 'Acceptable'
+         else
+            remark = 'Poor'
+         endif
+      endif
+      write (line,100) 'Optimisation metric:',vt,remark
+      call msg_out (' ',line,status)
+*      call msg_setr ('OPT',      
+*     :     1.0 - real(gau2par(gau2calcda)) / real(iv(30)))
+*      call msg_out (' ', '  Optimisation metric: ^OPT', status)
          
       call msg_blank (status)
       

@@ -9,7 +9,7 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {180.5}
 \newcommand{\stardocauthors}   {Norman Gray\\Mark Taylor\\Grant Privett}
-\newcommand{\stardocdate}      {15 November 1999}
+\newcommand{\stardocdate}      {5 December 1999}
 \newcommand{\stardoctitle}     {ESP --- Extended Surface Photometry}
 \newcommand{\stardocversion}   {Version 0.10}
 \newcommand{\stardocmanual}    {User's Manual}
@@ -318,6 +318,12 @@ conjunction with other packages like;
 
 It allows you to define areas to exclude in the analysis
 using keyword descriptions in text ARD files.
+
+There is now an interface to ESP within 
+\xref{GAIA}{sun214}{}.  This supports all the ESP applications except
+GRAPHS and HISTPEAK: GRAPHS is purely concerned with the display of
+ESP output, and all the non-graphical functionality of HISTPEAK is
+provided by the support for HSUB.
 
 The ESP web page is at
 \htmladdnormallink{\texttt{http://www.astro.gla.ac.uk/users/norman/star/esp/}}{http://www.astro.gla.ac.uk/users/norman/star/esp/}
@@ -923,7 +929,7 @@ be reported in PIXEL co-ordinates instead:
 % wcsframe ic3374 pixel
 \end{verbatim}
 \end{myquote}'s 
-To find out more about WCS components see \xref{SUN/95}{sun95}{se:wcsuse}.
+To find out more about WCS components see \xref{SUN/95}{sun95}{se_wcsuse}.
 
 Once the galaxy centre is identified, it is necessary to describe how far out
 from the centre you want the profiling to continue (if possible). This is again
@@ -1598,6 +1604,12 @@ algorithm, see the detailed description of GAUFIT in
 section~\ref{des:GAUFIT}.  The interface has not changed radically,
 but I will show two complete examples below.
 
+
+
+
+
+
+
 \subsubsection{GAUFIT: original fitting algorithm}
 
 Once the image to be analysed has been examined using 
@@ -1606,33 +1618,31 @@ session might proceed as follows:
 
 \begin{myquote}
 \begin{verbatim}
-% gaufit 
- 
+% gaufit
+
 ESP GAUFIT running.
- 
+
 MODE - Use the application interactively? /TRUE/ > 
 COLOUR - Pen colour? /1/ > 
 ANGCON - Use clockwise positive rotation convention? /FALSE/ > 
 ANGOFF - Position angle offset /0/ > 
-PSIZE - Pixel size /1/ > 
-FWHM - Work in FWHM, rather than sigmas? /FALSE/ > yes
 IMGDEV - Which device is displaying the image? /@xwindows/ > 
- 
-Using /home/norman/s/src/esp/ic3374c as the input NDF.
- 
+
+Using /local1/export/home/norman/s/src/esp/ic3374c as the input NDF.
+
 Select the source location
 Left mouse button:        Select location.
 Middle mouse button:      Show cursor coordinates.
 Right button or CTRL-C:  Quit selection.
 
-  GRID frame co-ordinates:  g1 = 93.2,  g2 = 94.2
- 
+  SKY frame co-ordinates:  RA = -11:23:21.4,  Dec = 62:13:07
+
 Indicate the outer limit of the source.
 Left mouse button:        Select location.
 Middle mouse button:      Show cursor coordinates.
 Right button or CTRL-C:  Quit selection.
 
-  GRID frame co-ordinates:  g1 = 103.6,  g2 = 65.8
+  SKY frame co-ordinates:  RA = -11:23:20.8,  Dec = 62:12:45
 \end{verbatim}
 \end{myquote}
 
@@ -1642,6 +1652,11 @@ so quit at this point.
 \begin{myquote}
 \begin{verbatim}
 You have opted to quit source selection.
+
+Read source positions:
+  Source     X      Y   Radius-limit
+     1      93.0   94.0   22.6
+Using info from SKY frame - pixels are  0.961 arcseconds square.
 \end{verbatim}
 \end{myquote}
 
@@ -1651,28 +1666,25 @@ image locations specified, the angle convention to be used is
 defined (via ANGCON and ANGOFF) and then the device displaying the 
 source image chosen (IMGDEV).
 
-Note that the PSIZE and FWHM parameters are new.  The first allows
-you to give the size of a single pixel in arcseconds; if you give a
-null parameter to PSIZE (that is, just an exclamation mark `!') then
-it will display results in units of pixels.  As usual, if a SKY
-co-ordinate frame is present, the PSIZE will be worked out automatically
-without asking you.
+
+\begin{myquote}
+\begin{verbatim}
+FWHM - Work in FWHM, rather than sigmas? /TRUE/ > 
+LSQFIT - Use the non-linear least-squares method? /FALSE/ > 
+BACK - Background count value /6196.5/ > 760
+SIGMA - Std. dev. of the background /400.4/ > 12
+NSIGMA - Number of sigma above sky /5/ > 
+NITER - Number of iterations /5/ > 3
+
+
+MODEL - Output NDF filename /@ic3374c-out/ > 
+MODTYP - Whole image model (W) or residuals (R) /'w'/ > 
+\end{verbatim}
+\end{myquote}
 If you set FWHM to be
 true, then results will be displayed as FWHM, rather than the gaussian
 width parameter, sigma.
 
-\begin{myquote}
-\begin{verbatim}
-LSQFIT - Use the non-linear least-squares method? /TRUE/ > no
-BACK - Background count value /6325/ > 776
-SIGMA - Std. dev. of the background > 10
-NSIGMA - Number of sigma above sky /8/ >             
-NITER - Number of iterations /4/ > 5
-  
-MODEL - Output NDF filename /@gaufit12/ > 
-MODTYP - Whole image model (W) or residuals (R) /'w'/ > w
-\end{verbatim}
-\end{myquote}
 
 If you set the parameter LSQFIT to be false, you get the original
 GAUFIT algorithm.
@@ -1703,16 +1715,17 @@ minus the model value for the same pixel).
 
 \begin{myquote}
 \begin{verbatim}
-XINC - Source origin movement in X /0.01/ > 
-YINC - Source origin movement in Y /0.01/ > 
+XINC - Source origin movement in X /0.001/ > 
+YINC - Source origin movement in Y /0.001/ > 
 SAINC - Source std dev factor in Sa /1/ > 
 SBINC - Source std dev factor in Sb /1/ > 
 PINC - Source peak variation /1/ > 
 ANGINC - Source origin variation in angle /1/ > 
- 
+
 AUTOL - Search for a better origin? /TRUE/ > 
 \end{verbatim}
 \end{myquote}
+
 
 These parameters define how tightly constrained the minimisation routine
 is when it tries to walk through variable space. That is, if any of these
@@ -1733,60 +1746,46 @@ are using may not be able to provide a 1:1 relationship between the
 pixels in the image and the pixels on the screen.
 
 
- 
 \begin{myquote}
 \begin{verbatim}
 Finding a better origin.
- 
+
 First estimates of source data
 
 Source      X           Y         Angle   FWHMa/as     FWHMb/as         Peak
-  1       93.13       96.06      117.00     6.9          5.5           194.50
+  1       93.40       95.10      105.00     7.6          5.6        0.210E+03
 
-Initial arbitrary residual   45.24
+Initial arbitrary residual   51.17
 
 
-Iteration  1  of  5
+Iteration  1  of  3
 Source      X           Y         Angle   FWHMa/as     FWHMb/as         Peak
-  1       93.12       96.07      115.00     6.7          4.3           195.06
+  1       93.40       95.10      107.00     7.4          4.3        0.209E+03
 
-Current arbitrary residual   37.8
+Current arbitrary residual   42.5
 
-Iteration  2  of  5
+Iteration  2  of  3
 Source      X           Y         Angle   FWHMa/as     FWHMb/as         Peak
-  1       93.13       96.09      110.67     6.9          4.1           195.62
+  1       93.40       95.10      106.67     7.7          4.1        0.210E+03
 
-Current arbitrary residual   36.4
+Current arbitrary residual   42.0
 
-Iteration  3  of  5
+Iteration  3  of  3
 Source      X           Y         Angle   FWHMa/as     FWHMb/as         Peak
-  1       93.14       96.10      110.00     6.9          4.0           197.28
+  1       93.40       95.11      107.33     7.7          4.1        0.210E+03
 
-Current arbitrary residual   36.1
-
-Iteration  4  of  5
-Source      X           Y         Angle   FWHMa/as     FWHMb/as         Peak
-  1       93.16       96.11      110.00     6.9          4.0           197.84
-
-Current arbitrary residual   35.9
-
-Iteration  5  of  5
-Source      X           Y         Angle   FWHMa/as     FWHMb/as         Peak
-  1       93.17       96.13      110.00     6.9          4.0           198.39
-
-Current arbitrary residual   35.8
-OUT - Text file for parameter /@gaufit12.dat/ > gau.out
-
+Current arbitrary residual   41.8
+OUT - Text file for parameter /'GaiaEsp-outputtext'/ > ic3374c-txt
 \end{verbatim}
 \end{myquote}
 
 As you can see, the source positions remained unchanged during the minimisation
 (as requested by the small values we assigned for XINC and YINC) while
-the other parameters varied considerably -  note that even at the last 
-iteration the position angle of one of the sources is still varying and the
+the other parameters varied considerably -- note that even at the last 
+iteration the position angle of the source is still varying and the
 residual is dropping. 
 The X and Y co-ordinates reported here,
-and those written to the output file {\tt gau.out}, 
+and those written to the output file {\tt ic3374c-txt}, 
 are in the Base co-ordinate system of the image.
 
 An example output file is shown in Section \ref{sec:output}
@@ -1802,31 +1801,7 @@ Fitting with the least-squares algorithm proceeds much as before:
 
 ESP GAUFIT running.
 
-MODE - Use the application interactively? /TRUE/ > 
-COLOUR - Pen colour? /1/ > 
-ANGCON - Use clockwise positive rotation convention? /FALSE/ > 
-ANGOFF - Position angle offset /0/ > 
-PSIZE - Pixel size /1/ > 
-FWHM - Display FWHM, rather than sigmas? /TRUE/ > 
-IMGDEV - Which device is displaying the image? /@xwindows/ > 
-
-Using /home/norman/s/src/esp/ic3374c as the input NDF.
-
-Select the source location
-Left mouse button:        Select location.
-Middle mouse button:      Show cursor coordinates.
-Right button or CTRL-C:  Quit selection.
-
-  GRID frame co-ordinates:  g1 = 93.2,  g2 = 94.2
-
-Indicate the outer limit of the source.
-Left mouse button:        Select location.
-Middle mouse button:      Show cursor coordinates.
-Right button or CTRL-C:  Quit selection.
-
-  GRID frame co-ordinates:  g1 = 103.6,  g2 = 65.8
-
-You have opted to quit source selection.
+[...]
 \end{verbatim}
 \end{myquote}
 
@@ -1835,11 +1810,14 @@ choose to use the new algorithm.
 
 \begin{myquote}
 \begin{verbatim}
-LSQFIT - Use the non-linear least-squares method? /FALSE/ > yes
+FWHM - Work in FWHM, rather than sigmas? /TRUE/ > 
+LSQFIT - Use the non-linear least-squares method? /FALSE/ > y
 CALCSD - Calculate and display uncertainties? /TRUE/ > 
-BACK - Background count value ( < 0 to have it fitted) /776/ > -1
-MAXITER - Maximum number of iterations (-1 for default) /-1/ > -1
-MODTYP - Whole image model (W)/Residuals (R)/reGression diag. (G) /w/ >
+BACK - Background count value ( < 0 to have it fitted) /760/ > -1
+MAXITER - Maximum number of iterations (-1 for default) /-1/ > 
+
+MODEL - Output NDF filename /@ic3374c-out/ > 
+MODTYP - Whole image model (W)/Residuals (R)/reGression diag. (G) /'w'/ > 
 \end{verbatim}
 \end{myquote}
 
@@ -1870,46 +1848,46 @@ select it unless you actually wish to examine it.
 
 \begin{myquote}
 \begin{verbatim}
-MODEL - Output NDF filename /@gaufit12/ > 
-
 First estimates of source data
 
 Source      X           Y         Angle   FWHMa/as     FWHMb/as         Peak
-  1       93.13       95.23       17.00     42.          41.           933.45
+  1       93.67       95.15       21.00     59.          57.        0.933E+03
 
    IT    NF     DRIFT    NL'D RESID
-    0     1      0.        0.00D+00
-    1     2   0.184E-05    0.44D+03
-    2     4   0.460E-03    0.43D+03
-    3     5   0.219        0.42D+03
-    4     7   0.105E-01    0.40D+03
-    5     8   0.255E-01    0.39D+03
-    6    10   0.172        0.16D+03
-    7    11   0.166        0.88D+02
-    8    12   0.163        0.74D+02
-    9    13   0.162        0.72D+02
-   10    14   0.162        0.72D+02
-   11    15   0.162        0.72D+02
-   12    16   0.162        0.72D+02
+    0     1    0.00        0.00E+00
+    1     2   0.110E-04    0.42E+03
+    2     4   0.120E-02    0.41E+03
+    3     5   0.383E-01    0.41E+03
+    4     6   0.287        0.39E+03
+    5     8   0.103        0.38E+03
+    6    10   0.230        0.32E+03
+    7    12   0.168        0.28E+03
+    8    14   0.190        0.15E+03
+    9    15   0.198        0.89E+02
+   10    16   0.199        0.75E+02
+   11    17   0.199        0.74E+02
+   12    18   0.199        0.74E+02
+   13    19   0.199        0.74E+02
+   14    20   0.199        0.74E+02
+   15    21   0.199        0.74E+02
 
 GAUFIT2: algorithm performance
-  Effective data s.d.: 12.06402
-  Condition number:    >18828.23
-  Optimisation metric: 1
+         Effective data s.d:     12.      Check reasonable
+           Condition number:    0.21E+05  poor -- uncertainties plausible
+        Optimisation metric:    0.91      Acceptable
 
-GAUFIT2: converged (5)
 
 Fitted parameter values:
 Source      X           Y         Angle   FWHMa/as     FWHMb/as         Peak
-  1       93.31       96.12       17.59     10.          5.9           190.97
+  1       93.32       96.11       20.73     10.          6.1        0.189E+03
 
 Parameter uncertainties: (-ve values indicate no estimate made)
 Source      X           Y         Angle   FWHMa/as     FWHMb/as         Peak
-  1        0.04        0.06        0.02    0.15         0.90E-01        -1.00
+  1        0.04        0.07        0.02    0.15         0.85E-01   -0.100E+01
 
-Background (fitted) = 774.059
+Background (fitted) = 769.0236
 
-OUT - Text file for parameter /@gau.out/ > gau-2.out
+OUT - Text file for parameter /@ic3374c-txt6/ > 
 \end{verbatim}
 \end{myquote}
 
@@ -1933,28 +1911,31 @@ unimportant -- it should decrease as the calculation goes on.
 When the routine calculates the parameter uncertainties, it assumes a
 value for the data standard deviation based on the size of the
 residual and the number of parameters and data points, and it
-reports this for your information.  If this value is
-\emph{substantially} different from what you know the standard
-deviation to be, please let me know.\footnote{Norman Gray,
-\texttt{norman@astro.gla.ac.uk}}
+reports this for your information.  If this value seems unreasonable,
+because it is \emph{substantially} different from an alternative
+estimate you have of the standard deviation, please let me
+know.\footnote{Norman Gray, \texttt{norman@astro.gla.ac.uk}}
 
 The routine also reports an estimated condition number (the ratio
 between the highest and lowest eigenvalues) for the Hessian used in
-the uncertainty calculation.  If this is huge (more than $10^6$, say),
+the uncertainty calculation.  If this is huge (more than about~$10^6$),
 you should not place too much reliance on the uncertainties produced.
+In this case, the condition number is larger than we'd like, but the
+reported uncertainties should not be too far out.  A condition number
+less than~$10^3$ would suggest good reliable uncertainties.
 
 In adapting the least-squares algorithm for this particular
 application, I made one or two optimisations, and the `optimisation
-metric' (only one at present, more might appear) indicates how well
-this is performing.  It's scaled so that a value towards 1 indicates
-that the optimisation is working as expected, zero means I needn't
-have bothered, and negative values suggest it's actually creating more
-work than the unimproved case.  If you have a non-pathological case
-which gives negative values here, I'd like to hear about it.
+metric' indicates how well this is performing.  It's scaled so that a
+value towards~1 indicates that the optimisation is working as
+expected, zero means I needn't have bothered, and negative values
+suggest it's actually creating more work than the unimproved case.  If
+you have a non-pathological case which gives negative values here, I'd
+like to hear about it.
 
 Finally, the routine reports that it has converged successfully (if it
-hasn't, it should give a more-or-less useful explanation here).  The
-number indicates which of several internal convergence tests was satisfied.
+hasn't, it should give a more-or-less useful explanation here).  
+% The number indicates which of several internal convergence tests was satisfied.
 
 The routine displays its results, then their corresponding
 uncertainties, with negative uncertainties indicating that no estimate
@@ -3487,10 +3468,13 @@ The ESP routine descriptions are contained in the following pages.
       used for all input required by the application.
    }
    \sstusage{
-      ELLFOU MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT\\
-\hbox{}\qquad             AUTOL AUTOLT FRZORI [CURSOR] [IN] [ORIGIN] (FINE)\\{}
-\hbox{}\qquad             [RLIM] (LIM1) (LIM2) [SAME] [AGAIN] [INFILE]\\{}
-\hbox{}\qquad             [IMGDEV] (COLOUR) (ANGCON) (ANGOFF) (FRACT)
+      ELLFOU MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT
+\LineBreak
+             AUTOL AUTOLT FRZORI [CURSOR] [IN] [ORIGIN] (FINE)
+\LineBreak
+             [RLIM] (LIM1) (LIM2) [SAME] [AGAIN] [INFILE]
+\LineBreak
+             [IMGDEV] (COLOUR) (ANGCON) (ANGOFF) (FRACT)
    }
    \sstparameters{
       \sstsubsection{
@@ -3703,14 +3687,14 @@ The ESP routine descriptions are contained in the following pages.
 \LineBreak
              ardfil=$\wedge$ardfile.dat out=elf autol=true frzori=true
 \LineBreak
-             cursor=false in=p2 origin={\tt "}12:36:53.42 62:12:21.8{\tt "}
+             cursor=false in=p2 origin="12:36:53.42 62:12:21.8"
 \LineBreak
              rlim=10. imgdev=x2windows
       }{
 
          Profiles for the object at the co-ordinates indicated on image
          P2 are obtained out to a radius of 10 pixels. The Current
-         co-ordinate frame of P2 is in the {\tt '}SKY{\tt '} domain.  Pixel size in
+         co-ordinate frame of P2 is in the 'SKY' domain.  Pixel size in
          arcseconds is determined automatically from the SKY co-ordinates.
          The results are output to device X2WINDOWS and to a file text
          file ELF. The background count is 6200 with an associated
@@ -3769,10 +3753,13 @@ The ESP routine descriptions are contained in the following pages.
       its co-ordinates.
    }
    \sstusage{
-      ELLPRO MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT \\{}
-\hbox{}\qquad             AUTOL AUTOLT FRZORI [CURSOR] [IN] [ORIGIN] (FAST)\\{}
-\hbox{}\qquad             (FINE) [RLIM] (LIM1) (LIM2) (LIM3) (FRACT) [SAME]\\{}
-\hbox{}\qquad             [AGAIN] [INFILE) [IMGDEV] (COLOUR) (ANGCON) (ANGOFF)
+      ELLPRO MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT
+\LineBreak
+             AUTOL AUTOLT FRZORI [CURSOR] [IN] [ORIGIN] (FAST)
+\LineBreak
+             (FINE) [RLIM] (LIM1) (LIM2) (LIM3) (FRACT) [SAME]
+\LineBreak
+             [AGAIN] [INFILE) [IMGDEV] (COLOUR) (ANGCON) (ANGOFF)
    }
    \sstparameters{
       \sstsubsection{
@@ -3988,7 +3975,7 @@ The ESP routine descriptions are contained in the following pages.
 \LineBreak
              out=elp1.dat autol=true frzori=false cursor=false
 \LineBreak
-             in=p2 rlim=10 origin={\tt "}12:36:53.42 62:12:21.8{\tt "}
+             in=p2 rlim=10 origin="12:36:53.42 62:12:21.8"
       }{
 
          Performs profiling on an object positioned at the co-ordinates
@@ -4106,7 +4093,7 @@ The ESP routine descriptions are contained in the following pages.
    \sstdescription{
       Uses a minimisation routine to determine the 2-D Gaussian profiles
       of multiple sources on an NDF format image. This will be especially
-      useful for those using JCMT data (see also \xref\{JCMTDR\}\{sun132\}\{\}).
+      useful for those using JCMT data (see also $\backslash$xref\{JCMTDR\}\{sun132\}\{\}).
 
       Source locations can be specified using a cursor or by
       text file. The user is allowed to restrain the extent to which
@@ -4134,15 +4121,21 @@ The ESP routine descriptions are contained in the following pages.
       least-squares (lsqfit=true)
    }
    \sstusage{
-      GAUFIT IN INFILE OUT MODE MODEL IMGDEV\\{}
-\hbox{}\qquad   MODTYPE COLOUR ANGCON ANGOFF FWHM PSIZE\\{}
-\hbox{}\qquad   BACK SIGMA NSIGMA\\{}
-\hbox{}\qquad   LSQFIT=false AUTOL XINC YINC SAINC SBINC PINC ANGINC NITER\\{}
+      GAUFIT IN INFILE OUT MODE MODEL IMGDEV
+\LineBreak
+             MODTYPE COLOUR ANGCON ANGOFF FWHM PSIZE
+\LineBreak
+             BACK SIGMA NSIGMA
+\LineBreak
+             LSQFIT=false AUTOL XINC YINC SAINC SBINC PINC ANGINC NITER
 
-      GAUFIT IN INFILE OUT MODE MODEL IMGDEV\\{}
-\hbox{}\qquad   MODTYPE COLOUR ANGCON ANGOFF FWHM PSIZE\\{}
-\hbox{}\qquad   BACK SIGMA NSIGMA\\{}
-\hbox{}\qquad   LSQFIT=true CALCSD MAXITER
+      GAUFIT IN INFILE OUT MODE MODEL IMGDEV
+\LineBreak
+             MODTYPE COLOUR ANGCON ANGOFF FWHM PSIZE
+\LineBreak
+             BACK SIGMA NSIGMA
+\LineBreak
+             LSQFIT=true CALCSD MAXITER
    }
    \sstparameters{
       \sstsubsection{
@@ -4380,8 +4373,9 @@ The ESP routine descriptions are contained in the following pages.
       coordinate system (units pixels) of the processed NDF images.
    }
    \sstusage{
-      GRAPHS MODE INFILE OUT RRANGE [AGAIN] [CURSOR] [DEVICE]\\{}
-\hbox{}\qquad   [FITLIM] [RADISP] [WHATD] (LOWLIM) (ANGCON) (ANGOFF)
+      GRAPHS MODE INFILE OUT RRANGE [AGAIN] [CURSOR] [DEVICE]
+\LineBreak
+             [FITLIM] [RADISP] [WHATD] (LOWLIM) (ANGCON) (ANGOFF)
    }
    \sstparameters{
       \sstsubsection{
@@ -4415,7 +4409,7 @@ The ESP routine descriptions are contained in the following pages.
       \sstsubsection{
          FITLIM = \_REAL (Read)
       }{
-         The range of radius values over which the scale length `fits'
+         The range of radius values over which the scale length 'fits'
          are to be calculated. Units arc seconds.
       }
       \sstsubsection{
@@ -4544,7 +4538,7 @@ The ESP routine descriptions are contained in the following pages.
       }{
 
          The results stored in file PROFS.DAT are read one after the.
-         other The profiles and {\tt '}fits{\tt '} may be observed interactively as
+         other The profiles and 'fits' may be observed interactively as
          graphs on device X2WINDOWS. The first display will be of
          log(radius) versus position angle. The radius range used
          when calculating the scale length is 1 to 20 arc seconds.
@@ -4622,7 +4616,7 @@ The ESP routine descriptions are contained in the following pages.
 
          \sstitem
          interpolated mode. Calculated by assuming a Normal form
-           for the histogram peak and `fitting' a function to it.
+           for the histogram peak and 'fitting' a function to it.
            The function is then used to provide both a modal value and
            the background count standard deviation.
 
@@ -4694,7 +4688,7 @@ The ESP routine descriptions are contained in the following pages.
       }{
          The modal value of the histogram calculated by
          assuming that near the histogram peak a Normal distribution
-         is present and then {\tt '}fitting{\tt '} it. The {\tt '}fit{\tt '} obtained
+         is present and then 'fitting' it. The 'fit' obtained
          supplies the value for the histogram peak and also an
          accurate estimate of the background count standard deviation.
       }
@@ -4785,8 +4779,8 @@ The ESP routine descriptions are contained in the following pages.
          Defines the method by which the areas of the image to be
          used in building up the pixel count histogram are to be
          selected.
-            USE=`W' All the image pixels are used.
-            USE=`A' The image pixels are defined using an ARD file
+            USE='W' All the image pixels are used.
+            USE='A' The image pixels are defined using an ARD file
       }
    }
    \sstexamples{
@@ -4801,9 +4795,7 @@ The ESP routine descriptions are contained in the following pages.
          radius 3 counts.
       }
       \sstexamplesubsection{
-         histpeak in=galaxy2 sfact=-1 use=a device=xwindows 
-\LineBreak
-ardfil=$\wedge$okay.dat
+         histpeak in=galaxy2 sfact=-1 use=a device=xwindows ardfil=$\wedge$okay.dat
       }{
          The statistics are calculated for the image GALAXY2, using
          the image pixels defined by ARD file OKAY.DAT
@@ -4895,7 +4887,7 @@ ardfil=$\wedge$okay.dat
       }{
          If true, then the output file will be free-format -- intended
          to be human-readable.  If false, then the output will be a
-         series of keyword-value pairs, which isn't really \emph{un}readable,
+         series of keyword-value pairs, which isn't really \_un\_readable,
          but is designed to be suitable for easy parsing.
       }
    }
@@ -4953,27 +4945,18 @@ ardfil=$\wedge$okay.dat
       the user.
 
       The user may also supply some indication of the number of pixels
-      that must be used to create the pixel value histogram. This
-      value may be supplied as the width of the square area around the
-      co-ordinates that will be used, or alternatively the number of
-      contiguous data points believed to be present in the object at
-      the image location specified.
+      that must be used to create the pixel value histogram.  This value
+      may be supplied as a number pixels around the given co-ordinates
+      (ie, an area), or alternatively the number of contiguous data
+      points believed to be present in the object at the image location
+      specified.  The latter method is intended specifically for use
+      with RGASP's IMAGES or IRAF's FOCAS output files.
 
-      The latter method is intended specifically for use with RGASP's
-      IMAGES or IRAF's FOCAS output files.
-
-      All co-ordinates are read from a two or three columns
-      ASCII text file. If two columns are present then these are
-      taken as representing the image co-ordinates required for the
-      regions of the image to be considered.  Co-ordinates are in
-      the Current coordinate system of the NDF. If three columns are
-      present the third column respresents the width of the area
-      to be sampled or the number of contiguous pixels detected there
-      by FOCAS or IMAGES.
-
-      The selection of the number of pixels to used in the histogram is
-      defined by the user subject to a lower limit of 1024 pixels
-      (32x32).
+      All co-ordinates are read from the
+      ASCII text file given in the parameter INFILE.
+      The selection of the number of pixels to be used in constructing
+      the histogram is defined by the user, subject to a lower limit of
+      1024 pixels (32x32).
    }
    \sstusage{
       LOBACK IN INFILE SFACT THIRD OUT WIDTH
@@ -4993,6 +4976,14 @@ ardfil=$\wedge$okay.dat
          or the number of contiguous pixels found there by FOCAS or
          IMAGES.  Co-ordinates are in the Current co-ordinate system
          of IN.
+
+         If two columns are present then these are
+         taken as representing the image co-ordinates required for the
+         regions of the image to be considered.  Co-ordinates are in
+         the Current coordinate system of the NDF.  If there is a third
+         column, it represents the area, in pixels, of a square
+         centred on the co-ordinates (but see the documentation for the
+         parameters THIRD and WIDTH below).
       }
       \sstsubsection{
          OUT = \_CHAR (Read)
@@ -5022,34 +5013,26 @@ ardfil=$\wedge$okay.dat
       \sstsubsection{
          THIRD = \_LOGICAL (Read)
       }{
-         Determines whether or not the third column found in
-         the text file specified using INFILE, contains the number
-         of contiguous image pixels believed to be at that image
-         location, (THIRD = TRUE), or the number of screen pixels to be
-         taken from the image around the required location
-         (THIRD=FALSE).
-
-          The value supplied via the third text column is used to
-          determine how big an area of image must be used when
-          calculating the background. This is done by assuming
-          that all the pixels in the object are in a square
-          area and then determining the width of that area.
-          The width used in the end is 3 times that of the
-          object.
-
-         However, the WIDTH parameter
-         overrides this if less than 32x32 pixels (as defined by the
-         WIDTH parameter limits in the LOBACK.IFL file) are to be used.
-         This ensures that the histogram employed is reasonably well
-         filled under most circumstances.
+         Determines whether or not the third column found in the INFILE
+         contains the number of contiguous image pixels believed to be
+         at that image location (THIRD=TRUE), or the number of screen
+         pixels to be taken from the image around the required location
+         (THIRD=FALSE).  Specifically, if THIRD=TRUE then the width
+         obtained from the pixel-area in the file is multiplied by three.
       }
       \sstsubsection{
          WIDTH = \_INTEGER (Read)
       }{
-         The width of the square area of the image from which pixel
-         values will be taken to construct the histogram. The minimum
-         permitted value is 32 (as defined in the LOBACK.IFL file).
-         Units pixels.
+         This parameter constrains any area obtained from the third
+         column of the input file, and acts as a default if no such
+         value exists.  If the width implied by that column value (that
+         is, its square-root, with any adjustment implied by the value
+         of the parameter THIRD) is less than WIDTH, then that
+         width is replaced by WIDTH.  The default value for this
+         parameter, and its minimum permitted value, is 32, giving a
+         minimum pixel count of 1024 (32x32).  This ensures that the
+         histogram employed is reasonably well filled under most
+         circumstances.  Units pixels.
       }
    }
    \sstexamples{
@@ -5146,7 +5129,7 @@ ardfil=$\wedge$okay.dat
       The routine may be used in conjunction with SKEW, SELFC,
       SELFCW or CORR when searching for low contrast objects. It
       provides comparison noise images which may be used to determine
-      the significance of `objects' identified by the other applications.
+      the significance of 'objects' identified by the other applications.
    }
    \sstusage{
       MIXUP IN OUT
@@ -5217,9 +5200,11 @@ ardfil=$\wedge$okay.dat
       an interactively selected galaxy.
    }
    \sstusage{
-      SECTOR CURSOR ARDFIL BACK SIGMA PSIZE SURF RADISP MIRROR AUTOL\\{}
-\hbox{}\qquad   ZEROP OUT [IN] [DEVICE] [IMGDEV] [FITLIM] [POSANG]\\{}
-\hbox{}\qquad   [ANGWID] [RLIM] [SAME] [AGAIN] [ORIGIN] (COLOUR)
+      SECTOR CURSOR ARDFIL BACK SIGMA PSIZE SURF RADISP MIRROR AUTOL
+\LineBreak
+             ZEROP OUT [IN] [DEVICE] [IMGDEV] [FITLIM] [POSANG]
+\LineBreak
+             [ANGWID] [RLIM] [SAME] [AGAIN] [ORIGIN] (COLOUR)
    }
    \sstparameters{
       \sstsubsection{
@@ -5271,7 +5256,7 @@ ardfil=$\wedge$okay.dat
       \sstsubsection{
          FITLIM = \_REAL (Read)
       }{
-         The range of radius values over which the scale length {\tt '}fits{\tt '}
+         The range of radius values over which the scale length 'fits'
          are to be calculated.  Units arc seconds.
       }
       \sstsubsection{
@@ -5292,10 +5277,19 @@ ardfil=$\wedge$okay.dat
          diametrically opposite sides of the galaxy origin.
       }
       \sstsubsection{
-         ORIGIN = \_REAL (Read)
+         ORIGIN = \_CHAR (Read)
       }{
          Image indices for the origin point to be used. Given in the
          Current coordinate system of the WCS component of IN.
+      }
+      \sstsubsection{
+         PORIGIN = \_CHAR (Read)
+      }{
+         Image indices for the origin point to be used, in pixel units.
+         This parameter is present to aid the interface with the GAIA system.
+         It should be regarded as an `internal' parameter, and may disappear
+         or change without notice.  If present, the value of this parameter
+         overrides any value specified by the ORIGIN parameter.
       }
       \sstsubsection{
          OUT = \_CHAR (Read)
@@ -5400,7 +5394,7 @@ ardfil=$\wedge$okay.dat
 \LineBreak
              fitlim=0,20 posang=25 angwid=5
 \LineBreak
-             rlim=25 origin={\tt "}12:36:53.42 62:12:21.8{\tt "}
+             rlim=25 origin="12:36:53.42 62:12:21.8"
       }{
 
          An object located at the co-ordinates indicated on image IC3374
@@ -5537,7 +5531,7 @@ ardfil=$\wedge$okay.dat
          A self-correlation is carried out on image PLATE. The search
          is for an object 5 arc seconds across.  The background count
          level is 6600 and the image pixel size in arc seconds will
-         be determined from a SKY coordinate frame in the image{\tt '}s WCS
+         be determined from a SKY coordinate frame in the image's WCS
          component if possible.  Since USEALL=FALSE, all pixels with
          a count value above 6600$+$35.x5. are excluded from the
          correlation calculation.  The output image is named PLATES.
@@ -5675,7 +5669,7 @@ ardfil=$\wedge$okay.dat
          source image and SCP2 as the output image.  The background
          count value for the source image is 444 and the pixel size
          in arc seconds will be determined from a SKY frame in the
-         image{\tt '}s WCS component if possible.
+         image's WCS component if possible.
 
          All pixels with a count value greater than 444.$+$12.x4. are
          excluded from the correlation calculations.
@@ -5739,8 +5733,9 @@ ardfil=$\wedge$okay.dat
       border have been assigned the value bad.
    }
    \sstusage{
-      SKEW IN OUT MODET WIDTH PSIZE MULT [BACK] [SIGMA]\\{}
-\hbox{}\qquad  [NSIGMA] [USEALL]
+      SKEW IN OUT MODET WIDTH PSIZE MULT [BACK] [SIGMA]
+\LineBreak
+           [NSIGMA] [USEALL]
    }
    \sstparameters{
       \sstsubsection{

@@ -2,63 +2,65 @@
 *+
 *  Name:
 *     LOBACK
-
+*
 *  Purpose:
 *     Establishes the local mode values for parts of an image.
- 
+*
 *  Language:
 *     Starlink Fortran 77
-
+*
 *  Invocation:
 *     CALL LOBACK( STATUS )
-
+*
 *  Arguments:   
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-
+*
 *  Description: 
 *     Establishes the local mode values for parts of an image
 *     immediately surrounding a set of image co-ordinates supplied by 
 *     the user. 
 *
-*     The user may also supply some indication of the number of pixels 
-*     that must be used to create the pixel value histogram. This  
-*     value may be supplied as the width of the square area around the 
-*     co-ordinates that will be used, or alternatively the number of
-*     contiguous data points believed to be present in the object at 
-*     the image location specified. 
+*     The user may also supply some indication of the number of pixels
+*     that must be used to create the pixel value histogram.  This value
+*     may be supplied as a number pixels around the given co-ordinates
+*     (ie, an area), or alternatively the number of contiguous data
+*     points believed to be present in the object at the image location
+*     specified.  The latter method is intended specifically for use
+*     with RGASP's IMAGES or IRAF's FOCAS output files.
 *
-*     The latter method is intended specifically for use with RGASP's
-*     IMAGES or IRAF's FOCAS output files.
-*
-*     All co-ordinates are read from a two or three columns
-*     ASCII text file. If two columns are present then these are
-*     taken as representing the image co-ordinates required for the 
-*     regions of the image to be considered.  Co-ordinates are in 
-*     the Current coordinate system of the NDF. If three columns are
-*     present the third column respresents the width of the area 
-*     to be sampled or the number of contiguous pixels detected there
-*     by FOCAS or IMAGES.
-
-*     The selection of the number of pixels to used in the histogram is 
-*     defined by the user subject to a lower limit of 1024 pixels 
-*     (32x32).
-  
+*     All co-ordinates are read from the
+*     ASCII text file given in the parameter INFILE.
+*     The selection of the number of pixels to be used in constructing
+*     the histogram is defined by the user, subject to a lower limit of
+*     1024 pixels (32x32).
+* 
 *  Usage:
 *     LOBACK IN INFILE SFACT THIRD OUT WIDTH
-
+*
 *  ADAM Parameters:
 *     IN = _NDF (Read)
 *        The name of the NDF data structure/file that is to be 
 *        examined.
+*
 *     INFILE = _CHAR (Read)
 *        The name of the ASCII text file containing the image 
 *        co-ordinates and number of pixels to be used at each location 
 *        or the number of contiguous pixels found there by FOCAS or 
 *        IMAGES.  Co-ordinates are in the Current co-ordinate system
 *        of IN.
+*
+*        If two columns are present then these are
+*        taken as representing the image co-ordinates required for the 
+*        regions of the image to be considered.  Co-ordinates are in 
+*        the Current coordinate system of the NDF.  If there is a third
+*        column, it represents the area, in pixels, of a square
+*        centred on the co-ordinates (but see the documentation for the
+*        parameters THIRD and WIDTH below).
+*
 *     OUT = _CHAR (Read)
-*        The file name in which the results are stored in text form.  
+*        The file name in which the results are stored in text form.
+*
 *     SFACT = _INTEGER (Read)
 *        The Gaussian smoothing filter radius requested. This may be:
 *        - -1 to indicate that the application should automatically
@@ -68,33 +70,27 @@
 *        Values greater than LOB__SFLIM (see include file) are not 
 *        allowed.
 *        The value returned is that employed. Units counts.
+*
 *     THIRD = _LOGICAL (Read)
-*        Determines whether or not the third column found in 
-*        the text file specified using INFILE, contains the number
-*        of contiguous image pixels believed to be at that image 
-*        location, (THIRD = TRUE), or the number of screen pixels to be 
-*        taken from the image around the required location 
-*        (THIRD=FALSE).
-*       
-*         The value supplied via the third text column is used to 
-*         determine how big an area of image must be used when
-*         calculating the background. This is done by assuming
-*         that all the pixels in the object are in a square
-*         area and then determining the width of that area.
-*         The width used in the end is 3 times that of the
-*         object. 
-* 
-*        However, the WIDTH parameter 
-*        overrides this if less than 32x32 pixels (as defined by the 
-*        WIDTH parameter limits in the LOBACK.IFL file) are to be used. 
-*        This ensures that the histogram employed is reasonably well 
-*        filled under most circumstances.
+*        Determines whether or not the third column found in the INFILE
+*        contains the number of contiguous image pixels believed to be
+*        at that image location (THIRD=TRUE), or the number of screen
+*        pixels to be taken from the image around the required location
+*        (THIRD=FALSE).  Specifically, if THIRD=TRUE then the width
+*        obtained from the pixel-area in the file is multiplied by three.
+*
 *     WIDTH = _INTEGER (Read)
-*        The width of the square area of the image from which pixel
-*        values will be taken to construct the histogram. The minimum
-*        permitted value is 32 (as defined in the LOBACK.IFL file). 
-*        Units pixels.
-
+*        This parameter constrains any area obtained from the third
+*        column of the input file, and acts as a default if no such
+*        value exists.  If the width implied by that column value (that
+*        is, its square-root, with any adjustment implied by the value
+*        of the parameter THIRD) is less than WIDTH, then that
+*        width is replaced by WIDTH.  The default value for this
+*        parameter, and its minimum permitted value, is 32, giving a
+*        minimum pixel count of 1024 (32x32).  This ensures that the
+*        histogram employed is reasonably well filled under most
+*        circumstances.  Units pixels.
+*
 *  Examples:
 *     loback in=p2 infile=coords.dat sfact=0 third=true 
 *            out=backs.dat width=64
@@ -117,7 +113,7 @@
 *        into text file OUTPUT.DAT. Since THIRD is false, the third 
 *        column represent the lower limit of pixels to be taken from 
 *        the image to make up the histogram.
-
+*
 *  Notes:
 *     The current version will not accept a pixel value range greater 
 *     than the largest integer value possible. 
@@ -126,20 +122,24 @@
 *     limit by modifying the WIDTH parameter entry in the LOBACK.IFL 
 *     file. This action is only recommended for use with very flat 
 *     images.
-
+*
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     MBT: Mark Taylor (STARLINK)
+*     NG:  Norman Gray (Starlink, Glasgow)
 *     {enter_new_authors_here}
-
+*
 *  History:
 *     14-Jun-1993 (GJP)
-*     (Original version)
+*       (Original version)
 *     26-OCT-1999 (MBT):
-*     Modified to cope with COSYS=C.
+*       Modified to cope with COSYS=C.
 *     8-NOV-1999 (MBT):
-*     Removed COSYS altogether.
-
+*       Removed COSYS altogether.
+*     28-Nov-1999 (NG):
+*       Severe edit of documentation for third input column (which
+*       involves also parameters `third' and `width'), to match code.
+*
 *-
 
 *  Type Definitions:                  ! No implicit typing
@@ -576,6 +576,136 @@
 
 
       SUBROUTINE LOB1_FILER(FIOID,INDF,NGALS,XC,YC,NPIX,STATUS)
+*+
+*     LOB1_FILER
+*
+*  Purpose:
+*     Opens a user-specified text file and reads from it a list of
+*     coordinates and an optional width.
+*
+*      
+*  Language:
+*     Starlink Fortran 77
+*
+*  Invocation:
+*      CALL LOB1_FILER(FIOID,INDF,NGALS,XC,YC,NPIX,STATUS)    
+*
+*  Description: 
+*     Reads a file of position information from an open file, ignoring
+*     blank lines and lines starting with # or !.  Each position
+*     indicates the locations where galaxies may exist in the
+*     image. Each of these is to be profiled.
+*
+*     The file reading and parsing are done by routine esp1_farr, which
+*     checks that the input coordinates lie within the bounds of the
+*     image.  Co-ordinates are in the Current frame of INDF.  If it is
+*     found that the a co-ordinate pair is not within the bounds of the
+*     image, the values are not retained, otherwise the counter is
+*     incremented and the values stored in arrays XC and YC.
+*
+*     The co-ordinates obtained are returned in the arrays XC and YC. the
+*     number of co-ordinate pairs defined is assigned to NGALS.
+*
+*  Arguments:               
+*     FIOID = INTEGER (Given)
+*        FIO identifier for the input file.
+*     INDF = INTEGER (Given)
+*        NDF identifier for the image.
+*     NGALS = INTEGER (Returned)
+*        Number of galaxies to be profiled.
+*     XC(LOB__NGALS) = REAL (Returned)
+*        X co-ordinates (for galaxies) obtained from the text file.
+*     YC(LOB__NGALS) = REAL (Returned)
+*        Y co-ordinates (for galaxies) obtained from the text file.
+*     NPIX(LOB__NGALS) = INTEGER (Returned)
+*        Number of contiguous pixels at the required location or the
+*        number of pixels to be used in the histogram.  If there is no
+*        third column in the file, then this is returned as 1.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+*
+*  Authors:
+*     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
+*     NG:  Norman Gray (Starlink, Glasgow)
+*
+*  History:
+*     29-APR-1993 (GJP)
+*       (Original version)
+*     26-OCT-1999 (MBT)
+*       Modified to cope with COSYS=C.
+*     8-NOV-1999 (MBT)
+*       COSYS removed altogether.
+*     27-Nov-1999 (NG)
+*       Completely rewritten, with same interface, to use the esp1_farr
+*       routine. 
+*-
+
+*   Type definitions
+      implicit none             ! No implicit typing
+
+*   Global constants
+      include 'SAE_PAR'         ! Standard SAE constants
+      include 'FIO_ERR'         ! FIO error definitions
+      include 'lob_par'         ! LOBACK constants
+      include 'NDF_PAR'         ! NDF public constants
+
+*  Arguments Given:                              
+      integer fioid             ! FIO identifier for the input file
+      integer indf              ! NDF identifier for image
+
+*  Arguments returned:
+      integer ngals             ! The number of galaxies to be profiled
+      integer npix(lob__ngals)  ! The number of contiguous pixels at a 
+                                ! given location or the number of pixels
+                                ! to be used
+      real xc(lob__ngals)       ! X co-ordinates of the galaxy positions
+                                ! found from the file
+      real yc(lob__ngals)       ! Y co-ordinates of the galaxy positions
+                                ! found from the file
+
+*  Status:     
+      integer status            ! Global status
+      
+*   Local variables:
+      integer i                 ! A loop counter
+      real pos(lob__ngals,3)    ! Positions read from file
+      integer poslen(lob__ngals) ! Number of numbers read on line i
+      integer ncolmax, ncolmin  ! Max and min cols read
+
+*   Check inherited status
+      if (status .ne. sai__ok) return
+
+*   Call the routine which does all the hard work
+      call esp1_farr (fioid, indf, lob__ngals, 3, pos, poslen,
+     :     ncolmax, ncolmin, ngals, status)
+      
+      if (ncolmin .lt. 2) then
+*      At least one line had fewer than two numbers on it.
+*      Indicate that the file was badly formatted
+         status = sai__error
+         call err_rep (' ','loback: Bad file format: '//
+     :        'too few (convertible) numbers on line',status)
+      else
+
+*      Assign the read values to the result arrays
+         do i=1,ngals
+            xc(i) = pos(i,1)
+            yc(i) = pos(i,2)
+            if (poslen(i) .ge. 3) then
+               npix(i) = int(pos(i,3))
+            else
+               npix(i) = 1
+            endif
+            write (*,'("xc=",f10.1,"yc=",f10.1,"npix=",i5)')
+     :           xc(i),yc(i),npix(i)
+         enddo
+      endif                     ! if(ncolmin.lt.1)...
+      
+      end
+
+
+      SUBROUTINE LOB1_XFILER(FIOID,INDF,NGALS,XC,YC,NPIX,STATUS)
 *+
 *  Name:
 *     LOB1_FILER

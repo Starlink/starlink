@@ -105,11 +105,7 @@
       integer status            ! Global status
 
 *  Local variables:
-      logical abort             ! Has the maximum permitted number of
-                                ! galaxies been exceeded?
-      logical fail
       integer i                 ! A loop counter
-      integer j                 ! A loop counter  
       real pos(elp__ngals,4)    ! Positions read from file
       integer poslen(elp__ngals) ! Number of numbers read
       integer ncolmax, ncolmin  ! Max and min cols read
@@ -118,16 +114,15 @@
 *   Check the inherited global status.
       if (status.ne.sai__ok) return   
 
-*   Start an error context.   
-      call err_mark
-      
-      call esp1_farr (fioid, indf, 10, 4, pos, poslen, 
+*   Call the routine which does all the work      
+      call esp1_farr (fioid, indf, elp__ngals, 4, pos, poslen, 
      :     ncolmax, ncolmin, ngals, status)
 
       if (ncolmin .lt. 2) then
 *      At least one line had fewer than two numbers on it.
 *      Indicate that the file was badly formatted
-         call msg_out(' ','Bad file format.',status)
+         status = sai__error
+         call err_rep (' ','Bad file format.',status)
       else
 
 *      Assign the values to the arrays.
@@ -152,17 +147,11 @@
       endif
                   
 *   Display the error message if necessary. Also, tidy up the error system.
-      if (status.ne.sai__ok .and. status.ne.fio__eof) then
-         call err_rep( ' ','Errors found when reading the data file.',
-     :                status)
-         call err_flush( status )
-      else
-         call err_annul( status )
-      end if
+      if (status.ne.sai__ok) then
+         call msg_out(' ','Errors found when reading the data file.',
+     :        status)
+      endif
           
-*   End the error context.
-      call err_rlse
-
       end 
 
 * $Id$
