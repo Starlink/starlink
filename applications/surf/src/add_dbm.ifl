@@ -1,0 +1,71 @@
+## ADD_DBM - Create dual beam image from single beam input
+ 
+#+
+#  Name:
+#     ADD_DBM
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     Tim Jenness (JACH) 
+
+#  History:
+#     {enter_further_changes_here}
+ 
+#-
+ 
+   INTERFACE ADD_DBM
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+ 
+      PARAMETER CHOP
+         TYPE    '_REAL'
+        POSITION 2
+        PPATH 'Current' 
+        PROMPT  'Chop throw in pixels'
+      ENDPARAMETER
+
+      PARAMETER PA
+         POSITION 3
+         TYPE    '_REAL'
+        PPATH 'Current' 
+         PROMPT  'Chop position angle (degrees)'
+      ENDPARAMETER
+
+      PARAMETER IN
+         TYPE NDF
+         POSITION 1
+         ACCESS 'READ'
+         VPATH 'PROMPT'
+         PPATH 'Current'
+         PROMPT 'Single-beam input image'
+      ENDPARAMETER
+
+      PARAMETER OUT
+         TYPE    NDF
+         POSITION 4
+         ACCESS   'WRITE'
+         VPATH    'PROMPT'
+
+         ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         PROMPT  'Name of file to contain dual beam image'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER PIXSIZE
+        TYPE    '_REAL'
+        POSITION 5
+        PPATH 'Current' 
+        PROMPT  'Pixel size in arcsec'
+      ENDPARAMETER
+
+
+   ENDINTERFACE
+

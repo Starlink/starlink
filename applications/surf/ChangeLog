@@ -1,3 +1,13 @@
+1999-01-11  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_add_dbm.f (SURF_ADD_DBM): Create
+
+	* scripts/surf.icl: Add ADD_DBM
+
+	* scripts/surf.csh: Add ADD_DBM
+
+	* surflib/surflib_calc_dual_beam.f (SURFLIB_CALC_DUAL_BEAM): Create
+
 1998-12-18  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* sculib_put_fits_d.f (SCULIB_PUT_FITS_D): Add fix to convert 'D'

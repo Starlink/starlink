@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.30  1999/01/12 02:51:01  timj
+*     Add ADD_DBM
+*
 *     Revision 1.29  1998/11/24 21:57:06  timj
 *     Add REDUCE_NOISE
 *
@@ -150,9 +153,13 @@ c
 
       CALL TASK_GET_NAME (NAME, STATUS)
 
-      IF (NAME .EQ. 'BOLREBIN') THEN
+      IF (NAME .EQ. 'ADD_DBM') THEN
 
-         CALL SURF_REBIN (NAME, STATUS)
+         CALL SURF_ADD_DBM (STATUS)
+
+      ELSE IF (NAME .EQ. 'BOLREBIN') THEN
+         
+         CALL SURF_REBIN(NAME, STATUS)
 
       ELSE IF (NAME .EQ. 'CALCSKY') THEN
          

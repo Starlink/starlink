@@ -37,6 +37,8 @@
 {          CALCSKY, SCUBA2MEM, SCUMAKEWT
 {     20-Nov-1998 (TIMJ):
 {        Add REDUCE_NOISE
+{     11-Jan-1999 (TIMJ):
+{        Add ADD_DBM
 {
 {  Bugs:
 {     {note_any_bugs_here}
@@ -45,6 +47,7 @@
 
 defstring scuhelp help surf
 
+define add_dbm         $SURF_DIR/surf_mon
 define bolrebin        $SURF_DIR/surf_mon
 define calcsky         $SURF_DIR/surf_mon
 define change_quality  $SURF_DIR/surf_mon
@@ -102,6 +105,7 @@ defhelp skydip          $SURF_HELP
 
 { Define the full commands for SURF
 
+define surf_add_dbm         $SURF_DIR/surf_mon add_dbm
 define surf_bolrebin        $SURF_DIR/surf_mon bolrebin
 define surf_calcsky         $SURF_DIR/surf_mon surf_calcsky
 define surf_change_flat     $SURF_DIR/surf_mon change_flat

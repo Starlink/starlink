@@ -58,6 +58,7 @@
 #
 #  Define aliases for the applications.
 
+alias add_dbm         ${SURF_DIR}/add_dbm
 alias bolrebin        ${SURF_DIR}/bolrebin
 alias calcsky         ${SURF_DIR}/calcsky
 alias change_data     ${SURF_DIR}/change_data
@@ -85,6 +86,7 @@ alias scuphot         ${SURF_DIR}/scuphot
 alias scuover         ${SURF_DIR}/scuover
 alias skydip          ${SURF_DIR}/skydip
 
+alias surf_add_dbm         ${SURF_DIR}/add_dbm
 alias surf_bolrebin        ${SURF_DIR}/bolrebin
 alias surf_calcsky         ${SURF_DIR}/calcsky
 alias surf_change_data     ${SURF_DIR}/change_data

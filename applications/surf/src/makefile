@@ -53,7 +53,7 @@ FSOURCES= surf_extinction.f surf_flatfield.f \
 	surf_recurse_read.f surf_write_photom_header.f surf_scan_rlb.f\
 	surf_despike.f surf_scuclip.f surf_extflat.f \
 	surf_grid_despike.f surf_scuba2mem.f surf_make_weight.f \
-	surf_grid_calcsky.f surf_reduce_noise.f
+	surf_grid_calcsky.f surf_reduce_noise.f surf_add_dbm.f
 
 FCPPSOURCES=	surf_write_map_info.F
 
@@ -65,7 +65,9 @@ IFL=    extinction.ifl reduce_switch.ifl flatfield.ifl \
 	intrebin.ifl change_data.ifl extract_data.ifl scan_rlb.ifl\
 	scuhelp.ifl remsky.ifl scuover.ifl bolrebin.ifl restore.ifl\
 	despike.ifl scuclip.ifl extract_flat.ifl scuba2mem.ifl \
-	calcsky.ifl reduce_noise.ifl scumakewt.ifl despike2.ifl
+	calcsky.ifl reduce_noise.ifl scumakewt.ifl despike2.ifl \
+	add_dbm.ifl
+
 
 # Dont include $PKG_SRC since that should not be included
 # in tar file
@@ -77,7 +79,8 @@ PKG_OBJ = ${PKG_SRC:.f=.o}
 IFC  = ${IFL:.ifl=.ifc} ${PKG_IFL:.ifl=.ifc}
 
 EXTERNAL_INCLUDES = SAE_PAR MSG_PAR PRM_PAR NDF_FUNC DAT_PAR NDF_PAR \
-	PAR_ERR NUM_DEC_CVT AST_PAR PAR_PAR GRP_PAR GKS_PAR NUM_DEF_CVT
+	PAR_ERR NUM_DEC_CVT AST_PAR PAR_PAR GRP_PAR GKS_PAR NUM_DEF_CVT \
+	NDF_ERR
 
 LOCAL_INCLUDES = SURF_PAR
 
@@ -138,6 +141,7 @@ PRM_PAR:     $(STAR_INC)/prm_par;     $(LINK) $? $@
 NDF_FUNC:    $(STAR_INC)/ndf_func;    $(LINK) $? $@
 DAT_PAR:     $(STAR_INC)/dat_par;     $(LINK) $? $@
 NDF_PAR:     $(STAR_INC)/ndf_par;     $(LINK) $? $@
+NDF_ERR:     $(STAR_INC)/ndf_err;     $(LINK) $? $@
 PAR_ERR:     $(STAR_INC)/par_err;     $(LINK) $? $@
 NUM_DEC_CVT: $(STAR_INC)/num_dec_cvt; $(LINK) $? $@
 NUM_DEF_CVT: $(STAR_INC)/num_def_cvt; $(LINK) $? $@
@@ -177,7 +181,7 @@ surf_skydip.o: DAT_PAR MSG_PAR NDF_FUNC PAR_ERR PRM_PAR SAE_PAR SURF_PAR
 surf_write_data.o: PRM_PAR SAE_PAR
 surf_write_photom.o: PRM_PAR SAE_PAR
 surf_write_photom_header.o: PRM_PAR SAE_PAR SURF_PAR
-
+surf_add_dbm.o: SAE_PAR SURF_PAR NDF_ERR PAR_ERR DAT_PAR
 
 
 
