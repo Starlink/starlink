@@ -1,0 +1,34 @@
+This file describes how to create a downloadable and installable package
+for the Starlink Software Collection on OS X. For more information on
+distributing software for OS X, please see
+http://developer.apple.com/documentation/DeveloperTools/Conceptual/SoftwareDistribution/SoftwareDistribution.html
+
+1. Set the user:group of all files in the release tree to be root:wheel.
+   This step may not actually be necessary if you don't set up
+   PackageMaker to ask for authorization in the appropriate location.
+   See http://developer.apple.com/documentation/DeveloperTools/Conceptual/SoftwareDistribution/Concepts/sd_permissions_author.html
+   for further information and discussion about file ownership with respect
+   to Packages.
+
+2. Run up PackageMaker. You will need the Apple Developer Tools to get
+   this application, which can normally be found in
+   /Developer/Applications/Utilities, and are downloadable from Apple at
+   http://developer.apple.com/tools/download/ or found on your OS X 10.3
+   installation CDs.
+
+3. Load the Starlink PackageMaker project located in
+   buildsupport/osx/package/StarlinkPackage.pmsp
+
+4. Modify the appropriate information, specifically the version number and
+   the directory containing Resources. The latter should be set to
+   buildsupport/osx/package/Resources
+
+5. Create the package by File > Create Package, and save it into an empty
+   directory.
+
+6. Run up Disk Utility. This is normally found in /Applications/Utilities
+
+7. Create a new image from folder by Images > New > Image from Folder....
+   Select the folder that you saved the PackageMaker package in.
+
+You now have an OS X disk image that can be distributed.
