@@ -314,5 +314,18 @@ if grep '%%PREFIX%%' configure >/dev/null 2>&1; then
     echorun "sed -e s,%%PREFIX%%,$def, configure >configure.tmp && mv configure.tmp configure && chmod +x configure"
 fi
 
+# Run configure WITHOUT RECURSION to create a basic Makefile which
+# will allow us to invoke 'make configure-deps'.  NOTE: This option isn't
+# advertised in the help, so it may not be public.
+./configure --no-recursion
+
+# If there is a non-empty list of configure-deps in Makefile.dependencies,
+# then remind the user to make them.
+if grep '^configure-deps: *\\' Makefile.dependencies >/dev/null; then
+    echo "Run 'make configure-deps' before configuration"
+    echo "Then run './configure -C'"
+else
+    echo "Run './configure -C' to configure the entire tree"
+fi
 
 exit 0
