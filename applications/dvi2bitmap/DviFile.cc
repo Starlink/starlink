@@ -6,12 +6,15 @@
 
 #define NULL 0
 #include <iostream>
+#include <assert.h>
 
 //#if NO_CSTD_INCLUDE
 //#include <math.h>
 //#else
 //#include <cmath>
 //#endif
+
+
 
 #include "DviFile.h"
 #include "PkFont.h"
@@ -39,8 +42,8 @@ verbosities DviFile::verbosity_ = normal;
 DviFile::DviFile (string& s, int res, double magmag)
     : fileName_(s), pending_hupdate_(0), pending_hhupdate_(0),
       current_font_(0), dvif_(0), resolution_(res), magmag_(magmag),
-      magfactor_(1.0), skipPage_(false), iterOK_(false),
-      max_drift_(0)
+      magfactor_(1.0), skipPage_(false),
+      max_drift_(0), iterOK_(false)
 {
     PkFont::setResolution(res);
 
@@ -81,8 +84,12 @@ DviFileEvent *DviFile::getEndOfPage()
 // The last event it'll return is a DviFilePostamble event, and it'll return
 // 0 if called afterwards.
 //
-// If the flag skipPage_ is true, then skip until we find a `eop' event 
-// (number 140), and resume normal parsing.
+// If the flag skipPage_ is true, then keep processing the file, but
+// without returning an event.  The eop opcode (number 140) resets
+// skipPage_ to false.  We can't just scan for opcode 140 because (a)
+// we need to process font-changing commands, so that current_font is
+// correct at the start of the next page, and (b) we might just come
+// across byte 140 in data, which would mess us up big-time.
 DviFileEvent *DviFile::getEvent()
 {
     DviFileEvent *gotEvent = 0;	// non-zero when we've got an event
@@ -100,19 +107,11 @@ DviFileEvent *DviFile::getEvent()
 	pending_hupdate_ = pending_hhupdate_ = 0;
     }
 
-    // When we start, assume the next character is an opcode
-    while (! gotEvent)
+    // When we start, assume the next character is an opcode.  Keep
+    // looping until we both have an event, and skipPage_ is false.
+    while (skipPage_ || ! gotEvent)
     {
-	if (skipPage_)
-	{
-	    // ignore everything else on this page, until eop
-	    do
-		opcode = getByte();
-	    while (opcode != 140); // eop
-	    skipPage_ = false;
-	}
-	else
-	    opcode = getByte();
+	opcode = getByte();
 
 	int charno;
 	if (verbosity_ > normal)
@@ -230,6 +229,7 @@ DviFileEvent *DviFile::getEvent()
 #endif
 		    throw DviBug("EOP: position stack not empty");
 		gotEvent = new DviFilePage(false);
+		skipPage_ = false;
 		break;
 	      case 141:		// push
 		{
@@ -463,60 +463,6 @@ DviFileEvent *DviFile::getEvent()
 	      case 246:		// fnt_def4
 		check_duplicate_font (4);
 		break;
-		/*
-	      case 243:		// fnt_def1
-		fontDef.number = getSIU(1);
-		fontDef.checksum = getUIU(4);
-		fontDef.scale = getUIU(4);
-		fontDef.size = getUIU(4);
-		fontDef.fontdir = "";
-		fontDef.fontname = "";
-		for (int a = getSIU(1); a>0; a--)
-		    fontDef.fontdir += static_cast<char>(getByte());
-		for (int l = getSIU(1); l>0; l--)
-		    fontDef.fontname += static_cast<char>(getByte());
-		gotEvent = &fontDef;
-		break;
-	      case 244:		// fnt_def2
-		fontDef.number = getSIU(2);
-		fontDef.checksum = getUIU(4);
-		fontDef.scale = getUIU(4);
-		fontDef.size = getUIU(4);
-		fontDef.fontdir = "";
-		fontDef.fontname = "";
-		for (int a = getSIU(1); a>0; a--)
-		    fontDef.fontdir += static_cast<char>(getByte());
-		for (int l = getSIU(1); l>0; l--)
-		    fontDef.fontname += static_cast<char>(getByte());
-		gotEvent = &fontDef;
-		break;
-	      case 245:		// fnt_def3
-		fontDef.number = getSIU(3);
-		fontDef.checksum = getUIU(4);
-		fontDef.scale = getUIU(4);
-		fontDef.size = getUIU(4);
-		fontDef.fontdir = "";
-		fontDef.fontname = "";
-		for (int a = getSIU(1); a>0; a--)
-		    fontDef.fontdir += static_cast<char>(getByte());
-		for (int l = getSIU(1); l>0; l--)
-		    fontDef.fontname += static_cast<char>(getByte());
-		gotEvent = &fontDef;
-		break;
-	      case 246:		// fnt_def4
-		fontDef.number = getSIS(4);
-		fontDef.checksum = getUIU(4);
-		fontDef.scale = getUIU(4);
-		fontDef.size = getUIU(4);
-		fontDef.fontdir = "";
-		fontDef.fontname = "";
-		for (int a = getSIU(1); a>0; a--)
-		    fontDef.fontdir += static_cast<char>(getByte());
-		for (int l = getSIU(1); l>0; l--)
-		    fontDef.fontname += static_cast<char>(getByte());
-		gotEvent = &fontDef;
-		break;
-		*/
 	      case 247:		// pre
 		{
 		    DviFilePreamble *pre = new DviFilePreamble();
@@ -540,11 +486,14 @@ DviFileEvent *DviFile::getEvent()
 		// This shouldn't happen within getEvent
 		throw DviBug("post_post found in getEvent");
 	      default:
-		throw DviBug("unrecognised opcode in getEvent");
+		throw DviBug ("unrecognised opcode %d in getEvent", opcode);
 	    }
 	}
     }
+
+    assert (gotEvent != 0);
     gotEvent->opcode = opcode;
+
     return gotEvent;
 }
 
