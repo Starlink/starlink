@@ -44,7 +44,7 @@
       INTEGER NVAL                       ! number of values in object
       INTEGER OPTR                       ! pointer to mapped object
       INTEGER VPTR                       ! pointer to mapped values
-      INTEGER OBJID, VALID
+      INTEGER OBJID
       LOGICAL PRIM                       ! whether object primitive
 *    Internal References :
       LOGICAL HDX_SAMESHAPE,HDX_SAMETYPE,HDX_NUMERIC
@@ -81,9 +81,7 @@
           CALL DAT_TYPE(OBJLOC,TYPE,STATUS)
 
 *        get values from terminal or other data object
-          CALL USI_ASSOC('VAL','*','READ',VALID,STATUS)
-          CALL ADI1_GETLOC(VALID,VALOC,STATUS)
-
+          CALL USI_DASSOC('VAL','READ',VALOC,STATUS)
           IF (STATUS.EQ.SAI__OK) THEN
 
 *          objects must be same shape and both numeric or otherwise
