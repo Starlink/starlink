@@ -136,11 +136,11 @@ to need explanation or elaboration.
   (let ((is-compact? (attribute-string (normalize "compact")
 				       (parent (current-node)))))
     (make sequence
-      (make empty-command name: "item"
-	    parameters: (list (string-append "?" (data (current-node)))))
+      (make command name: "DTitem"
+	    (process-children))
       (if is-compact?
 	  (empty-sosofo)
-	  (make fi data: "\\\\")))))
+	  (make fi data: "\\hfill\\\\")))))
 
 (element dd
   (process-children))
