@@ -8,7 +8,7 @@ INTERFACE SSANOT
    endparameter
    parameter LIST
      position 2
-     type 'LITERAL'
+     type 'UNIV'
      association '<-GLOBAL.SSDS'
      PPATH 'GLOBAL'
      HELP 'The sources contained in this dataset will be marked on the graphics dataset'
