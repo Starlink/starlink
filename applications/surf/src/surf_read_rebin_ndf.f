@@ -263,6 +263,7 @@
                                        ! occurred
       INTEGER          LAST_MEAS       ! measurement during which abort
                                        ! occurred
+      INTEGER          LBND(MAX_DIM)   ! Lower bounds of NDF section
       REAL             MAP_X           ! x offset of map centre from telescope
                                        ! centre (radians)
       REAL             MAP_Y           ! y offset of map centre from telescope
@@ -310,6 +311,7 @@
       REAL             SAMPLE_PA       ! position angle of sample x axis
                                        ! relative to x axis of SAMPLE_COORDS
                                        ! system
+      INTEGER          SECNDF          ! Section identifier
       LOGICAL          SCAN_REVERSAL   ! Are we using SCAN_REVERSAL?
       CHARACTER*80     SCUCD_STATE     ! 'state' of SCUCD at the end of
                                        ! the observation
@@ -320,6 +322,7 @@
                                           ! array that has 1 for
                                           ! switches selected by
                                           ! data-spec, 0 otherwise
+      INTEGER          UBND(MAX_DIM)   ! Upper bounds of NDF section
       LOGICAL          USE_INTS        ! How to use the specified ints
       REAL             WAVELENGTH      ! the wavelength of the map (microns)
 *.
@@ -381,6 +384,7 @@
       IF ((OBSERVING_MODE .NE. 'MAP')      .AND.
      :     (OBSERVING_MODE .NE. 'FOCUS')    .AND.
      :     (OBSERVING_MODE .NE. 'ALIGN')    .AND.
+     :     (OBSERVING_MODE .NE. 'PHOTOM')    .AND.
      :     (OBSERVING_MODE .NE. 'POINTING')) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
@@ -390,6 +394,13 @@
             RETURN
          END IF
       END IF
+
+      IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUTIF(MSG__QUIET, ' ', '^PKG: WARNING! The PHOTOM '//
+     :        'data will not provide a fully-sampled image', STATUS)
+      END IF
+
 
 *     check that the history of the file is OK
 
@@ -615,13 +626,67 @@
          END IF
       END IF
 
-*     map the various components of the data array and check the data
-*     dimensions
+*     Find the dimensions of the data array
 
       CALL NDF_DIM (IN_NDF, MAX_DIM, DIM, NDIM, STATUS)
 
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+            IF ((NDIM .NE. 3)                  .OR.
+     :          (DIM(1) .LT. 1)         .OR.
+     :          (DIM(2) .LT. 1)                .OR.
+     :          (DIM(3) .NE. SCUBA__MAX_BEAM)) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETI ('NDIM', NDIM)
+               CALL MSG_SETI ('DIM1', DIM(1))
+               CALL MSG_SETI ('DIM2', DIM(2))
+               CALL MSG_SETI ('DIM3', DIM(3))
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: main data '//
+     :           'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2 '//
+     :           '^DIM3', STATUS)
+            END IF
+         ELSE
+            IF ((NDIM .NE. 2)    .OR.
+     :           (DIM(1) .LT. 1)  .OR.
+     :           (DIM(2) .LT. 1)) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETI ('NDIM', NDIM)
+               CALL MSG_SETI ('DIM1', DIM(1))
+               CALL MSG_SETI ('DIM2', DIM(2))
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: data array '//
+     :              'has bad dimensions (^NDIM) ^DIM1, ^DIM2', STATUS)
+            END IF
+         END IF
+      END IF
+
+      N_BOL = DIM (1)
+      N_POS = DIM (2)
+
+
+*     Get an NDF identifier for an NDF section
+*     Do this so that I can deal with photometry 'images'
+
+*     Define a base section
+      LBND(1) = 1
+      LBND(2) = 1
+      UBND(1) = N_BOL
+      UBND(2) = N_POS
+      UBND(3) = 2
+      LBND(3) = 2   ! Use middle beam data
+
+*      NDIM = 2
+*      IF (OBSERVING_MODE .EQ. 'PHOTOM') NDIM = 3
+
+*     Get the section
+      CALL NDF_SECT(IN_NDF, NDIM, LBND, UBND, SECNDF, STATUS)
+
+*     Map the data and variance
+
       CALL NDF_SQMF(.TRUE., IN_NDF, STATUS)
-      CALL NDF_MAP (IN_NDF, 'DATA', '_REAL', 'READ', 
+      CALL NDF_SQMF(.TRUE., SECNDF, STATUS)
+      CALL NDF_MAP (SECNDF, 'DATA', '_REAL', 'READ', 
      :     FILE_DATA_PTR, ITEMP, STATUS)
 
 *     Need to check if FIGARO has removed the VARIANCE array
@@ -630,7 +695,7 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF (STATE) THEN
-            CALL NDF_MAP (IN_NDF, 'VARIANCE', '_REAL', 'READ',
+            CALL NDF_MAP (SECNDF, 'VARIANCE', '_REAL', 'READ',
      :           FILE_VARIANCE_PTR, ITEMP, STATUS)
          ELSE
             CALL MSG_SETC('TASK', TSKNAME)
@@ -648,23 +713,6 @@
          END IF               
       END IF
       
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF ((NDIM .NE. 2)    .OR.
-     :        (DIM(1) .LT. 1)  .OR.
-     :        (DIM(2) .LT. 1)) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI ('NDIM', NDIM)
-            CALL MSG_SETI ('DIM1', DIM(1))
-            CALL MSG_SETI ('DIM2', DIM(2))
-            CALL MSG_SETC('TASK', TSKNAME)
-            CALL ERR_REP (' ', '^TASK: data array '//
-     :           'has bad dimensions (^NDIM) ^DIM1, ^DIM2', STATUS)
-         END IF
-      END IF
-
-      N_BOL = DIM (1)
-      N_POS = DIM (2)
-
 *     map the DEM_PNTR and LST arrays and check their dimensions
 
       CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
@@ -782,6 +830,10 @@
      :        %VAL(VARIANCE_PTR), IERR, NERR, STATUS)
 
       END IF
+
+*     Annul the NDF section
+      CALL NDF_UNMAP(SECNDF, '*', STATUS)
+      CALL NDF_ANNUL(SECNDF, STATUS)
 
 *     SCUBA SECTION
 *     If there a SCUBA section has been specified then we need to apply it
