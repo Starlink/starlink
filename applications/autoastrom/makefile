@@ -1301,7 +1301,12 @@ $(CATLIBINSTALLDIR)/stamp:
 
 # Unpack match.
 $(MATCHPROG)/Makefile:
-	test -f $(MATCHPROG).tar
+	@ if test -f $(MATCHPROG).tar; then \
+	    echo "Found $(MATCHPROG).tar"; \
+	else \
+	    echo "!!! Can't find $(MATCHPROG).tar -- download it from http://stupendous.cis.rit.edu/richmond/#software"; \
+	    false; \
+	fi
 	test -d $(MATCHPROG) || $(TAR_OUT) $(MATCHPROG).tar
 	cd $(MATCHPROG) && $(CONFENVS) ./configure
 
