@@ -100,6 +100,7 @@
 *     MD: Mike Denby (University of Leicester)
 *     RDS: Richard Saxton (Starlink, University of Leicester)
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -127,6 +128,8 @@
 *        Don't upper case mask name
 *      7 Dec 1995 V2.0-0 (DJA):
 *        ADI port. Several ghastly bugs in quality handling fixed.
+*      8 Oct 1997 V2.2-0 (RB):
+*        Increase MASK size to 1024
 *     {enter_changes_here}
 
 *  Bugs:
@@ -151,7 +154,7 @@
 
 *  Local Constants:
       INTEGER                   NMASK,NMAX
-        PARAMETER               ( NMASK = 256 )
+        PARAMETER               ( NMASK = 1024 )
         PARAMETER               ( NMAX = 16384 )
 
       CHARACTER*30		VERSION
@@ -429,9 +432,10 @@
             IF (STATUS .NE. SAI__OK) GOTO 99
 
 *      Width ok?
-	    IF ( WDTH .GT. 64.0 ) THEN
+	    IF ( WDTH .GT. NMASK/4 ) THEN
+              CALL MSG_SETI( 'MAX', NMASK/4 )
 	      CALL MSG_PRNT('SMOOTH Error: WIDTH too large '/
-     :                           /'must be less than 65')
+     :                           /'must be less than ^MAX')
               CALL USI_CANCL('MSK_WIDTH',STATUS)
             ELSE
               JUMPOUT=.TRUE.
@@ -662,9 +666,9 @@
         INTEGER START1,END1,START2,END2 !Pixel range to fine mean end
         REAL START_DATA,END_DATA        !Value to use at both ends
         REAL START_ERR,END_ERR          !ERROR to use at both ends
-	REAL EBUF(-256:NWORK+256)        ! Workspace
-        REAL ABUF(-256:NWORK+256)        ! Workspace
-        LOGICAL QBUF(-256:NWORK+256)        ! Workspace
+	REAL EBUF(-LMASK:NWORK+LMASK)        ! Workspace
+        REAL ABUF(-LMASK:NWORK+LMASK)        ! Workspace
+        LOGICAL QBUF(-LMASK:NWORK+LMASK)        ! Workspace
 	REAL RES(NWORK)                  ! Workspace
         REAL ERES(NWORK)                 ! Workspace
         REAL ETEMP(NWORK)                ! Workspace
@@ -791,7 +795,7 @@
 *        Fill out start with first value and end with last value
             CALL SMOOTH_SETENDS( EMETH, START1, END1, START2, END2,
      :                    START_DATA, END_DATA, START_ERR, END_ERR,
-     :                 NWORK, LM2, LDIM, QBUF, ABUF, EBUF, STATUS )
+     :          NWORK, LMASK, LM2, LDIM, QBUF, ABUF, EBUF, STATUS )
 
 *        Do the crosscorrelation
 	    CALL SMOOTH_CORR(ABUF(1-(LM2-1)),RMASK,LMASK,LDIM,RES)
@@ -857,7 +861,7 @@
 *+  SMOOTH_SETENDS - Obtain option for dealing with the ends of the data.
       SUBROUTINE SMOOTH_SETENDS( EMETH, START1, END1, START2, END2,
      &                START_DATA, END_DATA, START_ERR, END_ERR, NVAL,
-     &                LM2, LDIM, QBUF, ABUF, EBUF, STATUS )
+     &                LMASK, LM2, LDIM, QBUF, ABUF, EBUF, STATUS )
 *    Description :
 *     Obtains from the user which ENDS option is to be used, and takes
 *     appropriate action.
@@ -891,12 +895,13 @@
       INTEGER START2,END2               ! Pixels to use in finding mean
       REAL START_DATA,END_DATA          ! Data Value to use at each end
       REAL START_ERR,END_ERR            ! Error Value to use at each end
-      INTEGER                NVAL                                       ! No of data values.
+      INTEGER                NVAL       ! No of data values.
+      INTEGER		     LMASK	! Size of smoothing mask
       INTEGER LM2,LDIM
-      LOGICAL                QBUF(-256:NVAL+256)                              ! Mapped DATA_QUALITY.
+      LOGICAL                QBUF(-LMASK:NVAL+LMASK)                    ! Mapped DATA_QUALITY.
 *    Import-Export :
-      REAL                   ABUF(-256:NVAL+256)                               ! Mapped data array.
-      REAL                   EBUF(-256:NVAL+256)                              ! Mapped DATA_ERROR.
+      REAL                   ABUF(-LMASK:NVAL+LMASK)                    ! Mapped data array.
+      REAL                   EBUF(-LMASK:NVAL+LMASK)                    ! Mapped DATA_ERROR.
 
 *  Status:
       INTEGER			STATUS             	! Global status
