@@ -28,9 +28,13 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council
 
+*  Notes:
+*     - On unsupported platforms this function return 0.
+      
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     PWD: Peter W. Draper (Starlink, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -40,6 +44,8 @@
 *        Changed IMPORT and EXPORT macros to GENPTR.
 *     23-JUN-2000 (AJC):
 *        Remove refs to VMS in prologue
+*     20-JUL-2004 (PWD):
+*        Added default behaviour for unsupported platforms.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -81,7 +87,9 @@ F77_SUBROUTINE(psx_geteuid)( INTEGER(uid), INTEGER(status) )
    if( *status != SAI__OK ) return;
 
 /* Get the effective user ID.						    */
-
+#if HAVE_GETEUID
    *uid = (F77_INTEGER_TYPE)geteuid();
-
+#else
+   *uid = (F77_INTEGER_TYPE)0;
+#endif
 }

@@ -27,6 +27,16 @@ AC_CHECK_FUNCS([getpwuid geteuid getlogin cuserid])
 AC_CHECK_DECLS([cuserid])
 AC_CHECK_FUNCS([setenv])
 AC_CHECK_FUNCS([getenv])
+AC_CHECK_FUNCS([uname])
+AC_CHECK_FUNCS([getppid])
+AC_CHECK_FUNCS([getgid])
+AC_CHECK_FUNCS([getegid])
+AC_CHECK_FUNCS([getuid])
+AC_CHECK_FUNCS([ttyname])
+
+dnl    MinGW Windows libraries and functions. Checking for the functions,
+dnl    fails (not enough like UNIX) so must check for the declaration only.
+AC_CHECK_DECLS([GetUserName],,,[#include <windows.h>])
 
 AC_PROG_LIBTOOL
 

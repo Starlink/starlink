@@ -28,7 +28,7 @@
 *        username is performed. Since there can be several usernames
 *        associated with a user ID, there is no guarantee that the value
 *        returned will be unique.
-*     -  The Unix function cuserid is no longer in the IEEE 1003.1-1990 
+*     -  The Unix function cuserid is no longer in the IEEE 1003.1-1990
 *        standard, so an alternative to this routine is used if available.
 *        with getpwuid being preferred over getlogin over cuserid.
 *     -  If the system call can not obtain a user ID, the value of LOGNAME
@@ -37,6 +37,8 @@
 *        exists.
 *     -  If the first attempt to get the username fails, one more attempt
 *        is made. This overcomes an occasional (timing?) problem on Linux.
+*
+*     -  Under MinGW (Windows) the GetUserName function is used.
 
 *  External Routines Used:
 *     cnf: cnfExprt
@@ -44,13 +46,15 @@
 *  References:
 *     -  POSIX standard (1988), section 4.2.4
 *     -  POSIX standard (1990), section B.4.2.4
-      
+
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council
 
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC)
+*     PWD: Peter W. Draper (Starlink, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -78,6 +82,10 @@
 *        Use configure to decide which low level routine to use to obtain
 *        the userid. Prefer getpwuid over getlogin over cuserid.
 *        Use LOGNAME and USER env vars if we can not get a value.
+*     20-JUL-2004 (PWD):
+*        Add check for GetUserName function. This is the equivalent
+*        for Windows and MinGW. Should only try to use this when all others
+*        have failed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -111,11 +119,19 @@
 #     if HAVE_CUSERID
 #        define USE_CUSERID
 #        if !HAVE_DECL_CUSERID
-/* cuserid is no longer in 1003.1-1990 */
-extern char *cuserid( const char *); 
+            /* cuserid is no longer in 1003.1-1990 */
+extern char *cuserid( const char *);
 #        endif
 #     else
-#        error "No supported cuserid equivalent on this system"
+         /* We may be trying to build under MinGW, in which case we use the
+            Windows function GetUserName */
+#        if defined HAVE_DECL_GETUSERNAME && HAVE_DECL_GETUSERNAME
+#           define USE_GETUSERNAME
+#           include <windows.h>
+#           define L_cuserid MAX_PATH
+#        else
+#           error "No supported cuserid equivalent on this system"
+#        endif
 #     endif
 #  endif
 #endif
@@ -132,13 +148,19 @@ F77_SUBROUTINE(psx_cuserid)( CHARACTER(user), INTEGER(status) TRAIL(user) )
 
 #ifdef USE_CUSERID
    char tempuser[L_cuserid];	 /* Array to hold username		    */
+#else 
+#ifdef USE_GETUSERNAME
+   char tempuser[L_cuserid];	 /* Array to hold username		    */
+   DWORD len = L_cuserid;        /* Maximum length of username */
 #else
    char tempuser[2];             /* Array to hold defaulted string */
+#endif
 #endif
    char *p_tempuser = NULL;	 /* Return value of calling cuserid	    */
 #ifdef USE_GETPWUID
    struct passwd * pw;
 #endif
+
 
 /* Check the inherited global status.					    */
 
@@ -165,6 +187,14 @@ F77_SUBROUTINE(psx_cuserid)( CHARACTER(user), INTEGER(status) TRAIL(user) )
    p_tempuser = cuserid( tempuser );
    if ( p_tempuser == NULL ) {
       p_tempuser = cuserid( tempuser );
+   }
+#endif
+
+#ifdef USE_GETUSERNAME
+   /* Use Windows function when operating under MinGW */
+   p_tempuser = tempuser;
+   if ( ! GetUserName( tempuser, &len ) ) {
+       p_tempuser = NULL;
    }
 #endif
 

@@ -26,6 +26,7 @@
 *     -  If a program that calls this routine is run several times,
 *        then unlike GETPID, it will always return the same process ID
 *        as all the processes will have the same parent.
+*     -  If getppid isn't supported on this OS then zero is always returned.
 
 *  References:
 *     -  POSIX standard (1988), section 4.1.1
@@ -36,6 +37,7 @@
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     PWD: Peter W. Draper (Starlink, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -45,6 +47,9 @@
 *        Changed IMPORT and EXPORT macros to GENPTR.
 *     23-JUN-2000 (AJC):
 *        Remove refs to VMS in prologue
+*     20-JUL-2004 (PWD):
+*        Add check for getppid function on host OS. If not available
+*        return 0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -86,7 +91,9 @@ F77_SUBROUTINE(psx_getppid)( INTEGER(pid), INTEGER(status) )
    if( *status != SAI__OK ) return;
 
 /* Get the parent process ID.						    */
-
+#if HAVE_GETPPID
    *pid = (F77_INTEGER_TYPE)getppid();
-
+#else 
+   *pid = (F77_INTEGER_TYPE)0;
+#endif
 }

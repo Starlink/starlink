@@ -85,13 +85,14 @@
 ----------------------------------------------------------------------------
 */
 
+#include <config.h>
 
 /* Global Constants:							    */
 
 #if defined(vms)
 #include <ssdef.h>		 /* VMS system services			    */
 #include <syidef.h>		 /* VMS codes for system services	    */
-#else
+#elif HAVE_UNAME
 #include <stdlib.h>		 /* Standard library			    */
 #include <string.h>		 /* String handling library		    */
 #include <sys/utsname.h>
@@ -126,7 +127,7 @@ F77_SUBROUTINE(psx_uname)( CHARACTER(sysname),
    GENPTR_INTEGER(status)
 
 
-#if !defined(vms)
+#if !defined(vms) && HAVE_UNAME
 /*-------------------   Normal executable code   ---------------------------*/
 
 /* Structure Declarations:						    */
@@ -173,9 +174,6 @@ F77_SUBROUTINE(psx_uname)( CHARACTER(sysname),
       psx1_rep_c( "PSX_UNAME_ERR",
          "Error in call to C run time library function uname", status );
    }
-
-}
-
 
 #elif defined(vms)
 /*-------------------   Executable code for VMS  ---------------------------*/
@@ -267,7 +265,22 @@ F77_SUBROUTINE(psx_uname)( CHARACTER(sysname),
          "Error in call to C run time library function uname", status );
    }
 
-}
+#else
 
+/* Not VMS and system doesn't have a uname function. Not much we can do. */
+/* If this is Windows (probably MinGW) we could try harder and look at  */
+/* GetSystemInfo, GetVersion etc. if the need arises. */ 
+
+  if( *status != SAI__OK ) return;
+
+   cnfExprt( " ", sysname, sysname_length );
+   cnfExprt( " ", nodename, nodename_length );
+   cnfExprt( " ", release, release_length );
+   cnfExprt( " ", version, version_length );
+   cnfExprt( " ", machine, machine_length );
+   *status = SAI__ERROR;
+   psx1_rep_c( "PSX_UNAME_ERR",
+       "PSX_UNAME not supported on this platform", status );
 
 #endif
+}

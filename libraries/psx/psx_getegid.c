@@ -24,6 +24,9 @@
 
 *  References:
 *     -  POSIX standard (1988), section 4.2.1
+
+*  Notes:
+*     - On unsupported platforms this function returns 0.
       
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council
@@ -31,6 +34,7 @@
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     PWD: Peter W. Draper (Starlink, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -40,6 +44,8 @@
 *        Changed IMPORT and EXPORT macros to GENPTR.
 *     23-JUN-2000 (AJC):
 *        Remove refs to VMS in prologue
+*     20-JUL-2004 (PWD):
+*        Added default behaviour for unsupported platforms.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -81,7 +87,9 @@ F77_SUBROUTINE(psx_getegid)( INTEGER(gid), INTEGER(status) )
    if( *status != SAI__OK ) return;
 
 /* Get the effective group ID.						    */
-
+#if HAVE_GETEGID
    *gid = (F77_INTEGER_TYPE)getegid();
-
+#else
+   *gid = (F77_INTEGER_TYPE)0;
+#endif   
 }

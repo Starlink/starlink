@@ -31,6 +31,7 @@
 *  Notes:
 *     -  If a terminal name is not found, then a blank string is
 *        returned in TNAME.
+*     -  Under MinGW the name "CON" is always returned.
 
 *  External Routines Used:
 *     cnf: cnfExprt
@@ -44,6 +45,7 @@
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     PWD: Peter W. Draper (Starlink, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -54,6 +56,9 @@
 *     23-JUN-2000 (AJC):
 *        Tidy refs to CNF routines
 *        Remove refs to VMS in prologue
+*     20-JUL-2004 (PWD):
+*        Added default behaviour (for when ttyname isn't defined) and
+*        return for MinGW.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -62,6 +67,8 @@
 *-
 ------------------------------------------------------------------------------
 */
+
+#include <config.h>
 
 /* Global Constants and External Functions.				    */
 
@@ -96,23 +103,34 @@ F77_SUBROUTINE(psx_ttyname)( INTEGER(fildsc), CHARACTER(tname),
 /* Get the terminal name.						    */
 
 #if defined(vms)
-   if( ( *fildsc >= 0 ) && ( *fildsc <= 2 ) )
+   if( ( *fildsc >= 0 ) && ( *fildsc <= 2 ) ) {
       name = ttyname();
-   else
+   }
+   else {
       name = 0;
-#else
+   }
+
+#elif HAVE_TTYNAME
    name = ttyname(*fildsc);
+   /* Easiest way to check for MinGW is by looking for __MINGW32__ */
+
+#elif __MINGW32__
+   name = "CON";
+
+#else
+   name = NULL;
+
 #endif
 
 /* Export the C string to a FORTRAN string. If there is no terminal name,   */
 /* export a blank string.						    */
 
-   if( name )
+   if( name ) {
       cnfExprt( name, tname, tname_length );
+   }
    else
    {
       cnfExprt( " ", tname, tname_length );
-      
    }
 
 }
