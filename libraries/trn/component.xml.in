@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/trn</path>
+  <description>TRANSFORM - Coordinate Transformation Facility</description>
+  <abstract><p> TRANSFORM provides a standard, flexible method for
+  manipulating coordinate transformations and for transferring
+  information about them between applications.  It can handle
+  coordinate systems with any number of dimensions and can efficiently
+  process large (i.e. image-sized) arrays of coordinate data using a
+  variety of numerical precisions.  No specific support for
+  astronomical coordinate transformations or map projections is
+  included -- these features are provided by the AST (SUN/210)
+  library.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
