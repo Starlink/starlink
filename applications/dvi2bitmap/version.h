@@ -1,1 +1,1 @@
-const char version_string[] = "dvi2bitmap 1.0-5";
+const char version_string[] = "dvi2bitmap 1.0-5 (dev)";
