@@ -148,6 +148,7 @@
 #     PTW: P.T.Wallace (Starlink, RAL)
 #     BLY: M.J.Bly (Starlink, RAL)
 #     AJC: A.J.Chipperfield (Starlink, RAL)
+#     NG: Norman Gray (Starlink, Glasgow)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -239,6 +240,9 @@
 #        Several fixes to mismatched data types and precisions in
 #           various routines.  Fix to uninitialised variable and illegal
 #           format specifiers (Linux).   Version 3.3-3
+#     05-JUL-1999 (NG):
+#        Added sun152.htx target.  Brought sources into CVS.  Fixed
+#        controls on OPEN statements (unsupported by g77).  Version 3.3-4
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -433,7 +437,7 @@ PKG_LINK = ECHOMOP
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 3.3-3
+PKG_VERS = 3.3-4
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -829,6 +833,12 @@ $(MONOLITH).ifl: $(IFL_FILES)
 
 .ifl.ifc:
 	$(STAR_BIN)/compifl $<
+
+#  HTX: build the star2html documentation
+#  --------------------------------------
+sun152.htx: sun152.tex
+	star2html sun152
+
 
 #  Rule and dependencies for building the database task.
 ech_ftrdb: ech_ftrdb.o $(OBJECT_LIBRARIES)
@@ -1649,7 +1659,7 @@ $(PKG_NAME)_source.tar:
 	   ech_tuner.f ech_decos1.f \
 	   ech_decos2.f $(MONO_SOURCE) $(HELPTASK_SOURCE)
 
-$(HYPERTEXT_DOCS:.htx=.htx_tar):
+$(HYPERTEXT_DOCS:.htx=.htx_tar): $(HYPERTEXT_DOCS)
 	$(TAR_IN) $@ $(@:.htx_tar=.htx)
 
 $(PKG_NAME)_arc.tar:
@@ -1711,6 +1721,7 @@ strip:
 	strip ech_scrn2d
 	strip $(HELPTASK)
 	@ echo '*** Monolith stripped'
+
 
 #-------------------------------------------------------------------------------
 
