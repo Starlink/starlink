@@ -22,13 +22,18 @@
 #     MAXPOS = integer (Given)
 #        The maximum number of points which may be selected on any of
 #        the NDFs.
-#     NDFNAMES = list of strings (Given)
-#        A list of strings giving the name of each of the NDFs which is
-#        to be presented to the user for point selection.
+#     NDFSETS = list of lists (Given)
+#        Each element of this list represents a set of NDFs which is
+#        to be presented to the user for aligning using this script.
+#        The format of each element is {setname ndfname ?ndfname ...?}.
+#        The setname is a text name of each set which is to be presented
+#        to the user (it may be blank, in which case the name of the
+#        first NDF will be used), and each ndfname is the name of one 
+#        of the NDFs which is to be a member of that set.  
 #     NPOINT = list of integers (Returned)
-#        The number of points for each image.  The Nth entry in this
-#        list contains the number of points selected for the Nth NDF 
-#        in the NDFNAMES variable.
+#        The number of points for each set.  The Nth entry in this
+#        list contains the number of points selected for the Nth set 
+#        in the NDFSETS variable.
 #     PERCHI = real (Given and Returned)
 #        The percentile of the data above which all values should be
 #        plotted as the same colour.  Must be between 0 and 100.
@@ -37,13 +42,16 @@
 #        plotted as the same colour.  Must be between 0 and 100.
 #     POINTS = list of lists of lists (Returned)
 #        The points selected on the images.  The Nth entry in this list
-#        contains data for the Nth NDF in the NDFNAMES variable.
+#        contains data for the Nth set in the NDFSETS variable.
 #        The entry for each NDF is a list containing one entry for each 
 #        selected point.  The entry for each point is a three-element
 #        list containing the point index number, X coordinate and 
-#        Y coordinate respectively.
-#     REFPOS = integer (Given)
-#        The position in the list NDFNAMES of the NDF to be used as the
+#        Y coordinate respectively.  The X and Y coordinates are given
+#        in Pixel coordinates if the corresponding element was a single
+#        NDF (the ndfset had only one member) and in CCD_SET coordinates
+#        if the corresponding ndfset had more than one member.
+#     REFSET = integer (Given)
+#        The position in the list NDFSETS of the set to be used as the
 #        reference image (the first image in the list has index 0).
 #     WINX = integer (Given and Returned)
 #        X dimension of the window used for NDF display.
@@ -59,15 +67,16 @@
 #  History:
 #     24-JUL-2000 (MBT):
 #        Original version.
+#     5-APR-2001 (MBT):
+#        Upgraded for use with Sets.
 #-
 
 #  Sort out arguments.
       set title CCDALIGN
-      set refndfname [ lindex $NDFNAMES $REFPOS ]
-      set ref $REFPOS
-      set ndfnames $NDFNAMES
-      set nndf [ llength $ndfnames ]
-      set nother [ expr $nndf - 1 ]
+      set ref $REFSET
+      set ndfsets $NDFSETS
+      set nndfset [ llength $ndfsets ]
+      set nother [ expr $nndfset - 1 ]
 
 #  Set defaults for some arguments.
       foreach pair { { ZOOM 1 } { WINX 300 } { WINY 300 } { PERCLO 5 } \
@@ -96,8 +105,8 @@
       ccdputs "  "
 
 #  Construct and tweak the viewer for the reference NDF.
-      set refndf [ ndf $refndfname ]
-      Ndfview .vref \
+      set refndfset [ eval ndfset [ lindex $ndfsets $ref ] ]
+      ndfview .vref \
                   -title "$title: %n (reference)" \
                   -watchstatus status$ref \
                   -percentiles [ list $PERCLO $PERCHI ] \
@@ -124,8 +133,8 @@
       .vref configure -helptext [ join $helplines "\n" ]
 
 #  Load the reference NDF into the viewer.
-      .vref loadndf $refndf $MAXCANV
-      ccdputs -log "  Mark points on the reference image, [ $refndf name ]:"
+      .vref loadndf $refndfset $MAXCANV
+      ccdputs -log "  Mark points on the reference image, [ $refndfset name ]:"
 
 #  Get the user to pick points.
       .vref activate
@@ -229,21 +238,21 @@
 #  Exclude the reference NDF, since that one stays posted all the time.
       set i 0
       set done 0
-      foreach ndfname $ndfnames {
+      foreach ndfset $ndfsets {
          if { $i != $ref } {
             incr done
 
 #  Configure the viewer.
-            set ndf [ ndf [ lindex $ndfnames $i ] ]
+            set ndfset [ eval ndfset [ lindex $ndfsets $i ] ]
             .v configure -title "$title: %n (#$done/$nother)"
             .v clearpoints
-            .v loadndf $ndf $MAXCANV
+            .v loadndf $ndfset $MAXCANV
             if { $done == 1 && $setposition } { 
                wm deiconify .v
                wm geometry .v $geometry
             }
             ccdputs -log \
-            "  Mark points on image #$done/$nother, [ $ndf name ]:"
+            "  Mark points on image #$done/$nother, [ $ndfset name ]:"
 
 #  Activate the viewer and get the user to mark points.  Ensure that he/she
 #  doesn't hit the exit button accidentally without marking any points.
@@ -264,7 +273,7 @@
             set pts($i) [ .v points ]
 
 #  Tidy up.
-            $ndf destroy
+            $ndfset destroy
          }
          incr i
       }
@@ -276,14 +285,14 @@
       if { [ llength $pts($ref) ] != $npref } {
          set npref [ llength $pts($ref) ]
          ccdputs -log \
-            "  Changes made to reference image, [ $refndf name ]:"
+            "  Changes made to reference image, [ $refndfset name ]:"
          ccdputs -log \
             "    $npref points marked in total."
          ccdputs -log "  "
       }
 
 #  Construct the list of all points for return to calling program.
-      for { set i 0 } { $i < $nndf } { incr i } {
+      for { set i 0 } { $i < $nndfset } { incr i } {
          lappend POINTS $pts($i)
          lappend NPOINT [ llength $pts($i) ]
       }
