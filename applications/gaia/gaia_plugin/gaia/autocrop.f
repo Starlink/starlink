@@ -36,11 +36,11 @@
 *        The output image.
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     2-DEC-1996 (PDRAPER):
+*     2-DEC-1996 (PWD):
 *        Original version.
 *     {enter_changes_here}
 

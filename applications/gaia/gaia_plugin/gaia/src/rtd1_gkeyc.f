@@ -71,7 +71,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -94,16 +94,16 @@
 *     1992 June 24 (MJC):
 *        Made to handle a value without a trailing blank.  Takes the
 *        remainder of the card image as the value.
-*     21-JUL-1994 (PDRAPER):
+*     21-JUL-1994 (PWD):
 *        Incorporated into IMG_ (was called FTS1_GKEYC in KAPPA).
-*     21-JUL-1994 (PDRAPER):
+*     21-JUL-1994 (PWD):
 *        Rewrite to remove need for quoted strings so HISTORY and
 *        COMMENT strings are allowed (these do not necessarily have the
 *        form "keyword = ' value  '/ comment", "keyword 'value'" is more
 *        likely).
-*     21-JUL-1994 (PDRAPER):
+*     21-JUL-1994 (PWD):
 *        Re-created flexible formatting after SCCS crisis.
-*     12-SEP-1994 (PDRAPER):
+*     12-SEP-1994 (PWD):
 *        Added ability to read occurence for multiple FITS keywords.
 *     {enter_further_changes_here}
 

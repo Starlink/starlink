@@ -24,11 +24,11 @@
 #     This class inherits LabelMenu. It is also based on LabelMenu.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     26-AUG-1997 (PDRAPER):
+#     26-AUG-1997 (PWD):
 #     	 Original version.
 #     {enter_changes_here}
 

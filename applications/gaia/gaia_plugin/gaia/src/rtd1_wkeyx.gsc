@@ -58,13 +58,13 @@
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     22-JUL-1994 (PDRAPER):
+*     22-JUL-1994 (PWD):
 *        Original version.
-*     30-NOV-1994 (PDRAPER):
+*     30-NOV-1994 (PWD):
 *        Added checj that non-compound names are only 8 characters.
 *     {enter_further_changes_here}
 

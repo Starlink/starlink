@@ -35,13 +35,13 @@
 #     Inherits CanvasDraw.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     9-MAY-1996 (PDRAPER):
+#     9-MAY-1996 (PWD):
 #        Original version.
-#     3-JUL-1996 (PDRAPER):
+#     3-JUL-1996 (PWD):
 #        Converted to itcl2.0.
 #     25-Mar-1998 (ALLAN)
 #        Ported to work with new CanvasDraw version.

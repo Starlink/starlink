@@ -18,7 +18,7 @@
 //    Copyright (C) 1998 Central Laboratory of the Research Councils
 
 //  History:
-//     28-JUN-1996 (PDRAPER):
+//     28-JUN-1996 (PWD):
 //        Start again for RTD version 2.3.
 //     16-Mar-1998 (Allan Brighton, ESO)
 //        Updated for Skycat/Gaia plugin (get() methods)

@@ -51,18 +51,18 @@
 *        The global status on exit.
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils
 
 *  History:
-*     16-JAN-1996 (PDRAPER):
+*     16-JAN-1996 (PWD):
 *        Original version.
-*     28-JUN-1996 (PDRAPER):
+*     28-JUN-1996 (PWD):
 *        Now propagates NDF.
-*     03-DEC-1997 (PDRAPER):
+*     03-DEC-1997 (PWD):
 *        Now accepts the name of the component to replace.
 *     {enter_changes_here}
 

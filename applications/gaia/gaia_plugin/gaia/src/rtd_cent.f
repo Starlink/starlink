@@ -65,13 +65,13 @@
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK)
+*     PWD: Peter Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
-*     9-OCT-1992 (PDRAPER):
+*     9-OCT-1992 (PWD):
 *        Original version.
-*     12-DEC-1997 (PDRAPER):
+*     12-DEC-1997 (PWD):
 *        Converted for use in GAIA (was CCDPACK CCD1_CENT).
 *     {enter_changes_here}
 

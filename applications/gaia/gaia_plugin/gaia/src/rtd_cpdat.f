@@ -32,13 +32,13 @@
 *     Copyright (C) 1997 Central Laboratory of the Research Councils
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     16-JAN-1997 (PDRAPER):
+*     16-JAN-1997 (PWD):
 *        Original version.
-*     03-DEC-1997 (PDRAPER):
+*     03-DEC-1997 (PWD):
 *        Now copies a named component rather than 'DATA'.
 *     {enter_changes_here}
 

@@ -73,7 +73,7 @@
 *        Original version.
 *     1995 Nov 21 (AJC):
 *        Remove unused NBYTES
-*     1996 Nov 22 (PDRAPER):
+*     1996 Nov 22 (PWD):
 *        Converted for GAIA/RTD.
 *     {enter_any_changes_here}
 

@@ -63,15 +63,15 @@
 
 *  Authors:
 *     RFWS: Rodney Warren-Smith (Durham Polarimetry Group)
-*     PDRAPER: Peter Draper (STARLINK)
+*     PWD: Peter Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     - (RFWS):
 *        Original version - Durham local version of EDRS.
-*     9-JUL-1992 (PDRAPER):
+*     9-JUL-1992 (PWD):
 *        Changed prologue, converted to ADAM and made generic.
-*     12-DEC-1997 (PDRAPER):
+*     12-DEC-1997 (PWD):
 *        Renamed RTD1_CENX (was CCG1_CEN) now part of GAIA.
 *     {enter_further_changes_here}
 

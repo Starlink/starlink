@@ -138,16 +138,16 @@
 #     Copyright (C) 1997 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     14-MAY-1996 (PDRAPER):
+#     14-MAY-1996 (PWD):
 #        Original version.
-#     14-JUN-1996 (PDRAPER):
+#     14-JUN-1996 (PWD):
 #        Removed top-level controls (was StarArd) to generalize the
 #        functionality for reuse in other toolboxes.
-#     4-JUL-1996 (PDRAPER):
+#     4-JUL-1996 (PWD):
 #        Converted to itcl2.0.
 #     24-Mar-1998 (ALLAN)
 #        There was a conflict with an rtd bitmap named "rect", use "rectangle"

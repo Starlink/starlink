@@ -74,7 +74,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
-*     PDRAPER: Peter W. Draper (STARLINK, Durham University)
+*     PWD: Peter W. Draper (STARLINK, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -87,7 +87,7 @@
 *        Added checks not to propagate the FITSIO banner and Starlink
 *        ORIGIN card in the NDF's FITS extension to the output FITS
 *        file.
-*     1996 November 22 (PDRAPER):
+*     1996 November 22 (PWD):
 *        Hacked for GAIA/RTD NDF import.
 *     {enter_further_changes_here}
 

@@ -84,13 +84,13 @@
 #     TopLevelWidget.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     14-JUN-1996 (PDRAPER):
+#     14-JUN-1996 (PWD):
 #        Original version.
-#     10-JUL-1996 (PDRAPER):
+#     10-JUL-1996 (PWD):
 #        Converted to itcl2.0.
 #     {enter_further_changes_here}
 

@@ -19,17 +19,17 @@
 //     Copyright (C) 1997 Central Laboratory of the Research Councils
 
 //  Authors:
-//     Peter W. Draper (PDRAPER):
+//     Peter W. Draper (PWD):
 //     Allan Brighton, ESO (ALLAN):
 //     {enter_new_authors_here}
 
 //  History:
-//     28-JUN-1996 (PDRAPER):
+//     28-JUN-1996 (PWD):
 //        Started again for version 2.3.
-//     22-NOV-1996 (PDRAPER):
+//     22-NOV-1996 (PWD):
 //        Converted to accept memory header (rather than use a fixed
 //        size local array).
-//     16-JAN-1997 (PDRAPER):
+//     16-JAN-1997 (PWD):
 //        Changed to create the memory copy of the image data before
 //        copying. This is intended to reduce the overall footprint of
 //        the application in memory when the NDF data is released. The

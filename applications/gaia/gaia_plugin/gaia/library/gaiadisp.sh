@@ -44,10 +44,10 @@ exec $GAIA_DIR/gaia_wish $0 ${1+"$@"}
 #      xauthority (the use of xauthority is strongly recommended).
 #
 #   Authors:
-#      Peter W. Draper (PDRAPER):
+#      Peter W. Draper (PWD):
 #
 #   History:
-#      25-NOV-1996 (PDRAPER):
+#      25-NOV-1996 (PWD):
 #         Original version.
 #-
 #.

@@ -46,11 +46,11 @@
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     21-AUG-1996 (PDRAPER):
+#     21-AUG-1996 (PWD):
 #        Original version.
 #     {enter_further_changes_here}
 

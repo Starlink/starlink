@@ -42,17 +42,17 @@
 *     - this routine has a version for the types C, L, D, R and I.
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     22-JUL-1994 (PDRAPER):
+*     22-JUL-1994 (PWD):
 *        Original version.
-*     7-SEP-1994 (PDRAPER):
+*     7-SEP-1994 (PWD):
 *        Added check for status return from GKEY.
-*     20-SEP-1994 (PDRAPER):
+*     20-SEP-1994 (PWD):
 *        Removed PSX calls.
-*     22-NOV-1996 (PDRAPER):
+*     22-NOV-1996 (PWD):
 *        Converted for RTD from IMG.
 *     {enter_further_changes_here}
 

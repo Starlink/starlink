@@ -19,7 +19,7 @@
 #     GaiaImagePanel name [configuration options]
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK)
+#     PWD: Peter Draper (STARLINK)
 #     {enter_new_authors_here}
 
 #  Copyright:
@@ -29,7 +29,7 @@
 #     Methods and configuration options of SkyCat (and Rtd).
 
 #  History:
-#     26-SEP-1997 (PDRAPER):
+#     26-SEP-1997 (PWD):
 #        Original version
 #     25-MAR-1998 (ALLAN):
 #        Changed ($f) to ([file tail $f]) in object entry, to save space

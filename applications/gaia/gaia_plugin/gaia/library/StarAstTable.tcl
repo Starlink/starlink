@@ -64,12 +64,12 @@
 #     FrameWidget
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     ALLAN: Allan Brighton (ESO)
 #     {enter_new_authors_here}
 
 #  History:
-#     6-JAN-1998 (PDRAPER):
+#     6-JAN-1998 (PWD):
 #        Original version.
 #     17-APR-1998 (ALLAN)
 #        Changed AstroCat "cget -image" to "[get_image_name]"

@@ -23,7 +23,7 @@
 #     of the GAIA package with a Starlink extended RTD.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK)
+#     PWD: Peter Draper (STARLINK)
 #     {enter_new_authors_here}
 
 #  Inherits:
@@ -33,13 +33,13 @@
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  History:
-#     24-SEP-1997 (PDRAPER):
+#     24-SEP-1997 (PWD):
 #        Original version
-#     15-NOV-1997 (PDRAPER):
+#     15-NOV-1997 (PWD):
 #        Commented out code relating to grid control. This is now
 #        replaced by the AST grid (the code is left in place in case a
 #        comparison of the two methods is helpful).
-#     05-FEB-1998 (PDRAPER):
+#     05-FEB-1998 (PWD):
 #        Removed commented out sections.
 #     {enter_changes_here}
 

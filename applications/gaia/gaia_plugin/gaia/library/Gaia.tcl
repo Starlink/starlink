@@ -19,7 +19,7 @@
 #     of the GAIA package with a Starlink extended RTD.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK)
+#     PWD: Peter Draper (STARLINK)
 #     ALLAN: Allan Brighton (ESO)
 #     {enter_new_authors_here}
 
@@ -30,7 +30,7 @@
 #     Methods and configuration options of SkyCat (and Rtd).
 
 #  History:
-#     24-SEP-1997 (PDRAPER):
+#     24-SEP-1997 (PWD):
 #        Original version
 #     24-APR-1998 (ALLAN):
 #        Changed "clone" method to work with new tclutil version.

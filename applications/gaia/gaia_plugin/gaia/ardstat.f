@@ -91,11 +91,11 @@
 *     - Just uses pixel coordinates (no axes support).
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     19-MAR-1996 (PDRAPER):
+*     19-MAR-1996 (PWD):
 *        Original version. Just for GAIA not general enough
 *        for other purposes.
 *     {enter_changes_here}

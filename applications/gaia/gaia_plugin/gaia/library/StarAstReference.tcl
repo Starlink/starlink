@@ -58,13 +58,13 @@
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     19-DEC-1997 (PDRAPER):
+#     19-DEC-1997 (PWD):
 #        Original version.
-#     20-JAN-1998 (PDRAPER):
+#     20-JAN-1998 (PWD):
 #        Rewrite to separate image coordinate system information from 
 #        image related stuff.
 #     {enter_further_changes_here}

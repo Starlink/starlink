@@ -74,7 +74,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -92,10 +92,10 @@
 *        Modified to handle hierarchical keywords.
 *     1991 August 31 (MJC):
 *        Fixed bug in comparing card keyword with the selected keyword.
-*     20-JUL-1994 (PDRAPER):
+*     20-JUL-1994 (PWD):
 *        Incorporated into IMG_ (was called FTS1_GKEYX in KAPPA). Beefed
 *        up the error reports and changed returned status to IMG codes.
-*     12-SEP-1994 (PDRAPER):
+*     12-SEP-1994 (PWD):
 *        Added ability to deal with keywords with more than one
 *        occurrence.
 *     {enter_further_changes_here}

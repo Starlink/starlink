@@ -77,18 +77,18 @@
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
-*     5-MAR-1996 (PDRAPER):
+*     5-MAR-1996 (PWD):
 *        Original version.
-*     26-FEB-1997 (PDRAPER):
+*     26-FEB-1997 (PWD):
 *        Now releases ARD group (stops limit of 100 patches).
-*     17-NOV-1997 (PDRAPER):
+*     17-NOV-1997 (PWD):
 *        Added changes to support quality.
-*     19-NOV-1997 (PDRAPER):
+*     19-NOV-1997 (PWD):
 *        Increases workspace for noise array to 2047 from 511.
 *     15-JUL-2004 (TIMJ):
 *        Use PDA_DRANN rather than private PDA_DRNOR

@@ -62,30 +62,30 @@
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     15-JAN-1996 (PDRAPER):
+*     15-JAN-1996 (PWD):
 *        Original version.
-*     7-MAR-1996 (PDRAPER):
+*     7-MAR-1996 (PWD):
 *        Added FITS header code.
-*     28-JUN-1996 (PDRAPER):
+*     28-JUN-1996 (PWD):
 *        Changed to return pointer to image, rather then a copy. RTD now
 *        makes a copy of its own. Will need to deal with BAD pixels in
 *        this code now.
-*     22-NOV-1996 (PDRAPER):
+*     22-NOV-1996 (PWD):
 *        Converted to return a pointer to the FITS information. Also
 *        more sophisticated FITS headers.
-*     16-JAN-1997 (PDRAPER):
+*     16-JAN-1997 (PWD):
 *        Removed the ability to return a pointer to the image data. Now
 *        returns the NDF identifier instead. This is now used to copy the
 *        image data by chunking at a later time.
-*     16-SEP-1997 (PDRAPER):
+*     16-SEP-1997 (PWD):
 *        Added code to deal with NDF slice information.
-*     15-NOV-1997 (PDRAPER):
+*     15-NOV-1997 (PWD):
 *        Added changes to support AST WCS systems.
-*     18-DEC-1997 (PDRAPER):
+*     18-DEC-1997 (PWD):
 *        Converted to return _UBYTE data as _WORD.
 *     {enter_changes_here}
 

@@ -90,17 +90,17 @@
 #     This widget inherits TopLevelWidget.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     ALLAN Allan Brighton (ESO)
 #     {enter_new_authors_here}
 
 #  History:
-#     25-NOV-1996 (PDRAPER):
+#     25-NOV-1996 (PWD):
 #        Original version.
-#     20-JAN-1996 (PDRAPER):
+#     20-JAN-1996 (PWD):
 #        Added scrollbars to control view, clone number display and
 #        offset views.
-#     20-MAR-1997 (PDRAPER):
+#     20-MAR-1997 (PWD):
 #        Added button to refresh images. Tried doing this on every
 #        move of the image, but this is far too slow for interactive
 #        scrolling.

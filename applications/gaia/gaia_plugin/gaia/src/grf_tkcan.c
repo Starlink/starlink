@@ -10,7 +10,7 @@
  *     the rest of AST, by evaluating suitable Tk canvas commands.
  *
  *  Authors:
- *     PDRAPER: Peter W. Draper (STARLINK - Durham University)
+ *     PWD: Peter W. Draper (STARLINK - Durham University)
  *
  *  Notes:
  *     This module requires the use of the rtd_mark, rtd_word
@@ -29,9 +29,9 @@
  *     Copyright (C) 1997-1998 Central Laboratory of the Research Councils
  *
  *  History:
- *     1-AUG-1997 (PDRAPER):
+ *     1-AUG-1997 (PWD):
  *        Original version, based on grp_pgplot.c.
- *     18-NOV-1997 (PDRAPER):
+ *     18-NOV-1997 (PWD):
  *        Added changes for version 0.9 AST.
  */
 

@@ -31,14 +31,14 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*     PDRAPER: Peter W. Draper (STARLINK, Durham University)
+*     PWD: Peter W. Draper (STARLINK, Durham University)
 *     {enter_new_authors_here}
 
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils
 
 *  History:
-*     15-NOV-1997 (PDRAPER):
+*     15-NOV-1997 (PWD):
 *        Original version.
 *     {enter_further_changes_here}
 
