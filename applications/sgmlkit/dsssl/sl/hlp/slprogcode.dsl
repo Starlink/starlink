@@ -426,6 +426,11 @@
          (make sequence
             (heading 2 "Implementation Status")
             (indent-block (process-children-normal))))
+
+      (element moduletype
+         (make sequence
+            (heading 2 "Type of Module")
+            (indent-block (process-children-normal))))
   
       (element bugs
          (make sequence
@@ -515,7 +520,7 @@
             (request "in 0")
             (request "ba 0")))
 
-      (element (examplelist description)
+      (element (examplenote)
          (make sequence
             (indent-block (process-children-normal))
             (request "sp")))
@@ -533,19 +538,6 @@
             (request "ba -4")
             (request "sp")))
 
-      (element authorref
-         (let*
-            ((id (attribute-string (normalize "id")))
-             (authel (element-with-id id))
-             (name (data (node-list-first (children authel))))
-             (affiliation (attribute-string (normalize "affiliation") authel)))
-            (make sequence
-               (request "LP")
-               (line (string-append id ":"))
-               (line name)
-               (line (string-append "(" id ")"))
-               (request "sp"))))
-
       (element author
          (let*
             ((id (attribute-string (normalize "id")))
@@ -555,7 +547,7 @@
                (request "LP")
                (line (string-append id ":"))
                (line name)
-               (line (string-append "(" id ")"))
+               (line (string-append "(" affiliation ")"))
                (request "sp"))))
 
       (element angle
