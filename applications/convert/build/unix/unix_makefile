@@ -1455,9 +1455,7 @@ archive:  $(STARTUP_SCRIPT) $(ICL_SCRIPT) \
           $(BLOCK_DATA) $(PRIVATE_INCLUDES) $(IRAF_LIBRARIES:.a=.*) \
           $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) $(TEST_FILES) \
           $(IFL_FILES) $(HELP_SOURCES)
-	for f in $(IRAF_LIBRARIES); do \
-           mv $$f $${f}_$(SYSTEM); \
-        done
+#
 	$(TAR_IN) $(PKG_NAME)_source.tar \
                 $(STARTUP_SCRIPT) $(ICL_SCRIPT) \
                 $(F_ROUTINES) $(PLATFORM_F_ROUTINES) $(SPP_F_ROUTINES) \
@@ -1465,9 +1463,6 @@ archive:  $(STARTUP_SCRIPT) $(ICL_SCRIPT) \
                 $(BLOCK_DATA) $(PRIVATE_INCLUDES) $(IRAF_LIBRARIES:.a=.*) \
                 $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) $(TEST_FILES) \
                 $(IFL_FILES) $(HELP_SOURCES)
-	for f in $(IRAF_LIBRARIES); do \
-           mv $${f}_$(SYSTEM) $$f; \
-        done
 #
 	@ echo "   Build of the $(PKG_NAME)_source.tar file is complete"
 
