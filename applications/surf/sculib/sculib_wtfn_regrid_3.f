@@ -70,7 +70,7 @@
 
 *  Arguments Given:
       REAL DIAMETER
-      REAL RES
+      INTEGER RES
       REAL PIXSPACE
       INTEGER NI
       INTEGER NJ
@@ -117,8 +117,8 @@
       REAL    YPIX                               ! y coord of output pixel
       REAL    WT                                 ! value of weighting function
                                                  ! at output pixel
-      REAL FILTER1_SQ
-      REAL FILTER_RAD_SQ
+      INTEGER FILTER1_SQ
+      INTEGER FILTER_RAD_SQ
       REAL SCALE
       REAL SCALESQ
       REAL RES_SCAL
@@ -158,8 +158,8 @@
       RTEMP = REAL(WEIGHTSIZE) * RES_ELEMENT / PIXSPACE
       PIX_RANGE = INT (RTEMP) + 1
 
-      RAD_OV_SCAL = FILTER_RAD_SQ / SCALESQ
-      RES_SCAL = FILTER1_SQ * SCALESQ
+      RAD_OV_SCAL = REAL(FILTER_RAD_SQ) / SCALESQ
+      RES_SCAL = REAL(FILTER1_SQ) * SCALESQ
 
 
 *  now do the convolution
@@ -213,11 +213,11 @@
       DO JOUT = 1, NJ
          DO IOUT = 1, NI
             IF (TOT_WEIGHT_IN (IOUT,JOUT) .LT. SMALL) THEN
-               CONV_DATA_SUM (IOUT,JOUT) = 0.0
-               CONV_VARIANCE_SUM (IOUT,JOUT) = 0.0
+               CONV_DATA_SUM (IOUT,JOUT) = VAL__BADR
+               CONV_VARIANCE_SUM (IOUT,JOUT) = VAL__BADR
                CONV_QUALITY_SUM (IOUT,JOUT) = 1
             ELSE
-               IF (CONV_WEIGHT(IOUT,JOUT) .GT. SMALLRT) THEN
+               IF (ABS(CONV_WEIGHT(IOUT,JOUT)) .GT. SMALLRT) THEN
                   CONV_DATA_SUM (IOUT,JOUT) = 
      :              CONV_DATA_SUM (IOUT,JOUT) /
      :               CONV_WEIGHT (IOUT,JOUT)
@@ -226,8 +226,8 @@
      :              CONV_WEIGHT (IOUT,JOUT)**2
                   CONV_QUALITY_SUM (IOUT,JOUT) = 0
                ELSE
-                  CONV_DATA_SUM (IOUT,JOUT) = 0.0
-                  CONV_VARIANCE_SUM (IOUT,JOUT) = 0.0
+                  CONV_DATA_SUM (IOUT,JOUT) = VAL__BADR
+                  CONV_VARIANCE_SUM (IOUT,JOUT) = VAL__BADR
                   CONV_QUALITY_SUM (IOUT,JOUT) = 1
                END IF
             END IF
