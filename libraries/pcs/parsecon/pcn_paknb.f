@@ -23,8 +23,9 @@
  
 *  Deficiencies:
 *     Uses BYTE
-*     The routine will only handle with certainty, values of N less
-*     than 4.
+*     The routine guarantees to handle only values of N up to MAXN,
+*       but in fact can handle one or two more without running out of space.
+
  
 *  Arguments:
 *     LU = INTEGER (Given)
@@ -50,6 +51,9 @@
 *     24-MAR-1993 (AJC):
 *        Remove include PARSECON_PAR
 *        Add DAT_PAR for SUBPAR_CMN
+*     01-FEB-2004 (Norman Gray, Starlink/Glasgow):
+*        Checked into CVS repository cvs.starlink.ac.uk.  See there for
+*        further changes.
 *     {enter_changes_here}
  
 *  Bugs:
@@ -76,10 +80,18 @@
  
 *  Global Variables:
       INCLUDE 'SUBPAR_CMN'       ! Needed for SUBPAR__MAXPAR
+      INCLUDE 'PARSECON_ERR'     ! For PARSE__NOMEM
+
+*  Parameters:
+*  The routine will certainly handle N <= MAXN, but might handle more.
+*  Warn if N is too big, but don't fail unless we actually run out of
+*  space below
+      INTEGER MAXN
+      PARAMETER ( MAXN = 5 )
 
 *  Local Variables:
-      BYTE VBUFF( 3*SUBPAR__MAXPAR ) ! Values buffer
-      INTEGER NBUFF( 3*SUBPAR__MAXPAR ) ! Values count buffer
+      BYTE VBUFF( MAXN*SUBPAR__MAXPAR ) ! Values buffer
+      INTEGER NBUFF( MAXN*SUBPAR__MAXPAR ) ! Values count buffer
       BYTE LASTV               ! The last value handled
       INTEGER NV                 ! The consecutive value counter
       INTEGER BPT                ! Pointer to next entry in buffers
@@ -103,12 +115,26 @@
  
             IF( ARRAY( J, I ) .NE. LASTV ) THEN
 *           End of consecutive equal values
-               VBUFF( BPT ) = LASTV
-               NBUFF( BPT ) = NV
-               BPT = BPT + 1
-               LASTV = ARRAY( J, I )
-               NV = 1
- 
+               IF ( BPT .LE. MAXN*SUBPAR__MAXPAR ) THEN
+                  VBUFF( BPT ) = LASTV
+                  NBUFF( BPT ) = NV
+                  BPT = BPT + 1
+                  LASTV = ARRAY( J, I )
+                  NV = 1
+               ELSE
+*               Run off the end of the arrays
+                  STATUS = PARSE__NOMEM
+                  CALL EMS_SETI ( 'N', N )
+                  CALL EMS_SETI ( 'MAXN', MAXN )
+                  CALL EMS_REP ( 'PCN_PAK1',
+     :               'PARSECON: Exceeded maximum working space'
+     :                 // ' (pcn_paknb called with N=^N, MAXN=^MAXN)',
+     :               STATUS)
+*               JUMP OUT immediately.  Don't bother trying to fix up
+*               BPT and write out what we've got -- this is too serious
+*               an error.
+                  RETURN
+               ENDIF
             ELSE
 *           Count consecutive values
                NV = NV + 1
@@ -118,7 +144,7 @@
 10       CONTINUE
  
 20    CONTINUE
- 
+
 *  End of ARRAY
 *  Save the last value and write the record
       VBUFF( BPT ) = LASTV
