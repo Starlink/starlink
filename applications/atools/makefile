@@ -457,7 +457,7 @@ PAR_ERR FIO_ERR AST_PAR
 F_ROUTINES = $(F_SUB1) $(F_SUB2) $(MONO_SOURCE)
 
 F_SUB1 = astaddframe.f astclear.f astget.f astset.f asttest.f \
-atl1_assoc.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f atl1_ptobj.f \
+atl1_gtgrp.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f atl1_ptobj.f \
 atl1_setop.f astcmpframe.f astcmpmap.f astframe.f astgetframe.f \
 astskyframe.f astgetmapping.f astunitmap.f atlhelp.f astframeset.f \
 astpermmap.f astremoveframe.f astremapframe.f astmatrixmap.f astconvert.f
@@ -1346,7 +1346,7 @@ strip:
 #  files).  These are normally generated automatically from the source
 #  files.
 
-atl1_assoc.o: AST_PAR SAE_PAR FIO_ERR
+atl1_gtgrp.o: SAE_PAR GRP_PAR
 atl1_assoc.o: SAE_PAR
 atl1_creat.o: SAE_PAR AST_PAR SAE_PAR FIO_ERR
 atl1_gtfrm.o: SAE_PAR AST_PAR

@@ -71,6 +71,7 @@
 
 *  Local Variables:
       INTEGER IAST2
+      INTEGER IGRP
       INTEGER INDF
 *.
 
@@ -88,10 +89,17 @@
          CALL KPG1_GTWCS( INDF, IAST, STATUS )
          CALL NDF_ANNUL( INDF, STATUS )
 
-*  If it was not an NDF, attempt to read an AST FrameSet from it
-*  as a text file.
+*  If it was not an NDF...
       ELSE
-         CALL ATL1_ASSOC( PARAM, IAST, STATUS )
+
+*  Obtain a GRP group containing text from which an Object is to be read.
+         CALL ATL1_GTGRP( PARAM, IGRP, STATUS )
+
+*  Tried to read an object form the group.
+         CALL ATL1_RDGRP( IGRP, IAST, STATUS )
+
+*  Delete the group.
+         CALL GRP_DELET( IGRP, STATUS )
 
       END IF
 

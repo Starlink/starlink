@@ -17,7 +17,7 @@ astgetmapping.ifl astgetmapping.f astmatrixmap.ifl astmatrixmap.f \
 astpermmap.ifl astpermmap.f astremapframe.ifl astremapframe.f \
 astremoveframe.f astremoveframe.ifl astset.f astset.ifl astshow.tcl \
 astskyframe.ifl astskyframe.f asttest.f asttest.ifl astunitmap.f \
-astunitmap.ifl atl1_assoc.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f \
+astunitmap.ifl atl1_gtgrp.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f \
 atl1_ptobj.f atl1_rm.c atl1_setop.f atlhelp.f atlhelp.ifl atools.csh \
 atools.hlp atools.icl atools_link_adam atools_mon.f atools_mon.ifl \
 kpg1_gtgrp.f
