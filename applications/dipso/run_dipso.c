@@ -77,7 +77,7 @@ extern F77_SUBROUTINE(dipso)( INTEGER(n) );
 jmp_buf here;      
 
 /*  Entry Point: */
-void main( int argc, char *argv[]){
+main( int argc, char *argv[]){
 
 /*  Local Variables: */
       DECLARE_INTEGER(n);
