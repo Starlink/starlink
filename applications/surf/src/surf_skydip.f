@@ -52,9 +52,12 @@
 *    History :
 *     $Id$
 *     $Log$
-*     Revision 1.3  1996/08/26 19:31:53  timj
-*     Remove LTEMP variable (left over from BAD_PIXEL experiment)
+*     Revision 1.4  1996/08/26 19:36:40  timj
+*     Quality array was being mapped as REAL instead of UBYTE.
 *
+c Revision 1.3  1996/08/26  19:31:53  timj
+c Remove LTEMP variable (left over from BAD_PIXEL experiment)
+c
 c Revision 1.2  1996/08/26  19:27:43  timj
 c Use SCULIB_COPYX to copy data to mapped arrays.
 c Fix bug when writing out T_COLD
@@ -715,7 +718,7 @@ c
 
 * Write QUALITY
 
-      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_REAL', 'WRITE',
+      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
      : OUT_QUAL_PTR, ITEMP, STATUS)
 
       CALL SCULIB_COPYI(UBND(1),JSKY_QUAL, %VAL(OUT_QUAL_PTR))
