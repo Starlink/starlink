@@ -46,6 +46,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  2000/07/11 02:38:00  timj
+*     Remove unused variables
+*
 *     Revision 1.2  2000/07/10 21:09:31  timj
 *     Documentation tweaks for V1.6
 *
@@ -75,7 +78,6 @@
 *  Local Constants:
 
 *  Local Variables:
-      INTEGER          FMTN     ! Format number to use for output
       INTEGER          I        ! loop counter
       INTEGER          IHMSF( 4 ) ! Hours, minutes, seconds and fraction
       CHARACTER * 1    SIGN     ! Sign of angle

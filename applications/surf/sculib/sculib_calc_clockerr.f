@@ -69,6 +69,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  2000/07/11 02:37:59  timj
+*     Remove unused variables
+*
 *     Revision 1.1  2000/06/17 00:54:38  timj
 *     First version
 *
@@ -108,9 +111,7 @@
       CHARACTER * 10   CENTRE_COORDS ! Centre coordinate frame
       DOUBLE PRECISION DEC      ! Declination of observation (radians)
       DOUBLE PRECISION HA       ! Hour angle of observation (radians)
-      INTEGER          IPOS     ! position in string
       DOUBLE PRECISION LAT_OBS  ! Latitude of observatory (radians)
-      INTEGER          SLA_STATUS ! Status from SLA calls
       DOUBLE PRECISION STRT_DAZ ! Eror in azimuth (converted to radians)
       DOUBLE PRECISION STRT_DEL ! Eror in elevation (converted to radians)
       DOUBLE PRECISION STRT_AZ  ! Azimuth from header (converted to radians)
