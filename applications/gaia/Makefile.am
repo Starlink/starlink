@@ -47,8 +47,8 @@ GAIA_LIB_FILES =  \
 GAIA_BIN_FILES = \
  gaia_swish$(EXEEXT) gaia_stcl$(EXEEXT) gaiaMon$(EXEEXT)
 
-GAIA_IFC_FILES = gaiaMon.ifc ardstat.ifc autocrop.ifc cat2tab.ifc \
- tab2cat.ifc asc2tab.ifc tab2asc.ifc
+GAIA_IFC_FILES = gaiaMon.ifc ardstat.ifc autocrop.ifc cat2tab.ifc tab2cat.ifc \
+                 asc2tab.ifc tab2asc.ifc
 
 GAIA_FILES = $(GAIA_LIB_FILES) $(GAIA_BIN_FILES) $(GAIA_IFC_FILES)
 
@@ -57,10 +57,7 @@ BUILT_SOURCES = $(TCL_FILE) $(SKYCAT_FILES) $(GAIA_FILES)
 ##  Tasks present in the gaiaMon binary.
 GAIA_TASKS = ardstat autocrop cat2tab tab2cat asc2tab tab2asc
 
-bin_MONOLITHS = gaiaMon
-gaiaMon_SOURCES =
-gaiaMon_TASKS = $(GAIA_TASKS)
-
+##  Documentation.
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun214fig.ps
 
 
@@ -74,7 +71,7 @@ SCRIPT_PLACES = \
         ./built/lib/blt2.4/*.pro
 
 ##  Build Tcl component.
-$(TCL_FILES) $(TCL_TEST_FILES): 
+$(TCL_FILES) $(TCL_TEST_FILES):
 	- mkdir -p ./built ;\
 	pwd=`pwd`;\
 	(cd ./tcl; \
@@ -163,3 +160,17 @@ dist-hook:
 ## Not installed or processed, just recorded for history.
 ##IRAF_SCRIPTS = gaia.cl gaia.hd _gaia.hd root.hd gaia.men \
 ##               gaiadisp.cl gaiacut.cl gaiadispandcut.cl gaiapercent.cl
+
+##  Post-installation tasks. We need to set up the softlinks for the various
+##  tasks in the monolith. Don't use the usually mechanisms as the gaiaMon
+##  monolith is created elsewhere.
+install-exec-local:
+	cd $(DESTDIR)$(bindir); \
+	for t in $(GAIA_TASKS); do \
+	   rm -f $$t; \
+	   echo $(LN_S) gaiaMon $$t; \
+	   $(LN_S) gaiaMon $$t; \
+	   if test -n "$$MANIFEST_FD"; then \
+	      echo "$(DESTDIR)$(bindir)/$$t" >&$${MANIFEST_FD-0}; \
+	   else :; fi; \
+	done
