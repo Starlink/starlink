@@ -57,12 +57,14 @@ setenv POLPACK_HELP INSTALL_HELP/polpack
 #  Define symbols for the applications and scripts.
 #  ===============================================
 #
+alias calpol    INSTALL_BIN/calpol
 alias polhelp   INSTALL_BIN/polhelp 
 alias polmap    INSTALL_BIN/polmap
 alias polreg    INSTALL_BIN/polreg
 #
 #  Now do the same with alternative names.
 #
+alias pol_calpol    INSTALL_BIN/pol_calpol
 alias pol_polhelp   INSTALL_BIN/polhelp 
 alias pol_polmap    INSTALL_BIN/pol_polmap
 alias pol_polreg    INSTALL_BIN/pol_polreg

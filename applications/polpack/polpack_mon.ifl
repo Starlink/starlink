@@ -1,5 +1,136 @@
 Monolith polpack_mon
 
+#+
+#  Name:
+#     CALPOL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     TMG: Tim Gledhill  (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     23-JUN-1997 (TMG):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface CALPOL
+
+   helplib ' '
+
+   parameter IN
+      position 1
+      keyword  IN
+      type     LITERAL
+      access   READ
+      vpath    'CURRENT'
+      ppath    'CURRENT'
+      prompt   'Input polarisation image'
+      helpkey  '*'
+   endparameter
+
+   parameter MODE
+      type     _CHAR
+      access   READ
+      vpath    'CURRENT, DEFAULT'
+      default  'LINEAR'
+      ppath    'DEFAULT'
+      prompt   'Polarimetric mode (LINEAR or CIRCULAR)'
+   endparameter
+
+   parameter VARIANCE		 # Variances required?
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  YES
+      prompt   'Are variance values to be generated?'
+      helpkey  '*'
+   endparameter
+
+   parameter   TOLS              # scale facto tolerance
+      type     _REAL
+      access   READ
+      vpath    'CURRENT, DEFAULT'
+      ppath    'CURRENT, DEFAULT'
+      default  0.01
+      prompt   'Scale factor tolerance for image inter-comparisons'
+      helpkey  '*'
+   endparameter
+
+   parameter   TOLZ              # zero point tolerance
+      type     _REAL
+      access   READ
+      vpath    'CURRENT, DEFAULT'
+      ppath    'CURRENT, DEFAULT'
+      default  0.01
+      prompt   'Zero point tolerance for image inter-comparisons'
+      helpkey  '*'
+   endparameter
+
+   parameter   MAXIT              # maximum number of intercomparison iterations
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT, DEFAULT'
+      ppath    'CURRENT, DEFAULT'
+      default  3
+      prompt   'Maximum number of interations during image inter-comparisons'
+      helpkey  '*'
+   endparameter
+
+   parameter   SKYSUP              # Sky supression factor 
+      type     _REAL
+      access   READ
+      vpath    'CURRENT, DEFAULT'
+      ppath    'CURRENT, DEFAULT'
+      default  1.0
+      prompt   'Sky supression factor'
+      helpkey  '*'
+   endparameter
+
+   parameter   ILEVEL              # user information level
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT, DEFAULT'
+      ppath    'CURRENT, DEFAULT'
+      default  2
+      prompt   'User information level'
+      helpkey  '*'
+   endparameter
+
+   parameter   ETOL              # tolerence for E factor convergence
+      type     _REAL
+      access   READ
+      vpath    'CURRENT, DEFAULT'
+      ppath    'CURRENT, DEFAULT'
+      default  0.01
+      prompt   'Tolerence for E factor convergence'
+      helpkey  '*'
+   endparameter
+
+   parameter   OUT              # Output NDF
+      type     NDF
+      access   WRITE
+      vpath    'CURRENT, PROMPT'
+      ppath    'CURRENT'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter  TSPOUT           # TEMPORARY TSP OUTPUT
+      type    NDF
+      access  WRITE
+      vpath   'CURRENT,PROMPT'
+      ppath   'CURRENT'
+      prompt  'TEMPORARY TSP OUTPUT - DELETE THIS!!'
+      helpkey '*'
+   endparameter
+
+endinterface
 
 #+
 #  Name:
