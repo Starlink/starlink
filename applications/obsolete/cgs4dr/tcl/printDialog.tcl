@@ -92,8 +92,8 @@ proc gwm_printDialog {w gwm c} {
     pack $w.file.b.fbut $w.file.b.flab $w.file.b.fname -side left -anchor w
 
 # Create an "OK" and a "Cancel" button.
-    button $w.bot.ok -text OK -width 6 -command {set gwm_priv(button) "ok"}
-    button $w.bot.can -text Cancel -width 6 -command {set gwm_priv(button) "can"}
+    button $w.bot.ok -text OK -command {set gwm_priv(button) "ok"}
+    button $w.bot.can -text Cancel -command {set gwm_priv(button) "can"}
 
 # Pack them into the bottom frame with a default border around the OK button.
     frame $w.bot.default -relief sunken -bd 1
