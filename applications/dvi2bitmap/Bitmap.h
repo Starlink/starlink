@@ -57,6 +57,10 @@ class Bitmap {
     static void cropDefault (Margin spec, int pixels, bool absolute=false);
     void crop (Margin spec, int pixels, bool absolute=false);
     void blur ();
+    /**
+     * Sets the current bitmap to be transparent, if possible.
+     * @param sw if true, the current bitmap is set to be transparent
+     */
     void setTransparent(const bool sw) { transparent_ = sw; }
     typedef struct BitmapColour_s {
 	Byte red, green, blue;
@@ -64,22 +68,62 @@ class Bitmap {
     void setRGB (const bool fg, const BitmapColour*);
     static void setDefaultRGB (const bool fg, const BitmapColour*);
     void scaleDown (const int factor);
-    // If the bounding-box variables have their initial impossible values,
-    // then either nothing has been written to the bitmap, or it was
-    // all out of bounds.
+    /**
+     * Is the bitmap empty?  If nothing has (yet) been written to the
+     * bitmap, or if everything that was written was out of
+     * bounds, then the bitmap is empty.
+     *
+     * @return true if the bitmap is empty
+     */
     bool empty () const
 	{ return (bbL > W || bbR < 0 || bbT > H || bbB < 0); }
-    // Does the bitmap overlap its canvas?  This can only be true before a
-    // call to freeze(), since that normalizes the bounding box variables.
+    /**
+     * Does the bitmap overlap its canvas?  This can only be true before a
+     * call to {@link #freeze}, since that normalizes the bounding box
+     * variables.
+     */
     bool overlaps () const
 	{ if (frozen_)
 	    throw BitmapError
 		("Bitmap::overlaps called after freeze() when it is always true");
 	else
 	    return (bbL < 0 || bbR > W || bbT < 0 || bbB > H); }
+    /**
+     * Obtain a bounding box for the current bitmap.  This returns a
+     * four-element array consisting of the coordinate of the
+     * leftmost blackened pixel, the topmost pixel, the rightmost
+     * pixel and the bottommost pixel.  The returned array occupies
+     * static storage, and is always current as of the last time this
+     * method was called.
+     *
+     * <p>Note that the order of the four dimensions is not that of
+     * the Postscript BoundingBox, which is (llx, lly, urx, ury)
+     * rather than here, effectively, (ulx, uly, lrx, lry).  This is
+     * because the position of the upper-left corner (ulx, uly) is
+     * the natural TeX reference point.
+     *
+     * @return the position of the bitmap bounding-box, in the order
+     * (ulx, uly, lrx, lry)
+     */
     int *boundingBox ()
 	{ BB[0]=bbL; BB[1]=bbT; BB[2]=bbR; BB[3]=bbB; return &BB[0]; }
-    static void verbosity (const verbosities level) { verbosity_ = level; }
+    /**
+     * Sets the verbosity of the current class.
+     * @param level the required verbosity
+     * @return the previous verbosity level
+     */
+    static verbosities verbosity (const verbosities level) {
+	enum verbosities oldv;
+	verbosity_ = level;
+	return oldv;
+    }
+    /**
+     * Sets whether bitmap information is logged.  If logging is
+     * enabled, then the details of the bitmaps are sent to the
+     * <code>stdout</code> prefixed by <code>Qbitmapts</code>.
+     *
+     * @param b if true, then bitmap activity is logged
+     */
     static void logBitmapInfo (bool b) { logBitmapInfo_ = b; };
 
  private:
@@ -94,6 +138,7 @@ class Bitmap {
     // be negative or greater than W or H); afterwards they are bounded by
     // 0..W and 0..H.  (they were distinct variables until
     // Bitmap.cc 1.13 and Bitmap.h 1.11).
+    // XXX make bb? references to BB[]
     int bbL, bbR, bbT, bbB;
     int BB[4];			// holds return values for boundingBox()
     bool frozen_;
