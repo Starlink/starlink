@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_CLIP_BOL(N_POS, SCUDATA, SCUQUAL,
-     :     N_SIGMA, BADBIT, STATUS)
+     :     N_SIGMA, BADBIT, NSPIKES, STATUS)
 *+
 *  Name:
 *     SCULIB_CLIP_BOL
@@ -9,7 +9,7 @@
 
 *  Invocation:
 *     SUBROUTINE SCULIB_CLIP_BOL(N_POS, SCUDATA, SCUQUAL,
-*    :     N_SIGMA, BADBIT, STATUS)
+*    :     N_SIGMA, BADBIT, NSPIKES, STATUS)
 
 *  Description:
 *     This routine despikes a single bolometer at the +/- n sigma
@@ -26,11 +26,12 @@
 *        Number of sigma to clip at
 *     BADBIT = BYTE (Given & Returned)
 *        Bad bit mask
+*     NSPIKES = INTEGER (Returned)
+*        Number of spikes that were detected.
 *     STATUS = INTEGER (Given and Returned)
 *        Global Status value
 
 *  Implementation Status:
-*     Uses Kappa library routines for stats
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
@@ -39,6 +40,10 @@
 *  History:
 *     1996 November 17 (TIMJ):
 *       Original version
+*     $Log$
+*     Revision 1.3  1997/10/17 02:19:34  timj
+*     Return the actual number of spikes that were removed.
+*
 *     {enter_changes_here}
 
 *  Bugs:
@@ -61,6 +66,9 @@
       BYTE    BADBIT
       REAL    SCUDATA(N_POS)
       BYTE    SCUQUAL(N_POS)
+
+*  Arguments returned:
+      INTEGER NSPIKES
 
 *  Status:
       INTEGER STATUS                 ! Global status
@@ -86,6 +94,10 @@
       DOUBLE PRECISION STDEV       ! Standard deviation
       DOUBLE PRECISION SUM         ! Sum
       DOUBLE PRECISION SUMSQ       ! Sum squares
+
+*    External functions:
+      INCLUDE 'NDF_FUNC'
+
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -103,6 +115,9 @@
 *     Free memory
 
       CALL SCULIB_FREE('CLIPSORT', SPNTR, SPNTR_END, STATUS)
+
+*     Set the number of spikes to 0
+      NSPIKES = 0
       
 *  Loop over all data removing those points which are greater than nsigma
 
@@ -113,10 +128,17 @@
 
          DO I = 1, N_POS
             SCUQUAL(I) = SCULIB_BITOFF(SCUQUAL(I), SKYBIT) ! Reset SKY bit
-            IF (SCUDATA(I) .NE. VAL__BADR) THEN
+            IF ((SCUDATA(I) .NE. VAL__BADR) .AND.
+     :           (NDF_QMASK(SCUQUAL(I), BADBIT))) THEN
+
+*     We have found a spike
                IF (SCUDATA(I) .GT. REAL(CLIPMAX) .OR.
      :              SCUDATA(I) .LT. REAL(CLIPMIN)) THEN
+
                   SCUQUAL(I) = SCULIB_BITON(SCUQUAL(I), SKYBIT)
+
+                  NSPIKES = NSPIKES + 1
+
                END IF
             END IF
          END DO
