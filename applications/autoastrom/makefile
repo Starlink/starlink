@@ -395,7 +395,7 @@ PKG_LINK = AUTOASTROM
 #  not merit documentation changes.
 
 # %%VERSION%%
-PKG_VERS = 0.5-7
+PKG_VERS = 0.5-8
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -1314,9 +1314,9 @@ moggy/Makefile.in astrom/makefile.in:
 	fi
 	test -d moggy -a -d astrom || $(TAR_OUT) $(PKG_NAME)_source.tar
 
-#  Propagate the version number
-autoastrom autoastrom.news makefile moggy/Moggy.pm: VERSION
-	support/propagate-version autoastrom autoastrom.news makefile moggy/Moggy.pm
+##  Propagate the version number
+#autoastrom autoastrom.news makefile moggy/Moggy.pm: VERSION
+#	support/propagate-version autoastrom autoastrom.news makefile moggy/Moggy.pm
 
 
 #------------------------------------------------------------------------------
