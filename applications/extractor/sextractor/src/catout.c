@@ -19,9 +19,15 @@
 *                       20/03/00: (PWD):
 *                                 Added initialisation of obj.rad FLAGs.
 *                       08/01/03: Fixed a double free of pointer.
+*	Last modify:	16/12/2002
+*                                 (EB) for 2.3.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
+
 #include	<math.h>
 #include	<stdio.h>
 #include	<stdlib.h>
@@ -29,7 +35,8 @@
 
 #include	"define.h"
 #include	"globals.h"
-#include	"fitscat.h"
+#include	"prefs.h"
+#include	"fits/fitscat.h"
 #include	"param.h"
 #include	"sexhead.h"
 #include	"sexhead1.h"
@@ -51,13 +58,13 @@ void	readcatparams(char *filename)
    int		i, size;
 
 /* Prepare the OBJECTS tables*/
-    objtab = new_tab("OBJECTS");
+  objtab = new_tab("OBJECTS");
 
   if ((infile = fopen(filename,"r")) == NULL)
     error(EXIT_FAILURE, "*ERROR*: can't read ", filename);
 
 /* Scan the catalog config file*/
-  cat.nparam = 0;
+  thecat.nparam = 0;
   while (fgets(str, MAXCHAR, infile))
     {
     sstr = str + strspn(str," \t");
@@ -70,7 +77,7 @@ void	readcatparams(char *filename)
         key = objkey+i;
         add_key(key, objtab, 0);
         *((char *)key->ptr) = (char)'\1';
-        cat.nparam++;
+        thecat.nparam++;
         if (key->naxis)
           {
           for (i=0; i<key->naxis; i++)
@@ -105,7 +112,7 @@ void	readcatparams(char *filename)
   updateparamflags();
 
 /* Go back to multi-dimensional arrays for memory allocation */
-  if (cat.nparam)
+  if (thecat.nparam)
     for (i=objtab->nkey, key=objtab->key; i--; key = key->nextkey) 
       if (key->naxis)
         {
@@ -262,7 +269,7 @@ void	updateparamflags()
   for (i=0; i<NISO; i++)
     FLAG(obj.iso[0]) |= FLAG(obj.iso[i]);
 
-/* Average radii are all calculated if one is needed */
+/* PWD: Average radii are all calculated if one is needed */
   for ( i = 0; i < NRAD; i++ ) {
      FLAG(obj.rad[0]) |= FLAG(obj.rad[i]);
   }
@@ -275,7 +282,7 @@ void	updateparamflags()
 /*
 Initialize the catalog header
 */
-void	initcat(picstruct *field)
+void	initcat(void)
   {
    tabstruct	*tab, *asctab;
    keystruct	*key;
@@ -330,12 +337,52 @@ void	initcat(picstruct *field)
     strcpy(fitscat->filename, prefs.cat_name);
     if (open_cat(fitscat, WRITE_ONLY) != RETURN_OK)
       error(EXIT_FAILURE,"*Error*: cannot open for writing ",prefs.cat_name);
-
     switch(prefs.cat_type)
       {
       case FITS_LDAC:
 /*------ Save a "pure" primary HDU */
         save_tab(fitscat, fitscat->tab);
+      case FITS_BINIMHEAD:
+      case FITS_NOIMHEAD:
+        break;
+
+      case FITS_10:
+/*------ Add to the primary HDU extraction parameters */
+        key = headkey1;
+        while (*key->name)
+          addkeyto_head(fitscat->tab, key++);
+        save_tab(fitscat, fitscat->tab);
+        break;
+      default:
+        error (EXIT_FAILURE, "*Internal Error*: Unknown FITS type in ",
+		"initcat()");
+      }
+    }
+
+  return;
+  }
+
+
+/********************************* reinitcat *********************************/
+/*
+Initialize the catalog header
+*/
+void	reinitcat(picstruct *field)
+  {
+   tabstruct	*tab, *asctab;
+   keystruct	*key;
+   int		i, n;
+
+  if (prefs.cat_type == CAT_NONE)
+    return;
+
+  if (prefs.cat_type != ASCII_HEAD && prefs.cat_type != ASCII
+      && prefs.cat_type != ASCII_SKYCAT)
+    {
+    update_tab(objtab);
+    switch(prefs.cat_type)
+      {
+      case FITS_LDAC:
 /*------ We create a dummy table (only used through its header) */
         QCALLOC(asctab, tabstruct, 1);
         asctab->headnblock = field->fitsheadsize/FBSIZE;
@@ -364,22 +411,22 @@ void	initcat(picstruct *field)
         break;
 
       case FITS_BINIMHEAD:
-        break;
-
       case FITS_NOIMHEAD:
         break;
 
       case FITS_10:
 /*------ Add to the primary HDU extraction parameters */
+/*
         key = headkey1;
         while (*key->name)
           addkeyto_head(fitscat->tab, key++);
         save_tab(fitscat, fitscat->tab);
+*/
         break;
 
       default:
         error (EXIT_FAILURE, "*Internal Error*: Unknown FITS type in ",
-		"initcat()");
+		"reinitcat()");
       }
 
     objtab->cat = fitscat;
@@ -433,12 +480,6 @@ void	endcat()
    char		*head;
    int		i;
 
-/* Free allocated memory for arrays */
-  key = objtab->key;
-  for (i=objtab->nkey; i--; key=key->nextkey)
-    if (key->naxis && key->allocflag)
-      free(key->ptr);
-
   switch(prefs.cat_type)
     {
     case ASCII:
@@ -454,29 +495,8 @@ void	endcat()
       break;
 
     case FITS_LDAC:
-      end_writeobj(fitscat, objtab);
-      if (!(tab=name_to_tab(fitscat, "LDAC_IMHEAD", 0))
-	|| !(key=name_to_key(tab, "Field Header Card")))
-        error(EXIT_FAILURE,"*Error*: cannot update table ", "ASCFIELD");
-      head = key->ptr;
-      fitswrite(head, "SEXNDET ", &cat.ndetect,H_INT,T_LONG);
-      fitswrite(head, "SEXNFIN ", &cat.ntotal, H_INT,T_LONG);
-      fitswrite(head, "SEXDATE ", cat.ext_date, H_STRING, 0);
-      fitswrite(head, "SEXTIME ", cat.ext_time, H_STRING, 0);
-      fitswrite(head, "SEXELAPS", &cat.ext_elapsed, H_FLOAT, T_DOUBLE);
-      QFSEEK(fitscat->file, tab->bodypos-FBSIZE*tab->headnblock, SEEK_SET,
-	fitscat->filename);
-      save_tab(fitscat, tab);
-      free_cat(fitscat,1);
-      break;
-
     case FITS_10:
-      end_writeobj(fitscat, objtab);
-      fitswrite(fitscat->tab->headbuf, "SEXNDET ", &cat.ndetect,H_INT,T_LONG);
-      fitswrite(fitscat->tab->headbuf, "SEXNFIN ", &cat.ntotal, H_INT,T_LONG);
-      QFSEEK(fitscat->file, 0, SEEK_SET, fitscat->filename);
-      save_tab(fitscat, fitscat->tab);
-      free_cat(fitscat,1);
+      free_cat(&fitscat,1);
       break;
 
     case CAT_NONE:
@@ -486,10 +506,73 @@ void	endcat()
       break;
     }
 
+/* Free allocated memory for arrays */
+  key = objtab->key;
+  for (i=objtab->nkey; i--; key=key->nextkey)
+    if (key->naxis && key->allocflag)
+      free(key->ptr);
+
   objtab->key = NULL;
   objtab->nkey = 0;
   free_tab(objtab);
 
   return;
   }
+
+
+/******************************** reendcat ***********************************/
+/*
+Terminate the catalog output.
+*/
+void	reendcat()
+  {
+   keystruct	*key;
+   tabstruct	*tab;
+   OFF_T	pos;
+   char		*head;
+   int		i;
+
+  switch(prefs.cat_type)
+    {
+    case ASCII:
+    case ASCII_HEAD:
+    case ASCII_SKYCAT:
+      break;
+
+    case FITS_LDAC:
+      end_writeobj(fitscat, objtab);
+      if (!(tab=fitscat->tab->prevtab)
+	|| !(key=name_to_key(tab, "Field Header Card")))
+        error(EXIT_FAILURE,"*Error*: cannot update table ", "ASCFIELD");
+      head = key->ptr;
+      fitswrite(head, "SEXNDET ", &thecat.ndetect,H_INT,T_LONG);
+      fitswrite(head, "SEXNFIN ", &thecat.ntotal, H_INT,T_LONG);
+      fitswrite(head, "SEXDATE ", thecat.ext_date, H_STRING, 0);
+      fitswrite(head, "SEXTIME ", thecat.ext_time, H_STRING, 0);
+      fitswrite(head, "SEXELAPS", &thecat.ext_elapsed, H_FLOAT, T_DOUBLE);
+      QFTELL(fitscat->file, pos, fitscat->filename);
+      QFSEEK(fitscat->file, tab->headpos, SEEK_SET, fitscat->filename);
+      save_tab(fitscat, tab);
+      QFSEEK(fitscat->file, pos, SEEK_SET, fitscat->filename);
+      break;
+
+    case FITS_10:
+      end_writeobj(fitscat, objtab);
+      fitswrite(fitscat->tab->headbuf,"SEXNDET ",&thecat.ndetect,H_INT,T_LONG);
+      fitswrite(fitscat->tab->headbuf,"SEXNFIN ",&thecat.ntotal, H_INT,T_LONG);
+      QFSEEK(fitscat->file, 0, SEEK_SET, fitscat->filename);
+      save_tab(fitscat, fitscat->tab);
+      free_cat(&fitscat,1);
+      break;
+
+    case CAT_NONE:
+      break;
+
+    default:
+      break;
+    }
+
+  return;
+  }
+
 

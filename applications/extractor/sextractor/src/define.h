@@ -13,19 +13,28 @@
 *	Last modify:	24/09/2001
 *	Last modify:	08/02/2001
 *                       20/03/2000 (PWD): Added NRAD define.
+*	Last modify:	13/12/2002
+*                                  (EB) 2.3.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
 
+/* Check if we are using a configure script here */
+#ifndef HAVE_CONFIG_H
+#define		VERSION		"2.x"
+#define		DATE		"2002-12-13"
+#endif
+
 /*------------------------ what, who, when and where ------------------------*/
 
 #define		BANNER		"SExtractor"
-#define		VERSION		"2.2.2 (Sep  24, 2001)"
+#define         EXECUTABLE      "sex"
+#define		MYVERSION	VERSION
 #define		COPYRIGHT	"Emmanuel BERTIN (bertin@iap.fr)"
 #define		WEBSITE		"http://terapix.iap.fr/sextractor"
 #define	       	MAILINGLIST	"sextractor@iap.fr"
 #define	       	MAILINGLISTREQ	"sextractor-request@iap.fr"
-#define		INSTITUTE	"IAP"
+#define		INSTITUTE	"TERAPIX team at IAP  http://terapix.iap.fr"
 
 /*--------------------------- Internal constants ----------------------------*/
 
@@ -68,38 +77,13 @@
 
 /*---- Set defines according to machine's specificities and customizing -----*/
 
-#ifdef DEC_ALPHA
-#define	BSWAP
-#define	INT64
+#if _LARGEFILE_SOURCE
+#define	FSEEKO	fseeko
+#define	FTELLO	ftello
+#else
+#define	FSEEKO	fseek
+#define	FTELLO	ftell
 #endif
-
-#ifdef HP_UX
-#define	_HPUX_SOURCE
-#endif
-
-#ifdef PC_LINUX
-#define	BSWAP
-#endif
-
-#ifdef SUN_ULTRASPARC
-#define	INT64
-#endif
-
-#ifdef IBM_AIX
-#define	INT64
-#endif
-
-#ifdef SUN_OS
-#endif
-
-#ifdef DEC_ULTRIX
-#define	BSWAP
-#endif
-
-#ifdef MEMORY_LINK
-#define MEMORY_READ
-#endif
-
 /*--------------------- in case of missing constants ------------------------*/
 
 #ifndef		SEEK_SET
@@ -155,12 +139,12 @@
 		  error(EXIT_FAILURE, "*Error* while writing ", fname)
 
 #define	QFSEEK(afile, offset, pos, fname) \
-		if (fseek(afile, (offset), pos)) \
+		if (FSEEKO(afile, (offset), pos)) \
 		  error(EXIT_FAILURE,"*Error*: file positioning failed in ", \
 			fname)
 
-#define	QFTELL(pos, afile, fname) \
-		if ((pos=ftell(afile))==-1) \
+#define	QFTELL(afile, pos, fname) \
+		if ((pos=FTELLO(afile))==-1) \
 		  error(EXIT_FAILURE,"*Error*: file position unknown in ", \
 			fname)
 
