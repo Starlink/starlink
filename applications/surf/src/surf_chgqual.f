@@ -63,7 +63,7 @@
 *     read from parameter BAD_QUALITY whether quality should be set good
 *     or bad. A `yes' answer will mark the area bad, a `no' answer will
 *     mark the area good (an area will only be good if no other QUALITY 
-*     bits are set - MODIFY only uses QUALITY bit 3).
+*     bits are set - CHANGE_QUALITY only uses QUALITY bit 3).
 
 *  Usage:
 *     change_quality in=mars{b7} bad_quality=yes
@@ -75,12 +75,14 @@
 *         will set them to good.
 *     IN = _CHAR (Read)
 *         Specification of data set to change.
+*     MSG_FILTER = _CHAR (Read)
+*         Message filter level. Default is NORM.
 
 *  Notes:
 *     Samples are marked bad by setting bit 3 of the quality array. The effects
-*     of MODIFY can be removed by changing the value of the bad bit mask
-*     (with the KAPPA task SETBB) so that bit 3 (decimal value of 8) is no 
-*     longer used as a masking bit.
+*     of CHANGE_QUALITY  can be removed by changing the value of the bad 
+*     bit mask (with the KAPPA task SETBB) so that bit 3 (decimal value of 8) 
+*     is no longer used as a masking bit.
 
 *  Related Application:
 *     REBIN, SCUPHOT
@@ -105,6 +107,8 @@
       INCLUDE 'DAT_PAR'                   ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                   ! for VAL__NBx
       INCLUDE 'REDS_SYS'                  ! REDS constants
+      INCLUDE 'MSG_PAR'                   ! MSG__ constants
+
 *    Import :
 *    Import-Export :
 *    Export :
@@ -117,14 +121,6 @@
 *    Local Constants :
       INTEGER          MAX__DIM           ! max number of dimensions in
       PARAMETER (MAX__DIM = 4)            ! array
-      INTEGER          MAX__EXP           ! max number of exposures
-      PARAMETER (MAX__EXP = 128)          ! in a file
-      INTEGER          MAX__INT           ! max number of integrations 
-      PARAMETER (MAX__INT = 200)          ! in a file
-      INTEGER          MAX__MEAS          ! max number of measurements
-      PARAMETER (MAX__MEAS = 20)          ! that can be specified
-      INTEGER          MAX__SWITCH        ! max number of switches
-      PARAMETER (MAX__SWITCH = 3)         ! in a file
       CHARACTER * 14   TSKNAME            ! Name of task
       PARAMETER (TSKNAME = 'CHANGE_QUALITY')
 
@@ -139,7 +135,7 @@
       INTEGER          CURLY              ! index of { in IN
       CHARACTER*80     DATA_SPEC          ! data-spec part of IN
       INTEGER          DIM (MAX__DIM)     ! dimensions of array
-      INTEGER          EXP_S (MAX__EXP)   ! array containing 1 for
+      INTEGER          EXP_S (SCUBA__MAX_EXP)   ! array containing 1 for
                                           ! exposures selected in
                                           ! data-spec, 0 otherwise
       CHARACTER*80     FILE               ! ndf name part of IN
@@ -151,7 +147,7 @@
       INTEGER          GOOD               ! good status
       INTEGER          I                  ! DO loop index
       CHARACTER*80     IN                 ! input filename and data-spec
-      INTEGER          INT_S (MAX__INT)   ! array containing 1 for
+      INTEGER          INT_S (SCUBA__MAX_INT)   ! array containing 1 for
                                           ! integration selected by
                                           ! data-spec, 0 otherwise
       INTEGER          IN_DEM_PNTR_PTR    ! pointer to .SCUBA.DEM_PNTR
@@ -163,7 +159,7 @@
       CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC
                                           ! HDS locator of .SCUBA extension
       INTEGER          ITEMP              ! scratch integer
-      INTEGER          MEAS_S (MAX__MEAS) ! array containing 1 for
+      INTEGER          MEAS_S (SCUBA__MAX_MEAS) ! array containing 1 for
                                           ! measurement selected by
                                           ! data-spec, 0 otherwise
       INTEGER          NDIM               ! number of dimensions in array
@@ -201,7 +197,7 @@
       CHARACTER*80     STEMP              ! scratch string
       LOGICAL          SWITCH_EXPECTED    ! .TRUE. if switch is to be
                                           ! specified in data-spec
-      INTEGER          SWITCH_S (MAX__SWITCH)
+      INTEGER          SWITCH_S (SCUBA__MAX_SWITCH)
                                           ! array that has 1 for
                                           ! switches selected by
                                           ! data-spec, 0 otherwise
@@ -210,6 +206,9 @@
 *     .
 
       IF (STATUS .NE. SAI__OK) RETURN
+
+*     Set the MSG output level (for use with MSG_OUTIF)
+      CALL MSG_IFGET('MSG_FILTER', STATUS)
 
 *     initialise some flags and locators
 
@@ -341,8 +340,9 @@
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUT (' ', '^PKG: run ^RUN was a ^MODE observation of '//
-     :     '^OBJECT', STATUS)
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     '^PKG: run ^RUN was a ^MODE observation of ^OBJECT',
+     :     STATUS)
 
 *     read the number of bolometers used
 
@@ -358,7 +358,7 @@
 *     switches for this routine
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (N_MEASUREMENTS .GT. MAX__MEAS) THEN
+         IF (N_MEASUREMENTS .GT. SCUBA__MAX_MEAS) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI ('N', N_MEASUREMENTS)
             CALL ERR_REP (' ', '^TASK: too many measurements - ^N',
@@ -367,7 +367,7 @@
       END IF
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (N_INTEGRATIONS .GT. MAX__INT) THEN
+         IF (N_INTEGRATIONS .GT. SCUBA__MAX_INT) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI ('N', N_INTEGRATIONS)
             CALL ERR_REP (' ', '^TASK: too many integrations - ^N',
@@ -376,7 +376,7 @@
       END IF
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (N_EXPOSURES .GT. MAX__EXP) THEN
+         IF (N_EXPOSURES .GT. SCUBA__MAX_EXP) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI ('N', N_EXPOSURES)
             CALL ERR_REP (' ', '^TASK: too many exposures - ^N',
@@ -429,13 +429,14 @@
       CALL MSG_SETI ('NBOLS', N_BOLS)
       CALL MSG_SETI ('NPOS', N_POS)
       CALL MSG_SETC('PKG', PACKAGE)
-      CALL MSG_OUT (' ', '^PKG: file has data for ^NBOLS '//
+      CALL MSG_OUTIF (MSG__NORM,' ', '^PKG: file has data for ^NBOLS '//
      :  'bolometers, measured at ^NPOS positions.', STATUS)
       CALL MSG_SETI ('NMEAS', N_MEASUREMENTS)
       CALL MSG_SETI ('NINT', N_INTEGRATIONS)
       CALL MSG_SETI ('NEXP', N_EXPOSURES)
-      CALL MSG_OUT (' ', ' - there are data for ^NEXP exposure(s) '//
-     :  'in ^NINT integration(s) in ^NMEAS measurements.', STATUS)
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     ' - there are data for ^NEXP exposure(s) '//
+     :     'in ^NINT integration(s) in ^NMEAS measurements.', STATUS)
 
 *     allocate memory for the POS_S array
 
