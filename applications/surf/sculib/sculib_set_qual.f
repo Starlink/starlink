@@ -1,11 +1,13 @@
 *+  SCULIB_SET_QUAL - set quality bits in a subset of a quality array
-      SUBROUTINE SCULIB_SET_QUAL (QUALITY, N_BOLS, N_POS, N_BEAM, 
-     :  BOL_S, POS_S, BIT_POS, BIT_VALUE, STATUS)
+      SUBROUTINE SCULIB_SET_QUAL (USE_SECT, QUALITY, N_BOLS, N_POS, 
+     :     N_BEAM, BOL_S, POS_S, BIT_POS, BIT_VALUE, STATUS)
 *    Description :
 *    Invocation :
 *     CALL SCULIB_SET_QUAL (QUALITY, N_BOLS, N_POS, N_BEAM, 
 *    :  BOL_S, POS_S, BIT_POS, BIT_VALUE, STATUS)
 *    Parameters :
+*     USE_SECT                = LOGICAL (Given)
+*           am I changing SECTION or not SECTION
 *     QUALITY (N_BOLS, N_POS, N_BEAM)
 *                             = BYTE (Given and returned)
 *           the quality array
@@ -46,6 +48,7 @@
       INTEGER POS_S (N_POS)
       INTEGER BIT_POS
       INTEGER BIT_VALUE
+      LOGICAL USE_SECT
 *    Import-Export :
       BYTE QUALITY (N_BOLS, N_POS, N_BEAM)
 *    Export :
@@ -68,44 +71,109 @@
 
 *  set the quality
 
-      IF (BIT_VALUE .NE. 0) THEN
+      IF (USE_SECT) THEN
 
-         DO POS = 1, N_POS
-            IF (POS_S(POS) .EQ. 1) THEN
+         IF (BIT_VALUE .NE. 0) THEN
 
-               DO BOL = 1, N_BOLS
-                  IF (BOL_S(BOL) .EQ. 1) THEN
+            DO POS = 1, N_POS
+               IF (POS_S(POS) .EQ. 1) THEN
 
-                     DO BEAM = 1, N_BEAM
-                        QUALITY (BOL,POS,BEAM) = 
-     :                    SCULIB_BITON (QUALITY(BOL,POS,BEAM), BIT_POS)
-                     END DO
+                  DO BOL = 1, N_BOLS
+                     IF (BOL_S(BOL) .EQ. 1) THEN
+
+                        DO BEAM = 1, N_BEAM
+                           QUALITY (BOL,POS,BEAM) = 
+     :                          SCULIB_BITON (QUALITY(BOL,POS,BEAM), 
+     :                          BIT_POS)
+                        END DO
          
-                  END IF
-               END DO
+                     END IF
+                  END DO
 
-            END IF
-         END DO
+               END IF
+            END DO
 
+         ELSE
+
+            DO POS = 1, N_POS
+               IF (POS_S(POS) .EQ. 1) THEN
+                  
+                  DO BOL = 1, N_BOLS
+                     IF (BOL_S(BOL) .EQ. 1) THEN
+
+                        DO BEAM = 1, N_BEAM
+                           QUALITY (BOL,POS,BEAM) = 
+     :                          SCULIB_BITOFF (QUALITY(BOL,POS,BEAM), 
+     :                          BIT_POS)
+                        END DO
+                        
+                     END IF
+                  END DO
+                  
+               END IF
+            END DO
+            
+         END IF
       ELSE
+*     This is the inverse section
 
-         DO POS = 1, N_POS
-            IF (POS_S(POS) .EQ. 1) THEN
+         IF (BIT_VALUE .NE. 0) THEN
+*     Setting the bit
+            DO POS = 1, N_POS
 
-               DO BOL = 1, N_BOLS
-                  IF (BOL_S(BOL) .EQ. 1) THEN
-
+               IF (POS_S(POS) .EQ. 0) THEN
+*     We know that this entire row is unmasked
+                  DO BOL = 1, N_BOLS
                      DO BEAM = 1, N_BEAM
                         QUALITY (BOL,POS,BEAM) = 
-     :                    SCULIB_BITOFF (QUALITY(BOL,POS,BEAM), BIT_POS)
-                     END DO
+     :                       SCULIB_BITON (QUALITY(BOL,POS,BEAM), 
+     :                       BIT_POS)
+                     END DO 
+                  END DO
+               ELSE
+*     Only set if unmasked
+                  DO BOL = 1, N_BOLS
+                     IF (BOL_S(BOL) .EQ. 0) THEN
+                        DO BEAM = 1, N_BEAM
+                           QUALITY (BOL,POS,BEAM) = 
+     :                          SCULIB_BITON (QUALITY(BOL,POS,BEAM), 
+     :                          BIT_POS)
+                        END DO
+                     END IF
+                  END DO
+               END IF
+            END DO
 
-                  END IF
-               END DO
+         ELSE
+*     Unsetting a bit
+            DO POS = 1, N_POS
 
-            END IF
-         END DO
+               IF (POS_S(POS) .EQ. 0) THEN
+*     We know that this entire row is unmasked
+                  DO BOL = 1, N_BOLS
+                     DO BEAM = 1, N_BEAM
+                        QUALITY (BOL,POS,BEAM) = 
+     :                       SCULIB_BITOFF (QUALITY(BOL,POS,BEAM), 
+     :                       BIT_POS)
+                     END DO 
+                  END DO
+               ELSE
+*     Only set if unmasked
+                  DO BOL = 1, N_BOLS
+                     IF (BOL_S(BOL) .EQ. 0) THEN
+                        DO BEAM = 1, N_BEAM
+                           QUALITY (BOL,POS,BEAM) = 
+     :                          SCULIB_BITOFF (QUALITY(BOL,POS,BEAM), 
+     :                          BIT_POS)
+                        END DO
+                     END IF
+                  END DO
+               END IF
+            END DO
+
+
+         END IF
 
       END IF
-    
+
       END
