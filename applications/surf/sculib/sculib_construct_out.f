@@ -29,7 +29,9 @@
 *     OPTIONS(N_OPTIONS) = CHAR (Given)
 *        Names of different options
 *     OPTION_STRINGS(N_OPTIONS) = CHAR (Given)
-*        Suffixes for each option
+*        Suffixes for each option. If the string starts with a '!'
+*        the input string is chopped from the last '_' before adding
+*        the new string.
 *     OUT_STRING = CHAR (Returned)
 *        Input string with suffix
 *     STATUS = INTEGER (Given & Returned)
@@ -42,6 +44,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.2  1997/11/08 00:40:58  timj
+*     Add the chopping '!' facility
+*
 *     Revision 1.1  1997/09/03 21:55:09  timj
 *     Initial revision
 *
@@ -74,6 +79,10 @@
 *  External References:
       INTEGER CHR_LEN
       EXTERNAL CHR_LEN
+
+*  Local Constants:
+      CHARACTER*(1) CHOP_CHAR        ! Character that indicates a chop
+      PARAMETER (CHOP_CHAR = '!')
 
 *  Local Variables:
       CHARACTER * (132)ENV_VALUE     ! Value of environment variable
@@ -123,9 +132,28 @@
          
       END IF
 
-*     Now just append the new suffix
-
+*     First copy the input string to the output
       OUT_STRING = IN_STRING
+
+*     If the SUFFIX contains the chopping character
+*     see if we can chop on an underscore
+
+      IF (SUFFIX(1:1) .EQ. CHOP_CHAR) THEN
+
+*     Search from the end of the string for an underscore.
+
+         IPOSN = CHR_LEN(OUT_STRING)
+         CALL CHR_FIND(OUT_STRING, '_', .FALSE., IPOSN) 
+
+*     Okay so have we found something
+         IF (IPOSN .GT. 1) OUT_STRING = OUT_STRING(1:IPOSN-1)
+
+*       Remove the chop character from the suffix string
+         SUFFIX = SUFFIX(2:)
+
+      END IF
+
+*     Now just append the new suffix
       IPOSN = CHR_LEN(OUT_STRING)
       CALL CHR_APPND(SUFFIX, OUT_STRING, IPOSN)
 
