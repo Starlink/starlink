@@ -62,7 +62,7 @@
             menubutton $itk_component(control).style \
                -relief raised \
                -menu $itk_component(control).style.menu \
-               -text "Style"
+               -text "Grid"
          }
          pack $itk_component(style)
          set menubutton $itk_component(style)
