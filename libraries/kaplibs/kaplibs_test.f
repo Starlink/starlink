@@ -14,6 +14,7 @@
       CHARACTER LIST*80
       DOUBLE PRECISION ATTRS( 20 )! Saved graphics attributes
       DOUBLE PRECISION BOX( 4 )  ! Bounds of used region of (X,Y) axes
+      DOUBLE PRECISION X,Y       ! 
       INTEGER IPICD              ! AGI identifier for the DATA picture
       INTEGER IPICF              ! AGI identifier for the frame picture
       INTEGER IPICK              ! AGI identifier for the KEY picture
@@ -43,9 +44,12 @@
       CALL KPG1_PSEED( STATUS )
 
 *  Tell the user what should happen.
+      CALL MSG_BLANK( STATUS )
       CALL MSG_OUT( ' ', 'A graphics window should appear '//
-     :              'containing a diagonal line and a set of axes.',
+     :              'containing a red diagonal line in a blue box '//
+     :              'with a green grid and cyan numerical labels.',
      :              STATUS )
+      CALL MSG_BLANK( STATUS )
 
 * Create an AST Plot for plotting.
       MARGIN( 1 ) = 0.1
@@ -65,8 +69,11 @@
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTRS, STATUS )
 
 *  Draw a diagonal line using PGPLOT.
-      CALL PGMOVE( 0.0, 0.0 )
-      CALL PGDRAW( 100.0, 100.0 )
+      CALL AST_TRAN2( IPLOT, 1, 0.0D0, 0.0D0, .FALSE., X, Y, STATUS )
+      CALL PGMOVE( REAL( X ), REAL( Y ) )
+
+      CALL AST_TRAN2( IPLOT, 1, 1.0D2, 1.0D2, .FALSE., X, Y, STATUS )
+      CALL PGDRAW( REAL( X ), REAL( Y ) )
 
 *  Re-instate the previous PGPLOT attributes.
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTRS, STATUS )
