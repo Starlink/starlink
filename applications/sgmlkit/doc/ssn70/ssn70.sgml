@@ -14,8 +14,8 @@
   <!entity programcodedtddoc system '../dtd2sgml/programcode-0.2.sgmltext'>
   <!entity % Feature.Routinelist 'include'>
   <!entity rsqbrack ']'	-- needed in order to describe marked sections -->
-  <!entity ddash '--'	-- so I can use this in CODE els without it
-			   being recognised as a shortref -->
+  <!entity ddash cdata '--'	-- so I can use this in CODE els without it
+				   being recognised as a shortref -->
   <!-- DSSSL source code -->
   <!entity dsssl.lib
 	system "../../dsssl/sl/lib/sllib.dsl" subdoc>
@@ -30,7 +30,7 @@
 ]>
 <!-- $Id$ -->
 
-<title>The Starlink SGML system
+<title>The Starlink SGML Set
 <author email='norman@astro.gla.ac.uk'
 	webpage='http://www.astro.gla.ac.uk/users/norman/'
 	affiliation='University of Glasgow'
@@ -46,10 +46,23 @@ First real release to other programmers.  Distribution contains only
 SGML lib stuff: Jade has to be built separately.
 </distribution>
 <change date="06-JUN-1999" author="ng" versionid="post-0.2">
-Various edits.  I received comments from Mark Taylor, arising from the
-DR-0.2 distribution.
+Various edits, great and small.  I received comments from Mark Taylor,
+arising from the DR-0.2 distribution.  I made considerable additions
+to the appendices.  Generally tidying up for release.
 </change>
+<distribution string="DR-0.3" date="15-JUN-1999" author="ng">
+More substantial release, CD candidate.
+</distribution>
 </history>
+
+<coverimage>
+<figurecontent alt="">
+<px>An SGML Application Conforming to International Standard ISO 8879
+-- Standard Generalized Markup Language
+<px>A HyTime application conforming to International Standard ISO/IEC
+10744 -- Hypermedia/Time-based Structuring Language
+</figurecontent>
+</coverimage>
 
 <copyright>
 Copyright 1999, Particle Physics and Astronomy Research Council
@@ -58,23 +71,31 @@ Copyright 1999, Particle Physics and Astronomy Research Council
 <abstract>
 <px>This is a developers' release, not production code.
 
-<px>This document describes the Starlink SGML system.
+<px>This document describes the Starlink SGML set.
 
 <px>Audience: 
 This document is addressed both at those who need to generate Starlink
-documentation of any kind, and at anyone maintaining the SGML system.
+documentation of any kind, and at anyone maintaining the Starlink SGML set.
 </abstract>
 
 <sect id=intro export>Introduction
 
-<p>The Starlink SGML system supports people writing Starlink documents,
-such as SUNs, SSNs, MUDs and the like.  It consists of a definition of
-a markup language suitable for such documents, plus software to
-convert these source documents to reader-friendly form.  At present,
-these `output formats' include HTML and &latex (and hence include
-postscript and PDF formats).
+<p>The Starlink SGML set supports people writing Starlink documents,
+such as SUNs, SSNs, MUDs and the like.<note>To avoid ambiguity, this
+somewhat arcane note needs to be here.  The terms `SGML system' and
+`SGML application' have precise meanings in the SGML world.  An SGML
+system is a program such as Jade or SP which parses SGML.  An SGML
+application is a collection of DTDs and other supporting documents
+(see the standard <citation/iso8879/, clause~4.279).  This package is
+therefore properly referred to as an SGML application, but since this
+term could be confusing, I will refer to this package instead
+as the (Starlink) SGML Set.</note> It consists of a definition of a
+markup language suitable for such documents, plus software to convert
+these source documents to reader-friendly form.  At present, these
+`output formats' include HTML and &latex (and hence include postscript
+and PDF formats).
 
-<p>The SGML system scores over previous solutions to Starlink's
+<p>The SGML set scores over previous solutions to Starlink's
 documentation needs, such as <code/runoff/ or &latex, because it is a
 well-defined system, so that there is excellent support for it in
 tools, and it is designed to be converted into whichever presentation
@@ -93,7 +114,7 @@ aims, describing how to read a Document Type Definition (DTD), and
 pointing to sources of information.  In <ref id=markup>, I describe
 how you would go about actually writing a document, describing the
 structure of Starlink documents which is crystallised in the
-specification of this system.  In <ref id=structure>, I describe the
+specification of this set.  In <ref id=structure>, I describe the
 structure of the document DTD, and the categories of elements you will use.
 In <ref id=doccode>, I describe the
 support which exists to support documentation of source code, allowing
@@ -102,15 +123,15 @@ source code.  In <ref id=processing>, I describe the details of how
 you transform your document from SGML to an output format.  Finally,
 the appendices give the detailed descriptions of the elements in the
 two DTDs described here, a more detailed description of SGML than is
-necessary for simple use of the system, and documentation for
-maintainers of the system.
+necessary for simple use of the set, and documentation for
+maintainers of the set.
 
 <!--
 In <ref id=future>, I describe
-some possible further improvements in the system (suggestions and
+some possible further improvements in the set (suggestions and
 comments are most welcome).  Finally, in <ref id=faq>, I
 answer (I hope) some frequently asked questions about SGML in general
-and this system in particular.
+and this set in particular.
 -->
 
 <sect id=sgml export>SGML Overview
@@ -290,7 +311,7 @@ large and various document set.
 
 <p>XML is a cut-down version of SGML, omitting rarely-used or
 dispensable features, but preserving many of its strengths (<ref
-id=further.xml>).  I have, however, used several of these omitted
+id=final.xml>).  I have, however, used several of these omitted
 features in this application.  Some of these features, such as markup
 minimisation (<ref id=markup.min>) are not vital, and would simply be
 inconvenient to lose, but others such as SGML's support for
@@ -302,6 +323,16 @@ available.
 
 <sect id=markup export>Marking up your document
 
+<p>In this section I will introduce you to SGML from the point of view
+of writing a document marked up using the particular set of SGML
+element types this application defines.  There are many 
+features of SGML which I will not describe, for simplicity and
+brevity, but if you wish to find out more about the possibilities of
+SGML, then see the more detailed documentation in <ref id=appx.sgml>
+or, for the most authoritative (but admittedly largely
+incomprehensible) documentation, the SGML standard
+<citation/iso8879/.
+
 <subsect id=markup.intro export>Sample document, and overview
 
 <p>A sample SUN is illustrated in <ref id=fig.simplesun>.
@@ -310,7 +341,7 @@ available.
 <figurecontent alt="Simple SUN document">
 <verbatim><![ cdata [
 <!doctype sun public "-//Starlink//DTD Starlink SUN//EN">
-<title>The Starlink SGML system
+<title>The Starlink SGML set
 <author email='norman@astro.gla.ac.uk'
         webpage='http://www.astro.gla.ac.uk/users/norman'
         affiliation='University of Glasgow'
@@ -336,13 +367,19 @@ available.
 SUN//EN&quot;></code>, which states which DTD this document claims to be
 conformant to, in this case the Starlink SUN document type.
 
-<li>The document is structured in terms of `elements' such as
+<li>The document is structured in terms of `element types' such as
 <code/author/ or <code/sect/, and these in turn contain further data,
 such as a sequence of characters (`Norman Gray') in the case of the
 <code/author/ element, or further elements (the <code/version/ element)
 in the case of the <code/history/ element.  Elements are delimited by
 `opening tags' like <code>&lt;abstract&gt;</code> and `closing tags'
-like <code>&lt;/abstract&gt;</code>.
+like <code>&lt;/abstract&gt;</code>.<note>There is a difference
+between `elements' and `element types': the former are things which
+appear in documents, with data in them; the latter are the abstract
+things defined by the DTD.  The distinction is not particularly
+important outside of a DTD, however, so I will not continue to make it
+in the description of the element types below.  It will always be
+possible to make the distinction from the context anyway.</note>
 
 <li>Elements have both <em/content/ and <em/attributes/.  For example,
 the <code/author/ element has the characters `Norman Gray' as its
@@ -376,7 +413,7 @@ of the document in <ref id=fig.simplesun>.
 <verbatim><![ cdata [
 <SUN>
 <DOCINFO>
-<TITLE>The Starlink SGML system</TITLE>
+<TITLE>The Starlink SGML set</TITLE>
 <AUTHORLIST>
 <AUTHOR EMAIL="norman@astro.gla.ac.uk" 
 WEBPAGE="http://www.astro.gla.ac.uk/users/norman" 
@@ -783,7 +820,7 @@ will parse your document, and convert it to a collection of HTML
 files, with the master file named <code/SUN-1234.html/ (this name is based
 on the information in the document, and is independent of what your
 source file is actually called).  The command actually spits out a
-line of text to the standard output; this is because the system is
+line of text to the standard output; this is because the SGML set is
 designed to be used from within a Makefile (see <ref id=proc.makefile>) rather
 than directly from the command line.
 
@@ -1148,7 +1185,7 @@ template Makefile (see <ref id=proc.makefile>), the name of the
 Bib&tex database is passed directly to Bib&tex, so you might need to
 have Bib&tex;'s <code/BIB_INPUTS/ environment variable suitably
 defined.  There is no way (at present) to specify the bibliography
-formatting style -- the system uses a customised bibliography style
+formatting style -- the SGML set uses a customised bibliography style
 which, incidentally, supports a URL field in bibliography entries.
 See the Bib&tex documentation in, for example, <citation/lamport/ for
 further details.
@@ -1370,9 +1407,9 @@ url='http://www.oasis-open.org/html/a503.htm' >Oasis
 Exchange Table Model</webref> as the basis for their tables.  Even
 though it is only a portable subset of a more elaborate standard (the
 industry-standard CALS table model), there is more in the table model
-than has yet been implemented in the Starlink system.
+than has yet been implemented in the Starlink application.
 
-<p>In the current release of the Starlink SGML system, all of the
+<p>In the current release of the Starlink SGML set, all of the
 elements and attributes in the Oasis model are permitted in the
 documents you write, but most of the attributes are ignored.  Support
 for these will likely be added in future releases, but the only real
@@ -1787,7 +1824,7 @@ be ended with the <code>&lt;/codebody></code> end-tag.</note>
 (perhaps because the document has been generated by a preprocessor
 stage), then you should include the attribute `empty' in the
 start-tag; this has no effect at present, but could become significant
-if the documents are repurposed in future versions of this system.
+if the documents are repurposed in future versions of this set.
 
 <p>
 <verbatim>
@@ -1953,7 +1990,7 @@ architectural form, <code/codereference/ to
 <code/external-specification/ (with attribute name remapping) and
 <code/codebody/ to <code/style-specification-body/. This follows a
 discussion of this technique in <code/comp.text.sgml/ by Eliot
-Kimber~<citation>kimber97</citation>.
+Kimber~<citation>kimber97a</citation>.
 
 <p>Also it defines the entity <code/%direction.attr/ to be simply
 `given', since arguments to DSSSL functions are only passed in.
@@ -2115,13 +2152,32 @@ transformation.
 
 <subsect id=proc.setup export>Setting up
 
-<p>To use the SGML system.  Blah.
+<p>To use the SGML set, give the command 
+<verbatim>
+% . /star/bin/sgml/sgml_set.sh
+</verbatim>
+or
+<verbatim>
+% source /star/bin/sgml/sgml_set.csh
+</verbatim>
+depending on whether you are using a Bourne-like shell (<code/sh/,
+<code/bash/ or <code/ksh/) or a C-shell (<code/csh/, <code/tcsh/ or
+other variants).  This will set up a couple of environment variables,
+and modify your path.
 
+<p>To use the SGML set, you need to have the program
+<code/dvi2bitmap/ installed.  This is a separate Starlink application,
+which converts &tex; DVI files to GIFs, and is used when you have
+maths in your document.  You also need to have a suitably patched copy
+of Jade installed, as this is not currently packaged with the rest of
+the SGML set.
+
+<!--
 <p>Note for developers: there will be a setup script, once I've sorted
-out where the various bits of the system will be placed, and whether
+out where the various bits of the set will be placed, and whether
 or not I'm going to distribute a built version of Jade.  At present,
 you need to have jade and co. (nsgmls, sgmlnorm,...) in your path; the
-environment variable <code/STARLINK_SGML_SYSTEM/ pointing to the root
+environment variable <code/STARLINK_SGML_DIR/ pointing to the root
 of the SGML distribution (ie, the directory which has doc, dsssl, dtd
 and lib subdirectories; and <code/SGML_CATALOG_FILES/ including 
 <code>/home/norman/s/src/sgml/documents/CATALOG</code> (the location
@@ -2130,12 +2186,10 @@ of the document summary files) and
 distributed SGML catalogue).
 
 <p>To test the setup, go to <code>$STARLINK_SGML_DIR/doc/ssn70</code>
-and type <kbd/make ssn70.html.stamp/ -- this should build the HTML
+and type <kbd/make ssn70.html.stamp/: this should build the HTML
 version of the documentation.  If you type <kbd/make
 ssn70.latex.stamp/ you should get the &latex version.
-
-
-<!-- FIXME: BOS?  Manifest? -->
+-->
 
 <subsect id=editors export>Editors
 
@@ -2165,7 +2219,7 @@ system.  It is for all these reasons that the system is designed to be
 used primarily <em/via/ Makefiles.
 
 <p>The distribution contains a Makefile,
-<code>$STARLINK_SGML_SYSTEM/lib/Makefile.common</code>, which contains
+<code>$STARLINK_SGML_DIR/lib/Makefile.common</code>, which contains
 reasonably modular rules for the various stages of the formatting
 process.  The aim is that you can process your documents by including
 this common Makefile in a per-directory Makefile, and then simply
@@ -2267,9 +2321,9 @@ a manifest of the files which make a complete set.  The names of the
 manifest files can be configured as parameters (see <ref
 id=appx.system.paramdsssl>).
 
-<sect id=further export>Further information
+<sect id=final export>Finally
 
-<subsect id=further.development export>Further developments
+<subsect id=final.development export>Further developments
 
 <p>What's next?  This section contains rather miscellaneous ideas for
 further work.  They're ordered from most to least work, but on the
@@ -2279,7 +2333,7 @@ expected utility.
 
 <dl>
 <dt>XML
-<dd>I'd like to support XML (see <ref id=further.xml>).  This requires
+<dd>I'd like to support XML (see <ref id=final.xml>).  This requires
 a little development of the DTD but, more substantially, also requires
 investigating what level of support we can reasonably expect from
 users' browsers.  There is a great deal of work being done on XML at
@@ -2291,7 +2345,7 @@ could be a smallish task or a huge one, depending on what we wanted to do.
 <dd>I'd like to support sophisticated searching.  The Starlink HTX
 system allows some context-based searching (see <docxref
 doc="sun188" loc='searching_for_information'>), and it should be easy
-to support this and more in the SGML system.  This would involve
+to support this and more in the SGML set.  This would involve
 finding a suitable SGML-aware search engine.  The <webref
 url="http://info.ox.ac.uk/bnc/sara/" >BNC's SARA server</webref> might
 be a possibility: I think it's free, but I haven't yet investigated
@@ -2328,7 +2382,7 @@ unobtrusive and rather helpful.
 
 </dl>
 
-<subsect id=further.xml export>XML
+<subsect id=final.xml export>XML
 
 <p>The primary XML resources are
 <ul>
@@ -2455,6 +2509,20 @@ maths on the internet
 
 </ul>
 
+<subsect id=final.ack export>Acknowledgements
+
+<p>I've benefited greatly from various contributers to the usenet
+newsgroup <code/comp.text.sgml/, from the Oasis SGML pages at
+<url>http://www.oasis-open.org/cover/</url> and references there, and
+specifically from the various papers made available by Eliot Kimber
+and co.~at <webref url='http://www.isogen.com' >Isogen International
+Corp</webref>. 
+
+<p>The DSSSL code started off heavily based on Norman Walsh's <webref
+url="http://nwalsh.com/docbook/dsssl/" >DocBook
+DSSSL stylesheets</webref>.
+
+<p>Mark Taylor read and commented on early versions of the documentation.
 
 <appendices>
 
@@ -2467,6 +2535,27 @@ give you enough understanding to allow you to read most DTDs.
 <p>This section is for extra, or more detailed, information than it
 was necessary to include in <ref id=markup>.  It will not, therefore,
 repeat information presented there.
+
+<subsect id=sgml.std export>Standard identification
+
+<p>The SGML Standard Identification:
+<blockquote>
+An SGML Application Conforming to International Standard ISO 8879 --
+Standard Generalized Markup Language
+</blockquote>
+SGML has many features not described in this document.
+For further details, see the standard, <citation/iso8879/ or
+<citation/goldfarb/ (better, since it contains all the standard text
+plus commentary).
+
+<p>The HyTime Standard Identification:
+<blockquote>
+A HyTime application conforming to International Standard ISO/IEC
+10744 -- Hypermedia/Time-based Structuring Language
+</blockquote>
+For further details of the possibilities available via HyTime, see
+<ref id=appx.system.hytime>, or the HyTime
+standard,~<citation/iso10744/.
 
 <subsect id=sgml.dtd export>Reading DTDs
 
@@ -2802,64 +2891,23 @@ particular document's DTD-subset (see <ref id=markup.dtdsubset>), or
 completely externally to the document in a command-line option to the
 parser.
 
-<sect id=appx.general.dtd export>The Starlink General DTD
-
-<p>This section includes a list of all the elements in the Starlink
-General DTD.  For a thematic treatment of the elements, see <ref
-id=structure>, and the groups in <ref id=table.elements>.
-
-<p>The elements listed here are shown as children of the top-level
-element <code>&lt;sun></code>, because this is the most general of the
-document types described in <ref id=str.structure>.  However, the
-listing here does not <em/quite/ document the SUN DTD, since it
-includes the <ref id=el.sun.docdate text='docdate'> element which is
-only available in those document types which do <em/not/ have the
-`Versioning' feature (see <ref id=str.structure> and <ref
-id=str.history>).
-
-<subsect id=appx.general.elementlist export>Element listing
-
-<p>The following element listing includes all the elements and
-attributes defined in the Starlink General DTD.  This includes a
-number of attributes with a <em/fixed/ value (indicated by a default
-keyword of <code/#fixed/).  These are for internal use by the DTD and
-the applications which process it, and are not documented further.
-
-&starlinkdtddoc;
-
-<sect id=appx.programcode.dtd export>The Programcode DTD
-
-<p>See <ref id=doccode> for an overview of documenting code.
-
-<p>The programcode DTD described here is the same for all languages.
-When you invoke it, however, you do so using a document type
-declaration specific to the language of the program being documented.
-See <ref id=doccode.languages> for details.
-
-<subsect id=appx.programcode.elementlist export>Element listing
-
-&programcodedtddoc;
-
-<sect id=appx.system export>The Starlink SGML system for maintainers
+<sect id=appx.system export>The Starlink SGML set for maintainers
 <update versionid="post-0.2">Very substantial additions -- this
 section was barely present before.</update>
 
 <p>This section is a reference for maintainers of the Starlink SGML
-system
+set
 
 <subsect id=appx.system.sgml export>SGML arcana
 
 <subsubsect id=appx.system.sgmldoc export>The SGML status of this project
 
-<p>This is an SGML application, ISO/IEC 8879:1986, blah.  Same for HyTime.
-<!-- FIXME find the appropriate incantations here -->
-
-<p>The system is standard in SGML and HyTime terms (apart from the
-unresolved `<code>SQL query...</code>' in the definition of docxref).
-The processing system uses DSSSL (see <ref id=appx.system.dsssl>),
-which is a standard, but generates HTML using DSSSL extensions
-specific to Jade, and generates LaTeX using DSSSL extensions specific
-to a version of Jade using my patch.
+<p>The SGML application conforms to the SGML~<citation/iso8879/ and
+HyTime~<citation/iso10744/ standards.  The processing system uses
+DSSSL (see <ref id=appx.system.dsssl> and~<citation/iso10179/), which
+is a standard, but generates HTML using DSSSL extensions specific to
+Jade, and generates LaTeX using DSSSL extensions specific to a patched
+version of Jade.
 
 <subsubsect id=appx.system.hytime export>HyTime, architectures and groves
 
@@ -2876,18 +2924,24 @@ defines a standard processing model for SGML documents in terms of the
 HyTime architecture -- for abstracting the semantics of document
 links.
 
-<!-- FIXME refine this description of  HyTime -->
-
 <p>A `grove' is an acyclic directed labelled graph (I think!) --
 alternatively defined, even in the HyTime standard, as `a bunch of
 trees and other stuff' -- which is the data structure into which an
 SGML document is nominally transformed, and with respect to which the
-semantics of SGML standards (SGML itself, HyTime, DSSSL and others) are
-now formally defined.  DSSSL is designed to be able to query the grove
-straightforwardly and efficiently, but unless you are maintaining the
-more recondite parts of the DSSSL sources, which query a few grove
-properties directly, you will not need to be aware of anything more
-than the grove's formal existence.
+semantics of SGML standards (SGML itself, HyTime, DSSSL and others)
+are now formally defined.  DSSSL is designed to be able to query the
+grove straightforwardly and efficiently, but unless you are
+maintaining the more recondite parts of the DSSSL sources, which query
+a few grove properties directly, you will not need to be aware of
+anything more than the grove's formal existence.  The grove is
+formally defined in <webref
+url="http://www.ornl.gov/sgml/wg8/document/n1920/html/clause-A.4.html"
+>ISO/IEC 10179, clause~A.4</webref>: there are introductions and
+tutorials on the relevant Oasis <webref
+url='http://www.oasis-open.org/cover/topics.html#groves' >special
+topic</webref> list, of which Paul Prescod's tutorial
+<citation/prescod99/ is particularly good, and Kimber has written
+variously on this <citation/kimber97c/.
 
 <p>An `architecture' is a skeleton DTD (the HyTime first edition name
 for it was `meta-DTD').  An individual DTD may declare itself to be a
@@ -2903,7 +2957,10 @@ of the DSSSL architecture, with suitable remappings of element and
 attribute names (see <ref id=doccode.dsssl> for discussion, and see
 the reference cited there).  For formal details see the HyTime
 standard, particularly clause~A.3, <cite/Architectural forms
-declaration requirement/.
+declaration requirement/.  The relevant Oasis
+<webref url='http://www.oasis-open.org/cover/topics.html#archForms'
+>special topic</webref> has an overwhelming number of references on
+this, of which Kimber's article <citation/kimber97b/ is very good.
 
 <p>Finally, the HyTime standard defines a particular architecture --
 the so-called HyTime Architecture.  This architecture defines forms
@@ -2938,12 +2995,13 @@ client, such as the Starlink General DTD, then Panorama can format and
 follow <code>&lt;ref></code> elements (for example) immediately.
 
 <p>The <ref id=el.sun.webref text='webref'> element in the Starlink
-General DTD is declared much as follows:
+General DTD is declared much as follows (compare <citation/iso10744/,
+clause~7.8)
 <verbatim>
 &lt;!element WEBREF - - (#pcdata)>
 &lt;!attlist WEBREF
     url      cdata #required
-    &ddash HyTime attributes... &ddash
+    &ddash HyTime attributes... &ddash;
     HyTime   name  #fixed clink
     HyNames  cdata #fixed "linkend url"
     anchcstr names #fixed "self required"
@@ -2969,7 +3027,10 @@ loctype="url QUERYLOC URL">&lt;/clink></code>.
 <!-- FIXME: is this right, or should it be loctype="linkend queryloc url"?-->
 
 <p>If you're curious, you can obtain the HyTime view of a document
-with the command <kbd/sgmlnorm -A hytime ssn70.sgml/.
+with the command <kbd/sgmlnorm -A hytime ssn70.sgml/.<note>Note that
+this currently doesn't work fully -- there's some defect in the HyTime
+declaration of the docxref element type which I haven't been able to
+identify.</note>
 
 <p>The linking elements in the Starlink General DTD have been defined
 in terms of HyTime.  This is partly for documentation purposes, partly
@@ -3032,7 +3093,7 @@ what I've seen of it, looks like hell on earth.
 </ul>
 
 <p>This does not in any way affect the standards conformance of the
-rest of the SGML system -- the various DTDs and the HyTime support --
+rest of the SGML set -- the various DTDs and the HyTime support --
 since the processing of documents is by design completely independent
 of the standards which define their markup.
 
@@ -3118,10 +3179,17 @@ SGML_CATALOG_FILES=./CATALOG:$SGML_CATALOG_FILES
 
 <subsect id=appx.system.software export>Supporting software
 
-<p>As well as the specifically SGML materials in this distribution --
-that is, the DTDs and associated DSSSL stylesheets -- there is some
-auxiliary software.  This is located in <code
-fspath>$STARLINK_SGML_DIR/lib</code>. 
+<p>This distribution primarily consists of SGML materials --
+that is, the DTDs and associated DSSSL stylesheets.  It also relies on
+the Jade DSSSL engine, suitably patched, and the
+<code/dvi2bitmap/ package (to help generate the GIFs used when
+displaying maths on the web.   See <ref id=install> for further
+details of obtaining and building these.
+
+<p>As well as these supporting applications, which must be obtained
+and installed separately, there is some auxiliary software distributed
+with the package itself.  This is located in <code
+fspath>$STARLINK_SGML_DIR/lib</code>.
 
 <dl>
 <dt><code/Makefile.common/
@@ -3162,8 +3230,6 @@ version was modified by me to include an extra resolution option.
 
 </dl>
 
-<!-- FIXME Include information about dvi2bitmap -->
-
 <p><ref id=appx.system.dssslcode> includes a selection of the more important
 DSSSL code modules.
 
@@ -3180,7 +3246,7 @@ must be marked up using the `document summary' DTD,
 <p>The Document Summary DTD has the same general structure as the
 Starlink General one, but the only text in it is the abstract
 (possibly) and the content of the various section headings.  The
-system uses the structure expressed in here, to work out the section
+SGML set uses the structure expressed in here, to work out the section
 number which will be given to the link text.
 The DTD has attributes to control a `link policy' (whether we may link
 to all elements, or only those with the export attribute present), and
@@ -3211,7 +3277,7 @@ support the extraction of architectural instances.  There is a Jade
 patch at <webref url='http://www.isogen.com' >Isogen</webref> which
 adds this as a Jade extension, but this has not (yet) been
 incorporated into the Starlink version of Jade which accompanies this
-system.  Note, however, that this is almost entirely an implementation
+set.  Note, however, that this is almost entirely an implementation
 issue: if this feature were to be added to Jade, as it might be if it
 conforms to any updated DSSSL standard which includes this feature,
 the only changes necessary would be a possible adjustment of that
@@ -3239,7 +3305,7 @@ would, however, be unnecessarily complicated for a first version of
 the system, as well as going beyond the current, and adequate, HTX
 model.
 
-<p>The current system uses Star2html and HTX.  Star2html (see <docxref
+<p>The current SGML set uses Star2html and HTX.  Star2html (see <docxref
 doc=sun199>) generates a distributable document set with correct
 internal cross-references, and `best guess', but possibly broken,
 external ones.  These references are then patched up in a separate
@@ -3247,16 +3313,16 @@ installation phase, being edited by a copy of HTX primed with
 appropriate local knowledge (see <docxref doc=sun188
 loc=how_linking_works>).
 
-<p>The aim of the current system is to produce documents which are in
+<p>The aim of the current set is to produce documents which are in
 their final form, and can be moved to their final location without
 further editing -- this assumes that documents are distributed in
 (SGML) source form and processed at installation time, and that the
-SGML system is the only system producing documentation.  This aim has
+SGML set is the only system producing documentation.  This aim has
 been achieved in the current version, but could benefit from more
 convenient parameterisation.
 
 <p>Since HTX is likely to remain in use for the forseeable future, 
-the current system is intended to be used with HTX, and is claimed
+the current set is intended to be used with HTX, and is claimed
 to be compatible with it.  It produces links in the format recognised
 by HTX, as described (or defined?) in <docxref doc=sun188
 loc=referring_to_targets>.  Note two points, however.  
@@ -3266,7 +3332,7 @@ loc=referring_to_targets>.  Note two points, however.
 document set is compatible as <em/input/ to HTX, and does not attempt
 to emulate it to the extent of generating HTX index, catalogue and log
 files.  This would not, however, be terribly difficult, and might
-appear in a future version of this system.  There is therefore at
+appear in a future version of this set.  There is therefore at
 least a potential interaction between the development of the two
 systems, and if you are involved in the development of either, some
 liason would be useful.
@@ -3360,10 +3426,105 @@ excellently concise.
 
 <subsect id=install export>Installation
 
-<p>How to install everything, including building Jade.
+<p>The installation procedure should be standard.  When you have
+unpacked the distribution, define the <code/SYSTEM/ and <code/INSTALL/
+environment variables as usual, and type
+<verbatim>
+% ./mk build
+% ./mk install
+</verbatim>
+This will install the DTD, DSSSL scripts and documentation in the
+correct places, and generate document summaries for all the Starlink
+documents it can find in <code fspath>/star/docs</code> (these
+summaries are not necessarily perfect, as they do not attempt to do
+anything clever with &latex; markup in the documents they are
+abstracting; however the script which generates them should not
+collapse during the installation).
+As noted in <ref id=proc.setup>, you prepare the set for use by
+sourcing one of two scripts.
 
-<p>More here presently.  For the present, see the notes on setting up,
-in <ref id=proc.setup>.
+<p>The SGML set does not have Jade packaged up within it, largely
+because it's rather difficult to build.  I hope to work on this, but
+at present, you will need to obtain, patch, and build Jade yourself.
+
+<p>Unfortunately, Jade turns out
+to be a real hassle to build with a compiler other than gcc.  The
+author, James Clark, is a fine programmer, but apparently a bit of a
+standards purist (he was involved with writing the DSSSL standard, and
+with the development of XML/XSL): he seems to take the position that a
+standards document is an adequate C++ user manual, and doesn't appear
+to believe that porting software to non-conforming compilers should be
+high on his priority list.  Now, I greatly approve of this attitude,
+<em/but/ I'd rather I had the attitude alone, rather than sharing it
+with Clark.  Jade builds
+perfectly happily on gcc, but I've been struggling away for ages
+trying to get it to build using Sun's and Digital's C++ compilers.  I
+will distribute a runnable version of Jade eventually, but for the
+moment, you'll have to build Jade yourself.  If <em/you/ manage to
+build it using one of those, could you tell me what you had to do&ellip;.
+
+<p>Get Jade from Clark's <webref
+url='http://www.jclark.com/jade/' >Jade pages</webref>.  Before you
+build it, you need to patch it to a Starlink-specific version, using
+the patch at
+<url>http://www.astro.gla.ac.uk/users/norman/distrib/jade.html</url>.
+The configuration you'll need is:
+<verbatim>
+% mkdir -p /my/star/bin/sgml/bin /my/star/bin/sgml/lib
+% ./configure --enable-latex --prefix=/my/star/bin/sgml
+% make
+% make install
+</verbatim>
+The stylesheets need Jade patched to version
+<code/1.2.1-starlink-1.0b2/ (you can check Jade's version with
+<kbd>jade -v &lt;/dev/null</kbd>).  Don't install Jade in the same
+place as this package installs its binaries -- the installation script
+for the SGML set assumes it has complete control over that
+subdirectory, and will squash anything else it finds there.
+
+<p>The application <code/dvi2bitmap/ is also required.  This is
+distributed separately.  Until it finds its way onto the Starlink CD,
+however, you can obtain a copy on <webref
+url="http://www.astro.gla.ac.uk/users/norman/star/dvi2bitmap/" >my
+dvi2bitmap page</webref>.
+
+<sect id=appx.general.dtd export>The Starlink General DTD
+
+<p>This section includes a list of all the elements in the Starlink
+General DTD.  For a thematic treatment of the elements, see <ref
+id=structure>, and the groups in <ref id=table.elements>.
+
+<p>The elements listed here are shown as children of the top-level
+element <code>&lt;sun></code>, because this is the most general of the
+document types described in <ref id=str.structure>.  However, the
+listing here does not <em/quite/ document the SUN DTD, since it
+includes the <ref id=el.sun.docdate text='docdate'> element which is
+only available in those document types which do <em/not/ have the
+`Versioning' feature (see <ref id=str.structure> and <ref
+id=str.history>).
+
+<subsect id=appx.general.elementlist export>Element listing
+
+<p>The following element listing includes all the elements and
+attributes defined in the Starlink General DTD.  This includes a
+number of attributes with a <em/fixed/ value (indicated by a default
+keyword of <code/#fixed/).  These are for internal use by the DTD and
+the applications which process it, and are not documented further.
+
+&starlinkdtddoc;
+
+<sect id=appx.programcode.dtd export>The Programcode DTD
+
+<p>See <ref id=doccode> for an overview of documenting code.
+
+<p>The programcode DTD described here is the same for all languages.
+When you invoke it, however, you do so using a document type
+declaration specific to the language of the program being documented.
+See <ref id=doccode.languages> for details.
+
+<subsect id=appx.programcode.elementlist export>Element listing
+
+&programcodedtddoc;
 
 <sect id=appx.releasenotes export>Release Notes
 
