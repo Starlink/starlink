@@ -1429,7 +1429,7 @@ int *status                         /* global status (give and returned) */
 
 /*   Setup the signal handler */
 
-   ioaction.sa_handler = ant_sighdlr;
+   ioaction.sa_sigaction = ant_sighdlr;
    sigemptyset ( &ioaction.sa_mask );
    ioaction.sa_flags = 0;
    sigaction ( SIGIO, &ioaction, NULL );
@@ -1997,7 +1997,7 @@ struct sigaction oact    /* action structure with flag initialised
 /* Retarget the signal handler towards ant_exhdlr - leave all flags etc
    as they were  */
 
-   oact.sa_handler = ant_exhdlr;
+   oact.sa_sigaction = ant_exhdlr;
    sigaction ( signo, &oact, NULL );
 
 /* Mark signal handler set in bitmask */
@@ -2968,7 +2968,7 @@ void
 void ant_exhdlr
 (
 int isig, 
-struct siginfo *info, 
+siginfo_t *info,
 void *dummy
 )
 {
@@ -3037,7 +3037,7 @@ void *dummy
          }
          if ( cur_entry != NULL ) 
          {
-            cur_entry->act.sa_handler(isig, info, dummy);
+             cur_entry->act.sa_sigaction(isig, info, dummy);
 
 /*   We do NOT expect the RTL handler for fatal signals to return. Just in case
      it does we exit as fast as possible! */
@@ -3062,7 +3062,7 @@ void *dummy
 void ant_sighdlr
 ( 
 int astparam,              /* the signal parameter (given) */
-struct siginfo *infop,     /* info pointer (given) */
+siginfo_t *infop,          /* info pointer (given) */
 void *ucp                  /* context pointer (given) */
 )
 
