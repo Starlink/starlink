@@ -32,7 +32,7 @@ AC_CHECK_FUNCS(memmove bcopy)
 dnl   Need to know the size of a pointer for CNF_PVAL
 dnl   (see CNF_PAR.c and Makefile.am)
 AC_CHECK_SIZEOF(void*)
-AC_CHECK_SIZEOF(int32_t)
+AC_CHECK_SIZEOF(uint32_t)
 
 dnl   This package has no dependencies
 
