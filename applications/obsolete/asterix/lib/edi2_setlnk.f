@@ -118,6 +118,7 @@
       INTEGER			NEVENT			! Number of records
       INTEGER			NLIST			! Number of lists
       INTEGER			TPOS			! Type code index
+      INTEGER			UIHDU			! User HDU number
 
       LOGICAL			GOTMAX, GOTMIN		! Got extrema?
       LOGICAL			RDF			! RDF data?
