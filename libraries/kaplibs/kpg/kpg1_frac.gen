@@ -120,6 +120,8 @@
 *     4-SEP-2001 (DSB):
 *        More fixes from MT related to checking for large numbers of
 *        equal-valued pixels, and correcting generic arithmetic.
+*     1-NOV-2001 (DSB):
+*        Corrected argument list for VAL_<T>TOI calls.
 *     {enter_further_changes_here}
 
 *-
@@ -246,8 +248,8 @@
       ELSE
 
 *  The extreme values must not exceed the integer dynamic range.
-         IF ( VAL_<T>TOI( MAXV ) .GT. VAL__MAXI .OR. 
-     :        VAL_<T>TOI( MINV ) .LT. VAL__MINI ) THEN
+         IF ( VAL_<T>TOI( .FALSE., MAXV, STATUS ) .GT. VAL__MAXI .OR. 
+     :        VAL_<T>TOI( .FALSE., MINV, STATUS ) .LT. VAL__MINI ) THEN
             INTVAL = .FALSE.
          ELSE
 
