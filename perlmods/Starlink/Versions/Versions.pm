@@ -55,7 +55,7 @@ use File::Spec;         # For catfile()
 		'Funcs' => [ @EXPORT_OK ],
 		);
 
-$VERSION = '0.01';
+$VERSION = '1.00';
 $DEBUG = 0;
 
 # This is the cache used to store the version numbers 
@@ -117,8 +117,7 @@ this module will not look explicitly in a Starlink install tree
 unless it can not work out a directory tree to search as an alternative.
 
 Finally, applications that do not have an application directory
-(and therefore most likely no datestamp file), for example C<hdstrace>,
-can not have their version determined with this module.
+or datestamp file can not have their version determined with this module.
 
 =head2 Special Cases
 
@@ -137,6 +136,14 @@ Figaro uses C<FIG_DIR> rather than C<FIGARO_DIR>.
 =item B<StarX>
 
 The starx date-stamp file is called C<starX_datestamp>.
+
+=item B<hdstrace>
+
+Hdstrace has an application directory that is not in the
+standard location of C</star/bin/app/>. Rather it uses
+C</star/bin>. In cases where the application dir ends in
+C<bin> the location of the datestamp directory is assumed
+to be C<../dates> rather than C<../../dates>.
 
 =back
 
@@ -249,6 +256,9 @@ This is simply derived from the C<PROG_DIR> environment
 variable. C<undef> is returned if the directory could not be
 determined (usually because the environment variable was not set).
 
+Special cases 'figaro' since the Figaro environment variable
+is C<FIG_DIR> rather than C<FIGARO_DIR>.
+
 =cut
 
 sub _get_app_dir ($) {
@@ -270,17 +280,25 @@ This is simply C<$PROG_DIR/../../dates>. Returns C<undef> if
 C<_get_app_dir> returns undef. Does not check that the directory
 exists.
 
-Special cases 'figaro' since the Figaro environment variable
-is C<FIG_DIR> rather than C<FIGARO_DIR>.
+If the supplied application directory ends in C<bin> it is assumed
+that the dates directory is in C<$PROG_DIR/../dates>. This is the
+case for Hdstrace.
 
 =cut
 
 sub _get_app_datestamp_dir ($) {
   my $appdir = _get_app_dir( $_[0] );
-  return ( defined $appdir ? 
-	   File::Spec->catdir($appdir, File::Spec->updir, 
-			      File::Spec->updir, 'dates') :
-	   undef );
+  if (defined $appdir) {
+    # special case bin dirs
+    if ($appdir =~ /bin$/) {
+      return File::Spec->catdir($appdir,
+				File::Spec->updir, 'dates');
+    } else {
+      return File::Spec->catdir($appdir, File::Spec->updir, 
+				File::Spec->updir, 'dates');
+    }
+  }
+  return undef;
 }
 
 =head2 _get_standard_datestamp_dir
@@ -346,6 +364,7 @@ supplied pattern.
 =cut
 
 sub _parse_version_string ($) {
+  print "CHECKING STRING: $_[0]" if $DEBUG;
   if ($_[0] =~ /V(\d+)\.(\d+)[-\.](\d+)/ ) {
     return ($1, $2, $3);
   } elsif ($_[0] =~ /V(\d+)\.(\d+)/) {
