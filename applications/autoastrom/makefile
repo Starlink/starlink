@@ -388,7 +388,7 @@ PKG_LINK = AUTOASTROM
 #  not merit documentation changes.
 
 # %%VERSION%%
-PKG_VERS = 0.5-10
+PKG_VERS = 0.5-11
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -1215,12 +1215,13 @@ sun242.xml:
 # The file build-subdirs must not exist at any time.
 #
 # When building, remove troublesome environment variables
+# Also, set RUN_LOCAL_AUTOTOOLS to false to stop `missing' attempting
+# to run programs (a bit of a hack, because we have generated files in CVS).
 build-subdirs: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a \
 		astrom/makefile $(MATCHPROG)/Makefile
-	cd moggy && $(CONFENVS) make
+	cd moggy && $(CONFENVS) RUN_LOCAL_AUTOTOOLS=false make
 	cd astrom && ./mk build
 	cd $(MATCHPROG) && $(CONFENVS) make
-#	cd $(MATCHPROG) && unset INSTALL LINK RANLIB CFLAGS; make
 
 # Creating moggy/Makefile configures the moggy package
 moggy/Makefile: moggy/Makefile.in  $(CATLIBINSTALLDIR)/lib/libcat.a
