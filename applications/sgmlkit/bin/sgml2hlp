@@ -27,7 +27,7 @@
 #        jade nroff tbl sed
 #
 #  <authorlist>
-#  <authorref id=mbt>
+#  <author id=mbt>
 #     MBT: Mark Taylor
 #
 #  <history>

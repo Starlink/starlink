@@ -12,9 +12,15 @@
 
 <programcode>
 
-<docblock>
 <title>Supporting programs</title>
 
+<userkeywords>This and that
+
+<history>
+<change author=ng date='01-jan-2000'>Created
+</history>
+
+<!--
 <authorlist>
 
 <author id=ng affiliation='Starlink, Glasgow'
@@ -24,17 +30,13 @@ Norman Gray
 <author id=mbt affiliation='Starlink, Institute of Astronomy, Cambridge'
 	email='mbt@ast.cam.ac.uk'>
 Mark Taylor
-
 <codegroup>Supporting programs
+-->
 
-<routine>
 &sgml2docs;
-<codebody empty>
 
-<routine>
 &sgml2xml;
-<codebody empty>
 
-<routine>
+<codegroup>Help programs
+
 &sgml2hlp;
-<codebody empty>

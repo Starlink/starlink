@@ -44,7 +44,7 @@
 #      <code>.../slmaths.dsl</code>, of the format described above.
 #
 #  <authorlist>
-#  <authorref id=ng>Norman Gray
+#  <author id=ng>Norman Gray
 #-
 
 $ident_string = "Starlink SGML system, release ((PKG_VERS))";

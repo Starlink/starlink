@@ -13,6 +13,7 @@
 <docblock>
 <title>Supporting library programs</title>
 
+<!--
 <authorlist>
 
 <author id=ng affiliation='Starlink, Glasgow'
@@ -24,8 +25,7 @@ Norman Gray
 Mark Taylor
 
 <codegroup>Supporting library programs
+-->
 
-<routine>
 &img-eqlist;
-<codebody empty>
 

@@ -91,8 +91,10 @@ RCSID="$Id$"
 #    is used.
 #
 #  <authorlist>
-#  <authorref id=ng>
-#     Norman Gray (Starlink, Glasgow)
+#  <author id=ng
+#          webpage='http://www.astro.gla.ac.uk/users/norman/'
+#	   affiliation='Glasgow University'>
+#     Norman Gray
 #
 #  <history>
 #    <change author=ng date='26-APR-2000'>Initial version. 

@@ -21,17 +21,6 @@ RCSID='$Id$'
 #     then creates a tarball in the source directory holding the
 #     generated files.
 #
-#  <diytopic>Environment
-#     <p>Requires that the environment variable <code>STARLINK_SGML_DIR</> is
-#     properly set, pointing to the root of the Starlink SGML kit.  It
-#     also requires that dvi2bitmap is in the <code>PATH</>.
-#
-#     <p>The script creates a work directory and does its processing
-#     there.  If it is necessary to run BibTeX, it will be done with
-#     that temporary directory as the current directory, so that it
-#     might be necessary to set <code>BIBINPUTS</> (for example) to let the
-#     system find the bibliography database.
-#
 #  <argumentlist>
 #     <parameter>arg1
 #     <type>filename
@@ -53,9 +42,43 @@ RCSID='$Id$'
 #     -n: don't actually run anything, just show what would happen.
 #     </dl>
 #
+#     <p>The available extra options, for the <code>--options</>
+#       option are <code>cts-sect</> and <code>cts-appx</>, which
+#       suppresses any page-break between sections in the main text
+#       and appendices; and <code>onepass-latex</>, which generates
+#       LaTeX which should need only a single pass to produce a table
+#       of contents.
+#
+#  <examplelist>
+#     <example>
+#       sgml2docs --html --tarball mydocs.tar docfile.sgml
+#     <examplenote>
+#       This converts the document <code>docfile.sgml</> to a set of
+#       HTML files, bundling the result into a tarball
+#       <code>mydocs.tar</>, rather than the default based on the
+#       source file's document class and number.
+#     <example>
+#       sgml2docs --latex --options cts-sect,cts-appx docfile.sgml
+#     <examplenote>
+#       Converts the document to a bundle of files which may be
+#       LaTeXed.  The page breaks between sections are suppressed.
+#       
+#  <diytopic>Environment
+#     <p>Requires that the environment variable <code>STARLINK_SGML_DIR</> is
+#     properly set, pointing to the root of the Starlink SGML kit.  It
+#     also requires that dvi2bitmap is in the <code>PATH</>.
+#
+#     <p>The script creates a work directory and does its processing
+#     there.  If it is necessary to run BibTeX, it will be done with
+#     that temporary directory as the current directory, so that it
+#     might be necessary to set <code>BIBINPUTS</> (for example) to let the
+#     system find the bibliography database.
+#
 #  <authorlist>
-#  <authorref id=ng>
-#     Norman Gray (Starlink, Glasgow)
+#  <author id=ng 
+#          email='norman@astro.gla.ac.uk'
+#          affiliation='Starlink, Glasgow'>
+#     Norman Gray
 #
 #  <history>
 #     <change author=ng date='29-SEP-1999'>Initial version.
