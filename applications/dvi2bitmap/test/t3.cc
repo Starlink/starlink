@@ -81,11 +81,6 @@ void sel(string label, PageRange& p, int i, bool issel)
 
 int main (int argc, char **argv)
 {
-    if (freopen("t3.stderr", "w", stderr) == NULL) {
-	cerr << "Can't reopen t3.stderr" << endl;
-	exit(1);
-    }
-
     usecounts = -1;
     PageRange pr1;
     sel("1-1", pr1, 4, true);

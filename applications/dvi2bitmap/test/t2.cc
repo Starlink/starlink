@@ -43,11 +43,6 @@ int ntests = sizeof(tests)/sizeof(tests[0]);
 
 int main (int argc, char **argv)
 {
-    if (freopen("t2.stderr", "w", stderr) == NULL) {
-	cerr << "Can't reopen t2.stderr" << endl;
-	exit(1);
-    }
-
     PkFont::verbosity(debug);
     int i;
     int nfails = 0;

@@ -26,10 +26,11 @@ test: regression pathtest
 
 regression: $(TESTS)
 	for f in $(TESTS); do \
-	    if ./$$f; then\
+	    if ./$$f 2>temp.stderr; then\
 		echo $$f: ok; \
 	    else \
 		echo $$f: FAILED; \
+		mv temp.stderr $$f.stderr; \
 	    fi; \
 	done
 
@@ -60,6 +61,6 @@ modetest.dvi: modetest.tex
 	$(LIBTOOL) --mode=link $(CXX) -o $@ $< ../libdvi2bitmap.la $(LIBS) -lm
 
 clean:
-	rm -f *~ *.o *.test *.stderr
+	rm -f *~ *.o *.lo *.test *.stderr
 	rm -f *.log *.aux *.dvi *.pdf
-	rm -f test-output*
+	rm -f test-output* temp*

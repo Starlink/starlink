@@ -52,11 +52,6 @@ void reportRGB(char *spec)
 
 int main (int argc, char **argv)
 {
-    if (freopen("t4.stderr", "w", stderr) == NULL) {
-	cerr << "Can't reopen t4.stderr" << endl;
-	exit(1);
-    }
-
     int i;
     int nfails = 0;
 

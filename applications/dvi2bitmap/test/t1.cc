@@ -32,11 +32,6 @@ int ntests = sizeof(tests)/sizeof(tests[0]);
 
 int main (int argc, char **argv)
 {
-    if (freopen("t1.stderr", "w", stderr) == NULL) {
-	cerr << "Can't reopen t1.stderr" << endl;
-	exit(1);
-    }
-
     Util::verbosity (debug);
 
     int i;
