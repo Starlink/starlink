@@ -15,6 +15,7 @@ $(MANIFEST)/adam: \
 	cd libraries/pcs/adam \
 	    && make>make.log && make install>>make.log
 
+# Component adamnet is OBSOLETE -- do not build
 $(MANIFEST)/adamnet: \
 		$(MANIFEST)/adam \
 		$(MANIFEST)/ams \
@@ -181,6 +182,7 @@ $(MANIFEST)/atools: \
 	cd applications/atools \
 	    && make>make.log && make install>>make.log
 
+# Component autoconf is a buildsupport component
 $(MANIFEST)/autoconf:
 	cd thirdparty/fsf/autoconf \
 	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
@@ -195,6 +197,7 @@ $(MANIFEST)/autoconf:
 	    fi \
 	    && make>make.log && make install>>make.log
 
+# Component automake is a buildsupport component
 $(MANIFEST)/automake: \
 		$(MANIFEST)/autoconf \
 		$(MANIFEST)/libtool
@@ -238,6 +241,8 @@ $(MANIFEST)/cat: \
 	cd libraries/cat \
 	    && make>make.log && make install>>make.log
 
+# Component ccdpack has configure dependencies on { itcl tcl tk },
+# which must be built before this component is configured.
 $(MANIFEST)/ccdpack: \
 		$(MANIFEST)/adam \
 		$(MANIFEST)/agi \
@@ -301,6 +306,7 @@ $(MANIFEST)/cfitsio: \
 	cd thirdparty/heasarc/cfitsio \
 	    && make>make.log && make install>>make.log
 
+# Component chart is OBSOLETE -- do not build
 $(MANIFEST)/chart: \
 		$(MANIFEST)/adam \
 		$(MANIFEST)/ams \
@@ -335,7 +341,8 @@ $(MANIFEST)/chr: \
 	cd libraries/chr \
 	    && make>make.log && make install>>make.log
 
-$(MANIFEST)/cnf:
+$(MANIFEST)/cnf: \
+		$(MANIFEST)/star2html
 	cd libraries/cnf \
 	    && make>make.log && make install>>make.log
 
@@ -347,6 +354,7 @@ $(MANIFEST)/coco: \
 
 $(MANIFEST)/convert: \
 		$(MANIFEST)/adam \
+		$(MANIFEST)/agi \
 		$(MANIFEST)/ams \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
@@ -354,8 +362,11 @@ $(MANIFEST)/convert: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
+		$(MANIFEST)/figaro \
 		$(MANIFEST)/fio \
+		$(MANIFEST)/gks \
 		$(MANIFEST)/grp \
+		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/lex \
@@ -367,6 +378,7 @@ $(MANIFEST)/convert: \
 		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
+		$(MANIFEST)/pda \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
@@ -540,12 +552,6 @@ $(MANIFEST)/dipso: \
 	cd applications/dipso \
 	    && make>make.log && make install>>make.log
 
-$(MANIFEST)/docfind: \
-		$(MANIFEST)/info \
-		$(MANIFEST)/star2html
-	cd applications/docfind \
-	    && make>make.log && make install>>make.log
-
 $(MANIFEST)/dtask: \
 		$(MANIFEST)/adam \
 		$(MANIFEST)/chr \
@@ -623,6 +629,7 @@ $(MANIFEST)/echwind: \
 	cd applications/echwind \
 	    && make>make.log && make install>>make.log
 
+# Component email is OBSOLETE -- do not build
 $(MANIFEST)/email: \
 		$(MANIFEST)/star2html
 	cd applications/obsolete/email \
@@ -722,6 +729,7 @@ $(MANIFEST)/extreme: \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/misc \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/psx \
@@ -1097,6 +1105,7 @@ $(MANIFEST)/init: \
 	cd etc/init \
 	    && make>make.log && make install>>make.log
 
+# Component iras90 is OBSOLETE -- do not build
 $(MANIFEST)/iras90: \
 		$(MANIFEST)/adam \
 		$(MANIFEST)/agi \
@@ -1135,6 +1144,7 @@ $(MANIFEST)/iras90: \
 	cd applications/obsolete/iras90 \
 	    && make>make.log && make install>>make.log
 
+# Component ircamdr is OBSOLETE -- do not build
 $(MANIFEST)/ircamdr: \
 		$(MANIFEST)/adam \
 		$(MANIFEST)/ams \
@@ -1169,10 +1179,12 @@ $(MANIFEST)/ircamdr: \
 	cd applications/obsolete/ircamdr \
 	    && make>make.log && make install>>make.log
 
+# Component itcl is a configure dependency, so is configurable in place.
 $(MANIFEST)/itcl: \
 		$(MANIFEST)/tcl \
 		$(MANIFEST)/tk
 	cd thirdparty/tclsys/itcl \
+	    && test -f config.status || ./configure >configure-output.log \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/jpl: \
@@ -1326,6 +1338,7 @@ $(MANIFEST)/lex: \
 	cd libraries/pcs/lex \
 	    && make>make.log && make install>>make.log
 
+# Component libtool is a buildsupport component
 $(MANIFEST)/libtool:
 	cd thirdparty/fsf/libtool \
 	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
@@ -1340,6 +1353,7 @@ $(MANIFEST)/libtool:
 	    fi \
 	    && make>make.log && make install>>make.log
 
+# Component m4 is a buildsupport component
 $(MANIFEST)/m4:
 	cd thirdparty/fsf/m4 \
 	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
@@ -1814,6 +1828,7 @@ $(MANIFEST)/sst: \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/misc \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/psx \
@@ -1829,6 +1844,7 @@ $(MANIFEST)/star2html:
 	cd applications/star2html \
 	    && make>make.log && make install>>make.log
 
+# Component starconf is a buildsupport component
 $(MANIFEST)/starconf: \
 		$(MANIFEST)/autoconf \
 		$(MANIFEST)/automake \
@@ -1915,13 +1931,17 @@ $(MANIFEST)/task: \
 	cd libraries/pcs/task \
 	    && make>make.log && make install>>make.log
 
+# Component tcl is a configure dependency, so is configurable in place.
 $(MANIFEST)/tcl:
 	cd thirdparty/tclsys/tcl \
+	    && test -f config.status || ./configure >configure-output.log \
 	    && make>make.log && make install>>make.log
 
+# Component tk is a configure dependency, so is configurable in place.
 $(MANIFEST)/tk: \
 		$(MANIFEST)/tcl
 	cd thirdparty/tclsys/tk \
+	    && test -f config.status || ./configure >configure-output.log \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/trn: \
@@ -1954,3 +1974,10 @@ EXTRA_BUILDSUPPORT_MANIFESTS = \
 buildsupport: $(BUILDSUPPORT_MANIFESTS)
 clean-buildsupport:
 	rm -f $(BUILDSUPPORT_MANIFESTS) $(EXTRA_BUILDSUPPORT_MANIFESTS)
+
+# Configuration dependencies
+# Run 'make configure-deps' to make these components before ./configure
+configure-deps: \
+		$(MANIFEST)/itcl \
+		$(MANIFEST)/tcl \
+		$(MANIFEST)/tk

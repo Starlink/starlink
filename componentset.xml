@@ -60,7 +60,7 @@ high-level interface to the AST library.
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ccdpack">
-  <version>4.0-16</version>
+  <version>4.0-17</version>
   <path>applications/ccdpack</path>
   <description>CCD data reduction package</description>
   <abstract>
@@ -85,7 +85,7 @@ high-level interface to the AST library.
     </p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><sourceset>messgen</sourceset><build>chr</build><build>agi</build><build>ard</build><build>ast</build><build>chr</build><build>fio</build><build>ndf</build><build>pgplot</build><build>prm</build><build>psx</build><build>trn</build><build>pda</build><build>ndg</build><build>tcl</build><build>tk</build><build>itcl</build><build>startcl</build><build>ifd</build><build>img</build><build>generic</build><build>sla</build><build>shl</build><build>ref</build><build>graphpar</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><sourceset>messgen</sourceset><build>chr</build><build>agi</build><build>ard</build><build>ast</build><build>chr</build><build>fio</build><build>ndf</build><build>pgplot</build><build>prm</build><build>psx</build><build>trn</build><build>pda</build><build>ndg</build><build>tcl</build><build>tk</build><build>itcl</build><build>startcl</build><build>ifd</build><build>img</build><build>generic</build><build>sla</build><build>shl</build><build>ref</build><build>graphpar</build><configure>tcl</configure><configure>tk</configure><configure>itcl</configure><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -138,7 +138,7 @@ Starlink's Extensible n-dimensional Data Format (NDF), which is used by most
 Starlink applications, and a number of other common data formats.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ast</build><build>sae</build><build>chr</build><build>hds</build><build>fio</build><build>cnf</build><build>grp</build><build>mers</build><build>prm</build><build>ndf</build><build>ndg</build><build>par</build><build>psx</build><build>subpar</build><build>shl</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>ast</build><build>sae</build><build>chr</build><build>hds</build><build>fio</build><build>cnf</build><build>grp</build><build>mers</build><build>prm</build><build>ndf</build><build>ndg</build><build>par</build><build>psx</build><build>subpar</build><build>shl</build><build>figaro</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -274,30 +274,6 @@ cube manipulation. </p></abstract>
     </person>
   </developers>
   <documentation> sun50</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
-<component id="docfind">
-  <version>1.3-1</version>
-  <path>applications/docfind</path>
-  <description>Starlink document index searching</description>
-  <abstract><p>
-   Simplify searching of Starlink documents. See also findme/showme.
-  </p></abstract>
-  <dependencies >
-    <build>info</build><sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Peter Allan</name>
-    </person>
-    <person>
-      <name>Martin Bly</name>
-    </person>
-  </developers>
-  <documentation> sun38</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -1248,7 +1224,7 @@ UNIX).
       commercial products being freely available on all Starlink
       machines. </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>chr</build><build>fio</build><build>mers</build><build>par</build><build>psx</build><build>sae</build><build>hds</build><build>hlp</build><build>task</build><build option='use'>dtask</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>chr</build><build>fio</build><build>mers</build><build>one</build><build>par</build><build>psx</build><build>sae</build><build>hds</build><build>hlp</build><build>task</build><build option='use'>dtask</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1533,7 +1509,7 @@ UNIX).
 </component>
 
 <component id="ast">
-  <version>3.4-1</version>
+  <version>3.4-2</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -1632,7 +1608,7 @@ No longer under active control.
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="cnf">
-  <version>4.0-2</version>
+  <version>4.1-1</version>
   <path>libraries/cnf</path>
   <description>Mixed Language Programming -- FORTRAN and C</description>
   <abstract><p>The CNF package comprises two sets of software which
@@ -1643,7 +1619,7 @@ No longer under active control.
       character strings, logical values and pointers to dynamically
       allocated memory.</p></abstract>
   <dependencies >
-    
+    <sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2254,7 +2230,7 @@ Ultrix and for SunOS and may still work for them.
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="one">
-  <version>1.1-4</version>
+  <version>1.1-5</version>
   <path>libraries/one</path>
   <description>General purpose Starlink odds and ends functions</description>
   <abstract><p> This library is a set of Fortran and C routines of a
