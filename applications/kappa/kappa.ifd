@@ -3676,6 +3676,33 @@ package kappa {
             helpkey *
           }
 
+         parameter key {
+            type _LOGICAL
+            prompt {Do you want a key to the colour table?}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter keypos {
+            type _REAL
+            prompt {Horizontal position of key}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            helpkey *
+            default 0.1
+          }
+
+         parameter keystyle {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Plotting style for the key}
+            helpkey *
+            default !
+          }
+
          parameter low {
             type _DOUBLE
             prompt {Low value for display}

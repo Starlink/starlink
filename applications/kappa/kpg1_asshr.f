@@ -83,6 +83,7 @@
       DOUBLE PRECISION BBOX( 4 ) ! Bounds of original window
       DOUBLE PRECISION XC        ! Axis 1 value
       DOUBLE PRECISION YC        ! Axis 2 value
+      INTEGER I                  ! Current Frame index in old Plot
       INTEGER ICURR              ! Current Frame index in old Plot
       INTEGER NC1                ! No. of characters in an axis 1 value
       INTEGER NC2                ! No. of characters in an axis 2 value
@@ -97,9 +98,11 @@
       REAL AR                    ! Original window aspect ratio
       REAL CEN                   ! Position of window centre
       REAL GBOX( 4 )             ! Bounds of new window
+      REAL OBOX( 4 )             ! Bounds of old window
       REAL HGT                   ! Height of window 
       REAL HTHGT                 ! Height of text with horizontal baseline
       REAL HTWID                 ! Char. width of text with horizontal baseline
+      REAL MAXEXT                ! Maximum allowed margin extension
       REAL MBOT                  ! Width of margin at bottom for annotation
       REAL MINDIM                ! Length of minimum viewport dimension
       REAL MLEFT                 ! Width of margin at left for annotation
@@ -116,6 +119,7 @@
       REAL VTWID                 ! Char. width of text with vertical baseline
       REAL WID                   ! Width of window 
       REAL X1, X2, Y1, Y2    	 ! GRAPHICS bounds of PGPLOT viewport
+      LOGICAL MORE               ! Find another graphics box?
 *.
 
 *  Check the inherited status. 
@@ -127,9 +131,6 @@
 *  Get the bounds of the current PGPLOT window, in the GRAPHICS Frame 
 *  (millimetres from the bottom left corner of the view surface).
       CALL PGQWIN( X1, X2, Y1, Y2 )
-
-*  Store the length of the minimum dimension.
-      MINDIM = MIN( ABS( X1 - X2 ), ABS( Y1 - Y2 ) )
 
 *  If required, store the original aspect ratio.
       IF( FIXAR ) AR = ABS( Y1 - Y2 )/ABS( X1 - X2 )
@@ -169,152 +170,193 @@
 *  Find the number of characters in a formatted axis 2 value.
       NC2 = CHR_LEN( AST_FORMAT( IPLOT, 2, YC, STATUS ) )
 
+*  Assume for the moment that the graphics box will be the entire 
+*  current viewport.       
+      GBOX( 1 ) = X1
+      GBOX( 3 ) = X2
+      GBOX( 2 ) = Y1
+      GBOX( 4 ) = Y2
+
+*  Loop round modifying the graphics box on each iteration to a size
+*  which excludes the annotation required for the current size of
+*  graphics box.
+      MORE = .TRUE.
+      DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
+
+*  Store the length of the minimum dimension.
+         MINDIM = MIN( ABS( GBOX( 1 ) - GBOX( 3 ) ), 
+     :                 ABS( GBOX( 2 ) - GBOX( 4 ) ) )
+
 *  Find the margin required for annotation at the bottom of the plot.
 *  First, find the space needed for any tick marks on the bottom edge.
-      MBOT = 0.0
-      IF( TKALL .OR. CHR_SIMLR( EDGE1, 'BOTTOM' ) .OR. 
-     :               CHR_SIMLR( EDGE2, 'BOTTOM' ) ) THEN
-         IF( TKLEN .LT. 0.0 ) THEN
-            MBOT = -MINDIM*TKLEN
+         MBOT = 0.0
+         IF( TKALL .OR. CHR_SIMLR( EDGE1, 'BOTTOM' ) .OR. 
+     :                  CHR_SIMLR( EDGE2, 'BOTTOM' ) ) THEN
+            IF( TKLEN .LT. 0.0 ) THEN
+               MBOT = -MINDIM*TKLEN
+            END IF
          END IF
-      END IF
 
 *  If numerical labels are being drawn on the bottom edge, see how far
 *  they extend from the edge of the data area.
-      IF( EXTLAB ) THEN
-         IF( NUMLB1 .AND. CHR_SIMLR( EDGE1, 'BOTTOM' ) ) THEN
-            MBOT = MAX( MBOT, NLGAP1*MINDIM + NLSIZE*HTHGT )
-         ELSE IF( NUMLB2 .AND. CHR_SIMLR( EDGE2, 'BOTTOM' ) ) THEN
-            MBOT = MAX( MBOT, NLGAP2*MINDIM + NLSIZE*HTHGT )
+         IF( EXTLAB ) THEN
+            IF( NUMLB1 .AND. CHR_SIMLR( EDGE1, 'BOTTOM' ) ) THEN
+               MBOT = MAX( MBOT, NLGAP1*MINDIM + NLSIZE*HTHGT )
+            ELSE IF( NUMLB2 .AND. CHR_SIMLR( EDGE2, 'BOTTOM' ) ) THEN
+               MBOT = MAX( MBOT, NLGAP2*MINDIM + NLSIZE*HTHGT )
+            END IF
          END IF
-      END IF
 
 *  If text labels are being drawn on the bottom edge, see how far
 *  they extend.
-      IF( TXTLB1 .AND. CHR_SIMLR( EDGE1, 'BOTTOM' ) ) THEN
-         MBOT = MBOT + MAX( 0.0, TLGAP1*MINDIM + TLSIZE*HTHGT )
-      ELSE IF( TXTLB2 .AND. CHR_SIMLR( EDGE2, 'BOTTOM' ) ) THEN
-         MBOT = MBOT + MAX( 0.0, TLGAP2*MINDIM + TLSIZE*HTHGT )
-      END IF
+         IF( TXTLB1 .AND. CHR_SIMLR( EDGE1, 'BOTTOM' ) ) THEN
+            MBOT = MBOT + MAX( 0.0, TLGAP1*MINDIM + TLSIZE*HTHGT )
+         ELSE IF( TXTLB2 .AND. CHR_SIMLR( EDGE2, 'BOTTOM' ) ) THEN
+            MBOT = MBOT + MAX( 0.0, TLGAP2*MINDIM + TLSIZE*HTHGT )
+         END IF
 
 *  Now do the same for the top margin.
-      MTOP = 0.0
-      IF( TKALL .OR. CHR_SIMLR( EDGE1, 'TOP' ) .OR. 
-     :               CHR_SIMLR( EDGE2, 'TOP' ) ) THEN
-         IF( TKLEN .LT. 0.0 ) THEN
-            MTOP = -MINDIM*TKLEN 
+         MTOP = 0.0
+         IF( TKALL .OR. CHR_SIMLR( EDGE1, 'TOP' ) .OR. 
+     :                  CHR_SIMLR( EDGE2, 'TOP' ) ) THEN
+            IF( TKLEN .LT. 0.0 ) THEN
+               MTOP = -MINDIM*TKLEN 
+            END IF
          END IF
-      END IF
 
-      IF( EXTLAB ) THEN
-         IF( NUMLB1 .AND. CHR_SIMLR( EDGE1, 'TOP' ) ) THEN
-            MTOP = MAX( MTOP, NLGAP1*MINDIM + NLSIZE*HTHGT )
-         ELSE IF( NUMLB2 .AND. CHR_SIMLR( EDGE2, 'TOP' ) ) THEN
-            MTOP = MAX( MTOP, NLGAP2*MINDIM + NLSIZE*HTHGT )
+         IF( EXTLAB ) THEN
+            IF( NUMLB1 .AND. CHR_SIMLR( EDGE1, 'TOP' ) ) THEN
+               MTOP = MAX( MTOP, NLGAP1*MINDIM + NLSIZE*HTHGT )
+            ELSE IF( NUMLB2 .AND. CHR_SIMLR( EDGE2, 'TOP' ) ) THEN
+               MTOP = MAX( MTOP, NLGAP2*MINDIM + NLSIZE*HTHGT )
+            END IF
          END IF
-      END IF
-
-      IF( TXTLB1 .AND. CHR_SIMLR( EDGE1, 'TOP' ) ) THEN
-         MTOP = MTOP + MAX( 0.0, TLGAP1*MINDIM + TLSIZE*HTHGT )
-      ELSE IF( TXTLB2 .AND. CHR_SIMLR( EDGE2, 'TOP' ) ) THEN
-         MTOP = MTOP + MAX( 0.0, TLGAP2*MINDIM + TLSIZE*HTHGT )
-      END IF
+   
+         IF( TXTLB1 .AND. CHR_SIMLR( EDGE1, 'TOP' ) ) THEN
+            MTOP = MTOP + MAX( 0.0, TLGAP1*MINDIM + TLSIZE*HTHGT )
+         ELSE IF( TXTLB2 .AND. CHR_SIMLR( EDGE2, 'TOP' ) ) THEN
+            MTOP = MTOP + MAX( 0.0, TLGAP2*MINDIM + TLSIZE*HTHGT )
+         END IF
 
 *  Add on space to the top margin for the title if required.
-      IF( AST_GETC( IPLOT, 'TITLE', STATUS ) .NE. ' ' .AND.
-     :    AST_GETL( IPLOT, 'DRAWTITLE', STATUS ) ) THEN
-         MTOP = MTOP + MAX( 0.0, 
+         IF( AST_GETC( IPLOT, 'TITLE', STATUS ) .NE. ' ' .AND.
+     :       AST_GETL( IPLOT, 'DRAWTITLE', STATUS ) ) THEN
+            MTOP = MTOP + MAX( 0.0, 
      :                 MINDIM*AST_GETR( IPLOT, 'TITLEGAP', STATUS ) + 
      :                 HTHGT*AST_GETR( IPLOT, 'SIZE(TITLE)', STATUS ) )
-      END IF
+         END IF
 
 *  Now do the same for the left margin, but taking account of the fact
 *  that numerical labels on the left and right are horizontal and so extend
 *  the margin by their length rather than their height.
-      MLEFT = 0.0
-      IF( TKALL .OR. CHR_SIMLR( EDGE1, 'LEFT' ) .OR. 
-     :               CHR_SIMLR( EDGE2, 'LEFT' ) ) THEN
-         IF( TKLEN .LT. 0.0 ) THEN
-            MLEFT = -MINDIM*TKLEN 
+         MLEFT = 0.0
+         IF( TKALL .OR. CHR_SIMLR( EDGE1, 'LEFT' ) .OR. 
+     :                  CHR_SIMLR( EDGE2, 'LEFT' ) ) THEN
+            IF( TKLEN .LT. 0.0 ) THEN
+               MLEFT = -MINDIM*TKLEN 
+            END IF
          END IF
-      END IF
-
-      IF( EXTLAB ) THEN
-         IF( NUMLB1 .AND. CHR_SIMLR( EDGE1, 'LEFT' ) ) THEN
-            MLEFT = MAX( MLEFT, NLGAP1*MINDIM + NLSIZE*HTWID*NC1 )
-         ELSE IF( NUMLB2 .AND. CHR_SIMLR( EDGE2, 'LEFT' ) ) THEN
-            MLEFT = MAX( MLEFT, NLGAP2*MINDIM + NLSIZE*HTWID*NC2 )
+   
+         IF( EXTLAB ) THEN
+            IF( NUMLB1 .AND. CHR_SIMLR( EDGE1, 'LEFT' ) ) THEN
+               MLEFT = MAX( MLEFT, NLGAP1*MINDIM + NLSIZE*HTWID*NC1 )
+            ELSE IF( NUMLB2 .AND. CHR_SIMLR( EDGE2, 'LEFT' ) ) THEN
+               MLEFT = MAX( MLEFT, NLGAP2*MINDIM + NLSIZE*HTWID*NC2 )
+            END IF
          END IF
-      END IF
-
-      IF( TXTLB1 .AND. CHR_SIMLR( EDGE1, 'LEFT' ) ) THEN
-         MLEFT = MLEFT + MAX( 0.0, TLGAP1*MINDIM + TLSIZE*VTHGT )
-      ELSE IF( TXTLB2 .AND. CHR_SIMLR( EDGE2, 'LEFT' ) ) THEN
-         MLEFT = MLEFT + MAX( 0.0, TLGAP2*MINDIM + TLSIZE*VTHGT )
-      END IF
+   
+         IF( TXTLB1 .AND. CHR_SIMLR( EDGE1, 'LEFT' ) ) THEN
+            MLEFT = MLEFT + MAX( 0.0, TLGAP1*MINDIM + TLSIZE*VTHGT )
+         ELSE IF( TXTLB2 .AND. CHR_SIMLR( EDGE2, 'LEFT' ) ) THEN
+            MLEFT = MLEFT + MAX( 0.0, TLGAP2*MINDIM + TLSIZE*VTHGT )
+         END IF
 
 *  Now do the same for the right margin.
-      MRIGHT = 0.0
-      IF( TKALL .OR. CHR_SIMLR( EDGE1, 'RIGHT' ) .OR. 
-     :               CHR_SIMLR( EDGE2, 'RIGHT' ) ) THEN
-         IF( TKLEN .LT. 0.0 ) THEN
-            MRIGHT = -MINDIM*TKLEN 
+         MRIGHT = 0.0
+         IF( TKALL .OR. CHR_SIMLR( EDGE1, 'RIGHT' ) .OR. 
+     :                  CHR_SIMLR( EDGE2, 'RIGHT' ) ) THEN
+            IF( TKLEN .LT. 0.0 ) THEN
+               MRIGHT = -MINDIM*TKLEN 
+            END IF
          END IF
-      END IF
-
-      IF( EXTLAB ) THEN
-         IF( NUMLB1 .AND. CHR_SIMLR( EDGE1, 'RIGHT' ) ) THEN
-            MRIGHT = MAX( MRIGHT, NLGAP1*MINDIM + NLSIZE*HTWID*NC1 )
-         ELSE IF( NUMLB2 .AND. CHR_SIMLR( EDGE2, 'RIGHT' ) ) THEN
-            MRIGHT = MAX( MRIGHT, NLGAP2*MINDIM + NLSIZE*HTWID*NC2 )
+   
+         IF( EXTLAB ) THEN
+            IF( NUMLB1 .AND. CHR_SIMLR( EDGE1, 'RIGHT' ) ) THEN
+               MRIGHT = MAX( MRIGHT, NLGAP1*MINDIM + NLSIZE*HTWID*NC1 )
+            ELSE IF( NUMLB2 .AND. CHR_SIMLR( EDGE2, 'RIGHT' ) ) THEN
+               MRIGHT = MAX( MRIGHT, NLGAP2*MINDIM + NLSIZE*HTWID*NC2 )
+            END IF
          END IF
-      END IF
-
-      IF( TXTLB1 .AND. CHR_SIMLR( EDGE1, 'RIGHT' ) ) THEN
-         MRIGHT = MRIGHT + MAX( 0.0, TLGAP1*MINDIM + TLSIZE*VTHGT )
-      ELSE IF( TXTLB2 .AND. CHR_SIMLR( EDGE2, 'RIGHT' ) ) THEN
-         MRIGHT = MRIGHT + MAX( 0.0, TLGAP2*MINDIM + TLSIZE*VTHGT )
-      END IF
+   
+         IF( TXTLB1 .AND. CHR_SIMLR( EDGE1, 'RIGHT' ) ) THEN
+            MRIGHT = MRIGHT + MAX( 0.0, TLGAP1*MINDIM + TLSIZE*VTHGT )
+         ELSE IF( TXTLB2 .AND. CHR_SIMLR( EDGE2, 'RIGHT' ) ) THEN
+            MRIGHT = MRIGHT + MAX( 0.0, TLGAP2*MINDIM + TLSIZE*VTHGT )
+         END IF
 
 *  Extend all margins by the specified fraction of the viewport size.
-      MLEFT = MLEFT + F*ABS( X2 - X1 )
-      MRIGHT = MRIGHT + F*ABS( X2 - X1 )
-      MBOT = MBOT + F*ABS( Y2 - Y1 )
-      MTOP = MTOP + F*ABS( Y2 - Y1 )
+         MAXEXT = MAX( 0.0, 0.5*( 0.95*ABS( GBOX( 3 ) - GBOX( 1 ) ) - 
+     :                            ( MLEFT + MRIGHT ) ) )
+
+         MLEFT = MLEFT + MIN( F*ABS( GBOX( 3 ) - GBOX( 1 ) ), MAXEXT )
+         MRIGHT = MRIGHT + MIN( F*ABS( GBOX( 3 ) - GBOX( 1 ) ), MAXEXT )
+
+         MAXEXT = MAX( 0.0, 0.5*( 0.95*ABS( GBOX( 4 ) - GBOX( 2 ) ) - 
+     :                            ( MTOP + MBOT ) ) )
+
+         MBOT = MBOT + MIN( F*ABS( GBOX( 4 ) - GBOX( 2 ) ), MAXEXT )
+         MTOP = MTOP + MIN( F*ABS( GBOX( 4 ) - GBOX( 2 ) ), MAXEXT )
+
+*  Save the old graphics box.
+         OBOX( 1 ) = GBOX( 1 )
+         OBOX( 2 ) = GBOX( 2 )
+         OBOX( 3 ) = GBOX( 3 )
+         OBOX( 4 ) = GBOX( 4 )
 
 *  Find the bounds to use for the unclipped region. If no aspect ratio
 *  has been specified, use the whole of the available space, excluding
 *  the margins found above.
-      IF( .NOT. FIXAR ) THEN
-         GBOX( 1 ) = X1 + MLEFT
-         GBOX( 3 ) = X2 - MRIGHT
-         GBOX( 2 ) = Y1 + MBOT
-         GBOX( 4 ) = Y2 - MTOP
+         IF( .NOT. FIXAR ) THEN
+            GBOX( 1 ) = X1 + MLEFT
+            GBOX( 3 ) = X2 - MRIGHT
+            GBOX( 2 ) = Y1 + MBOT
+            GBOX( 4 ) = Y2 - MTOP
 
 *  If the original window had an aspect ratio greater than 1 (a tall
 *  thin window), use the full height, and centre the area horizontally
 *  between the left and right margins.
-      ELSE IF( AR .GT. 1.0 ) THEN
-         GBOX( 2 ) = Y1 + MBOT
-         GBOX( 4 ) = Y2 - MTOP
-
-         CEN = 0.5*( ( X1 + MLEFT ) + ( X2 - MRIGHT ) )
-         WID = ( GBOX( 4 ) - GBOX( 2 ) )/AR
-         GBOX( 1 ) = CEN - 0.5*WID
-         GBOX( 3 ) = CEN + 0.5*WID
+         ELSE IF( AR .GT. 1.0 ) THEN
+            GBOX( 2 ) = Y1 + MBOT
+            GBOX( 4 ) = Y2 - MTOP
+   
+            CEN = 0.5*( ( X1 + MLEFT ) + ( X2 - MRIGHT ) )
+            WID = ( Y2 - Y1 )/AR
+            GBOX( 1 ) = CEN - 0.5*WID
+            GBOX( 3 ) = CEN + 0.5*WID
 
 *  If the original window had an aspect ratio less than 1 (a short
 *  wide window), use the full width, and centre the area vertically
 *  between the top and bottom margins.
-      ELSE 
-         GBOX( 1 ) = X1 + MLEFT
-         GBOX( 3 ) = X2 - MRIGHT
+         ELSE 
+            GBOX( 1 ) = X1 + MLEFT
+            GBOX( 3 ) = X2 - MRIGHT
+   
+            CEN = 0.5*( ( Y1 + MBOT ) + ( Y2 - MTOP ) )
+            HGT = ( X2 - X1 )*AR
+            GBOX( 2 ) = CEN - 0.5*HGT
+            GBOX( 4 ) = CEN + 0.5*HGT
+         END IF
 
-         CEN = 0.5*( ( Y1 + MBOT ) + ( Y2 - MTOP ) )
-         HGT = ( GBOX( 3 ) - GBOX( 1 ) )*AR
-         GBOX( 2 ) = CEN - 0.5*HGT
-         GBOX( 4 ) = CEN + 0.5*HGT
-      END IF
+*  Leave the loop if none of the box corners moved by more than 0.1
+*  millimetre.
+         MORE = .FALSE. 
+         DO I = 1, 4
+            IF( ABS( GBOX( I ) - OBOX( I ) ) .GT. 0.1 ) THEN
+               MORE = .TRUE.
+            END IF
+         END DO
+
+      END DO
 
 *  The graphics area covered by a Plot cannot be changed after it has been
 *  created. Therefore, since we want a Plot covering a different area to

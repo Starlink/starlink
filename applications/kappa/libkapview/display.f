@@ -494,6 +494,9 @@
       INTEGER KPG1_FLOOR       ! Largest integer .LE. a given floating value
 
 *  Local Constants:
+      REAL KW                  ! Width of key picture as a fraction of the
+      PARAMETER ( KW = 0.3 )   ! width of the DATA picture
+
       INTEGER MINCOL           ! Minimum number of colour indices on
                                ! device to be classed as an image
                                ! display
@@ -511,18 +514,21 @@
 *  Local Variables:
       CHARACTER COMP*8         ! Component to be displayed
       CHARACTER FORM*( NDF__SZFRM ) ! Form of the output data array
+      CHARACTER LABEL*255      ! Label for key
       CHARACTER MCOMP*8        ! Component to be mapped
       CHARACTER NDFNAM*255     ! Full NDF specification 
       CHARACTER OTYPE*( NDF__SZTYP )! Processing type of the output image
       CHARACTER TITLE*255      ! Default title for the plot
       DOUBLE PRECISION BOX( 4 )! Bounds of image in pixel co-ordinates
       DOUBLE PRECISION CC( 2 ) ! Current Frame co-ords at image centre
+      DOUBLE PRECISION DHI     ! Upper displayed data value limit
+      DOUBLE PRECISION DLO     ! Lower displayed data value limit
       DOUBLE PRECISION GC( 2 ) ! GRID co-ords at image centre
       INTEGER BPCI             ! Bad-pixel colour index
       INTEGER DIMS( NDIM )     ! Dimensions of input array
       INTEGER EL               ! Number of elements in the mapped array
       INTEGER I                ! General variable
-      INTEGER IDUMMY           ! Dummy integer argument
+      INTEGER IPICK            ! AGI identifier for KEY picture
       INTEGER IERR             ! Position of first conversion error
       INTEGER INDF1            ! NDF identifier for input NDF
       INTEGER INDF2            ! NDF identifier for displayed NDF section
@@ -533,6 +539,7 @@
       INTEGER IPICD            ! AGI id. for DATA picture
       INTEGER IPICF            ! AGI id. for new FRAME picture
       INTEGER IPLOT            ! Pointer to AST Plot for DATA picture
+      INTEGER IPWORK           ! Pointer to work array for key
       INTEGER IWCS             ! Pointer to the WCS FrameSet from the NDF
       INTEGER LBND( NDF__MXDIM )! Lower pixel index bounds of the image
       INTEGER LDIMS( NDIM )    ! Dimensions of LUT arrays
@@ -562,6 +569,7 @@
       LOGICAL BBOX             ! Was border a simple bounding box?
       LOGICAL BORDER           ! Border to be drawn?
       LOGICAL DEVCAN           ! Cancel DEVICE parameter?
+      LOGICAL KEY              ! Produce a colour ramp as a key?
       LOGICAL NN               ! Map the LUT via nearest-neighbour method?
       LOGICAL SCALE            ! Does the input array need to be scaled?
       REAL ASP0                ! Aspect ratio of the available space
@@ -570,6 +578,7 @@
       REAL DEFMAR              ! Default MARGIN value
       REAL GLBND( NDIM )       ! Low grid co-ord bounds of PGPLOT window
       REAL GUBND( NDIM )       ! High grid co-ord bounds of PGPLOT window
+      REAL KEYPOS              ! Horizontal position of key
       REAL LUT( NPRICL, 0:MXLUTE ) ! Lookup table
       REAL MARGIN( 4 )         ! Width of margins round DATA picture
       REAL OPLBND( NDIM )      ! Low pixel co-ord bounds of NDF overlap
@@ -670,6 +679,16 @@
          MARGIN( I ) = MARGIN( 1 )
       END DO
 
+*  See if a key is also required.
+      CALL PAR_GET0L( 'KEY', KEY, STATUS )
+
+*  If so, see how large a gap is required between the DATA picture and
+*  the key. This replaces the MARGIN value for the right hand edge.
+      IF( KEY ) THEN
+         CALL PAR_GET0R( 'KEYPOS', KEYPOS, STATUS )
+         MARGIN( 2 ) = KEYPOS
+      END IF
+
 *  Determine the section of the supplied NDF to be displayed.
 *  ==========================================================
 
@@ -719,8 +738,13 @@
 
 *  Now find the aspect ratio of the available space (i.e. the current
 *  picture minus the margins). 
-      ASP0 = ( ( Y2 - Y1 )*( 1.0 + MARGIN( 2 ) + MARGIN( 4 ) ) ) /
-     :       ( ( X2 - X1 )*( 1.0 + MARGIN( 1 ) + MARGIN( 3 ) ) ) 
+      IF( KEY ) THEN
+         ASP0 = ( ( Y2 - Y1 )*( 1.0 + MARGIN( 2 ) + MARGIN( 4 ) ) ) /
+     :          ( ( X2 - X1 )*( 1.0 + MARGIN( 1 ) + MARGIN( 3 ) + KW ) ) 
+      ELSE
+         ASP0 = ( ( Y2 - Y1 )*( 1.0 + MARGIN( 2 ) + MARGIN( 4 ) ) ) /
+     :          ( ( X2 - X1 )*( 1.0 + MARGIN( 1 ) + MARGIN( 3 ) ) ) 
+      END IF
 
 *  Get the aspect ratio of the supplied data array.
       ASPD = REAL( DIMS( 2 ) )/ REAL( DIMS( 1 ) )
@@ -892,17 +916,31 @@
       BOX( 4 ) = DBLE( PCUBND( 2 ) )
 
 *  Start up the graphics system again. This stores a new DATA picture in the 
-*  AGI database with the given pixel co-ordinate bounds (an enclosing FRAME
-*  picture is also created). The PGPLOT viewport is set so that it matches
-*  the area of the DATA picture. World co-ordinates within the PGPLOT 
-*  window are set to millimetres from the bottom left corner of the view
-*  surface. An AST Plot is returned for drawing in the DATA picture. The
-*  Base (GRAPHICS) Frame in the Plot corresponds to millimetres from the 
+*  AGI database with the given pixel co-ordinate bounds (enclosing FRAME
+*  and KEY pictures may also be created). The PGPLOT viewport is set so 
+*  that it matches the area of the DATA picture. World co-ordinates within 
+*  the PGPLOT window are set to millimetres from the bottom left corner of 
+*  the view surface. An AST Plot is returned for drawing in the DATA picture. 
+*  The Base (GRAPHICS) Frame in the Plot corresponds to millimetres from the 
 *  bottom left corner of the view surface, and the Current Frame is 
 *  inherited form the NDF's WCS FrameSet.
-      CALL KPG1_PLOT( IWCS, 'NEW', 'KAPPA_DISPLAY', NDFNAM( : NC ), 
-     :                MARGIN,0, ' ', ' ', 0.0, ASPECT, 'PIXEL', BOX, 
-     :                IPICD, IPICF, IDUMMY, IPLOT, NFRM, ALIGN, STATUS )
+
+*  First deal with cases where a key is required...
+      IF( KEY ) THEN
+
+*  Start up the graphics system, creating a KEY picture.
+         CALL KPG1_PLOT( IWCS, 'NEW', 'KAPPA_DISPLAY', NDFNAM( : NC ), 
+     :                   MARGIN, 1, 'KEY', 'R', KW, ASPECT, 'PIXEL', 
+     :                   BOX, IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN, 
+     :                   STATUS )
+
+*  Otherwise, start up the graphics system, creating no KEY picture.
+      ELSE
+         CALL KPG1_PLOT( IWCS, 'NEW', 'KAPPA_DISPLAY', NDFNAM( : NC ), 
+     :                   MARGIN, 0, ' ', ' ', 0.0, ASPECT, 'PIXEL', 
+     :                   BOX, IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN, 
+     :                   STATUS )
+      END IF
 
 *  If the user did not specify a Plot title (as indicated by the Plot title
 *  being the same as the WCS title), make the NDF Title the default Title for 
@@ -998,7 +1036,12 @@
 *  Otherwise, scale the supplied data to produce colour indices.
       ELSE 
          CALL KPS1_DISCL( INDF2, WDIM, MCOMP, LP, UP, BPCI, WPLBND, 
-     :                    WPUBND, IPCOL, NX, NY, STATUS )
+     :                    WPUBND, IPCOL, NX, NY, DLO, DHI, STATUS )
+
+*  Store the scaling limits in the output parameters.
+         CALL PAR_PUT0D( 'SCALOW', DLO, STATUS )
+         CALL PAR_PUT0D( 'SCAHIGH', DHI, STATUS )
+
       END IF
 
 *  Produce the display.
@@ -1023,6 +1066,28 @@
          CALL AST_CLEAR( IPLOT, 'STYLE', STATUS )
          CALL KPG1_ASSET( 'KAPPA_DISPLAY', 'BORSTYLE', IPLOT, STATUS )
          CALL KPG1_ASGRD( IPLOT, IPICF, .FALSE., STATUS )
+      END IF
+
+
+*  Now create the key if required.
+      IF( KEY ) THEN
+
+*  Create a label.
+         LABEL = 'Data value in '
+         NC = 14
+         CALL CHR_APPND( NDFNAM, LABEL, NC )
+
+*  Allocate a work array.
+         CALL PSX_CALLOC( UP - LP + 1, '_INTEGER', IPWORK, STATUS )
+         
+*  Create the key.
+         CALL KPG1_LUTKY( IPICK, 'KEYSTYLE', REAL( DHI ), REAL( DLO ), 
+     :                    LABEL( : NC ), 'KAPPA_DISPLAY', LP, UP, 0.1,
+     :                    %VAL( IPWORK ), STATUS )
+
+*  Deallocate the work array.
+         CALL PSX_FREE( IPWORK, STATUS )
+
       END IF
 
 *  Create the output NDF.
