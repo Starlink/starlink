@@ -12,19 +12,28 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
-AC_CHECK_LIB(jpeg,jpeg_start_compress)
+STAR_CNF_COMPATIBLE_SYMBOLS
 
-STAR_DECLARE_DEPENDENCIES(build, [pcs ems gwm mers tclsys sae])
+TCL_VERSION=8.2
+
+AC_CHECK_LIB(jpeg,jpeg_start_compress)
+AC_SEARCH_LIBS(Tcl_CreateCommand,[tcl$TCL_VERSION tcl],,
+               AC_MSG_ERROR([TCL not found]))
+AC_SEARCH_LIBS(Tk_MakeWindowExist,[tk$TCL_VERSION tk],,
+               AC_MSG_ERROR([Tk not found]))
+AC_CHECK_LIB(gwm,GWM_MakeIntoWindow)
+
+STAR_DECLARE_DEPENDENCIES(build, [starx pcs ems gwm mers tclsys sae])
 
 STAR_LATEX_DOCUMENTATION(sun186)
 STAR_LATEX_DOCUMENTATION(sun219)
 
 dnl    Locate the tclsh and wish binaries 
 dnl    (should we use STAR_CHECK_PROGS instead?)
-AC_ARG_VAR([TCLSH],[TCL 8.2 shell])
-AC_PATH_PROG([TCLSH],[tclsh8.2])
-AC_ARG_VAR([WISH],[TCL 8.2 windowing shell])
-AC_PATH_PROG([WISH],[wish8.2])
+AC_ARG_VAR([TCLSH],[TCL $TCL_VERSION shell])
+AC_PATH_PROG([TCLSH],[tclsh$TCL_VERSION])
+AC_ARG_VAR([WISH],[TCL $TCL_VERSION windowing shell])
+AC_PATH_PROG([WISH],[wish$TCL_VERSION])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.

@@ -51,7 +51,7 @@ LIBRARY_FILES = adamtask.tcl colourDialog.tcl dialogShow.tcl \
 
 ##  List of demo files
 
-PUBLIC_SCRIPTS = gwm gwmXrefresh nbstrace adamtest
+PUBLIC_SCR = gwm gwmXrefresh nbstrace adamtest
 
 ##  List of help texts.
 
@@ -63,29 +63,22 @@ HELP_FILES = gwm.help
 
 binsysdir=$(bindir)/@PACKAGE@
 libsysdir=$(libdir)/@PACKAGE@
+pubobjdir=$(libdir)
 
 # Dependencies.
 
-libadam_la_SOURCES = tclAdam.o
-libadam_la_LDADD = $(LDADD) `ams_link_adam` `ems_link_adam`
+libadam_la_SOURCES = tclAdam.c
+libadam_la_LIBADD = `ams_link_adam` `ems_link_adam`
 
-libgwm_la_SOURCES = tkGwm.o tkGwmPrint.o tkGwmCanv.o
-libgwm_la_LDADD = $(LDADD) `gwm_link_adam` `chr_link_adam`
+libgwm_la_SOURCES = tkGwm.c tkGwmPrint.c tkGwmCanv.c
+libgwm_la_LIBADD = `gwm_link_adam` `chr_link_adam`
 
-atclsh_SOURCES = tclAppInit.o tclAdam.o tclNbs.o
-atclsh_LDADD = $(LDADD) `ams_link_adam` `nbs_link`
+atclsh_SOURCES = tclAppInit.c tclNbs.c
+atclsh_LDADD = $(LDADD) `ams_link_adam` `nbs_link` -ladam
 
-awish_SOURCES = tkAppInit.o tclAdam.o tkGwm.o tkGwmPrint.o tkGwmCanv.o tclNbs.o
-awish_LDADD = $(LDADD) `nbs_link` `ams_link_adam` `gwm_link_adam` \
-              `chr_link_adam`
-
-tclAdam.o: tclAdam.h tclAdam.c
-tclNbs.o: tclNbs.h tclNbs.c
-tclAppInit.o: tclAdam.h tclNbs.h tclAppInit.c
-tkAppInit.o: tkGwm.h tkNbs.h tkAppInit.c
-tkGwm.o: tkGwm.h tkGwm_sys.h gwm_sys.h tkGwm.c
-tkGwmPrint.o: tkGwm_sys.h tkGwmPrint.c
-tkGwmCanv.o: tkGwm_sys.h tkGwmCanv.c
+awish_SOURCES = tkAppInit.c tclNbs.c
+awish_LDADD = $(LDADD) tkGwm.o tkGwmPrint.o tkGwmCanv.o libadam.la \
+             `nbs_link` `ams_link_adam` `gwm_link_adam` `chr_link_adam`
 
 
 # Define what is to be done with which sets of files.
@@ -93,12 +86,11 @@ tkGwmCanv.o: tkGwm_sys.h tkGwmCanv.c
 bin_PROGRAMS = $(PUBLIC_EXE)
 libsys_LTLIBRARIES = libadam.la libgwm.la
 include_HEADERS = $(PUBLIC_INCLUDES)
-lib_DATA = $(PUBLIC_OBJECTS)
-binsys_SCRIPTS = $(PUBLIC_SCRIPTS)
+pubobj_DATA = $(PUBLIC_OBJECTS)
+binsys_SCRIPTS = $(PUBLIC_SCR)
 binsys_DATA = $(HELP_FILES)
 libsys_DATA = $(LIBRARY_FILES) tclIndex
 libsys_SCRIPTS = adamMessageRelay
-
 
 #  Rules.
 
@@ -113,7 +105,7 @@ gwm: Makefile $(srcdir)/gwm.in
 	mv gwm.tmp gwm
 
 gwmXrefresh: Makefile $(srcdir)/gwmXrefresh.in
-	rm -f gwmXrefresh gwmXrefresh.in
+	rm -f gwmXrefresh gwmXrefresh.tmp
 	$(edit) gwmXrefresh.in >gwmXrefresh.tmp
 	chmod +x gwmXrefresh.tmp
 	mv gwmXrefresh.tmp gwmXrefresh
@@ -131,7 +123,7 @@ adamMessageRelay: Makefile $(srcdir)/adamMessageRelay.in
 	mv adamMessageRelay.tmp adamMessageRelay
 
 tclIndex: $(LIBRARY_FILES)
-	echo 'auto_mkindex' . *.tcl' | @TCLSH@
+	echo 'auto_mkindex . *.tcl' | @TCLSH@
 	echo >> tclIndex ''
 	echo >> tclIndex \
            'set auto_index(gwm) [list load [file join $$dir libgwm.la] tkGwm]'

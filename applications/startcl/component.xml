@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="startcl">
+  <version>1.5-5</version>
+  <path>applications/startcl</path>
+  <description>Starlink extensions to Tcl &amp; Tk</description>
+  <abstract>
+    <p>The STARTCL package is a set of extensions to the Tcl/Tk
+    language to enable Tcl and Tk applications to display Starlink
+    graphics inside widgets embedded in the application, send and
+    receive ADAM messages and access ADAM noticeboards.
+    This document will be of interest to programmers writing
+    graphics user interfaces for Starlink applications in Tcl/Tk.</p>
+  </abstract>
+  <dependencies >
+    <build>starx</build><build>pcs</build><build>ems</build><build>gwm</build><build>mers</build><build>tclsys</build><build>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name>Dave Terrett</name>
+      <uname>dlt</uname>
+      <email>dlt@star.rl.ac.uk</email>
+    </person>
+  </developers>
+  -->
+  <!-- <documentation> sun186 sun219</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
