@@ -170,6 +170,7 @@
 *
 *    Local variables :
 *
+      CHARACTER*132          LFILE              ! Local file name
       CHARACTER*132          PATH               ! Directory path
 
       INTEGER                CPOS               ! position of colon in PATH
@@ -197,8 +198,9 @@
 *      If that failed, and default extension is non-blank, try that
         IF ( (STATUS .NE. SAI__OK) .AND. (ELEN.GT.0) ) THEN
           CALL ERR_ANNUL( STATUS )
-          CALL FIO_OPEN( FILE(:FLEN)//AIO_DEFEXT(:ELEN),
-     :                   ACCESS, MODE, RECSZ, FD, STATUS )
+          LFILE = FILE(:FLEN)
+          LFILE(FLEN+1) = AIO_DEFEXT(:ELEN)
+          CALL FIO_OPEN( LFILE, ACCESS, MODE, RECSZ, FD, STATUS )
 
         END IF
 
@@ -228,8 +230,9 @@
           END IF
 
 *        Try and open file with extension
-          CALL FIO_OPEN( PATH(D_S:D_E)//'/'//FILE, ACCESS, MODE,
-     :                                       RECSZ, FD, STATUS )
+          LFILE = PATH(D_S:D_E)//'/'
+          LFILE(D_S-D_E+3:) = FILE
+          CALL FIO_OPEN( LFILE, ACCESS, MODE, RECSZ, FD, STATUS )
 
 *        Ok?
           IF ( STATUS .NE. SAI__OK ) THEN
@@ -237,9 +240,10 @@
 
 *          Try and open file with extension if defined
             IF ( ELEN .GT. 0 ) THEN
-              CALL FIO_OPEN( PATH(D_S:D_E)//'/'//FILE(:FLEN)//
-     :                       AIO_DEFEXT(:ELEN), ACCESS, MODE,
-     :                       RECSZ, FD, STATUS )
+              LFILE = PATH(D_S:D_E)//'/'
+              LFILE(D_S-D_E+3:) = FILE(:FLEN)
+              LFILE(D_S-D_E+3+FLEN:) = AIO_DEFEXT(:ELEN)
+              CALL FIO_OPEN( LFILE, ACCESS, MODE, RECSZ, FD, STATUS )
               IF ( STATUS .NE. SAI__OK ) THEN
                 CALL ERR_ANNUL( STATUS )
               ELSE

@@ -680,6 +680,9 @@
         CALL ADI_ERASE( O_LID(I), STATUS )
       END DO
 
+*  Free output
+      CALL USI_ANNUL( 'OUT', STATUS )
+
 *  Tidy up
  99   CALL AST_CLOSE
       CALL AST_ERR( STATUS )

@@ -430,7 +430,8 @@
 *  Try to open file
       CALL ADI_FOPEN( SPEC, 'BinDS', 'READ', SFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', 'Unable to open spectrum '//SPEC, STATUS )
+        CALL MSG_SETC( 'SP', SPEC )
+        CALL ERR_REP( ' ', 'Unable to open spectrum /^SP/', STATUS )
         GOTO 99
       END IF
 
@@ -683,7 +684,8 @@
 
 *      Report error if PSF not found
 	IF ( STATUS .NE. SAI__OK ) THEN
-	  CALL MSG_PRNT( 'Could not find PSF called '//STR )
+          CALL MSG_SETC( 'P', STR )
+	  CALL MSG_PRNT( 'Could not find PSF called /^P/' )
 	  CALL ERR_ANNUL( STATUS )
 	  GOTO 59
         ELSE
@@ -907,13 +909,19 @@
 *    Status :
 *
       INTEGER                  STATUS
+*
+*    Local Variables:
+*
+      CHARACTER*80		TXT
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
  10   IF ( IC .GT. LEN(STR) ) THEN
-	CALL MSG_SETC( 'REASON', 'Missing '//X )
+        TXT = 'Missing '
+        TXT(9:) = X
+	CALL MSG_SETC( 'REASON', TXT )
 	STATUS = SAI__ERROR
       ELSE
 	IC = IC + 1
