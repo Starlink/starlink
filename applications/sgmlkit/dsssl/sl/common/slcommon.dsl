@@ -347,7 +347,8 @@ is in effect.
 <returnvalue type=list>List of GIs
 <codebody>
 (define (section-element-list)
-  (list (normalize "sect")
+  (list (normalize "abstract")
+        (normalize "sect")
 	(normalize "subsect")
 	(normalize "subsubsect")
 	(normalize "subsubsubsect")
@@ -387,6 +388,8 @@ is in effect.
 ;; This mode is added to elsewhere, for example, the code for the back-matter
 ;; defines FO constructors in this mode.
 (mode section-reference
+  (element abstract
+    (literal "Abstract"))
   (element sect
     (make-section-reference))
   (element subsect
@@ -843,7 +846,8 @@ the first member of this list amongst the target element's ancestors.
 <returnvalue type='list of strings'>List of allowable link targets
 <codebody>
 (define (target-element-list)
-  (list (normalize "sect")
+  (list (normalize "abstract")
+        (normalize "sect")
 	(normalize "subsect")
 	(normalize "subsubsect")
 	(normalize "subsubsubsect")
