@@ -497,11 +497,13 @@ SHAREABLE_LIBRARIES =
 
 EXECUTABLE_PROGRAMS = astrom.x
 
-# Use -lcfitsio rather than `fitsio_link` because, as of 2001-06-11 at
-# least, there seems to be significant version skew between them.
+# Use `cfitsio_link` rather than `fitsio_link` because, as of 2001-06-11 at
+# least, `fitsio_link` points at an old, but not yet abandonable, version of
+# the library.
 $(EXECUTABLE_PROGRAMS): $(OBJECT_FILES)
 	$(FC) $(FFLAGS) $(OBJECT_FILES) -o $@ \
-            $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) `sla_link` -lcfitsio $(LDFLAG2)
+            $(LDFLAG1) $(ADDLIBS) -L$(STAR_LIB) `sla_link` `cfitsio_link` \
+	    $(LDFLAG2)
 
 #  Name of the date stamp file.  This is used to record the time of the
 #  most recent build for use in subsequent operations that require it.
