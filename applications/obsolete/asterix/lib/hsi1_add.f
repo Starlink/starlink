@@ -198,7 +198,7 @@
           CALL CMP_PUT0C( CRLOC, 'DATE', TSTR, STATUS )
 
 *      Write the command name
-          CALL ADI1_CCA2HC( ARGS(2), ' ', CRLOC, COMMAND, STATUS )
+          CALL ADI1_CCA2HC( ARGS(2), ' ', CRLOC, 'COMMAND', STATUS )
 
 *      Release current record
           CALL DAT_ANNUL( CRLOC, STATUS )
