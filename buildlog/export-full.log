@@ -809,7 +809,7 @@ install:
 prepare:
 
 check_packages:
-[available] Sep 18, 2003 4:25:14 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Sep 19, 2003 4:30:03 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1691,11 +1691,11 @@ javadocs:
   [javadoc]              +-s-> e --+
   [javadoc]  </pre>"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/pod/Pod.java:29: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/java2d/Polygon2D.java:475: warning - The first sentence is interpreted to be:
   [javadoc] "A Pod is a "pile of data." This is any complex evolving data
   [javadoc]  structure."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A Pod is a "pile of data." "
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/java2d/Polygon2D.java:475: warning - The first sentence is interpreted to be:
   [javadoc] "Create a new polygon with the
   [javadoc]  given vertices, in the format
   [javadoc]  [x0, y0, x1, y1, ..."
@@ -4421,4 +4421,4 @@ export-full:
      [copy] Copying 2 files to /apps/cvsbuild/export
 
 BUILD SUCCESSFUL
-Total time: 15 minutes 0 seconds
+Total time: 15 minutes 3 seconds
