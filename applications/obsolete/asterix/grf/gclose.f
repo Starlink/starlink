@@ -25,7 +25,7 @@
 
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'GCLOSE Version 1.7-0')
+      PARAMETER (VERSION = 'GCLOSE Version 2.0-0')
 *-
       CALL USI_INIT()
 
@@ -35,11 +35,10 @@
         CALL MSG_PRNT('Releasing dataset...')
         CALL GCB_ATTACH('GRAFIX',STATUS)
         IF (G_MULTI) THEN
-          CALL HDS_CLOSE(G_MLOC,STATUS)
+          CALL ADI_FCLOSE(G_MFID,STATUS)
         ELSE
-          CALL GCB_SAVE(G_LOC,STATUS)
-          CALL BDA_RELEASE(G_LOC,STATUS)
-          CALL HDS_CLOSE(G_LOC,STATUS)
+          CALL GCB_FSAVE(G_ID,STATUS)
+          CALL ADI_FCLOSE(G_ID,STATUS)
         ENDIF
         G_OPEN=.FALSE.
         CALL GCB_DETACH(STATUS)
@@ -60,5 +59,3 @@
       CALL USI_CLOSE()
 
       END
-
-
