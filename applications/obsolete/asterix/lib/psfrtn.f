@@ -2601,8 +2601,15 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *      Choose spatial bins
         IX = INT(0.5+(X0-RF_BASE(3,SLOT)) / RF_SCALE(3,SLOT)) + 1
         IY = INT(0.5+(Y0-RF_BASE(4,SLOT)) / RF_SCALE(4,SLOT)) + 1
-        IX = MIN( IX, RF_DIMS(3,SLOT) )
-        IY = MIN( IY, RF_DIMS(4,SLOT) )
+        IF ( (IX.LT.1) .OR. (IX.GT.RF_DIMS(3,SLOT)) .OR.
+     :       (IY.LT.1) .OR. (IY.GT.RF_DIMS(4,SLOT)) ) THEN
+          STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Psf requested is outside bounds '/
+     :         /'defined by response - probably an SPRESP problem',
+     :            STATUS )
+          GOTO 99
+
+        END IF
 
 *      Choose energy bin
         IF ( RF_PHA_DEF(SLOT) .AND. (RF_NDIM(SLOT).GT.4) ) THEN
@@ -2647,6 +2654,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
      :                                               0, ARRAY, STATUS )
 
       END IF
+
+*  Abort point
+ 99   CONTINUE
 
       END
 
