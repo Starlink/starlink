@@ -6,12 +6,10 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
-*                       P.W.DRAPER (STARLINK, Durham University)
 *
 *	Contents:	analyse(), endobject()...: measurements on detections.
 *
-*	Last modify:	13/01/98
-*                       11/03/99
+*	Last modify:	12/11/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -81,10 +79,10 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
    checkstruct		*check;
    pliststruct		*pixt;
    int			i,j,k,h, photoflag,area,errflag, cleanflag,
-			pospeakflag, minarea;
+			pospeakflag, profflag, minarea, gainflag;
    double		tv,sigtv, ngamma,
 			esum, emx2,emy2,emxy, err,gain,backnoise2,dbacknoise2,
-			xm,ym, x,y,var;
+			xm,ym, x,y,var,var2, profflux,proffluxvar;
    float		*heap,*heapt,*heapj,*heapk, swap;
    PIXTYPE		pix, cdpix, tpix, peak,cdpeak, thresh,dthresh;
    static PIXTYPE	threshs[NISO];
@@ -103,9 +101,11 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
     }
 
   pospeakflag = FLAG(obj.peakx);
+  profflag = FLAG(obj.flux_prof);
   gain = prefs.gain;
   ngamma = field->ngamma;
   photoflag = (prefs.detect_type==PHOTO);
+  gainflag = PLISTEXIST(var) && prefs.weightgain_flag;
 
 /* Prepare selection of the heap selection for CLEANing */
   if (cleanflag = prefs.clean_flag)
@@ -126,7 +126,7 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
     obj->mthresh = 0.0;
 
 /* Measure essential isophotal parameters in the measurement image... */
-  tv = sigtv = 0.0;
+  tv = sigtv = profflux = proffluxvar = 0.0;
   var = backnoise2 = field->backsig*field->backsig;
   peak = -BIG;
   cdpeak = -BIG;
@@ -139,31 +139,42 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
     if (pix>peak)
       peak = pix;
 
-    if (pospeakflag && (cdpix=PLISTPIX(pixt,cdvalue))>cdpeak)
+    cdpix=PLISTPIX(pixt,cdvalue);
+    if (pospeakflag && cdpix>cdpeak)
       {
       cdpeak=cdpix;
-      obj->peakx =  PLIST(pixt,x);
-      obj->peaky =  PLIST(pixt,y);
+      obj->peakx =  PLIST(pixt,x) + 1;
+      obj->peaky =  PLIST(pixt,y) + 1;
       }
     if (PLISTEXIST(var))
       var = PLISTPIX(pixt, var);
     if (photoflag)
       {
       pix = exp(pix/ngamma);
-      sigtv += pix*pix*var;
+      var2 = pix*pix*var;
       }
     else
-      sigtv += var;
-    if (PLISTEXIST(var) && pix>0.0 && gain>0.0)
-      sigtv += pix/gain*var/backnoise2;
-     if (pix>thresh)
+      var2 = var;
+
+    if (gainflag && pix>0.0 && gain>0.0)
+      var2 += pix/gain*var/backnoise2;
+
+    sigtv += var2;
+
+    if (profflag && cdpix>0.0)
+      {
+      profflux += cdpix*pix;
+      proffluxvar += cdpix*var2;
+      }
+
+    if (pix>thresh)
       area++;
     tv += pix;
     if (errflag)
       {
       err = dbacknoise2;
-      if (gain>0.0 && (pix=PLISTPIX(pixt,cdvalue))>0.0)
-        err += pix/gain;
+      if (gain>0.0 && cdpix>0.0)
+        err += cdpix/gain;
       x = PLIST(pixt,x) - xm;
       y = PLIST(pixt,y) - ym;
       esum += err;
@@ -217,6 +228,12 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
     free(heap);
     }
 
+  if (profflag)
+    {
+    obj->flux_prof = obj->fdflux>0.0? (float)(profflux/obj->fdflux) : 0.0;
+    obj->fluxerr_prof = obj->fdflux>0.0? (float)(proffluxvar/obj->fdflux):0.0;
+    }
+
   if (errflag)
     {
      double	flux2;
@@ -248,7 +265,7 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
   else
     {
     tv -= obj->fdnpix*obj->dbkg;
-    if (!PLISTEXIST(var) && gain > 0.0 && tv>0.0)
+    if (!gainflag && gain > 0.0 && tv>0.0)
       sigtv += tv/gain;
     }
 
@@ -270,23 +287,22 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
     memset(obj->iso, 0, NISO*sizeof(int));
     if (prefs.detect_type == PHOTO)
       for (i=0; i<NISO; i++)
-        threshs[i] = field->thresh + (obj->peak-field->thresh)*i/NISO;
+        threshs[i] = obj->thresh + (obj->peak-obj->thresh)*i/NISO;
     else
       {
       if (obj->peak>0.0)
         for (i=0; i<NISO; i++)
-          threshs[i] = field->thresh*pow(obj->peak/field->thresh,
+          threshs[i] = obj->thresh*pow(obj->peak/obj->thresh,
 		(double)i/NISO);
       else
         for (i=0; i<NISO; i++)
           threshs[i] = 0.0;
       }
     for (pixt=pixel+obj->firstpix; pixt>=pixel; pixt=pixel+PLIST(pixt,nextpix))
-      for (i=0,iso=obj->iso,thresht=threshs;
-           (i++)<NISO && PLIST(pixt,value)>*(thresht++);) /* PWD: change here, compare i & NISO before *thresht*/
-        (*(iso++))++;
+       for (i=NISO,iso=obj->iso,thresht=threshs;
+            i-- && PLIST(pixt,value)>*(thresht++);)
+          (*(iso++))++;
     }
-  /* PWD: was 		PLIST(pixt,value)>*(thresht++) && (i++)<NISO;)*/
 
 /* Put objects in "segmentation check-image" */
 
@@ -306,8 +322,8 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
      PIXTYPE	thresh0;
 
     thresh0 = obj->peak/5.0;
-    if (thresh0<field->thresh)
-      thresh0 = field->thresh;
+    if (thresh0<obj->thresh)
+      thresh0 = obj->thresh;
     if (thresh0>0.0)
       {
        double	mx,my, s,sx,sy,sxx,sxy, dx,dy,d2, lpix,pix, b, inverr2, sat,
@@ -365,7 +381,7 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
 		picstruct *dwfield, int n, objliststruct *objlist)
   {
    checkstruct	*check;
-   int		i, ix,iy,selecflag, newnumber;
+   int		i,j, ix,iy,selecflag, newnumber,nsub;
    objstruct	*obj;
 
   obj = &objlist->obj[n];
@@ -388,7 +404,6 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
   else
     selecflag = 1;
 
-
   if (selecflag)
     {
 /*-- Paste back to the image the object's pixels if BLANKing is on */
@@ -407,6 +422,12 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
 /*-- Convert the father of photom. error estimates from variance to RMS */
     obj2->flux_iso = obj->flux;
     obj2->fluxerr_iso = sqrt(obj->fluxerr);
+    if (FLAG(obj.flux_prof))
+      {
+      obj2->flux_prof = obj->flux_prof;
+      obj2->fluxerr_prof = sqrt(obj->fluxerr_prof);
+      }
+
     if (FLAG(obj2.flux_isocor))
       computeisocorflux(field, obj);
 
@@ -473,10 +494,6 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
       obj2->poserr_cxy = (float)(-2*xym/temp);
       }
 
-/* ------------------------------- Astrometry ------------------------------*/
-    if (prefs.world_flag)
-      computeastrom(field, obj);
-
 /* ---- Aspect ratio */
 
     if (FLAG(obj2.elong))
@@ -535,10 +552,6 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
       }
     obj->number = newnumber;
 
-/*-- PSF fitting */
-    if (FLAG(obj2.flux_psf))
-      psf_fit(thepsf, field, wfield, obj);
-
     if (FLAG(obj2.vignet))
       copyimage(field,outobj2.vignet,prefs.vignetsize[0],prefs.vignetsize[1],
 	ix,iy);
@@ -547,10 +560,59 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
       copyimage_center(field, outobj2.vigshift, prefs.vigshiftsize[0],
 		prefs.vigshiftsize[1], obj->mx, obj->my);
 
-/*-- Express everything in magnitude units */
+/*--- Express everything in magnitude units */
     computemags(field, obj);
 
-    FPRINTF(OUTPUT, "%8d %6.1f %6.1f %5.1f %5.1f %12g "
+/*------------------------------- PSF fitting ------------------------------*/
+    nsub = 1;
+    if (prefs.psf_flag)
+      {
+      psf_fit(thepsf, field, wfield, obj);
+      obj2->npsf = thepsfit->npsf;
+      if (prefs.psfdisplay_type == PSFDISPLAY_SPLIT)
+        {
+        nsub = thepsfit->npsf;
+        if (nsub<1)
+          nsub = 1;
+        }
+      else
+        for (j=0; j<thepsfit->npsf; j++)
+          {
+          if (FLAG(obj2.x_psf) && j<prefs.psf_xsize)
+            obj2->x_psf[j] = thepsfit->x[j];
+          if (FLAG(obj2.y_psf) && j<prefs.psf_ysize)
+            obj2->y_psf[j] = thepsfit->y[j];
+          if (FLAG(obj2.flux_psf) && j<prefs.psf_fluxsize)
+            obj2->flux_psf[j] = thepsfit->flux[j];
+          if (FLAG(obj2.mag_psf) && j<prefs.psf_magsize)
+            obj2->mag_psf[j] = thepsfit->flux[j]>0.0?
+		prefs.mag_zeropoint -2.5*log10(thepsfit->flux[j]) : 99.0;
+          }
+      }
+
+/*-------------------------------- Astrometry ------------------------------*/
+    if (prefs.world_flag)
+      computeastrom(field, obj);
+
+/*-- Go through each newly identified component */
+    for (j=0; j<nsub; j++)
+      {
+      if (prefs.psf_flag && prefs.psfdisplay_type == PSFDISPLAY_SPLIT)
+        {
+        if (FLAG(obj2.x_psf))
+          obj2->x_psf[0] = thepsfit->x[j];
+        if (FLAG(obj2.y_psf))
+          obj2->y_psf[0] = thepsfit->y[j];
+        if (FLAG(obj2.flux_psf))
+          obj2->flux_psf[0] = thepsfit->flux[j];
+        if (FLAG(obj2.mag_psf))
+          obj2->mag_psf[0] = thepsfit->flux[j]>0.0?
+		prefs.mag_zeropoint -2.5*log10(thepsfit->flux[j]) : 99.0;
+        if (j)
+          obj->number = ++cat.ntotal;
+        }
+
+      FPRINTF(OUTPUT, "%8d %6.1f %6.1f %5.1f %5.1f %12g "
 			"%c%c%c%c%c%c%c%c\n",
 	obj->number, obj->mx+1.0, obj->my+1.0,
 	obj->a, obj->b,
@@ -563,7 +625,8 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
 	obj->flag&OBJ_ISO_PB?'I':'_',
 	obj->flag&OBJ_DOVERFLOW?'D':'_',
 	obj->flag&OBJ_OVERFLOW?'O':'_');
-    writecat(n, objlist);
+      writecat(n, objlist);
+      }
     }
 
 /* Remove again from the image the object's pixels if BLANKing is on ... */
