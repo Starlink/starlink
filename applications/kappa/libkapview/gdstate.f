@@ -16,7 +16,7 @@
 *     CALL GDSTATE( STATUS )
 
 *  Usage:
-*     gdstate [frame] [device]
+*     gdstate [device] [frame] 
 
 *  Description:
 *     This application displays information about the current graphics
@@ -142,7 +142,7 @@
 *        Shows the status of the current graphics device. The bounds of
 *        the picture are displayed in the current co-ordinate Frame of
 *        the picture.
-*     gdstate ps_l frame=basepic
+*     gdstate ps_l basepic
 *        Shows the status of the ps_l device. The bounds of the picture 
 *        are displayed in the BASEPIC Frame (normalised device co-ordinates
 *        in which the short of the two dimensions of the display surface

@@ -4198,19 +4198,53 @@ package kappa {
             vpath DEFAULT
             default 0.0D0
             helpkey *
-          }
+         }
+
+         parameter describe {
+            type _LOGICAL
+            vpath CURRENT DEFAULT
+            prompt {Show a description of the requested Frame?}
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+         }
 
          parameter device {
-            access UPDATE
             position 1
-            prompt {Graphics device}
-            helpkey *
-            vpath GLOBAL CURRENT
             ptype DEVICE
+            access UPDATE
+            vpath GLOBAL CURRENT
+            prompt {Graphics device}
             association <-GLOBAL.GRAPHICS_DEVICE
+            helpkey *
           }
 
-         parameter label {
+          parameter domain {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default 0.0D0
+            helpkey *
+          }
+
+          parameter epoch {
+            type _DOUBLE
+            prompt {Epoch of observation}
+            ppath DYNAMIC CURRENT
+            helpkey *
+          }
+
+         parameter frame {
+            position 2
+            type LITERAL
+            vpath DEFAULT
+            prompt {Co-ordinate Frame to be displayed}
+            ppath DEFAULT
+            default !
+            helpkey *
+          }
+
+          parameter label {
             type LITERAL
             access WRITE
             vpath DEFAULT
@@ -4226,39 +4260,7 @@ package kappa {
             helpkey *
           }
 
-         parameter ncx1 {
-            type _REAL
-            access WRITE
-            vpath DEFAULT
-            default 0.0D0
-            helpkey *
-          }
-
-         parameter ncx2 {
-            type _REAL
-            access WRITE
-            vpath DEFAULT
-            default 0.0D0
-            helpkey *
-          }
-
-         parameter ncy1 {
-            type _REAL
-            access WRITE
-            vpath DEFAULT
-            default 0.0D0
-            helpkey *
-          }
-
-         parameter ncy2 {
-            type _REAL
-            access WRITE
-            vpath DEFAULT
-            default 0.0D0
-            helpkey *
-          }
-
-         parameter outline {
+          parameter outline {
             type _LOGICAL
             access READ
             vpath DEFAULT
@@ -4268,7 +4270,6 @@ package kappa {
           }
 
          parameter refnam {
-				 # picture
             type LITERAL
             access WRITE
             vpath DEFAULT
@@ -4285,32 +4286,41 @@ package kappa {
             helpkey *
           }
 
-         parameter wcx1 {
-            type _REAL
+          parameter style {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            prompt {Plotting style for the outline}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter x1 {
+            type LITERAL
             access WRITE
             vpath DEFAULT
             default 0.0D0
             helpkey *
           }
 
-         parameter wcx2 {
-            type _REAL
+         parameter x2 {
+            type LITERAL
             access WRITE
             vpath DEFAULT
             default 0.0D0
             helpkey *
           }
 
-         parameter wcy1 {
-            type _REAL
+         parameter y1 {
+            type LITERAL
             access WRITE
             vpath DEFAULT
             default 0.0D0
             helpkey *
           }
 
-         parameter wcy2 {
-            type _REAL
+         parameter y2 {
+            type LITERAL
             access WRITE
             vpath DEFAULT
             default 0.0D0
