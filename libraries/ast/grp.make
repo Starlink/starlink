@@ -26,6 +26,7 @@ ffitschan.c \
 fframe.c \
 fframeset.c \
 fgrismmap.c \
+fpolymap.c \
 fintramap.c \
 fitschan.c \
 flutmap.c \
@@ -51,6 +52,7 @@ fzoommap.c \
 grf_null.c \
 grf_pgplot.c \
 grismmap.c \
+polymap.c \
 intramap.c \
 loader.c \
 lutmap.c \
@@ -105,6 +107,7 @@ fitschan.h \
 frame.h \
 frameset.h \
 grf.h \
+polymap.h \
 grismmap.h \
 intramap.h \
 loader.h \

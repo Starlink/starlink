@@ -19,6 +19,7 @@
 #include "permmap.h"
 #include "plot.h"
 #include "pointset.h"
+#include "polymap.h"
 #include "skyaxis.h"
 #include "skyframe.h"
 #include "specframe.h"
@@ -85,6 +86,7 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(PcdMap);
    LOAD(PermMap);
    LOAD(Plot);
+   LOAD(PolyMap);
    LOAD(PointSet);
    LOAD(ShiftMap);
    LOAD(SkyAxis);

@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {211.11}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {16th July 2003}
+\newcommand{\stardocdate}      {18th August 2003}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -590,8 +590,8 @@ coordinate spaces---{\em{i.e.}}\ map projections (the \htmlref{DssMap}{DssMap} a
 \item Permutation, introduction and elimination of coordinates (the
 \htmlref{PermMap}{PermMap}).
 
-\item Various linear coordinate transformations (the \htmlref{MatrixMap}{MatrixMap}, \htmlref{WinMap}{WinMap}
-and \htmlref{ZoomMap}{ZoomMap}).
+\item Various linear coordinate transformations (the \htmlref{MatrixMap}{MatrixMap}, \htmlref{WinMap}{WinMap},
+ShiftMap and \htmlref{ZoomMap}{ZoomMap}).
 
 \item Lookup tables (the \htmlref{LutMap}{LutMap}).
 
@@ -1469,7 +1469,8 @@ In AST, it can be represented by concatenating two Mappings. The first
 is a \htmlref{MatrixMap}{MatrixMap}, which implements the matrix multiplication. The second
 is a \htmlref{WinMap}{WinMap}, which linearly transforms one coordinate window on to
 another, but will be used here simply to implement the shift of
-origin. These Mappings may be constructed and concatenated as follows:
+origin (alternatively, a ShiftMap could have been used in place of a
+WinMap). These Mappings may be constructed and concatenated as follows:
 
 \begin{quote}
 \small
@@ -5154,11 +5155,12 @@ skyframe = astSkyFrame( "" );
 \end{quote}
 
 Such a SkyFrame would represent the default celestial coordinate
-system which, at present, is the FK5~(J2000.0) equatorial system.
+system which, at present, is the ICRS system (the default was "FK5(J2000)" 
+in versions of AST prior to 3.0).
 
 \subsection{Specifying a Particular Celestial Coordinate System}
 
-For many purposes, the FK5~(J2000.0) coordinate system is perfectly
+For many purposes, the ICRS coordinate system is perfectly
 adequate. In order to support conversion between a variety of
 celestial coordinate systems, however, you can create SkyFrames that
 represent any of these.
@@ -5198,7 +5200,7 @@ celestial coordinate systems (see \secref{ss:introducingconversion} ).
 Many celestial coordinate systems have some additional free parameters
 which serve to identify a particular coordinate system from amongst a
 broader class of related coordinate systems. For example, the
-FK5~(J2010.0) system is distinguished from the (default) FK5~(J2000.0)
+FK5~(J2010.0) system is distinguished from the FK5~(J2000.0)
 system by a different equinox---and the coordinates of a fixed
 astronomical source would have different values when expressed in
 these two systems.
@@ -5945,7 +5947,7 @@ A very common use for a \htmlref{CmpFrame}{CmpFrame} within astronomy is to repr
 represents position within a spectrum, and the other two axes represent
 position on the sky (or some other spatial domain such as the focal plane
 of a telescope). As an example, we create such a CmpFrame in which axes
-1 and 2 represent Right Ascension and Declination (FK5 J2000), and axis 3 
+1 and 2 represent Right Ascension and Declination (ICRS), and axis 3 
 represents wavelength (these are the default coordinate Systems
 represented by a \htmlref{SkyFrame}{SkyFrame} and a \htmlref{SpecFrame}{SpecFrame} respectively):
 
@@ -6557,9 +6559,8 @@ SpecFrame, the default is wavelength (or equivalently, frequency)
 since this is the system in which observations are usually made. The
 SpecFrame class also has an attribute called \htmlref{AlignStdOfRest}{AlignStdOfRest} which
 allows the standard of rest of the alignment system to be specified.
-Currently, the \htmlref{SkyFrame}{SkyFrame} uses FK5 as the default for AlignSystem, since
-this is a close approximation to an inertial frame of rest (future
-versions of AST will use ICRS as the default).
+Currently, the \htmlref{SkyFrame}{SkyFrame} uses ICRS as the default for AlignSystem, since
+this is a close approximation to an inertial frame of rest.
 
 \cleardoublepage
 \section{\label{ss:framesets}Coordinate System Networks (FrameSets)}
@@ -7638,7 +7639,7 @@ astAddFrame( frameset, 1, astUnitMap( 2, "" ), skyframe );
 This constructs a trivial FrameSet whose base and current Frames are
 both the same SkyFrame connected by a \htmlref{UnitMap}{UnitMap}. You can think of this
 as a ``pipe'' connecting two coordinate systems. At present, these two
-systems represent identical FK5 (J2000) coordinates, so the FrameSet
+systems represent identical ICRS coordinates, so the FrameSet
 implements a unit Mapping. We can change the coordinate system on the
 current end of this pipe as follows:
 
@@ -11332,6 +11333,7 @@ Object             - Base class for all AST Objects
       MatrixMap    - Map positions by multiplying them by a matrix
       PcdMap       - Apply 2-dimensional pincushion/barrel distortion
       PermMap      - Coordinate permutation Mapping
+      ShiftMap     - Shifts each axis by a constant amount
       SlaMap       - Sequence of celestial coordinate conversions
       SpecMap      - Sequence of spectral coordinate conversions
       SphMap       - Map 3-d Cartesian to 2-d spherical coordinates
@@ -18979,7 +18981,7 @@ Object             - Base class for all AST Objects
       celestial longitude/latitude coordinate systems. The particular
       celestial coordinate system to be represented is specified by
       setting the SkyFrame's \htmlref{System}{System} attribute (currently, the default
-      is FK5) qualified, as necessary, by a mean \htmlref{Equinox}{Equinox} value and/or
+      is ICRS) qualified, as necessary, by a mean \htmlref{Equinox}{Equinox} value and/or
       an \htmlref{Epoch}{Epoch}.
 
       All the coordinate values used by a SkyFrame are in
@@ -19023,15 +19025,14 @@ Object             - Base class for all AST Objects
       \sstexamplesubsection{
          frame = astSkyFrame( {\tt{"}}{\tt{"}} );
       }{
-         Creates a SkyFrame to describe the default FK5 celestial
-         coordinate system, with the standard (default) mean Equinox of
-         J2000.0.
+         Creates a SkyFrame to describe the default ICRS celestial
+         coordinate system.
       }
       \sstexamplesubsection{
-         frame = astSkyFrame( {\tt{"}}Equinox = J2005, Digits = 10{\tt{"}} );
+         frame = astSkyFrame( {\tt{"}}System = FK5, Equinox = J2005, Digits = 10{\tt{"}} );
       }{
-         Creates a SkyFrame to describe the default FK5 celestial
-         coordinate system, but this time with a mean Equinox of J2005.0.
+         Creates a SkyFrame to describe the FK5 celestial
+         coordinate system, with a mean Equinox of J2005.0.
          Because especially accurate coordinates will be used,
          additional precision (10 digits) has been requested. This will
          be used when coordinate values are formatted for display.
@@ -19057,14 +19058,14 @@ Object             - Base class for all AST Objects
 
          \sstitem
          Currently, the default celestial coordinate system is
-         FK5. However, this default may change in future as new
+         ICRS. However, this default may change in future as new
          astrometric standards evolve. The intention is to track the most
          modern appropriate standard. For this reason, you should use the
          default only if this is what you intend (and can tolerate any
          associated slight change in behaviour with future versions of
-         this function). If you intend to use the FK5 system
+         this function). If you intend to use the ICRS system
          indefinitely, then you should specify it explicitly using an
-         {\tt{"}}options{\tt{"}} value of {\tt{"}}System=FK5{\tt{"}}.
+         {\tt{"}}options{\tt{"}} value of {\tt{"}}System=ICRS{\tt{"}}.
 
          \sstitem
          Whichever celestial coordinate system is represented, it will
@@ -19228,6 +19229,12 @@ Object             - Base class for all AST Objects
 
          \sstitem
          {\tt{"}}EQGAL{\tt{"}}: Convert J2000.0 equatorial to galactic coordinates.
+
+         \sstitem
+         {\tt{"}}HFK5Z{\tt{"}} (JEPOCH): Convert ICRS coordinates to J2000.0 equatorial.
+
+         \sstitem
+         {\tt{"}}FK5HZ{\tt{"}} (JEPOCH): Convert J2000.0 equatorial coordinates to ICRS.
 
          \sstitem
          {\tt{"}}GALSUP{\tt{"}}: Convert galactic to supergalactic coordinates.
@@ -21564,7 +21571,7 @@ Object             - Base class for all AST Objects
       \sstsubsection{
          \htmlref{SkyFrame}{SkyFrame}
       }{
-         The default AlignSystem attribute for a SkyFrame is {\tt{"}}FK5{\tt{"}}.
+         The default AlignSystem attribute for a SkyFrame is {\tt{"}}ICRS{\tt{"}}.
       }
       \sstsubsection{
          \htmlref{SpecFrame}{SpecFrame}
@@ -23089,8 +23096,8 @@ Object             - Base class for all AST Objects
       the point on the sky that defines the coordinate origin (the
       intersection of the two planes termed the {\tt{"}}mean equinox{\tt{"}}) move
       with time according to some model which removes the more rapid
-      fluctuations. The SkyFrame class supports both the old FK4 and
-      the current FK5 models.
+      fluctuations. The SkyFrame class supports both the FK4 and
+      FK5 models.
 
       The position of a fixed source expressed in any of these
       coordinate systems will appear to change with time due to
@@ -23465,7 +23472,7 @@ Object             - Base class for all AST Objects
       {\tt{"}}-45.6{\tt{"}}, {\tt{"}}S45.6{\tt{"}}. As indicated, the sign of the latitude can
       optionally be indicated using characters {\tt{"}}N{\tt{"}} and {\tt{"}}S{\tt{"}} in place of the
       usual {\tt{"}}$+${\tt{"}} and {\tt{"}}-{\tt{"}}. When converting the stored value to a string, the
-      format {\tt{"}}[s]dd:mm:ss.s{\tt{"}} is used, when {\tt{"}}[s]{\tt{"}} is {\tt{"}}N{\tt{"}} or {\tt{"}}S{\tt{"}}.
+      format {\tt{"}}[s]dd:mm:ss{\tt{"}} is used, when {\tt{"}}[s]{\tt{"}} is {\tt{"}}N{\tt{"}} or {\tt{"}}S{\tt{"}}.
    }
    \sstattributetype{
       String.
@@ -23494,7 +23501,7 @@ Object             - Base class for all AST Objects
       {\tt{"}}-204.67689{\tt{"}}, {\tt{"}}W204.67689{\tt{"}}. As indicated, the sign of the longitude can
       optionally be indicated using characters {\tt{"}}E{\tt{"}} and {\tt{"}}W{\tt{"}} in place of the
       usual {\tt{"}}$+${\tt{"}} and {\tt{"}}-{\tt{"}}. When converting the stored value to a string, the
-      format {\tt{"}}[s]ddd:mm:ss.s{\tt{"}} is used, when {\tt{"}}[s]{\tt{"}} is {\tt{"}}E{\tt{"}} or {\tt{"}}W{\tt{"}} and the
+      format {\tt{"}}[s]ddd:mm:ss{\tt{"}} is used, when {\tt{"}}[s]{\tt{"}} is {\tt{"}}E{\tt{"}} or {\tt{"}}W{\tt{"}} and the
       numerical value is chosen to be less than 180 degrees.
    }
    \sstattributetype{
@@ -25745,8 +25752,17 @@ Object             - Base class for all AST Objects
          \sstitemlist{
 
             \sstitem
+            {\tt{"}}ICRS{\tt{"}}: The Internation Celestial Reference System, realised
+            through the Hipparcos catalogue. Whilst not an equatorial system
+            by definition, the ICRS is very close to the FK5 (J2000) system
+            and is usually treated as an equatorial system. The distinction
+            between ICRS and FK5 (J2000) only becomes important when accuracies
+            of 50 milli-arcseconds or better are required. ICRS need not be
+            qualified by an \htmlref{Equinox}{Equinox} value.
+
+            \sstitem
             {\tt{"}}FK4{\tt{"}}: The old FK4 (barycentric) equatorial coordinate system,
-            which should be qualified by an \htmlref{Equinox}{Equinox} value. The underlying
+            which should be qualified by an Equinox value. The underlying
             model on which this is based is non-inertial and rotates slowly
             with time, so for accurate work FK4 coordinate systems should
             also be qualified by an \htmlref{Epoch}{Epoch} value.
@@ -25800,12 +25816,12 @@ Object             - Base class for all AST Objects
             SkyFrames has System set to {\tt{"}}Unknown{\tt{"}}.
 
          }
-         Currently, the default System value is {\tt{"}}FK5{\tt{"}}. However, this
+         Currently, the default System value is {\tt{"}}ICRS{\tt{"}}. However, this
          default may change in future as new astrometric standards
          evolve. The intention is to track the most modern appropriate
          standard. For this reason, you should use the default only if
          this is what you intend (and can tolerate any associated slight
-         change in future). If you intend to use the FK5 system
+         change in future). If you intend to use the ICRS system
          indefinitely, then you should specify it explicitly.
       }
       \sstsubsection{
@@ -27895,7 +27911,7 @@ Object             - Base class for all AST Objects
       celestial longitude/latitude coordinate systems. The particular
       celestial coordinate system to be represented is specified by
       setting the SkyFrame's \htmlref{System}{System} attribute (currently, the default
-      is FK5) qualified, as necessary, by a mean \htmlref{Equinox}{Equinox} value and/or
+      is ICRS) qualified, as necessary, by a mean \htmlref{Equinox}{Equinox} value and/or
       an \htmlref{Epoch}{Epoch}.
 
       All the coordinate values used by a SkyFrame are in
@@ -29471,6 +29487,10 @@ current version):
 
 \begin{enumerate}
 
+\item The \htmlref{SkyFrame}{SkyFrame} class now represents ICRS coordinates by default
+instead of FK5 (that is, the default for the \htmlref{System}{System} attribute for SkyFrames 
+has been changed to ``ICRS'').
+
 \item The 
 \htmlref{astRate}{astRate}
 function has been added which allows an estimate to be made of the rate of 
@@ -29478,6 +29498,20 @@ change of a \htmlref{Mapping}{Mapping} output with respect to one of the Mapping
 
 \item A new subclass of Mapping, the GrismMap, has been added which
 models the spectral dispersion produced by a grating, prism or grism.
+
+\item A new subclass of Mapping, the ShiftMap, has been added which adds
+constant values onto all coordinates (this is equivalent to a \htmlref{WinMap}{WinMap}
+with unit scaling on all axes).
+
+\item Minor bugs have been fixed within the \htmlref{Plot}{Plot} class to do with the choice 
+and placement of numerical axis labels.
+
+\item The SphMap class has a new attribute caller PolarLong which gives the 
+longitude value to be returned when a Cartesian position corresponding to 
+either the north or south pole is transformed into spherical coordinates.
+
+\item The \htmlref{WcsMap}{WcsMap} class now assigns a longitude of zero to output
+celestial coordinates which have a latitude of plus or minus 90 degrees.
 
 \end{enumerate}
 

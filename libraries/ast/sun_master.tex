@@ -23,7 +23,7 @@ f+
 \newcommand{\stardocnumber}    {210.11}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {18th August 2003}
+\newcommand{\stardocdate}      {1st October 2003}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -649,6 +649,8 @@ PermMap).
 
 \item Various linear coordinate transformations (the MatrixMap, WinMap,
 ShiftMap and ZoomMap).
+
+\item General N-dimensional polynomial transformations (the PolyMap).
 
 \item Lookup tables (the LutMap).
 
@@ -4720,6 +4722,7 @@ as a whole and some of the sub-classes it contains:
       MathMap
       MatrixMap
       PermMap
+      PolyMap
       SlaMap
       SpecMap
       UnitMap
@@ -17900,6 +17903,7 @@ Object             - Base class for all AST Objects
       MatrixMap    - Map positions by multiplying them by a matrix
       PcdMap       - Apply 2-dimensional pincushion/barrel distortion
       PermMap      - Coordinate permutation Mapping
+      PolyMap      - General N-dimensional polynomial Mapping
       ShiftMap     - Shifts each axis by a constant amount
       SlaMap       - Sequence of celestial coordinate conversions
       SpecMap      - Sequence of spectral coordinate conversions
@@ -19135,6 +19139,9 @@ Frame, axis specifiers will usually be ignored. The exception is that a
 CmpFrame will use the presence of an axis specifier to indicate that the
 attribute name relates to the primary Frame containing the specified
 axis, rather than to the CmpFrame as a whole.
+
+\item A new subclass of Mapping, the PolyMap, has been added which
+performs a general N-dimensional polynomial mapping.
 
 \item A new subclass of Mapping, the GrismMap, has been added which
 models the spectral dispersion produced by a grating, prism or grism.

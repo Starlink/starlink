@@ -381,7 +381,7 @@ $(PKG_NAME)_err.h axis.h c2f77.h channel.h cmpframe.h \
 cmpmap.h dssmap.h error.h fitschan.h frame.h \
 frameset.h grismmap.h intramap.h loader.h lutmap.h mapping.h \
 mathmap.h matrixmap.h memory.h object.h pcdmap.h \
-permmap.h plot.h pointset.h skyaxis.h skyframe.h specframe.h \
+permmap.h plot.h pointset.h polymap.h skyaxis.h skyframe.h specframe.h \
 specmap.h slamap.h sphmap.h unit.h unitmap.h wcsmap.h winmap.h \
 zoommap.h shiftmap.h
 
@@ -428,9 +428,10 @@ fmatrixmap.c fobject.c fpcdmap.c fpermmap.c fplot.c \
 frame.c frameset.c fskyframe.c fspecframe.c fslamap.c fspecmap.c fsphmap.c \
 funitmap.c fwcsmap.c fwinmap.c fshiftmap.c fzoommap.c grismmap.c intramap.c \
 loader.c lutmap.c mapping.c mathmap.c matrixmap.c \
-memory.c object.c pcdmap.c permmap.c plot.c \
+memory.c object.c pcdmap.c permmap.c plot.c fpolymap.c polymap.c \
 pointset.c skyaxis.c skyframe.c specframe.c specmap.c slamap.c sphmap.c \
-unit.c unitmap.c wcsmap.c winmap.c shiftmap.c zoommap.c
+unit.c unitmap.c wcsmap.c winmap.c shiftmap.c zoommap.c 
+
 
 #  The default error reporting module.
 ERR_C_ROUTINES = err_null.c
@@ -1335,6 +1336,7 @@ fframe.o: fframe.c f77.h c2f77.h error.h memory.h mapping.h object.h \
 fframeset.o: fframeset.c f77.h c2f77.h error.h memory.h mapping.h \
  object.h channel.h pointset.h frame.h axis.h frameset.h
 fgrismmap.o: fgrismmap.c f77.h c2f77.h error.h memory.h grismmap.h
+fpolymap.o: fpolymap.c f77.h c2f77.h error.h memory.h polymap.h
 fintramap.o: fintramap.c f77.h c2f77.h error.h memory.h intramap.h \
  mapping.h object.h channel.h pointset.h
 fitschan.o: fitschan.c error.h memory.h object.h channel.h pointset.h \
@@ -1387,6 +1389,8 @@ grf_pgplot.o: grf_pgplot.c f77.h c2f77.h pointset.h object.h error.h \
  channel.h memory.h grf.h ast_err.h
 grismmap.o: grismmap.c error.h memory.h object.h pointset.h mapping.h \
  unitmap.h channel.h grismmap.h
+polymap.o: polymap.c error.h memory.h object.h pointset.h mapping.h \
+ unitmap.h channel.h polymap.h
 intramap.o: intramap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h unitmap.h intramap.h ast_err.h
 loader.o: loader.c axis.h object.h error.h channel.h cmpframe.h \

@@ -46,7 +46,7 @@
 *     30-APR-2003 (DSB):
 *        Added AST_VERSION.
 *     15-JUL-2003 (DSB):
-*        Added AST_RATE and GRISMMAP functions.
+*        Added AST_RATE, POLYMAP, SHIFTMAP and GRISMMAP functions.
 *-
 
 *  Length of character string returned by a character function.
@@ -222,6 +222,10 @@ c      PARAMETER ( AST__UKERNN = 2 )
 *  PermMap class.
       INTEGER AST_PERMMAP
       LOGICAL AST_ISAPERMMAP
+
+*  PolyMap class.
+      INTEGER AST_POLYMAP
+      LOGICAL AST_ISAPOLYMAP
 
 *  SlaMap class.
       INTEGER AST_SLAMAP
