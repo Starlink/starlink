@@ -155,6 +155,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.25  1999/05/15 03:48:45  timj
+*     Initialise MAP_N_PTR.
+*
 *     Revision 1.24  1999/05/15 01:51:07  timj
 *     Add support for measurement propogation (POLPHOT mode)
 *
@@ -520,7 +523,11 @@ c
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
-
+      
+*     Initialisation
+      MAP_N_PTR = 0
+      MAP_N_PTR_END = 0
+            
       USEFILE = .TRUE.
       PARABOLA = .TRUE.   ! Assume I can fit a parabola
 
