@@ -2661,7 +2661,7 @@ to be used with care in scripts because not every parameter has a
 default, and therefore must be given on the command line for the
 application to work properly.  For example,
 \htmlref{CREFRAME}{CREFRAME} must have a value specified for parameter
-OUTPIC, the name of the output data object. If we run the application
+OUT, the name of the output NDF. If we run the application
 like this:
 
 \small
@@ -2670,16 +2670,16 @@ like this:
 \end{verbatim}
 \normalsize
 it would fail in the sense that it would still have to prompt for a
-value---it does not know where to write the output IMAGE
-data file.  However, if we run CREFRAME like this:
+value---it does not know where to write the output NDF. 
+However, if we run CREFRAME like this:
 
 \small
 \begin{verbatim}
-     ICL> creframe outpic=stars accept
+     ICL> creframe out=stars accept
 \end{verbatim}
 \normalsize
 it would generate an output image using default values for all the
-parameters except OUTPIC, and write the output to file {\tt stars.sdf}.
+parameters except OUT, and write the output to file {\tt stars.sdf}.
 Another point to be wary of is that some applications have loops,
 {\it{e.g.}}\ \htmlref{LOOK}{LOOK},
 \htmlref{LUTABLE}{LUTABLE}, and if you use the ACCEPT keyword
@@ -11243,7 +11243,7 @@ picture.}
 \menuitem{COPYBAD}{
  Copies the bad pixel mask from one NDF to another.}
 \menuitem{CREFRAME}{
- Generates a test 2-d data array from a  selection of several types.}
+ Generates a test 2-d NDF from a  selection of several types.}
 \menuitem{CRELUT}{
  Creates or manipulates an image-display lookup table using a palette.}
 \menuitem{CSUB}{
@@ -11606,7 +11606,7 @@ functions as follows.
 
 \begin{description}
 \classitem{CREFRAME}
- Generates a test 2-d data array from a selection of several types.
+ Generates a test 2-d NDF from a selection of several types.
 \classitem{FITSDIN}
  Reads a FITS disc file composed of simple, group or table objects.
 \classitem{FITSHEAD}
@@ -16551,110 +16551,246 @@ default value.
    }
 }
 
-\manroutine {{\manheadstyle{CREFRAME}}}{ Generates a test 2-d data array from a
-  selection of several types.}
-\begin{manroutinedescription}
-\manroutineitem {Description }{}
-  This routine allows you to generate several different types
-  of 2-d data array for test purposes. The data array is written to
-  an output {\mantt{IMAGE}} structure.  The types of array are summarised as
-  follows:
+\sstroutine{
+   CREFRAME
+}{
+   Generates a test 2-d NDF with a selection of several forms
+}{
+   \sstdescription{
+      This application creates a 2-dimensional output NDF containing
+      artificial data of various forms (see parameter MODE). The output
+      NDF can, optionally, have a Variance component describing the noise
+      in the Data array (see parameter VARIANCE), and additionally a
+      randomly generated pattern of bad pixels (see parameter BADPIX).
+      Bad columns or rows of pixels can also be generated
+   }
+   \sstusage{
+      creframe out mode [lbound] [ubound]
+   }
+   \sstparameters{
+      \sstsubsection{
+         BACKGROUND = \_REAL (Read)
+      }{
+         Background intensity to be used in the generated data array.
+         Must not be negative. (GS mode).
+      }
+      \sstsubsection{
+         BADCOL = \_INTEGER (Read)
+      }{
+         The number of bad columns to include. Only accessed if
+         parameter BADPIX is TRUE. The bad columns are distributed
+         at random using a uniform distribution. {\tt [0]}
+      }
+      \sstsubsection{
+         BADPIX  = \_LOGICAL (Read)
+      }{
+         Whether or not bad pixels are to be included. See also
+         parameters FRACTION, BADCOL and BADROW. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         BADROW = \_INTEGER (Read)
+      }{
+         The number of bad rows to include. Only accessed if
+         parameter BADPIX is TRUE. The bad rows are distributed
+         at random using a uniform distribution. {\tt [0]}
+      }
+      \sstsubsection{
+         DIRN = \_INTEGER (Read)
+      }{
+         Direction of the ramp. 1 means left to right, 2 is right to
+         left, 3 is bottom to top, and 4 is top to bottom. (RA mode)
+      }
+      \sstsubsection{
+         DISTRIB  =  \_CHAR (Read)
+      }{
+         Radial distribution of the Gaussians to be used (GS mode).
+         Alternatives weightings are:
 
-\begin{mandescription}
-\mandescriptionitem {Random}  - between 0 and 1, or specified limits
-\mandescriptionitem {Constant} - 0 or at a specified value
-\mandescriptionitem {Noisy}  - Poissonian or Gaussian noise about a
-  specified mean
-\mandescriptionitem {Ramped}  - between specified minimum and maximum values
-  and a choice of four directions
-\mandescriptionitem {Gaussian} - a random distribution of 2-d Gaussians of
-  defined FWHM and range of maximum peak values on a specified
-  background, with optional invalid pixels and bad column. There is a
-  choice of distributions for the Gaussians: fixed, or inverse square
-  radially from the array centre. (In essence it is equivalent to a
-  simulated star field.) The {$x$}-{$y$} position and peak
-  value of each Gaussian may be stored in a Fortran
-  formatted file, or reported to you. Magic-value bad
-  data may be included randomly, and/or in a column or line of the array.
-\end{mandescription}
+         \sstitemlist{
 
-\manroutineitem {Invocation }{}
-  CREFRAME
+            \sstitem
+            FIX: Fixed distance.
 
-\manroutineitem {Parameters }{}
-\begin{manparametertable}
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{OUTPIC}}  }{{\mantt{IMAGE}}}
-  Output {\mantt{IMAGE}} structure for the generated data array.
-\manparameterentry {{\mantt{READ}} }{{\mantt{OTITLE}}  }{{\mantt{\_CHAR}}}
-  Title for the output {\mantt{IMAGE}} structure. \mbox{\mantt ['KAPPA - Creframe']}
-\manparameterentry {{\mantt{READ}} }{{\mantt{IDIMS}}  }{{\mantt{\_INTEGER}}}
-  {$x$} and {$y$} dimensions of the output data array.
-\manparameterentry {{\mantt{READ}} }{{\mantt{TYPED}}  }{{\mantt{\_CHAR}}}
-  Type of data to be generated. The options are {\mantt{GS}} --- Gaussian;
-  {\mantt{RR}} --- random 0 -- 1; {\mantt{RP}} --- random Poisson noise
-  about mean; {\mantt{RL}} --- random with set limits;
-  {\mantt{FL}} --- flat;   {\mantt{BL}} --- zeroes;
-  {\mantt{RA}} --- ramps; and {\mantt{GN}} --- Gaussian noise about mean.
-\manparameterentry {{\mantt{READ}} }{{\mantt{HIGH}}  }{{\mantt{\_REAL}}}
-  High value used in the generated data array.
-   ({\mantt{RA}} and {\mantt{RL}} types)
-\manparameterentry {{\mantt{READ}} }{{\mantt{LOW}}  }{{\mantt{\_REAL}}}
-  Low value used in the generated data array.
-   ({\mantt{RA}} and {\mantt{RL}} types)
-\manparameterentry {{\mantt{READ}} }{{\mantt{DIRN}}  }{{\mantt{\_INTEGER}}}
-  Direction of the ramp. 1 means left to right, 2 is right to
-  left, 3 is bottom to top, and 4 is top to bottom.
-  ({\mantt{RA}} type)
-\manparameterentry {{\mantt{READ}} }{{\mantt{MEAN}}  }{{\mantt{\_REAL}}}
-  Mean value used in the generated data array.
-  ({\mantt{FL}} and {\mantt{RP}} types)
-\end{manparametertable}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{SIGMA}}  }{{\mantt{\_REAL}}}
-  Standard deviation of noise to be used in the generated data
-  array. ({\mantt{GN}} type)
-\manparameterentry {{\mantt{READ}} }{{\mantt{MAX}}  }{{\mantt{\_REAL}}}
-  Peak Gaussian intensity to be used in the generated data array.
- ({\mantt{GS}} type)
-\manparameterentry {{\mantt{READ}} }{{\mantt{MIN}}  }{{\mantt{\_REAL}}}
-  Lowest Gaussian intensity to be used in the generated data array.
- ({\mantt{GS}} type)
-\manparameterentry {{\mantt{READ}} }{{\mantt{BACKGROUND}}  }{{\mantt{\_REAL}}}
-  Background intensity to be used in the generated data array.
- ({\mantt{GS}} type)
-\manparameterentry {{\mantt{READ}} }{{\mantt{NGAUSS}}  }{{\mantt{\_INTEGER}}}
-  Number of Gaussian star-like images to be generated. ({\mantt{GS}} type)
-\manparameterentry {{\mantt{READ}} }{{\mantt{SEEING}}  }{{\mantt{\_REAL}}}
-  Seeing FWHM in pixels ({\em not} the same as the standard
-  deviation). ({\mantt{GS}} type)
-\manparameterentry {{\mantt{READ}} }{{\mantt{DISTRIB}}  }{{\mantt{\_CHAR}}}
-  Radial distribution of the Gaussians to be used; alternatives
-  weightings are {\mantt{FIX}} {\mantt{=}} fixed distance; and
-  {\mantt{RSQ}} {\mantt{=}} {${1\over r^2}$}. ({\mantt{GS}} type)
-  \mbox{\mantt ['FIX']}
-\manparameterentry {{\mantt{READ}} }{{\mantt{BADPIX}}  }{{\mantt{\_LOGICAL}}}
-  Whether or not bad pixels are to be included.  ({\mantt{GS}} type)
-  \mbox{\mantt [FALSE]}
-\manparameterentry {{\mantt{READ}} }{{\mantt{FRACTION}} }{{\mantt{\_REAL}}}
-  Fraction of bad pixels to be included. ({\mantt{GS}} type)
-  \mbox{\mantt [0.01]}
-\manparameterentry {{\mantt{READ}} }{{\mantt{BADCOL}}  }{{\mantt{\_LOGICAL}}}
-  Whether or not a bad column is to be included. ({\mantt{GS}} type)
-  \mbox{\mantt [FALSE]}
-\manparameterentry {{\mantt{READ}} }{{\mantt{SCREEN}}  }{{\mantt{\_LOGICAL}}}
-  True if the Gaussian parameters are reported to you. ({\mantt{GS}} type)
-  \mbox{\mantt [FALSE]}
-\manparameterentry {{\mantt{READ}} }{{\mantt{FILENAME}} }{{\mantt{\_CHAR}}}
-  Filename for the output of the Gaussian parameters.  ({\mantt{GS}} type)
-  \mbox{\mantt [!]}
-\end{manparametertable}
-\manroutineitem {Bugs }{}
-  None known.
+            \sstitem
+            RSQ: One over radius squared.
 
-\manroutineitem {Authors }{}
-  Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
-  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
-\end{manroutinedescription}
+         }
+         {\tt ["FIX"]}
+      }
+      \sstsubsection{
+         FRACTION = \_REAL (Read)
+      }{
+         Fraction of bad pixels to be included. Only accessed if BADPIX
+         is TRUE. {\tt [0.01]}
+      }
+      \sstsubsection{
+         HIGH = \_REAL (Read)
+      }{
+         High value used in the generated data array (RA and RL modes).
+      }
+      \sstsubsection{
+         LBOUND( 2 ) = \_INTEGER (Read)
+      }{
+         Lower pixel bounds of the output NDF. Only accessed if parameter
+         LIKE is set to null (!). {\tt [1,1]}
+      }
+      \sstsubsection{
+         LIKE = NDF (Read)
+      }{
+         An optional template NDF which, if specified, will be used to
+         define the bounds for the output NDF. If a null value (!) is
+         given the bounds are obtained via parameters LBOUND and
+         UBOUND. {\tt [!]}
+      }
+      \sstsubsection{
+         LOGFILE = LITERAL (Read)
+      }{
+         Name of a log file in which to store details of the Gaussians
+         added to the output NDF (GS mode). If a null value is supplied
+         no log file is created. {\tt [!]}
+      }
+      \sstsubsection{
+         LOW  = \_REAL (Read)
+      }{
+         Low value used in the generated data array (RA and RL modes).
+      }
+      \sstsubsection{
+         MAX = \_REAL (Read)
+      }{
+         Peak Gaussian intensity to be used in the generated data
+         array (GS mode).
+      }
+      \sstsubsection{
+         MEAN = \_REAL (Read)
+      }{
+         Mean value used in the generated data array (FL, RP and GN modes).
+      }
+      \sstsubsection{
+         MIN = \_REAL (Read)
+      }{
+         Lowest Gaussian intensity to be used in the generated data
+         array (GS mode).
+      }
+      \sstsubsection{
+         MODE = LITERAL (Read)
+      }{
+         The form of the data to be generated. The options are:
+
+         \sstitemlist{
+
+            \sstitem
+            RR: Uniform noise between 0 and 1.
+
+            \sstitem
+            RL: Uniform noise between specified limits.
+
+            \sstitem
+            BL: A constant value of zero.
+
+            \sstitem
+            FL: A specified constant value.
+
+            \sstitem
+            RP: Poisson noise about a specified mean
+
+            \sstitem
+            GN: Gaussian noise about a specified mean
+
+            \sstitem
+            RA: Ramped between specified minimum and maximum values and a
+                  choice of four directions.
+
+            \sstitem
+            GS: A random distribution of 2-d Gaussians of defined
+                  FWHM and range of maximum peak values on a specified
+                  background, with Poissonian noise. There is a choice of
+                  spatial distributions for the Gaussians: fixed, or inverse
+                  square radially from the array centre. (In essence it is
+                  equivalent to a simulated star field.) The x-y position and
+                  peak value of each Gaussian may be stored in a log file,
+                  a positions list catalogue, or reported on the screen.
+                  Bad pixels may be included randomly, and/or in a column
+                  or line of the array.
+         }
+      }
+      \sstsubsection{
+         NGAUSS  = \_INTEGER (Read)
+      }{
+         Number of Gaussian star-like images to be generated (GS mode).
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output NDF.
+      }
+      \sstsubsection{
+         OUTCAT = FILENAME (Write)
+      }{
+         An output catalogue in which to store the pixel co-ordinates of
+         the Gausians in the output NDF (GS mode). If a null value is
+         supplied, no output positions list is produced. {\tt [!]}
+      }
+      \sstsubsection{
+         QUIET = \_LOGICAL  (Read)
+      }{
+         If FALSE, the Gaussian parameters are reported to you on the
+         screen (GS mode) {\tt [TRUE]}
+      }
+      \sstsubsection{
+         SEEING = \_REAL (Read)
+      }{
+         Seeing (FWHM) in pixels (not the same as the standard deviation)
+         (GS mode).
+      }
+      \sstsubsection{
+         SIGMA = \_REAL (Read)
+      }{
+         Standard deviation of noise to be used in the generated data
+         array (GN mode).
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Title for the output NDF {\tt ["KAPPA - Creframe"]}
+      }
+      \sstsubsection{
+         UBOUND( 2 ) = \_INTEGER (Read)
+      }{
+         Upper pixel bounds of the output NDF. Only accessed if parameter
+         LIKE is set to null (!). {\tt [64,64]}
+      }
+      \sstsubsection{
+         VARIANCE = \_LOGICAL (Read)
+      }{
+         If TRUE, a Variance component is added to the output NDF
+         representing the noise added to the field. If a null (!) value is
+         supplied, a default is used which is TRUE for modes which include
+         noise, and FALSE for modes which do not include any noise. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         creframe out=file ubound=[128,128] mode=gs ngauss=5 badpix badcol=2
+                  max=200 min=20 background=20 seeing=1.5
+      }{
+         Produces a 128x128 pixel data array with 5 gaussians with peak
+         values of 200 counts and a background of 20 counts. There will
+         be two bad columns added to the resulting data.
+      }
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         The Data and Variance components of the output NDF have a numerical
+         type of {\tt "}\_REAL{\tt "} (single precision floating point).
+
+         \sstitem
+         This routine does not assign values to any of the following
+         components in the output NDF: LABEL, UNITS, QUALITY, AXIS, WCS.
+      }
+   }
+}
 
 \sstroutine{
    CRELUT
@@ -44616,6 +44752,24 @@ The following applications have been modified:
          memory was available.
       \end{itemize}
 
+   \item [\htmlref{CREFRAME}{CREFRAME}] \mbox{}
+      \begin{itemize}
+         \item Now produces an NDF data structure instead of an IMAGE
+         structure. The NDF may include a Variance component.
+         \item The Gaussian positions can now be saved in an output
+         positions list using the new parameter OUTCAT.
+         \item Parameter OUTPIC has been replaced by OUT.
+         \item Parameter TYPED has been replaced by MODE.
+         \item Parameter OTITLE has been replaced by TITLE.
+         \item Parameter SCREEN has been replaced by QUIET.
+         \item Parameter FILENAME has been replaced by LOGFILE.
+         \item Parameter IDIMS, XDIM and YDIM have been replaced by 
+         LBOUND, UBOUND and LIKE.
+         \item Parameters BADROW and BADCOL are now INTEGER parameters
+         which specify the number of bad rows or columns to add, not
+         LOGICAL parameters.
+      \end{itemize}
+
    \item [\htmlref{ELPROF}{ELPROF}] \mbox{}
       \begin{itemize}
          \item A new parameter called ESTIMATOR has been added. It allows
@@ -44743,7 +44897,7 @@ functions as follows.
 
 \begin{description}
 \classitem{CREFRAME}
- Generates a test 2-d data array from a selection of several types.
+ Generates a test 2-d NDF from a selection of several types.
 \classitem{FITSDIN}
  Reads a FITS disc file composed of simple, group or table objects.
 \classitem{FITSHEAD}
