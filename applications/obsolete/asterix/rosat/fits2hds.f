@@ -860,7 +860,11 @@
       END IF
 
 *  Make identifier from locator
-      CALL ADI1_MKFILE( LOC, FID, STATUS )
+      IF ( FNEW ) THEN
+        CALL ADI1_MKFILE( LOC, 'WRITE', FID, STATUS )
+      ELSE
+        CALL ADI1_MKFILE( LOC, 'UPDATE', FID, STATUS )
+      END IF
 
       END
 
