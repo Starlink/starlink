@@ -10,7 +10,7 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCG1_PRMT<T>( IN, RANK, N, DIM1, OUT, STATUS )
+*     CALL CCG1_PRMT<T>( IN, RANK, DIM1, N, OUT, STATUS )
 
 *  Description:
 *     This routine will permute columns an array IN of type <COMM>
