@@ -914,7 +914,6 @@
 	              DTOP(IAX)=DUBND(IAX)
 	              DWID(IAX)=ABS(DUBND(IAX)-DLBND(IAX))
                     ENDDO
-	print *,dbot(1),dtop(1),dwid(1)
 
 *  get donor bin values
                     IF (VOK.AND.QOK) THEN
