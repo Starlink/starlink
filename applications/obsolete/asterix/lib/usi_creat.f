@@ -107,7 +107,6 @@
       CHARACTER*200		FNAME			! Input object
 
       INTEGER			EP, PPOS		! Character pointers
-      INTEGER			IFID			! INP's ADI identifier
 *.
 
 *  Check inherited global status.
@@ -128,10 +127,10 @@
 *      If caller specified a representation on the parameter, glue it
 *      on to the file name
         IF ( PPOS .EQ. 0 ) THEN
-          CALL ADI_FCREAT( IFID, FNAME, BASEID, ID, STATUS )
+          CALL ADI_FCREAT( FNAME, BASEID, ID, STATUS )
         ELSE
-          CALL ADI_FCREAT( IFID, FNAME(:MAX(1,CHR_LEN(FNAME)))/
-     :                         /OUT(PPOS:), BASEID, ID, STATUS )
+          CALL ADI_FCREAT( FNAME(:MAX(1,CHR_LEN(FNAME)))//OUT(PPOS:),
+     :                     BASEID, ID, STATUS )
         END IF
 
 *    Store in common
