@@ -18,7 +18,7 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS(per-package-dirs)
 
 dnl    Build dependencies for this package.
-STAR_DECLARE_DEPENDENCIES([build], [ast cat kaplibs snx pda ndf sae])
+STAR_DECLARE_DEPENDENCIES([build], [ast cat kaplibs snx pda ndf sae], [link])
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
