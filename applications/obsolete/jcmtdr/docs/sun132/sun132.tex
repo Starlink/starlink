@@ -1,29 +1,81 @@
-\documentstyle[11pt]{article}
+\documentclass[twoside,11pt]{article}
 \pagestyle{myheadings}
+\usepackage{times}
+
+% +
+%  Name:
+%     sun132.tex
+%
+%  Purpose:
+%     SUN documentation for JCMTDR (SUN/132)
+%
+%  Authors:
+%     John F. Lightfoot (ATC)
+%     Paul A. Harrison (Starlink)
+%     Horst Meyerdierks (ATC/IfA/Starlink)
+%     Tim Jenness (JAC, Hilo)
+
+%  Copyright:
+%     Copyright (C) 1989-1995,2002,2003 Particle Physics and Astronomy
+%     Research Council. All Rights Reserved.
+%
+%  History:
+%     1989-1995 Unknown
+%     20 Mar 2003 (TIMJ):
+%       Tweak for linux release. Add version history from HTML help.
+%       Latex2e compliant
+% -
 
 % -----------------------------------------------------------------------------
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {132.2}
+\newcommand{\stardocnumber}    {132.3}
 \newcommand{\stardocauthors}
    {J F Lightfoot, P A Harrison, H Meyerdierks}
-\newcommand{\stardocdate}      {12 January 1995}
-\newcommand{\stardoctitle}     {JCMTDR\\[2ex]
-                               Applications for Reducing JCMT Data\\[2ex]
-                               {\em Version 1.2}}
+\newcommand{\stardocdate}      {20 March 2003}
+\newcommand{\stardoctitle}     {JCMTDR \\[2ex] Applications for Reducing JCMT GSD Data}
+\newcommand{\stardoccopyright} {Copyright \copyright\ 1989-2003 Particle Physics and Astronomy Research Council}
+\newcommand{\stardocversion}   {1.2-2}
+\newcommand{\stardocmanual}    {User's manual}
 \newcommand{\stardocabstract}  {
-JCMTDR is a package of Figaro applications that is intended to replace
-NOD2 for the reduction of continuum mapping data obtained with UKT14
+JCMTDR is a Starlink applications that is intended to replace
+NOD2 for the reduction of continuum on-the-fly mapping data obtained with UKT14
+or the heterodyne instruments using the IFD
 on the James Clerk Maxwell Telescope.
 }
 % ? End of document identification
-
 % -----------------------------------------------------------------------------
 
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%     {Add further history here}
+%
+% -
+
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
+\markboth{\stardocname}{\stardocname}
 \setlength{\textwidth}{160mm}
 \setlength{\textheight}{230mm}
 \setlength{\topmargin}{-2mm}
@@ -49,9 +101,9 @@ on the James Clerk Maxwell Telescope.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
-%  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -86,7 +138,6 @@ on the James Clerk Maxwell Telescope.
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -97,30 +148,28 @@ on the James Clerk Maxwell Telescope.
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
 \newcommand{\htmladdnormallink}[2]{#1}
 \newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
 \newcommand{\hyperref}[4]{#2\ref{#4}#3}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
 
 %  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
 
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary 
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
+\renewcommand{\_}{\texttt{\symbol{95}}}
 
 % -----------------------------------------------------------------------------
 %  Debugging.
@@ -133,8 +182,35 @@ on the James Clerk Maxwell Telescope.
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
+
+% New commands
+\newcommand{\oracdr}{\xref{\textsc{orac-dr}}{sun230}{}}
+\newcommand{\oracsun}{\xref{SUN/230}{sun230}{}}
+
+\newcommand{\task}[1]{{\textsf{#1}}}
+\newcommand{\recipe}[1]{{\small\textsf{#1}}}
+\newcommand{\primitive}[1]{{\small\texttt{#1}}}
+
+\newcommand{\Kappa}{\xref{{\sc{Kappa}}}{sun95}{}}
+\newcommand{\Fluxes}{\xref{{\sc{Fluxes}}}{sun213}{}}
+\newcommand{\SURF}{\xref{{\sc{Surf}}}{sun216}{}}
+\newcommand{\gaia}{\xref{{\sc{Gaia}}}{sun214}{}}
+\newcommand{\cgsdr}{\xref{{\sc{cgs4dr}}}{sun27}{}}
+
+
+\newcommand{\fitsmod}{\xref{\task{fitsmod}}{sun95}{FITSMOD}}
+\newcommand{\qdraw}{\xref{\task{qdraw}}{sun216}{QDRAW}}
+\newcommand{\extinction}{\xref{\task{extinction}}{sun216}{EXTINCTION}}
+\newcommand{\scusetenv}{\xref{\task{scusetenv}}{sun216}{SCUSETENV}}
+
+
+% Environment for indenting.
+\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
+
+
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -146,7 +222,7 @@ on the James Clerk Maxwell Telescope.
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
    {\large \stardoccategory\ \stardocnumber}
@@ -158,14 +234,21 @@ on the James Clerk Maxwell Telescope.
    \rule{\textwidth}{0.5mm}
    \vspace{5mm}
    \begin{center}
-   {\Huge\bf  \stardoctitle}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+   {\Huge\textbf{\stardocmanual}}
    \end{center}
    \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+
+% ? End of picture
 
 % ? Heading for abstract if used.
    \vspace{10mm}
    \begin{center}
-      {\Large\bf Abstract}
+      {\Large\textbf{Abstract}}
    \end{center}
 % ? End of heading for abstract.
 \end{latexonly}
@@ -175,27 +258,31 @@ on the James Clerk Maxwell Telescope.
 \begin{htmlonly}
    \xlabel{}
    \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
 
-% ? Add picture here if required.
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+\includegraphics[width=1.0in]{sun231_sculogo.eps}
+\includegraphics[width=1.0in]{sun231_logo.eps}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents. 
 %  ================================
@@ -206,7 +293,6 @@ on the James Clerk Maxwell Telescope.
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -220,16 +306,27 @@ on the James Clerk Maxwell Telescope.
 %  ==================
 \stardocabstract
 % ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? LateX Copyright Statement
+%  =========================
+\begin{latexonly}
+\newpage
+\vspace*{\fill}
+\stardoccopyright
+\end{latexonly}
+% ? End of Latex copyright statement
+
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
- \end{latexonly}
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \newpage
@@ -238,42 +335,38 @@ on the James Clerk Maxwell Telescope.
 
 \section{Introduction\xlabel{introduction}\xlabel{JCMT_HELP}\xlabel{JCMT_XHELP}}
 
-JCMTDR is a package of Figaro applications that is intended to replace
-NOD2 for the reduction of continuum mapping data obtained with UKT14
-on the James Clerk Maxwell Telescope.
+JCMTDR is a Starlink applications that is intended to replace NOD2 \cite{nod2}
+for the reduction of continuum on-the-fly mapping data obtained with UKT14
+\cite{ukt14} or the heterodyne instruments using the IFD on the James Clerk
+Maxwell Telescope.
 
-The package is available for both VAX/VMS and Unix machines. 
-On VMS the package can be run from DCL or ICL.
-The DCL commands are made available by typing:
-
-\begin{verbatim}
-      $ JCMTDR
-\end{verbatim}
-
-The ICL version is loaded by typing:
-
-\begin{verbatim}
-      $ ADAMSTART
-      $ ICL
-      ICL> JCMTDR
-\end{verbatim}
+A cookbook is available to provide a more complete overview of data processing
+with JCMTDR (see \xref{SC/1}{sc1}{}).
 
 The Unix version should be run from the shell, although it should also
 run from ICL. Make the commands available by typing:
 
 \begin{verbatim}
-      % jcmtdr
+     % jcmtdr
 \end{verbatim}
 
 The applications have lower-case names, a fact ignored in the rest of
 this document.
 
-Help information for VAX/DCL and VAX/ICL versions can be obtained by
-typing HELP JCMTDR. For the Unix version the command is ``jcmt\_help''.
-On Unix this document is also available in HyperText format (as World
-Wide Web pages). Give the command ``jcmt\_xhelp'' to start browsing
-those pages.
+Help information can be obtained by typing:
 
+\begin{verbatim}
+     % jcmt_help
+\end{verbatim}
+
+for command line help or
+
+\begin{verbatim}
+     % showme sun132
+     % showme sc1
+\end{verbatim}
+
+for online web pages (either this document or the cookbook respectively).
 
 \goodbreak
 
@@ -388,7 +481,8 @@ There is a problem with this method if the mapped area, or part of it,
 was not sampled closely enough to fully sample the telescope beam.
 Users should treat the resampled output for those  areas with
 suspicion. In such cases it would be better to use AE2RD2, which uses
-a NAG interpolation routine to perform the rebinning.
+a NAG interpolation routine to perform the rebinning. \textit{AE2RD2 is not
+  avbavailable in the current version due to the removal of NAG libraries.}
 
 
 \goodbreak
@@ -431,6 +525,8 @@ SETOBJ to give them values.
 
 \subsection{\xlabel{AE2RD2}AE2RD2}
 
+\textit{Not available at this time due to removal of the NAG libraries.}
+
 This application performs the same function as AE2RD1 but rebins each
 input dataset individually using NAG interpolation routines (E01SAF
 and E01SBF) before coadding them into the result. Errors associated
@@ -445,7 +541,7 @@ This application will append an IRAS astrometry structure to a
 rebinned map so that the IRAS90 package
 (\xref{SUN/161}{sun161}{}) can be used on it,
 for example to overlay coordinate grids, object positions, {\em etc}.
-
+This information is also readable by AST-aware KAPPA routines (\xref{SUN/95}{sun95}{}).
 
 \goodbreak
 
@@ -603,9 +699,9 @@ of the data structures used.)
 
 \subsection {\xlabel{MAP2MEM}MAP2MEM}
 
-This application takes a JCMT map file and converts the data into a
-format suitable for further processing (deconvolution and resampling)
-by the  DBMEM package written by J.S.\,Richer. The parameters required
+This application takes a JCMT map file and converts the data into a format
+suitable for further processing (deconvolution and resampling) by the DBMEM
+package written by J.S.\,Richer (see \cite{dbmem}). The parameters required
 are:
 
 \goodbreak
@@ -806,6 +902,9 @@ Performs the inverse operation of MAP2TS. The parameters required are:
 
 \section{GSD Utilities\xlabel{gsd_utilities}}
 
+\textit{The GSD utilities are now distributed separately from JCMTDR
+as part of the GSD distribution, see SUN/229}
+
 On VMS two utilities are provided to allow examination and  modification of
 the raw GSD data files. On Unix only an examination utility is
 available.
@@ -1005,4 +1104,106 @@ STRUCT  < >
 \end{verbatim}
 \end{small}
 
+\section*{Release Notes}
+
+\subsection*{V1.2-2}
+
+\begin{itemize}
+\item Port to Linux. This involved the replacement of all NAG routines with
+  routines from the PDA library (see \xref{SUN/194}{sun194}{} \cite{pda}). \texttt{ae2rd2} has been removed
+  as no replacement PDA routine is available.
+\item Include SC/1 and SUN/132 in the distribution. Update SUN/132 to current
+  standard although references to VMS and old Figaro support are still present
+and should be removed.
+\item GSD inspection routines have been removed. They are now distributed as
+  part of the separate GSD package (see SUN/229).
+
+\end{itemize}
+
+\subsection*{V1.2}
+
+Since the previous version (1.1), GSD support has been added.
+\begin{itemize}
+\item GSD files can be converted with ``makemap'' into NDF format for (i)
+    further use in JCMTDR, (ii) use in Figaro, (iii) use in Kappa and
+    associated packages.
+
+\item GSD files can be inspected with ``gsd\_print''. The name of the GSD
+    file must be given as first argument. Output is on standard output,
+    it can be re-directed to a file or piped into other commands like
+    ``more''.
+
+    The exact format of gsd\_print is changed compared to the VAX
+    version.
+\end{itemize}
+
+ GSD files must be specified by full name, including the file name
+ extension (usually .DAT or .dat).
+
+ GSD files can be taken across from the VAX/VMS system to the Unix
+ system either by ftp transfer in binary mode, or with the Unix ``cp''
+ command if the VAX file system is mounted by the Unix machine.
+
+ A further change is in ``ae2rd1'' and ``ae2rd2''. The parameter INFILE is
+ now prompted with blank default for the first file and with default
+ `END' for any further files.
+
+ Starlink User Note 132 is available on-line as Web pages. The browser
+ for these pages can be started with ``jcmt\_xhelp'' from the Unix shell.
+
+
+\subsection*{V1.1}
+
+This is the Port of JCMTDR 1.0 to Unix. Note the following differences
+in the Unix version:
+
+\begin{itemize}
+\item So far it is common to run the commands from the Unix shell. To start
+   up JCMTDR from the shell you need to:
+
+\begin{verbatim}
+      source /star/etc/cshrc in your .chsrc
+      source /star/etc/login in your .login
+\end{verbatim}
+   Then the command:
+\begin{verbatim}
+      % jcmtdr
+\end{verbatim}
+   will define all the commands of the JCMTDR package.
+
+\item On-line help is available, from the Unix shell use ``jcmt\_help''.
+
+\item GSD format is currently not supported. Thus MAKEMAP, GSD\_PRINT and
+   GSD\_FORMAT are not available. You will have to process GSD data on a
+   VAX with JCMTDR 1.0.
+
+\item JCMTDR data are in Figaro/NDF format and can be transferred as binary
+   files between VMS and various Unix flavours. It is not necessary to
+   process the files. However, you might run the ``native'' command from
+   the Kappa package on the files on the destination machine. This may
+   save some time in further access to the file.
+\end{itemize}
+
+
+\begin{thebibliography}{}
+\addcontentsline{toc}{section}{References}
+
+\bibitem{nod2}
+Haslam~C.~G.~T., 1974, \textit{A\&AS}, \textbf{15}, 333
+
+\bibitem{ukt14}
+Duncan~W.~D., Sandell~G., Robson~E.~I., Ade~P.~A.~R., Griffin~M.~J.,
+1990, \textit{MNRAS}, \textbf{243}, 126
+
+\bibitem{dbmem}
+Richer~J.~S., 1992, \textit{MNRAS}, \textbf{254}, 165
+
+\bibitem{pda}
+Meyerdierks~H., Berry~D., Draper~P., Privett~G., Currie~M,
+1997, \textit{ PDA -- Public Domain Algorithms},
+\xref{Starlink User Note 194}{sun194}{}
+
+\end{thebibliography}
+
 \end{document}
+
