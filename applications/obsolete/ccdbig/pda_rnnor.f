@@ -241,3 +241,4 @@
       END IF
  
       END
+* $Id: ccdbgen.f,v 1.11 1998/07/03 15:36:52 mbt Exp $

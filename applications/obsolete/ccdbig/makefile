@@ -6,14 +6,14 @@
 #     Library makefile Mk V, modified
 #
 #  Purpose:
-#     Build and install the XDISPLAY package.
+#     Build and install the CCDBIG package.
 #
 #  Type of Module:
 #     Description file for the make utility.
 #
 #  Description:
 #     This description file is used by the make utility to build the
-#     XDISPLAY package from the distributed source files, to install
+#     CCDBIG package from the distributed source files, to install
 #     the resulting system for use, and to perform other housekeeping
 #     tasks.
 #
@@ -126,7 +126,7 @@
 #     25-MAR-1996 (BLY):
 #        Hypertext docs added.
 #        Updated to Mk V standard.
-#     16-JUN-1998 (MBT):
+#     6-JUL-1998 (MBT):
 #        Adapted for CCDBIG.
 #     {enter_further_changes_here}
 #
@@ -397,7 +397,7 @@ OBJECT_FILES = $(SUBOBJ) $(GENOBJ) $(TASKOBJ)
 #  that are required to use the package (but excluding the date stamp
 #  file).
 
-BUILT_FILES = $(SHELL_SCRIPTS) $(TASKS) $(DATA_FILES) $(IFC_FILES)
+BUILT_FILES = $(SHELL_SCRIPTS) $(TASKS) $(IFC_FILES) $(DATA_FILES)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -417,19 +417,18 @@ CCD1_PAR:       ccd1_par;                 $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
-$(TASKSRC) $(SUBSRC) $(GENSRC) $(IFL_FILES) $(PRIVATE_INCLUDES): \
-                                                   $(PKG_NAME)_source.tar
+$(TASKSRC) $(SUBSRC) $(GENSRC) $(IFL_FILES) $(PRIVATE_INCLUDES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(SHELL_SCRIPTS) $(LINK_SCRIPT): $(PKG_NAME)_source.tar
+$(SHELL_SCRIPTS) $(LINK_SCRIPT):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	chmod 755 $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(DATA_FILES): $(PKG_NAME)_data.tar
+$(DATA_FILES):
 	$(TAR_OUT) $(PKG_NAME)_data.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -446,7 +445,7 @@ check_uptodate:
 RCS_FILES = $(TASKSRC) $(SUBSRC) $(IFL_FILES) $(SHELL_SCRIPTS) $(LINK_SCRIPT) \
             mk makefile
 
-#  Target for checking existence of all source files.
+#  Target for bringing into existence all source files.
 
 check_source: $(SOURCE_FILES)
 
@@ -459,7 +458,7 @@ SOURCE_CONTENTS = $(TASKSRC) $(SUBSRC) $(GENSRC) $(IFL_FILES) \
 
 DATA_CONTENTS = $(DATA_FILES)
 
-#  Rules for building release files from RCS repository.
+#  Rules for building release files from RCS repository:
 
 #  Rules for building distribution tar files.
 
@@ -1084,3 +1083,4 @@ ccdbgen.o: SAE_PAR DAT_PAR CCD1_PAR NDF_PAR
 #
 #  End of makefile.
 #.
+# $Id: ccdbig_link_adam,v 1.2 1998/07/01 16:46:44 mbt Exp $
