@@ -54,6 +54,19 @@
 
 *  Object commands:
 *
+*     ndfob-or-ndfsetob addframe baseframe coeffs ?newdomain?
+*        This adds a new frame to the WCS component of the NDF; note it
+*        does not write to the NDF on disk, it only affects the 
+*        properties of the NDF object available to Tcl.
+*
+*        The baseframe argument (specified either as a numerical
+*        frame index, as a domain name, or as one of the special
+*        strings "BASE" or "CURRENT") gives the frame from which 
+*        the new one is to be attached.  The coeffs argument is a 
+*        six-element list giving the coefficients of the linear
+*        mapping connecting it to baseframe.  The optional newdomain
+*        argument gives a domain name for the new frame.
+*
 *     ndfob-or-ndfsetob bbox frame
 *        Returns a list giving the extent of a bounding box large enough
 *        to hold the image when resampled from Base (Grid) coordinates into
@@ -364,7 +377,8 @@
 /* We deal with certain commands (those which work the same on ndf or
    ndfset objects) by passing them straight to the ObjectNdfsetCmd() 
    routine. */
-      if ( ! strcmp( command, "bbox" ) ||
+      if ( ! strcmp( command, "addframe" ) ||
+           ! strcmp( command, "bbox" ) ||
            ! strcmp( command, "destroy" ) ||
            ! strcmp( command, "display" ) ||
            ! strcmp( command, "frameatt" ) ||
@@ -644,6 +658,7 @@
          Tcl_AppendObjToObj( result, objv[ 1 ] );
          Tcl_AppendStringsToObj( result, ": ndf object command not known.  ",
                                "Should be one of -",
+                               "\n    addframe baseframe coeffs ?newdomain?",
                                "\n    bbox frame",
                                "\n    bounds", 
                                "\n    destroy",
@@ -795,9 +810,84 @@
 
 
 /**********************************************************************/
+/* "addframe" command                                                 */
+/**********************************************************************/
+      if ( ! strcmp( command, "addframe" ) ) {
+         int i;
+         int ibfrm;
+         int ncoeff;
+         int nfrm;
+         double coeffs[ 6 ];
+         char *cbadstr;
+         char *dname;
+         AstFrame *newframe;
+         AstMapping *map;
+         Tcl_Obj **ov;
+
+/* Check syntax. */
+         if ( objc < 4 || objc > 5 ) {
+            Tcl_WrongNumArgs( interp, 2, objv, 
+                              "baseframe coeffs ?newdomain?" ); 
+            return TCL_ERROR;
+         }
+
+/* Interpret the frame argument. */
+         if ( NdfGetIframeFromObj( interp, objv[ 2 ], wcs, &ibfrm ) 
+              != TCL_OK ) {
+            return TCL_ERROR;
+         }
+
+/* Get linear mapping coefficients. */
+         cbadstr = "coeffs should be a list of six numbers";
+         if ( Tcl_ListObjGetElements( interp, objv[ 3 ], &ncoeff, &ov ) 
+              != TCL_OK || ncoeff != 6 ) {
+            Tcl_SetObjResult( interp, Tcl_NewStringObj( cbadstr, -1 ) );
+            return TCL_ERROR;
+         }
+         for ( i = 0; i < 6; i++ ) {
+            if ( Tcl_GetDoubleFromObj( interp, ov[ i ], &coeffs[ i ] ) 
+                 != TCL_OK ) {
+               Tcl_SetObjResult( interp, Tcl_NewStringObj( cbadstr, -1 ) );
+               return TCL_ERROR;
+            }
+         }
+
+/* Get the new domain name if one exists. */
+         if ( objc == 5 ) {
+            dname = Tcl_GetString( objv[ 4 ] );
+         }
+         else {
+            dname = " ";
+         }
+
+/* Turn the coefficients into a linear mapping. */
+         STARCALL(
+            F77_CALL(ccd1_lnmap)( DOUBLE_ARRAY_ARG(coeffs), INTEGER_ARG(&map),
+                                  INTEGER_ARG(status) );
+         )
+         ASTCALL(
+
+/* Construct a new frame; make it a (deep) copy of the selected base frame. */
+            newframe = astCopy( astGetFrame( wcs, ibfrm ) );
+
+/* Set its domain. */
+            astSetC( newframe, "Domain", dname );
+
+/* Graft it onto the frameset */
+            astAddFrame( wcs, ibfrm, map, newframe );
+
+/* Get the index of the new frame (equal to the new total number of frames). */
+            nfrm = astGetI( wcs, "Nframe" );
+         )
+
+/* Set the result to the index of the newly created frame. */
+         result = Tcl_NewIntObj( nfrm );
+      }
+
+/**********************************************************************/
 /* "bbox" command                                                     */
 /**********************************************************************/
-      if ( ! strcmp( command, "bbox" ) ) {
+      else if ( ! strcmp( command, "bbox" ) ) {
          Tcl_Obj *ov[ 2 ];
          double lbox[ NDF__MXDIM ];
          double ubox[ NDF__MXDIM ];
@@ -1517,6 +1607,7 @@
          Tcl_AppendObjToObj( result, objv[ 1 ] );
          Tcl_AppendStringsToObj( result, ": ndfset object command not known.  ",
                                "Should be one of -",
+                               "\n    addframe baseframe coeffs ?newdomain?",
                                "\n    bbox frame",
                                "\n    destroy",
                                "\n    display ?-resamp? device loperc hiperc "
