@@ -1,5 +1,6 @@
 *+  SPEC_RZ - Fast computation of flux from Raymond & Smith hot plasma model
-      SUBROUTINE SPEC_RZ(NDS,NEN,ELBOUND,EUBOUND,PARAM,FLUX,STATUS)
+      SUBROUTINE SPEC_RZ(GENUS,NDS,NEN,ELBOUND,EUBOUND,PARAM,FLUX,
+     :                   STATUS)
 *
 *    Summary:
 *
@@ -70,6 +71,8 @@
 *                 matching grid. (MPW)
 *      8 May 91 : Tidied for release (MPW)
 *      1 Mar 94 : Added error buffering (DJA)
+*      5 Jul 95 : Added GENUS to stop use of full grid in non-spectral
+*                 code (DJA)
 *
 *    Type Definitions :
 *
@@ -82,6 +85,7 @@
 *
 *    Import :
 *
+      CHARACTER*(*)		GENUS			! Fitting genus
 	INTEGER NDS			! dataset number
 	INTEGER NEN			! No of energy channels
 	REAL ELBOUND(NEN)		! Lower bin bounds (keV)
@@ -129,8 +133,8 @@
 	A=A/(1.17+0.011*METALS)
 
 * Compute interpolated emissivity (in units of 1E-23 photons*cm**3/s)
-	CALL SPEC_RZ_EMISS(NDS,T,METALS,NEN,ELBOUND,EUBOUND,PARAM,FLUX,
-     :                                                          STATUS)
+	CALL SPEC_RZ_EMISS(GENUS,NDS,T,METALS,NEN,ELBOUND,EUBOUND,
+     :                                           PARAM,FLUX,STATUS)
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * Multiply by 1E-23*EM/4*pi*R**2 to get spec photon flux in photons/(cm**2*s)
@@ -145,8 +149,8 @@
 
 
 *+  SPEC_RZ_EMISS - Interpolate from the R+S grid to produce a source spectrum
-      SUBROUTINE SPEC_RZ_EMISS(NDS,TEMP,METALS,NEN,ELBOUND,EUBOUND,
-     :                                          PARAM,EMISS,STATUS)
+      SUBROUTINE SPEC_RZ_EMISS(GENUS,NDS,TEMP,METALS,NEN,ELBOUND,
+     :                                 EUBOUND,PARAM,EMISS,STATUS)
 
 *    Description :
 *     This routine accesses HDS data cubes containing the
@@ -184,6 +188,7 @@
       INCLUDE 'USER_ERR'
 
 *    Import
+      CHARACTER*(*)		GENUS			! Fitting genus
 	INTEGER NDS			! dataset number
 	REAL TEMP                       ! Temperature in keV
 	REAL METALS                   	! Metal abundance relative to cosmic
@@ -338,6 +343,15 @@ D	        type*,'  energy bounds values dont agree'
 
 *        no compact grid found, default to full grid
 	  IF(.NOT.SMALLGRID(NDS))THEN
+
+*          Don't use full grid unless spectral fitting
+            IF ( GENUS .NE. 'SPEC' ) THEN
+              STATUS = SAI__ERROR
+              CALL MSG_SETC( 'GENUS', GENUS )
+              CALL ERR_REP( ' ', 'Full Raymonth-Smith grid not '/
+     :                  /'available for ^GENUS fitting', STATUS )
+              GOTO 9000
+            END IF
 
             CALL PSX_GETENV( 'RZ_CUBE', RZCUBEFILE, STATUS )
             CALL HDS_OPEN( RZCUBEFILE, 'READ', S_RZLOC(NDS), STATUS )
