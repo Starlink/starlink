@@ -7,6 +7,7 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  25 Mar 98  Created
+ * Peter W. Draper 22 Feb 99  Added GaiaCat_Init
  */
 static const char* const rcsId="@(#) $Id$";
 
@@ -24,6 +25,7 @@ extern "C" {
     int Segment_Init();
     int RotBox_Init();
     int Tcladam_Init(Tcl_Interp *interp);
+    int GaiaCat_Init(Tcl_Interp *interp);
 #ifdef __GNUC__
     void f_init();
     int main(int argc, char** argv);
@@ -86,6 +88,12 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     if (Tcladam_Init(interp) != TCL_OK) {
 	return TCL_ERROR;
     }
+
+    //  Add GaiaCat command.
+    if (GaiaCat_Init(interp) != TCL_OK) {
+      return TCL_ERROR;
+    }
+
 
     // create the namespaces used by the itcl/itk classes
     // (This is just a convenience so you don't have to always call some init proc)

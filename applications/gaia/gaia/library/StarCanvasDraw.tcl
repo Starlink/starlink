@@ -45,6 +45,13 @@
 #        Converted to itcl2.0.
 #     23-APR-1998 (PDRAPER):
 #        Converted to SkyCat V2.0.7.
+#     22-FEB-1999 (PDRAPER):
+#        Merged Allan's changes into main GAIA branch:
+#          Ported to work with new CanvasDraw version.
+#          Made clipping an option.
+#          Changed tag "selected" to "$w_.selected", and added new tag
+#          "$w_.objects" in addition to the more general tag "objects".
+#          Updated method create_object.
 #     {enter_further_changes_here}
 
 #-
@@ -62,16 +69,19 @@ class gaia::StarCanvasDraw {
    #  Constructor:
    #  ------------
    constructor {args} {
-
-      #  Set the new drawing modes and remove any unwanted
-      #  initializations from args.
       set CanvasDraw::drawing_modes_ $drawing_modes_
-      regsub {\-rtdimage[\ ]+[^\ ]+} "$args" {} safeargs
-      regsub {\-lowestitem[\ ]+[^\ ]+} "$safeargs" {} safeargs
-      regsub {\-ignore_tag[\ ]+[^\ ]+} "$safeargs" {} safeargs
-      eval CanvasDraw::constructor $safeargs
    } {
       eval itk_initialize $args
+   }
+
+   # This method is called after the constructor have completed.
+
+   method init {} {
+      CanvasDraw::init
+       
+      # Set some options in the base class.
+      # (Since we have reimplemented rotation in C, we don't need the inherited Tcl version.)
+      configure -withrotate 0
 
       #  Define pixel_width_
       update_pixel_width
@@ -97,33 +107,6 @@ class gaia::StarCanvasDraw {
       }
    }
 
-   #  Override the move_object method to remove the edge clipping.
-   method move_object {id x y} {
-      if {$drawing_} {
-         return
-      }
-      if {![item_is_selected $id]} {
-         deselect_objects
-         select_object $id
-         mark $x $y
-      }
-      set dx [expr $x-($startx_+$xoffset_)]
-      set dy [expr $y-($starty_+$yoffset_)]
-      set xoffset_ [expr $x-$startx_]
-      set yoffset_ [expr $y-$starty_]
-      if {$dx || $dy} {
-         foreach i "$w_.selected grip" {
-            $canvas_ move $i $dx $dy
-         }
-         foreach i [selected_items] {
-            set moved_($i) 1
-            if {[info exists notify_update_($i)]} {
-               eval "$notify_update_($i) move"
-            }
-         }
-         update idletasks
-      }
-   }
 
    #  Set the width of a pixel in the RTD image.
    method update_pixel_width {} {
@@ -153,6 +136,15 @@ class gaia::StarCanvasDraw {
    method delete_object {id} {
       CanvasDraw::delete_object $id
       catch {unset types_($id)}
+   }
+
+   #  Return list of currently selected objects.
+   method list_selected {} {
+      set objects ""
+      foreach i [$canvas_ find withtag $w_.selected] {
+         lappend objects $i
+      }
+      return $objects
    }
 
    #  Set the type of object to draw (line, oval, etc.).  If
@@ -243,29 +235,21 @@ class gaia::StarCanvasDraw {
       if { [info exists types_($id)] } { 
          switch $types_($id) {
             circle {
-               if { $draw } { 
-                  draw_circle_selection_grips $id 
-               }
+               if { $draw } { draw_circle_selection_grips $id }
                $canvas_ addtag $w_.selected withtag $id
             }
             ellipse -
             rotbox {
-               if { $draw } { 
-                  draw_ellipse_selection_grips $id 
-               }
+               if { $draw } { draw_ellipse_selection_grips $id }
                $canvas_ addtag $w_.selected withtag $id
             }
             column -
             row -
             pixel {
-               if { $draw } { 
-                  $canvas_ addtag $w_.selected withtag $id 
-               }
+               if { $draw } { $canvas_ addtag $w_.selected withtag $id }
             }
             pointpoly {
-               if { $draw } { 
-                  draw_pointpoly_selection_grips $id 
-               }
+               if { $draw } { draw_pointpoly_selection_grips $id }
                $canvas_ addtag $w_.selected withtag $id
             }
             default {
@@ -292,7 +276,7 @@ class gaia::StarCanvasDraw {
          set sel_id [$canvas_ create rectangle 0 0 \
                      $itk_option(-gripwidth) \
                      $itk_option(-gripwidth) \
-                        -tags [list grip grip.$id grip.$id.$side] \
+                        -tags "grip grip.$id grip.$id.$side" \
                         -fill $itk_option(-gripfill) \
                         -outline $itk_option(-gripoutline)]
 
@@ -322,7 +306,7 @@ class gaia::StarCanvasDraw {
    method draw_circle_selection_grips {id} {
       set sel_id [$canvas_ create rectangle 0 0 \
                      $itk_option(-gripwidth)  $itk_option(-gripwidth) \
-                     -tags [list grip grip.$id] \
+                     -tags "grip grip.$id" \
                      -fill $itk_option(-gripfill) \
                      -outline $itk_option(-gripoutline)]
 
@@ -350,7 +334,7 @@ class gaia::StarCanvasDraw {
       for {set i 0} {$i < $obj_points_} {incr i} {
          set sel_id [$canvas_ create rectangle 0 0 \
                         $itk_option(-gripwidth) $itk_option(-gripwidth) \
-                        -tags [list grip grip.$id grip.$id.$i] \
+                        -tags "grip grip.$id grip.$id.$i" \
                         -fill $itk_option(-gripfill) \
                         -outline $itk_option(-gripoutline)]
          $canvas_ bind $sel_id <Any-Enter> \
@@ -543,15 +527,17 @@ class gaia::StarCanvasDraw {
    #  Create a new object in the canvas. Note this is a copy of the
    #  function as used in CanvasDraw (seems to need this to allow the
    #  types_ array to access obj_id_).
+
    method create_object {x y} {
-      mark $x $y
-      set obj_coords_ "$x $y"
-      set obj_id_ [create_$drawing_mode_ $x $y]
+       mark $x $y
+       set obj_coords_ "$x $y"
+       set obj_id_ [create_$drawing_mode_ $x $y]
       if {"$drawing_mode_" != "region"} {
          $canvas_ addtag objects withtag $obj_id_
          $canvas_ addtag $w_.objects withtag $obj_id_
          set types_($obj_id_) $drawing_mode_
       }
+      set resizing_ 1
    }
 
    #  Override add_object_bindings to deal with the case when a canvas 
@@ -571,7 +557,6 @@ class gaia::StarCanvasDraw {
          }
       }
    }
-
 
    #  Create and return a new circle object.
 

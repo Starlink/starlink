@@ -38,7 +38,7 @@
 #     See the method declarations below.
 
 #  Inheritance:
-#     cat::SkyQueryResult
+#     skycat::SkyQueryResult
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
@@ -62,8 +62,8 @@ itk::usual GaiaQueryResult {}
 # and cat packages) with overrides for supporting foreign catalogue
 # access.
 
-class cat::GaiaQueryResult {
-   inherit cat::SkyQueryResult
+class gaia::GaiaQueryResult {
+   inherit skycat::SkyQueryResult
 
    #  Constructor
    constructor {args} {

@@ -59,7 +59,7 @@ import add ::iwidgets
 
 #  Make GAIA modified core Tcl code available in preference to 
 #  the normal versions.
-source $gaia_library/TopLevelWidget.tcl
+#source $gaia_library/TopLevelWidget.tcl
 source $gaia_library/FrameWidget.tcl
 source $gaia_library/CanvasPrint.tcl 
 source $gaia_library/FileSelect.tcl 

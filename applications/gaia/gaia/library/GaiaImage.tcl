@@ -126,13 +126,18 @@ class gaia::GaiaImage {
          itk_component add draw {
             gaia::StarCanvasDraw $w_.draw \
                -canvas $canvas_ \
-               -withdraw 1 \
                -transient 1 \
-               -center 1 \
+               -center 0 \
+               -withdraw 1 \
+               -show_object_menu 1 \
+               -clipping 0 \
+  	       -shorthelpwin $itk_option(-shorthelpwin) \
+	       -withtoolbox $itk_option(-withtoolbox) \
                -defaultcursor $itk_option(-cursor) \
                -show_object_menu $itk_option(-show_object_menu) \
                -rtdimage $image_ \
                -lowestitem $imageId_ \
+	       -regioncommand $itk_option(-regioncommand) \
                -ignore_tag $itk_option(-grid_tag)
          }
       } else {

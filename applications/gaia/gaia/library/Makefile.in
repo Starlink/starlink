@@ -30,7 +30,7 @@ FILES        = \
  StarCanvasDraw.tcl StarCanvasObject.tcl StarDemo.tcl \
  StarEnterObject.tcl StarHelp.tcl StarLabelCheck.tcl StarPatch.tcl \
  StarPhotom.tcl StarPhotomDetails.tcl StarPhotomExtras.tcl \
- StarPhotomList.tcl StarPhotomObject.tcl TopLevelWidget.tcl \
+ StarPhotomList.tcl StarPhotomObject.tcl \
  defaults.tcl gaiaMain.tcl graphics_features.tcl udialog.tcl \
  Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp StarArd.hlp \
  StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp StarAstGrid.hlp \

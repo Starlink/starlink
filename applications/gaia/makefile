@@ -535,7 +535,7 @@ GAIA_FILES = Gaia.tcl \
  StarCanvasDraw.tcl StarCanvasObject.tcl StarDemo.tcl \
  StarEnterObject.tcl StarHelp.tcl StarLabelCheck.tcl StarPatch.tcl \
  StarPhotom.tcl StarPhotomDetails.tcl StarPhotomExtras.tcl \
- StarPhotomList.tcl StarPhotomObject.tcl TopLevelWidget.tcl \
+ StarPhotomList.tcl StarPhotomObject.tcl \
  defaults.tcl gaiaMain.tcl graphics_features.tcl udialog.tcl \
  ScrollArrows.tcl \
  Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp StarArd.hlp \
@@ -570,7 +570,7 @@ SKYCAT_FILES = \
  SkyQuery.tcl SkyQueryResult.tcl SearchConfig.tcl SymbolConfig.tcl \
  AstroQuery.tcl cat_version.tcl CatalogInfo.tcl QueryResult.tcl \
  RtdImageCopy.tcl RtdImagePerf.tcl RtdImagePrint.tcl RtdRecorder.tcl \
- RtdRemoteTcl.tcl tclutil_version.tcl astrotcl_version.tcl
+ RtdRemoteTcl.tcl TopLevelWidget.tcl tclutil_version.tcl astrotcl_version.tcl
 
 TCL_FILES = \
  Archetype.itk hyperhelp.itk scale.tcl Toplevel.itk init.tcl \
@@ -789,7 +789,8 @@ $(SKYCAT_FILES) $(SKYCAT_COLORMAP_FILES): .skycat.built
 	pwd=`pwd`;\
 	(cd ./skycat; \
 	export INSTALL; unset INSTALL;\
-	make -e World PREFIX=$${pwd}/built CONFIGURE_FLAGS=--with-$(CC))
+	./configure --prefix=$${pwd}/built --with-$(CC);\
+	make -e all install)
 	cp -p ./built/bin/rtdClient .
 	cp -p ./built/bin/rtdServer .
 	for f in ./built/lib/rtd/* ./built/lib/rtd/.??* ""; do \
