@@ -2392,7 +2392,7 @@ unobtrusive and rather helpful.
 annotated spec
 </ul>
 
-<subsubsect>XML is SGML--
+<subsubsect>XML is SGML&ddash;
 <p><ul>
 <li>An SGML document consists of an `SGML declaration' which
 sets various options, a `document type definition' (DTD) which
@@ -3471,7 +3471,7 @@ the patch at
 The configuration you'll need is:
 <verbatim>
 % mkdir -p /my/star/bin/sgml/bin /my/star/bin/sgml/lib
-% ./configure --enable-latex --prefix=/my/star/bin/sgml
+% ./configure &ddash;enable-latex &ddash;prefix=/my/star/bin/sgml
 % make
 % make install
 </verbatim>
