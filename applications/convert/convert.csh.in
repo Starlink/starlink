@@ -26,6 +26,8 @@
 #        Original version.
 #     1993 September 5 (MJC):
 #        Added IRCAM2NDF.
+#     1993 November 5 (MJC):
+#        Removed DIPSO2NDF and NDF2DIPSO.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -59,14 +61,12 @@ endif
 #
 alias ascii2ndf  $CONVERT_DIR/ascii2ndf
 alias conhelp    $CONVERT_DIR/conhelp
-alias dipso2ndf  $CONVERT_DIR/dipso2ndf
 alias dst2ndf    $CONVERT_DIR/dst2ndf
 alias gasp2ndf   $CONVERT_DIR/gasp2ndf
 alias iraf2ndf   $CONVERT_DIR/iraf2ndf
 alias ircam2ndf  $CONVERT_DIR/ircam2ndf
 alias unf2ndf    $CONVERT_DIR/unf2ndf
 alias ndf2ascii  $CONVERT_DIR/ndf2ascii
-alias ndf2dipso  $CONVERT_DIR/ndf2dipso
 alias ndf2dst    $CONVERT_DIR/ndf2dst
 alias ndf2gasp   $CONVERT_DIR/ndf2gasp
 alias ndf2iraf   $CONVERT_DIR/ndf2iraf
@@ -76,21 +76,19 @@ alias ndf2unf    $CONVERT_DIR/ndf2unf
 #
 alias con_ascii2ndf  $CONVERT_DIR/ascii2ndf
 alias con_conhelp    $CONVERT_DIR/conhelp
-alias con_dipso2ndf  $CONVERT_DIR/dipso2ndf
 alias con_dst2ndf    $CONVERT_DIR/dst2ndf
 alias con_gasp2ndf   $CONVERT_DIR/gasp2ndf
 alias con_iraf2ndf   $CONVERT_DIR/iraf2ndf
 alias con_ircam2ndf  $CONVERT_DIR/ircam2ndf
 alias con_unf2ndf    $CONVERT_DIR/unf2ndf
 alias con_ndf2ascii  $CONVERT_DIR/ndf2ascii
-alias con_ndf2dipso  $CONVERT_DIR/ndf2dipso
 alias con_ndf2dst    $CONVERT_DIR/ndf2dst
 alias con_ndf2gasp   $CONVERT_DIR/ndf2gasp
 alias con_ndf2iraf   $CONVERT_DIR/ndf2iraf
 alias con_ndf2unf    $CONVERT_DIR/ndf2unf
 echo " "
 echo " --    Initialised for CONVERT     -- "
-echo " --  Version 0.5U, 1993 September  -- "
+echo " --  Version 0.5U, 1993 November  -- "
 echo " "
 echo "    Type conhelp for CONVERT help   "
 echo " "
