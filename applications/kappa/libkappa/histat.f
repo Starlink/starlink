@@ -36,7 +36,7 @@
 *     -  the number of pixels omitted.
 
 *  Usage:
-*     histat ndf [comp] [percentiles] [logfile] [numbin]
+*     histat ndf [comp] [percentiles] [logfile]
 
 *  ADAM Parameters:
 *     COMP = LITERAL (Read)
@@ -88,23 +88,6 @@
 *        The number of pixels which were either not valid or were
 *        rejected from the statistics during iterative K-sigma
 *        clipping.
-*     NUMBIN = _INTEGER (Read)
-*        The number of histogram bins to be used.  There is a tradeoff
-*        between accuracy and processing time depending on the value
-*        of NUMBIN. Increasing the number of bins yields more accurate
-*        results, because it reduces quantisation errors biasing
-*        the computed statistics, but takes longer to compute.  The
-*        bias is in the same sense as the skewness, so generally it
-*        will add positive bias.  The default value of NUMBIN is a
-*        compromise and generally will give satisfactory results.
-*
-*        It is hard to quantify the tradeoff precisely; testing with a
-*        typical CCD image of stars and galaxies the increase in time
-*        went approximately as log of the number of bins, and the
-*        accuracy of the pixel sum for some values of NUMBIN were: 100,
-*        2.8%; 1000, 0.1% 10000, 0.03%; and 100000, 0.002%.
-*
-*        NUMBIN must be in the range 100 to 100000. [2048]
 *     NUMGOOD = _INTEGER (Write)
 *        The number of NDF pixels which actually contributed to the
 *        computed statistics.
@@ -136,17 +119,28 @@
 *        Computes ordered statistics for the data array in the NDF
 *        called halley, and writes the results to a logfile called
 *        stats.dat.
-*     histat ngc1333 percentiles=[0.25,0.75] numbin=100000
+*     histat ngc1333 percentiles=[0.25,0.75]
 *        Computes ordered statistics for the data array in the NDF
-*        called ngc1333, including the quartile values.  The highest
-*        accuracy is used.
+*        called ngc1333, including the quartile values.
 
 *  Notes:
-*     -  If the array has a few extreme outliers this can bias the
-*     statistics unless the number of bins in the histogram is large,
-*     or the outliers are removed (flagged) via application THRESH.
-*     -  There is quantisation bias in the statistics.  See parameter
-*     NUMBIN.
+*     -  Where the histogram contains a few extreme outliers, the
+*     histogram limits are adjusted to reduce greatly the bias upon
+*     the statistics, even if a chosen percentile corresponds to an
+*     extreme outlier.  The outliers are still accounted in the median
+*     and percentiles.  The histogram normally uses 10000 bins.  For
+*     small arrays the number of bins is at most a half of the number
+*     of array elements.  Integer arrays have a minimum bin width of
+*     one; this can also reduce the number of bins.  The goal is to
+*     avoid most histogam bins being empty artificially, since the
+*     sparseness of the histogram is the main criterion for detecting
+*     outliers.  Outliers can also be removed (flagged) via application
+*     THRESH prior to using this application.
+*     -  There is quantisation bias in the statistics, but for
+*     non-pathological distributions this should be insignificant.
+*     Accuracy to better than 0.01 of a percentile is normal.  Linear
+*     interpolation within a bin is used, so the largest errors arise
+*     near the median.
 
 *  Related Applications:
 *     KAPPA: HISTOGRAM, INSPECT, MSTATS, NDFTRACE, NUMB, STATS;
@@ -172,6 +166,10 @@
 *     1994 September 27 (MJC):
 *        Replaced AIF calls with PAR, FIO, and PSX.  Made messages
 *        conditional and used modern names for subroutines (_$ to 1_).
+*     2000 June 13 (MJC):
+*        Removed NUMBIN parameter.  No longer obtains dynamic space
+*        for the histogram.  Uses improved algorithm for calculating
+*        the median and percentiles.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -193,9 +191,6 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER MAXBIN             ! Maximum number of histogram bins
-      PARAMETER( MAXBIN = 100000 )! 
-
       INTEGER NPRCTL             ! Maximum number of percentiles
       PARAMETER( NPRCTL = 100 )
 
@@ -210,7 +205,6 @@
       DOUBLE PRECISION DMIN      ! Min. value of pixels in array
       LOGICAL DOPRCT             ! Percentiles have been supplied
       INTEGER EL                 ! Number of array elements mapped
-      INTEGER HPNTR              ! Pointer to the histogram
       INTEGER I                  ! Loop counter for percentiles
       INTEGER IFIL               ! File descriptor for logfile
       INTEGER IMAX( 1 )          ! Vector index of max. pixel
@@ -229,7 +223,6 @@
       INTEGER NDF                ! NDF identifier
       INTEGER NDIM               ! Number of NDF dimensions
       INTEGER NGOOD              ! No. valid pixels in array
-      INTEGER NUMBIN             ! Number of histogram bins
       INTEGER NUMPER             ! Number of percentiles
       REAL PERCNT( NPRCTL )      ! Percentiles
       DOUBLE PRECISION PERVAL( NPRCTL ) ! Values at the percentiles
@@ -300,11 +293,6 @@
          DOPRCT = .TRUE.
       END IF
       CALL ERR_RLSE
-
-*  Get the number of histogram bins to be used, within a sensible
-*  range.
-      CALL PAR_GDR0I( 'NUMBIN', 2048, 100, MAXBIN, .TRUE., NUMBIN,
-     :                STATUS )
 
 *  Obtain an optional file for logging the results.  Start a new error
 *  context as null is a valid value.
@@ -378,56 +366,43 @@
          CALL NDF_BAD( NDF, COMP, .FALSE., BAD, STATUS )
       END IF
 
-*    Obtain workspace for the histogram.
-      CALL PSX_CALLOC( NUMBIN, '_INTEGER', HPNTR, STATUS )
-      
 *  Call the appropriate routine to compute the histogram and hence the
 *  statistics.
       IF ( TYPE .EQ. '_BYTE' ) THEN
-         CALL KPG1_HSTAB( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN, NUMPER,
-     :                    PERCNT, NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
-     :                    DMAX, SUM, MEAN, MEDIAN, MODE, PERVAL,
-     :                    %VAL( HPNTR ), STATUS )
+         CALL KPG1_HSTAB( BAD, EL, %VAL( PNTR( 1 ) ), NUMPER, PERCNT,
+     :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
+     :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
  
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         CALL KPG1_HSTAUB( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN, NUMPER,
-     :                     PERCNT, NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
-     :                     DMAX, SUM, MEAN, MEDIAN, MODE, PERVAL,
-     :                     %VAL( HPNTR ), STATUS )
- 
+         CALL KPG1_HSTAUB( BAD, EL, %VAL( PNTR( 1 ) ), NUMPER, PERCNT,
+     :                     NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
+     :                     SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
+
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_HSTAD( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN, NUMPER,
-     :                    PERCNT, NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
-     :                    DMAX, SUM, MEAN, MEDIAN, MODE, PERVAL,
-     :                    %VAL( HPNTR ), STATUS )
+         CALL KPG1_HSTAD( BAD, EL, %VAL( PNTR( 1 ) ), NUMPER, PERCNT,
+     :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
+     :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
  
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         CALL KPG1_HSTAI( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN, NUMPER,
-     :                    PERCNT, NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
-     :                    DMAX, SUM, MEAN, MEDIAN, MODE, PERVAL,
-     :                    %VAL( HPNTR ), STATUS )
+         CALL KPG1_HSTAI( BAD, EL, %VAL( PNTR( 1 ) ), NUMPER, PERCNT,
+     :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
+     :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
  
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         CALL KPG1_HSTAR( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN, NUMPER,
-     :                    PERCNT, NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
-     :                    DMAX, SUM, MEAN, MEDIAN, MODE, PERVAL,
-     :                    %VAL( HPNTR ), STATUS )
+         CALL KPG1_HSTAR( BAD, EL, %VAL( PNTR( 1 ) ), NUMPER, PERCNT,
+     :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
+     :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
  
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         CALL KPG1_HSTAW( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN, NUMPER,
-     :                    PERCNT, NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
-     :                    DMAX, SUM, MEAN, MEDIAN, MODE, PERVAL,
-     :                    %VAL( HPNTR ), STATUS )
+         CALL KPG1_HSTAW( BAD, EL, %VAL( PNTR( 1 ) ), NUMPER, PERCNT,
+     :                    NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
+     :                    SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
  
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         CALL KPG1_HSTAUW( BAD, EL, %VAL( PNTR( 1 ) ), NUMBIN, NUMPER,
-     :                     PERCNT, NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ),
-     :                     DMAX, SUM, MEAN, MEDIAN, MODE, PERVAL,
-     :                     %VAL( HPNTR ), STATUS )
+         CALL KPG1_HSTAUW( BAD, EL, %VAL( PNTR( 1 ) ), NUMPER, PERCNT,
+     :                     NGOOD, IMIN( 1 ), DMIN, IMAX( 1 ), DMAX,
+     :                     SUM, MEAN, MEDIAN, MODE, PERVAL, STATUS )
       END IF
-
-*  Free the workspace.
-      CALL PSX_FREE( HPNTR, STATUS )
 
 *  Obtain the NDF bounds and initialise the indices of the minimum and
 *  maximim pixel positions and co-ordinates.

@@ -82,10 +82,13 @@ KAPGEN_SUB = $(KAPGEN_SOURCES) kpg1_darar.f kpg1_darad.f kpg1_darai.f \
 kpg1_daraw.f kpg1_darab.f kpg1_daraub.f kpg1_darauw.f kpg1_fracr.f \
 kpg1_fracd.f kpg1_fraci.f kpg1_fracw.f kpg1_fracb.f kpg1_fracub.f \
 kpg1_fracuw.f kpg1_mixvr.f kpg1_mixvd.f kpg1_mixvi.f kpg1_mixvw.f \
-kpg1_mixvb.f kpg1_mixvub.f kpg1_mixvuw.f kpg1_hsdsd.f kpg1_hsdsr.f 
+kpg1_mixvb.f kpg1_mixvub.f kpg1_mixvuw.f kpg1_hsdsd.f kpg1_hsdsr.f \
+kpg1_hstar.f kpg1_hstad.f kpg1_hstai.f kpg1_hstaw.f kpg1_hstab.f \
+kpg1_hstaub.f kpg1_hstauw.f 
 
 # Generic source files needed for kapsub_sub.tar:
-KAPGEN_GEN = kpg1_dara.gen kpg1_frac.gen kpg1_mixv.gen kpg1_hsds.gen
+KAPGEN_GEN = kpg1_dara.gen kpg1_frac.gen kpg1_mixv.gen kpg1_hsds.gen \
+kpg1_hsta.gen
 
 # Non-generic source files needed for kapgen_sub.tar:
 KAPSUB_NONGEN = agchax.f agchcu.f agchil.f bad2db.f bad2dd.f bad2di.f \
