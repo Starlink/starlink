@@ -12,7 +12,7 @@
      PARAMETER RESPFILE
                POSITION 2
                TYPE    '_CHAR'
-               PROMPT  Response matrix file'
+               PROMPT  'Response matrix file'
                PPATH   'DYNAMIC'
                HELP 'Enter dataset name without the .SDF extension'
             ENDPARAMETER
