@@ -171,6 +171,13 @@ AC_TRY_COMPILE([extern "C" {
 
 
 
+dnl   Check whether the version of AST which we'll be linking against
+dnl   still has the proj.o module within it (from wcslib).  Newer
+dnl   versions don't (or rather do, but modified and renamed).
+AC_SUBST(ASTHASOLDPROJ)
+AC_CHECK_LIB(ast_wcslib, airfwd, ASTHASOLDPROJ=yes, ASTHASOLDPROJ=no)
+
+
 dnl   We don't at present need to link against wcslib (though I
 dnl   thought we did, at one point).  Should we need to again, this is
 dnl   how:
@@ -194,17 +201,20 @@ dnl     AC_MSG_ERROR([--without-wcslib specified but need wcslib])
 dnl   else
 dnl     AC_DEFINE(WCSLIB,-L$wcs_libdir -lwcs)
 dnl   fi)
-AC_CHECK_LIB(ast_wcslib, glsfwd, ,
-  AC_CHECK_LIB(skycat, glsfwd, ,
-    AC_DEFINE(NEEDGLSFUNCS), -LSkyCat/lib -lskycat))
 
-
-dnl   Check whether the version of AST which we'll be linking against
-dnl   still has the proj.o module within it (from wcslib).  Newer
-dnl   versions don't (or rather do, but modified and renamed).
-AC_SUBST(ASTHASOLDPROJ)
-AC_CHECK_LIB(ast_wcslib, airfwd, ASTHASOLDPROJ=yes, ASTHASOLDPROJ=no)
-
+if test $ASTHASOLDPROJ = yes; then
+    # We're going to get our wcslib functions from AST (which is
+    # evidently an old version of the library, and so has un-renamed
+    # wcslib functions within it).  Does that set of wcslib functions
+    # include glsfwd and glsrev (used by libskycat)?  If not, we'll
+    # have to supply these in SkyCatHoles.c.
+    AC_CHECK_LIB(ast_wcslib, glsfwd, , AC_DEFINE(NEEDGLSFUNCS))
+else
+    # Do nothing.  We're going to get the wcslib functions from
+    # libskycat's proj.o module, so we mustn't have extra glsfwd
+    # functions, so don't change NEEDGLSFUNCS from its default no.
+    :
+fi
 
 
 dnl   Find where the SkyCat cat library has been installed.
@@ -220,6 +230,7 @@ AC_ARG_WITH(catlib,
     CATLIBDIR=$withval
   fi,
   CATLIBDIR=../catlib)
+
 
 
 
