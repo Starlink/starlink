@@ -9,7 +9,7 @@
 *     RAWDIR            = CHAR (read) Directory name
 *     ROOTNAME          = CHAR (read) Rootname for header file
 *     FILENAME          = CHAR (read) Ouput text file or TT for screen
-*     SHOWOBS           = LOGICAL (READ) Produce the observation listing ?
+*     SHOWOBS           = LOGICAL (read) Produce the observation listing ?
 *     TIM
 *    Method :
 *    Deficiencies :
@@ -24,7 +24,8 @@
 *                          e.g. 200 days. (RDS)
 *         Apr 94 : V1.7-0  RATionalised for new release of asterix (LTVAD::JKA)
 *      20 May 94 : V1.7-1  Use AIO for output (DJA)
-*       6 Apr 98 : V2.2-1  Removed structures (rjv)
+*       6 Apr 98 : V2.2-1  Removed structures (RJV)
+*       9 Feb 99 : V2.3-0  FITS file input (DGED)
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -47,6 +48,17 @@
 
 *    Local variables :
       LOGICAL LSHOW,LTIME
+
+      INTEGER                 BLOCK
+      INTEGER                 IUNIT             ! Logical I/O unit
+      INTEGER                 NFILES            ! Number of files
+*
+      CHARACTER*100           FILES(MAXRAW)     ! File name aray
+      CHARACTER*132           FILENAME
+      CHARACTER*132           FITSDIR           ! Directory for FITS
+      CHARACTER*132           FROOT             ! Root of FITS filename
+      CHARACTER*5             ORIGIN            ! Origin of FITS file
+
 *-
 *   Version anouncement
       CALL MSG_PRNT(VERSION)
@@ -54,14 +66,64 @@
 *   Initialize ASTERIX common blocks
       CALL AST_INIT
 *
-*     Get directory name from user and display the available observations.
-*     Get rootname of file wanted.
-      CALL XRTSORT_FILESELECT(STATUS)
+*  Get input file details
+*  Get the current working directory
+      CALL UTIL_GETCWD( FITSDIR, STATUS )
+      CALL USI_DEF0C( 'RAWDIR', FITSDIR, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+      CALL USI_GET0C( 'RAWDIR', FITSDIR, STATUS )
+*  Any FITS files?
+      CALL UTIL_FINDFILE(FITSDIR, '*.fits', MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+*  If no files - exit
+      IF (NFILES .LE. 0) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_PRNT ('SHOWXRT : Error - No FITS file found')
+         CALL MSG_PRNT ('SHOWXRT : Uses RDF FITS files only.')
+         CALL MSG_PRNT ('SHOWXRT : Please use VERSION V2.2-1 for SDF'
+     :                                                //'file input')
+         GOTO 999
+      END IF
 *
+*  Get root name of FITS file
+      CALL USI_GET0C ('FITSROOT', FROOT, STATUS )
+*  Append extension of FITS extension containing header
+      FILENAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
+*  Does file exist?
+      CALL UTIL_FINDFILE(FITSDIR, FILENAME, MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+      IF (NFILES .LE. 0) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_PRNT ('SHOWXRT : Error - Header file not found')
+         GOTO 999
+      END IF
+*
+      ORIGIN = 'RDF'
+      CALL USI_PUT0C( 'ORIGIN', ORIGIN, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
+*
+      CALL MSG_PRNT('SHOWXRT : Using FITS file : '// FILENAME)
+      SRT_ROOTNAME = FILENAME
 
-      CALL RAT_GETXRTHEAD(SRT_ROOTNAME, STATUS)
-
+*  Open the FITS fIle
+      CALL FIO_GUNIT(IUNIT, STATUS)
+      CALL FTOPEN(IUNIT, SRT_ROOTNAME, 0, BLOCK, STATUS)
+      IF ( STATUS .NE. SAI__OK ) THEN
+	 CALL MSG_SETC('FNAM',SRT_ROOTNAME)
+         CALL MSG_PRNT('SHOWXRT : Error - opening file ^FNAM **')
+         GOTO 999
+      ENDIF
+*
+*  Read in header
+      CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
+*
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+*
+*  Close FITS files
+      CALL FTCLOS(IUNIT, STATUS)
+      CALL FIO_PUNIT(IUNIT, STATUS)
+*
 *   Produce an observation summary ?
       CALL USI_GET0L('SHOWOBS', LSHOW, STATUS)
 
