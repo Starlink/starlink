@@ -130,6 +130,8 @@
 #        also leads to core dumps (GWM window lost by PGPLOT - I suspect,
 #        but can't prove, a bug in GWM or PGPLOT).  This can still 
 #        happen however if you do a lot of chooser resizing.
+#     9-JUL-2001 (MBT):
+#        Added scrollbars to the tabsets, to accomodate many NDFs.
 #-
 
 #  Inheritance.
@@ -277,15 +279,34 @@
          set side(B) right
          foreach slot { A B } {
 
-#  Construct the tabsets, in their own frame so they can get packed at 
-#  the top edge of it.
+#  Construct the tabsets, and controlling scrollbars.  The tabsets are
+#  window items within a canvas, since a canvas is a scrollable widget
+#  but a tabset is not.  An iwidgets::scrolledframe is unfortunately not
+#  suitable here since it constrains the scrollbar to lie on the right.
+            itk_component add tabframe$slot {
+               frame $itk_component(choosearea).tframe$slot
+            }
+            itk_component add tabcanv$slot {
+               canvas $itk_component(tabframe$slot).canv
+            }
             itk_component add tabs$slot {
-               iwidgets::tabset $itk_component(choosearea).tabs$slot \
+               iwidgets::tabset $itk_component(tabframe$slot).tabs \
                                 -tabpos $tabpos($slot) \
                                 -bevelamount 4 \
                                 -tabborders no \
                                 -command [ code $this ndfselect $slot ] 
             }
+            itk_component add tabscroll$slot {
+               scrollbar $itk_component(tabframe$slot).sb \
+                         -orient vertical \
+                         -command "$itk_component(tabcanv$slot) yview"
+            }
+            $itk_component(tabcanv$slot) create window 0 0 \
+                                         -window $itk_component(tabs$slot) \
+                                         -anchor "n$tabpos($slot)"
+            $itk_component(tabcanv$slot) configure \
+               -yscrollcommand "$itk_component(tabscroll$slot) set" -width 1
+            pack $itk_component(tabcanv$slot) -side $side($slot) -anchor n
 
 #  Construct the NDF area frames.
             itk_component add ndf$slot {
@@ -316,7 +337,8 @@
 
 #  Pack the ndf frames themselves and the controlling tabsets into the 
 #  choosing area.
-            pack $itk_component(tabs$slot) -side $side($slot) -fill y -anchor n
+            pack $itk_component(tabframe$slot) -side $side($slot) \
+                                               -fill y -anchor n
             pack $itk_component(ndf$slot) -side $side($slot)
 
 #  Set the initially selected images to blank ones.
@@ -853,9 +875,11 @@
 #  If this method is called it prepares all the ndfplot and ndfinfo
 #  windows for display; the effect of this is that subsequent 
 #  select operations are almost instantaneous.
+         waitpush "Plotting all windows"
          for { set index 1 } { $index <= $nndfset } { incr index } {
             ndfplotwindow $index
          }
+         waitpop
       }
 
 
@@ -999,20 +1023,53 @@
 #-----------------------------------------------------------------------
 #  If the viewport size is changed, then all the windows will need to
 #  be redrawn at the right size.
-         if { $viewport != $lastvp } {
-            foreach slot { A B } {
-               $itk_component(view$slot) configure \
-                   -width [ lindex $viewport 0 ] -height [ lindex $viewport 1 ]
-            }
-            for { set i 0 } { $i < $nndfset } { incr i } {
-               $itk_component(image$i) configure \
-                   -width [ lindex $viewport 0 ] -height [ lindex $viewport 1 ]
-            }
-            if { $status == "active" } {
+         if { $status == "active" } {
+            if { $viewport != $lastvp } {
+               set vpwidth [ lindex $viewport 0 ]
+               set vpheight [ lindex $viewport 1 ]
+
+#  Set the frames containing the images to the requested size.
+               foreach slot { A B } {
+                  $itk_component(view$slot) configure -width $vpwidth \
+                                                      -height $vpheight
+               }
+
+#  Set the tabset and associated scrollbar to the right size in each slot.
+               update idletasks
+               set side(A) left
+               set side(B) right
+               foreach slot { A B } {
+                  set bbox [ $itk_component(tabcanv$slot) bbox all ]
+                  set tabwidth [ expr [ lindex $bbox 2 ] - [ lindex $bbox 0 ] ]
+                  set tabheight [ lindex $bbox 3 ]
+                  set sbheight [ winfo height $itk_component(ndf$slot) ]
+                  $itk_component(tabcanv$slot) configure \
+                       -width $tabwidth -height $sbheight \
+                       -scrollregion $bbox
+
+#  Only post the scrollbar if the tabset is too high to fit at once.
+                  if { $tabheight > $sbheight } {
+                     pack $itk_component(tabscroll$slot) \
+                          -before $itk_component(tabcanv$slot) \
+                          -fill y -anchor n -side $side($slot)
+                  } else {
+                     pack forget $itk_component(tabscroll$slot)
+                  }
+               }
+
+#  Redraw all the windows.  This will only do an actual redraw of the
+#  ones which are currently being viewed, but others will be marked for
+#  redrawing at a later date.
+               for { set i 0 } { $i < $nndfset } { incr i } {
+                  $itk_component(image$i) configure -width $vpwidth \
+                                                    -height $vpheight
+               }
                refresh all
             }
+
+#  Remember the shape of the window we have just configured.
+            set lastvp $viewport
          }
-         set lastvp $viewport
       }
 
 
@@ -1021,6 +1078,9 @@
 #-----------------------------------------------------------------------
          if { ! [ isvalid ] } {
             $itk_component(gotpair) configure -state disabled
+         }
+         if { $status == "active" } {
+            configure -viewport $viewport
          }
       }
 
@@ -1075,7 +1135,7 @@
       private variable highlight       ;# Array by ndf index of highlight state
       private variable inview          ;# Array by slot of viewed images
       private variable noted           ;# Array containing info characteristics
-      private variable lastvp { 0 0 }  ;# Last value of viewport variable
+      private variable lastvp { 1 1 }  ;# Last value of viewport variable
       private variable nndfset         ;# Number of images under chooser control
       private variable ndfsetlist      ;# List of ndfset objects
       private variable percentilecontrol;# Perc control widgets for each image
