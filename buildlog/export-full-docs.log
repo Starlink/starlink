@@ -412,10 +412,10 @@ javadoc-sources:
   [javadoc] "A set of utilities for traversing/manipulating/etc."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphUtilities.java:25: warning - The first sentence is interpreted to be:
   [javadoc] "A set of utilities for traversing/manipulating/etc."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphUtilities.java:25: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
   [javadoc] "Extends the JSky ImageProcessor class so that HDXImages are
   [javadoc]  processed the same as FITSImages, i.e."
@@ -1701,6 +1701,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
@@ -2366,4 +2367,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 10 minutes 29 seconds
+Total time: 10 minutes 40 seconds
