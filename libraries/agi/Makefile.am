@@ -69,7 +69,7 @@ AGP_ADAM_F_ROUTINES = agi_assoc.f agi_cancl.f agp_assoc.f agp_deass.f
 BLOCK_DATA_ROUTINES = agi_block.f
 
 
-BUILT_ROUTINES = AGI_ERR
+BUILT_SOURCES = AGI_ERR
 
 
 # Testing
