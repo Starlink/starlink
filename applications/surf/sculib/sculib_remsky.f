@@ -124,7 +124,6 @@
                SKY_DATA(N_GOOD) = SCUDATA(SKYBOLS(SKY), I)
                SKY_QUAL(N_GOOD) = 0
 
-*               PRINT *, SKY, SKYBOLS(SKY), SKY_DATA(N_GOOD)
             END IF
          END DO
 
@@ -134,46 +133,57 @@
      :        GOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV, QSORT,
      :        STATUS)
 
-         IF (MODE .EQ. 'MEAN') THEN
-            BACKGROUND = REAL(MEAN)
-            IF (GOOD .GT. 0) THEN
-               ERRMEAN = REAL(STDEV/SQRT(DBLE(GOOD)))
+*     If there were no good points returned then finishe
+
+         IF (GOOD .GT. 0) THEN
+
+            IF (MODE .EQ. 'MEAN') THEN
+               BACKGROUND = SNGL(MEAN)
+               IF (GOOD .GT. 0) THEN
+                  ERRMEAN = SNGL(STDEV/SQRT(DBLE(GOOD)))
+               ELSE
+                  ERRMEAN = 0.0
+               END IF
+
+               SKYVAR = ERRMEAN * ERRMEAN
+
+               CALL MSG_SETI('BOL', I)
+               CALL MSG_SETR('BG', BACKGROUND)
+               CALL MSG_SETR('ERR', ERRMEAN)
+               CALL MSG_SETI('GOOD', GOOD)
+               
+               CALL MSG_OUTIF(MSG__VERB, ' ',
+     :              '^BOL: MEAN = ^BG +- ^ERR (^GOOD points)', STATUS)
             ELSE
-               ERRMEAN = 0.0
+               BACKGROUND = SNGL(MEDIAN)
+               
+               CALL MSG_SETI('BOL', I)
+               CALL MSG_SETR('BG', BACKGROUND)
+               
+               CALL MSG_OUTIF(MSG__VERB, ' ',
+     :              '^BOL: MEDIAN = ^BG', STATUS)
             END IF
 
-            SKYVAR = ERRMEAN * ERRMEAN
-
-            CALL MSG_SETI('BOL', I)
-            CALL MSG_SETR('BG', BACKGROUND)
-            CALL MSG_SETR('ERR', ERRMEAN)
-            CALL MSG_SETI('GOOD', GOOD)
-
-            CALL MSG_OUTIF(MSG__VERB, ' ',
-     :           '^BOL: MEAN = ^BG +- ^ERR (^GOOD points)', STATUS)
-         ELSE
-            BACKGROUND = REAL(MEDIAN)
-
-            CALL MSG_SETI('BOL', I)
-            CALL MSG_SETR('BG', BACKGROUND)
-
-            CALL MSG_OUTIF(MSG__VERB, ' ',
-     :           '^BOL: MEDIAN = ^BG', STATUS)
-         END IF
-
 *     Remove background value from entire JIGGLE
-         IF (BACKGROUND .NE. VAL__BADR) THEN
-            DO BOL = 1, N_BOLS
-               IF (SCUDATA(BOL, I) .NE. VAL__BADR) THEN
+            IF (BACKGROUND .NE. VAL__BADR) THEN
+               DO BOL = 1, N_BOLS
+                  IF (SCUDATA(BOL, I) .NE. VAL__BADR) THEN
 
-                  SCUDATA(BOL, I) = SCUDATA(BOL, I) - BACKGROUND
-               
-                  IF (MODE .EQ. 'MEAN') THEN
-                     SCUVAR(BOL, I) = SCUVAR(BOL, I) + SKYVAR
+                     SCUDATA(BOL, I) = SCUDATA(BOL, I) - BACKGROUND
+                     
+                     IF (MODE .EQ. 'MEAN') THEN
+                        SCUVAR(BOL, I) = SCUVAR(BOL, I) + SKYVAR
+                     END IF
+
                   END IF
+               END DO
+            END IF
+         ELSE
 
-               END IF
-            END DO
+            CALL MSG_SETI('POS', I)
+            CALL MSG_OUTIF(MSG__VERB, ' ',
+     :           '^POS: No good data present', STATUS)
+
          END IF
 
       END DO
