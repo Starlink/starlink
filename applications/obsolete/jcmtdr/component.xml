@@ -14,7 +14,7 @@
   beam maps.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sla</build><build>hlp</build><build>ndf</build><build>prm</build><build>fio</build><build>gsd</build><build>pda</build><build>figaro</build><build>kaplibs</build>
+    <build>pcs</build><build>sla</build><build>hlp</build><build>ndf</build><build>prm</build><build>fio</build><build>gsd</build><build>pda</build><build>figaro</build><build>kaplibs</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -34,7 +34,7 @@
       <uname>timj</uname>
     </person>
   </developers>
-  <documentation></documentation>
+  <documentation> sun132 sc1</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
