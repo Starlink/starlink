@@ -193,7 +193,8 @@
      :                    .FALSE., DIMS(IAX), ' ', STATUS )
         CALL ADI_NEW( TYPE, 1, DIMS(IAX), AXID, STATUS )
         CALL ADI_MAP( AXID, TYPE, 'WRITE', AXPTR, STATUS )
-        CALL ADI2_DMAP_AXINV ( BASE, DELTA, DIMS(IAX), %VAL(AXPTR), STATUS )
+        CALL ADI2_DMAP_AXINV ( BASE, DELTA, DIMS(IAX), %VAL(AXPTR),
+     :                         STATUS )
         PTR = AXPTR
 
 *  Or invent some axis widths
