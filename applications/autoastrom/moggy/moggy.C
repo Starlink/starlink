@@ -50,44 +50,22 @@ static const char RCSID[] =
         "$Id$";
 
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 
 #include <iostream>
-/* Following probably needed for Alphas, but there are other iostream issues on
-   Alphas, including an issue with __NO_USE_STD_IOSTREAM - see section 7.1.2
-   of the (Alpha) C++ Using Guide"
-using std::istream;		// ????
-using std::ostream;
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::exit;
-*/
 #include <string>
 #include <fstream>
 #include <assert.h>
 
-#if HAVE_SETENV
-#if DECLARE_SETENV
-/* (un)setenv is present, but not declared in stdlib.h */
-extern "C" void unsetenv(const char *name);
-#else
 #if HAVE_CSTD_INCLUDE
-#include <cstdlib>		/* for setenv */
-#else
-#include <stdlib.h>
-#endif /* HAVE_CSTD_INCLUDE */
-#endif /* DECLARE_SETENV */
-#endif /* HAVE_SETENV */
-
-#if HAVE_CSTD_INCLUDE
+#include <cstdlib>
 #include <ctime>
 #else
+#include <stdlib.h>
 #include <time.h>
 #endif
+
 
 #include <cat/CatalogInfo.h>
 
@@ -98,6 +76,29 @@ extern "C" void unsetenv(const char *name);
 #include "stringstream.h"
 #include "util.h"
 #include "verbosity.h"
+
+#ifdef STD_IN_STD_NAMESPACE
+/* Following probably needed for Alphas, but there are other iostream issues on
+   Alphas, including an issue with __NO_USE_STD_IOSTREAM - see section 7.1.2
+   of the (Alpha) C++ Using Guide" */
+using std::istream;
+using std::ostream;
+using std::cout;
+using std::cerr;
+using std::endl;
+using std::exit;
+#endif
+
+#if HAVE_UNSETENV
+#if !HAVE_DECL_UNSETENV
+extern "C" void unsetenv(const char *name);
+#endif
+#elif HAVE_PUTENV
+#if !HAVE_DECL_PUTENV
+extern "C" int putenv(char *string);
+#endif
+#endif
+
 
 const char *progname;
 
@@ -128,6 +129,12 @@ int main (int argc, char **argv)
 	if (**argv == '-')
 	    switch (*++*argv)
 	    {
+              case 'l':         // log file
+                argc--, argv++;
+                if (argc == 0)
+                    Usage();
+                Util::logstream(*argv);
+                break;
 #if 0
 	      case 'l':		// log file
 		++*argv;
@@ -153,7 +160,7 @@ int main (int argc, char **argv)
     // the CONF command.
 #if HAVE_SETENV
     unsetenv ("CATLIB_CONFIG");
-#else
+#elif HAVE_PUTENV
     {
 	// unsetenv() doesn't exist -- there seems no other way of
 	// deleting a variable from the environment.  If the
@@ -168,6 +175,8 @@ int main (int argc, char **argv)
 	    putenv (arg);
 	}
     }
+#else
+#error "This is ridiculous -- we don't have either unsetenv() or putenv()"
 #endif
 
     try
@@ -195,12 +204,12 @@ int main (int argc, char **argv)
 	    if (verbosity > normal)
 	    {
 		vector<string> arglist = cmd->arguments();
-		cerr << "Moggy:dialogue:Command :";
+		Util::logstream() << "Moggy:dialogue:Command :";
 		for (vector<string>::const_iterator p=arglist.begin();
 		     p != arglist.end();
 		     ++p)
-		    cerr << ' ' << *p;
-		cerr << endl;
+		    Util::logstream() << ' ' << *p;
+		Util::logstream() << endl;
 	    }
 
 	    // Process the parsed command obtained from the input.  If 
@@ -215,7 +224,7 @@ int main (int argc, char **argv)
 		cout << response << crlf;
 
 		if (verbosity > normal)
-		    cerr << "Moggy:dialogue:Response: " << response << endl;
+		    Util::logstream() << "Moggy:dialogue:Response: " << response << endl;
 	    }
 
 	    // Flush the output, since this program will be used inside a pipe.
@@ -298,7 +307,7 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 	if (arglist.size() == 2)
 	{
 	    if (verbosity > normal)
-		cerr << "moggy: COLUMNS=<"<<arglist[1]<<">"<<endl;
+		Util::logstream() << "moggy: COLUMNS=<"<<arglist[1]<<">"<<endl;
 	    string kwd = arglist[1];
 	    Util::uppercaseString(kwd);
 	    if (kwd == "ALL")
@@ -394,13 +403,13 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 
 		    if (verbosity > normal)
 			if (coordsok == decdegrees)
-			    cerr << "moggy: transPair ("
+			    Util::logstream() << "moggy: transPair ("
 				 << param[1] << ',' << param[2]
 				 << ") --> ("
 				 << radouble << ',' << decdouble
 				 << ')' << endl;
 			else
-			    cerr << "moggy: transPair ("
+			    Util::logstream() << "moggy: transPair ("
 				 << param[1] << ',' << param[2]
 				 << ") failed!" << endl;
 		}
@@ -455,28 +464,28 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 
 	    if (verbosity > normal)
 	    {
-		cerr << "moggy: " << nargs << " arguments:" << endl;
+		Util::logstream() << "moggy: " << nargs << " arguments:" << endl;
 		for (int i=1; i<=nargs; i++)
-		    cerr << "    " << i << ':' << param[i] << endl;
+		    Util::logstream() << "    " << i << ':' << param[i] << endl;
 		switch (coordsok)
 		{
 		  case badcoords:
-		    cerr << "    type=bad" << endl;
+		    Util::logstream() << "    type=bad" << endl;
 		    break;
 		  case sexagesimal:
-		    cerr << "    type=sexagesimal "
+		    Util::logstream() << "    type=sexagesimal "
 			 << rah << ':' << ramin << ':' << rasec
 			 << ' '
 			 << decdeg << ':' << decmin << ':' << decsec
 			 << endl;
 		    break;
 		  case decdegrees:
-		    cerr << "    type=dec. degrees "
+		    Util::logstream() << "    type=dec. degrees "
 			 << radouble << ',' << decdouble
 			 << endl;
 		    break;
 		  default:
-		    cerr << "    type=IMPOSSIBLE" << endl;
+		    Util::logstream() << "    type=IMPOSSIBLE" << endl;
 		    break;
 		}			 
 	    }
@@ -516,7 +525,7 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 
       case CommandParse::DEBUG:
 	// Switch on verbose mode in selected modules.  Undocumented elsewhere.
-	if (arglist.size() == 2)
+	if (arglist.size() == 2 || arglist.size() == 3)
 	{
 	    int convok;
 	    int flags = 0;
@@ -531,6 +540,12 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 	    if (flags & 2) msg << " CommandParse";
 	    if (flags & 4) msg << " AstHandler";
 	    if (flags & 8) msg << " CatalogueHandler";
+
+            if (arglist.size() == 3) {
+                Util::logstream(arglist[2].c_str());
+                msg << " (to file " << arglist[2] << ")";
+            }
+
 	    response = SS_STRING(msg);
 	}
 	else
@@ -741,7 +756,7 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 	    response = "501 Wrong number or type of parameters";
 	break;
 
-      case CommandParse::VERSION:
+      case CommandParse::MOGGYVERSION:
 	  {
 	      string tmp("250 ");
 	      response = tmp + RCSID;
@@ -815,7 +830,7 @@ string processAstCommand (vector<string>& arglist,
 		       << crlf << flush;
 
 		  if (verbosity > normal)
-		      cerr << "Moggy:dialogue:Response:"
+		      Util::logstream() << "Moggy:dialogue:Response:"
 			   << "350 Command accepted -- send frameset"
 			   << endl;
 
@@ -832,7 +847,7 @@ string processAstCommand (vector<string>& arglist,
 			  = astlinein.find_last_not_of (" \t\n\r");
 
 		      if (verbosity > normal)
-			  cerr << "Moggy:dialogue:Input   :"
+			  Util::logstream() << "Moggy:dialogue:Input   :"
 			       << astlinein << endl;
 
 		      if (startpos < astlinein.npos)
@@ -937,7 +952,7 @@ void dumpCatalogue (ostream& o)
 
 void Usage ()
 {
-    cerr << "Usage: " << progname << endl;
-    //cerr << "Usage: " << progname << " [-llogfilename]" << endl;
+    //cerr << "Usage: " << progname << endl;
+    cerr << "Usage: " << progname << " [-l logfilename]" << endl;
     exit (1);
 }

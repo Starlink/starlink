@@ -1,83 +1,112 @@
-/*
- *  This file is part of moggy.
- *  
- *  Copyright 2001, 2003, Council for the Central Laboratory of the Research Councils
- *  
- *  This program is part of the Starlink Software Distribution: see
- *  http://www.starlink.ac.uk 
- *  
- *  moggy is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *  
- *  moggy is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *  
- *  You should have received a copy of the GNU General Public License
- *  along with moggy; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
- *  The General Public License is distributed along with this
- *  program in the file LICENCE.
- *  
- *  Author: Norman Gray <norman@astro.gla.ac.uk>
- *  $Id$
- */
+/* config.h.in.  Generated from configure.ac by autoheader.  */
 
-#ifndef CONFIG_H_LOADED
-#define CONFIG_H_LOADED 1
+/* Define as 1 if we have (standard) <cname> libraries instead of just
+   <name.h> */
+#undef HAVE_CSTD_INCLUDE
 
-/* Do we have the <cstd...> include files? */
-/* Define as 1 if you DO have the (standard) <cstdio> headers.  If
-   not, we use <stdio.h> instead. */
-#define HAVE_CSTD_INCLUDE 0
+/* Define to 1 if you have the declaration of `getenv', and to 0 if you don't.
+   */
+#undef HAVE_DECL_GETENV
 
-/* Related: define as 1 if you have standard functions in the std
-   namespace; that is, if you need `using namespace std' in order to
-   get to them.  The Solaris compilers need this, GCC doesn't (and I
-   think that's a deficiency in GCC rather than Solaris).  At present,
-   we use this flag to decide if we need to dump everything into the
-   global namespace; this is not as elegant as I'd like, but it'll do
-   for now. */
-#define HAVE_STD_NAMESPACE 0
+/* Define to 1 if you have the declaration of `putenv', and to 0 if you don't.
+   */
+#undef HAVE_DECL_PUTENV
 
-/* The alpha cxx compiler currently (v6.0) needs to be invoked with 
-   __USE_STD_IOSTREAM defined, so that it uses a standards-conforming 
-   streams library.  See Digital C++ v6.0 manual, section 7.1.2.
-   This is defined by default when the compiler is invoked with
-   `-std strict_ansi', but that's a little harder to arrange in
-   here. */
-/* Now redundant, since this part has been rewritten in configure.in */
-/* #undef __USE_STD_IOSTREAM */
+/* Define to 1 if you have the declaration of `setenv', and to 0 if you don't.
+   */
+#undef HAVE_DECL_SETENV
 
-/* Define as 1 if you have <sstream> (as opposed to older
-   <strstream>).  Define as 0 otherwise. */
-#define HAVE_SSTREAM 0
+/* Define to 1 if you have the declaration of `unsetenv', and to 0 if you
+   don't. */
+#undef HAVE_DECL_UNSETENV
 
-/* Define as 1 if we have <map>.  Define as 0 otherwise. */
-#define HAVE_MAP 0
+/* Define to 1 if you have the `getenv' function. */
+#undef HAVE_GETENV
 
-/* Define as 1 if we have function setenv() (and if we have, we assume
-   we have function unsetenv(), too)... On Tru64, even though setenv
-   is present in the library, it appears not to be properly
-   declared in stdlib.h (it's bracketed off by an `#ifdef
-   AES_SOURCE', which isn't documented anywhere obvious): check for
-   this situation, and define DECLARE_SETENV if we're going to have
-   to include our own setenv definition. */
-#define HAVE_SETENV 0
-#define DECLARE_SETENV 0
-
-/* Define this if we have _not_ found the glsfwd and glsrev functions
-   somewhere.  If they are in AST, this means (a) our copy of AST is
-   old-ish (before 1.8), so (b) it has all of the wcslib functions
-   that are in Calabretta's wcslib distribution.  If it does _not_
-   have this function, then this means that out copy of AST is new
-   (1.8 or later), so we have to supply the wcslib functions
-   otherwise.  See SkyCatHoles.c, configure.in, and the Makefile, plus
-   ../makefile, which may have removed proj.o from libcat.a. */
+/* Define to 1 if you have the `glsfwd' function. */
 #undef HAVE_GLSFWD
 
-#endif /* CONFIG_H_LOADED */
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define as 1 if we do have a functioning AST library */
+#undef HAVE_LIBAST
+
+/* Define to 1 if you have the `nsl' library (-lnsl). */
+#undef HAVE_LIBNSL
+
+/* Define to 1 if you have the `socket' library (-lsocket). */
+#undef HAVE_LIBSOCKET
+
+/* Define to 1 if you have the <map> header file. */
+#undef HAVE_MAP
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `putenv' function. */
+#undef HAVE_PUTENV
+
+/* Define to 1 if you have the `setenv' function. */
+#undef HAVE_SETENV
+
+/* Define to 1 if you have the `slaDeuler' function. */
+#undef HAVE_SLADEULER
+
+/* Define to 1 if you have the <sstream> header file. */
+#undef HAVE_SSTREAM
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <strstream> header file. */
+#undef HAVE_STRSTREAM
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the `unsetenv' function. */
+#undef HAVE_UNSETENV
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define as 1 if the standard functions are in the std namespace (ie, you
+   have to use std:: to get them) */
+#undef STD_IN_STD_NAMESPACE
+
+/* Version number of package */
+#undef VERSION

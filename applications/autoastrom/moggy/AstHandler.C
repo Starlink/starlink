@@ -36,14 +36,12 @@
 // appropriate further mapping to this system.
 
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 #include <iostream>		// for cerr, endl
 #include <assert.h>
 
-#if HAVE_STD_NAMESPACE
+#if STD_IN_STD_NAMESPACE
 using std::cerr;
 using std::endl;
 #endif
@@ -74,7 +72,7 @@ AstHandler::AstHandler (vector<string>serialFrameset,
     bool isFits;		// `frameset' is actually a set of FITS cards
     isFits = serialFrameset_[0].substr(0,6) == "SIMPLE";
     if (verbosity_ > normal)
-	cerr << "AstHandler: Frameset[0]=<" << serialFrameset_[0]
+	Util::logstream() << "AstHandler: Frameset[0]=<" << serialFrameset_[0]
 	     << ">: " << (isFits ? "FITS" : "AST") << endl;
 
     // begin an AST context
@@ -111,15 +109,15 @@ AstHandler::AstHandler (vector<string>serialFrameset,
 
     if (verbosity_ > normal)
     {
-	cerr << "AstHandler: read a " << astGetC(astobj_, "Domain") << endl;
+	Util::logstream() << "AstHandler: read a " << astGetC(astobj_, "Domain") << endl;
 	if (astIsAFrameSet (astobj_))
-	    cerr << "    IsA FrameSet!" << endl;
+	    Util::logstream() << "    IsA FrameSet!" << endl;
     }
 
     fromDomainIndex_ = toDomainIndex_ = 0;
     nframes_ = astGetI (astobj_, "Nframe");
     if (verbosity_ > normal)
-	cerr << "AstHandler: FrameSet has " << nframes_ << " frames" << endl;
+	Util::logstream() << "AstHandler: FrameSet has " << nframes_ << " frames" << endl;
 
     for (int i=1; i<=nframes_; i++)
     {
@@ -132,17 +130,17 @@ AstHandler::AstHandler (vector<string>serialFrameset,
 				// incremented by astGetFrame
 
 	if (verbosity_ > normal)
-	    cerr << "AstHandler: domain " << i << "=" << domain << endl;
+	    Util::logstream() << "AstHandler: domain " << i << "=" << domain << endl;
 	if (domain == fromdomain_)
 	{
 	    if (verbosity_ > normal)
-		cerr << "  (fromdomain)" << endl;
+		Util::logstream() << "  (fromdomain)" << endl;
 	    fromDomainIndex_ = i;
 	}
 	if (domain == todomain_)
 	{
 	    if (verbosity_ > normal)
-		cerr << "  (todomain)" << endl;
+		Util::logstream() << "  (todomain)" << endl;
 	    toDomainIndex_ = i;
 	}
     }
@@ -150,7 +148,7 @@ AstHandler::AstHandler (vector<string>serialFrameset,
     // Check we did in fact find the from/input domain we were
     // promised.  We check the to/output domain below.
     if (verbosity_ > normal)
-	cerr << "AstHandler::AstHandler: from "
+	Util::logstream() << "AstHandler::AstHandler: from "
 	     << fromdomain_ << '=' << fromDomainIndex_
 	     << " to "
 	     << todomain_ << '=' << toDomainIndex_ << endl;
@@ -223,7 +221,7 @@ AstHandler::AstHandler (vector<string>serialFrameset,
     }
 
     if (verbosity_ > normal)
-	cerr << "AstHandler::AstHandler: successfully constructed astmap_"
+	Util::logstream() << "AstHandler::AstHandler: successfully constructed astmap_"
 	     << endl;
 }
 
@@ -238,7 +236,7 @@ bool AstHandler::transToSky (const double xpix, const double ypix,
 {
     astTran2 (astmap_, 1, &xpix, &ypix, 1, &radeg, &decdeg);
     if (verbosity_ > normal)
-	cerr << "AstHandler::transToSky: (" << xpix << ',' << ypix
+	Util::logstream() << "AstHandler::transToSky: (" << xpix << ',' << ypix
 	     << ") --> (" << radeg << ',' << decdeg
 	     << ")rad = ("
 	     << astFormat (astobj_, 1, radeg)
@@ -255,7 +253,7 @@ bool AstHandler::transToSky (const double xpix, const double ypix,
     decdeg *= DegreesPerRadian;
 
     if (verbosity_ > normal)
-	cerr << " = (" << radeg << ',' << decdeg << ")deg" << endl;
+	Util::logstream() << " = (" << radeg << ',' << decdeg << ")deg" << endl;
 
     return true;		// astTran2 does not indicate errors
 }
@@ -272,7 +270,7 @@ bool AstHandler::transFromSky (const double radeg, const double decdeg,
     double ldecdeg = decdeg/DegreesPerRadian;
     astTran2 (astmap_, 1, &lradeg, &ldecdeg, 0, &xpix, &ypix);
     if (verbosity_ > normal)
-	cerr << "AstHandler::transFromSky: (" << radeg << ',' << decdeg
+	Util::logstream() << "AstHandler::transFromSky: (" << radeg << ',' << decdeg
 	     << ")rad = (" << xpix << ',' << ypix << ')' << endl;
 
     return true;		// astTran2 does not indicate errors
@@ -343,9 +341,9 @@ const char *AstHandler::channel_source (bool reset)
 #if 0
     if (verbosity_ > normal)
 	if (rval != 0)
-	    cerr << "AstHandler::channel_source: " << rval << endl;
+	    Util::logstream() << "AstHandler::channel_source: " << rval << endl;
 	else
-	    cerr << "AstHandler::channel_source: EOD" << endl;
+	    Util::logstream() << "AstHandler::channel_source: EOD" << endl;
 #endif
 
     return rval;

@@ -618,6 +618,7 @@ sub query ($) {
     # whitespace-separated.
     my $RDR = $self->{SLAVEREADER};
     my $ncols = <$RDR>;		# read number of columns
+    (defined($ncols)) || return 0; # failure status
     $ncols =~ s/\s*//g;
     $self->{NCOLS} = $ncols;
     my $columnlist = [];
@@ -787,7 +788,7 @@ sub debug ($) {
 	    $mask += $kwdtomask{$kwd} if (defined($kwdtomask{$kwd}));
 	}
 	print STDERR "Debugging: <$dbgstring> -> $mask\n";
-	$self->send_command_to_slave_("DEBUG", $mask);
+	$self->send_command_to_slave_("DEBUG", $mask, "/tmp/moggylog.txt");
     }
 
     return "debug";
@@ -806,15 +807,16 @@ sub start_slave_ ($) {
     $self->{SLAVEWRITER} = gensym(); # ditto
 
     my $cmd = $self->{_MOGGYCMD};
-    $self->{MOGGYPID} = open2($self->{SLAVEREADER},
-			      $self->{SLAVEWRITER},
-			      $self->{_MOGGYCMD});
+     $self->{MOGGYPID} = open2($self->{SLAVEREADER},
+ 			      $self->{SLAVEWRITER},
+ 			      $self->{_MOGGYCMD});
 }
 
 sub stop_slave_ ($) {
     my $self = shift;
     if ($self->{MOGGYPID}) {
 	$self->send_command_to_slave_ ("quit");
+        waitpid($self->{MOGGYPID}, 0);
 	close ($self->{SLAVEREADER});
 	close ($self->{SLAVEWRITER});
 	$self->{MOGGYPID} = 0;

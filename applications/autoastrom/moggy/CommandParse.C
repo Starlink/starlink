@@ -26,13 +26,11 @@
 //  $Id$
 
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 #include <iostream>		// for cerr, endl
 
-#if HAVE_STD_NAMESPACE
+#if STD_IN_STD_NAMESPACE
 using std::cerr;
 using std::endl;
 #endif
@@ -57,7 +55,7 @@ CommandParse::CommandParse (string cmd)
     if (! command_table_init_)
     {
 	if (verbosity_ > normal)
-	    cerr << "CommandParse::CommandParse: initialising" << endl;
+	    Util::logstream() << "CommandParse::CommandParse: initialising" << endl;
 	command_table_["AST"] = AST;
 	command_table_["CONF"] = CONF;
 	command_table_["DEBUG"] = DEBUG;
@@ -67,7 +65,7 @@ CommandParse::CommandParse (string cmd)
 	command_table_["COORD1"] = COORD1;
 	command_table_["COORD2"] = COORD2;
 	command_table_["RADIUS"] = RADIUS;
-	command_table_["VERSION"] = VERSION;
+	command_table_["VERSION"] = MOGGYVERSION;
 	command_table_["STATUS"] = STATUS;
 	command_table_["TYPE"] = TYPE;
 	command_table_["CATCONFIG"] = CATCONFIG;
@@ -82,13 +80,13 @@ CommandParse::CommandParse (string cmd)
     if (verbosity_ > normal)
     {
 	int i=0;
-	cerr << "CommandParse::CommandParse: args_.size()="
+	Util::logstream() << "CommandParse::CommandParse: args_.size()="
 	     << args_.size() << ':' << endl;
 	for (vector<string>::const_iterator p = args_.begin();
 	     p != args_.end(); 
 	     p++)
 	{
-	    cerr << "    " << i << ':' << *p << endl;
+	    Util::logstream() << "    " << i << ':' << *p << endl;
 	    i++;
 	}
     }
@@ -110,7 +108,7 @@ CommandParse::CommandParse (string cmd)
 	    cmdcode_ = p->second;
 
 	if (verbosity_ > normal)
-	    cerr << "CommandParse::CommandParse: " << op << "-->"
+	    Util::logstream() << "CommandParse::CommandParse: " << op << "-->"
 		 << static_cast<int>(cmdcode_) << endl;
     }
 }
@@ -135,10 +133,10 @@ CommandParse::CommandParse (string cmd)
 	     p != args_.end(); 
 	     p++)
 	{
-	    cerr << "Arg ["<<i<<"]=["<<*p<<"]"<<endl;
+	    Util::logstream() << "Arg ["<<i<<"]=["<<*p<<"]"<<endl;
 	    i++;
 	}
-	cerr << "args_.size()=" << args_.size() << endl;
+	Util::logstream() << "args_.size()=" << args_.size() << endl;
     }
 
     if (args_.size() == 0)
@@ -164,7 +162,7 @@ CommandParse::CommandParse (string cmd)
 	else if (op.compare("SEARCH") == 0) cmdcode_ = SEARCH;
 	else if (op.compare("STATUS") == 0) cmdcode_ = STATUS;
 	else if (op.compare("TYPE") == 0) cmdcode_ = TYPE;
-	else if (op.compare("VERSION") == 0) cmdcode_ = VERSION;
+	else if (op.compare("VERSION") == 0) cmdcode_ = MOGGYVERSION;
 	else cmdcode_ = INVALID;
     }
 }

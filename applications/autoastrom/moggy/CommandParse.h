@@ -56,8 +56,8 @@ class CommandParse {
 
     enum token_value {
 	INVALID,
-	AST, CONF, DEBUG, SEARCH, NAME, NROW, COORD1, COORD2, RADIUS, VERSION,
-	STATUS, TYPE, CATCONFIG, COLUMNS, QUIT
+	AST, CONF, DEBUG, SEARCH, NAME, NROW, COORD1, COORD2, RADIUS,
+        MOGGYVERSION, STATUS, TYPE, CATCONFIG, COLUMNS, QUIT
     };
 
     token_value type () const { return cmdcode_; }

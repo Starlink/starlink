@@ -10,7 +10,7 @@ AC_REVISION($Revision$)dnl
 
 
 dnl AC_INIT(moggy.C)
-AC_INIT(moggy, VERSION, [norman@astro.gla.ac.uk])
+AC_INIT(moggy, 0.1, [norman@astro.gla.ac.uk])
 
 AM_INIT_AUTOMAKE
 

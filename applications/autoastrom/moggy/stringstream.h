@@ -37,6 +37,8 @@
 #ifndef STRINGSTREAM_H_LOADED
 #define STRINGSTREAM_H_LOADED 1
 
+#include <config.h>
+
 #if HAVE_SSTREAM
 
 #include <sstream>
@@ -50,7 +52,7 @@
 #define SS_C_STR(s) (s).str().c_str()
 #define SS_STRING(s) (s).str()
 
-#else
+#elif HAVE_STRSTREAM
 
 #include <strstream>
 
@@ -64,6 +66,8 @@
 /* Add the end-of-string to the stringbuf and convert it to a string */
 #define SS_STRING(s) ((s)<<ends,string((s).str()))
 
+#else /* no sstream or strstream! */
+#error "Have neither <sstream> nor <strstream>"
 #endif
 
 #endif /* STRINGSTREAM_H_LOADED */

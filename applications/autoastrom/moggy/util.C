@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #endif
+#include <fstream>
 
 #include <string>
 #include <errno.h>
@@ -143,4 +144,18 @@ vector<string> Util::tokeniseString (const string str, const char *seps)
     }
 
     return tokens;
+}
+
+ostream& Util::logstream(const char* fn)
+{
+    static ofstream log_;
+    
+    if (fn != 0) {
+        // open a new one
+        log_.open(fn);
+    }
+    if (log_.is_open())
+        return log_;
+    else
+        return cerr;
 }

@@ -30,16 +30,16 @@
 #include "config.h"
 #endif
 
-#if HAVE_SETENV
-#if DECLARE_SETENV  /* function present, but not declared in stdlib.h */
-extern "C" int setenv(const char *name, const char *value, int overwrite);
-#else
 #if HAVE_CSTD_INCLUDE
 #include <cstdlib>		// for setenv
 #else
 #include <stdlib.h>
 #endif /* HAVE_CSTD_INCLUDE */
-#endif /* DECLARE_SETENV */
+
+#if HAVE_SETENV
+#if !DECLARE_SETENV  /* function present, but not declared in stdlib.h */
+extern "C" int setenv(const char *name, const char *value, int overwrite);
+#endif /* !DECLARE_SETENV */
 #endif /* HAVE_SETENV */
 
 #include "stringstream.h"
@@ -101,18 +101,18 @@ int CatalogueHandler::doSearch ()
 
 	if (verbosity_ > normal)
 	{
-	    cerr << "CatalogueHandler::doSearch: sortcols("
+	    Util::logstream() << "CatalogueHandler::doSearch: sortcols("
 		 << nmagcols << ") =";
 	    for (int i=0; i<nmagcols; i++)
-		cerr << ' ' << (*magcols)[i] << '=' << sortcols[i];
-	    cerr << endl;
+		Util::logstream() << ' ' << (*magcols)[i] << '=' << sortcols[i];
+	    Util::logstream() << endl;
 	}
     }
 
     if (searchType_ == RADIUSSEARCH || searchType_ == RADIUSPOINTSEARCH)
     {
 	AstroQuery q;
-	cerr << "doSearch: radial search" << endl;
+	Util::logstream() << "doSearch: radial search" << endl;
 
 	if (searchType_ == RADIUSSEARCH)
 	    if (isValid_(RADIUS))
@@ -205,7 +205,7 @@ const CatalogueHandler::CatalogueRow
     }
 
     if (verbosity_ > normal)
-	cerr << "CatalogueHandler::* idx_=" << idx_
+	Util::logstream() << "CatalogueHandler::* idx_=" << idx_
 	     << '/' << parent_->queryResult_.numRows() << endl;
 
     return CatalogueRow (*parent_, idx_);
@@ -287,7 +287,7 @@ bool CatalogueHandler::setPos (int num,
     if (pos_[posindex].status()==0)
     {
 	if (verbosity_ > normal)
-	    cerr << "CatalogueHandler::setPos(" << num << "): ("
+	    Util::logstream() << "CatalogueHandler::setPos(" << num << "): ("
 		 << radeg << ", " << decdeg << " [" << equinox_ << "]) -->"
 		 << endl
 		 << "    = ("
@@ -302,7 +302,7 @@ bool CatalogueHandler::setPos (int num,
     else
     {
 	if (verbosity_ > normal)
-	    cerr << "CatalogueHandler::setPos(dec): (" << num
+	    Util::logstream() << "CatalogueHandler::setPos(dec): (" << num
 		 << ") failed" << endl;
 	return false;
     }
@@ -325,7 +325,7 @@ bool CatalogueHandler::setPos (int num,
     if (pos_[posindex].status()==0)
     {
 	if (verbosity_ > normal)
-	    cerr << "CatalogueHandler::setPos(" << num << "): ("
+	    Util::logstream() << "CatalogueHandler::setPos(" << num << "): ("
 		 << rah << ',' << ramin << ',' << rasec << ", "
 		 << degh << ',' << degmin << ',' << degsec
 		 << " [" << equinox_ << "]) --> " << endl
@@ -341,7 +341,7 @@ bool CatalogueHandler::setPos (int num,
     else
     {
 	if (verbosity_ > normal)
-	    cerr << "CatalogueHandler::setPos(hmsdms): (" << num
+	    Util::logstream() << "CatalogueHandler::setPos(hmsdms): (" << num
 		 << ") failed" << endl;
 	return false;
     }
@@ -389,7 +389,7 @@ bool CatalogueHandler::setConfig (string URL)
 {
 #if HAVE_SETENV
     return (setenv ("CATLIB_CONFIG", URL.c_str(), 1) == 0);
-#else
+#elif HAVE_PUTENV
     // Without setenv(), we have to resort to putenv, which is a mess.
     // The string passed to putenv is retained, so it can't be an
     // automatic variable.  Allocate the correct amount of space.  If
@@ -411,6 +411,8 @@ bool CatalogueHandler::setConfig (string URL)
 
     sprintf (putenvarg, "CATLIB_CONFIG=%s", urlstr);
     return (putenv (putenvarg) == 0);
+#else
+#error "This is ridiculous -- we don't have either setenv() or putenv()"
 #endif
 }
 
@@ -436,7 +438,7 @@ bool CatalogueHandler::setCatname (string name)
 	// This error will be `unknown catalog', raised by the error handler
 	if (verbosity_ > normal)
 	    // log the error to stderr
-	    cerr << e.msg << endl;
+	    Util::logstream() << e.msg << endl;
 	return false;
     }
 }
@@ -480,13 +482,13 @@ vector<int>* CatalogueHandler::mag_cols()
     }
     if (verbosity_ > normal)
     {
-	cerr << "CatalogueHandler::mag_cols: "
+	Util::logstream() << "CatalogueHandler::mag_cols: "
 	     << colnums->size() << " mag cols=";
 	for (vector<int>::const_iterator p = colnums->begin();
 	     p != colnums->end();
 	     p++)
-	    cerr << ' ' << *p;
-	cerr << endl;
+	    Util::logstream() << ' ' << *p;
+	Util::logstream() << endl;
     }
     return colnums;
 }

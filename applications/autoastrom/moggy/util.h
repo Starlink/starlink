@@ -41,6 +41,9 @@
 #if HAVE_STD_NAMESPACE
 using std::vector;
 using std::string;
+#define STD std
+#else
+#define STD
 #endif
 
 namespace Util {
@@ -50,6 +53,7 @@ namespace Util {
     bool stringToInteger (string str, int& i);
     bool stringToDouble (string str, double& f);
     vector<string> tokeniseString (const string s, const char *seps = " \r\n\t");
+    ostream& logstream(const char* fn = 0);
 }
 
 

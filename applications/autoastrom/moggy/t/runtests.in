@@ -31,11 +31,16 @@ LS=/bin/ls
 # If the environment variable ECHONONL is defined, then eval it to
 # define a function echononl which echoes its argument without a
 # newline.  Otherwise define a default
-if test -n "$ECHONONL"; then
-    eval ${ECHONONL}
-else
-    echononl () { echo -n $*; }
-fi
+#if test -n "$ECHONONL"; then
+#    eval ${ECHONONL}
+#else
+#    echononl () { echo -n $*; }
+#fi
+ECHO_N=@ECHO_N@
+ECHO_C=@ECHO_C@
+ECHO_T=@ECHO_T@
+PERLBIN=@PERLPATH@
+export PERLBIN
 
 filelist=""
 
@@ -69,28 +74,28 @@ nfailures=0
 
 for name in $filelist
 do
-	echononl "$name... "
+	echo $ECHO_N "$name... $ECHO_C"
 	sh $name >$name.stdout 2>$name.stderr
 	testval=$?
 
 	if [ $testval != 0 ]; then
-	    echo "failed (exited with error status $testval)"
+	    echo "${ECHO_T}failed (exited with error status $testval)"
 	    nfailures=`expr $nfailures + 1`
 	    # Don't delete temporary files on failure
 	elif [ -r "$name.correct" ]; then
 	    diff $name.correct $name.stdout >$name.diff
 	    rval=$?
 	    if [ $rval != 0 ]; then
-		echo "failed (results in $name.diff)"
+		echo "${ECHO_T}failed (results in $name.diff)"
 		nfailures=`expr $nfailures + 1`
 	    else
-		echo "ok"
+		echo "${ECHO_T}ok"
 		$deletetemp && rm -f $name.diff $name.stdout $name.stderr $name*.tmp
 	    fi
 	else
-		echo "apparently OK, but no correct results to compare"
+		echo "${ECHO_T}apparently OK, but no correct results to compare"
 		mv $name.stdout $name.correct
-		echo "    (now in $name.correct)"
+		echo "${ECHO_T}    (now in $name.correct)"
 		$deletetemp && rm -f $name.stderr $name*.tmp
 	fi
 done
