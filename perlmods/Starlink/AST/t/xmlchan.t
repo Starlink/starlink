@@ -8,7 +8,7 @@ use Test::More;
 BEGIN {
  use Starlink::AST;
  if ( Starlink::AST::Version() < 3000000 ) {
-   plan skip_all => "Skip Starlink::AST not available.";
+   plan skip_all => "Skip Please upgrade to AST Version > 3.x";
    exit;
  } else {
    plan tests => 2;
