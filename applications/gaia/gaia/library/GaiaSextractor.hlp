@@ -129,15 +129,3 @@ The file types output by the toolbox are restricted to the following:
 
 All these can be restored by reading back as local catalogues.
 
-
-  ---  Check that my new values are being used!
-
-After a detection pass look in the "default.sex" and "default.param"
-files in the current directory. These have the values actually used to
-run SExtractor, if they seem not to correspond to those in the
-toolbox, then make sure that you have pressed <Return> in any
-text/number entry fields. This is action is needed to update the
-value.
-
-  - 
-

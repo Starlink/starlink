@@ -6,7 +6,7 @@
 #     [incr Tk] class
 
 #  Purpose:
-#     Defines a class for controlling a Sextractor process.
+#     Defines a class for controlling a SExtractor process.
 
 #  Description:
 #     This class creates a top-levelwidget for displaying and
@@ -50,20 +50,23 @@
 #     TopLevelWidget
 
 #  Copyright:
-#     Copyright (C) 1998 Central Laboratory of the Research Councils
+#     Copyright (C) 1998-2000 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     25-AUG-1998 (PDRAPER):
+#     25-AUG-1998 (PWD):
 #        Original version.
-#     25-MAY-1999 (PDRAPER):
+#     25-MAY-1999 (PWD):
 #        Updated for 2.0.19. Added BACK_TYPE, BACK_VALUE and THRESH_TYPE.
-#     22-MAY-2000 (PDRAPER):
+#     22-MAY-2000 (PWD):
 #        Added RAD_TYPE and RAD_THRESH changes. Includes plotting of 
 #        RAD0 through RAD15 circles.
+#     30-MAY-2000 (PWD):
+#        Added -textvaribles to all entry related fields, this 
+#        ends need to press <return>.
 #     {enter_further_changes_here}
 
 #-
@@ -783,6 +786,7 @@ itcl::class gaia::GaiaSextractor {
             -validate real \
             -value $values_($this,analthresh) \
             -orient horizontal \
+            -textvariable [scope values_($this,analthresh)] \
             -command [code $this set_values_ analthresh]
       }
       pack $itk_component(analthresh) -side top -fill x -ipadx 1m -ipady 1m
@@ -825,6 +829,7 @@ itcl::class gaia::GaiaSextractor {
             -validate integer \
             -fix_range 1 \
             -value $values_($this,debthresh) \
+            -textvariable [scope values_($this,debthresh)] \
             -command [code $this set_values_ debthresh]
       }
       pack $itk_component(debthresh) -side top -fill x -ipadx 1m -ipady 1m
@@ -843,6 +848,7 @@ itcl::class gaia::GaiaSextractor {
             -validate real \
             -anchor w \
             -value $values_($this,debcontrast) \
+            -textvariable [scope values_($this,debcontrast)] \
             -from 0.0 \
             -to [max 0.1 [min 1.0 $values_($this,debcontrast)]] \
             -command [code $this set_values_ debcontrast]
@@ -878,6 +884,7 @@ itcl::class gaia::GaiaSextractor {
             -validate real \
             -anchor w \
             -value $values_($this,deteffic) \
+            -textvariable [scope values_($this,deteffic)] \
             -from 0.1 \
             -to 10.0 \
             -command [code $this set_values_ deteffic]
@@ -1061,6 +1068,7 @@ itcl::class gaia::GaiaSextractor {
             -valuewidth $vwidth \
             -validate real \
             -value $values_($this,photzero) \
+            -textvariable [scope values_($this,photzero)] \
             -command [code $this set_values_ photzero]
       }
       pack $itk_component(photzero) -side top -fill x -ipadx 1m -ipady 1m
@@ -1097,6 +1105,7 @@ itcl::class gaia::GaiaSextractor {
             -nentry $values_($this,photnum) \
             -anchor w \
             -orient vertical \
+            -textvariable [scope values_($this,photapps)] \
             -command [code $this set_values_ photapps]
       }
       eval $itk_component(photapps) setvals $values_($this,photapps)
@@ -1123,6 +1132,7 @@ itcl::class gaia::GaiaSextractor {
             -fix_range 1 \
             -validate real \
             -value $values_($this,kronfact) \
+            -textvariable [scope values_($this,kronfact)] \
             -command [code $this set_values_ kronfact]
       }
       pack $itk_component(kronfact) -side top -fill x -ipadx 1m -ipady 1m
@@ -1143,6 +1153,7 @@ itcl::class gaia::GaiaSextractor {
             -to 20.0 \
             -validate real \
             -value $values_($this,kronmin) \
+            -textvariable [scope values_($this,kronmin)] \
             -command [code $this set_values_ kronmin]
       }
       pack $itk_component(kronmin) -side top -fill x -ipadx 1m -ipady 1m
@@ -1275,6 +1286,7 @@ itcl::class gaia::GaiaSextractor {
             -valuewidth $vwidth \
             -validate real \
             -value $values_($this,imagescale) \
+            -textvariable [scope values_($this,imagescale)] \
             -command [code $this set_values_ imagescale]
       }
       pack $itk_component(imagescale) -side top -fill x -ipadx 1m -ipady 1m
@@ -1289,6 +1301,7 @@ itcl::class gaia::GaiaSextractor {
             -valuewidth $vwidth \
             -validate real \
             -value $values_($this,photsat) \
+            -textvariable [scope values_($this,photsat)] \
             -command [code $this set_values_ photsat]
       }
       pack $itk_component(photsat) -side top -fill x -ipadx 1m -ipady 1m
@@ -1310,6 +1323,7 @@ itcl::class gaia::GaiaSextractor {
             -to 5.0 \
             -validate real \
             -value $values_($this,photgain) \
+            -textvariable [scope values_($this,photgain)] \
             -command [code $this set_values_ photgain]
       }
       pack $itk_component(photgain) -side top -fill x -ipadx 1m -ipady 1m
@@ -1324,6 +1338,7 @@ itcl::class gaia::GaiaSextractor {
             -valuewidth $vwidth \
             -validate real \
             -value $values_($this,photgamma) \
+            -textvariable [scope values_($this,photgamma)] \
             -command [code $this set_values_ photgamma]
       }
       pack $itk_component(photgamma) -side top -fill x -ipadx 1m -ipady 1m
@@ -1369,6 +1384,7 @@ itcl::class gaia::GaiaSextractor {
             -valuewidth $vwidth \
             -validate real \
             -value $values_($this,fwhm) \
+            -textvariable [scope values_($this,fwhm)] \
             -command [code $this set_values_ fwhm]
       }
       pack $itk_component(fwhm) -side top -fill x -ipadx 1m -ipady 1m
@@ -1435,6 +1451,7 @@ itcl::class gaia::GaiaSextractor {
             -validate real \
             -orient vertical \
             -value $values_($this,radthresh) \
+            -textvariable [scope values_($this,radthresh)] \
             -command [code $this set_values_ radthresh]
       }
       pack $itk_component(radthresh) -side top -fill x -ipadx 1m -ipady 1m
@@ -1552,6 +1569,7 @@ itcl::class gaia::GaiaSextractor {
             -valuewidth $vwidth \
             -validate real \
             -value $values_($this,backvalue) \
+            -textvariable [scope values_($this,backvalue)] \
             -command [code $this set_values_ backvalue]
       }
       pack $itk_component(backvalue) -side top -fill x -ipadx 1m -ipady 1m
@@ -1567,6 +1585,7 @@ itcl::class gaia::GaiaSextractor {
             -anchor w \
             -validate integer \
             -value $values_($this,backmesh) \
+            -textvariable [scope values_($this,backmesh)] \
             -orient horizontal \
             -command [code $this set_values_ backmesh]
       }
@@ -1583,6 +1602,7 @@ itcl::class gaia::GaiaSextractor {
             -anchor w \
             -validate integer \
             -value $values_($this,backfilter) \
+            -textvariable [scope values_($this,backfilter)] \
             -orient horizontal \
             -command [code $this set_values_ backfilter]
       }
@@ -1625,6 +1645,7 @@ itcl::class gaia::GaiaSextractor {
             -fix_range 1 \
             -validate integer \
             -value $values_($this,backthick) \
+            -textvariable [scope values_($this,backthick)] \
             -command [code $this set_values_ backthick]
       }
       pack $itk_component(backthick) -side top -fill x -ipadx 1m -ipady 1m
