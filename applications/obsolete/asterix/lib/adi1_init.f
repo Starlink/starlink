@@ -113,6 +113,8 @@
       EXTERNAL			PRF1_SET
 
       EXTERNAL			SSI1_NEWLNK
+      EXTERNAL			SSI1_SETLNK
+      EXTERNAL			SSI1_SSETLNK
 
       EXTERNAL			UDI1_COPANC
 
@@ -184,6 +186,10 @@
       CALL ADI_DEFMTH( 'NewLink(_SSDS,_HDSfile)', SSI1_NEWLNK,
      :                 DID, STATUS )
       CALL ADI_DEFMTH( 'NewLink(_SSDSset,_HDSfile)', SSI1_NEWLNK,
+     :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'SetLink(_SSDS,_HDSfile)', SSI1_SETLNK,
+     :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'SetLink(_SSDSset,_HDSfile)', SSI1_SSETLNK,
      :                 DID, STATUS )
 
 *  Processing flag setting
