@@ -124,7 +124,8 @@ are shown at the top of the document.
 	 (coverimage (getdocinfo 'coverimage))
 	 )
     (make sequence
-      (make element gi: "TABLE"
+      (make element gi: "a" attributes: '(("name" "xref_"))
+	    (make element gi: "TABLE"
 	    attributes: '(("WIDTH" "100%"))
 	    (make sequence
 	      (make element gi: "TR"
@@ -182,7 +183,7 @@ are shown at the top of the document.
 						(list "COLSPAN" "2"))
 			      (make element gi: "SMALL"
 				    %starlink-banner%)))
-		  (empty-sosofo))))
+		  (empty-sosofo)))))
       (if coverimage
 	  (make element gi: "table"
 		attributes: '(("width" "100%")
