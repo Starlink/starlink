@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="jcmtdr">
-  <version>1.2-2</version>
+  <version>1.2-3</version>
   <path>applications/jcmtdr</path>
   <description>JCMTDR - Applications for Reducing JCMT GSD Data</description>
   <abstract><p>

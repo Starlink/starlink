@@ -1,7 +1,7 @@
 1 JCMTDR - Applications for reducing JCMT GSD on-the-fly data
                                                       Expires: ????.??.??
 
- This is release V1.2-2 of JCMTDR. This is the first release for
+ This is release V1.2-3 of JCMTDR. This is the first release for
  Linux and the first without reliance on the NAG library.
 
  JCMTDR is a collection of applications for use in reducing JCMT 
@@ -11,6 +11,13 @@
  and of heterodyne beam maps.
 
  For processing of SCUBA data use SURF (see SUN/216).
+
+2 New_in_version_1.2-3
+
+  o  Build system changed to use Gnu autoconf.
+
+  o  Now links against Figaro fda library rather than dsa/dta for
+     file access.
 
 2 New_in_version_1.2-2
 
