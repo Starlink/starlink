@@ -89,7 +89,7 @@ interface SECTOR
     type '_INTEGER'
     access 'read'
     keyword 'RLIM'
-    prompt 'Radius of the slice required'
+    prompt 'Radius of the slice required (in arcsec)'
     ppath 'current,default'
     vpath 'prompt'
     default 10
@@ -139,7 +139,7 @@ interface SECTOR
     access 'read'
     keyword 'PSIZE'
     position 5
-    prompt 'Size of the pixels'
+    prompt 'Size of the pixels (in arcsec)'
     ppath 'global,current,default'
     vpath 'prompt'
     association '<->GLOBAL.PSIZE'
@@ -189,7 +189,7 @@ interface SECTOR
     access 'read'
     keyword 'ZEROP'
     position 10
-    prompt 'Surface brightness zerop point'
+    prompt 'Surface brightness zerop point (in magnitudes per arcsec)'
     ppath 'global,current,default'
     vpath 'prompt'
     association '<->GLOBAL.ZEROP'
@@ -224,7 +224,7 @@ interface SECTOR
     type '_REAL'
     access 'read'
     keyword 'FITLIM'
-    prompt 'Limits of the radius range to be fitted'
+    prompt 'Limits of the radius range to be fitted (in arcsec)'
     ppath 'current,default'
     range 0.0,1e6
     vpath 'prompt'
@@ -247,7 +247,7 @@ interface SECTOR
     type '_CHAR'
     access 'read'
     keyword 'ORIGIN'
-    prompt 'Indices of the origin'
+    prompt 'Co-ordinates of the origin (Current frame)'
     ppath 'current,default'
     vpath 'prompt'
     default '92,96'

@@ -67,12 +67,12 @@
 *        results graph.
 *     FITLIM = _REAL (Read)
 *        The range of radius values over which the scale length 'fits' 
-*        are to be calculated.
+*        are to be calculated. Units arc seconds.
 *     INFILE = _CHAR (Read)
 *        Name of the text file containing the galaxy profile.
 *     LOWLIM = _REAL (Read)
 *        The radius below which a profile will not be included 
-*        in the automatic radius calculation.
+*        in the automatic radius calculation. Units arc seconds.
 *     MODE = LOGICAL (Read)
 *        Is the application to be used interactively or in file mode?
 *        TRUE = interactive. FALSE = file mode.

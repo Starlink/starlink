@@ -207,7 +207,7 @@ interface HISTPEAK
     access 'update'
     keyword 'SFACT'
     position 3
-    prompt 'Smoothing width you wish to use'
+    prompt 'Smoothing width you wish to use (in counts)'
     ppath 'current,default'
     vpath 'prompt'
     range -1,10000
@@ -218,7 +218,7 @@ interface HISTPEAK
   parameter SFACTA    # Smoothing filter radius employed 
     type '_INTEGER'
     access 'write'
-    prompt 'Smoothing radius used'
+    prompt 'Smoothing radius used (in counts)'
     vpath 'default'
     default 0
     helpkey '*'

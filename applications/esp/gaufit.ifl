@@ -283,7 +283,7 @@ interface GAUFIT
     access 'read'
     keyword 'PSIZE'
 #    position 5
-    prompt 'Pixel size'
+    prompt 'Pixel size (in arcsec)'
     ppath 'global,current,default'
     vpath 'prompt'
     association '<->GLOBAL.PSIZE'

@@ -100,7 +100,7 @@ interface TOPPED
     access 'read'
     keyword 'WIDTH'
     position 3
-    prompt 'Width about bright pixels to be set to bad'
+    prompt 'Width about bright pixels to be set to bad (in arcsec)'
     ppath 'current,default'
     vpath 'prompt'
     default '2'
@@ -112,7 +112,7 @@ interface TOPPED
     access 'read'
     keyword 'PSIZE'
     position 4
-    prompt 'Pixel size'
+    prompt 'Pixel size (in arcsec)'
     ppath 'global,current,default'
     vpath 'prompt'
     association '<->GLOBAL.PSIZE'

@@ -59,7 +59,7 @@ interface LOBACK
     access 'read'
     keyword 'SFACT'
     position 3
-    prompt 'Smoothing width'
+    prompt 'Smoothing width (in counts)'
     ppath 'current,default'
     vpath 'prompt'
     range -1,100
@@ -96,7 +96,7 @@ interface LOBACK
     access 'read'
     keyword 'WIDTH'
     position 6
-    prompt 'Min. box width'
+    prompt 'Min. box width (in pixels)'
     ppath 'current,default'
     vpath 'prompt'
     range 32,16384

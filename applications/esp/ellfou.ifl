@@ -104,7 +104,7 @@ interface ELLFOU
     access 'read'
     keyword 'PSIZE'
     position 4
-    prompt 'Size of the pixels'
+    prompt 'Size of the pixels (in arcsec)'
     ppath 'global,current,default'
     association '<->GLOBAL.PSIZE'
     vpath 'prompt'
@@ -117,7 +117,7 @@ interface ELLFOU
     access 'read'
     keyword 'ZEROP'
     position 5
-    prompt 'Surface brightness zerop point'
+    prompt 'Surface brightness zerop point (in magnitudes per arcsec)'
     ppath 'global,current,default'
     vpath 'prompt'
     association '<->GLOBAL.ZEROP'
@@ -189,7 +189,7 @@ interface ELLFOU
     type '_CHAR'
     access 'read'
     keyword 'ORIGIN'
-    prompt 'Indices of the origin'
+    prompt 'Co-ordinates of the origin (Current frame)'
     ppath 'current,default'
     vpath 'prompt'
     default '92,96'
@@ -212,7 +212,7 @@ interface ELLFOU
     type '_REAL'
     access 'read'
     keyword 'RLIM'
-    prompt 'Maximum ellipse radius'
+    prompt 'Maximum ellipse radius (in pixels)'
     ppath 'current,default'
     default 11
     vpath 'prompt'

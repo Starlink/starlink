@@ -94,7 +94,7 @@ interface SKEW
     access 'read'
     keyword 'PSIZE'
     position 5
-    prompt 'Pixel size'
+    prompt 'Pixel size (in arcsec)'
     ppath 'global,current,default'
     vpath 'prompt'
     association '<->GLOBAL.PSIZE'
@@ -128,7 +128,7 @@ interface SKEW
     access 'read'
     keyword 'WIDTH'
     position 4
-    prompt 'Template width'
+    prompt 'Template width (in arcsec)'
     ppath 'current,default'
     vpath 'prompt'
     default '8'

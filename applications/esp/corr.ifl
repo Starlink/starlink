@@ -83,7 +83,7 @@ interface CORR
     access 'read'
     keyword 'PSIZE'
     position 4
-    prompt 'Pixel size'
+    prompt 'Pixel size (in arcsec)'
     ppath 'global,current,default'
     vpath 'prompt'
     association '<->GLOBAL.PSIZE'
@@ -118,7 +118,7 @@ interface CORR
     access 'read'
     keyword 'SCALE'
     position 3
-    prompt 'Galaxy scale length'
+    prompt 'Galaxy scale length (in arcsec)'
     ppath 'current,default'
     vpath 'prompt'
     default '8'

@@ -103,7 +103,7 @@ interface GRAPHS
     type '_REAL'
     access 'read'
     keyword 'FITLIM'
-    prompt 'Limits of the radius range to be fitted'
+    prompt 'Limits of the radius range to be fitted (in arcsec)'
     ppath 'current,default'
     range 0.0,1e6
     vpath 'prompt'
@@ -137,7 +137,7 @@ interface GRAPHS
     type '_REAL'
     access 'read'
     keyword 'LOWLIM'
-    prompt 'Lower radius limit?'
+    prompt 'Lower radius limit (in arcsec)' 
     ppath 'current,default'
     vpath 'prompt'
     default 0.5

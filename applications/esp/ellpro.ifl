@@ -95,7 +95,7 @@ interface ELLPRO
     access 'read'
     keyword 'PSIZE'
     position 4
-    prompt 'Size of the pixels'
+    prompt 'Size of the pixels (in arcsec)'
     ppath 'global,current,default'
     vpath 'prompt'
     association '<->GLOBAL.PSIZE'
@@ -108,7 +108,7 @@ interface ELLPRO
     access 'read'
     keyword 'ZEROP'
     position 5
-    prompt 'Surface brightness zerop point'
+    prompt 'Surface brightness zerop point (in magnitudes per arcsec)'
     ppath 'global,current,default'
     vpath 'prompt'
     association '<->GLOBAL.ZEROP'
@@ -180,7 +180,7 @@ interface ELLPRO
     type '_CHAR'
     access 'read'
     keyword 'ORIGIN'
-    prompt 'Indices of the origin'
+    prompt 'Co-ordinates of the origin (Current frame)'
     ppath 'current,default'
     vpath 'prompt'
     helpkey '*'
@@ -214,7 +214,7 @@ interface ELLPRO
     type '_REAL'
     access 'read'
     keyword 'RLIM'
-    prompt 'Maximum ellipse radius'
+    prompt 'Maximum ellipse radius (in pixels)'
     ppath 'current,default'
     default 10.
     vpath 'prompt'
@@ -236,7 +236,7 @@ interface ELLPRO
     type '_REAL'
     access 'read'
     keyword 'LIM2'
-    prompt 'Lowest acceptable count factor'
+    prompt 'Lowest acceptable count factor (in standard deviations)'
     ppath 'current,default'
     vpath 'prompt'
     default 0.5
@@ -247,7 +247,7 @@ interface ELLPRO
     type '_REAL'
     access 'read'
     keyword 'LIM3'
-    prompt 'Parameters frozen radius'
+    prompt 'Parameters frozen radius (in pixels)'
     ppath 'current,default'
     vpath 'prompt'
     default 20
