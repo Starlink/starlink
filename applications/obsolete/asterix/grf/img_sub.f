@@ -987,6 +987,44 @@
       END
 
 
+
+*+ IMG_RPIXEL - display region mask
+	SUBROUTINE IMG_RPIXEL(STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'QUAL_PAR'
+*  Import :
+*  Export :
+*  Status :
+      INTEGER STATUS
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Local constants :
+*  Local variables :
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+*  set colours
+        CALL GFX_SETCOLS(STATUS)
+
+
+        IF (I_QOK) THEN
+
+*  plot pixels
+          CALL GFX_QPIXEL(I_WKPTR,I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
+     :                           .TRUE.,%VAL(I_XPTR),%VAL(I_YPTR),0,0,
+     :                              %VAL(I_REG_PTR),QUAL__MASK,STATUS)
+        ENDIF
+
+      ENDIF
+
+      END
+
+
 *+ IMG_SUBPIXEL - display pixels of subset of image
 	SUBROUTINE IMG_SUBPIXEL(I1,I2,J1,J2,STATUS)
 
