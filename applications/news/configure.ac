@@ -21,6 +21,7 @@ AC_PROG_MAKE_SET
  
 STAR_CHECK_PROGS(perl)
 STAR_CHECK_PROGS(sh)
+STAR_CHECK_PROGS(echo)
  
 dnl    Documentation is in the parent directory
 STAR_LATEX_DOCUMENTATION(sun195)

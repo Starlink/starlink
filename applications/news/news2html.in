@@ -89,11 +89,13 @@ NEWS_EMAIL="NEWSEMAIL"
 # Note: we want to be able to use '\c' to suppress newline characters.
 #       SunOS:   use /usr/5bin for System V 'echo'.
 #       Dec OSF: use /bin/echo which handles -n switch and '\c'.
+# Fall through default is from autoconf but this will not guarantee
+# to support all switches
 
 case `uname -s` in
    SunOS) ECHO=/usr/5bin/echo ;;
     OSF*) ECHO=/bin/echo      ;;
-       *) ECHO=/bin/echo      ;;
+       *) ECHO=@ECHO@      ;;
 esac
 
 #-----------------------------------------------------------------------
