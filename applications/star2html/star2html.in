@@ -222,12 +222,18 @@
 #        Incorporated TIMJ changes into repository code base. Changed
 #        to use the Starlink release of Perl, rather than the one
 #        found on the PATH or in /star/local/bin/perl.
+#     13-AUG-2004 (TIMJ):
+#        Replace generate_icon code with perl code in order to
+#        remove dependency on external uudecode and gunzip.
 #     {enter_further_changes_here}
 
 #  Bugs:
 #     {note_any_bugs_here}
 
 #-
+
+source_icon();
+exit;
 
 #  Print introductory message.
 $announce = "Star2HTML V@PACKAGE_VERSION@";
@@ -1160,42 +1166,177 @@ sub get_absolute_directory {
 
 #------------------------------------------------------------------------------
 
-sub source_icon {
-#+
-#  Subroutine to create the icon source.gif
-#
-#  A compressed tar file of the icon is stored in uuencode format
-#  (created using the sdt wrapup command). This is undecoded
-#  uncompressed and untarred. The method used here is to write out the
-#  shell script that recovers the information and then to execute it.
-#-
+## Since uudecode is no longer part of a standard linux distribution
+## the GIF icon is stored as uudecode in a <DATA> handle and we copy
+## the source code from Convert::UU CPAN module inline so as not to
+## have an external dependency. The file is source.gif but that is encoded
+## in the DATA segment.
 
-   open( ICONS , '>generate.icon' );
-   print( ICONS <<'_EOF_' );
-#!/bin/sh
-sed -e 's/^ //' << \#end-of-data | @UUDECODE@; \
-@UNCOMPRESS@ -c source.sh.Z | tar xvf - 1>/dev/null 2>&1; \
-rm -f source.sh.Z 
- begin 644 source.sh.Z
- M'YV0<][4D3.FC(LS:<P`6,BPH<.'$"-*G$BQ8D48&&]H!`$`1HP9-&K<X(A1
- MAHP;,DAB7.D1Y0P0,$36L&$CI,F1'FF$I$'2HL^?0(,*A5AG#ITP<CK"@$-&
- M3A@X99(.=4@&#IHY<.2\.3.U(4N,)&_4F`&VJ]FS:-.J77LDB1$<-\)H`(`!
- MP+V(@/+VVONK+["_P0(+&XR/'[Y_B!,K7LRXL>/'D"-+GDRYLN7+F#-KWLRY
- ML^?/H$.+'DVZM.G3J%.K7LV:1<.Y=0$@P`7@`0(.2."`"22@P`0/7)#!"C7D
- M$`$%!#`AB26JV*(`"B"`@``@T+%'((8HH@`!'#!`C@Z\\$$&!2!222A)".*$
- M2QY899)-0B!%&1%(<4HUNY1CC!-RJ4A2RA*<Z'"''YSD`L\)4H12P1WVL``.
- M!68<D4H'*UC#@QJ5H%!$)#S<X@T[BM2SQC.J!!&#(#TL4P,JP[`213:.U+$-
- M/&H@D0L05XA!AB*6F/*-+W[T(0D+@,Q22CC#(#+!`SZD@DLLXC`2P3U*V((+
- M-("4L4P@:4B``3"YS'&&,)X49P``.ZSEYIMPQBGGG'36:>>=>.:IYYY\]NGG
- MGX`&*NB@A!9JZ*&()JKHHHPVZNBCD$8JZ:245FKII9AFJNFFG';JZ:>@ABKJ
- MJ*26:NJIJ*:JZJJLMNKJJ[#&*NNLM-9JZZVXYJKKKKSVZNNOP`8K[+#$%FOL
- 8L<@FJ^RRS#;K[+/01BOMM-16:^VUV"8*
- `
- end
-#end-of-data
-_EOF_
-   close( ICONS );
-   chmod 0755 ,'./generate.icon';
-   system( './generate.icon');
-   unlink( './generate.icon');
+sub source_icon {
+  # Get the uuencoded GIF
+  my $uue = join("",<DATA>);
+
+  # Decode it
+  my ($string, $filename, $mode) = Convert::UU::uudecode( $uue );
+
+  open my $fh, ">$filename"
+    or die "Error opening output GIF $filename: $!";
+  print $fh $string;
+  close($fh);
+  return;
 }
+
+
+package Convert::UU;
+
+use strict;
+use vars qw($VERSION @ISA @EXPORT_OK);
+use Carp 'croak';
+
+require Exporter;
+
+@ISA = qw(Exporter);
+# Items to export into callers namespace by default. Note: do not export
+# names by default without a very good reason. Use EXPORT_OK instead.
+# Do not simply export all your public functions/methods/constants.
+@EXPORT_OK = qw(
+	     uudecode uuencode
+);
+$VERSION = '0.52';
+
+#
+#  From comp.lang.perl 3/1/95.
+#  Posted by Hans Mulder (hansm@wsinti05.win.tue.nl)
+#
+
+sub uuencode {
+    croak("Usage: uuencode( {string|filehandle} [,filename] [, mode] )")
+      unless(@_ >= 1 && @_ <= 3);
+
+    my($in,$file,$mode) = @_;
+    $mode ||= "644";
+    $file ||= "uuencode.uu";
+
+    my($chunk,@result,$r);
+    if (
+	ref($in) eq 'IO::Handle' or
+	ref(\$in) eq "GLOB" or
+	ref($in) eq "GLOB" or
+	ref($in) eq 'FileHandle'
+       ) {
+        # local $^W = 0; # Why did I get use of undefined value here ?
+	binmode($in);
+        local $/;
+        $in = <$in>;
+    }
+    pos($in)=0;
+    while ($in =~ m/\G(.{1,45})/sgc) {
+      push @result, uuencode_chunk($1);
+    }
+    push @result, "`\n";
+    join "", "begin $mode $file\n", @result, "end\n";
+}
+
+sub uuencode_chunk {
+    my($string) = shift;
+# for the Mac?
+#    my($mod3) = length($string) % 3;
+#    $string .= "\0", $mod3 -= 3 if $mod3;
+    my $encoded_string = pack("u", $string);           # unix uuencode
+# for the Mac?
+#    $encoded_string =~ s/.//;                       # remove length byte
+#    chop($encoded_string);                          # remove trailing \n
+#    $encoded_string =~ tr#`!-_#A-Za-z0-9+/#;        # tr to mime alphabet
+#    substr($encoded_string, $mod3) =~ tr/A/=/;      # adjust padding
+    $encoded_string;
+}
+
+sub uudecode {
+    croak("Usage: uudecode( {string|filehandle|array ref}) ")
+      unless(@_ == 1);
+    my($in) = @_;
+
+    my(@result,$file,$mode);
+    $mode = $file = "";
+    if (
+	ref($in) eq 'IO::Handle' or
+	ref(\$in) eq "GLOB" or
+	ref($in) eq "GLOB" or
+	ref($in) eq 'FileHandle'
+       ) {
+	local($\) = "\n";
+	binmode($in);
+	while (<$in>) {
+	    if ($file eq "" and !$mode){
+		($mode,$file) = ($1, $2) if /^begin\s+(\d+)\s+(.+)$/ ;
+		next;
+	    }
+	    last if /^end/;
+	    push @result, uudecode_chunk($_);
+	}
+    } elsif (ref(\$in) eq "SCALAR") {
+	while ($in =~ m/\G(.*?(\n|\r|\r\n|\n\r))/gc) {
+	    my $line = $1;
+	    if ($file eq "" and !$mode){
+		($mode,$file) = $line =~ /^begin\s+(\d+)\s+(.+)$/ ;
+		next;
+	    }
+	    next if $file eq "" and !$mode;
+	    last if $line =~ /^end/;
+	    push @result, uudecode_chunk($line);
+	}
+    } elsif (ref($in) eq "ARRAY") {
+	my $line;
+	foreach $line (@$in) {
+	    if ($file eq "" and !$mode){
+		($mode,$file) = $line =~ /^begin\s+(\d+)\s+(.+)$/ ;
+		next;
+	    }
+	    next if $file eq "" and !$mode;
+	    last if $line =~ /^end/;
+	    push @result, uudecode_chunk($line);
+	}
+    }
+    wantarray ? (join("",@result),$file,$mode) : join("",@result);
+}
+
+sub uudecode_chunk {
+    my($chunk) = @_;
+    return "" if $chunk =~ /^(?:--|CREATED)/;
+    my $string = substr($chunk,0,int((((ord($chunk) - 32) & 077) + 2) / 3)*4+1);
+
+    my $ret = unpack("u", $string);
+    defined $ret ? $ret : "";
+}
+
+1;
+
+package main;
+
+# The source.gif icon uuencoded
+__DATA__
+begin 755 source.gif
+M1TE&.#=A&@`8`/<``````````("`@+V]O;^_O\#`P,'!P<+"POC\^/______
+M____________________________________________________________
+M____________________________________________________________
+M____________________________________________________________
+M____________________________________________________________
+M____________________________________________________________
+M____________________________________________________________
+M____________________________________________________________
+M____________________________________________________________
+M____________________________________________________________
+M____________________________________________________________
+M____________________________________________________________
+M____________________________________________________________
+M____________________________________________________________
+M____________________________________________________________
+M____________________________________________________________
+M____________________________________________________________
+M_____________________RP`````&@`8```(N``/"!Q(<&"!`@43'ES(L*%#
+MAP0*!)A(L:+%BP$*$"`0`(''CR!#BA00X,"`C@<O/F0H@*1)E!)!3EQYL&7)
+MDPA2RD20<:7-ESEC3N2IDJ5+G#IW?IRY\"=2H15W]BS@%&9'J1TKUCQJE2A%
+MD3RWWNR*]6O/JD$Q@CW+-:C#K%'9CG7;\&I(N4!78F2*EJ;?OGY]DBR`LZ7A
+BPX@3#SZIN+'BC!'W2K:XT(!ERX%I$AC`N7-GPIY#AP8`.P``
+`
+end

@@ -14,16 +14,10 @@ dnl    isn't found then configure will complain
 AC_CONFIG_SRCDIR([star2html.in])
 
 dnl    Include defaults for Starlink configurations
+AC_PROG_MAKE_SET
 STAR_DEFAULTS
 
-AC_PATH_PROG(PERL, perl)
-AC_PATH_PROG(UUDECODE, uudecode)
-AC_PATH_PROGS(UNCOMPRESS, [gunzip uncompress])
-
-dnl    Check that all of these did in fact find a program
-if test -z "$PERL" -o -z "$UUDECODE" -o -z "$UNCOMPRESS"; then
-   AC_MSG_ERROR([One of PERL=$PERL, UUDECODE=$UUDECODE, or UNCOMPRESS=$UNCOMPRESS not found -- specify with corresonding argument to ./configure])
-fi
+STAR_CHECK_PROGS( perl )
 
 dnl    This package has no dependencies
 
