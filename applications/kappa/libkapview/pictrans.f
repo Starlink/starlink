@@ -59,7 +59,7 @@
 *        one of the following:
 *
 *        - A domain name such as SKY, AXIS, PIXEL, GRAPHICS, NDC, CURPIC, 
-*        BASEPIC, etc. 
+*        BASEPIC, CURNDC, etc. 
 *
 *        - An integer value giving the index of the required Frame within
 *        the WCS component.
@@ -76,7 +76,7 @@
 *        following:
 *
 *        - A domain name such as SKY, AXIS, PIXEL, GRAPHICS, NDC, CURPIC, 
-*        BASEPIC, etc. 
+*        BASEPIC, CURNDC, etc. 
 *
 *        - An integer value giving the index of the required Frame within
 *        the WCS component.
@@ -135,6 +135,12 @@
 *     bottom left corner of the current picture has CURPIC co-ordinates of 
 *     (0,0). The shorter dimension of the current picture has length 1.0, and 
 *     the other axis has a length greater than 1.0. 
+*
+*     -  CURNDC co-ordinates also locate a position within the current
+*     picture. The bottom left corner of the current picture has CURNDC 
+*     co-ordinates of (0,0), and the top right corner has CURNDC
+*     co-ordinates (1,1).
+*
 
 *  Related Applications:
 *     KAPPA: GDSTATE, PICIN, PICXY.
@@ -149,6 +155,8 @@
 *        Original version.
 *     24-SEP-2001 (DSB):
 *        Converted to AST/PGPLOT.
+*     13-AUG-2002 (DSB):
+*        Added CURNDC Frame.
 *     {enter_changes_here}
 
 *  Bugs:

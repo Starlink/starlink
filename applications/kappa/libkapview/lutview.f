@@ -88,6 +88,10 @@
 *        bottom left corner of the plotting surface is (0,0) and the 
 *        top right corner is (1,1).
 *
+*        - CURNDC -- gives positions in a normalised system in which the 
+*        bottom left corner of the current picture is (0,0) and the 
+*        top right corner is (1,1).
+*
 *        There may be additional Frames available, describing previously 
 *        displayed data. If a null value is supplied, the current Frame
 *        associated with the displayed data (if any) is used. This parameter 
@@ -270,6 +274,8 @@
 *        Calls to KPG1_PGCUR modified for new argument list.
 *     4-OCT-2001 (DSB):
 *        Added graph and histogram-style keys.
+*     13-AUG-2002 (DSB):
+*        Added CURNDC Frame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -524,6 +530,18 @@
             CALL AGI_ISAMP( IPICB, SAME, STATUS ) 
             IF( SAME ) THEN
                CALL KPG1_ASFFR( IPLOT, 'BASEPIC', IFRM, STATUS )
+               IF( IFRM .NE. AST__NOFRAME ) THEN
+                  CALL AST_SETI( IPLOT, 'CURRENT', IFRM, STATUS )
+               END IF
+            END IF
+         END IF
+
+*  If the CURNDC Frame was selected, and the current picture is the BASE
+*  picture, change the Current Frame to NDC for clarity.
+         IF( AST_GETC( IPLOT, 'DOMAIN', STATUS ) .EQ. 'CURNDC' ) THEN
+            CALL AGI_ISAMP( IPICB, SAME, STATUS ) 
+            IF( SAME ) THEN
+               CALL KPG1_ASFFR( IPLOT, 'NDC', IFRM, STATUS )
                IF( IFRM .NE. AST__NOFRAME ) THEN
                   CALL AST_SETI( IPLOT, 'CURRENT', IFRM, STATUS )
                END IF
