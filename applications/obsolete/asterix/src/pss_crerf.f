@@ -1,5 +1,5 @@
 *+  PSS_CRERF - Create a results file field
-      SUBROUTINE PSS_CRERF( SLOC, FLD, TYPE, UNITS, PTR, STATUS )
+      SUBROUTINE PSS_CRERF( SID, FLD, TYPE, UNITS, PTR, STATUS )
 *
 *    Description :
 *
@@ -18,7 +18,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -26,10 +25,10 @@
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC)   SLOC                    ! Results file
-      CHARACTER*(*)            FLD                     ! Field name
-      CHARACTER*(*)            TYPE                    ! Field type
-      CHARACTER*(*)            UNITS                   ! Field units
+      INTEGER			SID			! Results file id
+      CHARACTER*(*)             FLD                     ! Field name
+      CHARACTER*(*)             TYPE                    ! Field type
+      CHARACTER*(*)             UNITS                   ! Field units
 *
 *    Export :
 *
@@ -40,17 +39,17 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Create field
-        CALL SSO_CREFLD( SLOC, FLD, TYPE, STATUS )
+        CALL SSI_CREFLD( SID, FLD, TYPE, STATUS )
 
 *      Map it
-        CALL SSO_MAPFLD( SLOC, FLD, TYPE, 'WRITE', PTR, STATUS )
+        CALL SSI_MAPFLD( SID, FLD, TYPE, 'WRITE', PTR, STATUS )
 
 *      Write null error value
-        CALL SSO_PUTFITEM0R( SLOC, FLD, 'NULLVALUE', -1.0, STATUS )
+        CALL SSI_PUTFITEM0R( SID, FLD, 'NULLVALUE', -1.0, STATUS )
 
 *      Write units if given
         IF ( UNITS .GT. ' ' ) THEN
-          CALL SSO_PUTFITEM0C( SLOC, FLD, 'UNITS', 40, UNITS, STATUS )
+          CALL SSI_PUTFITEM0C( SID, FLD, 'UNITS', 40, UNITS, STATUS )
         END IF
 
       END IF
