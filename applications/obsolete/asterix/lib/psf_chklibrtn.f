@@ -1,5 +1,5 @@
 *+  PSF_CHKLIBRTN - Check that named library and routine exist
-      SUBROUTINE PSF_CHKLIBRTN( LIB, ROUT, LID, RID, STATUS )
+      SUBROUTINE PSF_CHKLIBRTN( ROUT, TAG, STATUS )
 *
 *    Description :
 *
@@ -29,7 +29,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :
@@ -38,11 +37,11 @@
 *
 *    Import :
 *
-      CHARACTER*(*)          LIB,ROUT             ! Library/routine names
+      CHARACTER*(*)          	ROUT             	! Routine names
 *
 *    Export :
 *
-      INTEGER                LID, RID             ! Library/routine codes
+      CHARACTER*(*)		TAG			! Full name
 *
 *    Status :
 *
@@ -50,81 +49,49 @@
 *
 *    Functions :
 *
-      LOGICAL                STR_ABBREV
+      LOGICAL                	STR_ABBREV
 *
 *    Local variables :
 *
-      INTEGER                ILIB                  ! Loop over libraries
-      INTEGER                IMOD                  ! Loop over library modules
-      INTEGER                LIB1, LIB2            ! Libraries to search
-      INTEGER                NMATCH                ! # matches to lib name
+      INTEGER                   ICMP                    ! Loop over list
+      INTEGER                   NPSF                    ! # psfs
+      INTEGER                   PID                     ! A particular psf
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialised?
-      IF ( .NOT. PSFLIBINIT ) CALL PSF_LINIT( STATUS )
+*  Initialised?
+      IF ( .NOT. PSF_INIT ) CALL PSF_INIT( STATUS )
 
-      LID = 0
-      RID = 0
+*  Find number of psfs
+      CALL ADI_NCMP( P_PLIST, NPSF, STATUS )
 
-*    Look for library name
-      IF ( LIB .GT. ' ' ) THEN
-        NMATCH = 0
-        DO ILIB = 1, L_NLIB
-          IF ( STR_ABBREV(L_NAME(ILIB),LIB) ) THEN
-            LIB1 = ILIB
-            LIB2 = ILIB
-            NMATCH = NMATCH + 1
-          END IF
-        END DO
+*  Scan list for a match
+      FOUND = .FALSE.
+      ICMP = 1
+      DO WHILE ( (ICMP.LE.NPSF) .AND. .NOT. FOUND )
 
-*      No library found?
-        IF ( NMATCH .EQ. 0 ) THEN
-          CALL MSG_SETC( 'LIB', LIB )
-          STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'No such library ^LIB', STATUS )
+*    Index it
+        CALL ADI_INDCMP( P_PLIST, ICMP, PID, STATUS )
+        CALL ADI_NAME( PID, TAG, STATUS )
+        CALL ADI_ERASE( PID, STATUS )
 
-*      Check for ambiguous definition
-        ELSE IF ( NMATCH .GT. 1 ) THEN
-          STATUS = SAI__ERROR
-          CALL MSG_PRNT( ' ',
-     :      'WARNING : Ambiguous library specification', STATUS )
-
+*    Match?
+        IF ( STR_ABBREV( TAG, ROUT ) ) THEN
+          FOUND = .FALSE.
+        ELSE
+          ICMP = ICMP + 1
         END IF
 
-      ELSE
-        LIB1 = 1
-        LIB2 = L_NLIB
+      END DO
 
+*  Report error
+      IF ( .NOT. FOUND ) THEN
+        STATUS = SAI__ERROR
+        CALL MSF_SETC( 'P', ROUT )
+        CALL ERR_REP( ' ', 'Psf /^P/ not found in PSF_CHKLIBRTN',
+     :                STATUS )
       END IF
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*    Search for routine
-      DO ILIB = LIB1, LIB2
-        DO IMOD = 1, L_NMOD(ILIB)
-          IF ( STR_ABBREV(L_MODN(IMOD,ILIB),ROUT) ) THEN
-            RID = IMOD
-            LID = ILIB
-            GOTO 99
-          END IF
-        END DO
-      END DO
-      DO ILIB = LIB1, LIB2
-        DO IMOD = 1, L_NMOD(ILIB)
-          IF ( STR_ABBREV('PSF_'//L_MODN(IMOD,ILIB),ROUT) ) THEN
-            RID = IMOD
-            LID = ILIB
-            GOTO 99
-          END IF
-        END DO
-      END DO
-
-*    Report error
-      STATUS = SAI__ERROR
-      CALL ERR_REP( ' ', 'Psf not found in PSF_CHKLIBRTN', STATUS )
-
- 99   CONTINUE
 
       END
