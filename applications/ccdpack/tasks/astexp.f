@@ -173,6 +173,8 @@
 *        the name that the frames will have in the AST file, and 
 *        consequently the name by which they will be known when the
 *        WCS information is imported into other NDFs using ASTIMP.
+*
+*        The name is converted to upper case, and whitespace is removed.
 *        [CCD_EXPORT]
 
 *  Examples:
@@ -376,8 +378,10 @@
       END IF
 
 *  Get the AST domain name for the Current frame of each frameset when
-*  written.
+*  written.  Spaces are removed and it is converted to upper case since
+*  this is how the AST system will treat it.
       CALL PAR_GET0C( 'OUTDOMAIN', OUTDOM, STATUS )
+      CALL CHR_RMBLK( OUTDOM )
       CALL CHR_UCASE( OUTDOM )
 
 *  Get the type of ID value which will be used to distinguish different
