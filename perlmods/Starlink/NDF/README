@@ -1,5 +1,5 @@
 
-This is version 1.50 of the perl NDF module
+This is version 1.42 of the perl NDF module
 -------------------------------------------
 
 The extensible N-dimensional data format (NDF) is a format for storing
@@ -21,15 +21,14 @@ This module provides a perl interface to the Fortran NDF libraries
 that are supplied with the standard Starlink software distribution.
 
 		Tim Jenness (t.jenness@jach.hawaii.edu)
-                      27th May 1998
+                      12 July 2000
 
 PDL
 ---
 
-A module is provided for reading and writing NDF files via
-the perl data language (PDL). The module is called PDL::IO::NDF
-and can manipulate data from NDF files whilst keeping 
-any NDF extensions intact.
+The Perl Data Language (PDL) distribution provides a module that can be
+used to read NDF files into it. That module (PDL::IO::NDF) requires this
+module to be installed.
 
 The PDL module requires at least v1.99 of perldl.
 The PDL home page can be found at http://pdl.perl.org/
@@ -37,8 +36,9 @@ The PDL home page can be found at http://pdl.perl.org/
 Copyright
 ---------
 
-This module is copyright (C) 1996-1998 Tim Jenness.  All rights reserved.
-This program is free software; you can redistribute it and/or
+This module is copyright (C) 1996-2000 Tim Jenness, Frossie Economou and
+the UK Particle Physics and Astronomy Research Council. All rights
+reserved.  This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-The NDF module itself is copyrighted by the Starlink Project, CLRC.
+The NDF library itself is copyrighted by the Starlink Project, CLRC.
