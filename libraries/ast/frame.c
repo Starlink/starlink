@@ -6077,12 +6077,13 @@ f     This routine
 *     sets the current value of the ActiveUnit flag for a Frame, which 
 *     controls how the Frame
 c     behaves when it is used (by astFindFrame) as a template to match
+c     another (target) Frame, or is used as the "to" Frame by astConvert.
 f     behaves when it is used (by AST_FINDFRAME) as a template to match
-*     another (target) Frame. It determines if the Mapping between the 
-*     template and target Frames should take differences in axis units
-c     into account. The default value is zero, which preserves the
-f     into account. The default value is .FALSE., which preserves the
-*     behaviour of older versions of AST.
+f     another (target) Frame, or is used as the TO Frame by AST_CONVERT.
+*     It determines if the Mapping between the template and target Frames 
+*     should take differences in axis units into account. The default value 
+*     for simple Frames is zero, which preserves the behaviour of versions 
+*     of AST prior to version 2.0.
 *
 c     If the ActiveUnit flag of the template Frame is zero, then the
 f     If the ActiveUnit flag of the template Frame is .FALSE., then the

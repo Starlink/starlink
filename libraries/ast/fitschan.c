@@ -88,6 +88,10 @@ f     encodings), then write operations using AST_WRITE will
 *     encoding. Otherwise (e.g. the NATIVE encoding), multiple Object
 *     descriptions are written sequentially and may later be read
 *     back in the same sequence.
+*
+*     Note, currently the FitsChan class does not recognise spectral axes. 
+*     They are treated as an ``unknown'' axis type, and are represented by 
+*     a simple 1-dimensional Frame (not a SpecFrame).
 
 *  Inheritance:
 *     The FitsChan class inherits from the Channel class.
