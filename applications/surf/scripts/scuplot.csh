@@ -26,6 +26,16 @@ else
   exit
 endif
 
+# Check for the new kappa
+if (-e $KAPPA_DIR/style.def) then
+  set newkappa = 1
+  # Store the original style before we mangle it
+  set old_style = `${kap}/parget style linplot`
+else
+  set newkappa = 0
+endif
+
+
 
 set prog = `echo $0 | awk -F\/ '{print $NF}' | tr '[A-Z]' '[a-z]'`
 set mode = `echo $prog | cut -c1`
@@ -98,7 +108,7 @@ while ( "$mode" != "d" && "$mode" != "D" && "$mode" != "P" && "$mode" != "R" && 
   echo "INVALID MODE: '$mode'. Allowed modes p(ltbol), d(spbol), r(linplot)."
   echo -n "Mode (p/d/r) > "
   set mode = $<
-  set mode = `echo $mode | cut -c1 | tr '[a-z]' '[A-Z]'`
+  set mode = `echo $mode | cut -c1 | tr '[A-Z]' '[a-z]'`
 end
 
 if ( "$mode" == "d" ) then
@@ -184,6 +194,14 @@ if !(-e "${sdf}.sdf") then
   exit
 endif
 
+# Now if we are using the new kappa we need to set the WCS of the
+# input frame to PIXEL
+if ($newkappa == 1) then
+  $kap/wcsframe ${sdf} pixel
+  #$kap/wcsattrib ${sdf} set 'label(2)' 'sample'
+  #$kap/wcsattrib ${sdf} set 'unit(2)' "' '"
+endif
+
 # ----------------------------------------------------------------------
 # Photometry?
 #
@@ -261,14 +279,30 @@ while (${iset} < ${nsets})
                      absaxs=2 ylimit=\[${ymn},${ymx}\] "lnindx=${bolset}"
     endif
   else
-     ${kap}/linplot mode=line lincol=red device=xwindows \
-           $sdf'('${bol}','${plim}')' axlim 'ordlim=['$ymn','$ymx']' \
-           'abslim=\!' cosys=world 'pltitl="'${sdf}: bolometer ${bol}'"' \
-           >& /dev/null
-    if ( "$ddf" != "" ) then
-      ${kap}/linplot mode=line noclear lincol=green device=xwindows \
-           $ddf'('${bol}',)' axlim 'ordlim=['$mn','$mx']' 'abslim=\!' \
-           'pltitl="'${sdf}: bolometer ${bol}'"' cosys=world >& /dev/null
+    if ($newkappa == 0) then
+        ${kap}/linplot mode=line lincol=red device=xwindows \
+             $sdf'('${bol}','${plim}')' axlim 'ordlim=['$ymn','$ymx']' \
+            'abslim=\!' cosys=world 'pltitl="'${sdf}: bolometer ${bol}'"' \
+            >& /dev/null
+      if ( "$ddf" != "" ) then
+        ${kap}/linplot mode=line noclear lincol=green device=xwindows \
+             $ddf'('${bol}',)' axlim 'ordlim=['$mn','$mx']' 'abslim=\!' \
+             'pltitl="'${sdf}: bolometer ${bol}'"' cosys=world >& /dev/null
+      endif
+    else
+        ${kap}/linplot mode=line device=xwindows $sdf'('${bol}','${plim}')' \
+             ytop=$ymx ybot=$ymn \
+             style="'colour(Lines)=red,title="${sdf}: bolometer ${bol}" '" \
+             >& /dev/null
+
+      if ( "$ddf" != "" ) then
+        ${kap}/linplot mode=line device=xwindows $ddf'('${bol}',)' \
+             noclear ytop=$mx ybot=$mn \
+             style="'colour(Lines)=green,title="${sdf}: bolometer ${bol}"'" \
+             >& /dev/null
+      endif
+
+
     endif
   endif
 
@@ -334,8 +368,14 @@ while (${iset} < ${nsets})
     set pmx = `echo $limits | awk -F" " '{print $NF}'`
     if ( "$pmn" == "" || "$pmx" == "x" ) then
        echo "Cursor: Left button: New plot center; Right button: Accept"
-       ${kap}/cursor >& /dev/null
-       set pmn = `${kap}/parget xc cursor`
+
+       if ($newkappa == 0) then
+         ${kap}/cursor >& /dev/null
+         set pmn = `${kap}/parget xc cursor`
+       else
+         ${kap}/cursor >& /dev/null
+         set pmn = `${kap}/parget lastpos cursor | awk '{print $1}'`
+       endif
        set pmx = `echo "$pmn + 0.5" | bc | cut -d"." -f1`
        set pmn = $pmx
     endif
@@ -389,18 +429,31 @@ while (${iset} < ${nsets})
     set point = `echo "$point" | sed s/"-"/":"/g | sed s/" "/":"/g `
     if ( "$point" == "p" || "$point" == "p " ) then
        echo "Cursor: Left button: Bad channel; Right button: Accept"
-       ${kap}/cursor >& /dev/null
-       set point = `${kap}/parget xc cursor`
+
+       if ($newkappa == 0) then
+         ${kap}/cursor >& /dev/null
+         set point = `${kap}/parget xc cursor`
+       else
+         ${kap}/cursor frame=pixel >& /dev/null
+         set point =  `${kap}/parget lastpos cursor | awk '{print $1}'`
+       endif
        set point = `echo "$point + 0.5" | bc | cut -d"." -f1`
        set point = "p${point}"
     endif
     echo " Flagging quality $point BAD"
     ${sur}/change_quality "'${sdf}{b${bol};${point}}'" yes  > /dev/null
 
-    ${kap}/linplot mode=line noclear lincol=green device=xwindows \
-          $sdf'('${bol}','${plim}')' axlim 'ordlim=['$ymn','$ymx']' \
-          'abslim=\!' cosys=world 'pltitl="'${sdf}: bolometer ${bol}'"' \
-          >& /dev/null
+    if ($newkappa == 0) then
+      ${kap}/linplot mode=line noclear lincol=green device=xwindows \
+            $sdf'('${bol}','${plim}')' axlim 'ordlim=['$ymn','$ymx']' \
+            'abslim=\!' cosys=world 'pltitl="'${sdf}: bolometer ${bol}'"' \
+            >& /dev/null
+    else
+      ${kap}/linplot mode=line noclear device=xwindows \
+            $sdf'('${bol}','${plim}')' ytop=$ymx ybot=$ymn \
+	    style="'Colour(lines)=green,title="${sdf}: bolometer ${bol}" '" \
+            >& /dev/null
+    endif
 
     echo -n " Accept [y]/n > "
     set accept = $<
@@ -424,6 +477,11 @@ end
 # ----------------------------------------------------------------------
 
 END_ALL:
+
+# Reset the LINPLOT style
+if ($newkappa == 1) then
+  ${kap}/linplot device=! ndf=! style=$old_style > /dev/null
+endif
 
 echo " "
 exit
@@ -680,6 +738,9 @@ exit
 *
 *  History:
 *     $Log$
+*     Revision 1.5  1998/12/10 20:13:07  timj
+*     Make V0.13 KAPPA compliant
+*
 *     Revision 1.4  1998/12/09 03:18:27  timj
 *     Add '/' between task name and directory name.
 *
