@@ -1085,7 +1085,7 @@
           CALL NBS_FIND_ITEM(I_NBID,BNAME,BID,STATUS)
 
           JCOL=ICOL
-          DO WHILE (JCOL.EQ.ICOL)
+          DO WHILE (ICOL.EQ.JCOL.AND.FLAG.EQ.0)
 
             CJ=CI
 
@@ -1122,11 +1122,10 @@
 
 *  see if colour has changed
             CALL NBS_GET_VALUE(CID,0,VAL__NBI,ICOL,NB,STATUS)
+*  see if GUI is still sending data
+            CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
 
           ENDDO
-
-*  see if GUI is still sending data
-          CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
 
         ENDDO
 
