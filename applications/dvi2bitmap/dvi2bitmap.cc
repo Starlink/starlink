@@ -212,7 +212,7 @@ int main (int argc, char **argv)
 			  case 'd': // debug DVI file
 			    DviFile::verbosity(debuglevel);
 			    break;
-			  case 'p': // debug PK file
+			  case 'p': // debug PK file (and kpathsea)
 			    PkFont::verbosity(debuglevel);
 			    break;
 			  case 'r': // debug rasterdata parsing

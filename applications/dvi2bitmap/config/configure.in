@@ -163,10 +163,18 @@ fi
 
 dnl   Specify support for PNG output.  We need a PNG library which has
 dnl   the function png_set_write_user_transform_fn (which means later
-dnl   than version 0.96)
+dnl   than version 0.96).  Test this by default (ie, unless the
+dnl   option --disable-png is given).
 AC_SUBST(PNGOBJ)
 AC_ARG_ENABLE(png,
 [  --enable-png            Enable output of PNG files],
+  test "$enableval" = "yes" && AC_CHECK_HEADER(png.h,
+    AC_CHECK_LIB(png, png_set_write_user_transform_fn,
+        AC_DEFINE(ENABLE_PNG)
+        PNGOBJ="PNGBitmap.o"
+        LIBS="$LIBS -lpng -lz",
+      echo "png library not found or too old -- not including PNG support",
+      -lz)),
   AC_CHECK_HEADER(png.h,
     AC_CHECK_LIB(png, png_set_write_user_transform_fn,
         AC_DEFINE(ENABLE_PNG)

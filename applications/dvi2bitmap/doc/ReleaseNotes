@@ -1,3 +1,29 @@
+<subsect id=rn-0.9 export>Release 0.9
+
+<p>No big changes, but a sufficiently significant change in the
+functionality to require a new minor version, rather than just a new
+release number.
+<ul>
+<li>The <code/-Q> options (see <ref id=usage.options.q/>) now write
+their output lines (to stdout) 
+prefixed by the option letters, so that the output of <code/-Qf> now
+consists of lines starting `<code/Qf >'.  This makes it easier to
+disentangle the output if several of these options are present -- it
+was added when option <code/-Qb> was added -- but means that any
+scripts parsing the previous version's output would break.
+
+<li>Options <code/-Rf> and <code/-Rb> added (see <ref
+id=usage.options.r/>), to set the foreground and 
+background colours on the command line, rather than just using the
+<ref id=usage.special.fg>foreground special</ref>
+
+<li>Some improvements to the PNG output, so that when transparent PNGs
+are viewed against their `natural' background, they look the same as
+the same image without transparency (ie, I fixed the relationship of
+the output palette and the alpha channel in this case).
+
+</ul>
+
 <subsect id=rn-0.8 export>Release 0.8
 
 <p>Added support for palettised PNG output.  This was intended to
