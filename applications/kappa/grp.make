@@ -407,7 +407,7 @@ kps1_lplfs.f kps1_lpllm.f kps1_lplnm.f kps1_lshcp.f kps1_lshct.f \
 kps1_lshfm.f kps1_lshpl.f kps1_prflt.f kps1_prfmk.f kps1_prfsm.f \
 kps1_wala0.f kps1_wala3.f kps1_wala4.f kps1_wala5.f kps1_wala6.f \
 kps1_cpbd.f kps1_cpbr.f kps1_cpbi.f kps1_cpbw.f kps1_cpbb.f kps1_cpbuw.f \
-kps1_cpbub.f 
+kps1_cpbub.f kps1_curfm.f
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = contour.f contover.f crelut.f cursor.f drawsig.f display.f \
