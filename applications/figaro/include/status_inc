@@ -1,0 +1,72 @@
+*+
+* Include file defining the size of the fit control parameter arrays.
+* These arrays pass the fit model etc. between the various fitting
+* routines.
+* The meanings of the elements are:
+*   FIT_MODEL  - Model, e.g. Gaussian
+*   FIT_TYPE   - Type of fit
+*   FIT_NCMP   - Number of components
+*   FIT_OPT    - Optimisation method
+*   FIT_STAT   - Success status
+*   FIT_ABS    - If aborption or emission
+*   FIT_GUES   - Guessing method
+*   FIT_WEIGH  - Weighting method
+*   FIT_CONSTR - Constraints
+*   FIT_STST   - Statistical test to apply (if any)
+*   FIT_DYNWEI - Dynamic weight flag
+*   BACK_MODEL - Model for background
+*   BACK_ORDER - Order for model (if polynomial etc.)
+*   BACK_WEIGH - Weighting method
+*   BACK_OPT   -
+*   BACK_LOCAL -
+*   BACK_STAT  -
+*   BACK_REMOV - Removal method
+*-
+      integer MAX_PROFILE_CONTROL,MAX_BACK_CONTROL,MAX_CONTROL
+      integer MAX_DECODE_CONTROL
+
+* Sizes of arrays for decoded status, for profile and back. Maximum
+* acceptable length of each element of control (i.e. of status when
+* encoded
+
+      parameter (MAX_PROFILE_CONTROL = 13,
+     :           MAX_BACK_CONTROL    = 7,
+     :           MAX_DECODE_CONTROL  = MAX_BACK_CONTROL
+     :                                      + MAX_PROFILE_CONTROL,
+     :           MAX_CONTROL         = 3)
+      integer deccntr(MAX_DECODE_CONTROL)
+
+* Positions of elements in decoded arrays
+
+      integer FIT_MODEL, FIT_TYPE, FIT_NCMP, FIT_OPT, FIT_STAT, FIT_ABS
+      integer FIT_GUES, FIT_WEIGH, FIT_CONSTR, FIT_STST, FIT_MAN
+      integer FIT_DYNWEI, FIT_GROUP
+      integer BACK_MODEL, BACK_ORDER, BACK_WEIGH,BACK_OPT, BACK_LOCAL
+      integer BACK_STAT, BACK_REMOV
+      parameter (FIT_ABS = 1,
+     :           FIT_MODEL = 2,
+     :           FIT_TYPE = 3,
+     :           FIT_NCMP = 4,
+     :           FIT_WEIGH = 5,
+     :           FIT_STAT = 6,
+     :           FIT_MAN = 7,
+     :           FIT_GUES = 8,
+     :           FIT_OPT = 9,
+     :           FIT_STST = 10,
+     :           FIT_CONSTR = 11,
+     :           FIT_DYNWEI = 12,
+     :           FIT_GROUP = 13,
+     :           BACK_REMOV = 1 + MAX_PROFILE_CONTROL,
+     :           BACK_ORDER = 2 + MAX_PROFILE_CONTROL,
+     :           BACK_WEIGH = 3 + MAX_PROFILE_CONTROL,
+     :           BACK_MODEL = 4 + MAX_PROFILE_CONTROL,
+     :           BACK_OPT = 5 + MAX_PROFILE_CONTROL,
+     :           BACK_LOCAL = 6 + MAX_PROFILE_CONTROL,
+     :           BACK_STAT = 7 + MAX_PROFILE_CONTROL)
+                
+* Default model-loaded at program start-up, but user-changeable
+
+      integer default_model(MAX_DECODE_CONTROL)
+      integer opt_routines(3)
+      common/default_model_cmn/default_model,opt_routines
+      save/default_model_cmn/
