@@ -24,7 +24,9 @@
 *     AST_PLOT
 *     AST_POLYCURVE
 *     AST_TEXT   
-*     AST_SETGRFFUN
+*     AST_GRFSET
+*     AST_GRFPUSH
+*     AST_GRFPOP
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -48,7 +50,8 @@
 *        Change argument "in" for astMark and astPolyCurve from type
 *        "const double (*)[]" to "const double *".
 *     13-JUN-2001 (DSB):
-*        Modified to add support for astSetGrfFun and EXTERNAL grf functions.
+*        Modified to add support for astGrfSet, astGrfPop, astGrfPush and 
+*        EXTERNAL grf functions.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -258,7 +261,23 @@ F77_SUBROUTINE(ast_text)( INTEGER(THIS),
    )
 }
 
-F77_SUBROUTINE(ast_setgrffun)( INTEGER(THIS), CHARACTER(NAME), 
+F77_SUBROUTINE(ast_grfpush)( INTEGER(THIS), INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   astAt( "AST_GRFPUSH", NULL, 0 );
+   astWatchSTATUS(
+      astGrfPush( astI2P( *THIS ) );
+   )
+}
+
+F77_SUBROUTINE(ast_grfpop)( INTEGER(THIS), INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   astAt( "AST_GRFPOP", NULL, 0 );
+   astWatchSTATUS(
+      astGrfPop( astI2P( *THIS ) );
+   )
+}
+
+F77_SUBROUTINE(ast_grfset)( INTEGER(THIS), CHARACTER(NAME), 
                                AstGrfFun FUN, INTEGER(STATUS)
                                TRAIL(NAME) ) {
    GENPTR_INTEGER(THIS)
@@ -270,7 +289,7 @@ F77_SUBROUTINE(ast_setgrffun)( INTEGER(THIS), CHARACTER(NAME),
    int ifun;               /* Index into grf function list */
    AstGrfWrap wrapper;     /* Wrapper function for C Grf routine*/
 
-   method = "AST_SETGRFFUN";
+   method = "AST_GRFSET";
    class = "Plot";
 
    astAt( method, NULL, 0 );
@@ -284,7 +303,7 @@ F77_SUBROUTINE(ast_setgrffun)( INTEGER(THIS), CHARACTER(NAME),
       }
 
       name = astString( NAME, NAME_length );
-      astSetGrfFun( astI2P( *THIS ), name, fun );
+      astGrfSet( astI2P( *THIS ), name, fun );
 
       ifun = astGrfFunID( name, method, class );
 

@@ -140,7 +140,7 @@ f        attributes for both axes, AST_TEST tests the attribute for axis 1,
 f        and AST_GET gets the value for axis 1.
 *     Grf (int)
 *        This attribute, if non-zero, indicates that the graphics
-*        functions registered using astSetGrfFun are to be used to draw 
+*        functions registered using astGrfSet are to be used to draw 
 *        graphics. Otherwise, the graphics interface selected at
 *        link-time (using ast_link options) is used.
 *     Grid (int)
@@ -519,7 +519,7 @@ f     - Strings: Text strings drawn using AST_TEXT
 *        Change argument "in" for astMark and astPolyCurve from type
 *        "const double (*)[]" to "const double *".
 *     13-JUN-2001 (DSB):
-*        Added function astSetGrfFun, and attribute Grf.
+*        Added methods astGrfSet, astGrfPop, astGrfPush and attribute Grf.
 *-
 */
 
@@ -535,8 +535,7 @@ f     - Strings: Text strings drawn using AST_TEXT
 
 /* Macros. */
 /* ======= */
-#define AST__NPID           10 /* No. of different plot object id's */
-
+#define AST__NPID      10   /* No. of different plot object id's */
 
 #define AST__GATTR	0   /* Identifiers for GRF functions */
 #define AST__GFLUSH	1
@@ -545,8 +544,10 @@ f     - Strings: Text strings drawn using AST_TEXT
 #define AST__GTEXT	4
 #define AST__GTXEXT	5
 
-#if defined(astCLASS)          /* Protected */
-#define AST__MXBRK         100 /* Max. no. of breaks in a drawn curve */
+#define AST__NGRFFUN    6   /* No. of Grf functions used by Plot */
+
+#if defined(astCLASS)       /* Protected */
+#define AST__MXBRK     100  /* Max. no. of breaks in a drawn curve */
 #endif
 
 /* Type Definitions */
@@ -559,7 +560,7 @@ struct AstPlot;
 /* Interfaces for GRF functions */
 /* ---------------------------- */
 /* A general interface into which actual Grf functions should be cast 
-   before being passed as an argument to astSetGrfFun. */
+   before being passed as an argument to astGrfSet. */
 typedef void (* AstGrfFun)();              
 
 /* Interfaces for specific Grf funstions implemented in C (other languages
@@ -582,6 +583,18 @@ typedef int (* AstGLineWrap)( struct AstPlot *, int, const float *, const float 
 typedef int (* AstGMarkWrap)( struct AstPlot *, int, const float *, const float *, int );
 typedef int (* AstGTextWrap)( struct AstPlot *, const char *, float, float, const char *, float, float );
 typedef int (* AstGTxExtWrap)( struct AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
+
+/* A structure in which a collection of Grf function pointers can be
+   stored. */
+typedef struct AstGrfPtrs {
+   AstGrfFun grffun[AST__NGRFFUN];
+   AstGAttrWrap GAttr;
+   AstGFlushWrap GFlush;
+   AstGLineWrap GLine;
+   AstGMarkWrap GMark;
+   AstGTextWrap GText;
+   AstGTxExtWrap GTxExt;
+} AstGrfPtrs;
 
 /* Plot structure. */
 /* ------------------- */
@@ -644,13 +657,15 @@ typedef struct AstPlot {
    int xrev;
    int yrev;      
    int ink;
-   AstGrfFun grffun[6];
+   AstGrfFun grffun[AST__NGRFFUN];
    AstGAttrWrap GAttr;
    AstGFlushWrap GFlush;
    AstGLineWrap GLine;
    AstGMarkWrap GMark;
    AstGTextWrap GText;
    AstGTxExtWrap GTxExt;
+   AstGrfPtrs *grfstack;
+   int grfnstack;
 
 } AstPlot;
 
@@ -675,7 +690,9 @@ typedef struct AstPlotVtab {
    void (* GridLine)( AstPlot *, int, const double [], double );
    void (* Curve)( AstPlot *, const double [], const double [] );
    void (* PolyCurve)( AstPlot *, int, int, int, const double * );
-   void (* SetGrfFun)( AstPlot *, const char *, AstGrfFun );
+   void (* GrfSet)( AstPlot *, const char *, AstGrfFun );
+   void (* GrfPush)( AstPlot * );
+   void (* GrfPop)( AstPlot * );
    void (* GrfWrapper)( AstPlot *, const char *, AstGrfWrap );
    void (* Grid)( AstPlot * ); 
    void (* Mark)( AstPlot *, int, int, int, const double *, int  ); 
@@ -836,7 +853,9 @@ AstPlot *astLoadPlot_( void *, size_t, int, AstPlotVtab *,
    void astCurve_( AstPlot *, const double [], const double [] );
    void astGrid_( AstPlot * );
    void astMark_( AstPlot *, int, int, int, const double *, int  ); 
-   void astSetGrfFun_( AstPlot *, const char *, AstGrfFun );
+   void astGrfSet_( AstPlot *, const char *, AstGrfFun );
+   void astGrfPush_( AstPlot * );
+   void astGrfPop_( AstPlot * );
    void astPolyCurve_( AstPlot *, int, int, int, const double * );
    void astText_( AstPlot *, const char *, const double [], const float [2], const char * );
 
@@ -1063,8 +1082,14 @@ astINVOKE(V,astCurve_(astCheckPlot(this),start,finish))
 #define astPolyCurve(this,npoint,ncoord,dim,in) \
 astINVOKE(V,astPolyCurve_(astCheckPlot(this),npoint,ncoord,dim,in))
 
-#define astSetGrfFun(this,name,fun) \
-astINVOKE(V,astSetGrfFun_(astCheckPlot(this),name,fun))
+#define astGrfSet(this,name,fun) \
+astINVOKE(V,astGrfSet_(astCheckPlot(this),name,fun))
+
+#define astGrfPush(this) \
+astINVOKE(V,astGrfPush_(astCheckPlot(this)))
+
+#define astGrfPop(this) \
+astINVOKE(V,astGrfPop_(astCheckPlot(this)))
 
 
 #define astGrfFunID astGrfFunID_
