@@ -118,6 +118,9 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.12  1997/11/04 23:21:12  timj
+*     Add support for LOCAL_COORDS and MAP_X/Y
+*
 *     Revision 1.11  1997/10/21 19:30:06  timj
 *     Read BADBITS mask
 *
@@ -275,6 +278,7 @@
       INTEGER          LAST_MEAS       ! measurement during which abort
                                        ! occurred
       INTEGER          LBND(MAX_DIM)   ! Lower bounds of NDF section
+      CHARACTER*(15)   LOCAL_COORDS    ! Coordinate system of MAP_X and MAP_Y
       REAL             MAP_X           ! x offset of map centre from telescope
                                        ! centre (radians)
       REAL             MAP_Y           ! y offset of map centre from telescope
@@ -605,6 +609,21 @@
      :     'MAP_Y', MAP_Y, STATUS)
       MAP_Y = MAP_Y / REAL (R2AS)
 
+*     and the coordinate frame of these offsets
+*     not sure whether old files have this parameter so test for status
+*     If it is not available then assume it is CENTRE_COORDS
+
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_GET_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'LOCL_CRD', LOCAL_COORDS, STATUS)
+
+         IF (STATUS .NE. SAI__OK) THEN
+            CALL ERR_ANNUL(STATUS)
+            LOCAL_COORDS = IN_CENTRE_COORDS
+         END IF
+      END IF
+
+
 *     the UT of the observation expressed as modified Julian day
 
       CALL SCULIB_GET_MJD(N_FITS, FITS, IN_UT1, RTEMP, STATUS)
@@ -823,9 +842,15 @@
       END IF
 
 *     calculate the apparent RA and Dec of the map centre at IN_UT1
+*     Cannot add MAP_X and MAP_Y here since 
+*       1. This routine does not support LOCAL_COORDS
+*       2. The tracking centre moves if LOCAL_COORDS is AZ for 
+*          a fixed RA,Dec centre.
+*     The reference centre will always be the map centre and not the
+*     offset map centre.
 
       CALL SCULIB_CALC_APPARENT (IN_LONG_RAD, IN_LAT_RAD,
-     :     IN_LONG2_RAD, IN_LAT2_RAD, DBLE(MAP_X), DBLE(MAP_Y), 
+     :     IN_LONG2_RAD, IN_LAT2_RAD, 0.0D0, 0.0D0, 
      :     IN_CENTRE_COORDS, %VAL(IN_LST_STRT_PTR), IN_UT1,
      :     IN_MJD1, IN_MJD2, IN_RA_CEN, IN_DEC_CEN, IN_ROTATION,
      :     STATUS)
@@ -959,6 +984,7 @@
      :        %VAL(IN_DEC1_PTR), %VAL(IN_DEC2_PTR), MJD_STANDARD,
      :        IN_UT1, IN_MJD1, IN_LONG_RAD, IN_LAT_RAD, IN_MJD2, 
      :        IN_LONG2_RAD, IN_LAT2_RAD,
+     :        LOCAL_COORDS, DBLE(MAP_X), DBLE(MAP_Y),
      :        N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
      :        SCUBA__NUM_CHAN, SCUBA__NUM_ADC, BOL_ADC, BOL_CHAN,
      :        BOL_DU3, BOL_DU4, SCAN_REVERSAL, 0.0, 0.0, 0.0, 0.0,
