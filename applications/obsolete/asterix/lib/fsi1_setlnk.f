@@ -99,6 +99,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*(DAT__SZLOC)	CLOC			! Component locator
       CHARACTER*(DAT__SZLOC)	LOC			! Dataset locator
       CHARACTER*(DAT__SZTYP)	TYP			! Dataset type
 
