@@ -156,6 +156,7 @@
       CHARACTER*( 10 ) SLPST     ! String form of slope of baseline
       INTEGER SLPLN              ! Used length of SLPST
       INTEGER UNITLN             ! Used length of UNITS
+      CHARACTER*(80) TEMPSTR     ! Temporary string
 
 *.
 
@@ -181,14 +182,17 @@
 * **************************************************************************
       CALL MSG_BLANK( STATUS )
       IF ( SRCN .EQ. 1 ) THEN 
+         CALL MSG_SETC('DETST',DETST(:DETLN))
          CALL MSG_OUT( 'POINB2_MSG1', ' A single '/
      :                /' point source is detected in the trace'/
-     :                /' of the detector '//DETST( : DETLN ), 
+     :                /' of the detector ^DETST',
      :                STATUS )
       ELSE 
-         CALL MSG_OUT( 'POINB2_MSG1', SRCNST( : SRCNLN )/
+         CALL MSG_SETC('DETST',DETST(:DETLN))
+         CALL MSG_SETC('SRCNST',SRCNST(:SRCNLN))
+         CALL MSG_OUT( 'POINB2_MSG1', '^SRCNST'/
      :                /' point sources have been found in the trace'/
-     :                 /' of the detector '//DETST( : DETLN ), STATUS )
+     :                 /' of the detector ^DETST', STATUS )
       END IF
       IF ( LOGREQ ) THEN
          CALL FIO_WRITE( LOGFID, ' ', STATUS )
@@ -214,8 +218,8 @@
 
 *  Write source number heading
          CALL MSG_BLANK( STATUS )
-         CALL MSG_OUT( 'POINB2_MSG2', '  SOURCE '//ISRCST( : ISRCLN )/
-     :                  /':',STATUS )
+         CALL MSG_SETC('ISRCST',ISRCST(:ISRCLN))
+         CALL MSG_OUT( 'POINB2_MSG2', '  SOURCE ^ISRCST:',STATUS)
          IF ( LOGREQ ) THEN
             CALL FIO_WRITE( LOGFID, ' ', STATUS )
             CALL FIO_WRITE( LOGFID, '   SOURCE '//ISRCST( : ISRCLN )/
@@ -238,9 +242,11 @@
 
 *  Report the sky coordinates of the source position, and the coordinate system
          CALL MSG_BLANK( STATUS )
+         CALL MSG_SETC('LONST', LONST(:LONLN))
+         CALL MSG_SETC('LATST', LATST(:LATLN))
+         CALL MSG_SETC('SCS',   SCS(:SCSLN))
          CALL MSG_OUT( 'POINB2_MSG3', 'Sky position    : '/
-     :                 /LONST( : LONLN )//', '//LATST( : LATLN )/
-     :                 /' '//SCS( :SCSLN ), STATUS )
+     :                 /'^LONST ^LATSRC ^SCS', STATUS)
          
          IF ( LOGREQ ) THEN
 
@@ -285,9 +291,10 @@
          IF ( EXPSRC ) THEN
             CALL CHR_RTOC( ABS( SRCINS( ISRC ) ), INSCST, INSCLN)
 
+            CALL MSG_SETC('INSCST', INSCST(:INSCLN))
             CALL MSG_OUT( 'POINB2_MSG4', 'Absolute value of '/
-     :                    /'In-scan distance: '//INSCST( : INSCLN)/
-     :                    /' (Arcmin) ', STATUS )
+     :                    /'In-scan distance: ^INSCST (Arcmin)',
+     :                    STATUS )
             IF ( LOGREQ ) THEN
                CALL FIO_WRITE( LOGFID, 'Absolute value of '/
      :                    /'In-scan distance: '//INSCST( : INSCLN)/
@@ -313,27 +320,33 @@
 
 *  Write information to the screen
          CALL MSG_BLANK( STATUS )
+         CALL MSG_SETC('AMPST',AMPST(:AMPLN))
+         CALL MSG_SETC('UNITS',UNITS(:UNITLN))
          CALL MSG_OUT( 'POINB2_MSG4', 'Source Amplitude: '/
-     :                 /AMPST( : AMPLN )//' ('//UNITS( : UNITLN )//')', 
+     :                 /'^AMPST (^UNITS)', 
      :                  STATUS )
+         CALL MSG_SETC('SLPST',SLPST(:SLPLN))
+         CALL MSG_SETC('UNITS',UNITS(:UNITLN))
+         CALL MSG_SETC('SRCDIR',SRCDIR)
          CALL MSG_OUT( 'POINB2_MSG4', 'Slope           : '/
-     :                 /SLPST( : SLPLN )//' ('//UNITS( : UNITLN )/
-     :                 /' per arcmin '//SRCDIR//')', STATUS )
+     :                 /'^SLPST (^UNITS per arcmin ^SRCDIR)',STATUS)
+         CALL MSG_SETC('BASST',BASST(:BASLN))
+         CALL MSG_SETC('UNITS',UNITS(:UNITLN))
          CALL MSG_OUT( 'POINB2_MSG4', 'Baseline height : '/
-     :                 /BASST( : BASLN )//' ('//UNITS( : UNITLN )//')',
-     :                  STATUS ) 
+     :                 /'^BASST (^UNITS)', STATUS)
 
 *  And to the logfile if required
          IF ( LOGREQ ) THEN
             CALL FIO_WRITE( LOGFID, ' ', STATUS )
+            TEMPSTR = UNITS( : UNITLN )
             CALL FIO_WRITE( LOGFID, 'Source Amplitude: '/
-     :                  /AMPST( : AMPLN )//' ('//UNITS( : UNITLN )//')',
+     :                  /AMPST( : AMPLN )//' ('//TEMPSTR//')',
      :                      STATUS )
             CALL FIO_WRITE( LOGFID, 'Slope           : '/
-     :                     /SLPST( : SLPLN )//' ('//UNITS( : UNITLN )/
+     :                     /SLPST( : SLPLN )//' ('//TEMPSTR/
      :                     /' per arcmin '//SRCDIR//')', STATUS )
             CALL FIO_WRITE( LOGFID, 'Baseline height : '/
-     :                  /BASST( : BASLN )//' ('//UNITS( : UNITLN )//')',
+     :                  /BASST( : BASLN )//' ('//TEMPSTR//')',
      :                      STATUS )
          END IF
 
@@ -349,22 +362,26 @@
 
 *  Report the estimated noise.
          CALL MSG_BLANK( STATUS )
+         CALL MSG_SETC('NOIST',NOIST(:NOILN))
+         CALL MSG_SETC('UNITS',UNITS(:UNITLN))
          CALL MSG_OUT( 'POINB2_MSG4', 'Estimated noise : '/
-     :                 /NOIST( : NOILN )//' ('//UNITS( : UNITLN )//')',
-     :                  STATUS )
+     :                 /'^NOIST (^UNITS)', STATUS)
+         CALL MSG_SETC('NOSMST',NOSMST(:NOSMLN))
          CALL MSG_OUT( 'POINB2_MSG5', 'Calculated over  '/
-     :                 /NOSMST( : NOSMLN )//' samples, ',STATUS )
+     :                 /'^NOSMST samples, ',STATUS )
          CALL MSG_OUT( 'POINB2_MSG5', '    taken both '/
      :                 /'sides of the point source profile around '/
      :                 /'the source',STATUS )
+         CALL MSG_SETC('CORRST', CORRST(:CORRLN))
          CALL MSG_OUT( 'POINB2_MSG6', 'Correlation coef: '/
-     :                 /CORRST( : CORRLN ) , STATUS )
+     :                 /'^CORRST' , STATUS )
 
 *  And to the logfile if required
          IF ( LOGREQ ) THEN
             CALL FIO_WRITE( LOGFID, ' ', STATUS )
+            TEMPSTR = UNITS( : UNITLN )
             CALL FIO_WRITE( LOGFID, 'Estimated noise : '/
-     :                 /NOIST( : NOILN )//' ('//UNITS( : UNITLN )//')',
+     :                 /NOIST( : NOILN )//' ('//TEMPSTR//')',
      :                      STATUS )
             CALL FIO_WRITE( LOGFID, 'Calculated over  '/
      :                 /NOSMST( : NOSMLN )//' samples, ',STATUS )

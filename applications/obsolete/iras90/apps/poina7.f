@@ -89,6 +89,7 @@
       INTEGER WNSMLN             ! Length of WNSMST
       CHARACTER*( 8 )WNOIST      ! String equivalent of WNOISE
       INTEGER WNOILN             ! Length of WNSMST
+      CHARACTER*( 80 ) TEMPSTR   ! Temporary string
 *.
 
 *  Check inherited global status.
@@ -112,11 +113,13 @@
 
 *  Report whole scan noise
          CALL MSG_BLANK( STATUS )
+         CALL MSG_SETC('DETST', DETST)
          CALL MSG_OUT( 'POINA7_MSG1', 'The Noise along the whole '/ 
      :              /'selected scan length for the trace of detector '/
-     :              /DETST(  : DETLN ), STATUS )
-         CALL MSG_OUT( 'POINA7_MSG2', 'was '//WNOIST(  : WNOILN )/
-     :              /' ('//UNITS( : UNITLN )//') '/
+     :              /'^DETST', STATUS )
+         CALL MSG_SETC('UNITS', UNITS)
+         CALL MSG_SETC('WNOIST', WNOIST)
+         CALL MSG_OUT( 'POINA7_MSG2', 'was ^WNOIST (^UNITS)'/
      :              /'and was calculated on '//WNSMST( : WNSMLN )/
      :              /' samples ',
      :              STATUS )
@@ -127,8 +130,9 @@
             CALL FIO_WRITE( LOGFID, 'The Noise along the whole '/ 
      :              /'selected scan length for the trace of detector '/
      :              /DETST(  : DETLN ), STATUS )
-            CALL FIO_WRITE( LOGFID, 'was '//WNOIST(  : WNOILN )/
-     :              /' ('//UNITS( : UNITLN )//') '/
+            TEMPSTR = UNITS( : UNITLN )
+            CALL FIO_WRITE( LOGFID, 'was '//WNOIST( : WNOILN )/
+     :              /' ('//TEMPSTR//') '/
      :              /'and was calculated on '//WNSMST( : WNSMLN )/
      :              /' samples ',
      :              STATUS )
