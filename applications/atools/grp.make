@@ -6,7 +6,7 @@
 #           Thu Nov 27 14:08:35 GMT 1997
 
 # The names of all the tar files containing system-independant files:
-TAR_FILES_A = atools_source  
+TAR_FILES_A = atools_source  atools_iraf
 
 # The contents of the atools_source.tar file:
 ATOOLS_SOURCE = addframe.f addframe.ifl astclear.f astclear.ifl astget.f \
