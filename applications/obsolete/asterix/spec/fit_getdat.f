@@ -200,11 +200,6 @@
 	CHARACTER*(DAT__SZLOC) LOC	! Component locator
 	CHARACTER*(DAT__SZLOC) DCLOC(NDSMAX)	! Data container file locators
 	CHARACTER*(DAT__SZLOC) CLOC	! Temporary component locator
-	CHARACTER*(DAT__SZLOC) BLOC(NDSMAX)	! Locator to b/g files
-	CHARACTER*(DAT__SZLOC) SLOC(NDSMAX)	! Data array slice locators
-	CHARACTER*(DAT__SZLOC) BSLOC(NDSMAX)	! B/g array slice locators
-	CHARACTER*(DAT__SZLOC) SVLOC(NDSMAX)	! Data variance slice locators
-	CHARACTER*(DAT__SZLOC) SQLOC(NDSMAX)	! Data quality slice locators
 	CHARACTER*(DAT__SZNAM) NAME	! Object name
 	CHARACTER*(DAT__SZTYP) TYPE	! Object type
 	CHARACTER*100 FILE		! File name for HDS_TRACE
@@ -233,10 +228,9 @@
       INTEGER			NVDIM			! Vignetting dim'ality
       INTEGER 			PTR			! General pointer
       INTEGER			TIMID			! Timing info
+      INTEGER			TPTR			! Temp pointer
       INTEGER			VDIMS(ADI__MXDIM)	! Vignetting dims
       INTEGER			VFID(NDSMAX)		! Vignetting datasets
-
-      BYTE 			MASK			! Quality mask byte
 
       LOGICAL			VIG			! Vignetting present?
 
@@ -442,8 +436,6 @@
 	      IF ( STATUS .NE. SAI__OK ) THEN
 	        CALL ERR_ANNUL( STATUS )
 	        BG = .FALSE.
-	      ELSE
-                CALL ADI1_GETLOC( BFID(N), BLOC(N), STATUS )
 	      END IF
             END IF
 
@@ -532,9 +524,9 @@
 	  END IF
 
 *    Loop through component spectra required from a given dataset
-	  INDEX=0
-	  NDSTOP=NDS+SETSIZE
-	  DO WHILE(NDS.LT.NDSTOP)
+	  INDEX = 0
+	  NDSTOP = NDS + SETSIZE
+	  DO WHILE ( NDS .LT. NDSTOP )
 	    NDS=NDS+1
 
 *       Abort if maximum permitted number of datasets is exceeded
@@ -560,43 +552,44 @@
      :                         /SPECH
 	    ELSE
 	      SPECNO=0
-	      OBDAT(NDS).DATNAME=FILE
+	      OBDAT(NDS).DATNAME = FILE
 	    END IF
-	    OBDAT(NDS).SETINDEX=SPECNO
-D	    print *,'index,specno:- ',index,specno
+	    OBDAT(NDS).SETINDEX = SPECNO
+
+*       Map the data array
+            CALL BDI_MAPDATA( OBDAT(NDS).D_ID, 'READ', TPTR, STATUS )
 
 *       Find and map data array
-	    IF (SPECSET(N)) THEN
+	    IF ( SPECSET(N) ) THEN
 
-*          Map slice for spectral set
-	      LDIM(1)=1
-	      LDIM(2)=SPECNO
-	      UDIM(1)=DIMS(1)
-	      UDIM(2)=SPECNO
-	      CALL BDA_LOCDATA( DCLOC(N), CLOC, STATUS )
-	      CALL DAT_SLICE(CLOC,2,LDIM,UDIM,SLOC(NDS),STATUS)
+*          Map dynamic memory for slice
+              CALL DYN_MAPR( 1, DIMS(1), OBDAT(NDS).DPTR, STATUS )
 
-D	      print *,'dat__mxdim,obdat(n).idim,obdat(n).ndim: ',dat__mxdim,
-D    :        obdat(nds).idim,obdat(nds).ndim
-	      OBDAT(NDS).NDIM=1
-	      OBDAT(NDS).IDIM(1)=DIMS(1)
-	      OBDAT(NDS).NDAT=DIMS(1)
-	      CALL DAT_MAPV(SLOC(NDS),'_REAL','READ',OBDAT(NDS).DPTR,
-     :        NACT,STATUS)
+*          Define the slice
+	      LDIM(1) = 1
+	      LDIM(2) = SPECNO
+	      UDIM(1) = DIMS(1)
+	      UDIM(2) = SPECNO
+	      OBDAT(NDS).NDIM = 1
+	      OBDAT(NDS).IDIM(1) = DIMS(1)
+	      OBDAT(NDS).NDAT = DIMS(1)
+
+*          Copy the slice
+              CALL ARR_SLCOPR( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
+     :                         %VAL(OBDAT(NDS).DPTR), STATUS )
+
 	    ELSE
 
-*          Simple BDA_ map
-	      OBDAT(NDS).NDIM=NDIM
-	      OBDAT(NDS).NDAT=1
-	      DO I=1,OBDAT(NDS).NDIM
-	        OBDAT(NDS).IDIM(I)=DIMS(I)
-	        OBDAT(NDS).NDAT=OBDAT(NDS).NDAT*DIMS(I)
+*          Simple mapping
+	      OBDAT(NDS).NDIM = NDIM
+	      DO I = 1,OBDAT(NDS).NDIM
+	        OBDAT(NDS).IDIM(I) = DIMS(I)
 	      END DO
-	      CALL BDI_MAPDATA(OBDAT(NDS).D_ID,'READ',OBDAT(NDS).DPTR,
-     :        STATUS)
-	      IF (STATUS.NE.SAI__OK) GOTO 99
+              OBDAT(NDS).DPTR = TPTR
+              CALL ARR_SUMDIM( NDIM, DIMS, OBDAT(NDS).NDAT )
 
 	    END IF
+	    IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *         For likelihood case scale to give raw counts, & accumulate SSCALE
 	    IF (LIKSTAT) THEN
@@ -613,14 +606,12 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 *          Get variance (slice in case of spectral set)
 	    CALL BDI_CHKVAR(OBDAT(NDS).D_ID,OK,NDIM,DIMS,STATUS)
 	    IF (OK) THEN
+	      CALL BDI_MAPVAR(OBDAT(NDS).D_ID,'READ',TPTR,STATUS)
 	      IF (SPECSET(N)) THEN
-	        CALL BDA_LOCVAR( DCLOC(N), CLOC, STATUS )
-	        CALL DAT_SLICE(CLOC,2,LDIM,UDIM,SVLOC(NDS),STATUS)
-	        CALL DAT_MAPV(SVLOC(NDS),'_REAL','READ',OBDAT(NDS).VPTR,
-     :          NACT,STATUS)
+                CALL ARR_SLCOPR( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
+     :                           %VAL(OBDAT(NDS).VPTR), STATUS )
 	      ELSE
-	        CALL BDI_MAPVAR(OBDAT(NDS).D_ID,'READ',
-     :          OBDAT(NDS).VPTR,STATUS)
+                OBDAT(NDS).VPTR = TPTR
 	      END IF
 	    ELSE
 	      IF (WEIGHTS) THEN
@@ -637,17 +628,12 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 *          Get quality
 	    CALL BDI_CHKQUAL(OBDAT(NDS).D_ID,QUAL,NDIM,DIMS,STATUS)
 	    IF (QUAL) THEN
+	      CALL BDI_MAPLQUAL(OBDAT(NDS).D_ID,'READ',BAD,TPTR,STATUS)
 	      IF (SPECSET(N)) THEN
-	        CALL BDI_GETMASK(OBDAT(NDS).D_ID,MASK,STATUS)
-	        CALL BDA_LOCQUAL( DCLOC(N), CLOC, STATUS )
-	        CALL DAT_SLICE(CLOC,2,LDIM,UDIM,SQLOC(NDS),STATUS)
-	        CALL DAT_MAPV(SQLOC(NDS),'_UBYTE','READ',PTR,NACT,STATUS)
-	        CALL DYN_MAPL(1,OBDAT(NDS).NDAT,OBDAT(NDS).QPTR,STATUS)
-	        CALL ARR_LOGMASK(%VAL(PTR),OBDAT(NDS).NDAT,MASK,
-     :          %VAL(OBDAT(NDS).QPTR),BAD,GOOD,STATUS)
+                CALL ARR_SLCOPL( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
+     :                           %VAL(OBDAT(NDS).QPTR), STATUS )
 	      ELSE
-	        CALL BDI_MAPLQUAL(OBDAT(NDS).D_ID,'READ',BAD,
-     :          OBDAT(NDS).QPTR,STATUS)
+                OBDAT(NDS).QPTR = TPTR
 	      END IF
 
 *         Set quality flag if bad values are present
@@ -727,21 +713,15 @@ D	    print *,'ldim,udim :',ldim,udim
 *              Store background object
                 OBDAT(NDS).B_ID = BFID(N)
 
+*              Map background data
+	        CALL BDI_MAPDATA( BFID(N), 'READ', TPTR, STATUS )
+
 *         Find and map b/g data array
 	        IF (SPECSET(N)) THEN
-
-*           Map slice for b/g spectral set
-	          CALL BDA_LOCDATA(BLOC(N),CLOC,STATUS)
-	          CALL DAT_SLICE(CLOC,2,LDIM,UDIM,BSLOC(NDS),STATUS)
-	          CALL DAT_MAPV(BSLOC(NDS),'_REAL','READ',OBDAT(NDS).BPTR,
-     :            NACT,STATUS)
-
+                  CALL ARR_SLCOPR( 2, DIMS, %VAL(TPTR), LDIM, UDIM,
+     :                             %VAL(OBDAT(NDS).BPTR), STATUS )
 	        ELSE
-
-*           Simple BDI_ map for straight b/g spectrum
-	          CALL BDI_MAPDATA( BFID(N), 'READ', OBDAT(NDS).BPTR,
-     :                              STATUS )
-	          IF (STATUS.NE.SAI__OK) GOTO 99
+                  OBDAT(NDS).BPTR = TPTR
 
 	        END IF
 
