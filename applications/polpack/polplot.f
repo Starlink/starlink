@@ -856,7 +856,8 @@
          CALL KPG1_ASPSY( '(TEXT)', '(STRINGS)', STATUS )
 
 *  Set the style for plotting in the key picture.
-         CALL KPG1_ASSET( 'POLPACK_POLPLOT', 'KEYSTYLE', IPLOTK, STATUS )
+         CALL KPG1_ASSET( 'POLPACK_POLPLOT', 'KEYSTYLE', IPLOTK,
+     :                    STATUS )
 
 *  Now produce the key.
          CALL POL1_VECKY( 'KEYVEC', IPLOTK, VSCALE, AHSIZM, YKEY,
