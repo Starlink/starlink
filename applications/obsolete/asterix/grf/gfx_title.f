@@ -26,6 +26,7 @@
       INTEGER NLINE
       INTEGER ILINE
       INTEGER BOLD
+      INTEGER COLOUR
       REAL SIZE
       REAL ALIGN
       REAL DISP
@@ -41,7 +42,7 @@
         CALL GCB_GETI('TITLE_N',OK,NLINE,STATUS)
 
 *  if none then use default
-        IF (.NOT.OK) THEN
+        IF (.NOT.OK.OR.(OK.AND.NLINE.EQ.0)) THEN
           DISP=0.5
           ALIGN=0.5
           CALL PGMTEXT('T',DISP,ALIGN,ALIGN,DEFAULT)
@@ -59,6 +60,10 @@
             CALL GCB_GET1I('TITLE_BOLD',ILINE,1,OK,BOLD,STATUS)
             IF (OK) THEN
               CALL PGSLW(BOLD)
+            ENDIF
+            CALL GCB_GET1I('TITLE_COLOUR',ILINE,1,OK,COLOUR,STATUS)
+            IF (OK) THEN
+              CALL PGSCI(COLOUR)
             ENDIF
             CALL GCB_GET1R('TITLE_SIZE',ILINE,1,OK,SIZE,STATUS)
             IF (OK) THEN
