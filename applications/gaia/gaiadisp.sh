@@ -104,7 +104,6 @@ proc connect_to_gaia {} {
          if {[catch {socket $host $port} msg]} {
             set needed 1
          } else {
-            #puts stderr "Connected to GAIA..."
             fconfigure $msg -buffering line
             return $msg
          }
@@ -148,25 +147,30 @@ proc send_to_gaia {args} {
 #  Open up connection to GAIA.
 set gaia_fd [connect_to_gaia]
 
+#  Command needs to performed by Skycat or derived object. We just
+#  talk to the first window on the list.
+set cmd "skycat::SkyCat::get_skycat_images"
+set images [send_to_gaia remotetcl $cmd]
 
-#  Send the command and output any result.
+#  Got list so select first and ask about the parent (should be 
+#  top-level GAIA).
+set ctrlwidget [lindex $images 0]
+set cmd "winfo parent $ctrlwidget"
+set gaia [send_to_gaia remotetcl $cmd]
+
+#  Construct the command needed to display the image.
 if { $clone != "" } { 
-    eval send_to_gaia clone $clone $image
-    puts stderr "Displayed image: $image in clone: $clone."
+   set cmd "$gaia noblock_clone $clone $image"
 } else {
-
-    #  Command needs to performed by Skycat or derived
-    #  object. We just talk to the first window on the list.
-    set cmd "winfo parent \[skycat::SkyCat::get_skycat_images\]"
-    set images [send_to_gaia remotetcl $cmd]
-    set ctrlwidget [lindex $images 0]
-    set cmd "$ctrlwidget open $image"
-    set ret [send_to_gaia remotetcl $cmd]
-    if { $ret == "" } { 
-       puts stderr "Displayed image: $image."
-    } else {
-       puts stderr "Failed to display image: ($ret)"
-    }
+   set cmd "$gaia open $image"
+}
+ 
+#  And send the command.
+set ret [send_to_gaia remotetcl $cmd]
+if { $ret == "" || $ret == ".gaia$clone" } { 
+   puts stderr "Displayed image: $image."
+} else {
+   puts stderr "Failed to display image: ($ret)"
 }
 close $gaia_fd
 exit

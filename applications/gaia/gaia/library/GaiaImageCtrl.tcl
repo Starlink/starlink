@@ -326,7 +326,7 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  Update the toplevel window header and icon name to include the name
    #  of the file being displayed.
-   protected method update_title {} {
+   public method update_title {} {
       set file "[file tail $itk_option(-file)]"
       set w [winfo toplevel $w_]
       wm title $w "GAIA::Skycat: $file ([$w cget -number])"

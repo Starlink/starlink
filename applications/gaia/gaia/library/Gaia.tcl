@@ -124,7 +124,7 @@ itk::usual Gaia {}
 
 #  Create a class for the application.
 itcl::class gaia::Gaia {
-   inherit skycat::SkyCat
+   inherit ::skycat::SkyCat
 
    #  Constructor: create a toplevel window.
    constructor {args} {
@@ -825,13 +825,13 @@ itcl::class gaia::Gaia {
    }
 
    #  Make a new main window with the given name, or the next in
-   #  sequence name. This version stops the TopLevelWidget::start
+   #  sequence name. This version can stop the TopLevelWidget::start
    #  command from blocking (stopping the possibility of remotely
    #  determining when the clone has been created). It also provides
    #  the ability to specify the file name directly (thus replacing
    #  the command-line version) and to gain access to an existing
    #  clone (by number). Used for demo/remote control.
-   public method noblock_clone {name {file ""} args} {
+   public method noblock_clone {number {file ""} {block 0} args} {
       global ::argv ::argc ::gaia_usage
 
       #  Append any new args.
@@ -842,6 +842,13 @@ itcl::class gaia::Gaia {
       #  is added to the list.
       if { $file != "" } {
 	 replace_image_ $file
+      }
+
+      #  If a clone number was given construct the related name.
+      if { $number != "" } { 
+	 set name ".gaia$number"
+      } else {
+	 set name ""
       }
 
       #  If named window already exists, just configure file and return.
@@ -863,15 +870,28 @@ itcl::class gaia::Gaia {
 	 }
       }
 
-      #  use the -noop option to avoid reloading the main image
-      #  (part of $argv list). The renames stop start method from
-      #  blocking with a tkwait.
-      rename ::tkwait ::real_tkwait
-      rename ::false_tkwait ::tkwait
-      util::TopLevelWidget::start gaia::Gaia "" "$gaia_usage" "$name"
-      rename ::tkwait ::false_tkwait
-      rename ::real_tkwait ::tkwait
-      tkwait visibility $name
+      #  Start a new clone, block the tkwait if asked.
+      if { ! $block } { 
+	 rename ::tkwait ::real_tkwait
+	 rename ::false_tkwait ::tkwait
+      }
+      util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage" "$name"
+
+      #  Actually we only arrive here if not blocking, except when
+      #  application is exiting, so clone number is wrong.
+      if { ! $block } { 
+	 rename ::tkwait ::false_tkwait
+	 rename ::real_tkwait ::tkwait
+	 tkwait visibility $name
+	 if { $number != {} } { 
+
+	    #  Number given, so update the title and make sure next
+	    #  clone doesn't try to have same name.
+	    $name configure -number $number
+	    $name.image update_title
+	    set clone_cnt_ [max $clone_cnt_ $number]
+	 }
+      }
       return $name
    }
 
@@ -914,15 +934,22 @@ itcl::class gaia::Gaia {
 
 	 #  Filename may be unpaired with -file, so look for it.
 	 set newargv ""
+	 set seenfile 0
 	 for {set i 0} {$i < $argc} {incr i} {
 	    set opt [lindex $argv $i]
 	    if {"[string index $opt 0]" == "-" && "$opt" != "-"} {
 	       set arg [lindex $argv [incr i]]
 	    } else {
+	       set seenfile 1
 	       set arg "$filename"
 	       set opt "-file"
 	    }
 	    lappend newargv $opt $arg
+	 }
+	 if { ! $seenfile } { 
+
+	    #  No -file and no unpaired options.
+	    lappend newargv "-file" "$filename"
 	 }
 	 set argv $newargv
 	 set argc [llength $argv]
