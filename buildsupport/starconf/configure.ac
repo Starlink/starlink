@@ -37,6 +37,6 @@ dnl Note that the starconf.in and starlink.m4.in files are _not_ to be
 dnl substituted by this command -- since they involve the
 dnl installation directory variables, they should have them replaced
 dnl at `make' time, not configure time.  See Makefile.am for details.
-AC_CONFIG_FILES(Makefile)
+AC_CONFIG_FILES(Makefile install-with-manifest)
 
 AC_OUTPUT
