@@ -52,7 +52,7 @@
 
 #-
 
-itcl::class GaiaProperties {
+itcl::class gaia::GaiaProperties {
 
    #  Singleton entry point:
    #  ----------------------

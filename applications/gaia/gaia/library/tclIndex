@@ -217,6 +217,6 @@ set auto_index(convert_coords) [list source [file join $dir graphics_features.tc
 set auto_index(save_graphics) [list source [file join $dir graphics_features.tcl]]
 set auto_index(load_graphics) [list source [file join $dir graphics_features.tcl]]
 set auto_index(gaia_version) [list source [file join $dir gaia_version.tcl]]
-set auto_index(GaiaProperties) [list source [file join $dir GaiaProperties.tcl]]
-set auto_index(::GaiaProperties::instance) [list source [file join $dir GaiaProperties.tcl]]
+set auto_index(::gaia::GaiaProperties) [list source [file join $dir GaiaProperties.tcl]]
+set auto_index(::gaia::::GaiaProperties::instance) [list source [file join $dir GaiaProperties.tcl]]
 set auto_index(::gaia::GaiaStartup) [list source [file join $dir GaiaStartup.tcl]]

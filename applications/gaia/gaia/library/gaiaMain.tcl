@@ -100,7 +100,7 @@ if { $argc >= 1 } {
 #  Restore any properties of the Gaia object that have been set last
 #  time around (and explicity saved), these go before other options so
 #  that these may be overridden on the command-line.
-set props [GaiaProperties::instance]
+set props [gaia::GaiaProperties::instance]
 foreach prop [$props get_named_keys Gaia] {
    set value [$props get_property $prop]
    set key [$props get_unnamed_key Gaia $prop]
