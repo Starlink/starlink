@@ -72,7 +72,7 @@ beginfig(1);
  
   boxit.ut("astronomer, programmer");
   boxit.lt("GUI, API, protocol");
-  boxit.st("app, library, service");
+  boxit.st("application, library, service");
 
 %Either...
 if true:
