@@ -1,4 +1,4 @@
-   proc tasksetup {
+   proc tasksetup {} {
 #+
 #  Name:
 #     tasksetup
