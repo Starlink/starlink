@@ -170,6 +170,7 @@ LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MESSGEN = @MESSGEN@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -594,6 +595,38 @@ GTAGS:
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
+# Compile messages for message file parse_err.msg.  This requires that the 
+# @MESSGEN@ substitution was requested in configure.ac, probably implicitly
+# by the STAR_MESSGEN macro.
+PARSE_ERR: parse_err.msg
+	@MESSGEN@ -F parse_err.msg
+parse_err: parse_err.msg
+	@MESSGEN@ -f parse_err.msg
+parse_err.h: parse_err.msg
+	@MESSGEN@ -c parse_err.msg
+fac_160_err: parse_err.msg
+	@MESSGEN@ -e parse_err.msg
+install-starhelpSTARDATA: $(starhelp_STARDATA)
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(starhelpdir)
+	@list='$(starhelp_STARDATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f"; \
+	  $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f; \
+	  if test -n "$$MANIFEST_FILE"; then \
+	  	echo "$(DESTDIR)$(starhelpdir)/$$f" >>$$MANIFEST_FILE; \
+	  else :; fi; \
+	done
+
+uninstall-starhelpSTARDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(starhelp_STARDATA)'; for p in $$list; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(starhelpdir)/$$f"; \
+	  rm -f $(DESTDIR)$(starhelpdir)/$$f; \
+	done
+
 # Create an install manifest, and install it in the required manifest location
 install-manifest.xml: all-am
 	rm -f $@
@@ -615,36 +648,6 @@ install-manifest: install-manifest.xml
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
 		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-
-# Compile messages for message file parse_err.msg
-PARSE_ERR: parse_err.msg
-	$(STARLINK)/bin/messgen -F parse_err.msg
-parse_err: parse_err.msg
-	$(STARLINK)/bin/messgen -f parse_err.msg
-parse_err.h: parse_err.msg
-	$(STARLINK)/bin/messgen -c parse_err.msg
-fac_160_err: parse_err.msg
-	$(STARLINK)/bin/messgen -e parse_err.msg
-install-starhelpSTARDATA: $(starhelp_STARDATA)
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(starhelpdir)
-	@list='$(starhelp_STARDATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f"; \
-	  $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(starhelpdir)/$$f" >>$$MANIFEST_FILE; \
-	  else :; fi; \
-	done
-
-uninstall-starhelpSTARDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(starhelp_STARDATA)'; for p in $$list; do \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " rm -f $(DESTDIR)$(starhelpdir)/$$f"; \
-	  rm -f $(DESTDIR)$(starhelpdir)/$$f; \
-	done
 
 distdir: $(DISTFILES)
 	$(am__remove_distdir)

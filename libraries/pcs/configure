@@ -277,7 +277,7 @@ PACKAGE_BUGREPORT='ussc@star.rl.ac.uk'
 ac_unique_file="ssn29.tex"
 ac_default_prefix=/export3/sun
 ac_subdirs_all="$ac_subdirs_all adam ams atimer dtask hdspar lex messys misc msp parsecon sock string subpar task"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot STARLINK STAR_DEPENDENCIES_ATTRIBUTES STAR_DEPENDENCIES_CHILDREN STAR_MESSGEN_SOURCES STAR_DOCUMENTATION STAR_EXTRA_DIST PACKAGE_VERSIONINT STAR_MANIFEST_DIR stardocs_STARDATA stardocsdir subdirs LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot STARLINK STAR_DEPENDENCIES_ATTRIBUTES STAR_DEPENDENCIES_CHILDREN STAR_MESSGEN_SOURCES STAR_DOCUMENTATION STAR_EXTRA_DIST PACKAGE_VERSIONINT STAR_MANIFEST_DIR stardocs_STARDATA stardocsdir STAR2HTML subdirs LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -722,6 +722,10 @@ ac_env_STARLINK_set=${STARLINK+set}
 ac_env_STARLINK_value=$STARLINK
 ac_cv_env_STARLINK_set=${STARLINK+set}
 ac_cv_env_STARLINK_value=$STARLINK
+ac_env_STAR2HTML_set=${STAR2HTML+set}
+ac_env_STAR2HTML_value=$STAR2HTML
+ac_cv_env_STAR2HTML_set=${STAR2HTML+set}
+ac_cv_env_STAR2HTML_value=$STAR2HTML
 
 #
 # Report the --help message.
@@ -797,7 +801,8 @@ if test -n "$ac_init_help"; then
   cat <<\_ACEOF
 
 Some influential environment variables:
-  STARLINK    Where all the Starlink software lives
+  STARLINK    Location of a current Starlink tree (used if necessary)
+  STAR2HTML   Location of the star2html application
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -1679,6 +1684,21 @@ INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
 
 
 #
+_star_per_package_dirs=false
+for opt in  NONE
+do
+    case $opt in
+        per-package-dirs)
+            _star_per_package_dirs=true
+            ;;
+        NONE)
+            ;;
+        *)
+            echo "Unrecognised STAR_DEFAULTS option  ignored"
+            ;;
+    esac
+done
+
 # Ensure that STARLINK has a value, defaulting to
 # /export3/sun.  Note that this directory may be
 # different from /star, and reflects the value of
@@ -1711,6 +1731,12 @@ INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
 
 test -n "$STARLINK" || STARLINK=/export3/sun
 
+if $_star_per_package_dirs; then
+    bindir="$bindir/$PACKAGE_NAME"
+    { echo "$as_me:$LINENO: STAR_DEFAULTS has per-package-dirs option: bindir=$bindir" >&5
+echo "$as_me: STAR_DEFAULTS has per-package-dirs option: bindir=$bindir" >&6;}
+fi
+
 # Everything depends on where /star is.  Declare STARLINK as a
 # `precious variable'.  Amongst other things, this will make
 # ./configure squeal if the package is re-configured with an
@@ -1737,25 +1763,18 @@ FCFLAGS="$FCFLAGS -I$STARLINK/include"
 FFLAGS="$FFLAGS -I$STARLINK/include"
 CFLAGS="$CFLAGS -I$STARLINK/include"
 LDFLAGS="$LDFLAGS -L$STARLINK/lib"
-# Note that the following imply that we are expecting to find
-# pre-installed versions of includes and libraries in the same
-# locations we plan to install new ones.  That is, I think, what we
-# expect.
-#FFLAGS="$FFLAGS -I$STARLINK/include${includedir}"
-#CFLAGS="$CFLAGS -I${includedir}"
-#LDFLAGS="$LDFLAGS -L${libdir}"
 
-# Dependency declarations and checks (see macros
-# [STAR_DECLARE_BUILD_DEPENDENCIES] and [STAR_DECLARE_USE_DEPENDENCIES])
+
+# Dependency declarations and checks.
 # Everything is dependent on starconf, so we don't have to declare that
-# for each package separately.  STAR_DEPENDENCIES_ATTRIBUTES is currently
-# not used.
+# for each package separately.
+# STAR_DEPENDENCIES_ATTRIBUTES is currently not used.
 STAR_DEPENDENCIES_ATTRIBUTES=''
 STAR_DEPENDENCIES_CHILDREN=''
 
 
 
-# List of message files.  Used to signal to automake
+# List of message files.  Used to signal to automake.
 STAR_MESSGEN_SOURCES=
 
 
@@ -1810,13 +1829,65 @@ STAR_MANIFEST_DIR='$(prefix)/manifests'
 
                                             if test "X$stardocs_STARDATA" = X; then
               # First time
-##              [STAR_]_STAR_UPCASE(docs)[_DIR]='$(prefix)/docs'
-##              AC_SUBST([STAR_]_STAR_UPCASE(docs)[_DIR])dnl
                             stardocsdir='$(prefix)/docs'
+
+
           fi
           stardocs_STARDATA="$stardocs_STARDATA ${docno}.tex ${docno}.ps ${docno}.htx_tar"
 
                     done
+                                        eval default_bindir=`echo $bindir | sed 's,\${exec_prefix},$ac_default_prefix,'`
+
+                      # Extract the first word of "star2html", so it can be a program name with args.
+set dummy star2html; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_STAR2HTML+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $STAR2HTML in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_STAR2HTML="$STAR2HTML" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="$default_bindir:$STARLINK/bin:$PATH"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_STAR2HTML="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_path_STAR2HTML" && ac_cv_path_STAR2HTML="star2html"
+  ;;
+esac
+fi
+STAR2HTML=$ac_cv_path_STAR2HTML
+
+if test -n "$STAR2HTML"; then
+  echo "$as_me:$LINENO: result: $STAR2HTML" >&5
+echo "${ECHO_T}$STAR2HTML" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+#                      if test -z "$star_prog"; then
+#                          if test -x $STARLINK/bin/starconf-finder; then
+#                              star_prog="$STARLINK/bin/starconf-finder ProgramName"
+#                          else
+#                              star_prog=ProgramName
+#                          fi
+#                      fi
+
+
 
 
 
@@ -2493,6 +2564,7 @@ s,@PACKAGE_VERSIONINT@,$PACKAGE_VERSIONINT,;t t
 s,@STAR_MANIFEST_DIR@,$STAR_MANIFEST_DIR,;t t
 s,@stardocs_STARDATA@,$stardocs_STARDATA,;t t
 s,@stardocsdir@,$stardocsdir,;t t
+s,@STAR2HTML@,$STAR2HTML,;t t
 s,@subdirs@,$subdirs,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t

@@ -467,7 +467,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot STARLINK STAR_DEPENDENCIES_ATTRIBUTES STAR_DEPENDENCIES_CHILDREN STAR_MESSGEN_SOURCES STAR_DOCUMENTATION STAR_EXTRA_DIST PACKAGE_VERSIONINT STAR_MANIFEST_DIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE FC FCFLAGS ac_ct_FC build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL stardocs_STARDATA stardocsdir starhelp_STARDATA starhelpdir LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA CYGPATH_W PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM mkdir_p AWK SET_MAKE am__leading_dot STARLINK STAR_DEPENDENCIES_ATTRIBUTES STAR_DEPENDENCIES_CHILDREN STAR_MESSGEN_SOURCES STAR_DOCUMENTATION STAR_EXTRA_DIST PACKAGE_VERSIONINT STAR_MANIFEST_DIR CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE am__fastdepCC_TRUE am__fastdepCC_FALSE FC FCFLAGS ac_ct_FC build build_cpu build_vendor build_os host host_cpu host_vendor host_os EGREP LN_S ECHO AR ac_ct_AR RANLIB ac_ct_RANLIB CPP CXX CXXFLAGS ac_ct_CXX CXXDEPMODE am__fastdepCXX_TRUE am__fastdepCXX_FALSE CXXCPP F77 FFLAGS ac_ct_F77 LIBTOOL stardocs_STARDATA stardocsdir STAR2HTML starhelp_STARDATA starhelpdir MESSGEN LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -960,6 +960,14 @@ ac_env_FFLAGS_set=${FFLAGS+set}
 ac_env_FFLAGS_value=$FFLAGS
 ac_cv_env_FFLAGS_set=${FFLAGS+set}
 ac_cv_env_FFLAGS_value=$FFLAGS
+ac_env_STAR2HTML_set=${STAR2HTML+set}
+ac_env_STAR2HTML_value=$STAR2HTML
+ac_cv_env_STAR2HTML_set=${STAR2HTML+set}
+ac_cv_env_STAR2HTML_value=$STAR2HTML
+ac_env_MESSGEN_set=${MESSGEN+set}
+ac_env_MESSGEN_value=$MESSGEN
+ac_cv_env_MESSGEN_set=${MESSGEN+set}
+ac_cv_env_MESSGEN_value=$MESSGEN
 
 #
 # Report the --help message.
@@ -1061,7 +1069,7 @@ Optional Packages:
                           include additional configurations [automatic]
 
 Some influential environment variables:
-  STARLINK    Where all the Starlink software lives
+  STARLINK    Location of a current Starlink tree (used if necessary)
   CC          C compiler command
   CFLAGS      C compiler flags
   LDFLAGS     linker flags, e.g. -L<lib dir> if you have libraries in a
@@ -1076,6 +1084,8 @@ Some influential environment variables:
   CXXCPP      C++ preprocessor
   F77         Fortran 77 compiler command
   FFLAGS      Fortran 77 compiler flags
+  STAR2HTML   Location of the star2html application
+  MESSGEN     Location of the messgen application
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -1957,6 +1967,21 @@ INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
 
 
 #
+_star_per_package_dirs=false
+for opt in  NONE
+do
+    case $opt in
+        per-package-dirs)
+            _star_per_package_dirs=true
+            ;;
+        NONE)
+            ;;
+        *)
+            echo "Unrecognised STAR_DEFAULTS option  ignored"
+            ;;
+    esac
+done
+
 # Ensure that STARLINK has a value, defaulting to
 # /export3/sun.  Note that this directory may be
 # different from /star, and reflects the value of
@@ -1989,6 +2014,12 @@ INSTALL_STRIP_PROGRAM="\${SHELL} \$(install_sh) -c -s"
 
 test -n "$STARLINK" || STARLINK=/export3/sun
 
+if $_star_per_package_dirs; then
+    bindir="$bindir/$PACKAGE_NAME"
+    { echo "$as_me:$LINENO: STAR_DEFAULTS has per-package-dirs option: bindir=$bindir" >&5
+echo "$as_me: STAR_DEFAULTS has per-package-dirs option: bindir=$bindir" >&6;}
+fi
+
 # Everything depends on where /star is.  Declare STARLINK as a
 # `precious variable'.  Amongst other things, this will make
 # ./configure squeal if the package is re-configured with an
@@ -2015,25 +2046,18 @@ FCFLAGS="$FCFLAGS -I$STARLINK/include"
 FFLAGS="$FFLAGS -I$STARLINK/include"
 CFLAGS="$CFLAGS -I$STARLINK/include"
 LDFLAGS="$LDFLAGS -L$STARLINK/lib"
-# Note that the following imply that we are expecting to find
-# pre-installed versions of includes and libraries in the same
-# locations we plan to install new ones.  That is, I think, what we
-# expect.
-#FFLAGS="$FFLAGS -I$STARLINK/include${includedir}"
-#CFLAGS="$CFLAGS -I${includedir}"
-#LDFLAGS="$LDFLAGS -L${libdir}"
 
-# Dependency declarations and checks (see macros
-# [STAR_DECLARE_BUILD_DEPENDENCIES] and [STAR_DECLARE_USE_DEPENDENCIES])
+
+# Dependency declarations and checks.
 # Everything is dependent on starconf, so we don't have to declare that
-# for each package separately.  STAR_DEPENDENCIES_ATTRIBUTES is currently
-# not used.
+# for each package separately.
+# STAR_DEPENDENCIES_ATTRIBUTES is currently not used.
 STAR_DEPENDENCIES_ATTRIBUTES=''
 STAR_DEPENDENCIES_CHILDREN=''
 
 
 
-# List of message files.  Used to signal to automake
+# List of message files.  Used to signal to automake.
 STAR_MESSGEN_SOURCES=
 
 
@@ -3263,7 +3287,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:3266:" \
+echo "$as_me:3290:" \
      "checking for Fortran compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -4031,7 +4055,7 @@ ia64-*-hpux*)
   ;;
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 4034 "configure"' > conftest.$ac_ext
+  echo '#line 4058 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -5596,7 +5620,7 @@ fi
 
 
 # Provide some information about the compiler.
-echo "$as_me:5599:" \
+echo "$as_me:5623:" \
      "checking for Fortran 77 compiler version" >&5
 ac_compiler=`set X $ac_compile; echo $2`
 { (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
@@ -6623,11 +6647,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6626: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6650: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6630: \$? = $ac_status" >&5
+   echo "$as_me:6654: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6855,11 +6879,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6858: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6882: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:6862: \$? = $ac_status" >&5
+   echo "$as_me:6886: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -6922,11 +6946,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:6925: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:6949: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:6929: \$? = $ac_status" >&5
+   echo "$as_me:6953: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -9040,7 +9064,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9043 "configure"
+#line 9067 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -9138,7 +9162,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 9141 "configure"
+#line 9165 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11290,11 +11314,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11293: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11317: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:11297: \$? = $ac_status" >&5
+   echo "$as_me:11321: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -11357,11 +11381,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:11360: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:11384: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:11364: \$? = $ac_status" >&5
+   echo "$as_me:11388: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -12686,7 +12710,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12689 "configure"
+#line 12713 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12784,7 +12808,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 12787 "configure"
+#line 12811 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -13606,11 +13630,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13609: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13633: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:13613: \$? = $ac_status" >&5
+   echo "$as_me:13637: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -13673,11 +13697,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:13676: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:13700: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:13680: \$? = $ac_status" >&5
+   echo "$as_me:13704: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -15635,11 +15659,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15638: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15662: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15642: \$? = $ac_status" >&5
+   echo "$as_me:15666: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15867,11 +15891,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15870: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15894: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>conftest.err)
    ac_status=$?
    cat conftest.err >&5
-   echo "$as_me:15874: \$? = $ac_status" >&5
+   echo "$as_me:15898: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s "$ac_outfile"; then
      # The compiler can only warn and ignore the option if not recognized
      # So say no if there are warnings
@@ -15934,11 +15958,11 @@ else
    -e 's:.*FLAGS}? :&$lt_compiler_flag :; t' \
    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
    -e 's:$: $lt_compiler_flag:'`
-   (eval echo "\"\$as_me:15937: $lt_compile\"" >&5)
+   (eval echo "\"\$as_me:15961: $lt_compile\"" >&5)
    (eval "$lt_compile" 2>out/conftest.err)
    ac_status=$?
    cat out/conftest.err >&5
-   echo "$as_me:15941: \$? = $ac_status" >&5
+   echo "$as_me:15965: \$? = $ac_status" >&5
    if (exit $ac_status) && test -s out/conftest2.$ac_objext
    then
      # The compiler can only warn and ignore the option if not recognized
@@ -18052,7 +18076,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18055 "configure"
+#line 18079 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -18150,7 +18174,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 18153 "configure"
+#line 18177 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -19264,13 +19288,65 @@ echo "$as_me: error: cannot work out how" >&2;}
 
                                             if test "X$stardocs_STARDATA" = X; then
               # First time
-##              [STAR_]_STAR_UPCASE(docs)[_DIR]='$(prefix)/docs'
-##              AC_SUBST([STAR_]_STAR_UPCASE(docs)[_DIR])dnl
                             stardocsdir='$(prefix)/docs'
+
+
           fi
           stardocs_STARDATA="$stardocs_STARDATA ${docno}.tex ${docno}.ps ${docno}.htx_tar"
 
                     done
+                                        eval default_bindir=`echo $bindir | sed 's,\${exec_prefix},$ac_default_prefix,'`
+
+                      # Extract the first word of "star2html", so it can be a program name with args.
+set dummy star2html; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_STAR2HTML+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $STAR2HTML in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_STAR2HTML="$STAR2HTML" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="$default_bindir:$STARLINK/bin:$PATH"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_STAR2HTML="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_path_STAR2HTML" && ac_cv_path_STAR2HTML="star2html"
+  ;;
+esac
+fi
+STAR2HTML=$ac_cv_path_STAR2HTML
+
+if test -n "$STAR2HTML"; then
+  echo "$as_me:$LINENO: result: $STAR2HTML" >&5
+echo "${ECHO_T}$STAR2HTML" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+#                      if test -z "$star_prog"; then
+#                          if test -x $STARLINK/bin/starconf-finder; then
+#                              star_prog="$STARLINK/bin/starconf-finder ProgramName"
+#                          else
+#                              star_prog=ProgramName
+#                          fi
+#                      fi
+
+
 
 
 #
@@ -19289,25 +19365,79 @@ echo "$as_me: error: cannot work out how" >&2;}
               # Format is `.FACILITY name,code/PREFIX=xxx'
               echo "$as_me:$LINENO: checking facility and code in $infile" >&5
 echo $ECHO_N "checking facility and code in $infile... $ECHO_C" >&6
-              eval `sed -n '/\.FACILITY/{s/.*\.FACILITY[ 	]*\([a-zA-Z]*\) *, *\([0-9]*\).*/_s_facname=\1; _s_faccode=\2;/p;q;}' $infile`
-              _s_facname=`echo $_s_facname | tr '[A-Z]' '[a-z]'`
-              echo "$as_me:$LINENO: result: $_s_facname/$_s_faccode" >&5
-echo "${ECHO_T}$_s_facname/$_s_faccode" >&6
+              eval `sed -n '/\.FACILITY/{s/.*\.FACILITY[ 	]*\([a-zA-Z]*\) *, *\([0-9]*\).*/star_facilityname=\1; star_facilitycode=\2;/p;q;}' $infile`
+              star_facilityname=`echo $star_facilityname | tr '[A-Z]' '[a-z]'`
+              echo "$as_me:$LINENO: result: $star_facilityname/$star_facilitycode" >&5
+echo "${ECHO_T}$star_facilityname/$star_facilitycode" >&6
                                   if test "X$starhelp_STARDATA" = X; then
               # First time
-##              [STAR_]_STAR_UPCASE(help)[_DIR]='$(prefix)/help'
-##              AC_SUBST([STAR_]_STAR_UPCASE(help)[_DIR])dnl
                             starhelpdir='$(prefix)/help'
-          fi
-          starhelp_STARDATA="$starhelp_STARDATA fac_${_s_faccode}_err"
+              if $_star_per_package_dirs; then
+                         starhelpdir=starhelpdir/$PACKAGE_NAME
+                     fi
 
-                        STAR_EXTRA_DIST="$STAR_EXTRA_DIST fac_${_s_faccode}_err"
+          fi
+          starhelp_STARDATA="$starhelp_STARDATA fac_${star_facilitycode}_err"
+
+                        STAR_EXTRA_DIST="$STAR_EXTRA_DIST fac_${star_facilitycode}_err"
 
           done
                                         for _star_tmp in messgen
           do
               STAR_DEPENDENCIES_CHILDREN="$STAR_DEPENDENCIES_CHILDREN<sourceset>$_star_tmp</sourceset>"
           done
+
+          eval default_bindir=`echo $bindir | sed 's,\${exec_prefix},$ac_default_prefix,'`
+
+                      # Extract the first word of "messgen", so it can be a program name with args.
+set dummy messgen; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_MESSGEN+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $MESSGEN in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_MESSGEN="$MESSGEN" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="$default_bindir:$STARLINK/bin:$PATH"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_MESSGEN="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_path_MESSGEN" && ac_cv_path_MESSGEN="messgen"
+  ;;
+esac
+fi
+MESSGEN=$ac_cv_path_MESSGEN
+
+if test -n "$MESSGEN"; then
+  echo "$as_me:$LINENO: result: $MESSGEN" >&5
+echo "${ECHO_T}$MESSGEN" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+#                      if test -z "$star_prog"; then
+#                          if test -x $STARLINK/bin/starconf-finder; then
+#                              star_prog="$STARLINK/bin/starconf-finder ProgramName"
+#                          else
+#                              star_prog=ProgramName
+#                          fi
+#                      fi
+
 
 
 
@@ -20038,8 +20168,10 @@ s,@ac_ct_F77@,$ac_ct_F77,;t t
 s,@LIBTOOL@,$LIBTOOL,;t t
 s,@stardocs_STARDATA@,$stardocs_STARDATA,;t t
 s,@stardocsdir@,$stardocsdir,;t t
+s,@STAR2HTML@,$STAR2HTML,;t t
 s,@starhelp_STARDATA@,$starhelp_STARDATA,;t t
 s,@starhelpdir@,$starhelpdir,;t t
+s,@MESSGEN@,$MESSGEN,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF

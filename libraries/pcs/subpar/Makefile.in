@@ -204,6 +204,7 @@ LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MESSGEN = @MESSGEN@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -737,6 +738,38 @@ GTAGS:
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
+# Compile messages for message file subpar_err.msg.  This requires that the 
+# @MESSGEN@ substitution was requested in configure.ac, probably implicitly
+# by the STAR_MESSGEN macro.
+SUBPAR_ERR: subpar_err.msg
+	@MESSGEN@ -F subpar_err.msg
+subpar_err: subpar_err.msg
+	@MESSGEN@ -f subpar_err.msg
+subpar_err.h: subpar_err.msg
+	@MESSGEN@ -c subpar_err.msg
+fac_170_err: subpar_err.msg
+	@MESSGEN@ -e subpar_err.msg
+install-starhelpSTARDATA: $(starhelp_STARDATA)
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(starhelpdir)
+	@list='$(starhelp_STARDATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f"; \
+	  $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f; \
+	  if test -n "$$MANIFEST_FILE"; then \
+	  	echo "$(DESTDIR)$(starhelpdir)/$$f" >>$$MANIFEST_FILE; \
+	  else :; fi; \
+	done
+
+uninstall-starhelpSTARDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(starhelp_STARDATA)'; for p in $$list; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(starhelpdir)/$$f"; \
+	  rm -f $(DESTDIR)$(starhelpdir)/$$f; \
+	done
+
 # Create an install manifest, and install it in the required manifest location
 install-manifest.xml: all-am
 	rm -f $@
@@ -758,36 +791,6 @@ install-manifest: install-manifest.xml
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
 		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-
-# Compile messages for message file subpar_err.msg
-SUBPAR_ERR: subpar_err.msg
-	$(STARLINK)/bin/messgen -F subpar_err.msg
-subpar_err: subpar_err.msg
-	$(STARLINK)/bin/messgen -f subpar_err.msg
-subpar_err.h: subpar_err.msg
-	$(STARLINK)/bin/messgen -c subpar_err.msg
-fac_170_err: subpar_err.msg
-	$(STARLINK)/bin/messgen -e subpar_err.msg
-install-starhelpSTARDATA: $(starhelp_STARDATA)
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(starhelpdir)
-	@list='$(starhelp_STARDATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f"; \
-	  $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(starhelpdir)/$$f" >>$$MANIFEST_FILE; \
-	  else :; fi; \
-	done
-
-uninstall-starhelpSTARDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(starhelp_STARDATA)'; for p in $$list; do \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " rm -f $(DESTDIR)$(starhelpdir)/$$f"; \
-	  rm -f $(DESTDIR)$(starhelpdir)/$$f; \
-	done
 
 distdir: $(DISTFILES)
 	$(am__remove_distdir)

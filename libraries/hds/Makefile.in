@@ -261,11 +261,11 @@ includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
-SUFFIXES = .tex .dvi .ps .htx_tar
 stardocsSTARDATA_INSTALL = $(INSTALL_STARDATA)
 starhelpSTARDATA_INSTALL = $(INSTALL_STARDATA)
 STARDATA = $(stardocs_STARDATA) $(starhelp_STARDATA)
 INSTALL_STARDATA = $(INSTALL_DATA)
+SUFFIXES = .tex .dvi .ps .htx_tar
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
@@ -320,6 +320,7 @@ LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MESSGEN = @MESSGEN@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -332,6 +333,7 @@ PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+STAR2HTML = @STAR2HTML@
 STARLINK = @STARLINK@
 STAR_DEPENDENCIES_ATTRIBUTES = @STAR_DEPENDENCIES_ATTRIBUTES@
 STAR_DEPENDENCIES_CHILDREN = @STAR_DEPENDENCIES_CHILDREN@
@@ -845,58 +847,29 @@ GTAGS:
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
-# Create an install manifest, and install it in the required manifest location
-install-manifest.xml: all-am
-	rm -f $@
-	echo "<?xml version='1.0'?>"                            >$@
-	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
-	echo "<manifest component='$(PACKAGE)'>"                >>$@
-	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
-	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
-	echo "</files>"                                         >>$@
-	echo "</manifest>"                                      >>$@
-
-# Install the install-manifest.xml into the $(STAR_MANIFEST_DIR) directory.
-# We should respect $(DESTDIR), but needn't worry about $(srcdir),
-# since we know that the file was created in the current directory.
-# Having done that, delete the install-manifest.xml file
-install-manifest: install-manifest.xml
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
-	$(INSTALL_DATA) install-manifest.xml \
-		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-# Templates to generate documentation
-.tex.dvi:
-	latex $<
-.dvi.ps:
-	dvips -o $@ $<
-# Don't express a dependency via the directory .htx, or else Make
-# tries to delete it as an intermediate.  An alternative is to use
-# .PRECIOUS, but that's not completely straightforward to arrange.
-.tex.htx_tar:
-	- star2html $<
-	tar cf $@ ${<:.tex=.htx}
-
-# Compile messages for message file cmp_err.msg
+# Compile messages for message file cmp_err.msg.  This requires that the 
+# @MESSGEN@ substitution was requested in configure.ac, probably implicitly
+# by the STAR_MESSGEN macro.
 CMP_ERR: cmp_err.msg
-	$(STARLINK)/bin/messgen -F cmp_err.msg
+	@MESSGEN@ -F cmp_err.msg
 cmp_err: cmp_err.msg
-	$(STARLINK)/bin/messgen -f cmp_err.msg
+	@MESSGEN@ -f cmp_err.msg
 cmp_err.h: cmp_err.msg
-	$(STARLINK)/bin/messgen -c cmp_err.msg
+	@MESSGEN@ -c cmp_err.msg
 fac_230_err: cmp_err.msg
-	$(STARLINK)/bin/messgen -e cmp_err.msg
+	@MESSGEN@ -e cmp_err.msg
 
-# Compile messages for message file dat_err.msg
+# Compile messages for message file dat_err.msg.  This requires that the 
+# @MESSGEN@ substitution was requested in configure.ac, probably implicitly
+# by the STAR_MESSGEN macro.
 DAT_ERR: dat_err.msg
-	$(STARLINK)/bin/messgen -F dat_err.msg
+	@MESSGEN@ -F dat_err.msg
 dat_err: dat_err.msg
-	$(STARLINK)/bin/messgen -f dat_err.msg
+	@MESSGEN@ -f dat_err.msg
 dat_err.h: dat_err.msg
-	$(STARLINK)/bin/messgen -c dat_err.msg
+	@MESSGEN@ -c dat_err.msg
 fac_200_err: dat_err.msg
-	$(STARLINK)/bin/messgen -e dat_err.msg
+	@MESSGEN@ -e dat_err.msg
 install-stardocsSTARDATA: $(stardocs_STARDATA)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(stardocsdir)
@@ -937,6 +910,41 @@ uninstall-starhelpSTARDATA:
 	  echo " rm -f $(DESTDIR)$(starhelpdir)/$$f"; \
 	  rm -f $(DESTDIR)$(starhelpdir)/$$f; \
 	done
+
+# Create an install manifest, and install it in the required manifest location
+install-manifest.xml: all-am
+	rm -f $@
+	echo "<?xml version='1.0'?>"                            >$@
+	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
+	echo "<manifest component='$(PACKAGE)'>"                >>$@
+	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
+	echo "<files>"                                          >>$@
+	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
+	echo "</files>"                                         >>$@
+	echo "</manifest>"                                      >>$@
+
+# Install the install-manifest.xml into the $(STAR_MANIFEST_DIR) directory.
+# We should respect $(DESTDIR), but needn't worry about $(srcdir),
+# since we know that the file was created in the current directory.
+# Having done that, delete the install-manifest.xml file
+install-manifest: install-manifest.xml
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
+	$(INSTALL_DATA) install-manifest.xml \
+		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
+# Templates to generate documentation
+.tex.dvi:
+	latex $<
+.dvi.ps:
+	dvips -o $@ $<
+# Don't express a dependency via the directory .htx, or else Make
+# tries to delete it as an intermediate.  An alternative is to use
+# .PRECIOUS, but that's not completely straightforward to arrange.
+# Requires that the STAR2HTML substitution was made in
+# configure.ac, probably implicitly by the STAR_LATEX_DOCUMENTATION macro.
+.tex.htx_tar:
+	- @STAR2HTML@ $<
+	tar cf $@ ${<:.tex=.htx}
 
 distdir: $(DISTFILES)
 	$(am__remove_distdir)

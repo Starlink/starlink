@@ -137,6 +137,7 @@ LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MESSGEN = @MESSGEN@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -426,6 +427,38 @@ GTAGS:
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
+# Compile messages for message file sock_err.msg.  This requires that the 
+# @MESSGEN@ substitution was requested in configure.ac, probably implicitly
+# by the STAR_MESSGEN macro.
+SOCK_ERR: sock_err.msg
+	@MESSGEN@ -F sock_err.msg
+sock_err: sock_err.msg
+	@MESSGEN@ -f sock_err.msg
+sock_err.h: sock_err.msg
+	@MESSGEN@ -c sock_err.msg
+fac_390_err: sock_err.msg
+	@MESSGEN@ -e sock_err.msg
+install-starhelpSTARDATA: $(starhelp_STARDATA)
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(starhelpdir)
+	@list='$(starhelp_STARDATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f"; \
+	  $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f; \
+	  if test -n "$$MANIFEST_FILE"; then \
+	  	echo "$(DESTDIR)$(starhelpdir)/$$f" >>$$MANIFEST_FILE; \
+	  else :; fi; \
+	done
+
+uninstall-starhelpSTARDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(starhelp_STARDATA)'; for p in $$list; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(starhelpdir)/$$f"; \
+	  rm -f $(DESTDIR)$(starhelpdir)/$$f; \
+	done
+
 # Create an install manifest, and install it in the required manifest location
 install-manifest.xml: all-am
 	rm -f $@
@@ -447,36 +480,6 @@ install-manifest: install-manifest.xml
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
 		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-
-# Compile messages for message file sock_err.msg
-SOCK_ERR: sock_err.msg
-	$(STARLINK)/bin/messgen -F sock_err.msg
-sock_err: sock_err.msg
-	$(STARLINK)/bin/messgen -f sock_err.msg
-sock_err.h: sock_err.msg
-	$(STARLINK)/bin/messgen -c sock_err.msg
-fac_390_err: sock_err.msg
-	$(STARLINK)/bin/messgen -e sock_err.msg
-install-starhelpSTARDATA: $(starhelp_STARDATA)
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(starhelpdir)
-	@list='$(starhelp_STARDATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f"; \
-	  $(starhelpSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(starhelpdir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(starhelpdir)/$$f" >>$$MANIFEST_FILE; \
-	  else :; fi; \
-	done
-
-uninstall-starhelpSTARDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(starhelp_STARDATA)'; for p in $$list; do \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " rm -f $(DESTDIR)$(starhelpdir)/$$f"; \
-	  rm -f $(DESTDIR)$(starhelpdir)/$$f; \
-	done
 
 distdir: $(DISTFILES)
 	$(am__remove_distdir)

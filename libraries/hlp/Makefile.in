@@ -101,10 +101,10 @@ DIST_SOURCES = $(libhlp_la_SOURCES) $(crehlp_SOURCES) \
 	$(lsthlp_SOURCES) $(tsthlp_SOURCES)
 ETAGS = etags
 CTAGS = ctags
-SUFFIXES = .tex .dvi .ps .htx_tar
 stardocsSTARDATA_INSTALL = $(INSTALL_STARDATA)
 STARDATA = $(stardocs_STARDATA)
 INSTALL_STARDATA = $(INSTALL_DATA)
+SUFFIXES = .tex .dvi .ps .htx_tar
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
@@ -178,6 +178,7 @@ PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+STAR2HTML = @STAR2HTML@
 STARLINK = @STARLINK@
 STAR_DEPENDENCIES_ATTRIBUTES = @STAR_DEPENDENCIES_ATTRIBUTES@
 STAR_DEPENDENCIES_CHILDREN = @STAR_DEPENDENCIES_CHILDREN@
@@ -528,6 +529,26 @@ GTAGS:
 
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
+install-stardocsSTARDATA: $(stardocs_STARDATA)
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(stardocsdir)
+	@list='$(stardocs_STARDATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(stardocsSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(stardocsdir)/$$f"; \
+	  $(stardocsSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(stardocsdir)/$$f; \
+	  if test -n "$$MANIFEST_FILE"; then \
+	  	echo "$(DESTDIR)$(stardocsdir)/$$f" >>$$MANIFEST_FILE; \
+	  else :; fi; \
+	done
+
+uninstall-stardocsSTARDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(stardocs_STARDATA)'; for p in $$list; do \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " rm -f $(DESTDIR)$(stardocsdir)/$$f"; \
+	  rm -f $(DESTDIR)$(stardocsdir)/$$f; \
+	done
 
 # Create an install manifest, and install it in the required manifest location
 install-manifest.xml: all-am
@@ -558,29 +579,11 @@ install-manifest: install-manifest.xml
 # Don't express a dependency via the directory .htx, or else Make
 # tries to delete it as an intermediate.  An alternative is to use
 # .PRECIOUS, but that's not completely straightforward to arrange.
+# Requires that the STAR2HTML substitution was made in
+# configure.ac, probably implicitly by the STAR_LATEX_DOCUMENTATION macro.
 .tex.htx_tar:
-	- star2html $<
+	- @STAR2HTML@ $<
 	tar cf $@ ${<:.tex=.htx}
-install-stardocsSTARDATA: $(stardocs_STARDATA)
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(stardocsdir)
-	@list='$(stardocs_STARDATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(stardocsSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(stardocsdir)/$$f"; \
-	  $(stardocsSTARDATA_INSTALL) $$d$$p $(DESTDIR)$(stardocsdir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(stardocsdir)/$$f" >>$$MANIFEST_FILE; \
-	  else :; fi; \
-	done
-
-uninstall-stardocsSTARDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(stardocs_STARDATA)'; for p in $$list; do \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " rm -f $(DESTDIR)$(stardocsdir)/$$f"; \
-	  rm -f $(DESTDIR)$(stardocsdir)/$$f; \
-	done
 
 distdir: $(DISTFILES)
 	$(am__remove_distdir)

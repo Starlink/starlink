@@ -150,6 +150,7 @@ LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
+MESSGEN = @MESSGEN@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
@@ -162,6 +163,7 @@ PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
+STAR2HTML = @STAR2HTML@
 STARLINK = @STARLINK@
 STAR_DEPENDENCIES_ATTRIBUTES = @STAR_DEPENDENCIES_ATTRIBUTES@
 STAR_DEPENDENCIES_CHILDREN = @STAR_DEPENDENCIES_CHILDREN@
@@ -512,15 +514,17 @@ GTAGS:
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
-# Compile messages for message file fio_err.msg
+# Compile messages for message file fio_err.msg.  This requires that the 
+# @MESSGEN@ substitution was requested in configure.ac, probably implicitly
+# by the STAR_MESSGEN macro.
 FIO_ERR: fio_err.msg
-	$(STARLINK)/bin/messgen -F fio_err.msg
+	@MESSGEN@ -F fio_err.msg
 fio_err: fio_err.msg
-	$(STARLINK)/bin/messgen -f fio_err.msg
+	@MESSGEN@ -f fio_err.msg
 fio_err.h: fio_err.msg
-	$(STARLINK)/bin/messgen -c fio_err.msg
+	@MESSGEN@ -c fio_err.msg
 fac_361_err: fio_err.msg
-	$(STARLINK)/bin/messgen -e fio_err.msg
+	@MESSGEN@ -e fio_err.msg
 install-stardocsSTARDATA: $(stardocs_STARDATA)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(stardocsdir)
@@ -591,8 +595,10 @@ install-manifest: install-manifest.xml
 # Don't express a dependency via the directory .htx, or else Make
 # tries to delete it as an intermediate.  An alternative is to use
 # .PRECIOUS, but that's not completely straightforward to arrange.
+# Requires that the STAR2HTML substitution was made in
+# configure.ac, probably implicitly by the STAR_LATEX_DOCUMENTATION macro.
 .tex.htx_tar:
-	- star2html $<
+	- @STAR2HTML@ $<
 	tar cf $@ ${<:.tex=.htx}
 
 distdir: $(DISTFILES)
