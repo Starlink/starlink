@@ -1,62 +1,130 @@
-*+  BINSUM - Integrate values in dataset
-      SUBROUTINE BINSUM(STATUS)
-*
-*    Description :
-*
+      SUBROUTINE BINSUM( STATUS )
+*+
+*  Name:
+*     BINSUM
+
+*  Purpose:
+*     Integrate values in dataset
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL BINSUM( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Integrates ( ie. sums ) data in either a primitive or an NDF. If
 *     input is not 1D then user is warned and the array is treated as a
 *     sequence of 1D strips.
-*
-*    Environment parameters :
-*
-*     INP = UNIV(R)
-*           Input dataset
-*     REVERSE = LOGICAL(R)
-*           Sum from end of array backwards
-*     OUT = UNIV(W)
-*           Output dataset
-*
-*    Method :
-*
+
+*  Usage:
+*     binsum {parameter_usage}
+
+*  Environment Parameters:
+*     INP = CHAR (read)
+*        Input dataset
+*     REVERSE = LOGICAL (read)
+*        Sum from end of array backwards
+*     OUT = CHAR (read)
+*        Output dataset
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
 *     Obvious. If bad quality is present then output data values reflect
 *     the integrated value being constant until good quality is met.
-*
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*      8 Dec 89 : V1.0-0  Original (DJA)
-*      5 Oct 90 : V1.3-0  REVERSE option added (DJA)
-*      3 Nov 94 : V1.8-0  Upgraded to new graphics (DJA)
-*     24 Nov 94 : V1.8-1  Now use USI for user interface (DJA)
-*     12 Jan 95 : V1.8-2  HDS removed, using new interfaces (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     binsum, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      8 Dec 1989 V1.0-0 (DJA):
+*        Original version.
+*      5 Oct 1990 V1.3-0 (DJA):
+*        REVERSE option added
+*      3 Nov 1994 V1.8-0 (DJA):
+*        Upgraded to new graphics
+*     24 Nov 1994 V1.8-1 (DJA):
+*        Now use USI for user interface
+*     12 Jan 1995 V1.8-2 (DJA):
+*        HDS removed, using new interfaces
+*     16 Nov 1995 V2.0-0 (DJA):
+*        Full ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local constants :
-*
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
       INTEGER                   MAXLINES         ! Maximum amount of hist text
          PARAMETER                (MAXLINES = 5)
-*
-*    Local variables :
-*
+
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'BINSUM Version V2.0-0' )
+
+*  Local Variables:
       CHARACTER*132             TEXT(MAXLINES)   	! Hostory text
 
       INTEGER                   DIMS(ADI__MXDIM) 	! Input dimensions
-      INTEGER                   QDIMS(ADI__MXDIM)	! Input quality dimensions
 
       INTEGER                   IDPTR        		! Input data
       INTEGER			IFID			! I/p file identifier
@@ -66,122 +134,81 @@
       INTEGER                   NREC             	! Amount of TEXT used
       INTEGER                   ODPTR        		! Output data
       INTEGER			OFID			! O/p file identifier
-      INTEGER                   QNDIM            	! Input quality dimensionality
 
-      LOGICAL                   ANYBAD     		! Any bad quality points?
       LOGICAL                   DATA_OK          	! Input data ok?
-      LOGICAL			IN_PRIM			! Input is primitive?
       LOGICAL                   REVERSE          	! In reverse mode?
       LOGICAL                   QUAL_OK          	! Input has quality?
-*
-*    Version :
-*
-      CHARACTER*30 VERSION
-         PARAMETER (VERSION = 'BINSUM Version 1.8-2')
-*-
+*.
 
-*    Check status
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Version announcement
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialise
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-*    Associate input dataset - can be primitive
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+*  Associate input dataset - can be primitive
+      CALL USI_TASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check data
-      CALL BDI_CHKDATA( IFID, DATA_OK, NDIM, DIMS, STATUS )
+*  Check data
+      CALL BDI_CHK( IFID, 'Data', DATA_OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
       IF ( DATA_OK ) THEN
-        CALL BDI_MAPDATA( IFID, 'READ', IDPTR, STATUS )
+        CALL BDI_MAPR( IFID, 'Data', 'READ', IDPTR, STATUS )
       ELSE
         CALL ERR_REP( ' ', 'Invalid data', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Warn if NDIM > 1
+*  Warn if NDIM > 1
       IF ( NDIM .GT. 1 ) THEN
          CALL MSG_PRNT( 'Dimensionality > 1, will process input '/
      :                               /'as if array of 1D strips' )
       END IF
 
-*    Work in reverse mode?
+*  Work in reverse mode?
       CALL USI_GET0L( 'REVERSE', REVERSE, STATUS )
 
-*    Find total number of elements in dataset
+*  Find total number of elements in dataset
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
-*    Check quality
-      CALL BDI_CHKQUAL( IFID, QUAL_OK, QNDIM, QDIMS, STATUS )
+*  Check quality
+      CALL BDI_CHK( IFID, 'Quality', QUAL_OK, STATUS )
 
-*    If quality there
+*  Map if quality there
       IF ( QUAL_OK ) THEN
-
-*      Map it
-        CALL BDI_MAPLQUAL( IFID, 'READ', ANYBAD, IQPTR, STATUS )
-
-*      Check for all good quality though
-        IF ( .NOT. ANYBAD ) THEN
-          CALL BDI_UNMAPLQUAL( IFID, STATUS )
-          QUAL_OK = .FALSE.
-        END IF
-
+        CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQPTR, STATUS )
       END IF
 
-*    Associate output dataset
-      CALL USI_TASSOCO( 'OUT', 'CUM_DISTRIB', OFID, STATUS )
+*  Associate output dataset
+      CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
 
-*    Create components
-      CALL BDI_CREDATA( OFID, NDIM, DIMS, STATUS )
-      IF ( QUAL_OK ) THEN
-         CALL BDI_CREQUAL( OFID, NDIM, DIMS, STATUS )
-      END IF
+*  Map output data
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
 
-*    Map output data
-      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
-
-*    Perform integration
+*  Perform integration
       CALL BINSUM_INT( DIMS(1), NELM / DIMS(1), REVERSE,%VAL(IDPTR),
      :          QUAL_OK, %VAL(IQPTR), %VAL(ODPTR), STATUS )
 
-*    Copy axis data from dataset to the other
-      CALL BDI_PRIM( IFID, IN_PRIM, STATUS )
-      IF ( .NOT. IN_PRIM ) THEN
+*  Set up histogram style
+      CALL GCB_LCONNECT( STATUS )
+      CALL GCB_SETL( 'STEP_FLAG', .TRUE., STATUS )
+      CALL GCB_FSAVE( OFID, STATUS )
+      CALL GCB_DETACH( STATUS )
 
-*       Copy axis bin info
-         CALL BDI_COPAXES( IFID, OFID, STATUS )
-
-      END IF
-
-*    Copy data label
-      CALL BDI_COPTEXT( IFID, OFID, STATUS )
-
-*    Copy over MORE box and QUALITY if present
-      CALL BDI_COPMORE( IFID, OFID, STATUS )
-      IF ( QUAL_OK ) THEN
-        CALL BDI_COPQUAL( IFID, OFID, STATUS )
-      END IF
-
-*    Set up histogram style
-      CALL GCB_LCONNECT(STATUS)
-      CALL GCB_SETL('STEP_FLAG',.TRUE.,STATUS)
-      CALL GCB_FSAVE(OFID,STATUS)
-      CALL GCB_DETACH(STATUS)
-
-*    Put name of input dataset into history
+*  Put name of input dataset into history
       TEXT(1) = 'Input dataset {INP}'
       NREC = MAXLINES
       CALL USI_TEXT( 1, TEXT, NREC, STATUS )
 
-*    Copy and update HISTORY
-      CALL HSI_COPY( IFID, OFID, STATUS )
+*  Copy and update HISTORY
       CALL HSI_ADD( OFID, VERSION, STATUS )
       CALL HSI_PTXT( OFID, NREC, TEXT, STATUS )
 
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE
       CALL AST_ERR( STATUS )
 
@@ -228,39 +255,39 @@
       INTEGER        I,J,START,END,DELTA
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Choose base and delta depending on direction
+*  Choose base and delta depending on direction
       IF ( REVERSE ) THEN
-         START = NX
-         END = 1
-         DELTA = -1
+        START = NX
+        END = 1
+        DELTA = -1
       ELSE
-         START = 1
-         END = NX
-         DELTA = 1
+        START = 1
+        END = NX
+        DELTA = 1
       END IF
 
-*    Switch depending on presence of quality
+*  Switch depending on presence of quality
       IF ( QOK ) THEN
-         DO J = 1, NY
-            SUM = 0.0
-            DO I = START, END, DELTA
-               IF ( QIN(I,J) ) THEN
-                  SUM = SUM + IN(I,J)
-               END IF
-               OUT(I,J) = SUM
-            END DO
-         END DO
+        DO J = 1, NY
+          SUM = 0.0
+          DO I = START, END, DELTA
+            IF ( QIN(I,J) ) THEN
+              SUM = SUM + IN(I,J)
+            END IF
+            OUT(I,J) = SUM
+          END DO
+        END DO
       ELSE
-         DO J = 1, NY
-            SUM = 0.0
-            DO I = START, END, DELTA
-               SUM = SUM + IN(I,J)
-               OUT(I,J) = SUM
-            END DO
-         END DO
+        DO J = 1, NY
+          SUM = 0.0
+          DO I = START, END, DELTA
+            SUM = SUM + IN(I,J)
+            OUT(I,J) = SUM
+          END DO
+        END DO
       END IF
 
       END
