@@ -12,6 +12,17 @@
 # Usage:
 #     ./bootstrap
 
+# The starconf below might update bootstrap, if a newer version is
+# available.  Unfortunately, this confuses sh.  So pipe this file into
+# 'exec sh', after removing this indirection magic.  Since sh is
+# reading from a file-descriptor, and since sed will open the file
+# and read from the FD, we are immune from any changes that happen to
+# the file.
+#MAGIC
+#sed '/^#MAGIC/,/^#ENDMAGIC/d' ./bootstrap | exec sh
+# No, this doesn't work -- dunno why.  Leave it for now.
+#ENDMAGIC
+
 
 # Echo a command then run it, terminating the script if the command fails
 echorun() { echo $*; eval $* || exit 1; }

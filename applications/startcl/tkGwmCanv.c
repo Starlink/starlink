@@ -2,7 +2,8 @@
   This file implements the Gwm canvas item type.
 */
 #include <math.h>
-#include <malloc.h>
+/* #include <malloc.h> */
+#include <stdlib.h>
 
 #include "tcl.h"
 #include "tk.h"
