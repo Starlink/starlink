@@ -45,7 +45,7 @@ MEMNOTALL	<Memory not allocated>
 MAXMEM	<Out of memory locators>
 TWTOOBIG	<Transfer window too big>
 IMGTOOBIG	<Image too big>
-LITIDERR	<Lookup table identifier invalid>
+LUTIDERR	<Lookup table identifier invalid>
 LUTLENERR	<Lookup table length error>
 LUTNOTDEF	<Lookup table not defined>
 ITTIDERR	<ITT identifier invalid>
@@ -76,7 +76,7 @@ VD_KWTYPERR	<Display window type error>
 VD_FILKWNOTCR	<Display window file not created>
 VD_WINOTOPN	<Requested display window not created>
 VD_FILKWERR	<Display window file read/update error>
-VD_DEVNULL	<Environment device name not defined>
+VD_NULLDEV	<Environment device name not defined>
 VD_SAVNOTALL	<SAVE operation not allowed for A>
 VD_XCONNERR	<Error connecting to X-server>
 VD_UNSUPVT	<Window visual type not supported>

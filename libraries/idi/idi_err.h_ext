@@ -1,0 +1,116 @@
+
+/* IDI__OK status must be added manually (or via messgen _ext file).
+   and it must match the value of SAI__OK. */
+
+/* Note that in earlier releases of IDI the C error code was actually
+   called as II_SUCCESS rather than IDI__OK */
+
+/*  Normal Status */
+#define	IDI__OK 0
+
+
+/* This is the header from the original idi_err.h
+   It has been modified from the original to map automatically
+   generated messgen status values which have an IDI__ prefix
+   to the old backwards compatible values. It would be nice to
+   remove these codes completely but I have no idea how many programs
+   in the wild use these codes (Tim Jenness [JAC]).
+ */
+
+/***********************************************************************
+*                                                                      *
+*   file IDI_ERR.H                                                     *
+*                                                                      *
+*   IDI  ERRORS & CONSTANTS definition                                 *
+*                                                                      *
+*   Code = 134250498 + 65536 * <fac> + 8 * <mes>                       *
+*   where <fac> = 275                                                  *
+*                                                                      *
+************************************************************************
+*   V 2.0    910320                                                    *
+*            920326  Added VD_ codes                                   *
+*            920807  Added NOCAP                                       *
+*   Author : Nick Eaton  - Durham University                           *
+*   Revised: Brian McIlwrath - Starlink, RAL                           *
+*            960604  Revised to match FORTRAN include file             *
+             2004-03-25 Tim Jenness (use actual messgen codes)
+***********************************************************************/
+
+# define II_SUCCESS    IDI__OK
+
+# define DISWNDERR     IDI__DISWNDERR
+# define NOAVAILDEV    IDI__NOAVAILDEV
+# define DEVNOTOP      IDI__DEVNOTOP
+# define NODYNCONF     IDI__NODYNCONF
+# define DEVNAMERR     IDI__DEVNAMERR
+# define DEVCAPTRUNC   IDI__DEVCAPTRUNC
+# define MAXCONFN      IDI__MAXCONFN
+# define EXTBMNOTFND   IDI__EXTBMNOTFND
+
+# define MEMALLERR     IDI__MEMALLERR
+# define DCTFILERR     IDI__DCTFILERR
+# define DYNCONFEN     IDI__DYNCONFEN
+# define DYNCONFNOTEN  IDI__DYNCONFNOTEN
+
+# define ILLCONFID     IDI__ILLCONFID
+
+# define MEMNOTFREE    IDI__MEMNOTFREE
+# define ILLMEMID      IDI__ILLMEMID
+# define MEMNOTALL     IDI__MEMNOTALL
+# define MAXMEM        IDI__MAXMEM
+
+# define TWTOOBIG      IDI__TWTOOBIG
+# define IMGTOOBIG     IDI__IMGTOOBIG
+
+# define LUTIDERR      IDI__LUTIDERR
+# define LUTLENERR     IDI__LUTLENERR
+# define LUTNOTDEF     IDI__LUTNOTDEF
+
+# define ITTIDERR      IDI__ITTIDERR
+# define ITTLENERR     IDI__ITTLENERR
+
+# define CURNOTDEF     IDI__CURNOTDEF
+
+# define ROINOTDEF     IDI__ROINOTDEF
+# define MAXROI        IDI__MAXROI
+
+# define ILLCURID      IDI__ILLCURID
+# define ILLTRIGGER    IDI__ILLTRIGGER
+# define ILLINTTYPE    IDI__ILLINTTYPE
+# define ILLINTOBJ     IDI__ILLINTOBJ
+# define ILLINTOPER    IDI__ILLINTOPER
+
+# define IDINOSUPP     IDI__IDINOSUPP
+
+# define DCTFILWARN    IDI__DCTFILWARN
+
+# define DEPTHERR      IDI__DEPTHERR
+# define MEMTYPERR     IDI__MEMTYPERR
+# define MAXMEMLST     IDI__MAXMEMLST
+
+# define LUTNOTFREE    IDI__LUTNOTFREE
+
+# define CURNOTFREE    IDI__CURNOTFREE
+# define CURNOTVIS     IDI__CURNOTVIS
+
+# define ROINOTVIS     IDI__ROINOTVIS
+
+# define INTNOTALL     IDI__INTNOTALL
+# define MAXNOINT      IDI__MAXNOINT
+# define INTNOEN       IDI__INTNOEN
+
+# define FONTNOTDEF    IDI__FONTNOTDEF
+
+# define VD_MAXWIND    IDI__VD_MAXWIND 
+# define VD_KWTYPERR   IDI__VD_KWTYPERR
+# define VD_FILKWNOTCR IDI__VD_FILKWNOTCR
+# define VD_WINOTOPN   IDI__VD_WINOTOPN
+# define VD_FILKWERR   IDI__VD_FILKWERR
+# define VD_NULLDEV    IDI__VD_NULLDEV
+# define VD_SAVNOTALL  IDI__VD_SAVNOTALL
+# define VD_XCONNERR   IDI__VD_XCONNERR
+# define VD_UNSUPVT    IDI__VD_UNSUPVT
+
+# define NOCAP         IDI__NOCAP
+
+/*********************************************************************/

@@ -1,7 +1,17 @@
 
-* Note: IDI__OK status added manually
+* Note: IDI__OK status added manually since it must always
+*       match SAI__OK
 
 *     Normal status
       INTEGER IDI__OK
       PARAMETER ( IDI__OK = 0 )
+
+* IDI__VD_DEVNULL added for backwards compatibility reasons.
+* since the C library has been using VD_NULLDEV and the Fortran
+* include files used VD_DEVNULL. Presumably Fortran code is not
+* using the C version so we have to provide both.
+
+*     Environment device name not defined
+      INTEGER IDI__DEVNULL
+      PARAMETER (IDI__DEVNULL = IDI__NULLDEV)
 
