@@ -7,7 +7,7 @@ interface GSET
    endparameter
    parameter INP
      position 2
-     type 'UNIV'
+     type 'LITERAL'
      ppath 'GLOBAL'
      prompt 'Dataset'
      association '<->GLOBAL.BINDS'
