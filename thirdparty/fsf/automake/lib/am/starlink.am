@@ -90,7 +90,7 @@ if %?VERSIONDAT%
 # only because we saw STAR_DEFAULTS(per-package-dir) in the configure.ac.
 # This is installed as a result of this file being included in the
 # value of the am__bin_DATA variable.
-version.dat: configure.ac
+version.dat: $(top_srcdir)/configure.ac
 	rm -f version.dat
 	echo $(PACKAGE_VERSION) >version.dat
 endif %?VERSIONDAT%
