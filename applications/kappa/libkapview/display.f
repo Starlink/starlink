@@ -464,6 +464,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -528,6 +529,8 @@
 *        of DATA picture.
 *     23-OCT-2001 (DSB):
 *        Changed to remove limit on size of colour table.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -546,6 +549,7 @@
       INCLUDE 'PAR_ERR'        ! Parameter-system error definitions
       INCLUDE 'PAR_PAR'        ! Parameter-system constants
       INCLUDE 'CTM_PAR'        ! Colour-table management constants
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -1105,7 +1109,8 @@
          CALL PAR_GTD0L( 'NN', .FALSE., .TRUE., NN, STATUS )
 
 *  Install the lookup table into image-display colour table.
-         CALL KPG1_PGLUT( LDIMS( 2 ), %VAL( LPNTR( 1 ) ), LP, UP, NN,
+         CALL KPG1_PGLUT( LDIMS( 2 ), %VAL( CNF_PVAL( LPNTR( 1 ) ) ), 
+     :                    LP, UP, NN,
      :                    STATUS )
 
       END IF
@@ -1151,7 +1156,7 @@
 *  Draw the image, extending over the pixel co-ordinate bounds of the DATA
 *  picture.
       CALL KPG1_PGPIX( IPLOT, 'PIXEL', WPLBND, WPUBND, NX, NY, 
-     :                 %VAL( IPCOL ), STATUS )
+     :                 %VAL( CNF_PVAL( IPCOL ) ), STATUS )
 
 *  Draw the axes grid if required.
       IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
@@ -1187,7 +1192,7 @@
          CALL KPG1_LUTKY( IPICK, 'KEYSTYLE', REAL( DHI ), REAL( DLO ), 
      :                    LABEL( : NC ), 'KAPPA_DISPLAY', LP, UP, 0.1,
      :                    ( Y2 - Y1 )*0.1, ( Y2 - Y1 )*0.1, 'CL',
-     :                    NX*NY, %VAL( IPCOL ), STATUS )
+     :                    NX*NY, %VAL( CNF_PVAL( IPCOL ) ), STATUS )
 
 *  Report a context message if anything went wrong.
          IF( STATUS .NE. SAI__OK ) THEN
@@ -1265,16 +1270,19 @@
 *  there can be no conversion errors by definition the count returned by the 
 *  conversion routine is ignored.
             IF ( OTYPE .EQ. '_UBYTE' ) THEN
-               CALL VEC_ITOUB( BAD, EL, %VAL( IPCOL ),
-     :                         %VAL( OPNTR( 1 ) ), IERR, NERR, STATUS )
+               CALL VEC_ITOUB( BAD, EL, %VAL( CNF_PVAL( IPCOL ) ),
+     :                         %VAL( CNF_PVAL( OPNTR( 1 ) ) ), 
+     :                         IERR, NERR, STATUS )
 
             ELSE IF ( OTYPE .EQ. '_UWORD' ) THEN
-               CALL VEC_ITOUW( BAD, EL, %VAL( IPCOL ),
-     :                         %VAL( OPNTR( 1 ) ), IERR, NERR, STATUS )
+               CALL VEC_ITOUW( BAD, EL, %VAL( CNF_PVAL( IPCOL ) ),
+     :                         %VAL( CNF_PVAL( OPNTR( 1 ) ) ), 
+     :                         IERR, NERR, STATUS )
 
             ELSE IF ( OTYPE .EQ. '_INTEGER' ) THEN
-               CALL VEC_ITOI( BAD, EL, %VAL( IPCOL ),
-     :                        %VAL( OPNTR( 1 ) ), IERR, NERR, STATUS )
+               CALL VEC_ITOI( BAD, EL, %VAL( CNF_PVAL( IPCOL ) ),
+     :                        %VAL( CNF_PVAL( OPNTR( 1 ) ) ), 
+     :                        IERR, NERR, STATUS )
             END IF
 
          END IF

@@ -195,6 +195,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -227,6 +228,8 @@
 *        Normalize displayed first pixel centre in current WCS Frame.
 *     10-JAN-2003 (DSB):
 *        Modified to display details of WCS SpecFrames.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -322,6 +325,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion routines
       INCLUDE 'NUM_DEF_CVT'
+      INCLUDE 'CNF_PAR'
 *.
 
 *  Check the inherited global status.
@@ -539,7 +543,8 @@
 *  Instead we issue a warning message so that the application can
 *  continue by using world co-ordinates.
             CALL ERR_BEGIN( STATUS )
-            CALL KPG1_MONOD( .TRUE., EL, %VAL( AXPNTR( 1 ) ),
+            CALL KPG1_MONOD( .TRUE., EL, 
+     :                       %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                       MONOTO( IAXIS ), STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL ERR_ANNUL( STATUS )
@@ -561,8 +566,9 @@
 *  afterwards.
                CALL NDF_AMAP( INDF, 'Centre,Width', IAXIS, '_DOUBLE',
      :                        'READ', PNTR, EL, STATUS )
-               CALL KPG1_AXRNG( EL, %VAL( PNTR( 1 ) ),
-     :                          %VAL( PNTR( 2 ) ), ASTART( IAXIS ),
+               CALL KPG1_AXRNG( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                          %VAL( CNF_PVAL( PNTR( 2 ) ) ), 
+     :                          ASTART( IAXIS ),
      :                          AEND( IAXIS ), STATUS )
                CALL NDF_AUNMP( INDF, 'Centre,Width', IAXIS, STATUS )
 

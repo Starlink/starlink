@@ -48,6 +48,8 @@
 *        updated every invocation.
 *     5-DEC-2001 (DSB):
 *        Report output file when using PS devices.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:

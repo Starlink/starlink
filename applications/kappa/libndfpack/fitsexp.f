@@ -139,11 +139,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1994 July 15 (MJC):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -159,6 +162,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants      
       INCLUDE 'FIO_ERR'          ! FIO_ error codes
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -622,7 +626,7 @@
 *  Ditto for extract data of other types from the FITS extension.
             IF ( TYPE( 1:5 ) .EQ. '_CHAR' ) THEN
                CALL DAT_GETVC( CLOCS( ICOMP ), 1, CVAL, NEL, STATUS )
-               CALL FTS1_UKEYC( EL, %VAL( PNTR( 1 ) ), 1,
+               CALL FTS1_UKEYC( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                          KEYWDS( ICOMP ), CVAL, '/',
      :                          COMNTS( ICOMP ), .FALSE., FOUND, CARD,
      :                          STATUS, %VAL( LENGTH ) )
@@ -633,7 +637,7 @@
 *  update the card.
             ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                CALL DAT_GETVD( CLOCS( ICOMP ), 1, DVAL, NEL, STATUS )
-               CALL FTS1_UKEYD( EL, %VAL( PNTR( 1 ) ), 1,
+               CALL FTS1_UKEYD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                          KEYWDS( ICOMP ), DVAL, '/',
      :                          COMNTS( ICOMP ), FOUND, CARD, STATUS,
      :                          %VAL( LENGTH ) )
@@ -646,7 +650,7 @@
      :                TYPE .EQ. '_UBYTE' .OR. TYPE .EQ. '_WORD' .OR.
      :                TYPE .EQ. '_UWORD' ) THEN
                CALL DAT_GETVI( CLOCS( ICOMP ), 1, IVAL, NEL, STATUS )
-               CALL FTS1_UKEYI( EL, %VAL( PNTR( 1 ) ), 1,
+               CALL FTS1_UKEYI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                          KEYWDS( ICOMP ), IVAL, '/',
      :                          COMNTS( ICOMP ), FOUND, CARD, STATUS,
      :                          %VAL( LENGTH ) )
@@ -657,7 +661,7 @@
 *  update the card.
             ELSE IF ( TYPE .EQ. '_LOGICAL' ) THEN
                CALL DAT_GETVL( CLOCS( ICOMP ), 1, LVAL, NEL, STATUS )
-               CALL FTS1_UKEYL( EL, %VAL( PNTR( 1 ) ), 1,
+               CALL FTS1_UKEYL( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                          KEYWDS( ICOMP ), LVAL, '/',
      :                          COMNTS( ICOMP ), FOUND, CARD, STATUS,
      :                          %VAL( LENGTH ) )
@@ -668,7 +672,7 @@
 *  update the card.
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                CALL DAT_GETVR( CLOCS( ICOMP ), 1, RVAL, NEL, STATUS )
-               CALL FTS1_UKEYR( EL, %VAL( PNTR( 1 ) ), 1,
+               CALL FTS1_UKEYR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                          KEYWDS( ICOMP ), RVAL, '/',
      :                          COMNTS( ICOMP ), FOUND, CARD, STATUS,
      :                          %VAL( LENGTH ) )

@@ -67,6 +67,8 @@
 *        Modified to use PGPLOT.
 *     30-SEP-1999 (DSB):
 *        Tidied up.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:

@@ -64,11 +64,14 @@
  
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     16-OCT-2001 (DSB):
 *        Original PGPLOT version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,6 +86,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CTM_PAR'          ! Colour-table-management constants
       INCLUDE 'PAR_ERR'          ! Parameter-system error codes
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -156,10 +160,12 @@
 
 *  Allocate memory and store the LUT in the memory.
          CALL PSX_CALLOC( DIMS( 1 )*DIMS( 2 ), '_REAL', PNTR, STATUS )
-         CALL KPG1_PLPUT( LP, UP, LP, UP, %VAL( PNTR ), STATUS )
+         CALL KPG1_PLPUT( LP, UP, LP, UP, %VAL( CNF_PVAL( PNTR ) ), 
+     :                    STATUS )
 
 *  Write it to a log file.
-         CALL KPG1_LSTAR( DIMS( 1 ), DIMS( 2 ), %VAL( PNTR ), 1, 1, 
+         CALL KPG1_LSTAR( DIMS( 1 ), DIMS( 2 ), 
+     :                    %VAL( CNF_PVAL( PNTR ) ), 1, 1,
      :                    DIMS( 1 ), DIMS( 2 ), .TRUE., FDI, 
      :                    'LOGFILE', STATUS )
 
@@ -173,10 +179,12 @@
          CALL NDF_MAP( NDF, 'DATA', '_REAL', 'WRITE', PNTR, EL, STATUS )
 
 *  Save the LUT to the NDF data component.
-         CALL KPG1_PLPUT( LP, UP, LP, UP, %VAL( PNTR ), STATUS )
+         CALL KPG1_PLPUT( LP, UP, LP, UP, %VAL( CNF_PVAL( PNTR ) ), 
+     :                    STATUS )
 
 *  Also write it to a log file.
-         CALL KPG1_LSTAR( DIMS( 1 ), DIMS( 2 ), %VAL( PNTR ), 1, 1, 
+         CALL KPG1_LSTAR( DIMS( 1 ), DIMS( 2 ), 
+     :                    %VAL( CNF_PVAL( PNTR ) ), 1, 1,
      :                    DIMS( 1 ), DIMS( 2 ), .TRUE., FDI, 
      :                    'LOGFILE', STATUS )
 

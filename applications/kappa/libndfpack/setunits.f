@@ -83,6 +83,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -93,6 +94,8 @@
 *        report and Related Applications.
 *     30-APR-2003 (DSB):
 *        Added MODIFY parameter.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -106,6 +109,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -196,12 +200,13 @@
 
 *  Make a copy of it.
             CALL PSX_CALLOC( EL, '_DOUBLE', IPW1, STATUS )
-            CALL VEC_DTOD( .FALSE., EL, %VAL( IPDAT ), %VAL( IPW1 ), 
+            CALL VEC_DTOD( .FALSE., EL, %VAL( CNF_PVAL( IPDAT ) ), 
+     :                     %VAL( CNF_PVAL( IPW1 ) ),
      :                     IERR, NERR, STATUS )
 
 *  Transform the data values.
-            CALL AST_TRAN1( FSET, EL, %VAL( IPW1 ), .TRUE., 
-     :                      %VAL( IPDAT ), STATUS )
+            CALL AST_TRAN1( FSET, EL, %VAL( CNF_PVAL( IPW1 ) ), .TRUE.,
+     :                      %VAL( CNF_PVAL( IPDAT ) ), STATUS )
 
 *  If the VARIANCE array is defined, we need to transform it. We do this
 *  by perturbing each data value by an amount equal to the corresponding 
@@ -216,28 +221,36 @@
 *  Find the square root of the Variance values (i.e. error estimates),
 *  putting them in new work space.
                CALL PSX_CALLOC( EL, '_DOUBLE', IPW2, STATUS )
-	       CALL VEC_SQRTD( .TRUE., EL, %VAL( IPVAR ), %VAL( IPW2 ),
+	       CALL VEC_SQRTD( .TRUE., EL, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                  %VAL( CNF_PVAL( IPW2 ) ),
      :                         IERR, NERR, STATUS )
 
 *  Perturb the original DATA values by an amount equal to the error
 *  estimate. Put the result back in the IPW1 workspace.
-	       CALL VEC_ADDD( .TRUE., EL, %VAL( IPW1 ), %VAL( IPW2 ), 
-     :                        %VAL( IPW1 ), IERR, NERR, STATUS )
+	       CALL VEC_ADDD( .TRUE., EL, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                 %VAL( CNF_PVAL( IPW2 ) ),
+     :                        %VAL( CNF_PVAL( IPW1 ) ), 
+     :                 IERR, NERR, STATUS )
 
 *  Transform these perturbed data values using the inter-unit Mapping,
 *  putting the result back in the IPW2 array.
-               CALL AST_TRAN1( FSET, EL, %VAL( IPW1 ), .TRUE., 
-     :                         %VAL( IPW2 ), STATUS )
+               CALL AST_TRAN1( FSET, EL, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                         .TRUE.,
+     :                         %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
 *  Find the difference between the tranformed original and transformed
 *  perturbed data values, putting the result in IPW1.
-	       CALL VEC_SUBD( .TRUE., EL, %VAL( IPDAT ), %VAL( IPW2 ), 
-     :                        %VAL( IPW1 ), IERR, NERR, STATUS )
+	       CALL VEC_SUBD( .TRUE., EL, %VAL( CNF_PVAL( IPDAT ) ), 
+     :                 %VAL( CNF_PVAL( IPW2 ) ),
+     :                        %VAL( CNF_PVAL( IPW1 ) ), 
+     :                 IERR, NERR, STATUS )
 
 *  Square these differences, putting the result in the output variance
 *  array.
-	       CALL VEC_MULD( .TRUE., EL, %VAL( IPW1 ), %VAL( IPW1 ), 
-     :                        %VAL( IPVAR ), IERR, NERR, STATUS )
+	       CALL VEC_MULD( .TRUE., EL, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                 %VAL( CNF_PVAL( IPW1 ) ),
+     :                        %VAL( CNF_PVAL( IPVAR ) ), 
+     :                 IERR, NERR, STATUS )
 
 *  Release work space.
                CALL PSX_FREE( IPW2, STATUS )

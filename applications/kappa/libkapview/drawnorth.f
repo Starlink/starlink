@@ -211,6 +211,8 @@
 *     3-SEP-2002 (DSB):
 *        Modified to allow arrows to be palced anywhere within the
 *        current picture.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *-

@@ -215,6 +215,8 @@
 *        bounds of Plot.
 *     10-DEC-2002 (DSB):
 *        Added display of colour palette.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:

@@ -52,11 +52,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1991 February 28 (MJC):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -71,6 +74,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -136,8 +140,8 @@
 *       does not harm on VMS.  The second character argument is no
 *       problem since it is not passed by pointer.
 
-         CALL KPG1_LISTC( FD, EL, %VAL( PNTR( 1 ) ), LOGF, STATUS,
-     :                    %VAL( LENGTH ) )
+         CALL KPG1_LISTC( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                    LOGF, STATUS, %VAL( LENGTH ) )
       END IF
 
 *    Close the log file if one has been opened.

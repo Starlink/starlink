@@ -66,6 +66,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -78,6 +79,8 @@
 *        Modified to use PGPLOT.
 *     30-SEP-1999 (DSB):
 *        Tidied up.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -91,6 +94,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'CTM_PAR'          ! Colour-table management constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -145,7 +149,8 @@
 *  Transfer the input data to the palette.  There will be no conversion 
 *  errors as we are merely copying data to the same type.
       CALL VEC_RTOR( .FALSE., 3 * MIN( DIMS( 2 ), CTM__RSVPN ),
-     :               %VAL( PPNTR( 1 ) ), PALETT, IERR, NERR, STATUS )
+     :               %VAL( CNF_PVAL( PPNTR( 1 ) ) ), 
+     :               PALETT, IERR, NERR, STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )

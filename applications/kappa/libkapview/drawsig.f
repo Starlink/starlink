@@ -159,6 +159,7 @@
 *     TIMJ: Tim Jenness (JACH)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -175,6 +176,8 @@
 *        workstation is closed.
 *     27-OCT-1999 (DSB):
 *        Major changes to use AST/PGPLOT for the graphics.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -192,6 +195,7 @@
       INCLUDE 'PAR_ERR'          ! PAR error codes
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global Status
@@ -368,49 +372,49 @@
 
 *  Call the routine of the appropriate data type.
          IF( TYPE .EQ. '_BYTE' ) THEN
-            CALL KPG1_STATB( BAD, EL, %VAL( IPIN ), NCLIP,
+            CALL KPG1_STATB( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
  
          ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-            CALL KPG1_STATUB( BAD, EL, %VAL( IPIN ), NCLIP,
+            CALL KPG1_STATUB( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
      :                        CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                        IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                        IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC,
      :                        SUMC, MEANC, STDEVC, STATUS )
  
          ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_STATD( BAD, EL, %VAL( IPIN ), NCLIP,
+            CALL KPG1_STATD( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
  
          ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-            CALL KPG1_STATI( BAD, EL, %VAL( IPIN ), NCLIP, 
+            CALL KPG1_STATI( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
  
          ELSE IF( TYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_STATR( BAD, EL, %VAL( IPIN ), NCLIP,
+            CALL KPG1_STATR( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
  
          ELSE IF( TYPE .EQ. '_WORD' ) THEN
-            CALL KPG1_STATW( BAD, EL, %VAL( IPIN ), NCLIP,
+            CALL KPG1_STATW( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
  
          ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-            CALL KPG1_STATUW( BAD, EL, %VAL( IPIN ), NCLIP,
+            CALL KPG1_STATUW( BAD, EL, %VAL( CNF_PVAL( IPIN ) ), NCLIP,
      :                        CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                        IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                        IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC,

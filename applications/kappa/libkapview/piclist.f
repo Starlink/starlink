@@ -121,6 +121,8 @@
 *        line, and allowed PICNUM to select the last picture.
 *     1995 January 13 (MJC):
 *        Made examples and usage lowercase.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:

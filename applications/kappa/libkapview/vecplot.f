@@ -292,6 +292,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -316,6 +317,8 @@
 *     26-OCT-1999 (DSB):
 *        Made MARGIN a fraction of the current picture, not the DATA
 *        picture.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -332,6 +335,7 @@
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'CTM_PAR'          ! CTM_ Colour-Table Management constants
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -745,11 +749,12 @@
 *  Plot the vectors.
       CALL KPS1_VECPL( MAP, SLBND, SUBND, NX*NY, 
      :                 SLBND1( 1 ), SUBND1( 1 ), SLBND1( 2 ), 
-     :                 SUBND1( 2 ), %VAL( IPMAG ),
+     :                 SUBND1( 2 ), %VAL( CNF_PVAL( IPMAG ) ),
      :                 SLBND2( 1 ), SUBND2( 1 ), SLBND2( 2 ), 
-     :                 SUBND2( 2 ), %VAL( IPANG ),
+     :                 SUBND2( 2 ), %VAL( CNF_PVAL( IPANG ) ),
      :                 STEP, ANGFAC, ANGROT, DSCALE, AHSIZE, JUST, 
-     :                 %VAL( IPW1 ), %VAL( IPW2 ), STATUS )
+     :                 %VAL( CNF_PVAL( IPW1 ) ), 
+     :                 %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
 *  Re-instate the previous PGPLOT attributes.
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTRS, STATUS )

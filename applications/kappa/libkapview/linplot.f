@@ -511,6 +511,7 @@
 *  Authors:
 *     MJC: Malcolm Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -534,6 +535,8 @@
 *        ALIGN is TRUE (previously a UnitMap was always used).
 *     26-NOV-2003 (DSB):
 *        Report an error if any non-monotonic AXIS structures are found.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -550,6 +553,7 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
       INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -1189,24 +1193,34 @@
 *  Map all the "what we've got" values into "what we want" values...
                
 *  Data values and vertical error bar limits.
-               CALL KPS1_LPLLM( EL, 1, EL, %VAL( IPYDAT ), YVAR, 
-     :                          .FALSE.,%VAL( IPYVAR ), YSIGMA, 
-     :                          AST__NULL, MAP,2, %VAL( IPYCEN ), 
-     :                          %VAL( IPYBAR ), TR( 2 ), BL( 2 ), 
+               CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPYDAT ) ), 
+     :                          YVAR,
+     :                          .FALSE.,%VAL( CNF_PVAL( IPYVAR ) ), 
+     :                          YSIGMA,
+     :                          AST__NULL, MAP,2, 
+     :                          %VAL( CNF_PVAL( IPYCEN ) ),
+     :                          %VAL( CNF_PVAL( IPYBAR ) ), 
+     :                          TR( 2 ), BL( 2 ),
      :                          MONO, BAD, STATUS )
 
 *  The X axis central values and horizontal error bar limits.
-               CALL KPS1_LPLLM( EL, 1, EL, %VAL( IPXDAT ), XVAR, 
-     :                          .FALSE., %VAL( IPXVAR ), XSIGMA, AXMAP, 
-     :                          MAP, 1, %VAL( IPXCEN ), %VAL( IPXBAR ), 
+               CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPXDAT ) ), 
+     :                          XVAR,
+     :                          .FALSE., %VAL( CNF_PVAL( IPXVAR ) ), 
+     :                          XSIGMA, AXMAP,
+     :                          MAP, 1, %VAL( CNF_PVAL( IPXCEN ) ), 
+     :                          %VAL( CNF_PVAL( IPXBAR ) ),
      :                          TR( 1 ), BL( 1 ), MONO, BAD, STATUS )
  
 *  If the mode is "STEP", we also do X axis width limits.
                IF( IMODE .EQ. 4 ) THEN
-                  CALL KPS1_LPLLM( EL, 1, EL, %VAL( IPXDAT ), .TRUE.,
-     :                             .TRUE., %VAL( IPAWID ), 0.5, AXMAP, 
-     :                             MAP, 1, %VAL( IPXCEN ), 
-     :                             %VAL( IPSTEP ), XSMAX, XSMIN, MONO, 
+                  CALL KPS1_LPLLM( EL, 1, EL, 
+     :                             %VAL( CNF_PVAL( IPXDAT ) ), .TRUE.,
+     :                             .TRUE., %VAL( CNF_PVAL( IPAWID ) ), 
+     :                             0.5, AXMAP,
+     :                             MAP, 1, %VAL( CNF_PVAL( IPXCEN ) ),
+     :                             %VAL( CNF_PVAL( IPSTEP ) ), 
+     :                             XSMAX, XSMIN, MONO,
      :                             BAD, STATUS )
                END IF
 
@@ -1256,9 +1270,12 @@
 *  Find the limits of the axis 1 data value in the "what we want"
 *  Frame, including any required error bars. This returns the central and
 *  extreme X axis values for each error bar in the "what we want" Frame.
-         CALL KPS1_LPLLM( EL, 1, EL, %VAL( IPXDAT ), XVAR, .FALSE.,
-     :                    %VAL( IPXVAR ), XSIGMA, AXMAP, MAP, 1, 
-     :                    %VAL( IPXCEN ), %VAL( IPXBAR ), TR( 1 ), 
+         CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPXDAT ) ), 
+     :                    XVAR, .FALSE.,
+     :                    %VAL( CNF_PVAL( IPXVAR ) ), 
+     :                    XSIGMA, AXMAP, MAP, 1,
+     :                    %VAL( CNF_PVAL( IPXCEN ) ), 
+     :                    %VAL( CNF_PVAL( IPXBAR ) ), TR( 1 ),
      :                    BL( 1 ), MONO, BAD, STATUS )
  
 *  Report an error if either limit is bad.
@@ -1277,9 +1294,12 @@
 *  Find the limits of the steps on axis 1 in the "what we want" Frame.
 *  This returns the central and extreme X axis values for each step in the 
 *  "what we want" Frame.
-            CALL KPS1_LPLLM( EL, 1, EL, %VAL( IPXDAT ), .TRUE., .TRUE.,
-     :                       %VAL( IPAWID ), 0.5, AXMAP, MAP, 1, 
-     :                       %VAL( IPXCEN ), %VAL( IPSTEP ), XSMAX, 
+            CALL KPS1_LPLLM( EL, 1, EL, %VAL( CNF_PVAL( IPXDAT ) ), 
+     :                       .TRUE., .TRUE.,
+     :                       %VAL( CNF_PVAL( IPAWID ) ), 
+     :                       0.5, AXMAP, MAP, 1,
+     :                       %VAL( CNF_PVAL( IPXCEN ) ), 
+     :                       %VAL( CNF_PVAL( IPSTEP ) ), XSMAX,
      :                       XSMIN, MONO, BAD, STATUS )
 
 *  Report an error if either limit is bad.
@@ -1335,9 +1355,12 @@
 *  extreme Y axis values for each error bar in the "what we want" Frame.
 *  The returned limits only include the data in the grid index range 
 *  covered by the X axis.
-         CALL KPS1_LPLLM( EL, ILO, IHI, %VAL( IPYDAT ), YVAR, .FALSE.,
-     :                    %VAL( IPYVAR ), YSIGMA, AST__NULL, MAP, 2, 
-     :                    %VAL( IPYCEN ), %VAL( IPYBAR ), TR( 2 ), 
+         CALL KPS1_LPLLM( EL, ILO, IHI, %VAL( CNF_PVAL( IPYDAT ) ), 
+     :                    YVAR, .FALSE.,
+     :                    %VAL( CNF_PVAL( IPYVAR ) ), 
+     :                    YSIGMA, AST__NULL, MAP, 2,
+     :                    %VAL( CNF_PVAL( IPYCEN ) ), 
+     :                    %VAL( CNF_PVAL( IPYBAR ) ), TR( 2 ),
      :                    BL( 2 ), MONO, BAD, STATUS )
 
 *  Report an error if either limit is bad.
@@ -1351,8 +1374,10 @@
 *  Find suitable default values for YTOP and YBOT.
          BL( 2 ) = VAL__BADD
          TR( 2 ) = VAL__BADD
-         CALL KPG1_GRLM2( 'LMODE', EL, %VAL( IPYCEN ), %VAL( IPXCEN ), 
-     :                    YVAR, %VAL( IPYBAR ), BL( 2 ), TR( 2 ), 
+         CALL KPG1_GRLM2( 'LMODE', EL, %VAL( CNF_PVAL( IPYCEN ) ), 
+     :                    %VAL( CNF_PVAL( IPXCEN ) ),
+     :                    YVAR, %VAL( CNF_PVAL( IPYBAR ) ), 
+     :                    BL( 2 ), TR( 2 ),
      :                    STATUS )
 
 *  Ensure the limits are not equal.
@@ -1487,22 +1512,30 @@
       CALL KPG1_ASSPL( IPLOT, 2, AXMAPS, STATUS )
 
 *  Map all the required axis values from "what we want" into GRAPHICS.
-      CALL AST_TRAN1( AXMAPS( 1 ), DIM, %VAL( IPXCEN ), .FALSE., 
-     :                %VAL( IPXCEN ), STATUS ) 
+      CALL AST_TRAN1( AXMAPS( 1 ), DIM, %VAL( CNF_PVAL( IPXCEN ) ), 
+     :                .FALSE.,
+     :                %VAL( CNF_PVAL( IPXCEN ) ), STATUS )
 
-      CALL AST_TRAN1( AXMAPS( 2 ), DIM, %VAL( IPYCEN ), .FALSE., 
-     :                %VAL( IPYCEN ), STATUS ) 
+      CALL AST_TRAN1( AXMAPS( 2 ), DIM, %VAL( CNF_PVAL( IPYCEN ) ), 
+     :                .FALSE.,
+     :                %VAL( CNF_PVAL( IPYCEN ) ), STATUS )
 
-      IF( XVAR ) CALL AST_TRAN1( AXMAPS( 1 ), 2*DIM, %VAL( IPXBAR ), 
-     :                           .FALSE., %VAL( IPXBAR ), STATUS ) 
+      IF( XVAR ) CALL AST_TRAN1( AXMAPS( 1 ), 2*DIM, 
+     :                           %VAL( CNF_PVAL( IPXBAR ) ),
+     :                           .FALSE., %VAL( CNF_PVAL( IPXBAR ) ), 
+     :                           STATUS )
 
 
-      IF( YVAR ) CALL AST_TRAN1( AXMAPS( 2 ), 2*DIM, %VAL( IPYBAR ), 
-     :                           .FALSE., %VAL( IPYBAR ), STATUS ) 
+      IF( YVAR ) CALL AST_TRAN1( AXMAPS( 2 ), 2*DIM, 
+     :                           %VAL( CNF_PVAL( IPYBAR ) ),
+     :                           .FALSE., %VAL( CNF_PVAL( IPYBAR ) ), 
+     :                           STATUS )
 
       IF( IMODE .EQ. 4 ) CALL AST_TRAN1( AXMAPS( 1 ), 2*DIM, 
-     :                                       %VAL( IPSTEP ), .FALSE., 
-     :                                       %VAL( IPSTEP ), STATUS ) 
+     :                                       %VAL( CNF_PVAL( IPSTEP ) ), 
+     :                                   .FALSE.,
+     :                                       %VAL( CNF_PVAL( IPSTEP ) ), 
+     :                                   STATUS )
 
 *  Allow the user to specify the units for either axis.
       CALL AST_SETACTIVEUNIT( IPLOT, .TRUE., STATUS )
@@ -1556,9 +1589,12 @@
       IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
 
 *  Produce the data plot.
-      CALL KPG1_PLTLN( DIM, ILO, IHI, %VAL( IPXCEN ), %VAL( IPYCEN ), 
-     :                 XVAR, YVAR, %VAL( IPXBAR ), %VAL( IPYBAR ), 
-     :                 %VAL( IPSTEP ), 'STYLE', IPLOT, IMODE, MTYPE, 
+      CALL KPG1_PLTLN( DIM, ILO, IHI, %VAL( CNF_PVAL( IPXCEN ) ), 
+     :                 %VAL( CNF_PVAL( IPYCEN ) ),
+     :                 XVAR, YVAR, %VAL( CNF_PVAL( IPXBAR ) ), 
+     :                 %VAL( CNF_PVAL( IPYBAR ) ),
+     :                 %VAL( CNF_PVAL( IPSTEP ) ), 
+     :                 'STYLE', IPLOT, IMODE, MTYPE,
      :                 ISHAPE, FREQ, 'KAPPA_LINPLOT', STATUS )
 
 *  Produce the Key (but only if we have not aligned the picture with an

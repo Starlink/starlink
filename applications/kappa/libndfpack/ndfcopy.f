@@ -135,6 +135,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -154,6 +155,8 @@
 *        Modified to avoid use of KPG1_ASGET since it automatically
 *        removes WCS axes corresponding to insignificant pixel axes, but
 *        we only want this to happen if TRIMWCS is true.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -170,6 +173,7 @@
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'DAT_PAR'          ! HDS_ public constants
       INCLUDE 'AST_PAR'          ! AST functions and constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -464,31 +468,38 @@
      :                       STATUS ) 
    
                IF( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( BAD, EL, %VAL( IP1 ), %VAL( IP2 ), 
+                  CALL VEC_DTOD( BAD, EL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
    
                ELSE IF( TYPE .EQ. '_REAL' ) THEN
-                  CALL VEC_RTOR( BAD, EL, %VAL( IP1 ), %VAL( IP2 ), 
+                  CALL VEC_RTOR( BAD, EL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
    
                ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-                  CALL VEC_ITOI( BAD, EL, %VAL( IP1 ), %VAL( IP2 ), 
+                  CALL VEC_ITOI( BAD, EL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
    
                ELSE IF( TYPE .EQ. '_WORD' ) THEN
-                  CALL VEC_WTOW( BAD, EL, %VAL( IP1 ), %VAL( IP2 ), 
+                  CALL VEC_WTOW( BAD, EL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
    
                ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-                  CALL VEC_UWTOUW( BAD, EL, %VAL( IP1 ), %VAL( IP2 ), 
+                  CALL VEC_UWTOUW( BAD, EL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                             %VAL( CNF_PVAL( IP2 ) ),
      :                             IERR, NERR, STATUS )
    
                ELSE IF( TYPE .EQ. '_BYTE' ) THEN
-                  CALL VEC_BTOB( BAD, EL, %VAL( IP1 ), %VAL( IP2 ), 
+                  CALL VEC_BTOB( BAD, EL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                           %VAL( CNF_PVAL( IP2 ) ),
      :                           IERR, NERR, STATUS )
    
                ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-                  CALL VEC_UBTOUB( BAD, EL, %VAL( IP1 ), %VAL( IP2 ), 
+                  CALL VEC_UBTOUB( BAD, EL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                             %VAL( CNF_PVAL( IP2 ) ),
      :                             IERR, NERR, STATUS )
                END IF
 

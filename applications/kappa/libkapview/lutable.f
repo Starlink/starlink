@@ -164,6 +164,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -188,6 +189,8 @@
 *     10-OCT-2001 (DSB):
 *        Most of code moved into kps1_ltaba in order to remove fixed
 *        limit on the size of the colour table.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -201,6 +204,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Global SSE definitions
       INCLUDE 'CTM_PAR'          ! Colour-table management constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -245,7 +249,8 @@
 *  Everything else is done in a lower level subroutine so that the
 *  above work space can be used. This avoids the need for static 
 *  arrays with an associated fixed limit on the number of colours.
-      CALL KPS1_LTABA( NINTS, FULL, %VAL( IPW1 ), %VAL( IPW2 ),
+      CALL KPS1_LTABA( NINTS, FULL, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                 %VAL( CNF_PVAL( IPW2 ) ),
      :                 STATUS )
 
 *  Free workspace. 

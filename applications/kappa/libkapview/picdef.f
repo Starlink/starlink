@@ -268,6 +268,8 @@
 *        Converted to use PGPLOT. Re-formatted code. Added parameter SIZE.
 *     15-FEB-2000 (DSB):
 *        Calls to KPG1_PGCUR modified for new argument list.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:

@@ -435,6 +435,7 @@
 *  Authors:
 *     Malcolm Currie STARLINK (RAL::CUR)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -443,6 +444,8 @@
 *     26-OCT-1999 (DSB):
 *        Made MARGIN a fraction of the current picture, not the DATA
 *        picture.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -459,6 +462,7 @@
       INCLUDE 'NDF_PAR'          ! NDF__ constants 
       INCLUDE 'PRM_PAR'          ! VAL__ constants 
       INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -660,7 +664,8 @@
       
 *  Get the indices of the lines to be displayed.
       CALL KPG1_GILST( SLBND( ORDAXS ), SUBND( ORDAXS ), MXLIN,
-     :                 'LNINDX', %VAL( IPW1 ), LNINDX, NDISP,
+     :                 'LNINDX', %VAL( CNF_PVAL( IPW1 ) ), 
+     :                 LNINDX, NDISP,
      :                 STATUS )
       
 *  If an error occurred, exit.
@@ -733,7 +738,8 @@
       END IF
 
 *  Get the vertical positions of every value to be displayed.
-      CALL KPS1_MLPND( DIM( 1 ), DIM( 2 ), %VAL( IPDIN ), %VAL( IPVIN ), 
+      CALL KPS1_MLPND( DIM( 1 ), DIM( 2 ), %VAL( CNF_PVAL( IPDIN ) ), 
+     :                 %VAL( CNF_PVAL( IPVIN ) ),
      :                 ERRBAR, SIGMA, ABSAXS, NDISP, SLBND( ORDAXS ), 
      :                 LNINDX, YLOG, IPNOM, USE, IPDAT, IPBAR, OFFSET, 
      :                 YB, YT, STATUS )
@@ -929,11 +935,13 @@ c         IMODE = 4
             IPND = IPDAT + ( I - 1 )*ABSDIM*VAL__NBD
 
 *  Map all the required axis values from "what we've got" into GRAPHICS.
-            CALL AST_TRAN1( AXMAPS( 1 ), ABSDIM, %VAL( IPNG ), .FALSE., 
-     :                      %VAL( IPNG ), STATUS ) 
+            CALL AST_TRAN1( AXMAPS( 1 ), ABSDIM, 
+     :                      %VAL( CNF_PVAL( IPNG ) ), .FALSE.,
+     :                      %VAL( CNF_PVAL( IPNG ) ), STATUS )
 
-            CALL AST_TRAN1( AXMAPS( 2 ), ABSDIM, %VAL( IPND ), .FALSE., 
-     :                      %VAL( IPND ), STATUS ) 
+            CALL AST_TRAN1( AXMAPS( 2 ), ABSDIM, 
+     :                      %VAL( CNF_PVAL( IPND ) ), .FALSE.,
+     :                      %VAL( CNF_PVAL( IPND ) ), STATUS )
 
 *  If required, map the error bar limits into GRAPHICS.
             IF( ERRBAR ) THEN
@@ -942,8 +950,10 @@ c         IMODE = 4
                IPB = IPBAR + 2*( I - 1 )*ABSDIM*VAL__NBD
 
 *  Do the transformation.
-               CALL AST_TRAN1( AXMAPS( 2 ), 2*ABSDIM, %VAL( IPB ), 
-     :                         .FALSE., %VAL( IPB ), STATUS ) 
+               CALL AST_TRAN1( AXMAPS( 2 ), 2*ABSDIM, 
+     :                         %VAL( CNF_PVAL( IPB ) ),
+     :                         .FALSE., %VAL( CNF_PVAL( IPB ) ), 
+     :                         STATUS )
             END IF
 
          END IF
@@ -952,8 +962,11 @@ c         IMODE = 4
 
 *  Produce the data curves.
       CALL KPS1_MLPML( NDISP, USE, ABSDIM, 1, ABSDIM, 
-     :                 %VAL( IPNOM ), %VAL( IPDAT ), .FALSE., ERRBAR,
-     :                 %VAL( IPBAR ), %VAL( IPBAR ), %VAL( IPBAR ),
+     :                 %VAL( CNF_PVAL( IPNOM ) ), 
+     :                 %VAL( CNF_PVAL( IPDAT ) ), .FALSE., ERRBAR,
+     :                 %VAL( CNF_PVAL( IPBAR ) ), 
+     :                 %VAL( CNF_PVAL( IPBAR ) ), 
+     :                 %VAL( CNF_PVAL( IPBAR ) ),
      :                 'STYLE', 'PENS', IPLOT, IMODE, MTYPE, 1, FREQ, 
      :                 'KAPPA_MLINPLOT', STATUS )
 
@@ -962,7 +975,8 @@ c         IMODE = 4
      :                STATUS ) 
 
 *  Add annotation to the plot (zero point markers and curve labels).
-      CALL KPS1_MLPLB( NDISP, USE, ABSDIM, %VAL( IPNOM ), %VAL( IPDAT ), 
+      CALL KPS1_MLPLB( NDISP, USE, ABSDIM, %VAL( CNF_PVAL( IPNOM ) ), 
+     :                 %VAL( CNF_PVAL( IPDAT ) ),
      :                 GOFF, IPLOT, 'STYLE', 'PENS', 'LABELS', 'LINLAB',
      :                 'KAPPA_MLINPLOT', LNINDX, KEY, IGRP, STATUS )
 

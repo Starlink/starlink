@@ -105,6 +105,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -112,6 +113,8 @@
 *        Original version.
 *     1991 July 15 (MJC):
 *        Added hierarchical keywords.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -127,6 +130,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants      
       INCLUDE 'FIO_ERR'          ! FIO_ error codes
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -246,7 +250,7 @@
 *  it is not passed by pointer.  Ditto for extract data of other types
 *  from the FITS extension.
                IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_CHAR' ) THEN
-                  CALL FTS1_GKEYC( EL, %VAL( PNTR( 1 ) ), 1,
+                  CALL FTS1_GKEYC( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                             LINE( I1( 3 ):I2( 3 ) ), 1, FOUND,
      :                             CVAL, COMENT, CARD, STATUS,
      :                             %VAL( LENGTH ) )
@@ -266,7 +270,7 @@
 *  ================
 *  Obtain a value for the keyword from the FITS header.
                ELSE IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_DOUBLE' ) THEN
-                  CALL FTS1_GKEYD( EL, %VAL( PNTR( 1 ) ), 1,
+                  CALL FTS1_GKEYD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                             LINE( I1( 3 ):I2( 3 ) ), 1, FOUND,
      :                             DVAL, COMENT, CARD, STATUS,
      :                             %VAL( LENGTH ) )
@@ -284,7 +288,7 @@
 *  =======
 *  Obtain a value for the keyword from the FITS header.
                ELSE IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_INTEGER' ) THEN
-                  CALL FTS1_GKEYI( EL, %VAL( PNTR( 1 ) ), 1,
+                  CALL FTS1_GKEYI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                             LINE( I1( 3 ):I2( 3 ) ), 1, FOUND,
      :                             IVAL, COMENT, CARD, STATUS,
      :                             %VAL( LENGTH ) )
@@ -302,7 +306,7 @@
 *  =======
 *  Obtain a value for the keyword from the FITS header.
                ELSE IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_LOGICAL' ) THEN
-                  CALL FTS1_GKEYL( EL, %VAL( PNTR( 1 ) ), 1,
+                  CALL FTS1_GKEYL( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                             LINE( I1( 3 ):I2( 3 ) ), 1, FOUND,
      :                             LVAL, COMENT, CARD, STATUS,
      :                             %VAL( LENGTH ) )
@@ -320,7 +324,7 @@
 *  ====
 *  Obtain a value for the keyword from the FITS header.
                ELSE IF ( LINE( I1( 2 ):I2( 2 ) ) .EQ. '_REAL' ) THEN
-                  CALL FTS1_GKEYR( EL, %VAL( PNTR( 1 ) ), 1,
+                  CALL FTS1_GKEYR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                             LINE( I1( 3 ):I2( 3 ) ), 1, FOUND,
      :                             RVAL, COMENT, CARD, STATUS,
      :                             %VAL( LENGTH ) )

@@ -67,6 +67,8 @@
 *        Converted to the SST prologue.
 *     1991 April 9 (MJC):
 *        Added AGI begin-and-end block.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:

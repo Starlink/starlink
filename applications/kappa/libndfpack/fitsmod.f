@@ -434,6 +434,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -444,6 +445,8 @@
 *     2000 May 8 (MJC):
 *        Increased comment length to 70, allowing for comment or blank
 *        lines.  Removed unused variables.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -461,6 +464,7 @@
       INCLUDE 'PRM_PAR'          ! PRM__ public constants      
       INCLUDE 'PAR_ERR'          ! PAR__ error codes
       INCLUDE 'FIO_ERR'          ! FIO__ error codes
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -605,21 +609,28 @@
 *  Validate the headers, syntax, and values.  Store the information in
 *  the work arrays.  Notice that the lengths must be passed in order
 *  following the last true argument: STATUS.
-         CALL FTS1_RFMOD( FD, NWRITE, NEDIT, %VAL( EDPNTR ),
-     :                    %VAL( EKPNTR ), %VAL( PKPNTR ),
-     :                    %VAL( KOPNTR ), %VAL( POPNTR ),
-     :                    %VAL( VAPNTR ), %VAL( COPNTR ),
-     :                    %VAL( TYPNTR ), STATUS,  %VAL( 1 ),
-     :                    %VAL( HKEYLN ), %VAL( HKEYLN ),
+         CALL FTS1_RFMOD( FD, NWRITE, NEDIT, %VAL( CNF_PVAL( EDPNTR ) ),
+     :                    %VAL( CNF_PVAL( EKPNTR ) ), 
+     :                    %VAL( CNF_PVAL( PKPNTR ) ),
+     :                    %VAL( CNF_PVAL( KOPNTR ) ), 
+     :                    %VAL( CNF_PVAL( POPNTR ) ),
+     :                    %VAL( CNF_PVAL( VAPNTR ) ), 
+     :                    %VAL( CNF_PVAL( COPNTR ) ),
+     :                    %VAL( CNF_PVAL( TYPNTR ) ), STATUS,  
+     :                    %VAL( 1 ), %VAL( HKEYLN ), %VAL( HKEYLN ),
      :                    %VAL( CVALLN ), %VAL( COMLN ), %VAL( 8 ) )
 
 *  Perform the edits on the FITS extension.
-         CALL FTS1_EDFEX( NEDIT, %VAL( EDPNTR ),
-     :                    %VAL( EKPNTR ), %VAL( PKPNTR ),
-     :                    %VAL( KOPNTR ), %VAL( POPNTR ),
-     :                    %VAL( VAPNTR ), %VAL( COPNTR ),
-     :                    %VAL( TYPNTR ), LOC, EXISTS, STATUS,
-     :                    %VAL( 1 ), %VAL( HKEYLN ), %VAL( HKEYLN ),
+         CALL FTS1_EDFEX( NEDIT, %VAL( CNF_PVAL( EDPNTR ) ),
+     :                    %VAL( CNF_PVAL( EKPNTR ) ), 
+     :                    %VAL( CNF_PVAL( PKPNTR ) ),
+     :                    %VAL( CNF_PVAL( KOPNTR ) ), 
+     :                    %VAL( CNF_PVAL( POPNTR ) ),
+     :                    %VAL( CNF_PVAL( VAPNTR ) ), 
+     :                    %VAL( CNF_PVAL( COPNTR ) ),
+     :                    %VAL( CNF_PVAL( TYPNTR ) ), 
+     :                    LOC, EXISTS, STATUS, %VAL( 1 ), 
+     :                    %VAL( HKEYLN ), %VAL( HKEYLN ),
      :                    %VAL( CVALLN ), %VAL( COMLN ), %VAL( 8 ) )
 
 *  Free the workspace.

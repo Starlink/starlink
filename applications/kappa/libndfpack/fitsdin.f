@@ -302,6 +302,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     RDS: Richard D. Saxton (STARLINK, Leicester)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -350,6 +351,8 @@
 *        Added FITS-PC and FITS-AIPS WCS encodings.
 *     2-SEP-2004 (TIMJ):
 *        Use ONE_FIND_FILE rather than FTS internal routine.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -368,6 +371,7 @@
       INCLUDE 'PAR_ERR'        ! Parameter-system error constants
       INCLUDE 'GRP_PAR'        ! GRP constants
       INCLUDE 'ONE_ERR'        ! ONE errors
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
       INTEGER  STATUS
@@ -982,7 +986,8 @@
          END IF
 
 *       Process the header blocks.  OFFSET is updated.
-         CALL FTS1_PHEAD( BFPNTR, RCPNTR, %VAL( RCPNTD ), 'DISK',
+         CALL FTS1_PHEAD( BFPNTR, RCPNTR, %VAL( CNF_PVAL( RCPNTD ) ), 
+     :                    'DISK',
      :                    UDFITS, TLOC, BLKSIZ, MAXHDR, .NOT. AUTO,
      :                    ACTSIZ, OFFSET, CURREC, HSTART, HDNUM, EXTEND,
      :                    NHEADS, STATUS, %VAL( 80 ) )
@@ -1012,9 +1017,10 @@
 *       Could there be sub-files?  Store the global EXTEND value.
 
          IF ( SUBFIL .EQ. 1 ) THEN
-            CALL FTS1_GKEYL( WHDIM( 1 ), %VAL( HPNTR( 1 ) ),
+            CALL FTS1_GKEYL( WHDIM( 1 ), %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                       HSTART( 1 ), 'EXTEND', 1, THERE, GEXTND,
-     :                       COMENT, NKC, STATUS, %VAL( 1 ) )
+     :                       COMENT, NKC, STATUS, 
+     :                       %VAL( 1 ) )
             GEXTND = GEXTND .AND. THERE
          END IF
 
@@ -1028,7 +1034,8 @@
 *       Check that the mandatory descriptors are present.
 
          CALL FTS1_MANDH( SUBFIL .EQ. 1, WHDIM( 1 ),
-     :                    %VAL( HPNTR( 1 ) ), HSTART( NHEADS ), BITPIX,
+     :                    %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+     :                    HSTART( NHEADS ), BITPIX,
      :                    NDIM, DIMS, DARRAY, NONSDA, SIZE, STATUS,
      :                    %VAL( 1 ) )
 
@@ -1077,8 +1084,10 @@
 
          IF ( LOGHDR ) THEN
 
-            CALL FTS1_HDLOG( %VAL( HPNTR( 1 ) ),FD, INFILE, SUBFIL, 
-     :                       NHEADS, HDNUM, STATUS, %VAL( 1 ) )
+            CALL FTS1_HDLOG( %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
+     :                       FD, INFILE, SUBFIL,
+     :                       NHEADS, HDNUM, STATUS, 
+     :                       %VAL( 1 ) )
 
             IF ( STATUS .NE. SAI__OK ) GOTO 970
          END IF
@@ -1098,9 +1107,10 @@
 
 *          Obtain the extension's name.
 
-            CALL FTS1_GKEYC( WHDIM( 1 ), %VAL( HPNTR( 1 ) ),
+            CALL FTS1_GKEYC( WHDIM( 1 ), %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                       HSTART( NHEADS ), 'XTENSION', 1, THERE,
-     :                       EXTNAM, COMENT, NKC, STATUS, %VAL( 1 ) )
+     :                       EXTNAM, COMENT, NKC, STATUS, 
+     :                       %VAL( 1 ) )
 
 *          Report any errors.
 
@@ -1123,7 +1133,8 @@
 
 *             Create the SCAR description file and text table.
 
-               CALL FTS1_SCTAB( %VAL( HPNTR( 1 ) ), 'DSCFTABLE', 
+               CALL FTS1_SCTAB( %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+     :                          'DSCFTABLE',
      :                         'TABLE', 'DISK', UDFITS, WHDIM( 1 ), 
      :                         HSTART( NHEADS ), NDIM, DIMS, LOGHDR,
      :                         FD, INFILE, SUBFIL, PREFIX, AUTO,
@@ -1209,7 +1220,8 @@
 *       a dummy dimension.
 
          CALL FTS1_DTYPE( DARRAY, NONSDA, BITPIX, HSTART( NHEADS ),
-     :                    WHDIM( 1 ), %VAL( HPNTR( 1 ) ), MXPARM,
+     :                    WHDIM( 1 ), %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+     :                    MXPARM,
      :                    NDIM, DIMS, BSCALE, BZERO, BLANK, BADPIX,
      :                    IEEE, GCOUNT, PCOUNT, PTYPE, PSCALE, PZERO,
      :                    STATUS, %VAL( 1 ) )
@@ -1304,7 +1316,8 @@
 *       data conversions and blank-pixel removal.
 *       =====================================================
 
-         CALL FTS1_NDF( %VAL( HPNTR( 1 ) ), BFPNTR, RCPNTR, AUTO, 'OUT',
+         CALL FTS1_NDF( %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+     :                  BFPNTR, RCPNTR, AUTO, 'OUT',
      :                  'DISK', UDFITS, VMS, LENDIA, SIZE, NDIM, DIMS,
      :                  BPV, EFMTCV, FORMTI, FORMAT, IEEE, BADPIX,
      :                  BLANK, BSCALE, BZERO, DARRAY, NONSDA, GCOUNT,
@@ -1341,10 +1354,11 @@
 *          an IOSTAT that's not the EOF, so check for a read error too.
 
             CALL FTS1_DREAD( UDFITS, BLKSIZ, ACTSIZ, .FALSE., 
-     :                       %VAL( BFPNTR ), OFFSET, %VAL( RCPNTR ),
+     :                       %VAL( CNF_PVAL( BFPNTR ) ), OFFSET, 
+     :                       %VAL( CNF_PVAL( RCPNTR ) ),
      :                       STATUS )
 
-            IF ( .NOT. FTS1_BLCAR( %VAL( RCPNTD ) ) .AND.
+            IF ( .NOT. FTS1_BLCAR( %VAL( CNF_PVAL( RCPNTD ) ) ) .AND.
      :           STATUS .EQ. SAI__OK ) THEN
 
 *             There is a sub file, so process its header like for

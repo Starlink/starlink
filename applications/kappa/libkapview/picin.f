@@ -150,6 +150,8 @@
 *        Added raster co-ordinates.
 *     24-SEP-2001 (DSB):
 *        Converted to AST/PGPLOT.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:

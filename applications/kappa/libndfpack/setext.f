@@ -160,6 +160,7 @@
 *  Authors:
 *     SMB: Steven M Beard (ROE)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -183,6 +184,8 @@
 *        passed by value in the "loop=no option=put ctype=_char" case for
 *        non-scalars. Also changed DAT_PUTVL to DAT_PUTVC in the same case.
 *        Also removed references to unused parameter RVALUE.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -255,6 +258,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *.
 
@@ -848,12 +852,14 @@
      :                                  WKLOC, STATUS )
 
 *  Obtain the requested number of values.
-                        CALL PAR_EXACC( 'CVALUE', EL, %VAL( CPNTR ),
-     :                                  STATUS, %VAL( 6 ), 
+                        CALL PAR_EXACC( 'CVALUE', EL, 
+     :                                  %VAL( CNF_PVAL( CPNTR ) ),
+     :                                  STATUS, %VAL( 6 ),
      :                                  %VAL( CLEN ) )
 
 *  Write the array to the component.
-                        CALL DAT_PUTVC( CLOC, EL, %VAL( CPNTR ),
+                        CALL DAT_PUTVC( CLOC, EL, 
+     :                                  %VAL( CNF_PVAL( CPNTR ) ),
      :                                  STATUS, %VAL( DAT__SZLOC ),
      :                                  %VAL( CLEN ) )
 
@@ -869,11 +875,13 @@
                      CALL PSX_CALLOC( EL, CTYPE, CPNTR, STATUS )
 
 *  Obtain the requested number of values.
-                     CALL PAR_EXACL( 'CVALUE', EL, %VAL( CPNTR ),
+                     CALL PAR_EXACL( 'CVALUE', EL, 
+     :                               %VAL( CNF_PVAL( CPNTR ) ),
      :                               STATUS )
 
 *  Write the array to the component.
-                     CALL DAT_PUTVL( CLOC, EL, %VAL( CPNTR ), STATUS )
+                     CALL DAT_PUTVL( CLOC, EL, 
+     :                               %VAL( CNF_PVAL( CPNTR ) ), STATUS )
 
 *  Free the workspace.
                      CALL PSX_FREE( CPNTR, STATUS )
@@ -886,11 +894,13 @@
                      CALL PSX_CALLOC( EL, CTYPE, CPNTR, STATUS )
 
 *  Obtain the requested number of values.
-                     CALL PAR_EXACD( 'CVALUE', EL, %VAL( CPNTR ),
+                     CALL PAR_EXACD( 'CVALUE', EL, 
+     :                               %VAL( CNF_PVAL( CPNTR ) ),
      :                               STATUS )
 
 *  Write the array to the component.
-                     CALL DAT_PUTVD( CLOC, EL, %VAL( CPNTR ), STATUS )
+                     CALL DAT_PUTVD( CLOC, EL, 
+     :                               %VAL( CNF_PVAL( CPNTR ) ), STATUS )
 
 *  Free the workspace.
                      CALL PSX_FREE( CPNTR, STATUS )
@@ -903,11 +913,13 @@
                      CALL PSX_CALLOC( EL, CTYPE, CPNTR, STATUS )
 
 *  Obtain the requested number of values.
-                     CALL PAR_EXACR( 'CVALUE', EL, %VAL( CPNTR ),
+                     CALL PAR_EXACR( 'CVALUE', EL, 
+     :                               %VAL( CNF_PVAL( CPNTR ) ),
      :                               STATUS )
 
 *  Write the array to the component.
-                     CALL DAT_PUTVR( CLOC, EL, %VAL( CPNTR ), STATUS )
+                     CALL DAT_PUTVR( CLOC, EL, 
+     :                               %VAL( CNF_PVAL( CPNTR ) ), STATUS )
 
 *  Free the workspace.
                      CALL PSX_FREE( CPNTR, STATUS )
@@ -920,11 +932,13 @@
                      CALL PSX_CALLOC( EL, CTYPE, CPNTR, STATUS )
 
 *  Obtain the requested number of values.
-                     CALL PAR_EXACI( 'CVALUE', EL, %VAL( CPNTR ),
+                     CALL PAR_EXACI( 'CVALUE', EL, 
+     :                               %VAL( CNF_PVAL( CPNTR ) ),
      :                               STATUS )
 
 *  Write the array to the component.
-                     CALL DAT_PUTVI( CLOC, EL, %VAL( CPNTR ), STATUS )
+                     CALL DAT_PUTVI( CLOC, EL, 
+     :                               %VAL( CNF_PVAL( CPNTR ) ), STATUS )
 
 *  Free the workspace.
                      CALL PSX_FREE( CPNTR, STATUS )
@@ -938,12 +952,14 @@
                      CALL PSX_CALLOC( EL, '_INTEGER', CPNTR, STATUS )
 
 *  Obtain the requested number of values.
-                     CALL PAR_EXACI( 'CVALUE', EL, %VAL( CPNTR ),
+                     CALL PAR_EXACI( 'CVALUE', EL, 
+     :                               %VAL( CNF_PVAL( CPNTR ) ),
      :                               STATUS )
 
 *  Write the array to the component.  The values will be converted to
 *  the appropriate type.
-                     CALL DAT_PUTVI( CLOC, EL, %VAL( CPNTR ), STATUS )
+                     CALL DAT_PUTVI( CLOC, EL, 
+     :                               %VAL( CNF_PVAL( CPNTR ) ), STATUS )
 
 *  Free the workspace.
                      CALL PSX_FREE( CPNTR, STATUS )

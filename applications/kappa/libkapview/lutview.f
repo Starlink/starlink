@@ -262,6 +262,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -276,6 +277,8 @@
 *        Added graph and histogram-style keys.
 *     13-AUG-2002 (DSB):
 *        Added CURNDC Frame.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -292,6 +295,7 @@
       INCLUDE 'AST_PAR'        ! AST_ constants
       INCLUDE 'PAR_ERR'        ! Parameter-system error definitions
       INCLUDE 'CTM_PAR'        ! Colour-table management constants
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -448,8 +452,10 @@
             CALL PSX_CALLOC( NCOL, '_INTEGER', IPCOL, STATUS )
 
 *  Produce the colour index corresponding to each data value.
-            CALL KPG1_ISCLR( .TRUE., NCOL, 1, %VAL( IPIN ), .FALSE., 
-     :                       LOW, HIGH, LP, UP, 0, %VAL( IPCOL ), 
+            CALL KPG1_ISCLR( .TRUE., NCOL, 1, %VAL( CNF_PVAL( IPIN ) ), 
+     :                       .FALSE.,
+     :                       LOW, HIGH, LP, UP, 0, 
+     :                       %VAL( CNF_PVAL( IPCOL ) ),
      :                       STATUS )
 
 * Annul the NDF identifier.
@@ -633,7 +639,8 @@
          CALL PAR_GTD0L( 'NN', .FALSE., .TRUE., NN, STATUS )
 
 *  Install the lookup table into image-display colour table.
-         CALL KPG1_PGLUT( LDIMS( 2 ), %VAL( IPLUT ), LP, UP, NN,
+         CALL KPG1_PGLUT( LDIMS( 2 ), %VAL( CNF_PVAL( IPLUT ) ), 
+     :                    LP, UP, NN,
      :                    STATUS )
 
       END IF
@@ -641,7 +648,7 @@
 *  Create the LUT key within the KEY Picture.
       CALL KPG1_LUTKY( IPICK, 'STYLE', HIGH, LOW, LABEL, 
      :                 'KAPPA_LUTVIEW', LP, UP, 0.0, 0.0, 0.0, 'CC',
-     :                 NCOL, %VAL( IPCOL ), STATUS ) 
+     :                 NCOL, %VAL( CNF_PVAL( IPCOL ) ), STATUS )
 
 *  Tidy up
  999  CONTINUE

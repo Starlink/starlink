@@ -208,11 +208,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     25-NOV-1999 (DSB):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -230,6 +233,7 @@
       INCLUDE 'PAR_ERR'        ! PAR error constants
       INCLUDE 'SUBPAR_PAR'     ! SUBPAR constants
       INCLUDE 'CTM_PAR'        ! Colour-table management constants
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -493,7 +497,8 @@
 
 *  Obtain the maximum and minimum values to define the bounds
 *  of the histogram used to find the percentiles.
-               CALL KPG1_MXMNR( .TRUE., EL, %VAL( IPIN( I ) ), NINVAL,
+               CALL KPG1_MXMNR( .TRUE., EL, 
+     :                          %VAL( CNF_PVAL( IPIN( I ) ) ), NINVAL,
      :                          RMAXV, RMINV, MAXPOS, MINPOS, STATUS )
 
 *  The number of bad pixels has been counted so it might be
@@ -501,7 +506,7 @@
                BAD = NINVAL .EQ. 0
 
 *  Generate the histogram between those bounds.
-               CALL KPG1_GHSTR( BAD, EL, %VAL( IPIN( I ) ),
+               CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( IPIN( I ) ) ),
      :                          NUMBIN, RMAXV, RMINV, HIST, STATUS )
 
 *  Estimate the values at the percentiles.
@@ -623,13 +628,18 @@
          CALL PSX_CALLOC( NHIST, '_REAL', IPBHST, STATUS )
 
 *  Create the output colour index array and colour table.
-         CALL KPS1_CCMQN( NLUT, NDATA, %VAL( IPIN( R ) ), HI( R ), 
-     :                 LO( R ), %VAL( IPIN( G ) ), HI( G ), LO( G ), 
-     :                 %VAL( IPIN( B ) ), HI( B ), LO( B ), BPCI, 
-     :                 CTM__RSVPN, NHIST, %VAL( IPRHST ), 
-     :                 %VAL( IPGHST ), 
-     :                 %VAL( IPBHST ), %VAL( IPPHST ), 
-     :                 %VAL( IPLUT ), %VAL( IPOUT ), STATUS )
+         CALL KPS1_CCMQN( NLUT, NDATA, %VAL( CNF_PVAL( IPIN( R ) ) ), 
+     :                    HI( R ),
+     :                 LO( R ), %VAL( CNF_PVAL( IPIN( G ) ) ), 
+     :                 HI( G ), LO( G ),
+     :                 %VAL( CNF_PVAL( IPIN( B ) ) ), 
+     :                 HI( B ), LO( B ), BPCI,
+     :                 CTM__RSVPN, NHIST, %VAL( CNF_PVAL( IPRHST ) ),
+     :                 %VAL( CNF_PVAL( IPGHST ) ),
+     :                 %VAL( CNF_PVAL( IPBHST ) ), 
+     :                 %VAL( CNF_PVAL( IPPHST ) ),
+     :                 %VAL( CNF_PVAL( IPLUT ) ), 
+     :                 %VAL( CNF_PVAL( IPOUT ) ), STATUS )
 
 *  Free the work space.
          CALL PSX_FREE( IPPHST, STATUS )
@@ -663,9 +673,11 @@
 *  Store the data in the output file.
          CALL KPS1_CCMPP( FD, UBNDO( 1 ) - LBNDO( 1 ) + 1,
      :                    UBNDO( 2 ) - LBNDO( 2 ) + 1, 
-     :                    %VAL( IPIN( R ) ), HI( R ), LO( R ), 
-     :                    %VAL( IPIN( G ) ), HI( G ), 
-     :                    LO( G ), %VAL( IPIN( B ) ), HI( B ), LO( B ), 
+     :                    %VAL( CNF_PVAL( IPIN( R ) ) ), 
+     :                    HI( R ), LO( R ),
+     :                    %VAL( CNF_PVAL( IPIN( G ) ) ), HI( G ),
+     :                    LO( G ), %VAL( CNF_PVAL( IPIN( B ) ) ), 
+     :                    HI( B ), LO( B ),
      :                    RGBBAD, STATUS )
 
 *  Close the output file.

@@ -69,11 +69,14 @@
 *  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1997 June 14 (MJC):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -88,6 +91,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF public constants
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -300,38 +304,41 @@
 *  data array.
          IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPG1_PASTR( TRANSP, BAD, OFFSET, IDIMS, ELI,
-     :                       %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                       %VAL( PNTRO( 1 ) ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS, ELO,
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPG1_PASTB( TRANSP, BAD, OFFSET, IDIMS, ELI,
-     :                          %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                          %VAL( PNTRO( 1 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                       ODIMS, ELO,
+     :                          %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPG1_PASTD( TRANSP, BAD, OFFSET, IDIMS, ELI,
-     :                       %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                       %VAL( PNTRO( 1 ) ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS, ELO,
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPG1_PASTI( TRANSP, BAD, OFFSET, IDIMS, ELI,
-     :                       %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                       %VAL( PNTRO( 1 ) ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS, ELO,
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL KPG1_PASTUB( TRANSP, BAD, OFFSET, IDIMS, ELI,
-     :                        %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                        %VAL( PNTRO( 1 ) ), STATUS )
+     :                        %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                        ODIMS, ELO,
+     :                        %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL KPG1_PASTUW( TRANSP, BAD, OFFSET, IDIMS, ELI,
-     :                        %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                        %VAL( PNTRO( 1 ) ), STATUS )
+     :                        %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                        ODIMS, ELO,
+     :                        %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
           ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL KPG1_PASTW( TRANSP, BAD, OFFSET, IDIMS, ELI,
-     :                       %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                       %VAL( PNTRO( 1 ) ), STATUS )
+     :                       %VAL( CNF_PVAL( PNTRI( 1 ) ) ), ODIMS, ELO,
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
 
          END IF
 
@@ -355,38 +362,52 @@
 *  data array.
             IF ( ITYPEV .EQ. '_REAL' ) THEN
                CALL KPG1_PASTR( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
-     :                          %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                          %VAL( PNTROV( 1 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          ODIMS, ELO,
+     :                          %VAL( CNF_PVAL( PNTROV( 1 ) ) ), 
+     :                          STATUS )
 
             ELSE IF ( ITYPEV .EQ. '_BYTE' ) THEN
                CALL KPG1_PASTB( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
-     :                          %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                          %VAL( PNTROV( 1 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          ODIMS, ELO,
+     :                          %VAL( CNF_PVAL( PNTROV( 1 ) ) ), 
+     :                          STATUS )
 
             ELSE IF ( ITYPEV .EQ. '_DOUBLE' ) THEN
                CALL KPG1_PASTD( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
-     :                          %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                          %VAL( PNTROV( 1 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          ODIMS, ELO,
+     :                          %VAL( CNF_PVAL( PNTROV( 1 ) ) ), 
+     :                          STATUS )
 
             ELSE IF ( ITYPEV .EQ. '_INTEGER' ) THEN
                CALL KPG1_PASTI( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
-     :                          %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                          %VAL( PNTROV( 1 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          ODIMS, ELO,
+     :                          %VAL( CNF_PVAL( PNTROV( 1 ) ) ), 
+     :                          STATUS )
 
             ELSE IF ( ITYPEV .EQ. '_UBYTE' ) THEN
                CALL KPG1_PASTUB( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
-     :                           %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                           %VAL( PNTROV( 1 ) ), STATUS )
+     :                           %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                           ODIMS, ELO,
+     :                           %VAL( CNF_PVAL( PNTROV( 1 ) ) ), 
+     :                           STATUS )
 
             ELSE IF ( ITYPEV .EQ. '_UWORD' ) THEN
                CALL KPG1_PASTUW( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
-     :                           %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                           %VAL( PNTROV( 1 ) ), STATUS )
+     :                           %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                           ODIMS, ELO,
+     :                           %VAL( CNF_PVAL( PNTROV( 1 ) ) ), 
+     :                           STATUS )
 
             ELSE IF ( ITYPEV .EQ. '_WORD' ) THEN
                CALL KPG1_PASTW( TRANSP, BADVAR, OFFSET, IDIMS, ELI,
-     :                          %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                          %VAL( PNTROV( 1 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                          ODIMS, ELO,
+     :                          %VAL( CNF_PVAL( PNTROV( 1 ) ) ), 
+     :                          STATUS )
             END IF
      
 *  Unmap the variance array, as we may already have three other arrays
@@ -406,8 +427,9 @@
 *  Call the routine that performs the concatenation of the quality
 *  array.
             CALL KPG1_PASTUB( TRANSP, BADQUA, OFFSET, IDIMS, ELI,
-     :                        %VAL( PNTRI( 1 ) ), ODIMS, ELO,
-     :                        %VAL( PNTROQ( 1 ) ), STATUS )
+     :                        %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+     :                        ODIMS, ELO,
+     :                        %VAL( CNF_PVAL( PNTROQ( 1 ) ) ), STATUS )
      
 *  Unmap the quality array, as we may already have three other arrays
 *  mapped.

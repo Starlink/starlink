@@ -215,6 +215,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -224,6 +225,8 @@
 *        Parameter LIKE added.
 *     23-AUG-2001 (DSB):
 *        Added mode WCS.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -311,6 +314,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *.
 
@@ -475,7 +479,8 @@
 
 *  Replace the element with the new value.
                   CALL KPG1_STORR( EL, PIND, RVALUE, 
-     :                             %VAL( AXPNTR( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                             STATUS )
 
 *  Double precision
 *  ----------------
@@ -494,7 +499,8 @@
 
 *  Replace the element with the new value.
                   CALL KPG1_STORD( EL, PIND, DVALUE, 
-     :                             %VAL( AXPNTR( 1 ) ), STATUS )
+     :                             %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                             STATUS )
                END IF
 
 *  Annul a null status as this is expected, and closes the loop.
@@ -618,11 +624,13 @@
 *  floating point).
                   IF ( TYPE .EQ. '_REAL' ) THEN
                      CALL KPG1_ELNMR( LBND( IAXIS ), UBND( IAXIS ), EL,
-     :                                %VAL( PNTRW ), STATUS )
+     :                                %VAL( CNF_PVAL( PNTRW ) ), 
+     :                                STATUS )
 
                   ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                      CALL KPG1_ELNMD( LBND( IAXIS ), UBND( IAXIS ), EL,
-     :                                %VAL( PNTRW ), STATUS )
+     :                                %VAL( CNF_PVAL( PNTRW ) ), 
+     :                                STATUS )
                   END IF
                END IF
 
@@ -636,12 +644,18 @@
 *  array (considered as 2-dimensional), using the appropriate routine
 *  for the data type.
                   IF ( TYPE .EQ. '_REAL' ) THEN
-                     CALL KPG1_PROWR( EL, %VAL( AXPNTR( 1 ) ), NIN,
-     :                                %VAL( PNTRW ), STATUS )
+                     CALL KPG1_PROWR( EL, 
+     :                                %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                                NIN,
+     :                                %VAL( CNF_PVAL( PNTRW ) ), 
+     :                                STATUS )
 
                   ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                     CALL KPG1_PROWD( EL, %VAL( AXPNTR( 1 ) ), NIN,
-     :                                %VAL( PNTRW ), STATUS )
+                     CALL KPG1_PROWD( EL, 
+     :                                %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                                NIN,
+     :                                %VAL( CNF_PVAL( PNTRW ) ), 
+     :                                STATUS )
 
                   END IF
 
@@ -665,15 +679,19 @@
 *  Real
 *  ----
                IF ( TYPE .EQ. '_REAL' ) THEN
-                  CALL TRN_TRNR( .TRUE., EL, NIN, EL, %VAL( PNTRW ),
-     :                           IMAP, EL, 1, %VAL( AXPNTR( 1 ) ), 
+                  CALL TRN_TRNR( .TRUE., EL, NIN, EL, 
+     :                           %VAL( CNF_PVAL( PNTRW ) ),
+     :                           IMAP, EL, 1, 
+     :                           %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                           STATUS )
 
 *  Double precision
 *  ----------------
                ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL TRN_TRND( .TRUE., EL, NIN, EL, %VAL( PNTRW ),
-     :                            IMAP, EL, 1, %VAL( AXPNTR( 1 ) ), 
+                  CALL TRN_TRND( .TRUE., EL, NIN, EL, 
+     :                           %VAL( CNF_PVAL( PNTRW ) ),
+     :                            IMAP, EL, 1, 
+     :                           %VAL( CNF_PVAL( AXPNTR( 1 ) ) ),
      :                            STATUS )
                END IF
 
@@ -713,10 +731,12 @@
 *  Append sequentially each value to the vector.  Choose the
 *  appropriate subroutine for the data type.
             IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPS1_TRNDD( FD, EL, %VAL( AXPNTR( 1 ) ), STATUS )
+               CALL KPS1_TRNDD( FD, EL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                          STATUS )
    
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-               CALL KPS1_TRNDR( FD, EL, %VAL( AXPNTR( 1 ) ), STATUS )
+               CALL KPS1_TRNDR( FD, EL, %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                          STATUS )
    
             END IF
 
@@ -746,11 +766,13 @@
 *  subroutine for the data type.
             IF ( TYPE .EQ. '_DOUBLE' ) THEN
                CALL KPG1_SSAZD( EL, 1.0D0, DBLE( LBND( IAXIS ) ) - 
-     :                          0.5D0, %VAL( FPNTR ), STATUS )
+     :                          0.5D0, %VAL( CNF_PVAL( FPNTR ) ), 
+     :                          STATUS )
 
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                CALL KPG1_SSAZR( EL, 1.0D0, DBLE( LBND( IAXIS ) ) - 
-     :                          0.5D0, %VAL( FPNTR ), STATUS )
+     :                          0.5D0, %VAL( CNF_PVAL( FPNTR ) ), 
+     :                          STATUS )
 
             END IF
 
@@ -772,13 +794,15 @@
 *  no type conversions, the bad value need not be checked.  Call the
 *  appropriate routine for the data type.
                IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( .FALSE., EL, %VAL( FPNTR ),
-     :                           %VAL( AXPNTR( 1 ) ), IERR, NERR, 
+                  CALL VEC_DTOD( .FALSE., EL, %VAL( CNF_PVAL( FPNTR ) ),
+     :                           %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                           IERR, NERR,
      :                           STATUS )
 
                ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-                  CALL VEC_RTOR( .FALSE., EL, %VAL( FPNTR ),
-     :                           %VAL( AXPNTR( 1 ) ), IERR, NERR, 
+                  CALL VEC_RTOR( .FALSE., EL, %VAL( CNF_PVAL( FPNTR ) ),
+     :                           %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                           IERR, NERR,
      :                           STATUS )
 
                END IF
@@ -863,15 +887,17 @@
 
 *  Fill the first EL elements with the grid coordinate at the centre of
 *  each pixel.
-            CALL KPG1_ELNMD( 1, EL, EL, %VAL( PNTRW ), STATUS )
+            CALL KPG1_ELNMD( 1, EL, EL, %VAL( CNF_PVAL( PNTRW ) ), 
+     :                       STATUS )
 
 *  Calculate new AXIS centres by transforming the grid centre values into
 *  the current Frame.
-            CALL AST_TRAN1( MAP, EL, %VAL( PNTRW ), .TRUE., 
-     :                      %VAL( PNTRW ), STATUS )
+            CALL AST_TRAN1( MAP, EL, %VAL( CNF_PVAL( PNTRW ) ), .TRUE.,
+     :                      %VAL( CNF_PVAL( PNTRW ) ), STATUS )
 
 *  Count the good values in the transformed array.
-            CALL KPG1_NBADD( EL, %VAL( PNTRW ), NBAD, STATUS )
+            CALL KPG1_NBADD( EL, %VAL( CNF_PVAL( PNTRW ) ), 
+     :                       NBAD, STATUS )
 
 *  Report an error if they are all bad.
             IF( NBAD .EQ. EL .AND. STATUS .EQ. SAI__OK ) THEN
@@ -894,8 +920,10 @@
      :                        AXPNTR, EL, STATUS )
 
 *  Copy the centre values from the work array to the axis array.
-               CALL KPG1_CPNDD( 1, 1, EL, %VAL( PNTRW ), 1, EL, 
-     :                          %VAL( AXPNTR( 1 ) ), EL, STATUS )
+               CALL KPG1_CPNDD( 1, 1, EL, %VAL( CNF_PVAL( PNTRW ) ), 
+     :                          1, EL,
+     :                          %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
+     :                          EL, STATUS )
 
 *  Set up the axis label and units.
                ATTR = 'LABEL('

@@ -335,6 +335,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     PMA: Peter Allan (University of Manchester)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -436,6 +437,8 @@
 *        Added support for WCS component.
 *     11-APR-2000 (DSB):
 *        Added FITS-PC and FITS-AIPS WCS encodings.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -452,6 +455,7 @@
       INCLUDE 'GRP_PAR'        ! GRP_ constants
       INCLUDE 'MAG_ERR'        ! MAG-error definitions
       INCLUDE 'PAR_ERR'        ! Parameter-system errors
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
       INTEGER  STATUS
@@ -983,14 +987,17 @@
 *                   Read first header block and check for error.
 *                   This is needed to obtain the blocksize.
 
-                     CALL MAG_READ( MT, BLKSIZ, %VAL( BFPNTR ),
+                     CALL MAG_READ( MT, BLKSIZ, 
+     :                              %VAL( CNF_PVAL( BFPNTR ) ),
      :                              ACTSIZ, STATUS )
 
 *                   Obtain the first FITS record from the tape buffer.
 
                      CALL FTS1_TREAD( MT, BLKSIZ, ACTSIZ,
-     :                                %VAL( BFPNTR ), OFFSET,
-     :                                %VAL( RCPNTR ), STATUS )
+     :                                %VAL( CNF_PVAL( BFPNTR ) ), 
+     :                                OFFSET,
+     :                                %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                                STATUS )
 
 *                   Do not want to process further files if we
 *                   have reached the end of the tape.
@@ -1075,7 +1082,8 @@
 
 *                Process the header blocks.  OFFSET is updated.
  
-                  CALL FTS1_PHEAD( BFPNTR, RCPNTR, %VAL( RCPNTD ),
+                  CALL FTS1_PHEAD( BFPNTR, RCPNTR, 
+     :                             %VAL( CNF_PVAL( RCPNTD ) ),
      :                             'TAPE', MT, TLOC, BLKSIZ, MAXHDR,
      :                             .NOT. AUTO, ACTSIZ, OFFSET, CURREC,
      :                             HSTART, HDNUM, EXTEND, NHEADS,
@@ -1109,7 +1117,8 @@
 *                value.
 
                   IF ( SUBFIL .EQ. 1 ) THEN
-                     CALL FTS1_GKEYL( WHDIM( 1 ), %VAL( HPNTR( 1 ) ),
+                     CALL FTS1_GKEYL( WHDIM( 1 ), 
+     :                                %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                                HSTART( 1 ), 'EXTEND', 1, THERE,
      :                                GEXTND, COMENT, NKC, STATUS,
      :                                %VAL( 1 ) )
@@ -1128,7 +1137,8 @@
 *                Check that the mandatory descriptors are present.
 
                   CALL FTS1_MANDH( SUBFIL .EQ. 1, WHDIM( 1 ),
-     :                             %VAL( HPNTR( 1 ) ), HSTART( NHEADS ),
+     :                             %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+     :                             HSTART( NHEADS ),
      :                             BITPIX, NDIM, DIMS, DARRAY, NONSDA,
      :                             SIZE, STATUS, %VAL( 1 ) )
 
@@ -1180,7 +1190,8 @@
 
                   IF ( LOGHDR ) THEN
 
-                     CALL FTS1_HDLOG( %VAL( HPNTR( 1 ) ), FD, CFN,
+                     CALL FTS1_HDLOG( %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+     :                                FD, CFN,
      :                                SUBFIL, NHEADS, HDNUM, STATUS,
      :                                %VAL( 1 ) )
 
@@ -1202,7 +1213,8 @@
 
 *                   Obtain the extension's name.
 
-                     CALL FTS1_GKEYC( WHDIM( 1 ), %VAL( HPNTR( 1 ) ),
+                     CALL FTS1_GKEYC( WHDIM( 1 ), 
+     :                                %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                                HSTART( NHEADS ), 'XTENSION', 1,
      :                                THERE, EXTNAM, COMENT, NKC,
      :                                STATUS, %VAL( 1 ) )
@@ -1229,14 +1241,15 @@
 
 *                      Create the SCAR description file and text table.
 
-                        CALL FTS1_SCTAB( %VAL( HPNTR( 1 ) ),
+                        CALL FTS1_SCTAB( %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                                   'DSCFTABLE', 'TABLE', 'TAPE',
      :                                   MT, WHDIM( 1 ),
      :                                   HSTART( NHEADS ), NDIM, DIMS,
      :                                   LOGHDR, FD, CFN, SUBFIL,
      :                                   PREFIX, AUTO, BLKSIZ, ACTSIZ,
      :                                   BFPNTR, OFFSET, CURREC,
-     :                                   RCPNTR, STATUS, %VAL( 1 ) )
+     :                                   RCPNTR, STATUS, 
+     :                                   %VAL( 1 ) )
      
                      END IF
 
@@ -1322,7 +1335,8 @@
 
                   CALL FTS1_DTYPE( DARRAY, NONSDA, BITPIX,
      :                             HSTART( NHEADS ), WHDIM( 1 ),
-     :                             %VAL( HPNTR( 1 ) ), MXPARM, NDIM,
+     :                             %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+     :                             MXPARM, NDIM,
      :                             DIMS, BSCALE, BZERO, BLANK, BADPIX,
      :                             IEEE, GCOUNT, PCOUNT, PTYPE, PSCALE, 
      :                             PZERO, STATUS, %VAL( 1 ) )
@@ -1427,7 +1441,8 @@
 *                data conversions and blank-pixel removal.
 *                =====================================================
 
-                  CALL FTS1_NDF( %VAL( HPNTR( 1 ) ), BFPNTR, RCPNTR,
+                  CALL FTS1_NDF( %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
+     :                           BFPNTR, RCPNTR,
      :                           AUTO, 'OUT', 'TAPE', MT, VMS, LENDIA,
      :                           SIZE, NDIM, DIMS, BPV, EFMTCV, FORMTI,
      :                           FORMAT, IEEE, BADPIX, BLANK, BSCALE,
@@ -1464,10 +1479,13 @@
 *                   is blank, or when a tape mark is encountered.
 
                      CALL FTS1_TREAD( MT, BLKSIZ, ACTSIZ,
-     :                                %VAL( BFPNTR ), OFFSET,
-     :                                %VAL( RCPNTR ), STATUS )
+     :                                %VAL( CNF_PVAL( BFPNTR ) ), 
+     :                                OFFSET,
+     :                                %VAL( CNF_PVAL( RCPNTR ) ), 
+     :                                STATUS )
 
-                     IF ( .NOT. FTS1_BLCAR( %VAL( RCPNTD ) ) .AND.
+                     IF ( .NOT. FTS1_BLCAR( %VAL( CNF_PVAL( RCPNTD ) ) ) 
+     :                    .AND.
      :                    STATUS .EQ. SAI__OK ) THEN
 
 *                      There is a sub file, so process its header like

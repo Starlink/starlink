@@ -61,11 +61,14 @@
 
 *  Authors:
 *     DSB David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     19-NOV-2001 (DSB):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -82,6 +85,7 @@
       INCLUDE 'PSX_ERR'        ! PSX error constants
       INCLUDE 'PAR_ERR'        ! PAR error constants
       INCLUDE 'CTM_PAR'        ! Colout Table Management constants
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -232,7 +236,8 @@
      :                    STATUS ) 
 
 *  Load the LUT into the colour table.
-            CALL KPG1_PGLUT( NEL/3, %VAL( IPLUT ), LP, UP, .FALSE., 
+            CALL KPG1_PGLUT( NEL/3, %VAL( CNF_PVAL( IPLUT ) ), 
+     :                       LP, UP, .FALSE.,
      :                       STATUS )
 
 *  Save the new colour table in $ADAM_USER/kappa_lut.sdf

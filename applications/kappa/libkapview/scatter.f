@@ -191,6 +191,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -202,6 +203,8 @@
 *     19-SEP-2001 (DSB):
 *        Ensure that none of the compression factors are bigger than the 
 *        number of pixels on the corresponding axis.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -216,6 +219,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -345,7 +349,8 @@
          CALL NDF_MAP( INDF1, 'QUALITY', '_UBYTE', 'READ', IPQ, NEL, 
      :                 STATUS )
          CALL PSX_CALLOC( NEL, '_REAL', IPW1, STATUS )
-         CALL VEC_UBTOR( .FALSE., NEL, %VAL( IPQ ), %VAL( IPW1 ), IERR,
+         CALL VEC_UBTOR( .FALSE., NEL, %VAL( CNF_PVAL( IPQ ) ), 
+     :                   %VAL( CNF_PVAL( IPW1 ) ), IERR,
      :                   NERR, STATUS )
          CALL NDF_UNMAP( INDF1, '*', STATUS )
          IP1 = IPW1
@@ -359,7 +364,8 @@
          CALL NDF_MAP( INDF2, 'QUALITY', '_UBYTE', 'READ', IPQ, NEL, 
      :                 STATUS )
          CALL PSX_CALLOC( NEL, '_REAL', IPW2, STATUS )
-         CALL VEC_UBTOR( .FALSE., NEL, %VAL( IPQ ), %VAL( IPW2 ), IERR,
+         CALL VEC_UBTOR( .FALSE., NEL, %VAL( CNF_PVAL( IPQ ) ), 
+     :                   %VAL( CNF_PVAL( IPW2 ) ), IERR,
      :                   NERR, STATUS )
          CALL NDF_UNMAP( INDF2, '*', STATUS )
          IP2 = IPW2
@@ -409,14 +415,18 @@
          CALL PSX_CALLOC( DIM( 1 ), '_INTEGER', IPW6, STATUS )
 
 *  Block average the first array.
-         CALL KPG1_CMAVR( NDIM, DIM, %VAL( IP1 ), CMPRS, 1, 
-     :                    %VAL( IPW3 ), %VAL( IPW5 ), %VAL( IPW6 ), 
+         CALL KPG1_CMAVR( NDIM, DIM, %VAL( CNF_PVAL( IP1 ) ), CMPRS, 1,
+     :                    %VAL( CNF_PVAL( IPW3 ) ), 
+     :                    %VAL( CNF_PVAL( IPW5 ) ), 
+     :                    %VAL( CNF_PVAL( IPW6 ) ),
      :                    STATUS )
          IP1 = IPW3
 
 *  Block average the second array.
-         CALL KPG1_CMAVR( NDIM, DIM, %VAL( IP2 ), CMPRS, 1, 
-     :                    %VAL( IPW4 ), %VAL( IPW5 ), %VAL( IPW6 ), 
+         CALL KPG1_CMAVR( NDIM, DIM, %VAL( CNF_PVAL( IP2 ) ), CMPRS, 1,
+     :                    %VAL( CNF_PVAL( IPW4 ) ), 
+     :                    %VAL( CNF_PVAL( IPW5 ) ), 
+     :                    %VAL( CNF_PVAL( IPW6 ) ),
      :                    STATUS )
          IP2 = IPW4
 
@@ -427,11 +437,13 @@
 
 *  Obtain the maximum and minimum values to define the bounds of the 
 *  first histogram.
-      CALL KPG1_MXMNR( .TRUE., NEL, %VAL( IP1 ), NINVAL, RMAXV, RMINV, 
+      CALL KPG1_MXMNR( .TRUE., NEL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                 NINVAL, RMAXV, RMINV,
      :                 MAXPOS, MINPOS, STATUS )
 
 *  Generate the histogram between those bounds.
-      CALL KPG1_GHSTR( .TRUE., NEL, %VAL( IP1 ), NUMBIN, RMAXV, RMINV, 
+      CALL KPG1_GHSTR( .TRUE., NEL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                 NUMBIN, RMAXV, RMINV,
      :                 HIST, STATUS )
 
 *  Estimate the values at the percentiles.
@@ -446,9 +458,11 @@
       END IF
 
 *  Do the same for the second NDF.
-      CALL KPG1_MXMNR( .TRUE., NEL, %VAL( IP2 ), NINVAL, RMAXV, RMINV, 
+      CALL KPG1_MXMNR( .TRUE., NEL, %VAL( CNF_PVAL( IP2 ) ), 
+     :                 NINVAL, RMAXV, RMINV,
      :                 MAXPOS, MINPOS, STATUS )
-      CALL KPG1_GHSTR( .TRUE., NEL, %VAL( IP2 ), NUMBIN, RMAXV, RMINV, 
+      CALL KPG1_GHSTR( .TRUE., NEL, %VAL( CNF_PVAL( IP2 ) ), 
+     :                 NUMBIN, RMAXV, RMINV,
      :                 HIST, STATUS )
       CALL KPG1_HSTFR( NUMBIN, HIST, RMAXV, RMINV, 2, PERC2, PERV2, 
      :                 STATUS )
@@ -483,7 +497,8 @@
       END IF
 
 *  Produce the scatter plot.
-      CALL KPG1_GRAPH( NEL, %VAL( IP1 ), %VAL( IP2 ), 0.0, 0.0, 
+      CALL KPG1_GRAPH( NEL, %VAL( CNF_PVAL( IP1 ) ), 
+     :                 %VAL( CNF_PVAL( IP2 ) ), 0.0, 0.0,
      :                 LAB1( : LEN1 ), LAB2( : LEN2 ), 'Scatter plot',
      :                 'XDATA', 'YDATA', 3, .FALSE., PERV1( 1 ), 
      :                 PERV1( 2 ), PERV2( 1 ), PERV2( 2 ), 

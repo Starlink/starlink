@@ -107,6 +107,8 @@
 *        Original version.
 *     25-OCT-2001 (DSB):
 *        Make pixel coords the default coord system for the ard file.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:

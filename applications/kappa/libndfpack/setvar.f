@@ -76,6 +76,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -87,6 +88,8 @@
 *        Added Usage and Examples items.
 *     1995 April 24 (MJC):
 *        Made usage and examples lowercase.  Added Related Applications.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 
@@ -103,6 +106,7 @@
       INCLUDE 'DAT_PAR'          ! DAT_ constants
       INCLUDE 'NDF_PAR'          ! NDF_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error codes
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -202,13 +206,17 @@
 
 *  Real...
                IF ( TYPE .EQ. '_REAL' ) THEN
-                  CALL TRN_TR1R( BAD, EL, %VAL( DPNTR( 1 ) ), IMAP,
-     :                           %VAL( VPNTR( 1 ) ), STATUS )
+                  CALL TRN_TR1R( BAD, EL, 
+     :                           %VAL( CNF_PVAL( DPNTR( 1 ) ) ), IMAP,
+     :                           %VAL( CNF_PVAL( VPNTR( 1 ) ) ), 
+     :                           STATUS )
 
 *  Double precision...
                ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL TRN_TR1D( BAD, EL, %VAL( DPNTR( 1 ) ), IMAP,
-     :                           %VAL( VPNTR( 1 ) ), STATUS )
+                  CALL TRN_TR1D( BAD, EL, 
+     :                           %VAL( CNF_PVAL( DPNTR( 1 ) ) ), IMAP,
+     :                           %VAL( CNF_PVAL( VPNTR( 1 ) ) ), 
+     :                           STATUS )
                END IF
 
 *  Annul the compiled mapping.

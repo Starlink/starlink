@@ -49,6 +49,7 @@
 *  Authors:
 *     RDS: Richard Saxton  (STARLINK, Leicester)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,6 +61,8 @@
 *     1995 April 24 (MJC):
 *        Made Usage lowercase.  Added Related Applications and an
 *        example.  Guessed previous history entry.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -74,6 +77,7 @@
       INCLUDE 'DAT_PAR'             ! Data-system constants
       INCLUDE 'NDF_PAR'             ! Standard NDF constants
       INCLUDE 'MSG_PAR'             ! MSG constants
+      INCLUDE 'CNF_PAR'             ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS                ! Global status
@@ -224,7 +228,7 @@
 
 *  Fill the data array.
                CALL KPG1_SSCOF( DIMS( LP ), DBLE( SCALE ), DBLE( BASE ),
-     :                          %VAL( DPNTR ), STATUS )
+     :                          %VAL( CNF_PVAL( DPNTR ) ), STATUS )
 
 *  Unmap the data and annul the data-array locator.
                CALL DAT_ANNUL( DDLOC, STATUS )

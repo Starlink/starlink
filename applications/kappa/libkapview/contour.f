@@ -400,6 +400,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -504,6 +505,8 @@
 *     20-AUG-2001 (DSB):
 *        Change default Format (to "%g") and Colour (to the colour used
 *        to draw the contour) for the contour indices in the key.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -522,6 +525,7 @@
       INCLUDE 'PAR_ERR'        ! PAR error constants
       INCLUDE 'AST_PAR'        ! AST constants
       INCLUDE 'GRP_PAR'        ! GRP constants
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -796,7 +800,7 @@
 *  Select the method of defining contour heights and evaluate them.
       CALL KPS1_CNSER( 'MODE', 'NCONT', 'FIRSTCNT', 'STEPCNT',
      :                 'HEIGHTS', 'PERCENTILES', BAD, EL,
-     :                 %VAL( PNTR ), MXCONT, CNTLEV, PERCNT,
+     :                 %VAL( CNF_PVAL( PNTR ) ), MXCONT, CNTLEV, PERCNT,
      :                 AREA, NCONT, MODE, STATUS )
 
 *  Abort if an error has occurred.
@@ -838,15 +842,18 @@
 *  Draw a data outline if required.
       IF( MODE .EQ. 'BOUNDS' .OR. MODE .EQ. 'GOOD' ) THEN
          CALL KPS1_CNTGD( (MODE .EQ. 'BOUNDS'), IPLOT, IGRP, DIMS( 1 ), 
-     :                    DIMS( 2 ), %VAL( PNTR ), 1, 1, DIMS( 1 ), 
+     :                    DIMS( 2 ), %VAL( CNF_PVAL( PNTR ) ), 
+     :                    1, 1, DIMS( 1 ),
      :                    DIMS( 2 ), FAST, CNTUSD, CNTLEN, CNTCLS, 
      :                    STATUS )
 
 *  Otherwise, draw a contour plot.
       ELSE
          CALL KPS1_CNTDR( IPLOT, IGRP, DIMS( 1 ), DIMS( 2 ), 
-     :                    %VAL( PNTR ), 1, 1, DIMS( 1 ), DIMS( 2 ), 
-     :                    NCONT, CNTLEV, STATS, FAST, %VAL( WKPNTR ), 
+     :                    %VAL( CNF_PVAL( PNTR ) ), 
+     :                    1, 1, DIMS( 1 ), DIMS( 2 ),
+     :                    NCONT, CNTLEV, STATS, FAST, 
+     :                    %VAL( CNF_PVAL( WKPNTR ) ),
      :                    CNTUSD, CNTLEN, CNTCLS, CNTPEN, STATUS )
       END IF
 

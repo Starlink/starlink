@@ -64,6 +64,8 @@
 *  History:
 *     1995 October 29 (MJC):
 *        Original version.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:

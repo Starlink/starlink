@@ -79,6 +79,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -87,6 +88,8 @@
 *     8-DEC-1998 (DSB):
 *        Corrected the name of the output NDF component to receive the
 *        QUALITY values from 'variance' to 'quality'.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -101,6 +104,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ PRIMDAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -211,32 +215,39 @@
 *  Copy the data from the input to the output array, using the
 *  appropriate routine for the data type.
       IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL VEC_RTOR( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                  %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+         CALL VEC_RTOR( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                  IERR, NERR, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL VEC_BTOB( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                  %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+         CALL VEC_BTOB( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                  IERR, NERR, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL VEC_DTOD( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                  %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+         CALL VEC_DTOD( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                  IERR, NERR, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL VEC_ITOI( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                  %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+         CALL VEC_ITOI( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                  IERR, NERR, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL VEC_UBTOUB( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                    %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+         CALL VEC_UBTOUB( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    IERR, NERR, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL VEC_UWTOUW( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                     %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+         CALL VEC_UWTOUW( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    IERR, NERR, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL VEC_WTOW( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                  %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+         CALL VEC_WTOW( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                  %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                  IERR, NERR, STATUS )
       END IF
 
 *  Unmap the data arrays.
@@ -261,32 +272,39 @@
 *  Copy the variance from the input to the output array, using the
 *  appropriate routine for the data type.
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL VEC_RTOR( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                     %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+            CALL VEC_RTOR( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL VEC_BTOB( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                     %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+            CALL VEC_BTOB( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL VEC_DTOD( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                     %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+            CALL VEC_DTOD( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL VEC_ITOI( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                     %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+            CALL VEC_ITOI( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL VEC_UBTOUB( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                       %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+            CALL VEC_UBTOUB( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL VEC_UWTOUW( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                        %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+            CALL VEC_UWTOUW( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                        %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       IERR, NERR, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL VEC_WTOW( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                     %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+            CALL VEC_WTOW( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     IERR, NERR, STATUS )
          END IF
 
 *  Unmap the variance arrays.
@@ -305,8 +323,9 @@
          CALL NDF_MAP( NDFO, 'Quality', ITYPE, 'WRITE/ZERO', PNTRO,
      :                 ELOUT, STATUS )
 
-         CALL VEC_UBTOUB( .TRUE., EL, %VAL( PNTRI( 1 ) ),
-     :                    %VAL( PNTRO( 1 ) ), IERR, NERR, STATUS )
+         CALL VEC_UBTOUB( .TRUE., EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    IERR, NERR, STATUS )
 
 *  Unmap the quality arrays.
          CALL NDF_UNMAP( NDFI, 'Quality', STATUS )

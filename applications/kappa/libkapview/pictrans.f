@@ -157,6 +157,8 @@
 *        Converted to AST/PGPLOT.
 *     13-AUG-2002 (DSB):
 *        Added CURNDC Frame.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:

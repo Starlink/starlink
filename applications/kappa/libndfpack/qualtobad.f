@@ -55,6 +55,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -62,6 +63,8 @@
 *        Original version.
 *     17-JAN-2002 (DSB):
 *        Brought into KAPPA.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -78,6 +81,7 @@
       INCLUDE 'IRQ_PAR'          ! IRQ constants.
       INCLUDE 'IRQ_ERR'          ! IRQ error constants.
       INCLUDE 'NDF_PAR'          ! NDF constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -149,31 +153,38 @@
 *  Set bad all output DATA pixels which satisfy the given quality
 *  expression.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL IRQ_SBADB( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD, NOBAD,
+         CALL IRQ_SBADB( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                   ALLBAD, NOBAD,
      :                   STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL IRQ_SBADUB( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD, NOBAD,
+         CALL IRQ_SBADUB( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                    ALLBAD, NOBAD,
      :                    STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL IRQ_SBADW( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD, NOBAD,
+         CALL IRQ_SBADW( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                   ALLBAD, NOBAD,
      :                   STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL IRQ_SBADUW( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD, NOBAD,
+         CALL IRQ_SBADUW( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                    ALLBAD, NOBAD,
      :                   STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL IRQ_SBADI( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD, NOBAD,
+         CALL IRQ_SBADI( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                   ALLBAD, NOBAD,
      :                   STATUS )
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL IRQ_SBADR( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD, NOBAD,
+         CALL IRQ_SBADR( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                   ALLBAD, NOBAD,
      :                   STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL IRQ_SBADD( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD, NOBAD,
+         CALL IRQ_SBADD( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                   ALLBAD, NOBAD,
      :                   STATUS )
 
       END IF
@@ -205,31 +216,38 @@
      :                 STATUS )
 
          IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL IRQ_SBADB( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD,
+            CALL IRQ_SBADB( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                      ALLBAD,
      :                      NOBAD, STATUS )
    
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL IRQ_SBADUB( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD,
+            CALL IRQ_SBADUB( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                       ALLBAD,
      :                       NOBAD, STATUS )
    
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL IRQ_SBADW( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD,
+            CALL IRQ_SBADW( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                      ALLBAD,
      :                      NOBAD, STATUS )
    
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL IRQ_SBADUW( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD,
+            CALL IRQ_SBADUW( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                       ALLBAD,
      :                       NOBAD, STATUS )
    
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL IRQ_SBADI( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD,
+            CALL IRQ_SBADI( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                      ALLBAD,
      :                      NOBAD, STATUS )
    
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL IRQ_SBADR( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD,
+            CALL IRQ_SBADR( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                      ALLBAD,
      :                      NOBAD, STATUS )
    
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL IRQ_SBADD( IDQ, .TRUE., NEL, %VAL( IPNT ), ALLBAD,
+            CALL IRQ_SBADD( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+     :                      ALLBAD,
      :                      NOBAD, STATUS )
    
          END IF

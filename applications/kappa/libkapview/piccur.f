@@ -71,6 +71,8 @@
 *  History:
 *     27-SEP-2001 (DSB):
 *        Re-write for AST/PGPLOT.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:

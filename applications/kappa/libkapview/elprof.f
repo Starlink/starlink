@@ -179,6 +179,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -196,6 +197,8 @@
 *        Added parameter ESTIMATOR.
 *     24-FEB-2004 (DSB):
 *        Added propagation of WCS to output and mask.
+*     2004 September 3 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -210,6 +213,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'PAR_ERR'          ! PAR__ error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -480,8 +484,10 @@
 *  the AXIS component of the output NDF.
          CALL KPS1_ELPR1( NX, NY, ANGMAJ, RATIO, NBIN, RSTEP, RMIN,
      :                    WIDTH, XC, YC, ANGLIM( 1 ), ANGLIM( 2 ), 
-     :                    USESEC, REGVAL, IGRP, %VAL( IPW1 ), 
-     :                    %VAL( IPAX( 1 ) ), %VAL( IPAX( 2 ) ), STATUS )
+     :                    USESEC, REGVAL, IGRP, 
+     :                    %VAL( CNF_PVAL( IPW1 ) ),
+     :                    %VAL( CNF_PVAL( IPAX( 1 ) ) ), 
+     :                    %VAL( CNF_PVAL( IPAX( 2 ) ) ), STATUS )
 
 *  Propagate WCS from input to output.
          CALL KPS1_ELPR5( INDF1, INDF2, ANGMAJ, RATIO, NBIN, RMIN, 
@@ -593,8 +599,9 @@
 *  the AXIS component of the output NDF.
          CALL KPS1_ELPR2( NX, NY, USEANN, ANGMAJ, RATIO, RMIN, RMAX, XC,
      :                    YC , NBIN, ANGLIM( 1 ), WIDTH, PASTEP, REGVAL, 
-     :                    IGRP, %VAL( IPW1 ), %VAL( IPAX( 1 ) ),
-     :                    %VAL( IPAX( 2 ) ), STATUS )
+     :                    IGRP, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                    %VAL( CNF_PVAL( IPAX( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( IPAX( 2 ) ) ), STATUS )
       END IF
 
 *  Get workspace.
@@ -603,10 +610,14 @@
 
 *  Find the mean and variance of the data values in each bin.
       CALL KPS1_ELPR3( VAR, SLBND( 1 ), SUBND( 1 ), SLBND( 2 ), 
-     :                 SUBND( 2 ), %VAL( IPI( 1 ) ), %VAL( IPI( 2 ) ),
-     :                 IGRP, %VAL( IPW1 ), NBIN, WMEAN, REGVAL, 
-     :                 %VAL( IPDO ), %VAL( IPVO ), %VAL( IPW2 ), 
-     :                 %VAL( IPMASK ), STATUS )
+     :                 SUBND( 2 ), %VAL( CNF_PVAL( IPI( 1 ) ) ), 
+     :                 %VAL( CNF_PVAL( IPI( 2 ) ) ),
+     :                 IGRP, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                 NBIN, WMEAN, REGVAL,
+     :                 %VAL( CNF_PVAL( IPDO ) ), 
+     :                 %VAL( CNF_PVAL( IPVO ) ), 
+     :                 %VAL( CNF_PVAL( IPW2 ) ),
+     :                 %VAL( CNF_PVAL( IPMASK ) ), STATUS )
 
 *  Store a new title in the output NDF.
       CALL KPG1_CCPRO( 'TITLE', 'TITLE', INDF1, INDF2, STATUS )
@@ -628,8 +639,9 @@
 
 *  Copy the mask to the output NDF, transforming the mask values from
 *  integer bin indices, into bin AXIS CENTRE values.
-         CALL KPS1_ELPR4( EL, %VAL( IPMASK ), NBIN, %VAL( IPAX( 1 ) ),
-     :                    %VAL( IPMOUT ), STATUS )
+         CALL KPS1_ELPR4( EL, %VAL( CNF_PVAL( IPMASK ) ), NBIN, 
+     :                    %VAL( CNF_PVAL( IPAX( 1 ) ) ),
+     :                    %VAL( CNF_PVAL( IPMOUT ) ), STATUS )
 
 *  Store a new title in the output mask NDF.
          CALL KPG1_CCPRO( 'MTITLE', 'TITLE', INDF1, INDF3, STATUS )
