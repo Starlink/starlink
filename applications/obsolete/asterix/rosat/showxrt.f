@@ -90,6 +90,7 @@
       CALL USI_GET0C ('ROOTNAME', FROOT, STATUS )
 *  Append extension of FITS extension containing header
       FILENAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
+
 *  Does file exist?
       CALL UTIL_FINDFILE(FITSDIR, FILENAME, MAXRAW, FILES, NFILES,
      :                                                       STATUS)
@@ -101,14 +102,14 @@
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
+      FILENAME = FITSDIR(1:CHR_LEN(FITSDIR))//'/'//FILENAME
       CALL MSG_PRNT('SHOWXRT : Using FITS file : '// FILENAME)
-      SRT_ROOTNAME = FILENAME
 
 *  Open the FITS fIle
       CALL FIO_GUNIT(IUNIT, STATUS)
-      CALL FTOPEN(IUNIT, SRT_ROOTNAME, 0, BLOCK, STATUS)
+      CALL FTOPEN(IUNIT, FILENAME, 0, BLOCK, STATUS)
       IF ( STATUS .NE. SAI__OK ) THEN
-	 CALL MSG_SETC('FNAM',SRT_ROOTNAME)
+	 CALL MSG_SETC('FNAM',FILENAME)
          CALL MSG_PRNT('SHOWXRT : Error - opening file ^FNAM **')
          GOTO 999
       ENDIF
