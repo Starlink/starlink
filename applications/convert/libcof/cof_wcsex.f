@@ -76,11 +76,13 @@
 *        Modified the way in which existing WCS cards are removed from
 *        the FitsChan before new ones are added. Now uses the new FitsChan
 *        "Clean" attribute.
-*     9-JUN-2003 (DSN):
+*     9-JUN-2003 (DSB):
 *        - Annul any error reported by AST_WRITE sop that any remaining
 *        encodings can be checked.
 *        - Ignore any trailing degenerate pixel axes if the number of
 *        pixel axes exceeds the number of WCS axes.
+*     27-AUG-2004 (DSB):
+*        - Added FITS-CLASS encoding.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -112,7 +114,7 @@
 
 *  Local Constants:
       INTEGER DEFNCD             ! Number of AST non-native encodings.
-      PARAMETER ( DEFNCD = 6 )
+      PARAMETER ( DEFNCD = 7 )
 
 *  Local Variables:
       CHARACTER ASTCOD( DEFNCD )*13 ! The AST non-native encoding names
@@ -162,6 +164,7 @@
       ASTCOD( 4 ) = 'FITS-AIPS'
       ASTCOD( 5 ) = 'FITS-AIPS++'
       ASTCOD( 6 ) = 'FITS-PC'
+      ASTCOD( 7 ) = 'FITS-CLASS'
 
 *  If we need to choose a default encoding, we need to decide on the
 *  order in which to use the available encodings. The first to be used 

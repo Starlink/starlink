@@ -92,6 +92,8 @@
 *     4-FEB-2003 (DSB):
 *        Modified so that 1.0 is used for unconnected GRID axes instead
 *        of AST__BAD.
+*     27-AUG-2004 (DSB):
+*        - Added FITS-CLASS encoding.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -119,7 +121,7 @@
 
 *  Local Constants:
       INTEGER DEFNCD             ! Number of non-native AST encodings.
-      PARAMETER ( DEFNCD = 6 )
+      PARAMETER ( DEFNCD = 7 )
 
 *  External References:
       LOGICAL COF_WCSDF
@@ -145,7 +147,7 @@
 
 *  Store names of non-native AST encodings to use.
       DATA ASTCOD / 'FITS-IRAF', 'FITS-WCS', 'DSS', 'FITS-AIPS', 
-     :              'FITS-AIPS++', 'FITS-PC' /
+     :              'FITS-AIPS++', 'FITS-PC', 'FITS-CLASS' /
 *.
 
 *  Check inherited global status.

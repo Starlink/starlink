@@ -107,6 +107,11 @@
 *           the use of a wider range of celestial projections, as used by
 *           the AIPS++ project.
 *	    
+*        "FITS-CLASS" --- This uses the conventions of the CLASS project.
+*           CLASS is a software package for reducing single-dish radio and
+*           sub-mm spectroscopic data. It supports double sideband spectra. See 
+*           http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html.
+*
 *        "DSS" --- This is the system used by the Digital Sky Survey,
 *           and uses keywords AMDXn, AMDYn, PLTRAH, etc.
 *	    
@@ -855,6 +860,8 @@
 *        projections.
 *     11-JUL-2004 (DSB):
 *        Added FITS-AIPS++ encoding.
+*     27-AUG-2004 (DSB):
+*        Added FITS-CLASS encoding.
 *     {enter_further_changes_here}
 
 
