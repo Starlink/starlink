@@ -1584,8 +1584,8 @@ astMAKE_TEST(DSBSpecFrame,IF,( this->ifr != AST__BAD ))
 *  Description:
 *     This attribute indicates whether the DSBSpecFrame currently
 *     represents its lower or upper sideband. It may take one of the
-*     values "lower" or "upper" (case insensitive). The default value is
-*     "upper".
+*     case insensitive values "lsb" (for lower sideband) or "usb" (for 
+*     upper sideband). The default value is "usb".
 
 *  Applicability:
 *     DSBSpecFrame
