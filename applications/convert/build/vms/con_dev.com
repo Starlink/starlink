@@ -50,9 +50,10 @@ $!  Set up for Figaro development.
 $!
 $    @FIGARO_PROG_N:FIGDEV
 $!
-$!  Define logicals for CONVERT include files.
+$!  Define logicals for FIGARO include files.
 $!
-$    @CONVERT_BUILD_DIR:CONVERT_INCLUDES
+$    DEFINE DTACODES FIGPACK_DISK:[FIGPACK.NFIGARO.INC]DTACODES.INC
+$    DEFINE DYNAMIC_MEMORY FIGPACK_DISK:[FIGPACK.NFIGARO.INC]DYNAMIC_MEMORY.INC
 $!
 $!  TRN definitions.
 $!
@@ -73,6 +74,10 @@ $!
 $!  Develop NDF applications.
 $!
 $    NDF_DEV
+$!
+$!  Develop PAR applications.
+$!
+$    PAR_DEV
 $!
 $!  Develop PRIMDAT applications.
 $!
