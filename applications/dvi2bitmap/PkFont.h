@@ -76,7 +76,8 @@ class PkGlyph {
 
 class PkFont {
  public:
-    PkFont (unsigned int c,
+    PkFont (unsigned int dvimag,
+	    unsigned int c,
 	    unsigned int s,
 	    unsigned int d,
 	    string name);
@@ -92,15 +93,26 @@ class PkFont {
     bool seenInDoc(void) const { return seen_in_doc_; }
     void setSeenInDoc() { seen_in_doc_ = true; }
  private:
-    unsigned int checksum_, scalefactor_, designsize_;
     string name_;
     InputByteStream *pkf_;
-    unsigned int id_, ds_, cs_, hppp_, vppp_;
-    string comment_;
+    struct {
+	unsigned int c, s, d;
+    } font_header_;		// this is the information retrieved
+				// from the font declaration
+    struct {
+	unsigned int id, ds, cs, hppp, vppp;
+	string comment;
+    } preamble_;
+    // 
+    double fontscale_;
+    // following are in DVI units
+    unsigned int quad_, word_space_, back_space_;
     const nglyphs_ = 256;
     PkGlyph *glyphs_[nglyphs_];
     void read_font(InputByteStream&);
-    bool seen_in_doc_;
+    bool seen_in_doc_;		// true once the font_def command has been
+    				// seen in the document, as well as the
+    				// postamble
     static bool debug_;
     static string fontpath_;	// single string with %F in it
 };

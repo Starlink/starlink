@@ -12,7 +12,8 @@ bool PkFont::debug_;
 bool PkGlyph::debug_;
 string PkFont::fontpath_;
 
-PkFont::PkFont(unsigned int c,
+PkFont::PkFont(unsigned int dvimag,
+	       unsigned int c,
 	       unsigned int s,
 	       unsigned int d,
 	       string name)
@@ -29,6 +30,18 @@ PkFont::PkFont(unsigned int c,
 	for (int i=0; i<nglyphs_; i++)
 	    glyphs_[i] = 0;
 	read_font (*pkf_);
+	delete pkf_;		// don't need the file any more
+
+	font_header_.c = c;
+	font_header_.s = s;
+	font_header_.d = d;
+	fontscale_ = ((double)dvimag/1000.0) * ((double)s/(double)d);
+	cout << "Font scaling: " << dvimag << "/1000 * (" << s '/' << d
+	     << ")=" << fontscale_ << '\n';
+
+	quad_ = ((double)dvimag/1000.0) * d;
+	word_space_ = 0.2*quad_;
+	back_space_ = 0.9*quad_;
     }
     catch (InputByteStreamError& e)
     {
@@ -39,34 +52,32 @@ PkFont::PkFont(unsigned int c,
 
 PkFont::~PkFont()
 {
-    delete pkf_;
 }
 
 void PkFont::read_font (InputByteStream& pkf)
 {
     // read the preamble, and check that the requested parameters match
-    Byte preamble_opcode;
-    if ((preamble_opcode = pkf.getByte()) != 247)
+    if ((Byte preamble_opcode = pkf.getByte()) != 247)
 	throw DviError ("PK file doesn't start with preamble");
-    if ((id_ = pkf.getByte()) != 89)
+    if ((preamble_.id = pkf.getByte()) != 89)
 	throw DviError ("PK file has wrong ID byte");
 
     int comment_length = pkf.getByte();
-    comment_ = "";
+    preamble_.comment = "";
     for (;comment_length > 0; comment_length--)
-	comment_ += static_cast<char>(pkf.getByte());
-    ds_   = pkf.getUIU(4);
-    cs_   = pkf.getUIU(4);
-    hppp_ = pkf.getUIU(4);
-    vppp_ = pkf.getUIU(4);
+	preamble_.comment += static_cast<char>(pkf.getByte());
+    preamble_.ds   = pkf.getUIU(4);
+    preamble_.cs   = pkf.getUIU(4);
+    preamble_.hppp = pkf.getUIU(4);
+    preamble_.vppp = pkf.getUIU(4);
 
 
     if (debug_)
-	cerr << "PK file " << name_ << " '" << comment_ << "\'\n"
-	     << "ds="  << ds_
-	     << " cs=" << cs_
-	     << " hppp=" << hppp_
-	     << " vppp=" << vppp_
+	cerr << "PK file " << name_ << " '" << preamble_.comment << "\'\n"
+	     << "ds="  << preamble_.ds
+	     << " cs=" << preamble_.cs
+	     << " hppp=" << preamble_.hppp
+	     << " vppp=" << preamble_.vppp
 	     << '\n';
 
     // Now scan through the file, reporting opcodes and character definitions
@@ -237,8 +248,6 @@ PkRasterdata::PkRasterdata(Byte opcode,
     rasterdata_ = new Byte[len];
     (void) memcpy ((void*)rasterdata_, (void*)rasterdata, len);
     eob_ = rasterdata_+len_;
-    cerr << "rasterdata for opcode " << static_cast<int>(opcode)
-	 << " initialised\n";
 };
 
 unsigned int PkRasterdata::unpackpk ()

@@ -3,7 +3,6 @@
 
 #define NULL 0
 #include <iostream>
-#include <stdio.h>
 #include "DviFile.h"
 #include "PkFont.h"
 #include "InputByteStream.h"
@@ -133,7 +132,7 @@ DviFileEvent *DviFile::getEvent()
 		page.previous = getSIS(4);
 		page.isStart = true;
 		gotEvent = &page;
-		h_ = v_ = w_ = x_ = y_ = z_ = 0;
+		h_ = v_ = w_ = x_ = y_ = z_ = hh_ = vv_ = 0;
 		posStack_->clear();
 		break;
 	      case 140:		// eop
@@ -144,7 +143,8 @@ DviFileEvent *DviFile::getEvent()
 		break;
 	      case 141:		// push
 		{
-		    const PosState *ps = new PosState(h_,v_,w_,x_,y_,z_);
+		    const PosState *ps
+			= new PosState(h_,v_,w_,x_,y_,z_,hh_,vv_);
 		    posStack_->push(ps);
 		    //PosState *ps = new PosState(h_,v_,w_,x_,y_,z_);
 		    //posStack_.push(ps);
@@ -166,6 +166,8 @@ DviFileEvent *DviFile::getEvent()
 		    const PosState *ps = posStack_->pop();
 		    h_ = ps->h;
 		    v_ = ps->v;
+		    hh_ = ps->hh;
+		    vv_ = ps->vv;
 		    w_ = ps->w;
 		    x_ = ps->x;
 		    y_ = ps->y;
@@ -405,6 +407,7 @@ DviFileEvent *DviFile::getEvent()
 		preamble.comment = "";
 		for (int k=getSIU(1); k>0; k--)
 		    preamble.comment += static_cast<char>(getByte());
+		process_preamble(preamble);
 		gotEvent = &preamble;
 		break;
 	      case 248:		// post
@@ -468,6 +471,69 @@ bool DviFile::eof()
     return dvif_->eof();
 }
 
+// dp is in DVI units, and should be converted to pixel units, with any
+// necessary rounding
+int DviFile::pixel_round(int dp)
+{
+    if (n>0)
+	return static_cast<int>(dvi_to_pix_ * dp + 0.5);
+    else
+	return static_cast<int>(dvi_to_pix_ * dp - 0.5);
+}
+
+// update the horizontal position by the width of the glyph
+void DviFile::updateH (PkGlyph *g)
+{
+    updateH(g->w());
+}
+void DviFile::updateH (DviFileSetRule *r)
+{
+    updateH(r->a);
+}
+// argument is in DVI units
+void DviFile::updateH (int x)
+{
+    if (   (x > 0 && x < word_space_)
+	|| (x < 0 && x > -back_space_))
+	hh_ += pixel_round(x);
+    else
+	hh_ = pixel_round(h_ + x);
+    h_ += x;
+
+    // check drift
+    int Kh = pixel_round(dvi_to_pix_ * h_);
+    int dist = hh_ - Kh;
+    int sdist = 1;
+    if (dist < 0)
+    {
+	dist = -dist;
+	sdist = -1;
+    }
+    if (dist > max_drift_)
+	hh_ = Kh + sdist*max_drift_;
+}
+void DviFile::updateV(int y)
+{
+    int range = 0.8 * quad_;
+    if (abs(y) < range)
+	vv_ += pixel_round(y);
+    else
+	vv_ = pixel_round(v_ + y);
+    v_ += y;
+
+    // check drift
+    int Kv = pixel_round(dvi_to_pix_ * v_);
+    int dist = vv_ - Kv;
+    int sdist = 1;
+    if (dist < 0)
+    {
+	dist = -dist;
+	sdist = -1;
+    }
+    if (dist > max_drift_)
+	vv_ = Kv + sdist*max_drift_;
+}
+
 void DviFile::read_postamble()
 {
     const tailbuflen = 64;
@@ -524,11 +590,7 @@ void DviFile::read_postamble()
 	    num = getSIU(1);
 	    cerr << "postamble font1 " << num << '\n';
 	    if (fontMap_[num] != 0)
-	    {
-		char errmsg[64];
-		sprintf (errmsg, "Font %d defined twice", num);
-		throw DviError (errmsg);
-	    }
+		throw DviError ("Font %d defined twice", num);
 	    c = getUIU(4);
 	    s = getUIU(4);
 	    d = getUIU(4);
@@ -538,18 +600,14 @@ void DviFile::read_postamble()
 		fontdir += static_cast<char>(getByte());
 	    for (int l = getSIU(1); l>0; l--)
 		fontname += static_cast<char>(getByte());
-	    fontMap_[num] = new PkFont(c, s, d, fontname);
+	    fontMap_[num] = new PkFont(preamble_.mag, c, s, d, fontname);
 	    break;
 
 	  case 244:		// fnt_def2
 	    num = getSIU(2);
 	    cerr << "postamble font1 " << num << '\n';
 	    if (fontMap_[num] != 0)
-	    {
-		char errmsg[64];
-		sprintf (errmsg, "Font %d defined twice", num);
-		throw DviError (errmsg);
-	    }
+		throw DviError ("Font %d defined twice", num);
 	    c = getUIU(4);
 	    s = getUIU(4);
 	    d = getUIU(4);
@@ -566,11 +624,7 @@ void DviFile::read_postamble()
 	    num = getSIU(3);
 	    cerr << "postamble font1 " << num << '\n';
 	    if (fontMap_[num] != 0)
-	    {
-		char errmsg[64];
-		sprintf (errmsg, "Font %d defined twice", num);
-		throw DviError (errmsg);
-	    }
+		throw DviError ("Font %d defined twice", num);
 	    c = getUIU(4);
 	    s = getUIU(4);
 	    d = getUIU(4);
@@ -587,11 +641,7 @@ void DviFile::read_postamble()
 	    num = getSIS(4);
 	    cerr << "postamble font1 " << num << '\n';
 	    if (fontMap_[num] != 0)
-	    {
-		char errmsg[64];
-		sprintf (errmsg, "Font %d defined twice", num);
-		throw DviError (errmsg);
-	    }
+		throw DviError ("Font %d defined twice", num);
 	    c = getUIU(4);
 	    s = getUIU(4);
 	    d = getUIU(4);
@@ -609,14 +659,43 @@ void DviFile::read_postamble()
 	    break;
 
 	  default:		// error
-	    {
-		char errmsg[64];
-		sprintf (errmsg, "unexpected opcode (%d) in postamble",opcode);
-		throw DviError (errmsg);
-	    }
+	    throw DviError ("unexpected opcode (%d) in postamble", opcode);
 	    break;
 	}
     }
+}
+
+// The preamble dimensions num and den `are positive integers that
+// define the units of measurement; they are the numerator and
+// denominator of a fraction by which all dimensions in the DVI file
+// could be multiplied in order to get lengths in units of 10^{-7}
+// meters.  (For example, there are exactly 7227 \TeX\ points in 254
+// centimeters, and \TeX82 works with scaled points where there are
+// $2^{16}$ sp in a point, so \TeX82 sets num=25400000 and
+// den=7227.2^{16}=473628672.)' [from the spec].  That is, for TeX,
+// DVI unit = sp, and 1sp = num/den x 10^{-7}m.
+//
+// We want to use these numbers to establish a conversion between DVI
+// units and screen pixels, each of which is nominally 1 TeX point
+// (1/72.27 inch) in size (for a 72dpi screen).  So, how many DVI
+// units are there in a TeX point?  Well, the conversion factor above
+// says that 1pt = 2.54x10^7/7227 (10^{-7}m), so 
+// DVI unit = sp = num/den x 7227/2.54x10^7 x 1pt.  Given the above
+// values for num and den, this works out as
+// DVI unit = sp = 1/2^16 x 1pt, which we actually knew as soon as we
+// were told that TeX's DVI file have (DVI units=sp).
+void DviFile::process_preamble(DviFilePreamble& p)
+{
+    preamble_.i = p.dviType;
+    preamble_.num = p.num;
+    preamble_.den = p.den;
+    preamble_.mag = p.mag;
+    preamble_.comment = comment;
+    dvi_to_pix_ = ((double)p.den/(double)p.num) * (2.54e7 / 7227e0);
+    dvi_to_pix_ *= (double)p.mag/1000.0;
+    cerr << "dvi_to_pix_ = " << dvi_to_pix_
+	 << " mag=" << p.mag
+	 << '\n';
 }
 
 void DviFile::check_duplicate_font (int ksize)
@@ -628,11 +707,7 @@ void DviFile::check_duplicate_font (int ksize)
 	number = getSIU(ksize);
     PkFont *f = fontMap_[number];
     if (f == 0 || f->seenInDoc())
-    {
-	char errmsg[64];
-	sprintf (errmsg, "font %d not declared, or declared twice", number);
-	throw DviError (errmsg);
-    }
+	throw DviError ("font %d not declared, or declared twice", number);
     f->setSeenInDoc();
     unsigned int int4 = getUIU(4); // c
     int4 = getUIU(4);		// s

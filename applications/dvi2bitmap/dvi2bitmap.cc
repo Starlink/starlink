@@ -1,13 +1,15 @@
 // part of dvi2bitmap
 // $Id$
 
-// For some reason which I don't understand (am I not including a
-// required library?), streambuf.h and iostream.h complain about NULL
-// being defined wrongly (as void*), unless I define it to be zero here.
-#define NULL 0
+#include "dvi2bitmap.h"
 #include <iostream>
 #include <cstdlib>
-#include "dvi2bitmap.h"
+#include <cstdarg>
+
+#if VSPRINTF_IN_STDIO
+#include <cstdio>
+#endif
+
 #include "DviFile.h"
 #include "PkFont.h"
 
@@ -19,7 +21,7 @@ main (int argc, char **argv)
     string dviname;
 
     DviFile::debug(true);
-    PkFont::debug(true);
+    //PkFont::debug(true);
     //PkRasterdata::debug(false);
     if (char *pkpath = getenv("DVI2BITMAP_PK_PATH"))
 	PkFont::setFontPath(pkpath);
@@ -58,12 +60,29 @@ main (int argc, char **argv)
 	    std::exit(1);
 	}
 
-	DviFileEvent *ev;
 	DviFilePostamble *post;
+	DviFileEvent *ev;
 	do
 	{
+	    PkGlyph *glyph;
+	    PkFont *curr_font;
 	    ev = dvif->getEvent();
 	    ev->debug();
+	    if (DviFileSetChar *sc = dynamic_cast<DviFileSetChar*>(ev))
+	    {
+		glyph = curr_font->glyph(sc->charno);
+		cout << "set glyph " << glyph->w() << 'x' << glyph->h() << '\n';
+	    }
+	    else if (DviFileFontChange *fc =
+		     dynamic_cast<DviFileFontChange*>(ev))
+		curr_font = fc->font;
+	    else if (DviFileSpecial* special =
+		     dynamic_cast<DviFileSpecial*>(ev))
+		cout << "Unrecognised special: "
+		     << special->specialString
+		     << '\n';
+
+		/*
 	    if (DviFileFontChange *fc = dynamic_cast<DviFileFontChange*>(ev))
 	    {
 		PkFont *f = fc->font;
@@ -85,6 +104,7 @@ main (int argc, char **argv)
 		    }
 		}
 	    }
+		*/
 	}
 	while (!(post = dynamic_cast<DviFilePostamble*>(ev)));
     }
@@ -98,6 +118,17 @@ main (int argc, char **argv)
     }
 
     exit (0);
+}
+
+DviError::DviError(char *fmt,...)
+{
+    char *p = new char[2*strlen(fmt)];
+    va_list ap;
+    va_start(ap,fmt);
+    vsprintf (p, fmt, ap);
+    va_end(ap);
+    problem_ = p;
+    delete[] p;
 }
 
 void Usage (void)
