@@ -8720,6 +8720,7 @@ U java/source/table/src/main/uk/ac/starlink/table/jdbc/JDBCStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/SwingAuthenticator.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/TerminalAuthenticator.java
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/join
+U java/source/table/src/main/uk/ac/starlink/table/join/BinContents.java
 U java/source/table/src/main/uk/ac/starlink/table/join/CartesianMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/CombinedMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/EqualsMatchEngine.java
@@ -8728,6 +8729,7 @@ U java/source/table/src/main/uk/ac/starlink/table/join/MatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/MatchStarTables.java
 U java/source/table/src/main/uk/ac/starlink/table/join/NullProgressIndicator.java
 U java/source/table/src/main/uk/ac/starlink/table/join/ProgressIndicator.java
+U java/source/table/src/main/uk/ac/starlink/table/join/ProgressRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/join/RangeModelProgressIndicator.java
 U java/source/table/src/main/uk/ac/starlink/table/join/RowLink.java
 U java/source/table/src/main/uk/ac/starlink/table/join/RowMatcher.java

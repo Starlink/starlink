@@ -1869,7 +1869,7 @@ dist:
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 127 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 129 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -2139,4 +2139,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:425: Compile failed; see the compiler error output for details.
 
-Total time: 3 minutes 40 seconds
+Total time: 3 minutes 35 seconds
