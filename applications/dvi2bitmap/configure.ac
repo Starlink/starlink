@@ -420,19 +420,6 @@ dnl   output will be placed
 AC_SUBST(DOXYGEN_OUTPUT_DIRECTORY)
 DOXYGEN_OUTPUT_DIRECTORY="doc_libdvi2bitmap"
 
-AC_CONFIG_FILES([Makefile test/Makefile Doxyfile])
+AC_CONFIG_FILES([Makefile test/Makefile Doxyfile version.h])
 AC_OUTPUT
-
-
-dnl   Check the dependencies, and append them to the just-generated Makefile.
-dnl   We can't do this once in the
-dnl   Makefile.in file, because the dependencies vary depending on the
-dnl   modules included.  Use the -MM flag rather than just -M so that
-dnl   we ignore dependencies on system files (well that's the plan,
-dnl   but it seems that Compaq's cxx compiler accepts -MM as
-dnl   equivalent to -M, and generates the full set of dependencies,
-dnl   taking as long to do it as it does to compile the source set).
-dnl AC_MSG_CHECKING(dependencies (might take a while))
-dnl make deps_
-dnl AC_MSG_RESULT(done)
 
