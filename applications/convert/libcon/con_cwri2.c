@@ -2,7 +2,7 @@
 #include "cnf.h"
 #include "f77.h"
 
-FILE *fd;   /*  A pointer to the FILE structure identifying the open file */
+extern FILE *fd;   /*  A pointer to the FILE structure identifying the open file */
 
 F77_INTEGER_FUNCTION(con_cwri2)( BYTE_ARRAY(data), INTEGER(data_length) ){
 /*
