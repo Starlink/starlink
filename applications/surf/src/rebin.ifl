@@ -1,81 +1,141 @@
+## REBIN - Rebin the SCUBA data onto a rectangular grid
+
+#+
+#  Name:
+#     REBIN.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     JFL:  John Lightfoot (ROE)
+#     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+#     {enter_new_authors_here}
+
+#  History:
+#     1995 (JFL)
+# 	 Original version
+#     1996 September (TIMJ)
+#        Add SELECT_INTS
+#     1996 October 29 (TIMJ)
+#        Use GLOBAL defaults
+ 
+#-
+
    INTERFACE REBIN
-   
+
+      HELPLIB 'SCUBA_HELP:'
+
+      PARAMETER REF        # First reference date file
+         TYPE NDF
+         ACCESS 'READ'
+         PPATH 'GLOBAL'
+         ASSOCIATION '<-GLOBAL.DATA_ARRAY'
+	 PROMPT   'Name of first data file to be rebinned'
+	 HELPKEY  '*'
+      ENDPARAMETER
+
       PARAMETER IN
-         TYPE    'FILENAME'
-         PROMPT  'Name of input file containing demodulated map data'
+         TYPE     NDF
+         ACCESS   'READ'
+         VPATH    'PROMPT'
+         PPATH    'DYNAMIC, DEFAULT'
+         DEFAULT  !
+         PROMPT   'Name of next input file to be rebinned'
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER REBIN_METHOD
          TYPE    '_CHAR'
          PROMPT  'Rebinning method to be used'
-         DEFAULT 'BESSEL'
+         DEFAULT 'LINEAR'
+	 IN      'BESSEL','LINEAR'
+	 HELPKEY  '*'
       ENDPARAMETER
  
       PARAMETER SELECT_INTS
 	TYPE '_LOGICAL'
 	PROMPT 'Do you wish to select specific integrations'
 	DEFAULT 'no'
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER INTEGRATIONS
          TYPE    '_INTEGER'
          PROMPT  'The integrations with quality to change; 0 for all'
 	 DEFAULT 0
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER USE_INTS
 	TYPE '_LOGICAL'
 	PROMPT 'Keep only these (else discard)'
 	DEFAULT 'yes'
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER WEIGHT
         TYPE     '_REAL'
         PROMPT   'Weight to be assigned to input dataset'
         DEFAULT  1.0
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER SHIFT_DX
          TYPE    '_REAL'
          PROMPT  'X shift to be applied to input dataset on output map (arcsec)'
          DEFAULT 0.0
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER SHIFT_DY
          TYPE    '_REAL'
          PROMPT  'Y shift to be applied to input dataset on output map (arcsec)'
          DEFAULT 0.0
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER OUT_OBJECT
          TYPE    '_CHAR'
          PROMPT  'Object name for output map'
+	 HELP    'This name becomes the title of the output map'
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER OUT_COORDS
          TYPE    '_CHAR'
          PROMPT  'Coordinate system of output map; RB, RJ, RD or GA'
+	 IN      'RB','RJ','RD','GA'
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER LONG_OUT
          TYPE    '_CHAR'
          PROMPT  'Longitude of of output map centre in hh (or dd) mm ss.ss format'
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER LAT_OUT
          TYPE    '_CHAR'
          PROMPT  'Latitude of output map centre in dd mm ss.ss format'
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER PIXSIZE_OUT
          TYPE    '_REAL'
          PROMPT  'Size of pixels in output map (arcsec)'
          DEFAULT 3.0
+	 RANGE   0.01, 60.0
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER OUT
          TYPE    'FILENAME'
+	 ACCESS   'WRITE'
+	 VPATH    'PROMPT'
+	 ASSOCIATION '->GLOBAL.DATA_ARRAY'
          PROMPT  'Name of file to contain rebinned map'
+	 HELPKEY  '*'
       ENDPARAMETER
          
    ENDINTERFACE
