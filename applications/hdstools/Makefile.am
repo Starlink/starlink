@@ -49,6 +49,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 prohlp=	@PROHLP@
 
 hdstools.hlp: $(hdstools_mon_TASKS:=.f) hdstools_master.hlp
+	PATH=$(PATH):$(STARLINK)/bin/sst; \
 	for f in $(hdstools_mon_TASKS:=.f); do \
 	   $(prohlp) in=$${f} out=$${f}.help ;\
 	done
