@@ -100,33 +100,17 @@ itcl::class gaia::GaiaAstTable {
 
        # Add options to the edit menu if given.
        if { $itk_option(-editmenu) != {} } {
-          set m $itk_option(-editmenu)
-          add_short_help $m {Edit/create reference positions}
-
-          $top_ add_menuitem $m command "Remove selected" \
-             {Remove selected rows} \
-             -command [code $this remove_selected]
-
-          $top_ add_menuitem $m command "Enter new object..." \
-             {Enter the data for a new object} \
-             -command [code $this enter_new_object]
-
-          $top_ add_menuitem $m command "Edit selected object..." \
-             {Edit the data for the selected object} \
-             -command [code $this edit_selected_object]
-
-          $top_ add_menuitem $m command "Label selected object" \
-             {Set label for the selected object} \
-             -command [code $this label_selected_object_]
-
-          $top_ add_menuitem $m command "Label all objects" \
-             {Add labels to all objects} \
-             -command [code $this label_objects]
+          make_edit_menu_
        }
 
        #  Add control for markers colours etc., if given.
        if { $itk_option(-markmenu) != {} } {
           make_markers_menu_ $itk_option(-markmenu)
+       }
+
+       #  Add controls for marker labels (uses identifiers).
+       if { $itk_option(-labelmenu) != {} } {
+          make_labels_menu_
        }
 
        #  Add the table for displaying the reference positions (note
@@ -639,7 +623,7 @@ itcl::class gaia::GaiaAstTable {
          unset tags_($id)
          unset marks_($tag)
          $itk_option(-canvas) delete $tag
-         
+
          #  Also remove label.
          if { [info exists ltags_($id)] } {
             $itk_option(-canvas) delete $ltags_($id)
@@ -863,6 +847,24 @@ itcl::class gaia::GaiaAstTable {
       redraw
    }
 
+   #  Create the menu item needed to allow editing of table lines.
+   protected method make_edit_menu_ {} {
+      set m $itk_option(-editmenu)
+      add_short_help $m {Edit/create reference positions}
+
+      $top_ add_menuitem $m command "Remove selected" \
+         {Remove selected rows} \
+         -command [code $this remove_selected]
+
+      $top_ add_menuitem $m command "Enter new object..." \
+         {Enter the data for a new object} \
+         -command [code $this enter_new_object]
+
+      $top_ add_menuitem $m command "Edit selected object..." \
+         {Edit the data for the selected object} \
+         -command [code $this edit_selected_object]
+   }
+
    #  Create the menu item needed to control the appearance
    #  of the markers.
    protected method make_markers_menu_ {m} {
@@ -873,6 +875,14 @@ itcl::class gaia::GaiaAstTable {
                                fill {Fill stipple} stipple} {
          $m add cascade -label $label -menu [menu $m.$name]
       }
+
+      #  Add short help texts for menu items
+      $top_ add_menu_short_help $m Type {Set the marker shape}
+      $top_ add_menu_short_help $m Size {Set the marker size}
+      $top_ add_menu_short_help $m Width {Set the marker width}
+      $top_ add_menu_short_help $m Fill {Set the fill color for some markers}
+      $top_ add_menu_short_help $m Outline {Set the marker colour}
+      $top_ add_menu_short_help $m Stipple {Select the stipple pattern for filling objects}
 
       #  Add the known types.
       foreach {name bitmap} $marker_types_ {
@@ -937,17 +947,52 @@ itcl::class gaia::GaiaAstTable {
       #  Redraw and clear graphics.
       $m add separator
       $m add command -label "Clear" -command [code $this clear_marks]
-      $m add command -label "Redraw" -command [code $this redraw]
-
-      #  Add short help texts for menu items
-      $top_ add_menu_short_help $m Type {Set the marker shape}
-      $top_ add_menu_short_help $m Size {Set the marker size}
-      $top_ add_menu_short_help $m Width {Set the marker width}
-      $top_ add_menu_short_help $m Fill {Set the fill color for some markers}
-      $top_ add_menu_short_help $m Outline {Set the marker colour}
-      $top_ add_menu_short_help $m Stipple {Select the stipple pattern for filling objects}
       $top_ add_menu_short_help $m Clear {Clear all markers}
+      $m add command -label "Redraw" -command [code $this redraw]
       $top_ add_menu_short_help $m Redraw {Redraw all markers}
+
+   }
+
+   #  Create the menu item for controlling labels.
+   protected method make_labels_menu_ {} {
+      set m $itk_option(-labelmenu)
+      add_short_help $m {Display/modify table id columns as labels}
+
+      $top_ add_menuitem $m command "Label selected objects" \
+         {Set label for the selected object} \
+         -command [code $this label_selected_objects_]
+
+      $top_ add_menuitem $m command "Label all objects" \
+         {Add labels to all objects} \
+         -command [code $this label_objects]
+
+      $top_ add_menuitem $m command "Remove all labels" \
+      {Remove all labels from objects} \
+         -command [code $this clear_labels]
+
+      #  Add the menu to control the text colour.
+      $m add cascade -label Colour -menu [menu $m.textcolor]
+      foreach i $itk_option(-colors) {
+         $m.textcolor add radiobutton \
+            -value $i \
+            -command [code $this configure -textcolor $i] \
+            -variable [scope itk_option(-textcolor)] \
+            -background $i
+      }
+      $top_ add_menu_short_help $m Color {Set label colour}
+
+      #  Menu to select font (these should be same as CanvasDraw).
+      $m add cascade -label Font -menu [menu $m.font]
+      foreach i $itk_option(-fonts) {
+         $m.font add radiobutton \
+            -value $i \
+            -label {abc} \
+            -command [code $this configure -textfont $i] \
+            -variable [scope itk_option(-textfont)] \
+            -font $i
+      }
+      $top_ add_menu_short_help $m Color {Set label font}
+
    }
 
    #  Clear the graphics markers from canvas.
@@ -964,6 +1009,12 @@ itcl::class gaia::GaiaAstTable {
    public method clear_table {} {
       $itk_component(table) clear
       clear_marks
+   }
+
+   #  Clear any labels.
+   public method clear_labels {} {
+      $itk_option(-canvas) delete ${this}_label
+      catch {unset ltags_}
    }
 
    #  Write a copy of the table to an ordinary file.
@@ -1210,12 +1261,31 @@ itcl::class gaia::GaiaAstTable {
       }
    }
 
+   #  Label all objects.
+   public method label_objects {} {
+      set nrows [$itk_component(table) total_rows]
+      set oldcon [$itk_component(table) get_contents]
+      for { set i 0 } { $i < $nrows } { incr i } {
+         lassign [lindex $oldcon $i] id
+         label_object_ $id
+      }
+   }
+
    #  Label the selected object using its identifier. Labels are text
    #  strings that can be moved, but not editted.
    protected method label_selected_object_ {} {
       set line [lindex [$itk_component(table) get_selected] 0]
       lassign $line id
       label_object_ $id
+   }
+
+   #  Label all selected objects using their identifiers. Labels are text
+   #  strings that can be moved, but not editted.
+   protected method label_selected_objects_ {} {
+      foreach line [$itk_component(table) get_selected] {
+         lassign $line id
+         label_object_ $id
+      }
    }
 
    #  Label the given object. The arg is the label. The position is
@@ -1245,24 +1315,14 @@ itcl::class gaia::GaiaAstTable {
       set labelid [$canvas create text $x $y \
                       -text "$id" \
                       -anchor c \
-                      -fill white \
-                      -font $itk_option(-canvasfont) \
+                      -fill $itk_option(-textcolor) \
+                      -font $itk_option(-textfont) \
                       -tags $tags]
 
       #  Make sure user can adjust label position and properies using
       #  the canvasdraw tools.
       [$itk_option(-image) component draw] add_object_bindings $labelid
       ct_add_bindings $canvas $labelid
-   }
-
-   #  Label all objects.
-   public method label_objects {} {
-      set nrows [$itk_component(table) total_rows]
-      set oldcon [$itk_component(table) get_contents]
-      for { set i 0 } { $i < $nrows } { incr i } {
-         lassign [lindex $oldcon $i] id
-         label_object_ $id
-      }
    }
 
    #  Configuration options
@@ -1279,6 +1339,9 @@ itcl::class gaia::GaiaAstTable {
 
    #  Name of a menu to add the marker control commands.
    itk_option define -markmenu markmenu MarkMenu {}
+
+   #  Name of a menu to add the label control commands.
+   itk_option define -labelmenu labelmenu LabelMenu {}
 
    #  Name of rtdimage widget.
    itk_option define -rtdimage rtdimage RtdImage {}
@@ -1363,6 +1426,14 @@ itcl::class gaia::GaiaAstTable {
        }
    }
 
+   #  Colour of text labels.
+   itk_option define -textcolor textcolor TextColor white {
+      if { $going_ } {
+         $itk_option(-canvas) itemconfigure ${this}_label \
+            -fill $itk_option(-textcolor)
+      }
+   }
+
    #  Possible colours.
    itk_option define -colors colors Colors {
        white
@@ -1407,9 +1478,30 @@ itcl::class gaia::GaiaAstTable {
    #  some applications).
    itk_option define -bind_enters bind_enters Bind_enters 0
 
-   #  Font used in canvas to mark objects
-   itk_option define -canvasfont canvasFont CanvasFont \
-      "-*-courier-bold-r-*-*-*-120-*-*-*-*-*-*"
+   #  Default font used in canvas to mark objects
+   itk_option define -textfont textFont TextFont \
+      {-adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*} {
+         if { $going_ } {
+            $itk_option(-canvas) itemconfigure ${this}_label \
+               -font $itk_option(-textfont)
+         }
+      }
+
+   #  Possible fonts for drawing labels.
+   itk_option define -fonts fonts Fonts {
+      -adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*
+      -adobe-courier-medium-o-*-*-*-120-*-*-*-*-*-*
+      -adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*
+      -adobe-courier-medium-r-*-*-*-140-*-*-*-*-*-*
+      -adobe-courier-medium-o-*-*-*-140-*-*-*-*-*-*
+      -adobe-courier-bold-r-*-*-*-140-*-*-*-*-*-*
+      -adobe-courier-medium-r-*-*-*-180-*-*-*-*-*-*
+      -adobe-courier-medium-o-*-*-*-180-*-*-*-*-*-*
+      -adobe-courier-bold-r-*-*-*-180-*-*-*-*-*-*
+      -adobe-courier-medium-r-*-*-*-240-*-*-*-*-*-*
+      -adobe-courier-medium-o-*-*-*-240-*-*-*-*-*-*
+      -adobe-courier-bold-r-*-*-*-240-*-*-*-*-*-*
+   }
 
    #  Protected variables: (available to instance)
    #  --------------------

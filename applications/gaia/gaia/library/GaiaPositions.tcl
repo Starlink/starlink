@@ -83,6 +83,7 @@ itcl::class gaia::GaiaPositions {
          GaiaPosTable $w_.table \
             -editmenu [get_menu Edit] \
             -markmenu [get_menu Markers] \
+            -labelmenu [get_menu Labels] \
             -showmsize 0 \
             -rtdimage $itk_option(-rtdimage) \
             -canvas $itk_option(-canvas) \
@@ -292,6 +293,9 @@ itcl::class gaia::GaiaPositions {
 
       #  Markers menu (filled by GaiaPosTable).
       add_menubutton Markers
+
+      #  Label control menu (filled by GaiaPosTable).
+      add_menubutton Labels
    }
 
    #  Add controls for image quality estimates.
