@@ -45,6 +45,7 @@
 *     16 Dec 92 : Changed IFAIL value to allow trap to work (DJA)
 *     19 May 94 : Updated to handle parameter constraints (DJA)
 *     10 Mar 97 : Update NAG call F01AAF to multiple calls (RB)
+*      6 Jun 97 : Convert to PDA (RB)
 *
 *    Type definitions :
 *
@@ -96,7 +97,8 @@
       DOUBLE PRECISION    ALPHAINV(NPAMAX,NPAMAX) ! Inverse of alpha matrix
       DOUBLE PRECISION    LSTATDERIV		! Lower reduced statistic deriv.
       DOUBLE PRECISION    USTATDERIV		! Upper reduced statistic deriv.
-      DOUBLE PRECISION    WORK(NPAMAX)		! Workspace for NAG routine
+      DOUBLE PRECISION    WORK(NPAMAX)		! Workspace for PDA routine
+      DOUBLE PRECISION	  DUMMY(2)		! Workspace for PDA routine
 
       REAL                DPUP(NPAMAX)		! Actual upper param increments
       REAL                DPDOWN(NPAMAX)	! Actual lower param increments
@@ -106,7 +108,8 @@
 
       INTEGER             IFAIL			! NAG failure flag
       INTEGER             IPFREE(NPAMAX)	! Free parameter indices
-      INTEGER             J,K			! Parameter indices
+      INTEGER		  IWORK(NPAMAX)		! PDA workspace
+      INTEGER             J,K,L,M		! Parameter indices
       INTEGER             JP1,JP2		! Parameter indices
       INTEGER             NPFREE		! No of free (unfrozen+unpegged params
       INTEGER             LSSCALE		! SSCALE proofed against zero value
@@ -201,13 +204,16 @@
 *    Invert alpha matrix to get parameter errors
       IFAIL=1
       IF ( NPFREE .GT. 0 ) THEN
-c       CALL F01AAF( ALPHA, NPAMAX, NPFREE, ALPHAINV, NPAMAX,
-c    :                                          WORK, IFAIL )
-        CALL F07ADF( NPFREE, NPFREE, ALPHA, NPAMAX, IPIV, IFAIL )
-        CALL F06QFF( 'General', NPFREE, NPFREE, ALPHA, NPAMAX,
-     :                                          ALPHAINV, NPAMAX )
-        CALL F07AJF( NPFREE, ALPHAINV, NPAMAX, IPIV, WORK, NPAMAX,
-     :                                                     IFAIL )
+        DO M = 1, NPRFREE
+          DO L = 1, NPFREE
+            ALPHAINV(L,M) = ALPHA(L,M)
+          END DO
+        END DO
+        CALL PDA_DGEFA( ALPHAINV, NPFREE, NPFREE, IWORK, IFAIL )
+        IF ( IFAIL .EQ. 0 ) THEN
+          CALL PDA_DGEDI( ALPHAINV, NPAMAX, NPFREE, IWORK, DUMMY,
+     :                    WORK, 1 )
+        END IF
       END IF
       IF ( IFAIL .EQ. 0 ) THEN
 	J = 1
