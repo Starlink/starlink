@@ -22,6 +22,7 @@
       CHARACTER*(DAT__SZLOC) ILOC
       INTEGER FID
       LOGICAL PRIM
+      LOGICAL EXIST
 
 *    Version :
       CHARACTER*30 VERSION
@@ -49,7 +50,12 @@
 
 *  get file name for on/off times
       CALL USI_GET0C('FILE',FILE,STATUS)
-      CALL FIO_OPEN(FILE,'WRITE','NONE',0,FID,STATUS)
+      INQUIRE(FILE=FILE,EXIST=EXIST)
+      IF (EXIST) THEN
+        CALL FIO_OPEN(FILE,'UPDATE','NONE',0,FID,STATUS)
+      ELSE
+        CALL FIO_OPEN(FILE,'WRITE','NONE',0,FID,STATUS)
+      ENDIF
 
 *  do the business
       CALL TONOFF_DOIT(%val(T_APTR),%val(T_WPTR),%val(T_QPTR),T_MASK,
