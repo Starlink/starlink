@@ -297,34 +297,8 @@
 *  Look for redshift
       CALL SFIT_GETZ( Z, STATUS )
 
-*  Apply red-shift and check instrument response
-      DO N = 1, NDS
-
-*    Apply redshift to model space energy bounds
-        CALL SFIT_APPRED( Z, PREDDAT(N).NMBOUND,
-     :                    %VAL(PREDDAT(N).MLBNDPTR),
-     :                    %VAL(PREDDAT(N).MUBNDPTR), STATUS )
-
-*    Report on success in finding instrument response if appropriate
-	IF ( PREDDAT(N).CONVOLVE ) THEN
-	  IF ( NDS .EQ. 1 ) THEN
-	    CALL MSG_PRNT('Instrument response found')
-	  ELSE
-	    CALL MSG_SETI('NDS',N)
-	    CALL MSG_PRNT('Instrument response found for dataset ^NDS' )
-	  END IF
-	ELSE
-	  IF ( NDS .EQ. 1 ) THEN
-	    CALL MSG_PRNT('!! Warning - no instrument response found'//
-     :          ', results may not be meaningful !!')
-	  ELSE
-	    CALL MSG_SETI('NDS',N)
-	    CALL MSG_PRNT('!! Warning - no instrument response for '//
-     :          'dataset ^NDS !!')
-	  END IF
-	END IF
-      END DO
-      IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
+*  Apply red-shift and check data structures
+      CALL SFIT_PRECHK( NDS, Z, PREDDAT, STATUS )
 
 *  Get model specification
       CALL USI_ASSOC( 'MODEL', '*', 'UPDATE', MFID, STATUS )
