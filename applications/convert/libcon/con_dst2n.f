@@ -1,4 +1,4 @@
-      SUBROUTINE CON_DST2N( FIGFIL, NDFFIL, STATUS )
+      SUBROUTINE CON_DST2N( FIGFIL, NDFFIL, FORM, STATUS )
 *+ 
 *  Name:
 *     CON_DST2N
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CON_DST2N( FIGFIL, NDFFIL, STATUS )
+*     CALL CON_DST2N( FIGFIL, NDFFIL, FORM, STATUS )
 
 *  Description:
 *     This routine reads through a file in Figaro version 2 format.
@@ -32,6 +32,10 @@
 *     NDFFIL = CHARACTER * ( * ) (Given)
 *        The name of the new format file to be produced. Extension of
 *        the new file is '.SDF'.
+*     FORM = CHARACTER * ( * ) (Given)
+*        The storage form of the data and variance arrays.  It can take
+*        one of two values.  "SIMPLE" gives the simple form, and
+*        "PRIMITIVE" gives the primitive form.
 *     STATUS = INTEGER (Given annd Returned)
 *        Global status. If passed as non-zero, this routine returns
 *        immediately.  If returned as zero, indicates Conversion
@@ -40,8 +44,12 @@
 *        description before returning.
 
 *  Format-conversion Rules:
-*     .Z.DATA  ->        .DATA_ARRAY
-*     .Z.ERRORS ->       .VARIANCE (after processing)
+*     .Z.DATA  ->        .DATA_ARRAY.DATA (when FORM = "SIMPLE")
+*     .Z.DATA  ->        .DATA_ARRAY (when FORM = "PRIMITIVE")
+*     .Z.ERRORS ->       .VARIANCE.DATA (after processing when
+*                        FORM = "SIMPLE")
+*     .Z.ERRORS ->       .VARIANCE (after processing when
+*                        FORM = "PRIMITIVE")
 *     .Z.QUALITY ->      .QUALITY.QUALITY (must be BYTE array)
 *                        (see Bad-pixel handling below).
 *     .Z.LABEL ->        .LABEL
@@ -92,9 +100,7 @@
 *     The QUALITY array is only copied if the bad-pixel flag
 *     (.Z.FLAGGED) is false or absent.  A simple NDF with the bad-pixel
 *     flag set to false (meaning that there are no bad-pixels present)
-*     is created when .Z.FLAGGED is absent or false.  Otherwise a
-*     primitive NDF, where the data array is at the top level of the
-*     data structure, is produced.
+*     is created when .Z.FLAGGED is absent or false and FORM = "SIMPLE".
 
 *  Authors: 
 *     JM: Jo Murray (STARLINK)
@@ -170,6 +176,9 @@
 *     1992 October 21 (MJC):
 *        Fixed another couple of bugs along the same lines as above.
 *        Now use separate variables for the diferent object dimensions.
+*     1993 October 25 (MJC):
+*        Added FORM argument to control the NDF storage format rather
+*        than use the value of the bad-pixel flag to decide.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -187,6 +196,7 @@
 
 *  Arguments Given:
       CHARACTER FIGFIL * ( * )   ! Name of input file
+      CHARACTER FORM * ( * )     ! NDF storage format
       CHARACTER NDFFIL * ( * )   ! Name of output file
 
 *  Status:
@@ -219,6 +229,7 @@
       INTEGER   DIMS(7)          ! Dimensions of output data
       INTEGER   DSTAT            ! DTA_ routine returned status
       CHARACTER ERROR*64         ! Error description
+      LOGICAL   ERPRES           ! True if .Z.ERRORS is present
       LOGICAL   EXIST            ! True if a FITS item has an comment
       REAL      FARRAY(100)      ! Used to read in FLOAT type data items
       INTEGER   FDIMS(2)         ! Dimensions of FITS extension
@@ -341,6 +352,7 @@
       NMSTAT = 0
       IPOSN = 0
       NAXIS = 0
+      ERPRES = .FALSE.
       NEEDAX = .FALSE.
       MORE = .FALSE.
       MOREFG = .FALSE.
@@ -456,6 +468,10 @@
                         CALL DTA_RDVARI( LEVEL2, 1, IFLAG, DSTAT )
                         FLAGGD = IFLAG .NE. 0
 
+*                  Test for the presence of errors.
+                     ELSE IF ( NAME2 .EQ. 'ERRORS' ) THEN
+                        ERPRES = .TRUE.
+
 *                  Test for the presence of quality.
                      ELSE IF ( NAME2 .EQ. 'QUALITY' ) THEN
                         QUPRES = .TRUE.
@@ -524,9 +540,8 @@
       END IF
 
 *   Determine whether the output NDF has a simple or primitive form.
-*   It just depends on whether or not there needs to be a BAD_PIXEL
-*   flag in the output NDF.
-      PRIM = FLAGGD
+*   We know that the value supplied will always be in uppercase.
+      PRIM = FORM .EQ. 'PRIMITIVE'
 
 *   Create the required structures just identified.
 *   ===============================================
@@ -560,8 +575,20 @@
       END IF
       IF ( DSTAT .NE. 0 ) THEN
          STATUS = DSTAT
-         CALL ERR_REP('DST2NDF_CR1',
+         CALL ERR_REP('DST2NDF_CRD',
      :     'DST2NDF: Unable to create output .DATA_ARRAY structure.',
+     :     STATUS)
+         GOTO 500 
+      END IF
+
+*   Create the .VARIANCE structure, if necessary.
+      IF ( .NOT. PRIM .AND. ERPRES ) THEN
+         CALL DTA_CRVAR( 'OUTPUT.VARIANCE', 'ARRAY', DSTAT )
+      END IF
+      IF ( DSTAT .NE. 0 ) THEN
+         STATUS = DSTAT
+         CALL ERR_REP('DST2NDF_CRV',
+     :     'DST2NDF: Unable to create output .VARIANCE structure.',
      :     STATUS)
          GOTO 500 
       END IF
@@ -572,7 +599,7 @@
       END IF
       IF ( DSTAT .NE. 0 ) THEN
          STATUS = DSTAT
-         CALL ERR_REP('DST2NDF_CR2',
+         CALL ERR_REP('DST2NDF_CRM',
      :     'DST2NDF: Unable to create output .MORE structure.',
      :     STATUS)
          GOTO 500 
@@ -584,7 +611,7 @@
       END IF
       IF ( DSTAT .NE. 0 ) THEN
          STATUS = DSTAT
-         CALL ERR_REP('DST2NDF_CR2',
+         CALL ERR_REP('DST2NDF_CRMF',
      :     'DST2NDF: Unable to create output .MORE.FIGARO structure.',
      :     STATUS)
          GOTO 500 
@@ -635,28 +662,23 @@
 *                     IF ( TYPE .EQ. 'CSTRUCT' ) THEN
                      CALL DTA_SZVAR( LEVEL2, 7, NDIM, DIMS, DSTAT )
 
-*                  Generate the name of the output object.  This will
-*                  depend on whether the NDF is simple or primitive. In
-*                  the former case the data array lies within the
-*                  DATA_ARRAY structure.  The data array .Z.DATA is
-*                  copied to .DATA_ARRAY directly or the DATA component
-*                  within .DATA_ARRAY.
+*                  Copy the data array to the output primitive array.
+*                  The name of the output object will depend on whether
+*                  the NDF is simple or primitive. In the former case
+*                  the data array lies within the DATA_ARRAY structure.
                      IF ( PRIM ) THEN
-                        CALL DTA_CRNAM( 'OUTPUT', 'DATA_ARRAY', NDIM,  
-     :                                   DIMS, NAMOUT, DSTAT )
                         CALL DTA_CYVAR( LEVEL2, 'OUTPUT.DATA_ARRAY',
      :                                  DSTAT )
                      ELSE
-                        CALL DTA_CRNAM( 'OUTPUT.DATA_ARRAY', 'DATA',
-     :                                  NDIM, DIMS, NAMOUT, DSTAT )
                         CALL DTA_CYVAR( LEVEL2, 'OUTPUT.'/
      :                                  /'DATA_ARRAY.DATA', DSTAT )
                      END IF
 
                      IF ( DSTAT .NE. 0 ) GOTO 400
 
-*                  Add the BAD_PIXEL flag in the simple NDF.
-                     IF ( .NOT. PRIM ) THEN
+*                  Add the BAD_PIXEL flag in the simple NDF, where
+*                  valid.
+                     IF ( .NOT. PRIM .AND. FLAGGD ) THEN
                         CALL DTA_CRVAR( 'OUTPUT.DATA_ARRAY.BAD_PIXEL',
      :                                  '_LOGICAL', DSTAT )
                         CALL DTA_WRVARI( 'OUTPUT.DATA_ARRAY.BAD_PIXEL',
@@ -679,13 +701,25 @@
                        NDATA = NDATA * DIMS( K )
                      END DO
 
-*                  Copy the error array to the variance.
-                     CALL DTA_CYVAR( LEVEL2, 'OUTPUT.VARIANCE', DSTAT )
+*                  Generate the name of the output object.  This will
+*                  depend on whether the NDF is simple or primitive. In
+*                  the former case the data array lies within the
+*                  VARIANCE structure.
+                     IF ( PRIM ) THEN
+                        CALL DTA_CRNAM( 'OUTPUT', 'VARIANCE', NDIM,
+     :                                  DIMS, NAMOUT, DSTAT )
+                     ELSE
+                        CALL DTA_CRNAM( 'OUTPUT.VARIANCE', 'DATA', NDIM,
+     :                                  DIMS, NAMOUT, DSTAT )
+                     END IF
+
+*                  Copy the input error array to the output primitive
+*                  variance.
+                     CALL DTA_CYVAR( LEVEL2, NAMOUT, DSTAT )
                      IF ( DSTAT .NE. 0 ) GOTO 400
 
 *                  Map the variance (still errors though).
-                     CALL DTA_MUVARF( 'OUTPUT.VARIANCE', NDATA, 
-     :                                IPTR, DSTAT )
+                     CALL DTA_MUVARF( NAMOUT, NDATA, IPTR, DSTAT )
 
 *                  Report what has happened should something have gone
 *                  wrong.
@@ -704,7 +738,7 @@
      :                              NERR, STATUS )
 
 *                  Unmap the variance array.
-                     CALL DTA_FRVAR( 'OUTPUT.VARIANCE', DSTAT )
+                     CALL DTA_FRVAR( NAMOUT, DSTAT )
 
 *                  Report what has happened should something have gone
 *                  wrong.
@@ -752,8 +786,8 @@
 *                     Generate a destination quality array of the
 *                     required dimensions and BYTE data type.
                         CALL DTA_CRNAM( 'OUTPUT.QUALITY', 'QUALITY', 
-     :                                  NDIM, DIMS, NAMOUT, DSTAT )
-                        CALL DTA_CRVAR( NAMOUT, 'BYTE', DSTAT )
+     :                                  NDIM, DIMS, namout, DSTAT )
+                        CALL DTA_CRVAR( namout, 'BYTE', DSTAT )
 
 *                     Find the total number of elements in the quality
 *                     array.
@@ -1380,7 +1414,7 @@
             ELSE IF ( TYPE .EQ. 'SHORT' ) THEN    
                CALL DTA_RDVARS( NAME, NDATA, SARRAY, DSTAT )
                IF ( DSTAT .NE. 0 ) GOTO 450
-               IARRAY( 1 ) = NUM_BTOI( SARRAY( 1 ) )
+               IARRAY( 1 ) = NUM_WTOI( SARRAY( 1 ) )
                CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
             END IF
 
