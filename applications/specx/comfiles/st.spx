@@ -5,7 +5,7 @@
 declare snum I4
 declare source_nam C10
 declare line_nam C10
-declare full_name C40
+declare full_name C60
 declare fil_num I4
 declare help C1; declare dum C10
 help = 'h'
@@ -158,8 +158,8 @@ return
 endif
 print line_nam
 print ' '
-write full_name 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-! char count     123456789012345678901234567890123456789412345678951234
+write full_name 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+! char count     123456789012345678901234567890123456789412345678951234567896
 full_name = ' '
 write full_name '/jcmt_sw/SpecStand/specxFiles/',source_nam,'_',line_nam
 print full_name 
