@@ -299,8 +299,14 @@
 *  Local Variables:
       CHARACTER*20		LITEM			! Local item name
 
+      REAL			SPARR(2)		! Regular spaced data
+
       INTEGER			ARGS(3)			! Function args
+      INTEGER			AXNO			! Axis number
+      INTEGER			NDIM, DIMS(ADI__MXDIM)	! Dataset shape
       INTEGER			LITL			! Used length of LITEM
+
+      LOGICAL			REG			! Regular spaced data?
 *.
 
 *  Check inherited global status.
@@ -357,6 +363,36 @@
 
           CALL ERR_ANNUL( STATUS )
           CALL ADI_NEWV0I( 255, DID, STATUS )
+
+*    Regular spaced data
+        ELSE IF ( (LITEM(1:5) .EQ. 'Axis_') .AND.
+     :            (LITEM(8:LITL) .EQ. 'SpacedData') ) THEN
+
+          CALL ERR_ANNUL( STATUS )
+
+*      Decode the axis number
+          CALL CHR_CTOI( LITEM(6:6), AXNO, STATUS )
+
+*      Map the axis data
+          CALL BDI_AXMAPR( ID, AXNO, 'Data', 'READ', AXPTR, STATUS )
+
+*      Values are regular?
+          CALL BDI_GETSHP( ID, ADI__MXDIM, DIMS, NDIM, STATUS )
+          CALL ARR_CHKREG( %VAL(AXPTR), DIMS(AXNO), REG, SPARR(1),
+     :                     SPARR(2), STATUS )
+
+*      Unmap the axis
+          CALL BDI_AXUNMAP( ID, AXNO, 'Data', AXPTR, STATUS )
+
+*      Regularly spaced?
+          IF ( REG .AND. (STATUS.EQ.SAI__OK) ) THEN
+            CALL ADI_NEWV1R( 2, SPARR, DID, STATUS )
+
+          ELSE
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'Axis values are not regularly spaced',
+     :                    STATUS )
+          END IF
 
 *    Otherwise report error
         ELSE
