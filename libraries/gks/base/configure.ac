@@ -20,18 +20,38 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
+AC_PROG_CC
 AC_PROG_FC
 AC_PROG_FPP
 AC_PROG_LIBTOOL
 
+dnl    Terminal control
+AC_HEADER_STDC
+AC_CHECK_HEADERS( termio.h sgtty.h sys/ioctl.h )
+AC_CHECK_FUNCS([isatty ioctl])
+
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
 AC_FC_OPEN_SPECIFIERS(readonly)
-AC_FC_CHECK_INTRINSICS([IDATE DATE GETENV FGETC FPUTC FLUSH GETPID])
+
+dnl    We need to work out how to get the date and time
+AC_FC_CHECK_INTRINSICS([CLOCK ITIME IDATE DATE])
+
+dnl    How to bypass Fortran I/O
+AC_FC_CHECK_INTRINSICS([FGETC FPUTC FLUSH])
+
+dnl    How to get the environment and process ID
+AC_FC_CHECK_INTRINSICS([GETENV GETPID])
+
+dnl    How to manipulate bits
 AC_FC_CHECK_INTRINSICS([LSHIFT SHIFTL RSHIFT SHIFTR ISHFT])
 AC_FC_CHECK_INTRINSICS([AND IAND OR IOR])
-AC_FC_CHECK_INTRINSICS([CLOCK ITIME])
 
+dnl    How to work out where the last non blank character is
+AC_FC_CHECK_INTRINSICS([ LNBLNK LEN_TRIM ])
+
+dnl    How to translate a Fortran unit to a Unix file descriptor
+AC_FC_CHECK_INTRINSICS([GETFD GETFILEP ISATTY])
 
 dnl    Use config.h
 AM_CONFIG_HEADER(config.h)

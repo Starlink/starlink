@@ -34,6 +34,7 @@ Files also added from the machine specific system directories:
           to g77 DATE() builtin
   GKS does not want the 4 digit year!
   Now runs with autoconf
+  Should just use PSX_LOCALTIME
 
  gkdfop.f - Add READONLY check to open. Use .fpp
 
@@ -76,7 +77,106 @@ Files also added from the machine specific system directories:
 
   gkna1.f    - no system specific code
   ggkntoa.f  - no system specific code
-  lnblnk.f   - no system specific code
+
+  lnblnk.f   - no system specific code BUT this is sometimes a builtin
+               (seemingly except for MIPS and RS6000) so should not
+               really be required. Can be removed.
 
   gktime.fpp - Use ITIME built in. RS6000 does not allow this.
                Cray uses CLOCK builtin
+               Should just use PSX_LOCALTIME
+
+C routines
+----------
+
+  The three C routines:  gkgtsp_.c  gkiosb_.c gktset_.c
+
+Are complicated and C portability issues carefully analyzed.
+In addition to the non-portable C there is a fundamental requirement
+that we can map a Fortran unit number to a Unix file descriptor.
+
+It does not seem to be as complicated as first look would suggest since
+all three of the above routines
+
+  - Get the file stream
+  - Translate to file descriptor
+  - Check if isatty and do nothing if it is not a tty
+
+ie all that is really required is for a ISATTY(LUN) function
+to work.
+
+At least g77 and Sun fortran supply ISATTY(LUN) directly.
+They also supply a GETFD builtin.
+
+Since we know that STDIN, STDOUT and STDERR are the only units
+that can be a tty, we can simplify things by writing a GETFD
+replacement that uses the builtin GETFD when available, else
+maps the standard fortran unit number 0, 5 and 6 to stderr,stdin
+and stdout, and ignores normal files.
+
+  getfd.fpp does this.
+
+
+C routine modifications:
+
+  gktsest.c     - rewritten for autoconf. Supports both the
+                  termio and sgtty approach.
+
+Include files
+=============
+
+  f77_type.h    - needed although a switch to CNF is obvious.
+
+
+
+
+Notes on Logical Unit to Unix Stream mapping
+============================================
+
+Note also that if fputc and fgetc are not present we will have to
+provide an interface for them. These are posix routines and in
+principal could be added to the PSX library. The real problem is that
+in the case of fputc/fgetc we do need a means of translating Fortran
+unit number to unix file stream.
+
+Need to find out what the current status of FPUTC/FGETC/FLUSH 
+intrinsics are. They are built in on g77, Sun Fortran and alpha
+fortran.
+
+For completeness, the following techniques are used by GKS to
+do this mapping:
+
+-   Suns provide a mapunit() function in the Fortran runtime library
+    specifically so that this can be called from C
+
+       FILE * mapunit( lun ) 
+
+    How does configure find a C function in the Fortran runtime library?
+
+-   g77 suggests using the fio.h header that comes with g77 (but which
+    is not installed by g77) to get details of the C struct used internally
+    that exposes the underlying FILE*.
+
+     #define mapunit(channel) (f__units[channel].ufd)
+
+    Other lunit.h files indicate that this technique is common on non-suns.
+    (eg cray).
+
+-   Use the GETFD intrinsic and from that use fdopen to get the FILE*
+    (presumably using "ab").
+    Note that this involves opening a stream and therefore this stream
+    must be closed. Not sure if this approach can work with fgetc/fputc
+    The systems that use this approach seem to do it purely to get the
+    file descriptor (for isatty) and not the stream.
+
+-   Use GETFILEP to get the FILE* directly in Fortran. Not portable. Sun only.
+    Not needed because suns provide other methods.
+
+-   Write simple wrapper (maplun.f/gkstrm_.c) that will take a unit
+    and convert it to a filename using INQUIRE. Then reopen that file
+    with fopen(name,"ab") and return the FILE*. This has to be closed.
+    Note that maplun.f has special code for units 5 and 6 but then returns
+    the file descriptor and not the FILE*. Must be a bug but implies that
+    the code never worked  since isatty will only be true for
+    stdout and stderr (and not for an actual file). This approach used
+    on alpha/OSF1.
