@@ -50,7 +50,7 @@ FILES        = \
  adamtask.tcl .gaFilters gaiacut zoomcutandflip
 
 PROGRAMS     = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay \
-               displaycat gaiadispmany.sh
+               displaycat gaiadispmany.sh tabbedgaia.sh
 srcdir	     = @srcdir@
 
 all:
