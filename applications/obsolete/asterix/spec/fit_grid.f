@@ -1,9 +1,8 @@
 *+  FIT_GRID - Make a grid of the fit statistic and/or free pars vs grid pars
-      SUBROUTINE FIT_GRID( NDS, OBDAT, INSTR, MODEL, OPCHAN, NAXIS,
-     :             GRID, NGRID, GRIDPAR, NITMAX, NPAR, LB, UB, FROZEN,
-     :             SSCALE, MINSLO,
-     :             FSTAT, PREDICTOR, PREDDAT, PARAM, STATMIN,
-     :             GDATA, GQUAL, GQMASK, STATUS )
+      SUBROUTINE FIT_GRID( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN,
+     :                     NAXIS, GRID, NGRID, GRIDPAR, NPAR, LB, UB,
+     :                     FROZEN, SSCALE, FSTAT, PREDICTOR, PREDDAT,
+     :                   PARAM, STATMIN, GDATA, GQUAL, GQMASK, STATUS )
 *
 *    Description :
 *
@@ -77,11 +76,8 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'FIT_PAR'
-*
-*    Structure definitions :
-*
       INCLUDE 'FIT_STRUC'
 *
 *    Import :
@@ -90,13 +86,13 @@
       RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
       RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
       RECORD /MODEL_SPEC/ MODEL			! Model specification
+      INTEGER			MCTRL
       INTEGER 		  OPCHAN		! Output channel for diagnostic
 						! messages ( <1 for no messages)
       INTEGER             NAXIS                 ! Number of grid axes
       RECORD /GRID_AXIS/  GRID(*)               ! Grid axis definitions
       INTEGER             NGRID                 ! # of grids
       INTEGER             GRIDPAR(NGRID)        ! Quantity for grids (0->NPAR)
-      INTEGER 		  NITMAX		! Return when NIT reaches NITMAX
       INTEGER 		  NPAR			! No of parameters
       REAL 		  LB(NPAMAX)		! Parameter lower bounds
       REAL 		  UB(NPAMAX)		! Parameter upper bounds
@@ -107,13 +103,10 @@
 *
 *    Import-Export :
 *
-      REAL 		  MINSLO		! Min scaled slope in statistic
-                                                ! forcing continuation
       RECORD /PREDICTION/ PREDDAT(NDS)		! Data predicted by model
                                                 ! (actually only the data
                                                 ! pointed to are updated)
       REAL 		  PARAM(NPAMAX)		! Model parameters
-      INTEGER 		  NIT			! Iteration number
 *
 *    Export :
 *
@@ -129,11 +122,11 @@
 *
 *    Local variables :
 *
-      INTEGER             DIMS(DAT__MXDIM)      ! Grid dimensions
+      INTEGER             DIMS(ADI__MXDIM)      ! Grid dimensions
       INTEGER             IAX                   ! Loop over grid axes
       INTEGER             IGR                   ! Loop over grids
 
-      LOGICAL             USED(DAT__MXDIM)      ! Use dimension of grid?
+      LOGICAL             USED(ADI__MXDIM)      ! Use dimension of grid?
 *-
 
 *    Status check
@@ -148,9 +141,9 @@
      :                               /' of parameters', STATUS )
 
 *    Grid isn't too big?
-      ELSE IF ( NAXIS .GT. DAT__MXDIM ) THEN
+      ELSE IF ( NAXIS .GT. ADI__MXDIM ) THEN
         STATUS = SAI__ERROR
-        CALL MSG_SETI( 'MAX', DAT__MXDIM )
+        CALL MSG_SETI( 'MAX', ADI__MXDIM )
         CALL ERR_REP( ' ', 'Too many grid axes defined, must be '/
      :                                   /'^MAX or less', STATUS )
 
@@ -181,16 +174,15 @@
         DIMS(IAX) = GRID(IAX).NVAL
         USED(IAX) = .TRUE.
       END DO
-      DO IAX = NAXIS + 1, DAT__MXDIM
+      DO IAX = NAXIS + 1, ADI__MXDIM
         DIMS(IAX) = 1
         USED(IAX) = .FALSE.
       END DO
 
 *    Invoke internal routine
-      CALL FIT_GRID_INT( NDS, OBDAT, INSTR, MODEL, OPCHAN, NAXIS, GRID,
-     :           NGRID, GRIDPAR,
-     :           NITMAX, NPAR, LB, UB, FROZEN, SSCALE, MINSLO, FSTAT,
-     :           PREDICTOR,
+      CALL FIT_GRID_INT( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN,
+     :                   NAXIS, GRID, NGRID, GRIDPAR, NPAR, LB, UB,
+     :                   FROZEN, SSCALE, FSTAT, PREDICTOR,
      :           PREDDAT, PARAM, DIMS(1), DIMS(2), DIMS(3), DIMS(4),
      :           DIMS(5), DIMS(6), DIMS(7),
      :           USED, STATMIN, GDATA, GQUAL, GQMASK, STATUS )
@@ -265,9 +257,9 @@
 
 
 *+  FIT_GRID_INT - Produce a grid of the fit statistic vs parameters
-      SUBROUTINE FIT_GRID_INT( NDS, OBDAT, INSTR, MODEL, OPCHAN, NAXIS,
-     :             GRID, NGRID, GRIDPAR, NITMAX, NPAR, LB, UB, FROZEN,
-     :             SSCALE, MINSLO,
+      SUBROUTINE FIT_GRID_INT( NDS, OBDAT, INSTR, MODEL, MCTRL, OPCHAN,
+     :             NAXIS, GRID, NGRID, GRIDPAR, NPAR, LB, UB, FROZEN,
+     :             SSCALE,
      :             FSTAT, PREDICTOR, PREDDAT, PARAM,
      :             L1, L2, L3, L4, L5, L6, L7, USED,
      :             STATMIN, GDATA, GQUAL, GQMASK, STATUS )
@@ -312,12 +304,9 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'FIT_PAR'
       INCLUDE 'QUAL_PAR'
-*
-*    Structure definitions :
-*
       INCLUDE 'FIT_STRUC'
 *
 *    Import :
@@ -326,13 +315,13 @@
       RECORD /DATASET/    OBDAT(NDS)		! Observed datasets
       RECORD /INSTR_RESP/ INSTR(NDS)		! Instrument responses
       RECORD /MODEL_SPEC/ MODEL			! Model specification
+      INTEGER			MCTRL
       INTEGER 		  OPCHAN		! Output channel for diagnostic
 						! messages ( <1 for no messages)
       INTEGER             NAXIS                 ! Number of grid axes
       RECORD /GRID_AXIS/  GRID(*)               ! Grid axis definitions
       INTEGER             NGRID                 ! # of grids
       INTEGER             GRIDPAR(NGRID)        ! Quantity for grids (0->NPAR)
-      INTEGER 		  NITMAX		! Return when NIT reaches NITMAX
       INTEGER 		  NPAR			! No of parameters
       REAL 		  LB(NPAMAX)		! Parameter lower bounds
       REAL 		  UB(NPAMAX)		! Parameter upper bounds
@@ -341,12 +330,10 @@
       INTEGER             FSTAT                 ! Fit statistic
       EXTERNAL 		  PREDICTOR             ! Model prediction routine
       INTEGER             L1,L2,L3,L4,L5,L6,L7  ! Grid dimensions
-      LOGICAL             USED(DAT__MXDIM)      ! Grid dimension used?
+      LOGICAL             USED(ADI__MXDIM)      ! Grid dimension used?
 *
 *    Import-Export :
 *
-      REAL 		  MINSLO		! Min scaled slope in statistic
-                                                ! forcing continuation
       RECORD /PREDICTION/ PREDDAT(NDS)		! Data predicted by model
                                                 ! (actually only the data
                                                 ! pointed to are updated)
@@ -384,17 +371,15 @@
       DOUBLE PRECISION    STAT                  ! Value of statistic at point
 
       REAL 		  DPAR(NPAMAX)		! Param increments for differencing
-      REAL                LMINSLO               ! Local slope after minimisation
       REAL 		  LOCPAR(NPAMAX)	! Local parameter set
 
       INTEGER 		  FITERR		! Fitting error encountered
       INTEGER             G1,G2,G3,G4,G5,G6,G7  ! Grid indices
       INTEGER             GG1                   ! Grid index for 1st dimension
-      INTEGER             GI(DAT__MXDIM)        ! Grid indices
+      INTEGER             GI(ADI__MXDIM)        ! Grid indices
       INTEGER 		  I  			! Parameter index
       INTEGER             IGR                   ! Loop over grids
       INTEGER             NDONE                 ! # of points done
-      INTEGER 		  NIT			! Iteration number
       INTEGER             NTOT                  ! # of points in grid
       INTEGER 		  NUNFROZEN		! No of unfrozen parameters
       INTEGER             NUPAR                 ! # useful non-grid parameters
@@ -404,8 +389,6 @@
       BYTE                MASK                  ! Quality mask BAD & !IGNORE
 
       LOGICAL 		  FINISHED		! Minimum found?
-      LOGICAL 		  INITIALISE		! Should be set true on first
-						! call only - always returned F
       LOGICAL		  LOCFRO(NPAMAX)	! Local parameter freezing
       LOGICAL             ONGRID                ! Parameter on the grid?
       LOGICAL 		  PEGGED(NPAMAX)	! Parameter pegged on bound
@@ -509,15 +492,11 @@
 
       ELSE
 
-*      Initialise fitting
-        INITIALISE = .TRUE.
-        LMINSLO = MINSLO
-
 *      Minimise with respect to parameters not on the grid
-        CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, 0, NITMAX, NPAR,
-     :                LB, UB, LOCFRO, SSCALE, INITIALISE, LMINSLO,
+        CALL FIT_MIN( NDS, OBDAT, INSTR, MODEL, MCTRL, 0, .FALSE.,
+     :                NPAR, LB, UB, LOCFRO, SSCALE,
      :                FSTAT, PREDICTOR, PREDDAT, LOCPAR, DPAR, PEGGED,
-     :                STAT, NIT, FINISHED, FITERR, STATUS )
+     :                STAT, FINISHED, FITERR, STATUS )
 
 *      Severe fitting error?
         IF ( STATUS .NE. SAI__OK ) THEN
