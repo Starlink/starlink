@@ -411,6 +411,9 @@
 *        attribute in KEYSTYLE to set the key text.
 *     22-FEB-2001 (DSB):
 *        Modified to support 3D data.
+*     11-DEC-2003 (DSB):
+*        Clear the unnecessary Format attribute values set in KPG1_GDGET for 
+*        the key style.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1273,9 +1276,10 @@
 
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Clear any title in this plot (the key has its own default Title,
-*  created in POL1_VECKY).
-         CALL AST_CLEAR( IPLOTK, 'TITLE', STATUS )        
+*  Clear any title and formats in this plot.
+         CALL AST_CLEAR( IPLOTK, 'TITLE', STATUS )
+         CALL AST_CLEAR( IPLOTK, 'FORMAT(1)', STATUS )
+         CALL AST_CLEAR( IPLOTK, 'FORMAT(2)', STATUS )
 
 *  Ensure that previous synonyms are cleared.
          CALL KPG1_ASPSY( ' ', ' ', STATUS )
