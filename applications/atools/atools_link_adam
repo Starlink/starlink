@@ -41,7 +41,7 @@
 
 #-
 
-      echo -lkapgen -lira -lfits `agi_link_adam` \
+      echo -lkapsub -lkapgen -lira -lfits `agi_link_adam` \
         `grp_link_adam` `fio_link_adam` `ndf_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}

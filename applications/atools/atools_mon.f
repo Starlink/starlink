@@ -78,6 +78,9 @@
       ELSE IF ( NAME .EQ. 'ASTTEST' ) THEN
          CALL ASTTEST( STATUS )
 
+      ELSE IF ( NAME .EQ. 'ATLHELP' ) THEN
+         CALL ATLHELP( STATUS )
+
       ELSE IF ( NAME .EQ. 'CMPFRAME' ) THEN
          CALL CMPFRAME( STATUS )
 

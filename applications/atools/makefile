@@ -459,7 +459,7 @@ F_ROUTINES = $(F_SUB1) $(F_SUB2) $(MONO_SOURCE)
 F_SUB1 = addframe.f astclear.f astget.f astset.f asttest.f \
 atl1_assoc.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f atl1_ptobj.f \
 atl1_setop.f cmpframe.f cmpmap.f frame.f getframe.f \
-getmapping.f unitmap.f
+getmapping.f unitmap.f atlhelp.f
 
 F_SUB2 = 
 
@@ -494,7 +494,7 @@ C_SUB2 =
 #  List of applications/tasks in monolith.
 
 TASKS = addframe astclear astget astset asttest cmpframe \
-cmpmap frame getframe getmapping unitmap
+cmpmap frame getframe getmapping unitmap atlhelp
 
 #  Monolith routine source name.
 
@@ -1351,6 +1351,7 @@ atl1_gtfrm.o: SAE_PAR AST_PAR
 atl1_gtobj.o: SAE_PAR AST_PAR NDF_PAR 
 atl1_ptobj.o: SAE_PAR DAT_PAR AST_PAR NDF_PAR NDF_ERR DAT_ERR
 atl1_setop.o: SAE_PAR AST_PAR GRP_PAR PAR_ERR
+atlhelp.o   : SAE_PAR PAR_ERR
 atools_mon.o: SAE_PAR 
 addframe.o  : SAE_PAR AST_PAR
 astclear.o  : SAE_PAR AST_PAR

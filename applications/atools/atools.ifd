@@ -451,4 +451,16 @@ iraf! {
 
       }
    }
+
+   icl {defhelp atools $ATOOLS_HELP 0}
+
+   display {
+
+     ATOOLS commands are now available -- (Version PKG_VERS)
+
+     Type atlhelp for help on ATOOLS commands.
+     Type "showme sun??" to browse the hypertext documentation.
+
+   }
+
 }
