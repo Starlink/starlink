@@ -6,7 +6,7 @@
      :     BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
-     :     QMF, QUALITY_PTR, QUALITY_END, INT_LIST,
+     :     QMF, QUALITY_PTR, QUALITY_END, BADBITS, INT_LIST,
      :     STATUS)
 *+
 *  Name:
@@ -24,7 +24,7 @@
 *     :     BOL_ADC, BOL_CHAN,
 *     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
 *     :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
-*     :     QMF, QUALITY_PTR, QUALITY_END, INT_LIST,
+*     :     QMF, QUALITY_PTR, QUALITY_END, BADBITS, INT_LIST,
 *     :     STATUS)
 
  
@@ -101,6 +101,8 @@
 *        Pointer to quality array
 *     QUALITY_END = INTEGER (Returned)
 *        Pointer to end of quality array
+*     BADBITS = BYTE (Returned)
+*        Bad bits mask for quality array
 *     INT_LIST( MAX_FILE, MAX_INTS+1) = INTEGER (Returned)
 *        Position of integrations in each data file
 *     STATUS = INTEGER (Given and Returned)
@@ -116,6 +118,9 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.11  1997/10/21 19:30:06  timj
+*     Read BADBITS mask
+*
 *     Revision 1.10  1997/10/20 21:13:16  timj
 *     Pass through quality arrays if needed.
 *     Free memory allocated to DUMMY_VARIANCE_PTR
@@ -154,6 +159,7 @@
       REAL             WAVELENGTH
 
 *  Arguments Returned:
+      BYTE             BADBITS
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
       INTEGER          BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
       INTEGER          BOL_DEC_END
@@ -734,6 +740,7 @@
             IF (STATE) THEN
                CALL NDF_MAP (SECNDF, 'QUALITY', '_UBYTE', 'READ',
      :              FILE_QUALITY_PTR, ITEMP, STATUS)
+               CALL NDF_BB(SECNDF, BADBITS, STATUS)
             ELSE
                CALL MSG_SETC('TASK', TSKNAME)
                CALL MSG_OUTIF(MSG__QUIET, ' ','WARNING! ^TASK: '//
@@ -747,6 +754,7 @@
                CALL SCULIB_CFILLB(ITEMP, BTEMP,
      :              %VAL(DUMMY_QUALITY_PTR))
                FILE_QUALITY_PTR = DUMMY_QUALITY_PTR
+               BADBITS = VAL__BADUB
             END IF               
          END IF
 
