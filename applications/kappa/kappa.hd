@@ -180,6 +180,7 @@ reshape        hlp = doc$reshape.hlp
 rift        hlp = doc$rift.hlp
 role_of_kappa        hlp = doc$role_of_kappa.hlp
 rotate        hlp = doc$rotate.hlp
+scatter        hlp = doc$scatter.hlp
 segment        hlp = doc$segment.hlp
 selecting_graphics_        hlp = doc$selecting_graphics_.hlp
 setaxis        hlp = doc$setaxis.hlp

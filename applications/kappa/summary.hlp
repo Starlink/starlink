@@ -223,6 +223,7 @@ RIFT        - Adds a scalar to a section of an NDF data structure
               to correct rift-valley defects.
 ROTATE      - Rotates a 2-dimensional NDF about its centre through
               any angle.
+SCATTER     - Displays a scatter plot between data in 2 n-dimensional NDFs.
 SEGMENT     - Copies polygonal segments from one NDF to another.
 SETAXIS     - Sets values for an axis array component within an NDF
               data structure.

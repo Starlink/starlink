@@ -2345,4 +2345,238 @@ component of an NDF.
 - WCSTRAN -- Transforms a position from one NDF WCS co-ordinate
 Frame to another.
 
+
+V0.13-6
+
+ This minor update to KAPPA contains fixes for the following bugs:
+
+ -  ARDMASK now sets the bad pixel flag in the output NDF so that 
+    other applications interpret the selected pixels as bad.
+
+ -  COMPAVE now traps zero variance values, preventing a divide by 
+    zero error.
+
+ -  CONTOUR no longer draws contours in the background colour if the
+    requested contour colour is not available on the selected device.
+    This previously could cause contours to be invisible when using a
+    monochrome postscript device.
+
+ -  History information written to NDFs now contain the up-to-date
+    KAPPA package version number.
+
+ -  DISPLAY now uses independant compression factors for both axes.
+    Previously, an inappropriate compression factor could be used for 
+    one of the axes if the lengths of the two axes were very different.
+
+ -  Trailing spaces are now stripped from the Title attribute of the 
+    current WCS Frame.
+
+ -  A bug in MATHS which could cause zero variances to be produced sometimes
+    when using double precision data has been fixed.
+
+ -  NOMAGIC and FILLBAD now set the bad bits flag in the output NDF to
+    zero. Previously, NDFs containing QUALITY arrays could still seems
+    to contain bad pixels after running NOMAGIC or FILLBAD. This no
+    longer happens.
+
+ -  WCSREMOVE now issues a warning instead of aborting if an attempt is 
+    made to remove the Base Frame of the WCS FrameSet.
+
+ -  NATIVE now correctly replaces IEEE NaN and Inf values by Starlink bad
+    values on Solaris systems.
+
+ -  The global parameter POSITIONS_LIST has been replaced by CATALOGUE.
+ 
+
+V0.14
+
+
+More applications have been changed to enable them to make use
+of the NDF WCS component, which stores descriptions of world
+co-ordinate systems within NDF data structures. More graphics 
+applications have also been changed to use the STYLE parameter 
+system introduced in V0.13 to control the detailed appearance of
+the plot. In some cases, these have involved major changes, 
+including the removal of existing parameters and the addition of 
+new parameters.
+
+
+       Scripts which make use of any of the removed or
+       modified parameters will fail when run with KAPPA
+       V0.14. Such scripts will need to be changed to take
+       account of the new features introduced in this
+       release. Check the lists below for details.
+
+
+
+Modified applications
+
+The following applications have been modified:
+
+
+MLINPLOT
+
+
+- The appearance of the annotated axes can now be controlled in much
+greater detail using the new STYLE parameter.
+
+- The horizontal axis may now be annotated with values from one of the
+axes in the Current co-ordinate Frame of the NDF (see new parameter
+USEAXIS).
+
+- The appearance of the data curves (colour, line style, line width, etc)
+can now be specified individually using the new PENS and MODE parameters.
+
+- Vertical error bars can now be displayed if the supplied NDF has a
+Variance component (see new parameter ERRBAR).
+
+- If the display is not cleared (using parameter CLEAR), then an attempt
+is made to align the new plot with any existing plot.
+
+- The vertical and horizontal position of the key can now be controlled
+using new parameter KEYPOS, and its appearance can be controlled using
+new parameter KEYSTYLE.
+
+- The strings which which to label the data curves can now be given
+explicitly using new parameter LABELS.
+
+- Whether or not vertical offset markers are drawn for each curve is now
+controlled by the new parameter ZMARK.
+
+- The following parameters have been removed (alternatives to using these
+old parameters are indicated):
+
+   o ABSLAB -- Use the STYLE parameter to specify a value for the
+   plotting attribute Label(1).
+
+   o FONT -- Use the Font plotting attributes.
+
+   o LBSIZE -- Use the Size(Labels) plotting attribute.
+
+   o MAJTIC -- Use the Gap plotting attributes.
+
+   o MINTIC -- Use the MinTick plotting attribute.
+
+   o ORDLAB -- Use Label(2) plotting attribute.
+
+   o OUTTIC -- Use MajTickLen and MinTickLen plotting attributes.
+
+   o PLTITL -- Use the Title plotting attribute.
+
+   o PXSIZE -- Create the picture first using PICDEF, the required
+   picture size using the SIZE.
+
+   o PYSIZE -- See PXSIZE.
+
+   o TICLN -- Use the MajTickLen and MinTickLen plotting attributes.
+
+   o XLOG -- Logarithmic X axes are not currently supported.
+
+   o YLIMIT -- Use new parameters YBOT and YTOP.
+
+- The following new parameters have been added: AXES, ERRBAR, FREQ,
+KEYPOS, KEYSTYLE, LABELS, MARGIN, MARKER, MODE, PENS, SIGMA, STYLE,
+USEAXIS, XLEFT, XRIGHT, YBOT, YTOP, ZMARK.
+
+- The following parameters have been modified:
+
+   o LNINDX -- Ranges of pixel indices are now specified using a colon
+   (":") instead of a minus sign ("-"). So for instance, pixel rows 5 to
+   10 would now be given as "5:10" and not "5-10".
+
+   o OFFSET -- Now double precision.
+
+   o SPACE -- Now accepts the additional value "None" which specifies
+   that all curves should be drawn with the same vertical zero point.
+
+   o YLOG -- If a logarithmic vertical axis is requested, the vertical
+   axis is now annotated with equally spaced values of the logarithm
+   (base 10) of the supplied data. Also, the curves are drawn with the
+   vertical offsets specified by parameter SPACE, and the appearance
+   specified by parameters PENS and STYLE.
+
+
+NORMALIZE
+
+
+- There is now much greater control over the appearance of the
+normalization plot. This is provided through the STYLE parameter
+which allow plotting attributes to be set.
+
+- The following parameters have been removed (alternatives to
+using these old parameters are indicated):
+
+   o ABSLAB -- Use the STYLE parameter to specify a value for the
+   plotting attribute Label(1).
+
+   o FONT -- Use the Font plotting attributes.
+
+   o MAJTIC -- Use the Gap plotting attributes.
+
+   o MINTIC -- Use the MinTick plotting attribute.
+
+   o ORDLAB -- Use Label(2) plotting attribute.
+
+   o OUTTIC -- Use MajTickLen and MinTickLen plotting attributes.
+
+   o PTITLE -- Use the Title plotting attribute.
+
+- The following new parameters have been added: AXES, MARGIN, MARKER, 
+XLEFT, XRIGHT, YBOT, YTOP.
+
+
+CENTROID
+
+
+- Positions can now be read from and written to position list catalogues
+such as created by CURSOR, LISTMAKE, etc.
+
+- All positions, both given by the user and returned by the program, now
+refer to the Current Frame of the NDF.
+
+- Either the initial or final positions may now be marked on the screen
+(see parameter MARK).
+
+- There is now much greater control over the appearance of any annotation
+draw over the screen. This is provided through the PLOTSTYLE parameter
+which allow plotting attributes to be set.
+
+- The error on the final position is now returned in parameters XERR and
+YERR.
+
+- The following parameters have been removed (alternatives to
+using these old parameters are indicated):
+
+   o COSYS -- Use application WCSFRAME to set the required
+   co-ordinate Frame first.
+
+- The following new parameters have been added: DESCRIBE, ERROR,
+GUESS, INCAT, MARKER, OUTCAT, PLOTSTYLE, QUIET, TITLE, XERR, YERR.
+
+- The following parameters have been modified:
+
+   o CENTRE -- This is now a string parameter in which is returned the
+   formatted co-ordinates of the last centroid position, in the current 
+   Frame of the NDF. 
+
+   o INIT -- This is now a string parameter which should be given the
+   co-ordinates of the initial guess in the Current Frame of the NDF.
+
+   o MARK -- Now indicates whether the initial or final positions should
+   be marked on the screen.
+
+   o MODE -- Now accepts the extra value "Catalogue".
+
+   o XCEN & YCEN -- These are now string parameters which return the
+   formatted X & Y co-ordinates of the last centroid position, in the 
+   current Frame of the NDF.
+
+
+
+New applications
+
+
+- SCATTER -- Produces a scatter plot of data in one NDF against the
+corresponding value in another NDF.
+
 .endhelp

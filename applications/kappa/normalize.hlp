@@ -31,8 +31,7 @@ Description:
 
    A plot is produced after the final iteration showing the bin
    centres, with error bars representing the spread of values in each
-   bin.  This plot is produced within the current AGI picture and is
-   of a size you specify.
+   bin.  The best fitting straight line is overlayed on this plot.
 
    Optionally, an output NDF can be created containing a normalised
    version of the data array from the first input NDF.
@@ -41,46 +40,44 @@ Parameters
 
 For information on individual parameters, select from the list below:
 
-ABSLAB
+AXES
 
-ABSLAB = LITERAL (Read)
-   A title for the plot's x axis.  Only the first 50 characters
-   are used.  The default is "Data value in ^NDF" where ^NDF is
-   replaced by the name of the NDF associated with IN2. []
+AXES = _LOGICAL (Read)
+   TRUE if labelled and annotated axes are to be drawn around the
+   plot. The width of the margins left for the annotation may be
+   controlled using parameter MARGIN. The appearance of the axes
+   (colours, fonts, etc) can be controlled using the parameter
+   STYLE. [TRUE]
 
 CLEAR
 
 CLEAR = _LOGICAL (Read)
-   Determines if the graphics workstation is to be cleared before
-   producing the plot. [TRUE]
+   If TRUE the current picture is cleared before the plot is
+   drawn. If CLEAR is FALSE not only is the existing plot retained,
+   but also an attempt is made to align the new picture with the
+   existing picture. Thus you can generate a composite plot within
+   a single set of axes, say using different colours or modes to
+   distinguish data from different datasets. [TRUE]
 
 DATARANGE
 
 DATARANGE( 2 ) = _REAL (Read)
-   This parameter may be used to override the plot auto-scaling
+   This parameter may be used to override the auto-scaling
    feature.  If given, two real numbers should be supplied
    specifying the lower and upper data values in IN2, between
    which data will be used.  If not given, the default is to use
    the auto-scaled values, calculated according to the value of
-   PCRANGE. [,]
+   PCRANGE. Note, this parameter controls the range of data used in
+   the fitting algorithm. The range of data displayed in the plot can
+   be specified separately using parameters XLEFT, XRIGHT, YBOT and
+   YTOP. [,]
 
 DEVICE
 
 DEVICE = DEVICE (Read)
-   The graphics workstation on which to produce the plot.  If it
-   is null, !, there will be no plot made.
-   [Current graphics device]
-
-FONT
-
-FONT = LITERAL (Read)
-   The fount to be used for the line graphics.  It can be either
-   "NCAR" for the NCAR fancy characters and "GKS" for the standard
-   GKS san-serif fount.   The former is intended for hardcopy
-   publication-quality plots, since it is relatively slow; the
-   latter is intended for normal interactive graphics requiring
-   rapid plotting, and it is clearer on small plots.  The
-   suggested default is the current value. ["GKS"]
+   The graphics workstation on which to produce the plot.  If a
+   null value (!) is supplied no plot will be made. [Current graphics
+   device]
 
 IN1
 
@@ -92,12 +89,25 @@ IN2
 IN2 = NDF (Read)
    The NDF to which IN1 will be normalised.
 
-MAJTIC
+MARGIN
 
-MAJTIC( 2 ) = _REAL (Read)
-   The parameter controlling the numbers of major tick marks
-   for the x and y axes.  (Number used is between MAJTIC+2 and
-   5*MAJTIC/2+4.) [3.,3.]
+MARGIN( 4 ) = _REAL (Read)
+   The widths of the margins to leave for axis annotation, given
+   as fractions of the corresponding dimension of the DATA picture.
+   Four values may be given, in the order - bottom, right, top, left.
+   If less than four values are given, extra values are used equal to
+   the first supplied value. If these margins are too narrow any axis
+   annotation may be clipped. The dynamic default is 0.18 (for all
+   edges) if annotated axes are produced, and zero otherwise. []
+
+MARKER
+
+MARKER = _INTEGER (Read)
+   Specifies the symbol with which each position should be marked in
+   the plot. It should be given as an integer PGPLOT marker type. For
+   instance, 0 gives a box, 1 gives a dot, 2 gives a cross, 3 gives
+   an asterisk, 7 gives a triangle. The value must be larger than or
+   equal to -31. [current value]
 
 MINPIX
 
@@ -105,13 +115,6 @@ MINPIX = _INTEGER (Read)
    The minimum number of good pixels required in a bin before it
    contributes to the fitted line.  It must be in the range 1 to
    the number of pixels per bin. [2]
-
-MINTIC
-
-MINTIC( 2 ) = _REAL (Read)
-   The number of minor tick marks between each major tick mark
-   for the x and y axes.  A negative value forces the graphics
-   package to compute appropriate values. [-1.,-1.]
 
 NBIN
 
@@ -137,14 +140,6 @@ OFFSET = _REAL (Write)
    An output parameter giving the offset in the linear
    normalisation expression: IN1 = SLOPE * IN2 + OFFSET.
 
-ORDLAB
-
-ORDLAB = LITERAL (Read)
-   A title for the plots y axis.  Only the first 50 characters
-   are used.  The default is "Data value in ^NDF" where ^NDF is
-   replaced by the name of the NDF associated with IN1.
-   []
-
 OUT
 
 OUT = NDF (Write)
@@ -152,44 +147,20 @@ OUT = NDF (Write)
    normalised to IN2.  A null (!) value indicates that an output
    NDF is not required.
 
-OUTTIC
-
-OUTTIC = _LOGICAL (Read)
-   TRUE if the axis tick marks are to appear on the outside of
-   the axes instead of inside. [FALSE]
-
 PCRANGE
 
 PCRANGE( 2 ) = _REAL (Read)
    This parameter takes two real values in the range 0 to 100 and
    is used to modify the action of the auto-scaling algorithm
-   which scales the plots.  The two values correspond to the
-   percentage points in the histogram of IN2 at which the lower
-   and upper cuts on data value are placed.  With the default
-   value, the plots will omit those pixels which lie in the lower
-   and upper 2 percent intensity range of IN2. [2,98]
-
-PTITLE
-
-PTITLE = LITERAL (Read)
-   A title for the top of the plot.  Only the first 50 characters
-   are used. ["Normalization plot"]
-
-PXSIZE
-
-PXSIZE = _REAL (Read)
-   The horizontal size of the plot in metres.  If a value less
-   than the default is requested, then the plot will appear at
-   the bottom left of the current picture. [The size of the
-   current picture]
-
-PYSIZE
-
-PYSIZE = _REAL (Read)
-   The vertical size of the plot in metres.  If a value less than
-   the default is requested, then the plot will appear at the
-   bottom left of the current picture. [The size of the current
-   picture]
+   which selects the data to use in the fitting algorithm. The two
+   values correspond to the percentage points in the histogram of
+   IN2 at which the lower and upper cuts on data value are placed.
+   With the default value, the plots will omit those pixels which
+   lie in the lower and upper 2 percent intensity range of IN2.
+   Note, this parameter controls the range of data used in the
+   fitting algorithm. The range of data displayed in the plot can
+   be specified separately using parameters XLEFT, XRIGHT, YBOT and
+   YTOP. [2,98]
 
 SLOPE
 
@@ -197,12 +168,85 @@ SLOPE = _REAL (Write)
    An output parameter giving the slope of the linear
    normalisation expression: IN1 = SLOPE * IN2 + OFFSET.
 
+STYLE
+
+STYLE = LITERAL (Read)
+   A group of attribute settings describing the plotting style to use
+   when drawing the annotated axes, data values, error bars, and
+   best fitting line.
+
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported).
+
+   The appearance of the best fitting straight line is controlled by
+   the attributes Colour(Curves), Width(Curves), etc (the synonym Line
+   may be used in place of Curves). The appearance of markers is
+   controlled by Colour(Markers), Width(Markers), etc (the synonym
+   Symbols may be used in place of Markers). The appearance of the
+   error bars is controlled using Colour(ErrBars), Width(ErrBars),
+   etc. Note, Size(ErrBars) controls the length of the serifs (i.e.
+   the cross pieces at each end of the error bar), and defaults to
+   1.0. [current value]
+
 TITLE
 
 TITLE = LITERAL (Read)
    Value for the title of the output NDF.  A null value will cause
    the title of the NDF supplied for parameter IN1 to be used
    instead. [!]
+
+XLEFT
+
+XLEFT = _REAL (Read)
+   The axis value to place at the left hand end of the horizontal
+   axis of the plot. The dynamic default is the minimum data value
+   used by the fitting algorithm from IN2 (with a small margin).
+   The value supplied may be greater than or less than the value
+   supplied for XRIGHT. []
+
+XRIGHT
+
+XRIGHT = _REAL (Read)
+   The axis value to place at the right hand end of the horizontal
+   axis of the plot. The dynamic default is the maximum data value
+   used by the fitting algorithm from IN2 (with a small margin).
+   The value supplied may be greater than or less than the value
+   supplied for XLEFT. []
+
+YBOT
+
+YBOT = _REAL (Read)
+   The axis value to place at the bottom end of the vertical axis of
+   the plot. The dynamic default is the minimum data value used by
+   the fitting algorithm from IN1 (with a small margin). The value
+   supplied may be greater than or less than the value supplied for
+   YTOP. []
+
+YTOP
+
+YTOP = _REAL (Read)
+   The axis value to place at the top end of the vertical axis of
+   the plot. The dynamic default is the maximum data value used by
+   the fitting algorithm from IN1 (with a small margin). The value
+   supplied may be greater than or less than the value supplied for
+   YBOT. []
 
 Examples
 
@@ -214,11 +258,10 @@ normalize cl123a cl123b cl123c
    except where noted).  The NDF cl123c is the normalised version
    of the input cl123a.
 
-normalize cl123a cl123b cl123c title="Gain calibration"
+normalize cl123a cl123b style="'size(errba)=0,title=Gain calibration'"
    This normalises NDF cl123a to the NDF cl123b.  A plot of the
    fit is made on the current graphics device with the title
-   "Gain calibration".  The NDF cl123c is the normalised version
-   of the input cl123a.
+   "Gain calibration".  The error bars are drawn with no serifs.
 
 normalize cl123a cl123b cl123c offset=(shift) slope=(scale)
    This normalises NDF cl123a to the NDF cl123b.  A plot of the
@@ -228,9 +271,10 @@ normalize cl123a cl123b cl123c offset=(shift) slope=(scale)
    passed to another application via an ICL procedure.  The NDF
    cl123c is the normalised version of the input cl123a.
 
-normalize in2=old in1=new out=! device=xwindows
+normalize in2=old in1=new out=! device=xwindows style=^normstyle
    This normalises NDF new to the NDF old.  A plot of the fit is
-   made on the xwindows device.  No output NDF is produced.
+   made on the xwindows device, using the plotting style defined in
+   text file normstyle.  No output NDF is produced.
 
 normalize in1=new in2=old out=young niter=5 pcrange=[3,98.5]
    This normalises NDF new to the NDF old.  It has five iterations
@@ -243,12 +287,13 @@ normalize in1=new in2=old out=young niter=5 pcrange=[3,98.5]
 
 Notes
 
--  Provided the application does not fail two pictures are stored
-in the graphics database: a FRAME of the specified size containing
-the title, annotated axes and the plot; and a DATA picture with
-each world co-ordinate being the pixel value of each NDF.  Both
-pictures have comment "KAPPA - Normalize".  The associated NDFs
-are not stored in the database.
+-  The application stores two pictures in the graphics database in
+the following order: a FRAME picture containing the annotated axes
+and data plot, and a DATA picture containing just the data plot.
+Note, the FRAME picture is only created if annotated axes have been
+drawn, or if non-zero margins were specified using parameter
+MARGIN. The world co-ordinates in the DATA picture will correspond
+to data value in the two NDFs.
 
 Related_Applications
 
@@ -288,6 +333,9 @@ History
 
  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
+
+ 17-JUN-1998 (DSB):
+    Converted graphics to AST/PGPLOT.
 
 Implementation_Status
 

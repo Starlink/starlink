@@ -59,7 +59,7 @@ ALIGN = _LOGICAL (Read)
    is TRUE, then the bounds of the new plot are set equal to
    the bounds of the existing plot (on both axes), and parameters
    XLEFT, XRIGHT, YBOT and YTOP are ignored. This parameter is only
-   accessed if parameter CLEAR is TRUE, and if there is another line
+   accessed if parameter CLEAR is FALSE, and if there is another line
    plot within the current picture. The dynamic default is to align
    the plots if the labels on the horizontal axes are the same, and
    not to align the plots if the labels are different. []

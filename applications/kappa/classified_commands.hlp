@@ -141,6 +141,7 @@ LOOK        - Outputs the values of a sub-array of a 2-d data array to
               the screen or a text file.
 MLINPLOT    - Draws a multi-line plot of a 2-d NDF's data values against
               their axis co-ordinates.
+SCATTER     - Displays a scatter plot between data in 2 n-dimensional NDFs.
 SNAPSHOT    - Dumps an image-display memory to a graphics hardcopy and
               optionally to an NDF.
 TURBOCONT   - Contours a 2-d NDF quickly.
