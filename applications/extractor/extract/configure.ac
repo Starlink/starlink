@@ -8,7 +8,7 @@ define([AC_CACHE_LOAD],)
 define([AC_CACHE_SAVE],)
 
 AC_INIT(extractor, 2.3, [extractor@star.rl.ac.uk])
-AC_CONFIG_SRCDIR(extractor/extractor.c)
+AC_CONFIG_SRCDIR(src/extractor.c)
 AC_CONFIG_AUX_DIR(autoconf)
 AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE
@@ -147,9 +147,19 @@ else
 LDFLAGS="$LDFLAGS -static"
 fi
 
+# Starlink.
+AC_MSG_CHECKING([Starlink installation])
+STARLINK=${STARLINK=/star}
+if test ! -x "${STARLINK}"; then
+    echo "What directory is the root of the Starlink development system?"
+    read STARLINK
+fi
+AC_MSG_RESULT($STARLINK)
+CFLAGS="-I${STARLINK}/include $CFLAGS"
+
 # Display compiler and linker flags
 AC_MSG_RESULT([I will compile using:  $CC $CFLAGS])
 AC_MSG_RESULT([I will link using:     $CC $LDFLAGS $LIBS])
 
-AC_CONFIG_FILES([Makefile extractor/Makefile extractor/fits/Makefile src/wcs/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile src/fits/Makefile src/wcs/Makefile])
 AC_OUTPUT

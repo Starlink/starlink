@@ -79,12 +79,12 @@ install_sh = @install_sh@
 # Main Makefile for SExtractor
 # Copyright (C) 2002,2003 Emmanuel Bertin.
 AUTOMAKE_OPTIONS = foreign no-dependencies
-SUBDIRS = extractor
+SUBDIRS = src
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/autoconf/mkinstalldirs
 CONFIG_HEADER = config.h
-CONFIG_CLEAN_FILES = src/wcs/Makefile
+CONFIG_CLEAN_FILES =
 depcomp =
 am__depfiles_maybe =
 DIST_SOURCES =
@@ -135,8 +135,6 @@ $(srcdir)/config.h.in:  $(top_srcdir)/configure.in $(ACLOCAL_M4)
 
 distclean-hdr:
 	-rm -f config.h stamp-h1
-src/wcs/Makefile: $(top_builddir)/config.status $(top_srcdir)/src/wcs/Makefile.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 uninstall-info-am:
 
 # This directory's subdirectories are mostly independent; you can cd
@@ -250,7 +248,7 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/autoconf $(distdir)/src/wcs
+	$(mkinstalldirs) $(distdir)/autoconf
 	@list='$(DISTFILES)'; for file in $$list; do \
 	  if test -f $$file || test -d $$file; then d=.; else d=$(srcdir); fi; \
 	  dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \
