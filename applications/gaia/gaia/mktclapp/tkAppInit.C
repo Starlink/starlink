@@ -33,6 +33,7 @@ extern int Blt_Init(Tcl_Interp *interp);
 extern int Itcl_Init(Tcl_Interp *interp);
 extern int Itk_Init(Tcl_Interp *interp);
 extern int Tclx_Init(Tcl_Interp *interp);
+extern int Tkhtml_Init(Tcl_Interp *interp);
 
 extern int Skycat_Init(Tcl_Interp *interp);
 extern int Gaia_Init(Tcl_Interp *interp);
@@ -71,6 +72,11 @@ int Et_AppInit( Tcl_Interp *interp )
     return TCL_ERROR;
   }
   Tcl_StaticPackage (interp, "Tclx", Tclx_Init, (Tcl_PackageInitProc *) NULL);
+
+  if (Tkhtml_Init(interp) == TCL_ERROR ) {
+      return TCL_ERROR;
+      }
+  Tcl_StaticPackage (interp, "TkHTML", Tkhtml_Init, (Tcl_PackageInitProc *) NULL);
 
   // install the Skycat package 
   if (Skycat_Init(interp) == TCL_ERROR) {

@@ -47,7 +47,7 @@ TCLTKLIBS = @ITK_LIB_SPEC@ \
             @BLT_LIB_SPEC@ \
             @TCLX_LIB_SPEC@ \
             @ITCL_LIB_SPEC@ \
-            @TCL_LIB_SPEC@
+            @TCL_LIB_SPEC@ -ltkhtml
 
 #  Tclutil library
 TCLUTIL_LIB          = -ltclutil

@@ -50,10 +50,12 @@ itcl::class util::HelpWin {
    public method display {} {
       if { ![winfo exists $hyperhelp_] } {
          create_
+      } else {
+         wm deiconify $hyperhelp_
+         raise $hyperhelp_
       }
       $hyperhelp_ showtopic $file
-      wm deiconify $hyperhelp_
-      raise $hyperhelp_
+
    }
 
    # Remove the help window.
@@ -73,7 +75,8 @@ itcl::class util::HelpWin {
       if { ![winfo exists $hyperhelp_] } {
          set hyperhelp_ [::gaia::GaiaHyperHelp .\#auto \
                             -topics {{Home index}} \
-                            -helpdir $helpdir]
+                            -helpdir $helpdir \
+                            -withdraw 1]
       }
    }
 

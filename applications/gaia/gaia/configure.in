@@ -700,4 +700,5 @@ AC_OUTPUT(Makefile \
         mktclapp/library/gaia_swish.tcl \
         mktclapp/library/gaia_stcl.tcl \
         colormaps/Makefile \
-        bitmaps/Makefile, sh makelinks)
+        bitmaps/Makefile, sh makelinks \
+        gaia.htx/Makefile )

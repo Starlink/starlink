@@ -154,6 +154,9 @@ itcl::class gaia::GaiaHyperHelp {
 
       #  Evaluate any options (sets topics and help directory).
       eval itk_initialize $args
+
+      #  Load first topic 
+      home
    }
 
    #  Destructor:
@@ -171,9 +174,6 @@ itcl::class gaia::GaiaHyperHelp {
    #
    #  Called after construction is complete.
    public method init {} {
-      
-      #  Load first topic.
-      home
    }
 
    #  METHOD: showtopic topic
@@ -206,6 +206,7 @@ itcl::class gaia::GaiaHyperHelp {
    #
    # Show a menu topic, clearing history.
    public method hometopic { topic } {
+      puts "hometopic"
       $itk_component(html) clear_history
       showtopic $topic
    }
