@@ -7819,8 +7819,8 @@ f     AST_PICKAXES
 
 *  Synopsis:
 c     #include "frame.h"
-c     AstFrame *PickAxes( AstFrame *this, int naxes, const int axes[],
-c                         AstMapping **map )
+c     AstFrame *astPickAxes( AstFrame *this, int naxes, const int axes[],
+c                            AstMapping **map )
 f     RESULT = AST_PICKAXES( THIS, NAXES, AXES, MAP, STATUS )
 
 *  Class Membership:

@@ -2008,7 +2008,7 @@ f     AST_SHOW
 
 *  Synopsis:
 c     #include "object.h"
-c     void Show( AstObject *this )
+c     void astShow( AstObject *this )
 f     CALL AST_SHOW( THIS, STATUS )
 
 *  Class Membership:
