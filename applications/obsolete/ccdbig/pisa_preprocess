@@ -28,8 +28,8 @@
 
 # Input file and dimensions
 pisafile='pisafind.dat'
-xmax=1000
-ymax=1000
+xmax=1500
+ymax=1500
 echo "Reading from $pisafile, dimensions $xmax * $ymax"
 
 # Output file
@@ -40,8 +40,8 @@ echo "Writing to $outfile"
 # Exclude the very brightest objects because ccdgenerate doesn't 
 # deal with them very well
 awkprog=' /^ *[^#]/ && $4 < 500000 \
-                    {printf "%12.8f %12.8f %14.0f %9.4f %8.1f\n", \
-                             $2/'$xmax', $3'/$ymax', $4, $7, $8; } '
+                    {printf "%10.8f %12.8f %12.8f %14.0f %9.4f %8.1f\n", \
+                             rand(), $2/'$xmax', $3'/$ymax', $4, $7, $8; } '
 
 # Print a header line
 echo >$outfile \
@@ -49,11 +49,12 @@ echo >$outfile \
 
 echo "Processing ..."
 
-# Select fields and sort according to intensity
+# Select fields and 'sort' into a random order
 # The final awk adds index numbers
    awk "$awkprog" $pisafile \
- | sort -n -r -k 3 -k 4     \
- | awk '/^ *[^#]/ {printf "%6d %s\n", ++ix, $0}'  >> $outfile
+ | sort -n \
+ | awk '/^ *[^#]/ {printf "%6d %12.8f %12.8f %14.0f %9.4f %8.1f\n", \
+                          ++ix, $2,   $3,    $4,    $5,   $6}'  >> $outfile
 
 nobj=`grep -v '^ *[#]' $outfile | wc -l`
 
