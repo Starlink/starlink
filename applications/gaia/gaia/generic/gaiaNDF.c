@@ -246,7 +246,7 @@ int gaiaAccessNDF( const char *filename, int *type, int *width, int *height,
    /* Convert the file name into an F77 string */
    if ( strlen( filename ) <= MAXNDFNAME ) {
        strncpy( tmpname, filename, tmpname_length );
-       cnf_exprt( tmpname, ndfname, ndfname_length );
+       cnfExprt( tmpname, ndfname, ndfname_length );
 
        /* Attempt to open the NDF. */
        emsMark();
@@ -267,8 +267,8 @@ int gaiaAccessNDF( const char *filename, int *type, int *width, int *height,
        }
 
        /* Convert the FITS headers into a C string */
-       *header = cnf_creib( (char *)charPtr, 80 * (*header_length) );
-       cnf_free( (void *)charPtr );
+       *header = cnfCreib( (char *)charPtr, 80 * (*header_length) );
+       cnfFree( (void *)charPtr );
        emsRlse();
        return 1;
    }
@@ -279,7 +279,6 @@ int gaiaAccessNDF( const char *filename, int *type, int *width, int *height,
        return 0;
    }
 }
-
 
 /*
  *  Name:
@@ -303,10 +302,10 @@ int gaiaWriteNDF( const char *filename, int type, int width, int height,
 
    /* Convert the file name into an F77 string */
    strncpy( tmpname, filename, tmpname_length );
-   cnf_exprt( tmpname, ndfname, ndfname_length );
+   cnfExprt( tmpname, ndfname, ndfname_length );
 
    /* Convert the NDF component into a F77 string */
-   cnf_exprt( (char *) component, comp, comp_length);
+   cnfExprt( (char *) component, comp, comp_length);
 
    /* Convert C pointer to Fortran pointer */
    dataPtr = (F77_POINTER_TYPE) data;
@@ -319,7 +318,7 @@ int gaiaWriteNDF( const char *filename, int type, int width, int height,
       /*  Convert the C string into a Fortran array. */
       dims[0] = lheader / 80;
       F77_CREATE_CHARACTER_ARRAY( fhead, 80, dims[0] );
-      cnf_exprta( (char *) header, 80, fhead, 80, 1, dims );
+      cnfExprta( (char *) header, 80, fhead, 80, 1, dims );
    }
 
    /* Attempt to open the NDF. */
@@ -689,244 +688,252 @@ static NDFinfo *getNDFInfo( const void *handle, const int index )
  */
 int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
 {
-   NDFinfo *head = (NDFinfo *) NULL;
-   NDFinfo *newstate = (NDFinfo *) NULL;
-   NDFinfo *state = (NDFinfo *) NULL;
-   char *emess = NULL;
-   char *filename = NULL;
-   char *ftype = NULL;
-   char *header = NULL;
-   char *left = NULL;
-   char *path = NULL;
-   char *right = NULL;
-   char baseloc[DAT__SZLOC];
-   char ndffile[MAXNDFNAME];
-   char ndfpath[MAXNDFNAME];
-   char newloc[DAT__SZLOC];
-   char slice[MAXNDFNAME];
-   char tmploc[DAT__SZLOC];
-   int baseid = 0;
-   int first;
-   int height;
-   int hlen;
-   int i;
-   int isect;
-   int istop = 0;
-   int level;
-   int ncomp = 0;
-   int ndfid;
-   int same;
-   int status = SAI__OK;
-   int type;
-   int width;
+    NDFinfo *head = (NDFinfo *) NULL;
+    NDFinfo *newstate = (NDFinfo *) NULL;
+    NDFinfo *state = (NDFinfo *) NULL;
+    char *emess = NULL;
+    char *filename = NULL;
+    char *ftype = NULL;
+    char *header = NULL;
+    char *left = NULL;
+    char *path = NULL;
+    char *right = NULL;
+    char baseloc[DAT__SZLOC];
+    char ndffile[MAXNDFNAME];
+    char ndfpath[MAXNDFNAME];
+    char newloc[DAT__SZLOC];
+    char slice[MAXNDFNAME];
+    char tmploc[DAT__SZLOC];
+    int baseid = 0;
+    int first;
+    int height;
+    int hlen;
+    int i;
+    int isect;
+    int istop = 0;
+    int level;
+    int ncomp = 0;
+    int ndfid;
+    int same;
+    int status = SAI__OK;
+    int type;
+    int width;
+    
+    /*  Mark the error stack */
+    emsMark();
+    
+    /*  Check that we're not going to have problems with the name
+        length */
+    if ( strlen( name ) > MAXNDFNAME ) {
+        *error_mess = (char *) malloc( (size_t) MAXNDFNAME );
+        sprintf( *error_mess, "NDF specification is too long "
+                 "(limit is %d characters)", MAXNDFNAME );
+        return 0;
+    }
+    
+    /*  Attempt to open the given name as an NDF */
+    if ( gaiaAccessNDF( name, &type, &width, &height, &header, &hlen,
+                        &ndfid, &emess ) ) {
+        
+        /*  Name is an NDF. Need a HDS path to its top-level so we can
+            check for other NDFs at this level, also need to check for the
+            existence of other displayables in the NDF */
+        baseid = ndfid;
+        head = (NDFinfo *) malloc( sizeof( NDFinfo ) );
+        setState( head, ndfid, name, type, width, height, header, hlen,
+                  &status );
+        
+        /*  Get the locator to the NDF and hence to its parent. */
+        ndfLoc( ndfid, "READ", tmploc, &status );
+        datParen( tmploc, baseloc, &status );
+        
+        /*  See if the NDF has a slice. If so all components and NDFs in
+            this file will also have that slice applied */
+        left = strrchr( name, '(');
+        right = strrchr( name, ')');
+        if ( left && right ) {
+            strcpy( slice, left );
+        }
+        else {
+            slice[0] = '\0';
+        }
+        if ( status == DAT__OBJIN ) {
+            
+            /*  At top level, so no parent available */
+            emsAnnul( &status );
+            datClone( tmploc, baseloc, &status );
+        }
+        else {
+            /*  Some other error occured, just let it go */
+            emess = errMessage( &status );
+        }
+    }
+    else {
 
-   /*  Mark the error stack */
-   emsMark();
+        /*  May just be a HDS container name with NDFs at this level. Need
+         *  to parse down to a filename and a HDS path.
+         */
+        filename = strdup( name );
+        path = strstr( filename, ".sdf" );
+        if ( path ) {
+            *path++ = ' '; /* Have ".sdf" in name, cut it out. */
+            *path++ = ' ';
+            *path++ = ' ';
+            *path++ = ' ';
+        }
+        path = strrchr( filename, '/' );  /* Last / in name */
+        if ( ! path ) {
+            path = strchr( filename, '.' );
+        }
+        else {
+            path = strchr( path, '.' );
+        }
+        if ( path ) {
+            *path = '\0';  /*  Remove "." from filename, rest is HDS path */
+            path++;
+        }
+        
+        /*  Attempt to open the file and obtain a base locator. */
+        hdsOpen( filename, "READ", tmploc, &status );
+        
+        /*  Now look for the object specified by the PATH */
+        if ( path && status == SAI__OK ) {
+            datFind( tmploc, path, baseloc, &status );
+        }
+        else {
+            datClone( tmploc, baseloc, &status );
+        }
 
-   /*  Check that we're not going to have problems with the name
-       length */
-   if ( strlen( name ) > MAXNDFNAME ) {
-       *error_mess = (char *) malloc( (size_t) MAXNDFNAME );
-       sprintf( *error_mess, "NDF specification is too long "
-                "(limit is %d characters)", MAXNDFNAME );
-       return 0;
-   }
-
-   /*  Attempt to open the given name as an NDF */
-   if ( gaiaAccessNDF( name, &type, &width, &height, &header, &hlen,
-                      &ndfid, &emess ) ) {
-
-      /*  Name is an NDF. Need a HDS path to its top-level so we can
-          check for other NDFs at this level, also need to check for the
-          existence of other displayables in the NDF */
-      baseid = ndfid;
-      head = (NDFinfo *) malloc( sizeof( NDFinfo ) );
-      setState( head, ndfid, name, type, width, height, header, hlen,
-                &status );
-
-      /*  Get the locator to the NDF and hence to its parent. */
-      ndfLoc( ndfid, "READ", tmploc, &status );
-      datParen( tmploc, baseloc, &status );
-
-      /*  See if the NDF has a slice. If so all components and NDFs in
-          this file will also have that slice applied */
-      left = strrchr( name, '(');
-      right = strrchr( name, ')');
-      if ( left && right ) {
-         strcpy( slice, left );
-      }
-      else {
-         slice[0] = '\0';
-      }
-      if ( status == DAT__OBJIN ) {
-
-         /*  At top level, so no parent available */
-         emsAnnul( &status );
-         datClone( tmploc, baseloc, &status );
-      }
-      else {
-          /*  Some other error occured, just let it go */
-          emess = errMessage( &status );
-      }
-   }
-   else {
-
-      /*  May just be a HDS container name with NDFs at this level. Need
-       *  to parse down to a filename and a HDS path.
-       */
-      filename = strdup( name );
-      path = strstr( filename, ".sdf" );
-      if ( path ) {
-         *path++ = ' '; /* Have ".sdf" in name, cut it out. */
-         *path++ = ' ';
-         *path++ = ' ';
-         *path++ = ' ';
-      }
-      path = strrchr( filename, '/' );  /* Last / in name */
-      if ( ! path ) {
-         path = strchr( filename, '.' );
-      }
-      else {
-         path = strchr( path, '.' );
-      }
-      if ( path ) {
-         *path = '\0';  /*  Remove "." from filename, rest is HDS path */
-         path++;
-      }
-
-      /*  Attempt to open the file and obtain a base locator. */
-      hdsOpen( filename, "READ", tmploc, &status );
-
-      /*  Now look for the object specified by the PATH */
-      if ( path && status == SAI__OK ) {
-         datFind( tmploc, path, baseloc, &status );
-      }
-      else {
-         datClone( tmploc, baseloc, &status );
-      }
-
-      /*  If all is well, cancel pending error message (from initial
-          attempt to open) */
-      if ( status == SAI__OK ) {
-         free( emess );
-         emess = NULL;
-      }
-      free( filename );
-
-      /*  Top level container file, so safe to strip .sdf from name
-       *  (if this was an NDF then .sdf.gz might be used).
-       */
-      istop = 1;
-
-      /*
-       *  No slice for plain top-level.
-       */
-      slice[0] = '\0';
-   }
-   if ( status == SAI__OK && datValid( baseloc, &status ) ) {
-
-      /*  Look for additional NDFs at baseloc, ignore tmploc which is
-       *  NDF itself (or baseloc).
-       */
-      datNcomp( baseloc, &ncomp, &status );
-      if ( status != SAI__OK ) {
-          ncomp = 0;
-      }
-      first = 1;
-      for ( i = 1; i <= ncomp; i++ ) {
-         datIndex( baseloc, i, newloc, &status );
-
-         /*  Get full name of component and see if it is an NDF */
-         hdsTrace( newloc, &level, ndfpath, MAXNDFNAME, ndffile,
-                   MAXNDFNAME, &status );
-
-         ftype = strstr( ndffile, ".sdf" ); /* Strip off .sdf from filename */
-         if ( ftype ) *ftype = '\0';
-
-         path = strstr( ndfpath, "." );  /* Now find first component */
-         if ( path == NULL ) {           /* and remove it (not used as */
-            strcat( ndffile, "." );      /* part of NDF name) */
-            path = ndfpath;
-         }
-         strcat( ndffile, path );        /*  Join filename and HDS
-                                             path to give NDF full
-                                             name */
-         if ( slice[0] != '\0' ) {
-            strcat( ndffile, slice );    /*  Add the NDF slice, if set */
-            strcat( path, slice );
-         }
-
-         /*  Attempt to open NDF to see if it exists (could check for
-             DATA_ARRAY component) */
-         emess = NULL;
-         if ( gaiaAccessNDF( ndffile, &type, &width, &height, &header, &hlen,
-                             &ndfid, &emess ) ) {
-
-             /*  Check that this isn't the base NDF by another name */
-             if ( ndfid != 0 && baseid != 0 ) {
-                 ndfSame( baseid, ndfid, &same, &isect, &status );
-             }
-             else {
-                 same = 0;
-             }
-             if ( ! same ) {
-                 /*  NDF exists so add its details to the list of NDFs */
-                 newstate = (NDFinfo *) malloc( sizeof( NDFinfo ) );
-                 if ( first ) {
-                     if ( head ) {
-                         head->next = newstate;
-                     }
-                     else {
-                         head = newstate;
-                     }
-                     first = 0;
-                 }
-                 else {
-                     state->next = newstate;
-                 }
-                 state = newstate;
-                 setState( state, ndfid, path, type, width, height, header,
-                           hlen, &status );
-             }
-             else {
-                 /* Same NDF as before, release it and continue */
-                 gaiaFreeNDF( ndfid );
-             }
-         }
-         if ( emess != NULL ) {
-             free( emess );
-         }
-         datAnnul( newloc, &status );
-      }
-
-      /*  Release locators */
-      datAnnul( baseloc, &status );
-      datAnnul( tmploc, &status );
-   }
-   else {
-
-       /* Invalid locator with no error message? */
-       if ( status == SAI__OK && ! emess ) {
-           emess = strdup( "Invalid base locator for this NDF" );
-       }
-
-       /*  Initialisation failed (no such NDF, or container file/path
-        *  doesn't have any NDFs in it).
-        */
-       if ( emess ) {
-           *error_mess = emess;
-       }
-       else {
-           *error_mess = strdup( "Failed to locate any NDFs" );
-       }
-       emsRlse();
-       return 0;
-   }
-
-   /*  Return list of NDFinfos */
-   *handle = head;
-   emsRlse();
-   return 1;
+        /*  If all is well, cancel pending error message (from initial
+            attempt to open) */
+        if ( status == SAI__OK ) {
+            free( emess );
+            emess = NULL;
+        }
+        free( filename );
+        
+        /*  Top level container file, so safe to strip .sdf from name
+         *  (if this was an NDF then .sdf.gz might be used).
+         */
+        istop = 1;
+        
+        /*
+         *  No slice for plain top-level.
+         */
+        slice[0] = '\0';
+    }
+    if ( status == SAI__OK && datValid( baseloc, &status ) ) {
+        
+        /*  Look for additional NDFs at baseloc, ignore tmploc which is
+         *  NDF itself (or baseloc).
+         */
+        datNcomp( baseloc, &ncomp, &status );
+        if ( status != SAI__OK ) {
+            ncomp = 0;
+        }
+        first = 1;
+        for ( i = 1; i <= ncomp; i++ ) {
+            datIndex( baseloc, i, newloc, &status );
+            
+            /*  Get full name of component and see if it is an NDF */
+            hdsTrace( newloc, &level, ndfpath, MAXNDFNAME, ndffile,
+                      MAXNDFNAME, &status );
+            
+            ftype = strstr( ndffile, ".sdf" ); /* Strip .sdf from filename */
+            if ( ftype ) *ftype = '\0';
+            
+            path = strstr( ndfpath, "." );  /* Now find first component */
+            if ( path == NULL ) {           /* and remove it (not used as */
+                strcat( ndffile, "." );      /* part of NDF name) */
+                path = ndfpath;
+            }
+            strcat( ndffile, path );        /*  Join filename and HDS
+                                                path to give NDF full
+                                                name */
+            if ( slice[0] != '\0' ) {
+                strcat( ndffile, slice );    /*  Add the NDF slice, if set */
+                strcat( path, slice );
+            }
+            
+            /*  Attempt to open NDF to see if it exists (could check for
+                DATA_ARRAY component) */
+            emess = NULL;
+            if ( gaiaAccessNDF( ndffile, &type, &width, &height,
+                                &header, &hlen, &ndfid, &emess ) ) {
+                
+                /*  Check that this isn't the base NDF by another name */
+                if ( ndfid != 0 && baseid != 0 ) {
+                    ndfSame( baseid, ndfid, &same, &isect, &status );
+                }
+                else {
+                    same = 0;
+                }
+                if ( ! same ) {
+                    /*  NDF exists so add its details to the list of NDFs */
+                    newstate = (NDFinfo *) malloc( sizeof( NDFinfo ) );
+                    if ( first ) {
+                        if ( head ) {
+                            head->next = newstate;
+                        }
+                        else {
+                            head = newstate;
+                        }
+                        first = 0;
+                    }
+                    else {
+                        state->next = newstate;
+                    }
+                    state = newstate;
+                    setState( state, ndfid, path, type, width, height, header,
+                              hlen, &status );
+                }
+                else {
+                    /* Same NDF as before, release it and continue */
+                    gaiaFreeNDF( ndfid );
+                }
+            }
+            if ( emess != NULL ) {
+                free( emess );
+                emess = NULL;
+            }
+            datAnnul( newloc, &status );
+        }
+        
+        /*  Release locators */
+        datAnnul( baseloc, &status );
+        datAnnul( tmploc, &status );
+    }
+    else {
+        
+        /* Invalid locator with no error message? */
+        if ( status == SAI__OK && ! emess ) {
+            emess = strdup( "Invalid base locator for this NDF" );
+        }
+        
+        /*  Initialisation failed (no such NDF, or container file/path
+         *  doesn't have any NDFs in it).
+         */
+        if ( emess ) {
+            *error_mess = emess;
+            emess = NULL;
+        }
+        else {
+            *error_mess = strdup( "Failed to locate any NDFs" );
+        }
+        emsRlse();
+        return 0;
+    }
+    
+    /*  Return list of NDFinfos */
+    *handle = head;
+    emsRlse();
+    
+    /*  No error messages should get past here! */
+    if ( emess ) {
+        free( emess );
+        fprintf( stderr, "leaked error message" );
+    }
+    return 1;
 }
 
 /*
@@ -1151,7 +1158,7 @@ void gaiaReleaseMNDF( const void *handle )
    do {
        /* Free NDF and header block */
        gaiaFreeNDF( current->ndfid );
-       cnf_free( current->header );
+       cnfFree( current->header );
 
        /* Free the NDFinfo structure that stored these */
        next = current->next;
@@ -1209,19 +1216,19 @@ void *gaiaCloneMNDF( void *handle )
     if ( current ) {
         for ( ; current; current = current->next ) {
 
-            //  Make a copy of the current NDFinfo structure.
+            /*  Make a copy of the current NDFinfo structure. */
             newState = (NDFinfo *) malloc( sizeof( NDFinfo ) );
             memcpy( newState, current, sizeof( NDFinfo ) );
 
-            //  Clone it's NDF identifier.
+            /*  Clone it's NDF identifier. */
             ndfClone( current->ndfid, &(newState->ndfid), &status );
 
-            //  And copy the headers.
+            /*  And copy the headers. */
             newState->header = cnfCreat( current->hlen * 80 );
             memcpy( newState->header, current->header, 
                     current->hlen * 80 );
 
-            //  And add this to the new super structure.
+            /*  And add this to the new super structure. */
             if ( first ) {
                 newInfo = newState;
                 first = 0;
@@ -1533,7 +1540,10 @@ static void hdsTrace( const char *loc, int *level, char *path,
                           TRAIL_ARG( ffile ) );
 
    F77_IMPORT_CHARACTER( fpath, fpath_length, path );
+   F77_FREE_CHARACTER( fpath );
    F77_IMPORT_CHARACTER( ffile, ffile_length, file );
+   F77_FREE_CHARACTER( ffile );
+
    F77_IMPORT_INTEGER( flevel, *level );
    F77_IMPORT_INTEGER( fstatus, *status );
    return;

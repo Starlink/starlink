@@ -118,83 +118,85 @@ int NDFIO::wcsinit()
 NDFIO *NDFIO::read( const char *filename, const char *component,
                     int useShm )
 {
-   Mem data;
-   Mem header;
-   char *error_mess;
-   char *inheader;
-   char *name;
-   const int header_length = FITSCARD;      //  Length of FITS header.
-   double bscale = 1.0;
-   double bzero = 0.0;
-   int bitpix = 0;
-   int header_records = 0;
-   int height = 0;
-   int ndfid = 0;
-   int width = 0;
-   int hasv;
-   int hasq;
-   void *NDFinfo;
-   void *indata;
+    Mem data;
+    Mem header;
+    char *error_mess;
+    char *inheader;
+    char *name;
+    const int header_length = FITSCARD;      //  Length of FITS header.
+    double bscale = 1.0;
+    double bzero = 0.0;
+    int bitpix = 0;
+    int header_records = 0;
+    int height = 0;
+    int ndfid = 0;
+    int width = 0;
+    int hasv;
+    int hasq;
+    void *NDFinfo;
+    void *indata;
 
-   //  Parse the input filename. This becomes an information structure
-   //  that describes the NDFs (of a list of NDFs if more than one are
-   //  available at the given HDS path). Displayable array components
-   //  of each NDF are known as "displayables".
-   if ( gaiaInitMNDF( filename, &NDFinfo, &error_mess ) ) {
+    //  Parse the input filename. This becomes an information structure
+    //  that describes the NDFs (of a list of NDFs if more than one are
+    //  available at the given HDS path). Displayable array components
+    //  of each NDF are known as "displayables".
+    if ( gaiaInitMNDF( filename, &NDFinfo, &error_mess ) ) {
 
-      //  Now check that the first NDF contains a displayable that
-      //  corresponds to the given component.
-      if ( gaiaCheckMNDF( NDFinfo, 1, component ) ) {
+        //  Now check that the first NDF contains a displayable that
+        //  corresponds to the given component.
+        if ( gaiaCheckMNDF( NDFinfo, 1, component ) ) {
 
-         //  NDF we can display something so get the NDF information
-         //  we need.
-         gaiaGetInfoMNDF( NDFinfo, 1, &name, &bitpix, &width, &height,
-                          &inheader, &header_records, &ndfid, &hasv, &hasq );
+            //  NDF we can display something so get the NDF information
+            //  we need.
+            gaiaGetInfoMNDF( NDFinfo, 1, &name, &bitpix, &width, &height,
+                             &inheader, &header_records, &ndfid, 
+                             &hasv, &hasq );
 
-         //  If accessing quality, then the data type is unsigned byte
-         //  not the current bitpix.
-         if ( strncasecmp( "qua", component, 3 ) == 0 ) {
-            bitpix = 8;
-         }
+            //  If accessing quality, then the data type is unsigned byte
+            //  not the current bitpix.
+            if ( strncasecmp( "qua", component, 3 ) == 0 ) {
+                bitpix = 8;
+            }
 
-         //  Create a Mem object to hold the displayable data.
-         int tsize = width * height * ( abs( bitpix ) / 8 );
+            //  Create a Mem object to hold the displayable data.
+            int tsize = width * height * ( abs( bitpix ) / 8 );
 
-         // Now map the data and initialise with this pointer.
-         if ( gaiaGetMNDF( NDFinfo, 1, component, &indata, &error_mess ) ) {
+            // Now map the data and initialise with this pointer.
+            if ( gaiaGetMNDF( NDFinfo, 1, component, &indata, &error_mess ) ) {
 
-            data = Mem( indata, tsize, 0 );
+                data = Mem( indata, tsize, 0 );
 
-            // Copy the header.
-            header = Mem( header_length * header_records + 1, useShm );
-            memcpy( (void *) header.ptr(), inheader, header_length * header_records + 1);
+                // Copy the header.
+                header = Mem( header_length * header_records + 1, useShm );
+                memcpy( (void *) header.ptr(), inheader,
+                        header_length * header_records + 1);
 
-            // Create NDFIO object with data and size.
-            return new NDFIO( NDFinfo, 1, component, ndfid,
-                              width, height, bitpix, bzero, bscale,
-                              header, data );
-         } else {
+                // Create NDFIO object with data and size.
+                return new NDFIO( NDFinfo, 1, component, ndfid,
+                                  width, height, bitpix, bzero, bscale,
+                                  header, data );
+            } else {
 
             // Failed to copy the image, must have ran out of memory or some
-            // such.
-            error( error_mess );
-            free( error_mess );
+                // such.
+                error( error_mess );
+                free( error_mess );
+                return NULL;
+            }
+        } else {
+
+            // Failed to get the component.
+            error( "Image does not contain the component:", component );
             return NULL;
-         }
-      } else {
+        }
+    } else {
 
-         // Failed to get the component.
-         error( "Image does not contain the component:", component );
-         return NULL;
-      }
-   } else {
-
-      // Failed to open NDF so issue the error message we have been
-      // given (this is a dynamic C string so free it).
-      error( error_mess );
-      free( error_mess );
-      return NULL;
-   }
+        // Failed to open NDF so issue the error message we have been
+        // given (this is a dynamic C string so free it).
+        error( error_mess );
+        free( error_mess );
+        return NULL;
+    }
 }
 
 //+
