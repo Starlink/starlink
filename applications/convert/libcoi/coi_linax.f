@@ -18,14 +18,14 @@
 *     describe a linear axis structure.  At least one complete set of
 *     keywords defining the axis must be present.  These keywords are
 *     CRVALn, the reference value; CRPIXn, the reference pixel to which
-*     the reference value corresponds; and CDELTn or CDn_n, the step
-*     size between axis values.  If they all exist for axis n, then an
-*     axis component is created and filled with the appropriate values.
-*     If any of CRVALn, or CRPIXn, or either CDELTn and CDn_n are
-*     absent, and USEDEF=.FALSE., the missing keywords are assigned
-*     1.0D0.  This option allows conversion from the Multispec-system,
-*     which omits these keywords.  When only some of the axes have
-*     defined centres, the remaining axes are assigned pixel
+*     the reference value corresponds; and CDELTn (the step size between 
+*     axis values), or CDi_j (the axis rotation/scaling matrix). If they 
+*     all exist for axis n, then an axis component is created and filled 
+*     with the appropriate values. If any of CRVALn, or CRPIXn, or either 
+*     CDELTn and CDn_n are absent, and USEDEF=.FALSE., the missing keywords 
+*     are assigned 1.0D0.  This option allows conversion from the 
+*     Multispec-system, which omits these keywords.  When only some of the 
+*     axes have defined centres, the remaining axes are assigned pixel
 *     co-ordinates.  If CTYPEn is in the header it is used to assign a
 *     value to the nth axis's label component.  If CUNITn is present,
 *     its value is stored in the nth axis's units component.
@@ -61,11 +61,17 @@
 *
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1997 July 24 (MJC):
 *        Original version.
+*     26-JAN-1998 (DSB):
+*        Modified to take account of CD matrices which indicate a
+*        rotation of 90 degrees.
+*     6-FEB-1998 (DSB):
+*        Modified to ignore CDELT if CD is found.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,9 +114,17 @@
                                  ! to be created
       PARAMETER ( PRECF = 100.0D0 )
 
+      DOUBLE PRECISION EPS       ! Tan of the largest angle allowable
+                                 ! between axes before they are considered 
+                                 ! not to be parallel.
+      PARAMETER ( EPS = 1.0E-6 )
+      
+
 *  Local Variables:
       INTEGER BUFLEN             ! Character length of the multi-line
                                  ! buffer for WATd_nnn headers
+      DOUBLE PRECISION CD_I( NDF__MXDIM ) ! CDi_j values
+      DOUBLE PRECISION CDELTI    ! CDELT value
       CHARACTER * ( 1 ) CNDIM    ! The axis number
       DOUBLE PRECISION DELT      ! The co-ordinate increment between
                                  ! pixels
@@ -120,14 +134,23 @@
       INTEGER DTYPE              ! Data code (0=linear,1=log-linear)
       INTEGER EL                 ! Dimension of the current axis
       INTEGER ERR                ! IMFORT status
-      INTEGER I                  ! Loop counter
+      LOGICAL GCD                ! Got at least one CDi_j value?
+      LOGICAL GCRVAL             ! Got a CRVAL value?
+      LOGICAL GCRPIX             ! Got a CRPIX value?
+      LOGICAL GCDELT             ! Got a CDELT value?
+      INTEGER I                  ! Axis index in IRAF world coordinate system
+      INTEGER IAT                ! Index at which to insert next character
+      INTEGER J                  ! Axis index in NDF pixel coordinate system
+      INTEGER JMAX               ! Index of NDF axis parallel to current IRAF axis
       CHARACTER * ( DAT__SZTYP ) ITYPE ! Data type of the axis centres
       CHARACTER * ( 8 ) KEYWRD   ! FITS keyword
       CHARACTER * ( 70 ) LABEL   ! Axis label
+      DOUBLE PRECISION MAXCD     ! Largest CDi_j value found for current axis
       INTEGER NC                 ! Number of characters in keyword
       INTEGER NCL                ! Number of characters in label
       INTEGER NCU                ! Number of characters in units
       INTEGER NDIM               ! Number of dimensions of the NDF
+      LOGICAL NONPAR             ! Were any non-parallel axes found?
       INTEGER NSDIG              ! Number of significant digits
       DOUBLE PRECISION OFFSET    ! Offset after allowing for the
                                  ! position of reference pixel
@@ -163,14 +186,15 @@
       CALL IMGKWI( IMDESC, 'DC-FLAG', DTYPE, ERR )
       IF ( ERR .NE. IMOK ) DTYPE = 0
 
-*  Loop for each dimension.
+*  Loop for each axis in the IRAF world coordinate system. This is
+*  assumed to be the same as the number of axes in the NDF.
       DO I = 1, NDIM
 
 *  Read the header for the four axis parameters.
 *  =============================================
 *
-*  Note rotation cannot be mapped on to an axis structure and requires
-*  a more-sophisticated astrometric system.
+*  Note rotation by angles other than 90 degrees cannot be mapped on to an
+*  axis structure and requires a more-sophisticated astrometric system.
 
 *  Create the extension to the keyword name for the current dimension.
          CALL CHR_ITOC( I, CNDIM, NC )
@@ -179,48 +203,111 @@
          KEYWRD = ' '
          KEYWRD = 'CRVAL'//CNDIM( :NC )
          CALL IMGKWD( IMDESC, KEYWRD, REFV, ERR )
-         THERE = ERR .EQ. IMOK
-         IF ( .NOT. THERE .AND. USEDEF ) REFV = 1.0D0
+         GCRVAL = ERR .EQ. IMOK
 
-*  The co-ordinate must be present to make any sense of an axis
-*  structure.
-         IF ( THERE ) THEN
+*  If not found, use a default of 1.0 for CRVAL if required.
+         IF ( .NOT. GCRVAL .AND. USEDEF ) REFV = 1.0D0
 
-*  Obtain the value of the element number of the reference pixel.
-            KEYWRD = 'CRPIX'//CNDIM( :NC )
-            CALL IMGKWD( IMDESC, KEYWRD, REFP, ERR )
+*  Initialise the largest absolute CD value found so far for the current
+*  world coordinate axis.
+         MAXCD = -1.0
+
+*  Go through each pixel axis (i.e. each axis of the NDF) to find the one
+*  which is most nearly parallel to the current world coordinate axis. 
+*  This is taken to be the axis with the largest absolute CDi_j value.
+         GCD = .FALSE.
+         DO J = 1, NDIM
+
+*  Get the value of CDi_j (the rate of change of world coordinate axis i
+*  with respect to pixel axis j).
+            KEYWRD = 'CD'
+            IAT = 2
+            CALL CHR_PUTI( I, KEYWRD, IAT )
+            CALL CHR_APPND( '_', KEYWRD, IAT )
+            CALL CHR_PUTI( J, KEYWRD, IAT )
+            CALL IMGKWD( IMDESC, KEYWRD, CD_I( J ), ERR )
             THERE = ERR .EQ. IMOK
-            IF ( .NOT. THERE .AND. USEDEF ) REFP = 1.0D0
 
-*  The reference pixel must be present to make any sense of an axis
-*  structure.
-            IF ( THERE ) THEN
-
-*  Obtain the increment of physical co-ordinate between adjacent
-*  pixels.  The co-ordinate increment per pixel must be present to make
-*  any sense of an axis structure.
-               KEYWRD = 'CDELT'//CNDIM( :NC )
-               CALL IMGKWD( IMDESC, KEYWRD, DELT, ERR )
-               THERE = ERR .EQ. IMOK
-
-*  If absent, look for the synonym CDn_n first.
-               IF ( .NOT. THERE ) THEN
-                  KEYWRD = 'CD'//CNDIM//'_'//CNDIM
-
-*  Obtain the value for the reference pixel.
-                  CALL IMGKWD( IMDESC, KEYWRD, DELT, ERR )
-                  THERE = ERR .EQ. IMOK
-
-                  IF ( .NOT. THERE .AND. USEDEF ) DELT = 1.0D0
+*  If CDi_j was not found, use a default of 1.0 for diagonal terms and
+*  zero for off diagonal.
+            IF( .NOT. THERE ) THEN
+               IF( I .EQ. J ) THEN
+                  CD_I( J ) = 1.0
+               ELSE
+                  CD_I( J ) = 0.0
                END IF
+
+*  Note if any CD matrix elements were found.
+            ELSE
+               GCD = .TRUE.
             END IF
+
+*   Note the largest CD term for this world axis. 
+            IF( ABS( CD_I( J ) ) .GT. MAXCD ) THEN
+               MAXCD = ABS( CD_I( J ) )
+               JMAX = J
+            END IF
+
+         END DO
+
+*  We now have the index of the NDF axis which contributes most to the
+*  current world coordinate axis. See if any other NDF axes make
+*  significant contributions to it.
+         IF( GCD ) THEN
+            DO J = 1, NDIM
+               IF( J .NE. JMAX ) THEN
+
+*  If we find another significant axis, the world coordinate axes are 
+*  not parallel to the NDF axes. In this case, leave the loop without
+*  creating any further AXIS structures. EPS should be a small constant
+*  value, but how small? 
+                  NONPAR = ( ABS( CD_I( J ) ) .GT. MAXCD*EPS )
+                  IF( NONPAR ) GO TO 10
+
+               END IF
+            END DO
          END IF
-      
+
+*  We arrive here only if the CD matrix indicates that the NDF and world 
+*  coordinate axes are parallel.
+
+*  If no CD matrix was obtained, attempt to get a value for CDELTi. This is 
+*  a scaling factor for values on the i'th world coordinate axis.
+         IF( .NOT. GCD ) THEN
+            KEYWRD = 'CDELT'//CNDIM( :NC )
+            CALL IMGKWD( IMDESC, KEYWRD, CDELTI, ERR )
+            GCDELT = ERR .EQ. IMOK
+         ELSE
+            GCDELT = .FALSE.
+         END IF
+
+*  Use a default of 1.0 for CDELT if required. Note, if a CD matrix
+*  was found, then we can default CDELT even if USEDEF is .FALSE.
+*  since the CD matrix implies a CDELT value.
+         IF ( .NOT. GCDELT .AND. ( USEDEF .OR. GCD ) ) CDELTI = 1.0D0
+
+*  Find the total scaling term from pixels on NDF axis JMAX to world
+*  coordinates on axis I.
+         DELT = CDELTI * CD_I( JMAX )
+
+*  Obtain the value of the element number of the reference pixel on the
+*  NDF axis parallel to the current world axis.
+         KEYWRD = 'CRPIX'
+         IAT = 5
+         CALL CHR_PUTI( JMAX, KEYWRD, IAT )
+         CALL IMGKWD( IMDESC, KEYWRD, REFP, ERR )
+         GCRPIX = ERR .EQ. IMOK
+
+*  If not found, use a default of 1.0 for CRPIX if required.
+         IF ( .NOT. GCRPIX .AND. USEDEF ) REFP = 1.0D0
+
+*  Abort if an error has occurred.
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Decide the data type of the axis centres.
 *  =========================================
-         IF ( THERE .OR. USEDEF ) THEN
+         IF ( ( GCRVAL .AND. GCRPIX .AND. ( GCD .OR. GCDELT ) ) 
+     :        .OR. USEDEF ) THEN
 
 *  Set the flag to indicate that at least one axis-centre array has been
 *  defined.
@@ -236,8 +323,12 @@
 
 *  Obtain the value as a string.  There is no need to test for an error
 *  because it would have been detected earlier.
-               KEYWRD = 'CRVAL'//CNDIM( :NC )
-               CALL IMGKWC( IMDESC, KEYWRD, VALUE, ERR )
+               IF( GCRVAL ) THEN
+                  KEYWRD = 'CRVAL'//CNDIM( :NC )
+                  CALL IMGKWC( IMDESC, KEYWRD, VALUE, ERR )
+               ELSE 
+                  VALUE = '1.0'
+               END IF
 
 *  Find the number of significant digits in the numerical value.
                CALL CON_SGDIG( VALUE, NSDIG, STATUS )
@@ -278,8 +369,8 @@
             IF ( ITYPE .EQ. '_REAL' ) THEN
 
 *  Map the centre array in the axis structure.
-               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'WRITE', PNTR, 
-     :                        EL, STATUS )
+               CALL NDF_AMAP( NDF, 'Centre', JMAX, '_REAL', 'WRITE', 
+     :                        PNTR, EL, STATUS )
 
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
@@ -291,17 +382,17 @@
      :              CALL COI_ALOGR( EL, %VAL( PNTR( 1 ) ), STATUS )
 
 *  Unmap the axis array.
-                  CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )
+                  CALL NDF_AUNMP( NDF, 'Centre', JMAX, STATUS )
                END IF
 
 *  Double precision is required.
             ELSE
 
 *  Ensure that the type is double precision.
-               CALL NDF_ASTYP( '_DOUBLE', NDF, 'Centre', I, STATUS )
+               CALL NDF_ASTYP( '_DOUBLE', NDF, 'Centre', JMAX, STATUS )
 
 *  Map the centre array in the axis structure.
-               CALL NDF_AMAP( NDF, 'Centre', I, '_DOUBLE', 'WRITE',
+               CALL NDF_AMAP( NDF, 'Centre', JMAX, '_DOUBLE', 'WRITE',
      :                        PNTR, EL, STATUS )
 
 *  Test status before accessing the pointer.
@@ -314,7 +405,7 @@
      :              CALL COI_ALOGD( EL, %VAL( PNTR( 1 ) ), STATUS )
 
 *  Unmap the axis array.
-                  CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )
+                  CALL NDF_AUNMP( NDF, 'Centre', JMAX, STATUS )
                END IF
             END IF
 
@@ -334,7 +425,8 @@
 
 *  Write the label to the axis structure, using only the length actually
 *  required.
-               CALL NDF_ACPUT( LABEL( :NCL ), NDF, 'Label', I, STATUS )
+               CALL NDF_ACPUT( LABEL( :NCL ), NDF, 'Label', JMAX, 
+     :                         STATUS )
             END IF
 
 *  Obtain the units of the axis.  Axis units is not part of the FITS
@@ -350,7 +442,8 @@
                NCU = CHR_LEN( UNITS )
 
 *  Write the units to the axis structure.
-               CALL NDF_ACPUT( UNITS( :NCU ), NDF, 'Units', I, STATUS )
+               CALL NDF_ACPUT( UNITS( :NCU ), NDF, 'Units', JMAX, 
+     :                         STATUS )
             END IF
 
 *  Obtain the axis label and units from IRAF MWCS headers.
@@ -373,7 +466,7 @@
 *  NDF.
                IF ( THERE ) THEN
                   NCL = CHR_LEN( LABEL )
-                  CALL NDF_ACPUT( LABEL( :NCL ), NDF, 'Label', I,
+                  CALL NDF_ACPUT( LABEL( :NCL ), NDF, 'Label', JMAX,
      :                            STATUS )
                END IF
 
@@ -386,7 +479,7 @@
 *  the NDF.
                IF ( THERE ) THEN
                   NCU = CHR_LEN( UNITS )
-                  CALL NDF_ACPUT( UNITS( :NCU ), NDF, 'Units', I,
+                  CALL NDF_ACPUT( UNITS( :NCU ), NDF, 'Units', JMAX,
      :                            STATUS )
                END IF
 
@@ -405,7 +498,9 @@
       END DO
 
 *  Delete the axis structure if it is just the default created earlier.
-      IF ( .NOT. DFAXIS ) CALL NDF_RESET( NDF, 'Axis', STATUS )
+  10  CONTINUE
+      IF ( NONPAR .OR. .NOT. DFAXIS ) CALL NDF_RESET( NDF, 'Axis', 
+     :                                                STATUS )
 
   999 CONTINUE
 
