@@ -79,16 +79,14 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'FRI_CMN'                                 ! FRI globals
-*        FRI_INIT = LOGICAL (given and returned)
-*           FRI definitions load attempted?
+      INCLUDE 'AST_PKG'
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
       EXTERNAL			FRI1_CHK
       EXTERNAL			FRI1_GET
       EXTERNAL			FRI1_PUT
@@ -100,16 +98,21 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Load methods for reading and writing references
-      CALL ADI_DEFMTH( 'ChkRef(_HDSfile,_CHAR)', FRI1_CHK,
+*  Not already loaded?
+      IF ( .NOT. AST_QPKGI( FRI__PKG ) ) CALL FRI0_INIT( STATUS )
+
+*    Load methods for reading and writing references
+        CALL ADI_DEFMTH( 'ChkRef(_HDSfile,_CHAR)', FRI1_CHK,
      :                                       DID, STATUS )
-      CALL ADI_DEFMTH( 'GetRef(_HDSfile,_CHAR)', FRI1_GET,
+        CALL ADI_DEFMTH( 'GetRef(_HDSfile,_CHAR)', FRI1_GET,
      :                                       DID, STATUS )
-      CALL ADI_DEFMTH( 'PutRef(_HDSfile,_CHAR,_)', FRI1_PUT,
+        CALL ADI_DEFMTH( 'PutRef(_HDSfile,_CHAR,_)', FRI1_PUT,
      :                                       DID, STATUS )
 
 *  Mark as initialised
-      FRI_INIT = .TRUE.
+        CALL AST_SPKGI( FRI__PKG )
+
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'FRI0_INIT', STATUS )
