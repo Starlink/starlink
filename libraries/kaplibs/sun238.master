@@ -283,6 +283,11 @@ contain the internal routines from KAPPA which are deemed to be
 ``generally useful''. Now, you only need to have KAPLIBS installed to
 build your software, not the much larger KAPPA.
 
+There are a large number of routines in KAPLIBS, making it potentially
+difficult to find the routines you want. To ease this problem, a search
+tool is provided which allows the contents of this document to be
+searched (see \hyperref{here}{section }{}{SEC:SEARCH}).
+
 \subsection{Stability of the KAPLIBS Interface}
 KAPLIBS was created as a pragmatic solution to the problem of
 proliferation of KAPPA source code in several other packages. One of the
@@ -395,7 +400,7 @@ Sometimes, routine names are documented as ending with a lower case
 numerical types. The \emph{actual} routines names will not include the trailing
 ``x'', but will have one of the above codes in place of the ``x''.
 
-\section{\xlabel{search}Finding the Routines you Need}
+\section{\label{SEC:SEARCH}\xlabel{search}Finding the Routines you Need}
 \begin{latexonly}
 
    The hypertext version of this document contains a tool which allows
