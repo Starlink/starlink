@@ -119,11 +119,39 @@
             -value { 6 94 } \
             -valuevar percentiles
       }
+      itk_component add abort {
+         buttoncontrol $panel.abort \
+            -text "Abort" \
+            -cmd [ code $this deactivate ] \
+            -balloonstr "Abort the application"
+      }
+      itk_component add abortdialog {
+         iwidgets::messagedialog $itk_component(abort).confirm \
+            -bitmap questhead \
+            -modality application \
+            -master $this \
+            -title "Confirm Abort" \
+            -text "Do you wish to abort the application?"
+      } {
+         ignore -modality
+      }
+      $itk_component(abortdialog) buttonconfigure Cancel \
+         -text "Continue application"
+      $itk_component(abortdialog) buttonconfigure OK \
+         -text "Abort application"
+      $itk_component(abortdialog) hide Help
+      $itk_component(abort) configure -confirmcmd \
+         "\[ $itk_component(abortdialog) center $itk_component(hull); \
+             $itk_component(abortdialog) activate \]"
 
 #  Add new control widgets to the panel.
       addcontrol $itk_component(wcsframe) style
       addcontrol $itk_component(dstyle) style
       addcontrol $itk_component(percut) cutoff
+      addcontrol $itk_component(abort) action
+
+#  Switch the positions of the Abort and Exit buttons.
+      pack $itk_component(exit) -after $itk_component(abort)
 
 #  Rearrange the control widget groups into two rows.
       itk_component add row1 { frame [ panel ].row1 }
