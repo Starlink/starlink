@@ -59,11 +59,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     20 Mar 1995 (DJA):
 *        Original version.
+*     21 Oct 1997 (RB):
+*        Initialise STATUS variable.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -96,6 +99,7 @@
       IF ( DYN_ISINIT ) THEN
 
 *    Start new error context
+        STATUS = SAI__OK
         CALL ERR_BEGIN( STATUS )
 
 *    Loop over sections
