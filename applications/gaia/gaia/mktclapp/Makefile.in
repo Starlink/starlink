@@ -144,6 +144,7 @@ gaia_stcl.c: $(MKTCLAPP) library/gaia_stcl.tcl
 $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o FORCE
 	@echo "linking \"$(TKPROG)\"..."
 	- ar d $(LIBDIR)/libskycat.a proj.o
+	- @RANLIB@ $(LIBDIR)/libskycat.a
 	$(CXX) $(CC_SWITCHES) tkAppInit.o gaia_swish.o -o $(TKPROG)  \
 	   $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
 	   $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
