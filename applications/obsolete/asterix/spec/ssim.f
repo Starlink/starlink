@@ -140,7 +140,7 @@
       FOUND = .FALSE.
 
 *  Read input file
-      CALL USI_ASSOC( 'INP', '*', 'READ', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
       CALL FIT_GETINS( IFID, 0, 1, FOUND, INSTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF(.NOT.FOUND)THEN
