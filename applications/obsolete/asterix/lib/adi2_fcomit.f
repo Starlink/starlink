@@ -98,7 +98,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Extract logical unit
-      CALL ADI_CGET0I( FID, '.NHDU', NHDU, STATUS )
+      CALL ADI_CGET0I( FID, 'Nhdu', NHDU, STATUS )
 
 *  Commit units and keywords
       CALL ADI2_CHKPRV( FID, NHDU, .TRUE., STATUS )
@@ -227,7 +227,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Extract logical unit
-      CALL ADI_CGET0I( FID, '.LUN', LUN, STATUS )
+      CALL ADI2_GETLUN( FID, LUN, STATUS )
 
 *  Get number of keywords
       CALL ADI_NCMP( HID, NKEY, STATUS )

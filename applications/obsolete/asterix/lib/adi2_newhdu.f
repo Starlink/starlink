@@ -1,4 +1,4 @@
-      SUBROUTINE ADI2_NEWHDU( ID, HDUNAME, STATUS )
+      SUBROUTINE ADI2_NEWHDU( FID, HDUNAME, STATUS )
 *+
 *  Name:
 *     ADI2_NEWHDU
@@ -120,7 +120,7 @@
 
 *  Write property name so that ADI can do number -> HDU name mapping
       CALL CHR_ITOC( NHDU, STR, NDIG )
-      CALL ADI_CPUT0C( FID, '.HDU_'//STR(:NDIG), HDU, STATUS )
+      CALL ADI_CPUT0C( FID, '.HDU_'//STR(:NDIG), HDUNAME, STATUS )
 
 *  Relase new HDU
       CALL ADI_ERASE( HID, STATUS )
