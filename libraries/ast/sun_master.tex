@@ -23,7 +23,7 @@ f+
 \newcommand{\stardocnumber}    {210.11}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {19th August 2002}
+\newcommand{\stardocdate}      {23th October 2002}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -17680,12 +17680,10 @@ etc., on certain platforms (MacOS, for instance).
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V1.8-8}
+\subsection{Changes Introduced in V1.8-8}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V1.8-7 and V1.8-8 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V1.8-7 and V1.8-8:
 
 \begin{enumerate}
 
@@ -17723,6 +17721,82 @@ produced by the Plot class. These bugs were to do with the way in which
 graphical elements relating to a specific axis (e.g. {\tt Colour(axis1)}, etc.) 
 interacted with the corresponding generic element (e.g. 
 {\tt Colour(axes)}, etc.).
+
+\end{enumerate}
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V1.8-13}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.8-8 and V1.8-13 (the
+current version):
+
+\begin{enumerate}
+
+\item The FitsChan class has been modified so that LONPOLE keywords
+c+
+are only produced by astWrite when necessary. For zenithal projections such as 
+TAN, the LONPOLE keyword can always take its default value and so is
+not included in the FITS header produced by astWrite.
+c-
+f+
+are only produced by AST\_WRITE when necessary. For zenithal projections such as 
+TAN, the LONPOLE keyword can always take its default value and so is
+not included in the FITS header produced by AST\_WRITE
+f-
+Previously, the unnecessary production of a LONPOLE keyword could prevent
+FrameSets being written out using encodings which do not support the
+LONPOLE keyword (such as FITS-IRAF).
+
+\item The FitsChan class has been modified to retain leading and trailing
+spaces within COMMENT cards.
+
+\item The FitsChan class has been modified to only use CTYPE comments as 
+axis labels if all non-celestial axes have unique non-blank comments
+(otherwise the CTYPE keyword values are used as labels).
+
+\item The FitsChan class has been modified to use latest list of FITS-WCS 
+projections, as described in the FITS-WCS paper II, "Representations of
+celestial coordinates in FITS" (Calabretta \& Greisen, draft dated 23
+April 2002). One consequence of this is that the polynomial correction
+terms which previous drafts have allowed to be associated with TAN
+projections are no longer available. However, support for an AST-specific
+projection code "TPN" has been introduced into the FitsChan and WcsMap
+classes which retains the old behaviour of the TAN projection (i.e.
+allows polynomial correction terms to be associated with longitude and/or
+latitude axes). Existing TAN headers which include projection parameters
+are translated into ``TPN'' by the astRead method, as are TNX and DSS
+c+
+headers. The astWrite method produces TPN headers when using FITS-WCS
+c-
+f+
+headers. The AST\_WRITE routine produces TPN headers when using FITS-WCS
+f-
+encoding if the FrameSet requires a TAN projection with polynomial
+correction terms. Obviously, these TPN headers will not be recognized by
+other FITS readers unless the reader uses the AST library internally.
+This anomolous situation will hopefully be cleared up when the FITS-WCS
+paper IV is published, which specifies how such corrections should be
+encoded in a FITS header.
+
+\item The WcsMap class has additional projection types of AST\_\_TPN (see
+above) and AST\_\_SZP. In addition, the usage of projection parameters
+has been brought into line with the the FITS-WCS paper II. 
+
+\item The WcsMap class has been modified so that a "get" operation on a
+projection parameter attribute will return the default value defined in the
+FITS-WCS paper II if no value has been set for the attribute. Previously, a
+value of AST\_\_BAD was returned in such a situation.
+
+\item The Frame class has new attributes Top(axis) and Bottom(axis) which
+allow a ``plottable range'' to be specified for each Frame axis. The grid
+c+
+produced by the astGrid method will not extend beyond these limits.
+c-
+f+
+produced by the AST\_GRID routine will not extend beyond these limits.
+f-
 
 \end{enumerate}
 
