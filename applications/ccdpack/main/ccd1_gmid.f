@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_GMID( GRAPH, NEDGES, NNODE, IP, IL, X1, Y1, X2,
+      SUBROUTINE CCD1_GMID( GRAPH, NEDGES, HINODE, IP, IL, X1, Y1, X2,
      :                      Y2, N, TOLS, OFFS, ID1, ID2, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_GMID( GRAPH, NEDGES, NNODE, IP, IL, X1, Y1,
+*     CALL CCD1_GMID( GRAPH, NEDGES, HINODE, IP, IL, X1, Y1,
 *                     X2, Y2, N, TOLS, OFFS, ID1, ID2, STATUS )
 
 *  Description:
@@ -35,9 +35,9 @@
 *        The indices of an edges positions list are (4,*) in this array.
 *     NEDGES = INTEGER (Given)
 *        The number of edges in the spanning graph.
-*     NNODE = INTEGER (Given)
-*        The number of nodes in the input graph (NEDGES-1 for a spanning
-*        graph).
+*     HINODE = INTEGER (Given)
+*        The index of the highest-indexed node which may be in the 
+*        input graph.  The lowest is assumed to be 1.
 *     IP( N ) = INTEGER (Given and Returned)
 *        Workspace
 *     IL( N ) = INTEGER (Given and Returned)
@@ -95,6 +95,8 @@
 *        Complete rewrite.
 *     11-JUL-2001 (MBT):
 *        Added TOLS argument.
+*     11-FEB-2002 (MBT):
+*        Now receives rather than calculating the range of referenced nodes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,12 +109,11 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
 
 *  Arguments Given:
       INTEGER NEDGES
       INTEGER GRAPH( 4, NEDGES )
-      INTEGER NNODE
+      INTEGER HINODE
       INTEGER N
       DOUBLE PRECISION X1( N )
       DOUBLE PRECISION Y1( N )
@@ -141,12 +142,10 @@
       DOUBLE PRECISION YN        ! Current X position
       INTEGER CHANGE             ! Numbers of identifiers changed this time
       INTEGER EDGE               ! Current edge
-      INTEGER FNODE              ! First node number
       INTEGER I                  ! Loop variable
       INTEGER ID                 ! Identifier count
       INTEGER IDN                ! Current identifier
       INTEGER J                  ! Loop variable
-      INTEGER LNODE              ! Last node number
       INTEGER NIT                ! Number of iterations
       INTEGER NODE               ! Current node
       INTEGER NPOS               ! Number of positions associated with a node
@@ -167,16 +166,6 @@
  2       CONTINUE
  1    CONTINUE
 
-*  Find the span of node numbers.
-      FNODE = VAL__MAXI
-      LNODE = VAL__MINI
-      DO 4 EDGE = 1, NEDGES
-         IF ( GRAPH( 1, EDGE ) .GT. LNODE ) LNODE = GRAPH( 1, EDGE )
-         IF ( GRAPH( 2, EDGE ) .GT. LNODE ) LNODE = GRAPH( 2, EDGE )
-         IF ( GRAPH( 1, EDGE ) .LT. FNODE ) FNODE = GRAPH( 1, EDGE )
-         IF ( GRAPH( 2, EDGE ) .LT. FNODE ) FNODE = GRAPH( 2, EDGE )
- 4    CONTINUE
-
 *  Look at the nodes in turn. While IDs change using the method of
 *  identifying positions with the same positions and different IDs
 *  keep iterating. Convergence should ensure a reasonable number of
@@ -190,7 +179,7 @@
  3    CONTINUE
 
 *  For each node...
-      DO 5 NODE = FNODE, LNODE
+      DO 5 NODE = 1, HINODE 
 
 *  Identify all the edges which have this node.
          NPOS = 0 

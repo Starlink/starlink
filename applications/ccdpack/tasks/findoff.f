@@ -475,6 +475,9 @@
 *     22-MAY-2001 (MBT):
 *        Changed to write an empty list file rather than no list file
 *        at all.
+*     11-FEB-2002 (MBT):
+*        Modified a call to CCD1_GMMP to take care of an uninitialised
+*        array bug when OVERRIDE is true.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1274,9 +1277,9 @@
                METHOD = 'SLOW'
                CALL CCD1_MALL( NPOSS, '_DOUBLE', IPWRK2, STATUS )
                CALL CCD1_MALL( NPOSS, '_INTEGER', IPWRK3, STATUS )
-               CALL CCD1_MALL( NRECN( J ) + 2, '_INTEGER', IPWRK4, 
+               CALL CCD1_MALL( NUMI2 + 2, '_INTEGER', IPWRK4, 
      :                         STATUS )
-               CALL CCD1_MALL( NRECN( J ) + 2, '_INTEGER', IPWRK5, 
+               CALL CCD1_MALL( NUMI2 + 2, '_INTEGER', IPWRK5, 
      :                         STATUS )
                CALL CCD1_SOFF( ERROR * PIXSIZ, MAXDIS * PIXSIZ, 
      :                         %VAL( IPXI1 ), %VAL( IPYI1 ),
@@ -1500,10 +1503,9 @@
          DO I = 1, NSUP
             TOLS( I ) = 0D0
          END DO
-         CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, NNODE, IPXO1, IPYO1,
+         CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, NSUP, IPXO1, IPYO1,
      :                   IPRCN1, IPXO2, IPYO2, IPRCN2, NMAT, TOLS,
      :                   OFFS, IPX, IPY, IPRAN, IPID, NOUT, STATUS )
-
       ELSE
 
 *  Set STATUS and issue error (may change this to cope with error

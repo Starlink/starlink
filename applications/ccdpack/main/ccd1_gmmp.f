@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_GMMP( GRAPH, NEDGES, NNODE, IPX1, IPY1, IPRAN1,
+      SUBROUTINE CCD1_GMMP( GRAPH, NEDGES, HINODE, IPX1, IPY1, IPRAN1,
      :                      IPX2, IPY2, IPRAN2, NIN, TOLS, OFFS, IPX,
      :                      IPY, IPRANK, IPIDS, NOUT, STATUS )
 *+
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_GMMP( GRAPH, NEDGES, NNODE, IPX1, IPY1, IPRAN1, IPX2,
+*     CALL CCD1_GMMP( GRAPH, NEDGES, HINODE, IPX1, IPY1, IPRAN1, IPX2,
 *                     IPY2, IPRAN, NIN, TOLS, OFFS, IPX, IPY, IPRANK, 
 *                     IPIDS, NOUT, STATUS )
 
@@ -27,9 +27,9 @@
 *        The indices of an edges positions list are (4,*) in this array.
 *     NEDGES = INTEGER (Given)
 *        The number of edges in the spanning graph.
-*     NNODE = INTEGER (Given)
-*        The number of nodes in the input graph (NEDGES+1 for a spanning
-*        graph).
+*     HINODE = INTEGER (Given)
+*        The index of the highest-indexed node which may be in the 
+*        input graph.  The lowest is assumed to be 1.
 *     IPX1( * ) = INTEGER (Given)
 *        Pointer to X positions related to edge. These are indexed
 *        by IPX1( GRAPH( 4, * ) ).
@@ -86,6 +86,8 @@
 *     NOUT( * ) = INTEGER (Returned)
 *        The numbers of positions matched at each node. The index to
 *        this array and IPX, IPY, IPIDS and IPRANK are the node numbers.
+*        The first HINODE elements of this array will be returned 
+*        correctly.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -101,6 +103,9 @@
 *        Added the IPRAN1, IPRAN2 and IPRANK parameters.
 *     11-JUL-2001 (MBT):
 *        Added TOLS parameter.
+*     11-FEB-2002 (MBT):
+*        Fixed a bug in which elements of NOUT were uninitialised for a
+*        non-spanning graph.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -113,12 +118,11 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
 
 *  Arguments Given:
       INTEGER NEDGES
       INTEGER GRAPH( 4, NEDGES )
-      INTEGER NNODE
+      INTEGER HINODE
       INTEGER IPX1( * )
       INTEGER IPY1( * )
       INTEGER IPRAN1( * )
@@ -142,7 +146,6 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER FNODE              ! First node index
       INTEGER I                  ! Loop variable
       INTEGER IIN                ! Offset into lists
       INTEGER IPAR1              ! Pointer to workspace
@@ -156,7 +159,6 @@
       INTEGER IP                 ! Pointer to workspace
       INTEGER IL                 ! Pointer to workspace
       INTEGER J                  ! Loop variable
-      INTEGER LNODE              ! Last node index
       INTEGER NEED               ! Total number of positions
 *.
 
@@ -209,24 +211,13 @@
       IIN = IIN - 1
 
 *  Now do the work of generating the matched identifiers.
-      CALL CCD1_GMID( GRAPH, NEDGES, NNODE, %VAL( IP ), %VAL( IL ),
+      CALL CCD1_GMID( GRAPH, NEDGES, HINODE, %VAL( IP ), %VAL( IL ),
      :                %VAL( IPAX1 ), %VAL( IPAY1 ), %VAL( IPAX2 ),
      :                %VAL( IPAY2 ), IIN, TOLS, OFFS, %VAL( IPI1 ),
      :                %VAL( IPI2 ), STATUS )
 
-*  Get workspace for the output lists.
-*  First find the span of node numbers.
-      FNODE = VAL__MAXI
-      LNODE = VAL__MINI
-      DO 3 I = 1, NEDGES
-         IF ( GRAPH( 1, I ) .GT. LNODE ) LNODE = GRAPH( 1, I )
-         IF ( GRAPH( 2, I ) .GT. LNODE ) LNODE = GRAPH( 2, I )
-         IF ( GRAPH( 1, I ) .LT. FNODE ) FNODE = GRAPH( 1, I )
-         IF ( GRAPH( 2, I ) .LT. FNODE ) FNODE = GRAPH( 2, I )
- 3    CONTINUE
-
 *  Reset number of output entries per-node.
-      DO 4 I = FNODE, LNODE
+      DO 4 I = 1, HINODE
          NOUT( I ) = 0
  4    CONTINUE
 
@@ -239,7 +230,7 @@
 
 *  Loop over all node numbers, extracting values for those nodes which
 *  have been used.
-      DO 6 I = FNODE, LNODE
+      DO 6 I = 1, HINODE
          IF ( NOUT( I ) .GT. 0 ) THEN
             CALL CCD1_MALL( NOUT( I ), '_DOUBLE', IPX( I ), STATUS )
             CALL CCD1_MALL( NOUT( I ), '_DOUBLE', IPY( I ), STATUS )

@@ -437,6 +437,8 @@
 *        Added new TOLER parameter.
 *     18-JUL-2001 (MBT):
 *        Changed the way that centroiding is done.
+*     11-FEB-2002 (MBT):
+*        Modified call to CCD1_GMMP to fix an uninitialised array bug.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -718,7 +720,7 @@
 
 *  Generate the ID's for the output lists. Matching positions between
 *  the lists and finally merging all positions for each node.
-      CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, TOTNOD, IPX1, IPY1, IPRAN1,
+      CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, NSET, IPX1, IPY1, IPRAN1,
      :                IPX2, IPY2, IPRAN2, NMAT, TOLS, OFFS, IPXO, IPYO,
      :                IPRAN, IPID, NOUT, STATUS )
 
