@@ -12036,7 +12036,7 @@ f       The following symbolic values are defined in GRF_PAR:
 *       GRF__COLOUR (Colour index).
 c     - value - 
 f     - VAL = DOUBLE PRECISION (Given) - 
-c       A new value to store for the attribute. If this is AST__BAD
+*       A new value to store for the attribute. If this is AST__BAD
 *       no value is stored.
 c     - old_value - A pointer to a double in which to return 
 f     - OLDVAL = DOUBLE PRECISION (Returned) - Returned holding
