@@ -105,7 +105,7 @@
 
 *  Local Constants:
       CHARACTER*1		NUL
-        PARAMETER		( NUL = CHAR(0) )
+C        PARAMETER		( NUL = CHAR(0) )
 
 *  Local Variables:
       CHARACTER*4		FSTR			! File number string
@@ -127,6 +127,8 @@
       LOGICAL			ISTEMP			! Temporary value?
       LOGICAL			THERE			! Object exists?
 *.
+
+      NUL=CHAR(0)
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
