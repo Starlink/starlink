@@ -9,5 +9,5 @@ bin_SCRIPTS = pgplot_link pgplot_link_adam rgb.txt
 lib_LTLIBRARIES = libpgplot.la
 
 libpgplot_la_SOURCES = 
-libpgplot_la_LIBADD = src/libpgplot_base.la drivers/libpgplot_drivers.la
+libpgplot_la_LIBADD = src/libpgplot_base.la sys/libpgplot_sys.la drivers/libpgplot_drivers.la
 
