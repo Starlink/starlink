@@ -528,6 +528,11 @@ AC_EGREP_HEADER([connect.*\(], [sys/socket.h],
 	[AC_MSG_RESULT(no); AC_DEFINE(NEED_SOCKET_PROTO)])
 
 # -----------------------------------------------------------------------
+# 	Check if we need (or can use) the socklen_t type.
+# -----------------------------------------------------------------------
+AC_CHECK_TYPES([socklen_t],,[sys/socket.h])
+
+# -----------------------------------------------------------------------
 # 	Check if we need (or can use) shared memory (sysv/shm) prototypes
 # -----------------------------------------------------------------------
 AC_MSG_CHECKING([sysv shared memory prototypes])
