@@ -188,9 +188,79 @@
           CALL BDI1_STOMAP( PSID, .TRUE., DAT__NOLOC, 0, PTR, 'REAL',
      :                      'READ', STATUS )
 
+*     Axis low or high widths?
+        ELSE IF ( (ITEM(1:5).EQ.'Axis_') .AND.
+     :            ((ITEM(8:).EQ.'LoWidth').OR.
+     :             (ITEM(8:).EQ.'HiWidth')) ) THEN
+
+*       Real widths present?
+          CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM(1:7)//'Width',
+     :                     .FALSE., CLOC, STATUS )
+          IF ( CLOC .NE. DAT__NOLOC ) THEN
+
+*        Locate the BDI private storage for the item, creating if required
+            CALL BDI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
+
+*        Map it
+            CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', .FALSE., PSID, PTR,
+     :                        NELM, STATUS )
+
+*        Create dynamic array
+            CALL DYN_MAPR( 1, NELM, WPTR, STATUS )
+
+*        Convert to widths to half-widths
+            CALL BDI1_MAP_W2HW( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
+
+*        Free mapped data
+            CALL BDI1_UNMAP_INT( PSID, STATUS )
+
+*         Return widths
+            PTR = WPTR
+
+*       Store dynamic mapped widths
+            CALL BDI1_STOMAP( PSID, .TRUE., DAT__NOLOC, 0, PTR, 'REAL',
+     :                        'READ', STATUS )
+
+          ELSE
+
+*        Clear any bad status
+            IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+
+*        Locate the main data
+            CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM(1:7)//'Data',
+     :                       .FALSE., CLOC, STATUS )
+            IF ( CLOC .NE. DAT__NOLOC ) THEN
+
+*          Locate the BDI private storage for the item, creating if required
+              CALL BDI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
+
+*          Map it
+              CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', .FALSE., PSID, PTR,
+     :                          NELM, STATUS )
+
+*          Create dynamic array
+              CALL DYN_MAPR( 1, NELM, WPTR, STATUS )
+
+*          Convert to values to half-widths
+              CALL BDI1_MAP_V2HW( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
+
+*          Free mapped data
+              CALL BDI1_UNMAP_INT( PSID, STATUS )
+
+*          Return widths
+              PTR = WPTR
+
+*          Store dynamic mapped widths
+              CALL BDI1_STOMAP( PSID, .TRUE., DAT__NOLOC, 0, PTR, 'REAL',
+     :                          'READ', STATUS )
+
+            END IF
+
+          END IF
+
         ELSE
 
-*       Report error
+*      Report error
           STATUS = SAI__ERROR
           CALL MSG_SETC( 'IT', ITEM )
           CALL ERR_REP( 'BDI1_MAP_1', 'Item ^IT does not exist',
@@ -337,5 +407,232 @@
         WIDTH(NVAL) = ABS(AXVAL(NVAL) - AXVAL(NVAL-1))
 
       END IF
+
+      END
+
+
+
+      SUBROUTINE BDI1_MAP_W2HW( NVAL, WIDTH, HWIDTH, STATUS )
+*+
+*  Name:
+*     BDI1_MAP_W2HW
+
+*  Purpose:
+*     Invent axis half-widths from axis widths
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL BDI1_MAP_W2HW( NVAL, WIDTH, HWIDTH, STATUS )
+
+*  Description:
+
+*  Arguments:
+*     NVAL = INTEGER (given)
+*        Number of axis widths to invent
+*     WIDTH(*) = REAL (given)
+*        Axis widths
+*     HWIDTH(*) = REAL (returned)
+*        Axis widths
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
+
+*  Keywords:
+*     package:bdi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     9 Aug 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER                   NVAL
+      REAL			WIDTH(*)
+
+*  Arguments Given and Returned:
+      REAL			HWIDTH(*)
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			I			! Loop over values
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert widths to half-widths
+      DO I = 1, NVAL
+        HWIDTH(I) = WIDTH(I) / 2.0
+      END DO
+
+      END
+
+
+
+      SUBROUTINE BDI1_MAP_V2HW( NVAL, VALUE, HWIDTH, STATUS )
+*+
+*  Name:
+*     BDI1_MAP_V2HW
+
+*  Purpose:
+*     Invent axis half-widths from axis values
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL BDI1_MAP_V2HW( NVAL, VALUE, HWIDTH, STATUS )
+
+*  Description:
+
+*  Arguments:
+*     NVAL = INTEGER (given)
+*        Number of axis widths to invent
+*     VALUE(*) = REAL (given)
+*        Axis values
+*     HWIDTH(*) = REAL (returned)
+*        Axis half widths
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
+
+*  Keywords:
+*     package:bdi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     9 Aug 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER                   NVAL
+      REAL			WIDTH(*)
+
+*  Arguments Given and Returned:
+      REAL			HWIDTH(*)
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			I			! Loop over values
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert values to half-widths
+      DO I = 1, NVAL-1
+        HWIDTH(I) = ABS(VALUE(I+1)-VALUE(I))/2.0
+      END DO
+      HWIDTH(NVAL) = HWIDTH(NVAL-1)
 
       END
