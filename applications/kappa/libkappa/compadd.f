@@ -196,6 +196,10 @@
 *     12-OCT-1998 (DSB):
 *        Changed the way in which the bounds of the output image are
 *        determined so that pixel origin information is retained.
+*     1998 October 23 (MJC):
+*        Fixed bug for 1-dimensional data with axes.  It now uses the
+*        the actual dimensionality as opposed to 2, as needed by the
+*        resampling tasks.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -402,7 +406,7 @@
 *  Create a section of the input NDF containing the region will actually
 *  be used (i.e. excluding any pixels which lie over the edge of the
 *  output image).
-      CALL NDF_SECT( NDFI, NDIM, LBND, UBND, NDFIS, STATUS )
+      CALL NDF_SECT( NDFI, NDIMI, LBND, UBND, NDFIS, STATUS )
 
 *  Annul the original input NDF and use the section create above instead.
       CALL NDF_ANNUL( NDFI, STATUS )
@@ -413,7 +417,7 @@
 *
 *  Take a shortcut to propagate ancillary data from the input NDF.
 *  Create a section from the input NDF of the size of the required NDF.
-      CALL NDF_SECT( NDFI, NDIM, LBNDO, UBNDO, NDFS, STATUS )
+      CALL NDF_SECT( NDFI, NDIMI, LBNDO, UBNDO, NDFS, STATUS )
 
 *  Create the output NDF based on the sub-section.  The array components
 *  and axes will be processed individually, but this enables the LABEL,
@@ -540,7 +544,7 @@
          ADIMS( 2 ) = 1
 
 *  Loop for all axes.
-         DO IAXIS = 1, NDIM
+         DO IAXIS = 1, NDIMI
 
 *  Inquire whether or not there is a variance array and derive a list
 *  of the axis array components to be processed together.  The variance
@@ -643,7 +647,7 @@
 *  =============================
 
 *  Loop for all axes.
-         DO IAXIS = 1, NDIM
+         DO IAXIS = 1, NDIMI
 
 *  Inquire whether or not there is a width array.
             WIDTH = .FALSE.
@@ -710,13 +714,13 @@
 *  Propagate the WCS component, incorporating a linear mapping between
 *  pixel coordinates. This mapping is described by a matrix and an offset
 *  vector. Set these up. 
-      DO I = 1, NDIMI*NDIMI
-         MATRIX( I ) = 0.0
+      DO I = 1, NDIMI * NDIMI
+         MATRIX( I ) = 0.0D0
       END DO
 
       DO J = 1, NDIMI
-         OFFSET( J ) = DBLE( 1 - LBND( J ) )/DBLE( COMPRS( J ) )
-         MATRIX( NDIMI*( J - 1 ) + J ) = 1.0D0/DBLE( COMPRS( J ) )
+         OFFSET( J ) = DBLE( 1 - LBND( J ) ) / DBLE( COMPRS( J ) )
+         MATRIX( NDIMI * ( J - 1 ) + J ) = 1.0D0 / DBLE( COMPRS( J ) )
       END DO
 
 *  Propagate the WCS component.
