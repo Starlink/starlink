@@ -35,7 +35,7 @@
 #include <string>
 #include <assert.h>
 
-#if HAVE_STD_NAMESPACE
+#if STD_IN_STD_NAMESPACE
 using std::vector;
 #endif
 

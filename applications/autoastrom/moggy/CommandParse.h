@@ -43,7 +43,7 @@
 #include <map>
 #endif
 
-#if HAVE_STD_NAMESPACE
+#if STD_IN_STD_NAMESPACE
 using std::string;
 using std::vector;
 #define STD std

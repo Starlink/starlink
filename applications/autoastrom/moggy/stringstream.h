@@ -43,7 +43,7 @@
 
 #include <sstream>
 
-#if HAVE_STD_NAMESPACE
+#if STD_IN_STD_NAMESPACE
 #define SSTREAM std::ostringstream
 #else
 #define SSTREAM ostringstream
@@ -56,7 +56,7 @@
 
 #include <strstream>
 
-#if HAVE_STD_NAMESPACE
+#if STD_IN_STD_NAMESPACE
 #define SSTREAM std::ostrstream
 #else
 #define SSTREAM std::ostrstream

@@ -77,7 +77,7 @@ static const char RCSID[] =
 #include "util.h"
 #include "verbosity.h"
 
-#ifdef STD_IN_STD_NAMESPACE
+#if STD_IN_STD_NAMESPACE
 /* Following probably needed for Alphas, but there are other iostream issues on
    Alphas, including an issue with __NO_USE_STD_IOSTREAM - see section 7.1.2
    of the (Alpha) C++ Using Guide" */
