@@ -25,7 +25,8 @@
 *     In addition, the application reduces the component switches of an
 *     exposure to give the exposure result. Optionally, the routine will
 *     divide the internal calibrator signal into the data before doing either
-*     of these things. 
+*     of these things. It is also possible to select a single switch
+*     from the input data.
 
 *  Usage:
 *     reduce_switch IN USE_CALIBRATOR SPIKE_LEVEL OUT
@@ -51,10 +52,12 @@
 *  Examples:
 *     reduce_switch
 *        All parameters will be requested.
-*     reduce_switch IN=test USE_CALIBRATOR=no SPIKE_LEVEL=0 OUT=nosw
+*     reduce_switch test OUT=nosw \
 *        This will reduce the switch from input file test.sdf without dividing
 *        by the calibrator signal and no toleration of spikes detected by
 *        the transputers. The output data will be written to nosw.sdf.
+*     reduce_switch test OUT=nosw SWITCH=2 \
+*        This will selecte switch 2 from test.sdf and write it to nosw.sdf
 
 *  Notes:
 *     If the input file is not found in the current directory, the directory
@@ -115,6 +118,9 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.18  1997/06/05 22:28:11  timj
+*     Initialise pointer variables.
+*
 *     Revision 1.17  1997/05/22 03:33:22  timj
 *     Use SCULIB_SEARCH_DATADIR routine.
 *
@@ -286,6 +292,18 @@ c
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
+
+*     Initialise variables
+      DEMOD_DATA_PTR = 0
+      DEMOD_DATA_END = 0
+      DEMOD_VARIANCE_PTR = 0
+      DEMOD_VARIANCE_END = 0
+      DEMOD_CALIBRATOR_PTR = 0
+      DEMOD_CALIBRATOR_END = 0
+      DEMOD_CAL_VARIANCE_PTR = 0
+      DEMOD_CAL_VARIANCE_END = 0
+      DEMOD_QUALITY_PTR = 0
+      DEMOD_QUALITY_END = 0
 
 *     Set the MSG output level (for use with MSG_OUTIF)
       CALL MSG_IFGET('MSG_FILTER', STATUS)
