@@ -71,6 +71,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.3  1998/05/20 22:21:17  timj
+*     Make sure index range checking is correct (GE 1 instead of .GT.1)
+*
 *     Revision 1.2  1998/05/20 19:18:36  timj
 *     Distinguish not having enough memory from not having a large
 *     enough grid.
@@ -137,8 +140,8 @@
      :        (NDF_QMASK(IN_QUALITY(I), BADBIT))) THEN
 
 *     Check that the index is within range
-            IF ((IJ(1,I) .LE. NX) .AND. (IJ(1,I) .GT. 1) .AND.
-     :           (IJ(2,I) .LE. NY) .AND. (IJ(2,I) .GT. 1)) THEN
+            IF ((IJ(1,I) .LE. NX) .AND. (IJ(1,I) .GE. 1) .AND.
+     :           (IJ(2,I) .LE. NY) .AND. (IJ(2,I) .GE. 1)) THEN
 
 *     GRID tells us the 'Z' position in the output array
                GRID(IJ(1,I), IJ(2,I)) = GRID(IJ(1,I), IJ(2,I)) + 1
