@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_NMID( INDF, ID, MATCH, STATUS )
+      SUBROUTINE CCD1_NMID( INDF, ID, JNDF, MATCH, STATUS )
 *+
 *  Name:
 *     CCD1_NMID
@@ -10,12 +10,12 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_NMID( INDF, ID, MATCH, STATUS )
+*     CALL CCD1_NMID( INDF, ID, JNDF, MATCH, STATUS )
 
 *  Description:
 *     This routine checks a given NDF to see whether it matches the ID
 *     string.  The ID string is (of the same type as) that written by
-*     the REGISTER task to the AST file identifying framesets, so that
+*     the ASTEXP task to the AST file identifying framesets, so that
 *     matching is in the sense defined by that task.  The ID string 
 *     consists of a keyword indicating the kind of test, followed by
 *     some text in a format specific to that keyword.  Currently 
@@ -24,14 +24,20 @@
 *        FITSID <fitskey> <value>
 *           An NDF matches this ID if the first FITS header card with 
 *           the keyword <fitskey> has the value <value>.  If the value 
-*           is of type CHARACTER it must be in single quotes.  <ftskey>
+*           is of type CHARACTER it must be in single quotes.  <fitskey>
 *           may be compound to permit reading of hierarchical keywords.
+*        INDEX <number>
+*           An NDF matches this ID if the JNDF argument is equal to
+*           <number>.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
 *        NDF identifier.
 *     ID = CHARACTER * ( * ) (Given)
 *        String identifying the NDF.
+*     JNDF = INTEGER (Given)
+*        Index of NDF in set being considered.  This is required so that
+*        the INDEX keyword type can work.
 *     MATCH = LOGICAL (Returned)
 *        Whether the NDF matches the given ID string.
 *     STATUS = INTEGER (Given and Returned)
@@ -62,6 +68,7 @@
       
 *  Arguments Given:
       INTEGER INDF
+      INTEGER JNDF
       CHARACTER * ( * ) ID
       
 *  Arguments Returned:
@@ -75,6 +82,7 @@
       INTEGER IAT                ! Position in string
       INTEGER IWE                ! Position of word end
       INTEGER IWS                ! Position of word start
+      INTEGER JFSET              ! Index of frameset
       
 *.
 
@@ -98,6 +106,16 @@
          IAT = IWE + 1
          CALL CHR_FIWS( ID, IAT, STATUS )
          MATCH = ID( IAT: ) .EQ. FTSVAL
+
+*  INDEX type.
+      ELSE IF ( ID( IAT:IAT + 5 ) .EQ. 'INDEX ' ) THEN
+         IAT = IAT + 6
+         CALL CHR_FIWS( ID, IAT, STATUS )
+         IWS = IAT
+         CALL CHR_FIWE( ID, IAT, STATUS )
+         IWE = IAT
+         CALL CHR_CTOI( ID( IWS:IWE ), JFSET, STATUS )
+         MATCH = JFSET .EQ. JNDF
 
 *  Unidintified ID string type
       ELSE
