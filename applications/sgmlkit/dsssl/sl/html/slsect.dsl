@@ -40,7 +40,6 @@ section ready to flow into whatever contains this.
   <description>The body of the section.
 <codebody>
 (define ($html-section$ #!optional (bod ($html-section-body$)))
-;  (let ((title (node-list-first (children (current-node)))))
   (let* ((subhead (select-elements (children (current-node))
 				   (normalize "subhead")))
 	 (title (select-elements (children subhead)
@@ -81,14 +80,8 @@ unit ready to flow into whatever contains this.
                        (process-node-list (current-node))))
               (with-mode section-reference
                  (process-node-list (current-node)))))
-         (process-children)))))
-         
-
-;(define ($html-section$ #!optional (bod ($html-section-body$)))
-;   (html-document (with-mode section-reference
-;                  (process-node-list (current-node)))
-;                bod))
-
+         (process-children))
+       navbars?: (not suppress-navig))))
 
 <routine>
 <routinename>$html-section-body$
