@@ -1,0 +1,603 @@
+{+
+{  Name:
+{     figaro.icl
+{
+{  Purpose:
+{     Start the Figaro package from Unix ICL.
+{
+{  Type of Module:
+{     ICL command list
+{
+{  Invocation:
+{     load $FIG51_DIR/figaro
+{
+{  Description:
+{     This procedure starts the Figaro package for use from ICL by
+{     defining the actions needed to execute each application.
+{
+{     This is the Unix version, the VMS version is different and called
+{     figaro.prc.
+{
+{  Authors:
+{     hme: Horst Meyerdierks (UoE, Starlink)
+{     acc: Anne Charles (RAL)
+{     acd: Clive Davenhall (UoE, Starlink)
+{     mbt: Mark Taylor (IoA, Starlink)
+{     tdca: Tim Ash (RAL, Starlink)
+{     bly: Martin Bly (RAL, Starlink)
+{     MJC: Malcolm J. Currie (RAL, Starlink)
+{     {enter_new_authors_here}
+{
+{  History:
+{     18 Aug 1992 (hme):
+{        Original Version
+{     25 Oct 1992 (hme):
+{        Scrap disk FITS read/write.
+{     25 Oct 1992 (hme):
+{        Adapted from figaro.csh.
+{     16 Nov 1992 (hme):
+{        Help added. Discontinued applications added. IGCUR added.
+{     06 Apr 1993 (hme):
+{        Five imaging routines added.
+{        creobj rather than crobj.
+{        Split let into copobj and setobj.
+{     13 Aug 1993 (hme):
+{        Split VAX/ICL monolith into three.
+{     31 May 1994 (hme):
+{        Adapt from figaro.prc for Unix ICL.
+{     20 Jul 1995 (hme):
+{        Add yc* applications.
+{     11 Oct 1995 (hme):
+{        No longer define un-ported applications.
+{     19 Nov 1997 (acc):
+{        Merge with specdre.icl
+{     22 Dec 1997 (acd)
+{        Modified date to correspond to version 5.3-0.
+{     14 Aug 1998 (mbt):
+{        Added sclean.
+{     09 Nov 1998 (acd):
+{        Added flaircomp, flairext and skyliner and help entry for sclean.
+{     21 Jun 1999 (tdca):
+{        Added twodspec applications.
+{     11 Feb 2000 (bly):
+{        Added PKG_DATE macro.
+{     30 Oct 2001 (acd):
+{        Added impos.
+{     2004 July 23 (MJC):
+{        Replaced version token.  Remove date token.
+{     {enter_changes_here}
+{
+{-
+{.
+{
+{  Define help for package.
+{
+defhelp    figaro $FIG_HELP
+defhelp    specdre $FIG_HELP
+defhelp    twodspec $FIG_HELP
+{
+{  Announce name now, version etc. below.
+{
+print ' '
+print ' ----------- Initialising for  Figaro ------------'
+{
+{  Define actions for each application.
+{
+define     abconv $FIG_DIR/figaro2
+define     abline $FIG_DIR/figaro2
+define     adjoin $FIG_DIR/figaro1
+define     alasin $FIG_DIR/figaro2
+define     alasout $FIG_DIR/figaro2
+define     aperture $FIG_DIR/figaro2
+define     arc $FIG_DIR/figaro3
+define     arc2d $FIG_DIR/figaro5
+define     arcdisp $FIG_DIR/figaro4
+define     arcgendb $FIG_DIR/figaro4
+define     arcident $FIG_DIR/figaro4
+define     arclocat $FIG_DIR/figaro4
+define     arcsdi $FIG_DIR/figaro5
+define     ascin $FIG_DIR/figaro4
+define     ascout $FIG_DIR/figaro4
+define     bbody $FIG_DIR/figaro4
+define     bclean $FIG_DIR/figaro1
+define     bfft $FIG_DIR/figaro2
+define     bsmult $FIG_DIR/figaro2
+define     cadd $FIG_DIR/figaro5
+define     caldiv $FIG_DIR/figaro2
+define     ccdlin $FIG_DIR/figaro1
+define     ccur $FIG_DIR/figaro1
+define     cdist $FIG_DIR/figaro3
+define     centers $FIG_DIR/figaro2
+define     cfit $FIG_DIR/figaro1
+define     changed $FIG_DIR/figaro5
+define     clean $FIG_DIR/figaro1
+define     clip $FIG_DIR/figaro1
+define     cmplx2i $FIG_DIR/figaro2
+define     cmplx2m $FIG_DIR/figaro2
+define     cmplx2r $FIG_DIR/figaro2
+define     cmplxadd $FIG_DIR/figaro2
+define     cmplxconj $FIG_DIR/figaro2
+define     cmplxdiv $FIG_DIR/figaro2
+define     cmplxfilt $FIG_DIR/figaro2
+define     cmplxmult $FIG_DIR/figaro2
+define     cmplxsub $FIG_DIR/figaro2
+define     coadd $FIG_DIR/figaro1
+define     colour $FIG_DIR/figaro1
+define     comb $FIG_DIR/figaro5
+define     combine $FIG_DIR/figaro1
+define     copobj $FIG_DIR/figaro1
+define     correl $FIG_DIR/figaro4
+define     cosbell $FIG_DIR/figaro2
+define     cosrej $FIG_DIR/figaro1
+define     creobj $FIG_DIR/figaro1
+define     criguass $FIG_DIR/figaro5
+define     cscan $FIG_DIR/figaro5
+define     cset $FIG_DIR/figaro1
+define     cspike $FIG_DIR/figaro2
+define     csub $FIG_DIR/figaro5
+define     cube2long $FIG_DIR/figaro5
+define     delobj $FIG_DIR/figaro1
+define     dvdplot $FIG_DIR/figaro1
+define     echarc $FIG_DIR/figaro3
+define     echfind $FIG_DIR/figaro3
+define     echmask $FIG_DIR/figaro3
+define     echmerge $FIG_DIR/figaro3
+define     echselect $FIG_DIR/figaro3
+define     editext $FIG_DIR/figaro4
+define     elsplot $FIG_DIR/figaro1
+define     emlt $FIG_DIR/figaro2
+define     errcon $FIG_DIR/figaro1
+define     esplot $FIG_DIR/figaro1
+define     evalfit $FIG_DIR/figaro4
+define     extin $FIG_DIR/figaro2
+define     extlist $FIG_DIR/figaro1
+define     extract $FIG_DIR/figaro1
+define     fet321 $FIG_DIR/figaro2
+define     ff $FIG_DIR/figaro2
+define     ffcross $FIG_DIR/figaro2
+define     fft $FIG_DIR/figaro2
+define     fib2cube $FIG_DIR/figaro5
+define     fibdisp $FIG_DIR/figaro5
+define     fibsep $FIG_DIR/figaro5
+define     figinfo $FIG_DIR/figaro1
+define     figs321 $FIG_DIR/figaro2
+define     figs322 $FIG_DIR/figaro2
+define     figs422 $FIG_DIR/figaro2
+define     figs423 $FIG_DIR/figaro2
+define     figs424 $FIG_DIR/figaro2
+define     figsee $FIG_DIR/figaro2
+define     figsflux $FIG_DIR/figaro2
+define     fillcube $FIG_DIR/figaro4
+define     findsp $FIG_DIR/figaro3
+define     fitbb $FIG_DIR/figaro4
+define     fitcont $FIG_DIR/figaro5
+define     fitgauss $FIG_DIR/figaro4
+define     fitpoly $FIG_DIR/figaro4
+define     fitset $FIG_DIR/figaro2
+define     fitskeys $FIG_DIR/figaro2
+define     fittri $FIG_DIR/figaro4
+define     flag2qual $FIG_DIR/figaro1
+define     flaircomp $FIG_DIR/figaro3
+define     flairext $FIG_DIR/figaro3
+define     flconv $FIG_DIR/figaro2
+define     foto $FIG_DIR/figaro2
+define     fscrunch $FIG_DIR/figaro1
+define     fwconv $FIG_DIR/figaro2
+define     gauss $FIG_DIR/figaro2
+define     goodvar $FIG_DIR/figaro1
+define     grow $FIG_DIR/figaro4
+define     growx $FIG_DIR/figaro1
+define     growxt $FIG_DIR/figaro1
+define     growxy $FIG_DIR/figaro1
+define     growy $FIG_DIR/figaro1
+define     growyt $FIG_DIR/figaro1
+define     gspike $FIG_DIR/figaro2
+define     hard $FIG_DIR/figaro1
+define     hcross $FIG_DIR/figaro1
+define     himage $FIG_DIR/figaro5
+define     hist $FIG_DIR/figaro1
+define     hopt $FIG_DIR/figaro1
+define     i2cmplx $FIG_DIR/figaro2
+define     iadd $FIG_DIR/figaro1
+define     iarc $FIG_DIR/figaro3
+define     icadd $FIG_DIR/figaro1
+define     icdiv $FIG_DIR/figaro1
+define     icmult $FIG_DIR/figaro1
+define     icont $FIG_DIR/figaro1
+define     iconv3 $FIG_DIR/figaro1
+define     icor16 $FIG_DIR/figaro1
+define     icset $FIG_DIR/figaro1
+define     icsub $FIG_DIR/figaro1
+define     icur $FIG_DIR/figaro1
+define     idev $FIG_DIR/figaro1
+define     idiff $FIG_DIR/figaro1
+define     idiv $FIG_DIR/figaro1
+define     igconv $FIG_DIR/figaro1
+define     igcur $FIG_DIR/figaro1
+define     igrey $FIG_DIR/figaro1
+define     ilist $FIG_DIR/figaro1
+define     ilog $FIG_DIR/figaro1
+define     image $FIG_DIR/figaro1
+define     impos $FIG_DIR/figaro2
+define     imult $FIG_DIR/figaro1
+define     interp $FIG_DIR/figaro2
+define     iplots $FIG_DIR/figaro1
+define     ipower $FIG_DIR/figaro1
+define     irconv $FIG_DIR/figaro2
+define     irevx $FIG_DIR/figaro1
+define     irevy $FIG_DIR/figaro1
+define     irflat $FIG_DIR/figaro2
+define     irflux $FIG_DIR/figaro2
+define     irot90 $FIG_DIR/figaro1
+define     iscan $FIG_DIR/figaro5
+define     iscrunch $FIG_DIR/figaro3
+define     iscruni $FIG_DIR/figaro3
+define     isedit $FIG_DIR/figaro1
+define     ishift $FIG_DIR/figaro1
+define     ismooth $FIG_DIR/figaro1
+define     isplot $FIG_DIR/figaro1
+define     istat $FIG_DIR/figaro1
+define     istretch $FIG_DIR/figaro1
+define     isub $FIG_DIR/figaro1
+define     isubset $FIG_DIR/figaro1
+define     isuper $FIG_DIR/figaro1
+define     isxadd $FIG_DIR/figaro1
+define     isxdiv $FIG_DIR/figaro1
+define     isxmul $FIG_DIR/figaro1
+define     isxsub $FIG_DIR/figaro1
+define     isyadd $FIG_DIR/figaro1
+define     isydiv $FIG_DIR/figaro1
+define     isymul $FIG_DIR/figaro1
+define     isysub $FIG_DIR/figaro1
+define     ixsmooth $FIG_DIR/figaro1
+define     linterp $FIG_DIR/figaro2
+define     longslit $FIG_DIR/figaro5
+define     lsplot $FIG_DIR/figaro1
+define     lxset $FIG_DIR/figaro1
+define     lyset $FIG_DIR/figaro1
+define     mask $FIG_DIR/figaro2
+define     maskext $FIG_DIR/figaro3
+define     mcfit $FIG_DIR/figaro2
+define     medfilt $FIG_DIR/figaro1
+define     medfiltr $FIG_DIR/figaro1
+define     medsky $FIG_DIR/figaro1
+define     moments $FIG_DIR/figaro4
+define     movie $FIG_DIR/figaro4
+define     msplot $FIG_DIR/figaro1
+define     ncset $FIG_DIR/figaro1
+define     offdist $FIG_DIR/figaro3
+define     optextract $FIG_DIR/figaro1
+define     overpf $FIG_DIR/figaro3
+define     peak $FIG_DIR/figaro2
+define     polext $FIG_DIR/figaro3
+define     polysky $FIG_DIR/figaro1
+define     profile $FIG_DIR/figaro1
+define     q2bad $FIG_DIR/figaro1
+define     qual2flag $FIG_DIR/figaro1
+define     r2cmplx $FIG_DIR/figaro2
+define     rcgs2 $FIG_DIR/figaro2
+define     rdfits $FIG_DIR/figaro2
+define     rdipso $FIG_DIR/figaro2
+define     rembad $FIG_DIR/figaro1
+define     renobj $FIG_DIR/figaro1
+define     resamp $FIG_DIR/figaro4
+define     resample $FIG_DIR/figaro1
+define     rescale $FIG_DIR/figaro1
+define     retype $FIG_DIR/figaro1
+define     rotx $FIG_DIR/figaro1
+define     sclean $FIG_DIR/figaro1
+define     scnsky $FIG_DIR/figaro1
+define     scross $FIG_DIR/figaro1
+define     scrunch $FIG_DIR/figaro1
+define     sdist $FIG_DIR/figaro3
+define     setobj $FIG_DIR/figaro1
+define     sfit $FIG_DIR/figaro1
+define     skyliner $FIG_DIR/figaro3
+define     slice $FIG_DIR/figaro1
+define     soft $FIG_DIR/figaro1
+define     speccont $FIG_DIR/figaro4
+define     specgrid $FIG_DIR/figaro4
+define     specplot $FIG_DIR/figaro4
+define     spflux $FIG_DIR/figaro2
+define     spied $FIG_DIR/figaro2
+define     spifit $FIG_DIR/figaro2
+define     splot $FIG_DIR/figaro1
+define     sqrterr $FIG_DIR/figaro1
+define     subset $FIG_DIR/figaro4
+define     table $FIG_DIR/figaro2
+define     tippex $FIG_DIR/figaro1
+define     trimfile $FIG_DIR/figaro1
+define     vachel $FIG_DIR/figaro3
+define     vig $FIG_DIR/figaro5
+define     wdfits $FIG_DIR/figaro2
+define     wdipso $FIG_DIR/figaro2
+define     xcadd $FIG_DIR/figaro1
+define     xcdiv $FIG_DIR/figaro1
+define     xcmult $FIG_DIR/figaro1
+define     xcsub $FIG_DIR/figaro1
+define     xtract $FIG_DIR/figaro4
+define     ycadd $FIG_DIR/figaro1
+define     ycdiv $FIG_DIR/figaro1
+define     ycmult $FIG_DIR/figaro1
+define     ycsub $FIG_DIR/figaro1
+define     xcopi $FIG_DIR/figaro3
+define     xcopy $FIG_DIR/figaro3
+define     xcur $FIG_DIR/figaro1
+define     xtplane $FIG_DIR/figaro1
+define     xyplane $FIG_DIR/figaro1
+define     ystract $FIG_DIR/figaro1
+define     ytplane $FIG_DIR/figaro1
+{
+{  Define help for each application.
+{
+defhelp    abconv $FIG_HELP
+defhelp    abline $FIG_HELP
+defhelp    adjoin $FIG_HELP
+defhelp    alasin $FIG_HELP
+defhelp    alasout $FIG_HELP
+defhelp    aperture $FIG_HELP
+defhelp    arc $FIG_HELP
+defhelp    arc2d $FIG_HELP
+defhelp    arcdisp  $FIG_HELP
+defhelp    arcgendb $FIG_HELP
+defhelp    arcident $FIG_HELP
+defhelp    arclocat $FIG_HELP
+defhelp    arcsdi   $FIG_HELP
+defhelp    ascin    $FIG_HELP
+defhelp    ascout   $FIG_HELP
+defhelp    bbody    $FIG_HELP
+defhelp    bclean $FIG_HELP
+defhelp    bfft $FIG_HELP
+defhelp    bsmult $FIG_HELP
+defhelp    cadd   $FIG_HELP
+defhelp    caldiv $FIG_HELP
+defhelp    ccdlin $FIG_HELP
+defhelp    ccur $FIG_HELP
+defhelp    cdist $FIG_HELP
+defhelp    centers $FIG_HELP
+defhelp    cfit $FIG_HELP
+defhelp    changed   $FIG_HELP
+defhelp    clean $FIG_HELP
+defhelp    clip $FIG_HELP
+defhelp    cmplx2i $FIG_HELP
+defhelp    cmplx2m $FIG_HELP
+defhelp    cmplx2r $FIG_HELP
+defhelp    cmplxadd $FIG_HELP
+defhelp    cmplxconj $FIG_HELP
+defhelp    cmplxdiv $FIG_HELP
+defhelp    cmplxfilt $FIG_HELP
+defhelp    cmplxmult $FIG_HELP
+defhelp    cmplxsub $FIG_HELP
+defhelp    coadd $FIG_HELP
+defhelp    colour $FIG_HELP
+defhelp    comb   $FIG_HELP
+defhelp    combine $FIG_HELP
+defhelp    copobj $FIG_HELP
+defhelp    correl   $FIG_HELP
+defhelp    cosbell $FIG_HELP
+defhelp    cosrej $FIG_HELP
+defhelp    creobj $FIG_HELP
+defhelp    criguass   $FIG_HELP
+defhelp    cscan   $FIG_HELP
+defhelp    cset $FIG_HELP
+defhelp    cspike $FIG_HELP
+defhelp    csub   $FIG_HELP
+defhelp    cube2long   $FIG_HELP
+defhelp    delobj $FIG_HELP
+defhelp    dvdplot $FIG_HELP
+defhelp    echarc $FIG_HELP
+defhelp    echfind $FIG_HELP
+defhelp    echmask $FIG_HELP
+defhelp    echmerge $FIG_HELP
+defhelp    echselect $FIG_HELP
+defhelp    editext  $FIG_HELP
+defhelp    elsplot $FIG_HELP
+defhelp    emlt $FIG_HELP
+defhelp    errcon $FIG_HELP
+defhelp    esplot $FIG_HELP
+defhelp    evalfit  $FIG_HELP
+defhelp    extin $FIG_HELP
+defhelp    extlist $FIG_HELP
+defhelp    extract $FIG_HELP
+defhelp    fet321 $FIG_HELP
+defhelp    ff $FIG_HELP
+defhelp    ffcross $FIG_HELP
+defhelp    fft $FIG_HELP
+defhelp    fib2cube   $FIG_HELP
+defhelp    fibdisp   $FIG_HELP
+defhelp    fibsep   $FIG_HELP
+defhelp    figinfo $FIG_HELP
+defhelp    figs321 $FIG_HELP
+defhelp    figs322 $FIG_HELP
+defhelp    figs422 $FIG_HELP
+defhelp    figs423 $FIG_HELP
+defhelp    figs424 $FIG_HELP
+defhelp    figsee $FIG_HELP
+defhelp    figsflux $FIG_HELP
+defhelp    fillcube $FIG_HELP
+defhelp    findsp $FIG_HELP
+defhelp    fitbb    $FIG_HELP
+defhelp    fitcont   $FIG_HELP
+defhelp    fitpoly  $FIG_HELP
+defhelp    fitgauss $FIG_HELP
+defhelp    fitset $FIG_HELP
+defhelp    fitskeys $FIG_HELP
+defhelp    fittri   $FIG_HELP
+defhelp    flag2qual $FIG_HELP
+defhelp    flaircomp $FIG_HELP
+defhelp    flairext $FIG_HELP
+defhelp    flconv $FIG_HELP
+defhelp    foto $FIG_HELP
+defhelp    fscrunch $FIG_HELP
+defhelp    fwconv $FIG_HELP
+defhelp    gauss $FIG_HELP
+defhelp    goodvar $FIG_HELP
+defhelp    grow     $FIG_HELP
+defhelp    growx $FIG_HELP
+defhelp    growxt $FIG_HELP
+defhelp    growxy $FIG_HELP
+defhelp    growy $FIG_HELP
+defhelp    growyt $FIG_HELP
+defhelp    gspike $FIG_HELP
+defhelp    hard $FIG_HELP
+defhelp    hcross $FIG_HELP
+defhelp    himage   $FIG_HELP
+defhelp    hist $FIG_HELP
+defhelp    hopt $FIG_HELP
+defhelp    i2cmplx $FIG_HELP
+defhelp    iadd $FIG_HELP
+defhelp    iarc $FIG_HELP
+defhelp    icadd $FIG_HELP
+defhelp    icdiv $FIG_HELP
+defhelp    icmult $FIG_HELP
+defhelp    icont $FIG_HELP
+defhelp    iconv3 $FIG_HELP
+defhelp    icor16 $FIG_HELP
+defhelp    icset $FIG_HELP
+defhelp    icsub $FIG_HELP
+defhelp    icur $FIG_HELP
+defhelp    idev $FIG_HELP
+defhelp    idiff $FIG_HELP
+defhelp    idiv $FIG_HELP
+defhelp    igconv $FIG_HELP
+defhelp    igcur $FIG_HELP
+defhelp    igrey $FIG_HELP
+defhelp    ilist $FIG_HELP
+defhelp    ilog $FIG_HELP
+defhelp    image $FIG_HELP
+defhelp    impos $FIG_HELP
+defhelp    imult $FIG_HELP
+defhelp    interp $FIG_HELP
+defhelp    iplots $FIG_HELP
+defhelp    ipower $FIG_HELP
+defhelp    irconv $FIG_HELP
+defhelp    irevx $FIG_HELP
+defhelp    irevy $FIG_HELP
+defhelp    irflat $FIG_HELP
+defhelp    irflux $FIG_HELP
+defhelp    irot90 $FIG_HELP
+defhelp    iscan   $FIG_HELP
+defhelp    iscrunch $FIG_HELP
+defhelp    iscruni $FIG_HELP
+defhelp    isedit $FIG_HELP
+defhelp    ishift $FIG_HELP
+defhelp    ismooth $FIG_HELP
+defhelp    isplot $FIG_HELP
+defhelp    istat $FIG_HELP
+defhelp    istretch $FIG_HELP
+defhelp    isub $FIG_HELP
+defhelp    isubset $FIG_HELP
+defhelp    isuper $FIG_HELP
+defhelp    isxadd $FIG_HELP
+defhelp    isxdiv $FIG_HELP
+defhelp    isxmul $FIG_HELP
+defhelp    isxsub $FIG_HELP
+defhelp    isyadd $FIG_HELP
+defhelp    isydiv $FIG_HELP
+defhelp    isymul $FIG_HELP
+defhelp    isysub $FIG_HELP
+defhelp    ixsmooth $FIG_HELP
+defhelp    linterp $FIG_HELP
+defhelp    longslit   $FIG_HELP
+defhelp    lsplot $FIG_HELP
+defhelp    lxset $FIG_HELP
+defhelp    lyset $FIG_HELP
+defhelp    mask $FIG_HELP
+defhelp    maskext $FIG_HELP
+defhelp    mcfit $FIG_HELP
+defhelp    medfilt $FIG_HELP
+defhelp    medfiltr $FIG_HELP
+defhelp    medsky $FIG_HELP
+defhelp    moments  $FIG_HELP
+defhelp    movie    $FIG_HELP
+defhelp    msplot $FIG_HELP
+defhelp    ncset $FIG_HELP
+defhelp    offdist $FIG_HELP
+defhelp    optextract $FIG_HELP
+defhelp    overpf $FIG_HELP
+defhelp    peak $FIG_HELP
+defhelp    polext $FIG_HELP
+defhelp    polysky $FIG_HELP
+defhelp    profile $FIG_HELP
+defhelp    q2bad $FIG_HELP
+defhelp    qual2flag $FIG_HELP
+defhelp    r2cmplx $FIG_HELP
+defhelp    rcgs2 $FIG_HELP
+defhelp    rdfits $FIG_HELP
+defhelp    rdipso $FIG_HELP
+defhelp    rembad $FIG_HELP
+defhelp    renobj $FIG_HELP
+defhelp    resamp $FIG_HELP
+defhelp    resample $FIG_HELP
+defhelp    rescale $FIG_HELP
+defhelp    retype $FIG_HELP
+defhelp    rotx $FIG_HELP
+defhelp    sclean $FIG_HELP
+defhelp    scnsky $FIG_HELP
+defhelp    scross $FIG_HELP
+defhelp    scrunch $FIG_HELP
+defhelp    sdist $FIG_HELP
+defhelp    setobj $FIG_HELP
+defhelp    sfit $FIG_HELP
+defhelp    slice $FIG_HELP
+defhelp    skyliner $FIG_HELP
+defhelp    soft $FIG_HELP
+defhelp    specplot $FIG_HELP
+defhelp    specgrid $FIG_HELP
+defhelp    speccont $FIG_HELP
+defhelp    spflux $FIG_HELP
+defhelp    spied $FIG_HELP
+defhelp    spifit $FIG_HELP
+defhelp    splot $FIG_HELP
+defhelp    sqrterr $FIG_HELP
+defhelp    subset   $FIG_HELP
+defhelp    xtract   $FIG_HELP
+defhelp    table $FIG_HELP
+defhelp    tippex $FIG_HELP
+defhelp    trimfile $FIG_HELP
+defhelp    vachel $FIG_HELP
+defhelp    vig   $FIG_HELP
+defhelp    wdfits $FIG_HELP
+defhelp    wdipso $FIG_HELP
+defhelp    xcadd $FIG_HELP
+defhelp    xcdiv $FIG_HELP
+defhelp    xcmult $FIG_HELP
+defhelp    xcsub $FIG_HELP
+defhelp    ycadd $FIG_HELP
+defhelp    ycdiv $FIG_HELP
+defhelp    ycmult $FIG_HELP
+defhelp    ycsub $FIG_HELP
+defhelp    xcopi $FIG_HELP
+defhelp    xcopy $FIG_HELP
+defhelp    xcur $FIG_HELP
+defhelp    xtplane $FIG_HELP
+defhelp    xyplane $FIG_HELP
+defhelp    ystract $FIG_HELP
+defhelp    ytplane $FIG_HELP
+{
+defhelp    exam $FIG_HELP
+defstring exam print 'The EXAM command has been removed - please use hdstrace '
+{
+{  Turn parameter name abbreviation on
+{
+defstring abbrev 'setenv ADAM_ABBRV'
+defstring noabbrev 'unsetenv ADAM_ABBRV'
+{
+{ Show that the Figaro commands are now available.
+{
+print '              General data reduction'
+print '                  Version @VERSION@'
+print ' '
+print '           Type  "help figaro" for help'
+print ' '
+print ' Type "showme sun86" to browse HTML documentation'
+print ' '
+print ' Use "abbrev" and "noabbrev" to turn parameter name'
+print ' abbreviation on and off.'
+print ' '
+{
+{ end
+{
+
+
+
