@@ -79,9 +79,16 @@ sub Usage();
     }
 
     sub sort_log_entry {
-        return $a->{file} cmp $b->{file};
+	# Sort on sort_string() first -- this groups related entries
+	# together.  If two have the same sort_string(), then sort on
+	# the filename -- sorts entries within groups.
+	my $s = $a->sort_string cmp $b->sort_string;
+	if ($s == 0) {
+	    return $a->file cmp $b->file;
+	} else {
+	    return $s;
+	}
     }
-
 }
 
 {
@@ -204,6 +211,31 @@ sub Usage();
     sub revisions {
         my $self = shift;
         return @{$self->{revisions} || []};
+    }
+
+    # A string indicating the component this is part of, for sorting
+    # purposes.  This is basically just the first two elements of the path,
+    # but it's TOP for the top level, and the first three elements for
+    # java/ and thirdparty/.
+    sub sort_string {
+        my $self = shift;
+	unless (defined($self->{sort_string})) {
+	    my @s = split(m{/}, $self->{file});
+	    my $prefixlen;
+	    if ($#s == 0) {
+		$prefixlen = 0;
+	    } elsif ($#s == 1) {
+		$prefixlen = 1;
+	    } elsif ($s[0] eq "java" or $s[0] eq "thirdparty") {
+		$prefixlen = 3;
+	    } else {
+		$prefixlen = 2;
+	    }
+	    $self->{sort_string} = ($prefixlen == 0
+				    ? "TOP"
+				    : join('/',@s[0..$prefixlen-1]));
+	}
+	return $self->{sort_string};
     }
 }
 
@@ -351,13 +383,13 @@ if ($cvslog->have_entries) {
     print HTML "<table>\n<tr><th>File</th><th>author</th><th>revision</th></tr>\n";
 
     foreach my $e ($cvslog->get_entries) {
-        ($e->file =~ m{(^([^/]*/){0,2})});
-        my $thisprefix = $1;
-        if ($thisprefix ne $lastprefix) {
-            print HTML "<tr style='background: #99F'><td colspan='3' style='line-height: 2.0'>$thisprefix</td></tr>\n";
-            $lastprefix = $thisprefix;
-        }
-        
+
+        if ($e->sort_string ne $lastprefix) {
+	    printf HTML ("<tr style='background: #99F'><td colspan='3' style='line-height: 2.0'>%s</td></tr>\n",
+			 $e->sort_string);
+	    $lastprefix = $e->sort_string;
+	}
+
         my @revs = $e->revisions;
         my $l = $revs[0];
         printf(HTML
