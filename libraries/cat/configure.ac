@@ -26,7 +26,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [ast sae par prm])
-STAR_DECLARE_DEPENDENCIES(link,  [cfitsio par err sla chr ast])
+STAR_DECLARE_DEPENDENCIES(link,  [cfitsio par mers sla chr ast])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
