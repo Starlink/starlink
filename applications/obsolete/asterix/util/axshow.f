@@ -125,8 +125,6 @@
       INTEGER			IFID			! Input dataset id
       INTEGER                   OCH               	! Output channel
       INTEGER                   NAX               	! Number of axes
-      INTEGER                   NVAL              	! Number of axis values
-      INTEGER                   NWID              	! Number of axis widths
       INTEGER                   PTR               	! Ptr to mapped component
       INTEGER                   TLEN              	! Text length
 
@@ -172,13 +170,10 @@
           CALL BDI_AXGET0C( IFID, I, 'Label', LABEL, STATUS )
           CALL BDI_AXGET0C( IFID, I, 'Units', UNITS, STATUS )
 
-*      Get dimension
-          CALL BDI_CHKAXVAL( IFID, I, OK, REG, NVAL, STATUS )
-
 *      Construct range string
           CALL BDI_AXMAPR( IFID, I, 'Data', 'READ', PTR, STATUS )
-          CALL ARR_ELEM1R( PTR, NVAL, 1, LO, STATUS )
-          CALL ARR_ELEM1R( PTR, NVAL, NVAL, HI, STATUS )
+          CALL ARR_ELEM1R( PTR, DIMS(I), 1, LO, STATUS )
+          CALL ARR_ELEM1R( PTR, DIMS(I), DIMS(I), HI, STATUS )
           CALL BDI_AXUNMAP( IFID, I, 'Data', PTR, STATUS )
           CALL MSG_SETR( 'LO', LO )
           CALL MSG_SETR( 'HI', HI )
@@ -196,7 +191,7 @@
 
 *      Write to output
           WRITE( OBUF, '(1X,I3,2X,A22,I6,2X,A,T67,A)',
-     :        IOSTAT=FSTAT ) I, LABEL, NVAL, RSTR, WSTR
+     :        IOSTAT=FSTAT ) I, LABEL, DIMS(I), RSTR, WSTR
           CALL AIO_WRITE( OCH, OBUF, STATUS )
 
         END DO
