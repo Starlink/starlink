@@ -9,7 +9,7 @@
 #include "config.h"
 #endif
 
-#include <ostream>		// for cerr, endl
+#include <iostream>		// for cerr, endl
 
 #if HAVE_STD_NAMESPACE
 using std::cerr;

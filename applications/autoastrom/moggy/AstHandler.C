@@ -19,7 +19,7 @@
 #include "config.h"
 #endif
 
-#include <ostream>		// for cerr, endl
+#include <iostream>		// for cerr, endl
 #include <assert.h>
 
 #if HAVE_STD_NAMESPACE
