@@ -112,8 +112,6 @@
       EXTERNAL IMG1_INIT        ! Initialise common blocks
 
 *  Local variables:
-      CHARACTER * ( DAT__SZLOC ) LOC ! Temporary locator
-      INTEGER I                 ! Loop variable
       INTEGER IPFITS            ! Pointer to re-mapped FITS block
       INTEGER NFITS             ! Number of FITS records
       INTEGER NOUT              ! Number of copied FITS records

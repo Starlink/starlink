@@ -53,7 +53,6 @@
       INCLUDE 'IMG_CONST'       ! IMG_ parameters
       INCLUDE 'DAT_PAR'         ! HDS/DAT parameters
       INCLUDE 'NDF_PAR'         ! NDF parmeters
-      INCLUDE 'CNF_PAR'         ! CNF parameters
 
 *  Global Variables:
       INCLUDE 'IMG_ECB'         ! IMG Extension Control Block
@@ -81,7 +80,6 @@
       INTEGER STATUS            ! Global status
 
 *  Local Variables:
-      INTEGER NOUT              ! Number of copied FITS records
       CHARACTER * ( DAT__SZLOC ) PARENT ! Locator to extension parent
       CHARACTER * ( DAT__SZLOC ) CHILD ! Locator to extension
 
