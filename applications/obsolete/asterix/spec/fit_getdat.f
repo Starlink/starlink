@@ -368,7 +368,7 @@
         IF ( VIG ) THEN
 
 *      Open vignetting data
-          CALL FRI_FOPEN( DCFID(N), 'VIGN', '*', 'READ', VFID(N),
+          CALL FRI_FOPEN( DCFID(N), 'VIGN', 'BinDS', 'READ', VFID(N),
      :                    STATUS )
 	  IF ( STATUS .NE. SAI__OK ) THEN
 	    CALL ERR_ANNUL( STATUS )
@@ -435,8 +435,8 @@
           IF ( BG ) THEN
 
 *        Open b/g data
-            CALL FRI_FOPEN( DCFID(N), 'BGND', '*', 'READ', BFID(N),
-     :                        STATUS )
+            CALL FRI_FOPEN( DCFID(N), 'BGND', 'BinDS', 'READ', BFID(N),
+     :                      STATUS )
 	    IF ( STATUS .NE. SAI__OK ) THEN
 	      CALL ERR_ANNUL( STATUS )
 	      BG = .FALSE.
