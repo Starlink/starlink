@@ -83,6 +83,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'GRP_PAR'          ! GRP constants 
 
 *  Status:
       INTEGER STATUS
@@ -108,6 +109,7 @@
       DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK ) 
 
 *  Get a group holding the formated LUT values.
+         IGRP = GRP__NOID
          CALL KPG1_GTGRP( 'LUT', IGRP, NLUT, STATUS )
 
 *  Allocate memory to hold the floating point LUT values.
@@ -117,7 +119,7 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Read the values from the group into the memory.
-         CALL ATL1_GTOFL( IGRP, NLUT, IPLUT, STATUS )
+         CALL ATL1_GTOFL( IGRP, NLUT, %VAL( IPLUT ), STATUS )
 
 *  If an error occurred reading the group, annull the error, cancel the
 *  parameter and go round to get a new group. Otherwise, indicate that we
@@ -142,6 +144,7 @@
       DO WHILE( .NOT. DONE .AND. STATUS .EQ. SAI__OK )
          CALL PAR_GET0D( 'INC', INC, STATUS )
          IF( INC .EQ. 0.0 .AND. STATUS .EQ. SAI__OK ) THEN
+            CALL PAR_CANCL( 'INC', STATUS )
             STATUS = SAI__ERROR
             CALL ERR_REP( 'ASTLUTMAP_ERR2', 'Zero not allowed for '//
      :                    'parameter INC. Please supply a new value.', 
