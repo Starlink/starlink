@@ -119,7 +119,6 @@ F77_INTEGER_FUNCTION(grp1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
    int Ichar;            /* Index into FileName for next character */
    int NullFd;           /* File descriptor for the null device */
    int Status;           /* Status value returned to caller */
-   FILE *fd;
 
 /* Start off with good status */
    Status = GRP__OK;
@@ -172,7 +171,7 @@ F77_INTEGER_FUNCTION(grp1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
 /* Allocate ourselves enough space for the context structure we will use 
    to hold its address. */
       ContextPtr = cnfMalloc( 2 * sizeof(ContextStruct) );
-      if ( (int) ContextPtr == 0 ) {
+      if ( ContextPtr == NULL ) {
          Status = GRP__WMER;
       } else {
          Fdptr = ContextPtr->Fds;
@@ -186,7 +185,6 @@ F77_INTEGER_FUNCTION(grp1_wild)( CHARACTER(FileSpec), CHARACTER(FileName),
 /* Fdptr[0] can now be used as the reading end of the pipe, and Fdptr[1] as 
    the writing end.  Having that, we now fork off a new process to do the 
    command that we will use to give us the filenames we want. */
-            int STATUS;
             if( ( ContextPtr->pid = fork() ) == 0 ) {
 
 /* This is the child process that we will use to run a command to get 
