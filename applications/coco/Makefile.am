@@ -20,7 +20,7 @@ edit = sed \
 	-e 's,@starbindir\@,$(bindir),g'
 
 coco: coco.in
-	rm -f cooc.tmp coco
+	rm -f coco.tmp coco
 	$(edit) \
 	 -e 's,@edited_input\@,coco: produced from coco.in by Makefile.am,' \
 	 $(srcdir)/coco.in > coco.tmp
