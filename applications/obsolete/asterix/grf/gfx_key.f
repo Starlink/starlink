@@ -254,7 +254,7 @@
 
 *  now use the correct limits (RB)
           DO IL=1,NL
-            POS=(LEVS(IL)-MIN)/(MAX-MIN)
+            POS=(LEVS(IL)-PMIN)/(PMAX-PMIN)
             IF (LEVS(IL).EQ.0.0) THEN
               CALL PGMTEXT('RV',0.5,POS,0.0,'0.0')
             ELSE
