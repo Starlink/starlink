@@ -28,12 +28,12 @@ build:
 
 compile-tests:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/testcases
-    [javac] Compiling 11 source files to /apps/cvsbuild/java/source/util/build/testcases
+    [javac] Compiling 12 source files to /apps/cvsbuild/java/source/util/build/testcases
 
 run-tests:
 
 BUILD FAILED
-file:/apps/cvsbuild/java/source/util/build.xml:914: Could not create task or type of type: junit.
+file:/apps/cvsbuild/java/source/util/build.xml:913: Could not create task or type of type: junit.
 
 Ant could not find the task or a class this task relies upon.
 

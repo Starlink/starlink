@@ -24,7 +24,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/java
-     [copy] Copying 63 files to /apps/cvsbuild/java/source/util/build/java
+     [copy] Copying 64 files to /apps/cvsbuild/java/source/util/build/java
      [echo] Executing Task target: javadoc-sources
 
 javadoc-sources:
@@ -431,6 +431,7 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Send when a figure is changed (i.e."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawFigures
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/FileNameListCellRenderer.java:35: warning - Tag @link: reference not found: ListCellRenderer
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:67: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -846,11 +847,13 @@ javadoc-sources:
   [javadoc]  default and have their bad pixel flags set correctly.
   [javadoc]  "
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/FileNameListCellRenderer.java:35: warning - Tag @link: reference not found: ListCellRenderer
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/XMLEncodeDecode.java:25: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/PrimitiveXMLEncodeDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectCharactersListener.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: File.listFiles
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/FileNameListCellRenderer.java:35: warning - Tag @link: reference not found: ListCellRenderer
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectCharacters.java:50: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/util/gui/SelectCharacters.html...
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectCharacters.java:50: Tag @see: Malformed: InsertCharacters, SelectCharactersModel
@@ -1528,7 +1531,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleDocument.java:33: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
-  [javadoc] 575 warnings
+  [javadoc] 578 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 10 seconds
+Total time: 1 minute 9 seconds

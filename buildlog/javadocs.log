@@ -59,6 +59,7 @@ javadocs:
   [javadoc] Building index for all the packages and classes...
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharacters.java:50: warning - Tag @see: malformed: "InsertCharacters, SelectCharactersModel"
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/FileNameListCellRenderer.java:35: warning - Tag @link: reference not found: ListCellRenderer
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/StoreConfiguration.java:295: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/index-all.html...
   [javadoc] "Create a new Element ready for attaching a configuration state
@@ -72,12 +73,14 @@ javadocs:
   [javadoc] use -breakiterator from that point forward, which will output this new sentence.
   [javadoc] Building index for all classes...
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/FileNameListCellRenderer.java:35: warning - Tag @link: reference not found: ListCellRenderer
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeDecode.java:25: warning - Tag @link: reference not found: uk.ac.starlink.ast.gui.AbstractPlotControlsModel
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/XMLEncodeDecode.java:25: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharactersListener.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: File.listFiles
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/FileNameListCellRenderer.java:35: warning - Tag @link: reference not found: ListCellRenderer
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharacters.java:50: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/uk/ac/starlink/util/gui/SelectCharacters.html...
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharacters.java:50: Tag @see: Malformed: InsertCharacters, SelectCharactersModel
@@ -96,7 +99,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/StoreControlFrame.java:56: warning - Tag @link: reference not found: SourceSource
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/StoreFileUtils.java:68: warning - Tag @link: reference not found: getConfigDirectory
   [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/stylesheet.css...
-  [javadoc] 18 warnings
+  [javadoc] 21 warnings
      [echo] Executing Task target: javadocs
 
 prepare:
@@ -2764,4 +2767,4 @@ javadocs:
   [javadoc] 204 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 18 seconds
+Total time: 3 minutes 19 seconds

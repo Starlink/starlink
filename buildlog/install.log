@@ -126,7 +126,7 @@ install:
 [loggedcopy] Copying 2 files to /star/starjava/bin
 [loggedcopy] Copying 3 files to /star/starjava/lib
 [loggedcopy] Copying 1 file to /star/starjava/etc
-[loggedcopy] Copying 78 files to /star/starjava/docs
+[loggedcopy] Copying 79 files to /star/starjava/docs
      [echo] Executing Task target: install
 
 prepare:
@@ -522,6 +522,7 @@ webstart:
 dist:
      [copy] Copying 3 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 3 files to /star/starjava/bin
@@ -1043,4 +1044,4 @@ install:
 [loggedcopy] Copying 152 files to /star/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 26 seconds
+Total time: 4 minutes 29 seconds

@@ -115,7 +115,7 @@ install:
 [loggedcopy] Copying 2 files to /star/starjava/bin
 [loggedcopy] Copying 3 files to /star/starjava/lib
 [loggedcopy] Copying 1 file to /star/starjava/etc
-[loggedcopy] Copying 78 files to /star/starjava/docs
+[loggedcopy] Copying 79 files to /star/starjava/docs
      [echo] Executing Task target: install
 
 prepare:
@@ -877,4 +877,4 @@ export-full-built:
       [tar] Building tar: /star/sources/starjavaexport/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 1 second
+Total time: 4 minutes 9 seconds

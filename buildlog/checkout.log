@@ -9378,6 +9378,7 @@ U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileChooser.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFontChooser.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/DragListener.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/FileNameListCellRenderer.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/GridBagLayouter.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/ProxySetupFrame.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharacters.java
@@ -9428,6 +9429,8 @@ U java/source/util/src/testcases/uk/ac/starlink/util/ReaderThreadTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/SourceReaderTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/TestCaseTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/XMLUtilTest.java
+cvs checkout: Updating java/source/util/src/testcases/uk/ac/starlink/util/gui
+U java/source/util/src/testcases/uk/ac/starlink/util/gui/RendererTest.java
 cvs checkout: Updating java/source/votable
 U java/source/votable/.properties
 U java/source/votable/build.xml
