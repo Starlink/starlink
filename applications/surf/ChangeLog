@@ -1,5 +1,8 @@
 2002-09-09  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* src/surf_remsky.f (SURF_REMSKY): Fix "use of unintialized value"
+	warning with LONG2_RAD [also surf_extinction, and surf_remip]
+
 	* src/surf_scuba2mem.f (SURF_SCUBA2MEM): Fix pointer
 	initialisation problem with LST_PTR
 

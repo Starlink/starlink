@@ -137,6 +137,9 @@
 *     3 Nov 1996: TIMJ
 *        Original version
 *     $Log$
+*     Revision 1.19  2002/09/09 21:43:33  timj
+*     Fix "use of unintialized value" warning with LONG2_RAD
+*
 *     Revision 1.18  2000/07/07 03:24:15  timj
 *     Doc fixes
 *
@@ -447,6 +450,13 @@
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'LONG',
      :  STEMP, STATUS)
       CALL SCULIB_DECODE_ANGLE (STEMP, LONG_RAD, STATUS)
+
+*     initialise so that we do not get a warning with valgrind
+*     when we multiply LONG2_RAD by 15.0
+      LONG2_RAD = 0.0D0
+      LAT2_RAD = 0.0D0
+      MJD1 = 0.0D0
+      MJD2 = 0.0D0
 
       IF (CENTRE_COORDS .EQ. 'PLANET') THEN
          CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'LAT2',
