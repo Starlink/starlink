@@ -94,6 +94,9 @@
 *        one significant pixel axis. 
 *        - Obtain spectral calibrartion for X axis from NDF WCS component
 *        if the NDF was not created by DIPSO.
+*     24-AUG-2003 (DSB):
+*        - Check for usable AXIS structures before using FITS WCS headers.
+*        - Check for unit plurals ("Angstroms" instead of "Angstrom")
 *     {enter_changes_here}
 
 *  Bugs:
@@ -147,6 +150,10 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN
+      LOGICAL UNITOK
+
 *  Local Variables:
       CHARACTER SYS*40           ! System string
       CHARACTER TEXT*50          ! Label string
@@ -176,6 +183,7 @@
       INTEGER SFRM               ! Pointer to spectral Frame
       INTEGER TEMPLT             ! Pointer to a template Frame
       INTEGER UBND( NDF__MXDIM ) ! Pixel index at upper bound of NDF
+      INTEGER ULEN               ! Used length of UNIT
       INTEGER WORKI( MAXBRK )    ! Work array
       LOGICAL DIPNDF             ! Is this a DIPSO NDF?
       LOGICAL GOTAX              ! Got an NDF AXIS structure?
@@ -302,8 +310,24 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Get the NDFs WCS FrameSet.
-      CALL KPG1_GTWCS( INDF, IWCS, STATUS )
+*  If the NDF has a WCS FrameSet, get it.
+      CALL NDF_STATE( INDF, 'WCS', THERE, STATUS )
+      IF( THERE ) THEN 
+         CALL NDF_GTWCS( INDF, IWCS, STATUS )
+
+*  Otherwise, if the Axis structure is defined, use the default WCS
+*  FrameSet in which the AXIS Frame is the current Frame. 
+      ELSE
+         CALL NDF_ASTAT( INDF, 'CENTRE', SDIM, THERE, STATUS )
+         IF( THERE ) THEN 
+            CALL NDF_GTWCS( INDF, IWCS, STATUS )
+
+*  Otherwise, try to get a WCS FrameSet from the FITS headers in the FITS 
+*  extension. 
+         ELSE
+            CALL KPG1_GTWCS( INDF, IWCS, STATUS )
+         END IF
+      END IF
 
 *  Now map the NDFs DATA array.
       CALL NDF_MAP( INDF, 'DATA', '_REAL', 'READ', IPDATA, NPOINT,
@@ -374,12 +398,13 @@
                NEWFRM = AST_PICKAXES( IWCS, 1, I, MAP, STATUS ) 
                MORE = .FALSE.
 
-*  Get the axis unit.
-               UNIT = AST_GETC( NEWFRM, 'UNIT(1)', STATUS )
-
 *  Get the upper case axis label.
                TEXT = AST_GETC( NEWFRM, 'LABEL(1)', STATUS )
                CALL CHR_UCASE( TEXT )            
+
+*  Get the axis unit.
+               UNIT = AST_GETC( NEWFRM, 'UNIT(1)', STATUS )
+ 10            CONTINUE
 
 *  Create a candidate SpecFrame to describe the current axis.
                SFRM = AST_SPECFRAME( ' ', STATUS )
@@ -435,28 +460,20 @@
 *  First try wavelength.
                   CALL AST_SETC( SFRM, 'SYSTEM', 'WAVE', STATUS )
                   CALL AST_SETC( SFRM, 'UNIT', TEXT, STATUS )
-                  JUNK = AST_FINDFRAME( SFRM, TEMPLT, ' ', STATUS )
 
-*  If an error occurred setting the unit, annul it and try frequency.
-                  IF( STATUS .NE. SAI__OK ) THEN
-                     CALL ERR_ANNUL( STATUS )
+*  If the unit string is not OK, and try frequency.
+                  IF( .NOT. UNITOK( SFRM, STATUS ) ) THEN
                      CALL AST_SETC( SFRM, 'SYSTEM', 'FREQ', STATUS )
                      CALL AST_SETC( SFRM, 'UNIT', TEXT, STATUS )
-                     JUNK = AST_FINDFRAME( SFRM, TEMPLT, ' ', STATUS )
                                
-*  If an error occurred setting the unit, annul it and try optical
-*  velocity.
-                     IF( STATUS .NE. SAI__OK ) THEN
-                        CALL ERR_ANNUL( STATUS )
+*  If the unit was not OK, try optical velocity.
+                     IF( .NOT. UNITOK( SFRM, STATUS ) ) THEN
                         CALL AST_SETC( SFRM, 'SYSTEM', 'VOPT', STATUS )
                         CALL AST_SETC( SFRM, 'UNIT', TEXT, STATUS )
-                        JUNK = AST_FINDFRAME( SFRM, TEMPLT, ' ', 
-     :                                        STATUS )
 
-*  If an error occurred setting the unit, annul it, indicate that we need
-*  to try the next axis in the current Frame.
-                        IF( STATUS .NE. SAI__OK ) THEN
-                            CALL ERR_ANNUL( STATUS )
+*  If the Unit was not OK, indicate that we need to try the next axis in the 
+*  current Frame.
+                        IF( .NOT. UNITOK( SFRM, STATUS ) ) THEN
                             MORE = .TRUE.
 
 *  If this is the axis which has the same index as the significant pixel
@@ -467,8 +484,8 @@
      :                                        STATUS )
                                CALL AST_SETC( SFRM, 'UNIT', 'Angstrom', 
      :                                       STATUS )
-                               DEFFRM = AST_CLONE( SFRM, STATUS )
-                               DEFMAP = AST_CLONE( MAP, STATUS )
+                               DEFFRM = AST_COPY( SFRM, STATUS )
+                               DEFMAP = AST_COPY( MAP, STATUS )
                                DEFUNI = UNIT
                             END IF
 
@@ -479,7 +496,20 @@
                      END IF                               
                   END IF
                END IF
-            END DO
+
+*  If we have not found a good SpecFrame System, and the unit ends with the
+*  letter "S", try using the Unit again without the "S" (in case the S is
+*  just a plural - e.g. "Angstroms" instead of "Angstrom" ).
+               IF( MORE ) THEN
+                  ULEN = CHR_LEN( UNIT )
+                  IF( UNIT( ULEN : ULEN ) .EQ. 'S' .OR.
+     :                UNIT( ULEN : ULEN ) .EQ. 's' ) THEN
+                     UNIT( ULEN : ULEN ) = ' '
+                     GO TO 10
+                  END IF
+               END IF
+
+             END DO
 
 *  Use the default SpecFrame if no more appropriate one was found.
             IF( SFRM .EQ. AST__NULL ) THEN
@@ -493,13 +523,27 @@
      :                                         STATUS )
             IF( UUNIT .NE. ' ' ) UNIT = UUNIT
 
-*  Attempt to set the axis unit. If an error occurs, annul it and clear
-*  the Unit attribute.
+*  If we have a Unit string, set it.
             IF( STATUS .EQ. SAI__OK .AND. UNIT .NE. ' ' ) THEN
                CALL AST_SETC( SFRM, 'UNIT', UNIT, STATUS )
-               IF( STATUS .NE. SAI__OK ) THEN
-                  CALL ERR_ANNUL( STATUS )
-                  CALL AST_CLEAR( SFRM, 'UNIT', STATUS )
+
+*  If the Unit is unsuitable... */
+               IF( .NOT. UNITOK( SFRM, STATUS ) ) THEN
+
+*  Removing any trailing "s" may make it usable.
+                  ULEN = CHR_LEN( UNIT )
+                  IF( UNIT( ULEN : ULEN ) .EQ. 'S' .OR.
+     :                UNIT( ULEN : ULEN ) .EQ. 's' ) THEN
+                     UNIT( ULEN : ULEN ) = ' '
+                  END IF
+                  CALL AST_SETC( SFRM, 'UNIT', UNIT, STATUS )
+
+*  If the Unit is still unsuitable, clear the Unit attribute so that the
+*  default Unit is used. */
+                  IF( .NOT. UNITOK( SFRM, STATUS ) ) THEN
+                     CALL AST_CLEAR( SFRM, 'UNIT', STATUS )
+                  END IF
+
                END IF
             END IF
 
@@ -531,12 +575,12 @@
             UNIT = AST_GETC( SFRM, 'UNIT', STATUS )
             IF( UNIT .NE. ' ' ) THEN 
                CALL MSG_SETC( 'UN', AST_GETC( SFRM, 'UNIT', STATUS ) )
-               CALL MSGOUT( COMM, 'Unsure about the spectral system '//
-     :                      'in the input NDF: assuming it is ^SYS in'//
+               CALL MSGOUT( COMM, 'Assuming the spectral system '//
+     :                      'in the input NDF is ^SYS in'//
      :                      ' units of ''^UN''.', .TRUE., STATUS )
             ELSE
-               CALL MSGOUT( COMM, 'Unsure about the spectral system '//
-     :                      'in the input NDF: assuming it is ^SYS '//
+               CALL MSGOUT( COMM, 'Assuming the spectral system '//
+     :                      'in the input NDF is ^SYS '//
      :                      '(in dimensionless units).', .TRUE., 
      :                      STATUS )
             END IF
@@ -669,3 +713,92 @@
       IF( STATUS .NE. SAI__OK ) NPOINT = 0
 
       END 
+
+
+      LOGICAL FUNCTION UNITOK( SF, STATUS )
+*+
+*  Name:
+*     UNITOK
+
+*  Purpose:
+*     See if the Unit and System attributes of hte supplied SpecFrame are
+*     consistent.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     RESULT = UNITOK( SF, STATUS )
+
+*  Description:
+*     Returns .TRUE. if the Unit attribute of the supplied SpecFrame is a
+*     valid unit for the spectral system specified by the System attribute 
+*     of the supplied SpecFrame. Returns .FALSE. otherwise.
+
+*  Arguments:
+*     SF = INTEGER (Given)
+*        An identifier for a SpecFrame.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Returned Value:
+*     .TRUE if the Unit is OK.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     23-AUG-2003 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST__ constants and functions
+      INCLUDE 'AST_ERR'          ! AST__ error constants 
+
+*  Arguments Given:
+      INTEGER SF
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      CHARACTER OPTS*50
+      INTEGER IAT
+      INTEGER SF2
+
+*  Initialise
+      UNITOK = .FALSE.
+
+*  Check inherited status
+      IF( STATUS .NE. SAI__OK ) RETURN
+
+*  Attempt to create a new SpecFrame with the same System as the given
+*  SpecFrame, and the supplied unit.
+      OPTS = 'SYSTEM='
+      IAT = 7
+      CALL CHR_APPND( AST_GETC( SF, 'System', STATUS ), OPTS, IAT )
+      CALL CHR_APPND( ',Unit(1)=', OPTS, IAT )
+      CALL CHR_APPND( AST_GETC( SF, 'Unit(1)', STATUS ), OPTS, IAT )
+  
+      SF2 = AST_SPECFRAME( OPTS( : IAT ), STATUS )
+      IF( STATUS .EQ. AST__BADUN ) THEN
+         CALL ERR_ANNUL( STATUS )
+
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         UNITOK = .TRUE.
+         CALL AST_ANNUL( SF2, STATUS )
+
+      END IF
+
+      END      
