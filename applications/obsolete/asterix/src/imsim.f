@@ -547,7 +547,11 @@
           END IF
 
 *        Write astrometry
-          CALL WCI_PUTIDS( OFID, PIXID, PRJID, SYSID, STATUS )
+          IF ( (PIXID .NE. ADI__NULLID) .AND.
+     :         (PRJID .NE. ADI__NULLID) .AND.
+     :         (SYSID .NE. ADI__NULLID) ) THEN
+            CALL WCI_PUTIDS( OFID, PIXID, PRJID, SYSID, STATUS )
+          END IF
 
 *        Write data units
           CALL BDI_PUTUNITS( OFID, 'counts', STATUS )
