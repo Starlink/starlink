@@ -20,7 +20,7 @@
        All applications retain the option of using the previous
        functionality for backwards compatibility however.
           Affected tasks:
-             FINDOFF   (new parameters MAXDISP, RESTRICT, MAXDISP)
+             FINDOFF   (new parameters MAXDISP, RESTRICT, USEWCS)
              REGISTER  (new parameters OUTDOMAIN, OUTFORMAT)
              TRANLIST  (new parameters FRAMEIN, EPOCHIN, FRAMEOUT, 
                                        EPOCHOUT, WCSFILE)
@@ -55,8 +55,6 @@
 
   * There are some minor changes in behaviour:
 
-     - REGISTER: output to screen has changed slightly for readability.
-
      - Some routines fail differently when objects cannot be matched:
           FINDOFF erases the associated position list of NDFs which
              cannot be matched instead of leaving the previously 
@@ -64,8 +62,22 @@
           REGISTER ignores NDFs without associated position lists 
              instead of exiting.
 
+     - REGISTER: output to screen has changed slightly for readability.
 
 
   (at v2.3-2:
-     FINDCENT and PAIRNDF modified to improve centroiding for large images.)
+     Modifications to improve centroiding for large images.
+        Affected tasks:
+           FINDCENT, PAIRNDF, CCDALIGN
+
+     Modified window size and stacking.
+        Affected files:
+           CCDDialog.tcl, CCDExit.tcl, CCDIssueError.tcl, 
+           CCDIssueInfo.tcl, CCDSetDetector.tcl, Ccd_toplevel.tcl
+
+     Bug fix.
+        Affected files:
+           CCDGeomDrawCommand.tcl
+   )
+
 
