@@ -1049,6 +1049,7 @@
           ELSE
             CALL GDRAW_GET2DRANGE(XDIM,YDIM,IX1,IX2,IY1,IY2,
      :                           %val(DPTR),DMIN,DMAX,STATUS)
+          ENDIF
 	ENDIF
 
 	IF (PIXEL) THEN
@@ -1448,7 +1449,7 @@
 
 *+
       SUBROUTINE GDRAW_GET2DRANGEQ(NX,NY,IX1,IX2,IY1,IY2,
-     :                          Q,MASK,Z,ZMIN,ZMAX,STATUS)
+     :                          Z,Q,MASK,ZMIN,ZMAX,STATUS)
 
 *    Description :
 *    Parameters :
