@@ -171,6 +171,9 @@
 *      4-MAR-1993: Added GA, EQ, HA coords
 *     14-AUG-1993: Moved to SCULIB library
 *     $Log$
+*     Revision 1.7  1997/11/19 03:33:19  timj
+*     An AZ offset requires a sign change.
+*
 *     Revision 1.6  1997/11/04 20:40:43  timj
 *     Add MAP_X and MAP_Y offsets.
 *
@@ -235,6 +238,8 @@
       DOUBLE PRECISION SIN_HA                 ! Sine of hour angle
       DOUBLE PRECISION SIN_ROT, COS_ROT       ! sin and cos of ROTATION, 
                                               !   multiplied by cos (lat)
+      DOUBLE PRECISION SHIFT_X                ! Offset in X
+      DOUBLE PRECISION SHIFT_Y                ! Offset in Y 
 
 *  Internal References:
 
@@ -252,7 +257,14 @@
 
 *     Shift map centre by MAP_X and MAP_Y (if non-zero)
       IF (MAP_X .NE. 0.0D0 .OR. MAP_Y .NE. 0.0D0) THEN
-         CALL SLA_DTP2S(MAP_X, MAP_Y, LONG, LAT, MYLONG, MYLAT)
+
+         SHIFT_X = MAP_X
+         SHIFT_Y = MAP_Y
+      
+*     Special case for AZ - need to reverse azimuth offset
+         IF (COORD_TYPE .EQ. 'AZ') SHIFT_X = -1.0D0 * SHIFT_X 
+
+         CALL SLA_DTP2S(SHIFT_X, SHIFT_Y, LONG, LAT, MYLONG, MYLAT)
       END IF
          
 *  handle each coord type in turn
