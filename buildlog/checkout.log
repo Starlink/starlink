@@ -7542,6 +7542,7 @@ U java/source/votable/src/main/uk/ac/starlink/votable/BitDecoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/BooleanDecoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/CharDecoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Decoder.java
+U java/source/votable/src/main/uk/ac/starlink/votable/Encoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Field.java
 U java/source/votable/src/main/uk/ac/starlink/votable/FitsTable.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Link.java
@@ -7558,6 +7559,7 @@ U java/source/votable/src/main/uk/ac/starlink/votable/VOTable.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTableBuilder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTableEntityResolver.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTableFormatException.java
+U java/source/votable/src/main/uk/ac/starlink/votable/VOTableWriter.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Values.java
 U java/source/votable/src/main/uk/ac/starlink/votable/package.html
 cvs checkout: Updating java/source/votable/src/resources
