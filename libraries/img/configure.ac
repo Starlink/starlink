@@ -46,8 +46,8 @@ dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile component.xml])
 
-dnl    Define GC for the Starlink generic pre-processor.
-AC_PATH_PROG(GENERIC, generic)
+dnl    Locate the Starlink generic pre-processor.
+STAR_CHECK_PROGS(generic)
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
