@@ -1733,6 +1733,66 @@ MJC: Malcolm J. Currie  (STARLINK)
    dimensions for historical reasons.  The 2-d has a tabular layout
    with headings.  Logging awaits a proper table system to make this
    consistent.
+1 CHAIN
+Concatenates a series of vectorized NDFs.
+
+Usage:
+
+   chain in c1 [c2] [c3] ... [c25] out=?
+
+Description:
+
+   This application concatenates a series of NDFs, in the order
+   supplied and treated as vectors, to form a 1-dimensional output
+   NDF.  The dimensions of the NDFs may be different, and indeed so
+   may their dimensionalities.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   The base NDF after which the other input NDFs will be
+   concatenated.
+3 OUT
+OUT = NDF (Write)
+   The one-dimensional NDF resulting from concatenating the input
+   NDFs.
+3 C1-C25
+C1-C25 = NDF (Read)
+   The NDFs to be concatenated to the base NDF.  The NDFs are
+   joined in the order C1, C2, ... C25.  There can be no missing
+   NDFs, e.g. in order for C3 to be processed there must be a C2
+   given as well.   A null value (!) indicates that there is no
+   NDF.  NDFs C2 to C25 are defaulted to !.  At least one NDF
+   must be pasted, therefore C1 may not be null.
+3 TITLE
+TITLE = LITERAL (Read)
+   Title for the output NDF structure.  A null value (!)
+   propagates the title from the base NDF to the output NDF. [!]
+2 Examples
+chain obs1 obs2 out=stream
+   This concatenates the NDF called obs2 on to the arrays in the
+   NDF called obs1 to produce the 1-dimensional NDF stream.
+
+chain c1=obs2 c2=obs1 in=obs3 out=stream
+   This concatenates the NDF called obs2 on to the arrays in the
+   NDF called obs3, and then concatenates the arrays from obs1
+   to them to produce the 1-dimensional NDF stream.
+2 Related_Applications
+   KAPPA: PASTE, RESHAPE.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1997 June 14 (MJC):
+    Original version.
+2 Implementation_Status
+   -  This routine correctly processes the DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
+   data structure and propagates all extensions.  Propagation is from
+   the base NDF.  WCS and AXIS information is lost.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  Any number of NDF dimensions is supported.
 1 Changes_to_KAPPA
 
 The main changes made to KAPPA at each release are described in the
@@ -27291,6 +27351,77 @@ Group. The Starlink World Wide Web pages will periodically contain
 news of plans and work in progress.  KAPPA also receives a high
 level of support, and bug reports are dealt with promptly. 
 
+1 RESHAPE
+Reshapes an NDF, treating its arrays as vectors.
+
+Usage:
+
+   reshape in out shape=?
+
+Description:
+
+   This application reshapes an NDF to create another NDF by copying
+   array values.  The array components in the input NDF are treated
+   as vectors.  Each output array is filled in order with values from
+   the input vector, until it is full or the input vector is
+   exhausted.  Output data and variance pixels not filled are set to
+   the bad value; unfilled quality pixels are set to zero.  The
+   filling is in Fortran order, namely the first dimension, followed
+   by the second dimension,... to the highest dimension.
+
+   It is possible to form a vectorized NDF using parameter VECTORIZE
+   without having to specify the shape.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   The input NDF to be reshaped.
+3 OUT
+OUT = NDF (Read)
+   The NDF after reshaping.
+3 SHAPE
+SHAPE( ) = _INTEGER (Read)
+   The shape of the output NDF.  For example, [50,30,20] would
+   create 50 columns by 30 lines by 20 bands.  It is only
+   accessed when VECTORIZE = FALSE.
+3 TITLE
+TITLE = LITERAL (Read)
+   Title for the output NDF structure.  A null value (!)
+   propagates the title from the base NDF to the output NDF. [!]
+3 VECTORIZE
+VECTORIZE = _LOGICAL (Read)
+   If TRUE, the output NDF is the vectorized form of the input
+   NDF.  If FALSE, parameter SHAPE is used to specify the new
+   shape.  [FALSE]
+2 Examples
+reshape shear normal shape=[511,512]
+   This reshapes the NDF called shear to form NDF normal, whose
+   shape is 511 x 512 pixels.  One example is where the original
+   image has 512 x 512 pixels but one pixel was omitted from each
+   line during some data capture, causing the image to be sheared
+   between lines.
+
+reshape cube cube1d vectorize
+   This vectorizes the NDF called cube to form NDF cube1d.  This
+   could be used for a task that only permits one-dimensional
+   data.
+2 Related_Applications
+   KAPPA: CHAIN, PASTE, RESHAPE.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1997 June 15 (MJC):
+    Original version.
+2 Implementation_Status
+   -  This routine correctly processes the DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
+   data structure and propagates all extensions.  WCS and AXIS information 
+   is lost.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  Any number of NDF dimensions is supported.
+
 1 RIFT
 Adds a scalar to a section of an NDF data structure to correct
 rift-valley defects.
@@ -33695,6 +33826,104 @@ DSB: David Berry (STARLINK)
 2 History
  2-APR-1998 (DSB):
     Original version.
+
+1 WCSSHOW
+Examine the internal structure of an AST Object.
+
+Usage:
+
+   wcsshow ndf object logfile newwcs full quiet
+
+Description:
+
+   This application allows you to examine an AST Object stored in a
+   specified NDF or HDS object. The structure can be dumped to a text
+   file, or a Graphical User Interface can be used to navigate through
+   the structure (see parameter LOGFILE). A new FrameSet can also be
+   stored in the WCS component of the NDF (see parameter NEWWCS). This
+   allows an NDF WCS component to be dumped to a text file, edited, and
+   then restored to the NDF.
+
+   The GUI main window contains the attribute values of the supplied AST
+   Object. Only those associated with the Object's class are displayed
+   initially, but attributes of the Objects parent classes can be
+   displayed by clicking one of the class button to the top left of the
+   window.
+
+   If the Object contains attributes which are themselves AST Objects
+   (such as the Frames within a FrameSet), then new windows can be
+   created to examine these attributes by clicking over the attribute
+   name.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 FULL
+FULL = _INTEGER (Read)
+   This parameter is a three-state flag and takes values of -1, 0 or
+   +1. It controls the amount of information included in the output
+   generated by this application. If FULL is zero, then a modest
+   amount of non-essential but useful information will be included
+   in the output. If FULL is negative, all non-essential information
+   will be suppressed to minimise the amount of output, while if it is
+   positive, the output will include the maximum amount of detailed
+   information about the Object being examined. [current value]
+3 LOGFILE
+LOGFILE = FILENAME (Write)
+   The name of the text file in which to store a dump of the
+   specified AST Object. If a null (!) value is supplied, no log
+   file is created. If a log file is given, the Tk browser window
+   is not produced. [!]
+3 NDF
+NDF = NDF (Update)
+   If an NDF is supplied, then its WCS FrameSet is displayed. If a
+   null (!) value is supplied, then the parameter OBJECT is used to
+   specify the AST Object to display.
+3 NEWWCS
+NEWWCS = GROUP (Read)
+   A group expression giving a dump of an AST FrameSet which
+   is to be stored as the WCS component in the NDF given by parameter
+   NDF. The existing WCS component is unchanged if a null value is
+   supplied. This parameter is only accessed if a non-null value is
+   supplied for parameter NDF. The Base Frame in the FrameSet is
+   assumed to be the GRID Frame. If a value is given for this
+   parameter, then the log file or Tk browser will display the new
+   FrameSet (after being stored in the NDF and retrieved). [!]
+3 OBJECT
+OBJECT = LITERAL (Read)
+   The HDS object containing the AST Object to display. Only
+   accessed if parameter NDF is null. It must have an HDS type
+   of WCS, must be scalar, and must contain a single 1-D array component
+   with name DATA and type _CHAR.
+3 QUIET
+QUIET = _LOGICAL (Read)
+   If TRUE, then the structure of the AST Object is not displayed
+   (using the Tk GUI). Other functions are unaffected. The dynamic
+   default is TRUE if a non-null value is supplied for parameter
+   LOGFILE or parameter NEWWCS, and FALSE otherwise. []
+2 Examples
+wcsshow m51
+   Displays the WCS component of the NDF m51 in a Tk GUI.
+
+wcsshow m51 logfile=m51.ast
+   Dumps the WCS component of the NDF m51 to text file m51.ast.
+
+wcsshow m51 newwcs=^m51.ast
+   Reads a FrameSet from the text file m51.ast and stores it in the
+   WCS component of the NDF m51. For instance, the text file m51.ast
+   could be an edited version of the text file created in the
+   previous example.
+
+wcsshow object="~/agi_starprog.agi_3800_1.picture(4).more.ast_plot"
+   Displays the AST Plot stored in the AGI database with X windows
+   picture number 4.
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 2-APR-1998 (DSB):
+    Original version.
+
+ 5-OCT-1998 (DSB):
+    Added parameter NDF.
+
 1 WIENER
 Applies a Wiener filter to a 1- or 2-dimensional array.
 
