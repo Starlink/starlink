@@ -5,6 +5,9 @@
   The CCDALIGN application has been changed so that images of
   different sizes are displayed at different scales.
 
+  The FLATCOR application has been changed to trap divide by zero
+  on Linux and OSF/1.
+
   CCDPACK is fully described in SUN/139 and can be viewed on-line using 
   the "showme sun139" command. The latest information about CCDPACK 
   problems is always available at:
