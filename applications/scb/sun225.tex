@@ -10,15 +10,17 @@
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
-\newcommand{\stardoccategory}  {Starlink System Note}
-\newcommand{\stardocinitials}  {SSN}
-\newcommand{\stardocsource}    {ssn\stardocnumber}
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {[number].[version]}
+\newcommand{\stardocnumber}    {226.1}
 \newcommand{\stardocauthors}   {M. B. Taylor}
-\newcommand{\stardocdate}      {19 October 1998}
-\newcommand{\stardoctitle}     {SCB - Starlink Source Code browser}
+\newcommand{\stardocdate}      {11 November 1998}
+\newcommand{\stardoctitle}     {SCB --- Source Code Browser}
+\newcommand{\stardocversion}   {1.0}
+\newcommand{\stardocmanual}    {Use and installation guide}
 \newcommand{\stardocabstract}  {
 This document describes the installation and use of SCB, 
 the Starlink Source Code Browser.  
@@ -36,10 +38,10 @@ must be installed as a CGI script.
 
 % +
 %  Name:
-%     ssn.tex
+%     sun.tex
 %
 %  Purpose:
-%     Template for Starlink System Note (SSN) documents.
+%     Template for Starlink User Note (SUN) documents.
 %     Refer to SUN/199
 %
 %  Authors:
@@ -53,11 +55,12 @@ must be installed as a CGI script.
 %        Original with hypertext macros, based on MDL plain originals.
 %     16-JUN-1997 (BLY):
 %        Adapted for LaTeX2e.
+%        Added picture commands.
 %     13-AUG-1998 (PWD):
 %        Converted for use with LaTeX2HTML version 98.2 and
 %        Star2HTML version 1.3.
-%     19-OCT-1998 (MBT):
-%        Text added for SCB.
+%     11-NOV-1998 (MBT):
+%        Instantiated as SUN/226.
 %     {Add further history here}
 %
 % -
@@ -196,9 +199,15 @@ must be installed as a CGI script.
    \rule{\textwidth}{0.5mm}
    \vspace{5mm}
    \begin{center}
-   {\Large\textbf \stardoctitle}
+   {\Huge\textbf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\textbf \stardocversion \\ [4ex]}
+   {\Huge\textbf  \stardocmanual}
    \end{center}
    \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
 
 % ? Heading for abstract if used.
    \vspace{10mm}
@@ -213,8 +222,14 @@ must be installed as a CGI script.
 \begin{htmlonly}
    \xlabel{}
    \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
-      \stardoctitle
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
    \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
    \stardoccategory\ \stardocnumber \\
@@ -247,7 +262,6 @@ must be installed as a CGI script.
 % ? New section for abstract if used.
   \section{\xlabel{abstract}Abstract}
 % ? End of new section for abstract
-
 \end{htmlonly}
 
 % -----------------------------------------------------------------------------
