@@ -19,6 +19,7 @@ wcstrig.h \
 proj.h \
 memory.h \
 error.h \
+unit.h \
 ast_err.h \
 object.h \
    pointset.h \
@@ -34,6 +35,7 @@ object.h \
       pcdmap.h \
       permmap.h \
       slamap.h \
+      specmap.h \
       sphmap.h \
       unitmap.h \
       wcsmap.h \
@@ -44,6 +46,7 @@ object.h \
          frameset.h \
             plot.h \
          skyframe.h \
+         specframe.h \
    channel.h \
       fitschan.h
 

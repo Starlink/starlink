@@ -381,8 +381,8 @@ $(PKG_NAME)_err.h axis.h c2f77.h channel.h cmpframe.h \
 cmpmap.h dssmap.h error.h fitschan.h frame.h \
 frameset.h intramap.h loader.h lutmap.h mapping.h \
 mathmap.h matrixmap.h memory.h object.h pcdmap.h \
-permmap.h plot.h pointset.h skyaxis.h skyframe.h \
-slamap.h sphmap.h unitmap.h wcsmap.h winmap.h \
+permmap.h plot.h pointset.h skyaxis.h skyframe.h specframe.h \
+specmap.h slamap.h sphmap.h unit.h unitmap.h wcsmap.h winmap.h \
 zoommap.h
 
 #  The following include files are associated with various externally
@@ -425,12 +425,12 @@ dssmap.c error.c fchannel.c fcmpframe.c fcmpmap.c \
 fdssmap.c ferror.c ffitschan.c fframe.c fframeset.c \
 fintramap.c fitschan.c flutmap.c fmapping.c fmathmap.c \
 fmatrixmap.c fobject.c fpcdmap.c fpermmap.c fplot.c \
-frame.c frameset.c fskyframe.c fslamap.c fsphmap.c \
+frame.c frameset.c fskyframe.c fspecframe.c fslamap.c fspecmap.c fsphmap.c \
 funitmap.c fwcsmap.c fwinmap.c fzoommap.c intramap.c \
 loader.c lutmap.c mapping.c mathmap.c matrixmap.c \
 memory.c object.c pcdmap.c permmap.c plot.c \
-pointset.c skyaxis.c skyframe.c slamap.c sphmap.c \
-unitmap.c wcsmap.c winmap.c zoommap.c
+pointset.c skyaxis.c skyframe.c specframe.c specmap.c slamap.c sphmap.c \
+unit.c unitmap.c wcsmap.c winmap.c zoommap.c
 
 #  The default error reporting module.
 ERR_C_ROUTINES = err_null.c
@@ -448,7 +448,7 @@ PGPLOT_C_ROUTINES = grf_pgplot.c
 SLALIB_C_ROUTINES = sla.c
 
 #  Modules adapted from the wcslib library.
-WCSLIB_C_ROUTINES = proj.c tpn.c wcstrig.c
+WCSLIB_C_ROUTINES = proj.c wcstrig.c tpn.c
 
 #  The facility error file, which associates messages with error codes.
 
@@ -1304,7 +1304,7 @@ unbuild: clean
 #  files.
 
 axis.o: axis.c ast_err.h error.h memory.h object.h channel.h \
- pointset.h axis.h
+ pointset.h axis.h unit.h
 c2f77.o: c2f77.c error.h c2f77.h
 channel.o: channel.c error.h memory.h object.h channel.h loader.h \
  ast_err.h
@@ -1363,7 +1363,11 @@ frameset.o: frameset.c error.h memory.h object.h channel.h mapping.h \
  ast_err.h
 fskyframe.o: fskyframe.c f77.h c2f77.h error.h memory.h skyframe.h \
  object.h channel.h frame.h axis.h mapping.h pointset.h frameset.h
+fspecframe.o: fspecframe.c f77.h c2f77.h error.h memory.h specframe.h \
+ object.h channel.h frame.h axis.h mapping.h pointset.h frameset.h
 fslamap.o: fslamap.c f77.h c2f77.h error.h memory.h slamap.h mapping.h \
+ object.h channel.h pointset.h
+fspecmap.o: fspecmap.c f77.h c2f77.h error.h memory.h specmap.h mapping.h \
  object.h channel.h pointset.h
 fsphmap.o: fsphmap.c f77.h c2f77.h error.h memory.h sphmap.h mapping.h \
  object.h channel.h pointset.h
@@ -1383,8 +1387,8 @@ intramap.o: intramap.c error.h memory.h object.h channel.h pointset.h \
 loader.o: loader.c axis.h object.h error.h channel.h cmpframe.h \
  frame.h mapping.h pointset.h frameset.h cmpmap.h dssmap.h fitschan.h \
  intramap.h loader.h lutmap.h mathmap.h matrixmap.h pcdmap.h permmap.h \
- plot.h skyaxis.h skyframe.h slamap.h sphmap.h unitmap.h wcsmap.h \
- proj.h wcstrig.h wcsmath.h winmap.h zoommap.h ast_err.h
+ plot.h skyaxis.h skyframe.h specframe.h slamap.h specmap.h sphmap.h unitmap.h wcsmap.h \
+ proj.h wcstrig.h wcsmath.h winmap.h zoommap.h ast_err.h unit.h
 lutmap.o: lutmap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h winmap.h lutmap.h ast_err.h
 mapping.o: mapping.c error.h memory.h object.h channel.h pointset.h \
@@ -1405,24 +1409,31 @@ plot.o: plot.c channel.h object.h error.h cmpmap.h mapping.h \
  skyframe.h winmap.h wcsmap.h proj.h wcstrig.h wcsmath.h permmap.h ast_err.h
 pointset.o: pointset.c error.h memory.h object.h channel.h pointset.h \
  ast_err.h
-proj.o: proj.c proj.h wcstrig.h wcsmath.h
 tpn.o: tpn.c proj.h wcstrig.h wcsmath.h
+proj.o: proj.c proj.h wcstrig.h wcsmath.h
 skyaxis.o: skyaxis.c ast_err.h slalib.h error.h memory.h pointset.h \
  object.h channel.h axis.h skyaxis.h
 skyframe.o: skyframe.c error.h memory.h object.h channel.h pointset.h \
  unitmap.h mapping.h permmap.h cmpmap.h slamap.h skyaxis.h axis.h \
  frame.h frameset.h skyframe.h slalib.h ast_err.h
+specframe.o: specframe.c error.h memory.h object.h channel.h pointset.h \
+ unitmap.h mapping.h permmap.h cmpmap.h slamap.h skyaxis.h axis.h \
+ frame.h frameset.h specframe.h slalib.h ast_err.h 
 sla.o: sla.c memory.h error.h f77.h slalib.h
 slamap.o: slamap.c slalib.h error.h memory.h object.h channel.h \
+ pointset.h mapping.h unitmap.h slamap.h ast_err.h
+specmap.o: specmap.c slalib.h error.h memory.h object.h channel.h \
  pointset.h mapping.h unitmap.h slamap.h ast_err.h
 sphmap.o: sphmap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h unitmap.h sphmap.h slalib.h ast_err.h
 unitmap.o: unitmap.c error.h object.h channel.h pointset.h mapping.h \
  unitmap.h ast_err.h
+unit.o: unit.c error.h object.h channel.h mapping.h \
+ unitmap.h ast_err.h
 wcsmap.o: wcsmap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h unitmap.h permmap.h wcsmap.h proj.h wcstrig.h wcsmath.h slalib.h \
  ast_err.h
-wcstrig.o: wcstrig.c wcstrig.h
+wcstrig.o: wcstrig.c wcstrig.h wcsmath.h
 winmap.o: winmap.c error.h memory.h object.h channel.h pointset.h \
  matrixmap.h mapping.h unitmap.h zoommap.h permmap.h winmap.h \
  ast_err.h

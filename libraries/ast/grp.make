@@ -39,6 +39,8 @@ frame.c \
 frameset.c \
 fskyframe.c \
 fslamap.c \
+fspecframe.c \
+fspecmap.c \
 fsphmap.c \
 funitmap.c \
 fwcsmap.c \
@@ -63,8 +65,11 @@ skyaxis.c \
 skyframe.c \
 sla.c \
 slamap.c \
+specframe.c \
+specmap.c \
 sphmap.c \
 tpn.c \
+unit.c \
 unitmap.c \
 wcsmap.c \
 wcstrig.c \
@@ -113,7 +118,10 @@ skyaxis.h \
 skyframe.h \
 slalib.h \
 slamap.h \
+specframe.h \
+specmap.h \
 sphmap.h \
+unit.h \
 unitmap.h \
 wcsmap.h \
 wcsmath.h \
