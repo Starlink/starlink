@@ -1,7 +1,7 @@
-      SUBROUTINE KPS1_CLNST<T>( LBND, UBND, XCEN, X, STATUS )
+      SUBROUTINE KPS1_CLNS<T>( LBND, UBND, XCEN, X, STATUS )
 *+
 *  Name:
-*     KPS1_CLNSTx
+*     KPS1_CLNSx
 
 *  Purpose:
 *     To 'clean' a marginal star profile, removing neighbouring stars
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_CLNSTx( LBND, UBND, XCEN, X, STATUS )
+*     CALL KPS1_CLNSx( LBND, UBND, XCEN, X, STATUS )
 
 *  Description:
 *     This routine cleans a marginal star profile by subtracting the
