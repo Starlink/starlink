@@ -65,10 +65,10 @@
 *                 Column values are formatted with this format.
 *      hfmts_   : A list of Tcl formats specifications, one for each column.
 *                 Column headings are formatted with this format.
-*      zaxunit_ : The units associated with the Z axis in the current
+*      zaunit_  : The units associated with the Z axis in the current
 *                 Frame of the catalogues WCS FrameSet. Not written if
 *                 the catalogue does not have a Z axis.
-*      zcolunit_: The units associated with the Z column in the catalogue.
+*      zcunit_  : The units associated with the Z column in the catalogue.
 *                 Not written if the catalogue does not have a Z column.
 
 *  Usage:
@@ -94,7 +94,7 @@
 *     13-FEB-2001 (DSB):
 *        Modified to support 3D data.
 *     2-MAR-2001 (DSB):
-*        Added zcolunit_ and zaxunit_,
+*        Added zcunit_ and zaunit_,
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -164,9 +164,9 @@
       CHARACTER TEXT*512         ! O/p text buffer
       CHARACTER XCNM*20          ! Name of the X column
       CHARACTER YCNM*20          ! Name of the Y column
-      CHARACTER ZAXUN*20         ! Units for Z axis
+      CHARACTER ZAUNIT*20         ! Units for Z axis
       CHARACTER ZCNM*20          ! Name of the Z column
-      CHARACTER ZCOLUN*20        ! Units for Z column
+      CHARACTER ZCUNIT*20        ! Units for Z column
       DOUBLE PRECISION DEQN      ! Input equinox
       INTEGER BFRM               ! Base Frame from input WCS FrameSet
       INTEGER CI                 ! CAT identifier for input catalogue
@@ -353,9 +353,9 @@
 *  If a Z column is present, get the units strings from the 3rd axis in
 *  both base and current Frames.
       IF( ZCOL .GT. 0 ) THEN
-         ZAXUN = AST_GETC( AST_GETFRAME( IWCS, AST__CURRENT, STATUS ),
+         ZAUNIT = AST_GETC( AST_GETFRAME( IWCS, AST__CURRENT, STATUS ),
      :                      'UNIT(3)', STATUS )
-         ZCOLUN = AST_GETC( AST_GETFRAME( IWCS, AST__BASE, STATUS ),
+         ZCUNIT = AST_GETC( AST_GETFRAME( IWCS, AST__BASE, STATUS ),
      :                      'UNIT(3)', STATUS )
       END IF
 
@@ -733,15 +733,15 @@
          CALL CHR_PUTR( UBND( 3 ), TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
-         TEXT = 'set zaxunit_ "'
-         IAT = 14
-         CALL CHR_APPND( ZAXUN, TEXT, IAT )
+         TEXT = 'set zaunit_ "'
+         IAT = 13
+         CALL CHR_APPND( ZAUNIT, TEXT, IAT )
          CALL CHR_APPND( '"', TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
-         TEXT = 'set zcolunit_ "'
-         IAT = 15
-         CALL CHR_APPND( ZCOLUN, TEXT, IAT )
+         TEXT = 'set zcunit_ "'
+         IAT = 13
+         CALL CHR_APPND( ZCUNIT, TEXT, IAT )
          CALL CHR_APPND( '"', TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
