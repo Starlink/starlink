@@ -1,5 +1,5 @@
 *+  PSF_ENERGY_PFL - Return radii at which energy level is enclosed
-      SUBROUTINE PSF_ENERGY_PFL( SLOT, NFRAC, FRAC, X0, Y0,
+      SUBROUTINE PSF_ENERGY_PFL( PSID, NFRAC, FRAC, X0, Y0,
      :                                      RADII, STATUS )
 *
 *    Description :
@@ -40,16 +40,11 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
       INCLUDE 'MATH_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *
-      INTEGER                  SLOT                    ! The PSF id
+      INTEGER                  PSID                    ! The PSF id
       INTEGER                  NFRAC                   ! Number of fractions
       REAL                     FRAC(NFRAC)             ! Requested fractions
       REAL                     X0, Y0                  ! Image position
@@ -99,10 +94,9 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Invoke specialist routine if it exists
-      CALL PSF0_FNDRTN( P_PSID(SLOT), 'Eprofile', THERE, RTNPTR,
-     :                  STATUS )
+      CALL PSF0_FNDRTN( PSID, 'Eprofile', THERE, RTNPTR, STATUS )
       IF ( THERE ) THEN
-        CALL PSF_ENERGY_PFL_SPEC( %VAL(RTNPTR), P_PSID(SLOT), X0, Y0,
+        CALL PSF_ENERGY_PFL_SPEC( %VAL(RTNPTR), PSID, X0, Y0,
      :                            NFRAC, FRAC, RADII, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           GOTO 99
@@ -112,10 +106,10 @@
       END IF
 
 *  Axis identifiers
-      CALL PSF_QAXES( SLOT, X_AX, Y_AX, E_AX, T_AX, STATUS )
+      CALL PSF_QAXES( PSID, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
 *  Direction of increase of X axis
-      IF ( PSF1_GETAXINC( P_INST(SLOT), X_AX, STATUS ) ) THEN
+      IF ( PSF1_GETAXINC( PSID, X_AX, STATUS ) ) THEN
         XDIR = 1.0
       ELSE
         XDIR = -1.0
@@ -123,7 +117,7 @@
 
 *    STAGE 1
       CDX = MAXRAD * MATH__DTOR / REAL( MAXPR ) * XDIR
-      CALL PSF_ENERGY_PFL_INT( SLOT, X0, Y0, CDX, MAXPR, COARSE,
+      CALL PSF_ENERGY_PFL_INT( PSID, X0, Y0, CDX, MAXPR, COARSE,
      :                                             TOT, STATUS )
       CDX = ABS(CDX)
 
@@ -136,7 +130,7 @@
       ZOOM = CDX / FDX
       ZOOM = REAL( INT(ZOOM) + 1 )
       FDX = XDIR * CDX / ZOOM
-      CALL PSF_ENERGY_PFL_INT( SLOT, X0, Y0, FDX, MAXPR, FINE, TOT,
+      CALL PSF_ENERGY_PFL_INT( PSID, X0, Y0, FDX, MAXPR, FINE, TOT,
      :                                                     STATUS )
 
 *    Try to do those radii inside the fine strip
@@ -242,7 +236,7 @@
 
 
 *+  PSF_ENERGY_PFL_INT - Internal psf access routine
-      SUBROUTINE PSF_ENERGY_PFL_INT( SLOT, X0, Y0, DX, NX, ARRAY,
+      SUBROUTINE PSF_ENERGY_PFL_INT( PSID, X0, Y0, DX, NX, ARRAY,
      :                                              TOT, STATUS )
 *    Description :
 *    Method :
@@ -268,7 +262,7 @@
 *
 *    Import :
 *
-      INTEGER                  SLOT           ! Psf handle
+      INTEGER                  PSID           ! Psf handle
       REAL                     X0, Y0         ! Image position
       INTEGER                  NX             ! Size of psf data array
       REAL                     DX             ! Bin size to use
@@ -296,7 +290,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Get the psf data
- 10   CALL PSF_2D_DATA( SLOT, X0, Y0, (NX+1)*DX/2.0, 0.0, DX,
+ 10   CALL PSF_2D_DATA( PSID, X0, Y0, (NX+1)*DX/2.0, 0.0, DX,
      :      ABS(DX/YFAC), .TRUE., NX+1, 1, ARRAY(0), STATUS )
 
 *    Abort if bad status
