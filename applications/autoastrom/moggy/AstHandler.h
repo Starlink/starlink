@@ -96,6 +96,9 @@ class AstHandler{
 
     static verbosities verbosity_;
     static const double DegreesPerRadian;
+
+    int raIndex_;
+    int decIndex_;
 };
 
 

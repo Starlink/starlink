@@ -230,6 +230,19 @@ AstHandler::AstHandler (vector<string>serialFrameset,
 	throw MoggyException (SS_STRING(msg));
     }
 
+    // PWD: work out which axes are longitude and which are latitude
+    // (note we leave at defaults if neither is a time axis).  Note
+    // this comment contradicts the assertion about latitude and
+    // longitude order made above.
+    int astime2 = astGetI( astobj_, "astime(2)" );
+    if ( astime2 ) {
+        raIndex_  = 2;
+        decIndex_ = 1;
+    } else {
+        raIndex_  = 1;
+        decIndex_ = 2;
+    }
+
     if (verbosity_ > normal)
 	Util::logstream() << "AstHandler::AstHandler: successfully constructed astmap_"
 	     << endl;
@@ -245,6 +258,22 @@ bool AstHandler::transToSky (const double xpix, const double ypix,
 			     double& radeg, double& decdeg)
 {
     astTran2 (astmap_, 1, &xpix, &ypix, 1, &radeg, &decdeg);
+
+    // RA and Dec can be swapped. Also normalize the result into the
+    // correct range. 
+    double point[2];
+    point[0] = radeg;
+    point[1] = decdeg;
+    astNorm( astobj_, point );
+    if ( raIndex_ == 1 ) {
+        radeg = point[0];
+        decdeg = point[1];
+    } 
+    else {
+        decdeg = point[0];
+        radeg = point[1];
+    }
+
     if (verbosity_ > normal)
 	Util::logstream() << "AstHandler::transToSky: (" << xpix << ',' << ypix
 	     << ") --> (" << radeg << ',' << decdeg
@@ -255,11 +284,8 @@ bool AstHandler::transToSky (const double xpix, const double ypix,
 	     << ")";
 
     // These coordinates are in radians (by the definition of the
-    // SkyFrame).  Convert them to decimal degrees and normalise RA
-    // to [0,360[.
+    // SkyFrame).  Convert them to decimal degrees.
     radeg *= DegreesPerRadian;
-    while (radeg < 0) radeg += 360.0;
-    while (radeg >= 360) radeg -= 360.0;
     decdeg *= DegreesPerRadian;
 
     if (verbosity_ > normal)
@@ -276,8 +302,16 @@ bool AstHandler::transFromSky (const double radeg, const double decdeg,
     // Transform RA and Dec coordinates from decimal degrees to
     // radians -- no need to worry about normalisation, since AST
     // takes care of everything.
-    double lradeg  = radeg/DegreesPerRadian;
-    double ldecdeg = decdeg/DegreesPerRadian;
+    double lradeg;
+    double ldecdeg;
+    if ( raIndex_ == 1 ) {
+        lradeg  = radeg/DegreesPerRadian;
+        ldecdeg = decdeg/DegreesPerRadian;
+    } else {
+        ldecdeg  = radeg/DegreesPerRadian;
+        lradeg = decdeg/DegreesPerRadian;
+    }
+
     astTran2 (astmap_, 1, &lradeg, &ldecdeg, 0, &xpix, &ypix);
     if (verbosity_ > normal)
 	Util::logstream() << "AstHandler::transFromSky: (" << radeg << ',' << decdeg
