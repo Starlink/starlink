@@ -4043,6 +4043,29 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
 
 
 
+*+ IMG_INBOUNDS
+	LOGICAL FUNCTION IMG_INBOUNDS(I,J)
+
+        IMPLICIT NONE
+
+*  Global constants :
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Import :
+      INTEGER I,J
+*  Export :
+*  Status :
+*  Local constants :
+*  Local variables :
+*-
+
+      IMG_INBOUNDS=(I.GE.1.AND.I.LE.I_NX.AND.J.GE.1.AND.J.LE.I_NY)
+
+
+      END
+
+
+
 *+ IMG_INCIRC
 	LOGICAL FUNCTION IMG_INCIRC(I,J,XC,YC,R)
 
@@ -4059,6 +4082,8 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
 *  Export :
 *  Status :
       INTEGER STATUS
+*  Functions :
+      LOGICAL IMG_INBOUNDS
 *  Local constants :
 *  Local variables :
       REAL XPIX,YPIX
@@ -4071,7 +4096,7 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
       CALL IMG_PIXTOWORLD(XPIX,YPIX,X,Y,STATUS)
       DISP=SQRT((X-XC)**2 + (Y-YC)**2)
 
-      IMG_INCIRC=(DISP.LE.R)
+      IMG_INCIRC=(DISP.LE.R.AND.IMG_INBOUNDS(I,J))
 
 
       END
@@ -4094,6 +4119,8 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
 *  Export :
 *  Status :
       INTEGER STATUS
+*  Functions :
+      LOGICAL IMG_INBOUNDS
 *  Local constants :
 *  Local variables :
       REAL XPIX,YPIX
@@ -4106,7 +4133,8 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
       CALL IMG_PIXTOWORLD(XPIX,YPIX,X,Y,STATUS)
       DISP=SQRT((X-XC)**2 + (Y-YC)**2)
 
-      IMG_INANNULUS=(DISP.GE.IRAD.AND.DISP.LE.ORAD)
+      IMG_INANNULUS=(DISP.GE.IRAD.AND.DISP.LE.ORAD.AND.
+     :                                      IMG_INBOUNDS(I,J))
 
 
       END
@@ -4131,7 +4159,8 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Function declarations :
+*  Functions :
+      LOGICAL IMG_INBOUNDS
 *    Local variables :
       REAL X,Y
       REAL THETA
@@ -4159,7 +4188,8 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
         Y=DISP*SIN(LANGLE-THETA)
 
 *  check transformed coord falls within slice
-        IMG_INSLICE=(ABS(X).LE.LENGTH/2.0.AND.ABS(Y).LE.WIDTH/2.0)
+        IMG_INSLICE=(ABS(X).LE.LENGTH/2.0.AND.ABS(Y).LE.WIDTH/2.0.AND.
+     :                                   IMG_INBOUNDS(I,J))
 
 
 	END
@@ -4186,7 +4216,8 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Function declarations :
+*  Functions :
+      LOGICAL IMG_INBOUNDS
 *    Local variables :
       REAL X,Y
       REAL THETA
@@ -4222,7 +4253,7 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
         RAD=SQRT((MAJOR*COS(ALPHA))**2 + (MINOR*SIN(ALPHA))**2)
 
 *  check transformed coord falls within ellipse
-        IMG_INELLIPSE=(DISP.LE.RAD)
+        IMG_INELLIPSE=(DISP.LE.RAD.AND.IMG_INBOUNDS(I,J))
 
 
 	END
@@ -4292,7 +4323,7 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
         FLAG=.FALSE.
       ENDIF
 
-      IMG_INPOLY=FLAG
+      IMG_INPOLY=(FLAG.AND.IMG_INBOUNDS(I,J)
 
       END
 
