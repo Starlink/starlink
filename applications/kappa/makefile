@@ -678,7 +678,7 @@ rotate.f segment.f setmagic.f shadow.f slide.f \
 sqorst.f stats.f sub.f substitute.f surfit.f thresh.f \
 trandat.f traninvert.f tranjoin.f tranmake.f \
 transformer.f trantrace.f trig.f wiener.f zaplin.f \
-listmake.f listshow.f profile.f wcsalign.f wcstran.f
+listmake.f listshow.f profile.f wcsalign.f wcstran.f scatter.f
 
 KAPSUB_F_ROUTINES = \
 apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f ftsize.f ftsizt.f \
@@ -3525,6 +3525,7 @@ quilt.o:	 SAE_PAR DAT_PAR PAR_ERR
 reshape.o:	 SAE_PAR NDF_PAR PRM_PAR
 rift.o:	         SAE_PAR NDF_PAR DAT_PAR
 rotate.o:	 SAE_PAR NDF_PAR PRM_PAR PAR_ERR
+scatter.o:	 SAE_PAR NDF_PAR PRM_PAR
 segment.o:	 SAE_PAR GKS_PAR NDF_PAR PRM_PAR CTM_PAR GNS_PAR PAR_PAR PAR_ERR MSG_PAR
 setaxis.o:	 SAE_PAR NDF_PAR DAT_PAR PRM_PAR PAR_PAR PAR_ERR NUM_DEC_CVT NUM_DEF_CVT
 setbad.o:	 SAE_PAR PAR_ERR

@@ -225,7 +225,8 @@ trantrace.par trig.par turbocont.par vecplot.par wiener.par zaplin.par \
 kappa_mon.tcl kapview_mon.tcl ndfpack_mon.tcl mem2d.tcl root.hd kappa.hd \
 _kappa.hd kappa.men helpdb.mip profile.par listshow.par listmake.par \
 wcsadd.par wcsalign.par wcsattrib.par wcscopy.par wcsframe.par \
-wcsremove.par wcsshow.par chain.par reshape.par copybad.par wcstran.par
+wcsremove.par wcsshow.par chain.par reshape.par copybad.par wcstran.par \
+scatter.par
 
 #  Contents of the doc/ directory in kappa_iraf.tar
 IRAF_DOCS = add.hlp aperadd.hlp ardgen.hlp ardmask.hlp axconv.hlp \
@@ -268,7 +269,7 @@ automatic_data_conv.hlp colour_table_and_pa.hlp getting_data_into_k.hlp \
 image_display_inter.hlp masking__bad_values.hlp selecting_graphics_.hlp \
 iraf_usage.hlp listshow.hlp listmake.hlp wcsadd.hlp wcsalign.hlp \
 wcsattrib.hlp wcscopy.hlp wcsframe.hlp wcsremove.hlp wcsshow.hlp \
-chain.hlp reshape.hlp copybad.hlp wcstran.hlp
+chain.hlp reshape.hlp copybad.hlp wcstran.hlp scatter.hlp
 
 # The contents of the kappa_data_alpha_OSF1.tar file:
 KAPPA_DATA_ALPHA_OSF1 = bgyrw_lut.sdf.alpha_OSF1 cont_lut.sdf.alpha_OSF1 \
@@ -321,7 +322,7 @@ setbad.ifl setbb.ifl setbound.ifl setext.ifl setlabel.ifl setnorm.ifl \
 setorigin.ifl setsky.ifl settitle.ifl settype.ifl setunits.ifl setvar.ifl \
 mem2d.ifl wcsframe.ifl wcsremove.ifl listshow.ifl listmake.ifl wcscopy.ifl \
 wcsadd.ifl wcsattrib.ifl wcsalign.ifl profile.ifl wcsshow.ifl chain.ifl \
-reshape.ifl copybad.ifl wcstran.ifl
+reshape.ifl copybad.ifl wcstran.ifl scatter.ifl
 
 # The contents of the kappa_sub.tar file:
 KAPPA_SUB = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \
@@ -335,7 +336,7 @@ numb.f outset.f parget.f paste.f pixdupe.f kap_pow.f psf.f quilt.f rift.f \
 rotate.f segment.f setmagic.f shadow.f slide.f sqorst.f stats.f sub.f \
 substitute.f surfit.f thresh.f trandat.f traninvert.f tranjoin.f \
 tranmake.f transformer.f trantrace.f trig.f wiener.f zaplin.f mem2d.f \
-listmake.f listshow.f profile.f wcsalign.f wcstran.f copybad.f
+listmake.f listshow.f profile.f wcsalign.f wcstran.f copybad.f scatter.f
 
 # The contents of the kapsub_sub.tar file:
 KAPSUB_SUB = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
