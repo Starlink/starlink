@@ -29,23 +29,30 @@
 
 *  Author:
 *     Tim Jenness (JAC, Hawaii)
+*     Alan Chipperfield (Starlink)
 
 *  History:
 *     6 Jan 2000 (TIMJ)
 *        Original version
 *    21 Sep 2000 (AJC)
 *        Unused IFAIL
+*    10 Jun 2003 (TIMJ)
+*        Linux does not like '(I4,''-''...)' embedded format style
+*        so pull out as explicit format statements
+*        Added CCYY-MM-DDTHH:MM format for completeness.
 
 *  Notes:
 *     Guesses at the format of the DATE-OBS string from its length.
 *        DD/MM/YY                    8
 *        CCYY-MM-DD                 10
+*        CCYY-MM-DDTHH:MM           16
 *        CCYY-MM-DDTHH:MM:SS        19
 *        CCYY-MM-DDTHH:MM:SSZ       20
 *        CCYY-MM-DDTHH:MM:SS.SSS    23
 *        CCYY-MM-DDTHH:MM:SS.SSSZ   24
 *     But note that the trailing Z is irrelevant for the parsing
-*     of the DATE-OBS string by the READ command
+*     of the DATE-OBS string by the READ command and that SPECX
+*     dates do not care about fractional seconds.
 *
 
 *.
@@ -77,6 +84,7 @@
       CHARACTER*3 MONTHS(12)    ! List of all 12 months
       INTEGER SS                ! Number of seconds
       INTEGER YY                ! year number (2 or 4 digit)
+      INTEGER LSTATUS
 
 *  Local Date:
       DATA MONTHS /'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
@@ -92,37 +100,43 @@
 *     Find length of string
       ILEN = CHR_LEN ( DATE_OBS )
 
+      print *,'ILEN = ',ILEN
+
 *     Use length to guess at format
       IF (ILEN .EQ. 8) THEN
 
 *     DD/MM/YY format
-         READ( DATE_OBS, '(I2,''/'',I2,''/'',I2)') 
-     :        DD, MM, YY
+         READ( DATE_OBS, FMT=2221) DD, MM, YY
 
          READUT = .FALSE.
 
       ELSE IF (ILEN .EQ. 10) THEN
 
 *     CCYY-MM-DD format
-         READ( DATE_OBS, '(I4,''-'',I2,''-'',I2)') YY, MM, DD
+         READ( DATE_OBS, FMT=2222) YY, MM, DD
 
          READUT = .FALSE.
+
+      ELSE IF (ILEN .EQ. 16) THEN
+
+*     CCYY-MM-DD format
+         READ( DATE_OBS, FMT=2225) YY, MM, DD, HH, MIN
+         SS = 0
+         FS = 0
+
+         READUT = .TRUE.
 
       ELSE IF (ILEN .EQ. 19 .OR. ILEN .EQ. 20) THEN
 
 *     "ccyy-mm-ddThh:mm:ss" or "ccyy-mm-ddThh:mm:ssZ"
-         READ( DATE_OBS, 
-     :        '(I4,''-'',I2,''-'',I2,''T'',I2,'':'',I2,'':'',I2)') 
-     :        YY, MM, DD, HH, MIN, SS
+         READ( DATE_OBS, FMT=2223) YY, MM, DD, HH, MIN, SS
 
          READUT = .TRUE.
 
       ELSE IF (ILEN .EQ. 23 .OR. ILEN .EQ. 24) THEN
 
 *     "ccyy-mm-ddThh:mm:ss.sss" or "ccyy-mm-ddThh:mm:ss.sssZ"
-         READ( DATE_OBS, 
-     :      '(I4,''-'',I2,''-'',I2,''T'',I2,'':'',I2,'':'',I2,''.'',I3)'
-     :      ) YY, MM, DD, HH, MIN, SS, FS
+         READ( DATE_OBS(:23), FMT=2224) YY, MM, DD, HH, MIN, SS, FS
 
          READUT = .TRUE.
 
@@ -148,6 +162,13 @@
 *     Create the date string
       WRITE (IDATE, '(I2.2,''-'',A3,''-'',I2.2)')
      &     DD, MONTHS(MM), MOD(YY,100)
+
+*     Formats for parsing
+ 2221 FORMAT(I2,'/',I2,'/',I2)  ! DD/MM/YY
+ 2222 FORMAT(I4,'-',I2,'-',I2)  ! CCYY-MM-DD
+ 2223 FORMAT(I4,'-',I2,'-',I2,'T',I2,':',I2,':',I2) ! CCYY-MM-DDTHH:MM:SS[Z]
+ 2224 FORMAT(I4,'-',I2,'-',I2,'T',I2,':',I2,':',I2,'.',I3) ! CCYY-MM-DDTHH:MM:SS.SSS[Z] 
+ 2225 FORMAT(I4,'-',I2,'-',I2,'T',I2,':',I2) ! CCYY-MM-DDTHH:MM
 
       END
 
