@@ -32,6 +32,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
 *    Import :
       REAL NU
       REAL T
@@ -52,6 +53,10 @@
 *    Local data :
 *-
 
+*     Set to bad value in case we return with bad status
+      SCULIB_JNU = VAL__BADR
+
+*     Now we can return safely if status is bad
       IF (STATUS .NE. SAI__OK) RETURN
 
       X = (H * NU) / (K * T)
