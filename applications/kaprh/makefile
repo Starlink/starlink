@@ -435,9 +435,9 @@ PRIVATE_INCLUDES =
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = HLPCMD PRM_PAR SAE_PAR DAT_PAR CTM_PAR NUM_DEC_CVT \
-NDF_ERR GNS_PAR NDF_PAR NUM_DEF_CVT PAR_ERR NUM_DEC_R SUBPAR_PAR GKS_PAR \
-NUM_DEF_R IDI_PAR IDI_ERR
+EXTERNAL_INCLUDES = HLPCMD PRM_PAR SAE_PAR DAT_PAR CTM_PAR FIO_ERR \
+IDI_ERR NUM_DEC_CVT FIO_PAR IDI_PAR NDF_ERR NUM_DEF_CVT GNS_PAR NDF_PAR \
+PAR_ERR NUM_DEC_R SUBPAR_PAR NUM_DEF_R GKS_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -604,9 +604,13 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES)
 #
 CTM_PAR:	$(STAR_INC)/ctm_par;	$(LINK) $? $@
 DAT_PAR:	$(STAR_INC)/dat_par;	$(LINK) $? $@
+FIO_ERR:	$(STAR_INC)/fio_err;	$(LINK) $? $@
+FIO_PAR:	$(STAR_INC)/fio_par;	$(LINK) $? $@
 GKS_PAR:	$(STAR_INC)/gks_par;	$(LINK) $? $@
 GNS_PAR:	$(STAR_INC)/gns_par;	$(LINK) $? $@
 HLPCMD:	$(STAR_INC)/hlpcmd;	$(LINK) $? $@
+IDI_ERR:	$(STAR_INC)/idi_err;	$(LINK) $? $@
+IDI_PAR:	$(STAR_INC)/idi_par;	$(LINK) $? $@
 NDF_ERR:	$(STAR_INC)/ndf_err;	$(LINK) $? $@
 NDF_PAR:	$(STAR_INC)/ndf_par;	$(LINK) $? $@
 NUM_DEC_CVT:	$(STAR_INC)/num_dec_cvt;	$(LINK) $? $@
@@ -616,8 +620,6 @@ NUM_DEF_R:	$(STAR_INC)/num_def_R;	$(LINK) $? $@
 PAR_ERR:	$(STAR_INC)/par_err;	$(LINK) $? $@
 PRM_PAR:	$(STAR_INC)/prm_par;	$(LINK) $? $@
 SAE_PAR:	$(STAR_INC)/sae_par;	$(LINK) $? $@
-IDI_PAR:	$(STAR_INC)/idi_par;	$(LINK) $? $@
-IDI_ERR:	$(STAR_INC)/idi_err;	$(LINK) $? $@
 SUBPAR_PAR:	$(STAR_INC)/subpar_par;	$(LINK) $? $@
 
 #
@@ -1679,12 +1681,25 @@ $(PKG_NAME)_ifls.tar:
 #  files). These are normally generated automatically from the source
 #  files.
 
-snapshot.o:      SAE_PAR DAT_PAR CTM_PAR PAR_ERR NDF_PAR IDI_PAR IDI_ERR
 cnthlt.o:	 SAE_PAR
+cntkey.o:	 SAE_PAR
 cntsbp.o:	 SAE_PAR
 contover.o:	 SAE_PAR DAT_PAR PAR_ERR PRM_PAR NDF_PAR NDF_ERR GKS_PAR
 gethlp.o:	 SAE_PAR HLPCMD
+getv2.o:	 SAE_PAR
 greyplot.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR PRM_PAR NDF_PAR NDF_ERR CTM_PAR GNS_PAR NUM_DEC_CVT NUM_DEF_CVT
+hstdsp.o:	 SAE_PAR
+hstlo.o:	 SAE_PAR
+hstrep.o:	 SAE_PAR
+imlst.o:	 SAE_PAR PRM_PAR
+inhi.o:	 SAE_PAR DAT_PAR PAR_ERR
+inpe.o:	 SAE_PAR PAR_ERR
+inpol.o:	 SAE_PAR PRM_PAR
+inre.o:	 SAE_PAR
+insl.o:	 SAE_PAR DAT_PAR PRM_PAR PAR_ERR
+inspect.o:	 SAE_PAR DAT_PAR PRM_PAR SUBPAR_PAR PAR_ERR NDF_PAR NDF_ERR
+inva.o:	 SAE_PAR PRM_PAR PAR_ERR
+inxy.o:	 SAE_PAR PRM_PAR PAR_ERR FIO_PAR FIO_ERR
 kaprh_mon.o:	 SAE_PAR
 kps1_cnser.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEF_CVT
 kps1_cntur.o:	 SAE_PAR PRM_PAR
@@ -1699,8 +1714,22 @@ kps1_faini.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_fainr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_fainw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_imzbo.o:	 SAE_PAR
+kps1_ncuco.o:	 SAE_PAR
 krhhelp.o:	 SAE_PAR PAR_ERR
 lccell.o:	 SAE_PAR PRM_PAR
+linplt.o:	 SAE_PAR
+linset.o:	 SAE_PAR
+mfnext.o:	 SAE_PAR DAT_PAR
+mfopen.o:	 SAE_PAR DAT_PAR
+mosaic.o:	 SAE_PAR DAT_PAR PAR_ERR
+moscad.o:	 SAE_PAR PRM_PAR
+moscdv.o:	 SAE_PAR PRM_PAR
 ncraxs.o:	 SAE_PAR
+peepsb.o:	 SAE_PAR PRM_PAR
+quilt.o:	 SAE_PAR DAT_PAR PAR_ERR
+slc2t1.o:	 SAE_PAR PRM_PAR
+snapshot.o:	 SAE_PAR DAT_PAR CTM_PAR PAR_ERR NDF_PAR IDI_PAR IDI_ERR
+thrsr.o:	 SAE_PAR PRM_PAR
+turbocont.o:	 SAE_PAR DAT_PAR PRM_PAR NDF_PAR NDF_ERR PAR_ERR GKS_PAR
 
 #  End of makefile.
