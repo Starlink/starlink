@@ -116,6 +116,7 @@
       INTEGER QI                 ! Identifier for a catalogue parameter
       INTEGER TMPLT              ! Template Frame
       INTEGER IFRM               ! Frame index of SKY Frame within IWCS
+      INTEGER LWCS               ! Local copy of WCS FrameSet
 *.
 
       EQMAP = AST__NULL
@@ -165,12 +166,16 @@
 *  If we can get RA and DEC positions using the FrameSet, add RA and DEC
 *  columns.
       IF( GETEQM ) THEN
-         CALL KPG1_ASFFR( IWCS, 'SKY', IFRM, STATUS )
+
+*  Create a copy to avoid KPG1_ASFFR modifying the original FrameSet.
+         LWCS = AST_COPY( IWCS, STATUS )
+
+         CALL KPG1_ASFFR( LWCS, 'SKY', IFRM, STATUS )
          IF( IFRM .NE. AST__NOFRAME ) THEN
 
             TMPLT = AST_SKYFRAME( 'System=FK5,Equinox=J2000', STATUS )
 
-            EQFS = AST_FINDFRAME( IWCS, TMPLT, ' ', STATUS ) 
+            EQFS = AST_FINDFRAME( LWCS, TMPLT, ' ', STATUS ) 
   
             CALL AST_ANNUL( TMPLT, STATUS )
             IF( EQFS .NE. AST__NULL ) THEN
