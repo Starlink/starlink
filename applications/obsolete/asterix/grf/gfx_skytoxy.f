@@ -5,7 +5,7 @@
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
+        INCLUDE 'MATH_PAR'
 *  Import :
 	DOUBLE PRECISION AZ		!input	azimuth (degrees)
 	DOUBLE PRECISION EL		!input	elevation (degrees)
@@ -17,15 +17,37 @@
         INTEGER STATUS
 *  Global variables :
         INCLUDE 'GFX_SKY_CMN'
-*  Local constants :
-        DOUBLE PRECISION PI,DTOR
-	PARAMETER (PI = 3.14159265358979D0,DTOR=PI/180.0D0)
 *  Local variables :
-*-
-        STATUS=SAI__OK
-        CALL CONV_POLTOXY(AZ*DTOR,EL*DTOR,G_TMAT(1,1,FRAME),X,Y,STATUS)
-        X=X/G_XYTORAD
-        Y=Y/G_XYTORAD
+      DOUBLE PRECISION		LCEL(2), EQU(2)
 
+      REAL			LWORLD(2)		! Axis coordinates
+*-
+
+*  Local status
+      STATUS = SAI__OK
+
+*  Equatorial supplied?
+      IF ( FRAME .EQ. 1 ) THEN
+        EQU(1) = AZ * MATH__DDTOR
+        EQU(2) = EL * MATH__DDTOR
+
+*  Ecliptic supplied?
+      ELSE IF ( FRAME .EQ. 2 ) THEN
+        LCEL(1) = AZ * MATH__DDTOR
+        LCEL(2) = EL * MATH__DDTOR
+        CALL WCI_CNS2S( LCEL, G_ECLSYS, G_SYSID, EQU, STATUS )
+
+*  Galactic supplied?
+      ELSE IF ( FRAME .EQ. 3 ) THEN
+        LCEL(1) = AZ * MATH__DDTOR
+        LCEL(2) = EL * MATH__DDTOR
+        CALL WCI_CNS2S( LCEL, G_GALSYS, G_SYSID, EQU, STATUS )
+
+      END IF
+
+*  Convert equatorial to world
+      CALL WCI_CNS2A( EQU, G_PIXID, G_PRJID, LWORLD, STATUS )
+      X = LWORLD(1)
+      Y = LWORLD(2)
 
       END
