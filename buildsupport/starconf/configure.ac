@@ -145,6 +145,7 @@ AC_DEFUN([STAR_CHECK_JAVAC],
 
 STAR_CHECK_JAVAC(1.4)
 
+AM_CONDITIONAL(BUILDJAVA, test "$JAVAC" != NOJAVAC -a "$JAR" != "NOJAR")
 
 
 # We install material in the aclocal macro directory with aclocal_DATA
