@@ -11,14 +11,15 @@
 *          calculating the offsets that must be added to the bolometer
 *          positions to cater for the fact that the origin of the bolometer
 *          coordinate system may be offset from the `centre' specified by
-*          RA_CENTRE , DEC_CENTRE. Two types of offsets may be added; Nasmyth
-*          offsets which are simply subtracted from the bolometer coordinates, 
-*          or offsets in a coordinate system fixed relative to the sky, rotated 
-*          relative to apparent RA,Dec by the angle ROTATION. The latter are
-*          added to the bolometer coordinates when they are in the form of
-*          tangent plane coords in apparent RA,Dec. NA offsets will occur
-*          during a jiggle observation, for example, other types during
-*          MAP observations with raster sampling.
+*          RA_CENTRE , DEC_CENTRE. 
+*
+*          Three types of offsets may be added; Nasmyth offsets which are 
+*          simply subtracted from the bolometer coordinates, azimuth offsets
+*          which are subtracted from the bolometer positions in az and el, 
+*          or offsets in a coordinate system fixed relative to the sky, 
+*          rotated relative to apparent RA,Dec by the angle ROTATION. The
+*          latter are added to the bolometer coordinates when they are in
+*          the form of tangent plane coords in apparent RA,Dec.
 *
 *          working out the elevation and parallactic angle for the sidereal
 *          time and apparent RA, dec of the `centre'.
@@ -146,6 +147,7 @@
       PARAMETER (PI = 3.14159265359)
 *    Local variables :
       INTEGER          ADC                ! ADC number of bolometer
+      DOUBLE PRECISION AZ_OFFSET          ! offset in az (arcsec)
       DOUBLE PRECISION DAZ                ! azimuth of point (radians)
       INTEGER          BOL                ! bolometer index in DO loop
       DOUBLE PRECISION BOL_XOFF           ! tangent plane offset in apparent
@@ -159,6 +161,7 @@
                                           ! straddling LST of measured point
                                           ! have been found
       DOUBLE PRECISION E                  ! elevation of `centre' (radians)
+      DOUBLE PRECISION EL_OFFSET          ! offset in el (arcsec)
       DOUBLE PRECISION DEL                ! elevation of point (radians)
       DOUBLE PRECISION HOUR_ANGLE         ! hour angle (radians)
       INTEGER          I                  ! array index
@@ -176,9 +179,9 @@
       DOUBLE PRECISION SIN_E              ! sin (E)
       DOUBLE PRECISION SIN_Q              ! sin (Q)
       DOUBLE PRECISION U3_OFFSET          ! offset of Nasmyth origin from
-                                          ! `centre' (radians)
+                                          ! `centre' (arcsec)
       DOUBLE PRECISION U4_OFFSET          ! offset of Nasmyth origin from
-                                          ! `centre' (radians)
+                                          ! `centre' (arcsec)
       DOUBLE PRECISION U3_OFF             ! bolometer offset from `centre'
                                           ! (radians)
       DOUBLE PRECISION U4_OFF             ! bolometer offset from `centre'
@@ -190,12 +193,23 @@
 
 *  calculate the extra offsets to be added due to jiggling or scanning
 
-      IF (OFFSET_COORDS .EQ. 'NA') THEN
+      IF (OFFSET_COORDS .EQ. 'AZ') THEN
+         AZ_OFFSET = DBLE (OFFSET_X)
+         EL_OFFSET = DBLE (OFFSET_Y)
+         U3_OFFSET = 0.0D0
+         U4_OFFSET = 0.0D0
+         RD_X_OFFSET = 0.0D0
+         RD_Y_OFFSET = 0.0D0
+      ELSE IF (OFFSET_COORDS .EQ. 'NA') THEN
+         AZ_OFFSET = 0.0D0
+         EL_OFFSET = 0.0D0
          U3_OFFSET = DBLE (OFFSET_X)
          U4_OFFSET = DBLE (OFFSET_Y)
          RD_X_OFFSET = 0.0D0
          RD_Y_OFFSET = 0.0D0
       ELSE IF (OFFSET_COORDS .EQ. 'RD') THEN
+         AZ_OFFSET = 0.0D0
+         EL_OFFSET = 0.0D0
          U3_OFFSET = 0.0D0
          U4_OFFSET = 0.0D0
          RD_X_OFFSET = DBLE(OFFSET_X) * COS (ROTATION) -
@@ -291,13 +305,14 @@
                DAZ = U3_OFF * COS_E + U4_OFF * SIN_E
                DEL = -U3_OFF * SIN_E + U4_OFF * COS_E
 
-*  add the pointing offset (assuming pointing corrections are tangent plane
-*  alt-az offsets with the azimuth value refering to the error at zero 
-*  elevation)
+*  add any AZ offset and the pointing offset (assuming pointing corrections 
+*  are tangent plane alt-az offsets with the azimuth value refering to the 
+*  error at zero elevation)
 
                IF (N_POINT .GT. 0) THEN
-                  DAZ = DAZ + P_DAZ * COS (DEL) * ARCSEC2RAD
-                  DEL = DEL + P_DEL * ARCSEC2RAD
+                  DAZ = DAZ + (P_DAZ * COS (DEL) - AZ_OFFSET) * 
+     :              ARCSEC2RAD
+                  DEL = DEL + (P_DEL - EL_OFFSET) * ARCSEC2RAD
                END IF
 
 *  now rotate the offset to apparent RA,dec
