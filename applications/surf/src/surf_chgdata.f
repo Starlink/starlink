@@ -1,4 +1,4 @@
-      SUBROUTINE REDS_CHGDATA (STATUS)
+      SUBROUTINE SURF_CHGDATA (STATUS)
 *+
 *  Name:
 *     CHANGE_DATA
@@ -13,7 +13,7 @@
 *     ADAM A-task
  
 *  Invocation:
-*     CALL REDS_CHGDATA( STATUS )
+*     CALL SURF_CHGDATA( STATUS )
  
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -130,7 +130,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'                   ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                   ! for VAL__NBx
-      INCLUDE 'REDS_SYS'                  ! REDS constants
+      INCLUDE 'SURF_PAR'                  ! SURF constants
       INCLUDE 'MSG_PAR'                   ! MSG__ constants
 
 *    Import :
