@@ -1,8 +1,8 @@
-      SUBROUTINE KPG1_GAUFT<T>( DATA, LBND, UBND, NITER, TOLL, AMP, X0,
-     :                         SIGMA, BACK, STATUS )
+      SUBROUTINE KPG1_GAUF<T>( DATA, LBND, UBND, NITER, TOLL, AMP, X0,
+     :                        SIGMA, BACK, STATUS )
 *+
 *  Name:
-*     KPG1_GAUFTx
+*     KPG1_GAUFx
 
 *  Purpose:
 *     To fit a Gaussian to a one-dimensional array of data.
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_GAUFTx( DATA, LBND, UBND, NITER, TOLL, AMP, X0,
+*     CALL KPG1_GAUFx( DATA, LBND, UBND, NITER, TOLL, AMP, X0,
 *    :                  SIGMA, BACK, STATUS )
 
 *  Description:
@@ -185,7 +185,7 @@
 
       IF ( STAK( 1 ) .EQ. VAL__MAX<T> ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'KPG1_GAUFTx_BADDA',
+         CALL ERR_REP( 'KPG1_GAUFx_BADDA',
      :     'Cannot fit a Gaussian because all the data are bad.',
      :     STATUS )
          GOTO 100
@@ -213,7 +213,7 @@
 
       IF ( SUM1 .LE. 0.0D0 ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'KPG1_GAUFTX_NEGDA',
+         CALL ERR_REP( 'KPG1_GAUFX_NEGDA',
      :     'All the data are negative.  Unable to fit a Gaussian.',
      :     STATUS )
          GO TO 100
@@ -266,7 +266,7 @@
 
       IF ( SUM0 .LE. 0.0D0 .OR. SUM1 .LE. 0.0D0 ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'KPG1_GAUFTx_CONDA',
+         CALL ERR_REP( 'KPG1_GAUFx_CONDA',
      :     'Unable to fit a Gaussian because the data have the same 
      :     value.', STATUS )
          GO TO 100
@@ -374,7 +374,7 @@
          IF ( IFAIL .GT. 0 ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'IFAIL', IFAIL )
-            CALL ERR_REP( 'KPG1_GAUFTx_NORMEQ',
+            CALL ERR_REP( 'KPG1_GAUFx_NORMEQ',
      :        'Error solving the normal equations for the Gaussian '/
      :        /'fit.  F04ATF failed with error ^IFAIL.', STATUS )
             GO TO 100
