@@ -483,9 +483,14 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
 /* Class name of opened object */
   ocls = _DTDEF(id)->aname;
 
+/* Already opened correct class? */
+  if ( ! strx_cmpc( cls, clen, ocls ) )
+    found = ADI__true;
+  else
+    found = ADI__false;
+
 /* Loop over supplied classes trying to create the link */
   icp = 0;
-  found = ADI__false;
   while ( (icp < clen) && _ok(status) && ! found ) {
 
 /* Find end of this class name */
