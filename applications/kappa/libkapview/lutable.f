@@ -143,7 +143,7 @@
 *        This maps the lookup table stored in the NDF called rococo
 *        linearly to the full colour table on the current image-display
 *        device, i.e. ignoring the reserved pens.
-*     lutable hi gr in=nebula shade=0 percentiles=[5,90]
+*     lutable hi gr ndf=nebula shade=0 percentiles=[5,90]
 *        This maps the greyscale lookup table via histogram
 *        equalisation between the 5 and 90 percentiles of an NDF called
 *        nebula to the colour table on the current image-display
