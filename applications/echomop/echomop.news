@@ -1,3 +1,9 @@
+1 ECHOMOP_v3.3-7_release
+
+ Very minor bugfix.  The installation procedure was missing quotes on
+ two lines, which caused the installation to bomb (how was this not
+ noticed before!?).
+
 1 ECHOMOP_v3.3-6_release
 
  Bugfix release:

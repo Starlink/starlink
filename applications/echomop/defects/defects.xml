@@ -207,5 +207,23 @@ RESULT_TYPE: SCROBJ) the program crashes out with this message:
 </defect>
 </defectgroup>
 
+<defectgroup>
+<title>Other problems</title>
+<defect
+    status="open"
+    originator="Martin Bly"
+    originatoremail="ussc@star.rl.ac.uk"
+    date="11-Nov-2002">
+<title>Hyperlinking into sun152 fails</title>
+<p>Although the links within the SUN/152 document still work, for some 
+reason links <em>into</em> it from other Starlink documents break.
+It's not clear when this started happening, since both SUN/152 and the 
+HTX (hypertext linking) system have been stable for a long while.</p>
+<p>Does not affect the users of the SUN/152 document itself, only the
+software librarian building the complete document set, and it is on
+this ground that ECHOMOP 3.3-6 will not appear on the Autumn 2002 CD.</p>
+</defect>
+</defectgroup>
+
 </defectslist>
 

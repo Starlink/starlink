@@ -444,9 +444,10 @@ PKG_LINK = ECHOMOP
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 #  %%VERSION%%
-PKG_VERS = 3.3-6
+PKG_VERS = 3.3-7
 
-PKG_DATE = 2002 July 16
+#  Date the package was released (spaces are OK)
+PKG_DATE = 2002 November 12
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -909,7 +910,7 @@ alphainstall:
 	   sed -e s#INSTALL_BIN#`pwd`# \
                -e s#INSTALL_HELP#`pwd`# \
                -e s#PKG_VERS#$(PKG_VERS)# \
-               -e s#PKG_DATE#$(PKG_DATE)# \
+               -e "s#PKG_DATE#$(PKG_DATE)#" \
               echomopalpha.csh > echalpha.csh;\
            chmod 755 echalpha.csh;\
 	else :; fi
@@ -1279,7 +1280,7 @@ install:
 		    sed -e s#INSTALL_BIN#$(INSTALL_BIN)# \
 			-e s#INSTALL_HELP#$(INSTALL_HELP)# \
 			-e s#PKG_VERS#$(PKG_VERS)# \
-			-e s#PKG_DATE#$(PKG_DATE)# \
+			-e "s#PKG_DATE#$(PKG_DATE)#" \
 			$$f >$(INSTALL_BIN)/$$f ;\
 		    chmod 755 $(INSTALL_BIN)/$$f ;\
 		fi; \
