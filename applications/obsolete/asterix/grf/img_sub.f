@@ -4895,12 +4895,20 @@ c      REAL HWID
 
         IF (I_QOK) THEN
 
+	print *,'arr_rang1rq'
+	call flush(6)
           CALL ARR_RANG1RQ(NVAL,%val(I_DPTR),%val(I_QPTR),I_MASK,
      :                                       I_DMIN,I_DMAX,STATUS)
+	print *,'done'
+	call flush(6)
 
         ELSE
+	print *,'arr_rang1rm'
+	call flush(6)
 
           CALL ARR_RANG1RM(NVAL,%val(I_DPTR),I_DMIN,I_DMAX,STATUS)
+	print *,'done'
+	call flush(6)
 
         ENDIF
 
