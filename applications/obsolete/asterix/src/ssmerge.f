@@ -264,7 +264,7 @@
 
 *        Release file
           CALL SSI_RELEASE( IFID, STATUS )
-          CALL ADI_CLOSE( IFID, STATUS )
+          CALL ADI_FCLOSE( IFID, STATUS )
 
         END IF
 
