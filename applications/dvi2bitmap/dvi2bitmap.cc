@@ -72,8 +72,10 @@ int bitmapW = -1;
 
 // Make resolution global -- 
 // several functions in here might reasonably want to see this.
-int resolution = 72;		// in pixels-per-inch
-int oneInch = 72;		// one inch, including magnification
+//int resolution = 72;		// in pixels-per-inch
+//int oneInch = 72;		// one inch, including magnification
+int resolution = PkFont::dpiBase();// in pixels-per-inch
+int oneInch = resolution;
 
 main (int argc, char **argv)
 {
@@ -159,12 +161,33 @@ main (int argc, char **argv)
 		  }
 		  break;
 	      }
-	      case 'f':		// set PK font path
-		argc--, argv++;
-		if (argc <= 0)
-		    Usage();
-		PkFont::setFontPath(*argv);
-		break;
+	      case 'f':
+		{
+		    char sel = *++*argv;
+		    argc--, argv++;
+		    if (argc <= 0)
+			Usage();
+		    switch (sel)
+		    {
+		      case '\0':
+		      case 'p':	// -fp set PK font path
+			PkFont::setFontPath(*argv);
+			break;
+		      case 'm':	// -fm set PK font generation mode
+			PkFont::setMissingFontMode (*argv);
+			break;
+		      case 'g':	// -fg switch off font generation
+			PkFont::setMakeFonts (false);
+			break;
+		      case 'G':	// -fG switch on font generation
+			PkFont::setMakeFonts (true);
+			break;
+		      default:
+			Usage();
+			break;
+		    }
+		    break;
+		}
 	      case 'g':		// debugging...
 		{
 		    verbosities debuglevel = debug;
@@ -274,7 +297,8 @@ main (int argc, char **argv)
 		argc--, argv++;
 		if (argc <= 0)
 		    Usage();
-		resolution = atoi (*argv);
+		PkFont::setResolution (atoi(*argv));
+		resolution = PkFont::dpiBase();
 		break;
 	      case 's':		// scale down
 		argc--, argv++;
@@ -826,10 +850,15 @@ string_list& tokenise_string (string str)
 
 void Usage (void)
 {
-    cerr << "Usage: " << progname << " [-qQV] [-L[L]] [-b(h|w) size] [-f PKpath ] [-r resolution]\n\t[-P[bt]] [-s scale-factor] [-o outfile-pattern] [-m magmag ]\n\t[-p num] [-l num] [-pp ranges] [-[Cc][lrtb]] [-t xbm"
+    cerr << "Usage: " << progname << " [-qQV] [-L[L]] [-b(h|w) size]\n\
+	[-fp PKpath ] [-fm mfmode] [-fg] [-fG]\n\
+	[-r resolution] [-P[bt]] [-s scale-factor] [-o outfile-pattern]\n\
+	[-m magmag ] [-[Cc][lrtb]] [-n]\n\
+	[-p num] [-l num] [-pp ranges] [-t xbm"
 #if ENABLE_GIF
 	 << "|gif"
 #endif
-	 << "] [-n[f]]\n\tdvifile" << '\n';
+	 << "]\n\
+	dvifile" << '\n';
     exit (1);
 }
