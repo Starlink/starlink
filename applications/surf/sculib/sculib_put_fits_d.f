@@ -104,13 +104,11 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-      N_FITS = N_FITS + 1
-
-      IF (N_FITS .LT. 1) THEN
+      IF (N_FITS .LE. 0) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP (' ', 'SCULIB_PUT_FITS_D: bad input value of '//
      :     'N_FITS', STATUS)
-      ELSE IF (N_FITS .GT. MAX_FITS) THEN
+      ELSE IF (N_FITS+1 .GT. MAX_FITS) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP (' ', 'SCULIB_PUT_FITS_D: size of FITS array '//
      :     'has been exceeded', STATUS)
@@ -123,6 +121,10 @@
          STATUS = SAI__ERROR
          CALL ERR_REP (' ', 'SCULIB_PUT_FITS_D: blank name given '//
      :     'for FITS item', STATUS)
+      ELSE IF (FITS(N_FITS) .NE. 'END') THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP(' ','SCULIB_PUT_FITS_D: Last card was not END',
+     :        STATUS)
       ELSE
 
          FITS (N_FITS) = NAME
@@ -147,6 +149,13 @@
 
          FITS (N_FITS)(CPTR:CPTR) = '/'
          FITS (N_FITS)(CPTR+2:) = COMMENT
+
+*     Increment the number of keywords
+         N_FITS = N_FITS + 1
+
+*     Rewrite the END card
+         FITS(N_FITS) = 'END'
+
       END IF
 
       END

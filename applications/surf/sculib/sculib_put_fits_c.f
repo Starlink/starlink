@@ -54,6 +54,9 @@
 *     $Id$
 *     15-AUG-1995: original version
 *     $Log$
+*     Revision 1.5  2000/06/03 03:08:45  timj
+*     Correctly recognise the END keyword
+*
 *     Revision 1.4  1999/08/19 03:37:18  timj
 *     Header tweaks to ease production of SSN72 documentation.
 *
@@ -109,12 +112,11 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
-      N_FITS = N_FITS + 1
-      IF (N_FITS .LT. 1) THEN
+      IF (N_FITS .LE. 0) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP (' ', 'SCULIB_PUT_FITS_C: bad input value of '//
      :     'N_FITS', STATUS)
-      ELSE IF (N_FITS .GT. MAX_FITS) THEN
+      ELSE IF (N_FITS+1 .GT. MAX_FITS) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP (' ', 'SCULIB_PUT_FITS_C: size of FITS array '//
      :     'has been exceeded', STATUS)
@@ -127,7 +129,12 @@
          STATUS = SAI__ERROR
          CALL ERR_REP (' ', 'SCULIB_PUT_FITS_C: blank name given '//
      :     'for FITS item', STATUS)
+      ELSE IF (FITS(N_FITS) .NE. 'END') THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP(' ','SCULIB_PUT_FITS_C: Last card was not END',
+     :        STATUS)
       ELSE
+*     This will overwrite the existing END card
          FITS (N_FITS) = NAME
          FITS (N_FITS)(9:11) = '= '''
          FITS (N_FITS)(12:) = VALUE
@@ -148,6 +155,12 @@
          IF (CPTR+2 .LE. 80) THEN
             FITS (N_FITS)(CPTR+2:) = COMMENT
          END IF
+
+*     Increment the number of keywords
+         N_FITS = N_FITS + 1
+
+*     Rewrite the END card
+         FITS(N_FITS) = 'END'
 
       END IF
       END
