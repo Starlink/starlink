@@ -322,9 +322,9 @@
         END IF
 
 *    Perform grouping
-        CALL UTIL_GRPVLQ( NELM, %VAL(IDPTR), VAROK, %VAL(IVPTR), QUALOK,
-     :                    %VAL(IQPTR), %VAL(GPTR), NGRP, %VAL(GDPTR),
-     :                    %VAL(GVPTR), %VAL(GQPTR), STATUS )
+        CALL UTIL_GRPVD( NELM, %VAL(IDPTR), VAROK, %VAL(IVPTR), QUALOK,
+     :                   %VAL(IQPTR), %VAL(GPTR), NGRP, %VAL(GDPTR),
+     :                   %VAL(GVPTR), %VAL(GQPTR), STATUS )
 
 *    Do the statistics
         CALL STATISTIX_INT( USEGRP, NGRP, %VAL(GDPTR), %VAL(WPTR),
