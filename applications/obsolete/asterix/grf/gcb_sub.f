@@ -1156,6 +1156,7 @@
 *  record total size of each group for that structure
               G_STSIZ(NSTRUC)=DISP
               STRUCTURE=.FALSE.
+              G_NCOMP(NSTRUC)=NCOMP
 *  end of description file
             ELSEIF (BUFFER(2:).EQ.'enddescription') THEN
               FINI=.TRUE.
@@ -1214,11 +1215,60 @@
         ENDIF
       ENDDO
 
+      G_NSCAL=NSCAL
+      G_NSTRUC=NSTRUC
+
       G_TOPSCAL=SCPTR
 
       G_INITIALISED=(STATUS.EQ.SAI__OK)
 
       CALL FIO_CLOSE(FD,STATUS)
+
+      END
+
+
+
+*+  GCB_CRESHADOW - create a shadow of GCB in noticeboard
+      SUBROUTINE GCB_CRESHADOW(ID,STATUS)
+*    Description :
+*    Method :
+*    Deficiencies :
+*    Authors :
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+      INCLUDE 'GCB_PAR'
+*    Global variables :
+      INCLUDE 'GCB_CMN'
+*    Structure definitions :
+*    Import :
+*    Import-Export :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+      INTEGER NSCAL,NSTRUC,NCOMP,SID
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        DO NSCAL=1,G_NSCAL
+          CALL NBS_DEFINE_PRIMITIVE(ID,G_SCNAME(NSCAL),'_CHAR',
+     :                                     0,G_SCSIZE(NSCAL),SID,STATUS)
+        ENDDO
+        DO NSTRUC=1,G_NSTRUC
+          DO NCOMP=1,G_NCOMP(NSTRUC)
+            CALL NBS_DEFINE_PRIMITIVE(ID,G_CNAME(NSTRUC,NCOMP),'_CHAR',
+     :                               0,G_CSIZE(NSTRUC,NCOMP),SID,STATUS)
+          ENDDO
+        ENDDO
+
+      ENDIF
 
       END
 
