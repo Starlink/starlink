@@ -314,8 +314,8 @@
 *        produced.
 
 *  Notes:
-*     - If present, WCS information is copied from the first (reference)
-*     input NDF to the output NDFs.
+*     - If present, WCS information is copied from each input NDF to the 
+*     corresponding output NDFs.
 *     - The following components are added to the POLPACK extension in the 
 *     output intensity images (the extension is first created if it does 
 *     not already exist): 
