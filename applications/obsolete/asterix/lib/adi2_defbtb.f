@@ -106,7 +106,7 @@
       CHARACTER*(*)		NAMES(*)		!
       CHARACTER*(*)		TYPES(*)		!
       CHARACTER*(*)		UNITS(*)		!
-      LOGICAL			VARIDAT			!
+      INTEGER			VARIDAT			!
 
 *  Status:
       INTEGER 			STATUS             	! Global status
