@@ -188,6 +188,8 @@
 *        Added propagation of the WCS component.
 *     4-MAY-1999 (TDCA):
 *        Badbits mask set to zero.
+*     23-MARCH-2001 (DSB):
+*        Reset the smoothing size before processing each block.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -202,6 +204,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -237,7 +240,9 @@
       INTEGER DIM( NDF__MXDIM )  ! Size of the image in each dimension
       INTEGER EL                 ! Number of elements in mapped array
       INTEGER I                  ! Loop index
+      INTEGER II                 ! Loop index
       INTEGER IDIM               ! Actual number of dimensions of image
+      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of block
       INTEGER MNVP               ! Index of min variance value
       INTEGER MXVP               ! Index of max variance value
       INTEGER NBAD               ! Number of bad values replaced in a block 
@@ -261,6 +266,7 @@
       INTEGER SLBND( NDIM )      ! Lower bounds of significant dimensions
       INTEGER SUBND( NDIM )      ! Upper bounds of significant dimensions
       INTEGER TOTBAD             ! Total number of bad values replaced
+      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of block
       LOGICAL BAD                ! Bad pixels present?
       LOGICAL BLOCK              ! Process in blocks?
       LOGICAL QUAL               ! Quality array present in output NDF ?
@@ -268,6 +274,7 @@
       REAL RMNV                  ! Min variance value
       REAL RMXV                  ! Max variance value
       REAL SIZE                  ! Scale length
+      REAL SIZEF                 ! Final Scale length
 *.
 
 *  Check the inherited global status.
@@ -399,9 +406,28 @@
          CALL NDF_BLOCK( NDFO, IDIM, BLDIM, I, NDFBO, STATUS )
 
 *  Obtain the significant dimensions of the block.
-         CALL NDF_DIM( NDFBI, NDF__MXDIM, DIM, IDIM, STATUS )
-         DIM( 1 ) = DIM( SDIM( 1 ) )
-         DIM( 2 ) = DIM( SDIM( 2 ) )
+         CALL NDF_BOUND( NDFBI, NDF__MXDIM, LBND, UBND, IDIM, STATUS )
+         DIM( 1 ) = UBND( SDIM( 1 ) ) - LBND( SDIM( 1 ) ) + 1
+         DIM( 2 ) = UBND( SDIM( 2 ) ) - LBND( SDIM( 2 ) ) + 1
+
+*  If blocking, tell the user which block is being done.
+         IF( BLOCK ) THEN
+            CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+ 
+            DO II = 1, IDIM
+               CALL MSG_SETI( 'SEC', LBND( II ) )
+               CALL MSG_SETC( 'SEC', ':' )
+               CALL MSG_SETI( 'SEC', UBND( II ) )
+               IF( II .NE. IDIM ) CALL MSG_SETC( 'SEC', ',' )
+            END DO
+
+            CALL MSG_SETI( 'I', I )
+            CALL MSG_SETI( 'N', NBLOCK )
+
+            CALL MSG_OUTIF( MSG__NORM, ' ', '      Block ^I of ^N '//
+     :                      '(^SEC)', STATUS )
+
+         END IF
 
 *  Map the input arrays.
          CALL KPG1_MAP( NDFBI, COMP, ITYPE, 'READ', PNTRI, EL, STATUS )
@@ -467,11 +493,14 @@
 *  Perform the filtering.
 *  ======================
 
+*  Reset the smoothing size for this block.
+         SIZEF = SIZE   
+
 *  Reject pixels deviating from their local mean by more than the
 *  threshold calling the routine of the appropriate data type.
          IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_BAFIR( DIM( 1 ), DIM( 2 ), %VAL( PNTRI( 1 ) ),
-     :                       VAR, %VAL( PNTRI( 2 ) ), NITER, SIZE,
+     :                       VAR, %VAL( PNTRI( 2 ) ), NITER, SIZEF,
      :                       CNGMAX, CNGRMS, NBAD, %VAL( PNTRO( 1 ) ),
      :                       %VAL( PNTRO( 2 ) ), %VAL( PNTW1 ),
      :                       %VAL( PNTW2 ), %VAL( PNTW3 ),
@@ -479,7 +508,7 @@
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_BAFID( DIM( 1 ), DIM( 2 ), %VAL( PNTRI( 1 ) ),
-     :                       VAR, %VAL( PNTRI( 2 ) ), NITER, SIZE,
+     :                       VAR, %VAL( PNTRI( 2 ) ), NITER, SIZEF,
      :                       CNGMAX, CNGRMS, NBAD, %VAL( PNTRO( 1 ) ),
      :                       %VAL( PNTRO( 2 ) ), %VAL( PNTW1 ),
      :                       %VAL( PNTW2 ), %VAL( PNTW3 ),
