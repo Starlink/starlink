@@ -669,6 +669,8 @@ $(TCL_FILES): .tcl.built
 	pwd=`pwd`;\
 	(cd ./tcl; \
 	export INSTALL; unset INSTALL;\
+	export TCL_LIBRARY; unset TCL_LIBRARY;\
+	export TK_LIBRARY; unset TK_LIBRARY;\
 	./configure --prefix=$${pwd}/built;\
 	make -e World)
 	cp -p ./built/bin/atclsh .
