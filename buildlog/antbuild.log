@@ -93,4 +93,4 @@ install:
      [copy] Copied 87 empty directories to 1 empty directory under /apps/cvsbuild/starjava/docs/ant
 
 BUILD SUCCESSFUL
-Total time: 39 seconds
+Total time: 1 minute 37 seconds

@@ -79,14 +79,10 @@ if test -n "sun124.htx"; then \
            /apps/cvsbuild/star/bin/hlink /apps/cvsbuild/star/docs /apps/cvsbuild/star/help;\
         fi;
 Updating index file for document: sun124
-Updating index file for document: sun191
-2 hypertext documents need re-linking
+1 hypertext document needs re-linking
    updating cross-references in document sun124 (0 files to modify)...
    replacing original files with re-linked versions...
       ...document sun124 linked
-   updating cross-references in document sun191 (0 files to modify)...
-   replacing original files with re-linked versions...
-      ...document sun191 linked
 cp -p hlp_datestamp /apps/cvsbuild/star/dates
 chmod 444 /apps/cvsbuild/star/dates/hlp_datestamp
 chmod 644 hlp_datestamp

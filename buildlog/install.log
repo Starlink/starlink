@@ -937,7 +937,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Dec 17, 2004 5:19:46 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Dec 18, 2004 5:50:41 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] INFO: java.lang.UnsatisfiedLinkError: couldn't load library jniast: /apps/cvsbuild/starjava/lib/i386/libjniast.so: libg2c.so.0: cannot open shared object file: No such file or directory
   [javadoc] java.lang.UnsatisfiedLinkError: couldn't load library jniast: /apps/cvsbuild/starjava/lib/i386/libjniast.so: libg2c.so.0: cannot open shared object file: No such file or directory
   [javadoc] 	at uk.ac.starlink.util.Loader.loadLibrary(Loader.java:146)
@@ -963,7 +963,7 @@ docs:
   [javadoc] 	at java.lang.System.loadLibrary(System.java:832)
   [javadoc] 	at uk.ac.starlink.util.Loader.loadLibrary(Loader.java:111)
   [javadoc] 	... 16 more
-  [javadoc] Dec 17, 2004 5:19:46 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Dec 18, 2004 5:50:41 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST load failed - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -1004,7 +1004,6 @@ dist:
      [copy] Copying 1 file to /apps/cvsbuild/java/source/topcat/bin
      [copy] Copying 197 files to /apps/cvsbuild/java/source/topcat/docs/topcat
      [copy] Copied 1 empty directory to 1 empty directory under /apps/cvsbuild/java/source/topcat/docs/topcat
-    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/topcat
@@ -1163,4 +1162,4 @@ install:
 [loggedcopy] Copying 24 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 27 seconds
+Total time: 10 minutes 50 seconds
