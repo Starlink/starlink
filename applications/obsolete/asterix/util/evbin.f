@@ -554,8 +554,9 @@
 
 *  Map quality
       IF ( QUALITY .AND. QKEEP ) THEN
-        CALL BDI_MAPB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
-        CALL BDI_PUT0B( OFID, 'QualityMask', QUAL__MASK, STATUS )
+        CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', OQPTR, STATUS )
+        CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0,
+     :                QUAL__MASK, STATUS )
       END IF
 
 *  Loop over AXIS structure writing the values.

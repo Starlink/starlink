@@ -200,7 +200,7 @@
 *  Use axis values or channels
       CALL BDI_AXCHK( IFID, AXIS, 'Data', OK, STATUS )
       IF ( OK ) THEN
-        CALL BDI_AXMAPR( IFID, AXIS, 'READ', IAPTR, STATUS )
+        CALL BDI_AXMAPR( IFID, AXIS, 'Data', 'READ', IAPTR, STATUS )
       ELSE
         CALL DYN_MAPR( 1, DIMS(AXIS), IAPTR, STATUS )
         CALL ARR_REG1R( 1.0, 1.0, DIMS(AXIS), %VAL(IAPTR), STATUS )
