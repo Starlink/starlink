@@ -27,7 +27,7 @@ dnl   only the implicit ones.  Also config.h is not at present
 dnl   included by anything.  However we might as well include this
 dnl   stanza here, to support that in future, but also to keep down
 dnl   the length of generated command lines.
-AM_CONFIG_HEADER(config.h)
+dnl AM_CONFIG_HEADER(config.h)
 
 
 AC_CONFIG_FILES(Makefile component.xml)

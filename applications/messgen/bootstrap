@@ -25,7 +25,7 @@ fi
 
 echorun aclocal
 
-echorun autoheader
+# echorun autoheader
 
 # We need to explicitly run libtoolize only if ltmain.sh is not present
 # (it won't be, in the case when we really are bootstrapping, but it might
