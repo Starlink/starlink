@@ -32,63 +32,63 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: uk.ac.starlink.util.DOMUtilsTest
-    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.366 sec
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.509 sec
 
-    [junit] Testcase: testGetChildElementByName took 0.127 sec
-    [junit] Testcase: testGetTextContent took 0.028 sec
-    [junit] Testcase: testNewDocument took 0.018 sec
-    [junit] Testcase: testRelativizeDOM took 0.188 sec
+    [junit] Testcase: testGetChildElementByName took 0.206 sec
+    [junit] Testcase: testGetTextContent took 0.04 sec
+    [junit] Testcase: testNewDocument took 0.031 sec
+    [junit] Testcase: testRelativizeDOM took 0.216 sec
     [junit] Testsuite: uk.ac.starlink.util.DataSourceTest
-    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 4.259 sec
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 4.042 sec
 
-    [junit] Testcase: testData took 1.056 sec
-    [junit] Testcase: testIntro took 0.79 sec
-    [junit] Testcase: testStream took 0.808 sec
-    [junit] Testcase: testHybridStream took 0.613 sec
-    [junit] Testcase: testCombo1 took 0.787 sec
-    [junit] Testcase: testResourceStream took 0.173 sec
+    [junit] Testcase: testData took 0.975 sec
+    [junit] Testcase: testIntro took 0.733 sec
+    [junit] Testcase: testStream took 0.68 sec
+    [junit] Testcase: testHybridStream took 0.719 sec
+    [junit] Testcase: testCombo1 took 0.734 sec
+    [junit] Testcase: testResourceStream took 0.184 sec
     [junit] Testsuite: uk.ac.starlink.util.IOUtilsTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.03 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.297 sec
 
-    [junit] Testcase: testDataInput took 0.01 sec
-    [junit] Testcase: testInputStream took 0.015 sec
+    [junit] Testcase: testDataInput took 0.008 sec
+    [junit] Testcase: testInputStream took 0.284 sec
     [junit] Testsuite: uk.ac.starlink.util.NodeDescendantsTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.173 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.148 sec
 
-    [junit] Testcase: testTraversal took 0.164 sec
+    [junit] Testcase: testTraversal took 0.139 sec
     [junit] Testsuite: uk.ac.starlink.util.PipeReaderThreadTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.069 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.104 sec
 
     [junit] Testcase: testPipe1 took 0.041 sec
-    [junit] Testcase: testPipeBlock took 0.023 sec
+    [junit] Testcase: testPipeBlock took 0.058 sec
     [junit] Testsuite: uk.ac.starlink.util.ReaderThreadTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.013 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.019 sec
 
-    [junit] Testcase: testThread took 1.009 sec
+    [junit] Testcase: testThread took 1.015 sec
     [junit] Testsuite: uk.ac.starlink.util.SourceReaderTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.763 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.743 sec
 
-    [junit] Testcase: testGetDOM took 0.758 sec
+    [junit] Testcase: testGetDOM took 0.739 sec
     [junit] Testsuite: uk.ac.starlink.util.TestCaseTest
-    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.418 sec
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.414 sec
 
     [junit] Testcase: testFlags took 0.3 sec
     [junit] Testcase: testAssertSource took 0.048 sec
-    [junit] Testcase: testValidation took 0.066 sec
+    [junit] Testcase: testValidation took 0.062 sec
     [junit] Testsuite: uk.ac.starlink.util.URLUtilsTest
     [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.016 sec
 
     [junit] Testcase: testMakeURL took 0.01 sec
     [junit] Testcase: testUrlToUri took 0.002 sec
     [junit] Testsuite: uk.ac.starlink.util.XMLUtilTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.09 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.035 sec
 
-    [junit] Testcase: testXMLEncodeDecode took 1.087 sec
+    [junit] Testcase: testXMLEncodeDecode took 1.032 sec
     [junit] Warning: Cannot convert string "MetaCtrl<Key>Insert" to type VirtualBinding
     [junit] Testsuite: uk.ac.starlink.util.gui.RendererTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 7.125 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 6.65 sec
 
-    [junit] Testcase: testRenderer took 7.122 sec
+    [junit] Testcase: testRenderer took 6.646 sec
 
 test:
      [echo] Executing Task target: test
@@ -136,13 +136,13 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: uk.ac.starlink.ast.AstTest
-    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.444 sec
+    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.442 sec
     [junit] ------------- Standard Error -----------------
-    [junit] Jun 25, 2004 5:18:08 AM uk.ac.starlink.ast.AstPackage isAvailable
+    [junit] Jun 26, 2004 5:18:01 AM uk.ac.starlink.ast.AstPackage isAvailable
     [junit] WARNING: JNIAST native library not on java.library.path - no WCS processing
     [junit] ------------- ---------------- ---------------
 
-    [junit] Testcase: testAstObject took 0.438 sec
+    [junit] Testcase: testAstObject took 0.436 sec
     [junit] 	FAILED
     [junit] null
     [junit] junit.framework.AssertionFailedError
@@ -153,4 +153,4 @@ run-tests:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/jniast/build.xml:1323: Test uk.ac.starlink.ast.AstTest failed
 
-Total time: 38 seconds
+Total time: 37 seconds
