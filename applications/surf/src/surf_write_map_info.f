@@ -98,6 +98,9 @@
 *     1997 May 12 (TIMJ)
 *        Remove FITS from input arguments
 * $Log$
+* Revision 1.3  2004/11/18 20:37:24  timj
+* Annul AST objects
+*
 * Revision 1.2  2004/09/08 02:03:35  timj
 * Add CNF_PVAL where appropriate
 *
@@ -580,6 +583,8 @@
          END DO
 
 *     Shut down AST
+         CALL AST_ANNUL( WCSINFO, STATUS )
+         CALL AST_ANNUL( FITSCHAN, STATUS )
          CALL AST_END( STATUS )
 
       END IF
