@@ -575,9 +575,13 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *     16-AUG-2004 (DSB):
 *        - Removed support for paper III keyword VSOURCE, and added
 *        support for SSYSSRC keyword.
+*        - Added initial support for CLASS encoding.
 *        - In FitOK: Changed tolerance for detecting constant values
 *        from 1.0E-10 to 1.0E-8.
-
+*     17-AUG-2004 (DSB):
+*        Correct GetFiducialNSC so that the stored values for longitude
+*        parameters 1 and 2 are ignored unless the value of parameter 0 is 
+*        not zero.
 *class--
 */
 
@@ -8901,8 +8905,13 @@ static void GetFiducialNSC( AstWcsMap *map, double *phi, double *theta ){
    fixed native shperical coordinates at the projection reference point). */
    if( astGetWcsType( map ) != AST__TPN ) {
       axlon = astGetWcsAxis( map, 0 );
-      *phi = AST__DD2R*astGetPV( map, axlon, 1 );
-      *theta = AST__DD2R*astGetPV( map, axlon, 2 );
+      if( astGetPV( map, axlon, 0 ) != 0.0 ) {
+         *phi = AST__DD2R*astGetPV( map, axlon, 1 );
+         *theta = AST__DD2R*astGetPV( map, axlon, 2 );
+      } else {
+         *phi = astGetNatLon( map );
+         *theta = astGetNatLat( map );
+      }
 
 /* If this is a TPN projection, the returned values are always the fixed 
    native shperical coordinates at the projection reference point). */
@@ -29903,6 +29912,8 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *     CLASS is a software package for reducing single-dish radio and
 *     sub-mm spectroscopic data. See 
 *     http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html.
+*
+*     NOTE, DO NOT USE THIS ENCODING YET AS IT IS NOT YET FULLY OPERATIVE.
 *
 *     - "NATIVE": Encodes AST Objects in FITS header cards using a
 *     convention which is private to the AST library (but adheres to
