@@ -924,7 +924,7 @@ int StarRtdImage::foreignCmd( int argc, char *argv[] )
     }
     
     // Now check for its existence and invoke it.
-    for ( int i = 0; i < sizeof( foreigncmds_ ) / sizeof( *foreigncmds_); i++ ) {
+    for ( unsigned int i = 0; i < sizeof( foreigncmds_ ) / sizeof( *foreigncmds_); i++ ) {
         StarRtdForeignCmds *t = &foreigncmds_[i];
         if ( strcmp( t->name, argv[0] ) == 0 ) {
             
