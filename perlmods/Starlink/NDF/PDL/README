@@ -1,16 +1,18 @@
-This is version 0.90 of the PDL::NDF module
+This is version 1.0 of the PDL::IO::NDF module
 -------------------------------------------
 
 This module allows NDF files to be written and read from PDL.
 All numerical array components are read as PDLs.
 
-Information on using this module is available in PDL::NDF.pm
+Information on using this module is available in PDL::IO::NDF.pm
+
+The PDL home page can be found at http://pdl.perl.org/
 
 Requirements:
 ------------
 
-This package has been tested with PDL-1.03. It will not work with more
-recent alpha versions.
+This package has been tested with PDL-1.9907.  It will not
+work with versions earlier than 1.94.
 
 You will also need the NDF module (which should be part of this
 distribution).
