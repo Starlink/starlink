@@ -1,0 +1,195 @@
+#!/usr/bin/perl -w
+
+#+
+#  Name:
+#     extmakefile
+#
+#  Purpose:
+#     Modify makefile for use with EXTREME data sets.
+#
+#  Usage:
+#     extmakefile < makefile > makefile.new
+#
+#  Description:
+#     This is a simple filter which takes a Starlink makefile as input
+#     and writes as output a file which provides some of the changes 
+#     required for EXTREME use.  Not all the requisite changes can be
+#     made however, and the resulting file will need some edits to be
+#     made by hand.
+#
+#  *  The changes it attempts to make are as follows:
+#  *     - Add comment blocks describing the two new values of SYSTEM
+#  *     - Modify the comment describing the default value of CFLAGS
+#  *     - Add a comment describing the INTEGER8 environment variable
+#  *     - Export the INTEGER8 environment variable
+#  *     - Modify SYSTEM-specific settings for existing SYSTEMs
+#  *     - Add support for the two new SYSTEMs 
+#  *
+#  *  If it is unable to make any of the modifications it would like to,
+#  *  it will print an explanatory message saying what it could not do.
+#  *
+#  *  The only change which might be required which this script does not
+#  *  make is to set values for the SOURCE_VARIANT variable.  Depending
+#  *  on how the system-specific compilation is going to be done, it 
+#  *  may be desirable to add SOURCE_VARIANT='alpha_OSF1' in the new 
+#  *  alpha_OSF1_64 stanza, and SOURCE_VARIANT='sun4_Solaris' in the 
+#  *  new sun4_Solaris_64 stanza.  If required, this must be done by hand.
+#  *
+#  *  This script is not extremely intelligent - unless the mk file
+#  *  follows the usual pattern quite closely, the output may be in
+#  *  error, or complete rubbish.  It is intended as a convenience, 
+#  *  and if it does not work, then it will be necessary to make the
+#  *  modifications by hand; this is not too arduous.
+#
+#  Authors:
+#     MBT: Mark Taylor (Starlink)
+#
+#  History:
+#     10-MAR-2000 (MBT):
+#        Initial version.
+#-
+
+#  Safe programming.
+      use strict;
+
+#  Set up input and output.
+      if ( @ARGV > 2 ) {
+         print( STDERR "Usage: extmakefile [ in [ out ] ]\n" );
+         exit( 1 );
+      }
+      if ( @ARGV ) {
+         my( $infile ) = shift( @ARGV );
+         open( IN, $infile ) 
+            or die( "Failed to open $infile for reading.\n" );
+      }
+      else {
+         *IN = *STDIN;
+      }
+      if ( @ARGV ) {
+         my( $outfile ) = shift( @ARGV );
+         open( OUT, ">$outfile" ) 
+            or die( "Failed to open $outfile for writing.\n" );
+         select( OUT );
+      }
+
+#  Read input.
+      my( @makefile );
+      while (<IN>) {
+         push( @makefile, $_ );
+      }
+      my( $makefile ) = join( '', @makefile );
+
+#  Perform some rudimentary checks on the input.
+      if ( $makefile =~ /INTEGER8/i ) {
+         print( STDERR 
+                "Warning: makefile already contains 64-bit adaptations.\n",
+                "         Proceeding anyway.\n" );
+      }
+      if ( $makefile !~ /\n\# *makefile *\n/ || $makefile !~ /TAR_OUT/ ) {
+         print( STDERR
+                "Warning: input doesn't look exactly like a makefile.\n",
+                "         Proceeding anyway.\n" );
+      }
+
+#  Perform the edits.
+      my( %done );
+
+#  Add the command line macro definition for C compilation.
+      $done{ "Add -DINT_BIG=int to default CFLAGS value" } =
+      $makefile =~ 
+         s{
+            ( \n   \ *  CFLAGS  [\t\ ]*  =  .*  )
+         }{
+            $1 . "-DINT_BIG=int"
+         }ex;
+
+#  Add the replacement text for Fortran INTEGER * 8 type.
+      $done{ "Add default definition 'INTEGER8 = INTEGER'" } =
+      $makefile =~ 
+         s{ 
+            ( \n FFLAGS  [\t\ ]* = .*?  \n )  ( \# ) 
+         }{
+            $1 . "\n" .
+            "\#  Default replacement text for Fortran INTEGER * 8 type.\n\n" .
+            "INTEGER8 = INTEGER\n\n" .
+            $2
+         }sex;
+
+#  Add the macro for replacing INTEGER * 8 declarations.
+      $done{ "Add definition of REPLACE_INTEGER8 macro" } =
+         s{
+            ( \n \ * \n  \#  \ *   Rules\ for\ extracting\   [^\n]*  \n \ * \n )
+            ( .*? \n ) ( \ * \n )
+         }{
+            my( $comm ) = $1;
+            my( $extract ) = $2;
+            my( $comm_f ) = "";
+            my( $extract_f ) = "";
+            if ( $extract =~ s{\$\(TAR_OUT\).*\$\@ *$\n} ) {
+               $comm_f = $comm;
+               $comm_f =~ s/source files/Fortran source files/;
+               $extract_f = 
+                  $extract .
+                  "\tif test \$(INTEGER8); then \\\n" . 
+                  "           \$(REPLACE_INTEGER8) < \$\@ > \$\@_tmp; \\\n" .
+                  "           mv \$\@_tmp \$\@; \\\n" .
+                  "        else :; fi\n" .
+                  "\n";
+               $extract_f =~ s/^\n*//;
+               $extract_f =~ s/^([^\t].*\n)*/\$(FORTRAN_FILES):/;
+               $done{ "Add rule for extracting Fortran source files" } = 1;
+            }
+            else {
+               $done{ "Add rule for extracting Fortran source files" } = 0;
+            }
+
+            "\n\n" .
+            "\#  Macro for filter to replace INTEGER * 8 declarations" .
+                                           " with INTEGER8\n\n" .
+            "REPLACE_INTEGER8 = sed \\\n" .
+            '   "s/^[ \t]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr] *\* *8' .
+                                           '/      $(INTEGER8)/"' . "\n\n" .
+            $comm . $extract .
+            $comm_f . $extract_f
+            ;
+         }sex;
+ 
+
+#  Add the code for recording INTEGER8 macro in datestamp file.
+      $done{ "Add @ echo '   INTEGER8: \$(INTEGER8)  >>\$(DATE_STAMP)" } =
+         s{
+            ( \n  \t  @?  \ *  echo  .*   \$\(LINK\) .*  >>\ *\$\(DATE_STAMP\) )
+         }{
+            $1 .
+            "\n\t@ echo '   INTEGER8: \$(INTEGER8)'     >>\$(DATE_STAMP)"
+         }ex;
+
+
+
+#  Output the remainder of the modified text.
+      print $makefile;
+
+#  Record any parts of the process which didn't get done.
+      my( $task, $success );
+      my( @undone );
+      while ( ( $task, $success ) = each( %done ) ) {
+         push( @undone, $task ) unless ( $success );
+      }
+      if ( @undone ) {
+         print( STDERR join( "\n      ", 
+                             "The following edits could not be made:",
+                             @undone ),
+                       "\n" );
+      }
+
+#  Reminder that hand editing is required.
+      print( STDERR join( "\n      ",
+            "The following must still be done:",
+            "Extract Fortran files using new extraction rule.",
+            "Locate any other extractions of Fortran files from archives.",
+            "Add new include files and dependencies if required.",
+            "Check private archive-building type targets which may be broken.",
+         ), "\n" );
+        
+
+# $Id$
