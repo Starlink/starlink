@@ -29,7 +29,7 @@
 *     26-SEP-1997 (DSB):
 *        Added SLA_DD2TF, SLA_DJCL.
 *     21-JUN-2001 (DSB):
-*        Added SLA_DBEAR.
+*        Added SLA_DBEAR, SLA_DVDV.
 */
 
 /* Macros */
@@ -437,6 +437,25 @@ double slaDsep ( double a1, double b1, double a2, double b2 ) {
                                 DOUBLE_ARG(&B1),
                                 DOUBLE_ARG(&A2),
                                 DOUBLE_ARG(&B2) );
+   return result;
+}
+
+F77_DOUBLE_FUNCTION(sla_dvdv)( DOUBLE_ARRAY(VA),
+                               DOUBLE_ARRAY(VB) );
+
+double slaDvdv( double va[3], double vb[3] ) {
+   DECLARE_DOUBLE_ARRAY(VA,3);
+   DECLARE_DOUBLE_ARRAY(VB,3);
+   double result;
+   int i;
+
+   int i;
+   for ( i = 0; i < 3; i++ ) {
+      VA[ i ] = va[ i ];
+      VB[ i ] = vb[ i ];
+   }
+   result = F77_CALL(sla_dvdv)( DOUBLE_ARRAY_ARG(VA),
+                                DOUBLE_ARRAY_ARG(VB) );
    return result;
 }
 

@@ -4217,7 +4217,12 @@ static void Shapp( double dist, double *r0, double *r3, double a0,
    }
 
 /* Create the latitude of the required point. */
-   p4[ 1 ] = asin( max( -1.0, min( 1.0, r4[ 2 ] ) ) );
+   if( r4[ 2 ] > 1.0 ) { 
+      r4[ 2 ] = 1.0;
+   } else if( r4[ 2 ] < -1.0 ) {
+      r4[ 2 ] = -1.0;
+   }
+   p4[ 1 ] = asin( r4[ 2 ] );
 
 }
 
