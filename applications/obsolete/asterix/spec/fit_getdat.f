@@ -1,5 +1,6 @@
       SUBROUTINE FIT_GETDAT( MPCID, ID, GENUS, FSTAT, WORKSPACE,
-     :                       WEIGHTS, NDS, NGOOD, SSCALE, STATUS )
+     :                       WEIGHTS, NDS, NGOOD, SSCALE, LNDFAC,
+     :                       STATUS )
 *+
 *  Name:
 *     FIT_GETDAT
@@ -174,6 +175,9 @@
 *        Added group loading capability
 *      5 August 1997 (RB):
 *        Map all arrays before slicing, pass FileSet to FSI.
+*      7 Nov 1997 (ELD):
+*        LNDFAC calculated
+
 *     {enter_changes_here}
 
 *  Bugs:
@@ -207,6 +211,7 @@ c     RECORD /DATASET/ 		OBDAT(NDSMAX)  		! Observed datasets
       INTEGER 			SSCALE                  ! Factor for scaling fitstat
 c     RECORD /PREDICTION/ 	PREDDAT(NDSMAX) 	! Data predicted by model
 c     RECORD /INSTR_RESP/ 	INSTR(NDSMAX) 		! Instrument responses
+      DOUBLE PRECISION          LNDFAC                  ! lnd!
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -869,10 +874,16 @@ c110	        FORMAT(' Using numbers: ',<SETSIZE>(I3))
 	        CALL FIT_GETDAT_COUNTSQ(DATASET_NDAT(NDS),
      :                      %VAL(DATASET_DPTR(NDS)),
      :                      %VAL(DATASET_QPTR(NDS)),SSCALE)
+                CALL FIT_GETDAT_LNDFACQ(DATASET_NDAT(NDS),
+     :                      %VAL(DATASET_DPTR(NDS)),%VAL(DATASET_QPTR(NDS)),
+     :                      LNDFAC)
               ELSE
 	        CALL ARR_SUM1R( DATASET_NDAT(NDS), %VAL(DATASET_DPTR(NDS)),
      :                          RSUM, STATUS )
                 SSCALE = SSCALE + NINT(RSUM)
+                CALL FIT_GETDAT_LNDFAC(DATASET_NDAT(NDS),
+     :                                 %VAL(DATASET_DPTR(NDS)),
+     :                                 LNDFAC)
               END IF
 
             END IF
@@ -1004,3 +1015,64 @@ c110	        FORMAT(' Using numbers: ',<SETSIZE>(I3))
       END IF
 
       END
+
+
+*+  FIT_GETDAT_LNDFACQ - Calculate lnd! for dataset
+      SUBROUTINE FIT_GETDAT_LNDFACQ(NDAT,DATA,QUAL,LNDFAC)
+*    Description :
+*     lnd! from the (REAL) DATA array are accumulated in LNDFAC
+*    History :
+*     7 Nov 97: Original (ELD)
+*    Type definitions :
+        IMPLICIT NONE
+*    Import :
+        INTEGER NDAT            ! No of data values
+        REAL DATA(*)            ! Data array
+        LOGICAL QUAL(*)         ! Quality array
+*    Import-Export :
+        DOUBLE PRECISION LNDFAC ! lnd!
+*    Export :
+*    Local constants :
+*    Local variables :
+        INTEGER I,J
+*-
+
+        DO I=1,NDAT
+          IF ( QUAL(I) ) THEN
+            IF (NINT(DATA(I)).GT.0) THEN
+              DO J=1,NINT(DATA(I))
+                LNDFAC=LNDFAC+LOG(DBLE(J))
+              END DO
+            END IF
+          END IF
+        END DO
+        END
+
+
+*+  FIT_GETDAT_LNDFAC - Calculate lnd! for dataset
+      SUBROUTINE FIT_GETDAT_LNDFAC(NDAT,DATA,LNDFAC)
+*    Description :
+*     lnd! from the (REAL) DATA array are accumulated in LNDFAC
+*    History :
+*     7 Nov 97: Original (ELD)
+*    Type definitions :
+        IMPLICIT NONE
+*    Import :
+        INTEGER NDAT            ! No of data values
+        REAL DATA(*)            ! Data array
+*    Import-Export :
+        DOUBLE PRECISION LNDFAC ! lnd!
+*    Export :
+*    Local constants :
+*    Local variables :
+        INTEGER I,J
+*-
+
+        DO I=1,NDAT
+          IF (NINT(DATA(I)).GT.0) THEN
+            DO J=1,NINT(DATA(I))
+              LNDFAC=LNDFAC+LOG(DBLE(J))
+            END DO
+          END IF
+        END DO
+        END
