@@ -389,6 +389,8 @@
 *        Applications section.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     29-NOV-2001 (DSB):
+*        Corrected argument list for KPS1_MEMNM.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -988,8 +990,10 @@
          CALL KPG1_MAP( NMDNDF, 'DATA', '_REAL', 'WRITE/BAD', IPNMOD,
      :                 NEL, STATUS )
 
-         CALL KPS1_MEMNM( DEF, C1_DIM( 1 ), C1_DIM( 2 ), %VAL( IPNMOD ),
-     :                    STATUS )
+         CALL KPS1_MEMNM( DEF, C1_DIM( 1 ), C1_DIM( 2 ), 
+     :                    ME_ST( ME_KB( 1 ) ), ME_ST( ME_KB( 20 ) ),
+     :                    ME_ST( ME_KB( 22 ) ), ME_ST( ME_KB( 2 ) ),
+     :                    %VAL( IPNMOD ), STATUS )
 
       END IF
 
