@@ -39,15 +39,22 @@ Description:
    transform only two lists may be registered at any time.
 
    The results from REGISTER are reported via the logging system
-   and then coded as TRANSFORM structures containing the final
-   algebraic solutions for each input list. These structures are
-   usually stored in the CCDPACK extensions of the associated images
-   and then used by the applications TRANLIST and TRANNDF which may
-   be used to transform position lists and resample the actual
-   datasets respectively. The transformation structures may also be
-   stored within a named HDS container file if no associated images exist.
+   and then coded either as new frames with a domain name given
+   by the OUTDOMAIN parameter in the WCS component of the NDFs,
+   or as TRANSFORM structures, containing the final algebraic
+   solutions for each input list.  Transform structures may be
+   stored in the CCDPACK exensions of the associated NDFs or within
+   a named HDS container file if no associated NDFs exist.  Whether
+   TRANSFORM structures or frames within the WCS components are
+   chosen, they can be used by the applications TRANLIST and
+   TRANNDF to transform position lists and resample the actual
+   datasets respectively.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CLASS
 
 CLASS( ) = LITERAL (Read)
    If CLASSIFY is TRUE then a list of classifications that
@@ -75,6 +82,9 @@ CLASS( ) = LITERAL (Read)
    See SUN/61 Appendix B for details of transformation
    classification and a table of classifications of common
    mappings.
+
+CLASSIFY
+
 CLASSIFY = _LOGICAL (Read)
    If TRUE then this indicates that you want to classify the
    transform. Classifying a transformation can help in later
@@ -84,6 +94,9 @@ CLASSIFY = _LOGICAL (Read)
    Linear transformations are classified by this routine directly
    and do not use this parameter.
    [FALSE]
+
+FA-FZ
+
 FA-FZ = LITERAL (Read)
    These parameters supply the values of "sub-expressions" used in
    the expressions XFOR, YFOR, XINV and YINV. These parameters
@@ -97,6 +110,9 @@ FA-FZ = LITERAL (Read)
       YINV > PA*SIND(FB/PA)*YY/FB
       FA > SQRT(X*X+Y*Y)
       FB > SQRT(XX*XX+YY*YY)
+
+FITTYPE
+
 FITTYPE = _INTEGER (Read)
    The type of fit which should be used when determining the
    transformation between the input positions lists. This may take
@@ -116,6 +132,9 @@ FITTYPE = _INTEGER (Read)
       - 6 -- self defined function
 
    [5]
+
+FULL
+
 FULL = _LOGICAL (Read)
    If FITTYPE=6 is chosen then this parameter value determines
    if a full transformation is to be performed or not. If FALSE
@@ -129,23 +148,30 @@ FULL = _LOGICAL (Read)
    mapping means that image resampling (TRANNDF) may not be
    performed.
    [FALSE]
-IN = LITERAL (Read)
-   If NDFNAMES is FALSE and PLACEIN is "NDF" then a list of image
-   names in which to store the transformation structures is
-   required. This list of names must correspond exactly to the
-   order of the associated input lists. A listing of the order
-   of inputs is shown before this parameter is accessed.
 
-   The image names may (although this is probably not advisable)
+IN
+
+IN = LITERAL (Read)
+   If NDFNAMES is FALSE and PLACEIN is "NDF" then a list of NDF
+   names in which to store the WCS frames or transformation
+   structures is required. This list of names must correspond
+   exactly to the order of the associated input lists. A listing
+   of the order of inputs is shown before this parameter is
+   accessed.
+
+   The NDF names may (although this is probably not advisable)
    be specified using wildcards, or may be specified using an
    indirection file (the indirection character is "^").
+
+INLIST
+
 INLIST = LITERAL (Read)
    This parameter is used to access the names of the lists
    which contain the positions and, if NDFNAMES is TRUE, the names
-   of the associated images. If NDFNAMES is TRUE the names of the
+   of the associated NDFs. If NDFNAMES is TRUE the names of the
    position lists are assumed to be stored in the extension of the
-   images (in the CCDPACK extension item CURRENT_LIST) and the names
-   of the images themselves should be given (and may include
+   NDFs (in the CCDPACK extension item CURRENT_LIST) and the names
+   of the NDFs themselves should be given (and may include
    wildcards).
 
    If NDFNAMES is FALSE then the actual names of the position
@@ -154,6 +180,9 @@ INLIST = LITERAL (Read)
    processing routines will write the names of their results
    files into files suitable for use in this manner) the
    indirection character is "^".
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -163,6 +192,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -183,20 +215,66 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+NDFNAMES
+
 NDFNAMES = _LOGICAL (Read)
    This parameter specifies whether the names of the input
-   positions lists are stored in the CCDPACK extensions of images.
-   If TRUE then the INLIST parameter accesses a list of images
+   positions lists are stored in the CCDPACK extensions of NDFs.
+   If TRUE then the INLIST parameter accesses a list of NDFs
    which are used to get the associated positions lists. If FALSE
    then INLIST just accesses the position list names directly.
 
-   If the names of the lists are stored in the CCDPACK image
-   extension then the final transformation structure is also
-   written to the image extension.
+   If the names of the lists are stored in the CCDPACK NDF
+   extension then the final WCS frame information or
+   transformation structure is also written to the NDF
+   extension.
 
    If a global value for this parameter has been set using
    CCDSETUP then that value will be used.
    [TRUE]
+
+OUTDOMAIN
+
+OUTDOMAIN = LITERAL (Read)
+   If OUTFORMAT is 'WCS', the transformation information is
+   written as a new frame to the WCS component of the NDF.
+   The frame normally has a Domain name of 'CCD_REG', but
+   that can be overridden with this parameter.  When this
+   frame is added, any previously existing frame which has
+   the same Domain is removed.
+
+   The name is converted to upper case, and whitespace is removed.
+   [CCD_REG]
+
+OUTFORMAT
+
+OUTFORMAT = LITERAL (Read)
+   If NDFNAMES is TRUE, or PLACEIN is 'NDF', then this parameter
+   specifies how the transformation is to be written into the
+   NDFs.  There are two possible values:
+
+      - WCS       -- written into WCS component of the NDF
+
+      - TRANSFORM -- written as a TRANSFORM structure into the
+                     .MORE.CCDPACK extension of the NDF
+
+   If WCS is chosen, then a new frame, with a Domain value given
+   by OUTDOMAIN, is inserted into the WCS extension of the NDF
+   (a new WCS extension is created if none previously existed).
+   A mapping between this and the 'PIXEL' domain is defined,
+   which is the unit mapping in the case that the NDF in question
+   is the reference set.  If any frame in the domain OUTDOMAIN
+   already exists in the WCS component, it will be erased, so
+   that after successful processing by REGISTER it will contain
+   only one such frame.
+
+   WCS is currently only possible for linear transformations
+   (FITTYPE values between 1 and 5).
+   [WCS]
+
+PA-PZ
+
 PA-PZ = LITERAL (Read)
    When FITTYPE=6 these parameters are used for supplying initial
    guesses at the values of the fit parameters. Normally the
@@ -205,34 +283,49 @@ PA-PZ = LITERAL (Read)
    are usually caused by trig functions etc. which are given
    invalid values (outside +/-1 etc.)).
    [1.0D0]
+
+PLACEIN
+
 PLACEIN = LITERAL (Read)
    If NDFNAMES is FALSE then this parameter specifies where
    you would like to store the final transformation structures.
    The options are:
 
-      - NDF  -- store them in image extensions
+      - NDF  -- store them in NDF extensions
 
       - FILE -- store them in a container file.
 
    If the NDF option is chosen then you will have the option of
-   supplying the image names via the parameter IN. If the FILE
+   supplying the NDF names via the parameter IN. If the FILE
    option is chosen then the name of an HDS container file should
    be given in response to the TRFILE parameter.
    [NDF]
+
+REFPOS
+
 REFPOS = _INTEGER (Read)
    The position within the list of inputs which corresponds to
    the list to be used as the reference set.
    [1]
+
+TOLER
+
 TOLER = _DOUBLE (Read)
    The RMS tolerance in positions which is used to determine the
    best fit. Adjust this value only if the input positions are
    specified in coordinates with a higher accuracy or smaller
    units.
    [0.001]
+
+TRFILE
+
 TRFILE = TRFILE (Read)
    If PLACEIN is given as "FILE" then the value of this parameter
    specifies the name of the container file to be used to store
    the resultant transformation structures.
+
+XFOR
+
 XFOR = LITERAL (Read)
    If FITTYPE=6 then this parameter specifies the parameterised
    algebraic expression to be used as the forward X
@@ -246,6 +339,9 @@ XFOR = LITERAL (Read)
 
    which is the same as the linear X transformation which just
    applies an offset and a scale factor.
+
+XINV
+
 XINV = LITERAL (Read)
    If FITTYPE=6 and FULL=TRUE then this parameter specifies
    the inverse X transformation. The expression may use all the
@@ -258,6 +354,9 @@ XINV = LITERAL (Read)
 
    which is the same as the inverse linear X transformation for an
    offset and scale.
+
+YFOR
+
 YFOR = LITERAL (Read)
    If FITTYPE=6 then this parameter specifies the parameterised
    algebraic expression to be used as the forward Y
@@ -271,6 +370,9 @@ YFOR = LITERAL (Read)
 
    which is the same as the linear Y transformation which just
    applies an offset and a scale factor.
+
+YINV
+
 YINV = LITERAL (Read)
    If FITTYPE=6 and FULL=TRUE then this parameter specifies
    the inverse Y transformation. The expression may use all the
@@ -287,40 +389,46 @@ YINV = LITERAL (Read)
 Examples
 
 register inlist='*' fittype=1
-   In this example all the images in the current directory are
+   In this example all the NDFs in the current directory are
    accessed and their associated position lists are opened.
    A global fit between all the datasets is then performed
    which results in estimates for the offsets from the first input
-   image's position. The results are then coded as transform
-   structures in the CCDPACK extensions of the images (under the
-   item TRANSFORM). The transform structures are arranged so that
-   the forward transformation maps current positions into the
-   reference coordinate system.
+   NDF's position.  The results are then coded as new frames,
+   given the domain name 'CCD_REG' in the WCS component of the
+   NDFs.  Actual registration of the images can then be achieved
+   by aligning all the NDFs in the CCD_REG domain.
 
-register inlist='*' trtype=5
+register inlist='*' trtype=5 outdomain=result-set1
    This example works as above but this time the global
    transformations are derived for a full 6-parameter linear fit
    (which allows offset, rotation, magnification and shear).
+   The results are coded as frames in the Domain 'RESULT-SET1'.
 
-register inlist='"myimage1,myimage2"' fittype=4 refpos=2
+register inlist='"myndf1,myndf2"' fittype=4 refpos=2
    In this example a solid body fit is performed between the
-   position lists associated with the images myimage1 and myimage2.
+   position lists associated with the NDFs myndf1 and myndf2.
    The reference positions are chosen to be those associated with
-   myimage2.
+   myndf2.
 
 register inlist='"one,two"' fittype=6 xfor='pa+pb*x' yfor='pa+pb*y'
-   In this example the positions lists associated with the images
+   In this example the position lists associated with the NDFs
    one and two are said to be related by the algebraic
    expressions "pa+pb*x" and "pa+pb*y", which indicates that a
    single offset applies in both directions and a single scale
    factor. A solution for the values PA and PB is found using a
    general least-squares minimization technique. Starting values
    for PA and PB can be given using the parameters PA and PB.
+   Since the fittype is 6, outformat must be 'transform', so
+   the results are coded as transform structures in the CCDPACK
+   extensions of the NDFs (under the item TRANSFORM).  The
+   transform structures are arranged so that the forward
+   transformation maps current positions into the reference
+   coordinate system.
 
-register inlist='"image1,image2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
+register inlist='"ndf1,ndf2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
          yfor='pe+pf*x+pg*y+ph*x*y'
    In this example an non-linear transformation is fit between the
-   positions associated with the images image1 and image2. This analysis
+   positions associated with the NDFs ndf1 and ndf2. This analysis
    may help in determining whether a 6-parameter fit is good
    enough, or if you just want to transform positions. A problem
    with proceeding with this transformation in a general fashion
@@ -328,13 +436,14 @@ register inlist='"image1,image2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
    perform image resampling.
 
 register ndfnames=false inlist='"list1.acc,list2.acc,list3.acc"'
-         fittype=3 placein=ndf in='"image1,image2,image3"'
+         fittype=3 placein=ndf outformat=transform
+         in='"ndf1,ndf2,ndf3"'
    In this example the input position lists are not associated
-   with images (ndfnames=false) and have to be specified by name
+   with NDFs (ndfnames=false) and have to be specified by name
    (no wildcards allowed). Since the position lists are not
-   associated with images there is no natural home for the
+   associated with NDFs there is no natural home for the
    transform structures. In this example it has been decided to
-   place the transforms in images anyway. PLACEIN could also be
+   place the transforms in NDFs anyway. PLACEIN could also be
    given as "file" in which case the transform structures are
    written to a container file, under the items TRN_1, TRN_2 ...
 
@@ -377,13 +486,20 @@ Notes
 - NDF extension items.
 
   If NDFNAMES is TRUE then the item "CURRENT_LIST" of the
-  .MORE.CCDPACK structure of the input images will be located
+  .MORE.CCDPACK structure of the input NDFs will be located
   and assumed to contain the names of the lists whose positions
   are to be used for registration.
 
-  On exit an item "TRANSFORM" will be added to any input images.
+  On exit, if OUTFORMAT is "WCS" then a new frame with domain
+  name given by the OUTDOMAIN parameter will be added to the
+  .WCS component of input NDFs.  Taken together these contain the
+  registration information and can be inspected using NDFTRACE
+  or WCSSHOW (SUN/95).
+
+  If OUTFORMAT is "TRANSFORM" then an item "TRANSFORM" will be
+  added to the .MORE.CCDPACK structure of the input NDFs.
   This contains the registration information as a TRANSFORM
-  structure and may be inspected using the ADAM utility TRACE
+  structure and may be inspected using the utility HDSTRACE
   (SUN/102).
 
 Behaviour_of_parameters
@@ -409,6 +525,8 @@ Authors
 
 PDRAPER: Peter Draper (STARLINK)
 
+MBT: Mark Taylor (STARLINK)
+
 History
 
  28-JUL-1992 (PDRAPER):
@@ -422,4 +540,17 @@ History
 
  6-OCT-1995 (PDRAPER):
     Updated for CCDPACK version 2.0.
+
+ 18-SEP-1996 (PDRAPER):
+    Removed dependency on NAG calls. This affects fittypes 3,4,5,6.
+
+ 3-MAR-1997 (PDRAPER):
+    Removed top-level locator control (foreign data access upgrade).
+
+ 23-MAR-1998 (PDRAPER):
+    Changed to only open input lists when required. This works
+    around the FIO limit of 40 open file.
+
+ 11-MAR-1999 (MBT):
+    Changed to use WCS components as well as TRANSFORM structures.
 .endhelp

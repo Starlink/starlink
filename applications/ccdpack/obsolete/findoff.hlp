@@ -19,7 +19,11 @@ Description:
    registration using the REGISTER routine. The estimated offsets are
    also reported.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+COMPLETE
 
 COMPLETE = _DOUBLE (Read)
    A completeness threshold for rejecting matched position
@@ -31,27 +35,39 @@ COMPLETE = _DOUBLE (Read)
    matched. Ideally a completeness of 1 should be found, the lower
    this value the lower the quality of the match.
    [0.5]
+
+ERROR
+
 ERROR = _DOUBLE (Read)
    The error in the X and Y positions. This value is used to
    determine which positions match within an error box (SLOW) or
    as a bin size (FAST). An inaccurate value may result in
    excessive false or null matches.
    [1.0]
+
+FAILSAFE
+
 FAILSAFE = _LOGICAL (Read)
    If FAST is TRUE then this parameter indicates whether the SLOW
    algorithm is to be used when FAST fails.
    [TRUE]
+
+FAST
+
 FAST = _LOGICAL (Read)
    If TRUE then the FAST matching algorithm is used, otherwise
    just the SLOW algorithm is used.
    [TRUE]
+
+INLIST
+
 INLIST = LITERAL (Read)
    This parameter is used to access the names of the lists
    which contain the positions and, if NDFNAMES is TRUE, the names
-   of the associated images. If NDFNAMES is TRUE the names of the
+   of the associated NDFs. If NDFNAMES is TRUE the names of the
    position lists are assumed to be stored in the extension of the
-   images (in the CCDPACK extension item CURRENT_LIST) and the names
-   of the images themselves should be given in response (and may
+   NDFs (in the CCDPACK extension item CURRENT_LIST) and the names
+   of the NDFs themselves should be given in response (and may
    include wildcards).
 
    If NDFNAMES is FALSE then the actual names of the position
@@ -60,6 +76,9 @@ INLIST = LITERAL (Read)
    processing routines will write the names of their results file
    into files suitable for use in this manner) the indirection
    character is "^".
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -69,6 +88,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -89,17 +111,46 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+MAXDISP
+
+MAXDISP = _DOUBLE (Read)
+   This parameter gives the maximum acceptable displacement in
+   pixels between the original alignment of the NDFs and the
+   alignment in which the objects are matched.  If frames have
+   to be displaced more than this value to obtain a match, the
+   match is rejected.  This will be of use when USEWCS is set
+   and the alignment defined by the WCS components of the
+   NDFs is fairly accurate.  It should be set to the maximum
+   expected inaccuracy in that alignment.  If null, arbitrarily
+   large displacements are allowed, although note that a
+   similar restriction is effectively imposed by setting the
+   RESTRICT parameter.
+   [!]
+
+MINMATCH
+
 MINMATCH = _INTEGER (Read)
    This parameter specifies the minimum number of positions
    which must be matched for a comparison of two lists to be
-   deemed successful. This must be greater than 2.
+   deemed successful.  Small values (especially less than 3) of
+   this parameter can lead to a high probability of false matches,
+   and are only advisable for very sparsely populated lists
+   and/or small values of the MAXDISP parameter (presumably in
+   conjunction with USEWCS).
    [3]
+
+MINSEP
+
 MINSEP = _DOUBLE (Read)
    Positions which are very close may cause false matches by being
    within the error box of other positions. The value of this
    parameter controls how close objects may be before they are
    both rejected (this occurs before pattern-matching).
    [Dynamic -- 5.0*ERROR]
+
+NAMELIST
+
 NAMELIST = LITERAL (Read)
    The name of a file to contain the names of the output
    position lists. The names written to this file are those
@@ -107,11 +158,14 @@ NAMELIST = LITERAL (Read)
    This file may be used in an indirection expression to input
    all the position lists output from this routine into another
    routine (say REGISTER), if the associating position lists with
-   images option is not being used.
+   NDFs option is not being used.
    [FINDOFF.LIS]
+
+NDFNAMES
+
 NDFNAMES = _LOGICAL (Read)
    If TRUE then the routine will assume that the names of the
-   position lists are stored in the image CCDPACK extensions under
+   position lists are stored in the NDF CCDPACK extensions under
    the item "CURRENT_LIST". The names will be present in the
    extension if the positions were located using a CCDPACK
    application (such as FINDOBJ). Using this facility allows the
@@ -121,17 +175,20 @@ NDFNAMES = _LOGICAL (Read)
    If a global value for this parameter has been set using
    CCDSETUP then that value will be used.
    [TRUE]
+
+OUTLIST
+
 OUTLIST = FILENAME (Write)
    A list of names specifying the result files. These contain
    labelled positions which can be used in registration.
    The names of the lists may use modifications of the
-   input names (image names if available otherwise the names of the
+   input names (NDF names if available otherwise the names of the
    position lists). So if you want to call the output lists
-   the same name as the input images except to add a type use.
+   the same name as the input NDFs except to add a type use.
 
       OUTLIST > *.find
 
-   If no image names are given (NDFNAMES is FALSE) then if you want
+   If no NDF names are given (NDFNAMES is FALSE) then if you want
    to change the extension of the files (from ".find" to ".off"
    in this case) use
 
@@ -141,7 +198,44 @@ OUTLIST = FILENAME (Write)
    These may use indirection elements as well as names separated
    by commas.
    [*]
-USECOMP = LOGICAL (Read)
+
+OVERRIDE
+
+OVERRIDE = LOGICAL (Read)
+   This parameter controls whether to continue and create an
+   incomplete solution. Such solutions will result when only a
+   subset of the input position lists have been matched.
+
+   This situation would ideally indicate that one, or more, of the
+   input lists are from positions not coincident with the others,
+   in which case it is perfectly legimate to proceed, however, the
+   more likely scenario is that they have too few positions and
+   have consequently been rejected.
+   [TRUE]
+
+RESTRICT
+
+RESTRICT = LOGICAL (Read)
+   This parameter determines whether the mapping between coordinate
+   systems of NDF pairs is used to restrict the choice of objects
+   to match with each other.  If set TRUE, then only objects
+   which would appear in the overlap of two frames if the
+   mapping determined by the WCS components of each NDF pair
+   were accurate are tested for matching.  If it is set FALSE, then
+   no such restriction is made.
+
+   This parameter should therefore be set TRUE if the translational
+   part of the information about the coordinate frames in the
+   WCS components is fairly accurate (especially in the case that
+   there are many objects and a small overlap), and FALSE if it
+   is not.
+
+   This parameter is ignored if USEWCS is FALSE.
+   [FALSE]
+
+USECOM
+
+USECOM = LOGICAL (Read)
    This parameter specifies whether the completeness value will
    be used to weight the number of matches between a pair, when
    determining the graph connecting all input datasets. Using
@@ -150,21 +244,53 @@ USECOMP = LOGICAL (Read)
    with the highest counts in favour of those with lower counts.
    [TRUE]
 
+USEWCS
+
+USEWCS = LOGICAL (Read)
+   This parameter specifies whether the World Coordinate System
+   information in the NDF should be used to make guesses about
+   how to align the frames.  If set true, and if a mapping
+   between the coordinates of each pair of NDFs can be found in
+   the domain of the Current coordinate frame of either of the pair
+   then this mapping is applied before the match is attempted.
+   Additionally, if the parameter RESTRICT is TRUE, the objects
+   chosen for matching up between each pair of images are only
+   those which would overlap in that pair if the WCS coordinate
+   information in both NDFs were accurate.  No other restriction
+   is made on the basis of this information however.  Since the
+   algorithms rely on shifting images in the X and Y directions
+   therefore, they will be capable of matching up objects even if
+   there is a significant (if RESTRICT is TRUE) or an arbitrarily
+   large (if RESTRICT is FALSE) translational error in the
+   coordinate system of the chosen domain, but other large errors
+   in the mapping (e.g. rotational alignment) will not be
+   tolerated.
+
+   If this parameter is set FALSE, then object matching proceeds
+   on the assumption that the coordinate frames of all NDFs
+   are the same apart from a translation.
+
+   This parameter is ignored if NDFNAMES is false.
+   [TRUE]
+
 Examples
 
 findoff inlist='*' error=1 outlist='*.off'
-   In this example all the images in the current directory are
-   accessed and their associated position lists are used. The
-   matched positions are named *.off. The method used is to try
-   the FAST algorithm, switching to SLOW if FAST fails. The
-   completeness measure is used when forming the spanning tree.
-   Matches with completenesses less than 0.5 and with less than
-   three positions are rejected.
+   In this example all the NDFs in the current directory are
+   accessed and their associated position lists are used.
+   Before object matching is attempted any transformations
+   implied by aligning the images in the Current frames
+   of the NDFs' WCS components are applied to the position list
+   coordinates.  The matched position lists are named *.off.
+   The method used is to try the FAST algorithm, switching to SLOW
+   if FAST fails. The completeness measure is used when forming
+   the spanning tree.  Matches with completenesses less than
+   0.5 and or with less than three positions, are rejected.
 
 findoff fast nofailsafe
    In this example the only the FAST algorithm is used.
 
-findoff usecomp=false
+findoff usecom=false
    In this example the completeness factor is derived but not used
    to weight the edges of the spanning tree.
 
@@ -173,6 +299,27 @@ findoff error=0.002 minsep=0.008
    are being used. The intrinsic error in the measurements is
    around 0.002 and positions within a box 0.008 of each other are
    rejected.
+
+findoff inlist='data*' outlist='*.off' restrict=true
+   This form would be used if the NDFs 'data*' have WCS components
+   which are already approximately correct.  The Current domain
+   of each should be set to the domain in which they are all
+   (approximately) registered.  Setting the RESTRICT parameter
+   then tells FINDOFF to consider only objects in the region which
+   the WCS components say ought to overlap between pairs of frames.
+   This can save a lot of time if there are many objects and a
+   small overlap, but will result in failure of the program if
+   the WCS components are not translationally registered
+   reasonably well.
+
+findoff inlist='data*' outlist='*.off' restrict minmatch=2
+        maxdisp=20 minsep=30
+   In this example the NDFs are sparsely populated, and a pair
+   will be considered to match if as few as two matching objects
+   can be found.  The NDFs have been initially aligned in the
+   Current frames of their WCS components to an accuracy of 20
+   or better.  As an additional safeguard, no objects within
+   30 pixels of each other in the same NDF are used for matching.
 
 Notes
 
@@ -210,12 +357,12 @@ Notes
 
   If NDFNAMEs is TRUE then the names of the input position lists
   will be gotten from the item "CURRENT_LIST" of the CCDPACK
-  extension of the input images. On exit this item will be updated
+  extension of the input NDFs. On exit this item will be updated
   to contain the name of the appropriate output lists.
 
 Notes_on_Algorithms
 
-   The pattern-matching process uses two algorithms, one which
+   The pattern-matching process uses two main algorithms, one which
    matches all the point pair-offsets between any two input lists,
    looking for the matches with the most common positions, and one
    which uses a statistical method based on a histogram of the
@@ -245,6 +392,18 @@ Notes_on_Algorithms
    try this first (without the SLOW process as a backup), only use
    the SLOW algorithm when you have small datasets and do not
    expect large areas (numbers of positions) of overlap.
+
+   A third algorithm, referred to as SNGL, is used automatically if
+   one or both of the lists in a pair contains only a single object.
+   In this case object matching is trivial and, of course, may
+   easily be in error.  SNGL can only be used if the MINMATCH
+   parameter has been set to 1, which should be done with care.  The
+   SNGL algorithm may be useful if there really is only one object,
+   correctly identified, in all the frames.  If this is not the
+   case, it should only be used when USEWCS is true and MAXDISP is
+   set to a low value, indicating that the alignment of the NDFs in
+   the Current frames of their WCS components is already fairly
+   accurate.
 
    The global registration process works by forming a graph with
    each position list at a node and with connecting edges of weight
@@ -291,6 +450,8 @@ Authors
 
 PDRAPER: Peter Draper (STARLINK)
 
+MBT: Mark Taylor (STARLINK)
+
 History
 
  29-SEP-1992 (PDRAPER):
@@ -301,4 +462,30 @@ History
 
  6-OCT-1995 (PDRAPER):
     Updated for CCDPACK 2.0.
+
+ 16-SEP-1996 (PDRAPER):
+    Removed all NAG calls.
+
+ 3-MAR-1997 (PDRAPER):
+    Removed top-level locator control (foreign data access upgrade).
+
+ 23-MAR-1998 (PDRAPER):
+    Changed to open input formatted files as required (rather than
+    all at once). This works around the FIO limit of 40 open files
+    and achieves the CCDPACK limit of 100 instead.
+
+ 16-DEC-1998 (PDRAPER):
+    Added OVERRIDE parameter to control the behaviour when
+    only some of the datasets are paired.
+
+ 20-JAN-1999 (PDRAPER):
+    Sorted out workspace problems for incomplete matching
+    (IPBEEN and IPQUE increased to NOPEN from NMATCH).
+
+ 30-MAR-1999 (MBT):
+    Changed to deal with WCS components of NDFs.
+
+ 26-APR-1999 (MBT):
+    Now erases .MORE.CCPACK.CURRENT_LIST component for unmatched
+    NDFs.
 .endhelp

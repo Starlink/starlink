@@ -20,24 +20,35 @@ Description:
    list processing CCDPACK applications) or from an explicit list of
    names.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+AUTOSCALE
 
 AUTOSCALE = _LOGICAL (Read)
-  Whether to "automatically" adjust the centroid location
-  parameters to reflect the fact that picking good initial
-  positions is less likely when dealing with very large images
-  (these tend to be displayed using one display pixel to
-  represent many image pixels).
+   Whether to "automatically" adjust the centroid location
+   parameters to reflect the fact that picking good initial
+   positions is less likely when dealing with very large images
+   (these tend to be displayed using one display pixel to
+   represent many image pixels).
 
-  If TRUE then the values of the parameters ISIZE, TOLER and
-  MAXSHIFT are scaled by an amount that maps the largest
-  dimension of each input image to an image of size 1024
-  square (so an image of size 2048 square will have these
-  parameters increased by a factor of two).
+   If TRUE then the values of the parameters ISIZE, TOLER and
+   MAXSHIFT are scaled by an amount that maps the largest
+   dimension of each input image to an image of size 1024
+   square (so an image of size 2048 square will have these
+   parameters increased by a factor of two).
+   [FALSE]
+
+IN
+
 IN = LITERAL (Read)
    The names of the images whose data components contain image
    features which are to be centroided.  The image names should be
    separated by commas and may include wildcards.
+
+INLIST
+
 INLIST = LITERAL (Read)
    If NDFNAMES is FALSE then this parameter will be used to
    access the names of the lists which contain the initial
@@ -47,13 +58,12 @@ INLIST = LITERAL (Read)
    The names of the input lists may use modifications of the
    input image names, so for instance if the position lists are
    stored in files with the same name as the input images but with
-   a file type of ".dat" instead of ".sdf" then use:
+   a file type of ".dat" instead of ".sdf" then use
 
       INLIST > *.dat
 
-   If the input list
-   names are a modification of the image names say with a trailing
-   type of "_initial.positions". Then a response of
+   If the input list names are a modification of the image names say
+   with a trailing type of "_initial.positions". Then a response of
 
       INLIST > *_initial.positions
 
@@ -71,11 +81,17 @@ INLIST = LITERAL (Read)
    the input image name order (after any wildcard expansions etc.
    have been made) is shown to make sure that the order is
    correct.
+
+ISIZE
+
 ISIZE = _INTEGER (Read)
    The size of a box side (in pixels) centered on current
    position which will be used to form the marginal profiles used
    to estimate the centroid.
    [9]
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter, then no logfile will be written, regardless of
@@ -85,6 +101,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -105,20 +124,32 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+MAXITER
+
 MAXITER = _INTEGER (Read)
    The maximum number of iterations which may be used in
    estimating the centroid. Only used if the tolerance criterion
    is not met in this number of iterations.
    [3]
+
+MAXSHIFT
+
 MAXSHIFT = _DOUBLE (Read)
    The maximum shift (in pixels) allowed from an initial position.
    [5.5]
+
+NAMELIST
+
 NAMELIST = LITERAL (Read)
    Only used if NDFNAMES is FALSE. If this is the case then this
    specifies the name of a file to contain a listing of the names
    of the output lists. This file may then be used to pass the
    names onto another CCDPACK application using indirection.
    [FINDCENT.LIS]
+
+NDFNAMES
+
 NDFNAMES = _LOGICAL (Read)
    If TRUE then the routine will assume that the names of the
    input position lists are stored in the CCDPACK extension item
@@ -131,10 +162,16 @@ NDFNAMES = _LOGICAL (Read)
    If a global value for this parameter has been set using
    CCDSETUP then that value will be used.
    [TRUE]
+
+POSITIVE
+
 POSITIVE = _LOGICAL (Read)
    If TRUE then the image features have increasing values
    otherwise they are negative.
    [TRUE]
+
+OUTLIST
+
 OUTLIST = FILENAME (Write)
    A list of names specifying the centroid result files. The
    names of the lists may use modifications of the input image
@@ -147,6 +184,9 @@ OUTLIST = FILENAME (Write)
    These may use indirection elements as well as names separated
    by commas.
    [*.cent]
+
+TOLER
+
 TOLER = _DOUBLE (Read)
    The required tolerance in the positional accuracy of the
    centroid. On each iteration the box of data from which the
@@ -258,6 +298,12 @@ History
 
  6-OCT-1995 (PDRAPER):
     Updated for CCDPACK 2.0.
+
+ 3-MAR-1997 (PDRAPER):
+    Removed top-level locator control (foreign data access upgrades).
+
+ 1-MAR-1999 (PDRAPER):
+    Added autoscale parameter.
 
 Implementation_Status
 
