@@ -611,7 +611,15 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 	    if (cat.setCatname (arglist[1]))
 		response = "250 Parameter set successfully";
 	    else
-		response = "552 Unknown catalogue";
+	    {
+		SSTREAM msg;
+		msg << "552 Unknown catalogue (" << arglist[1];
+		char *env = getenv ("CATLIB_CONFIG");
+		if (env)
+		    msg << ", CATLIB_CONFIG=" << env;
+		msg << ")";
+		response = SS_STRING(msg);
+	    }
 	else
 	    response = "501 Wrong number or type of parameters";
 	break;
@@ -720,10 +728,22 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 		    // Write out the number of catalogue rows, 
 		    // followed by the catalogue.
 		    cout << nrows << crlf;
+		    int rowcountcheck = nrows;
 		    for (CatalogueHandler::const_iterator p = cat.begin();
 			 p != cat.end();
 			 ++p)
 		    {
+			if (--rowcountcheck < 0)
+			{
+			    // This shouldn't happen -- we've entered
+			    // this loop more times than we promised.
+			    // Somehow, the number of rows reported
+			    // and held in nrows is different from the 
+			    // number returned by the iterator.
+			    throw MoggyException
+				("We have more rows than we expected -- extras discarded");
+			}
+
 			const CatalogueHandler::CatalogueRow& r = *p;
 			if (got_id)  cout << r.id() << OPseparator;
 			if (got_ra)  cout << r.ra() << OPseparator;
@@ -736,7 +756,40 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 			    cout << x << OPseparator << y << OPseparator;
 			}
 			cout << crlf;
+			if (0)
+			{
+			    cerr << "cols:"
+				 << " id=" <<  (got_id  ? r.id() : "??")
+				 << " ra=" <<  (got_ra  ? r.ra() : 0)
+				 << " dec=" << (got_dec ? r.dec() : 0)
+				 << " mag=" << (got_mag ? r.mag() : 0)
+				 << "\n";
+				
+			}
 		    }
+		    if (rowcountcheck > 0)
+		    {
+			// This shouldn't happen -- the iterator ran
+			// out before supplying nrows rows of values.
+			// Provide fake ones, and then throw an
+			// exception.
+			while (rowcountcheck > 0)
+			{
+			    if (got_id)  cout << "XX" << OPseparator;
+			    if (got_ra)  cout << 0.0 << OPseparator;
+			    if (got_dec) cout << 0.0 << OPseparator;
+			    if (got_mag) cout << 0.0 << OPseparator;
+			    if (ast)
+				cout << 0.0 << OPseparator
+				     << 0.0 << OPseparator;
+			    cout << crlf;
+			    rowcountcheck--;
+			}
+			throw MoggyException
+			    ("Too few rows returned from catalogue search -- last few might be bogus");
+		    }
+		    assert (rowcountcheck == 0);
+
 		    response = ""; // no further response required
 		}
 		else
