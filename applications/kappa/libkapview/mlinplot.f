@@ -169,7 +169,7 @@
 *        for the second curve, etc. If the number of supplied strings is
 *        less than the number of curves requested using LNINDX, then
 *        extra default labels are used. These are equal to the NDF pixel
-*        index of the row or column, preceeded by a hash character ("#").
+*        index of the row or column, preceded by a hash character ("#").
 *        If a null (!) value is supplied for LABELS, then default labels are 
 *        used for all curves. [!]
 *     LINLAB = _LOGICAL (Read)
