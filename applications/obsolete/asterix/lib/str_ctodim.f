@@ -22,11 +22,14 @@
         INTEGER CHR_LEN
 * Local variables :
 	CHARACTER ITEM*80
+
         INTEGER II,IL,NC
         INTEGER NN
         INTEGER NCOL
         INTEGER N1,N2
         INTEGER IERR          !Error variable
+        CHARACTER T*1
+        CHARACTER FMT*80
 *-
 *
 	NDIM=0
@@ -47,19 +50,28 @@
 	ENDIF
 *
 	NCOL=INDEX(ITEM,':')
+
+        T=CHAR(48+NN)
+        FMT = '(I'//T//')'
+
+
 	IF(NCOL.EQ.0) THEN
-		READ(ITEM,'(I<NN>)',IOSTAT=IERR) NELS(NDIM)
+		READ(ITEM,FMT,IOSTAT=IERR) NELS(NDIM)
 		NUP(NDIM)=NELS(NDIM)
 	ELSE
 		N1=NCOL-1
 		IF(N1.GT.0) THEN
-			READ(ITEM(:NCOL-1),'(I<N1>)',IOSTAT=IERR) NELS(NDIM)
+                        T=CHAR(48+N1)
+                        FMT = '(I'//T//')'
+			READ(ITEM(:NCOL-1),FMT,IOSTAT=IERR) NELS(NDIM)
 		ELSE
 			NELS(NDIM)=1
 		ENDIF
 		N2=NN-NCOL
 		IF(N2.GT.0) THEN
-			READ(ITEM(NCOL+1:),'(I<N2>)',IOSTAT=IERR) NUP(NDIM)
+                        T=CHAR(48+N2)
+                        FMT = '(I'//T//')'
+			READ(ITEM(NCOL+1:),FMT,IOSTAT=IERR) NUP(NDIM)
 		ELSE
 			NUP(NDIM)=0
 		ENDIF
