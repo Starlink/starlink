@@ -76,7 +76,6 @@ itcl::class gaia::GaiaSearch {
       #  available.
       if { $iscat_ } { 
 	 set m [get_menu File] 
-	 puts "m = $m"
 	 $m delete "Save with image" 
       }
 
