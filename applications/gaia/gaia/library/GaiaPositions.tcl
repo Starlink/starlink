@@ -109,6 +109,16 @@ itcl::class gaia::GaiaPositions {
          {Add new position to table}
       pack $itk_component(add) -side left -expand 1 -pady 2 -padx 2
 
+      #  Add button to stop adding new objects.
+      itk_component add stop {
+         button $itk_component(actions).stop -text "Stop" \
+            -command [code $this stop]
+      }
+      add_short_help $itk_component(stop) \
+         {Stop adding positions to table}
+      pack $itk_component(stop) -side left -expand 1 -pady 2 -padx 2
+      $itk_component(stop) configure -state disabled
+
       #  Update button for stats on all objects
       itk_component add update {
          button $itk_component(actions).update -text {Update all}\
@@ -144,6 +154,9 @@ itcl::class gaia::GaiaPositions {
    #  Destructor:
    #  -----------
    destructor  {
+      #  Stop the adding mode interaction.
+      stop
+
       if { $importer_ != {} && [winfo exists $importer_] } {
          catch {delete object $importer_}
       }
@@ -162,6 +175,9 @@ itcl::class gaia::GaiaPositions {
 
    #  Just close the window, removing associated graphics.
    public method close {} {
+
+      #  Stop the adding mode interaction.
+      stop
 
       #  Add binding to restore contents and store them.
       bind [winfo toplevel $w_] <Map> [code $this reappears_]
@@ -387,9 +403,24 @@ itcl::class gaia::GaiaPositions {
    public method add {} {
 
       #  Set up interaction to read the next <1> on the image
-      #  and get the coordinates.
-      $itk_component(table) add_new_row
-      $itk_component(table) update_row
+      #  and get the coordinates. Do this until interrupted.
+      set adding_ 1
+      $itk_component(stop) configure -state normal
+      $itk_component(add) configure -state disabled
+      while { $adding_ } {
+         set info [$itk_component(table) get_coords $itk_option(-image)]
+         if { $info != "" } {
+            eval $itk_component(table) set_new_row $info
+         }
+      }
+   }
+
+   #  Stop adding positions.
+   public method stop {} {
+      $itk_component(stop) configure -state disabled
+      $itk_component(add) configure -state normal
+      set adding_ 0
+      catch {$itk_component(table) stop_get_coords}
    }
 
    #  Read and write reference positions to a file.
@@ -581,6 +612,9 @@ itcl::class gaia::GaiaPositions {
 
    #  Window for importing text files.
    protected variable importer_ {}
+
+   #  Indicate when we're locked in the adding mode.
+   protected variable adding_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

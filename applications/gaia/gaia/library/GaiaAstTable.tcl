@@ -274,7 +274,7 @@ itcl::class gaia::GaiaAstTable {
    #  Destructor:
    #  -----------
    destructor  {
-      clear_marks
+      catch { clear_marks }
       if { $enter_object_ != {} } {
          catch {destroy $enter_object_}
       }

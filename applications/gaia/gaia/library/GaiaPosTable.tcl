@@ -133,6 +133,28 @@ itcl::class gaia::GaiaPosTable {
       redraw
    }
 
+   #  Add a new row to the table and set its values. A new identifier
+   #  is generated so only the x y, ra and dec values are required.
+   public method set_new_row {ra dec x y} {
+
+      #  Create a unique identifier.
+      set t $itk_component(table)
+      set nselect 1
+      while { $nselect > 0 } {
+         $t clear_selection
+         $t search "id" [incr ids_]
+         set nselect [$t num_selected]
+      }
+
+      #  Create the new row.
+      $itk_component(table) append_row [list $ids_ $ra $dec $x $y]
+      $itk_component(table) new_info
+
+      #  Make this the current selection.
+      $itk_component(table) select_row end
+      redraw
+   }
+
    #  Update the selected row with new X-Y and RA/Dec coordinates.
    public method update_row {} {
 
@@ -141,7 +163,7 @@ itcl::class gaia::GaiaPosTable {
       if { $row != "" } {
 
          #  Ok, get a coordinate position from the associated image.
-         set result [get_coords_ $itk_option(-image)]
+         set result [get_coords $itk_option(-image)]
 
          #  And replace existing X, Y, RA and Dec.
          lassign $result ra dec x y
@@ -153,7 +175,7 @@ itcl::class gaia::GaiaPosTable {
 
    #  Select a coordinate position on a given RtdImage. The return is a
    #  list of "ra dec x y".
-   protected method get_coords_ {image} {
+   public method get_coords {image} {
 
       #  Retain current canvas cursor and bindings, before overriding.
       set canvas [$image get_canvas]
@@ -181,8 +203,15 @@ itcl::class gaia::GaiaPosTable {
       return [set $w_.picked]
    }
 
+   #  Stop the get_coords method (if waiting) and make the return
+   #  blank. Use this to interrupt get_coords.
+   public method stop_get_coords {} {
+      global ::$w_.picked
+      set $w_.picked {}
+   }
+
    #  This method is called when the user clicks in the image to
-   #  select an object or star for the "get_coords_" method.
+   #  select an object or star for the "get_coords" method.
    protected method picked_object_ {image canvas winx winy} {
 
       #  Get canvas coordinates of event.
@@ -207,9 +236,14 @@ itcl::class gaia::GaiaPosTable {
 
       #  Convert to WCS system of image.
       set equinox [$rtdimage wcsequinox]
-      if { [catch { $rtdimage convert coords \
-                       $imagex $imagey image ra dec "wcs $equinox" }] != 0 } {
-         #  No RA and Dec found.
+      if { [$rtdimage astcelestial] } {
+         if { [catch { $rtdimage convert coords \
+                          $imagex $imagey image ra dec "wcs $equinox" }] != 0 } {
+            #  No RA and Dec found.
+            set ra "00:00:00"
+            set dec "00:00:00"
+         }
+      } else {
          set ra "00:00:00"
          set dec "00:00:00"
       }
@@ -229,9 +263,14 @@ itcl::class gaia::GaiaPosTable {
       set i 0
       foreach {newx newy} $newlist {
          set id [lindex [lindex $oldcon $i] 0]
-         if { [catch { $itk_option(-rtdimage) convert coords \
-                          $newx $newy image ra dec "wcs $equinox" }] != 0 } {
-            #  No RA and Dec found.
+         if { [$itk_option(-rtdimage)  astcelestial] } {
+            if { [catch { $itk_option(-rtdimage) convert coords \
+                             $newx $newy image ra dec "wcs $equinox" }] != 0 } {
+               #  No RA and Dec found.
+               set ra "00:00:00"
+               set dec "00:00:00"
+            }
+         } else {
             set ra "00:00:00"
             set dec "00:00:00"
          }
@@ -254,8 +293,13 @@ itcl::class gaia::GaiaPosTable {
          lassign [$itk_option(-canvas) coords $tags_($nid)] newx newy
          $itk_option(-rtdimage) convert coords $newx $newy canvas x y image
          set equinox [$itk_option(-rtdimage) wcsequinox]
-         if { [catch {$itk_option(-rtdimage) convert coords \
-                         $newx $newy canvas ra dec "wcs $equinox"}] != 0 } {
+         if { [$itk_option(-rtdimage) astcelestial] } {
+            if { [catch {$itk_option(-rtdimage) convert coords \
+                            $newx $newy canvas ra dec "wcs $equinox"}] != 0 } {
+               set ra "00:00:00"
+               set dec "00:00:00"
+            }
+         } else {
             set ra "00:00:00"
             set dec "00:00:00"
          }
