@@ -1,16 +1,25 @@
 1 POLPACK
 
- Version 1.1 of POLPACK (an applications package for processing imaging 
- polarimetry data) is now available. The main changes are:
+ Version 2.0 of POLPACK (an applications package for processing imaging 
+ polarimetry data) is now available. It is fully documented in SUN/223.
+ The main changes are:
  
-   o  Various changes have been made to the software to allow the
-   propagation of World Co-ordinate System (WCS) information through to
-   the final vector map.
+   o  Full support for single-beam data.
 
-   o  New sections have been added to SUN/223 describing the use of
-   RA/DEC calibrations within POLPACK, and how to use GAIA to create them.
+   o  A new command POLIMAGE for creating a 1 or 2-dimensional NDF from
+   the values in a column of a catalogue.
 
-   o  The handling of co-ordinate Frame information and graphical styles
-   have been brought into line with KAPPA V0.13.
+   o  A new command POLSIM for creating simulated intensity images from
+   a cube of Stokes vectorsd and a set of template intensity images.
 
- Various other bug fixes have been included.
+   o  Stokes vectors are now created using north as the reference direction
+   if the data contains World Coordinate System information defining a
+   celestial co-ordinate Frame. Otherwise, the reference direction is the 
+   second image axis (Y). The reference direction for Stokes vectors
+   created by previous version of POLPACK was always the first image
+   axis (X). Applications in this version of POLPACK will automatically
+   recognise data sets created by previous versions of POLPACK and use
+   the correct reference direction.
+
+   o  Multiple NDFs within a single HDS container file can now be processed
+   without needing to first extract them into separate files.
