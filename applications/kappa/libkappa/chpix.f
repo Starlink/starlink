@@ -35,7 +35,7 @@
 *        options are: "Data", "Error", "Quality" or "Variance".
 *        "Error" is the alternative to "Variance" and causes the
 *        square of the supplied replacement value to be stored in the
-*        output VARIANCE array.
+*        output VARIANCE array. ["Data"]
 *     IN = NDF (Read)
 *        NDF structure containing the array component to be modified.
 *     NEWVAL = LITERAL (Read)
