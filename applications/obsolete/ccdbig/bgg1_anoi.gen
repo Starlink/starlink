@@ -79,7 +79,7 @@
          IF( IMAGE( I ) .NE. VAL__BAD<T> ) THEN
 
 *  Scale image value to estimate the real mean.
-            VALUE = DCV_<T>TOR( IMAGE( I ) * ADU )
+            VALUE = DCV_<T>TOR( IMAGE( I ) ) * ADU
 
 *  Find the noise value for this means standard deviation.
             NOISE = CCD1_RNORM( 0.0, SQRT( ABS( VALUE)  ), STATUS )
@@ -93,4 +93,4 @@
  2    CONTINUE
 
       END
-* $Id: bgg1_anoi.gen,v 1.4 1998/07/06 09:25:33 mbt Exp $
+* $Id: bgg1_anoi.gen,v 1.5 1998/07/06 10:33:02 mbt Exp $
