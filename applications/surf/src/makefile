@@ -7,7 +7,7 @@ SCULIB = /jcmt_sw/sun4_Solaris/lib
 
 # Libraries
 
-LIBS = -L$(SCULIB) -lsculib -lV77 -lnag
+LIBS = -L$(SCULIB) -lsculib -lV77
 IRAS = -L/star/iras90 -lira -L/star/kappa -lkapsub -lkapgen
 STARLINK = -L/star/lib `ndf_link_adam` `fio_link_adam` `sla_link_adam` `agi_link_adam` `hlp_link_adam`
 ADAMLIBS = $(IRAS) $(STARLINK)
@@ -38,12 +38,15 @@ FSOURCES= reds.f reds_wtfn_rebin.f reds_crosstalk.f reds_extinction.f \
 	reds_flatfield.f reds_get_demod.f reds_get_flat.f reds_modify.f \
 	reds_scuphot.f reds_rebin.f reds_reduce_switch.f reds_restore.f \
 	reds_write_demod.f reds_write_flat.f reds_write_photom.f \
-	reds_skydip.f reds_scucat.f skydip_fit.f kstest.f ve08ad.f drawsig.f \
-	kpg1_ivci.f scuhelp.f reds_remsky.f reds_scuover.f
+	reds_skydip.f reds_scucat.f kstest.f drawsig.f \
+	reds_chgpnt.f reds_chgflat.f reds_chgqual.f\
+	kpg1_ivci.f scuhelp.f reds_remsky.f reds_scuover.f lsq_fit.f \
+	lsq_matinv.f
 
 IFL=    reds.ifl extinction.ifl modify.ifl reduce_switch.ifl flatfield.ifl \
 	rebin.ifl scucat.ifl kstest.ifl scuphot.ifl skydip.ifl drawsig.ifl \
-	scuhelp.ifl remsky.ifl scuover.ifl
+	change_pointing.ifl change_flat.ifl change_quality.ifl\
+	scuhelp.ifl remsky.ifl scuover.ifl bolrebin.ifl restore.ifl
 
 OBJS = ${FSOURCES:.f=.o}
 IFC  = ${IFL:.ifl=.ifc}
@@ -89,6 +92,18 @@ PRM_PAR:
 
 REDS_SYS:
 	ln -s reds_sys $@
+
+reds_chgflat.f:      REDS_SYS    
+reds_chgpnt.f:       REDS_SYS
+reds_extinction.f:   REDS_SYS
+reds_flatfield.f:    REDS_SYS
+reds_modify.f:       REDS_SYS
+reds_reduce_switch.f:     REDS_SYS
+reds_restore.f:      REDS_SYS
+reds_scuover.f:      REDS_SYS
+reds_scuphot.f:      REDS_SYS
+reds_skydip.f:       REDS_SYS
+reds_wtfn_rebin.f:   REDS_SYS
 
 kstest.f:  SAE_PAR 
 kstest.f:  PRM_PAR 
