@@ -462,7 +462,7 @@ atl1_setop.f astcmpframe.f astcmpmap.f astframe.f astgetframe.f astfindframe.f \
 astskyframe.f astgetmapping.f astunitmap.f atlhelp.f astframeset.f astpermaxes.f \
 astpermmap.f astremoveframe.f astremapframe.f astmatrixmap.f astconvert.f \
 atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f astpcdmap.f astwinmap.f \
-astpickaxes.f
+astpickaxes.f astsimplify.f
 
 F_SUB2 = 
 
@@ -499,7 +499,7 @@ C_SUB2 =
 TASKS = astcopy astaddframe astclear astget astset asttest astcmpframe \
 astcmpmap astframe astgetframe astgetmapping astunitmap atlhelp astskyframe \
 astframeset astpermmap astremoveframe astremapframe astmatrixmap astconvert \
-astlutmap astpcdmap astwinmap astfindframe astpermaxes astpickaxes
+astlutmap astpcdmap astwinmap astfindframe astpermaxes astpickaxes astsimplify
 
 #  Monolith routine source name.
 
@@ -1381,6 +1381,7 @@ astconvert.o   : SAE_PAR AST_PAR PAR_ERR
 astfindframe.o : SAE_PAR AST_PAR PAR_ERR
 astpermaxes.o  : SAE_PAR AST_PAR NDF_PAR
 astpickaxes.o  : SAE_PAR AST_PAR NDF_PAR PAR_ERR
+astsimplify.o  : SAE_PAR AST_PAR 
 astmatrixmap.o : SAE_PAR NDF_PAR AST_PAR
 astlutmap.o    : SAE_PAR AST_PAR
 astpcdmap.o    : SAE_PAR AST_PAR
