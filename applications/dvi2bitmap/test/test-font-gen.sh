@@ -197,7 +197,7 @@ else
 	fi
     fi
     echo ""
-    echo "See the section on `Not finding fonts' in the manual."
+    echo "See the section on 'Not finding fonts' in the manual."
 
 fi
 
