@@ -16,3 +16,4 @@ libtool
 starconf.m4
 starconf.status
 starconf.status.local
+cug1_*.f

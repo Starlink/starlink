@@ -2,7 +2,6 @@
 .libs
 *.la
 *.lo
-*.ifc
 Makefile
 Makefile.in
 acinclude.m4
@@ -17,7 +16,3 @@ libtool
 starconf.m4
 starconf.status
 starconf.status.local
-confdefs.h
-datacube.csh
-datacube.icl
-version.dat

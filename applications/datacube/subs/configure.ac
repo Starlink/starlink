@@ -12,7 +12,7 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
  
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-AC_CONFIG_SRCDIR([copyaxis.f])
+AC_CONFIG_SRCDIR([cub1_ainit.f])
 
 dnl    Include defaults for Starlink configurations
 dnl    Need to find out whether we need this

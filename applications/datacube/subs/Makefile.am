@@ -1,9 +1,12 @@
 ## Process this file with automake to produce Makefile.in
 
+# Use common set of include files.
+AM_FCFLAGS = -I../include
+
 noinst_LTLIBRARIES = libdatacube_subs.la
 
 libdatacube_subs_la_SOURCES = \
-   $(F_ROUTINES) $(PUBLIC_INCLUDES) $(GENSRC:.gen=.f) 
+   $(F_ROUTINES) $(PRIVATE_INCLUDES) $(GEN_ROUTINES:.gen=.f) 
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -17,8 +20,8 @@ F_ROUTINES = \
 GEN_ROUTINES = \
   cug1_cpya.gen   cug1_doast.gen  cug1_filla.gen
 
-PUBLIC_INCLUDES = \
-	CUB1_PAR
+PRIVATE_INCLUDES = \
+  CUB1_PAR
 	
 #  Define the known suffixes in this subsystem.  Automake will infer
 #  this list from the suffix rules without us having to write it
