@@ -80,6 +80,7 @@ XSOBJ           <too many Objects in use at once>
 ZOOMI           <zoom factor invalid>
 
 !  New codes introduced for V1.1.
+BADCI           <bad coordinate index>
 ILOST           <FrameSet integrity lost>
 ITFER           <error in IntraMap transformation function>
 ITFNI           <IntraMap transformation function name invalid>
