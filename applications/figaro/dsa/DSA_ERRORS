@@ -1,0 +1,120 @@
+C+
+C                     D S A _ E R R O R S
+C
+C     File defining the various error codes for the DSA_ package
+C
+C     History:
+C        ??   ??? 19??.  Original version, KS/AAO.
+C        23rd Aug 1992.  PARAMETER statement split up to reduce continuation 
+C                        lines used so as to comply with standard Fortran.
+C        25th Oct 1994.  Added INVRANG and CONMAP. KS/AAO.
+C+
+      INTEGER DSA__ALROPEN               ! File already open
+      INTEGER DSA__DUPREF                ! Duplicate reference name
+      INTEGER DSA__NOREFSL               ! No reference slot available
+      INTEGER DSA__NOPARSL               ! No parameter slot available
+      INTEGER DSA__DTAERR                ! Error from DTA_ system
+      INTEGER DSA__NOOBJ                 ! No such data object
+      INTEGER DSA__OBJINV                ! Data object invalid
+      INTEGER DSA__OVRDIM                ! Too many dimensions
+      INTEGER DSA__NOREF                 ! No such reference name defined
+      INTEGER DSA__STRTRN                ! String truncated
+      INTEGER DSA__AXINV                 ! Axis number invalid
+      INTEGER DSA__NOARRY                ! No such array
+      INTEGER DSA__NOMPSL                ! No map slots available
+      INTEGER DSA__INVTYP                ! Type invalid
+      INTEGER DSA__ACCINV                ! Invalid access mode
+      INTEGER DSA__PROVIO                ! Protection violation
+      INTEGER DSA__NOWKSL                ! No workspace slots available
+      INTEGER DSA__VMSERR                ! VMS service routine error
+      INTEGER DSA__CHRCON                ! Invalid character conversion
+      INTEGER DSA__CLSERR                ! Error closing down system
+      INTEGER DSA__BSNOTOP               ! Basis structure not open
+      INTEGER DSA__BADDIM                ! Dimension mismatch
+      INTEGER DSA__DATDIF                ! Data arrays differ
+      INTEGER DSA__UNIDIF                ! Data units differ
+      INTEGER DSA__MPSLNV                ! Map slot not valid
+      INTEGER DSA__PRESEQ                ! Prepare sequence wrong
+      INTEGER DSA__EQDIFF                ! Errors and quality set-ups differ
+      INTEGER DSA__RNGUPD                ! Range update failed
+      INTEGER DSA__AXSMAP                ! Axis data mapped, can't coerce
+      INTEGER DSA__SETOBJ                ! Unable to set data object
+      INTEGER DSA__OBJMAP                ! Objects mapped in structure
+      INTEGER DSA__SPCSTR                ! Specific sub-structure error
+      INTEGER DSA__FORERR                ! Fortran I/O error
+      INTEGER DSA__DEFERR                ! Error in structure definition
+      INTEGER DSA__NOSVAR                ! Structure variable undefined
+      INTEGER DSA__NOSTRU                ! Structure undefined
+      INTEGER DSA__INTERR                ! Internal error
+      INTEGER DSA__BLDERR                ! Error building a structure
+      INTEGER DSA__NOLUSL                ! No available logical unit slot
+      INTEGER DSA__INVEXS                ! Invalid existence string
+      INTEGER DSA__INVLU                 ! Invalid logical unit number
+      INTEGER DSA__INVDIM                ! Invalid dimension specification
+      INTEGER DSA__INVITM                ! Item list invalid
+      INTEGER DSA__SEQERR                ! Invalid operation sequence
+      INTEGER DSA__INCSTR                ! Inconsistent structure
+      INTEGER DSA__ABORT                 ! User requested abort
+      INTEGER DSA__BADMIX                ! Mixture of flagged values & quality
+      INTEGER DSA__FITINV                ! Invalid FITS item
+      INTEGER DSA__XSFITS                ! Too many FITS items for workspace
+      INTEGER DSA__FITSNF                ! FITS item not found
+      INTEGER DSA__INVORI                ! Invalid structured array origin
+      INTEGER DSA__INVRANG               ! Invalid array range to be mapped
+      INTEGER DSA__CONMAP                ! Overlapping array subsets mapped
+C
+      PARAMETER (DSA__ALROPEN = 1
+     :          ,DSA__DUPREF  = 2
+     :          ,DSA__NOREFSL = 3
+     :          ,DSA__NOPARSL = 4
+     :          ,DSA__DTAERR  = 5
+     :          ,DSA__NOOBJ   = 6
+     :          ,DSA__OBJINV  = 7
+     :          ,DSA__OVRDIM  = 8
+     :          ,DSA__NOREF   = 9
+     :          ,DSA__STRTRN  = 10
+     :          ,DSA__AXINV   = 11
+     :          ,DSA__NOARRY  = 12
+     :          ,DSA__NOMPSL  = 13
+     :          ,DSA__INVTYP  = 14
+     :          ,DSA__ACCINV  = 15)
+      PARAMETER (DSA__PROVIO  = 16
+     :          ,DSA__NOWKSL  = 17
+     :          ,DSA__VMSERR  = 18
+     :          ,DSA__CHRCON  = 19
+     :          ,DSA__CLSERR  = 20
+     :          ,DSA__BSNOTOP = 21
+     :          ,DSA__BADDIM  = 22
+     :          ,DSA__DATDIF  = 23
+     :          ,DSA__UNIDIF  = 24
+     :          ,DSA__MPSLNV  = 25
+     :          ,DSA__PRESEQ  = 26
+     :          ,DSA__EQDIFF  = 27
+     :          ,DSA__RNGUPD  = 28
+     :          ,DSA__SETOBJ  = 29
+     :          ,DSA__OBJMAP  = 30)
+      PARAMETER (DSA__SPCSTR  = 31
+     :          ,DSA__FORERR  = 32
+     :          ,DSA__DEFERR  = 33
+     :          ,DSA__NOSVAR  = 34
+     :          ,DSA__NOSTRU  = 35
+     :          ,DSA__INTERR  = 36
+     :          ,DSA__BLDERR  = 37
+     :          ,DSA__NOLUSL  = 38
+     :          ,DSA__INVEXS  = 39
+     :          ,DSA__INVLU   = 40
+     :          ,DSA__INVDIM  = 41
+     :          ,DSA__INVITM  = 42
+     :          ,DSA__SEQERR  = 43
+     :          ,DSA__INCSTR  = 44
+     :          ,DSA__ABORT   = 45)
+      PARAMETER (DSA__AXSMAP  = 46
+     :          ,DSA__BADMIX  = 47
+     :          ,DSA__FITINV  = 48
+     :          ,DSA__XSFITS  = 49
+     :          ,DSA__FITSNF  = 50
+     :          ,DSA__INVORI  = 51
+     :          ,DSA__INVRANG = 52
+     :          ,DSA__CONMAP  = 53
+     :          )
+C

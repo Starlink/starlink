@@ -1,0 +1,355 @@
+C+
+C                           D S A _ C O M M O N
+C
+C     Common variables and parameters used by the DSA_ package routines.
+C
+C     The common variables divide into a number of sections:
+C
+C     A) System variables and parameters
+C        OPEN_FLAG    (Logical) Indicates system has been initialised.
+C        SYS_STATUS   (Integer) Overall DSA system status.
+C        DTA_CODE     (Integer) Last DTA_ system failure status code.
+C        FOR_CODE     (Integer) Last Fortran I/O error code
+C        VMS_CODE     (Integer) Last VMS routine error code.
+C        MAX_AXES     (Integer parameter) Maximum number of axes for data.
+C        LOG_DELETES  (Logical) Indicates system should log when deleting
+C                     arrays as the result of a structure consistency check.
+C        DISK_FORMAT  (Integer) Code controlling which formats are supported.
+C        DST_ONLY     (Integer parameter) Only DST format is supported.
+C        DST_THEN_NDF (Integer parameter) DST and NDF supported, DST default.
+C        NDF_THEN_DST (Integer parameter) DST and NDF supported, NDF default.
+C        NDF_ONLY     (Integer parameter) Only NDF format is supported.
+C        DST_CODE     (Integer parameter) Code for DST format structures.
+C        NDF_CODE     (Integer parameter) Code for NDF format structures.
+C        QF_BOTH_OK   (Logical) Indicates program may handle data files
+C                     with both data quality and flagged data values.
+C        QF_LOGGED    (Logical) Set if a message about unexpected clash of
+C                     quality specifications has been output.
+C                      
+C
+C     B) Message buffer - as used by DSA_WRUSER etc.
+C        BUFF_LEN     (Integer parameter) Buffer length in bytes.
+C        BUFF_PTR     (Integer) Position of last character put into buffer.
+C        LAST_BLANK   (Integer) Position of last space put into buffer.
+C        MESS_BUFF    (Fixed string) Message buffer.
+C
+C     C) File tables - one entry for each file open.  
+C        MAX_FILES     (Integer parameter) Maximum number of file entries.
+C        FILE_COUNT    (Integer array) Number of reference names associated
+C                      with each file.
+C        FILE_NAMES    (String array) Full file specification for each file.
+C        FILE_TOP_NAMES (String array) Top-level name associated with
+C                      each file.
+C        FILE_USED     (Logical array) Indicates file table slot in use.
+C
+C     D) Map tables - one entry for each mapped array.  Note that there is
+C        one of these entries for each actual array mapped, and these
+C        should not be confused with the 'map call' tables.
+C        MAX_MAPS      (Integer parameter) Maximum number of mapped arrays.
+C        MAP_USED      (Logical array) Indicates map slot in use.
+C        MAP_NAMES     (String array) Names of requested mapped arrays.
+C        MAP_ACTNAM    (String array) Names of actual mapped arrays.
+C        MAP_COUNT     (Integer array) Reference count for this array.
+C        MAP_POINTER   (Integer array) Memory address for the array.
+C        MAP_WORK      (Integer array) Workspace slot associated with array.
+C        MAP_MODE      (Character array) Access type for the data.
+C        MAP_CODE      (Integer array) Type code for the mapped array.
+C        MAP_TYPE      (String array) Type of actual data object.
+C        MAP_SCALED    (Logical array) Indicates named object is a scaled array.
+C        MAP_SIZE      (Integer array) Number of elements in mapped array.
+C        MAP_START     (Integer array) Number of first element mapped.
+C        
+C     E) 'Map call' tables.  One entry for each call to a mapping routine,
+C        whether the actual mapping was done on an actual array or a
+C        workspace array.
+C        MAX_MAP_CALLS (Integer parameter) Maximum number of map calls.
+C        MAP_CALL_USED (Logical array) Indicates table entry in use.
+C        MAP_CALL_MODE (Character array) Mode of mapping.
+C        MAP_CALL_SLOT (Integer array) Map table entry corresponding to call.
+C        MAP_CALL_WORK (Integer array) Work entry corresponding to call.
+C        MAP_CALL_FSLOT(Integer array) Work entry used for flag data.
+C        MAP_CALL_VSLOT(Integer array) Work entry used for err<->variance
+C                      array conversions.  
+C        MAP_CALL_NFLAG(Integer array) Number of values unflagged in array.
+C      
+C     F) Reference name tables - one entry for each reference name in use.
+C        ACTUAL_NAMES  (String array) The fully extended name for the structure.
+C        MAX_REFS      (Integer parameter) Maximum number of reference names.
+C        OBJ_LEN       (Integer array) Number of chars in each OBJ_NAME.
+C        OBJ_NAMES     (String array) Name (as recognised by DTA_) of data 
+C                      object corresponding to reference name.
+C        PARM_VALUE    (String array) If ref name is associated with a
+C                      parameter, this is the value of that parameter.
+C        REF_FILE      (Integer array) File slot number of file in question.
+C        REF_NAMES     (String array) Reference names in use.
+C        REF_USED      (Logical array) Indicates reference slot in use.
+C        NDF_FORMAT    (Logical array) Indicates structure format is Starlink's
+C                      NDF format (described in SGP38).  If false, format is
+C                      original Figaro format (DST files).
+C        DATA_NDIM     (Integer array) Number of dimensions of main data array.
+C        DATA_DIMS     (Integer array) Dimensions of main data array. (2D array)
+C        AXIS_EXIST    (Integer array) State of knowledge about axis arrays.
+C                      Indicates unknown (0), known not to exist (-1),
+C                      exists and is 1d (1), exists and is multi-
+C                      dimensional (2).  (2D array)
+C        ERROR_EXIST   (Integer array) State of knowledge about error array.
+C                      Indicates unknown (0), known not to exist (-1),
+C                      exists (1).
+C        QUAL_EXIST    (Integer array) State of knowledge about quality array.
+C                      Indicates unknown (0), known not to exist (-1),
+C                      exists (1).
+C        DATA_FLAGGED  (Integer array) State of knowledge about data flagging.
+C                      Indicates unknown (0), known not to exist (-1),
+C                      exists (1).
+C        QF_HANDLING   (Integer array) Flags that record the use the program
+C                      is making of the quality and flag information.
+C        DATA_RESHAPE  (Logical array) Indicates that the main data array
+C                      was reshaped.
+C        AXIS_RESHAPE  (Logical array) Indicates that the axis data structures
+C                      were reshaped.
+C        ERROR_UPDATE  (Logical array) Indicates that the error array has 
+C                      been updated (or at least, mapped for update).
+C        DATA_UPDATE   (Logical array) Indicates that the data array has 
+C                      been updated (or at least, mapped for update).
+C        RANGE_UPDATE  (Logical array) Indicates that the data range values 
+C                      have been updated.
+C        QUAL_UPDATE   (Logical array) Indicates that the quality array
+C                      has been updated (or at least, mapped for update).
+C        AXIS_UPDATE   (Logical array) Indicates that an axis data array
+C                      has been updated (or at least, mapped for update).
+C        WIDTH_UPDATE  (Logical array) Indicates that an axis width array
+C                      has been updated (or at least, mapped for update).
+C        SHAPE_CHECK   (Logical array) Indicates that the data or axis
+C                      arrays have been changed and should be checked for
+C                      consistiency on closedown.
+C        USE_FLAGS     (Logical array) Indicates application will use 
+C                      flagged data values for this structure.
+C        USE_QUALITY   (Logical array) Indicates application will use
+C                      quality information for this structure.
+C        DATA_SLOT     (Integer array) Map call slot for data mapping.
+C        QUALITY_SLOT  (Integer array) Map call slot for quality mapping.
+C        PRE_QUAL      (Logical array) Indicates quality pre-processing done.
+C        PRE_FLAG      (Logical array) Indicates flag values pre-processed.
+C        FITS_OPEN     (Logical array) Indicates FITS processing begun for
+C                      this structure.
+C
+C     G) Workspace tables.  One entry for each block of virtual memory
+C        used as workspace.
+C        MAX_WORK      (Integer parameter) Number of workspace slots available.
+C        WORK_USED     (Logical array) Indicates workspace slot in use.
+C        WORK_BYTES    (Integer array) Bytes allocated for this slot.
+C        WORK_LINK     (Integer array) Link to other work slots.
+C        WORK_POINTER  (Integer array) Memory address of workspace array.
+C        WORK_PROP     (Logical array) Indicates flagged pixels propagated.
+C        WORK_TYPE     (String array) Type of array held in workspace.
+C
+C     H) Logical units in use.  Supports routines such as DSA_GET_LU.
+C        MAX_LUS       (Integer) Number of logical units available
+C        LU_USED       (Logical array) Indicates logical unit slot in use
+C        LU_NUMBER     (Integer array) Logical unit numbers
+C
+C     I) Variables used for FITS processing.
+C        MAX_FITSTR    (Integer parameter) Maximum number of buffer strings.
+C        FITS_STRINGS  (String array) Comment strings being buffered.
+C        FITS_CODES    (Integer array) Code (comment, history, etc) for
+C                      each buffered string, and ref_slot number.
+C        MAX_NDF_FITS  (Integer parameter) Maximum number of NDF FITS strings.
+C        FITS_ARRAY    (String array) Used for all strings read from NDF
+C                      format FITS structures.
+C        FITS_ITEMS    (Integer array) FITS item numbers for each array entry.
+C                      This matches the string number in the original FITS
+C                      header, but is -ve if the string has been modified.
+C        FITS_REFS     (Integer array) Reference slot numbers associated with
+C                      each array entry.  0 implies unused.
+C
+C     J) Parameters defining error types
+C        UNCERTAINTY_CODE  (Integer parameter) Error type is `uncertainty'
+C        VARIANCE_CODE (Integer parameter) Error type is `variance'
+C
+C     K) Variables keeping track of temporary file names
+C        MAX_TEMP_NAMES (Integer parameter) Maximum number of temporary
+C                      file names.
+C        FILE_TEMP_NAMES(String array) Temporary names used for files.
+C        FILE_REAL_NAMES(String array) Name file really ought to have.
+C        NAME_USED     (Logical array) This name pair already in use.
+C        
+C     L) Parameters that define the flags set in QF_HANDLING to
+C        indicate the way the program is processing quality and
+C        flagged value information.
+C        QF_QUAL_SET     (Integer parameter) Indicates program has
+C                        done a DSA_SEEK_QUALITY call which showed that
+C                        the data had an associated quality array.
+C        QF_FLAG_SET     (Integer parameter) Indicates program has
+C                        done a DSA_SEEK_FLAGGED_VALUES call that showed
+C                        that the data did contain flagged values.
+C        QF_USE_FLAGS    (Integer parameter) Indicates program has
+C                        done a call to DSA_USE_FLAGGED_VALUES.
+C        QF_USE_QUALITY  (Integer parameter) Indicates program has done
+C                        a call to DSA_USE_QUALITY.
+C        QF_PROBLEM      (Integer parameter) The value of QF_HANDLING 
+C                        that may represent a possible problem (program
+C                        is using both flagged values and data quality
+C                        at the same time without having indicated that
+C                        it knows that files may have both at once.
+C        
+C  Version date: 29th November 1995.
+C
+C  History:
+C     29th Aug 1992. Changed FITS_OPEN from INTEGER to the LOGICAL that it
+C                    always should have been. KS/AAO.
+C     17th Dec 1992. Added section K), the temporary file name variables. 
+C                    WORK_VM_LIMIT no longer used and removed. KS/AAO.
+C     26th Jul 1994. Make common blocks SAVE. HME / UoE, Starlink.
+C     25th Oct 1994. Added MAP_START to support array subset mapping. KS/AAO.
+C     17th Feb 1995. Added QF_HANDLING and associated parameters. KS/AAO.
+C     19th Jul 1995. Make common blocks SAVE. HME / UoE, Starlink.
+C     29th Nov 1995. Added QF_LOGGED flag. KS/AAO.
+C      1st Dec 1995. Make common blocks SAVE. HME / UoE, Starlink.
+C+
+      INTEGER UNCERTAINTY_CODE
+      INTEGER VARIANCE_CODE
+      PARAMETER (UNCERTAINTY_CODE=0,VARIANCE_CODE=1)
+C
+      INTEGER QF_QUAL_SET
+      INTEGER QF_FLAG_SET
+      INTEGER QF_USE_FLAGS
+      INTEGER QF_USE_QUALITY
+      INTEGER QF_PROBLEM 
+      PARAMETER (QF_QUAL_SET=1,QF_FLAG_SET=2,QF_USE_FLAGS=4,
+     :           QF_USE_QUALITY=8,QF_PROBLEM=15)
+C
+      INTEGER DST_ONLY
+      INTEGER DST_THEN_NDF
+      INTEGER NDF_THEN_DST
+      INTEGER NDF_ONLY
+      PARAMETER (DST_ONLY=0,DST_THEN_NDF=1,NDF_THEN_DST=2,NDF_ONLY=3)
+C
+      INTEGER DST_CODE
+      INTEGER NDF_CODE
+      PARAMETER (DST_CODE=0, NDF_CODE=1)
+C
+      INTEGER BUFF_LEN
+      INTEGER MAX_AXES
+      INTEGER MAX_FILES
+      INTEGER MAX_FITSTR
+      INTEGER MAX_LUS
+      INTEGER MAX_MAPS
+      INTEGER MAX_REFS
+      INTEGER MAX_WORK
+      INTEGER MAX_MAP_CALLS
+      INTEGER MAX_NDF_FITS
+      INTEGER MAX_TEMP_NAMES
+      PARAMETER (BUFF_LEN=80,MAX_AXES=6,MAX_FILES=8,MAX_MAPS=32,
+     :           MAX_REFS=8,MAX_WORK=32,MAX_MAP_CALLS=32,MAX_LUS=5,
+     :           MAX_FITSTR=80,MAX_NDF_FITS=320,MAX_TEMP_NAMES=8)
+C
+      CHARACTER ACTUAL_NAMES(MAX_REFS)*128
+      INTEGER   AXIS_EXIST(MAX_AXES,MAX_REFS)
+      LOGICAL   AXIS_RESHAPE(MAX_AXES,MAX_REFS)
+      LOGICAL   AXIS_UPDATE(MAX_AXES,MAX_REFS)
+      INTEGER   BUFF_PTR
+      INTEGER   DATA_DIMS(MAX_AXES,MAX_REFS)
+      INTEGER   DATA_FLAGGED(MAX_REFS)
+      INTEGER   DATA_NDIM(MAX_REFS)
+      LOGICAL   DATA_RESHAPE(MAX_REFS)
+      INTEGER   DATA_SLOT(MAX_REFS)
+      LOGICAL   DATA_UPDATE(MAX_REFS)
+      INTEGER   DISK_FORMAT
+      INTEGER   DTA_CODE
+      LOGICAL   ERROR_UPDATE(MAX_REFS)
+      INTEGER   ERROR_EXIST(MAX_REFS)
+      INTEGER   FILE_COUNT(MAX_FILES)
+      CHARACTER FILE_NAMES(MAX_FILES)*128
+      CHARACTER FILE_REAL_NAMES(MAX_TEMP_NAMES)*128
+      CHARACTER FILE_TEMP_NAMES(MAX_TEMP_NAMES)*128
+      CHARACTER FILE_TOP_NAMES(MAX_FILES)*16
+      LOGICAL   FILE_USED(MAX_FILES)
+      CHARACTER FITS_ARRAY(MAX_NDF_FITS)*80
+      INTEGER   FITS_CODES(MAX_FITSTR)
+      INTEGER   FITS_ITEMS(MAX_NDF_FITS)
+      LOGICAL   FITS_OPEN(MAX_REFS)
+      INTEGER   FITS_REFS(MAX_NDF_FITS)
+      CHARACTER FITS_STRINGS(MAX_FITSTR)*80
+      INTEGER   FOR_CODE
+      INTEGER   LAST_BLANK
+      LOGICAL   LOG_DELETES
+      INTEGER   LU_NUMBER(MAX_LUS)
+      LOGICAL   LU_USED(MAX_LUS)
+      CHARACTER MAP_ACTNAM(MAX_MAPS)*80
+      CHARACTER MAP_CALL_MODE(MAX_MAP_CALLS)*1
+      LOGICAL   MAP_CALL_USED(MAX_MAP_CALLS)
+      INTEGER   MAP_CALL_SLOT(MAX_MAP_CALLS)
+      INTEGER   MAP_CALL_WORK(MAX_MAP_CALLS)
+      INTEGER   MAP_CALL_NFLAG(MAX_MAP_CALLS)
+      INTEGER   MAP_CALL_FSLOT(MAX_MAP_CALLS)
+      INTEGER   MAP_CALL_VSLOT(MAX_MAP_CALLS)
+      INTEGER   MAP_CODE(MAX_MAPS)
+      INTEGER   MAP_COUNT(MAX_MAPS)
+      CHARACTER MAP_MODE(MAX_MAPS)*1
+      CHARACTER MAP_NAMES(MAX_MAPS)*80
+      INTEGER   MAP_POINTER(MAX_MAPS)
+      LOGICAL   MAP_SCALED(MAX_MAPS)
+      INTEGER   MAP_SIZE(MAX_MAPS)
+      INTEGER   MAP_START(MAX_MAPS)
+      CHARACTER MAP_TYPE(MAX_MAPS)*16
+      LOGICAL   MAP_USED(MAX_MAPS)
+      INTEGER   MAP_WORK(MAX_MAPS)
+      CHARACTER MESS_BUFF*(BUFF_LEN)
+      LOGICAL   NAME_USED(MAX_TEMP_NAMES) 
+      LOGICAL   NDF_FORMAT(MAX_REFS)
+      INTEGER   OBJ_LEN(MAX_REFS)
+      CHARACTER OBJ_NAMES(MAX_REFS)*80
+      LOGICAL   OPEN_FLAG
+      CHARACTER PARM_VALUE(MAX_REFS)*64
+      LOGICAL   PRE_FLAG(MAX_REFS)
+      LOGICAL   PRE_QUAL(MAX_REFS)
+      LOGICAL   QF_BOTH_OK
+      INTEGER   QF_HANDLING(MAX_REFS)
+      LOGICAL   QF_LOGGED
+      INTEGER   QUAL_EXIST(MAX_REFS)
+      LOGICAL   QUAL_UPDATE(MAX_REFS)
+      INTEGER   QUALITY_SLOT(MAX_REFS)
+      LOGICAL   RANGE_UPDATE(MAX_REFS)
+      INTEGER   REF_FILE(MAX_REFS)
+      CHARACTER REF_NAMES(MAX_REFS)*16
+      LOGICAL   REF_USED(MAX_REFS)
+      LOGICAL   SHAPE_CHECK(MAX_REFS)
+      INTEGER   SYS_STATUS
+      LOGICAL   USE_FLAGS(MAX_REFS)
+      LOGICAL   USE_QUALITY(MAX_REFS)
+      INTEGER   VMS_CODE
+      LOGICAL   WIDTH_UPDATE(MAX_AXES,MAX_REFS)
+      LOGICAL   WORK_USED(MAX_WORK)
+      INTEGER   WORK_BYTES(MAX_WORK)
+      INTEGER   WORK_LINK(MAX_WORK)
+      INTEGER   WORK_POINTER(MAX_WORK)
+      LOGICAL   WORK_PROP(MAX_WORK)
+      CHARACTER WORK_TYPE(MAX_WORK)*16
+C
+      COMMON /DSA_VALUES/ OPEN_FLAG,FILE_USED,MAP_USED,REF_USED,
+     :                    BUFF_PTR,LAST_BLANK,DTA_CODE,OBJ_LEN,
+     :                    REF_FILE,FILE_COUNT,DATA_NDIM,DATA_DIMS,
+     :                    WORK_USED,WORK_BYTES,
+     :                    WORK_POINTER,MAP_COUNT,MAP_POINTER,MAP_WORK,
+     :                    MAP_CODE,MAP_SCALED,WORK_LINK,VMS_CODE,
+     :                    MAP_CALL_USED,MAP_CALL_SLOT,MAP_CALL_WORK,
+     :                    AXIS_EXIST,ERROR_EXIST,QUAL_EXIST,
+     :                    DATA_UPDATE,ERROR_UPDATE,RANGE_UPDATE,
+     :                    FOR_CODE,LU_USED,LU_NUMBER,SHAPE_CHECK,
+     :                    USE_FLAGS,USE_QUALITY,DATA_FLAGGED,
+     :                    MAP_CALL_FSLOT,MAP_SIZE,QUALITY_SLOT,
+     :                    DATA_SLOT,PRE_QUAL,PRE_FLAG,FITS_OPEN,
+     :                    FITS_CODES,MAP_CALL_VSLOT,WORK_PROP,
+     :                    LOG_DELETES,QUAL_UPDATE,AXIS_UPDATE,
+     :                    WIDTH_UPDATE,DATA_RESHAPE,AXIS_RESHAPE,
+     :                    NDF_FORMAT,DISK_FORMAT,FITS_ITEMS,FITS_REFS,
+     :                    MAP_CALL_NFLAG,NAME_USED,SYS_STATUS,MAP_START,
+     :                    QF_HANDLING,QF_BOTH_OK,QF_LOGGED
+      COMMON /DSA_CHARS/ FILE_NAMES,MAP_NAMES,REF_NAMES,MESS_BUFF,
+     :                    OBJ_NAMES,FILE_TOP_NAMES,ACTUAL_NAMES,
+     :                    MAP_MODE,MAP_TYPE,WORK_TYPE,MAP_CALL_MODE,
+     :                    MAP_ACTNAM,PARM_VALUE,FITS_STRINGS,FITS_ARRAY,
+     :                    FILE_TEMP_NAMES,FILE_REAL_NAMES
+      SAVE /DSA_VALUES/
+      SAVE /DSA_CHARS/
+C

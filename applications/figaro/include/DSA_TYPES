@@ -1,0 +1,37 @@
+C+
+C                   D S A _ T Y P E S . I N C
+C
+C     Type definitions for data types supported by the DSA_ system.
+C
+C     MAX_TYPES      (Integer parameter) Number of supported types
+C     BYTE_TYPE      (Integer parameter) Code for 'BYTE' data
+C     INT_TYPE       (Integer parameter) Code for 'INT' data
+C     DOUBLE_TYPE    (Integer parameter) Code for 'DOUBLE' data
+C     CHAR_TYPE      (Integer parameter) Code for 'CHAR' data
+C     SHORT_TYPE     (Integer parameter) Code for 'SHORT' data
+C     FLOAT_TYPE     (Integer parameter) Code for 'FLOAT' data
+C     USHORT_TYPE    (Integer parameter) Code for 'USHORT' data
+C     TYPE_NAMES     (String array) Names corresponding to type codes
+C     TYPE_SIZE      (Integer array) Size in bytes for each type
+C     FMTCON_CODE    (Integer array) Types codes used by CNV_FMTCON
+C+
+C
+C     Note that the type codes are quite arbitrary, and are just index
+C     values into the other arrays.  The CNV_FMTCON codes are determined
+C     by that routine.
+C
+      INTEGER MAX_TYPES, FLOAT_TYPE, INT_TYPE, DOUBLE_TYPE,
+     :        SHORT_TYPE, CHAR_TYPE, BYTE_TYPE, USHORT_TYPE
+      PARAMETER (MAX_TYPES=7, FLOAT_TYPE=1, INT_TYPE=2, DOUBLE_TYPE=3,
+     :        SHORT_TYPE=4, CHAR_TYPE=5, BYTE_TYPE=6, USHORT_TYPE=7)
+C
+      CHARACTER TYPE_NAMES(MAX_TYPES)*6
+      INTEGER TYPE_SIZE(MAX_TYPES)
+      INTEGER FMTCON_CODE(MAX_TYPES)
+      DATA TYPE_NAMES/
+     :  'FLOAT ','INT   ','DOUBLE','SHORT ','CHAR  ','BYTE  ','USHORT'/
+      DATA TYPE_SIZE/
+     :   4,       4,       8,       2,       1,       1,       2/
+      DATA FMTCON_CODE/
+     :   4,       3,       5,       2,       1,       1,       7/
+C
