@@ -1,0 +1,10 @@
+
+chmod +x ./getnewversion
+./getnewversion
+AST_VERSION="`cat ./version.number`"
+echo "AST_VERSION $AST_VERSION"
+export AST_VERSION
+
+(
+   buildhyperdocs
+) 2>&1 | tee ~/ast_release.log

@@ -1,0 +1,5 @@
+
+here=${PWD}
+cd ${AST_REF}
+cp $@ ${here}
+cd ${here}

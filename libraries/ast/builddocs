@@ -1,0 +1,88 @@
+
+goodsource="$AST_REF/axis.c \
+            $AST_REF/channel.c \
+            $AST_REF/cmpframe.c \
+            $AST_REF/cmpmap.c \
+            $AST_REF/dssmap.c \
+            $AST_REF/error.c \
+            $AST_REF/fchannel.c \
+            $AST_REF/fitschan.c \
+            $AST_REF/frame.c \
+            $AST_REF/frameset.c \
+            $AST_REF/grismmap.c \
+            $AST_REF/intramap.c \
+            $AST_REF/lutmap.c \
+            $AST_REF/mapping.c \
+            $AST_REF/mathmap.c \
+            $AST_REF/matrixmap.c \
+            $AST_REF/object.c \
+            $AST_REF/pcdmap.c \
+            $AST_REF/permmap.c \
+            $AST_REF/plot.c \
+            $AST_REF/pointset.c \
+            $AST_REF/polymap.c \
+            $AST_REF/shiftmap.c \
+            $AST_REF/skyaxis.c \
+            $AST_REF/skyframe.c \
+            $AST_REF/slamap.c \
+            $AST_REF/specframe.c \
+            $AST_REF/specmap.c \
+            $AST_REF/sphmap.c \
+            $AST_REF/tranmap.c \
+            $AST_REF/unitmap.c \
+            $AST_REF/wcsmap.c \
+            $AST_REF/winmap.c \
+            $AST_REF/xmlchan.c \
+            $AST_REF/zoommap.c"
+
+goodsource="${goodsource} \
+            $AST_REF/ast_dev \
+            $AST_REF/ast_link \
+            $AST_REF/ast_link_adam"
+
+chmod +x $AST_REF/addcopyright
+chmod +x $AST_REF/addlinks
+chmod +x $AST_REF/addversion
+chmod +x $AST_REF/doincludes
+chmod +x $AST_REF/getatt
+chmod +x $AST_REF/selectfc
+PATH="${AST_REF}:${PATH}"
+
+export SST_DIR
+SST_DIR=$INSTALL/bin/sst
+rm -f .sst.tmp
+
+   getatt -class -f ${goodsource} >f_classes.tex
+   cat getatt.labels >global_f.labels; rm -f getatt.labels
+   getatt -class ${goodsource} >c_classes.tex
+   cat getatt.labels >global_c.labels; rm -f getatt.labels
+   getatt -att -f ${goodsource} >f_attribs.tex
+   cat getatt.labels >>global_f.labels; rm -f getatt.labels
+   getatt -att ${goodsource} >c_attribs.tex
+   cat getatt.labels >>global_c.labels; rm -f getatt.labels
+   getatt -f ${goodsource} >f_routines.tex
+   cat getatt.labels >>global_f.labels; rm -f getatt.labels
+   getatt ${goodsource} >c_routines.tex
+   cat getatt.labels >>global_c.labels; rm -f getatt.labels
+
+   getatt -u -f ${goodsource} >f_commands.tex
+   cat getatt.labels >>global_f.labels; rm -f getatt.labels
+   getatt -u ${goodsource} >c_commands.tex
+   cat getatt.labels >>global_c.labels; rm -f getatt.labels
+
+   ln -f global_f.labels global.labels
+   doincludes $AST_REF/sun_master.tex \
+      | selectfc -f | addlinks | addcopyright | addversion >sun210.tex
+   ln -f global_c.labels global.labels
+   doincludes $AST_REF/sun_master.tex \
+      | selectfc | addlinks | addcopyright | addversion >sun211.tex
+
+   rm -f global.labels global_f.labels global_c.labels
+   rm -f c_attribs.tex c_classes.tex c_routines.tex c_commands.tex
+   rm -f f_attribs.tex f_classes.tex f_routines.tex f_commands.tex
+
+   latex sun210; latex sun210
+   latex sun211; latex sun211
+
+   dvips -f sun210 >sun210.ps
+   dvips -f sun211 >sun211.ps

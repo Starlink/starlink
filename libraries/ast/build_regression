@@ -1,1 +1,0 @@
-g77 -fno-second-underscore -o regression -g regression.f -L/dsbwork/lib -L/star/lib `ast_link` `chr_link`
