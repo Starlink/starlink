@@ -4,15 +4,15 @@ use strict;
 use Test::More;
 
 BEGIN {
- eval { use Graphics::PLplot; };
+ eval {require Graphics::PLplot; };
  if ( $@ ) {
    plan skip_all => "Graphics::PLplot module not installed.";
    exit;
  } else {
    plan tests => 9;
- }  
+ }
  Graphics::PLplot->import(qw/ :all /);
- 
+
 };
 
 

@@ -10,27 +10,27 @@ require_ok( "Starlink::AST::PLplot" );
 use File::Spec;
 
 BEGIN {
- 
- eval { use Graphics::PLplot };
+
+ eval "use Graphics::PLplot";
  if ( $@ ) {
    plan skip_all => "Graphics::PLplot module not installed.";
    exit;
- } 
- 
+ }
+
  eval "use Astro::FITS::CFITSIO;";
  if ( $@ ) {
    plan skip_all => "Astro::FITS::CFITSIO not installed.";
    exit;
  }
- 
+
  eval "use Astro::FITS::Header::CFITSIO;";
  if ( $@ ) {
    plan skip_all => "Astro::FITS::Header::CFITSIO not installed.";
    exit;
  }
- 
- plan tests => 5;  
- 
+
+ plan tests => 5;
+
 };
 
 Starlink::AST::Begin();
