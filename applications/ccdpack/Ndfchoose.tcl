@@ -232,8 +232,7 @@
 
 #  Construct the NDF area frames.
             itk_component add ndf$slot {
-               frame $itk_component(choosearea).ndf$slot \
-                  -cursor watch
+               frame $itk_component(choosearea).ndf$slot
             }
 
 #  Construct the viewing area frames.
@@ -446,11 +445,9 @@
             set height [ lindex $viewport 1 ]
             if { $isndf } {
                set percs [ percentiles $index ]
-               set scalevals [ $ndf percentile [ lindex $percs 0 ] \
-                                               [ lindex $percs 1 ] ]
                set wcsframe [ wcsframe $index ]
             } else {
-               set scalevals 0
+               set percs 0
                set style 0
                set wcsframe 0
             }
@@ -460,7 +457,7 @@
          if { [ array names itk_component plot$index ] != "" && \
               ( $plotted($index,width) != $width || \
                 $plotted($index,height) != $height || \
-                $plotted($index,scalevals) != $scalevals || \
+                $plotted($index,percs) != $percs || \
                 $plotted($index,wcsframe) != $wcsframe || \
                 $plotted($index,displaystyle) != $displaystyle ) } {
             destroy $itk_component(plot$index)
@@ -480,8 +477,7 @@
             if { $isndf } {
 
 #  Display might be time-consuming: post a busy window.
-               set waitwin [ waiter $itk_component(choosearea).wait \
-                                    -text "Drawing image [ $ndf name ]" ]
+               waitpush "Drawing image [ $ndf name ]"
 
 #  Construct the GWM widget.
                set gwmname [ winfo id $itk_component(choosearea) ]_$index
@@ -491,6 +487,10 @@
                       -height $height \
                       -name $gwmname
                }
+
+#  Get the percentile values.
+               set scalevals [ $ndf percentile [ lindex $percs 0 ] \
+                                               [ lindex $percs 1 ] ]
 
 #  Plot the NDF inside the GWM.
                set options {border=1 drawtitle=0 textlab=0 tickall=1 \
@@ -518,7 +518,7 @@
                $ndf mapped 0
 
 #  Remove the busy window.
-               destroy $waitwin
+               waitpop
 
 #  This is a blank window; write instructions to the user.
             } else {
@@ -547,7 +547,7 @@
 #  plot requests are out of date.
             set plotted($index,width) $width
             set plotted($index,height) $height
-            set plotted($index,scalevals) $scalevals
+            set plotted($index,percs) $percs
             set plotted($index,wcsframe) $wcsframe
             set plotted($index,displaystyle) $displaystyle
          }
@@ -769,16 +769,16 @@
             set pos "-relx 0.5 -rely 0.5 -anchor center"
          }
          set inview($slot) $item
-         set cursview [ $itk_component(view$slot) cget -cursor ]
-         set cursdescribe [ $itk_component(describe$slot) cget -cursor ]
-         $itk_component(view$slot) configure -cursor watch
-         $itk_component(describe$slot) configure -cursor watch
+      #  set cursview [ $itk_component(view$slot) cget -cursor ]
+      #  set cursdescribe [ $itk_component(describe$slot) cget -cursor ]
+      #  $itk_component(view$slot) configure -cursor watch
+      #  $itk_component(describe$slot) configure -cursor watch
          eval place [ ndfplotwindow $item ] \
             -in $itk_component(view$slot) $pos
          pack [ ndfinfowindow $item ] \
             -in $itk_component(describe$slot) -anchor w
-         $itk_component(view$slot) configure -cursor $cursview
-         $itk_component(describe$slot) configure -cursor $cursdescribe
+      #  $itk_component(view$slot) configure -cursor $cursview
+      #  $itk_component(describe$slot) configure -cursor $cursdescribe
          if { [ isvalid ] } {
             $itk_component(gotpair) configure -state normal
          }
@@ -809,12 +809,14 @@
          set yinc [ expr [ winfo height $itk_interior ] - \
                          [ winfo reqheight $itk_interior ] ]
          if { $xinc != 0 || $yinc != 0 } {
+            waitpush "Resizing chooser window"
             set oldbind [ bind $itk_interior <Configure> ]
             bind $itk_interior <Configure> ""
             configure -viewport [ list [ expr [ lindex $viewport 0 ] + $xinc ] \
                                        [ expr [ lindex $viewport 1 ] + $yinc ] ]
             update idletasks
             bind $itk_interior <Configure> $oldbind
+            waitpop
          }
       }
 
