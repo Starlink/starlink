@@ -10,21 +10,22 @@ change.</strong></p>
 
 <p>Autoastrom requires:
 <dl>
+
 <dt>AST 1.8-1</dt>
-<dd>Depending on
+<dd><p>Depending on
 precisely which earlier version of AST you have, the moggy tool will
 fail to compile, or if it compiles, fail to link.  If you have AST
 installed in a non-standard place, you should use the
 <code>STARLINKS</code> environment variable at build time (see <ref
-id="build"/>), to tell the build script where to find it.</dd>
+id="build"/>), to tell the build script where to find it.</p></dd>
 
 <dt>ATOOLS 1.3</dt>
-<dd>This will be on the next Starlink CD, but is available at present
-	from David Berry.</dd>
+<dd><p>This will be on the next Starlink CD, but is available at present
+	from David Berry.</p></dd>
 
 <dt>CCDPACK 4.0-1</dt>
-<dd>This will be on the next Starlink CD, but is available at present
-	from Mark Taylor.</dd>
+<dd><p>This will be on the next Starlink CD, but is available at present
+	from Mark Taylor.</p></dd>
 
 </dl>
 </p>
@@ -32,24 +33,24 @@ id="build"/>), to tell the build script where to find it.</dd>
 
   <p>Changes since v0.3:
     <ul>
-      <li>The distribution builds successfully on Alpha (with the 
+      <li><p>The distribution builds successfully on Alpha (with the 
 	cxx compiler), Solaris (with CC) and Linux (with gcc).  There is no
 	post-installation test yet, but you can run a pre-installation
-	self-test with <code>./mk pretest</code>.</li>
+	self-test with <code>./mk pretest</code>.</p></li>
       
-      <li>The astrometry can now come from a FITS extension or from the
-	commandline (<code>--obsdata</code> switch).</li>
+      <li><p>The astrometry can now come from a FITS extension or from the
+	commandline (<code>--obsdata</code> switch).</p></li>
 
-      <li>Handles FITS dates more robustly, specifically including
-	pre-2000 FITS dates.</li>
+      <li><p>Handles FITS dates more robustly, specifically including
+	pre-2000 FITS dates.</p></li>
 
-      <li>Notes in the documentation and within the program chatter
-	about <code>http_proxy</code>.</li>
+      <li><p>Notes in the documentation and within the program chatter
+	about <code>http_proxy</code>.</p></li>
 
-      <li>Fixed a silly bug which means that the script does now work
-	for negative Decs.</li>
+      <li><p>Fixed a silly bug which means that the script does now work
+	for negative Decs.</p></li>
 
-      <li>Report more coherent information to the user.</li>
+      <li><p>Report more coherent information to the user.</p></li>
 
     </ul>
   </p>
@@ -81,6 +82,7 @@ kit is to errors in the initial astrometry.</p></li>
 
 <!-- Local Variables: -->
 <!-- mode: xml -->
+<!-- sgml-parent-document: '("sun242.xml" "sect" "subsect") -->
 <!-- sgml-indent-data: t -->
 <!-- sgml-indent-step: 2 -->
 <!-- End: -->
