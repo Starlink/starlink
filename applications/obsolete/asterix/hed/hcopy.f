@@ -41,6 +41,9 @@
 *     30 Nov 94 : V1.8-1 Allow primitive to primitive slice copying (DJA)
 *      9 Feb 95 : V1.8-2 Changed definition of array same sizeness to allow
 *                        images to be copied into planes of cubes (DJA)
+*     16 Aug 95 : V1.8-3 Changed above definition again, this time to cope
+*                        with slices whose dims=1 precede the real
+*                        dimensions (DJA)
 *
 *    Type Definitions :
 *
@@ -84,6 +87,7 @@
         INTEGER ODIMS(DAT__MXDIM)        ! Input dimensions
         INTEGER IDIM, PPOS, IPTR
 
+      LOGICAL			ALLONES
       LOGICAL 			STRUC, PRIM		! Input attributes
       LOGICAL			SAME			! Dimensions the same?
       LOGICAL			THERE			! Object exists?
@@ -91,7 +95,7 @@
 *    Version id :
 *
       CHARACTER*(20) VERSION
-	PARAMETER(VERSION= 'HCOPY Version 1.8-2')
+	PARAMETER(VERSION= 'HCOPY Version 1.8-3')
 *-
 
 *    Version id
@@ -188,33 +192,43 @@
 *          Get output shape
             CALL DAT_SHAPE( CLOC, DAT__MXDIM, ODIMS, ONDIM, STATUS )
 
-*          Check they're the same. Arrays are the same if dimensions are
-*          same until MIN(NDIM,ONDIM), and subsequent dimensions are unity
-            SAME = .TRUE.
-            IDIM = 1
-            DO WHILE ( (IDIM.LE.MIN(NDIM,ONDIM)) .AND. SAME )
-              SAME = (DIMS(IDIM).EQ.ODIMS(IDIM))
-              IDIM = IDIM + 1
-            END DO
-            IF ( SAME .AND. (NDIM.NE.ONDIM) ) THEN
-              IDIM = MIN(NDIM,ONDIM) + 1
-              IF ( NDIM .GT. ONDIM ) THEN
-                DO WHILE ( (IDIM .LE. NDIM) .AND. SAME )
-                  IF ( DIMS(IDIM) .EQ. 1 ) THEN
-                    IDIM = IDIM + 1
-                  ELSE
-                    SAME = .FALSE.
-                  END IF
-                END DO
+*          Total number of elements must match
+            CALL ARR_SUMDIM( NDIM, DIMS, INELM )
+            CALL ARR_SUMDIM( ONDIM, ODIMS, ONELM )
+            SAME = (INELM.EQ.ONELM)
+            IF ( SAME ) THEN
+
+*            If dimensionality is the same compare all dimensions. If they
+*            are different then chose which end of the output dimension
+*            list to compare with depending on presence of 1's. The default
+*            is to compare the bottom dimensions
+              CDLO = 1
+              CDHI = NDIM
+              IF ( NDIM .EQ. ONDIM ) THEN
+                SAME = HCOPY_CDIM( NDIM, DIMS, ODIMS )
               ELSE
-                DO WHILE ( (IDIM .LE. ONDIM) .AND. SAME )
-                  IF ( ODIMS(IDIM) .EQ. 1 ) THEN
-                    IDIM = IDIM + 1
+                ALLONES = .TRUE.
+                IF ( ONDIM .GT. NDIM ) THEN
+                  DO I = 1, ONDIM - NDIM
+                    ALLONES = (ALLONES .AND. (ODIMS(I).EQ.1))
+                  END DO
+                  IF ( ALLONES ) THEN
+                    SAME = HCOPY_CDIM( NDIM, DIMS, ODIMS(ONDIM-NDIM+1) )
                   ELSE
-                    SAME = .FALSE.
+                    SAME = HCOPY_CDIM( NDIM, DIMS, ODIMS )
                   END IF
-                END DO
+                ELSE
+                  DO I = 1, NDIM - ONDIM
+                    ALLONES = (ALLONES .AND. (DIMS(I).EQ.1))
+                  END DO
+                  IF ( ALLONES ) THEN
+                    SAME = HCOPY_CDIM( NDIM, ODIMS, DIMS(NDIM-ONDIM+1) )
+                  ELSE
+                    SAME = HCOPY_CDIM( NDIM, ODIMS, DIMS )
+                  END IF
+                END IF
               END IF
+
             END IF
 
             IF ( SAME ) THEN
@@ -298,4 +312,21 @@
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
+      END
+
+
+
+      LOGICAL FUNCTION HCOPY_CDIM( N, D1, D2 )
+      INTEGER N,D1(*),D2(*),I
+      LOGICAL SAME
+      SAME = .TRUE.
+      I = 1
+      DO WHILE ( (I.LE.N) .AND. SAME )
+        IF ( D1(1) .NE. D2(I) ) THEN
+          SAME = .FALSE.
+        ELSE
+          I = I + 1
+        END IF
+      END DO
+      HCOPY_CDIM = SAME
       END
