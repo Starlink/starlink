@@ -538,6 +538,7 @@ proc newCsys {} {
       $BB configure -text "" -state disabled
       SetHelp $BB "Unused in monochrome mode" LUTEDIT_BB
       SetHelp c-blue ""
+
    }
 
    if { $CSYS != $CSYSNOW } {
@@ -548,6 +549,7 @@ proc newCsys {} {
          set CTRL(blue) ""
       }
       updateEditor
+      if { $CSYS == "MONO" } { gwmUpdate 0 }
    }
 }
 
@@ -979,27 +981,28 @@ proc updateCursor {usepen} {
 #
    global CAN2
    global CENT
-   global EVAL
-   global PVAL
    global CPEN
-   global CURX
-   global CURY2
    global CURSID
+   global CURX
    global CURY1
-   global EX1
+   global CURY2
+   global EVAL
    global EX0
+   global EX1
    global LP
    global LUT
-   global PX1
-   global PX0
-   global RGBNOW
-   global UP
-   global XP0
-   global XP1
-   global XE0
-   global XE1
    global MARKID
    global MENT
+   global PPENT
+   global PVAL
+   global PX0
+   global PX1
+   global RGBNOW
+   global UP
+   global XE0
+   global XE1
+   global XP0
+   global XP1
 
    set oldcent $CENT
 
@@ -1018,23 +1021,20 @@ proc updateCursor {usepen} {
         
       } else {
 
-#  If using the current entry, find the corresponding pen number.
+#  If using the current entry, find the corresponding cursor x value.
          if { $usepen == 2 } {
-            set CPEN [expr round($PX0+$PX1*($XE0+$XE1*$CENT))]
+            set x [expr $XE0+$XE1*$CENT]
+
+#  If using the current pen, find the corresponding cursor x value.
+         } else {
+            set x [expr $XP0+$XP1*$CPEN]
          }
 
-#  Limit the pen number to legal values.
-         if { $CPEN < $LP } {
-            set CPEN $LP
-         } elseif { $CPEN > $UP } {
-            set CPEN $UP
-         }
+#  Calculate the pen and entry number and intensity from the cursor X position.
+         cintCent $x
 
-#  Calculate the cursor X position from the pen index
+#  Calculate the new cursor X position from the updated pen index
          set CURX [expr $XP0+$XP1*$CPEN]
-
-#  Calculate the entry number and intensity from the cursor X position.
-         cintCent $CURX
 
 #  Either create or reconfigure the cursor to have these values.
          if { $CURSID != "" } {
@@ -1055,12 +1055,6 @@ proc updateCursor {usepen} {
          set PVAL ""
          set EVAL ""
       } else {
-         set CPEN [expr round( $PX0+$PX1*$CURX )]
-         if { $CPEN > $UP } {
-            set CPEN $UP
-         } elseif { $CPEN < $LP } {
-            set CPEN $LP
-         }
          cintCent $CURX
       }
    }
@@ -1105,7 +1099,10 @@ proc cintCent {x} {
    global PX1
    global XP0
    global XP1
+   global XE0
+   global XE1
    global LUT
+   global PPENT
    global RGBNOW
    global NENT
    global NENTM1
@@ -1115,30 +1112,38 @@ proc cintCent {x} {
 
    if { $x != "" } {
 
-#  Ensure the current pen is a legal whole number, and find the corresponding
-#  fractional entry value.
-      set cpen [expr $PX0+$PX1*$x]
-      set CPEN [expr round($cpen)]
+#  Find the fractional entry, and then find the corresponding integer
+#  (i.e. nearest) entry.
+      set fe [expr $EX0+$EX1*$x]
+      if { $fe < 0 } { 
+         set fe 0
+      } elseif { $fe > $NENTM1 } {
+         set fe $NENTM1
+      }
+      set CENT [expr round($fe)]       
+
+#  If there are more entries than pens, find the fractional pen value
+#  which corresponds to the entry centre.
+      if { $PPENT < 1.0 } {
+         set CPEN [format "%.2f" [expr $PX0+$PX1*($XE0+$XE1*$CENT)]]
+
+#  Otherwise (i.e. more pens than entries), find the nearest pen centre to the
+#  supplied X value.
+      } else {
+         set CPEN [expr round($PX0+$PX1*$x)]
+      }
+
+#  Limit the pen to legal values.
       if { $CPEN < $LP } {
          set CPEN $LP
       } elseif { $CPEN > $UP } {
          set CPEN $UP
       }
 
-#  Set the current entry to the nearest entry, and limit to available
-#  entries.
-      set fe [expr $EX0+$EX1*($XP0+$XP1*$cpen)]
-      set CENT [expr round( $fe )]
-      if { $CENT > $NENTM1 } {
-         set CENT $NENTM1
-      } elseif { $CENT < 0 } {
-         set CENT 0
-      }
-
 #  Find the value of the current entry.
       set EVAL [format "%.3f" [lindex $LUT($RGBNOW) $CENT]]
 
-#  Frr nearest neighbour interpolation, the pen value is the same as the
+#  For nearest neighbour interpolation, the pen value is the same as the
 #  entry value.
       if { $NN != "NO" } {
          set PVAL $EVAL
@@ -2660,7 +2665,7 @@ proc updateDisplay {force} {
 #
 #  Redraws all items on the editor canvas, and recreate the GWM items.
 #  If force is zero, then the GWM items are only updated if auto-update
-#  is selected. IF force is -1, then the GWM items are not updated even
+#  is selected. If force is -1, then the GWM items are not updated even
 #  if auto-update is on.
 #-
    global AUTOUP
@@ -3421,7 +3426,6 @@ proc New {} {
    global LUTFILE
    global UP
    global LP
-   global CPEN
    global NEW
    global NENT
    global NEWNENT
@@ -3832,7 +3836,6 @@ proc ReleaseBind {x y} {
    global CP0
    global CP1
    global CP2
-   global CPEN
    global CPL1 
    global CPL2 
    global CURSID
@@ -3944,8 +3947,6 @@ proc ReleaseBind {x y} {
          set LUT($RGBNOW) [lreplace $LUT($RGBNOW) $MENT $MENT $nv]
          updateCurrent 
          record
-         set cx [expr $XE0+$MENT*$XE1]
-         set CPEN [expr round($PX0+$cx*$PX1)]
       }
 
 # Selecting pens: Store the high and low selected entry numbers. Do not
@@ -5078,7 +5079,7 @@ proc WaitFor {name args} {
       $optsmenu add cascade -label "Interpolation" -menu $intermenu
          menu $intermenu 
          $intermenu add radiobutton -label "Linear" -variable NN -value NO -command "updateDisplay 0"
-         $intermenu add radiobutton -label "Nearest neighbour" -variable NN -value YES -command "updateDisplay 0"
+         $intermenu add radiobutton -label "Nearest neighbour" -variable NN -value YES -command "updateDisplay 1"
    
       set imagemenu "$optsmenu.image"
       $optsmenu add cascade -label "Image display" -menu $imagemenu
@@ -5219,7 +5220,7 @@ proc WaitFor {name args} {
 
    set rhs [frame $F4.rhs]
 
-   set upbut [button $rhs.up -bitmap @$KAPPA_DIR/uparrow.bit -command "gwmUpdate 1"]
+   set upbut [button $rhs.up -bitmap @$KAPPA_DIR/uparrow.bit -command "gwmUpdate 0"]
    SetHelp $upbut "Click to force the image and histogram to be re-displayed with the current colour table." LUTEDIT_UPBUT
    pack $upbut -side top 
 
@@ -5331,8 +5332,8 @@ proc WaitFor {name args} {
    SetHelp hist "A histogram of the pen numbers used within the neighbouring image display, with each bin coloured using its own pen colour."
 
 #  Keyboard left and right arrow keys move the cursor by one pen.
-   bind $UWIN <Left> {incr CPEN -1;updateCursor 1}
-   bind $UWIN <Right> {incr CPEN;updateCursor 1}
+   bind $UWIN <Left> {set CPEN [expr $CPEN-1.0];updateCursor 1}
+   bind $UWIN <Right> {set CPEN [expr $CPEN+1.0];updateCursor 1}
 
 #  Set cursors to use when pointer is over a canvas item with various tags.
    set CURTAGS [list mark pcurs cp bkgrnd]
