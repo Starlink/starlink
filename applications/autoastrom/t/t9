@@ -131,7 +131,8 @@ dotest nodateinfo && $AUTOASTROM_DIR/autoastrom \
 # BAD
 #
 # This image is very skewed, and this test currently doesn't work
-dotest cat320421 && $AUTOASTROM_DIR/autoastrom \
+if test -f images/cat320421.sdf; then
+  dotest cat320421 && $AUTOASTROM_DIR/autoastrom \
     --verbose \
     --ccdcatalogue=images/cat320421.extractor \
     --noinsert \
@@ -142,7 +143,9 @@ dotest cat320421 && $AUTOASTROM_DIR/autoastrom \
     images/cat320421.sdf \
     >${PREFIX}cat320421.STDOUT \
     2>${PREFIX}cat320421.STDERR
-
+else
+  echo "Test image cat320421.sdf not available -- see CVS repository"
+fi
 
 #################################################################
 #
@@ -150,7 +153,8 @@ dotest cat320421 && $AUTOASTROM_DIR/autoastrom \
 #
 # This one just doesn't work!  The --obsdata isn't enough
 thistest=r106280-findoff-obsdata
-dotest $thistest && $AUTOASTROM_DIR/autoastrom \
+if test -f images/r106280.sdf; then
+  dotest $thistest && $AUTOASTROM_DIR/autoastrom \
     --verbose \
     --ccdcatalogue=images/r106280.extractor \
     --noinsert \
@@ -161,13 +165,17 @@ dotest $thistest && $AUTOASTROM_DIR/autoastrom \
     images/r106280.sdf \
     >${PREFIX}$thistest.STDOUT \
     2>${PREFIX}$thistest.STDERR
+else
+  echo "Test image r106280.sdf not available -- see CVS repository"
+fi
 
 #################################################################
 #
 # r106280, using reasonably good astrometry already in file r106280-withwcs.sdf
 thistest=r106280-findoff
-(cd images; make r106280-withwcs.sdf >/dev/null 2>&1)
-dotest $thistest && $AUTOASTROM_DIR/autoastrom \
+if test -f images/r106280.sdf; then
+  (cd images; make r106280-withwcs.sdf >/dev/null 2>&1)
+  dotest $thistest && $AUTOASTROM_DIR/autoastrom \
     --verbose \
     --ccdcatalogue=images/r106280.extractor \
     --noinsert \
@@ -177,12 +185,16 @@ dotest $thistest && $AUTOASTROM_DIR/autoastrom \
     images/r106280-withwcs.sdf \
     >${PREFIX}$thistest.STDOUT \
     2>${PREFIX}$thistest.STDERR
+else
+  echo "Test image r106280.sdf not available -- see CVS repository"
+fi
 
 #################################################################
 #
 # r106280 with --obsdata
 thistest=r106280-match
-dotest $thistest && $AUTOASTROM_DIR/autoastrom \
+if test -f images/r106280.sdf; then
+  dotest $thistest && $AUTOASTROM_DIR/autoastrom \
     --verbose \
     --ccdcatalogue=images/r106280.extractor \
     --noinsert \
@@ -193,12 +205,16 @@ dotest $thistest && $AUTOASTROM_DIR/autoastrom \
     images/r106280.sdf \
     >${PREFIX}$thistest.STDOUT \
     2>${PREFIX}$thistest.STDERR
+else
+  echo "Test image r106280.sdf not available -- see CVS repository"
+fi
 
 #################################################################
 #
 # Can we work with only --obsdata location (albeit pretty close)
 thistest=south-match
-dotest $thistest && $AUTOASTROM_DIR/autoastrom \
+if test -f images/south.sdf; then
+  dotest $thistest && $AUTOASTROM_DIR/autoastrom \
     --verbose \
     --ccdcatalogue=images/south.extractor \
     --noinsert \
@@ -210,13 +226,17 @@ dotest $thistest && $AUTOASTROM_DIR/autoastrom \
     images/south.sdf \
     >${PREFIX}$thistest.STDOUT \
     2>${PREFIX}$thistest.STDERR
+else
+  echo "Test image south.sdf not available -- see CVS repository"
+fi
 
 #################################################################
 #
 # Test whether we can work with just FITS headers
 thistest=south-noast
-(cd images; make south-noast.sdf >/dev/null 2>&1)
-dotest $thistest && $AUTOASTROM_DIR/autoastrom \
+if test -f images/south.sdf; then
+  (cd images; make south-noast.sdf >/dev/null 2>&1)
+  dotest $thistest && $AUTOASTROM_DIR/autoastrom \
     --verbose \
     --ccdcatalogue=images/south.extractor \
     --noinsert \
@@ -227,6 +247,9 @@ dotest $thistest && $AUTOASTROM_DIR/autoastrom \
     images/south-noast.sdf \
     >$PREFIX$thistest.STDOUT \
     2>$PREFIX$thistest.STDERR
+else
+  echo "Test image south.sdf not available -- see CVS repository"
+fi
 
 
 
