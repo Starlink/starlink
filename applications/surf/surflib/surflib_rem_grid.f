@@ -43,6 +43,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  1999/07/17 02:50:15  timj
+*     Check for a bad value in the index array
+*
 *     Revision 1.2  1999/05/15 01:43:47  timj
 *     Remove unused variables
 *
@@ -89,13 +92,15 @@
          IPOS = IJ(1, I)
          JPOS = IJ(2, I)
 
-         IF ((IPOS .GT. 1) .AND. (IPOS .LE. NX) .AND. (JPOS.GT.1)
-     :        .AND. (JPOS .LE. NY)) THEN
+         IF (IPOS .NE. VAL__BADI .AND. JPOS .NE. VAL__BADI) THEN
+
+            IF ((IPOS .GT. 1) .AND. (IPOS .LE. NX) .AND. (JPOS.GT.1)
+     :           .AND. (JPOS .LE. NY)) THEN
 
 *     Remove grid
 *     If input data is bad do nothing
 
-            IF (IN_DATA(I) .NE. VAL__BADR) THEN
+               IF (IN_DATA(I) .NE. VAL__BADR) THEN
 
 *     If grid value is bad (should not happen in the case this routine 
 *     was written for but check for it anyway) then data value is set to bad
@@ -111,12 +116,14 @@
 *     :                 grid(ipos,jpos),in_data(i)-grid(ipos,jpos)
 *               end if
 
-               IF (GRID(IPOS, JPOS) .EQ. VAL__BADR) THEN
-                  IN_DATA ( I ) = VAL__BADR
-               ELSE
-                  IN_DATA ( I ) = IN_DATA ( I ) - GRID (IPOS, JPOS)
-               END IF
+                  IF (GRID(IPOS, JPOS) .EQ. VAL__BADR) THEN
+                     IN_DATA ( I ) = VAL__BADR
+                  ELSE
+                     IN_DATA ( I ) = IN_DATA ( I ) - GRID (IPOS, JPOS)
+                  END IF
                
+               END IF
+
             END IF
 
          END IF

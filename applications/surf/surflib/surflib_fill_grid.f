@@ -67,10 +67,16 @@
 *       each time a point is placed in BINS
 *     - BINS and BIN_POS are not initialised here but should be filled
 *       with bad before this routine is first called.
+*     - a status of SAI__WARN is returned if the indices lie outside
+*       the model area. It is up to the calling routine to decide
+*       whether to halt.
 
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.4  1999/07/17 02:49:48  timj
+*     Check for a bad value in the index array
+*
 *     Revision 1.3  1998/05/20 22:21:17  timj
 *     Make sure index range checking is correct (GE 1 instead of .GT.1)
 *
@@ -136,8 +142,11 @@
 
       DO I = 1, N_PTS
 
+*     Check the data and check that the indices do not have bad values
          IF ((IN_DATA(I) .NE. VAL__BADR) .AND.
-     :        (NDF_QMASK(IN_QUALITY(I), BADBIT))) THEN
+     :        (NDF_QMASK(IN_QUALITY(I), BADBIT)) .AND.
+     :        IJ(1,I) .NE. VAL__BADI .AND.
+     :        IJ(2,I) .NE. VAL__BADI) THEN
 
 *     Check that the index is within range
             IF ((IJ(1,I) .LE. NX) .AND. (IJ(1,I) .GE. 1) .AND.

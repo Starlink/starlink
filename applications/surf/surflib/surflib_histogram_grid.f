@@ -65,10 +65,16 @@
 *       pixels can be identified and not included into the histogram of
 *       positions.
 *     - GRID is not initialised by this routine
+*     - A warning error is raised if the bounds of the histogram
+*       are exceeded. It is up to the caller to decide whether this
+*       is a fatal error.
 
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.3  1999/07/17 02:49:49  timj
+*     Check for a bad value in the index array
+*
 *     Revision 1.2  1997/10/22 02:02:21  timj
 *     Add check for index range.
 *     Really do the check for good data.
@@ -135,12 +141,18 @@
 
          DO I = 1, N_PTS
 
+*     Check that data has a good value and that the index is not
+*     a bad value
             IF ((IN_DATA(I) .NE. VAL__BADR) .AND.
-     :           (NDF_QMASK(IN_QUALITY(I), BADBIT))) THEN
+     :           (NDF_QMASK(IN_QUALITY(I), BADBIT)) .AND.
+     :           IJ(1,I) .NE. VAL__BADI .AND. 
+     :           IJ(2,I) .NE. VAL__BADI ) THEN
 
+*     Check bounds
                IF ((IJ(1,I) .LE. NX) .AND. (IJ(1,I) .GT. 1) .AND.
      :              (IJ(2,I) .LE. NY) .AND. (IJ(2,I) .GT. 1)) THEN
-               
+
+*     Place in grid
                   GRID(IJ(1,I), IJ(2,I)) = GRID(IJ(1,I), IJ(2,I)) + 1
 
                ELSE
@@ -157,15 +169,23 @@
 
          DO I = 1, N_PTS
 
-            IF ((IJ(1,I) .LE. NX) .AND. (IJ(1,I) .GT. 1) .AND.
-     :           (IJ(2,I) .LE. NY) .AND. (IJ(2,I) .GT. 1)) THEN
+*     Ignore bad pixels
+            IF (IJ(1,I) .NE. VAL__BADI .AND. 
+     :           IJ(2,I) .NE. VAL__BADI) THEN
 
-               GRID(IJ(1,I), IJ(2,I)) = GRID(IJ(1,I), IJ(2,I)) + 1
+*     Check bounds
+               IF ((IJ(1,I) .LE. NX) .AND. (IJ(1,I) .GT. 1) .AND.
+     :              (IJ(2,I) .LE. NY) .AND. (IJ(2,I) .GT. 1)) THEN
 
-            ELSE
+*     Place in grid
+                  GRID(IJ(1,I), IJ(2,I)) = GRID(IJ(1,I), IJ(2,I)) + 1
 
-               WARNING = .TRUE.
+               ELSE
+
+                  WARNING = .TRUE.
                
+               END IF
+
             END IF
 
          END DO
@@ -195,11 +215,10 @@
 *     be set if an index was found to be out of range in array IJ
 
       IF (WARNING) THEN
-
          STATUS = SAI__WARN
-
-         CALL ERR_REP(' ', 'SURFLIB_HISTOGRAM_GRID: Index out '//
-     :        'range when generating histogram', STATUS)
+         CALL ERR_REP(' ', 'SURFLIB_HISTOGRAM_GRID:'//
+     :        ' The supplied indices lie outside the histogram'//
+     :        'grid', STATUS)
 
       END IF
 
