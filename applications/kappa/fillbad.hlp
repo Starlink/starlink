@@ -56,7 +56,7 @@ MEMORY = _LOGICAL (Read)
 
 NITER
 
-NITER = INTEGER (Given)
+NITER = INTEGER (Read)
    The number of iterations of the relaxation algorithm.  This
    value cannot be less than two, since this is the minimum
    number required to ensure that all bad values are assigned a

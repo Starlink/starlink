@@ -19,7 +19,7 @@ For information on individual parameters, select from the list below:
 
 KEYWORD
 
-KEYWORD = LITERAL (Given)
+KEYWORD = LITERAL (Read)
 
    The name of the keyword whose existence in the FITS extension is
    to be tested.  A name may be compound to handle hierarchical

@@ -29,7 +29,7 @@ For information on individual parameters, select from the list below:
 
 COMMENT
 
-COMMENT = LITERAL (Given)
+COMMENT = LITERAL (Read)
    The comments to be written to the KEYWORD keyword for the
    "Update" and "Write" editing commands.  A null value (!)
    gives a blank comment.  The special value "$C" means use the
@@ -75,7 +75,7 @@ EDIT = LITERAL (Read)
 
 KEYWORD
 
-KEYWORD = LITERAL (Given)
+KEYWORD = LITERAL (Read)
    The name of the keyword to be edited in the FITS extension.  A
    name may be compound to handle hierarchical keywords, and it
    has the form keyword1.keyword2.keyword3 etc.  The maximum
@@ -117,7 +117,7 @@ NDF = NDF (Read and Write)
 
 NEWKEY
 
-NEWKEY = LITERAL (Given)
+NEWKEY = LITERAL (Read)
    The name of the keyword to replace the KEYWORD keyword.  It is
    only accessed when EDIT="Rename".  A name may be compound to
    handle hierarchical keywords, and it has the form
@@ -128,7 +128,7 @@ NEWKEY = LITERAL (Given)
 
 POSITION
 
-POSITION = LITERAL (Given)
+POSITION = LITERAL (Read)
    The position keyword name.  A position name may be compound to
    handle hierarchical keywords, and it has the form
    keyword1.keyword2.keyword3 etc.  The maximum number of
@@ -169,7 +169,7 @@ TABLE = FILENAME (Read)
 
 VALUE
 
-VALUE = LITERAL (Given)
+VALUE = LITERAL (Read)
    The new value of the KEYWORD keyword for the "Update" and
    "Write" editing commands.  The special value "$V" means use the
    current value of the KEYWORD keyword.  This makes it possible

@@ -21,7 +21,7 @@ For information on individual parameters, select from the list below:
 
 COMMENT
 
-COMMENT = LITERAL (Given)
+COMMENT = LITERAL (Read)
    The comments to be written to the KEYWORD keyword.  A null value
    (!) gives a blank comment.  The special value "$C" means use the
    current comment.  In addition "$C(keyword)" requests that the
@@ -31,7 +31,7 @@ COMMENT = LITERAL (Given)
 
 KEYWORD
 
-KEYWORD = LITERAL (Given)
+KEYWORD = LITERAL (Read)
    The name of the new keyword in the FITS extension.  A name may
    be compound to handle hierarchical keywords, and it has the
    form keyword1.keyword2.keyword3 etc.  The maximum number of
@@ -54,7 +54,7 @@ NDF = NDF (Read)
 
 POSITION
 
-POSITION = LITERAL (Given)
+POSITION = LITERAL (Read)
    The position keyword name.  A position name may be compound to
    handle hierarchical keywords, and it has the form
    keyword1.keyword2.keyword3 etc.  The maximum number of keywords
@@ -81,7 +81,7 @@ STRING = _LOGICAL (Read)
 
 VALUE
 
-VALUE = LITERAL (Given)
+VALUE = LITERAL (Read)
    The new value of the KEYWORD keyword.  The special value "$V"
    means use the current value of the KEYWORD keyword.  This makes
    it possible to modify a comment, leaving the value unaltered.

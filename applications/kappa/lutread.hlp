@@ -18,7 +18,7 @@ For information on individual arguments, select from the list below:
 
 LUT
 
-LUT = LITERAL (Given)
+LUT = LITERAL (Read)
    The file containing the lookup table.  It is passed to the
    parameter LUT but not validated.
 

@@ -19,7 +19,7 @@ For information on individual parameters, select from the list below:
 
 KEYWORD
 
-KEYWORD = LITERAL (Given)
+KEYWORD = LITERAL (Read)
 
    The name of an existing keyword in the FITS extension whose value
    is to be reported.  A name may be compound to handle hierarchical
