@@ -4,8 +4,8 @@
      :                     BSCALE, BZERO, DARRAY, NONSDA, GCOUNT,
      :                     PCOUNT, MXPARM, PTYPE, PSCALE, PZERO, FILROO,
      :                     LOGHDR, FD, CFN, SUBFIL, GEXTND, NCARD,
-     :                     SCARD, BLKSIZ, ACTSIZ, OFFSET, CURREC, NEXT,
-     :                     PARAMS, STATUS )
+     :                     SCARD, NENCOD, ENCODS, BLKSIZ, ACTSIZ, OFFSET, 
+     :                     CURREC, NEXT, PARAMS, STATUS )
 *+
 *  Name:
 *     FTS1_NDF
@@ -22,8 +22,8 @@
 *                    FMTOUT, IEEE, BADPIX, BLANK, BSCALE, BZERO, DARRAY,
 *                    NONSDA, GCOUNT, PCOUNT, MXPARM, PTYPE, PSCALE,
 *                    PZERO, FILROO, LOGHDR, FD, CFN, SUBFIL, GEXTND,
-*                    NCARD, HEADER, SCARD, BLKSIZ, ACTSIZ, OFFSET,
-*                    CURREC, NEXT, PARAMS, STATUS )
+*                    NCARD, HEADER, SCARD, NENCOD, ENCODS, BLKSIZ, ACTSIZ, 
+*                    OFFSET, CURREC, NEXT, PARAMS, STATUS )
 
 *  Description:
 *
@@ -32,7 +32,7 @@
 *     and name an NDF; copy the FITS data to the NDF's data array,
 *     performing a data conversion if requested and flagging blank data
 *     with the standard bad-pixel values; generate the other
-*     components: title, units, axis structure and the FITS extension.
+*     components: title, units, WCS, axis structure and the FITS extension.
 *     For group-format FITS data, a series of NDFs are created, one per
 *     group, each with a generated filename.  A null NDF may be given
 *     and this routine will exit, but permit the calling routine to
@@ -151,6 +151,13 @@
 *        The number of the card from where the searches of the header
 *        will begin.  This is needed because the headers make contain a
 *        dummy header prior to an extension.
+*     NENCOD = INTEGER (Given)
+*        The number of AST encodings supplied in ENCODS.
+*     ENCODS( NENCOD ) = CHARACTER * ( * ) (Given)
+*        The user's preferred AST encodings. If NENCOD is zero, then this
+*        is ignored, and an intelligent guess is made as to which encoding
+*        to use. The encoding determines which FITS headers are used to
+*        create the NDF WCS component.
 *     BLKSIZ = INTEGER (Given)
 *        The maximum blocksize and dimension of the tape/disk buffer.
 *     ACTSIZ = INTEGER (Given and Returned)
@@ -177,6 +184,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     RDS: Richard D. Saxton (STARLINK, Leicester)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -200,6 +208,8 @@
 *        Added the LENDIA argument to indicate whether or not the
 *        application is being run on a little-endian operating system,
 *        where byte-swapping is required.
+*     9-JUN-1998 (DSB):
+*        Added support for NDF WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -230,6 +240,7 @@
      :  DIMS( NDIM ),
      :  PCOUNT,
      :  SCARD,
+     :  NENCOD,
      :  SIZE,
      :  SUBFIL
 
@@ -257,7 +268,8 @@
      :  MEDIUM,
      :  PNNDF,
      :  HEADER( NCARD ) * 80,
-     :  PTYPE( MXPARM )
+     :  PTYPE( MXPARM ),
+     :  ENCODS( NENCOD )*(*)
 
       REAL
      :  BSCALE,
@@ -743,7 +755,7 @@
 *       contains the group parameters.
 
          CALL FTS1_NDFCM( SCARD - 1 + NCARD, HEADER, SCARD, NDF,
-     :                    STATUS )
+     :                    NENCOD, ENCODS, STATUS )
 
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_REP( 'FTS1_NDF_COPHDR',

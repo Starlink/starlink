@@ -85,6 +85,29 @@
 *        immediately prior to prompting in manual mode.  It is the name
 *        of the catalogue, as written in the FITS header, with a "dscf"
 *        prefix.
+*     ENCODINGS = LITERAL (Read)
+*        Determines which FITS keywords should be used to define the
+*        world co-ordinate information stored in NDF's WCS component.  
+*        The allowed values (case-insensitive) are:
+*
+*        "FITS-WCS" --- This uses keywords CRVALi, CDELTi, CRPIXi,
+*           PCiiijjj, etc., as described in the (draft) FITS world
+*           co-ordinate system paper by E.W.Greisen and M.Calabretta
+*           (A & A, in preparation).
+*	    
+*        "DSS" --- This is the system used by the Digital Sky Survey,
+*           and uses keywords AMDXn, AMDYn, PLTRAH, etc.
+*	    
+*        "Native" --- This is the native system used by the AST library
+*           (see SUN/210), and is the most general.  The others are
+*           limited in the co-ordinate systems they can describe, and
+*           may thus not fully describe the NDF's WCS component.
+*
+*        A comma-separated list of up to three values may be supplied,
+*        in which case the value actually used is in the first in the
+*        list for which corresponding keywords can be found in the FITS
+*        header. If a null parameter value (!) is supplied, the encoding
+*        is chosen automatically on the basis of the available headers. [!]
 *     FILES()  = _CHAR (Read)
 *        The list of the file numbers to be processed.  Files are
 *        numbered consecutively from 1 from the start of the tape.
@@ -373,6 +396,8 @@
 *     18-FEB-1998 (DSB):
 *        Call to FTS1_GKEYL had arguments THERE and NOCCUR swapped, causing 
 *        a segmentation violation.
+*     9-JUN-1998 (DSB):
+*        Added support for WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -386,6 +411,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! SSE global definitions
       INCLUDE 'DAT_PAR'        ! Data-system constants
+      INCLUDE 'GRP_PAR'        ! GRP_ constants
       INCLUDE 'MAG_ERR'        ! MAG-error definitions
       INCLUDE 'PAR_ERR'        ! Parameter-system errors
 
@@ -405,6 +431,7 @@
      :  BLKSIZ,                ! Maximum blocksize, which is the FITS
                                ! record length, times the maximum
                                ! blocking factor of ten
+     :  MAXCOD,                ! No. of known AST encodings.
      :  MAXHDR,                ! Maximum number of header sections in a
                                ! sub-file, including dummy header 
                                ! sections before the extension *with* data
@@ -417,6 +444,7 @@
       PARAMETER(
      :  RECSIZ = 2880,
      :  BLKSIZ = RECSIZ * 22,
+     :  MAXCOD = 3,
      :  MAXHDR = 2,
      :  MXCARD = BLKSIZ / 80,
      :  MXFILE = 32,
@@ -486,6 +514,10 @@
      :  SUBFIL,                ! Number of the FITS sub file
      :  WHDIM( 1 )             ! Size of the structure to store the 
                                ! header cards
+      INTEGER 
+     :  NENCOD,                ! No. of of WCS encodings supplied
+     :  ADDED,                 ! Number of items added to a group
+     :  ENCGRP                 ! Group identifier of ENCODINGS
 
       LOGICAL                  ! True if:
      :  AUTO,                  ! Automatic mode is operative
@@ -528,6 +560,9 @@
      :  VALID,                 ! A locator is valid
      :  VMS                    ! Operating system is VMS
 
+      LOGICAL 
+     :  CFLAG                  ! Group requires further input ?
+
       REAL
      :  BSCALE,                ! Scale factor used to convert tape
                                ! values to true values
@@ -562,6 +597,8 @@
      :  RCLOC,                 !   FITS record
      :  TLOC                   !   temporary header
 
+      CHARACTER*(GRP__SZNAM)   ! 
+     :  ENCODS( MAXCOD )       ! AST encodings for WCS component
 *.
 
 *    Check status on entry - return if not o.k.
@@ -643,6 +680,47 @@
       RCPNTD = RCPNTR
       CALL GRP1_CDESC( 80, BFPNTD, STATUS )
       CALL GRP1_CDESC( 80, RCPNTD, STATUS )
+
+*  Get a list of the AST Encodings to be used when creating NDF WCS
+*  components.
+*  ================================================================
+
+*  Abort if there has been an error.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Get a group from parameter ENCODINGS holding the AST encodings to use 
+*  when creating the WCS component from the FITS header.
+      CALL GRP_NEW( 'AST Encodings', ENCGRP, STATUS )
+      CALL GRP_SETCS( ENCGRP, .FALSE., STATUS )
+
+      CFLAG = .TRUE.
+      DO WHILE ( CFLAG .AND. STATUS .EQ. SAI__OK )
+         CALL GRP_GROUP( 'ENCODINGS', GRP__NOID, ENCGRP, NENCOD, ADDED,
+     :                   CFLAG, STATUS )
+         IF ( CFLAG ) CALL PAR_CANCL( 'ENCODINGS', STATUS )
+      END DO
+
+*  If a NULL parameter value was given for ENCODINGS annul the error,
+*  and find the real number of values in the group.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CALL GRP_GRPSZ( ENCGRP, NENCOD, STATUS )
+      END IF
+
+*  Limit the number of encodings used to MAXCOD.
+      IF( NENCOD .GT. MAXCOD ) THEN
+         CALL MSG_SETI( 'MX', MAXCOD )
+         CALL MSG_OUT( 'ENCODINGS', 'Only the first ^MX '//
+     :                 'values for parameter %ENCODINGS will be '//
+     :                 'used.', STATUS )
+         NENCOD = MAXCOD
+      END IF
+
+*  Extract the encodings from the group into an array.
+      CALL GRP_GET( ENCGRP, 1, NENCOD, ENCODS, STATUS )
+
+*  Prepare the tape drive.
+*  =======================
 
 *    Is the tape to be rewound?
 
@@ -1318,9 +1396,9 @@
      :                           BZERO, DARRAY, NONSDA, GCOUNT, PCOUNT,
      :                           MXPARM, PTYPE, PSCALE, PZERO, FILROO,
      :                           LOGHDR, FD, CFN, SUBFIL, GEXTND,
-     :                           WHDIM( 1 ), HSTART( NHEADS ), BLKSIZ,
-     :                           ACTSIZ, OFFSET, CURREC, NEXT, PARAMS,
-     :                           STATUS, %VAL( 80 ) )
+     :                           WHDIM( 1 ), HSTART( NHEADS ), NENCOD,
+     :                           ENCODS, BLKSIZ, ACTSIZ, OFFSET, CURREC,
+     :                           NEXT, PARAMS, STATUS, %VAL( 80 ) )
 
 *                Test for exit.
 

@@ -505,7 +505,8 @@ fts1_qtype.f fts1_rdata.f fts1_rfmod.f fts1_rgrda.f \
 fts1_rootn.f fts1_rstab.f fts1_scofb.f fts1_sctab.f \
 fts1_sdscf.f fts1_skip.f fts1_tread.f fts1_ukeyc.f fts1_ukeyd.f \
 fts1_ukeyi.f fts1_ukeyl.f fts1_ukeyr.f fts1_vhead.f \
-fts1_wkeyc.f fts1_wkeyd.f fts1_wkeyi.f fts1_wkeyl.f fts1_wkeyr.f
+fts1_wkeyc.f fts1_wkeyd.f fts1_wkeyi.f fts1_wkeyl.f fts1_wkeyr.f \
+fts1_ftwcs.f fts1_wcsim.f fts1_fndfs.f fts1_wcsax.f fts1_wcsut.f
 
 IRM_F_ROUTINES = \
 irm1_rglmt.f irm1_split.f irm1_wrtbx.f irm_bldat.f irm_chkob.f \
@@ -2460,6 +2461,11 @@ fts1_wkeyd.o:      SAE_PAR
 fts1_wkeyi.o:      SAE_PAR
 fts1_wkeyl.o:      SAE_PAR
 fts1_wkeyr.o:      SAE_PAR
+fts1_ftwcs.o:      SAE_PAR AST_PAR
+fts1_wcsim.o:      SAE_PAR AST_PAR DAT_PAR NDF_PAR
+fts1_fndfs.o:      SAE_PAR AST_PAR 
+fts1_wcsax.o:      SAE_PAR AST_PAR NDF_PAR
+fts1_wcsut.o:      SAE_PAR AST_PAR NDF_PAR
 ftsize.o:          SAE_PAR
 ftsizt.o:          SAE_PAR
 gausmooth.o:       SAE_PAR NDF_PAR PRM_PAR PAR_ERR

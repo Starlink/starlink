@@ -1,23 +1,24 @@
-      SUBROUTINE FTS1_NDFCM( NCARD, HEADER, SCARD, NDF, STATUS )
+      SUBROUTINE FTS1_NDFCM( NCARD, HEADER, SCARD, NDF, NENCOD, ENCODS,
+     :                       STATUS )
 *+
 *  Name:
 *     FTS1_NDFCM
 
 *  Purpose:
-*     Create the title, units, axes, and FITS extension in an NDF
+*     Create the title, units, axes, wcs, and FITS extension in an NDF
 *     from the FITS headers.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FTS1_NDFCM( NCARD, HEADER, SCARD, NDF, STATUS )
+*     CALL FTS1_NDFCM( NCARD, HEADER, SCARD, NDF, NENCOD, ENCODS, STATUS )
 
 *  Description:
-*     This routine adds the character components, axis structure and
-*     FITS extension to an NDF.  It searches a buffer containing the
-*     FITS header card images for the OBJECT keyword whose value
-*     becomes the NDF title if present.  Similarly BUNIT is mapped to
+*     This routine adds the character components, axis structure, WCS
+*     component and FITS extension to an NDF.  It searches a buffer 
+*     containing the FITS header card images for the OBJECT keyword whose 
+*     value becomes the NDF title if present.  Similarly BUNIT is mapped to
 *     the NDF units.  The supplied header structure is copied to the
 *     FITS extension.
 
@@ -36,11 +37,19 @@
 *     NDF = INTEGER (Given)
 *        Identifier of the NDF to which to write the additional 
 *        components and the FITS extension.
+*     NENCOD = INTEGER (Given)
+*        The number of AST encodings supplied in ENCODS.
+*     ENCODS( NENCOD ) = CHARACTER * ( * ) (Given)
+*        The user's preferred AST encodings. If NENCOD is zero, then this
+*        is ignored, and an intelligent guess is made as to which encoding
+*        to use. The encoding determines which FITS headers are used to
+*        create the NDF WCS component.
 *     STATUS = INTEGER (Given)
 *        Global status value.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -51,6 +60,8 @@
 *        calls.
 *     1996 November 24 (MJC):
 *        Modern style.  Revised FTS1_GKEYx calls.
+*     9-JUN-1998 (DSB):
+*        Added support for WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -70,6 +81,8 @@
       CHARACTER * ( 80 ) HEADER( NCARD ) ! Header cards
       INTEGER SCARD              ! Search-start card number
       INTEGER NDF                ! NDF identifier
+      INTEGER NENCOD
+      CHARACTER ENCODS( NENCOD )*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -124,6 +137,11 @@
 *  Make the axes.
 *  ==============
       CALL FTS1_AXIS( NCARD, HEADER, SCARD, NDF, STATUS )
+
+*  Make the WCS component.
+*  =======================
+      CALL FTS1_FTWCS( NCARD, HEADER, SCARD, NDF, NENCOD, ENCODS, 
+     :                 STATUS )
 
 *  Make the FITS extension.
 *  ========================
