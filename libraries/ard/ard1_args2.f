@@ -150,7 +150,7 @@
          IF( MORE ) THEN
             J = I - 1
          ELSE
-            J = J - 2
+            J = I - 2
          END IF
 
 *  Store the string as a new element in the returned group.

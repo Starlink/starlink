@@ -14,14 +14,17 @@
 
 *  Description:
 *     This routine can be used to specify the cooordinate systems
-*     which can be used in subsequent calls to ARD_WORK. ARD expressions
+*     which can be used in subsequent calls to ARD_WORK. ARD descriptions
 *     passed to subsequent calls to ARD_WORK can include positions in any
-*     of the Frames included in the supplied FrameSet (the ARD expression
+*     of the Frames included in the supplied FrameSet. The ARD description
 *     should include suitable COFRAME or WCS statements to indicate which
-*     coordinate system is being used).
+*     coordinate system is being used. If no COFRAME or WCS statements
+*     are included in the ARD description, then it is assumed that
+*     positions within the ARD description are given in the current Frame 
+*     of the supplied FrameSet, IWCS.
 *   
 *     If this routine is not called prior to ARD_WORK (or if it is
-*     called with IWCS set AST__NULL), then the ARD expression must
+*     called with IWCS set AST__NULL), then the ARD description must
 *     provide (either directly or through a WCS statement) positions in 
 *     pixel coordinates.
 *

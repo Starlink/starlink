@@ -166,6 +166,9 @@
 *  The application FrameSet used by ARD_WORK
       INTEGER CMN_AWCS
 
+*  The Domain name corresponding to pixel coordinates in the mask array.
+      CHARACTER CMN_ADOM*40
+
 *  The index of ht enext GRP element to be read.
       INTEGER CMN_ASTLN
 
@@ -183,7 +186,8 @@
      :                CMN_NXTLN, CMN_AWCS, CMN_AGRP, CMN_ASTLN
 
 *  Declare the common block /ARD_C2/, to hold character variables.
-      COMMON /ARD_C2/ CMN_OPSYM, CMN_KWSYM, CMN_STSYM, CMN_INSTR
+      COMMON /ARD_C2/ CMN_OPSYM, CMN_KWSYM, CMN_STSYM, CMN_INSTR,
+     :                CMN_ADOM
 
 *  Ensure that common blocks are saved.
       SAVE /ARD_C1/, /ARD_C2/

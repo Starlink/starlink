@@ -16,7 +16,7 @@
 *  Description:
 *     The number of characters at the start of the sub-string
 *     STR1( START : L ) which match the corresponding character in
-*     STR2( 1 : ) is found. The comparisons are case-sensitive and
+*     STR2( 1 : ) is found. The comparisons are case-insensitive and
 *     blanks are ignored.
 
 *  Arguments:
@@ -42,6 +42,8 @@
 *  History:
 *     10-FEB-1994 (DSB):
 *        Original version.
+*     14-SEP-2001 (DSB):
+*        Made comparisons case insensitive.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -61,6 +63,9 @@
 *  Arguments Returned:
       INTEGER NMATCH
       INTEGER N1
+
+*  External References:
+      CHARACTER CHR_UPPER*1
 
 *  Local Variables:
       CHARACTER
@@ -136,7 +141,7 @@
 *  increment the indices of the next characters to be checked in the
 *  two strings, and go back to check them so long as neither string has
 *  been exhausted.
-      IF( C1. EQ. C2 ) THEN
+      IF( CHR_UPPER( C1 ). EQ. CHR_UPPER( C2 ) ) THEN
          NMATCH = NMATCH + 1
          I1 = I1 + 1
          I2 = I2 + 1
