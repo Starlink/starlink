@@ -13,6 +13,8 @@
 #     so that points on it may be indicated.
 #
 #  External Variables:
+#     CENTROID = boolean (Given and Returned)
+#        Indicates whether points are centroided when added.
 #     DOMAIN = string (Given)
 #        The domain in which the ndfset is to be plotted, and in which
 #        the POINTS coordinates will be supplied and returned in.
@@ -26,8 +28,6 @@
 #     MAXCANV = integer (Given and Returned)
 #        The maximum X or Y dimension of the canvas in which the initial
 #        NDF is to be displayed.  If zero, there is no limit.
-#     MAXPOS = integer (Given)
-#        The maximum number of points which the user may indicate.
 #     NDFSET = list of strings (Given)
 #        A list of strings of the form {setname ndfname ndfname ...}
 #        indicating which NDFs comprise the ndfset to be examined.
@@ -78,9 +78,9 @@
                       -percentiles [ list $PERCLO $PERCHI ] \
                       -watchstatus viewstatus \
                       -zoom $ZOOM \
-                      -maxpoints $MAXPOS \
                       -geometry ${WINX}x${WINY} \
-                      -markstyle $MARKSTYLE
+                      -markstyle $MARKSTYLE \
+                      -centroiding $CENTROID
 
 #  Tinker with cosmetic aspects of the viewer.
       [ .viewer component exit ] configure -balloonstr "Finish adding points"
@@ -90,13 +90,38 @@
 #  Add a help control.
       catch { unset helplines }
       lappend helplines \
-         "Click with mouse button 1 (left) on the image to add a point" \
-         "Click with mouse button 3 (right) on the image to remove a point" \
-         "" \
-         "Use the `Markers' controls to set the shape of the markers" \
-         "and change the index of the next point marked." \
-         "" \
-         "Click the `Done' button to finish marking points and end the program"
+      "The window can be resized as normal and the scrollbars used to pan" \
+      "the viewing region.  The cursor position is displayed below the image." \
+      "The controls in the panel are used as follows:" \
+      "" \
+      "Mouse buttons:" \
+      "   Click button 1 (left) on the image to add a point" \
+      "   Click button 3 (right) on the image to remove a point" \
+      "" \
+      "Zoom:" \
+      "   Select scale factor or zoom in or out to control magnification" \
+      "" \
+      "Cutoff:" \
+      "   Select a preset or custom cutoff level to control image brightness" \
+      "" \
+      "Markers:" \
+      "   The `Centroid' checkbox controls whether points added by clicking" \
+      "   will be centroided on a nearby feature to get the exact position." \
+      "   The other controls allow selection of the size, shape and colour" \
+      "   of the plotted points, and the index of the next point to be marked."\
+      "" \
+      "WCS:" \
+      "   Select a frame from the ones in the World Coordinate System" \
+      "   extension of the image.  This controls the X,Y coordinates displayed"\
+      "   which indicate the postion of the cursor, and the grid plotting." \
+      "   The `Grid' button lets you select whether grid lines and/or " \
+      "   labelled axes are plotted." \
+      "" \
+      "Control:" \
+      "   `Help' shows this window." \
+      "   `Abort' exits the program (following confirmation) without writing" \
+      "   a position list." \
+      "   `Done' indicates that you have finished with this image." 
       .viewer configure -helptext [ join $helplines "\n" ]
 
 #  Load the NDF into the widget.
@@ -128,6 +153,7 @@
          set PERCLO [ lindex [ .viewer cget -percentiles ] 0 ]
          set PERCHI [ lindex [ .viewer cget -percentiles ] 1 ]
          set MARKSTYLE [ .viewer cget -markstyle ]
+         set CENTROID [ .viewer cget -centroiding ]
 
 #  Set the return variable to contain the list of points selected.  If 
 #  If we were displaying the indices then return the list with the indices
