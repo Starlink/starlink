@@ -16,6 +16,10 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+o The SkyFrame class now represents ICRS coordinates by default
+instead of FK5 (that is, the default for the System attribute for SkyFrames 
+has been changed to "ICRS").
+
 o A function called astRate (AST_RATE) has been added which allows an
 estimate to be made of the rate of change of a Mapping output with
 respect to one of the Mapping inputs.
@@ -26,6 +30,16 @@ the spectral dispersion produced by a grating, prism or grism.
 o A new subclass of Mapping, the ShiftMap, has been added which adds
 constant values onto all coordinates (this is equivalent to a WinMap
 with unit scaling on all axes).
+
+o Minor bugs have been fixed within the Plot class to do with the choice 
+and placement of numerical axis labels.
+
+o The SphMap class has a new attribute caller PolarLong which gives the 
+longitude value to be returned when a Cartesian position corresponding to 
+either the north or south pole is transformed into spherical coordinates.
+
+o The WcsMap class now assigns a longitude of zero to output
+celestial coordinates which have a latitude of plus or minus 90 degrees.
 
 
    For further details of these changes, see the final appendix of
