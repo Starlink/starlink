@@ -50,7 +50,7 @@
 
 #-
 
-      echo -lpgplot -png -lz `gwm_link` \
+      echo -lpgplot -lpng -lz `gwm_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
