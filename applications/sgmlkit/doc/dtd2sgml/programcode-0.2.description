@@ -47,7 +47,16 @@ perhaps a package you've based the function on -- can be credited in
 the <elemref gi='otherauthors'> element.
 
 <element gi='authornote'>
-<p>Optional further information about an author.
+<p>Optional further information about an author.  This might be
+particularly useful when the author is one of those consigned to the
+<elemref gi=otherauthors> element.
+
+<p>For example, in the DSSSL code
+written for this SGML project, the ISO standard document describing
+DSSSL was used to supply various functions which were not implemented
+as primitives in the Jade system.  The standard was therefore listed
+as an `other author' of some parts of the code, with a note explaining
+this in the <elemref self gi=authornote> element.
 
 <element gi='authorref'>
 <p>A reference to an author whose details are in the <elemref

@@ -215,6 +215,9 @@ which references another document.
 <attribute name='loc'>
 <p>Indicates a location within a document.  The value of the loc
 attribute is an ID reference within the target document.
+<attribute name='text'>
+<p>If present, the attribute's data is used to form the link text,
+rather than generating it based on the target.
 
 <element gi='draftnote'>
 <p>A note to be included in the text of the document.  It'll be
@@ -245,9 +248,10 @@ caption supplied.
 the ID to be referred to from outside this document.
 <attribute name='float'>
 <p>If the float attribute is present and has value `float', then the
-table may be moved to a more suitable place in the document.  If the
+table may be moved to a more suitable place in the document, if this
+would help to avoid an ugly pagebreak, for example.  If the
 attribute is missing or has the value `nofloat', then it is pinned to
-its current location in the document.
+its current location.
 
 <element gi='figurecontent'>
 <p>The actual content of the figure.  This may be paragraphs of text.
@@ -412,7 +416,7 @@ author should be credited here.
 <element gi='px'>
 <p>A restricted paragraph.
 
-<p>In certain contexts, it is convenient to forbid from
+<p>In certain contexts, it is convenient to forbid certain elements from
 otherwise-unrestricted paragraph text.  The
 <elemref self gi=px> element has the same usage as <elemref gi=p>, but
 with a slightly restricted content model.
@@ -425,13 +429,18 @@ gi=blockquote> element.
 <p>A reference to another point in the same document.  The element has
 no content -- the link text will, in general, be generated for you, based on
 the link target.  Any element which has an ID attribute may be linked
-to.  A small subtlety is that the link is to a complete ,em/element/ of the
+to.  A small subtlety is that the link is to a complete <em/element/ of the
 document, rather than a <em/point/ of the document.
+<example>
+See also <ref id=other.ref> for more details.
+</example>
 <attribute name='id'>
 <p>The ID of the element to link to.
+<!--
 <attribute name='text'>
 <p>If present, the attribute's data is used to form the link text,
 rather than generating it based on the target.
+-->
 
 <element gi='routinelist'>
 <p>This element introduces the <elemref gi=codecollection> elements
@@ -520,6 +529,19 @@ attributes are ignored.  You may mark up your document using all the
 features in the Oasis model.
 I will progressively add support for these attributes
 as time permits.
+
+<attribute name='id'>
+<p>An ID for the table.
+<attribute name='export'>
+<p>If present, then the ID is `exported', and may be linked to from
+other Starlink documents.
+<attribute name='float'>
+<p>If the float attribute is present and has value `float', then the
+table may be moved to a more suitable place in the document, if this
+would help to avoid an ugly pagebreak, for example.  If the
+attribute is missing or has the value `nofloat', then it is pinned to
+its current location.
+
 
 <element gi='tbody'>
 <p>A table body.  This contains a series of table rows.
