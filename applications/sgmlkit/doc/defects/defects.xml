@@ -1,0 +1,352 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE defectslist SYSTEM "defects.dtd">
+
+<defectslist>
+
+<title>SGML project defect list</title>
+
+<version>$Revision$</version>
+<date>$Date$</date>
+
+<p>This list contains the current defects list for
+the Starlink General and Programcode DTDs.  As well as specific
+deficiencies, these `defects' include items which are merely
+suggestions or TODOs</p>
+
+<p>If it's not in here, I don't plan to do anything about it (which
+probably means I've forgotten about it, and you should remind
+me).</p>
+
+<p>These are in no particular order, and some have a higher priority
+than others.</p>
+
+<!-- DO NOT CHANGE THE ORDER OF ELEMENTS IN THIS FILE.
+     They're numbered when they're formatted, and it'd be nice to keep
+     those numbers correct.
+     -->
+
+<defectgroup>
+<title>General DTD</title>
+
+<defect status="closed" originator="Mark">
+<title>Implement a FOREIGN element</title>
+<p>Support such things as &lt;foreign&gt;et. al.&lt;/foreign&gt;.
+Dead easy to do.</p>
+<resolution status="fixed" author="Norman" date="00-Mar-2000">
+<p>Done.</p>
+</resolution>
+</defect>
+
+<defect status="closed" originator="Rodney">
+<title>Non-sentence-ending periods</title>
+<p>Include an abbrev element?  nbsp entity?</p>
+<resolution status="fixed" author="Norman" date="21-Mar-2000"
+	note="entities-latex.ent, rev 1.9, and entities-html.ent, rev 1.9">
+<p>Added a &amp;dot; entity to indicate a non-sentence-ending period.</p>
+</resolution>
+</defect>
+
+<defect status="open" originator="DSB">
+<title>LaTeX as alt format </title>
+<p>Some documents could use a specialised layout for some section
+headings.  Possibly include a LaTeX-formatted element, which
+could be used as an alternative, but legitimately ignored.</p>
+<p>I'm open to concrete suggestions for the syntax of this -- is this
+a real priority?</p>
+</defect>
+
+<defect status="closed" originator="ACD">
+<title>Hours and degrees elements</title>
+<p>Clive even supplied SGML and LaTeX to support this!  Just a
+matter of slotting them in when I'm next fiddling with that DTD.
+</p>
+<resolution status="fixed" author="Norman" date="00-Apr-2000">
+<p>Incorporated Clive's fixes.</p>
+</resolution>
+</defect>
+
+<defect status="open" originator="Norman/Mark">
+<title>Admonition</title>
+<p>At same level as BLOCKQUOTE, with a couple of `class'
+attributes.  Should one of these classes be `epigraph'...?
+</p>
+</defect>
+
+<defect status="open" originator="prog meeting">
+<title>Bibliography within source document</title>
+<p>Some folk don't (want to) use BibTeX, so it may be worth
+supporting bib elements within the document if that doesn't
+make things too complicated (could I simply mimic BibTeX?).
+</p>
+</defect>
+
+<defect status="closed" date="15-Sep-1999" originator="Mark">
+<title>Cross-references to CODECOLLECTIONs</title>
+<p>Mark pointed out that this is OK from within the document
+which references them, but it's not necessarily easy from
+within another document.  This is potentially rather knotty, I
+think, but it'll be quite interesting to solve.
+</p>
+<resolution status="fixed" author="Norman" date="10-May-2000"
+note="starlink-0.7.dtd, rev 1.2">
+<p>I think this is fixed (if I've recalled the details of the problem
+accurately).  Alongside the REF and DOCXREF elements is now a CODEREF
+element, which refers to IDs within programcode documents by
+indirection via the CODECOLLECTION element which references the
+programcode.</p>
+</resolution>
+</defect>
+
+<defect status="open" originator="Mark" date="04-Apr-2000"
+	note="Commentary on m element in starlink-0.7">
+<title>Maths in help files.</title>
+<p>Quoth Mark:</p>
+<p>Have we any ideas what to do with math content for help downconverters
+(or any other downconverters to non-graphical output)?
+A latex -> eqn (eqn is a roff preprocessor) converter would be a good start, 
+though it obviously couldn't cope with everything; however a quick 
+search doesn't reveal that any such thing exists.  </p>
+
+<p>As things stand the only robust alternative I can see is spitting out the
+latex content, but this is not very friendly to help file readers.</p>
+
+<p>Maybe we need a mechanism which can contain an alternative 
+ascii-art representation of the latex-notation content.  
+This probably needs to be an optional, verbatim-like, element rather 
+than an attribute since it may need line breaks to make sense.
+In practice, as far as I can see, this is only going to
+be a problem for programcode not main document text, since only 
+programcode gets converted to an ascii-like format (unless we envisage
+people reading SUNs with lynx??).  But if we make a modification,
+it's probably best to programcode and main DTDs alike.</p>
+
+</defect>
+
+</defectgroup>
+
+<defectgroup>
+<title>Programcode DTD</title>
+
+<defect status="closed" originator="prog meeting">
+<title>Allow ampersand connector in codeprologue</title>
+<p>The order of the element children of routineprologue should be
+arbitrary.  Also, use the SST elements.</p>
+<resolution status="fixed" author="Norman" date="19-Sep-1999">
+<p>Supported in DCs as of 19 Sept -- it just doesn't look very nice.
+This won't work in XML, but that's OK since these'll usually be SGML
+sources.</p>
+</resolution>
+</defect>
+
+<defect status="open" originator="Mark">
+<title>Shortrefs in programcode DTD</title>
+<p>Shortrefs to make lists in prologues tidier.  Nice, but I'm
+always nervous of having too much cleverness in this area,
+because the more shortrefs there are, the easier it is to type
+one by accident, and so provoke a completely unintelligible
+error message.  I don't plan to do anything with this before
+we've discussed it at greater length.
+</p>
+</defect>
+
+<defect status="closed" originator="Mark" date="14-Sep-1999">
+<title>AUTHORREF element</title>
+<p>`The AUTHORLIST element is a nasty example of SGML forcing one
+to write something which one otherwise wouldn't want to'.
+This is probably true, but there are no ideal alternatives, I
+don't think.
+</p>
+<resolution status="fixed" author="Norman" date="17-May-2000"
+	note="programcode-0.7.dtd, rev 1.4">
+<p>After some discussion, the AUTHORREF element was removed, and the
+`id' attribute on the AUTHOR element demoted to CDATA, with the
+extra-syntactic constraint that the same CDATA string throughout a
+document (or indeed the whole documentation set!) would be taken
+to refer to the same author.  This makes the
+association between authors less robust, but much more convenient.</p>
+</resolution>
+</defect>
+
+<defect status="closed" originator="Mark" date="14-Sep-1999">
+<title>DL/DD/DT/BLOCKQUOTE/VERBATIM/M in prologues </title>
+<p>Easy, I think.</p>
+<resolution status="fixed" author="Norman" date="19-Sep-2000">
+<p>Implemented by restructuring the General and Programcode
+DTDs so that they both include a common set of para-level
+elements.  No additional DC support needed, since the DC
+support for the General DTD takes care of this.  Just needs
+documented quickly.</p>
+</resolution>
+</defect>
+
+<defect status="closed" originator="Mark/Norman" date="07-Apr-2000">
+<title>Programcode DTD variant for scripts</title>
+<p>This should involve nothing more
+sophisticated than adding #+, # and #- to the shortref list in the
+declaration.</p>
+<resolution status="deferred" author="Norman" date="29-May-2000">
+<p>Norman and Mark have been discussing this.  Norman has gone off the
+idea somewhat, because he's suspicious of the potential for chaos
+represented by shortrefs in general.  Mark is enthusiastic, because it
+obviates the need for any sed magic when building documentation.  We
+left it in the air somewhat: a scriptcode DTD is present in the 0.7
+release, with Norman claiming a couple of problems with it.  If either
+of us wants to tidy it up at all, we can.</p>
+</resolution>
+</defect>
+
+<defect status="open" originator="Mark" date="07-Apr-2000"
+	note="Commentary on programcode-0.7+parameter">
+<title>Array sizes in parameter elements</title>
+<p>Quoth Mark:</p>
+<p>There are various possibilities to accommodate this:
+   1)  A 'shape' attribute (CDATA) on the &lt;type> or &lt;parameter> elements
+   2)  A &lt;shape> optional element (PCDATA) in the content of &lt;type>
+          or &lt;parameter>
+   3)  Just write the size as part of the PCDATA content of &lt;type></p>
+<p>I suggest (3), so one would have
+<verbatim>
+   *  &lt;parameter given>
+   *     ORIGIN = _INTEGER( 3 )
+</verbatim></p>
+</defect>
+
+</defectgroup>
+
+<defectgroup>
+<title>Down-converters</title>
+
+<defect status="open" originator="Mark">
+<title>Nested CODE elements</title>
+<p>CODE elements within other elements like STRONG don't always
+come out in tt-type.</p>
+</defect>
+
+<defect status="open" originator="Mark">
+<title>Process picture environments with maths in DC</title>
+<p>Should be fairly easy.  Can I do metapost at the same time?</p>
+</defect>
+
+<defect status="open" originator="Norman/Mark">
+<title>SDATA entities</title>
+<p>...are a mess.  Perhaps this should wait until I build and
+incorporate OpenJade 1.3, which has map-sdata-entity support,
+when I can do it properly.</p>
+</defect>
+
+<defect status="open" originator="Norman">
+<title>DT element in LaTeX </title>
+<p>Tweak the generated LaTeX so that {description} \item s are
+cleverer about spacing.</p>
+</defect>
+
+<defect status="open" originator="Mark" date="9-Sep-1999">
+<title>REF/maths in DT in LaTeX doesn't insert text</title>
+<p>Haven't investigated</p>
+</defect>
+
+<defect status="open" originator="Mark">
+<title>LaTeX pages are smaller than standard, and positioned differently</title>
+<p>Should need only the most minor tweaking.</p>
+</defect>
+
+<defect status="open" originator="Mark">
+<title>KBD in VERBATIM doesn't work</title>
+</defect>
+
+<defect status="closed" originator="Rodney, Mark">
+<title>Script-driven downconversion</title>
+<p>At present, this is little more than an alias for make, and so
+could probably be made more sophisticated without breaking
+anything....</p>
+<resolution status="fixed" author="Norman" date="00-Jan-2000">
+<p>Replaced by sgml2docs script</p>
+</resolution>
+</defect>
+
+<defect status="open" originator="Mark">
+<title>Improve the tables implementation</title>
+<p>The HTML version of this is extremely sparse at present; the LaTeX
+DC does better.</p>
+</defect>
+
+<defect status="open" originator="Mark" date="15-Sep-1999">
+<title>TeX global declarations</title>
+<p>A collection of \newcommands at the head of the document.</p>
+<p>Mmm, I've now forgotten what this means.  I can't remember if we
+discussed this and decided it was probably a bad idea.  There's
+support for something like this in the data content attributes for the
+latexgraphics notation (see notations.text), but this might be too
+arcane for the future, and in any case isn't implemented (not least
+because it's arcane).</p>
+</defect>
+
+<defect status="closed" originator="Mark" date="15-Sep-1999">
+<title>LaTeX programcode formatting</title>
+<p>The results are very ugly at present.</p>
+<resolution status="fixed" author="Norman" date="15-May-2000">
+<p>Use an adapted version of the SST macros in the generated LaTeX.
+Not really worth worrying about too much, as there might well be a substantial
+redesign of the output in future.</p>
+</resolution>
+</defect>
+
+<defect status="closed" originator="Mark">
+<title>HTML programcode formatting</title>
+<p>This is still pretty hideous.  Should be made to look more like the
+current star2html output.</p>
+<resolution status="fixed" author="Norman" date="29-May-2000">
+<p>Looks much like star2html output.  This conformance hasn't been
+extensively tested, and the formatting of the authorlist, at least, is
+significantly different, but there's not much point in getting every
+last feature correct, since this should be resolved in the upcoming
+redesign of both the formatters and the format.</p>
+</resolution>
+</defect>
+
+<defect status="open" originator="Norman" date="29-May-2000">
+<title>programcode next/previous and TOC occasionally wrong</title>
+<p>At great effort, the HTML formatting of programcode documents now
+both splits routines into separate files (not toooo hard) and manages
+`up' links to the rest of the document (damn hard, as it turns out).
+I think there are still a few wrinkles in the way that
+next/previous/up links work.</p>
+<resolution status="deferred" author="Norman" date="29-May-2000">
+<p>I don't plan to fix this.  Because of the way the programcode
+down-converter is structured, most of the business of linking up and
+down to the programcode documents is vaguely nightmarish, since it's
+difficult to use the same mechanism
+that the rest of the down-converter uses.  This sort of problem is one
+of the big reasons supporting a redesign of the down-converters, so
+that they work via an intermediate XML file, so that the messy
+business of fixing up cross-references can be done more sanely.</p>
+</resolution>
+</defect>
+
+</defectgroup>
+
+<defectgroup>
+<title>General</title>
+
+<defect status="open" originator="Mark" date="16-Aug-1999">
+<title>Does the Makefile work on all platforms? </title>
+<p>I haven't checked this (and the Tru64 make is so crappy that
+the answer is almost certainly `no'), but the point is moot at
+the moment, as Jade builds only on the Linux boxes.</p>
+<resolution status="deferred" author="Norman" date="00-Jan-2000">
+<p>By the time this becomes live, we might be running Linux on the
+alphas, too!</p>
+</resolution>
+</defect>
+
+<defect status="open" originator="Mark" date="15-Sep-1999">
+<title>Document templates </title>
+<p>`Some hints and tips, in the form of examples, might be useful
+(for instance creative use of entities)'.  Norman doubts very much that
+we ought to be encouraging `creative' use of entities....</p>
+</defect>
+
+
+</defectgroup>
+</defectslist>
