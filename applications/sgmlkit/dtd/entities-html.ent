@@ -31,6 +31,7 @@
 <!entity ellip  CDATA "..."	-- ellipses		-->
 <!entity percent CDATA "%"	-- percent sign		-->
 <!entity tilde	CDATA "~"	-- tilde		-->
+<!entity underscore CDATA "_"	-- underscore		-->
 
 <![ include [
 <!entity latex	SDATA "L<sup>a</sup>T<small>E</small>X" >

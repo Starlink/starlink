@@ -27,5 +27,6 @@
 <!entity percent SDATA "\%"		-- percent sign		-->
 <!entity deg    SDATA "\ensuremath{{}^\circ}"	-- degree	-->
 <!entity tilde	CDATA "~"		-- tilde		-->
+<!entity underscore SDATA "\Underscore{}" -- underscore		-->
 <!entity latex  SDATA "\LaTeX{}"	-- might as well...	-->
 <!entity tex	SDATA "\TeX{}"		-- might as well...	-->
