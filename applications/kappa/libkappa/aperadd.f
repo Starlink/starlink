@@ -59,7 +59,7 @@
 *        This allows apertures of almost any shape to be used. If a null 
 *        (!) value is supplied then the aperture is assumed to be circular 
 *        with centre and diameter given by parameters CENTRE and DIAM. ARD 
-*        files can be created euther "by hand" using an editor, or using a
+*        files can be created either "by hand" using an editor, or using a
 *        specialist application should as KAPPA:ARDGEN. 
 *
 *        The co-ordinate system in which positions within the ARD file are
