@@ -127,6 +127,9 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.26  1997/10/08 18:44:02  timj
+*     Fix 'no data' message when using 2 switches (^PKG instead of PKG)
+*
 *     Revision 1.25  1997/09/03 23:57:01  timj
 *     Supply a default for 'OUT'
 *
@@ -865,7 +868,7 @@ c
                         CALL MSG_SETI ('M', MEASUREMENT)
                         CALL MSG_SETC('PKG', PACKAGE)
                         CALL MSG_OUTIF (MSG__NORM, ' ', 
-     :                       'PKG: no data for '//
+     :                       '^PKG: no data for '//
      :                       'switch 2 in exp ^E, int ^I, meas ^M',
      :                       STATUS)
                         MISSING_SWITCH = .TRUE.
