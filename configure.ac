@@ -26,9 +26,11 @@ dnl    configured as part of the bootstrap process) and eso (which
 dnl    contains libraries which haven't yet been brought within the
 dnl    Starlink build system).
 dnl
-dnl    Do NOT recurse into buildsupport.  If we include buildsupport
-dnl    here, then autoreconf will recurse into buildsupport/starconf,
-dnl    which means we end up reconfiguring it with a wrong --prefix.
+dnl    Do NOT mention buildsupport in AC_CONFIG_SUBDIRS.  If we
+dnl    include buildsupport here, then ./configure will recurse into
+dnl    buildsupport/starconf, which means we end up reconfiguring it
+dnl    with a wrong --prefix whenever we ./configure in the top-level
+dnl    directory.
 AC_CONFIG_SUBDIRS(applications libraries)
 dnl AC_CONFIG_SUBDIRS(applications libraries buildsupport thirdparty)
 
