@@ -606,7 +606,7 @@ itcl::class gaia::Gaia {
    #  Make an ARD toolbox.
    public method make_ard_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarArd .\#auto \
+         GaiaArd .\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \

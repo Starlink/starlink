@@ -155,7 +155,8 @@
 #     4-MAY-1999 (PDRAPER):
 #        Merged Allan's changes.
 #     28-JUN-1999 (PDRAPER):
-#        Added ability to save log window to text file. Renamed to GaiaArd.
+#        Added ability to save log window to text file. Renamed to
+#        GaiaArd. Added short_help.
 #     {enter_further_changes_here}
 #-
 
@@ -198,6 +199,9 @@ itcl::class gaia::GaiaArd {
       global gaia_dir
       add_help_button $gaia_dir/GaiaArd.hlp "On Window..."
 
+      #  Add short help window.
+      make_short_help
+
       #  Add option to create a new window.
       $File add command -label {New window} \
          -command [code $this clone_me_] \
@@ -212,6 +216,9 @@ itcl::class gaia::GaiaArd {
          -command [code $this save_file] \
          -accelerator {Control-s}
       bind $w_ <Control-s> [code $this save_file]
+      $short_help_win_ add_menu_short_help $File \
+         {Save ARD description...} \
+	 {Save the current ARD regions to a file}
 
       #  Read measurements from a file.
       $File add command \
@@ -219,6 +226,9 @@ itcl::class gaia::GaiaArd {
          -command [code $this read_file] \
          -accelerator {Control-r}
       bind $w_ <Control-r> [code $this read_file]
+      $short_help_win_ add_menu_short_help $File \
+         {Read ARD description...} \
+	 {Read a simple ARD description from a file}
 
       #  Set the exit menu item.
       $File add command -label Exit \
@@ -266,6 +276,8 @@ itcl::class gaia::GaiaArd {
          button $itk_component(action).close -text Close \
             -command [code $this close]
       }
+      add_short_help $itk_component(close) \
+	 {Close window}
 
       #  Create buttons for creating regions interactively (this
       #  cannot be recognised as an itk component widget, so just keep
@@ -279,31 +291,47 @@ itcl::class gaia::GaiaArd {
             -text {Stats all} \
             -command [code $this stats all]
       }
+      add_short_help $itk_component(wholestats) \
+	 {Get stats for all regions}
       itk_component add selectedstats {
          button $itk_component(action).selected \
             -text {Stats selected} \
             -command [code $this stats selected]
       }
+      add_short_help $itk_component(selectedstats) \
+	 {Get stats for just the selected regions}
       itk_component add clearstats {
          button $itk_component(action).clear \
             -text {Clear stats} \
             -command [code $this stats clear]
       }
+      add_short_help $itk_component(clearstats) \
+	 {Clear the stats results window}
+      itk_component add savestats {
+         button $itk_component(action).save \
+            -text {Save stats} \
+            -command [code $this save_stats_]
+      }
+      add_short_help $itk_component(savestats) \
+	 {Save the stats results to the named file}
 
       #  Add an entry widget to display the results.
       itk_component add statsresults {
          Scrollbox $w_.statsresults -exportselection 1 -singleselect 0
       }
+      add_short_help $itk_component(statsresults) \
+	 {Results of stats measurements}
 
       #  And a file for saving the results.
       itk_component add logfile {
          LabelFileChooser $w_.logfile \
             -labelwidth 14 \
-            -text "Log file:" \
-            -textvariable [scope logfile_]
+            -text "Stats results file:" \
+            -textvariable [scope logfile_] \
+	    -value "$logfile_"
       }
       add_short_help $itk_component(logfile) \
-         {Name of file to save results}
+	 {File name for saving contents of stats window}
 
 
       #  Add buttons for extracting and masking out the current
@@ -313,26 +341,36 @@ itcl::class gaia::GaiaArd {
             -text {Extract all} \
             -command [code $this extract all]
       }
+      add_short_help $itk_component(extractwhole) \
+	 {Extract all regions into a new image}
       itk_component add extractselected {
          button $itk_component(action).exselect \
             -text {Extract selected} \
             -command [code $this extract selected]
       }
+      add_short_help $itk_component(extractselected) \
+	 {Extract select regions into a new image}
       itk_component add maskwhole {
          button $itk_component(action).maskwhole \
             -text {Blank all} \
             -command [code $this blank all]
       }
+      add_short_help $itk_component(maskwhole) \
+	 {Create a new image with all regions blanked}
       itk_component add maskselected {
          button $itk_component(action).maskselect \
             -text {Blank selected} \
             -command [code $this blank selected]
       }
+      add_short_help $itk_component(maskselected) \
+	 {Create a new image with selected regions blanked}
       itk_component add autocrop {
          button $itk_component(action).autocrop \
             -text {Auto crop} \
             -command [code $this crop]
       }
+      add_short_help $itk_component(autocrop) \
+	 {Create a new image with all blank edge regions removed}
 
       #  Pack everything into place.
       pack $itk_component(lrect) $itk_component(lcircle) \
@@ -350,6 +388,7 @@ itcl::class gaia::GaiaArd {
          $itk_component(selectedstats)   1,0 -fill x -pady 3 -padx 3 \
          $itk_component(wholestats)      1,1 -fill x -pady 3 -padx 3 \
          $itk_component(clearstats)      1,2 -fill x -pady 3 -padx 3 \
+         $itk_component(savestats)       1,3 -fill x -pady 3 -padx 3 \
          $itk_component(close)           1,4 -fill x -pady 3 -padx 3
       pack $itk_component(logfile) -side top -fill x -ipadx 1m -ipady 1m
       pack $itk_component(statsresults) -fill both -expand 1 -side top
@@ -422,7 +461,7 @@ itcl::class gaia::GaiaArd {
       if { $mode == "clear" } {
          $itk_component(statsresults) clear 0 end
          return
-      } 
+      }
 
       #  First save the current description to a file
       incr count_
@@ -477,6 +516,22 @@ itcl::class gaia::GaiaArd {
       blt::busy release $w_
       $itk_component(statsresults) insert end " "
       $itk_component(statsresults) see end
+   }
+
+   #  Save the stats window to the named file.
+   protected method save_stats_ {} {
+      if { $logfile_ != {} } {
+         busy {
+            set fid [::open $logfile_ w]
+            puts $fid "\# GAIA ARD region stats file."
+            puts $fid "\#"
+	    set size [$itk_component(statsresults) size]
+	    for {set i 0} {$i < $size} {incr i} {
+	       puts $fid [$itk_component(statsresults) get $i]
+	    }
+	    ::close $fid
+	 }
+      }
    }
 
    #  Blank out regions and display in a new clone.
@@ -709,7 +764,7 @@ itcl::class gaia::GaiaArd {
    protected variable tmpimage_ {}
 
    #  Name of file to save results window into.
-   protected logfile_ GaiaArd.Log
+   protected variable logfile_ GaiaArd.Log
 
    #  Common variables: (shared by all instances)
    #  -----------------
