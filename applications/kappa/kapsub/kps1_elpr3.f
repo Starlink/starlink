@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_ELPR3( VAR, ILO, IHI, JLO, JHI, DATIN, VARIN, 
-     :                       IGRP, REGIND, NBIN, REGVAL, DATOUT, VAROUT,
-     :                       NSUM, MASK, STATUS )
+     :                       IGRP, REGIND, NBIN, WMEAN, REGVAL, DATOUT, 
+     :                       VAROUT, NSUM, MASK, STATUS )
 *+
 *  Name:
 *     KPS1_ELPR3
@@ -13,12 +13,12 @@
 
 *  Invocation:
 *     CALL KPS1_ELPR3( VAR, ILO, IHI, JLO, JHI, DATIN, VARIN, IGRP,
-*                      REGIND, NBIN, REGVAL, DATOUT, VAROUT, NSUM, MASK,
-*                      STATUS )
+*                      REGIND, NBIN, WMEAN, REGVAL, DATOUT, VAROUT, 
+*                      NSUM, MASK, STATUS )
 
 *  Description:
-*     This subroutine finds the mean and variance of the data values
-*     within specified sub-regions of the supplied data array,
+*     This subroutine finds the mean (or weighted mean) and variance of the 
+*     data values within specified sub-regions of the supplied data array,
 *     excluding any bad data pixels.  The regions are specified by
 *     means of an "ARD description" (see SUN/183).  The pixel mask
 *     corresponding to the ARD description is returned, modified so
@@ -48,6 +48,9 @@
 *        REGIND array.
 *     NBIN = INTEGER (Given)
 *        The number of bins.
+*     WMEAN = LOGICAL (Given)
+*        If TRUE, then return the weighted mean values. Otherwise return
+*        the simple mean values.
 *     REGVAL = INTEGER (Given and Returned)
 *        The integer value to use to represent the first region in the
 *        ARD description.  It should be no less than 2.  It is returned
@@ -80,6 +83,8 @@
 *     1995 March 28 (MJC):
 *        Minor stylistic and typographical changes, shortened long
 *        lines, and used a modern-style variable declaration.
+*     13-MAY-2002 (DSB):
+*        Add the WMEAN argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -105,6 +110,7 @@
       INTEGER IGRP 
       INTEGER REGIND( * )
       INTEGER NBIN
+      LOGICAL WMEAN
 
 *  Arguments Given and Returned:
       INTEGER REGVAL
@@ -131,7 +137,7 @@
       INTEGER UBND( 2 )             ! High bounds of whole image
       INTEGER UBNDE( 2 )            ! High bounds of exterior region
       INTEGER UBNDI( 2 )            ! High bounds of interior region
-
+      REAL W                        ! The weight for this data value
 *.
 
 *  Check the inherited global status.
@@ -159,59 +165,125 @@
 *  First deal with the cases where input variances are available.
       IF ( VAR ) THEN
 
-*  Initialise the bins
-         DO IBIN = 1, NBIN
-            DATOUT( IBIN ) = 0.0
-            VAROUT( IBIN ) = 0.0
-            NSUM( IBIN ) = 0
-         END DO
+*  First do weighted mean...
+         IF( WMEAN ) THEN
+
+*  Initialise the bins. DATOUT initially holds the sum of the weighted
+*  data values, and VAROUT holds the sum of the weights.
+            DO IBIN = 1, NBIN
+               DATOUT( IBIN ) = 0.0
+               VAROUT( IBIN ) = 0.0
+            END DO
 
 *  Loop round every pixel in the region of the mask containing the
 *  selected pixels.
-         DO J = MAX( JLO, LBNDI( 2 ) ), MIN( JHI, UBNDI( 2 ) )
-            DO I = MAX( ILO, LBNDI( 1 ) ), MIN( IHI, UBNDI( 1 ) )
+            DO J = MAX( JLO, LBNDI( 2 ) ), MIN( JHI, UBNDI( 2 ) )
+               DO I = MAX( ILO, LBNDI( 1 ) ), MIN( IHI, UBNDI( 1 ) )
 
 *  Ignore pixels which are not in any of the required bins.
-               IF ( MASK( I, J ) .GE. MASKLO ) THEN
+                  IF ( MASK( I, J ) .GE. MASKLO ) THEN
 
 *  Find the profile bin number into which this pixel falls.
-                  IBIN = REGIND( MASK( I, J ) )
+                     IBIN = REGIND( MASK( I, J ) )
+
+*  Increment the weighted bin value and the sum of weights if the data 
+*  and variance values are both good.
+                     IF ( DATIN( I, J ) .NE. VAL__BADR .AND.
+     :                    VARIN( I, J ) .NE. VAL__BADR .AND.
+     :                    VARIN( I, J ) .GT. 0.0 ) THEN
+
+                        W = 1.0/VARIN( I, J )
+ 
+                        DATOUT( IBIN ) = DATOUT( IBIN ) 
+     :                                   + W*DATIN( I, J )
+                        VAROUT( IBIN ) = VAROUT( IBIN ) + W
+                     END IF
+
+*  Replace the mask value with the bin index.
+                     MASK( I, J ) = IBIN
+
+*  Store zero in all non-used mask pixels.
+                  ELSE
+                     MASK( I, J ) = 0
+   
+                  END IF
+   
+               END DO
+            END DO
+
+*  Return weighted mean and variance values.  Set to bad values if there were
+*  no values in the bin.
+            DO IBIN = 1, NBIN
+               IF ( VAROUT( IBIN ) .GT. 0.0 ) THEN
+                  DATOUT( IBIN ) = DATOUT( IBIN ) / VAROUT( IBIN )
+                  VAROUT( IBIN ) = 1.0/VAROUT( IBIN )
+                  ALLBAD = .FALSE.
+               ELSE
+                  DATOUT( IBIN ) = VAL__BADR
+                  VAROUT( IBIN ) = VAL__BADR
+               END IF
+   
+            END DO
+
+* Now do simple means...
+         ELSE
+
+*  Initialise the bins
+            DO IBIN = 1, NBIN
+               DATOUT( IBIN ) = 0.0
+               VAROUT( IBIN ) = 0.0
+               NSUM( IBIN ) = 0
+            END DO
+
+*  Loop round every pixel in the region of the mask containing the
+*  selected pixels.
+            DO J = MAX( JLO, LBNDI( 2 ) ), MIN( JHI, UBNDI( 2 ) )
+               DO I = MAX( ILO, LBNDI( 1 ) ), MIN( IHI, UBNDI( 1 ) )
+
+*  Ignore pixels which are not in any of the required bins.
+                  IF ( MASK( I, J ) .GE. MASKLO ) THEN
+
+*  Find the profile bin number into which this pixel falls.
+                     IBIN = REGIND( MASK( I, J ) )
 
 *  Increment the bin values if the data and variance values are both
 *  good.
-                  IF ( DATIN( I, J ) .NE. VAL__BADR .AND.
-     :                 VARIN( I, J ) .NE. VAL__BADR ) THEN
-
-                     DATOUT( IBIN ) = DATOUT( IBIN ) + DATIN( I, J )
-                     VAROUT( IBIN ) = VAROUT( IBIN ) + VARIN( I, J )
-                     NSUM( IBIN ) = NSUM( IBIN ) + 1
-                  END IF
+                     IF ( DATIN( I, J ) .NE. VAL__BADR .AND.
+     :                    VARIN( I, J ) .NE. VAL__BADR ) THEN
+ 
+                        DATOUT( IBIN ) = DATOUT( IBIN ) + DATIN( I, J )
+                        VAROUT( IBIN ) = VAROUT( IBIN ) + VARIN( I, J )
+                        NSUM( IBIN ) = NSUM( IBIN ) + 1
+                     END IF
 
 *  Replace the mask value with the bin index.
-                  MASK( I, J ) = IBIN
+                     MASK( I, J ) = IBIN
 
 *  Store zero in all non-used mask pixels.
-               ELSE
-                  MASK( I, J ) = 0
-
-               END IF
-
+                  ELSE
+                     MASK( I, J ) = 0
+   
+                  END IF
+   
+               END DO
             END DO
-         END DO
 
 *  Return mean and variance values.  Set to bad values if there were
 *  no values in the bin.
-         DO IBIN = 1, NBIN
-            IF ( NSUM( IBIN ) .GT. 0 ) THEN
-               DATOUT( IBIN ) = DATOUT( IBIN ) / REAL( NSUM( IBIN ) )
-               VAROUT( IBIN ) = VAROUT( IBIN ) / REAL( NSUM( IBIN )**2 )
-               ALLBAD = .FALSE.
-            ELSE
-               DATOUT( IBIN ) = VAL__BADR
-               VAROUT( IBIN ) = VAL__BADR
-            END IF
+            DO IBIN = 1, NBIN
+               IF ( NSUM( IBIN ) .GT. 0 ) THEN
+                  DATOUT( IBIN ) = DATOUT( IBIN ) / REAL( NSUM( IBIN ) )
+                  VAROUT( IBIN ) = VAROUT( IBIN ) 
+     :                             / REAL( NSUM( IBIN )**2 )
+                  ALLBAD = .FALSE.
+               ELSE
+                  DATOUT( IBIN ) = VAL__BADR
+                  VAROUT( IBIN ) = VAL__BADR
+               END IF
+   
+            END DO
 
-         END DO
+         END IF
 
 *  Now deal with cases where input variances are not available.
       ELSE
