@@ -2,7 +2,7 @@ INTERFACE SLICE
 
    PARAMETER INP
       POSITION 1
-      TYPE     'UNIV'
+      TYPE     'LITERAL'
       PPATH    'GLOBAL'
       ASSOCIATION '<->GLOBAL.BINDS'
       PROMPT   'Input data object'
