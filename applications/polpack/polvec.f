@@ -168,6 +168,8 @@
 *        Original version.
 *     24-JUN-1998 (DSB):
 *        Added parameter Q, U and V.
+*     30-JUN-1998 (DSB):
+*        Set TR array if no bining is used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -350,6 +352,10 @@
          WKBNSZ = 0
          IPDBIN = IPDIN
          IPVBIN = IPVIN
+         TR( 1 ) = 0.0D0
+         TR( 2 ) = 1.0D0
+         TR( 3 ) = 0.0D0
+         TR( 4 ) = 1.0D0
 
 *  If we are binning, allocate memory to hold the binned Stokes parameters, 
 *  and their variances.
