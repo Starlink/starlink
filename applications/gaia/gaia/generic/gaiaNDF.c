@@ -323,13 +323,7 @@ int gaiaFreeNDF( int ndfid )
    }
 
    /* Free the NDF */
-   printf( "Before annul\n");
-   hdsShow( "LOCATORS", &status );
-   hdsShow( "FILES", &status );
    ndfAnnul( &ndfid, &status );
-   printf( "After annul\n");
-   hdsShow( "LOCATORS", &status );
-   hdsShow( "FILES", &status );
    if ( status != SAI__OK ) {
       emsAnnul( &status );
    }
@@ -704,9 +698,6 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
          emsAnnul( &status );
          datClone( tmploc, baseloc, &status );
       }
-      printf( "1\n" );
-      hdsShow( "LOCATORS", &status );
-      hdsShow( "FILES", &status );
    } else {
 
       /*  May just be a HDS container name with NDFs at this level. Need
@@ -756,9 +747,6 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
        *  No slice for plain top-level.
        */
       slice[0] = '\0';
-      printf( "2\n" );
-      hdsShow( "LOCATORS", &status );
-      hdsShow( "FILES", &status );
    }
    if ( status == SAI__OK ) {
 
@@ -791,9 +779,6 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
 
          /*  Attempt to open NDF to see if it exists (could check for
              DATA_ARRAY component) */
-         printf( "2.5\n" );
-         hdsShow( "LOCATORS", &status );
-         hdsShow( "FILES", &status );
          if ( gaiaAccessNDF( ndffile, &type, &width, &height, &header, &hlen,
                              &ndfid, &emess ) ) {
              
@@ -821,21 +806,12 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
                            hlen, &status );
              }
          }
-         printf( "3\n" );
-         hdsShow( "LOCATORS", &status );
-         hdsShow( "FILES", &status );
          datAnnul( newloc, &status );
-         printf( "4\n" );
-         hdsShow( "LOCATORS", &status );
-         hdsShow( "FILES", &status );
       }
 
       /*  Release locators */
       datAnnul( baseloc, &status );
       datAnnul( tmploc, &status );
-      printf( "5\n" );
-      hdsShow( "LOCATORS", &status );
-      hdsShow( "FILES", &status );
    } else {
 
       /*  Initialisation failed (no such NDF, or container file/path

@@ -118,7 +118,7 @@
             IAT = NCHAR + 4 + ( IEND - IAT + 1 )
             CALL FIO_WRITE( IFOUT, LINE( :IAT ), STATUS )
 
-*  Increment position withing COLS string for next word.
+*  Increment position within COLS string for next word.
             IAT = IEND + 1
          ELSE
 

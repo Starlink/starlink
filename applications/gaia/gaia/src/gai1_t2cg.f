@@ -165,10 +165,12 @@
 *  contain sky coordinates.
                      IF ( NAME .EQ. 'ra_col' .OR.
      :                    NAME .EQ. 'RA_COL' ) THEN
-                        RACOL = I
+                        CALL CHR_CTOI( VALUE, RACOL, STATUS )
+                        RACOL = RACOL + 1
                      ELSE IF ( NAME .EQ. 'dec_col' .OR.
      :                         NAME .EQ. 'DEC_COL' ) THEN
-                        DECCOL = I
+                        CALL CHR_CTOI( VALUE, DECCOL, STATUS )
+                        DECCOL = DECCOL + 1
                      END IF
                   END IF
                ELSE

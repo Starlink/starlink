@@ -5219,7 +5219,6 @@ int StarRtdImage::astwarningsCmd( int argc, char *argv[] )
    return TCL_OK;
 }
 
-
 //+
 //   StarRtdImage::xyProfileCmd
 //
