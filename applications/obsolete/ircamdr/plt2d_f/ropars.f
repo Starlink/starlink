@@ -23,7 +23,8 @@
 *                  from new data format 
 *     25-Jul-94  Changed error reporting to ERR clls, removed VALUE (SKL@JACH)
 *     30-Dec=94  Added UTstart and UTend to fits items got (CAA@JACH)
-*     11-Apr-94  Changed to use Ab's new search routine (CAA@JACH)
+*     11-Apr-94  Changed to use AB's new search routine (CAA@JACH)
+*     14-Apr-95  Added MODE to fits items soughtand got (CAA@JACH)
 *
 * Type definitions :
 	IMPLICIT  NONE			! no default typing allowed
@@ -47,7 +48,7 @@
 !        PARAMETER ( MINEL = 57)
 
 * Local variables :
-        CHARACTER*(DAT__SZLOC) LOC_FITS ! HDS locator for FITS array
+!        CHARACTER*(DAT__SZLOC) LOC_FITS ! HDS locator for FITS array
 !	CHARACTER*80 ARRAY(NELEMENTS)   ! array of FITS info
  
 !        INTEGER NUMBER                  ! For DO loop    
@@ -198,6 +199,9 @@ D            WRITE (6,*) ( 'VALUE   ', PARVAL(NUMBER))
         CALL NDFX_GET_FITSR (LOC_IMAGE, 'RUTEND', REAL_PAR, STATUS)
 !        CALL CHR_CTOR( PARVAL(12), REAL_PAR, STATUS )
 	CALL PAR_PUT0R( 'UTEND', REAL_PAR, STATUS)
+
+        CALL NDFX_GET_FITSC (LOC_IMAGE, 'MODE', CHAR_PAR, STATUS)
+	CALL PAR_PUT0C( 'MODE', CHAR_PAR, STATUS)
 
 	IF( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP('ERR', 
