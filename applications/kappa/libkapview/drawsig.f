@@ -102,7 +102,8 @@
 *        reported). 
 *
 *        The attributes Colour(Curves), Width(Curves), etc, can be used
-*        to specify the style for the lines. These values apply to all
+*        to specify the style for the lines ("Lines" is recognised as a
+*        synonym for "Curves"). These values apply to all
 *        lines unless subsequent attributes over-ride them. Attributes for
 *        individual clipping levels can be given by replacing "Curves" above 
 *        by a string of the form "Nsig<i>" where "<i>" is an integer
@@ -419,6 +420,10 @@
 *  Ensure that any previous synonyms for AST attributes are cleared.
          CALL KPG1_ASPSY( ' ', ' ', STATUS )
 
+*  Use Lines and Line+ as synonyms for Curve.
+         CALL KPG1_ASPSY( '(LINES)', '(CURVE)', STATUS )
+         CALL KPG1_ASPSY( '(LINE+)', '(CURVE)', STATUS )
+
 *  Make the synonymns "(NSIG<i>)" and "(NSIG<i>+)" equate to "(Curve)"
          SYN = '(NSIG'
          IAT = 5
@@ -431,7 +436,6 @@
          CALL KPG1_ASPSY( SYN( : IAT ), '(CURVE)', STATUS )
          
 *  Set the plotting style for the upper (positive) line.
-         CALL KPG1_ASPSY( '(LINE+)', '(CURVE)', STATUS )
          CALL KPG1_ASSET( 'KAPPA_DRAWSIG', 'STYLE', IPLOT, STATUS )
 
 *  Draw the first line.
@@ -445,6 +449,10 @@
 *  Ensure that any previous synonyms for AST attributes are cleared.
             CALL KPG1_ASPSY( ' ', ' ', STATUS )
 
+*  Use Lines and Line- as synonyms for Curve.
+            CALL KPG1_ASPSY( '(LINES)', '(CURVE)', STATUS )
+            CALL KPG1_ASPSY( '(LINE-)', '(CURVE)', STATUS )
+
 *  Make the synonymns "(NSIG<i>)" and "(NSIG<i>-)" equate to "(Curve)"
             SYN = '(NSIG'
             IAT = 5
@@ -457,7 +465,6 @@
             CALL KPG1_ASPSY( SYN( : IAT ), '(CURVE)', STATUS )
          
 *  Set the plotting style for the upper (positive) line.
-            CALL KPG1_ASPSY( '(LINE+)', '(CURVE)', STATUS )
             CALL KPG1_ASSET( 'KAPPA_DRAWSIG', 'STYLE', IPLOT, STATUS )
 
 *  Draw the line.

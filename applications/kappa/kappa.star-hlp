@@ -7189,19 +7189,21 @@ STYLE = GROUP (Read)
    attributes. Any unrecognised attributes are ignored (no error is
    reported).
 
-   The attributes Colour(Curves), Width(Curves), etc, can be used
-   to specify the style for the lines. These values apply to all
-   lines unless subsequent attributes over-ride them. Attributes for
-   individual clipping levels can be given by replacing "Curves" above
-   by a string of the form "Nsig<i>" where "<i>" is an integer
-   index into the list of clipping levels supplied for parameter
-   NSIGMA. Thus, "Colour(Nsig1)" will set the colour for the lines
-   associated with the first clipping level, etc. The attribute
-   settings can be restricted to one of the two lines by appending
-   either a "+" or a "-" to the "Nsig<i>" string. Thus,
-   "Width(Nsig2-)" sets the line width for the lower of the two
-   lines associated with the second clipping level, and "Width(Nsig2-)"
-   sets the width for the upper of the two lines. [current value]
+   The attributes Colour(Curves), Width(Curves), etc, can be used to
+   specify the style for the lines ("Lines" is recognised as a
+   synonymn for "Curves"). These values apply to all lines unless
+   subsequent attributes over-ride them. Attributes for individual
+   clipping levels can be given by replacing "Curves" above by a
+   string of the form "Nsig<i>" where "<i>" is an integer index into
+   the list of clipping levels supplied for parameter NSIGMA. Thus,
+   "Colour(Nsig1)" will set the colour for the lines associated with
+   the first clipping level, etc. The attribute settings can be
+   restricted to one of the two lines by appending either a "+" or a
+   "-" to the "Nsig<i>" string. Thus, "Width(Nsig2-)" sets the line
+   width for the lower of the two lines associated with the second
+   clipping level, and "Width(Nsig2-)" sets the width for the upper
+   of the two lines. [current value]
+
 2 Examples
 drawsig nsigma=3 style='style=1'
    This draws solid horizontal lines on the last DATA picture on

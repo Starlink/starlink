@@ -17659,7 +17659,7 @@ plot (101k).
 \sstroutine{
    DRAWSIG
 }{
-   Draws ${\pm}n$ standard-deviation lines on a line plot
+   Draws $+$/-n standard-deviation lines on a line plot
 }{
    \sstdescription{
       This routine draws straight lines on an existing plot stored in
@@ -17668,9 +17668,10 @@ plot (101k).
       deviation (NSIGMA) either side of the mean of a given dataset.
       The default dataset is the one used to draw the existing plot.
       You can plot the lines horizontally or vertically as appropriate.
-      The lines extend the full width or height of the plot's data
+      The lines extend the full width or height of the plot{\tt '}s data
       area.  Up to five different multiples of the standard deviation
-      may be presented in this fashion.
+      may be presented in this fashion. Each line can be drawn with a
+      different style (see parameter STYLE).
 
       The application also computes statistics for those array values
       that lie between each pair of plotted lines.  In other words it
@@ -17684,7 +17685,7 @@ plot (101k).
       written at the normal reporting level.
    }
    \sstusage{
-      drawsig ndf nsigma [axis] [comp] [sigcol] [linestyle]
+      drawsig ndf nsigma [axis] [comp]
    }
    \sstparameters{
       \sstsubsection{
@@ -17692,45 +17693,28 @@ plot (101k).
       }{
          The orientation of the lines, or put another way, the axis
          which represents data value.  Thus the allowed values are
-         {\tt "Horizontal"}, {\tt "Vertical"}, {\tt "X"}, or {\tt "Y"}.
-         {\tt "Horizontal"} is equivalent to {\tt "Y"} and
-         {\tt "Vertical"} is a synonym for {\tt "X"}.  On
-         LINPLOT output AXIS would be {\tt "Y"}, but on a plot from HISTOGRAM
-         it would be {\tt "X"}.  The suggested default is the current value.
+         {\tt "}Horizontal{\tt "}, {\tt "}Vertical{\tt "}, {\tt "}X{\tt "}, or {\tt "}Y{\tt "}.  {\tt "}Horizontal{\tt "} is
+         equivalent to {\tt "}Y{\tt "} and {\tt "}Vertical{\tt "} is a synonym for {\tt "}X{\tt "}.  On
+         LINPLOT output AXIS would be {\tt "}Y{\tt "}, but on a plot from HISTOGRAM
+         it would be {\tt "}X{\tt "}.  The suggested default is the current value.
          {\tt ["Y"]}
       }
       \sstsubsection{
          COMP = LITERAL (Read)
       }{
          The name of the NDF array component from which to derive the
-         mean and standard deviation used to draw the lines: {\tt "Data"},
-         {\tt "Error"}, {\tt "Quality"} or {\tt "Variance"} (where
-         {\tt "Error"} is the
-         alternative to {\tt "Variance"} and causes the square root of the
+         mean and standard deviation used to draw the lines: {\tt "}Data{\tt "},
+         {\tt "}Error{\tt "}, {\tt "}Quality{\tt "} or {\tt "}Variance{\tt "} (where {\tt "}Error{\tt "} is the
+         alternative to {\tt "}Variance{\tt "} and causes the square root of the
          variance values to be taken before computing the statistics).
-         If {\tt "Quality"} is specified, then the quality values are treated
+         If {\tt "}Quality{\tt "} is specified, then the quality values are treated
          as numerical values (in the range 0 to 255).  {\tt ["Data"]}
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
          The graphics device to draw the sigma lines on.
-         {\tt [}Current graphics device{\tt ]}
-      }
-      \sstsubsection{
-         LINESTYLE = \_INTEGER (Read)
-      }{
-         Line style to be used.  The allowed values produce the
-         following styles.
-         \begin{description}
-         \item {\tt 1} = solid
-         \item {\tt 2} = dashed
-         \item {\tt 3} = dotted
-         \item {\tt 4} = dot-dashed
-         \end{description}
-  
-         LINESTYLE defaults to the current value, which is initially
-         {\tt 3}, giving dotted lines. {\tt []}
+         {\tt [Current graphics device]}
       }
       \sstsubsection{
          NDF = NDF (Read)
@@ -17741,49 +17725,60 @@ plot (101k).
          used to draw the plot.  If, however, you had plotted a section
          of a dataset but wanted to plot the statistics from the whole
          dataset, you would specify the full dataset with parameter NDF.
-         {\tt [}The dataset used to create the existing plot.{\tt ]}
+         {\tt [The dataset used to create the existing plot.]}
       }
       \sstsubsection{
          NSIGMA() = \_REAL (Read)
       }{
          Number of standard deviations about the mean at which the
-         lines should be drawn.  The null value or {\tt 0.0} causes a line to
+         lines should be drawn.  The null value or 0.0 causes a line to
          be drawn at the mean value.
       }
       \sstsubsection{
-         SIGCOL = \_INTEGER (Read)
+         STYLE = GROUP (Read)
       }{
-         The colour in which to draw any graphics specified by
-         parameter LINESTYLE.  The options are described below.
+         A group of attribute settings describing the plotting style to use
+         for the lines.
 
-         \begin{description}
-         \item [{\tt "MAX"}] --- The maximum colour index used for the
-                            display of the image.
-         \item [{\tt "MIN"}] --- The minimum colour index used for the
-                            display of the image.
-         \item [An integer]  --- The actual colour index.  It is constrained
-                            between 0 and the maximum colour index
-                            available on the device.
-         \item [A named colour] --- Uses the named colour from the palette, and
-                            if it is not present, the nearest colour
-                            from the palette is selected.
-         \end{description}
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
 
-         If the colour is to remain unaltered as the lookup table is
-         manipulated choose an integer between 0 and 15, or a named
-         colour.  The suggested default is the current value.
-      }
-      \sstsubsection{
-         THICK = \_REAL (Read)
-      }{
-         The thickness of the lines in the plot, where 1.0 is the
-         normal thickness.  It must take a value in the range
-         0.5--10.0.  {\tt [1.0]}
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
+         the value to assign to the attribute. Default values will be
+         used for any unspecified attributes. All attributes will be
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
+         attributes. Any unrecognised attributes are ignored (no error is
+         reported).
+
+         The attributes Colour(Curves), Width(Curves), \emph{etc}, can be used
+         to specify the style for the lines (``Lines'' is recognised as a
+         synonym for ``Curves''). These values apply to all
+         lines unless subsequent attributes over-ride them. Attributes for
+         individual clipping levels can be given by replacing {\tt "}Curves{\tt "} above
+         by a string of the form {\tt "}Nsig$<$i$>${\tt "} where {\tt "}$<$i$>${\tt "} is an integer
+         index into the list of clipping levels supplied for parameter
+         NSIGMA. Thus, {\tt "}Colour(Nsig1){\tt "} will set the colour for the lines
+         associated with the first clipping level, \emph{etc}. The attribute
+         settings can be restricted to one of the two lines by appending
+         either a {\tt "}$+${\tt "} or a {\tt "}-{\tt "} to the {\tt "}Nsig$<$i$>${\tt "} string. Thus,
+         {\tt "}Width(Nsig2-){\tt "} sets the line width for the lower of the two
+         lines associated with the second clipping level, and {\tt "}Width(Nsig2+){\tt "}
+         sets the width for the upper of the two lines. {\tt [current value]}
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         drawsig nsigma=3 linestyle=1
+         drawsig nsigma=3 style={\tt '}style=1{\tt '}
       }{
          This draws solid horizontal lines on the last DATA picture on
          the current graphics device located at plus and minus 3
@@ -17798,6 +17793,12 @@ plot (101k).
          the default graphics device.
       }
       \sstexamplesubsection{
+         drawsig phot 2.5 style={\tt '}{\tt "}colour(nsig1-)=red,colour(nsig1$+$)=green{\tt "}{\tt '}
+      }{
+         As above, but the lower line is drawn in red and the upper line
+         is drawn in green.
+      }
+      \sstexamplesubsection{
          drawsig cluster [2,3] X Error
       }{
          This draws vertical lines at plus and minus 2 and 3
@@ -17805,10 +17806,10 @@ plot (101k).
          NDF called cluster on the default graphics device.
       }
       \sstexamplesubsection{
-         drawsig device=xwindows phot(20:119) 3 linestyle=3 sigcol=red
+         drawsig device=xwindows phot(20:119) 3 style={\tt "}{\tt '}colour=red,style=4{\tt '}{\tt "}
       }{
          This draws red dotted horizontal lines on the xwindows device
-         at $\pm$ 3 standard deviations using the 100 pixels in NDF
+         at $+$/- 3 standard deviations using the 100 pixels in NDF
          phot(20:119).
       }
    }
@@ -43945,6 +43946,29 @@ The following applications have been modified:
          New parameters KEY, KEYPOS and KEYSTYLE have been added, allowing
          DISPLAY to create a key containing a colour ramp in the same style 
          as LUTVIEW.
+
+      \item [\htmlref{DRAWSIG}{DRAWSIG}] \mbox{}
+         \begin{itemize}
+            \item There is now much greater control over the appearance
+                  of the lines drawn. Each line may be drawn with a
+                  different appearance. This is provided through the 
+                  STYLE parameter which allow plotting attributes to
+                  be set for each line drawn.
+
+            \item The following parameters have been removed (alternatives to 
+                  using these old parameters are indicated): 
+
+               \begin{description}
+                  \item[LINESTYLE] -- Use the STYLE parameter to specify a
+                                   value for the plotting attribute {\tt 
+                                   Style(Lines)}.
+                  \item[SIGCOL] -- Use the {\tt Colour(Lines)} plotting attributes.
+                  \item[THICK]  -- Use the {\tt Width(Lines)} plotting attributes.
+               \end{description}
+
+            \item The following new parameters have been added: STYLE.
+         
+         \end{itemize}
 
       \item [\htmlref{EXP10}{EXP10}] \mbox{}
          This command is now a synonym for {\tt expon base=10D0}.
