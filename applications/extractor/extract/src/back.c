@@ -9,7 +9,7 @@
 *
 *	Contents:	functions dealing with background computation.
 *
-*	Last modify:	03/02/2000
+*	Last modify:	07/02/2001
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -200,13 +200,19 @@ void	makeback(picstruct *field, picstruct *wfield)
       QFSEEK(field->file, fcurpos2, SEEK_SET, field->filename);
       bm = backmesh;
       for (m=nx; m--; bm++)
-        QCALLOC(bm->histo, LONG, bm->nlevels);
+        if (bm->mean <= -BIG)
+          bm->histo=NULL;
+        else
+          QCALLOC(bm->histo, LONG, bm->nlevels);
       if (wfield)
         {
         QFSEEK(wfield->file, wfcurpos2, SEEK_SET, wfield->filename);
         wbm = wbackmesh;
         for (m=nx; m--; wbm++)
-          QCALLOC(wbm->histo, LONG, wbm->nlevels);
+          if (wbm->mean <= -BIG)
+            wbm->histo=NULL;
+          else
+            QCALLOC(wbm->histo, LONG, wbm->nlevels);
         }
 /*---- Build (progressively this time) the histograms */
       for(size=meshsize, bufsize2=bufsize; size>0; size -= bufsize2)
@@ -239,7 +245,6 @@ void	makeback(picstruct *field, picstruct *wfield)
         {
         k = m+nx*j;
         backguess(wbm, wfield->back+k, wfield->sigma+k);
-        free(wbm->histo);
         }
       }
     }
@@ -266,7 +271,7 @@ void	makeback(picstruct *field, picstruct *wfield)
 
 /* Compute normalization for variance- or weight-maps*/
   if (wfield && wfield->flags&(VAR_FIELD|WEIGHT_FIELD))
-    {      
+    {
     nr = 0;
     QMALLOC(ratio, float, wfield->nback);
     ratiop = ratio;
@@ -287,8 +292,7 @@ void	makeback(picstruct *field, picstruct *wfield)
       {
       warning("Null or negative global weighting factor:","defaulted to 1");
       wfield->sigfac = 1.0;
-      } 
-
+      }
     free(ratio);
     }
 
@@ -358,13 +362,13 @@ Compute robust statistical estimators in a row of meshes.
 void	backstat(backstruct *backmesh, backstruct *wbackmesh,
                  PIXTYPE *buf, PIXTYPE *wbuf, size_t bufsize,
                  int n, int w, int bw, PIXTYPE wthresh)
-   
+
 {
    backstruct	*bm, *wbm;
    double	pix,wpix, sig, mean,wmean, sigma,wsigma, step;
    PIXTYPE	*buft,*wbuft, *bufpos, lcut,wlcut, hcut,whcut;
    int		m,h,x,y, npix,wnpix, offset, lastbite, ngood;
-   
+
    h = bufsize/w;
    bm = backmesh;
    wbm = wbackmesh;
@@ -385,7 +389,7 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
          wmean = wsigma = 0.0;
          ngood = 0;
          wbuft = wbuf;
-         for (y=h; y--; buft+=offset,wbuft+=offset) 
+         for (y=h; y--; buft+=offset,wbuft+=offset)
          {
             for (x=bw; x--;)
             {
@@ -401,7 +405,7 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
             }
          }
       }
-      else 
+      else
       {
          for (y=h; y--; buft+=offset)
          {
@@ -411,7 +415,7 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
                   mean += (pix = *(buft++));
                   sigma += pix*pix;
                }
-               else 
+               else
                {
                   buft++;
                }
@@ -433,24 +437,24 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
             }
             continue;
          }
-         else 
+         else
          {
             npix = ngood;
          }
 
          wmean /= (double)npix;
          wsigma = (sig = wsigma/npix - wmean*wmean)>0.0? sqrt(sig):0.0;
-         wlcut = wbm->lcut = (PIXTYPE)(mean - 2.0*sigma);
-         whcut = wbm->hcut = (PIXTYPE)(mean + 2.0*sigma);
+         wlcut = wbm->lcut = (PIXTYPE)(wmean - 2.0*sigma);
+         whcut = wbm->hcut = (PIXTYPE)(wmean + 2.0*sigma);
       }
-      
+
       if ( mean != 0.0 && sigma != 0.0 ) {
          mean /= (double)npix;
          sigma = (sig = sigma/npix - mean*mean)>0.0? sqrt(sig):0.0;
          lcut = bm->lcut = (PIXTYPE)(mean - 2.0*sigma);
          hcut = bm->hcut = (PIXTYPE)(mean + 2.0*sigma);
-      } 
-      else 
+      }
+      else
       {
          lcut = BIG;
          hcut = -BIG;
@@ -493,7 +497,7 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
                   npix++;
                }
             }
-      
+
       if ( mean != 0.0 && sigma != 0.0 ) {
          bm->npix = npix;
          mean /= (double)npix;
@@ -505,7 +509,7 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
             bm->nlevels = QUANTIF_NMAXLEVELS;
          bm->qscale = sigma>0.0? 2*QUANTIF_NSIGMA*sigma/bm->nlevels : 1.0;
          bm->qzero = mean - QUANTIF_NSIGMA*sigma;
-      } 
+      }
       else {
          bm->npix = 0;
          bm->mean = -BIG;
@@ -530,7 +534,7 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
          wbuf += bw;
       }
    }
-   
+
    return;
 }
 
@@ -586,7 +590,7 @@ void	backhisto(backstruct *backmesh, backstruct *wbackmesh,
         for (x=bw; x--;)
           {
           bin = (int)(*(buft++)/qscale + cste);
-          if (wpix = *(wbuft++)<wthresh && bin<nlevels && bin>=0)
+          if ((wpix = *(wbuft++))<wthresh && bin<nlevels && bin>=0)
             {
             (*(histo+bin))++;
             bin = (int)(wpix/wqscale + wcste);
@@ -606,7 +610,7 @@ void	backhisto(backstruct *backmesh, backstruct *wbackmesh,
                 if (bin>=0 && bin<nlevels)
                    (*(histo+bin))++;
              }
-             else 
+             else
              {
                 buft++;
              }
@@ -665,7 +669,6 @@ float	backguess(backstruct *bkg, float *mean, float *sigma)
 	((hihigh-histo)+0.5+((double)highsum-lowsum)/(2.0*(*hilow>*hihigh?
                                                 *hilow:*hihigh)))
        : 0.0;
-
     if (sum)
       {
       mea /= (double)sum;
@@ -676,7 +679,6 @@ float	backguess(backstruct *bkg, float *mean, float *sigma)
     hcut = (ftemp=med+3.0*sig)<nlevelsm1 ?(int)(ftemp>0.0?ftemp+0.5:ftemp-0.5)
 								: nlevelsm1;
     }
-
   *mean = fabs(sig)>0.0? (fabs(bkg->sigma/(sig*bkg->qscale)-1) < 0.0 ?
 			    bkg->qzero+mea*bkg->qscale
 			    :(fabs((mea-med)/sig)< 0.3 ?
@@ -1167,8 +1169,8 @@ PROTO   void backrmsline(picstruct *field, int y, PIXTYPE *line)
 PURPOSE Bicubic-spline interpolation of the background noise along the current
         scanline (y).
 INPUT   Measurement or detection field pointer,
-        Current line position. 
-        Where to put the data. 
+        Current line position.
+        Where to put the data.
 OUTPUT  -.
 NOTES   Most of the code is a copy of subbackline(), for optimization reasons.
 AUTHOR  E. Bertin (IAP & Leiden & ESO)

@@ -9,6 +9,7 @@
 *
 *	Contents:	Keywords for the configuration file.
 *
+*	Last modify:	14/10/2000 (EB):
 *	Last modify:	12/11/99 (EB):
 *                       27/11/98 (PWD):
 *                          Removed ".fits" as default output file
@@ -44,7 +45,7 @@ pkeystruct key[] =
    "MIN", "MAX", ""}},
   {"ASSOCSELEC_TYPE", P_KEY, &prefs.assocselec_type, 0,0, 0.0,0.0,
    {"ALL","MATCHED","-MATCHED",""}},
-  {"BACK_FILTERSIZE", P_INTLIST, prefs.backfsize, 1,7, 0.0,0.0,
+  {"BACK_FILTERSIZE", P_INTLIST, prefs.backfsize, 1,11, 0.0,0.0,
     {""}, 1,2, &prefs.nbackfsize},
   {"BACK_FILTTHRESH", P_FLOAT, &prefs.backfthresh, 0,0, 0.0,BIG},
   {"BACKPHOTO_THICK", P_INT, &prefs.pback_size, 1, 256},

@@ -9,7 +9,7 @@
 *
 *	Contents:	global definitions.
 *
-*	Last modify:	11/02/2000
+*	Last modify:	08/02/2001
 *                       (EB):
 *                       14/07/98 (AJC)
 *                          QFTELL, QFSEEK work with mapped NDF
@@ -29,7 +29,7 @@
 /*------------------------ what, who, when and where ------------------------*/
 
 #define		BANNER		"SExtractor"
-#define		VERSION		"2.1.6 (Feb 11, 2000)"
+#define		VERSION		"2.2.1 (Feb  8, 2001)"
 #define		COPYRIGHT	"Emmanuel BERTIN (bertin@iap.fr)"
 #define		WEBSITE		"http://terapix.iap.fr/sextractor"
 #define	       	MAILINGLIST	"sextractor@iap.fr"

@@ -11,6 +11,7 @@
 *
 *	Contents:	Handling of field structures.
 *
+*	Last modify:	14/10/2000 (EB):
 *	Last modify:	12/08/99 (EB):
 *	Last modify:	02/02/98 (EB):
 *                       27/10/98 (AJC)
@@ -83,7 +84,7 @@ picstruct	*newfield(char *filename, int flags)
     field->pixscale=prefs.pixel_scale;
 
 /* Background */
-  if (flags & (DETECT_FIELD|MEASURE_FIELD|WEIGHT_FIELD|VAR_FIELD))
+  if (flags & (DETECT_FIELD|MEASURE_FIELD|WEIGHT_FIELD|VAR_FIELD|RMS_FIELD))
     {
     field->ngamma = prefs.mag_gamma/log(10.0);
 
