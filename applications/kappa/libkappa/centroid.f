@@ -261,6 +261,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -275,6 +276,8 @@
 *        Handles arbitrary user-defined sections.
 *     1992 November 30 (MJC):
 *        Does not use non-monotonic axis centres.
+*     5-JUN-1998 (DSB):
+*        Report an error if an even value is supplied for SEARCH.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -917,10 +920,21 @@
          END DO
       END IF
 
-*    Constrain the search area.
+*    Constrain the search area to be odd and no bigger than the image.
 
       DO  I = 1, NDIM
+
+         IF( MOD( SEARCH( I ), 2  ) .EQ. 0 .AND. 
+     :      STATUS .EQ. SAI__OK ) THEN
+            CALL MSG_SETI( 'S', SEARCH( I ) )
+            CALL ERR_REP( 'CENTROID_EVN', 'CENTROID: Even value ^S '//
+     :                    'supplied for parameter %SEARCH - must '//
+     :                    'be odd.', STATUS )
+            GO TO 960
+         END IF
+
          SEARCH( I ) = MIN( DIMS( I ), SEARCH( I ) )
+
       END DO
 
       CALL PAR_GDR0I( 'MAXITER', 3, 1, 9, .TRUE., MXITER, STATUS )

@@ -70,7 +70,7 @@
 *        The global status.
 
 *  Notes:
-*     -  If a new NDF is created, the AXIS, QUALITY and UNITS components
+*     -  If a new NDF is created, the WCS, AXIS, QUALITY and UNITS components
 *     of the input NDF are propagated to it.
 *     -  See SUN/117 for details of the MEM3 parameters.
 
@@ -95,6 +95,8 @@
 *        Modified to allow use of external arrays.
 *     1995 April 7 (MJC):
 *        Minor stylistic changes.  Stripped trailing blanks.
+*     5-JUN-1998 (DSB):
+*        Added propagation of the WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -163,7 +165,7 @@
 
 *  Either create a new NDF or access an existing NDF for update.
       IF ( MODE .EQ. 'WRITE' ) THEN
-         CALL NDF_PROP( INDF, 'AXIS,QUALITY,UNITS', PARAM, ONDF,
+         CALL NDF_PROP( INDF, 'WCS,AXIS,QUALITY,UNITS', PARAM, ONDF,
      :                  STATUS )
 
       ELSE

@@ -16,6 +16,8 @@
 #     This procedure allows you to use your favourite editor to
 #     modify the FITS headers stored in an NDF's FITS extension.
 #     There is limited validation of the FITS headers after editing.
+#     A FITS extension is created if the NDF does not already have 
+#     one.
 #
 #  ADAM Parameters:
 #     NDF = NDF (Read)
@@ -37,6 +39,7 @@
 #
 #  Authors:
 #     Malcolm J. Currie (STARLINK)
+#     David S. Berry (DSB):
 #     {enter_new_authors_here}
 #
 #  History:
@@ -47,6 +50,9 @@
 #     1996 January 16 (MJC):
 #        Added suggested default and search path for foreign data
 #        formats.
+#     5-JUN-1998 (DSB):
+#        Added facility to create a new FITS extension if there is no 
+#        existing FITS extension in the NDF.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -196,9 +202,32 @@ else
    set fitseditor = vi
 endif
 #
-#   List the FITS extension into a temporary file.
+#   See if the NDF has a FITS extension.
 #
-fitslist $ndf logfile=zzfitsedit.tmp
+ndftrace $ndf quiet
+set gotext = 0
+if ( `parget nextn ndftrace` > 0 ) then
+   foreach ext (`parget extname ndftrace`)
+      if ( $ext == "FITS" ) set gotext = 1
+   end
+endif
+#
+#   If the NDF has a FITS extension, list it into a temporary file.
+#   Otherwise warn the user (pausing to give some time to read the
+#   message before the screen is cleared by the editor) and create a 
+#   temporary file containing a vestigial header.
+#
+if ( $gotext == 1 ) then
+   fitslist $ndf logfile=zzfitsedit.tmp
+else
+   echo "fitsedit: \'$ndf\' has no FITS extension. A new FITS extension"
+   echo "will be created."   
+   sleep 5
+   echo "COMMENT   This FITS header was created by KAPPA:FITSEDIT" > zzfitsedit.tmp
+   echo "COMMENT   (delete these comments if required.)" >> zzfitsedit.tmp
+   echo "COMMENT " >> zzfitsedit.tmp
+   echo "SIMPLE  =                    T / File conforms to FITS standard" >> zzfitsedit.tmp
+endif
 #
 #   Call the selected editor to modify the listing.
 #

@@ -59,11 +59,15 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 November 13 (MJC):
 *        Original version.
+*     5-JUN-1998 (DSB):
+*        Move statement which initialises NCHAR outside the IF block
+*        so that it is executed even if COMCRD is .TRUE.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -185,13 +189,12 @@
       CALL CHR_APPND( KEYWRD, HEADER, CARDLN )
 
 *  Make a copy of the supplied value so that any quotes present can be
-*  doubled.
+*  doubled. Find the length of the value.  
       VAL = VALUE
+      NCHAR = CHR_LEN( VAL )
       IF ( .NOT. COMCRD .AND. VAL .NE. ' ' ) THEN
 
-*  Find the length of the value.  Initialise some column-position
-*  counters.
-         NCHAR = CHR_LEN( VAL )
+*  Initialise some column-position counters.
          STAPOS = 1
          ENDPOS = 1
          CARDLN = 0

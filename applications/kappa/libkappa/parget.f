@@ -71,11 +71,16 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1995 August 15 (MJC):
 *        Original version.
+*     5-JUN-1998 (DSB):
+*        Use DAT_SHAPE to determine if the parameter is a scalar instead
+*        of DAT_SIZE. DAT_SIZE does not distinguish between a scalar and 
+*        an array with only one element.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -110,6 +115,7 @@
       CHARACTER * ( DAT__SZNAM ) APPLIC ! Name of application
       CHARACTER * ( BUFLEN ) BUFFER ! Buffer to hold output
       CHARACTER * ( BUFLEN ) CVALUE ! A value (stored as a string)
+      INTEGER DIM( DAT__MXDIM )  ! Object dimensions
       INTEGER EL                 ! Number of elements returned
       INTEGER HEIGHT             ! Height of the screen in characters
       INTEGER I                  ! Loop counter
@@ -120,6 +126,7 @@
       INTEGER NC                 ! Number of characters in the buffer
       INTEGER NCV                ! Number of characters in the value
                                  ! string
+      INTEGER NDIM               ! No. of dimensions
       CHARACTER * ( DAT__SZNAM ) PARNAM ! Name of parameter
       CHARACTER * ( 132 ) PATH   ! Path to the object
       LOGICAL PRIM               ! Object is primitive?
@@ -219,11 +226,11 @@
          END IF
 
 *  Find the number of elements associated with the object.
-         CALL DAT_SIZE( LOCO, SIZE, STATUS )
+         CALL DAT_SHAPE( LOCO, DAT__MXDIM, DIM, NDIM, STATUS ) 
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Obtain and report a scalar value.
-         IF ( SIZE .EQ. 1 ) THEN
+         IF ( NDIM .EQ. 0 ) THEN
             CALL DAT_GET0C( LOCO, CVALUE, STATUS )
             CALL MSG_OUT( 'VALUE', CVALUE, STATUS )
 
@@ -250,6 +257,7 @@
             NC = 0
 
 *  Loop for each object.
+            CALL DAT_SIZE( LOCV, SIZE, STATUS )
             DO I = 1, SIZE
 
 *  The following is not efficient, but saves coding time.
