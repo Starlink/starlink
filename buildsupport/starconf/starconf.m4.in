@@ -491,8 +491,10 @@ void func_two_() { return; }
     then
         AC_MSG_ERROR([cannot work out how])
     else
-        AM_FCFLAGS="$AM_FCFLAGS $star_cv_cnf_compatible_symbols"
-        AM_FFLAGS="$AM_FFLAGS $star_cv_cnf_compatible_symbols"
+        FCFLAGS="$FCFLAGS $star_cv_cnf_compatible_symbols"
+        FFLAGS="$FFLAGS $star_cv_cnf_compatible_symbols"
+##        AM_FCFLAGS="$AM_FCFLAGS $star_cv_cnf_compatible_symbols"
+##        AM_FFLAGS="$AM_FFLAGS $star_cv_cnf_compatible_symbols"
     fi
 ])# STAR_CNF_COMPATIBLE_SYMBOLS
 
