@@ -82,16 +82,15 @@
 #  Generate the ifl files, and the icl and csh start-up scripts. 
       ifd2star kappa
 
-#  Create the doc directory for inclusion in kappa_iraf.tar and move all the 
-#  iraf help files into it.
-      mkdir doc
-      foreach file (`grp iraf_docs`)
-         mv ${file} doc
-      end
+#  Generate the IRAF files.
+      ifd2iraf kappa
 
-#  Now that the iraf help file kappa.hlp has been moved, we can rename the 
-#  starlink help file kappa.star-hlp to its correct name (kappa.hlp).
+#  Generate the IRAF documentation.
       mv kappa.star-hlp kappa.hlp
+      ifd_irafhlpgen kappa
+
+#  Remove entries from kappa.men which do not relate to actions.
+      $KAPPA_DEV/bin/mencheck.tcl
 
 #  Create each of the tar files. First do the system-independant ones
 #  listed in group TAR_FILES_A...
