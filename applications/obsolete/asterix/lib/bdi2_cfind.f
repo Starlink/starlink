@@ -138,11 +138,8 @@
 
       INTEGER			DIMS(ADI__MXDIM)	! Dimensions
       INTEGER			NDIM			! Dimensionality
-      INTEGER			I
 
       LOGICAL			DIDCRE			! Did we create cache
-							! object?
-c     LOGICAL			ISBIND			! Binned dataset
       LOGICAL			THERE			! Object exists?
 *.
 
@@ -480,9 +477,7 @@ c     LOGICAL			ISBIND			! Binned dataset
 
 *    QUALITY extension (why doesn't EXTNAME work? RB)
         ELSE IF ( CREOBJ .EQ. 'QUALITY' ) THEN
-c         CALL ADI2_FPKYC( FITID, 'QUALITY', 'EXTNAME', 'QUALITY',
-c    :                     'Contains ASTERIX pixel quality', STATUS )
-          CALL ADI2_FPKYC( FITID, 'QUALITY', 'QUALITY', 'QUALITY',
+          CALL ADI2_FPKYC( FITID, 'QUALITY', 'EXTNAME', 'QUALITY',
      :                     'Contains ASTERIX pixel quality', STATUS )
 
 *    GROUPING extension
