@@ -267,7 +267,7 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*132 FILE
-      CHARACTER*80 REC
+      CHARACTER*16 REC
       REAL COLTAB(3,16)
       INTEGER IFD
       INTEGER I,N
