@@ -3525,7 +3525,15 @@ M Makefile.dependencies
             <dd>
               <p>Use the <code>stardocs</code>, <code>staretc</code>
                 and <code>starhelp</code> <code>DATA</code> prefixes.
-                See <ref id="automakeoverview"/>.</p>
+                The Starlink autoconf macros <ref id="macro-doc-files"
+                ><code>STAR_DOC_FILES</code></ref>, <ref
+                id="macro-etc-files"
+                ><code>STAR_ETC_FILES</code></ref> and <ref
+                id="macro-help-files"
+                ><code>STAR_HELP_FILES</code></ref> allow you to do
+                the same thing from within the
+                <code>configure.ac</code> file.  See <ref
+                id="automakeoverview"/> for an example.</p>
             </dd>
 
             <dt>How do I control which compiler and compiler options I
@@ -4468,10 +4476,12 @@ file.f: file.$(FPP_SRC_EXT)
 
         <subsect id='macro-doc-files' export='export'>
           <subhead>
-            <title>STAR_DOC_FILES</title>
+            <title>STAR_DOC_FILES and the stardocs prefix</title>
           </subhead>
 
           <p><strong><code>STAR_DOC_FILES(docfiles)</code></strong></p>
+
+          <p><strong><code>stardocs_DATA</code></strong></p>
 
           <p>Declare a list of files to be installed into the
             Starlink documentation directory.  This can be used both
@@ -4485,10 +4495,12 @@ file.f: file.$(FPP_SRC_EXT)
 
         <subsect id='macro-etc-files' export='export'>
           <subhead>
-            <title>STAR_ETC_FILES</title>
+            <title>STAR_ETC_FILES and the staretc prefix</title>
           </subhead>
 
           <p><strong><code>STAR_ETC_FILES(etcfiles)</code></strong></p>
+
+          <p><strong><code>staretc_DATA</code></strong></p>
 
           <p>Declare a list of files to be installed into the
             Starlink <code>etc</code> directory.  This can be used
@@ -4514,10 +4526,12 @@ file.f: file.$(FPP_SRC_EXT)
 
         <subsect id='macro-help-files' export='export'>
           <subhead>
-            <title>STAR_HELP_FILES</title>
+            <title>STAR_HELP_FILES and the starhelp prefix</title>
           </subhead>
 
           <p><strong><code>STAR_HELP_FILES(helpfiles)</code></strong></p>
+
+          <p><strong><code>starhelp_DATA</code></strong></p>
 
           <p>Declare a list of files to be installed into the
             Starlink <code>help</code> directory.  This can be used
