@@ -93,8 +93,8 @@
       REAL    SUM                ! temporary sum of sinc interpolation
       REAL    XDELTA             ! distance of delta function from centre
                                  ! of convolution function in pixels
-*  Internal References:
-      REAL    SINC               ! SIN(PI*X)/(PI*X)
+*  External References:
+      REAL    SCULIB_SINC        ! SIN(PI*X)/(PI*X)
 
 *.
 
@@ -148,7 +148,7 @@
 *  add its contribution to this element of the convolution by sinc
 *  interpolation
 
-            SUM = SUM + HDELTA * SINC (DX - XDELTA)
+            SUM = SUM + HDELTA * SCULIB_SINC (DX - XDELTA)
 
          END DO
 

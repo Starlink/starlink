@@ -133,8 +133,8 @@
       INTEGER J                  ! counter
       REAL X                     ! temporary variable for element swapping
 
-*  Internal References:
-      REAL SINC                  ! SIN(PI*X)/(PI*X)
+*  External References:
+      REAL SCULIB_SINC           ! SIN(PI*X)/(PI*X)
 
 *.
 
@@ -182,7 +182,8 @@
 
             ALPHA = ALPHA * AUNBAL
             IF (J .EQ. NPIX/2+1) ALPHA = 1.0
-            SUM = SUM + SIGN(ALPHA,UNBAL) * SINC(DX-B1) * SIGN(1.0,B1)
+            SUM = SUM + SIGN(ALPHA,UNBAL) * SCULIB_SINC(DX-B1) * 
+     :           SIGN(1.0,B1)
             B1 = B1 + PIXBSEP
          END DO
 

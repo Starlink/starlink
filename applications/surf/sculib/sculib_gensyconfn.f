@@ -127,8 +127,8 @@
       INTEGER J                  ! counter
       INTEGER NSINC              ! number of negative delta functions
 
-*  Internal References:
-      REAL SINC                  ! SIN(PI*X)/(PI*X)
+*  External References:
+      REAL SCULIB_SINC           ! SIN(PI*X)/(PI*X)
 
 
 *.
@@ -170,7 +170,7 @@
 *  ...add its contribution to this element of the convolution function by
 *  sinc interpolation 
 
-            SUM = SUM + SINC(DX-B1)
+            SUM = SUM + SCULIB_SINC(DX-B1)
             B1 = B1 + PIXBSEP
          END DO
 
