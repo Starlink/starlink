@@ -76,6 +76,8 @@
 *        Added STAR returned arguement
 *     20-JAN-1999
 *        Added CODE to passed arguements
+*     07-SEP-2004
+*        Changed to use CNF pointers
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -90,6 +92,7 @@
       INCLUDE 'SAE_PAR' 
       INCLUDE 'DAT_PAR'
       INCLUDE 'DAT_ERR'
+      INCLUDE 'CNF_PAR'
 
 *  Arguments Given : 
 
@@ -184,8 +187,9 @@
 *   This is a temporary hack while I figure out  a linear version
 *   of the algorithim, should work fine, if somewhat more slowly
 
-      CALL DOSUM(IMAGE, NX, NY, %VAL(VVAR),%VAL(RVAR), %VAL(MASK),
-     :           %VAL(DATA), X, Y, SKY, SIGMA, VSKY, APAR, 
+      CALL DOSUM(IMAGE, NX, NY, %VAL(CNF_PVAL(VVAR)),
+     :           %VAL(CNF_PVAL(RVAR)), %VAL(CNF_PVAL(MASK)),
+     :           %VAL(CNF_PVAL(DATA)), X, Y, SKY, SIGMA, VSKY, APAR, 
      :           PADU, SATURE, CLIP, ERROR, BESTN, STAR, 
      :           MIN1, MAX1, MIN2, MAX2, CODE, STATUS)     
      

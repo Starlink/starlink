@@ -115,6 +115,8 @@
 *     6-DEC-1998 (AA)
 *        Added CLIP (clipping radius) parameter and associted changes
 *        Added SEE (approx seeing in pixels) parameter and associated changes
+*     07-SEP-2004 (PWD):
+*        Changed to use CNF pointers.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -130,6 +132,7 @@
       INCLUDE 'PRM_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'FIO_ERR'
+      INCLUDE 'CNF_PAR'
 
 *  Arguments Given :
       INTEGER NX
@@ -508,14 +511,15 @@
                   IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *   Clear the workspace array and pass it to the photometry routine
-                  CALL CLGRID( GSIZE, GSIZE, %VAL( IG ), 1, GSIZE,
-     :                         1, GSIZE )
+                  CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ), 1, 
+     :                         GSIZE, 1, GSIZE )
                   CALL AUTOM( NE, ELLIPS, A, A2, A3, E, THETA, NX, NY,
-     :                        ORIGIN, IMAGE, ISVAR, IMVAR, %VAL( IG ),
-     :                        GSIZE, MASK, USEMSK, L, R, YLIST, LYLIST,
-     :                        RYLIST, INSL, INSR, POLY, CENTRO, SEARCH,
-     :                        POSTVE, MXSHFT, MXITER, TOLER, PADU,
-     :                        MAGS, SKYMAG, SKYEST, SKY, SKYSIG, PHOTON,
+     :                        ORIGIN, IMAGE, ISVAR, IMVAR, 
+     :                        %VAL( CNF_PVAL( IG ) ), GSIZE, MASK, 
+     :                        USEMSK, L, R, YLIST, LYLIST, RYLIST, 
+     :                        INSL, INSR, POLY, CENTRO, SEARCH, POSTVE, 
+     :                        MXSHFT, MXITER, TOLER, PADU, MAGS, 
+     :                        SKYMAG, SKYEST, SKY, SKYSIG, PHOTON, 
      :                        BIASLE, SATURE, ETIME, FIN, FOUT, 
      :                        OPTIMA, CLIP, SEE, STATUS )
 
@@ -659,8 +663,8 @@
                   IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *   Clear the workspace array and pass it to the photometry routine
-                  CALL CLGRID( GSIZE, GSIZE, %VAL( IG ), 1, GSIZE,
-     :                         1, GSIZE )
+                  CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ), 
+     :                         1, GSIZE, 1, GSIZE )
                   CALL MEASUR ( BZONE, IZONE, CLEAR, PENO, PENS, PENP,
      :                          NE, ELLIPS, A, A2, A3, E, THETA, NX, 
      :                          NY, ORIGIN, IMAGE, ISVAR, IMVAR, GRID, 

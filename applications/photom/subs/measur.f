@@ -218,6 +218,8 @@
 *        Fixed bug that caused the PSF error code not to be returned correctly
 *     19-AUG-2002 (AA):
 *        Changes to support modifications to PSFCAL()
+*     07-SEP-2004 (PWD):
+*        Changed to use CNF pointers.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -229,9 +231,8 @@
 
 *  Global Constants :
       INCLUDE 'SAE_PAR'
-
       INCLUDE 'DAT_PAR'
-
+      INCLUDE 'CNF_PAR'
 
 *  Arguments Given :
       INTEGER BZONE
@@ -803,7 +804,8 @@
                   IF ( STATUS .NE. SAI__OK ) GOTO 99
                   CALL BACK ( SKYEST, NX, NY, IMAGE, IMVAR, USEVAR,
      :                        GRID, GS, MASK, USEMSK, NXL, NXH, NYL,
-     :                        NYH, %VAL( IV ), NV, LOCSKY, SIGMA, VSKY )
+     :                        NYH, %VAL( CNF_PVAL( IV ) ), NV, LOCSKY, 
+     :                        SIGMA, VSKY )
                   CALL DAT_UNMAP( VLOC, STATUS )
                   CALL DAT_ANNUL( VLOC, STATUS )
                ENDIF

@@ -45,6 +45,8 @@
 *  History :
 *     6-JAN-1998 (AA)
 *        Shifted SKY measurement to this subroutine from MEASUR.F
+*     07-SEP-2004 (PWD):
+*        Changed to use CNF pointers.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -57,6 +59,7 @@
 *  Global Constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'CNF_PAR'
             
 *  Arguments Given :
 
@@ -138,7 +141,8 @@
 *              WRITE(*,*) ' DEBUG --- --- calling RAGGED() asky > maxsky'
               CALL RAGGED( SKYEST, NX, NY, IMAGE, IMVAR, USEVAR, 
      :                     MASK, USEMSK, NXL, NXH, NYL, NYH, XCEN, 
-     :                     YCEN, A2, A3, E, THETA, %VAL( IV ), NV,
+     :                     YCEN, A2, A3, E, THETA, 
+     :                     %VAL( CNF_PVAL( IV ) ), NV,
      :                     LOCSKY, SIGMA, VSKY )
               CALL DAT_UNMAP( VLOC, STATUS )
               CALL DAT_ANNUL( VLOC, STATUS )

@@ -374,6 +374,8 @@
 *        Added CLIP and SEE parameters and associated changes
 *     10-DEC-1998 (AA)
 *        CLIP and SEE parameters changed to _REAL from _INT
+*     07-SEP-2004 (PWD):
+*        Change to use CNF pointers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -387,6 +389,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
+      INCLUDE 'CNF_PAR'
 
 *    Status :
       INTEGER STATUS
@@ -475,10 +478,12 @@
 
 *   Call the main routine
       IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL APTOP ( IDIMS( 1 ), IDIMS( 2 ), LBND, %VAL( IDATA ),
-     :                ISVAR, %VAL( IVAR ), USEMSK, %VAL( IMASK ),
-     :                ETIME, NE, ELLIPS, L, R, YLIST, LYLIST, RYLIST,
-     :                INSL, INSR, POLY, STATUS )
+         CALL APTOP ( IDIMS( 1 ), IDIMS( 2 ), LBND, 
+     :                %VAL( CNF_PVAL( IDATA ) ), ISVAR, 
+     :                %VAL( CNF_PVAL( IVAR ) ), USEMSK, 
+     :                %VAL( CNF_PVAL( IMASK ) ), ETIME, NE, ELLIPS, 
+     :                L, R, YLIST, LYLIST, RYLIST, INSL, INSR, POLY, 
+     :                STATUS )
       ENDIF
 
 *   Unmap the arrays and annul the locators

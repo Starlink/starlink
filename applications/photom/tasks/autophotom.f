@@ -389,6 +389,8 @@
 *        Removed CLIP and SEE parameters. These are defined by the PSF
 *        entry. Sorted out problems with PSF and Optimal records
 *        (these did not match documented values).
+*     07-SEP-2004 (PWD):
+*        Changed to use CNF pointers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -404,6 +406,7 @@
       INCLUDE 'PAR_ERR'         ! Parameter system constants
       INCLUDE 'PRM_PAR'         ! Primitive data constants
       INCLUDE 'GRP_PAR'         ! GRP parameters
+      INCLUDE 'CNF_PAR'         ! CNF functions
 
 *  Status:
       INTEGER STATUS            ! Global status
@@ -602,8 +605,8 @@
          TRCOEF( 1 ) = VAL__BADR
          REGVAL = 2
          CALL ARD_WORK( ARDGRP, NDIM, LBND, UBND, TRCOEF, .FALSE.,
-     :                  REGVAL, %VAL( IPMASK ), LBNDI, UBNDI,
-     :                  LBNDE,  UBNDE, STATUS )
+     :                  REGVAL, %VAL( CNF_PVAL( IPMASK ) ), 
+     :                  LBNDI, UBNDI, LBNDE,  UBNDE, STATUS )
       ENDIF
 
 *  See if annuli are defined in terms of absolute radii or relative
@@ -614,13 +617,13 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL PHO1_AUTO( MAGS, OBJIND, OBJINF, SKYIND, SKYINF,
      :                   PSFIND, PSFINF, IDIMS( 1 ), IDIMS( 2 ),
-     :                   LBND, %VAL( IPIN ), ISVAR, %VAL( IPVAR ),
-     :		         USEMSK, %VAL( IPMASK ), CENTRO, PADU, SKYMAG,
-     :		         SKYEST, SKY, SKYSIG, PHOTON, BIASLE, SATURE,
-     :		         SEARCH, POSTVE, MXSHFT, MXITER, TOLER, ETIME,
-     :		         FIXANN, NE, ELLIPS, L, R, YLIST, LYLIST,
-     :		         RYLIST, INSL, INSR, POLY, OPTIMA,
-     :		         STATUS )
+     :                   LBND, %VAL( CNF_PVAL( IPIN ) ), ISVAR, 
+     :                   %VAL( CNF_PVAL( IPVAR ) ), USEMSK, 
+     :                   %VAL( CNF_PVAL( IPMASK ) ), CENTRO, PADU, 
+     :                   SKYMAG, SKYEST, SKY, SKYSIG, PHOTON, BIASLE, 
+     :                   SATURE, SEARCH, POSTVE, MXSHFT, MXITER, TOLER,
+     :                   ETIME, FIXANN, NE, ELLIPS, L, R, YLIST, LYLIST,
+     :                   RYLIST, INSL, INSR, POLY, OPTIMA, STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Write the results to a new file.

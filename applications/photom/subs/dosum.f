@@ -14,10 +14,10 @@
 *     FORTRAN
 *
 *  Invocation :
-*      CALL DOSUM(IMAGE, NX, NY, %VAL(VVAR),%VAL(RVAR),%VAL(MASK), 
-*     :           %VAL(DATA), X, Y, SKY, SIGMA, VSKY, APAR, PADU, 
-*     :           SATURE, CLIP, ERROR, BESTN, STAR, MIN1, MAX1,MIN2,
-*     :           MAX2,STATUS)  
+*      CALL DOSUM(IMAGE, NX, NY, %VAL(CNF_PVAL(VVAR)), %VAL(CNF_PVAL(RVAR)),
+*     :           %VAL(CNF_PVAL(MASK)), %VAL(CNF_PVAL(DATA)), X, Y, SKY,
+*     :           SIGMA, VSKY, APAR, PADU, SATURE, CLIP, ERROR, BESTN, 
+*     :           STAR, MIN1, MAX1, MIN2, MAX2, STATUS)  
 *
 *  Description :
 *        This subroutine is not original to OPPHOT. To get round

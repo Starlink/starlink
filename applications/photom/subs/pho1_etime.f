@@ -57,6 +57,8 @@
 *  History:
 *     16-MAY-1998 (PWD):
 *        Original version.
+*     07-SEP-2004 (PWD):
+*        Changed to use CNF pointers
 *     {enter_changes_here}
 
 *  Bugs:
@@ -70,6 +72,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'DAT_PAR'         ! HDS constants
+      INCLUDE 'CNF_PAR'         ! CNF functions
 
 *  Arguments Given:
       CHARACTER * ( * ) EXSRC
@@ -148,8 +151,8 @@
 *  Attempt to find and decode the FITS header item. Note the trailing
 *  %VAL*( 80 ) is required when passing characters arrays via pointers
 *  on UNIX.
-            CALL PHO1_GKEY( NREC, %VAL( PNTR ), CETIME, EXISTS, 
-     :                      ETIME, STATUS, %VAL( 80 ) )
+            CALL PHO1_GKEY( NREC, %VAL( CNF_PVAL( PNTR ) ), CETIME, 
+     :                      EXISTS, ETIME, STATUS, %VAL( 80 ) )
             IF ( STATUS .EQ. SAI__OK .AND. .NOT. EXISTS ) THEN 
                ETIME = 1.0
                STATUS = SAI__ERROR

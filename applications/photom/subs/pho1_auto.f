@@ -150,6 +150,8 @@
 *        for PSF stars.
 *     19-AUG-2002 (AA):
 *        Changes to support modifications to PSFCAL()
+*     07-SEP-2004 (PWD):
+*        Changed to use CNF pointer.
 *     {enter_changes_here}
 
 *  Bugs :
@@ -163,6 +165,7 @@
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'PRM_PAR'         ! Primitive constants
       INCLUDE 'GRP_PAR'         ! GRP constants
+      INCLUDE 'CNF_PAR'         ! CNF functions
 
 *  Arguments Given:
       LOGICAL MAGS
@@ -393,8 +396,8 @@
                   CALL PHO1_RAGGED( SKYTYP, NX, NY, IMAGE, IMVAR, ISVAR,
      :                              MASK, USEMSK, NXL, NXH, NYL, NYH,
      :                              XPOS, YPOS, OUTER, INNER, ECCEN,
-     :                              ANGLE, %VAL( IV ), NV, LOCSKY,
-     :                              SIGMA, VSKY )
+     :                              ANGLE, %VAL( CNF_PVAL( IV ) ), NV, 
+     :                              LOCSKY, SIGMA, VSKY )
 
 *  If background estimation failed skip loop.
                   IF ( SIGMA .LT. 0.0 ) CODE ='?'
@@ -453,12 +456,12 @@
                      CALL PSX_CALLOC( GSIZE * GSIZE, '_REAL', IG,
      :                                STATUS)
                      IF ( STATUS .NE. SAI__OK ) GO TO 99
-                     CALL CLGRID( GSIZE, GSIZE, %VAL( IG ),
+                     CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ),
      :                            1, NXH - NXL + 1,1, NYH - NYL + 1 )
                      CALL BOXELL( NE, ELLIPS, NXL, NXH, NYL, NYH, NX,
-     :                            NY, 1.0, %VAL( IG ), GSIZE, SKYARE,
-     :                            CUTOFF, L, R, YLIST, LYLIST, RYLIST,
-     :                            INSL, INSR, POLY )
+     :                            NY, 1.0, %VAL( CNF_PVAL( IG ) ), 
+     :                            GSIZE, SKYARE, CUTOFF, L, R, YLIST, 
+     :                            LYLIST, RYLIST, INSL, INSR, POLY )
 
 *  Estimate the number of pixels that will be used in the sky annulus
 *  Add on a few for luck
@@ -470,10 +473,10 @@
                      CALL PSX_CALLOC( NV, '_REAL', IV, STATUS )
                      IF ( STATUS .NE. SAI__OK ) GO TO 99
                      CALL PHO1_BACK( SKYTYP, NX, NY, IMAGE, IMVAR,
-     :                               ISVAR, %VAL( IG ), GSIZE, MASK,
-     :                               USEMSK, NXL, NXH, NYL, NYH,
-     :                               %VAL( IV ), NV, LOCSKY, SIGMA,
-     :                               VSKY )
+     :                               ISVAR, %VAL( CNF_PVAL( IG ) ), 
+     :                               GSIZE, MASK, USEMSK, NXL, NXH, 
+     :                               NYL, NYH, %VAL( CNF_PVAL( IV ) ), 
+     :                               NV, LOCSKY, SIGMA, VSKY )
 
 *  If background estimation failed skip loop.
                      CALL PSX_FREE( IG, STATUS )
@@ -684,7 +687,8 @@
                     CALL PHO1_RAGGED( SKYTYP, NX, NY, IMAGE, IMVAR,
      :                                ISVAR, MASK, USEMSK, NXL, NXH,
      :                                NYL, NYH, XPOS, YPOS, OUTER,
-     :                                INNER, ECCEN, ANGLE, %VAL( IV ),
+     :                                INNER, ECCEN, ANGLE, 
+     :                                %VAL( CNF_PVAL( IV ) ),
      :                                NV, LOCSKY, SIGMA, VSKY )
 
 *  If background estimation failed skip loop.
@@ -745,12 +749,13 @@
                        CALL PSX_CALLOC( GSIZE * GSIZE, '_REAL', IG,
      :                                  STATUS)
                        IF ( STATUS .NE. SAI__OK ) GO TO 99
-                       CALL CLGRID( GSIZE, GSIZE, %VAL( IG ),
+                       CALL CLGRID( GSIZE, GSIZE, 
+     :                              %VAL( CNF_PVAL( IG ) ),
      :                              1, NXH - NXL + 1,1, NYH - NYL + 1 )
                        CALL BOXELL( NE, ELLIPS, NXL, NXH, NYL, NYH, NX,
-     :                              NY, 1.0, %VAL( IG ), GSIZE, SKYARE,
-     :                              CUTOFF, L, R, YLIST, LYLIST, RYLIST,
-     :                              INSL, INSR, POLY )
+     :                              NY, 1.0, %VAL( CNF_PVAL( IG ) ), 
+     :                              GSIZE, SKYARE, CUTOFF, L, R, YLIST, 
+     :                              LYLIST, RYLIST, INSL, INSR, POLY )
 
 *  Estimate the number of pixels that will be used in the sky annulus
 *  Add on a few for luck
@@ -762,10 +767,11 @@
                        CALL PSX_CALLOC( NV, '_REAL', IV, STATUS )
                        IF ( STATUS .NE. SAI__OK ) GO TO 99
                        CALL PHO1_BACK( SKYTYP, NX, NY, IMAGE, IMVAR,
-     :                                 ISVAR, %VAL( IG ), GSIZE, MASK,
-     :                                 USEMSK, NXL, NXH, NYL, NYH,
-     :                                 %VAL( IV ), NV, LOCSKY, SIGMA,
-     :                                 VSKY )
+     :                                 ISVAR, %VAL( CNF_PVAL( IG ) ), 
+     :                                 GSIZE, MASK, USEMSK, NXL, NXH, 
+     :                                 NYL, NYH, 
+     :                                 %VAL( CNF_PVAL( IV ) ), NV, 
+     :                                 LOCSKY, SIGMA, VSKY )
 
 *  If background estimation failed skip loop.
                      CALL PSX_FREE( IG, STATUS )
@@ -921,23 +927,24 @@
          GSIZE = INT( 2.0 * ( MAJOR + 2.0 ) ) + 2
          CALL PSX_CALLOC( GSIZE * GSIZE, '_REAL', IG, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 99
-         CALL CLGRID( GSIZE, GSIZE, %VAL( IG ), 1, NXH - NXL + 1,
-     :                1, NYH - NYL + 1 )
+         CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ), 1, 
+     :                NXH - NXL + 1, 1, NYH - NYL + 1 )
 
 *  Create an ellipse centered on the cursor
          CALL MAKELL ( XPOS, YPOS, MAJOR, ECCEN, ANGLE, NE, ELLIPS )
 
 *  Integrate over the aperture.
          CALL BOXELL ( NE, ELLIPS, NXL, NXH, NYL, NYH, NX, NY, 1.0,
-     :                 %VAL( IG ), GSIZE, AREA, CUTOFF, L, R, YLIST,
-     :                 LYLIST, RYLIST, INSL, INSR, POLY )
-         CALL INTELL ( NX, NY, IMAGE, %VAL( IG ), GSIZE, NXL, NXH,
-     :                 NYL, NYH, SATURE, CODE, STAR, AREA )
+     :                 %VAL( CNF_PVAL( IG ) ), GSIZE, AREA, CUTOFF, 
+     :                 L, R, YLIST, LYLIST, RYLIST, INSL, INSR, POLY )
+         CALL INTELL ( NX, NY, IMAGE, %VAL( CNF_PVAL( IG ) ), GSIZE, 
+     :                 NXL, NXH, NYL, NYH, SATURE, CODE, STAR, AREA )
 
 *  Integrate the ellipse over the variance array
          IF ( ISVAR ) THEN
-            CALL INTELL ( NX, NY, IMVAR, %VAL( IG ), GSIZE, NXL, NXH,
-     :                    NYL, NYH, SATURE, CODE, VSTAR, VAREA )
+            CALL INTELL ( NX, NY, IMVAR, %VAL( CNF_PVAL( IG ) ), GSIZE, 
+     :                    NXL, NXH, NYL, NYH, SATURE, CODE, VSTAR, 
+     :                    VAREA )
          ENDIF
 
 *  Annul the workspace
@@ -1007,8 +1014,8 @@
                   CALL PHO1_RAGGED( SKYTYP, NX, NY, IMAGE, IMVAR, ISVAR,
      :                              MASK, USEMSK, NXL, NXH, NYL, NYH,
      :                              XPOS, YPOS, OUTER, INNER, ECCEN,
-     :                              ANGLE, %VAL( IV ), NV, LOCSKY,
-     :                              SIGMA, VSKY )
+     :                              ANGLE, %VAL( CNF_PVAL( IV ) ), NV, 
+     :                              LOCSKY, SIGMA, VSKY )
 
 *  If background estimation failed skip loop.
                   IF ( SIGMA .LT. 0 ) GO TO 7
@@ -1067,12 +1074,12 @@
                      CALL PSX_CALLOC( GSIZE * GSIZE, '_REAL', IG,
      :                                STATUS)
                      IF ( STATUS .NE. SAI__OK ) GO TO 99
-                     CALL CLGRID( GSIZE, GSIZE, %VAL( IG ),
+                     CALL CLGRID( GSIZE, GSIZE, %VAL( CNF_PVAL( IG ) ),
      :                            1, NXH - NXL + 1,1, NYH - NYL + 1 )
                      CALL BOXELL( NE, ELLIPS, NXL, NXH, NYL, NYH, NX,
-     :                            NY, 1.0, %VAL( IG ), GSIZE, SKYARE,
-     :                            CUTOFF, L, R, YLIST, LYLIST, RYLIST,
-     :                            INSL, INSR, POLY )
+     :                            NY, 1.0, %VAL( CNF_PVAL( IG ) ), 
+     :                            GSIZE, SKYARE, CUTOFF, L, R, YLIST, 
+     :                            LYLIST, RYLIST, INSL, INSR, POLY )
 
 *  Estimate the number of pixels that will be used in the sky annulus
 *  Add on a few for luck
@@ -1084,10 +1091,10 @@
                      CALL PSX_CALLOC( NV, '_REAL', IV, STATUS )
                      IF ( STATUS .NE. SAI__OK ) GO TO 99
                      CALL PHO1_BACK( SKYTYP, NX, NY, IMAGE, IMVAR,
-     :                               ISVAR, %VAL( IG ), GSIZE, MASK,
-     :                               USEMSK, NXL, NXH, NYL, NYH,
-     :                               %VAL( IV ), NV, LOCSKY, SIGMA,
-     :                               VSKY )
+     :                               ISVAR, %VAL( CNF_PVAL( IG ) ), 
+     :                               GSIZE, MASK, USEMSK, NXL, NXH, 
+     :                               NYL, NYH, %VAL( CNF_PVAL( IV ) ), 
+     :                               NV, LOCSKY, SIGMA, VSKY )
 
 *  If background estimation failed skip loop.
                      CALL PSX_FREE( IG, STATUS )
