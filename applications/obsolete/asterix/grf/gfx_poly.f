@@ -24,6 +24,7 @@
 *    Local variables :
       REAL X1,X2,Y1,Y2
       REAL XW1,XW2,YW1,YW2
+      REAL XX,YY
       INTEGER I,N
       INTEGER STYLE,WIDTH,COLOUR
       LOGICAL OK
@@ -92,30 +93,38 @@
         ELSEIF (XLOG.AND..NOT.YLOG) THEN
           FIRST=.TRUE.
           DO I=N1,N2
-            IF (INBOX(X(I),Y(I)).AND.X(I).GT.VAL__SMLR) THEN
-              IF (FIRST) THEN
-                CALL PGMOVE(LOG10(X(I)),Y(I))
-                FIRST=.FALSE.
+            IF (X(I).GT.VAL__SMLR) THEN
+              XX=LOG10(X(I))
+              YY=Y(I)
+              IF (INBOX(XX,YY)) THEN
+                IF (FIRST) THEN
+                  CALL PGMOVE(XX,YY)
+                  FIRST=.FALSE.
+                ELSE
+                  CALL PGDRAW(XX,YY)
+                ENDIF
               ELSE
-                CALL PGDRAW(LOG10(X(I)),Y(I))
+                FIRST=.TRUE.
               ENDIF
-            ELSE
-              FIRST=.TRUE.
             ENDIF
           ENDDO
 
         ELSEIF (.NOT.XLOG.AND.YLOG) THEN
           FIRST=.TRUE.
           DO I=N1,N2
-            IF (INBOX(X(I),Y(I)).AND.Y(I).GT.VAL__SMLR) THEN
-              IF (FIRST) THEN
-                CALL PGMOVE(X(I),LOG10(Y(I)))
-                FIRST=.FALSE.
+            IF (Y(I).GT.VAL__SMLR) THEN
+              XX=X(I)
+              YY=LOG10(Y(I))
+              IF (INBOX(XX,YY)) THEN
+                IF (FIRST) THEN
+                  CALL PGMOVE(XX,YY)
+                  FIRST=.FALSE.
+                ELSE
+                  CALL PGDRAW(XX,YY)
+                ENDIF
               ELSE
-                CALL PGDRAW(X(I),LOG10(Y(I)))
+                FIRST=.TRUE.
               ENDIF
-            ELSE
-              FIRST=.TRUE.
             ENDIF
           ENDDO
 
@@ -123,16 +132,19 @@
         ELSEIF (XLOG.AND.YLOG) THEN
           FIRST=.TRUE.
           DO I=N1,N2
-            IF (INBOX(X(I),Y(I)).AND.
-     :                X(I).GT.VAL__SMLR.AND.Y(I).GT.VAL__SMLR) THEN
-              IF (FIRST) THEN
-                CALL PGMOVE(LOG10(X(I)),LOG10(Y(I)))
-                FIRST=.FALSE.
+            IF (X(I).GT.VAL__SMLR.AND.Y(I).GT.VAL__SMLR) THEN
+              XX=LOG10(X(I))
+              YY=LOG10(Y(I))
+              IF (INBOX(XX,YY)) THEN
+                IF (FIRST) THEN
+                  CALL PGMOVE(XX,YY)
+                  FIRST=.FALSE.
+                ELSE
+                  CALL PGDRAW(XX,YY)
+                ENDIF
               ELSE
-                CALL PGDRAW(LOG10(X(I)),LOG10(Y(I)))
+                FIRST=.TRUE.
               ENDIF
-            ELSE
-              FIRST=.TRUE.
             ENDIF
           ENDDO
 
