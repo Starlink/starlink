@@ -41,7 +41,7 @@ linear interpolation is selected.
 
 o The Component of the LutEdit GUI:
 
-At the top is the MENU BAR, with the usual collection od menu buttons.
+At the top is the MENU BAR, with the usual collection of menu buttons.
 
 Under this is an area containing INFORMATION about the number of pens and
 entries in the colour table, and the data values used to scale the
@@ -69,9 +69,12 @@ one. The editor will contain one or more coloured curves representing the
 value of each component of the colour system, at each pen (see the
 "Colour System" entry in the "Options" menu for further details). One of
 these curves will be highlighted and is known as the "current" curve. All
-editing functions affect the current curve only. To change the current
+editing functions usually affect the current curve only (this may be
+changed by selecting "All Curves" in the Options menu). To change the current
 curve, click on one of the buttons below the lower left corner of the
-editor panel.
+editor panel. A narrow bar of colours may optionally be included at the 
+bottom of the editor showing the requested visual appearance of each entry 
+in the colour table.
 
 The WHITE VERTICAL LINE is the "cursor", which may be moved by clicking
 anywhere within the editor panel. The pen number and the value of the
@@ -89,7 +92,7 @@ identifies the value and extent of the table entry which contains the
 current pen. This marker can be dragged vertically to change the value
 of the corresponding table entry.
 
-The editor panel can be ZOOMED independantly in the horizontal or
+The editor panel can be ZOOMED independently in the horizontal or
 vertical direction. Each direction has a pair of buttons labelled "+" and
 "-" which can be pressed to increase or decrease the zoom factor. There
 is also an "UNZOOM" button at the bottom right corner of the panel, which
@@ -110,6 +113,18 @@ curve to be "bent" to allow value at the current pen to follow the
 control point. The bends in the curve occur at the adjacent control
 points (if there is no adjacent control point, then the remaining part of
 the curve is shifted bodily up or down.
+
+Underneath this, a set if buttons representing a palette of pre-defined
+colours can optionally be displayed (see the "Palette" entry in the
+Options menu). Clicking on one of these buttons will cause all the
+currently selected table entries to be set to the colour of the button.
+If no entries are selected, then the single entry under the cursor will
+be set to the selected colour. For instance, you could assign predefined
+colours to two blocks of entries, and then use "Edit/Bridge" to fill the
+intervening pens with intermediate colours. To change the colour
+associated with a palette button, shift-click the button (i.e. hold down
+the shift key while clicking the button). To save any changed palette
+entries, use the "Options/Save options" command.
 
 At the very bottom is an area which displays short help about each item
 under the pointer as the pointer is moved over the interface.
@@ -155,7 +170,33 @@ o The Options Menu:
   "update" button is pressed (an upward pointing arrow to the right of
   the editor panel).
 
-  - Colour system: Determines hwo the colour of each pen is represented.
+  - Colour bar: If selected, a narrow bar of colour is displayed at the
+  bottom of the editor panel showing the requested visual appearance of
+  each entry in the colour table.
+
+  - All Curves: If selected, most editing functions will be applied to
+  all displayed curves, not just the "current " curve. There are some
+  functions which are unaffected by this setting (for instance, dragging
+  a control point or marker will never affect anything other than the
+  current curve).
+
+  - Palette: A sub-menu of options related to the colour palette, which
+  is a horizontal row of buttons representing a palette of pre-defined
+  colours displayed below the editor window. Clicking on one of these
+  buttons will cause the currently selected table entries (or the entry
+  under the cursor if none are selected) to be set to the colour of the
+  button. In greyscale mode, the Value (brightness) of the colour is
+  used. The colour of a button can be changed by shift-clicking the
+  button. Palette colours can be saved using the "Options/Save options"
+  command.
+
+     Show: Controls whether or not the palette should be visible.
+
+     Default: Restore the built-in default set of palette colours.
+
+     Sort: Sorts the buttons according to their colour.
+
+  - Colour system: Determines how the colour of each pen is represented.
   Each curve within the editor represents one of the parameters of the 
   selected colour system. Each time the system is changed, the curves in
   the editor will be transformed into the newly selected system, and the
@@ -184,26 +225,30 @@ o The Options Menu:
   - Image display: Determines how the the image display in the top left 
   corner should be produced. "Auto-cut" allows the scaling of the image
   to be selected. For instance, "0.5%" means that the top 0.5% of the 
-  pixel valuess in the image will be coloured with the highest available 
+  pixel values in the image will be coloured with the highest available 
   pen, and lowest 0.5% will be coloured with the lowest available pen. 
   This can be changed by selecting "Negative" in which case the top data
   values are coloured using the bottom pen, and vice-versa.
 
   - Histogram: Determines how the histogram to the top right corner
   should be produced. The labels on the X axis can be either pen numbers
-  or the corresponding data values within the displayed image. The SIze
-  of the text can be changed, adn the Y axis can be drawn logarithmically
+  or the corresponding data values within the displayed image. The Size
+  of the text can be changed, and the Y axis can be drawn logarithmically
   (base 10) or linearly.
 
   - Save options: This causes all the current options settings to be
   saved in a file called "luteditrc" in your ADAM directory. This file
   will be used to re-establish the current options value when LutEdit is
-  next run.
+  next run. The colours of the palette buttons are saved with the other
+  options.
 
 o The Edit Menu:
 
 To select a range of pens, click and drag the pointer over the editor
-window.
+window. These functions will affect only the current curve unless the
+"All curves" option is selected in the Options menu. Where the descriptions
+below refer to "the current curve", it should be read as "the current
+curve, or all curves if the All Curves option is selected."
 
   - Undo: Undo the previous change to the colour table. The most recent ten 
   changes can be undone.
@@ -224,7 +269,7 @@ window.
   - Set Constant: This replaces the values for the currently selected
   pens with a specified constant value.
 
-  - Smooth: This smooths the values for the selected pens using a
+  - Smooth: This smoothes the values for the selected pens using a
   "box-filter" of specified size. A box filter replaces each value with
   the mean of the values within a box of the specified size, centred on
   the pen being changed.

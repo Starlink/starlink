@@ -762,7 +762,7 @@ TEST_DEMO = v0.16-3
 
 #  Other miscellaneous files in kappa-source.tar
 MISC_FILES = cpoint.bit dpoint.bit minus.bit plus.bit unzoom.bit \
-uparrow.bit lutedit.help
+uparrow.bit lutedit.help blank.bit
 
 #  List of TK/TCL object libraries.
 

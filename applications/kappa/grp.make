@@ -43,7 +43,7 @@ kappa_linplot_keystyle.def kappa_vecplot_keystyle.def stardemo.tcl \
 stardemo_procs.tcl adamMessageRelay adamtask.tcl dialog.tcl kappa.demo \
 v0.14-5.demo v0.15-9.demo v0.16-3.demo sty0 sty1 sty2 sty3 pazo.csh \
 lutedit.help lutedit.tcl cpoint.bit dpoint.bit minus.bit plus.bit \
-unzoom.bit uparrow.bit cpoint.bit dpoint.bit
+unzoom.bit uparrow.bit cpoint.bit dpoint.bit blank.bit
 
 # The contents of the kappa_iraf.tar file:
 KAPPA_IRAF = doc log10.cl loge.cl exp10.cl expe.cl lutcold.cl \

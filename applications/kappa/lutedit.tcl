@@ -1,4 +1,4 @@
-#!/star/bin/awish
+#!STAR_BIN/awish
 #+
 #  Name:
 #     LutEdit.tcl
@@ -15,7 +15,7 @@
 #     The modified colour table may be saved in an NDF which can later be
 #     used by LUTABLE, etc.
 #     
-#     The LUTABLE a-task should normally be used to execute this script.
+#     The LUTEDIT a-task should normally be used to execute this script.
 #
 #  Usage:
 #     lutedit.tcl lut image
@@ -42,6 +42,953 @@
 #-
 
 # Define procedures...
+
+
+# 
+# Set the current pen value to a specified value
+#
+proc SetPenVal {new} {
+   global LUT
+   global RGBNOW
+   global MENT
+
+   if { $new > 1.0 } {
+      set new 1.0
+   } elseif { $new < 0.0 } {
+      set new 0.0
+   }
+   set LUT($RGBNOW) [lreplace $LUT($RGBNOW) $MENT $MENT $new]
+   updateCurrent 
+   record
+}
+
+
+#
+# Order a list of 3D positions. $x $y and $z are lists of x y and z
+# coordinates. Returns a list of integer indices into the x,y,z lists.
+# Traversing the set of positions in the order indicated by the returned
+# list produces some sort of minimal distance path throught the points.
+# (similar to travelling salesman problem).
+#
+proc Sort3D {xx yy zz} {
+
+# For the first try, the first returned position is the first supplied position.
+   set start 0
+
+# Loop round trying different starting points. For each try the length of
+# a walk through all the colour points, starting at the chosen starting
+# point, is found. We return the the walk which has the minimum length.
+   set is 0
+   set ddtotmin 1000000.0
+   while { $is < [llength $start] } {
+      set i [lindex $start $is]
+      incr is
+
+# Copy the supplied coords.
+      set x $xx
+      set y $yy
+      set z $zz
+
+# Note how many points are supplied.
+      set ni [llength $xx]
+
+# Save a list of original indices.
+      for {set j 0} {$j < $ni} {incr j} {
+         lappend ord $j
+      }
+
+#  Initialize the list of indices which would be returned by this try.
+      set retry ""
+
+# Loop round until all input points have been used.
+      set ddtot 0
+      set nr 0
+      while { $ni > 0 } {
+
+# Save the coords of the next point in the search.
+         set xv [lindex $x $i]
+         set yv [lindex $y $i]
+         set zv [lindex $z $i]
+         set here [lindex $ord $i]
+         lappend retry $here
+         incr nr
+
+# Remove this point from the remaining input positions.
+         set x [lreplace $x $i $i]
+         set y [lreplace $y $i $i]
+         set z [lreplace $z $i $i]
+         set ord [lreplace $ord $i $i]
+         incr ni -1
+         if { $ni > 0 } { 
+
+# Find the squared distance to the first remaining input point.
+            set dx [expr $xv - [lindex $x 0]]
+            set dy [expr $yv - [lindex $y 0]]
+            set dz [expr $zv - [lindex $z 0]]
+            set ddmin [expr $dx*$dx + $dy*$dy + $dz*$dz]
+            set i 0
+
+# Search the other remaining input points for a closer position. The
+# closest position becomes the new current position.
+            for {set j 1} {$j < $ni} {incr j} {
+               set dx [expr $xv - [lindex $x $j]]
+               set dy [expr $yv - [lindex $y $j]]
+               set dz [expr $zv - [lindex $z $j]]
+               set dd [expr $dx*$dx + $dy*$dy + $dz*$dz]
+               if { $dd < $ddmin } {
+                  set ddmin $dd
+                  set i $j
+               }
+            }
+
+# Increment the total length of the journey.
+            set ddtot [expr $ddtot + $ddmin]
+
+# If this is a particularly long jump, not that we should try the walk again, 
+# starting at the new point.
+             if { $ddmin > 2.0*$ddtot/$nr } { 
+                if { [lsearch -exact $start $here] == -1 } {
+                   lappend start $here 
+                }
+             }
+    
+          }
+       }
+
+# If the total path length for this try is less than for the previous
+# minimum, save this try as the returned path.
+       if { $ddtot < $ddtotmin } {
+          set ddtotmin $ddtot
+          set ret $retry
+       }
+   }
+
+# Return the list of indices.
+  return $ret
+
+}
+
+#
+# Set the colours of the palette buttons and associated short help.
+#
+proc PalButs {} {
+   global FPAL
+   global NPAL
+   global PAL
+   global PBUT
+
+   if { $FPAL != "" } {
+      for {set i 0} { $i < $NPAL } { incr i } {
+         $PBUT($i) configure -bg $PAL($i) -activebackground $PAL($i)
+         SetHelp $PBUT($i) "Click to fill the selected pens or the current pen with colour $PAL($i) (shift-click to change the button colour)" LUTEDIT_PALEBUT
+      }
+   } 
+}
+
+#
+# Sort the palette buttons.
+#
+proc PalSort {} {
+   global NPAL
+   global PAL
+   global UWIN
+
+   set old_cursor [$UWIN cget -cursor]
+   $UWIN config -cursor watch
+
+# Extract the red green blue values from the original palette colours,and
+# save the original colours.
+   for {set i 0} {$i < $NPAL} {incr i} {
+      if { [scan $PAL($i) "#%2x%2x%2x" r g b] != 3 } {
+         Message "Bad palette colour for button $i : $PAL($i)"
+         lappend col(red) 0.0
+         lappend col(green) 0.0
+         lappend col(blue) 0.0
+      } else {
+         lappend col(red) [expr $r/255.0]
+         lappend col(green) [expr $g/255.0]
+         lappend col(blue) [expr $b/255.0]
+      }
+      set ocols($i) $PAL($i)
+   }
+
+# Sort them, Sort3D returns a list of indices into the original list
+# of buttons. Copy the original colours into PAL in their new sorted order.
+   set j 0
+   foreach i [Sort3D $col(red) $col(green) $col(blue)] { 
+      set PAL($j) $ocols($i)
+      incr j
+   }
+
+# Change the button colours.
+   PalButs
+
+# Revert to the previous cursor.
+   $UWIN config -cursor $old_cursor
+
+} 
+
+
+#
+# Set the data value corresponding to the current pen number (or
+# vice-versa).
+#
+proc setDV {inv} {
+   global CPEN
+   global DVM
+   global DVC
+   global DV
+   global LP
+   global UP
+   global F4
+
+   if { $inv } {
+      if { [catch { set CPEN [expr int(0.5+($DV-$DVC)/$DVM) ] } ] } {
+         set CPEN 1
+      } else {
+         if { $CPEN < $LP } {
+            set CPEN $LP
+         } elseif { $CPEN > $UP } {
+            set CPEN $UP
+         }
+      }
+      updateCursor 1
+
+   } else {
+      if { [catch { set DV [format %.4g [expr $CPEN*$DVM + $DVC] ] } ] } {
+         set DV ""
+      }
+   }
+   focus $F4
+}
+
+#
+# Fill selected pens or current pen with a palette colour
+#
+proc Pale {i} {
+   global LENTRY
+   global HENTRY
+   global MENT
+   global PAL
+   global LUT
+
+# Get the limits of the entries to fill. Use the selected entries if any
+# are selected. Otherwise just fill the marker entry.
+   if { $HENTRY == "" } {
+      set hi $MENT
+   } else {
+      set hi $HENTRY
+   }
+
+   if { $LENTRY == "" } {
+      set lo $MENT
+   } else {
+      set lo $LENTRY
+   }
+
+#  Check the limits are numerical
+   if { ![catch { set a [expr $hi - $lo] }] } {
+
+# Get the floating RGB values for the selected colour.
+      if { [scan $PAL($i) "#%2x%2x%2x" r g b] == 3 } {
+         set col(red) [expr $r/255.0]
+         set col(green) [expr $g/255.0]
+         set col(blue) [expr $b/255.0]
+
+# Convert to the current colour system.
+	 toCSYS col RGB
+
+# Create strings holding lists of replacement rgb values.
+         set newr ""
+         set newg ""
+         set newb ""
+         for {set i $lo } {$i <= $hi} {incr i} {
+            append newr "$col(red) "
+            append newg "$col(green) "
+            append newb "$col(blue) "
+         }
+
+#  Replace the values in the LUT array.
+         set LUT(red) [eval lreplace {$LUT(red)} $lo $hi $newr]
+         set LUT(green) [eval lreplace {$LUT(green)} $lo $hi $newg]
+         set LUT(blue) [eval lreplace {$LUT(blue)} $lo $hi $newb]
+
+#  Update the display to use the new colours, and record the change.
+         updateDisplay 0
+         record
+
+      }
+   }
+}
+
+#
+# Change the colour of a palette button
+#
+proc NewPale {i} {
+   global SAMPR
+   global SAMPG
+   global SAMPB
+   global SAMPH
+   global SAMPS
+   global SAMPV
+
+   global ENTR
+   global ENTG
+   global ENTB
+   global ENTH
+   global ENTS
+   global ENTV
+
+   global NEWR
+   global NEWG
+   global NEWB
+   global NEWH
+   global NEWS
+   global NEWV
+
+   global SAMPF
+   global PAL
+   global NAMEDCOL
+   global COLLB
+   global SAMPBUT
+
+# Set up standard colour names unless already done so.
+   if { ![info exists NAMEDCOL] } {
+      set NAMEDCOL(AliceBlue)		      "240 248 255"
+      set NAMEDCOL(AntiqueWhite)	      "250 235 215"
+      set NAMEDCOL(Aquamarine)		      "127 255 212"
+      set NAMEDCOL(Azure)		      "240 255 255"
+      set NAMEDCOL(Beige)		      "245 245 220"
+      set NAMEDCOL(Bisque)		      "255 228 196"
+      set NAMEDCOL(Black)		      "  0   0   0"
+      set NAMEDCOL(BlanchedAlmond)	      "255 235 205"
+      set NAMEDCOL(Blue)		      "  0   0 255"
+      set NAMEDCOL(BlueViolet)		      "138  43 226"
+      set NAMEDCOL(Brown)		      "165  42  42"
+      set NAMEDCOL(Burlywood)		      "222 184 135"
+      set NAMEDCOL(CadetBlue)		      " 95 158 160"
+      set NAMEDCOL(Chartreuse)		      "127 255   0"
+      set NAMEDCOL(Chocolate)		      "210 105  30"
+      set NAMEDCOL(Coral)		      "255 127  80"
+      set NAMEDCOL(CornflowerBlue)	      "100 149 237"
+      set NAMEDCOL(Cornsilk)		      "255 248 220"
+      set NAMEDCOL(Cyan)		      "  0 255 255"
+      set NAMEDCOL(Dalmon)		      "250 128 114"
+      set NAMEDCOL(DarkBlue)		      "0     0 139"
+      set NAMEDCOL(DarkCyan)		      "0   139 139"
+      set NAMEDCOL(DarkGoldenrod)	      "184 134  11"
+      set NAMEDCOL(DarkGreen)		      "  0 100   0"
+      set NAMEDCOL(DarkGrey)		      "169 169 169"
+      set NAMEDCOL(DarkKhaki)		      "189 183 107"
+      set NAMEDCOL(DarkMagenta)		      "139   0 139"
+      set NAMEDCOL(DarkOliveGreen)	      " 85 107  47"
+      set NAMEDCOL(DarkOrange)		      "255 140   0"
+      set NAMEDCOL(DarkOrchid)		      "153  50 204"
+      set NAMEDCOL(DarkRed)		      "139   0   0"
+      set NAMEDCOL(DarkSalmon)		      "233 150 122"
+      set NAMEDCOL(DarkSeaGreen)	      "143 188 143"
+      set NAMEDCOL(DarkSlateBlue)	      " 72  61 139"
+      set NAMEDCOL(DarkSlateGrey)	      " 47  79  79"
+      set NAMEDCOL(DarkTurquoise)	      "  0 206 209"
+      set NAMEDCOL(DarkViolet)		      "148   0 211"
+      set NAMEDCOL(DeepPink)		      "255  20 147"
+      set NAMEDCOL(DeepSkyBlue)		      "  0 191 255"
+      set NAMEDCOL(DimGrey)		      "105 105 105"
+      set NAMEDCOL(DodgerBlue)		      " 30 144 255"
+      set NAMEDCOL(Firebrick)		      "178  34  34"
+      set NAMEDCOL(FloralWhite)		      "255 250 240"
+      set NAMEDCOL(ForestGreen)		      " 34 139  34"
+      set NAMEDCOL(Gainsboro)		      "220 220 220"
+      set NAMEDCOL(GhostWhite)		      "248 248 255"
+      set NAMEDCOL(Gold)		      "255 215   0"
+      set NAMEDCOL(Goldenrod)		      "218 165  32"
+      set NAMEDCOL(Green)		      "  0 255   0"
+      set NAMEDCOL(GreenYellow)		      "173 255  47"
+      set NAMEDCOL(Grey)		      "190 190 190"
+      set NAMEDCOL(Honeydew		      "240 255 240"
+      set NAMEDCOL(HotPink)		      "255 105 180"
+      set NAMEDCOL(IndianRed)		      "205  92  92"
+      set NAMEDCOL(Ivory)		      "255 255 240"
+      set NAMEDCOL(Khaki)		      "240 230 140"
+      set NAMEDCOL(Lavender		      "230 230 250"
+      set NAMEDCOL(LavenderBlush	      "255 240 245"
+      set NAMEDCOL(LawnGreen)		      "124 252   0"
+      set NAMEDCOL(LemonChiffon)	      "255 250 205"
+      set NAMEDCOL(LightBlue)		      "173 216 230"
+      set NAMEDCOL(LightCoral)		      "240 128 128"
+      set NAMEDCOL(LightCyan)		      "224 255 255"
+      set NAMEDCOL(LightGoldenrod)	      "238 221 130"
+      set NAMEDCOL(LightGoldenrodYellow)      "250 250 210"
+      set NAMEDCOL(LightGreen)		      "144 238 144"
+      set NAMEDCOL(LightGrey)		      "211 211 211"
+      set NAMEDCOL(LightPink)		      "255 182 193"
+      set NAMEDCOL(LightSalmon)		      "255 160 122"
+      set NAMEDCOL(LightSeaGreen)	      " 32 178 170"
+      set NAMEDCOL(LightSkyBlue)	      "135 206 250"
+      set NAMEDCOL(LightSlateBlue)	      "132 112 255"
+      set NAMEDCOL(LightSlateGrey)	      "119 136 153"
+      set NAMEDCOL(LightSteelBlue)	      "176 196 222"
+      set NAMEDCOL(LightYellow)		      "255 255 224"
+      set NAMEDCOL(LimeGreen)		      " 50 205  50"
+      set NAMEDCOL(Linen)		      "250 240 230"
+      set NAMEDCOL(Magenta)		      "255   0 255"
+      set NAMEDCOL(Maroon)		      "176  48  96"
+      set NAMEDCOL(MediumAquamarine)	      "102 205 170"
+      set NAMEDCOL(MediumBlue)		      "  0   0 205"
+      set NAMEDCOL(MediumOrchid)	      "186  85 211"
+      set NAMEDCOL(MediumPurple)	      "147 112 219"
+      set NAMEDCOL(MediumSeaGreen)	      " 60 179 113"
+      set NAMEDCOL(MediumSlateBlue)	      "123 104 238"
+      set NAMEDCOL(MediumSpringGreen)	      "  0 250 154"
+      set NAMEDCOL(MediumTurquoise)	      " 72 209 204"
+      set NAMEDCOL(MediumVioletRed)	      "199  21 133"
+      set NAMEDCOL(MidnightBlue)	      " 25  25 112"
+      set NAMEDCOL(MintCream		      "245 255 250"
+      set NAMEDCOL(MistyRose)		      "255 228 225"
+      set NAMEDCOL(Moccasin)		      "255 228 181"
+      set NAMEDCOL(NavajoWhite)		      "255 222 173"
+      set NAMEDCOL(Navy)		      "  0   0 128"
+      set NAMEDCOL(NavyBlue)		      "  0   0 128"
+      set NAMEDCOL(OldLace)		      "253 245 230"
+      set NAMEDCOL(OliveDrab)		      "107 142  35"
+      set NAMEDCOL(Orange)		      "255 165   0"
+      set NAMEDCOL(OrangeRed)		      "255  69   0"
+      set NAMEDCOL(Orchid)		      "218 112 214"
+      set NAMEDCOL(PaleGoldenrod)	      "238 232 170"
+      set NAMEDCOL(PaleGreen)		      "152 251 152"
+      set NAMEDCOL(PaleTurquoise)	      "175 238 238"
+      set NAMEDCOL(PaleVioletRed)	      "219 112 147"
+      set NAMEDCOL(PapayaWhip)		      "255 239 213"
+      set NAMEDCOL(PeachPuff)		      "255 218 185"
+      set NAMEDCOL(Peru)		      "205 133  63"
+      set NAMEDCOL(Pink)		      "255 192 203"
+      set NAMEDCOL(Plum)		      "221 160 221"
+      set NAMEDCOL(PowderBlue)		      "176 224 230"
+      set NAMEDCOL(Purple)		      "160  32 240"
+      set NAMEDCOL(Red)			      "255   0   0"
+      set NAMEDCOL(RosyBrown)		      "188 143 143"
+      set NAMEDCOL(RoyalBlue)		      " 65 105 225"
+      set NAMEDCOL(SaddleBrown)		      "139  69  19"
+      set NAMEDCOL(SandyBrown)		      "244 164  96"
+      set NAMEDCOL(SeaGreen)		      " 46 139  87"
+      set NAMEDCOL(Seashell)		      "255 245 238"
+      set NAMEDCOL(Sienna)		      "160  82  45"
+      set NAMEDCOL(SkyBlue)		      "135 206 235"
+      set NAMEDCOL(SlateBlue)		      "106  90 205"
+      set NAMEDCOL(SlateGrey)		      "112 128 144"
+      set NAMEDCOL(Snow)                      "255 250 250"
+      set NAMEDCOL(SpringGreen)		      "  0 255 127"
+      set NAMEDCOL(SteelBlue)		      " 70 130 180"
+      set NAMEDCOL(Tan)			      "210 180 140"
+      set NAMEDCOL(Thistle)		      "216 191 216"
+      set NAMEDCOL(Tomato)		      "255  99  71"
+      set NAMEDCOL(Turquoise)		      " 64 224 208"
+      set NAMEDCOL(Violet)		      "238 130 238"
+      set NAMEDCOL(VioletRed)		      "208  32 144"
+      set NAMEDCOL(Wheat)		      "245 222 179"
+      set NAMEDCOL(White)		      "255 255 255"
+      set NAMEDCOL(WhiteSmoke)		      "245 245 245"
+      set NAMEDCOL(Yellow)		      "255 255   0"
+      set NAMEDCOL(YellowGreen)		      "154 205  50"
+   }
+
+# Make the dialog box.
+   set top ".paleWin"
+   set topf [MakeDialog $top "Palette Colour Chooser" 1]
+   set SAMPBUT {}
+
+# Main frames
+   set frgb [frame $topf.rgb]
+   set fhsv [frame $topf.hsv]
+   set fname [frame $topf.na]
+   set fsamp [frame $topf.samp]
+   set fbuts [frame $topf.buts]
+
+   grid $frgb -column 0 -row 0 -sticky nsew -padx 3m -pady 3m 
+   grid $fhsv -column 0 -row 1 -sticky nsew -padx 3m -pady 3m 
+   grid $fname -column 0 -row 2 -sticky nsew -padx 3m -pady 3m
+   grid $fsamp -column 1 -row 0 -rowspan 2 -sticky nsew -padx 3m -pady 3m
+   grid $fbuts -column 0 -row 3 -columnspan 2 -sticky nsew -padx 3m -pady 3m
+
+# RGB panel...
+   set SAMPR [scale $frgb.red -from 0 -to 255 -length 3c \
+	                      -showvalue 0 -orient horizontal -command "SampleCol rs"]
+   bind $SAMPR <ButtonPress-1> "set SAMPBUT {rs}"
+   bind $SAMPR <ButtonRelease-1> "set SAMPBUT {}"
+
+   grid [label $frgb.lr -text "Red:"] -column 0 -row 0 -ipadx 2m -ipady 1m -sticky ne
+   grid $SAMPR -column 1 -row 0 -ipadx 2m -ipady 1m -sticky ne
+   set ENTR [entry $frgb.enr -width 6 -relief sunken -bd 2 -textvariable NEWR] 
+   bind $ENTR <Return> "SampleCol re 0"
+   bind $ENTR <FocusOut> "SampleCol re 0"
+   bind $ENTR <FocusIn> "$ENTR selection range 0 end;$ENTR icursor end"
+   grid $ENTR -column 2 -row 0 -ipadx 2m -ipady 1m -sticky ne
+
+   set SAMPG [scale $frgb.green -from 0 -to 255 -length 3c \
+	                      -showvalue 0 -orient horizontal -command "SampleCol gs" ]
+   bind $SAMPG <ButtonPress-1> "set SAMPBUT {gs}"
+   bind $SAMPG <ButtonRelease-1> "set SAMPBUT {}"
+
+   grid [label $frgb.lg -text "Green:"] -column 0 -row 1 -ipadx 2m -ipady 1m -sticky ne
+   grid $SAMPG -column 1 -row 1 -ipadx 2m -ipady 1m -sticky ne
+   set ENTG [entry $frgb.eng -width 6 -relief sunken -bd 2 -textvariable NEWG] 
+   bind $ENTG <Return> "SampleCol ge 0"
+   bind $ENTG <FocusOut> "SampleCol ge 0"
+   bind $ENTG <FocusIn> "$ENTG selection range 0 end;$ENTG icursor end"
+   grid $ENTG -column 2 -row 1 -ipadx 2m -ipady 1m -sticky ne
+
+   set SAMPB [scale $frgb.blue -from 0 -to 255 -length 3c \
+	                      -showvalue 0 -orient horizontal -command "SampleCol bs" ]
+   bind $SAMPB <ButtonPress-1> "set SAMPBUT {bs}"
+   bind $SAMPB <ButtonRelease-1> "set SAMPBUT {}"
+
+   grid [label $frgb.lb -text "Blue:"] -column 0 -row 2 -ipadx 2m -ipady 1m -sticky ne
+   grid $SAMPB -column 1 -row 2 -ipadx 2m -ipady 1m -sticky ne
+   set ENTB [entry $frgb.enb -width 6 -relief sunken -bd 2 -textvariable NEWB] 
+   bind $ENTB <Return> "SampleCol be 0"
+   bind $ENTB <FocusOut> "SampleCol be 0"
+   bind $ENTB <FocusIn> "$ENTB selection range 0 end;$ENTB icursor end"
+   grid $ENTB -column 2 -row 2 -ipadx 2m -ipady 1m -sticky ne
+
+   grid columnconfigure $frgb 0 -weight 100
+
+# HSV panel...
+   set SAMPH [scale $fhsv.hue -from 0 -to 255 -length 3c \
+	                      -showvalue 0 -orient horizontal -command "SampleCol hs"]
+   bind $SAMPH <ButtonPress-1> "set SAMPBUT {hs}"
+   bind $SAMPH <ButtonRelease-1> "set SAMPBUT {}"
+
+   grid [label $fhsv.lr -text "Hue:"] -column 0 -row 0 -ipadx 2m -ipady 1m -sticky ne
+   grid $SAMPH -column 1 -row 0 -ipadx 2m -ipady 1m -sticky ne
+   set ENTH [entry $fhsv.enh -width 6 -relief sunken -bd 2 -textvariable NEWH]
+   bind $ENTH <Return> "SampleCol he 0"
+   bind $ENTH <FocusOut> "SampleCol he 0"
+   bind $ENTH <FocusIn> "$ENTH selection range 0 end;$ENTH icursor end"
+   grid $ENTH -column 2 -row 0 -ipadx 2m -ipady 1m -sticky ne
+
+   set SAMPS [scale $fhsv.sat -from 0 -to 255 -length 3c \
+	                      -showvalue 0 -orient horizontal -command "SampleCol ss"]
+   bind $SAMPS <ButtonPress-1> "set SAMPBUT {ss}"
+   bind $SAMPS <ButtonRelease-1> "set SAMPBUT {}"
+
+   grid [label $fhsv.ls -text "Saturation:"] -column 0 -row 1 -ipadx 2m -ipady 1m -sticky ne
+   grid $SAMPS -column 1 -row 1 -ipadx 2m -ipady 1m -sticky ne
+   set ENTS [entry $fhsv.ens -width 6 -relief sunken -bd 2 -textvariable NEWS] 
+   bind $ENTS <Return> "SampleCol se 0;focus $ENTS"
+   bind $ENTS <FocusOut> "SampleCol se 0"
+   bind $ENTS <FocusIn> "$ENTS selection range 0 end;$ENTS icursor end"
+   grid $ENTS -column 2 -row 1 -ipadx 2m -ipady 1m -sticky ne
+
+   set SAMPV [scale $fhsv.val -from 0 -to 255 -length 3c \
+	                      -showvalue 0 -orient horizontal -command "SampleCol vs"]
+   bind $SAMPV <ButtonPress-1> "set SAMPBUT {vs}"
+   bind $SAMPV <ButtonRelease-1> "set SAMPBUT {}"
+
+   grid [label $fhsv.lb -text "Value:"] -column 0 -row 2 -ipadx 2m -ipady 1m -sticky ne
+   grid $SAMPV -column 1 -row 2 -ipadx 2m -ipady 1m -sticky ne
+   set ENTV [entry $fhsv.env -width 6 -relief sunken -bd 2 -textvariable NEWV] 
+   bind $ENTV <Return> "SampleCol ve 0"
+   bind $ENTV <FocusOut> "SampleCol ve 0"
+   bind $ENTV <FocusIn> "$ENTV selection range 0 end;$ENTV icursor end"
+   grid $ENTV -column 2 -row 2 -ipadx 2m -ipady 1m -sticky ne
+
+   grid columnconfigure $fhsv 0 -weight 100
+
+# Binding for up/down keys within entries.
+   bind $ENTR <Up> "SampleCol re 0"
+   bind $ENTR <Down> "SampleCol re 0;focus $ENTG"
+   bind $ENTG <Up> "SampleCol ge 0;focus $ENTR"
+   bind $ENTG <Down> "SampleCol ge 0;focus $ENTB"
+   bind $ENTB <Up> "SampleCol be 0;focus $ENTG"
+   bind $ENTB <Down> "SampleCol be 0;focus $ENTH"
+   bind $ENTH <Up> "SampleCol he 0;focus $ENTB"
+   bind $ENTH <Down> "SampleCol he 0;focus $ENTS"
+   bind $ENTS <Up> "SampleCol se 0;focus $ENTH"
+   bind $ENTS <Down> "SampleCol se 0;focus $ENTV"
+   bind $ENTV <Up> "SampleCol ve 0;focus $ENTS"
+   bind $ENTV <Down> "SampleCol ve 0"
+
+# Named colour panel.
+   set scb $fname.scb
+   set COLLB [listbox $fname.lb -yscrollcommand "$scb set" -height 5]
+   scrollbar $scb -command "$COLLB yview"
+
+   foreach col [array names NAMEDCOL] { 
+      $COLLB insert end $col
+   }
+
+   pack [label $fname.lr -text "Named Colour:"] -side left 
+   pack $COLLB -side left
+   pack $scb -side right -fill y
+
+   bind $COLLB <1> "SampleCol name %y"
+
+# Colour samples...
+   set SAMPF [frame $fsamp.sample -bg $PAL($i) -height 1.5c -width 1.5c]
+   pack [label $fsamp.l1 -text "New:"] -side top -anchor s -expand 1
+   pack $SAMPF -side top -anchor n -expand 1
+
+   set orig [frame $fsamp.orig -bg $PAL($i) -height 1.5c -width 1.5c]
+   pack [label $fsamp.l2 -text "Original:"] -side top -anchor s -expand 1
+   pack $orig -side top -anchor n -expand 1
+
+# Buttons...
+   set b1 [button $fbuts.ok -text "OK" -command "SetPale $i $top"]
+   set b2 [button $fbuts.cancel -text "Cancel" -command "SetPale -1 $top"]
+   pack $b1 $b2 -side left -expand 1 
+
+# Set up the initial values
+   if { [scan $PAL($i) "#%2x%2x%2x" r g b] == 3 } {
+      set NEWR [expr $r/255.0]
+      set NEWG [expr $g/255.0]
+      set NEWB [expr $b/255.0]
+      SampleCol re 0
+   }
+
+}
+
+#
+# Display a sample of the colour currently set by the sliders in the 
+# palette colour selection dialog.
+#
+proc SampleCol {item value} {
+   global SAMPR
+   global SAMPG
+   global SAMPB
+   global SAMPH
+   global SAMPS
+   global SAMPV
+   global SAMPF
+
+   global NAMEDCOL
+   global COLLB
+   global SAMPBUT
+
+   global NEWR
+   global NEWG
+   global NEWB
+   global NEWH
+   global NEWS
+   global NEWV
+
+# The command given by the -command option on the "scale" widget (i.e.
+# this proc) is fired when the user moves the slider. But it is *also* fired if 
+# the [set] method is used to set a new value in the slider. Since this proc 
+# uses the [set] method to adjust the value of the other sliders, we need to be
+# careful that these slider changes don't themselves cause this proc to
+# be called *again*. Check that, if the initiating item is a slider, it is the 
+# currently pressed slider...
+   if { [string index $item end] != "s" || $item == $SAMPBUT } {
+
+# If the colour was changed via an RGB slider control, get the RGB slider 
+# values.
+      if { $item == "rs" || $item == "gs" || $item == "bs" } {
+         set new(red) [expr [$SAMPR get]/255.0]
+         set new(green) [expr [$SAMPG get]/255.0]
+         set new(blue) [expr [$SAMPB get]/255.0]
+         set got "rgb"
+
+# If the colour was changed via an RGB entry field, get the entry field 
+# values.
+      } elseif { $item == "re" || $item == "ge" || $item == "be" } {
+         if { $NEWR < 0.0 } {
+            set new(red) 0.0
+         } elseif { $NEWR > 1.0 } {
+            set new(red) 1.0
+         } else {
+            set new(red) $NEWR
+         }
+         if { $NEWG < 0.0 } {
+            set new(green) 0.0
+         } elseif { $NEWG > 1.0 } {
+            set new(green) 1.0
+         } else {
+            set new(green) $NEWG
+         }
+         if { $NEWB < 0.0 } {
+            set new(blue) 0.0
+         } elseif { $NEWB > 1.0 } {
+            set new(blue) 1.0
+         } else {
+            set new(blue) $NEWB
+         }
+         set got "rgb"
+
+# If the colour was changed via an HSV slider control, get the HSV slider 
+# values.
+      } elseif { $item == "hs" || $item == "ss" || $item == "vs" } {
+         set new(red) [expr [$SAMPH get]/255.0]
+         set new(green) [expr [$SAMPS get]/255.0]
+         set new(blue) [expr [$SAMPV get]/255.0]
+         set got "hsv"
+
+# If the colour was changed via an HSV entry field, get the entry field 
+# values.
+      } elseif { $item == "he" || $item == "se" || $item == "ve" } {
+         if { $NEWH < 0.0 } {
+            set new(red) 0.0
+         } elseif { $NEWH > 1.0 } {
+            set new(red) 1.0
+         } else {
+            set new(red) $NEWH
+         }
+         if { $NEWS < 0.0 } {
+            set new(green) 0.0
+         } elseif { $NEWS > 1.0 } {
+            set new(green) 1.0
+         } else {
+            set new(green) $NEWS
+         }
+         if { $NEWV < 0.0 } {
+            set new(blue) 0.0
+         } elseif { $NEWV > 1.0 } {
+            set new(blue) 1.0
+         } else {
+            set new(blue) $NEWV
+         }
+         set got "hsv"
+
+# A named colour...
+      } else {
+         set cols $NAMEDCOL([$COLLB get @0,$value])
+         set new(red) [expr [lindex $cols 0]/255.0]
+         set new(green) [expr [lindex $cols 1]/255.0]
+         set new(blue) [expr [lindex $cols 2]/255.0]
+         set got "rgb"
+      }
+
+# If we have rgb values, get the corresponding hsv values.
+      if { $got == "rgb" } {
+         set r $new(red)
+         set g $new(green)
+         set b $new(blue)
+
+         toHSV new RGB
+         set h $new(red)
+         set s $new(green)
+         set v $new(blue)
+
+# If we have hsv values, get the corresponding grb values.
+      } else {
+         set h $new(red)
+         set s $new(green)
+         set v $new(blue)
+         toRGB new HSV
+         set r $new(red)
+         set g $new(green)
+         set b $new(blue)
+      }
+
+# Store the new values in all appropriate places.
+      set NEWH [format "%.2f" $h]
+      set NEWS [format "%.2f" $s]
+      set NEWV [format "%.2f" $v]
+      $SAMPH set [expr int($h*255.0)]
+      $SAMPS set [expr int($s*255.0)]
+      $SAMPV set [expr int($v*255.0)]
+   
+      set NEWR [format "%.2f" $r]
+      set NEWG [format "%.2f" $g]
+      set NEWB [format "%.2f" $b]
+      set r [expr int($r*255.0)]
+      set g [expr int($g*255.0)]
+      set b [expr int($b*255.0)]
+      $SAMPR set $r
+      $SAMPG set $g
+      $SAMPB set $b
+
+# Set up the sample colour square.
+      set c [format "#%0.2X%0.2X%0.2X" $r $g $b]
+      $SAMPF configure -bg $c
+   }
+}
+
+#
+# Save the colour currently set by the sliders in the palette colour 
+# selection dialog.
+#
+proc SetPale {i t} {
+   global SAMPR
+   global SAMPG
+   global SAMPB
+   global PAL
+   global PBUT
+   if { $i > -1 } {
+      set PAL($i) [format "#%0.2X%0.2X%0.2X" [$SAMPR get] [$SAMPG get] [$SAMPB get]]
+      PalButs
+   }
+   destroy $t
+}
+
+proc PalArea {} {
+#+
+#  Name:
+#     PalArea
+#
+#  Purpose:
+#     Create or destroy the frame displaying a palette of colours at the
+#     bottom of the main window.
+#
+#  Arguments:
+#     None.
+#
+#  Globals:
+#     FPAL (Read and Write)
+#        The name of the frame to contain help information.
+#     PALON (Read)
+#        Is help information to be displayed?
+#-
+   global KAPPA_DIR
+   global PALON
+   global FPAL
+   global F3
+   global NPAL
+   global PAL
+   global PBUT
+
+# If required, create the help frame (if it has not already been created).
+   if { $PALON } {
+      if { $FPAL == "" } {
+
+# Create the frame to enclose the palette.
+         set FPAL [frame $F3.pale ]
+         pack $FPAL -side top -anchor nw -fill x
+
+# Set the Frame Help.
+         SetHelp $FPAL "Click on a colour to fill the selected pens or the current pen with the colour" LUTEDIT_PALE
+
+# Create the palette buttons.
+         for {set i 0} {$i < $NPAL} { incr i } {
+            set PBUT($i) [button $FPAL.pb$i -bitmap "@$KAPPA_DIR/blank.bit" -bg $PAL($i) -activebackground $PAL($i) -command "Pale $i"]
+            bind $PBUT($i) <Shift-ButtonPress-1> "NewPale $i;break"
+            pack $PBUT($i) -side left -expand 1 -pady 1m
+            SetHelp $PBUT($i) "Click to fill the selected pens or the current pen with colour $PAL($i) (shift-click to change the button colour)" LUTEDIT_PALEBUT
+         }
+
+      }
+
+# If required, destroy the frame (if it has not already been destroyed).
+   } {
+      if { $FPAL != "" } {
+         destroy $FPAL
+         set FPAL ""
+      }
+   }
+}
+
+#
+# Set up the default palette
+#
+proc DefPal {} {
+   global PAL
+   global NPAL 
+   global PBUT
+   global FPAL
+
+   set NPAL 30
+
+# Palette entries 0 to 7 are shades of grey.
+   for {set i 0} { $i < 8 } { incr i } {
+      set v [expr int(255.0*($i/7.0))]
+      set PAL($i) [format "#%0.2X%0.2X%0.2X"  $v $v $v]
+   }
+
+# The rest are HSV values with constant Saturation and Value and varying
+# Hue.
+   set pl(red) ""
+   set pl(green) ""
+   set pl(blue) ""
+   for {set i 8} { $i < $NPAL} { incr i } {
+      lappend pl(red) [expr (double($i)-8.0)/($NPAL-1.0)]
+      lappend pl(green) 1.0
+      lappend pl(blue) 1.0
+   }
+
+# Convert to RGB values.
+   toRGB pl HSV
+
+# Format and store.
+   set j 0
+   for {set i 8} { $i < $NPAL} { incr i } {
+      set r [lindex $pl(red) $j]
+      set r [expr int(255.0*$r)]
+      set g [lindex $pl(green) $j]
+      set g [expr int(255.0*$g)]
+      set b [lindex $pl(blue) $j]
+      set b [expr int(255.0*$b)]
+      set PAL($i) [format "#%0.2X%0.2X%0.2X"  $r $g $b]
+      incr j
+   }
+
+# Update the colours of the buttons.
+   PalButs
+   
+}
+
+
+proc LutBar {} {
+#
+#  Creates or configues the colour bar at the bottom of the editor canvas.
+#
+   global NENT
+   global LUT
+   global CSYSNOW
+   global CAN2
+   global LBAR
+   global LBARY
+   global XE0
+   global XE1
+   global LBARON
+
+# If not required, delete any colour bar
+   if { ! $LBARON } {
+      $CAN2 delete lbar
+      catch { unset LBAR }
+
+# Otherwise....
+   } else {
+
+# Get the RGB values to display.
+      set rgb(red) $LUT(red)
+      set rgb(blue) $LUT(blue)
+      set rgb(green) $LUT(green)
+      toRGB rgb $CSYSNOW
+
+# If no bar exists, create it and set the colours.
+      if { ! [info exists LBAR] } {
+         for { set i 0 } { $i < $NENT } { incr i } {
+            set cxl [expr $XE0 + $XE1*($i-0.5)]
+            set cxh [expr $cxl + $XE1]
+            set r [expr int( [lindex $rgb(red) $i]*255 )]
+            if { $r > 255 } { set r 255 }
+            set g [expr int( [lindex $rgb(green) $i]*255 )]
+            if { $g > 255 } { set g 255 }
+            set b [expr int( [lindex $rgb(blue) $i]*255 )]
+            if { $b > 255 } { set b 255 }
+            set col [format "#%0.2X%0.2X%0.2X"  $r $g $b]
+            lappend LBAR [$CAN2 create line $cxl $LBARY $cxh $LBARY -width 10 -fill "$col" -tags lbar]
+         }
+         SetHelp lbar "A colour bar showing the colour of the corresponding entry in the colour table editor." LUTEDIT_LBAR
+
+# If a bar exists already, just set the colours.
+      } else {
+         for { set i 0 } { $i < $NENT } { incr i } {
+            set cxl [expr $XE0 + $XE1*($i-0.5)]
+            set cxh [expr $cxl + $XE1]
+            set r [expr int( [lindex $rgb(red) $i]*255 )]
+            if { $r > 255 } { set r 255 }
+            set g [expr int( [lindex $rgb(green) $i]*255 )]
+            if { $g > 255 } { set g 255 }
+            set b [expr int( [lindex $rgb(blue) $i]*255 )]
+            if { $b > 255 } { set b 255 }
+            set col [format "#%0.2X%0.2X%0.2X"  $r $g $b]
+            set id [lindex $LBAR $i]
+            $CAN2 itemconfigure $id -fill "$col"
+            $CAN2 coords $id $cxl $LBARY $cxh $LBARY
+         }         
+      }
+   }
+}
 
 proc addHelp {helpmenu} {
 #
@@ -112,8 +1059,11 @@ proc saveOpts {} {
 #
 # Save the current settings in the options menu.
 #
+   global PALON
+   global ALLCRV
    global INITRC 
    global AUTOUP
+   global LBARON
    global CSYS 
    global CSYSNOW 
    global NN
@@ -121,16 +1071,26 @@ proc saveOpts {} {
    global NEGIMAGE
    global HISTXLAB
    global LOGPOP
+   global NPAL
+   global PAL
 
    set rc [open $INITRC "w"]
+   puts $rc "set ALLCRV $ALLCRV"
    puts $rc "set AUTOUP $AUTOUP"
+   puts $rc "set LBARON $LBARON"
    puts $rc "set CSYS $CSYS"
    puts $rc "set CSYSNOW $CSYS"
+   puts $rc "set PALON $PALON"
    puts $rc "set NN $NN"
    puts $rc "set AUTOCUT $AUTOCUT"
    puts $rc "set NEGIMAGE $NEGIMAGE"
    puts $rc "set HISTXLAB $HISTXLAB"
    puts $rc "set LOGPOP $LOGPOP"
+   for {set i 0} { $i < $NPAL } { incr i } {
+      puts $rc "set PAL($i) $PAL($i)"
+   }
+
+   puts $rc "PalArea"
    puts $rc "newCsys"
    puts $rc "histStyle 0"
    close $rc
@@ -156,6 +1116,7 @@ proc resample {} {
    global RSENT
    global RSINT
    global UP
+   global DV
 
    set type(RSENT) "_INTEGER"
    set type(RSINT) "_CHOICE"
@@ -299,6 +1260,7 @@ proc select {} {
          set SELID [$CAN2 create rectangle $cxl $CURY1 $cxh $CURY2 -outline "" -fill $BACKCOL]
          $CAN2 lower $SELID
       }
+
    }
 }
 
@@ -316,6 +1278,7 @@ proc rotate {} {
    global NENTM1
    global SHIFT
    global PPENT
+   global ALLCRV
 
    set type(SHIFT) "_INTEGER"
    set lab(SHIFT) "Number of pens by which to to rotate (+ve or -ve)"
@@ -347,11 +1310,19 @@ proc rotate {} {
 
 #  Split the original entries into two groups, swap them round and join
 #  them together again.
-         set loents [lrange $LUT($RGBNOW) $lo $l]
-         set hients [lrange $LUT($RGBNOW) [expr $l+1] $hi] 
-         set newents [join [concat $hients $loents]]
-         set LUT($RGBNOW) [eval lreplace {$LUT($RGBNOW)} $lo $hi  $newents]
-         updateCurrent
+         foreach col [array names LUT] { 
+            if { $ALLCRV || $col == $RGBNOW } {
+               set loents [lrange $LUT($col) $lo $l]
+               set hients [lrange $LUT($col) [expr $l+1] $hi] 
+               set newents [join [concat $hients $loents]]
+               set LUT($col) [eval lreplace {$LUT($col)} $lo $hi  $newents]
+            }
+         }
+         if { $ALLCRV } {
+            updateDisplay 0
+         } else {
+            updateCurrent
+         }
          record
       }
    }
@@ -366,35 +1337,46 @@ proc bridge {} {
    global HENTRY
    global RGBNOW
    global LUT
+   global ALLCRV
 
    if { $HENTRY == "" || $LENTRY == "" } {
       Message "No pens are currently selected. Drag the cursor to select pens."
 
    } else {
-      set vl [lindex $LUT($RGBNOW) $LENTRY]
-      set d [expr ([lindex $LUT($RGBNOW) $HENTRY] - $vl)/($HENTRY-$LENTRY)]
+      foreach col [array names LUT] {
+         if { $col == $RGBNOW || $ALLCRV } {
 
-      set f [expr $LENTRY+1]
-      set l [expr $HENTRY-1]
-      set new ""
-      for {set i $f } {$i <= $l} {incr i} {
-         set vl [expr $vl + $d]
-         append new "$vl "
-      }
-      if { $new != "" } {
-         set LUT($RGBNOW) [eval lreplace {$LUT($RGBNOW)} $f $l $new]
+            set vl [lindex $LUT($col) $LENTRY]
+            set d [expr ([lindex $LUT($col) $HENTRY] - $vl)/($HENTRY-$LENTRY)]
+
+            set f [expr $LENTRY+1]
+            set l [expr $HENTRY-1]
+            set new ""
+            for {set i $f } {$i <= $l} {incr i} {
+               set vl [expr $vl + $d]
+               append new "$vl "
+            }
+            if { $new != "" } {
+               set LUT($col) [eval lreplace {$LUT($col)} $f $l $new]
+            }
+      
+         }
       }
 
-      updateCurrent
+      if { $ALLCRV } {
+         updateDisplay 0
+      } else {
+         updateCurrent
+      }
       record
 
    }
 }
 
-proc flip {all} {
+proc flip {} {
 #
 #  Flip the selected pens horizontally. If there is currently no
-#  selection, use the whole table. If $all is zero, just flip the current
+#  selection, use the whole table. If $ALLCRV is zero, just flip the current
 #  curve. Otherwise flip all curves.
 #
    global LENTRY
@@ -404,6 +1386,7 @@ proc flip {all} {
    global NENTM1
    global SHIFT
    global PPENT
+   global ALLCRV
 
    if { $HENTRY == "" } {
       set hi $NENTM1
@@ -417,7 +1400,7 @@ proc flip {all} {
       set lo $LENTRY
    }
 
-   if { $all } {
+   if { $ALLCRV } {
       set newr ""
       set newg ""
       set newb ""
@@ -454,9 +1437,10 @@ proc setCon {} {
    global RGBNOW
    global LUT
    global CONST
+   global ALLCRV
  
    set type(CONST) "_REAL"
-   set lab(CONST) "The constant value"
+   set lab(CONST) "The constant value (in the range 0.0 to 1.0)"
    set lim(CONST) [list 0.0 1.0]
    if { ![info exists CONST] } { set CONST 0.0 }
 
@@ -469,10 +1453,17 @@ proc setCon {} {
          append new "$CONST "
       }
       if { $new != "" } {
-         set LUT($RGBNOW) [eval lreplace {$LUT($RGBNOW)} $LENTRY $HENTRY $new]
+         foreach col [array names LUT] {
+            if { $ALLCRV || $col == $RGBNOW } {
+               set LUT($col) [eval lreplace {$LUT($col)} $LENTRY $HENTRY $new]
+            }
+         }
       }
-
-      updateCurrent
+      if { $ALLCRV } {
+         updateDisplay 0
+      } else {
+         updateCurrent
+      }
       record
 
    }
@@ -490,6 +1481,7 @@ proc smooth {} {
    global PPENT
    global NENT
    global NENTM1
+   global ALLCRV
  
    set type(WID) "_INTEGER"
    set lab(WID) "The number of pens across the filter box"
@@ -505,46 +1497,56 @@ proc smooth {} {
       set hw [expr round($WID/$PPENT)/2]
       if { $hw > 0 } { 
 
-         set lp [expr $LENTRY-$hw]
-         set up [expr $LENTRY+$hw]
-         if { $lp < 0 } { set lp 0 } elseif { $lp > $NENTM1 } { set $lp $NENTM1 }
-         if { $up < $lp } { set up $lp } elseif { $up > $NENTM1 } { set $up $NENTM1 }
+         foreach col [array names LUT] { 
+            if { $ALLCRV || $col == $RGBNOW } {
 
-         set sm 0.0
-         set nm 0
-         for {set i $lp} { $i <= $up } {incr i} {
-            if { $i >= $LENTRY && $i <= $HENTRY } {
-               set sm [expr $sm + [lindex $LUT($RGBNOW) $i]]
-               incr nm
+                set lp [expr $LENTRY-$hw]
+                set up [expr $LENTRY+$hw]
+                if { $lp < 0 } { set lp 0 } elseif { $lp > $NENTM1 } { set $lp $NENTM1 }
+                if { $up < $lp } { set up $lp } elseif { $up > $NENTM1 } { set $up $NENTM1 }
+
+                set sm 0.0
+                set nm 0
+                for {set i $lp} { $i <= $up } {incr i} {
+                   if { $i >= $LENTRY && $i <= $HENTRY } {
+                      set sm [expr $sm + [lindex $LUT($col) $i]]
+                      incr nm
+                   }
+                }
+       
+                set new "[expr $sm/$nm] "
+                for {set i [expr $LENTRY +1] } {$i <= $HENTRY} {incr i} {
+                   if { $lp >= $LENTRY && $lp <= $HENTRY } {
+                      set sm [expr $sm - [lindex $LUT($col) $lp]]
+                      incr nm -1
+                   }
+                   incr lp
+       
+                   incr up
+                   if { $up >= $LENTRY && $up <= $HENTRY } {
+                      set sm [expr $sm + [lindex $LUT($col) $up]]
+                      incr nm
+                   }
+       
+                   if { $nm > 0 } {
+                      append new "[expr $sm/$nm] "
+                   } else {
+                      append new "[lindex $LUT($col) $i] "
+                   }
+                }
+
+                if { $new != "" } {
+                   set LUT($col) [eval lreplace {$LUT($col)} $LENTRY $HENTRY $new]
+                }
             }
          }
 
-         set new "[expr $sm/$nm] "
-         for {set i [expr $LENTRY +1] } {$i <= $HENTRY} {incr i} {
-            if { $lp >= $LENTRY && $lp <= $HENTRY } {
-               set sm [expr $sm - [lindex $LUT($RGBNOW) $lp]]
-               incr nm -1
-            }
-            incr lp
-
-            incr up
-            if { $up >= $LENTRY && $up <= $HENTRY } {
-               set sm [expr $sm + [lindex $LUT($RGBNOW) $up]]
-               incr nm
-            }
-
-            if { $nm > 0 } {
-               append new "[expr $sm/$nm] "
-            } else {
-               append new "[lindex $LUT($RGBNOW) $i] "
-            }
-         }
-
-         if { $new != "" } {
-            set LUT($RGBNOW) [eval lreplace {$LUT($RGBNOW)} $LENTRY $HENTRY $new]
+         if { $ALLCRV } {
+            updateDisplay 0
+         } else {                  
             updateCurrent
-            record
          }
+         record
       }
    }
 }
@@ -583,16 +1585,15 @@ proc newCsys {} {
       SetHelp $BB "Press to edit the value curve..." LUTEDIT_BB
       SetHelp c-blue "A curve showing the value (roughly equivalent to the brightness) at each pen."
    } elseif { $CSYS == "MONO" } {
-      $RB configure -text "" -state disabled
+      $RB configure -text "Intensity" -state disabled
       SetHelp $RB "Unused in monochrome mode" LUTEDIT_GB
       SetHelp c-red "A curve showing the monochrome value at each pen."
-      $GB configure -text "" -state disabled
+      $GB configure -text "(un-used)" -state disabled
       SetHelp $GB "Unused in monochrome mode" LUTEDIT_GB
       SetHelp c-green ""
-      $BB configure -text "" -state disabled
+      $BB configure -text "(un-used)" -state disabled
       SetHelp $BB "Unused in monochrome mode" LUTEDIT_BB
       SetHelp c-blue ""
-
    }
 
    if { $CSYS != $CSYSNOW } {
@@ -645,7 +1646,7 @@ proc toRGB {a now} {
             set p [expr $v*(1-$s)]
             set q [expr $v*(1-$s*$f)]
             set t [expr $v*(1-$s*(1-$f))]
-            if { $i == 0 } {
+            if { $i == 0 || $i == 6 } {
                set r $v
                set g $t
                set b $p
@@ -1129,7 +2130,10 @@ proc updateCursor {usepen} {
    } else {
       $CAN2 raise $MARKID
    }
-   
+
+# Set the data value corresponding to the current pen index.
+   setDV 0
+
 }
 
 proc updateCurrent {} {
@@ -1141,6 +2145,7 @@ proc updateCurrent {} {
    global AUTOUP
 
    drawCurve $RGBNOW
+   LutBar
    rgbSel
    updateCursor 1
    updateMark 1
@@ -1203,6 +2208,9 @@ proc cintCent {x} {
       } elseif { $CPEN > $UP } {
          set CPEN $UP
       }
+
+#  Set the corresponding data value.
+      setDV 0
 
 #  Find the value of the current entry.
       set EVAL [format "%.3f" [lindex $LUT($RGBNOW) $CENT]]
@@ -1445,6 +2453,12 @@ proc imageDisp { } {
    global LUTEDIT_SCRATCH
    global AUTOCUT
    global NEGIMAGE
+   global SCALOW
+   global SCAHIGH
+   global DVM
+   global DVC
+   global LP
+   global UP
 
    if { $NEGIMAGE } {
       set per "\[$AUTOCUT,[expr 100-$AUTOCUT]\]"
@@ -1454,6 +2468,15 @@ proc imageDisp { } {
 
    Obey kapview picsel "label=image" 1
    Obey kapview display "in=$IMAGE axes=no mode=perc margin=0.05 percentiles=$per " 1
+
+# Save the data values corresponding to the top oabd bottom pen indices.
+   set SCALOW [format "%.6g" [GetParamED kapview display:scalow]]
+   set SCAHIGH [format "%.5g" [GetParamED kapview display:scahigh]]
+
+# Set up constants for converting from pen number to data value.
+   set DVM [expr double($SCAHIGH - $SCALOW)/double($UP - $LP)]
+   set DVC [expr $SCALOW - $LP*$DVM]
+   setDV 0
 
 #  Update the histogram to ensure it reflects the new image display.
    histDisp
@@ -1468,9 +2491,6 @@ proc histDisp { } {
    global LUTEDIT_SCRATCH
    global SCALOW
    global SCAHIGH
-
-   set SCALOW [format "%.6g" [GetParamED kapview display:scalow]]
-   set SCAHIGH [format "%.5g" [GetParamED kapview display:scahigh]]
 
    Obey kapview picsel "label=hist" 1
    Obey kapview gdclear "current=yes" 1
@@ -1561,6 +2581,7 @@ proc setTrans {} {
    global CYL
    global CYH
    global CURX
+   global LBARY
 
    if { $CAN2 != "" } {
       update idletasks
@@ -1633,6 +2654,10 @@ proc setTrans {} {
 #  Note, CYL will be greater than CYH because canvas Y increases downwards.
       set CYL $YOFF
       set CYH [expr $YOFF - $YSCALE]
+
+# Store the canvas Y for the colour bar i the editor.
+      set LBARY [expr $h - 5]
+
    }
 }
 
@@ -1699,6 +2724,7 @@ proc emptyEditor {} {
    global EX0
    global HENTRY
    global LENTRY
+   global LBAR
    
    unzoom 
 
@@ -1713,9 +2739,12 @@ proc emptyEditor {} {
 
    $CAN2 delete all
 
-   unset LUT(red)
-   unset LUT(green)
-   unset LUT(blue)
+   catch { 
+      unset LUT(red)
+      unset LUT(green)
+      unset LUT(blue)
+      unset LBAR
+   }
 
    set CTRL(red) ""
    set CTRL(blue) ""
@@ -2730,6 +3759,8 @@ proc greyCurves {nent} {
    set CURX ""
    setTrans
 
+# Set the data value corresponding to the current pen index.
+   setDV 0
 }
 
 proc updateDisplay {force} {
@@ -2770,6 +3801,9 @@ proc updateEditor {} {
    drawCurve red
    drawCurve green
    drawCurve blue
+
+# Bring the colour bar up to date.
+   LutBar
 
 #  Raise the currently selected curve.
    rgbSel
@@ -4045,7 +5079,6 @@ proc ReleaseBind {x y} {
       updateCursor 0
    }
 
-
 }
 
 proc Resize {} {
@@ -4324,7 +5357,13 @@ proc saveLUT {file conf} {
 
 #  Write out the contents of the colour curves.
       for {set i 0} {$i < $NENT} {incr i} {
-         puts $id "[lindex $lut(red) $i] [lindex $lut(green) $i] [lindex $lut(blue) $i]"
+         set r [lindex $lut(red) $i]
+         set r [expr $r < 0.0 ? 0.0 : ( $r > 1.0 ? 1.0 : $r )]
+         set g [lindex $lut(green) $i]
+         set g [expr $g < 0.0 ? 0.0 : ( $g > 1.0 ? 1.0 : $g )]
+         set b [lindex $lut(blue) $i]
+         set b [expr $b < 0.0 ? 0.0 : ( $b > 1.0 ? 1.0 : $b )]
+         puts $id "$r $g $b"
       }
 
 #  Close the file.
@@ -4628,6 +5667,8 @@ proc textLut {file} {
          set CURX ""
          setTrans
 
+# Set the data value corresponding to the current pen index.
+         setDV 0
       }
 
    }
@@ -4820,19 +5861,26 @@ proc WaitFor {name args} {
    set LP 16
    set UP [expr $GWM_NCOL - 1 ]
    set NP ""
+   set DVM 1.0
+   set DVC 0.0
+   set SCAHIGH $UP
+   set SCALOW $LP
 
 #  Initialise LutEdit global variables.
    set ACTION ""
    set ADAM_ERRORS ""
    set ADAM_TASKS ""
    set ADAM_USER ""
+   set ALLCRV 0
    set ATASK_OUTPUT ""
    set AUTOCUT "95"
    set AUTOUP 1
+   set LBARON 1
    set CAN ""
    set CAN2 ""
    set CANCEL_OP 0
    set CENT ""
+   set SAMPF ""
    set CFREEZE 0
    set CPEN ""
    set CPVIS 0
@@ -4865,13 +5913,13 @@ proc WaitFor {name args} {
    set NN "NO"
    set NOLD 0
    set KEEPFILE 0
+   set FPAL ""
+   set PALON 0
    set PPENT 1
    set PVAL ""
    set RGBNOW ""
    set RGBSEL red
    set SAFE ""
-   set SCAHIGH ""
-   set SCALOW ""
    set SELID ""
    set STATUS ""
    set TOP ""
@@ -4915,6 +5963,9 @@ proc WaitFor {name args} {
 # Set the default colour for all backgrounds.
    . configure -background $BACKCOL
    option add *background $BACKCOL
+
+# Set up the default palette
+   DefPal
 
 # Try to stop problems with the AMS (ADAM Message System) rendevous files 
 # by creating a new directory as ADAM_USER.
@@ -5019,6 +6070,7 @@ proc WaitFor {name args} {
    set S_FONT [font create -weight normal -slant roman -size 12]
    set IT_FONT [font create -weight bold -slant italic -size 18]
    set TT_FONT [font create -family helvetica -weight normal -slant roman -size 14]
+   set SML_FONT [font create -family helvetica -weight normal -slant roman -size 10]
 
 # Loop round until we have succesully create a gwm canvas item. The first
 # pass round this loop attempts to manage without a private colour map.
@@ -5135,15 +6187,29 @@ proc WaitFor {name args} {
       $editmenu add command -label "Smooth      " -command {smooth}
       MenuHelp $editmenu "Smooth      " "Smooth the currently selected pens using a box filter of specified width."
 
-      $editmenu add command -label "Flip current" -command {flip 0}
-      MenuHelp $editmenu "Smooth      " "Flip the current curve horizontally."
-
-      $editmenu add command -label "Flip all" -command {flip 1}
-      MenuHelp $editmenu "Smooth      " "Flip all curves horizontally."
+      $editmenu add command -label "Flip        " -command {flip}
+      MenuHelp $editmenu "Flip        " "Flip the curve(s) horizontally."
 
 # Add menu items to the Options menu.
       $optsmenu add checkbutton -label "Auto-update" -variable AUTOUP 
       MenuHelp $optsmenu "Auto-update" "Update the image display and histogram automatically whenever any change is mad to the colour table?"
+
+      $optsmenu add checkbutton -label "Colour bar" -variable LBARON -command LutBar
+      MenuHelp $optsmenu "Colour bar" "Include a colour bar at the bottom of the editor window?"
+
+      $optsmenu add checkbutton -label "All curves" -variable ALLCRV 
+      MenuHelp $optsmenu "All curves" "Should Edit menu functions affect all the curves, or only the current curve?"
+
+      set palmenu "$optsmenu.pal"
+      MenuHelp $optsmenu "Palette   " "Options for the palette of pre-defined colours"
+      $optsmenu add cascade -label "Palette   " -menu $palmenu
+         menu $palmenu 
+         $palmenu add checkbutton -label "Show" -variable PALON -command PalArea
+         MenuHelp $palmenu "Show" "Display the palette?"
+         $palmenu add command -label "Default" -command {DefPal} 
+         MenuHelp $palmenu "Default" "Restore the default palette colours"
+         $palmenu add command -label "Sort" -command {PalSort} 
+         MenuHelp $palmenu "Sort" "Sort the palette colours"
 
       set csysmenu "$optsmenu.csys"
       MenuHelp $optsmenu "Colour system" "Specifies how colours are represented within the colour editor"
@@ -5216,10 +6282,9 @@ proc WaitFor {name args} {
    
       $optsmenu add separator 
       $optsmenu add command -label "Save options" -command {saveOpts} -accelerator "Ctrl-p"
-      MenuHelp $optsmenu "Save options" "Save the current options settings so that they become the default settings in future."
+      MenuHelp $optsmenu "Save options" "Save the current options settings and palette colours so that they become the default settings in future."
       bind $UWIN <Control-p> {saveOpts}
       
-
 #  Pack the menu buttons.
       pack $file $edit $opts -side left 
       pack $help -side right
@@ -5339,21 +6404,30 @@ proc WaitFor {name args} {
    set F6 [frame $F3.current]
 
    grid [label $F6.l1 -text "Current pen index: "]  -column 0 -row 0 -sticky "nw"
-   grid [entry $F6.v1 -width 6 -relief sunken -bd 2 -textvariable CPEN] -column 1 -row 0 -sticky "nw"
+   grid [entry $F6.v1 -width 6 -relief sunken -bd 2 -textvariable CPEN -font $SML_FONT] -column 1 -row 0 -sticky "nw"
    bind $F6.v1 <Return> "updateCursor 1"
    SetHelp [list $F6.l1 $F6.v1] "The current pen index (type a new value to move the cursor)..." LUTEDIT_RB
 
-   grid [label $F6.l0 -text "       "]  -column 2 -row 0 -sticky nw
+   grid [label $F6.l3 -text " "]  -column 2 -row 0 -sticky nw
+   grid [entry $F6.v3 -width 10 -relief sunken -bd 2 -textvariable DV -font $SML_FONT] -column 3 -row 0 -sticky "nw"
+   bind $F6.v3 <Return> "setDV 1"
 
-   grid [label $F6.l2 -text "Current pen value: "]  -column 3 -row 0 -sticky "nw"
-   grid [label $F6.v2 -width 6 -relief sunken -bd 2 -textvariable PVAL] -column 4 -row 0 -sticky "nw"
+   SetHelp $F6.v3 "The data value in the displayed image corresponding to the current pen index..." LUTEDIT_DV
+
+   grid [label $F6.l0 -text "       "]  -column 4 -row 0 -sticky nw
+
+   grid [label $F6.l2 -text "Current pen value: "]  -column 5 -row 0 -sticky "nw"
+   grid [entry $F6.v2 -width 6 -relief sunken -bd 2 -textvariable PVAL -font $SML_FONT] -column 6 -row 0 -sticky "nw"
+   bind $F6.v2 <Return> "SetPenVal \$PVAL"
+
+
    SetHelp [list $F6.l2 $F6.v2] "The current pen value." LUTEDIT_RB
 
-   grid columnconfigure $F6 5 -weight 10
-   grid [button $F6.b1 -bitmap "@$KAPPA_DIR/cpoint.bit" -command cpoint] -column 5 -row 0 -sticky ne
+   grid columnconfigure $F6 6 -weight 10
+   grid [button $F6.b1 -bitmap "@$KAPPA_DIR/cpoint.bit" -command cpoint] -column 7 -row 0 -sticky ne
    SetHelp $F6.b1 "Click to add a control point to the current curve at the table entry nearest to the cursor position." LUTEDIT_CPADD
 
-   grid [button $F6.b2 -bitmap "@$KAPPA_DIR/dpoint.bit" -command "dpoint 0"] -column 6 -row 0 -sticky ne
+   grid [button $F6.b2 -bitmap "@$KAPPA_DIR/dpoint.bit" -command "dpoint 0"] -column 8 -row 0 -sticky ne
    SetHelp $F6.b2 "Click to delete the control point nearest to the cursor in the current curve (shift-click to delete all control points)." LUTEDIT_CPDEL
    bind $F6.b2 <Shift-ButtonPress-1> "dpoint 1"
 
@@ -5414,8 +6488,8 @@ proc WaitFor {name args} {
    SetHelp hist "A histogram of the pen numbers used within the neighbouring image display, with each bin coloured using its own pen colour."
 
 #  Keyboard left and right arrow keys move the cursor by one pen.
-   bind $UWIN <Left> {set CPEN [expr $CPEN-1.0];updateCursor 1}
-   bind $UWIN <Right> {set CPEN [expr $CPEN+1.0];updateCursor 1}
+   bind $F4 <Left> {set CPEN [expr $CPEN-1.0];updateCursor 1}
+   bind $F4 <Right> {set CPEN [expr $CPEN+1.0];updateCursor 1}
 
 #  Set cursors to use when pointer is over a canvas item with various tags.
    set CURTAGS [list mark pcurs cp bkgrnd]
