@@ -7,10 +7,7 @@ astrom_SOURCES = \
 	$(BLOCK_DATA_FILES) \
 	$(PRIVATE_INCLUDES)
 
-## FIXME: Add "-L/usr/lib -lgcc" to the link line.  This is harmless on most
-## platforms, but an essential hack on OSX.  This has to be fixed at some
-## point.
-astrom_LDADD = -lsla -lcfitsio -L/usr/lib -lgcc
+astrom_LDADD = -lsla -lcfitsio
 
 F_ROUTINES = \
 	astrom.f \
