@@ -373,7 +373,7 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  First report results when replacing data outside a given range.
-         IF ( NREPHI .LE. 0 ) THEN
+         IF ( NREPHI .GE. 0 ) THEN
 
 *  Report the number of replacements in the array that were below the
 *  threshold.
@@ -413,11 +413,11 @@
             IF ( NREPLO .NE. 1 ) THEN
                CALL MSG_OUTIF( MSG__NORM, 'REPLACE',
      :           '^NREP elements were changed in the ^COMPS '/
-     :           /'array.', STATUS )
+     :           /'array between the thresholds.', STATUS )
             ELSE
                CALL MSG_OUTIF( MSG__NORM, 'REPLACE',
      :           'One element was changed in the ^COMPS '/
-     :           /'array.', STATUS )
+     :           /'array between the thresholds.', STATUS )
             END IF
 
          END IF

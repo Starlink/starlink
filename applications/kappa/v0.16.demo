@@ -59,19 +59,20 @@ demo v0.16 {
 
       command {Obey kapview gdclear ""}
       command {Obey kapview picdef "mode=array xpic=2 ypic=1 outline=no prefix=a"}
-      command {Obey kapview display "in=$KAPPA_DIR/m57 lut=$KAPPA_DIR/warm_lut axes=no mode=scale low=879 high=5089 badcol=red style=def accept"}
+      command {Obey kapview display "in=$KAPPA_DIR/m57(-214:103,216:532) lut=$KAPPA_DIR/warm_lut axes=no mode=scale low=879 high=5089 badcol=red style=def accept"}
       command {Obey kapview picsel "label=a2"}
-      command {Obey kappa thresh "in=$KAPPA_DIR/m57 out=./temp thrlo=929 thrhi=909 newlo=bad"}
+      command {Obey kappa thresh "in=$KAPPA_DIR/m57(-214:103,216:532) out=./temp thrlo=2500 thrhi=1500 newlo=bad"}
       command {Obey kapview display "in=./temp lut=$KAPPA_DIR/warm_lut axes=no mode=scale low=879 high=5089 badcol=red style=def accept"}
 
-      text "The <command thresh> command has been changed so that data
-      values <emph within> a specified data range can be replaced, by
+      text "The <command thresh> command replaces pixel values outside a
+      given range with nominated replacement values (they may also be set
+      bad). <command thresh> has been changed to also allow pixel values 
+      <emph inside> a given range to be replaced. This is done by 
       giving a value for the the lower threshold which is higher than 
       the upper threshold. For instance, the right hand image above was
       created by the command:\n\n  % <command thresh> <command 
-      in=in=$KAPPA_DIR/m57 out=./temp thrlo=929 thrhi=909 newlo=bad>"
-
-      pause 18
+      in=in=$KAPPA_DIR/m57 out=./temp thrlo=2500 thrhi=1500 newlo=bad>"
+      pause 22
 
    }
 } 
