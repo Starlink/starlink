@@ -93,7 +93,7 @@ begin
                 rnoise=9.95, direction="x", deferred=INDEF,
                 extent="6,119,1,128", logto="both",
                 logfile="ccdtest.log", preserve=yes, genvar=no,
-                ndfnames=yes, save=no, saturate=no,
+                ndfnames=yes, save=no, saturate=no, useset=no,
                 mask="ccdtest.ard", maskname="ccdtest.ard" )
    } else {
      print "Cannot locate ARD file; mask not applied"
@@ -101,7 +101,7 @@ begin
                 rnoise=9.95, direction="x", deferred=INDEF,
                 extent="6,119,1,128", logto="both",
                 logfile="ccdtest.log", preserve=yes, genvar=no,
-                ndfnames=yes, save=no, saturate=no,
+                ndfnames=yes, save=no, saturate=no, useset=no,
                 mask=INDEF, maskname=INDEF )
    }
 

@@ -92,6 +92,7 @@ hidden proc ccdexercise
             preserve=true ~
             direction=x ~
             mask=(mask) ~
+            useset=no ~
             reset accept
 {       end ccdsetup
      else
@@ -107,6 +108,7 @@ hidden proc ccdexercise
             logfile=ccdtest.log ~
             preserve=true ~
             direction=x ~
+            useset=no ~
             reset accept
 {       end ccdsetup
       endif

@@ -115,6 +115,7 @@
 	    preserve=true \
 	    direction=x \
             mask=ccdtest.ard \
+            useset=no \
 	    reset accept
 #        end ccdsetup
       else
@@ -130,6 +131,7 @@
 	    logfile=ccdtest.log \
 	    preserve=true \
 	    direction=x \
+            useset=no \
             reset accept
 #        end ccdsetup
       endif
