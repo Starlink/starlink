@@ -8,7 +8,7 @@
 
 % The textpos package is necessary to position textblocks at arbitary 
 % places on the page.
-\usepackage[absolute]{textpos}
+\usepackage[absolute,overlay]{textpos}
 
 \usepackage{graphicx,times,url}
 
@@ -19,12 +19,21 @@
 \definecolor{Red}{rgb}{0.9,0.0,0.1}
 
 % see documentation for a0poster class for the size options here
-\let\Textsize\normalsize
-\def\RHead#1{\noindent\hbox to \hsize{\hfil{\LARGE\color{DarkBlue} #1\par}}\bigskip}
-\def\LHead#1{\noindent{\LARGE\color{DarkBlue} #1\par}\bigskip}
-\let\Head\RHead
-\def\Subhead#1{\noindent{\large\color{DarkBlue} #1\par}\bigskip}
-\def\Title#1{\noindent{\VeryHuge\color{Red} #1\par}}
+\iffalse
+  \let\Textsize\normalsize
+  \def\RHead#1{\noindent\hbox to \hsize{\hfil{\LARGE\color{DarkBlue} #1\par}}\bigskip}
+  \def\LHead#1{\noindent{\LARGE\color{DarkBlue} #1\par}\bigskip}
+  \let\Head\RHead
+  \def\Subhead#1{\noindent{\large\color{DarkBlue} #1\par}\bigskip}
+  \def\Title#1{\noindent{\VeryHuge\color{Red} #1\par}}
+\else
+  \let\Textsize\large
+  \def\RHead#1{\noindent\hbox to \hsize{\hfil{\huge\color{DarkBlue} #1\par}}\bigskip}
+  \def\LHead#1{\noindent{\huge\color{DarkBlue} #1\par}\bigskip}
+  \let\Head\RHead
+  \def\Subhead#1{\noindent{\Large\color{DarkBlue} #1\par}\bigskip}
+  \def\Title#1{\noindent{\VeryHuge\color{Red} #1\par}}
+\fi
 
 
 \TPGrid[40mm,40mm]{23}{12}      % 3 cols of width 7, plus 2 gaps width 1
@@ -33,6 +42,19 @@
 \parskip=0.5\baselineskip
 
 \begin{document}
+
+\Textsize
+
+\hbox{}
+\vskip 2\TPVertModule
+\vbox to 0pt{
+  \vbox to 10\TPVertModule{
+    \vss
+    \hbox to \hsize{\hss\includegraphics[angle=90]{script-big}\hss}
+    \vss
+  }
+  \vss
+}
 
 \begin{textblock}{23}(0,0)
 \Title{P2.1.10: The Starlink Software Collection\\
@@ -44,12 +66,13 @@
 \begin{textblock}{15}(0,1.0)
 \LHead{\strut
   Norman Gray$^1$, Tim Jenness$^2$, Alasdair Allan$^1$, David Berry$^1$,
+  \goodbreak
   Malcolm Currie$^1$, 
   Peter Draper$^1$, Mark Taylor$^1$ and Brad Cavanagh$^2$
 \\ % \hfil\break
 \textsl{%
-  1: Starlink, UK\\
-  2: Joint Astronomy Centre, Hawai'i, USA}}
+  ${}^1$ Starlink, UK;\quad
+  ${}^2$ Joint Astronomy Centre, Hawai'i, USA}}
 \end{textblock}
 
 
@@ -90,50 +113,49 @@
 % In both cases, place the centre of the graphic at the centre of the
 % lower region, extending from (0,2)..(23,12).
 \begin{textblock}{7}[0.5,0.5](11.5,7)
-\vbox to 0pt{\vss\hbox to 0pt{\hss\includegraphics[angle=90]{script-big}\hss}\vss}%
+%\vbox to 0pt{\vss\hbox to 0pt{\hss\includegraphics[angle=90]{script-big}\hss}\vss}%
 \vbox to 0pt{\vss\hbox to 0pt{\hss\includegraphics{script-little}\hss}\vss}%
 \end{textblock}
 
 
 
 \begin{textblock}{7}(0,2)
-\hrule\medskip
 
-\Head{Summary}
+%\hrule\medskip
+%\Head{Summary}
 
 \slshape
 
 The Classic Starlink Software Collection (aka `USSC', see below)
-currently runs 
-on three different Unix platforms and contains approximately 130 separate
-software items, totaling millions of lines of code, in a mix of
-Fortran, C, C++, Tcl, Perl and a few others. The proliferation of requests
-for ports to
-new operating systems (including multiple variants of Linux), in
-conjunction with a decrease in the level of support for the classic
-software collection, has lead to a decision to modify the build system
-from the current collection of makefiles with hard-wired OS
-configurations to a scheme involving feature-discovery via GNU
-Autoconf.
+currently runs on three different Unix platforms and contains
+approximately 130 separate software items, totalling millions of lines
+of code, in a mix of Fortran, C, C++, Tcl, Perl and others.  We get requests
+to port to an increasing range of platforms, while suffering a
+decrease in the funding support for the classic collection.  We have
+therefore changed the build system from a hand-maintained collection
+of makefiles with hard-wired OS configurations to a scheme involving
+feature-discovery via GNU Autoconf.
 
 As a result of this work, we have already ported the USSC to Mac OSX
-and Cygwin. 
-
-This had some unexpected benefits and costs, and a few valuable lessons.
+and Cygwin.  This had some unexpected benefits and costs, and
+valuable lessons.
 
 \bigskip
 \hrule
 \end{textblock}
 
+\def\itemize{}
+\def\item{\noindent\hbox to 1em{$\bullet$\hfil}}
 
-\begin{textblock}{7}(0,5)
+
+\begin{textblock}{7}(0,4.5)
 
 \Head{The problems}
 
 \begin{itemize}
-\item It's Big!  About 130 items, with around 1700kSLOC of our
-  multi-language legacy code, 300kSLOC of Java (not included in
-  this build system), plus another 600kSLOC of thirdparty code, some
+\item It's Big!  About 130 items, with around 1700 kSLOC of our
+  multi-language legacy code, 300 kSLOC of Java (not included in
+  this build system), plus another 600 kSLOC of thirdparty code, some
   tweaked, and all built at the same time.
 
 \item According to David A Wheeler's SLOCCount,
@@ -142,13 +164,18 @@ This had some unexpected benefits and costs, and a few valuable lessons.
   \url{http://www.dwheeler.com/sloc/redhat71-v1/redhat71sloc.html}.
   Busy types, aren't we?
 
+\item It (was) weird!  Our legacy build system was idiosyncratic.  It
+  worked, but was unusual both in the way the code was distributed and
+  built.  This presented a barrier to potential developers and
+  maintainers, and an ongoing and unsustainable cost.
+
 \item It's Crusty!  Some of that code dates back quite a long way, and
   some of it comes from community donations.  While the majority of it
   is well-written, there are a few\dots gems in there.
 
-\item It (was) Scattered!  For historical reasons, the master copies
-  of all our code weren't kept in the one place.  Simply
-  \emph{finding} all our code was slightly harder than we expected.
+%\item It (was) Scattered!  For historical reasons, the master copies
+%  of all our code weren't kept in the one place.  Simply
+%  \emph{finding} all our code was slightly harder than we expected.
 
 \item Did I mention funding problems?
 
@@ -156,7 +183,8 @@ This had some unexpected benefits and costs, and a few valuable lessons.
 \end{textblock}
 
 
-\begin{textblock}{7}(0,8)
+%\begin{textblock}{7}(0,8.5)
+\begin{textblock}{7}(8,8)
 
 \Head{History}
 
@@ -211,52 +239,42 @@ the community will have to take a larger role in its curation.
 \item GPLed wherever possible.
 
 \item The project has always obsessed about coding standards and
-  coding discipline.  This has really did pay off here.
+  coding discipline.  This concern paid off, with interest, here.
 
 \end{itemize}  
 \end{textblock}
 
 
-\begin{textblock}{7}(8,9)
+%\begin{textblock}{7}(8,9)
+\begin{textblock}{7}(0,8.5)
 \Head{Patching autoconf and automake}
 
 We have a number of project-specific code and installation
 conventions, which we wanted to preserve, and a few build tools which
 need special makefile rules.  This is what \texttt{automake} is for.
 
+We tried doing everything with autoconf macros, but that quickly
+became far too precarious -- this route isn't suitable for more than
+light customisation.
+
 Since, for safety, we had to have \texttt{autoconf}, \texttt{automake}
 and \texttt{libtool} snapshots in our repository in any case, it was a
 natural (though nerve-wracking) move to start using patched versions
 of those tools.
 
-We tried doing everything with autoconf macros, but that quickly
-became far too precarious -- this route isn't suitable for more than
-light customisation.
-
-We needed more Fortran support (checking for open specifiers, checking
-for intrinsics, checking for record lengths and the like) than was
+We needed more Fortran support (checking for open specifiers,
+intrinsics, record lengths and the like) than was 
 available in standard \texttt{autoconf}.  This group of modifications
 are due to be contributed back to the \texttt{autoconf} maintainers.
 
 The \texttt{automake} source code isn't an easy read, but it's pretty
-well written, and reasonably easy to patch.
-
-The result is robust and portable distributed Makefiles.
+well written, and reasonably easy to patch.  The result is robust and
+portable distributed Makefiles.
   
 \end{textblock}
 
 
-%\begin{textblock}{7}(16,4)
-%\Head{Payoffs}
-%
-%\begin{itemize}
-%\item The project has always obsessed about coding standards and
-%  coding discipline.  This really did pay off here.
-%\end{itemize}
-%\end{textblock}
-
-
-\begin{textblock}{7}(16,3)
+\begin{textblock}{7}(16,2.5)
 
 \Head{Lessons and Warnings}
 
@@ -279,7 +297,7 @@ The result is robust and portable distributed Makefiles.
   new one, because it was mostly hand-maintained.  But that turned out
   not to be a problem in fact: disciplined coding in the past meant
   that packages could
-  generally be ported to the new system very mechanically, and this
+  generally be ported to the new system with little thought, and this
   turned out to be a small part of the effort.
 
 \item The original plan was to autoconf everything with only necessary
@@ -301,7 +319,8 @@ The result is robust and portable distributed Makefiles.
   project.
 
 \item We should have bowed to the inevitable, and started tweaking the
-  autotools earlier.
+  autotools earlier.  Delaying this meant some functionality had to be
+  implemented twice.
 
 \item GPLing was harder than we expected.  This is largely because of
   the donations in the past, of code written in gentler times, with
@@ -315,19 +334,24 @@ The result is robust and portable distributed Makefiles.
 
 \end{textblock}
 
-\begin{textblock}{7}(16,9)
+\begin{textblock}{7}(16,10)
 \Head{Contacts}
+\normalsize
 \raggedright
 \begin{itemize}
 \item Norman Gray: \texttt{norman@astro.gla.ac.uk},
-  \url{http://www.astro.gla.ac.uk/users/norman}
+  \url{http://www.astro.gla.ac.uk/users/norman/}
+
 \item Tim Jenness: \texttt{t.jenness@jach.hawaii.edu},
   \url{http://www.jach.hawaii.edu/~timj/}
+
 \item Starlink: \url{http://www.starlink.ac.uk} and
   \url{http://dev.starlink.ac.uk}
+
 \item AnonCVS: access at
   \texttt{:pserver:anonymous@cvs.starlink.ac.uk:/cvs} 
   with password `starlink'
+
 \item CVS browser: \url{http://cvsweb.starlink.ac.uk}
 \end{itemize}
   
