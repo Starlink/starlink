@@ -154,7 +154,6 @@
    set SELCOL red
    set SELECTED_AREA ""
    set SEQ_STOP ""
-   set SKYTEXT "(none)"
    set STOP_BLINK ""
    set TEST_ID ""
    set V0 ""
@@ -589,7 +588,7 @@
    $OPTSMENU add cascade -label "View" -menu $OPTSMENU.view
    $OPTSMENU add separator
    $OPTSMENU add checkbutton -label "Use Cross-hair" -variable XHAIR -selectcolor $CB_COL
-   $OPTSMENU add checkbutton -label "Remove Sky" -variable SKYOFF -selectcolor $CB_COL -command SkyOff}
+   $OPTSMENU add checkbutton -label "Remove Sky" -variable SKYOFF -selectcolor $CB_COL -command SkyOff
    $OPTSMENU add checkbutton -label "Display Help Area" -variable HAREA -command HelpArea -selectcolor $CB_COL
    $OPTSMENU add checkbutton -label "Display Status Area" -variable SAREA -command "StatusArea \$SAREA" -selectcolor $CB_COL
    $OPTSMENU add separator
@@ -1061,7 +1060,7 @@
    StatusItem VIEW         "Image view: "            "What section of the image will be displayed when a new image is selected using the \"Images\" menu?\n(To change the value use the \"Options\" menu.)" 9
    StatusItem OEFITTYPE    "O-E mappings: "          "The type of mapping being used to align the O and E rays.\n(To change the mapping type, use the \"Options\" menu.)" 34
    StatusItem INTERP       "Interpolation method: "  "The interpolation method to use when sampling the input images.\n(To change the method, use the \"Options\" menu.)" 20
-   StatusItem SKYTEXT      "Sky estimated in:"       "The image in which the sky background will be determined. This will either be one of the supplied sky frames, or the displayed image (if no sky frames were supplied). $maxsfwid
+   StatusItem SKYTEXT      "Sky estimated in:"       "The image in which the sky background will be determined. This will either be one of the supplied sky frames, or the displayed image (if no sky frames were supplied)." $maxsfwid
 
 # Load the options supplied by the polreg atask.
    LoadOptions

@@ -20,7 +20,7 @@
 
 interface POLHELP
 
-   helplib        POLPACK_HELP:
+   helplib        'POLPACK_HELP:'
 
    parameter      TOPIC
       position    1

@@ -2309,10 +2309,6 @@ proc DrawGwm {} {
 # If a new image is being displayed...
    if { $IMSEC_REQ != $IMSEC_DISP } {
 
-# Set the text to display in the status area describing the sky subtraction
-# method.
-      SkyOff      
-
 # Extract the image name and section string from the requested image
 # section string. Save the old displayed image first.
       set old_image $IMAGE_DISP
@@ -2370,6 +2366,11 @@ proc DrawGwm {} {
       } {
          $UNZOOM configure -state normal
       }
+
+# Set the text to display in the status area describing the sky subtraction
+# method.
+      SkyOff      
+
    }
 
 # Get the image to be displayed.
@@ -3407,6 +3408,9 @@ proc Effects {im effect nodisp} {
 #        The data value corresponding to white in the displayed image.
 #     SCALOW (Read)
 #        The data value corresponding to black in the displayed image.
+#     SKYOFF (Read)
+#        Should sky subtraction be performed? If not, then the input image
+#        name is returned unchanged.
 #     SSIZE (Read and Write)
 #        The FWHM of the gaussian used by the Smooth effect (in pixels).
 #     THRBAD (Read and Write)
@@ -3430,6 +3434,7 @@ proc Effects {im effect nodisp} {
    global PSF_SIZE
    global SCAHIGH
    global SCALOW
+   global SKYOFF
    global SSIZE
    global THRBAD
    global THRHI 
@@ -3775,13 +3780,21 @@ proc Effects {im effect nodisp} {
 # areas or supplied sky frames, and subtract it from the displayed image.
       } elseif { $effect == "Sky Subtraction" } {
 
-         set file [SkySub $image $im]
-         if { $file == "" } {
+         if { !$SKYOFF } {
+            Message "Sky subtraction is currently disabled. Select the \"Remove Sky\" item in the \"Options\" menu to enable it."
             set update 0
             set desc ""
             set ok 0
+
          } {
-            set desc "Sky subtraction"
+            set file [SkySub $image $im]
+            if { $file == "" } {
+               set update 0
+               set desc ""
+               set ok 0
+            } {
+               set desc "Sky subtraction"
+            }
          }
 
 #---------------------------------------------------------------
@@ -6882,8 +6895,8 @@ proc LoadOptions {} {
    global ATASK_SAREA
    global ATASK_SELCOL
    global ATASK_SI
-   global ATASK_VIEW
    global ATASK_SKYOFF
+   global ATASK_VIEW
    global ATASK_XHAIR
    global ATASK_XHRCOL
    global BADCOL      
@@ -6905,6 +6918,7 @@ proc LoadOptions {} {
    global SELCOL
    global SI_LIST
    global SI_VARS
+   global SKYOFF               
    global VIEW
    global XHAIR
    global XHRCOL
@@ -8871,7 +8885,6 @@ proc Save {} {
    global SKYOFF
    global SKY_AREA
    global SKY_METHOD
-   global STOP_BLINK
 
 # Begin a temporary file context.
    set tfc [BeginUF]
@@ -9402,8 +9415,8 @@ proc SaveOptions {} {
    global ATASK_SAREA
    global ATASK_SELCOL
    global ATASK_SI
-   global ATASK_VIEW
    global ATASK_SKYOFF
+   global ATASK_VIEW
    global ATASK_XHAIR
    global ATASK_XHRCOL          
    global BADCOL
@@ -9423,6 +9436,7 @@ proc SaveOptions {} {
    global SELCOL            
    global SI_LIST
    global SI_VARS
+   global SKYOFF           
    global VIEW
    global XHAIR
    global XHRCOL
@@ -10848,7 +10862,6 @@ proc SkySub {data image args} {
    global SKY_AREA
    global SKY_FRAME
    global SKY_METHOD
-   global STOP_BLINK
 
 # Begin a temporary file context.
    set tfc [BeginUF]
@@ -10880,10 +10893,15 @@ proc SkySub {data image args} {
       if { $DBEAM } { Wop $setick(E) configure -foreground black }
       Wop $sslab configure -foreground red 
 
-# Do the subtraction
+# Do the subtraction, then ensure that he bounds are the same as the
+# supplied data (padding with bad pixels if necessary).
       set ssimage [UniqueFile]
       if { ![Obey kappa sub "in1=$data in2=$SKYIMS($image) out=$ssimage"] } {
          set ssimage ""
+      } {
+         if { ![Obey ndfpack setbound "ndf=$ssimage like=$data"] } {
+            set ssimage ""
+         }
       }
 
 # Indicate that the sky areas have been subtracted.

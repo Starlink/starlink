@@ -126,8 +126,6 @@ endinterface
 
 interface POLCENT
 
-   helplib 'POLPACK_HELP'
-
    parameter DEVICE
       access   READ
       vpath    'GLOBAL,CURRENT,PROMPT '
@@ -268,7 +266,7 @@ endinterface
 
 interface POLHELP
 
-   helplib        POLPACK_HELP:
+   helplib        'POLPACK_HELP:'
 
    parameter      TOPIC
       position    1
@@ -332,7 +330,7 @@ endinterface
 
 interface POLREG
 
-   helplib 'POLPACK_HELP'
+   helplib 'POLPACK_HELP:'
 
    parameter BADCOL
       type     _CHAR
@@ -608,8 +606,6 @@ endinterface
 #-
 
 interface SEGMENT
-
-   helplib        'KAPPA_HELP:'
 
    parameter AXES
       type        '_INTEGER'
