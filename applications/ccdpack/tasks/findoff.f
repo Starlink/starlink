@@ -498,15 +498,12 @@
       EXTERNAL CHR_LEN 
 
 *  Local Variables:
-      CHARACTER * ( AST__SZCHR ) DMN ! Current domain of NDF 
-      CHARACTER * ( AST__SZCHR ) DMN1 ! Current domain of first NDF 
       CHARACTER * ( CCD1__BLEN ) LINE ! Line buffer for reading in data
       CHARACTER * ( CCD1__BLEN ) LINE1 ! Line buffer for writing out text
       CHARACTER * ( CCD1__BLEN ) LINE2 ! Line buffer for writing out text
       CHARACTER * ( DAT__SZLOC ) LOCEXT ! HDS locator for CCDPACK extension
       CHARACTER * ( FIO__SZFNM ) FNAME ! Buffer to store filenames
       CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of the NDF
-      CHARACTER * ( GRP__SZNAM ) SNAME ! Set Name attribute
       CHARACTER * ( 4 ) METHOD  ! Last method attempted for object matching
       DOUBLE PRECISION BNDX( 4, CCD1__MXLIS ) ! X coords of bounding boxes
       DOUBLE PRECISION BNDY( 4, CCD1__MXLIS ) ! Y coords of bounding boxes
@@ -535,7 +532,6 @@
       INTEGER I                 ! Loop variable
       INTEGER IAT               ! Position in CHR_ string
       INTEGER IDIN              ! NDF identifier
-      INTEGER IGOT              ! Index of name found in group
       INTEGER ILIS( CCD1__MXLIS ) ! Array of list indices in superlist order
       INTEGER ILISOF( CCD1__MXLIS + 1 ) ! Offsets into ILIS for each superlist
       INTEGER IOFF              ! Offset into superlist
@@ -589,10 +585,7 @@
       INTEGER IPYT              ! Pointer to temporary Y coords
       INTEGER IS                ! Superlist loop variable
       INTEGER ISUP( CCD1__MXLIS ) ! Superlist index applying to this list
-      INTEGER IWCS              ! AST pointer to WCS component
       INTEGER J                 ! Loop variable
-      INTEGER JPIX              ! Index of frame in Pixel domain
-      INTEGER JSET              ! Index of frame in CCD_SET domain
       INTEGER LBND( 2 )         ! Lower pixel-index bounds of NDF 
       INTEGER K                 ! Loop index
       INTEGER L                 ! Loop index for lists
@@ -601,7 +594,6 @@
       INTEGER MAPSET( CCD1__MXLIS ) ! AST pointers to CCD_SET->Current mappings
       INTEGER MAP1              ! Unsimplified mapping
       INTEGER MINMAT            ! Minimum number of positions for match
-      INTEGER NAMGRP            ! GRP identifier for Set Names
       INTEGER NDFGR             ! Input NDF group
       INTEGER NDIM              ! Number of dimensions in NDF
       INTEGER NEDGES            ! Number of edges in graph
@@ -624,14 +616,12 @@
       INTEGER NXVAL( CCD1__MXLIS ) ! Number of extra data columns
       INTEGER OFFS( CCD1__MXLIS + 1 ) ! Offsets into extended lists
       INTEGER OUTGRP            ! Output group identifier
-      INTEGER SINDEX            ! Set Index attribute
       INTEGER TOTNOD            ! Total number of nodes in graph
       INTEGER UBND( 2 )         ! Upper pixel-index bounds of NDF
       INTEGER WRTGRP            ! GRP identifier for list files actually written
       LOGICAL ALLOK             ! Trur no input positions removed in preselection phase
       LOGICAL COMPL             ! True if graph is complete
       LOGICAL CYCLIC            ! True if graph is cyclic
-      LOGICAL DIFDMN            ! True if different domains have been used
       LOGICAL FAILED            ! True if FAST and FSAFe are true and error occurs during match
       LOGICAL FAST              ! True if n**2 method used
       LOGICAL FSAFE             ! True if n**4 method used if n**2 fails
@@ -663,7 +653,6 @@
       FIOGR = GRP__NOID
       OUTGRP = GRP__NOID
       NDFGR = GRP__NOID
-      NAMGRP = GRP__NOID
       WRTGRP = GRP__NOID
 
 *  Find out what is to be used for the source of the position list
@@ -741,61 +730,18 @@
          RSTRCT = .FALSE.
       END IF
 
-*  If appropriate write a header to the user for the names of the
-*  associated NDFs.
-      IF ( NDFS ) THEN 
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         LINE1 = '    NDFs containing position lists'
-         LINE2 = '    ------------------------------'
-         IF ( USEWCS ) THEN
-            LINE1( 40: ) = 'Current domain'
-            LINE2( 40: ) = '--------------'
-         END IF
-         IF ( USESET ) THEN
-            LINE1( 60: ) = 'Set Name attribute'
-            LINE2( 60: ) = '------------------'
-         END IF
-         CALL CCD1_MSG( ' ', LINE1, STATUS )
-         CALL CCD1_MSG( ' ', LINE2, STATUS )
-         DIFDMN = .FALSE.
-      END IF
+*  Extract required Set and WCS information from the position lists,
+*  and write logging messages to the user.
+      CALL CCD1_SWLIS( NDFGR, FIOGR, NOPEN, NDFS, USEWCS, USESET,
+     :                 FRMS, MAPS, MAPSET, ISUP, NSUP, ILIS, ILISOF,
+     :                 STATUS )
 
-*  Initialise group of Set Name attributes.
-      NSUP = 0
-      IF ( USESET ) THEN
-         CALL GRP_NEW( 'CCD:NAMES', NAMGRP, STATUS )
-      END IF
+*  Get the pixel size and bounds if required.
+      IF ( USEWCS ) THEN
+         DO I = 1, NOPEN
 
-*  Loop over position lists to acquire coordinate and Set information.
-      DO 7 I = 1, NOPEN
-
-*  Get the NDF identifier and WCS frameset if required.
-         IF ( USEWCS .OR. USESET ) THEN
+*  Get the NDF identifier.
             CALL NDG_NDFAS( NDFGR, I, 'READ', IDIN, STATUS )
-            CALL CCD1_GTWCS( IDIN, IWCS, STATUS )
-            CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
-         END IF
-
-*  Get World Coordinate System information from NDFs.
-         IF ( USEWCS ) THEN
-
-*  Get Current domain of frameset, and check against previous one.
-            DMN = AST_GETC( IWCS, 'Domain', STATUS )
-            IF ( I .EQ. 1 ) THEN
-               DMN1 = DMN
-            ELSE IF ( DMN .NE. DMN1 ) THEN
-               DIFDMN = .TRUE.
-            END IF
-
-*  Get a mapping from the position list as read (PIXEL-domain
-*  coordinates) to the values to be used for comparison (coordinates
-*  of the Current domain of each NDF).
-            MAP1 = AST_GETMAPPING( IWCS, JPIX, AST__CURRENT, STATUS )
-            MAPS( I ) = AST_SIMPLIFY( MAP1, STATUS )
-
-*  Get the Current frame of the WCS component (used for formatting 
-*  coordinate output).
-            FRMS( I ) = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
 *  Get NDF bounding box in pixel coordinates.
             CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
@@ -844,140 +790,14 @@
             PSIZE( I ) = SQRT( ( XQ( 2 ) - XQ( 1 ) ) ** 2 + 
      :                         ( YQ( 2 ) - YQ( 1 ) ) ** 2 ) 
      :                             / SQRT( 2D0 )
-         ELSE
+         END DO
 
 *  Not using WCS; set pixel size to unity, since the coordinates we will
 *  be using will be pixel coordinates.
-            PSIZE( I ) = 1D0
-         END IF
-
-*  Get Set header information if required.
-         IF ( USESET ) THEN
-            CALL CCD1_SETRD( IDIN, IWCS, SNAME, SINDEX, JSET, STATUS )
-
-*  See if this NDF is, for alignment purposes, a member of a Set.
-            IF ( JSET .EQ. AST__NOFRAME ) SNAME = ' '
-
-*  If it is not a Set member, we will have to create a new superlist 
-*  containing only this list.
-            IF ( SNAME .EQ. ' ' ) THEN
-               IGOT = 0
-
-*  If it is a Set member, see if we have already started the superlist
-*  for this Set.
-            ELSE
-               CALL GRP_INDEX( SNAME, NAMGRP, 1, IGOT, STATUS )
-            END IF
-
-*  If we have already started this superlist, just note which one this
-*  list belongs to.
-            IF ( IGOT .GT. 0 ) THEN
-               ISUP( I ) = IGOT
-
-*  If for whatever reason we have not already started this superlist, 
-*  create a new entry and record that this list belongs to it.
-            ELSE
-               NSUP = NSUP + 1
-               CALL GRP_PUT( NAMGRP, 1, SNAME, NSUP, STATUS )
-               ISUP( I ) = NSUP
-            END IF
-
-*  If this is a Set member, store a mapping from the Set alignment 
-*  frame to the frame in which FINDOFF will be working.  If not,
-*  store a null entry.
-            IF ( SNAME .EQ. ' ' ) THEN
-               MAPSET( I ) = AST__NULL
-            ELSE
-               IF ( USEWCS ) THEN
-                  MAP1 = AST_GETMAPPING( IWCS, JSET, AST__CURRENT,
-     :                                   STATUS )
-               ELSE
-                  MAP1 = AST_GETMAPPING( IWCS, JSET, JPIX, STATUS )
-               END IF
-               MAPSET( I ) = AST_SIMPLIFY( MAP1, STATUS )
-            END IF
-
-*  No Sets - store default entries.
-         ELSE
-            ISUP( I ) = I
-            MAPSET( I ) = AST__NULL
-         END IF
-
-*  Release NDF.
-         IF ( USEWCS .OR. USESET ) THEN
-            CALL NDF_ANNUL( IDIN, STATUS )
-         END IF
-
-*  Write message about NDF name and possibly WCS and Set information.
-         IF ( NDFS ) THEN
-            CALL GRP_GET( NDFGR, I, 1, FNAME, STATUS )
-            CALL MSG_SETC( 'FNAME', FNAME )
-            CALL MSG_SETI( 'N', I )
-            CALL MSG_LOAD( ' ', '  ^N) ^FNAME', LINE, IAT, STATUS )
-            IF ( USEWCS ) LINE( MAX( 45, IAT + 2 ): ) = DMN
-            IF ( USESET ) LINE( MAX( 60, CHR_LEN( LINE ) + 2 ): ) 
-     :                    = SNAME
-            CALL CCD1_MSG( ' ', LINE, STATUS )
-         END IF
- 7    CONTINUE
-
-*  Record number of superlists.  If it is the same as the number of
-*  lists altogether, then we don't need to do any further Set-specific 
-*  processing.
-      IF ( USESET ) THEN
-         IF ( NSUP .EQ. NOPEN ) USESET = .FALSE.
       ELSE
-         NSUP = NOPEN
-      END IF
-
-*  Construct a pair of arrays to list the members of each superlist.
-*  If USESET is false, then this will just map the range 1..NOPEN
-*  straight on to 1..NSUP.
-      K = 1
-      DO I = 1, NSUP
-         ILISOF( I ) = K
-         DO J = 1, NOPEN
-            IF ( ISUP( J ) .EQ. I ) THEN
-               ILIS( K ) = J
-               K = K + 1
-            END IF
+         DO I = 1, NOPEN
+            PSIZE( I ) = 1D0
          END DO
-      END DO
-      ILISOF( NSUP + 1 ) = NOPEN + 1
-
-*  Warn if not all domains were the same.
-      IF ( USEWCS .AND. DIFDMN ) THEN
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL CCD1_MSG( ' ', 
-     :   '  Warning - not all NDFs have the same Current domain', 
-     :                  STATUS )
-      END IF
-
-*  Output names of the positions lists and labels.
-      CALL CCD1_MSG( ' ', ' ', STATUS )
-      CALL CCD1_MSG( ' ', '    Input position lists:', STATUS )
-      CALL CCD1_MSG( ' ', '    ---------------------', STATUS )
-      DO 6 I = 1, NSUP
-         CALL MSG_SETI( 'N', I )
-         CALL MSG_LOAD( ' ', '  ^N)', LINE, IAT, STATUS )
-         DO J = ILISOF( I ), ILISOF( I + 1 ) - 1
-            CALL GRP_GET( FIOGR, ILIS( J ), 1, LINE( IAT + 2: ),
-     :                    STATUS )
-            CALL CCD1_MSG( ' ', LINE, STATUS )
-            LINE = ' '
-         END DO
- 6    CONTINUE
-
-*  Where the position list names originated.
-      IF ( NDFS ) THEN 
-         IF ( USESET ) THEN
-            CALL CCD1_MSG( ' ',
-     :'  Position list names extracted from NDF extensions grouped by'//
-     :' Set.', STATUS )
-         ELSE
-            CALL CCD1_MSG( ' ',
-     :'  Position list names extracted from NDF extensions.', STATUS )
-         END IF
       END IF
 
 *  Report the initial parameters.
@@ -1895,7 +1715,6 @@
       CALL CCD1_GRDEL( FIOGR, STATUS )
       CALL CCD1_GRDEL( OUTGRP, STATUS )
       CALL CCD1_GRDEL( NDFGR, STATUS )
-      CALL CCD1_GRDEL( NAMGRP, STATUS )
       CALL CCD1_GRDEL( WRTGRP, STATUS )
 
 *  Close AST.
