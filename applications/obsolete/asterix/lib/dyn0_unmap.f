@@ -134,7 +134,7 @@
 
 *  Diagnostic?
       IF ( DYS_DIAG ) THEN
-        CALL MSG_SETI( 'PTR', PTR )
+        CALL MSG_SETI( 'PTR', DYS_PTR(SLOT) )
         CALL MSG_SETI( 'NB', DYS_NBYTE(SLOT) )
         CALL ADP_OUT( 'DYN: Deallocated ^NB bytes at address ^PTR' )
       END IF

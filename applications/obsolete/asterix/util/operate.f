@@ -127,6 +127,8 @@
 *        Use new data interface
 *      3 Oct 1995 V2.0-0 (DJA):
 *        Full ADI port. Only create quality if new bad points.
+*     10 Jan 1996 V2.0-1 (DJA):
+*        Changed to use USI_NAMES
 *     {enter_changes_here}
 
 *  Bugs:
@@ -151,33 +153,31 @@
         PARAMETER		( VERSION = 'OPERATE Version V2.0-0' )
 
 *  Local Variables:
-      CHARACTER*200          	FILE(4)               ! Input file spec
-      CHARACTER*200          	FILEO(4)              ! Output file spec
-      CHARACTER*6            	OPER                  ! Operator
-      CHARACTER*80           	LABEL                 ! Data label
-      CHARACTER*80           	STRING                ! Temp. String
+      CHARACTER*6            	OPER                  	! Operator
+      CHARACTER*80           	LABEL                 	! Data label
+      CHARACTER*80           	STRING                	! Temp. String
 
-      DOUBLE PRECISION       	EVALUE                ! Manual error estimate
+      DOUBLE PRECISION       	EVALUE                	! Manual error estimate
 
-      INTEGER                	DPTR                  ! Output data array
-      INTEGER			IFID		      ! Input dataset id
-      INTEGER                   LEVELS                ! Levels of input
-      INTEGER                   LEVELSO               ! Levels of Output
+      INTEGER                	DPTR                  	! Output data array
+      INTEGER			IFID		      	! Input dataset id
+      INTEGER			IFILES			! Input file list
+      INTEGER			OFILES			! Output file list
       INTEGER			NBAD			! New bad points
-      INTEGER                   NELM                  ! # input data values
-      INTEGER			OFID		      ! Output dataset id
+      INTEGER                   NELM                  	! # input data values
+      INTEGER			OFID		      	! Output dataset id
       INTEGER                	OQPTR, QPTR                  ! Output quality
-      INTEGER                   SLEN                  ! Length of STRING
-      INTEGER                	VPTR                  ! Output variance
+      INTEGER                   SLEN                  	! Length of STRING
+      INTEGER                	VPTR                  	! Output variance
 
-      BYTE                      MASK                  ! Quality mask
+      BYTE                      MASK                  	! Quality mask
 
-      LOGICAL                   ERR                   ! Data errors present?
-      LOGICAL                   INPUT                 ! Controls operator input
-      LOGICAL                   OK                    ! Component present and defined?
-      LOGICAL                   OVER                  ! Input object to be overwritten?
-      LOGICAL                   PRIM                  ! Input is primitive?
-      LOGICAL                   QOK                   ! QUALITY present?
+      LOGICAL                   ERR                   	! Data errors present?
+      LOGICAL                   INPUT                 	! Controls operator input
+      LOGICAL                   OK                    	! Component present and defined?
+      LOGICAL                   OVER                  	! Input object to be overwritten?
+      LOGICAL                   PRIM                  	! Input is primitive?
+      LOGICAL                   QOK                   	! QUALITY present?
 *.
 
 *  Check inherited global status.
@@ -198,9 +198,9 @@
       ELSE
         CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
         CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
-        CALL USI_NAMEO( LEVELSO, FILEO, STATUS )
+        CALL USI_NAMES( 'O', OFILES, STATUS )
       END IF
-      CALL USI_NAMEI( LEVELS, FILE, STATUS )
+      CALL USI_NAMES( 'I', IFILES, STATUS )
 
 *  Is input a structured data object?
       CALL ADI_DERVD( OFID, 'Array', PRIM, STATUS )
@@ -339,9 +339,9 @@
 *  History
       IF ( .NOT. PRIM ) THEN
         CALL HSI_ADD( OFID, VERSION, STATUS )
-        CALL HSI_PTXT( OFID, LEVELS, FILE, STATUS )
+        CALL HSI_PTXTI( OFID, IFILES, STATUS )
         IF ( .NOT. OVER ) THEN
-          CALL HSI_PTXT(OFID,LEVELSO,FILEO,STATUS)
+          CALL HSI_PTXTI( OFID, OFILES, STATUS )
         END IF
         CALL HSI_PTXT( OFID, 1, 'Operator = '//OPER, STATUS )
       END IF
