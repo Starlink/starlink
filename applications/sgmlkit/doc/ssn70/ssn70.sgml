@@ -1,4 +1,4 @@
-<!DOCTYPE ssn PUBLIC "-//Starlink//DTD Starlink SSN 0.6//EN" [
+<!DOCTYPE ssn PUBLIC "-//Starlink//DTD Starlink SSN 0.7//EN" [
   <!-- Other Starlink documents referred to -->
   <!ENTITY sgp28	PUBLIC "-//Starlink//DOCUMENT Summary SGP/28//EN"
 			SUBDOC
@@ -19,15 +19,19 @@
 
   <!-- Local text files included -->
   <!ENTITY starlinkdtddoc	
-			SYSTEM '../dtd2sgml/starlink-0.6.sgmltext'>
+			SYSTEM '../dtd2sgml/starlink-0.7.sgmltext'>
   <!ENTITY programcodedtddoc
-			SYSTEM '../dtd2sgml/programcode-0.6.sgmltext'>
+			SYSTEM '../dtd2sgml/programcode-0.7.sgmltext'>
   <!ENTITY dsssl.lib	SYSTEM "../../dsssl/sl/lib/sllib-jade-1.2.1.dsl" SUBDOC
 			-- DSSSL library code -->
   <!ENTITY dsssl.common	SYSTEM "../../dsssl/sl/common/slcommon.dsl" SUBDOC
 			-- dsssl common code -->
   <!ENTITY dsssl.params	SYSTEM "../../dsssl/sl/common/slparams.sgml" SUBDOC
 			-- Parameterisation -->
+  <!ENTITY supportbinaries SYSTEM "../../bin/sgmlbin.sgml" SUBDOC
+			-- Generated documentation for sgml2... -->
+  <!ENTITY supportlib SYSTEM "../../lib/sgmllib.sgml" SUBDOC
+			-- Generated documentation for library utils... -->
   <!ENTITY release.notes	
 			SYSTEM "ReleaseNotes">
   <!ENTITY release.notes.old
@@ -104,10 +108,13 @@ a snapshot for distribution to Rodney Warren-Smith and Mark Taylor.
 There will be a proper distribution before 1 June.
 </distribution>
 
-<change date="7-APR-2000" author=mbt>
+<change date="7-APR-2000" versionid="v0-6-1" author=mbt>
 <px>Added a description of the HLP file downconversion tool.
 <px>Modified documentation of the programcode upconverter to reflect new usage.
 </change>
+
+<change date='10-May-2000' versionid='v0-7-1' author=ng>
+<px>Miscellaneous tweaks.
 
 </history>
 
@@ -2497,8 +2504,10 @@ discussion of very simple processing.</update>
 <update versionid="v0.6">Significant change to sgml2docs commands</update>
 
 <p>You should use the command <code/sgml2docs/ to process your SGML
-documents.
+documents.  See <coderef collection=supportprogs
+id=sgml2docs>sgml2docs</coderef> for detailed documentation.
 
+<![IGNORE[
 <p>Given a single argument, specifying an SGML source file, the script
 uses the Starlink DSSSL stylesheets to process this into a
 collection of HTML files and GIFs, or &latex; and EPS files
@@ -2542,6 +2551,7 @@ current directory.
 <dt><code/--debug/
 <dd>Don't delete the working directory at the end (allows you to explore).
 </dl>
+]]>
 
 <p>The final option, <code/--jadeflags/, allows you to do some limited
 customisation of the output.  See <ref id=appx.system.paramdsssl>.
@@ -2556,6 +2566,8 @@ rearrangement).
 
 
 <subsect id=proc.sgml2hlp export>Generating HELP files
+<update versionid="v0-6-1">Added section on HELP files</update>
+
 
 <p>The command <code/sgml2hlp/ can be used to process an SGML document
 conforming to the <ref id=appx.programcode.dtd text=programcode> DTD,
@@ -4021,7 +4033,18 @@ SGML_CATALOG_FILES=./CATALOG:$SGML_CATALOG_FILES
 </verbatim>
 (or use the corresponding <code/setenv/ command).
 
-<subsect id=appx.system.software export>Supporting software
+<subsect id=appx.supportprogs export>Support utilities
+<update versionid=v0-7-1>Added codecollections for bin and lib
+directory programs</update>
+
+<routinelist>
+<p>The following sections document some of the support utilities in
+the SGML kit.
+
+<codecollection doc="supportbinaries" id=supportprogs>
+<codecollection doc="supportlib" id=supportlibs>
+
+<subsect id=appx.system.software export>Other supporting software
 
 <p>This distribution primarily consists of SGML materials --
 that is, the DTDs and associated DSSSL stylesheets.  It also relies on
@@ -4050,8 +4073,8 @@ The SGML one conforms to a very simple DTD (with system id
 one consists of a &latex; document with one equation per page.  The
 latter should be processed by &latex; plus whatever dvi to gif magic
 you need, making sure that the resulting GIF filenames match those
-in the img-eqlist document.  See the file header for further
-documentation.
+in the img-eqlist document.  See <coderef collection=supportlibs
+id=img-eqlist>the file header</coderef> for further documentation.
 
 <dt><code/plainhtml.bst/ and <code/plainlatex.bst/
 <dd>These are Bib&tex; style files used by the Bib&tex; step in the
