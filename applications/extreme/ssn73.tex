@@ -22,7 +22,7 @@
 \newcommand{\stardocabstract}  {
 This package provides some utilities and background documentation,
 and associated files
-for adapting the USSC, and software which uses it, 
+for adapting the Starlink Software Collection, and software which uses it, 
 to handle very large data sets.
 The principal focus of this is to move to use of 64 bits of address
 space on 64-bit operating systems.
@@ -615,7 +615,7 @@ is to use the \xref{CNF\_PVAL}{sun209}{CNF\_PVAL} function.
 
 This package provides some tools and instructions for 
 software maintainers to use 
-in modifying their source code to work in a 64-bit environment.
+in modifying their source code to take advantage of a 64-bit environment.
 
 The issues addressed in this document apply to user programs which link
 against Starlink libraries as well as to the code which forms the USSC;
@@ -637,9 +637,10 @@ that all the packages on which it depends are 64-bit compatible.
 Certain packages, which are used only at a command-line level, 
 may not need changes to the code, but any package which provides a library 
 against which other code is to link, must be modified,
-since the routine interfaces (argument types) will change, 
-and, in the case of Solaris
-the 32-bit and 64-bit object types cannot be mixed by the link loader.
+since the public interfaces of the routines,
+specifically the types of integer arguments, will change. 
+Additionally, in the case of Solaris,
+32-bit and 64-bit object types cannot be mixed by the link loader.
 
 At some point in the future, it may be that support for 32-bit systems
 is dropped, but at the moment this is undesirable, since 
@@ -648,10 +649,10 @@ code compiled for 64 bits.
 Older Suns (before SPARC v9) cannot be made to run the 64-bit kernels.
 
 For these reasons, the transfer to 64 bits will be approached
-effectively as a port to a new system.  All Starlink packages should
+effectively as ports to new systems.  All Starlink packages should
 therefore come to 
 include support for two new values of the \file{makefile}/\file{mk}
-SYSTEM variable: ``{\tt alpha\_OSF1\_64}'' and ``{sun4\_Solaris\_64}''.
+SYSTEM variable: ``alpha\_OSF1\_64'' and ``sun4\_Solaris\_64''.
 
 
 
@@ -673,16 +674,15 @@ have enough bits to hold sufficiently large numbers.
 Because of the difficulty of distinguishing, in any automatic fashion,
 variables which may 
 need to hold big numbers from those which will not,
-the approach taken is to change the type of {\em all\/} 
+the recommended approach is to change the type of {\em all\/} 
 integer variables to a 64-bit type in 64-bit environments.
-This is a somewhat extravagant solution,
-but the alternatives seem to be worse.
 Once the increase in integer size has been made 
 globally to the source code in a package,
 it is possible to identify variables which do not need the extra size
 and change their declarations (and other parts of the code which depend
 on these) back to the normal integer types.
-Such retrochanges could be appropriate in either of the following situations:
+In general such retrochanges may not be worthwhile, 
+but they could be appropriate in either of the following situations:
 \begin{itemize}
 \item
 The change has broken something which is easier to fix by returning to 
@@ -702,15 +702,22 @@ is used to pass the value of allocated
 memory to a subroutine, its argument should be wrapped in a call
 to \xref{CNF\_PVAL}{sun209}{CNF\_PVAL}.  This effectively allows
 a 32-bit integer to address memory in a 64-bit address space.
-Additionally, the header file \file{CNF\_PAR} needs to be included
-in affected source files to provide the declaration of the CNF\_PVAL 
-function.
-This modification is fairly unproblematic, 
-since it should not under normal
-circumstances affect the behaviour of the code in either 32-bit or
-64-bit environments, so it's possible, and advisable, to make this
+This call could in principle be avoided 
+where code is written using long integers as
+described in section \ref{sec:fint}, but it is necessary as an intermediate
+measure where Fortran is written using normal integers in a
+64-bit environment.
+This includes the case of SYSTEM=alpha\_OSF1 (as opposed to alpha\_OSF1\_64),
+which is to be supported for the forseeable future, so even where the
+move to large integers is to be made, these calls should be incorporated.
+Since this change is less problematic than the move to large integers,
+it is possible, and advisable, to make this
 change to all code and test it before converting the normal integer types
 as described in section \ref{sec:fint}.  
+
+As well as the calls to CNF\_PVAL themselves, 
+the header file \file{CNF\_PAR} needs to be included
+in affected source files to provide the declaration of the CNF\_PVAL function.
 
 The main pitfall of making these modifications is
 wrapping the argument of a \%VAL in a CNF\_PVAL call when it ought
@@ -745,7 +752,8 @@ Therefore all variables currently declared as `INTEGER'
 should be changed instead to type `INTEGER*8'. 
 This is not standard Fortran 77, but it is widely understood by compilers.
 This should not be interpreted (by a human) as an indication that exactly
-eight bytes are required, but as an indication that this needs to be
+eight bytes are required, but as an indication that 
+the variable in question needs to be
 long enough to hold a large number.
 At compile time, typically on 64-bit systems the code will be compiled
 as it stands, while on 32-bit systems a simple \file{sed(1)} script or similar
@@ -818,7 +826,7 @@ the first executable statement of the routine.
 
 For convenience another mechanism is provided by the EXTREME package;
 the file \file{EXT\_PAR} includes definitions of the integers
--10\ldots 10, with names EXT\_\_M10\ldots EXT\_\_10.
+$-10$\ldots 10, with names EXT\_\_M10\ldots EXT\_\_10.
 So a third alternative for the above situation would be
 \begin{squote}
 \begin{verbatim}
@@ -833,13 +841,23 @@ So a third alternative for the above situation would be
 \\
 Calls to Fortran intrinsic functions should take care of themselves,
 as long as the generic name is used rather than the specific one
-(e.g. you should use ABS instead of IABS).  This is always good
-practice in any case.  The only time it is not possible to do 
-this is if you are passing an intrinsic function as an actual
-argument to a procedure, which is pretty rare.
+(e.g. you should use ABS instead of IABS).  
+Use of generic names is generally good practice anyway;
+the only time it is necessary to supply the specific name is 
+when passing an intrinsic function itself as an actual argument
+to a procedure, which is pretty rare.
 The only intrinsic functions in standard Fortran 77 which have 
 INTEGER-specific names are IABS, ISIGN, IDIM, MAX0, AMAX0, MIN0 and AMIN0.
 Others may be available in particular Fortran implementations.
+
+A related problem is using a call to an intrinsic function with 
+an integer return type as an actual argument to a function.
+Since for most functions the return type is the same as the argument,
+this will, again, take care of itself.  However, for the few
+intrinsic functions which return integer regardless of the type of
+the argument (LEN, INDEX), the return value will have to be converted to
+the correct type as if it were an integer literal, as described above.
+as argument
 %
 \item[Storage association]\mbox{}
 \\
@@ -858,7 +876,7 @@ but there may be instances of them lurking about.
 \item[IMPLICIT variable declarations]\mbox{}
 \\
 It is highly desirable in Fortran, and usual in Starlink code, to use
-the ``IMPLICIT NONE'' declaration, so that all variables must be
+the ``IMPLICIT NONE'' declaration, so that all variables have to be
 explicitly declared before use.
 It would be possible to fix this by redeclaring IMPLICIT INTEGER
 statements as IMPLICIT INTEGER*8, but to make the job easier for
@@ -900,7 +918,7 @@ warns about, are given in section \ref{sec:tools}.
 All references to the type \cc{int} in C code should be changed to 
 \cc{INT\_BIG}.  This is a reference to a macro which can be defined
 in a header file or on the compiler command line 
-(and hence typically in the CFLAG \file{mk} environment variable).  
+(and hence typically in the CFLAGS \file{mk} environment variable).  
 For a 32-bit build it would normally be defined at build time as 
 \cc{int} and for a 64-bit build as \cc{long}.
 As well as declarations of variables and functions, this applies
@@ -913,12 +931,14 @@ should not be changed.  Type \cc{unsigned INT\_BIG}
 
 As regards calling functions from external libraries,
 the approach described in section \ref{sec:fint} of 
-recoding all the functions in the library will of course work in C too.
+recoding all the functions in the library will of course work in C
+as well as in Fortran.
 However, this is not always necessary.
-If a function's declaration (prototype) is in scope when it is called,
+If a function's declaration (prototype) is in scope when 
+the function is called,
 the compiler will normally 
 convert each actual argument to the declared type of
-the corresponding formal argument in the prototype 
+the corresponding formal argument in the declaration 
 before passing it by value.
 Hence the following code
 \begin{squote}
@@ -996,8 +1016,8 @@ an \cc{INT\_BIG} argument in the variable (\cc{...}) part of the argument
 list.  
 Normally the cast should be to \cc{int}, but it may possible,
 as with \cc{printf}, to cast to \cc{long} and indicate to the called
-function that this has been done).
-A modified function which will may get called by unmodified code
+function that this has been done.
+A modified function which may get called by unmodified code
 should expect arguments of type \cc{int}
 (i.e.\ should call the \cc{va\_arg} macro with a second argument
 of \cc{int} instead of \cc{INT\_BIG}).
@@ -1049,7 +1069,7 @@ common, we discuss it in detail here.
 Most of the functions in the standard library will be handled
 adequately as described above by including the appropriate header files,
 since they do not have \cc{int~*} arguments or variable argument lists.
-The exception is those which use format strings:
+The exceptions are those which use format strings:
 \cc{printf}, \cc{fprintf}, \cc{sprintf} and 
 \cc{scanf}, \cc{fscanf}, \cc{sscanf}; these fall foul of both obstacles.
 For \cc{printf} and friends 
@@ -1071,9 +1091,10 @@ then the calling code needs to be changed.
 
 In the case of \cc{int} arguments, if the actual argument
 might be too large to be
-represented in an \cc{int}, then an \cc{l} should be inserted to 
+represented in an \cc{int}, then an \cc{l} should be inserted 
+after the `\tt{\%}' sign to 
 indicate that a \cc{long} argument is being supplied and the 
-corresponding argument cast to \cc{long}.  If it will definitely
+corresponding argument should be cast to \cc{long}.  If it will definitely
 be possible to store the value in an \cc{int} then the format specifier
 may be left alone and the argument cast to \cc{int}.
 Arguments passed using the \cc{c} or \cc{*} specifiers should be cast 
@@ -1127,8 +1148,7 @@ Where an \cc{int} is compared against one of the values
 defined in the system header file \file{limits.h},
 an \cc{INT\_BIG} should be compared against one of the corresponding
 macros \cc{INT\_BIG\_MAX} etc.
-These macros are defined in the header file \file{extreme.h}, 
-which should be included {\em after\/} \file{limits.h} in the source file.
+These macros are defined in the header file \file{extreme.h}. 
 %
 \item[Implicit int declarations:]\mbox{}
 \\
@@ -1153,6 +1173,9 @@ it should not be replaced by \cc{INT\_BIG}.
 This is only likely to arise in certain low-level code 
 (e.g.\ \xref{HDS}{sun92}{} and \xref{CNF}{sun209}{}) 
 which does direct interfacing with Fortran.
+Under normal circumstances code should use the macros
+F77\_LOGICAL\_TYPE AND F77\_INTEGER\_TYPE defined in the 
+CNF header files.
 %
 \end{description}
 
@@ -1178,7 +1201,7 @@ sub( x ) {
 then running
 \begin{squote}
 \begin{verbatim}
-% cc -protoi -noobject sub.c
+% cc -protois -noobject sub.c
 \end{verbatim}
 \end{squote}
 will produce a file called \file{sub.H} which reads:
@@ -1202,7 +1225,7 @@ INT_BIG sub( INT_BIG x ) {
 By running
 \begin{squote}
 \begin{verbatim}
-% cc -protoi -noobject -DINT_BIG=long
+% cc -protois -noobject -DINT_BIG=long
 \end{verbatim}
 \end{squote}
 and attending to any \cc{int} declarations in the resulting \file{.H} files,
@@ -1232,25 +1255,55 @@ Thus two new stanzas are required in the \file{mk} file for each package
 setting the values of the other \file{makefile} macros for the newly
 supported systems.  
 
-Additionally, a new macro INTEGER8 should be 
+Additionally, if the package contains Fortran source,
+a new macro INTEGER8 should be 
 defined by the \file{mk} file.  This should contain text which is to
 replace `INTEGER~*~8' declarations in fortran source code.  
 If blank (defined as spaces or the empty string) it means 
 that INTEGER~*~8 declarations should be left unchanged.
 Therefore for 64-bit systems this should be defined as the empty
 string, and for 32-bit systems it should be defined as `INTEGER~~~~'
-(defining it with four trailing spaces improves the aesthetics of
+(defining it with four trailing spaces
+is not required, but improves the aesthetics of
 the modified source files).
 The makefile should then apply the INTEGER*8 $\rightarrow$ \$(INTEGER8)
 substitution to the fortran source files as it extracts them from the
 tar archive where they are stored.
+The recommended code for this is:
+\begin{squote}
+\begin{verbatim}
+sed "s/^[ \t]*[Ii][Nn][Tt][Ee][Gg][Ee][Rr] *\* *8/      $(INTEGER8)/"
+\end{verbatim}
+\end{squote}
+Note that this changes nothing except variable declarations; 
+in particular it will not modify references to INTEGER*8 type in IMPLICIT
+statements.
+It also makes no allowance for the more bizarre spacing possibilities
+allowed in Fortran 77.
+It would be possible to use a more comprehensive editing script,
+but in the interests of clarity, and of simplicity at build time,
+it is recommended that the above is used, 
+and source code required to match the given pattern where edits
+are needed.
 
-For C source code, the \cc{INT\_BIG} preprocessor macro needs to be defined.
+The intention is that Fortran source code is stored in the source 
+archive with INTEGER*8 declarations,
+and is edited if necessary 
+as it is extracted from the tar file, prior to being
+written in the build directory.
+In this way, the set of Fortran files in the build directory 
+will be consistent and compilable, 
+but may not have the same content as the set of files in the source archive.
+
+For C files, the source code itself does not need to be modified at
+build time, but the \cc{INT\_BIG} preprocessor macro must be defined.
 This is most easily done by adding a \cc{-DINT\_BIG=int} or 
 \cc{-DINT\_BIG=long} flag as appropriate to the
 CFLAGS macro in each \file{mk} stanza.
-Alternatively, a SYSTEM\_VARIANT-controlled header file could be
-written and included into all C source files.
+Alternatively, a SOURCE\_VARIANT-controlled header file could be
+written and included into all C source files;
+the EXTREME package provides the header \file{extreme.h}
+for this purpose.
 
 The following gives the relevant parts of a minimal \file{mk}
 file by way of example:
@@ -1318,10 +1371,11 @@ file by way of example:
             INTEGER8='INTEGER    '
                ...
 
-#  SUN Sparcstations running SunOS 5.x (Solaris), long integers.
-#  ------------------------------------------------------------
+#  SUN Sparcstations running SunOS 5.x (64-bit Solaris), long integers.
+#  -------------------------------------------------------------------
          sun4_Solaris_64)
             CFLAGS='-DINT_BIG=long -xarch=v9'
+            FFLAGS='-xarch=v9'
             INTEGER8=''
             SOURCE_VARIANT='sun4_Solaris'
                ...
@@ -1334,15 +1388,16 @@ file by way of example:
                ...
 \end{verbatim}
 \end{squote}
-Note the `{\tt -xarch=v9}' addition to the sun4\_Solaris\_64 CFLAGS,
-which instructs the compiler to compile for a 64-bit system
-(the difference is effectively that pointers and \cc{long}s are stored in
-64 bits instead of 32 bits when this flag is given).
+Note the `{\tt -xarch=v9}' addition to the sun4\_Solaris\_64 CFLAGS
+and FFLAGS variables,
+which instruct the compiler to compile for a 64-bit system.
 Tru64 Unix C compiles for 64 bit executables by default, so needs no
 extra flags.
 The SOURCE\_VARIANT assignments here make the assumption that the same
 machine-specific source files can be used for 32-bit and 64-bit 
-builds on the same platform.
+builds on the same platform; if this is not the case then SOURCE\_VARIANT
+should be allowed to default to \$(SYSTEM) as usual,
+and additional copies of the system-dependent files must be supplied.
 
 The relevant parts of a suitable matching \file{makefile} would look 
 something like this:
@@ -1410,7 +1465,9 @@ Note that because of the way this method edits Fortran source files on
 their way out of the source archive
 (typically \file{\$(PKG\_NAME)\_source.tar}),
 the copies of the files in the build directory may not be the same
-as the files in the source archive.
+as the files in the source archive, and so files cannot in general
+be transferred between the build directory and source archive
+simply using {\tt tar}.
 This means that in general the source archive cannot be rebuilt 
 from the files in the build directory.
 This may well break private, non-standard targets inserted into the
@@ -1431,7 +1488,7 @@ tasks described in the previous section:
 \item[frepint:] Converts INTEGER to INTEGER*8 in Fortran source code
 \item[crepint:] Converts \cc{int} to \cc{INT\_BIG} in C source code
 \end{description}
-Each of these is a normal Unix filter command such as \file{cat}, 
+Each of these is a normal Unix filter command with usage like \file{cat}, 
 so may be given zero, one or two arguments to specify its input and output.
 Where no change needs to be made, the input is written with no changes 
 to the output.  This means that the \file{diff} command can be used 
@@ -1457,15 +1514,31 @@ which might give a result like:
 \end{verbatim}
 \end{squote}
 
-Each of the filters draws attention to constructs which might need 
-further attention.  It will do this either by writing a message to
-standard error or by inserting a comment line in the output.
+Each of the filters, as well as making changes, 
+draws attention to constructs which might need 
+further attention by writing a message to standard error. 
+In some cases, it will also insert a comment in the modified file where
+the questionable construct occurs.
 Such comment lines contain the name of the filter followed by a colon
-and explanatory text, so for instance:
+and explanatory text, so given the file \file{watcher.c}:
 \begin{squote}
 \begin{verbatim}
-% crepint file.c | grep crepint:
-/* crepint: Format string contains %[cdiouxX*]                           */
+   int watcher( int mins ) {
+      printf( "Only %i minutes till coffee break\n", mins );
+   }
+\end{verbatim}
+\end{squote}
+\xroutine{crepint} will do the following:
+\begin{squote}
+\begin{verbatim}
+% crepint watcher.c >fixed/watcher.c
+crepint: Format string has %[cdiouxX*] (comment inserted)
+%
+% cat fixed/watcher.c
+INT_BIG watcher( INT_BIG mins ) {
+/* crepint: Format string has %[cdiouxX*]                                */
+   printf( "Only %i minutes till coffee break\n", mins );
+}
 \end{verbatim}
 \end{squote}
 If the filter thinks it has lost track of the source code in a dangerous
@@ -1486,7 +1559,7 @@ In addition, for each of the filters, a driver script is provided.
 For converting large numbers of files, this is likely to be the 
 most convenient way to proceed.  Basically the driver scripts 
 run the filters on a given set of files, summarise the output, and
-write the files which need changes in a given place.
+write the files which need changes in a new directory.
 They also perform some crude safety checks that the modified source
 files seem to have been changed in the right way (for instance, that
 no changes have been made except for the ones which should have been
@@ -1530,258 +1603,46 @@ The other driver scripts, \file{do\_crepint} and \file{do\_frepint},
 differ in the form of their output somewhat but otherwise work the
 same way as \file{do\_inscnf}.
 
+The driver script may occasionally throw out a comment like this:
+\begin{squote}
+\begin{verbatim}
+ndf1_pshdt.f:              Possible error in modifications?          
+\end{verbatim}
+\end{squote}
+which indicates that a crude check suggests a difference between
+the output of the filter and the input plus the expected changes.
+The checking is done by a quick-and-dirty Perl script called
+\file{cmp_inscnf.pl} (and similarly for the other filters),
+and if you see this warning you can run this script yourself
+to get an idea what the problem may have been. 
+The above warning was emitted by \routine{do_frepint}; investigate 
+as follows:
+\begin{squote}
+\begin{verbatim}
+% cmp_frepint.pl ndf1_pshdt.f
+ *** Edit error near line 69?:
+ CALL NDF1_SPLDT( STR, 1, LEN( STR ), ' ', -10, F, L, NFIELD, STATUS )
+ CALL NDF1_SPLDT( STR, 1, LEN( STR ), ' ', - 10, F, L, NFIELD, STATUS )
+\end{verbatim}
+\end{squote}
+from which it is clear that the culprit is some harmlessly inserted
+whitespace.
+Note that in order to make these comparisons, the \file{cmp\_*.pl} scripts
+deal in a cavalier fashion with formatting, so the source
+lines may not look very much like the original copies and the line number
+reporting may not be accurate, but the message
+should be sufficient to locate the problem.
+Such ``{\tt Possible error in modifications?}'' 
+warnings ought to be infrequent, and may often not be indicative
+of a real problem, but it is as well to investigate them.
+
 Detailed descriptions of the behaviour of the filter programs is
 given in section \ref{sec:filters}
+
 
 \section{Filter utility descriptions\label{sec:filters}}
 
 %%%% Begin filter descriptions
-\newpage
-\sstroutine{
-   inscnf
-}{
-   Wrap \%VAL arguments with CNF\_PVAL in Fortran
-}{
-   \sstdescription{
-      This is a filter which takes FORTRAN 77 source code
-      and modifies it so that text which is the argument of a \%VAL
-      directive is wrapped in a call to CNF\_PVAL; i.e. input text
-
-         \%VAL( IPTR )
-
-      is changed to
-
-         \%VAL( CNF\_PVAL( IPTR ) )
-
-      If the call to CNF\_PVAL is already present no change is made.
-      Lines with no references to the \%VAL directive are left alone.
-
-      Additionally, for each program unit in which a call to CNF\_PVAL
-      has been made, an attempt is made to insert a line like
-
-         INCLUDE {\tt '}CNF\_PAR{\tt '}        ! For CNF\_PVAL function
-
-      This is inserted after the last INCLUDE line which already exists
-      in the program unit.  If there are no INCLUDE lines there, this
-      line is not inserted, and a warning message is printed to standard
-      error.
-
-      Attention is paid to Fortran 77 source format, so that lines
-      more than 72 characters long are avoided (unless they were there
-      in the first place).
-
-      Characters {\tt '}$\backslash$r{\tt '} (carriage return) and {\tt '}$\backslash$t{\tt '} (tab) might possibly
-      cause erroneous line breaking - if any are encountered a warning
-      is given (these shouldn{\tt '}t be in the source really).
-      Code using columns 73-80 of the source cards for comments is
-      likely to be mangled (nobody does this any more do they?).
-
-      Under certain improbable circumstances it is possible for the
-      program to get stuck trying to break a line; in this case it will
-      exit with error status and an error message.
-
-      Some attention is paid to the aesthetic qualities of the output:
-      line breaks are done, where possible, following the usage in, e.g.,
-      KAPPA.  An attempt is made copy the style of case usage and bracket
-      spacing from the input.
-
-      This program wraps ALL occurrences of \%VAL in a call to CNF\_PVAL,
-      unless they are already so wrapped.  If it suspects that \%VAL
-      may not be a legitimate candidate for this treatment, it will
-      output a warning message to standard error.  It will do this in
-      the following cases:
-      \sstitemlist{
-
-         \sstitem
-           \%VAL is on the last argument in the argument list (this
-             suggests that it might be a trailing string length)
-
-         \sstitem
-           The argument of \%VAL looks like an integer constant
-
-         \sstitem
-           The argument of \%VAL looks like a Starlink-style symbolic
-             constant (has two adjacent underscore characters).
-      }
-   }
-   \sstusage{
-      inscnf [ in [ out ] ]
-   }
-   \sstnotes{
-      Although this program behaves as a filter, it is written on
-      the assumption that it will be run on a file of a finite length:
-      it may buffer large amounts of input before writing output, and
-      it may not free up memory.
-   }
-}
-\newpage
-\sstroutine{
-   frepint
-}{
-   Replace INTEGER by INTEGER$*$8 in Fortran
-}{
-   \sstdescription{
-      This program is a filter which takes FORTRAN 77 source code
-      and modifies it so that INTEGER declarations are rewritten as
-      {\tt '}INTEGER $*$ 8{\tt '}.  It also attempts to warn if there are usages which
-      might cause trouble given this change.
-
-      Additionally, if there appear to be actual arguments to subroutines
-      or functions which are literal integers, the program will attempt
-      to replace them with symbolic constants, as defined in the
-      EXT\_PAR include file.  It will also attempt to add a line INCLUDEing
-      this file.  This aspect of the processing is not foolproof.
-      It can misidentify an array reference as a function call - if
-      the {\tt '}function{\tt '} name contains an underscore it assumes that it is
-      a function name and not an array name.  Only single literal integers
-      as actual arguments are thus replaced, so that, e.g. the code
-
-         L = XXX1\_FUNC( X, Y, Z, 0, 3 $*$ 5, STATUS )
-
-      will be replaced by
-
-         L = XXX1\_FUNC( X, Y, Z, EXT\_\_0, 3 $*$ 5, STATUS )
-
-      Attention is paid to fortran 77 source format, so that lines
-      more than 72 characters long are avoided (unless they were there
-      in the first place).
-
-      Some attention is paid to the aesthetic qualities of the output:
-      line breaks are done, where possible, following the usage in, e.g.,
-      KAPPA.  An attempt is made copy the style of case usage from the
-      input.
-
-      No changes are made to comment lines so that, for instance, the
-      Arguments stanza of subroutine prologues will not have argument
-      types modified from {\tt '}INTEGER{\tt '} to {\tt '}INTEGER $*$ 8{\tt '}.
-
-      The program will write a warning on standard error for certain
-      constructions in the code which are likely to cause trouble after
-      the mass redeclaration of INTEGER as INTEGER$*$8 has occurred.
-      These constructions are:
-      \sstitemlist{
-
-         \sstitem
-            INTEGER $*$ n declarations which already exist in the code
-              (these are not modified)
-
-         \sstitem
-            EQUIVALENCE statements
-
-         \sstitem
-            Use of INTEGER Specific names for standard intrinsic functions
-              (IABS, ISIGN, IDIM, MAX0, AMAX0, MIN0, IMIN0)
-
-         \sstitem
-            Any module (SUBROUTINE, FUNCTION or BLOCK DATA) which does not
-              include an IMPLICIT NONE statement.
-      }
-   }
-   \sstusage{
-      frepint [ in [ out ] ]
-   }
-   \sstnotes{
-      Although this program behaves as a filter, it is written on
-      the assumption that it will be run on a file of a finite length:
-      it may buffer large amounts of input before writing output, and
-      it may not free up memory.
-   }
-   \sstbugs{
-      In some cases, the line breaks are not made in very beautiful places.
-      They should, however, always be correct.
-   }
-}
-\newpage
-\sstroutine{
-   crepint
-}{
-   Replace int by INT\_BIG in C
-}{
-   \sstdescription{
-      This program is a filter which takes C source code and replaces
-      any occurrences of the type specifier `int{\tt '} by the identifier
-      `INT\_BIG{\tt '}.  This identifier should then be assigned a preprocessor
-      value of a suitable integral type (int or long) either using an
-      include file or with a -DINT\_BIG=xxx flag on the C compiler.
-
-      It{\tt '}s not quite as simple as replacing every semantically significant
-      occurrence of the `int{\tt '} identifier; `short int{\tt '} and `long int{\tt '} type
-      specifiers will be left alone.
-
-      If a use of int appears to be declaring a symbol called `main{\tt '} or
-      `argc{\tt '}, then this will be left alone too, and a message written
-      to standard error to the effect that it is not being changed.
-
-      Additionally, references to the limit.h macros INT\_MAX, INT\_MIN
-      and UINT\_MAX are replaced by INT\_BIG\_MAX, INT\_BIG\_MIN and
-      UINT\_BIG\_MAX respectively.  These may be defined on the compiler
-      command line, or using a suitable header file (extreme.h), which
-      would sensibly be included immediately after limit.h.
-
-      Explicit declarations which are implicitly of type int will have
-      an INT\_BIG token inserted - for instance `static x, y;{\tt '} will be
-      changed to `static INT\_BIG x, y;{\tt '}.
-
-      The program will write a warning on standard error for certain
-      constructions in the code which are likely to cause trouble after
-      the mass redeclaration of int as INT\_BIG has occurred.
-      These constructions are:
-      \sstitemlist{
-
-         \sstitem
-            Declarations of functions with variable argument lists
-
-         \sstitem
-            Use of format strings in formatted I/O which may need changes
-
-      }
-      In the case of potentially dangerous format strings, for
-      convenience a comment is inserted in the output code on the line
-      before the format string is used.  The comment will contain the
-      character string `crepint: {\tt '}.
-
-      The program does not make all changes which are required to effect
-      this conversion.  The following constructions are likely to cause
-      trouble, but will not be warned about by the program:
-      \sstitemlist{
-
-         \sstitem
-            Use of functions without prototypes.  If header files are
-              omitted or old style function declarations are used then the
-              ANSI C machinery for doing type conversion at function call
-              time will not work.
-
-         \sstitem
-            Use of external C libraries apart from the C standard library
-              which have not been recoded replacing INT\_BIG for int.
-
-         \sstitem
-            Implicit declarations, which are implicitly of type int.
-              If a name is declared simply by mentioning it without any type
-              or type qualifiers, it is implicitly of type int, and so
-              should become delcared as INT\_BIG.  This program does not
-              find these.  Such implicit declarations (only?) occur in
-              function declarations.  The Tru64 Unix C compiler{\tt '}s {\tt "}-protois{\tt "}
-              flag is useful for identifying these.
-
-      }
-      The program tries to adjust padding whitespace outside comments
-      so that the spacing of the output looks OK.
-
-      No changes are made to comment lines so that, for instance, the
-      Synopsis stanza of function prologues will not have formal argument
-      types changed from {\tt '}int{\tt '} to {\tt '}INT\_BIG{\tt '}.
-   }
-   \sstusage{
-      crepint [ in [ out ] ]
-   }
-   \sstnotes{
-      Although this program behaves as a filter, it is written on
-      the assumption that it will be run on a file of a finite length:
-      it may buffer large amounts of input before writing output, and
-      it may not free up memory.
-   }
-}
 %%%% End filter descriptions
 
 % ? End of main text
