@@ -1,9 +1,73 @@
 #!/bin/csh -f
 
+#+
+#  Name:
+#     RESLOG
+
+#  Purpose:
+#     Enables logging of resource (time + memory usage) of large processes
+#     run from it's parent shell (e.g. a shell script)
+
+#  Language:
+#     C shell
+
+#  Description:
+#     The script spends most of its time sleeping, but at intervals wakes
+#     up and takes a look at what processes are running.  It takes note
+#     of the largest (biggest memory usage) and records the current 
+#     CPU and elapsed time values, and the maximum so far total virtual
+#     memory use and resident set size (i.e. real memory use).
+#     Every time the contents of a given external label file are changed
+#     (presumably by the parent process) it writes the contents of the 
+#     label file, plus a summary of the resource usage since last time 
+#     the label file was changed to a log file.
+#     The only communication between the parent and this process, 
+#     after it is started, is via the label file.
+#
+#     Accuracy of the summary will necessarily depend on the lenght of
+#     the intervals during which the script sleeps.  In particular 
+#     it cannot be expected to report accurately on processes whose
+#     elapsed time is comparable with the interval time, and may 
+#     miss reporting on these altogether.
+#
+#     If this process receives an interrupt, or if it detects that its
+#     parent no longer exists, this process will terminate.
+
+#  Implementation status:
+#     Determining resource usage is inherently a highly system-dependent
+#     task, and the script cannot be expected to be portable to 
+#     arbitrary platforms.  In particular the 'ps' command, which has
+#     to be used heavily, exists in two very differnt forms, one 
+#     descending from BSD and one from Sytem V Unix.
+#     The script as it stands appears to run on the following systems:
+#        Red Hat Linux 5.0
+#        Solaris (SunOS 5.6)
+#     however it's likely to be sensitive to details of the systems it's
+#     running on.  There may also be problems, for instance, if (e.g. 
+#     for a process with very large memory usage) the columns from ps 
+#     run into each other.
+
+#  Parameters:
+#     If invoked with a command-line argument, it will take it as the
+#     name of the log file to write to.  Otherwise it will use a default
+#     file name (reslog.log).
+
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-MAY-1998 (MBT):
+#        Original version.
+#     {enter_further_changes_here}
+#-
+#
+
+
 # Set up variables
 set logfile = test.log
 if ("$1" != "") set logfile = "$1"
-set labelfile = current_label
+set labelfile = ./current_label
 set tmpfile = ./tmpfile
 set interval = 10
 
