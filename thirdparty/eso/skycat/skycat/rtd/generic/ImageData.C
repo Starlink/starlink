@@ -231,6 +231,7 @@ void ImageData::setXImage(ImageDisplay* xImage)
 {
     // save XImage info
     xImage_ = xImage;
+    if ( xImage == NULL ) return;
     xImageData_ = xImage_->data();
     xImageBytesPerPixel_ = xImage_->depth()/8;
     xImageBytesPerLine_ = xImage_->bytesPerLine();
