@@ -503,7 +503,7 @@ CONFIG_SCRIPTS = EEV3QUICK.DAT EEV3STANDARD.DAT EEV5QUICK.DAT \
 #  IRAF files that go into this directory (like the help databases).
 #  All these files will be installed with read permissions.
 
-IRAF_SCRIPTS = ccdexercise.cl use_globals.cl $(MONOLITHS:=.tcl) \
+IRAF_SCRIPTS = ccdexercise.cl use_globals.cl \
                ccdpack.hd ccdpack.men _ccdpack.hd root.hd
 
 #  Startup scripts.  These are the files that must be executed (sourced)
@@ -827,7 +827,7 @@ BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
  $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MONOLITHS) $(IFC_FILES) \
  $(HELP_FILES) $(ICL_STARTUP_SCRIPT) $(STARTUP_SCRIPT) \
  $(IRAF_STARTUP_SCRIPT) $(HELPTASK) $(PLATFORM_TCLBINARIES) \
- $(IRAF_SCRIPTS) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
+ $(IRAF_SCRIPTS) $(MONO_TCL) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -1658,7 +1658,7 @@ install:
 	      $(IRAF_STARTUP_SCRIPT) >$(INSTALL_IRAF_BIN)/$(IRAF_STARTUP_SCRIPT) ;\
 	   chmod 755 $(INSTALL_IRAF_BIN)/$(IRAF_STARTUP_SCRIPT) ;\
 	else :; fi
-	for f in $(IRAF_SCRIPTS) $(IRAF_PAR) helpdb.mip ""; do \
+	for f in $(IRAF_SCRIPTS) $(MONO_TCL) $(IRAF_PAR) helpdb.mip ""; do \
            if test -n "$$f"; then \
               $(CP) $$f $(INSTALL_IRAF_BIN);\
               chmod 644 $(INSTALL_IRAF_BIN)/$$f;\
@@ -1890,7 +1890,7 @@ do_deinstall:
            else :; fi ;\
            $(MAKE) $(IRAF_STARTUP_SCRIPT);\
 	else :; fi
-	- for f in $(IRAF_SCRIPTS) $(IRAF_PAR) helpdb.mip ""; do \
+	- for f in $(IRAF_SCRIPTS) $(MONO_TCL) $(IRAF_PAR) helpdb.mip ""; do \
 	   if test -n "$$f" -a -f $(INSTALL_IRAF_BIN)/$$f; then \
 	      $(RM) $$f;\
 	      $(CP) $(INSTALL_IRAF_BIN)/$$f .;\
