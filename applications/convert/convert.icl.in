@@ -16,9 +16,11 @@
 
 {  History:
 {     1992 September 10 (MJC):
-{	 Original version.
+{        Original version.
 {     1992 September 29 (MJC):
-{	 Added NDF2IRAF.
+{        Added NDF2IRAF.
+{     1992 September 30 (MJC):
+{        Added CONHELP and CONVERT help.
 {     {enter_further_changes_here}
 
 {-
@@ -36,6 +38,7 @@ define   unf2{ndf}     convert_dir:convert
 
 defhelp  ascii2ndf     convert_dir:convert
 defhelp  bdf2ndf       convert_dir:convert
+defhelp  convert       convert_dir:convert help
 defhelp  dipso2ndf     convert_dir:convert
 defhelp  dst2ndf       convert_dir:convert
 defhelp  ndf2ascii     convert_dir:convert
@@ -45,6 +48,8 @@ defhelp  ndf2dst       convert_dir:convert
 defhelp  ndf2iraf      convert_dir:convert
 defhelp  ndf2unf       convert_dir:convert
 defhelp  unf2ndf       convert_dir:convert
+
+defstring conh(elp) help convert
 
 { print CONVERT initialisation message }
 
