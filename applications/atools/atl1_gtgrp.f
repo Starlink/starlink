@@ -171,7 +171,7 @@
 *  Read the file into the group.
          CALL GRP_GRPEX( GRPEXP( : IAT ), GRP__NOID, IGRP, SIZE, ADDED,
      :                   FLAG, STATUS )     
-         
+
       ENDIF
 
 *  Delete the group if an error occurred.
@@ -189,8 +189,8 @@
                CALL MSG_SETC( 'TYP', 'text' )
             END IF
    
-            CALL MSG_OUT( ' ', '   AST data read from ^TYP file '//
-     :                    '''^FILE''.', STATUS )
+            CALL ATL1_NOTIF( '   AST data read from ^TYP file '//
+     :                       '''^FILE''.', STATUS )
          END IF
       END IF
 

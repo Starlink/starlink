@@ -95,8 +95,8 @@
 
       ELSE
          CALL MSG_SETC( 'F', FNAME )
-         CALL MSG_OUT( ' ', '   AST data written to text file ''^F''.', 
-     :                 STATUS )
+         CALL ATL1_NOTIF( '   AST data written to text file ''^F''.', 
+     :                    STATUS )
       END IF
 
 *  Annul the channel.

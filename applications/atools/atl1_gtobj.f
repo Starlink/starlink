@@ -91,8 +91,8 @@
 *  Tell the user where the object came from. 
          IF( IAST .NE. AST__NULL ) THEN
             CALL NDF_MSG( 'NDF', INDF ) 
-            CALL MSG_OUT( ' ', '   AST data read from NDF ''^NDF''.', 
-     :                    STATUS )
+            CALL ATL1_NOTIF( '   AST data read from NDF ''^NDF''.', 
+     :                       STATUS )
          END IF
 
 *  Annul the NDF identifer.
