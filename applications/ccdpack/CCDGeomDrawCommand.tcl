@@ -37,6 +37,9 @@ proc CCDGeomDrawCommand { Top Canvas } {
 #     	 Original version.
 #     17-JAN-1996 (PDRAPER):
 #        Fixed display to reset xmagn and ymagn parameters.
+#     24-MAR-1999 (PDRAPER):
+#        Removed the xmagn & ymagn changes, no longer needed. Stopped
+#        KAPPA drawing axes.
 #     {enter_further_changes_here}
 
 #-
@@ -77,7 +80,7 @@ proc CCDGeomDrawCommand { Top Canvas } {
       set ndf [CCDFileToNDFName $NDF]
       set perc "\[$PERCENTILES(low),$PERCENTILES(high)\]"
       CCDRunTask display \
-         "in=$ndf mode=per percentiles=$perc device=$XDEVICE xmagn=! ymagn=!" \
+         "in=$ndf mode=per percentiles=$perc device=$XDEVICE axes=f" \
          1 $Top "Displaying image $NDF"
       set DISPLAYED $NDF
       $Canvas do raise Gwm
