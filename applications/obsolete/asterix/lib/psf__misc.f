@@ -22,11 +22,16 @@
 *
 *    History :
 *
-*     29 Apr 90 : Original (DJA)
-*      9 Aug 90 : New iterative technique to counter coarse binning problems
-*     27 Oct 90 : Tries to invoke special library routine first (DJA)
-*     18 Mar 91 : Varies over field (DJA)
-*     15 Dec 93 : Use internal routine for axis info (DJA)
+*     29 Apr 1990 (DJA):
+*        Original version
+*      9 Aug 1990 (DJA):
+*        New iterative technique to counter coarse binning problems
+*     27 Oct 1990 (DJA):
+*        Tries to invoke special library routine first
+*     18 Mar 1991 (DJA):
+*        Varies over field
+*     15 Dec 1993 (DJA):
+*        Use internal routine for axis info
 *
 *    Type definitions :
 *
@@ -82,38 +87,39 @@
       REAL                     ZOOM                    ! Coarse to fine zoom
 
       INTEGER                  I, ILEV
-      INTEGER                  LID, MID                ! Library/module id's
       INTEGER                  NCBIN                   !
       INTEGER                  NDONE                   !
+      INTEGER			RTNPTR			! Specialist routine
       INTEGER                  X_AX, Y_AX, E_AX, T_AX  !
+
+      LOGICAL			THERE			! Specialist exists?
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Axis identifiers
+*  Invoke specialist routine if it exists
+      CALL PSF0_FNDRTN( P_PSID(SLOT), 'Eprofile', THERE, RTNPTR,
+     :                  STATUS )
+      IF ( THERE ) THEN
+        CALL PSF_ENERGY_PFL_SPEC( %VAL(RTNPTR), P_PSID(SLOT), X0, Y0,
+     :                            NFRAC, FRAC, RADII, STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
+          GOTO 99
+        ELSE IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+        END IF
+      END IF
+
+*  Axis identifiers
       CALL PSF_QAXES( SLOT, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
-*    Direction of increase of X axis
+*  Direction of increase of X axis
       IF ( PSF1_GETAXINC( P_INST(SLOT), X_AX, STATUS ) ) THEN
         XDIR = 1.0
       ELSE
         XDIR = -1.0
       END IF
-
-*    See if the library has a PSFLIB_ENERGY_PFL routine available
-      LID = P_LIBID(SLOT)
-      MID = P_MODID(SLOT)
-      IF ( L_MOD_PFL(MID,LID) .NE. 0 ) THEN
-        CALL PSF_ENERGY_PFL_SPEC( %VAL(L_MOD_PFL(MID,LID)),
-     :               P_PSID(SLOT), NFRAC, FRAC, RADII, STATUS )
-        IF ( STATUS .EQ. SAI__OK ) THEN
-          GOTO 99
-        ELSE
-          STATUS = SAI__OK
-        END IF
-      END IF
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    STAGE 1
       CDX = MAXRAD * MATH__DTOR / REAL( MAXPR ) * XDIR
@@ -187,7 +193,7 @@
 
 
 *+  PSF_ENERGY_PFL_SPEC - Invoke library routine for profiling
-      SUBROUTINE PSF_ENERGY_PFL_SPEC( ROUTINE, PSID, NFRAC, FRAC,
+      SUBROUTINE PSF_ENERGY_PFL_SPEC( ROUTINE, PSID, X0, Y0, NFRAC, FRAC,
      :                                            RADII, STATUS )
 *
 *    Description :
@@ -207,18 +213,14 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *
-      EXTERNAL                 ROUTINE                 ! LIB routine to call
-      INTEGER                  PSID                    ! The PSF id
-      INTEGER                  NFRAC                   ! Number of fractions
-      REAL                     FRAC(NFRAC)             ! Requested fractions
+      EXTERNAL                  ROUTINE                 ! LIB routine to call
+      REAL			X0, Y0			! Detector position
+      INTEGER                  	PSID                    ! The PSF id
+      INTEGER                   NFRAC                   ! Number of fractions
+      REAL                      FRAC(NFRAC)             ! Requested fractions
 *
 *    Export :
 *
@@ -229,10 +231,11 @@
       INTEGER                  STATUS
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      CALL ROUTINE( PSID, NFRAC, FRAC, RADII, STATUS )
+*  Invoke routine
+      CALL ROUTINE( PSID, X0, Y0, NFRAC, FRAC, RADII, STATUS )
 
       END
 
