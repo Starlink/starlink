@@ -1,0 +1,35 @@
+#!/bin/csh
+#
+#  Convert POLPACK FITS table into a GAIA tab table with suitable 
+#  header.
+#
+
+#  Get names of files.
+if ( "$1" == "" ) then
+   echo -n "Input POLPACK file: "
+   set infile = $<
+else
+   set infile = "$1"
+endif
+if ( "$2" == "" ) then
+   echo -n "Output GAIA file: "
+   set outfile = $<
+else
+   set outfile = "$2"
+endif
+
+
+#  Convert the FITS table into a tab table.
+$GAIA_DIR/cat2tab $infile gaiatemp.TAB
+
+#  And edit the parameters 
+sed \
+        -e '/cat2tab/a\\
+id_col: 2 \\
+symbol: {P ANG} {line green {} {$ANG} {} {}} {{$P*0.5} {}}' \
+	-e 's/x_col: -1/x_col: 0/' \
+	-e 's/y_col: -1/y_col: 1/'  \
+	< gaiatemp.TAB >! $outfile
+
+
+exit
