@@ -38,7 +38,11 @@ maps numbers to strings, and is initialised in ech_initialise.f (hard
 to find!).  ech_echomop_option then has _another_ big IF, and calls
 routines from there.
 
-The keywords recognised here are:
+Thus after option 4, ech_spatial, is invoked, option_module
+refers to Submenu_2, which points to ech_get_slit_extent and
+ech_get_obj_profile.
+
+The keywords recognised in ech_echomop_option are:
 
 ECH_2D_EXT_OPT
 ECH_CHECK_FRAME
@@ -94,7 +98,7 @@ ECH_WAVELENGTH_CALIB
 ECH_WAVELENGTH_CALIB
 ECH_WRITE_RESULTS
 
-these typically, but now always, call a routine with the same name.
+these typically, but not always, call a routine with the same name.
 
 
 
@@ -127,6 +131,40 @@ I've been fiddling with the echomop web pages fairly ad lib., fixing
 up broken references and the like.  It's probably now in a reasonably
 stable state, and I can start working on it.
 
+20-Jan-2002
+-----------
+
+Bit the bullet and removed the failed
+CVS/starlink/{echomop-old,echelle} directories from the repository.
+
+It turns out that it's easy to build the documentation, using the
+preprocessing script included in sun152.tex, so that was
+added to the doc/sun152/Makefile.  So I don't need to hang on to the
+sun152.htx_tar tarball.
+
+Fiddled with the documentation, updating dates and little more.
+
+
+25-Jan-2002
+-----------
+
+The Bug: it's something to do with SLITIM, since it appears that the
+bug consists of being reprompted for SLITIM each time round (though
+this has yet to be confirmed):
+    SLITIM - Frame for dekker measurement /''/ > test_flat
+but grepping for SLITIM doesn't show up anything obvious.  Hmm, I
+think that SLITIM is the IMAGE passed to ech_get_profile and thence to 
+ech_spatial_profile and ech_spatial_avgprof, but
+where does it come from?  ech_setup_object_ref, perhaps?  But then
+where's the link to the SLITIM parameter made?  Ooooh.
+
+No, I don't think it _is_ anything to do with SLITIM.  I think the
+problem after all this time was to do with the twisted option-parsing
+code in echomop.f, so that suboptions were never being recognised.  I
+created ech_parse_option.c, and now things _seem_ to work.  I'll
+release this as 3.3-6b1 and see if anyone breaks it.
+
+
 
 Things it would be nice to do
 -----------------------------
@@ -135,11 +173,11 @@ Make a bash version of the initialisation and demo scripts
 (echomop.csh and echomop_demo.tar).
 
 Some conflicts between documentation and actual files.  For
-example, ech_demo.txt doesn't exist.
+example, ech_demo.txt doesn't exist.  Done, 20-Jan-2002.
 
 Demo uses more, but this should be changed to `more -w', so that the
 demo doesn't fly through the demo when the displayed text is less than
-a pageful.
+a pageful.  Fixed.
 
 In the demo, the ech_idwave demonstration produces an error: 
 
