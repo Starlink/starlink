@@ -863,6 +863,20 @@ $(MANIFEST)/libtool:
 	    fi \
 	    && make>make.log && make install>>make.log
 
+$(MANIFEST)/m4:
+	cd thirdparty/fsf/m4 \
+	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
+	        ./configure --prefix=$$BUILDSUPPORT_PREFIX \
+	            >configure-output.log; \
+	    elif test ! -f Makefile; then \
+	        { t="Directory unconfigured but BUILDSUPPORT_PREFIX undefined";\
+	          echo $$t >configure-output.log; echo $$t >&2; \
+	          exit 1; }; \
+	    else \
+	        echo "No configuration necessary" >configure-output.log; \
+	    fi \
+	    && make>make.log && make install>>make.log
+
 $(MANIFEST)/mag: \
 		$(MANIFEST)/adam \
 		$(MANIFEST)/ams \

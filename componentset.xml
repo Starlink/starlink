@@ -2553,7 +2553,56 @@ Ultrix and for SunOS and may still work for them.
 <component id="autoconf" buildsupport="yes">
   <version>2.59</version>
   <path>thirdparty/fsf/autoconf</path>
-  <description>GNU autoconf</description>
+  <description>Starlink autoconf</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies/>
+  <developers>
+    <!-- Cast of thousands, but locally to Starlink... -->
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>@PACKAGE_BUGREPORT</bugreports>
+  <notes><p>This version of autoconf has been patched to include
+      Fortran preprocessor support.  Those patches were submitted
+      to autoconf-patches@gnu.org in January 2004, and were being
+      examined after that.</p></notes>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="automake" buildsupport="yes">
+  <version>1.8.2-starlink</version>
+  <path>thirdparty/fsf/automake</path>
+  <description>GNU automake, patched</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies>
+    <!-- hard-code these, rather than requiring us to put
+         STAR_DEFAULTS in configure.ac -->
+    <build>starlink-autoconf</build>
+    <build>libtool</build>
+  </dependencies>
+  <developers>
+    <!-- Cast of thousands, but locally to Starlink... -->
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>This version of automake has been patched to include
+      Fortran preprocessor support, and a variety of Starlink-specific
+      targets.  The Fortran patches were submitted
+      to automake-patches@gnu.org in January 2004, and were being
+      examined after that.</p></notes>
+</component>
+
+<component id="libtool" buildsupport="yes">
+  <version>1.5</version>
+  <path>thirdparty/fsf/libtool</path>
+  <description>GNU libtool</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies/>
   <developers>
@@ -2565,11 +2614,50 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>This version of libtool is unpatched -- just the standard
+      version.</p></notes>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="m4" buildsupport="noauto">
+  <!-- Note that, although m4 is a 'buildsupport' tool, we do NOT
+       add the buildsupport="yes" attribute.  If we did, then this would
+       ALWAYS be built at the beginning of the bootstrap process.
+       Instead, we want to build it only if the system m4 is not GNU m4.
+       Thus set the attribute to be "noauto", which causes the correct
+       build rule to be generated (by GenerateDependencies.java), but does
+       not include it in the list of buildsupport dependencies, so that it
+       is not build automatically. -->
+  <version>1.4</version>
+  <path>thirdparty/fsf/m4</path>
+  <description>GNU m4</description>
+  <dependencies/>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Imported from distributed m4-1.4.tar.gz by nxg,
+    on 2004-03-07</p></notes>
+</component>
+
+<component id="autoconf" buildsupport="yes">
+  <version>2.59</version>
+  <path>thirdparty/fsf/autoconf</path>
+  <description>Starlink autoconf</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies/>
+  <developers>
+    <!-- Cast of thousands, but locally to Starlink... -->
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>@PACKAGE_BUGREPORT</bugreports>
   <notes><p>This version of autoconf has been patched to include
       Fortran preprocessor support.  Those patches were submitted
       to autoconf-patches@gnu.org in January 2004, and were being
       examined after that.</p></notes>
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="automake" buildsupport="yes">
   <version>1.8.2-starlink</version>
@@ -2577,6 +2665,8 @@ Ultrix and for SunOS and may still work for them.
   <description>GNU automake, patched</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies>
+    <!-- hard-code these, rather than requiring us to put
+         STAR_DEFAULTS in configure.ac -->
     <build>autoconf</build>
     <build>libtool</build>
   </dependencies>
@@ -2613,6 +2703,25 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>This version of libtool is unpatched -- just the standard
       version.</p></notes>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="m4" buildsupport="noauto">
+  <!-- Note that, although m4 is a 'buildsupport' tool, we do NOT
+       add the buildsupport="yes" attribute.  If we did, then this would
+       ALWAYS be built at the beginning of the bootstrap process.
+       Instead, we want to build it only if the system m4 is not GNU m4.
+       Thus set the attribute to be "noauto", which causes the correct
+       build rule to be generated (by GenerateDependencies.java), but does
+       not include it in the list of buildsupport dependencies, so that it
+       is not build automatically. -->
+  <version>1.4</version>
+  <path>thirdparty/fsf/m4</path>
+  <description>GNU m4</description>
+  <dependencies/>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Imported from distributed m4-1.4.tar.gz by nxg,
+    on 2004-03-07</p></notes>
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
