@@ -962,13 +962,10 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *
       REAL			BIT1, BIT2
       REAL                     ENERGY                  ! Mean photon energy
-      REAL                     FWHM, SIG               ! Gaussian attrs
       REAL                     LNORM                   ! Normalisation constant
       REAL                     OFFAXIS                 ! Off-axis angle (arcmin)
       REAL                     P_SCALE                 ! Scale size of psf
       REAL                     ROFF                    ! Off-axis angle
-      REAL                     RPS                     ! Radius of sub-pix ^ 2
-      REAL                     RSCALE                  ! Cube radial bin size
       REAL                     SDX, SDY                ! Sub-pixel bin sizes
       REAL                     SUM                     ! Cumulative value
       REAL                     XP0, YP0                ! Major pixel centre
@@ -1379,7 +1376,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *
 *    Local variables :
 *
-      REAL                     	RVAL                    ! Function return value
       REAL			RVAL_0, RVAL_20
 *
 *    Local data :
@@ -2090,7 +2086,6 @@ C         CALL CAL_CLOSE( IGNORE )
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)   HLOC                    ! HEADER locator
       CHARACTER*(DAT__SZLOC)   ILOC                    ! INSTRUMENT locator
       CHARACTER*(DAT__SZLOC)   LOC                     ! Locator from FID
       CHARACTER*(DAT__SZLOC)   SLOC                    ! SORT locator
@@ -2104,8 +2099,6 @@ C         CALL CAL_CLOSE( IGNORE )
       INTEGER			TIMID			! Timing info
 
       LOGICAL                  FILTER_OK, IRIS_OK      ! Sort components there?
-      LOGICAL                  THERE
-      LOGICAL                  I_THERE, S_THERE
 *-
 
 *    Check status
@@ -4165,21 +4158,18 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)   HLOC                    ! HEADER locator
       CHARACTER*(DAT__SZLOC)   ILOC                    ! INSTRUMENT locator
+      CHARACTER*(DAT__SZLOC)	LOC                    ! Dataset locator
       CHARACTER*(DAT__SZLOC)   SLOC                    ! SORT locator
       CHARACTER*80             CID                     ! Filter description
 
       REAL                     IRIS                    ! Sort iris value
 
-      INTEGER                  BDA                     ! BDA identifier
       INTEGER                  CALFN                   ! CAL filter no.
       INTEGER                  IFILT                   ! Dataset filter code
       INTEGER			TIMID			! Timing info
 
       LOGICAL                  FILTER_OK, IRIS_OK      !
-      LOGICAL                  THERE
-      LOGICAL                  I_THERE, S_THERE, B_THERE
 *-
 
 *    Check status
