@@ -107,6 +107,7 @@
 *  Local Variables:
       INTEGER			HID			! HDU identifier
       INTEGER			KID			! Keyword identifier
+      INTEGER			KSID			! Keyword structure id
 
       LOGICAL			THERE			! Object exists?
 *.
@@ -117,8 +118,11 @@
 *  Locate the HDU structure to contain the keyword
       CALL ADI2_LOCHDU( FID, HDU, HID, STATUS )
 
+*  Locate the keyword structure
+      CALL ADI_FIND( HID, 'Keys', KSID, STATUS )
+
 *  Does the keyword already exist?
-      CALL ADI_THERE( HID, KEY, THERE, STATUS )
+      CALL ADI_THERE( KSID, KEY, THERE, STATUS )
       IF ( THERE ) THEN
 
 *    Do some checks here? Committed to disk? Same value etc?
@@ -126,16 +130,17 @@
       END IF
 
 *  Write the value
-      CALL ADI_CPUT0<T>( HID, KEY, VALUE, STATUS )
+      CALL ADI_CPUT0<T>( KSID, KEY, VALUE, STATUS )
 
 *  Comment is non-standard? If so write the value as a property
       IF ( COMNT(1:1) .NE. '*' ) THEN
-        CALL ADI_FIND( HID, KEY, KID, STATUS )
+        CALL ADI_FIND( KSID, KEY, KID, STATUS )
         CALL ADI_CPUT0C( KID, '.COMMENT', COMNT, STATUS )
         CALL ADI_ERASE( KID, STATUS )
       END IF
 
-*  Free the identifier
+*  Free the identifiers
+      CALL ADI_ERASE( KSID, STATUS )
       CALL ADI_ERASE( HID, STATUS )
 
 *  Report any errors
