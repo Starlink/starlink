@@ -179,9 +179,7 @@ itcl::class gaia::GaiaAstTransfer {
 
    #  Set the contents of the table (appended to any existing content).
    public method set_contents {args} {
-      foreach line $args {
-         $itk_component(table) set_contents $line
-      }
+      eval $itk_component(table) set_contents $args
       $itk_component(table) redraw
    }
 

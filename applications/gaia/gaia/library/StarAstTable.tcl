@@ -287,10 +287,7 @@ itcl::class gaia::StarAstTable {
 
    #  Set the contents of the table.
    public method set_contents {args} {
-      foreach line $args {
-         $itk_component(table) append_row $line
-      }
-      $itk_component(table) new_info
+      $itk_component(table) append_rows $args
       redraw
    }
 
