@@ -1,4 +1,5 @@
 #! /bin/sh -
+# @configure_input@
 #
 # Create a starconf script which packages current versions of important files
 #
@@ -46,9 +47,13 @@
 # Yes, we are indeed more cunning than a nest of monkeys.
 #
 #
-# Dependency: the starconf.m4.in file defines a macro
-# STAR_DEFAULTS: that macro relies on us including
-# install-with-manifest.in here.
+# Dependencies:
+#   - the starconf.m4.in file defines a macro STAR_DEFAULTS:
+#     that macro relies on us including install-with-manifest.in here.
+#   - starconf.m4.in defines STAR_FPP_SOURCE: that relies on us
+#     extracting extra-fortran.m4 here, and we scan for that macro
+#     name to tell us to extract the file.
+
 
 
 
@@ -88,6 +93,7 @@ cat >&3 <<\_STARCONF_EOD
 bindir=@bindir@
 datadir=@datadir@
 ln_s="@LN_S@"
+curr_starconf_version="@PACKAGE_VERSIONINT@"
 
 # Always include the following files:
 _STARCONF_EOD
@@ -124,13 +130,18 @@ if test -e bootstrap; then
     # Check the `bootstrap' file, to see if the first word on the second line
     # is `original'.  If it is, then unpack the bootstrap file, overwriting
     # any bootstrap file that's already there.
-    original=`sed -e '1d' -e '2{s/^[^a-z]*\([a-z]*\).*/\1/;q;}' bootstrap`
-    if test "X$original" = Xoriginal; then
-        extrachunks=!bootstrap
+    eval `sed -e '1d' -e '2{s/^[^a-z]*\([a-z]*\).*rnum=\([0-9]*\)/original=\1; bootstrap_version=\2;/;q;}' bootstrap`
+    # echo "original=$original  v=$bootstrap_version"
+    if test "X$original" != Xoriginal; then
+        : do nothing -- file has been modified
+    elif test $bootstrap_version -lt $curr_starconf_version; then
+        extrachunks="$extrachunks !bootstrap"
+    else
+        : do nothing -- file is up to date
     fi
 else
     # No `bootstrap' file, so unpack one
-    extrachunks=bootstrap
+    extrachunks="$extrachunks bootstrap"
 fi
 
 # Scan configure.ac, getting all the used STAR_* macros into a string
@@ -146,6 +157,9 @@ do
     case $foundmacro in
         STAR_DEFAULTS)
             found_star_defaults=true
+            ;;
+        STAR_FPP_SOURCES)
+            extrachunks="$extrachunks extra-fortran.m4"
             ;;
         *) ;;
     esac
@@ -193,11 +207,13 @@ _STARCONF_EOD
 echo "    echo \$f | sed \"s/^[$optchars]*\([^:]*\).*/#    \1/\" >&4"    >&3
 echo 'done'                                                              >&3
 echo 'echo "" >&4'                                                       >&3
-
+echo 'echo "allm4=" >&4'                                                 >&3
+  
 for ch in $allconfchunks
 do
     # extract the options, destination and source filenames
     eval `echo $ch | sed 's/\(['$optchars']*\)\([^:]*\)\(:\(.*\)\)*/opts=\1;filename=\2; filesource=\4/'`
+    test -n "$filename" || { echo "Impossible: null filename"; exit 1; }
     test -n "$filesource" || filesource=$filename
     echo "Including $filename from $filesource (opts=$opts)"
 
@@ -234,11 +250,18 @@ do
     echo "echo 'else'                                    >&4"            >&3
     echo "echo '    echo \"File $filename already exists, not overwriting\"'>&4 ">&3
     echo "echo 'fi'                                      >&4"            >&3
+    echo "echo 'expr $filename : \".*m4\$\" >/dev/null && allm4=\"\$allm4 $filename\"' >&4" >&3
 #    echo 'fi'                                                            >&3
 done
 
 cat >&3 <<\_STARCONF_EOD
-echo "exit 0" >&4
+cat >&4 <<\_STARCONF4_EOD
+if test -n "$allm4"; then
+    echo "Creating acinclude.m4 from$allm4"
+    cat $allm4 >acinclude.m4
+fi
+exit 0
+_STARCONF4_EOD
 # Close the starconf.status file
 exec 4>&-
 # ...and make it executable
