@@ -105,6 +105,8 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 \\newcommand\\Quote[1]{`#1'}
 \\let\\Strong\\textbf
 \\let\\Cite\\textit
+<!-- I may make \DTitem more sophisticated about linebreaking -->
+\\def\\DTitem#1{\\item[#1]}
 <!-- Title page. 
      No error checking - assume the stylesheet takes care of this -->
 \\let\\@Abstract\\@empty
