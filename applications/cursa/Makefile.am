@@ -3,7 +3,9 @@
 SUBDIRS = @subdirs@
 
 bin_SCRIPTS = xcatview cursa_test.csh cursa.csh xcatview catcdsin \
- catremote UrlReader.class UrlReader.java xcatviewLib/adamMessageRelay
+ catremote UrlReader.class UrlReader.java 
+
+nobase_bin_SCRIPTS = xcatviewLib/adamMessageRelay
 
 LOCAL_LINK = libcap/libcap.la `$(srcdir)/cursa_link_adam`
 
@@ -22,9 +24,6 @@ cursa_TASKS = catchart catchartrn catcoord catcopy catgrid  \
 bin_PROGRAMS = geturl
 
 geturl_SOURCES = geturl.c
-
-##  Name things to be built that are not named elsewhere.
-##BUILT_SOURCES = 
 
 #  List of ancillary data files (all types). These need a home at some point.
 EXAMPLE_FILES = examples/*
@@ -52,8 +51,7 @@ xcatviewsupport_DATA = \
  xcatviewLib/GetRow.tcl xcatviewLib/RemoteName.tcl \
  xcatviewLib/GetExprn.tcl xcatviewLib/GetScatter.tcl \
  xcatviewLib/RemoteQuery.tcl xcatviewLib/RemoteUrl.tcl \
- xcatviewLib/adamtask.tcl xcatviewLib/adamMessageRelay \
- xcatviewLib/tclIndex
+ xcatviewLib/adamtask.tcl xcatviewLib/tclIndex
 
 ##  Edit scripts during make to have the correct paths.
 NETWORKED = "yes"
@@ -101,7 +99,7 @@ cursa.csh: cursa.csh.in
 	   $(srcdir)/cursa.csh.in >cursa.csh.tmp
 	mv cursa.csh.tmp cursa.csh
 
- cursa_test.csh: cursa_test.csh.in
+cursa_test.csh: cursa_test.csh.in
 	rm -f cursa_test.csh.tmp cursa_test.csh
 	$(edit) \
 	   -e 's,@edited_input\@,cursa_test.csh: produced from cursa_test.csh.in by Makefile.am,' \
