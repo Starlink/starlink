@@ -24,19 +24,19 @@
 *     PHOTOM observation. For each bolometer used to look at the source the
 *     data will be analysed as follows:-
 *
-*      -An ndf called <bolname>_map (e.g. h7_map) will be created in the OUT 
-*       file to hold the coadded data from all the integrations. If the
-*       jiggle pattern points fit a 2-d rectangular pattern then these data
-*       will be arranged as a 2-d map suitable for plotting as an image. A
-*       2-d parabola will be fitted to the coadded image and the results 
-*       written in ASCII form to FILE. If an irregular jiggle pattern is
-*       used the map will take the form of a 1-D strip.
-*      -Second, an ndf called <bolname>_peak (e.g. h7_peak) will be created in
-*       the OUT file to hold the fit results to the data for each 
-*       integration. The results stored are the fit peak, its variance and
-*       quality and they are held as a 1-d array suitable for plotting as
-*       a graph. The fit results are also written in ASCII form to FILE, as
-*       is the coadd of all the individual fits to the data.
+*      - An ndf called <bolname>_map (e.g. h7_map) will be created in the
+*        OUT file to hold the coadded data from all the integrations. If the
+*        jiggle pattern points fit a 2-d rectangular pattern then these data
+*        will be arranged as a 2-d map suitable for plotting as an image. A
+*        2-d parabola will be fitted to the coadded image and the results 
+*        written in ASCII form to FILE. If an irregular jiggle pattern is
+*        used the map will take the form of a 1-D strip.
+*      - Second, an ndf called <bolname>_peak (e.g. h7_peak) will be created
+*        in the OUT file to hold the fit results to the data for each 
+*        integration. The results stored are the fit peak, its variance and
+*        quality and they are held as a 1-d array suitable for plotting as
+*        a graph. The fit results are also written in ASCII form to FILE, as
+*        is the coadd of all the individual fits to the data.
 *
 
 *  Usage:
@@ -44,8 +44,8 @@
 
 *  ADAM Parameters:
 *     ALLBOLS = LOGICAL (Read)
-*        By default only the observed bolometers are processed. (ie if you
-*        observed with H7 only h7 data will be stored). If ALLBOLS is set
+*        By default only the observed bolometers are processed (i.e. if you
+*        observed with H7 only H7 data will be stored). If ALLBOLS is set
 *        to true then all middle beam data is processed. This is useful
 *        for examining sky noise. Note that for 2 and 3 bolometer photometry
 *        ALLBOLS must be false to avoid weighting problems for the 
@@ -66,8 +66,17 @@
 *        specified in the name.
 
 *  Notes:
-*     ALLBOLS must be false for 2 and 3 bolometer photometry unless you
-*     know what you are doing.
+*     - ALLBOLS must be false for 2 and 3 bolometer photometry unless you
+*       know what you are doing.
+*     - SCUPHOT can process JIGGLE/MAP data. The output is the signal
+*       for each integration for each bolometer. This is useful
+*       for checking sky removal and should not be used for performing
+*       on-source photometry on map data! This method can not be used
+*       for SCAN/MAP data.
+
+*  Implementation Status:
+*     Ideally SCUPHOT should process MAP data on a per exposure basis.
+*     Currently only per integration is supported.
 
 *  Related Applications:
 *     SURF: SCUCAT
@@ -136,6 +145,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.17  1997/06/27 23:17:59  timj
+*     Tweak header.
+*
 *     Revision 1.16  1997/06/13 00:17:24  timj
 *     Check if we have performed a parabolic fit or not.
 *     Update doc.
@@ -221,6 +233,8 @@ c
       PARAMETER (TSKNAME = 'SCUPHOT')
 
 *    Local variables :
+      INTEGER          ALL             ! Beam to use for ALLBOLS
+      LOGICAL          ALL_BOLS        ! Select all bolometers
       CHARACTER*10     ANALYSIS        ! analysis mode
       BYTE             BADBIT          ! bad bit mask
       INTEGER          BEAM            ! beam index in DO loop
@@ -245,6 +259,7 @@ c
       CHARACTER*15     FILTER          ! the name of the filter being used
       CHARACTER*80     FITS (SCUBA__MAX_FITS)
 				       ! array of FITS keywords
+      CHARACTER*(DAT__SZNAM) HDSNAME   ! Name of the container (not the fname)
       INTEGER          I               ! DO loop index
       INTEGER          IBEAM           ! ndf identifier
       INTEGER          IERR            ! Pos of errors from VEC_
@@ -424,10 +439,10 @@ c
       REAL             RTEMP           ! scratch real
       INTEGER          RUN_NUMBER      ! run number of input file
       CHARACTER*15     SAMPLE_COORDS   ! coordinate system of sample offsets
+      CHARACTER*15     SAMPLE_MODE     ! sample mode of input file
       REAL             SAMPLE_PA       ! position angle of sample x axis
                                        ! relative to x axis of SAMPLE_COORDS
                                        ! system
-      LOGICAL          SELECT_BOLS     ! Select a bolometer?
       LOGICAL          SKY_ERROR       ! .TRUE. if SKY_ERROR application has
                                        ! been run on the data
       INTEGER          START_BOL       ! First bolometer
@@ -558,13 +573,26 @@ c
      :     OBSERVING_MODE, STATUS)
       CALL CHR_UCASE (OBSERVING_MODE)
 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :     'SAM_MODE', SAMPLE_MODE, STATUS)
+      CALL CHR_UCASE (SAMPLE_MODE)
+
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (OBSERVING_MODE .NE. 'PHOTOM') THEN
+
+         IF (SAMPLE_MODE .NE. 'JIGGLE') THEN
+
             STATUS = SAI__ERROR
             CALL MSG_SETC('TASK', TSKNAME)
             CALL ERR_REP (' ', '^TASK: the file '//
      :           'does not contain data from a PHOTOM observation',
      :           STATUS)
+         END IF
+
+         IF (OBSERVING_MODE .NE. 'PHOTOM') THEN
+            CALL MSG_OUTIF(MSG__QUIET, ' ',
+     :           'WARNING! This is not a PHOTOM observation -- please'//
+     :           ' take care.', STATUS)
+
          END IF
       END IF
 
@@ -574,9 +602,10 @@ c
 
       CALL MSG_SETC ('OBJECT', OBJECT)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
+      CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETC('PKG', PACKAGE)
       CALL MSG_OUTIF (MSG__NORM, ' ', 
-     :     '^PKG: run ^RUN was a PHOTOM observation '//
+     :     '^PKG: run ^RUN was a ^MODE observation '//
      :     'of ^OBJECT', STATUS)
 
 *     get the sub-instrument and filter used 
@@ -644,19 +673,34 @@ c
      :     NELM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF ((NDIM .NE. 3)                  .OR.
-     :        (DIM(1) .NE. N_BOLS)           .OR.
-     :        (DIM(2) .LT. 1)                .OR.
-     :        (DIM(3) .NE. SCUBA__MAX_BEAM)) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI ('NDIM', NDIM)
-            CALL MSG_SETI ('DIM1', DIM(1))
-            CALL MSG_SETI ('DIM2', DIM(2))
-            CALL MSG_SETI ('DIM3', DIM(3))
-            CALL MSG_SETC('TASK', TSKNAME)
-            CALL ERR_REP (' ', '^TASK: data array '//
-     :           'has bad dimensions (^NDIM) ^DIM1, ^DIM2, ^DIM3', 
-     :           STATUS)
+         IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+            IF ((NDIM .NE. 3)                  .OR.
+     :           (DIM(1) .NE. N_BOLS)           .OR.
+     :           (DIM(2) .LT. 1)                .OR.
+     :           (DIM(3) .NE. SCUBA__MAX_BEAM)) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETI ('NDIM', NDIM)
+               CALL MSG_SETI ('DIM1', DIM(1))
+               CALL MSG_SETI ('DIM2', DIM(2))
+               CALL MSG_SETI ('DIM3', DIM(3))
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: data array '//
+     :              'has bad dimensions (^NDIM) ^DIM1, ^DIM2, ^DIM3', 
+     :              STATUS)
+            END IF
+         ELSE
+            IF ((NDIM .NE. 2)                  .OR.
+     :           (DIM(1) .NE. N_BOLS)           .OR.
+     :           (DIM(2) .LT. 1))                THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETI ('NDIM', NDIM)
+               CALL MSG_SETI ('DIM1', DIM(1))
+               CALL MSG_SETI ('DIM2', DIM(2))
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: data array '//
+     :              'has bad dimensions (^NDIM) ^DIM1, ^DIM2, ^DIM3', 
+     :              STATUS)
+            END IF
          END IF
       END IF
 
@@ -682,16 +726,27 @@ c
      :     'exposure(s) in ^N_I integrations(s) in ^N_M '//
      :     'measurement(s)', STATUS)
 
+      IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN 
 *     get the target indices of the bolometers in the data array
+         CALL CMP_GETVI (IN_SCUBAX_LOC, 'PHOT_BB', SCUBA__MAX_BEAM,
+     :        PHOT_BB, NELM, STATUS)
 
-      CALL CMP_GETVI (IN_SCUBAX_LOC, 'PHOT_BB', SCUBA__MAX_BEAM,
-     :     PHOT_BB, NELM, STATUS)
 
 *     and the associated weights
 
-      CALL CMP_GETVR (IN_REDSX_LOC, 'BEAM_WT', SCUBA__MAX_BEAM,
-     :     BEAM_WEIGHT, NELM, STATUS)
+         CALL CMP_GETVR (IN_REDSX_LOC, 'BEAM_WT', SCUBA__MAX_BEAM,
+     :        BEAM_WEIGHT, NELM, STATUS)
 
+      ELSE
+
+*     If this is a map observation then I need to use beam 1
+         DO I = 1, SCUBA__MAX_BEAM
+            BEAM_WEIGHT(I) = 1.0
+            PHOT_BB(I) = 0.0
+         END DO
+         PHOT_BB(1) = 1  ! Select a beam 1 (any bolometer)
+
+      END IF
 
 *     get the channel and ADC numbers of the bolometers used
 
@@ -736,11 +791,15 @@ c
          LBND (1) = 1
          LBND (2) = 1
 
+*     There seems to be a problem with MAP jiggls returning zero
+*     from this routine.
+
          CALL SCULIB_CALC_GRID (JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
      :        XMIN, XMAX, XSPACE, UBND(1), YMIN, YMAX, YSPACE, 
      :        UBND(2), IPOS, JPOS, STATUS)
 
-         IF (YSPACE .LT. 1.0E-5) THEN
+
+         IF (ABS(YSPACE) .LT. 1.0E-5 .AND. ABS(XSPACE) .LT. 1.0E-5) THEN 
 *     Zero jiggle
 *     Lots of this is now done in SCULIB_CALC_GRID
             IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL (STATUS)
@@ -754,10 +813,19 @@ c
                JPOS(I) = 0
             END DO
 
+*     Tweak the message if not a PHOTOM observation
+
             CALL MSG_SETC('PKG', PACKAGE)
-            CALL MSG_OUTIF (MSG__NORM, ' ', 
-     :           '^PKG: No jiggle pattern was used. '//
-     :           'No images will be stored', STATUS)
+            IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+
+               CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :              '^PKG: No jiggle pattern was used. '//
+     :              'No images will be stored', STATUS)
+            ELSE
+               CALL MSG_OUTIF(MSG__NORM, ' ',
+     :              '^PKG: No images will be stored', STATUS)
+            END IF
+
             WRITEMAP = .FALSE.
             PARABOLA = .FALSE.
 
@@ -810,28 +878,30 @@ c
 *     create the output file that will contain the reduced data in NDFs
 
       CALL PAR_GET0C ('OUT', OUT, STATUS)
-      CALL HDS_NEW (OUT, OUT, 'SURF_SCUPHOT', 0, 0, OUT_LOC, STATUS)
+
+      HDSNAME = OUT(1:DAT__SZNAM)
+      CALL HDS_NEW (OUT, HDSNAME, 'SURF_SCUPHOT', 0, 0, OUT_LOC, STATUS)
 
 *     Get some work space
-         DO BEAM = 1, SCUBA__MAX_BEAM
-            IF (PHOT_BB(BEAM) .NE. 0) THEN
+      DO BEAM = 1, SCUBA__MAX_BEAM
+         IF (PHOT_BB(BEAM) .NE. 0) THEN
 
 *     get some scratch memory to hold the data for the target bolometers
-               INT_D_PTR(BEAM) = 0
-               INT_D_END(BEAM) = 0
-               INT_V_PTR(BEAM) = 0
-               INT_V_END(BEAM) = 0
-               INT_Q_PTR(BEAM) = 0
-               INT_Q_END(BEAM) = 0
+            INT_D_PTR(BEAM) = 0
+            INT_D_END(BEAM) = 0
+            INT_V_PTR(BEAM) = 0
+            INT_V_END(BEAM) = 0
+            INT_Q_PTR(BEAM) = 0
+            INT_Q_END(BEAM) = 0
 
-               CALL SCULIB_MALLOC (N_POS * VAL__NBR, INT_D_PTR(BEAM), 
-     :              INT_D_END(BEAM), STATUS)
-               CALL SCULIB_MALLOC (N_POS * VAL__NBR, INT_V_PTR(BEAM),
-     :              INT_V_END(BEAM), STATUS)
-               CALL SCULIB_MALLOC (N_POS * VAL__NBUB, INT_Q_PTR(BEAM),
-     :              INT_Q_END(BEAM), STATUS)
-            END IF
-         END DO
+            CALL SCULIB_MALLOC (N_POS * VAL__NBR, INT_D_PTR(BEAM), 
+     :           INT_D_END(BEAM), STATUS)
+            CALL SCULIB_MALLOC (N_POS * VAL__NBR, INT_V_PTR(BEAM),
+     :           INT_V_END(BEAM), STATUS)
+            CALL SCULIB_MALLOC (N_POS * VAL__NBUB, INT_Q_PTR(BEAM),
+     :           INT_Q_END(BEAM), STATUS)
+         END IF
+      END DO
 
 
 *     Now fix PHOT_BB so that it gives me the bolometer I want
@@ -839,10 +909,17 @@ c
 *     Only 3 numbers and we only want to specify middle beam if 
 *     processing all of them
 
+*     If this is is not a PHOTOM observation I have to use ALLBOLS
 
-      CALL PAR_GET0L('ALLBOLS', SELECT_BOLS, STATUS)
+      ALL = 2  ! This is the beam of choice for ALLBOLS
 
-      IF (SELECT_BOLS) THEN
+      IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+         CALL PAR_GET0L('ALLBOLS', ALL_BOLS, STATUS)
+      ELSE
+         ALL_BOLS = .TRUE.
+      END IF
+
+      IF (ALL_BOLS) THEN
          PHOT_BB(1) = 0
          PHOT_BB(3) = 0
          
@@ -852,6 +929,14 @@ c
          CALL MSG_SETC('TASK', TSKNAME)
          CALL MSG_OUTIF(MSG__QUIET,' ','^TASK: All bolometers selected',
      :        STATUS)
+
+         IF (OBSERVING_MODE .NE. 'PHOTOM') THEN
+*     Want to use the first beam
+            PHOT_BB(2) = 0
+            PHOT_BB(3) = 0
+            ALL = 1
+
+         END IF
 
       ELSE
 
@@ -866,7 +951,7 @@ c
       DO PHOTBB = START_BOL, END_BOL
 
          COUNT = COUNT + 1
-         PHOT_BB(2) = PHOTBB
+         PHOT_BB(ALL) = PHOTBB
 
 *     Extract data for each targeted bolometer
 
