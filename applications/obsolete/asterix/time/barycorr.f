@@ -1081,11 +1081,18 @@ c         INTEGER*2 IXRT(3)		! RA, dec, roll, arcmin
 c         INTEGER*2 IBGLONG                      ! long and lat
 c         INTEGER*2 IBGLAT                       !
 c      END STRUCTURE
+c      STRUCTURE /POS_REC/
+c         INTEGER UT				! hk clock (1/2s) time
+c         REAL SATGEO(3)		! Sat vector in geo frame
+c         INTEGER*2 IXRT(3)		! RA, dec, roll, arcmin
+c         INTEGER*2 IBGLONG                      ! long and lat
+c         INTEGER*2 IBGLAT                       !
+c      END STRUCTURE
 *
 *    Local constants :
 *
 
-      RECORD /POS_REC/ POS
+c      RECORD /POS_REC/ POS
       REAL BARY                         ! Barycentric  correction in Secs
       DOUBLE PRECISION ROSAT_MATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
 
@@ -1126,12 +1133,30 @@ c      END STRUCTURE
 *     <declarations and descriptions for exported arguments>
 
 *  Status :
+
+*  Status :
       INTEGER STATUS
 
 *  External References:
       EXTERNAL			BARY_MJD2HK
         INTEGER 		BARY_MJD2HK
+*  External References:
+      EXTERNAL			BARY_MJD2HK
+        INTEGER 		BARY_MJD2HK
 
+*  Local constants :
+      DOUBLE PRECISION		S2_REF_MJD
+        PARAMETER               ( S2_REF_MJD = 47892.0D0 )
+
+*  Local variables :
+      DOUBLE PRECISION		LB, UB			! Lower/upper bounds
+      DOUBLE PRECISION     	MJD_CURRENT           	! MJD for current event
+      DOUBLE PRECISION     	MJD_START,MJD_END     	! MJD for start/stop
+
+      REAL                 	TRIGGER               !current trigger time
+
+      INTEGER              	I,J,K                 ! DO loop variables
+      INTEGER              	CURRENT_KEY           ! for KEYed access to POS file
 *  Local constants :
       DOUBLE PRECISION		S2_REF_MJD
         PARAMETER               ( S2_REF_MJD = 47892.0D0 )
@@ -1153,12 +1178,20 @@ c      END STRUCTURE
 *  If binned and axis width present, then do not use trigger times as gaps
 *  will appear in the time series due to differential barycentric corrections
 *  during the observation
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If binned and axis width present, then do not use trigger times as gaps
+*  will appear in the time series due to differential barycentric corrections
+*  during the observation
       IF(BINNED .AND. AX_WID_OK)THEN
 *       BOUNDS(NEVENT+1) = INTIMES(NEVENT)+0.5*WIDTHS(NEVENT)
+         LB = INTIMES(1) - WIDTHS(1) / 2
          LB = INTIMES(1) - WIDTHS(1) / 2
          CALL BARY_CORR_INT(LB,RA,DEC,LUN_POS,
      :   POS_FILE_OK,BASE_MJD,BASE_UTC,BASE_TAI,EQUINOX,BARY,STATUS)
          LB = LB + BARY
+         UB = INTIMES(1) + WIDTHS(1) / 2
          UB = INTIMES(1) + WIDTHS(1) / 2
          CALL BARY_CORR_INT(UB,RA,DEC,LUN_POS,
      : POS_FILE_OK,BASE_MJD,BASE_UTC,BASE_TAI,EQUINOX,BARY,STATUS)
@@ -1194,7 +1227,7 @@ c      END STRUCTURE
       END
 
 
-*+  BARY_CORR - Does the barycentric corrections according to user spec
+*+  BARY_CORR_INT - Does the barycentric corrections according to user spec
       SUBROUTINE BARY_CORR_INT(TIME,RA,DEC,LUN_POS,POS_FILE_OK,
      : BASE_MJD,BASE_UTC,BASE_TAI,EQUINOX,BARY,STATUS)
 *    Description :
