@@ -762,6 +762,7 @@
       DOUBLE PRECISION SCALE( CCD1__MXNDF + 1 ) ! Scale factor corrn.
       DOUBLE PRECISION ZERO( CCD1__MXNDF + 1 ) ! Zero point correction
       INTEGER DIMSIZ             ! Output NDF dimension size
+      INTEGER FDSZ               ! File descriptor for correction file
       INTEGER I                  ! General loop counter
       INTEGER IDIM               ! Loop counter for NDF dimensions
       INTEGER IGNORE             ! I/O error status (ignored)
@@ -769,7 +770,6 @@
       INTEGER INGRP              ! ID for group of input NDFs
       INTEGER IREF               ! Loop counter for reference NDFs
       INTEGER IDUM               ! Dummy integer
-      INTEGER ISTAT              ! I/O Status
       INTEGER LBND( NDF__MXDIM , CCD1__MXNDF ) ! NDF lower bounds
       INTEGER LBNDX( NDF__MXDIM ) ! Minimum (overall) lower bound
       INTEGER LW                 ! Size of workspace
@@ -814,6 +814,7 @@
       LOGICAL ISECT              ! NDFs intersect? (not used)
       LOGICAL LISTIN             ! Display input NDFs?
       LOGICAL MODIFY             ! Modify "input" NDFs?
+      LOGICAL OPNSZ              ! Is correction file opened OK?
       LOGICAL PRESRV             ! Preserve input data type?
       LOGICAL SAME               ! NDFs are the same?
       LOGICAL USEVAR             ! Use input variance information?
@@ -1492,40 +1493,39 @@
 *  Should we output data?
       IF ( WRSAZ .AND. ( GETS .OR. GETZ ) ) THEN
 
-*  If so, get the output filename from the CORRECT parameter
-         CALL PAR_GET0C( 'correct', CORFIL, STATUS )
-      
-*  Get a unit number
-         CALL FIO_GUNIT( UNIT, STATUS )
+*  Get file for output.
+         CALL CCD1_ASFIO( 'CORRECT', 'WRITE', 'LIST', 0, FDSZ, OPNSZ,
+     :                    STATUS )
+         IF ( OPNSZ ) THEN
 
-*  Open a file
-         OPEN( UNIT=UNIT, FILE=CORFIL, STATUS='UNKNOWN', 
-     :         IOSTAT=ISTAT)
-     
-         IF ( ISTAT .EQ. 0 ) THEN
+*  File opened successfully.  Get a unit number
+            CALL FIO_UNIT( FDSZ, UNIT, STATUS )
 
-*  Things are okay, write to file
-            WRITE(UNIT,'(A)') '#'
+*  Write to file
+            WRITE( UNIT, '(A)' ) '#'
             DO I = 1, NIN
                IF ( GETS .AND. GETZ ) THEN
-                  WRITE(UNIT,*) I, SCALE(I), 
-     :                          ZERO( I ) - SCALE( I )*ORIGIN( I )
-               ELSE IF( .NOT. GETS ) THEN
-                  WRITE(UNIT,*) I, 1.0D0, 
-     :                          ZERO( I ) - SCALE( I )*ORIGIN( I ) 
+                  WRITE( UNIT, * ) I, SCALE( I ), 
+     :                             ZERO( I ) - SCALE( I ) * ORIGIN( I )
+               ELSE IF ( .NOT. GETS ) THEN
+                  WRITE( UNIT, * ) I, 1.0D0, 
+     :                             ZERO( I ) - SCALE( I ) * ORIGIN( I ) 
                ELSE IF( .NOT. GETZ ) THEN
-                  WRITE(UNIT,*) I, SCALE(I), 0.0D0
+                  WRITE( UNIT, * ) I, SCALE( I ), 0.0D0
                ENDIF                           
             END DO
-            CLOSE( UNIT )
+            CALL FIO_CLOSE( FDSZ, STATUS )
          ELSE
 
-*  Panic, report the error
-            CALL FIO_REP( UNIT, CORFIL, ISTAT, ' ', STATUS )
+*  File open failed - warn user.
+            CALL CCD1_MSG( ' ', ' ', STATUS )
+            CALL CCD1_MSG( ' ',
+     :      'WARNING: Correction file could not be opened', STATUS )
+            CALL CCD1_MSG( ' ',
+     :      '         Scale factors and zero points will not be output',
+     :                     STATUS )
          ENDIF
 
-*  Return the unit number to the pool 
-         CALL FIO_PUNIT( UNIT, STATUS ) 
       ENDIF
      
 *  Display information about the output mosaic.
