@@ -855,7 +855,6 @@ double StarWCS::width() const
     else {
         dist *= 60.0 * r2d_;
     }
-    cout << "width = " << dist << endl;
     return dist;
 }
 
@@ -909,7 +908,6 @@ double StarWCS::height() const
     else {
         dist *= 60.0 * r2d_;
     }
-    cout << "height = " << dist << endl;
     return dist;
 }
 
