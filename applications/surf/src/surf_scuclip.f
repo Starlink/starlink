@@ -72,6 +72,10 @@
 *     3 Nov 1996: TIMJ
 *        Original version (in REMSKY)
 *     $Log$
+*     Revision 1.2  1997/11/06 23:42:32  timj
+*     Report total number of spikes removed.
+*     Add the verbose suffix option.
+*
 *     Revision 1.1  1997/11/06 23:32:40  timj
 *     Initial revision
 *
@@ -132,7 +136,6 @@
       CHARACTER*132    FNAME            ! Input filename
       INTEGER          I                ! DO loop variable
       INTEGER          INDF             ! NDF identifier of input file
-      INTEGER          IN_DATA_PTR      ! pointer to data array of input file
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC
                                         ! locator to FITS extension in input
                                         ! file
@@ -167,10 +170,11 @@
       INTEGER          SECNDF           ! NDF id of section
       CHARACTER*80     STEMP            ! scratch string
       CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
+      INTEGER          TOT_SPIKES       ! Total number of spikes
       INTEGER          UBND(MAXDIM)     ! Upper bounds of section
 
 *  Local Data:
-      DATA SUFFIX_STRINGS /'_clip','c'/
+      DATA SUFFIX_STRINGS /'!_clip','c','_clip'/
 
 *.
 
@@ -285,9 +289,6 @@
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
 
-      CALL NDF_MAP (INDF, 'DATA', '_REAL', 'READ', IN_DATA_PTR,
-     :  ITEMP, STATUS)
-
       IF (STATUS .EQ. SAI__OK) THEN
          IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
             IF ((NDIM .NE. 3)                  .OR.
@@ -321,8 +322,6 @@
       END IF
 
       N_POS = DIM (2)
-
-      CALL NDF_UNMAP(INDF, '*', STATUS)
 
 *  get the bolometer description arrays
 
@@ -359,6 +358,9 @@
          N_BEAMS = 1
          NDIM = 2
       END IF
+
+*     Initialise the counter
+      TOT_SPIKES = 0
 
 *  Define the base section
       LBND(1) = 1
@@ -407,19 +409,31 @@
 *  Despike
             CALL SCULIB_CLIP_BOL(N_POS, %val(BOL_PTR),
      :           %val(BOL_QPTR), NSIGMA, BADBIT, NSPIKES, STATUS)
+
+*     I note that the system will find the same spike in each
+*     beam (of photometry data) so that I should only report spikes
+*     when we are in the first beam.
+
+            IF (BEAM .EQ. 1) THEN
+
+*     Keep track of the total number of spikes
+               TOT_SPIKES = TOT_SPIKES + NSPIKES
             
 *     Report the number of spikes
 
-            IF (NSPIKES .GT. 0) THEN
-               CALL MSG_SETC('TSK', TSKNAME)
-               CALL MSG_SETI('NM', NSPIKES)
-               CALL MSG_SETI('BOL', I)
-               
-               CALL MSG_OUTIF(MSG__VERB, ' ', 
-     :              '^TSK: ^NM points clipped from bolometer ^BOL',
-     :              STATUS)
+               IF (NSPIKES .GT. 0) THEN
+                  CALL MSG_SETC('TSK', TSKNAME)
+                  CALL MSG_SETI('NM', NSPIKES)
+                  CALL MSG_SETI('BOL', I)
+                  
+                  CALL MSG_OUTIF(MSG__VERB, ' ', 
+     :                 '^TSK: ^NM points clipped from bolometer ^BOL',
+     :                 STATUS)
+
+               END IF
 
             END IF
+
 
             CALL SCULIB_INSERT_BOL(I, N_BOLS, N_POS, %val(BOL_PTR), 
      :           %val(BOL_QPTR), %val(OUT_DATA_PTR),
@@ -442,6 +456,16 @@
 *  set the bad bit mask
 
       CALL NDF_SBB(BADBIT, OUTNDF, STATUS)
+
+*     Report the total number of spikes
+
+      IF (TOT_SPIKES .GT. 0) THEN
+         CALL MSG_SETI('NS',TOT_SPIKES)
+         CALL MSG_SETC('PKG',PACKAGE)
+         CALL MSG_OUTIF(MSG__NORM, ' ',
+     :        '^PKG: Removed ^NS spikes', STATUS)
+      END IF
+
 
 *  tidy up
 
