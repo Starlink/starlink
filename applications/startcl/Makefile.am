@@ -91,6 +91,7 @@ binsys_SCRIPTS = $(PUBLIC_SCR)
 binsys_DATA = $(HELP_FILES)
 libsys_DATA = $(LIBRARY_FILES) tclIndex
 libsys_SCRIPTS = adamMessageRelay
+TESTS = tester.sh
 
 #  Rules.
 
