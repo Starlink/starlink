@@ -1,0 +1,76 @@
+      SUBROUTINE CCG1_CADD<T>( DATA, EL, CONST, STATUS )
+*+
+*  Name:
+*     CCG1_CADD<T>
+
+*  Purpose:
+*     Adds a constant in place to an array.
+
+*  Language:
+*     Starlink Fortran 77.
+
+*  Invocation:
+*     CALL CCG1_CADD<T>( DATA, EL, CONST, STATUS )
+
+*  Description:
+*     Adds a constant to an array in place.  No fancy error checking is
+*     performed; for a more capable routine see KPG1_CADD.
+
+*  Arguments:
+*     DATA( EL ) = <COMM> (Given and Returned)
+*        Data array to be modified.
+*     EL = INTEGER (Given)
+*        Size of DATA.
+*     CONST = <COMM> (Given)
+*        Constant to be added.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2001 Central Laboratory of the Research Councils
+
+*  Authors:
+*     MBT: Mark Taylor (STARLINK - IoA)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-FEB-2001 (MBT):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      
+*  Arguments Given:
+      INTEGER EL
+      <TYPE> CONST
+      
+*  Arguments Given and Returned:
+      <TYPE> DATA( EL )
+      
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+      
+*  Do the additions.
+      DO I = 1, EL
+         DATA( I ) = DATA( I ) + CONST
+      END DO
+
+      END
+* $Id$

@@ -1,0 +1,124 @@
+      SUBROUTINE CCG1_ORD<T>( AGRP1, BARR1, AGRP2, BARR2, STATUS )
+*+
+*  Name:
+*     CCG1_ORD<T>
+
+*  Purpose:
+*     Generates an ordered subgroup.
+
+*  Language:
+*     Starlink Fortran 77.
+
+*  Invocation:
+*     CALL CCG1_ORD<T>( AGRP1, BARR1, AGRP2, BARR2, STATUS )
+
+*  Description:
+*     This routine creates an array from a group with members and
+*     ordering corresponding to a given array, group pair.
+*     Given GRP group AGRP1 and an array of type <COMM>
+*     BARR1 which define the correspondence between a name and a
+*     value, this routine will generate a new array BARR2 of type 
+*     <COMM> which corresponds in the same way to a given
+*     group AGRP2.
+*     So if AGRP1 consists of the names AX, AY, AZ; BGRP1 consists
+*     of the values 1, 2, 3; and AGRP2 consists of the name AY, a
+*     new group BARR2 will be created containing the single element 2.
+
+*  Arguments:
+*     AGRP1 = INTEGER (Given)
+*        GRP identifier of the A-type template group.
+*     BARR1( * ) = <COMM> (Given)
+*        The B-type template array.  It is assumed to have the same
+*        number of elements as the size of group AGRP1.
+*     AGRP2 = INTEGER (Given)
+*        GRP identifier of the A-type actual group.
+*     BGRP2( * ) = <COMM> (Returned)
+*        The B-type actual array, constructed by this routine.  It will
+*        have the same number of elements as the size of group AGRP2.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     Use of this subroutine is not a particularly efficient way to
+*     proceed; it would in principle be possible not to lose track of
+*     the ordering of the output array in the first place.  However,
+*     because of the small size of the lists involved, it's hardly
+*     going to be a performance bottleneck, and it gives the calling
+*     code fewer things to worry about.
+
+*  Copyright:
+*     Copyright (C) 2001 Central Laboratory of the Research Councils
+
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     12-FEB-2001 (MBT):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
+      
+*  Arguments Given:
+      INTEGER AGRP1
+      <TYPE> BARR1( * )
+      INTEGER AGRP2
+      
+*  Arguments Returned:
+      INTEGER BARR2( * )
+      
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      INTEGER IGOT               ! Position of name in AGRP1
+      INTEGER N2                 ! Size of the output group
+      CHARACTER * ( GRP__SZNAM ) ANAME ! Name got from AGRP1
+      
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+      
+*  Find the size of the output group.
+      CALL GRP_GRPSZ( AGRP2, N2, STATUS )
+
+*  Loop through each name in AGRP2 finding the corresponding one in AGRP1.
+      DO I = 1, N2
+
+*  Get the name in AGRP2.
+         CALL GRP_GET( AGRP2, I, 1, ANAME, STATUS )
+
+*  Find the corresponding position in AGRP1.
+         CALL GRP_INDEX( ANAME, AGRP1, 1, IGOT, STATUS )
+         IF ( IGOT .LE. 0 ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'CCG1_ORD<T>', 'CCG1_ORD<T>: Matching name '//
+     :                    'not found in group (programming error?)',
+     :                    STATUS )
+            GO TO 99
+         END IF
+
+*  Copy the corresponding name from BGRP1 to BGRP2.  For the first 
+*  item only use GRP_COPY, since this should copy across all the 
+*  auxiliary data like case significance flags etc.
+         BARR2( I ) = BARR1( IGOT )
+      END DO
+
+*  Error exit label.
+ 99   CONTINUE
+
+      END
+* $Id$
