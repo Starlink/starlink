@@ -96,7 +96,7 @@ int i, curconf, xs0, ys0;
 int xs[8192], ys[8192];
 int iigerr;
 CONF_DATA *conf;
-MEM_DATA *mem;
+MEM_DATA *mem = NULL;
 
 /* check if dispaly has been opened */
 
@@ -232,7 +232,7 @@ int IIGTXT_C ( int display, int memid, char txt[], int x0, int y0, int path,
 int curconf, xs0, ys0;
 int iigerr;
 CONF_DATA *conf;
-MEM_DATA *mem;
+MEM_DATA *mem = NULL;
 
 /* check if dispaly has been opened */
 

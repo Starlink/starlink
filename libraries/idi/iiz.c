@@ -89,7 +89,7 @@ int    i , ir , curconf , curmem;
 int    iizerr;
 
 CONF_DATA   *conf;
-MEM_DATA    *mem;
+MEM_DATA    *mem = NULL;
 
 iizerr = II_SUCCESS;
 
@@ -192,6 +192,8 @@ CONF_DATA   *conf;
 MEM_DATA    *mem;
 CURS_DATA   *curs;
 ROI_DATA    *roi;
+
+xc = 0; yc = 0;
 
 /* check if display has been opened */
 

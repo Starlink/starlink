@@ -98,7 +98,7 @@ MEM_DATA   *mem;
 CURS_DATA  *curs;
 
 int         curconf , vis0 , col, xmax, ymax;
-int         iicerr;
+int         iicerr = IDI__OK;
 
 /* check if display has been opened */
 
