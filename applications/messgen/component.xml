@@ -12,9 +12,8 @@
       The utility program CREMSG can be used to produce
       source files for MESSGEN.</p>
   </abstract>
-  <dependencies>
-    <build></build>
-    <use></use>
+  <dependencies >
+    
   </dependencies>
   <developers>
     <person>
