@@ -12,6 +12,7 @@ dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
 AC_CONFIG_SRCDIR([convert.f])
 
+dnl    Main programs etc. go into convert sub-directory of bindir.
 STAR_DEFAULTS(per-package-dirs)
 
 dnl    Find required versions of the programs we need for configuration
@@ -19,6 +20,7 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
+dnl    Setup for building monoliths.
 STAR_MONOLITHS
 
 dnl    Progs needed for gif2ndf, ndf2gif and tiff2ndf
@@ -32,10 +34,13 @@ AC_CHECK_PROGS(tifftopnm)
 dnl    Build dependencies for this package.
 STAR_DECLARE_DEPENDENCIES([build], [figaro ast sae chr hds fio cnf grp mers prm ndf ndg par psx subpar])
 
+dnl    Documentation.
 STAR_LATEX_DOCUMENTATION([sun55])
 
+dnl    Library/component sub-directories.
 AC_CONFIG_SUBDIRS([aif cof coi con idl iraf])
 
-AC_CONFIG_FILES([Makefile component.xml ])
+dnl    Configure .in files.
+AC_CONFIG_FILES([Makefile component.xml])
 
 AC_OUTPUT
