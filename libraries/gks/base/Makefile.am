@@ -8,6 +8,9 @@ noinst_LTLIBRARIES = libgks_base.la
 
 libgks_base_la_SOURCES = $(F_ROUTINES) $(FPP_ROUTINES) $(C_ROUTINES)
 
+## Need main GKS directory for GKS_ERR
+INCLUDES = -I..
+
 # These are the old "sources" files and the "fortran" files.
 # plus the "machines" files that do not actually need to be
 # machines specific.
