@@ -558,20 +558,20 @@ char-property - see notes at
     (list->string (normalise-character-list rrl))))
 
 <routine>
-<routinename>root-file-name
-<purpose>Return a root filename.
+<routinename>index-file-name
+<purpose>Return the filename of the document index.
 <description>
-Returns the filename to be used for the root HTML file, and the `root part'
-of any generated filenames, based on
+Returns the filename to be used as entry point of the collection of
+documents.  Note that this is different from the
+<funcname/root-file-name/, which is a prefix applied to generated file
+names.  In some cases, it might be sensible for
+<funcname/index-file-name/ to simply call <funcname/root-file-name/,
+but that's not what we want to do in this case.
+<p>This can be generated using the
 document type and DOCNUMBER if present (which need not be the case for
 all document types). Another way to set this might be through a
 processing-instruction.
-<p>This is also used by the LaTeX stylesheet, when generating the names
-of various auxiliary files.
-<p>Note that the parameter <funcname/%override-root-file-name%/ does <em/not/
-override within this function, since this function is not merely used for
-the name of the single root file.  See <funcname/html-file/.
-<p>An arguably better way to obtain a root file name is to 
+<p>An arguably better way to obtain a root/index file name is to 
 root around in the grove and find the name of the source file,
 then use that information to generate the output file name.
 That should be possible, and it 
@@ -585,12 +585,8 @@ SGML property set.  This isn't, however, implemented in Jade.
 <parameter optional default='(current-node)'>
   nd<type>node-list<description>Node which identifies the grove 
   we want the root file name of
-<history>
-<change author=ng date='16-JUN-1999'>Added clause to get docref when 
-	docdate missing
-</history>
 <codebody>
-(define (root-file-name #!optional (nd (current-node)))
+(define (index-file-name #!optional (nd (current-node)))
   (let* ((dn (getdocinfo 'docnumber nd))
 	 (docelemtype (case-fold-down
 		       (if dn
@@ -598,7 +594,7 @@ SGML property set.  This isn't, however, implemented in Jade.
 			       (attribute-string (normalize "documenttype") dn)
 			       (error "DOCNUMBER has no DOCUMENTTYPE"))
 			   (gi (document-element)))))
-	 (docref (cond (dn (if (attribute-string "UNASSIGNED" dn)
+	 (docref (cond (dn (if (attribute-string (normalize "unassigned") dn)
 			       "unassigned" ; better alternative?
 			       (trim-data dn)))
 		       ((getdocinfo 'docdate nd)
@@ -609,8 +605,28 @@ SGML property set.  This isn't, however, implemented in Jade.
 	 )
     (string-append docelemtype ;(gi (document-element))
 		   (if docref docref ""))))
-;;(define (root-file-name #!optional (nd (current-node)))
-;;  "N")
+
+<routine>
+<routinename>root-file-name
+<purpose>Return the filename root.
+<description>
+Returns the filename to be used as the `root part' of the name when
+generating HTML file names.  Note that this is not the same as the
+<funcname/index-file-name/, which is the name of the `index' file
+which is the entry point of the collection of documents.
+<p>This is also used by the LaTeX stylesheet, when generating the names
+of various auxiliary files.
+<p>Note that the parameter <funcname/%override-root-file-name%/ does <em/not/
+override within this function, since this function is not merely used for
+the name of the single root file.  See <funcname/html-file/.
+<returnvalue type=string>Complete filename for the `entry-point' HTML file.
+<argumentlist>
+<parameter optional default='(current-node)'>
+  nd<type>node-list<description>Node which identifies the grove 
+  we want the root file name of
+<codebody>
+(define (root-file-name #!optional (nd (current-node)))
+  "N")
 
 <routine>
 <routinename>document-release-info
