@@ -149,6 +149,9 @@
 	doc	 	-- the document containing the code being
 			   referred to --
 		entity #required
+	docid		-- an id within the above document, if needed
+			   to further distinguish the target --
+		name #implied
 	%codereference.arch.atts;
 	>
 <!attlist codebody
@@ -169,9 +172,18 @@
 <!--
   The code prologue is the documentation of the routine.  I'd consider
   making the connectors here into `&'; that can be done in future if
-  we decide that's necessary
+  we decide that's necessary.
+
+  The elements in %para.markup are as follows
+     code     : verbatim program code
+     em       : emphasis
+     url      : a URL - the stylesheet might make a link here
+     funcname : the name of a function, persumably in the same broad
+                collection of code.  The stylesheet may make a link
+                here, if there's some clever way of finding the
+                referenced function.
 -->
-<!entity % para.markup 'code | em | url'>
+<!entity % para.markup 'code | em | url | funcname'>
 <!entity % para.content '(#pcdata | %para.markup | ul)*'>
 
 <!element codeprologue	o o (routinename , purpose? , description , 
@@ -195,7 +207,6 @@
 <!element returnvalue	- o (%para.content;)
 				-- If there's no return value, there
 				   needn't be any explanatory text -->
-<!-- <!element argumentlist	- o (p*, parameter*)> -->
 <!element argumentlist	o o (parameter*)>
 
 <!attlist argumentlist
@@ -260,6 +271,9 @@
 			   are used in both DSSSL and IDL (for
 			   example). --
 		(optional|keyword) #implied
+	default		-- The default value of an optional parameter,
+			   if omitted --
+		cdata #implied
 	%direction.attr;
 	>
 
@@ -267,7 +281,7 @@
 	id		-- identify author --
 		id
 		#required
-	attribution	-- where based --
+	affiliation	-- where based --
 		cdata
 		#implied
 	-- etc... add further author details --
