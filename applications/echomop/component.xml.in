@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/echomop</path>
+  <description>Echelle Data Reduction Package</description>
+  <abstract>
+    <p>ECHOMOP provides facilities for the extraction of
+      spectra from 2-D data frames.  These data can be single-order
+      spectra, or multi-order echelle spectra.</p>
+    <p>A substantial degree of automation is provided, particularly in
+      the traditionally manual functions for cosmic-ray detection and
+      wavelength calibration; manual overrides are available.</p>
+    <p>Features include; robust and flexible order tracing, optimal
+      extraction, support for variance arrays, and 2-D distortion
+      fitting and extraction.</p>
+  </abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Dave Mills</name>
+    </person>
+    <person>
+      <name>John Webb</name>
+    </person>
+    <person>
+      <name>Martin Clayton</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
