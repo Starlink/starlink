@@ -78,6 +78,8 @@
       ENDDO
 *
       END
+
+
 *+DTA_COPYSLICER   Copies a slice of one real array to another and reorders
       SUBROUTINE DTA_COPYSLICER(IDIM1, IDIM2, IDIM3, IDIM4, DATA_IN,
      &                  AMIN, AMAX, ORD, ODIM1, ODIM2, ODIM3, ODIM4,
@@ -158,61 +160,8 @@
       ENDDO
 *
       END
-*+  DTA_WRISPACED - Write components of a spaced array to an HDS object
-      SUBROUTINE DTA_WRISPACED(LOC,ORIGIN,DIM,SCALE,BASE,STATUS)
-* Description :
-*        This routine writes a spaced array.
-* Method :
-*        The elements of a spaced array as defined by SGP38 are written
-*      into the structrure.
-* Deficiencies :
-* Bugs :
-* Authors :
-*     Richard Saxton
-* History :
-*     10 Apr 88: original (LTVAD::RDS)
-*     10 May 88: New header (LTVAD::RDS)
-* Type Definitions :
-      IMPLICIT NONE
-* Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-* Import :
-      CHARACTER*(DAT__SZLOC) LOC           !Locator of HDS file or structure
-      INTEGER ORIGIN                       !Pixel no of first data point.
-      INTEGER DIM                          !Number of elements in ARRAY
-      REAL SCALE                           !Scale value for array
-      REAL BASE                            !Value of 1st element
-* Export :
-* Status :
-      INTEGER STATUS
-* Function declarations :
-* Local constants :
-* Local variables :
-      CHARACTER*(DAT__SZLOC) DLOC          !Locator of Data array structure
-* Local data :
-*-
-      IF (STATUS .NE. SAI__OK) RETURN
-*
-* Create data array structure
-      CALL DAT_NEW(LOC,'DATA_ARRAY','ARRAY',0,0,STATUS)
-      CALL DAT_FIND(LOC,'DATA_ARRAY',DLOC,STATUS)
-*
-* Write in elements of the spaced array
-      CALL HDX_PUTC(DLOC,'VARIANT',1,'SPACED',STATUS)
-      CALL HDX_PUTI(DLOC,'ORIGIN',1,ORIGIN,STATUS)
-      CALL HDX_PUTI(DLOC,'DIMENSION',1,DIM,STATUS)
-      CALL HDX_PUTR(DLOC,'BASE',1,BASE,STATUS)
-      CALL HDX_PUTR(DLOC,'SCALE',1,SCALE,STATUS)
-*
-      CALL DAT_ANNUL(DLOC,STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-          CALL ERR_REP(' ','from DTA_WRISPACED',STATUS)
-      ENDIF
-*
-      END
+
+
 *+DTA_WRITESLICEB   Copies a slice of one BYTE array to another and reorders
       SUBROUTINE DTA_WRITESLICEB(IDIM1,IDIM2,IDIM3,IDIM4,DATA_IN,
      &                           AMIN,AMAX,ORD,ODIM1,ODIM2,ODIM3,
@@ -282,6 +231,8 @@
       ENDDO
 *
       END
+
+
 *+DTA_WRITESLICER   Copies a slice of one real array to another and reorders
       SUBROUTINE DTA_WRITESLICER(IDIM1, IDIM2, IDIM3, IDIM4,
      &                           DATA_IN, AMIN, AMAX, ORD, ODIM1,
