@@ -17018,12 +17018,11 @@ a CD matrix and a PC matrix are erroneously present in a FITS header.
 \item A small number of documentation errors have been corrected.
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V1.5}
+\subsection{Changes Introduced in V1.5}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V1.4 and V1.5 (the
-current version):
+occurred in the AST library between versions V1.4 and V1.5 (not the most
+recent version):
 
 \begin{enumerate}
 
@@ -17120,6 +17119,22 @@ the latitude axis.
 \item The GLS projection projection has been renamed as SFL, but the 
 AST\_\_GLS type has been retained as an alias for AST\_\_SFL.
 \end{itemize}
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V1.6}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.5 and V1.6 (the
+current version):
+
+\begin{enumerate}
+
+\item A new ``interpolation'' scheme identified by the symbolic constant
+AST__BLOCKAVE has been added to the AST\_RESAMPLE$<$X$>$ set of
+functions. The new scheme calculates each output pixel value by finding
+the mean of the input pixels in a box centred on the output pixel.
 
 \end{enumerate}
 
