@@ -1,0 +1,94 @@
+dnl   Configure script for moggy
+dnl   Copyright 2001 Council for the Central Laboratory of
+dnl                  the Research Councils. 
+dnl   See file LICENCE for conditions.
+dnl
+dnl   $Id$
+
+
+AC_REVISION($Revision$)dnl
+
+
+AC_INIT(moggy.C)
+
+dnl   Use a config file (the list of settings is getting too long)
+AC_CONFIG_HEADER(config.h)
+
+dnl   Say where the install-sh, config.guess and config.sub scripts are
+AC_CONFIG_AUX_DIR(config)
+
+dnl   Checks for programs.
+AC_PROG_CXX
+
+dnl   use C++ to compile test programs
+AC_LANG_CPLUSPLUS
+
+dnl   Checks for header files.  I don't actually use these defines within
+dnl   the program, so there doesn't seem much point in testing for them. 
+dnl   I think everything I use is in invoked in the place it's supposed to
+dnl   be according to the C++ standard (with the possible exception of the
+dnl   things in GIFBitmap.cc), so if anything goes wrong here, it's the 
+dnl   compiler's fault, not mine.
+dnl AC_HEADER_STDC
+dnl AC_CHECK_HEADERS(fcntl.h unistd.h)
+dnl AC_CHECK_HEADERS(assert.h)
+
+dnl   Check if we've got sstream.  If not, we'll assume we have the older
+dnl   strstream
+AC_CHECK_HEADERS(sstream)
+
+dnl   What type of system are we on?
+dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with 
+dnl   __USE_STD_IOSTREAM defined, so that it uses a standards-conforming 
+dnl   streams library.  See Digital C++ v6.0 manual, section 7.1.2.
+dnl   This is defined by default when the compiler is invoked with
+dnl   `-std strict_ansi', but that's a little harder to arrange in here.
+AC_CANONICAL_HOST
+case "$host" in
+  alpha*) test "$CXX" = "cxx" && AC_DEFINE(__USE_STD_IOSTREAM) ;;
+esac
+
+dnl   Do we have (standard) <cname> for C libraries, or just <name.h>?
+AC_MSG_CHECKING(whether compiler has <cname> instead of just <name.h>)
+AC_TRY_COMPILE([#include <cstdio>],,
+  AC_MSG_RESULT(yes),
+  AC_DEFINE(NO_CSTD_INCLUDE) AC_MSG_RESULT(no))
+
+dnl  AC_CHECK_HEADER(cat/AstroCatalog.h,AC_DEFINE(ENABLE_CAT))
+dnl   Specify (or at least check) the location of the cat library.
+dnl
+dnl   This had better work, since the program depends absolutely on
+dnl   the presence of this library.
+dnl
+AC_SUBST(CATOBJ)
+AC_ARG_WITH(cat,
+[  --without-cat      Do not use the skycat library
+  --with-cat[=path]  Use skycat giving optional path to library],
+  echo "withval=$withval"
+  if test "$withval" = "yes"
+  then
+    AC_CHECK_HEADER(cat/AstroCatalog.h,
+    AC_CHECK_LIB(cat, main,
+      AC_DEFINE(ENABLE_CAT) 
+      LIBS="$LIBS -lcat"))
+  elif test "$withval" != "no"
+  then
+    safe_CPPFLAGS="$CPPFLAGS"
+    CPPFLAGS="$CPPFLAGS -I$withval/include"
+    safe_LIBS="$LIBS"
+    LIBS="$LIBS -L$withval/lib -lcat"
+    AC_CHECK_HEADER(cat/AstroCatalog.h,
+      AC_CHECK_LIB(cat, main,
+        AC_DEFINE(ENABLE_CAT) 
+        safe_CPPFLAGS="$safe_CPPFLAGS -I$withval/include"
+        safe_LIBS="$safe_LIBS -L$withval/lib -lcat"))
+    CPPFLAGS="$safe_CPPFLAGS"
+    LIBS="$safe_LIBS"
+  fi,
+  AC_CHECK_HEADER(cat/AstroCatalog.h,
+    AC_CHECK_LIB(cat, main,
+      AC_DEFINE(ENABLE_CAT) 
+      LIBS="$LIBS -lcat")))
+
+
+AC_OUTPUT(Makefile)

@@ -1,0 +1,46 @@
+x5z = Catalogue system -- problems relating to the availability of
+catalogue resources
+
+Connection establishment
+  s: 220 OK
+  f: 420 Can't start up
+
+CONF
+         [ Send configuration file ]
+  s: 210 Configuration file follows, terminated by <CRLF>.<CRLF>
+  e: 550 Unspecified problem obtaining configuration     
+  f: 450 Can't connect to server, or otherwise can't generate config file
+
+SRCH <string>
+         [ Perform catalogue search ]
+  s: 210 Catalogue follows, terminated by <CRLF>.<CRLF>
+  e: 551 Unknown catalogue
+     503 Out of order: not all required information has been supplied
+  f: 451 Can't connect to catalogue
+
+NROW <int>
+         [ limit number of rows to return ]
+  s: 250 Parameter set successfully
+  e: 501 Syntax error: missing parameter or can't convert to positive integer
+
+SRAD <int> <int> <float> <int> <int> <float> <float>
+         [ Do radial search when requested (by SRCH).  Parameters are
+         <rah> <ram> <ras> <decd> <decm> <decs> <radius>.  Radius in
+         units of arcmin. ]
+  s: 250 Parameter set successfully
+  e: 501 Wrong number or type of parameters.
+
+SBOX  <int> <int> <float> <int> <int> <float> <int> <int> <float> <int> <int> <float>
+         [ Do box search between corners specified.  Parameters are
+         two pairs of RA and Dec. ]
+  s: 250 Parameter set successfully
+  e: 501 Wrong number or type of parameters
+
+QUIT
+         [ Exit ]
+  s: 220 Goodbye
+  e: 500 Syntax error
+
+
+other command
+  e: 500 Unknown command

@@ -1,0 +1,63 @@
+# Makefile for program moggy
+#
+# Copyright 2001 Council for the Central Laboratory of the Research Councils.
+# See file LICENCE for conditions.
+#
+# $Id$
+
+# C++ all-warnings flags:
+#  g++ -Wall  (GNU)
+#  CC +w2     (Sun Workshop compilers)
+#  cxx -w0    (Compaq compilers)
+DEFS=@DEFS@
+CPPFLAGS=@CPPFLAGS@
+CXX=@CXX@
+CXXFLAGS=-g -Wall @CXXFLAGS@ $(CPPFLAGS) $(DEFS)
+LIBS=-lm @LIBS@
+
+
+
+# Use suffix rules for stupid makes (hello, Tru64)
+.SUFFIXES: .o .C
+.c.o:
+	$(CC) -I$$STARLINK/include -c $< -o $@
+
+.C.o:
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+
+#%.o: %.f
+#	$(F77) -fno-underscoring -I$$STARLINK/include -c $< -o $@
+#
+#%.o: %.c
+#	$(CC) -I$$STARLINK/include -c $< -o $@
+#
+#%.o: %.C
+#	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+
+
+EXEC=moggy
+OBJS=moggy.o CommandParse.o
+
+$(EXEC): $(OBJS)
+	$(CXX) $(OBJS) $(LIBS) -o $@
+
+#CATDIR=/data/goedel/norman/s/src/gaia/build/built
+#moggy: $(OBJS)
+#	$(CXX) -o $@ $(OBJS) -L$(CATDIR)/lib -lcat
+
+# for i in *.C;do echo `echo $i|sed 's/\.C/.o/'`: $i `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $i`;done
+moggy.o: moggy.C moggy.h config.h CommandParse.h
+#	$(CXX) $(CXXFLAGS) -c -o $@ -I$(CATDIR)/include/cat moggy.C
+
+CommandParse.o: CommandParse.C CommandParse.h config.h
+
+# for i in *.h;do echo "$i:" `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $i`;done
+CommandParse.h: moggy.h verbosity.h
+
+
+# Distribution
+configure: config/configure.in
+	autoconf config/configure.in >configure
+	chmod 755 configure
