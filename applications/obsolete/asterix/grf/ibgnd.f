@@ -368,10 +368,12 @@
 *  Local Variables:
       CHARACTER*79		TXT			! Output text buffer
 
+      REAL			M, EM
       REAL			X, Y, R			! Source attrs
 
       INTEGER			I			! Loop over sources
       INTEGER			ISTAT			! I/o status code
+      INTEGER			NP			! # points in sample
 *.
 
 *  Check inherited global status.
@@ -398,6 +400,17 @@
         CALL MSG_BLNK()
 
 *    Sampling
+        CALL MSG_PRNT( '  Samp    Mean (N)' )
+        DO I = 1, I_BGM_NSAMP
+          CALL ARR_ELEM1R( I_BGM_SAMPTR(1), I_BGM_NSAMP, I, M, STATUS )
+          CALL ARR_ELEM1R( I_BGM_SAMPTR(2), I_BGM_NSAMP, I, EM, STATUS )
+          CALL ARR_ELEM1I( I_BGM_SAMPTR(3), I_BGM_NSAMP, I, NP, STATUS )
+          CALL MSG_SETR( 'M', M )
+          CALL MSG_SETR( 'EM', EM )
+          CALL MSG_SETI( 'N', NP )
+          CALL MSG_SETI( 'I', I )
+          CALL MSG_PRNT( '   ^I    ^M +- ^EM (^N)' )
+        END DO
 
 *    Surface
 
