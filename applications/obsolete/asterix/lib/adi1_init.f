@@ -90,10 +90,13 @@
       EXTERNAL			ADI1_FCREAT
       EXTERNAL			ADI1_FTRACE
 
-c      EXTERNAL			BDI1_SETLNK
+      EXTERNAL			BDI1_SETLNK
+      EXTERNAL			BDI1_UNLNK
 
       EXTERNAL			EDI1_SETLNK
       EXTERNAL			EDI1_UNLNK
+
+      EXTERNAL			UDI1_COPANC
 
 *  Local Variables:
       INTEGER			DID			! Dummy id (ignored)
@@ -112,22 +115,32 @@ c      EXTERNAL			BDI1_SETLNK
 *  Define the file methods
       CALL ADI_DEFRCB( RID, 'OpenRtn', ADI1_OPEN, STATUS )
       CALL ADI_DEFRCB( RID, 'CreatRtn', ADI1_FCREAT, STATUS )
-      CALL ADI_DEFMTH( 'FileClose(_HDSfile)', ADI1_FCLOSE, DID,
-     :                 STATUS )
       CALL ADI_DEFMTH( 'FileClone(_HDSfile,_CHAR)', ADI1_FCLONE, DID,
      :                 STATUS )
+      CALL ADI_DEFMTH( 'FileClose(_HDSfile)', ADI1_FCLOSE, DID,
+     :                   STATUS )
       CALL ADI_DEFMTH( 'FileTrace(_HDSlocator)', ADI1_FTRACE, DID,
      :                 STATUS )
 
 *  Define BDI interface
-c      CALL ADI_DEFMTH( 'SetLink(_BinDS,_HDSfile)', BDI1_SETLNK,
-c     :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'SetLink(_BinDS,_HDSfile)', BDI1_SETLNK,
+     :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'SetLink(_Array,_HDSfile)', BDI1_SETLNK,
+     :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'UnLink(_BinDS,_HDSfile)', BDI1_UNLNK,
+     :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'UnLink(_Array,_HDSfile)', BDI1_UNLNK,
+     :                 DID, STATUS )
 
 *  Define EDI interface
       CALL ADI_DEFMTH( 'SetLink(_EventDS,_HDSfile)', EDI1_SETLNK,
      :                 DID, STATUS )
       CALL ADI_DEFMTH( 'UnLink(_EventDS,_HDSfile)', EDI1_UNLNK,
      :                 DID, STATUS )
+
+*  Ancillary copying
+      CALL ADI_DEFMTH( 'CopyAncillary(_,_HDSfile,_,_HDSfile,_CHAR)',
+     :                 UDI1_COPANC, DID, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI1_INIT', STATUS )
