@@ -6529,6 +6529,61 @@ BUILT_SOURCES = $(include_MESSAGES)
             sources.<index>thirdparty code</index></p> 
         </subsect>
 
+        <subsect id="macro-suppress-build-if" export="export"
+          indexkey="starconf!macros!STAR_SUPPRESS_BUILD_IF">
+          <subhead>
+            <title>STAR_SUPPRESS_BUILD_IF</title>
+          </subhead>
+
+          <p><strong><code>STAR_SUPPRESS_BUILD_IF(test, message)</code></strong></p>
+
+          <p>Some components should be built only conditionally, if
+            certain conditions apply.  For example, the
+            <code>sgmlkit</code> component can be built only if the
+            host system has <code>jade</code> installed on it, but the
+            lack of this is not an <em>error</em>, in the sense that
+            it should cause a tree-wide <code>./configure</code> to
+            fail.  This macro helps with this situation.</p>
+
+          <p>The <code>test</code> in the first argument is a shell
+            expression which should evaluate to true (ie, return a
+            zero status) if the build should be suppressed.  In the
+            case of the <code>sgmlkit</code> component, the
+            <code>configure.ac</code> includes the lines:
+<verbatim>
+AC_PATH_PROGS(JADE, [openjade jade], NOJADE)
+AC_PATH_PROGS(SGMLNORM, [osgmlnorm sgmlnorm], NOSGMLNORM)
+...
+STAR_SUPPRESS_BUILD_IF([test $JADE = NOJADE -o $SGMLNORM = NOSGMLNORM],
+    [JADE=$JADE, SGMLNORM=$SGMLNORM: both needed for sgmlkit])
+</verbatim>
+            The <code>test</code> expression evaluates to true if
+            either of the <code>$JADE</code> or <code>$SGMLNORM</code>
+            variables has the special values given as defaults in the
+            <code>AC_PATH_PROGS</code> macros earlier.</p>
+
+          <p>If the test is true, the message is displayed during the
+            <code>./configure</code> run, but the configuration does
+            <em>not</em> fail.  Instead, a stamp file
+            <code>STAR_SUPPRESS_BUILD</code> is left in the build
+            directory, with the consequence that if you subsequently
+            type <kbd>make</kbd>, that build will immediately fail,
+            with the same message.</p>
+
+          <p>The difference between this and the standard
+            <code>AC_FATAL</code> macro is that the latter is for an
+            error in the configuration script -- either a logic error
+            there, or a serious problem like being unable to compile
+            anything at all!  Alternatively, if a dependency should be
+            present because it is listed in the
+            <code>configure.ac</code> as such, but it isn't, that's a
+            case for a call to <code>AC_FATAL</code>.  The
+            <code>STAR_SUPPRESS_BUILD_IF</code> macro is for rather
+            more well-mannered interactions with the user, indicating
+            that there is other work they might have to do to get this
+            component building.</p>
+        </subsect>
+
         <subsect id="macro-xml-documentation" export="export"
           indexkey="starconf!macros!STAR_XML_DOCUMENTATION">
           <subhead>
