@@ -71,7 +71,7 @@ Explained how to set DVI2BITMAP_PK_PATH automatically.
 </change>
 
 <change date='12-Jun-2000' author=ng versionid='v0-9-2-2'>
-Added documentation for -QG and -Qg</change>
+Mostly clarifying and amplifying explanations.</change>
 
 </history>
 
@@ -203,11 +203,11 @@ takes no account of any magnification in the DVI file.
 <p>See <ref id=usage.special/> for &tex; <code/\special> commands which
 set this within the &tex; file.
 
-<dt><code>-fp font-path</code>
+<dt id=usage.options.fp><code>-fp font-path</code>
 <dd>Specifies the path to the PK fonts which dvi2bitmap will use.  See
 also <ref id=usage.fonts/>.
 
-<dt><code>-fm mode</code>
+<dt id=usage.options.fm><code>-fm mode</code>
 <dd>Specify the MetaFont mode which is to be used when generating fonts.
 The default is <code/ibmvga>, but see
 <code/&ddash;enable-fontgen> in <ref id=install.nonstarlink/>.
@@ -312,10 +312,10 @@ that this implies that you should choose a mid-grey background colour
 when making such transparent PNGs.  I'd welcome advice on this point.
 
 <dt><code/-q>
-<dd>Quiet mode -- suppress chatter.  
+<dd>Quiet mode -- suppress chatter.  This also suppresses warnings.
 
 <dt><code/-qq>
-<dd>Silent mode -- suppress warnings and errors as well.
+<dd>Silent mode -- suppress errors as well.
 
 <dt id=usage.options.q><code/-Q...>
 <dd><p><update versionid="v0-9">
@@ -569,14 +569,17 @@ texmf.cnf configuration file when it comes to finding fonts.
 enable-kpathsea and enable-fontgen configuration options.</update>
 <update versionid="v0-9-2-1">
 Added description of setting DVI2BITMAP_PK_PATH automatically.
+<update versionid='v0-9-2-2'>
+Added discussion of the `make test' script.
 </update>
 
 <p>The program searches in up to three places for fonts.
 
 <ol>
-<li>The <code/-f> option specifies a colon-separated list of
-directories which should be searched for font PK files.  If this is given on
-the command line, it overrides&ellip
+
+<li>The <code/-fp> option (see <ref id=usage.options.fp/>) specifies a
+colon-separated list of directories which should be searched for font
+PK files.  If this is given on the command line, it overrides&ellip
 
 <li>The <code/DVI2BITMAP_PK_PATH> environment variable, if defined,
 specifies a colon-separated list of directories which are to be
@@ -597,7 +600,23 @@ files using the same mechanism other DVI processors use.
 
 </ol>
 
-<p>There are one or two possible wrinkles with the last method.  The
+<p>It is a good idea to run the <code/dvi2bitmap> tests, by giving the
+command <kbd/make test> in the build directory.  If you do, then you
+should have at least <code/cmr10> built using the Metafont mode and
+point size which <code/dvi2bitmap> uses by default.  That should give
+you an indication of how to set the <code/DVI2BITMAP_PK_PATH>
+variable.  Note that the advice this script gives relies on a rather
+specific assumption about how your font-building script (ie,
+<code/mktexpk> or <code/MakeTeXPK>) works: namely that all the fonts
+built for a particular Metafont mode and size will be placed in the
+same directory.  This is true for for the font-building scripts I know
+about, but it's not any sort of formal standard, so your local
+system's behaviour may quite reasonably be different, in which case
+this script can't offer much help.  You can change the default
+Metafont mode: see <ref id=usage.options.fm/> or <ref
+id=conf.enable-fontgen/>.
+
+<p>There are one or two possible wrinkles with the third method.  The
 path-searching library is very powerful and flexible, but it is
 possible to be tripped up by its configuration file.
 
@@ -682,6 +701,9 @@ need to look at the documentation for your &tex; system, specifically
 the <code/mktexpk> and <code/MakeTeXPK> scripts (one of which might be
 just an interface to the other).
 
+<p>See the discussion of the `<code/make test>' script in <ref
+id=usage.fonts.finding/>.
+
 <p>Since dvi2bitmap's default resolution is 72~dpi, as opposed to the
 usual printer resolution of 300 or 600~dpi, you are unlikely to have
 suitable fonts on your system, and will need to generate them.  The
@@ -697,7 +719,7 @@ scripts to
 generate fonts for you; if you have a different distribution, there
 might be a similar script for you to use, or you might have to do it
 by hand.  In the case of teTeX, the command you'd use in the
-example would be:
+example above would be:
 <verbatim>
 % MakeTeXPK cmr10 165 110 1.5 ibmvga
 </verbatim>
@@ -710,15 +732,13 @@ magnification of 1.5 times, giving a resultant resolution of 165~dpi.
 % mktexpk &ddash;mfmode ibmvga &ddash;mag 1.5 &ddash;bdpi 110 &ddash;dpi 165 cmr10
 </verbatim>
 
-<p>If you want to use the same mode as you
-use for printing documents, then the mode
-<code/localfont> should do the right thing.  Otherwise, and probably
-better if these images are intended for the screen rather than paper,
-you could use a more specialised mode such as 
-<code/ibmvga>,
-which has been tweaked to be readable at small resolutions.  See the file
-<code/modes.mf>
-somewhere in your metafont distribution for the list of possibilities.
+<p>If you want to use the same mode as you use for printing documents,
+then the mode <code/localfont> should do the right thing.  Otherwise,
+and probably better if these images are intended for the screen rather
+than paper, you could use a more specialised mode such as
+<code/ibmvga>, which has been tweaked to be readable at small
+resolutions.  See the file <code/modes.mf> somewhere in your metafont
+distribution for the list of possibilities.
 
 <p>After you have created the fonts, try giving the command
 <verbatim>
@@ -737,10 +757,9 @@ url='http://www.starlink.rl.ac.uk' >Starlink Project</webref>, and one
 which is more usual for network-distributed software.  
 
 <p>When you unpack the distribution tarball, you should find at least
-the files
-<code/dvi2bitmap_source.tar>, <code/Makefile.starlink> and <code/mk>.
-You can build the software the Starlink way, using the <code/mk>
-script (see <ref id=install.starlink/>), or unpack the
+the files <code/dvi2bitmap_source.tar>, <code/Makefile.starlink> and
+<code/mk>.  You can build the software the Starlink way, using the
+<code/mk> script (see <ref id=install.starlink/>), or unpack the
 <code/dvi2bitmap_source.tar> file, and build it the other way (see
 <ref id=install.nonstarlink/>).  Since the <code/mk> script is really
 just a driver for the Makefile within the tar file, you should get the
@@ -787,6 +806,9 @@ and new default setting.</update>
 % make
 </verbatim>
 but see the configuration options below.
+
+<p>It's a good idea to run `<code/make test>' as well.  See <ref
+id=usage.fonts.finding/>.
 
 <p>To install, just copy the executable dvi2bitmap wherever you want it
 to live.
@@ -844,7 +866,7 @@ suppress this behaviour by providing the flag
 <code/&ddash;disable-texmfcnf>, or equivalently
 <code/&ddash;enable-texmfcnf=no>.
 
-<dt><code/&ddash;enable-fontgen>
+<dt id=conf.enable-fontgen><code/&ddash;enable-fontgen>
 
 <dd>The program can attempt to generate fonts, and will
 do so using the MetaFont mode <code/ibmvga>, which has a resolution of

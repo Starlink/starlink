@@ -1,7 +1,17 @@
 <subsect id=rn-0.x export>Release ??
 
-<p>Added <code/-QG> and <code/-Qg> options (see <ref
-id=usage.options.q/>).
+<p>No significant added functionality to the main program, but:
+
+<ul>
+<li>Added <code/-QG> and <code/-Qg> options (see <ref id=usage.options.q/>).
+<li>Added <code/test> directory, and test script, which aims to give
+useful advice about setting <code/DVI2BITMAP_PK_PATH> if that turns
+out to be necessary.
+<li>More discussing in the documentation about generating fonts,
+specifically referring folk to the `<code/make test>' target in the Makefile.
+<li>Now option <code/-q> turns off warnings, but not errors (was
+rather inconsistent before), and <code/-qq> turns off errors, too.
+</ul>
 
 <subsect id=rn-0.9-2 export>Release 0.9-2
 
