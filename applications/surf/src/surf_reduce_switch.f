@@ -79,6 +79,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                 ! for VAL__xxxx
+      INCLUDE 'NDF_PAR'                 ! for NDF__NOID
       INCLUDE 'REDS_SYS'                ! REDS constants
 *    Import :
 *    Import-Export :
@@ -123,7 +124,6 @@
       INTEGER EXPOSURE                  ! exposure index in DO loop
       INTEGER EXP_POINTER               ! the offset in the output data array
                                         ! of a reduced exposure result
-      CHARACTER*20 FILENAME             ! Name of data file
       CHARACTER*80 FITS (SCUBA__MAX_FITS)
                                         ! array of FITS keyword lines
       CHARACTER*(DAT__SZLOC) FITS_LOC   ! HDS locator to FITS structure
@@ -192,23 +192,22 @@
       TRYING = .TRUE.
       DO WHILE (TRYING)
 
-         CALL PAR_GET0C ('IN', FILENAME, STATUS)
          CALL PAR_CANCL('IN', STATUS)
-         CALL NDF_FIND(DAT__ROOT, FILENAME, IN_NDF, STATUS)
+
+         CALL NDF_EXIST('IN', 'READ', IN_NDF, STATUS)
 
 *  The file could be in DATADIR
 
-         IF (STATUS.NE. SAI__OK) THEN
+         IF (IN_NDF.EQ.NDF__NOID) THEN
             CALL GETENV('DATADIR', DATA_DIR)
 
             ISTAT = GETCWD(CWD)
             IF (ISTAT .EQ. 0) THEN
                ISTAT = CHDIR(DATA_DIR)
                IF (ISTAT .EQ. 0) THEN
-                  CALL ERR_ANNUL(STATUS)
-                  CALL NDF_FIND(DAT__ROOT, FILENAME, IN_NDF, STATUS)
+                  CALL NDF_EXIST('IN', 'READ', IN_NDF, STATUS)
                   ISTAT = CHDIR(CWD)
-                  IF (STATUS .EQ. SAI__OK) TRYING = .FALSE.
+                  IF (IN_NDF .NE. NDF__NOID) TRYING = .FALSE.
                END IF
             END IF
          ELSE
@@ -221,7 +220,6 @@
      :           ' find requested file in CWD and DATADIR',
      :           STATUS)
          END IF
-
       END DO
 
 *  does the user want to divide the data by the internal calibrator
@@ -460,27 +458,22 @@
 * Ask for the level at switch spikes should be removed
 
       CALL PAR_GET0I('SPIKE_LEVEL', SPIKE_LEVEL, STATUS)
+      SPIKE_LEVEL = SPIKE_LEVEL * 256
 
 *  get some scratch memory and copy the different sections of the data array
 *  into it
 
-*      PRINT *, 'Malloc', N_BOLS, N_POS
       CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, DEMOD_DATA_PTR,
      :  DEMOD_DATA_END, STATUS)
-*      PRINT *, 'Malloc', N_BOLS, N_POS, STATUS
       CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, DEMOD_VARIANCE_PTR,
      :  DEMOD_VARIANCE_END, STATUS)
-*      PRINT *, 'Malloc', N_BOLS, N_POS, STATUS
       CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR,
      :  DEMOD_CALIBRATOR_PTR, DEMOD_CALIBRATOR_END, STATUS)
-*      PRINT *, 'Malloc', N_BOLS, N_POS, STATUS
       CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBR, 
      :  DEMOD_CAL_VARIANCE_PTR, DEMOD_CAL_VARIANCE_END, STATUS)
-*      PRINT *, 'Malloc', N_BOLS, N_POS, STATUS
       CALL SCULIB_MALLOC (N_BOLS * N_POS * VAL__NBUB, DEMOD_QUALITY_PTR,
      :  DEMOD_QUALITY_END, STATUS)
 
-*      PRINT *,'About to DEMOD_SWITCH', STATUS
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_COPY_DEMOD_SWITCH (N_BOLS, N_POS, SPIKE_LEVEL,
      :     %val(IN_DATA_PTR), %val(DEMOD_DATA_PTR),
@@ -491,7 +484,6 @@
 
 *  if required, divide the calibrator signal into the data
 
-*      PRINT *,'About to CALIB'
       IF (STATUS .EQ. SAI__OK) THEN
          IF (USE_CALIBRATOR) THEN
             CALL SCULIB_DIV_CALIBRATOR (N_BOLS * N_POS,
