@@ -17689,6 +17689,13 @@ current version):
 
 \begin{enumerate}
 
+\item A bug has been fixed in the FitsChan class which could cause
+problems when creating a FrameSet from a FITS header containing WCS
+information stored in the form of Digitised Digitised Sky Survey (DSS) 
+keywords. These problems only occurred for DSS fields in the southern
+hemisphere, and resulted in pixel positions being mapped to sky positions
+close to the corresponding {\em northern} hemispshere field.
+
 \item A new method called 
 c+
 astBoundingBox
