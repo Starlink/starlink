@@ -24,7 +24,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/java
-     [copy] Copying 49 files to /apps/cvsbuild/java/source/util/build/java
+     [copy] Copying 58 files to /apps/cvsbuild/java/source/util/build/java
      [echo] Executing Task target: javadoc-sources
 
 javadoc-sources:
@@ -44,7 +44,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/astgui/build/java
-     [copy] Copying 45 files to /apps/cvsbuild/java/source/astgui/build/java
+     [copy] Copying 41 files to /apps/cvsbuild/java/source/astgui/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/astgui/build/java
      [echo] Executing JNIHDS target: javadoc-sources
 
@@ -94,7 +94,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/diva/build/java
-     [copy] Copying 850 files to /apps/cvsbuild/java/source/diva/build/java
+     [copy] Copying 851 files to /apps/cvsbuild/java/source/diva/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/diva/build/java
      [echo] Executing JSky target: javadoc-sources
 
@@ -164,8 +164,8 @@ javadoc-sources:
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.util...
-  [javadoc] Loading source files for package uk.ac.starlink.util.gui...
   [javadoc] Loading source files for package uk.ac.starlink.util.images...
+  [javadoc] Loading source files for package uk.ac.starlink.util.gui...
   [javadoc] Loading source files for package uk.ac.starlink.task...
   [javadoc] Loading source files for package uk.ac.starlink.ast...
   [javadoc] Loading source files for package uk.ac.starlink.ast.grf...
@@ -227,10 +227,10 @@ javadoc-sources:
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectCharacters.java:50: warning - Tag @see: malformed: "InsertCharacters, SelectCharactersModel"
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:55: warning - Tag @see: malformed: "AstAxisLabels,"
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:56: warning - Tag @see: malformed: "AstAxisLabels,"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - Tag @see: malformed: "Plot, PlotConfig."
   [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:28: warning - Tag @see: malformed: "Plot, PlotConfigurator"
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:110: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:112: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/index-all.html...
   [javadoc] "Array of AbstractPlotControlsModel objects that are genuine Ast
   [javadoc]  related parts (i.e."
@@ -258,7 +258,7 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e. floating point and integer) numbers. "
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:223: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:225: warning - The first sentence is interpreted to be:
   [javadoc] "Decode (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
@@ -292,14 +292,14 @@ javadoc-sources:
   [javadoc]  processed the same as FITSImages, i.e. are flipped top to bottom by
   [javadoc]  default and have their bad pixel flags set correctly.
   [javadoc]  "
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/ConfigurationStore.java:295: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/StoreConfiguration.java:295: warning - The first sentence is interpreted to be:
   [javadoc] "Create a new Element ready for attaching a configuration state
   [javadoc]  to (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Create a new Element ready for attaching a configuration state
   [javadoc]  to (i.e. get this Element then write the configuration data
   [javadoc]  attached to it). "
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:55: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:56: warning - The first sentence is interpreted to be:
   [javadoc] "PlotConfiguration is a repository for all the configuration information
   [javadoc]  related to a Plot (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -334,7 +334,7 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e. floating point and integer) numbers. "
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:55: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:56: warning - The first sentence is interpreted to be:
   [javadoc] "PlotConfiguration is a repository for all the configuration information
   [javadoc]  related to a Plot (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -379,12 +379,23 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectCharactersEvent.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectCharactersModel.java:18: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectTextField.java:33: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/StoreConfiguration.java:70: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/StoreConfiguration.java:295: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/util/gui/StoreConfiguration.html...
+  [javadoc] "Create a new Element ready for attaching a configuration state
+  [javadoc]  to (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Create a new Element ready for attaching a configuration state
+  [javadoc]  to (i.e. get this Element then write the configuration data
+  [javadoc]  attached to it). "
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/StoreControlFrame.java:56: warning - Tag @link: reference not found: SourceSource
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/StoreFileUtils.java:68: warning - Tag @link: reference not found: getConfigDirectory
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedListener.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotController.java:36: warning - Tag @link: reference not found: PlotConfiguration.getAst
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotControls.java:27: warning - Tag @link: reference not found: Plot
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AbstractPlotControlsModel.java:47: warning - Tag @link: reference not found: Plot
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AbstractPlotControlsModel.java:47: warning - Tag @link: reference not found: Changelistener
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AbstractPlotControlsModel.java:47: warning - Tag @link: reference not found: ChangeEvents
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AbstractPlotControlsModel.java:48: warning - Tag @link: reference not found: Plot
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AbstractPlotControlsModel.java:48: warning - Tag @link: reference not found: Changelistener
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AbstractPlotControlsModel.java:48: warning - Tag @link: reference not found: ChangeEvents
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxes.java:235: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/AstAxes.html...
   [javadoc] "Set position along the X axis at which to start labelling
@@ -423,15 +434,6 @@ javadoc-sources:
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AxisLabelControls.java:51: warning - Tag @see: reference not found: AstAxisLabel
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AxisNumLabControls.java:46: warning - Tag @see: reference not found: AstNumerLabels
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/ConfigurationStore.java:70: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/ConfigurationStore.java:295: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/ConfigurationStore.html...
-  [javadoc] "Create a new Element ready for attaching a configuration state
-  [javadoc]  to (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Create a new Element ready for attaching a configuration state
-  [javadoc]  to (i.e. get this Element then write the configuration data
-  [javadoc]  attached to it). "
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedEvent.java:15: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontControls.java:30: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
@@ -444,8 +446,8 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: Tag @see: Malformed: Plot, PlotConfig.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/LineControls.java:38: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/PlotConfiguration.html...
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:55: Tag @see: Malformed: AstAxisLabels,
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:110: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:56: Tag @see: Malformed: AstAxisLabels,
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:112: warning - The first sentence is interpreted to be:
   [javadoc] "Array of AbstractPlotControlsModel objects that are genuine Ast
   [javadoc]  related parts (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -453,15 +455,11 @@ javadoc-sources:
   [javadoc]  related parts (i.e. can be passed to an Ast Plot as
   [javadoc]  configuration options, these are the default list and cannot be
   [javadoc]  extended)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:223: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:225: warning - The first sentence is interpreted to be:
   [javadoc] "Decode (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/Utilities.java:66: warning - Tag @link: reference not found: getConfigDirectory
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
@@ -475,7 +473,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 91 warnings
+  [javadoc] 89 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 16 seconds
+Total time: 1 minute 14 seconds

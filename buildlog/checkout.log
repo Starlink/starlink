@@ -2352,8 +2352,6 @@ U java/source/astgui/src/main/uk/ac/starlink/ast/gui/BorderControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/ColourIcon.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/ColourStore.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/ComponentColourControls.java
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/ConfigurationStore.java
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/Configurator.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/DecimalDocument.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/DecimalField.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/FontChangedEvent.java
@@ -2369,22 +2367,12 @@ U java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotConfiguration.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotConfigurator.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotController.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotControls.java
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/StoreConfigurator.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/StringsControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/TODO
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/TickControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/TitleControls.java
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/Utilities.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/package.html
 cvs checkout: Updating java/source/astgui/src/main/uk/ac/starlink/ast/gui/images
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/ImageHolder.java
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/accept.gif
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/add.gif
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/config.gif
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/delete.gif
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/exit.gif
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/reset.gif
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/update.gif
 cvs checkout: Updating java/source/astgui/src/testcases
 U java/source/astgui/src/testcases/TestPlotConfigFrame.java
 cvs checkout: Updating java/source/axis
@@ -5484,6 +5472,7 @@ U java/source/diva/src/main/uk/ac/starlink/diva/DrawRectangleFigure.java
 U java/source/diva/src/main/uk/ac/starlink/diva/FigureChangedEvent.java
 U java/source/diva/src/main/uk/ac/starlink/diva/FigureListener.java
 U java/source/diva/src/main/uk/ac/starlink/diva/FigureProps.java
+U java/source/diva/src/main/uk/ac/starlink/diva/FigureStore.java
 U java/source/diva/src/main/uk/ac/starlink/diva/InterpolatedCurveFigure.java
 U java/source/diva/src/main/uk/ac/starlink/diva/InterpolatedCurveManipulator.java
 U java/source/diva/src/main/uk/ac/starlink/diva/RangeManipulator.java
@@ -8410,7 +8399,17 @@ U java/source/table/.properties
 U java/source/table/build.xml
 cvs checkout: Updating java/source/table/src
 cvs checkout: Updating java/source/table/src/docs
+U java/source/table/src/docs/MultiHTML.java
+U java/source/table/src/docs/docs.dtd
+U java/source/table/src/docs/multi.xslt
+U java/source/table/src/docs/starlinklogo3.gif
+U java/source/table/src/docs/stil.html
+U java/source/table/src/docs/stil_large.gif
+U java/source/table/src/docs/stil_small.gif
+U java/source/table/src/docs/stil_sun.xml
 U java/source/table/src/docs/table.txt
+U java/source/table/src/docs/toHTML.xslt
+U java/source/table/src/docs/toHTML1.xslt
 cvs checkout: Updating java/source/table/src/lib
 U java/source/table/src/lib/htmIndex.jar
 cvs checkout: Updating java/source/table/src/main
@@ -9135,13 +9134,22 @@ U java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharactersListener.jav
 U java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharactersModel.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/SelectStringDialog.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/SelectTextField.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/StoreConfiguration.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/StoreControlFrame.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/StoreFileUtils.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/StoreSource.java
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/images
 U java/source/util/src/main/uk/ac/starlink/util/images/ImageHolder.java
 U java/source/util/src/main/uk/ac/starlink/util/images/accept.gif
+U java/source/util/src/main/uk/ac/starlink/util/images/add.gif
 U java/source/util/src/main/uk/ac/starlink/util/images/close.gif
+U java/source/util/src/main/uk/ac/starlink/util/images/config.gif
+U java/source/util/src/main/uk/ac/starlink/util/images/delete.gif
 U java/source/util/src/main/uk/ac/starlink/util/images/exit.gif
 U java/source/util/src/main/uk/ac/starlink/util/images/help.gif
+U java/source/util/src/main/uk/ac/starlink/util/images/reset.gif
 U java/source/util/src/main/uk/ac/starlink/util/images/special.gif
+U java/source/util/src/main/uk/ac/starlink/util/images/update.gif
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/text
 U java/source/util/src/main/uk/ac/starlink/util/text/VOTable.dtd
 U java/source/util/src/main/uk/ac/starlink/util/text/VOTable.xsd
