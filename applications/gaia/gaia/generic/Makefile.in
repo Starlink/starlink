@@ -78,6 +78,7 @@ INCLUDES	= -I../include  \
                   -I../../skycat/astrotcl/wcslib/include \
                   -I../../skycat/cat/astrocat/include \
                   -I../../skycat/cat/tclcat/include \
+                  -I../../skycat/tclutil/tix/unix \
 	          $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE) -I$(STAR_INC)
 
 DEFINES         = \
