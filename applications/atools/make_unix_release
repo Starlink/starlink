@@ -81,55 +81,28 @@
       mv atools.star-hlp atools.hlp
       ifd_irafhlpgen atools
 
-#  Create a CL script which will create the help database on sa1.
+#  Copy files to iraf directory.
+      set airaf = "$HOME/iraf/atools"
+      /bin/rm -rf $airaf
+      mkdir $airaf
+      cp root.hd $airaf
+      cp _kappa.hd $airaf
+      cp kappa.hd $airaf
+      cd $airaf/..
+
+#  Create a CL script which will create the help database.
       cat > temp.cl << FOO
-set atools = /sa1/home/dsb/iraf/atools/
+set kappa = /home/dsb/iraf/atools/
 so
-mkhelpdb atools\$root.hd helpdb.mip
+mkhelpdb $airaf/root.hd helpdb.mip
 lo
 FOO
 
-#  Create a tcsh script to set things up on sa1 and activate the CL script.
-      cat > atliraf << FOO2
-#!/usr/local/bin/tcsh
-cd iraf
-rm -rf atools
-mkdir atools
-cd atools
-ftp -v sl5 << FOO3
-ascii
-cd ${REL_DIR}
-get root.hd
-get _atools.hd
-get atools.hd
-get temp.cl
-bye
-FOO3
-mv temp.cl ..
-cd ..
-cl < temp.cl
-FOO2
-      chmod u+x atliraf
-
-#  FTP this file to sa1.
-      ftp -v sa1 << FOO4
-ascii
-put atliraf
-bye
-FOO4
-      rm atliraf 
-
-#  Ask the user to execute the script on sa1. Why wont rsh do this?
-      alert "\nNow log into sa1 and do 'source atliraf'\nPress OK when done ..."
-
-#  Now FTP the helpdb.mip file back from sa1.
-      ftp -v sa1 << FOO5
-binary
-cd iraf
-get helpdb.mip
-bye
-FOO5
+# Execute the cl script, and copy the helpdb.mip file back.
+      cl < temp.cl
+      cp helpdb.mip $REL_DIR
       rm temp.cl
+      cd $REL_DIR
 
 #  Create each of the tar files. First do the system-independant ones
 #  listed in group TAR_FILES_A...

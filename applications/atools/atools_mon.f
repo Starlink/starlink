@@ -147,6 +147,12 @@
       ELSE IF ( NAME .EQ. 'ASTTRANN' ) THEN
          CALL ASTTRANN( STATUS )
 
+      ELSE IF ( NAME .EQ. 'ASTMAPBOX' ) THEN
+         CALL ASTMAPBOX( STATUS )
+
+      ELSE IF ( NAME .EQ. 'ASTINVERT' ) THEN
+         CALL ASTINVERT( STATUS )
+
 *  If the action name is not recognised, then report an error.
       ELSE
          STATUS = SAI__ERROR

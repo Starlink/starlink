@@ -394,7 +394,7 @@ PKG_LINK = ATOOLS
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.3
+PKG_VERS = 1.4
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -462,7 +462,8 @@ atl1_setop.f astcmpframe.f astcmpmap.f astframe.f astgetframe.f astfindframe.f \
 astskyframe.f astgetmapping.f astunitmap.f atlhelp.f astframeset.f astpermaxes.f \
 astpermmap.f astremoveframe.f astremapframe.f astmatrixmap.f astconvert.f \
 atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f astpcdmap.f astwinmap.f \
-astpickaxes.f astsimplify.f asttrann.f atl1_cpcol.f gethlp.f
+astpickaxes.f astsimplify.f asttrann.f atl1_cpcol.f gethlp.f astinvert.f \
+astmapbox.f
 
 F_SUB2 = 
 
@@ -500,7 +501,7 @@ TASKS = astcopy astaddframe astclear astget astset asttest astcmpframe \
 astcmpmap astframe astgetframe astgetmapping astunitmap atlhelp astskyframe \
 astframeset astpermmap astremoveframe astremapframe astmatrixmap astconvert \
 astlutmap astpcdmap astwinmap astfindframe astpermaxes astpickaxes \
-astsimplify asttrann
+astsimplify asttrann astinvert astmapbox
 
 #  Monolith routine source name.
 
@@ -1388,6 +1389,8 @@ astpermaxes.o  : SAE_PAR AST_PAR NDF_PAR
 astpickaxes.o  : SAE_PAR AST_PAR NDF_PAR PAR_ERR
 astsimplify.o  : SAE_PAR AST_PAR 
 asttrann.o     : SAE_PAR NDF_PAR AST_PAR PAR_ERR 
+astinvert.o    : SAE_PAR AST_PAR 
+astmapbox.o    : SAE_PAR NDF_PAR AST_PAR PAR_ERR 
 astmatrixmap.o : SAE_PAR NDF_PAR AST_PAR
 astlutmap.o    : SAE_PAR AST_PAR
 astpcdmap.o    : SAE_PAR AST_PAR
