@@ -84,6 +84,11 @@
 #     Arguments may be presented in ADAM style, either as 'arg=val' 
 #     (which is what CGI makes them look like) or positionally determined.
 
+#  Notes:
+#     Operation of this script will be affected by the build-time and
+#     run-time values of certain environment variables, as documented
+#     in the module Scb.pm.
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
