@@ -179,7 +179,6 @@
         AXES(1)=1
       ENDIF
 
-	print *,'gotlist'
 
       IF (OPT.EQ.5) THEN
         CALL USI_ASSOCI('CLONE','READ',CLOC,CPRIM,STATUS)
@@ -196,7 +195,6 @@
 * Map bin attributes
       DO I=1,NDIM
 
-	print *,i
 
         CALL BDA_CHKAXIS(ILOC,I,AOK(I),STATUS)
 
@@ -205,18 +203,15 @@
         CALL BDA_GETAXLABEL(ILOC,I,AXLABEL(I),STATUS)
         CALL BDA_MAPAXVAL(ILOC,'READ',I,AXVP(I),STATUS)
 
-	print *,'values'
 
 * axis bounds
         CALL BDA_MAPAXBNDS(ILOC,'READ',I,AXBP(I),STATUS)
 
-	print *,'bounds'
 
 * axis widths
         CALL BDA_CHKAXWID(ILOC,I,WDOK(I),UNIF(I),NAXWDIM(I),STATUS)
         CALL BDA_MAPAXWID(ILOC,'READ',I,AXWP(I),STATUS)
 
-	print *,'widths'
 
 * check if donor bins normalised
         CALL BDA_GETAXNORM(ILOC,I,NORM(I),STATUS)
