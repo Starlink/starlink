@@ -1,4 +1,4 @@
-      SUBROUTINE REDS (STATUS)
+      SUBROUTINE SURF_MON (STATUS)
 *+
 *  Name:
 *     REDS
@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.19  1997/06/12 21:12:39  timj
+*     Change name to SURF_MON (from REDS) and rename subroutine.
+*
 *     Revision 1.18  1997/06/12 21:07:45  timj
 *     Remove KSTEST and DRAWSIG
 *     Comment out GET_FLAT
