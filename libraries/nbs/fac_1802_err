@@ -1,0 +1,30 @@
+FACILITY NBS
+100,SECTIONEXISTED,noticeboard already existed
+200,TOOMANYDIMS,more dimensions than maximum allowed
+201,TOOMANYBYTES,more bytes than maximum allowed
+202,BADOFFSET,offset is less than zero
+203,BADOPTION,illegal parameter / item name
+204,DATANOTSAVED,data part of noticeboard not saved - cannot restore it
+300,DEFINING,currently defining noticeboard contents
+301,NOTDEFINING,not currently defining noticeboard contents
+302,NILSID,NIL static ID
+303,NILID,NIL item ID
+304,PRIMITIVE,item is primitive
+305,NOTPRIMITIVE,item is not primitive
+306,ITEMNOTFOUND,item does not exist
+307,SECTIONNOTFOUND,noticeboard does not exist
+308,CANTOPEN,can't open noticeboard definition file
+309,CANTWRITE,can't write noticeboard definition file
+310,CANTREAD,can't read noticeboard definition file
+311,NOTOWNER,non-owner attempted to alter noticeboard
+312,TIMEOUT,time out finding noticeboard or getting item value or shape
+313,DATASAVED,data part of noticeboard saved - cannot restore definition
+314,DATANOTRESTORED,data was not restored from noticeboard file - cannot save it
+315,HASIDS,item / noticeboard has items derived from it - cannot lose it
+316,NOTTOPLEVEL,item is not top-level (ie not noticeboard) - cannot lose it
+317,TOPLEVEL,item is top-level (ie noticeboard) - cannot lose it
+318,NEVERFOUND,parent has no items derived from it - cannot lose it
+400,INITALLOCFAILED,couldn't initialise storage allocator
+401,NOMOREROOM,couldn't get memory - increase MAX_DEFN_SIZE if when defining
+402,BADVERSION,noticeboard or definition file had wrong version
+403,IMPOSSIBLE,something impossible happened - system error

@@ -1,0 +1,12 @@
+1 NBS_library
+                                             Expires:  ??
+
+A new release (V2.5-4) of the NBS library is now available. NBS stores
+but does not make use of the type of primitive noticeboard items. In
+particular prior to version V2.5-4 the data address of primitive items
+could have arbitrary alignment. As of this release primitive items are
+aligned on quadword boundaries ensuring that numeric items mapped from
+C or Fortran will be correctly aligned. This will result in an increase
+in the size of existing noticeboards containing items whose data is not
+a multiple of 8 bytes. UNIX memory section names are now hashed with an
+algorithm less likely to cause clashes.
