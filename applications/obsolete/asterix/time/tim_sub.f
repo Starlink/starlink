@@ -156,8 +156,11 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
+      CHARACTER*(DAT__SZLOC) HLOC
       INTEGER DPTR,VPTR,APTR,WPTR,QPTR
       INTEGER NVAL
+      INTEGER BASEMJD,BASEUTC
+      LOGICAL OK,HOK
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -215,6 +218,34 @@
           T_MASK=QUAL__MASK
         ENDIF
 
+*  Header
+        CALL BDA_CHKHEAD(LOC,HOK,STATUS)
+        IF (HOK) THEN
+          CALL BDA_LOCHEAD(LOC,HLOC,STATUS)
+          CALL HDX_OK(HLOC,'BASE_MJD',OK,STATUS)
+          IF (OK) THEN
+            CALL CMP_GET0I(HLOC,'BASE_MJD',BASEMJD,STATUS)
+          ELSE
+            CALL MSG_PRNT(
+     :       '*** BASE_MJD not present - using 0 ***')
+            BASEMJD=0
+          ENDIF
+          CALL HDX_OK(HLOC,'BASE_UTC',OK,STATUS)
+          IF (OK) THEN
+            CALL CMP_GET0I(HLOC,'BASE_UTC',BASEUTC,STATUS)
+          ELSE
+            CALL MSG_PRNT(
+     :       '*** BASE_UTC not present - using 0 ***')
+            BASEUTC=0
+          ENDIF
+
+          T_BASEMJD=DBLE(BASEMJD)+DBLE(BASEUTC)/86400.0D0
+
+        ELSE
+          CALL MSG_PRNT(
+     :      '*** no Header information - setting Base MJD to 0.0 ***')
+          T_BASEMJD=0.0D0
+        ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_REP(' ','from TIM_MAP',STATUS)
