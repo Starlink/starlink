@@ -46,8 +46,10 @@
 #        scuplot and dspbol
 #     26-JAN-1997 (TIMJ)
 #        Add SCUBA2MEM
-#     10-Jun-1997 (TIMJ)
+#     10-Jun-1998 (TIMJ)
 #        Add CALCSKY, REMDBM and CHANGE_NACENTRE. SCUNOISE and SETBOLWT
+#     20-Nov-1998 (TIMJ)
+#        Add REDUCE_NOISE
 #     {enter_changes_here}
 #
 #-
