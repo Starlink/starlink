@@ -68,6 +68,7 @@
 *     11 Jan 94 : V1.7-2 Added traps for HMS and DMS type input (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     24 Apr 95 : V1.8-1 Updated data interfaces (DJA)
+*     17 Jan 1996 : V1.8-2 Use newer USI routines (DJA)
 *
 *    Type definitions :
 *
@@ -76,6 +77,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
@@ -160,27 +162,40 @@
 
 *    Create or retrieve FIT_MODEL
       RESET = .FALSE.
-      CALL USI_DEXIST('MODEL','UPDATE',FLOC,STATUS)
-      IF ( STATUS .EQ. PAR__ERROR ) THEN
-	CALL ERR_ANNUL(STATUS)
-	CALL USI_TASSOCO('MODEL','FIT_MODEL',FID,STATUS)
-        CALL ADI1_GETLOC( FID, FLOC, STATUS )
-	SNEW=.TRUE.
 
+*  Associate input
+      CALL USI_ASSOC( 'MODEL', '*', 'UPDATE', FID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+
+*    User abort
+        IF ( (STATUS.EQ.PAR__NULL) .OR. (STATUS.EQ.PAR__ABORT) ) THEN
+          GOTO 99
+
+*    Didn't exist
+        ELSE
+          CALL ERR_ANNUL( STATUS )
+          SNEW = .TRUE.
+          CALL USI_CREAT( 'MODEL', ADI__NULLID, FID, STATUS )
+          CALL ADI1_GETLOC( FID, FLOC, STATUS )
+          CALL DAT_RETYP( FLOC, 'FIT_MODEL', STATUS )
+
+        END IF
+
+*  Opened ok?
       ELSE
 
-*      Object already exists, so check it
-	CALL DAT_TYPE(FLOC,TYP,STATUS)
-	IF(TYP.NE.'FIT_MODEL')THEN
-          STATUS=SAI__ERROR
+*    Test type
+        CALL ADI1_GETLOC( FID, FLOC, STATUS )
+        CALL DAT_TYPE( FLOC, TYP, STATUS )
+	IF ( TYP .NE. 'FIT_MODEL' ) THEN
+          STATUS = SAI__ERROR
 	  CALL ERR_REP( ' ', 'Not a fit_model data object', STATUS )
+          GOTO 99
 	END IF
-	SNEW=.FALSE.
-        CALL ADI1_PUTLOC( FLOC, FID, STATUS )
+	SNEW = .FALSE.
 
 *      Reset model?
         CALL USI_GET0L( 'RESET', RESET, STATUS )
-	IF(STATUS.NE.SAI__OK) GOTO 99
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -467,10 +482,10 @@
 
       END DO
 
-*    History file entry
+*  History file entry
       CALL HSI_ADD( FID, VERSION, STATUS )
 
-*    Exit
+*  Exit
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
