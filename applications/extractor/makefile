@@ -464,7 +464,7 @@ I_SUB3 = wcsmod/cel.h wcsmod/lin.h wcsmod/proj.h wcsmod/wcs.h wcsmod/wcstrig.h
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = sae_par.h dat_par.h par.h merswrap.h ndf.h ast.h
+EXTERNAL_INCLUDES = sae_par.h dat_par.h par.h merswrap.h ndf.h ast.h msg_par.h
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -544,7 +544,8 @@ $(PKG_NAME).news $(LICENCE)
 
 #  Conditions of use file.
 
-LICENCE = $(PACK_NAME)_CONDITIONS
+#LICENCE = $(PACK_NAME)_CONDITIONS
+LICENCE =
 
 ################################################################################
 #-------------------------------------------------------------------------------
@@ -589,6 +590,7 @@ par.h:             $(STAR_INC)/par.h;            $(LINK) $? $@
 merswrap.h:        $(STAR_INC)/merswrap.h;       $(LINK) $? $@
 ndf.h:             $(STAR_INC)/ndf.h;            $(LINK) $? $@
 ast.h:             $(STAR_INC)/ast.h;            $(LINK) $? $@
+msg_par.h:         $(STAR_INC)/msg_par.h;        $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
@@ -994,8 +996,8 @@ install:
 #
 #  Install the conditions of use file and make it read-only to prevent its
 #  date being changed.
-	cp -p $(LICENCE) $(INSTALL_DATES)
-	chmod 444 $(INSTALL_DATES)/$(LICENCE)
+#	cp -p $(LICENCE) $(INSTALL_DATES)
+#	chmod 444 $(INSTALL_DATES)/$(LICENCE)
 #
 #  Install the date stamp file and make it read-only to prevent its
 #  date being changed.
@@ -1147,10 +1149,10 @@ do_deinstall:
 #
 #  Deinstall the conditions of use file after setting its protection so it may
 #  be removed.
-	- if test -f $(INSTALL_DATES)/$(LICENCE); then \
-           chmod 644 $(INSTALL_DATES)/$(LICENCE);\
-           rm -f $(INSTALL_DATES)/$(LICENCE);\
-        else :; fi
+#	- if test -f $(INSTALL_DATES)/$(LICENCE); then \
+#           chmod 644 $(INSTALL_DATES)/$(LICENCE);\
+#           rm -f $(INSTALL_DATES)/$(LICENCE);\
+#        else :; fi
 #
 #  Deinstall the date stamp file after setting its protection so it may
 #  be removed.
@@ -1362,7 +1364,7 @@ strip:
 #  files).  These are normally generated automatically from the source
 #  files.
 
-adamprint.o: sae_par.h merswrap.h
+adamprint.o: sae_par.h merswrap.h msg_par.h
 
 analyse.o: define.h globals.h fitscat.h back.h check.h assoc.h plist.h flag.h \
            growth.h photom.h psf.h retina.h types.h
