@@ -233,7 +233,6 @@
       INTEGER          IN_VARIANCE_PTR  ! pointer to variance array in input
                                         ! file
       INTEGER          ITEMP            ! scratch integer
-      INTEGER          J                ! Loop counter
       INTEGER          JIGGLE_COUNT     ! number of jiggles in pattern
       INTEGER          JIGGLE_P_SWITCH  ! number of jiggles per switch
       INTEGER          JIGGLE_REPEAT    ! number of times jiggle pattern is
@@ -269,8 +268,6 @@
                                         ! was at LAT2,LONG2 for PLANET centre
                                         ! coordinate system
       INTEGER          NDIM             ! the number of dimensions in an array
-      INTEGER          NINTS            ! Number of whole ints (+1 if abort)
-      INTEGER          NJIGGLE          ! Number of jiggles in an aborted int
       INTEGER          NREC             ! number of history records in file
       INTEGER          N_BEAM           ! number of beams for which data have
                                         ! been reduced
@@ -288,7 +285,6 @@
       CHARACTER*30     OBJECT           ! name of object observed
       CHARACTER*15     OBSERVING_MODE   ! type of observation
       INTEGER          OUTNDF           ! NDF identifier of output file
-      INTEGER          OUT_A_PTR        ! Pointer to AXIS 
       INTEGER          OUT_BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! A/D numbers of bolometers in output
                                         ! file
@@ -315,7 +311,6 @@
                                         ! (arcsec)
       DOUBLE PRECISION POINT_LST (SCUBA__MAX_POINT)
                                         ! LST of pointing corrections (radians)
-      INTEGER          POSITION         ! Position in array
       DOUBLE PRECISION RA_CENTRE        ! apparent RA of map centre (radians)
       LOGICAL          REDUCE_SWITCH    ! .TRUE. if REDUCE_SWITCH has been run
       DOUBLE PRECISION ROTATION         ! angle between apparent north and 
@@ -325,6 +320,7 @@
       INTEGER          RUN_NUMBER       ! run number of observation
       CHARACTER*15     SAMPLE_COORDS    ! coordinate system of sample offsets
       CHARACTER*15     SAMPLE_MODE      ! SAMPLE_MODE of observation
+      INTEGER          SECNDF           ! Section NDF identifier
       CHARACTER*20     SECOND_LST       ! sidereal time at which SECOND_TAU
                                         ! measured
       DOUBLE PRECISION SECOND_LST_RAD   ! SECOND_LST in radians
@@ -489,19 +485,11 @@
       CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'N_BOLS',
      :  N_BOL_IN, STATUS)
 
-*  map the various components of the data array and check the data dimensions 
+
+*     Check the dimensions of the input data
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
 
-*  Map QUALITY first to stop automatic masking
-
-      CALL NDF_MAP (INDF, 'QUALITY', '_UBYTE', 'READ',
-     :  IN_QUALITY_PTR, ITEMP, STATUS)
-
-      CALL NDF_MAP (INDF, 'DATA', '_REAL', 'READ', IN_DATA_PTR,
-     :  ITEMP, STATUS)
-      CALL NDF_MAP (INDF, 'VARIANCE', '_REAL', 'READ', IN_VARIANCE_PTR,
-     :  ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
@@ -536,6 +524,19 @@
       END IF
 
       N_POS = DIM (2)
+
+*     Map the input data
+*     Map QUALITY first to stop automatic masking
+
+      CALL NDF_MAP (INDF, 'QUALITY', '_UBYTE', 'READ',
+     :  IN_QUALITY_PTR, ITEMP, STATUS)
+
+      CALL NDF_MAP (INDF, 'DATA', '_REAL', 'READ', IN_DATA_PTR,
+     :  ITEMP, STATUS)
+      CALL NDF_MAP (INDF, 'VARIANCE', '_REAL', 'READ', IN_VARIANCE_PTR,
+     :  ITEMP, STATUS)
+
+
 
 *  map the DEM_PNTR array and check its dimensions
 
@@ -746,11 +747,9 @@
          END IF
       END IF
 
-*  now open the output NDF, propagating it from the input file
+*  CREATE an output file
 
-      CALL NDF_PROP (INDF, ' ', 'OUT', OUTNDF, STATUS)
-
-*  reset the data array bounds and map the various components
+*  Calculate the data array bounds and map the various components
 
       N_BEAM = 1
       NDIM = 2
@@ -764,7 +763,20 @@
          LBND (3) = 1
          UBND (3) = SCUBA__MAX_BEAM
       END IF
-      CALL NDF_SBND (NDIM, LBND, UBND, OUTNDF, STATUS)
+
+*     Now create a section of the required size
+
+      CALL NDF_SECT(INDF, NDIM, LBND, UBND, SECNDF, STATUS)
+
+*     And propogate the section to the output (including the axes)
+
+      CALL NDF_PROP (SECNDF, 'Axis,Units', 'OUT', OUTNDF, STATUS)
+
+*     Annul the section
+
+      CALL NDF_ANNUL(SECNDF, STATUS)
+
+*     Map the output arrays
 
       CALL NDF_MAP (OUTNDF, 'QUALITY', '_UBYTE', 'WRITE',
      :  OUT_QUALITY_PTR, ITEMP, STATUS)
@@ -860,55 +872,9 @@
      :        %VAL(OUT_DATA_PTR), %VAL(OUT_VARIANCE_PTR),
      :        STATUS)
 
-* Put in some axis information
-
-         CALL NDF_AMAP(OUTNDF, 'CENTRE', 1, '_INTEGER', 'WRITE',
-     :        OUT_A_PTR, ITEMP, STATUS)
-         IF (STATUS .EQ. SAI__OK) THEN
-            CALL SCULIB_NFILLI (N_BOL_OUT, %val(OUT_A_PTR))
-         END IF
-         CALL NDF_ACPUT ('Bolometer', OUTNDF, 'LABEL', 1, STATUS)
-         CALL NDF_AUNMP (OUTNDF, 'CENTRE', 1, STATUS)
-
-         IF (SAMPLE_MODE .NE. 'RASTER') THEN
-            CALL NDF_AMAP (OUTNDF, 'CENTRE', 2, '_REAL', 'WRITE',
-     :        OUT_A_PTR, ITEMP, STATUS)
-            IF (STATUS .EQ. SAI__OK) THEN
-               POSITION = 0
-
-*     For aborted datasets need to be careful so must use N_POS
-*     and not just N_INTEGRATIONS
-
-               NINTS = N_POS / JIGGLE_COUNT
-               IF (NINTS * JIGGLE_COUNT .LT. N_POS) THEN
-                  NINTS = NINTS + 1
-               END IF
-            
-               DO I = 1, NINTS
-                  NJIGGLE = MOD (N_POS - (I-1) * JIGGLE_COUNT, 
-     :              JIGGLE_COUNT)
-                  IF (NJIGGLE .EQ. 0) THEN
-                     NJIGGLE = JIGGLE_COUNT
-                  END IF
-
-                  DO J = 1, NJIGGLE
-                     RTEMP = REAL(I)+ (REAL(J-1)/REAL(JIGGLE_COUNT))
-                     CALL SCULIB_CFILLR(1,RTEMP,
-     :                 %VAL(OUT_A_PTR+(POSITION*VAL__NBR)))
-                     POSITION = POSITION + 1
-                  END DO
-               END DO
-
-            END IF  
-
-            CALL NDF_ACPUT ('Integration', OUTNDF, 'LABEL', 2, STATUS)
-            CALL NDF_AUNMP (OUTNDF, 'CENTRE', 2, STATUS)
-         END IF
 
 * and a title
 
-         CALL NDF_CPUT(OBJECT, OUTNDF, 'Title', STATUS)
-         CALL NDF_CPUT('Volts', OUTNDF, 'UNITS', STATUS)
          CALL NDF_CPUT('Extinction corrected',OUTNDF, 'LAB', STATUS)
  
 *  unmap the main data array
