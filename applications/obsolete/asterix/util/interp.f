@@ -43,6 +43,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Status :
@@ -282,16 +283,6 @@
         BADBITS = QUAL__MASK
         CALL ERR_ANNUL( STATUS )
       END IF
-
-*  Check shape of quality array is the same as the data array
-      DO LP = 1, NDIM
-        IF (DIM(LP) .NE. QDIM(LP)) THEN
-          STATUS=SAI__ERROR
-          CALL ERR_REP(' ',
-     :      'Quality and data arrays have different dimensions',STATUS)
-          GOTO 99
-        END IF
-      END DO
 
 *  Copy required slice of data,quality,variance into temp arrays.
       CALL DTA_COPYSLICER( DIM(1),DIM(2),DIM(3),DIM(4),%VAL(D_PNTR),
