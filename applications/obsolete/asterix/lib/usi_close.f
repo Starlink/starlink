@@ -23,7 +23,7 @@
       DO N=1,USI__NMAX
         IF (DS(N).USED) THEN
           IF ( DS(N).ADIFPN ) THEN
-            CALL ADI_FCLOSE( DS(N).ADI_ID, STATUS )
+            CALL ADI_FCLOSE( DS(N).ADI_ID, ISTAT )
 
           ELSE IF ( DS(N).LOC .NE. DAT__NOLOC ) THEN
             CALL DAT_VALID(DS(N).LOC,VALID,ISTAT)
