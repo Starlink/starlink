@@ -15,7 +15,7 @@
     graphics user interfaces for Starlink applications in Tcl/Tk.</p>
   </abstract>
   <dependencies >
-    <build>starx</build><build>adam</build><build>ams</build><build>dtask</build><build>ems</build><build>gwm</build><build>messys</build><build>mers</build><build>tcl</build><build>tk</build><build>nbs</build><build>sae</build><sourceset>star2html</sourceset>
+    <build>ems</build><build>gwm</build><build>mers</build><build>nbs</build><build>pcs</build><build>sae</build><build>starx</build><build>tcl</build><build>tk</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

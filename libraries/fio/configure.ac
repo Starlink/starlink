@@ -47,8 +47,8 @@ AC_FC_RECL_UNIT
 #   This may be a problem if alink has not yet been installed
 STAR_MONOLITHS
 
-STAR_DECLARE_DEPENDENCIES([build], [sae par])
-STAR_DECLARE_DEPENDENCIES([link],  [chr ems mers subpar])
+STAR_DECLARE_DEPENDENCIES([build], [par sae])
+STAR_DECLARE_DEPENDENCIES([link], [chr ems mers pcs])
 
 #  Documentation is uncomplicated
 STAR_LATEX_DOCUMENTATION(sun143)

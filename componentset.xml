@@ -44,7 +44,7 @@ to one of the functions within the AST library. ATOOLS thus provides a
 high-level interface to the AST library. 
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ast</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>ifd</build><build>ndf</build><build>par</build><build>sae</build><build option='link'>kaplibs</build><build option='link'>ast</build><build option='link'>shl</build><sourceset>sst</sourceset>
+    <build>pcs</build><build>ast</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>ifd</build><build>ndf</build><build>par</build><build>sae</build><build option='link'>kaplibs</build><build option='link'>ast</build><build option='link'>shl</build><sourceset>sst</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -85,7 +85,7 @@ high-level interface to the AST library.
     </p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><sourceset>messgen</sourceset><build>chr</build><build>agi</build><build>ard</build><build>ast</build><build>chr</build><build>fio</build><build>ndf</build><build>pgplot</build><build>prm</build><build>psx</build><build>trn</build><build>pda</build><build>ndg</build><build>tcl</build><build>tk</build><build>itcl</build><build>startcl</build><build>ifd</build><build>img</build><build>generic</build><build>sla</build><build>shl</build><build>ref</build><build>graphpar</build><configure>tcl</configure><configure>tk</configure><configure>itcl</configure><sourceset>star2html</sourceset>
+    <build>pcs</build><sourceset>messgen</sourceset><build>ard</build><build>ast</build><build>chr</build><build>cnf</build><build>fio</build><build>generic</build><build>grp</build><build>hds</build><build>idi</build><build>itcl</build><build>ndf</build><build>ndg</build><build>one</build><build>par</build><build>pcs</build><build>pgplot</build><build>prm</build><build>psx</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>agi</build><build option='link'>graphpar</build><build option='link'>img</build><build option='link'>pda</build><build option='link'>ref</build><build option='link'>shl</build><build option='link'>sla</build><build option='link'>startcl</build><configure>itcl</configure><configure>tcl</configure><configure>tk</configure><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -138,7 +138,7 @@ Starlink's Extensible n-dimensional Data Format (NDF), which is used by most
 Starlink applications, and a number of other common data formats.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ast</build><build>chr</build><build>cnf</build><build>figaro</build><build>fio</build><build>grp</build><build>hds</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>subpar</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>ast</build><build>chr</build><build>cnf</build><build>figaro</build><build>fio</build><build>grp</build><build>hds</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -185,7 +185,7 @@ text files.  CURSA also includes some facilities for accessing remote
 on-line catalogues via the Internet.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build option='link'>sae</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>pgp</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>sae</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>ndf</build><build option='link'>pgp</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -216,7 +216,7 @@ on-line catalogues via the Internet.
     which improves the accuracy of the photometry.</p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>mers</build><build>subpar</build><build>ndf</build><build>psx</build><build>chr</build><build>agi</build><build>gks</build><build>cnf</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>sae</build><build>mers</build><build>pcs</build><build>ndf</build><build>psx</build><build>chr</build><build>agi</build><build>gks</build><build>cnf</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person><name>Peter Stetson</name><role>Original author</role></person>
@@ -239,7 +239,7 @@ okbook (SC/16), a small number of applications used for AXIS and  WCS
 manipulation, and a collection of example shell and IDL scripts for IFS data
 cube manipulation. </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ndf</build><build>kappa</build><build>figaro</build><build>convert</build>
+    <build>pcs</build><build>ndf</build><build>kappa</build><build>figaro</build><build>convert</build><sourceset>star2html</sourceset>
   </dependencies>
   <!--
   <developers>
@@ -250,7 +250,7 @@ cube manipulation. </p></abstract>
     </person>
   </developers>
   -->
-  <!-- <documentation></documentation> -->
+  <!-- <documentation> sun45</documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -345,7 +345,7 @@ cube manipulation. </p></abstract>
       fitting and extraction.</p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>cnf</build><build>fio</build><build>hds</build><build>hlp</build><build>mers</build><build>ndf</build><build>par</build><build>pda</build><build>pgp</build><build>prm</build><build>sae</build><build>sla</build><build>shl</build><build>mers</build><build option='link'>kaplibs</build>
+    <build>pcs</build><build>cnf</build><build>fio</build><build>hds</build><build>hlp</build><build>mers</build><build>ndf</build><build>par</build><build>pda</build><build>pgp</build><build>prm</build><build>sae</build><build>sla</build><build>shl</build><build>mers</build><build option='link'>kaplibs</build><sourceset>htx</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -407,7 +407,7 @@ proposal, or before or during an observing run.
   Gaussian profiles to galaxies,  generate  pie slice cross-sections
   of galaxies and display profiling results.</p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ast</build><build>cat</build><build>chr</build><build>fio</build><build>grp</build><build>hds</build><build>ndf</build><build>par</build><build>mers</build><build>pda</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>sgs</build><build>subpar</build><build option='link'>agi</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>fio</build><build>grp</build><build>hds</build><build>ndf</build><build>mers</build><build>par</build><build>pcs</build><build>pda</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>sgs</build><build option='link'>agi</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -441,7 +441,7 @@ flexible configuration facilities and can handle images and catalogues in a
 variety of formats.
 </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build option='link'>ast</build><build option='link'>ndf</build><build option='link'>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>ast</build><build option='link'>ndf</build><build option='link'>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -503,7 +503,7 @@ The programs it contains can be used to process a
 wide range of images and spectra.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>pda</build><build>agi</build><build>grp</build><build>ndf</build><build>fio</build><build>idi</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>pda</build><build>agi</build><build>grp</build><build>ndf</build><build>fio</build><build>idi</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -581,7 +581,7 @@ and its coordinates are displayed.
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="gaia">
-  <version>2.7-5</version>
+  <version>2.7-6</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -593,7 +593,7 @@ calibration and modification, grid overlays, blink comparison, defect patching
 and the ability to query on-line (WWW) catalogues.
 </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build option='link'>ard</build><build option='link'>ams</build><build option='link'>ast</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>ndf</build><build option='link'>pda</build><build option='link'>sae</build><build option='link'>subpar</build><sourceset>star2html</sourceset><use>convert</use><use>esp</use><use>extractor</use><use>kappa</use><use>photom</use><use>polpack</use><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>ard</build><build option='link'>ast</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>ndf</build><build option='link'>pcs</build><build option='link'>pda</build><build option='link'>sae</build><sourceset>star2html</sourceset><use>convert</use><use>esp</use><use>extractor</use><use>kappa</use><use>photom</use><use>polpack</use><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -643,7 +643,7 @@ to edit and display HDS objects. The tools originated in the ASTERIX
 package but have now been modified to run as normal Starlink tasks.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>hds</build><build>fio</build><build>mers</build><build>par</build><build>prm</build><build>sae</build><build>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><build>hds</build><build>fio</build><build>mers</build><build>par</build><build>prm</build><build>sae</build><build>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -666,7 +666,7 @@ package but have now been modified to run as normal Starlink tasks.
 Traces an HDS file
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>fio</build><build>prm</build><build>par</build><build>sae</build><build>hds</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>fio</build><build>prm</build><build>par</build><build>sae</build><build>hds</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -786,7 +786,7 @@ intended to work in conjunction with Starlink's various specialised
 packages.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>agi</build><build>ast</build><build>chr</build><build>cnf</build><build>kaplibs</build><build>hds</build><build>fio</build><build>grp</build><build>mag</build><build>mers</build><build>ndf</build><build>one</build><build>par</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>subpar</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>ard</build><build option='link'>kaplibs</build><build option='link'>shl</build><build option='link'>one</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>agi</build><build>ast</build><build>chr</build><build>cnf</build><build>fio</build><build>grp</build><build>hds</build><build>kaplibs</build><build>mag</build><build>mers</build><build>ndf</build><build>one</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>shl</build><build>tcl</build><build>tk</build><build>trn</build><build option='link'>ard</build><build option='link'>kaplibs</build><build option='link'>one</build><build option='link'>shl</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -815,7 +815,7 @@ are retained within KAPRH to satisfy any occasional need there may be for
 them. 
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ast</build><build>kaplibs</build><build>hds</build><build>fio</build><build>gks</build><build>gns</build><build>idi</build><build>mers</build><build>ndf</build><build>par</build><build>prm</build><build>sae</build><build>subpar</build><build>trn</build><build option='link'>kaplibs</build><build option='link'>cat</build><build option='link'>snx</build><build option='link'>ncar</build><build option='link'>idi</build><build option='link'>sgs</build><build option='link'>ndg</build><build option='link'>gks</build><build option='link'>gwm</build><build option='link'>gns</build><build option='link'>ndf</build><build option='link'>agi</build><build option='link'>fio</build><build option='link'>ref</build><build option='link'>ard</build><build option='link'>grp</build><build option='link'>trn</build><build option='link'>prm</build><build option='link'>shl</build><build option='link'>mag</build><build option='link'>sla</build><build option='link'>psx</build><build option='link'>pda</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>ast</build><build>fio</build><build>gks</build><build>gns</build><build>hds</build><build>idi</build><build>kaplibs</build><build>mers</build><build>ndf</build><build>par</build><build>pcs</build><build>prm</build><build>sae</build><build>trn</build><build option='link'>agi</build><build option='link'>ard</build><build option='link'>cat</build><build option='link'>fio</build><build option='link'>gks</build><build option='link'>gns</build><build option='link'>grp</build><build option='link'>gwm</build><build option='link'>idi</build><build option='link'>kaplibs</build><build option='link'>mag</build><build option='link'>ncar</build><build option='link'>ndf</build><build option='link'>ndg</build><build option='link'>pda</build><build option='link'>prm</build><build option='link'>psx</build><build option='link'>ref</build><build option='link'>sgs</build><build option='link'>shl</build><build option='link'>sla</build><build option='link'>snx</build><build option='link'>trn</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -907,7 +907,7 @@ may be listed on a terminal or printer, or used to plot finding charts
 or perform astrometric reductions.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>chr</build><build>mers</build><build>sgs</build><build>gks</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>chr</build><build>mers</build><build>sgs</build><build>gks</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -981,7 +981,7 @@ and astronomy groups in the UK and the rest of the world.
 IRAS90 is a suite of programs for processing IRAS data.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ard</build><build>agi</build><build>fio</build><build>snx</build><build>ndf</build><build>ary</build><build>sla</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>ard</build><build>agi</build><build>fio</build><build>snx</build><build>ndf</build><build>ary</build><build>sla</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1015,7 +1015,7 @@ and renamed) will analyse and display any 2D data image with a .sdf
 file extension stored in the standard Starlink NDF data format.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ndf</build><build>sgs</build><build>fio</build><build>gks</build><build>mag</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>ndf</build><build>sgs</build><build>fio</build><build>gks</build><build>mag</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1041,7 +1041,7 @@ file extension stored in the standard Starlink NDF data format.
     elliptical apertures, using either the aperture or optimal extraction
     algorithms.</p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ard</build><build>fio</build><build>grp</build><build>ndf</build><build>agi</build><build>sgs</build><build>pgp</build><build>gns</build><build>gks</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>ard</build><build>fio</build><build>grp</build><build>ndf</build><build>agi</build><build>sgs</build><build>pgp</build><build>gns</build><build>gks</build><sourceset>star2html</sourceset>
   </dependencies>
   <!--
   <developers>
@@ -1066,7 +1066,7 @@ file extension stored in the standard Starlink NDF data format.
       
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build option='link'>agi</build><build option='link'>cat</build><build option='link'>chr</build><build option='link'>fio</build><build option='link'>ndf</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>prm</build><build option='link'>sae</build><build option='link'>shl</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>agi</build><build option='link'>cat</build><build option='link'>chr</build><build option='link'>fio</build><build option='link'>ndf</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>prm</build><build option='link'>sae</build><build option='link'>shl</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1092,7 +1092,7 @@ registration, sky subtraction, calculation of Stokes parameters, and
 display of vector maps.  
 </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>trn</build><build option='link'>sla</build><build option='link'>nbs</build><build option='link'>kaplibs</build><build option='link'>shl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><sourceset>star2html</sourceset>
+    <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>trn</build><build option='link'>sla</build><build option='link'>nbs</build><build option='link'>kaplibs</build><build option='link'>shl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1120,7 +1120,7 @@ in ordinary text files. It is based around the PGPLOT (SUN/15) graphics
 package. 
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>agi</build><build>sla</build><build>fio</build><build>pda</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>agi</build><build>sla</build><build>fio</build><build>pda</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1309,7 +1309,7 @@ UNIX).
       commercial products being freely available on all Starlink
       machines. </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>chr</build><build>fio</build><build>mers</build><build>one</build><build>par</build><build>psx</build><build>sae</build><build>hds</build><build>hlp</build><build>task</build><build option='use'>dtask</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>chr</build><build>fio</build><build>hds</build><build>hlp</build><build>mers</build><build>one</build><build>par</build><build>pcs</build><build>psx</build><build>sae</build><build option='use'>pcs</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1366,7 +1366,7 @@ UNIX).
     graphics user interfaces for Starlink applications in Tcl/Tk.</p>
   </abstract>
   <dependencies >
-    <build>starx</build><build>adam</build><build>ams</build><build>dtask</build><build>ems</build><build>gwm</build><build>messys</build><build>mers</build><build>tcl</build><build>tk</build><build>nbs</build><build>sae</build><sourceset>star2html</sourceset>
+    <build>ems</build><build>gwm</build><build>mers</build><build>nbs</build><build>pcs</build><build>sae</build><build>starx</build><build>tcl</build><build>tk</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1556,7 +1556,7 @@ UNIX).
      operators (AND, OR, NOT, etc.) to create more complex shapes.
      Data arrays can be multi-dimensional.</p></abstract>
   <dependencies >
-    <build>sae</build><build>ast</build><build>grp</build><build>subpar</build><build>cnf</build><link>ast</link><link>psx</link><link>mers</link><link>chr</link><link>pgplot</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>ast</build><build>cnf</build><build>grp</build><build>pcs</build><build>sae</build><link>ast</link><link>chr</link><link>mers</link><link>pgplot</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1608,7 +1608,7 @@ UNIX).
       is portable and environment-independent.</p>
   </abstract>
   <dependencies >
-    <sourceset>sst</sourceset><build>sla</build><sourceset>messgen</sourceset>
+    <sourceset>sst</sourceset><sourceset>htx</sourceset><build>sla</build><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1767,7 +1767,7 @@ No longer under active control.
       the Starlink software environment, plus routines to interface to
       the Starlink parameter system.</abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>par</build><link>chr</link><link>ems</link><link>mers</link><link>subpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>pcs</build><build>par</build><build>sae</build><link>chr</link><link>ems</link><link>mers</link><link>pcs</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1856,7 +1856,7 @@ No longer under active control.
   package.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>chr</build><build>ems</build><build>par</build><build>mers</build><build>starx</build><build>gks</build><build>gns</build><build>pgp</build><build>sgs</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>sae</build><build>chr</build><build>ems</build><build>par</build><build>mers</build><build>starx</build><build>gks</build><build>gns</build><build>pgp</build><build>sgs</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1895,7 +1895,7 @@ No longer under active control.
       file. It also allows the creation of groups in which each element
       is a modified version of an element in another group.</p></abstract>
   <dependencies >
-    <build>cnf</build><build>sae</build><build>subpar</build><build>prm</build><link>chr</link><link>mers</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>pcs</build><build>prm</build><build>sae</build><link>chr</link><link>mers</link><link>psx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2051,7 +2051,7 @@ No longer under active control.
   (A&amp;AS, 76, 263).
     </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>cnf</build><build>ems</build><build>gns</build><build>gwm</build><build>par</build><build>starx</build><link>cnf</link><link>ems</link><link>gwm</link><link>gns</link><link>starx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>pcs</build><build>sae</build><build>cnf</build><build>ems</build><build>gns</build><build>gwm</build><build>par</build><build>starx</build><link>cnf</link><link>ems</link><link>gwm</link><link>gns</link><link>starx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2083,7 +2083,7 @@ associated header information. It is designed to be easy to use and
 understand.
 </p></abstract>
   <dependencies >
-    <build>ndf</build><build>sae</build><build>hds</build><build>par</build><build>cnf</build><build>prm</build><build>generic</build><link>ndf</link><link>prm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset><build>parsecon</build><build>dtask</build>
+    <build>ndf</build><build>sae</build><build>hds</build><build>par</build><build>cnf</build><build>prm</build><build>generic</build><link>ndf</link><link>prm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset><build>pcs</build>
   </dependencies>
   <developers>
     <person>
@@ -2134,7 +2134,7 @@ KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
 independently of KAPPA.</p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>mag</build><build>subpar</build><build>gks</build><build>gns</build><build>idi</build><build>agi</build><build>ast</build><build>cat</build><build>ndg</build><build>hds</build><build>chr</build><build>fio</build><build>grp</build><build>ndf</build><build>prm</build><build>par</build><build>psx</build><build>snx</build><build>generic</build><link>cat</link><link>mers</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link><link>snx</link><sourceset>star2html</sourceset>
+    <build>pcs</build><build>agi</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>fio</build><build>generic</build><build>gks</build><build>gns</build><build>grp</build><build>hds</build><build>idi</build><build>mag</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>pcs</build><build>prm</build><build>psx</build><build>sae</build><build>snx</build><link>agi</link><link>ast</link><link>cat</link><link>fio</link><link>grp</link><link>mag</link><link>mers</link><link>ndf</link><link>ndg</link><link>pcs</link><link>pda</link><link>pgplot</link><link>prm</link><link>psx</link><link>psx</link><link>snx</link><link>trn</link><sourceset>htx</sourceset><sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2167,7 +2167,7 @@ for DEC Alphas running OSF/1. Historically it has been supported for DEC
 Ultrix and for SunOS and may still work for them.
     </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>par</build><build>hds</build><build>psx</build><build>mers</build><link>par</link><link>hds</link><link>psx</link><link>mers</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>pcs</build><build>sae</build><build>par</build><build>hds</build><build>psx</build><build>mers</build><link>par</link><link>hds</link><link>psx</link><link>mers</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2372,7 +2372,7 @@ Ultrix and for SunOS and may still work for them.
       library -- this may be subject to change in the light of experience.</p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><build>parsecon</build><link>chr</link><link>mers</link><link>subpar</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>pcs</build><build>cnf</build><build>mers</build><build>pcs</build><build>sae</build><link>chr</link><link>mers</link><link>pcs</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2392,15 +2392,35 @@ Ultrix and for SunOS and may still work for them.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="adam">
-  <version>3.0</version>
-  <path>libraries/pcs/adam</path>
-  <description>ADAM -- The Control Subsystem</description>
-  <!-- <abstract><p></p></abstract> -->
+<component id="pcs">
+  <version>4.1-1</version>
+  <path>libraries/pcs</path>
+  <description>PCS -- Parameter and Communication Subsystems</description>
+  <abstract>
+    <p>Application programs often need to obtain parameter
+      values from a variety of sources and to communicate with other programs. 
+      The Parameter and Communication Subsystems (PCS) are a set of
+      closely-related subroutine libraries which provide these
+      facilities for many Starlink applications and the associated
+      user-interfaces.</p>
+    <p>The PCS libraries will not generally be called directly by
+      application programs, but form a basic part of the Starlink
+      Software Environment which is described in Starlink Guide SG/4.
+      Additional notes on using it under Unix are given in Starlink
+      User Note SUN/144.</p>
+  </abstract> 
   <dependencies >
-    <build>sae</build><build>messys</build><link>chr</link><link>psx</link><link>ems</link><link>messys</link>
+    <build>cnf</build><build>ems</build><build>hds</build><build>psx</build><build>sae</build><build option='link'>chr</build><link>chr</link><link>ems</link><link>hds</link><link>hlp</link><link>mers</link><link>psx</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
+    <!-- The following people list was assembled from the individual
+         component.xml files when PCS was reorganised into a single
+         component.  The individual lists were assembled from evidence
+         within code comments.  There's a certain amount of
+         duplication, so that Alan Chipperfield appears numerous
+         times. -->
+
+    <!--libraries/pcs/adam-->
     <person>
       <name>John Cooke (REVAD::JAC)</name>
     </person>
@@ -2411,24 +2431,8 @@ Ultrix and for SunOS and may still work for them.
       <name>Alan J Chipperfield</name>
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
-  </developers>
-  <documentation>ssn77 sun115 </documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Part of the PCS system.</p></notes>
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="adamnet" status="obsolete">
-  <version>1.0</version>
-  <path>libraries/pcs/adamnet</path>
-  <description>Implements the ADAM networking process. It interfaces
-  the ADAM intertask communication software on unix to TCP/IP, thereby
-  allowing ADAM tasks on different machines to communicate with one
-  another. </description>
-  <dependencies >
-    <build>sae</build><build>messys</build><build>adam</build><build>ams</build><build>msp</build><build>sock</build><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
+    <!--libraries/pcs/adamnet-->
     <person>
       <name>B.D.Kelly (REVAD::BDK)</name>
     </person>
@@ -2437,86 +2441,34 @@ Ultrix and for SunOS and may still work for them.
       <uname>bkm</uname>
       <email>b.k.mcilwrath@rl.ac.uk</email>
     </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="ams">
-  <version>1.3</version>
-  <path>libraries/pcs/ams</path>
-  <description>ADAM Message System</description>
-  <!-- <abstract><p></p></abstract> -->
-  <dependencies >
-    <build>sae</build><build>cnf</build><build>dtask</build><build>atimer</build><build>messys</build><build>msp</build><build>adam</build>
-  </dependencies>
-  <developers>
+    <!--libraries/pcs/ams-->
     <person><name>Ian Jenkins (IRJ)</name></person>
     <person><name>Dennis Kelly (BDK)</name></person>
     <person><name>Brian McIlwrath (BKM)</name></person>
     <person><name>Alan Chipperfield (AJC)</name></person>
     <person><name>David Terrett (DLT)</name></person>
-  </developers>
-  <!-- <documentation></documentation> -->
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="atimer">
-  <version>1.0</version>
-  <path>libraries/pcs/atimer</path>
-  <description>ATIMER -- millisecond interval timers</description>
-  <abstract><p>This library provides a system of millisecond interval
-      timers used by the message system and DTASK.  Each timer has an
-      associated handler which is invoked when the timer expires.  The
-      library is written in C but a Fortran interface, FATIMER, is
-      provided.</p></abstract>
-  <dependencies >
-    <build>sae</build><build>cnf</build><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
+    <!--libraries/pcs/atimer-->
     <person>
       <name>Alan J Chipperfield</name>
       <uname>ajc</uname>
       <email>a.j.chipperfield@rl.ac.uk</email>
     </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Described in SSN/29</p></notes>
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="dtask">
-  <version>3.0</version>
-  <path>libraries/pcs/dtask</path>
-  <description>DTASK linking library</description>
-  <abstract><p>ADD DETAILS!</p></abstract>
-  <dependencies >
-    <build>adam</build><build>cnf</build><build>messys</build><build>psx</build><build>sae</build><build>subpar</build><link>chr</link><link>ems</link><link>mers</link><link>ams</link><link>atimer</link><link>hds</link><link>psx</link><link>subpar</link><use>hdspar</use><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
+    <!--libraries/pcs-->
+    <person>
+      <name>Alan J Chipperfield</name>
+    </person>
+
+    <!--libraries/pcs/dtask-->
     <person>
       <name>Alan J Chipperfield</name>
       <uname>ajc</uname>
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
-  </developers>
-  <!-- <documentation></documentation> -->
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="hdspar">
-  <version>1.0-1</version>
-  <path>libraries/pcs/hdspar</path>
-  <description>Part of the HDS system.  HDSPAR declares bulk data
-    parameters.</description>
-  <dependencies >
-    <build>sae</build><link>subpar</link>
-  </dependencies>
-  <developers>
+    <!--libraries/pcs/hdspar-->
     <person>
       <name>B D Kelly, ROE</name>
     </person>
@@ -2525,21 +2477,8 @@ Ultrix and for SunOS and may still work for them.
       <uname>ajc</uname>
       <email>a.j.chipperfield@rl.ac.uk</email>
     </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Documented in SUN/224, handled in pcs directory</p></notes>
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="lex">
-  <version>1.2-1</version>
-  <path>libraries/pcs/lex</path>
-  <description>SUBPAR lexical analyser</description>
-  <!-- <abstract><p></p></abstract> -->
-  <dependencies >
-    <build>sae</build><link>ems</link><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
+    <!--libraries/pcs/lex-->
     <person>
       <name>Jeremy Bailey (AAOEPP::JAB)</name>
     </person>
@@ -2552,75 +2491,23 @@ Ultrix and for SunOS and may still work for them.
       <name>Tim Jenness (JACH::TIMJ)</name>
       <email>t.jenness@jach.hawaii.edu</email>
     </person>
-  </developers>
-  <!-- documentation is maintained in the parent package -->
-  <documentation>ssn29 </documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Part of the PCS package</p></notes>
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="messys">
-  <version>3.0</version>
-  <path>libraries/pcs/messys</path>
-  <description>Message system</description>
-  <!-- <abstract><p></p></abstract> -->
-  <dependencies >
-    <build>sae</build><link>ams</link><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
+    <!--libraries/pcs/messys-->
     <person>
       <name>B D Kelly (REVAD::BDK)</name>
     </person>
     <person>
       <name>Alan J Chipperfield (RLVAD::AJC)</name>
     </person>
-  </developers>
-  <!-- <documentation></documentation> -->
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Part of the PCS system</p></notes>
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="misc">
-  <version>1.4</version>
-  <path>libraries/pcs/misc</path>
-  <description>Miscellaneous routines required for the Unix build of
-    ADAM/HDS</description>
-  <abstract><p>Miscellaneous routines which do not fit into other
-      libraries.  Two handle terminal I/O for programs running
-      directly from a Unix shell and others provide a Fortran
-      interface into the C library for platforms (notably Linux) which
-      do not include them as part of the system.</p></abstract>
-  <dependencies >
-    <build>cnf</build>
-  </dependencies>
-  <developers>
+    <!--libraries/pcs/misc-->
     <person>
       <name>Alan J Chipperfield</name>
       <uname>ajc</uname>
       <email>a.j.chipperfield@rl.ac.uk</email>
     </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Documented in SUN/144 in PCS</p></notes>
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="msp">
-  <version>2.3</version>
-  <path>libraries/pcs/msp</path>
-  <description>Message System Primitives library</description>
-  <abstract><p>MSP uses a single STREAM socket (path) in the INET
-      domain to communicate between any two tasks and a STREAM socket pair
-      in the UNIX domain to send/receive local (internal)
-      messages. Messages on the sockets specify a `queue' in the
-      receiving task for which they are intended and a queue in the
-      sending task to which replies should be sent.</p></abstract>
-  <dependencies >
-    <build>sae</build><build>sock</build><link>sock</link><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
+    <!--libraries/pcs/msp-->
     <person>
       <name>B D Kelly (ROE)</name>
     </person>
@@ -2629,24 +2516,8 @@ Ultrix and for SunOS and may still work for them.
       <uname>ajc</uname>
       <email>a.j.chipperfield@ral.ac.uk</email>
     </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Documented in SUN/241 in PCS system</p></notes>
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="parsecon">
-  <version>1.3</version>
-  <path>libraries/pcs/parsecon</path>
-  <description>Parsing of the interface files associated with
-    SUBPAR</description>
-  <abstract><p>Parsing of the interface files associated with SUBPAR.
-      The package also includes the interface file compiler,
-      COMPIFL.</p></abstract>
-  <dependencies >
-    <build>hds</build><build>sae</build><build option='link'>chr</build><build option='link'>ems</build><build option='link'>string</build><build option='link'>subpar</build><link>chr</link><link>ems</link><link>string</link><link>subpar</link><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
+    <!--libraries/pcs/parsecon-->
     <person>
       <name>B D Kelly (ROE)</name>
     </person>
@@ -2655,113 +2526,27 @@ Ultrix and for SunOS and may still work for them.
       <uname>ajc</uname>
       <email>a.j.chipperfield@rl.ac.uk</email>
     </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Documented in passing in SSN/29</p></notes>
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="pcs-docs">
-  <version>1.0</version>
-  <path>libraries/pcs/pcs-docs</path>
-  <description>PCS documentation</description>
-  <!-- <abstract><p></p></abstract> -->
-  <dependencies >
-    <sourceset>star2html</sourceset>
-  </dependencies>
-  <!--
-  <developers>
-    <person>
-      <name></name>
-      <uname></uname>
-      <email></email>
-    </person>
-  </developers>
-  -->
-   <documentation> ssn29 ssn77 sun115 sun134 sun144 sun224 sun241</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
-<component id="sock">
-  <version>1.0</version>
-  <path>libraries/pcs/sock</path>
-  <description>Provides a Unix-socket-based message transport system
-    for the MSP system</description>
-  <dependencies >
-    <build>sae</build><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
+    <!--libraries/pcs/sock-->
     <person>
       <name>B D Kelly</name>
     </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Described in SSN/29</p></notes>
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="string">
-  <version>1.1-1</version>
-  <path>libraries/pcs/string</path>
-  <description>Fortran string manipulation subroutines</description>
-  <abstract><p>Fortran string manipulation subroutines. These
-      subroutines are also used by software items outside the
-      parameter system, but the library has no published
-      interface</p></abstract>
-  <dependencies >
-    <build>sae</build><build>chr</build><link>chr</link><link>ems</link>
-  </dependencies>
-  <developers>
+    <!--libraries/pcs/string-->
     <person>
       <name>Alan J Chipperfield</name>
       <uname>ajc</uname>
       <email>a.j.chipperfield@rl.ac.uk</email>
     </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Described in SSN/29, but has no published interface</p></notes>
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="subpar">
-  <version>2.1</version>
-  <path>libraries/pcs/subpar</path>
-  <description>Parameter subsystem</description>
-  <!-- <abstract><p></p></abstract> -->
-  <dependencies >
-    <build>adam</build><build>chr</build><build>hds</build><build>ems</build><build>lex</build><build>messys</build><build>sae</build><link>ams</link><link>chr</link><link>ems</link><link>hds</link><link>hlp</link><link>lex</link><link>misc</link><link>parsecon</link><link>psx</link><link>string</link><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
+    <!--libraries/pcs/subpar-->
     <person>
       <name>Alan J Chipperfield</name>
       <uname>ajc</uname>
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
-  </developers>
-  <!-- <documentation></documentation> -->
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="task">
-  <version>2.0</version>
-  <path>libraries/pcs/task</path>
-  <description>TASK -- an interface between the
-  application code and the DTASK layer</description>
-  <abstract><p>This library provides an interface between the
-      application code and the DTASK layer so that an application can
-      find out some information about its own status. It also enables
-      programs to control other co-operating programs using the ADAM
-      message protocol and includes subroutines for encoding and
-      decoding data values in messages.  For examples of use, see
-      SUN/134.</p></abstract>
-  <dependencies >
-    <build>adam</build><build>dtask</build><build>messys</build><build>sae</build><build>subpar</build><link>ams</link><link>chr</link><link>dtask</link><link>ems</link><link>mers</link><link>string</link><link>subpar</link><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
+    <!--libraries/pcs/task-->
     <person>
       <name>B D Kelly</name>
     </person>
@@ -2771,8 +2556,9 @@ Ultrix and for SunOS and may still work for them.
       <email>a.j.chipperfield@rl.ac.uk</email>
     </person>
   </developers>
+  <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Described in SSN/29, with examples in SUN/134</p></notes>
+  <notes><p>Documentation is in the pcs-docs subdirectory.</p></notes>
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
@@ -3011,7 +2797,7 @@ Ultrix and for SunOS and may still work for them.
      SHL.</p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>fio</build><build>cnf</build><build>hlp</build><build>mers</build><build>one</build><link>fio</link><link>cnf</link><link>hlp</link><link>par</link><link>mers</link><link>one</link>
+    <build>pcs</build><build>sae</build><build>fio</build><build>cnf</build><build>hlp</build><build>mers</build><build>one</build><link>fio</link><link>cnf</link><link>hlp</link><link>par</link><link>mers</link><link>one</link>
   </dependencies>
   <developers>
     <person>
@@ -3250,7 +3036,7 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
 
 <component id="jpeg">
   <version>6b</version>
-  <path>thirdparty/ijg/jpeg</path>
+  <path>thirdparty/ijl/jpeg</path>
   <description>Independent JPEG Group library</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >

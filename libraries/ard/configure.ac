@@ -25,8 +25,8 @@ dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [sae ast grp subpar cnf])
-STAR_DECLARE_DEPENDENCIES(link,  [ast psx mers chr pgplot])
+STAR_DECLARE_DEPENDENCIES(build, [ast cnf grp pcs sae])
+STAR_DECLARE_DEPENDENCIES(link, [ast chr mers pgplot psx])
 
 dnl    Check for PGPLOT since there is a slight dependency on it.
 AC_CHECK_LIB(pgplot,pgbbuf_)

@@ -12,7 +12,7 @@ associated header information. It is designed to be easy to use and
 understand.
 </p></abstract>
   <dependencies >
-    <build>ndf</build><build>sae</build><build>hds</build><build>par</build><build>cnf</build><build>prm</build><build>generic</build><link>ndf</link><link>prm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset><build>parsecon</build><build>dtask</build>
+    <build>ndf</build><build>sae</build><build>hds</build><build>par</build><build>cnf</build><build>prm</build><build>generic</build><link>ndf</link><link>prm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset><build>pcs</build>
   </dependencies>
   <developers>
     <person>

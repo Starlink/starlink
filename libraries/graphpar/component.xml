@@ -13,7 +13,7 @@
   package.
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>sae</build><build>chr</build><build>ems</build><build>par</build><build>mers</build><build>starx</build><build>gks</build><build>gns</build><build>pgp</build><build>sgs</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build>sae</build><build>chr</build><build>ems</build><build>par</build><build>mers</build><build>starx</build><build>gks</build><build>gns</build><build>pgp</build><build>sgs</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

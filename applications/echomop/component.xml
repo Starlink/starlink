@@ -18,7 +18,7 @@
       fitting and extraction.</p>
   </abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>cnf</build><build>fio</build><build>hds</build><build>hlp</build><build>mers</build><build>ndf</build><build>par</build><build>pda</build><build>pgp</build><build>prm</build><build>sae</build><build>sla</build><build>shl</build><build>mers</build><build option='link'>kaplibs</build><sourceset>htx</sourceset>
+    <build>pcs</build><build>cnf</build><build>fio</build><build>hds</build><build>hlp</build><build>mers</build><build>ndf</build><build>par</build><build>pda</build><build>pgp</build><build>prm</build><build>sae</build><build>sla</build><build>shl</build><build>mers</build><build option='link'>kaplibs</build><sourceset>htx</sourceset>
   </dependencies>
   <developers>
     <person>
