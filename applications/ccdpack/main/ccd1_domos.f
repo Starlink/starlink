@@ -313,6 +313,11 @@
 *     27-NOV-2000 (MBT):
 *        Fixed bug; the weight array being passed to CCG1_CM3 routines
 *        was not indexed correctly.
+*     5-JAN-2004 (MBT):
+*        Fixed bug; attempt could be made to unmap non-mapped component
+*        if the first chunk had no contributing pixels.  Think I've done
+*        this correctly, but it is slightly surprising that it hasn't 
+*        been spotted before.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -424,6 +429,7 @@
       LOGICAL BDOUTD            ! Output data has bad pixels?
       LOGICAL BDOUTV            ! Output variance has bad pixels?
       LOGICAL GVAR              ! Generate output variances?
+      LOGICAL OUT1              ! First output chunk to be written?
       LOGICAL UVAR              ! Use variances for weighting?
       LOGICAL VAR               ! Input NDF has variance information?
       LOGICAL EVAR              ! Create variances from data
@@ -574,6 +580,7 @@
 *  Divide the output NDF into chunks of contiguous pixels for
 *  processing.
       CALL NDF_NCHNK( NDFOUT, MXPIX, NCHUNK, STATUS )
+      OUT1 = .TRUE.
       DO 10 ICHUNK = 1, NCHUNK
 
 *  Begin an NDF context for each chunk and select the chunk.
@@ -1009,7 +1016,8 @@
 *  If this is the first output chunk to be written, then unmap it,
 *  causing the values assigned to be written back to the data
 *  structure.
-            IF ( ICHUNK .EQ. 1 ) THEN
+            IF ( OUT1 .AND. NIC .NE. 0 ) THEN
+               OUT1 = .FALSE.
                CALL NDF_UNMAP( NDFC, COMP2, STATUS )
 
 *  If no bad pixels were assigned to either of its arrays, then check
