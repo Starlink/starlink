@@ -12,11 +12,16 @@ int main()
 {
    char *string;
    int length;
+   void * dummy;
 
    string = "Twenty six characters long";
    length = cnf_lenc( string );
 
    printf( "The string \"%s\" is %d characters long\n", string, length );
+
+   /* Make sure we can alloc and free */
+   dummy = cnfMalloc( 10 );
+   cnfFree( dummy );
 
    exit( 0 );
 }
