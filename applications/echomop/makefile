@@ -443,8 +443,8 @@ PKG_LINK = ECHOMOP
 #  functionality.  Any revision number (appended after a dash) should
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
-
-PKG_VERS = 3.3-5
+#  %%VERSION%%
+PKG_VERS = 3.3-6
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -470,7 +470,7 @@ PUBLIC_SCRIPTS = decos_many ech_toarchive
 #  and environment variables.  It is listed separately from the public
 #  scripts as it is edited by the installation procedure.
 
-STARTUP_SCRIPT = $(PKG_NAME).csh
+STARTUP_SCRIPT = $(PKG_NAME).csh $(PKG_NAME).sh
 
 #  List of public include files.  These are include files
 #  which form part of the package and are required in order to build
@@ -690,16 +690,18 @@ TEST_FILES_ARCHIVE = $(PKG_NAME)_test.tar
 
 #  Lists of LaTeX and hypertext documents.
 
-LATEX_DOCS = sun152.tex sun152_cover.eps \
-   sun152_01.eps sun152_02.eps sun152_03.eps sun152_04.eps \
-   sun152_05.eps sun152_06.eps sun152_07.eps sun152_08.eps \
-   sun152_glossy1.eps sun152_glossy2.eps
+#LATEX_DOCS = sun152.tex sun152_cover.eps \
+#   sun152_01.eps sun152_02.eps sun152_03.eps sun152_04.eps \
+#   sun152_05.eps sun152_06.eps sun152_07.eps sun152_08.eps \
+#   sun152_glossy1.eps sun152_glossy2.eps
 
-HYPERTEXT_DOCS = sun152.htx
+LATEX_DOCS = sun152.latex_tar
+
+HYPERTEXT_DOCS = sun152.htx_tar
 
 #  List of documentation files.
 
-DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
+DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS) $(PKG_NAME).news VERSION
 
 ################################################################################
 #-------------------------------------------------------------------------------
@@ -1267,39 +1269,51 @@ install:
 #  libraries must be edited into this, and execute permission given.
 #  Leave the original file in place.
 	if test -n "$(STARTUP_SCRIPT)"; then \
-           sed -e s#INSTALL_BIN#$(INSTALL_BIN)# \
-               -e s#INSTALL_HELP#$(INSTALL_HELP)# \
-               -e s#PKG_VERS#$(PKG_VERS)# \
-              $(STARTUP_SCRIPT) >$(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
-           chmod 755 $(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
+           for f in $(STARTUP_SCRIPT) ""; do \
+              sed -e s#INSTALL_BIN#$(INSTALL_BIN)# \
+                  -e s#INSTALL_HELP#$(INSTALL_HELP)# \
+                  -e s#PKG_VERS#$(PKG_VERS)# \
+                 $$f >$(INSTALL_BIN)/$$f ;\
+              chmod 755 $(INSTALL_BIN)/$$f ;\
+            done; \
         else :; fi
 #
 #  Install the Latex documentation, giving it world read permission,
 #  leaving the source copy in place.
-	for f in $(LATEX_DOCS) ""; do \
-           if test -n "$$f"; then \
-              cp -p $$f $(INSTALL_DOCS);\
-              chmod 644 $(INSTALL_DOCS)/$$f;\
-           else :; fi;\
-        done
+#	for f in $(LATEX_DOCS) ""; do \
+#           if test -n "$$f"; then \
+#              cp -p $$f $(INSTALL_DOCS);\
+#              chmod 644 $(INSTALL_DOCS)/$$f;\
+#           else :; fi;\
+#        done
+	if test -n "$(LATEX_DOCS)"; then \
+	    pwd=`pwd`; \
+	    (cd $(INSTALL_DOCS); $(TAR_OUT) $$pwd/$(LATEX_DOCS)); \
+	fi
 #
 #  Install any hypertext documents, giving world read access to all the files
 #  they contain and linking with other documents.
+#	if test -n "$(HYPERTEXT_DOCS)"; then \
+#           pwd=`pwd`;\
+#           (cd $(INSTALL_DOCS);\
+#           for f in $(HYPERTEXT_DOCS) ""; do \
+#              if test -n "$$f"; then\
+#                 $(TAR_OUT) $$pwd/$${f}_tar;\
+#                 chmod 755 `find $$f -type d -print`;\
+#                 chmod 644 `find $$f ! -type d -print`;\
+#                 touch $$f;\
+#              else :; fi;\
+#           done);\
+#           HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
+#           export HTX_PATH;\
+#           $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
+#        fi
 	if test -n "$(HYPERTEXT_DOCS)"; then \
-           pwd=`pwd`;\
-           (cd $(INSTALL_DOCS);\
-           for f in $(HYPERTEXT_DOCS) ""; do \
-              if test -n "$$f"; then\
-                 $(TAR_OUT) $$pwd/$${f}_tar;\
-                 chmod 755 `find $$f -type d -print`;\
-                 chmod 644 `find $$f ! -type d -print`;\
-                 touch $$f;\
-              else :; fi;\
-           done);\
-           HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
-           export HTX_PATH;\
-           $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
-        fi
+	    pwd=`pwd`; \
+	    (cd $(INSTALL_DOCS); $(TAR_OUT) $$pwd/$(HYPERTEXT_DOCS)); \
+	    HTX_PATH=$(STAR_DOCS):$(STAR_HELP) \
+		$(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
+	fi
 #
 #  Install the date stamp file and make it read-only to prevent its
 #  date being changed.
@@ -1451,34 +1465,50 @@ do_deinstall:
            else :; fi;\
         done
 #
-#  Deinstall the package startup file.  Since it will have been edited
+#  Deinstall the package startup files.  Since it will have been edited
 #  during installation, we remove the installed copy, if present, and
 #  then ensure that the original exists.
 	- if test -n "$(STARTUP_SCRIPT)"; then \
-           if test -f $(INSTALL_BIN)/$(STARTUP_SCRIPT); then\
-              rm -f $(INSTALL_BIN)/$(STARTUP_SCRIPT);\
-           else :; fi ;\
-           $(MAKE) $(STARTUP_SCRIPT);\
+             for f in $(STARTUP_SCRIPT) ""; do \
+                if test -f $(INSTALL_BIN)/$$f; then \
+                   rm -f $(INSTALL_BIN)/$$f;\
+                else :; fi ; \
+                $(MAKE) $$f; \
+             done; \
         else :; fi
 #
 #  Deinstall the Latex documentation, if installed versions exist.
-	- for f in $(LATEX_DOCS) ""; do \
-           if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
-              rm -f $(INSTALL_DOCS)/$$f;\
-           else :; fi;\
-        done
+#	- for f in $(LATEX_DOCS) ""; do \
+#           if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
+#              rm -f $(INSTALL_DOCS)/$$f;\
+#           else :; fi;\
+#        done
+	if test -f $(LATEX_DOCS); then \
+	    for f in `$(TAR_LIST) $(LATEX_DOCS)`; do \
+		rm -f $(INSTALL_DOCS)/$$f ;\
+	    done; \
+	fi
 #
 #  Deinstall any hypertext documents,  and relink the hypertext if required.
-	- if test -n "$(HYPERTEXT_DOCS)"; then \
-           for f in $(HYPERTEXT_DOCS) ""; do \
-              if test -n "$$f" -a -d $(INSTALL_DOCS)/$$f; then \
-                 rm -f -r $(INSTALL_DOCS)/$$f;\
-              else :; fi;\
-           done;\
-           HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
-           export HTX_PATH;\
-           $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
-        fi
+#	- if test -n "$(HYPERTEXT_DOCS)"; then \
+#           for f in $(HYPERTEXT_DOCS) ""; do \
+#              if test -n "$$f" -a -d $(INSTALL_DOCS)/$$f; then \
+#                 rm -f -r $(INSTALL_DOCS)/$$f;\
+#              else :; fi;\
+#           done;\
+#           HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
+#           export HTX_PATH;\
+#           $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
+#        fi
+#       Read just the first line of the tar archive TOC, to get the name
+#       of the .htx directory, and delete this directory and its contents.
+	if test -f $(HYPERTEXT_DOCS); then \
+	    for f in `$(TAR_LIST) $(HYPERTEXT_DOCS) | sed 1q`; do \
+		rm -Rf $(INSTALL_DOCS)/$$f ;\
+	    done; \
+	    HTX_PATH=$(STAR_DOCS):$(STAR_HELP) \
+		$(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
+	fi
 #
 #  Deinstall the date stamp file after setting its protection so it may
 #  be removed.
@@ -1655,7 +1685,7 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #  SOURCE_FILES from their contents.
 
 export_dev: $(PKG_NAME)_source.tar $(PKG_NAME)_arc.tar $(PKG_NAME)_data.tar \
-   $(PKG_NAME)_def.tar $(PKG_NAME)_demo.tar  $(HYPERTEXT_DOCS:.htx=.htx_tar) \
+   $(PKG_NAME)_def.tar $(PKG_NAME)_demo.tar  $(HYPERTEXT_DOCS) \
    $(PKG_NAME)_hyper.tar $(PKG_NAME)_ifl.tar $(PKG_NAME)_inc.tar \
    $(PKG_NAME)_test.tar
 
@@ -1665,8 +1695,9 @@ $(PKG_NAME)_source.tar:
 	   ech_tuner.f ech_decos1.f \
 	   ech_decos2.f $(MONO_SOURCE) $(HELPTASK_SOURCE)
 
-$(HYPERTEXT_DOCS:.htx=.htx_tar): $(HYPERTEXT_DOCS)
-	$(TAR_IN) $@ $(@:.htx_tar=.htx)
+$(HYPERTEXT_DOCS):
+	(cd doc; $(MAKE) HYPERTEXT_DOCS=$(HYPERTEXT_DOCS) $@)
+	test -f doc/$@ && ln -f doc/$@ ./$@
 
 $(PKG_NAME)_arc.tar:
 	$(TAR_IN) $@ $(ARC_FILES)
@@ -1677,11 +1708,27 @@ $(PKG_NAME)_data.tar:
 $(PKG_NAME)_def.tar:
 	$(TAR_IN) $@ $(DEF_FILES)
 
-$(PKG_NAME)_demo.tar:
-	$(TAR_IN) $@ $(DEMO_FILES)
+# ech_demo.txt is assembled from the files mentioned in ech_demo.csh
+# (has to exist because it's mentioned in the documentation)
+$(PKG_NAME)_demo.tar: ech_demo.txt
+	$(TAR_IN) $@ $(DEMO_FILES) ech_demo.txt
+
+ech_demo.txt: ech_demo.csh
+	echo '### ech_demo script...' > $@
+	for f in `sed -n '/^more/s+^[^/]*/++p' ech_demo.csh `; do \
+		echo "###"	>> $@; \
+		echo "### $$f"	>> $@; \
+		echo "###"	>> $@; \
+		cat $$f		>> $@; \
+	done
 
 $(PKG_NAME)_hyper.tar:
-	cd hyper; $(TAR_IN) ../$@ .
+	(cd doc; $(MAKE) PKG_NAME=$(PKG_NAME) $@)
+	test -f doc/$@ && ln -f doc/$@ ./$@
+
+$(LATEX_DOCS):
+	(cd doc; $(MAKE) LATEX_DOCS=$(LATEX_DOCS) $@)
+	test -f doc/$@ && ln -f doc/$@ ./$@
 
 $(PKG_NAME)_ifl.tar:
 	$(TAR_IN) $@ $(IFL_FILES) $(MONO_IFL)
@@ -1691,6 +1738,12 @@ $(PKG_NAME)_inc.tar:
 
 $(PKG_NAME)_test.tar:
 	$(TAR_IN) $@ $(TEST_FILES)
+
+#  Propagate the version number (there's also a dependency of
+#  echmono.f on VERSION, but some makes don't like a file having two
+#  dependencies).
+makefile: VERSION
+	./propagate-version makefile echmono.f
 
 #  clean: Clean up the source directory.
 #  ------------------------------------
