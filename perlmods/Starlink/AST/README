@@ -31,7 +31,7 @@ The AST library provides:
 REQUIREMENTS
 ------------
 
-Has been tested with AST v1.8 onwards (AST is currently at v3.2)
+Has been tested with AST v1.8 onwards (AST is currently at v3.5)
 and with perl 5.005 through perl 5.8.3. Also known to work on Linux,
 Mac OS X, Solaris and Digital Unix.
 
@@ -89,3 +89,15 @@ v0.01 - First release. Most methods implemented. PGPLOT and PLplot
 
 v0.02 - Same as 0.01 except that now include the PLplot interface
         which was mistakenly missing from the MANIFEST
+
+v0.03 - Now supports AST functionality added between v3.2 and v3.5 of AST
+        (if you don't have this version it will still compile with older
+        versions of AST but these routines will not be available)
+        + Support for Regions
+        + Support for FluxFrames and SpecFluxFrames
+        + Support for RateMap
+        + Support for KeyMap
+        + Support for DSBSpecFrame
+        + astRate now returns the second derivative only if the version
+           supports it
+        + Add astLinearApprox (Mapping), astEscapes (Plotting), astPutCards (FitsChan)
