@@ -35,7 +35,7 @@
  *      30-MAY-2001
  *         Now supports double precision data type correctly.
  *      31-MAY-2001
- *         Made NDF name handling more robust to very long names 
+ *         Made NDF name handling more robust to very long names
  *         (>MAXNDFNAME).
  *      {enter_changes_here}
  *-
@@ -51,6 +51,7 @@
 #include "ems_par.h"
 #include "ems.h"
 #include "dat_par.h"
+#define DAT__OBJIN 147358563  /* Not available in HDS include files */
 #include "ndf.h"
 #include "gaiaNDF.h"
 
@@ -138,6 +139,8 @@ static void hdsShow( const char *name, int *status );
 
 static char *errMessage( int *status );
 
+static int datValid( const char *loc, int *status );
+
 /*
  *  Name:
  *     errMessage
@@ -151,26 +154,69 @@ static char *errMessage( int *status );
  */
 static char *errMessage( int *status )
 {
-   char *opPtr = (char *) NULL;
-   char *opStr = (char *) NULL;
-   char param[EMS__SZPAR+1];
-   int errcount = 1;
-   int i;
-   int j;
-   int used = 0;
+    char buffer[EMS__SZMSG+1];
+    char param[EMS__SZPAR+1];
+    char *result_message = NULL;
+    char *result_copy = NULL;
+    int status_copy;
+    int buffer_length = 0;
+    int mess_length = 0;
+    int param_length = 0;
+    int result_length = 0;
 
-   while ( *status != SAI__OK ) {
-      opStr = (char *)realloc( (void *)opStr,
-                               (size_t) EMS__SZMSG * sizeof(char) * errcount++ );
-      opPtr = opStr + used;
-      emsStat( status );
-      emsEload( param, &i, opPtr, &j, status);
-      used += j;
-      opStr[used++] ='\n';
-   }
-   opStr[used] = '\0';
-   emsAnnul( status );
-   return opStr;
+    if ( status != SAI__OK ) {
+        /* Need to get error message in one pass. Since we don't know how
+           big this is going to be we need to realloc memory used */
+
+        /* Recover error status from EMS */
+        emsStat( &status_copy );
+
+        /* Loop until all error has been read */
+        while ( status_copy != SAI__OK ) {
+
+            /* Load error message and start reading it */
+            emsEload( param, &param_length, buffer, &buffer_length,
+                      &status_copy );
+
+            /* If all read then stop */
+            if ( status_copy != SAI__OK ) {
+
+                /* Else initialise or increase the result buffer to
+                   make room for new part, plus 2 for newline and
+                   null. */
+                mess_length += ( buffer_length + 2 );
+                result_copy = (char *) realloc( (void *) result_message,
+                                                (size_t) mess_length );
+                if ( result_copy == NULL ) {
+
+                    /* Realloc failed so use the fragment already
+                       recovered in  result_message */
+                    status_copy = SAI__OK;
+                }
+                else {
+                    /* Realloc suceeded */
+                    result_message = result_copy;
+
+                    /* Add a newline to end of string to wrap last
+                       line, unless this is first, in which initialise
+                       it */
+                    if ( mess_length == ( buffer_length + 2 ) ) {
+                        result_message[0] = '\0';
+                    }
+                    else {
+                        strcat( result_message, "\n" );
+                    }
+
+                    /* Concatenate buffer into result string */
+                    strncat( result_message, buffer, buffer_length );
+                }
+            }
+        }
+    }
+    else {
+        result_message = strdup( "Bad status value (gaiaNDF:errMessage)" );
+    }
+    return result_message;
 }
 
 /*
@@ -225,8 +271,9 @@ int gaiaAccessNDF( const char *filename, int *type, int *width, int *height,
        cnf_free( (void *)charPtr );
        emsRlse();
        return 1;
-   } else {
-       
+   }
+   else {
+
        /* Filename too long. */
        *error_mess = strdup( "NDF specification is too long" );
        return 0;
@@ -383,7 +430,8 @@ int gaiaCopyNDF( int ndfid, void **data, const char* component,
              *toPtr++ = *fromPtr++;
          }
       }
-   } else if ( strncmp( dtype, "_REAL", 5 ) == 0 ) {
+   }
+   else if ( strncmp( dtype, "_REAL", 5 ) == 0 ) {
       float *fromPtr;
       float *toPtr = *data;
       for ( i = 1; i <= nchunk; i++ ) {
@@ -394,7 +442,8 @@ int gaiaCopyNDF( int ndfid, void **data, const char* component,
             *toPtr++ = *fromPtr++;
          }
       }
-   } else if ( strncmp( dtype, "_INTEGER", 8 ) == 0 ) {
+   }
+   else if ( strncmp( dtype, "_INTEGER", 8 ) == 0 ) {
       int *fromPtr;
       int *toPtr = *data;
       for ( i = 1; i <= nchunk; i++ ) {
@@ -405,7 +454,8 @@ int gaiaCopyNDF( int ndfid, void **data, const char* component,
             *toPtr++ = *fromPtr++;
          }
       }
-   } else if ( strncmp( dtype, "_WORD", 5 ) == 0 ||
+   }
+   else if ( strncmp( dtype, "_WORD", 5 ) == 0 ||
                strncmp( dtype, "_UWORD", 6 ) == 0 ) {
       unsigned short *fromPtr;
       unsigned short *toPtr = *data;
@@ -417,7 +467,8 @@ int gaiaCopyNDF( int ndfid, void **data, const char* component,
             *toPtr++ = *fromPtr++;
          }
       }
-   } else if ( strncmp( dtype, "_BYTE", 5 ) == 0 ) {
+   }
+   else if ( strncmp( dtype, "_BYTE", 5 ) == 0 ) {
       unsigned char *fromPtr;
       unsigned char *toPtr = *data;
       for ( i = 1; i <= nchunk; i++ ) {
@@ -428,7 +479,8 @@ int gaiaCopyNDF( int ndfid, void **data, const char* component,
             *toPtr++ = *fromPtr++;
          }
       }
-   } else if ( strncmp( dtype, "_UBYTE", 6 ) == 0 ) {
+   }
+   else if ( strncmp( dtype, "_UBYTE", 6 ) == 0 ) {
 
       /*  Cannot represent this type, so mapping is to short */
       unsigned char *fromPtr;
@@ -562,7 +614,8 @@ static void setState( struct NDFinfo *state, int ndfid, const char *name,
    if ( exists ) {
       ncomp++;
       state->havevar = 1;
-   } else {
+   }
+   else {
       state->havevar = 0;
    }
 
@@ -570,7 +623,8 @@ static void setState( struct NDFinfo *state, int ndfid, const char *name,
    if ( exists ) {
       ncomp++;
       state->havequal = 1;
-   } else {
+   }
+   else {
       state->havequal = 0;
    }
 
@@ -636,13 +690,13 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
    NDFinfo *head = (NDFinfo *) NULL;
    NDFinfo *newstate = (NDFinfo *) NULL;
    NDFinfo *state = (NDFinfo *) NULL;
-   char *emess;
-   char *filename;
-   char *ftype;
-   char *header;
-   char *left;
-   char *path;
-   char *right;
+   char *emess = NULL;
+   char *filename = NULL;
+   char *ftype = NULL;
+   char *header = NULL;
+   char *left = NULL;
+   char *path = NULL;
+   char *right = NULL;
    char baseloc[DAT__SZLOC];
    char ndffile[MAXNDFNAME];
    char ndfpath[MAXNDFNAME];
@@ -657,7 +711,7 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
    int isect;
    int istop = 0;
    int level;
-   int ncomp;
+   int ncomp = 0;
    int ndfid;
    int same;
    int status = SAI__OK;
@@ -698,16 +752,22 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
       right = strrchr( name, ')');
       if ( left && right ) {
          strcpy( slice, left );
-      } else {
+      }
+      else {
          slice[0] = '\0';
       }
-      if ( status != SAI__OK ) {
+      if ( status == DAT__OBJIN ) {
 
-         /*  At top level already */
+         /*  At top level, so no parent available */
          emsAnnul( &status );
          datClone( tmploc, baseloc, &status );
       }
-   } else {
+      else {
+          /*  Some other error occured, just let it go */
+          emess = errMessage( &status );
+      }
+   }
+   else {
 
       /*  May just be a HDS container name with NDFs at this level. Need
        *  to parse down to a filename and a HDS path.
@@ -723,7 +783,8 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
       path = strrchr( filename, '/' );  /* Last / in name */
       if ( ! path ) {
          path = strchr( filename, '.' );
-      } else {
+      }
+      else {
          path = strchr( path, '.' );
       }
       if ( path ) {
@@ -737,7 +798,8 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
       /*  Now look for the object specified by the PATH */
       if ( path && status == SAI__OK ) {
          datFind( tmploc, path, baseloc, &status );
-      } else {
+      }
+      else {
          datClone( tmploc, baseloc, &status );
       }
 
@@ -759,19 +821,22 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
        */
       slice[0] = '\0';
    }
-   if ( status == SAI__OK ) {
+   if ( status == SAI__OK && datValid( baseloc, &status ) ) {
 
       /*  Look for additional NDFs at baseloc, ignore tmploc which is
        *  NDF itself (or baseloc).
        */
       datNcomp( baseloc, &ncomp, &status );
+      if ( status != SAI__OK ) {
+          ncomp = 0;
+      }
       first = 1;
       for ( i = 1; i <= ncomp; i++ ) {
          datIndex( baseloc, i, newloc, &status );
 
          /*  Get full name of component and see if it is an NDF */
          hdsTrace( newloc, &level, ndfpath, MAXNDFNAME, ndffile,
-                   MAXNDFNAME, &status ); 
+                   MAXNDFNAME, &status );
 
          ftype = strstr( ndffile, ".sdf" ); /* Strip off .sdf from filename */
          if ( ftype ) *ftype = '\0';
@@ -793,11 +858,12 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
              DATA_ARRAY component) */
          if ( gaiaAccessNDF( ndffile, &type, &width, &height, &header, &hlen,
                              &ndfid, &emess ) ) {
-             
+
              /*  Check that this isn't the base NDF by another name */
              if ( ndfid != 0 && baseid != 0 ) {
                  ndfSame( baseid, ndfid, &same, &isect, &status );
-             } else {
+             }
+             else {
                  same = 0;
              }
              if ( ! same ) {
@@ -806,11 +872,13 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
                  if ( first ) {
                      if ( head ) {
                          head->next = newstate;
-                     } else {
+                     }
+                     else {
                          head = newstate;
                      }
                      first = 0;
-                 } else {
+                 }
+                 else {
                      state->next = newstate;
                  }
                  state = newstate;
@@ -824,18 +892,25 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
       /*  Release locators */
       datAnnul( baseloc, &status );
       datAnnul( tmploc, &status );
-   } else {
+   }
+   else {
 
-      /*  Initialisation failed (no such NDF, or container file/path
-       *  doesn't have any NDFs in it).
-       */
-      if ( emess ) {
-         *error_mess = emess;
-      } else {
-         *error_mess = strdup( "Failed to locate any NDFs" );
-      }
-      emsRlse();
-      return 0;
+       /* Invalid locator with no error message? */
+       if ( status == SAI__OK && ! emess ) {
+           emess = strdup( "Invalid base locator for this NDF" );
+       }
+
+       /*  Initialisation failed (no such NDF, or container file/path
+        *  doesn't have any NDFs in it).
+        */
+       if ( emess ) {
+           *error_mess = emess;
+       }
+       else {
+           *error_mess = strdup( "Failed to locate any NDFs" );
+       }
+       emsRlse();
+       return 0;
    }
 
    /*  Return list of NDFinfos */
@@ -868,33 +943,36 @@ int gaiaCheckMNDF( const void *handle, int index, const char *component )
             status = 1;
          }
          break;
-         
+
          case 'v':
          case 'V': {
             if ( current->havevar ) {
                status = 1;
-            } else {
+            }
+            else {
                status = 0;
             }
          }
          break;
-         
+
          case 'q':
          case 'Q': {
             if ( current->havequal ) {
                status = 1;
-            } else {
+            }
+            else {
                status = 0;
             }
          }
          break;
-         
+
          default: {
             status = 0;
          }
          break;
       }
-   } else {
+   }
+   else {
 
       /*  Bad NDF index */
       status = 0;
@@ -910,9 +988,9 @@ int gaiaCheckMNDF( const void *handle, int index, const char *component )
  *     Get information about a particular NDF.
  */
 void gaiaGetInfoMNDF( const void *handle, int index, char **name,
-                      int *type, int *width, int *height, 
-                      char **header, int *hlen, int *ndfid, 
-                      int *hasvar, int *hasqual ) 
+                      int *type, int *width, int *height,
+                      char **header, int *hlen, int *ndfid,
+                      int *hasvar, int *hasqual )
 {
    NDFinfo *current = NULL;
    current = getNDFInfo( handle, index );
@@ -934,15 +1012,15 @@ void gaiaGetInfoMNDF( const void *handle, int index, char **name,
  *     gaiaGetMNDF
  *
  *  Purpose:
- *     Obtained a copy of an NDF data component. 
+ *     Obtained a copy of an NDF data component.
  *
  *  Description:
  *     This routine obtains access to a named NDF data component and
  *     returns either a copy or a pointer to mapped memory depending
- *     the readonly state of the NDF. 
+ *     the readonly state of the NDF.
  *
  *     If readonly is true then a mapped pointer is returned,
- *     otherwise a copy is made into some supplied memory (may want to 
+ *     otherwise a copy is made into some supplied memory (may want to
  *     offer malloc version?).
  */
 int gaiaGetMNDF( const void *handle, int index, const char *component,
@@ -958,7 +1036,8 @@ int gaiaGetMNDF( const void *handle, int index, const char *component,
       if ( current->readonly ) {
          return gaiaMapNDF( current->ndfid, data, component,
                             error_mess );
-      } else {
+      }
+      else {
          return gaiaCopyNDF( current->ndfid, data, component,
                              error_mess );
       }
@@ -969,14 +1048,14 @@ int gaiaGetMNDF( const void *handle, int index, const char *component,
    return 0;
 }
 
-/*  
+/*
  *  Name:
  *     gaiaSetReadMNDF
  *
  *  Purpose:
  *     Set the access method for the NDF data components.
  *     The value is 1 for readonly and 0 for writable memory.
- *  
+ *
  *  Notes:
  *     Existing memory is not affected by this call, you will need to
  *     recall gaiaFreeMNDF and gaiaGetMNDF make the change.
@@ -989,13 +1068,13 @@ void gaiaSetReadMNDF( const void *handle, int index, int readonly )
    }
 }
 
-/*  
+/*
  *  Name:
  *     gaiaGetReadMNDF
  *
  *  Purpose:
  *     Get the access method for the NDF data components.
- *  
+ *
  *  Notes:
  *     Existing memory is not affected by this call, you will need to
  *     recall gaiaFreeMNDF and gaiaGetMNDF make the change.
@@ -1030,7 +1109,7 @@ int gaiaCountMNDFs( const void *handle )
 /*
  *  Name:
  *     gaiaReleaseMNDF
- * 
+ *
  *  Purpose:
  *     Release all NDF resources associated with given handle.
  */
@@ -1431,4 +1510,44 @@ static void hdsShow( const char *name, int *status )
 
    F77_FREE_CHARACTER( fname );
    return;
+}
+
+/*
+ *  Name:
+ *     datValid
+ *
+ *  Purpose:
+ *     Enquire if a locator is valid.
+ *
+ *  Params:
+ *     loc = structure locator
+ *     status = global status
+ *
+ *  Return:
+ *     1 for valid locator, 0 for bad.
+ *
+ */
+extern void F77_EXTERNAL_NAME( dat_valid )(
+   CHARACTER( floc ),
+   LOGICAL( freply ),
+   INTEGER( fstatus )
+   TRAIL( floc ) );
+static int datValid( const char *loc, int *status )
+{
+   DECLARE_CHARACTER(floc,DAT__SZLOC);
+   DECLARE_LOGICAL(freply);
+   DECLARE_INTEGER(fstatus);
+   int reply;
+
+   F77_EXPORT_LOCATOR( loc, floc);
+   F77_EXPORT_INTEGER( *status, fstatus );
+
+   F77_CALL( dat_valid )( CHARACTER_ARG( floc ),
+                          LOGICAL_ARG( &freply ),
+                          INTEGER_ARG( &fstatus )
+                          TRAIL_ARG( floc ) );
+
+   F77_IMPORT_LOGICAL( freply, reply );
+   F77_IMPORT_INTEGER( fstatus, *status );
+   return reply;
 }
