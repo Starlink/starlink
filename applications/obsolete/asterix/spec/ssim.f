@@ -195,10 +195,14 @@
       CALL BDI_COPMORE( IFID, OFID, STATUS )
 
 *  Read timing info from input, adjust and write to output
-      CALL TCI_GETID( IFID, TIMID, STATUS )
-      CALL ADI_CPUT0R( TIMID, 'ObsLength', TOBS, STATUS )
-      CALL ADI_CPUT0R( TIMID, 'Exposure', TOBS, STATUS )
-      CALL TCI_PUTID( OFID, TIMID, STATUS )
+      IF ( POISS ) THEN
+        CALL TCI_GETID( IFID, TIMID, STATUS )
+	CALL ADI_PRINT( TIMID, STATUS )
+        CALL ADI_CPUT0R( TIMID, 'ObsLength', TOBS, STATUS )
+        CALL ADI_CPUT0R( TIMID, 'Exposure', TOBS, STATUS )
+	CALL ADI_PRINT( TIMID, STATUS )
+        CALL TCI_PUTID( OFID, TIMID, STATUS )
+      END IF
 
 *  Change target
       CALL DCI_GETID( IFID, DETID, STATUS )
