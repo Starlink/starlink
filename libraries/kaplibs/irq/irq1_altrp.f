@@ -46,7 +46,7 @@
 *        The size of the QNAMES array arguments.
 *     EXPRES = CHARACTER * ( * ) (Given and Returned)
 *        The quality expression. On exit, it is converted to upper case
-*        and any leading blanks are removed.
+*        and any unneeded blanks are removed.
 *     OPCODE( MXOPCO ) = INTEGER (Returned)
 *        The integer codes representing the operations to be performed
 *        on a FILO stack in order to evaluate the quality expression.
@@ -120,6 +120,7 @@
       INTEGER CHR_LEN            ! Retuirns used length of a string.
 
 *  Local Variables:
+      CHARACTER C*1              ! This character
       INTEGER D1                 ! Index of first delimiting dot in a
                                  ! pair of dots.
       INTEGER D2                 ! Index of second delimiting dot in a
@@ -136,6 +137,7 @@
       INTEGER IOP                ! Index into an array of instructions.
       INTEGER ITERM              ! Position of given potential quality
                                  ! name terminator.
+      INTEGER LNONSP             ! Index of last non-space character
       INTEGER LSYM               ! No. of characters in current symbol.
       INTEGER NCIN               ! No. of used characters in IN.
       INTEGER NSYMB              ! No. of recognised symbols found so
@@ -146,6 +148,8 @@
                                  ! operator.
       CHARACTER QEXP*(IRQ__SZQEX)! The quality expression with an
                                  ! appended "=" symbol.
+      CHARACTER QEXP2*(IRQ__SZQEX)! The quality expression with no spaces
+                                 ! adjacent to any dot.
       INTEGER QNMEND             ! Position of end of a quality name.
       INTEGER STACK( 0:IRQ__NSYMS )! "First In Last Out"  stack used for
                                  ! temporary storage of symbols.
@@ -189,6 +193,32 @@
          NQNAME = 0
          GO TO 999
 
+      END IF
+
+*  Remove spaces from around dots.
+      LNONSP = 0
+      D2 = 1
+      DO D1 = 1, NCIN      
+         C = EXPRES( D1:D1 ) 
+         IF( C .EQ. '.' ) THEN
+            LNONSP = LNONSP + 1
+            EXPRES( LNONSP:LNONSP ) = '.'
+            D2 = LNONSP + 1
+         ELSE
+            IF( C .NE. ' ' ) THEN
+               LNONSP = LNONSP + 1
+               EXPRES( D2:D2 ) = C
+               D2 = D2 + 1
+            ELSE IF( EXPRES( LNONSP:LNONSP ) .NE. '.' ) THEN
+               EXPRES( D2:D2 ) = C
+               D2 = D2 + 1
+            END IF
+         END IF
+      END DO
+
+      IF( LNONSP .LT. NCIN ) THEN
+         EXPRES( LNONSP + 1: NCIN ) = ' '
+         NCIN = LNONSP
       END IF
 
 *  Check that any dots in the string delimit recognised symbols (dots
