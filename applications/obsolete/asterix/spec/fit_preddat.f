@@ -40,6 +40,7 @@
 *     10 Jan 94 : Change to FIT_MCALC interface,number of parameters used
 *                 passed down (DJA)
 *      9 Feb 94 : Now pass MODEL spec directly rather than splitting it up (DJA)
+*      1 Aug 95 : Apply vignetting correction if available (DJA)
 *
 *    Type definitions :
 *
@@ -81,23 +82,23 @@
 	INTEGER IERR,NERR		! Error arguments for VEC_* routines
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Check if raw count model is required
+*  Check if raw count model is required
       COUNTMODEL = ( FSTAT .EQ. FIT__LOGL )
 
-*    Convolution with instrument response required
+*  Convolution with instrument response required
       IF ( PREDDAT(N).CONVOLVE ) THEN
 
-*      Generate model space data
+*    Generate model space data
 	CALL FIT_MCALC( MODEL, PARAM, N, PREDDAT(N).NMDIM,
      :                  PREDDAT(N).IDIMM, PREDDAT(N).NMDAT,
      :                  PREDDAT(N).NMBOUND,%VAL(PREDDAT(N).MLBNDPTR),
      :                  %VAL(PREDDAT(N).MUBNDPTR),%VAL(MODEL.STACKPTR),
      :                  %VAL(PREDDAT(N).MPTR),STATUS)
 
-*      Fold through instrument response. Test for new style response
+*    Fold through instrument response. Test for new style response
         IF ( INSTR(N).R_ID .NE. ADI__NULLID ) THEN
           CALL ERI_FOLD( PREDDAT(N).NMDAT, %VAL(PREDDAT(N).MPTR),
      :                   OBDAT(N).NDAT, INSTR(N).R_ID, INSTR(N).A_ID,
@@ -112,7 +113,7 @@
 
       ELSE
 
-*      No convolution required (i.e. model space = data space )
+*    No convolution required (i.e. model space = data space )
 	CALL FIT_MCALC( MODEL, PARAM, N, PREDDAT(N).NMDIM,
      :                  PREDDAT(N).IDIMM, PREDDAT(N).NMDAT,
      :                  PREDDAT(N).NMBOUND, %VAL(PREDDAT(N).MLBNDPTR),
@@ -121,14 +122,20 @@
 
       END IF
 
-*    Scale up by TEFF and add background if count model is required
+*  Scale by vignetting array if present
+      IF ( OBDAT(N).V_ID .NE. ADI__NULLID ) THEN
+	CALL VEC_MULR( .FALSE., OBDAT(N).NDAT, %VAL(OBDAT(N).VIGPTR),
+     :                 PRED, PRED, IERR, NERR, STATUS )
+      END IF
+
+*  Scale up by TEFF and add background if count model is required
       IF ( COUNTMODEL ) THEN
 	CALL ARR_MULTR( OBDAT(N).TEFF, OBDAT(N).NDAT, PRED )
 	CALL VEC_ADDR( .FALSE., OBDAT(N).NDAT, %VAL(OBDAT(N).BPTR),
      :                 PRED, PRED, IERR, NERR, STATUS )
       END IF
 
-*    Exit
+*  Exit
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'FIT_PREDDAT', STATUS )
       END IF
