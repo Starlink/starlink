@@ -436,13 +436,6 @@
 
       END DO
 
-*    Issue a warning if the final solution is poorly determined.
-
-      IF ( ERRCO .EQ. -10 ) THEN
-         CALL MSG_OUT( 'INSIGNIF',
-     :     'The least-squares fit solution may be inaccurate.', STATUS )
-      END IF
-
   100 CONTINUE
 
       END
