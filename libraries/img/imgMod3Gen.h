@@ -81,7 +81,7 @@ IMGMOD3( IMG_SHORT_C_TYPE ) ( char *param,
                               int *status )
 {
   DECLARE_CHARACTER_DYN( fparam );
-  DECLARE_CHARACTER_ARRAY_DYN( fip );
+  DECLARE_POINTER_ARRAY_DYN( fip );
   int nparam;
 
   F77_CREATE_CHARACTER( fparam, strlen( param ) );
