@@ -122,7 +122,7 @@
 #  Implementation Deficiencies:
 #
 #  Copyright:
-#     Copyright (C) 1995 Rutherford Appleton Laboratory
+#     Copyright (C) 1995-2000 Central Laboratory of the Research Councils
 #
 #  Authors:
 #     RFWS: R.F.Warren-Smith (Starlink, RAL)
@@ -130,7 +130,7 @@
 #     PTW: P.T.Wallace (Starlink, RAL)
 #     BLY: M.J.Bly (Starlink, RAL)
 #     AJC: A.J.Chipperfield (Starlink, RAL)
-#     PDRAPER: P.W.Draper (Starlink, Durham University)
+#     PWD: P.W.Draper (Starlink, Durham University)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -206,15 +206,18 @@
 #        Designated Mk V.
 #     03-JUL-1995 (BLY):
 #        Template makefile now generated automatically.
-#     12-JUL-1995 (PDRAPER):
+#     12-JUL-1995 (PWD):
 #        Adapted for GAIA.
-#     17-NOV-1997 (PDRAPER):
+#     17-NOV-1997 (PWD):
 #        Updated for GAIA version 2.0.
-#     2-NOV-1998 (PDRAPER):
+#     2-NOV-1998 (PWD):
 #        Updated for GAIA version 2.2.
-#     18-MAY-1999 (PDRAPER):
+#     18-MAY-1999 (PWD):
 #        Updated for GAIA version 2.3. Introduced single binaries
 #        for Tcl scripts.
+#     20-JUL-2000 (PWD):
+#        Update for GAIA version 2.5. Single monolith for tasks now.
+#        Copy and link for installed documentation.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -481,7 +484,7 @@ MONO_SOURCE =
 
 #  Monolith binary name.
 
-MONOLITH =
+MONOLITH = gaiaMon
 
 #  Monolith interface file name.
 
@@ -524,12 +527,13 @@ GAIA_LIB_FILES =  \
    GaiaSearch.hlp GaiaSextractor.hlp GaiaTextImport.hlp \
    GaiaXYProfile.hlp StarBlink.hlp \
    skycat2.0.cfg gaiawcs2tab pix2wcs gaia.sh gaiadisp.sh gaiaremote.sh \
-   adamMessageRelay 
+   adamMessageRelay
 
 GAIA_BIN_FILES = \
- gaia_swish gaia_stcl ardstat ardstat.ifc autocrop autocrop.ifc \
- cat2tab cat2tab.ifc tab2cat tab2cat.ifc asc2tab asc2tab.ifc tab2asc \
- tab2asc.ifc
+ gaia_swish gaia_stcl gaiaMon gaiaMon.ifc ardstat.ifc autocrop.ifc \
+ cat2tab.ifc tab2cat.ifc asc2tab.ifc tab2asc.ifc
+
+GAIA_TASKS = ardstat autocrop cat2tab tab2cat asc2tab tab2asc
 
 GAIA_FILES = $(GAIA_LIB_FILES) $(GAIA_BIN_FILES)
 
@@ -546,8 +550,7 @@ $(GAIA_FILES): $(SKYCAT_FILES)
 $(SKYCAT_FILES): $(TCL_FILES)
 
 #  Names of binaries that will need to be stripped.
-RUNTIME_BINARIES = gaia_swish gaia_stcl rtdClient rtdServer ardstat \
-                   autocrop tab2cat cat2tab asc2tab tab2asc
+RUNTIME_BINARIES = gaia_swish gaia_stcl rtdClient rtdServer gaiaMon
 
 #  Names of scripts that will need 755 protections.
 RUNTIME_SCRIPTS = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay
@@ -979,11 +982,11 @@ install:
 #        done
 #
 #  Create the application/task name soft links.
-#	for f in $(TASKS) ""; do \
-#           if test -n "$$f"; then \
-#              $(LINK) ./$(MONOLITH) $(INSTALL_BIN)/$$f ;\
-#           else :; fi;\
-#        done
+	for f in $(GAIA_TASKS) ""; do \
+           if test -n "$$f"; then \
+              $(LINK) ./$(MONOLITH) $(INSTALL_BIN)/$$f ;\
+           else :; fi;\
+        done
 #
 #  Install the package startup script.  The package version number,
 #  the name of the directory containing the installed binaries and
@@ -1023,6 +1026,8 @@ install:
            if test -n "$$f"; then \
               cp -p $$f $(INSTALL_DOCS);\
               chmod 644 $(INSTALL_DOCS)/$$f;\
+	      rm -f $$f;\
+	      $(LINK) $(INSTALL_DOCS)/$$f $$f;\
            else :; fi;\
         done
 #
@@ -1158,11 +1163,11 @@ do_deinstall:
 #        done
 #
 #  Remove the application/task soft links.
-#	- for f in $(TASKS) ""; do \
-#             if test -n "$$f"; then \
-#                rm -f $(INSTALL_BIN)/$$f ;\
-#           else :; fi;\
-#        done
+	- for f in $(GAIA_TASKS) ""; do \
+             if test -n "$$f"; then \
+                rm -f $(INSTALL_BIN)/$$f ;\
+           else :; fi;\
+        done
 #
 #  Deinstall the package startup file.  Since it will have been edited
 #  during installation, we remove the installed copy, if present, and
@@ -1204,6 +1209,8 @@ do_deinstall:
 #  Deinstall the Latex documentation, if installed versions exist.
 	- for f in $(LATEX_DOCS) ""; do \
            if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
+	      rm -r $$f;\
+	      cp -p $(INSTALL_DOCS)/$$f .\;
               rm -f $(INSTALL_DOCS)/$$f;\
            else :; fi;\
         done
