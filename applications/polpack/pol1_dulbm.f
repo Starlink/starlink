@@ -265,6 +265,14 @@
          CALL NDG_NDFAS( IGRP, I, 'READ', NDFIN( I ), STATUS )
       END DO
 
+*  Find out whether we are doing linear or circular polarimetry. In
+*  circular polarimetry mode there are 2 waveplate positions and in
+*  linear polarimetry mode 4 waveplate positions.
+      CALL PAR_CHOIC( 'PMODE', 'LINEAR', 'LINEAR,CIRCULAR', .TRUE.,
+     :                PMODE, STATUS )
+      NPOS = 4
+      IF ( PMODE .EQ. 'CIRCULAR' ) NPOS = 2
+      
 *  Replace the identifiers to the supplied NDFs with identifiers for
 *  sections of the supplied NDFs which have equal bounds. Abort if there
 *  is an error since this means that some of the images do not overlap.
@@ -404,14 +412,6 @@
          GO TO 99
       ENDIF
 
-*  Find out whether we are doing linear or circular polarimetry. In
-*  circular polarimetry mode there are 2 waveplate positions and in
-*  linear polarimetry mode 4 waveplate positions.
-      CALL PAR_CHOIC( 'PMODE', 'LINEAR', 'LINEAR,CIRCULAR', .TRUE.,
-     :                PMODE, STATUS )
-      NPOS = 4
-      IF ( PMODE .EQ. 'CIRCULAR' ) NPOS = 2
-      
 *  Check the status value so that we can be sure that any error condition
 *  detected after the next subroutine call was generated within the
 *  called subroutine.
