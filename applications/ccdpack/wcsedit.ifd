@@ -16,6 +16,8 @@
 #  History:
 #     18-MAR-1999 (MBT):
 #        Original version.
+#     13-NOV-1999 (MBT):
+#        Added parameters for MathMaps.
 #     {enter_further_changes_here}
 
 #-
@@ -88,7 +90,7 @@
              access READ
              vpath PROMPT
              ppath CURRENT DEFAULT
-             prompt {Type of mapping (UNIT,LINEAR,PINCUSHION)}
+             prompt {Type of mapping (UNIT,LINEAR,PINCUSHION,MATH)}
              default UNIT
              helpkey *
           }
@@ -118,6 +120,46 @@
              vpath DEFAULT
              default { }
              outputpar
+             helpkey *
+          }
+
+          parameter forexp {
+             type LITERAL
+             access READ
+             vpath PROMPT
+             ppath CURRENT
+             prompt {MathMap forward mapping expressions}
+             size *
+             helpkey *
+          }
+
+          parameter invexp {
+             type LITERAL
+             access READ
+             vpath PROMPT
+             ppath CURRENT
+             prompt {MathMap inverse mapping expressions}
+             size *
+             helpkey *
+          }
+
+          parameter simpfi {
+             type _LOGICAL
+             access READ
+             vpath PROMPT
+             ppath DEFAULT
+             prompt {Simplify forward followed by inverse to unit?}
+             default TRUE
+             helpkey *
+          }
+
+          parameter simpif {
+             type _LOGICAL
+             access READ
+             vpath PROMPT
+             ppath CURRENT,DEFAULT
+             prompt {Simplify inverse followed by forward to unit?}
+             default TRUE
              helpkey *
           }
              

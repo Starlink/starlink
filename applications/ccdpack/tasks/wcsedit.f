@@ -71,6 +71,13 @@
 *        ("1996.8" for example). Such values are interpreted as a
 *        Besselian epoch if less than 1984.0 and as a Julian epoch
 *        otherwise.
+*     FOREXP * ( * ) = LITERAL (Read)
+*        If MODE=ADD and MAPTYPE=MATH, this gives the expressions to
+*        be used for the forward transformation to be added.  There
+*        must be at least two expressions (for the two coordinates)
+*        but there may be more if intermediate expressions are to 
+*        be used.  Expression syntax is fortran-like; see the 
+*        AST_MATHMAP documentation in SUN/210 for details.
 *     FRAME = LITERAL (Read)
 *        This parameter specifies the 'target frame', which has the
 *        following meaning according to the value of the MODE parameter:
@@ -102,6 +109,13 @@
 *        If set TRUE the mapping defined by COEFFS will be applied in 
 *        the reverse direction.
 *        [FALSE]
+*     INVEXP * ( * ) = LITERAL (Read)
+*        If MODE=ADD and MAPTYPE=MATH, this gives the expressions to
+*        be used for the inverse transformation to be added.  There
+*        must be at least two expressions (for the two coordinates)
+*        but there may be more if intermediate expressions are to 
+*        be used.  Expression syntax is fortran-like; see the 
+*        AST_MATHMAP documentation in SUN/210 for details.
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -131,9 +145,10 @@
 *        This parameter is required when MODE is ADD, and specifies the
 *        type of mapping which maps from the target frame to the new frame.
 *        It may take one of the following values:
-*           -  UNIT
-*           -  LINEAR
-*           -  PINCUSHION
+*           -  UNIT       -- A Unit mapping
+*           -  LINEAR     -- A linear mapping
+*           -  PINCUSHION -- A pincushion distortion
+*           -  MATH       -- A general algebraic mapping
 *        [UNIT]
 *     MODE = LITERAL (Read)
 *        The action to be performed.  It may take one of the following
@@ -155,6 +170,18 @@
 *        If MODE is SET, then this gives a string of the form 
 *        "attribute=value" which is to be applied to the frame.  The 
 *        string is passed straight to the AST_SET routine (see SUN/210).
+*     SIMPFI = _LOGICAL (Read)
+*        If MODE=SET and MAPTYPE=MATH, this gives the value of the 
+*        mapping's SimpFI attribute (whether it is legitimate to simplify
+*        the forward followed by the inverse transformation to a unit
+*        transformation).
+*        [TRUE]
+*     SIMPIF = _LOGICAL (Read)
+*        If MODE=SET and MAPTYPE=MATH, this gives the value of the
+*        mapping's SimpIF attribute (whether it is legitimate to simplivy
+*        the inverse followed by the forward transformation to a unit
+*        transformation).
+*        [TRUE]
 
 *  Examples:
 *     wcsedit * current ccd_reg
@@ -203,6 +230,8 @@
 *        Original version.
 *     2-NOV-1999 (MBT):
 *        Added SHOW mode.
+*     13-NOV-1999 (MBT):
+*        Added MathMaps.
 *     {enter_changes_here}
 
 *-
@@ -226,6 +255,10 @@
 *  Local Constants:
       INTEGER MXMDLN             ! Maximum length of MODIFIED string
       PARAMETER( MXMDLN = 2048 ) ! Should be long enough
+      INTEGER MAXEXP             ! Maximum number of expressions for MathMap
+      PARAMETER( MAXEXP = 12 )
+      INTEGER MAXELN             ! Maximum length of expressions for MathMap
+      PARAMETER( MAXELN = 512 )
 
 *  Local Variables:
       CHARACTER * ( 80 ) BUFFER  ! Buffer for line output
@@ -238,6 +271,8 @@
       CHARACTER * ( AST__SZCHR ) FRAME ! Target frame as specified
       CHARACTER * ( AST__SZCHR ) SET ! String pass to AST_SET
       CHARACTER * ( MXMDLN ) MODIF ! List of modified NDFs
+      CHARACTER * ( MAXELN ) FOREXP( MAXEXP ) ! Forward expressions for MathMap
+      CHARACTER * ( MAXELN ) INVEXP( MAXEXP ) ! Inverse expressions for MathMap
       DOUBLE PRECISION COEFFS( 6 ) ! Coefficients of mapping
       INTEGER BL                 ! Buffer length
       INTEGER FRTARG             ! AST pointer to target frame
@@ -252,9 +287,15 @@
       INTEGER JCUR               ! Index of Current frame in unedited WCS comp
       INTEGER JNEW               ! Index of new frame in WCS component
       INTEGER MAP                ! AST pointer to mapping
+      INTEGER NEXP               ! Number of expressions got so far
+      INTEGER NFEXP              ! Number of expressions for forward transforms
+      INTEGER NIEXP              ! Number of expressions for inverse transforms
       INTEGER NFRAME             ! Number of frames in unedited WCS component
       INTEGER NNDF               ! Number of NDFs
       LOGICAL INVERT             ! Is mapping to be applied backwards
+      LOGICAL FIBOTH             ! Do we have both forward and inverse mappings?
+      LOGICAL SIMPFI             ! SimpFI attribute of MathMap
+      LOGICAL SIMPIF             ! SimpIF attribute of MathMap
       LOGICAL SUCCES             ! Whether WCS has been successfully modified
 
 *.
@@ -426,7 +467,7 @@
 
 *  Get additional required parameters.
                CALL PAR_CHOIC( 'MAPTYPE', 'UNIT', 
-     :                         'UNIT,LINEAR,PINCUSHION', .FALSE., 
+     :                         'UNIT,LINEAR,PINCUSHION,MATH', .FALSE.,
      :                         MAPTYP, STATUS )
                CALL PAR_GET0C( 'DOMAIN', DOMAIN, STATUS )
                CALL CHR_RMBLK( DOMAIN )
@@ -449,6 +490,58 @@
                   CALL PAR_EXACD( 'COEFFS', 3, COEFFS, STATUS )
                   MAP = AST_PCDMAP( COEFFS( 1 ), COEFFS( 2 ), ' ', 
      :                              STATUS )
+
+*  General algebraic transformation.
+               ELSE IF ( MAPTYP .EQ. 'MATH' ) THEN
+
+*  Get the algebraic expressions for the forward transformation.
+ 5                CONTINUE
+                  NFEXP = 0
+                  CALL PAR_GET1C( 'FOREXP', MAXEXP, FOREXP( NFEXP + 1 ),
+     :                            NEXP, STATUS )
+                  NFEXP = NFEXP + NEXP
+                  IF ( NFEXP .LT. 2 .AND. STATUS .EQ. SAI__OK ) THEN
+                     CALL MSG_OUT( ' ', 'At least two expressions '
+     :                             // 'required - enter more', STATUS )
+                     CALL PAR_CANCL( 'FOREXP', STATUS )
+                     GO TO 5
+                 END IF
+
+*  Get the algebraic expressions for the inverse transformation.
+ 6                CONTINUE
+                  NIEXP = 0
+                  CALL PAR_GET1C( 'INVEXP', MAXEXP, INVEXP( NIEXP + 1 ),
+     :                            NEXP, STATUS )
+                  NIEXP = NIEXP + NEXP
+                  IF ( NIEXP .LT. 2 .AND. STATUS .EQ. SAI__OK ) THEN
+                     CALL MSG_OUT( ' ', 'At least two expressions '
+     :                             // 'required - enter more', STATUS )
+                     CALL PAR_CANCL( 'INVEXP', STATUS )
+                     GO TO 6
+                  END IF
+
+*  See whether it looks as if non-dummy expressions have been supplied
+*  for both forward and inverse transformations.
+                  FIBOTH = INDEX( FOREXP( NFEXP ), '=' ) .NE. 0
+     :               .AND. INDEX( INVEXP( NFEXP ), '=' ) .NE. 0
+
+*  Get values of SimpFI and SimpIF attributes for mapping if a forward
+*  and inverse transformations both exist.
+                  IF ( FIBOTH ) THEN
+                     CALL PAR_GET0L( 'SIMPFI', SIMPFI, STATUS )
+                     CALL PAR_GET0L( 'SIMPIF', SIMPIF, STATUS )
+                  ELSE
+                     SIMPFI = .FALSE.
+                     SIMPIF = .FALSE.
+                  END IF
+
+*  Construct the mapping.
+                  MAP = AST_MATHMAP( 2, 2, NFEXP, FOREXP, NIEXP, INVEXP,
+     :                               ' ', STATUS )
+
+*  Add simplification attributes.
+                  CALL AST_SETL( MAP, 'SimpFI', SIMPFI, STATUS )
+                  CALL AST_SETL( MAP, 'SimpIF', SIMPIF, STATUS )
                END IF
 
 *  Use inverse mapping if required.
