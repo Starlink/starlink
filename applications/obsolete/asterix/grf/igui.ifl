@@ -1,0 +1,8 @@
+interface I_GUI
+  parameter ACTION
+    type '_CHAR'
+  endparameter
+  parameter VALUE
+    type '_CHAR'
+  endparameter
+endinterface
