@@ -93,6 +93,9 @@
  
 *  History:
 *     $Log$
+*     Revision 1.4  1998/05/06 18:29:58  timj
+*     Increase size of 'IN' parameter.
+*
 *     Revision 1.3  1998/04/28 20:50:20  timj
 *     Support the return of FITS information from SURF_READ_REBIN_NDF
 *
@@ -150,12 +153,12 @@
                                       ! measured points in input file (radians)
       INTEGER DATA_END                  ! Pointer to end of input data
       INTEGER DATA_PTR                  ! Pointer to input data
-      CHARACTER * 40  DATA_SPEC(SCUBA__MAX_SECT) ! Array of section specs
+      CHARACTER * 128 DATA_SPEC(SCUBA__MAX_SECT) ! Array of section specs
       CHARACTER * 80  FITS ( SCUBA__MAX_FITS ) ! FITS information
       CHARACTER * 132 FNAME             ! Input filename
       INTEGER I                         ! Loop counter
       INTEGER IERR                      ! Position of error in VEC copy
-      CHARACTER * 132 INSTRING          ! Input filename string + section
+      CHARACTER * 256 INSTRING          ! Input filename string + section
       INTEGER INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1) ! Integration pointers
       DOUBLE PRECISION IN_DEC_CEN       ! Declination of map centre
       DOUBLE PRECISION IN_RA_CEN        ! RA of map centre

@@ -195,6 +195,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.53  1998/05/06 18:30:11  timj
+*     Increase size of 'IN' parameter.
+*
 *     Revision 1.52  1998/05/05 20:01:45  timj
 *     Use SCUBA__MAX_FITS to specify max size of FITS array when
 *     acessing the FITS array.
@@ -443,7 +446,7 @@ c
       INTEGER          EACHBOL         ! Bolometer loop counter
       INTEGER          FD              ! File descriptor
       INTEGER          FILE            ! number of input files read
-      CHARACTER*40     FILENAME (MAX_FILE)
+      CHARACTER*128    FILENAME (MAX_FILE)
                                        ! names of input files read
       CHARACTER*80     FITS(SCUBA__MAX_FITS, MAX_FILE)
                                        ! FITS entries for each file
@@ -456,7 +459,7 @@ c
       INTEGER          IERR            ! For VEC copies
       INTEGER          IJ_PTR_END      ! End of scratch pointer
       INTEGER          IJ_PTR          ! Scratch pointer
-      CHARACTER*80     IN              ! input filename and data-spec
+      CHARACTER*256    IN              ! input filename and data-spec
       LOGICAL          INTREBIN        ! Am I rebinning ints separately?
       INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
                                 ! Pointer to integration posns

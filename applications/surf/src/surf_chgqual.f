@@ -159,16 +159,16 @@
       LOGICAL          BAD_QUALITY        ! .TRUE. if quality to be set
                                           ! bad, .FALSE. if to be set good
       BYTE             BTEMP              ! Value to fill empty array
-      CHARACTER*80     DATA_SPEC(SCUBA__MAX_SECT) ! data-spec part of IN
+      CHARACTER*128    DATA_SPEC(SCUBA__MAX_SECT) ! data-spec part of IN
       INTEGER          DIM (MAX__DIM)     ! dimensions of array
-      CHARACTER*80     FILE               ! ndf name part of IN
+      CHARACTER*128    FILE               ! ndf name part of IN
       CHARACTER*80     FITS (SCUBA__MAX_FITS)
                                           ! array of FITS keywords
       LOGICAL          FLATFIELD          ! .TRUE. if the FLATFIELD
                                           ! application has been run on
                                           ! the input file
       INTEGER          I                  ! DO loop index
-      CHARACTER*80     IN                 ! input filename and data-spec
+      CHARACTER*256    IN                 ! input filename and data-spec
       INTEGER          IN_DEM_PNTR_PTR    ! pointer to .SCUBA.DEM_PNTR
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC ! HDS locator of .FITS
                                           ! extension
