@@ -58,8 +58,8 @@
 
      The following minor changes have also been made since v3.1-1:
 
-      - A bug in FINDOFF which caused failure when NDFNAMES=false has
-        been fixed.
+      - Some bugs in FINDOFF, including one which caused failure when 
+        NDFNAMES=false, have been fixed.
 
       - FINDOFF will now propagate values in trailing columns from the
         input to output position lists.
