@@ -46,6 +46,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
+      INCLUDE 'PAR_ERR'
 *    Status :
       INTEGER STATUS
 *    External references :
@@ -85,14 +86,12 @@
       INTEGER			OFID			! Output dataset id
       INTEGER			PFID			! Phase spectrum id
 
-      LOGICAL                AST_THERE     ! ASTERIX structure present?
       LOGICAL                AXOK          ! AXIS(1) OK
       LOGICAL                BAD           ! Bad quality points?
       LOGICAL                OK
       LOGICAL                PHASE         ! Create a PHASE_SPECRUM too?
       LOGICAL                PRIM          ! Used to test for primitive
       LOGICAL                QUALOK        ! QUALITY OK
-      LOGICAL                THERE         ! Does MORE box exist?
       LOGICAL                VAROK         ! VARIANCE OK
 *
 *    Version id :
@@ -128,7 +127,7 @@
          CALL ERR_REP( ' ', 'FATAL ERROR: Unable to find suitable data'/
      :                                          /' component.', STATUS )
       END IF
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
       IF (NDIMS .NE. 1) THEN
          CALL MSG_PRNT('WARNING: Data is not one-dimensional')
@@ -219,7 +218,7 @@
       CALL DYN_MAPR( 1, NFREQ, WORKPTR, STATUS )
 
 *    Check status.
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    Create components in output dataset
       CALL BDI_CREDATA (OFID, 1, NFREQ,        STATUS)
@@ -284,7 +283,7 @@
      :                               %VAL(VAROUT), NPOWER, IERR, STATUS)
 
 *    Check status.
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
       IF (IERR .GT. 0) THEN
         CALL MSG_SETI ('NERR', IERR)
@@ -512,7 +511,7 @@
       CALL USI_GET0L ('DEMEAN', DEMEAN, STATUS)
 
 *    Check status
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
       IF (DEMEAN) THEN
 *      Calcualte data mean
@@ -531,7 +530,7 @@
         END IF
 
 *      Check status
-        IF (STATUS .NE. SAI__OK) GOTO 999
+        IF (STATUS .NE. SAI__OK) GOTO 99
 
 *      Loop over data
         DO I = 1, NPTS
@@ -688,9 +687,8 @@
 
       END IF
 
-999   IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP ('E', '...from SINFIT_PGRAM', STATUS)
-
+ 99   IF (STATUS .NE. SAI__OK) THEN
+        CALL AST_REXIT( 'SINFIT_PGRAM', STATUS )
       END IF
       IERR = NERR
       END
