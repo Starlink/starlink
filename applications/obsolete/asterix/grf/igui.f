@@ -113,6 +113,15 @@
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
+*  see if it exists already
+        CALL NBS_FIND_NOTICEBOARD(NAME,ID,STATUS)
+*  if it does destroy it and make a new one
+        IF (STATUS.EQ.SAI__OK) THEN
+          CALL NBS_LOSE_NOTICEBOARD(ID,'FORCE',STATUS)
+        ELSE
+          CALL ERR_CANCL(STATUS)
+        ENDIF
+
         CALL NBS_TUNE('MAX_DEFN_SIZE',NBSIZ,OLDSIZ,STATUS)
         CALL NBS_BEGIN_DEFINITION(ID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'FLAG','_INTEGER',0,VAL__NBI,
