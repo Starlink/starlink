@@ -112,6 +112,8 @@ class PkFont {
     double designSize() const { return preamble_.designSize; }
     double hppp() const { return preamble_.hppp; }
     double vppp() const { return preamble_.vppp; }
+    // return checksum obtained from PK file
+    unsigned int checksum() const { return preamble_.cs; }
 
  private:
     string name_;

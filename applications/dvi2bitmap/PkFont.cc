@@ -24,7 +24,8 @@ PkFont::PkFont(unsigned int dvimag,
     name_ = fontpath_;
     int strpos = name_.find("%F");
     name_.replace(strpos, 2, name);
-    cout << "Font file: " << name_ << '\n';
+    if (debug_)
+	cerr << "Font file: " << name_ << '\n';
     try
     {
 	pkf_ = new InputByteStream (name_, true);
@@ -37,9 +38,11 @@ PkFont::PkFont(unsigned int dvimag,
 	font_header_.s = s;
 	font_header_.d = d;
 	fontscale_ = ((double)dvimag/1000.0) * ((double)s/(double)d);
-	cout << "Font scaling: " << dvimag << "/1000 * (" << s << '/' << d
-	     << ")=" << fontscale_ << '\n';
-	cout << "DVI's font checksum=" << c << '\n';
+	if (debug_)
+	    cout << "PkFont: font scaling: "
+		 << dvimag << "/1000 * (" << s << '/' << d
+		 << ")=" << fontscale_ << '\n'
+		 << "DVI's font checksum=" << c << '\n';
 
 	quad_ = ((double)dvimag/1000.0) * d;
 	word_space_ = 0.2*quad_;

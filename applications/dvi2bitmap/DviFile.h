@@ -26,6 +26,13 @@ public:
     // units, including possible drift corrections
     int currH() const { return hh_; }	// device units
     int currV() const { return vv_; }
+    // hSize is the `width of the widest page' and vSize is the
+    // `height plus depth of the tallest page' in pixels.  Note that 
+    // this isn't the same as the max values of currH and currV, any more
+    // than 0 is the minimum, but if the origin is set `appropriately' 
+    // (ie, at (1in,1in)?), then everything should fit on.
+    int hSize() const { return static_cast<int>(postamble_.u * px_per_dviu_); }
+    int vSize() const { return static_cast<int>(postamble_.l * px_per_dviu_); }
 private:
     string fileName_;
     // all dimensions within this class are in DVI units, except where stated.
@@ -70,7 +77,7 @@ private:
 	string comment;
     } preamble_;
     void read_postamble ();
-    void process_preamble(DviFilePreamble&);
+    void process_preamble(DviFilePreamble *);
     void check_duplicate_font(int);
     int pixel_round(int);
     int charwidth_ (int charno);

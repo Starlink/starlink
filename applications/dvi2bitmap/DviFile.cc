@@ -51,7 +51,6 @@ DviFileEvent *DviFile::getEvent()
     Byte opcode;
     int i1, i2;
 
-    cerr << "getEvent\n";
     // Add in any pending update of the horizontal position.
     if (pending_hupdate_ != 0)
     {
@@ -71,7 +70,6 @@ DviFileEvent *DviFile::getEvent()
 	    pending_hhupdate_ += current_font_->glyph(opcode)->hEscapement();
 	    pending_hupdate_ += charwidth_(opcode);
 	    gotEvent = new DviFileSetChar(opcode, this);
-	    gotEvent->debug();
 	}
 	else if (opcode >= 171 && opcode <= 234)
 	{
@@ -462,16 +460,16 @@ DviFileEvent *DviFile::getEvent()
 		*/
 	      case 247:		// pre
 		{
-		    DviFilePreamble pre;
-		    pre.dviType = getUIU(1);
-		    pre.num = getUIU(4);
-		    pre.den = getUIU(4);
-		    pre.mag = getUIU(4);
-		    pre.comment = "";
+		    DviFilePreamble *pre = new DviFilePreamble();
+		    pre->dviType = getUIU(1);
+		    pre->num = getUIU(4);
+		    pre->den = getUIU(4);
+		    pre->mag = getUIU(4);
+		    pre->comment = "";
 		    for (int k=getSIU(1); k>0; k--)
-			pre.comment += static_cast<char>(getByte());
+			pre->comment += static_cast<char>(getByte());
 		    process_preamble(pre);
-		    gotEvent = &pre;
+		    gotEvent = pre;
 		}
 		break;
 	      case 248:		// post
@@ -488,8 +486,6 @@ DviFileEvent *DviFile::getEvent()
 	}
     }
     gotEvent->opcode = opcode;
-    cerr << "getEvent returning event @ " << gotEvent << ":opcode="
-        << static_cast<int>(opcode) << '\n';
     return gotEvent;
 }
 
@@ -672,7 +668,6 @@ void DviFile::read_postamble()
 	{
 	  case 243:		// fnt_def1
 	    num = getSIU(1);
-	    cerr << "postamble font1 " << num << '\n';
 	    if (fontMap_[num] != 0)
 		throw DviError ("Font %d defined twice", num);
 	    c = getUIU(4);
@@ -685,11 +680,15 @@ void DviFile::read_postamble()
 	    for (int l = getSIU(1); l>0; l--)
 		fontname += static_cast<char>(getByte());
 	    fontMap_[num] = new PkFont(dvimag, c, s, d, fontname);
+	    if (fontMap_[num]->checksum() != c)
+		cerr << "Font " << fontname
+		     << ": expected checksum " << c
+		     << ", got checksum " << fontMap_[num]->checksum()
+		     << '\n';
 	    break;
 
 	  case 244:		// fnt_def2
 	    num = getSIU(2);
-	    cerr << "postamble font1 " << num << '\n';
 	    if (fontMap_[num] != 0)
 		throw DviError ("Font %d defined twice", num);
 	    c = getUIU(4);
@@ -706,7 +705,6 @@ void DviFile::read_postamble()
 
 	  case 245:		// fnt_def3
 	    num = getSIU(3);
-	    cerr << "postamble font1 " << num << '\n';
 	    if (fontMap_[num] != 0)
 		throw DviError ("Font %d defined twice", num);
 	    c = getUIU(4);
@@ -723,7 +721,6 @@ void DviFile::read_postamble()
 
 	  case 246:		// fnt_def4
 	    num = getSIS(4);
-	    cerr << "postamble font1 " << num << '\n';
 	    if (fontMap_[num] != 0)
 		throw DviError ("Font %d defined twice", num);
 	    c = getUIU(4);
@@ -768,20 +765,20 @@ void DviFile::read_postamble()
 // values for num and den, this works out as
 // DVI unit = sp = 1/2^16 x 1pt, which we actually knew as soon as we
 // were told that TeX's DVI file have (DVI units=sp).
-void DviFile::process_preamble(DviFilePreamble& p)
+void DviFile::process_preamble(DviFilePreamble* p)
 {
-    preamble_.i = p.dviType;
-    preamble_.num = p.num;
-    preamble_.den = p.den;
-    preamble_.mag = p.mag;
-    preamble_.comment = p.comment;
-    true_dviu_per_pt_ = ((double)p.den/(double)p.num) * (2.54e7/7227e0);
-    dviu_per_pt_ = true_dviu_per_pt_ * (double)p.mag/1000.0;
-    px_per_dviu_ = ((double)p.num/(double)p.den) * (resolution_/254000e0);
-    cerr << "dviu_per_pt_ = " << dviu_per_pt_
-	 << " px_per_dviu_ = " << px_per_dviu_
-	 << " mag=" << p.mag
-	 << '\n';
+    preamble_.i = p->dviType;
+    preamble_.num = p->num;
+    preamble_.den = p->den;
+    preamble_.mag = p->mag;
+    preamble_.comment = p->comment;
+    true_dviu_per_pt_ = ((double)p->den/(double)p->num) * (2.54e7/7227e0);
+    dviu_per_pt_ = true_dviu_per_pt_ * (double)p->mag/1000.0;
+    px_per_dviu_ = ((double)p->num/(double)p->den) * (resolution_/254000e0);
+    if (debug_)
+	cerr << "Preamble: dviu_per_pt_ = " << dviu_per_pt_
+	     << ", px_per_dviu_ = " << px_per_dviu_
+	     << ", mag=" << p->mag << '\n';
 }
 
 void DviFile::check_duplicate_font (int ksize)

@@ -12,6 +12,7 @@
 
 #include "DviFile.h"
 #include "PkFont.h"
+#include "Bitmap.h"
 
 void Usage (void);
 char *progname;
@@ -20,9 +21,11 @@ main (int argc, char **argv)
 {
     string dviname;
 
-    DviFile::debug(true);
+    bool debug_ = false;
+    //DviFile::debug(true);
     //PkFont::debug(true);
     //PkRasterdata::debug(false);
+    Bitmap::debug(true);
     if (char *pkpath = getenv("DVI2BITMAP_PK_PATH"))
 	PkFont::setFontPath(pkpath);
 
@@ -65,20 +68,42 @@ main (int argc, char **argv)
 	const PkFont *curr_font;
 	do
 	{
-	    cerr << "Event\n";
 	    PkGlyph *glyph;
+	    Bitmap *bitmap;
+	    int pagenum = 0;
+
 	    ev = dvif->getEvent();
-	    ev->debug();
-	    if (DviFileSetChar *sc = dynamic_cast<DviFileSetChar*>(ev))
+	    if (debug_)
+		ev->debug();
+	    if (DviFilePage *page = dynamic_cast<DviFilePage*>(ev))
+		if (page->isStart)
+		    bitmap = new Bitmap (dvif->hSize(), dvif->vSize());
+		else
+		{
+		    pagenum++;
+		    bitmap->crop();
+		    char fn[100];
+		    sprintf (fn, "page%d.gif", pagenum);
+		    bitmap->write(fn);
+		    delete bitmap;
+		    bitmap = 0;
+		}
+	    else if (DviFileSetChar *sc = dynamic_cast<DviFileSetChar*>(ev))
 	    {
-		cerr << "set glyph\n";
-		/*
 		glyph = curr_font->glyph(sc->charno);
-		clog << "set glyph " << glyph->w() << 'x' << glyph->h()
-		     << " at position ("
-		     << dvif->currH() << ',' << dvif->currV()
-		     << ")\n";
-		*/
+		if (debug_)
+		    cerr << "set glyph " << glyph->w() << 'x' << glyph->h()
+			 << " at position ("
+			 << dvif->currH() << ',' << dvif->currV()
+			 << ")\n";
+		// calculate glyph positions, taking into account the
+		// offsets for the bitmaps, and the (1in,1in)=(72pt,72pt)
+		// = (72px,72px) offset of the TeX origin.
+		int x = dvif->currH() + glyph->hoff() + 72;
+		int y = dvif->currV() + glyph->voff() + 72;
+		bitmap->paint (x, y,
+			       glyph->w(), glyph->h(),
+			       glyph->bitmap());
 	    }
 	    else if (DviFileFontChange *fc =
 		     dynamic_cast<DviFileFontChange*>(ev))
@@ -112,7 +137,6 @@ main (int argc, char **argv)
 		}
 	    }
 		*/
-	    cerr << "Opcode="<<static_cast<int>(ev->opcode) << "...done\n";
 	    delete ev;
 	}
 	while (!(post = dynamic_cast<DviFilePostamble*>(ev)));

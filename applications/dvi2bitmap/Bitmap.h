@@ -6,16 +6,17 @@ class Bitmap {
  public:
     Bitmap (int,int);
     ~Bitmap();
-    void paint (int x, int y, int w, int h, Byte* b);
-    void rule (int x, int y, int w, int h);
+    void paint (const int x, const int y, const int w, const int h,
+		const Byte* b);
+    void rule (const int x, const int y, const int w, const int h);
     enum imageFormats { gif, debugbitmap };
     void write (string filename, imageFormats format=gif);
     void crop ();
     static debug (bool sw) { debug_ = sw; }
 
+ private:
     // pointer to bitmap.  Pixel (x,y) is at B[y*W + x];
     Byte *B;
- private:
     // width and height of bitmap
     const int W, H;
     // bounding box - 

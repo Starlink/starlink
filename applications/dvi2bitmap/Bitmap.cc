@@ -25,6 +25,9 @@ Bitmap::Bitmap (int w, int h)
     cropT = 0;
     cropB = H;
     cropped_ = false;
+
+    if (debug_)
+	cerr << "new Bitmap(" << w << ',' << h << ")\n";
 }
 
 Bitmap::~Bitmap()
@@ -37,7 +40,8 @@ Bitmap::~Bitmap()
 // Update bb? as a side-effect.
 // OR the new pixels into place, and crop any parts of the new bitmap
 // falling outside the boundary of the master
-void Bitmap::paint (int x, int y, int w, int h, Byte *b)
+void Bitmap::paint (const int x, const int y, const int w, const int h,
+		    const Byte *b)
 {
     // Put [row1,row2-1] and [col1,col2-1] of the new bitmap
     // at position (x+col1,y+row1) of the master bitmap.
@@ -51,7 +55,7 @@ void Bitmap::paint (int x, int y, int w, int h, Byte *b)
     for (int row=row1; row<row2; row++)
     {
 	Byte *P = &B[(y+row)*W+(x+col1)];
-	Byte *p = &b[row*w+col1];
+	const Byte *p = &b[row*w+col1];
 	for (int col=col1; col<col2; col++)
 	    *P++ |= *p++;
     }
@@ -77,7 +81,7 @@ void Bitmap::paint (int x, int y, int w, int h, Byte *b)
 // Update bb? as a side-effect.
 // OR the new pixels into place, and crop any parts of the new bitmap
 // falling outside the boundary of the master
-void Bitmap::rule (int x, int y, int w, int h)
+void Bitmap::rule (const int x, const int y, const int w, const int h)
 {
     // OR everything in a block between [row1,row2-1] and [col1,col2-1]
     int row2 = y+1;   if (row2 > H) row2 = H;
