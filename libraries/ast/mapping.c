@@ -6936,9 +6936,10 @@ f     interpolation kernel, the first element of the PARAMS array
 *     interpolated result on either side of the interpolation point in
 *     each dimension (the nearest integer value is used). Execution time
 *     increases rapidly with this number. Typically, a value of 2 is
-*     appropriate and the minimum value used will be 1 (i.e. one pixel on
-c     either side). A value of zero or less may be given for "params[0]"
-f     either side). A value of zero or less may be given for PARAMS(1)
+*     appropriate and the minimum value used will be 1 (i.e. two pixels
+*     altogether, one on either side of the interpolation point).
+c     A value of zero or less may be given for "params[0]"
+f     A value of zero or less may be given for PARAMS(1)
 *     to indicate that a suitable number of pixels should be calculated
 *     automatically.
 *
@@ -7019,8 +7020,8 @@ f     envelope function, given by PARAMS(2), to the point spread function
 c     value of the first element of the "params" array, which gives
 f     value of the first element of the PARAMS array, which gives
 *     the number of pixels in each dimension on either side of the
-c     central point.  Hence a block of (2 * params[0] + 1)^ndim_in
-f     central point.  Hence a block of (2 * PARAMS(1) + 1)**NDIM_IN
+c     central point.  Hence a block of (2 * params[0])^ndim_in
+f     central point.  Hence a block of (2 * PARAMS(1))**NDIM_IN
 *     pixels in the input grid will be examined to determine the
 *     value of the output pixel.  If the variance is not being used
 c     (var_in or var_out = NULL) then all valid pixels in this cube
@@ -7031,8 +7032,8 @@ f     (USEVAR = .FALSE.) then all valid pixels in this cube
 *     pixel without a valid variance will be discarded.  This scheme
 *     is suitable where the output grid is much coarser than the 
 *     input grid; if the ratio of pixel sizes is R then a suitable
-c     value of params[0] may be (R - 1)/2.
-f     value of PARAMS(1) may be (R - 1)/2.
+c     value of params[0] may be R/2.
+f     value of PARAMS(1) may be R/2.
 *
 c     Finally, supplying the following values for "interp" allows you
 c     to implement your own sub-pixel interpolation scheme by means of
