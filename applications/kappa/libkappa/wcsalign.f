@@ -240,7 +240,12 @@
 *     KAPPA: WCSFRAME, TRANMAKE, TRANSFORMER; CCDPACK: TRANNDF
 
 *  Implementation Status:
-*     All non-complex data-types can now be processed directly.
+*     -  This routine correctly processes the DATA, VARIANCE, LABEL, 
+*     TITLE, UNITS, WCS and HISTORY components of the input NDFs (see the
+*     METHOD parameter for notes on the interpretation of output variances).
+*     -  Processing of bad pixels and automatic quality masking are
+*     supported.
+*     -  All non-complex numeric data types can be handled.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
