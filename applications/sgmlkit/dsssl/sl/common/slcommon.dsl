@@ -1376,7 +1376,8 @@ dd-MMM-yyyy.
 	    nl				; return the trailing paragraphs
 	    ))))
 
-<![IGNORE[ <!-- redundant -->
+<![INCLUDE[
+<!-- redundant for ../latex/sltables.dsl, but not for ../html/sltables.dsl -->
 <routine>
 <routinename>table-colno
 <purpose>Return a list of numbers, indicating the current column number and the
