@@ -1424,6 +1424,9 @@ sub run_astrom ($$) {
 #             it's a Dec (return DMS)
 #     $sep  = if present, use this as separator (default ' ')
 #
+# Return a string with two-digit (leading-zero) minutes and seconds,
+# and three-digit fraction.
+#
 # Return undef on range errors.
 sub deg2sex ($$;$) {
     my ($val, $isra, $sep) = @_;
