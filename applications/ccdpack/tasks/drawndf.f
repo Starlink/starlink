@@ -20,18 +20,29 @@
 *        The global status.
 
 *  Description:
-*     This routine draws on a graphics device the boundary outlines of 
-*     a set of NDFs in their Current attached coordinate system.  This
+*     This routine displays on a graphics device the positions of a
+*     group of NDFs in their Current attached coordinate system.  This
 *     will show their relative positions in their current coordinates,
 *     and so can, for instance, be used to check that alignment looks
 *     sensible prior to resampling and combining into a mosaic.
+*     Depending on the LINES and IMAGE parameters, an outline showing
+*     the extent of each NDF can be plotted, or the pixels of the NDF
+*     resampled into the given coordinates, or both.
 *     Each outline indicates the extent of the data array of the 
 *     corresponding NDF, and is therefore basically rectangular
 *     in shape, though it may be distorted if the mapping
 *     between pixel and Current coordinates is nonlinear.  The origin
 *     (minimum X,Y pixel value) of each boundary can be marked and
-*     the outline labelled with the NDF's name and/or index number
-*     (as determined by the LABMODE parameter).
+*     the image labelled with its name and/or index number.
+*
+*     If the IMAGE parameter is set, then the NDF's data can be seen 
+*     as well as its position.  The colour levels in this case are 
+*     determined by the PERCENTILES argument.  Overlapping images 
+*     will simply be drawn on top of each other (no averaging is
+*     performed).  For displaying a single image in its pixel coordinate
+*     system the KAPPA program DISPLAY, which has more display options,
+*     may be preferable.  Without this option the program does not 
+*     need to examine the pixel data at all, so it will run much faster.
 *
 *     The results are only likely to be sensible if the Current 
 *     coordinate system of all the NDFs is one in which they are all
@@ -77,29 +88,43 @@
 *        aligned in any suitable domain, then BOUNDS will terminate
 *        with an error.  If CLEAR is set to FALSE, then there must
 *        already be a picture displayed on the graphics device.
+*        The CLEAR parameter is ignored if IMAGE is true.
 *        [TRUE]
 *     DEVICE = DEVICE (Read)
 *        The name of the device on which to draw the outlines.
 *        [Current display device]
 *     IN = LITERAL (Read)
 *        A list of the NDFs whose boundaries are to be drawn.
-*     LABMODE = LITERAL( * ) (Read)
-*        This is a comma-separated list of keywords indicating what 
-*        sort of label should be written to label the outlines.
-*        Any combination of one or more of the following keywords may 
-*        be used:
-*           - NAME   -- The name of the NDF is written
-*           - INDEX  -- The index number of the NDF is written
-*           - ORIGIN -- The pixel coordinate origin of the NDF is marked
-*           - OPAQUE -- The text is written on an opaque background
-*
-*        Unrecognised values will be ignored.  If you don't want any
-*        of these options, use the null value (!).
-*        [NAME,ORIGIN]
+*     IMAGE = _LOGICAL (Read)
+*        If true, the pixels of the each image will be plotted as well
+*        as the outlines.  In this case the existing image is always
+*        cleared, regardless of the value of the CLEAR parameter.
+*        Note that BOUNDS does not need to examine the NDF pixels
+*        at all unless this option is true, so setting it will make
+*        the program run much more slowly.
+*        [FALSE]
+*     LABNAME = _LOGICAL (Read)
+*        If true, each plotted outline is labelled with the name of
+*        the NDF.  Label positioning is determined by the LABPOS
+*        parameter.
+*        [TRUE]
+*     LABNUM = _LOGICAL (Read)
+*        If true, each plotted outline is labelled with the number of
+*        the NDF (i.e. the first on in the IN list is 1, the second
+*        is 2, etc).  If both this and the LABNAME parameter are true,
+*        the label will contain both the number and the name.
+*        Label positioning is determined by the LABPOS parameter.
+*        [FALSE]
+*     LABOPAQUE = _LOGICAL (Read)
+*        If true, the background on which the label (if the LABNUM or
+*        LABNAME parameters are true) will be an opaque rectangle of
+*        the background colour.  If false, the text will just be
+*        plotted over the top, and may be hard to read.
+*        [TRUE]
 *     LABPOS = LITERAL (Read)
 *        A two-character string identifying the positioning of the text 
-*        label (only used if the value of LABEL includes either "INDEX"
-*        or "NAME").  The first letter indicates the side-to-side
+*        label (only used if at least one of LABNAME or LABNUM is 
+*        true).  The first letter indicates the side-to-side
 *        position and the second indicates the up-and-down position
 *        in the pixel coordinates of each NDF.  Each letter must be
 *        "N", "C" or "F", for Near to the origin, Central or Far from
@@ -117,15 +142,19 @@
 *        [NN]
 *     LABUP = _LOGICAL (Read)
 *        Normally this parameter is FALSE, and each text label (as
-*        determined by LABMODE) is written parallel or anti-parallel 
-*        to the pixel X axis of the corresponding NDF.  If this
-*        parameter is set TRUE however, text will be written upright,
-*        that is, horizontal on the graphics device.  In this case
-*        the positioning algorithm may fail to place it inside the
-*        corresponding outline; it is generally not advisable to 
-*        set LABUP to TRUE unless the label is positioned in the 
+*        determined by LABNAME and LABNUM) is written parallel or 
+*        anti-parallel to the pixel X axis of the corresponding NDF.
+*        If this parameter is set TRUE however, text will be written 
+*        upright, that is, horizontal on the graphics device.  
+*        In this case the positioning algorithm may fail to place it 
+*        inside the corresponding outline; it is generally not advisable
+*        to set LABUP to TRUE unless the label is positioned in the 
 *        centre of the outline by setting LABPOS="CC".
 *        [FALSE]
+*     LINES = _LOGICAL (Read)
+*        If true, outlines of each NDF are plotted.  If false, no
+*        outlines are plotted.
+*        [TRUE]
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -151,17 +180,30 @@
 *        then the value specified there will be used. Otherwise, the
 *        default is "BOTH".
 *        [BOTH]
+*     ORIGIN = _LOGICAL (Read)
+*        If true, a marker is placed at the pixel coordinate origin
+*        of each NDF.
+*        [TRUE]
 *     PENROT = _LOGICAL (Read)
 *        If TRUE, each outline will be drawn with a different pen 
 *        (colour).  Otherwise, they will all be drawn in the same pen.
 *        [FALSE]
+*     PERCENTILES( 2 ) = _DOUBLE (Read)
+*        If IMAGE is true, this gives the percentile limits between
+*        each image (not each Set) will be scaled when it is drawn.
+*        Any pixels with a value lower than the first element
+*        will have the same colour, and any with a value 
+*        higher than the second will have the same colour.
+*        Must be in the range 0 <= PERCENTILES( 1 ) <= 
+*        PERCENTILES( 2 ) <= 100.
+*        [2,98]
 *     STYLE = LITERAL (Read)
 *        A group of attribute settings describing the plotting style 
 *        to use for the outlines and annotated axes.  This should be
 *        a string consisting of comma-separated `attribute=value'
 *        items, as explained in the `Plotting Styles and Attributes'
 *        section of SUN/95, except that colours may only be specified
-*        by index, and not by name.
+*        by number, and not by name.
 *        [""]
 *     USESET = _LOGICAL (Read)
 *        If the pen colour is being rotated because PENROT is true,
@@ -188,7 +230,7 @@
 *        or of a previous call of BOUNDS.  Parts of the NDF outlines
 *        which fall outside the existing plot area will not be visible.
 *
-*     bounds in="one,two,three' axes=yes label=[name,index] penrot=yes
+*     bounds in="one,two,three' axes=yes labname labnum penrot=yes
 *             style="size(strings)=2,width(curves)=3"
 *        This will draw outlines of the NDFs `one', `two' and `three' 
 *        in the current directory with labelled axes, in triple-thick 
@@ -197,9 +239,23 @@
 *        outline and its associated text label will be different from
 *        the others.
 *
-*     bounds in=a* noclear nopenrot style="colour=2" label=\!
+*     bounds in=a* noclear nopenrot style="colour=2" nolabel nolabnum
 *        All the NDFs beginning with `a' will be outlined in colour 2,
 *        with no text labels or indication of the origin.
+*
+*     bounds in=gc2112 nolines image percentiles=1,99
+*        The graphics device will be cleared, and the named image
+*        resampled into its Current attached coordinate system will
+*        be displayed.  The data will be scaled such that any pixels
+*        brighter than the 99th percentile are plotted in the highest
+*        available colour and any dimmer than the 1st percentile are
+*        plotted in the lowset available colour.
+*
+*     bounds obs-[abc] image lines labup labopaque=false
+*        The files obs-a, obs-b and obs-c will be plotted; both the
+*        outlines and the pixel data will be shown, and the name of
+*        each will be drawn upright in the middle of each one,
+*        without an opaque background.
 
 *  Behaviour of Parameters:
 *     All parameters retain their current value as default. The
@@ -272,9 +328,11 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      INTEGER BADCOL             ! Image background colour
       INTEGER BGCOL              ! Normal text background colour
       INTEGER BL                 ! Buffer length
       INTEGER DIMS( 2, CCD1__MXNDF ) ! Dimensions of NDFs
+      INTEGER EL                 ! Number of pixels in NDF
       INTEGER FRM                ! AST identifier for a frame
       INTEGER FSET               ! AST identifier for global frameset
       INTEGER GID                ! NDG group identifier for input NDFs
@@ -283,7 +341,9 @@
       INTEGER IGOT               ! Index of name found in a group
       INTEGER INDF               ! NDF identifier
       INTEGER INIPEN             ! Initial pen index
+      INTEGER IPDAT              ! Pointer to mapped data of NDF
       INTEGER IPEN               ! Current pen index
+      INTEGER IPIM               ! Pointer to image pixel array
       INTEGER ISET( CCD1__MXNDF ) ! Index of Set for each NDF
       INTEGER IX                 ! Group search index
       INTEGER IWCS               ! AST identifier for WCS frameset
@@ -292,6 +352,7 @@
       INTEGER JBAS               ! Index of Base frame in frameset
       INTEGER JCUR               ! Index of Current frame in frameset
       INTEGER JGRID( CCD1__MXNDF ) ! Relative frame indices of Grid-like frames
+      INTEGER JPGP               ! Frame index for PGPIXL plotting frame
       INTEGER JSET               ! Set alignment frame index (dummy)
       INTEGER KEYGID             ! GRP identifier for Set Name attributes
       INTEGER LBGCOL             ! Label text background colour
@@ -314,37 +375,60 @@
       INTEGER PICID              ! AGI identifier for initial DATA picture
       INTEGER PICOD              ! AGI identifier for new picture
       INTEGER PLOT               ! AST identifier of plot
+      INTEGER SCHEME             ! Resampling scheme for AST_RESAMPLE.
       INTEGER SINDEX             ! Set Index attribute value (dummy)
       INTEGER STATE              ! Parameter state
       INTEGER STYLEN             ! Length of style element
+      INTEGER XIM                ! X dimension of image pixel array
+      INTEGER YIM                ! Y dimension of image pixel array
       LOGICAL AXES               ! Draw axes?
+      LOGICAL BAD                ! Might there be bad pixels in the NDF?
       LOGICAL CLEAR              ! Clear the graphics device before plotting?
       LOGICAL DIFERS             ! Not all the same domain?
+      LOGICAL IMAGE              ! Draw pixels too?
       LOGICAL LABDOT             ! Use labelling ORIGIN option?
       LOGICAL LABIND             ! Use labelling INDEX option?
       LOGICAL LABNAM             ! Use labelling NAME option?
       LOGICAL LABOPQ             ! Use labelling OPAQUE option?
       LOGICAL LABUP              ! Write labels upright on graphics device?
+      LOGICAL LINES              ! Draw an outline?
       LOGICAL PENROT             ! Rotate pen styles for different outlines?
       LOGICAL NOINV              ! Has coordinate system been reflected?
       LOGICAL USESET             ! Rotate pen styles by Set?
+      REAL X1                    ! Lower X limit of plotting surface
+      REAL X2                    ! Upper X limit of plotting surface
+      REAL Y1                    ! Lower Y limit of plotting surface
+      REAL Y2                    ! Upper Y limit of plotting surface
       REAL XCH                   ! Vertical baseline text character height
       REAL YCH                   ! Horizontal baseline text character height
       REAL UP( 2 )               ! Up direction for text
       DOUBLE PRECISION DIMOD     ! Length of the unit diagonal vector
       DOUBLE PRECISION GLBND( 2 ) ! Lower GRID-like coordinate bounds
       DOUBLE PRECISION GUBND( 2 ) ! Upper GRID-like coordinate bounds
+      DOUBLE PRECISION INA( 2 )  ! Coordinates of input A point for winmap
+      DOUBLE PRECISION INB( 2 )  ! Coordinates of input B point for winmap
+      DOUBLE PRECISION INTPAR( 1 ) ! Parameters for AST_RESAMPLE
       DOUBLE PRECISION IXUN( 4 ) ! Input X corners of the unit square 
       DOUBLE PRECISION IYUN( 4 ) ! Input Y corners of the unit square
+      DOUBLE PRECISION LIMITS( 2 ) ! Values at percentile limits
       DOUBLE PRECISION LPOS( 2 ) ! Dummy low position
       DOUBLE PRECISION OFS       ! Offset length for text label
-      DOUBLE PRECISION OLBND( 2 ) ! Upper common coordinate bounds
-      DOUBLE PRECISION OUBND( 2 ) ! Upper common coordinate bounds
+      DOUBLE PRECISION OLBND( 2, CCD1__MXNDF ) ! Upper common coordinate bounds
+      DOUBLE PRECISION OUBND( 2, CCD1__MXNDF ) ! Upper common coordinate bounds
+      DOUBLE PRECISION OUTA( 2 ) ! Coordinates of output A point for winmap
+      DOUBLE PRECISION OUTB( 2 ) ! Coordinates of output B point for winmap
       DOUBLE PRECISION OXUN( 4 ) ! Output X corners of the unit square
       DOUBLE PRECISION OYUN( 4 ) ! Output Y corners of the unit square
+      DOUBLE PRECISION PERCNT( 2 ) ! Percentile values for image scaling
+      DOUBLE PRECISION PSIZE     ! Image magnification factor
+      DOUBLE PRECISION PX( 2 )   ! X input coords of test transformation point
+      DOUBLE PRECISION PY( 2 )   ! Y input coords of test transformation point
+      DOUBLE PRECISION QX( 2 )   ! X output coords of test transformation point
+      DOUBLE PRECISION QY( 2 )   ! Y output coords of test transformation point
       DOUBLE PRECISION TPOS( 2 ) ! Text reference position
       DOUBLE PRECISION UPOS( 2 ) ! Dummy high position
       DOUBLE PRECISION VERTEX( 5, 2 ) ! GRID-like coordinates of array corners
+      DOUBLE PRECISION WORK( 2 ) ! Workspace
       DOUBLE PRECISION XADD      ! Padding in X direction
       DOUBLE PRECISION XC        ! X coordinate of NDF grid centre
       DOUBLE PRECISION XF        ! X coordinate of NDF grid Far edge
@@ -373,10 +457,16 @@
       CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of the NDF
       CHARACTER * ( GRP__SZNAM ) SNAME ! Set Name attribute value
       CHARACTER * ( GRP__SZNAM ) STYEL ! Style element
+      CHARACTER * ( NDF__SZTYP ) TYPE ! Type of NDF data
 
 *  Local data:
       DATA PAXES / 1, 2 /
       DATA BGCOL / 0 /
+      DATA PX / 0D0, 1D0 /
+      DATA PY / 0D0, 1D0 /
+
+      INTEGER AST__BLOCKAVE
+      PARAMETER ( AST__BLOCKAVE = 10 )
 
 *.
 
@@ -403,25 +493,21 @@
       CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, GID, NNDF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
-*  Determine what the labelling options are required.
-      NLAB = 0
-      IX = 0
-      CALL ERR_MARK
-      CALL CCD1_STRGR( 'LABMODE', GRP__NOID, 0, 6, LMGID, NLAB, STATUS )
-      IF ( STATUS .EQ. PAR__NULL ) THEN
-         NLAB = 0
-         CALL ERR_ANNUL( STATUS )
+*  See if we are plotting images, and if so get percentile scaling limits.
+      CALL PAR_GET0L( 'IMAGE', IMAGE, STATUS )
+      IF ( IMAGE ) THEN
+         CALL PAR_EXACD( 'PERCENTILES', 2, PERCNT, STATUS )
+         PERCNT( 1 ) = MAX( 0D0, PERCNT( 1 ) )
+         PERCNT( 2 ) = MAX( PERCNT( 1 ), MIN( 1D2, PERCNT( 2 ) ) )
+         PERCNT( 1 ) = 1D-2 * PERCNT( 1 )
+         PERCNT( 2 ) = 1D-2 * PERCNT( 2 )
       END IF
-      CALL GRP_SETCS( LMGID, .FALSE., STATUS )
-      CALL GRP_INDEX( 'NAME', LMGID, 1, IX, STATUS )
-      LABNAM = IX .GT. 0
-      CALL GRP_INDEX( 'INDEX', LMGID, 1, IX, STATUS )
-      LABIND = IX .GT. 0
-      CALL GRP_INDEX( 'ORIGIN', LMGID, 1, IX, STATUS )
-      LABDOT = IX .GT. 0
-      CALL GRP_INDEX( 'OPAQUE', LMGID, 1, IX, STATUS )
-      LABOPQ = IX .GT. 0
-      CALL CCD1_GRDEL( LMGID, STATUS )
+
+*  Determine what labelling and drawing options are required.
+      CALL PAR_GET0L( 'LABNAME', LABNAM, STATUS )
+      CALL PAR_GET0L( 'LABNUM', LABIND, STATUS )
+      CALL PAR_GET0L( 'ORIGIN', LABDOT, STATUS )
+      CALL PAR_GET0L( 'LINES', LINES, STATUS )
 
 *  Construct a labelling format string accordingly.
       IF ( LABNAM .AND. LABIND ) THEN
@@ -436,6 +522,9 @@
 
 *  Get label positioning and orientation options if required.
       IF ( LFMT .NE. ' ' ) THEN
+
+*  Get label background option.
+         CALL PAR_GET0L( 'LABOPAQUE', LABOPQ, STATUS )
 
 *  Get label orientation option.
          CALL PAR_GET0L( 'LABUP', LABUP, STATUS )
@@ -483,7 +572,11 @@
       IF ( PENROT ) CALL PAR_GET0L( 'USESET', USESET, STATUS )
 
 *  Determine whether we should clear the display device before plotting.
-      CALL PAR_GET0L( 'CLEAR', CLEAR, STATUS )
+      IF ( IMAGE ) THEN
+         CLEAR = .TRUE.
+      ELSE
+         CALL PAR_GET0L( 'CLEAR', CLEAR, STATUS )
+      END IF
 
 *  Determine whether we will draw axes.
       CALL PAR_GTD0L( 'AXES', CLEAR, .TRUE., AXES, STATUS )
@@ -687,15 +780,15 @@
             GUBND( 2 ) = DBLE( DIMS( 2, I ) ) + 0.5D0
             DO J = 1, 2
                CALL AST_MAPBOX( MAP, GLBND, GUBND, .TRUE., J, 
-     :                          OLBND( J ), OUBND( J ), LPOS, UPOS, 
-     :                          STATUS )
+     :                          OLBND( J, I ), OUBND( J, I ), LPOS,
+     :                          UPOS, STATUS )
             END DO
 
 *  Update limits if necessary.
-            IF ( OLBND( 1 ) .LT. XMIN ) XMIN = OLBND( 1 )
-            IF ( OLBND( 2 ) .LT. YMIN ) YMIN = OLBND( 2 )
-            IF ( OUBND( 1 ) .GT. XMAX ) XMAX = OUBND( 1 )
-            IF ( OUBND( 2 ) .GT. YMAX ) YMAX = OUBND( 2 )
+            IF ( OLBND( 1, I ) .LT. XMIN ) XMIN = OLBND( 1, I )
+            IF ( OLBND( 2, I ) .LT. YMIN ) YMIN = OLBND( 2, I )
+            IF ( OUBND( 1, I ) .GT. XMAX ) XMAX = OUBND( 1, I )
+            IF ( OUBND( 2, I ) .GT. YMAX ) YMAX = OUBND( 2, I )
          END DO
 
 *  Add a little to the limits so the outlines don't butt up to the edges.
@@ -746,6 +839,97 @@
 *  the position of the common one, we can easily get the positions of
 *  the others.
       JCOM = AST_GETI( PLOT, 'Current', STATUS )
+
+*  If we are going to plot pixels, do it here.  We have to assemble
+*  the image to be plotted first, and then plot it, since the pixel
+*  plotting routine can only plot orthogonal rectangles, and our
+*  blocks may not be that shape.
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+      IF ( IMAGE ) THEN
+
+*  Get an array of integers the same shape as the plotting surface so
+*  that transferring it from the array to the plotting device will
+*  be efficient.
+         CALL PGQVP( 3, X1, X2, Y1, Y2 )
+         XIM = INT( X2 - X1 )
+         YIM = INT( Y2 - Y1 )
+         CALL CCD1_MALL( XIM * YIM, '_INTEGER', IPIM, STATUS )
+
+*  Prepare for filling the array.
+         CALL PGQWIN( X1, X2, Y1, Y2 )
+         CALL PGQCIR( LOCOL, HICOL )
+         BADCOL = 0
+         SCHEME = AST__LINEAR
+         INTPAR( 1 ) = 0D0
+
+*  Add a frame to the Plot frameset which represents the array we have
+*  just allocated (graphical pixel coordinates).
+         CALL PGQVP( 2, X1, X2, Y1, Y2 )
+         INA( 1 ) = DBLE( X1 )
+         INA( 2 ) = DBLE( Y1 )
+         INB( 1 ) = DBLE( X2 )
+         INB( 2 ) = DBLE( Y2 )
+         OUTA( 1 ) = 0.5D0
+         OUTA( 2 ) = 0.5D0
+         OUTB( 1 ) = XIM + 0.5D0
+         OUTB( 2 ) = YIM + 0.5D0
+         MAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
+         FRM = AST_FRAME( 2, 'Domain=CCD_PGPIXL', STATUS )
+         CALL AST_ADDFRAME( PLOT, AST__BASE, MAP, FRM, STATUS )
+         JPGP = AST_GETI( PLOT, 'Current', STATUS )
+
+*  Initialise the array with empty-coloured pixels.
+         CALL CCG1_STVI( BADCOL, XIM * YIM, %VAL( IPIM ), STATUS )
+         DO I = 1, NNDF
+
+*  Get a mapping from the GRID coordinates of the NDF to the coordinates
+*  of the image pixels array.
+            MAP = AST_GETMAPPING( PLOT, JCOM + JGRID( I ), JPGP,
+     :                            STATUS )
+
+*  Calculate the approximate size of an NDF pixel in this frame.
+            CALL AST_TRAN2( MAP, 2, PX, PY, .TRUE., QX, QY, STATUS )
+            PSIZE = SQRT( ( QX( 2 ) - QX( 1 ) ) ** 2
+     :                 + ( QY( 2 ) - QY( 1 ) ) ** 2 ) / SQRT( 2D0 )
+            IF ( PSIZE .LT. 0.3D0 ) THEN
+               SCHEME = AST__BLOCKAVE
+               INTPAR( 1 ) = ( 1D0 / PSIZE - 1D0 ) * 0.5D0
+            ELSE
+               SCHEME = AST__LINEAR
+            END IF
+
+*  Open the NDF and map its data.
+            CALL NDG_NDFAS( GID, I, 'READ', INDF, STATUS )
+            CALL NDF_TYPE( INDF, 'DATA', TYPE, STATUS )
+            CALL NDF_MAP( INDF, 'DATA', TYPE, 'READ', IPDAT, EL,
+     :                    STATUS )
+            CALL NDF_BAD( INDF, 'DATA', .FALSE., BAD, STATUS )
+
+*  Find the percentile values.
+            CALL CCD1_FRA( TYPE, EL, IPDAT, 2, PERCNT, BAD,
+     :                     WORK, LIMITS, STATUS )
+
+*  Resample the data array onto the pixel grid.
+            CALL CCD1_MKIMG( IPDAT, TYPE, DIMS( 1, I ), DIMS( 2, I ),
+     :                       MAP, XIM, YIM, LIMITS( 1 ), LIMITS( 2 ),
+     :                       LOCOL, HICOL, BADCOL, SCHEME, INTPAR, 
+     :                       %VAL( IPIM ), STATUS )
+
+*  Release the NDF.
+            CALL NDF_ANNUL( INDF, STATUS )
+         END DO
+
+*  Plot the array which now contains all the resampled images.
+         CALL PGPIXL( %VAL( IPIM ), XIM, YIM, 1, XIM, 1, YIM,
+     :                X1, X2, Y1, Y2 )
+
+*  Free the memory used for the plot.
+         CALL CCD1_MFREE( IPIM, STATUS )
+         CALL AST_REMOVEFRAME( PLOT, JPGP, STATUS )
+      END IF
+
+*  Set the Current frame of the plot to the common coordinate frame.
+      CALL AST_SETI( PLOT, 'Current', JCOM, STATUS )
 
 *  Plot the coordinate axes if required.
       IF ( AXES ) THEN
@@ -807,46 +991,50 @@
       OFS = XCH * 0.7D0
 
 *  Loop for each NDF.
-      DO I = 1, NNDF
+      IF ( LINES .OR. LABDOT ) THEN
+         DO I = 1, NNDF
 
 *  Set pen colour if required.
-         IF ( PENGID .NE. GRP__NOID ) THEN
-            IF ( USESET ) THEN
-               IPEN = 1 + MOD( INIPEN + ISET( I ) - 1, NPEN )
-            ELSE
-               IPEN = 1 + MOD( INIPEN + I - 1, NPEN )
+            IF ( PENGID .NE. GRP__NOID ) THEN
+               IF ( USESET ) THEN
+                  IPEN = 1 + MOD( INIPEN + ISET( I ) - 1, NPEN )
+               ELSE
+                  IPEN = 1 + MOD( INIPEN + I - 1, NPEN )
+               END IF
+               CALL GRP_GET( PENGID, IPEN, 1, STYEL, STATUS )
+               CALL AST_SET( PLOT, STYEL, STATUS )
             END IF
-            CALL GRP_GET( PENGID, IPEN, 1, STYEL, STATUS )
-            CALL AST_SET( PLOT, STYEL, STATUS )
-         END IF
 
 *  Set up an array giving the GRID-like coordinates of the corners of 
 *  the data array for this NDF.  The fifth point is a copy of the first
 *  one, which makes it easier for plotting a closed loop.
-         XHI = DIMS( 1, I ) + 0.5D0
-         YHI = DIMS( 2, I ) + 0.5D0
-         VERTEX( 2, 1 ) = XHI
-         VERTEX( 3, 1 ) = XHI
-         VERTEX( 3, 2 ) = YHI
-         VERTEX( 4, 2 ) = YHI
+            XHI = DIMS( 1, I ) + 0.5D0
+            YHI = DIMS( 2, I ) + 0.5D0
+            VERTEX( 2, 1 ) = XHI
+            VERTEX( 3, 1 ) = XHI
+            VERTEX( 3, 2 ) = YHI
+            VERTEX( 4, 2 ) = YHI
 
 *  Set the Current frame of the Plot object to the GRID-like coordinate 
 *  system of this NDF.
-         CALL AST_SETI( PLOT, 'Current', JCOM + JGRID( I ), STATUS )
+            CALL AST_SETI( PLOT, 'Current', JCOM + JGRID( I ), STATUS )
 
 *  Plot a marker at the origin of each outline.
-         IF ( LABDOT ) THEN
-            CALL PGQLW( LW )
-            CALL PGSLW( MLW )
-            CALL AST_MARK( PLOT, 1, 2, 5, VERTEX, -1, STATUS )
-            CALL PGSLW( LW )
-         END IF
+            IF ( LABDOT ) THEN
+               CALL PGQLW( LW )
+               CALL PGSLW( MLW )
+               CALL AST_MARK( PLOT, 1, 2, 5, VERTEX, -1, STATUS )
+               CALL PGSLW( LW )
+            END IF
 
 *  Plot geodesics in the GRID-like coordinate system along the edges
 *  of the data array.  These will appear as the correct outlines in the
 *  common coordinate system.
-         CALL AST_POLYCURVE( PLOT, 5, 2, 5, VERTEX, STATUS )
-      END DO
+            IF ( LINES ) THEN
+               CALL AST_POLYCURVE( PLOT, 5, 2, 5, VERTEX, STATUS )
+            END IF
+         END DO
+      END IF
 
 *  Check if we need to write any text.  We do this after all the lines
 *  have been plotted so that if text is written on an opaque background
