@@ -1,6 +1,6 @@
 interface MAGIC
   parameter INP
-    type 'UNIV'
+    type 'LITERAL'
     position 1
     ppath 'GLOBAL'
     association '<-GLOBAL.BINDS'
@@ -8,7 +8,7 @@ interface MAGIC
     help 'Name of binned dataset'
   endparameter
   parameter OUT
-    type 'UNIV'
+    type 'LITERAL'
     position 2
     association '->GLOBAL.BINDS'
     prompt 'Output dataset'
