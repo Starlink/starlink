@@ -442,7 +442,7 @@ ccd1_qntlr.f ccd1_qsrtr.f ccd1_rdlin.f ccd1_rmcom.f \
 ccd1_skysr.f ccg1_cenr.f ccg1_clipr.f ccg1_cmltr.f ccg1_is2r.f \
 ccg1_is3r.f ccg1_is4d.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_mer1r.f \
 ccg1_mer3r.f ccg1_scr1r.f ccg1_scr3r.f ccg1_wtm2r.f ccg1_wtm3r.f \
-datapic.f gethlp.f gthlpi.f pol1_chkex.f pol1_clcat.f pol1_angrt.f \
+gethlp.f gthlpi.f pol1_chkex.f pol1_clcat.f pol1_angrt.f \
 pol1_clcnt.f pol1_cm1rr.f pol1_cm3rr.f pol1_cpctd.f pol1_cpctr.f \
 pol1_ctclm.f pol1_gtcta.f pol1_gtctc.f pol1_gtctw.f polprep.f \
 pol1_gtwcs.f pol1_knext.f pol1_lnam.f pol1_mkcat.f pol1_sngmn.f \
@@ -500,7 +500,7 @@ TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 
 #  List of applications/tasks in monolith.
 
-TASKS = polhelp polka datapic polcent polcal polimp polimpx polext \
+TASKS = polhelp polka polcent polcal polimp polimpx polext \
 polexpx polexp polvec polplot polbin polsim polimage polstack polprep \
 polversion polwrtcl polrdtcl polzconv
 
@@ -518,7 +518,7 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 
 #  List of task interface files.
 
-IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polka.ifl polext.ifl \
+IFL_FILES = polcent.ifl polhelp.ifl polka.ifl polext.ifl \
 polcal.ifl polimp.ifl polexp.ifl polvec.ifl polplot.ifl polimage.ifl \
 polbin.ifl polsim.ifl polimpx.ifl polexpx.ifl polstack.ifl polprep.ifl \
 polversion.ifl polwrtcl.ifl polrdtcl.ifl polzconv.ifl
@@ -1792,7 +1792,6 @@ ctg_creat.o:	 SAE_PAR GRP_PAR PAR_ERR
 ctg_gtsup.o:	 SAE_PAR GRP_PAR
 ctg_ptsup.o:	 SAE_PAR GRP_PAR
 ctg_setsz.o:	 SAE_PAR GRP_PAR
-datapic.o:	 SAE_PAR
 gethlp.o:	 SAE_PAR HLPCMD
 gthlpi.o:	 SAE_PAR HLPCMD
 pol1_fclos.o:    SAE_PAR 

@@ -101,10 +101,7 @@
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task
 
-      IF ( NAME .EQ. 'DATAPIC' ) THEN
-         CALL DATAPIC( STATUS )
-
-      ELSE IF ( NAME .EQ. 'POLBIN' ) THEN
+      IF ( NAME .EQ. 'POLBIN' ) THEN
          CALL POLBIN( STATUS )
 
       ELSE IF ( NAME .EQ. 'POLCAL' ) THEN

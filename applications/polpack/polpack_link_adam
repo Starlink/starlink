@@ -41,7 +41,7 @@
 
 #-
 
-      echo -lsla `nbs_link_adam` `kaplibs_link_adam` \
+      echo -lsla `nbs_link_adam` `kaplibs_link_adam -nogks` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

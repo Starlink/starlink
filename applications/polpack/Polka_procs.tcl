@@ -2958,13 +2958,20 @@ proc DrawGwm {} {
          set SCALOW [format "%.5g" $scalow]
          set SCAHIGH [format "%.5g" $scahigh]
 
-# Use datapic to get the bounds of the DATA picture just created in 
+# Use picin to get the bounds of the DATA picture just created in 
 # normalised device coordinates and NDF pixels. These NDC values extend
 # from 0 to 1 on both axes (and in general are therefore not square).
-         Obey polpack datapic "device=$DEVICE" 1
-         set result [GetParamED polpack datapic:result]
-         scan $result "' %f %f %f %f %f %f %f %f '" ncx1 ncx2 ncy1 ncy2 \
-                                                    wcx1 wcx2 wcy1 wcy2
+         Obey kapview picin "device=$DEVICE current=yes name=DATA frame=ndc" 1
+         set ncx1 [GetParamED kapview picin:x1]
+         set ncx2 [GetParamED kapview picin:x2]
+         set ncy1 [GetParamED kapview picin:y1]
+         set ncy2 [GetParamED kapview picin:y2]
+
+         Obey kapview picin "device=$DEVICE current=yes name=DATA frame=pixel" 1
+         set wcx1 [GetParamED kapview picin:x1]
+         set wcx2 [GetParamED kapview picin:x2]
+         set wcy1 [GetParamED kapview picin:y1]
+         set wcy2 [GetParamED kapview picin:y2]
       
 # Calculate the offsets and scaling factors for converting from canvas
 # coordinates to NDF pixels.
@@ -8978,7 +8985,7 @@ proc GetParamED {task param} {
 #
 #  Purpose:
 #     Returns the value of an ATASK parameter substituing "E" exponents for 
-#     "D" exponents.
+#     "D" exponents. Also removes delimiting quotes.
 #
 #  Arguments:
 #     task
@@ -8991,6 +8998,7 @@ proc GetParamED {task param} {
 #
 #-
    regsub -nocase -all D [GetParam $task $param] E res
+   regexp {^\'(.*)\'$} $res match res
    return $res
 }
     
