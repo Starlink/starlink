@@ -9,10 +9,9 @@
 #include <X11/IntrinsicP.h>
 
 #include <X11/Xaw3d/SimpleP.h>   /* Modified to use Xaw3d rather than   */
+                                 /* Xaw -- Alasdair Allan (30-JUN-2004) */
 
-
-#include <X11/Shell.h>           /* Xaw -- Alasdair Allan (30-JUN-2004) */
-
+#include <X11/Shell.h>           
 #include <stdio.h>
 #include <stdlib.h>
 

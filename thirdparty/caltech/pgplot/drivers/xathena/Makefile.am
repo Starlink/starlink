@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-if HAVE_XATHENA
+if !HAVE_XATHENA
    lib_LTLIBRARIES = libXaPgplot.la
    libXaPgplot_la_SOURCES = $(C_ROUTINES)
 

@@ -1,9 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = @subdirs@
-
 ## In automake terminology, this is the `bin' prefix to the `SCRIPTS' primary.
-bin_SCRIPTS = drivers/pgplot_link drivers/pgplot_link_adam
+bin_SCRIPTS = pgplot_link pgplot_link_adam
 dist_bin_SCRIPTS = rgb.txt
 
 # Made up from sublibs
