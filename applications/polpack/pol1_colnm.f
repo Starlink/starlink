@@ -230,6 +230,7 @@
 *  do it again.
          IF( STATUS .EQ. SAI__OK ) THEN
             INIT = .TRUE.
+         ELSE
             NCOL = 0
          END IF
 
