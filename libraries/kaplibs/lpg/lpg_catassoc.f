@@ -52,6 +52,8 @@
 *        Original version.
 *     10-APR-2000 (DSB):
 *        Added argument VERB.
+*     11-JUN-2002 (DSB):
+*        Removed erroneous VERB argument from CAT_ASSOC call.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -132,7 +134,7 @@
 
 *  If looping is currently disabled, just call CAT_ASSOC and exit.
       IF( DISAB ) THEN
-         CALL CAT_ASSOC( PARAM, VERB, MODE, CI, STATUS )
+         CALL CAT_ASSOC( PARAM, MODE, CI, STATUS )
          GO TO 999
       END IF
 

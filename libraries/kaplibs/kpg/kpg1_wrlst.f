@@ -73,6 +73,11 @@
 *     13-DEC-2001 (DSB):
 *        Added facility to specify the Frame in which to store positions
 *        in the catalogue.
+*     11-JUN-2002 (DSB):
+*        Remove code which pre-opened the output catalogue since CAT does
+*        not allow a catalogue to be opened more than once. This gave
+*        problems when using ICL due to FITS files not being closed
+*        properly.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -106,7 +111,6 @@
 
 *  Local Variables:
       CHARACTER CVAL*80          ! Character value obtained for the parameter
-      INTEGER CI                 ! CAT identifier
       INTEGER IBASE              ! Index of base Frame 
       INTEGER ICURR              ! Index of current Frame 
       INTEGER IDEF               ! Index of default catalogue Frame 
@@ -123,16 +127,6 @@
 
 *  Start an AST context.
       CALL AST_BEGIN( STATUS )
-
-*  Access the catalogue. There is no need to create the positions
-*  list is a catalogue cannot be obtained.
-      CALL LPG_CATCREAT( PARAM, CI, STATUS )
-      IF( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_BEGIN( STATUS )
-         CALL CAT_TRLSE( CI, STATUS )
-         CALL ERR_END( STATUS )
-         GO TO 999
-      END IF
 
 *  If the input FrameSet has more than 1 Frame, allow the user to select an alternative 
 *  base Frame. 
