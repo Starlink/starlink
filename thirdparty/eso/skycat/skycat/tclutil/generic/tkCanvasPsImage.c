@@ -391,6 +391,9 @@ ImageToPostscript(interp, canvas, itemPtr, prepass)
      Visual *visual;
      int screenX1, screenY1, screenX2, screenY2;
  
+     fprintf( stderr, 
+              "Using the correct version of postscript printing commands");
+
      if (prepass) {
          return TCL_OK;
      }
@@ -398,6 +401,7 @@ ImageToPostscript(interp, canvas, itemPtr, prepass)
      /*  Determine region of image that needs to be drawn. Only the
          part visible on the display screen is done. */
      Tk_SizeOfImage(imgPtr->image, &width, &height);
+     fprintf( stderr, "%d,%d\n", width, height );
      screenX1 = canvasPtr->xOrigin + canvasPtr->inset;
      screenY1 = canvasPtr->yOrigin + canvasPtr->inset;
      screenX2 = canvasPtr->xOrigin + Tk_Width(canvasWin) - canvasPtr->inset;
