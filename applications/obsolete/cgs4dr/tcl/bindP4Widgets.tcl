@@ -4,6 +4,7 @@ proc bindP4Widgets {taskname} {
 # p4 interface.
 #-
     global P4Widgets
+    global P4NoticeBoard
 
 # Command buttons.
     $P4Widgets(PLOT) configure -command "p4Plot $taskname"
