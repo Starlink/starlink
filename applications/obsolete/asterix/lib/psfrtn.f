@@ -1740,7 +1740,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Store methods
-      CALL PSF0_SETRTN( PSID, 'Data', PSF_XRT_HRI, STATUS )
+      CALL PSF0_SETRTN( PSID, 'Data', PSF_EXOLE, STATUS )
 
 *  Tidy up
       IF ( STATUS .NE. SAI__OK ) THEN
