@@ -183,6 +183,10 @@
 *        Add to list
             CALL IBGND_ADDSRC( XPOS, YPOS, R, STATUS )
 
+*      Mark sources
+          ELSE IF ( CMD .EQ. 'MARKSRC' ) THEN
+            CALL IBGND_MARK( STATUS )
+
 *      Display model
           ELSE IF ( CMD .EQ. 'DISP' ) THEN
             CALL IBGND_DISP_SURF( .FALSE., STATUS )
@@ -341,6 +345,141 @@
         CALL MSG_PRNT( '  No surface definition defined' )
       END IF
       CALL MSG_BLNK()
+
+      END
+
+
+      SUBROUTINE IBGND_MARK( STATUS )
+*+
+*  Name:
+*     IBGND_MARK
+
+*  Purpose:
+*     Mark sources on display
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Task subroutine
+
+*  Invocation:
+*     CALL IBGND_MARK( STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     STATUS = INTEGER (given)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ibgnd, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Jan 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Global Variables:
+      INCLUDE 'IMG_CMN'
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Variables:
+      CHARACTER*4		STR			! String of I
+
+      REAL			X, Y, R			! Source attrs
+
+      INTEGER			I			! Loop over sources
+      INTEGER			NDIGIT			! # chars used in STR
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise
+      STR = ' '
+
+*  Loop over sources
+      DO I = 1, I_BGM_NSRC
+
+*    Extract data
+        CALL ARR_ELEM1R( I_BGM_SRCPTR(1), I__MXBGSRC, I, X, STATUS )
+        CALL ARR_ELEM1R( I_BGM_SRCPTR(2), I__MXBGSRC, I, Y, STATUS )
+        CALL ARR_ELEM1R( I_BGM_SRCPTR(3), I__MXBGSRC, I, R, STATUS )
+
+*    Plot a circle
+        CALL IMG_CIRCLE( X, Y, R, STATUS )
+
+*    Write string with source number
+        X = X + R*COSD(45.0)
+        Y = Y + R*SIND(45.0)
+        CALL PGUPDT(0)
+        CALL CHR_ITOC( I, STR(2:), NDIGIT )
+        CALL PGTEXT( X, Y, STR(:NDIGIT+1) )
+        CALL PGUPDT(2)
+        CALL PGUPDT(1)
+
+*  Next source
+      END DO
 
       END
 
