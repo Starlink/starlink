@@ -39,6 +39,7 @@
 *  Authors:
 *     NE: Nick Eaton (STARLINK - Durham University)
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -49,6 +50,8 @@
 *        Original version.
 *     6-NOV-1996 (PDRAPER):
 *        Converted prologue to new standard.
+*     28-SEP-2004 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -63,6 +66,7 @@
       INCLUDE 'PRM_PAR'
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'CNF_PAR'
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -146,8 +150,8 @@
 
 * Find the maximum and minimum data values in the subarray
 * Use the KAPGEN routine MAXMIN
-      call MAXMIN( idims( 1 ), idims( 2 ), %val( datpin ), xstart,
-     :             ystart, xend, yend, npix, ninval, vmax, vmin,
+      call MAXMIN( idims( 1 ), idims( 2 ), %val( CNF_PVAL(datpin) ),
+     :             xstart, ystart, xend, yend, npix, ninval, vmax, vmin,
      :             maxpos, minpos, status )
 
 * Get the black and white parameters, using max and min as defaults
@@ -191,8 +195,9 @@
 
 * Scale the data array into the workspace array
       call MSG_OUT( ' ', 'Scaling image', status )
-      call GREY( idims( 1 ), idims( 2 ), %val( datpin ), xstart, xend,
-     :           ystart, yend, dx, dy, %val( worpin ),
+      call GREY( idims( 1 ), idims( 2 ), %val( CNF_PVAL( datpin ) ),
+     :           xstart, xend, ystart, yend, dx, dy, 
+     :           %val( CNF_PVAL( worpin ) ),
      :           npens, vmax, vmin )
 
 * Create an SGS zone of the correct shape, best filling the display
@@ -207,7 +212,8 @@
 
 * Plot out the image
       call MSG_OUT( ' ', 'Plotting image', status )
-      call GCA( x1, y2, x2, y1, dx, dy, 1, 1, dx, dy, %val( worpin ) )
+      call GCA( x1, y2, x2, y1, dx, dy, 1, 1, dx, dy,
+     :             %val( CNF_PVAL( worpin ) ) )
 
 * Make a database entry
       call AGS_SZONE( 'DATA', 'PHOTGREY', picid3, status )
