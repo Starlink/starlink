@@ -10,6 +10,7 @@
 *     25 Oct 93 : Don't make assumption that LAMB>15 is Gaussian. Use new NAG
 *                 routine in release 15. (DJA)
 *     11 Jun 97 : Convert to PDA (RB)
+*     22 Jun 98 : Make seed varry every second and with PID (RB)
 *
 *    Type definitions :
 *
@@ -26,7 +27,7 @@
 *
 *    Local variables :
 *
-      INTEGER SEED, TICKS, STATUS
+      INTEGER SEED, TICKS, PID, STATUS
       LOGICAL INITIALISE
 *
 *    Local Data :
@@ -38,7 +39,9 @@
       IF ( INITIALISE ) THEN
         STATUS = 0
         CALL PSX_TIME( TICKS, STATUS )
-        SEED = ( TICKS / 4 ) + 1
+        CALL PSX_GETPID( PID, STATUS )
+        SEED = 1000 * (( TICKS / 4 ) / 1000 ) + MOD( TICKS, 1000 )
+     :                                        + MOD( PID, 1000 )
         CALL PDA_RNSED( SEED )
         INITIALISE=.FALSE.
       END IF

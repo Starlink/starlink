@@ -17,6 +17,7 @@
 *     10 Aug 90 : Original (adapted from MATH_POISS) (DB)
 *     10 Jun 94 : Converted internals to double precision (DJA)
 *      6 Jun 97 : Convert to PDA (RB)
+*     22 Jun 98 : Make seed varry every second and with PID (RB)
 *
 *    Type Definitions :
 *
@@ -37,7 +38,7 @@
       LOGICAL			INITIALISE		! True if first call
         SAVE			INITIALISE
 
-      INTEGER			SEED, TICKS, STATUS
+      INTEGER			SEED, TICKS, PID, STATUS
 *
 *    Local data :
 *
@@ -48,7 +49,9 @@
       IF ( INITIALISE ) THEN
         STATUS = 0
         CALL PSX_TIME( TICKS, STATUS )
-        SEED = ( TICKS / 4 ) + 1
+        CALL PSX_GETPID( PID, STATUS )
+        SEED = 1000 * (( TICKS / 4 ) / 1000 ) + MOD( TICKS, 1000 )
+     :                                        + MOD( PID, 1000 )
         CALL PDA_RNSED( SEED )
 	INITIALISE=.FALSE.
       END IF
