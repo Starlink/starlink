@@ -61,6 +61,7 @@
 *     21 Apr 95 : V1.8-1 Updated data interface (DJA)
 *     14 Jun 95 : V1.8-2 Ensure effective exposure is updated in the
 *                        Poisson error case (DJA)
+*     25 Aug 95 : V1.8-3 Silly big with new vignetting code (DJA)
 *
 *    Type definitions :
 	IMPLICIT NONE
@@ -122,7 +123,7 @@
 
 *  Version :
       CHARACTER*30 		VERSION
-	PARAMETER		( VERSION = 'SSIM VERSION 1.8-2' )
+	PARAMETER		( VERSION = 'SSIM VERSION 1.8-3' )
 *-
 
 *  Version
@@ -181,6 +182,7 @@
 *  Set up the only OBDAT component needed (no. of channels, taken from response)
       CALL ADI_CGET0I( INSTR.R_ID, 'NCHAN', NCHAN, STATUS )
       OBDAT.NDAT = NCHAN
+      OBDAT.V_ID = ADI__NULLID
 
 *  Set up PREDDAT (no workspace required)
       PREDDAT.CONVOLVE = .TRUE.
