@@ -64,14 +64,14 @@
 *          Title               -> .OBS.OBJECT 
 *
 *          AXIS(1) structure   -> .X 
-*             AXIS(1) Data     -> .X.DATA   (unless there is a DATA
+*             AXIS(1) Data     -> .X.DATA  (unless there is a DATA_ARRAY
 *                                 component of AXIS(1).MORE.FIGARO to
 *                                 allow for a non-1-dimensional array)
-*             AXIS(1) Variance -> .X.VARIANCE   (unless there is a
+*             AXIS(1) Variance -> .X.VARIANCE  (unless there is a
 *                                 VARIANCE component of
 *                                 AXIS(1).MORE.FIGARO to allow for a
 *                                 non-1-dimensional array)
-*             AXIS(1) Width    -> .X.WIDTH   (unless there is a WIDTH
+*             AXIS(1) Width    -> .X.WIDTH  (unless there is a WIDTH
 *                                 component of AXIS(1).MORE.FIGARO to
 *                                 allow for a non-1-dimensional array)
 *             AXIS(1) Units    -> .X.UNITS
@@ -138,6 +138,20 @@
 *        Moved special cases of .OBS.SECZ, .OBS.TIME, .Z.MAGFLAG,
 *        .Z.RANGE from the top-level Figaro extension as this is where
 *        DSA_ now expects to find them in an NDF.
+*     1995 July 25 (MJC):
+*        Fixed bug when n-dimensional axis is present: it was getting
+*        pixel co-ordinate DATA component and a DATA_ARRAY component
+*        for the n-dimensional array.  Made the latter the DATA
+*        component.
+*     1996 February 7 (MJC):
+*        Checked whether or not AXIS().MORE.FIGARO.DATA_ARRAY is
+*        primitive.  If it is, its DATA component becomes the new
+*        n-D axis array, rather than renaming DATA_ARRAY to DATA, in
+*        the Figaro file.
+*     1996 February 9 (MJC):
+*        Checked whether or not AXIS().MORE.FIGARO.WIDTH is primitive.
+*        If it is, its DATA component becomes the new n-D axis-width
+*        array in the Figaro file.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -210,6 +224,7 @@
       CHARACTER*(DAT__SZLOC) LFAXU  ! Figaro AXIS UNITS locator
       CHARACTER*(DAT__SZLOC) LFAXV  ! Figaro AXIS VARIANCE locator
       CHARACTER*(DAT__SZLOC) LFAXW  ! Figaro AXIS WIDTH locator
+      CHARACTER*(DAT__SZLOC) LFAXWD ! Figaro AXIS WIDTH DATA locator
       CHARACTER*(DAT__SZLOC) LFCOM  ! Figaro .COMMENTS locator
       CHARACTER*(DAT__SZLOC) LFFT   ! Figaro .FITS locator
       CHARACTER*(DAT__SZLOC) LFFTC  ! Figaro .FITS.xxx.DESCRIPTION locator
@@ -262,6 +277,7 @@
       CHARACTER*(DAT__SZLOC) NXFIT  ! NDF FITS extension locator
       LOGICAL                QUPRES ! True if QUALITY is present in the
                                     ! NDF
+      LOGICAL                PRIM   ! True if component is primitive
       REAL                   RVAL   ! Holds real value
       CHARACTER*80           STRING ! FITS string
       CHARACTER*80           TITLE  ! Title
@@ -685,14 +701,28 @@
 *         Deal with the standard top-level components.  All non-standard
 *         components will be lost.
 
-*         First the (1-dimensional) data array if there is not an
-*         axis-centre array already, otherwise just use the existing
-*         array after renaming from NDF STANDARD to DST nomenclature.
+*         If there is an axis-centre array already either just use the
+*         existing primitive array after renaming from NDF standard to
+*         DST nomenclature (i.e. DATA_ARRAY to DATA); or if it's an
+*         <ARRAY> structure move the primitive component (called DATA)
+*         from within the DATA_ARRAY <ARRAY> structure, and then erase
+*         the <ARRAY> structure.  Tidy the temporary locator at the
+*         end (DAT_MOVE annuls the LFAXD locator and the erase
+*         operation annuls LFAXDA).
             IF ( AXDATA ) THEN
                CALL DAT_FIND( LFAX, 'DATA_ARRAY', LFAXDA, STATUS )
-               CALL DAT_RENAM( LFAXDA, 'DATA', STATUS )
-               CALL DAT_ANNUL( LFAXDA, STATUS )
+               CALL DAT_PRIM( LFAXDA, PRIM, STATUS )
+               IF ( PRIM ) THEN
+                  CALL DAT_RENAM( LFAXDA, 'DATA', STATUS )
+                  CALL DAT_ANNUL( LFAXDA, STATUS )
+               ELSE
+                  CALL DAT_FIND( LFAXDA, 'DATA', LFAXD, STATUS )
+                  CALL DAT_MOVE( LFAXD, LFAX, 'DATA', STATUS )
+                  CALL DAT_ERASE( LFAX, 'DATA_ARRAY', STATUS )
+               END IF
 
+*         Otherwise deal with the (1-dimensional) data array if there is
+*         not an axis-centre array already.
             ELSE
 
 *            Map the axis data array with the appropriate type.
@@ -764,9 +794,29 @@
                END IF
             END IF
 
+*         If there is an axis-width array already either just use the
+*         existing primitive array; or if it's an <ARRAY> structure
+*         move the primitive component (called DATA) from within the
+*         WIDTH <ARRAY> structure, and then erase the <ARRAY>
+*         structure.  Since in the latter case these have the same name
+*         we rename the original width array to OWIDTH.  Tidy the
+*         temporary locator at the end (DAT_MOVE annuls the LFAXWD
+*         locator and the erase operation annuls LFAXW).
+            IF ( AXWIDT ) THEN
+               CALL DAT_FIND( LFAX, 'WIDTH', LFAXW, STATUS )
+               CALL DAT_PRIM( LFAXW, PRIM, STATUS )
+               IF ( PRIM ) THEN
+                  CALL DAT_ANNUL( LFAXW, STATUS )
+               ELSE
+                  CALL DAT_RENAM( LFAXW, 'OWIDTH', STATUS )
+                  CALL DAT_FIND( LFAXW, 'DATA', LFAXWD, STATUS )
+                  CALL DAT_MOVE( LFAXWD, LFAX, 'WIDTH', STATUS )
+                  CALL DAT_ERASE( LFAX, 'OWIDTH', STATUS )
+               END IF
+
 *         Copy the (1-dimensional) width array if there is not a width
 *         array already.
-            IF ( .NOT. AXWIDT ) THEN
+            ELSE 
 
 *            Look to see if there is an axis-width array.
                CALL NDF_ASTAT( NDF, 'Width', IAXIS, EXIST, STATUS )
