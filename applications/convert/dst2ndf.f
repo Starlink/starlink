@@ -144,6 +144,11 @@
 *        Fixed bug that caused a phantom 2-d FITS structure to be
 *        created when there is an empty FITS structure within the DST
 *        file.
+*     1992 September 3 (MJC):
+*        Made provision for the FLAGGED component, also affecting
+*        whether or not quality is propagated.  Creates simple NDF where
+*        required.  Fixed another occurrence of a logical being used for
+*        a data type 'STRUCT'.
 *     1992 September 8 (MJC):
 *        Improved the documentation and added the rules for
 *        non-1-dimensional axis arrays.   Handles axis variance in
@@ -155,7 +160,9 @@
 *     1992 September 28 (MJC):
 *        Obtained NDF by SUBPAR calls, not PAR so that the global value
 *        is not written in quotes, and thus may be accepted by other
-*        applications.
+*        applications.  Corrected the closedown sequence of DTA-error
+*        reporting.  Added message tokens for the filenames to clarify
+*        some error reports.
 *     {enter_further_changes_here}
 
 *  Bugs:
