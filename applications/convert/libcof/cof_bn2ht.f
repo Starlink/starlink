@@ -38,7 +38,10 @@
 *  History:
 *     1996 January 21 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1997 November 12 (MJC):
+*        Added _LOGICAL.  (This was originally done in 1996, but
+*        appears not to have made it into V1.0.)
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -100,6 +103,9 @@
 
       ELSE IF ( TCODE .EQ. 'D' ) THEN
          TYPE = '_DOUBLE'
+
+      ELSE IF ( TCODE .EQ. 'L' ) THEN
+         TYPE = '_LOGICAL'
 
       ELSE IF ( TCODE .EQ. 'A' ) THEN
          TYPE = '_CHAR'
