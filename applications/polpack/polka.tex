@@ -1986,6 +1986,30 @@ containing the current $O$ and $E$ ray masks from the first image. This
 file can then be restored at the start of each subsequent run of POLKA to
 re-establish the $O$ and $E$ ray masks.
 
+\subsection {\mylabel{POLKA_USING_HELP}Align Data from Several Runs}
+If you want to process your data using POLKA in several batches, you will
+need to take care to ensure that the results of each batch are aligned on
+the sky. To do this, you should ensure that the first file supplied as
+input to POLKA is the same for each batch. The first file defines the
+reference frame to which the output images are aligned. Thus if you have
+data files \texttt{D1, D2, D3 ... D16}, and you want to process them in 4
+batches, you should run POLKA four times. If, for the first run, you
+specify the inputs images as \texttt{D1, D2, D3, D4}, then the list of
+input images supplied for each subsequent run should start with image
+\texttt{D1}. Thus for instance, you could specify the input images for
+the second run as \texttt{D1, D5, D6, D7, D8}, and \texttt{D1, D9, D10, 
+D11, D12} for the third run, etc.
+
+Note, you should give a null (!) response to parameter STOKES when
+running POLKA each time in order to prevent Stokes vectors from being 
+calculated for each batch. Once all batches have been processed by POLKA, 
+you then run POLCAL a single time to create Stokes vectors from all the 
+aligned, extracted $O$ and $E$ ray images.
+
+This method has the slight problem that the first image (D1 in the above
+example) is processed several times by POLKA. In a future release POLKA will 
+be modified to provide a better system than this.
+
 \subsection {\mylabel{POLKA_STOP_START}Stop and Re-start POLKA}
 Use the \htmlref{{\em Dump}}{POLKA_DUMP}/{\em Everything} and 
 \htmlref{{\em Restore}}{POLKA_RESTORE}/{\em Everything} commands in the 
