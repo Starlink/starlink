@@ -119,7 +119,7 @@ if <code/docnumber/ isn't defined.
 			       (if asString
 				   (string-append (code-to-string doctype)
 						  " ")
-				   (string-append doctype "/"))
+				   (string-append (case-fold-up doctype) "/"))
 			       (error "DOCNUMBER has no DOCUMENTTYPE")))))
     (if dn
 	(string-append docelemtype
@@ -139,7 +139,7 @@ if <code/docnumber/ isn't defined.
   <description>One of the Starlink document codes
 <codebody>
 (define (code-to-string doccode)
-  (case (normalize doccode)
+  (case (case-fold-down doccode)
     (("sun") "Starlink User Note")
     (("ssn") "Starlink System Note")
     (("mud") "Miscellaneous User Document")
