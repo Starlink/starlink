@@ -348,7 +348,7 @@
       SXL = SXL - MARGIN( 4 )*CXI
 
 *  Now add on each of the extra pictures.
-      DO I = 1, NP, -1
+      DO I = 1, NP
 
          IF( PSIDE( I ) .EQ. 'L' ) THEN
             SXL = SXL - ABS( PSIZE( I )*CXI ) 
