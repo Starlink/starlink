@@ -504,17 +504,6 @@
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-
-
-      call msg_blank( status )   
-      call msg_blank( status )   
-      call msg_out( ' ', '  WARNING:  The CONTOVER application will '//
-     :              'be withdrawn at the next release of KAPPA. Use '//
-     :              'CONTOUR CLEAR=NO instead.', STATUS )
-      call msg_blank( status )   
-      call msg_blank( status )   
-
-
       DEVCAN = .FALSE.
 
 *    Obtain and map the array to be contoured.

@@ -435,7 +435,9 @@ PRIVATE_INCLUDES =
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = HLPCMD PRM_PAR NUM_DEF_CVT SAE_PAR PAR_ERR NUM_DEC_CVT
+EXTERNAL_INCLUDES = HLPCMD PRM_PAR SAE_PAR DAT_PAR CTM_PAR NUM_DEC_CVT \
+NDF_ERR GNS_PAR NDF_PAR NUM_DEF_CVT PAR_ERR NUM_DEC_R SUBPAR_PAR GKS_PAR \
+NUM_DEF_R
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -595,12 +597,21 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES)
 #
 #  Rules to set up links to locate each of the above include files.
 #
-HLPCMD:		$(STAR_INC)/hlpcmd;	$(LINK) $? $@
+CTM_PAR:	$(STAR_INC)/ctm_par;	$(LINK) $? $@
+DAT_PAR:	$(STAR_INC)/dat_par;	$(LINK) $? $@
+GKS_PAR:	$(STAR_INC)/gks_par;	$(LINK) $? $@
+GNS_PAR:	$(STAR_INC)/gns_par;	$(LINK) $? $@
+HLPCMD:	$(STAR_INC)/hlpcmd;	$(LINK) $? $@
+NDF_ERR:	$(STAR_INC)/ndf_err;	$(LINK) $? $@
+NDF_PAR:	$(STAR_INC)/ndf_par;	$(LINK) $? $@
 NUM_DEC_CVT:	$(STAR_INC)/num_dec_cvt;	$(LINK) $? $@
+NUM_DEC_R:	$(STAR_INC)/num_dec_R;	$(LINK) $? $@
 NUM_DEF_CVT:	$(STAR_INC)/num_def_cvt;	$(LINK) $? $@
+NUM_DEF_R:	$(STAR_INC)/num_def_R;	$(LINK) $? $@
 PAR_ERR:	$(STAR_INC)/par_err;	$(LINK) $? $@
 PRM_PAR:	$(STAR_INC)/prm_par;	$(LINK) $? $@
 SAE_PAR:	$(STAR_INC)/sae_par;	$(LINK) $? $@
+SUBPAR_PAR:	$(STAR_INC)/subpar_par;	$(LINK) $? $@
 
 #
 #  Rules for extracting source files from the source archive.  Split to
@@ -1663,15 +1674,24 @@ $(PKG_NAME)_ifls.tar:
 
 cnthlt.o:	 SAE_PAR
 cntsbp.o:	 SAE_PAR
+contover.o:	 SAE_PAR DAT_PAR PAR_ERR PRM_PAR NDF_PAR NDF_ERR GKS_PAR
 gethlp.o:	 SAE_PAR HLPCMD
+greyplot.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR PRM_PAR NDF_PAR NDF_ERR CTM_PAR GNS_PAR NUM_DEC_CVT NUM_DEF_CVT
+kaprh_mon.o:	 SAE_PAR
 kps1_cnser.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEF_CVT
 kps1_cntur.o:	 SAE_PAR PRM_PAR
+kps1_dsclb.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
+kps1_dscld.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
+kps1_dscli.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
+kps1_dsclr.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
+kps1_dsclw.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
 kps1_fainb.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_faind.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_faini.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_fainr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_fainw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_imzbo.o:	 SAE_PAR
+krhhelp.o:	 SAE_PAR PAR_ERR
 lccell.o:	 SAE_PAR PRM_PAR
 ncraxs.o:	 SAE_PAR
 
