@@ -109,7 +109,6 @@
       INTEGER			BITPIX			! Bits per pixel
       INTEGER			IAX			! Loop over dimensions
       INTEGER			IHDU			! HDU number
-      INTEGER			IMID			! Image identifier
 
       LOGICAL			THERE			! Object exists?
 *.

@@ -346,7 +346,6 @@
 
       INTEGER			BITPIX			! Bits per pixel
       INTEGER			FSTAT			! FITSIO status
-      INTEGER			HDUID			! HDU identifier
       INTEGER			HDUTYPE			! FITSIO hdu type
       INTEGER			IAX			! Loop over axes
       INTEGER			IMID			! Image cache object
@@ -670,7 +669,6 @@
       INTEGER			CRDID			! Card cache object
       INTEGER			CRDTAB			! HDU table
       INTEGER			FSTAT			! FITSIO status
-      INTEGER			HDUID			! HDU identifier
       INTEGER			ICARD			! Loop over cards
       INTEGER			IVAL			! Keyword value
       INTEGER			NCARD			! # cards in HDU
