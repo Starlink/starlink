@@ -1,0 +1,11 @@
+#
+# macro definitions for the gcc ANSI-C Compiler on other systems
+#
+# E.BERTIN 1997
+#
+SEXMACHINE= gcc
+CC    = gcc				# the C compiler
+COPTS = -O				# options for the C compiler
+CD    = cd
+CP    = cp
+RM    = rm -f

@@ -1,0 +1,11 @@
+#
+# macro definitions for the gcc ANSI-C Compiler on PC-LINUX systems
+#
+# E.BERTIN 1999
+#
+SEXMACHINE= linux
+CC    = gcc				# the C compiler
+COPTS = -DPC_LINUX -O2 -malign-double -finline-functions -funroll-loops		# options for the C compiler
+CD    = cd
+CP    = cp
+RM    = rm -f
