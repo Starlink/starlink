@@ -58,6 +58,7 @@ proc CCDTaskRegistry { } {
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -66,6 +67,8 @@ proc CCDTaskRegistry { } {
 #     31-OCT-1995 (PDRAPER):
 #        Recoded to check monoliths by back tracking the link from the
 #        command name to the executable.
+#     19-JUN-2001 (MBT):
+#        Added some tasks: ccdedit, makeset, showset.
 #     {enter_changes_here}
 
 #-
@@ -75,7 +78,8 @@ proc CCDTaskRegistry { } {
    global KAPdir
 
 #  Local constants.
-   set ccdpack_tasks "schedule ccdclear ccdsetup present import picinfo"
+   set ccdpack_tasks "schedule ccdclear ccdsetup present import picinfo \
+                      ccdedit makeset showset"
    set kappa_tasks "display fitslist lutable"
 
 #.
