@@ -171,7 +171,6 @@ C      {data_type} {external_name} ! [external_description]
       INTEGER			CBPTR			! Counts per block store
       INTEGER		      	CCOUNT			! Events to copy per block
       INTEGER                 	COPY                 	! Pointer to copy array
-      INTEGER                 	DIMS                 	! Number of dimensions
       INTEGER                 	EVENTS               	! Number of events in EVDS
       INTEGER			EVID			! New event object
       INTEGER                 	I, J, K              	! Loop counters
@@ -182,11 +181,9 @@ C      {data_type} {external_name} ! [external_description]
       INTEGER			ILID			! Input list id
       INTEGER                   INDEX(MXSEL)       	! Lists to apply ranges
       INTEGER                 	IQPTR(MXSEL)    	! Pointer to input quantum
-      INTEGER                 	LDIMS(ADI__MXDIM)    	! Length of each dimension
       INTEGER                 	LEN                  	! Length of various things
       INTEGER			LID			! List identifier
       INTEGER			NBLK			! # blocks to copy
-      INTEGER                 	NCOMP                	! Number of components
       INTEGER                 	NLISTS               	! Number of LISTs
       INTEGER                 	NRANGES(MXSEL)  	! Number of ranges per list
       INTEGER                 	NSEL                 	! # selected lists
@@ -268,7 +265,7 @@ C      {data_type} {external_name} ! [external_description]
           CALL ADI_CGET0C( LID, 'Name', NAME(I), STATUS )
 
 *      Map list
-          CALL EDI_MAPR( IFID, NAME, 'READ', 0, 0, IDPTR(I), STATUS )
+          CALL EDI_MAPR( IFID, NAME(I), 'READ', 0, 0, IDPTR(I), STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Get extreme values
@@ -291,20 +288,17 @@ C      {data_type} {external_name} ! [external_description]
           CALL MSG_SETR( 'MAX', FMAX(I) )
           CALL MSG_PRNT( 'The ^NAME range is from ^MIN to ^MAX.' )
 
-          CALL CHR_ITOC (J, PAR, LEN)
-          PAR = 'KEEP'//PAR(1:LEN)
-          CALL USI_GET0L( PAR, KEEP(J), STATUS )
+          CALL CHR_ITOC( I, PAR, LEN )
+          CALL USI_GET0L( 'KEEP'//PAR(:LEN), KEEP(I), STATUS )
 
-          CALL CHR_ITOC (J, PAR, LEN)
-          PAR = 'RANGES'//PAR(1:LEN)
-          CALL PRS_GETRANGES( PAR, MXBNDS, 1, FMIN(J), FMAX(J),
-     :                      RANGES(1,J), NRANGES(J), STATUS )
+          CALL PRS_GETRANGES( 'RANGES'//PAR(:LEN), MXBNDS, 1, FMIN(I),
+     :                      FMAX(I), RANGES(1,I), NRANGES(I), STATUS )
 
 *      Check STATUS - exit if bad
           IF (STATUS .NE. SAI__OK) GOTO 99
 
-*    Check ranges are increasing
-          CALL ARR_INCR( 2*NRANGES(J), RANGES(1,J), OK )
+*      Check ranges are increasing
+          CALL ARR_INCR( 2*NRANGES(I), RANGES(1,I), OK )
           IF ( .NOT. OK ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'FATAL ERROR: Ranges must be increasing',
@@ -313,29 +307,23 @@ C      {data_type} {external_name} ! [external_description]
           END IF
 
 *      Alter bounds according to QUANTUM
-c          CALL HDX_OK( ILLOC(J), 'QUANTUM', QOK(J), STATUS )
-c
-c          IF ( QOK(J) ) THEN
-c            CALL CMP_SHAPE( ILLOC(J), 'QUANTUM', DAT__MXDIM, LDIMS,
-c     :                                             DIMS, STATUS )
-c
-c            IF (DIMS .EQ. 0) THEN
-c              CALL CMP_GET0R( ILLOC(J), 'QUANTUM', QUANTUM, STATUS )
-c              CALL EVSUBSET_ALTER_RNG_S( QUANTUM, NRANGES(J), RANGES(1,J),
-c     :                               FMIN(J), FMAX(J), KEEP(J), STATUS )
-c
-c            ELSE
-c
-c*            Map input vector QUANTUM component
-c              QVEC(I) = .TRUE.
-c              CALL CMP_MAPV( ILLOC(I), 'QUANTUM', '_REAL', 'READ',
-c     :                                 IQPTR(J), LDIMS, STATUS )
-c              CALL EVSUBSET_ALTER_RNG_V( EVENTS, %VAL(IQPTR(J)),
-c     :                         NRANGES(J), RANGES(1,J), FMIN(J),
-c     :                         FMAX(J), STATUS )
-c
-c            END IF
-c          END IF
+          QVEC(I) = .FALSE.
+          CALL ADI_THERE( LID, 'Quantum', QOK(I), STATUS )
+          IF ( QOK(I) ) THEN
+            CALL ADI_CGET0R( LID, 'Quantum', QUANTUM, STATUS )
+            CALL EVSUBSET_ALTER_RNG_S( QUANTUM, NRANGES(I), RANGES(1,I),
+     :                               FMIN(I), FMAX(I), KEEP(I), STATUS )
+          ELSE
+            CALL ADI_CGET0L( LID, 'VectorQuantum', QVEC(I), STATUS )
+            IF ( QVEC(I) ) THEN
+              CALL EDI_QMAP( IFID, NAME(I), 'REAL', 'READ', 0, 0,
+     :                                        IQPTR(I), STATUS )
+              CALL EVSUBSET_ALTER_RNG_V( EVENTS, %VAL(IQPTR(I)),
+     :                         NRANGES(I), RANGES(1,I), FMIN(I),
+     :                         FMAX(I), STATUS )
+            END IF
+          END IF
+
         END DO
 
 *    Check each event to see if it should be copied
@@ -343,7 +331,7 @@ c          END IF
         DO I = 1, EVENTS
           J  = 1
           OK = .TRUE.
-          DO WHILE ( (J.LE.NLISTS) .AND. OK )
+          DO WHILE ( (J.LE.NSEL) .AND. OK )
             CALL EVSUBSET_CHECK_RANGE( I, KEEP(J), NRANGES(J),
      :                                 RANGES(1,J), %VAL(IDPTR(J)),
      :                                 %VAL(COPY), OK, STATUS )
@@ -355,6 +343,9 @@ c          END IF
 *    Unmap the selected lists
         DO I = 1, NSEL
           CALL EDI_UNMAP( IFID, NAME(I), STATUS )
+          IF ( QVEC(I) ) THEN
+            CALL EDI_QUNMAP( IFID, NAME(I), STATUS )
+          END IF
         END DO
 
 *    Else index mode
@@ -477,13 +468,13 @@ c          END IF
           END IF
 
 *        Copy the data
-          IF ( MTYPE(1:1) .EQ. 'I' ) THEN
-            CALL EVSUBSET_QCOPYI( BLEN,
+          IF ( MTYPE(1:1) .EQ. 'D' ) THEN
+            CALL EVSUBSET_QCOPYD( BLEN,
      :                            %VAL(ADPTR), QVEC(I), %VAL(AQPTR),
      :                            %VAL(COPY+(BSTART-1)*VAL__NBB),
      :                            %VAL(ODPTR), %VAL(OQPTR), STATUS )
           ELSE
-            CALL EVSUBSET_QCOPYD( BLEN,
+            CALL EVSUBSET_QCOPYI( BLEN,
      :                            %VAL(ADPTR), QVEC(I), %VAL(AQPTR),
      :                            %VAL(COPY+(BSTART-1)*VAL__NBB),
      :                            %VAL(ODPTR), %VAL(OQPTR), STATUS )
