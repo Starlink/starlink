@@ -104,7 +104,7 @@
           ELSEIF (MODE.EQ.'POL') THEN
             CALL IREGION_POLYGON(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'ANN') THEN
-            CALL IREGION_ANNULUS(EXCLUDE,STATUS)
+            CALL IREGION_ANNULUS(SUBMODE,EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'ELL') THEN
             CALL IREGION_ELLIPSE(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'WHO') THEN
@@ -271,7 +271,7 @@
 
 
 *+
-      SUBROUTINE IREGION_ANNULUS(EXCLUDE,STATUS)
+      SUBROUTINE IREGION_ANNULUS(MODE,EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -286,14 +286,18 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
+      CHARACTER*(*) MODE
       LOGICAL EXCLUDE
 *    Export :
 *    Status :
       INTEGER STATUS
 *    Function declarations :
+      INTEGER CHR_LEN
 *    Local constants :
 *    Local variables :
+      CHARACTER*80
       REAL XC,YC,IRAD,ORAD
+      INTEGER L
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -301,6 +305,38 @@
         CALL IMG_GETANNULUS('XC','YC','IRAD','ORAD',XC,YC,IRAD,ORAD,
      :                                                       STATUS)
         CALL IMG_SETANNULUS(XC,YC,IRAD,ORAD,EXCLUDE,STATUS)
+
+        IF (MODE.EQ.'AND') THEN
+          TEXT=' .AND.'
+          L=7
+        ELSE
+          TEXT=' '
+          L=1
+        ENDIF
+
+        IF (EXCLUDE) THEN
+          TEXT(L:)=' .NOT. (CIRCLE( '
+        ELSE
+          TEXT(L:)=' (CIRCLE( '
+        ENDIF
+        L=CHR_LEN(TEXT)
+
+        CALL MSG_SETR('XC',XC)
+        CALL MSG_SETR('YC',YC)
+        CALL MSG_SETR('RAD',ORAD)
+        CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^RAD )',TEXT,L)
+        TEXT=' .AND..NOT. CIRCLE('
+        L=CHR_LEN(TEXT)
+        CALL MSG_SETR('XC',XC)
+        CALL MSG_SETR('YC',YC)
+        CALL MSG_SETR('RAD',IRAD)
+        CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^RAD )',TEXT,L)
+        IF (EXCLUDE) THEN
+          L=L+1
+          TEXT(L:)=')'
+        ENDIF
+
+        CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
 
 
 
