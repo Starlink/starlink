@@ -53,7 +53,7 @@
 #     1998 May 12 (TIMJ)
 #        Add a parameter for writing MEDIAN image
 #     1998 June 3 (TIMJ)
-#        Add DEFOUT
+#        Add DEFOUT. Remove GRID parameter.
 #     {enter_further_changes_here}
 
 #-
@@ -105,12 +105,12 @@
          PROMPT 'Please ignore (will only appear in prompt mode)'
       ENDPARAMETER
 
-      PARAMETER GRID
-         TYPE NDF
-         ACCESS 'WRITE'
-         DEFAULT !
-         PROMPT 'File containing the median data'
-      ENDPARAMETER
+#      PARAMETER GRID
+#         TYPE NDF
+#         ACCESS 'WRITE'
+#         DEFAULT !
+#         PROMPT 'File containing the median data'
+#      ENDPARAMETER
 
       PARAMETER MSG_FILTER
         TYPE     '_CHAR'
