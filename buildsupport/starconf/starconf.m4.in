@@ -55,7 +55,11 @@ AC_ARG_VAR(STARLINK, [Where all the Starlink software lives])dnl
 AC_SUBST(STARLINK)
 
 # Use the above information: $STARLINK indicates a preexisting
-# Starlink tree.
+# Starlink tree.  Note that we are using FCFLAGS rather than FFLAGS --
+# we prefer the FC macros to the F77 ones, and have modified automake
+# to generate these.  However, we maintain FFLAGS also, so that we
+# allow both.
+FCFLAGS="$FCFLAGS -I$STARLINK/include"
 FFLAGS="$FFLAGS -I$STARLINK/include"
 CFLAGS="$CFLAGS -I$STARLINK/include"
 LDFLAGS="$LDFLAGS -L$STARLINK/lib"
@@ -70,11 +74,16 @@ LDFLAGS="$LDFLAGS -L$STARLINK/lib"
 # Dependency declarations and checks (see macros
 # [STAR_DECLARE_BUILD_DEPENDENCIES] and [STAR_DECLARE_USE_DEPENDENCIES])
 # Everything is dependent on starconf, so we don't have to declare that 
-# for each package separately.
-STAR_BUILD_DEPENDENCIES=''
-AC_SUBST(STAR_BUILD_DEPENDENCIES)dnl
-STAR_USE_DEPENDENCIES=''
-AC_SUBST(STAR_USE_DEPENDENCIES)dnl
+# for each package separately.  STAR_DEPENDENCIES_ATTRIBUTES is currently
+# not used.
+dnl STAR_BUILD_DEPENDENCIES=''
+dnl AC_SUBST(STAR_BUILD_DEPENDENCIES)dnl
+dnl STAR_USE_DEPENDENCIES=''
+dnl AC_SUBST(STAR_USE_DEPENDENCIES)dnl
+STAR_DEPENDENCIES_ATTRIBUTES=''
+STAR_DEPENDENCIES_CHILDREN=''
+AC_SUBST(STAR_DEPENDENCIES_ATTRIBUTES)
+AC_SUBST(STAR_DEPENDENCIES_CHILDREN)
 
 # List of message files.  Used to signal to automake
 STAR_MESSGEN_SOURCES=
@@ -138,17 +147,9 @@ AC_SUBST(PACKAGE_VERSION)
 # the Makefile.am if they are to be used in code, or are to be
 # installed.  If they are used in building the package, you will
 # probably need to declare them additionally as `BUILT_SOURCES'.  The
-# package also implicitly declares a build-time dependency on the
+# package also implicitly declares a `sourceset' dependency on the
 # messgen package.
 #
-## Note that, apart from declaring the dependency on messgen, this is
-## a configure-time no-op.  All the configuration work is done within
-## (the Starlink additions to) automake, and a complete set of make
-## rules is emitted into Makefile.in.
-## NOAC_DEFUN([STAR_MESSGEN],
-##         [STAR_DECLARE_BUILD_DEPENDENCIES(messgen)])dnl
-
-
 AC_DEFUN([STAR_MESSGEN],
          [#
           m4_ifval([$1], [], [AC_FATAL([$0: called with no message file])])dnl
@@ -172,102 +173,106 @@ AC_DEFUN([STAR_MESSGEN],
               STAR_HELP_FILES(fac_${_s_faccode}_err)
               _STAR_EXTRA_DIST(fac_${_s_faccode}_err)
           done
-          STAR_DECLARE_BUILD_DEPENDENCIES(messgen)
+          STAR_DECLARE_DEPENDENCIES([sourceset], [messgen])
 ])# STAR_MESSGEN
 
 
-## NOAC_DEFUN([STAR_MESSGEN],
-##          [#
-##           _s_facfile="m4_ifval([$1], [$1], [${PACKAGE}_err.msg])"
-##           AC_SUBST(MESSGEN_DEPENDENCIES)
-##           for infile in $_s_facfile
-##           do
-##               expr "x$infile" : 'x.*\.msg$' >/dev/null || \
-##                 { echo "ERROR: facility file $infile does not end in .msg";
-##                   exit 1; }
-##               if test -r $infile; then
-##                   : OK
-##               else
-##                   echo "Facility file $infile missing or not readable"
-##                   exit 1
-##               fi
-##               # Extract the facility name and code from the .msg file
-##               # Format is `.FACILITY name,code/PREFIX=xxx'
-##               AC_MSG_CHECKING([facility and code in $infile])
-##               eval [`sed -n '/\.FACILITY/{s/.*\.FACILITY[ 	]*\([a-zA-Z]*\) *, *\([0-9]*\).*/_s_facname=\1; _s_faccode=\2;/p;q;}' $infile`]
-##               _s_facname=[`echo $_s_facname | tr '[A-Z]' '[a-z]'`]
-##               _s_FACNAME=[`echo $_s_facname | tr '[a-z]' '[A-Z]'`]
-##               AC_MSG_RESULT([$_s_facname/$_s_faccode])
-##               # Note quoting below: doubly escaped newline
-##               MESSGEN_DEPENDENCIES="${MESSGEN_DEPENDENCIES}${_s_FACNAME}_ERR ${_s_facname}_err ${_s_facname}_err.h fac_${_s_faccode}_err: ${infile}_stamp\\
-## "
-##               STAR_HELP_FILES(fac_${_s_faccode}_err)
-##               _STAR_EXTRA_DIST(fac_${_s_faccode}_err)
-##           done
-##           STAR_DECLARE_BUILD_DEPENDENCIES(messgen)
-## ])# STAR_MESSGEN
-
-
-
-# STAR_HAVE_F77_OPEN_READONLY
+# STAR_HAVE_FC_OPEN_READONLY
 # ---------------------------
 #
 # Tests if the Fortran compiler supports the READONLY option on the
 # OPEN command.
-AC_DEFUN([STAR_HAVE_F77_OPEN_READONLY],
-         [AC_REQUIRE([AC_PROG_F77])dnl
+AC_DEFUN([STAR_HAVE_FC_OPEN_READONLY],
+         [AC_REQUIRE([AC_PROG_FC])dnl
           AC_CACHE_CHECK([whether OPEN has the READONLY specifier],
-                         [star_cv_have_f77_open_readonly],
-                         [AC_LANG_PUSH([Fortran 77])dnl
-                          AC_COMPILE_IFELSE(AC_LANG_PROGRAM([],
+                         [star_cv_have_fc_open_readonly],
+                         [AC_LANG_PUSH([Fortran])dnl
+                          AC_COMPILE_IFELSE(
+                              AC_LANG_PROGRAM([],
                                               [      OPEN(UNIT=99,READONLY)]),
-                                            [star_cv_have_f77_open_readonly=yes],
-                                            [star_cv_have_f77_open_readonly=no])
-                          AC_LANG_POP(Fortran 77)])
-          if test $star_cv_have_f77_open_readonly = yes; then
-              AC_DEFINE([HAVE_F77_OPEN_READONLY], 1,
-                        [Define to 1 if F77 OPEN has the READONLY specifier])
+                              [star_cv_have_fc_open_readonly=yes],
+                              [star_cv_have_fc_open_readonly=no])
+                          AC_LANG_POP(Fortran)])
+          if test $star_cv_have_fc_open_readonly = yes; then
+              AC_DEFINE([HAVE_FC_OPEN_READONLY], 1,
+                        [Define to 1 if f77 OPEN has the READONLY specifier])
           fi
 ])
 
 
-## # STAR_F77_C_SYMBOLS
-## # ------------------
-## NOTAC_DEFUN([STAR_F77_C_SYMBOLS],
-## 	 [AC_REQUIRE([AC_PROG_F77])dnl
-##           AC_REQUIRE([AC_PROG_CC])dnl
-## AC_MSG_CHECKING([how to make Fortran produce C-compatible symbols])
-## AC_LANG_PUSH([C])
-## AC_LANG_CONFTEST(
-##   [AC_LANG_SOURCE([void testfunc() {}])])
-## if (eval $ac_compile) 2>&5; then
-##   mv conftest.$ac_objext c-conftest.$ac_objext
-## else
-##   AC_MSG_ERROR([cannot compile a C program!])
-## fi
-## AC_LANG_POP([C])
-## AC_LANG_PUSH([Fortran 77])
-## AC_LANG_CONFTEST(
-##   [AC_LANG_PROGRAM([], [      CALL testfunc])])
-## star_f77_c_symbols=X
-## for opt in "" "-fno-second-underscore"
-## do
-##   echo "Trying opt=$opt"
-##   if $F77 $opt -o conftest conftest.f c-conftest.$ac_objext 2>&5; then
-##     star_f77_c_symbols=$opt
-##     break
-##   else
-##     echo "opt=$opt didn't work"
-##   fi
-## done
-## if test "$star_f77_c_symbols" = X; then
-##         for x in conftest*; do cp $x saved-$x;done
-##   AC_MSG_ERROR([cannot work out how])
-## else
-##   AC_MSG_RESULT([option <$star_f77_c_symbols>])
-## fi
-## AC_LANG_POP([Fortran 77])
-## ])# STAR_F77_C_SYMBOLS
+# STAR_CNF_COMPATIBLE_SYMBOLS
+# ---------------------------
+#
+# Work out what is required to have the Fortran compiler produce
+# library symbols which are compatible with those expected by the CNF
+# package.  If you are building a library which includes Fortran code,
+# then you should call this macro, which possibly adjusts the FCFLAGS
+# variable.
+#
+# At present, all this macro has to do is simply work out whether it
+# needs to stop g77 adding a second underscore to generated symbol
+# names (it adds a single underscore to most Fortran symbols, but by
+# default adds two when the symbol name already contains an
+# underscore); the other Fortran compilers we use don't need any extra
+# options, as it happens.  However this could potentially be much more
+# complicated.  The autoconf AC_F77_WRAPPERS macro detects more
+# possibilities, but probably not a completely exhaustive set.  In
+# future it might be necessary to extend the CNF macros, by somehow
+# merging the results of AC_F77_WRAPPERS into it, and at that point it
+# might be necessary to extend this macro.
+#
+# This macro is designed to work with CNF, however it does _not_
+# require the cnf.h headers to be installed, because it should remain
+# callable at configuration time before _anything_ has been installed.
+# Instead we fake the functionality of the definition
+# F77_EXTERNAL_NAME in cnf.h, which appends an underscore (just one)
+# to the end of C symbols.
+#
+AC_DEFUN([STAR_CNF_COMPATIBLE_SYMBOLS],
+         [AC_CACHE_CHECK([how to make Fortran and C play nicely],
+                         [star_cv_cnf_compatible_symbols],
+                         [AC_REQUIRE([AC_PROG_FC])dnl
+                          AC_REQUIRE([AC_PROG_CC])dnl
+                          AC_LANG_PUSH([C])
+                          AC_LANG_CONFTEST([AC_LANG_PROGRAM([
+void funcone_(); 
+void func_two_();
+],[
+funcone_();
+func_two_();
+])])
+                          if (eval $ac_compile) 2>&5; then
+                              mv conftest.$ac_objext c-conftest.$ac_objext
+                          else
+                              AC_MSG_ERROR([cannot compile a C program!])
+                          fi
+                          AC_LANG_POP(C)
+                          AC_LANG_PUSH([Fortran])
+                          AC_LANG_CONFTEST([AC_LANG_SOURCE([
+      SUBROUTINE funcone
+      END
+      SUBROUTINE func_two
+      END
+])])
+                          star_cv_cnf_compatible_symbols=X
+                          for opt in "" "-fno-second-underscore"
+
+                          do
+                              if $FC $opt -o conftest conftest.f c-conftest.$ac_objext 2>&5; then
+                                  star_cv_cnf_compatible_symbols=$opt
+                                  break
+                              fi
+                          done
+                          AC_LANG_POP([Fortran])
+                          rm -f conftest* c-conftest*
+                          ])
+          if test "$star_cv_cnf_compatible_symbols" = X; then
+              AC_MSG_ERROR([cannot work out how])
+          else
+              FCFLAGS="$FCFLAGS $star_cv_cnf_compatible_symbols"
+              FFLAGS="$FFLAGS $star_cv_cnf_compatible_symbols"
+          fi
+])# STAR_CNF_COMPATIBLE_SYMBOLS
 
 
 # STAR_LATEX_DOCUMENTATION(documentcode, [targets])
@@ -298,10 +303,9 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
                         _STAR_EXTRA_DIST(${docno}.tex ${docno}.ps ${docno}.htx_tar)
                         STAR_DOC_FILES(${docno}.tex ${docno}.ps ${docno}.htx_tar)
                     done
-                    dnl STAR_DECLARE_BUILD_DEPENDENCIES(star2html)
+                    dnl STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
                    ])dnl
 ])# STAR_LATEX_DOCUMENTATION
-
 
 
 # STAR_HELP_FILES(helpfiles)
@@ -331,72 +335,84 @@ AC_DEFUN([STAR_DOC_FILES],
          [_STAR_EXTRADIR_COMMON([docs], [$1])])
 
 
-# STAR_DECLARE_BUILD_DEPENDENCIES(packagelist)
-# --------------------------------------------
+# STAR_DECLARE_DEPENDENCIES(type, deplist, option='')
+# ---------------------------------------------------
 #
-# Declare a space-separated list of packages/components which the
-# build of this package depends on.  The packages here are tested to
-# ensure thay do exist, and the list is available for substitution in
-# the AC_SUBST-ed variable [@STAR_BUILD_DEPENDENCIES@]. 
+# Declare dependencies of this component.  The TYPE is one of
+# `sourceset', `build', `link' or `use', and the DEPLIST is a space
+# separated list of component names, which this component depends on in
+# the given way.
 #
-# For libraries, this refers to packages which provide include files
-# which must be present for this package to compile, or libraries
-# which are linked in to the current package in some way.  It should
-# not include libraries which this library calls.  Thus a Fortran
-# library might require the `sae' package in order to read the SAE_PAR
-# include file, but it will not typically require the `ems' package to
-# be installed, if it only refers to EMS_* routines from its own
-# code.  In this case, `sae' is a build dependency, but `ems' is a use
-# dependency.
+# -- Sourceset dependencies are those components which must be
+# installed in order to build the complete set of sources, either for
+# building or for distribution.  This includes documentation, so it
+# would include star2html as well as messgen.
 #
-# In contrast, an analogous C library would generally require the
-# `ems' package to be installed before the library can be built, since
-# it needs to include the header
-# files which would be installed with the library.  An application
-# needs to link in all the libraries it calls, so they all have to be
-# installed before the application will build, and so they are build
-# dependencies.
+# -- Build dependencies are those which are required in order to build
+# this component.  This typically means include files, but if part of
+# the component is an executable file (such as compifl within the
+# parsecon component), then that's a build dependence also (but see
+# the discussion of `option', below).  You may not have two components
+# which have a build dependency on each other, since that would mean
+# that each would have to be built before the other, which is
+# impossible.
+#
+# -- Link dependencies are those required to link against the
+# libraries in a component.  That means all the libraries that this
+# component's libraries use.  These are not necessarily build
+# dependencies, since if you are building a library, any called
+# libraries don't have to be present in order to build this library;
+# you can have two components which have mutual link dependencies.  If
+# you are building an application, however, then all its link
+# dependencies will actually be build dependencies and should be
+# declared as such.  In other words, the distinction between build and
+# link dependencies is important only for library components.
+#
+# -- Use dependencies are those which are required in order for the
+# component to be used by something else, after it has been built and
+# installed.  For example a library which called another application
+# as part of its functionality would have only a use dependency on the
+# component which contained that application.
+#
+# The point of this is that different dependencies are required at
+# different times.  The set of dependencies in the master makefile is
+# composed of all the `sourceset' and `build' dependencies, but not
+# `link' or `use' dependencies, and since the core Starlink libraries
+# are closely interdependent, the set of `build' dependencies needs to
+# be kept as small as possible in order to avoid circularities (that
+# is, A depending on B, which depends, possibly indirectly, on A).
+#
+# All these relationships are transitive: if A has a build dependency
+# on B, and B has one on C, then A has a build dependency on C.  You
+# can augment this by using the final `option' argument: if, in
+# component A's declaration element you say
+# STAR_DECLARE_DEPENDENCIES(build, B, link), then you declare that A
+# has a build-time dependency on B, but that (presumably because you
+# are building an application within a component which is mostly
+# libraries) you need to link against B, so component A has a
+# dependency on all of B's _link_ dependencies, not just its build
+# dependencies.  This is (I believe) the only case where this `option'
+# attribute is useful, though it is legal for each of the dependency types.
 #
 # You need only declare direct dependencies.  If package A depends on
 # package B, which depends in turn on package C, then package A need
 # not declare a dependency on C.
 #
-# In fact it doesn't really matter all that much, since the worst that
-# happens if you declare a use dependency as a build dependency is
-# that the package gets built later in the sequence than is absolutely
-# necessary.
-#
-# The macro may be called several times.
-AC_DEFUN([STAR_DECLARE_BUILD_DEPENDENCIES],
-         [#
-          m4_ifval([$1], [],
-                         [AC_FATAL([$0: called with empty packagelist])])dnl
-          STAR_BUILD_DEPENDENCIES="$STAR_BUILD_DEPENDENCIES $1"
-          for p in $1
+# The macro may be called more than once.  The results of this macro
+# are expressed in the file component.xml in the component directory.
+AC_DEFUN([STAR_DECLARE_DEPENDENCIES],
+         [m4_ifval([$1], [], [AC_FATAL([$0: no type given])])dnl
+          m4_if(m4_bregexp([$1], 
+                           [^\(sourceset\|build\|link\|use\)$]),
+                [0],
+                [],
+                [AC_FATAL([$0: unrecognised type $1])])dnl
+          m4_ifval([$2], [], [AC_FATAL([$0: no deplist given])])dnl
+          for _star_tmp in $2
           do
-              test -e $current_MANIFESTS/$p || \
-                  echo "Package $PACKAGE depends on $p, but that doesn't appear to be installed"
+              STAR_DEPENDENCIES_CHILDREN="$STAR_DEPENDENCIES_CHILDREN<[$1]m4_ifval([$3], [ option='$3'], [])>$_star_tmp</$1>"
           done
-])# STAR_DECLARE_BUILD_DEPENDENCIES
-
-
-
-# STAR_DECLARE_USE_DEPENDENCIES(packagelist)
-# ------------------------------------------
-#
-# Declare a space-separated list of packages/components which the use
-# of this package depends on.  The packages here are tested to ensure
-# thay do exist (XXX not yet), and the list is available for
-# substitution in the [AC_SUBST]-ed variable [@STAR_USE_DEPENDENCIES@].
-#
-# The macro may be called several times.
-AC_DEFUN([STAR_DECLARE_USE_DEPENDENCIES],
-         [#
-          m4_ifval([$1], [],
-                         [AC_FATAL([$0: called with empty packagelist])])dnl
-         STAR_USE_DEPENDENCIES="$STAR_USE_DEPENDENCIES $1"
-])# STAR_DECLARE_USE_DEPENDENCIES
-
+])# STAR_DECLARE_DEPENDENCIES
 
 
 # STAR_PLATFORM_SOURCES(target-file-list, platform-list)
@@ -490,7 +506,8 @@ fi
 
 # _STAR_UPCASE(string)
 # --------------------
-# Expands to STRING with all letters translated to uppercase
+# Expands to STRING with all letters translated to uppercase.  Not
+# currently used in fact.
 AC_DEFUN([_STAR_UPCASE],
          [m4_translit([$1],
                       [abcdefghijklmnopqrstuvwxyz],
