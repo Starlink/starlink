@@ -133,7 +133,7 @@
       CALL ADI1_CCH2AC( HLOC, 'OBSERVER', OARG, 'Observer', STATUS )
 
 *  Look for the various header components
-      CALL ADI1_CGET0C( HLOC, 'INSTRUMENT', MOK, MISSION, STATUS )
+      CALL ADI1_CGET0C( HLOC, 'OBSERVATORY', MOK, MISSION, STATUS )
       CALL ADI1_CGET0C( HLOC, 'INSTRUMENT', IOK, INSTRUM, STATUS )
 
 *  If instrument was specified, look for detector and filter names
