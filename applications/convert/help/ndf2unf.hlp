@@ -21,28 +21,24 @@ COMP = LITERAL (Read)
    or "Variance". ["Data"]
 3 FITS
 FITS = _LOGICAL (Read)
-   If true, any FITS extension is written to start of the output
+   If TRUE, any FITS extension is written to start of the output
    file, unless there is no extension whereupon a minimal FITS
    header is written to the unformatted file. [FALSE]
 3 IN
 IN = NDF (Read)
-   Input NDF data structure. The suggested default is the current
+   Input NDF data structure.  The suggested default is the current
    NDF if one exists, otherwise it is the current value.
 3 NOPEREC
 NOPEREC = _INTEGER (Read)
    The number of data values per record of the output file.  On
-   VMS systems it should be in the range 1 to n, where n is 32764
-   divided by the number of bytes per data value; on UNIX systems
-   it need only be positive.  The suggested default is the
-   current value. [The first dimension of the NDF (or n if this
-   is smaller)]
+   UNIX systems it must be positive.  The suggested default is
+   the the current value. [The first dimension of the NDF (or n
+   if this is smaller)]
 3 OUT
 OUT = FILENAME (Write)
    Name of the output sequential unformatted file.  The file will
    normally have variable-length records when there is a header,
-   but always fixed-length records when there is no header.  On
-   VMS platforms a default file extension of ".DAT" is appended
-   when parameter OUT contains no file extension.
+   but always fixed-length records when there is no header.
 2 Examples
 ndf2unf cluster cluster.dat
    This copies the data array of the NDF called cluster to an
@@ -139,12 +135,17 @@ The details of the conversion are as follows:
    CONVERT: UNF2NDF.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+AJC: Alan J. Chipperfield (STARLINK)
 2 History
  1992 September 16 (MJC):
     Original version.
 
  1993 August 25 (MJC):
     Corrected the calculations of record lengths.
+
+ 1995 November 8 (AJC):
+    Set RECMIN 80 in all cases where header is required
 2 Implementation_Status
    -  The value of bad pixels is not written to a FITS-like header
    record with keyword BLANK.

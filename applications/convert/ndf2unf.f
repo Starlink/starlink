@@ -35,25 +35,21 @@
 *        The NDF component to be copied.  It may be "Data", "Quality"
 *        or "Variance". ["Data"]
 *     FITS = _LOGICAL (Read)
-*        If true, any FITS extension is written to start of the output
+*        If TRUE, any FITS extension is written to start of the output
 *        file, unless there is no extension whereupon a minimal FITS
 *        header is written to the unformatted file. [FALSE]
 *     IN = NDF (Read)
-*        Input NDF data structure. The suggested default is the current
+*        Input NDF data structure.  The suggested default is the current
 *        NDF if one exists, otherwise it is the current value.
 *     NOPEREC = _INTEGER (Read)
 *        The number of data values per record of the output file.  On
-*        VMS systems it should be in the range 1 to n, where n is 32764
-*        divided by the number of bytes per data value; on UNIX systems
-*        it need only be positive.  The suggested default is the
-*        current value. [The first dimension of the NDF (or n if this
-*        is smaller)]
+*        UNIX systems it must be positive.  The suggested default is
+*        the the current value. [The first dimension of the NDF (or n
+*        if this is smaller)]
 *     OUT = FILENAME (Write)
 *        Name of the output sequential unformatted file.  The file will
 *        normally have variable-length records when there is a header,
-*        but always fixed-length records when there is no header.  On
-*        VMS platforms a default file extension of ".DAT" is appended
-*        when parameter OUT contains no file extension.
+*        but always fixed-length records when there is no header.
 
 *  Examples:
 *     ndf2unf cluster cluster.dat
@@ -145,6 +141,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -152,6 +149,8 @@
 *        Original version.
 *     1993 August 25 (MJC):
 *        Corrected the calculations of record lengths.
+*     1995 November 8 (AJC):
+*        Set RECMIN to be 80 in all cases where header is required.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -291,7 +290,7 @@
 *  Is there a FITS extension to be copied?  If there is, set the minimum
 *  recordlength to 80 bytes for the unformatted FITS headers.
       CPFITS = HEADER .AND. THERE
-      IF ( CPFITS ) THEN
+      IF ( HEADER ) THEN
          RECMIN = 80
       ELSE
          RECMIN = 1

@@ -25,7 +25,7 @@
       \sstsubsection{
          FITS = \_LOGICAL (Read)
       }{
-         If true, any FITS extension is written to start of the output
+         If {\tt TRUE}, any FITS extension is written to start of the output
          file, unless there is no extension whereupon a minimal FITS
          header is written to the unformatted file. {\tt [FALSE]}
       }
@@ -38,20 +38,16 @@
       \sstsubsection{
          NOPEREC = \_INTEGER (Read)
       }{
-         The number of data values per record of the output file.  On
-         VMS systems it should be in the range 1 to $n$, where $n$ is 32764
-         divided by the number of bytes per data value; on UNIX systems
-         it need only be positive.  The suggested default is the
-         the current value. {\tt [}The first dimension of the NDF
-         (or $n$ if this is smaller){\tt ]}
+         The number of data values per record of the output file.
+         On UNIX systems it must be positive.  The suggested default is the
+         the current value. {\tt{[}}The first dimension of the NDF
+         (or {\em{n}} if this is smaller){\tt{]}}
       }
       \sstsubsection{
          OUT = FILENAME (Write)
       }{
          Name of the output sequential unformatted file.  The file will
-         but always fixed-length records when there is no header.  On
-         VMS platforms a default file extension of {\tt ".dat"} is appended
-         when parameter OUT contains no file extension.
+         but always fixed-length records when there is no header.
       }
    }
    \sstexamples{
@@ -59,7 +55,7 @@
          ndf2unf cluster cluster.dat
       }{
          This copies the data array of the NDF called cluster to an
-         unformatted file called cluster.dat.  The number of data values
+         unformatted file called {\tt cluster.dat}.  The number of data values
          per record is equal to the size of the first dimension of the
          NDF.
       }
@@ -67,7 +63,7 @@
          ndf2unf cluster cluster.dat v
       }{
          This copies the variance of the NDF called cluster to an
-         unformatted file called cluster.dat.  The number of variance
+         unformatted file called {\tt cluster.dat}.  The number of variance
          values per record is equal to the size of the first dimension
          of the NDF.
       }
@@ -75,16 +71,16 @@
          ndf2unf cluster cluster.dat noperec=12
       }{
          This copies the data array of the NDF called cluster to an
-         unformatted file called cluster.dat.  There are twelve data
-         values per record in cluster.dat.
+         unformatted file called {\tt cluster.dat}.  There are twelve data
+         values per record in {\tt cluster.dat}.
       }
       \sstexamplesubsection{
          ndf2unf out=ndf234.dat fits in=@234
       }{
          This copies the data array of the NDF called 234 to an
-         unformatted file called ndf234.dat.  The number of data values
+         unformatted file called {\tt ndf234.dat}.  The number of data values
          per record is equal to the size of the first dimension of the
-         NDF.  If there is a FITS extension, it is copied to ndf234.dat
+         NDF.  If there is a FITS extension, it is copied to {\tt ndf234.dat}
          with substitution of certain keywords, otherwise a minimal
          FITS header is produced.
       }
@@ -126,8 +122,8 @@
                (Similarly for AXIS(2) structures {\it etc.}) FITS does not have
                a standard method of storing axis widths and variances, so these
                NDF components will not be propagated to the header.
-               Non-linear axis data arrays cannot be represented by CRVAL$n$
-               and CDELT$n$, and must be ignored.
+               Non-linear axis data arrays cannot be represented by CRVAL{\em{n}}
+               and CDELT{\em{n}}, and must be ignored.
 
             \sstitem
                If the input NDF contains TITLE, LABEL or UNITS components
@@ -141,17 +137,17 @@
                \begin{itemize}
                \item BITPIX is derived from the type of the NDF data array,
                and so it is not copied from the NDF FITS extension.
-               \item NAXIS, and NAXIS$n$ are derived from the dimensions of the
+               \item NAXIS, and NAXIS{\em{n}} are derived from the dimensions of the
                NDF data array as described above, so these items are not
                copied from the NDF FITS extension.
                \item The TITLE, LABEL, and BUNITS descriptors are only copied
                if no TITLE, LABEL, and UNITS NDF components respectively
                have already been copied into these headers.
-               \item The CDELT$n$, CRVAL$n$, CTYPE$n$, and CRTYPE$n$ descriptors
+               \item The CDELT{\em{n}}, CRVAL{\em{n}}, CTYPE{\em{n}}, and CRTYPE{\em{n}} descriptors
                in the FITS extension are only copied if the input NDF
                contained no linear axis structures.
                \item The standard order of the FITS keywords is preserved,
-               thus BITPIX, NAXIS and NAXIS$n$ appear immediately after the
+               thus BITPIX, NAXIS and NAXIS{\em{n}} appear immediately after the
                first card image, which should be SIMPLE.
                \item BSCALE and BZERO in a FITS extension are copied when
                BITPIX is positive, {\it i.e.} the array is not floating-point.
@@ -176,7 +172,7 @@
    \sstdiytopic{
       Related Applications
    }{
-      CONVERT: UNF2NDF.
+      \CONVERT: UNF2NDF.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -187,3 +183,4 @@
       }
    }
 }
+
