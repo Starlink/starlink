@@ -34,6 +34,10 @@ misc/ipfile.dat \
 misc/polimp.scuba \
 surf_kap/hlpcmd
 
+
+# Files that are simply to be copied into the starlink directory
+COPY = SURF_CONDITIONS
+
 # This is a list of tar files created by other makefiles
 # I make it the responsibility of this makefile to copy them
 # to the Starlink directory
@@ -64,7 +68,8 @@ export: surf_source.tar
 	(cd $$i ; echo "making" all "in $(CURRENT_DIR)/$$i..."; \
 	$(MAKE) $(MFLAGS) 'CDEBUGFLAGS=$(CDEBUGFLAGS)' export); \
 	done; \
-	$(CP) $(SURF_TAR) starlink/ ;
+	$(CP) $(SURF_TAR) starlink/ ; \
+	$(CP) $(COPY) starlink/ ;
 
 surf_source.tar: ${DIST}
 	mkdir tartmp; \
