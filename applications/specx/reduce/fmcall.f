@@ -8,6 +8,8 @@ C   Calls the routine FINDMX to calculate maximum of each array
 C   History:
 C      6-JUN-2000 (AJC):
 C        Missing comma in FORMAT
+C      9-AUG-2004 (TIMJ):
+C        Increase number of decimal places (needed for frequency axis)
 
       IMPLICIT  NONE
 
@@ -58,7 +60,7 @@ C        Missing comma in FORMAT
       RETURN
 
  1910 FORMAT(' Quadrant ',I2.1,':  data maximum is ',G11.4,' at ',
-     &       F9.2,A6)
+     &       F12.5,A6)
 
       END
 
