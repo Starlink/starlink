@@ -74,6 +74,9 @@
 #        Now centers on selected row using <2>.
 #     28-MAR-2000 (PWD):
 #        Changed to GaiaAstTable (from StarAstTable).
+#     10-APR-2001 (PWD):
+#        Changed fitting RMS value to sqrt(sum_of_dist_squared/n)
+#        rather than sqrt(sum_of_dist_squared)/n. Which was wrong.
 #     {enter_further_changes_here}
 
 #-
@@ -767,7 +770,6 @@ itcl::class gaia::GaiaAstTable {
          for { set i 0 } { $i < $nrows } { incr i } {
             lassign [lindex $oldcon $i] id ra dec x y
             if { [ catch { $itk_option(-rtdimage) astwcs2pix $ra $dec } msg ] == 0 } {
-               #  Insert these into the table.
                lassign $msg newx newy
                $itk_component(table) append_row [list $id $ra $dec $newx $newy]
             }
@@ -778,14 +780,13 @@ itcl::class gaia::GaiaAstTable {
          for { set i 0 } { $i < $nrows } { incr i } {
             lassign [lindex $oldcon $i] id ra dec x y
             if { [ catch { $itk_option(-rtdimage) astwcs2pix $ra $dec } msg ] == 0 } {
-               #  Insert these into the table.
                lassign $msg newx newy
                $itk_component(table) append_row [list $id $ra $dec $newx $newy]
                set dist [expr $dist+($x-$newx)*($x-$newx)+($y-$newy)*($y-$newy)]
                incr nout
             }
          }
-         set rms [expr sqrt($dist)/$nout]
+         set rms [expr sqrt($dist/$nout)]
       }
       $itk_component(table) new_info
       redraw
@@ -801,7 +802,6 @@ itcl::class gaia::GaiaAstTable {
       for { set i 0 } { $i < $nrows } { incr i } {
          lassign [lindex $oldcon $i] id ra dec x y
          if { [ catch { $itk_option(-rtdimage) astpix2wcs $x $y } msg ] == 0 } {
-            #  Insert these into the table.
             lassign $msg newra newdec
             $itk_component(table) append_row [list $id $newra $newdec $x $y]
          }

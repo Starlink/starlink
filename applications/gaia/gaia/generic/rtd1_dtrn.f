@@ -44,7 +44,7 @@
 *     TR( 6 ) = DOUBLE PRECISION (Returned)
 *        The six parameters which define the fit.
 *     RESID = DOUBLE PRECISION (Returned)
-*        Mean residual of fit.
+*        Root mean square residual distance of the fit.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -174,7 +174,7 @@
 *  Set type of fit required between 1 and 6.
       IFIT = MIN( MAX( 1, IFIT ), 6 )
 
-*  Set default value for mean residual.
+*  Set default value for root mean square residual.
       RESID = 0.0D0
 
 *  Check that the fit does not have too many degrees of freedom for
@@ -398,11 +398,11 @@
                   DO 3 J = 1, NVAL
                      X0 = TR(1) + X1(J) * TR(2) + Y1(J) * TR(3)
                      Y0 = TR(4) + X1(J) * TR(5) + Y1(J) * TR(6)
-                     XMEAN = X2(J) - X0
-                     YMEAN = Y2(J) - Y0
+                     XMEAN = X2( J ) - X0
+                     YMEAN = Y2( J ) - Y0
                      RESID = RESID + XMEAN * XMEAN + YMEAN * YMEAN
  3                CONTINUE
-                  SIG( I ) = SQRT( RESID ) / DBLE( NVAL )
+                  SIG( I ) = SQRT( RESID / DBLE( NVAL ) )
                END IF
  2          CONTINUE
             IF ( SIG( I ) .NE. VAL__MAXD .OR. 
@@ -480,7 +480,7 @@
  99   CONTINUE
       IF ( STATUS .EQ. SAI__OK .AND. IND .GT. 0 ) THEN
 
-*  Work out the fitting error (a sort of mean distance between points).
+*  Work out the fitting error (the root mean square distance).
          RESID = 0.0
          DO 1 I = 1, NVAL
             X0 = TR( 1 ) + X1( I ) * TR( 2 ) + Y1( I ) * TR( 3 )
@@ -489,7 +489,7 @@
             WY = Y2( I ) - Y0
             RESID = RESID + WX * WX + WY * WY
  1       CONTINUE
-         RESID = SQRT( RESID ) / DBLE( NVAL )
+         RESID = SQRT( RESID / DBLE( NVAL ) )
       END IF
 
       END

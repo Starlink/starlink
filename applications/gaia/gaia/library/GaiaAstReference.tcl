@@ -69,6 +69,8 @@
 #        image related stuff.
 #     23-MAY-2000 (PWD):
 #        Changed name to GaiaAstReference.
+#     10-APR-2001 (PWD):
+#        Change to report RMS of fit in mean arcsecs.
 #     {enter_further_changes_here}
 
 #-
@@ -713,11 +715,14 @@ itcl::class gaia::GaiaAstReference {
                set angle_  [expr [lindex $errmsg 12]+$angle_]
                if { $update } { 
                   set fitqual [$itk_component(table) update_x_and_y 1]
+                  set xs [expr $xscale_*3600.0]
+                  set ys [expr $yscale_*3600.0]
+                  set rms [expr $fitqual*0.5*(abs($xs)+abs($ys))]
 
                   #  Report the results of the fit.
-                  report_result_ "Rms of fit = $fitqual (pixels)" \
-                     "x,y scales = [expr $xscale_*3600.0] \
-                                   [expr $yscale_*3600.0] (arcsec/pixel)" \
+                  report_result_ \
+                     "Rms of fit = $rms (arcsec), $fitqual (pixels)" \
+                     "x,y scales = $xs, $ys (arcsec/pixel)" \
                      "orientation = $angle_ (degrees)"
                }
             } else {
