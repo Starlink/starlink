@@ -47,8 +47,6 @@
 *  Timing:
 *     {routine_timing}
 
-*  External Routines Used:
-
 *  References:
 *     HSI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/hsi.html
 
@@ -63,8 +61,8 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     14 Feb 1995 (DJA):
-*        Original version.
+*      6 Jun 1996 (DJA):
+*        Original version, adapted from HDS version
 *     {enter_changes_here}
 
 *  Bugs:
@@ -89,18 +87,23 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  External References:
-      EXTERNAL			CHR_LEN
-        INTEGER			CHR_LEN
+*  Local Constants:
+      CHARACTER*1		NUL			! String separator
+        PARAMETER		( NUL = CHAR(0) )
+      INTEGER			TLEN			! History text length
+        PARAMETER		( TLEN = 80 )
 
 *  Local Variables:
-      CHARACTER*132		LINE			! Line of text
+      CHARACTER*512		LINE			! Line of text
 
       INTEGER			CID			! String array slice
-      INTEGER			ILINE 			! Loop over lines
-      INTEGER			IVERB			! Verbosity
+      INTEGER			I			! Loop over LINE
+      INTEGER			ILINE			! Loop over lines
+      INTEGER			IPOS, NPOS		! String pointers
+      INTEGER			LLEN			! Length of LINE
       INTEGER			NLINE 			! # lines to write
-      INTEGER			PHDU			! Main HDU
+      INTEGER			NNUL			! # nulls in LINE
+      INTEGER			PHDU			! Primary HDU
 *.
 
 *  Check inherited global status.
@@ -109,38 +112,52 @@
 *  No output from this method
       OARG = ADI__NULLID
 
-*  Locate main HDU
-      CALL ADI2_FNDHDU( ARGS(1), ' ', PHDU, STATUS )
+*  Locate primary HDU
+      CALL ADI2_FNDHDU( ARGS(2), 'PRIMARY', .TRUE., PHDU, STATUS )
 
-*  Get verbosity
-      IVERB = HSI__NORMAL
+*  Get number of lines
+      CALL ADI_SIZE( ARGS(2), NLINE, STATUS )
 
-*  Only write text if verbosity is NORMAL or greater
-      IF ( IVERB .GE. HSI__NORMAL ) THEN
+*  Write lines one at a time
+      DO ILINE = 1, NLINE
 
-*    Get number of lines
-        CALL ADI_SIZE( ARGS(2), NLINE, STATUS )
+*    Locate ILINE'th ADI string and get its data
+        CALL ADI_CELL( ARGS(2), 1, ILINE, CID, STATUS )
+        CALL ADI_CLEN( CID, LLEN, STATUS )
+        CALL ADI_GET0C( CID, LINE(:LLEN), STATUS )
+        LLEN = MIN( LLEN, LEN(LINE) )
+        CALL ADI_ERASE( CID, STATUS )
 
-*    Write lines one at a time
-        DO ILINE = 1, NLINE
+*    If the string contains nulls we need to split it into several
+*    lines. Count the nulls and extend the text array
+        NNUL = 0
+        DO I = 1, LLEN
+          IF ( LINE(I:I) .EQ. NUL ) NNUL = NNUL + 1
+        END DO
 
-*      Locate ILINE'th ADI string
-          CALL ADI_CELL( ARGS(2), 1, ILINE, CID, STATUS )
+*    Write each bit of LINE to a new HDS string
+        IPOS = 1
+        DO WHILE ( IPOS .LE. LLEN )
 
-*      Extract the string and write it
-          CALL ADI_GET0C( CID, LINE, STATUS )
-          CALL ADI2_ADDHIS( PHDU, '  '//LINE(:MAX(1,CHR_LEN(LINE))),
-     :                      .TRUE., STATUS )
+*      Find position of next null
+          NPOS = INDEX( LINE(IPOS:LLEN), NUL )
+          IF ( NPOS .EQ. 0 ) THEN
+            NPOS = LLEN + 1
+          ELSE
+            NPOS = NPOS + IPOS - 1
+          END IF
 
-*      Release the sliced object
-          CALL ADI_ERASE( CID, STATUS )
+*      Write the HDS string
+          CALL ADI2_HPHIS( PHDU, '  '//LINE(IPOS:NPOS-1), STATUS )
+
+*      Next bit of line
+          IPOS = NPOS + 1
 
         END DO
 
-*  End of verbosity test
-      END IF
+      END DO
 
-*  Rerlease the HDU
+*  Release the HDU
       CALL ADI_ERASE( PHDU, STATUS )
 
 *  Report any errors
