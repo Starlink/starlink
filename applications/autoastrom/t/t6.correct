@@ -20,30 +20,9 @@ CD2_2   =          0.000277778
 RADESYS = 'FK5'
 EQUINOX = '2000.0'
 END     
-  SIMPLE = 1
-  BITPIX = 8
-   NAXIS = 0
-  CTYPE1 = RA---AZP
-  CTYPE2 = DEC--AZP
-   PV2_1 = 0.000000
- LONPOLE = 180.000000
-COMMENT   dec=45:0:0 ra=210
-  CRVAL1 = 210.000000
-  CRVAL2 = 45.000000
-  CUNIT1 = deg
-  CUNIT2 = deg
-  CRPIX1 = 128.500000
-  CRPIX2 = 512.500000
-   CD1_1 = 0.000277778
-   CD1_2 = 0
-   CD2_1 = -0
-   CD2_2 = 0.000277778
- RADESYS = FK5
- EQUINOX = 2000.0
-     END = 
 
 
-dec=90  scale=2  ra=12:0:0  invert=0  pa=45  ...
+dec=90  invert=0  pa=45  ra=12:0:0  scale=2  ...
 SIMPLE  =                    T
 BITPIX  =                    8
 NAXIS   =                    0
@@ -51,7 +30,7 @@ CTYPE1  = 'RA---AZP  '
 CTYPE2  = 'DEC--AZP  '
 PV2_1   =             0.000000
 LONPOLE =             0.000000
-COMMENT   dec=90 scale=2 ra=12:0:0 invert=0 pa=45
+COMMENT   dec=90 invert=0 pa=45 ra=12:0:0 scale=2
 CRVAL1  =           180.000000 / RA    12 00 00.000
 CRVAL2  =            90.000000 / Dec   90 00 00.000
 CUNIT1  = 'deg       '
@@ -65,30 +44,9 @@ CD2_2   =          0.000392837
 RADESYS = 'FK5'
 EQUINOX = '2000.0'
 END     
-  SIMPLE = 1
-  BITPIX = 8
-   NAXIS = 0
-  CTYPE1 = RA---AZP
-  CTYPE2 = DEC--AZP
-   PV2_1 = 0.000000
- LONPOLE = 0.000000
-COMMENT   dec=90 scale=2 ra=12:0:0 invert=0 pa=45
-  CRVAL1 = 180.000000
-  CRVAL2 = 90.000000
-  CUNIT1 = deg
-  CUNIT2 = deg
-  CRPIX1 = 128.500000
-  CRPIX2 = 512.500000
-   CD1_1 = 0.000392837
-   CD1_2 = 0.000392837
-   CD2_1 = -0.000392837
-   CD2_2 = 0.000392837
- RADESYS = FK5
- EQUINOX = 2000.0
-     END = 
 
 
-dec=-12:0:0  scale=0.5  ra=12:0:0  pa=270  invert=1  ...
+dec=-12:0:0  invert=1  pa=270  ra=12:0:0  scale=0.5  ...
 SIMPLE  =                    T
 BITPIX  =                    8
 NAXIS   =                    0
@@ -96,7 +54,7 @@ CTYPE1  = 'RA---AZP  '
 CTYPE2  = 'DEC--AZP  '
 PV2_1   =             0.000000
 LONPOLE =           180.000000
-COMMENT   dec=-12:0:0 scale=0.5 ra=12:0:0 pa=270 invert=1
+COMMENT   dec=-12:0:0 invert=1 pa=270 ra=12:0:0 scale=0.5
 CRVAL1  =           180.000000 / RA    12 00 00.000
 CRVAL2  =           -12.000000 / Dec   -12 00 00.000
 CUNIT1  = 'deg       '
@@ -110,30 +68,9 @@ CD2_2   =         -2.55126E-20
 RADESYS = 'FK5'
 EQUINOX = '2000.0'
 END     
-  SIMPLE = 1
-  BITPIX = 8
-   NAXIS = 0
-  CTYPE1 = RA---AZP
-  CTYPE2 = DEC--AZP
-   PV2_1 = 0.000000
- LONPOLE = 180.000000
-COMMENT   dec=-12:0:0 scale=0.5 ra=12:0:0 pa=270 invert=1
-  CRVAL1 = 180.000000
-  CRVAL2 = -12.000000
-  CUNIT1 = deg
-  CUNIT2 = deg
-  CRPIX1 = 128.500000
-  CRPIX2 = 512.500000
-   CD1_1 = 2.55126e-20
-   CD1_2 = 0.000138889
-   CD2_1 = 0.000138889
-   CD2_2 = -2.55126e-20
- RADESYS = FK5
- EQUINOX = 2000.0
-     END = 
 
 
-dec=74:31:58.00  scale=0.33  ra=17:27:10.94  pa=88.7  invert=1  ...
+dec=74:31:58.00  invert=1  pa=88.7  ra=17:27:10.94  scale=0.33  ...
 SIMPLE  =                    T
 BITPIX  =                    8
 NAXIS   =                    0
@@ -141,7 +78,7 @@ CTYPE1  = 'RA---AZP  '
 CTYPE2  = 'DEC--AZP  '
 PV2_1   =             0.000000
 LONPOLE =           180.000000
-COMMENT   dec=74:31:58.00 scale=0.33 ra=17:27:10.94 pa=88.7 invert=1
+COMMENT   dec=74:31:58.00 invert=1 pa=88.7 ra=17:27:10.94 scale=0.33
 CRVAL1  =           261.795583 / RA    17 27 10.940
 CRVAL2  =            74.532778 / Dec   74 31 58.000
 CUNIT1  = 'deg       '
@@ -155,27 +92,6 @@ CD2_2   =          2.07967E-06
 RADESYS = 'FK5'
 EQUINOX = '2000.0'
 END     
-  SIMPLE = 1
-  BITPIX = 8
-   NAXIS = 0
-  CTYPE1 = RA---AZP
-  CTYPE2 = DEC--AZP
-   PV2_1 = 0.000000
- LONPOLE = 180.000000
-COMMENT   dec=74:31:58.00 scale=0.33 ra=17:27:10.94 pa=88.7 invert=1
-  CRVAL1 = 261.795583
-  CRVAL2 = 74.532778
-  CUNIT1 = deg
-  CUNIT2 = deg
-  CRPIX1 = 128.500000
-  CRPIX2 = 512.500000
-   CD1_1 = -2.07967e-06
-   CD1_2 = -9.16431e-05
-   CD2_1 = -9.16431e-05
-   CD2_2 = 2.07967e-06
- RADESYS = FK5
- EQUINOX = 2000.0
-     END = 
 
 
 dec=91:0:0  ra=210  ...
