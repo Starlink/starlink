@@ -103,6 +103,7 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
+      CHARACTER*8 CNAME
       INTEGER ID,SID,ITEMID
       INTEGER GCBID
       INTEGER I
@@ -127,31 +128,31 @@
         CALL NBS_DEFINE_PRIMITIVE(ID,'YMAX','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
         DO I=1,9
-          NAME='RED'
-          WRITE(NAME(4:4),'(I1)') I
-          CALL NBS_DEFINE_PRIMITIVE(ID,NAME,'_REAL',0,VAL__NBR,SID,
+          CNAME='RED'
+          WRITE(CNAME(4:4),'(I1)') I
+          CALL NBS_DEFINE_PRIMITIVE(ID,CNAME,'_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
-          NAME='GREEN'
-          WRITE(NAME(6:6),'(I1)') I
-          CALL NBS_DEFINE_PRIMITIVE(ID,NAME,'_REAL',0,VAL__NBR,SID,
+          CNAME='GREEN'
+          WRITE(CNAME(6:6),'(I1)') I
+          CALL NBS_DEFINE_PRIMITIVE(ID,CNAME,'_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
-          NAME='BLUE'
-          WRITE(NAME(5:5),'(I1)') I
-          CALL NBS_DEFINE_PRIMITIVE(ID,NAME,'_REAL',0,VAL__NBR,SID,
+          CNAME='BLUE'
+          WRITE(CNAME(5:5),'(I1)') I
+          CALL NBS_DEFINE_PRIMITIVE(ID,CNAME,'_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
         ENDDO
         DO I=10,16
-          NAME='RED'
-          WRITE(NAME(4:5),'(I2)') I
-          CALL NBS_DEFINE_PRIMITIVE(ID,NAME,'_REAL',0,VAL__NBR,SID,
+          CNAME='RED'
+          WRITE(CNAME(4:5),'(I2)') I
+          CALL NBS_DEFINE_PRIMITIVE(ID,CNAME,'_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
-          NAME='GREEN'
-          WRITE(NAME(6:7),'(I2)') I
-          CALL NBS_DEFINE_PRIMITIVE(ID,NAME,'_REAL',0,VAL__NBR,SID,
+          CNAME='GREEN'
+          WRITE(CNAME(6:7),'(I2)') I
+          CALL NBS_DEFINE_PRIMITIVE(ID,CNAME,'_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
-          NAME='BLUE'
-          WRITE(NAME(5:6),'(I2)') I
-          CALL NBS_DEFINE_PRIMITIVE(ID,NAME,'_REAL',0,VAL__NBR,SID,
+          CNAME='BLUE'
+          WRITE(CNAME(5:6),'(I2)') I
+          CALL NBS_DEFINE_PRIMITIVE(ID,CNAME,'_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
         ENDDO
         CALL NBS_DEFINE_PRIMITIVE(ID,'COLOUR','_INTEGER',0,VAL__NBI,
