@@ -1,5 +1,5 @@
-      SUBROUTINE CCD1_SETSW( NDFGRP, NNDF, USESET, ISET, NSET, NAMGRP,
-     :                       MAPSET, STATUS )
+      SUBROUTINE CCD1_SETSW( NDFGRP, NNDF, USESET, ISET, NSET, IMEM,
+     :                       IMEMOF, NAMGRP, MAPSET, STATUS )
 *+
 *  Name:
 *     CCD1_SETSW
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_SETSW( NDFGRP, NNDF, USESET, ISET, NSET, NAMGRP,
-*                      MAPSET, STATUS )
+*     CALL CCD1_SETSW( NDFGRP, NNDF, USESET, ISET, NSET, IMEM, IMEMOF,
+*                      NAMGRP, MAPSET, STATUS )
 
 *  Description:
 *     This routine returns information about how a group of NDFs is 
@@ -49,6 +49,21 @@
 *     NSET = INTEGER (Returned)
 *        The number of Sets constructed from the NDFGRP group.
 *        If USESET is false this will be returned equal to NNDF.
+*     IMEM( NNDF ) = INTEGER (Returned)
+*        This array contains the numbers 1..NNDF sorted into Set order,
+*        i.e. all the ones from the first Set are first, then all the
+*        ones from the second Set...  If USESET is false, it will be
+*        returned as 1, 2, 3,....  You can index into it using IMEMOF.
+*        Taken together, IMEM and IMEMOF are a sort of inversion of ISET.
+*     IMEMOF( NNDF + 1 ) = INTEGER (Returned)
+*        The first NSET + 1 elements of this array are pointers into
+*        the IMEM array by set number.  Thus elements IMEMOF( I ) ..
+*        IMEMOF( I + 1 ) - 1 inclusive are the set numbers of the 
+*        NDFs comprising Set I.  If USESET is false, it will be returned
+*        as 1, 2, 3, .. NSET + 1.
+*        Taken together, IMEM and IMEMOF are a sort of inversion of ISET.
+*        Note that this array should be declared with at least NSET + 1
+*        elements; the final element is a sentry value.
 *     NAMGRP = INTEGER (Returned)
 *        A GRP identifier for the group of Set Names; the Ith member
 *        is the Set Name attribute common to NDFs with ISET = I.
@@ -57,12 +72,7 @@
 *        this routine and should be annulled by the calling routine.
 *        If USESET is false this will be returned equal to GRP__NOID.
 *     MAPSET( NNDF ) = INTEGER (Returned)
-*        If USESET is true, the first NSUP elements returned are 
-*        AST pointers to mappings from the CCD_SET-domain frame to the
-*        Current frame of the WCS component of NDFs in the corresponding
-*        Set.  If there is no consistent mapping for the Set,
-*        AST__NULL is returned.  This array is required as workspace.
-*        Only returned if USEWCS is true.
+*        Workspace.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -102,7 +112,10 @@
 *  Arguments Returned:
       INTEGER ISET( * )
       INTEGER NSET
+      INTEGER IMEM( * ) 
+      INTEGER IMEMOF( * )
       INTEGER MAPSET( * )
+      INTEGER NAMGRP
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -125,11 +138,11 @@
       INTEGER INDF              ! NDF identifier
       INTEGER IWCS              ! AST pointer to WCS frameset
       INTEGER J                 ! Loop index
+      INTEGER K                 ! Counter
       INTEGER JSET              ! Frame index of CCD_SET-domain frame
       INTEGER MAP1              ! AST pointer to mapping
       INTEGER MAP2              ! AST pointer to mapping
       INTEGER MAPS              ! AST pointer to Set mapping
-      INTEGER NAMGRP            ! GRP identifier for group of Set names
       INTEGER NIN               ! Number of members in the Set
       INTEGER SINDEX            ! Set Index attribute
       DOUBLE PRECISION DIFF     ! Difference bewtween points
@@ -145,12 +158,12 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Start an AST context.
+      CALL AST_BEGIN( STATUS )
+
 *  If we are using Sets, analyse Set membership of all NDFs.
       NAMGRP = GRP__NOID
       IF ( USESET ) THEN
-
-*  Start an AST context.
-         CALL AST_BEGIN( STATUS )
 
 *  Write a header to the user.
          CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -266,8 +279,6 @@
 
 *  Tidy up.
                   CALL AST_INVERT( MAPS, STATUS )
-                  CALL AST_ANNUL( MAP1, STATUS )
-                  CALL AST_ANNUL( MAP2, STATUS )
                END IF
             END IF
 
@@ -319,9 +330,6 @@
 *  If we effectively had no Set information, record this fact.
          IF ( NSET .EQ. NNDF ) USESET = .FALSE.
 
-*  Release resources.
-         CALL AST_END( STATUS )
-
 *  No Sets - store trivial Set membership information.
       ELSE
          NSET = NNDF
@@ -330,6 +338,20 @@
          END DO
          CALL GRP_COPY( NDFGRP, 1, NNDF, .FALSE., NAMGRP, STATUS )
       END IF
+
+*  Construct a pair of arrays to record which NDFs are members of which
+*  Sets.
+      K = 1
+      DO I = 1, NSET
+         IMEMOF( I ) = K
+         DO J = 1, NNDF
+            IF ( ISET( J ) .EQ. I ) THEN
+               IMEM( K ) = J 
+               K = K + 1
+            END IF
+         END DO
+      END DO
+      IMEMOF( NSET + 1 ) = NNDF + 1
 
 *  Summarise Set grouping.
       CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -345,13 +367,12 @@
          NIN = 0
          CALL MSG_SETI( 'N', I )
          CALL MSG_LOAD( ' ', '  ^N)', LINE, IAT, STATUS )
-         DO J = 1, NNDF
-            IF ( ISET( J ) .EQ. I ) THEN
-               NIN = NIN + 1
-               CALL GRP_GET( NDFGRP, J, 1, LINE( IAT + 2: ), STATUS )
-               CALL CCD1_MSG( ' ', LINE, STATUS )
-               LINE = ' '
-            END IF
+         DO J = IMEMOF( I ), IMEMOF( I + 1 ) - 1
+            NIN = NIN + 1
+            CALL GRP_GET( NDFGRP, IMEM( J ), 1, LINE( IAT + 2: ),
+     :                    STATUS )
+            CALL CCD1_MSG( ' ', LINE, STATUS )
+            LINE = ' '
          END DO
 
 *  If the CCD_SET->Current mappings have been inconsistent, warn
@@ -364,6 +385,9 @@
      :' almost certainly result in errors.', STATUS )
          END IF
       END DO
+
+*  Exit AST context.
+      CALL AST_END( STATUS )
 
       END
 * $Id$
