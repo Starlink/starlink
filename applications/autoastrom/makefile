@@ -1137,8 +1137,8 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 # distribution, we can tolerate this missing dependency, and simply
 # remember to delete autoastrom_source.tar when it's no longer needed.
 $(PKG_NAME)_source.tar:
-	cd astrom && make -f makefile.in configure || echo "Need newer version of autoconf!" || false
-	cd moggy && make -f Makefile.in configure
+	cd astrom && test -f configure || sh bootstrap || (echo "Need newer version of autoconf!" && false)
+	cd moggy && test -f configure || sh bootstrap || (echo "Need newer version of autoconf!" && false)
 	cd catlib && if test -f Makefile; then make distclean; fi
 	test ! -f $(PKG_NAME)_source.tar || $(RMF) $(PKG_NAME)_source.tar
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) astrom moggy misc catlib plugin-*.pl t
