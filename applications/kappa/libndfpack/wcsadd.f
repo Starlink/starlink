@@ -25,13 +25,13 @@
 *     optionally use the Mapping to add a new co-ordinate Frame into 
 *     the WCS component of an NDF (see parameter NDF). An output text file 
 *     may also be created holding a textual representation of the 
-*     Mapping for future use by other applications such as RESAMPLE (see 
+*     Mapping for future use by other applications such as REGRID (see 
 *     parameter MAPOUT). A number of different types of Mapping can be 
 *     used (see parameter MAPTYPE).
 *     
 *     When adding a new Frame to a WCS component, the Mapping is used to 
-*     connect the new Frame to an existing one (called the "basis" Frame
-*     - see parameter FRAME). The specific type of Frame to add is specified 
+*     connect the new Frame to an existing one (called the "basis" Frame:
+*     see parameter FRAME). The specific type of Frame to add is specified 
 *     using parameter FRMTYPE (the default is to simply copy the basis Frame). 
 *     Attributes which have been assigned an explicit value in the basis Frame 
 *     are transfered to the new Frame (but only if they are relevant to the 
@@ -119,7 +119,7 @@
 *        be given, preceeded by a "^" character. Individual expression
 *        should be separated by commas or, if they are supplied in a file,
 *        new-lines (see SUN/95 section "Specifying Groups of Objects"
-*        which is within the section "Parameters"). The suntax for each 
+*        which is within the section "Parameters"). The syntax for each 
 *        expression is fortran-like; see the "Examples" section below, and 
 *        the Appendix entitled "Using MathMaps" in SUN/95 for details. Only 
 *        used when MAPTYPE=MATH.
@@ -168,7 +168,7 @@
 *        used. Only used when MAPTYPE=FILE.
 *     MAPOUT = FILENAME (Write)
 *        The name of a text file in which to store a textual representation 
-*        of the Mapping. This can be used, for instance, by the RESAMPLE 
+*        of the Mapping. This can be used, for instance, by the REGRID
 *        application. If a null (!) value is supplied, no file is
 *        created. [!]
 *     MAPTYPE = LITERAL (Read)
@@ -315,7 +315,7 @@
 *        This constructs a pincushion-type distortion Mapping centred
 *        on the origin with a distortion coefficient of 5.3e-10,
 *        and writes out the Mapping as a text file called pcd.ast.
-*        This file could then be used by RESAMPLE to resample
+*        This file could then be used by REGRID to resample
 *        the pixels of an NDF according to this transformation.
 *        No NDF is accessed.
 
@@ -325,7 +325,7 @@
 *     TR is singular. 
 
 *  Related Applications:
-*     KAPPA: RESAMPLE, NDFTRACE, WCSFRAME, WCSREMOVE, WCSATTRIB.
+*     KAPPA: NDFTRACE, REGRID, WCSFRAME, WCSREMOVE, WCSATTRIB;
 *     CCDPACK: WCSEDIT.
 
 *  Authors:

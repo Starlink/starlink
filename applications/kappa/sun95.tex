@@ -7336,7 +7336,7 @@ which only have an AXIS structure?''. This is simple to do using the
 NDF called {\tt fred} containing an AXIS structure holding the frequency
 at the centre of each pixel in units of GHz. The following command will add
 an appropriate SpecFrame to the WCS component of the NDF (and will also
-make it the \emph{current} Frame}:
+make it the \emph{current} Frame):
 
 \small
 \begin{verbatim}
@@ -7381,7 +7381,7 @@ example:
 These commands set new values for named attributes within the current
 Frame of NDF {\tt fred}. These attributes are described
 \hyperref{here}{in section }{}{se:frmatt}. The inclusion of ``remap=no''
-is important: it tells the command to change the Frame attribute {\emph
+is important: it tells the command to change the Frame attribute \emph{
 without} changing the Mappings between Frames accordingly. If the default
 value of ``remap=yes'' was used, the Mappings which connect the SpecFrame
 to the other Frames within the WCS FrameSet would be modified in order to
@@ -7409,7 +7409,7 @@ not frequency at all, then you would want to \emph{correct} the WCS
 component by changing the System attribute of the SpecFrame from 
 ``freq'' to ``wave''. In this situation you want to leave the Mapping
 from the pixel Frame to the spectral Frame unchanged since the Mapping
-already gives the corrrect {\emph wavelength} value (previously, but
+already gives the correct \emph{wavelength} value (previously, but
 erroneously, thought to be a frequency value). So here you would do:
 
 \small
@@ -7969,7 +7969,7 @@ could say:
       \emph{etc.}) depend on the particular co-ordinate system represented by 
       the Frame ({\it e.g.}\ ``{\tt Right ascension}'', 
       ``{\tt Galactic latitude}'', ``{\tt Frequency}'', 
-      ``{\tt Wavelength in air}'', {\emph etc.}).
+      ``{\tt Wavelength in air}'', \emph{etc.}).
 
    }
    \sstattributetype{
@@ -8261,7 +8261,7 @@ could say:
       set, ``{\tt x}'' is used as the $<${\tt Domain}$>$ value in constructing 
       this default string.
 
-      Specialised Frames (SkyFrame,SpecFrame, {\emph etc.}) re-define the 
+      Specialised Frames (SkyFrame,SpecFrame, \emph{etc.}) re-define the 
       default {\tt Symbol} value to be appropriate for 
       the particular co-ordinate system being represented.
 
@@ -8449,7 +8449,7 @@ could say:
       system}'', where {\tt <n>} is the number of Frame axes 
       ({\tt Naxes} attribute).
 
-      Specialised Frames (SkyFrame, SpecFrame, {\emph etc.}) re-define the 
+      Specialised Frames (SkyFrame, SpecFrame, \emph{etc.}) re-define the 
       default Title value to be appropriate to the particular co-ordinate 
       system being represented.
    }
@@ -8484,14 +8484,14 @@ could say:
       units used to represent coordinate values on a particular axis
       of a \htmlref{Frame}{Frame}. 
 
-      Specialised Frames (SkyFrame, SpecFrame, {\emph etc.}) re-define the 
+      Specialised Frames (SkyFrame, SpecFrame, \emph{etc.}) re-define the 
       default Unit values to be appropriate to the particular co-ordinate 
       system being represented.
 
       For most classes, the Unit attribute is a purely descriptive
       comment intended for human readers and makes no difference to the
       operation of the software. However, there are some classes which
-      have {\emph active} Unit attributes. Changing the Unit attribute 
+      have \emph{active} Unit attributes. Changing the Unit attribute 
       for such classes will result in the Mappings within the WCS
       FrameSet being modified in order to reflect the change in units.
       By default, only SpecFrames have an active Unit attribute.
@@ -33229,7 +33229,7 @@ plot (9k).
       \sstsubsection{
          CURRENT = \_LOGICAL (Read)
       }{
-         If this is \{$\backslash$tt TRUE\}, the current picture is compared against the
+         If this is {\tt TRUE}, the current picture is compared against the
          chosen name before searching from the most-recent picture
          within the current picture. {\tt [FALSE]}
       }
@@ -40723,7 +40723,7 @@ plot (7k).
          be given, preceeded by a {\tt "}$\wedge${\tt "} character. Individual expression
          should be separated by commas or, if they are supplied in a file,
          new-lines (see SUN/95 section {\tt "}Specifying Groups of Objects{\tt "}
-         which is within the section {\tt "}Parameters{\tt "}). The suntax for each
+         which is within the section {\tt "}Parameters{\tt "}). The syntax for each
          expression is fortran-like; see the {\tt "}Examples{\tt "} section below, and
          the Appendix entitled {\tt "}Using MathMaps{\tt "} in SUN/95 for details. Only
          used when MAPTYPE=MATH.
@@ -41171,7 +41171,7 @@ plot (7k).
          be given, preceeded by a {\tt "}$\wedge${\tt "} character. Individual expression
          should be separated by commas or, if they are supplied in a file,
          new-lines (see SUN/95 section {\tt "}Specifying Groups of Objects{\tt "}
-         which is within the section {\tt "}Parameters{\tt "}). The suntax for each
+         which is within the section {\tt "}Parameters{\tt "}). The syntax for each
          expression is fortran-like; see the {\tt "}Examples{\tt "} section below, and
          the Appendix entitled {\tt "}Using MathMaps{\tt "} in SUN/95 for details. Only
          used when MAPTYPE=MATH.
@@ -41486,7 +41486,7 @@ plot (7k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: RESAMPLE, NDFTRACE, WCSFRAME, WCSREMOVE, WCSATTRIB.
+      KAPPA: RESAMPLE, NDFTRACE, WCSFRAME, WCSREMOVE, WCSATTRIB;
       CCDPACK: WCSEDIT.
    }
 }
