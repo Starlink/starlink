@@ -248,6 +248,28 @@
       CALL MSG_OUTIF( MSG__VERB, 'KPS1_WALA0_MSG2', '    The output '//
      :                'NDF has bounds ( ^LX:^UX, ^LY:^UY )', STATUS )
 
+*  Get bounds of input NDF in grid co-ords.
+      LGRID1( 1 ) = 1
+      LGRID1( 2 ) = 1
+      UGRID1( 1 ) = UBND1( 1 ) - LBND1( 1 ) + 1
+      UGRID1( 2 ) = UBND1( 2 ) - LBND1( 2 ) + 1
+
+*  Get bounds of output NDF in grid co-ords.
+      LGRID2( 1 ) = 1
+      LGRID2( 2 ) = 1
+      UGRID2( 1 ) = UBND2( 1 ) - LBND2( 1 ) + 1
+      UGRID2( 2 ) = UBND2( 2 ) - LBND2( 2 ) + 1     
+
+*  Report an error if the output image would be too large.
+      IF( ( UGRID2( 1 ) .GT. 50000 .OR. UGRID2( 2 ) .GT. 50000 ) .AND.
+     :    STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'NX', UGRID2( 1 ) )
+         CALL MSG_SETI( 'NY', UGRID2( 2 ) )
+         CALL ERR_REP( 'KPS1_WALA0_ERR1', 'The output image '//
+     :                 'dimensions are too big (^NX,^NY).', STATUS )
+      END IF
+
 *  Change the bounds of the output NDF to the values required to cover
 *  all the input data.
       CALL NDF_SBND( 2, LBND2, UBND2, INDF2, STATUS )
@@ -302,18 +324,6 @@
 
 *  Set TOL (DOUBLE) to ERRLIM (REAL)
       TOL = ERRLIM
-
-*  Get bounds of input NDF in grid co-ords.
-      LGRID1( 1 ) = 1
-      LGRID1( 2 ) = 1
-      UGRID1( 1 ) = UBND1( 1 ) - LBND1( 1 ) + 1
-      UGRID1( 2 ) = UBND1( 2 ) - LBND1( 2 ) + 1
-
-*  Get bounds of output NDF in grid co-ords.
-      LGRID2( 1 ) = 1
-      LGRID2( 2 ) = 1
-      UGRID2( 1 ) = UBND2( 1 ) - LBND2( 1 ) + 1
-      UGRID2( 2 ) = UBND2( 2 ) - LBND2( 2 ) + 1     
 
 *  Map the DATA component of the input and output NDF.
       CALL NDF_TYPE( INDF1, 'DATA', TY_IN, STATUS )
@@ -402,11 +412,12 @@
      :                               %VAL( IPD2 ), %VAL( IPV2 ), 
      :                               STATUS )
 
-      ELSE 
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'TY', TY_IN )
-         CALL ERR_REP( 'WCSALIGN_UTYP', 'KPS1_WALA0: Unsupported data'//
-     :                 ' type ''^TY'' (programming error).', STATUS )
+         CALL ERR_REP( 'KPS1_WALA0_ERR2', 'KPS1_WALA0: Unsupported '//
+     :                 'data type ''^TY'' (programming error).', 
+     :                 STATUS )
       END IF
 
 *  Set the bad pixel flags for the output DATA and VARIANCE arrays.
