@@ -49,7 +49,7 @@
             vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default 1.0
-            prompt {Error in positions}
+            prompt {Error in positions (pixels)}
             helpkey *
           }
 
@@ -175,7 +175,7 @@
             vpath PROMPT
             ppath CURRENT DEFAULT
             default !
-            prompt {Maximum displacement relative to initial positioning}
+            prompt {Maximum displacement relative to initial placing (pixels)}
             helpkey *
           }
 
