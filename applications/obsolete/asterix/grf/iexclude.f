@@ -1038,9 +1038,9 @@
         ELSE
 *  or get spatial description (ARD) file
           CALL ARX_OPEN('READ',GRPID,STATUS)
+          CALL ARX_READ('FILE',GRPID,STATUS)
         ENDIF
 
-        CALL ARX_READ('FILE',GRPID,STATUS)
 
         DIMS(1)=I_NX
         DIMS(2)=I_NY

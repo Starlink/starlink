@@ -725,6 +725,7 @@
       REAL X,Y
       INTEGER L
       INTEGER I,J
+      INTEGER NPIX
       BYTE FLAG
 *-
 
@@ -753,7 +754,7 @@
         CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
         TEXT = ' '
         L = 1
-
+        NPIX=0
 
 
         DO J=1,I_NY
@@ -764,14 +765,16 @@
               REG(I,J)=FLAG
 
 *  write each pixel allowing for line continuation
+              NPIX=NPIX+1
               CALL IMG_PIXTOWORLD(REAL(I),REAL(J),X,Y,STATUS)
               CALL MSG_SETR( 'X', X)
               CALL MSG_SETR( 'Y', Y)
               CALL MSG_MAKE( TEXT(:L)//' ^X , ^Y ,', TEXT, L )
-              IF (L.GT.65.AND.I.LT.I_NX.AND.J.LT.I_NY) THEN
+              IF (NPIX.EQ.3.AND.I.LT.I_NX.AND.J.LT.I_NY) THEN
                 CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
                 TEXT = ' '
                 L = 1
+                NPIX=0
               ENDIF
 
 
