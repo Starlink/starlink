@@ -1,10 +1,10 @@
-      SUBROUTINE REDS_CHGPNT (STATUS)
+      SUBROUTINE SURF_CHGPNT (STATUS)
 *+
 *  Name:
 *     CHANGE_POINTING
 
 *  Purpose:
-*     Routine to change the pointing corrections to map data.
+*     Change the pointing corrections to map data.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,7 +13,7 @@
 *     ADAM A-task
  
 *  Invocation:
-*     CALL REDS_CHGPNT( STATUS )
+*     CALL SURF_CHGPNT( STATUS )
  
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -39,19 +39,19 @@
 *     change_pointing in change_point
 
 *  ADAM Parameters:
-*     CHANGE_POINT = _CHAR (Read)
+*     CHANGE_POINT = CHAR (Read)
 *         If true you will be prompted for pointing corrections otherwise
 *         the program will exit after listing the current pointing 
 *         corrections.
 *     IN = NDF (Read)
 *         Name of NDF to change.
-*     MSG_FILTER = _CHAR (Read)
+*     MSG_FILTER = CHAR (Read)
 *         Message filter level. (Default is NORM)
-*     POINT_DAZ = _REAL (Read)
+*     POINT_DAZ = REAL (Read)
 *         The Azimuth pointing correction (arcsec).
-*     POINT_DEL = _REAL (Read)
+*     POINT_DEL = REAL (Read)
 *         The elevation pointing correction (arcsec).
-*     POINT_LST = _CHAR (Read)
+*     POINT_LST = CHAR (Read)
 *         The sidereal time of the pointing correction. Pointing corrections
 *         are asked for repeatedly until a NULL (!) or negative value are 
 *         given for POINT_LST.
@@ -87,7 +87,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'REDS_SYS'                         ! REDS constants
+      INCLUDE 'SURF_SYS'                         ! SURF constants
       INCLUDE 'MSG_PAR'                          ! MSG__ constants
       INCLUDE 'PAR_ERR'
 
