@@ -33,6 +33,7 @@
         INTEGER			HLP			! ADI help id
         INTEGER			ASS			! ADI association id
         INTEGER			KEY			! ADI key id
+        INTEGER                 CURDAT			! Current data id
         BYTE                    VPATH(5), PPATH(5)
         CHARACTER*16		NAME			! Parameter name
       END STRUCTURE
