@@ -48,7 +48,8 @@
 #     22-JUN-1998 (DSB):
 #        Disable OE Mapping types which include rotation or shear in the
 #        Options/Mapping Types/OE Mapping menu when dealing with
-#        polarimetric data.
+#        polarimetric data. Added sub-menus to File/Dump and File/Restore
+#        menus.
 #-
 
 # Uncomment this section to see the names of all procedure as they are 
@@ -600,8 +601,8 @@
    MenuHelp $helpmenu "Pointer..."  ".  Select this menu item, and then click with the pointer over a widget to see help on the widget."
 
 # Add menu items to the File menu.
-   $filemenu add command -label "Dump        " -command {Dump ""} -accelerator "Ctrl-d"
-   $filemenu add command -label "Restore     " -command {Restore ""} -accelerator "Ctrl-r"
+   $filemenu add cascade -label "Dump        " -menu $filemenu.dump
+   $filemenu add cascade -label "Restore     " -menu $filemenu.restore
    $filemenu add command -label "Save        " -command Save -accelerator "Ctrl-s"
    $filemenu add command -label "Exit        " -command {Finish 1} -accelerator "Ctrl-e"
    $filemenu add command -label "Quit        " -command {Finish 0} -accelerator "Ctrl+q"
@@ -612,11 +613,22 @@
    MenuHelp $filemenu "Exit        " ".  Store the current image registration information and exit the application."
    MenuHelp $filemenu "Quit        " ".  Quit the application, thowing away the current image registration information."
 
-   bind . <Control-d> {Dump ""}
-   bind . <Control-r> {Restore ""}
    bind . <Control-s> Save
    bind . <Control-e> {Finish 1}
    bind . <Control-q> {Finish 0}
+
+# Create the Dump and Restore sub-menus.
+   set dumpmenu [menu $filemenu.dump]
+   set restmenu [menu $filemenu.restore]
+
+# Add menu items to the Dump and Restore sub-menus.
+   $dumpmenu add command -label "Everything   " -command {Dump ""} -accelerator "Ctrl-d"
+   $dumpmenu add command -label "Current Image" -command {DumpImage ""} 
+   bind . <Control-d> {Dump ""}
+
+   $restmenu add command -label "Everything   " -command {Restore ""} -accelerator "Ctrl-r"
+   $restmenu add command -label "Current Image" -command {RestoreImage ""} 
+   bind . <Control-r> {Restore ""}
 
 # Add menu items to the Effects menu.
    foreach effect [list Align Fill Filter "Fit Sky" Log Maths Negate Smooth Stats Threshold] {

@@ -14,6 +14,7 @@
 #     22-JUN-1998 (DSB):
 #        Modified Save to avoid long integer image identifiers (i.e. IMGID
 #        values) producing "integer value too large to represent" message.
+#        Added procedures DumpImage and RestoreImage.
 #---------------------------------------------------------------------------
 
 proc Accept {} {
@@ -3356,6 +3357,126 @@ proc Dump {file} {
       foreach var "XHRCOL CURCOL BADCOL REFCOL SELCOL PSF_SIZE INTERP FITTYPE OEFITTYPE SKYPAR VIEW XHAIR SKYOFF HAREA SAREA" {
          upvar #0 $var gvar
          puts $fd [list $var $gvar]
+      }
+
+# Close the output dump file.
+      close $fd
+
+# Indicate a dump was made.
+      set ret 1
+
+# Cancel the informative text set earlier in this procedure.
+      if { $told } { SetInfo "" 0 }
+
+   }
+
+   return $ret
+}
+
+proc DumpImage {file} {
+#+
+#  Name:
+#     DumpImage
+#
+#  Purpose:
+#     Dump the current positions lists, masks, and mappings related to
+#     the currently displayed image to a text file which can be restored 
+#     later (using procedure RestoreImage).
+#
+#  Arguments:
+#     file 
+#        If supplied non-blank, then the dump is written to the specified
+#        file (any existing file with the same name is over-written).
+#        Otherwise, the user is asked to supply a file name.
+#
+#
+#  Returned Value:
+#     1 if a succesful dump was performed, zero otherwise.
+#
+#-
+   global E_RAY_FEATURES 
+   global E_RAY_MASK
+   global IMAGE_DISP
+   global O_RAY_FEATURES 
+   global O_RAY_MASK 
+   global O_RAY_SKY
+   global E_RAY_SKY
+   global IMMAP
+   global OEMAP
+   global PNTPX
+   global PNTPY
+   global PNTNXT
+   global PNTLBL
+   global PNTTAG
+   global PROT_OEMAP
+   global PROT_IMMAP
+
+# Assume no dump is made.
+   set ret 0
+
+# Open the supplied file, or open a file specified by the user.
+   if { $file != "" } {
+      if { [catch { set fd [open $file "w"]} ] } {
+         set ok 0
+      } {
+         set ok 1
+      }
+
+   } {
+      set ok [OpenFile "w" "Dump output file" \
+                           "Give name of dump file to create:" file fd] 
+   }
+
+# Only proceed if a file was opened.
+   if { $ok } {
+
+# Tell the user what is happening.
+      set told [SetInfo "Dumping current positions lists, etc, to disk..." 0]
+
+# Dump the name of the currently displayed image.
+      set image $IMAGE_DISP
+      puts $fd "Image $image"
+
+# Write the OE Mapping to the output file.
+      if { [info exists OEMAP($image)] && [llength $OEMAP($image)] == 6 } {
+         puts $fd $OEMAP($image)
+      } {
+         puts $fd ""
+      }
+
+# Write the image Mapping to the output file.
+      if { [info exists IMMAP($image)] && [llength $IMMAP($image)] == 6 } {
+         puts $fd $IMMAP($image)
+      } {
+         puts $fd ""
+      }
+
+# Dump the mapping protection flags.
+      if { [info exists PROT_OEMAP($image)] } {
+         puts $fd $PROT_OEMAP($image)
+      } {
+         puts $fd ""
+      }
+         
+      if { [info exists PROT_IMMAP($image)] } {
+         puts $fd $PROT_IMMAP($image)
+      } {
+         puts $fd ""
+      }
+
+# Loop round each object type...
+      foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK \
+                           $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY] {
+
+# Write out the number of posisions in this list.
+         puts $fd [llength $PNTPX($image,$object)]
+
+# Write out the arrays holding information describing the list.
+         puts $fd $PNTPX($image,$object)
+         puts $fd $PNTPY($image,$object)
+         puts $fd $PNTNXT($image,$object)
+         puts $fd $PNTLBL($image,$object)
+         puts $fd $PNTTAG($image,$object)
       }
 
 # Close the output dump file.
@@ -10096,6 +10217,226 @@ proc Restore {file} {
       if { $bad && !$backup } { 
          Message "Syntax error encountered restoring positions from \"$file\". Last line read was:\n\n\"$line\""
          Restore $safefile
+      }
+
+#  Re-display the reference and current objects.
+      UpdateDisplay ref
+
+   }
+
+}
+
+proc RestoreImage {file} {
+#+
+#  Name:
+#     RestoreImage
+#
+#  Purpose:
+#     Restore positions lists, masks, and options from a text file 
+#     previously created using procedure DumpImage. The properties
+#     read from the file are assigned to the currently displayed image.
+#
+#  Arguments:
+#     file 
+#        If supplied non-blank, then the dump is read from the specified
+#        file. Otherwise, the user is asked to supply a file name.
+#
+#  Returned Value:
+#     1 if a succesful dump was performed, zero otherwise.
+#-
+   global E_RAY_FEATURES 
+   global E_RAY_MASK
+   global IMAGE_DISP
+   global O_RAY_FEATURES 
+   global O_RAY_MASK 
+   global O_RAY_SKY
+   global E_RAY_SKY
+   global IMMAP
+   global OEMAP
+   global PNTCY
+   global PNTCX
+   global PNTID
+   global PNTNXT
+   global PNTVID
+   global PNTLBL
+   global PROT_OEMAP
+   global PROT_IMMAP
+
+# Open an existing dump file, either the supplied one, or one specified by
+# the user.
+   if { $file != "" } {
+      set backup 1
+      if { [catch {set fd [open $file "r"]} mess] } {
+         Message "Could not restored original positions lists, etc.\n\n\"$mess\"."
+         set ok 0
+      } {
+         set ok 1
+      }
+      set info "Restoring original positions lists, etc."
+   } {
+      set backup 0
+      set ok [OpenFile "r" "Dump file" "Give name of dump file to read:" file fd]
+      set info "Restoring positions lists, etc, from disk."
+   }
+
+# Only proceed if a file was opened.
+   if { $ok } {
+
+# Tell the user what is happening.
+      set told [SetInfo $info 0]
+
+# Set a flag indicating that the supplied file is a valid dump file.
+      set bad 0
+
+# If the user supplied the dump file, dump the current positions, masks, etc, 
+# so that they can be restored if anything goes wrong. Abort if the dump fails.
+      if { !$backup } {
+         set safefile [UniqueFile]
+         if { ![DumpImage $safefile] } {
+            Message "Unable to create backup dump of current positions."
+            set bad 1
+         }
+      }
+
+# Save the name of the currently displayed image.
+      foreach image $IMAGE_DISP {
+
+# Check that this is the start of a new image. If no more images are
+# contained in the given file, break out of the image loop.
+         if { [gets $fd line] == -1 } {
+            set bad 1
+            break
+         } 
+         if { ![regexp {^Image } $line] } { break }
+
+# Restore the the OE Mapping.
+         if { [gets $fd line] == -1 } {
+            set bad 1
+            break
+         } 
+
+         if { $line != "" } {
+            if { [llength $line] == 6 } {
+               set OEMAP($image) $line
+            } {
+               set bad 1
+               break
+            } 
+         } {
+            catch { unset OEMAP($image) }
+         }
+
+# Restore the the Image Mapping.
+         if { [gets $fd line] == -1 } {
+            set bad 1
+            break
+         } 
+
+         if { $line != "" } {
+            if { [llength $line] == 6 } {
+               set IMMAP($image) $line
+            } {
+               set bad 1
+               break
+            } 
+         } {
+            catch { unset IMMAP($image) }
+         }
+
+# Restore the mapping protection flags.
+         if { [gets $fd line] == -1 } {
+            set bad 1
+            break
+         } 
+
+         if { $line != "" } {
+            set PROT_OEMAP($image) $line
+         } {
+            catch { unset PROT_OEMAP($image) }
+         }
+         
+         if { [gets $fd line] == -1 } {
+            set bad 1
+            break
+         } 
+
+         if { $line != "" } {
+            set PROT_IMMAP($image) $line
+         } {
+            catch { unset PROT_IMMAP($image) }
+         }
+
+# Loop round each object type...
+         foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK \
+                              $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY] {
+
+# Delete the existing positions.
+            while { [NumPosn "" $image $object] > 0 } {
+               DelPosn 0 0 $image $object
+            }
+
+# Get the number of positions in this list ($npnt).
+            if { [gets $fd line] == -1 || [scan $line "%d" npnt] != 1 } {
+               set bad 1
+            } 
+
+# Read the arrays holding information describing the list.
+            foreach item "PX PY NXT LBL TAG" {
+               set aryname "PNT${item}"
+               upvar #0 $aryname ary 
+
+               if { $bad || [gets $fd line] == -1 || [llength $line] != $npnt } {
+                  set bad 1
+               } 
+
+# Store the new array values.
+               if { !$bad } {
+                  set ary($image,$object) $line
+               } {
+                  set ary($image,$object) ""
+               }
+            }
+
+#  The rest is only done if the Object was restored succesfully.
+            if { !$bad } {
+
+#  Set up the arrays holding the number of times each label is used.
+               foreach lbl $PNTLBL($image,$object) {
+                  Labels $lbl 1
+               }
+
+# Initialise the other required arrays to indicate that nothing is
+# currently drawn.
+               catch { unset PNTID($image,$object) }
+               catch { unset PNTCX($image,$object) }
+               catch { unset PNTCY($image,$object) }
+               catch { unset PNTVID($image,$object) }
+               foreach nxt $PNTNXT($image,$object) {
+                  lappend PNTID($image,$object) -1
+                  lappend PNTCX($image,$object) ""
+                  lappend PNTCY($image,$object) ""
+                  if { $nxt == "" } {
+                     lappend PNTVID($image,$object) ""
+                  } {
+                     lappend PNTVID($image,$object) -1
+                  }
+               }            
+            }
+         }
+      }
+
+# Close the dump file.
+      close $fd
+
+# Cancel the informative text set earlier in this procedure.
+      if { $told } { SetInfo "" 0 }
+
+#  If the specified file was bad, try restoring the dump saved at the start
+#  of this procedure. Do not do this if we are already restoring a saved
+#  "backup" dump.
+      if { $bad && !$backup } { 
+         Message "Syntax error encountered restoring positions from \"$file\". Last line read was:\n\n\"$line\""
+         RestoreImage $safefile
       }
 
 #  Re-display the reference and current objects.
