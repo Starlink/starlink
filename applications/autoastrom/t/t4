@@ -1,0 +1,21 @@
+
+test -n "$AUTOASTROM_DIR"   || AUTOASTROM_DIR=..
+test -n "$PERLBIN" || PERLBIN=/star/Perl/bin/perl
+
+export AUTOASTROM_DIR;
+exec $PERLBIN <<'EOD';
+
+use lib '..';
+use autoastrom;
+
+print "ymd2dec (2000,  1,  1) = ", ymd2dec(2000,  1,  1), "\n";
+print "ymd2dec (2000,  7,  1) = ", ymd2dec(2000,  7,  1), "\n";
+print "ymd2dec (2000, 12, 31) = ", ymd2dec(2000, 12, 31), "\n";
+print "ymd2dec (2000,  6, 30) = ", ymd2dec(2000,  6, 30), "\n";
+
+
+exit 0;
+EOD;
+
+
+
