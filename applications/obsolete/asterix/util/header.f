@@ -38,12 +38,13 @@
 *
       CHARACTER*(DAT__SZLOC) ASTLOC             ! Locator to ASTERIX struc
       CHARACTER*(DAT__SZLOC) HLOC               ! Locator to HEADER struc
-      CHARACTER*(DAT__SZLOC) LOC                ! Locator to input object
       CHARACTER*(DAT__SZLOC) PLOC               ! Locator to PROCESSING struc
       CHARACTER              LINE*80, NAME*132
+      CHARACTER*200		FILE,PATH
 
       INTEGER			FID			! Dataset id
       INTEGER                	L
+      INTEGER			NLEV			! Trace info
       INTEGER                	OCH                	! Output channel
       INTEGER                	WIDTH              	! Output width
 
@@ -92,8 +93,8 @@
           CALL AIO_WRITE( OCH, LINE, STATUS )
           CALL AIO_WRITE( OCH, 'Dataset:-', STATUS )
           CALL AIO_BLNK( OCH, STATUS )
-          CALL STR_OBNAME (LOC,NAME,L,STATUS)
-          CALL AIO_IWRITE( OCH, 1, NAME(:L), STATUS )
+          CALL ADI_FTRACE( FID, NLEV, PATH, FILE, STATUS )
+          CALL AIO_IWRITE( OCH, 1, FILE(:CHR_LEN(FILE)), STATUS )
           CALL AIO_BLNK( OCH, STATUS )
 
           CALL ADI1_LOCHEAD( FID, .FALSE., HLOC, STATUS )
