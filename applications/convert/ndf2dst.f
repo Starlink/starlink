@@ -189,6 +189,7 @@
       CHARACTER*48           FITCOM ! FITS comment         
       CHARACTER*70           FITDAT ! FITS value
       CHARACTER*8            FITNAM ! FITS keyword          
+      LOGICAL                HUSED  ! FITS header already exists if true
       INTEGER                I      ! Loop variable
       INTEGER                IAXIS  ! Axis number
       INTEGER                IERR   ! First numerical error
@@ -227,6 +228,8 @@
       INTEGER                NBYTES ! Number of bytes
       INTEGER                NCOMP  ! Number of components 
       INTEGER                NCC    ! Column of FITS comment delimiter
+      INTEGER                NCCOM  ! Number of characters in FITS
+                                    ! COMMENT or HISTORY card
       INTEGER                NCCQ   ! Column of FITS trailing quote for
                                     ! character value
       INTEGER                NCDQ   ! Column of FITS double quote for
@@ -843,131 +846,180 @@
 *            First 8 characters contain the keyword.
                FITNAM = STRING( 1:8 )
 
+*            The FITS object string the value and comments uses the
+*            FITS keyword for their names.  Since there can only be one
+*            object of a given name in a structure and that Figaro DSA
+*            does not support arrays of values for a given FITS keyword
+*            we must determine whether or not the HDS object already
+*            exists.
+               CALL DAT_THERE( LFFT, FITNAM, HUSED, STATUS )
+
 *            Look for a blank keyword.  Skip the card image if there
 *            is no keyword present.  Note that this cannot handle
-*            hierarchical keywords.
-               IF ( FITNAM .NE. ' ' ) THEN
+*            hierarchical keywords.  Skip over the END keyword too.
+*            Also we cannot write the value and comments if the keyword
+*            is duplicated because the the HDS object already exists.
+               IF ( FITNAM .NE. ' ' .AND. FITNAM .NE. 'END     ' .AND.
+     :             .NOT. HUSED ) THEN
 
-*               Columns 11:30 contain FITS item value if numeric or
-*               logical.  Character values may extend to column 80.
-*               Search for the leading quote.
-                  IF ( STRING( 11:11 ) .EQ. '''' ) THEN
-                     FITDAT = STRING( 11:80 )
+*               Deal with the special case of COMMENT and HISTORY
+*               keywords.
+                  IF ( FITNAM .EQ. 'HISTORY' .OR.
+     :                 FITNAM .EQ. 'COMMENT' ) THEN
 
-*                  Determine where the trailing blank is located.  First
-*                  look for any double quotes.  Prevent the search
-*                  extending beyond the end of the value.
-                     NCDQ = 1
-                     DO WHILE ( NCDQ .NE. 0 )
-                        NCSTQ = MIN( NCDQ, 66 )
-                        NCDQ = INDEX( FITDAT( NCSTQ+2: ), '''''' )
-                     END DO
+*                  There is no equals sign for these so extract the
+*                  comment or history.  Get it's effective length.
+                     FITDAT = STRING( 9:80 )
+                     NCCOM = CHR_LEN( FITDAT )
 
-*                  Closing quote must occur in or after column 10 (20 in
-*                  the card).
-                     NCCQ = INDEX( FITDAT( MIN( 10, NCSTQ+2 ): ), '''' )
-
-*                  Use last quote as delimiter.
-                     IF ( NCCQ .EQ. 0 ) NCCQ = MIN( 8, NCSTQ + 2 )
-
-*                  Extract the value.
-                     FITDAT = STRING( 12: NCCQ + 11 )
-
-*                  Define the column from which to look for a comment.
-                     NCOMS = NCCQ + 12
-
-*               Straightforward for other types.
-                  ELSE
-                     FITDAT = STRING( 11:30 )
-                     NCOMS = 31
-                  END IF
-
-*               Look for the comment character /.
-                  NCC = INDEX( STRING( NCOMS: ), '/' ) + NCOMS - 1
-                  IF ( NCC .EQ. NCOMS - 1 ) THEN
-
-*                  There is no comment.
-                     FITCOM = ' '
-                  ELSE
-
-*                  Deal with the special case of a comment delimiter,
-*                  but no comment.
-                     IF ( CHR_LEN( STRING( NCC: ) ) .EQ. 1 ) THEN
-                        FITCOM = ' '
-
-*                  Extract the comment associated with the keyword.
-*                  Watch for a leading space, which can be ignored.
-                     ELSE IF ( STRING( NCC+1:NCC+1 ) .EQ. ' ' ) THEN
-                        FITCOM = STRING( NCC+2: )
-                     ELSE
-                        FITCOM = STRING( NCC+1: )
-                     END IF
-                  END IF
-
-*               Put value of item into .FITS.xxx.
-*               =================================
-
-*               Find its type.  Although we have partially done this,
-*               i.e.  located a character value, there are naughty
-*               people who don't put the quotes about the character
-*               value.  For these it is assumed that the value extends
-*               no further than column 30 of the FITS card-image.
-
-*               First, check for an INTEGER.
-                  CSTAT = 0
-                  CLEN = CHR_LEN( FITDAT )
-                  CALL CHR_CTOI( FITDAT, IVAL, CSTAT )
-                  IF ( CSTAT .EQ. 0 .AND. CLEN .GT. 0 ) THEN
-                     TYPE = '_INT'
-                     CALL DAT_NEW0I( LFFT, FITNAM, STATUS )
+*                  Create the object and a locator to it.
+                     CALL DAT_NEWC( LFFT, FITNAM, NCCOM, 0, 0, STATUS )
                      CALL DAT_FIND( LFFT, FITNAM, LFFTD, STATUS )
-                     CALL DAT_PUTI( LFFTD, 0, 0, IVAL, STATUS )
+
+*                  Write the value to the FITS structure.
+                     CALL DAT_PUTC( LFFTD, 0, 0, FITDAT( :NCCOM ),
+     :                              STATUS )
+
+*               Deal with the normal headers...
                   ELSE
 
-*                  Check for a REAL.
-                     CSTAT = 0
-                     CALL CHR_CTOR( FITDAT, RVAL, CSTAT )
-                     IF (CSTAT .EQ. 0 .AND. CLEN.GT.0) THEN
-                        TYPE = '_REAL'
-                        CALL DAT_NEW0R( LFFT, FITNAM, STATUS )
-                        CALL DAT_FIND( LFFT, FITNAM, LFFTD, STATUS )
-                        CALL DAT_PUTR( LFFTD, 0, 0, RVAL, STATUS )
+*                  Columns 11:30 contain FITS item value if numeric or
+*                  logical.  Character values may extend to column 80.
+*                  Search for the leading quote.
+                     IF ( STRING( 11:11 ) .EQ. '''' ) THEN
+                        FITDAT = STRING( 11:80 )
+
+*                     Determine where the trailing blank is located.
+*                     First look for any double quotes.  Prevent the
+*                     search extending beyond the end of the value.
+                        NCDQ = 1
+                        DO WHILE ( NCDQ .NE. 0 )
+                           NCSTQ = MIN( NCDQ, 66 )
+                           NCDQ = INDEX( FITDAT( NCSTQ+2: ), '''''' )
+                        END DO
+
+*                     Closing quote must occur in or after column 10
+*                     (20 in the card).
+                        NCCQ = INDEX( FITDAT( MIN( 10, NCSTQ+2 ): ),
+     :                         '''' )
+
+*                     Use last quote as delimiter.
+                        IF ( NCCQ .EQ. 0 ) NCCQ = MIN( 8, NCSTQ + 2 )
+
+*                     Extract the value.
+                        FITDAT = STRING( 12: NCCQ + 11 )
+
+*                     Define the column from which to look for a
+*                     comment.
+                        NCOMS = NCCQ + 12
+
+*                  Straightforward for other types.
+                     ELSE
+                        FITDAT = STRING( 11:30 )
+                        NCOMS = 31
+                     END IF
+
+*                  Look for the comment character /.
+                     NCC = INDEX( STRING( NCOMS: ), '/' ) + NCOMS - 1
+                     IF ( NCC .EQ. NCOMS - 1 ) THEN
+
+*                     There is no comment.
+                        FITCOM = ' '
                      ELSE
 
-*                     Check for a logical.  Note it must be T or F in
-*                     the header column 30 (20 in in the data value).
-                        CSTAT = 0
-                        CALL CHR_CTOL( FITDAT(20:20), LVAL, CSTAT )
-                        IF (CSTAT .EQ. 0 .AND. CLEN.GT.0 .AND.
-     :                      FITDAT(1:19) .EQ. ' ' ) THEN
-                           TYPE = '_LOGICAL'
-                           CALL DAT_NEW0L( LFFT, FITNAM, STATUS )
-                           CALL DAT_FIND( LFFT, FITNAM, LFFTD, STATUS )
-                           CALL DAT_PUTL( LFFTD, 0, 0, LVAL, STATUS )
-                        ELSE
+*                     Deal with the special case of a comment delimiter,
+*                     but no comment.
+                        IF ( CHR_LEN( STRING( NCC: ) ) .EQ. 1 ) THEN
+                           FITCOM = ' '
 
-*                        Assume it's just a character string.  If it is
-*                        a correctly formatted string, the surrounding
-*                        quotes have already been stripped from it.
-*                        Make the size equal to the length of the
-*                        character string.
-                           CALL DAT_NEWC( LFFT, FITNAM, NCOMS-12, 0, 0,
-     :                                    STATUS )
-                           CALL DAT_FIND( LFFT, FITNAM, LFFTD, STATUS )
-                           CALL DAT_PUTC( LFFTD, 0, 0, FITDAT, STATUS )
+*                     Extract the comment associated with the keyword.
+*                     Watch for a leading space, which can be ignored.
+                        ELSE IF ( STRING( NCC+1:NCC+1 ) .EQ. ' ' ) THEN
+                           FITCOM = STRING( NCC+2: )
+                        ELSE
+                           FITCOM = STRING( NCC+1: )
                         END IF
                      END IF
-                  END IF
 
-*                Put any comments into .COMMENTS.XXX
-                  IF ( CHR_LEN( FITCOM ) .NE. 0 ) THEN
-                     CALL DAT_NEWC(LFCOM, FITNAM, 48, 0, 0, STATUS )
-                     CALL DAT_FIND(LFCOM, FITNAM, LFFTC, STATUS )
-                     CALL DAT_PUTC( LFFTC, 0, 0, FITCOM, STATUS )
-                     CALL DAT_ANNUL( LFFTC, STATUS )
+*                 Put value of item into .FITS.xxx.
+*                 =================================
 
+*                  Find its type.  Although we have partially done
+*                  this, i.e.  located a character value, there are
+*                  naughty people who don't put the quotes about the
+*                  character value.  For these it is assumed that the
+*                  value extends no further than column 30 of the FITS
+*                  card-image.
+
+*                  First, check for an INTEGER.
+                     CSTAT = 0
+                     CLEN = CHR_LEN( FITDAT )
+                     CALL CHR_CTOI( FITDAT, IVAL, CSTAT )
+                     IF ( CSTAT .EQ. 0 .AND. CLEN .GT. 0 ) THEN
+
+*                     Create the integer object and give it the value.
+                        TYPE = '_INT'
+                        CALL DAT_NEW0I( LFFT, FITNAM, STATUS )
+                        CALL DAT_FIND( LFFT, FITNAM, LFFTD, STATUS )
+                        CALL DAT_PUTI( LFFTD, 0, 0, IVAL, STATUS )
+                    ELSE
+
+*                     Check for a REAL.
+                        CSTAT = 0
+                        CALL CHR_CTOR( FITDAT, RVAL, CSTAT )
+                        IF (CSTAT .EQ. 0 .AND. CLEN.GT.0) THEN
+
+*                        Create the real object and give it the value.
+                           TYPE = '_REAL'
+                           CALL DAT_NEW0R( LFFT, FITNAM, STATUS )
+                           CALL DAT_FIND( LFFT, FITNAM, LFFTD, STATUS )
+                           CALL DAT_PUTR( LFFTD, 0, 0, RVAL, STATUS )
+                        ELSE
+
+*                        Check for a logical.  Note it must be T or F in
+*                        the header column 30 (20 in in the data value).
+                           CSTAT = 0
+                           CALL CHR_CTOL( FITDAT(20:20), LVAL, CSTAT )
+                           IF ( CSTAT .EQ. 0 .AND. CLEN .GT. 0 .AND.
+     :                          FITDAT(1:19) .EQ. ' ' ) THEN
+
+*                           Create the logical object and give it the
+*                           value.
+                              TYPE = '_LOGICAL'
+                              CALL DAT_NEW0L( LFFT, FITNAM, STATUS )
+                              CALL DAT_FIND( LFFT, FITNAM, LFFTD,
+     :                                       STATUS )
+                              CALL DAT_PUTL( LFFTD, 0, 0, LVAL, STATUS )
+                           ELSE
+
+*                           Assume it's just a character string.  If it
+*                           is a correctly formatted string, the
+*                           surrounding quotes have already been
+*                           stripped from it.  Make the size equal to
+*                           the length of the character string.  Create
+*                           the object and write the character value.
+                              CALL DAT_NEWC( LFFT, FITNAM, NCOMS-12,
+     :                                       0, 0, STATUS )
+                              CALL DAT_FIND( LFFT, FITNAM, LFFTD,
+     :                                       STATUS )
+                              CALL DAT_PUTC( LFFTD, 0, 0, FITDAT,
+     :                                       STATUS )
+                           END IF
+                        END IF
+                     END IF
+
+*                Put any comments into .COMMENTS.XXX.  First create the
+*                object, get a locator to it, and put the value into the
+*                object.
+                     IF ( CHR_LEN( FITCOM ) .NE. 0 ) THEN
+                        CALL DAT_NEWC( LFCOM, FITNAM, 48, 0, 0, STATUS )
+                        CALL DAT_FIND( LFCOM, FITNAM, LFFTC, STATUS )
+                        CALL DAT_PUTC( LFFTC, 0, 0, FITCOM, STATUS )
+                        CALL DAT_ANNUL( LFFTC, STATUS )
+
+                     END IF
+                     CALL DAT_ANNUL( LFFTD, STATUS )
                   END IF
-                  CALL DAT_ANNUL( LFFTD, STATUS )
                END IF
 
             END IF
