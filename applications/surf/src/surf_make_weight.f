@@ -160,7 +160,9 @@
 *     Generate an axis. The axis scales as 1/array size in chops
 
       DO I = 1, 2
-         INC = CHOP_THROW / (PIXSIZE * IDIMS(I) )
+         IF (STATUS .EQ. SAI__OK) THEN
+            INC = CHOP_THROW / (PIXSIZE * IDIMS(I) )
+         END IF
 
 *     Map the axis of the weights
          CALL NDF_AMAP(FT_NDF, 'CENTRE', I, '_REAL', 'WRITE',
