@@ -38,7 +38,7 @@ line
 			{ $$ = scat( 3, $1, $2, $3 ); }
 	| LINE_START declaration_line LINE_END
 			{ $$ = scat( 3, $1, $2, $3 ); }
-	| LINE_START executable_line LINE_END
+	| LINE_START statement LINE_END
 			{ $$ = scat( 3, $1, $2, $3 ); }
 	| LINE_START include_line LINE_END
 			{ $$ = scat( 3, $1, $2, $3 ); }
@@ -63,11 +63,6 @@ module_start_line
 			{ $$ = scat( 2, $1, $2 ); }
 	;
 
-executable_line
-	: executable_text
-			{ $$ = $1; }
-	;
-
 include_line
 	: INCLUDE STRING_CONSTANT
 			{ $$ = scat( 2, $1, fanchor_inc( "href", $2 ) ); }
@@ -84,7 +79,7 @@ type_spec
 	| type '*' INTEGER_CONSTANT
 			{ $$ = scat( 3, $1, $2, $3 ); }
 	| type '*' '(' expression ')'
-			{ $$ = scat( 4, $1, $2, $3, $4 ); }
+			{ $$ = scat( 5, $1, $2, $3, $4, $5 ); }
 	| DIMENSION
 			{ $$ = $1; }
 	;
@@ -129,13 +124,17 @@ var_dec_item
 			  $$ = scat( 4, $1, $2, $3, $4 ); }
 	| token '(' expression ':' expression ')'
 			{ $$ = scat( 6, $1, $2, $3, $4, $5, $6 ); }
+	| token '*' '(' expression ')'
+			{ $$ = scat( 5, $1, $2, $3, $4, $5 ); }
 	;
 
-executable_text
+statement
 	: if '(' expression ')' THEN
 			{ $$ = scat( 5, $1, $2, $3, $4, $5 ); }
-	| if '(' expression ')' executable_text
+	| if '(' expression ')' statement
 			{ $$ = scat( 5, $1, $2, $3, $4, $5 ); }
+	| if '(' expression ')' INTEGER_CONSTANT expression
+			{ $$ = scat( 6, $1, $2, $3, $4, $5, $6 ); }
 	| token '=' expression
 			{ $$ = scat( 3, $1, $2, $3 ); }
 	| token '(' expression ')' '=' expression
@@ -253,23 +252,30 @@ token
 
    char *fanchor( char *attrib, char *name ) {
       char *string, *rname;
-      int leng;
+      int leng, i;
 
       rname = refname( name );
-      leng = strlen( attrib ) + strlen( name ) + strlen( rname ) + 13;
+      leng = strlen( attrib ) + strlen( rname ) + strlen( name ) + 13;
       string = malloc( leng );
-      sprintf( string, "<a %s='%s_'>%s</a>", attrib, rname, name );
+      sprintf( string, "<a %s=\"%s_\">%s", attrib, rname, name );
+      for ( i = strlen( name ); i >= 0 && isspace( name[ i - 1 ] ); i-- );
+      sprintf( string + leng - strlen( name ) - 5 + i, "</a>%s", name + i );
       return( string );
    }
 
    char *fanchor_inc( char *attrib, char *name ) {
       char *string, *rname;
-      int leng;
+      int leng, nleng, i;
 
       rname = refname( name );
       leng = strlen( attrib ) + strlen( name ) + strlen( rname ) + 20;
       string = malloc( leng );
-      sprintf( string, "<a %s='INCLUDE-%s'>%s</a>", attrib, rname, name );
+      i = strcspn( name, "'" ) + 1;
+      strncpy( string, name, i );
+      string[ i ] = '\0';
+      sprintf( string + i, "<a %s=\"INCLUDE-%s\">%s", attrib, rname, name + i );
+      i += strcspn( name + i, "'" );
+      sprintf( string + leng - strlen( name ) - 5 + i, "</a>%s", name + i );
       return( string );
    }
 

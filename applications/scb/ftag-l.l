@@ -1,8 +1,8 @@
 
-CONT			(\n.....[^ 0\n])
+CONT			(\n[^cCdD!*\n]....[^ 0\n])
 BLANK			([ \t]|!.*|{CONT})*
-LETTER			[A-Za-z$_%]{BLANK}
-DIGIT			[0-9]{BLANK}
+LETTER			[A-Za-z$_%]
+DIGIT			[0-9]
 A			[Aa]
 B			[Bb]
 C			[Cc]
@@ -31,7 +31,7 @@ Y			[Yy]
 Z			[Zz]
 
 
-%Start	FIRST
+%START	FIRST
 %{
 
 void count();
@@ -43,53 +43,53 @@ void count();
 ^[0-9 ]{5,5}[ 0]{BLANK}		{ count(); BEGIN FIRST; return( LINE_START ); }
 ^[0-9 ]{5,5}[ 0]{BLANK}\n	{ count(); return( BLANK_LINE ); }
 ^{BLANK}\n			{ count(); return( BLANK_LINE ); }
-^[Cc!].*\n			{ count(); return( COMMENT_LINE ); }
+^[CcDd!*].*\n			{ count(); return( COMMENT_LINE ); }
 \n				{ count(); return( LINE_END ); }
 
 
-<FIRST>{S}{U}{B}{R}{O}{U}{T}{I}{N}{E}	{ count(); return( SUBROUTINE ); }
-<FIRST>{E}{N}{T}{R}{Y}			{ count(); return( ENTRY ); }
-<FIRST>{B}{L}{O}{C}{K}{BLANK}{D}{A}{T}{A}	{ count(); return( BLOCKDATA ); }
-<FIRST>{P}{R}{O}{G}{R}{A}{M}		{ count(); return( PROGRAM ); }
-<FIRST>{I}{N}{C}{L}{U}{D}{E}		{ count(); return( INCLUDE ); }
-<FIRST>{E}{L}{S}{E}{BLANK}{I}{F}	{ count(); return( ELSEIF ); }
-<FIRST>{T}{H}{E}{N}			{ count(); return( THEN ); }
-<FIRST>{I}{N}{T}{E}{G}{E}{R}		{ count(); return( INTEGER ); }
-<FIRST>{R}{E}{A}{L}			{ count(); return( REAL ); }
-<FIRST>{D}{O}{U}{B}{L}{E}{BLANK}{P}{R}{E}{C}{I}{S}{I}{O}{N}	{ 
+<FIRST>{S}{U}{B}{R}{O}{U}{T}{I}{N}{E}{BLANK}	{ count(); return( SUBROUTINE ); }
+<FIRST>{E}{N}{T}{R}{Y}{BLANK}			{ count(); return( ENTRY ); }
+<FIRST>{B}{L}{O}{C}{K}{BLANK}{D}{A}{T}{A}{BLANK}	{ count(); return( BLOCKDATA ); }
+<FIRST>{P}{R}{O}{G}{R}{A}{M}{BLANK}		{ count(); return( PROGRAM ); }
+<FIRST>{I}{N}{C}{L}{U}{D}{E}{BLANK}		{ count(); return( INCLUDE ); }
+<FIRST>{E}{L}{S}{E}{BLANK}{I}{F}{BLANK}		{ count(); return( ELSEIF ); }
+<FIRST>{T}{H}{E}{N}{BLANK}			{ count(); return( THEN ); }
+<FIRST>{I}{N}{T}{E}{G}{E}{R}{BLANK}		{ count(); return( INTEGER ); }
+<FIRST>{R}{E}{A}{L}{BLANK}			{ count(); return( REAL ); }
+<FIRST>{D}{O}{U}{B}{L}{E}{BLANK}{P}{R}{E}{C}{I}{S}{I}{O}{N}{BLANK}	{ 
 					  count(); return( DOUBLEPRECISION ); }
-<FIRST>{C}{O}{M}{P}{L}{E}{X}		{ count(); return( COMPLEX ); }
-<FIRST>{L}{O}{G}{I}{C}{A}{L}		{ count(); return( LOGICAL ); }
-<FIRST>{C}{H}{A}{R}{A}{C}{T}{E}{R}	{ count(); return( CHARACTER ); }
-<FIRST>{B}{Y}{T}{E}			{ count(); return( BYTE ); }
-<FIRST>{U}{B}{Y}{T}{E}			{ count(); return( UBYTE ); }
-<FIRST>{W}{O}{R}{D}			{ count(); return( WORD ); }
-<FIRST>{U}{W}{O}{R}{D}			{ count(); return( UWORD ); }
-<FIRST>{D}{I}{M}{E}{N}{S}{I}{O}{N}	{ count(); return( DIMENSION ); }
-<FIRST>"<"[Tt][Yy][Pp][Ee]">"{BLANK}	{ count(); return( GENERIC_TYPE ); }
+<FIRST>{C}{O}{M}{P}{L}{E}{X}{BLANK}		{ count(); return( COMPLEX ); }
+<FIRST>{L}{O}{G}{I}{C}{A}{L}{BLANK}		{ count(); return( LOGICAL ); }
+<FIRST>{C}{H}{A}{R}{A}{C}{T}{E}{R}{BLANK}	{ count(); return( CHARACTER ); }
+<FIRST>{B}{Y}{T}{E}{BLANK}			{ count(); return( BYTE ); }
+<FIRST>{U}{B}{Y}{T}{E}{BLANK}			{ count(); return( UBYTE ); }
+<FIRST>{W}{O}{R}{D}{BLANK}			{ count(); return( WORD ); }
+<FIRST>{U}{W}{O}{R}{D}{BLANK}			{ count(); return( UWORD ); }
+<FIRST>{D}{I}{M}{E}{N}{S}{I}{O}{N}{BLANK}	{ count(); return( DIMENSION ); }
+<FIRST>"<"{T}{Y}{P}{E}">"{BLANK}		{ count(); return( GENERIC_TYPE ); }
 
-{F}{U}{N}{C}{T}{I}{O}{N}		{ count(); return( FUNCTION ); }
-{I}{F}/\(				{ count(); return( IF ); }
-{C}{A}{L}[Ll]([ \t]|!.*|{CONT})+	{ count(); return( CALL ); }
+{F}{U}{N}{C}{T}{I}{O}{N}{BLANK}			{ count(); return( FUNCTION ); }
+{I}{F}{BLANK}/\(				{ count(); return( IF ); }
+{C}{A}{L}{L}{BLANK}				{ count(); return( CALL ); }
 
 
-{DIGIT}+				{ count(); return( INTEGER_CONSTANT ); }
-"'"(''|[^'\n]|{CONT})"'"		{ count(); return( STRING_CONSTANT ); }
+{DIGIT}+{BLANK}				{ count(); return( INTEGER_CONSTANT ); }
+\'(''|[^'\n]|{CONT})*\'{BLANK}		{ count(); return( STRING_CONSTANT ); }
 
-{LETTER}({LETTER}|{DIGIT})*		{ count(); return( TOKEN ); }
+{LETTER}({LETTER}|{DIGIT})*{BLANK}	{ count(); return( TOKEN ); }
 
 ":"{BLANK}				{ count(); return( ':' ); }
 "("{BLANK}				{ count(); return( '(' ); }
 ")"{BLANK}				{ count(); return( ')' ); }
 "+"{BLANK}				{ count(); return( '+' ); }
-"-"{BLANK}				{ count(); return( '0' ); }
+"-"{BLANK}				{ count(); return( '-' ); }
 "*"{BLANK}				{ count(); return( '*' ); }
 "/"{BLANK}				{ count(); return( '/' ); }
 "."{BLANK}				{ count(); return( '.' ); }
 ","{BLANK}				{ count(); return( ',' ); }
-"'"{BLANK}				{ count(); return( '\'' ); }
 
-.{BLANK}				{ count(); return( ILLEGAL_CHAR ); }
+.([ \t]|{CONT}){BLANK}			{ count(); return( ILLEGAL_CHAR ); }
+[^'\n]{BLANK}				{ count(); return( ILLEGAL_CHAR ); }
 
 
 %%
