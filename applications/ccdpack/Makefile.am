@@ -116,10 +116,8 @@ $(IFL_FILES) $(STARTUP_SCRIPT) $(ICL_STARTUP_SCRIPT): $(IFD_FILES)
 
 #  List of task interface files.
 
-MONO_IFL = ccdpack_red.ifl ccdpack_reg.ifl ccdpack_res.ifl ccdpack_scr.ifl
-
 IFL_FILES = $(REDTASKS:=.ifl) $(REGTASKS:=.ifl) $(RESTASKS:=.ifl) \
-            $(SCRTASKS:=.ifl) $(MONO_IFL)
+            $(SCRTASKS:=.ifl)
 
 
 
