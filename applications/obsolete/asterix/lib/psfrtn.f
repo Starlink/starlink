@@ -900,8 +900,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       END
 
 *+  PSF_ASCA - ASCA GIS and SIS psfs
-      SUBROUTINE PSF_ASCA( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX,
-     :                                              NY, ARRAY, STATUS )
+      SUBROUTINE PSF_ASCA( PSID, X0, Y0, QX, QY, DX, DY, INTEG, NX,
+     :                                          NY, ARRAY, STATUS )
 *
 *    Description :
 *
@@ -939,7 +939,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Import :
 *
       REAL                     DX, DY, X0, Y0,QX,QY
-      INTEGER                  NX,NY,SLOT
+      INTEGER                  NX,NY,PSID
       LOGICAL                  INTEG
 *
 *    Export :
@@ -968,19 +968,22 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Local variables :
 *
       CHARACTER*132		FNAME
+      CHARACTER*3		INS			! Instrument name
 
-      REAL                     ENERGY                  ! Mean photon energy
+      REAL                      ENERGY                  ! Mean photon energy
       REAL                     	NORM                   ! Normalisation constant
-      REAL                     P_SCALE                 ! Scale size of psf
-      REAL                     ROFF                    ! Off-axis angle
+      REAL                      P_SCALE                 ! Scale size of psf
+      REAL                      ROFF                    ! Off-axis angle
       REAL			ROTA			! Rotation angle
-      REAL                     SUM                     ! Cumulative value
-      REAL                     XP0, YP0                ! Major pixel centre
-      REAL                     XPS, YPS                ! Sub-pixel pixel centre
+      REAL                      SUM                     ! Cumulative value
+      REAL                      XP0, YP0                ! Major pixel centre
+      REAL                      XPS, YPS                ! Sub-pixel pixel centre
 
-      INTEGER                  I, J                    ! Major pixel loops
+      INTEGER                   I, J                    ! Major pixel loops
       INTEGER			IENER, IRAD		! Indexing values
+      INTEGER			PHALO, PHAHI		! PHA band
 
+      LOGICAL			PHADEF			! PHA band defined
       LOGICAL			SIS			! SIS detector?
       LOGICAL                  	SYMMETRIC               ! Symmetric about X0,Y0?
 *
@@ -992,32 +995,43 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
         DATA			AZIM/5,10,9,35,0,0/
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Base coordinates
+*  Base coordinates
       XP0 = ( - REAL(NX)/2.0 ) * DX + X0 + QX
       YP0 = ( - REAL(NY)/2.0 ) * DY + Y0 + QY
 
-*    Symmetric?
+*  Symmetric?
       SYMMETRIC = ( ( X0 .EQ. 0.0 ) .AND. ( Y0 .EQ. 0.0 )
      :        .AND. ( QX .EQ. 0.0 ) .AND. ( QY .EQ. 0.0 ) )
 
-*    Find energy in keV, and then energy bin number 1->2, 2->3 etc, and
-*    coerce into the range 0 to 10
-      IF ( AS_PHA_DEF(SLOT) ) THEN
+*  Find PHA bounds
+      CALL PSF0_GETID0L( PSID, 'PhaDef', PHADEF, STATUS )
+      CALL PSF0_GETID0I( PSID, 'PhaLo', PHALO, STATUS )
+      CALL PSF0_GETID0I( PSID, 'PhaHi', PHAHI, STATUS )
+
+*  Get instrument
+      CALL PSF0_GETID0C( PSID, 'Instr', INS, STATUS )
+      SIS = (INS .EQ. 'SIS' )
+
+*  Find energy in keV, and then energy bin number 1->2, 2->3 etc, and
+*  coerce into the range 0 to 10
+      IF ( PHADEF ) THEN
+
+*      Get channel scale
+        CALL PSF0_GETID0R( PSID, 'ChanScale', CSCALE, STATUS )
 
 *      Convert users PHA to raw PHA
-        IF ( AS_INSTR(SLOT) .EQ. 'SIS' ) THEN
-          ENERGY = (REAL(AS_PHALO(SLOT)) + REAL(AS_PHAHI(SLOT)))*
-     :              SIS_GAIN*AS_CHAN_SCALE(SLOT)/2.0
+        IF ( SIS ) THEN
+          ENERGY = (REAL(PHALO) + REAL(PHAHI))*SIS_GAIN*CSCALE/2.0
         ELSE
-          ENERGY = (REAL(AS_PHALO(SLOT)) + REAL(AS_PHAHI(SLOT)))*
-     :              GIS_GAIN*AS_CHAN_SCALE(SLOT)/2.0
+          ENERGY = (REAL(PHALO) + REAL(PHAHI))*GIS_GAIN*CSCALE/2.0
         END IF
 
       ELSE
-        ENERGY = AS_ENERGY(SLOT)
+        CALL PSF0_GETID0R( PSID, 'Energy', ENERGY, STATUS )
+
       END IF
       IENER = INT(ENERGY)
       IENER = MAX( IENER, 1 )
@@ -1043,9 +1057,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       END IF
       IF ( ROTA .LT. 0.0 ) ROTA = ROTA + 360.0
       ROTA = (ROTA - REAL(AZIM(IRAD))+180.0) * MATH__DTOR
-
-*    SIS or GIS?
-      SIS = ( AS_INSTR(SLOT) .EQ. 'SIS' )
 
 *    Load the telescope and detector psfs
  10   FORMAT( A, I2.2, '_', I2.2, '.fits' )
@@ -1306,56 +1317,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       END
 
 
-*+  PSF_ASCA_DEF - ASCA PSF time/energy definition
-      SUBROUTINE PSF_ASCA_DEF( SLOT, TLO, THI, ELO, EHI, UIN, UOUT,
-     :                                                     STATUS )
-*
-*    Description :
-*
-*    Method :
-*
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     28 Oct 92 : Original (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_ASCA_CMN'
-*
-*    Import :
-*
-      INTEGER                  SLOT                    ! Psf slot id
-      DOUBLE PRECISION         TLO, THI                ! Time bounds
-      INTEGER                  ELO, EHI                ! Energy channel bounds
-      BYTE                     UIN(*), UOUT(*)         ! User in/out
-*
-*    Status :
-*
-      INTEGER                  STATUS                  ! Run-time error
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Define only energy bounds
-      AS_PHA_DEF(SLOT) = .TRUE.
-      AS_PHALO(SLOT) = ELO
-      AS_PHAHI(SLOT) = EHI
-
-      END
-
 *+  PSF_ASCA_HINT - ASCA psf hint handler
       SUBROUTINE PSF_ASCA_HINT( SLOT, HINT, DATA, STATUS )
 *
@@ -1482,16 +1443,22 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Local variables :
 *
       CHARACTER*(DAT__SZLOC)	ILOC
-      CHARACTER*20            MASK              ! Mask name
+      CHARACTER*3	    	INS			! Instrument name
+      CHARACTER*20            	MASK              	! Mask name
 
+      REAL			CSCALE			! Channel scale
       REAL			RCLO,RCHI,CLO,CHI
+      REAL 			ENERGY			! Mean photon energy
+
       INTEGER			X_AX,Y_AX,E_AX,T_AX
+
+      LOGICAL			PHADEF			! PHA band defined?
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Get directory containing FTOOLS calibrations
+*  Get directory containing FTOOLS calibrations
       CALL PSX_GETENV( 'AST_FTOOLS_CALDB', AS_CALDB, STATUS )
       IF ( AS_CALDB(1:7) .EQ. 'unknown' ) THEN
         STATUS = SAI__ERROR
@@ -1502,7 +1469,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
         AS_CALDBL = CHR_LEN( AS_CALDB )
       END IF
 
-*    Get mask name
+*  Get mask name
       CALL USI_PROMT( 'MASK', 'ASCA detector (GIS or SIS)', STATUS )
       CALL USI_DEF0C( 'MASK', 'GIS', STATUS )
  10   CALL USI_GET0C( 'MASK', MASK, STATUS )
@@ -1510,11 +1477,10 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
 *    Validate choice
       IF ( CHR_SIMLR(MASK,'GIS') ) THEN
-        AS_INSTR(SLOT) = 'GIS'
+        INS = 'GIS'
 
       ELSE IF ( CHR_SIMLR(MASK,'SIS') ) THEN
-
-        AS_INSTR(SLOT) = 'SIS'
+        INS = 'SIS'
 
       ELSE
         STATUS = SAI__ERROR
@@ -1524,9 +1490,11 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
+      CALL PSF0_SETID0C( PSID, 'Instr', INS, STATUS )
 
 *  User is supplying PHA bounds
-      IF ( AS_PHA_DEF(SLOT) ) THEN
+      CALL PSF0_GETID0L( PSID, 'PhaDef', PHADEF, STATUS )
+      IF ( PHADEF ) THEN
 
 *    Locate INSTRUMENT box
         CALL ADI1_LOCINSTR( FID, .FALSE., ILOC, STATUS )
@@ -1536,7 +1504,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
           CALL ERR_ANNUL( STATUS )
           RCLO = 0.0
-          IF ( AS_INSTR(SLOT) .EQ. 'SIS' ) THEN
+          IF ( INS .EQ. 'SIS' ) THEN
             RCHI = 4095.0
           ELSE
             RCHI = 1023.0
@@ -1550,17 +1518,19 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
         CALL PSF_QAXES( SLOT, X_AX, Y_AX, E_AX, T_AX, STATUS )
         IF ( E_AX .GT. 0 ) THEN
           CALL PSF_QAXEXT( SLOT, E_AX, CLO, CHI, STATUS )
-          AS_CHAN_SCALE(SLOT) = REAL(RCHI-RCLO)/REAL(CHI-CLO)
-          CALL MSG_SETR( 'SC', AS_CHAN_SCALE(SLOT) )
+          CSCALE = REAL(RCHI-RCLO)/REAL(CHI-CLO)
+          CALL MSG_SETR( 'SC', CSCALE )
 	  CALL MSG_PRNT( 'User to RAW channel scaling = ^SC' )
         ELSE
-          AS_CHAN_SCALE(SLOT) = 1.0
+          CSCALE = 1.0
         END IF
+        CALL PSF0_SETID0R( PSID, 'ChanScale', CSCALE, STATUS )
 
 *    Get a mean photon energy
       ELSE
         CALL USI_PROMT( 'AUX', 'Mean photon energy in keV', STATUS )
-        CALL USI_GET0R( 'AUX', AS_ENERGY(SLOT), STATUS )
+        CALL USI_GET0R( 'AUX', ENERGY, STATUS )
+        CALL PSF0_SETID0R( PSID, 'Energy', ENERGY, STATUS )
 
       END IF
 
@@ -1822,247 +1792,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
       END
 
-
-
-*+  PSF_WFC_CALIN - Initialise the WFC cal library
-      SUBROUTINE PSF_WFC_CALIN( STATUS )
-*
-*    Description :
-*
-*    Method :
-*
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     14 Mar 1996 (DJA):
-*        Original version
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-*
-*    Status :
-*
-      INTEGER                  STATUS                  ! Run-time error
-*-
-
-*  Check inherited global status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Initialise CAL
-      CALL CAL_INIT( STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', 'Unable to open WFC calibration '/
-     :         /'database. Check assignment of CAL_WFC_MASTER '/
-     :         /'environment variable.', STATUS )
-      END IF
-
-      END
-
-
-*+  PSF_WFC_LOADD - Load detector info from file and store in PSID
-      SUBROUTINE PSF_WFC_LOADD( FID, ISSUR, PSID, STATUS )
-*
-*    Description :
-*
-*    Method :
-*
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     10 Jul 89 : Original (DJA)
-*     23 Apr 90 : Checks detector and filter info from dataset (DJA)
-*     19 May 90 : Bit more robust if no sort data present (DJA)
-*     23 May 90 : Changed over to new CAL system. This routine now controls
-*                 the survey psf. See PWFC for pointed phase psf. (DJA)
-*     28 Jun 90 : Prompts for filter if not found (DJA)
-*      6 Jul 90 : Suppressed error if BASE_MJD not found (DJA)
-*     17 Jul 90 : Filter translation table added (DJA)
-*     19 Jul 90 : Filter translation done by WFC_FILT_CONV (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'MATH_PAR'
-      INCLUDE 'PSF_PAR'
-*
-*    Status :
-*
-      INTEGER                  STATUS                  ! Run-time error
-*
-*    Import :
-*
-      INTEGER			PSID,FID
-      LOGICAL			ISSUR
-*
-*    Functions :
-*
-      INTEGER                   CAL_FILT_S2N
-      INTEGER                   CHR_LEN
-*
-*    Local variables :
-*
-      CHARACTER*(DAT__SZLOC)    LOC                     ! Locator from FID
-      CHARACTER*(DAT__SZLOC)    SLOC                    ! SORT locator
-      CHARACTER*80              CID                     ! Filter description
-
-      DOUBLE PRECISION		MJD			! MJD of observation
-
-      REAL			ENER			! Energy for filter
-      REAL                      IRIS                    ! Sort iris value
-
-      INTEGER                   CALFN                   ! CAL filter id
-      INTEGER                   IFILT                   ! Dataset filter id
-      INTEGER			MCP			! Detector number
-      INTEGER			TIMID			! Timing info
-
-      LOGICAL                  DATASET,FILTER_OK, IRIS_OK      ! Sort components there?
-*-
-
-*  Check inherited global status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Set the SURVEY flag
-      CALL PSF0_SETID0L( PSID, 'Survey', ISSUR, STATUS )
-      IRIS_OK = .FALSE.
-      FILTER_OK = .FALSE.
-
-*  Extract locator
-      CALL ADI1_GETLOC( FID, LOC, STATUS )
-
-*    Is locator valid
-      CALL DAT_VALID( LOC, DATASET, STATUS )
-      IF ( DATASET ) THEN
-
-*    Try and get MJD from dataset
-        CALL TCI_GETID( FID, TIMID, STATUS )
-        CALL ADI_CGET0D( TIMID, 'MJDObs', MJD, STATUS )
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_ANNUL( STATUS )
-	  MJD = 48000.0D0
-        END IF
-        CALL PSF0_SETID0D( PSID, 'MJD', MJD, STATUS )
-
-*    Get the detector id from CAL
-        CALL CIN_SET_DET( MJD, MCP, STATUS )
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL MSG_PRNT( 'No detector id present - '/
-     :        /'assuming detector 2 for psf access' )
-          STATUS = SAI__OK
-          MCP = 2
-        END IF
-        CALL PSF0_SETID0I( PSID, 'MCP', MCP, STATUS )
-
-*    Get filter id
-        CALL ADI1_LOCSORT( FID, .FALSE., SLOC, STATUS )
-        IF ( STATUS .EQ. SAI__OK ) THEN
-
-*      Look for filter id
-          CALL CMP_GET0I( SLOC, 'FILTER', IFILT, STATUS )
-          IF ( (IFILT.LT.1) .OR. (IFILT.GT.8) .OR.
-     :                    (STATUS .NE. SAI__OK) ) THEN
-            IF ( STATUS .EQ. SAI__OK ) THEN
-              CALL MSG_SETI( 'N', IFILT )
-              CALL MSG_PRNT( 'Invalid filter id code ^N' )
-            ELSE
-              CALL ERR_ANNUL( STATUS )
-            END IF
-          ELSE
-            FILTER_OK = .TRUE.
-            CALL WFC_FILT_CONV( IFILT, CALFN, STATUS )
-          END IF
-
-*        Get iris value
-          CALL DAT_THERE( SLOC, 'IRIS', IRIS_OK, STATUS )
-          IF ( IRIS_OK ) THEN
-            CALL CMP_GET0R( SLOC, 'IRIS', IRIS, STATUS )
-            IF ( STATUS .NE. SAI__OK ) THEN
-             CALL ERR_ANNUL( STATUS )
-              IRIS_OK = .FALSE.
-            ELSE IF ( IRIS .LT. 0.001 ) THEN
-              CALL MSG_PRNT( 'WARNING : bad IRIS value,'/
-     :                                /' check dataset' )
-              IRIS_OK = .FALSE.
-            END IF
-          END IF
-
-*        Tidy up
-          CALL DAT_ANNUL( SLOC, STATUS )
-
-        ELSE
-          CALL ERR_ANNUL( STATUS )
-
-        END IF
-
-*      Get filter from user if none supplied
-        CALL USI_PROMT( 'AUX', 'Enter filter id (P1,P2,UV,OP'/
-     :                             /'Q,S1A/B,S2A/B)', STATUS )
-        DO WHILE ( .NOT. FILTER_OK )
- 20       CALL USI_GET0C( 'AUX', CID, STATUS )
-          CALL USI_CANCL( 'AUX', STATUS )
-          IF ( STATUS .NE. SAI__OK ) GOTO 69
-          CALFN = CAL_FILT_S2N( CID(:CHR_LEN(CID)) )
-          IF ( ( CALFN .GE. 1 ) .AND. ( CALFN .LE. 8) ) THEN
-            FILTER_OK = .TRUE.
-          ELSE
-            CALL MSG_SETC( 'NAM', CID )
-            CALL MSG_PRNT( 'Invalid filter name /^NAM/' )
-          END IF
-        END DO
-
-*    Warn user if no filter
-        IF ( .NOT. FILTER_OK ) THEN
-          IF ( ISSUR ) THEN
-            CALL MSG_SETC( 'PD', 'S1a' )
-            CALFN = CAL_FILT_S2N( 'S1a' )
-          ELSE
-            CALL MSG_SETC( 'PD', 'P1' )
-            CALFN = CAL_FILT_S2N( 'P1' )
-          END IF
-          CALL MSG_PRNT( 'Unable to get filter id from dataset -'/
-     :                                     /' defaulting to ^PD' )
-        END IF
-        CALL PSF0_SETID0I( PSID, 'Filter', CALFN, STATUS )
-
-*      Use filter to get stuff - inform user and store energy
-        CALL CAL_FILT_INFO( CALFN, CID, ENER, STATUS )
-        CALL PSF0_SETID0R( PSID, 'Energy', ENER, STATUS )
-        CALL MSG_SETC( 'ID', CID )
-        CALL MSG_PRNT( '   Filter ^ID')
-
-        IF ( .NOT. IRIS_OK ) THEN
-          IRIS = 2.5
-          CALL MSG_PRNT( 'Unable to get IRIS value from dataset'/
-     :                          /' - defaulting to 2.5 degrees' )
-        END IF
-
-*    Convert IRIS value to radians and store
-        CALL PSF0_SETID0R( PSID, 'Iris', IRIS * MATH__DTOR, STATUS )
-
- 69     CONTINUE
-
-      END IF
-
-      END
 
 
 *+  PSF_RADIAL - 1D user supplied psf handler
@@ -2567,7 +2296,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_RESPFILE - Extract psf data from response and give to user
-      SUBROUTINE PSF_RESPFILE( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX,
+      SUBROUTINE PSF_RESPFILE( PSID, X0, Y0, QX, QY, DX, DY, INTEG, NX,
      :                                              NY, ARRAY, STATUS )
 *
 *    Description :
@@ -2608,7 +2337,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Import :
 *
       REAL                     DX, DY, X0, Y0,QX,QY
-      INTEGER                  NX,NY,SLOT
+      INTEGER                  PSID, NX, NY
       LOGICAL                  INTEG
 *
 *    Export :
@@ -2629,10 +2358,18 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER                  IR			! Response radial bin
       INTEGER                  IX			! Response X axis bin
       INTEGER                  IY			! Response Y axis bin
+      INTEGER			PHALO, PHAHI		! PHA band
+
+      LOGICAL			PHADEF			! PHA band defined?
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Find PHA bounds
+      CALL PSF0_GETID0L( PSID, 'PhaDef', PHADEF, STATUS )
+      CALL PSF0_GETID0I( PSID, 'PhaLo', PHALO, STATUS )
+      CALL PSF0_GETID0I( PSID, 'PhaHi', PHAHI, STATUS )
 
 *    Radial response?
       IF ( RF_RADIAL(SLOT) ) THEN
@@ -2643,8 +2380,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         IR = MIN( IR, RF_DIMS(3,SLOT) )
 
 *      Choose energy bin
-        IF ( RF_PHA_DEF(SLOT) .AND. (RF_NDIM(SLOT).GT.3) ) THEN
-          IE = INT((RF_PHALO(SLOT)-RF_BASE(4,SLOT)) /
+        IF ( PHADEF .AND. (RF_NDIM(SLOT).GT.3) ) THEN
+          IE = INT((PHALO-RF_BASE(4,SLOT)) /
      :                       RF_SCALE(4,SLOT)) + 1
         ELSE
           IE = 1
@@ -2822,55 +2559,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       END
 
-*+  PSF_RESPFILE_DEF - RESPFILE PSF time/energy definition
-      SUBROUTINE PSF_RESPFILE_DEF( SLOT, TLO, THI, ELO, EHI, UIN, UOUT,
-     :                                                         STATUS )
-*
-*    Description :
-*
-*    Method :
-*
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan (ROSAT,University of Birmingham)
-*
-*    History :
-*
-*     21 Dec 93 : Original (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_RESPFILE_CMN'
-*
-*    Import :
-*
-      INTEGER                  SLOT                    ! Psf slot id
-      DOUBLE PRECISION         TLO, THI                ! Time bounds
-      INTEGER                  ELO, EHI                ! Energy channel bounds
-      BYTE                     UIN(*), UOUT(*)         ! User in/out
-*
-*    Status :
-*
-      INTEGER                  STATUS                  ! Run-time error
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Define only energy bounds
-      RF_PHA_DEF(SLOT) = .TRUE.
-      RF_PHALO(SLOT) = ELO
-      RF_PHAHI(SLOT) = EHI
-
-      END
 
 *+  PSF_RESPFILE_HINT - Spatial response hint handler
       SUBROUTINE PSF_RESPFILE_HINT( SLOT, HINT, DATA, STATUS )
@@ -3243,22 +2931,20 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( (RF_DIMS(RF_NDIM(SLOT),SLOT).GT.1) .AND.
      :                     .NOT. RF_PHA_DEF(SLOT) ) THEN
 
-*      Construct prompt
+*    Construct prompt
         CALL BDI_AXGET0C( SID, RF_NDIM(SLOT), 'Units', EUNITS, STATUS )
         CALL MSG_SETC( 'UNITS', EUNITS )
         CALL MSG_MAKE( 'Mean photon energy in ^UNITS', TEXT, TLEN )
         CALL USI_PROMT( 'AUX', TEXT(:TLEN), STATUS )
 
-*      Get user respomse
+*    Get user response
         CALL USI_GET0R( 'AUX', ENERGY, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Validate
-
-*      Set PHA band
-        RF_PHALO(SLOT) = ENERGY
-        RF_PHAHI(SLOT) = ENERGY
-        RF_PHA_DEF(SLOT) = .TRUE.
+*    Set PHA band
+        CALL PSF0_SETID0R( PSID, 'PhaLo', ENERGY, STATUS )
+        CALL PSF0_SETID0R( PSID, 'PhaHi', ENERGY, STATUS )
+        CALL PSF0_SETID0L( PSID, 'PhaDef', .TRUE., STATUS )
 
       END IF
 
@@ -3396,13 +3082,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
           AS_GPTR(J,I) = 0
           AS_SPTR(J,I) = 0
         END DO
-      END DO
-
-*    Clear channel bounds set flag in XRT_PSPC psfs
-      DO I = 1, PSF_NMAX
-        RF_PHA_DEF(I) = .FALSE.
-        RX_PHA_DEF(I) = .FALSE.
-        AS_PHA_DEF(I) = .FALSE.
       END DO
 
 *    Return models available
@@ -4015,6 +3694,247 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       CALL PSF_WFC_LOADD( FID, .TRUE., PSID, STATUS )
 
       END
+
+*+  PSF_WFC_CALIN - Initialise the WFC cal library
+      SUBROUTINE PSF_WFC_CALIN( STATUS )
+*
+*    Description :
+*
+*    Method :
+*
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*
+*     David J. Allan (BHVAD::DJA)
+*
+*    History :
+*
+*     14 Mar 1996 (DJA):
+*        Original version
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+*
+*    Status :
+*
+      INTEGER                  STATUS                  ! Run-time error
+*-
+
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise CAL
+      CALL CAL_INIT( STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_REP( ' ', 'Unable to open WFC calibration '/
+     :         /'database. Check assignment of CAL_WFC_MASTER '/
+     :         /'environment variable.', STATUS )
+      END IF
+
+      END
+
+
+*+  PSF_WFC_LOADD - Load detector info from file and store in PSID
+      SUBROUTINE PSF_WFC_LOADD( FID, ISSUR, PSID, STATUS )
+*
+*    Description :
+*
+*    Method :
+*
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*
+*     David J. Allan (BHVAD::DJA)
+*
+*    History :
+*
+*     10 Jul 89 : Original (DJA)
+*     23 Apr 90 : Checks detector and filter info from dataset (DJA)
+*     19 May 90 : Bit more robust if no sort data present (DJA)
+*     23 May 90 : Changed over to new CAL system. This routine now controls
+*                 the survey psf. See PWFC for pointed phase psf. (DJA)
+*     28 Jun 90 : Prompts for filter if not found (DJA)
+*      6 Jul 90 : Suppressed error if BASE_MJD not found (DJA)
+*     17 Jul 90 : Filter translation table added (DJA)
+*     19 Jul 90 : Filter translation done by WFC_FILT_CONV (DJA)
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'MATH_PAR'
+      INCLUDE 'PSF_PAR'
+*
+*    Status :
+*
+      INTEGER                  STATUS                  ! Run-time error
+*
+*    Import :
+*
+      INTEGER			PSID,FID
+      LOGICAL			ISSUR
+*
+*    Functions :
+*
+      INTEGER                   CAL_FILT_S2N
+      INTEGER                   CHR_LEN
+*
+*    Local variables :
+*
+      CHARACTER*(DAT__SZLOC)    LOC                     ! Locator from FID
+      CHARACTER*(DAT__SZLOC)    SLOC                    ! SORT locator
+      CHARACTER*80              CID                     ! Filter description
+
+      DOUBLE PRECISION		MJD			! MJD of observation
+
+      REAL			ENER			! Energy for filter
+      REAL                      IRIS                    ! Sort iris value
+
+      INTEGER                   CALFN                   ! CAL filter id
+      INTEGER                   IFILT                   ! Dataset filter id
+      INTEGER			MCP			! Detector number
+      INTEGER			TIMID			! Timing info
+
+      LOGICAL                  DATASET,FILTER_OK, IRIS_OK      ! Sort components there?
+*-
+
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set the SURVEY flag
+      CALL PSF0_SETID0L( PSID, 'Survey', ISSUR, STATUS )
+      IRIS_OK = .FALSE.
+      FILTER_OK = .FALSE.
+
+*  Extract locator
+      CALL ADI1_GETLOC( FID, LOC, STATUS )
+
+*    Is locator valid
+      CALL DAT_VALID( LOC, DATASET, STATUS )
+      IF ( DATASET ) THEN
+
+*    Try and get MJD from dataset
+        CALL TCI_GETID( FID, TIMID, STATUS )
+        CALL ADI_CGET0D( TIMID, 'MJDObs', MJD, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+	  MJD = 48000.0D0
+        END IF
+        CALL PSF0_SETID0D( PSID, 'MJD', MJD, STATUS )
+
+*    Get the detector id from CAL
+        CALL CIN_SET_DET( MJD, MCP, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL MSG_PRNT( 'No detector id present - '/
+     :        /'assuming detector 2 for psf access' )
+          STATUS = SAI__OK
+          MCP = 2
+        END IF
+        CALL PSF0_SETID0I( PSID, 'MCP', MCP, STATUS )
+
+*    Get filter id
+        CALL ADI1_LOCSORT( FID, .FALSE., SLOC, STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
+
+*      Look for filter id
+          CALL CMP_GET0I( SLOC, 'FILTER', IFILT, STATUS )
+          IF ( (IFILT.LT.1) .OR. (IFILT.GT.8) .OR.
+     :                    (STATUS .NE. SAI__OK) ) THEN
+            IF ( STATUS .EQ. SAI__OK ) THEN
+              CALL MSG_SETI( 'N', IFILT )
+              CALL MSG_PRNT( 'Invalid filter id code ^N' )
+            ELSE
+              CALL ERR_ANNUL( STATUS )
+            END IF
+          ELSE
+            FILTER_OK = .TRUE.
+            CALL WFC_FILT_CONV( IFILT, CALFN, STATUS )
+          END IF
+
+*        Get iris value
+          CALL DAT_THERE( SLOC, 'IRIS', IRIS_OK, STATUS )
+          IF ( IRIS_OK ) THEN
+            CALL CMP_GET0R( SLOC, 'IRIS', IRIS, STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+             CALL ERR_ANNUL( STATUS )
+              IRIS_OK = .FALSE.
+            ELSE IF ( IRIS .LT. 0.001 ) THEN
+              CALL MSG_PRNT( 'WARNING : bad IRIS value,'/
+     :                                /' check dataset' )
+              IRIS_OK = .FALSE.
+            END IF
+          END IF
+
+*        Tidy up
+          CALL DAT_ANNUL( SLOC, STATUS )
+
+        ELSE
+          CALL ERR_ANNUL( STATUS )
+
+        END IF
+
+*      Get filter from user if none supplied
+        CALL USI_PROMT( 'AUX', 'Enter filter id (P1,P2,UV,OP'/
+     :                             /'Q,S1A/B,S2A/B)', STATUS )
+        DO WHILE ( .NOT. FILTER_OK )
+ 20       CALL USI_GET0C( 'AUX', CID, STATUS )
+          CALL USI_CANCL( 'AUX', STATUS )
+          IF ( STATUS .NE. SAI__OK ) GOTO 69
+          CALFN = CAL_FILT_S2N( CID(:CHR_LEN(CID)) )
+          IF ( ( CALFN .GE. 1 ) .AND. ( CALFN .LE. 8) ) THEN
+            FILTER_OK = .TRUE.
+          ELSE
+            CALL MSG_SETC( 'NAM', CID )
+            CALL MSG_PRNT( 'Invalid filter name /^NAM/' )
+          END IF
+        END DO
+
+*    Warn user if no filter
+        IF ( .NOT. FILTER_OK ) THEN
+          IF ( ISSUR ) THEN
+            CALL MSG_SETC( 'PD', 'S1a' )
+            CALFN = CAL_FILT_S2N( 'S1a' )
+          ELSE
+            CALL MSG_SETC( 'PD', 'P1' )
+            CALFN = CAL_FILT_S2N( 'P1' )
+          END IF
+          CALL MSG_PRNT( 'Unable to get filter id from dataset -'/
+     :                                     /' defaulting to ^PD' )
+        END IF
+        CALL PSF0_SETID0I( PSID, 'Filter', CALFN, STATUS )
+
+*      Use filter to get stuff - inform user and store energy
+        CALL CAL_FILT_INFO( CALFN, CID, ENER, STATUS )
+        CALL PSF0_SETID0R( PSID, 'Energy', ENER, STATUS )
+        CALL MSG_SETC( 'ID', CID )
+        CALL MSG_PRNT( '   Filter ^ID')
+
+        IF ( .NOT. IRIS_OK ) THEN
+          IRIS = 2.5
+          CALL MSG_PRNT( 'Unable to get IRIS value from dataset'/
+     :                          /' - defaulting to 2.5 degrees' )
+        END IF
+
+*    Convert IRIS value to radians and store
+        CALL PSF0_SETID0R( PSID, 'Iris', IRIS * MATH__DTOR, STATUS )
+
+ 69     CONTINUE
+
+      END IF
+
+      END
+
 
 *+  PSF_XRT_HRI - ROSAT XRT HRI PSF
       SUBROUTINE PSF_XRT_HRI( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX,
@@ -4846,56 +4766,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       END
 
-*+  PSF_XRT_PSPC_DEF - ROSAT XRT PSPC PSF time/energy definition
-      SUBROUTINE PSF_XRT_PSPC_DEF( SLOT, TLO, THI, ELO, EHI, UIN, UOUT,
-     :                                                         STATUS )
-*
-*    Description :
-*
-*    Method :
-*
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     28 Oct 92 : Original (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'MATH_PAR'
-      INCLUDE 'PSF_XRT_PSPC_CMN'
-*
-*    Import :
-*
-      INTEGER                  SLOT                    ! Psf slot id
-      DOUBLE PRECISION         TLO, THI                ! Time bounds
-      INTEGER                  ELO, EHI                ! Energy channel bounds
-      BYTE                     UIN(*), UOUT(*)         ! User in/out
-*
-*    Status :
-*
-      INTEGER                  STATUS                  ! Run-time error
-*-
 
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Define only energy bounds
-      RX_PHA_DEF(SLOT) = .TRUE.
-      RX_PHALO(SLOT) = ELO
-      RX_PHAHI(SLOT) = EHI
-
-      END
 
 *+  PSF_XRT_PSPC_HINT - XRT PSPC psf hint handler
       SUBROUTINE PSF_XRT_PSPC_HINT( SLOT, HINT, DATA, STATUS )
