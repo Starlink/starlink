@@ -1,16 +1,50 @@
-define   bdf2ndf      convert_dir:convert
-define   dipso2ndf    convert_dir:convert
-define   dst2ndf      convert_dir:convert
-define   ndf2bdf      convert_dir:convert
-define   ndf2dipso    convert_dir:convert
-define   ndf2dst      convert_dir:convert
+{+
+{  Name:
+{     CONVERT.ICL
 
-defhelp  bdf2ndf      convert_dir:convert
-defhelp  dipso2ndf    convert_dir:convert
-defhelp  dst2ndf      convert_dir:convert
-defhelp  ndf2bdf      convert_dir:convert
-defhelp  ndf2dipso    convert_dir:convert
-defhelp  ndf2dst      convert_dir:convert
+{  Type of module:
+{     ICL procedure.
+
+{  Description:
+{     This procedure defines the ICL commands for running, and obtaining
+{     help about CONVERT applications.  It gives an initialisation
+{     message giving the version number activated.
+
+{  Authors:
+{     MJC: Malcolm J. Currie (STARLINK)
+{     {enter_new_authors_here}
+
+{  History:
+{     1992 September 10 (MJC):
+{	 Original version.
+{     1992 September 29 (MJC):
+{	 Added NDF2IRAF.
+{     {enter_further_changes_here}
+
+{-
+define   ascii2{ndf}   convert_dir:convert
+define   bdf2{ndf}     convert_dir:convert
+define   dipso2{ndf}   convert_dir:convert
+define   dst2{ndf}     convert_dir:convert
+define   ndf2a{scii}   convert_dir:convert
+define   ndf2b{df}     convert_dir:convert
+define   ndf2di{pso}   convert_dir:convert
+define   ndf2ds{t}     convert_dir:convert
+define   ndf2i{raf}    convert_dir:convert
+define   ndf2u{nf}     convert_dir:convert
+define   unf2{ndf}     convert_dir:convert
+
+defhelp  ascii2ndf     convert_dir:convert
+defhelp  bdf2ndf       convert_dir:convert
+defhelp  dipso2ndf     convert_dir:convert
+defhelp  dst2ndf       convert_dir:convert
+defhelp  ndf2ascii     convert_dir:convert
+defhelp  ndf2bdf       convert_dir:convert
+defhelp  ndf2dipso     convert_dir:convert
+defhelp  ndf2dst       convert_dir:convert
+defhelp  ndf2iraf      convert_dir:convert
+defhelp  ndf2unf       convert_dir:convert
+defhelp  unf2ndf       convert_dir:convert
 
 { print CONVERT initialisation message }
 
