@@ -59,7 +59,8 @@ pol1_sngad.f  pol1_sngcl.f pol1_sngbm.f  pol1_snghd.f  pol1_imprt.f \
 pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_xeval.f polimpx.f polimpx.ifl \
 pol1_sngsm.f polsim.f pol1_simcl.f polsim.ifl pol1_gtvrs.f pol1_sngmn.f \
 pol1_prsvr.f pol1_gtvrc.f polimage.f polimage.ifl pol1_axset.f pol1_gtang.f \
-pol1_ptang.f pol1_stftr.f pol1_blocr.f pol1_sngva.f pol1_sngct.f pol1_sngvn.f
+pol1_ptang.f pol1_stftr.f pol1_blocr.f pol1_sngva.f pol1_sngct.f pol1_sngvn.f \
+$(KAPFIX)
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.
@@ -68,7 +69,7 @@ POLPACK_CONDITIONS
 
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
-UNIX_RELEASE =  $(UNIX_SOURCE) $(KAPFIX) $(UNIX_OTHERS) $(FIGS)
+UNIX_RELEASE =  $(UNIX_SOURCE) $(UNIX_OTHERS) $(FIGS)
 
 #  The contents of polpack.tar.
 UNIX_TOTAL = polka.htx_tar ndg_source.tar polpack_source.tar \

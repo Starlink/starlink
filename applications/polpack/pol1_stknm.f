@@ -43,6 +43,9 @@
 *  History:
 *     25-MAY-1999 (DSB):
 *        Original version.
+*     26-MAY-1999 (DSB):
+*        Returned variance values corrected from standard error to
+*        squared standard error.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -104,11 +107,11 @@
 *  N - 1 instead of N).
                V = ( VOUT( I ) - N*M*M )/( N - 1 )
 
-*  Store the standard error.
-               VOUT( I ) = SQRT( V / N )
+*  Store the squared standard error.
+               VOUT( I ) = V / N
 
 *  Increment the sum of the square standard errors.
-               ME = ME + ( V / N )
+               ME = ME + VOUT( I )
                MEN = MEN + 1
 
             ELSE
