@@ -1,0 +1,56 @@
+
+Automake branches
+=================
+
+
+automake tree created by the import of automake-1.8.2, on 2004 January 15.
+
+
+
+dev-nxg-20040116-add-fpp-support
+--------------------------------
+
+Branch tag applied to automake and autoconf. 
+
+The patches for adding FPP support, originally announced by Martin Wilck on
+<http://sources.redhat.com/ml/autoconf-patches/2000-07/msg00287.html>,
+will be added on this branch, and then merged onto the main
+development branch, with an appropriate merge tag added then.  I'll
+keep this branch, however, and when debugging that support, I'll do
+the fixes on this branch and remerge them.  That way, I keep these
+patches separate from the main ones I'll apply, plus it'll be easy to
+generate a patch to 1.8.2 for eventual submission to the
+automake-patches list.
+
+Both the autoconf and automake trees on this branch were tagged, as
+autoconf-2-59-fpp1 and automake-1-8-2-fpp1 respectively, on
+2004-January-21.  They were then merged onto the trunk, and the
+branches then tagged with dev-nxg-20040116-add-fpp-support-MERGED
+
+Similarly for ...-fpp2, -fpp3, -fpp4.
+
+
+
+DEV-nxg-20040720-special-install
+--------------------------------
+
+I'm afraid I don't really know the status of this branch!  I presume it was
+for the changes to STAR_SPECIAL_INSTALL_COMMAND, but I appear to have
+done them on the trunk instead.  How ill-disciplined of me.
+
+However
+http://www.jiscmail.ac.uk/cgi-bin/webadmin?A2=ind0407&L=stardev&P=R15945&I=-1
+gives a clue, and suggests that I may well have merged this at some
+point in the past.  At any rate, the special-install stuff currently
+works, so if there's anything left unmerged on this branch it's
+probably best abandoned.
+
+
+
+DEV-nxg-20040730-fix-ac-canonical
+---------------------------------
+
+Automake handling of AC_CANONICAL_* is wrong, I think.  Fix on this
+branch, and the patch offered to automake-patches@gnu.org:
+http://lists.gnu.org/archive/html/automake-patches/2004-07/msg00023.html
+Merged onto trunk 2004 July 30.
