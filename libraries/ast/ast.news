@@ -28,6 +28,11 @@ Main Changes in this Version
   one graphics system to another at any time. It also allows wrapper
   functions to be written in Fortran as well as C.
 
+  In addition, two new Plot methods allow the current graphics routines
+  to be saved and restore on a first-in-last-out stack, allowing
+  temporary changes to be made to the set of registered graphics
+  routines.
+
   o A bug has been fixed in the Plot class which could cause axis labels
   to be drawn on inappropriate edges of the plotting box when using
   interior labelling.
