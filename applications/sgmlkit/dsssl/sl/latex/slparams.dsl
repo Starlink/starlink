@@ -138,9 +138,63 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 \\newenvironment{VersoTitlepage}{\\clearpage\\hbox{}\\vfill}{%
   \\ifx\\@Copyright\\@empty\\else
     \\par\\vspace{2ex}\\copyright \\@Copyright\\fi}
-% I probably could manage to generate the TOC in a single LaTeX pass,
-% but we're probably going to need multiple passes to accumulate
-% indexing and bibliographic information, so there's no real need.
-\\newcommand\\TableOfContents{\\clearpage\\tableofcontents}
+%% Generate the TOC in a single LaTeX pass.
+%% This should be generic enough that LOT and LOF should be similar
+%%\\newcommand\\TableOfContents{\\clearpage\\tableofcontents}
+%\\newcommand\\TableOfContents{\\cleardoublepage
+%  \\newwrite\\tf@toc
+%  \\immediate\\openout\\tf@toc \\jobname.toc \\relax
+%  \\immediate\\write\\tf@toc{\\string\\renewcommand\\string\\thepage{\\string\\roman{page}}\\string\\setcounter{page}{\\arabic{page}}}
+%  \\immediate\\write\\tf@toc{\\string\\section*{Table of Contents}}
+%  \\AtEndDocument\\ReadTableOfContents
+%  }
+%% Redefine addtocontents, to avoid writing via aux file
+%\\def\\addtocontents#1#2{\\write\\csname tf@#1\\endcsname{#2}}
+%\\newcommand\\ReadTableOfContents{%
+%  \\cleardoublepage
+%  \\immediate\\closeout\\tf@toc
+%  \\@input{\\jobname.toc}}
+% Generate TOC+LOF+LOT in a single LaTeX pass.
+% TOC etc appear at _end_ of document, with correct page numbers.
+% Use standard aux-file mechanism.  Indirection isn't necessary here, but
+% too complicated to replace.
+\\def\\@OpenTocFile#1{\\expandafter\\newwrite\\csname tf@#1\\endcsname
+  \\immediate\\openout\\csname tf@#1\\endcsname \\jobname.#1 \\relax}
+\\newcommand\\TableOfContents{\\cleardoublepage
+  \\xdef\\@TocStartPage{\\the\\c@page}
+  \\AtEndDocument\\WriteReadTableOfContents
+  }
+% Redefine @writefile to open output files on demand
+\\long\\def\\@writefile#1#2{%
+  \\@ifundefined{tf@#1}{\\@OpenTocFile{#1}}\\relax
+  {\\@temptokena{#2}%
+   \\immediate\\write\\csname tf@#1\\endcsname{\\the\\@temptokena}%
+  }}
+\\newcommand\\WriteReadTableOfContents{% append command to end of .aux file
+  \\hbox{}% Following write must not be immediate (or else out of sequence), 
+  % but it gets skipped if there's nothing on the page.  This can cause
+  % blank pages, though.
+  \\write\\@mainaux{\\string\\ReadTableOfContents}}
+\\newcommand\\ReadTableOfContents{%
+  \\@ifundefined{@TocStartPage}\\relax  % this is beginning of a second pass
+  {\\cleardoublepage
+    \\renewcommand\\thepage{\\roman{page}}%
+    \\setcounter{page}{\\@TocStartPage}%
+    \\@ifundefined{tf@toc}\\relax
+      {\\immediate\\closeout\\tf@toc
+       \\section*{Table of Contents}
+       \\@input{\\jobname.toc}}%
+    \\@ifundefined{tf@lof}\\relax
+      {\\immediate\\closeout\\tf@lof
+       \\clearpage
+       \\section*{List of Figures}
+       \\@input{\\jobname.lof}}%
+    \\@ifundefined{tf@lot}\\relax
+      {\\immediate\\closeout\\tf@lot
+       \\clearpage
+       \\section*{List of Tables}
+       \\@input{\\jobname.lot}}%
+    \\clearpage  % flush pages
+    }}
 \\makeatother
 ")
