@@ -1,0 +1,95 @@
+\newpage
+\sstroutine{
+   NDF2IRAF
+}{
+   Converts an NDF to an IRAF (OIF) image
+}{
+   \sstdescription{
+      This application converts an NDF to an IRAF image in the old
+      format (OIF).  See the Notes for details of the conversion.
+   }
+   \sstusage{
+      NDF2IRAF IN OUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input NDF data structure. The suggested default is the current
+         NDF if one exists, otherwise it is the current value.
+      }
+      \sstsubsection{
+         OUT = \_CHAR (Write)
+      }{
+         The name of the output IRAF image.  Two files are produced
+         with the same name but different extensions. The {\tt ".PIX"} file
+         contains the data array, and {\tt ".IMH"} is the associated header
+         file that may contain a copy of the NDF's FITS extension.
+         The suggested default is the current value.
+       }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         NDF2IRAF ABELL119 A119
+      }{
+         Converts an NDF called ABELL119.SDF into the IRAF image
+         comprising the pixel file A119.PIX and the header file
+         A119.IMH.
+      }
+   }
+   \sstnotes{
+      The rules for the conversion are as follows:
+      \sstitemlist{
+
+         \sstitem
+         The NDF data array is copied to the {\tt ".PIX"} file.
+
+         \sstitem
+         The NDF title is written to the header object {\tt i\_title} in
+         the {\tt ".IMH"} header file.  There is a limit of twenty
+         characters.
+
+         \sstitem
+         If there is a FITS extension in the NDF, then this is added to
+         the `user area' of the IRAF header file.
+
+         \sstitem
+         A HISTORY record is added to the IRAF header file indicating
+         that it originated in the named NDF and was converted by
+         NDF2IRAF.
+
+         \sstitem
+         All other NDF components are ignored.
+      }
+   }
+   \sstdiytopic{
+      Pitfalls
+   }{
+      The IMFORT routines refuse to overwrite an IRAF image if an image
+      with the same name exists.  The application then aborts.
+   }
+   \sstdiytopic{
+      References
+   }{
+      IRAF IMFORT subroutine library manual.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         Only handles two-dimensional NDFs, though a one-dimensional NDF
+         is treated as an image with a second dimension equal to one.
+
+         \sstitem
+         Of the NDF's array components only the data array may be
+         copied.
+
+         \sstitem
+         The IRAF image produced has type REAL independent of the
+         type of the NDF's data array.  The pixel type of the image can be
+         changed from within IRAF using the {\bf chpixtype} task in the
+         {\bf images} package.
+      }
+   }
+}
+
