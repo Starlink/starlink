@@ -225,7 +225,7 @@
      :             STATUS )
 
 *  Read the data from the NDF into the current arrays.
-      CALL RDNDF( COMM, INDF, WORV, TITLE, STATUS )
+      CALL RDNDF( COMM, INDF, ' ', ' ', WORV, TITLE, STATUS )
 
 *  If succesful, multiply all the flux values by PI.
       IF( STATUS .EQ. SAI__OK ) THEN

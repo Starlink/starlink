@@ -123,7 +123,7 @@
      :             STATUS )
 
 *  Read the data from the NDF into the current arrays.
-      CALL RDNDF( COMM, INDF, WORV, TITLE, STATUS )
+      CALL RDNDF( COMM, INDF, ' ', ' ', WORV, TITLE, STATUS )
 
 *  If required remove any pixels with value zero, and add an entry to
 *  the break array for each block of contiguous zeros.

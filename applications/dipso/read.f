@@ -74,6 +74,10 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER
+     :        USYS*30,           ! Default X-axis system
+     :        UUNIT*30           ! Default X-axis unit
+
       INTEGER
      :        INDF               ! NDF identifier
 
@@ -83,7 +87,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Give a warning if too many parameters were supplied.
-      CALL EXPAR( COMM, PARAMS, 1, STATUS )
+      CALL EXPAR( COMM, PARAMS, 3, STATUS )
 
 *  Begin an NDF context.
       CALL NDF_BEGIN
@@ -92,13 +96,19 @@
       CALL GETNDF( PARAMS, 1, .FALSE., COMM, 'The NDF to be read',
      :             ' ', 'READ', ' ', INDF, STATUS )
 
+*  Get the default X-axis System.
+      CALL GET0C( PARAMS, 2, .TRUE., COMM, ' ', ' ', USYS, STATUS )
+
+*  Get the default X-axis Unit.
+      CALL GET0C( PARAMS, 3, .TRUE., COMM, ' ', ' ', UUNIT, STATUS )
+
 *  Tell the user what is about to happen.
       CALL NDF_MSG( 'NDFNAM', INDF )
       CALL MSGOUT( COMM, 'Reading data from NDF ''^NDFNAM'' into the '//
      :             'current arrays.', .FALSE., STATUS )
 
 *  Read the data from the NDF into the current arrays.
-      CALL RDNDF( COMM, INDF, WORV, TITLE, STATUS )
+      CALL RDNDF( COMM, INDF, USYS, UUNIT, WORV, TITLE, STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
