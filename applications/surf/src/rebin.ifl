@@ -19,7 +19,9 @@
 #        Add SELECT_INTS
 #     1996 October 29 (TIMJ)
 #        Use GLOBAL defaults
- 
+#     1996 November 13 (TIMJ)
+#        Add NA output coords
+
 #-
 
    INTERFACE REBIN
@@ -104,8 +106,8 @@
 
       PARAMETER OUT_COORDS
          TYPE    '_CHAR'
-         PROMPT  'Coordinate system of output map; RB, RJ, RD or GA'
-	 IN      'RB','RJ','RD','GA'
+         PROMPT  'Coordinate system of output map; NA, RB, RJ, RD or GA'
+#	 IN      'RB','RJ','RD','GA', 'NA'
 	 HELPKEY  '*'
       ENDPARAMETER
 
