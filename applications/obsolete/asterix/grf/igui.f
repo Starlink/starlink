@@ -488,21 +488,25 @@
             N=0
           ENDIF
 	print *,n,' lines'
+	call flush(6)
 *  put temp block on reading by GUI
           CALL IMG_NBPUT0I('FLAG',-1,STATUS)
           CALL IMG_NBPUT0I('PAR_I1',N,STATUS)
 *  take block off reading
           CALL IMG_NBPUT0I('FLAG',0,STATUS)
 	print *,'sent 0'
+	call flush(6)
           FLAG=0
 *  wait 'til GUI flags that values have been read
           DO WHILE (FLAG.EQ.0)
             CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
           ENDDO
 	print *,flag,' received'
+	call flush(6)
           I=1
           DO WHILE (I.LE.N)
 	print *,'line ',i
+	call flush(6)
 *  put block on reading by GUI
             CALL IMG_NBPUT0I('FLAG',-1,STATUS)
 *  write parameters to noticeboard
@@ -540,6 +544,7 @@
             CALL IMG_NBPUT0I('FLAG',0,STATUS)
             FLAG=0
 	print *,'sent 0'
+	call flush(6)
 *  wait 'til GUI flags that values have been read
             DO WHILE (FLAG.EQ.0)
               CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
