@@ -301,7 +301,7 @@
                   CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,II,II,J,J,
      :                .TRUE.,%VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
      :                           D,Q,MASK2,I_PMIN,I_PMAX,STATUS)
-
+                ENDIF
 
               ENDDO
 
