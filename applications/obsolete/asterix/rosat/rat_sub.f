@@ -385,8 +385,8 @@
 
       END
 
-*+  RAT-PUTHEAD - Create HEAD structure
-      SUBROUTINE RAT_PUTHEAD(LOC,OBJECT,HEAD,STATUS)
+*+  RAT_PUTHEAD - Create HEAD structure
+      SUBROUTINE RAT_PUTHEAD(FID,OBJECT,HEAD,STATUS)
 *
 * Description :
 *  Write the contents of the HEAD structure into a HDS container.
@@ -403,19 +403,24 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Include files
       INCLUDE 'INC_XRTHEAD'
 *    Parameters :
-      CHARACTER*(DAT__SZLOC)   LOC                   ! Start locator
+      INTEGER			FID
       CHARACTER*(*)            OBJECT                ! Structured name
       RECORD /XRT_HEAD/ HEAD 		! Structure to hold header information
 *    Status :
       INTEGER STATUS
 *    Local constants :
 *    Local variables :
+      CHARACTER*(DAT__SZLOC)   LOC                   ! Start locator
       CHARACTER*(DAT__SZLOC)   ALOC                   ! locator
 *
+
+      IF ( STATUS.NE.SAI__OK ) RETURN
+
+      CALL ADI1_GETLOC( FID, LOC, STATUS )
+
 ***** Create HEAD structure
       CALL HDX_CREATE(LOC,OBJECT,0,0,OBJECT,ALOC,STATUS)
       CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
