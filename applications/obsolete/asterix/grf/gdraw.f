@@ -384,13 +384,13 @@
 
 *  map error information if needed
 	IF ( ERRS ) THEN
+	   CALL BDI_MAPR( ID, 'Variance', 'READ', VPTR, STATUS )
 	  IF ( AERR ) THEN
 	    CALL BDI_AXMAPR( ID, 1, 'LoWidth,HiWidth',
      :                     'READ', ASXPTR, STATUS )
 	    CALL BDI_MAPR( ID, 'LoError,HiError', 'READ', ASYPTR,
      :                     STATUS )
 	  ELSE
-	    CALL BDI_MAPR( ID, 'Variance', 'READ', VPTR, STATUS )
 	    CALL BDI_AXMAPR( ID, 1, 'Width', 'READ', WPTR, STATUS )
 	  ENDIF
 	ENDIF
