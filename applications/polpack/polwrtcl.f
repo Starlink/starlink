@@ -323,6 +323,10 @@
 *  columns.
       GOTRD = .TRUE.
 
+*  Assume for the moment that we do not need to create RA DEC columns
+*  because usable ones already exist in the catalogue.
+      MAKERD = .FALSE.
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
