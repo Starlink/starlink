@@ -761,10 +761,7 @@ int DviFile::pixel_round(int dp)
  *
  * <p>It is possible to convert to pixel units with this method;
  * however it is generally better to either get pixel positions
- * directly (through {@link #currH} or {@link #currV} for example) or
- * to convert from DVIunits to pixels using {@link #pixel_round} (the
- * conversion here avoids the specific rounding algorithm required
- * for that).
+ * directly (through {@link #currH} or {@link #currV} for example).
  *
  * <p>The conversions to DVIunits and pixels are not universal, but
  * are instead dependent on a particular DVI file; if you wish to
@@ -786,6 +783,9 @@ int DviFile::pixel_round(int dp)
 double DviFile::convertFromScaledPoints(int sp, DviUnits units, DviFile *dvif)
     throw (DviError)
 {
+    // You should generally convert from DVIunits to pixels using
+    // pixel_round() (the conversion here avoids the specific rounding
+    // algorithm required for that).
     double ans;
     switch (units) {
       case unit_pt:
@@ -948,7 +948,7 @@ double DviFile::convertUnits(double length,
 /**
  * Convert a string to a unit.
  * @param unitString one of the strings representing a DVI unit
- * @return the appropriate member of the {@link #DviUnit} enum, or
+ * @return the appropriate member of the {@link #DviUnits} enum, or
  * {@link #unit_BAD} if the unit string is not recognised
  */
 DviFile::DviUnits DviFile::unitType(string unitString)
