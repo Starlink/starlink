@@ -81,7 +81,7 @@
 #        name of the package, or a tarfile called 'package.tar', 
 #        'package.tar.Z' or 'package.tar.gz'.  For each package 
 #        indexed in this way, any existing index entries concerning
-#        it are first erased from the indices, and new entries are
+#        it are first erased from the indexes, and new entries are
 #        written for all files and routines found.  Index entries
 #        for other packages are not affected.
 #

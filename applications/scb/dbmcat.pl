@@ -16,7 +16,7 @@
 
 #  Description:
 #     This utility is for examining the DBM files representing StarIndex
-#     objects used to store the indices used by the SCB package for 
+#     objects used to store the indexes used by the SCB package for 
 #     indexing files and routines.
 #
 #     It is not required for any part of the package operation, but is

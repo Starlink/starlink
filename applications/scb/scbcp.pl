@@ -36,9 +36,9 @@
 
 #  Arguments:
 #     dir1
-#        Source directory containing SCB indices.
+#        Source directory containing SCB indexes.
 #     dir2
-#        Target directory into which SCB indices are to be copied.
+#        Target directory into which SCB indexes are to be copied.
 
 #  Notes:
 
