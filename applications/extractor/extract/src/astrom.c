@@ -1,4 +1,4 @@
- /*
+/*
  				astrom.c
 
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -6,18 +6,22 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN, IAP & Leiden observatory
+*                       P.W.DRAPER, Starlink & Durham University
 *
 *	Contents:	Astrometrical computations.
 *
-*	Last modify:	13/06/98
+*	Last modify:	13/06/98 (EB)
+*                       04/01/99 (PWD): Converted to use NDF AST
+*                       information for coordinate transformations
+*                       (including precession).  Model of local affine
+*                       transform is retained for to modifying
+*                       measurements based on area and angle etc.
 *
-*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-*/
+*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 #include	<math.h>
 #include	<stdlib.h>
-#include        <string.h> /* PWD: modification here */
+#include        <string.h>
 
-#include 	"wcs/wcs.h"
 #include	"define.h"
 #include	"globals.h"
 #include	"astrom.h"
@@ -25,187 +29,138 @@
 
 /****************************** initastrom **********************************/
 /*
-Initialize astrometrical structures.
+  Initialize astrometrical structures.
 */
-void	initastrom(picstruct *field)
-
-  {
+void initastrom( picstruct *field ) {
    astromstruct	*as;
    double	*lm;
    int		l;
+   AstSkyFrame  *current, *blank;
 
-  as = field->astrom;
+   as = field->astrom;
 
-/* Test if the WCS is in use */
-  if (as->wcs_flag)
-/*-- ...Yes: launch the WCS stuff! */
-    {
-    QMALLOC(as->lin, struct linprm, 1);
-    QMALLOC(as->cel, struct celprm, 1);
-    QMALLOC(as->prj, struct prjprm, 1);
-    QMALLOC(as->lin->cdelt, double, 2);
-    QMALLOC(as->lin->crpix, double, 2);
-    QMALLOC(as->lin->pc, double, 4);
-    as->wcs->flag = as->lin->flag = as->cel->flag = as->prj->flag = 0;
-    as->lin->naxis = as->naxis;
+   /* Test if the WCS is in use */
+   if ( as->wcs_flag ) {
 
-/*-- linprm structure */
-    for (l=0; l<2; l++)
-      {
-      as->lin->crpix[l] = as->crpix[l];
-      as->lin->cdelt[l] = as->cdelt[l];
-      as->cel->ref[l] = as->crval[l];
-      }
-    for (l=0; l<4; l++)
-      as->lin->pc[l] = as->pc[l];
+     /*  Create a FrameSet, which has a SkyFrame with the input
+         celestial coordinate system as its base and a blank SkyFrame
+         as current. This is used for precessing coordinates. */
+     current = astGetFrame( field->astwcs, AST__CURRENT );
+     blank = astSkyFrame( "" );
+     as->cvt = astConvert( current, blank, "" );
+     current = astAnnul( current );
+     blank = astAnnul( blank );
 
-/*-- celprm structure */
-    as->cel->ref[2] = as->longpole;
-    as->cel->ref[3] = as->latpole;
+     /*-- Compute an "average linear matrix" (at field center) */
+     compute_wcs( field, (field->width+1)/2.0, (field->height+1)/2.0 );
 
-/*-- prjprm structure */
-    as->prj->r0 = 0.0;
-    for (l=0; l<10; l++)
-      as->prj->p[l] = as->projp[l];
+     /*---- Compute Pole coordinates in J2000 and/or B1950 for THETAs */
+     if (FLAG(obj2.theta2000) || FLAG(obj2.theta1950) ||
+         FLAG(obj2.poserr_theta2000) || FLAG(obj2.poserr_theta1950)) {
+       fk5( field, 0.0, 90.0, &as->ap2000, &as->dp2000);
+       if (FLAG(obj2.theta1950) || FLAG(obj2.poserr_theta1950)) {
+         fk4( field, 0.0, 90.0, &as->ap1950, &as->dp1950);
+       }
+     }
 
-/*-- Compute an "average linear matrix" (at field center) */
-    compute_wcs(field, (field->width+1)/2.0, (field->height+1)/2.0);
+   } else {
 
-/*---- Compute Pole coordinates in J2000 and/or B1950 for THETAs */
-    if (FLAG(obj2.theta2000) || FLAG(obj2.theta1950)
-	|| FLAG(obj2.poserr_theta2000) || FLAG(obj2.poserr_theta1950))
-      {
-      if (fabs(as->equinox-2000.0)>0.003)
-        precess(as->equinox, 0.0, 90.0, 2000.0, &as->ap2000, &as->dp2000);
-      else
-        {
-        as->ap2000 = 0.0;
-        as->dp2000 = 90.0;
-        }
+     /*  No WCS structure. Implement a unit identity mapping to be used
+         for parameters that are required. */
+     lm = as->linmat;
+     lm[0] = 0.0;
+     lm[1] = 1.0;
+     lm[2] = 0.0;
+     lm[3] = 1.0;
+     as->lindet = lm[0]*lm[3] - lm[1]*lm[2];
+     warning ( "WORLD-parameters"," will be incorrect" );
+   }
 
-      if (FLAG(obj2.theta1950) || FLAG(obj2.poserr_theta1950))
-        j2b(as->equinox, as->ap2000, as->dp2000, &as->ap1950, &as->dp1950);
-      }
-    }
-  else
-/*-- ...No: compute only the determinant */
-    {
-/*-- Simplify the original FITS PC matrix */
-    lm = as->linmat;
-    for (l=0; l<4; l++)
-      lm[l] = as->pc[l]*as->cdelt[l%2];
-    if ((as->lindet = lm[0]*lm[3] - lm[1]*lm[2]) == 0.0)
-      warning ("Null determinant in the global distortion matrix:\n",
-	"         Some WORLD-parameters will be incorrect");
-    }
-
-/* Override astrometric definitions only if user supplies a pixel-scale */
-  if (prefs.pixel_scale == 0.0)
-    {
-    as->pixscale = sqrt(fabs(as->lindet));
-    field->pixscale = 3600.0*as->pixscale;	/* in arcsec2 */
-    }
-  else
-    as->pixscale = (field->pixscale=prefs.pixel_scale)/3600.0;
-
-  return;
-  }
+   /* Override astrometric definitions only if user supplies a pixel-scale */
+   if ( prefs.pixel_scale == 0.0 ) {
+     as->pixscale = sqrt(fabs(as->lindet));
+     field->pixscale = 3600.0*as->pixscale;	/* in arcsec2 */
+   } else {
+     as->pixscale = (field->pixscale=prefs.pixel_scale)/3600.0;
+   }
+   return;
+ }
 
 
 /**************************** computeastrom *********************************/
 /*
-Compute real WORLD coordinates and dimensions according to FITS info.
+  Compute real WORLD coordinates and dimensions according to WCS info.
 */
-void	computeastrom(picstruct *field, objstruct *obj)
-
-  {
+void computeastrom(picstruct *field, objstruct *obj) {
   astromstruct	*as;
   double	*lm, *wcspos;
 
   as = field->astrom;
   lm = as->linmat;
 
-/* If working with WCS, compute WORLD coordinates and local matrix */
-  if (as->wcs_flag)
-    {
+  /* If working with WCS, compute WORLD coordinates and local matrix */
+  if (as->wcs_flag) {
     wcspos = compute_wcs(field, obj2->posx, obj2->posy);
     obj2->alphas = obj2->mxw = wcspos[0];
     obj2->deltas = obj2->myw = wcspos[1];
-    if (FLAG(obj2.alpha2000))
-      {
-      if (fabs(as->equinox-2000.0)>0.003)
-        precess(as->equinox, wcspos[0], wcspos[1],
-		2000.0, &obj2->alpha2000, &obj2->delta2000);
-      else
-        {
-        obj2->alpha2000 = obj2->mxw;
-        obj2->delta2000 = obj2->myw;
-        }
-      if (FLAG(obj2.alpha1950))
-        j2b(as->equinox, obj2->alpha2000, obj2->delta2000,
-		&obj2->alpha1950, &obj2->delta1950);
+    if (FLAG(obj2.alpha2000)) {
+      /*  Get coordinates in FK5, if not already available */
+      fk5(field, wcspos[0], wcspos[1], &obj2->alpha2000, &obj2->delta2000);
+
+      if (FLAG(obj2.alpha1950)) {
+        /*  Get coordinates in FK4 */
+        fk4(field, wcspos[0], wcspos[1], &obj2->alpha1950, &obj2->delta1950);
       }
     }
-  else if (FLAG(obj2.mxw))
-    {
-     double	dx,dy;
+  } else if (FLAG(obj2.mxw)) {
+    /*  Request for world coordinates, but no WCS.*/
+    double	dx,dy;
+    dx = obj2->posx;
+    dy = obj2->posy;
+    obj2->mxw = lm[0]*dx + lm[1]*dy;	/* CDELT included! */
+    obj2->myw = lm[2]*dx + lm[3]*dy;	/* CDELT included! */
+  }
 
-    dx = obj2->posx - as->crpix[0];
-    dy = obj2->posy - as->crpix[1];
-    obj2->mxw = as->crval[0]+ lm[0]*dx + lm[1]*dy;	/* CDELT included! */
-    obj2->myw = as->crval[1]+ lm[2]*dx + lm[3]*dy;	/* CDELT included! */
-    }
-
-/* Iden for peak-flux positions */
-  if (as->wcs_flag)
-    {
-    wcspos = compute_wcs(field, (double)obj->peakx, (double)obj->peaky);
+/* Same for peak-flux positions */
+  if (as->wcs_flag) {
+    wcspos = compute_wcs( field, (double)obj->peakx, (double)obj->peaky );
     obj2->peakalphas = obj2->peakxw = wcspos[0];
     obj2->peakdeltas = obj2->peakyw = wcspos[1];
-    if (FLAG(obj2.peakalpha2000))
-      {
-      if (fabs(as->equinox-2000.0)>0.003)
-        precess(as->equinox, wcspos[0], wcspos[1],
-		2000.0, &obj2->peakalpha2000, &obj2->peakdelta2000);
-      else
-        {
-        obj2->peakalpha2000 = obj2->peakxw;
-        obj2->peakdelta2000 = obj2->peakyw;
-        }
-      if (FLAG(obj2.peakalpha1950))
-        j2b(as->equinox, obj2->peakalpha2000, obj2->peakdelta2000,
-		&obj2->peakalpha1950, &obj2->peakdelta1950);
+    if ( FLAG(obj2.peakalpha2000 ) ) {
+      fk5( field, wcspos[0], wcspos[1], &obj2->peakalpha2000, &obj2->peakdelta2000);
+      if ( FLAG(obj2.peakalpha1950 ) ) {
+        fk4( field, wcspos[0], wcspos[1], &obj2->peakalpha1950, &obj2->peakdelta1950);
       }
     }
-  else if (FLAG(obj2.peakxw))
-    {
-     double	dx,dy;
+  } else if (FLAG(obj2.peakxw)) {
+    /* Need WCS positions, but no WCS available. */
+    double	dx,dy;
+    dx = obj->peakx;
+    dy = obj->peaky;
+    obj2->peakxw = lm[0]*dx + lm[1]*dy;	/* CDELT included! */
+    obj2->peakyw = lm[2]*dx + lm[3]*dy;	/* CDELT included! */
+  }
 
-    dx = obj->peakx - as->crpix[0];
-    dy = obj->peaky - as->crpix[1];
-    obj2->peakxw = as->crval[0]+ lm[0]*dx + lm[1]*dy;	/* CDELT included! */
-    obj2->peakyw = as->crval[1]+ lm[2]*dx + lm[3]*dy;	/* CDELT included! */
-    }
-
-/* Custom coordinate system for the MAMA machine */
-  if (FLAG(obj2.mamaposx))
-    {
-     double	dx,dy;
+  /* Custom coordinate system for the MAMA machine */
+  if ( FLAG(obj2.mamaposx ) ) {
+    double	dx,dy;
 
     dx = obj2->posx - 0.5;
     dy = obj2->posy - 0.5;
-    obj2->mamaposx = (as->crval[1]+lm[2]*dx+lm[3]*dy)
-			*(prefs.mama_corflex+1.0);	/* CDELT included! */
-    obj2->mamaposy = (as->crval[0]+lm[0]*dx+lm[1]*dy);	/* CDELT included! */
-    }
+    obj2->mamaposx = (lm[2]*dx+lm[3]*dy)
+      *(prefs.mama_corflex+1.0);	                /* CDELT included! */
+    obj2->mamaposy = (lm[0]*dx+lm[1]*dy);	/* CDELT included! */
+  }
 
 /* Express shape parameters in WORLD frame */
-  if (FLAG(obj2.mx2w))
+  if ( FLAG(obj2.mx2w) ) {
     astrom_shapeparam(field, obj);
+  }
 
 /* Express position error parameters in WORLD frame */
-  if (FLAG(obj2.poserr_mx2w))
+  if (FLAG(obj2.poserr_mx2w)) {
     astrom_errparam(field, obj);
+  }
 
   if (FLAG(obj2.npixw))
     obj2->npixw = obj->npix*as->pixscale*as->pixscale;
@@ -216,42 +171,45 @@ void	computeastrom(picstruct *field, objstruct *obj)
     obj2->fwhmw = obj->fwhm*as->pixscale;
 
   return;
-  }
+}
 
 
 /****************************** compute_wcs *********************************/
 /*
-Compute real WORLD coordinates and local distortion matrix according to the
-WCS info.
+  Compute real WORLD coordinates and local distortion matrix according to the
+  WCS info.
 */
-double	*compute_wcs(picstruct *field, double mx, double my)
-
-  {
-   astromstruct	*as;
-   static double	pixpos[2], wcspos[2],wcspos0[2], imgcrd[2], phi,theta;
-   double	*lm, al,da,de,cde;
-   int		rcode;
+double  *compute_wcs(picstruct *field, double mx, double my)
+{
+  astromstruct	*as;
+  static double	wcspos[2], wcspos0[2];
+  double        xin[1], yin[1], xout[1], yout[1];
+  double	*lm, al, da, de, cde;
+  int		rcode;
 
   as = field->astrom;
   lm = as->linmat;
 
-  pixpos[0] = mx;
-  pixpos[1] = my;
+  /*  Transform position to world coordinates */
+  xin[0] = mx;
+  yin[0] = my;
+  astTran2( field->astwcs, 1, xin, yin, 1, xout, yout );
+  if ( ! astOK ) {
+    error(EXIT_FAILURE, "*Error*"," transforming to world coordinates: " );
+  }
+  /* Compute the local distortion matrix, note results are in radians */
+  al = wcspos0[0] = xout[0] * R2D;
+  de = wcspos0[1] = yout[0] * R2D;
 
-  if (rcode=wcsrev((const char(*)[9])as->ctype, as->wcs, pixpos, as->lin,
-	imgcrd, as->prj, &phi, &theta, as->crval, as->cel, wcspos0))
-    error(EXIT_FAILURE, "*Error* in WCSlib: ", (char *)wcsrev_errmsg[rcode]);
-
-/* Compute the local distortion matrix */
-  al = wcspos0[0];
-  de = wcspos0[1];
-
-/* Get world coordinates for vector 1,0 */
-  pixpos[0] = mx + 1;
-  pixpos[1] = my;
-  if (rcode=wcsrev((const char(*)[9])as->ctype, as->wcs, pixpos, as->lin,
-	imgcrd, as->prj, &phi, &theta, as->crval, as->cel, wcspos))
-    error(EXIT_FAILURE, "*Error* in WCSlib: ", (char *)wcsrev_errmsg[rcode]);
+  /* Get world coordinates for vector 1,0 */
+  xin[0] = mx + 1;
+  yin[0] = my;
+  astTran2( field->astwcs, 1, xin, yin, 1, xout, yout );
+  if ( ! astOK ) {
+    error(EXIT_FAILURE, "*Error*"," transforming to world coordinates: " );
+  }
+  wcspos[0] = xout[0] * R2D;
+  wcspos[1] = yout[0] * R2D;
 
   da = wcspos[0]-al;
   if (da>180.0)
@@ -262,13 +220,16 @@ double	*compute_wcs(picstruct *field, double mx, double my)
   lm[0] = da*(cde=cos(de*DEG));
   lm[1] = wcspos[1] - de;
 
-/* Get world coordinates for vector 0,1 */
-/* Second one */
-  pixpos[0] = mx;
-  pixpos[1] = my + 1;
-  if (rcode=wcsrev((const char(*)[9])as->ctype, as->wcs, pixpos, as->lin,
-	imgcrd, as->prj, &phi, &theta, as->crval, as->cel, wcspos))
-    error(EXIT_FAILURE, "*Error* in WCSlib: ", (char *)wcsrev_errmsg[rcode]);
+  /* Get world coordinates for vector 0,1 */
+  /* Second one */
+  xin[0] = mx;
+  yin[0] = my + 1;
+  astTran2( field->astwcs, 1, xin, yin, 1, xout, yout );
+  if ( ! astOK ) {
+    error(EXIT_FAILURE, "*Error*"," transforming to world coordinates: " );
+  }
+  wcspos[0] = xout[0] * R2D;
+  wcspos[1] = yout[0] * R2D;
 
   da = wcspos[0]-al;
   if (da>180.0)
@@ -282,13 +243,13 @@ double	*compute_wcs(picstruct *field, double mx, double my)
   as->lindet = lm[0]*lm[3] - lm[1]*lm[2];
   if (as->lindet == 0.0)
     warning ("Null determinant in the local distortion matrix:\n",
-	"         Some WORLD-parameters will be incorrect");
+             "         Some WORLD-parameters will be incorrect");
 
   if (prefs.pixel_scale == 0.0)
     as->pixscale = sqrt(fabs(as->lindet));
 
   return wcspos0;
-  }
+}
 
 
 /****************************** astrom_shapeparam ****************************/
@@ -470,16 +431,9 @@ void	copyastrom(picstruct *infield, picstruct *outfield)
     QMEMCPY(infield->astrom, outfield->astrom, astromstruct, 1);
     inas = infield->astrom;
     outas = outfield->astrom;
-    if (inas->wcs_flag)
-      {
-      QMEMCPY(inas->wcs, outas->wcs, struct wcsprm, 1);
-      QMEMCPY(inas->lin, outas->lin, struct linprm, 1);
-      QMEMCPY(inas->cel, outas->cel, struct celprm, 1);
-      QMEMCPY(inas->prj, outas->prj, struct prjprm, 1);
-      QMEMCPY(inas->lin->cdelt, outas->lin->cdelt, double, 2);
-      QMEMCPY(inas->lin->crpix, outas->lin->crpix, double, 2);
-      QMEMCPY(inas->lin->pc, outas->lin->pc, double, 4);
-      }
+
+    /*  Copy precession FrameSet */
+    outas->cvt = astCopy( inas->cvt );
     }
 
   return;
@@ -491,144 +445,86 @@ void	copyastrom(picstruct *infield, picstruct *outfield)
 Free astrometrical structures.
 */
 void	endastrom(picstruct *field)
-
-  {
-   astromstruct	*as;
-
+{
+  astromstruct	*as;
   as = field->astrom;
-  if (as->wcs_flag)
-    {
-    free(as->lin->cdelt);
-    free(as->lin->crpix);
-    free(as->lin->pc);
-    free(as->wcs);
-    free(as->lin);
-    free(as->cel);
-    free(as->prj);
-    }
+
+  /* Release precession FrameSet */
+  as->cvt = astAnnul( as->cvt );
 
   free(as);
-
   return;
-  }
+}
 
 
-/********************************* precess ***********************************/
+/****************************** fk5 *****************************************/
 /*
-precess equatorial coordinates according to the equinox (from Ephemerides du
-Bureau des Longitudes 1992). Epoch for coordinates should be J2000
-(FK5 system).
-*/
-void	precess(double yearin, double alphain, double deltain,
-		double yearout, double *alphaout, double *deltaout)
+ *  Tranform image world coordinates (in degrees) to FK5/J2000.
+ */
+void fk5( picstruct *field, double inalp, double indec,
+          double *outalp, double *outdec )
+{
+  astromstruct	*as;
+  int isfk5;           /*  True if field coordinates are already FK5 */
+  double equinox;      /*  Equinox of field celestial coordinates */
+  AstFrameSet *cvt;    /*  FrameSet for converting coordinates */
+  double a[1], b[1], x[1], y[1];   /*  Input/output coordinates in radians */
 
-  {
-   double	dzeta,theta,z, t1,t1t1,t1t1t1,t2,t2t2,t2t2t2,
-		cddsadz, cddcadz, cdd, sdd, adz, cdin,sdin,ct,st,caindz;
+  as = field->astrom;
 
-  alphain *= DEG;
-  deltain *= DEG;
+  /*  If image is in FK5/J2000, then do nothing */
+  isfk5 = ( strcmp( astGetC( field->astwcs, "System" ), "FK5" ) == 0 );
+  equinox = astGetD( field->astwcs, "Equinox" );
+  if ( ! isfk5 | ( isfk5 && ( equinox != 2000.0 ) ) ) {
 
-  t1 = (yearin - 2000.0)/1000.0;
-  t2 = (yearout - yearin)/1000.0;
-  t1t1t1 = (t1t1 = t1*t1)*t1;
-  t2t2t2 = (t2t2 = t2*t2)*t2;
-  theta = (97171.735e-06 - 413.691e-06*t1 - 1.052e-06 * t1t1) * t2
-	+ (-206.846e-06 - 1.052e-06*t1) * t2t2 - 202.812e-06 * t2t2t2;
-  dzeta = (111808.609e-06 + 677.071e-06*t1 - 0.674e-06 * t1t1) * t2
-	+ (146.356e-06 - 1.673e-06*t1) * t2t2 + 87.257e-06 * t2t2t2;
-  z = (111808.609e-06 +677.071e-06*t1 - 0.674e-06 * t1t1) * t2
-	+ (530.716e-06 + 0.320e-06*t1) * t2t2 + 88.251e-06 * t2t2t2;
-  cddsadz = (cdin=cos(deltain)) * sin(alphain+dzeta);
-  cddcadz = -(sdin=sin(deltain))*(st=sin(theta))
-	+cdin*(ct=cos(theta))*(caindz=cos(alphain+dzeta));
-  sdd = sdin*ct + cdin*st*caindz;
-  cdd = cos(*deltaout = asin(sdd));
-  adz = asin(cddsadz/cdd);
-  if (cddcadz<0.0)
-    adz = PI - adz;
-  if (adz<0.0)
-    adz += 2.0*PI;
-  adz += z;
-  *alphaout = adz/DEG;
-  *deltaout /= DEG;
-
-  return;
+    /* Need to precess coordinates... */
+    cvt = (AstFrameSet *)as->cvt;
+    astSet( cvt, "System=FK5, Equinox=J2000" );
+    a[0] = inalp * D2R;
+    b[0] = indec * D2R;
+    astTran2( cvt, 1, a, b, 1, x, y );
+    *outalp = x[0] * R2D;
+    *outdec = y[0] * R2D;
+  } else {
+    /*  Input coordinates are already correct */
+    *outalp = inalp;
+    *outdec = indec;
   }
+}
 
-
-/*********************************** j2b *************************************/
+/****************************** fk4 *****************************************/
 /*
-conver equatorial coordinates from equinox and epoch J2000 to equinox and
-epoch B1950 for extragalactic sources (from Aoki et al. 1983, after
-inversion of their matrix and some custom arrangements).
-*/
-void    j2b(double yearobs, double alphain, double deltain,
-	double *alphaout, double *deltaout)
-  {
-   int			i,j;
-   static double	a[3] = {-1.62557e-6, -0.31919e-6, -0.13843e-6},
-                        ap[3] = {1.245e-3, -1.580e-3, -0.659e-3},
-                        m[6][6] = {
-   0.9999256794678425,    0.01118148281196562,   0.004859003848996022,
-  -2.423898417033081e-06,-2.710547600126671e-08,-1.177738063266745e-08,
-  -0.01118148272969232,   0.9999374849247641,   -2.717708936468247e-05,
-   2.710547578707874e-08,-2.423927042585208e-06, 6.588254898401055e-11,
-  -0.00485900399622881,  -2.715579322970546e-05, 0.999988194643078,
-   1.177738102358923e-08, 6.582788892816657e-11,-2.424049920613325e-06,
-  -0.0005508458576414713, 0.2384844384742432,   -0.4356144527773499,
-   0.9999043171308133,    0.01118145410120206,   0.004858518651645554,
-  -0.2385354433560954,   -0.002664266996872802,  0.01225282765749546,
-  -0.01118145417187502,   0.9999161290795875,   -2.717034576263522e-05,
-   0.4357269351676567,   -0.008536768476441086,  0.002113420799663768,
-  -0.004858518477064975, -2.715994547222661e-05, 0.9999668385070383},
-			a1[3], r[3], ro[3], r1[3], r2[3], v1[3], v[3];
-   static double	cai, sai, cdi, sdi, dotp, rmod, alpha, delta, t1;
+ *  Tranform image world coordinates (in degrees) to FK4/B1950.
+ */
+void fk4( picstruct *field, double inalp, double indec,
+          double *outalp, double *outdec )
+{
+  astromstruct	*as;
+  int isfk4;           /*  True if field coordinates are already FK4 */
+  double equinox;      /*  Equinox of field celestial coordinates */
+  double epoch;        /*  Epoch of field celestial coordinates */
+  AstFrameSet *cvt;    /*  FrameSet for converting coordinates */
+  double a[1], b[1], x[1], y[1];   /*  Input/output coordinates in radians */
 
-/* Convert Julian years from J2000.0 to tropic centuries from B1950.0 */
-  t1 = ((yearobs - 2000.0) + (MJD2000 - MJD1950)/365.25)*JU2TROP/100.0;
-  alphain *= DEG;
-  deltain *= DEG;
-  cai = cos(alphain);
-  sai = sin(alphain);
-  cdi = cos(deltain);
-  sdi = sin(deltain);
-  r[0] = cdi*cai;
-  r[1] = cdi*sai;
-  r[2] = sdi;
-  for (i=0; i<3; i++)
-    v[i] = r2[i] = v1[i] = 0.0;
-  for (j=0; j<6; j++)
-    for (i=0; i<6; i++)
-      if (j<3)
-        r2[j] += m[j][i]*(i<3?r[i]:v[i-3]);
-      else
-        v1[j-3] += m[j][i]*(i<3?r[i]:v[i-3]);
+  as = field->astrom;
 
-  for (i=0; i<3; i++)
-    r1[i] = r2[i]+v1[i]*ARCSEC*t1;
+  /*  If image is in FK4/B1950/B1950, then do nothing */
+  isfk4 = ( strcmp( astGetC( field->astwcs, "System" ), "FK4" ) == 0 );
+  equinox = astGetD( field->astwcs, "Equinox" );
+  epoch = astGetD( field->astwcs, "Epoch" );
+  if ( ! isfk4 | ( isfk4 && ( equinox != 1950.0 ) && ( epoch != 1950.0 ) ) ) {
 
-  dotp = 0.0;
-  for (i=0; i<3; i++)
-    {
-    a1[i] = a[i]+ap[i]*ARCSEC*t1;
-    dotp += a1[i]*(r1[i]+a1[i]);
-    }
-  dotp = 2.0/(sqrt(1+4.0*dotp)+1.0);
-  rmod = 0.0;
-  for (i=0; i<3; i++)
-    {
-    ro[i] = dotp*(r1[i]+a1[i]);
-    rmod += ro[i]*ro[i];
-    }
-  rmod = sqrt(rmod);
-  delta = asin(ro[2]/rmod);
-  alpha = acos(ro[0]/cos(delta)/rmod);
-  if (ro[1]<0)
-    alpha = 2.0*PI - alpha;
-  *alphaout = alpha/DEG;
-  *deltaout = delta/DEG;
-
-  return;
+    /* Need to precess coordinates... */
+    cvt = as->cvt;
+    astSet( cvt, "System=FK4, Equinox=B1950, Epoch=B1950" );
+    a[0] = inalp * D2R;
+    b[0] = indec * D2R;
+    astTran2( cvt, 1, a, b, 1, x, y );
+    *outalp = x[0] * R2D;
+    *outdec = y[0] * R2D;
+  } else {
+    /*  Input coordinates are already correct */
+    *outalp = inalp;
+    *outdec = indec;
   }
-
+}

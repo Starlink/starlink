@@ -17,6 +17,7 @@
 */
 
 #include <stdio.h>
+#include "ast.h"
 
 /*-------------------------------- flags ------------------------------------*/
 
@@ -302,6 +303,8 @@ typedef struct
   void          *map;                   /* pointer to mapped data */
   int           nel;                    /* size of map (pixels) */
   int           file;                   /* next pixel number from map */
+  AstFrameSet*  *astwcs;                /* NDF WCS component */
+
   }	picstruct;
 
 

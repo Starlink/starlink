@@ -6,13 +6,20 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN, IAP & Leiden observatory
+*                       P.W.DRAPER Starlink & Durham University
 *
 *	Contents:	Astrometrical stuff.
 *
-*	Last modify:	01/06/97
+*	Last modify:	01/06/97 (EB):
+*                       17/12/98 (PWD):
+*                          Removed unused parts of structures
+*                       04/01/99 (PWD):
+*                          Added cvt component for precession AstFrameSet.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#include        "ast.h"
 
 /*----------------------------- Internal constants --------------------------*/
 
@@ -26,28 +33,15 @@
 
 typedef struct structastrom
   {
-  int		naxis;			/* Number of image axes */
-  char		ctype[2][9];		/* FITS CTYPE strings */
-  char		cunit[2][32];		/* FITS CUNIT strings */
-  double	crval[2];		/* FITS CRVAL parameters */
-  double	cdelt[2];		/* FITS CDELT parameters */
-  double	crpix[2];		/* FITS CRPIX parameters */
-  double	projp[10];		/* FITS PROJP parameters */
-  double	longpole,latpole;	/* FITS LONGPOLE and LATPOLE */
-  double	pc[4];			/* FITS PC matrix */
-  double	linmat[4];		/* Local linear mapping matrix */
-  double	lindet;			/* Determinant of the local matrix */
-  double	pixscale;		/* (Local) pixel scale */
-  double	ap2000,dp2000;		/* J2000 coordinates of pole */
-  double	ap1950,dp1950;		/* B1950 coordinates of pole */
-  double	equinox;		/* Equinox of observations */
-  enum {RDSYS_FK5, RDSYS_FK4, RDSYS_FK4_NO_E, RDSYS_GAPPT}
-		radecsys;		/* FITS RADECSYS reference frame */
-  int		wcs_flag;		/* WCSLIB: can it be used? */
-  struct wcsprm	*wcs;			/* WCSLIB's wcsprm structure */
-  struct linprm	*lin;			/* WCSLIB's linprm structure */
-  struct celprm	*cel;			/* WCSLIB's celprm structure */
-  struct prjprm *prj;			/* WCSLIB's prjprm structure */
+    int		naxis;			/* Number of image axes */
+    double	linmat[4];		/* Local linear mapping matrix */
+    double	lindet;			/* Determinant of the local matrix */
+    double	pixscale;		/* (Local) pixel scale */
+    double	ap2000,dp2000;		/* J2000 coordinates of pole */
+    double	ap1950,dp1950;		/* B1950 coordinates of pole */
+    double	equinox;		/* Equinox of observations */
+    int		wcs_flag;		/* AST structure can it be used? */
+    AstFrameSet *cvt;                   /* FrameSet for precessions */
   }	astromstruct;
 
 /*------------------------------- functions ---------------------------------*/
@@ -56,8 +50,12 @@ extern void		astrom_errparam(picstruct *, objstruct *),
 			computeastrom(picstruct *, objstruct *),
 			copyastrom(picstruct *infield, picstruct *outfield),
 			endastrom(picstruct *),
-			initastrom(picstruct *),
-			j2b(double, double, double, double *, double *),
-			precess(double,double,double,double,double *,double *);
+			initastrom(picstruct *);
+static                  void fk5( picstruct *field, double inalp,
+                                  double indec, double *outalp, double
+                                  *outdec );
+static                  void fk4( picstruct *field, double inalp,
+                                  double indec, double *outalp, double
+                                  *outdec );
 
 extern double		*compute_wcs(picstruct *, double, double);
