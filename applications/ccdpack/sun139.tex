@@ -15,8 +15,8 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {139.12}
-\newcommand{\stardocauthors}   {Peter W. Draper, Mark Taylor}
+\newcommand{\stardocnumber}    {139.11}
+\newcommand{\stardocauthors}   {Peter W. Draper, Mark Taylor, Alasdair Allan}
 \newcommand{\stardocdate}      {27 January 1999}
 \newcommand{\stardoctitle}     {CCDPACK}
 \newcommand{\stardoconeline}   {CCD data reduction package}
@@ -28,7 +28,7 @@ allow you to debias, remove dark current, flatfield, register,
 resample and normalize your data.
 
 CCDPACK is designed to help you to reduce your data easily.
-The basic reduction stages can be setup using an X based GUI that
+The basic reduction stages can be set up using an X based GUI that
 controls an automated reduction system.
 The GUI is designed to allow you to start working without any
 detailed knowledge of the package (or indeed CCD reduction).
@@ -620,7 +620,7 @@ programs.
 
 CCDPACK is a package of programs for reducing CCD-like data. They
 allow you to debias, remove dark current, pre-flash, flatfield,
-register, resample and normalize your data.
+register, resample, normalize and combine your data.
 
 Using CCDPACK it is possible to automatically reduce CCD data (as far
 as the flatfielding stage). This uses a scheduling system that only
@@ -663,7 +663,7 @@ Debiassing can be performed using only the bias strips as well as
 using bias frames (these are combined to reduce noise levels).
 Calibration data can be combined using many different techniques
 (mean, median, trimmed mean etc.), so that you can pick a method that
-make most efficient use of your data.
+makes most efficient use of your data.
 
 Data registration (the determination of geometric transformations that
 map the same positions in each of your data frames) is primarily based
@@ -675,17 +675,22 @@ General linear transforms can be easily determined using an
 interactive procedure for displaying and selecting image features.
 Alternatively if your datasets are just shifted (offset) with respect
 to each other, then you may be able to register them by using a series
-of commands which locate the all the objects in all the frames,
+of commands which locate all the objects in all the frames,
 determine the object-object correspondence and then derive the
 transforms.
 A graphical application is also provided (for offset frames) that allows
 you to select the objects to be used by identifying image pairs that
 overlap and have some objects in common.
+Other facilities are provided for using external information about
+alignment of images; these may be of particular use for mosaic
+cameras, or when pointing information is available in FITS headers
+of the data products being reduced.
 
-Data resampling makes use of the registering transforms.
-These are stored inside your data, which removes the need to remember them.
-General transformations may also be applied to `rubber-sheet' the
-data into novel configurations.
+Data resampling uses World Coordinate System information stored 
+within the data, which removes the need to remember them. 
+As well as a wide selection of general purpose combination methods 
+such as median estimators, the more specialized `drizzling' 
+algorithm is also available.
 
 Normalisation and combination (often also called mosaicing) 
 are done in a single step, which is
@@ -812,7 +817,7 @@ per hour, so this correction can generally be ignored.
 Pre-flashing of CCDs has been used to stop loss of signal in CCDs with
 poor across-chip charge transfer characteristics, the reasoning being
 that if signal is entered in a pixel before the main exposure, then
-subsequent losses are less likely to effect the data --- note however
+subsequent losses are less likely to affect the data --- note however
 that this also means that a higher signal to noise level is required
 for detection.
 
@@ -923,7 +928,7 @@ to those possible).
 \end{enumerate}
 Debiassing is done by two basic methods, either by subtracting bias frames
 or using the bias strips. If you have bias frames then use them, if
-you don't look for dark strips down the sides of your data these are
+you don't look for dark strips down the sides of your data; these are
 the bias strips (have a look at \hyperref{this figure}{Figure
 \S}{}{CCDPICCY}).
 If you have bias frames and bias strips then use both (this is the
@@ -935,7 +940,7 @@ are finished (this is after you have accepted the options under
 \butt{Setup and Run}) and the reduction will continue.
 
 One final piece of information concerns the nature of the ``data
-frames'' as they have been called so far. These may be of any kind as
+frames'' as they have been called so far. These may be of any kind (as
 described \hyperref{later}{in section \S}{}{datatypes}) providing you
 have initialized the \xref{CONVERT}{sun55}{} package before starting
 up \routine{XREDUCE}.  If you have not initialized CONVERT then you
@@ -996,7 +1001,7 @@ read them into NDFs. You can also get a complete list of all the FITS
 headers of all the files on a tape (or list of files) using the KAPPA
 application \xref{FITSHEAD}{sun95}{FITSHEAD}.
 
-If you already have (or want to keep your) data in another
+If you already have (or want to keep) your data in another
 astronomical format such as IRAF, disk FITS or old FIGARO then CCDPACK
 can also process these, but with an additional processing overhead. To
 use data in these formats you should initialise the CONVERT package
@@ -1006,7 +1011,7 @@ use data in these formats you should initialise the CONVERT package
 % convert
 \end{verbatim}
 \end{myquote}
-and the necessary facilities will be setup. All you should now need to
+and the necessary facilities will be set up. All you should now need to
 do is specify your files using their full names, see
 \hyperref{later}{section \S}{}{ndflists} for more about specifying
 image names.
@@ -1022,7 +1027,7 @@ obvious what header information CCDPACK is using.
 
 If you are unfortunate to have data in a format not supported by the
 CONVERT package then you will need to consult \xref{SSN/20}{ssn20}{}
-about how to proceed. You should bare in mind that the requirements
+about how to proceed. You should bear in mind that the requirements
 of CCDPACK are that your format supports the storage of an image and
 some associated header information (this is essential for registration).
 
@@ -1083,7 +1088,7 @@ for these regions are always defined in pixel indices (i.e.\ row or
 column numbers, usually starting at 1,1 for the lower left-hand corner
 of the data array).
 
-A typical setup command is:
+A typical set up command is:
 \begin{myquote}
 \begin{verbatim}
 % ccdsetup adc=1.5 bounds='[2,10,400,416]' rnoise=10 extent='[11,399,1,576]'
@@ -1113,7 +1118,7 @@ put your data frames through a process known as ``importing''. What
 this means is that all the necessary descriptions about the type of
 data (target, bias, flat etc.), filter, where the CCD bias strips are
 etc. are put into the data files (in a part known as the CCDPACK
-extension; note that for none NDF formats this means the image
+extension; note that for non-NDF formats this means the image
 headers).
 
 There are two ways to enter this information into your data frame
@@ -1327,7 +1332,7 @@ following sections will lead you through the various options. At the
 end of this section reduction scripts are shown as examples.
 
 \subsubsection{Step 1 - Setting up}
-The first step in starting a CCDPACK reduction sequence is to setup
+The first step in starting a CCDPACK reduction sequence is to set up
 the device characteristics using the routine:
 \begin{itemize}
 \item \xroutine{CCDSETUP}.
@@ -2052,6 +2057,9 @@ axes in the coordinates of the Current frame.
 The WCS component also contains {\em mappings\/} which 
 encode the rules for transforming between any two frames in
 the WCS component.
+The upshot of this is that when an NDF has a suitable WCS component
+its contents can be addressed in the coordinates of its Current
+frame, rather than just in pixel coordinates.
 
 The problem of registration therefore is to process the set of
 images which are to be registered until 
@@ -2139,6 +2147,8 @@ to confusion.  CCDPACK will usually try to ensure that multiple
 frames with the same domain do not exist by deleting all but one.
 In this case a warning will be issued, but it is not considered
 a fatal error.
+For instance, if one of the programs tries to add a frame 
+when one with the same domain already exists, the old one is deleted.
 \item
 Some of the CCDPACK applications add new frames to WCS components.
 Usually, if a domain name is not specified by the user, a default
@@ -2338,7 +2348,9 @@ corresponding positions.  It will also work when all terms
 In this case it is just necessary to add to the image's WCS component 
 a coordinate frame taking account of the known transformations
 before the offsets are determined;
-alternatively the position list can be transformed directly using
+as long as the Current coordinate frames of the images in question
+are related by a simple offset then \routine{FINDOFF} can find it.
+Alternatively the position list can be transformed directly using
 \xroutine{TRANLIST}.
 
 Invoking \xroutine{FINDOBJ}, \xroutine{FINDOFF} and
@@ -2367,7 +2379,7 @@ Analysis Workshop.
 
 \subsubsection{\xlabel{semiautomated}Semi-automated registration}
 
-When datasets are offset only by X and Y translations,
+When datasets are offset only by X and Y translations as above,
 but contain insufficient objects for the fully automated registration
 described in the previous section, 
 registration may be done in a semi-automated way,
@@ -2489,7 +2501,7 @@ between two sets of objects,
 the coordinates used are those in the position lists transformed into
 the Current coordinate frame of their associated NDFs (though this
 transformation can be inhibited 
-by setting the USEWCS parameter in either case).
+by unsetting the \text{usewcs} parameter in either case).
 Thus as long as the Current frame in the WCS component of the NDF in question
 is selected appropriately, CCDPACK can keep implicit track of
 transformations which have to be applied to position list coordinates.
@@ -2593,8 +2605,8 @@ Rotation uses the coefficients:
 \(
 \left(
      \begin{array}{ll}
-        \text{TR(2)} = cos(\theta), & \text{TR(3)} = -sin(\theta) \\
-        \text{TR(5)} = sin(\theta), & \text{TR(6)} = cos(\theta) \\
+        \text{TR(2)} = \cos(\theta), & \text{TR(3)} = -\sin(\theta) \\
+        \text{TR(5)} = \sin(\theta), & \text{TR(6)} = \cos(\theta) \\
      \end{array}
 \right)
 \)
@@ -2623,7 +2635,8 @@ to some arbitrary level and now masquerade as \text{fx} and
 \text{fy}). This also allows quick modifications since only the values
 of the parameters need to be changed on re-runs.
 Note that a pincushion distortion could be added instead to a WCS
-component using \xroutine{WCSEDIT}.
+component using \xroutine{WCSEDIT} 
+(see \hyperref{later}{section \S}{}{wcsdirect}).
 
 
 
@@ -2639,7 +2652,7 @@ extension of the NDFs.
 If you are used to this way of doing things do not despair!
 In the first place,
 the object matching methods appear to work just the same as
-before (i.e. a CCDPACK script which used to perform registration,
+before (i.e.\ a CCDPACK script which used to perform registration,
 resampling and combination should still do so),
 although by default the routines are now storing coordinate 
 system information in a different way.
@@ -2653,9 +2666,8 @@ which cannot currently be handled by the \xref{AST}{sun210}{}
 library underlying the processing of WCS components.
 
 The applications 
-\routine{FINDOFF}, \routine{REGISTER}, \routine{TRANLIST}, \routine{TRANNDF} 
-%  ?? MAKEMOS ??
-and \routine{DRIZZLE}
+\routine{FINDOFF}, \routine{REGISTER}, \routine{TRANLIST}, and 
+\routine{TRANNDF} 
 by default read and write coordinate system
 information using frames in WCS components, but retain options
 which allow them to use the old TRANSFORM structures on request.
@@ -2748,8 +2760,8 @@ When fitting a general transform it is necessary to parameterise the
 formulation, the object of the exercise being to determine good values
 for the parameters.
 An obvious way to use this ability is to test the hypothesis that a
-linear transformation is not good enough to accurately register
-datasets.
+linear transformation is not good enough to register
+datasets accurately.
 To do this you might use the forward transform expression:
 \begin{myquote}
 \begin{verbatim}
@@ -2782,7 +2794,8 @@ objects are present in the data) may be entered directly into the images
 (see their entries in appendix \S\ref{app:description}).
 
 
-\subsection{Handling the WCS component directly}
+\subsection{\xlabel{wcsdirect}\label{wcsdirect}Handling the WCS component 
+            directly}
 
 CCDPACK provides the routine
 \begin{itemize}
@@ -2798,10 +2811,10 @@ a frame an additional parameter of the form
 `\text{attribute=value [, attribute=value]}'
 must be given.
 One useful application of this is to change the domain of an existing
-frame: for instance
+frame, for instance
 \begin{myquote}
 \begin{verbatim}
-wcsedit file1 mode=set set="domain=obs1"
+% wcsedit file1 set frame='!' set='domain=obs1'
 \end{verbatim}
 \end{myquote}
 For more sophisticated use of this feature, see the documentation
@@ -2831,8 +2844,11 @@ can be specified by giving three coefficients:
 the first is the magnitude of the distortion
 and the other two are the coordinates of its centre:
 \begin{eqnarray*}
-   x^\prime = x ( 1 + C_1  [ (x - C_2)^2 + (y - C_3)^2 ] ) \\
-   y^\prime = y ( 1 + C_1  [ (x - C_2)^2 + (y - C_3)^2 ] )
+   x^\prime = x \left( 1 + C_1  \left[ \left( x - C_2 \right)^2 
+                                     + \left( y - C_3 \right)^2 \right] \right)
+   \\
+   y^\prime = y \left( 1 + C_1  \left[ \left( x - C_2 \right)^2 
+                                     + \left( y - C_3 \right)^2 \right] \right)
 \end{eqnarray*}
 A positive $C_1$ corresponds to a pincushion distortion and 
 a negative $C_1$ corresponds to a barrel distortion.
@@ -2845,8 +2861,8 @@ and an optical
 centre at coordinates (1000,1000):
 \begin{myquote}
 \begin{verbatim}
-wcsedit image* add frame=pixel domain=squashed
-        maptype=pincushion coeffs=[-7e-10,0,0]
+% wcsedit 'image*' add frame=pixel domain=squashed
+          maptype=pincushion coeffs='[-7e-10,0,0]'
 \end{verbatim}
 \end{myquote}
 
@@ -2856,6 +2872,8 @@ is done using the FRAME parameter, which can take one of four types
 of value:
 \begin{itemize}
 \item
+The null value (`{\tt !}'), indicating the NDF's Current frame.
+\item
 A domain name
 \item
 An integer value giving the index of the frame within the WCS component
@@ -2863,8 +2881,6 @@ An integer value giving the index of the frame within the WCS component
 A \qt{Sky Co-ordinate System} (SCS) value such as EQUAT(J2000)
 (see section \xref{`Sky Co-ordinate Systems'}{sun95}{se_scs} in 
 \xref{SUN/95}{sun95}{}).
-\item
-The null value (`{\tt !}'), indicating the NDF's Current frame.
 \end{itemize}
 When run, \routine{WCSEDIT} will log what it has done, 
 giving the domain of the altered frame where appropriate
@@ -2901,7 +2917,7 @@ data1,data3,data4
 To examine the WCS component of an NDF,
 use the command
 \begin{myquote}
-\tt ndftrace \it filename \tt fullwcs
+\tt \% ndftrace \it filename \tt fullwcs
 \end{myquote}
 For more detail, which is unlikely to be of much use unless you
 are quite familiar with the \xref{AST}{sun210}{} system,
@@ -2911,7 +2927,7 @@ you could try
 \end{myquote}
 or
 \begin{myquote}
-\tt hdstrace \it filename \tt nlines=all eachline
+\tt \% hdstrace \it filename \tt nlines=all eachline
 \end{myquote}
 The \xref{KAPPA}{sun95}{} command \xref{NDFTRACE}{sun95}{NDFTRACE} is 
 documented in \xref{SUN/95}{sun95}{}, 
@@ -2919,7 +2935,8 @@ and \xref{HDSTRACE}{sun102}{HDSTRACE}
 is documented in \xref{SUN/102}{sun102}{}.
 
 
-\subsection{Re-use of frames with AST files}
+\subsection{\xlabel{astfiles}\label{astfiles}Re-use of WCS 
+            information with AST files}
 
 Coordinate frame information can be exported from and imported to
 image files using the commands:
@@ -2979,8 +2996,8 @@ can be found in appendix \S\ref{app:description},
 but the following gives an example.
 \begin{myquote}
 \begin{verbatim}
-astexp reg_data* astfile=int.ast idtype=fitsid fitsid=chipname
-astimp new_data* astfile=int.ast
+% astexp 'reg_data*' astfile=int.ast idtype=fitsid fitsid=chipname
+% astimp 'new_data*' astfile=int.ast
 \end{verbatim}
 \end{myquote}
 The first command takes a set of images which has been fully registered
@@ -3024,7 +3041,8 @@ so that the object matching methods of
 \hyperref{a previous section}{section \S}{}{object_matching}
 can be used to apply a common coordinate system to these.
 Furthermore, the geometry of the CCD chips in the instrument
-is known and stored in an AST file,
+is known and stored in an AST file as 
+\hyperref{explained earlier}{in section \S}{}{astfiles},
 so that a common coordinate system applies to 
 images \text{1a}, \text{1b} and \text{1c},
 and another to images \text{2a}, \text{2b} and \text{2c}.
@@ -3034,20 +3052,20 @@ sharing a common domain, to the WCS component of each.
 We can use a set of commands like:
 \begin{myquote}
 \begin{verbatim}
-astimp in='1a,1b,1c' astfile=instrument.ast indomain=obs1
-astimp in='2a,2b,2c' astfile=instrument.ast indomain=obs2
-wcsedit in='2a,2b,2c' add obs2 domain=obs2-rot 
-        maptype=linear coeffs=[0,-1,0,0,0,-1]
+% astimp in='"1a,1b,1c"' astfile=instrument.ast indomain=obs1 
+% astimp in='"2a,2b,2c"' astfile=instrument.ast indomain=obs2
+% wcsedit in='"2a,2b,2c"' mode=add frame=obs2 domain=obs2-rot 
+          maptype=linear coeffs='[0,-1,0,0,0,-1]'
 \end{verbatim}
 \end{myquote}
 The \xroutine{WCSEDIT} command is necessary because the focal plane
 of the instrument was rotated between the two observations.
 In fact since this is quite a common occurrence the \xroutine{ASTIMP}
 command has a parameter for adding rotations, so that the last
-two commands could be replaced by:
+two commands above could be replaced by:
 \begin{myquote}
 \begin{verbatim}
-astimp in='2a,2b,2c' astfile=instrument.ast indomain=obs2rot rot=180
+% astimp in='"2a,2b,2c"' astfile=instrument.ast indomain=obs2rot rot=180
 \end{verbatim}
 \end{myquote}
 --- this step can also be automated under some circumstances by using 
@@ -3057,23 +3075,31 @@ by a simple offset so that the automatic object matching routines
 can be applied to the overlapping frames:
 \begin{myquote}
 \begin{verbatim}
-findobj in='1b,1c,2b,2c' outlist=*.find
-findoff in='1b,1c,2b,2c' outlist=*.off
-register inlist='1b,1c,2b,2c' fittype=1
+% findobj in='"1b,1c,2b,2c"' outlist='*.find'
+% findoff inlist='"1b,1c,2b,2c"' outlist='*.off'
+% register inlist='"1b,1c,2b,2c"' fittype=1
 \end{verbatim}
 \end{myquote}
-Now the WCS components of the NDFs 
-contain (amongst others) the following frames:
-\begin{myquote}
-\begin{tabular}{lcccc}
-\text{1a}: & OBS1 &      &          &          \\
-\text{1b}: & OBS1 &      &          & CCD\_REG \\
-\text{1c}: & OBS1 &      &          & CCD\_REG \\
-\text{2a}: &      & OBS2 & OBS2-ROT &          \\
-\text{2b}: &      & OBS2 & OBS2-ROT & CCD\_REG \\
-\text{2c}: &      & OBS2 & OBS2-ROT & CCD\_REG  
+Now the frames contained in the WCS components of the NDFs 
+are (amongst others) as follows:
+\begin{center}
+\begin{tabular}{l|c|c|c|c|}
+           & OBS1     & OBS2     & OBS2-ROT & CCD\_REG \\
+\hline
+\text{1a} & $\times$ &          &          &          \\
+\hline
+\text{1b} & $\times$ &          &          & $\times$ \\
+\hline
+\text{1c} & $\times$ &          &          & $\times$ \\
+\hline
+\text{2a} &          & $\times$ & $\times$ &          \\
+\hline
+\text{2b} &          & $\times$ & $\times$ & $\times$ \\
+\hline
+\text{2c} &          & $\times$ & $\times$ & $\times$ \\
+\hline
 \end{tabular}
-\end{myquote}
+\end{center}
 This is not yet sufficient to perform the resampling,
 since there is no single domain in which all the images share a frame.
 To add an extra frame representing a single coordinate system
@@ -3096,8 +3122,8 @@ All the frames added are given the same domain (by default CCD\_WCSREG).
 So in the above example, after executing a command like:
 \begin{myquote}
 \begin{verbatim}
-wcsedit 1a current pixel
-wcsreg '1a,1b,1c,2a,2b,2c' domains='ccd_reg,obs1,obs2'
+% wcsedit 1a current pixel
+% wcsreg '"1a,1b,1c,2a,2b,2c"' domains='[ccd_reg,obs1,obs2]'
 \end{verbatim}
 \end{myquote}
 all of the listed NDFs will have a new common coordinate frame with 
@@ -3140,10 +3166,8 @@ transformations. Variances are resampled in the same way as ordinary
 data.
 
 The size of the output images can be estimated from the transformation of
-selected boundary positions, this is very useful when transforming whole
-lists of images as the output images are made only as big as necessary,
-without any interaction. Note, however, that this method will fail for
-complex transformations.
+selected boundary positions, which is very useful when transforming whole
+lists of images as the output images are made only as big as necessary.
 
 To use \routine{TRANNDF} type something like:
 \begin{myquote}
@@ -3156,9 +3180,12 @@ images the same as the inputs except that the string `\text{-trn}' is
 appended to each output name. By default \routine{TRANNDF} will guess a size for
 the output image, interpolate using nearest neighbour and conserve flux.
 
-\routine{TRANNDF} is based on the KAPPA application
-\xref{TRANSFORMER}{sun95}{TRANSFORMER}, look at
-TRANSFORMER if \routine{TRANNDF} does not supply the capabilities you require.
+Note that \routine{TRANNDF} resamples into the Current coordinate frame,
+so that each pixel in the output image is a $1.0 \times 1.0$ square 
+in those coordinates.  Thus the coordinate frame in question must be
+a suitable one for that purpose.  If the frame yields pixels of 
+the wrong size, then a suitable transformation can be made by
+adding a new frame with the \routine{WCSEDIT} program.
 
 
 \subsection{Mosaicing and normalisation}
@@ -3270,30 +3297,34 @@ reconstruction of an image from a set of undersampled dithered data;
 it preserves photometry and resolution, and can weight input images
 according to the statistical weight of each pixel.
 
-The algorithm is conceptually straightforward. The input pixels,
-which are shrunk by a user defined amount (see the \xroutine{DRIZZLE}
-description for details), are mapped onto a finer grid of output pixels,
-taking account of shifts and rotations. The input pixels, now referred
-to as ``drops'', rain down onto the subsampled output grid 
-\latex{(see figure \ref{drizzlepicture})}.
+The input grid is mapped onto an output grid which is normally
+finer; where many dithered input images are being combined this
+allows subsampling of the input data.
+Before the pixels are resampled onto the output grid however,
+they are shrunk into smaller pixels, now referred to as ``drops'',
+which rain down onto the output grid.
+Each drop affects the pixels in the output grid which it covers
+in proportion to the area of overlap; if an output pixel is
+not touched by any of the drops it receives no data from the image.
+This is shown schematically 
+in \hyperref{the figure}{figure }{}{drizzlepicture}.
 
 \myfig{sun139driz.eps}{height=0.5\textheight}{driz.gif}{drizzlepicture}
 {A schematic representation of Drizzling. The input pixel grid
-(shown left) is mapped onto a finer output grid (shown right)
-as determined by the WCS component of the NDF.
-The user is additionally allowed to ``shrink''
-the input pixels to smaller pixels, refered to as drops (faint inner
-squares). Each input image only affects the output pixels under the drops,
-so that
-in the above example the central output pixel recieves no information
+(shown left) is mapped onto a finer output grid (shown right).
+Each input image only affects the output pixels under the drops,
+so that here the central output pixel recieves no information
 from that image (Fruchter \& Hook, ADASS VI,
 ASP Conf.\ Series, Vol.\ 125, 1997, G.~Hunt and H.E.~Payne, eds., pp.\
 147--150).}
 
-The drop size is determined by the \text{pixfrac} parameter, which
-is the ratio of the linear size of the drop to the input pixel, while
-the subsampling of the ouptut grid is determined by the \text{multi}
-parameter. It is important to note that the default values for these
+The mapping of input grid to output grid is given by the
+mapping between the PIXEL-domain frame and the Current frame 
+in the WCS component of the NDF; however an additional shrinking
+factor can for convenience be given using the \text{multi} 
+parameter of DRIZZLE.  The ratio of the linear size of the
+drop to the size of the input pixel is controlled by the
+parameter \text{pixfrac}.  The default values for these
 parameters are 0.9 and 1.5 respectively.
 
 The algorithm has a number of advantages over the resampling and
@@ -3349,6 +3380,11 @@ application. This allows the deletion of CCDPACK items, the association
 of position lists, the entry of general transforms and the inversion of
 the sense of transforms.
 
+Control of the new style WCS coordinate information should be
+done using the \routine{WCSEDIT} program as described
+\hyperref{earlier}{in section \S}{}{wcsdirect}.
+
+
 If you are using a foreign data format then the extension information
 is actually stored with the general image headers (using a special
 namespace reserved for CCDPACK, examine the files
@@ -3376,7 +3412,7 @@ registration, resampling and mosaicing.}
 \section{Parameter behaviour and control}
 
 CCDPACK has a number of `global' {\em program} parameters which you
-can setup `once and for all'
+can set up `once and for all'
 \footnote{This section does not apply to \routine{XREDUCE} or IRAF.}.
 The usual time to do this is at the beginning of a
 reduction sequence.
@@ -3418,9 +3454,9 @@ to set most parameters every time you run an application.
 However, this does have a drawback of that you must remember what
 value you gave to the parameter.
 Most parameters will appear in the log or be directly reported (if
-the log system is setup to do so), so always take care to inspect
+the log system is set up to do so), so always take care to inspect
 the log, or the terminal output, until you're sure of how things
-are setup.
+are set up.
 To get rid of any unwanted parameter values (and restore the
 `intrinsic' default behaviour of an application) just use the keyword
 \text{reset}, on the command line (this is used in many of the
@@ -3862,7 +3898,7 @@ get help on the commands in the usual way. A useful document to
 consult is \xref{SUN/217}{sun217}{}.
 
 The way that CCDPACK commands work from the CL is pretty much as is
-described in the proceeding sections, except you'll need to write your
+described in the preceeding sections, except you'll need to write your
 scripts in CL and you'll also be constrained to the choice of having
 to use \routine{CCDSETUP} to define the CCD characteristics and
 package preferences, or not having its facilities at all (all the
@@ -4053,7 +4089,7 @@ data values. No weighting is taken into account. This is significantly
 faster than the weighted median, but takes no account of the known
 errors in the measurements.
 \item[DRIZZLE]  or variable-pixel linear reconstruction, maps weighted
-input data into pixels in a subsmapled output image. In order to avoid
+input data into pixels in a subsampled output image. In order to avoid
 convoluting the output image with the large input pixel size, the input
 pixels are shrunk before it is averaged into the output image.
 \end{description}
