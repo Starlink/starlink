@@ -61,6 +61,10 @@
       ELSE
         CALL BDI_NEW( 'BinDS', 2, GR_DIMS, 'REAL', BDID, STATUS )
         CALL USI_CREAT( EPAR, BDID, MP_ID, STATUS )
+
+*    Copy ancillaries
+        CALL UDI_COPANC( IM_ID, 'grf', MP_ID, STATUS )
+
       END IF
       IF ( STATUS .NE. SAI__OK ) THEN
         IF ( (STATUS.EQ.PAR__NULL) .AND. NOK ) THEN
@@ -351,9 +355,6 @@
 *  Copy SMAP data to output
       CALL ARR_COP1R( GR_NELM, SMAP, %VAL(MP_DPTR), STATUS )
 
-*  Copy ancillaries
-      CALL UDI_COPANC( IM_ID, 'grf', MP_ID, STATUS )
-
 *  Pixel plot with colour bar
       CALL GCB_LCONNECT( STATUS )
       CALL GCB_CLEAR( STATUS )
@@ -642,9 +643,6 @@
         HLINES = 5
         CALL USI_TEXT( 1, HTEXT, HLINES, STATUS )
         CALL HSI_PTXT( MP_ID, HLINES, HTEXT, STATUS )
-
-*    Copy ancillaries
-        CALL UDI_COPANC( IM_ID, 'grf', MP_ID, STATUS )
 
       ELSE
 
