@@ -69,6 +69,11 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  1997/07/17 02:16:36  timj
+*     Failed to allocate enough memory for multiple beam (PHOTOM) observations
+*     in the mask array.
+*     SCULIB_SET_QUAL now requires a logical for bit_value.
+*
 *     Revision 1.2  1997/06/09 21:43:06  timj
 *     Initialise BYTE_PTR and check status before running SCULIB_CFILLB
 *
@@ -119,6 +124,7 @@
 *     Local Constants:
 
 *     Local Variables:
+      LOGICAL BIT_SWITCH     ! .TRUE. to call SCULIB_BITON .FALSE. for BITOFF
       INTEGER BOL_S_PTR      ! Selected bolometer
       INTEGER BOL_S_END      ! End of selected bolometer
       INTEGER BYTE_END       ! end of byte mask
@@ -179,7 +185,7 @@
 *     Setup a mask array. This is necessary for multiple specs 
 *     when inverting the section mask
 
-      CALL SCULIB_MALLOC(N_POS * N_BOLS * VAL__NBUB, BYTE_PTR, 
+      CALL SCULIB_MALLOC(N_POS * N_BOLS * N_BEAM * VAL__NBUB, BYTE_PTR, 
      :     BYTE_END, STATUS) 
 
 *     Now fill this with zeroes. Work out the actual mask first
@@ -187,12 +193,13 @@
 
       BTEMP = 0
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLB(N_POS * N_BOLS, BTEMP, %VAL(BYTE_PTR))
+         CALL SCULIB_CFILLB(N_POS * N_BOLS * N_BEAM, BTEMP, 
+     :        %VAL(BYTE_PTR))
       END IF
 
-*     I am setting bit 1 in the mask array
+*     I am setting bit 0 in the mask array to ON
 
-      BTEMP = 1
+      BIT_SWITCH = .TRUE.
       MASK_BIT = 0
 
 *     decode each data specification in turn
@@ -209,7 +216,7 @@
          
          CALL SCULIB_SET_QUAL (.TRUE., %val(BYTE_PTR), N_BOLS,
      :        N_POS, N_BEAM, %VAL(BOL_S_PTR), %val(POS_S_PTR), 
-     :        MASK_BIT, BTEMP, STATUS)
+     :        MASK_BIT, BIT_SWITCH, STATUS)
 
       END DO
 
