@@ -91,6 +91,10 @@
 *  History:
 *     13-JAN-1998 (DSB):
 *        Original version.
+*     22-JUN-1998 (DSB):
+*        Corrected structuring of IF blocks which caused BAD values
+*        to be used within calculations, resulting in NaN and Inf values
+*        being stored in output images.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -335,60 +339,60 @@
                      T = VAL__BADR
                   END IF
 
-               END IF
-
 *  Polarised intensity.
-               IP = 0.01 * P * I
+                  IP = 0.01 * P * I
 
 *  Now produced variances if required.
-               IF ( VAR ) THEN
+                  IF ( VAR ) THEN
 
 *  Total intensity.
-                  VI = VIIN
+                     VI = VIIN
 
 *  If any of the input variances are bad, or if the percentage polarisation 
 *  is zero, store bad output variances.
-                  IF( VIIN .EQ. VAL__BADR .OR. VQIN .EQ. VAL__BADR .OR.
-     :                VUIN .EQ. VAL__BADR .OR. P2 .EQ. 0.0 ) THEN
+                     IF( VIIN .EQ. VAL__BADR .OR. VQIN .EQ. VAL__BADR 
+     :                  .OR. VUIN .EQ. VAL__BADR .OR. P2 .EQ. 0.0 ) THEN
 
-                     VIP = VAL__BADR
-                     VP = VAL__BADR
-                     VT = VAL__BADR
-
-*  Otherwise, calculate the variances.
-                  ELSE
-
-*  Normalised Stokes parameter, Q and U.
-                     VQ = ( Q2 * VIIN + VQIN )/( I**2 )
-                     VU = ( U2 * VIIN + VUIN )/( I**2 )
-
-*  Find the average variance of the normalised Q and U.
-                     EPS2 = 0.5*( VQ + VU )
-
-*  Percentage polarisation.
-                     VP = 10000.0 * EPS2
-
-*  Polarisation angle (degs).
-                     VT = RTOD * RTOD * 0.25 * EPS2 / P2
-
-*  Polarised intensity.
-                     VIP = P2*VI + I*I*EPS2
-
-*  If any of the variances are negative store bad results.
-                     IF ( VIP .LT. 0.0 .OR. VI .LT. 0.0 .OR.
-     :                    VP .LT. 0.0 .OR. VT .LT. 0.0 ) THEN
                         VIP = VAL__BADR
-                        VI = VAL__BADR
                         VP = VAL__BADR
                         VT = VAL__BADR
+
+*  Otherwise, calculate the variances.
+                     ELSE
+
+*  Normalised Stokes parameter, Q and U.
+                        VQ = ( Q2 * VIIN + VQIN )/( I**2 )
+                        VU = ( U2 * VIIN + VUIN )/( I**2 )
+
+*  Find the average variance of the normalised Q and U.
+                        EPS2 = 0.5*( VQ + VU )
+
+*  Percentage polarisation.
+                        VP = 10000.0 * EPS2
+
+*  Polarisation angle (degs).
+                        VT = RTOD * RTOD * 0.25 * EPS2 / P2
+
+*  Polarised intensity.
+                        VIP = P2*VI + I*I*EPS2
+
+*  If any of the variances are negative store bad results.
+                        IF ( VIP .LT. 0.0 .OR. VI .LT. 0.0 .OR.
+     :                       VP .LT. 0.0 .OR. VT .LT. 0.0 ) THEN
+                           VIP = VAL__BADR
+                           VI = VAL__BADR
+                           VP = VAL__BADR
+                           VT = VAL__BADR
 
 *  If required, make an estimate of the percentage polarisation and
 *  polarised intensity excluding the bias introduced because of the
 *  distribution of P being non-symmetric.
-                     ELSE
-                        IF ( DEBIAS ) THEN
-                           P = 100.0*SQRT( MAX( 0.0, P2 - EPS2 ) )
-                           IP = 0.01 * I * P
+                        ELSE
+                           IF ( DEBIAS ) THEN
+                              P = 100.0*SQRT( MAX( 0.0, P2 - EPS2 ) )
+                              IP = 0.01 * I * P
+                           END IF
+  
                         END IF
 
                      END IF
@@ -580,43 +584,43 @@
                      T = 90.0
                   END IF
 
-               END IF
-
 *  Polarised intensity.
-               IP = 0.01 * I * P
+                  IP = 0.01 * I * P
 
 *  Now produced variances if required.
-               IF ( VAR ) THEN
+                  IF ( VAR ) THEN
 
 *  Total intensity.
-                  VI = VIIN
+                     VI = VIIN
 
 *  If any of the input variances are bad, store bad output variances.
-                  IF( VIIN .EQ. VAL__BADR .OR. 
-     :                VVIN .EQ. VAL__BADR ) THEN
+                     IF( VIIN .EQ. VAL__BADR .OR. 
+     :                   VVIN .EQ. VAL__BADR ) THEN
 
-                     VIP = VAL__BADR
-                     VP = VAL__BADR
-                     VT = VAL__BADR
+                        VIP = VAL__BADR
+                        VP = VAL__BADR
+                        VT = VAL__BADR
 
 *  Otherwise, calculate the variances.
-                  ELSE
+                     ELSE
 
 *  Percentage polarisation.
-                     VP = 10000.0 * ( V * V * VIIN + VVIN )/( I**2 )
+                        VP = 10000.0 * ( V * V * VIIN + VVIN )/( I**2 )
 
 *  Polarisation angle.
-                     VT = VAL__BADR
+                        VT = VAL__BADR
 
 *  Polarised intensity.
-                     VIP = 0.0001 * ( P*P*VI + I*I*VP )
+                        VIP = 0.0001 * ( P*P*VI + I*I*VP )
 
 *  If any of the variances are negative store bad results.
-                     IF ( VIP .LT. 0.0 .OR. VI .LT. 0.0 .OR.
-     :                    VP .LT. 0.0 ) THEN
-                        VIP = VAL__BADR
-                        VI = VAL__BADR
-                        VP = VAL__BADR
+                        IF ( VIP .LT. 0.0 .OR. VI .LT. 0.0 .OR.
+     :                       VP .LT. 0.0 ) THEN
+                           VIP = VAL__BADR
+                           VI = VAL__BADR
+                           VP = VAL__BADR
+                        END IF
+
                      END IF
 
                   END IF
