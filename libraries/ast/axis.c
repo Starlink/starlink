@@ -604,10 +604,7 @@ static int AxisUnformat( AstAxis *this, const char *string, double *value ) {
 */
 
 /* Local Variables: */
-   const int mxlen = 30;         /* Max. length of string for error message */
    double coord;                 /* Coordinate value read */
-   int i;                        /* Loop counter for characters */
-   int len;                      /* Length of string for error message */
    int nc;                       /* Number of characters read */
 
 /* Initialise. */
