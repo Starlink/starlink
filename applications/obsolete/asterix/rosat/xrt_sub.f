@@ -1748,7 +1748,7 @@ D          WRITE(1,*)HEAD.OFFAX
       INTEGER STATUS
 *    Local variables :
       INTEGER XLP,YLP
-      REAL VTOT
+      REAL VTOT,QTOT
       REAL XCENT,YCENT,XSCALE,YSCALE,OFFAX
       REAL XOFF,YOFF
       REAL VIG,QE
@@ -1762,7 +1762,7 @@ D          WRITE(1,*)HEAD.OFFAX
       YSCALE = HEAD.YSCALE
 *
       VTOT=0.0
-
+      QTOT=0.0
 
 * Loop over each image pixel
       DO XLP=1,NX
@@ -1778,10 +1778,12 @@ D          WRITE(1,*)HEAD.OFFAX
 
 *    Get quantum efficiency factor
           CALL XRT_HRIQE(OFFAX,QE)
-*
+
+*    Combine into a single correction
           VCORR(XLP,YLP)=1.0/(VIG*QE)
 
-          VTOT = VTOT + VCORR(XLP,YLP)
+          VTOT = VTOT + 1.0/VIG
+          QTOT = QTOT + 1.0/QE
 *
 *
        ENDDO
@@ -1790,6 +1792,8 @@ D          WRITE(1,*)HEAD.OFFAX
       IF (DISPLAY) THEN
          CALL MSG_SETR('VMEAN', VTOT/(NX*NY))
          CALL MSG_PRNT('Mean vignetting correction : ^VMEAN')
+         CALL MSG_SETR('QMEAN', QTOT/(NX*NY))
+         CALL MSG_PRNT('Mean QE correction : ^QMEAN')
       ENDIF
 
  999  CONTINUE
@@ -3188,7 +3192,7 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
       CHARACTER*(DAT__SZLOC) TLOC      !Locator to effective area array
       CHARACTER*(DAT__SZLOC) FLOC      !Locator to first effective area array
       CHARACTER*(DAT__SZLOC) FTLOC     !Locator to filter array
-*
+      CHARACTER*3 CSTR                 !String
       CHARACTER*40 ARRTOP,ARRBOT
       INTEGER BPNTR,TPNTR              !Pointers to eff. area arrays
       INTEGER PNTR1                    !Pointer to first eff. area array
@@ -3198,7 +3202,7 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
       INTEGER NEFF                     !No. of eff. area arrays
       REAL ANGLE(MAXANG)               !Off axis angles
       REAL FRAC                        !Interpolation fraction
-      CHARACTER*3 CSTR                 !String
+      REAL HVIG,HQE		       !HRI corrections
       LOGICAL PSPC,HRI
 *-
       IF (STATUS .NE. SAI__OK) RETURN
@@ -3363,16 +3367,23 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 *
       ELSEIF (HRI) THEN
 
-        CALL XRT_VIGNET_HRI(HEAD.OFFAX,VCORR,VSING,STATUS)
+        CALL XRT_VIGNET_HRI(HEAD.OFFAX,HVIG,HQE,VCORR,VSING,STATUS)
 
         VFLAG=.TRUE.
 
       ENDIF
 
       IF ( DISPLAY ) THEN
-        CALL MSG_SETR('VIG',VSING)
-        CALL MSG_PRNT('Vignetting correction : ^VIG')
-      END IF
+        IF (PSPC) THEN
+          CALL MSG_SETR('VIG',VSING)
+          CALL MSG_PRNT('Vignetting correction : ^VIG')
+        ELSEIF (HRI) THEN
+          CALL MSG_SETR('VIG',HVIG)
+          CALL MSG_PRNT('Vignetting correction : ^VIG')
+          CALL MSG_SETR('QE',HQE)
+          CALL MSG_PRNT('QE correction : ^QE')
+        ENDIF
+      ENDIF
 
 999   CONTINUE
 *
@@ -3485,7 +3496,7 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 
 
 *+XRT_VIGNET_HRI    -   Calculates the vignetting correction for HRI
-      SUBROUTINE XRT_VIGNET_HRI(OFFAX, VCORR, VSING, STATUS)
+      SUBROUTINE XRT_VIGNET_HRI(OFFAX, VIG, QE, VCORR, VSING, STATUS)
 *    Description :
 *     <description of what the subroutine does>
 *    History :
@@ -3498,7 +3509,8 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 *    Import :
       REAL OFFAX			  ! off-axis angle (arcmin)
 *    Import-Export :
-      REAL VCORR			  ! Vignetting correction
+      REAL VIG,QE			  ! Vignetting and QE corrections
+      REAL VCORR			  ! Combined correction
       REAL VSING                          ! Single correction value
 *                                           both the same - for now
 *    Export :
@@ -3507,17 +3519,18 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
       INTEGER STATUS
 *    Local constants :
 *    Local variables :
-      REAL VIG,QE
 *-
       IF (STATUS.NE.SAI__OK) RETURN
 
 *  get vignetting factor
       CALL XRT_HRIVIG(OFFAX,VIG)
+      VIG=1.0/VIG
 
 *  Get quantum efficiency factor
       CALL XRT_HRIQE(OFFAX,QE)
+      QE=1.0/QE
 *
-      VCORR=1.0/(VIG*QE)
+      VCORR=VIG*QE
       VSING=VCORR
 
 
