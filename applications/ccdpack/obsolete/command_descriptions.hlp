@@ -6,7 +6,7 @@
 
      CALCOR: Performs dark or flash count corrections.
 
-     CCDALIGN: Determines general inter-image transformations.
+     CCDALIGN: Aligns images graphically by interactive object selection.
 
      CCDCLEAR: Clears global parameters.
 
@@ -39,8 +39,7 @@
 
      FLATCOR: Performs the flatfield correction on a list of images.
 
-     IDICURS: Reads co-ordinates from an X display (allows zooming
-              and panning).
+     IDICURS: Views and writes position lists interactively.
 
      IMPORT: Imports FITS information into CCDPACK extensions.
 
@@ -52,8 +51,7 @@
 
      MAKEMOS: Makes image mosaics by combining and (optionally) normalising.
 
-     PAIRNDF: Displays and manipulates image pairs to allow easy registration
-              (offsets only).
+     PAIRNDF: Aligns images graphically by drag and drop.
 
      PLOTLIST: Draws position markers on a graphics display.
 

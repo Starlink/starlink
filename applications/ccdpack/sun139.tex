@@ -16,12 +16,12 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {139.13}
+\newcommand{\stardocnumber}    {139.14}
 \newcommand{\stardocauthors}   {Peter W. Draper, Mark Taylor, Alasdair Allan}
-\newcommand{\stardocdate}      {1 July 2000}
+\newcommand{\stardocdate}      {21 November 2000}
 \newcommand{\stardoctitle}     {CCDPACK}
 \newcommand{\stardoconeline}   {CCD data reduction package}
-\newcommand{\stardocversion}   {Version 3.1}
+\newcommand{\stardocversion}   {Version 3.2}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {
 CCDPACK is a package of programs for reducing CCD-like data. They
@@ -688,7 +688,8 @@ cameras, or when pointing information is available in FITS headers
 of the data products being reduced.
 
 Data resampling uses World Coordinate System information stored 
-within the data, which removes the need to remember them. 
+within the data, which removes the need to remember the
+appropriate transformations. 
 As well as a wide selection of general purpose combination methods 
 such as median estimators, the more specialized `drizzling' 
 algorithm is also available.
@@ -1026,7 +1027,7 @@ propagate in your data. Also the extension information stored by
 CCDPACK has to be converted into native headers, this makes it less
 obvious what header information CCDPACK is using.
 
-If you are unfortunate to have data in a format not supported by the
+If you are unfortunate enough to have data in a format not supported by the
 CONVERT package then you will need to consult \xref{SSN/20}{ssn20}{}
 about how to proceed. You should bear in mind that the requirements
 of CCDPACK are that your format supports the storage of an image and
@@ -2001,7 +2002,7 @@ usually makes use of a robust estimator to protect against spurious
 values, cosmic rays etc.
 
 {\em
-This release (3.0) of CCDPACK handles the registration process
+Version 3 of CCDPACK, released in mid-2000, handles the registration process
 differently from previous versions --- instead of using TRANSFORM
 structures it now normally makes use of World Coordinate System
 (WCS) components of the images.  For much of the time, and in particular
@@ -2353,7 +2354,7 @@ lists which are output for use by \routine{REGISTER}.
 
 Note it is not necessary that the pixel grids of the images are simply 
 related by an offset,
-just that their Current coordinate systems are.
+but that their Current coordinate systems are.
 For instance you might have two images with reasonably accurate
 SKY coordinate systems which were attached by the observing system,
 but which you wish to register more accurately by matching image features.
@@ -2405,7 +2406,8 @@ Analysis Workshop.
 
 \subsubsection{\xlabel{semiautomated}Semi-automated registration}
 
-When datasets are offset only by X and Y translations as above,
+When datasets are offset in their Current attached coordinate system
+only by X and Y translations as above,
 but contain insufficient objects for the fully automated registration
 described in the previous section, 
 registration may be done in a semi-automated way,
@@ -2417,19 +2419,8 @@ using the programs:
 
 \routine{PAIRNDF} displays the images to be registered and allows the direct
 selection of image features which are common between image pairs.
-This works by displaying all the images in a palette region down the
-right-hand side of an X windows display. The mouse buttons may then be
-used to select two of the images which are re-displayed in the larger
-`scratch' region. After selection these two images may be manipulated
-by setting a reference position (which may be on either image), then
-showing where this corresponds on the other image. The two are then
-displayed overlaid with an average value in the overlap region. If the
-overlap is correct then the positions of the image-features in it may
-be identified. Zoom and pan are available so that images may be
-closely inspected and positioned very accurately. As with all
-graphically based interfaces it is difficult to describe the
-advantages and ease of use, it's best to try them out.
-
+This works by asking you alternately to choose a pair of images
+which has an overlap, and then to line them up.
 When enough of the datasets have been selected this way, and
 successfully paired, the global correspondence of the image features
 is determined. Using this method avoids the need to identify each
@@ -2438,10 +2429,34 @@ being in `common' between any pair, \routine{PAIRNDF} works out the rest using
 the same methods as \xroutine{FINDOFF}, except a single spanning tree is not
 chosen since in this case, all pairings are assumed to be correct.
 
-Note that unlike \routine{FINDOFF}, 
-\routine{PAIRNDF} currently only works when the pixel 
-coordinates (instead of those of the Current coordinate system) are
-related by simple offsets.
+Both the pair selection and the pair alignment are done using an
+intuitive graphical user interface on the Xwindows display.
+During pair selection you can see any combination of
+two images side by side, along with their names and other information
+such as selected FITS headers.  They are displayed resampled into
+their current coordinate frames, so that it should be easy to see
+where any overlap between the two is.  When you have selected a pair
+which contains objects common to both, you can move to 
+the alignment stage
+in which you drag one image with the mouse to the correct position 
+on top of the other.  
+The display can be zoomed and scrolled to make careful positioning easy.
+You are then asked to select centroidable features in the 
+overlap region so that the program
+can determine the offset between the two accurately.
+
+To summarise, during the graphical part of \routine{PAIRNDF} 
+you have to do the following:
+\begin{enumerate}
+\item Select a pair with features in common
+\item Align them by dragging and dropping
+\item Mark objects in the overlap region
+\item Repeat until the program stops asking you to do so
+\end{enumerate}
+
+As with all graphically based interfaces it is difficult to 
+describe the advantages and ease of use, it's best to try them out.
+
 
 \subsubsection{\xlabel{usinglineartransforms}General linear transformations}
 
@@ -2462,12 +2477,24 @@ an approximate registration which it then uses to extrapolate the
 positions of a reference set on each dataset. This new extended set of
 positions are now centroided picking up any missed objects. The
 reference set of positions are either selected from a designated image or
-from the first image. The reference set can be extended by identifying
-objects after all the current reference set have been identified
-(possibly by selecting positions off the image if they are not actually
-present).  \routine{CCDALIGN} can then invoke \routine{REGISTER} itself to
+from the first image.
+\routine{CCDALIGN} can then invoke \routine{REGISTER} itself to
 perform the fitting of the transformation parameters using all these
 positions.
+
+Selection of points on the images is done using an inuitive Xwindows-based
+graphical user interface, which allows you to mark and remove 
+points with the mouse, change the brightness of the display,
+zoom and scroll the image, and read out positions in any
+of the image's attached coordinate systems.
+
+To summarise, during the graphical part of \routine{CCDALIGN} 
+you have to do the following:
+\begin{enumerate}
+\item Mark a set of points on the reference (or first) image
+\item Mark corresponding points on each of the other images
+\end{enumerate}
+
 
 
 \subsubsection{\xlabel{usinglistsofpositions}Using position lists
@@ -2537,7 +2564,13 @@ in its .MORE.CCDPACK extension under the item CURRENT\_LIST, and
 can be examined using \xref{HDSTRACE (SUN/102)}{sun102}{}
 or modified using \xroutine{CCDEDIT}.
 
-
+If you wish to view or edit positions in a list interactively, 
+you can use the \xroutine{IDICURS} program, which displays a 
+graphical interface in
+which the image is displayed with points from a position list 
+plotted over it.  Points can be added and removed with the mouse.
+If you want to display points in a list non-interactively or
+to print them out, use \xroutine{PLOTLIST}.
 
 
 \subsection{\xlabel{wcsdirect}\label{wcsdirect}Handling coordinate systems
@@ -2872,7 +2905,7 @@ in \hyperref{the examples section}{\S }{}{regexamples}.
 
 Data resampling is normally performed by the application:
 \begin{itemize}
-\item \routine{TRANNDF}
+\item \xroutine{TRANNDF}
 \end{itemize}
 This resamples an image from pixel coordinates into
 its Current coordinate system.
@@ -3926,7 +3959,8 @@ application. \xroutine{TRANNDF} uses the internals of an early version
 of the KAPPA application \xref{TRANSFORMER}{sun95}{TRANSFORMER}
 written by Malcolm Currie.
 
-The \xroutine{XREDUCE} application uses
+The \xroutine{XREDUCE}, \xroutine{IDICURS}, \xroutine{PAIRNDF} and
+\xroutine{CCDALIGN}  applications use
 \htmladdnormallink{Tcl/Tk}{http://www.scriptics.com/}
 scripting language developed by John Ousterhout, together with the
 \htmladdnormallink{[incr Tcl]}{http://www.tcltk.com/itcl} extensions
@@ -4182,7 +4216,7 @@ better than the median, and this is the normal default.
 
 \quickdes{CALCOR}{Performs dark or flash count corrections.}{CALCOR}
 
-\quickdes{CCDALIGN}{Determines general inter-image transformations.}
+\quickdes{CCDALIGN}{Aligns images graphically by interactive object selection.}
          {CCDALIGN}
 
 \quickdes{CCDCLEAR}{Clears global parameters.}
@@ -4231,9 +4265,7 @@ better than the median, and this is the normal default.
 \quickdes{FLATCOR}{Performs the flatfield correction on a list of images.}
                   {FLATCOR}
 
-
-\quickdes{IDICURS}{Reads co-ordinates from an X display (allows
-                   zooming and panning).}{IDICURS}
+\quickdes{IDICURS}{Views and writes position lists interactively.}{IDICURS}
 
 \quickdes{IMPORT}{Imports FITS information into CCDPACK extensions.}{IMPORT}
 
@@ -4249,9 +4281,7 @@ better than the median, and this is the normal default.
                    normalising.}
                   {MAKEMOS}
 
-\quickdes{PAIRNDF}{Displays and manipulates image pairs to allow easy
-                   registration (offsets only).}
-                  {PAIRNDF}
+\quickdes{PAIRNDF}{Aligns NDFs graphically by drag and drop}{PAIRNDF}
 
 \quickdes{PLOTLIST}{Draws position markers on a graphics display.}
                    {PLOTLIST}
@@ -5262,10 +5292,10 @@ The CCDPACK routine descriptions are contained in the following pages.
    }
 }
 \sstroutine{CCDALIGN}{
-   Interactive procedure to aid the alignment of images
+   Aligns images graphically by interactive object selection
 }{
    \sstdescription{
-      This procedure aids the registration of images which are not
+      This program aids the registration of images which are not
       related by simple offsets (see \xroutine{FINDOFF} and \xroutine{PAIRNDF} if they are).
       It also has the capability of dealing with groups of images which
       are almost registered (frames which have not been moved on the
@@ -5274,15 +5304,11 @@ The CCDPACK routine descriptions are contained in the following pages.
       The basic method used is to access groups of images (or a series
       of single images if all are moved between exposures) and an
       optional reference image. The first image of the first group or the
-      reference image is then displayed and a cursor application is used
-      to record the positions of centroidable image features. The
-      first images of all the other groups are then displayed and you
-      are invited to identify the image features in the order which
-      corresponds to that used for the reference image. Missing image
-      features are identified as off the currently displayed image (so
-      the centroid routine will fail to find them). The reference set
-      of image features may be extended by identification after the
-      last reference feature has been marked.
+      reference image is initially displayed and you are invited to mark
+      the positions of centroidable image features on it using a 
+      graphical interface.  This window then remains on the screen for 
+      reference while you identify the same features on each of the 
+      other sets of images in the same way.
 
       After centroiding you are then given the option to stop. If
       you decide to then you will have labelled position lists to use
@@ -5292,30 +5318,33 @@ The CCDPACK routine descriptions are contained in the following pages.
       be performed for \qt{linear} transformations.
 
       After choosing a transformation type the procedure will then go on
-      to calculate a transformation set between all the images, this is
-      then used (with the extended reference set from \xroutine{REGISTER}) to
-      approximate the position of all possible image features, these are
+      to calculate a transformation set between all the images; this is
+      used (with the extended reference set from \xroutine{REGISTER}) to
+      approximate the position of all possible image features, which are
       then located by centroiding and a final registration of all images
-      is performed. The resultant images then have associated lists of
-      labelled positions and TRANSFORM structures which may be used to
-      transform other position lists or when resampling the data.
+      is performed.  The resultant images then have associated lists of
+      labelled positions, and attached coordinate systems which may be
+      used to transform other position lists or when resampling the data.
+
+      The graphical interface used for marking features on the image
+      should be fairly self-explanatory.  The image can be scrolled using
+      the scrollbars, the window can be resized, and there are controls
+      for zooming the image in or out, changing the style of display and 
+      altering the percentile cutoff limits.  The numbers of any 
+      identified features on each image must match those of the 
+      reference image (though it is not necessary to identify all of 
+      the features from the reference image on each one), and there is 
+      also a control for selecting the number of the next point to mark.
+      Points are added by clicking mouse button 1 (usually the left one) 
+      and may be removed by clicking mouse button 3 (usually the right 
+      one).  It is possible to edit the points marked on the reference
+      image while you are marking points on the other images.  When 
+      you have selected all the points you wish to on a given image, 
+      click the `Done' button and you will be presented with the next
+      one.
    }
    \sstusage{
       ccdalign
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         Display restrictions.
-
-      }
-
-         CCDALIGN will only work on PseudoColor X displays; this means
-         that it cannot be used on the displays of most newer Linux
-         machines as normally configured.  Attempting to do so may
-         result in a core dump.
-
    }
 }
 
@@ -7566,14 +7595,14 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          the input data type will be {\tt "}preserved{\tt "} in the output image.
          Alternatively, if a FALSE value is given, then the output image
          will be given an appropriate floating point data type.
- 
+
          When using integer input data, the former option is useful for
          minimising the storage space required for large mosaics, while
          the latter typically permits a wider output dynamic range when
          necessary. A wide dynamic range is particularly important if a
          large range of scale factor corrections are being applied (as
          when combining images with a wide range of exposure times).
- 
+
          If a global value has been set up for this parameter using
          CCDSETUP, then that value will be used.
          [TRUE]
@@ -8064,7 +8093,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
         CCDPACK supports data in two formats.
 
-        CCDPACK format - the first three columns are interpreted as the
+        CCDPACK format -- the first three columns are interpreted as the
         following.
 
       \sstitemlist{
@@ -8084,7 +8113,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
         on different images. Values in any other (trailing) columns are
         usually ignored.
 
-        EXTERNAL format - positions are specified using just an X and
+        EXTERNAL format -- positions are specified using just an X and
         a Y entry and no other entries.
 
       \sstitemlist{
@@ -8105,6 +8134,9 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
         Data following the third column is copied without modification
         into the results files
 
+        In all cases, the coordinates in position lists are pixel 
+        coordinates.
+
       \sstitemlist{
 
          \sstitem
@@ -8112,7 +8144,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
       }
         If NDFNAMES is TRUE then the item \qt{CURRENT\_LIST} of the
-        .MORE.CCDPACK structure of the input NDFs will be located
+        .MORE.CCDPACK structure of the input images will be located
         and assumed to contain the names of the lists whose positions
         are to be centroided. On exit this item will be updated to
         reference the name of the centroided list of positions.
@@ -8411,7 +8443,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
         presence of extreme outliers.  If there are extreme outliers
         therefore, the percentile method (USEPER set to TRUE) of
         determining the threshold should be used.
- 
+
         The histogram used by \routine{FINDOBJ} when USEPER is FALSE is formed by
         (if necessary) re-binning until the BINFRAC criterion is met,
         it is expected that this will always result in a well sampled
@@ -8423,7 +8455,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
         20 percent of the peak value, stopping when either 3 iterations
         have been performed or the standard deviation does not change
         by more than one bin width in data values.
- 
+
         \routine{FINDOBJ} is optimised to determine a reliable detection threshold
         and is not concerned with the accurate determination of the
         background value on a frame (as it performs no photometric
@@ -9239,67 +9271,63 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
    }
 }
 \sstroutine{IDICURS}{
-   Reads coordinates from an X display device
+   Views and writes position lists interactively.
+
 }{
    \sstdescription{
-      This routine reports and records positions selected from an
-      X display device. Before using this routine an image must
-      have been displayed using a routine such as KAPPA
-      \xref{DISPLAY}{sun95}{DISPLAY} (SUN/95).
-      \routine{IDICURS} allows displayed images and graphics to be zoomed
-      and scrolled during the location operation.
+      This program displays an image on the screen and provides a 
+      graphical user interface for marking points on it, which are then
+      written out to a file as a position list.
+
+      The graphical interface used for marking features on the image
+      should be fairly self-explanatory.  The image can be scrolled
+      using the scrollbars, the window can be resized, and there are 
+      controls for zooming the image in or out, changing the style of 
+      display, and altering the percentile cutoff limits which control
+      the mapping of pixel value to displayed colour.  The position 
+      of the cursor is reported below the display using the coordinates 
+      of the selected coordinate frame for information, but the position 
+      list written out is always written in Pixel coordinates, since 
+      that is how all CCDPACK applications expect to find it written.
+      Points are marked on the image by clicking mouse button 1 
+      (usually the left one) and may be removed using mouse button 3
+      (usually the right one).  When you have marked all the points
+      that you wish to, click the 'Done' button.
+
+      Optionally (if the READLIST parameter is set true), a list of 
+      points may be read at the start of the program; these will be 
+      marked on the image as an initial set which may be added to or
+      removed as if marked by the user in the first place.
    }
    \sstusage{
-      idicurs outlist device
+      idicurs in outlist
    }
    \sstparameters{
       \sstsubsection{
-         ARROWS = \_LOGICAL (Read)
+         IN = LITERAL (Read)
       }{
-         Only used if SCROLL is TRUE. This parameter defines whether or
-         not the keyboard arrows are used to control the display scroll.
-         Using the keyboard increases the accuracy of positioning but is
-         slower. Pressing Shift-Arrow-Key increases the rate of scroll.
+         Gives the name of the image to display and get coordinates from.
+         If multiple images are specified using wildcards or separating 
+         their names with commas, the program will run on each one in
+         turn.
+      }
+      \sstsubsection{
+         INEXT = \_LOGICAL (Read)
+      }{
+         If the READLIST parameter is set true, then this parameter 
+         determines where the input position list comes from.  If set
+         true, then the position list currently associated with the
+         image will be used.  If set false, then the input position list
+         names will be obtained from the INLIST parameter.
          [FALSE]
       }
       \sstsubsection{
-         COLOUR = \_INTEGER (Read)
+         INLIST = FILENAME (Read)
       }{
-         The colour of the position marker. This may take any value in
-         the range 0-4.
-         [4]
-      }
-      \sstsubsection{
-         DEVICE = DEVICE (Read)
-      }{
-         The name of the image display device.
-         [Current-image display device]
-      }
-      \sstsubsection{
-         IN = LITERAL (Read)
-      }{
-         The names of a list of images which are to be \qt{associated} with
-         the output position list. Associating a list with an image means
-         that the item \qt{CURRENT\_LIST} in its CCDPACK extension will be
-         set to the name of the list. In future applications the image
-         name may then be used instead of the list name (any derived
-         lists will then be associated with the image instead), this is
-         the usual method in CCDPACK.
-
-         The names of the images may be given as \qt{!} in which case none
-         will be associated, otherwise the image names should be as a list
-         separated by commas and may include wildcards.
-         [!]
-      }
-      \sstsubsection{
-         KEEPLUT = \_LOGICAL (Read)
-      }{
-         If TRUE then the Look-Up-Table of the current device will be
-         used \qt{as is}. Otherwise a greyscale will be loaded. The
-         visibility of the cursor when using X windows and with
-         scrolling enabled is often a problem. To help with this the
-         primary colours are loaded into the first fews pens.
-         [TRUE]
+         If the READLIST parameter is set true, and the INEXT parameter
+         is set false, then this parameter gives the name of the file
+         in which the input position list is stored.  This parameter
+         may use modifications of the input image name.
       }
       \sstsubsection{
          LOGFILE = FILENAME (Read)
@@ -9343,84 +9371,139 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          [BOTH]
       }
       \sstsubsection{
-         MEMORY = \_INTEGER (Read)
+         MAXCANV = \_INTEGER (Read and Write)
       }{
-         The memory of the device which is to be used. This can take
-         the values 0 and 1. 0 means the base memory and 1 the overlay.
-         [0]
+         A value in pixels for the maximum initial X or Y dimension of
+         the region in which the image is displayed.  Note this is the 
+         scrolled region, and may be much bigger than the sizes given
+         by WINX and WINY, which limit the size of the window on the
+         X display.  It can be overridden during operation by zooming
+         in and out using the GUI controls, but it is intended to 
+         limit the size for the case when ZOOM is large (perhaps
+         because the last image was quite small) and a large image
+         is going to be displayed, which otherwise might lead to 
+         the program attempting to display an enormous viewing region.
+         If set to zero, then no limit is in effect.
+         [1280]
       }
       \sstsubsection{
-         MSIZE = \_REAL (Read)
+         READLIST = \_LOGICAL (Read)
       }{
-         Determines the size of the position marker. This is set as a
-         fraction of the X dimension of the display.
-         [0.03]
+         If set true, then the program will start up with a set of points
+         displayed, read from the list specified by the INLIST parameter.
+         If set false, the program will start up with no points initially
+         plotted.
+         [FALSE]
       }
       \sstsubsection{
          OUTLIST = FILENAME (Write)
       }{
          The name of the file which is to contain the selected
-         positions. The positions are written using the
-         standard format in CCDPACK which is described in the notes
-         section.
-         [IDICURS.LIS]
+         positions.  If the program exits normally the positions will
+         be written to this file using the standard CCDPACK format,
+         as described in the Notes section, and the list file will 
+         become associated with the input image.  The value of this 
+         parameter may use modifications of the input image name.
+         If set null (!), no output file will be written.  This
+         parameter is allowed to take the same value as INLIST, in
+         which case the list will be overwritten.
+         [*.lis]
       }
       \sstsubsection{
-         SCROLL = \_LOGICAL (Read)
+         PERCENTILES( 2 ) = \_DOUBLE (Read and Write)
       }{
-         If TRUE then scrolling of the image display is enabled. This
-         may be very slow on devices with poor graphics facilities
-         and/or slow processors so is normally disabled.
+         The initial values for the low and high percentiles of the data 
+         range to use when displaying the images; any pixels with a value
+         lower than the first element will have the same colour, and any 
+         with a value higher than the second will have the same colour.
+         Must be in the range 0 $<=$ PERCENTILES( 1 ) $<=$ PERCENTILES( 2 ) 
+         $<=$ 100.  These values can be changed interactively while the
+         program runs.
+         [2,98]
+      }
+      \sstsubsection{
+         SHOWIND = \_LOGICAL (Read)
+      }{
+         If true, then the index numbers will be displayed on the image
+         for each point marked, and it will be possible to choose 
+         the index number for each point.  If false, points will not
+         be numbered on the display, and will be written to the 
+         position list in (roughly) the order in which they are entered.
          [FALSE]
       }
       \sstsubsection{
-         THICK = \_INTEGER (Read)
+         WINX = \_INTEGER (Read and Write)
       }{
-         The thickness of the position marker in device pixels.
+         The width in pixels of the window to display the image and
+         associated controls in.  If the image is larger than the area
+         allocated for display, it can be scrolled around within the 
+         window.  The window can be resized in the normal way using 
+         the window manager while the program is running.
+         [450]
+      }
+      \sstsubsection{
+         WINY = \_INTEGER (Read and Write)
+      }{
+         The height in pixels of the window to display the image and
+         associated controls in.  If the image is larger than the area
+         allocated for display, it can be scrolled around within the
+         window.  The window can be resized in the normal way using
+         the window manager while the program is running.
+         [600]
+      }
+      \sstsubsection{
+         ZOOM = \_INTEGER (Read and Write)
+      }{
+         A factor giving the initial level to zoom in to the image 
+         displayed, that is the number of screen pixels to use for one
+         image pixel.  It will be rounded to one of the values 
+         \ldots\ 3, 2, 1, 1/2, 1/3 \ldots.  The zoom can be changed 
+         interactively from within the program.  The initial value 
+         may be limited by MAXCANV.
          [1]
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         idicurs stars.pos
+         idicurs mosaic mos.lis
       }{
-         In this example \routine{IDICURS} writes the output positions to the
-         formatted file stars.pos.
+         This starts up the graphical user interface, allowing you to
+         select a number of points which will be written to the
+         position list file 'mos.lis', which will be associated with
+         the image file.
       }
       \sstexamplesubsection{
-         idicurs device=xw outlist=objects.dat memory=1
+         idicurs in=$*$ out=$*$.pts percentiles=[10,90]
       }{
-         In this example the overlay plane of an xwindows display
-         can be manipulated and coordinates are read. The overlay
-         could contain a contour map as produced by KAPPA
-         \xref{TURBOCONT}{sun95}{TURBOCONT}.
+         Each of the images in the current directory will be displayed,
+         and the positions marked on it written to a list with the same
+         name as the image but the extension `.pts', which will be
+         associated with the image in question.  The display will
+         initially be scaled so that pixels with a value higher than
+         the 90th percentile will all be displayed as the brightest
+         colour and those with a value lower than the 10th percentile
+         as the dimmest colour, but this may be changed interactively
+         while the program is running.
       }
       \sstexamplesubsection{
-         idicurs outlist=group\_positions in=\qt{$*$}
+         idicurs in=gc6253 showind readlist inlist=found.lis outlist=out.lis
       }{
-         In this example an output position list group\_positions is
-         associated with all the images in the current directory. This
-         method could be useful if all the images are not moved
-         significantly with respect to one another. This one list then
-         supplies initial positions for objects in all these images (using
-         the centroid routine \xroutine{FINDCENT} would then give each image an
-         accurate position list from these initial positions).
-      }
-      \sstexamplesubsection{
-         idicurs scroll arrows
-      }{
-         In this example scrolling via the use of the keyboard arrows is
-         enabled.
+         The image gc6253 will be displayed, with the points stored in
+         the position list `found.lis' already plotted on it.  These
+         may be added to, moved and deleted, and the resulting list
+         will be written to the file out.lis.
       }
    }
    \sstnotes{
       \sstitemlist{
 
          \sstitem
-         Output position list format.
+         Position list formats.
 
       }
-        CCDPACK format - Position lists in CCDPACK are formatted files
+        CCDPACK supports data in two formats.
+
+        CCDPACK format -- Position lists in CCDPACK are formatted files
         whose first three columns are interpreted as the following.
 
       \sstitemlist{
@@ -9436,40 +9519,35 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
       }
         The column one value must be an integer and is used to identify
-        positions which may have different locations but are to be
-        considered as the same point. Comments may be included in the
-        file using the characters \# and !. Columns may be separated by
-        the use of commas or spaces.
+        positions which are the same but which have different locations
+        on different images. Values in any other (trailing) columns are
+        usually ignored.
+
+        EXTERNAL format -- positions are specified using just an X and
+        a Y entry and no other entries.
 
       \sstitemlist{
 
          \sstitem
-         X windows display.
-
-      }
-        It is possible to scroll the memory using either the pointer or
-        keyboard arrows (if the keyboard arrows are chosen then holding
-        down the shift keys will accelerate the motion) parameters
-        SCROLL and ARROWS control these options. The C key performs a
-        quick re-centre, cancelling any zoom and scroll. The Q key
-        is used to exit from the routine.
-
-      \sstitemlist{
+           Column 1: the X position
 
          \sstitem
-         Display restrictions.
-
+           Column 2: the Y position
       }
 
-         IDICURS will only work on PseudoColor X displays; this means
-         that it cannot be used on the displays of most newer Linux 
-         machines as normally configured.  If an attempt is made to
-         do so, then the warning:
-\begin{quote} 
-            !! Window has unsupported visual type
-\end{quote}
-         will be emitted; attempting to proceed may result in a core
-         dump.
+        This format is used by \xref{KAPPA}{sun95}{} applications such as 
+        \xref{CURSOR}{sun95}{CURSOR}.
+
+        Comments may be included in a file using the characters \qt{\#} and
+        \qt{!}. Columns may be separated by the use of commas or spaces.
+
+        Input position lists read when READLIST is true may be in either
+        of these formats.  The output list named by the OUTLIST
+        parameter will be written in CCDPACK (3 column) format.
+
+        In all cases, the coordinates in position lists are pixel
+        coordinates.
+
 
       \sstitemlist{
 
@@ -9477,10 +9555,11 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          NDF extension items.
 
       }
-        On exit the CURRENT\_LIST items in the CCDPACK extensions
-        (.MORE.CCDPACK) of the input images are set to the name of the
-        output list. These items will be used by other CCDPACK position
-        list processing routines to automatically access the list.
+        On normal exit, unless OUTLIST is set to null (!), the 
+        CURRENT\_LIST items in the CCDPACK extensions (.MORE.CCDPACK) of 
+        the input images are set to the name of the output list. These 
+        items will be used by other CCDPACK position list processing 
+        routines to automatically access the list.
    }
    \sstdiytopic{
       Behaviour of parameters
@@ -9500,9 +9579,13 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       assignment is made on the command line.  Global values may be set
       and reset using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands.
 
-      The DEVICE parameter also has a global association. This is not
-      controlled by the usual CCDPACK mechanisms, instead it works in
-      co-operation with \xref{KAPPA (SUN/95)}{sun95}{} image display/control routines.
+      Some of the parameters (MAXCANV, PERCENTILES, WINX, WINY, ZOOM)
+      give initial values for quantities which can be modified while
+      the program is running.  Although these may be specified on the
+      command line, it is normally easier to start the program up and
+      modify them using the graphical user interface.  If the program
+      exits normally, their values at the end of the run will be used
+      as defaults next time the program starts up.
    }
 }
 
@@ -9727,7 +9810,7 @@ EXTENT.MAXX \> TRIMSEC<X2>
       \end{myquote}
       would set the extents from the first two fields of a suitably 
       formatted TRIMSEC header.
- 
+
       Fields in the table may be separated by commas if desired, any
       amount of white space and tabs are also allowed. Comments may be
       placed anywhere and should start with the characters \qt{\#} or \qt{!}.
@@ -11624,67 +11707,90 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
    }
 }
 \sstroutine{PAIRNDF} {
-   Displays and manipulates image pairs to allow easy registration
+   Aligns NDFs graphically by drag and drop.
 } {
    \sstdescription{
       This routine accepts a list of images which may be aligned using
-      simple offsets. In a first interactive section pairs of images
-      may be selected from a palette of images (which are drawn down
-      the side of the display). Passing on to a second section the
-      chosen pair of images may then be manipulated by selecting a
-      reference position on one and then indicating where the
-      corresponding position on the second is. The reference image is
-      then moved and overlaid on the second. In any overlap regions the
-      image display values are averaged. If the pair of images are
-      overlaid (registering them) then a third section may be entered
-      in which the cursor can be used to pick out the positions of
-      image features in the overlap region. The image features are then
-      centroided to get accurate positions.
-
-      You are required to choose all the pairings required to
-      completely register all frames (the routine will not exit
-      until enough images have been paired to allow this, and a policy
-      to ensure completeness is enforced by insisting that each pair,
-      except for the first, contains one previously paired image).
-      When this is complete a global merger of the all the positions
+      simple offsets in their Current coordinate frames.
+      By making use of a graphical user interface you
+      can indicate how pairs of images are aligned with respect
+      to each other, and mark image features to allow accurate
+      alignments.  Once enough pairings have been specified to register
+      all frames completely a global merger of all the positions
       for each image takes place. This results in the output of one list
       of uniquely labelled positions for each image. These position lists
       can then be used in a routine such as \xroutine{REGISTER} to produce the
       actual transformation between the images.
+
+      The graphical interface consists of two parts: a chooser which
+      allows you to inspect pairs of images to see whether they are 
+      able to be paired, and an aligner which allows you to move 
+      a pair of images around so that they are registered, and to
+      mark points in the overlapping region where the same centroidable 
+      features exist in both images.
+
+      Operation is as follows.  You must first use the chooser window
+      to select a pair of images which have a region in common.
+      Use the tabs at either side of the screen to pick the image to
+      appear on that side.  You can use the `Show FITS' button to
+      select one or more FITS headers to be displayed alongside
+      each image if this will make it easier to identify which is which.
+      You can use the `Display cutoff' menu to select the percentiles
+      controlling the brightness of each pixel; alignment is easier if
+      the same features are of a similar brightness in different images.
+      The images are displayed resampled into their Current attached 
+      coordinate system; you can only align them using this program if 
+      a simple offset (translation) maps one onto another in these 
+      coordinates (or very nearly does so).  If that is not the case,
+      you will have to set their Current coordinate system 
+      to a different value (see \xroutine{WCSEDIT}) or align them using a 
+      different method.  The whole of each image will be displayed in
+      the chooser window, and you can resize it in the usual way to 
+      make the images appear bigger or smaller.  Select a pair with 
+      an overlapping region which you wish to align, and click the 
+      `Use this pair' button.  The aligner window will then appear, 
+      displaying the two images which you have selected.
+
+      In the aligner window you can drag either of these images around
+      the display region by holding down mouse button 1 (usually the 
+      left one) as you move the mouse; the easiest way to align the pair 
+      is to `pick up' one image by an identifiable feature and `drop' it
+      on the same feature in the other image.  Where the images overlap
+      their pixels will be averaged.  If they are not correctly 
+      positioned, you can move them again.  Once you are happy that
+      they are aligned about right, then click in the overlap region
+      to mark features which appear in both images -- these will be
+      centroided to get an accurate alignment.  During this
+      part you mark points by clicking with mouse button 1 (usually
+      the left one) and you can remove them by clicking with button 3
+      (usually the right one).  The window can be resized, the 
+      magnification can be changed using the `Zoom' control, and the 
+      display region scrolled using the scrollbars.  When you have aligned 
+      the images and marked shared features, or if you decide that
+      the pair cannot be satisfactorily registered, click the `Done' 
+      button.  
+
+      You will then be returned to the chooser window to select another
+      pair and repeat the process.  After the first time however, 
+      you will only be allowed to select a pair of images to align
+      if at least one of them has already been aligned already.  Those
+      which have already been done are marked with a `+' sign on their
+      selection tabs.
+
+      Once you have made enough pairings to register the whole set, the
+      graphical windows will disappear and the program will complete
+      the global matching up of positions without any further user 
+      interaction.
    }
    \sstusage{
-      pairndf in outlist device percentiles
+      pairndf in outlist percentiles
    }
    \sstparameters{
-      \sstsubsection{
-         DEVICE = DEVICE (Read)
-      } {
-         The name of the image display device.
-         [Current image display device]
-      }
-      \sstsubsection{
-         FILLFRAC = \_DOUBLE (Read)
-      } {
-         The largest fraction of the display area which the images
-         displayed in the scratch region (the part where they can be
-         manipulated) may take. A value will always be in the
-         range 0.05 to 0.95.
-         [0.55]
-      }
       \sstsubsection{
          IN = LITERAL (Read)
       } {
          A list of image names whose data are to be transformed. The image
          names should be separated by commas and may include wildcards.
-      }
-      \sstsubsection{
-         KEEPLUT = \_LOGICAL (Read)
-      } {
-         Whether to retain the current device look-up-table. If FALSE
-         then a greyscale look-up-table is loaded. \routine{PAIRNDF} loads the
-         primary colours into the first few pens regardless of the
-         value of this parameter.
-         [TRUE]
       }
       \sstsubsection{
          LOGFILE = FILENAME (Read)
@@ -11728,28 +11834,20 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          [BOTH]
       }
       \sstsubsection{
-         MAKEBIG = \_LOGICAL (Read)
+         MAXCANV = \_INTEGER (Read and Write)
       } {
-         If TRUE then images will be scaled to fit into the whole of
-         the FILLFRAC area. If FALSE then scaling will never exceed
-         one device pixel per image pixel. This latter option decreases
-         the time needed to process images from the display palette
-         into the scratch region.
-         [TRUE]
-      }
-      \sstsubsection{
-         MEMORY = \_INTEGER (Read)
-      } {
-         The memory of the device which is to be used. This can take
-         the values 0 and 1. 0 means the base memory and 1 the overlay.
-         [0]
-      }
-      \sstsubsection{
-         MSIZE = \_REAL (Read)
-      } {
-         Determines the size of the position marker. This is set as a
-         fraction of the X dimension of the display.
-         [0.03]
+         A value in pixels for the maximum initial X or Y dimension of 
+         the region in which the image is displayed.  Note this is the      
+         scrolled region, and may be much bigger than the sizes given
+         by WINX and WINY, which limit the size of the window on the
+         X display.  It can be overridden during operation by zooming
+         in and out using the GUI controls, but it is intended to
+         limit the size for the case when ZOOM is large (perhaps
+         because the last image was quite small) and a large image
+         is going to be displayed, which otherwise might lead to
+         the program attempting to display an enormous viewing region.
+         If set to zero, then no limit is in effect.
+         [1280]
       }
       \sstsubsection{
          NAMELIST = LITERAL (Read)
@@ -11770,7 +11868,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          list of names for the output position lists.
 
          These may be specified as list of comma separated names,
-         using indirection if required, OR, as a single modification
+         using indirection if required, {\em or\/} as a single modification
          element (of the input names). The simplest modification
          element is the asterisk \qt{$*$} which means call each of the
          output lists the same name as the corresponding input images.
@@ -11801,143 +11899,97 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          [$*$.DAT]
       }
       \sstsubsection{
-         PALFRAC = \_DOUBLE (Read)
-      } {
-         The fraction of display X-dimension which is reserved for the
-         image palette. A value will always be in the range
-         0.05 to 0.95.
-         [0.25]
-      }
-      \sstsubsection{
          PERCENTILES( 2 ) = \_DOUBLE (Read)
       } {
-         The percentile data range to use as limits when displaying the
-         images. Must be in the range 0 to 100. Using percentiles as
-         display limits automatically adjusts the data ranges of the
-         images to show similar information levels. This helps when
-         combining the data using a mean as a crude normalisation has
-         been performed.
+         The default low and high percentiles of the data range to use
+         when displaying the images; any pixels with a value lower than 
+         the first value will have the same colour, and any with a
+         value higher than the second will have the same colour.  This
+         parameter gives the default value -- the percentile settings
+         can be set for each image individually from within the GUI
+         to accommodate the situation where images have different 
+         brightnesses.  Must be in the range 0 $<=$ PERCENTILES( 1 ) 
+         $<=$ PERCENTILES( 2 ) $<=$ 100.
          [2,98]
       }
       \sstsubsection{
-         THICK = \_INTEGER (Read)
+         PREVX = \_INTEGER (Read and Write)
       } {
-         The thickness of the position marker in device pixels.
-         [3]
+         The initial width in pixels of the preview display for each image;
+         two images will be displayed side by side at any one time at
+         this size in the chooser window.  This can be effectively changed
+         by resizing the entire chooser window in the normal way using
+         the window manager while the program is running.
+         [350]
+      }
+      \sstsubsection{
+         PREVY = \_INTEGER (Read and Write)
+      } {
+         The initial height in pixels of the preview display for each image;
+         two images will be displayed side by side at any one time at
+         this size in the chooser window.  This can be effectively changed
+         by resizing the entire chooser window in the normal way using
+         the window manager while the program is running.
+         [350]
+      }
+      \sstsubsection{
+         WINX = \_INTEGER (Read and Write)
+      } {
+         The initial width in pixels of the aligner window, which contains
+         a space for dragging around a pair of images and associated
+         controls.  If the region required for the images is larger 
+         than the area allocated for display, it can be scrolled 
+         around within the window.  The window can be resized in the 
+         normal way using the window manager while the program is running.
+         [800]
+      }
+      \sstsubsection{
+         WINY = \_INTEGER (Read and Write)
+      } {
+         The initial height in pixels of the aligner window, which contains
+         space for dragging around a pair of images and associated
+         controls.  If the region required for the images is larger 
+         than the area allocated for display, it can be scrolled 
+         around within the window.  The window can be resized in the 
+         normal way using the window manager while the program is running.
+         [400]
+      }
+      \sstsubsection{
+         ZOOM = \_DOUBLE (Read and Write)
+      } {
+         A factor giving the initial level to zoom in to the images
+         displayed in the aligner window, that is the number of 
+         screen pixels to use for one
+         image pixel.  It will be rounded to one of the values
+         \ldots 3, 2, 1, 1/2, 1/3 \ldots  The zoom can be changed
+         interactively from within the program.  The initial value
+         may be limited by MAXCANV.
+         [1]
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         pairndf \qs{$*$}  \qs{$*$.dat} xw \qs{[1,99]}
+         pairndf * *.dat [1,99]
       } {
-        In this routine the positional nature of the parameters is
-        shown. All the images in the current directory are displayed.
-        Their output position lists have the same name as the images
-        except that they have a file type of .dat. The images are
-        displayed using the percentile limits 1,99 which shows bright
-        detail well.
+         This example shows the positional nature of the parameters.
+         All the images in the current directory are presented for 
+         alignment.  Their output position lists have the same name 
+         as the images except that they have a file extension of .dat.
+         The default image display cutoff is between the 1st and 99th
+         percentile, which shows bright detail well.
       }
       \sstexamplesubsection{
-         pairndf msize=0.1 thick=7
+         pairndf in={\tt "}data1,data2{\tt "} outlist={\tt "}d1-pos,d2-pos{\tt "} zoom=2 maxcanv=0
       } {
-         In this example the cross which is used to identify the
-         image features is made very large and thick.
-      }
-      \sstexamplesubsection{
-         pairndf fillfrac=0.75 keeplut palfrac=0.15
-      } {
-         The parameters used in this example will make the images
-         displayed in the scratch region larger than the default. This
-         can be useful when the images have a long and a short side as
-         a scale factor is chosen which maps one of the image sides to
-         the scratch side exactly so images can be scaled and still be
-         all visible. KEEPLUT keeps the look-up-table loaded in the
-         current device (say a colour one). Reducing PALFRAC to 0.15
-         makes the scratch display surface larger but has the
-         disadvantage that the images in the palette are small (perhaps
-         too small to identify image features, but this needn't be a
-         problem as images may be drawn into the scratch region - for
-         inspection side-by-side - during the pair selection phase).
+         Only the two images data1 and data2 will be aligned, and the 
+         corresponding sets of positions will be written to the
+         files d1-pos and d2-pos.  The images will initially be 
+         displayed for alignment at a magnification of two screen 
+         pixels to each data pixel, even if that results in a very 
+         large display area.
       }
    }
    \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         Interactive sections.
-
-      }
-        There are three distinct sections in \routine{PAIRNDF}. In the first
-        section a pair of images should be chosen from the palette.
-        Choosing an image is performed by simply placing the cursor on
-        the image and pressing the left-hand button. to select an image
-        for display on the left and the right button to display an
-        image on the right. Two images must be chosen before a
-        progression to the next section is allowed.  When an image is
-        chosen it is rescaled and displayed in the scratch region.
-        During the first pass any two images may be chosen,
-        subsequently at least one image which has already been chosen
-        (and successfully processed) must be used (you may of course
-        select two processed images if you like). This ensures that
-        the final registration is complete. Images which have been
-        processed are probably outlined in green. You are not
-        restricted to the first pair of images chosen - just keep
-        pointing at images you want to expand into the scratch region
-        until you have a pair with image features in common.
-
-        After selecting the pair of images you want to register you
-        must pass on to a second stage, this is entered by pressing the
-        right-hand button, the title \qt{Align the images} will then
-        appear. These two images may now be moved. This is achieved by
-        first selecting a reference point on one of the images (say a
-        star which is clearly visible on both images) then moving the
-        cursor onto it and pressing the left-hand button (accuracy is
-        not critical as positions will be centroided later, but if
-        you're using X-windows -- see the next section -- then zooming
-        in on a feature allows very accurate placements). Next move the
-        cursor to the corresponding image feature on the second image
-        and press the centre button. The routine will now move the
-        reference image onto the new position. In areas where the
-        images overlap a mean is taken.
-
-        The final interactive section is used to select the positions of
-        image features in the overlap regions. These are selected by
-        moving the cursor onto them and pressing the left-hand button.
-        When you have selected as many image features as you require
-        pressing the right-hand button exits this section. The features
-        (on both images) are then centroided. If enough information has
-        now been given to register all the frames then the routine
-        passes out of the interaction session and determines the
-        registration.
-
-      \sstitemlist{
-
-         \sstitem
-         X windows display.
-
-      }
-       Using keyboard I and O keys it is possible to zoom-in and
-       zoom-out. The arrow keys allow the memory to be scrolled,
-       pressing the shift key at the same time increases the rate of
-       scroll. The C key performs a quick re-centre, cancelling any
-       zoom and scroll. The Q key aborts the routine.
-
-      \sstitemlist{
-
-         \sstitem
-         Display restrictions.
-
-      }
-
-         PAIRNDF will only work on PseudoColor X displays; this means
-         that it cannot be used on the displays of most newer Linux
-         machines as normally configured.  If an attempt is made to
-         do so, then the warning:
-\begin{quote}
-            !! Window has unsupported visual type
-\end{quote}
-         will be emitted; attempting to proceed may result in a core
-         dump.
 
       \sstitemlist{
 
@@ -11977,6 +12029,9 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
         considered as the same point. Comments may be included in the
         file using the characters \# and !. Columns may be separated by
         the use of commas or spaces.
+
+        In all cases, the coordinates in position lists are pixel
+        coordinates.
    }
    \sstdiytopic{
       Behaviour of parameters
@@ -11996,9 +12051,13 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       assignment is made on the command line.  Global values may be set
       and reset using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands.
 
-      The DEVICE parameter also has a global association. This is not
-      controlled by the usual CCDPACK mechanisms, instead it works in
-      co-operation with \xref{KAPPA (SUN/95)}{sun95}{} image display/control routines.
+      Some of the parameters (MAXCANV, PERCENTILES, PREVX, PREVY, WINX,
+      WINY)  give initial values for quantities which can be modified 
+      while the program is running.  Although these may be specified on
+      the command line, it is normally easier to start the program up and
+      modify them using the graphical user interface.  If the program
+      exits normally, their values at the end of the run will be used
+      as defaults next time the program starts up.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -12017,6 +12076,9 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       Before this application can be run an image (or other graphical
       output such as a contour image) must have been displayed using a
       suitable routine such as KAPPA \xref{DISPLAY}{sun95}{DISPLAY} (SUN/95).
+
+      For a more interactive display of markers on an Xwindows display,
+      you can use the \xroutine{IDICURS} program instead.
    }
    \sstusage{
       plotlist inlist [device]
@@ -13417,7 +13479,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
         .MORE.CCDPACK structure of the input NDFs will be located
         and assumed to contain the names of the lists whose positions
         are to be used for registration.
- 
+
         On exit, a new coordinate frame with a Domain as given by the
         OUTDOMAIN parameter will be inserted in the WCS component of 
         the input NDFs.  Taken together these contain the registration
@@ -16050,7 +16112,7 @@ This is a major update to CCDPACK.
   the CORRECT parameters in \xroutine{MAKEMOS} and \xroutine{DRIZZLE} 
   correspondingly modified.
 
-\subsection{This release 3.1-0}
+\subsection{Release 3.1-0}
 
   This is a minor update of CCDPACK, and incorporates the following changes:
 \begin{itemize}
@@ -16070,7 +16132,7 @@ This is a major update to CCDPACK.
   deal better with images containing a few rogue pixels with far 
   outlying values.
 \item
-  The IMPORT task has been improved so that it can use hierarchical
+  The \xroutine{IMPORT} task has been improved so that it can use hierarchical
   FITS header keywords, and values in FITS headers of the form 
   '[X1:X2,Y1:Y2]'.
 \item
@@ -16089,6 +16151,36 @@ This is a major update to CCDPACK.
   for use with the IMPORT task.
 \end{itemize}
 
+\subsection{This release 3.2-0}
+
+  This is a minor update of CCDPACK, but provides greatly
+  improved facilities for interactive registration:
+
+  \begin{itemize}
+  \item
+     The following programs have been completely rewritten:
+     \begin{itemize}
+     \item \xroutine{IDICURS} -- View and edit position lists
+     \item \xroutine{PAIRNDF}  -- 
+           Align imagess graphically by drag and drop
+     \item \xroutine{CCDALIGN} -- 
+           Align images graphically by interactive object selection
+     \end{itemize}
+
+     These programs should now work on all X displays, including those
+     which do not offer a PseudoColor visual (e.g. typical newer Linux
+     displays).  In addition, they provide a much more intuitive and
+     easier to use graphical interface than in their previous
+     incarnations.
+  \end{itemize}
+
+  The following minor changes have also been made since v3.1-0:
+  \begin{itemize}
+  \item
+     There have been some improvements and bug fixes to the percentile
+     location routine used by FINDOBJ.
+  \end{itemize}
+
 
 \begin{latexonly}
 
@@ -16100,8 +16192,7 @@ This is a major update to CCDPACK.
 % set up a mini table of contents for the back pages of document.
 %
 
-\quickdes{IDICURS}{Reads co-ordinates from an X display (allows
-                   zooming and panning).}{IDICURS}
+\quickdes{IDICURS}{Views and writes position lists interactively.}{IDICURS}
 
 \quickdes{IMPORT}{Imports FITS information into CCDPACK extensions.}{IMPORT}
 
@@ -16116,9 +16207,7 @@ This is a major update to CCDPACK.
 \quickdes{MAKEMOS}{Makes image mosaics by combining and (optionally) normalising.}
                   {MAKEMOS}
 
-\quickdes{PAIRNDF}{Displays and manipulates image pairs to allow easy
-                   registration (offsets only).}
-                  {PAIRNDF}
+\quickdes{PAIRNDF}{Aligns images graphically by drag and drop}{PAIRNDF}
 
 \quickdes{PLOTLIST}{Draws position markers on a graphics display.}
                    {PLOTLIST}
@@ -16157,7 +16246,7 @@ This is a major update to CCDPACK.
 
 \quickdes{CALCOR}{Performs dark or flash count corrections.}{CALCOR}
 
-\quickdes{CCDALIGN}{Determines general inter-image transformations.}
+\quickdes{CCDALIGN}{Aligns images graphically by interactive object selection.}
          {CCDALIGN}
 
 \quickdes{CCDCLEAR}{Clears global parameters.}

@@ -1,6 +1,6 @@
 .help ccdalign Starlink ccdpack
 .nf
-Interactive procedure to aid the alignment of images.
+Aligns images graphically by interactive object selection.
 
 Usage:
 
@@ -8,7 +8,7 @@ Usage:
 
 Description:
 
-   This procedure aids the registration of images which are not
+   This program aids the registration of images which are not
    related by simple offsets (see FINDOFF and PAIRNDF if they are).
    It also has the capability of dealing with groups of images which
    are almost registered (frames which have not been moved on the
@@ -17,15 +17,11 @@ Description:
    The basic method used is to access groups of images (or a series
    of single images if all are moved between exposures) and an
    optional reference image. The first image of the first group or the
-   reference image is then displayed and a cursor application is used
-   to record the positions of centroidable image features. The
-   first images of all the other groups are then displayed and you
-   are invited to identify the image features in the order which
-   corresponds to that used for the reference image. Missing image
-   features are identified as off the currently displayed image (so
-   the centroid routine will fail to find them). The reference set
-   of image features may be extended by identification after the
-   last reference feature has been marked.
+   reference image is initially displayed and you are invited to mark
+   the positions of centroidable image features on it using a 
+   graphical interface.  This window then remains on the screen for 
+   reference while you identify the same features on each of the 
+   other sets of images in the same way.
 
    After centroiding you are then given the option to stop. If
    you decide to then you will have labelled position lists to use
@@ -35,13 +31,30 @@ Description:
    be performed for "linear" transformations.
 
    After choosing a transformation type the procedure will then go on
-   to calculate a transformation set between all the images, this is
-   then used (with the extended reference set from REGISTER) to
-   approximate the position of all possible image features, these are
-   then located by centroiding and a final registration of all images
-   is performed. The resultant images then have associated lists of
-   labelled positions and TRANSFORM structures which may be used to
-   transform other position lists or when resampling the data.
+   to calculate a transformation set between all the image; this is
+   used (with the extended reference set from REGISTER) to
+   approximate the position of all possible image features, which are
+   then located by centroiding and a final registration of all image
+   is performed.  The resultant image then have associated lists of
+   labelled positions and attached coordinate systems which may be
+   used to transform other position lists or when resampling the data.
+
+   The graphical interface used for marking features on the image
+   should be fairly self-explanatory.  The image can be scrolled using
+   the scrollbars, the window can be resized, and there are controls
+   for zooming the image in or out, changing the style of display and 
+   altering the percentile cutoff limits.  The numbers of any 
+   identified features on each image must match those of the 
+   reference image (though it is not necessary to identify all of 
+   the features from the reference image on each one), and there is 
+   also a control for selecting the number of the next point to mark.
+   Points are added by clicking mouse button 1 (usually the left one) 
+   and may be removed by clicking mouse button 3 (usually the right 
+   one).  It is possible to edit the points marked on the reference
+   image while you are marking points on the other images.  When 
+   you have selected all the points you wish to on a given image, 
+   click the 'Done' button and you will be presented with the next
+   one.
 
 Parameters
 
@@ -54,6 +67,8 @@ NONE
 Authors
 
 PDRAPER: Peter Draper (STARLINK)
+
+MBT: Mark Taylor (STARLINK)
 
 History
 

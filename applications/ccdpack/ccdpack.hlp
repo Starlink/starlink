@@ -88,7 +88,7 @@
 
      CALCOR: Performs dark or flash count corrections.
 
-     CCDALIGN: Determines general inter-image transformations.
+     CCDALIGN: Aligns images graphically by interactive object selection.
 
      CCDCLEAR: Clears global parameters.
 
@@ -121,8 +121,7 @@
 
      FLATCOR: Performs the flatfield correction on a list of images.
 
-     IDICURS: Reads co-ordinates from an X display (allows zooming
-              and panning).
+     IDICURS: Views and writes position lists interactively.
 
      IMPORT: Imports FITS information into CCDPACK extensions.
 
@@ -134,8 +133,7 @@
 
      MAKEMOS: Makes image mosaics by combining and (optionally) normalising.
 
-     PAIRNDF: Displays and manipulates image pairs to allow easy registration
-              (offsets only).
+     PAIRNDF: Aligns images graphically by drag and drop.
 
      PLOTLIST: Draws position markers on a graphics display.
 
@@ -769,8 +767,7 @@ MBT: Mark Taylor (STARLINK)
  05-MAR-1999 (MBT):
     Original version.
 1 CALCOR
-Subtracts a scaled dark or flash calibration image from a series of
-images.
+Subtracts a scaled dark or flash calibration image from a series of images.
 
 Usage:
 
@@ -1032,7 +1029,7 @@ PDRAPER: Peter Draper (STARLINK)
    - Supports processing of all non-complex numeric types.
      BAD pixels are processed as are all NDF components.
 1 CCDALIGN
-Interactive procedure to aid the alignment of images.
+Aligns images graphically by interactive object selection.
 
 Usage:
 
@@ -1040,7 +1037,7 @@ Usage:
 
 Description:
 
-   This procedure aids the registration of images which are not
+   This program aids the registration of images which are not
    related by simple offsets (see FINDOFF and PAIRNDF if they are).
    It also has the capability of dealing with groups of images which
    are almost registered (frames which have not been moved on the
@@ -1049,15 +1046,11 @@ Description:
    The basic method used is to access groups of images (or a series
    of single images if all are moved between exposures) and an
    optional reference image. The first image of the first group or the
-   reference image is then displayed and a cursor application is used
-   to record the positions of centroidable image features. The
-   first images of all the other groups are then displayed and you
-   are invited to identify the image features in the order which
-   corresponds to that used for the reference image. Missing image
-   features are identified as off the currently displayed image (so
-   the centroid routine will fail to find them). The reference set
-   of image features may be extended by identification after the
-   last reference feature has been marked.
+   reference image is initially displayed and you are invited to mark
+   the positions of centroidable image features on it using a 
+   graphical interface.  This window then remains on the screen for 
+   reference while you identify the same features on each of the 
+   other sets of images in the same way.
 
    After centroiding you are then given the option to stop. If
    you decide to then you will have labelled position lists to use
@@ -1067,26 +1060,38 @@ Description:
    be performed for "linear" transformations.
 
    After choosing a transformation type the procedure will then go on
-   to calculate a transformation set between all the images, this is
-   then used (with the extended reference set from REGISTER) to
-   approximate the position of all possible image features, these are
+   to calculate a transformation set between all the images; this is
+   used (with the extended reference set from REGISTER) to
+   approximate the position of all possible image features, which are
    then located by centroiding and a final registration of all images
-   is performed. The resultant images then have associated lists of
-   labelled positions and TRANSFORM structures which may be used to
-   transform other position lists or when resampling the data.
+   is performed.  The resultant images then have associated lists of
+   labelled positions and attached coordinate systems which may be
+   used to transform other position lists or when resampling the data.
+
+   The graphical interface used for marking features on the image
+   should be fairly self-explanatory.  The image can be scrolled using
+   the scrollbars, the window can be resized, and there are controls
+   for zooming the image in or out, changing the style of display and 
+   altering the percentile cutoff limits.  The numbers of any 
+   identified features on each image must match those of the 
+   reference image (though it is not necessary to identify all of 
+   the features from the reference image on each one), and there is 
+   also a control for selecting the number of the next point to mark.
+   Points are added by clicking mouse button 1 (usually the left one) 
+   and may be removed by clicking mouse button 3 (usually the right 
+   one).  It is possible to edit the points marked on the reference
+   image while you are marking points on the other images.  When 
+   you have selected all the points you wish to on a given image, 
+   click the 'Done' button and you will be presented with the next
+   one.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 NONE
 NONE
-2 Notes
-- Display restrictions.
-
-  IDICURS will only work on PseudoColor X displays; this means
-  that it cannot be used on the displays of most newer Linux
-  machines as normally configured.  Attempting to do so may cause
-  a core dump.
 2 Authors
 PDRAPER: Peter Draper (STARLINK)
+
+MBT: Mark Taylor (STARLINK)
 2 History
  10-JUN-1993 (PDRAPER):
     Original version.
@@ -1651,8 +1656,7 @@ PDRAPER: Peter Draper (STARLINK - Durham University)
  19-JUL-1995 (PDRAPER):
     Removed AIF calls.
 1 CCDFORK
-   Creates a script for executing CCDPACK commands in a background
-   process.
+   Creates a script for executing CCDPACK commands in a background process.
 
 Usage:
 
@@ -2276,8 +2280,7 @@ PDRAPER: Peter Draper (STARLINK)
  28-JAN-1994 (PDRAPER):
     Added saturation extensions.
 1 DEBIAS
-Performs the debiassing and initial preparation of CCD
-data.
+Performs the debiassing and initial preparation of CCD data.
 
 Usage:
 
@@ -3850,8 +3853,7 @@ PDRAPER: Peter Draper (STARLINK)
      of an NDF data structure. Bad pixels and all non-complex numeric
      data types can be handled.
 1 FINDOFF
-Performs pattern-matching between position lists related by
-simple offsets.
+Performs pattern-matching between position lists related by simple offsets.
 
 Usage:
 
@@ -4501,59 +4503,59 @@ PDRAPER: Peter Draper (STARLINK)
    - Supports processing of all non-complex numeric types.
      BAD pixels are processed as are all NDF components.
 1 IDICURS
-Reads coordinates from an X display device.
+Views and writes position lists interactively.
 
 Usage:
 
-   idicurs outlist device
+   idicurs in outlist
 
 Description:
 
-   This routine reports and records positions selected from an
-   X display device. Before using this routine an image must
-   have been displayed using a routine such as KAPPA DISPLAY (SUN/95).
-   IDICURS allows displayed images and graphics to be zoomed
-   and scrolled during the location operation.
+   This program displays an image on the screen and provides a 
+   graphical user interface for marking points on it, which are then
+   written out to a file as a position list.
+
+   The graphical interface used for marking features on the image
+   should be fairly self-explanatory.  The image can be scrolled
+   using the scrollbars, the window can be resized, and there are 
+   controls for zooming the image in or out, changing the style of 
+   display, and altering the percentile cutoff limits which control
+   the mapping of pixel value to displayed colour.  The position 
+   of the cursor is reported below the display using the coordinates 
+   of the selected coordinate frame for information, but the position 
+   list written out is always written in Pixel coordinates, since 
+   that is how all CCDPACK applications expect to find it written.
+   Points are marked on the image by clicking mouse button 1 
+   (usually the left one) and may be removed using mouse button 3
+   (usually the right one).  When you have marked all the points
+   that you wish to, click the 'Done' button.
+
+   Optionally (if the READLIST parameter is set true), a list of 
+   points may be read at the start of the program; these will be 
+   marked on the image as an initial set which may be added to or
+   removed as if marked by the user in the first place.
 2 Parameters
 For information on individual parameters, select from the list below:
-3 ARROWS
-ARROWS = _LOGICAL (Read)
-   Only used if SCROLL is TRUE. This parameter defines whether or
-   not the keyboard arrows are used to control the display scroll.
-   Using the keyboard increases the accuracy of positioning but is
-   slower. Pressing Shift-Arrow-Key increases the rate of scroll.
-   [FALSE]
-3 COLOUR
-COLOUR = _INTEGER (Read)
-   The colour of the position marker. This may take any value in
-   the range 0-4.
-   [4]
-3 DEVICE
-DEVICE = DEVICE (Read)
-   The name of the image display device.
-   [Current-image display device]
 3 IN
 IN = LITERAL (Read)
-   The names of a list of images which are to be "associated" with
-   the output position list. Associating a list with an image means
-   that the item "CURRENT_LIST" in its CCDPACK extension will be
-   set to the name of the list. In future applications the image
-   name may then be used instead of the list name (any derived
-   lists will then be associated with the image instead), this is
-   the usual method in CCDPACK.
-
-   The names of the images may be given as "!" in which case none
-   will be associated, otherwise the image names should be as a list
-   separated by commas and may include wildcards.
-   [!]
-3 KEEPLUT
-KEEPLUT = _LOGICAL (Read)
-   If TRUE then the Look-Up-Table of the current device will be
-   used "as is". Otherwise a greyscale will be loaded. The
-   visibility of the cursor when using X windows and with
-   scrolling enabled is often a problem. To help with this the
-   primary colours are loaded into the first fews pens.
-   [TRUE]
+   Gives the name of the image to display and get coordinates from.
+   If multiple images are specified using wildcards or separating 
+   their names with commas, the program will run on each one in
+   turn.
+3 INEXT
+INEXT = _LOGICAL (Read)
+   If the READLIST parameter is set true, then this parameter 
+   determines where the input position list comes from.  If set
+   true, then the position list currently associated with the
+   image will be used.  If set false, then the input position list
+   names will be obtained from the INLIST parameter.
+   [FALSE]
+3 INLIST
+INLIST = FILENAME (Read)
+   If the READLIST parameter is set true, and the INEXT parameter
+   is set false, then this parameter gives the name of the file
+   in which the input position list is stored.  This parameter
+   may use modifications of the input image name.
 3 LOGFILE
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
@@ -4585,100 +4587,147 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
-3 MEMORY
-MEMORY = _INTEGER (Read)
-   The memory of the device which is to be used. This can take
-   the values 0 and 1. 0 means the base memory and 1 the overlay.
-   [0]
-3 MSIZE
-MSIZE = _REAL (Read)
-   Determines the size of the position marker. This is set as a
-   fraction of the X dimension of the display.
-   [0.03]
+3 MAXCANV
+MAXCANV = _INTEGER (Read and Write)
+   A value in pixels for the maximum initial X or Y dimension of
+   the region in which the image is displayed.  Note this is the 
+   scrolled region, and may be much bigger than the sizes given
+   by WINX and WINY, which limit the size of the window on the
+   X display.  It can be overridden during operation by zooming
+   in and out using the GUI controls, but it is intended to 
+   limit the size for the case when ZOOM is large (perhaps
+   because the last image was quite small) and a large image
+   is going to be displayed, which otherwise might lead to 
+   the program attempting to display an enormous viewing region.
+   If set to zero, then no limit is in effect.
+   [1280]
+3 READLIST
+READLIST = _LOGICAL (Read)
+   If set true, then the program will start up with a set of points
+   displayed, read from the list specified by the INLIST parameter.
+   If set false, the program will start up with no points initially
+   plotted.
+   [FALSE]
 3 OUTLIST
 OUTLIST = FILENAME (Write)
    The name of the file which is to contain the selected
-   positions. The positions are written using the
-   standard format in CCDPACK which is described in the notes
-   section.
-   [IDICURS.LIS]
-3 SCROLL
-SCROLL = _LOGICAL (Read)
-   If TRUE then scrolling of the image display is enabled. This
-   may be very slow on devices with poor graphics facilities
-   and/or slow processors so is normally disabled.
+   positions.  If the program exits normally the positions will
+   be written to this file using the standard CCDPACK format,
+   as described in the Notes section, and the list file will 
+   become associated with the input image.  The value of this 
+   parameter may use modifications of the input image name.
+   If set null (!), no output file will be written.  This
+   parameter is allowed to take the same value as INLIST, in
+   which case the list will be overwritten.
+   [*.lis]
+3 PERCENTILES
+PERCENTILES( 2 ) = _DOUBLE (Read and Write)
+   The initial values for the low and high percentiles of the data 
+   range to use when displaying the images; any pixels with a value
+   lower than the first value will have the same colour, and any 
+   with a value higher than the second will have the same colour.
+   Must be in the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) 
+   <= 100.  These values can be changed interactively while the
+   program runs.
+   [2,98]
+3 SHOWIND
+SHOWIND = _LOGICAL (Read)
+   If true, then the index numbers will be displayed on the image
+   for each point marked, and it will be possible to choose 
+   the index number for each point.  If false, points will not
+   be numbered on the display, and will be written to the 
+   position list in (roughly) the order in which they are entered.
    [FALSE]
-3 THICK
-THICK = _INTEGER (Read)
-   The thickness of the position marker in device pixels.
+3 WINX
+WINX = _INTEGER (Read and Write)
+   The width in pixels of the window to display the image and
+   associated controls in.  If the image is larger than the area
+   allocated for display, it can be scrolled around within the 
+   window.  The window can be resized in the normal way using 
+   the window manager while the program is running.
+   [450]
+3 WINY
+WINY = _INTEGER (Read and Write)
+   The height in pixels of the window to display the image and
+   associated controls in.  If the image is larger than the area
+   allocated for display, it can be scrolled around within the
+   window.  The window can be resized in the normal way using
+   the window manager while the program is running.
+   [600]
+3 ZOOM
+ZOOM = _INTEGER (Read and Write)
+   A factor giving the initial level to zoom in to the image 
+   displayed, that is the number of screen pixels to use for one
+   image pixel.  It will be rounded to one of the values 
+   ... 3, 2, 1, 1/2, 1/3 ....  The zoom can be changed 
+   interactively from within the program.  The initial value 
+   may be limited by MAXCANV.
    [1]
 2 Examples
-idicurs stars.pos
-   In this example IDICURS writes the output positions to the
-   formatted file stars.pos.
+idicurs mosaic mos.lis
+   This starts up the graphical user interface, allowing you to 
+   select a number of points which will be written to the 
+   position list file 'mos.lis', which will be associated with
+   the image file.
 
-idicurs device=xw outlist=objects.dat memory=1
-   In this example the overlay plane of an xwindows display
-   can be manipulated and coordinates are read. The overlay
-   could contain a contour map as produced by KAPPA TURBOCONT.
+idicurs in=* out=*.pts percentiles=[10,90]
+   Each of the images in the current directory will be displayed, 
+   and the positions marked on it written to a list with the same
+   name as the image but the extension '.pts', which will be 
+   associated with the image in question.  The display will
+   initially be scaled so that pixels with a value higher than
+   the 90th percentile will all be displayed as the brightest
+   colour and those with a value lower than the 10th percentile
+   as the dimmest colour, but this may be changed interactively
+   while the program is running.
 
-idicurs outlist=group_positions in='*'
-   In this example an output position list group_positions is
-   associated with all the images in the current directory. This
-   method could be useful if all the images are not moved
-   significantly with respect to one another. This one list then
-   supplies initial positions for objects in all these images (using
-   the centroid routine FINDCENT would then give each image an
-   accurate position list from these initial positions).
-
-idicurs scroll arrows
-   In this example scrolling via the use of the keyboard arrows is
-   enabled.
+idicurs in=gc6253 showind readlist inlist=found.lis outlist=out.lis
+   The image gc6253 will be displayed, with the points stored in
+   the position list 'found.lis' already plotted on it.  These 
+   may be added to, moved and deleted, and the resulting list
+   will be written to the file out.lis.
 2 Notes
-- Output position list format.
+   - Position list formats.
 
-  CCDPACK format - Position lists in CCDPACK are formatted files
-  whose first three columns are interpreted as the following.
+     CCDPACK supports data in two formats.
 
-     - Column 1: an integer identifier
+     CCDPACK format - the first three columns are interpreted as the
+     following.
 
-     - Column 2: the X position
+        - Column 1: an integer identifier
+        - Column 2: the X position
+        - Column 3: the Y position
 
-     - Column 3: the Y position
+     The column one value must be an integer and is used to identify
+     positions which are the same but which have different locations
+     on different images. Values in any other (trailing) columns are
+     usually ignored.
 
-  The column one value must be an integer and is used to identify
-  positions which may have different locations but are to be
-  considered as the same point. Comments may be included in the
-  file using the characters # and !. Columns may be separated by
-  the use of commas or spaces.
+     EXTERNAL format - positions are specified using just an X and
+     a Y entry and no other entries.
 
-- X windows display.
+        - Column 1: the X position
+        - Column 2: the Y position
 
-  It is possible to scroll the memory using either the pointer or
-  keyboard arrows (if the keyboard arrows are chosen then holding
-  down the shift keys will accelerate the motion) parameters
-  SCROLL and ARROWS control these options. The C key performs a
-  quick re-centre, cancelling any zoom and scroll. The Q key
-  is used to exit from the routine.
+     This format is used by KAPPA applications such as CURSOR.
 
-- Display restrictions.
+     Comments may be included in a file using the characters "#" and
+     "!". Columns may be separated by the use of commas or spaces.
 
-  IDICURS will only work on PseudoColor X displays; this means
-  that it cannot be used on the displays of most newer Linux
-  machines as normally configured.  If an attempt is made to
-  do so, then the warning:
+     Input position lists read when READLIST is true may be in either
+     of these formats.  The output list named by the OUTLIST
+     parameter will be written in CCDPACK (3 column) format.
 
-     !! Window has unsupported visual type
+     In all cases, the coordinates in position lists are pixel
+     coordinates.
 
-  will be emitted; attempting to proceed may result in a core
-  dump.
+   - NDF extension items.
 
-- NDF extension items.
-
-  On exit the CURRENT_LIST items in the CCDPACK extensions
-  (.MORE.CCDPACK) of the input images are set to the name of the
-  output list. These items will be used by other CCDPACK position
-  list processing routines to automatically access the list.
+     On normal exit, unless OUTLIST is set to null (!), the
+     CURRENT_LIST items in the CCDPACK extensions (.MORE.CCDPACK) of
+     the input NDFs are set to the name of the output list. These
+     items will be used by other CCDPACK position list processing
+     routines to automatically access the list.
 2 Behaviour_of_parameters
    All parameters retain their current value as default. The
    "current" value is the value assigned on the last run of the
@@ -4695,13 +4744,19 @@ idicurs scroll arrows
    assignment is made on the command line.  Global values may be set
    and reset using the CCDSETUP and CCDCLEAR commands.
 
-   The DEVICE parameter also has a global association. This is not
-   controlled by the usual CCDPACK mechanisms, instead it works in
-   co-operation with KAPPA (SUN/95) image display/control routines.
+   Some of the parameters (MAXCANV, PERCENTILES, WINX, WINY, ZOOM)
+   give initial values for quantities which can be modified while
+   the program is running.  Although these may be specified on the
+   command line, it is normally easier to start the program up and
+   modify them using the graphical user interface.  If the program
+   exits normally, their values at the end of the run will be used
+   as defaults next time the program starts up.
 2 Authors
 NE: Nick Eaton  (Durham University)
 
 PDRAPER: Peter Draper (STARLINK - Durham University)
+
+MBT: Mark Taylor (STARLINK)
 2 History
  10-JUL-1992 (NE + PDRAPER):
     Original version, based on IDI example routine.
@@ -5831,8 +5886,7 @@ PDRAPER: Peter Draper (STARLINK)
      processing, assuming that the input data have a normal
      distribution.
 1 MAKEMOS
-Make a mosaic by combining and (optionally) normalising a set of
-images.
+Make a mosaic by combining and (optionally) normalising a set of images.
 
 Usage:
 
@@ -6569,62 +6623,92 @@ AALLAN: Alasdair Allan (Keele University, STARLINK)
      propagation to the output mosaic, which will typically have a
      larger extent than any of the input images).
 1 PAIRNDF
-Displays and manipulates image pairs to allow easy registration.
+Aligns images graphically by drag and drop.
 
 Usage:
 
-   pairndf in outlist device percentiles
+   pairndf in outlist percentiles
 
 Description:
 
    This routine accepts a list of images which may be aligned using
-   simple offsets. In a first interactive section pairs of images
-   may be selected from a palette of images (which are drawn down
-   the side of the display). Passing on to a second section the
-   chosen pair of images may then be manipulated by selecting a
-   reference position on one and then indicating where the
-   corresponding position on the second is. The reference image is
-   then moved and overlaid on the second. In any overlap regions the
-   image display values are averaged. If the pair of images are
-   overlaid (registering them) then a third section may be entered
-   in which the cursor can be used to pick out the positions of
-   image features in the overlap region. The image features are then
-   centroided to get accurate positions.
-
-   You are required to choose all the pairings required to
-   completely register all frames (the routine will not exit
-   until enough images have been paired to allow this, and a policy
-   to ensure completeness is enforced by insisting that each pair,
-   except for the first, contains one previously paired image).
-   When this is complete a global merger of the all the positions
+   simple offsets in their Current coordinate frames.
+   By making use of a graphical user interface you
+   can indicate how pairs of images are aligned with respect
+   to each other, and mark image features to allow accurate
+   alignments.  Once enough pairings have been specified to register
+   all frames completely a global merger of all the positions
    for each image takes place. This results in the output of one list
    of uniquely labelled positions for each image. These position lists
    can then be used in a routine such as REGISTER to produce the
    actual transformation between the images.
+
+   The graphical interface consists of two parts: a chooser which
+   allows you to inspect pairs of images to see whether they are 
+   able to be paired, and an aligner which allows you to move 
+   a pair of images around so that they are registered, and to
+   mark points in the overlapping region where the same centroidable 
+   features exist in both images.
+
+   Operation is as follows.  You must first use the chooser window
+   to select a pair of images which have a region in common.
+   Use the tabs at either side of the screen to pick the image to
+   appear on that side.  You can use the "Show FITS" button to
+   select one or more FITS headers to be displayed alongside
+   each image if this will make it easier to identify which is which.
+   You can use the "Display cutoff" menu to select the percentiles
+   controlling the brightness of each pixel; alignment is easier if
+   the same features are of a similar brightness in different images.
+   The images are displayed resampled into their Current attached 
+   coordinate system; you can only align them using this program if 
+   a simple offset (translation) maps one onto another in these 
+   coordinates (or very nearly does so).  If that is not the case,
+   you will have to set their Current coordinate system 
+   to a different value (see WCSEDIT) or align them using a 
+   different method.  The whole of each image will be displayed in
+   the chooser window, and you can resize it in the usual way to 
+   make the images appear bigger or smaller.  Select a pair with 
+   an overlapping region which you wish to align, and click the 
+   "Use this pair" button.  The aligner window will then appear, 
+   displaying the two images which you have selected.
+
+   In the aligner window you can drag either of these images around
+   the display region by holding down mouse button 1 (usually the 
+   left one) as you move the mouse; the easiest way to align the pair 
+   is to "pick up" one image by an identifiable feature and "drop" it
+   on the same feature in the other image.  Where the images overlap
+   their pixels will be averaged.  If they are not correctly 
+   positioned, you can move them again.  Once you are happy that
+   they are aligned about right, then click in the overlap region
+   to mark features which appear in both images - these will be
+   centroided to get an accurate alignment.  During this
+   part you mark points by clicking with mouse button 1 (usually
+   the left one) and you can remove them by clicking with button 3
+   (usually the right one).  The window can be resized, the 
+   magnification can be changed using the "Zoom" control, and the 
+   display region scrolled using the scrollbars.  When you have aligned 
+   the images and marked shared features, or if you decide that
+   the pair cannot be satisfactorily registered, click the "Done" 
+   button.  
+
+   You will then be returned to the chooser window to select another
+   pair and repeat the process.  After the first time however, 
+   you will only be allowed to select a pair of images to align
+   if at least one of them has already been aligned already.  Those
+   which have already been done are marked with a `+' sign on their
+   selection tabs.
+
+   Once you have made enough pairings to register the whole set, the
+   graphical windows will disappear and the program will complete
+   the global matching up of positions without any further user 
+   interaction.
+
 2 Parameters
 For information on individual parameters, select from the list below:
-3 DEVICE
-DEVICE = DEVICE (Read)
-   The name of the image display device.
-   [Current image display device]
-3 FILLFRAC
-FILLFRAC = _DOUBLE (Read)
-   The largest fraction of the display area which the images
-   displayed in the scratch region (the part where they can be
-   manipulated) may take. A value will always be in the
-   range 0.05 to 0.95.
-   [0.55]
 3 IN
 IN = LITERAL (Read)
    A list of image names whose data are to be transformed. The image
    names should be separated by commas and may include wildcards.
-3 KEEPLUT
-KEEPLUT = _LOGICAL (Read)
-   Whether to retain the current device look-up-table. If FALSE
-   then a greyscale look-up-table is loaded. PAIRNDF loads the
-   primary colours into the first few pens regardless of the
-   value of this parameter.
-   [TRUE]
 3 LOGFILE
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
@@ -6656,24 +6740,20 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
-3 MAKEBIG
-MAKEBIG = _LOGICAL (Read)
-   If TRUE then images will be scaled to fit into the whole of
-   the FILLFRAC area. If FALSE then scaling will never exceed
-   one device pixel per image pixel. This latter option decreases
-   the time needed to process images from the display palette
-   into the scratch region.
-   [TRUE]
-3 MEMORY
-MEMORY = _INTEGER (Read)
-   The memory of the device which is to be used. This can take
-   the values 0 and 1. 0 means the base memory and 1 the overlay.
-   [0]
-3 MSIZE
-MSIZE = _REAL (Read)
-   Determines the size of the position marker. This is set as a
-   fraction of the X dimension of the display.
-   [0.03]
+3 MAXCANV
+MAXCANV = INTEGER (Read and Write)
+   A value in pixels for the maximum initial X or Y dimension of 
+   the region in which the image is displayed.  Note this is the      
+   scrolled region, and may be much bigger than the sizes given
+   by WINX and WINY, which limit the size of the window on the
+   X display.  It can be overridden during operation by zooming
+   in and out using the GUI controls, but it is intended to
+   limit the size for the case when ZOOM is large (perhaps
+   because the last image was quite small) and a large image
+   is going to be displayed, which otherwise might lead to
+   the program attempting to display an enormous viewing region.
+   If set to zero, then no limit is in effect.
+   [1280]
 3 NAMELIST
 NAMELIST = LITERAL (Read)
    The name of a file to contain the names of the output
@@ -6709,119 +6789,82 @@ OUTLIST = LITERAL (Read)
    this replaces the string "_debias" with "_images.dat" in any
    of the output names.
 
-   If wildcarded names for the input images are used then is it
+   If wildcarded names for the input images are used then it is
    recommended that wildcards are also used for the position list
    names as the correspondence between these may be confusing.
    [*.DAT]
-3 PALFRAC
-PALFRAC = _DOUBLE (Read)
-   The fraction of display X-dimension which is reserved for the
-   image palette. A value will always be in the range
-   0.05 to 0.95.
-   [0.25]
 3 PERCENTILES
 PERCENTILES( 2 ) = _DOUBLE (Read)
-   The percentile data range to use as limits when displaying the
-   images. Must be in the range 0 to 100. Using percentiles as
-   display limits automatically adjusts the data ranges of the
-   images to show similar information levels. This helps when
-   combining the data using a mean as a crude normalisation has
-   been performed.
+   The default low and high percentiles of the data range to use
+   when displaying the images; any pixels with a value lower than 
+   the first value will have the same colour, and any with a
+   value higher than the second will have the same colour.  This
+   parameter gives the default value - the percentile settings
+   can be set for each image individually from within the GUI
+   to accomodate the situation where images have different 
+   brightnesses.  Must be in the range 0 <= PERCENTILES( 1 ) 
+   <= PERCENTILES( 2 ) <= 100.
    [2,98]
-3 THICK
-THICK = _INTEGER (Read)
-   The thickness of the position marker in device pixels.
-   [3]
+3 PREVX
+PREVX = INTEGER (Read and Write)
+   The initial width in pixels of the preview display for each image;
+   two images will be displayed side by side at any one time at
+   this size in the chooser window.  This can be effectively changed
+   by resizing the entire chooser window in the normal way using
+   the window manager while the program is running.
+   [350]
+3 PREVY
+PREVY = INTEGER (Read and Write)
+   The initial height in pixels of the preview display for each image;
+   two images will be displayed side by side at any one time at
+   this size in the chooser window.  This can be effectively changed
+   by resizing the entire chooser window in the normal way using
+   the window manager while the program is running.
+   [350]
+3 WINX
+WINX = INTEGER (Read and Write)
+   The initial width in pixels of the aligner window, which contains
+   a space for dragging around a pair of images and associated
+   controls.  If the region required for the images is larger 
+   than the area allocated for display, it can be scrolled 
+   around within the window.  The window can be resized in the 
+   normal way using the window manager while the program is running.
+   [800]
+3 WINY
+WINY = INTEGER (Read and Write)
+   The initial height in pixels of the aligner window, which contains
+   space for dragging around a pair of images and associated
+   controls.  If the region required for the images is larger 
+   than the area allocated for display, it can be scrolled 
+   around within the window.  The window can be resized in the 
+   normal way using the window manager while the program is running.
+   [400]
+3 ZOOM
+ZOOM = DOUBLE (Read and Write)
+   A factor giving the initial level to zoom in to the images
+   displayed in the aligner window, that is the number of screen pixels 
+   to use for one image pixel.  It will be rounded to one of the values
+   ... 3, 2, 1, 1/2, 1/3 ....  The zoom can be changed
+   interactively from within the program.  The initial value
+   may be limited by MAXCANV.
+   [1]
 2 Examples
-pairndf '*'  '*.dat' xw '[1,99]'
-  In this routine the positional nature of the parameters is
-  shown. All the images in the current directory are displayed.
-  Their output positions lists have the same name as the images
-  except that they have a file type of .dat. The images are
-  displayed using the percentile limits 1,99 which shows bright
-  detail well.
+pairndf * *.dat [1,99]
+   This example shows the positional nature of the parameters.
+   All the NDFs in the current directory are presented for 
+   alignment.  Their output position lists have the same name 
+   as the NDFs except that they have a file extension of .dat.
+   The default image display cutoff is between the 1st and 99th
+   percentile, which shows bright detail well.
 
-pairndf msize=0.1 thick=7
-   In this example the cross which is used to identify the
-   image features is made very large and thick.
-
-pairndf fillfrac=0.75 keeplut palfrac=0.15
-   The parameters used in this example will make the images
-   displayed in the scratch region larger than the default. This
-   can be useful when the images have a long and a short side as
-   a scale factor is chosen which maps one of the image sides to
-   the scratch side exactly so images can be scaled and still be
-   all visible. KEEPLUT keeps the look-up-table loaded in the
-   current device (say a colour one). Reducing PALFRAC to 0.15
-   makes the scratch display surface larger but has the
-   disadvantage that the images in the palette are small (perhaps
-   too small to identify image features, but this needn't be a
-   problem as images may be drawn into the scratch region - for
-   inspection side-by-side - during the pair selection phase).
+pairndf in="data1,data2" outlist="d1-pos,d2-pos" zoom=2 maxcanv=0
+   Only the two images data1 and data2 will be aligned, and the 
+   corresponding sets of positions will be written to the
+   files d1-pos and d2-pos.  The images will initially be 
+   displayed for alignment at a magnification of two screen 
+   pixels to each data pixel, even if that results in a very 
+   large display area.
 2 Notes
-- Interactive sections.
-
-  There are three distinct sections in PAIRNDF. In the first
-  section a pair of images should be chosen from the palette.
-  Choosing an image is performed by simply placing the cursor on
-  the image and pressing the left-hand button. to select an image
-  for display on the left and the right button to display an
-  image on the right. Two images must be chosen before a
-  progression to the next section is allowed.  When an image is
-  chosen it is rescaled and displayed in the scratch region.
-  During the first pass any two images may be chosen,
-  subsequently at least one image which has already been chosen
-  (and successfully processed) must be used (you may of course
-  select two processed images if you like). This ensures that
-  the final registration is complete. Images which have been
-  processed are probably outlined in green. You are not
-  restricted to the first pair of images chosen - just keep
-  pointing at images you want to expand into the scratch region
-  until you have a pair with image features in common.
-
-  After selecting the pair of images you want to register you must
-  pass on to a second stage, this is entered by pressing the
-  right-hand button, the title "Align the images" will then
-  appear. These two images may now be moved. This is achieved by
-  first selecting a reference point on one of the images (say a
-  star which is clearly visible on both images) then moving the
-  cursor onto it and pressing the left-hand button (accuracy is
-  not critical as positions will be centroided later, but you can
-  zoom in on a feature). Next move the cursor to the corresponding
-  image feature on the second image and press the centre
-  button. The routine will now move the reference image onto the
-  new position. In areas where the images overlap a mean is taken.
-
-  The final interactive section is used to select the positions of
-  image features in the overlap regions. These are selected by
-  moving the cursor onto them and pressing the left-hand button.
-  When you have selected as many image features as you require
-  pressing the right-hand button exits this section. The features
-  (on both images) are then centroided. If enough information has
-  now been given to register all the frames then the routine
-  passes out of the interaction session and determines the
-  registration.
-
-- X windows display.
-
-  Using keyboard I and O keys it is possible to zoom-in and
-  zoom-out. The arrow keys allow the memory to be scrolled,
-  pressing the shift key at the same time increases the rate of
-  scroll. The C key performs a quick re-centre, cancelling any
-  zoom and scroll. The Q key aborts the routine.
-
-- Display restrictions.
-
-  PAIRNDF will only work on PseudoColor X displays; this means
-  that it cannot be used on the displays of most newer Linux
-  machines as normally configured.  If an attempt is made to
-  do so, then the warning:
-
-     !! Window has unsupported visual type
-
-  will be emitted; attempting to proceed may result in a core
-  dump.
-
 - NDF extension items.
 
   On exit the CURRENT_LIST items in the CCDPACK extensions
@@ -6836,9 +6879,7 @@ pairndf fillfrac=0.75 keeplut palfrac=0.15
   whose first three columns are interpreted as the following.
 
      - Column 1: an integer identifier
-
      - Column 2: the X position
-
      - Column 3: the Y position
 
   The column one value must be an integer and is used to identify
@@ -6846,6 +6887,9 @@ pairndf fillfrac=0.75 keeplut palfrac=0.15
   considered as the same point. Comments may be included in the
   file using the characters # and !. Columns may be separated by
   the use of commas or spaces.
+
+  In all cases, the coordinates in position lists are pixel 
+  coordinates.
 2 Behaviour_of_parameters
    All parameters retain their current value as default. The
    "current" value is the value assigned on the last run of the
@@ -6862,11 +6906,17 @@ pairndf fillfrac=0.75 keeplut palfrac=0.15
    assignment is made on the command line.  Global values may be set
    and reset using the CCDSETUP and CCDCLEAR commands.
 
-   The DEVICE parameter also has a global association. This is not
-   controlled by the usual CCDPACK mechanisms, instead it works in
-   co-operation with KAPPA (SUN/95) image display/control routines.
+   Some of the parameters (MAXCANV, PERCENTILES, PREVX, PREVY, WINX,
+   WINY)  give initial values for quantities which can be modified 
+   while the program is running.  Although these may be specified on
+   the command line, it is normally easier to start the program up and
+   modify them using the graphical user interface.  If the program
+   exits normally, their values at the end of the run will be used
+   as defaults next time the program starts up.
 2 Authors
 PDRAPER: Peter Draper (STARLINK - Durham University)
+
+MBT: Mark Taylor (STARLINK)
 2 History
  5-FEB-1993 (PDRAPER):
     Original version.
@@ -6889,6 +6939,9 @@ Description:
    Before this application can be run an image (or other graphical
    output such as a contour image) must have been displayed using a
    suitable routine such as KAPPA DISPLAY (SUN/95).
+
+   For a more interactive display of markers on an Xwindows display,
+   you can use the IDICURS program instead.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 CLEAR

@@ -1,7 +1,7 @@
       astexp - Exports AST FrameSet information from images to AST file.
       astimp - Imports AST FrameSet information into images from AST file.
       calcor - Subtracts a scaled dark or flash calibration image from a list.
-    ccdalign - Interactive procedure to aid the alignment of images.
+    ccdalign - Aligns images graphically by interactive object selection
     ccdclear - Clears CCDPACK global parameters.
      ccdedit - Edits CCDPACK header items.
     ccdndfac - Accesses a list of images and writes their names to a file.
@@ -14,13 +14,13 @@
      findobj - Locates and centroids image features.
      findoff - Performs pattern-matching between offset position lists.
      flatcor - Divides a series of images by a flatfield
-     idicurs - Reads coordinates from an X display device.
+     idicurs - Views and writes position lists interactively.
       import - Imports FITS information.
     makebias - Produces a master from a set of bias frames.
      makecal - Produces a dark or pre-flash calibration image.
     makeflat - Produces a flatfield calibration image.
      makemos - Make a mosaic by combining and (optionally) normalising images.
-     pairndf - Displays and manipulates image pairs to allow easy registration.
+     pairndf - Aligns images graphically by drag and drop.
     plotlist - Draws position markers on a graphics display.
      present - Presents a list of images to CCDPACK.
       reduce - Automatic CCD data reduction facility (command-line version).
