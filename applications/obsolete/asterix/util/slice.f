@@ -99,7 +99,7 @@
       CALL AST_INIT()
 
 *  Obtain data object, access and check it
-      CALL USI_TASSOCI( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
       CALL USI_SHOW( 'Input dataset {INP}', STATUS )
 
 *  Is the input object the array required?
