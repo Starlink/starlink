@@ -440,7 +440,8 @@ kpg1_plot.f kpg1_prnth.f kpg1_rcatw.f kpg1_vect.f kpg1_wread.f \
 kpg1_wwrt.f kps1_vecky.f pol1_vecpl.f polplot.f kpg1_rdast.f kpg1_wrast.f \
 kpg1_short.f kpg1_isscs.f kpg1_h2ast.f kpg1_ast2h.f kpg1_chscs.f \
 kpg1_seteq.f kpg1_asget.f kpg1_wcatw.f pol1_squar.f pol1_clcnt.f \
-pol1_stk2.f pol1_setd.f polbin.f pol1_ctclm.f kpg1_odrst.f kpg1_asrep.f
+pol1_stk2.f pol1_setd.f polbin.f pol1_ctclm.f kpg1_odrst.f kpg1_asrep.f \
+ccd1_repc.f 
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
@@ -459,7 +460,7 @@ C_ROUTINES = $(C_SUB1) $(C_SUB2)
 
 C_SUB1 = ndg1_wild.c
 
-C_SUB2 = polpack.c kpg1_trmsz.c grf_kappa.c
+C_SUB2 = polpack.c kpg1_trmsz.c 
 
 #  List of platform specific C routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
@@ -543,7 +544,7 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
 
 BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MONOLITH) \
 $(IFC_FILES) $(HELP_FILES) $(STARTUP_SCRIPT) $(ICL_SCRIPT) $(TEST_SCRIPT) \
-$(DATA_FILES)
+$(DATA_FILES) 
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -626,7 +627,7 @@ $(PLATFORM_C) dummy_target1:
 #  List of object files produced by compiling the source code and rules
 #  for performing the compilations.
 
-OBJECT_FILES = $(O_SUB1) $(O_SUB2) $(MONO_OBJECT)
+OBJECT_FILES = $(O_SUB1) $(O_SUB2) $(MONO_OBJECT) grf_kappa.o
 
 O_SUB1 = $(F_SUB1:.f=.o) $(C_SUB1:.c=.o)
 
@@ -667,7 +668,7 @@ libpolpack.a: $(O_SUB2)
 
 #  Rule and dependencies for building the monolith.
 
-$(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
+$(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT) grf_kappa.o
 	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
             -L/star-test/lib -L$(KAPPA_SOURCE) $(ADDLIBS) $(TCLLIBS) \
             `./$(LINK_SCRIPT)` $(LDFLAGS)
