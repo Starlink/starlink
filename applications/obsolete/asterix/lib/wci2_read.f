@@ -116,7 +116,6 @@
       CHARACTER*3		SYS			! Coord system name
       CHARACTER*40		UNITS(2)		! X,Y axis units
 
-      DOUBLE PRECISION		BTAI			! Value of BASE_TAI
       DOUBLE PRECISION		EPOCH			! Epoch
       DOUBLE PRECISION		LONGPOLE		!
       DOUBLE PRECISION		MJD			! Observation time
@@ -129,7 +128,6 @@
       REAL			TOR			! Radian conversion
 
       INTEGER			DIMS(2)			! Axis dimensions
-      INTEGER			IMJD			! Value of BASE_MJD
       INTEGER			IP			! Loop over proj params
       INTEGER			IPSF			! Psf system handle
       INTEGER			NPRJP			! # projection pars
@@ -146,7 +144,6 @@
       LOGICAL			RAOK, DECOK, PAOK       ! Found ok flags
       LOGICAL			REG(2)			! Axes regular
       LOGICAL			PRJOK, SYSOK		! Projection/system ok?
-      LOGICAL			TAIOK			! BASE_TAI found?
 *.
 
 *  Check inherited global status.

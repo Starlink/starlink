@@ -199,7 +199,7 @@
         IF ( (STATUS .NE. SAI__OK) .AND. (ELEN.GT.0) ) THEN
           CALL ERR_ANNUL( STATUS )
           LFILE = FILE(:FLEN)
-          LFILE(FLEN+1) = AIO_DEFEXT(:ELEN)
+          LFILE(FLEN+1:) = AIO_DEFEXT(:ELEN)
           CALL FIO_OPEN( LFILE, ACCESS, MODE, RECSZ, FD, STATUS )
 
         END IF
