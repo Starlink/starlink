@@ -332,7 +332,7 @@ c     RECORD /MODEL_SPEC/      MODEL			! Dummy model record
           CALL FIT_PARCON( 1, IMOD, MCTRL, SOFF, 0, 1, P__F,
      :                     PSS__FITNPAR, LB, UB, FROZEN, PSCALE, DPAR,
      :                     ISTAT, PSS_FIT_GENMODEL, STATMIN,
-     :                     PARAM, PEGGED, PLO, PHI, PEGCODE, LNDFAC
+     :                     PARAM, PEGGED, PLO, PHI, PEGCODE, LNDFAC,
      :                     STATUS )
 
 *        Fit error?
