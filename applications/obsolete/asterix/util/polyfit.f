@@ -312,6 +312,10 @@
           WRITE(NAME(9:9),'(I1)') I
           CALL GCB_SETR(NAME,PARAM(I),STATUS)
         ENDDO
+        DO I=MIN(6,NDEG+1)+1,6
+          WRITE(NAME(9:9),'(I1)') I
+          CALL GCB_CANR(NAME,STATUS)
+        ENDDO
         CALL GCB_FSAVE(IFID,STATUS)
         CALL GCB_DETACH(STATUS)
       ENDIF
