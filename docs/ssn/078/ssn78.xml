@@ -2686,19 +2686,21 @@ autoconf (GNU Autoconf) 2.59
         <p>If, on the other hand, you wish to build only one
           component, because you wish to install the latest and
           greatest version of some application, or because you want to
-          work on the CVS version, then you do not want to build the
-          entire code collection, but only the component you are
-          interested in.</p>
+          work on the CVS version, then you do not need to build the
+          entire code collection.  However you do still need a
+          complete built Starlink directory somewhere (and an
+          old-style Starlink release will not do); see the end of this
+          section for details.</p>
 
-        <p>In this case, you <em>may</em> want to control two things,
-          namely where
-          your newly-built component is to be installed, and where it
-          is to find any other Starlink applications and libraries it
-          requires.</p>
+        <p>In this case, you may need to specify two things, namely
+          where your newly-built component is to be installed, and
+          where it is to find any other Starlink applications and
+          libraries it requires.  See the end of this section for
+          details on how to do this.</p>
 
         <p>Generally, however, you don't have to worry about
-          intricate configuration matters.  You simply give the
-          commands
+          intricate configuration matters.  You simply move to the
+          component's directory, and give the commands
           <verbatim>
 % ./bootstrap
 % ./configure
@@ -2728,8 +2730,7 @@ autoconf (GNU Autoconf) 2.59
           <code>--prefix</code> option to the <code>./configure</code>
           script.  The default value for this prefix is baked in to
           the <code>./configure</code> script, and controlled by the
-          starconf application.
-        </p>
+          starconf application.</p>
 
         <p>You can control where the configuration process finds other
           Starlink applications in a broadly similar way.  The default
@@ -2744,6 +2745,34 @@ autoconf (GNU Autoconf) 2.59
           generally leave the <code>STARLINK</code> variable unset,
           and use either the first or the last of these methods
           instead.</p>
+
+        <p>If you are starting from scratch, and don't have a
+          pre-built Starlink directory available, then you will have
+          to build all or most of the tree, before the component
+          you're interested on can be built.  In this case, follow the
+          instructions in <ref id="bootstrapping"/>, but instead of
+          finishing with <kbd>make world</kbd> in step 9, do <kbd>make
+          /mystar/manifests/cpt</kbd>, where <code>/mystar</code> is
+          the location you have chosen for the installation tree (as
+          in <code>STARCONF_DEFAULT_STARLINK</code>), and
+          <code>cpt</code> is the component you are interested in.
+          This will build and install in turn each of your component's
+          dependencies, and then the component itself.  After that,
+          you can start working on your component, in the knowledge
+          that all the libraries it depends on are indeed available in
+          the local installation tree.</p>
+
+        <p>If you want to keep the functioning version separate from
+          your development version, then you need to go through this
+          procedure once with <code>STARCONF_DEFAULT_STARLINK</code>
+          and <code>..._PREFIX</code> having the same values (to
+          create a functioning version), and then either bootstrap
+          your development component a second time, with
+          <code>STARCONF_DEFAULT_PREFIX</code> set to a separate
+          installation location, or else re-run
+          <code>./configure</code> with its <code>--prefix</code>
+          option set to point to that alternative location (the first
+          mechanism simply sets the default for the second).</p>
 
         <p>Note that part of the function of the
           <code>./configure</code> script is to find the location of
