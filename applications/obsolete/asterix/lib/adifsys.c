@@ -99,7 +99,6 @@ void adix_getfile( ADIobj id, ADIobj *root, ADIstatus status )
 
   while ( (lid!=ADI__nullid) && _ok(status) && ! found )
     {
-printf("Searching ");adic_print(lid,status);
     if ( adix_isfile(lid,status) )
       found = ADI__true;
     else

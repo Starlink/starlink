@@ -130,8 +130,6 @@ C      PARAMETER ( {constant_name} = {cons} )
 *  Grab logical unit from system
       CALL FIO_GUNIT( LUN, STATUS )
 
-	CALL ADI_PRINT( ID, STATUS )
-
 *  Try to create file
       BSIZE = 1
       FSTAT = 0

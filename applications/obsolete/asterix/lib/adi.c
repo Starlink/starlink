@@ -696,6 +696,7 @@ ADIobj adix_new_cdef( char *name, int nlen,
   tdef->nslot = 0;                      /* Starting values */
   tdef->members = ADI__nullid;
   tdef->superclasses = ADI__nullid;
+  tdef->dslist = ADI__nullid;
   tdef->defmem = DEF_MEMBER_FLAG_VALUE;
 
   tdef->pdata = NULL;
@@ -751,6 +752,32 @@ void adix_def_pclass_data( ADIclassDefPtr tdef, char *data, ADIstatus status )
   {
   _chk_stat;
   tdef->pdata = data;
+  }
+
+
+void ADIdefClassMakeDlist( ADIclassDefPtr tdef, ADIstatus status )
+  {
+  ADIobj	curp;
+  ADIobj	*ipoint = &tdef->dslist;
+
+  _chk_stat;
+
+/* Superclasses persent? */
+  if ( _valid_q(tdef->superclasses) ) {
+
+/* Put class name at head of list */
+    *ipoint = lstx_cell( tdef->aname, ADI__nullid, status );
+    ipoint = & _CDR(*ipoint);
+
+/* Each each direct superclass name in turn */
+    curp = tdef->superclasses;
+    while ( _valid_q(curp) ) {
+      *ipoint = lstx_cell( _pdef_name(curp), ADI__nullid, status );
+      ipoint = & _CDR(*ipoint);
+
+      curp = _pdef_next(curp);
+      }
+    }
   }
 
 
@@ -1471,6 +1498,10 @@ ADIobj ADIdefClass_i( int narg, ADIobj args[], ADIstatus status )
   if ( ! _null_q(ADI_G_commonstrings) )
     ADIdefClassConvertNames( tdef, status );
 
+/* Construct direct super class list if table built. Also done manually */
+  if ( ! _null_q(ADI_G_commonstrings) )
+    ADIdefClassMakeDlist( tdef, status );
+
 /* Set function return value */
   return cid;
   }
@@ -1838,6 +1869,8 @@ void adi_init( ADIstatus status )
 
       ADIdefClassConvertNames( _cdef_data(UT_ALLOC_list), status );
       ADIdefClassConvertNames( _cdef_data(UT_ALLOC_tbl), status );
+      ADIdefClassMakeDlist( _cdef_data(UT_ALLOC_list), status );
+      ADIdefClassMakeDlist( _cdef_data(UT_ALLOC_tbl), status );
       }
 
 /* Install "Standard" method combination */
@@ -2295,6 +2328,15 @@ void adix_findcls( char *cls, int clen, ADIblockCtrlPtr *tid, ADIstatus status )
     if ( found )
       *tid = &tdef->alloc;
     }
+  }
+
+ADIobj adix_findclsi( ADIobj name, ADIstatus status )
+  {
+  ADIblockCtrlPtr tid;
+
+  adix_findcls( _str_dat(name), _str_len(name), &tid, status );
+
+  return tid->cdef->selfid;
   }
 
 
@@ -4536,6 +4578,140 @@ ADIboolean adix_chkder( KT_CTYPE_cdef *c1,
   return derived;
   }
 
+/*  Rank a list of methods in descending priority order given a bunch of
+ *  arguments */
+void adix_primth( int narg, int farg, int nmth,
+                  ADIobj *mlist, ADIstatus status )
+  {
+  ADIobj	curp;
+  int		iarg;
+  ADIobj	newlist = ADI__nullid;	/* The users reordered list */
+  int		nleft;			/* Number of methods remaining */
+  ADIobj	*ipoint = &newlist;	/* List insertion point */
+
+  _chk_stat;
+
+/* If nthm = 0 was supplied, then do them all */
+  if ( ! nmth ) {
+    curp = *mlist;
+    while ( _valid_q(curp) ) {
+      nmth++;
+      curp = _CDR(curp);
+      }
+    }
+
+/* Check case of only one method */
+  if ( nmth > 1 ) {
+
+/* While more input methods and more arguments to process */
+    for( nleft=nmth, iarg=farg; iarg<narg && (nleft>1) && _ok(status); iarg++ ) {
+
+      int	imth;
+      ADIobj	curp;
+      ADIobj 	adslist = ADI__nullid;	/* Direct superclass list */
+      ADIobj 	dslist = ADI__nullid;	/* Direct superclass list */
+      ADIobj 	mclist = ADI__nullid;	/* Method arg class list */
+      ADIobj	rlist; 			/* Ranked class list */
+
+/* Gather a list of the classes which appear at this argument position for */
+/* each of the remaining methods */
+      curp = *mlist;
+      imth = 1;
+      while ( imth <= nmth ) {
+        ADIobj 	adslist;	/* Method arg direct superclass list */
+        ADIobj mthd = _CAR(curp);
+        ADIobj cura = _mthd_args(mthd);
+        ADIobj acls;
+        int	jarg = iarg;
+
+/* Skip to the iarg'th argument for this method */
+        while ( jarg-- )
+          cura = _CDR(cura);
+
+/* Locate class definition object */
+        acls = adix_findclsi( _CAR(cura), status );
+
+/* Add the direct-superclass list to our list of such */
+        adslist = _cdef_data(acls)->dslist;
+        if ( _valid_q(adslist) )
+          lstx_addtoset( &dslist, _cdef_data(acls)->dslist, status );
+
+/* Add to our set of list elements */
+        lstx_addtoset( &mclist, _CAR(cura), status );
+
+/* Next method */
+        curp = _CDR(curp); imth++;
+        }
+
+/* Order the list of classes appearing in mclist into ascending priority */
+      rlist = adix_estab_ord( mclist, dslist, status );
+
+/* Now process the list of methods. Start at the beginning of the ranked
+ * list and shuffle the remaining methods with this class to the head of the
+ * the list. */
+      curp = rlist;
+      while ( _valid_q(curp) && (nleft>1) ) {
+
+        int	nmoved = 0;
+        ADIobj	curm = *mlist;
+        ADIobj  *cpoint = mlist;
+        ADIobj  *mipoint = mlist;
+        int	imth = 0;
+        ADIboolean anyout = ADI__false;
+
+        while ( imth < nleft ) {
+
+          int	  jarg = iarg;
+          ADIobj  mthd = _CAR(curm);
+          ADIobj  cura = _mthd_args(mthd);
+          ADIobj  *anext = &_CDR(curm);
+          ADIobj  next = *anext;
+
+/*    Skip to the iarg'th argument for this method */
+          while ( jarg-- )
+            cura = _CDR(cura);
+
+/*    This method's argument matches the current one in the ranked list?
+ *    Shove to the front of the list, unless there are no intervening out
+ *    of order methods */
+          if ( _CAR(curp) == _CAR(cura) ) {
+            if ( anyout ) {
+              ADIobj old = *mlist;
+              *cpoint = next;
+              *anext = old;
+              *mlist = curm;
+              }
+            nmoved++;
+            }
+          else {
+            anyout = ADI__true;
+            cpoint = anext;
+            }
+
+          curm = next; imth++;
+          }
+
+/* All the high priority methods have been transferred to the head of the
+ * the list. If more than one method, invoke this routine recursively to
+ * order them. */
+        if ( nmoved > 1 )
+          adix_primth( narg, farg+1, nmoved, mlist, status );
+
+/* Move all these methods to our output list. They go on the end! Advance
+ * the output list insertion point */
+        *ipoint = *mlist;
+        nleft -= nmoved;
+        while ( nmoved-- )
+          ipoint = & _CDR(*ipoint);
+        }
+
+      }
+
+/* Set user list to reordered list */
+    if ( _ok(status) )
+      *mlist = newlist;
+    }
+  }
 
 /*  Gather applicable methods for the given generic function, given
  *  arguments and the allowable method forms specified. Each method
@@ -4631,6 +4807,9 @@ void adix_gthmth( ADIobj gen, int narg, ADIobj args[], int nmform,
     for ( iform=0;                      /* Loop over forms */
 	  iform<nmform; iform++ )
       if ( ! _null_q(mlist[iform]) ) {  /* Methods for this form? */
+
+/*     Order the methods in descending order of priority */
+        adix_primth( narg, 0, 0, mlist + iform, status );
 
 /*     Callee wants list in ascending priority order? */
 	if ( ! mfopri[iform] )
