@@ -142,6 +142,7 @@
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     MBT: M.B. Taylor (Starlink, Bristol)
 #     {enter_new_authors_here}
 
 #  History:
@@ -152,6 +153,9 @@
 #     13-NOV-1995 (RFWS):
 #        Changed to store search data in a file instead of memory (running out
 #        of memory with increasing size of document sets).
+#     27-JAN-2003 (MBT):
+#        Modified sort flags to avoid obsolete forms no longer supported
+#        on Linux.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -695,7 +699,7 @@
 #  significance and the 4th lowest significance.
          sortflags=''
          if test "${HTX_SORT}" = '1'; then
-            sortflags='+0 -n -r -1 +1 -n -r -2 +2 -n -r -3 +3 -n -r -4'
+            sortflags='-r -n -k1,1 -k2,2 -k3,3 -k4,4'
          fi
 
 #  If required, define a "sed" script to be used to edit the final counts
@@ -1062,7 +1066,7 @@
 #  decreasing match significance, with an alphabetic sort applied to records
 #  with equal significance. Pipe the output of "sort" into another invocation
 #  of "awk".
-         }' | sort ${sortflags} +8 -f | awk '
+         }' | sort ${sortflags} -f -k9 | awk '
 
 #  Start of "awk" script.
 #  ---------------------
