@@ -1,33 +1,35 @@
-Interface SIGNIF
-   Parameter INP
-      position    1
-      type        'UNIV'
-      ppath       'GLOBAL'
-      association '<-GLOBAL.BINDS'
-      prompt      'Enter name of the input dataset'
-      help        'Must be an Asterix88 binned dataset'
-   EndParameter
+INTERFACE SIGNIF
 
-   Parameter OUT
-      position    2
-      type        'UNIV'
-      association '->GLOBAL.BINDS'
-      prompt      'Enter name of the output dataset'
-      help        'Can be same as input'
-   EndParameter
+   PARAMETER INP
+      POSITION    1
+      TYPE        'LITERAL'
+      PPATH       'GLOBAL'
+      ASSOCIATION '<-GLOBAL.BINDS'
+      PROMPT      'Enter name of the input dataset'
+      HELP        'Must be an Asterix88 binned dataset'
+   ENDPARAMETER
 
-   Parameter WEIGHT_DATA
-      position    3
-      type        '_REAL'
-      prompt      'Significance data'
-      help        'Must be a primitive object'
-   EndParameter
+   PARAMETER OUT
+      POSITION    2
+      TYPE        'LITERAL'
+      ASSOCIATION '->GLOBAL.BINDS'
+      PROMPT      'Enter name of the output dataset'
+      HELP        'Can be same as input'
+   ENDPARAMETER
 
-   Parameter OVER
-      type        '_LOGICAL'
-      default     N
-      vpath       'DEFAULT'
-      prompt      'Overwrite first input data object?'
-      help        'If TRUE output object overwrites first input object'
-   EndParameter
-EndInterface
+   PARAMETER WEIGHT_DATA
+      POSITION    3
+      TYPE        '_REAL'
+      PROMPT      'Significance data'
+      HELP        'Must be a primitive object'
+   ENDPARAMETER
+
+   PARAMETER OVER
+      TYPE        '_LOGICAL'
+      DEFAULT     N
+      VPATH       'DEFAULT'
+      PROMPT      'Overwrite first input data object?'
+      HELP        'If TRUE output object overwrites first input object'
+   ENDPARAMETER
+
+ENDINTERFACE
