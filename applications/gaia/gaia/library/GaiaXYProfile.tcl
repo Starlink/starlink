@@ -234,13 +234,15 @@ itcl::class gaia::GaiaXYProfile {
       ::Blt_ActiveLegend $xgraph_
       ::Blt_Crosshairs $xgraph_
       ::Blt_ClosestPoint $xgraph_
-      bind bltCrosshairs <Any-Motion> [code $this dispXY %W %x %y]
+      bind bltCrosshairs$this <Any-Motion> [code $this dispXY %W %x %y]
+      blt::AddBindTag $xgraph_ bltCrosshairs$this
 
       ::Blt_ZoomStack $ygraph_
       ::Blt_ActiveLegend $ygraph_
       ::Blt_Crosshairs $ygraph_
       ::Blt_ClosestPoint $ygraph_
-      bind bltCrosshairs <Any-Motion> [code $this dispXY %W %x %y]
+      bind bltCrosshairs$this <Any-Motion> [code $this dispXY %W %x %y]
+      blt::AddBindTag $ygraph_ bltCrosshairs$this
 
       # Tk frame for position and data value readout.
       itk_component add fpos {
