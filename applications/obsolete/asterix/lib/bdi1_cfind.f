@@ -279,6 +279,9 @@
             CALL BDI1_CFIND1( ALOC, 'HWIDTH', CREATE, '_'//TYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
+          ELSE IF ( ITEM(8:) .LE. ' ' ) THEN
+            CALL DAT_CLONE( ALOC, CLOC, STATUS )
+
           END IF
 
 *      Release the AXIS cell
