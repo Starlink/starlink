@@ -517,7 +517,7 @@ c     RECORD /MODEL_SPEC/ 	TMODEL			! Term model spec
             CALL BDI_MAPUB( DSID, 'Quality', 'READ', QPTR, STATUS )
             CALL DYN_MAPB( 1, NEL, DQPTR, STATUS )
             DO I = 1, DATASET_NDIM(N)
-              IDIM(I) = DATASET_IDIM(N, I)
+              IDIM(I) = DATASET_IDIM(I,N)
             END DO
             CALL ARR_SLCOPB( DATASET_NDIM(N), IDIM,
      :                       %VAL(QPTR), LDIM, UDIM, %VAL(DQPTR),

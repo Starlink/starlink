@@ -620,7 +620,7 @@ c DCFID(I)
 	      UDIM(1) = DIMS(1)
 	      UDIM(2) = SPECNO
 	      DATASET_NDIM(NDS) = 1
-	      DATASET_IDIM(NDS,1) = DIMS(1)
+	      DATASET_IDIM(1,NDS) = DIMS(1)
 	      DATASET_NDAT(NDS) = DIMS(1)
 
 *          Copy the slice
@@ -632,7 +632,7 @@ c DCFID(I)
 *          Simple mapping
 	      DATASET_NDIM(NDS) = NDIM
 	      DO I = 1,DATASET_NDIM(NDS)
-	        DATASET_IDIM(NDS,I) = DIMS(I)
+	        DATASET_IDIM(I,NDS) = DIMS(I)
 	      END DO
               DATASET_DPTR(NDS) = TPTR
               CALL ARR_SUMDIM( NDIM, DIMS, DATASET_NDAT(NDS) )

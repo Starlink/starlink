@@ -92,7 +92,7 @@ c     RECORD/PREDICTION/PREDDAT(NDS)	! Data predicted by model
 
 *  Copy out the axis pointers
       DO I = 1, FIT__MXDIM
-        IDIMM(I) = PREDICTION_IDIMM(N, I)
+        IDIMM(I) = PREDICTION_IDIMM(I,N)
       END DO
 
 *  Convolution with instrument response required
@@ -126,7 +126,7 @@ c     RECORD/PREDICTION/PREDDAT(NDS)	! Data predicted by model
 
 *  Restore the axis pointers
       DO I = 1, FIT__MXDIM
-        PREDICTION_IDIMM(N, I) = IDIMM(I)
+        PREDICTION_IDIMM(I,N) = IDIMM(I)
       END DO
 
 *  Scale by vignetting array if present
