@@ -1,5 +1,6 @@
 # Starlink M4 macros for autoconf
-# This is starconf version @PACKAGE_VERSION@
+# This file is part of starconf version @PACKAGE_VERSION@
+# DO NOT EDIT: it may be overwritten when starconf is next run
 
 # _STAR_WRITE_BOILERPLATE
 # -----------------------
@@ -51,13 +52,13 @@ AC_DEFUN([STAR_DEFAULTS],
 # inconsistent value of this variable.
 AC_ARG_VAR(STARLINK, [Where all the Starlink software lives])dnl
 
-# Ensure that STARLINK has a value, defaulting to @prefix@.  
+# Ensure that STARLINK has a value, defaulting to @DEFAULT_STARLINK@.  
 # Note that this directory will be different from /star, if the
-# `starconf' component was configured with a non-default --prefix
-test -n "$STARLINK" || STARLINK=@prefix@
+# `starconf' component was configured with a non-default value of STARLINK
+test -n "$STARLINK" || STARLINK=@DEFAULT_STARLINK@
 
-# Install software in @prefix@ by default
-AC_PREFIX_DEFAULT(@prefix@)dnl
+# Install software in @DEFAULT_STARLINK@ by default
+AC_PREFIX_DEFAULT(@DEFAULT_STARLINK@)dnl
 
 # Include a dependency of acinclude.m4 on this file
 cat >>$STAR_BOILERPLATE <<EOD
