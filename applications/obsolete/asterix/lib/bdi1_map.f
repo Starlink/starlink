@@ -174,8 +174,8 @@
           CALL ERR_ANNUL( STATUS )
 
 *       Locate the data
-          CALL BDI1_CFIND( ARGS(1), ARGS(2), 'Data', .FALSE.,
-     :                     CLOC, STATUS )
+          CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM(1:7)//'Data',
+     :                     .FALSE., CLOC, STATUS )
 
 *       Map it
           CALL BDI1_ARYMAP( CLOC, TYPE, 'READ', .FALSE., PSID, PTR,
