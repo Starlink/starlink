@@ -1,9 +1,9 @@
-*+  REDS_BESSEL_REBIN - routine to rebin demodulated SCUBA data onto output map
-*                       by convolution with a Bessel function
-      SUBROUTINE REDS_BESSEL_REBIN (STATUS)
+*+  REDS_WTFN_REBIN - routine to rebin demodulated SCUBA data onto output map
+*                       by convolution with a weighting function
+      SUBROUTINE REDS_WTFN_REBIN (METHOD, STATUS)
 *    Description :
 *     This routine rebins the demodulated data from SCUBA MAP observations
-*     onto a rectangular mesh by convolving it with a modified Bessel function.
+*     onto a rectangular mesh by convolving it with a weighting function.
 *     The width of the Bessel function is such that it should preserve all
 *     spatial information obtained by the telescope at the wavelength of
 *     observation, but suppress higher spatial frequencies. To minimise edge
@@ -15,10 +15,12 @@
 *     (the F.T. of the Bessel function), then transforming back into image
 *     space.
 *
+*     A linear weighting function is also available.
+*
 *     The application can read in up to 10 separate input datasets. The 
 *     output map will be large enough 
 *    Invocation :
-*     CALL REDS_BESSEL_REBIN (STATUS)
+*     CALL REDS_WTFN_REBIN (STATUS)
 *    Parameters :
 *     STATUS          = INTEGER (Given and returned)
 *           global status
@@ -52,6 +54,9 @@
       PARAMETER (MAX_DIM = 4)
       INTEGER     MAX_FILE             ! max number of input files
       PARAMETER (MAX_FILE = 10)
+      BYTE BADBIT                      ! Bad bit mask
+      PARAMETER (BADBIT = 1)
+
 *    Local variables :
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                        ! A/D numbers of bolometers measured in
@@ -125,6 +130,7 @@
       INTEGER          IHOUR           ! hour in which observation started
       INTEGER          IM              ! month in which observation started
       INTEGER          IMIN            ! minute at which observation started
+      CHARACTER*40     INSTRUMENT      ! FITS instrument entry
       INTEGER          INTEGRATION     ! integration index in DO loop
       CHARACTER*15     IN_CENTRE_COORDS! coord system of telescope centre in
                                        ! an input file
@@ -214,6 +220,7 @@
       REAL             MAP_Y           ! y offset of map centre from telescope
                                        ! centre (radians)
       INTEGER          MEASUREMENT     ! measurement index in DO loop
+      CHARACTER*15     METHOD          ! rebin method
       DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs of all
                                        ! measured positions are calculated
       INTEGER          NDIM            ! the number of dimensions in an array
@@ -300,6 +307,7 @@
       CHARACTER*80     STEMP           ! scratch string
       CHARACTER*15     SUB_INSTRUMENT  ! the sub-instrument used to make the
                                        ! maps
+      CHARACTER*40     TELESCOPE       ! FITS telescope entry
       INTEGER          TOTAL_WEIGHT_END! pointer to end of TOTAL_WEIGHT_PTR
                                        ! space
       INTEGER          TOTAL_WEIGHT_PTR! pointer to scratch space holding 
@@ -315,6 +323,13 @@
       DOUBLE PRECISION XMIN            ! min of map offsets
       DOUBLE PRECISION YMAX            ! max of map offsets
       DOUBLE PRECISION YMIN            ! min of map offsets
+      INTEGER WEIGHTSIZE               ! Radius of weighting function
+      REAL             WTFN(SCUIP__RES1 * SCUIP__RES1 *
+     :     SCUIP__FILTRAD * SCUIP__FILTRAD) ! Weighting function
+
+      REAL T0, T1
+      REAL SECNDS
+      EXTERNAL SECNDS
 *    Internal References :
 *    Local data :
 *-
@@ -326,6 +341,27 @@
       DO I = 1, MAX_FILE
          DUMMY_VARIANCE_PTR(I) = 0
       END DO
+
+* Read in the weighting function
+      
+      IF (METHOD.EQ.'BESSEL') THEN
+*   Bessel
+         CALL MSG_OUT(' ', 'Initialising BESSEL weighting functions',
+     :        STATUS)
+         WEIGHTSIZE = SCUIP__FILTRAD
+         CALL SCULIB_BESSEL_WTINIT(WTFN, WEIGHTSIZE, SCUIP__RES1,STATUS)
+      ELSE IF (METHOD.EQ.'LINEAR') THEN
+*   Linear
+         CALL MSG_OUT(' ', 'Initialising LINEAR weighting functions',
+     :        STATUS)
+         WEIGHTSIZE = 1
+         CALL SCULIB_LINEAR_WTINIT(WTFN, SCUIP__RES1, STATUS)
+      ELSE
+         STATUS = SAI__ERROR
+         CALL MSG_SETC('METHOD', METHOD)
+         CALL ERR_REP(' ','REDS: Rebin type ^METHOD unavailable',
+     :        STATUS)
+      END IF
 
 *  start up the NDF system and read in the input demodulated files
 
@@ -717,7 +753,7 @@
      :              STATUS)
                ITEMP = DIM(1) * DIM(2)
                RTEMP = 1.0e-6
-               CALL SCULIB_VFILLR(ITEMP, RTEMP,
+               CALL SCULIB_CFILLR(ITEMP, RTEMP,
      :              %VAL(DUMMY_VARIANCE_PTR(FILE)))
                FILE_VARIANCE_PTR = DUMMY_VARIANCE_PTR(FILE)
             END IF               
@@ -1578,6 +1614,8 @@
       CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
      :  OUT_QUALITY_PTR, ITEMP, STATUS)
 
+      CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
+
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_CFILLB (NX_OUT * NY_OUT, 1, 
      :     %val(OUT_QUALITY_PTR))
@@ -1599,9 +1637,11 @@
 *  now go through the datasets calculating the `total weight' going into
 *  each output pixel
 
+      T0 = SECNDS(0.0)
+      PRINT *, 'Entering REGRID_1 at t=0'
       IF (STATUS .EQ. SAI__OK) THEN
          DO I = 1, FILE
-            CALL SCULIB_BESSEL_REGRID_1 (WEIGHT(I), 
+            CALL SCULIB_WTFN_REGRID_1 (DIAMETER, WAVELENGTH, WEIGHT(I), 
      :        %val(BOL_RA_PTR(I)), %val(BOL_DEC_PTR(I)), 
      :        N_BOL(I) * N_POS(I), DBLE(OUT_PIXEL), NX_OUT, 
      :        NY_OUT, I_CENTRE, J_CENTRE, %val(TOTAL_WEIGHT_PTR), 
@@ -1620,28 +1660,36 @@
 
 *  go through the input datasets coadding them into the convolution
 
+      T1 = SECNDS(T0)
+      PRINT *, 'REGRID 2 at T = ',T1
       IF (STATUS .EQ. SAI__OK) THEN
          DO I = 1, FILE
-            CALL SCULIB_BESSEL_REGRID_2 (%val(IN_DATA_PTR(I)),
-     :        %val(IN_VARIANCE_PTR(I)),
+            CALL SCULIB_WTFN_REGRID_2 (DIAMETER, SCUIP__RES1,
+     :        %val(IN_DATA_PTR(I)), %val(IN_VARIANCE_PTR(I)),
      :        WEIGHT(I), %val(BOL_RA_PTR(I)), %val(BOL_DEC_PTR(I)),
      :        N_BOL(I) * N_POS(I), OUT_PIXEL, NX_OUT, NY_OUT,
      :        I_CENTRE, J_CENTRE, %val(TOTAL_WEIGHT_PTR),
      :        WAVELENGTH, %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
-     :        %val(CONV_WEIGHT_PTR), STATUS)
+     :        %val(CONV_WEIGHT_PTR), WEIGHTSIZE, WTFN, STATUS)
          END DO
       END IF
 
 *  now add the output pixels with zero `total weight' into the
 *  convolution sum and calculate the final result
 
+      T1 = SECNDS(T0)
+      PRINT *, 'REGRID 3 at T= ', T1
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_BESSEL_REGRID_3 (OUT_PIXEL, NX_OUT, NY_OUT,
-     :     I_CENTRE, J_CENTRE, %val(TOTAL_WEIGHT_PTR), WAVELENGTH,
-     :     %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
-     :     %val(OUT_QUALITY_PTR), %val(CONV_WEIGHT_PTR), STATUS)
+         CALL SCULIB_WTFN_REGRID_3 (DIAMETER, SCUIP__RES1, OUT_PIXEL, 
+     :        NX_OUT, NY_OUT,
+     :        I_CENTRE, J_CENTRE, %val(TOTAL_WEIGHT_PTR), WAVELENGTH,
+     :        %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
+     :        %val(OUT_QUALITY_PTR), %val(CONV_WEIGHT_PTR), WEIGHTSIZE,
+     :        WTFN, STATUS)
       END IF
 
+      T1 = SECNDS(T0)
+      PRINT *, 'FINISH at T= ',T1
 *  set up the output axes
 
       CALL NDF_AMAP (OUT_NDF, 'CENTRE', 1, '_REAL', 'WRITE',
@@ -1669,6 +1717,11 @@
       CALL NDF_ACPUT ('Y', OUT_NDF, 'LABEL', 2, STATUS)
       CALL NDF_ACPUT ('arcsec', OUT_NDF, 'UNITS', 2, STATUS)
       CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 2, STATUS)
+
+* and a title
+ 
+         CALL NDF_CPUT(OBJECT, OUT_NDF, 'Title', STATUS)
+         CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
 
 *  create the IRAS astrometry structure
 
@@ -1703,6 +1756,13 @@
       CALL IRA_CREAT ('GNOMONIC', NP, P, SCS, OUT_EPOCH, OUT_NDF,
      :  ITEMP, STATUS)
 
+* Get telescope and instrument from FITS
+
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :     'INSTRUME', INSTRUMENT, STATUS)
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :     'TELESCOP', TELESCOPE, STATUS)
+
 *  and write out the same information to a .MORE.FITS section
 
       N_FITS = 0
@@ -1730,6 +1790,11 @@
      :  I_CENTRE, 'I of centre pixel', STATUS)
       CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'J_CENTRE',
      :  J_CENTRE, 'J of centre pixel', STATUS)
+
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'TELESCOP',
+     :  TELESCOPE, 'name of telescope', STATUS)
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'INSTRUME',
+     :  INSTRUMENT, 'name of instrument', STATUS)
 
 *  write out the FITS extension
 
