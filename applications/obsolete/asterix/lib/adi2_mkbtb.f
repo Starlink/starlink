@@ -124,7 +124,6 @@
       INTEGER			LUN			! Logical unit
       INTEGER			NDIG			! Number of digits
       INTEGER			I
-      INTEGER			nhdu, hdutype
 *.
 
 *  Check inherited global status.
@@ -175,19 +174,6 @@
 *  Define its size
       FSTAT = 0
       CALL ADI2_GETLUN( FID, LUN, STATUS )
-
-c     print*, 'HDU=', hdu
-c     call ftghdn(lun, nhdu)
-c     call ftmahd(lun, nhdu, hdutype, fstat)
-c     print*, nhdu, hdutype, fstat
-c     call ftcrhd(lun, fstat)
-c     print*, fstat
-c     call ftghdn(lun, nhdu)
-c     call ftmahd(lun, nhdu, hdutype, fstat)
-c     print*, nhdu, hdutype, fstat
-
-c     CALL FTIBIN( LUN, NROWS, NFLDS, NAMES, TYPES, UNITS, EXTNAME, VARIDAT, FSTAT )
-c     CALL FTPHBN( LUN, NROWS, NFLDS, NAMES, TYPES, UNITS, EXTNAME, VARIDAT, FSTAT )
       CALL FTBDEF( LUN, NFLDS, TYPES, VARIDAT, NROWS, FSTAT )
       IF ( FSTAT .NE. 0 ) STATUS = SAI__ERROR
 
