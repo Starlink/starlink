@@ -16,7 +16,7 @@
       basis for more complex text processing applications.
     </p></abstract>
   <dependencies>
-    <build>starconf sae cnf star2html messgen</build>
+    <build>starconf sae cnf star2html</build>
     <use></use>
   </dependencies>
   <developers>
