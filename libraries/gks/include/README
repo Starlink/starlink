@@ -1,0 +1,37 @@
+These are the standard RAL GKS include files with the exception
+that the explicit CPP processing that used switching on operating
+systems has been tidied up for inclusion in autoconf system.
+
+
+check.inc
+
+  Since modern fortran compilers understand 'IMPLICIT NONE'
+  this include file now simply includes that one statement.
+
+gkmc.par
+
+  This is now processed by the configure system which then generates
+  a files suitable for CPP processing (.fpp).
+
+  The configure processing generates the version string.
+
+  Fortran CPP processor inserts the units of RECL. (KRCBYT)
+
+  KMNIO was always 0 and so is now simply 0
+
+  QTOL was 1.0E-7 for all cases except vax. Simply set it to 1.0E-7
+
+  Calculation of KMXIO is now set at 40 until a configure test
+  can be created.
+
+gkwca.cmn
+
+  String size set to 512 for all. RS6000 used 500. Cray used 152.
+
+gkpid.par
+
+  All systems were identical except for Cray.
+  Since we are not running autoconf on Cray, simply ignore the difference
+  for now.
+
+
