@@ -126,7 +126,7 @@
       FSTAT = 0
 
 *  Locate the HDU buffer
-      CALL ADI2_LOCHDU( FID, HDU, HID, STATUS )
+      CALL ADI2_MOVHDU( FID, HDU, HID, STATUS )
 
 *  Get logical unit
       CALL ADI2_GETLUN( FID, LUN, STATUS )

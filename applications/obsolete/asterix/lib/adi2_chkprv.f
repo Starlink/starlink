@@ -133,7 +133,7 @@
         IF ( IHDU .EQ. 1 ) THEN
           HDU = ' '
         ELSE
-          WRITE( STR, '(A,I1.1)' ) '.HDU', IHDU
+          WRITE( STR, '(A,I1.1)' ) '.HDU_', IHDU
           CALL ADI_CGET0C( FID, STR, HDU, STATUS )
         END IF
         CALL ADI2_LOCHDU( FID, HDU, OHID, STATUS )

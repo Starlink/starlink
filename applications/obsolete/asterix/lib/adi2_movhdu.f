@@ -103,6 +103,8 @@
       INTEGER			FSTAT			! FITSIO status
       INTEGER			LUN			! Logical unit
       INTEGER			NHDU			! HDU number
+
+      LOGICAL			CREATED			! HDU already exists?
 *.
 
 *  Check inherited global status.
