@@ -1479,6 +1479,7 @@ proc CommentaryArea {} {
 #-
    global F3
    global COM_FONT
+   global HD_FONT
    global TOP
    global HSTRUT
    global CLAB
@@ -1509,9 +1510,15 @@ proc CommentaryArea {} {
       set sc [scrollbar $F3.sc -command "$F3.lab yview" -width 15 -relief sunken]
       pack $sc -side right -fill y
 
+# Create a label widget to contain the current headline.
+      set HDLAB [label $F3.hdlab -justify left -textvariable HEADLINE \
+                    -anchor nw -font $HD_FONT -foreground "#a00" -width 3 ]
+      pack $HDLAB -side top -fill x -padx 7m -pady 2m
+
 # Create a text widget to display dynamic commentary information
       set CLAB [text $F3.lab -state disabled -relief flat -wrap word -bd 0 \
                 -highlightthickness 0 -font $COM_FONT -width $width \
+                -foreground "#000" \
                 -yscrollcommand "$F3.sc set" -spacing1 1m -spacing2 1m]
       pack $CLAB -fill both -expand 1 -padx 7m -pady 4m
 
@@ -1861,7 +1868,7 @@ proc Step {demo body} {
          } elseif { $element == "alpha" } {
             incr i
    
-         } elseif { $element == "agitate" } {
+         } elseif { $element == "head" } {
             incr i
    
          } elseif { $element == "link" } {
@@ -1906,6 +1913,13 @@ proc Step {demo body} {
             break
          }
 
+      } elseif { $element == "head" } {
+         incr i
+         if { ![Head [lindex $body $i]] } {
+            set ret 0
+            break
+         }
+
       } elseif { $element == "pause" } {
          incr i
          if { ![Pause [lindex $body $i]] } {
@@ -1916,12 +1930,6 @@ proc Step {demo body} {
       } elseif { $element == "alpha" } {
          incr i
          if { ![Alpha [lindex $body $i]] } {
-            set ret 0
-            break
-         }
-
-      } elseif { $element == "agitate" } {
-         if { ![Agitate] } {
             set ret 0
             break
          }
@@ -1942,6 +1950,13 @@ proc Step {demo body} {
 
       }
    }
+
+#  Reset the Adam Message System to prevent AMS trampling over the
+#  monoliths when some (unknown) internal limit is exceeded (this would
+#  result in the monolith dying and a "rendevouz file lost" message).
+#  Amongst other things, this throws away all parameter defaults and clears
+#  the screen.
+   AdamReset
 
    return $ret
 
@@ -2604,6 +2619,7 @@ proc Run {} {
    global CAN
    global ADAM_TASKS
    global TASK_FILE
+   global HEADLINE
 
 #  Cancel the binding for Configure so that the configuration changes 
 #  do not result in teh GWM display being re-created.
@@ -2623,12 +2639,14 @@ proc Run {} {
    
          set ABORT_DEMO 0
 
-         SetCom "Starting demonstration \"$name\"..."
+         SetCom ""
+         set HEADLINE "Starting demonstration \"$name\"..."
 
          set a 0
          after 2000 "set a 1"
          tkwait variable a
-   
+
+         set HEADLINE ""
          set RUNNING_DEMO $name
          Demo $name $DEMO($name)
 
@@ -2652,12 +2670,14 @@ proc Run {} {
          set RUNNING_DEMO "<idle>"
          set DOING ""
 
-         SetCom "Demonstration \"$name\" has now finished."
+         SetCom ""
+         set HEADLINE "Demonstration \"$name\" has now finished."
+
          set a 0
          after 2000 "set a 1"
          tkwait variable a
    
-         SetCom ""
+         set HEADLINE ""
 
          set first 0
          if { $ABORT_DEMO == 1 } { break }
@@ -2684,23 +2704,27 @@ proc Abort {} {
    global ABORT_DEMO
    global TIMED_PAUSE
    global PAUSE_DEMO  
+   global HEADLINE
 
    if { $PAUSE_DEMO } { ResumeDemo }
 
    set ABORT_DEMO 1
    set TIMED_PAUSE 0
-   SetCom "Aborting demonstration..."
+   set HEADLINE "Aborting demonstration..."
+   SetCom ""
 
 }
 
 proc Next {} {
    global ABORT_DEMO
    global PAUSE_DEMO  
+   global HEADLINE
 
    if { $PAUSE_DEMO } { ResumeDemo }
 
    set ABORT_DEMO 2
-   SetCom "Moving on to the next demonstration..."
+   set HEADLINE "Moving on to the next demonstration..."
+   SetCom ""
 
 }
 
@@ -2838,16 +2862,72 @@ proc SetCom {com args} {
 
 }
 
-proc Agitate {} {
+proc AdamReset {} {
    global CHECK_DEMO
-   global env
+   global ADAM_TASKS
+   global ADAM_USER
+   global DEVICE
+   global TASK_FILE
+   global OLDKAPPA
 
    if { !$CHECK_DEMO } {
-      set fl [glob -nocomplain $env(AGI_USER)/agi_*.sdf]
-      if { $fl != "" } {
-         file delete $fl
+
+#  Kill all tasks
+      foreach task $ADAM_TASKS {
+         catch {$task kill}
       }
+
+#  Record the tasks which are to be re-instated later and then empty the
+#  currently list of active tasks.
+      set tasks $ADAM_TASKS 
+      set ADAM_TASKS ""
+
+#  Shutdown Startcl
+      upvar #0 adamtask_priv priv
+      fileevent $priv(PIPE) readable ""
+      adam_reply $priv(RELAY_PATH) $priv(RELAY_MESSID) SYNC "" exit
+      unset priv 
+      rename exit {}
+      rename adamtask.realExit exit
+
+#  Delete the temporary ADAM_USER directory created at the start, and
+#  create a new one.
+      if { [file exists $ADAM_USER] } {
+         catch {exec rm -r -f $ADAM_USER}
+      }
+      catch {exec mkdir -p $ADAM_USER}
+
+#  Pause
+      after 1000
+
+#  Start up Startcl
+      adamtask.init         
+      bind . <Destroy> ""
+
+#  Re-load the tasks.
+      foreach task $tasks {
+         LoadTask $task $TASK_FILE($task)
+      }
+
+#  Re-establish the graphics devices.
+      Obey kapview gdset "device=$DEVICE" 1
+      Obey kapview idset "device=$DEVICE" 1
+      Obey kapview gdclear ""
    }
+   return 1
+}
+
+proc Head {text} {
+   global ABORT_DEMO
+   global CHECK_DEMO
+   global HEADLINE
+
+   Diag "      $text"
+
+   if { !$CHECK_DEMO && !$ABORT_DEMO } { 
+      set HEADLINE $text
+   }
+
    return 1
 }
 
@@ -3061,6 +3141,7 @@ proc ShowText {name mess scope args} {
 # Create the text widget.
    set text [text $tf.lab -state disabled -relief flat -wrap word -bd 0 \
                    -highlightthickness 0 -font $COM_FONT -width 60 \
+                   -foreground "#000" \
                    -height 20  -yscrollcommand "$tf.sc set"]
    pack $text -side left -fill both -expand 1 -padx 5m -pady 5m
 
@@ -3623,4 +3704,5 @@ proc GetEnv {varnam} {
 
       return $ret
    }
+
 

@@ -224,11 +224,13 @@
 
 
 
+   set px240 [expr round( 24.0 * $fac ) ]   
    set px180 [expr round( 18.0 * $fac ) ]   
    set px140 [expr round( 14.0 * $fac ) ]   
    set px120 [expr round( 12.0 * $fac ) ]   
    set px100 [expr round( 10.0 * $fac ) ]   
 
+   set HD_FONT [SelectFont "-*-*-bold-r-*-*-$px240-*-*-*-*-*-*-*"]
    set BIG_FONT [SelectFont "-*-*-bold-i-*-*-$px180-*-*-*-*-*-*-*"]
    set FONT [SelectFont "-*-*-bold-r-*-sans-$px140-*-*-*-*-*-*-*"]
    set COM_FONT [SelectFont "-*-*-bold-r-*-sans-$px180-*-*-*-*-*-*-*"]
@@ -295,6 +297,7 @@
 
 # Define Startcl procedures (this must be done after the ADAM_USER
 # directory has been set up).
+   set env(ADAM_MESSAGE_RELAY) $STARDEMO_DIR/adamMessageRelay
    source $STARDEMO_DIR/adamtask.tcl
 
 # The adamtask.tcl file creates a binding which causes the application to
