@@ -161,6 +161,10 @@
 #        Modified to read file when given name.
 #     18-MAY-1998 (PDRAPER):
 #        Added support for image exposure times.
+#     21-MAY-1999 (PDRAPER):
+#        Substantial rework of interface to add panes (to save
+#        real-estate and a pop-up window) and the ability to append to
+#        a named file.
 #     {enter_further_changes_here}
 #-
 
@@ -182,6 +186,9 @@ itcl::class gaia::StarPhotom {
       #  Evaluate any options.
       eval itk_initialize $args
 
+      #  Add short_help window.
+      make_short_help
+
       #  Record the choice of magnitudes or counts (default is true)
       #  and set the top-level window description.
       if { ! $mags } {
@@ -194,11 +201,11 @@ itcl::class gaia::StarPhotom {
             "GAIA: Aperture photometry -- magnitudes ($itk_option(-number))"
       }
 
-      #  Add tab window for revealing the object defails, main parameters
-      #  and misc. extras.
+      #  Add tab window for revealing the aperture details,
+      #  measurement parameters and possible all results.
       itk_component add TabNoteBook {
 	  iwidgets::tabnotebook $w_.tab \
-	      -angle 0 -tabpos n -width 350 -height 400
+	      -angle 0 -tabpos n -width 350 -height 450
       }
 
       #  Add pane for current aperture details.
@@ -209,18 +216,14 @@ itcl::class gaia::StarPhotom {
       $itk_component(TabNoteBook) add -label Parameters
       set child_(params) [$itk_component(TabNoteBook) childsite 1]
 
-      #  Add pane for photometer control parameters.
-      $itk_component(TabNoteBook) add -label Extra
-      set child_(extras) [$itk_component(TabNoteBook) childsite 2]
-
       #  Add pane for viewing all measurements together (slower).
       $itk_component(TabNoteBook) add -label Results
-      set child_(results) [$itk_component(TabNoteBook) childsite 3]
+      set child_(results) [$itk_component(TabNoteBook) childsite 2]
 
       #  Add controls for viewing all measurements (do this now to get
       #  name).
       set view_($this) 0
-      itk_component add viewall {
+      itk_component add ViewAll {
          checkbutton $child_(results).viewall  \
             -text {View all measurements:} \
             -variable [scope view_($this)] \
@@ -228,7 +231,9 @@ itcl::class gaia::StarPhotom {
             -offvalue 0 \
             -command [code $this view]
       }
-      pack $itk_component(viewall) -side top -fill x
+      pack $itk_component(ViewAll) -side top -fill x
+      add_short_help $itk_component(ViewAll) \
+         {Display all measurements in scrollable window (slow)}
 
       #  Create a StarPhotomDetails object to display the values
       #  of the selected object.
@@ -237,6 +242,8 @@ itcl::class gaia::StarPhotom {
             -positions_cmd [code $this sky_method_changed] \
             -usemags $usemags_
       }
+      add_short_help $itk_component(ObjectDetails) \
+         {Details of the currently selected aperture}
 
       #  Create the StarPhotomList object to deal with the details of
       #  the objects that are being measured.
@@ -264,7 +271,7 @@ itcl::class gaia::StarPhotom {
       #  Create a StarPhotomExtras object to deal with any additional
       #  parameters for autophotom.
       itk_component add Extras {
-         StarPhotomExtras $child_(extras).extras
+         StarPhotomExtras $child_(params).extras
       }
 
       #  Add an options menu for setting options that should probably
@@ -284,9 +291,7 @@ itcl::class gaia::StarPhotom {
          -command [code $this clone_me_] \
          -accelerator {Control-n}
       bind $w_ <Control-n> [code $this clone_me_]
-      $short_help_win_ add_menu_short_help $File \
-         {New window} \
-         {Create a new toolbox}
+      add_menu_short_help $File {New window} {Create a new toolbox}
 
       #  Save measurements to a file.
       $File add command \
@@ -294,6 +299,8 @@ itcl::class gaia::StarPhotom {
          -command [code $this save_objects] \
          -accelerator {Control-s}
       bind $w_ <Control-s> [code $this save_objects]
+      add_menu_short_help $File {Save measurements...} \
+         {Save current measurements to a selected file}
 
       #  Read measurements from a file.
       $File add command \
@@ -301,11 +308,14 @@ itcl::class gaia::StarPhotom {
          -command [code $this read_file] \
          -accelerator {Control-r}
       bind $w_ <Control-r> [code $this read_file]
+      add_menu_short_help $File {Read measurements...} \
+         {Read existing measurements from a selected file}
 
-      #  Set the exit menu item.
+      #  Set the exit menu items.
       $File add command -label Exit -command [code $this close] \
          -accelerator {Control-c}
       bind $w_ <Control-c> [code $this close]
+      add_menu_short_help $File {Exit} {Close this window}
 
       #  Determine how sky positions will be indicated.
       set skymethod_($this) 1
@@ -315,6 +325,8 @@ itcl::class gaia::StarPhotom {
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this sky_method_changed]
+      add_menu_short_help $Options {Use annular sky regions}  \
+         {Toggle to define sky in detached apertures}
 
       #  Get shape of apertures (sky and object must be the same).
       set shape_($this) 1
@@ -325,6 +337,8 @@ itcl::class gaia::StarPhotom {
          -offvalue 0 \
          -command [code $this set_shape]
       $itk_component(ObjectDetails) set_for_circles 1
+      add_menu_short_help $Options {Use circular apertures}  \
+         {Toggle to get elliptical apertures}
 
       #  Whether fixed size apertures are to be used.
       set resize_($this) 1
@@ -334,6 +348,8 @@ itcl::class gaia::StarPhotom {
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this set_resize]
+      add_menu_short_help $Options {Allow interactive aperture adjustment} \
+         {Toggle to create apertures with a fixed size}
 
       #  Sky zero point and frame exposure time.
       if { $usemags_ } {
@@ -344,6 +360,8 @@ itcl::class gaia::StarPhotom {
                -labelwidth 25 \
                -command [code $this sky_zero_changed]
          }
+         add_short_help $itk_component(Skymag) \
+            {Magnitude assigned to sky level}
       }
 
       #  Name of the results file.
@@ -353,27 +371,8 @@ itcl::class gaia::StarPhotom {
             -text "Results:" \
 	    -value "StarPhotomLog.Dat"
       }
-
-      #  Source of the exposure time.
-      itk_component add ExSource {
-         LabelMenu $child_(params).exsrc \
-            -text "Exposure time source:" \
-            -labelwidth 25
-      }
-      $itk_component(ExSource) add -label {simple constant} \
-	      -command [code $this set_exsrc CONSTANT]
-      $itk_component(ExSource) add -label {FITS keyword} \
-	      -command [code $this set_exsrc HEADER]
-      $itk_component(ExSource) add -label {HDS object} \
-	      -command [code $this set_exsrc HDS]
-
-      #  Exposure time qualifier.
-      itk_component add ExQual {
-	  LabelEntry $child_(params).exqual \
-		  -text {Exposure time/qualifier:} \
-		  -value 1.0 \
-		  -labelwidth 25 \
-      }
+      add_short_help $itk_component(Results) \
+         {Name of file that "Save" and "Append" buttons use}
 
       #  Create a button bar with options for defining either an
       #  object or sky regions.
@@ -390,6 +389,8 @@ itcl::class gaia::StarPhotom {
             -command [code $this define_object]
       }
       $itk_component(DefineObject) configure -highlightbackground black
+      add_short_help $itk_component(DefineObject) \
+         {Press and then drag out aperture on image}
 
       #  Define sky regions (only used if skymethod is set to regions).
       itk_component add DefineSky  {
@@ -399,6 +400,8 @@ itcl::class gaia::StarPhotom {
             -command [code $this define_sky] \
             -state disabled
       }
+      add_short_help $itk_component(DefineSky) \
+         {Press and then drag out aperture on image}
 
       #  Copy selected objects.
       itk_component add MeasureFrame {frame $w_.copy}
@@ -408,6 +411,8 @@ itcl::class gaia::StarPhotom {
             -width 20 \
             -command [code $object_list_ copy]
       }
+      add_short_help $itk_component(Copy) \
+         {Create copy of current/last aperture}
 
       #  Measure all objects.
       itk_component add Measure {
@@ -416,6 +421,8 @@ itcl::class gaia::StarPhotom {
             -width 20 \
             -command [code $this measure_objects]
       }
+      add_short_help $itk_component(Measure) \
+         {Calculate photometry of all apertures}
 
       #  Close window button.
       itk_component add CloseFrame {frame $w_.close}
@@ -423,6 +430,7 @@ itcl::class gaia::StarPhotom {
          button $itk_component(CloseFrame).close \
             -text {Close}  -command [code $this close]
       }
+      add_short_help $itk_component(Close) {Close this window}
 
       #  Save measurements to the results file.
       itk_component add SaveFrame {frame $w_.save}
@@ -432,6 +440,8 @@ itcl::class gaia::StarPhotom {
 	      -width 20 \
 	      -command [code $this save_results]
       }
+      add_short_help $itk_component(Save) \
+         {Save current measurements to results file}
 
       #  Append measurements to the results files.
       itk_component add Append {
@@ -440,6 +450,8 @@ itcl::class gaia::StarPhotom {
 	      -width 20 \
 	      -command [code $this append_results]
       }
+      add_short_help $itk_component(Append) \
+         {Append current measurements to results file}
 
       #  Pack up window.
       pack $itk_component(Close) -side bottom -pady 2 -padx 2
@@ -452,8 +464,6 @@ itcl::class gaia::StarPhotom {
       pack $itk_component(ObjectDetails) -fill both -expand true \
 	  -pady 2 -padx 2
       pack $itk_component(Extras) -fill both -expand true -pady 2 -padx 2
-      pack $itk_component(ExSource) -fill x -pady 2
-      pack $itk_component(ExQual) -fill x -pady 2
 
       pack $itk_component(Define) -side top -fill x  -pady 2 -padx 2
       pack $itk_component(DefineObject) -side left -expand true -pady 2 -padx 2
@@ -576,6 +586,7 @@ itcl::class gaia::StarPhotom {
             } else {
                set more ""
             }
+            puts "more = $more"
 
             #  And run the command.
             if { $usemags_ } {
@@ -592,8 +603,6 @@ itcl::class gaia::StarPhotom {
                outfile=StarPhotomOut.Dat \
                skymag=$skymag_ \
                usemags=$ok \
-	       exsource=$exsrc_ \
-	       etime=[$itk_component(ExQual) get] \
                $more
          } else {
             error_dialog "No image is displayed"
@@ -719,11 +728,6 @@ itcl::class gaia::StarPhotom {
       }
    }
 
-   #  Set the source of the exposure factor.
-   private method set_exsrc {value} {
-       set exsrc_ $value
-   }
-
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -812,9 +816,6 @@ itcl::class gaia::StarPhotom {
 
    #  Value of skymag when last known.
    protected variable skymag_ 50
-
-   #  Source of exposure factor.
-   protected variable exsrc_ CONSTANT
 
    #  Common variables: (shared by all instances)
    #  -----------------

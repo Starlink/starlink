@@ -14,7 +14,7 @@
 #     "autophotom" application. At present these are:
 #
 #        BIASLE CENTRO MAXITER MAXSHIFT PADU PHOTON POSITIVE
-#        SATURE SEARCH SKY SKYEST SKYSIG TOLER
+#        SATURE SEARCH SKY SKYEST SKYSIG TOLER EXSOURCE ETIME
 #
 #     The current values of these parameters (which are public
 #     variables of this class) can be queried in one call, "getstate".
@@ -98,7 +98,8 @@
 #     See method statements below.
 
 #  Inheritance:
-#     This widget inherits the TopLevelWidget class.
+#     This widget inherits the FrameWidget class (also assumes part of 
+#     a TopLevelWidget).
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -120,17 +121,44 @@ itcl::class gaia::StarPhotomExtras {
 
    #  Inheritances:
    #  -------------
-#   inherit util::TopLevelWidget
    inherit util::FrameWidget
 
    #  Constructor:
    #  ------------
    constructor {args} {
 
-      #  Add widget for accessing the values.
       set labelwidth 28
+
+      #  Add widgets for accessing the values.
+      #  Source of the exposure time.
       itk_component add Label1 {
          LabelRule $w_.label1 \
+            -text "Exposure time:"
+      }
+      itk_component add ExSource {
+         LabelMenu $w_.exsrc \
+            -text "Exposure time source:" \
+            -labelwidth $labelwidth
+      }
+      $itk_component(ExSource) add -label {simple constant} -value CONSTANT
+      $itk_component(ExSource) add -label {FITS keyword} -value HEADER
+      $itk_component(ExSource) add -label {HDS object} -value HDS
+      add_short_help $itk_component(ExSource) \
+         {How exposure time is located}
+
+      #  Exposure time qualifier.
+      itk_component add Etime {
+	  LabelEntry $w_.etime \
+		  -text {Exposure time/qualifier:} \
+		  -value 1.0 \
+		  -labelwidth $labelwidth  \
+      }
+      add_short_help $itk_component(Etime) \
+         {Exposure time, FITS keyword or HDS object}
+
+      #  Image description parameters.
+      itk_component add Label2 {
+         LabelRule $w_.label2 \
             -text "Image parameters:"
       }
       itk_component add Biaslevel {
@@ -139,21 +167,28 @@ itcl::class gaia::StarPhotomExtras {
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
+      add_short_help $itk_component(Biaslevel) \
+         {Bias level in image data units (zero when removed)}
       itk_component add Photons {
          LabelEntry $w_.padu \
             -text "Photons per data unit" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
+      add_short_help $itk_component(Photons) \
+         {Numbers of photons per ADU, used for noise est.}
       itk_component add Saturation {
          LabelEntry $w_.satur \
             -text "Saturation value:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
+      add_short_help $itk_component(Saturation) \
+         {Objects with greater intensity flagged "S"}
 
-      itk_component add Label2 {
-         LabelRule $w_.label2 \
+      #  Centroid parameters.
+      itk_component add Label3 {
+         LabelRule $w_.label3 \
             -text "Centroid parameters:"
       }
       itk_component add Centroid {
@@ -164,30 +199,40 @@ itcl::class gaia::StarPhotomExtras {
             -variable [scope state_($this,centroid)]
       }
       set state_($this,centroid) TRUE
+      add_short_help $itk_component(Centroid) \
+         {Centroid initial aperture positions}
       itk_component add Maxiterations {
          LabelEntry $w_.maxiter \
             -text "Maximum iterations:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
+      add_short_help $itk_component(Maxiterations) \
+         {Maximum no. iterations when locating centroid}
       itk_component add Maxshift {
          LabelEntry $w_.maxshift \
             -text "Maximum shift in position:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
+      add_short_help $itk_component(Maxshift) \
+         {Maximum shift from initial positions (pixels)}
       itk_component add Search {
          LabelEntry $w_.search \
             -text "Size of search box:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
+      add_short_help $itk_component(Search) \
+         {Size of box to use when locating centroid}
       itk_component add Toler {
          LabelEntry $w_.toler \
             -text "Positional accuracy:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
+      add_short_help $itk_component(Toler) \
+         {Accuracy for centroid corrected position}
       itk_component add Positive {
          StarLabelCheck $w_.positive \
             -text "Positive features:" \
@@ -195,10 +240,13 @@ itcl::class gaia::StarPhotomExtras {
             -labelwidth $labelwidth \
             -variable [scope state_($this,positive)]
       }
+      add_short_help $itk_component(Positive) \
+         {Look for positive features}
       set state_($this,positive) TRUE
 
-      itk_component add Label3 {
-         LabelRule $w_.label3 \
+      #  Measurement parameters.
+      itk_component add Label4 {
+         LabelRule $w_.label4 \
             -text "Measurement parameters:"
       }
 
@@ -213,6 +261,8 @@ itcl::class gaia::StarPhotomExtras {
          -command [code $this configure -photon_errors {sky variance}]
       $itk_component(Photonerr) add -label {data variance} \
          -command [code $this configure -photon_errors {data variance}]
+      add_short_help $itk_component(Photonerr) \
+         {How to calculate measurement errors}
 
       itk_component add Skyest {
          LabelMenu $w_.skyest -text "Sky estimator:" \
@@ -226,6 +276,8 @@ itcl::class gaia::StarPhotomExtras {
          -command [code $this configure -sky_estimator mode]
       $itk_component(Skyest) add -label {constant} \
          -command [code $this configure -sky_estimator constant]
+      add_short_help $itk_component(Skyest) \
+         {Estimator to use when determining sky value}
 
       itk_component add Sky {
          LabelEntry $w_.sky \
@@ -233,30 +285,38 @@ itcl::class gaia::StarPhotomExtras {
             -labelwidth $labelwidth \
          -command [code $this null_method]
       }
+      add_short_help $itk_component(Sky) \
+         {Sky value when estimator is set to constant}
       itk_component add Skysig {
          LabelEntry $w_.skysig \
             -text "Default error in sky level:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
       }
+      add_short_help $itk_component(Skysig) \
+         {Error in sky value when using a constant}
 
       #  All widgets now exist so set default values.
       eval itk_initialize $args
 
       #  Pack up frame.
       pack $itk_component(Label1) -fill x
+      pack $itk_component(ExSource) -fill x -pady 2
+      pack $itk_component(Etime) -fill x -pady 2
+
+      pack $itk_component(Label2) -fill x
       pack $itk_component(Biaslevel) -fill x
       pack $itk_component(Photons) -fill x
       pack $itk_component(Saturation) -fill x
 
-      pack $itk_component(Label2) -fill x
+      pack $itk_component(Label3) -fill x
       pack $itk_component(Centroid) -fill x
       pack $itk_component(Maxiterations) -fill x
       pack $itk_component(Maxshift) -fill x
       pack $itk_component(Toler) -fill x
       pack $itk_component(Positive) -fill x
 
-      pack $itk_component(Label3) -fill x
+      pack $itk_component(Label4) -fill x
       pack $itk_component(Photonerr) -fill x
       pack $itk_component(Skyest) -fill x
       pack $itk_component(Sky) -fill x
@@ -273,7 +333,7 @@ itcl::class gaia::StarPhotomExtras {
 
    # "Close" the window. What is actually does is make it
    #  invisible. The object must survive to be quieried about its
-   #  state. 
+   #  state.
    method hide_window {} {
       wm withdraw $w_
    }
@@ -297,6 +357,8 @@ itcl::class gaia::StarPhotomExtras {
       configure -sky_value [$itk_component(Sky) get]
       configure -sky_value_error [$itk_component(Skysig) get]
       configure -positional_accuracy [$itk_component(Toler) get]
+      configure -exsource [$itk_component(ExSource) get]
+      configure -etime [$itk_component(Etime) get]
    }
 
    #  Do nothing command (overrides <Return> defaults).
@@ -316,8 +378,10 @@ itcl::class gaia::StarPhotomExtras {
                  SEARCH=$itk_option(-search_box_size) \
                  SKY=$itk_option(-sky_value) \
                  SKYSIG=$itk_option(-sky_value_error) \
-                 TOLER=$itk_option(-positional_accuracy) "
-      
+                 TOLER=$itk_option(-positional_accuracy) \
+                 EXSOURCE=$itk_option(-exsource) \
+	         ETIME=$itk_option(-etime) "
+
       switch $itk_option(-photon_errors) {
          {data variance} {
             append state "PHOTON=3 "
@@ -356,13 +420,13 @@ itcl::class gaia::StarPhotomExtras {
       #  Parse string into program parameter pairs and process into
       #  proper descriptions. The input string is split into a list,
       #  multiple spaces in this list become {} elements, so we skip
-      #  these, we alse need to accomodate the condition 
+      #  these, we alse need to accomodate the condition
       #  "keyword = value", rather than the expected "keyword=value".
       set skip 0
       set lstate [split $state]
       for { set i 0 } { $i < [llength $lstate] } { incr i } {
          set element [lindex $lstate $i]
-         if { ! $skip || $element == {} } { 
+         if { ! $skip || $element == {} } {
             set value {}
             switch -glob $element {
                {=} {
@@ -443,9 +507,15 @@ itcl::class gaia::StarPhotomExtras {
                   TOLER {
                      configure -positional_accuracy $value
                   }
+                  EXSOURCE {
+                     configure -exsource $value
+                  }
+                  ETIME {
+                     configure -etime $value
+                  }
                }
             }
-            
+
          } else {
             set skip 0
          }
@@ -521,8 +591,24 @@ itcl::class gaia::StarPhotomExtras {
    itk_option define -sky_value_error sky_value_error Sky_value_error {0} {
       $itk_component(Skysig) configure -value $itk_option(-sky_value_error)
    }
-   itk_option define -positional_accuracy positional_accuracy Positional_accuracy {0.05} { 
+   itk_option define -positional_accuracy positional_accuracy Positional_accuracy {0.05} {
       $itk_component(Toler) configure -value $itk_option(-positional_accuracy)
+   }
+   itk_option define -exsource exsource Exsource CONSTANT {
+      switch $itk_option(-exsource) {
+         HDS {
+            $itk_component(ExSource) configure -value HDS
+         }
+         HEADER {
+            $itk_component(ExSource) configure -value HEADER
+         }
+         default {
+            $itk_component(ExSource) configure -value CONSTANT
+         }
+      }
+   }
+   itk_option define -etime etime Etime {1.0} {
+      $itk_component(Etime) configure -value $itk_option(-etime)
    }
 
    #  Protected variables: (available to instance)
@@ -530,7 +616,7 @@ itcl::class gaia::StarPhotomExtras {
 
    #  Common variables: (shared by all instances)
    #  -----------------
-   
+
    #  Global variable to decouple check button states.
    common state_
 
