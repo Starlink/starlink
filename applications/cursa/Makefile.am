@@ -2,7 +2,7 @@
 
 SUBDIRS = libcap
 
-bin_SCRIPTS = xcatview cursa_test.csh cursa.csh xcatview catcdsin \
+bin_SCRIPTS = xcatview cursa_test.csh cursa.csh catcdsin \
  catremote UrlReader.class UrlReader.java 
 
 nobase_bin_SCRIPTS = xcatviewLib/adamMessageRelay
