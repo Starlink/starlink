@@ -49,6 +49,8 @@ $!    1992 September 29 (MJC):
 $!       Added IRAF libraries and used released FIO.
 $!    1992 September 30 (MJC):
 $!       Used options file to reduce size of executables.
+$!    1993 July 30 (MJC):
+$!       Link with FIO explicitly, and released PAR library.
 $!    {enter_further_changes_here}
 $!
 $!-
@@ -64,8 +66,8 @@ PRM_LINK/OPT,-
 FIGARO_LIBS:DTA/LIB,-
 DYN/LIB,-
 CNV/LIB,-
+FIO_LINK_ADAM/OPT,-
 KAPPA_DIR:AIF/LIB,-
-CONVERT_DIR:PART/LIB,-
 CONVERT_DIR:LIBIMFORT/LIB,-
 CONVERT_DIR:LIBSYS/LIB,-
 CONVERT_DIR:LIBVOPS/LIB,-
