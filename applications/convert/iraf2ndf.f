@@ -67,6 +67,11 @@
 *     beware.
 
 *  Implementation Status:
+*     -  It is only available on VMS, SunOS, and Ultrix systems.  On
+*     Solaris 2.3 systems the version built on SunOS can be used in
+*     compatibility mode, but there is no guarantee that this will
+*     work for all IRAF images.  At the time of writing there was no
+*     working IRAF imfort library available for Alpha/OSF1.
 *     -  Only handles one-, two-, and three-dimensional IRAF files.
 *     -  The NDF produced has type _WORD or _REAL corresponding to the
 *     type of the IRAF image.  (The IRAF imfort FORTRAN subroutine

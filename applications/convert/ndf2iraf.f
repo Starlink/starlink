@@ -85,6 +85,11 @@
 *     system installed, or access to the object libraries required.
 
 *  Implementation Status:
+*     -  It is only available on VMS, SunOS, and Ultrix systems.  On
+*     Solaris 2.3 systems the version built on SunOS can be used in
+*     compatibility mode, but there is no guarantee that this will
+*     work for all NDFs.  At the time of writing there was no working
+*     IRAF imfort library available for Alpha/OSF1.
 *     -  Only handles one-, two-, and three-dimensional NDFs.
 *     -  Of the NDF's array components only the data array may be
 *     copied.
