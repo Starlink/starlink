@@ -1,0 +1,41 @@
+1 FINDCOORDS -- Finding the Coordinates of a Named Object
+
+  findcoords is a new utility for using the name of an astronomical object
+  to look up its equatorial coordinates.  You simply enter the name of
+  the object and its coordinates are displayed.  Type:
+
+    findcoords  object-name
+
+  For example:
+
+    findcoords  ngc3379
+
+  The object-name should be entered without embedded spaces.  The case of
+  letters (upper or lower) is not significant.  If the name is recognised
+  then the equatorial coordinates of the object will be displayed.  The
+  Right Ascension is shown in sexagesimal hours and the Declination in
+  sexagesimal degrees; both are for equinox J2000.
+
+  findcoords works by submitting a remote query via the Internet to the
+  version of the SIMBAD name-resolver provided by ESO (the basic SIMBAD is
+  maintained by the Centre de Donnees astronomiques de Strasbourg, CDS).
+  Consequently, findcoords will only work on computers with a suitable
+  Internet connection.  Also, the name given must be recognised by SIMBAD,
+  though the latter's dictionary of names is very extensive.
+
+  findcoords is documented (insofar as any documentation is necessary) in
+  SUN/240.  To view an on-line version type:
+
+     showme sun240
+
+
+  A C Davenhall (acd@roe.ac.uk), 31 May 2001.
+
+2 Further Examples
+
+  findcoords  ngc6240
+  findcoords  iras20056+1834
+  findcoords  bd+303639
+  findcoords  pks1417-19
+  findcoords  mkn477
+  findcoords  altair

@@ -1,0 +1,103 @@
+#!PERL
+#+
+#  Name:
+#     FINDCOORDS
+#  Purpose:
+#     Find the coordinates of a named astronomical object.
+#  Language:
+#     Perl 5.
+#  Type of Module:
+#     Perl script (with interaction via the command-line).
+#  Description:
+#     Find the equatorial coordinates of a named astronomical object.
+#     The coordinates are obtained by submitting a remote query via
+#     the Internet to the version of the SIMBAD name resolver maintained
+#     by ESO.  If the given name is found in the SIMBAD database then
+#     the coordinates of the object are displayed.  The Right Ascension
+#     is shown in sexagesimal hours and the Declination in sexagesimal
+#     degrees; both are for equinox J2000.
+#  Usage:
+#      findcoords  object-name
+#  Arguments:
+#     object-name (read)
+#        The name of an astronomical object whose coordinates are to be
+#        found.  It should be entered without embedded spaces.  The case
+#        of letters (upper or lower) is not significant.  For example:
+#        NGC3379.
+#  Environment Variables:
+#        None.
+#  Examples:
+#     findcoords  ngc3379
+#        Find the equatorial coordinates of the galaxy NGC 3379.  The
+#        coordinates returned are for equinox J2000.
+#  Algorithm:
+#     Note that findcoords is a simple wrap-around for the name-resolver
+#     function of catremote.  catremote is documented in SSN/76.
+#
+#     Set the variable holding the location of the catremote script.
+#     Set the catremote environment variables.
+#     If there is more than one command-line argument then
+#       Extract the first command-line argument as the object name.
+#       Assemble the catremote query.
+#       Submit the query.
+#     else
+#       Print usage details.
+#     end if
+#  Copyright:
+#     Copyright (C) 2001 Central Laboratory of the Research Councils
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     28/5/01 (ACD): Original version.
+#     29/5/01 (ACD): First stable version.
+#  Bugs:
+#     None known
+#  Libraries required:
+#     None.
+#-
+
+#
+#  Set the variable holding the location of the catremote script.
+
+#    $catremote = "/home/acd/starbase/cursa/catremote/catremote";
+    $catremote = "STAR_BIN/cursa/catremote";
+
+#
+#  Set the catremote environment variables.
+
+#    $ENV{"CATREM_URLREADER"} = "/home/acd/starbase/cursa/catremote/geturl/geturl";
+    $ENV{"CATREM_URLREADER"} = "STAR_BIN/cursa/geturl";
+    $ENV{"CATREM_CONFIG"} = "http://www.roe.ac.uk/acdwww/catremote/cursa.cfg";
+    $ENV{"CATREM_MAXOBJ"} = "200";
+    $ENV{"CATREM_ECHOURL"} = "no";
+
+#
+#  Check that there is at least one command line argument.
+
+    if ($#ARGV >= 0) 
+    {
+
+#
+#     Extract the first command-line argument as the object name.
+
+       $objectName = $ARGV[0];
+
+#
+#     Assemble the catremote query.
+
+       $command = "$catremote  name  simbad_ns\@eso  $objectName";
+
+#
+#     Submit the query.
+
+       system("$command");
+    }
+    else
+    {
+
+#
+#     Print usage details.
+
+       print "Usage:- \n";
+       print "  findcoords  object-name\n";
+    }
