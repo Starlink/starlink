@@ -130,9 +130,9 @@
         CALL ADI_FIND( FID, 'EXTENSIONS', EID, STATUS )
         CALL ADI_THERE( EID, HDU, THERE, STATUS )
         IF ( .NOT. THERE ) THEN
-          CALL ADI_CNEW0( FID, HDU, 'STRUC', STATUS )
+          CALL ADI_CNEW0( EID, HDU, 'STRUC', STATUS )
         END IF
-        CALL ADI_FIND( FID, HDU, ID, STATUS )
+        CALL ADI_FIND( EID, HDU, ID, STATUS )
 
 *  Remove temporary
         CALL ADI_ERASE( EID, STATUS )
