@@ -31,9 +31,7 @@ FITS = _LOGICAL (Read)
 IN = FILENAME (Read)
    Name of the input Fortran text file.  The file will normally
    have variable-length records when there is a header, but
-   always fixed-length records when there is no header.  On VMS
-   platforms a default file extension of ".DAT" is appended when
-   parameter IN contains no file extension.
+   always fixed-length records when there is no header.
 3 OUT
 OUT = NDF (Read and Write)
    Output NDF data structure.  When COMP is not "Data" the NDF
@@ -59,25 +57,24 @@ TYPE = LITERAL (Read)
    unambiguous abbreviation may be given.  TYPE is ignored when
    COMP = "Quality" since the QUALITY component must comprise
    unsigned bytes (equivalent to TYPE = "_UBYTE") to be a valid
-   NDF. The suggested default is the current value.  TYPE is only
+   NDF.  The suggested default is the current value.  TYPE is only
    accessed when FITS is FALSE. ["_REAL"]
 2 Examples
 ascii2ndf ngc253.dat ngc253 shape=[100,60]
    This copies a data array from the text file ngc253.dat to the
-   NDF called ngc253.  ngc253.dat does not contain a header
-   section.  The NDF is two-dimensional: 100 elements in x by 60
+   NDF called ngc253.  The input file does not contain a header
    in y.  Its data array has type _REAL.
 
 ascii2ndf ngc253q.dat ngc253 q shape=[100,60]
    This copies a quality array from the text file ngc253q.dat to
    an existing NDF called ngc253 (such as created in the first
-   example).  ngc253q.dat does not contain a header section.  The
-   NDF is two-dimensional: 100 elements in x by 60 in y.  Its
+   example).  The input file does not contain a header section.
+   The NDF is two-dimensional: 100 elements in x by 60 in y.  Its
    data array has type _UBYTE.
 
 ascii2ndf ngc253.dat ngc253 fits
    This copies a data array from the text file ngc253.dat
-   to the NDF called ngc253.  ngc253.dat contains a FITS-like
+   to the NDF called ngc253.  The input file contains a FITS-like
    header section, which is copied to the FITS extension of the
    NDF.  The shape of the NDF is controlled by the mandatory FITS
    keywords NAXIS, AXIS1, ..., AXISn, and the data type by
@@ -85,19 +82,19 @@ ascii2ndf ngc253.dat ngc253 fits
 
 ascii2ndf type='_uword' in=ngc253.dat out=ngc253 \
    This copies a data array from the text file ngc253.dat to the
-   NDF called ngc253.  ngc253.dat does not contain a header
+   NDF called ngc253.  The input file does not contain a header
    section.  The NDF has the current shape and data type is
    unsigned word.
 
 ascii2ndf spectrum zz skip=2 shape=200
    This copies a data array from the text file spectrum to
-   the NDF called zz.  spectrum contains two header records
+   the NDF called zz.  The input file contains two header records
    that are ignored.  The NDF is one-dimensional comprising 200
    elements of type _REAL.
 
 ascii2ndf spectrum.lis ZZ skip=1 fits
    This copies a data array from the text file spectrum.lis to
-   the NDF called ZZ.  spectrum.lis contains one header record,
+   the NDF called ZZ.  The input file contains one header record,
    that is ignored, followed by a FITS-like header section, which
    is copied to the FITS extension of the NDF.  The shape of the
    NDF is controlled by the mandatory FITS keywords NAXIS, AXIS1,
@@ -107,9 +104,7 @@ The details of the conversion are as follows:
 
    -  the text-file array is written to the NDF array as
    selected by COMP.  When the NDF is being modified, the shape
-   of the new component must match that of the NDF.  Up to 32766
-   bytes per record can be input (this is set by the size of the
-   input buffer).
+   of the new component must match that of the NDF.
 
    -  If the input file contains a FITS-like header, and a new
    NDF is created, i.e. COMP = "Data", the header records are
