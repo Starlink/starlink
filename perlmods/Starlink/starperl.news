@@ -5,17 +5,17 @@
  that they may be installed for use with the Starlink Software using the 
  standard Starlink installation techniques.
 
- This version (v1.3-0) contains:
+ This version (v1.4-0) contains:
 
  o  Starlink::Config v1.00 - a configuration module that provides other
        modules with information about a Starlink Software installation,
 
- o  NDF v1.44 - an interface to NDF,
+ o  NDF v1.45 - an interface to NDF,
 
- o  Starlink v1.13 - a set of Perl modules which interface to parts of 
+ o  Starlink v1.14 - a set of Perl modules which interface to parts of 
        the error reporting and process control systems,
 
- o  GSD v1.12 - an interface to GSD files,
+ o  GSD v1.13 - an interface to GSD files,
 
  o  Astro-SLA v0.96 - an interface to the Fortran SLA library.
 
