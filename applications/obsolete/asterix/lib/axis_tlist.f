@@ -43,7 +43,7 @@
         CALL BDI_CHKAXIS( ID, I, OK, STATUS )
         CALL MSG_SETI ('I', I)
         IF (OK) THEN
-          CALL BDA_GETAXLABEL( ID, I, LABEL, STATUS )
+          CALL BDI_GETAXLABEL( ID, I, LABEL, STATUS )
           CALL MSG_SETC( 'LABEL', LABEL )
           CALL MSG_PRNT( ' ^I ^LABEL' )
         ELSE
