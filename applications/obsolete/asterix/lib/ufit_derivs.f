@@ -49,6 +49,7 @@
 *    Import :
 *
       INTEGER NPAR			! No of parameters
+      EXTERNAL			COMPARATOR
       REAL PARAM(NPAMAX)		! Model parameters
       REAL LB(NPAMAX)			! Parameter lower bounds
       REAL UB(NPAMAX)			! Parameter upper bounds

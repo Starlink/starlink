@@ -91,7 +91,6 @@
 *
 *    Import :
 *
-      INTEGER             NDS			! Number of observed datasets
       REAL                SOFF			! Stat offset for conf. limit
       INTEGER             OPCHAN		! Output channel for diagnostic
 	                                        ! messages ( <1 for no messages)
