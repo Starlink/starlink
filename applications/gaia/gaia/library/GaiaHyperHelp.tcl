@@ -229,7 +229,10 @@ itcl::class gaia::GaiaHyperHelp {
    public method search {} {
       file delete $tmpfile_
       catch {
-         exec findme -q -warn -html -f -m -s \
+#         23rd Jan 2003 "-s" option currently broken under Linux.
+#         exec findme -q -warn -html -f -m -s \
+#            [$itk_component(searchtext) get] > $tmpfile_
+         exec findme -q -warn -html -f -m \
             [$itk_component(searchtext) get] > $tmpfile_
       }
       set ret [readtopic_ $tmpfile_]
