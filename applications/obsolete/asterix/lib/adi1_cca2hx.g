@@ -123,7 +123,7 @@
         END IF
       ELSE
         THERE = .TRUE.
-        MID = ID
+        CALL ADI_CLONE( ID, MID, STATUS )
       END IF
 
 *  Try to copy if it exists
@@ -174,11 +174,9 @@ C            CALL DAT_ERASE( LOC, CMP, STATUS )
 *    Release the HDS object
         CALL DAT_ANNUL( CLOC, STATUS )
 
-      END IF
-
-*  Free the member identifier
-      IF ( MEMBER .GT. ' ' ) THEN
+*    Free the member identifier
         CALL ADI_ERASE( MID, STATUS )
+
       END IF
 
 *  Report any errors

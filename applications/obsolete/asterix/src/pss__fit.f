@@ -1384,6 +1384,7 @@
 
       REAL			APOS(2)
       REAL                     	BASE                    ! Axis base value
+      REAL			ERR
       REAL                     	SCALE                   ! Axis scale value
       REAL                     	LB(PSS__FITNPAR)        ! Copies of IN_LB
       REAL			SPARR(2)		! Spaced array values
@@ -1518,10 +1519,11 @@
           IF ( BASE .LT. 10.0 ) THEN
             BASE = -20.0
           ELSE
-            BASE = 1.0
+            ERR = SQRT(BASE)
+            BASE = MAX(1.0,BASE-3.0*ERR)
           END IF
           LB(P__F) = -25.0
-          SCALE = 1.0
+          SCALE = (6.0*ERR)/100.0
 
         ELSE IF ( EC .EQ. 'X' ) THEN
           IP = P__X
