@@ -406,7 +406,7 @@ PKG_VERS = 2.6-0
 
 SOURCE_FILES = $(PKG_NAME)_source.tar $(PKG_NAME).tar $(PKG_NAME)_skycat.tar \
 	$(PKG_NAME)_tcl.tar makefile mk $(PKG_NAME)_iraf.tar \
-	$(DATA_FILES) $(DOCUMENTATION) $(ONLINE_HELP)
+	$(DATA_FILES) $(DOCUMENTATION)
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -504,7 +504,7 @@ HELP_SOURCES =
 
 IRAF_HELP = gaia.hlp gaiadisp.hlp
 
-ONLINE_DOCS = gaia.htx
+HYPERTEXT_HELP = gaia.htx
 
 #  List of ancilliary data files.
 
@@ -518,7 +518,7 @@ HYPERTEXT_DOCS = sun214.htx
 #  List of documentation files.
 
 DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
-                $(PKG_NAME).news $(ONLINE_DOCS:.htx=.htx_tar)
+                $(PKG_NAME).news $(HYPERTEXT_HELP:.htx=.htx_tar)
 
 #  List of files that should be created and copied into the runtime
 #  directory for a sucessful built of GAIA.
@@ -642,7 +642,7 @@ INSTALL_BIN = $(INSTALL)/bin/$(PKG_NAME)
 INSTALL_DATES = $(INSTALL)/dates
 INSTALL_DOCS = $(INSTALL)/docs
 INSTALL_HELP = $(INSTALL)/help/$(PKG_NAME)
-INSTALL_ONLINE_DOC = $(INSTALL_BIN)/$(PKG_NAME).htx
+INSTALL_HYPERHELP = $(INSTALL)/help
 
 #  And the IRAF equivalents.
 INSTALL_IRAF_BIN = $(INSTALL)/iraf/$(PKG_NAME)
@@ -653,7 +653,7 @@ INSTALL_IRAF_DOC = $(INSTALL)/iraf/$(PKG_NAME)/doc
 
 INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_DOCS) \
                $(INSTALL_HELP) $(INSTALL_MAPS) $(INSTALL_IRAF_BIN) \
-	       $(INSTALL_IRAF_DOC) $(INSTALL_ONLINE_DOC)
+	       $(INSTALL_IRAF_DOC) $(INSTALL_HYPERHELP)
 
 $(INSTALL_DIRS):
 	mkdir -p $@
@@ -1020,23 +1020,6 @@ install:
 	   else :; fi;\
 	done
 #
-#   Install the on-line help documentation, lives in $STAR_HELP/gaia.htx. 
-	if test -n "$(ONLINE_DOCS)"; then \
-           pwd=`pwd`;\
-           (cd $(STAR_HELP);\
-           for f in $(ONLINE_DOCS) ""; do \
-              if test -n "$$f"; then\
-                 $(TAR_OUT) $$pwd/$${f}_tar;\
-                 chmod 755 `find $$f -type d -print`;\
-                 chmod 644 `find $$f ! -type d -print`;\
-                 touch $$f;\
-              else :; fi;\
-           done);\
-           HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
-           export HTX_PATH;\
-           $(STAR_BIN)/hlink $(STAR_HELP);\
-        fi;
-#
 #  Install the Latex documentation, giving it world read permission,
 #  leaving the source copy in place.
 	for f in $(LATEX_DOCS) ""; do \
@@ -1061,10 +1044,22 @@ install:
                  touch $$f;\
               else :; fi;\
            done);\
-           HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
-           export HTX_PATH;\
-           $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
-        fi;
+	fi
+	if test -n "$(HYPERTEXT_HELP)"; then \
+           pwd=`pwd`;\
+           (cd $(INSTALL_HYPERHELP);\
+           for f in $(HYPERTEXT_HELP) ""; do \
+              if test -n "$$f"; then\
+                 $(TAR_OUT) $$pwd/$${f}_tar;\
+                 chmod 755 `find $$f -type d -print`;\
+                 chmod 644 `find $$f ! -type d -print`;\
+                 touch $$f;\
+              else :; fi;\
+           done);\
+        fi
+	HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
+        export HTX_PATH;\
+	$(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HYPERHELP)
 #
 #  Install the date stamp file and make it read-only to prevent its
 #  date being changed.
@@ -1223,18 +1218,6 @@ do_deinstall:
 	   else :; fi;\
 	done
 #
-#  Deinstall any on-line help documents.
-	- if test -n "$(ONLINE_DOCS)"; then \
-	   for f in $(ONLINE_DOCS) ""; do \
-	      if test -n "$$f" -a -d $(STAR_HELP)/$$f; then \
-	         rm -f -r $(STAR_HELP)/$$f;\
-	      else :; fi;\
-	   done;\
-	   HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
-	   export HTX_PATH;\
-	   $(STAR_BIN)/hlink $(STAR_HELP);\
-	fi
-#
 #  Deinstall the Latex documentation, if installed versions exist.
 	- for f in $(LATEX_DOCS) ""; do \
 	    if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
@@ -1251,10 +1234,18 @@ do_deinstall:
 	         rm -f -r $(INSTALL_DOCS)/$$f;\
 	      else :; fi;\
 	   done;\
-	   HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
-	   export HTX_PATH;\
-	   $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
 	fi
+	- if test -n "$(HYPERTEXT_HELP)"; then \
+	   for f in $(HYPERTEXT_HELP) ""; do \
+	      if test -n "$$f" -a -d $(INSTALL_HYPERHELP)/$$f; then \
+	         rm -f -r $(INSTALL_HYPERHELP)/$$f;\
+	      else :; fi;\
+	   done;\
+	fi
+	HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
+	export HTX_PATH;\
+	$(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HYPERHELP);\
+
 #
 #  Deinstall the date stamp file after setting its protection so it may
 #  be removed.
@@ -1319,7 +1310,7 @@ do_test:
 	@ echo ' % $(PKG_NAME) -demo_mode 1'
 	@ echo
 	@ echo 'And select the Demonstration item in the Image-Analysis menu.'
-	@ echo 
+	@ echo
 #
 #  Note the test has been run.
 	@ touch .TESTED_$(SYSTEM)
