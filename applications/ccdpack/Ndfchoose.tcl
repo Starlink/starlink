@@ -625,17 +625,22 @@
 #  the WCS frame out from under us, since this would make it difficult 
 #  to keep the relative sizes in step.
                   if { $choosewcsframe } {
-                     set scale 1
+                     set gwidth $width
+                     set gheight $height
                   } else {
                      set bbox [ $ndfset bbox $wcsframe ]
+                     set xdim [ expr [ lindex [ lindex $bbox 0 ] 1 ] - \
+                                     [ lindex [ lindex $bbox 0 ] 0 ] ]
+                     set ydim [ expr [ lindex [ lindex $bbox 1 ] 1 ] - \
+                                     [ lindex [ lindex $bbox 1 ] 0 ] ]
                      if { [ expr $xmax / $ymax ] > [ expr $width / $height ] } {
-                        set scale \
-                            [ expr ( [ lindex [ lindex $bbox 0 ] 1 ] - \
-                                     [ lindex [ lindex $bbox 0 ] 0 ] ) / $xmax ]
+                        set fraction [ expr $xdim / $xmax ]
+                        set gwidth [ expr $width * $fraction ]
+                        set gheight [ expr $gwidth * $ydim / $xdim ]
                      } else {
-                        set scale \
-                            [ expr ( [ lindex [ lindex $bbox 1 ] 1 ] - \
-                                     [ lindex [ lindex $bbox 1 ] 0 ] ) / $ymax ]
+                        set fraction [ expr $ydim / $ymax ]
+                        set gheight [ expr $height * $fraction ]
+                        set gwidth [ expr $gheight * $xdim / $ydim ]
                      }
                   }
 
@@ -647,9 +652,7 @@
                   if { $createwindow } {
                      itk_component add $gwmwin($index):display {
                         gwm $itk_component($gwmwin($index)).gwm \
-                            -width [ expr $width * $scale ] \
-                            -height [ expr $height * $scale ] \
-                            -name $gwmname
+                            -width $gwidth -height $gheight -name $gwmname
                      }
                   }
 
