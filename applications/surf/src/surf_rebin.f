@@ -101,13 +101,19 @@
 *  Authors :
 *     JFL: J.Lightfoot (ROE)
 *     TIMJ: T. Jenness (timj@jach.hawaii.edu)
+
 *  History :
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.19  1996/12/12 01:18:02  timj
-*     Remove CALC_AZNA_OFFSET (merged with CALC_BOL_COORDS)
+*     Revision 1.20  1996/12/13 02:38:51  timj
+*     Replace DAT_FIND with CMP_.
+*     Report number of good integrations. (not just total).
+*     Change PRINT to MSG_OUT for timing data.
 *
+c Revision 1.19  1996/12/12  01:18:02  timj
+c Remove CALC_AZNA_OFFSET (merged with CALC_BOL_COORDS)
+c
 c Revision 1.18  1996/11/14  02:52:54  timj
 c Add support for AZ and NA regrids.
 c
@@ -133,7 +139,7 @@ c Added GLOBAL default for IN parameter.
 c Fixed bug (segmentation fault) when error occurs before NDF_STATE.
 c Replace calls to SCULIB_COPY? with VEC_?TO?
 c
-*  endhistory
+*     {note_history_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -163,6 +169,8 @@ c
 * Local Constants :
       INTEGER          MAX__INT        ! max number of integrations 
       PARAMETER (MAX__INT = 20)        ! that can be specified
+      INTEGER          MAX__INTS       ! max number of integrations 
+      PARAMETER (MAX__INTS = 200)      ! in an input file
       REAL DIAMETER                    ! diameter of JCMT mirror
       PARAMETER (DIAMETER = 15.0)
       INTEGER WTFNRES                  ! number of values per scale length
@@ -177,6 +185,7 @@ c
       PARAMETER (BADBIT = 1)
 
 *    Local variables :
+      INTEGER          BAD_INTS        ! Number of bad integrations in file
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                        ! A/D numbers of bolometers measured in
                                        ! input file
@@ -219,6 +228,7 @@ c
       REAL             DEC_VEL         ! Dec velocity of scan (arcsec/sec)
       INTEGER          DIM (MAX_DIM)   ! array dimensions
       INTEGER          DIMX (MAX_DIM)  ! expected array dimensions
+      INTEGER          DUMMY_QUALITY(MAX__INTS) ! Dummy quality array
       DOUBLE PRECISION DTEMP           ! scratch double
       DOUBLE PRECISION DTEMP1          ! scratch double
       INTEGER          DUMMY_VARIANCE_PTR(MAX_FILE) ! Pointer to dummy variance
@@ -243,6 +253,7 @@ c
                                        ! array of FITS keywords
       LOGICAL          FLATFIELD       ! .TRUE. if the FLATFIELD application
                                        ! has been run on the input file
+      INTEGER          GOOD_INTS      ! Total number of good ints per file
       INTEGER          HMSF (4)        ! holds converted angle information from
                                        ! SLA routine
       LOGICAL          HOURS           ! .TRUE. if the angle being read in is
@@ -258,6 +269,9 @@ c
       INTEGER          INTEGRATION     ! integration index in DO loop
       INTEGER          INT_BAD (MAX__INT) ! Numbers of integrations to be
                                        ! ignored
+      INTEGER          INT_TIME        ! Number of good jiggles
+      INTEGER          INT_QUAL        ! Scratch quality
+      INTEGER          INT_QUALITY(MAX__INTS) ! Integration quality (modify)
       CHARACTER*15     IN_CENTRE_COORDS! coord system of telescope centre in
                                        ! an input file
       INTEGER          IN_DATA_END (MAX_FILE)
@@ -281,7 +295,6 @@ c
                                        ! file (radians)
       DOUBLE PRECISION IN_LAT2_RAD     ! latitude of telescope centre at MJD2
                                        ! (radians)
-      CHARACTER*(DAT__SZLOC) IN_LOC    ! locator of item in input file
       DOUBLE PRECISION IN_LONG_RAD     ! longitude of telescope centre in
                                        ! input file (radians)
       DOUBLE PRECISION IN_LONG2_RAD    ! longitude of telescope centre at MJD2
@@ -446,9 +459,11 @@ c
       CHARACTER*80     STEMP           ! scratch string
       CHARACTER*15     SUB_INSTRUMENT  ! the sub-instrument used to make the
                                        ! maps
+      INTEGER          SUM_GOOD_INTS   ! Running total of good ints
       CHARACTER*15     SUTDATE         ! date of first observation
       CHARACTER*15     SUTSTART        ! UT of start of first observation
       CHARACTER*10     TELESCOPE       ! FITS telescope entry
+      INTEGER          TOTAL_INTS      ! Total number of ints per file
       INTEGER          TOTAL_WEIGHT_END! pointer to end of TOTAL_WEIGHT_PTR
                                        ! space
       INTEGER          TOTAL_WEIGHT_PTR! pointer to scratch space holding 
@@ -482,6 +497,11 @@ c
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
+
+* Initialize
+      INT_TIME = 0
+      SUM_GOOD_INTS = 0
+
 
 * Start up the error system
       CALL ERR_BEGIN(STATUS)
@@ -917,28 +937,17 @@ c
 *  is one read in the corrections
 
             IF (STATUS .EQ. SAI__OK) THEN
-               CALL DAT_FIND (IN_REDSX_LOC, 'POINT_LST', IN_LOC,
-     :           STATUS)
+
+               CALL CMP_GET1D(IN_REDSX_LOC,'POINT_LST',SCUBA__MAX_POINT,
+     :              POINT_LST, N_POINT, STATUS)
+               CALL CMP_GET1R(IN_REDSX_LOC,'POINT_DAZ',SCUBA__MAX_POINT,
+     :              POINT_DAZ, N_POINT, STATUS)
+               CALL CMP_GET1R(IN_REDSX_LOC,'POINT_DEL',SCUBA__MAX_POINT,
+     :              POINT_DEL, N_POINT, STATUS)
+               
                IF (STATUS .NE. SAI__OK) THEN
-                  CALL ERR_ANNUL (STATUS)
+                  CALL ERR_ANNUL(STATUS)
                   N_POINT = 0
-               ELSE
-                  CALL DAT_GET1D (IN_LOC, SCUBA__MAX_POINT, POINT_LST, 
-     :              N_POINT, STATUS)
-                  CALL DAT_ANNUL (IN_LOC, STATUS)
-
-                  CALL DAT_FIND (IN_REDSX_LOC, 'POINT_DAZ', IN_LOC,
-     :              STATUS)
-                  CALL DAT_GET1R (IN_LOC, SCUBA__MAX_POINT, POINT_DAZ, 
-     :              ITEMP, STATUS)
-                  CALL DAT_ANNUL (IN_LOC, STATUS)
-
-                  CALL DAT_FIND (IN_REDSX_LOC, 'POINT_DEL', IN_LOC,
-     :              STATUS)
-                  CALL DAT_GET1R (IN_LOC, SCUBA__MAX_POINT, POINT_DEL,
-     :              ITEMP, STATUS)
-                  CALL DAT_ANNUL (IN_LOC, STATUS)
-
                END IF
             END IF
 
@@ -1090,6 +1099,36 @@ c
 
             N_SWITCHES = DIM (1)
 
+*       Calculate the number of GOOD integrations so that I can report
+*       time contribution from each map
+               
+            TOTAL_INTS = N_MEASUREMENTS * N_INTEGRATIONS
+            DO I = 1, TOTAL_INTS
+               INT_QUALITY (I) = 0
+            END DO
+
+*     Find INT_QUALITY extension
+            IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
+               CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :              'JIGL_CNT', JIGGLE_COUNT, STATUS)
+               
+               IF (IN_REDSX_LOC .NE. DAT__NOLOC) THEN
+                  CALL CMP_GET1I(IN_REDSX_LOC, 'INT_QUALITY',TOTAL_INTS,
+     :                 INT_QUALITY, ITEMP, STATUS)
+                  IF (STATUS .NE. SAI__OK)  CALL ERR_ANNUL(STATUS)
+               END IF
+            END IF
+
+*     Find number of bad integrations
+            BAD_INTS = 0
+            DO I = 1, TOTAL_INTS
+               BAD_INTS = BAD_INTS + INT_QUALITY(I)
+            END DO
+
+*     Find number of good ints and add to running total
+            GOOD_INTS = TOTAL_INTS - BAD_INTS
+
+*     Print out information on observation
             CALL MSG_SETI ('N_E', N_EXPOSURES)
             CALL MSG_SETI ('N_I', N_INTEGRATIONS)
             CALL MSG_SETI ('N_M', N_MEASUREMENTS)
@@ -1097,6 +1136,12 @@ c
             CALL MSG_OUT (' ', 'REDS: file contains data for ^N_E '//
      :        'exposure(s) in ^N_I integrations(s) in ^N_M '//
      :        'measurement(s)', STATUS)
+
+            CALL MSG_SETI('TOT', GOOD_INTS)
+            CALL MSG_SETI('TIME', GOOD_INTS * JIGGLE_COUNT)
+
+            CALL MSG_OUT(' ','REDS: file contains ^TOT complete good '//
+     :           'integrations (^TIME jiggles)', STATUS)
 
 *  calculate the apparent RA and Dec of the map centre at IN_UT1
 
@@ -1115,12 +1160,11 @@ c
 
 *  get the bolometer description arrays
 
-            CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_DU3', IN_LOC, STATUS)
             NDIM = 2
             DIMX (1) = SCUBA__NUM_CHAN
             DIMX (2) = SCUBA__NUM_ADC
-            CALL DAT_GETNR (IN_LOC, NDIM, DIMX, BOL_DU3, DIM, STATUS)
-            CALL DAT_ANNUL (IN_LOC, STATUS)
+            CALL CMP_GETNR (IN_SCUBAX_LOC, 'BOL_DU3', NDIM, DIMX,
+     :           BOL_DU3, DIM, STATUS)
             
             IF (STATUS .EQ. SAI__OK) THEN
                IF ((NDIM .NE. 2)                 .OR.
@@ -1136,12 +1180,11 @@ c
                END IF
             END IF
 
-            CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_DU4', IN_LOC, STATUS)
             NDIM = 2
             DIMX (1) = SCUBA__NUM_CHAN
             DIMX (2) = SCUBA__NUM_ADC
-            CALL DAT_GETNR (IN_LOC, NDIM, DIMX, BOL_DU4, DIM, STATUS)
-            CALL DAT_ANNUL (IN_LOC, STATUS)
+            CALL CMP_GETNR (IN_SCUBAX_LOC, 'BOL_DU4', NDIM, DIMX,
+     :           BOL_DU4, DIM, STATUS)
 
             IF (STATUS .EQ. SAI__OK) THEN
                IF ((NDIM .NE. 2)                 .OR.
@@ -1157,10 +1200,9 @@ c
                END IF
             END IF
 
-            CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_CHAN', IN_LOC, STATUS)
-            CALL DAT_GET1I (IN_LOC, SCUBA__NUM_CHAN * SCUBA__NUM_ADC,
-     :        BOL_CHAN, ITEMP, STATUS)
-            CALL DAT_ANNUL (IN_LOC, STATUS)
+            CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_CHAN', 
+     :           SCUBA__NUM_CHAN * SCUBA__NUM_ADC,
+     :           BOL_CHAN, ITEMP, STATUS)
 
             IF (STATUS .EQ. SAI__OK) THEN
                IF (ITEMP .NE. N_BOL(FILE)) THEN
@@ -1171,10 +1213,9 @@ c
                END IF
             END IF
 
-            CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_ADC', IN_LOC, STATUS)
-            CALL DAT_GET1I (IN_LOC, SCUBA__NUM_CHAN * SCUBA__NUM_ADC,
-     :        BOL_ADC, ITEMP, STATUS)
-            CALL DAT_ANNUL (IN_LOC, STATUS)
+            CALL CMP_GET1I(IN_SCUBAX_LOC, 'BOL_ADC', 
+     :           SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_ADC, ITEMP,
+     :           STATUS)
 
             IF (STATUS .EQ. SAI__OK) THEN
                IF (ITEMP .NE. N_BOL(FILE)) THEN
@@ -1197,11 +1238,8 @@ c
 
 *  the jiggle pattern itself
 
-               CALL DAT_FIND (IN_SCUCDX_LOC, 'JIGL_X', IN_LOC,
-     :           STATUS)
-               CALL DAT_GET1R (IN_LOC, SCUBA__MAX_JIGGLE, JIGGLE_X, 
-     :           ITEMP, STATUS)
-               CALL DAT_ANNUL (IN_LOC, STATUS)
+               CALL CMP_GET1R (IN_SCUCDX_LOC, 'JIGL_X',
+     :              SCUBA__MAX_JIGGLE, JIGGLE_X, ITEMP, STATUS)
 
                IF (ITEMP .NE. JIGGLE_COUNT) THEN
                   IF (STATUS .EQ. SAI__OK) THEN
@@ -1212,11 +1250,8 @@ c
                   END IF
                END IF
 
-               CALL DAT_FIND (IN_SCUCDX_LOC, 'JIGL_Y', IN_LOC,
-     :           STATUS)
-               CALL DAT_GET1R (IN_LOC, SCUBA__MAX_JIGGLE, JIGGLE_Y,
-     :           ITEMP, STATUS)
-               CALL DAT_ANNUL (IN_LOC, STATUS)
+               CALL CMP_GET1R (IN_SCUCDX_LOC, 'JIGL_Y',
+     :              SCUBA__MAX_JIGGLE, JIGGLE_Y, ITEMP, STATUS)
 
                IF (ITEMP .NE. JIGGLE_COUNT) THEN
                   IF (STATUS .EQ. SAI__OK) THEN
@@ -1495,8 +1530,16 @@ c
                      CALL PAR_CANCL ('USE_INTS', STATUS)
                      IF (USE_INTS) THEN
                         KEEP_INT = .TRUE.
+                        INT_QUAL = 0
+                        DO I = 1,TOTAL_INTS
+                           DUMMY_QUALITY(I) = 1
+                        END DO
                      ELSE
                         KEEP_INT = .FALSE.
+                        INT_QUAL = 1
+                        DO I = 1,TOTAL_INTS
+                           DUMMY_QUALITY(I) = 0
+                        END DO
                      END IF
 
 *  Initialise the usage array
@@ -1508,6 +1551,7 @@ c
                      DO I = 1, N_INT_BAD
                         IF (INT_BAD(I) .GT. 0) THEN
                            USE_INT(INT_BAD(I)) = KEEP_INT
+                           DUMMY_QUALITY(INT_BAD(I)) = INT_QUAL ! keep track
                         END IF
                      END DO
 
@@ -1535,6 +1579,21 @@ c
                END IF
             END IF
 
+*     Now find running total of good and bad integrations
+*     Find number of bad integrations
+            BAD_INTS = 0
+            DO I = 1, TOTAL_INTS
+               IF (DUMMY_QUALITY(I).EQ.1.OR.INT_QUALITY(I).EQ.1) THEN
+                  BAD_INTS = BAD_INTS + 1
+               END IF
+            END DO
+
+*     Find number of good ints and add to running total
+            GOOD_INTS = TOTAL_INTS - BAD_INTS
+
+            INT_TIME = INT_TIME + 
+     :           (GOOD_INTS * JIGGLE_COUNT)
+            SUM_GOOD_INTS = SUM_GOOD_INTS + GOOD_INTS
 
 *     calculate position of each bolometer at each measurement
 
@@ -1729,6 +1788,13 @@ c
      :           'input data', STATUS)
          END IF
       END IF
+
+*     Report total number of good integrations
+      CALL MSG_SETI('TIME', INT_TIME)
+      CALL MSG_SETI('INTS', SUM_GOOD_INTS)
+
+      CALL MSG_OUT(' ','REDS:Total number of integrations in output'//
+     :     ' map is ^INTS (^TIME jiggles)', STATUS)
 
 *     get a title for the output map
 
@@ -1934,7 +2000,8 @@ c
 *  each output pixel
 
       T0 = SECNDS(0.0)
-      PRINT *, 'Entering REGRID_1 at t=0'
+      CALL MSG_OUT(' ','REDS: Beginning regrid process', STATUS)
+
       IF (STATUS .EQ. SAI__OK) THEN
          DO I = 1, FILE
             CALL SCULIB_WTFN_REGRID_1 (DIAMETER, WAVELENGTH, WEIGHT(I), 
@@ -1958,7 +2025,11 @@ c
 *  go through the input datasets coadding them into the convolution
 
       T1 = SECNDS(T0)
-      PRINT *, 'REGRID 2 at T = ',T1
+
+      CALL MSG_SETR('T1', T1)
+      CALL MSG_OUT(' ','REDS: Entering second rebin phase (T = ^T1 '//
+     :     'seconds)', STATUS)
+
       IF (STATUS .EQ. SAI__OK) THEN
          DO I = 1, FILE
             CALL SCULIB_WTFN_REGRID_2 (DIAMETER, WTFNRES,
@@ -1975,7 +2046,11 @@ c
 *  convolution sum and calculate the final result
 
       T1 = SECNDS(T0)
-      PRINT *, 'REGRID 3 at T= ', T1
+
+      CALL MSG_SETR('T1', T1)
+      CALL MSG_OUT(' ','REDS: Entering third rebin phase (T = ^T1 '//
+     :     'seconds)', STATUS)
+
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_WTFN_REGRID_3 (DIAMETER, WTFNRES, OUT_PIXEL, 
      :        NX_OUT, NY_OUT,
@@ -1986,7 +2061,12 @@ c
       END IF
 
       T1 = SECNDS(T0)
-      PRINT *, 'FINISH at T= ',T1
+
+      CALL MSG_SETR('T1', T1)
+      CALL MSG_OUT(' ','REDS: Regrid complete. Elapsed time = ^T1 '//
+     :     'seconds.', STATUS)
+
+
 *  set up the output axes
 
       IF (OUT_COORDS .EQ. 'GA') THEN
