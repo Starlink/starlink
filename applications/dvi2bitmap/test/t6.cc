@@ -481,10 +481,10 @@ int do_stream_tests()
     return nfails;
 }
 
-#if HAVE_SETENV
+#if HAVE_SETENV && !HAVE_DECL_SETENV
 extern "C" int setenv(const char* name, const char *value, int overwrite);
 #endif
-#if HAVE_PUTENV
+#if HAVE_PUTENV && !HAVE_DECL_PUTENV
 extern "C" int putenv(const char* string);
 #endif
 
@@ -562,7 +562,7 @@ int do_pipe_tests()
 #if HAVE_SETENV
             setenv("TT", "test", 1);
 #elif HAVE_PUTENV	    
-            putenv((char*)"TT=test");
+            putenv((const char*)"TT=test");
 #else
 #  error "Can't set environment variables"
 #endif
