@@ -83,6 +83,7 @@
 *                        label (DJA)
 *      9 Feb 94 : V1.7-2 Writes new form GCB attributes (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     26 Mar 95 : V1.8-1 Use new data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -91,7 +92,7 @@
 *    Global constants :
 *
       INCLUDE     'SAE_PAR'
-      INCLUDE     'DAT_PAR'
+      INCLUDE     'ADI_PAR'
 *
 *    Status :
 *
@@ -106,10 +107,7 @@
 *
 *    Local variables :
 *
-      CHARACTER     LOC*(DAT__SZLOC)	        ! input object locator
-      CHARACTER     OLOC*(DAT__SZLOC)	        ! output object locator
       CHARACTER     TEXT(MAXLINES)*80           ! History text
-      CHARACTER     NAME*(DAT__SZNAM)	        ! name of input object
       CHARACTER     LABEL*80	                ! Data label
       CHARACTER     UNITS*80	                ! Data units
 
@@ -119,31 +117,32 @@
       REAL          MAXSIZ	 	        ! maximum bin size
       REAL          SPACING                     ! regular bin spacing
 
-      INTEGER                DUMMY       ! Dummy string length parameter
       INTEGER 	             APTR	 ! Ptr to output axis data
       INTEGER 	             AWPTR	 ! Ptr to output axis data
       INTEGER                BPTR        ! Pointer to output bins
-      INTEGER		     DIMS(DAT__MXDIM)! Sizes of dimensions of object
+      INTEGER		     DIMS(ADI__MXDIM)		! Input dimensions
       INTEGER		     DPTR	 ! Ptr to output data array
+      INTEGER                DUMMY       ! Dummy string length parameter
+      INTEGER			IFID			! Input dataset id
       INTEGER		     IPTR	 ! pointer to input data
       INTEGER		     NBIN	 ! required number of bins
       INTEGER		     NDIM	 ! Dimensionality of input arrays
       INTEGER		     NELM	 ! # input values
       INTEGER                NREC        ! Returned from USI_xxxNAME
-      INTEGER		     QPTR	 ! pointer to quality info.
+      INTEGER			OFID			! Output dataset id
+      INTEGER		     	QPTR	 		! Quality info
 
       LOGICAL 	             ANYBAD      ! Any points with bad quality
       LOGICAL		     DQL	 ! data quality present
       LOGICAL                INCREASING  ! Bounds increase monotonically
       LOGICAL		     NORMALISE	 ! norm'n required to unit frequency?
       LOGICAL		     OK	         ! object there and set
-      LOGICAL		     PRIM	 ! primitive input object
       LOGICAL 	             REG         ! regular output bins?
 *
 *    Version id :
 *
       CHARACTER              VERSION*30
-        PARAMETER            (VERSION = 'FREQUENCY Version 1.8-0')
+        PARAMETER            (VERSION = 'FREQUENCY Version 1.8-1')
 *-
 
 *    Check status
@@ -156,28 +155,25 @@
       CALL AST_INIT()
 
 *    Associate input object
-      CALL USI_ASSOCI( 'INP', 'READ', LOC, PRIM, STATUS )
-
-*    Get its name
-      CALL DAT_NAME( LOC, NAME, STATUS )
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
 
 *    Check data object
-      CALL BDA_CHKDATA( LOC, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( IFID, OK, NDIM, DIMS, STATUS )
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
       IF ( OK ) THEN
 
-        CALL BDA_MAPDATA( LOC, 'READ', IPTR, STATUS )
+        CALL BDI_MAPDATA( IFID, 'READ', IPTR, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Check for quality
-        CALL BDA_CHKQUAL( LOC, DQL, NDIM, DIMS, STATUS )
+        CALL BDI_CHKQUAL( IFID, DQL, NDIM, DIMS, STATUS )
 
         IF ( DQL ) THEN
-          CALL BDA_MAPLQUAL( LOC, 'READ', ANYBAD, QPTR, STATUS )
+          CALL BDI_MAPLQUAL( IFID, 'READ', ANYBAD, QPTR, STATUS )
           IF ( .NOT. ANYBAD ) THEN
-            CALL BDA_UNMAPLQUAL( LOC, STATUS )
+            CALL BDI_UNMAPLQUAL( IFID, STATUS )
             DQL = .FALSE.
           END IF
         END IF
@@ -207,14 +203,14 @@
       CALL ARR_INIT1R( 0.0, MXBIN, BOUNDS, STATUS )
 
 *    Get data label
-      CALL BDA_GETLABEL( LOC, LABEL, STATUS )
+      CALL BDI_GETLABEL( IFID, LABEL, STATUS )
       IF ((LABEL .LE. ' ') .OR. ( STATUS .NE. SAI__OK )) THEN
-        LABEL = NAME
+        LABEL = ' '
         IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
       END IF
 
 *    Get data units
-      CALL BDA_GETUNITS( LOC, UNITS, STATUS )
+      CALL BDI_GETUNITS( IFID, UNITS, STATUS )
       IF ((UNITS .LE. ' ') .OR. ( STATUS .NE. SAI__OK )) THEN
         UNITS = 'unitless'
         IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
@@ -311,20 +307,20 @@
       END IF
 
 *    Create output object
-      CALL USI_ASSOCO( 'OUT', 'DISTRIBUTION', OLOC, STATUS )
+      CALL USI_TASSOCO( 'OUT', 'DISTRIBUTION', OFID, STATUS )
 
 *    Create components
-      CALL BDA_CREDATA( OLOC, 1, NBIN, STATUS )
-      CALL BDA_CREAXES( OLOC, 1, STATUS )
+      CALL BDI_CREDATA( OFID, 1, NBIN, STATUS )
+      CALL BDI_CREAXES( OFID, 1, STATUS )
 
 *    Fill in component values
-      CALL BDA_MAPDATA( OLOC, 'WRITE', DPTR, STATUS )
+      CALL BDI_MAPDATA( OFID, 'WRITE', DPTR, STATUS )
       CALL ARR_COP1R( NBIN, %VAL(BPTR), %VAL(DPTR), STATUS )
 
       IF ( NORMALISE ) THEN
-        CALL BDA_PUTLABEL( OLOC, 'Relative Frequency', STATUS )
+        CALL BDI_PUTLABEL( OFID, 'Relative Frequency', STATUS )
       ELSE
-        CALL BDA_PUTLABEL( OLOC, 'Frequency', STATUS )
+        CALL BDI_PUTLABEL( OFID, 'Frequency', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -332,39 +328,39 @@
       IF ( REG ) THEN
 
 *      If regularly spaced then set up spaced axis array
-        CALL BDA_PUTAXVAL( OLOC, 1, DMIN+SPACING/2.0, SPACING,
+        CALL BDI_PUTAXVAL( OFID, 1, DMIN+SPACING/2.0, SPACING,
      :                                          NBIN, STATUS )
 
       ELSE
 
-        CALL BDA_CREAXVAL( OLOC, 1, .FALSE., NBIN, STATUS )
-        CALL BDA_CREAXWID( OLOC, 1, .FALSE., NBIN, STATUS )
+        CALL BDI_CREAXVAL( OFID, 1, .FALSE., NBIN, STATUS )
+        CALL BDI_CREAXWID( OFID, 1, .FALSE., NBIN, STATUS )
 
 *      Otherwise find bin centres and write to output object
-        CALL BDA_MAPAXVAL( OLOC, 'WRITE', 1, APTR, STATUS )
-        CALL BDA_MAPAXWID( OLOC, 'WRITE', 1, AWPTR, STATUS )
+        CALL BDI_MAPAXVAL( OFID, 'WRITE', 1, APTR, STATUS )
+        CALL BDI_MAPAXWID( OFID, 'WRITE', 1, AWPTR, STATUS )
         CALL AXIS_RNG2VALW( NBIN, BOUNDS, %VAL(APTR), %VAL(AWPTR),
      :                                                    STATUS )
 
       END IF
-      CALL BDA_PUTAXLABEL( OLOC, 1, LABEL, STATUS )
-      CALL BDA_PUTAXUNITS( OLOC, 1, UNITS, STATUS )
+      CALL BDI_PUTAXLABEL( OFID, 1, LABEL, STATUS )
+      CALL BDI_PUTAXUNITS( OFID, 1, UNITS, STATUS )
 
 *    Set axis normalisation
-      CALL BDA_PUTAXNORM( OLOC, 1, NORMALISE, STATUS )
+      CALL BDI_PUTAXNORM( OFID, 1, NORMALISE, STATUS )
 
 *    Copy MORE structure across.
-      CALL BDA_COPMORE( LOC, OLOC, STATUS )
+      CALL BDI_COPMORE( IFID, OFID, STATUS )
 
 *    Set up histogram style
-      CALL GCB_LCONNECT(STATUS)
-      CALL GCB_SETL('STEP_FLAG',.TRUE.,STATUS)
-      CALL GCB_SAVE(OLOC,STATUS)
-      CALL GCB_DETACH(STATUS)
+      CALL GCB_LCONNECT( STATUS )
+      CALL GCB_SETL( 'STEP_FLAG', .TRUE., STATUS )
+      CALL GCB_FSAVE( OFID, STATUS )
+      CALL GCB_DETACH( STATUS )
 
 *    Copy, set up and update history
-      CALL HIST_COPY( LOC, OLOC, STATUS )
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_COPY( IFID, OFID, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *    Fancy stuff - put input parameters into HISTORY
       TEXT(1) = 'Input dataset {INP}'
@@ -382,14 +378,14 @@
       CALL USI_TEXT( 3, TEXT, NREC, STATUS )
 
 *    Write this into history structure
-      CALL HIST_PTXT( OLOC, NREC, TEXT, STATUS )
+      CALL HSI_PTXT( OFID, NREC, TEXT, STATUS )
 
 *    Release datasets
-      CALL BDA_RELEASE( LOC, STATUS )
-      CALL BDA_RELEASE( OLOC, STATUS )
+      CALL BDI_RELEASE( IFID, STATUS )
+      CALL BDI_RELEASE( OFID, STATUS )
 
 *    Tidy up
- 99   CALL AST_CLOSE
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
@@ -418,7 +414,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -497,7 +492,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -557,7 +551,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE     'DAT_PAR'
 *
 *    Status :
 *
