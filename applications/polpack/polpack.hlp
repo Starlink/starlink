@@ -5,10 +5,57 @@
  using this help system, enter "Using_help" in response to the
  "Topic?" prompt. 
 
-1 Changes_to_POLPACK
+1 POLEXP
+Copies information from the POLPACK extension to the FITS extension.
 
-The main changes made to POLPACK at each release are described in the
-following sub-topics.
+Usage:
+
+   POLEXP in
+
+Description:
+
+   This routine creates FITS header cards describing the contents of
+   the POLPACK extensions in a group of NDFs. The header cards are
+   written to the FITS extensions of the NDFs, replacing any existing
+   cards for the same keywords. The keywords used are listed below.
+   Information exported to the FITS extension can be imported back
+   into the POLPACK extension using POLIMP.
+
+   The main use of this routine is for exporting POLPACK NDFs for use
+   bu other non-NDF based packages.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = LITERAL (Read)
+   A list of NDF names. The NDF names should be separated by commas
+   and may include wildcards.
+3 NAMELIST
+NAMELIST = LITERAL (Read)
+   The name of a file to create containing a list of the
+   succesfully processed NDFs. This file can be used when
+   specifying the input NDFs for subsequent applications. [!]
+2 Examples
+POLEXP in=^names.lis
+   This example processes the NDFs listed in the text file
+   "names.lis". The information stored in the POLPACK extension of
+   each is exported to the FITS extension.
+2 FITS_Keywords
+   The following FITS keywords are created. The POLPACK extension item
+   stored in the keyword is shown in parenthesise (see POLIMP for a
+   description of these extension items):
+
+         PPCKANGR  (ANGROT)
+         PPCKFILT  (FILTER)
+         PPCKIMID  (IMGID)
+         PPCKWPLT  (WPLATE)
+         PPCKRAY   (RAY)
+         PPCKROT   (ROTATION)
+         PPCKYROT  (YROTATION)
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 12-DEC-1997 (DSB):
+    Original version.
 
 1 POLHELP
 Gives help about POLPACK.
@@ -118,7 +165,7 @@ DSB: David S. Berry (STARLINK)
    -  Uses the portable help system.
 
 1 POLIMP
-Sets values for items within the POLPACK extension of a set of NDFs.
+Stores information in the POLPACK extension.
 
 Usage:
 

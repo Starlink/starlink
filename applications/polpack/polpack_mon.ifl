@@ -377,6 +377,50 @@ endinterface
 
 #+
 #  Name:
+#     POLEXP.IFL 
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     12-DEC-1997 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface POLEXP
+
+   helplib 'POLPACK_HELP:'
+
+   parameter IN                  # List of Input NDFs
+      position 1
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT,GLOBAL'
+      ppath    'CURRENT,GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input images'
+      helpkey  '*'
+   endparameter
+
+   parameter NAMELIST
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'File to contain a list of the NDFs'
+   endparameter
+
+endinterface
+
+#+
+#  Name:
 #     POLHELP.IFL
 
 #  Type of module:

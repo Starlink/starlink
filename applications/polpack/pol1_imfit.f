@@ -294,13 +294,25 @@
                   END DO
                   IF( IC .LE. LENFUN ) THEN
                      IF( EXTFUN( IC : IC ) .EQ. '"' ) THEN                  
+
                         IF( IC + 1 .LE. LENFUN - 1 ) THEN
                            CALL POL1_STOCC( NDF, EXTNAM, 
      :                                    EXTFUN( IC + 1 : LENFUN - 1 ),
      :                                    STATUS )
+                           CALL MSG_SETC( 'VL', 
+     :                                   EXTFUN( IC + 1 : LENFUN - 1 ) )
+   
                         ELSE
                            CALL POL1_STOCC( NDF, EXTNAM, ' ', STATUS )
+                           CALL MSG_SETC( 'VL', ' ' )
                         END IF                        
+
+*  Inform user of result, unless the extension item is defered.
+                        IF( EXTNAM .NE. 'FILTER' ) THEN
+                           CALL MSG_SETC( 'NM', EXTNAM )
+                           CALL MSG_OUT( ' ', '     Setting ^NM to '//
+     :                                   '''^VL''', STATUS )
+                        END IF
                      END IF
                   END IF
                END IF

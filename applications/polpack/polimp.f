@@ -4,7 +4,7 @@
 *     POLIMP
 
 *  Purpose:
-*     Sets values for items within the POLPACK extension of a set of NDFs.
+*     Stores information in the POLPACK extension.
 
 *  Language:
 *     Starlink Fortran 77

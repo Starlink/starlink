@@ -423,7 +423,7 @@ ccd1_cmprr.f ccd1_qntlr.f ccd1_qsrtr.f ccd1_skysr.f ccg1_cmltr.f ccg1_is2r.f \
 ccg1_is3r.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f ccd1_asfio.f \
 ccd1_cfgrp.f ccd1_mall.f ccd1_ftgrp.f ccd1_mfree.f ccd1_rdlin.f ccd1_nxwrd.f \
 ccd1_rmcom.f ccd1_hvcon.f pol1_imfit.f pol1_lnam.f pol1_chkex.f \
-pol1_knext.f polimp.f ccd1_iscom.f pol1_deftb.f
+pol1_knext.f polimp.f ccd1_iscom.f pol1_deftb.f polexp.f pol1_setft.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
@@ -461,7 +461,7 @@ ADDLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 
 #  List of applications/tasks in monolith.
 
-TASKS = polhelp polmap polreg datapic polcent segment calpol polimp
+TASKS = polhelp polmap polreg datapic polcent segment calpol polimp polexp
 
 #  Monolith routine source name.
 
@@ -478,7 +478,7 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 #  List of task interface files.
 
 IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polmap.ifl polreg.ifl \
-segment.ifl calpol.ifl polimp.ifl
+segment.ifl calpol.ifl polimp.ifl polexp.ifl
 
 #  List of help library sources.
 
@@ -552,7 +552,7 @@ DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
 GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@
 MSG_PAR:   $(STAR_INC)/msg_par;   $(LINK) $? $@
 NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@
-AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
+AST_PAR:   $(INSTALL)/include/ast_par;   $(LINK) $? $@
 CHR_ERR:   $(STAR_INC)/chr_err;   $(LINK) $? $@
 TRN_ERR:   $(STAR_INC)/trn_err;   $(LINK) $? $@
 FIO_ERR:   $(STAR_INC)/fio_err;   $(LINK) $? $@
@@ -644,7 +644,7 @@ libpolpack.a: $(O_SUB2)
 
 $(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
-            -L/star-dev/lib -L$(KAPPA_SOURCE) $(ADDLIBS) `./$(LINK_SCRIPT)` \
+            -L/star-test/lib -L$(KAPPA_SOURCE) $(ADDLIBS) `./$(LINK_SCRIPT)` \
             $(LDFLAGS)
 
 
@@ -1513,6 +1513,8 @@ pol1_knext.o:	SAE_PAR
 pol1_lnam.o:	SAE_PAR     
 pol1_lnam.o:	GRP_PAR     
 pol1_lnam.o:	FIO_PAR     
+pol1_setft.o: 	SAE_PAR
+pol1_setft.o: 	DAT_PAR
 pol1_sto0.o:	SAE_PAR DAT_PAR PRM_PAR     
 pol1_stoc.o:	SAE_PAR DAT_PAR PRM_PAR     
 pol_cale.o:	SAE_PAR     
@@ -1529,6 +1531,9 @@ polhelp.o:	PAR_ERR
 polimp.o:	SAE_PAR
 polimp.o:	DAT_PAR
 polimp.o:	FIO_PAR
+polexp.o:	SAE_PAR
+polexp.o:	DAT_PAR
+polexp.o:	GRP_PAR
 polmap.o:	SAE_PAR     
 polmap.o:	PAR_ERR     
 polreg.o:	SAE_PAR     
