@@ -59,10 +59,14 @@ D     print *, '  left and right limits: ', xl, xr
       IF (N1.EQ.0) THEN
         XLL = XL
         XRR = 0.5*(X(2)+X(1))
+      ELSE IF (N1 .EQ. 1) THEN
+        XLL = 0.5*X(N1) ! Assume X(N1-1)=0
+        XRR = 0.5*(X(N1)+X(N1+1))
       ELSE IF (N1.EQ.NX) THEN
         XLL = 0.5*(X(NX)+X(NX-1)) 
         XRR = XR
       ELSE
+*     Can not use this for N1=1 since that would address index 0
         XLL = 0.5*(X(N1)+X(N1-1)) 
         XRR = 0.5*(X(N1)+X(N1+1))
       END IF
@@ -82,10 +86,14 @@ D     print *, '  channel increment dx: ', dx
         IF (N1.LE.0) THEN
           XLL = XL
           XRR = 0.5*(X(2)+X(1))
+        ELSE IF (N1.EQ.1) THEN
+          XLL = 0.5*X(N1) ! Assume X(N1-1)=0
+          XRR = 0.5*(X(N1)+X(N1+1))
         ELSE IF (N1.GE.NX) THEN
           XLL = 0.5*(X(NX)+X(NX-1)) 
           XRR = XR
         ELSE
+C     Can not use this with N1=1 since that uses index=0
           XLL = 0.5*(X(N1)+X(N1-1)) 
           XRR = 0.5*(X(N1)+X(N1+1))
         END IF
@@ -100,7 +108,12 @@ D       print *, '  channel increment dx: ', dx
 
 *     final interpolation 
 
-      XSNART = N1 + (V-X(N1))/DX
+      IF (N1 .NE. 0) THEN
+         XSNART = N1 + (V-X(N1))/DX
+      ELSE
+*     must protect addressing index 0
+         XSNART = V/DX
+      END IF
 D     print *, '  final value: ', xsnart
 
       RETURN
