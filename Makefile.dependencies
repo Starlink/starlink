@@ -374,6 +374,7 @@ $(MANIFEST)/datacube: \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
+		$(MANIFEST)/ifd \
 		$(MANIFEST)/kaplibs \
 		$(MANIFEST)/kappa \
 		$(MANIFEST)/mag \
@@ -395,7 +396,6 @@ $(MANIFEST)/datacube: \
 		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
-		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/tcl \
 		$(MANIFEST)/tk \
@@ -969,7 +969,7 @@ $(MANIFEST)/itcl: \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/jpeg:
-	cd thirdparty/ijl/jpeg \
+	cd thirdparty/ijg/jpeg \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/jpl: \
@@ -1034,9 +1034,11 @@ $(MANIFEST)/kappa: \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
+		$(MANIFEST)/ifd \
 		$(MANIFEST)/kaplibs \
 		$(MANIFEST)/mag \
 		$(MANIFEST)/mers \
+		$(MANIFEST)/messgen \
 		$(MANIFEST)/ncar \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/ndg \
@@ -1583,6 +1585,7 @@ $(MANIFEST)/startcl: \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/jpeg \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/nbs \
 		$(MANIFEST)/pcs \
