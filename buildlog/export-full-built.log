@@ -87,7 +87,7 @@ dist:
 
 install:
 [loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 397 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/docs
      [echo] Executing AGLIB target: install
 
 prepare:
@@ -136,7 +136,7 @@ install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/etc
-[loggedcopy] Copying 80 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 81 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Task target: install
 
 prepare:
@@ -809,6 +809,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
@@ -945,4 +946,4 @@ export-full-built:
       [zip] Building zip: /apps/cvsbuild/export/starjava.zip
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 23 seconds
+Total time: 5 minutes 12 seconds

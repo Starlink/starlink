@@ -316,7 +316,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/java
-     [copy] Copying 68 files to /apps/cvsbuild/java/source/util/build/java
+     [copy] Copying 69 files to /apps/cvsbuild/java/source/util/build/java
      [echo] Executing Task target: javadoc-sources
 
 javadoc-sources:
@@ -478,4 +478,4 @@ javadoc-sources:
 BUILD FAILED
 /apps/cvsbuild/java/source/build.xml:554: No supported regular expression matcher found
 
-Total time: 46 seconds
+Total time: 44 seconds
