@@ -37,8 +37,8 @@
           TEXT=' .AND.'
           L=7
         ELSEIF (MODE.EQ.'OR'.OR.MODE.EQ.'ADD') THEN
-          TEXT=' .OR.'
-          L=6
+          TEXT=' '
+          L=2
         ELSEIF (MODE.EQ.'XOR') THEN
           TEXT=' .XOR.'
           L=7
@@ -47,7 +47,7 @@
           L=7
         ELSE
           TEXT=' '
-          L=1
+          L=2
         ENDIF
 
         IF (EXCLUDE) THEN

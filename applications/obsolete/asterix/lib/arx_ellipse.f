@@ -37,8 +37,8 @@
           TEXT=' .AND.'
           L=7
         ELSEIF (MODE.EQ.'OR'.OR.MODE.EQ.'ADD') THEN
-          TEXT=' .OR.'
-          L=6
+          TEXT=' '
+          L=2
         ELSEIF (MODE.EQ.'XOR') THEN
           TEXT=' .XOR.'
           L=7
@@ -47,7 +47,7 @@
           L=7
         ELSE
           TEXT=' '
-          L=1
+          L=2
         ENDIF
 
         IF (EXCLUDE) THEN
@@ -62,12 +62,10 @@
         CALL MSG_SETR('LN',RMAJ)
         CALL MSG_SETR('WD',RMIN)
         CALL MSG_SETR('AN',ANGLE)
-        CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^LN , ^WD , ^AN ',
+        CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^LN , ^WD , ^AN )',
      :                                                    TEXT,L)
         IF (EXCLUDE) THEN
-          TEXT(L:)='))'
           L=L+1
-        ELSE
           TEXT(L:L)=')'
         ENDIF
 
