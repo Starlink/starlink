@@ -7,11 +7,14 @@
 
 #  Authors:
 #     GJP: Grant Privett (STARLINK)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
 #     15-MAY-1993 (GJP):
 #        Original version.
+#     22-SEP-2004 (TIMJ):
+#        Add missing quote on BACK VPATH parameter
 #     {enter_changes_here}
 
 #-    
@@ -65,7 +68,7 @@ interface FASTMED
     position 3
     prompt 'Background count value'
     ppath 'global,current,default'
-    vpath 'prompt
+    vpath 'prompt'
     association '<->GLOBAL.BACK'
     default 998
     helpkey '*'
