@@ -52,11 +52,14 @@
 
 *  Authors:
 *     AA: Alasdair Allan (STARLINK, Keele University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     08-SEP-1999 (AA):
-*        Original version based on TRANNDF and MAKEMOS code
+*        Original version based on TRANNDF and MAKEMOS code.
+*     9-NOV-1999 (MBT):
+*        Modified warnings.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -106,6 +109,7 @@
       
 *  Local Variables:
       CHARACTER * ( 8 ) COMP( NACOMP ) ! NDF array component names
+      CHARACTER * ( AST__SZCHR ) DMN ! Domain of frame
       CHARACTER * ( 9 ) EBUFS    ! Buffer for formatting scale error
       CHARACTER * ( 9 ) EBUFZ    ! Buffer for formatting zero error
       CHARACTER * ( 1 ) REFFLG   ! Character to flag reference NDF
@@ -176,7 +180,6 @@
       INTEGER WRK3                 ! Workspace pointer
       INTEGER WRK4                 ! Workspace pointer
       INTEGER WRK5                 ! Workspace pointer
-      INTEGER WRK6                 ! Workspace pointer    
         
       DOUBLE PRECISION AEND( NDF__MXDIM )   ! End co-ord of each axis
       DOUBLE PRECISION ASTART( NDF__MXDIM ) ! Start co-ord of each axis 
@@ -242,7 +245,7 @@
          CALL CCD1_MSG( ' ',  ' ', STATUS )          
 
 *  Get pointer to the NDF
-         CALL CCD1_GTWCS(NDF( I ), IWCS, STATUS)
+         CALL CCD1_GTWCS( NDF( I ), IWCS, STATUS )
 
 *  Lets find out which frame contains the PIXEL domain (its going to be
 *  frame 2, but we may as well do it properly) in the output WCS frameset.
@@ -256,19 +259,23 @@
 *  Get the current mapping
          MAPCUR = AST_GETMAPPING( IWCS, JPIX, CFRAME( I ), STATUS )
          MAPCUR = AST_SIMPLIFY( MAPCUR, STATUS )
-                  
+
+*  Tell the user which co-ordinate frame we'll be resampling into.
+         FRM = AST_GETFRAME( IWCS, CFRAME( I ), STATUS )
+         DMN = AST_GETC( FRM, 'Domain', STATUS )
+         CALL MSG_SETC( 'DMN', DMN )
+         CALL CCD1_MSG( ' ', '  Resampling into the ^DMN '
+     :                     //'coordinate system', STATUS )
+
+*  If it's neither CCD_REG nor CCD_WCSREG then issue a mild warning.
+         IF ( DMN .NE. 'CCD_REG ' .AND. DMN .NE. 'CCD_WCSREG ' ) THEN
+            CALL CCD1_MSG( ' ', '    (Warning: this is not a default'//
+     :      'CCDPACK registration coordinate system)', STATUS )
+         END IF
+
 *  Make sure the user has actually run REGISTER, if not warn them
          CALL CCD1_FRDM( IWCS, 'CCD_REG', JREG, STATUS )
               
-*  Tell the user which co-ordinate domain we'll be transforming too
-         IF( JREG .EQ. 0 ) THEN
-            CALL MSG_SETC( 'CURR_DOM', 
-     :                  AST_GETC(FRCUR, 'Domain', STATUS))
-            CALL CCD1_MSG( ' ', '    Domain of current AST Frame: '
-     :                  //' ^CURR_DOM (WARNING)', STATUS )
- 
-         ENDIF 
-
 *  Obtain the number of input and output co-ordinates for a Mapping
          NVIN = AST_GETI( MAPCUR, 'Nin', STATUS )
          NVOUT = AST_GETI( MAPCUR, 'Nout', STATUS ) 
