@@ -15645,7 +15645,7 @@ physical coordinate space.
 f-
 
 \subsection{\label{ss:plottinggeneralizedcurves}Plotting Generalized Curves}
-We have seen how geodesic curves and grid lines can be drawn, and the Plot
+We have seen how geodesic curves and grid lines can be drawn. The Plot
 class includes another method,
 c+
 astGenCurve,
@@ -15654,10 +15654,10 @@ f+
 AST_GENCURVE,
 f-
 which allows curves of {\em any} form to be drawn. The caller supplies a
-Mapping which maps distance along the curve\footnote{normalized so that
-the start of the curve is at ``distance'' of 0.0 and the end of the curve
-is at ``distance'' 1.0.}. into the corresponding
-position in the current Frame of the Plot. 
+Mapping which maps offset along the curve\footnote{normalized so that the
+start of the curve is at offset 0.0 and the end of the curve is at offset
+1.0 - offset need not be linearly related to distance.} into the
+corresponding position in the current Frame of the Plot.
 c+
 astGenCurve,
 c- 

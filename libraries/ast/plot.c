@@ -29,11 +29,11 @@ f     AST_PLOT
 *     may often be non-linear, or even discontinuous, most plotting
 *     does not result in simple straight lines. The basic plotting
 *     element is therefore not a straight line, but a geodesic curve
-c     (see astCurve and astPolyCurve). A Plot also provides facilities for 
+c     (see astCurve, astGenCurve and astPolyCurve). A Plot also provides facilities for 
 c     drawing markers or symbols (astMark), text (astText) and grid lines
 c     (astGridLine). It is also possible to draw curvilinear axes with
 c     optional coordinate grids (astGrid).
-f     (see AST_CURVE and AST_POLYCURVE). A Plot also provides facilities 
+f     (see AST_CURVE, AST_GENCURVE and AST_POLYCURVE). A Plot also provides facilities 
 f     for drawing markers or symbols (AST_MARK), text (AST_TEXT) and grid 
 f     lines (AST_GRIDLINE). It is also possible to draw curvilinear axes
 f     with optional coordinate grids (AST_GRID).
@@ -106,6 +106,7 @@ f     following routines may also be applied to all Plots:
 c     - astBorder: Draw a border around valid regions of a Plot
 c     - astClip: Set up or remove clipping for a Plot
 c     - astCurve: Draw a geodesic curve
+c     - astGenCurve: Draw a generalized curve
 c     - astGrfPop: Retrieve previously saved graphics functions
 c     - astGrfPush: Save the current graphics functions 
 c     - astGrfSet: Register a graphics routine for use by a Plot
@@ -117,6 +118,7 @@ c     - astText: Draw a text string for a Plot
 f     - AST_BORDER: Draw a border around valid regions of a Plot
 f     - AST_CLIP: Set up or remove clipping for a Plot
 f     - AST_CURVE: Draw a geodesic curve
+f     - AST_GENCURVE: Draw a generalized curve
 f     - AST_GRFPOP: Retrieve previously saved graphics functions
 f     - AST_GRFPUSH: Save the current graphics functions 
 f     - AST_GRFSET: Register a graphics routine for use by the Plot class
@@ -140,8 +142,8 @@ c     - Border: The Plot border drawn using astBorder or astGrid
 f     - Border: The Plot border drawn using AST_BORDER or AST_GRID
 c     - Grid: Grid lines drawn using astGridLine or astGrid
 f     - Grid: Grid lines drawn using AST_GRIDLINE or AST_GRID
-c     - Curves: Geodesic curves drawn using astCurve or astPolyCurve
-f     - Curves: Geodesic curves drawn using AST_CURVE or AST_POLYCURVE
+c     - Curves: Geodesic curves drawn using astCurve, astGenCurve or astPolyCurve
+f     - Curves: Geodesic curves drawn using AST_CURVE, AST_GENCURVE or AST_POLYCURVE
 c     - NumLab: Numerical axis labels drawn using astGrid
 f     - NumLab: Numerical axis labels drawn using AST_GRID
 c     - TextLab: Descriptive axis labels drawn using astGrid
@@ -280,7 +282,7 @@ f     using AST_GRID
 *        Added a check when using interior labelling, to ensure that the
 *        most appropriate edges are used for text labels.
 *     13-JUN-2001 (DSB):
-*        Added public method astGrfSet, astGrfPop, astGrfPush.
+*        Added public method astGenCurve, astGrfSet, astGrfPop, astGrfPush.
 *        Made DrawAxes attribute axis specific.
 *class--
 */
@@ -311,7 +313,7 @@ f     using AST_GRID
 #define EDGETICKS_DIM 100 /* No. of edge samples used to find tick marks */
 #define BORDER_ID       0 /* Id for astBorder curves */
 #define GRIDLINE_ID     1 /* Id for astGridLine curves */
-#define CURVE_ID        2 /* Id for astCurve or astPolyCurve curves */
+#define CURVE_ID        2 /* Id for astCurve, astGenCurve or astPolyCurve curves */
 #define NUMLABS_ID      3 /* Id for numerical labels */
 #define TEXTLABS_ID     4 /* Id for textual axis labels */
 #define TITLE_ID        5 /* Id for textual title */
@@ -1155,6 +1157,12 @@ static const double *Map3_origin = NULL;
 static const double *Map3_end = NULL; 
 static double        Map3_scale;
 
+/* Variables used by function Map4. See the prologue of Map4 for details. */
+static int           Map4_ncoord;       
+static AstPlot      *Map4_plot = NULL; 
+static AstMapping   *Map4_map = NULL; 
+static AstMapping   *Map4_umap = NULL; 
+
 /* A structure which stores information about the breaks in the last curve
    drawn using the public methods "astGridLine" and "astCurve". */
 static CurveData Curve_data;
@@ -1399,6 +1407,7 @@ static void GLine( AstPlot *, int, const float *, const float *, const char *, c
 static void GMark( AstPlot *, int, const float *, const float *, int, const char *, const char * );
 static void GText( AstPlot *, const char *, float, float, const char *, float, float, const char *, const char * );
 static void GTxExt( AstPlot *, const char *, float , float, const char *, float, float, float *, float *, const char *, const char * );
+static void GenCurve( AstPlot *, AstMapping * );
 static void GraphGrid( int, double, double, double, double, double ** );
 static void GrfSet( AstPlot *, const char *,  AstGrfFun );
 static void GrfPop( AstPlot * );
@@ -1413,6 +1422,7 @@ static void LinePlot( AstPlot *, double, double, double, double, int, CurveData 
 static void Map1( int, double *, double *, double *, const char *, const char * );
 static void Map2( int, double *, double *, double *, const char *, const char * );
 static void Map3( int, double *, double *, double *, const char *, const char * );
+static void Map4( int, double *, double *, double *, const char *, const char * );
 static void Mark( AstPlot *, int, int, int, const double *, int );
 static void Opoly( AstPlot *, const char *, const char * );
 static void PlotLabels( AstPlot *, AstFrame *, int, LabelList *, char *, int, float **, const char *, const char *);
@@ -6372,8 +6382,8 @@ static int CvBrk( AstPlot *this, int ibrk, double *brk, double *vbrk,
 *     astCvBrk
 
 *  Purpose:
-*     Return information about breaks in the last curve drawn by astGridLine
-*     or astCurve.
+*     Return information about breaks in the last curve drawn by astGridLine,
+*     astCurve or astGenCurve.
 
 *  Type:
 *     Protected virtual function.
@@ -6387,10 +6397,10 @@ static int CvBrk( AstPlot *this, int ibrk, double *brk, double *vbrk,
 *     Plot method.
 
 *  Description:
-*     Curves drawn by astGridLine or astCurve may contain breaks for several 
-*     reasons (for instance, it may go outside the plotting area, or the 
-*     mapping between physical and graphics coordinates may be discontinuous).
-*     This function returns information about such breaks.
+*     Curves drawn by astGridLine, astCurve or astGenCurve may contain breaks 
+*     for several reasons (for instance, it may go outside the plotting area, 
+*     or the mapping between physical and graphics coordinates may be 
+*     discontinuous). This function returns information about such breaks.
 
 *  Parameters:
 *     this
@@ -6846,6 +6856,11 @@ c     astCurve, but will usually be more efficient.
 f     If you need to draw many geodesic curves end-to-end, then the
 f     AST_POLYCURVE routine is equivalent to repeatedly calling
 f     AST_CURVE, but will usually be more efficient.
+*
+c     If you need to draw curves which are not geodesics, see astGenCurve
+c     or astGridLine.
+f     If you need to draw curves which are not geodesics, see AST_GENCURVE
+f     or AST_GRIDLINE.
 
 *  Parameters:
 c     this
@@ -10204,6 +10219,186 @@ static void GAttr( AstPlot *this, int attr, double value, double *old_value,
 
 }
 
+static void GenCurve( AstPlot *this, AstMapping *map ){
+/*
+*++
+*  Name:
+c     astGenCurve
+f     AST_GENCURVE
+
+*  Purpose:
+*     Draw a generalized curve.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "plot.h"
+c     void astGenCurve( AstPlot *this, astMapping *map )
+f     CALL AST_GENCURVE( THIS, MAP )
+
+*  Class Membership:
+*     Plot method.
+
+*  Description:
+c     This function draws a general user-defined curve defined by the 
+f     This routine draws a general user-defined curve defined by the 
+*     supplied Mapping. Note that the curve is transformed into graphical
+*     coordinate space for plotting, so that a straight line in
+*     physical coordinates may result in a curved line being drawn if
+*     the Mapping involved is non-linear. Any discontinuities in the
+*     Mapping between physical and graphical coordinates are
+c     catered for, as is any clipping established using astClip.
+f     catered for, as is any clipping established using AST_CLIP.
+*
+c     If you need to draw simple straight lines (geodesics), astCurve
+c     or astPolyCurve will usually be easier to use and faster.
+f     If you need to draw simple straight lines (geodesics), AST_CURVE
+f     or AST_POLYCURVE will usually be easier to use and faster.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Plot.
+c     map
+f     MAP = INTEGER (Given)
+*        Pointer to a Mapping. This Mapping should have 1 input
+*        coordinate representing offset along the required curve,
+*        normalized so that the start of the curve is at offset 0.0, 
+*        and the end of the curve is at offset 1.0. Note, this offset
+*        does not need to be linearly related to distance along the curve.
+*        The number of output coordinates should equal the number of axes
+*        in the current Frame of the Plot. The Mapping should map a
+*        specified offset along the curve, into the corresponding
+*        coordinates in the current Frame of the Plot. The inverse
+*        transformation need not be defined.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - An error results if the base Frame of the Plot is not 2-dimensional.
+*     - An error also results if the transformation between the
+*     current and base Frames of the Plot is not defined (i.e. the
+*     Plot's TranInverse attribute is zero).
+*--
+*/
+/* Local Variables: */
+   const char *class;      /* Object class */
+   const char *method;     /* Current method */
+   double d[ CRV_NPNT ];   /* Offsets to evenly spaced points along curve */
+   double tol;             /* Absolute tolerance value */
+   double x[ CRV_NPNT ];   /* X coords at evenly spaced points along curve */
+   double y[ CRV_NPNT ];   /* Y coords at evenly spaced points along curve */
+   int i;                  /* Loop count */
+   int naxes;              /* No. of axes in the base Frame */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Store the current method, and the class of the supplied object for use 
+   in error messages.*/
+   method = "astGenCurve";
+   class = astGetClass( this );
+
+/* Check the base Frame of the Plot is 2-D. */
+   naxes = astGetNin( this );
+   if( naxes != 2 && astOK ){
+      astError( AST__NAXIN, "%s(%s): Number of axes (%d) in the base "
+                "Frame of the supplied %s is invalid - this number should "
+                "be 2.", method, class, naxes, class );
+   } 
+
+/* Only proceed if there has been no error. */
+   if( astOK ){   
+
+/* Establish the correct graphical attributes as defined by attributes
+   with the supplied Plot. */
+      GrfAttrs( this, CURVE_ID, 1, GRF__LINE, method, class );
+
+/* Set up the externals used to communicate with the Map4 function... */
+      Map4_ncoord = astGetNout( this );
+      Map4_plot = this;
+      Map4_map = astGetMapping( this, AST__BASE, AST__CURRENT );
+      Map4_umap = map;
+
+/* Convert the tolerance from relative to absolute graphics coordinates. */
+      tol = astGetTol( this )*MAX( this->xhi - this->xlo, 
+                                   this->yhi - this->ylo );
+
+/* Now set up the external variables used by the Crv and CrvLine function. */
+      Crv_ux0 = AST__BAD;    
+      Crv_tol = tol;
+      Crv_limit = 0.5*tol*tol;
+      Crv_map = Map4;
+      Crv_ink = 1;
+      Crv_xlo = this->xlo;
+      Crv_xhi = this->xhi;
+      Crv_ylo = this->ylo;
+      Crv_yhi = this->yhi;
+      Crv_out = 1;
+      Crv_xbrk = Curve_data.xbrk;
+      Crv_ybrk = Curve_data.ybrk;
+      Crv_vxbrk = Curve_data.vxbrk;
+      Crv_vybrk = Curve_data.vybrk;
+
+/* Set up a list of points spread evenly over the curve. */
+      for( i = 0; i < CRV_NPNT; i++ ){
+        d[ i ] = ( (double) i)/( (double) CRV_NSEG );
+      }
+
+/* Map these points into graphics coordinates. */
+      Map4( CRV_NPNT, d, x, y, method, class );
+
+/* Use Crv and Map4 to draw the curve. */
+      Crv( this, d, x, y, method, class );
+
+/* End the current poly line. */
+      Opoly( this, method, class );
+
+/* Tidy up the static data used by Map4. */
+      Map4( 0, NULL, NULL, NULL, method, class );
+
+/* If no part of the curve could be drawn, set the number of breaks and the 
+   length of the drawn curve to zero. */
+      if( Crv_out ) {
+         Crv_nbrk = 0;
+         Crv_len = 0.0F;
+
+/* Otherwise, add an extra break to the returned structure at the position of 
+   the last point to be plotted. */
+      } else {
+         Crv_nbrk++;
+         if( Crv_nbrk > CRV_MXBRK ){
+            astError( AST__CVBRK, "%s(%s): Number of breaks in curve "
+                      "exceeds %d.", method, class, CRV_MXBRK );
+         } else {
+            *(Crv_xbrk++) = (float) Crv_xl;
+            *(Crv_ybrk++) = (float) Crv_yl;
+            *(Crv_vxbrk++) = (float) -Crv_vxl;
+            *(Crv_vybrk++) = (float) -Crv_vyl;
+         }
+      }
+
+/* Store extra information about the curve in the returned structure, and 
+   purge any zero length sections. */
+      Curve_data.length = Crv_len;
+      Curve_data.out = Crv_out;
+      Curve_data.nbrk = Crv_nbrk;
+      PurgeCdata( &Curve_data );
+
+/* Annul the Mapping. */
+      Map4_map = astAnnul( Map4_map );
+
+/* Re-establish the original graphical attributes. */
+      GrfAttrs( this, CURVE_ID, 0, GRF__LINE, method, class );
+
+   }
+
+/* Return. */
+   return;
+
+}
+
 static void GFlush( AstPlot *this, const char *method, 
                    const char *class ) {
 /*
@@ -13097,7 +13292,7 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, con
 *
 *        BORDER_ID   - The boundary curve drawn by astBorder.
 *        GRIDLINE_ID - Curves drawn by astGridLine.
-*        CURVE_ID    - Curves drawn by astCurve or astPolyCurve.
+*        CURVE_ID    - Curves drawn by astCurve, astGenCurve or astPolyCurve.
 *        NUMLABS_ID  - Numerical labels.
 *        TEXTLABS_ID - Textual axis labels (not the title).
 *        TITLE_ID    - The grid title.
@@ -14171,6 +14366,7 @@ static void InitVtab( AstPlotVtab *vtab ) {
    vtab->GrfPush = GrfPush;
    vtab->GrfPop = GrfPop;
    vtab->GrfWrapper = GrfWrapper;
+   vtab->GenCurve = GenCurve;
    vtab->PolyCurve = PolyCurve;
    vtab->CvBrk = CvBrk;
    vtab->Grid = Grid; 
@@ -15885,6 +16081,147 @@ static void Map3( int n, double *dist, double *x, double *y,
 
 /* Map all the positions into graphics coordinates. */
       (void) Trans( Map3_plot, NULL, Map3_map, pset1, 0, pset2, 1, method, class );
+   }
+   
+/* Return. */
+   return;
+
+}
+
+static void Map4( int n, double *dist, double *x, double *y, 
+                  const char *method, const char *class  ){
+/*
+*  Name:
+*     Map4
+
+*  Purpose:
+*     Find graphics coordinates at given distances along a user
+*     specified curve.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     void Map4( int n, double *dist, double *x, double *y,
+*                const char *method, const char *class )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     The supplied distances are converted into physical coordinates using
+*     the Mapping Map4_umap. These physical coordinates are transformed into 
+*     graphics coordinates.
+
+*  Parameters:
+*     n 
+*        The number of points to map. Static resources are released but
+*        no points are mapped if zero is supplied.
+*     dist
+*        A pointer to an array holding "n" distances. A "dist" value of
+*        zero corresponds to the starting position supplied in external 
+*        variable Map3_origin. A "dist" value of one corresponds to the 
+*        finishing position given by Map3_end.
+*     x
+*        A pointer to an array in which to store the "n" graphics X 
+*        coordinate values corresponding to the positions in "dist".
+*     y
+*        A pointer to an array in which to store the "n" graphics Y
+*        coordinate values corresponding to the positions in "dist".
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
+
+*  External Variables:
+*     Map4_ncoord = int (Read)
+*        The number of axes in the physical coordinate system.
+*     Map4_plot = AstPlot * (Read)
+*        A pointer to the Plot defining the mapping from graphics cordinates
+*        to physical coordinates.
+*     Map4_map = AstMapping * (Read)
+*        A pointer to the mapping from graphics cordinates to physical 
+*        coordinates extracted from the Plot.
+*     Map4_umap = AstMapping * (Read)
+*        A pointer to the mapping from distance along the curve to physical 
+*        coordinates.
+
+*  Notes:
+*     -  On the first call, this function allocates static resources which 
+*     are used by subsequent invocation. These resources should be freed before
+*     calling this function with new values for any of the external variables, 
+*     or when no longer needed, by calling this function with "n" supplied as 
+*     zero.
+*     -  If an error has already occurred, this runction returns without 
+*     action ,except that if "n" is supplied as zero then static resources
+*     are released even if an error has already occurred.
+
+*/
+
+/* Local Variables: */
+   double *ptr1[ 1 ];                /* Pointer to distances data */
+   double *ptr3[ 2 ];                /* Pointers to graphics coord data */
+   int i;                            /* Loop count */
+   static AstPointSet *pset1 = NULL; /* PointSet holding distances */
+   static AstPointSet *pset2 = NULL; /* PointSet holding physical coords */
+   static AstPointSet *pset3 = NULL; /* PointSet holding graphics coords */
+   static int nl = 0;                /* No. of points in pset1 and pset2 */
+
+/* If zero points were supplied, release any PointSets which have
+   been created and return. */
+   if( n == 0 ){
+      nl = 0;       
+      if( pset1 ) pset1 = astAnnul( pset1 );
+      if( pset2 ) pset2 = astAnnul( pset2 );
+      if( pset3 ) pset3 = astAnnul( pset3 );
+      return;
+   }
+   
+/* Otherwise, check the inherited global status. */
+   if( !astOK ) return;
+
+/* If the number of points to be mapped is different to last time, 
+   set up some PointSets to store the specified number of points. */
+   if( n != nl ){
+      nl = n;
+
+/* Create a PointSet to hold the distances along the curve. First annul any 
+   existing PointSet. */
+      if( pset1 ) pset1 = astAnnul( pset1 );
+      pset1 = astPointSet( n, 1, "" );   
+
+/* Create a PointSet to hold the physical coordinates corresponding to
+   the supplied distances. First annul any existing PointSet. */
+      if( pset2 ) pset2 = astAnnul( pset2 );
+      pset2 = astPointSet( n, Map4_ncoord, "" );   
+
+/* Create a PointSet to hold the corresponding graphics coordinates. 
+   First annul any existing PointSet. */
+      if( pset3 ) pset3 = astAnnul( pset3 );
+      pset3 = astPointSet( n, 2, "" );   
+
+   }
+
+/* Check the initialisation went OK (if done). */
+   if( astOK ){
+
+/* Use Map4_umap to convert the supplied distances into physical coords
+   (i.e. coords in the current Frame of the Plot).
+      ptr1[ 0 ] = dist;
+      astSetPoints( pset1, ptr1 );
+      (void) astTransform( Map4_umap, pset1, 1, pset2 );
+
+/* Store pointers to the results arrays in PointSet 2. */
+      ptr3[ 0 ] = x;
+      ptr3[ 1 ] = y;   
+      astSetPoints( pset3, ptr3 );
+
+/* Now transform these physical coords into graphical coords,
+   incorporating clipping. */
+      (void) Trans( Map4_plot, NULL, Map4_map, pset2, 0, pset3, 1, method, class );
    }
    
 /* Return. */
@@ -21536,6 +21873,11 @@ void astGridLine_( AstPlot *this, int axis, const double start[], double length 
 void astCurve_( AstPlot *this, const double start[], const double finish[] ){
    if( !astOK ) return;
    (**astMEMBER(this,Plot,Curve))(this,start,finish);
+}
+
+void astGenCurve_( AstPlot *this, AstMapping *map ){
+   if( !astOK ) return;
+   (**astMEMBER(this,Plot,GenCurve))(this,map);
 }
 
 void astPolyCurve_( AstPlot *this, int npoint, int ncoord, int dim, 

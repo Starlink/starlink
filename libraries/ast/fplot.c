@@ -17,6 +17,7 @@
 *     AST_BORDER
 *     AST_CLIP
 *     AST_CURVE
+*     AST_GENCURVE
 *     AST_GRID
 *     AST_GRIDLINE
 *     AST_ISAPLOT
@@ -50,8 +51,8 @@
 *        Change argument "in" for astMark and astPolyCurve from type
 *        "const double (*)[]" to "const double *".
 *     13-JUN-2001 (DSB):
-*        Modified to add support for astGrfSet, astGrfPop, astGrfPush and 
-*        EXTERNAL grf functions.
+*        Modified to add support for astGenCurve, astGrfSet, astGrfPop, 
+*        astGrfPush and EXTERNAL grf functions.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -233,6 +234,18 @@ F77_SUBROUTINE(ast_polycurve)( INTEGER(THIS),
    astWatchSTATUS(
       astPolyCurve( astI2P( *THIS ), *NPOINT, *NCOORD, *INDIM,
                 (const double *)IN );
+   )
+}
+
+F77_SUBROUTINE(ast_gencurve)( INTEGER(THIS),
+                              INTEGER(MAP),
+                              INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(MAP)
+
+   astAt( "AST_GENCURVE", NULL, 0 );
+   astWatchSTATUS(
+      astGenCurve( astI2P( *THIS ), astI2P( *MAP ) );
    )
 }
 

@@ -385,8 +385,8 @@ c     - Border: The plot boundary drawn using astBorder or astGrid
 f     - Border: The plot boundary drawn using AST_BORDER or AST_GRID
 c     - Grid: Curves drawn using astGridLine or astGrid
 f     - Grid: Curves drawn using AST_GRIDLINE or AST_GRID
-c     - Curves: Curves drawn using astCurve or astPolyCurve
-f     - Curves: Curves drawn using AST_CURVE or AST_POLYCURVE
+c     - Curves: Curves drawn using astCurve, astGenCurve or astPolyCurve
+f     - Curves: Curves drawn using AST_CURVE, AST_GENCURVE or AST_POLYCURVE
 c     - NumLab: Numerical axis labels drawn using astGrid
 f     - NumLab: Numerical axis labels drawn using AST_GRID
 c     - TextLab: Textual axis labels drawn using astGrid
@@ -431,6 +431,8 @@ f     - Strings: Text strings drawn using AST_TEXT
 *           Draw a curve following a constant axis value.
 *        astCurve
 *           Draw a geodesic curve between two points.
+*        astGenCurve
+*           Draw a generalized curve.
 *        astMark
 *           Draw a set of graphical markers at given physical coordinates.
 *        astPolyCurve
@@ -441,7 +443,7 @@ f     - Strings: Text strings drawn using AST_TEXT
 *     Protected:
 *        astCvBrk
 *           Return information about the most recent curve drawn by
-*           astGridLine or astCurve (NOT astPolyCurve).
+*           astGridLine, astGenCurve or astCurve (NOT astPolyCurve).
 
 *        Protected methods are supplied to set, test, clear and test each
 *        of the attributes described in the above section entitled "New
@@ -519,7 +521,8 @@ f     - Strings: Text strings drawn using AST_TEXT
 *        Change argument "in" for astMark and astPolyCurve from type
 *        "const double (*)[]" to "const double *".
 *     13-JUN-2001 (DSB):
-*        Added methods astGrfSet, astGrfPop, astGrfPush and attribute Grf.
+*        Added methods astGenCurve, astGrfSet, astGrfPop, astGrfPush and 
+*        attribute Grf.
 *-
 */
 
@@ -689,6 +692,7 @@ typedef struct AstPlotVtab {
    int (* CvBrk)( AstPlot *, int, double *, double *, double * );
    void (* GridLine)( AstPlot *, int, const double [], double );
    void (* Curve)( AstPlot *, const double [], const double [] );
+   void (* GenCurve)( AstPlot *, AstMapping * );
    void (* PolyCurve)( AstPlot *, int, int, int, const double * );
    void (* GrfSet)( AstPlot *, const char *, AstGrfFun );
    void (* GrfPush)( AstPlot * );
@@ -856,6 +860,7 @@ AstPlot *astLoadPlot_( void *, size_t, int, AstPlotVtab *,
    void astGrfSet_( AstPlot *, const char *, AstGrfFun );
    void astGrfPush_( AstPlot * );
    void astGrfPop_( AstPlot * );
+   void astGenCurve_( AstPlot *, AstMapping * );
    void astPolyCurve_( AstPlot *, int, int, int, const double * );
    void astText_( AstPlot *, const char *, const double [], const float [2], const char * );
 
@@ -1078,6 +1083,9 @@ astINVOKE(V,astGridLine_(astCheckPlot(this),axis,start,length))
 
 #define astCurve(this,start,finish) \
 astINVOKE(V,astCurve_(astCheckPlot(this),start,finish))
+
+#define astGenCurve(this,map) \
+astINVOKE(V,astGenCurve_(astCheckPlot(this),astCheckMapping(map)))
 
 #define astPolyCurve(this,npoint,ncoord,dim,in) \
 astINVOKE(V,astPolyCurve_(astCheckPlot(this),npoint,ncoord,dim,in))
