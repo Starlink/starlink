@@ -685,8 +685,8 @@
 *      Find indices of all LIVE_TIME slots which contribute to this time bin.
 *      The binary search routine rounds down to the nearest index number so
 *      add on an extra bin at the top end and do a test in the next loop.
-        CALL UTIL_BINSEARCH( N, ON, TLO, JLO )
-        CALL UTIL_BINSEARCH( N, OFF, THI, JHI )
+        CALL ARR_BSRCHR( N, ON, TLO, JLO, STATUS )
+        CALL ARR_BSRCHR( N, OFF, THI, JHI, STATUS )
         JHI = JHI + 1
 
 *      Loop over the LIVE_TIME bins contributing to the current time bin

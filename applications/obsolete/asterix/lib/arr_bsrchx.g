@@ -10,10 +10,11 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ARR_BSRCHX( N, ARRAY, VALUE, MID, STATUS )
+*     CALL ARR_BSRCH<X>( N, ARRAY, VALUE, MID, STATUS )
 
 *  Description:
-*     {routine_description}
+*     Binary search of sorted <COMM> array. The array is assumed to be
+*     sorted into ascending order.
 
 *  Arguments:
 *     N = INTEGER (given)
