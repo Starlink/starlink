@@ -113,9 +113,9 @@
       INTEGER			PTR			! Item data
       INTEGER			WBPTR			! Write back proc
 
-      CHARACTER*1		CAX
+      CHARACTER*1		CAX, AXIS
       LOGICAL			DIDCRE
-      REAL			AXINFO(2), BASE, DELTA
+      REAL			AXINFO(2), BASE, DELTA, TANG
       INTEGER			IDUM
 *.
 
@@ -127,22 +127,32 @@
 
 *  Extract the arguments
       CALL ADI_GET0C( ARGS(3), ITEM, STATUS )
+      CALL ADI_TYPE( ARGS(4), TYPE, STATUS )
 
 *  Special case for coping with spaced data axis array (RB)
       IF ( ITEM(1:4) .EQ. 'Axis' .AND. ITEM(8:11) .EQ. 'Data' ) THEN
         CALL ADI_GET1R( ARGS(4), 2, AXINFO, IDUM, STATUS )
         BASE = AXINFO(1)
         DELTA = AXINFO(2) - AXINFO(1)
+        TANG = 1.0 - ( BASE / DELTA )
         CAX = ITEM(6:6)
+        IF ( CAX .EQ. '1' ) THEN
+          AXIS = 'X'
+        ELSE IF ( CAX .EQ. '2' ) THEN
+          AXIS = 'Y'
+        ELSE
+          AXIS = '-'
+        END IF
+        print*, axis, base, delta, tang
         CALL ADI2_CFIND( ARGS(2), ' ', '.CRPIX'//CAX, ' ', .TRUE.,
      :                   .FALSE., TYPE, 0, 0, DIDCRE, ITID, STATUS )
-        CALL ADI_CNEWV0R( ITID, 'Value', BASE, STATUS )
-        CALL ADI_CNEWV0C( ITID, 'Comment', 'First value on x-axis',
+        CALL ADI_CNEWV0R( ITID, 'Value', TANG, STATUS )
+        CALL ADI_CNEWV0C( ITID, 'Comment', ' pixel of tangent point',
      :                    STATUS )
         CALL ADI2_CFIND( ARGS(2), ' ', '.CDELT'//CAX, ' ', .TRUE.,
      :                   .FALSE., TYPE, 0, 0, DIDCRE, ITID, STATUS )
         CALL ADI_CNEWV0R( ITID, 'Value', DELTA, STATUS )
-        CALL ADI_CNEWV0C( ITID, 'Comment', 'Delta value of x-axis',
+        CALL ADI_CNEWV0C( ITID, 'Comment', ' degrees per pixel',
      :                    STATUS )
       ELSE
 
@@ -164,9 +174,6 @@
 
 *    Scrub status
         CALL ERR_ANNUL( STATUS )
-
-*    Get basic data type
-        CALL ADI_TYPE( ARGS(4), TYPE, STATUS )
 
 *    Try to invent the object
         CALL BDI2_INVNT( ARGS(1), ARGS(2), ITEM, TYPE, 'WRITE',
