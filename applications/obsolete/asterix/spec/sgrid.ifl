@@ -238,6 +238,24 @@ INTERFACE SGRID
       HELP 'Terminating chi-squared slope. Default 20. Smaller => more fussy.'
    ENDPARAMETER
 
+   PARAMETER NUP
+      TYPE '_INTEGER'
+      DEFAULT 3
+      VPATH 'DEFAULT'
+      PPATH 'DEFAULT'
+      PROMPT 'Update interval'
+      HELP 'Number of its. between update of model file (and diagnostic o/p)'
+   ENDPARAMETER
+
+   PARAMETER MCTRL
+      TYPE 'CHAR'
+      DEFAULT !
+      VPATH 'CURRENT,DEFAULT'
+      PPATH 'CURRENT,DEFAULT'
+      PROMPT 'Minimisation control file'
+      HELP 'Name of minimisation control file, or ! for defaults'
+   ENDPARAMETER
+
    PARAMETER OPT
       TYPE '_INTEGER'
       VPATH 'PROMPT'
