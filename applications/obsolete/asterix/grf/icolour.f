@@ -1043,11 +1043,12 @@
       CHARACTER*8 RNAME,GNAME,BNAME
       REAL RED,GREEN,BLUE
       REAL REDHUE,GREENHUE,BLUEHUE
-      INTEGER ID,NB
+      INTEGER FLAG
+      INTEGER RID,GID,BID,FID
+      INTEGER NB
       INTEGER CI
       INTEGER J,K,J1,J2
       INTEGER ICOL
-      INTEGER GCBID
 *-
       IF (STATUS.EQ.SAI__OK.AND.NCOL.GE.16) THEN
 
@@ -1074,38 +1075,47 @@
           WRITE(GNAME(6:7),'(I2)') ICOL
           WRITE(BNAME(5:6),'(I2)') ICOL
         ENDIF
-        CALL NBS_FIND_ITEM(I_NBID,RNAME,ID,STATUS)
-        CALL NBS_GET_VALUE(ID,0,VAL__NBR,RED,NB,STATUS)
-        COL(1,ICOL)=RED
-        CALL NBS_FIND_ITEM(I_NBID,GNAME,ID,STATUS)
-        CALL NBS_GET_VALUE(ID,0,VAL__NBR,GREEN,NB,STATUS)
-        COL(2,ICOL)=GREEN
-        CALL NBS_FIND_ITEM(I_NBID,BNAME,ID,STATUS)
-        CALL NBS_GET_VALUE(ID,0,VAL__NBR,BLUE,NB,STATUS)
-        COL(3,ICOL)=BLUE
+        CALL NBS_FIND_ITEM(I_NBID,RNAME,RID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,GNAME,GID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,BNAME,BID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'FLAG',FID,STATUS)
+
+*  monitor noticeboard until flag goes non-zero
+        FLAG=0
+        DO WHILE (FLAG.EQ.0)
+          CALL NBS_GET_VALUE(RID,0,VAL__NBR,RED,NB,STATUS)
+          COL(1,ICOL)=RED
+          CALL NBS_GET_VALUE(GID,0,VAL__NBR,GREEN,NB,STATUS)
+          COL(2,ICOL)=GREEN
+          CALL NBS_GET_VALUE(BID,0,VAL__NBR,BLUE,NB,STATUS)
+          COL(3,ICOL)=BLUE
 
 *  set colour
-        DO J=J1,J2-1
-          RED=COL(1,J)
-          REDHUE=(COL(1,J+1)-RED)/REAL(NSHADE+1)
-          GREEN=COL(2,J)
-          GREENHUE=(COL(2,J+1)-GREEN)/REAL(NSHADE+1)
-          BLUE=COL(3,J)
-          BLUEHUE=(COL(3,J+1)-BLUE)/REAL(NSHADE+1)
-          CALL PGSCR(CI,RED,GREEN,BLUE)
-          DO K=1,NSHADE
-            CI=CI+1
-            RED=RED+REDHUE
-            GREEN=GREEN+GREENHUE
-            BLUE=BLUE+BLUEHUE
+          DO J=J1,J2-1
+            RED=COL(1,J)
+            REDHUE=(COL(1,J+1)-RED)/REAL(NSHADE+1)
+            GREEN=COL(2,J)
+            GREENHUE=(COL(2,J+1)-GREEN)/REAL(NSHADE+1)
+            BLUE=COL(3,J)
+            BLUEHUE=(COL(3,J+1)-BLUE)/REAL(NSHADE+1)
             CALL PGSCR(CI,RED,GREEN,BLUE)
+            DO K=1,NSHADE
+              CI=CI+1
+              RED=RED+REDHUE
+              GREEN=GREEN+GREENHUE
+              BLUE=BLUE+BLUEHUE
+              CALL PGSCR(CI,RED,GREEN,BLUE)
+            ENDDO
+            CI=CI+1
           ENDDO
-          CI=CI+1
+          RED=COL(1,J2)
+          GREEN=COL(2,J2)
+          BLUE=COL(3,J2)
+          CALL PGSCR(CI,RED,GREEN,BLUE)
+
+          CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
+
         ENDDO
-        RED=COL(1,J2)
-        GREEN=COL(2,J2)
-        BLUE=COL(3,J2)
-        CALL PGSCR(CI,RED,GREEN,BLUE)
 
       ENDIF
 
