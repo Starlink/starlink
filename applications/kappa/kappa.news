@@ -1,14 +1,10 @@
-1 KAPPA_Version_1.3
+1 KAPPA_Version_1.4
 
-   A new release of KAPPA (v1.3) has been made. The main changes are:
+   A new release of KAPPA (v1.4) has been made. The main changes are:
 
-   o An option now exists to allow the same NDF to be used both as input
-   and output for a command, in which case the original contents of the
-   NDF will be over-written by the output of th ecommand when the command
-   terminates. This option is disabled by default so that past behaviour
-   is unchanged (i.e. an error is reported if the same NDF is specified
-   as both input and output). To enable this facility define the
-   environment variable KAPPA_REPLACE, giving it any arbitrary value.
+   o The HISTAT and STATS applications now display the position of the
+   minimum and maximum pixel values in the current WCS coordinate system
+   rather than AXIS coordinates.
 
  For complete details of all changes, see the "Release Notes" appendix in
  SUN/95.
