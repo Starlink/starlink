@@ -152,6 +152,15 @@
 			"-//Starlink//NOTATION Other language script//EN"
 	>
 
+<!-- Add the other notations.  We tend not to have figures in
+     programcode prologues, but we _can_ have maths, so we need the
+     latexmaths notation.
+     -->
+<!ENTITY % notations-subset 
+	PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN"
+	>
+%notations-subset;
+
 <!--==================== Element structure ====================-->
 <!ELEMENT programcode	O O (docblock, routine*, (codegroup | codereference)*)
 		-- Document element -->
