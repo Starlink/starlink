@@ -5,7 +5,7 @@ dnl   Copyright 1999, Particle Physics and Astronomy Research Council.
 dnl   See file LICENCE for conditions.
 
 
-AC_REVISION($Id$)dnl
+AC_REVISION($Revision$)dnl
 
 
 AC_INIT(dvi2bitmap.cc)
