@@ -1024,7 +1024,16 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       IF ( IRAD .GT. NRAD ) IRAD = NRAD
 
 *    Rotation of requested psf position from calibration position
-      ROTA = ATAN2D(Y0,-X0)
+      IF ( X0 .EQ. 0.0 ) THEN
+        IF ( Y0 .GE. 0.0 ) THEN
+          ROTA = 0.0
+        ELSE
+          ROTA = 180.0
+        END IF
+      ELSE
+        ROTA = ATAN2D(Y0,-X0)
+      END IF
+
       IF ( ROTA .LT. 0.0 ) ROTA = ROTA + 360.0
       ROTA = (ROTA - REAL(AZIM(IRAD))) * MATH__DTOR
 
