@@ -57,7 +57,7 @@ my $MoggyCommand = '$AUTOASTROM_DIR/moggy';
 #my $MoggyCommand = '$AUTOASTROM_DIR/test/dummy-slave.pl';
 my $MoggyRCSId = '$Id$ ';
 # %%VERSION%%
-my $VERSION = '0.5-1';
+my $VERSION = '0.5-3';
 
 
 # Declare methods

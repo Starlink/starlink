@@ -392,7 +392,7 @@ PKG_LINK = AUTOASTROM
 #  not merit documentation changes.
 
 # %%VERSION%%
-PKG_VERS = 0.5-1
+PKG_VERS = 0.5-3
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
