@@ -105,10 +105,13 @@
 
       INTEGER			CLEN			! Lengths of string
       INTEGER			FID			! File identifier
+      INTEGER			TSTAT			! Temporary status
 *.
 
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
+*  Save the STATUS value and mark the error stack.
+      TSTAT = STATUS
+      CALL ERR_MARK
+      STATUS = SAI__OK
 
 *  Get the file object
       CALL ADI_GETFILE( ID, FID, STATUS )
@@ -136,5 +139,9 @@
         END IF
 
       END IF
+
+*  Release error stack
+      STATUS = TSTAT
+      CALL ERR_RLSE
 
       END

@@ -140,7 +140,7 @@
           CALL MSG_SETI( 'ND', NDIM )
           CALL MSG_SETI( 'NA', MXNDIM )
           CALL ERR_REP( 'BDI_GETSHP_0', 'Input object ^ID has '/
-     :                  /'^ND dimensions, where as the calling '/
+     :                  /'^ND dimensions, whereas the calling '/
      :                  /'program can only cope with ^NA', STATUS )
 
         ELSE
