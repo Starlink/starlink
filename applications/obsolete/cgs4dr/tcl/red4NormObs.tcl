@@ -23,7 +23,7 @@ proc red4NormObs {taskname} {
     set Red4Widgets(NO_LAB01) [label $top.l1 -text "Filename"]
     set Red4Widgets(NO_ENT01) [entry $top.e1 -width 40]
     pack $Red4Widgets(NO_LAB01) $Red4Widgets(NO_ENT01) -in $top -side left
-    $Red4Widgets(NO_ENT01) insert end $Red4Widgets(OB) 
+    $Red4Widgets(NO_ENT01) insert end $Red4Widgets(RO) 
     bind $Red4Widgets(NO_LAB01) <Button-2> "red4Update red4NormObs ALL"
     bind $Red4Widgets(NO_ENT01) <Button-2> "red4Update red4NormObs NO_ENT01"
     bind $Red4Widgets(NO_ENT01) <Double-Button-2> "$Red4Widgets(NO_ENT01) delete 0 end"
@@ -55,17 +55,17 @@ proc red4NormObs {taskname} {
       set obs [string trim [$Red4Widgets(NO_ENT01) get]]
       set pol [string trim [$Red4Widgets(NO_ENT02) get]]
       set box [string trim [$Red4Widgets(NO_ENT03) get]]
-      if {$obs=="" || $obs==$Red4Widgets(DOB)} {
+      if {$obs=="" || $obs==$Red4Widgets(DRO)} {
         cgs4drClear $taskname
         cgs4drInform $taskname "red4NormObs error : A dataset has not been specified properly!"
       } else {
 
 # Remove observation
-        set Red4Widgets(OB) $obs
+        set Red4Widgets(RO) $obs
         set out ${obs}_ff
         set message "Generating normalised observation from $obs output to $out"
         cgs4drInform $taskname $message
-        $taskname obey normalise_ff "input=$obs norm_method=$Red4Widgets(NO_METHOD) order=$pol boxsize=$box" \
+        $taskname obey normalise_ff "input=$obs output=$out norm_method=$Red4Widgets(NO_METHOD) order=$pol boxsize=$box" \
            -inform "cgs4drInform $taskname %V"
       }
     }
