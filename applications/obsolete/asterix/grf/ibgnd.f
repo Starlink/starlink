@@ -247,7 +247,7 @@
 
 *      Display data
           ELSE IF ( CMD .EQ. 'DDISP' ) THEN
-            CALL IBGND_DISP_SURF( 0, STATUS )
+            CALL IBGND_DISP_SURF( 2, STATUS )
 
 *      Display model residuals
           ELSE IF ( CMD .EQ. 'RDISP' ) THEN
