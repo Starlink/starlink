@@ -1,0 +1,52 @@
+
+#  Initialise linking options.
+      nogks=''
+
+#  Interpret command line switches.
+#  --------------------------------
+      while :; do
+         case "${1}" in
+
+#  -nogks - Requests linking with native pgplot and without GKS or IDI
+         -nogks)
+            nogks='y'
+            shift;;
+
+#  Once all switches have been read, continue with the rest of the script.
+         '') break;;
+
+#  Catch unrecognised arguments and report an error.
+         *)
+            echo >&2 "kaplibs_link: unknown argument \""${1}"\" given"
+            exit 1;;
+         esac
+      done
+
+#  Form list of graphics libraries.
+      if test "${nogks}" = 'y'; then 
+         echo -lkapgen -lira -lirq -llpg -lctg -lfits -laif -lkapgrf \
+           `cat_link` `ndg_link` \
+           `ndf_link` `ast_link -mygrf` \
+           `agp_link` `fio_link` \
+           `grp_link` `trn_link` \
+           `prm_link` `mag_link` \
+           `psx_link` `pda_link` \
+           -lkapgrf `pgplot_link`  \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+      else
+         echo -lkapgen -lira -lirq -llpg -lctg -lfits -laif -lkapgrf \
+           `cat_link` `snx_link` \
+           `sgs_link` `ndg_link` \
+           `gks_link` `gns_link` \
+           `ndf_link` `ast_link -mygrf` \
+           `agi_link` `fio_link` \
+           `grp_link` `trn_link` \
+           `prm_link` `mag_link` \
+           `psx_link` `pda_link` \
+           -lkapgrf `pgp_link`  \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+      fi
