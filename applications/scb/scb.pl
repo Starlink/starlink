@@ -71,7 +71,8 @@ $self =~ s%.*/%%;
 #  Name of source code retrieval program.
 
 $scb = $self;
-$usage = "Usage: $self <module> [<package>]\n";
+$usage = "Usage: $self [-html]    <func-name> [<package>]\n"
+       . "       $self [-html] -f <file-name> [<package>]\n";
 
 #  Required libraries.
 
@@ -120,6 +121,7 @@ if (@args) {
       }
    }
 }
+my $fmode = exists $arg{'file'};
 
 #  If chosen variables still have no value pick them up by order on 
 #  command line.
@@ -129,38 +131,47 @@ while ($args[0] =~ /^-/) {
    if ($flag eq '-html') {
       $html = 1;
    }
+   elsif ($flag =~ /^-f(ile(mode)?)?/) {
+      $fmode = 1;
+   }
    else {
       error $usage;
    }
 }
 
-$arg{'module'}  ||= shift (@args);
+my $firstarg = $fmode ? 'file' : 'module';
+$arg{$firstarg}  ||= shift (@args);
 $arg{'package'} ||= shift (@args);
 
 #  Decode hex encoded characters.
 
-$arg{'module'}  =~ s/%(..)/pack("c",hex($1))/ge;
-$arg{'package'} =~ s/%(..)/pack("c",hex($1))/ge;
+foreach $key (keys %arg) {
+   $arg{$key} =~ s/%(..)/pack("c",hex($1))/ge;
+}
 
 #  Substitute for '<' and '>' to match encoding in index.
 
-$arg{'module'} =~ s/</&lt;/g;
-$arg{'module'} =~ s/>/&gt;/g;
+if (exists $arg{'module'}) {
+   $arg{'module'} =~ s/</&lt;/g;
+   $arg{'module'} =~ s/>/&gt;/g;
+}
 
-#  Initialise index object containing locations of all modules.
+#  Initialise index objects containing locations of functions and files.
 
 $func_index = Directory->new($func_indexfile, O_RDONLY);
+$file_index = Directory->new($file_indexfile, O_RDONLY);
 
 #  Main processing.
 
 if ($arg{'module'}) {
 
-#  Try to retrieve requested module.
+#  Try to retrieve requested function.
 #  Check if module exists in index; try appending an underscore if the 
 #  initial try fails (and doesn't have one already).
 
-   $arg{'module'} .= "_" 
-      unless ($arg{'module'} =~ /_$/ || $func_index->get($arg{'module'}));
+   if ($arg{'module'} !~ /_$/ && !$func_index->get($arg{'module'})) {
+      $arg{'module'} .= "_" 
+   }
    unless ($func_index->get($arg{'module'})) {
       error "Failed to find module $arg{'module'}",
          "This may be a result of a deficiency in the source
@@ -168,7 +179,25 @@ if ($arg{'module'}) {
           requested doesn't exist, or because the index 
           database <code>$func_indexfile</code> has become out of date.";
    }
-   get_module $arg{'module'}, $arg{'package'};
+   get_module 'func', $arg{'module'}, $arg{'package'};
+}
+elsif ($arg{'file'}) {
+
+#  Try to retrieve requested file.
+#  Check if file exists in index; try uppercasing it if it looks like
+#  a fortran include file.
+
+   if ($arg{'file'} =~ /^[A-Z0-9_]*$/ && !$file_index->get($arg{'file'})) {
+      $arg{'file'} =~ tr/A-Z/a-z/;
+   }
+   unless ($file_index->get($arg{'file'})) {
+      error "Failed to find file $arg{'file'}",
+         "This may be a result of a deficiency in the source
+          code indexing program, or because the module you
+          requested doesn't exist, or because the index 
+          database <code>$file_indexfile</code> has become out of date.";
+   }
+   get_module 'file', $arg{'file'}, $arg{'package'};
 }
 else {
 
@@ -297,8 +326,8 @@ sub query_form {
 
          hprint "
             <h3>Modules</h3>
-            The following modules (C and Fortran functions, subroutines
-            and include files) from the package $package are indexed:<br>
+            The following modules (C and Fortran functions and subroutines)
+            from the package $package are indexed:<br>
          ";
          print "<dl>\n";
          my ($prefix, $r_mods, $ignore);
@@ -370,6 +399,7 @@ sub get_module {
 
 #  Arguments.
 
+   my $type = shift;          #  Type of module ('file' or 'func').
    my $module = shift;        #  Name of (checked) key in index file.
    my $package = shift;       #  Hint about which package contains module.
 
@@ -380,7 +410,12 @@ sub get_module {
 
 #  Get logical path name from database.  $locname is a global variable.
 
-   $locname = $func_index->get($module, packpref => $package);
+   if ($type eq 'func') {
+      $locname = $func_index->get($module, packpref => $package);
+   }
+   elsif ($type eq 'file') {
+      $locname = $file_index->get($module, packpref => $package);
+   }
 
 #  Generate an error if no module of the requested name is indexed.
 #  This ought not to happen, since $module should have been checked 
@@ -395,7 +430,7 @@ sub get_module {
    ($head, $tail) = ($1, $2);
 
    my ($file, $tarfile, $dir, $loc);
-   if ($loc = $func_index->get("$head#")) {
+   if ($loc = $file_index->get("$head#")) {
       $file = ($loc =~ m%\.tar[^/>#]*$%) ? "$loc>$tail" : "$loc/$tail";
    }
    elsif (-d "$srcdir/$head") {
@@ -498,6 +533,7 @@ sub extract_file {
    ($initial, $tarcontents, $rest) = ($1, $2, $3);
    $initial =~ m%^(.*/)?([^/]+)$%;
    ($head, $tail) = ($1, $2);
+   $head ||= '';
 
 #  If $initial is not a tarfile, just output the file.
 
@@ -581,19 +617,35 @@ sub output {
             sub {
                %tag = parsetag $1;
                if (($tag{'Start'} eq 'a') && ($name = $tag{'href'})) {
-                  return '<b>' unless 
-                     ($loc = $func_index->get($name, packpref => $package));
-                  $inhref = 1;
-                  if ($name =~ /^INCLUDE-/) {
-                     $href = "$scb?$name&$package";
-                  }
-                  elsif (index ($loc, $locname) >= 0) {
-                     $href = "#$name";
+                  my $href;
+                  if ($name =~ /^INCLUDE-(.*)/) {
+                     my $file = $1;
+                     if ($file =~ /^[A-Z0-9_]*$/ && !$file_index->get($file)) {
+                        $file =~ tr/A-Z/a-z/;
+                     }
+                     if ($file_index->get($file)) {
+                        $href = "$scb?file=$file&$package";
+                     }
                   }
                   else {
-                     $href = "$scb?$name&$package#$name";
+                     $loc = $func_index->get($name);
+                     if ($loc) {
+                        if (index ($loc, $locname) >= 0) {
+                           $href = "#$name";
+                        }
+                        else {
+                           $href = "$scb?$name&$package#$name";
+                        }
+                     }
                   }
-                  return "<a href='$href'>";
+                  if ($href) {
+                     $inhref = 1;
+                     return "<a href='$href'>";
+                  }
+                  else {
+                     $inhref = 0;
+                     return "<b>";
+                  }
                }
                elsif ($tag{'End'} eq 'a') {
                   my $retval = $inhref ? '</a>' : '</b>';
@@ -629,7 +681,7 @@ sub output {
       my $year = 1900 + (localtime)[5];
       hprint "
          <hr><i>
-         Copyright &copy; $year Central Laboratories Research Council
+         Copyright &copy; $year Central Laboratory of the Research Councils
          </i>
       ";
    }
