@@ -19,8 +19,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
  
-*  Description :
-
+*  Description:
 *     This application takes raw SKYDIP data and calculates tau, eta_tel
 *     and B by fitting. Sky temperatures are taken at different airmasses.
 
@@ -68,22 +67,22 @@
 *     model data are then written to NDFs for plotting in KAPPA-LINPLOT. (The
 *     model data is calculated with SCULIB_J_THEORETICAL.
 
-*  Implementation status:
-*     Data, Variance and Quality arrays are copied. 
-*     Bad pixels are recognised.
-*     Uses NAG routine for fit.
-
 *  Authors :
 *     TIMJ: T. Jenness (timj@jach.hawaii.edu)
 
 *  History :
 *     $Id$
 *     $Log$
-*     Revision 1.7  1996/12/12 21:05:28  timj
-*     Fix Starlink header.
-*     Replace COPYR with VEC
-*     Use PAR_CHOIC for SUB_INSTRUMENT.
+*     Revision 1.8  1997/03/07 02:33:30  timj
+*     Add support for PAR__NULL.
+*     Add support for START_EL and END_EL.
+*     Minor tweak in call name for non-NAG.
 *
+c Revision 1.7  1996/12/12  21:05:28  timj
+c Fix Starlink header.
+c Replace COPYR with VEC
+c Use PAR_CHOIC for SUB_INSTRUMENT.
+c
 c Revision 1.6  1996/08/28  03:07:57  timj
 c Added BADBIT
 c
@@ -118,7 +117,8 @@ c
 *  Global constants :
       INCLUDE 'SAE_PAR'                 ! SSE global definitions
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
-      INCLUDE 'PRM_PAR'                 ! for VAL__xxxx
+      INCLUDE 'PAR_ERR'                 ! for PAR__ constants
+      INCLUDE 'PRM_PAR'                 ! for VAL__ constants
       INCLUDE 'REDS_SYS'                ! REDS constants
 *    Import :
 *    Import-Export :
@@ -144,8 +144,8 @@ c
 *    Local variables :
       REAL    AIR_MODEL(N_MODEL)        ! Airmass values for MODEL
       REAL    AIRMASS(SCUBA__MAX_INT)   ! Array of AIRMASS data
-      REAL    AIRMASS_MAX               ! Max airmass
-      REAL    AIRMASS_MIN               ! Min airmass
+      REAL    AIRMASS_START             ! Start airmass
+      REAL    AIRMASS_END               ! End airmass
       REAL    AIRMASS_VAR(SCUBA__MAX_INT)! Array of AIRMASS variance
       REAL    AIRSTEP                   ! AIRMASS increment for DO loop
       REAL    B                         ! requested B
@@ -155,6 +155,7 @@ c
       INTEGER DIM (MAXDIM)              ! the dimensions of an array
       INTEGER DIMX (MAXDIM)             ! expected dimensions of an array
       REAL    EL                        ! Elevation in radians used for loop
+      REAL    END_EL                    ! End elevation of skydip
       REAL    ETA_TEL                   ! Telescope efficiency
       REAL    ETA_TEL_FIT               ! Fitted eta_tel
       INTEGER EXP_END                   ! end index of data for an exposure
@@ -201,9 +202,7 @@ c
       REAL    J_THEORETICAL (N_MODEL)   ! Array of model sky data
       INTEGER LBND (MAXDIM)             ! lower bounds of array
       CHARACTER*(DAT__SZLOC) LOC1       ! Dummy locator
-      REAL    MAX_EL                    ! Max elevation of skydip
       INTEGER MEASUREMENT               ! measurement index in DO loop
-      REAL    MIN_EL                    ! Min elevation of skydip
       INTEGER MOD_NDF                   ! NDF identifier of output file
       INTEGER NDIM                      ! the number of dimensions in an array
       INTEGER NERR                      ! For VEC_
@@ -238,7 +237,8 @@ c
       INTEGER SLICE_PTR                 ! Pointer to start of slice
       INTEGER SLICE_PTR_END             ! Pointer to end of slice
       CHARACTER*80 STEMP                ! scratch string
-      CHARACTER*40     SUBLIST          ! List of available sub instruments
+      REAL    START_EL                  ! Start elevation of skydip
+      CHARACTER*40 SUBLIST              ! List of available sub instruments
       CHARACTER*15 SUB_FILTER (SCUBA__MAX_SUB)
                                         ! filters in front of sub-instruments
       CHARACTER*15 SUB_INSTRUMENT (SCUBA__MAX_SUB)
@@ -603,29 +603,43 @@ c
      :  '^N_I integration(s) in ^N_M measurement(s)', STATUS)
 
 * Read in the elevation data from the FITS header
+* Read from START and END EL first
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'START_EL',START_EL, STATUS)
+         CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :        'END_EL', END_EL, STATUS)
 
-      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'MAX_EL',
-     :  MAX_EL, STATUS)
-      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'MIN_EL',
-     :  MIN_EL, STATUS)
+* Doesnt have START_EL so look for MAX_EL
+         IF (STATUS .NE. SAI__OK) THEN
+            CALL ERR_ANNUL(STATUS)
+            CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
+     :           'MAX_EL',START_EL, STATUS)
+            CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :           'MIN_EL', END_EL, STATUS)
+         ENDIF
+      ENDIF
 
-* Calculate AIRMASS array (High EL to low EL)
+* Calculate AIRMASS array (Assume constant space between airmasses)
 
-*     Min airmass
-      EL = (REAL(PI)/2.0) - MAX_EL * DEG2RAD
-      CALL SCULIB_AIRMASS (EL, AIRMASS_MIN, STATUS)
+      IF (STATUS .EQ. SAI__OK) THEN
+*     Start airmass
+         EL = (REAL(PI)/2.0) - START_EL * DEG2RAD
+         CALL SCULIB_AIRMASS (EL, AIRMASS_START, STATUS)
 
-*     Max airmass
-      EL = (REAL(PI)/2.0) - MIN_EL * DEG2RAD
-      CALL SCULIB_AIRMASS (EL, AIRMASS_MAX, STATUS)
+*     End airmass
+         EL = (REAL(PI)/2.0) - END_EL * DEG2RAD
+         CALL SCULIB_AIRMASS (EL, AIRMASS_END, STATUS)
 
-      AIRSTEP = (AIRMASS_MAX - AIRMASS_MIN) / REAL(N_MEASUREMENTS - 1)
-      DO I = 1, N_MEASUREMENTS
-         AIRMASS(I) = AIRMASS_MIN + AIRSTEP * REAL(I-1) 
+         AIRSTEP = (AIRMASS_END - AIRMASS_START) / 
+     :        REAL(N_MEASUREMENTS - 1)
+         DO I = 1, N_MEASUREMENTS
+            AIRMASS(I) = AIRMASS_START + AIRSTEP * REAL(I-1) 
 *  Calculate the variance Delta A = (TAN / SIN) Delta EL
-         EL = ASIN(1.0/AIRMASS(I))
-         AIRMASS_VAR(I) = ARCSEC * TAN(EL) / SIN(EL) ! 1 arcsec error in EL
-      END DO
+            EL = ASIN(1.0/AIRMASS(I))
+            AIRMASS_VAR(I) = ARCSEC * TAN(EL) / SIN(EL) ! 1 arcsec error in EL
+         END DO
+      END IF
 
 * Read temperatures from FITS information
 
@@ -721,10 +735,6 @@ c
      :     WAVE, INST, FILT, T_TEL, T_AMB, ETA_TEL, B, ETA_TEL_FIT,
      :     B_FIT, TAUZ_FIT, STATUS)
 
-*      CALL FIT_SKYDIP (N_MEASUREMENTS, AIRMASS, JSKY, JSKY_VAR,
-*     :     WAVE, INST, FILT, T_TEL, T_AMB, ETA_TEL, B, ETA_TEL_FIT,
-*     :     B_FIT, TAUZ_FIT, STATUS)
-
       IF (STATUS .EQ. SAI__OK) THEN
          FITFAIL = .FALSE.
       ELSE
@@ -739,91 +749,100 @@ c
       CALL NDF_PROP (IN_NDF, 'NOEXTENSION(SCUCD,SCUBA) ', 'OUT',
      :     OUT_NDF, STATUS)
 
+* dont bother if a NULL has been returned
+
+      IF (STATUS .EQ. PAR__NULL) THEN
+         CALL ERR_ANNUL(STATUS)   ! Reset NULL
+      ELSE
 * Create a REDS extension to store the FIT parameters
-      CALL NDF_XNEW (OUT_NDF, 'REDS', 'REDS_EXTENSION', 0, 0, 
-     :     LOC1, STATUS)
-      CALL DAT_ANNUL (LOC1, STATUS)
+         CALL NDF_XNEW (OUT_NDF, 'REDS', 'REDS_EXTENSION', 0, 0, 
+     :        LOC1, STATUS)
+         CALL DAT_ANNUL (LOC1, STATUS)
 
 * Store fit parameters
 
-      CALL NDF_XPT0C(INST, OUT_NDF, 'REDS', 'SUB_INSTRUMENT', STATUS)
-      CALL NDF_XPT0C(FILT, OUT_NDF, 'REDS', 'FILTER', STATUS)
-      CALL NDF_XPT0R(WAVE, OUT_NDF, 'REDS', 'WAVELENGTH', STATUS)
-      CALL NDF_XPT0R(T_COLD(SUB_POINTER), OUT_NDF, 'REDS', 'T_COLD', 
-     :     STATUS)
+         CALL NDF_XPT0C(INST, OUT_NDF, 'REDS', 'SUB_INSTRUMENT', STATUS)
+         CALL NDF_XPT0C(FILT, OUT_NDF, 'REDS', 'FILTER', STATUS)
+         CALL NDF_XPT0R(WAVE, OUT_NDF, 'REDS', 'WAVELENGTH', STATUS)
+         CALL NDF_XPT0R(T_COLD(SUB_POINTER), OUT_NDF, 'REDS', 'T_COLD', 
+     :        STATUS)
 
 *  create a history component in the output file
 
-      CALL NDF_HCRE (OUT_NDF, STATUS)
+         CALL NDF_HCRE (OUT_NDF, STATUS)
 
 * Title of DATASET
-      CALL NDF_CPUT ('Skydip',OUT_NDF,'TITLE',STATUS)
+         CALL NDF_CPUT ('Skydip',OUT_NDF,'TITLE',STATUS)
 
 * Data label
-      CALL NDF_CPUT ('Jsky (measured)', OUT_NDF, 'LABEL',STATUS)
+         CALL NDF_CPUT ('Jsky (measured)', OUT_NDF, 'LABEL',STATUS)
 
 * Data unit
-      CALL NDF_CPUT ('K', OUT_NDF, 'UNITS', STATUS)
+         CALL NDF_CPUT ('K', OUT_NDF, 'UNITS', STATUS)
 
 * Set-up the DATA array
 
-      NDIM = 1
-      LBND (1) = 1
-      UBND (1) = N_MEASUREMENTS
+         NDIM = 1
+         LBND (1) = 1
+         UBND (1) = N_MEASUREMENTS
 
 * Set new bounds of data array
-      CALL NDF_SBND (NDIM, LBND, UBND, OUT_NDF, STATUS)
+         CALL NDF_SBND (NDIM, LBND, UBND, OUT_NDF, STATUS)
 
 * Turn off automatic quality masking (just to make sure)
-      CALL NDF_SQMF(.FALSE., OUT_NDF, STATUS)
+         CALL NDF_SQMF(.FALSE., OUT_NDF, STATUS)
 
 *  Map the data
-      CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE',
-     : OUT_DATA_PTR, ITEMP, STATUS)
+         CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE',
+     :        OUT_DATA_PTR, ITEMP, STATUS)
 
-      CALL VEC_RTOR(.FALSE., UBND(1),JSKY, %VAL(OUT_DATA_PTR),
-     :     IERR, NERR, STATUS)
+         CALL VEC_RTOR(.FALSE., UBND(1),JSKY, %VAL(OUT_DATA_PTR),
+     :        IERR, NERR, STATUS)
 
 * Write VARIANCE
 
-      CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE',
-     : OUT_VAR_PTR, ITEMP, STATUS)
-
-      CALL VEC_RTOR(.FALSE., UBND(1),JSKY_VAR, %VAL(OUT_VAR_PTR),
-     :     IERR, NERR, STATUS)
-
+         CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE',
+     :        OUT_VAR_PTR, ITEMP, STATUS)
+         
+         CALL VEC_RTOR(.FALSE., UBND(1),JSKY_VAR, %VAL(OUT_VAR_PTR),
+     :        IERR, NERR, STATUS)
 
 * Write QUALITY
 
-      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
-     : OUT_QUAL_PTR, ITEMP, STATUS)
-      CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
-
-      CALL VEC_BTOB(.FALSE.,UBND(1),JSKY_QUAL, %VAL(OUT_QUAL_PTR),
-     :     IERR, NERR, STATUS)
+         CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
+     :        OUT_QUAL_PTR, ITEMP, STATUS)
+         CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
+         
+         CALL VEC_BTOB(.FALSE.,UBND(1),JSKY_QUAL, %VAL(OUT_QUAL_PTR),
+     :        IERR, NERR, STATUS)
 
 * Create the AXES
 
-      CALL NDF_ACRE(OUT_NDF, STATUS)
+         CALL NDF_ACRE(OUT_NDF, STATUS)
 
 * Label everything
 
-      CALL NDF_ACPUT('AIRMASS',OUT_NDF,'LABEL',1,STATUS)
+         CALL NDF_ACPUT('AIRMASS',OUT_NDF,'LABEL',1,STATUS)
 
 * Write AXES data points
 
-      CALL NDF_AMAP (OUT_NDF, 'Centre', 1, '_REAL', 'WRITE',
-     :     OUT_AXIS_PTR, UBND(1), STATUS)
-
-      CALL VEC_RTOR(.FALSE., UBND(1), AIRMASS, %VAL(OUT_AXIS_PTR),
-     :     IERR, NERR, STATUS)
+         CALL NDF_AMAP (OUT_NDF, 'Centre', 1, '_REAL', 'WRITE',
+     :        OUT_AXIS_PTR, UBND(1), STATUS)
+         
+         CALL VEC_RTOR(.FALSE., UBND(1), AIRMASS, %VAL(OUT_AXIS_PTR),
+     :        IERR, NERR, STATUS)
 
 * Write the AXIS variance (probably pretty inaccurate)
-      CALL NDF_AMAP (OUT_NDF, 'Error', 1, '_REAL', 'WRITE',
-     :     OUT_AXIS_PTR, UBND(1), STATUS)
+         CALL NDF_AMAP (OUT_NDF, 'Error', 1, '_REAL', 'WRITE',
+     :        OUT_AXIS_PTR, UBND(1), STATUS)
 
-      CALL VEC_RTOR(.FALSE., UBND(1), AIRMASS_VAR, %VAL(OUT_AXIS_PTR),
-     :     IERR, NERR, STATUS)
+         CALL VEC_RTOR(.FALSE., UBND(1), AIRMASS_VAR,%VAL(OUT_AXIS_PTR),
+     :        IERR, NERR, STATUS)
+
+         CALL NDF_ANNUL (OUT_NDF, STATUS)
+
+      ENDIF
+
 
 * If FIT worked...
 
@@ -831,78 +850,92 @@ c
 
 **** Now calculate the model and write out to another NDF *****
 
-* Calculate model values
-      AIRSTEP = (AIRMASS(N_MEASUREMENTS) - AIRMASS(1)) /
-     :     (N_MODEL - 1)
-
-      DO I = 1, N_MODEL
-         AIR_MODEL(I) = AIRMASS(1) + AIRSTEP * (I - 1)
-         CALL SCULIB_J_THEORETICAL (TAUZ_FIT, AIR_MODEL(I), T_TEL,
-     :        T_AMB, WAVE, ETA_TEL_FIT, B_FIT, J_THEORETICAL(I),
-     :        STATUS)
-      END DO
-
 *  now open the output NDF, propagating it from the input file
  
-      CALL NDF_PROP (IN_NDF, 'NOEXTENSION(SCUCD,SCUBA) ', 'MODEL_OUT',
-     :     MOD_NDF, STATUS)
+         CALL NDF_PROP (IN_NDF, 'NOEXTENSION(SCUCD,SCUBA) ','MODEL_OUT',
+     :        MOD_NDF, STATUS)
+
+* Only write out if required
+         IF (STATUS .EQ. PAR__NULL) THEN
+            CALL ERR_ANNUL(STATUS)
+         ELSE
+
+* Calculate model values
+            AIRSTEP = (AIRMASS(N_MEASUREMENTS) - AIRMASS(1)) /
+     :           (N_MODEL - 1)
+               print *,AIRSTEP, AIRMASS(1), AIRMASS(N_MEASUREMENTS),
+     :           STATUS
+            DO I = 1, N_MODEL
+               AIR_MODEL(I) = AIRMASS(1) + AIRSTEP * (I - 1)
+               CALL SCULIB_J_THEORETICAL (TAUZ_FIT, AIR_MODEL(I), T_TEL,
+     :              T_AMB, WAVE, ETA_TEL_FIT, B_FIT, J_THEORETICAL(I),
+     :              STATUS)
+               print *,AIR_MODEL(I), J_THEORETICAL(I)
+            END DO
+
 
 * Create a REDS extension to store the FIT parameters
-      CALL NDF_XNEW (MOD_NDF, 'REDS', 'REDS_EXTENSION', 0, 0, 
-     :     LOC1, STATUS)
-      CALL DAT_ANNUL (LOC1, STATUS)
+            CALL NDF_XNEW (MOD_NDF, 'REDS', 'REDS_EXTENSION', 0, 0, 
+     :           LOC1, STATUS)
+            CALL DAT_ANNUL (LOC1, STATUS)
 
 * Store fit parameters
-      CALL NDF_XPT0C(INST, MOD_NDF, 'REDS', 'SUB_INSTRUMENT', STATUS)
-      CALL NDF_XPT0C(FILT, MOD_NDF, 'REDS', 'FILTER', STATUS)
-      CALL NDF_XPT0R(WAVE, MOD_NDF, 'REDS', 'WAVELENGTH', STATUS)
-      CALL NDF_XPT0R(T_COLD(SUB_POINTER), MOD_NDF, 'REDS', 'T_COLD',
-     :     STATUS)
-      CALL NDF_XPT0R(ETA_TEL_FIT, MOD_NDF, 'REDS', 'ETA_TEL', STATUS)
-      CALL NDF_XPT0R(B_FIT, MOD_NDF, 'REDS', 'B_FIT', STATUS)
-      CALL NDF_XPT0R(TAUZ_FIT, MOD_NDF, 'REDS', 'TAU_Z', STATUS)
+            CALL NDF_XPT0C(INST, MOD_NDF, 'REDS', 'SUB_INSTRUMENT',
+     :           STATUS)
+            CALL NDF_XPT0C(FILT, MOD_NDF, 'REDS', 'FILTER', STATUS)
+            CALL NDF_XPT0R(WAVE, MOD_NDF, 'REDS', 'WAVELENGTH', STATUS)
+            CALL NDF_XPT0R(T_COLD(SUB_POINTER), MOD_NDF,'REDS','T_COLD',
+     :           STATUS)
+            CALL NDF_XPT0R(ETA_TEL_FIT, MOD_NDF, 'REDS', 'ETA_TEL',
+     :           STATUS)
+            CALL NDF_XPT0R(B_FIT, MOD_NDF, 'REDS', 'B_FIT', STATUS)
+            CALL NDF_XPT0R(TAUZ_FIT, MOD_NDF, 'REDS', 'TAU_Z', STATUS)
 
 *  create a history component in the output file
 
-      CALL NDF_HCRE (MOD_NDF, STATUS)
+            CALL NDF_HCRE (MOD_NDF, STATUS)
 
 * Title of DATASET
-      CALL NDF_CPUT ('Skydip',MOD_NDF,'TITLE',STATUS)
-* Data label
-      CALL NDF_CPUT ('Jsky (Theoretical)', MOD_NDF, 'LABEL',STATUS)
+            CALL NDF_CPUT ('Skydip',MOD_NDF,'TITLE',STATUS)
+*     Data label
+            CALL NDF_CPUT ('Jsky (Theoretical)', MOD_NDF,'LABEL',STATUS)
 * Data unit
-      CALL NDF_CPUT ('K', MOD_NDF, 'UNITS', STATUS)
+            CALL NDF_CPUT ('K', MOD_NDF, 'UNITS', STATUS)
 
 
 * Set-up the DATA array
 
-      NDIM = 1
-      LBND (1) = 1
-      UBND (1) = N_MODEL
+            NDIM = 1
+            LBND (1) = 1
+            UBND (1) = N_MODEL
 
 * Set new bounds of data array
-      CALL NDF_SBND (NDIM, LBND, UBND, MOD_NDF, STATUS)
+            CALL NDF_SBND (NDIM, LBND, UBND, MOD_NDF, STATUS)
 
 *  Map the data
-      CALL NDF_MAP (MOD_NDF, 'DATA', '_REAL', 'WRITE',
-     : OUT_DATA_PTR_M, ITEMP, STATUS)
+            CALL NDF_MAP (MOD_NDF, 'DATA', '_REAL', 'WRITE',
+     :           OUT_DATA_PTR_M, ITEMP, STATUS)
 
-      CALL VEC_RTOR(.FALSE.,UBND(1),J_THEORETICAL, %VAL(OUT_DATA_PTR_M),
-     :     IERR, NERR, STATUS)
+            CALL VEC_RTOR(.FALSE.,UBND(1),J_THEORETICAL, 
+     :           %VAL(OUT_DATA_PTR_M), IERR, NERR, STATUS)
 
 * Set the BAD pixel flag
-      CALL NDF_SBAD(.FALSE., MOD_NDF, 'Data', STATUS)
+            CALL NDF_SBAD(.FALSE., MOD_NDF, 'Data', STATUS)
 
 * Create the AXES
-      CALL NDF_ACRE(MOD_NDF, STATUS)
+            CALL NDF_ACRE(MOD_NDF, STATUS)
 * Label everything
-      CALL NDF_ACPUT('AIRMASS',MOD_NDF,'LABEL',1,STATUS)
+            CALL NDF_ACPUT('AIRMASS',MOD_NDF,'LABEL',1,STATUS)
 * Write AXES data points
-      CALL NDF_AMAP (MOD_NDF, 'Centre', 1, '_REAL', 'WRITE',
-     :     OUT_AXIS_PTR_M, UBND(1), STATUS)
+            CALL NDF_AMAP (MOD_NDF, 'Centre', 1, '_REAL', 'WRITE',
+     :           OUT_AXIS_PTR_M, UBND(1), STATUS)
 
-      CALL VEC_RTOR(.FALSE., UBND(1), AIR_MODEL, %VAL(OUT_AXIS_PTR_M),
-     :     IERR, NERR, STATUS)
+            CALL VEC_RTOR(.FALSE., UBND(1), AIR_MODEL, 
+     :           %VAL(OUT_AXIS_PTR_M), IERR, NERR, STATUS)
+
+*   Tidy up
+            CALL NDF_ANNUL (MOD_NDF, STATUS)
+         ENDIF
 
       ENDIF
 
@@ -911,9 +944,6 @@ c
       CALL SCULIB_FREE ('SLICE' , SLICE_PTR, SLICE_PTR_END, STATUS )
 
       CALL NDF_ANNUL (IN_NDF, STATUS)
-      CALL NDF_ANNUL (OUT_NDF, STATUS)
-
-      IF (.NOT.FITFAIL)  CALL NDF_ANNUL (MOD_NDF, STATUS)
 
       CALL NDF_END (STATUS)
 
