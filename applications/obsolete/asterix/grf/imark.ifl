@@ -21,7 +21,7 @@ interface IMARK
   endparameter
   parameter LIST
     position 1
-    type '_CHAR'
+    type 'LITERAL'
     prompt 'Source list'
     help 'Text or HDS file containing source list'
   endparameter
