@@ -1,6 +1,7 @@
 #!@PERL@ -w
 # -*- perl -*-
 # @configure_input@
+# Starlink version: $Id$
 
 eval 'case $# in 0) exec @PERL@ -S "$0";; *) exec @PERL@ -S "$0" "$@";; esac'
     if 0;
