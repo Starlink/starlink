@@ -17499,6 +17499,10 @@ iraf! {
       }
    }
 
+   command kapdemo {
+      obey {$KAPPA_DIR/stardemo.tcl}
+   }
+
    command log10 {
       task logar {
          taskinherit in
