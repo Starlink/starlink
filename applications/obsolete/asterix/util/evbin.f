@@ -93,6 +93,7 @@
 *      5 Jun 92 : V1.6-0  Fixed bug if irregular axis wasn't first axis (DJA)
 *     25 Feb 94 : V1.7-0  Updated quality handling (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*     20 Apr 95 : V1.8-1  New data interface for output (DJA)
 *
 *    Type Definitions :
 *
@@ -132,7 +133,6 @@
       CHARACTER*(DAT__SZLOC)    ILOC             ! Locator to input dataset
       CHARACTER*(DAT__SZLOC)    LLOC(LIST__MXNL) ! Locator to lists in the evds
       CHARACTER*(DAT__SZNAM)    NAME(LIST__MXNL) ! Names of lists in input
-      CHARACTER*(DAT__SZLOC)    OLOC             ! Locator to output image
 
       CHARACTER*80              ACTION(MX_HTEXT) ! History text
       CHARACTER*80              AXLABEL(DAT__MXDIM) ! Axis labels for UTIL_GETTYPE
@@ -147,12 +147,14 @@
       INTEGER                   BADQUAL          ! Exclude events with quality
                                                  ! > this value.
       INTEGER                   I, J             ! Loop counters
+      INTEGER			IFID			! Input dataset id
       INTEGER                   INDEX(LIST__MXNL)! Index number of selected lists
       INTEGER                   NACT             ! # of history lines used
       INTEGER                   NEVENT           ! # input events
       INTEGER                   NINDEX           ! Number of lists selected.
       INTEGER                   INLIST           ! Number of lists in input
                                                  ! EVDS
+      INTEGER			OFID			! Output dataset id
       INTEGER                   ONDIM            ! Output dimensionality
       INTEGER                   ODIMS(DAT__MXDIM)! Dimensions of output image
       INTEGER                   ONELM            ! Total no. of output elements
@@ -175,8 +177,8 @@
 *
 *    Version id :
 *
-      CHARACTER*24              VERSION
-         PARAMETER              ( VERSION = 'EVBIN Version 1.8-0' )
+      CHARACTER*24		VERSION
+        PARAMETER              	( VERSION = 'EVBIN Version 1.8-1' )
 *-
 
 *    Check status
@@ -186,10 +188,12 @@
       CALL MSG_PRNT( VERSION )
 
 *    Initialize ASTERIX
-      CALL AST_INIT
+      CALL AST_INIT()
 
 *    Get event dataset
-      CALL USI_ASSOCI( 'INP', 'READ', ILOC, INPRIM, STATUS )
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
+      CALL DAT_PRIM( ILOC, INPRIM, STATUS )
       IF ( INPRIM ) THEN
         CALL MSG_PRNT( 'FATAL ERROR: Input is not an event dataset' )
         STATUS = SAI__ERROR
@@ -452,64 +456,64 @@
 
 *    Create output dataset
       CALL MSG_BLNK()
-      CALL USI_ASSOCO( 'OUT', DATASET, OLOC, STATUS )
+      CALL USI_TASSOCO( 'OUT', DATASET, OFID, STATUS )
 
 *    Create, fill, or map components
-      CALL BDA_CREDATA( OLOC, ONDIM, ODIMS, STATUS )
-      CALL BDA_MAPDATA( OLOC, 'WRITE', ODPTR, STATUS )
+      CALL BDI_CREDATA( OFID, ONDIM, ODIMS, STATUS )
+      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
 
 *    Create & map QUALITY
       IF ( QUALITY .AND. QKEEP ) THEN
-        CALL BDA_CREQUAL( OLOC, ONDIM, ODIMS, STATUS )
-        CALL BDA_MAPQUAL( OLOC, 'WRITE', OQPTR, STATUS )
-        CALL BDA_PUTMASK( OLOC, QUAL__MASK, STATUS )
+        CALL BDI_CREQUAL( OFID, ONDIM, ODIMS, STATUS )
+        CALL BDI_MAPQUAL( OFID, 'WRITE', OQPTR, STATUS )
+        CALL BDI_PUTMASK( OFID, QUAL__MASK, STATUS )
       END IF
 
 *    Create AXIS structure
-      CALL BDA_CREAXES( OLOC, ONDIM, STATUS )
+      CALL BDI_CREAXES( OFID, ONDIM, STATUS )
 
 *    Loop over AXIS structure writing the values.
       DO I = 1, ONDIM
 
 *      Write text
-        CALL BDA_PUTAXLABEL( OLOC, I, D(I).NAME,  STATUS)
-        CALL BDA_PUTAXUNITS( OLOC, I, D(I).UNITS, STATUS)
-        CALL BDA_PUTAXNORM( OLOC, I, .FALSE., STATUS )
+        CALL BDI_PUTAXLABEL( OFID, I, D(I).NAME,  STATUS)
+        CALL BDI_PUTAXUNITS( OFID, I, D(I).UNITS, STATUS)
+        CALL BDI_PUTAXNORM( OFID, I, .FALSE., STATUS )
 
 *      Write bin characteristics
         IF ( D(I).REG ) THEN
 
 *        Find leftmost bin centre and signed bin width
-          CALL BDA_PUTAXVAL( OLOC, I, D(I).LHS + D(I).BSIZE/2.0,
+          CALL BDI_PUTAXVAL( OFID, I, D(I).LHS + D(I).BSIZE/2.0,
      :                           D(I).BSIZE, D(I).NBIN, STATUS )
 
         ELSE
 
 *        Centres and widths if irregular
-          CALL BDA_CREAXVAL( OLOC, I, .FALSE., D(I).NBIN, STATUS )
-          CALL BDA_CREAXWID( OLOC, I, .FALSE., D(I).NBIN, STATUS )
-          CALL BDA_MAPAXVAL( OLOC, 'WRITE', I, AXPTR, STATUS )
-          CALL BDA_MAPAXWID( OLOC, 'WRITE', I, WPTR, STATUS )
+          CALL BDI_CREAXVAL( OFID, I, .FALSE., D(I).NBIN, STATUS )
+          CALL BDI_CREAXWID( OFID, I, .FALSE., D(I).NBIN, STATUS )
+          CALL BDI_MAPAXVAL( OFID, 'WRITE', I, AXPTR, STATUS )
+          CALL BDI_MAPAXWID( OFID, 'WRITE', I, WPTR, STATUS )
 
           CALL AXIS_RNG2VALW( D(I).NBIN, RANGES, %VAL(AXPTR),
      :                                   %VAL(WPTR), STATUS )
 
-          CALL BDA_UNMAPAXVAL( OLOC, I, STATUS )
-          CALL BDA_UNMAPAXWID( OLOC, I, STATUS )
+          CALL BDI_UNMAPAXVAL( OFID, I, STATUS )
+          CALL BDI_UNMAPAXWID( OFID, I, STATUS )
 
         END IF
 
       END DO
 
 *    Copy header info
-      CALL BDA_GETTITLE( ILOC, TEMP, STATUS )
+      CALL BDI_GETTITLE( IFID, TEMP, STATUS )
       IF ( TEMP .GT. ' ' ) THEN
-        CALL BDA_PUTTITLE( OLOC, TEMP, STATUS )
+        CALL BDI_PUTTITLE( OFID, TEMP, STATUS )
       END IF
-      CALL BDA_PUTLABEL( OLOC, 'Events', STATUS )
+      CALL BDI_PUTLABEL( OFID, 'Events', STATUS )
 
 *    Copy the MORE structure
-      CALL BDA_COPMORE( ILOC, OLOC, STATUS )
+      CALL BDI_COPMORE( IFID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Find total number of output elements
@@ -537,8 +541,8 @@
      :               (QKEEP.AND.QUALITY ), %VAL(OQPTR), %VAL(ODPTR) )
 
 *    Copy history from input
-      CALL HIST_COPY( ILOC, OLOC, STATUS )
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_COPY( IFID, OFID, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *   Write essential data to history
 
@@ -579,7 +583,7 @@
       END IF
 
 *    Write the text
-      CALL HIST_PTXT( OLOC, NACT, ACTION, STATUS )
+      CALL HSI_PTXT( OFID, NACT, ACTION, STATUS )
 
 *    Free input lists
       DO I = 1, NINDEX
