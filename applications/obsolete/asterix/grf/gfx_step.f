@@ -63,34 +63,30 @@
 *  simple case of lin/lin axes
         IF (.NOT.(XLOG.OR.YLOG)) THEN
 *  get starting point
-          X1=X(N1)-(X(N1+1)-X(N1))/2.0
+          X1=X(N1)-XW(N1)/2.0
           CALL PGMOVE(X1,Y(N1))
-          X2=(X(N1)+X(N1+1))/2.0
+          X2=X(N1)+XW(N1)/2.0
           CALL PGDRAW(X2,Y(N1))
 *  plot points
           DO I=N1+1,N2-1
             X1=X2
-            X2=(X(I)+X(I+1))/2.0
+            X2=X(I)+XW(I)/2.0
             CALL PGDRAW(X1,Y(I))
             CALL PGDRAW(X2,Y(I))
           ENDDO
 *  last point
           X1=X2
-          X2=X(N2)+(X(N2)-X(N2-1))/2.0
+          X2=X(N2)+XW(N2)/2.0
           CALL PGDRAW(X1,Y(N2))
           CALL PGDRAW(X2,Y(N2))
 
 *  one or both log axes
         ELSEIF (XLOG.AND..NOT.YLOG) THEN
           FIRST=.TRUE.
-          X2=X(N1)-(X(N1+1)-X(N1))/2.0
+          X2=X(N1)-XW(N1)/2.0
           DO I=N1,N2
             X1=X2
-            IF (I.LT.N2) THEN
-              X2=(X(I)+X(I+1))/2.0
-            ELSE
-              X2=X(I)+(X(I)-X(I-1))/2.0
-            ENDIF
+            X2=X(I)+XW(I)/2.0
             IF (X1.GT.VAL__SMLR) THEN
               IF (FIRST) THEN
                 CALL PGMOVE(LOG10(X1),Y(I))
@@ -108,13 +104,9 @@
 
         ELSEIF (.NOT.XLOG.AND.YLOG) THEN
           FIRST=.TRUE.
-          X2=X(N1)-(X(N1+1)-X(N1))/2.0
+          X2=X(N1)--XW(N1)/2.0
           DO I=N1,N2
-            IF (I.LT.N2) THEN
-              X2=(X(I)+X(I+1))/2.0
-            ELSE
-              X2=X(I)+(X(I)-X(I-1))/2.0
-            ENDIF
+            X2=X(I)+XW(I)/2.0
             IF (Y(I).GT.VAL__SMLR) THEN
               IF (FIRST) THEN
                 CALL PGMOVE(X1,LOG10(Y(I)))
@@ -132,14 +124,10 @@
 
         ELSEIF (XLOG.AND.YLOG) THEN
           FIRST=.TRUE.
-          X2=X(N1)-(X(N1+1)-X(N1))/2.0
+          X2=X(N1)-XW(N1)/2.0
           DO I=N1,N2
             X1=X2
-            IF (I.LT.N2) THEN
-              X2=(X(I)+X(I+1))/2.0
-            ELSE
-              X2=X(I)+(X(I)-X(I-1))/2.0
-            ENDIF
+            X2=X(I)+XW(I)/2.0
             IF (X1.GT.VAL__SMLR.AND.Y(I).GT.VAL__SMLR) THEN
               IF (FIRST) THEN
                 CALL PGMOVE(LOG10(X1),LOG10(Y(I)))
