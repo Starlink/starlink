@@ -499,7 +499,7 @@ sub delete {
 
 #  Invocation:
 #     $starindex->delete($name, $package);
-#     $starindex->delete();
+#     $starindex->delete($name);
 
 #  Description:
 #     Removes an entry with a given name, and optionally a given package, 
@@ -752,6 +752,10 @@ sub delpack {
    foreach $name (@names) {
       $rlocate->delete($name, $package);
    }
+
+#  Delete package location entry.
+
+   $rlocate->delete("$package#");
 }
 
 

@@ -288,12 +288,6 @@ sub index_pack {
    $package ||= $2;
    print "\nPACKAGE: $package\n";
 
-#  Get fully qualified pathname of package location and store in file index.
-
-   my $fqpack_file = $pack_file;
-   $fqpack_file =~ s%^(?!/)% cwd . '/' %e;
-   $file_index->put("$package#", $fqpack_file);
-
 #  If any records for this package already exist in the function index, 
 #  or file index, delete them.
 
@@ -304,6 +298,12 @@ sub index_pack {
 #  If any tasks exist for this package delete them.
 
    $tasks{$package} = [ ];
+
+#  Get fully qualified pathname of package location and store in file index.
+
+   my $fqpack_file = $pack_file;
+   $fqpack_file =~ s%^(?!/)% cwd . '/' %e;
+   $file_index->put("$package#", $fqpack_file);
 
 #  Perform the indexing.
 
@@ -793,6 +793,10 @@ sub index_includes {
 #  Get arguments.
 
    my ($dir, $packname) = @_;
+
+#  Erase old entries.
+
+   $file_index->delpack($packname);
 
 #  Store location of directory in file StarIndex object.
 
