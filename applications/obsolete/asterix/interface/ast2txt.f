@@ -1,7 +1,7 @@
-      SUBROUTINE EXPORT( STATUS )
+      SUBROUTINE AST2TXT( STATUS )
 *+
 *  Name:
-*     EXPORT
+*     AST2TXT
 
 *  Purpose:
 *     Write contents of a dataset to ascii, optionally with IMPORT keywords
@@ -13,7 +13,7 @@
 *     ASTERIX task
 
 *  Invocation:
-*     CALL EXPORT( STATUS )
+*     CALL AST2TXT( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -21,7 +21,7 @@
 
 *  Description:
 *     Writes out all the useful axis, data, error, variance and quality
-*     values of a dataset to a specified text file. EXPORT also optionally
+*     values of a dataset to a specified text file. AST2TXT also optionally
 *     writes a header for use with the IMPORT program.
 
 *  Usage:
@@ -81,6 +81,7 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -98,6 +99,8 @@
 *        Full ADI port.
 *      3 Apr 1996 V2.0-1 (DJA):
 *        Added output of grouping array
+*      2 Mar 1998 V2.2-1 (RB):
+*        Convert from EXPORT (RB)
 *     {enter_changes_here}
 
 *  Bugs:
@@ -117,7 +120,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'EXPORT Version 2.2-0' )
+        PARAMETER		( VERSION = 'AST2TXT Version 2.2-1' )
 
 *  Local Variables:
       CHARACTER*80              LABUN(2)                ! Label & units
@@ -245,9 +248,9 @@
 *    Construct TOPLEVEL component
         CALL ADI_TYPE( IFID, TYPE, STATUS )
         CALL BDI_GET0C( IFID, 'Title', TITLE, STATUS )
-        CALL EXPORT_SET( 'TYPE', TYPE )
-        CALL EXPORT_SET( 'TITLE', TITLE )
-        CALL EXPORT_WRITE( OFD, 'TOPLEVEL ^TYPE ^TITLE', STATUS )
+        CALL AST2TXT_SET( 'TYPE', TYPE )
+        CALL AST2TXT_SET( 'TITLE', TITLE )
+        CALL AST2TXT_WRITE( OFD, 'TOPLEVEL ^TYPE ^TITLE', STATUS )
 
 *    For each dimension
         DO IAX = 1, NDIM
@@ -275,8 +278,8 @@
             END IF
 
 *        Set the tokens
-            CALL EXPORT_SET( 'LABEL', LABUN(1) )
-            CALL EXPORT_SET( 'UNITS', LABUN(2) )
+            CALL AST2TXT_SET( 'LABEL', LABUN(1) )
+            CALL AST2TXT_SET( 'UNITS', LABUN(2) )
             IF ( DECREASING ) THEN
               CALL MSG_SETC( 'DECREASING', 'DECREASING' )
             ELSE
@@ -284,17 +287,17 @@
             END IF
 
 *        Write the descriptor
-            CALL EXPORT_WRITE( OFD, 'AXIS ^LABEL ^UNITS ^NORM'/
+            CALL AST2TXT_WRITE( OFD, 'AXIS ^LABEL ^UNITS ^NORM'/
      :                         /' ^DECREASING', STATUS )
 
 *        Width descriptor?
             IF ( AWOK(IAX) ) THEN
-              CALL EXPORT_WRITE( OFD, 'WIDTH', STATUS )
+              CALL AST2TXT_WRITE( OFD, 'WIDTH', STATUS )
             END IF
 
 *      Otherwise write dummy axis
           ELSE
-            CALL EXPORT_WRITE( OFD, 'AXIS', STATUS )
+            CALL AST2TXT_WRITE( OFD, 'AXIS', STATUS )
 
           END IF
 
@@ -302,28 +305,28 @@
 
 *    The data
         CALL BDI_GET0C( IFID, 'Label,Units', LABUN, STATUS )
-        CALL EXPORT_SET( 'LABEL', LABUN(1) )
-        CALL EXPORT_SET( 'UNITS', LABUN(2) )
-        CALL EXPORT_WRITE( OFD, 'DATA ^LABEL ^UNITS', STATUS )
+        CALL AST2TXT_SET( 'LABEL', LABUN(1) )
+        CALL AST2TXT_SET( 'UNITS', LABUN(2) )
+        CALL AST2TXT_WRITE( OFD, 'DATA ^LABEL ^UNITS', STATUS )
 
 *    Quality
         IF ( QOK ) THEN
           CALL CHR_ITOC( IMASK, STRING, NCHAR )
-          CALL EXPORT_SET( 'MASK', STRING(:NCHAR) )
-          CALL EXPORT_WRITE( OFD, 'QUALITY ^MASK', STATUS )
+          CALL AST2TXT_SET( 'MASK', STRING(:NCHAR) )
+          CALL AST2TXT_WRITE( OFD, 'QUALITY ^MASK', STATUS )
         END IF
 
 *    Grouping
         IF ( GOK ) THEN
-          CALL EXPORT_WRITE( OFD, 'GROUP', STATUS )
+          CALL AST2TXT_WRITE( OFD, 'GROUP', STATUS )
         END IF
 
 *    Asymmetric errors if present
         IF ( EOK ) THEN
-          CALL EXPORT_WRITE( OFD, 'LOERROR', STATUS )
-          CALL EXPORT_WRITE( OFD, 'UPERROR', STATUS )
+          CALL AST2TXT_WRITE( OFD, 'LOERROR', STATUS )
+          CALL AST2TXT_WRITE( OFD, 'UPERROR', STATUS )
         ELSE IF ( VOK ) THEN
-          CALL EXPORT_WRITE( OFD, 'VARIANCE', STATUS )
+          CALL AST2TXT_WRITE( OFD, 'VARIANCE', STATUS )
         END IF
 
       END IF
@@ -336,7 +339,7 @@
       END DO
 
 *  Write data values
-      CALL EXPORT_INT( DIMS(1), DIMS(2), DIMS(3), DIMS(4), DIMS(5),
+      CALL AST2TXT_INT( DIMS(1), DIMS(2), DIMS(3), DIMS(4), DIMS(5),
      :                 DIMS(6), DIMS(7), NDIM,
      :                 AOK, APTR, AWOK, AWPTR,
      :                 DOK, %VAL(DPTR), QOK, %VAL(QPTR), GOK,
@@ -356,8 +359,8 @@
 
 
 
-*+  EXPORT_INT - Write data arrays to output file
-      SUBROUTINE EXPORT_INT( L1, L2, L3, L4, L5, L6, L7, NDIM,
+*+  AST2TXT_INT - Write data arrays to output file
+      SUBROUTINE AST2TXT_INT( L1, L2, L3, L4, L5, L6, L7, NDIM,
      :                       AOK, APTR, AWOK, AWPTR,
      :                       DOK, DATA, QOK, QUAL, GOK, GRP, VOK, VAR,
      :                       FD, STATUS )
@@ -617,8 +620,8 @@
 
 
 
-*+  EXPORT_SET - Set a named token for output to IMPORT header
-      SUBROUTINE EXPORT_SET( TOKEN, TEXT )
+*+  AST2TXT_SET - Set a named token for output to IMPORT header
+      SUBROUTINE AST2TXT_SET( TOKEN, TEXT )
 *
 *    Description :
 *
@@ -680,8 +683,8 @@
 
 
 
-*+  EXPORT_WRITE - Expand and write a line of text to output file
-      SUBROUTINE EXPORT_WRITE( FD, TEXT, STATUS )
+*+  AST2TXT_WRITE - Expand and write a line of text to output file
+      SUBROUTINE AST2TXT_WRITE( FD, TEXT, STATUS )
 *    Description :
 *     <description of what the subroutine does - for user info>
 *    Method :
