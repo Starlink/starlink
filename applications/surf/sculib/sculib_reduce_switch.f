@@ -118,11 +118,16 @@
 *     $Id$
 *     5-AUG-1993: Original version.
 *     18-NOV-1994: Data arrays made 1-d (JFL).
+*     $Log$
+*     Revision 1.3  1998/07/23 23:11:20  timj
+*     Check for bad pixels
+*
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
 *    Import :
       CHARACTER*(*) CHOP_FUN
       INTEGER SWITCH_PER_EXP
@@ -255,10 +260,23 @@
 
                DO I = 1, N_DATA
 
-                  EXP_DATA (I) = SWITCH_2_DATA (I) - SWITCH_1_DATA (I)
-                  EXP_VARIANCE (I) = 
-     :                 SWITCH_2_VARIANCE (I) +
-     :                 SWITCH_1_VARIANCE (I)
+                  IF (SWITCH_1_DATA(I) .NE. VAL__BADR .AND.
+     :                 SWITCH_2_DATA(I) .NE. VAL__BADR) THEN
+                     EXP_DATA (I) = SWITCH_2_DATA (I) - 
+     :                    SWITCH_1_DATA (I)
+                  ELSE
+                     EXP_DATA(I) = VAL__BADR
+                  END IF
+
+                  IF (SWITCH_1_VARIANCE(I) .NE. VAL__BADR .AND.
+     :                 SWITCH_2_VARIANCE(I) .NE. VAL__BADR) THEN
+                     EXP_VARIANCE (I) = 
+     :                    SWITCH_2_VARIANCE (I) +
+     :                    SWITCH_1_VARIANCE (I)
+                  ELSE
+                     EXP_VARIANCE(I) = VAL__BADR
+                  END IF
+
                   EXP_QUALITY (I) = SCULIB_BITOR(SWITCH_1_QUALITY(I),
      :                 SWITCH_2_QUALITY(I))
 
@@ -268,11 +286,22 @@
                WEIGHT = 1.0
 
                DO I = 1, N_DATA
-                  EXP_DATA (I) = (SWITCH_1_DATA (I) -
-     :                 SWITCH_2_DATA (I)) / 2.0
-                  EXP_VARIANCE (I) = 
-     :                 (SWITCH_2_VARIANCE (I) +
-     :                 SWITCH_1_VARIANCE (I)) / 4.0
+
+                  IF (SWITCH_1_DATA(I) .NE. VAL__BADR .AND.
+     :                 SWITCH_2_DATA(I) .NE. VAL__BADR) THEN
+                     EXP_DATA (I) = (SWITCH_1_DATA (I) -
+     :                    SWITCH_2_DATA (I)) / 2.0
+                  ELSE
+                     EXP_DATA(I) = VAL__BADR
+                  END IF
+                  IF (SWITCH_1_VARIANCE(I) .NE. VAL__BADR .AND.
+     :                 SWITCH_2_VARIANCE(I) .NE. VAL__BADR) THEN
+                     EXP_VARIANCE (I) = 
+     :                    (SWITCH_2_VARIANCE (I) +
+     :                    SWITCH_1_VARIANCE (I)) / 4.0
+                  ELSE
+                     EXP_VARIANCE(I) = VAL__BADR
+                  END IF
                   EXP_QUALITY (I) = SCULIB_BITOR(SWITCH_1_QUALITY(I),
      :                 SWITCH_2_QUALITY(I))
 
@@ -294,10 +323,22 @@
 
                DO I = 1, N_DATA
 
-                  EXP_DATA (I) = - 2.0 * (SWITCH_1_DATA (I) -
-     :                 SWITCH_2_DATA (I))
-                  EXP_VARIANCE (I) = 4.0 * (SWITCH_2_VARIANCE (I) +
-     :                 SWITCH_1_VARIANCE (I))
+                  IF (SWITCH_1_DATA(I) .NE. VAL__BADR .AND.
+     :                 SWITCH_2_DATA(I) .NE. VAL__BADR) THEN
+                     EXP_DATA (I) = - 2.0 * (SWITCH_1_DATA (I) -
+     :                    SWITCH_2_DATA (I))
+                  ELSE
+                     EXP_DATA(I) = VAL__BADR
+                  END IF
+
+                  IF (SWITCH_1_VARIANCE(I) .NE. VAL__BADR .AND.
+     :                 SWITCH_2_VARIANCE(I) .NE. VAL__BADR) THEN
+                     EXP_VARIANCE (I) = 4.0 * (SWITCH_2_VARIANCE (I) +
+     :                    SWITCH_1_VARIANCE (I))
+                  ELSE
+                     EXP_DATA(I) = VAL__BADR
+                  END IF
+
                   EXP_QUALITY (I) = SCULIB_BITOR(SWITCH_1_QUALITY(I),
      :                 SWITCH_2_QUALITY(I))
 
@@ -307,11 +348,23 @@
                WEIGHT = 1.5
 
                DO I = 1, N_DATA
-                  EXP_DATA (I) = 2.0 * (SWITCH_1_DATA (I) -
-     :                 SWITCH_2_DATA (I)) / 3.0
-                  EXP_VARIANCE (I) = 4.0 *
-     :                 (SWITCH_2_VARIANCE (I) +
-     :                 SWITCH_1_VARIANCE (I)) / 9.0
+                  IF (SWITCH_1_DATA(I) .NE. VAL__BADR .AND.
+     :                 SWITCH_2_DATA(I) .NE. VAL__BADR) THEN
+                     EXP_DATA (I) = 2.0 * (SWITCH_1_DATA (I) -
+     :                    SWITCH_2_DATA (I)) / 3.0
+                  ELSE
+                     EXP_DATA(I) = VAL__BADR
+                  END IF
+
+                  IF (SWITCH_1_VARIANCE(I) .NE. VAL__BADR .AND.
+     :                 SWITCH_2_VARIANCE(I) .NE. VAL__BADR) THEN
+                     EXP_VARIANCE (I) = 4.0 *
+     :                    (SWITCH_2_VARIANCE (I) +
+     :                    SWITCH_1_VARIANCE (I)) / 9.0
+                  ELSE
+                     EXP_DATA(I) = VAL__BADR
+                  END IF
+
                   EXP_QUALITY (I) = SCULIB_BITOR(SWITCH_1_QUALITY(I),
      :                 SWITCH_2_QUALITY(I))
                END DO
@@ -320,10 +373,22 @@
                WEIGHT = 1.5
 
                DO I = 1, N_DATA
-                  EXP_DATA (I) = - 2.0 * (SWITCH_1_DATA (I) -
-     :                 SWITCH_2_DATA (I)) / 3.0
-                  EXP_VARIANCE (I) = 4.0 * (SWITCH_2_VARIANCE (I) +
-     :                 SWITCH_1_VARIANCE (I)) / 9.0
+                  IF (SWITCH_1_DATA(I) .NE. VAL__BADR .AND.
+     :                 SWITCH_2_DATA(I) .NE. VAL__BADR) THEN
+                     EXP_DATA (I) = - 2.0 * (SWITCH_1_DATA (I) -
+     :                    SWITCH_2_DATA (I)) / 3.0
+                  ELSE
+                     EXP_DATA(I) = VAL__BADR
+                  END IF
+
+                  IF (SWITCH_1_VARIANCE(I) .NE. VAL__BADR .AND.
+     :                 SWITCH_2_VARIANCE(I) .NE. VAL__BADR) THEN
+                     EXP_VARIANCE (I) = 4.0 * (SWITCH_2_VARIANCE (I) +
+     :                    SWITCH_1_VARIANCE (I)) / 9.0
+                  ELSE
+                     EXP_VARIANCE(I) = VAL__BADR
+                  END IF
+
                   EXP_QUALITY (I) = SCULIB_BITOR(SWITCH_1_QUALITY(I),
      :                 SWITCH_2_QUALITY(I))
 

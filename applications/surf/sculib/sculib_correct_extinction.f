@@ -41,11 +41,16 @@
 *    History :
 *     $Id$
 *     2-AUG-1995: original version.
+*     $Log$
+*     Revision 1.4  1998/07/23 23:10:41  timj
+*     Check for bad pixels
+*
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
 *    Import :
       INTEGER          SIZE_BOL
       INTEGER          N_BOL
@@ -97,8 +102,10 @@
 
 *  correct the data
 
-            BOL_DATA(BOL) = BOL_DATA(BOL) * CORRECTION
-            BOL_VARIANCE(BOL) = BOL_VARIANCE(BOL) * CORRECTION**2
+            IF (BOL_DATA(BOL) .NE. VAL__BADR)
+     :           BOL_DATA(BOL) = BOL_DATA(BOL) * CORRECTION
+            IF (BOL_VARIANCE(BOL) .NE. VAL__BADR)
+     :           BOL_VARIANCE(BOL) = BOL_VARIANCE(BOL) * CORRECTION**2
          END DO
 
       END IF
