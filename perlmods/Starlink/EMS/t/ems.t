@@ -1,24 +1,20 @@
 #!/usr/local/bin/perl -w
 
-BEGIN { $| = 1; print "1..10\n"; }
-END {print "not ok 1\n" unless $loaded;}
+use strict;
+use Test;
+BEGIN { plan tests => 9 }
 use Starlink::EMS qw/:ems :sai /;
-$loaded = 1;
-print "ok 1\n";
 
-$count = 1;
-$ok = SAI__OK;
-$status = $ok;
+my $ok = SAI__OK;
+my $status = $ok;
 
 # Start ems
 ems_begin( $status );
-&test( $status == $ok);
+ok($status, $ok);
 
 # Start a new reporting level
 ems_mark;
-
-&test( ems_level() == 3);
-
+ok(ems_level(), 3);
 ems_rlse;
 
 $status = SAI__ERROR;
@@ -29,17 +25,17 @@ $status = SAI__WARN;
 ems_rep("PAR2", "This is meant to be a warning", $status);
 
 # Retrieve the above error messages
+my ($par, $str, $lstat) = ems_eload();
+
+ok( $par, 'PARAM');
+ok( $lstat, SAI__ERROR);
+ok( $str, 'This is meant to be an error');
+
 ($par, $str, $lstat) = ems_eload();
 
-&test( $par eq 'PARAM');
-&test( $lstat == SAI__ERROR);
-&test( $str eq 'This is meant to be an error');
-
-($par, $str, $lstat) = ems_eload();
-
-&test( $par eq 'PAR2');
-&test( $lstat == SAI__WARN);
-&test( $str eq 'This is meant to be a warning');
+ok( $par, 'PAR2');
+ok( $lstat, SAI__WARN);
+ok( $str, 'This is meant to be a warning');
 
 
 # Tidy up status
@@ -47,15 +43,5 @@ ems_annul( $status );
 
 # End ems
 ems_end( $status );
-&test( $status == $ok);
+ok( $status, $ok);
 
-
-
-sub test {
-  $count++;
-  if ($_[0]) {
-    print "ok $count\n";
-  } else {
-    print "not ok $count\n";
-  }
-}
