@@ -3603,8 +3603,8 @@ static void DSSToStore( AstFitsChan *this, FitsStore *store,
 /* Local Variables: */
    char *pltdecsn;     /* PLTDECSN keyword value */
    char keyname[10];   /* Buffer for keyword name */
-   double amdx[13];    /* AMDXi keyword value */
-   double amdy[13];    /* AMDYi keyword value */
+   double amdx[20];    /* AMDXi keyword value */
+   double amdy[20];    /* AMDYi keyword value */
    double cnpix1;      /* CNPIX1 keyword value */
    double cnpix2;      /* CNPIX2 keyword value */
    double crval2;      /* Equivalent CRVAL2 keyword value */
@@ -3651,7 +3651,7 @@ static void DSSToStore( AstFitsChan *this, FitsStore *store,
 
 /* Get the polynomial co-efficients. These can be defaulted if they are 
    missing, so do not report an error. */
-   for( i = 0; i < 13; i++ ){
+   for( i = 0; i < 20; i++ ){
       (void) sprintf( keyname, "AMDX%d", i + 1 );
       amdx[i] = AST__BAD;
       GetValue( this, keyname, AST__FLOAT, amdx + i, 0, method, class );
