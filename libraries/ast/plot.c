@@ -347,10 +347,13 @@ f     - Axis2: Axis line drawn through tick marks on axis 2 using AST_GRID
 *       necessary (i.e. to create labels for display, etc). Tick mark
 *       values are stored and handled as non-normalized values as much as
 *       possible.
-*     13-JUN-2002 (DSN):
+*     13-JUN-2002 (DSB):
 *       Modified Norm1 to prevent major tick value from being removed if
 *       the supplied reference value is out of bounds, resulting int he
 *       Mapping producing bad values
+*     14-JUN-2002 (DSB):
+*       Re-wrote PlotLabels to improve abbreviation of labels and the
+*       choice of which labels not to print. 
 *class--
 */
 
@@ -1133,6 +1136,8 @@ typedef struct LabelList {
    double upx;
    double upy;
    double val;
+   int priority;
+   const char *atext;
 } LabelList;
 
 /* Structure holding information about curves drawn by astGridLine and 
@@ -1456,6 +1461,7 @@ static int CGTxExtWrapper( AstPlot *, const char *, float, float, const char *, 
 static int CheckLabels( AstFrame *, int, double *, int, int, char **, double );
 static int ChrLen( const char * );
 static int Compare_LL( const void *, const void * );
+static int Compare_LL2( const void *, const void * );
 static int Compared( const void *, const void * );
 static int CountGood( int, double * );
 static int Cross( float, float, float, float, float, float, float, float );
@@ -1469,7 +1475,7 @@ static int FullForm( const char *, const char *, const char *, const char *, con
 static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **, AstPointSet **, double *, double *, double *, double *, int *, const char *, const char *);
 static int GrText( AstPlot *, int, const char *, int, int, float, float, float, float, float *, float *, const char *, const char * );
 static int Inside( int, float *, float *, float, float);
-static int Overlap( AstPlot *, int, const char *, float, float, const char *, float, float, float **, const char *, const char *);
+static int Overlap( AstPlot *, int, int, const char *, float, float, const char *, float, float, float **, const char *, const char *);
 static int UseColour( AstPlot *, int );
 static int UseFont( AstPlot *, int );
 static int UseStyle( AstPlot *, int );
@@ -5884,6 +5890,70 @@ static int Compare_LL( const void *elem1, const void *elem2 ){
 
 }
 
+static int Compare_LL2( const void *elem1, const void *elem2 ){
+/*
+*  Name:
+*     Compare_LL2
+
+*  Purpose:
+*     Compare two LabelList structures as used by function PlotLabels.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int Compare_LL2( const void *elem1, const void *elem2 )
+
+*  Class Membership:
+*     Plot method.
+
+*  Description:
+*     This function compares two "LabelList" structures as used by function
+*     PlotLabels, and returns an integer indicating which has a larger 
+*     "priority" value. This function is intended to be used with the C 
+*     Run-Time-Library sorting function "qsort". 
+
+*  Parameters:
+*     elem1
+*        Pointer to the first LabelList.
+*     elem2
+*        Pointer to the second LabelList. 
+
+*  Returned Value:
+*     Zero is returned if the priorities are equal. If the first is larger
+*     than the second then -1 is returned. Otherwise, +1 is returned.
+
+*  Notes:
+*     -  This function executes even if an error has occurred.
+
+*/
+
+/* Local Variables: */
+   LabelList *ll1;           /* Pointer to the first LabelList */
+   LabelList *ll2;           /* Pointer to the second LabelList */
+   int ret;                  /* The returned value */
+   
+/* Get pointers to the two LabelList structures. */
+   ll1 = (LabelList *) elem1;
+   ll2 = (LabelList *) elem2;
+
+/* Compare the indices for the two label's. */
+   if( ll1->priority < ll2->priority ){
+      ret = 1;
+
+   } else if( ll1->priority > ll2->priority ){
+      ret = -1;
+
+   } else {
+      ret = 0;
+   }
+
+/* Return the answer. */
+   return ret;
+
+}
+
 static int CountGood( int n, double *data ){
 /*
 *  Name:
@@ -8794,7 +8864,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 /* If an error has occurred, break out of the loop. */
          if( !astOK ) break;
 
-/* If one ore more labels could be produced for this tick mark value,
+/* If one or more labels could be produced for this tick mark value,
    increment the number of labeled tick marks found. */
          if( ok ) maxlab++;
 
@@ -15205,6 +15275,10 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
 /* Get the minimum dimension of the plotting ares. */
    mindim = MIN( this->xhi - this->xlo, this->yhi - this->ylo );
 
+/* Empty the list of bounding boxes kept by the Overlap function. */
+   (void) Overlap( this, 0, 0, NULL, 0.0, 0.0, NULL, 0.0, 0.0, NULL, 
+                   method, class );
+
 /* If required, draw the labels around the edges of the plotting area. */
    if( labelat[ 0 ] == AST__BAD || labelat[ 1 ] == AST__BAD ){
       (void) EdgeLabels( this, 1, grid, cdata, method, class );
@@ -16877,7 +16951,7 @@ static void Opoly( AstPlot *this, const char *method, const char *class ){
 
 }
 
-static int Overlap( AstPlot *this, int esc, const char *text, float x, 
+static int Overlap( AstPlot *this, int mode, int esc, const char *text, float x, 
                     float y, const char *just, float upx, float upy, 
                     float **work, const char *method, const char *class  ){
 /*
@@ -16893,7 +16967,7 @@ static int Overlap( AstPlot *this, int esc, const char *text, float x,
 
 *  Synopsis:
 *     #include "plot.h"
-*     int Overlap( AstPlot *this, int esc, const char *text, float x, 
+*     int Overlap( AstPlot *this, int mode, int esc, const char *text, float x, 
 *                  float y, const char *just, float upx, float upy, 
 *                  float **work, const char *method, const char *class )
 
@@ -16901,12 +16975,14 @@ static int Overlap( AstPlot *this, int esc, const char *text, float x,
 *     Plot member function.
 
 *  Description:
+*     The operation of this function is determined by the "mode" parameter.
+
 *     A record is kept of the bounding boxes enclosing all the displayed
 *     labels. If the bounding box of the new label defined by the given
 *     parameter values would overlap any of the old bounding boxes, 0 is 
 *     returned. Otherwise 1 is returned and the bounding box for the new 
 *     label is added to the list of old bounding boxes.
-*
+
 *     This function also updates the external variables Box_lbnd and
 *     Box_ubnd which hold the lower and upper bounds of the area enclosing
 *     all used labels.
@@ -16914,6 +16990,18 @@ static int Overlap( AstPlot *this, int esc, const char *text, float x,
 *  Parameters:
 *     this
 *        A pointer to the Plot.
+*     mode
+*        - If -1, find the bounding box of the supplied label, add it
+*        to the list of stored bounding box, and return 1 if it overlaps
+*        any previously stored bounding boxes.
+*        - If -2, leave the bounding boxes unchanged and return the
+*        number of bounding boxes currently stored. No other action is taken 
+*        and all other arguments are ignored. 
+*        - Otherwise, reset the number of stored bounding boxes to the
+*        value of mode, and return the new number of bounding boxes. No
+*        action is taken if mode is less than zero or greater than the current
+*        number of stored boxes. No other action is taken and all other 
+*        arguments are ignored. 
 *     esc
 *        Should escape sequences in the text be interpreted?
 *     text
@@ -16951,8 +17039,7 @@ static int Overlap( AstPlot *this, int esc, const char *text, float x,
 *        This is only for use in constructing error messages.
 
 *  Returned Value:
-*     A boolean flag indicating if the new label overlaps any of the previous
-*     labels.
+*     See parameter "mode." 
 
 *  Notes:
 *     -  Zero is returned if an error has occurred, or if this function
@@ -16971,6 +17058,16 @@ static int Overlap( AstPlot *this, int esc, const char *text, float x,
 
 /* Initialise the returned value to indicate no overlap has been found. */
    ret = 0;
+
+/* If required, return the number of bounding boxes currently stored. */
+   if( mode == -2 ) return nbox;
+
+/* If required, reset the number of bounding boxes currently stored, and
+   return the new number. */
+   if( mode >= 0 ) {
+      if( mode < nbox ) nbox = mode;
+      return nbox;
+   }
 
 /* If no work array has been supplied, allocate one now with room for
    10 boxes. Each box requires 8 floats, 2 for each of the 4 corners. The
@@ -17098,240 +17195,203 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
 *        This is only for use in constructing error messages.
 */
 
-/* Local Constants: */
-#define MAXFLD 20            /* Maximum no. of fields in label */
-
 /* Local Variables: */
-   LabelList *ll;            /* Pointer to next label structure */
-   char *a;                  /* Pointer to next character */
-   char *ctext;              /* Pointer to comparison label text */
-   char *text;               /* Pointer to label text */
-   const char *atext;        /* Pointer to abbreviated label text */
-   int esc;                  /* Interpret escape sequences? */
-   int i;                    /* Label index */
-   int nz;                   /* Number of trailing zeros in this label */
-   int nzmax;                /* Max. number of trailing zeros */
-   int root;                 /* Index of unabbreviated label */
+   LabelList *ll;         /* Pointer to next label structure */
+   char *a;               /* Pointer to next character */
+   char *text;            /* Pointer to label text */
+   float xbn[ 4 ];        /* X coords at corners of new label's bounding box */
+   float ybn[ 4 ];        /* Y coords at corners of new label's bounding box */
+   int i;                 /* Label index */
+   int ioff;              /* Distance from this label to root label */
+   int ipri;              /* Priority of label i */
+   int j;                 /* Label index offset */
+   int jpri;              /* Priority of label i+j */
+   int lab0;              /* Index of middle label */
+   int nbox;              /* The number of bounding boxes stored previously */
+   int nremove;           /* No. of labels rejected by the current loop */
+   int nz;                /* Number of trailing zeros in this label */
+   int nzmax;             /* Max. number of trailing zeros */
+   int root;              /* Index of unabbreviated label */
+   int rootoff;           /* Distance from middle to root label */
 
 /* Return without action if an error has occurred, or there are no labels to 
    draw. */
    if( !astOK || nlab == 0 || !list || !astGetNumLab( this, axis ) ) return;
 
-/* See if escape sequences are to be interpreted within text strings. */
-   esc = astGetEscape( this );
+/* Sort the labels into increasing index order. */
+   qsort( (void *) list, (size_t) nlab, sizeof(LabelList), Compare_LL );
 
-/* If there is only 1 label to display, display it so long as it does not
-   overlap any previosuly drawn labels. */
-   if( nlab == 1 ) {
-
-/* Check to see if the supplied label would overlap any other existing
-   labels. */
-      if( !Overlap( this, esc, list->text, (float) list->x, (float) list->y, 
-                    list->just, (float) list->upx, (float) list->upy, box, 
-                    method, class ) ) {
-
-         GText( this, list->text, (float) list->x, (float) list->y, list->just, 
-                   (float) list->upx, (float) list->upy, method, class );
-
-/* ENABLE-ESCAPE - Replace the above call to GText with the call to
-   DrawText below when escape sequences are enabled.
-         DrawText( this, esc, list->text, (float) list->x, (float) list->y,
-                   list->just, (float) list->upx, (float) list->upy, method, 
-                   class );
-*/
+/* Assign a priority to each label, equal to the number of trailing zeros
+   in the label text. At the same time, find the highest priority label,
+   giving preference to labels which occur in the middle of the index order.
+   This label will be the "root" label - a label which is guaranteed not
+   to be abbreviated. At the same time, initialize the abbreviated text
+   for each label to be equal to the unabbreviated text. */
+   lab0 = ( nlab + 1 )/2;
+   nzmax = -1;
+   ll = list - 1;
+   for( i = 0; i < nlab; i++ ) {
+      ll++;
+      text = ll->text;
+      nz = 0;
+      for( a = text + strlen( text ) - 1; a >= text; a-- ) {
+         if( isdigit( (int) *a ) && *a != '0' ) break;
+         nz++;
       }
 
-/* If there is more than 1 label to draw... */
-   } else {
+      ll->priority = nz;
 
-/* Sort the supplied LabelList into ascending index order. */
-      qsort( (void *) list, (size_t) nlab, sizeof(LabelList), Compare_LL );
-
-/* Find the label with the largest number of trailing zeros (ignoring
-   field delimiter characters). This label may be obscured by an earlier label,
-   so loop round until one is found which is not obscured. */
-      while( 1 ) {
-
-         ll = list;
-         nzmax = -1;
-         for( i = 0; i < nlab; i++ ) {
-            if( ll->index != DBL_MAX ) {
-               text = ll->text;
-
-/* Loop through each field (least significant first), counting the number
-   of trailing zeros. Ignore non-digits (eg decimal points, +, -, etc). 
-
-   NOTE - this assumes that field delimiter strings never contain any
-   digits. When escape sequences are supported this will not be the case,
-   and the following block of code will need to be replaced by something
-   like the following block (currently commented out), which is based on
-   a new Frame method "astFields" which decompoeses a formatted axis value
-   into its separate fields. (ENABLE-ESCAPE) */
-               nz = 0;
-               for( a = text + strlen( text ) - 1; a >= text; a-- ) {
-                  if( isdigit( (int) *a ) && *a != '0' ) break;
-                  nz++;
-               }
-
-/*
-               nf = astFields( frame, axis, fmt, text, MAXFLD, fld, nc, NULL );
-               nz = 0;
-               for( jf = nf - 1; jf >= 0; jf-- ) {
-                  for( a = fld[ jf ] + nc[ jf ] - 1; a >= fld[ jf ]; a-- ) {
-                     if( isdigit( (int) *a ) && *a != '0' ) break;
-                     nz++;
-                  }
-               }
-*/
-
-
-/* If this label beats the previous maximum number of trailing zeros, record 
-   the new maximum. */
-               if( nz > nzmax ) {
-                  nzmax = nz;
-                  root = i;         
-               }            
-            }
-            ll++;
+      if( nz > nzmax ) {
+         nzmax = nz;
+         root = i;
+         rootoff = abs( i - lab0 );
+      } else if( nz == nzmax ) {
+         ioff = abs( i - lab0 );
+         if( ioff < rootoff ) {
+            root = i;
+            rootoff = ioff;
          }
+      }
 
-/* If no labels remain, return. */
-         if( nzmax == -1 ) return;
+      ll->atext = ll->text;
 
-/* Check to see if this label would overlap any other existing labels. */
-         ll = list + root;
-         if( !Overlap( this, esc, ll->text, (float) ll->x, (float) ll->y, 
-                       ll->just, (float) ll->upx, (float) ll->upy, box, 
-                       method, class ) ) {
+   }
 
-/* If not, draw this "root" label without any abbreviation. */
-            GText( this, ll->text, (float) ll->x, (float) ll->y, ll->just, 
-                      (float) ll->upx, (float) ll->upy, method, class );
+/* Add one to the priority of the root label to ensure that it is larger 
+   than any other label priority. This ensures the root label will not be
+   abbreviated since the choice of which labels to abbreviate is based on
+   label priority (lower priority labels are abbreviated). */
+   (list[ root ].priority)++;
 
-/* ENABLE-ESCAPE - Replace the above call to GText with the call to
-   DrawText below when escape sequences are enabled.
-            DrawText( this, esc, ll->text, (float) ll->x, (float) ll->y,
-                      ll->just, (float) ll->upx, (float) ll->upy, method, 
-                      class );
-*/
+/* Store the number of bounding boxes stored for previous axes. */
+   nbox = Overlap( this, -2, 0, NULL, 0.0, 0.0, NULL, 0.0, 0.0, NULL, 
+                   method, class );
 
-/* Leave the loop once a label has been drawn. */
-            break;
+/* The following process may have removed some labels which define the
+   missing fields in neighbouring abbreviated fields, so that the user
+   would not be able to tell what value the abbvreviated leading fields
+   should have. We therefore loop back and perform the abbreviation
+   process again, omitting the removed labels this time. Continue doing
+   this until no further labels are removed. */
+   nremove = 1;
+   while( nremove > 0 ) {
 
-/* If the label overlaps an existing label, flag it by setting its index
-   value to DBL_MAX. */
+/* We now attempt to abbreviate the labels (i.e. remove leading fields which
+   are the same as in the neighbouring labels)... Pass through the labels in
+   index order (except the last one since the last one can have no "next 
+   label"). */
+      ll = list - 1;
+      for( i = 0; i < nlab-1; i++ ) {
+         ll++;
+
+/* If this label has been rejected on a previous pass throught the outer
+   "while" loop (because it overlapped a higher priority label), continue 
+   with the next label. */
+         if( ll->priority < 0 ) continue;
+
+/* We consider the pair of labels formed by the current label and the next
+   non-rejected label. Find the next non-rejected label. Leave the loop if
+   there are no more non-rejected labels. */
+         j = 1;
+         while( (ll+j)->priority < 0 && i+j < nlab ) j++;
+         if( i+j >= nlab ) break;
+
+/* If one label in this pair has a higher priority than the other, abbreviate
+   only the lower priority label. If the priorities are equal, abbreviate
+   both labels. In any case, do not abbreviate labels if they have
+   already been abbreviated. If a label would be completely removed by this
+   abbreviation, do not abbreviate the label at all. */
+         ipri = ll->priority;
+         jpri = (ll+j)->priority;
+         if( ipri > jpri ) {
+            if( (ll+j)->atext == (ll+j)->text ) {
+               (ll+j)->atext = astAbbrev( frame, axis, ll->text, (ll+j)->text );
+               if( !((ll+j)->atext)[0] ) (ll+j)->atext = (ll+j)->text;
+            }
+   
+         } else if( ipri < jpri ) {
+            if( ll->atext == ll->text ) {
+               ll->atext = astAbbrev( frame, axis, (ll+j)->text, ll->text );
+               if( !(ll->atext)[0] ) ll->atext = ll->text;
+            }
+   
          } else {
-            ll->index = DBL_MAX;
-         }
-      }
-            
-/* Draw the labels with lower indices (only those which do not overlap). */
-      for( i = root - 1; i >= 0; i-- ) {
-         ll = list + i;
-         if( !Overlap( this, esc, ll->text, (float) ll->x, (float) ll->y, 
-                       ll->just, (float) ll->upx, (float) ll->upy, box, 
-                       method, class ) ) {
-            text = ll->text;
-
-/* Select the comparison text to be used when abbreviating redundant
-   leading fields. Compare the current field with which ever neighbour 
-   has the smaller absolute value. */
-            if( fabs( ll->val ) < fabs( (ll + 1)->val ) ) {
-               if( i > 0 ) {
-                  ctext = (ll - 1)->text;
-               } else {
-                  ctext = (ll + 1)->text;
-               }
-
-            } else {
-               if( i < nlab - 1 ) {
-                  ctext = (ll + 1)->text;
-               } else {
-                  ctext = (ll - 1)->text;
-               }
+            if( ll->atext == ll->text ) {
+               ll->atext = astAbbrev( frame, axis, (ll+j)->text, ll->text );
+               if( !(ll->atext)[0] ) ll->atext = ll->text;
             }
-
-/* Get an abbreviated form of the label from which any leading fields have 
-   been removed which are identical to the leading fields in the comparison
-   label. Do not allow the label to be totally removed by this abbreviation.
-   When escape sequences are enabled, the astAbbrev argument list may
-   need to be changed to include the format string pointed to by variable 
-   "fmt".  (ENABLE-ESCAPE). */
-            if( ctext && text ){
-               atext = astAbbrev( frame, axis, ctext, text );
-               if( !atext || !strlen( atext ) ) atext = text;
-            } else {
-               atext = text;
+            if( (ll+j)->atext == (ll+j)->text ) {
+               (ll+j)->atext = astAbbrev( frame, axis, ll->text,(ll+j)->text );
+               if( !((ll+j)->atext)[0] ) (ll+j)->atext = (ll+j)->text;
             }
-
-/* Draw the label. */
-            GText( this, atext, (float) ll->x, (float) ll->y, ll->just, 
-                      (float) ll->upx, (float) ll->upy, method, class );
-
-/* ENABLE-ESCAPE - Replace the above call to GText with the call to
-   DrawText below when escape sequences are enabled.
-            DrawText( this, esc, atext, (float) ll->x, (float) ll->y,
-                      ll->just, (float) ll->upx, (float) ll->upy, method, 
-                      class );
-*/
          }
       }
 
-/* In the same way, draw the labels with higher indices (only those which do 
-   not overlap). */
-      for( i = root + 1; i < nlab; i++ ) {
-         ll = list + i;
-         if( !Overlap( this, esc, ll->text, (float) ll->x, (float) ll->y, 
-                       ll->just, (float) ll->upx, (float) ll->upy, box, 
-                       method, class ) ) {
-            text = ll->text;
+/* We now look for labels which overlap, removing labels with lower
+   priority if they are overlapped by labels of higher priority. First
+   sort the labels into decreasing priority order. Previouslty rejected 
+   labnels (with negative priority) will be placed at he end of the list.*/
+      qsort( (void *) list, (size_t) nlab, sizeof(LabelList), Compare_LL2 );
 
-/* Select the comparison text to be used when abbreviating redundant
-   leading fields. Compare the current field with which ever neighbour 
-   has the smaller absolute value. */
-            if( fabs( ll->val ) > fabs( (ll - 1)->val ) ) {
-               if( i > 0 ) {
-                  ctext = (ll - 1)->text;
-               } else {
-                  ctext = (ll + 1)->text;
-               }
-            } else {
-               if( i < nlab - 1 ) {
-                  ctext = (ll + 1)->text;
-               } else {
-                  ctext = (ll - 1)->text;
-               }
-            }
+/* Now pass through the labels in priority order. For each one we find
+   the bounding box which the drawn label would have. If this box
+   overlaps any of the boxes of the previously checked (higher priority)
+   labels, then set the labels priority to -1 to indicate that the label 
+   should not be drawn. Count the number of removed labels. Leave the
+   loop as soon as a previously rejected label is encountered. */
+      ll = list - 1;
+      nremove = 0;
+      for( i = 0; i < nlab-1; i++ ) {
+         ll++;
+         if( ll->priority < 0 ) break;
 
-/* Get an abbreviated form of the label from which any leading fields have 
-   been removed which are identical to the leading fields in the comparison
-   label. Do not allow the label to be totally removed by this abbreviation. 
-   When escape sequences are enabled, the astAbbrev argument list may
-   need to be changed to include the format string pointed to by variable 
-   "fmt".  (ENABLE-ESCAPE). */
-            if( ctext && text ){
-               atext = astAbbrev( frame, axis, ctext, text );
-               if( !atext || !strlen( atext ) ) atext = text;
-            } else {
-               atext = text;
-            }
+         if( Overlap( this, -1, 0, ll->atext, (float) ll->x, (float) ll->y, 
+                      ll->just, (float) ll->upx, (float) ll->upy, box, 
+                      method, class ) ){
+            ll->priority = -1;
+            nremove++;
+         }
 
-/* Draw the label. */
-            GText( this, atext, (float) ll->x, (float) ll->y, ll->just, 
-                      (float) ll->upx, (float) ll->upy, method, class );
+      }
 
-/* ENABLE-ESCAPE - Replace the above call to GText with the call to
-   DrawText below when escape sequences are enabled.
-            DrawText( this, esc, atext, (float) ll->x, (float) ll->y,
-                      ll->just, (float) ll->upx, (float) ll->upy, method, 
-                      class );
-*/
+/* If any labels were removed, we will be doing another abbreviation and
+   rejection loop. Sort the labels into increasing index order in
+   preparation for the next loop. Also restore the number of bounding boxes 
+   stored for previous axes, and reset the abbreviated text to be the
+   full text. */
+      if( nremove > 0 ) {
+         qsort( (void *) list, (size_t) nlab, sizeof(LabelList), Compare_LL );
+         (void) Overlap( this, nbox, 0, NULL, 0.0, 0.0, NULL, 0.0, 0.0, NULL, 
+                         method, class );
+         for( i = 0; i < nlab-1; i++ ) list[i].atext = list[i].text;
+      }
+   }
+   
+/* We can now draw the abbreviated labels (ignoring rejected labels). */
+   ll = list-1;
+   for( i = 0; i < nlab; i++ ) {
+      ll++;
+      if( ll->priority >= 0 ) {
+
+/* Draw the abbreviated label text. */
+         GText( this, ll->atext, (float) ll->x, (float) ll->y, ll->just, 
+                   (float) ll->upx, (float) ll->upy, method, class );
+
+/* Get the bounds of the box containing the new label. */
+         BoxText( this, 0, ll->atext, (float) ll->x, (float) ll->y, 
+                  ll->just, (float) ll->upx, (float) ll->upy, xbn,
+                  ybn, method, class );
+
+/* Extend the bounds of the global bounding box held externally to include 
+   the new box. */
+         for( j = 0; j < 4; j++ ){
+            Box_lbnd[ 0 ] = MIN( xbn[ j ], Box_lbnd[ 0 ] );
+            Box_ubnd[ 0 ] = MAX( xbn[ j ], Box_ubnd[ 0 ] );
+            Box_lbnd[ 1 ] = MIN( ybn[ j ], Box_lbnd[ 1 ] );
+            Box_ubnd[ 1 ] = MAX( ybn[ j ], Box_ubnd[ 1 ] );
          }
       }
    }
-
-/* Undefine macros local to this function. */
-#undef MAXFLD
 
 }
 
@@ -23030,4 +23090,6 @@ f     function is invoked with STATUS set to an error value, or if it
    return astMakeId( new );
 
 }
+
+
 
