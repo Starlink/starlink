@@ -174,6 +174,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
+      INCLUDE 'FIO_ERR'
 *    Import :
 *    Import-Export :
 *    Export :
@@ -389,111 +390,13 @@
 
         CALL MSG_BLNK()
         DO IPOS=1,I_NPOS
-          CALL GRP_GET(I_POS_ID,NUM,1,REC(6:),STATUS)
+          CALL GRP_GET(I_POS_ID,IPOS,1,REC(6:),STATUS)
           WRITE(REC(:3),'(I3)') IPOS
           CALL MSG_PRNT(REC)
         ENDDO
         CALL MSG_BLNK()
 
       ENDIF
-
-      END
-
-*+  IPOSIT - set current position
-      SUBROUTINE IPOSIT(STATUS)
-*    Description :
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*    History :
-*     22 Oct 90: V1.2-1 positions in various frames (RJV)
-*      1 Jul 93: V1.2-2 GTR used (RJV)
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Import :
-*    Import-Export :
-*    Export :
-*    Status :
-      INTEGER STATUS
-*    Functions :
-*    Local Constants :
-*    Local variables :
-      CHARACTER*1 CH
-      CHARACTER*20 SRA,SDEC
-      DOUBLE PRECISION RA,DEC,ELON,ELAT,B,L
-      REAL X,Y,XPIX,YPIX
-      INTEGER FRAME
-*    Global Variables :
-      INCLUDE 'IMG_CMN'
-*    Version :
-      CHARACTER*30 VERSION
-      PARAMETER (VERSION='IPOSIT Version 1.2-2')
-*-
-      CALL USI_INIT()
-
-      CALL MSG_PRNT(VERSION)
-
-      IF (.NOT.I_OPEN) THEN
-        CALL MSG_PRNT('AST_ERR: image processing system not active')
-      ELSEIF (.NOT.I_DISP) THEN
-        CALL MSG_PRNT('AST_ERR: no image currently displayed')
-      ELSE
-
-*  ensure transformations correct
-        CALL GTR_RESTORE(STATUS)
-
-*  cursor mode
-        IF (I_MODE.EQ.1) THEN
-          CALL MSG_PRNT(' ')
-          CALL MSG_PRNT('Select position...')
-
-          CALL PGCURSE(X,Y,CH)
-
-*  keyboard mode
-        ELSE
-
-*  get coordinate frame
-          CALL USI_GET0I('FRAME',FRAME,STATUS)
-
-          IF (FRAME.EQ.1) THEN
-            CALL USI_GET0C('RA',SRA,STATUS)
-            CALL USI_GET0C('DEC',SDEC,STATUS)
-            CALL CONV_RADEC(SRA,SDEC,RA,DEC,STATUS)
-            CALL IMG_CELTOWORLD(RA,DEC,X,Y,STATUS)
-
-          ELSEIF (FRAME.EQ.2) THEN
-            CALL USI_GET0D('ELON',ELON,STATUS)
-            CALL USI_GET0D('ELAT',ELAT,STATUS)
-            CALL IMG_ECLTOWORLD(ELON,ELAT,X,Y,STATUS)
-
-          ELSEIF (FRAME.EQ.3) THEN
-            CALL USI_GET0D('L',L,STATUS)
-            CALL USI_GET0D('B',B,STATUS)
-            CALL IMG_GALTOWORLD(L,B,X,Y,STATUS)
-
-          ELSEIF (FRAME.EQ.4) THEN
-            CALL USI_GET0R('X',X,STATUS)
-            CALL USI_GET0R('Y',Y,STATUS)
-
-          ELSEIF (FRAME.EQ.5) THEN
-            CALL USI_GET0R('XPIX',XPIX,STATUS)
-            CALL USI_GET0R('YPIX',YPIX,STATUS)
-            CALL IMG_PIXTOWORLD(XPIX,YPIX,X,Y,STATUS)
-
-          ENDIF
-
-        ENDIF
-
-        CALL IMG_SETPOS(X,Y,STATUS)
-
-      ENDIF
-
-      CALL USI_CLOSE()
 
       END
 
