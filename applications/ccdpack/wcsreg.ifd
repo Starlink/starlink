@@ -43,10 +43,11 @@
             type LITERAL
             access READ
             vpath PROMPT
-            ppath CURRENT
+            ppath CURRENT DEFAULT
             prompt {Ordered list of domains to align by}
             size *
             helpkey *
+            default !
           }
 
          parameter outdomain {
@@ -86,6 +87,16 @@
             ppath CURRENT DEFAULT
             default TRUE
             prompt {Should Set information (CCD_SET frames) take precedence?}
+            helpkey *
+          }
+
+         parameter namelist {
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default wcsreg.lis
+            prompt {Name of successfully registered files listing}
             helpkey *
           }
 
