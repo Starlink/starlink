@@ -97,19 +97,9 @@
 *  Get the first Mapping.
       CALL ATL1_GTOBJ( 'MAP1', 'Mapping', AST_ISAMAPPING, MAP1, STATUS )
 
-*  If it is a FrameSet, extract the base->current Mapping.
-      IF( AST_ISAFRAMESET( MAP1, STATUS ) ) THEN
-         MAP1 = AST_GETMAPPING( MAP1, AST__BASE, AST__CURRENT, STATUS )
-      END IF
- 
 *  Get the second Frame.
       CALL ATL1_GTOBJ( 'MAP2', 'Mapping', AST_ISAMAPPING, MAP2, STATUS )
 
-*  If it is a FrameSet, extract the base->current Mapping.
-      IF( AST_ISAFRAMESET( MAP2, STATUS ) ) THEN
-         MAP2 = AST_GETMAPPING( MAP2, AST__BASE, AST__CURRENT, STATUS )
-      END IF
- 
 *  Should the Mappings be combined in series?
       CALL PAR_GET0L( 'SERIES', SERIES, STATUS )
 

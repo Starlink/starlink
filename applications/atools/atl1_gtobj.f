@@ -19,7 +19,9 @@
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The parameter name.
 *     CLASS = CHARACTER * ( * ) (Given)
-*        The required class. Used in error reports (see ISA).
+*        The required class. Used in error reports (see ISA). If Objects
+*        of more than 1 class can be used, this should be supplied blank, and 
+*        the calling routine should verify that the Object is usable.
 *     ISA = EXTERNAL (Given)
 *        A suitable AST "ISA.." function which returns .TRUE. if an Object
 *        is of a suitable class. This is ignored if CLASS is blank.
@@ -65,8 +67,10 @@
 
 *  External References:
       EXTERNAL ISA
+      LOGICAL CHR_SIMLR
 
 *  Local Variables:
+      INTEGER IAST2
       INTEGER INDF
 *.
 
@@ -101,6 +105,25 @@
             CALL ERR_REP( 'ATL1_GTOBJ_ERR1', '$^P contains a ^C. '//
      :                 'A ^L is required.', STATUS )
          END IF
+
+*  If a FrameSet is supplied, but a Frame or Mapping is required, extract
+*  a Frame or Mapping from the FrameSet.
+         IF( AST_ISAFRAMESET( IAST, STATUS ) ) THEN
+
+            IF( CHR_SIMLR( CLASS, 'Frame' ) ) THEN
+               IAST2 = AST_GETFRAME( IAST, AST__CURRENT, STATUS )
+               CALL AST_ANNUL( IAST, STATUS )
+               IAST = IAST2
+
+            ELSE IF( CHR_SIMLR( CLASS, 'Mapping' ) ) THEN
+               IAST2 = AST_GETMAPPING( IAST, AST__BASE, AST__CURRENT, 
+     :                                 STATUS )
+               CALL AST_ANNUL( IAST, STATUS )
+               IAST = IAST2
+            END IF
+
+         END IF
+
       END IF
 
 *  Annul the object if an error occurred.

@@ -88,19 +88,9 @@
 *  Get the first Frame.
       CALL ATL1_GTOBJ( 'FRAME1', 'Frame', AST_ISAFRAME, FRAME1, STATUS )
 
-*  If it is a FrameSet, extract the current Frame.
-      IF( AST_ISAFRAMESET( FRAME1, STATUS ) ) THEN
-         FRAME1 = AST_GETFRAME( FRAME1, AST__CURRENT, STATUS )
-      END IF
- 
 *  Get the second Frame.
       CALL ATL1_GTOBJ( 'FRAME2', 'Frame', AST_ISAFRAME, FRAME2, STATUS )
 
-*  If it is a FrameSet, extract the current Frame.
-      IF( AST_ISAFRAMESET( FRAME2, STATUS ) ) THEN
-         FRAME2 = AST_GETFRAME( FRAME2, AST__CURRENT, STATUS )
-      END IF
- 
 *  Create the required Frame.
       RESULT = AST_CMPFRAME( FRAME1, FRAME2, ' ', STATUS )
 
