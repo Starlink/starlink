@@ -683,7 +683,7 @@
       CALL AIO_BLNK( OCH, STATUS )
 
       CALL ADI_CGET0D( TIMID, 'MJDObs', MJD, STATUS )
-      IF ( STATUS .EQ. SAI_OK ) THEN
+      IF ( STATUS .EQ. SAI__OK ) THEN
         CALL TCI_MJD2DT( MJD, DSTR, TSTR, STATUS )
         CALL ASHOW_VAL( DSTR//' '//TSTR, 'Date/time at start', ' ',
      :                  OCH, STATUS )
@@ -799,6 +799,10 @@
 
 *  Status:
       INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			CHR_LEN
+        INTEGER			CHR_LEN
 
 *  Local Constants:
       INTEGER			NLINK
