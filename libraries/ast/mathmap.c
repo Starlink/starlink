@@ -1,7 +1,8 @@
 /* To do:
+      o Check scaling in Ran2 (random_int goes from 1 to m1-1, rather
+        than as previously thought!), rename, tidy and add prologue.
+      o Implement gaussian generator.
       o Prototype user docs for expression syntax.
-      o Implement random number generators.
-      o Add Seed attribute for above.
       o Write Fortran interface.
       o Tidy .h file.
       o Write user documentation.
@@ -82,9 +83,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 /* Module Variables. */
 /* ================= */
+
+typedef AstMathMapRandContext_ Rcontext;
+
 /* Define the class virtual function table and its initialisation flag
    as static variables. */
 static AstMathMapVtab class_vtab; /* Virtual function table */
@@ -370,14 +375,18 @@ AstMathMap *astMathMapId_( int, int, const char *[], const char *[], const char 
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );
+static int DefaultSeed( const Rcontext * );
+static int GetSeed( AstMathMap * );
 static int GetSimpFI( AstMathMap * );
 static int GetSimpIF( AstMathMap * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
+static int TestSeed( AstMathMap * );
 static int TestSimpFI( AstMathMap * );
 static int TestSimpIF( AstMathMap * );
 static void CleanFunctions( int, const char *[], char *** );
 static void ClearAttrib( AstObject *, const char * );
+static void ClearSeed( AstMathMap * );
 static void ClearSimpFI( AstMathMap * );
 static void ClearSimpIF( AstMathMap * );
 static void CompileExpression( const char *, const char *, int, const char *[], int **, double **, int * );
@@ -393,114 +402,164 @@ static void ParseConstant( const char *, const char *, int, int *, double * );
 static void ParseName( const char *, int, int * );
 static void ParseVariable( const char *, const char *, int, int, const char *[], int *, int * );
 static void SetAttrib( AstObject *, const char * );
+static void SetSeed( AstMathMap *, int );
 static void SetSimpFI( AstMathMap *, int );
 static void SetSimpIF( AstMathMap *, int );
 static void ValidateSymbol( const char *, const char *, int, int, int *, int **, int **, int *, double ** );
-static void VirtualMachine( int, int, const double **, const int *, const double *, int, double * );
+static void VirtualMachine( Rcontext *, int, int, const double **, const int *, const double *, int, double * );
 
 /* Member functions. */
 /* ================= */
-static double Ran2( void ) {
-   const int ntab = 32;
-   const int nwarm = 8;
-   const long a1 = 40014;
-   const long a2 = 40692;
-   const long m1 = 2147483563;
-   const long m2 = 2147483399;
-   const long q1 = 53668;
-   const long q2 = 52774;
-   const long r1 = 12211;
-   const long r2 = 3791;
-   int itab;
-   long k;
-   static long rand1 = -94638137; // Arbitrary negative number
-   static long rand2 = -94638137;
-   static long table[ 32 ];
-   static long random_int = 0;
+static double Ran2( Rcontext *context ) {
 
-   long ran[ 2 ];
-   int iloop;
-   double result;
+/* Local Constants: */
+   const long int a1 = 40014L;   /* Random number generator constants... */
+   const long int a2 = 40692L;
+   const long int m1 = 2147483563L;
+   const long int m2 = 2147483399L;
+   const long int q1 = 53668L;
+   const long int q2 = 52774L;
+   const long int r1 = 12211L;
+   const long int r2 = 3791L;
+   const int ntab =              /* Size of shuffle table */
+      AST_MATHMAP_RAND_CONTEXT_NTAB_;
+   const int nwarm = 8;          /* Number of warm-up iterations */
 
-   static double alpha;
-   static double scale0;
-   static double scale1;
-   static int init = 0;
+/* Local Variables: */
+   double result;                /* Result value to return */
+   double scale;                 /* Scale factor for random integers */
+   double sum;                   /* Sum for forming normalisation constant */
+   int dbits;                    /* Approximate bits in double mantissa */
+   int irand;                    /* Loop counter for random integers */
+   int itab;                     /* Loop counter for shuffle table */
+   int lbits;                    /* Approximate bits used by generators */
+   long int seed;                /* Random number seed */
+   long int tmp;                 /* Temporary variable */
+   static double norm;           /* Normalisation constant */
+   static double scale0;         /* Scale decrement for successive integers */
+   static int init = 0;          /* Local initialisation performed? */
+   static int nrand;             /* Number of random integers to use */
    
-/* Perform initialisation, if not already done. */
-   if ( !init ) {
+/* If the random number generator context is not active, then
+   initialise it. */
+   if ( !context->active ) {
 
-/* Loop to fill the shuffle table with an initial set of random
-   values. We generate more values than required in order to "warm up"
-   the generator before recording values in the table. */
+/* First, perform local initialisation for this function, if not
+   already done. */
+      if ( !init ) {
+
+/* Obtain the approximate number of bits used by the random integer
+   generator from the value "m1". */
+         (void) frexp( (double) m1, &lbits );
+
+/* Obtain the approximate number of bits used by the mantissa of the
+   double value we want to produce, allowing for the (unlikely)
+   possibility that the mantissa's radix isn't 2. */
+         dbits = (int) ceil( (double) DBL_MANT_DIG *
+                             log( (double) FLT_RADIX ) / log( 2.0 ) );
+
+/* Hence determine how many random integers we need to combine to
+   produce each double value, so that all the mantissa's bits will be
+   used. */
+         nrand = ( dbits + lbits - 1 ) / lbits;
+
+/* Calculate the scale factor by which each successive random
+   integer's contribution to the result is reduced so as to generate
+   progressively less significant bits. */
+         scale0 = 1.0 / (double) ( m1 - 2L );
+
+/* Loop to sum the maximum contributions from each random integer
+   (assuming that each takes its largest possible value). This produces
+   the normalisation factor by which the result must be scaled so as to
+   lie between 0.0 and 1.0 (inclusive). */
+         sum = 0.0;
+         scale = 1.0;
+         for ( irand = 0; irand < nrand; irand++ ) {
+            scale *= scale0;
+            sum += scale;
+         }
+         norm = 1.0 / ( sum * (double) ( m1 - 1L ) );
+
+/* Note that local initialisation has been done. */
+         init = 1;
+      }
+
+/* Obtain the seed value, enforcing positivity. */
+      seed = (long int) context->seed;
+      if ( seed < 1 ) seed = seed + LONG_MAX;
+      if ( seed < 1 ) seed = LONG_MAX;
+
+/* Initialise the random number generators with this seed. */
+      context->rand1 = context->rand2 = seed;
+
+/* Now loop to initialise the shuffle table with an initial set of
+   random values. We generate more values than required in order to "warm
+   up" the generator before recording values in the table. */
       for ( itab = ntab + nwarm - 1; itab >= 0; itab-- ) {
 
 /* Repeatedly update "rand1" from the expression "(rand1*a1)%m1" while
    avoiding overflow. */
-         k = rand1 / q1;
-         rand1 = a1 * ( rand1 - k * q1 ) - k * r1;
-         if ( rand1 < 0 ) rand1 += m1;
+         tmp = context->rand1 / q1;
+         context->rand1 = a1 * ( context->rand1 - tmp * q1 ) - tmp * r1;
+         if ( context->rand1 < 0L ) context->rand1 += m1;
 
 /* After warming up, start recording values in the table. */
-         if ( itab < ntab ) table[ itab ] = rand1;
+         if ( itab < ntab ) context->table[ itab ] = context->rand1;
       }
 
-/* Store the last entry in the table as the "previous" random
+/* Record the last entry in the table as the "previous" random
    integer. */
-      random_int = table[ 0 ];
+      context->random_int = context->table[ 0 ];
 
-/* Calculate the scale factors required to convert a pair of random
-   integers lying between 1 and "m1" (inclusive) into a single double
-   value lying between 0.0 and 1.0 (also inclusive). */
-      alpha = (double) ( m1 - 2 ) / (double) ( m1 - 1 );
-      alpha *= alpha;
-      scale0 = 1.0 / (double) ( m1 - 2 );
-      scale1 = scale0 * scale0;
-
-/* Note when initialisation has been done. */
-      init = 1;
+/* Note the random number generator context is active. */
+      context->active = 1;
    }
+
+/* Generate a random value. */
+/* ------------------------ */
+/* Initialise. */
+   result = 0.0;
 
 /* Loop to generate sufficient random integers to combine into a
    single double value. */
-   for ( iloop = 0; iloop < 2; iloop++ ) {
+   scale = norm;
+   for ( irand = 0; irand < nrand; irand++ ) {
 
 /* Update the first generator "rand1" from the expression
    "(a1*rand1)%m1" while avoiding overflow. */
-      k = rand1 / q1;
-      rand1 = a1 * ( rand1 - k * q1 ) - k * r1;
-      if ( rand1 < 0 ) rand1 += m1;
+      tmp = context->rand1 / q1;
+      context->rand1 = a1 * ( context->rand1 - tmp * q1 ) - tmp * r1;
+      if ( context->rand1 < 0L ) context->rand1 += m1;
 
 /* Similarly, update the second generator "rand2" from the expression
    "(a2*rand2)%m2". */
-      k = rand2 / q2;
-      rand2 = a2 * ( rand2 - k * q2 ) - k * r2;
-      if ( rand2 < 0 ) rand2 += m2;
+      tmp = context->rand2 / q2;
+      context->rand2 = a2 * ( context->rand2 - tmp * q2 ) - tmp * r2;
+      if ( context->rand2 < 0L ) context->rand2 += m2;
 
 /* Use the previous random integer to generate an index into the
    shuffle table. */
-      itab = random_int / ( 1 + ( m1 - 1 ) / ntab );
+      itab = (int) ( context->random_int /
+                     ( 1L + ( m1 - 1L ) / (long int) ntab ) );
 
 /* Extract the table entry and replace it with a new random value from
-   the first generator "rand1". */
-      random_int = table[ itab ];
-      table[ itab ] = rand1;
+   the first generator "rand1". This is the Bays-Durham shuffle. */
+      context->random_int = context->table[ itab ];
+      context->table[ itab ] = context->rand1;
 
 /* Combine the extracted value with the latest value from the second
-   generator "rand2" and ensure positivity. */
-      random_int -= rand2;
-      if ( random_int < 1 ) random_int += m1 - 1;
+   generator "rand2". */
+      context->random_int -= context->rand2;
+      if ( context->random_int < 1L ) context->random_int += m1 - 1L;
 
-/* Save the random integers produced until we have enough for a random
-   double value. */
-      ran[ iloop ] = random_int;
+/* Update the scale factor to apply to the resulting random integer
+   and accumulate its contribution to the result. */
+      scale *= scale0;
+      result += scale * (double) ( context->random_int - 1L );
    }
-
-/* Combine the separate integer results into a double value. */
-   result = alpha * ( scale0 * (double) ( ran[ 0 ] - 1 ) +
-                      scale1 * (double) ( ran[ 1 ] - 1 ) );
-
+#if 0
    printf( "%.20g\n", result );
+#endif
 
 /* Return the result. */
    return result;
@@ -643,9 +702,14 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Check the attribute name and clear the appropriate attribute. */
 
+/* Seed. */
+/* ----- */
+   if ( !strcmp( attrib, "seed" ) ) {
+      astClearSeed( this );
+
 /* SimpFI. */
 /* ------- */
-   if ( !strcmp( attrib, "simpfi" ) ) {
+   } else if ( !strcmp( attrib, "simpfi" ) ) {
       astClearSimpFI( this );
 
 /* SimpIF. */
@@ -1254,6 +1318,112 @@ static void CompileMapping( const char *method, int nin, int nout,
    }
 }
 
+static int DefaultSeed( const Rcontext *context ) {
+/*
+*  Name:
+*     DefaultSeed
+
+*  Purpose:
+*     Generate an unpredictable seed for a random number generator.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mathmap.h"
+*     int DefaultSeed( Rcontext *context )
+
+*  Class Membership:
+*     MathMap member function.
+
+*  Description:
+*     On each invocation this function returns an integer value which is
+*     highly unpredictable. This value may be used as a default seed for the
+*     random number generator associated with a MathMap, so that it
+*     generates a different sequence on each occasion.
+
+*  Parameters:
+*     context
+*        Pointer to the random number generator context associated with
+*        the MathMap.
+
+*  Returned Value:
+*     The unpredictable integer.
+
+*  Notes:
+*     - This function does not perform error checking and will execute even
+*     if the global error status is set.
+*/
+
+/* Local Constants: */
+   const int nwarm = 5;          /* Number of warm-up iterations */
+   const long int a = 8121L;     /* Constants for random number generator... */
+   const long int c = 28411L;
+   const long int m = 134456L;
+
+/* Local Variables; */
+   int iwarm;                    /* Loop counter for warm-up iterations */
+   static long init = 0;         /* Local initialisation performed? */
+   static long int rand;         /* Local random integer */
+   unsigned long int bits;       /* Bit pattern for producing result */
+
+/* On the first invocation, initialise a local random number generator
+   to a value derived by combining bit patterns obtained from the system
+   clock and the processor time used. The result needs to be positive and
+   lie in the range 0 to "m-1". */
+   if ( !init ) {
+      rand = (long int) ( ( (unsigned long int) time( NULL ) ^
+                            (unsigned long int) clock() ) %
+                          (unsigned long int) m );
+
+/* These values will typically only change in their least significant
+   bits between programs run successively, but by using the bit pattern
+   as a seed, we ensure that these differences are rapidly propagated to
+   other bits. To hasten this process, we "warm up" the local generator
+   with a few iterations. This is a quick and dirty generator using
+   constants from Press et al. (Numerical recipes). */
+      for ( iwarm = 0; iwarm < nwarm; iwarm++ ) {
+         rand = ( rand * a + c ) % m;
+      }
+
+/* Note that this initialisation has been performed. */
+      init = 1;
+   }
+
+/* Generate a new bit pattern from the system time. Apart from the
+   first invocation, this will be a different time to that used above. */
+   bits = (unsigned long int) time( NULL );
+
+/* Mask in a pattern derived from the CPU time used. */
+   bits ^= (unsigned long int) clock();
+
+/* The system time may change quite slowly (e.g. every second), so
+   also mask in the address of the random number generator context
+   supplied. This makes the seed depend on which MathMap is in use. */
+   bits ^= (unsigned long int) context;
+
+/* Now mask in the last random integer produced by the random number
+   generator whose context has been supplied. This makes the seed depend
+   on the MathMap's past use of random numbers. */
+   bits ^= (unsigned long int) context->random_int;
+
+/* Finally, in order to produce different seeds when this function is
+   invoked twice in rapid succession on the same object (with no
+   intermediate processing), we also mask in a pseudo-random value
+   generated here. Generate the next local random integer. */
+   rand = ( rand * a + c ) % m;
+
+/* We then scale this value to give an integer in the range 0 to
+   ULONG_MAX and mask the corresponding bit pattern into our seed. */
+   bits ^= (unsigned long int) ( ( (double) rand / (double) ( m - 1UL ) ) *
+                                 ( ( (double) ULONG_MAX + 1.0 ) *
+                                   ( 1.0 - DBL_EPSILON ) ) );
+
+/* Return the integer value of the seed (which may involve discarding
+   some unwanted bits). */
+   return (int) bits;
+}
+
 static void EvaluationSort( const double con[], int nsym, int symlist[],
                             int **code, int *stacksize ) {
 /*
@@ -1818,9 +1988,18 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    the value into "buff" as a null-terminated string in an appropriate
    format.  Set "result" to point at the result string. */
 
+/* Seed. */
+/* ----- */
+   if ( !strcmp( attrib, "seed" ) ) {
+      ival = astGetSeed( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
 /* SimpFI. */
 /* ------- */
-   if ( !strcmp( attrib, "simpfi" ) ) {
+   } else if ( !strcmp( attrib, "simpfi" ) ) {
       ival = astGetSimpFI( this );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
@@ -1894,12 +2073,16 @@ static void InitVtab( AstMathMapVtab *vtab ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
+   vtab->ClearSeed = ClearSeed;
    vtab->ClearSimpFI = ClearSimpFI;
    vtab->ClearSimpIF = ClearSimpIF;
+   vtab->GetSeed = GetSeed;
    vtab->GetSimpFI = GetSimpFI;
    vtab->GetSimpIF = GetSimpIF;
+   vtab->SetSeed = SetSeed;
    vtab->SetSimpFI = SetSimpFI;
    vtab->SetSimpIF = SetSimpIF;
+   vtab->TestSeed = TestSeed;
    vtab->TestSimpFI = TestSimpFI;
    vtab->TestSimpIF = TestSimpIF;
 
@@ -2644,18 +2827,25 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    that the entire string was matched. Once a value has been obtained, use the
    appropriate method to set it. */
 
+/* Seed. */
+/* ----- */
+   if ( nc = 0,
+        ( 1 == sscanf( setting, "seed= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetSeed( this, ival );
+      
 /* SimpFI. */
 /* ------- */
-   if ( nc = 0,
-        ( 1 == sscanf( setting, "simpfi= %d %n", &ival, &nc ) )
-        && ( nc >= len ) ) {
+   } else if ( nc = 0,
+               ( 1 == sscanf( setting, "simpfi= %d %n", &ival, &nc ) )
+               && ( nc >= len ) ) {
       astSetSimpFI( this, ival );
 
 /* SimpIF. */
 /* ------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "simpif= %d %n", &ival, &nc ) )
-        && ( nc >= len ) ) {
+               ( 1 == sscanf( setting, "simpif= %d %n", &ival, &nc ) )
+               && ( nc >= len ) ) {
       astSetSimpIF( this, ival );
 
 /* Pass any unrecognised setting to the parent method for further
@@ -2719,9 +2909,14 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Check the attribute name and test the appropriate attribute. */
 
+/* Seed. */
+/* ----- */
+   if ( !strcmp( attrib, "seed" ) ) {
+      result = astTestSeed( this );
+
 /* SimpFI. */
 /* ------- */
-   if ( !strcmp( attrib, "simpfi" ) ) {
+   } else if ( !strcmp( attrib, "simpfi" ) ) {
       result = astTestSimpFI( this );
 
 /* SimpIF. */
@@ -2841,7 +3036,7 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
    expressions. Pass the appropriate code and constants arrays, depending
    on the direction of coordinate transformation, together with the
    required stack size. */
-         VirtualMachine( npoint, ncoord_in, (const double **) ptr_in,
+         VirtualMachine( &this->rcontext, npoint, ncoord_in, (const double **) ptr_in,
                          forward ? this->fwdcode[ coord ] :
                                    this->invcode[ coord ],
                          forward ? this->fwdcon[ coord ] :
@@ -3082,7 +3277,8 @@ static void ValidateSymbol( const char *method, const char *exprs,
    }
 }
 
-static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
+static void VirtualMachine( Rcontext *rcontext, int npoint,
+                            int ncoord_in, const double **ptr_in,
                             const int *code, const double *con, int stacksize,
                             double *out ) {
 /*
@@ -3208,7 +3404,7 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
 
 /* Check the global error status. */
    if ( !astOK ) return;
-   
+
 /* If this is the first invocation of this function, then initialise
    the trigonometrical conversion factors. */
    if ( !init ) {
@@ -3856,7 +4052,7 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
             ARG_2( OP_MOD,      *y = ( x2 != 0.0 ) ?
                                      fmod( x1, x2 ) : AST__BAD )
             ARG_2( OP_POW,      *y = CATCH_MATHS_ERROR( pow( x1, x2 ) ) )
-            ARG_2( OP_RAND,     ran = Ran2();
+            ARG_2( OP_RAND,     ran = Ran2( rcontext );
                                 *y = x1 * ran + x2 * ( 1.0 - ran ); )
             ARG_2( OP_SIGN,     *y = ( ( x1 >= 0.0 ) == ( x2 >= 0.0 ) ) ?
                                      x1 : -x1 )
@@ -3960,6 +4156,31 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
    "object.h" file. For a description of each attribute, see the class
    interface (in the associated .h file). */
 
+/* Clear the Seed value by setting it to a new unpredictable value
+   produced by DefaultSeed and clearing the "seed_set" flag in the
+   MathMap's random number generator context. Also clear the "active"
+   flag, so that the generator will be re-initialised to use this seed
+   when it is next invoked. */
+astMAKE_CLEAR(MathMap,Seed,rcontext.seed,( this->rcontext.seed_set = 0,
+                                           this->rcontext.active = 0,
+                                           DefaultSeed( &this->rcontext ) ))
+
+/* Return the "seed" value from the random number generator
+   context. */
+astMAKE_GET(MathMap,Seed,int,0,this->rcontext.seed)
+
+/* Store the new seed value in the MathMap's random number generator
+   context and set the context's "seed_set" flag. Also clear the "active"
+   flag, so that the generator will be re-initialised to use this seed
+   when it is next invoked. */
+astMAKE_SET(MathMap,Seed,int,rcontext.seed,( this->rcontext.seed_set = 1,
+                                             this->rcontext.active = 0,
+                                             value ))
+
+/* Test the "seed_set" flag in the random number generator context. */
+astMAKE_TEST(MathMap,Seed,( this->rcontext.seed_set ))
+
+
 /* Clear the SimpFI value by setting it to -INT_MAX. */
 astMAKE_CLEAR(MathMap,SimpFI,simp_fi,-INT_MAX)
 
@@ -3972,6 +4193,7 @@ astMAKE_SET(MathMap,SimpFI,int,simp_fi,( value != 0 ))
 
 /* The SimpFI value is set if it is not -INT_MAX. */
 astMAKE_TEST(MathMap,SimpFI,( this->simp_fi != -INT_MAX ))
+
 
 /* Clear the SimpIF value by setting it to -INT_MAX. */
 astMAKE_CLEAR(MathMap,SimpIF,simp_if,-INT_MAX)
@@ -4160,7 +4382,7 @@ static void Delete( AstObject *obj ) {
    FREE_POINTER_ARRAY( this->invcon, this->ninv )
 }
 
-/* dDump function. */
+/* Dump function. */
 /* -------------- */
 static void Dump( AstObject *this_object, AstChannel *channel ) {
 /*
@@ -4262,6 +4484,19 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    astWriteInt( channel, "SimpIF", set, 0, ival,
                 ival ? "Inverse-forward pairs may simplify" :
                        "Inverse-forward pairs do not simplify" );
+
+/* Seed. */
+/* ----- */
+/* Write out any random number seed value which is set. Prefix this with
+   a separate flag which indicates if the seed has been set. */
+   set = TestSeed( this );
+   ival = set ? GetSeed( this ) : astGetSeed( this );
+   astWriteInt( channel, "Seeded", set, 0, set,
+                set? "Explicit random number seed set" :
+                     "No random number seed set" );
+   astWriteInt( channel, "Seed", set, 0, ival,
+                set ? "Random number seed value" :
+                      "Default random number seed used" );
 
 /* Undefine macros local to this function. */
 #undef COMMENT_LEN
@@ -4658,6 +4893,13 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
       new->simp_fi = -INT_MAX;
       new->simp_if = -INT_MAX;
 
+/* Initialise the random number generator context associated with the
+   MathMap. */
+      new->rcontext.random_int = 0;
+      new->rcontext.active = 0;
+      new->rcontext.seed_set = 0;
+      new->rcontext.seed = DefaultSeed( &new->rcontext );
+
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
    }
@@ -4844,6 +5086,24 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size, int init,
 /* ------------------------------------ */
             new->simp_if = astReadInt( channel, "simpif", -INT_MAX );
             if ( TestSimpIF( new ) ) SetSimpIF( new, new->simp_if );
+
+/* Random number context. */
+/* ---------------------- */
+/* Initialise the random number generator context. */
+            new->rcontext.random_int = 0;
+            new->rcontext.active = 0;
+
+/* Read the flag that determines if the Seed value is set, and the
+   Seed value itself. */
+            new->rcontext.seed_set = astReadInt( channel, "seeded", 0 );
+            if ( TestSeed( new ) ) {
+               new->rcontext.seed = astReadInt( channel, "seed", 0 );
+               SetSeed( new, new->rcontext.seed );
+
+/* Supply a default Seed value if necessary. */
+            } else {
+               new->rcontext.seed = DefaultSeed( &new->rcontext );
+            }
 
 /* Compile the MathMap's transformation functions. */
             CompileMapping( "astLoadMathMap",
