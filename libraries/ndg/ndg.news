@@ -1,6 +1,7 @@
 1 NDG_library
 
-Version 5.2-1 of the NDG library (a library of fortran subroutines for
+Version 5.2-2 of the NDG library (a library of fortran subroutines for
 accessing groups of NDFs) has been released. 
 
-   o Length of internal file name buffers have been increased.
+   o Added NDG_NDFCO which allows an output NDF to be created by copying
+     an input NDF.

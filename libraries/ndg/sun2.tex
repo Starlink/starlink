@@ -7,9 +7,9 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun2.5}
-\newcommand{\stardocnumber}    {2.4}
+\newcommand{\stardocnumber}    {2.5}
 \newcommand{\stardocauthors}   {D.S.\ Berry \\ M.B.\ Taylor}
-\newcommand{\stardocdate}      {3rd September 2002}
+\newcommand{\stardocdate}      {12th November 2004}
 \newcommand{\stardoctitle}     {NDG \\ [1ex]
                                 Routines for Accessing Groups of NDFs}
 \newcommand{\stardocversion}   {Version 5.2}
@@ -488,6 +488,12 @@ to add further members.
       CALL NDG\_NDFAS( IGRP, INDEX, MODE, INDF, STATUS )
 }{
    Obtain an NDF identifier for an existing NDF
+}
+\noteroutine{
+      CALL NDG\_NDFCO( INDF1, IGRP, INDEX, INDF2, STATUS )
+}{
+   Obtain an NDF identifier for a new NDF created by copying an 
+   existing NDF
 }
 \noteroutine{
       CALL NDG\_NDFCP( IGRP, INDEX, FTYPE, NDIM, UBND, INDF, STATUS )
@@ -1555,6 +1561,64 @@ to add further members.
          \sstitem
          If this routine is called with STATUS set, then a value of
          NDF\_\_NOID will be returned for the INDF argument, although no
+         further processing will occur. The same value will also be
+         returned if the routine should fail for any reason. The NDF\_\_NOID
+         constant is defined in the include file NDF\_PAR.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   NDG\_NDFCO
+}{
+   Obtain an NDF identifier for a new NDF created by copying an existing NDF
+}{
+   \sstdescription{
+      The routine returns an NDF identifier for a new NDF created by
+      copying an existing NDF. The name of the new NDF is held
+      at a given index within a given group. It is equivalent to NDF\_PROP.
+   }
+   \sstinvocation{
+      CALL NDG\_NDFCO( INDF1, IGRP, INDEX, INDF2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF1 = INTEGER (Given)
+      }{
+         Identifier for an existing NDF (or NDF section) to act as a
+         template.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for a group holding the names of NDFs. This
+         will often be creted using NDG\_ASSOC, but groups created {\tt "}by
+         hand{\tt "} using GRP directly (i.e. without the supplemental groups
+         created by NDG\_ASSOC) can also be used.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         The index within the group at which the name of the NDF to be
+         accessed is stored.
+      }
+      \sstsubsection{
+         INDF2 = INTEGER (Returned)
+      }{
+         Identifier for the new NDF.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If this routine is called with STATUS set, then a value of
+         NDF\_\_NOID will be returned for the INDF2 argument, although no
          further processing will occur. The same value will also be
          returned if the routine should fail for any reason. The NDF\_\_NOID
          constant is defined in the include file NDF\_PAR.
