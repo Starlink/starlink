@@ -30,7 +30,7 @@
 *     in shape, though it may be distorted if the mapping
 *     between pixel and Current coordinates is nonlinear.  The origin
 *     (minimum X,Y pixel value) of each outline can be marked and
-*     and the outline labelled with the NDF's name and/or index number
+*     the outline labelled with the NDF's name and/or index number
 *     (as determined by the LABMODE parameter).
 *
 *     The results are only likely to be sensible if the Current 
@@ -38,9 +38,9 @@
 *     registered.  If they do not all have the same current Domain
 *     name, a warning will be issued, but plotting will proceed.
 *
-*     OUTLINE uses the AGI graphics database in the same way
-*     as KAPPA applications; if the CLEAR parameter is set to 
-*     false then it will attempt to align the outline drawings with
+*     OUTLINE uses the AGI graphics database in a way which is 
+*     compatible with KAPPA applications; if the CLEAR parameter is set
+*     to false then it will attempt to align the outline drawings with
 *     suitably registered graphics which are already on the graphics 
 *     device.  So, for instance, it is easy to overlay the outlines
 *     of a set of NDFs on a mosaic image which has been constructed 
@@ -211,6 +211,13 @@
 *     controlled by the usual CCDPACK mechanisms, instead it works in
 *     co-operation with KAPPA (SUN/95) image display/control routines.
 
+*  Implementation Status:
+*     OUTLINE's communication with the AGI database is compatible with
+*     most of KAPPA's behaviour, but is slightly less capable; in 
+*     particular it will fail to align with pictures whose alignment
+*     has been stored using TRANSFORM structures instead of MORE.AST
+*     extensions.  This affects only older applications.
+
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
@@ -234,6 +241,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
+      INCLUDE 'PAR_PAR'          ! Standard PAR constants
       INCLUDE 'PAR_ERR'          ! PAR system error codes
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
 
@@ -258,6 +266,7 @@
       INTEGER HICOL              ! Highest colour index available
       INTEGER I                  ! Loop variable
       INTEGER INDF               ! NDF identifier
+      INTEGER INIPEN             ! Initial pen index
       INTEGER IPEN               ! Current pen index
       INTEGER IX                 ! Group search index
       INTEGER IWCS               ! AST identifier for WCS frameset
@@ -279,6 +288,7 @@
       INTEGER PICID              ! AGI identifier for initial DATA picture
       INTEGER PICOD              ! AGI identifier for new picture
       INTEGER PLOT               ! AST identifier of plot
+      INTEGER STATE              ! Parameter state
       INTEGER STYLEN             ! Length of style element
       LOGICAL AXES               ! Draw axes?
       LOGICAL CLEAR              ! Clear the graphics device before plotting?
@@ -395,12 +405,21 @@
 *  Get label orientation option.
          CALL PAR_GET0L( 'LABUP', LABUP, STATUS )
 
-*  If labels are to be written horizontally on the graphics device, then
-*  dynamically default the label positioning to central.
-         IF ( LABUP ) CALL PAR_DEF0C( 'LABPOS', 'CC', STATUS )
+*  Get and the label positioning option.  If LABUP is TRUE,
+*  then just use positioning of 'CC' unless the parameter has been
+*  explicitly supplied on the command line.
+         IF ( LABUP ) THEN 
+            CALL PAR_STATE( 'LABPOS', STATE, STATUS )
+            IF ( STATE .EQ. PAR__ACTIVE ) THEN
+               CALL PAR_GET0C( 'LABPOS', LABPOS, STATUS )
+            ELSE
+               LABPOS = 'CC'
+            END IF
+         ELSE
+            CALL PAR_GET0C( 'LABPOS', LABPOS, STATUS )
+         END IF
 
-*  Get and validate the label positioning option.
-         CALL PAR_GET0C( 'LABPOS', LABPOS, STATUS ) 
+*  Validate the label positioning option.
          CALL CHR_UCASE( LABPOS )
          IF ( STATUS .EQ. SAI__OK .AND. (
      :        LABPOS( 1:1 ) .NE. 'N' .AND. LABPOS( 1:1 ) .NE. 'C' .AND.
@@ -670,8 +689,8 @@ c        CALL PGSCLP( 0 )
          CALL AST_GRID( PLOT, STATUS )
       END IF
 
-*  Initialise pen number.
-      IPEN = AST_GETI( PLOT, 'Colour(curves)', STATUS )
+*  Set initial pen number.
+      INIPEN = AST_GETI( PLOT, 'Colour(curves)', STATUS )
 
 *  If we are rotating pens between plots, generate a group of pen style
 *  attributes to cycle through.  Doing it like this is slightly more 
@@ -718,6 +737,9 @@ c        CALL PGSCLP( 0 )
       CALL PGQCS( 4, XCH, YCH )
       OFS = XCH * 0.7D0
 
+*  Initialise pen colour.
+      IPEN = INIPEN
+
 *  Loop for each NDF.
       DO I = 1, NNDF
 
@@ -751,8 +773,34 @@ c        CALL PGSCLP( 0 )
             CALL PGSLW( LW )
          END IF
 
-*  Check if we need to write any text.
-         IF ( LFMT .NE. ' ' ) THEN
+*  Plot geodesics in the GRID-like coordinate system along the edges
+*  of the data array.  These will appear as the correct outlines in the
+*  common coordinate system.
+         CALL AST_POLYCURVE( PLOT, 5, 2, 5, VERTEX, STATUS )
+      END DO
+
+*  Check if we need to write any text.  We do this after all the lines
+*  have been plotted so that if text is written on an opaque background
+*  it will not get overwritten by the outlines of other NDFS.
+      IF ( LFMT .NE. ' ' ) THEN
+
+*  Initialise pen colour.
+         IPEN = INIPEN
+
+*  If so, loop over all the NDFs.  
+         DO I = 1, NNDF
+     
+*  Set pen colour if required.
+            IF ( PENGID .NE. GRP__NOID ) THEN
+               IF ( IPEN .GT. NPEN ) IPEN = 1
+               CALL GRP_GET( PENGID, IPEN, 1, STYEL, STATUS )
+               CALL AST_SET( PLOT, STYEL, STATUS )
+               IPEN = IPEN + 1
+            END IF
+
+*  Set the Current frame of the Plot object to the GRID-like coordinate 
+*  system of this NDF.
+            CALL AST_SETI( PLOT, 'Current', JCOM + I, STATUS )
 
 *  Set the near, centre, and far edge grid coordinates.
             XN = 0.5D0
@@ -864,13 +912,8 @@ c        CALL PGSCLP( 0 )
             CALL AST_TEXT( PLOT, BUFFER( :BL ), TPOS, UP, JUST, STATUS )
             CALL AST_SETI( PLOT, 'Current', JCOM + I, STATUS )
             CALL PGSTBG( BGCOL )
-         END IF
-
-*  Plot geodesics in the GRID-like coordinate system along the edges
-*  of the data array.  These will appear as the correct outlines in the
-*  common coordinate system.
-         CALL AST_POLYCURVE( PLOT, 5, 2, 5, VERTEX, STATUS )
-      END DO
+         END DO
+      END IF
 
 *  Error exit label.
  99   CONTINUE
