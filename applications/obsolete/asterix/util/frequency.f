@@ -164,6 +164,8 @@
 *        Full ADI port.
 *      3 Apr 1996 V2.0-1 (DJA):
 *        Use grouping info if available
+*      1 May 1996 V2.0-2 (DJA):
+*        Explcitly write widths
 *     {enter_changes_here}
 
 *  Bugs:
@@ -410,6 +412,7 @@
         RAXP(1) = DMIN + SPACING/2.0
         RAXP(2) = SPACING
         CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, RAXP, STATUS )
+        CALL BDI_AXPUT0R( OFID, 1, 'ScalarWidth', SPACING, STATUS )
 
       ELSE
 
