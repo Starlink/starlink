@@ -17119,40 +17119,35 @@ Draws a colour-table key.
 
 Usage:
 
-   lutview [mode] [low] [high] [annota] [curpic] [device] lbound=?
-     ubound=?
+   lutview [mode] [low] [high] [curpic] [device]
 
 Description:
 
-   This application draws a key of the colour table at a location
-   you select.  You can constrain the key to lie within either the
-   current or the BASE picture.  The key may be annotated, in which
-   case you must allow sufficient room for the annotations.  For
-   oblate regions colour index increases from left to right, and for
-   prolate it increases from bottom to top; the annotations
-   appearing to the top and right respectively.  The annotations
-   scale linearly between the values corresponding to the lower and
-   upper indices of the colour table.
+   This application displays a ramp of colours on the specified image
+   display device using the whole of the current colour table (excluding
+   the low 16 pens which are reserved for axis annotation ,etc). By
+   default, numerical values are displayed along the long edge of the
+   ramp. The values corresponding to the maximum and minimum colour
+   index are supplied using parameters HIGH and LOW. Intermediate colour
+   indices are labelled with values which are linearly interpolated
+   between these two extreme values.
 
-   The situation of the key is defined by the co-ordinates of a pair
-   of opposite corners of a rectangular region.  You may specify
-   these using one of the following methods:
-     1.  moving a cursor and pressing a button on the mouse or
-         trackerball;
-     2.  obtaining bounds from the environment (in normalised
-         co-ordinates of the reference picture).
+   The rectangular area in which the ramp (plus annotations) is drawn
+   may be specified either using a graphics cursor, or by specifying the
+   co-ordinates of two corners using parameters LBOUND and UBOUND.
+   Additionally, there is an option to make the ramp fill the current
+   picture. See parameter MODE. The ramp may be constrained to the
+   current picture using parameter CURPIC.
+
+   The appearance of the annotation my be controlled in detail using
+   the STYLE parameter.
 2 Parameters
 For information on individual parameters, select from the list below:
-3 ANNOTA
-ANNOTA = _LOGICAL (Read)
-   ANNOTA is TRUE if the colour table is to be annotated with the
-   pen numbers.  Note a squarer picture should be created so that
-   the annotations are legible. [FALSE]
 3 CURPIC
 CURPIC = _LOGICAL (Read)
    If CURPIC is TRUE, the colour table key is to lie within the
    current picture, otherwise the new picture can lie anywhere
-   within the BASE picture.  It is ignored when the
+   within the BASE picture.  This parameter ignored if the
    current-picture mode is selected. [FALSE]
 3 DEVICE
 DEVICE = DEVICE (Read)
@@ -17163,6 +17158,29 @@ DEVICE = DEVICE (Read)
    indices.  It must also not reset when the device is opened
    (since the colour table would be lost) unless parameter LUT
    does not have the null value.  [Current image-display device]
+3 FRAME
+FRAME = LITERAL (Read)
+   Specifies the co-ordinate Frame of the positions supplied using
+   parameters LBOUND and UBOUND. The following Frames will always
+   be available:
+
+   - GRAPHICS -- gives positions in millimetres from the bottom left
+   corner of the plotting surface.
+
+   - BASEPIC -- gives positions in a normalised system in which the
+   bottom left corner of the plotting surface is (0,0) and the
+   shortest dimension of the plotting surface has length 1.0. The
+   scales on the two axes are equal.
+
+   - CURPIC -- gives positions in a normalised system in which the
+   bottom left corner of the current picture is (0,0) and the
+   shortest dimension of the current picture has length 1.0. The
+   scales on the two axes are equal.
+
+   There may be additional Frames available, describing previously
+   displayed data. If a null value is supplied, the current Frame
+   associated with the displayed data (if any) is used. This parameter
+   is only accessed if parameter MODE is set to "XY". [BASEPIC]
 3 HIGH
 HIGH = _REAL (Read)
    The value corresponding to the maximum colour index.  It is
@@ -17170,10 +17188,14 @@ HIGH = _REAL (Read)
    is null (!) the maximum colour index is used.
    [Current display linear-scaling maximum]
 3 LBOUND
-LBOUND( 2 ) = _REAL (Read)
-   Co-ordinates of the lower bound that defines the location of
-   the colour-table plot.  These are in the world system of the
-   BASE or current picture. (XY mode)
+LBOUND = LITERAL (Read)
+   Co-ordinates of the lower left corner of the rectangular region
+   containing the colour ramp and annotation, in the co-ordinate
+   Frame specified by parameter FRAME (supplying a colon ":" will
+   display details of the selected co-ordinate Frame). The position
+   should be supplied as a list of formatted axis values separated
+   by spaces or commas. A null (!) value causes the lower left corner
+   of the BASE or (if CURPIC is TRUE) current picture to be used.
 3 LOW
 LOW = _REAL (Read)
    The value corresponding to the minimum colour index.  It is
@@ -17202,12 +17224,20 @@ LUT = NDF (Read)
 3 MODE
 MODE = LITERAL (Read)
    Method for defining the position, size and shape of the
-   colour-table key.  The options are "Cursor" for cursor mode
-   (provided the graphics device has one), "XY" to select x-y
-   limits via the parameter system, and "Picture" where the
-   whole of the current picture is used.  Additional positioning
-   options are available by using other KAPPA applications to
-   create new pictures and then specifying the picture mode.
+   rectangular region containing the colour ramp and annotation.
+   The options are:
+
+   - "Cursor" --  The graphics cursor is used to supply two
+   diametrically opposite corners or the region.
+
+   - "XY" -- The parameters LBOUND and UBOUND are used to get the
+   limits.
+
+   - "Picture" -- The whole of the current picture is used.
+   Additional positioning options are available by using other
+   KAPPA applications to create new pictures and then specifying
+   the picture mode.
+
    ["Cursor"]
 3 NN
 NN = _LOGICAL (Read)
@@ -17217,19 +17247,63 @@ NN = _LOGICAL (Read)
    colour.  If NN is FALSE, linear interpolation is used, and
    this is suitable for smoothly varying colour tables.  NN is
    ignored unless LUT is not null. [FALSE]
-3 OUTLINE
-OUTLINE = _LOGICAL (Read)
-   If OUTLINE is TRUE, a box that delimits the key is drawn.  A
-   box is always drawn when there are annotations. [TRUE]
+3 STYLE
+STYLE = GROUP (Read)
+   A group of attribute settings describing the plotting style to use
+   for the annotation.
+
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported).
+
+   Axis 1 is always the "data value" axis, whether it is displayed
+   horizontally or vertically. So for instance, to set the label
+   for the data value axis, assign a value to "Label(1)" in the
+   supplied style. [current value]
 3 UBOUND
-UBOUND( 2 ) = _REAL (Read)
-   Co-ordinates of the upper bound that defines the location
-   of the colour-table plot.  These are in the world system of the
-   BASE or current picture. (XY mode)
+UBOUND = LITERAL (Read)
+   Co-ordinates of the upper right corner of the rectangular region
+   containing the colour ramp and annotation, in the co-ordinate
+   Frame specified by parameter FRAME (supplying a colon ":" will
+   display details of the selected co-ordinate Frame). The position
+   should be supplied as a list of formatted axis values separated
+   by spaces or commas. A null (!) value causes the lower left corner
+   of the BASE or (if CURPIC is TRUE) current picture to be used.
 2 Examples
-lutview annota
+lutview
    Draws an annotated colour table at a position selected via
    the cursor on the current image-display device.
+
+lutview style="'edge(1)=right,label(1)=Data value in m31'"
+   As above, but the data values are labelled on the right edge of
+   the box, and the values are labelled with the string "Data value
+   in m31".
+
+lutview style='"textlab(1)=0,width(border)=3,colour(border)=white"'
+   No textual label is drawn for the data values, and a thicker than
+   usual white box is drawn around the colour ramp.
+
+lutview style="'textlab(1)=0,numlab(1)=0,majticklen(1)=0'"
+   Only the border is drawn around the colour ramp.
+
+lutview style="'textlab(1)=0,numlab(1)=0,majticklen(1)=0,border=0'"
+   No annotation at all is drawn.
 
 lutview p
    Draws a colour table that fills the current picture on the
@@ -17239,68 +17313,21 @@ lutview curpic
    Draws a colour table within the current picture positioned
    via the cursor.
 
-lutview mode=xy outline device=ikon \
-   Draws a outlined colour table within the BASE picture
-   on the Ikon, defined by x-y extents.
-
-lutview xy lut=my_lut device=lj250_p lbound=[0.92,0.2]
-
-ubound=[0.98,0.8]
+lutview xy lut=my_lut device=ps_p lbound=[0.92,0.2] ubound=[0.98,0.8]
    Draws the colour table in the NDF called my_lut with an
-   outline within the BASE picture on the device lj250_p, defined
+   outline within the BASE picture on the device ps_p, defined
    by the x-y bounds (0.92,0.2) and (0.98,0.8).  In other words
    the plot is to the right-hand side with increasing colour
    index with increasing y position.
-2 Notes
--  When annotations are selected their precise height and the
-width of the colour table, depend on the largest number of
-significant figures in an annotation.  The colour table will have
-an aspect ratio in the range 0.17--0.45, and the text height is
-adjusted to fit the characters within the available room.  The
-default aspect ratio is 0.275.
-
--  The text has a maximum height as a fraction of width (if
-oblate) or height of the initial picture (BASE or current) so
-that ridiculously large characters are drawn for big keys.
-However, this can result in characters which are too small if for
-example a highly oblate colour table is plotted within a strongly
-prolate current picture.
-
--  A FRAME picture (when there are annotations) and the
-colour-table picture are stored in the graphics database. These
-have names FRAME and KEY respectively.  On completion the
-current picture is unchanged.
-
--  Parameters LOW and HIGH are single precision because they are
-also required to define world co-ordinates of the graphics.  Thus
-this application is not suitable for double-precision data that
-have been scaled over a range near the precision of real values.
 2 Related_Applications
    KAPPA: DISPLAY, LUTABLE; Figaro: COLOUR.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
- 1990 July 24 (MJC):
-    Original version.
-
- 1991 April 9 (MJC):
-    Added AGI begin-and-end block.  Added LOW and HIGH parameters
-    and made to display only the non-reserved pens.
-
- 1991 July 31 (MJC):
-    No longer redefines colours of SGS pens to predefined state if
-    workstation has dynamic colour representation, now there is
-    palette control.
-
- 1992 March 3 (MJC):
-    Replaced AIF parameter-system calls by the extended PAR
-    library.
-
- 1992 December 1 (MJC):
-    LOW and HIGH default to the current linear scaling limits.
-
- 1993 January 14 (MJC):
-    Added LUT and NN parameters.
+ 15-OCT-1999 (DSB):
+    Original AST/PGPLOT version. Based on previous version by MJC.
 
 1 LUTZEBRA
 Loads a pseudo-contour lookup table.

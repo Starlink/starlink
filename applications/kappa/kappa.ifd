@@ -5528,108 +5528,100 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
-         parameter annota {
+         parameter curpic {
             position 4
             type _LOGICAL
             vpath DEFAULT
-            ppath DEFAULT
-            prompt {Annote the colour table?}
-            helpkey *
-            default TRUE
-          }
-
-         parameter curpic {
-            position 5
-            type _LOGICAL
-            vpath DEFAULT
-            ppath DEFAULT
             prompt {Restrict to the current picture?}
-            helpkey *
+            ppath DEFAULT
             default FALSE
+            helpkey *
           }
-
          parameter device {
+            position 5
             ptype DEVICE
-            position 6
             vpath GLOBAL PROMPT
+            prompt {Name of display device}
             ppath GLOBAL CURRENT
             association <-GLOBAL.IMAGE_DISPLAY
-            prompt {Name of display device}
             helpkey *
           }
-
+         parameter epoch {
+            type _DOUBLE
+            prompt {Epoch of observation}
+            ppath DYNAMIC CURRENT
+            helpkey *
+          }
+         parameter frame {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Required coordinate Frame}
+            ppath DEFAULT
+            default BASEPIC
+            helpkey *
+          }
          parameter high {
             position 3
             type _REAL
             vpath GLOBAL DEFAULT
-            ppath GLOBAL DEFAULT
             prompt {Value corresponding to highest colour index}
-            association <-GLOBAL.DISP_SCALE_HIGH
+            ppath GLOBAL DEFAULT
             default !
+            association <-GLOBAL.DISP_SCALE_HIGH
             helpkey *
           }
-
          parameter lbound {
-            size *
-            type _REAL
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
+            type LITERAL
             prompt {Lower bound}
+            ppath DYNAMIC
             helpkey *
           }
-
          parameter low {
             position 2
             type _REAL
             vpath GLOBAL DEFAULT
-            ppath GLOBAL DEFAULT
             prompt {Value corresponding to lowest colour index}
-            association <-GLOBAL.DISP_SCALE_LOW
+            ppath GLOBAL DEFAULT
             default !
+            association <-GLOBAL.DISP_SCALE_LOW
             helpkey *
           }
-
          parameter lut {
             type NDF
             access READ
             vpath DEFAULT
             prompt {NDF containing lookup table}
-            helpkey *
             default !
+            helpkey *
           }
-
          parameter mode {
             position 1
             type LITERAL
-            vpath DYNAMIC
-            ppath DYNAMIC
+            vpath DEFAULT
             prompt {Positioning method}
+            ppath DEFAULT
+            default CURSOR
             helpkey *
           }
-
          parameter nn {
             type _LOGICAL
+            vpath DEFAULT
             prompt {Nearest-neighbour mapping of lookup table?}
-            vpath DEFAULT
             default FALSE
             helpkey *
           }
-
-         parameter outline {
-            type _LOGICAL
-            vpath DEFAULT
-            ppath DEFAULT
-            prompt {Draw an outline around the colour table?}
+         parameter style {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            prompt {Plotting style for the annotation}
+            ppath CURRENT DEFAULT
+            default !
             helpkey *
-            default FALSE
           }
-
          parameter ubound {
-            size *
-            type _REAL
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
+            type LITERAL
             prompt {Upper bound}
+            ppath DYNAMIC
             helpkey *
           }
 
