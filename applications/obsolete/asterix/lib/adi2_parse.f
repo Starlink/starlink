@@ -194,6 +194,7 @@
           FPATH(FPLEN+1:) = FSPEC(NCP+1:FLEN)
           FPLEN = FPLEN + FLEN - NCP
         END IF
+        CALL CHR_UCASE( FPATH )
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
