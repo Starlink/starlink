@@ -949,7 +949,7 @@ static int ResampleBlock( AstMapping *this, const double *linear,
 }
 
 /*
-*++
+*+
 *  Name:
 c     astResample<X>
 f     AST_RESAMPLE<X>
@@ -1001,7 +1001,7 @@ f     IN_VAR( * ) = <XTYPE> (Given)
 
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
-*--
+*-
 */
 #define MAKE_RESAMPLE(name,abbrev,type) \
 static int Resample##abbrev( AstMapping *this, int ndim_in, \
