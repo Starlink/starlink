@@ -868,38 +868,38 @@
 
 *  Get the mean variance from a byte array.
                   IF ( ITYPE .EQ. '_BYTE' ) THEN
-                     CALL CCG1_CALVB( %VAL(IVAR), NPXIN(I), MEANV, 
-     :                                STATUS ) 
+                     CALL CCG1_MEANB( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+     :                                MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from a double-precision array.
                   ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                     CALL CCG1_CALVD( %VAL(IVAR), NPXIN(I), MEANV, 
-     :                                STATUS ) 
+                     CALL CCG1_MEANB( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+     :                                MEANV, VALPIX, STATUS )
                   
 *  Get the mean variance from an integer array.
                   ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-                     CALL CCG1_CALVI( %VAL(IVAR), NPXIN(I), MEANV, 
-     :                                STATUS ) 
+                     CALL CCG1_MEANI( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+     :                                MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from a single-precision array.
                   ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-                     CALL CCG1_CALVR( %VAL(IVAR), NPXIN(I), MEANV, 
-     :                                STATUS ) 
+                     CALL CCG1_MEANR( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+     :                                MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from an unsigned-byte array.
                   ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-                     CALL CCG1_CALVUB( %VAL(IVAR), NPXIN(I), MEANV, 
-     :                                 STATUS ) 
+                     CALL CCG1_MEANUB( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+     :                                 MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from an unsigned-word array.
                   ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-                     CALL CCG1_CALVUW( %VAL(IVAR), NPXIN(I), MEANV, 
-     :                                 STATUS ) 
+                     CALL CCG1_MEANUW( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+     :                                 MEANV, VALPIX, STATUS )
 
 *  Get the mean variance from a word array.
                   ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-                     CALL CCG1_CALVW( %VAL(IVAR), NPXIN(I), MEANV, 
-     :                                STATUS ) 
+                     CALL CCG1_MEANW( .TRUE., %VAL( IVAR ), NPXIN( I ), 
+     :                                MEANV, VALPIX, STATUS )
  
                   END IF
                   VARFAC = MEANV 
