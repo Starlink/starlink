@@ -135,7 +135,7 @@ F77_SUBROUTINE(psx_cuserid)( CHARACTER(user), INTEGER(status) TRAIL(user) )
 #else
    char tempuser[2];             /* Array to hold defaulted string */
 #endif
-   char *p_tempuser;		 /* Return value of calling cuserid	    */
+   char *p_tempuser = NULL;	 /* Return value of calling cuserid	    */
 #ifdef USE_GETPWUID
    struct passwd * pw;
 #endif
