@@ -15,7 +15,7 @@ $inc = "-I/usr/include";
 # This is the list of libraries required to use ams
 $amslibs = qx/ams_link_adam/;
 
-die "No NDF libraries were found.\n This may imply that the
+die "No AMS libraries were found.\n This may imply that the
 ams_link_adam command is not in your path." if $amslibs !~ /./;
 
 # Firstly I need to remove the link directives from the library list
