@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/csh 
 #+
 #  Name:
 #     CCDBIG
@@ -59,7 +59,8 @@
 #  Copy required files from source directory.
       if ( -e $CCDBIG_DIR/ccdbig_obj.dat )  cp $CCDBIG_DIR/ccdbig_obj.dat .
       if ( -e $CCDBIG_DIR/ccdtest_ard.dat ) cp $CCDBIG_DIR/ccdtest_ard.dat .
-      if ( -x $CCDBIG_DIR/timediff )        cp $CCDBIG_DIR/timediff .
+      if ( -e $CCDBIG_DIR/reslog )          cp $CCDBIG_DIR/reslog .
+      if ( ! -x ./reslog )                  chmod +x reslog
       if ( ! -e ccdbig_obj.dat ) then
         echo "Can't find file of objects ccdbig_obj.dat - aborting"
         goto EXIT
@@ -87,32 +88,26 @@
       endif
 
 #  Write some startup info to the log file
-      set timelogfile=ccdbig_time.log
+      set timelogfile = ccdbig_time.log
+      set labelfile = current_label
       printf '\n\n\n\n'                                   >>$timelogfile
       uname -a                                            >>$timelogfile
       uptime                                              >>$timelogfile
       date                                                >>$timelogfile 
       du -sk $PWD                                         >>$timelogfile
-      printf "\n%7s%7s%12s\n\n" 'Pixels ' Objects Command >>$timelogfile 
+      printf "\n%7s%7s%12s\n"   'Pixels ' Objects Command >>$timelogfile 
 
 #  Set up aliases for logging run times to a file.
-#  Usage of these is:
-#     startwatch
-#     (run command)
-#     stopwatch
-#     timelog command_name
-#  which writes a line of the form
-      set tmpfile = ./tmpfile
-      alias startwatch 'time >$tmpfile; set tstart = "`cat $tmpfile`"'
-      alias stopwatch  'time >$tmpfile; set tstop  = "`cat $tmpfile`"'
-      alias timelog    'printf "%7d%7d%12s:  " $frame_pixels $objects \!\!:1 >>$timelogfile ; timediff "$tstart" "$tstop" >>$timelogfile'
+      alias log_start \
+         'printf "%7d%7d%12s:  " $frame_pixels $objects \!\!:1 >$labelfile'
+      ./reslog $timelogfile &
 
 #  Loop over sizes of images
-      foreach frame_pixels (3000 3500 4000 4500 5000)
+      foreach frame_pixels (500 1000 1500 2000)
          @ field_pixels = ($frame_pixels * 15) / 10
 
 #  Loop over number of objects in frame
-         foreach density (5 25)
+         foreach density (5)
             @ objects = ($field_pixels * $field_pixels * $density) / 100000
             if ($objects < 25) set objects = 25 
 
@@ -145,7 +140,7 @@
 
 #  Found the ARD file setup CCDPACK appropriately.
 #  We use the same ARD file regardless of size.  This is probably OK.
-               startwatch
+               log_start ccdsetup
                ccdsetup \
                   bounds="[1,$lobias,$hibias,$frame_pixels]" \
                   extent="[$loframe,$hiframe,1,$frame_pixels]" \
@@ -157,14 +152,11 @@
                   direction=x \
                   mask=ccdtest_ard.dat \
                   reset accept
-               stopwatch
-               timelog ccdsetup
 #              end ccdsetup
             else
                echo "Cannot locate ARD file; mask not applied"
 
 #  Do the "device" setup without an ARD file.
-               startwatch
                ccdsetup \
                   bounds="[1,$lobias,$hibias,$frame_pixels]" \
                   extent="[$loframe,$hiframe,1,$frame_pixels]" \
@@ -176,8 +168,6 @@
                   direction=x \
                   reset accept
 #              end ccdsetup
-               stopwatch
-               timelog ccdsetup
             endif
 
 #  Try to locate the file containing the long list of objects.
@@ -208,6 +198,7 @@
             @ x2hi = $x2lo + $frame_pixels - 1
             @ y1hi = $y1lo + $frame_pixels - 1
             @ y2hi = $y2lo + $frame_pixels - 1
+            log_start ccdgenerate
             ccdgenerate \
                nseq=2 \
                ubnds="[$x1hi,$y1hi,$x2hi,$y2hi]" \
@@ -215,8 +206,6 @@
      	       file=ccdtest_obj.dat \
      	       accept
 #           end ccdgenerate
-            stopwatch
-            timelog ccdgenerate
 
 #  Temporary fix for inconsistent versions of CCDPACK on Sun and Linux:
             foreach digit (1 2 3 4)
@@ -230,21 +219,16 @@
                echo " "
                echo "  Displaying one raw target frame."
                echo " "
-               startwatch
                lutheat \
                   accept
 #              end lutheat
-               stopwatch
-               timelog lutheat
-               startwatch
+               log_start display
                display \
                   in=data1 \
                   mode=percentiles \
                   percentiles='[2,98]' \
                   accept
 #              end display
-               stopwatch
-               timelog display
             endif
  
 #  Add note to logfile.
@@ -265,25 +249,21 @@
             echo "  by median stacking the ordinary bias frames. This process"
             echo "  reduces the noise introduced in debiassing."
             echo " "
-            startwatch
+            log_start makebias
             makebias \
                in='bias*' \
                out=master_bias \
                preserve=true \
                accept
 #           end makebias
-            stopwatch
-            timelog makebias
 
 #  DEBIAS all frames (including flatfields)
-            startwatch
+            log_start debias
             debias \
                in='"data?,ff?"' \
                out='debias_*' \
                accept
 #           end debias
-            stopwatch
-            timelog debias
 
 #  Display all the debiassed frames.
            if ( "$device" != "NONE" ) then
@@ -294,15 +274,13 @@
               echo "  but are not displayed."
               echo " "
               gdclear \\
-              startwatch
+              log_start display
               display \
                  in=debias_data1 \
                  mode=percentiles \
                  percentiles='[2,98]' \
                  accept
 #             end display
-              stopwatch
-              timelog display
            endif
 
 #  Create a flat field master
@@ -313,14 +291,12 @@
            echo "   As in the creation of the master bias frame median stacking is"
            echo "   used to combine a series of flatfields."
            echo " "
-           startwatch
+           log_start makeflat
            makeflat \
               in='debias_ff?' \
               out=master_flat \
               accept
 #          end makeflat
-           stopwatch
-           timelog makeflat
 
 #  Display the master flatfield.
            if ( "$device" != "NONE" ) then 
@@ -329,49 +305,40 @@
               echo "  is a ramp, normal flatfields are not like this). "
               echo " "
               gdclear \\
-              startwatch
+              log_start display
               display \
                  in=master_flat \
                  mode=percentiles \
                  percentiles='[2,98]' \
                  accept
 #             end display
-              stopwatch
-              timelog display
            endif
 
 #  Flatfield all the DATA frames
            echo " "
            echo "  Flatfielding all the target frames."
            echo " "
-           startwatch
+           log_start flatcor
            flatcor \
               in='debias_data?' \
               out='*|debias|reduced|' \
               accept
 #          end flatcor
-           stopwatch
-           timelog flatcor
            if ( "$device" != "NONE" ) then
               echo " "
               echo "  Displaying one flatfielded target frame."
               echo " "
               gdclear \\
-              startwatch
               lutheat \
                  accept
 #             end lutheat
-              stopwatch
-              timelog lutheat
-              startwatch
+              log_start display
               display \
                  in=reduced_data1 \
                  mode=percentiles \
                  percentiles='[2,98]' \
                  accept
 #             end display
-              stopwatch
-              timelog display
            endif
 
 #  Now proceed to test out some alignment functionality.
@@ -385,7 +352,7 @@
            echo "  The first stage of the automated registration process is"
            echo "  to detect the positions of objects (stars and galaxies)."
            echo "  "
-           startwatch
+           log_start findobj
            findobj \
               in='reduced_data?' \
               outlist='*.find' \
@@ -393,8 +360,6 @@
               binfrac=0 \
               accept
 #          end findobj
-           stopwatch
-           timelog findobj
            if ( "$device" != "NONE" ) then
 
 #  Display the objects located.
@@ -402,15 +367,13 @@
               echo "  Displaying the positions of the object which have been"
               echo "  detected."
               echo " "
-              startwatch
+              log_start plotlist
               plotlist \
                  inlist='reduced_data1' \
                  palnum=4 \
                  mtype=23 \
                  accept
 #             end plotlist
-              stopwatch
-              timelog plotlist
            endif
      	
 #  Determine matches between the positions.
@@ -418,22 +381,20 @@
            echo "  After locating the objects it is now necessary to determine"
            echo "  which objects correspond."
            echo " "
-           startwatch
+           log_start findoff
            findoff \
               inlist='reduced_data?' \
               ndfnames=true \
               outlist='*.off' \
               accept
 #          end findoff
-           stopwatch
-           timelog findoff
            if ( "$device" != "NONE" ) then
 
 #  Display the objects located.
               echo " "
               echo "  Displaying the labels of objects which have been matched."
               echo " "
-              startwatch
+              log_start plotlist
               plotlist \
                  inlist='reduced_data1' \
                  palnum=3 \
@@ -442,8 +403,6 @@
                  msize=1.5 \
                  accept
 #             end plotlist
-              stopwatch
-              timelog plotlist
            endif
 
 #  Set the registration structures.
@@ -454,14 +413,12 @@
            echo "  transformation types. It also writes the information into the"
            echo "  NDFs so that other routines may use it."
            echo " "
-           startwatch
+           log_start register
            register \
               inlist='reduced_data?' \
               fittype=1 \
               accept
 #          end register
-           stopwatch
-           timelog register
 
 #  Resample the data.
            echo " "
@@ -472,20 +429,18 @@
            echo "  exposure time) into a single frame which shows the complete"
            echo "  data coverage for the target area."
            echo " "
-           startwatch
+           log_start tranndf
            tranndf \
               in='reduced_data?' \
               out='*|reduced|resamp|' \
               accept
 #          end tranndf
-           stopwatch
-           timelog tranndf
 
 #  Normalise it.
            echo " "
            echo "  Normalising the aligned datasets."
            echo " "
-           startwatch
+           log_start makemosnorm
            makemos \
               in='resamp_data?' \
               scale=true \
@@ -493,15 +448,13 @@
               modify=true \
               out=\! \
               accept
-           stopwatch
-           timelog makemosnorm
 
 
 #  Normalise it.
            echo " "
            echo "  Combining the aligned datasets."
            echo " "
-           startwatch
+           log_start makmoscomb
            makemos \
               in='resamp_data?' \
               scale=false \
@@ -509,8 +462,6 @@
               out=mosaic \
               accept
 #          end makemos
-           stopwatch
-           timelog makemoscomb
 
 #  Display the final mosaic.
            if ( "$device" != "NONE" ) then 
@@ -518,15 +469,13 @@
               echo "  Displaying the final mosaic."
               echo " "
               gdclear \\
-              startwatch
+              log_start display
               display \
                  in=mosaic \
                  mode=percentiles \
                  percentiles='[2,98]' \
                  accept
 #             end display
-              stopwatch
-              timelog display
            endif
 
 #  Exercise is completed.
@@ -538,6 +487,8 @@
         end        # density loop
 
      end           # frame_pixels loop
+
+     log_start "done"
 
 #  Exit label
      EXIT:
