@@ -12,7 +12,7 @@
   (A&amp;AS, 76, 263).
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>cnf</build><build>ems</build><link>starx</link><link>ems</link><link>cnf</link><link>gwm</link><link>gns</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>cnf</build><build>ems</build><link>starx</link><link>ems</link><link>cnf</link><link>gwm</link><link>gns</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

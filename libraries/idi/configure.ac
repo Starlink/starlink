@@ -24,6 +24,8 @@ AC_HEADER_STDC
 AC_PATH_XTRA
 AC_PROG_LIBTOOL
 
+dnl    make check requires starlink monolith
+STAR_MONOLITHS
 
 STAR_CNF_COMPATIBLE_SYMBOLS
  

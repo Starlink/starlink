@@ -61,5 +61,5 @@ gnsrun_idi_LDADD = libidi.la `gwm_link` `gns_link` `cnf_link` $(X_LIBS) $(X_EXTR
 
 idi_test_TASKS =
 idi_test_SOURCES = idi_test.f
-idi_test_LDADD = $(LDADD) `$(srcdir)/idi_link_adam` `ndf_link_adam`
+idi_test_LDADD = $(LDADD) `$(srcdir)/idi_link_adam` `ndf_link_adam` -lpthread
 
