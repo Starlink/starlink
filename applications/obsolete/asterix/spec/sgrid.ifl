@@ -38,11 +38,11 @@ INTERFACE SGRID
 
    PARAMETER PARS
       POSITION 3
-      TYPE '_INTEGER'
+      TYPE 'LITERAL'
       VPATH 'PROMPT'
       PPATH 'DEFAULT'
-      PROMPT 'Fit parameter for grid axes'
-      HELP   'Enter parameter numbers separated by commas or spaces'
+      PROMPT 'Fit parameters for grid axes'
+      HELP   'use ASTERIX list notation, eg. 1,2 or 1:3,5,8:*"
    ENDPARAMETER
 
    PARAMETER ERR

@@ -13,8 +13,8 @@
        POSITION 2
        TYPE 'LITERAL'
        VPATH 'PROMPT'
-       PROMPT 'Axis numbers to flip - separate by spaces'
-       HELP 'The direction of these axes will reversed. eg. 1 3'
+       PROMPT 'Axis numbers to flip'
+       HELP 'Use ASTERIX list notation, eg. 1,2 or 1:3, 2:*'
     ENDPARAMETER
 
     PARAMETER OUT
