@@ -37,6 +37,10 @@ versionid="upd5">Assorted changes, to describe significant new functionality.
 Added page-selection features, and documented them.
 </change>
 
+<distribution string="1.0-6" date="18-SEP-1999" author="ng" versionid=upd6>
+Add --enable-fake-progname.
+</distribution>
+
 </history>
 
 <copyright>
@@ -360,11 +364,12 @@ font files.
 examples.</update>
 <update versionid="upd3">Described new functionality for environment
 variable.</update>
+
+<subsubsect id=usage.fonts.finding>Finding fonts
 <update versionid="post-upd5">Added a discussion of the foibles of the
 texmf.cnf configuration file when it comes to finding fonts.
 </update>
-
-<subsubsect>Finding fonts
+<update versionid="upd6">Mentioned &ddash;enable-fake-progname</update>
 
 <p>The program searches in up to three places for fonts.
 
@@ -416,13 +421,13 @@ Now, <code/$SELFAUTOPARENT/ is a variable which is set
 by the kpathsea library to be the grandparent directory of the executable
 which uses the library.  So, for <code>/usr/bin/{tex,latex,mktexpk,...}</code>,
 it's <code>/</code>, but if your <code/dvi2bitmap/ binary doesn't live
-with the other &tex;ware then its <code/$SELFAUTOPARENT/ will be
+with the other dvi-ware then its <code/$SELFAUTOPARENT/ will be
 different, so that <code/dvi2bitmap/ will look for fonts in a
 <em/different/ place from the place where <code/mktexpk/ put them when
 it successfully generated them.
 
 <p>I would argue fairly strongly that having the <code/VARTEXFONTS/
-directory depend on the location of the &tex;ware <em/executables/ is
+directory depend on the location of the dvi-ware <em/executables/ is
 a very silly thing to do, but unfortunately it's true in at least one
 common &tex; distribution.  If you've fallen foul of this, then you
 can either
@@ -432,6 +437,12 @@ second example above; or
 <li>install <code/dvi2bitmap/ along with the other &tex;ware.
 </ul>
 I'd prefer the first alternative, myself.
+
+<p>A third option is to get <code/dvi2bitmap/ to work around the
+problem, by telling it to claim to be some program which <em/is/
+installed along with the other dvi-ware.  You do this with the
+<code/&ddash;enable-fake-progname/ option to the configuration
+script.  See <ref id=install.nonstarlink> for details.
 
 
 <subsubsect>Generating fonts
@@ -533,6 +544,7 @@ project machines).
 Largely rewrote the configuration instructions, in an attempt to make
 them clearer.
 </update>
+<update versionid="upd6">Mentioned --enable-fake-progname</update>
 
 <p>To configure and build:
 <verbatim>
@@ -615,6 +627,22 @@ But don't listen to me: there's a much fuller account of the whole
 sorry business in the <webref
 url='http://www.lib.ox.ac.uk/internet/news/faq/archive/graphics.fileformats-faq.part1.html'
 >comp.graphics.misc FAQ</webref>
+
+<dt><code/&ddash;enable-fake-progname/
+
+<dd>This option enables a workaround which allows <code/dvi2bitmap/ to
+have the expected behaviour when (a) you do not install
+<code/dvi2bitmap/ along with the other dvi-ware, and (b) your
+<code/texmf.cnf/ file has <code/VARTEXFONTS/ or similar depend on one
+of the <code/SELFAUTO.../ variables.  This option makes
+<code/dvi2bitmap/ claim to be a different DVI-reading program which
+<em/is/ installed in the standard place.  See <ref
+id=usage.fonts.finding> for discussion.  The configuration script uses
+the location of the <code/xdvi/ program by default, but you can
+override this by giving the full path to an alternative as an argument
+to this option.
+<p>Since this uses undocumented behaviour of the library (`use the
+source, Luke!'), you probably shouldn't enable it unless you have to.
 
 </dl>
 
