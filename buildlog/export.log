@@ -137,4 +137,4 @@ create_archives:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/aglib/build.xml:319: /apps/cvsbuild/java/source/aglib/docs not found.
 
-Total time: 2 minutes 52 seconds
+Total time: 3 minutes 10 seconds
