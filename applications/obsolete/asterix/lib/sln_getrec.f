@@ -88,11 +88,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'SLN_CMN'                                 ! SLN common block
-*       SLN_INIT = LOGICAL (given)
-*         SLN class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       INTEGER			ID, IREC
@@ -105,7 +101,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			SLN0_BLK		! Ensures inclusion
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
 
 *  Local Variables:
       INTEGER			IARG(3)			! Method inputs
@@ -116,7 +113,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. SLN_INIT ) CALL SLN0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( SLN_PKG ) ) CALL SLN0_INIT( STATUS )
 
 *  Locate file identifier
       CALL ADI_GETFILE( ID, IARG(1), STATUS )
