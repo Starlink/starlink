@@ -82,7 +82,6 @@
 *  isn't always enough resolution to get a unique values, machines are
 *  getting fast... May not work for non-UNIX.
          CALL PSX_GETPID( SEED, STATUS )
-         WRITE(*,*) SEED
          CALL PDA_DSTART( SEED )
       END IF
 
