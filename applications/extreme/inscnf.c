@@ -151,7 +151,7 @@
 
 
 
-#include "tag.h"
+#include "ygen.h"
 
 
    struct outchr {
@@ -546,6 +546,4 @@
    }
 
 
-
-
-
+/* $Id$ */
