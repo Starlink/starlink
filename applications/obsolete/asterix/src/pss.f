@@ -117,7 +117,6 @@
 
 *    Initialise sub-systems
       CALL AST_INIT()
-      CALL SSO_INIT()
 
 *    Zero the common block
       CALL PSS_CMN_INIT( STATUS )
@@ -222,8 +221,7 @@
       CALL PSS_OP_CLOSE( STATUS )
 
 *    Inform environment of errors
- 99   CALL SSO_CLOSE()
-      CALL AST_CLOSE()
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
