@@ -25,55 +25,60 @@
 *  Description:
 *     This routine rebins the demodulated data from SCUBA MAP observations
 *     onto a rectangular mesh by convolving it with a weighting function.
+*     Currently linear and bessel weighting function are supported.
+*
 *     The width of the Bessel function is such that it should preserve all
 *     spatial information obtained by the telescope at the wavelength of
 *     observation, but suppress higher spatial frequencies. To minimise edge
 *     effects the Bessel function is truncated at a radius of 10 half-widths
 *     from the centre, and apodized over its outer third by a cosine function.
+*     A linear weighting function is also available which works out
+*     to one half-width - this has the advantage that it is much faster to
+*     process and is much less susceptible to edge effects. 
 *
 *     Viewed in frequency space the method consists of Fourier transforming 
 *     the input dataset(s), multiplying the transform by a cylindrical top-hat
 *     (the F.T. of the Bessel function), then transforming back into image
 *     space.
 *
-*     A linear weighting function is also available which works out
-*     to one half-width..
-*
-*     The application can read in up to 10 separate input datasets. The 
-*     output map will be large enough to include all data points.
+*     The REBIN task can not be fully automated since the INPUT parameters
+*     are reused for each dataset. Datasets are entered until a null parameter
+*     value (!) is returned for IN.
 
 *  Usage:
-*     Invoked via the REBIN command.
+*     rebin REBIN_METHOD OUT_COORDS PIXSIZE_OUT
 
 *  ADAM parameters:
 *     REF = NDF (Read)
-*        The name of the first NDf to be rebinned. [Global]
+*        The name of the first NDF to be rebinned.
 *     IN = NDF (Read)
 *        The name of the input file to be rebinned. This parameter is requested
 *        repeatedly until a NULL value (!) is supplied.
 *     INTEGRATIONS = _INTEGER (Read)
 *        The inegrations that should be selected from the input data. Pass
 *        zero to select all integration (ie if you have gone into this mode
-*        by mistake). This question is only asked if SELECT_INTS is true [0]
+*        by mistake). This question is only asked if SELECT_INTS is true.
 *     LAT_OUT = _CHAR (Read)
-*        The latitude of the output map centre [map centre of first map]
+*        The latitude of the output map centre. The supplied default value
+*        is that of the map centre of the first map.
 *     LONG_OUT = _CHAR (Read)
-*        The longitude of the output map centre [map centre of first map]
+*        The longitude of the output map centre. The supplied default value 
+*        is that of the map centre of the first map.
 *     OUT = NDF (Write)
 *        The name of the NDF that will contain the rebinned map.
 *     OUT_COORDS = _CHAR (Read)
 *        The coordinate system of the output map. Available coordinate
-*        systems are AZimuth/El offsets, NAsmyth, RB (B1950), 
+*        systems are AZimuth/elevation offsets, NAsmyth, RB (B1950), 
 *        RJ (J2000), RD (Current epoch) and GAlactic [RJ]
 *     OUT_OBJECT = _CHAR (Read)
-*        The name of the object (ie the NDF title). []
+*        The name of the object (ie the NDF title).
 *     PIXSIZE_OUT = _REAL (Read)
 *        Size of pixels in the output map
 *     REBIN_METHOD = _CHAR (Read)
-*        The rebin method to be used.[bessel]
+*        The rebin method to be used. This can be either LINEAR or BESSEL.
 *     SELECT_INTS = _LOGICAL (Read)
 *        This parameter governs whether the user wishes to select any
-*        integrations for special treatment.[no]
+*        integrations for special treatment.
 *     SHIFT_DX = _REAL (Read)
 *        The pointing shift (in X) to be applied that would bring the
 *        maps in line.
@@ -83,20 +88,23 @@
 *     USE_INTS = _LOGICAL (Read)
 *        If you wish to discard the integrations specified by the INTEGRATIONS
 *        parameter then select 'no'. If you wish to rebin a map using only
-*        the specified integrations select 'yes' [yes]
+*        the specified integrations select 'yes'.
 *     WEIGHT = _REAL (Read)
-*        The relative weight that should be assigned to each dataset.[1.0]
+*        The relative weight that should be assigned to each dataset.
 
 *  Examples:
-*     rebin REBIN_METHOD=LINEAR
+*     rebin REBIN_METHOD=LINEAR OUT_COORDS=RJ
+*        Rebin the maps with LINEAR weighting function in J2000 RA/Dec 
+*        coordinates. You will be asked for input datasets until a null
+*        value is given.
 
 *  Notes: 
 *     For each file name that is entered, values for the parameters
 *     SELECT_INTS, WEIGHT, SHIFT_DX and SHIFT_DY are requested.
+*     - Currently LINEAR and BESSEL regridding are supported.
+*     - The application can read in up to 100 separate input datasets. 
+*     - The output map will be large enough to include all data points.
 
-*  Implementation status:
-*     - Can rebin using LINEAR or BESSEL weighting functions
-*     - Handles quality array (and bad values) correctly
 
 *  Authors :
 *     JFL: J.Lightfoot (ROE)
@@ -106,9 +114,13 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.21  1996/12/17 21:09:49  timj
-*     Write SCUPROJ to output file. (for SCUOVER)
+*     Revision 1.22  1997/01/10 19:09:12  timj
+*     Improve header documentation.
+*     Set XMAX and XMIn etc before checking for max and min of data.
 *
+c Revision 1.21  1996/12/17  21:09:49  timj
+c Write SCUPROJ to output file. (for SCUOVER)
+c
 c Revision 1.20  1996/12/13  02:38:51  timj
 c Replace DAT_FIND with CMP_.
 c Report number of good integrations. (not just total).
@@ -1919,6 +1931,11 @@ c
       OUT_PIXEL = OUT_PIXEL / REAL(R2AS)
 
 *  find the extent of the input data
+
+      XMAX = -1.0D30
+      XMIN = 1.0D30
+      YMIN = 1.0D30
+      YMAX = -1.0D30
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_RANGED (%val(BOL_RA_PTR(1)), 1,
