@@ -207,6 +207,8 @@
 
               ENDIF
 
+              CALL IMG_SETPOS(X,Y,STATUS)
+
             ENDIF
           ENDIF
 
