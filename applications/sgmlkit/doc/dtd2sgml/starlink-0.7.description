@@ -414,7 +414,9 @@ number has not (yet?) been assigned by the Starlink librarian.
   &lt;!ENTITY otherdoc PUBLIC "-//Starlink//DOCUMENT Summary SUN/123//EN" SUBDOC&gt;
 ]&gt;
 ...
-&lt;p&gt;See also &lt;docxref doc=otherdoc&gt;</example>
+&lt;p&gt;See also &lt;docxref doc=otherdoc /&gt;, particularly
+the &lt;docxref doc=otherdoc loc=vimport&gt;warning&lt;/docxref&gt;
+notes there.</example>
 </p>
 
 <p>Exactly as with the <elemref gi='ref'/> element, you can give the
@@ -444,6 +446,13 @@ corresponding document at the central <webref
 url="http://www.starlink.rl.ac.uk/docscode.html" >Starlink document
 server</webref>.  If you also supply a `loc' attribute, the system
 will add that to the end of the generated URL.</p>
+
+<p>If you want to make linking within your document more robust, you
+can generate document summaries yourself.  Try experimenting with the
+script in <code type="fspath">$STARLINK_SGML_DIR/lib/htx2summ.pl</code>
+to convert a current LaTeX-based Starlink document, and its HTX files,
+into a document summary file.  This should become easier, or even
+automatic, in future.</p>
 
 <attribute name="doc">
 <p>Indicates the document we wish to link to.  The value of this
