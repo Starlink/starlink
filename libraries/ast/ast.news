@@ -15,56 +15,93 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
-o  A new MathMap class has been introduced. This is a form of Mapping
-   that allows you to define coordinate transformations in a flexible
-   and transportable way using arithmetic operations and mathematical
-   functions similar to those available in C or Fortran.
 
-o  WARNING---INCOMPATIBLE CHANGE. Transformation functions used with
-   the IntraMap class (see, for example, astIntraReg/AST_INTRAREG) now
-   require a "this" pointer as their first argument. EXISTING
-   IMPLEMENTATIONS WHICH USE INTRAMAPS WILL NOT CONTINUE TO WORK
-   CORRECTLY WITH THIS VERSION OF AST UNLESS THIS IS ADDED. There is no
-   need for existing software to make use of this pointer, but it must be
-   present.
+o  The FitsChan class has been modified to support the latest draft FITS
 
-   This change has been introduced so that transformation functions can
-   gain access to IntraMap attributes.
+   WCS standard, described in the two papers "Representation of world
+   coordinates in FITS" (E.W.,Greisen and M.,Calabretta, dated 30th
+   November, 1999), and "Representation of celestial coordinates in
+   FITS" (M.,Calabretta and E.W.,Greisen, dated 24th September, 1999).
+   These are available at http://www.cv.nrao.edu/fits/documents/wcs/wcs.html.
 
-o  A new IntraFlag attribute has been added to the IntraMap class. This
-   allows the transformation functions used by IntraMaps to adapt to
-   produce the required transformation on a per-IntraMap basis.
+   The FITS-WCS encoding now uses these updated conventions. The main
+   changes are:
 
-o  The Plot attributes MajTickLen and MinTickLen, which control the
-   length of major and minor tick marks on coordinate axes, may now be
-   subscripted using an axis number.
+   - Rotation and scaling of pixel axes is now represented by a matrix
+   of CDj_i keywords instead of a combination of PCjjjiii and CDELTj 
+   keywords.
 
-o  The value of the Plot attribute NumLab, which controls the
-   plotting of numerical labels on coordinate axes, no longer has any
-   effect on whether labelling of a coordinate grid is interior or
-   exterior (as controlled by the Labelling attribute).
+   - Projection parameters are now associated with particular axes and
+   are represented by PVi_m keywords instead of the PROJPm keywords.
 
-o  Some support is now provided for use of the IRAF-specific "ZPX"
-   sky projection in FITS headers.
+   - The tangent plane projection ("TAN") can now include optional 
+   polynomial correction terms.
 
-o  The coordinate system "ICRS" is now recognised in FITS headers and
-   is taken to be equivalent to "FK5" (as an interim measure).
+   -   An entire set of keywords must be supplied for each set of secondary 
+   axis descriptions, and each such keyword must finish with a single
+   character indicating which set it belongs to. This means that keywords
+   which previously occupied eight characters have been shorten to seven
+   to leave room for this extra character. Thus LONGPOLE has become 
+   LONPOLE and RADECSYS has become RADESYS.
 
-o  A bug has been fixed which could cause longitude values to be
-   incorrect by 180 degrees when using cylindrical sky projections.
+o  Two new encodings have been added to the FitsChan class:
 
-o  A bug has been fixed which could result in incorrect naming of the
-   FITS sky projection parameters ProjP(0) to ProjP(9) when writing
-   them	out as FITS cards.
+   FITS-PC: This encoding uses the conventions of the now superseded
+      FITS WCS paper by E.W.,Greisen and M.,Calabretta which used
+      keywords CDELTj and PCjjjiii to describe axis scaling and rotation.
+      These are the conventions which were used by the FITS-WCS encoding
+      prior to version 1.5 of AST. This encoding is provided to allow
+      existing data which use these conventions to be read. It should not
+      in general be used to create new data.
 
-o  A bug in the FitsChan class has been fixed which could cause
-   confusion between the FITS-IRAF and FITS-WCS encoding schemes if
-   both a CD matrix and a PC matrix are erroneously present in a FITS
-   header.
+   FITS-AIPS: This encoding is based on the conventions described in the 
+      document "Non-linear Coordinate Systems in AIPS" by Eric W. Greisen
+      (revised 9th September, 1994 and available by ftp from
+      fits.cv.nrao.edu /fits/documents/wcs/aips27.ps.Z). This encoding
+      uses CROTAi and CDELTi keywords to describe axis rotation and
+      scaling.
 
-o  Some minor memory leaks have been fixed.
+o  The FitsChan class now provides some support for the IRAF-specific 
+   "TNX" sky projection, which is converted transparently into the
+   equivalent FITS "TAN" projection (see the description of the Encoding
+   attribute for details).
 
-o  A small number of documentation errors have been corrected.
+o  FrameSets originally read from a DSS encoded FITS header can now be
+   written out using the FITS-WCS encoding (a TAN projection with
+   correction terms will be used) in addition to the DSS encoding. The
+   reverse is also possible: FrameSets originally read from a FITS-WCS
+   encoded FITS header and which use a TAN projection can now be written
+   out using the DSS encoding.
+
+o  The algorithm used by the FitsChan class to verify that a FrameSet 
+   conforms to the FITS-WCS model has been improved so that FrameSets
+   including more complex mixtures of parallel and serial Mappings can be
+   written out using the FITS-WCS encoding.
+
+o  The FitsChan class has been changed so that long strings included in 
+   the description of an Object can be saved and restored without
+   truncation when using the NATIVE encoding. Previously, very long Frame
+   titles, mathematical expressions, etc. were truncated if they exceeded
+   the capacity of a single FITS header card. They are now split over
+   several header cards so that they can be restored without truncation.
+   Note, this facility is only available when using NATIVE encoding.
+
+o  The WcsMap class has been changed to support the changes made to the
+   FITS-WCS encoding in the FitsChan class:
+
+   - Projection parameters are now associated with a particular axis and
+   are specified using a new set of attributes called PVj_m. Here, "j"
+   is the index of an axis of WcsMap, and "m" is the index of the
+   projection parameter.
+
+   - The old attributes ProjP(0) to ProjP(9) are still available but are
+   now deprecated in favour of the new PVj_m attributes. They are
+   interpreted as aliases for PV(axlat)_0 to PV(axlat)_9, where "axlat"
+   is the index of the latitude axis.
+
+   - The GLS projection projection has been renamed as SFL, but the
+   AST__GLS type has been retained as an alias for AST__SFL.
+
 
    For further details of these changes, see the final appendix of
 Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).
@@ -82,4 +119,4 @@ Alternatively, on Starlink systems, type:
 or
       showme sun211 changes
 
-29/9/1999
+2/4/2000

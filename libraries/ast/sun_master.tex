@@ -17059,9 +17059,9 @@ LONPOLE} and {\tt RADECSYS} has become {\tt RADESYS}.
 \item Two new encodings have been added to the FitsChan class:
 \begin{description}
 
-\item [FITS-PC] This encoding uses the conventions of the now superceded
+\item [FITS-PC] This encoding uses the conventions of the now superseded
 FITS WCS paper by E.W.\,Greisen and M.\,Calabretta which used keywords
-{\tt CDELTj} abd {\tt PCjjjiii} to describe axis scaling and rotation.
+{\tt CDELTj} and {\tt PCjjjiii} to describe axis scaling and rotation.
 These are the conventions which were used by the FITS-WCS encoding prior
 to version 1.5 of AST. This encoding is provided to allow existing data
 which use these conventions to be read. It should not in general be used
@@ -17083,7 +17083,7 @@ attribute for details).
 \item FrameSets originally read from a DSS encoded FITS header can now be
 written out using the FITS-WCS encoding (a TAN projection with correction
 terms will be used) in addition to the DSS encoding. The reverse is also
-posible: FrameSets originally read from a FITS-WCS encoded FITS header
+possible: FrameSets originally read from a FITS-WCS encoded FITS header
 and which use a TAN projection can now be written out using the DSS
 encoding.
 
@@ -17108,7 +17108,7 @@ are specified using a new set of attributes called PVj\_m. Here, ``j'' is
 the index of an axis of WcsMap, and ``m'' is the index of the projection 
 parameter.
 \item The old attributes ProjP(0) to ProjP(9) are still available but are
-now depracated in favour of the new PVj\_m attributes. They are interpreted 
+now deprecated in favour of the new PVj\_m attributes. They are interpreted 
 as aliases for PV(axlat)\_0 to PV(axlat)\_9, where ``axlat'' is the index of 
 the latitude axis.
 \item The GLS projection projection has been renamed as SFL, but the 
