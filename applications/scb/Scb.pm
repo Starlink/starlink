@@ -94,19 +94,17 @@ sub cwd { $ENV{'PWD'} ||= Cwd::cwd }
 
 #  The capitalised variable names in this section may be replaced by
 #  environment variables or mk script variables by the makefile at 
-#  build time.  The sequences "$VARIABLE_NAME" are substituted for 
+#  installation time.  The sequences "$VARIABLE_NAME" are substituted for 
 #  by sed(1), so it is important that the quoting syntax (in the pre-
 #  build files) is not modified in these assignments.  Since the mk 
-#  script/makefile modify these files at build time, if you are looking
-#  at the built version of this script it may look confusing.  The
-#  pre-build version can be seen by extracting the script directly
-#  from the scb_source.tar tar file.
+#  script/makefile modify these files at install time, if you are looking
+#  at the installed version of this script it may look confusing.
 #
-#  The script is written so that it works in its pre-build form also, 
-#  using default values.
+#  The script is written as a matter of convenience so that it works in 
+#  its pre-install form also, using default values.
 #
-#  Some of the values determined by build-time environment variables
-#  (or pre-build defaults) can be overridden at run-time by environment 
+#  Some of the values determined by install-time environment variables
+#  (or pre-install defaults) can be overridden at run-time by environment 
 #  variables of the same name, if they exist and have a value.
 
 #  Starlink source tree directory locations.
@@ -167,19 +165,16 @@ $indexdir = $ENV{'SCB_INDEX'} || "$SCB_INDEX" || cwd;
 #     to tagging routine is done here, by setting the %tagger hash.
 #
 #     New tagging routines may be written, or the ones supplied may be
-#     replaced as desired (the existing ones are not very efficient, 
-#     especiallly with respect to memory, for large files).  
-#     The remainder of this comment block documents the interface 
-#     between the tagging routines and the rest of the package 
-#     for anybody wishing to do this.
+#     replaced as desired.  The remainder of this comment block 
+#     documents the interface between the tagging routines and the 
+#     rest of the package for anybody wishing to do this.
 #
 #     The interface is fairly simple: the tagging routine must take the 
 #     filehandle from which the raw source code may be read as its first
 #     argument (and may optionally read the second argument to tell it 
 #     the file type), and must return the tagged source code.  
-#     The tagged source is a kind of stripped down 
-#     HTML; it should be the same as the raw source, with the following 
-#     anchor tags added:
+#     The tagged source is a kind of stripped down HTML; it should be 
+#     the same as the raw source, with the following anchor tags added:
 #
 #        <a name=''> tags identifying function/subroutine definitions, 
 #        <a href=''> tags identifying function/subroutine calls, 
