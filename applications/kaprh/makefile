@@ -775,18 +775,6 @@ $(INSTALL_DIRS):
 #  These are the targets intended for normal external use (apart from
 #  help, which appears at the start of the file).
 
-#  archive: Create the source tar files.
-#  -------------------------------------
-#
-#  This is for development use.  It enables the source tar file to be
-#  created and updated(?).
-
-archive: $(PKG_NAME)_source.tar kaprh_sub.tar kapsub_sub.tar \
-         $(PKG_NAME)_ifls.tar 
-         
-#
-	@ echo "   Build of the $(PACK_NAME) tar files is complete."
-
 #  check: Check source file presence and show current state.
 #  ---------------------------------------------------------
 
