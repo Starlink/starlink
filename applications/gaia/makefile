@@ -587,7 +587,7 @@ TCL_FILES = \
  tk.tcl \
  bltCanvEps.pro bltHier.tcl bltDnd.tcl bltTabset.tcl \
  itcl.tcl \
- Archetype.itk Widget.itk Topplevel.itk itk.tcl \
+ Archetype.itk Widget.itk Toplevel.itk itk.tcl \
  iwidgets.tcl \
  buttonbox.itk pane.itk calendar.itk panedwindow.itk \
  canvasprintbox.itk promptdialog.itk canvasprintdialog.itk \
@@ -758,7 +758,9 @@ SCRIPT_PLACES = \
 	./built/lib/tk8.0/*.tcl \
 	./built/lib/tk8.0/prolog.ps \
 	./built/lib/iwidgets3.0.0/scripts/*.itk \
-	./built/lib/iwidgets3.0.0/*.tcl
+	./built/lib/iwidgets3.0.0/*.tcl \
+	./built/lib/blt2.4/*.tcl \
+	./built/lib/blt2.4/*.pro
 
 $(TCL_FILES): .tcl.built
 
