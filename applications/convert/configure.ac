@@ -26,7 +26,7 @@ STAR_MONOLITHS
 
 dnl    Build dependencies for this package.
 STAR_DECLARE_DEPENDENCIES([build], 
-   [ast chr cnf figaro fio grp hds mers ndf ndg par pcs prm psx sae shl])
+ [ast chr cnf cfitsio figaro fio grp hds mers ndf ndg par pcs prm psx sae shl])
 
 dnl    Need to pre-process generic code.
 STAR_CHECK_PROGS(fgeneric)
