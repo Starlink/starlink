@@ -17,7 +17,10 @@
 *  Description:
 *     The input array is filtered by replacing every pixel with the
 *     median of the pixel values contained in a rectangular region
-*     centred on the required output pixel. 
+*     centred on the required output pixel.  If the box is so large in
+*     either dimension that an entire line or column is included for
+*     all output pixels, then the output values will be the same and so 
+*     can be copied rather than re-calculated.
 
 *  Arguments:
 *     BAD = LOGICAL (Given)
@@ -82,6 +85,9 @@
 *     1995 March 22 (MJC):
 *        Made generic, corrected typo's, removed long lines, used
 *        modern-style variable declarations.
+*     16-JUN-1995 (DSB):
+*        Modified to avoid re-calculating output median values when the 
+*        the input filter box has not changed position or size.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,7 +128,9 @@
       INTEGER II, JJ             ! Input pixel indices
       REAL INVAL                 ! Input data value
       INTEGER ILO, IHI           ! Filter box x bounds
+      INTEGER ILOL, IHIL         ! X bounds for previous output column
       INTEGER JLO, JHI           ! Filter box y bounds
+      INTEGER JLOL, JHIL         ! Y bounds for previous output line
       INTEGER N                  ! No. of elements in filter box
       <LTYPE> MIDPER             ! Central percentile, i.e. median
 
@@ -138,6 +146,11 @@
 *  been put in the output image.
       BADOUT = .FALSE.
 
+*  Initialise the y bounds of the filter box used to create the
+*  `previous' output line.
+      JLOL = VAL__BADI
+      JHIL = VAL__BADI
+
 *  First deal with cases where bad pixels may be present in the input
 *  image.
       IF ( BAD ) THEN
@@ -150,57 +163,98 @@
             JLO = MAX( 1, J - HY )
             JHI = MIN( NY, J + HY )
 
+*  If both bounds are the same as last time, then the current output
+*  row will be identical to the previous output row.  Save time by
+*  copying it rather than re-calculating it.
+            IF ( JLO .EQ. JLOL .AND. JHI .EQ. JHIL ) THEN
+
+               DO I = 1, NX
+                  OUT( I, J ) = OUT( I, J - 1 )
+               END DO
+
+*  If the current output row is based on different input pixels to the
+*  previous row, calculate the output row.
+            ELSE
+
+*  Initialise the x bounds of the filter box used to create the
+*  `previous' output column.
+               ILOL = VAL__BADI
+               IHIL = VAL__BADI
+
 *  Loop round each column in the current row of the output image.
-            DO I = 1, NX
+               DO I = 1, NX
 
 *  Form the upper and lower x bounds of the input block.  Limit them to
 *  the edges of the input image.
-               ILO = MAX( 1, I - HX )
-               IHI = MIN( NX, I + HX )
+                  ILO = MAX( 1, I - HX )
+                  IHI = MIN( NX, I + HX )
 
-*  If the input pixel is bad and SAMBAD is .true., then the output pixel
-*  will also be bad.
-               IF ( SAMBAD .AND. IN( I, J ) .EQ. VAL__BAD<T> ) THEN
-                  OUT( I, J ) = VAL__BAD<T>
-                  BADOUT = .TRUE.
+*  If both bounds are the same as last time, then the current output
+*  value will be identical to the previous output value.  Save time by
+*  copying it rather than re-calculating it.
+                  IF ( ILO .EQ. ILOL .AND. IHI .EQ. IHIL ) THEN
+                     OUT( I, J ) = OUT( I - 1, J )
+
+*  If the current output value is based on different input pixels to the
+*  previous value, calculate the output value from scratch.
+                  ELSE
+
+*  If the input pixel is bad and SAMBAD is .TRUE., then the output
+*  pixel will also be bad.
+                     IF ( SAMBAD .AND.
+     :                    IN( I, J ) .EQ. VAL__BAD<T> ) THEN
+                        OUT( I, J ) = VAL__BAD<T>
+                        BADOUT = .TRUE.
 
 *  Otherwise, copy the good data values from the area of the input
 *  image covered by the current filter block to the WORK1 array, and
 *  set up points for these values in the WORK2 array.
-               ELSE
-                  N = 0
+                     ELSE
+                        N = 0
 
-                  DO JJ = JLO, JHI            
-                     DO II = ILO, IHI
+                        DO JJ = JLO, JHI
+                           DO II = ILO, IHI
 
-                        INVAL = IN( II, JJ )
+                              INVAL = IN( II, JJ )
 
-                        IF ( INVAL .NE. VAL__BAD<T> ) THEN 
-                           N = N + 1
-                           WORK1( N ) = INVAL
-                           WORK2( N ) = N
-                        END IF
+                              IF ( INVAL .NE. VAL__BAD<T> ) THEN 
+                                 N = N + 1
+                                 WORK1( N ) = INVAL
+                                 WORK2( N ) = N
+                              END IF
 
-                     END DO
-                  END DO
+                           END DO
+                        END DO
 
 *  Find the median of the data in the work array and store it in the
 *  output image.  If SAMBAD is .FALSE., the NLIM criterion has to be
 *  met.
-                  IF ( SAMBAD .OR. N .GE. NLIM ) THEN 
-                     CALL KPG1_QNTL<T>( .FALSE., .TRUE., MIDPER, N,
-     :                                WORK1, DUMMY, WORK2, OUT( I, J ),
-     :                                STATUS )
+                        IF ( SAMBAD .OR. N .GE. NLIM ) THEN 
+                           CALL KPG1_QNTL<T>( .FALSE., .TRUE., MIDPER,
+     :                                        N, WORK1, DUMMY, WORK2,
+     :                                        OUT( I, J ), STATUS )
 
 *  Otherwise, store a bad value in the output image. 
-                  ELSE
-                     OUT( I, J ) = VAL__BAD<T>
-                     BADOUT = .TRUE.
+                        ELSE
+                           OUT( I, J ) = VAL__BAD<T>
+                           BADOUT = .TRUE.
+                        END IF
+
+                     END IF
+
                   END IF
 
-               END IF
+*  Save the filter-box y bounds used to create this output row.
+                  ILOL = ILO
+                  IHIL = IHI
 
-            END DO
+               END DO
+
+            END IF
+
+*  Save the filter-box y bounds used to create this output row.
+            JLOL = JLO
+            JHIL = JHI
 
          END DO
 
@@ -216,33 +270,74 @@
             JLO = MAX( 1, J - HY )
             JHI = MIN( NY, J + HY )
 
+*  If both bounds are the same as last time, then the current output
+*  row will be identical to the previous output row.  Save time by
+*  copying it rather than re-calculating it.
+            IF ( JLO .EQ. JLOL .AND. JHI .EQ. JHIL ) THEN
+
+               DO I = 1, NX
+                  OUT( I, J ) = OUT( I, J - 1 )
+               END DO
+
+*  If the current output row is based on different input pixels to the
+*  previous row, calculate the output row.
+            ELSE
+
+*  Initialise the x bounds of the filter box used to create the
+*  `previous' output column.
+               ILOL = VAL__BADI
+               IHIL = VAL__BADI
+
 *  Loop round each column in the current row of the output image.
-            DO I = 1, NX
+               DO I = 1, NX
 
 *  Form the upper and lower x bounds of the input block.  Limit them to
 *  the edges of the input image.
-               ILO = MAX( 1, I - HX )
-               IHI = MIN( NX, I + HX )
+                  ILO = MAX( 1, I - HX )
+                  IHI = MIN( NX, I + HX )
+
+*  If both bounds are the same as last time, then the current output value
+*  will be identical to the previous output value. Save time by copying it
+*  rather than re-calculating it.
+                  IF( ILO .EQ. ILOL .AND. IHI .EQ. IHIL ) THEN
+                     OUT( I, J ) = OUT( I - 1, J )
+
+*  If the current output value is based on different input pixels to the
+*  previous value, calculate the output value from scratch.
+                  ELSE
 
 *  Copy the good data values from the area of the input image 
 *  covered by the current filter block to the WORK1 array, and set up 
 *  points for these values in the WORK2 array.
-               N = 0
+                     N = 0
 
-               DO JJ = JLO, JHI            
-                  DO II = ILO, IHI
-                     N = N + 1
-                     WORK1( N ) = IN( II, JJ )
-                     WORK2( N ) = N
-                  END DO
-               END DO
+                     DO JJ = JLO, JHI            
+                        DO II = ILO, IHI
+                           N = N + 1
+                           WORK1( N ) = IN( II, JJ )
+                           WORK2( N ) = N
+                        END DO
+                     END DO
 
 *  Find the median of the data in the work array and store it in the
 *  output image. 
-               CALL KPG1_QNTL<T>( .FALSE., .TRUE., MIDPER, N, WORK1,
-     :                          DUMMY, WORK2, OUT( I, J ), STATUS )
+                     CALL KPG1_QNTL<T>( .FALSE., .TRUE., MIDPER, N,
+     :                                  WORK1, DUMMY, WORK2,
+     :                                  OUT( I, J ), STATUS )
 
-            END DO
+                  END IF
+
+*  Save the filter-box x bounds used to create this output row.
+                  ILOL = ILO
+                  IHIL = IHI
+
+               END DO
+
+            END IF
+
+*  Save the filter-box y bounds used to create this output row.
+            JLOL = JLO
+            JHIL = JHI
 
          END DO
 
