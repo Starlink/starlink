@@ -2036,10 +2036,7 @@ do_test:
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
 #
 	@ echo
-	KAPPA_DIR='$(INSTALL_BIN)';export KAPPA_DIR; \
-           mkdir kappa-test; cd kappa-test; \
-           $(INSTALL_BIN)/stardemo.tcl $(TEST_DEMO); \
-           cd ..; rm -rf kappa-test 
+	$(INSTALL_BIN)/stats $(INSTALL_BIN)/comwest
 	@ echo
 #
 #  Note the test has been run.
