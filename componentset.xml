@@ -1149,28 +1149,6 @@ A software package designed to search for periodicities in data.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
-<component id="pisa" support="U">
-  <version>2.4-7</version>
-  <path>applications/pisa</path>
-  <description>PISA - Position Intensity and Shape Analysis</description>
-  <abstract><p>
-      
-  </p></abstract>
-  <dependencies >
-    <build>pcs</build><build option='link'>agi</build><build option='link'>cat</build><build option='link'>chr</build><build option='link'>fio</build><build option='link'>ndf</build><build option='link'>par</build><build option='link'>pda</build><build option='link'>prm</build><build option='link'>sae</build><build option='link'>shl</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Peter W. Draper</name>
-      <uname>pwd</uname>
-      <email>p.w.draper@durham.ac.uk</email>
-      <role>owner</role>
-    </person>
-  </developers>
-  <documentation> sun109</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
 <component id="polpack" support="S">
   <version>3.1-3</version>
   <path>applications/polpack</path>
@@ -1182,7 +1160,7 @@ registration, sky subtraction, calculation of Stokes parameters, and
 display of vector maps.  
 </p></abstract>
   <dependencies >
-    <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>tcl</build><build>trn</build><build>ifd</build><build option='link'>sla</build><build option='link'>nbs</build><build option='link'>kaplibs</build><build option='link'>shl</build><build option='link'>tcl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><sourceset>star2html</sourceset>
+    <build>pcs</build><build>ast</build><build>cat</build><build>chr</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>mers</build><build>ndf</build><build>ndg</build><build>par</build><build>prm</build><build>sae</build><build>tcl</build><build>trn</build><build>ifd</build><build option='link'>sla</build><build option='link'>nbs</build><build option='link'>kaplibs</build><build option='link'>shl</build><build option='link'>tcl</build><use>kappa</use><use>ccdpack</use><use>tcl</use><use>tk</use><use>startcl</use><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1430,41 +1408,6 @@ UNIX).
     <year></year>
     <name>Council for the Central Laboratory of the Research Councils</name>
   </copyright>
-</component>
-
-<component id="star2html" support="S">
-  <version>1.4-7</version>
-  <path>applications/star2html</path>
-  <description>Convert Starlink documents to hypertext</description>
-  <abstract><p>Star2HTML lets you write (or convert) a Starlink document
-      so that you can create two versions of it from a single source file.
-      A paper version is produced by LaTeX, and a hypertext version
-      (suitable for browsing on the web) is produced by latex2html.
-      You can tailor each version to its own medium by marking selected text as
-      LaTeX-only or HTML-only.</p>
-    <p>Star2HTML also includes a set of document templates for producing
-      Starlink documents in a standard style (such as `Starlink User
-      Note').  They also define new LaTeX commands for adding extra
-      links to the hypertext version of your document (without
-      affecting the paper version). </p></abstract>
-  <dependencies >
-    
-  </dependencies>
-  <developers>
-    <person>
-      <name>Peter Draper</name>
-      <uname>pwd</uname>
-      <email>P.W.Draper@durham.ac.uk</email>
-      <role>owner</role>
-    </person>
-  </developers>
-  <documentation> sun199</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <copyright>
-    <year></year>
-    <name>Council for the Central Laboratory of the Research Councils</name>
-  </copyright>
-  <notes><p>Starlink customised wrapper around latex2html</p></notes>
 </component>
 
 <component id="star2html" support="S">
