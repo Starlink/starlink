@@ -1,0 +1,36 @@
+<HEAD>
+<TITLE> Starting the Software at UKIRT</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node128.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node127.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Starting the Software at UKIRT</H1>
+<P>
+If you are using the software at the telescope, the following startup 
+procedure is recommended:
+<P>
+<blockquote> %  source   /star/etc/login <BR> 
+  %  source   /star/etc/cshrc <BR> 
+  %  start_adamnet <BR>
+  %  cgs4dr_ukirt <BR>
+  %
+</blockquote>
+<P>
+The alias <em>cgs4dr_ukirt</em> points to the correct directory and UT-date.
+When the night's observing is finished, you should remember to kill ADAMnet with:
+<P>
+<blockquote> %  stop_adamnet <BR> 
+  %
+</blockquote>
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>
