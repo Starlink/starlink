@@ -12,6 +12,7 @@
 *     25 Nov 93 : V1.7-3 BDA_ASSOC used so FITS can be read (RJV)
 *      1 Jul 94 : V1.7-4 screen clearing more intelligent (RJV)
 *     20 Sep 94 : V1.7-5 region mask incorporated (RJV)
+*      6 Jan 95 : V1.8-0 ARD for regions (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -37,7 +38,7 @@
       LOGICAL FRESH
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ILOAD Version 1.7-5')
+      PARAMETER (VERSION = 'ILOAD Version 1.8-0')
 *-
 *  first invocation do global initialisation
       IF (.NOT.I_OPEN) THEN
@@ -120,10 +121,11 @@
 
         CALL GCB_ATTACH('IMAGE',STATUS)
 
-*  if new session create caches
+*  if new session create caches and group for ARD text
         IF (NEW) THEN
           CALL GCB_CRECACHE(I_CACHE,STATUS)
           I_CACHE_1D=0
+          CALL ARX_OPEN('WRITE',I_ARD_ID,STATUS)
         ELSE
           CALL IMG_2DGCB(STATUS)
         ENDIF

@@ -8,6 +8,7 @@
 *    History :
 *    3 Oct 94 : v1.7-0 original (RJV)
 *   13 Dec 94 : v1.8-0 sub-mode added (RJV)
+*    6 Jan 95 : v1.8-1 writes ARD (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -27,7 +28,7 @@
       LOGICAL MERGE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IREGION Version 1.8-0')
+      PARAMETER (VERSION = 'IREGION Version 1.8-1')
 *-
       CALL USI_INIT()
 
@@ -75,7 +76,8 @@
           IF (SUBMODE.EQ.'NEW') THEN
             CALL IMG_SETWHOLE(STATUS)
             MERGE=.FALSE.
-          ELSE
+            CALL ARX_RESET(I_ARD_ID,STATUS)
+           ELSE
 *  otherwise save current region mask and get memory to store new stuff
             RPTR=I_REG_PTR
             CALL DYN_MAPB(1,I_NX*I_NY,I_REG_PTR,STATUS)
@@ -215,8 +217,11 @@
 *    Status :
       INTEGER STATUS
 *    Function declarations :
+      INTEGER CHR_LEN
 *    Local constants :
 *    Local variables :
+      CHARACTER*80 TEXT
+      INTEGER L
       REAL XC,YC,RAD
 *-
 
@@ -225,6 +230,25 @@
         CALL IMG_GETCIRC('XC','YC','RAD',XC,YC,RAD,STATUS)
         CALL IMG_SETCIRC(XC,YC,RAD,EXCLUDE,STATUS)
 
+        IF (EXCLUDE) THEN
+          TEXT=' .NOT. (CIRCLE( '
+        ELSE
+          TEXT=' CIRCLE( '
+        ENDIF
+        L=CHR_LEN(TEXT)
+
+        CALL MSG_SETR('XC',XC)
+        CALL MSG_SETR('YC',YC)
+        CALL MSG_SETR('RAD',RAD)
+        CALL MSG_MAKE(TEXT(L+1:),' ^XC , ^YC , ^RAD ',L)
+        IF (EXCLUDE) THEN
+          TEXT(L:)='))'
+          L=L+1
+        ELSE
+          TEXT(L:L)=')'
+        ENDIF
+
+        CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_REP(' ','from IREGION_CIRCLE',STATUS)
@@ -717,20 +741,30 @@
       CHARACTER*(DAT__SZLOC) LOC
       INTEGER DIMS(2)
       INTEGER PTR
+      LOGICAL MASK,ARDFILE
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        CALL USI_ASSOCO('OUT','REGION_MASK',LOC,STATUS)
-        DIMS(1)=I_NX
-        DIMS(2)=I_NY
-        CALL BDA_CRETDATA(LOC,'_BYTE',2,DIMS,STATUS)
-        CALL BDA_MAPTDATA(LOC,'_BYTE','W',PTR,STATUS)
-        CALL ARR_COP1B(I_NX*I_NY,%val(I_REG_PTR),%val(PTR),STATUS)
-        CALL BDA_COPAXES(I_LOC,LOC,STATUS)
-        CALL BDA_COPMORE(I_LOC,LOC,STATUS)
-        CALL BDA_RELEASE(LOC,STATUS)
-        CALL USI_ANNUL(LOC,STATUS)
+        CALL USI_GET0L('MASK',MASK,STATUS)
+        IF (MASK) THEN
+          CALL USI_ASSOCO('OUT','REGION_MASK',LOC,STATUS)
+          DIMS(1)=I_NX
+          DIMS(2)=I_NY
+          CALL BDA_CRETDATA(LOC,'_BYTE',2,DIMS,STATUS)
+          CALL BDA_MAPTDATA(LOC,'_BYTE','W',PTR,STATUS)
+          CALL ARR_COP1B(I_NX*I_NY,%val(I_REG_PTR),%val(PTR),STATUS)
+          CALL BDA_COPAXES(I_LOC,LOC,STATUS)
+          CALL BDA_COPMORE(I_LOC,LOC,STATUS)
+          CALL BDA_RELEASE(LOC,STATUS)
+          CALL USI_ANNUL(LOC,STATUS)
+        ENDIF
+
+        CALL USI_GET0L('ARDFILE',ARDFILE,STATUS)
+        IF (ARDFILE) THEN
+          CALL ARX_WRITE('FILE',I_ARD_ID,STATUS)
+        ENDIF
+
 
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_REP(' ','from IREGION_EXPORT',STATUS)

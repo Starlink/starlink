@@ -9,6 +9,7 @@
 *      3 Sep 92 : V1.7-0 doesn't close device (RJV)
 *      5 Feb 93 : V1.7-1 closes device if only one graphics context (RJV)
 *     25 Nov 93 : V1.7-2 used BDA_ANNUL (RJV)
+*      6 Jan 95 : V1.8-0 closes ARD group (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -26,7 +27,7 @@
       LOGICAL ACTIVE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ICLOSE Version 1.7-2')
+      PARAMETER (VERSION = 'ICLOSE Version 1.8-0')
 *-
       CALL USI_INIT()
 
@@ -35,6 +36,8 @@
       CALL PSF_RELEASE(I_PSF,STATUS)
       CALL PSF_CLOSE(STATUS)
       CALL BDA_ANNUL(I_LOC,STATUS)
+
+      CALL ARX_CLOSE(I_ARD_ID,STATUS)
 
       CALL GCB_ATTACH('IMAGE',STATUS)
       CALL GCB_DETACH(STATUS)
