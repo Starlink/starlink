@@ -103,6 +103,7 @@
 *        available:
 *        - LINEAR:  Linear weighting function
 *        - BESSEL:  Bessel weighting function
+*        - GAUSSIAN:Gaussian weighting function
 *        - SPLINE1: Interpolating spline (PDA_IDBVIP)
 *        - SPLINE2: Smoothing spline (PDA_SURFIT)
 *        - SPLINE3: Interpolating spline (PDA_IDSFFT)
@@ -194,6 +195,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.50  1998/04/28 00:32:07  timj
+*     Add Gaussian convolution function
+*
 *     Revision 1.49  1998/03/24 01:23:31  timj
 *     Initialise pointer variables.
 *     Fix memory leak for OUT_WEIGHT_PTR.
@@ -615,7 +619,7 @@ c
       ELSE
 
          CALL PAR_CHOIC('REBIN_METHOD', 'Linear', 
-     :        'Linear,Bessel,Spline1,Spline2,Spline3', .TRUE.,
+     :        'Linear,Bessel,Gaussian,Spline1,Spline2,Spline3', .TRUE.,
      :        METHOD, STATUS)
 
          IF (METHOD.EQ.'BESSEL') THEN
@@ -634,6 +638,15 @@ c
      :           STATUS)
             WEIGHTSIZE = 1
             CALL SCULIB_LINEAR_WTINIT(WTFN, WTFNRES, STATUS)
+
+         ELSE IF (METHOD.EQ.'GAUSSIAN') THEN
+*     Gaussian
+            CALL MSG_SETC('PKG',PACKAGE)
+            CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :           '^PKG: Initialising GAUSSIAN weighting functions',
+     :           STATUS)
+            WEIGHTSIZE = 2
+            CALL SCULIB_GAUSS_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
             
          ELSE IF (METHOD(1:6) .EQ. 'SPLINE') THEN
 *     Do nothing
@@ -1481,7 +1494,8 @@ c
 
 *     Now time for regrid
                   IF ((METHOD .EQ. 'BESSEL') .OR. 
-     :                 (METHOD .EQ. 'LINEAR')) THEN
+     :                 (METHOD .EQ. 'LINEAR') .OR.
+     :                 (METHOD .EQ. 'GAUSSIAN')) THEN
 
 *     Rebin the data using weighting function
                      CALL SCULIB_WTFN_REGRID( NFILES, N_PTS, WTFNRAD, 
