@@ -300,7 +300,7 @@ sub index_pack {
 
 #  Get name of package.
 
-   $pack_file =~ m%^(.*/)?([^.]+)(\.tar.*)?%;
+   $pack_file =~ m%^(.*/)?(.+?)(\.tar.*)?$%;
    my ($dir, $tarext) = ($1, $3);
    $package ||= $2;
    print "\nPACKAGE: $package\n";
