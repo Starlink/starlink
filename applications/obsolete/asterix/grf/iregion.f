@@ -1293,19 +1293,21 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
-      LOGICAL EXCLUDE
 *    Export :
 *    Status :
       INTEGER STATUS
 *    Function declarations :
 *    Local constants :
 *    Local variables :
+      INTEGER MPTR
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        CALL ARX_RESET(I_ARD_ID,STATUS)
-        CALL ARX_READ('TEXT',I_ARD_ID,STATUS)
+        CALL DYN_MAPI(1,I_NX*I_NY,MPTR,STATUS)
+        CALL IMG_GETARD('TEXT',%val(MPTR),STATUS)
+        CALL IMG_SETARD(%val(MPTR),.FALSE.,STATUS)
+        CALL DYN_UNMAP(MPTR,STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_REP(' ','from IREGION_IMPORT',STATUS)
