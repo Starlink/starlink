@@ -76,6 +76,8 @@
 *        Original version.
 *     11 Feb 1997 (RB):
 *        Cope with SpacedData arrays
+*     18 May 1997 (RB):
+*        Cope with 'Axis_n' multiple put.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -116,7 +118,14 @@
       CHARACTER*1		CAX, AXIS
       LOGICAL			DIDCRE
       REAL			AXINFO(2), BASE, DELTA, TANG
-      INTEGER			IDUM
+      INTEGER			IDUM, I
+
+      CHARACTER*11		AXITEM(7)
+
+*  Local data:
+      DATA AXITEM		/'_Label', '_Units', '_Normalised', '_Data',
+     :                           '_Width', '_LoWidth', '_HiWidth'/
+
 *.
 
 *  Check inherited global status.
@@ -130,7 +139,7 @@
       CALL ADI_TYPE( ARGS(4), TYPE, STATUS )
 
 *  Special case for coping with spaced data axis array (RB)
-      IF ( ITEM(1:4) .EQ. 'Axis' .AND. ITEM(8:11) .EQ. 'Data' ) THEN
+      IF ( ITEM(1:5) .EQ. 'Axis_' .AND. ITEM(7:11) .EQ. '_Data' ) THEN
         CALL ADI_GET1R( ARGS(4), 2, AXINFO, IDUM, STATUS )
         BASE = AXINFO(1)
         DELTA = AXINFO(2) - AXINFO(1)
@@ -141,7 +150,7 @@
         ELSE IF ( CAX .EQ. '2' ) THEN
           AXIS = 'Y'
         ELSE
-          AXIS = '-'
+          AXIS = ' '
         END IF
         CALL ADI2_CFIND( ARGS(2), ' ', '.CRPIX'//CAX, ' ', .TRUE.,
      :                   .FALSE., TYPE, 0, 0, DIDCRE, ITID, STATUS )
@@ -153,6 +162,25 @@
         CALL ADI_CNEWV0R( ITID, 'Value', DELTA, STATUS )
         CALL ADI_CNEWV0C( ITID, 'Comment', AXIS//' degrees per pixel',
      :                    STATUS )
+
+*  Special case for Axis_<n> item, only copy, don't invent (RB)
+      ELSE IF (ITEM(1:5) .EQ. 'Axis_' .AND. ITEM(7:).LE.' ' ) THEN
+        DO I = 1, 7
+          CALL BDI2_CFIND( ARGS(1), ARGS(2), ITEM(1:6)//AXITEM(I),
+     :                     .TRUE., .FALSE., ITID, CNDIM, CDIMS,
+     :                     STATUS )
+          print*
+          print*, i, ' ', axitem(i)
+          call adi_print(itid, status)
+          IF ( STATUS .EQ. SAI__OK ) THEN
+            CALL ADI2_DCOP( ARGS(4), ITID, STATUS )
+            CALL ADI_ERASE( ITID, STATUS )
+          ELSE
+            CALL ERR_ANNUL( STATUS )
+          END IF
+        END DO
+
+*  All the other items as standard...
       ELSE
 
 *  Locate the data item
