@@ -4,7 +4,7 @@ lib_LTLIBRARIES = libctg.la
 
 libctg_la_SOURCES = \
 	$(PRIVATE_INCLUDES) \
-	$(UBLIC_INCLUDES) \
+	$(PUBLIC_INCLUDES) \
 	$(C_ROUTINES) \
 	$(F_ROUTINES)
 
