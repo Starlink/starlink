@@ -63,28 +63,36 @@ interface POLPLOT
 
    parameter      COLANG
       type        LITERAL
-      ppath       'CURRENT'
+      ppath       'DEFAULT'
+      vpath       'DEFAULT'
       prompt      'Name of catalogue column holding vector angles'
+      default     'THETA'
       helpkey     '*'
    endparameter
 
    parameter      COLMAG
       type        LITERAL
-      ppath       'CURRENT'
+      ppath       'DEFAULT'
+      vpath       'DEFAULT'
+      default     'P'
       prompt      'Name of catalogue column holding vector lengths'
       helpkey     '*'
    endparameter
 
    parameter      COLX
       type        LITERAL
-      ppath       'CURRENT'
+      ppath       'DEFAULT'
+      vpath       'DEFAULT'
+      default     'X'
       prompt      'Name of catalogue column holding vector X position'
       helpkey     '*'
    endparameter
 
    parameter      COLY
       type        LITERAL
-      ppath       'CURRENT'
+      ppath       'DEFAULT'
+      vpath       'DEFAULT'
+      default     'Y'
       prompt      'Name of catalogue column holding vector Y position'
       helpkey     '*'
    endparameter

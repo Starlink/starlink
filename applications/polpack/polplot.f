@@ -67,11 +67,11 @@
 *        insensitive).  The positive Y axis defines zero orientation, and 
 *        rotation from the X axis to the Y axis is considered positive. 
 *        A list of available column names is displayed if a non-existent
-*        column name is given.
+*        column name is given. [THETA]
 *     COLMAG = LITERAL (Read)
 *        The name of the catalogue column holding the magnitude of each 
 *        vector. A list of available column names is displayed if a 
-*        non-existent column name is given.
+*        non-existent column name is given. [P]
 *     COLX = LITERAL (Read)
 *        The name of the catalogue column holding the X coordinate at
 *        each vector. A list of available column names is displayed if 
@@ -86,10 +86,10 @@
 *        existing picture (in the coordinate Frame given by parameter COSYS).
 *        This will only be possible if the catalogue contains information
 *        about coordinate Frames in the form of an AST FrameSet (see 
-*        SUN/210). 
+*        SUN/210). [X]
 *     COLY = LITERAL (Read)
 *        The name of the catalogue column holding the Y coordinate at
-*        each vector (see COLX for additional information).
+*        each vector (see COLX for additional information). [Y]
 *     COSYS = GROUP (Read)
 *        This gives the co-ordinate Frame to be displayed along annotated 
 *        axes. The supplied value will usually be a Domain name such as
