@@ -1,0 +1,10 @@
+Makefile
+Makefile.in
+*.m4
+config.*
+*.cache
+*.m4
+configure
+starconf.status
+*.shl
+
