@@ -13,7 +13,7 @@ interface AST2XSP
   parameter AREA
     type '_REAL'
     prompt 'Geometrical area of detector (cm**2)'
-    help 'Note this is purely the geometric area, and so isn't energy dependent'
+    help 'Note this is purely the geometric area, and so isnt energy dependent'
   endparameter
   parameter OUT
     position 2
