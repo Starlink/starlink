@@ -118,7 +118,11 @@
       IF ( CLASS(1:7) .EQ. 'HDSfile' ) THEN
         CALL ADI1_CCA2HZ( ID, MEMBER, LOC, CMP, STATUS )
 
-      ELSE IF ( CLASS(1:7) .EQ. 'INTEGER' ) THEN
+      ELSE IF ( (CLASS(1:7) .EQ. 'INTEGER') .OR.
+     :          (CLASS(1:5) .EQ. 'UWORD') ) THEN
+     :          (CLASS(1:4) .EQ. 'WORD') ) THEN
+     :          (CLASS(1:5) .EQ. 'UBYTE') ) THEN
+     :          (CLASS(1:4) .EQ. 'BYTE') ) THEN
         CALL ADI1_CCA2HI( ID, MEMBER, LOC, CMP, STATUS )
 
       ELSE IF ( CLASS(1:7) .EQ. 'LOGICAL' ) THEN
