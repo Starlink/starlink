@@ -1965,6 +1965,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
@@ -2139,4 +2140,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:425: Compile failed; see the compiler error output for details.
 
-Total time: 3 minutes 29 seconds
+Total time: 3 minutes 52 seconds
