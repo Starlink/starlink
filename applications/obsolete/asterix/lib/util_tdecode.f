@@ -44,9 +44,9 @@
 *     <declarations and descriptions for imported/exported arguments>
 *    Export :
       INTEGER NTRANGE                   ! Number of time ranges specified.
-      REAL START(MXRNG)                 ! Start times - offset from base zero
+      DOUBLE PRECISION START(MXRNG)                 ! Start times - offset from base zero
 *                                       !  in seconds.
-      REAL STOP(MXRNG)                  ! Stop times - offset from base zero
+      DOUBLE PRECISION STOP(MXRNG)                  ! Stop times - offset from base zero
 *                                       !  in seconds.
 *    Status :
       INTEGER STATUS
@@ -163,11 +163,11 @@
 *
 *         Decode the start time
                READ(TWORD(LP)(K1+1:K2-1),*)MJD
-               START(LP) = ( MJD - BASE_MJD ) * 86400.
+               START(LP) = ( MJD - BASE_MJD ) * 86400.0D0
 *
 *         Decode the stop time
                READ(TWORD(LP)(K2+2:),*)MJD
-               STOP(LP) = ( MJD - BASE_MJD ) * 86400.
+               STOP(LP) = ( MJD - BASE_MJD ) * 86400.0D0
 *
             ENDDO
 *
@@ -183,12 +183,12 @@
 *         Decode the start time
                K1=INDEX(TWORD(LP),'M')
                READ(TWORD(LP)(K1+1:),*) MJD
-               START(NTRANGE) = ( MJD - BASE_MJD ) * 86400.
+               START(NTRANGE) = ( MJD - BASE_MJD ) * 86400.0D0
 *
 *         Decode the stop time
                K1=INDEX(TWORD(LP+1),'M')
                READ(TWORD(LP+1)(K1+1:),*) MJD
-               STOP(NTRANGE) = ( MJD - BASE_MJD ) * 86400.
+               STOP(NTRANGE) = ( MJD - BASE_MJD ) * 86400.0D0
 *
             ENDDO
 *
