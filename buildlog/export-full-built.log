@@ -297,6 +297,9 @@ unpack_jni_arch:
 unpack_jni_arch:
     [unjar] Expanding: /apps/cvsbuild/java/source/jnihds/src/lib/ppc/jnihds_libs.jar into /apps/cvsbuild/java/source/jnihds/lib/ppc
 
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jnihds/src/lib/i386/jnihds_libs.jar into /apps/cvsbuild/java/source/jnihds/lib/i386
+
 build:
 
 jars:
@@ -945,4 +948,4 @@ export-full-built:
       [zip] Building zip: /apps/cvsbuild/export/starjava.zip
 
 BUILD SUCCESSFUL
-Total time: 10 minutes 48 seconds
+Total time: 5 minutes 45 seconds
