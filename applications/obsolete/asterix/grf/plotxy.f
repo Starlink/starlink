@@ -14,87 +14,78 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Import :
-*    Import-export :
+      INCLUDE 'ADI_PAR'
 *    Export :
 *    Status :
       INTEGER STATUS
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='PLOTXY Version 1.7-0')
+      PARAMETER (VERSION='PLOTXY Version 2.0-0')
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) XLOC	! locator to x-array
-      CHARACTER*(DAT__SZLOC) YLOC	! locator to y-array
-      CHARACTER*30 DEV
-      CHARACTER*80 XLBL,YLBL,TITLE
-      REAL X1,X2,Y1,Y2
-      REAL XLO,XHI,YLO,YHI
-      INTEGER XPTR,YPTR
-      INTEGER XLEN,YLEN
-      INTEGER NVAL
-      INTEGER SYMBOL
-      LOGICAL XPRIM,YPRIM
-      LOGICAL POLY,STEP
-      LOGICAL ACTIVE
-*    Global variables :
-*    Functions :
+      CHARACTER*30 		DEV			! Plot device
+      CHARACTER*80 		XLBL,YLBL,TITLE
+
+      REAL 			X1,X2,Y1,Y2
+      REAL 			XLO,XHI,YLO,YHI
+
+      INTEGER 			NVAL			! # points to plot
+      INTEGER 			SYMBOL			! Plot symbol
+      INTEGER 			XFID,YFID		! Input datasets
+      INTEGER 			XLEN,YLEN		! # elements in inputs
+      INTEGER 			XPTR,YPTR		! Mapped inputs
+
+      LOGICAL 			POLY,STEP
+      LOGICAL 			ACTIVE			! Already active?
 *-
       CALL MSG_PRNT(VERSION)
 
       CALL AST_INIT()
 
+*  Get input objects
+      CALL USI_ASSOC('X','Array','READ',XFID,STATUS)
+      CALL USI_ASSOC('Y','BinDS|Array','READ',YFID,STATUS)
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-      CALL USI_ASSOCI('X','READ',XLOC,XPRIM,STATUS)
-      CALL USI_ASSOCI('Y','READ',YLOC,YPRIM,STATUS)
+*  Get dimensions
+      CALL BDI_GETNEL( XFID, XLEN, STATUS )
+      CALL BDI_GETNEL( YFID, YLEN, STATUS )
+      NVAL=MIN(XLEN,YLEN)
 
-*  check both are primitive arrays
-      IF (.NOT.(XPRIM.AND.YPRIM)) THEN
-        CALL MSG_PRNT('AST_ERR: input not primitive')
-        STATUS=SAI__ERROR
-      ENDIF
+*  Map data
+      CALL BDI_MAPR( XFID, 'Data', 'READ', XPTR, STATUS )
+      CALL BDI_MAPR( YFID, 'Data', 'READ', YPTR, STATUS )
 
-      IF (STATUS.EQ.SAI__OK) THEN
+*  Get plot style
+      POLY=.FALSE.
+      STEP=.FALSE.
+      SYMBOL=0
+      CALL USI_GET0L('POLY',POLY,STATUS)
+      CALL USI_GET0L('STEP',STEP,STATUS)
+      CALL USI_GET0I('SYMBOL',SYMBOL,STATUS)
+      IF (.NOT.(POLY.OR.STEP).AND.SYMBOL.EQ.0) THEN
+        POLY=.TRUE.
+      END IF
 
-        CALL DAT_MAPV(XLOC,'_REAL','READ',XPTR,XLEN,STATUS)
-        CALL DAT_MAPV(YLOC,'_REAL','READ',YPTR,YLEN,STATUS)
-        NVAL=MIN(XLEN,YLEN)
+*  Get axis ranges
+      CALL ARR_RANG1R(NVAL,%VAL(XPTR),X1,X2,STATUS)
+      CALL USI_DEF0R('XLO',X1,STATUS)
+      CALL USI_GET0R('XLO',XLO,STATUS)
+      CALL USI_DEF0R('XHI',X2,STATUS)
+      CALL USI_GET0R('XHI',XHI,STATUS)
+      CALL ARR_RANG1R(NVAL,%VAL(YPTR),Y1,Y2,STATUS)
+      CALL USI_DEF0R('YLO',Y1,STATUS)
+      CALL USI_GET0R('YLO',YLO,STATUS)
+      CALL USI_DEF0R('YHI',Y2,STATUS)
+      CALL USI_GET0R('YHI',YHI,STATUS)
 
-*  get plot style
-        POLY=.FALSE.
-        STEP=.FALSE.
-        SYMBOL=0
-        CALL USI_GET0L('POLY',POLY,STATUS)
-        CALL USI_GET0L('STEP',STEP,STATUS)
-        CALL USI_GET0I('SYMBOL',SYMBOL,STATUS)
-        IF (.NOT.(POLY.OR.STEP).AND.SYMBOL.EQ.0) THEN
-          POLY=.TRUE.
-        ENDIF
-
-*  get axis ranges
-        CALL ARR_RANG1R(NVAL,%VAL(XPTR),X1,X2,STATUS)
-        CALL USI_DEF0R('XLO',X1,STATUS)
-        CALL USI_GET0R('XLO',XLO,STATUS)
-        CALL USI_DEF0R('XHI',X2,STATUS)
-        CALL USI_GET0R('XHI',XHI,STATUS)
-        CALL ARR_RANG1R(NVAL,%VAL(YPTR),Y1,Y2,STATUS)
-        CALL USI_DEF0R('YLO',Y1,STATUS)
-        CALL USI_GET0R('YLO',YLO,STATUS)
-        CALL USI_DEF0R('YHI',Y2,STATUS)
-        CALL USI_GET0R('YHI',YHI,STATUS)
-
-*  get labels
-        CALL USI_GET0C('XLBL',XLBL,STATUS)
-        CALL USI_GET0C('YLBL',YLBL,STATUS)
-        CALL USI_GET0C('TITLE',TITLE,STATUS)
-
-
-      ENDIF
+*  Get labels
+      CALL USI_GET0C('XLBL',XLBL,STATUS)
+      CALL USI_GET0C('YLBL',YLBL,STATUS)
+      CALL USI_GET0C('TITLE',TITLE,STATUS)
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-*  get device if not already open
+*    Get device if not already open
         CALL GDV_STATUS(ACTIVE,STATUS)
         IF (.NOT.ACTIVE) THEN
           CALL USI_GET0C('DEV',DEV,STATUS)
@@ -106,33 +97,33 @@
           CALL GDV_CLEAR(STATUS)
         ENDIF
 
-
-
         IF (STATUS.EQ.SAI__OK) THEN
 
-*  set transformations and draw axes
+*      Set transformations and draw axes
           CALL PGVSTAND()
           CALL PGWINDOW(XLO,XHI,YLO,YHI)
           CALL PGBOX('BCNTS',0.0,0,'BCNTS',0.0,0)
           CALL PGLABEL(XLBL,YLBL,TITLE)
 
-*  plot data
+*      Plot data
           CALL PLOTXY_DOIT(NVAL,%VAL(XPTR),%VAL(YPTR),POLY,STEP,SYMBOL,
      :                                                         STATUS)
 
         ENDIF
 
-
       ENDIF
 
-      IF (.NOT.ACTIVE) THEN
-        CALL GDV_CLOSE(STATUS)
-      ENDIF
+*  Close device if we opened it
+      IF ( .NOT. ACTIVE ) THEN
+        CALL GDV_CLOSE( STATUS )
+      END IF
 
-      CALL USI_ANNUL('X',STATUS)
-      CALL USI_ANNUL('Y',STATUS)
+*  Close inputs
+      CALL USI_ANNUL( 'X',STATUS )
+      CALL USI_ANNUL( 'Y',STATUS )
 
-      CALL AST_CLOSE()
+*  Tidy up
+ 99   CALL AST_CLOSE()
       CALL AST_ERR(STATUS)
 
       END
