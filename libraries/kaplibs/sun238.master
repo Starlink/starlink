@@ -458,10 +458,10 @@ numerical types. The \emph{actual} routines names will not include the trailing
 \item how many of the words in your search phrase were found
 \item how often they were found
 \item whether any sub-strings of one or more words were found (longer
-sub-phrase are deemed as more relevant).
+sub-phrases are deemed to be more relevant).
 \end{itemize}
 
-   The results are order so that the most relevant matches are first.
+   The results are ordered so that the most relevant matches are first.
    Matches with the same relevance are order alphabetically by routine
    name.   
 
