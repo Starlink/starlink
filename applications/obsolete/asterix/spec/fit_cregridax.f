@@ -68,10 +68,10 @@
 *      Find axis values and widths and store in axis arrays
           DO IBIN = 1, GAX(IAX).NVAL
             CALL FIT_GRID_AXVAL( GAX(IAX), IBIN, AVAL, STATUS )
-            CALL ARR_SELEM( PTR, GAX(IAX).NVAL, IBIN, AVAL, STATUS )
+            CALL ARR_SELEM1R( PTR, GAX(IAX).NVAL, IBIN, AVAL, STATUS )
             AWID = ( 10.0**(LOG10(AVAL)+GAX(IAX).SCALE/2.0) -
      :               10.0**(LOG10(AVAL)-GAX(IAX).SCALE/2.0) )
-            CALL ARR_SELEM( WPTR, GAX(IAX).NVAL, IBIN, AWID, STATUS )
+            CALL ARR_SELEM1R( WPTR, GAX(IAX).NVAL, IBIN, AWID, STATUS )
           END DO
 
 *      Unmap axis data and widths
