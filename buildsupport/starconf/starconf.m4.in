@@ -377,29 +377,52 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
 # we can do at configure time); and by the $STARLINK/bin directory.
 #
 # The default, if the program isn't in the augmented path, is the path
-# to the starconf-finder program.  Is this the best default?  Would just
-# <program-name> be better?  The program may not be in the augmented
+# to the starconf-finder program if that's available, and the bare
+# program-name otherwise.  Is this the best default?  Would just 
+# program-name be better?  The program may not be in the augmented
 # path for two reasons: (1) we are doing the global configuration done
 # during bootstrapping, and noting has been installed yet; or (2) the
 # program is one of those installed in a subdirectory of the
 # `bindir'.  In case (2), there's not a lot we can do, short of
 # grubbing round manifest files at some point, but the
-# appfinder-general, which is the eventual default, knows about this
-# case, and can take care of it.
+# starconf-finder, which is the eventual default, knows about this
+# case, and could take care of it.
 AC_DEFUN([STAR_CHECK_PROGS],
          [eval default_bindir=`echo $bindir | sed 's,\${exec_prefix},$ac_default_prefix,'`
           AC_FOREACH([ProgramName], [$1],
-                     [AC_PATH_PROG(_STAR_UPCASE(m4_bpatsubst(ProgramName,
-                                                             [[^0-9a-zA-Z_]], 
-                                                             [_])),
+                     [m4_define([star_prog],
+                                _STAR_UPCASE(m4_bpatsubst(ProgramName,
+                                                          [[^0-9a-zA-Z_]], 
+                                                          [_])))
+                      AC_PATH_PROG(star_prog,
                                    ProgramName,
-                                   [$STARLINK/bin/starconf-finder ProgramName],
+                                   [],
                                    [$default_bindir:$STARLINK/bin:$PATH])
-                      AC_ARG_VAR(_STAR_UPCASE(m4_bpatsubst(ProgramName,
-                                                           [[^0-9a-zA-Z_]], 
-                                                           [_])),
+                      if test -z "$star_prog"; then
+                          if test -x $STARLINK/bin/starconf-finder; then
+                              star_prog="$STARLINK/bin/starconf-finder ProgramName"
+                          else
+                              star_prog=ProgramName
+                          fi
+                      fi
+                      AC_ARG_VAR(star_prog,
                                  [Location of the ]ProgramName[ application])])
 ])# STAR_CHECK_PROGS
+
+## NOTAC_DEFUN([STAR_CHECK_PROGS],
+####         [eval default_bindir=`echo $bindir | sed 's,\${exec_prefix},$ac_default_prefix,'`
+##          AC_FOREACH([ProgramName], [$1],
+##                     [AC_PATH_PROG(_STAR_UPCASE(m4_bpatsubst(ProgramName,
+##                                                             [[^0-9a-zA-Z_]], 
+##                                                             [_])),
+##                                   ProgramName,
+##                                   [$STARLINK/bin/starconf-finder ProgramName],
+##                                   [$default_bindir:$STARLINK/bin:$PATH])
+##                      AC_ARG_VAR(_STAR_UPCASE(m4_bpatsubst(ProgramName,
+##                                                           [[^0-9a-zA-Z_]], 
+##                                                           [_])),
+##                                 [Location of the ]ProgramName[ application])])
+##])# STAR_CHECK_PROGS
           
 
 
@@ -636,7 +659,6 @@ fi
 # Expands to STRING with all letters translated to uppercase.
 AC_DEFUN([_STAR_UPCASE],
          [m4_translit([$1], [a-z], [A-Z])])
-##         [m4_translit(m4_bpatsubst([$1], [[^0-9a-zA-Z_]], [_]), [a-z], [A-Z])])
 
 
 # _STAR_EXTRADIR_COMMON(dir-type, file-list)
