@@ -132,7 +132,6 @@
          set present($slot) 0
       }
       set canvas [ canvas ]
-      $this configure -uselabels 0
 
 #  Split the info panel into two parts.
       itk_component add infofrmA {

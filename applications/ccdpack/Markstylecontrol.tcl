@@ -1,7 +1,7 @@
-   class Marktypecontrol {
+   class Markstylecontrol {
 #+
 #  Name:
-#     Marktypecontrol
+#     Markstylecontrol
 
 #  Type of Module:
 #     [incr Tk] Mega-Widget
@@ -19,7 +19,7 @@
 #  Public Methods:
 #
 #     draw canvas cx cy taglist label
-#        Draws a marker of the current type on the canvas window given
+#        Draws a marker in the current style on the canvas window given
 #        by the canvas argument at coordinates (cx, cy).
 #        All the elements of the list taglist are added as tags of
 #        the canvas item thus created.  The label is text printed only
@@ -29,7 +29,7 @@
 #  Public Variables (Configuration Options):
 #
 #     value
-#        The value which indicates the type of the marker.  This has
+#        The value which indicates the style of the marker.  This has
 #        the form of a comma-separated list of attribute=value
 #        strings.  The available attributes are:
 #           - colour     -- Colour of the marker.
@@ -42,7 +42,7 @@
 #        opaque value, and other than reading and writing it, client code
 #        cannot do anything useful with it.
 #
-#     Marktypecontrol also inherits all the public variables of the
+#     Markstylecontrol also inherits all the public variables of the
 #        Control widget.
 
 #-
@@ -60,20 +60,20 @@
          itk_component add control {
             frame [ childsite ].control
          }
-         itk_component add marktype {
-            frame $itk_component(control).marktype \
+         itk_component add markstyle {
+            frame $itk_component(control).markstyle \
                -relief raised \
                -borderwidth 3
          }
          itk_component add shower {
-            canvas $itk_component(marktype).shower \
+            canvas $itk_component(markstyle).shower \
                -height 26 \
                -width 50 
          }
 
 #  Pack the control.
          pack $itk_component(shower)
-         pack $itk_component(marktype)
+         pack $itk_component(markstyle)
          pack $itk_component(control)
 
 #  Construct the dialog which selects the marker shape.
@@ -149,9 +149,9 @@
          }
          pack $itk_component(scratchholder) -side top -anchor c
          pack $itk_component(scratchcanvas)
-         set but $itk_component(marktype)
+         set but $itk_component(markstyle)
          set canv $itk_component(shower)
-         configure -balloonstr "Marker type"
+         configure -balloonstr "Marker style"
          configure -state normal
          eval itk_initialize $args
          newmarker
@@ -165,10 +165,8 @@
 #-----------------------------------------------------------------------
       public method draw { canvas cx cy {tags ""} {label ""} } {
 #-----------------------------------------------------------------------
-       # set x [ expr round( $cx ) + 0.5 ]
-       # set y [ expr round( $cy ) - 0.5 ]
-         set x [ expr round( $cx ) ]
-         set y [ expr round( $cy ) ]
+         set x [ expr round( $cx ) + 1 ]
+         set y [ expr round( $cy ) - 1 ]
          
          foreach copair $mcopairs {
             lappend coords [ expr [ lindex $copair 0 ] + $x ] \
@@ -358,7 +356,7 @@
       private variable mitem             ;# Marker canvas item type
       private variable mconfig           ;# Marker configuration string
       private variable mcopairs          ;# Marker base coordinate list
-      private variable option            ;# Possible values for marker types
+      private variable option            ;# Possible values for marker styles
 
    }
 
@@ -367,18 +365,18 @@
 #  Widget resource management
 ########################################################################
 
-   itk::usual Marktypecontrol {
+   itk::usual Markstylecontrol {
       keep -background -cursor -foreground 
    }
-   option add *Marktypecontrol.selectColor #b03060 widgetDefault
+   option add *Markstylecontrol.selectColor #b03060 widgetDefault
 
 
 ########################################################################
 #  Constructor alias
 ########################################################################
 
-   proc marktypecontrol { pathname args } {
-      uplevel Marktypecontrol $pathname $args
+   proc markstylecontrol { pathname args } {
+      uplevel Markstylecontrol $pathname $args
    }
    
 
