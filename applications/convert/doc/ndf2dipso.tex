@@ -11,7 +11,7 @@
       are listed in the Notes.
    }
    \sstusage{
-      ndf2dipso in out
+      NDF2DIPSO IN OUT
    }
    \sstparameters{
       \sstsubsection{
@@ -24,23 +24,22 @@
       \sstsubsection{
          OUT = FILENAME (Write)
       }{
-         Output DIPSO file.  On VMS platforms a default file extension
-         of {\tt ".DAT"} is appended when parameter OUT contains no file
-         extension.
+         Output DIPSO file.  A default file extension of {\tt ".DAT"}
+         is appended when parameter OUT contains no file extension.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         ndf2dipso old new
+         NDF2DIPSO OLD NEW
       }{
-         This converts the NDF called old (in file old.sdf) to the
-         DIPSO file called new.
+         This converts the NDF called OLD (in file OLD.SDF) to the
+         DIPSO file called NEW.DAT.
       }
       \sstexamplesubsection{
-         ndf2dipso spectre spectre.dat
+         NDF2DIPSO SPECTRE SPECTRE.DAT
       }{
-         This converts the NDF called spectre (in file spectre.sdf) to
-         the DIPSO file spectre.dat.
+         This converts the NDF called SPECTRE (in file SPECTRE.SDF) to
+         the DIPSO file SPECTRE.DAT.
       }
    }
    \sstnotes{
@@ -62,6 +61,11 @@
          data title will not be copied.
       }
    }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: DIPSO2NDF; DIPSO: commands OREAD and OWRITE.
+   }
    \sstimplementationstatus{
       \sstitemlist{
 
@@ -77,6 +81,9 @@
          \sstitem
          If the NDF does not have an axis, the application will abort
          with an appropriate error message.
+
+         \sstitem
+         Only available on VMS platforms.
       }
    }
 }

@@ -147,9 +147,13 @@
 *     -  Reset INTERIM environment in case NDF2BDF is re-run without re-
 *     loading.
 
+*  Related Applications:
+*     CONVERT: BDF2NDF.
+
 *  Implementation Status:
 *     -  Primitive NDFs are created.
 *     -  The value of bad pixels is not written to the descriptor BLANK.
+*     -  Only available on VMS platforms.
 
 *  Authors:
 *     JM: Jo Murray (STARLINK)

@@ -3,7 +3,7 @@ Converts an NDF to a DIPSO-format file.
 
 Usage:
 
-   ndf2dipso in out
+   NDF2DIPSO IN OUT
 
 Description:
 
@@ -20,17 +20,16 @@ IN = NDF (Read)
    one exists, otherwise it is the current value.
 3 OUT
 OUT = FILENAME (Write)
-   Output DIPSO file.  On VMS platforms a default file extension
-   of ".DAT" is appended when parameter OUT contains no file
-   extension.
+   Output DIPSO file.  A default file extension of ".DAT" is appended
+   when parameter OUT contains no file extension.
 2 Examples
-ndf2dipso old new
-   This converts the NDF called old (in file old.sdf) to the
-   DIPSO file called new.
+NDF2DIPSO OLD NEW
+   This converts the NDF called OLD (in file OLD.SDF) to the
+   DIPSO file called NEW.DAT.
 
-ndf2dipso spectre spectre.dat
-   This converts the NDF called spectre (in file spectre.sdf) to
-   the DIPSO file spectre.dat.
+NDF2DIPSO SPECTRE SPECTRE.DAT
+   This converts the NDF called SPECTRE (in file SPECTRE.SDF) to
+   the DIPSO file SPECTRE.DAT.
 2 Notes
 -  The NDF TITLE object is to the DIPSO file.
 
@@ -42,6 +41,8 @@ Bad pixels found in the NDF result in `breaks' in the DIPSO file.
 -  Most NDF components are not supported by the DIPSO format,
 and therefore anything but the data array, axis centres, and
 data title will not be copied.
+2 Related_Applications
+   CONVERT: DIPSO2NDF; DIPSO: commands OREAD and OWRITE.
 2 Authors
 JM: Jo Murray (STARLINK)
 
@@ -71,3 +72,5 @@ MJC: Malcolm J. Currie (STARLINK)
 
    -  If the NDF does not have an axis, the application will abort
    with an appropriate error message.
+
+   -  Only available on VMS platforms.

@@ -115,6 +115,8 @@ rules, rather than those given above.
    (.Z.FLAGGED) is false or absent.  A simple NDF with the bad-pixel
    flag set to false (meaning that there are no bad-pixels present)
    is created when .Z.FLAGGED is absent or false and FORM = "SIMPLE".
+2 Related_Applications
+   CONVERT: NDF2DST.
 2 Authors
 JM: Jo Murray (STARLINK)
 

@@ -1,6 +1,10 @@
 1 NDF2DST
 Converts an NDF to a Figaro (Version 2) DST file.
 
+Usage:
+
+     ndf2dst in out
+
 Description:
 
      This application converts an NDF to a Figaro (Version 2) `DST'
@@ -9,8 +13,6 @@ Description:
      most files can be be converted with little or no information
      lost.
 
-   Usage:
-      ndf2dst in out
 2 Parameters
 For information on individual parameters, select from the list below:
 3 IN
@@ -79,6 +81,8 @@ _________________________________________________________________
 
      Other extensions:
      .MORE.other         -> .MORE.other
+2 Related_Applications
+   CONVERT: DST2NDF.
 2 Authors
 JM: Jo Murray (STARLINK)
 

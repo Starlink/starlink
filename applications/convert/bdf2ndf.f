@@ -142,8 +142,12 @@
 *     -  Reset INTERIM environment in case BDF2NDF is re-run without re-
 *     loading.
 
+*  Related Applications:
+*     CONVERT: NDF2BDF.
+
 *  Implementation Status:
 *     -  Note the data array in the NDF is of the primitive form.
+*     -  Only available on VMS platforms.
 
 *  Authors:
 *     JM: Jo Murray (STARLINK)

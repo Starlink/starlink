@@ -135,6 +135,9 @@
 *           END.
 *        -  Other extensions are not propagated.
 
+*  Related Applications:
+*     CONVERT: UNF2NDF.
+
 *  Implementation Status:
 *     -  The value of bad pixels is not written to a FITS-like header
 *     record with keyword BLANK.

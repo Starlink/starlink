@@ -25,24 +25,23 @@
 *     for the conversion are listed in the Notes.
 
 *  Usage:
-*     dipso2ndf in out
+*     DIPSO2NDF IN OUT
 
 *  ADAM Parameters:
 *     IN = FILENAME (Read)
-*        Input DIPSO file.  On VMS platforms a default file extension
-*        of ".DAT" is appended when parameter IN contains no file
-*        extension.
+*        Input DIPSO file.  A default file extension of ".DAT" is
+*        appended when parameter IN contains no file extension.
 *     OUT = NDF (Write)
 *        Output NDF data structure.  A file extension must not be given
 *        after the name.  It becomes the new current NDF.
 
 *  Examples:
-*     dipso2ndf old new
-*        This converts the DIPSO file called old to the NDF called new
-*        (in file new.sdf).
-*     dipso2ndf spectre.dat spectre
-*        This converts the DIPSO file spectre.dat to the NDF called
-*        spectre (in file spectre.sdf).
+*     DIPSO2NDF OLD NEW
+*        This converts the DIPSO file called OLD to the NDF called NEW
+*        (in file NEW.SDF).
+*     DIPSO2NDF SPECTRE.DAT SPECTRE
+*        This converts the DIPSO file SPECTRE.DAT to the NDF called
+*        SPECTRE (in file SPECTRE.SDF).
 
 *  Notes:
 *     -  The DIPSO title is written to the NDF TITLE.
@@ -60,6 +59,9 @@
 *     -  The data and the axis centres need not be fluxes and
 *     wavelengths respectively.
 
+*  Related Applications:
+*     CONVERT: NDF2DIPSO; DIPSO: commands OREAD and OWRITE.
+
 *  Implementation Status:
 *     -  The output NDF has a primitive data array.
 *     -  The input wavelength and flux data are always of Fortran REAL 
@@ -67,6 +69,7 @@
 *     -  The application assumes that the bad-pixel padding will not
 *     cause the number of elements in the data array to exceed twice
 *     the original number.
+*     -  Only available on VMS platforms.
 
 *  Authors:
 *     Jo Murray (STARLINK)

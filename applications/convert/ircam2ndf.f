@@ -25,7 +25,7 @@
 *     detailed list of the rules of the conversion.
 
 *  Usage:
-*     IRCAM2NDF IN PREFIX OBS [CONFIG]
+*     ircam2ndf in prefix obs [config]
 
 *  ADAM Parameters:
 *     CONFIG = LITERAL (Read)
@@ -83,7 +83,7 @@
 *        This converts four observations in the IRCAM data file called
 *        ircam_27aug89_1cl into NDFs called rhooph32, rhooph34,
 *        rhooph35, rhooph36.  The scale and offset are applied.
-*     ircam2ndf in=ircam_04nov90_1c CONFIG="KTC" OBS=5 PREFIX=bias 
+*     ircam2ndf in=ircam_04nov90_1c config="KTC" obs=5 prefix=bias 
 *        This converts the fifth observation in the IRCAM data file
 *        called ircam_04nov90_1c into an NDF called bias5 containing
 *        the electronic pedestal in its data array.  There is no format

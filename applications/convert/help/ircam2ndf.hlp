@@ -3,7 +3,7 @@ Converts an IRCAM data file to a series of NDFs.
 
 Usage:
 
-   IRCAM2NDF IN PREFIX OBS [CONFIG]
+   ircam2ndf in prefix obs [config]
 
 Description:
 
@@ -73,7 +73,7 @@ ircam2ndf ircam_27aug89_1cl rhooph [32,34-36] fmtcnv
    ircam_27aug89_1cl into NDFs called rhooph32, rhooph34,
    rhooph35, rhooph36.  The scale and offset are applied.
 
-ircam2ndf in=ircam_04nov90_1c CONFIG="KTC" OBS=5 PREFIX=bias
+ircam2ndf in=ircam_04nov90_1c config="KTC" obs=5 prefix=bias
    This converts the fifth observation in the IRCAM data file
    called ircam_04nov90_1c into an NDF called bias5 containing
    the electronic pedestal in its data array.  There is no format

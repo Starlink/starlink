@@ -129,6 +129,9 @@
 *     flag set to false (meaning that there are no bad-pixels present)
 *     is created when .Z.FLAGGED is absent or false and FORM = "SIMPLE".
 
+*  Related Applications:
+*     CONVERT: NDF2DST.
+
 *  Implementation Status:
 *     -  The maximum number of dimensions is 6.
 

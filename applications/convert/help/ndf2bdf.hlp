@@ -122,6 +122,8 @@ The details of the conversion are as follows:
 
    -  All character objects longer than 70 characters are
    truncated in a BDF descriptor.
+2 Related_Applications
+   CONVERT: BDF2NDF.
 2 Authors
 JM: Jo Murray (STARLINK)
 
@@ -161,3 +163,5 @@ MJC: Malcolm J. Currie (STARLINK)
    -  Primitive NDFs are created.
 
    -  The value of bad pixels is not written to the descriptor BLANK.
+
+   -  Only available on VMS platforms.

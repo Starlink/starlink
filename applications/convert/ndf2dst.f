@@ -26,8 +26,8 @@
 *     most files can be be converted with little or no information
 *     lost.
 
-*   Usage:
-*      ndf2dst in out
+*  Usage:
+*     ndf2dst in out
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -94,6 +94,9 @@
 *
 *          Other extensions:
 *          .MORE.other         -> .MORE.other
+
+*  Related Applications:
+*     CONVERT: DST2NDF.
 
 *  Authors:
 *     JM: Jo Murray (STARLINK)

@@ -128,7 +128,7 @@ The details of the conversion are as follows:
    placed within the NDF's FITS extension.  This enables more
    than one array (input file) to be used to form an NDF.  Note
    that the data array must be created first to make a valid NDF,
-   and its the FITS structure associated with that array that is
+   and it's the FITS structure associated with that array that is
    wanted.  Indeed the application prevents you from doing
    otherwise.
 

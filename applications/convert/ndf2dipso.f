@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Usage:
-*     ndf2dipso in out
+*     NDF2DIPSO IN OUT
 
 *  Description:
 *     The routine converts a 1-dimensional NDF data file into a
@@ -34,17 +34,16 @@
 *        after the name.  The suggested default is the current NDF if
 *        one exists, otherwise it is the current value.
 *     OUT = FILENAME (Write)
-*        Output DIPSO file.  On VMS platforms a default file extension
-*        of ".DAT" is appended when parameter OUT contains no file
-*        extension.
+*        Output DIPSO file.  A default file extension of ".DAT" is
+*        appended when parameter OUT contains no file extension.
 
 *  Examples:
-*     ndf2dipso old new
-*        This converts the NDF called old (in file old.sdf) to the
-*        DIPSO file called new.
-*     ndf2dipso spectre spectre.dat
-*        This converts the NDF called spectre (in file spectre.sdf) to
-*        the DIPSO file spectre.dat.
+*     NDF2DIPSO OLD NEW
+*        This converts the NDF called OLD (in file OLD.SDF) to the
+*        DIPSO file called NEW.DAT.
+*     NDF2DIPSO SPECTRE SPECTRE.DAT
+*        This converts the NDF called SPECTRE (in file SPECTRE.SDF) to
+*        the DIPSO file SPECTRE.DAT.
 
 *  Notes:
 *     -  The NDF TITLE object is to the DIPSO file.
@@ -55,6 +54,9 @@
 *     and therefore anything but the data array, axis centres, and
 *     data title will not be copied.
 
+*  Related Applications:
+*     CONVERT: DIPSO2NDF; DIPSO: commands OREAD and OWRITE.
+
 *  Implementation Status:
 *     -  If the NDF data array exceeds the DIPSO limits of 28000
 *     elements or 1000 breaks in the data, the application will abort
@@ -63,6 +65,7 @@
 *     as the DIPSO file's title.
 *     -  If the NDF does not have an axis, the application will abort
 *     with an appropriate error message.
+*     -  Only available on VMS platforms.
 
 *  Authors:
 *     JM: Jo Murray (STARLINK)

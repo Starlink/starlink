@@ -10,15 +10,14 @@
       for the conversion are listed in the Notes.
    }
    \sstusage{
-      dipso2ndf in out
+      DIPSO2NDF IN OUT
    }
    \sstparameters{
       \sstsubsection{
          IN = FILENAME (Read)
       }{
-         Input DIPSO file.  On VMS platforms a default file extension
-         of {\tt ".DAT"} is appended when parameter IN contains no file
-         extension.
+         Input DIPSO file.  A default file extension of {\tt ".DAT"} is
+         appended when parameter IN contains no file extension.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -29,16 +28,16 @@
    }
    \sstexamples{
       \sstexamplesubsection{
-         dipso2ndf old new
+         DIPSO2NDF OLD NEW
       }{
-         This converts the DIPSO file called old to the NDF called new
-         (in file new.sdf).
+         This converts the DIPSO file called OLD to the NDF called NEW
+         (in file NEW.SDF).
       }
       \sstexamplesubsection{
-         dipso2ndf spectre.dat spectre
+         DIPSO2NDF SPECTRE.DAT SPECTRE
       }{
-         This converts the DIPSO file spectre.dat to the NDF called
-         spectre (in file SPECTRE.SDF).
+         This converts the DIPSO file SPECTRE.DAT to the NDF called
+         SPECTRE (in file SPECTRE.SDF).
       }
    }
    \sstnotes{
@@ -66,6 +65,11 @@
          The data and the axis centres need not be fluxes and
          wavelengths respectively.
       }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: NDF2DIPSO; DIPSO: commands OREAD and OWRITE.
    }
    \sstimplementationstatus{
       \sstitemlist{
