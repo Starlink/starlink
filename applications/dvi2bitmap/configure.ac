@@ -88,7 +88,7 @@ AC_REPLACE_FUNCS(getopt_long getsubopt)
 dnl   Now switch to doing header checks with C++, for those headers
 dnl   which are specific to C++
 AC_LANG([C++])
-AC_CHECK_HEADERS(sstream strstream csignal cassert)
+AC_CHECK_HEADERS(sstream strstream cassert)
 
 dnl   What type of system are we on?
 dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with 
