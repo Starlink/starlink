@@ -125,6 +125,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Added astResolvePoints method.
 *     2-DEC-2004 (DSB):
 *        Added System "J2000"
+*     27-JAN-2005 (DSB):
+*        Fix memory leak in astLoadSkyFrame_
 *class--
 */
 
@@ -8020,7 +8022,7 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 /* SkyRefIs. */
 /* --------- */
       sval = astReadString( channel, "srefis", " " );
-      if( astOK ){
+      if( sval ){
          new->skyrefis = BAD_REF;
          if( astChrMatch( sval, POLE_STRING ) ) {
             new->skyrefis = POLE_REF;
@@ -8031,6 +8033,7 @@ AstSkyFrame *astLoadSkyFrame_( void *mem, size_t size,
 		      "invalid SkyRefIs attribute value (%d).", sval );
          }
          if( TestSkyRefIs( new ) ) SetSkyRefIs( new, new->skyrefis );
+         sval = astFree( sval );
       }
 
 /* SkyRef. */

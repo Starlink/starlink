@@ -20,6 +20,10 @@
   </dependencies>
   <developers>
     <person>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+    <person>
       <name>David Berry</name>
       <uname>dsb</uname>
       <email>dsb@ast.man.ac.uk</email>

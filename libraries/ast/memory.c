@@ -47,6 +47,10 @@
 *     3-MAR-2004 (DSB):
 *        Modified astSscanf to avoid use of uninitialised values
 *        corresponding to "%n" fields in the format string.
+*     26-JAN-2004 (DSB):
+*        Modified astRealloc to clarify the nature of the returned pointer 
+*        (which is not a "Memory *"). Also correct issuing and deissuing
+*        of pointers in DEBUG code within astRealloc.
 */
 
 /* Module Macros. */
@@ -792,19 +796,19 @@ void *astRealloc_( void *ptr, size_t size ) {
 */
 
 /* Local Variables: */
+   void *result;                 /* Returned pointer */
    Memory *mem;                  /* Pointer to memory header */
-   Memory *oldmem;               /* Original pointer to memory header */
 
 /* Check the global error status. */
    if ( !astOK ) return ptr;
 
 /* Initialise. */
-   mem = (Memory *) ptr;
+   result = ptr;
 
 /* If a NULL pointer was supplied, use astMalloc to allocate some new
    memory. */
    if ( !ptr ) {
-      mem = astMalloc( size );
+      result = astMalloc( size );
 
 /* Otherwise, check that the pointer supplied points at memory
    allocated by a function in this module (IsDynamic sets the global
@@ -826,21 +830,22 @@ void *astRealloc_( void *ptr, size_t size ) {
    pointer value. */
          if ( size == (size_t) 0 ) {
             astFree( ptr );
-            mem = NULL;
+            result = NULL;
 
 /* Otherwise, reallocate the memory. */
          } else {
-            oldmem = mem;
+
+#ifdef DEBUG
+            DeIssue( mem );
+#endif
             mem = realloc( mem, sizeof( Memory ) + size );
 
-/* If this failed, report an error and restore the original pointer
+/* If this failed, report an error and return the original pointer
    value. */
             if ( !mem ) {
                astError( AST__NOMEM, "realloc: %s", strerror( errno ) );
-               astError( AST__NOMEM,
-                  "Failed to reallocate a block of memory to %ld bytes.",
-                         (long) size );
-               mem = (Memory *) ptr;
+               astError( AST__NOMEM, "Failed to reallocate a block of "
+                         "memory to %ld bytes.", (long) size );
 
 /* If successful, set the new "magic" value and size in the memory
    header and obtain a pointer to the start of the region of memory to
@@ -848,23 +853,17 @@ void *astRealloc_( void *ptr, size_t size ) {
             } else {
                mem->magic = Magic( mem, size );
                mem->size = size;
-
 #ifdef DEBUG
-               if( oldmem != mem ) {
-                  DeIssue( oldmem );
-                  mem->id = ++next_id;
-                  Issue( mem );
-               }
+               Issue( mem );
 #endif
-
-               mem++;
+               result = mem + 1;
             }
          }
       }
    }
 
 /* Return the result. */
-   return mem;   
+   return result;   
 }
 
 size_t astSizeOf_( void *ptr ) {

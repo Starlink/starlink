@@ -29,6 +29,15 @@
 *        element.
 *     29-NOV-2004 (DSB):
 *        Added astXmlGetType method.
+*     27-JAN-2005 (DSB):
+*        - Move astXmlTrace and associated code into conditional
+*        compilation blokc (included if DEBUG macro is defined). This
+*        speeds up the create and destruction of XmlObjects in non-DEBUG code.
+*        - Renamed the private Delete function as astXmlDelete and gave
+*        it protected access.
+*        - Modify astXmlDelete so that it can succesfully annul objects
+*        which have no parent.
+*        - Include extra info in some error messages.
 */
 
 
@@ -135,10 +144,11 @@ AstXml##type *astXmlCheck##type##_( void *this, int nullok ) { \
 
 /* Module variables. */
 /* ================= */
-static int nobj = 0;
 static int next_id = 0;
+#ifdef DEBUG
+static int nobj = 0;
 static AstXmlObject **existing_objects = NULL;
-
+#endif
 
 /* Function prototypes. */
 /* ==================== */
@@ -162,9 +172,7 @@ static const char *ResolvePrefix( const char *, AstXmlElement * );
 static int CheckType( long int, long int );
 static int MatchName( AstXmlElement *, const char * );
 static int Ustrcmp( const char *, const char * );
-static void *Delete( void * );
 static void AddContent( AstXmlParent *, int, AstXmlContentItem * );
-static void AddObjectToList( AstXmlObject * );
 static void CheckName( const char *, const char *, const char *, int );
 static void CheckPrefName( char *, const char *, const char * );
 static void CleanXml( AstXmlObject *, long int );
@@ -181,8 +189,12 @@ static void InitXmlElement( AstXmlElement *, int, const char *, const char * );
 static void InitXmlNamespace( AstXmlNamespace *, int, const char *, const char * );
 static void InitXmlObject( AstXmlObject *, long int );
 static void InitXmlPI( AstXmlPI *, int, const char *, const char * );
-static void RemoveObjectFromList( AstXmlObject * );
 static AstXmlElement *ReadContent( AstXmlDocument **, int, int (*)( AstXmlElement * ), int, char (*)( void * ), void *, int );
+
+#ifdef DEBUG
+static void AddObjectToList( AstXmlObject * );
+static void RemoveObjectFromList( AstXmlObject * );
+#endif
 
 /* Function implementations. */
 /* ========================= */
@@ -432,6 +444,7 @@ static const char *AddEscapes( const char *text ){
 }
 
 
+#ifdef DEBUG
 static void AddObjectToList( AstXmlObject *obj ){
 /*
 *  Name:
@@ -456,29 +469,21 @@ static void AddObjectToList( AstXmlObject *obj ){
 *     this
 *        A pointer to a new XmlObject.
 */
-
-#ifdef DEBUG
    int pm;     /* See astSetPermMem in memory.c */
-#endif
 
 /* Return if the pointer is NULL or if an error has occurred. */
    if( !astOK || !obj ) return;
 
 /* Increment the number of objects in the list and increase the size of
    the list. */
-#ifdef DEBUG
    pm = astSetPermMem( 1 );
-#endif
-
    existing_objects = astGrow( existing_objects, ++nobj, sizeof( AstXmlObject *) );
-
-#ifdef DEBUG
    astSetPermMem( pm );
-#endif
 
 /* Add the new pointer to the end of the list. */
    existing_objects[ nobj - 1 ] = obj;
 }
+#endif
 
 static char *AppendChar( char *str1, int *nc, char ch ) {
 /*
@@ -845,7 +850,7 @@ void astXmlAddCDataSection_( AstXmlElement *this, const char *text ){
 
 /* If an error occurred, delete the new structure. */
    if( !astOK ) {
-      new = Delete( new );
+      new = astXmlDelete( new );
 
 /* Otherwise, add the content item to the element. */
    } else {
@@ -933,7 +938,7 @@ void astXmlAddCharData_( AstXmlParent *this, int where, const char *text ){
 
 /* If an error occurred, delete the new structure. */
    if( !astOK ) {
-      new = Delete( new );
+      new = astXmlDelete( new );
 
 /* Otherwise, add the content item to the element. */
    } else {
@@ -997,7 +1002,7 @@ void astXmlAddComment_( AstXmlParent *this, int where, const char *text ){
 
 /* If an error occurred, delete the new structure. */
    if( !astOK ) {
-      new = Delete( new );
+      new = astXmlDelete( new );
 
 /* Otherwise, add the content item to the element. */
    } else {
@@ -1066,7 +1071,7 @@ AstXmlElement *astXmlAddElement_( AstXmlElement *this, const char *name,
 
 /* If an error occurred, delete the new structure. */
    if( !astOK ) {
-      new = Delete( new );
+      new = astXmlDelete( new );
 
 /* Otherwise, add the content item to the element. */
    } else {
@@ -1139,7 +1144,7 @@ void astXmlAddPI_( AstXmlParent *this, int where, const char *target, const char
 
 /* If an error occurred, delete the new structure. */
    if( !astOK ) {
-      new = Delete( new );
+      new = astXmlDelete( new );
 
 /* Otherwise, add the content item to the element. */
    } else {
@@ -1308,8 +1313,10 @@ void *astXmlAnnul_( AstXmlObject *this ){
    if( this->parent && 
        astXmlCheckType( this->parent, AST__XMLPAR ) ) return this;
 
+#ifdef DEBUG
 /* Remove the supplied object from the list of currently active XmlObjects. */
    RemoveObjectFromList( this );
+#endif
 
 /* Clean the objects contents, and free the memory holding the XmlObject. */
    CleanXml( this, this->type );
@@ -1574,7 +1581,7 @@ AstXmlObject *astXmlCopy_( AstXmlObject *this ) {
    }
 
 /* If an error occurred, delete the new structure. */
-   if( !astOK ) new = Delete( new );
+   if( !astOK ) new = astXmlDelete( new );
 
 /* Return the result. */
    return new;
@@ -2427,7 +2434,7 @@ void astXmlPurge_( AstXmlParent *this ) {
       while( ++i < doc->nepi ) {
          misc = doc->epilog[ i ];
          if( astXmlCheckType( misc, AST__XMLWHITE ) ) {
-            misc = Delete( misc );
+            misc = astXmlDelete( misc );
             i--;
          }
       }
@@ -2440,7 +2447,7 @@ void astXmlPurge_( AstXmlParent *this ) {
       while( ++i < pro->nmisc1 ) {
          misc = pro->misc1[ i ];
          if( astXmlCheckType( misc, AST__XMLWHITE ) ) {
-            misc = Delete( misc );
+            misc = astXmlDelete( misc );
             i--;
          }
       }
@@ -2449,7 +2456,7 @@ void astXmlPurge_( AstXmlParent *this ) {
       while( ++i < pro->nmisc2 ) {
          misc = pro->misc2[ i ];
          if( astXmlCheckType( misc, AST__XMLWHITE ) ) {
-            misc = Delete( misc );
+            misc = astXmlDelete( misc );
             i--;
          }
       }
@@ -2464,7 +2471,7 @@ void astXmlPurge_( AstXmlParent *this ) {
          item = elem->items[ i ];
    
          if( astXmlCheckType( item, AST__XMLWHITE ) ) {
-            item = Delete( item );
+            item = astXmlDelete( item );
             i--;
    
          } else if( astXmlCheckType( item, AST__XMLELEM ) ) {
@@ -2545,10 +2552,10 @@ void astXmlRemoveAttr_( AstXmlElement *this, const char *name,
 
 /* If there is an existing attribute with the same name and prefix,
    delete it. */
-      if( oldi > -1 ) Delete( oldattr );
+      if( oldi > -1 ) astXmlDelete( oldattr );
 
 /* Delete the temporary attribute structure. */
-      attr = Delete( attr );
+      attr = astXmlDelete( attr );
 
    }
 }
@@ -2693,10 +2700,10 @@ void astXmlRemoveURI_( AstXmlElement *this, const char *prefix ){
       }
 
 /* If the supplied namespace prefix was found in the list, delete it. */
-      if( oldi > -1 ) Delete( oldns );
+      if( oldi > -1 ) astXmlDelete( oldns );
 
 /* Delete the temporary namespace structure. */
-      ns = Delete( ns );
+      ns = astXmlDelete( ns );
 
    }
 }
@@ -2765,7 +2772,7 @@ void astXmlSetDTDec_( AstXmlDocument *this, const char *text1,
 
 /* If an error occurred, delete the new structure. */
    if( !astOK ) {
-      new = Delete( new );
+      new = astXmlDelete( new );
 
 /* Otherwise, store it in the document, deleting any existing declaration
    first. */
@@ -2775,7 +2782,7 @@ void astXmlSetDTDec_( AstXmlDocument *this, const char *text1,
       if( !this->prolog ) this->prolog = NewPrologue( this );
 
       pro = this->prolog;
-      if( pro->dtdec ) Delete( pro->dtdec );
+      if( pro->dtdec ) astXmlDelete( pro->dtdec );
       pro->dtdec = new;
    }
 }
@@ -2833,7 +2840,7 @@ void astXmlSetXmlDec_( AstXmlDocument *this, const char *text ){
 
 /* If an error occurred, delete the new structure. */
    if( !astOK ) {
-      new = Delete( new );
+      new = astXmlDelete( new );
 
 /* Otherwise, store it in the document, deleting any existing declaration
    first. */
@@ -2843,7 +2850,7 @@ void astXmlSetXmlDec_( AstXmlDocument *this, const char *text ){
       if( !this->prolog ) this->prolog = NewPrologue( this );
 
       pro = this->prolog;
-      if( pro->xmldecl ) Delete( pro->xmldecl );
+      if( pro->xmldecl ) astXmlDelete( pro->xmldecl );
       pro->xmldecl = new;
    }
 }
@@ -3324,13 +3331,13 @@ static void CleanXml( AstXmlObject *this, long int type ){
       elem->defns = astFree( elem->defns );   
       elem->prefix = astFree( elem->prefix );   
 
-      while( elem->nattr > 0 ) Delete( elem->attrs[ 0 ] );
+      while( elem->nattr > 0 ) astXmlDelete( elem->attrs[ 0 ] );
       elem->attrs = astFree( elem->attrs );
 
-      while( elem->nitem > 0 ) Delete( elem->items[ 0 ] );
+      while( elem->nitem > 0 ) astXmlDelete( elem->items[ 0 ] );
       elem->items = astFree( elem->items );
       
-      while( elem->nnspref > 0 ) Delete( elem->nsprefs[ 0 ] );
+      while( elem->nnspref > 0 ) astXmlDelete( elem->nsprefs[ 0 ] );
       elem->nsprefs = astFree( elem->nsprefs );
 
       CleanXml( this, AST__XMLOBJECT );
@@ -3376,20 +3383,20 @@ static void CleanXml( AstXmlObject *this, long int type ){
 
    } else if( type == AST__XMLDOC ){
       doc = (AstXmlDocument *) this;
-      doc->prolog = Delete( doc->prolog );
-      doc->root = Delete( doc->root );
-      while( doc->nepi > 0 ) Delete( doc->epilog[ 0 ] );
+      doc->prolog = astXmlDelete( doc->prolog );
+      doc->root = astXmlDelete( doc->root );
+      while( doc->nepi > 0 ) astXmlDelete( doc->epilog[ 0 ] );
       doc->epilog = astFree( doc->epilog );
       doc->current = NULL;
       CleanXml( this, AST__XMLOBJECT );
 
    } else if( type == AST__XMLPRO ){
       pro = (AstXmlPrologue *) this;
-      pro->xmldecl = Delete( pro->xmldecl );
-      while( pro->nmisc1 > 0 ) Delete( pro->misc1[ 0 ] );
+      pro->xmldecl = astXmlDelete( pro->xmldecl );
+      while( pro->nmisc1 > 0 ) astXmlDelete( pro->misc1[ 0 ] );
       pro->misc1 = astFree( pro->misc1 );
-      pro->dtdec = Delete( pro->dtdec );
-      while( pro->nmisc2 > 0 ) Delete( pro->misc2[ 0 ] );
+      pro->dtdec = astXmlDelete( pro->dtdec );
+      while( pro->nmisc2 > 0 ) astXmlDelete( pro->misc2[ 0 ] );
       pro->misc2 = astFree( pro->misc2 );
       CleanXml( this, AST__XMLOBJECT );
 
@@ -3477,20 +3484,21 @@ static const char *DefaultURI( AstXmlElement *elem ){
    return result;
 }
 
-static void *Delete( void *obj_ptr ){
+void *astXmlDelete_( void *obj_ptr ){
 /*
+*+
 *  Name:
-*     Delete
+*     astXmlDelete
 
 *  Purpose:
 *     Remove the supplied XmlObject from its parent and delete it.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "xml.h"
-*     void *Delete( void *obj )
+*     void *astXmlDelete( void *obj )
 
 *  Description:
 *     This function removes the supplied XmlObject from its parent and 
@@ -3506,6 +3514,7 @@ static void *Delete( void *obj_ptr ){
 *  Notes:
 *     - This function attempts to execute even if an error has already
 *     occurred.
+*-
 */
 
 /* Local Variables: */
@@ -3562,7 +3571,7 @@ static void *Delete( void *obj_ptr ){
             }
 
          } else if( astOK ) {
-            astError( AST__INTER, "Delete(xml): XmlObject of type %d has "
+            astError( AST__INTER, "astXmlDelete(xml): XmlObject of type %d has "
                       "inappropriate parent of type %d (internal AST "
                       "programming error).", obj->type, parent->type );
          }           
@@ -3611,7 +3620,7 @@ static void *Delete( void *obj_ptr ){
             }
 
          } else if( astOK ) {
-            astError( AST__INTER, "Delete(xml): XmlObject of type %d has "
+            astError( AST__INTER, "astXmlDelete(xml): XmlObject of type %d has "
                       "inappropriate parent of type %d (internal AST "
                       "programming error).", obj->type, parent->type );
          }           
@@ -3664,18 +3673,22 @@ static void *Delete( void *obj_ptr ){
          }
 
       } else if( astOK ) {
-         astError( AST__INTER, "Delete(xml): XmlObject of type %d has "
+         astError( AST__INTER, "astXmlDelete(xml): XmlObject of type %d has "
                    "inappropriate parent of type %d (internal AST "
                    "programming error).", obj->type, parent->type );
       }
 
 /* Nullify the parent pointer so that astXmlAnnul will delete the object. */
       obj->parent = NULL;
+
+/* If the supplied object has no parent, we can continue to annul it. */
+   } else {
+      ok = 1;
    }
 
 /* Report an error if required. */
    if( !ok && astOK ) {
-      astError( AST__INTER, "Delete(xml): Supplied XmlObject (type %d) "
+      astError( AST__INTER, "astXmlDelete(xml): Supplied XmlObject (type %d) "
                 "is not owned by its own parent (internal AST "
                 "programming error).", obj->type );
    }
@@ -4828,8 +4841,10 @@ static void InitXmlObject( AstXmlObject *new, long int type ){
    new->type = type;
    new->id = next_id++;
 
+#ifdef DEBUG
 /* Add the new XmlObject to the list of all XmlObjects. */
    AddObjectToList( new );
+#endif
 
 }
 
@@ -5091,7 +5106,7 @@ static AstXmlAttribute *NewAttribute( const char *name, const char *value,
    InitXmlAttribute( new, AST__XMLATTR, name, value, prefix );
 
 /* If an error occurred, delete the new structure. */
-   if( !astOK ) new = Delete( new );
+   if( !astOK ) new = astXmlDelete( new );
 
 /* Return the result. */
    return new;
@@ -5142,7 +5157,7 @@ static AstXmlDocument *NewDocument(){
    InitXmlDocument( new, AST__XMLDOC );
 
 /* If an error occurred, delete the new structure. */
-   if( !astOK ) new = Delete( new );
+   if( !astOK ) new = astXmlDelete( new );
 
 /* Return the result. */
    return new;
@@ -5200,7 +5215,7 @@ static AstXmlNamespace *NewNamespace( const char *prefix, const char *uri ){
    InitXmlNamespace( new, AST__XMLNAME, prefix, uri );
 
 /* If an error occurred, delete the new structure. */
-   if( !astOK ) new = Delete( new );
+   if( !astOK ) new = astXmlDelete( new );
 
 /* Return the result. */
    return new;
@@ -5258,7 +5273,7 @@ static AstXmlPrologue *NewPrologue( AstXmlDocument *doc ){
    ((AstXmlObject *) new )->parent = (AstXmlParent *) doc;
 
 /* If an error occurred, delete the new structure. */
-   if( !astOK ) new = Delete( new );
+   if( !astOK ) new = astXmlDelete( new );
 
 /* Return the result. */
    return new;
@@ -5369,6 +5384,7 @@ static char *RemoveEscapes( const char *text ){
    return result;
 }
 
+#ifdef DEBUG
 static void RemoveObjectFromList( AstXmlObject *obj ){
 /*
 *  Name:
@@ -5430,6 +5446,7 @@ static void RemoveObjectFromList( AstXmlObject *obj ){
       existing_objects[ nobj ] = NULL;
    }
 }
+#endif
 
 static const char *ResolvePrefix( const char *prefix, AstXmlElement *elem){
 /*
@@ -5585,6 +5602,7 @@ static int Ustrcmp( const char *a, const char *b ){
 
 }
 
+#ifdef DEBUG
 int astXmlTrace( int show ){
 /*
 *+
@@ -5659,6 +5677,7 @@ int astXmlTrace( int show ){
 
    return result;
 }
+#endif
 
 AstXmlElement *astXmlReadDocument_( AstXmlDocument **doc, 
                                    int (*is_wanted)( AstXmlElement * ),
@@ -5904,6 +5923,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
    AstXmlElement *parent;       /* Pointer to current parent element */
    AstXmlElement *elem;         /* A new element to be read */
    AstXmlElement *result;       /* The returned pointer */
+   char *cc;                    /* Pointer to next character */
    char *msg;                   /* Pointer to message buffer */
    char *text1;                 /* Pointer to dynamic string */
    char *text2;                 /* Pointer to another dynamic string */
@@ -6057,10 +6077,24 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
                      astXmlAddCharData( (AstXmlParent *) parent, 0, text4 );
                      text4 = astFree( text4 );
 
+
+/* If we are not allowed to skip over non-blank content, report an
+   error if the text is not blank. */
                   } else if( !skip ) {
-                     astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
-                               "the input data: \"%s\".", text1 );
-                     break;
+                     cc = text1 - 1;
+                     while( *(++cc) ) {
+                        if( !isspace( *cc ) ) {
+                           if( parent ) {
+                              astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
+                                        "the input data \"%s\" within element %s.", 
+                                        text1, astXmlGetTag( parent, 1 ) );
+                           } else {
+                              astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
+                                        "the input data: \"%s\".", text1 );
+                           }
+                           break;
+                        }
+                     }
                   }
 
 /* Otherwise, add it to the document prologue or epilogue. */
@@ -6089,8 +6123,13 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
 
 /* If the character is a ">", report an error. */
          if( c == '>' ) {
-            astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag \"<>\" "
-                      "encountered." );
+            if( parent ) {
+               astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag \"<>\" "
+                         "encountered within element %s.", astXmlGetTag( parent, 1 ) );
+            } else {
+               astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag \"<>\" "
+                         "encountered." );
+            }
             break;
 
 /* If the character is a "?", this must be a PI tag. */
@@ -6138,8 +6177,14 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             state = 9;
             text1 = astAppendString( text1, &nc1, "<![" );
          } else {
-            astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
-                      "starting with \"<!%c...\" encountered.", c );
+            if( parent ) {
+               astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
+                         "starting with \"<!%c...\" encountered within "
+                         "element %s.", c, astXmlGetTag( parent, 1 ) );
+            } else {
+               astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
+                         "starting with \"<!%c...\" encountered.", c );
+            }
             break;
          }
 
@@ -6177,8 +6222,14 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
          if( c == '-' ) {
             state = 10;
          } else {
-            astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
-                      "starting with \"<!-%c...\" encountered.", c );
+            if( parent ) {
+               astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
+                         "starting with \"<!-%c...\" encountered within "
+                         "element %s.", c, astXmlGetTag( parent, 1 ) );
+            } else {
+               astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
+                         "starting with \"<!-%c...\" encountered.", c );
+            }
             break;
          }
 
@@ -6189,8 +6240,14 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
                state = 11;
                text1 = astFree( text1 );
             } else {
-               astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
-                         "starting with \"%s%c...\" encountered.", text1, c );
+               if( parent ) {
+                  astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
+                            "starting with \"%s%c...\" encountered within "
+                            "element %s.", text1, c, astXmlGetTag( parent, 1 )  );
+               } else {
+                  astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
+                            "starting with \"%s%c...\" encountered.", text1, c );
+               }
                text1 = astFree( text1 );
                break;
             }
@@ -6199,8 +6256,14 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             text1 = AppendChar( text1, &nc1, c );
 
          } else {  
-            astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
-                      "starting with \"%s%c...\" encountered.", text1, c );
+            if( parent ) {
+               astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
+                         "starting with \"%s%c...\" encountered within "
+                         "element %s.", text1, c, astXmlGetTag( parent, 1 )  );
+            } else {
+               astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
+                         "starting with \"%s%c...\" encountered.", text1, c );
+            }
             text1 = astFree( text1 );
             break;
          }
@@ -6234,8 +6297,14 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
 
          } else if( c == '>' ) {
             if( text1 ) {
-               astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag \"%s...\" "
-                         "encountered.", msg );
+               if( parent ) {
+                  astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
+                            " \"%s...\" encountered within element %s.", msg, 
+                            astXmlGetTag( parent, 1 )  );
+               } else {
+                  astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag \"%s...\" "
+                            "encountered.", msg );
+               }
                break;
             } else {
                if( lc == '/' ) {
@@ -6301,8 +6370,14 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
                state = 17;
                text1 = astFree( text1 );
             } else {
-               astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
-                         "starting with \"%s%c...\" encountered.", text1, c );
+               if( parent ) {
+                  astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
+                            "starting with \"%s%c...\" encountered within "
+                            "element %s.", text1, c, astXmlGetTag( parent, 1 )  );
+               } else {
+                  astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
+                            "starting with \"%s%c...\" encountered.", text1, c );
+               }
                text1 = astFree( text1 );
                break;
             }
@@ -6311,8 +6386,14 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             text1 = AppendChar( text1, &nc1, c );
 
          } else {  
-            astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
-                      "starting with \"%s%c...\" encountered.", text1, c );
+            if( parent ) {
+               astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
+                         "starting with \"%s%c...\" encountered within "
+                         "element %s.", text1, c, astXmlGetTag( parent, 1 )  );
+            } else {
+               astError( AST__XMLWF, "astRead(XmlChan): Illegal XML tag "
+                         "starting with \"%s%c...\" encountered.", text1, c );
+            }
             text1 = astFree( text1 );
             break;
          }
@@ -6430,8 +6511,14 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
                   if( wanted > 0 ) {
                      astXmlAddPI( (AstXmlParent *) parent, 0, text1, text2 );
                   } else if( !skip ) {
-                     astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
-                               "the input data: \"%s\".", msg );
+                     if( parent ) {
+                        astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
+                                  "the input data \"%s\" within element %s.", 
+                                  msg, astXmlGetTag( parent, 1 ) );
+                     } else {
+                        astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
+                                  "the input data: \"%s\".", msg );
+                     }
                      break;
                   }
 
@@ -6564,8 +6651,14 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
                if( wanted > 0 ) {
                   astXmlAddComment( (AstXmlParent *) parent, 0, text1 );
                } else if( !skip ) {
-                  astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
-                            "the input data: \"%s\".", msg );
+                  if( parent ) {
+                     astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
+                               "the input data \"%s\" within element %s.", 
+                               msg, astXmlGetTag( parent, 1 ) );
+                  } else {
+                     astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
+                               "the input data: \"%s\".", msg );
+                  }
                   break;
                }
 
@@ -6597,8 +6690,14 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             if( parent && wanted > 0 ) {
                astXmlAddCDataSection( parent, text1 );
             } else if( !skip ) {
-               astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
-                         "the input data: \"%s\".", msg );
+               if( parent ) {
+                  astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
+                            "the input data \"%s\" within element %s.", 
+                            msg, astXmlGetTag( parent, 1 ) );
+               } else {
+                  astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
+                            "the input data: \"%s\".", msg );
+               }
                break;
             }
             text1 = astFree( text1 );
@@ -6697,7 +6796,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
                if( astOK ) {
                   astError( AST__XMLWF, "astRead(XmlChan): Multiple root "
                             "elements encountered." );
-                  elem = Delete( elem );
+                  elem = astXmlDelete( elem );
                }
                break;
             } else {
@@ -6717,8 +6816,14 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
 
 /* If it is not interested, report an error if skip is zero. */
          if( !newwanted && !skip ) {
-            astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
-                      "the input data: \"%s\".", msg );
+            if( parent ) {
+               astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
+                         "the input data \"%s\" within element %s.", 
+                         msg, astXmlGetTag( parent, 1 ) );
+            } else {
+               astError( AST__BADIN, "astRead(XmlChan): Cannot interpret "
+                         "the input data: \"%s\".", msg );
+            }
             break;
          }
 
@@ -6738,13 +6843,13 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
             if( answer ) {
                result = answer;
             } else {
-               elem = Delete( elem );
+               elem = astXmlDelete( elem );
             }
 
 /* If the elem is of no interest, delete it and return the initialised
    NULL pointer. */
          } else if( newwanted == 0 ) {
-            elem = Delete( elem );
+            elem = astXmlDelete( elem );
 
 /* Otherwise, "elem" itself is definitely of interest. If "elem" is
    the first item of interest, return it. */
@@ -6779,7 +6884,7 @@ static AstXmlElement *ReadContent( AstXmlDocument **doc, int wanted,
    if( msg ) msg = astFree( msg );
 
 /* Delete the returned object if an error occurred. */
-   if( !astOK ) result = Delete( result );
+   if( !astOK ) result = astXmlDelete( result );
 
 /* Return the result. */
    return result;

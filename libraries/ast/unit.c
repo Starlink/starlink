@@ -72,7 +72,6 @@
 #include "memory.h"              
 #include "pointset.h"            
 #include "mapping.h"             
-#include "mapping.h"             
 #include "unitmap.h"             
 #include "zoommap.h"             
 #include "mathmap.h"             

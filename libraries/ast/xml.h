@@ -268,9 +268,9 @@ const char *astXmlGetValue_( AstXmlObject *, int );
 const char *astXmlShow_( AstXmlObject * );
 int astXmlCheckType_( void *, long int );
 int astXmlGetNitem_( AstXmlElement *);
-int astXmlTrace_( int );           
 void *astXmlAnnulTree_( AstXmlObject * );
 void *astXmlAnnul_( AstXmlObject * );
+void *astXmlDelete_( void * );
 void astXmlAddAttr_( AstXmlElement *, const char *, const char *, const char * );
 void astXmlAddCDataSection_( AstXmlElement *, const char * );
 void astXmlAddCharData_( AstXmlParent *, int, const char * );
@@ -284,6 +284,10 @@ void astXmlRemoveItem_( AstXmlContentItem * );
 void astXmlRemoveURI_( AstXmlElement *, const char * );
 void astXmlSetXmlDec_( AstXmlDocument *, const char * );
 void astXmlSetDTDEC_( AstXmlDocument *, const char *, const char *, const char *);
+
+#ifdef DEBUG
+int astXmlTrace_( int );           
+#endif
 
 /* Function interfaces. */
 /* ==================== */
@@ -310,13 +314,13 @@ void astXmlSetDTDEC_( AstXmlDocument *, const char *, const char *, const char *
 #define astXmlAddAttr(elem,name,value,prefix) astXmlAddAttr_(astXmlCheckElement(elem,0),name,value,prefix)
 #define astXmlAddURI(elem,prefix,uri) astXmlAddURI_(astXmlCheckElement(elem,0),prefix,uri)
 #define astXmlAnnul(this) astXmlAnnul_(astXmlCheckObject(this,1))
+#define astXmlDelete(this) astXmlDelete_(this)
 #define astXmlAnnulTree(this) astXmlAnnulTree_(astXmlCheckObject(this,1))
 #define astXmlAddCDataSection(this,text) astXmlAddCDataSection_(astXmlCheckElement(this,0),text)
 #define astXmlAddCharData(this,where,text) astXmlAddCharData_(astXmlCheckParent(this,0),where,text)
 #define astXmlAddComment(this,where,text) astXmlAddComment_(astXmlCheckParent(this,0),where,text)
 #define astXmlAddElement(this,name,prefix) astXmlAddElement_(astXmlCheckElement(this,1),name,prefix)
 #define astXmlAddPI(this,where,target,text) astXmlAddPI_(astXmlCheckParent(this,0),where,target,text)
-#define astXmlTrace(show) astXmlTrace_(show)
 #define astXmlGetParent(this) astXmlGetParent_(astXmlCheckObject(this,0))
 #define astXmlGetRoot(this) astXmlGetRoot_(astXmlCheckObject(this,0))
 #define astXmlGetName(this) astXmlGetName_(astXmlCheckObject(this,0))
@@ -339,5 +343,9 @@ void astXmlSetDTDEC_( AstXmlDocument *, const char *, const char *, const char *
 #define astXmlSetDTDec(this,text1,text2,text3) astXmlSetDTDec_(astXmlCheckDocument(this,0),text1,text2,text3) 
 #define astXmlCheckType(this,type) astXmlCheckType_(this,type)
 #define astXmlCopy(this) astXmlCopy_(astXmlCheckObject(this,1))
+
+#ifdef DEBUG
+#define astXmlTrace(show) astXmlTrace_(show)
+#endif
 
 #endif

@@ -31,12 +31,15 @@
 *     AST_SET(C,D,I,L,R)
 *     AST_SHOW
 *     AST_VERSION 
+*     AST_LISTISSUED   (only if macro DEBUG is defined)
+*     AST_SETWATCHID   (only if macro DEBUG is defined)
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     20-JUN-1996 (RFWS):
@@ -51,6 +54,9 @@
 *        Add AST_VERSION function.
 *     7-FEB-2004 (DSB):
 *        Add AST_ESCAPES function.
+*     27-JAN-2005 (DSB):
+*        Added AST_LISTISSUED and AST_SETWATCHID so that DEBUG facilities
+*        can be used from fortran.
 *-
 */
 
@@ -392,3 +398,29 @@ F77_LOGICAL_FUNCTION(ast_test)( INTEGER(THIS),
    )
    return RESULT;
 }
+
+#ifdef DEBUG
+
+F77_SUBROUTINE(ast_listissued)( CHARACTER(TEXT)
+                                TRAIL(TEXT) ) {
+   GENPTR_CHARACTER(TEXT)
+   char *text;
+
+   astSetPermMem( 1 );
+   text = astString( TEXT, TEXT_length );
+   astSetPermMem( 0 );
+   astListIssued( text );
+   astFree( text );
+}
+
+F77_SUBROUTINE(ast_setwatchid)( INTEGER(ID) ) {
+   GENPTR_INTEGER(ID)
+   astSetWatchId( *ID );
+}
+
+
+
+#endif
+
+
+
