@@ -1,10 +1,14 @@
+2005-02-10  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+
+        * Extractor.pm: Add error handling.
+
 2005-01-24  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
-	* Extractor.pm: cache Task object in case extraction is done
-	twice in the same process.
+        * Extractor.pm: cache Task object in case extraction is done
+          twice in the same process.
 
 2005-01-05  Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
 
-	* Extractor.pm: require filter when doing extraction, delete 
-	catalog file after extraction if debugging is not on
+        * Extractor.pm: Require filter when doing extraction, delete
+          catalog file after extraction if debugging is not on.
 
