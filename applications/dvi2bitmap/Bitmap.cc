@@ -81,19 +81,27 @@ Bitmap::const_iterator Bitmap::endIterator_;
  * increasing to the right, and the <em>y</em>-axis increasing downwards.
  *
  * @param w the width of the bitmap, in pixels
+ *
  * @param h the height of the bitmap, in pixels
- * @param bpp the number of bits-per-pixel
- * @param expandable if true, the bitmap is expandable
- * @param maxwidth if <code>expandable</code> is true, and this is
- * greater than or equal to <code>w</code>, this is the maximum horizontal size
- * the bitmap will expand to; if it is less than <code>w</code>
- * (which includes negative, the default), it is set to a default
- * multiplier of the width <code>w</code>
- * @param maxheight if <code>expandable</code> is true, and this is
- * greater than or equal to <code>h</code>, this is the maximum vertical size
- * the bitmap will expand to; if it is less than <code>h</code> (which
- * includes negative, the default), the maximum vertical size will be
- * such that <code>maxheight/h==maxwidth/w</code>
+ *
+ * @param bpp the number of bits-per-pixel (default is 1)
+ *
+ * @param expandable if true (the default), the bitmap is expandable;
+ * if false, the bitmap is fixed at the specified size
+ *
+ * @param maxwidth if <code>expandable</code> is true, and
+ * <code>maxwidth</code> is greater than or equal to <code>w</code>,
+ * this is the maximum horizontal size the bitmap will expand to; if
+ * it is less than <code>w</code> (which includes negative, the
+ * default), the maximum width is set to a default multiplier of the width
+ * <code>w</code>
+ *
+ * @param maxheight if <code>expandable</code> is true, and
+ * <code>maxheight</code> is greater than or equal to <code>h</code>,
+ * this is the maximum vertical size the bitmap will expand to; if
+ * <code>maxheight</code> is less than <code>h</code> (which includes
+ * negative, the default), the maximum vertical size will be such that
+ * <code>maxheight/h==maxwidth/w</code>
  */
 Bitmap::Bitmap (const int w, const int h, const int bpp,
 		bool expandable,
@@ -103,9 +111,8 @@ Bitmap::Bitmap (const int w, const int h, const int bpp,
       customRGB_(false), bpp_(bpp)
 {
     B = new Byte[W*H];
-    //    memset ((void*)B, 0, W*H);
 
-    reset();
+    clear();
     
     if (isExpandable_) {
 	if (maxwidth >= w)
@@ -115,7 +122,7 @@ Bitmap::Bitmap (const int w, const int h, const int bpp,
 	if (maxheight >= h)
 	    maxH_ = maxheight;
 	else
-	    maxH_ = h*maxwidth/w + 1; // round up
+	    maxH_ = h*maxW_/w + 1; // round up
     }
 
 //     bbL = bbT = INT_MAX;	// numeric_limits<int>::max();
@@ -179,7 +186,7 @@ Bitmap::~Bitmap()
  * the past, the reset bitmap is the same size.  Also, it does not
  * reset the transparency flag or adjust the colour settings.
  */
-void Bitmap::reset()
+void Bitmap::clear()
 {
     memset ((void*)B, 0, W*H);
     
@@ -206,7 +213,7 @@ void Bitmap::reset()
     // but don't reset transparent_ or customRGB_
 
     if (verbosity_ > normal)
-	cerr << "Bitmap::reset" << endl;
+	cerr << "Bitmap::clear" << endl;
 }
 
 /**
