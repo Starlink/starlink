@@ -166,6 +166,12 @@ public class GenerateDependencies {
                     System.out.print(newlineString + manifestString + cpt);
                     lastComponent = cpt;
                 }
+
+                if (cpt.getStatus() == Component.STATUS_OBSOLETE) {
+                    System.err.println("Component " + c.getName()
+                                       + " depends on obsolete component "
+                                       + cpt.getName());
+                }
             }
             System.out.println();
 
@@ -216,7 +222,7 @@ public class GenerateDependencies {
     /**
      * Represents a single component.
      */
-    private static class Component {
+    private static final class Component {
 
         private Element el;
         /**
@@ -256,10 +262,26 @@ public class GenerateDependencies {
          */
         public static final int BUILDSUPPORT_NO = 3;
 
+        /**
+         * This component is a current one.
+         */
+        public static final int STATUS_CURRENT = 1;
+        /**
+         * This component is an obsolete one.
+         */
+        public static final int STATUS_OBSOLETE = 2;
+
+
         public Component(Element el) {
             this.el = el;
             allDirectDependencies = new java.util.HashMap();
             allComponentDependencies = new java.util.HashMap();
+            if (componentPath().indexOf("obsolete") >= 0
+                && getStatus() != STATUS_OBSOLETE) {
+                System.err.println("Warning: Component " + getName()
+                                   + ": path " + componentPath()
+                                   + " contains 'obsolete' but attribute 'status' does not");
+            }
         }
 
         /** Name of the component */
@@ -306,7 +328,30 @@ public class GenerateDependencies {
             }
             return path;
         }
-        
+
+        /**
+         * Retrieves the status of this component.
+         * @return one of the status values {@link #STATUS_CURRENT} or
+         * {@link #STATUS_OBSOLETE}
+         */
+        public int getStatus() {
+            String s = el.getAttribute("status");
+            int ret;
+
+            if (s.equals("current")
+                || s.equals("")) // default is current
+                ret = STATUS_CURRENT;
+            else if (s.equals("obsolete"))
+                ret = STATUS_OBSOLETE;
+            else {
+                System.err.println("Component " + getName()
+                                   + " has unknown status " + s
+                                   + " (defaulting to 'current')");
+                ret = STATUS_CURRENT;
+            }
+            return ret;
+        }
+
         /**
          * Gets the set of direct dependencies of this component.
          * @param type one of the type strings SOURCESET, INCLUDE, and so on.
@@ -490,9 +535,9 @@ public class GenerateDependencies {
     /**
      * Encapsulates a dependency on a component.  Expresses that there
      * is a dependency of type {@link #type} on the component
-     * {@link * #dependency}.
+     * {@link #component}.
      */
-    private static class Dependency
+    private static final class Dependency
             implements Comparable {
         private String mytype;
         private String dependsOnComponentName;
