@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {226.5}
+\newcommand{\stardocnumber}    {226.6}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {20 February 2002}
+\newcommand{\stardocdate}      {4th September 2002}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
 \newcommand{\stardocmanual}    {User Manual}
@@ -554,8 +554,8 @@ data, but also performs well on other astronomical images.
 
 \EXTRACTOR\ is basically Emmanuel Bertin's \SExtractor\
 (Source-Extractor) program\footnote{BERTIN E. and ARNOUTS S., 1996,
-A\&AS 117,393} re-packaged for use in the 
-\xref{Starlink Software Environment}{sg4}{} \latex{(see SG/4)}.  
+A\&AS 117,393} re-packaged for use in the
+\xref{Starlink Software Environment}{sg4}{} \latex{(see SG/4)}.
 This means that it uses the Starlink parameter system, accepts images in
 \xref{NDF}{sun33}{abstract} format \latex{(see SUN/33)} and uses the
 \xref{AST}{sun210}{} library \latex{(SUN/210)} for astrometry.
@@ -570,13 +570,13 @@ SUN/55)} -- these include \htmladdnormallink{FITS}{\FITSURL} and
 \htmladdnormallink{IRAF}{\IRAFURL} OIF.
 
 An slightly modified version of \SExtractor\ \sexversion\ is also
-included in the distribution of \EXTRACTOR.  
+included in the distribution of \EXTRACTOR.
 You can find details of \SExtractor's operation, and how to configure
 it, in the \htmladdnormallink{\SExtractor\ User's Guide}{\MUD} (which is issued
 as a Starlink Miscellaneous User Document, MUD 165\footnote{Note this
 document is still in draft, consequently you should read this in
-conjunction with the \htmladdnormallink{A\&AS paper}{sexpaper.ps} 
-and the \htmladdnormallink{earlier SExtractor user document}{sex1_doc.ps}.}) 
+conjunction with the \htmladdnormallink{A\&AS paper}{sexpaper.ps}
+and the \htmladdnormallink{earlier SExtractor user document}{sex1_doc.ps}.})
 \dash\ you configure \EXTRACTOR\
 in much the same way, although with
 \htmlref{some restrictions}{implementation_notes}
@@ -777,13 +777,26 @@ Either put \texttt{\$EXTRACTOR\_DIR} on your \texttt{PATH} or define an alias:
 \end{verbatim}\end{quote}
 then type:
 \begin{quote}
-\texttt{\% sex \textit{image} [-c \textit{configuration-file}]} 
+\texttt{\% sex \textit{image} [-c \textit{configuration-file}]}
 \texttt{[-\textit{Parameter1 Value1}] [-\textit{Parameter2 Value2}] ...}
 \end{quote}
 
-Note that if the \texttt{-c} option is omitted, file \texttt{default.sex} in the
-current working directory will be used \dash\ if you want to use the installed
-default file, you will need to specify it explicitly.
+Note that if the \texttt{-c} option is omitted, file
+\texttt{default.sex} in the current working directory will be used
+\dash\ if you want to use the installed default file, you will need to
+specify it explicitly.
+
+A patch has been applied to \SExtractor\ that allows it to read some
+types of MEF files. To process an image stored in the first extension
+you should use the format:
+\begin{quote}
+\texttt{\% sex \textit{image'[1]'} [-c \textit{configuration-file}]}
+\texttt{[-\textit{Parameter1 Value1}] [-\textit{Parameter2 Value2}] ...}
+\end{quote}
+the second extension is indicated by \texttt{\textit{image'[2]'}} and
+so on (note that the single quotes are only needed to protect the square
+brackets from the C-shell). MEF files that contain a primary image are
+not understood.
 
 \section{\xlabel{using_gaia_and_extractor}Using GAIA and \EXTRACTOR}
 The Graphical Astronomy and Image Analysis Tool (GAIA -
@@ -853,13 +866,13 @@ with existing data and analysis methods, the \EXTRACTOR\ and Starlink
 configuration scheme that allows this traditional behaviour to be
 recovered and naturally extended.
 
-The configuration options that control the chosen isophotal thresholds 
+The configuration options that control the chosen isophotal thresholds
 are:
 \begin{itemize}
   \item \texttt{RAD\_TYPE} and
   \item \texttt{RAD\_THRESH}
 \end{itemize}
-\texttt{RAD\_TYPE} can be either \texttt{SB} or \texttt{INT}, 
+\texttt{RAD\_TYPE} can be either \texttt{SB} or \texttt{INT},
 which indicate that the levels will be defined in terms of surface
 brightnesses or intensities (\textit{i.e}. magnitudes and data counts),
 respectively.
@@ -885,7 +898,7 @@ The actual formula used to generate the thresholds is:
 \begin{quote}
     $I_{i} = A * 10^{-0.4 * (start+step*i-zp)},\ i = 0, 15$
 \end{quote}
-where $I_{i}$ is the $i$th threshold, $A$ is the area of an image pixel 
+where $I_{i}$ is the $i$th threshold, $A$ is the area of an image pixel
 in arcseconds, $start$, $step$ and $zp$ are as described above.
 
 If \texttt{RAD\_TYPE} is \texttt{INT} then the correct
@@ -932,13 +945,13 @@ the peak intensity.
  This is a minor update to the \EXTRACTOR\ package with several
  significant changes:
  \begin{itemize}
-   \item \SExtractor\ has been updated to version 2.2.1. 
+   \item \SExtractor\ has been updated to version 2.2.1.
 
    \item New parameters to control the measurement of \texttt{mean}
          object radii at configurable intensity levels have been
          added to the Starlink version of \EXTRACTOR\ and \SExtractor.
  \end{itemize}
- The update to \SExtractor\ 2.2.1 introduces the following changes (from 
+ The update to \SExtractor\ 2.2.1 introduces the following changes (from
  the \SExtractor\ change log).
  \begin{itemize}
    \item Version 2.2.1
@@ -959,7 +972,7 @@ the peak intensity.
    \item Version 2.1.5
       \begin{itemize}
         \item Small inaccuracy in crowding-flag positioning fixed.
-        \item Fixed division by zero in local background in 
+        \item Fixed division by zero in local background in
               \texttt{MASK\_TYPE} \texttt{CORRECT} mode.
         \item Risk of segmentation fault with huge weight maps fixed.
       \end{itemize}
@@ -972,10 +985,10 @@ the peak intensity.
    \item Version V2.1.3
       \begin{itemize}
         \item Bug in \texttt{ASSOC} on Linux systems fixed.
-        \item Background bug in \texttt{WEIGHT\_TYPE} \texttt{NONE}, 
+        \item Background bug in \texttt{WEIGHT\_TYPE} \texttt{NONE},
               \texttt{MAP\_WEIGHT} mode fixed.
         \item \texttt{THRESH\_TYPE} \texttt{ABSOLUTE} now works on
-              weighted images. 
+              weighted images.
       \end{itemize}
    \item Version V2.1.0
       \begin{itemize}
@@ -1019,21 +1032,30 @@ A minor update to \EXTRACTOR\ with the following changes:
 
     \item The output format for the \texttt{X\_WORLD} and
           \texttt{Y\_WORLD} fields has been changed to always give at
-           least $0.01$ arcsecond accuracy. 
+           least $0.01$ arcsecond accuracy.
 
     \item \EXTRACTOR\ and \SExtractor\ have modified to offer the
        \texttt{BKGSIG} parameter (local background sigma) option used
        by \texttt{GIM2D} .
 
-     \item A bug causing the output from \EXTRACTOR\ to be occasionally 
+     \item A bug causing the output from \EXTRACTOR\ to be occasionally
        garbled has been fixed.
 \end{itemize}
 
 \subsection{Version 1.4-0}
-A minor release of EXTRACTOR, just adding two new parameters:
-\texttt{X\_PIXEL} and \texttt{Y\_PIXEL}. These output NDF pixel
-coordinates.
+ This is a minor release of \EXTRACTOR, just adding two new parameters:
+ \texttt{X\_PIXEL} and \texttt{Y\_PIXEL}. These output NDF pixel coordinates.
 
+ A patch to enable the native version to read MEF files has been
+ incorporated. The extension is identified using a number in square
+ brackets (0 is the primary extension), for instance:
+ \begin{quote}
+ \begin{verbatim}
+     % $EXTRACTOR_DIR/sex mef_file.fits'[1]'
+ \end{verbatim}
+ \end{quote}
+ would process the first extension. MEF files input to 
+ \SExtractor\ should contain a primary image.
 
 \section{\xlabel{references}References}
 Bailey, J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\
