@@ -6,15 +6,18 @@ use Test::More;
 BEGIN {
  eval { use Graphics::PLPLOT; };
  if ( $@ ) {
-   plan skip_all => "PLPLOT module not installed.";
+   plan skip_all => "Graphics::PLPLOT module not installed.";
    exit;
  } else {
-   plan tests => 1;
+   plan tests => 5;
  }  
+ Graphics::PLPLOT->import(qw/ :all /);
  
 };
 
-print "# PLplot Version: ". &plgver() ."\n";
+
+require_ok("Starlink::AST");
+require_ok("Starlink::AST::PLplot");
 
 plsdev( "xwin" );
 plinit();
@@ -23,20 +26,24 @@ pladv(0);
 plvpor(0, 1, 0, 1);
 plwind(0, 1, 0, 1);
 
+plcol0(2);
+plenv(0, 1, 0, 1, 0, 1);
+
 my ( @x, @y );
-$x[0] = 1; $y[0] = 1;
-$x[1] = 2; $y[1] = 2;
-$x[2] = 3; $y[2] = 3;
-$x[3] = 4; $y[3] = 4;
+$x[0] = 0.1; $y[0] = 0.1;
+$x[1] = 0.2; $y[1] = 0.2;
+$x[2] = 0.3; $y[2] = 0.3;
+$x[3] = 0.4; $y[3] = 0.4;
 
 # _Gline( \@x, \@y );
-is( Starlink::AST::PGPLOT::_GLine( \@x, \@y ), 1, "Calling _GLine()" );
+plcol0(1);
+is( Starlink::AST::PLplot::_GLine( \@x, \@y ), 1, "Calling _GLine()" );
 
 # _GMark( \@x, \@y, $type );
-is( Starlink::AST::PGPLOT::_GMark( \@x, \@y, 6 ), 1, "Calling _GMark()" );
+is( Starlink::AST::PLplot::_GMark( \@x, \@y, 6 ), 1, "Calling _GMark()" );
 
 # _GFlush();
-is( Starlink::AST::PGPLOT::_GFlush(), 1, "Calling _GFlush()" );
+is( Starlink::AST::PLplot::_GFlush(), 1, "Calling _GFlush()" );
 
 plend();
 
