@@ -100,7 +100,7 @@
       STATUS = SAI__ERROR
       CALL MSG_SETC( 'TYPE', INTTYP )
       CALL ERR_REP( 'CON_I2HTY_ERR',
-     :  'Invalid Interim data type ^INTTYP.  Unable to convert it to '/
+     :  'Invalid Interim data type ^TYPE.  Unable to convert it to '/
      :  /'an HDS equivalent.', STATUS )
 
   999 CONTINUE
