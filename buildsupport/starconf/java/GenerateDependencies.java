@@ -255,9 +255,10 @@ public class GenerateDependencies {
                     Component c = (Component)allComponents.get(dep.packName());
                     if (c == null) {
                         // never heard of it!
-                        System.err.println("Package " + getName()
+                        System.err.println("Component " + getName()
                                            + " depends on non-existent "
                                            + dep);
+                        allDeps.add(dep);
                     } else if (pathHere.search(dep.packName()) >= 0) {
                         // circular dependency
                         if (warnCircular) {
