@@ -722,9 +722,14 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
     *status = istat;
 
-    if ( ! ppos )
+    if ( ! ppos ) {
+      int    lfp = flen;
+      while ( (fspec[lfp] <= ' ') && (lfp>1) )
+        lfp--;
+
       adic_setecs( ADI__INVARG, "File %*s cannot be opened", status,
-		   flen, fspec );
+		   flp, fspec );
+      }
     }
 
 /* Opened ok? If so, write in details of representation and access mode */
