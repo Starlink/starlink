@@ -30,6 +30,7 @@
 #include "unitmap.h"
 #include "wcsmap.h"
 #include "winmap.h"
+#include "xmlchan.h"
 #include "zoommap.h"
 
 #include "error.h"
@@ -98,6 +99,7 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(UnitMap);
    LOAD(WcsMap);
    LOAD(WinMap);
+   LOAD(XmlChan);
    LOAD(ZoomMap);
 
    astError( AST__OCLUK, "astGetLoader: Object of unknown class \"%s\" cannot "

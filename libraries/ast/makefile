@@ -1384,7 +1384,7 @@ fwinmap.o: fwinmap.c f77.h c2f77.h error.h memory.h winmap.h mapping.h \
 fshiftmap.o: fshiftmap.c f77.h c2f77.h error.h memory.h shiftmap.h mapping.h \
  object.h channel.h pointset.h
 fxmlchan.o: fxmlchan.c f77.h c2f77.h error.h memory.h xmlchan.h \
- channel.h object.h
+ channel.h object.h xml.h
 fzoommap.o: fzoommap.c f77.h c2f77.h error.h memory.h zoommap.h \
  mapping.h object.h channel.h pointset.h
 grf_null.o: grf_null.c grf.h error.h ast_err.h
