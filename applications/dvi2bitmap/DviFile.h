@@ -157,7 +157,7 @@ public:
 	 * compatible ones) have a preamble which ensures that the DVI
 	 * units are scaled points, times the overall magnification factor.
 	 */
-	unit_dvi,
+	unit_dvi
     };
     static DviUnits unitType(string unitString);
     static string unitString(DviUnits unit);
