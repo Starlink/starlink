@@ -108,7 +108,7 @@ int IIIENI_C ( int display, int intype, int intid, int objtype, int objid,
 {
 
 /* Local Variables */
-int              i , j , ii , jj , intid0;
+int              i , j , ii , jj , intid0 = 0;
 int              slir , slig , slib;
 int              iiierr;
 
@@ -361,7 +361,7 @@ int  i , trg_flag , user_flag , exit_trg;
 int  userstatus , ew;
 int  iiierr;
 int  int_scroll;
-int  int_scroll_mem;
+int  int_scroll_mem = 0;
 
 INTER_DATA     *intdata;
 

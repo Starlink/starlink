@@ -460,7 +460,7 @@ int IIMSMV_C ( int display, int memlist[], int nmem, int vis )
 
 /* Local Variables */
 int    i , j , k , jj , kk , curconf , curmem , bck , status;
-int    xc0 , xc1 , yc0 , yc1;
+int    xc0 , xc1 = 0, yc0 , yc1 = 0;
 int    dxc , dyc , x_dev , y_dev , x_mem , y_mem;
 int    lowx , lowy , upx , upy , x_min , y_min , x_max , y_max;
 int    zx , zy , xoff , yoff , xdim , ydim;
@@ -470,7 +470,7 @@ int    lvis;
 int    zoomf;
 
 float  x0 , x1 , y0 , y1 , xs0 , xs1 , ys0 , ys1;
-float  zoom;
+float  zoom = 0.0;
 
 CONF_DATA  *conf;
 MEM_DATA   *mem;
@@ -1083,7 +1083,7 @@ int IIMEBM_C ( int display, char bmdscr[], char bmtype, int* xdim, int* ydim )
 {
 
 /* Local Variables */
-int  extbm, xsize, ysize;
+int  extbm, xsize = 0, ysize = 0;
 int  iimerr;
 
 /* check if display has been opened */
