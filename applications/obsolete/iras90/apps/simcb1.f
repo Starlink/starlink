@@ -159,7 +159,7 @@
 
          DO SLOT = 1, NSLOTS
             IF( PSFDET( SLOT ) .NE. 0 ) THEN
-               CALL NDG_ANNUL( PSFNDF( SLOT ), STATUS )
+               CALL NDF_ANNUL( PSFNDF( SLOT ), STATUS )
                SLOTS( PSFDET( SLOT ) ) = 0
                PSFDET( SLOT ) = 0
             END IF
@@ -226,7 +226,7 @@
 *  release the resources used by the PSF stored in the slot, before
 *  storing the new information.
                IF( PSFDET( NEXT ) .NE. 0 ) THEN
-                  CALL NDG_ANNUL( PSFNDF( NEXT ), STATUS )
+                  CALL NDF_ANNUL( PSFNDF( NEXT ), STATUS )
                   SLOTS( PSFDET( NEXT ) ) = 0
                   PSFDET( NEXT ) = 0
                END IF

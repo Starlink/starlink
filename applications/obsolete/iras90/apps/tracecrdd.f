@@ -1135,7 +1135,7 @@
       CALL IRC_CLOSE( STATUS )
 
 *  Annul the NDF identifier.
-      CALL NDG_ANNUL( INDF, STATUS )
+      CALL NDF_ANNUL( INDF, STATUS )
 
 *  Store the processed file for use by later applications.
       CALL IRM_LISTN( 'NDFLIST', IGRP, 'TRACECRDD', STATUS )

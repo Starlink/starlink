@@ -141,7 +141,7 @@
             IF( STATUS .NE. SAI__OK ) THEN
 
 *  ...annul the NDF identifier.
-               CALL NDG_ANNUL( INDF, STATUS )
+               CALL NDF_ANNUL( INDF, STATUS )
 
 *  Flush the error condition.
                CALL ERR_FLUSH( STATUS )

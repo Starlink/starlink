@@ -356,7 +356,7 @@
 *  Remove the CRDD file from the IRC_ and NDF system.
          CALL IRC_ANNUL( IDC, STATUS )
          CALL NDF_ANNUL( TNDF, STATUS )
-         CALL NDG_ANNUL( INDF, STATUS )
+         CALL NDF_ANNUL( INDF, STATUS )
 
       END DO
 

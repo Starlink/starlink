@@ -337,14 +337,14 @@
      :                 DUSED, STATUS )
 
 *  Annul the NDF identifier for the input NDF.
-         CALL NDG_ANNUL( INDF3, STATUS )
+         CALL NDF_ANNUL( INDF3, STATUS )
 
 *  If an error has occurred, delete the output NDF, otherwise just 
 *  annul its identifier.
          IF( STATUS .NE. SAI__OK ) THEN
-            CALL NDG_DELET( INDF4, STATUS )
+            CALL NDF_DELET( INDF4, STATUS )
          ELSE
-            CALL NDG_ANNUL( INDF4, STATUS )
+            CALL NDF_ANNUL( INDF4, STATUS )
          END IF
 
 *  If any error has occured, then

@@ -220,6 +220,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      LCMD = 0
+
 *  Establish the conditional message filter level using parameter
 *  MSG_LEVEL.
       CALL MSG_IFGET( 'MSG_FILTER', STATUS )
@@ -473,7 +475,7 @@
          CALL DAT_ANNUL( NDFLOC, STATUS )
 
 *  Annul the NDF identifier.
-         CALL NDG_ANNUL( NDFIN, STATUS )
+         CALL NDF_ANNUL( NDFIN, STATUS )
 
 *  If an error occured processing the current NDF, flush the error.
          IF( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )

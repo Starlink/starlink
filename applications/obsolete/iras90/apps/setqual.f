@@ -318,6 +318,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+      THERE = .FALSE.
+
 *  Establish the conditional message filter level using parameter
 *  MSG_LEVEL.
       CALL MSG_IFGET( 'MSG_FILTER', STATUS )
@@ -333,7 +335,7 @@
 *  in the list must have the same number of dimensions.
       CALL NDG_NDFAS( IGRP2, 1, 'READ', NDFIN, STATUS )
       CALL NDF_BOUND( NDFIN, NDF__MXDIM, LBNDI, UBNDI, NDIMI, STATUS )
-      CALL NDG_ANNUL( NDFIN, STATUS )
+      CALL NDF_ANNUL( NDFIN, STATUS )
 
 *  Get a value for parameter QNAME.
       CALL PAR_GET0C( 'QNAME', QNAME, STATUS )
@@ -642,7 +644,7 @@
             END IF
 
 *  Annul the locator to mask.
-            CALL NDG_ANNUL( NDFMSK, STATUS )
+            CALL NDF_ANNUL( NDFMSK, STATUS )
 
 *  If the selected pixels were specified by a list, modify the QUALITY
 *  component of the input NDF, to perform the requested function.
@@ -704,7 +706,7 @@
          CALL IRQ_RLSE( LOCS, STATUS )
 
 *  Annul the NDF identifier.
-         CALL NDG_ANNUL( NDFIN, STATUS )
+         CALL NDF_ANNUL( NDFIN, STATUS )
 
 *  If a parameter abort or null status exists, abort.
          IF( STATUS .EQ. PAR__ABORT .OR.

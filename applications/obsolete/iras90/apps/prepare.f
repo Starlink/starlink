@@ -537,8 +537,8 @@
      :                STATUS )
 
 *  Annul the input NDF identifiers.
-         CALL NDG_ANNUL( INDF1, STATUS )
-         IF( INDF2 .NE. NDF__NOID ) CALL NDG_ANNUL( INDF2, STATUS )
+         CALL NDF_ANNUL( INDF1, STATUS )
+         IF( INDF2 .NE. NDF__NOID ) CALL NDF_ANNUL( INDF2, STATUS )
 
 *  If an error occured processing the current input NDF, flush the
 *  error.

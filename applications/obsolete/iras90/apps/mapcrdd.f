@@ -652,7 +652,7 @@
 
 *  Annul the NDF and IRC identifiers for the first good CRDD file.
       CALL IRC_ANNUL( IDC0, STATUS )
-      CAll NDG_ANNUL( INDF0, STATUS )
+      CAll NDF_ANNUL( INDF0, STATUS )
 
 *  Abort if an error has been reported.
       IF ( STATUS .NE. SAI__OK ) GO TO 999

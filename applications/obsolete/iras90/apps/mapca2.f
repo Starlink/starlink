@@ -198,7 +198,7 @@
 *  CRDD file), annull the NDF identifier, flush the error condition and
 *  pass on to the next input file.
          IF( STATUS .NE. SAI__OK ) THEN
-            CALL NDG_ANNUL( INDF, STATUS )
+            CALL NDF_ANNUL( INDF, STATUS )
             CALL ERR_FLUSH( STATUS )
 
 *  If the file was succesfully imported into IRC, get the band number
@@ -240,7 +240,7 @@
 
 *  Annul the input IDC and NDF identifiers.
             CALL IRC_ANNUL( IDC, STATUS )
-            CALL NDG_ANNUL( INDF, STATUS )
+            CALL NDF_ANNUL( INDF, STATUS )
 
          END IF
 

@@ -164,7 +164,7 @@
      :                STATUS, %VAL( LNITEM ) )
 
 *  Annul the NDF identifier.
-         CALL NDG_ANNUL( INDF, STATUS )
+         CALL NDF_ANNUL( INDF, STATUS )
 
 *  If an error has occurred, annul it.
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )

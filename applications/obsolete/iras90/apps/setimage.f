@@ -273,8 +273,8 @@
 *  Release the resources for this pair of input NDFs.
          CALL DAT_ANNUL( LOC1, STATUS )
          CALL DAT_ANNUL( LOC2, STATUS )
-         CALL NDG_ANNUL( INDF1, STATUS )
-         CALL NDG_ANNUL( INDF2, STATUS )
+         CALL NDF_ANNUL( INDF1, STATUS )
+         CALL NDF_ANNUL( INDF2, STATUS )
 
 *  If an error occured processing the current NDF, flush the error.
          IF( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )

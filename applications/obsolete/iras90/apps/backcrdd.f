@@ -272,6 +272,9 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialise
+      BAND0 = 0
+
 *  Set the filter level for conditional message output.
       CALL MSG_IFGET( 'MSG_FILTER', STATUS )
 
@@ -514,14 +517,14 @@
 *  Annul the identifiers for the input NDF and the temporary copy of
 *  the input NDF.
          CALL NDF_ANNUL( TNDF, STATUS )
-         CALL NDG_ANNUL( INDF1, STATUS )
+         CALL NDF_ANNUL( INDF1, STATUS )
 
 *  If an error has occurred, delete the output NDF, otherwise just 
 *  annul its identifier.
          IF( STATUS .NE. SAI__OK ) THEN
-            CALL NDG_DELET( INDF2, STATUS )
+            CALL NDF_DELET( INDF2, STATUS )
          ELSE
-            CALL NDG_ANNUL( INDF2, STATUS )
+            CALL NDF_ANNUL( INDF2, STATUS )
          END IF
 
 *  If any error has occured, then

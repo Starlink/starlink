@@ -331,12 +331,12 @@
 
 *  If all has gone ok, annul the output NDF identifier.
       IF( STATUS .EQ. SAI__OK ) THEN
-         CALL NDG_ANNUL( INDF3, STATUS )
+         CALL NDF_ANNUL( INDF3, STATUS )
 
 *  If an error has occurred, attempt to delete the output NDF and
 *  remove the output NDF name from the returned group.
       ELSE
-         CALL NDG_DELET( INDF3, STATUS )
+         CALL NDF_DELET( INDF3, STATUS )
 
          CALL ERR_BEGIN( STATUS )
          CALL GRP_SETSZ( IGRP, INDEX - 1, STATUS )

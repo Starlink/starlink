@@ -237,9 +237,9 @@
          END IF
 
 *  Annul the NDF identifier.
-         CALL NDG_ANNUL( INDF, STATUS )
+         CALL NDF_ANNUL( INDF, STATUS )
 
-*  Flush any error which occurred during the call to NDG_ANNUL.
+*  Flush any error which occurred during the call to NDF_ANNUL.
          IF( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
 
       END DO

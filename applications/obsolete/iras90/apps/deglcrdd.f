@@ -452,7 +452,7 @@
      :                      HSTORY, STATUS )
 
 *  Annul the id for the output file.
-            CALL NDG_ANNUL( NDFOUT, STATUS )
+            CALL NDF_ANNUL( NDFOUT, STATUS )
 
 *  If the samples in the glitches will have their quality set, find or
 *  create (if not existing ) a extension which is used to contain
@@ -491,7 +491,7 @@
          CALL IRC_ANNUL( IRCID, STATUS )
       
 *  Annul the ID of the current CRDD file.
-         CALL NDG_ANNUL( NDFIN, STATUS )
+         CALL NDF_ANNUL( NDFIN, STATUS )
       
 *  Process next CRDD file.
       END DO

@@ -102,7 +102,7 @@
          END IF
       
 *  Annul the NDF identifier.
-         CALL NDG_ANNUL( INDF, STATUS )
+         CALL NDF_ANNUL( INDF, STATUS )
 
       END DO
 
