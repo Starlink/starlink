@@ -24,9 +24,9 @@
 *    Environment parameters :
 *     INP=UNIV(R)
 *            input data (either a single dataset or a file of references).
-*     REDSHIFT=REAL(R)
+*     Z=REAL(R)
 *            redshift of source spectrum
-*     FIT_MOD=UNIV(R)
+*     MODEL=UNIV(R)
 *            data object containing model specification
 *     MODE=LITERAL(R)
 *            plot mode
@@ -197,13 +197,12 @@
         ENDIF
 
 * Get model specification
-	CALL USI_ASSOCI('FIT_MOD','READ',MLOC,MPRIM,STATUS)
+	CALL USI_ASSOCI('MODEL','READ',MLOC,MPRIM,STATUS)
 	CALL FIT_MODGET(MLOC,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,STATUS)
 	CALL CMP_GET0C(MLOC,'SPEC',MODSPEC,STATUS)
 
 *   Look for redshift
         CALL SFIT_GETZ( Z, STATUS )
-
 
         IF (MPLOT) THEN
 

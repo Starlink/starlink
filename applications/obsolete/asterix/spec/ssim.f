@@ -9,15 +9,15 @@
 *    Environment parameters :
 *     INP=UNIV(R)
 *            dataset containing instrument response
-*     FIT_MOD=UNIV(R)
+*     MODEL=UNIV(R)
 *            data object containing model specification
-*     BG_DATA=UNIV(R)
+*     BG=UNIV(R)
 *            background spectral dataset
-*     POISS_ERRS=LOGICAL(R)
+*     POISS=LOGICAL(R)
 *            Poisson noise to be added?
-*     OBS_LENGTH=REAL(R)
+*     OBLEN=REAL(R)
 *            observation length in seconds
-*     REDSHIFT=REAL(R)
+*     Z=REAL(R)
 *            redshift
 *     OUT=UNIV(W)
 *            output spectrum
@@ -138,12 +138,12 @@
 	ENDIF
 
 * Get model specification
-	CALL USI_DASSOC('FIT_MOD','READ',MLOC,STATUS)
+	CALL USI_DASSOC('MODEL','READ',MLOC,STATUS)
 	CALL FIT_MODGET(MLOC,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,STATUS)
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * User input
-	CALL USI_DASSOC('BG_DATA','READ',BGLOC,STATUS)
+	CALL USI_DASSOC('BG','READ',BGLOC,STATUS)
 	IF(STATUS.EQ.SAI__OK)THEN
 	  BG=.TRUE.
 	ELSE IF(STATUS.EQ.PAR__NULL)THEN
@@ -152,9 +152,9 @@
 	ELSE
 	  GO TO 9000
 	ENDIF
-	CALL USI_GET0L('POISS_ERRS',POISS,STATUS)
+	CALL USI_GET0L('POISS',POISS,STATUS)
 	IF(POISS)THEN
-	  CALL USI_GET0R('OBS_LENGTH',TOBS,STATUS)
+	  CALL USI_GET0R('OBLEN',TOBS,STATUS)
 	ENDIF
         CALL SFIT_GETZ( Z, STATUS )
 

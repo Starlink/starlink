@@ -104,7 +104,7 @@ static
   int           nafree = ADI__MXMTR;
 #endif
 
-ADIblockPtr     ADI_G_blks[ADI__MXBLK]; /* Block address array */
+ADIblock        *ADI_G_blks[ADI__MXBLK]; /* Block address array */
 static
   long          ADI_G_nbyte = 0;        /* Global ADI memory count */
 static
@@ -236,7 +236,7 @@ ADIobj ADImemIdAddOff( ADIobj id, ADIinteger off, ADIstatus status )
 
 /* Set up a basic block control structure */
 
-void ADImemInitBlock( ADIblockCtrlPtr ctrl, int code, size_t size,
+void ADImemInitBlock( ADIblockCtrl *ctrl, size_t size,
 		      int nunit, ADIobj clsid, ADIstatus status )
   {
   if ( !_ok(status) )                   /* Check status on entry */
@@ -247,7 +247,6 @@ void ADImemInitBlock( ADIblockCtrlPtr ctrl, int code, size_t size,
     adic_setecs( SAI__ERROR, "Allocation cluster should be multiple of %d",
 	status, CHAR_BIT );
   else {
-    ctrl->clas = code;
     if ( clsid != ADI__nullid ) {
       ctrl->cdef = _cdef_data(clsid);
       ctrl->cdef->selfid = clsid;

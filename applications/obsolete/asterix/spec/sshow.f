@@ -8,9 +8,9 @@
 *
 *    Environment parameters :
 *
-*     FIT_MOD=UNIV(U)
+*     MODEL=UNIV(U)
 *		Object containing model
-*     DEVICE=CHAR(R)
+*     DEV=CHAR(R)
 *               Output device specification
 *
 *    Deficiencies :
@@ -62,7 +62,7 @@
       CALL MSG_PRNT( VERSION )
 
 *    Form or retrieve fit_model object
-      CALL USI_DASSOC( 'FIT_MOD', 'READ', FLOC, STATUS )
+      CALL USI_DASSOC( 'MODEL', 'READ', FLOC, STATUS )
 
 *    Declare file to user :
       CALL DISP_FILENAM( FLOC, 'Model', STATUS )

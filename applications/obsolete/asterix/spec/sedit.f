@@ -8,7 +8,7 @@
 *
 *    Environment parameters :
 *
-*     FIT_MOD=UNIV(U)
+*     MODEL=UNIV(U)
 *		Object containing model (existing or not)
 *     OVERRIDE=LOGICAL(R)
 *		Overwrite existing model specification?
@@ -103,14 +103,14 @@
       CALL MSG_PRNT( VERSION )
 
 *    Form or retrieve fit_model object
-      CALL USI_DEXIST('FIT_MOD','UPDATE',FLOC,STATUS)
+      CALL USI_DEXIST('MODEL','UPDATE',FLOC,STATUS)
 
       IF ( STATUS .EQ. PAR__ERROR ) THEN
 
 *      Object doesn't exist - Create it
         CALL ERR_ANNUL(STATUS)
-	CALL USI_DCREAT('FIT_MOD','FIT_MODEL',0,0,STATUS)
-        CALL USI_DASSOC('FIT_MOD','WRITE',FLOC,STATUS)
+	CALL USI_DCREAT('MODEL','FIT_MODEL',0,0,STATUS)
+        CALL USI_DASSOC('MODEL','WRITE',FLOC,STATUS)
         CALL DAT_NEWC(FLOC,'SPEC',80,0,0,STATUS)
         CALL DAT_NEWC(FLOC,'POLISH',80,0,0,STATUS)
         CALL DAT_NEW(FLOC,'NCOMP','_INTEGER',0,0,STATUS)
@@ -379,7 +379,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Delete old model if found :
-      CALL USI_DASSOC( 'FIT_MOD', 'WRITE', FLOC, STATUS )
+      CALL USI_DASSOC( 'MODEL', 'WRITE', FLOC, STATUS )
       CALL DAT_THERE( FLOC, 'PMODEL', THERE, STATUS )
       IF ( THERE ) THEN
         CALL DAT_ERASE( FLOC, 'PMODEL', STATUS )
@@ -387,9 +387,9 @@
       IF (STATUS.NE.SAI__OK) GOTO 99
 
 *    Get genus from user
-      CALL USI_DEF0C( 'GENUS', 'SPEC', STATUS )
-      CALL USI_GET0C( 'GENUS', GENUS, STATUS )
-      CALL USI_CANCL( 'GENUS', STATUS )
+      CALL USI_DEF0C( 'GEN', 'SPEC', STATUS )
+      CALL USI_GET0C( 'GEN', GENUS, STATUS )
+      CALL USI_CANCL( 'GEN', STATUS )
       IF (STATUS.NE.SAI__OK) GOTO 99
 
 *    Display menu and enter new model
@@ -469,7 +469,7 @@
 
 *    Write components to fit_model object :
       CALL DAT_NEW(FLOC,'PMODEL','PRIM_MODEL',1,NMCOMP,STATUS)
-      CALL USI_DASSOC('FIT_MOD','UPDATE',FLOC,STATUS)
+      CALL USI_DASSOC('MODEL','UPDATE',FLOC,STATUS)
       CALL CMP_PUT0C(FLOC,'SPEC',MODSPEC,STATUS)
       CALL CMP_PUT0C(FLOC,'POLISH',POLISH,STATUS)
       CALL CMP_PUT0I(FLOC,'NCOMP',NMCOMP,STATUS)

@@ -331,7 +331,7 @@ void strx_exit( ADIstatus status )
 /*  Load data into newly created string instance
  *
  */
-void strx_newmta( ADIobj id, ADImtaPtr mta, ADIstatus status )
+void strx_newmta( ADIobj id, ADImta *mta, ADIstatus status )
   {
   int                   nval;
   ADIstring         	*sptr;

@@ -8,7 +8,7 @@
 *
 *    Environment parameters :
 *
-*     FIT_MOD=UNIV(U)
+*     MODEL=UNIV(U)
 *		Object containing fit model
 *     PARAMS=INTEGER()(R)
 *		Numbers of parameters to be thawed
@@ -83,12 +83,12 @@
       CALL AST_INIT()
 
 *    Access and check fit_model object
-      CALL USI_ASSOCI( 'FIT_MOD', 'UPDATE', FLOC, INPRIM, STATUS )
+      CALL USI_ASSOCI( 'MODEL', 'UPDATE', FLOC, INPRIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       CALL DAT_TYPE(FLOC,TYP,STATUS)
       IF(TYP.NE.'FIT_MODEL')THEN
 	STATUS=SAI__ERROR
-	CALL ERR_REP('WRONG_OBJ','Not a fit_model data object',STATUS)
+	CALL ERR_REP( ' ', 'Not a fit_model data object', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 

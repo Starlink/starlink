@@ -99,7 +99,7 @@
 	ENDIF
 
 * Check for non-zero redshift
-	CALL USI_GET0R('REDSHIFT',Z,STATUS)
+	CALL USI_GET0R('Z',Z,STATUS)
 	RESCALE=1.0/(1.0+Z)
 
 * Set up base absorption

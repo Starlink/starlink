@@ -251,7 +251,7 @@
       IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
 
 *    Get model specification
-      CALL USI_ASSOCI( 'FIT_MOD', 'UPDATE', MLOC, PRIM, STATUS )
+      CALL USI_ASSOCI( 'MODEL', 'UPDATE', MLOC, PRIM, STATUS )
       CALL FIT_MODGET( MLOC, MODEL, NPAR, PARAM, LB, UB, LE, UE,
      :                                          FROZEN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -582,9 +582,9 @@
 
 *    Set iteration limits
       IF ( OPTIMISING ) THEN
-        CALL USI_DEF0I( 'MAX_IT', 30, STATUS )
-        CALL USI_GET0I( 'MAX_IT', NITMAX, STATUS )
-        CALL USI_GET0R( 'MINSLOPE', MINSLO, STATUS )
+        CALL USI_DEF0I( 'MAX', 30, STATUS )
+        CALL USI_GET0I( 'MAX', NITMAX, STATUS )
+        CALL USI_GET0R( 'MINS', MINSLO, STATUS )
         CALL MSG_PRNT( 'There are free non-grid parameters - '/
      :                          /' optimising at each grid point.' )
       ELSE
@@ -611,7 +611,7 @@
       END DO
 
 *    Update the model?
-      CALL USI_GET0L( 'UPDATE', UP, STATUS )
+      CALL USI_GET0L( 'UP', UP, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( UP ) THEN
         CALL MSG_PRNT( '** Updating model spec - do not exit'/

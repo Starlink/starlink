@@ -61,11 +61,11 @@ void ADIaryIndices( int ndim, int dims[], int offset, int index[],
  *  Given an array object and index array, return the base index,
  *  address of the base dimensions and the base data object
  */
-void ADIaryBaseInfo( ADIarrayPtr ary, int indices[], int orig[],
+void ADIaryBaseInfo( ADIarray *ary, int indices[], int orig[],
 		     int **bdims, ADIobj *bdata, ADIstatus status )
   {
   int		i;			/* Loop over dimensions */
-  ADIarrayPtr	lastary = ary;
+  ADIarray	*lastary = ary;
   int		offset;
 
   _chk_stat;				/* Check status on entry */
@@ -113,7 +113,7 @@ int ADIaryOffset( int ndim, int dims[], int index[] )
 /*
  * Index an array assuming Fortran indexing
  */
-ADIobj ADIaryCell( ADIarrayPtr ary, int index[], ADIstatus status )
+ADIobj ADIaryCell( ADIarray *ary, int index[], ADIstatus status )
   {
   ADIobj	bdata;			/* Base data handle */
   int		*bdims;			/* Dimensions of base array */
@@ -153,7 +153,7 @@ void ADIaryDel( ADIobj id, ADIstatus status )
 ADIobj ADIaryNew( int ndim, int dims[], ADIobj dataobj, ADIobj parent,
 		  ADIstatus status )
   {
-  ADIarrayPtr   adata;                  /* Pointer to array data */
+  ADIarray   	*adata;                 /* Pointer to array data */
   int           i;
   ADIobj    newa = ADI__nullid;
 
@@ -194,7 +194,7 @@ void ADIaryAlter( ADIobj id, char *name, int nlen, int ndim,
     ADIobj 	hid = _han_id(*lid);	/* Locate handled object */
 
     if ( _ary_q(hid) ) {              	/* Array object? */
-      ADIarrayPtr	ary;
+      ADIarray		*ary;
       int		idim;
       int		onelm,nnelm;
 

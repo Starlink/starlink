@@ -76,7 +76,7 @@ void adix_unlnk( ADIobj id, ADIstatus status )
 
 ADIlogical adix_isfile( ADIobj id, ADIstatus status )
   {
-  ADIclassDefPtr tdef = _DTDEF(id);
+  ADIclassDef *tdef = _DTDEF(id);
 
   return adix_chkder( tdef, _cdef_data(DsysFileObj), status );
   }
@@ -127,23 +127,20 @@ void adix_getpath( ADIobj id, ADIlogical nulterm, int mxlen, char *path,
   char lc;
   ADIobj rep;
   ADIobj lid = id;
-  ADIclassDefPtr tdef;
+  ADIclassDef *tdef;
 
   _chk_stat;
 
-  while ( (lid!=ADI__nullid) && _ok(status) )
-    {
+  while ( (lid!=ADI__nullid) && _ok(status) ) {
     tdef = _DTDEF(lid);
 
-    if ( tdef->selfid == DsysFileObj )
-      {
+    if ( tdef->selfid == DsysFileObj ) {
       lc = '%';
       adic_cget0i( lid, "REP", (ADIinteger *) &rep, status );
       adic_cget0c( rep, "NAME", 30, lbit, status );
       lcbit = lbit;
       }
-    else
-      {
+    else {
       lc = '>';
       lcbit = tdef->name;
       }
@@ -309,6 +306,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
       ADIlogical	there=ADI__false;
 
       rid = _CAR(curp);
+       adic_print( rid, status );
 
       adic_there( rid, "CREAT_RTN", &there, status );
 

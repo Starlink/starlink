@@ -4,9 +4,9 @@
 *     Sets FROZEN flag (and optionally values) for parameters in a fit_model
 *     data object.
 *    Environment parameters :
-*     FIT_MOD=UNIV(U)
+*     MODEL=UNIV(U)
 *		Object containing fit model
-*     PARAMS=INTEGER()(R)
+*     PAR[]=INTEGER()(R)
 *		Numbers of parameters to be frozen
 *     VALS=REAL()(R)
 *               Values for frozen parameters
@@ -66,31 +66,31 @@
         CALL AST_INIT()
 
 * Access and check fit_model object
-	CALL USI_ASSOCI('FIT_MOD','UPDATE',FLOC,INPRIM,STATUS)
+	CALL USI_ASSOCI('MODEL','UPDATE',FLOC,INPRIM,STATUS)
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 	CALL DAT_TYPE(FLOC,TYP,STATUS)
 	IF(TYP.NE.'FIT_MODEL')THEN
-	  CALL ERR_REP('WRONG_OBJ','Not a fit_model data object',STATUS)
 	  STATUS=SAI__ERROR
+	  CALL ERR_REP('WRONG_OBJ','Not a fit_model data object',STATUS)
 	  GO TO 9000
 	ENDIF
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * Get parameter numbers
-	CALL PAR_GET1I('PARAMS',MAXFREEZE,PARNO,NFREEZE,STATUS)
+	CALL USI_GET1I('PAR',MAXFREEZE,PARNO,NFREEZE,STATUS)
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * Check for invalid parameter numbers
 	DO J=1,NFREEZE
 	  IF(PARNO(J).LT.1.OR.PARNO(J).GT.NPAMAX)THEN
-	    CALL ERR_REP('BAD_NUM','Bad parameter number',STATUS)
 	    STATUS=SAI__ERROR
+	    CALL ERR_REP('BAD_NUM','Bad parameter number',STATUS)
 	    GO TO 9000
 	  ENDIF
 	ENDDO
 
 * Get values at which frozen parameters are to be set
-	CALL PAR_GET1R('VALS',MAXFREEZE,VAL,NVAL,STATUS)
+	CALL USI_GET1R('VALS',MAXFREEZE,VAL,NVAL,STATUS)
 	IF(STATUS.EQ.PAR__NULL)THEN
 	  CALL ERR_ANNUL(STATUS)
 	  PVALS=.FALSE.			! Null indicates no resetting of params

@@ -167,6 +167,7 @@ void adix_setes( char *ctx, int clen, ADIstatus status )
       strcpy( lctx, ADI_G_err_rtn );
       strcpy( lctx + lrtn, " : " );
       strncpy( lctx + lrtn + 3, ctx, clen );
+      *(lctx+lrtn+3+clen) = 0;
       cptr = lctx;
       }
     else

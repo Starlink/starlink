@@ -4,9 +4,9 @@
 *     Resets FROZEN flag (and optionally values) for parameters in a fit_model
 *     data object.
 *    Environment parameters :
-*     FIT_MOD=UNIV(U)
+*     MODEL=UNIV(U)
 *		Object containing fit model
-*     PARAMS=INTEGER()(R)
+*     PAR=INTEGER()(R)
 *		Numbers of parameters to be thawed
 *     VALS=REAL()(R)
 *               Values for thawed parameters
@@ -70,7 +70,7 @@
         CALL AST_INIT()
 
 * Access and check fit_model object
-	CALL USI_ASSOCI('FIT_MOD','UPDATE',FLOC,INPRIM,STATUS)
+	CALL USI_ASSOCI('MODEL','UPDATE',FLOC,INPRIM,STATUS)
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 	CALL DAT_TYPE(FLOC,TYP,STATUS)
 	IF(TYP.NE.'FIT_MODEL')THEN
@@ -81,7 +81,7 @@
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * Get parameter numbers
-	CALL USI_GET1I('PARAMS',MAXTHAW,PARNO,NTHAW,STATUS)
+	CALL USI_GET1I('PAR',MAXTHAW,PARNO,NTHAW,STATUS)
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * Check for invalid parameter numbers

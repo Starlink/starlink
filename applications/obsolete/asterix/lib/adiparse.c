@@ -521,18 +521,15 @@ void ADIstrmVprintf( ADIobj stream, char *format, int flen,
   if ( _ok(status) ) {
     ADIinteger	ai_arg;
     ADIobj	as_arg;
-    ADIobj	*asp_arg;
     char	*cp_arg;
     double	d_arg;
     char	fc;
     char	fct;
     char	*fptr = format;
     int		i_arg;
-    long	l_arg;
     char	*lbegin = NULL;
     char	lbuf[30];
     int		nb;
-    int		nitem;
     int		nlit = 0;
     int		npr;
     int		prec;
@@ -640,17 +637,6 @@ void ADIstrmVprintf( ADIobj stream, char *format, int flen,
 	  case '%':
 	    ADIstrmPutInt( dev, &fct, 1, status );
 	    break;
-	  case 'L':
-            nitem = va_arg(ap,int);
-	    asp_arg = va_arg(ap,ADIobj *);
-            while ( nitem-- ) {
-	      adix_print( stream, *asp_arg++, 1, ADI__true, status );
-              if ( nitem ) {
-                fct = ',';
-	        ADIstrmPutInt( dev, &fct, 1, status );
-                }
-              }
-	    break;
 	  }
 
 	if ( nb )
@@ -678,7 +664,11 @@ void ADIstrmVprintf( ADIobj stream, char *format, int flen,
     if ( nlit ) {
       ADIstrmPutInt( dev, lbegin, nlit, status ); nlit = 0;
       }
+/* Null terminate if enough room. The null is not part of the string */
+    if ( dev->bnc < dev->bufsiz )
+      dev->buf[dev->bnc] = 0;
     }
+
   }
 
 
@@ -840,23 +830,17 @@ char ADIreadCharFromStream( ADIobj stream, ADIstatus status )
 	    }
 	  break;
 	case ADIdevCin:
-	  if ( *str->dev->ptr )
-	    {
+	  if ( *str->dev->ptr ) {
 	    ch = *(str->dev->ptr++); gotit = ADI__true;
 	    }
-	  else
-	    {
-/*          if ( str->dev->ptr == str->dev->buf )
-	      {*/
-	      str->dev->ptr = str->dev->buf;
-	      printf( "> " );
-	      fgets( str->dev->buf, str->dev->bufsiz, stdin );
-/*            }
+	  else {
+	    str->dev->ptr = str->dev->buf;
+	    printf( "> " );
+	    fgets( str->dev->buf, str->dev->bufsiz, stdin );
+	    if ( feof(stdin) )
+	      ADIdropDevice( stream, status );
 	    else
-	      {
-	      str->dev->ptr = str->dev->buf;
-	      str->dev->buf[0] = '\0'; ch = '\n'; gotit = ADI__true;
-	      } */
+	      gotit = ADI__true;
 	    }
 	  break;
 	}
@@ -865,7 +849,7 @@ char ADIreadCharFromStream( ADIobj stream, ADIstatus status )
       *status = SAI__ERROR;
     }
 
-  str->ctok.dat[str->ctok.nc++] = ch;
+  if ( gotit ) str->ctok.dat[str->ctok.nc++] = ch;
   return ch;
   }
 
@@ -985,10 +969,12 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
   ADItokenType		tok = TOK__NOTATOK;
   char           	ch;
   ADIlogical        	inquotes = ADI__true;
-  ADIstream		*str = _strm_data(stream);
+  ADIstream		*str;
 
   if ( !_ok(status) )
     return tok;
+
+  str = _strm_data(stream);
 
 /* The token to return if a logical end of line is met. If end-of-lines are */
 /* ignored then the flag token is chosen, which forces more parsing */
@@ -1671,15 +1657,14 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 
     case TOK__CONST:
       next = ADI__true;
-      switch ( str->ctok.dt ) {
-	case UT_CODE_i:
+      if ( str->ctok.dt == UT_ALLOC_i ) {
 	  base = 10;
 	  idata = str->ctok;
 	  ADInextToken( stream, status );
 	  if ( str->ctok.t == TOK__CARAT2 ) {
 	    ADInextToken( stream, status );
 	    if ( (str->ctok.t != TOK__CONST) ||
-		 (str->ctok.dt != UT_CODE_i ) )
+		 (str->ctok.dt != UT_ALLOC_i ) )
 	      adic_setecs( ADI__SYNTAX, "Numeric base expected", status );
 	    else {
 	      base = (int) ADIparseScanInt( str->ctok.dat, 10, status );
@@ -1693,20 +1678,19 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 	    next = ADI__false;
 	  ival = ADIparseScanInt( idata.dat, base, status );
 	  adic_newv0i( ival, &expr, status );
-	  break;
-	case UT_CODE_d:
+	}
+      else if ( str->ctok.dt == UT_ALLOC_d ) {
 	  if ( ! sscanf(str->ctok.dat,"%lf",&dval) )
 	    *status = SAI__ERROR;
 	  else
 	    adic_newv0d( dval, &expr, status );
 	  break;
-	case UT_CODE_c:
-	  adic_newv0c( str->ctok.dat, &expr, status );
-	  break;
-	default:
-	  adic_newv0c( str->ctok.dat, &expr, status );
-	  break;
 	}
+      else if ( str->ctok.dt == UT_ALLOC_c ) {
+	  adic_newv0c( str->ctok.dat, &expr, status );
+	}
+      else
+	adic_newv0c( str->ctok.dat, &expr, status );
       if ( next )
 	ADInextToken( stream, status );
       break;

@@ -20,19 +20,19 @@
 *            lilelihood fit (else chi-squared)
 *     INP=UNIV(R)
 *            input data (either a single dataset or a file of references).
-*     REDSHIFT=REAL(R)
+*     Z=REAL(R)
 *            redshift of spectrum
-*     FIT_MOD=UNIV(R)
+*     MODEL=UNIV(R)
 *            data object containing model specification
-*     MAX_IT=INTEGER(R)
+*     MAX=INTEGER(R)
 *            max number of iterations to be performed
-*     MINSLOPE=REAL(R)
+*     MINS=REAL(R)
 *            minimum `reduced statistic' slope forcing continued iteration
-*     NUPDATE=INTEGER(R)
+*     NUPE=INTEGER(R)
 *            number of iterations between updates of model parameter file
-*     ERRORS=LOGICAL(R)
+*     ERR=LOGICAL(R)
 *            evaluate approximate parameter errors and write to model file?
-*     OUTPUT=LOGICAL(R)
+*     OUT=LOGICAL(R)
 *            spool (or send to file) summary of fit results?
 *     FITOUT=CHAR(R)
 *            File name for fit text output
@@ -266,7 +266,7 @@
       IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
 *    Get model specification
-      CALL USI_ASSOCI( 'FIT_MOD', 'UPDATE', MLOC, PRIM, STATUS )
+      CALL USI_ASSOCI( 'MODEL', 'UPDATE', MLOC, PRIM, STATUS )
       CALL FIT_MODGET(MLOC,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,STATUS)
       IF(STATUS.NE.SAI__OK) GOTO 9000
 
@@ -282,9 +282,9 @@
       END IF
 
 *    Set iteration limits
-      CALL USI_GET0I('MAX_IT',NITMAX,STATUS)
-      CALL USI_GET0R('MINSLOPE',MINSLO,STATUS)
-      CALL USI_GET0I('NUPDATE',NITUP,STATUS)
+      CALL USI_GET0I('MAX',NITMAX,STATUS)
+      CALL USI_GET0R('MINS',MINSLO,STATUS)
+      CALL USI_GET0I('NUP',NITUP,STATUS)
       IF ( STATUS .NE. SAI__OK ) GOTO 9000
 
 *    Set up workspace for model stack
@@ -393,7 +393,7 @@
       IF ( NOFREE ) THEN
 	ER = .FALSE.
       ELSE
-	CALL USI_GET0L('ERRORS',ER,STATUS)
+	CALL USI_GET0L('ERR',ER,STATUS)
       END IF
       IF ( ER ) THEN
 	CALL MSG_BLNK()

@@ -60,6 +60,7 @@
 *			  equivalent)
 *	adic_defmth	- define a method
 *       adic_defrep	- define a new file representation
+*	adic_dervd	- is an object derived from specified class
 *
 *      Method execution :
 *
@@ -487,6 +488,18 @@ void adic_defrep( char *name, ADIobj *id, ADIstatus status )
   _ERR_OUT;
   }
 
+void adic_dervd( ADIobj id, char *name, ADIlogical *der, ADIstatus status )
+  {
+  _chk_init_err; _chk_stat;
+
+  _ERR_IN("adic_dervd");
+
+  *der = ADIkrnlChkDerived( id, name, _CSM, status );
+
+  _ERR_OUT;
+  }
+
+
 /* -------------------------------------------------------------------------
  * Method execution
  * -------------------------------------------------------------------------
@@ -502,22 +515,32 @@ void adic_calnxt( ADIstatus status )
 
 void adic_exec( char *func, int narg, ADIobj args[], ADIobj *res, ADIstatus status )
   {
+  ADIobj	resid;
+
   _chk_init_err; _chk_stat;
 
   _ERR_IN("adic_exec");		/* Mark routine for error reporting */
 
-  *res = adix_exec( func, _CSM, narg, args, status );
+  resid = adix_exec( func, _CSM, narg, args, status );
+
+  if ( res )
+    *res = resid;
 
   _ERR_OUT;
   }
 
 void adic_execi( ADIobj func, int narg, ADIobj args[], ADIobj *res, ADIstatus status )
   {
+  ADIobj	resid;
+
   _chk_init_err; _chk_stat;
 
   _ERR_IN("adic_execi");		/* Mark routine for error reporting */
 
-  *res = adix_execi( func, narg, args, status );
+  resid = adix_execi( func, narg, args, status );
+
+  if ( res )
+    *res = resid;
 
   _ERR_OUT;
   }
@@ -612,7 +635,7 @@ void _TM_name(adic_new,_t)( int ndim, int dims[], ADIobj *id, ADIstatus status )
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_new,_t)); \
-  adix_new_n( ADI__true, ADI__nullid, NULL, 0, ndim, dims, NULL, _cdef_data(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, ADI__nullid, NULL, 0, ndim, dims, NULL, _TM_cdef(_t), \
 	      0, id, status ); \
   _ERR_OUT;}
 
@@ -626,7 +649,7 @@ void _TM_name(adic_new0,_t)( ADIobj *id, ADIstatus status ) \
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_new0,_t)); \
-  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 0, NULL, NULL, _cdef_data(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 0, NULL, NULL, _TM_cdef(_t), \
 	      0, id, status ); \
   _ERR_OUT;}
 
@@ -640,7 +663,7 @@ void _TM_name(adic_new1,_t)( int nval, ADIobj *id, ADIstatus status )\
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_new1,_t)); \
-  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 1, &nval, NULL, _cdef_data(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 1, &nval, NULL, _TM_cdef(_t), \
 	      0, id, status ); \
   _ERR_OUT;}
 
@@ -654,7 +677,7 @@ void _TM_name(adic_newv,_t)( int ndim, int dims[], _TM_ctype(_t) value[], ADIobj
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_newv,_t)); \
-  adix_new_n( ADI__true, ADI__nullid, NULL, 0, ndim, dims, value, _cdef_data(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, ADI__nullid, NULL, 0, ndim, dims, value, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     id, status ); \
   _ERR_OUT;}
@@ -670,8 +693,8 @@ void adic_newvc( int ndim, int dims[], charptr value[], ADIobj *id, ADIstatus st
 
   _ERR_IN("adic_newvc");		/* Mark routine for error reporting */
 
-  adix_new_n( ADI__true, ADI__nullid, NULL, 0, ndim, dims, value, _cdef_data(_TM_alloc(c)),
-	      _CSM, id, status );
+  adix_new_n( ADI__true, ADI__nullid, NULL, 0, ndim, dims, value,
+	_TM_cdef(c), _CSM, id, status );
 
   _ERR_OUT;
   }
@@ -681,7 +704,7 @@ void _TM_name(adic_newv0,_t)( _TM_ctype(_t) value, ADIobj *id, ADIstatus status 
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_newv0,_t)); \
-  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 0, NULL, &value, _cdef_data(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 0, NULL, &value, _TM_cdef(_t), \
 	     sizeof(value), \
 	     id, status ); \
   _ERR_OUT;}
@@ -698,7 +721,7 @@ void adic_newv0c( char *value, ADIobj *id, ADIstatus status )
   _ERR_IN("adic_newv0c");		/* Mark routine for error reporting */
 
   adix_new_n( ADI__true, ADI__nullid, NULL, 0, 0, NULL, &value,
-	_cdef_data(_TM_alloc(c)), _CSM, id, status );
+	_TM_cdef(c), _CSM, id, status );
 
   _ERR_OUT;
   }
@@ -710,8 +733,10 @@ void adic_newv0c_n( _TM_ctype(c) value, int len,
 
   _ERR_IN("adic_newv0c_n");		/* Mark routine for error reporting */
 
-  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 0, NULL, &value,/* Use user supplied length */
-	      _cdef_data(_TM_alloc(c)), len, id, status );
+/* Use user supplied length */
+  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 0, NULL, &value,
+	      _TM_cdef(c), len, id, status );
+
   _ERR_OUT;
   }
 
@@ -720,7 +745,7 @@ void _TM_name(adic_newv1,_t)( int nval, _TM_ctype(_t) value[], ADIobj *id, ADIst
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_newv1,_t)); \
-  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 1, &nval, value, _cdef_data(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 1, &nval, value, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     id, status ); \
   _ERR_OUT;}
@@ -737,7 +762,7 @@ void adic_newv1c( int nval, charptr value[], ADIobj *id, ADIstatus status )
   _ERR_IN("adic_newv1c");		/* Mark routine for error reporting */
 
   adix_new_n( ADI__true, ADI__nullid, NULL, 0, 1, &nval, value,
-	      _cdef_data(_TM_alloc(c)), _CSM, id, status );
+	      _TM_cdef(c), _CSM, id, status );
 
   _ERR_OUT;
   }
@@ -753,7 +778,7 @@ void _TM_name(adic_get,_t)( ADIobj id, int ndim, int dims[], \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_get,_t)); \
-  adix_get_n( 1, id, NULL, 0, ndim, dims, _TM_code(_t), \
+  adix_get_n( 1, id, NULL, 0, ndim, dims, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, NULL, status ); \
   _ERR_OUT;}
@@ -770,8 +795,7 @@ void adic_getc( ADIobj id, int ndim, int dims[], int len,
 
   _ERR_IN("adic_getc");			/* Mark routine for error reporting */
 
-  adix_get_n( 1, id, NULL, 0, ndim, dims,
-	      _TM_code(c), len,
+  adix_get_n( 1, id, NULL, 0, ndim, dims, _TM_cdef(c), len,
 	      value, NULL, status );
 
   _ERR_OUT;
@@ -782,7 +806,7 @@ void _TM_name(adic_get0,_t)( ADIobj id, _TM_ctype(_t) *value, ADIstatus status )
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_get0,_t)); \
-  adix_get_n( 1, id, NULL, 0, 0, NULL, _TM_code(_t), \
+  adix_get_n( 1, id, NULL, 0, 0, NULL, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, NULL, status ); \
   if ( !_ok(status) ) adic_setes( "Error reading object value", status );\
@@ -799,8 +823,8 @@ void _TM_name(adic_get0,c)( ADIobj id, int len, char *value, ADIstatus status )
 
   _ERR_IN("adic_get0c");		/* Mark routine for error reporting */
 
-  adix_get_n( 1, id, NULL, 0, 0, NULL, _TM_code(c), len,
-	    value, NULL, status );
+  adix_get_n( 1, id, NULL, 0, 0, NULL, _TM_cdef(c), len,
+	      value, NULL, status );
 
   _ERR_OUT;
   }
@@ -811,7 +835,7 @@ void _TM_name(adic_get1,_t)( ADIobj id, int mxval, \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_get1,_t)); \
-  adix_get_n( 1, id, NULL, 0, 1, &mxval, _TM_code(_t), \
+  adix_get_n( 1, id, NULL, 0, 1, &mxval, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, nactval, status ); \
   _ERR_OUT;}
@@ -828,8 +852,7 @@ void adic_get1c( ADIobj id, int mxval, int len,
 
   _ERR_IN("adic_get1c");		/* Mark routine for error reporting */
 
-  adix_get_n( 1, id, NULL, 0, 1, &mxval,
-	      _TM_code(c), len,
+  adix_get_n( 1, id, NULL, 0, 1, &mxval, _TM_cdef(c), len,
 	      value, nactval, status );
 
   _ERR_OUT;
@@ -854,7 +877,7 @@ void _TM_name(adic_map,_t)( ADIobj id, char *mode, \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_map,_t)); \
   adix_map_n( 1, id, NULL, 0, mode, _CSM, \
-	      _TM_code(_t), sizeof(_TM_ctype(_t)), \
+	      _TM_cdef(_t), sizeof(_TM_ctype(_t)), \
 	      (void **) vptr, status ); \
   _ERR_OUT;}
 
@@ -867,7 +890,7 @@ void _TM_name(adic_put0,_t)( ADIobj id, _TM_ctype(_t) value, ADIstatus status ) 
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_put0,_t)); \
-  adix_put_n( 1, id, NULL, 0, 0, NULL, _cdef_data(_TM_alloc(_t)), \
+  adix_put_n( 1, id, NULL, 0, 0, NULL, _TM_cdef(_t), \
 	     sizeof(value), \
 	     &value, status ); \
   _ERR_OUT;}
@@ -883,7 +906,7 @@ void _TM_name(adic_put0,c)( ADIobj id, char *value, ADIstatus status )
 
   _ERR_IN("adic_put0c");		/* Mark routine for error reporting */
 
-  adix_put_n( 1, id, NULL, 0, 0, NULL, _cdef_data(_TM_alloc(c)),
+  adix_put_n( 1, id, NULL, 0, 0, NULL, _TM_cdef(c),
 	      _CSM, &value, status );
 
   _ERR_OUT;
@@ -895,7 +918,7 @@ void _TM_name(adic_put,_t)( ADIobj id, int ndim, int dims[], \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_put,_t)); \
-  adix_put_n( 1, id, NULL, 0, ndim, dims, _cdef_data(_TM_alloc(_t)), \
+  adix_put_n( 1, id, NULL, 0, ndim, dims, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, status ); \
   _ERR_OUT;}
@@ -912,7 +935,7 @@ void adic_putc( ADIobj id, int ndim, int dims[],
 
   _ERR_IN("adic_putc");		/* Mark routine for error reporting */
 
-  adix_put_n( 1, id, NULL, 0, ndim, dims, _cdef_data(_TM_alloc(c)),
+  adix_put_n( 1, id, NULL, 0, ndim, dims, _TM_cdef(c),
 	      _CSM, value, status );
 
   _ERR_OUT;
@@ -924,7 +947,7 @@ void _TM_name(adic_put1,_t)( ADIobj id, int nval, \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_put1,_t)); \
-  adix_put_n( 1, id, NULL, 0, 1, &nval, _cdef_data(_TM_alloc(_t)), \
+  adix_put_n( 1, id, NULL, 0, 1, &nval, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, status ); \
   _ERR_OUT;}
@@ -941,7 +964,7 @@ void adic_put1c( ADIobj id, int nval,
 
   _ERR_IN("adic_put1c");		/* Mark routine for error reporting */
 
-  adix_put_n( 1, id, NULL, 0, 1, &nval, _cdef_data(_TM_alloc(c)),
+  adix_put_n( 1, id, NULL, 0, 1, &nval, _TM_cdef(c),
 	      _CSM, value, status );
 
   _ERR_OUT;
@@ -1004,7 +1027,7 @@ void _TM_name(adic_cnew,_t)( ADIobj id, char *name, int ndim, int dims[], ADIsta
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_cnew,_t)); \
-  adix_new_n( ADI__true, id, name, _CSM, ndim, dims, NULL, _cdef_data(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, id, name, _CSM, ndim, dims, NULL, _TM_cdef(_t), \
 	      0, NULL, status ); \
   _ERR_OUT;}
 
@@ -1018,7 +1041,7 @@ void _TM_name(adic_cnew0,_t)( ADIobj id, char *name, ADIstatus status ) \
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_cnew0,_t)); \
-  adix_new_n( ADI__true, id, name, _CSM, 0, NULL, NULL, _cdef_data(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, id, name, _CSM, 0, NULL, NULL, _TM_cdef(_t), \
 	      0, NULL, status ); \
   _ERR_OUT;}
 
@@ -1032,7 +1055,7 @@ void _TM_name(adic_cnew1,_t)( ADIobj id, char *name, int nval, ADIstatus status 
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_cnew1,_t)); \
-  adix_new_n( ADI__true, id, name, _CSM, 1, &nval, NULL, _cdef_data(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, id, name, _CSM, 1, &nval, NULL, _TM_cdef(_t), \
 	      0, NULL, status ); \
   _ERR_OUT;}
 
@@ -1046,7 +1069,7 @@ void _TM_name(adic_cnewv,_t)( ADIobj id, char *name, int ndim, int dims[], _TM_c
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_cnewv,_t)); \
-  adix_new_n( ADI__true, id, name, _CSM, ndim, dims, value, _cdef_data(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, id, name, _CSM, ndim, dims, value, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     NULL, status ); \
   _ERR_OUT;}
@@ -1062,7 +1085,7 @@ void adic_cnewvc( ADIobj id, char *name, int ndim, int dims[], charptr value[], 
 
   _ERR_IN("adic_cnewvc");		/* Mark routine for error reporting */
 
-  adix_new_n( ADI__true, id, name, _CSM, ndim, dims, value, _cdef_data(_TM_alloc(c)),
+  adix_new_n( ADI__true, id, name, _CSM, ndim, dims, value, _TM_cdef(c),
 	      _CSM, NULL, status );
 
   _ERR_OUT;
@@ -1073,7 +1096,7 @@ void _TM_name(adic_cnewv0,_t)( ADIobj id, char *name, _TM_ctype(_t) value, ADIst
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_cnewv0,_t)); \
-  adix_new_n( ADI__true, id, name, _CSM, 0, NULL, &value, _cdef_data(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, id, name, _CSM, 0, NULL, &value, _TM_cdef(_t), \
 	     sizeof(value), \
 	     NULL, status ); \
   _ERR_OUT;}
@@ -1090,7 +1113,7 @@ void adic_cnewv0c( ADIobj id, char *name, char *value, ADIstatus status )
   _ERR_IN("adic_cnewv0c");		/* Mark routine for error reporting */
 
   adix_new_n( ADI__true, id, name, _CSM, 0, NULL, &value,
-	_cdef_data(_TM_alloc(c)), _CSM, NULL, status );
+	_TM_cdef(c), _CSM, NULL, status );
 
   _ERR_OUT;
   }
@@ -1103,8 +1126,8 @@ void adic_cnewv0c_n( ADIobj id, char *name, _TM_ctype(c) value, int len,
   _ERR_IN("adic_cnewv0c_n");		/* Mark routine for error reporting */
 
   adix_new_n( ADI__true, id, name, _CSM, 0, NULL, &value,/* Use user supplied length */
-	      _cdef_data(_TM_alloc(c)),
-	      len, NULL, status );
+	      _TM_cdef(c), len, NULL, status );
+
   _ERR_OUT;
   }
 
@@ -1113,7 +1136,7 @@ void _TM_name(adic_cnewv1,_t)( ADIobj id, char *name, int nval, _TM_ctype(_t) va
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_cnewv1,_t)); \
-  adix_new_n( ADI__true, id, name, _CSM, 1, &nval, value, _cdef_data(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, id, name, _CSM, 1, &nval, value, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     NULL, status ); \
   _ERR_OUT;}
@@ -1129,7 +1152,7 @@ void adic_cnewv1c( ADIobj id, char *name, int nval, charptr value[], ADIstatus s
 
   _ERR_IN("adic_cnewv1c");		/* Mark routine for error reporting */
 
-  adix_new_n( ADI__true, id, name, _CSM, 1, &nval, value, _cdef_data(_TM_alloc(c)),
+  adix_new_n( ADI__true, id, name, _CSM, 1, &nval, value, _TM_cdef(c),
 	      _CSM, NULL, status );
 
   _ERR_OUT;
@@ -1146,7 +1169,7 @@ void _TM_name(adic_cget,_t)( ADIobj id, char *name, int ndim, int dims[], \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cget,_t)); \
-  adix_get_n( 1, id, name, _CSM, ndim, dims, _TM_code(_t), \
+  adix_get_n( 1, id, name, _CSM, ndim, dims, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, NULL, status ); \
   _ERR_OUT;}
@@ -1163,7 +1186,7 @@ void adic_cgetc( ADIobj id, char *name, int ndim, int dims[], int len,
 
   _ERR_IN("adic_cgetc");		/* Mark routine for error reporting */
 
-  adix_get_n( 1, id, name, _CSM, ndim, dims, _TM_code(c),
+  adix_get_n( 1, id, name, _CSM, ndim, dims, _TM_cdef(c),
 	      len, value, NULL, status );
   _ERR_OUT;
   }
@@ -1173,7 +1196,7 @@ void _TM_name(adic_cget0,_t)( ADIobj id, char *name, _TM_ctype(_t) *value, ADIst
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cget0,_t)); \
-  adix_get_n( 1, id, name, _CSM, 0, NULL, _TM_code(_t), \
+  adix_get_n( 1, id, name, _CSM, 0, NULL, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), value, NULL, status ); \
   _ERR_OUT;}
 
@@ -1188,7 +1211,7 @@ void adic_cget0c( ADIobj id, char *name, int len, char *value, ADIstatus status 
 
   _ERR_IN("adic_cget0c");		/* Mark routine for error reporting */
 
-  adix_get_n( 1, id, name, _CSM, 0, NULL, _TM_code(c),
+  adix_get_n( 1, id, name, _CSM, 0, NULL, _TM_cdef(c),
 	      len, value, NULL, status );
 
   _ERR_OUT;
@@ -1200,7 +1223,7 @@ void _TM_name(adic_cget1,_t)( ADIobj id, char *name, int mxval, \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cget1,_t)); \
-  adix_get_n( 1, id, name, _CSM, 1, &mxval, _TM_code(_t), \
+  adix_get_n( 1, id, name, _CSM, 1, &mxval, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, nactval, status ); \
   _ERR_OUT;}
@@ -1217,7 +1240,7 @@ void adic_cget1c( ADIobj id, char *name, int mxval, int len,
 
   _ERR_IN("adic_cget1c");		/* Mark routine for error reporting */
 
-  adix_get_n( 1, id, name, _CSM, 1, &mxval, _TM_code(c),
+  adix_get_n( 1, id, name, _CSM, 1, &mxval, _TM_cdef(c),
 	      len, value, nactval, status );
   _ERR_OUT;
   }
@@ -1241,7 +1264,7 @@ void _TM_name(adic_cmap,_t)( ADIobj id, char *name, char *mode, \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cmap,_t)); \
   adix_map_n( 1, id, name, _CSM, mode, _CSM, \
-	      _TM_code(_t), sizeof(_TM_ctype(_t)), \
+	      _TM_cdef(_t), sizeof(_TM_ctype(_t)), \
 	      (void **) vptr, status ); \
   _ERR_OUT;}
 
@@ -1255,7 +1278,7 @@ void _TM_name(adic_cput,_t)( ADIobj id, char *name, int ndim, int dims[], \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cput,_t)); \
-  adix_put_n( 1, id, name, _CSM, ndim, dims, _cdef_data(_TM_alloc(_t)), \
+  adix_put_n( 1, id, name, _CSM, ndim, dims, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), value, status ); \
   _ERR_OUT;}
 
@@ -1271,7 +1294,7 @@ void adic_cputc( ADIobj id, char *name, int ndim, int dims[],
 
   _ERR_IN("adic_cputc");		/* Mark routine for error reporting */
 
-  adix_put_n( 1, id, name, _CSM, ndim, dims, _cdef_data(_TM_alloc(c)),
+  adix_put_n( 1, id, name, _CSM, ndim, dims, _TM_cdef(c),
 	      _CSM, value, status );
 
   _ERR_OUT;
@@ -1282,7 +1305,7 @@ void _TM_name(adic_cput0,_t)( ADIobj id, char *name, _TM_ctype(_t) value, ADIsta
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cput0,_t)); \
-  adix_put_n( 1, id, name, _CSM, 0, NULL, _cdef_data(_TM_alloc(_t)), \
+  adix_put_n( 1, id, name, _CSM, 0, NULL, _TM_cdef(_t), \
 	     sizeof(value), &value, status ); \
   _ERR_OUT;}
 
@@ -1297,7 +1320,7 @@ void adic_cput0c( ADIobj id, char *name, char *value, ADIstatus status )
 
   _ERR_IN("adic_cput0c");		/* Mark routine for error reporting */
 
-  adix_put_n( 1, id, name, _CSM, 0, NULL, _cdef_data(_TM_alloc(c)),
+  adix_put_n( 1, id, name, _CSM, 0, NULL, _TM_cdef(c),
 	      _CSM, &value, status );
 
   _ERR_OUT;
@@ -1309,7 +1332,7 @@ void _TM_name(adic_cput1,_t)( ADIobj id, char *name, int nval, \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cput1,_t)); \
-  adix_put_n( 1, id, name, _CSM, 1, &nval, _cdef_data(_TM_alloc(_t)), \
+  adix_put_n( 1, id, name, _CSM, 1, &nval, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, status ); \
   _ERR_OUT;}
@@ -1326,7 +1349,7 @@ void adic_cput1c( ADIobj id, char *name, int nval,
 
   _ERR_IN("adic_cput1c");		/* Mark routine for error reporting */
 
-  adix_put_n( 1, id, name, _CSM, 1, &nval, _cdef_data(_TM_alloc(c)), _CSM,
+  adix_put_n( 1, id, name, _CSM, 1, &nval, _TM_cdef(c), _CSM,
 	      value, status );
 
   _ERR_OUT;
@@ -1373,7 +1396,7 @@ void _TM_name(adic_cset,_t)( ADIobj id, char *name, int ndim, int dims[], \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cset,_t)); \
-  adix_set_n( 1, id, name, _CSM, ndim, dims, _cdef_data(_TM_alloc(_t)), \
+  adix_set_n( 1, id, name, _CSM, ndim, dims, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, status ); \
   _ERR_OUT;}
@@ -1390,9 +1413,9 @@ void adic_csetc( ADIobj id, char *name, int ndim, int dims[],
 
   _ERR_IN("adic_csetc");		/* Mark routine for error reporting */
 
-  adix_set_n( 1, id, name, _CSM, ndim, dims,
-	      _cdef_data(_TM_alloc(c)), _CSM,
+  adix_set_n( 1, id, name, _CSM, ndim, dims, _TM_cdef(c), _CSM,
 	      value, status );
+
   _ERR_OUT;
   }
 
@@ -1401,7 +1424,7 @@ void _TM_name(adic_cset0,_t)( ADIobj id, char *name, _TM_ctype(_t) value, ADIsta
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cset0,_t)); \
-  adix_set_n( 1, id, name, _CSM, 0, NULL, _cdef_data(_TM_alloc(_t)), \
+  adix_set_n( 1, id, name, _CSM, 0, NULL, _TM_cdef(_t), \
 	     sizeof(value), &value, status ); \
   _ERR_OUT;}
 
@@ -1416,7 +1439,7 @@ void adic_cset0c( ADIobj id, char *name, char *value, ADIstatus status )
 
   _ERR_IN("adic_cset0c");		/* Mark routine for error reporting */
 
-  adix_set_n( 1, id, name, _CSM, 0, NULL, _cdef_data(_TM_alloc(c)), _CSM,
+  adix_set_n( 1, id, name, _CSM, 0, NULL, _TM_cdef(c), _CSM,
 	       &value, status );
 
   _ERR_OUT;
@@ -1428,7 +1451,7 @@ void _TM_name(adic_cset1,_t)( ADIobj id, char *name, int nval, \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cset1,_t)); \
-  adix_set_n( 1, id, name, _CSM, 1, &nval, _cdef_data(_TM_alloc(_t)), \
+  adix_set_n( 1, id, name, _CSM, 1, &nval, _TM_cdef(_t), \
 	     sizeof(_TM_ctype(_t)), value, status ); \
   _ERR_OUT;}
 
@@ -1444,7 +1467,7 @@ void adic_cset1c( ADIobj id, char *name, int nval,
 
   _ERR_IN("adic_cset1c");		/* Mark routine for error reporting */
 
-  adix_set_n( 1, id, name, _CSM, 1, &nval, _cdef_data(_TM_alloc(c)), _CSM,
+  adix_set_n( 1, id, name, _CSM, 1, &nval, _TM_cdef(c), _CSM,
 	      value, status );
   _ERR_OUT;
   }

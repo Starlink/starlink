@@ -10,15 +10,15 @@
 *
 *    Parameters :
 *
-*     FIT_MOD=UNIV(R)
+*     MODEL=UNIV(R)
 *            data object containing model spec
-*     REDSHIFT=REAL(R)
+*     Z=REAL(R)
 *            redshift to be applied to source spectrum
-*     NO_OF_CHANNELS=INTEGER(R)
+*     NCH=INTEGER(R)
 *            number of channels for integral evaluation
-*     LOWER_ENERGY=REAL(R)
+*     LEN=REAL(R)
 *            start energy for integral
-*     UPPER_ENERGY=REAL(R)
+*     UEN=REAL(R)
 *            upper energy for integral
 *     SPLIT=LOGICAL(R)
 *            find fluxes in each model component
@@ -139,7 +139,7 @@
       MODEL.GENUS='SPEC'
 
 *    Read in the model to be fitted
-      CALL USI_ASSOCI('FIT_MOD','READ',MLOC,INPRIM,STATUS)
+      CALL USI_ASSOCI('MODEL','READ',MLOC,INPRIM,STATUS)
       CALL FIT_MODGET(MLOC,MODEL,NPAR,PARAM,LB,UB,LE,UE,FROZEN,STATUS)
       IF ( STATUS.NE.SAI__OK ) GOTO 9000
 
@@ -147,7 +147,7 @@
       CALL SFIT_GETZ( Z, STATUS )
 
 *    Enter no of energy channels
-      CALL USI_GET0I('NO_OF_CHANNELS',NEN,STATUS)
+      CALL USI_GET0I('NCH',NEN,STATUS)
       IF(STATUS.NE.SAI__OK) GOTO 9000
       IF(NEN.GT.MAXEN) THEN
 	CALL MSG_SETI('MAXEN',MAXEN)
@@ -157,8 +157,8 @@
 
 *    Enter energy range to be integrated
       CALL MSG_PRNT( 'Enter energy limits in keV' )
-      CALL USI_GET0R('LOWER_ENERGY',LENERGY,STATUS)
-      CALL USI_GET0R('UPPER_ENERGY',UENERGY,STATUS)
+      CALL USI_GET0R('LEN',LENERGY,STATUS)
+      CALL USI_GET0R('UEN',UENERGY,STATUS)
       IF(STATUS.NE.SAI__OK) GOTO 9000
 
 *    Apply redshift to required energy range
