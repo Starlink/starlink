@@ -30,7 +30,19 @@ NOUNDERSCORES=@NOUNDERSCORES@
 
 EXECS=timewaster fpdemo fpp dfpp mixed crash
 
+EXAMPLES=crash.c fpp.c fpdemo.c \
+	io-f.f io-c.c \
+	p1.f p2.f p3.f \
+	islittleendian.c mixed-f.f mixed-c.c \
+	maple.ms idl-functions.pro
+
+
 all: $(EXECS)
+
+sgmlexamples: $(EXAMPLES:=.sgml)
+
+%.sgml: %
+	sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' $< > $@
 
 #
 # Floating-point demo
@@ -100,4 +112,7 @@ tidy:
 	rm -f *~ core gmon.out timewaster.gprof *.gz
 
 clean: tidy
-	rm -f *.o $(EXECS)
+	rm -f *.o $(EXECS) $(EXAMPLES:=.sgml)
+
+distclean: clean
+	rm -f Makefile bytesex.h config.cache config.log config.status
