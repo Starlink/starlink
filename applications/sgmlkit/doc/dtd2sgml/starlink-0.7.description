@@ -282,7 +282,8 @@ align=center&gt;</code>.
 </p>
 
 <attribute name="align">
-<p>Default alignment of entries in cells.</p>
+<p>Default alignment of entries in cells.  Possible values are `left',
+`right', `center', `justify' (`char' not supported).</p>
 </attribute>
 
 <attribute name="char">
@@ -1351,7 +1352,8 @@ specified by this element.</p>
 <elemref gi="tbody"/> elements.</p>
 </attribute>
 <attribute name="align">
-<p>The default alignment of columns</p>
+<p>The default alignment of columns.    Possible values are `left',
+`right', `center', `justify' (`char' not supported).</p>
 </attribute>
 <attribute name="colsep">
 <p>If given and non-zero, then separate columns with vertical lines
