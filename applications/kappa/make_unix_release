@@ -171,6 +171,7 @@ FOO5
 #  listed in group TAR_FILES_A...
       foreach file (`grp tar_files_a`)
          echo "Creating ${file}.tar"
+         chmod 644 `grp ${file}`
          tar -cvh -f ${TEMPDIR}/${file}.tar `grp ${file}`
          rm -f `grp ${file}`
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
@@ -182,6 +183,8 @@ FOO5
 
 #  Tar up all the release files and then remove them.
       echo "Creating kappa.tar"
+      chmod 644 `grp unix_total`
+      chmod 755 mk
       tar -cvh -f ${TEMPDIR}/kappa.tar `grp unix_total` 
       rm `grp unix_total` 
       mv ${TEMPDIR}/kappa.tar ${REL_DIR}

@@ -38,16 +38,6 @@
       set REL_DIR = ${TEMPDIR}/polpack_${SYSTEM}
       cd ${REL_DIR}
 
-#  See if the hypertext documents are to be re-created.
-#      echo -n "Re-create polka.htx? (y/n): "
-#      set ans = $<
-#      if( $ans == "y" ) then
-#         star2html polka.tex
-#         tar -cvhf ./polka.htx_tar polka.htx/*
-#         rm -rf polka.htx
-#         mv ./polka.htx_tar ${POLPACK_DEV}/..
-#      endif
-
 #  Copy the hypertext docs to the release directory.
       cp ${POLPACK_DEV}/../polka.htx_tar ${REL_DIR}
       cp ${POLPACK_DEV}/../sun223.htx_tar ${REL_DIR}
@@ -88,6 +78,7 @@
       end
 
 #  Tar up the source files and then remove them.
+      chmod 644 `grp unix_source`
       tar -cvh -f ${TEMPDIR}/polpack_source.tar `grp unix_source` 
       rm -f `grp unix_source` 
       mv ${TEMPDIR}/polpack_source.tar ${REL_DIR}
@@ -103,6 +94,8 @@
 
 #  Tar up all the release files (source and non-source), and then remove
 #  them.
+      chmod 644 `grp unix_total`
+      chmod 755 mk
       tar -cvh -f ${TEMPDIR}/polpack.tar `grp unix_total` 
       rm -rf `grp unix_total` 
       mv ${TEMPDIR}/polpack.tar ${REL_DIR}
