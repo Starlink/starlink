@@ -162,7 +162,6 @@ int astGLine( int n, const float *x, const float *y ){
   SV * external;
   int retval;
 
-  printf("Calling astGLine with %d points\n", n);
   if (n == 0 ) return 1;
 
   if (!astOK) return 0;
@@ -308,7 +307,6 @@ int astGMark( int n, const float *x, const float *y, int type ){
   SV * external;
   int retval;
 
-  printf("Calling astGMark with %d points\n", n);
   if (n == 0 ) return 1;
 
   if (!astOK) return 0;
@@ -408,7 +406,7 @@ int astGText( const char *text, float x, float y, const char *just,
       if ( external != NULL ) {
 	XPUSHs( external );
       }
-    
+
       XPUSHs( sv_2mortal(newSVpv(text, 0) ) );
       XPUSHs( sv_2mortal(newSVnv(x) ) );
       XPUSHs( sv_2mortal(newSVnv(y) ) );
@@ -460,8 +458,6 @@ int astGTxExt( const char *text, float x, float y, const char *just,
   int retval;
   int len;
   int i;
-  static float outxb[4];
-  static float outyb[4];
 
   if (!astOK) return 0;
   if (CurrentPlot == NULL ) {
@@ -508,10 +504,9 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 	  /* The status will be on the stack furthest back so we 
 	     need to read off yb, then xb then status  */
 
-	  /* yb. Read and copy into static storage space 
+	  /* yb. Read and copy into output array which was 
+	     allocated by the caller.
 	     We can do this because we know there are always 4 numbers.
-	     We do not want to have to allocate mortal space and then
-	     worry about where our FREETMPS/SAVETMPS go
 	  */
 	  retarg = POPs;
 	  if ( SvROK(retarg) && SvTYPE(SvRV(retarg))==SVt_PVAV) {
@@ -525,12 +520,11 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 	      for (i=0; i<len; i++) {
 		elem = av_fetch( retarr, i, 0);
 		if (elem == NULL ) {
-		  outyb[i] = 0.0;
+		  yb[i] = 0.0;
 		} else {
-		  outyb[i] = (float)SvNV(*elem);
+		  yb[i] = (float)SvNV(*elem);
 		}
 	      }
-	      yb = outyb;
 	    }
 	  } else {
 	    astError( AST__GRFER,
@@ -551,12 +545,11 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 		for (i=0; i<len; i++) {
 		  elem = av_fetch( retarr, i, 0);
 		  if (elem == NULL ) {
-		    outxb[i] = 0.0;
+		    xb[i] = 0.0;
 		  } else {
-		    outxb[i] = (float)SvNV(*elem);
+		    xb[i] = (float)SvNV(*elem);
 		  }
 		}
-		xb = outxb;
 	      }
 	    } else {
 	      astError( AST__GRFER,
