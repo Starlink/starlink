@@ -30,7 +30,7 @@
  -  WCSREMOVE now issues a warning instead of aborting if an attempt is 
     made to remove the Base Frame of the WCS FrameSet.
 
- -  NATIVE now correctly replaces IEE NaN and Inf values by Starlink bad
+ -  NATIVE now correctly replaces IEEE NaN and Inf values by Starlink bad
     values on Solaris systems.
 
  -  The global parameter POSITIONS_LIST has been replaced by CATALOGUE.

@@ -4001,6 +4001,41 @@ component of an NDF.
 - WCSTRAN -- Transforms a position from one NDF WCS co-ordinate
 Frame to another.
 
+2 V0.13-6
+ This minor update to KAPPA contains fixes for the following bugs:
+
+ -  ARDMASK now sets the bad pixel flag in the output NDF so that 
+    other applications interpret the selected pixels as bad.
+
+ -  COMPAVE now traps zero variance values, preventing a divide by 
+    zero error.
+
+ -  History information written to NDFs now contain the up-to-date
+    KAPPA package version number.
+
+ -  DISPLAY now uses independant compression factors for both axes.
+    Previously, an inappropriate compression factor could be used for 
+    one of the axes if the lengths of the two axes were very different.
+
+ -  Trailing spaces are now stripped from the Title attribute of the 
+    current WCS Frame.
+
+ -  A bug in MATHS which could cause zero variances to be produced sometimes
+    when using double precision data has been fixed.
+
+ -  NOMAGIC and FILLBAD now set the bad bits flag in the output NDF to
+    zero. Previously, NDFs containing QUALITY arrays could still seems
+    to contain bad pixels after running NOMAGIC or FILLBAD. This no
+    longer happens.
+
+ -  WCSREMOVE now issues a warning instead of aborting if an attempt is 
+    made to remove the Base Frame of the WCS FrameSet.
+
+ -  NATIVE now correctly replaces IEEE NaN and Inf values by Starlink bad
+    values on Solaris systems.
+
+ -  The global parameter POSITIONS_LIST has been replaced by CATALOGUE.
+ 
 1 CHPIX
 Replaces the values of selected pixels in an NDF.
 

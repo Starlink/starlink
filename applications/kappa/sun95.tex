@@ -11,12 +11,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.13}
-\newcommand{\stardocnumber}    {95.13}
+\newcommand{\stardocsource}    {sun95.14}
+\newcommand{\stardocnumber}    {95.14}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {18 December 1998}
+\newcommand{\stardocdate}      {9 June 1999}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {0.13}
+\newcommand{\stardocversion}   {0.13-6}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -41672,7 +41672,6 @@ CONVOLVE CSUB DISPLAY DIV ERRCLIP FFCLEAN FILLBAD FLIP GAUSMOOTH GREYPLOT
 HISTEQ INSPECT LUCY MAKESURFACE MATHS MEDIAN MEM2D MULT NDFCOPY
 NOMAGIC NORMALIZE PASTE PIXDUPE RIFT ROTATE SEGMENT SETMAGIC SHADOW SUB
 SUBSTITUTE SURFIT THRESH WIENER ZAPLIN
-\end{htmlonly}
 
 \section{Release Notes---V0.13}
 Several applications have been changed to enable them to make use of the
@@ -42123,7 +42122,46 @@ section \ref{se:style} the use of graphical style parameters.
          WCS co-ordinate Frame to another.
 
 \end{description}
+\end{htmlonly}
 
+\section{Release Notes---V0.13-6}
+ No new applications or facilities have been introduced or changed, but 
+ the following bugs have been fixed:
+
+\begin{itemize}
+\item ARDMASK now sets the bad pixel flag in the output NDF so that 
+    other applications interpret the selected pixels as bad.
+
+\item COMPAVE now traps zero variance values, preventing a divide by 
+    zero error.
+
+\item History information written to NDFs now contain the up-to-date
+    KAPPA package version number.
+
+\item DISPLAY now uses independant compression factors for both axes.
+    Previously, an inappropriate compression factor could be used for 
+    one of the axes if the lengths of the two axes were very different.
+
+\item Trailing spaces are now stripped from the Title attribute of the 
+    current WCS Frame.
+
+\item A bug in MATHS which could cause zero variances to be produced sometimes
+    when using double precision data has been fixed.
+
+\item NOMAGIC and FILLBAD now set the bad bits flag in the output NDF to
+    zero. Previously, NDFs containing QUALITY arrays could still seems
+    to contain bad pixels after running NOMAGIC or FILLBAD. This no
+    longer happens.
+
+\item WCSREMOVE now issues a warning instead of aborting if an attempt is 
+    made to remove the Base Frame of the WCS FrameSet.
+
+\item NATIVE now correctly replaces IEEE NaN and Inf values by Starlink bad
+    values on Solaris systems.
+
+\item The global parameter POSITIONS\_LIST has been replaced by CATALOGUE.
+ 
+\end{itemize}
 
 \begin{latexonly}
 \newpage
