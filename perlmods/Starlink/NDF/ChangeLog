@@ -1,3 +1,7 @@
+2003-05-06  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.pm: Release V1.45 to Starlink
+
 2003-03-19  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.pm: Forgot to export dat_put0i 
