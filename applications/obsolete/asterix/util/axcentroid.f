@@ -236,10 +236,8 @@
 
 *    Create quality if present in input
         IF ( QOK ) THEN
-          CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0,
-     :                  QUAL__MASK, STATUS )
-          CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', OQPTR,
-     :                  STATUS )
+          CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
+          CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
         END IF
 
 *    Copy stuff from input
@@ -250,8 +248,7 @@
             JAX = 1
             DO IAX = 1, NAX
               IF ( IAX .NE. AXIS ) THEN
-                CALL BDI_AXCOPY( IFID, IAX, ' ', OFID, JAX,
-     :                           STATUS )
+                CALL BDI_AXCOPY( IFID, IAX, ' ', OFID, JAX, STATUS )
                 JAX = JAX + 1
               END IF
             END DO
