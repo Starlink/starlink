@@ -187,9 +187,11 @@
                CALL DAT_NEW0C( XLOC, ITEM( : LITEM ), CHR_LEN( CVAL ), 
      :                         STATUS )
                CALL CMP_PUT0C( XLOC, ITEM( : LITEM ), CVAL, STATUS ) 
-               CALL MSG_SETC( 'VALUE', '''' )
-               CALL MSG_SETC( 'VALUE', CVAL )
-               CALL MSG_SETC( 'VALUE', '''' )
+               IF( ITEM( : LITEM ) .NE. 'FILTER' ) THEN
+                  CALL MSG_SETC( 'VALUE', '''' )
+                  CALL MSG_SETC( 'VALUE', CVAL )
+                  CALL MSG_SETC( 'VALUE', '''' )
+               END IF
    
             ELSE IF( TYPE .EQ. '_LOGICAL' ) THEN
                CALL CHR_CTOL( CVAL, LVAL, STATUS )

@@ -713,8 +713,8 @@ $(PLATFORM_C) dummy_target1:
 $(IRAF_STARTUP) $(IRAF_PKG_PAR) $(IRAF_IFL_FILES) $(IRAF_OUTPAR_FILES) \
 $(IRAF_PAR_FILES) $(IRAF_HELP_FILES) $(IRAF_AUX_SCRIPTS) $(IRAF_AUX_PARFILES) \
 $(IRAF_DEMO) :
-        $(TAR_OUT) $(PKG_NAME)_iraf.tar $@
-        @ if test -r $@; then :;\
+	$(TAR_OUT) $(PKG_NAME)_iraf.tar $@
+	@ if test -r $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 ## End of rules for extracting IRAF package source files
 
@@ -1697,8 +1697,8 @@ clean:
               $(C_ROUTINES) $(LINK_SCRIPT) 1>/dev/null 2>/dev/null
 	@- rm -f $(F_ROUTINES) 1>/dev/null 2>/dev/null
 	@- rm -f $(OBJECT_FILES) 1>/dev/null 2>/dev/null
-        @- rm -f $(IRAF_IFL_FILES) 1>/dev/null 2>/dev/null
- 	@ echo
+	@- rm -f $(IRAF_IFL_FILES) 1>/dev/null 2>/dev/null
+	@ echo
 	@ echo '*** Intermediate files removed'
 	@ echo
 

@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include "f77.h"
 #include "sae_par.h"
+#include "merswrap.h"
 
 #define GRP__NOID 0
 #define PACK_DIR "POLPACK_DIR"
@@ -219,6 +220,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    char *script = NULL;
    char *value = NULL;
    int i;
+   int report;
    int j;
    int n;                      
    int size;
@@ -377,18 +379,22 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    the TCL script. */
       fd = fopen( outfile_name, "r" );
 
-/* If succesful, report an error and copy each line of the file to the
-   error system. */
+/* If succesful, display each non-null line of the file and report an error. */
       if( fd ) {
+
+         report = 0;
          while( fgets( buf, BUFLEN, fd ) ){
-            if( strlen( buf ) ){
-               if( *STATUS == SAI__OK ){
-                  *STATUS = SAI__ERROR;
-                  Error( "Messages received from the TCL script...", STATUS );
-               }
-               Error( buf, STATUS );
+            if( strlen( buf ) ) {
+               msgOut( " ", buf, STATUS );
+               report = 1;
             }
          }
+
+         if( report && *STATUS == SAI__OK ){
+            *STATUS = SAI__ERROR;
+            Error( "Messages received from the TCL script.", STATUS );
+         }
+
          fclose( fd );
          remove( outfile_name );
       }

@@ -768,6 +768,36 @@ proc CheckMsg {action val} {
    }
 }
 
+proc CheckNDF {ndf image} {
+#+
+#  Name:
+#     CheckNDF
+#
+#  Purpose:
+#     Check if the supplied NDF can be used. An error is reported and
+#     Polka aborts if it has not got either an ANLANG or WPLATE value. 
+#
+#  Arguments:
+#     ndf
+#        The ndf structure to be checked.
+#     image
+#        The name of the data file to be used in the report.
+#-
+   set ok 0
+   if { [Extension $ndf ANLANG _REAL "" anlang] &&
+        [Extension $ndf WPLATE _REAL "" wplate] } {
+      if { $anlang != "" || $wplate != "" } {
+         set ok 1
+      }      
+   }
+
+   if { !$ok } {
+      Message "$image does not contain either an ANLANG or a WPLATE value. Make sure you have run POLIMP on this image."
+      exit 1
+   }
+
+}
+
 proc CheckRef {} {
 #+
 #  Name:
@@ -5212,10 +5242,9 @@ proc Message {message} {
    global env
 
 # If the top level window has not yet been created, message to standard 
-# output (so long as we are not running from ICL or IRAF - in these cases
-# the message is lost since writing to standard output seems to upset IRAF).
+# output 
    if { ![info exists TOP] } {
-      if { ![info exists env(ICL_TASK_NAME)] } { puts $message }
+      puts $message
 
 # Otherwise, display the message in a dialog box.
    } {
@@ -5326,7 +5355,7 @@ proc EndUF {context leave} {
    for {set i $ifile_start} {$i <= $IFILE} {incr i} {
 
 # Construct the corresponding file name (NB, make sure this next line keeps
-# in step with any changes made in rocedure UniqueFile).
+# in step with any changes made in procedure UniqueFile).
       set file "$POLKA_SCRATCH/polka$i"
 
 # If the file exists (with any file extension), but has not been included
@@ -10691,6 +10720,7 @@ proc Save {} {
    global STOKES
    global S_FONT
    global GOTOUT
+   global WCSDOMAIN
 
 # If no output files are required, tell the user.
    if { !$GOTOUT } { 
@@ -11046,15 +11076,7 @@ proc Save {} {
                   }
 
 # Ensure that the current WCS Frame is the same as that in the input image.
-                  if { [Obey ndfpack wcsattrib "$image get domain"] } {
-                     set dom [GetParam ndfpack wcsattrib:value]
-
-                     if { ![Obey ndfpack wcsframe "$outndf $dom"] } {
-                        set ok 0
-                        break
-                     }
-
-                  } {
+                  if { ![Obey ndfpack wcsframe "$outndf $WCSDOMAIN($image)"] } {
                      set ok 0
                      break
                   }
@@ -11124,9 +11146,13 @@ proc Save {} {
                   break            
                }
 
-#  Write the name of the output image just created to the text file
-#  opened earlier. 
-               puts $intfiles_id $outim
+#  Write the name of the NDF version of the output image just created to the 
+#  text file opened earlier. 
+               puts $intfiles_id $outndf
+
+# Add the name of the NDF to a list of files to be escaped to the next
+# higher file context when EndUF is next called.
+               lappend escapes $outndf
 
             }
 
@@ -11145,8 +11171,11 @@ proc Save {} {
             Wop $tick($image) configure -foreground black
             Wop $lb($image) configure -foreground black
 
-# Delete all the temporary files created in this pass through the loop.
-            EndUF $tfci ""
+# Delete all the temporary files created in this pass through the loop,
+# except the output NDF files which are required to create the Stokes
+# vectors. Clear the list of escaped files.
+            EndUF $tfci $escapes
+            unset escapes
 
 # Leave the image loop if an error has occurred.
             if { !$ok } { break }
@@ -11748,6 +11777,8 @@ proc SendBack {} {
    global ATASK_POLMODE
 
    if { $COMFILE != "" } { 
+
+      catch {exec rm -f $comfile} 
 
       set fd [open $COMFILE "w"]
 
@@ -15166,3 +15197,4 @@ proc GetCents {px py rlabel image object} {
 
    return $nbad
 }
+

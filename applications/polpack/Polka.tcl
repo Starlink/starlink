@@ -71,9 +71,7 @@
       puts "Polka: No communications file supplied on command line. Aborting..."
       exit 1
 
-# Otherwise, attempt to source the file, then delete it so that new values
-# can be stored in it for passing back to the a-task when this script
-# terminates.
+# Otherwise, attempt to source the file.
    } {
       set comfile [lindex "$argv" 0]
       if { [catch {source $comfile} msg] } {
@@ -82,12 +80,6 @@
          exit 1
       }
       
-      if { [catch {exec rm -f $comfile} msg] } {
-         puts "Polka: Error deleting the communications file: $comfile"
-         puts "   $msg"
-         exit 1
-      }
-
 # Store the name of the communications file in a glbal variable.
       set COMFILE $comfile
 
@@ -1031,12 +1023,25 @@
          set PNTLBL($image,$object) ""
       }
 
-# Make a copy of the supplied image (ensuring it is in NDF format), and
-# push it onto the image's IMAGE_STACK. Ensure the current WCS Frame in the
-# NDF is pixel co-ordinates.
+# Make a copy of the supplied image (ensuring it is in NDF format).
       set copy [UniqueFile]
       Obey ndfpack ndfcopy "in=$imsec out=$copy" 1
+
+# Check it has a POLPACK extension containing either WPLATE or ANLANG.
+      CheckNDF $copy $image 
+
+# Save the current WCS Frame in the NDF so that it can be re-instated
+# when the output images are saved.
+      if { [Obey ndfpack wcsattrib "$copy get domain"] } {
+         set WCSDOMAIN($image) [GetParam ndfpack wcsattrib:value]
+      } {
+         set WCSDOMAIN($image) "PIXEL"
+      }
+
+# Now set the current WCS Frame in the NDF explicitly to pixel co-ordinates.
       Obey ndfpack wcsframe "ndf=$copy frame=pixel"
+
+# Push the name of the NDF copy onto the image's IMAGE_STACK. 
       set IMAGE_STACK($image) $copy
       set EFFECTS_MAPPINGS($image) ""
       set EFFECTS_STACK($image) ""

@@ -399,13 +399,11 @@
      :        DIM( NDF__MXDIM ), ! Dimension in input image
      :        DPI,               ! Dots per inch to use
      :        FIT,               ! Fit type for aligning images
-     :        I,                 ! Index for curent input object frame
      :        IGRP1,             ! Identifier for input object frames group
      :        IGRP2,             ! Identifier for output O-ray NDF group
      :        IGRP3,             ! Identifier for output E-ray NDF group
      :        IGRP4,             ! Identifier for output Stokes NDF group
      :        IGRPS,             ! Identifier for input sky frames group
-     :        INDF,              ! NDF identifier for input object frame
      :        NDIM,              ! No. of dimension in input image
      :        OEFIT,             ! Fit type for aligning the O and E rays
      :        PSF,               ! Size of feature to search for
@@ -424,8 +422,7 @@
      :        XHAIR              ! Is a cross-hair required?
       REAL
      :        PERCNT(2),         ! Display percentiles
-     :        PERDEF(2),         ! Default display percentiles
-     :        ANG                ! Value of WPLATE or ANLANG extension item
+     :        PERDEF(2)          ! Default display percentiles
 *.
 
 *  Check inherited global status.
@@ -513,36 +510,6 @@
      :               'mode has not yet been implemented.', STATUS )
                GO TO 999
             END IF
-
-*  Check that all of the input object frames have POLPACK extensions 
-*  containing WPLATE or ANLANG values. Also check the image is 2d.
-            DO I = 1, SIZE
-               CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
-
-               CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS )
-               IF( STATUS .EQ. SAI__OK .AND. NDIM .NE. 2 ) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI( 'NDIM', NDIM )
-                  CALL NDF_MSG( 'NDF', INDF )
-                  CALL ERR_REP( 'POLKA_ERR3a', 'POLKA: ''^NDF'' is '//
-     :                          '^NDIM dimensional. Polka can only '//
-     :                          'handle 2 dimensional images.', STATUS )
-               END IF
-
-               ANG = VAL__BADR
-               CALL NDF_XGT0R( INDF, 'POLPACK', 'WPLATE', ANG, STATUS )
-               CALL NDF_XGT0R( INDF, 'POLPACK', 'ANLANG', ANG, STATUS )
-
-               IF( STATUS .EQ. SAI__OK .AND. ANG .EQ. VAL__BADR ) THEN
-                  STATUS = SAI__ERROR
-                  CALL NDF_MSG( 'NDF', INDF )
-                  CALL ERR_REP( 'POLKA_ERR3', 'POLKA: Unable to ' //
-     :                          'obtain either a WPLATE or ANLANG ' //
-     :                          'value from the POLPACK extension ' //
-     :                          'of ''^NDF''.', STATUS )
-               END IF
-               CALL NDF_ANNUL( INDF, STATUS )
-            END DO
 
          ELSE
             CALL GRP_DELET( IGRP4, STATUS )
