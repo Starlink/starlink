@@ -1,8 +1,59 @@
+/*
+ *
+ *  Notes on functions :
+ *
+ *    Test:
+ *
+ *      GetPid()	- especially as regards use of ()
+ *
+ *    New functions:
+ *
+ *	AtomQ		- raw data object?
+ *	NullQ		- object == ADI__nullid
+ *	CardinalQ	- is object B|UB|W|UW|I
+ *	NumberQ		- CardinalQ | R|D
+ *	Shape/Size	-
+ *	mk...		- series generators
+ *	GetEnv		- value of environment variable
+ *	Nint		- nearest integer
+ *	Power(x,y)	- exponentiation (special case for 2?)
+ *	Round(x,np)	- round to specified number of places
+ *	B|UB|W|UW 	- constructors
+ *	Strip		- strip spaces from string
+ *	Substr(s,b,n)	- sub-string op
+ *	HMS2RAD		-
+ *	RAD2HMS		- format radian angle to H,M,S
+ *	Time,Date,TimeZone etc
+ *	FiniteQ		- number != infinity?
+ *	BadQ		- number == bad value?
+ *
+ *    Other issues:
+ *
+ *    o And/Or shortcut evaluation
+ *    o Function specialisation to actual value (needs adix_equal)
+ *    o	Ensure handling of zero length strings/lists is consistent
+ *    o Printing of non-prnt able types, eg. streams
+ *    o precision of D.P. printing
+ *    o Properties must be particular to a binding rather than a symbol. Affects
+ *	evaluation logic. Needed for shortcut BOOLEAN ops. Find how MM does it
+ *    o Casteing to support mixed mode maths
+ *    o Coercion of bool values to T|F on input
+ *    o Creation and printing of arrays
+ *    o Object accounting!
+ *    o local and global statements
+ */
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <ctype.h>
 #include <math.h>
 #include <string.h>
+#ifdef __MSDOS__
+#include <process.h>
+#else
+#include <sys/types.h>
+#include <unistd.h>
+#endif
 
 #include "asterix.h"                    /* Asterix definitions */
 
@@ -14,6 +65,7 @@
 #include "adiparse.h"
 #include "adierror.h"                   /* ADI error handling */
 #include "adilist.h"
+#include "adisyms.h"
 #include "adistrng.h"
 #include "adiexpr.h"
 
@@ -28,6 +80,21 @@ ADIobj ADI##_tcode##_ocode##_i( int narg, ADIobj args[], ADIstatus status ) \
   res = _tacc(args[0]) _oop _tacc(args[1]);\
   adic_newv0l( res ? ADI__true : ADI__false, &rval, status );\
   return rval;}
+
+/*
+ *  System interface functions
+ */
+ADIobj ADIsysGetPid_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIinteger	pid;
+  ADIobj	rval = ADI__nullid;
+
+  pid = (ADIinteger) getpid();
+
+  adic_newv0i( pid, &rval, status );
+
+  return rval;
+  }
 
 /*
  *  General purpose functions
@@ -45,6 +112,19 @@ ADIobj ADIgenName_i( int narg, ADIobj args[], ADIstatus status )
     adic_new0c( &rval, status );
 
   return rval;
+  }
+
+ADIobj ADIgenSet_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	rval = ADI__nullid;
+
+  rval = ADIexprOwnArg( args+1, status );
+
+  ADIsymAddBind( _etn_head(args[0]), ADI__true,
+		 ADIsbindNew( ADI__defn_sb, rval, status ),
+		 status );
+
+  return adix_clone( rval, status );
   }
 
 ADIobj ADIgenType_i( int narg, ADIobj args[], ADIstatus status )
@@ -112,6 +192,34 @@ ADIobj ADIintEvenQ_i( int narg, ADIobj args[], ADIstatus status )
   ADIobj	rval = ADI__nullid;
 
   adic_newv0l( ! (_IVAL(args[0]) % 2), &rval, status );
+
+  return rval;
+  }
+
+ADIobj ADIintFact_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIinteger	inp = _IVAL(args[0]);
+
+  ADIobj	rval = ADI__nullid;
+
+  if ( inp < 0 )
+    ;
+  else if ( inp < 13 ) {
+    ADIinteger	res = 1;
+    while ( inp > 1 )
+      res *= inp--;
+
+    adic_newv0i( res, &rval, status );
+    }
+
+  else {
+    ADIdouble	res = 479001600.0;
+
+    while ( inp > 12 )
+      res *= inp--;
+
+    adic_newv0d( res, &rval, status );
+    }
 
   return rval;
   }
@@ -293,6 +401,19 @@ ADIobj ADIintShift_i( int narg, ADIobj args[], ADIstatus status )
   return rval;
   }
 
+ADIobj ADIintSign_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIinteger	sign = 1;
+  ADIobj	rval = ADI__nullid;
+
+  if ( _IVAL(args[1]) < 0 )
+    sign = -1;
+
+  adic_newv0i( abs(_IVAL(args[0]))*sign, &rval, status );
+
+  return rval;
+  }
+
 ADIobj ADIintSub_i( int narg, ADIobj args[], ADIstatus status )
   {
   ADIobj	rval = ADI__nullid;
@@ -332,13 +453,18 @@ ADIobj ADIreal##_ocode##_i( int narg, ADIobj args[], ADIstatus status ) \
 _math_rop(ArcCos,acos)
 _math_rop(ArcSin,asin)
 _math_rop(ArcTan,atan)
+_math_rop(Ceil,ceil)
 _math_rop(Cos,cos)
+_math_rop(Cosh,cosh)
 _math_rop(Exp,exp)
+_math_rop(Floor,floor)
 _math_rop(Log,log)
 _math_rop(Log10,log10)
 _math_rop(Sin,sin)
+_math_rop(Sinh,sinh)
 _math_rop(Sqrt,sqrt)
 _math_rop(Tan,tan)
+_math_rop(Tanh,tanh)
 
 ADIobj ADIrealAbs_i( int narg, ADIobj args[], ADIstatus status )
   {
@@ -425,6 +551,18 @@ ADIobj ADIrealMin_i( int narg, ADIobj args[], ADIstatus status )
   return rval;
   }
 
+ADIobj ADIrealMod_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	rval = ADI__nullid;
+  ADIreal	value;
+
+  value = (ADIreal) fmod( _RVAL(args[0]), _RVAL(args[1]) );
+
+  adic_newv0r( value, &rval, status );
+
+  return rval;
+  }
+
 ADIobj ADIrealMult_i( int narg, ADIobj args[], ADIstatus status )
   {
   ADIobj	*carg;
@@ -476,6 +614,19 @@ ADIobj ADIrealQ_i( int narg, ADIobj args[], ADIstatus status )
   return rval;
   }
 
+ADIobj ADIrealSign_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIreal	sign = 1.0;
+  ADIobj	rval = ADI__nullid;
+
+  if ( _RVAL(args[1]) < 0.0 )
+    sign = -1.0;
+
+  adic_newv0r( (ADIreal) fabs(_RVAL(args[0]))*sign, &rval, status );
+
+  return rval;
+  }
+
 ADIobj ADIrealSub_i( int narg, ADIobj args[], ADIstatus status )
   {
   ADIobj	rval = ADI__nullid;
@@ -506,13 +657,18 @@ ADIobj ADIdble##_ocode##_i( int narg, ADIobj args[], ADIstatus status ) \
 _math_dop(ArcCos,acos)
 _math_dop(ArcSin,asin)
 _math_dop(ArcTan,atan)
+_math_dop(Ceil,ceil)
 _math_dop(Cos,cos)
+_math_dop(Cosh,cosh)
 _math_dop(Exp,exp)
+_math_dop(Floor,floor)
 _math_dop(Log,log)
 _math_dop(Log10,log10)
 _math_dop(Sin,sin)
+_math_dop(Sinh,sinh)
 _math_dop(Sqrt,sqrt)
 _math_dop(Tan,tan)
+_math_dop(Tanh,tanh)
 
 ADIobj ADIdbleAbs_i( int narg, ADIobj args[], ADIstatus status )
   {
@@ -599,6 +755,18 @@ ADIobj ADIdbleMin_i( int narg, ADIobj args[], ADIstatus status )
   return rval;
   }
 
+ADIobj ADIdbleMod_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	rval = ADI__nullid;
+  ADIdouble	value;
+
+  value = fmod( _DVAL(args[0]), _DVAL(args[1]) );
+
+  adic_newv0d( value, &rval, status );
+
+  return rval;
+  }
+
 ADIobj ADIdbleMult_i( int narg, ADIobj args[], ADIstatus status )
   {
   ADIobj	*carg;
@@ -646,6 +814,19 @@ ADIobj ADIdbleQ_i( int narg, ADIobj args[], ADIstatus status )
   ADIobj	rval = ADI__nullid;
 
   adic_newv0l( _dble_q(args[0]), &rval, status );
+
+  return rval;
+  }
+
+ADIobj ADIdbleSign_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIdouble	sign = 1.0;
+  ADIobj	rval = ADI__nullid;
+
+  if ( _DVAL(args[1]) < 0.0 )
+    sign = -1.0;
+
+  adic_newv0d( fabs(_DVAL(args[0]))*sign, &rval, status );
 
   return rval;
   }
@@ -782,6 +963,17 @@ ADIobj ADIstrCapit_i( int narg, ADIobj args[], ADIstatus status )
       if ( islower( *sdat->data ) )
 	*sdat->data -= 'a' - 'A';
     }
+
+  return rval;
+  }
+
+ADIobj ADIstrCaste_i( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIobj	rval = ADI__nullid;
+
+  adic_new0c( &rval, status );
+
+  adic_putid( rval, args[0], status );
 
   return rval;
   }
@@ -1055,151 +1247,177 @@ ADIobj ADIlstQ_i( int narg, ADIobj args[], ADIstatus status )
 
 void ADIfuncInit( ADIstatus status )
   {
+  DEFINE_FUNC_TABLE(sys_funcs)
+    FUNC_TENTRY( "GetPid()",				ADIsysGetPid_i,	0 ),
+  END_FUNC_TABLE;
+
   DEFINE_FUNC_TABLE(gen_funcs)
-    FUNC_TENTRY( "Name(_)",				ADIgenName_i,	0 ),
-    FUNC_TENTRY( "Type(_)",				ADIgenType_i,	0 ),
+    FUNC_TENTRY( "Name(_)",				ADIgenName_i,	FA_L ),
+    FUNC_TENTRY( "Set(_Symbol,_)",			ADIgenSet_i,	FA_L1 ),
+    FUNC_TENTRY( "Type(_)",				ADIgenType_i,	FA_L ),
   END_FUNC_TABLE;
 
   DEFINE_FUNC_TABLE(int_funcs)
-    FUNC_TENTRY( "Abs(_INTEGER)",			ADIintAbs_i,	0 ),
-    FUNC_TENTRY( "And(__INTEGER)",			ADIintAnd_i,	0 ),
-    FUNC_TENTRY( "Divide(_INTEGER,_INTEGER)",		ADIintDiv_i,	0 ),
-    FUNC_TENTRY( "Equal(_INTEGER,_INTEGER)", 		ADIintEQ_i,	0 ),
-    FUNC_TENTRY( "EvenQ(_INTEGER)",			ADIintEvenQ_i,	0 ),
-    FUNC_TENTRY( "GCD(_INTEGER,_INTEGER)", 		ADIintGCD_i,	0 ),
-    FUNC_TENTRY( "GreaterThan(_INTEGER,_INTEGER)", 	ADIintGT_i,	0 ),
-    FUNC_TENTRY( "GreaterThanOrEqual(_INTEGER,_INTEGER)", ADIintGE_i,	0 ),
-    FUNC_TENTRY( "Integer(_REAL)",			ADIintCaste_i,	0 ),
-    FUNC_TENTRY( "Integer(_DOUBLE)",			ADIintCaste_i,	0 ),
-    FUNC_TENTRY( "IntegerQ(_)",				ADIintQ_i,	0 ),
-    FUNC_TENTRY( "LessThan(_INTEGER,_INTEGER)", 	ADIintLT_i,	0 ),
-    FUNC_TENTRY( "LessThanOrEqual(_INTEGER,_INTEGER)", 	ADIintLE_i,	0 ),
+    FUNC_TENTRY( "Abs(_INTEGER)",			ADIintAbs_i,	FA_L ),
+    FUNC_TENTRY( "And(__INTEGER)",			ADIintAnd_i,	FA_L ),
+    FUNC_TENTRY( "Divide(_INTEGER,_INTEGER)",		ADIintDiv_i,	FA_L ),
+    FUNC_TENTRY( "Equal(_INTEGER,_INTEGER)", 		ADIintEQ_i,	FA_L ),
+    FUNC_TENTRY( "EvenQ(_INTEGER)",			ADIintEvenQ_i,	FA_L ),
+    FUNC_TENTRY( "Factorial(_INTEGER)",			ADIintFact_i,	FA_L ),
+    FUNC_TENTRY( "GCD(_INTEGER,_INTEGER)", 		ADIintGCD_i,	FA_L ),
+    FUNC_TENTRY( "GreaterThan(_INTEGER,_INTEGER)", 	ADIintGT_i,	FA_L ),
+    FUNC_TENTRY( "GreaterThanOrEqual(_INTEGER,_INTEGER)", ADIintGE_i,	FA_L ),
+    FUNC_TENTRY( "Integer(_REAL)",			ADIintCaste_i,	FA_L ),
+    FUNC_TENTRY( "Integer(_DOUBLE)",			ADIintCaste_i,	FA_L ),
+    FUNC_TENTRY( "IntegerQ(_)",				ADIintQ_i,	FA_L ),
+    FUNC_TENTRY( "LessThan(_INTEGER,_INTEGER)", 	ADIintLT_i,	FA_L ),
+    FUNC_TENTRY( "LessThanOrEqual(_INTEGER,_INTEGER)", 	ADIintLE_i,	FA_L ),
     FUNC_TENTRY( "Max(__INTEGER)",			ADIintMax_i,	0 ),
     FUNC_TENTRY( "Min(__INTEGER)",			ADIintMin_i,	0 ),
-    FUNC_TENTRY( "Mod(_INTEGER,_INTEGER)", 		ADIintMod_i,	0 ),
-    FUNC_TENTRY( "Multiply(__INTEGER)",			ADIintMult_i,	0 ),
-    FUNC_TENTRY( "Negate(_INTEGER)",			ADIintNeg_i,	0 ),
-    FUNC_TENTRY( "Not(_INTEGER)",			ADIintNot_i,	0 ),
-    FUNC_TENTRY( "NotEqual(_INTEGER,_INTEGER)", 	ADIintNE_i,	0 ),
-    FUNC_TENTRY( "OddQ(_INTEGER)",			ADIintOddQ_i,	0 ),
-    FUNC_TENTRY( "Or(__INTEGER)",			ADIintOr_i,	0 ),
-    FUNC_TENTRY( "Plus(__INTEGER)",			ADIintPlus_i,	0 ),
-    FUNC_TENTRY( "Shift(_INTEGER,_INTEGER)",		ADIintShift_i,	0 ),
-    FUNC_TENTRY( "Subtract(_INTEGER,_INTEGER)", 	ADIintSub_i,	0 ),
-    FUNC_TENTRY( "Xor(_INTEGER,_INTEGER)",		ADIintXor_i,	0 ),
+    FUNC_TENTRY( "Mod(_INTEGER,_INTEGER)", 		ADIintMod_i,	FA_L ),
+    FUNC_TENTRY( "Multiply(__INTEGER)",			ADIintMult_i,	FA_L ),
+    FUNC_TENTRY( "Negate(_INTEGER)",			ADIintNeg_i,	FA_L ),
+    FUNC_TENTRY( "Not(_INTEGER)",			ADIintNot_i,	FA_L ),
+    FUNC_TENTRY( "NotEqual(_INTEGER,_INTEGER)", 	ADIintNE_i,	FA_L ),
+    FUNC_TENTRY( "OddQ(_INTEGER)",			ADIintOddQ_i,	FA_L ),
+    FUNC_TENTRY( "Or(__INTEGER)",			ADIintOr_i,	FA_L ),
+    FUNC_TENTRY( "Plus(__INTEGER)",			ADIintPlus_i,	FA_L ),
+    FUNC_TENTRY( "Shift(_INTEGER,_INTEGER)",		ADIintShift_i,	FA_L ),
+    FUNC_TENTRY( "Sign(_INTEGER,_INTEGER)",		ADIintSign_i,	FA_L ),
+    FUNC_TENTRY( "Subtract(_INTEGER,_INTEGER)", 	ADIintSub_i,	FA_L ),
+    FUNC_TENTRY( "Xor(_INTEGER,_INTEGER)",		ADIintXor_i,	FA_L ),
   END_FUNC_TABLE;
 
   DEFINE_FUNC_TABLE(list_funcs)
     FUNC_TENTRY( "Length(_List)",			ADIlstLen_i,	0 ),
     FUNC_TENTRY( "List(__)",				ADIlstMk_i,	0 ),
-    FUNC_TENTRY( "ListQ(_)",				ADIlstQ_i,	0 ),
+    FUNC_TENTRY( "ListQ(_)",				ADIlstQ_i,	FA_L ),
   END_FUNC_TABLE;
 
   DEFINE_FUNC_TABLE(real_funcs)
-    FUNC_TENTRY( "Abs(_REAL)",				ADIrealAbs_i,	0 ),
-    FUNC_TENTRY( "ArcCos(_REAL)",			ADIrealArcCos_i,0 ),
-    FUNC_TENTRY( "ArcSin(_REAL)",			ADIrealArcSin_i,0 ),
-    FUNC_TENTRY( "ArcTan(_REAL)",			ADIrealArcTan_i,0 ),
-    FUNC_TENTRY( "ArcTan(_REAL,_REAL)",			ADIrealArcTan2_i,0 ),
-    FUNC_TENTRY( "Cos(_REAL)",				ADIrealCos_i,	0 ),
-    FUNC_TENTRY( "Divide(_REAL,_REAL)",  		ADIrealDiv_i,   0 ),
-    FUNC_TENTRY( "Equal(_REAL,_REAL)", 			ADIrealEQ_i,	0 ),
-    FUNC_TENTRY( "Exp(_REAL)",				ADIrealExp_i,	0 ),
-    FUNC_TENTRY( "GreaterThan(_REAL,_REAL)", 		ADIrealGT_i,	0 ),
-    FUNC_TENTRY( "GreaterThanOrEqual(_REAL,_REAL)", 	ADIrealGE_i,	0 ),
-    FUNC_TENTRY( "LessThan(_REAL,_REAL)", 		ADIrealLT_i,	0 ),
-    FUNC_TENTRY( "LessThanOrEqual(_REAL,_REAL)", 	ADIrealLE_i,	0 ),
-    FUNC_TENTRY( "Log(_REAL)",				ADIrealLog_i,	0 ),
-    FUNC_TENTRY( "Log10(_REAL)",			ADIrealLog10_i,	0 ),
+    FUNC_TENTRY( "Abs(_REAL)",				ADIrealAbs_i,	FA_L ),
+    FUNC_TENTRY( "ArcCos(_REAL)",			ADIrealArcCos_i,FA_L ),
+    FUNC_TENTRY( "ArcSin(_REAL)",			ADIrealArcSin_i,FA_L ),
+    FUNC_TENTRY( "ArcTan(_REAL)",			ADIrealArcTan_i,FA_L ),
+    FUNC_TENTRY( "ArcTan(_REAL,_REAL)",			ADIrealArcTan2_i,FA_L ),
+    FUNC_TENTRY( "Ceil(_REAL)",				ADIrealCeil_i,	FA_L ),
+    FUNC_TENTRY( "Cos(_REAL)",				ADIrealCos_i,	FA_L ),
+    FUNC_TENTRY( "Cosh(_REAL)",				ADIrealCosh_i,	FA_L ),
+    FUNC_TENTRY( "Divide(_REAL,_REAL)",  		ADIrealDiv_i,   FA_L ),
+    FUNC_TENTRY( "Equal(_REAL,_REAL)", 			ADIrealEQ_i,	FA_L ),
+    FUNC_TENTRY( "Exp(_REAL)",				ADIrealExp_i,	FA_L ),
+    FUNC_TENTRY( "Floor(_REAL)",			ADIrealFloor_i,	FA_L ),
+    FUNC_TENTRY( "GreaterThan(_REAL,_REAL)", 		ADIrealGT_i,	FA_L ),
+    FUNC_TENTRY( "GreaterThanOrEqual(_REAL,_REAL)", 	ADIrealGE_i,	FA_L ),
+    FUNC_TENTRY( "LessThan(_REAL,_REAL)", 		ADIrealLT_i,	FA_L ),
+    FUNC_TENTRY( "LessThanOrEqual(_REAL,_REAL)", 	ADIrealLE_i,	FA_L ),
+    FUNC_TENTRY( "Log(_REAL)",				ADIrealLog_i,	FA_L ),
+    FUNC_TENTRY( "Log10(_REAL)",			ADIrealLog10_i,	FA_L ),
     FUNC_TENTRY( "Max(__REAL)",				ADIrealMax_i,	0 ),
     FUNC_TENTRY( "Min(__REAL)",				ADIrealMin_i,	0 ),
-    FUNC_TENTRY( "Multiply(__REAL)",			ADIrealMult_i,	0 ),
-    FUNC_TENTRY( "Negate(_REAL)",			ADIrealNeg_i,	0 ),
-    FUNC_TENTRY( "NotEqual(_REAL,_REAL)",  		ADIrealNE_i,	0 ),
-    FUNC_TENTRY( "Plus(__REAL)",			ADIrealPlus_i,	0 ),
-    FUNC_TENTRY( "Real(_DOUBLE)",			ADIrealCaste_i,	0 ),
-    FUNC_TENTRY( "Real(_INTEGER)",			ADIrealCaste_i,	0 ),
-    FUNC_TENTRY( "RealQ(_)",				ADIrealQ_i,	0 ),
-    FUNC_TENTRY( "Sin(_REAL)",				ADIrealSin_i,	0 ),
-    FUNC_TENTRY( "Sqrt(_REAL)",				ADIrealSqrt_i,	0 ),
-    FUNC_TENTRY( "Subtract(_REAL,_REAL)",  		ADIrealSub_i,	0 ),
-    FUNC_TENTRY( "Tan(_REAL)",				ADIrealTan_i,	0 ),
+    FUNC_TENTRY( "Mod(_REAL,_REAL)",  			ADIrealMod_i,	FA_L ),
+    FUNC_TENTRY( "Multiply(__REAL)",			ADIrealMult_i,	FA_L ),
+    FUNC_TENTRY( "Negate(_REAL)",			ADIrealNeg_i,	FA_L ),
+    FUNC_TENTRY( "NotEqual(_REAL,_REAL)",  		ADIrealNE_i,	FA_L ),
+    FUNC_TENTRY( "Plus(__REAL)",			ADIrealPlus_i,	FA_L ),
+    FUNC_TENTRY( "Real(_DOUBLE)",			ADIrealCaste_i,	FA_L ),
+    FUNC_TENTRY( "Real(_INTEGER)",			ADIrealCaste_i,	FA_L ),
+    FUNC_TENTRY( "RealQ(_)",				ADIrealQ_i,	FA_L ),
+    FUNC_TENTRY( "Sign(_REAL,_REAL)",  			ADIrealSign_i,	FA_L ),
+    FUNC_TENTRY( "Sin(_REAL)",				ADIrealSin_i,	FA_L ),
+    FUNC_TENTRY( "Sinh(_REAL)",				ADIrealSinh_i,	FA_L ),
+    FUNC_TENTRY( "Sqrt(_REAL)",				ADIrealSqrt_i,	FA_L ),
+    FUNC_TENTRY( "Subtract(_REAL,_REAL)",  		ADIrealSub_i,	FA_L ),
+    FUNC_TENTRY( "Tan(_REAL)",				ADIrealTan_i,	FA_L ),
+    FUNC_TENTRY( "Tanh(_REAL)",				ADIrealTanh_i,	FA_L ),
   END_FUNC_TABLE;
 
   DEFINE_FUNC_TABLE(log_funcs)
-    FUNC_TENTRY( "And(__LOGICAL)",			ADIlogAnd_i,	0 ),
-    FUNC_TENTRY( "LogicalQ(_)",				ADIlogQ_i,	0 ),
-    FUNC_TENTRY( "Not(_LOGICAL)",			ADIlogNot_i,	0 ),
-    FUNC_TENTRY( "Or(__LOGICAL)",			ADIlogOr_i,	0 ),
-    FUNC_TENTRY( "Xor(_LOGICAL,_LOGICAL)",		ADIlogXor_i,	0 ),
+    FUNC_TENTRY( "And(__LOGICAL)",			ADIlogAnd_i,	FA_L ),
+    FUNC_TENTRY( "LogicalQ(_)",				ADIlogQ_i,	FA_L ),
+    FUNC_TENTRY( "Not(_LOGICAL)",			ADIlogNot_i,	FA_L ),
+    FUNC_TENTRY( "Or(__LOGICAL)",			ADIlogOr_i,	FA_L ),
+    FUNC_TENTRY( "Xor(_LOGICAL,_LOGICAL)",		ADIlogXor_i,	FA_L ),
   END_FUNC_TABLE;
 
   DEFINE_FUNC_TABLE(string_funcs)
-    FUNC_TENTRY( "AlnumQ(_)",				ADIstrAlnumQ_i, 0 ),
-    FUNC_TENTRY( "AlphaQ(_)",				ADIstrAlphaQ_i, 0 ),
-    FUNC_TENTRY( "AsciiQ(_)",				ADIstrAsciiQ_i, 0 ),
-    FUNC_TENTRY( "Capitalise(_CHAR)",			ADIstrCapit_i,  0 ),
-    FUNC_TENTRY( "Char(__INTEGER)",			ADIstrChar_i,	0 ),
-    FUNC_TENTRY( "Characters(_CHAR)",			ADIstrChars_i,	0 ),
-    FUNC_TENTRY( "CntrlQ(_)",				ADIstrCntrlQ_i, 0 ),
-    FUNC_TENTRY( "Concat(__CHAR)",			ADIstrConcat_i, 0 ),
-    FUNC_TENTRY( "DigitQ(_)",				ADIstrDigitQ_i, 0 ),
-    FUNC_TENTRY( "Equal(_CHAR,_CHAR)",			ADIstrEQ_i,	0 ),
-    FUNC_TENTRY( "GreaterThan(_CHAR,_CHAR)", 		ADIstrGT_i,	0 ),
-    FUNC_TENTRY( "GreaterThanOrEqual(_CHAR,_CHAR)", 	ADIstrGE_i,	0 ),
-    FUNC_TENTRY( "Ichar(_CHAR)",			ADIstrIchar_i,	0 ),
-    FUNC_TENTRY( "LessThan(_CHAR,_CHAR)", 		ADIstrLT_i,	0 ),
-    FUNC_TENTRY( "LessThanOrEqual(_CHAR,_CHAR)", 	ADIstrLE_i,	0 ),
-    FUNC_TENTRY( "Length(_CHAR)",			ADIstrLen_i,	0 ),
-    FUNC_TENTRY( "LowerCase(_CHAR)",			ADIstrLower_i,  0 ),
-    FUNC_TENTRY( "LowerQ(_)",				ADIstrLowerQ_i, 0 ),
-    FUNC_TENTRY( "NotEqual(_CHAR,_CHAR)",		ADIstrNE_i,	0 ),
-    FUNC_TENTRY( "PrintQ(_)",				ADIstrPrintQ_i, 0 ),
-    FUNC_TENTRY( "PunctQ(_)",				ADIstrPunctQ_i, 0 ),
-    FUNC_TENTRY( "Reverse(_CHAR)",			ADIstrRvrse_i,  0 ),
-    FUNC_TENTRY( "SimilarQ(_CHAR,_CHAR)",		ADIstrSimQ_i,	0 ),
-    FUNC_TENTRY( "SpaceQ(_)",				ADIstrSpaceQ_i, 0 ),
-    FUNC_TENTRY( "StringQ(_)",				ADIstrQ_i,	0 ),
-    FUNC_TENTRY( "Take(_CHAR,_INTEGER)",		ADIstrTake_i,	0 ),
-    FUNC_TENTRY( "UpperCase(_CHAR)",			ADIstrUpper_i,  0 ),
-    FUNC_TENTRY( "UpperQ(_)",				ADIstrUpperQ_i, 0 ),
-    FUNC_TENTRY( "XdigitQ(_)",				ADIstrXdigitQ_i,0 ),
+    FUNC_TENTRY( "AlnumQ(_)",				ADIstrAlnumQ_i, FA_L ),
+    FUNC_TENTRY( "AlphaQ(_)",				ADIstrAlphaQ_i, FA_L ),
+    FUNC_TENTRY( "AsciiQ(_)",				ADIstrAsciiQ_i, FA_L ),
+    FUNC_TENTRY( "Capitalise(_CHAR)",			ADIstrCapit_i,  FA_L ),
+    FUNC_TENTRY( "Char(__INTEGER)",			ADIstrChar_i,	FA_L ),
+    FUNC_TENTRY( "Characters(_CHAR)",			ADIstrChars_i,	FA_L ),
+    FUNC_TENTRY( "CntrlQ(_)",				ADIstrCntrlQ_i, FA_L ),
+    FUNC_TENTRY( "Concat(__CHAR)",			ADIstrConcat_i, FA_L ),
+    FUNC_TENTRY( "DigitQ(_)",				ADIstrDigitQ_i, FA_L ),
+    FUNC_TENTRY( "Equal(_CHAR,_CHAR)",			ADIstrEQ_i,	FA_L ),
+    FUNC_TENTRY( "GreaterThan(_CHAR,_CHAR)", 		ADIstrGT_i,	FA_L ),
+    FUNC_TENTRY( "GreaterThanOrEqual(_CHAR,_CHAR)", 	ADIstrGE_i,	FA_L ),
+    FUNC_TENTRY( "Ichar(_CHAR)",			ADIstrIchar_i,	FA_L ),
+    FUNC_TENTRY( "LessThan(_CHAR,_CHAR)", 		ADIstrLT_i,	FA_L ),
+    FUNC_TENTRY( "LessThanOrEqual(_CHAR,_CHAR)", 	ADIstrLE_i,	FA_L ),
+    FUNC_TENTRY( "LowerCase(_CHAR)",			ADIstrLower_i,  FA_L ),
+    FUNC_TENTRY( "LowerQ(_)",				ADIstrLowerQ_i, FA_L ),
+    FUNC_TENTRY( "NotEqual(_CHAR,_CHAR)",		ADIstrNE_i,	FA_L ),
+    FUNC_TENTRY( "PrintQ(_)",				ADIstrPrintQ_i, FA_L ),
+    FUNC_TENTRY( "PunctQ(_)",				ADIstrPunctQ_i, FA_L ),
+    FUNC_TENTRY( "Reverse(_CHAR)",			ADIstrRvrse_i,  FA_L ),
+    FUNC_TENTRY( "SimilarQ(_CHAR,_CHAR)",		ADIstrSimQ_i,	FA_L ),
+    FUNC_TENTRY( "SpaceQ(_)",				ADIstrSpaceQ_i, FA_L ),
+    FUNC_TENTRY( "String(_LOGICAL)",			ADIstrCaste_i,	FA_L ),
+    FUNC_TENTRY( "String(_INTEGER)",			ADIstrCaste_i,	FA_L ),
+    FUNC_TENTRY( "String(_REAL)",			ADIstrCaste_i,	FA_L ),
+    FUNC_TENTRY( "String(_DOUBLE)",			ADIstrCaste_i,	FA_L ),
+    FUNC_TENTRY( "StringLength(_CHAR)",			ADIstrLen_i,	FA_L ),
+    FUNC_TENTRY( "StringQ(_)",				ADIstrQ_i,	FA_L ),
+    FUNC_TENTRY( "Take(_CHAR,_INTEGER)",		ADIstrTake_i,	FA_L ),
+    FUNC_TENTRY( "UpperCase(_CHAR)",			ADIstrUpper_i,  FA_L ),
+    FUNC_TENTRY( "UpperQ(_)",				ADIstrUpperQ_i, FA_L ),
+    FUNC_TENTRY( "XdigitQ(_)",				ADIstrXdigitQ_i,FA_L ),
   END_FUNC_TABLE;
 
   DEFINE_FUNC_TABLE(dble_funcs)
-    FUNC_TENTRY( "Abs(_DOUBLE)",			ADIdbleAbs_i,	0 ),
-    FUNC_TENTRY( "ArcCos(_DOUBLE)",			ADIdbleArcCos_i,0 ),
-    FUNC_TENTRY( "ArcSin(_DOUBLE)",			ADIdbleArcSin_i,0 ),
-    FUNC_TENTRY( "ArcTan(_DOUBLE)",			ADIdbleArcTan_i,0 ),
-    FUNC_TENTRY( "ArcTan(_DOUBLE,_DOUBLE)",		ADIdbleArcTan2_i,0 ),
-    FUNC_TENTRY( "Cos(_DOUBLE)",			ADIdbleCos_i,	0 ),
-    FUNC_TENTRY( "Divide(_DOUBLE,_DOUBLE)",      	ADIdbleDiv_i,	0 ),
-    FUNC_TENTRY( "Equal(_DOUBLE,_DOUBLE)", 		ADIdbleEQ_i,	0 ),
-    FUNC_TENTRY( "Exp(_DOUBLE)",			ADIdbleExp_i,	0 ),
-    FUNC_TENTRY( "GreaterThan(_DOUBLE,_DOUBLE)", 	ADIdbleGT_i,	0 ),
-    FUNC_TENTRY( "GreaterThanOrEqual(_DOUBLE,_DOUBLE)", ADIdbleGE_i,	0 ),
-    FUNC_TENTRY( "LessThan(_DOUBLE,_DOUBLE)", 		ADIdbleLT_i,	0 ),
-    FUNC_TENTRY( "LessThanOrEqual(_DOUBLE,_DOUBLE)", 	ADIdbleLE_i,	0 ),
-    FUNC_TENTRY( "Log(_DOUBLE)",			ADIdbleLog_i,	0 ),
-    FUNC_TENTRY( "Log10(_DOUBLE)",			ADIdbleLog10_i,	0 ),
+    FUNC_TENTRY( "Abs(_DOUBLE)",			ADIdbleAbs_i,	FA_L ),
+    FUNC_TENTRY( "ArcCos(_DOUBLE)",			ADIdbleArcCos_i,FA_L ),
+    FUNC_TENTRY( "ArcSin(_DOUBLE)",			ADIdbleArcSin_i,FA_L ),
+    FUNC_TENTRY( "ArcTan(_DOUBLE)",			ADIdbleArcTan_i,FA_L ),
+    FUNC_TENTRY( "ArcTan(_DOUBLE,_DOUBLE)",		ADIdbleArcTan2_i,FA_L ),
+    FUNC_TENTRY( "Ceil(_DOUBLE)",			ADIdbleCeil_i,	FA_L ),
+    FUNC_TENTRY( "Cos(_DOUBLE)",			ADIdbleCos_i,	FA_L ),
+    FUNC_TENTRY( "Cosh(_DOUBLE)",			ADIdbleCosh_i,	FA_L ),
+    FUNC_TENTRY( "Divide(_DOUBLE,_DOUBLE)",      	ADIdbleDiv_i,	FA_L ),
+    FUNC_TENTRY( "Double(_INTEGER)",			ADIdbleCaste_i,	FA_L ),
+    FUNC_TENTRY( "Double(_REAL)",			ADIdbleCaste_i,	FA_L ),
+    FUNC_TENTRY( "DoubleQ(_)",				ADIdbleQ_i,	FA_L ),
+    FUNC_TENTRY( "Equal(_DOUBLE,_DOUBLE)", 		ADIdbleEQ_i,	FA_L ),
+    FUNC_TENTRY( "Exp(_DOUBLE)",			ADIdbleExp_i,	FA_L ),
+    FUNC_TENTRY( "Floor(_DOUBLE)",			ADIdbleFloor_i,	FA_L ),
+    FUNC_TENTRY( "GreaterThan(_DOUBLE,_DOUBLE)", 	ADIdbleGT_i,	FA_L ),
+    FUNC_TENTRY( "GreaterThanOrEqual(_DOUBLE,_DOUBLE)", ADIdbleGE_i,	FA_L ),
+    FUNC_TENTRY( "LessThan(_DOUBLE,_DOUBLE)", 		ADIdbleLT_i,	FA_L ),
+    FUNC_TENTRY( "LessThanOrEqual(_DOUBLE,_DOUBLE)", 	ADIdbleLE_i,	FA_L ),
+    FUNC_TENTRY( "Log(_DOUBLE)",			ADIdbleLog_i,	FA_L ),
+    FUNC_TENTRY( "Log10(_DOUBLE)",			ADIdbleLog10_i,	FA_L ),
     FUNC_TENTRY( "Max(__DOUBLE)",			ADIdbleMax_i,	0 ),
     FUNC_TENTRY( "Min(__DOUBLE)",			ADIdbleMin_i,	0 ),
-    FUNC_TENTRY( "Multiply(__DOUBLE)",			ADIdbleMult_i,	0 ),
-    FUNC_TENTRY( "Negate(_DOUBLE)",			ADIdbleNeg_i,	0 ),
-    FUNC_TENTRY( "NotEqual(_DOUBLE,_DOUBLE)",  		ADIdbleNE_i,	0 ),
-    FUNC_TENTRY( "Plus(__DOUBLE)",		    	ADIdblePlus_i,	0 ),
-    FUNC_TENTRY( "Double(_INTEGER)",			ADIdbleCaste_i,	0 ),
-    FUNC_TENTRY( "Double(_REAL)",			ADIdbleCaste_i,	0 ),
-    FUNC_TENTRY( "DoubleQ(_)",				ADIdbleQ_i,	0 ),
-    FUNC_TENTRY( "Sin(_DOUBLE)",			ADIdbleSin_i,	0 ),
-    FUNC_TENTRY( "Sqrt(_DOUBLE)",			ADIdbleSqrt_i,	0 ),
-    FUNC_TENTRY( "Subtract(_DOUBLE,_DOUBLE)",  		ADIdbleSub_i,	0 ),
-    FUNC_TENTRY( "Tan(_DOUBLE)",			ADIdbleTan_i,	0 ),
+    FUNC_TENTRY( "Mod(_DOUBLE,_DOUBLE)",  		ADIdbleMod_i,	FA_L ),
+    FUNC_TENTRY( "Multiply(__DOUBLE)",			ADIdbleMult_i,	FA_L ),
+    FUNC_TENTRY( "Negate(_DOUBLE)",			ADIdbleNeg_i,	FA_L ),
+    FUNC_TENTRY( "NotEqual(_DOUBLE,_DOUBLE)",  		ADIdbleNE_i,	FA_L ),
+    FUNC_TENTRY( "Plus(__DOUBLE)",		    	ADIdblePlus_i,	FA_L ),
+    FUNC_TENTRY( "Sign(_DOUBLE,_DOUBLE)",  		ADIdbleSign_i,	FA_L ),
+    FUNC_TENTRY( "Sin(_DOUBLE)",			ADIdbleSin_i,	FA_L ),
+    FUNC_TENTRY( "Sinh(_DOUBLE)",			ADIdbleSinh_i,	FA_L ),
+    FUNC_TENTRY( "Sqrt(_DOUBLE)",			ADIdbleSqrt_i,	FA_L ),
+    FUNC_TENTRY( "Subtract(_DOUBLE,_DOUBLE)",  		ADIdbleSub_i,	FA_L ),
+    FUNC_TENTRY( "Tan(_DOUBLE)",			ADIdbleTan_i,	FA_L ),
+    FUNC_TENTRY( "Tanh(_DOUBLE)",			ADIdbleTanh_i,	FA_L ),
   END_FUNC_TABLE;
 
   _chk_stat;
 
 /* Install functions */
+  ADIkrnlAddFuncs( sys_funcs, status );
   ADIkrnlAddFuncs( gen_funcs, status );
   ADIkrnlAddFuncs( int_funcs, status );
   ADIkrnlAddFuncs( list_funcs, status );

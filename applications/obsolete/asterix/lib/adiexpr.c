@@ -142,7 +142,7 @@ ADIlogical ADIexprTestBind( ADIobj sbind, ADIstatus status )
   int		iarg;
   ADIlogical	match = ADI__true;
   ADIclassDef   *margc;
-  ADIobj	mclass;
+  ADIobj	mclass,marg;
   ADIlogical	mmode;			/* Method (or function) mode */
   ADImethod	*mthd;
   int		nleft;			/* Number of values to process */
@@ -204,8 +204,9 @@ ADIlogical ADIexprTestBind( ADIobj sbind, ADIstatus status )
 	mclass = _CAR(earg);
 	if ( _null_q(mclass) )
 	  mclass = K_WildCard;
-	else if ( _etn_q(mclass) )
-	  mclass = _etn_head(mclass);
+	else if ( _etn_q(mclass) ) {
+	  _GET_HEDARG( mclass, marg, mclass );
+	  }
 	else
 	  ADIstrmPrintf( ADIcvStdOut, "Comp %O and %O\n",status,mclass,cur_sp_t->aname);
 
@@ -213,7 +214,14 @@ ADIlogical ADIexprTestBind( ADIobj sbind, ADIstatus status )
 	ok = ADI__true;
 	while ( (sacnt < nmax) && ok && nleft ) {
 
-	  if ( mclass == K_WildCard )
+	  if ( mclass == K_Symbol ) {
+	    ok = _etn_q(*cur_sp);
+	    if ( ok ) {
+              ok = _null_q(_etn_args(*cur_sp));
+	      }
+	    }
+
+	  else if ( mclass == K_WildCard )
 	    ;
 
 	  else if ( mclass == cur_sp_t->aname )
@@ -283,24 +291,20 @@ ADIobj ADIexprOwnArg( ADIobj *arg, ADIstatus status )
   }
 
 
-ADIobj ADIexprMapFun( ADIobj head, ADIobj *first,
+ADIobj ADIexprMapFun( ADIobj head, ADIobj *first, ADIinteger llen,
 		      int nlist, ADIstatus status )
   {
   int		ihead;
   int		ilist;			/* Loop over lists */
   ADIobj	*cursor = vs_top;
-  ADIinteger	llen;			/* List length */
   ADIobj	*newargl = vs_top + nlist;/* Argument lists for new heads */
   ADIobj 	robj = ADI__nullid;	        /* Returned object */
 
   if ( _ok(status) ) {
 
-/* Initialise cursors */
+/* Initialise cursors. Inputs may be List() or raw lists */
     for( ilist=0; ilist<nlist; ilist++)
-      cursor[ilist] = first[ilist];
-
-/* Length of lists */
-    llen = lstx_len( *first, status );
+      cursor[ilist] = _list_q(first[ilist]) ? first[ilist] : _etn_args(first[ilist]);
 
     for( ihead=0; ihead<llen; ihead++ )
       newargl[ihead] = ADI__nullid;
@@ -322,9 +326,8 @@ ADIobj ADIexprMapFun( ADIobj head, ADIobj *first,
 /* Reverse list elements in situ */
       newargl[ihead] = lstx_revrsi( newargl[ihead], status );
 
-      newargl[ihead] =			/* Turn this into expression tree */
-	ADIetnNew( adix_copy(head,status),
-	    newargl[ihead], status );
+/* Turn this into expression tree */
+      newargl[ihead] = ADIetnNew( adix_clone(head,status), newargl[ihead], status );
 
       ihead++;				/* Next output sub-expression */
       }
@@ -332,9 +335,6 @@ ADIobj ADIexprMapFun( ADIobj head, ADIobj *first,
 /* Join all these sub-expressions into an argument list */
     for( ihead=llen-1; ihead>=0; ihead--)
       robj = lstx_cell( newargl[ihead], robj, status );
-
-/* The top-level expression tree node */
-    robj = lstx_cell( adix_clone( K_List, status ), robj, status );
     }
 
   return robj;
@@ -512,11 +512,13 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
   ADIobj		head;
   int                   iter = 0;       /* Iterations through eval loop */
   ADIinteger              llen;           /* Length of list argument */
+  ADIobj	    	lroot;
   ADIlogical               match;          /* Binding match found? */
   ADIobj                newval;         /* New argument value */
   ADIobj                robj;           /* Result object */
   ADIobj                s_bind;
   ADIobj                *old_vs_base,*old_vs_top;
+  ADIlogical		this_a_list;
   ADIobj                *vs_first, *vs_last;
   ADIobj                *vs_ptr;        /* Loop over virtual stack */
   ADIlogical       	wereonstack;
@@ -622,11 +624,17 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 
 	if ( _valid_q(earg) ) {
 	  all_list = ADI__true;              /* Are all the arguments lists? */
-	  _ARGLOOP_1ST_TO_NTH_AND(vs_ptr,all_list)
-	  if ( *vs_ptr )
-	    all_list = (all_list & (_list_q(*vs_ptr)));
-	  else
-	    all_list = ADI__false;
+	  _ARGLOOP_1ST_TO_NTH_AND(vs_ptr,all_list) {
+	    this_a_list = ADI__false;
+	    if ( *vs_ptr ) {
+	      if ( _list_q(*vs_ptr) )
+		this_a_list = ADI__true;
+	      else if ( _etn_q(*vs_ptr) )
+		this_a_list = (_etn_head(*vs_ptr) == K_List);
+	      }
+
+	    all_list &= this_a_list;
+	    }
 	  }
 	else
 	  all_list = ADI__false;
@@ -641,10 +649,13 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 	  if ( _valid_q(adix_pl_geti(head, K_Listable, status )) ) {
 
 /* Get length of first list */
-	    llen = lstx_len( *vs_base, status );
+	    lroot = _list_q(*vs_base) ? *vs_base : _etn_args(*vs_base);
+	    llen = lstx_len( lroot, status );
 
-	    _ARGLOOP_2ND_TO_NTH_AND(vs_ptr,all_list)
-		all_list = (lstx_len(*vs_ptr,status) == llen);
+	    _ARGLOOP_2ND_TO_NTH_AND(vs_ptr,all_list) {
+	      lroot = _list_q(*vs_ptr) ? *vs_ptr : _etn_args(*vs_ptr);
+	      all_list = (lstx_len(lroot,status) == llen);
+	      }
 	    }
 	  else
 	    all_list = ADI__false;           /* Cancel list processing */
@@ -656,7 +667,23 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 /* Map over lists? */
       if ( all_list ) {
 
-	robj = ADIexprMapFun( head, vs_base, vs_top-vs_base, status );
+	ADIobj	*rcar,*rcdr,curp,newval;
+	ADIlogical	cachanged;
+
+	robj = curp = ADIexprMapFun( head, vs_base, llen, vs_top-vs_base, status );
+
+	while ( _valid_q(curp) ) {
+	  _GET_CARCDR_A(rcar,rcdr,curp);
+
+	  newval = ADIexprEvalInt( *rcar, level+1, &cachanged, status );
+
+	  if ( cachanged ) {
+	    adix_erase( rcar, 1, status );
+	    *rcar = newval;
+	    }
+
+	  curp = *rcdr;
+	  }
 
 	*changed = ADI__true;
 	}
@@ -686,7 +713,7 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 	    ADIobj	mthd = _sbind_defn(a_bind);
 
 	    robj = adix_exemth( ADI__nullid, _mthd_exec(mthd), _NARG,
-				vs_first, status );
+				vs_base, status );
 
 	    if ( !_ok(status) ) {       /* Bad status from procedure? */
 	      defer_error = ADI__true;
@@ -747,27 +774,23 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 /* Non-functional expression tree */
     else if ( _etn_q(expr) ) {
 
-      s_bind = ADIsymFind( head, ADI__false,
-		      ADI__defn_sb|ADI__trnsfm_sb, status );
+      s_bind = ADIsymFind( head, ADI__true, ADI__defn_sb|ADI__trnsfm_sb, status );
 
-      if ( ! _valid_q(s_bind) )
-	s_bind = ADIsymFind( head, ADI__false, ADI__enum_sb, status );
+/*      if ( ! _valid_q(s_bind) )
+	s_bind = ADIsymFind( head, ADI__true, ADI__enum_sb, status ); */
 
 /* Did we match the symbol? */
       if ( _valid_q(s_bind) ) {
 
 /* Access the symbol binding value */
-	robj = adix_clone( _sbind_defn(_CAR(s_bind)), status );
+	robj = adix_clone( _sbind_defn(s_bind), status );
 
-/* Remove symbol bindings */
-	lstx_sperase( &s_bind, status );
 	*changed = ADI__true;
-	finished = ADI__true;
 	}
-      else {
+      else
 	robj = expr;
-	finished = ADI__true;
-	}
+
+      finished = ADI__true;
       }
 
 /* Internal data forms. Simply return the object and finish */

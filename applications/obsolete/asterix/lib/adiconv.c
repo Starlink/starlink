@@ -113,8 +113,10 @@ void ADIcnvNew( ADIclassDef *from, ADIclassDef *to,
 #define _coppad_c_tr(_pref,_source) \
   {char *sptr;int ic; \
   if ( _pref##_nterm ) {_pref##_buf=*_pref##dptr;} \
-  else if ( _pref##_is_adi ) {_pref##_buf=_pref##sptr->data;\
-	_pref##_blen=_pref##sptr->len;} \
+  else if ( _pref##_is_adi ) {\
+  if ( ! _pref##sptr->data ) { _pref##sptr->len = strlen(_source);\
+   _pref##sptr->data=strx_alloc(_pref##sptr->len,status);}\
+	_pref##_buf = _pref##sptr->data; _pref##_blen=_pref##sptr->len;} \
   else _pref##_buf = _pref##ptr; \
   for(sptr=_source,ic=0;*sptr && (ic<_pref##_blen);sptr++,ic++) \
     _pref##_buf[ic] = *sptr;\
@@ -210,6 +212,21 @@ _cnv_to_c(R,r,ADIdouble,"%g")
 _cnv_to_c(D,d,ADIdouble,"%g")
 _cnv_to_c(P,p,ADIpointer,"%x")
 
+void ADIcnvLC( ADImta *idd, int n, char *in, ADImta *odd,
+		    char *out, int *nerr, ADIstatus status )
+  {
+  char		*ts = "True";
+  char		*fs = "False";
+  _TM_ctype(l)	*iptr = (_TM_ctype(l) *) in;
+  int           ival = n;
+ _declare_c_tr(o,odd);
+  _chk_stat;
+  _start_c_tr(o,out);
+  while (ival--) {
+    ADIlogical val = *iptr++;
+    _setbuf_c_tr(o); _coppad_c_tr(o,val ? ts : fs); _advance_c_tr(o);
+    }
+  }
 
 int ADIcnvCtoD( char *dat, int dlen, ADIdouble *val )
   {
@@ -629,6 +646,7 @@ void ADIcnvInit( ADIstatus status )
     { i, c, ADIcnvIC },
     { r, c, ADIcnvRC },
     { d, c, ADIcnvDC },
+    { l, c, ADIcnvLC },
 
     { c, c, ADIcnvCC },
 

@@ -53,6 +53,7 @@
 *	adi_defmth	 - Define a method
 *	adi_defprt	 - Define a class printer
 *       adi_defrep	 - Define a new file representation
+*	adi_defvar	 - Define a variable
 *	adi_dervd	 - Is an object derived from a specified class
 *
 *      Method execution :
@@ -525,6 +526,21 @@ F77_SUBROUTINE(adifn(defrep))( CHARACTER(name), INTEGER(id),
   adix_defrep( name, name_length, (ADIobj *) id, status );
 
   _ERR_REP( "ADI_DEFREP", Estr__DefFilRep );
+  }
+
+F77_SUBROUTINE(adifn(defvar))( CHARACTER(name), LOGICAL(global), INTEGER(valid),
+			       INTEGER(status) TRAIL(name) )
+  {
+  GENPTR_CHARACTER(name)
+  GENPTR_LOGICAL(global)
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(status)
+
+  _chk_stat;                 		/* Standard checks */
+
+  adix_defvar( name, name_length, *global, (ADIobj) *valid, status );
+
+  _ERR_REP( "ADI_DEFVAR", Estr__DefVar );
   }
 
 F77_SUBROUTINE(adifn(dervd))( INTEGER(id), CHARACTER(name), LOGICAL(der),

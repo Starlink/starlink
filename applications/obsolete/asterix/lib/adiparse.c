@@ -114,6 +114,7 @@ ADIobj  K_SetDelayed = ADI__nullid;
 ADIobj  K_Subtract = ADI__nullid;
 ADIobj  K_SubtractFrom = ADI__nullid;
 ADIobj  K_Switch = ADI__nullid;
+ADIobj  K_Symbol = ADI__nullid;
 
 ADIobj  K_Try = ADI__nullid;
 
@@ -1418,6 +1419,8 @@ ADIobj ADIstrmExtendC( ADIobj stream, char *buf, int blen, ADIstatus status )
     str->dev->ptr = str->dev->buf = buf;
     str->dev->bufsiz = blen;
     str->dev->pstatic = ADI__true;
+
+    _han_set(stream) = ADI__true;
     }
 
   return stream;
@@ -1433,6 +1436,8 @@ ADIobj ADIstrmExtendCst( ADIobj stream, char *buf, int blen, ADIstatus status )
     str->dev->bufsiz = blen;
     str->dev->pstatic = ADI__true;
     str->dev->dstatic = ADI__true;
+
+    _han_set(stream) = ADI__true;
     }
 
   return stream;
@@ -1452,6 +1457,8 @@ ADIobj ADIstrmExtendFile( ADIobj stream, FILE *f, ADIstatus status )
     str->dev->isatty = isatty(fileno(f));
     str->dev->buf[0] = '\0';
     str->dev->ptr = str->dev->buf;
+
+    _han_set(stream) = ADI__true;
     }
 
   return stream;
@@ -2501,6 +2508,7 @@ void prsx_init( ADIstatus status )
     CSTR_TENTRY(K_Subtract,"Subtract"),
     CSTR_TENTRY(K_SubtractFrom,"SubtractFrom"),
     CSTR_TENTRY(K_Switch,"Switch"),
+    CSTR_TENTRY(K_Symbol,"Symbol"),
 
     CSTR_TENTRY(K_Try,"Try"),
 

@@ -12,6 +12,8 @@
 #include "adimem.h"                     /* Allocation routines */
 #include "adistrng.h"
 #include "adicface.h"
+#include "adiexpr.h"
+#include "adilist.h"
 #include "adiparse.h"
 #include "adipkg.h"                   	/* Prototypes for this sub-package */
 
@@ -69,6 +71,52 @@ ADIobj adix_prs_defcls( ADIobj pstream, ADIstatus status )
   }
 
 
+ADIobj adix_prs_global( ADIobj pstream, ADIstatus status )
+  {
+  ADIobj	cargs[3] = {ADI__nullid, ADI__nullid, ADI__nullid};
+  ADIobj	lcell;
+  ADIobj	rlist = ADI__nullid;
+  ADIobj	*ipoint = &rlist;
+  ADIlogical	more = ADI__true;
+
+  ADInextToken( pstream, status );
+
+/* Get new class name from stream */
+  cargs[0] = prsx_symname( pstream, status );
+  ADInextToken( pstream, status );
+
+/* Parse the list of symbols and construct a list of expression nodes whose */
+/* heads are the names of the symbols */
+  while ( ADIcurrentToken(pstream,status) == TOK__SYM && more ) {
+
+/* Get symbol name */
+    lcell = lstx_cell(
+		ADIetnNew(
+		   prsx_symname( pstream, status ),
+		   ADI__nullid,
+		   status ),
+		ADI__nullid,
+		status );
+
+    ADInextToken( pstream, status );
+
+/* Add to list of symbols */
+    *ipoint = lcell;
+    ipoint = &_CDR(lcell);
+
+/* End of list if not a comma */
+    more = ADIifMatchToken( pstream, TOK__COMMA, status );
+    }
+
+  if ( ! _valid_q(rlist) )
+    adic_setecs( ADI__SYNTAX, "Symbol name expected", status );
+
+/* Define class, ignoring returned identifier */
+/*  return ADIdefGlobal_i( 1, &rlist, status ); */
+  return ADI__nullid;
+  }
+
+
 void adix_prs_cmd( ADIobj pstream, ADIstatus status )
   {
   ADIobj	sdat = ADI__nullid;
@@ -77,6 +125,8 @@ void adix_prs_cmd( ADIobj pstream, ADIstatus status )
     if ( ADIisTokenCstring( pstream, "defclass", status ) ) {
       sdat = adix_prs_defcls( pstream, status );
       }
+    else if ( ADIisTokenCstring( pstream, "global", status ) )
+      sdat = adix_prs_global( pstream, status );
     else {
       char	*cmd;
 

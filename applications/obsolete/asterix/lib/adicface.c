@@ -54,6 +54,7 @@
 *	adic_defmth	- define a method
 *	adic_defprt	- define class printer method
 *       adic_defrep	- define a new file representation
+*	adic_defvar	- define a new variable value
 *	adic_dervd	- is an object derived from specified class
 *
 *      Method execution :
@@ -436,6 +437,15 @@ void adic_defrep( char *name, ADIobj *id, ADIstatus status )
   adix_defrep( name, _CSM, id, status );/* Invoke kernel routine */
 
   _ERR_REP( "adic_defrep", Estr__DefFilRep );
+  }
+
+void adic_defvar( char *name, ADIlogical global, ADIobj id, ADIstatus status )
+  {
+  _chk_stat;                 		/* Standard entry checks */
+
+  adix_defvar( name, _CSM, global, id, status );
+
+  _ERR_REP( "adic_defvar", Estr__DefVar );
   }
 
 void adic_dervd( ADIobj id, char *name, ADIlogical *der, ADIstatus status )

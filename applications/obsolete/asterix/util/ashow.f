@@ -343,7 +343,8 @@
         CALL ADI_CGET0D( SYSID, 'EPOCH', EPOCH, STATUS )
         CALL MSG_SETC( 'EF', EFORM )
         CALL MSG_SETD( 'EP', EPOCH )
-        CALL AIO_IWRITE( OCH, 6, 'Epoch           : ^EF^EP', STATUS )
+        CALL AIO_IWRITE( OCH, 6, 'Epoch                : ^EF^EP',
+     :                   STATUS )
       ELSE
         CALL AIO_IWRITE( OCH, 6, '* not present *', STATUS )
       END IF
@@ -375,7 +376,8 @@
           CALL MSG_SETD( 'A', PNT(1) )
           CALL MSG_SETD( 'B', PNT(2) )
         END IF
-        CALL AIO_IWRITE( OCH, 6, 'Axis origin     : ^A ^B', STATUS )
+        CALL AIO_IWRITE( OCH, 6, 'Axis origin          : ^A ^B',
+     :                   STATUS )
 
 *    Centre of f.o.v
         CALL ADI_THERE( PRJID, 'NPOINT', THERE, STATUS )
@@ -392,7 +394,8 @@
             CALL MSG_SETD( 'A', PNT(1) )
             CALL MSG_SETD( 'B', PNT(2) )
           END IF
-          CALL AIO_IWRITE( OCH, 6, 'FOV position    : ^A ^B', STATUS )
+          CALL AIO_IWRITE( OCH, 6, 'FOV position         : ^A ^B',
+     :                     STATUS )
         END IF
 
       ELSE
@@ -673,6 +676,7 @@
      :                'np', OCH, STATUS )
       CALL ASHOW_OB( TIMID, 'EffExposure', 'R', 'Effective exposure',
      :                'seconds', 'ig', OCH, STATUS )
+      CALL AIO_BLNK( OCH, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ASHOW_TIM', STATUS )
