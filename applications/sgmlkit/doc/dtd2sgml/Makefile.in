@@ -64,19 +64,27 @@ DTDDIR=../../dtd
 DECL=../../dtd/xml.decl
 
 %.dtdsummary: $(DTDDIR)/%.dtd
+	rm -f $@ $@.tmp
 	SGML_CATALOG_FILES=./CATALOG:$(DTDDIR)/CATALOG \
-	SGML_SEARCH_PATH=$(DTDDIR) \
-	$(PERL) -I $(PERLSGMLDIR) dtd2sgml.pl $< >$@ 
+	    SGML_SEARCH_PATH=$(DTDDIR) \
+	    $(PERL) -I $(PERLSGMLDIR) dtd2sgml.pl $< >$@.tmp
+	mv $@.tmp $@
 
 %.sgmltext: %.description
-	$(JADE) -t sgml -d dtd2sgml.dsl $(DECL) $< >$@
+	rm -f $@ $@.tmp
+	SGML_CATALOG_FILES=./CATALOG:$(DTDDIR)/CATALOG \
+	    SGML_SEARCH_PATH=$(DTDDIR) \
+	    $(JADE) -t sgml -d dtd2sgml.dsl $(DECL) $< >$@.tmp
+	mv $@.tmp $@
 
 # Handy target for producing a skeleton description of a DTD, to
 # start on the documentation task.
 %.description.skel:
+	rm -f $@ $@.tmp
 	SGML_SEARCH_PATH=$(DTDDIR) \
-	$(PERL) -I $(PERLSGMLDIR) dtdskeleton.pl \
-		$(DTDDIR)/$(@:.description.skel=.dtd) >$@
+	    $(PERL) -I $(PERLSGMLDIR) dtdskeleton.pl \
+	    $(DTDDIR)/$(@:.description.skel=.dtd) >$@.tmp
+	mv $@.tmp $@
 
 
 
