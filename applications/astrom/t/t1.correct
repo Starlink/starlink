@@ -19,7 +19,7 @@ ASTR
 17 27 44.640   74 22  0.120 0.0  0.0  1998.47
   681.152000    1624.824000
 END
-!!!-
+!!!- tmp1.astrom-in
 !!!+ tmp1.rep
 1* * * * * * * * * * * * *
  *  A S T R O M E T R Y  *
@@ -117,7 +117,7 @@ END
 
                                                                                   RMS :     0.270     0.321     0.420
 
-!!!-
+!!!- tmp1.rep
 !!!+ tmp1.sum
 
 
@@ -153,7 +153,7 @@ END
                 8        +0.132    -0.502     0.519
 
                 RMS :     0.270     0.321     0.420
-!!!-
+!!!- tmp1.sum
 !!!+ tmp1.log
 FIT   1
 INFO RESIDUAL      1         0.252         0.121         0.279
@@ -201,7 +201,7 @@ RESULT     decsex +74:20:08            # projection pole Dec, sexagesimal
 RESULT        wcs tmp1-fits02.fits # FITS-WCS output file
 STATUS OK
 ENDFIT
-!!!-
+!!!- tmp1.log
 !!!+ tmp1-fits01.fits
 SIMPLE  =                    T / file does conform to FITS standard             
 BITPIX  =                    8 / number of bits per data pixel                  
@@ -225,6 +225,7 @@ CRPIX1  =         1012.5201473 / Projection pole -- x-pixels
 CRPIX2  =         2018.9278316 / Projection pole -- y-pixels                    
 CUNIT1  = 'deg     '           / RA always given in degrees                     
 CUNIT2  = 'deg     '           / Dec always given in degrees                    
+COMMENT   Mean scale  0.33arcsec, nonperp  0.00, angle 88.86, inv? T            
 CD1_1   =       -1.8281422E-06 / Transformation to intermed. world coords       
 CD2_1   =       -9.2240926E-05                                                  
 CD1_2   =       -9.2240926E-05                                                  
@@ -249,7 +250,7 @@ PV2_31  =       -0.0000000E+00 / b_31 y^7  = -12q^3
 PV2_37  =       -0.0000000E+00 / b_37 yx^6 = -12q^3                             
 MJD-OBS =        50985.6675000 / Obs. start J1998.470 (1998-06-21T16:01)        
 END                                                                             
-!!!-
+!!!- tmp1-fits01.fits
 !!!+ tmp1-fits02.fits
 SIMPLE  =                    T / file does conform to FITS standard             
 BITPIX  =                    8 / number of bits per data pixel                  
@@ -273,6 +274,7 @@ CRPIX1  =         1011.7752847 / Projection pole -- x-pixels
 CRPIX2  =         2020.0308714 / Projection pole -- y-pixels                    
 CUNIT1  = 'deg     '           / RA always given in degrees                     
 CUNIT2  = 'deg     '           / Dec always given in degrees                    
+COMMENT   Mean scale  0.33arcsec, nonperp  0.35, angle 88.83, inv? T            
 CD1_1   =       -2.1600490E-06 / Transformation to intermed. world coords       
 CD2_1   =       -9.2015132E-05                                                  
 CD1_2   =       -9.2066602E-05                                                  
@@ -297,4 +299,4 @@ PV2_31  =       -0.0000000E+00 / b_31 y^7  = -12q^3
 PV2_37  =       -0.0000000E+00 / b_37 yx^6 = -12q^3                             
 MJD-OBS =        50985.6675000 / Obs. start J1998.470 (1998-06-21T16:01)        
 END                                                                             
-!!!-
+!!!- tmp1-fits02.fits
