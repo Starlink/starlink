@@ -1,0 +1,91 @@
+#! /bin/sh -
+# original bootstrap file, installed by starconf 1.0-6, rnum=1000006
+# If you _need_ to change this file, delete or replace `original' above
+# or else starconf may overwrite it with an updated version
+
+# bootstrap.installed.  Generated from bootstrap.installed.in by configure.
+
+# Bootstrap a checked-out component of the Starlink software tree.
+# Run this script in a freshly checked-out directory to bring the
+# system to the point where you can just type ./configure;make
+#
+# Usage:
+#     ./bootstrap
+#
+# Important environment variables:
+#
+#     STARCONF_BUILDSUPPORT: this bootstrap script executes the
+#     configuration script $STARCONF_BUILDSUPPORT/bin/starconf, and
+#     objects if it can't find it.  This script adds required files,
+#     and establishes installation directories.
+#
+# The configuration script here works with automake versions 1.6.3 and
+# 1.7.5, and autoconf 2.57, and probably not much that's significantly
+# older than those.
+
+# Echo a command then run it, terminating the script if the command fails
+echorun() { echo $*; eval $* || exit 1; }
+
+if test -z "$STARCONF_BUILDSUPPORT"; then
+    # Use a default, based on starconf.
+    test -x ./starconf.status && \
+        STARCONF_BUILDSUPPORT=`./starconf.status --show buildsupport`
+    # The `starconf' script won't necessarily be in the path.
+    test -n "$STARCONF_BUILDSUPPORT" || \
+        STARCONF_BUILDSUPPORT=`starconf --show buildsupport 2>/dev/null`
+fi
+if test -z "$STARCONF_BUILDSUPPORT"; then
+    # Use a default.  We don't normally refer to the STARLINK
+    # variable, but we've little choice here.  Try it, but don't fail
+    # if it's not there -- we have other defaults.
+    if test -n "$STARLINK" -a -d $STARLINK/buildsupport; then
+        STARCONF_BUILDSUPPORT=$STARLINK/buildsupport
+        echo "Defaulting STARCONF_BUILDSUPPORT to $STARCONF_BUILDSUPPORT"
+    fi
+fi
+if test -z "$STARCONF_BUILDSUPPORT"; then
+    # Give up!
+    echo "STARCONF_BUILDSUPPORT is empty -- hope that's OK"
+fi
+
+# Run starconf, by running the starconf script installed in
+# $STARCONF_BUILDSUPPORT.
+#
+# It is possible to recreate the current starconf configuration by
+# running the ./starconf.status script in the current directory.  At
+# present, we _do_ this as a fallback, but we might not in future.
+if test -x $STARCONF_BUILDSUPPORT/bin/starconf; then
+    echorun $STARCONF_BUILDSUPPORT/bin/starconf
+elif test -x ./starconf.status; then
+    # When starconf is run, it finishes by execing ./starconf.status
+    # with arguments which do final configuration (indicating
+    # installation location).  These arguments can be defaulted from
+    # the environment, and we rely on this here -- the script exits if
+    # the required variables are not findable.
+    echorun ./starconf.status
+else
+    echo "No starconf found in $STARCONF_BUILDSUPPORT, and no ./starconf.status.  Exiting"
+    exit 1
+fi
+
+# Bootstrap any child directories
+for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` DUMMY
+do
+    if test -n "$d" -a -d "$d"; then
+        echo "Bootstrapping $d..."
+        (cd $d; ./bootstrap)
+    fi
+done
+
+# If STAR_SUPPRESS_AUTORECONF is true in the environment, then we
+# suppress the call of `autoreconf'.  This is here _only_ so that the top-level
+# bootstrap file can suppress multiple calls of this in bootstrap scripts
+# in its children.
+: ${STAR_SUPPRESS_AUTORECONF=false}
+if $STAR_SUPPRESS_AUTORECONF; then
+    echo "Suppressing autoreconf"
+else
+    echorun autoreconf --install --symlink
+fi
+
+exit 0

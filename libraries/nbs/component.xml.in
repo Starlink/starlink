@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/nbs</path>
+  <description>NBS Noticeboard System</description>
+  <abstract><p> The noticeboard system routines provide a fast means
+  for processes to share data in global memory. A given process may
+  own as many noticeboards as it wishes and may access noticeboards
+  owned by other processes.  Normally the only process that writes to
+  a noticeboard is its owner but other processes that know what they
+  are doing can subvert this rule either by calling a special routine
+  or else by accessing noticeboard data by using a pointer.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>William Lupton</name>
+      <uname>wfl</uname>
+    </person>
+    <person>
+      <name>David Allan</name>
+      <uname>dja</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
