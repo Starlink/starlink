@@ -378,7 +378,7 @@ $(DOCUMENTATION) $(PKG_NAME)_iraf.tar
 
 PUBLIC_SCRIPTS = Polka.tcl Polka_procs.tcl \
 CCDShowHelp.tcl dialog.tcl adamtask.tcl adamMessageRelay irg_wild polimp.csh \
-polexp.csh
+polexp.csh makecube.csh
 
 #  Startup script.  This is the file that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases 

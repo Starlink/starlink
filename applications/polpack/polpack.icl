@@ -49,6 +49,7 @@ define polsim            $POLPACK_DIR/polpack_mon
 define polstack          $POLPACK_DIR/polpack_mon
 define polvec            $POLPACK_DIR/polpack_mon
 defstring polh(elp)      !$POLPACK_DIR/polhelp
+defstring makec(ube)     !$POLPACK_DIR/makecube.csh
 
 {  Full command definitions.
 define pol_polbin        $POLPACK_DIR/polpack_mon polbin
@@ -64,6 +65,7 @@ define pol_polsim        $POLPACK_DIR/polpack_mon polsim
 define pol_polstack      $POLPACK_DIR/polpack_mon polstack
 define pol_polvec        $POLPACK_DIR/polpack_mon polvec
 defstring pol_polh(elp)  !$POLPACK_DIR/polhelp
+defstring pol_makec(ube) !$POLPACK_DIR/makecube.csh
 
 { Define POLPACK's help from ICL.  Note that polhelp points to help polpack
 { because polhelp doesn't work from UNIX ICL.

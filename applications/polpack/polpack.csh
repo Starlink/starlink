@@ -75,6 +75,7 @@
       alias polsim    INSTALL_BIN/polsim
       alias polstack  INSTALL_BIN/polstack
       alias polvec    INSTALL_BIN/polvec
+      alias makecube  INSTALL_BIN/makecube.csh
 #
 #  Now do the same with alternative names.
 #
@@ -90,6 +91,7 @@
       alias pol_polsim    INSTALL_BIN/polsim
       alias pol_polstack  INSTALL_BIN/polstack
       alias pol_polvec    INSTALL_BIN/polvec
+      alias pol_makecube  INSTALL_BIN/makecube.csh
 #
 #
 #  Set up the commands and environment variables needed to export and

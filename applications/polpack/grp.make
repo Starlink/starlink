@@ -40,7 +40,7 @@ pol1_ctclm.f pol1_gtcta.f pol1_gtctc.f pol1_gtctw.f \
 pol1_gtwcs.f pol1_knext.f pol1_lnam.f pol1_mkcat.f \
 pol1_plvec.f pol1_rmbnd.f pol1_setd.f pol1_setft.f pol1_squar.f \
 pol1_stbin.f pol1_stk.f pol1_stk2.f pol1_ptvrc.f \
-pol1_vecky.f pol1_vecpl.f pol1_vect.f pol_cale.f \
+pol1_vecky.f pol1_vecpl.f pol1_vect.f pol_cale.f makecube.csh \
 pol_calf.f pol_calp.f pol_calti.f polbin.f polbin.ifl polcal.f \
 polcal.ifl polcent.f polcent.ifl polexp.csh polexp.f polexp.ifl \
 polext.f polext.ifl polhelp.f polhelp.ifl polimp.csh polimp.f \
