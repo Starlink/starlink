@@ -39,8 +39,6 @@ surf_kap/kpg_ast \
 surf_kap/kpg_par \
 surf_kap/lpg_com \
 surf_kap/lpg_const \
-surf_kap/ndg_err \
-surf_kap/ndg_const \
 surf_kap/grf.h
 
 # This is a list of tar files created by other makefiles
