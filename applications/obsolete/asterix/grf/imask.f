@@ -46,10 +46,10 @@
             CALL MSG_BLNK()
             CALL STR_BTOC(I_MASK,MSTR,STATUS)
             CALL MSG_PRNT(' Old mask value: '//MSTR)
-            IF ((I_MASK.AND.QUAL_IGNORE).EQ.QUAL_GOOD) THEN
-              I_MASK=I_MASK.OR.QUAL_IGNORE
+            IF ((I_MASK.AND.QUAL__IGNORE).EQ.QUAL__GOOD) THEN
+              I_MASK=I_MASK.OR.QUAL__IGNORE
             ELSE
-              I_MASK=I_MASK.AND.(.NOT.QUAL_IGNORE)
+              I_MASK=I_MASK.AND.(.NOT.QUAL__IGNORE)
             ENDIF
             CALL STR_BTOC(I_MASK,MSTR,STATUS)
             CALL MSG_PRNT(' New mask value: '//MSTR)
@@ -74,7 +74,6 @@
           CALL MSG_PRNT('AST_ERR: no QUALITY present')
         ENDIF
 
-
       ENDIF
 
       CALL AST_ERR(STATUS)
@@ -82,5 +81,3 @@
       CALL USI_CLOSE()
 
       END
-
-
