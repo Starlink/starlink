@@ -93,6 +93,12 @@ typedef void AstTranMap;
 typedef void AstDSBSpecFrame;
 #endif
 
+/* between v3.0 and v3.4 astRate returned the second derivative */
+#if ( AST_MAJOR_VERS == 3 && AST_MINOR_VERS < 5 )
+#define RATE_HAS_SECOND_DERIVATIVE 1
+#endif
+
+
 
 
 /* Helper functions */
@@ -332,6 +338,33 @@ void My_astCopyErrMsg ( AV ** newbuff ) {
   }
 
 }
+
+/* Since you can not put CPP code within CPP code inside XS we need
+   to provide a special wrapper routine for astRate */
+void myAstRate ( AstMapping * this, double * cat, int ax1, int ax2, 
+		 double * d2) {
+  double RETVAL;
+  dXSARGS;
+
+#if RATE_HAS_SECOND_DERIVATIVE
+  ASTCALL(
+    RETVAL = astRate( this, cat, ax1, ax2, &d2 );
+  )
+#else
+  ASTCALL(
+    RETVAL = astRate( this, cat, ax1, ax2 );
+  )
+#endif
+  if ( RETVAL != AST__BAD ) {
+     XPUSHs(sv_2mortal(newSVnv(RETVAL)));
+#ifdef RATE_HAS_SECOND_DERIVATIVE
+     XPUSHs(sv_2mortal(newSVnv(d2)));
+#endif
+  } else {
+     XSRETURN_EMPTY;
+  }
+}
+
 
 MODULE = Starlink::AST     PACKAGE = Starlink::AST
 
@@ -1760,7 +1793,7 @@ astInvert( this )
 
 
 # astRate
-#  Returns the rate and ref to array of derivatives
+#  Returns the rate and (sometimes) the second derivatives
 #  Returns empty list if astRate returns AST__BAD
 
 void
@@ -1773,7 +1806,6 @@ astRate( this, at, ax1, ax2 )
   int nin;
   int len;
   double * cat;
-  double RETVAL;
   double d2;
  PPCODE:
 #ifndef HASRATE
@@ -1785,16 +1817,7 @@ astRate( this, at, ax1, ax2 )
       Perl_croak(aTHX_ "Must supply Nin coordinates to astRate [%d != %d]",
                         nin, len);
   cat = pack1D( newRV_noinc((SV*)at), 'd');
-
-  ASTCALL(
-    RETVAL = astRate( this, cat, ax1, ax2, &d2 );
-  )
-  if ( RETVAL != AST__BAD ) {
-     XPUSHs(sv_2mortal(newSVnv(RETVAL)));
-     XPUSHs(sv_2mortal(newSVnv(d2)));
-  } else {
-     XSRETURN_EMPTY;
-  }
+  myAstRate( this, cat ,ax1, ax2, &d2 );
 #endif
 
 
