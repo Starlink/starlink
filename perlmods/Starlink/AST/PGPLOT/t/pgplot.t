@@ -61,6 +61,10 @@ is( $status, 1, "Calling _GTxtEx()" );
 $xb->[4] = $xb->[0]; $yb->[4] = $yb->[0];
 Starlink::AST::PGPLOT::_GLine( $xb, $yb );
 
+my $upx = 1.;
+my $upy = -1;
+Starlink::AST::PGPLOT::_GText( "Testing", 4, 6, "CL", $upx, $upy);
+Starlink::AST::PGPLOT::_GMark([4],[6],24);
 
 # _GQch()
 my ( $chv, $chh );
@@ -103,5 +107,5 @@ is( Starlink::AST::PGPLOT::_GMark( \@x, \@y, 6 ), 1, "Calling _GMark()" );
 is( Starlink::AST::PGPLOT::_GFlush(), 1, "Calling _GFlush()" );
 
 # Done!
-sleep(1);
+sleep(2);
 exit;
