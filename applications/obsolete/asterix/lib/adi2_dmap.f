@@ -129,6 +129,10 @@
       INTEGER			ENELM			! Expected # elements
       INTEGER			NDIM, DIMS(ADI__MXDIM)	! Actual dimensions
       INTEGER			PARENT			! Parent of cache obj
+      INTEGER			NID, NPTR
+      INTEGER			QMASK
+
+      BYTE			MASK
 
       LOGICAL			THERE			! Object exists?
 
@@ -185,7 +189,7 @@
 
 *  FITS mapping always works by creating the data array in the cache
 *  object. Map that data if it exists, otherwise read it from the file
-      IF ( ISAXDAT ) THEN
+      IF ( ISAXDAT .OR. ISAXWID ) THEN
         CALL CHR_CTOI( ITEM(6:6), IAX, STATUS )
         CAX = ITEM(6:6)
         CALL ADI2_GKEY0I( FITID, ' ', 'NAXIS'//CAX, .FALSE.,
@@ -245,23 +249,18 @@
               END IF
             END IF
           END IF
+        END IF
 
-*      Now construct the axis data array
+*    Now construct the axis data or width array
+        IF ( ISAXDAT ) THEN
           CALL ADI2_DMAP_AXINV ( BASE, DELTA, DIMS(IAX), %VAL(AXPTR),
+     :                           STATUS )
+        ELSE
+          CALL ADI2_DMAP_AXWID ( DELTA, DIMS(IAX), %VAL(AXPTR),
      :                           STATUS )
         END IF
 
 *    Put the correct pointer in place
-        PTR = AXPTR
-
-*  Or invent some axis widths
-      ELSE IF ( ISAXWID ) THEN
-        CALL CHR_CTOI( ITEM(6:6), IAX, STATUS )
-        CALL ADI2_GKEY0D( FITID, ' ', 'CDELT'//ITEM(6:6), .FALSE.,
-     :                    .FALSE., DELTA, ' ', STATUS )
-        CALL ADI_NEW( TYPE, 1, DIMS(IAX), AXID, STATUS )
-        CALL ADI_MAP( AXID, TYPE, 'WRITE', AXPTR, STATUS )
-        CALL ADI2_DMAP_AXWID ( DELTA, DIMS(IAX), %VAL(AXPTR), STATUS )
         PTR = AXPTR
 
 *  Otherwise carry on as normal
@@ -270,7 +269,25 @@
         IF ( THERE ) THEN
           CALL ADI_CMAP( CACHEID, 'Value', TYPE, MODE, PTR, STATUS )
         ELSE
-          CALL ADI2_DCOP_IN( CACHEID, PTR, NELM, TYPE, STATUS )
+          IF ( ITEM .EQ. 'LogicalQuality' ) THEN
+            CALL ADI2_DCOP_IN( CACHEID, PTR, NELM, 'UBYTE', STATUS )
+            CALL ADI2_GKEY0I( FITID, 'QUALITY', 'QMASK', .FALSE.,
+     :                        .FALSE., QMASK, ' ', STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+              CALL ERR_ANNUL( STATUS )
+              MASK = 0
+            ELSE
+              MASK = QMASK
+            END IF
+            CALL BIT_AND1UB( NELM, %VAL(PTR), MASK, STATUS )
+            CALL ADI_NEW( 'LOGICAL', NDIM, DIMS, NID, STATUS )
+            CALL ADI_MAP( NID, 'LOGICAL', 'WRITE', NPTR, STATUS )
+            CALL ADI2_IC2L( PTR, 'UBYTE', %VAL(NPTR), NELM, STATUS )
+            CALL ADI2_IMGCNV_NOTL( %VAL(NPTR), NELM, STATUS )
+            PTR = NPTR
+          ELSE
+            CALL ADI2_DCOP_IN( CACHEID, PTR, NELM, TYPE, STATUS )
+          END IF
         END IF
       END IF
 
