@@ -24,7 +24,7 @@
 
 #  History:
 #     29-JUN-1997 (DSB):
-#       Original Version (based on ircampack.csh).
+#       Original Version.
 #     {enter_changes_here}
 
 #-
@@ -37,69 +37,72 @@
 #  If there is, issue a warning and exit.  Otherwise create the required
 #  directory.
 #
-if (-d $HOME/adam) then
-   echo -n
-else
-   if (-f $HOME/adam) then
-      echo "You have a file called adam in your home directory.  Please rename "
-      echo "since adam must be a directory for ADAM files."
-      exit
-   else
-      mkdir $HOME/adam
-   endif
-endif
+      if (-d $HOME/adam) then
+         echo -n
+      else
+         if (-f $HOME/adam) then
+            echo "You have a file called adam in your home directory.  Please rename "
+            echo "since adam must be a directory for ADAM files."
+            exit
+         else
+            mkdir $HOME/adam
+         endif
+      endif
 #
 #
 #  Set up an environment variable pointing to the help library. This is refered
 #  to within the appliation interface files.
-setenv POLPACK_HELP INSTALL_HELP/polpack
+      setenv POLPACK_HELP INSTALL_HELP/polpack
 #
 #  Define symbols for the applications and scripts.
 #  ===============================================
 #
-alias calpol    INSTALL_BIN/calpol
-alias polhelp   INSTALL_BIN/polhelp 
-alias polexp    INSTALL_BIN/polexp
-alias polimp    INSTALL_BIN/polimp
-alias polmap    INSTALL_BIN/polmap
-alias polreg    INSTALL_BIN/polreg
+      alias calpol    INSTALL_BIN/calpol
+      alias polhelp   INSTALL_BIN/polhelp 
+      alias polexp    INSTALL_BIN/polexp
+      alias polimp    INSTALL_BIN/polimp
+      alias polmap    INSTALL_BIN/polmap
+      alias polreg    INSTALL_BIN/polreg
 #
 #  Now do the same with alternative names.
 #
-alias pol_calpol    INSTALL_BIN/pol_calpol
-alias pol_polhelp   INSTALL_BIN/polhelp 
-alias pol_polexp    INSTALL_BIN/pol_polexp
-alias pol_polimp    INSTALL_BIN/pol_polimp
-alias pol_polmap    INSTALL_BIN/pol_polmap
-alias pol_polreg    INSTALL_BIN/pol_polreg
+      alias pol_calpol    INSTALL_BIN/pol_calpol
+      alias pol_polhelp   INSTALL_BIN/polhelp 
+      alias pol_polexp    INSTALL_BIN/pol_polexp
+      alias pol_polimp    INSTALL_BIN/pol_polimp
+      alias pol_polmap    INSTALL_BIN/pol_polmap
+      alias pol_polreg    INSTALL_BIN/pol_polreg
 #
 #
 #  Set up the commands and environment variables needed to export and
 #  import POLPACK extension information to and from foreign data formats.
 #
-if ( $?NDF_XTN ) then
-   setenv NDF_XTN $NDF_XTN,POLPACK
-else
-   setenv NDF_XTN POLPACK
-endif
-#
-setenv NDF_IMP_POLPACK 'INSTALL_BIN/polimp in=^ndf quiet=y table=INSTALL_BIN/polimp.tab'
-setenv NDF_EXP_POLPACK 'INSTALL_BIN/polexp in=^ndf quiet=y'
-#
-setenv NDF_IMP_POLPACK_COMPRESSED ' '
-setenv NDF_EXP_POLPACK_COMPRESSED ' '
-#
-setenv NDF_IMP_POLPACK_GZIP ' '
-setenv NDF_EXP_POLPACK_GZIP ' '
+      if ( $?NDF_XTN ) then
+         switch ($NDF_XTN)
+            case *POLPACK*:
+               breaksw
+            default:
+               setenv NDF_XTN ${NDF_XTN},POLPACK
+         endsw
+      else
+         setenv NDF_XTN POLPACK
+      endif
+
+      setenv NDF_IMP_POLPACK 'INSTALL_BIN/polimp in=^ndf quiet=y table=INSTALL_BIN/polimp.tab'
+      setenv NDF_EXP_POLPACK 'INSTALL_BIN/polexp in=^ndf quiet=y'
+      setenv NDF_IMP_POLPACK_COMPRESSED ' '
+      setenv NDF_EXP_POLPACK_COMPRESSED ' '
+      setenv NDF_IMP_POLPACK_GZIP ' '
+      setenv NDF_EXP_POLPACK_GZIP ' '
 #
 #
 # Tell the user that POLPACK commands are now available.
 #
-echo ""
-echo "   POLPACK commands are now available -- (Version PKG_VERS)"
-echo " "
-echo "   Type polhelp for help on POLPACK commands"
-echo "   Type 'showme sun???' to browse the hypertext documentation"
-echo " "
+      echo ""
+      echo "   POLPACK commands are now available -- (Version PKG_VERS)"
+      echo " "
+      echo "   Type polhelp for help on POLPACK commands"
+      echo "   Type 'showme sun???' to browse the hypertext documentation"
+      echo " "
 #
 # end
