@@ -14,19 +14,36 @@
    o  A new command POLSIM for creating simulated intensity images from
    a cube of Stokes vectorsd and a set of template intensity images.
 
-   o POLKA now has a REFIN parameter which may be used to specify a 
+   o  POLKA now has a REFIN parameter which may be used to specify a 
    reference image to which the other images should be aligned. A 
    reference image specified in this way will not be processed to create
    any output files.
 
-   o  Stokes vectors are now created using north as the reference direction
-   if the data contains World Coordinate System information defining a
-   celestial co-ordinate Frame. Otherwise, the reference direction is the 
-   second image axis (Y). The reference direction for Stokes vectors
-   created by previous version of POLPACK was always the first image
-   axis (X). Applications in this version of POLPACK will automatically
-   recognise data sets created by previous versions of POLPACK and use
-   the correct reference direction.
+   o  The reference direction for Stokes parameters created by POLCAL,
+   POLBIN and POLVEC has been changed. Prior to V2.0 the reference
+   direction was the WPLATE=0 position (i.e. the direction of the fixed
+   analyser). As of V2.0, the reference direction will be north if there
+   is WCS information available to define north, or the positive Y axis 
+   {i.e. the second pixel axis) otherwise. POLVEC and POLBIN can still
+   read data sets created by earlier versions of POLPACK which use the
+   previous convention, but will write data sets using the new
+   convention.
+
+   o  The angles produced by POLBIN and POLVEC which give the orientation
+   of the polarization vectors are now referred to the same reference
+   direction as the Stokes parameters. Previously, these angles were
+   measured anti-clockwise form the positive X axis (i.e. the first pixel
+   axis). They are now measured anti-clockwise from the same reference
+   direction as the Stokes parameters. POLPLOT will automatically
+   determine the correct convention to use, based on the POLPACK version
+   number stored in the supplied catalogue.
+
+   o  The way in which the reference direction is recorded within a
+   POLPACK data file has been changed. Prior to V2.0, the POLPACK
+   extension item named ANGROT was used. The reference direction is now
+   specified by the POLANAL co-ordinate Frame added to the WCS component
+   when POLIMP or POLEXT is run. V2.0 will read ANGROT values in existing
+   data sets, but will no longer write them.
 
    o  Multiple NDFs within a single HDS container file can now be processed
    without needing to first extract them into separate files.

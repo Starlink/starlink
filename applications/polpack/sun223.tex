@@ -2728,7 +2728,7 @@ for NDF applications.
    }
    \sstparameters{
       \sstsubsection{
-         DEZERO = _LOGICAL (Read)
+         DEZERO = \_LOGICAL (Read)
       }{
          This parameter is only accessed by the single-beam algorithm
          when parameter WEIGHTS is set to 3. If TRUE, a constant value
@@ -6227,19 +6227,31 @@ noise characteristics within a set of intensity images.
 which allows a 1 or 2 dimensional image to be created from a column of a 
 catalogue. 
 
-\item The reference direction for Stokes vectors and polarization vectors
-has been changed. Prior to V2.0 the first image axis was always used. As
-of V2.0, the reference direction will either be north, or the second
-image axis (if there is no WCS information to define north).
-\htmlref{POLPLOT}{POLPLOT} will display vectors written by previous
-versions of POLPACK correctly. 
+\item The reference direction for Stokes parameters created by
+\htmlref{POLCAL}, \htmlref{POLBIN} and \htmlref{POLVEC} has been changed.
+Prior to V2.0 the reference direction was the WPLATE=0 position ({\emph i.e.} 
+the direction of the fixed analyser). As of V2.0, the reference direction
+will be north if there is WCS information available to define north, or
+the positive Y axis ({\emph i.e.} the second pixel axis) otherwise.
+\htmlref{POLVEC} and \htmlref{POLBIN} can still read data sets created by
+earlier versions of POLPACK which use the previous convention, but will 
+write data sets using the new convention.
+
+\item The angles produced by \htmlref{POLBIN} and \htmlref{POLVEC} which
+give the orientation of the polarization vectors are now referred to the
+same reference direction as the Stokes parameters. Previously, these
+angles were measured anti-clockwise form the positive X axis ({\emph
+i.e.} the first pixel axis). They are now measured anti-clockwise from
+the same reference direction as the Stokes parameters. \htmlref{POLPLOT}
+will automatically determine the correct convention to use, based on the
+POLPACK version number stored in the supplied catalogue.
 
 \item The way in which the reference direction is recorded within a
-POLPACK data file has been changed. Prior to V2.0, the POLPACK extension 
-item named ANGROT was used. The reference direction is now specified by 
-the POLANAL co-ordinate Frame added to the WCS component when POLIMP or 
-POLEXT is run. V2.0 will read ANGROT values in existing data sets, but 
-will no longer write them.
+POLPACK data file has been changed. Prior to V2.0, the POLPACK extension
+item named ANGROT was used. The reference direction is now specified by
+the POLANAL co-ordinate Frame added to the WCS component when
+\htmlref{POLIMP} or \htmlref{POLEXT} is run. V2.0 will read ANGROT values
+in existing data sets, but will no longer write them.
 
 \item The facilities for processing textual values within an import
 control table used by \htmlref{POLIMP}{POLIMP} have been expanded.
