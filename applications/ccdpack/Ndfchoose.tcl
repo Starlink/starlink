@@ -552,14 +552,13 @@
             set wcsframe 0
          }
 
-
 #  Unless we establish otherwise, we will need to create a new window
 #  and GWM widget, and draw the image onto it.
          set createwindow 1
          set drawimage 1
 
 #  See if the window and GWM widget already exists.
-         if { [ array names itk_component plot$index ] != "" } {
+         if { [ array names gwmwin $index ] != "" } {
 
 #  See if it has the right shape; if so, we will not need to create a
 #  new one.
@@ -575,12 +574,30 @@
                   set drawimage 0
                }
 
-#  The window has the wrong shape; we have to destroy the existing one
-#  so that we can create a new one and replot the image.
+#  The window has the wrong shape; here we should destroy the existing
+#  one prior to creating a new one on which to replot the image.
+#  However, a bug somewhere (I'm fairly sure it's in the GWM driver 
+#  of PGPLOT) can sometimes cause an error with the message
+#
+#      %PGPLOT, /gwm: lost PGPLOT window 1
+#
+#  followed by a core dump to occur when GWM windows are re-used.
+#  This bug has been reported, but since it is hard to pin down in
+#  a reproducible way a it does not seem likely to be fixed.
+#  Never destroying the GWM windows seems to make it OK, though this
+#  is not ideal since resources which are no longer used are not
+#  being freed up.
             } else {
-               destroy $itk_component(plot$index)
-               unset itk_component(plot$index)
+               place forget $itk_component($gwmwin($index))
+               # destroy $itk_component($gwmwin($index))
             }
+         }
+
+#  Set the name of the GWM component.  If we are creating a new GWM 
+#  widget here, ensure that it is a window name which has not been
+#  used before.
+         if { $createwindow } {
+            set gwmwin($index) "plot[ incr gseq ]"
          }
 
 #  Check whether we need to do anything; we may only need to return
@@ -590,8 +607,8 @@
 #  The window does not currently exist; we need to create and fill it.
 #  Create the containing frame.
             if { $createwindow } {
-               container plot$index $itk_component(choosearea) \
-                                    [ expr "{$index}" == "{1}" ]
+               container $gwmwin($index) $itk_component(choosearea) \
+                                         [ expr "{$index}" == "{1}" ]
             }
 
 #  Only proceed if the widget is in the active state.
@@ -623,12 +640,13 @@
                   }
 
 #  Get the name that the GWM widget has/will have.
-                  set gwmname [ winfo id $itk_component(choosearea) ]_$index
+                  set gwmname \
+                      [ winfo id $itk_component(choosearea) ]_$gwmwin($index)
 
 #  Construct the GWM widget if necessary.
                   if { $createwindow } {
-                     itk_component add plot$index:display {
-                        gwm $itk_component(plot$index).gwm \
+                     itk_component add $gwmwin($index):display {
+                        gwm $itk_component($gwmwin($index)).gwm \
                             -width [ expr $width * $scale ] \
                             -height [ expr $height * $scale ] \
                             -name $gwmname
@@ -644,7 +662,8 @@
                                   [ lindex $percs 0 ] [ lindex $percs 1 ] \
                                   $wcsframe [ join $options "," ]
 
-                  pack $itk_component(plot$index:display) -expand 1 -fill both
+                  pack $itk_component($gwmwin($index):display) \
+                       -expand 1 -fill both
 
 #  It may be a good idea to unmap the NDF here (although it may not).
                   $ndfset mapped 0
@@ -655,26 +674,27 @@
 
 #  This is a blank window; write instructions to the user.
             } else {
-               itk_component add plot$index:display {
-                  frame $itk_component(plot$index).blank \
+               itk_component add $gwmwin($index):display {
+                  frame $itk_component($gwmwin($index)).blank \
                       -width $width \
                       -height $height
                }
                set msg \
                   "Use the tabs to\npick an image for\ndisplay on the $side"
-               itk_component add plot$index:instructions {
-                  label $itk_component(plot$index:display).instruct$index \
+               itk_component add $gwmwin($index):instructions {
+                  label $itk_component($gwmwin($index):display).instruct$index \
                      -justify $side -text $msg
                }
-               itk_component add plot$index:arrow {
-                  label $itk_component(plot$index:display).arrow$index \
+               itk_component add $gwmwin($index):arrow {
+                  label $itk_component($gwmwin($index):display).arrow$index \
                      -bitmap @$CCDdir/arrow_$side.xbm
                }
-               pack $itk_component(plot$index:arrow) \
+               pack $itk_component($gwmwin($index):arrow) \
                   -side $side -anchor n -expand 0
-               pack $itk_component(plot$index:instructions) \
+               pack $itk_component($gwmwin($index):instructions) \
                   -side $side -anchor n -expand 1 -fill both
-               pack $itk_component(plot$index:display) -expand 1 -fill both
+               pack $itk_component($gwmwin($index):display) \
+                  -expand 1 -fill both
             }
 
 #  Store characteristics of this plot so that we know whether subsequent 
@@ -690,7 +710,7 @@
          wm resizable $itk_interior 1 1
 
 #  Return the name of the window.
-         return $itk_component(plot$index)
+         return $itk_component($gwmwin($index))
       }
 
 
@@ -1135,6 +1155,8 @@
 #  Private variables.
 ########################################################################
       private variable allfits         ;# List of available FITS header lines
+      private variable gseq 0          ;# Unique sequence number for gwm widgets
+      private variable gwmwin          ;# Array by ndf index of gwm widget name
       private variable highlight       ;# Array by ndf index of highlight state
       private variable inview          ;# Array by slot of viewed images
       private variable noted           ;# Array containing info characteristics
