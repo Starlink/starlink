@@ -313,11 +313,11 @@
 
 *  Locate the start of the next line in the input arrays.
             J = 1
-   1        CONTINUE
+   2        CONTINUE
             IF ( J .LE. NDIM ) THEN
                IF ( J .EQ. IDIM ) THEN
                   J = J + 1
-                  GO TO 1
+                  GO TO 2
                ELSE
                   IF ( POS( J ) .LT. DIMI( J ) ) THEN
                      OFFI = OFFI + STRIDI( J )
@@ -328,7 +328,7 @@
                      OFFO = OFFO - ( DIMO( J ) - 1 ) * STRIDO( J )
                      POS( J ) = 1
                      J = J + 1
-                     GO TO 1
+                     GO TO 2
                   END IF
                END IF
             ELSE
