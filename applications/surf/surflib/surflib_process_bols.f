@@ -274,13 +274,16 @@
 
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1995-2002 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.14  2002/09/14 03:58:13  timj
+*     Update copyright
+*
 *     Revision 1.13  2002/03/11 21:18:48  timj
 *     - finally fix the problem with SC chopping and SCUBA2MEM [the IF clause was
 *     wrong]

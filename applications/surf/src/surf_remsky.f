@@ -130,13 +130,16 @@
  
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1995-2002 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
 *     3 Nov 1996: TIMJ
 *        Original version
 *     $Log$
+*     Revision 1.20  2002/09/14 03:58:13  timj
+*     Update copyright
+*
 *     Revision 1.19  2002/09/09 21:43:33  timj
 *     Fix "use of unintialized value" warning with LONG2_RAD
 *

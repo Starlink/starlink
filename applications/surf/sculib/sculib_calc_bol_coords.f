@@ -121,7 +121,7 @@
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1995-2002 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:

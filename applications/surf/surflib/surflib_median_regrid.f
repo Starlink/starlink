@@ -108,12 +108,15 @@
 
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1995-2002 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.6  2002/09/14 03:58:13  timj
+*     Update copyright
+*
 *     Revision 1.5  2002/09/11 00:00:33  timj
 *     Initialize the weights array
 *
