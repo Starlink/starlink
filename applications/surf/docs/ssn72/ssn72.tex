@@ -18,10 +18,10 @@
 \newcommand{\stardocsource}    {ssn\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {72.1}
+\newcommand{\stardocnumber}    {72.2}
 \newcommand{\stardocauthors}   {Tim Jenness, John F.\ Lightfoot\\
                                 Joint Astronomy Centre, Hilo, Hawaii}
-\newcommand{\stardocdate}      {09 August 1999}
+\newcommand{\stardocdate}      {10 July 2000}
 \newcommand{\stardoctitle}     {SURF Programming Interface}
 \newcommand{\stardocabstract}  {This document describes the SURF programming
 interface. Including the library API, instructions on how to build
@@ -278,6 +278,9 @@ a SURF import task.}
 %
 %  History:
 %     $Log$
+%     Revision 1.5  2000/07/10 23:55:13  timj
+%     Correctly update the document release number and date
+%
 %     Revision 1.4  2000/05/11 19:43:47  timj
 %     Include some minor mods made by Martin Bly for the Starlink release.
 %
@@ -2628,8 +2631,8 @@ proc SET_BOLS
  SETBOL I7  LONG     -0.3669E+02  0.5404E+02  0.1054E+01 -0.6765E+02  0.7037E+01  0.7043E+01  0  66.4728125000  16 H8         
  SETBOL I8  LONG     -0.1578E+02  0.6389E+02  0.1065E+01 -0.2099E+02  0.6717E+01  0.7520E+01  0  66.4855787037  16 H8         
  SETBOL I9  LONG      0.9047E+01  0.7776E+02  0.1045E+01 -0.7307E-02  0.7092E+01  0.7032E+01  0  66.4977546296  16 H8         
-												
-{ short-wave array										
+                                                                                                
+{ short-wave array                                                                              
  SETBOL A1  SHORT     0.5708E+02 -0.2814E+02  0.1286E+01 -0.7433E-01  0.4129E+01  0.3690E+01  0  64.9820833333  43 C14        
  SETBOL A2  SHORT     0.4590E+02 -0.3591E+02  0.9311E+00 -0.3590E-01  0.4002E+01  0.3673E+01  0  64.9895138889  43 C14
  SETBOL A3  SHORT     0.3615E+02 -0.4146E+02  0.9499E+00  0.1720E+00  0.3987E+01  0.3677E+01  0  64.9969675926  43 C14
@@ -2722,13 +2725,13 @@ proc SET_BOLS
  SETBOL F10 SHORT    -0.4009E+02  0.3977E+02  0.9474E+00  0.8256E+00  0.3667E+01  0.3968E+01  0  66.0116203704  11 C14
  SETBOL F11 SHORT    -0.5045E+02  0.3338E+02  0.1169E+01  0.7934E+00  0.3701E+01  0.3940E+01  0  66.0190625000  11 C14
  SETBOL I11 SHORT_DC  0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  1   0.0000000000   0 NUL
-{ P1100 bolometer										     		    
+{ P1100 bolometer                                                                                                   
  SETBOL I10 P1100    -0.5465E+02  0.7116E+02  0.1000E+01 -0.1453E+03  0.1002E+02  0.9003E+01  1  69.6688541667  65 NUL
  SETBOL I15 P1100_DC  0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  1   0.0000000000   0 NUL
-{ P1350 bolometer										     		    
+{ P1350 bolometer                                                                                                   
  SETBOL G12 P1350    -0.5827E+02 -0.7068E+02  0.1000E+01 -0.8953E+00  0.9681E+01  0.1101E+02  0  69.7100231481  66 NUL
  SETBOL I14 P1350_DC  0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  0   0.0000000000   0 NUL
-{ P2000 bolometer										     		    
+{ P2000 bolometer                                                                                                   
  SETBOL G6  P2000     0.1000E+03  0.2375E+01  0.1000E+01 -0.1447E+00  0.1735E+02  0.1374E+02  0  69.7901157407  71 NUL
  SETBOL I13 P2000_DC  0.0000E+00  0.0000E+00  0.1000E+01  0.0000E+00  0.0000E+00  0.0000E+00  0   0.0000000000   0 NUL
 end proc
