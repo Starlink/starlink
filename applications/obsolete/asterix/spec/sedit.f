@@ -1468,7 +1468,7 @@
 
 *    Read line from menu file, leave loop if end of menu
       DO WHILE ( STATUS .EQ. SAI__OK )
- 10	CALL AFIO_READF( MFD, LINE, STATUS )
+ 10	CALL AIO_READF( MFD, LINE, STATUS )
 	IF(INDEX(LINE,'endmenu').GT.0) GO TO 99	! Jump to exit
 
 *      Look for 'model' header
