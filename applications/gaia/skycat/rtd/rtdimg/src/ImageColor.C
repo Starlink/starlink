@@ -59,6 +59,8 @@ ImageColor::ImageColor(Display* display, Visual* visual,
   }
 
   //  If default visual isn't the same then create a local colormap.
+  //  Note this is a private map, but isn't made available because of
+  //  colour exhaustion.
   Visual *defvis = DefaultVisual(display_, screen_);
   if ( defvis->c_class != visual_->c_class ) {
      colormap_ = XCreateColormap( display_,
