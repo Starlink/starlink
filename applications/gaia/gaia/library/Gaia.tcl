@@ -75,6 +75,8 @@
 #        Revealed ramp printing option.
 #     23-JUL-2001 (PWD):
 #        Added UKIRT quick look option.
+#     21-JUL-2003 (PWD):
+#        Added support for the new tabbed interface.
 #     {enter_changes_here}
 
 #-
@@ -87,7 +89,7 @@ set about_skycat ""
 set about_gaia "
 GAIA version $gaia_version
 
-Copyright (C) 1997-2001 Central Laboratory of the Research Councils (U.K.)
+Copyright (C) 1997-2003 Central Laboratory of the Research Councils (U.K.)
 
 Authors:
 Peter W. Draper (p.w.draper@durham.ac.uk)
@@ -176,7 +178,6 @@ itcl::class gaia::Gaia {
       itk_option remove rtd::Rtd::scrollbars
       itk_option remove rtd::Rtd::panel_layout
 
-      puts "Gaia args = $args"
       eval itk_initialize $args
 
       #  Override about_skycat message.
@@ -213,9 +214,9 @@ itcl::class gaia::Gaia {
    # Restore the position of the top level window from the previous
    # session, or not depending on mode.
    protected method load_toplevel_geometry {} {
-      puts "no geometry ($toplevel_geometry_)"
-      return
-      
+      if { $itk_option(-tabbedgaia) } {
+         return
+      }
       if {[catch {set fd [::open $toplevel_geometry_]}]} {
          return
       }
@@ -237,6 +238,7 @@ itcl::class gaia::Gaia {
 
       #  Permission supplied so continue with exit.
       delete object $w_
+      puts "$this exiting..."
       after idle exit
    }
 
@@ -306,11 +308,19 @@ itcl::class gaia::Gaia {
    #  to remove skycat logo and add plain option for showing
    #  minimalist stuff when creating a clone.
    protected method make_init_window {{plain 0}} {
+
       global ::about_skycat ::gaia_dir
-      set w [util::TopLevelWidget $w_.init -center 1 -cursor watch]
-      rtd_set_cmap $w
-      wm title $w "$appname_ loading..."
-      wm withdraw $w_
+      if { $itk_option(-tabbedgaia) } {
+         
+         #  If tabbedgaia then use a simple component not a window.
+         set w [frame $w_.init]
+         place $w  -relx 0.5 -rely 0.5 -anchor s
+      } else {
+         set w [util::TopLevelWidget $w_.init -center 1 -cursor watch]
+         rtd_set_cmap $w
+         wm title $w "$appname_ loading..."
+         wm withdraw $w_
+      }
       if { ! $plain } {
          set gaia_logo [image create pixmap -id gaia_logo]
          pack \
@@ -331,7 +341,10 @@ itcl::class gaia::Gaia {
                 -borderwidth 2 -relief groove] \
             -side top -fill x -padx 1m -pady 2m -expand 1
       }
-      tkwait visibility $w
+
+      if { ! $itk_option(-tabbedgaia) } {
+         tkwait visibility $w
+      }
    }
 
    #  Add help for GAIA and SkyCat.
@@ -413,9 +426,12 @@ itcl::class gaia::Gaia {
       lappend skycat_images $itk_component(image)
    }
 
-   #  Delete this object.
+   #  Delete this object. Invoke the on_close_cmd if set.
    public method delete_window {} {
       delete object $w_
+      if { $itk_option(-on_close_cmd) != {} } {
+         eval $itk_option(-on_close_cmd)
+      }
    }
 
    #  Make changes to Skycat menus that we require.
@@ -442,6 +458,12 @@ itcl::class gaia::Gaia {
          {Close this window, exit application if last}
       add_menu_short_help $m "New Window" \
          {Create a new main window}
+
+      #  If this is the tabbedgaia instance, exit is controlled
+      #  elsewhere.
+      if { $itk_option(-tabbedgaia) } {
+         $m delete {Exit}
+      }
 
       #  Add window for configuring the startup options. Put this just
       #  before the "Clear" item.
@@ -1617,6 +1639,12 @@ window gives you access to this."
 
    # -- public variables (also program options) --
 
+   #  Is this controlled from the tabbed interface?
+   itk_option define -tabbedgaia tabbedgaia TabbedGaia 0 
+
+   #  Command invoked when window is closed.
+   itk_option define -on_close_cmd on_close_cmd On_Close_Cmd {}
+
    #  Mark displayed image as temporary, these are deleted on exit
    #  (after a request to save it is made), try to disable options
    #  database configuring this.
@@ -1749,8 +1777,6 @@ proc false_tkwait {args} {
 itcl::body ::cat::AstroCat::new_catalog {name {id ""}
    {classname AstroCat} {debug 0} {tcs_flag 0} {type "catalog"}
    {w ""}} {
-      
-   puts "new_catalog w = $w"       
    if {[check_local_catalog $name $id $classname $debug $tcs_flag $type $w] != 0} {
       return
    }
@@ -1765,10 +1791,6 @@ itcl::body ::cat::AstroCat::new_catalog {name {id ""}
    if {[winfo exists $w]} {
       set instname $w.ac[incr n_instances_]
    } else {
-      puts "no parent for catalogue window"
-      for { set i [info level] } { $i > -1 } { incr i -1 } { 
-         puts "$i: [info level $i]"
-      }
       set instname .ac[incr n_instances_]
    }
    set instances_($i) \
