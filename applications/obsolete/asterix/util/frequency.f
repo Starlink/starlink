@@ -160,6 +160,8 @@
 *        Use new data interface
 *     12 Sep 1995 V2.0-0 (DJA):
 *        Full ADI port.
+*      3 Apr 1996 V2.0-1 (DJA):
+*        Use grouping info if available
 *     {enter_changes_here}
 
 *  Bugs:
@@ -185,7 +187,7 @@
         PARAMETER	        ( MXBIN=2000 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'FREQUENCY Version V2.0-0' )
+        PARAMETER		( VERSION = 'FREQUENCY Version V2.0-1' )
 
 *  Local Variables:
       CHARACTER			TEXT(MAXLINES)*80	! History text
@@ -204,6 +206,7 @@
       INTEGER		     	DPTR	 		! Output data array
       INTEGER                   DSID                    ! New output object
       INTEGER                	DUMMY       		! Dummy string length
+      INTEGER			GDPTR, GQPTR		! Grouped data
       INTEGER			IFID			! Input dataset id
       INTEGER		     	IPTR	 		! Input data
       INTEGER		     	NBIN	 		! Required # bins
@@ -214,6 +217,7 @@
       INTEGER		     	QPTR	 		! Quality info
 
       LOGICAL		     	DQL	 		! Data quality present?
+      LOGICAL			GRPED			! Data is grouped?
       LOGICAL                	INCREASING  		! Bounds increase
 							! monotonically?
       LOGICAL		     	NORMALISE	 	! Norm'n required to unit frequency?
@@ -274,6 +278,14 @@
       END IF
       MAXSIZ = DMAX - DMIN
 
+*  Handle grouping
+      CALL UTIL_GRPR( IFID, 'USEGRP', IPTR, .FALSE., 0, DQL, QPTR,
+     :                GRPED, NELM, GDPTR, 0, GQPTR, STATUS )
+      IF ( GRPED ) THEN
+        IPTR = GDPTR
+        QPTR = GQPTR
+      END IF
+
 *  Zero the BOUNDS array
       CALL ARR_INIT1R( 0.0, MXBIN, BOUNDS, STATUS )
 
@@ -281,12 +293,12 @@
       CALL BDI_GET0C( IFID, 'Label,Units', AXTXT, STATUS )
       IF ( AXTXT(2) .LE. ' ' ) AXTXT(2) = 'unitless'
 
-*    Tell user valid regular bin sizes
+*  Tell user valid regular bin sizes
       CALL MSG_SETR( 'MAXSIZ', MAXSIZ )
       CALL MSG_SETC( 'UNITS', AXTXT(2) )
       CALL MSG_PRNT( 'Regular bin sizes can up to ^MAXSIZ (^UNITS)' )
 
-*    Tell environment what data range is
+*  Tell environment what data range is
       CALL MSG_SETR( 'DMIN', DMIN )
       CALL MSG_SETR( 'DMAX', DMAX )
       CALL MSG_PRNT( 'The data range is ^DMIN to ^DMAX' )
@@ -411,8 +423,8 @@
 *  Set axis normalisation
       CALL BDI_AXPUT0L( OFID, 1, 'Normalised', NORMALISE, STATUS )
 
-*  Inherit everything bar graphics
-      CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
+*  Inherit everything bar graphics and grouping
+      CALL UDI_COPANC( IFID, 'grf,grp', OFID, STATUS )
 
 *  Set up histogram style
       CALL GCB_LCONNECT( STATUS )
@@ -437,7 +449,12 @@
         TEXT(3) = 'Bin boundaries given by axis data values'
       END IF
       NREC = MAXLINES
-      CALL USI_TEXT( 3, TEXT, NREC, STATUS )
+      IF ( GRPED ) THEN
+        TEXT(4) = 'Used grouped data when binning'
+        CALL USI_TEXT( 4, TEXT, NREC, STATUS )
+      ELSE
+        CALL USI_TEXT( 3, TEXT, NREC, STATUS )
+      END IF
 
 *  Write this into history structure
       CALL HSI_PTXT( OFID, NREC, TEXT, STATUS )
