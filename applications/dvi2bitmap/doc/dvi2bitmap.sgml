@@ -185,7 +185,7 @@ will search for PK files at 200 dpi.
 <dt><code>-n</code>
 <dd>Do not actually process the DVI file, but read the DVI pre- and
 postamble.  Useful in conjunction with the 
-<code>-l</code>
+<code>-L</code>
 option.  If this option is present, then the program returns non-zero
 if any fonts were missing.
 
@@ -214,7 +214,7 @@ and the pages falling in those ranges (inclusive of the end pages) are
 processed.  Any of these may be prefixed by either <code/=/ or
 <code/:$n$,/.  In the former case, DVI page numbers are used rather
 than &tex; <code/\count/$n$ registers; in the latter case, the program
-refers to the <code/\count/$n$ register rather than the default
+examines the <code/\count/$n$ register rather than the default
 <code/\count0/.  You can specify both of these prefixes in one or more
 options, and the
 program will respect only the last one, but you cannot mix <code/-p/
@@ -372,7 +372,8 @@ the value in <code/DVI2BITMAP_PK_PATH/.
 and if it was configured with support for the Kpathsearch
 library (see <ref id=install.nonstarlink>), then it should find PK
 files using the same mechanism other DVI processors use.  If you did
-not install dvi2bitmap along with other &tex;ware, then you might
+not install dvi2bitmap along with other &tex;ware, or if the the
+program was not told where they live at configuration time, then you might
 additionally have to specify the <code/TEXMFCNF/ environment variable:
 set it to the directory which contains the main &tex; configuration
 file, which you can find using the command <kbd/kpsewhich cnf texmf.cnf/.
