@@ -21,6 +21,7 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*10 MODE
+      LOGICAL EXCLUDE
 *    Version :
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IREGION Version 1.7-0')
@@ -47,25 +48,33 @@
           ENDIF
         ENDDO
 
+        CALL PAR_GET0L('EXC',EXCLUDE,STATUS)
+        IF (EXCLUDE.AND.I_REG_TYPE.EQ.'NONE') THEN
+          CALL ARR_FILL1B('01'X,I_NX*I_NY,%val(I_REG_PTR),STATUS)
+          I_REG_TYPE='COMPLEX'
+        ENDIF
+
         IF (STATUS.EQ.SAI__OK) THEN
+
+
 
           MODE=MODE(:3)
           IF (MODE.EQ.'CIR') THEN
-            CALL IREGION_CIRCLE(STATUS)
+            CALL IREGION_CIRCLE(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'BOX') THEN
-            CALL IREGION_BOX(STATUS)
+            CALL IREGION_BOX(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'POL') THEN
-            CALL IREGION_POLYGON(STATUS)
+            CALL IREGION_POLYGON(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'ANN') THEN
-            CALL IREGION_ANNULUS(STATUS)
+            CALL IREGION_ANNULUS(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'WHO') THEN
             CALL IREGION_WHOLE(STATUS)
           ELSEIF (MODE.EQ.'SLI') THEN
-            CALL IREGION_SLICE(STATUS)
+            CALL IREGION_SLICE(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'GTE') THEN
-            CALL IREGION_GTE(STATUS)
+            CALL IREGION_GTE(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'ARD') THEN
-            CALL IREGION_ARD(STATUS)
+            CALL IREGION_ARD(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'SHO') THEN
             CALL IREGION_SHOW(STATUS)
           ELSE
@@ -82,7 +91,7 @@
 
 
 *+
-      SUBROUTINE IREGION_CIRCLE(STATUS)
+      SUBROUTINE IREGION_CIRCLE(EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -97,6 +106,7 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
+      LOGICAL EXCLUDE
 *    Export :
 *    Status :
       INTEGER STATUS
@@ -109,8 +119,7 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
         CALL IMG_GETCIRC('XC','YC','RAD',XC,YC,RAD,STATUS)
-        CALL IMG_SETCIRC(XC,YC,RAD,STATUS)
-        CALL IMG_CIRCLE(XC,YC,RAD,STATUS)
+        CALL IMG_SETCIRC(XC,YC,RAD,EXCLUDE,STATUS)
 
 
         IF (STATUS.NE.SAI__OK) THEN
@@ -125,7 +134,7 @@
 
 
 *+
-      SUBROUTINE IREGION_ANNULUS(STATUS)
+      SUBROUTINE IREGION_ANNULUS(EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -140,6 +149,7 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
+      LOGICAL EXCLUDE
 *    Export :
 *    Status :
       INTEGER STATUS
@@ -153,9 +163,7 @@
 
         CALL IMG_GETANNULUS('XC','YC','IRAD','ORAD',XC,YC,IRAD,ORAD,
      :                                                       STATUS)
-        CALL IMG_SETANNULUS(XC,YC,IRAD,ORAD,STATUS)
-        CALL IMG_CIRCLE(XC,YC,IRAD,STATUS)
-        CALL IMG_CIRCLE(XC,YC,ORAD,STATUS)
+        CALL IMG_SETANNULUS(XC,YC,IRAD,ORAD,EXCLUDE,STATUS)
 
 
 
@@ -172,7 +180,7 @@
 
 
 *+
-      SUBROUTINE IREGION_SLICE(STATUS)
+      SUBROUTINE IREGION_SLICE(EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -187,6 +195,7 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
+      LOGICAL EXCLUDE
 *    Export :
 *    Status :
       INTEGER STATUS
@@ -200,7 +209,7 @@
 
         CALL IMG_GETSLICE('XC','YC','ANGLE','LENGTH','WIDTH',
      :                           XC,YC,ANGLE,LENGTH,WIDTH,STATUS)
-        CALL IMG_SETSLICE(XC,YC,ANGLE,LENGTH,WIDTH,STATUS)
+        CALL IMG_SETSLICE(XC,YC,ANGLE,LENGTH,WIDTH,EXCLUDE,STATUS)
 
 
         IF (STATUS.NE.SAI__OK) THEN
@@ -217,7 +226,7 @@
 
 
 *+
-      SUBROUTINE IREGION_POLYGON(STATUS)
+      SUBROUTINE IREGION_POLYGON(EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -232,6 +241,7 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
+      LOGICAL EXCLUDE
 *    Export :
 *    Status :
       INTEGER STATUS
@@ -247,7 +257,7 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
         CALL IMG_GETPOLY(NVMAX,XV,YV,NV,STATUS)
-        CALL IMG_SETPOLY(NV,XV,YV,STATUS)
+        CALL IMG_SETPOLY(NV,XV,YV,EXCLUDE,STATUS)
 
 
         IF (STATUS.NE.SAI__OK) THEN
@@ -262,7 +272,7 @@
 
 
 *+
-      SUBROUTINE IREGION_BOX(STATUS)
+      SUBROUTINE IREGION_BOX(EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -277,6 +287,7 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
+      LOGICAL EXCLUDE
 *    Export :
 *    Status :
       INTEGER STATUS
@@ -289,8 +300,7 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
         CALL IMG_GETBOX('XC','YC','XWID','YWID',XC,YC,DX,DY,STATUS)
-        CALL IMG_SETBOX(XC,YC,DX,DY,STATUS)
-        CALL IMG_BOX(XC,YC,DX,DY,STATUS)
+        CALL IMG_SETBOX(XC,YC,DX,DY,EXCLUDE,STATUS)
 
 
         IF (STATUS.NE.SAI__OK) THEN
@@ -342,7 +352,7 @@
 
 
 *+
-      SUBROUTINE IREGION_GTE(STATUS)
+      SUBROUTINE IREGION_GTE(EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -357,6 +367,7 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
+      LOGICAL EXCLUDE
 *    Export :
 *    Status :
       INTEGER STATUS
@@ -370,7 +381,8 @@
 
         CALL PAR_GET0R('LEV',LEV,STATUS)
 
-        CALL IREGION_GTE_SUB(LEV,%val(I_DPTR),%val(I_REG_PTR),STATUS)
+        CALL IREGION_GTE_SUB(LEV,%val(I_DPTR),EXCLUDE,
+     :                            %val(I_REG_PTR),STATUS)
         I_REG_TYPE='COMPLEX'
 
         IF (STATUS.NE.SAI__OK) THEN
@@ -384,7 +396,7 @@
 
 
 *+
-      SUBROUTINE IREGION_GTE_SUB(LEV,D,REG,STATUS)
+      SUBROUTINE IREGION_GTE_SUB(LEV,D,EXCLUDE,REG,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -401,6 +413,7 @@
 *    Import :
       REAL LEV
       REAL D(I_NX,I_NY)
+      LOGICAL EXCLUDE
 *    Export :
       BYTE REG(I_NX,I_NY)
 *    Status :
@@ -409,15 +422,21 @@
 *    Local constants :
 *    Local variables :
       INTEGER I,J
+      BYTE FLAG
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
+
+        IF (EXCLUDE) THEN
+          FLAG='00'X
+        ELSE
+          FLAG='01'X
 
         DO J=1,I_NY
           DO I=1,I_NX
 
             IF (D(I,J).GE.LEV) THEN
-              REG(I,J)='01'X
+              REG(I,J)=FLAG
             ENDIF
 
           ENDDO
