@@ -620,7 +620,7 @@ NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@
 PRM_PAR:   $(STAR_INC)/prm_par;   $(LINK) $? $@
 CAT_PAR:   $(STAR_INC)/cat_par;   $(LINK) $? $@
 CAT_ERR:   $(STAR_INC)/cat_err;   $(LINK) $? $@
-AST_ERR:   $(STAR_INC)/ast_err;   $(LINK) $? $@
+AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
 
 KUSE_COM:       kuse_com;         $(LINK) $? $@
 KARS_COM:       kars_com;         $(LINK) $? $@
