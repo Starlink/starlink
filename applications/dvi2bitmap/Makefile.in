@@ -98,7 +98,7 @@ dvi2bitmap.tar: dvi2bitmap_source.tar dvi2bitmap_doc.tar
 		ln -s $$FN $@
 
 version.h README dvi2bitmap.1 Makefile.starlink: VERSION
-	./propagate-version
+	./propagate-version version.h README dvi2bitmap.1 Makefile.starlink
 
 # Build defects list.  This requires non-distributed scripts,
 # so is not buildable after distribution.
