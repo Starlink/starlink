@@ -75,8 +75,8 @@
 
 #  Set the gaps between the axes and the associated textual labels. The default
 #  is 0.01.
-      textlabgap(1)=0.03
-      textlabgap(2)=0.03
+      textlabgap(1)=0.05
+      textlabgap(2)=0.05
 
 #  Make the ticks marks (both major and minor) longer. The defaults are
 #  0.015 for major ticks and 0.007 for minor ticks.
