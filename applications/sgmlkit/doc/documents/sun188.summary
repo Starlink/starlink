@@ -1,4 +1,4 @@
-<!doctype documentsummary public "-//Starlink//DTD Document Summary 0.1//EN">
+<!DOCTYPE documentsummary PUBLIC "-//Starlink//DTD Document Summary 0.6//EN">
 <documentsummary urllinkpolicy="explicit">
 <docinfo>
 <title>HTX -- Hypertext Cross-Reference Utilities</title>
@@ -6,7 +6,7 @@
 <author>R.F. Warren-Smith</author>
 <!-- Insert email, webpage, affiliation attributes -->
 </authorlist>
-<docnumber documenttype="SUN">188.3</docnumber>
+<docnumber documenttype="sun">188</docnumber>
 </docinfo>
 <docbody>
 <sect id="introduction" export urlpath="sun188.htx/node2.html"><title>INTRODUCTION</title>

@@ -1,4 +1,4 @@
-<!doctype documentsummary public "-//Starlink//DTD Document Summary 0.1//EN">
+<!DOCTYPE documentsummary PUBLIC "-//Starlink//DTD Document Summary 0.6//EN">
 <documentsummary urllinkpolicy="explicit">
 <docinfo>
 <title>ESP --- Extended Surface Photometry</title>
@@ -11,7 +11,7 @@
 <author
   id="gp">Grant Privett</author>
 </authorlist>
-<docnumber documenttype="SUN">180.4</docnumber>
+<docnumber documenttype="sun">180</docnumber>
 </docinfo>
 <docbody>
 <sect><title>Introduction</title>
