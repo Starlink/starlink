@@ -11,8 +11,8 @@
 
 %\title{Data modelling, data access, and code}
 %\author{Norman Gray}
-\institution{Starlink @ \{Glasgow, RAL, Central Lancashire, RAL,
-Bristol\}, UK}
+\institution{Starlink \& \{Glasgow, RAL, Central Lancashire, RAL,
+Bristol\}, UK\\\url{http://www.starlink.ac.uk}}
 \slideCaption{Norman Gray, www.starlink.ac.uk / ADASS XIII,
 Strasbourg, 2003 October 14}
 %\Logo{\vbox{\hsize=1.2cm \parindent=0pt \parskip=0pt \nointerlineskip
@@ -32,10 +32,10 @@ Strasbourg, 2003 October 14}
 
 \newenvironment{myslide}[1]{\begin{slide}{#1}\slidetoc{#1}}{\end{slide}}
 
-\makeatletter
-\def\verbatim@font{\fontsize{7}{8}\selectfont\ttfamily}
-\makeatother
-%\def\UrlFont{\fontsize{10}{11}\selectfont\ttfamily}
+%\makeatletter
+%\def\verbatim@font{\fontsize{7}{8}\selectfont\ttfamily}
+%\makeatother
+\def\UrlFont{\fontsize{9}{11}\selectfont\ttfamily}
 
 
 \begin{document}
@@ -50,13 +50,25 @@ Strasbourg, 2003 October 14}
 
 \begin{slidegroup}{models}{Why do we need models?}
 
+  \begin{myslide}{The Sapir-Whorf hypothesis}
+    \vskip2.5cm
+    \noindent We can only conceive what we can express in language
+  \end{myslide}
+
+  \begin{myslide}{Charles V}
+    \vskip 2.5cm
+    I speak Spanish to God, Italian to women, French to men, and
+    German to my horse.
+  \end{myslide}
+
 \begin{myslide}{What are data models?}
 
 \begin{itemize}
 
-\item Data Models exist in people's heads.
+\item Data Models exist in people's heads
 
-\item Data modelling consists of making these explicit on paper.
+\item Data modelling consists of making these explicit on paper, so we
+  can reason with them
 
 \item How many models?
 
@@ -65,10 +77,9 @@ Strasbourg, 2003 October 14}
 %than one important model, and (b) we can develop using the model which
 %has the best impedance match with the community being targeted.
 
-\item Thus
-modelling is not just about communications -- about bits (or angle
+\item Modelling is not just about communications -- about bits (or angle
 brackets!) on the wire -- but is a software quality and usability
-issue.
+issue
 
 \end{itemize}
 \end{myslide}
@@ -78,14 +89,33 @@ issue.
 \includegraphics[width=\hsize]{models.eps}
 \end{myslide}
 
-\begin{myslide}{Languages}
+\begin{myslide}{(Users)}
+In this picture, the `users' include, but are not limited to, the
+person handling the mouse.  Thus we might find
+  \begin{itemize}
+    \item an astronomer is a \emph{user} using a UI to interact with an
+      application
+    \item \dots the developer of which is a \emph{user} of an API to
+      interact with a library
+    \item \dots which is a \emph{user} of a protocol to interact
+      with a local/remote service.
+  \end{itemize}
+So we're not just talking about GUI design, here.
+
+There are \emph{multiple} user/language/system sets.
+
+Each model must be comprehensible.  But we don't have to cover everything.
+
+\end{myslide}
+
+\begin{myslide}{Languages II}
 \vbox to 0pt{\hbox to \hsize{\hss\includegraphics[width=0.5\hsize]{models.eps}}\vss}
 \begin{itemize}
 \item interface${}={}$`language'
 \item \dots and thus a model
 \item Systems are modelled
-\item Users create models
-\item \dots by reading documentation and language
+\item Users have/create models
+\item \dots by reading documentation and using the language
 \item If the three match, we get usable/correct/fast code
 \item If not, not
 \end{itemize}
@@ -94,27 +124,44 @@ have in common except a tendency to generate entropy?
 \end{myslide}
 
 \begin{myslide}{Models are for thinking with}
+A data model is the set of primitive concepts that we hope 
 \begin{itemize}
-\item A data model is the set of primitive concepts that we hope our user
-thinks with,
-\item \dots the language expresses,
-\item \dots and the underlying system implements.
+\item \dots our user thinks with,
+\item \dots the language expresses (in syntax),
+\item \dots and the underlying system implements (in code)
 \end{itemize}
 If the model is made explicit at the beginning of the process, then we
 can think with it, check it is consistent, both with itself and with
-the outside world.
+the outside world
+%
+%The DM is what will be implemented in code, not the syntax, so the
+%language had better reflect it well to the user.
 \end{myslide}
 
 \begin{myslide}{So how do we make it explicit?}
 \begin{itemize}
-\item Obvious answers are XSchema, UML, Java class library.
-\item But these come with a lot of extra baggage, which worms its way
-into the model (do stars \emph{really} have methods?).
-\item (If we think about syntax too early, we end up modelling the
-syntax.)
-\item So either decide that you \emph{want} the baggage, or use a more
-modelling language which describes things at a more primitive level.
+
+\item Obvious answers are XSchema, UML, Java class library
+
+%\item But these come with a lot of extra baggage, which worms its way
+%into the model: Do stars \emph{really} have methods?  Multiple
+%containment/circular reference in XML
+
+\item But extra baggage worms its way into the model: Do stars
+  \emph{really} have methods?  Multiple containment/circular reference
+  in XML
+% Latter point is: eg, calibration image for more than one
+% observation -- can express this in XML, but it's not necessarily
+% natural. If you have `containement' relations, get them for free in XML.
+
+\item So either decide that you \emph{want} the baggage, or use a
+  more neutral modelling language
+% which describes things at a more primitive level
+\item RDF is another possibility, with little baggage
 \end{itemize}
+As long as you separate modelling from syntax (that is, the set of
+rules for bytes/angle-brackets) you can \emph{discuss} the syntax --
+if you don't you have to muddle the two together.
 \end{myslide}
 
 % 
@@ -189,9 +236,25 @@ modelling language which describes things at a more primitive level.
 
 \begin{slidegroup}{votable}{VOTable and other models}
 
-\begin{myslide}{VOTable}
+\begin{myslide}{VO data models}
+  There are already several data models in the air
+  \begin{itemize}
+    \item VOTable -- resources within resources within\dots
+    \item SIAP -- `get me a picture like\dots'
+    \item UCD and Quantities -- what \emph{is} an Observation anyway?
+    \item WCS -- `where did that image come from?'
+  \end{itemize}
+Note that several of these use VOTable: make sure to distinguish
+VOTable(model) from VOTable(syntax).
+% How do we serve lazy/rushed/generic developers?
+% Cut down VOTable?
+% Work out what their DM is and \emph{then} write it down.
+\end{myslide}
+
+\begin{myslide}{VOTable is good}
 Viewed as a way of\dots
 \begin{itemize}
+\item \dots archiving catalogue metadata,
 \item \dots transporting catalogues from catalogue producers to catalogue
 consumers,
 \item \dots encoding \emph{all} available information about a
@@ -203,23 +266,39 @@ language and user.
 VOTable is expressive, recursive, and flexible.  \emph{But\dots}. 
 \end{myslide}
 
-\begin{myslide}{VOTable II}
-\dots it's expressive, recursive, and flexible.
+\begin{myslide}{VOTable is hard}
 
-These are \emph{good} things if you're an archivist.  But \emph{bad}
-things if all you want is an image.  So:
+\dots it's expressive, recursive, and flexible.
 \begin{itemize}
-\item extend VOTable?  \emph{No!}: that would just make it more complicated.
-\item simplify VOTable$\to$ miniVOTable?  No: that limits the
-flexibility without really addressing the problem.
-\item provide libraries?  Yeeesss\dots
+  \item These are \emph{good} things if you're an archivist.  But
+    \emph{bad} things if all you want is an image
+  
+  \item The problem is not with VOTable; instead there's \emph{more than one
+model}, because there's more than one constituency of users.
+How do we serve busy/ignorant/generic developers?
 \end{itemize}
-The problem is not with VOTable; instead there's \emph{more than one
-model}, because there's more than one constituency of users (ie,
-programmers professional and casual).
+  
 \end{myslide}
 
-\begin{myslide}{VOTable III}
+%% \begin{myslide}{VOTable is hard}
+%% \dots it's expressive, recursive, and flexible.
+
+%% These are \emph{good} things if you're an archivist.  But \emph{bad}
+%% things if all you want is an image.  So:
+%% \begin{itemize}
+%% \item extend VOTable?  \emph{No!}: that would just make it more complicated
+%% \item simplify VOTable -- miniVOTable?  Probably not: might not
+%%   really address the problem
+%% % that limits the flexibility without necessarily addressing the problem
+%% \item provide libraries?  Possibly\dots
+%% \end{itemize}
+%% The problem is not with VOTable; instead there's \emph{more than one
+%% model}, because there's more than one constituency of users.
+%% How do we serve lazy/igorant/generic developers?
+%% % (ie, programmers professional and casual).
+%% \end{myslide}
+
+\begin{myslide}{VOTable and data consumers}
 \vbox to 0pt{\hbox to \hsize{\hss\includegraphics[width=0.5\hsize]{models.eps}}\vss}
 \begin{itemize}
 \item \begin{minipage}{0.5\hsize}
@@ -237,6 +316,45 @@ programmers professional and casual).
 in principle, at the system end
 \item Step 3: \emph{then} choose syntax/technology
 \end{itemize}
+\end{myslide}
+
+\begin{myslide}{What to do?}
+  
+\begin{itemize}
+\item extend VOTable?  \emph{No!}: that would just make it more complicated
+
+\item simplify VOTable -- miniVOTable?  Maybe -- might not
+  really address the problem
+
+\item provide libraries/alternative syntax?  Possibly\dots
+\end{itemize}
+
+\end{myslide}
+
+\begin{myslide}{UCDs}
+  \begin{verbatim}
+    _x rdf:type :pos.eq.ra .
+    _x :stat.err "0.5arcsec" .
+  \end{verbatim}
+\begin{itemize}
+\item Thus \texttt{pos.eq.ra} appears to be a type/class,
+  \texttt{stat.err} is a property
+\item Did we want that?
+% Did we know that?  Did we mean that?  Do we want that?
+\item Is this what we want \texttt{stat.err, pos.eq.ra} to mean?
+\item If not, what?
+\item Could we turn this into syntax $x$ if we wanted?  And
+if not, isn't it lucky we didn't start with that syntax?!
+\item Are there things the proposed syntax can't express?
+%\item  Are there
+%things we could think with the modelling language that we'd want to
+%communicate but couldn't with the proposed syntax?
+
+% At this point we can think about serialising this in syntax,
+% confident that we are clear about the meaning.  We can have that
+% confidence because we gave ourselves the words to think about it with.
+\end{itemize}
+
 \end{myslide}
 
 \end{slidegroup}
@@ -267,7 +385,7 @@ in principle, at the system end
 \begin{itemize}
 \item Well-known: XML instance syntax
 \item Verbose
-\item Complicated
+\item Complicated: the main benefit is \dots
 \item Elaborate type system, looks familiar to database people; also this
 is the type system used by other W3C standards
 \item Langauges like RelaxNG have easier-to-read syntax and can
@@ -280,16 +398,45 @@ writing a schema
 \begin{myslide}{UML}
 \begin{itemize}
 \item For designing object-oriented libraries
-\item \dots thus usable for general modelling
+\item So it's usable for general modelling, to the extent that an object
+  model is appropriate for you
+%\item Emphasises processing and interfacing over data
+
+\item O-O notions of subclassing and object manipulation are natural
+  in UML, in the way that containment is natural in XML
+
 \end{itemize}
+\end{myslide}
+
+\begin{myslide}{Object modelling languages}
+If you've decided that an object model is for you, then
+acronym salad: UML, IDL, CORBA,
+Java/EJB/.NET/SOAP.
+
+OMG standards to generate UML/XML
+models from `metamodels', then generate the code to tie them together.
+\begin{itemize}
+% HUTN <http://www.dstc.edu.au/Research/Projects/Pegamento/hutn/>
+% OMG MDA at <http://www.omg.org/mda/>
+% OMG XMI at <http://www.omg.org/technology/documents/formal/xmi.htm>
+\item MDA (Model Driven Architecture): platform-independent
+  application descriptions
+\item XMI (XML Metadata Interchange): XML-based modelling language
+intended to help generate and exchange mutually consistent XSchemas,
+UML and code (CORBA and IDL interfaces).
+\item HUTN (Human-Usable Textual Notations): how to write XMI without
+angle-brackets.
+\end{itemize}
+Buzzzzzzzz.
 \end{myslide}
 
 \begin{myslide}{RDF and OWL}
 \begin{itemize}
-\item Set of primitive ideas for representing relations between
+\item W3C standard
+\item RDF is a set of primitive ideas for representing relations between
 entities -- subject-predicate-object
 \item Base RDF is mostly concerned with syntax
-\item OWL (Ontology Language for the Web) supplements RDF with
+\item RDFSchema and OWL (Ontology Language for the Web) supplements RDF with
 properties such as \texttt{minCardinality}, \texttt{equivalentClass}
 and \texttt{intersectionOf} which support basic reasoning
 \item Notation3 is \emph{much} more readable than ugly RDF/XML: for example
@@ -298,22 +445,23 @@ and \texttt{intersectionOf} which support basic reasoning
 \url{http://www.astro.gla.ac.uk/users/norman/note/2003/rdf-intro/}
 \end{myslide}
 
-\begin{myslide}{Other modelling languages}
-\begin{itemize}
-% HUTN <http://www.dstc.edu.au/Research/Projects/Pegamento/hutn/>
-% OMG MDA at <http://www.omg.org/mda/>
-% OMG XMI at <http://www.omg.org/technology/documents/formal/xmi.htm>
-\item XMI (XML Metadata Interchange): XML-based modelling language
-intended to help generate and exchange mutually consistent XSchemas,
-UML and code (CORBA and IDL interfaces).
-\item HUTN (Human-Usable Textual Notations): how to write XMI without
-angle-brackets.
-\item MDA (Model Driven Architecture): ties these together.
-\end{itemize}
-Buzzzzzzzz.
-\end{myslide}
-
 \end{slidegroup}
+
+\begin{myslide}{So\dots}
+  \begin{itemize}
+    \item The VO will have multiple user/language/system sets
+    \item \textbf{Each \emph{potentially} has a separate model, and
+      this should be acknowledged and planned for}
+    \item Three-way consistency and intelligibility are more important
+      than having one model for the whole VO
+    \item Linking these independent models might be more profitable
+      than attempting to develop some Grand Unified Model
+    \item \textbf{Making your DM explicit lets you think about it --
+      syntax comes \emph{second}}
+    %\item Modelling is separate from syntax
+    \item If we think about syntax too early, we end up modelling the syntax
+  \end{itemize}
+\end{myslide}
 
 
 \end{document}
