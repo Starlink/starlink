@@ -19,7 +19,7 @@
 *     15 Aug 90 : Original
 *      7 Jun 91 : Asterix version   (LTVAD::RDS)
 *     11 Apr 95 : V1.8-0  Updated data interfaces (DJA)
-*
+*     11 Dec 1995 V2.0-0 ADI port (DJA)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -99,7 +99,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER               ( VERSION = 'CLEANPOW  version 1.8-0' )
+        PARAMETER               ( VERSION = 'CLEANPOW Version V2.0-0' )
 *-
 
 *  Initialise
@@ -367,11 +367,12 @@ C        IF(LGXFL.EQ.1)XMIN =0.5*NUFREQ(1)
       FINC = (FMAX - FMIN) / REAL (NPOI-1)
 
 *  Write the output file. Periodogram
-      CALL TIM_PUTOUT( 'OUT', 'POWER_SPECTRUM', NPOI,
+      CALL TIM_PUTOUT( 'OUT', 'PowerSpectrum', NPOI,
      :                  %val(SPPTR), FMIN, FINC, OFID, STATUS )
 
 *  Add axis label
-      CALL BDI_PUTAXTEXT(OFID, 1, 'Frequency', 'Hz', STATUS)
+      CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Frequency', STATUS )
+      CALL BDI_AXPUT0C( OFID, 1, 'UNITS', 'Hz', STATUS )
 
 *  Add history
       CALL HSI_NEW(OFID, STATUS)
