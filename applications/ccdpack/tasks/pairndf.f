@@ -62,11 +62,15 @@
 *     you will have to set their Current coordinate system 
 *     to a different value (see WCSEDIT) or align them using a 
 *     different method.  The whole of each image will be displayed in
-*     the chooser window, and you can resize the window in the usual way to 
-*     make the images appear bigger or smaller.  Select a pair with 
+*     the chooser window; select a pair with 
 *     an overlapping region which you wish to align, and click the 
 *     "Use this pair" button.  The aligner window will then appear, 
 *     displaying the two images which you have selected.
+*     The chooser window can normally be resized in the normal way to 
+*     make the images bigger or smaller.  However there is currently
+*     a bug which causes this to crash in some window managers which
+*     use continuous resizing.  In this case you must use the PREVX
+*     and PREVY parameters to change the image size.
 *
 *     In the aligner window you can drag either of these images around
 *     the display region by holding down mouse button 1 (usually the 
@@ -436,7 +440,10 @@
 *     {enter_changes_here}
 
 *  Bugs:
-*     {note_any_bugs_here}
+*     A few window managers which allow continuous active resizing of 
+*     windows may cause the program to crash when the chooser window is
+*     being resized.  In this case, the PREVX and PREVY parameters
+*     must be used to control the size of previewed images.
 
 *-
       
