@@ -1872,7 +1872,6 @@ do_deinstall:
            if test -f $(INSTALL_BIN)/$(STARTUP_SCRIPT); then\
               $(RM) $(INSTALL_BIN)/$(STARTUP_SCRIPT);\
            else :; fi ;\
-           $(MAKE) $(STARTUP_SCRIPT);\
         else :; fi
 #
 #   Deinstall the IRAF files. These are in INSTALL_IRAF_BIN and
@@ -1881,7 +1880,6 @@ do_deinstall:
            if test -f $(INSTALL_IRAF_BIN)/$(IRAF_STARTUP_SCRIPT); then\
               $(RM) $(INSTALL_IRAF_BIN)/$(IRAF_STARTUP_SCRIPT);\
            else :; fi ;\
-           $(MAKE) $(IRAF_STARTUP_SCRIPT);\
 	else :; fi
 	- for f in $(IRAF_SCRIPTS) $(MONO_TCL) $(IRAF_PAR) helpdb.mip ""; do \
 	   if test -n "$$f" -a -f $(INSTALL_IRAF_BIN)/$$f; then \
@@ -1915,7 +1913,6 @@ do_deinstall:
            if test -f $(INSTALL_BIN)/$(ICL_STARTUP_SCRIPT); then\
               $(RM) $(INSTALL_BIN)/$(ICL_STARTUP_SCRIPT);\
            else :; fi ;\
-           $(MAKE) $(ICL_STARTUP_SCRIPT);\
         else :; fi
 #
 #  Deinstall the Latex documentation, if installed versions exist.
