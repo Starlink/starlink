@@ -907,11 +907,12 @@
 
 *  External References:
       EXTERNAL			ADI2_MKIDX
-        CHARACTER*8		ADI2_MKIDX
+        CHARACTER*8		  ADI2_MKIDX
 
 *  Local Variables:
       CHARACTER*8		IDXSTR			! Index string
       CHARACTER*80		DOTNAME
+
       INTEGER			INDEX			! Index value
 
       LOGICAL			THERE			! Object exists?
@@ -1408,7 +1409,7 @@ c     END IF
       IF ( NAME .GT. ' ' ) THEN
         CALL ADI_CPUT0C( ID, 'Name', NAME, STATUS )
         DOTNAME = '.' // NAME
-        CALL ADI_CPUT0I( TABID, '.'//NAME, COUNT, STATUS )
+        CALL ADI_CPUT0I( TABID, DOTNAME, COUNT, STATUS )
       END IF
       CALL ADI_CPUT0I( ID, 'Number', COUNT, STATUS )
 
