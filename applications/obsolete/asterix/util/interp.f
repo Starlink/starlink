@@ -69,7 +69,7 @@
       INTEGER NVDIM                             !Number of dims. of the variance
       INTEGER VDIM(MAXDIM)                      !Dimensions of the variance
       INTEGER LP
-      CHARACTER*20 LABEL(MAXDIM)
+      CHARACTER*50 LABEL(MAXDIM)
       LOGICAL LDARRAY,LDQUAL,LDVAR              !Are the data,quality,variance
 *                                               !   arrays present ?
       REAL START(MAXDIM),STOP(MAXDIM)           !Extreme values of each axis
