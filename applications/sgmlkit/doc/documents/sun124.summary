@@ -1,0 +1,45 @@
+<!DOCTYPE documentsummary PUBLIC '-//Starlink//DTD Document Summary 0.5//EN'>
+<documentsummary urlpath='sun124.htx/sun124.html' urllinkpolicy='explicit'>
+<docinfo>
+<title>HLP --- Interactive Help System</title>
+<authorlist><author id=PTW affiliation='RAL'>Patrick Wallace</author>
+</authorlist>
+<docnumber documenttype='sun'>124</docnumber>
+</docinfo>
+
+<docbody>
+<abstract></abstract>
+<sect><title>INTRODUCTION</title>
+<subsect><title>Comparison with VMS Help</title>
+<subsect><title>Portability</title>
+<subsect><title>Package Contents</title>
+<sect><title>USING HELP</title>
+<sect><title>CREATING A HELP LIBRARY</title>
+<subsect><title>The Source File</title>
+<subsect><title>Creating the Library File</title>
+<sect><title>RETRIEVING HELP TEXT</title>
+<subsect><title>The HLP_HELP Subprogram</title>
+<subsect><title>The Output Subprogram</title>
+<subsect><title>The Input Subprogram</title>
+<subsect><title>The Name Translation Subprogram</title>
+<subsect><title>Terminal Handling</title>
+<subsect><title>Error Codes</title>
+<subsect><title>Linking</title>
+<sect><title>SOFTWARE SUPPORT GUIDE</title>
+<subsect><title>Release Contents</title>
+<subsect><title>Portability Issues</title>
+<subsect><title>Library Format</title>
+<subsect><title>The INCLUDE files</title>
+<subsect><title>Subprograms</title>
+<subsubsect><title>Supported interfaces</title>
+<subsubsect><title>Templates</title>
+<subsubsect><title>String handling</title>
+<subsubsect><title>Variable-length random-access file package</title>
+<subsubsect><title>Indexed-sequential package</title>
+<subsubsect><title>Internal</title>
+<subsect><title>Rebuilding the System</title>
+<subsect><title>VAX/VMS Logical Names</title>
+<sect><title>ACKNOWLEDGMENTS</title>
+<sect><title>About this document ...</title>
+</docbody>
+</documentsummary>
