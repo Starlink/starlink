@@ -28,7 +28,11 @@
 UsageString="$0 [--keep] [filename...]"
 deletetemp=true
 LS=/bin/ls
-
+if test -n "$ECHONONL"; then
+    eval ${ECHONONL}
+else
+    function echononl () { echo -n $*; }
+fi
 
 filelist=""
 
@@ -62,7 +66,7 @@ nfailures=0
 
 for name in $filelist
 do
-	echo -n "$name... "
+	echononl "$name... "
 	sh $name >$name.stdout 2>$name.stderr
 	testval=$?
 
