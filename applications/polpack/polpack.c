@@ -368,8 +368,9 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
       script = (char *) malloc( (size_t) ( strlen( dir )
                                            + strlen( "/Polka.tcl " )  
                                            + strlen( file_name ) 
-                                           + strlen( " >& " )  
+                                           + strlen( " 1>" )  
                                            + strlen( outfile_name ) 
+                                           + strlen( " 2>&1" ) 
                                            + 1 ) );
       if( !script ) {
          *STATUS = SAI__ERROR;
@@ -379,8 +380,9 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
          strcpy( script, dir );
          strcpy( script + strlen( script ), "/Polka.tcl " );
          strcpy( script + strlen( script ), file_name );
-         strcpy( script + strlen( script ), " >& " );
+         strcpy( script + strlen( script ), " 1>" );
          strcpy( script + strlen( script ), outfile_name );
+         strcpy( script + strlen( script ), " 2>&1" );
          SetVar( fd, "POLPACK_DIR", dir, 0, STATUS );
       }
    }

@@ -85,12 +85,6 @@
 
    }
 
-# Display a label asking the user to wait while the main interface is
-# constructed.
-   set wait [label .wait -text "  Please Wait...  " -bd 3 -relief sunken \
-                               -background #c0c0c0]
-   pack $wait -ipadx 4m -ipady 4m -padx 4m -pady 2m -fill y -expand 1
-
 # Set the number of digits used by tcl to represent floating point values as
 # strings.
    set tcl_precision 15
@@ -487,9 +481,6 @@
       option add *Menubutton.font $B_FONT 
       option add *Menu.font $B_FONT 
    }
-
-# Menus do not have "tear-off" marks.
-   option add *Menu.tearOff 0
 
 # Radiobuttons and Checkbuttons do not have a highlighted border.
    option add *Radiobutton.highlightThickness 0 
@@ -946,12 +937,26 @@
       set ref 0 
    }
 
+#  Create a label telling the user about the process towards preparing
+#  the input images.
+   set prep [label .prep -textvariable doing -bd 3 \
+             -relief sunken -background #c0c0c0]
+   pack $prep -ipadx 4m -ipady 4m -padx 2m -pady 2m -fill y -expand 1
+
+
+# Start the Images menu with an entry for the "Transfer" function, followed
+# by a separator.
+   $imagesmenu add command -label "Transfer..." -command Transfer
+   MenuHelp $imagesmenu "Transfer..." ".  Transfer the features from the current image to a group of other images."
+   $imagesmenu add separator
+
 # Go through every supplied image section.
    set maximwid 0
    set maxrimwid 0
    set maxsfwid 15
    set i 0
    foreach imsec $IMSECS {
+      set doing "Preparing input images ( [expr $nin - $i] to go)\n\nPlease wait..."
 
 # Extract the image name (i.e. remove any section specifier), and append
 # it to a list of image names.
@@ -1083,12 +1088,6 @@
       set ref 0
       incr i   
    }
-
-# Complete the Images menu by adding a separator, and an entry for the 
-# "Transfer" function.
-   $imagesmenu add separator
-   $imagesmenu add command -label "Transfer..." -command Transfer
-   MenuHelp $imagesmenu "Transfer..." ".  Transfer the features from the current image to a group of other images."
 
 # Pack the menu buttons.
    pack $file $edit $opts $images $effects -side left 
@@ -1325,9 +1324,9 @@
 # Load the options supplied by the polka atask.
    LoadOptions
 
-# Destroy the "please wait" label, displayed while the main interface is
-# being created.
-   destroy $wait
+# Destroy the "preparing input images" label, displayed while the main 
+# interface is being created.
+   destroy $prep
 
 # Pack the top level frame. This make it appear on the screen.
    pack $TOP -padx 2m -pady 2m 

@@ -8877,8 +8877,9 @@ proc MenuMotionBind {win y} {
    global HELP
    global MENUHELPS
 
-# Ignore separators...
-   if { [$win type @$y] != "separator" } {
+# Ignore separators and tearoffs
+   set mty [$win type @$y] 
+   if { $mty != "separator" && $mty != "tearoff" } {
 
 # Get the label from the menu entry under the pointer.
       set label [$win entrycget @$y -label]
@@ -15074,10 +15075,12 @@ proc Transfer {} {
    pack $fr0 -side top
    SetHelp $fr0 ".  Click the buttons corresponding to the images to which the current features are to be transferred.\nAny which already have any features are indicated by a tick mark."
 
-# Create two columns within this frame.
+# Create four columns within this frame.
    set fr1 [frame $fr0.fr1]
    set fr2 [frame $fr0.fr2]
-   pack $fr1 $fr2 -side left -anchor n -padx 4m -pady 4m
+   set fr3 [frame $fr0.fr3]
+   set fr4 [frame $fr0.fr4]
+   pack $fr1 $fr2 $fr3 $fr4 -side left -anchor n -padx 4m -pady 4m
 
 # Indicate that no images have yet been selected.
    set TRAN_LIST ""
@@ -15130,26 +15133,30 @@ proc Transfer {} {
 # Swap frames.
       if { $f == $fr1 } {
          set f $fr2
+      } elseif { $f == $fr2 } {
+         set f $fr3
+      } elseif { $f == $fr3 } {
+         set f $fr4
       } {
          set f $fr1
       }
    }
 
 # Create a frame for the buttons.
-   set fr3 [frame $topf.fr3]
-   pack $fr3 -side top -expand 1 -fill x
+   set fr5 [frame $topf.fr5]
+   pack $fr5 -side top -expand 1 -fill x
 
 # Create the OK and Cancel buttons.
-   set b1 [button $fr3.ok -text "OK" -command "set TRANSFER_EXIT ok"]
-   set b3 [button $fr3.cancel -text "Cancel" -command "set TRANSFER_EXIT cancel"]
+   set b1 [button $fr5.ok -text "OK" -command "set TRANSFER_EXIT ok"]
+   set b3 [button $fr5.cancel -text "Cancel" -command "set TRANSFER_EXIT cancel"]
    pack $b1 $b3 -padx 1m -side left -expand 1
    SetHelp $b1 ".  Press to close the dialog box, transferring the features from the current image to all the selected images."
    SetHelp $b3 ".  Press to close the dialog box without making any changes to the selected images."
 
 # Create the ClearAll and SetAll and Help buttons.
-   set b4 [button $fr3.cl -text "ClearAll" -command "set TRANSFER_EXIT clear"]
-   set b5 [button $fr3.st -text "SetAll" -command "set TRANSFER_EXIT set"]
-   set b6 [button $fr3.help -text "Help" -command "set TRANSFER_EXIT help"]
+   set b4 [button $fr5.cl -text "ClearAll" -command "set TRANSFER_EXIT clear"]
+   set b5 [button $fr5.st -text "SetAll" -command "set TRANSFER_EXIT set"]
+   set b6 [button $fr5.help -text "Help" -command "set TRANSFER_EXIT help"]
    pack $b4 $b5 $b6 -padx 1m -side left -expand 1
    SetHelp $b4 ".  Press to clear all check buttons."
    SetHelp $b5 ".  Press to set all check buttons."
