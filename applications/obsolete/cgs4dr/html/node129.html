@@ -18,13 +18,7 @@ In Portable-CGS4DR the software tasks have been de-coupled which allows each tas
 run individually. Clearly this functionality is useful for debugging. Some tasks, however,
 are generic so that they can be used outside of Portable-CGS4DR. I am thinking particularly
 of the plotting task which can display DST or NDF data. If you wish to run the tasks
-separately, some symbolic links should already be setup so you can just do:
-<P>
-<blockquote>
-  %  $CGS4DR_ROOT/tcl/p4_tcl &amp <BR>
-</blockquote>
-<P>
-If such links are absent, you can create your own:
+separately, create some symbolic links:
 <P>
 <blockquote>
   %  ln -s  $CGS4DR_ROOT/tcl/cgs4dr_tcl  p4_tcl <BR> 

@@ -2920,13 +2920,7 @@ In Portable-CGS4DR the software tasks have been de-coupled which allows each tas
 run individually. Clearly this functionality is useful for debugging. Some tasks, however,
 are generic so that they can be used outside of Portable-CGS4DR. I am thinking particularly
 of the plotting task which can display {\sc dst} or {\sc ndf} data. If you wish to run the
-tasks separately, some symbolic links should already be setup so you can do:
-
-\begin{quote}
-  \% \ \$(CGS4DR\_ROOT)/tcl/p4\_tcl \ \& \ \\
-\end{quote}
-
-If such links are absent, you can create your own:
+tasks separately, create some symbolic links:
 
 \begin{quote}
   \% \ ln -s \ \$(CGS4DR\_ROOT)/tcl/cgs4dr\_tcl \ p4\_tcl \\
