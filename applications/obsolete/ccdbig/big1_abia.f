@@ -78,6 +78,7 @@
       INTEGER J                  ! loop variable
       INTEGER UP                 ! right boundary of data region
       REAL MEAN                  ! mean of Gaussian distribution
+      REAL NOISE                 ! bias noise
       REAL SD                    ! std deviation of Gaussian distribution
 
 *  Data
@@ -104,15 +105,17 @@
             IF ( I .GE. INL .AND. I .LE. UP ) THEN
 
 *     Add bias noise to image in data region.
-               IMAGE( I ) = IMAGE( I ) + NOISE
+               IMAGE( I, J ) = IMAGE( I, J ) + NOISE
 
             ELSE
 
 *     Replace image by bias noise in bias strip region.
-               IMAGE( I ) = NOISE
+               IMAGE( I, J ) = NOISE
 
             END IF
+
          END DO
+      END DO
 
       END
-* $Id: ccdb1_abia.f,v 1.3 1998/06/17 10:23:45 mbt Exp $
+* $Id: ccdb1_abia.f,v 1.4 1998/06/17 16:47:03 mbt Exp $
