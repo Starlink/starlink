@@ -15,12 +15,12 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {139.11}
-\newcommand{\stardocauthors}   {Peter W. Draper}
+\newcommand{\stardocnumber}    {139.12}
+\newcommand{\stardocauthors}   {Peter W. Draper, Mark Taylor}
 \newcommand{\stardocdate}      {27 January 1999}
 \newcommand{\stardoctitle}     {CCDPACK}
 \newcommand{\stardoconeline}   {CCD data reduction package}
-\newcommand{\stardocversion}   {Version 2.4-0b}
+\newcommand{\stardocversion}   {Version 3.0}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {
 CCDPACK is a package of programs for reducing CCD-like data. They
@@ -1963,7 +1963,9 @@ exit
 A copy of this file is available from
 \text{\$CCDPACK\_DIR} in the file \text{ccdpack\_ex8.csh}.
 
-\section{Registration and mosaicing \xlabel{mosaicing}}
+
+
+\section{Registration and mosaicing\xlabel{mosaicing}}
 
 Multiple observations form the backbone of many astronomical programmes.
 Determining the registration (inter-dataset transformations) of the
@@ -1975,11 +1977,18 @@ determine the registration of imaging data and subsequently to transform
 positions or resample and combine the data is the purpose of this part
 of CCDPACK.
 
-The registration techniques provided by CCDPACK rely on the presence
-of image features (objects which are centroidable). So registration is
-simply determining the correspondence of the image features between
-all the datasets and from that the transformations which map image
-feature to image feature. If it is the intention to combine datasets
+% The registration techniques provided by CCDPACK rely on the presence
+% of image features (objects which are centroidable). So registration is
+% simply determining the correspondence of the image features between
+% all the datasets and from that the transformations which map image
+% feature to image feature. 
+%
+A number of registration techniques are provided, which can
+identify the relative positioning of frames by examining image
+features (centroidable objects), or by making use of prior information
+about the observational geometry, or both.
+%
+If it is the intention to combine datasets
 into one (to increase signal to noise levels, or to increase the
 effective area or dynamic range of the detector) the registering
 transforms may be used to resample the datasets so they are aligned
@@ -1991,18 +2000,172 @@ stages the data may be combined to produce a mosaic. Data combination
 usually makes use of a robust estimator to protect against spurious
 values, cosmic rays etc.
 
-In CCDPACK four methods for determining image feature correspondence
+
+\subsection{\xlabel{registrationprocess}\label{regproc}The registration process}
+
+Registering a set of images requires identifying a single 
+coordinate system which can apply to all of them, so that 
+each pixel in each of the images has a definite position in 
+the overall picture as well as within its own grid.
+This single coordinate system within which all the images can
+be embedded may be an actual sky coordinate system with RA and
+Dec coordinates, or an arbitrary one which coincides with the
+pixel coordinates of one of the images, or some other kind.
+Information on how to embed the images in the same coordinate
+system may come from one or more of a variety of sources, 
+for instance:
+\begin{description}
+\item[Telescope pointing information:]
+The telescope system may insert FITS headers recording the
+direction in the sky in which the observation was taken.
+Alternatively, this could simply be encoded in the filename or
+known to you in a non-machine-readable form.
+\item[Mosaic camera geometry:]
+If the instrument is a mosaic camera in which several CCD chips
+are adjacently positioned on the focal plane,
+their relative positions may be known.
+\item[Multiple exposures:]
+If multiple exposures are taken without moving the telescope
+or otherwise altering the observational setup,
+then trivially the images in question will share the same coordinate
+system.
+\item[Object matching:]
+When a number of images overlap and the same features
+appear in more than one of them, the relative positioning
+of the images can be determined by matching up the features.
+\end{description}
+Some of these sources may be more accurate or reliable than others.
+
+Coordinate systems obtained like this, or in other ways,
+can be associated with an NDF as {\em coordinate frames\/} in the
+WCS (World Coordinate System) component of the NDF.
+The WCS component contains a number of frames, each having
+an associated coordinate system and a {\em domain}\footnote{
+Frames also have a number of other attributes which we won't describe
+here; see \xref{SUN/210}{sun210}{Frame} for more detail.}\/,
+which is a label by which the frame can be referred to.
+At any time just one of these frames, known as the {\em current\/} frame,
+has a special status and is used by certain commands; 
+for instance KAPPA's \xref{DISPLAY}{sun95}{DISPLAY} labels 
+axes in the coordinates of the current frame.
+The WCS component also contains {\em mappings\/} which 
+encode the rules for transforming between any two frames in
+the WCS component.
+
+The problem of registration therefore is to process the set of
+images which are to be registered until 
+a frame representing the same coordinate system
+is contained in the WCS component of each one.
+Once this is done, each image can be resampled to the new 
+coordinate system (so that pixel-by-pixel alignment is achieved)
+and combined to form a mosaic.
+If there is only one kind of information about the relative 
+positioning of images then attaching this common coordinate 
+system may be done in a single step,
+but for more complicated cases it could require adding several
+intermediate coordinate frames before we reach that stage.
+To keep track of which NDFs share common coordinates,
+each set of frames representing a common coordinate system that is added
+is given a common domain name between NDFs, 
+different from those used for other coordinate systems.  
+Then, when all the NDFs have a frame in a single domain,
+the resampling can take place into the corresponding coordinates.
+This means that some care has to be exercised in allocating
+domain names, so that different coordinate systems do not appear
+to be the same.  To a large extent CCDPACK looks after this 
+for you, but in some cases you will have to choose an appropriate 
+domain name yourself.  
+You should also be aware that existing frames may not follow this rule;
+for instance all NDFs have a domain called `PIXEL', but this 
+does not mean that they can usefully all be resampled into the
+corresponding coordinate system for combination or comparison.
+
+CCDPACK provides four main categories of facility 
+for adding coordinate frames to sets of NDFs:
+\begin{itemize}
+\item
+Object matching methods: 
+\routine{FINDOBJ}, \routine{FINDOFF}, \routine{PAIRNDF}, \routine{CCDALIGN},
+\routine{REGISTER}
+\item
+Use of instrument-type-based geometry information:
+\routine{ASTIMP}, \routine{ASTEXP}
+\item
+Direct manipulation of WCS components:
+\routine{WCSEDIT}
+\item
+Sorting through existing frames:
+\routine{WCSREG}
+\end{itemize}
+The rest of this subsection explains the use of these methods
+(and a schematic illustration of how they fit together is contained
+in \hyperref{this figure }{Figure }{}{registration}).
+
+There is also a discussion of the \xref{TRANSFORM}{sun61}{}-based
+approach used by previous versions of CCDPACK, which is still
+available, but on the whole deprecated.
+
+
+\subsubsection{More about WCS and AST}
+
+The discussion in this document tells you all that you need to know
+for using WCS components and coordinate frames 
+in order to register images within CCDPACK.
+In fact for simple cases in which images are to be registered using,
+for instance, only object matching methods, it is not necessary to
+understand how the coordinate frames are handled by the registration
+programs.
+However, you can get a better understanding of WCS components
+and what you can do with them (including using them for NDF display)
+in the ``\xref{Using World Coordinate Systems}{sun95}{se_wcsuse}''
+section of the KAPPA document, \xref{SUN/95}{sun95}{},
+and more detailed description of the underlying AST system in 
+\xref{SUN/210}{sun210}.
+
+In general CCDPACK conforms to the normal rules about AST
+objects and WCS components, so other applications, for instance
+KAPPA's \xref{WCSTRAN}{sun95}{WCSTRAN} and friends, can freely
+be mixed with CCDPACK applications.  In fact some of the KAPPA
+applications provide similar facilities to those of the CCDPACK
+ones, and they can be used instead if for some reason you prefer
+them.
+There are a couple of additional conventions used within CCDPACK however:
+\begin{itemize}
+\item
+Although there is nothing to prevent multiple frames in the same
+WCS component having the same domain name, this usually only leads
+to confusion.  CCDPACK will usually try to ensure that multiple
+frames with the same domain do not exist by deleting all but one.
+In this case a warning will be issued, but it is not considered
+a fatal error.
+\item
+Some of the CCDPACK applications add new frames to WCS components.
+Usually, if a domain name is not specified by the user, a default
+name is supplied, and this will begin with the characters `CCD\_'.
+Thus it is not a good idea to pick a domain name which begins `CCD\_'
+if you are assigning one yourself, unless you intend it to look
+like an automatically generated one.
+\end{itemize}
+
+
+
+\subsection{Object matching and position lists}
+
+
+In CCDPACK three methods for determining image feature correspondence
 are provided. Two of these rely on the transformations being
 `well modelled' by simple offsets. These methods have the advantage of
 automated and semi-automated processing. The third method relies on
 considerable interaction but can deal with transformations of scale,
-magnification and shear as well as offsets (so called linear
-transformations). The fourth method is undefined -- do-it-yourself --
-and consists of making any use of the basic tools provided. Using the
-CCDPACK applications it is possible to determine transformations
-between datasets using completely general functions.
+magnification and shear as well as offsets (i.e.\ general linear
+transformations).
+% The fourth method is undefined -- do-it-yourself --
+% and consists of making any use of the basic tools provided. Using the
+% CCDPACK applications it is possible to determine transformations
+% between datasets using completely general functions.
+%   (this refers to CCDEDIT)
 
-\subsection{\xlabel{registration}Registration}
+\subsubsection{\xlabel{registration}Transformation parameter determination}
 
 The routine which determines the transformations between labelled
 position lists is called:
@@ -2015,9 +2178,10 @@ star say no.\ 100 is present on several datasets it should be labelled
 no.\ 100 (or any other unique value) in all the datasets in which it
 appears {\em regardless of its coordinates}. In many ways getting
 labelled position lists may be considered as most of the process of
-registration, the rest being essentially straight-forward.
+object-matching-based registration, 
+the rest being essentially straight-forward.
 
-The main transform used by \routine{REGISTER} is the linear transform:
+The main mapping used by \routine{REGISTER} is the linear mapping:
 \begin{myquote}
 \begin{verbatim}
 XX = A + B * X + C * Y
@@ -2036,26 +2200,27 @@ various types of linear transformations namely:
 \item or a full six parameter fit.
 \end{itemize}
 
-When using a linear fit you can register a {\em whole} list of datasets
+When using a linear fit you can register a {\em whole\/} list of datasets
 in one go. So for instance if you have a set of position lists in which
 corresponding objects have been identified, you may pick any list as the
-reference set (the first is chosen by default) and all the transforms to
-(and from) the reference set from the other datasets will be
-derived. If the position lists are `associated' with images then the
-images will have the transformation information to map to and from the
-reference set entered into their CCDPACK extensions (see
-\hyperref{using lists of positions}{\S}{}{using_lists_of_positions}
-and
-\hyperref{handling transforms}{\S}{}{handling_transforms}), this
-information can be used by other CCDPACK applications.
+reference set (the first is chosen by default) and all the mappings between
+this and the other datasets will be derived. 
+If the position lists are `associated' with images then a new frame, 
+by default with the domain `CCD\_REG', 
+will be added to each image:
+the coordinates are the pixel coordinates of the reference image.
 
-A general transformation between {\em two} datasets can also be
+A general transformation between {\em two\/} datasets can also be
 determined. These are entered using suitably parameterised algebraic
 expressions. A general least squares fitting algorithm is used to find
-a solution which gives satisfactory values for the parameters (see
-\hyperref{general transformations}{\S}{}{general_transforms}).
+a solution which gives satisfactory values for the parameters.
+Currently, this cannot be done using coordinate frames in WCS components,
+and the older method using TRANSFORM structures must be used instead ---
+see \hyperref{this section}{\S}{}{transformreg}.
 
-\subsection{\xlabel{offsetdata}Registering offset datasets}
+
+
+\subsubsection{\xlabel{automatedregistration}Automated registration}
 
 If your datasets are just offset from each other (i.e.\ translated in X
 and Y), or more precisely are sufficiently `well modelled' by simple
@@ -2064,7 +2229,6 @@ positioning is in general a larger effect) and have image features in
 common it may be possible to register them with a minimum of effort and
 preparation.
 
-\subsubsection{\xlabel{automatedregistration}Automated registration}
 Automated registration is performed by the applications:
 \begin{itemize}
 \item \xroutine{FINDOBJ}
@@ -2073,9 +2237,10 @@ Automated registration is performed by the applications:
 \end{itemize}
 used in that order.
 
-\routine{FINDOBJ} locates and centroids image features. \routine{FINDOFF} determines the
+\routine{FINDOBJ} locates and centroids image features,
+\routine{FINDOFF} determines the
 correspondence of the image-features and \routine{REGISTER} produces the
-transformations from this information. This sequence is used in the
+mappings from this information. This sequence is used in the
 CCDEXERCISE script. To see it in action change to a empty directory and
 issue the command ``\text{ccdexercise}''. You should delete any
 files produced by this script.
@@ -2165,11 +2330,12 @@ lists which are output for use by \routine{REGISTER}.
 The above scheme also works with datasets whose transformations really
 need fully linear transforms provided that distorting terms are so small
 that the error box used when comparing objects will include
-corresponding positions. One can also envision its use when all terms
-(say plate distortions) except the offset are known. Then the known
-transformations could be applied to the data (using \xroutine{TRANLIST}) and the
-offsets determined. The new position lists could then be transformed
-back into the original coordinates.
+corresponding positions.  It will also work when all terms
+(say plate distortions) except the offset are known. 
+In this case it is just necessary to add to the image's WCS component 
+(or apply to the position list directly using \routine{TRANLIST})
+a coordinate frame taking account of the known transformations
+before the offsets are determined.
 
 Invoking \xroutine{FINDOBJ}, \xroutine{FINDOFF} and
 \xroutine{REGISTER} is trivial:
@@ -2181,13 +2347,11 @@ Invoking \xroutine{FINDOBJ}, \xroutine{FINDOFF} and
 \end{verbatim}
 \end{myquote}
 This locates the objects on all the images in the current directory,
-performs pattern-matching and finally registers them, writing the
-transformations into the images.
-See \hyperref{``using lists of positions''}{\S}{}{using_lists_of_positions}
+performs pattern-matching and finally registers them, writing 
+a new frame with domain `CCD\_REG' into each image.
+See \hyperref{``using position lists''}{\S}{}{using_position_lists}
 if using `\text{*}' for both the \text{in} and \text{inlist}
 parameters seems mysterious.
-How the transformation information is stored is described in
-\hyperref{``handling transforms''}{\S}{}{handling_transforms}.
 
 FINDOFF's other parameters are detailed in
 \hyperref{a later section}{\S}{}{FINDOFF} and some of its internals are
@@ -2195,9 +2359,15 @@ explained in, P.W. Draper, {\bf 1993}, `Preparing multiple CCD frames for the
 photometry of extended fields', Proceedings of the 5th ESO/ST-ECF Data
 Analysis Workshop.
 
+
+
 \subsubsection{\xlabel{semiautomated}Semi-automated registration}
 
-Semi-automated registration uses the applications:
+When datasets are offset only by X and Y translations,
+but contain insufficient objects for the fully automated registration
+described in the previous section, 
+semi-automated registration may be used.
+This uses the applications:
 \begin{itemize}
 \item \xroutine{PAIRNDF}
 \item \xroutine{REGISTER}
@@ -2226,10 +2396,11 @@ being in `common' between any pair, \routine{PAIRNDF} works out the rest using
 the same methods as \xroutine{FINDOFF}, except a single spanning tree is not
 chosen since in this case, all pairings are assumed to be correct.
 
-\subsection{\xlabel{usinglineartransforms}Using linear transforms}
+\subsubsection{\xlabel{usinglineartransforms}General linear transformations}
 
 To align datasets that require more general linear transformations
-use the :
+than a simple offset
+use the:
 \begin{itemize}
 \item \xroutine{CCDALIGN}
 \end{itemize}
@@ -2247,90 +2418,120 @@ reference set of positions are either selected from a designated image or
 from the first image. The reference set can be extended by identifying
 objects after all the current reference set have been identified
 (possibly by selecting positions off the image if they are not actually
-present). The complete registration is performed using all these
+present).  \routine{CCDALIGN} can then invoke \routine{REGISTER} itself to
+perform the fitting of the transformation parameters using all these
 positions.
 
-\subsection{\xlabel{generaltransforms}General transformations
-\label{general_transforms}}
-CCDPACK can also fit and use general transformations. The fitting of
-general transformations is restricted to {\em two} datasets at a time.
-General transformations are based on `algebraic-like' expressions
-that you must define.
-An example of such a transformation is the Sanson-Flamstead
-sinusoidal:
+
+\subsubsection{\xlabel{usinglistsofpositions}Using position lists
+               \label{using_position_lists}}
+
+In CCDPACK the positions of identified/detected image features are
+stored in ordinary text files which are referred to as `position lists'.
+The format of these lists is flexible. Usually position lists have three
+columns:
 \begin{myquote}
 \begin{verbatim}
-XX = X * COS(Y)
-YY = Y
-X  = XX / COS(YY)
-Y  = YY
+Identifier    X-position    Y-position
 \end{verbatim}
 \end{myquote}
-where \text{X} and \text{Y} are the present coordinates and
-\text{XX} and \text{YY} are the new coordinates.
-This is the FORTRAN related form that is used by the package
-\xref{TRANSFORM SUN/61}{sun61}{}.
+these may be separated by commas or blanks. The identifier is an
+integer value which is used to identify positions which are related
+(i.e.\ are of the same object) in different lists.
 
-When fitting a general transform it is necessary to parameterise the
-formulation, the object of the exercise being to determine good values
-for the parameters.
-An obvious way to use this ability is to test the hypothesis that a
-linear transformation is not good enough to accurately register
-datasets.
-To do this you might use the forward transform expression:
+If more than three columns exist then only the first three are used.
+If only two columns exist it is assumed that they are:
 \begin{myquote}
 \begin{verbatim}
-XX = PA + PB * X + PC * Y + PD * X * X + PE * Y * Y
-YY = PF + PG * X + PH * Y + PI * X * X + PJ * Y * Y
+X-position   Y-position
 \end{verbatim}
 \end{myquote}
-The best values of the parameters \text{PA-PJ} can then be determined.
-General expressions are always given in this form with coordinates
-\text{(X,Y)} and \text{(XX,YY)}, parameters \text{PA-PZ}.
-Sub-expressions are also supported using the tokens \text{FA-FZ}, these
-should be used when complex repeated strings (which may include
-\text{PA-PZ} references) occur e.g.:
-\begin{myquote}
-\begin{verbatim}
-XX = PA * ASIND( FA / PA ) * X / FA
-YY = PA * ASIND( FA / PA ) * Y / FA
-X  = PA * SIND( FB / PA ) * XX / FB
-Y  = PA * SIND( FB / PA ) * YY / FB
-FA = SQRT( X * X + Y * Y )
-FB = SQRT( XX * XX + YY * YY )
-\end{verbatim}
-\end{myquote}
-which is a form of perspective projection.
+such lists may be produced by \xref{KAPPA}{sun95}{} applications. In
+this case applications which rely on a knowledge of the identifiers
+assume they are monotonically increasing from one.
 
-Transformations which are already known (as must be the case if no
-objects are present in the data) may be entered directly into the images
-(by-passing \xroutine{REGISTER}) using the \xroutine{CCDEDIT} command
-(see its entry in appendix \S\ref{app:description}).
+Whole and in-line comments are allowed in position lists using the
+character `\#'.
 
-\subsection{Transforming\xlabel{transformingpositions} position lists}
-Transforms may be applied to position lists using the routine:
+Usually position lists are `associated' with images. What this means is
+that when a position list is created a record of its name is kept in the
+extension of the image. It is then usual to refer to the image instead of
+the position list when the position list is to be accessed. Applications
+which create new position lists associate the new position lists with
+the appropriate image. Using this method avoids any confusion about the
+relationship of position lists and images, which is vital when determining
+the registration of many images at one go. It also allows the use of the
+wildcarding properties of image names to access position lists.
+
+Position lists may be associated with images using the \routine{CCDEDIT}
+routine. To disable associations set the NDFNAMES global parameter
+(\xroutine{CCDSETUP}) to false. In this case, position lists must be specified
+explicitly as a comma separated list of names or gotten from a text
+file using indirection, this is exactly the same as for naming images
+(see \hyperref{``processing lists of data''}{\S}{}{ndflists}) except that
+wildcards are {\em not} allowed. Output list names may be formed
+from the modification of these names when NDFNAMES is false, otherwise
+the input image names are {\em always} used.
+
+Position lists associated with an NDF should always contain the 
+positions of identified image features in the pixel coordinates
+of the NDF with which they are associated (that is, the coordinates
+of the frame with the `PIXEL' domain).  However, for the purposes
+of offset determination they usually get mapped automatically
+to the NDF's current coordinate frame.
+That is to say that when \routine{FINDOFF} determines X and Y offsets,
+or \routine{REGISTER} determines the parameters of a transformation
+between two sets of objects, 
+the coordinates used are those in the position lists transformed into
+the current coordinate frame of their associated NDFs (though this
+transformation can be inhibited 
+by setting the USEWCS parameter in either case).
+Thus as long as the current frame in the WCS component of the NDF in question
+is selected appropriately, CCDPACK can keep implicit track of
+transformations which have to be applied to position list coordinates.
+
+
+\subsubsection{Transforming\xlabel{transformingpositions} position lists}
+
+For the reasons given in the previous section, once a position list
+is associated with an image,
+explicit transformation of the positions is
+usually not necessary, but there are circumstances in which it may
+be required:
+for examination of image coordinates by a human or a program other
+than a CCDPACK one, 
+for position lists which are not associated with NDFs, 
+for use with the old TRANSFORM-based methods, 
+or if the associated NDF is resampled.
+In these cases, the coordinates of each point in a position 
+list can be transformed using the routine:
 \begin{itemize}
 \item \xroutine{TRANLIST}
 \end{itemize}
-\routine{TRANLIST} can use transformations expressed in three different forms:
+\routine{TRANLIST} can use transformations expressed in four different forms:
 \begin{itemize}
+\item frame pairs from WCS components
 \item transform structures
 \item linear transform coefficients
-\item and general algebraic expressions.
+\item general algebraic expressions.
 \end{itemize}
-The first method is the usual one used for passing transformation
-information between CCDPACK applications (\S\ref{handling_transforms}).
-The second uses the coefficients of the linear transform and the third
+The first method uses the usual format for passing transformation
+information between CCDPACK applications (\S\ref{regproc})
+and the second uses the format which served 
+that purpose in previous versions of CCDPACK (\S\ref{transformreg}).
+The third uses the coefficients of a linear transform and the fourth
 allows you to transform a list using the algebraic expressions which are
 understood by the \xref{TRANSFORM package (SUN/61)}{sun61}{}.
 
 Transforming positions using transform structures is usually
-straight-forward, provided you've registered your data and finally
-entered this information into the images using \xroutine{REGISTER}. The
-choice then becomes one of whether you want the forward or inverse
+straight-forward, provided you've registered your data and 
+entered this information into the images using \xroutine{REGISTER},
+or have added coordinate frames or TRANSFORM structures in some other way.
+The choice then becomes one of whether you want the forward or inverse
 transform.
 
-Transforming positions selected from one dataset (say using the \xroutine{IDICURS}
+Transforming positions selected from one dataset 
+(say using the \xroutine{IDICURS}
 application) to a reference coordinate system or indeed vice-versa, is
 fairly straight-forward given registered datasets. It is also possible
 to transform to the coordinates of another dataset. The sequence of
@@ -2340,12 +2541,11 @@ commands for this operation goes like:
 % display  img                                      [1]
 % idicurs  in=img outlist=img.approx                [2]
 % findcent inlist=img outlist=img.acc               [3]
-% tranlist trtype=struct inlist=img forward         [4]
-           outlist=img.ref
-% tranlist inlist=img inext=false                   [5]
-           outlist=img.look
-           transform=newimg.more.ccdpack.transform
-           forward=false
+% tranlist trtype=wcs inlist=img framein=pixel      [4]
+           frameout=ccd_reg
+% tranlist trtype=wcs inlist=img inext=false        [5]
+           outlist=img.look wcsfile=newimg
+           framein=pixel frameout=ccd_reg
 \end{verbatim}
 \end{myquote}
 
@@ -2357,23 +2557,17 @@ is used for image display.
 position list \text{image.approx} and associated with the image.
 \item \xroutine{FINDCENT} centroids the positions. The new position list is
 \text{img.acc} which is now associated with the image.
-\item \xroutine{TRANLIST} transforms the new positions to the reference
-coordinates, using the forward transformation stored in the image.
-\item \xroutine{TRANLIST} now transforms the positions from the reference
-coordinate system to coordinate system of \text{newimg}, using the
-inverse transform stored in \text{newimg}.
+\item \xroutine{TRANLIST} transforms the new positions from pixel coordinates
+to the coordinates of the frame with domain CCD\_REG in the WCS component
+of the image.
+\item \xroutine{TRANLIST} now transforms the positions from pixel 
+coordinates to the current frame coordinate system of \text{newimg}.
 \end{enumerate}
 
-The final command is complex as the transform to be used is not
+The final command is more complex as the mapping to be used is not
 associated with the image with which the position list to be transformed
-is associated, so it is necessary to give the full name of the
-transform structure.
-This exemplifies why storing the transformations in a standard place
-that all the CCDPACK applications know about is such a good idea.
-Managing the names of extension items such as these in a complex
-situation could be fraught (note that if you're using a non-NDF based
-format, then transform information is really stored as part of the
-image headers and you will not be able to use this method).
+is associated, so it is necessary to give the location of the WCS
+component.
 
 Using linear coefficients is a quick way of applying offsets, scales and
 rotations to data. The linear transform form is:
@@ -2423,11 +2617,49 @@ more manageable levels (\text{x} and \text{y} are offset and scaled
 to some arbitrary level and now masquerade as \text{fx} and
 \text{fy}). This also allows quick modifications since only the values
 of the parameters need to be changed on re-runs.
+Note that a pincushion distortion could be added instead to a WCS
+component using \xroutine{WCSEDIT}.
 
-\subsection{\xlabel{handlingtransforms}Handling transformation information
-            \label{handling_transforms}}
-The transformations determined by the \xroutine{REGISTER} application
-are stored in \xref{HDS -- SUN/92 --}{sun92}{} objects known as
+
+
+\subsection{\xlabel{transformregistration}\label{transformreg}Registration 
+            using TRANSFORM structures}
+
+In previous versions of CCDPACK a different method was used
+for registration, which relied only on object matching and
+stored coordinate mapping information in 
+\xref{TRANSFORM (SUN/61)}{sun61}{} structures in the CCDPACK
+extension of the NDFs. 
+If you are used to this way of doing things do not despair!
+In the first place,
+the object matching methods appear to work just the same as
+before (i.e. a CCDPACK script which used to perform registration,
+resampling and combination should still do so),
+although by default the routines are now storing coordinate 
+system information in a different way.
+Furthermore, all the TRANSFORM
+functionality is still available, 
+and can can be used for backward compatibility
+with files which have already been partially processed by CCDPACK.
+Use of the old methods
+is also necessary for certain nonlinear kinds of transformations
+which cannot currently be handled by the \xref{AST}{sun210}{}
+library which underlies the processing of WCS components.
+
+The applications 
+\routine{FINDOFF}, \routine{REGISTER}, \routine{TRANLIST}, \routine{TRANNDF} 
+%  ?? MAKEMOS ??
+and \routine{DRIZZLE}
+by default read and write coordinate system
+information using frames in WCS components, but retain options
+which allow them to use the old TRANSFORM structures on request.
+
+
+\subsubsection{\xlabel{handlingtransforms}Handling TRANSFORM structures
+               \label{handling_transforms}}
+
+If the old method of handling coordinate transformations is used
+they are stored in \xref{HDS -- SUN/92 --}{sun92}{} objects known as
 `transform structures'. These objects are produced by the
 \xref{TRANSFORM -- SUN/61 --}{sun61}{} package and contain a full
 description (in an algebraic form which may be examined using the
@@ -2481,54 +2713,68 @@ properties and may take action to speed up or stop processing if a
 required property is not apparent (CCDPACK produces classifications for
 linear transformations).
 
-\subsection{\xlabel{usinglistsofpositions}Using lists of positions
-            \label{using_lists_of_positions}}
-In CCDPACK the positions of identified/detected image features are
-stored in ordinary text files which are referred to as `position lists'.
-The format of these lists is flexible. Usually position lists have three
-columns:
+
+\subsubsection{\xlabel{generaltransforms}General nonlinear transformations
+\label{general_transforms}}
+
+Using the TRANSFORM-based methods, CCDPACK can fit and use more
+general transformations than those which can be encoded in WCS components. 
+The fitting of general transformations by \routine{REGISTER} 
+is restricted to {\em two} datasets at a time.
+General transformations are based on `algebraic-like' expressions
+that you must define.
+An example of such a transformation is the Sanson-Flamstead
+sinusoidal:
 \begin{myquote}
 \begin{verbatim}
-Identifier    X-position    Y-position
+XX = X * COS(Y)
+YY = Y
+X  = XX / COS(YY)
+Y  = YY
 \end{verbatim}
 \end{myquote}
-these may be separated by commas or blanks. The identifier is an
-integer value which is used to identify positions which are related
-(i.e.\ are of the same object) in different lists.
+where \text{X} and \text{Y} are the present coordinates and
+\text{XX} and \text{YY} are the new coordinates.
+This is the FORTRAN related form that is used by the package
+\xref{TRANSFORM SUN/61}{sun61}{}.
 
-If more than three columns exist then only the first three are used.
-If only two columns exist it is assumed that they are:
+When fitting a general transform it is necessary to parameterise the
+formulation, the object of the exercise being to determine good values
+for the parameters.
+An obvious way to use this ability is to test the hypothesis that a
+linear transformation is not good enough to accurately register
+datasets.
+To do this you might use the forward transform expression:
 \begin{myquote}
 \begin{verbatim}
-X-position   Y-position
+XX = PA + PB * X + PC * Y + PD * X * X + PE * Y * Y
+YY = PF + PG * X + PH * Y + PI * X * X + PJ * Y * Y
 \end{verbatim}
 \end{myquote}
-such lists may be produced by \xref{KAPPA}{sun95}{} applications. In
-this case applications which rely on a knowledge of the identifiers
-assume they are monotonically increasing from one.
+The best values of the parameters \text{PA-PJ} can then be determined.
+General expressions are always given in this form with coordinates
+\text{(X,Y)} and \text{(XX,YY)}, parameters \text{PA-PZ}.
+Sub-expressions are also supported using the tokens \text{FA-FZ}, these
+should be used when complex repeated strings (which may include
+\text{PA-PZ} references) occur e.g.:
+\begin{myquote}
+\begin{verbatim}
+XX = PA * ASIND( FA / PA ) * X / FA
+YY = PA * ASIND( FA / PA ) * Y / FA
+X  = PA * SIND( FB / PA ) * XX / FB
+Y  = PA * SIND( FB / PA ) * YY / FB
+FA = SQRT( X * X + Y * Y )
+FB = SQRT( XX * XX + YY * YY )
+\end{verbatim}
+\end{myquote}
+which is a form of perspective projection.
 
-Whole and in-line comments are allowed in position lists using the
-character `\#'.
+Transformations which are already known (as must be the case if no
+objects are present in the data) may be entered directly into the images
+(by-passing \xroutine{REGISTER}) using the 
+\xroutine{WCSEDIT} or \xroutine{CCDEDIT} commands
+(see their entries in appendix \S\ref{app:description}).
 
-Usually position lists are `associated' with images. What is means is
-that when a position list is created a record of its name is kept in the
-extension of the image. It is then usual to refer to the image instead of
-the position list when the position list is to be accessed. Applications
-which create new position lists associate the new position lists with
-the appropriate image. Using this method avoids any confusion about the
-relationship of position lists and images, which is vital when determining
-the registration of many images at one go. It also allows the use of the
-wildcarding properties of image names to access position lists.
-
-Position lists may be associated with images using the \routine{CCDEDIT}
-routine. To disable associations set the NDFNAMES global parameter
-(\xroutine{CCDSETUP}) to false. In this case, position lists must be specified
-explicitly as a comma separated list of names or gotten from a text
-file using indirection, this is exactly the same as for naming images
-(see \hyperref{``processing lists of data''}{\S}{}{ndflists}) except that
-wildcards are {\em not} allowed. Output list names may be formed
-from the modification of these names when NDFNAMES is false, otherwise
-the input image names are {\em always} used.
 
 \subsection{Data resampling}
 Data resampling is performed by the application:
@@ -2642,6 +2888,8 @@ is given in appendix \S\ref{MAKEMOS}, some of the philosophy of
 its algorithms are explained in, R.F. Warren-Smith, {\bf 1993},
 `The Calibration of Large-Field Mosaics', Proceedings of the 5th
 ESO/ST-ECF Data Analysis Workshop.
+
+
 
 \subsection{Schematic registration sequences}
 The order in which the various application should be used are shown in
@@ -2842,7 +3090,7 @@ file, redirect comments into it etc.
 Perhaps the most noticeable `feature' of CCDPACK programs is their ability to
 accept, and process, lists of data files and other associated parameters,
 such as exposure times and position list names (see
-\hyperref{``using lists of positions''}{\S}{}{using_lists_of_positions}).
+\hyperref{``using position lists''}{\S}{}{using_position_lists}).
 A list of `names' can be supplied in
 response to one prompt, or can be supplied on successive lines using the
 continuation character `\text{-}' to force a reprompt for more
