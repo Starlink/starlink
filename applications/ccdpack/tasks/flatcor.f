@@ -4,7 +4,7 @@
 *     FLATCOR
 
 *  Purpose:
-*     Divides a series of NDFs by a flatfield
+*     Divides a series of images by a flatfield
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*    This routine applies a flat field correction to a series of NDFs.
+*    This routine applies a flat field correction to a series of images.
 *    If the input data have been saturated using a saturation value  
 *    (instead of using BAD pixel flagging) then the saturation values 
 *    may be protected from modification.
@@ -30,7 +30,7 @@
 
 *  ADAM Parameters:
 *     FLAT = LITERAL (Read)
-*        Name of the NDF which contains the normalised (mean of one)
+*        Name of the image which contains the normalised (mean of one)
 *        flatfield data. This should have been produced by a program 
 *        such as MAKEFLAT. The data should have a floating point HDS 
 *        data type (_REAL or _DOUBLE).
@@ -38,12 +38,12 @@
 *        through a file.
 *        [Global flatfield]
 *     IN = LITERAL (Read)
-*        Names of the NDFs containing the data which are to have the
-*        flatfield correction applied.  The NDF names should be
+*        Names of the images containing the data which are to have the
+*        flatfield correction applied.  The image names should be
 *        separated by commas and may include wildcards.
 *     KEEPIN = _LOGICAL (Read)
-*        Whether to keep (i.e. not delete) the input NDFs (parameter IN)
-*        or not. Deleting the input NDFs has the advantage of saving
+*        Whether to keep (i.e. not delete) the input images (parameter IN)
+*        or not. Deleting the input images has the advantage of saving
 *        disk space, but should probably only be used if this program
 *        is part of a sequence of commands and the intermediary data
 *        produced by it are not important.
@@ -80,21 +80,21 @@
 *        default is "BOTH".
 *        [BOTH]
 *     OUT = LITERAL (Write)
-*        Names of the output NDFs. These may be specified as list of
+*        Names of the output images. These may be specified as list of
 *        comma separated names, using indirection if required, or,
 *        as a single modification element (of the input names).
 *        The simplest modification element is the asterisk "*" which
-*        means each of the output NDFs the same name as the
-*        corresponding NDFs files. So,
+*        means call each of the output NDFs the same name as the
+*        corresponding input images. So,
 *           IN > *
 *           OUT > *
-*        signifies that all the NDFs in the current directory should be
-*        used and the output NDFs should have the same names.
+*        signifies that all the images in the current directory should be
+*        used and the output images should have the same names.
 *
 *        Other types of modification can also
 *        occur, such as,
 *           OUT > tmp_*
-*        which means call the output NDFs the same as the input NDFs but
+*        which means call the output images the same as the input images but
 *        put tmp_ in front of the names. Replacement of a specified
 *        string with another in the output file names can also be used,
 *           OUT > tmp_*|debias|flattened|
@@ -129,14 +129,14 @@
 *        CCDSETUP then this will be used.
 *        [TRUE]
 *     TITLE = LITERAL (Read)
-*        Title for the output NDFs.
+*        Title for the output images.
 *        [Output from FLATCOR]
 
 *  Examples:
 *     flatcor frame1 frame1_f flatr
-*        In this example the data in NDF frame1 are corrected for the
-*        flatfield response stored in NDF flatr. The result of dividing
-*        FRAME1 by flatr is written to NDF frame1_f. If a saturation
+*        In this example the data in image frame1 are corrected for the
+*        flatfield response stored in image flatr. The result of dividing
+*        FRAME1 by flatr is written to image frame1_f. If a saturation
 *        value has been applied to the data in frame1 then this will be
 *        automatically accommodated by FLATCOR providing the saturation
 *        has been applied within CCDPACK.
@@ -147,9 +147,9 @@
 *        information has been supplied.
 *
 *     flatcor in='*' out='*_flattened' flat=master_flatr
-*        In this example all the NDFs in the current directory are
+*        In this example all the images in the current directory are
 *        processed. The resultant data are written to files with the
-*        same name as the corresponding input NDFs, but with the 
+*        same name as the corresponding input images, but with the 
 *        characters "_flattened" appended to the filename.
 
 *  Notes:
