@@ -31,8 +31,8 @@
 *     IN = NDF (Read)
 *         Name of NDF to change.
 *     MSG_FILTER = CHAR (Read)
-*         Message filter level.
-*     NEW_FLAT = _CHAR (Read)
+*         Message filter level (Default is NORM).
+*     NEW_FLAT = CHAR (Read)
 *         Name of the new flatfield file.
 
 *  Related Application:
