@@ -32,11 +32,11 @@ C_ROUTINES = idiic.c idiutil.c iig.c iim.c kwm.c idienv.c idilocal.c \
 iic.c iii.c iir.c vdm.c idiextra.c idiother.c iid.c iil.c iiz.c	     \
 vdmdd.c
 
-BUILT_SOURCES = IDI_ERR
+BUILT_SOURCES = IDI_ERR idi_err.h
 
-# We do not really want to install dctprep!
+# We do not want to install dctprep
 
-bin_PROGRAMS = dctprep
+noinst_PROGRAMS = dctprep
 dctprep_SOURCES = dctprep.c
 dctprep_LDADD = libidi.la `gwm_link` `gns_link` `cnf_link` $(X_LIBS) $(X_EXTRA_LIBS) $(X_PRE_LIBS) -lX11
 
@@ -49,10 +49,17 @@ xworks.dat: xworks.dct dctprep
 
 # idi_test.f is an ADAM task
 
-TESTS = gnsrun_idi
+TESTS = gnsrun_idi idi_test
 check_PROGRAMS = gnsrun_idi
+check_MONOLITHS = idi_test
 
 gnsrun_idi_SOURCES = gnsrun_idi.f
 # LDADD is the expansion of ref_link, with -lref replaced by libref.la
 gnsrun_idi_LDADD = libidi.la `gwm_link` `gns_link` `cnf_link` $(X_LIBS) $(X_EXTRA_LIBS) $(X_PRE_LIBS) -lX11
+
+# idi_test requires ndf and lpthread?
+
+idi_test_TASKS =
+idi_test_SOURCES = idi_test.f
+idi_test_LDADD = $(LDADD) `$(srcdir)/idi_link_adam` `ndf_link_adam`
 
