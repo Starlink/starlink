@@ -488,9 +488,9 @@ TCL_SCRIPTS = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
  CCDTaskQuery.tcl CCDGeomSetPercent.tcl CCDExit.tcl \
  CCDFileMonitorMain.tcl CCDDoPresent.tcl \
  CCDTkWidget.tcl CCDCcdWidget.tcl CCDNameTail.tcl CCDPathOf.tcl CCDCmdOf.tcl \
- Control.tcl Gwmview.tcl Marknumcontrol.tcl Ndfalign.tcl Ndfchoose.tcl \
- Ndfview.tcl Percentilecontrol.tcl Stylecontrol.tcl Vectordialog.tcl \
- Zoomcontrol.tcl \
+ Ccdtop.tcl Control.tcl Gwmview.tcl Marknumcontrol.tcl Ndfalign.tcl \
+ Ndfchoose.tcl Ndfview.tcl Percentilecontrol.tcl Stylecontrol.tcl \
+ Vectordialog.tcl Waiter.tcl Zoomcontrol.tcl \
  taskrun.tcl tasksetup.tcl ccdalign.tcl pairndf.tcl idicurs.tcl
 
 
@@ -744,7 +744,8 @@ PLATFORM_F =
 C_ROUTINES = $(CSUBSRC) $(WISH_SOURCE)
 
 CSUBSRC = ccd1_exec.c slv.c find_file.c \
- tcltalk.c ndf.c ndfdrawpair.c ndfcentroffset.c ccdlog.c ccdAppInit.c \
+ tcltalk.c tclbgcmd.c ndf.c ndfdrawpair.c ndfcentroffset.c ccdputs.c \
+ intersect.c ccdAppInit.c \
  ccd1_tcurs.c ccd1_algn.c ccd1_pndf.c
 
 #  List of applications/tasks in monoliths.
@@ -1017,7 +1018,7 @@ $(TCL_SUPPORT_ITK):
 $(TCL_SUPPORT_IWIDGETS):
 	cp $(STAR_LIB)/iwidgets$(IWIDGETS_VERS)/scripts/$@ $@
 $(TCL_INDEX): $(TCL_SCRIPTS) $(TCL_SUPPORT_NOEXE) $(WISH)
-	TCLLIBPATH=$(STAR_LIB); export TCLLIBPATH; \
+	CCDPACK_DIR=$(STAR_LIB); export CCDPACK_DIR; \
         echo 'auto_mkindex . *.tcl *.tk *.itcl *.itk; exit' | $(WISH)
 
 
@@ -2219,12 +2220,13 @@ ccd1_algn.o: ccdtcl.h
 ccd1_pndf.o: ccdtcl.h grp_par.h
 ccd1_tcurs.o: ccdtcl.h
 ccdAppInit.o:
-ccdlog.o:
+ccdputs.o: ccdtcl.h
 ndf.o: tclndf.h
 ndfdrawpair.o: tclndf.h
 ndfcentroffset.o: tclndf.h
 slv.o: slv.h
 tcltalk.o: ccdtcl.h
+tclbgcmd.o:
 
 aif_antmp.o: DAT_PAR SAE_PAR
 aif_asfio.o: PAR_ERR SAE_PAR
@@ -2519,7 +2521,7 @@ ccg1_fch1.o: DAT_PAR PRM_PAR SAE_PAR
 ccg1_ffrj.o: PRM_PAR SAE_PAR
 ccg1_flw.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_fpw.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
-ccg1_frac.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
+ccg1_frac.o: NUM_DEC_B NUM_DEC_CVT NUM_DEC_D NUM_DEC_I NUM_DEC_R NUM_DEC_UB NUM_DEC_UW NUM_DEC_W NUM_DEF_B NUM_DEF_CVT NUM_DEF_D NUM_DEF_I NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PRM_PAR SAE_PAR
 ccg1_ghst.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_gpl.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 ccg1_gvar.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
