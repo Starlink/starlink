@@ -406,6 +406,9 @@
         CALL QUALITY_SETAXSEL(NDIM, DIMS, NAXRANGES, PIXRNG, %VAL(CPTR),
      :                                                    NMOD, STATUS )
 
+*    End of axis selection option
+      END IF
+
 *    Use a spatial file (ARD file) to select pixels wanted?
       IF ( FSEL ) THEN
 
@@ -417,6 +420,7 @@
         CALL QUALITY_SETFSEL( ILOC, NDIM, DIMS, AXLO, AXHI,
      :                                 NMOD, CPTR, STATUS )
 
+*    End of ARD file selection option
       END IF
 
 *    No axis selection - assume all wanted unless MAGIC mode
