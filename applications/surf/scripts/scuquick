@@ -1,0 +1,253 @@
+#!/bin/perl -s
+
+# See end for Starlink header (Since PROHLP wants * and not # comments)
+
+use lib "/jcmt_sw/perl/modules/ndf/blib/lib";
+use lib "/jcmt_sw/perl/modules/ndf/blib/arch";
+use NDF;
+
+my ($par, $pkg);
+
+
+# The location of stats and linplot
+$root = '/star/bin/kappa';
+$lroot = '/jcmt_sw/sun4_Solaris/bin';
+
+
+########################################################################
+# Read the command line parameters
+
+@ndfs = ();
+%params = ();
+
+foreach $arg (@ARGV) {
+
+  $arg =~ /=/ && do {
+    ($param, $value) = split(/=/, $arg);
+    $param = uc($param);
+    $params{$param} = $value;
+  } || push(@ndfs, $arg);
+
+}
+
+
+# Set the GLOBAL status
+$status = &NDF::SAI__OK;
+
+########################################################################
+# Check for file
+
+if ($#ndfs > -1) {
+
+# If there are more than one possible files given, loop through and
+# take the first one that exists.
+
+  undef $usethis;
+  foreach $ndf (@ndfs) {
+    ($ndf, $junk) = split('\.',$ndf) if $ndf =~ /\.sdf$/;
+
+    if ($ndf =~ /./) {
+      (-e "$ndf.sdf" || -e $ENV{'DATADIR'}."/$ndf.sdf") &&
+	do {      
+	  print "NDF is $ndf\n";
+	  $usethis = $ndf;
+	  last;
+	};
+    }
+  }
+
+  undef $ndf;
+  if (defined $usethis) {
+    $ndf = $usethis;
+  } else {
+    print "No files were found named ",join(" ",@ndfs),"\n";
+  }
+}
+
+########################################################################
+# reduce_switch
+
+$parin = "IN=$ndf" if ($ndf =~ /./);
+
+undef $modpars;
+foreach $par ('USE_CALIBRATOR','SPIKE_LEVEL','OUT') {
+  $modpars = $modpars." $par=".$params{$par}
+  if ($params{$par} =~ /./);
+}
+
+$exstat = system("reduce_switch $parin $modpars");
+
+die "REDUCE_SWITCH finished abnormally...stopping (status = $exstat)\n"
+  if ($exstat != 0);
+
+
+#Get OUT from GLOBAL.sdf
+
+$status = &NDF::SAI__OK;
+($in) = par_get("data_array","GLOBAL", \$status);
+
+########################################################################
+#Modify
+
+if ($modify) {
+
+  undef $modpars;
+
+  # If NEW_FLAT parameter is set then I can pass that in
+  if ($params{'NEW_FLAT'} =~ /./) {
+    $modpars = $params{'NEW_FLAT'};
+  }
+
+  $exstat = system("change_flat $in $modpars");
+  die "CHANGE_FLAT finished abnormally...stopping (status = $exstat)\n"
+    if ($exstat != 0);
+} 
+
+########################################################################
+# Flatfield
+
+(-e "$in.sdf") || die "REDUCE_SWITCH finished abnormally...stopping\n";
+
+$outflat = $in."_flat";
+
+system("flatfield $in $outflat");
+die "FLATFIELD finished abnormally...stopping (status = $exstat)\n"
+  if ($exstat != 0);
+
+$outext = $in."_ext";
+
+########################################################################
+# Extinction
+
+@parlist = ('SUB_INSTRUMENT','FIRST_TAU','FIRST_LST', 'SECOND_TAU',
+	   'SECOND_LST');
+undef $modpars;
+foreach $par (@parlist) {
+  $modpars = $modpars." $par=".$params{$par} 
+  if ($params{$par} =~ /./);
+}
+
+$exstat = system("extinction IN=$outflat $modpars OUT=$outext");
+die "EXTINCTION finished abnormally...stopping (status = $exstat)\n"
+  if ($exstat != 0);
+print "Extinction corrected data has been written to file $outext.sdf\n";
+
+########################################################################
+# REMSKY
+
+if ($remsky) {
+
+  $outsky = $in."_sky";
+
+@parlist = ('BOLOMETERS','CLIP','MODE', 'NSIGMA');
+
+undef $modpars;
+foreach $par (@parlist) {
+  $modpars = $modpars." $par=".$params{$par} 
+  if ($params{$par} =~ /./);
+}
+
+$exstat = system("remsky IN=$outext $modpars OUT=$outsky");
+die "REMSKY finished abnormally...stopping (status = $exstat)\n"
+  if ($exstat != 0);
+print "Sky corrected data has been written to file $outsky.sdf\n";
+
+$outext = $outsky;
+}
+
+########################################################################
+# Find out what mode of observation is being used
+
+ndf_begin;
+ndf_find(&NDF::DAT__ROOT, $outext, $indf, $status);
+ndf_xloc($indf, 'FITS', 'READ', $xloc, $status);
+@fits = ();
+dat_get1c($xloc, 200, @fits, $nfits, $status);
+dat_annul($xloc, $status);
+ndf_annul($indf, $status);
+ndf_end($status);
+
+$mode = fits_get_item(@fits, "MODE");
+
+
+########################################################################
+# Now, if this is a photometry observation I need to run
+# SCUPHOT as well.
+
+if ($mode eq 'PHOTOM') {
+
+  @parlist = ('ANALYSIS');
+  undef $modpars;
+  foreach $par (@parlist) {
+    $modpars = $modpars." $par=".$params{$par} 
+    if ($params{$par} =~ /./);
+  }
+
+  $outphot = $in."_phot";
+  $exstat = system("scuphot IN=$outext OUT=$outphot FILE=$outphot.dat $modpars");
+  die "SCUPHOT finished abnormally...stopping (status = $exstat)\n"
+    if ($exstat != 0);
+
+  ($file) = par_get("file", "scuphot", \$status);
+
+  (-e $file) || die "SCUPHOT did not write a log file\n";
+  print "Processed photometry data written to $outphot.sdf and $file\n";
+
+} elsif (($mode eq 'MAP' || $mode eq 'POINTING') && $rebin){
+
+########################################################################
+  # I can give the option of rebinning
+  @parlist = ('REBIN_METHOD','IN','SELECT_INTS','INTEGRATIONS','USE_INTS',
+	     'WEIGHT','SHIFT_DX','SHIFT_DY','OUT_OBJECT','OUT_COORDS',
+	     'LAT_OUT','LONG_OUT','PIXSIZE_OUT');
+  undef $modpars;
+  foreach $par (@parlist) {
+    $modpars = $modpars." $par=".$params{$par} 
+    if ($params{$par} =~ /./);
+  }
+
+  $outreb = $in."_reb";
+  $exstat = system("rebin REF=$outext $modpars OUT=$outreb");
+  die "REBIN finished abnormally...stopping (status = $exstat)\n"
+    if ($exstat != 0);
+}
+
+########################################################################
+__END__
+
+
+*+
+*  Name:
+*    scuquick
+
+*  Purpose:
+*    To automate the basic SCUBA data reduction
+
+*  Type of module:
+*    Perl 5 script
+
+*  Description:
+*    This script attempts to automate the first 3 steps of scuba data
+*    reduction.
+
+*  Command line switches
+*    -modify
+*        Invoke the MODIFY task after REDUCE_SWITCH
+*    -remsky
+*        Invoke the REMSKY task after EXTINCTION
+*    -rebin
+*        Invoke the REBIN package after EXTINCTION IF the data is MAP or POINTING
+
+*  Arguments:
+*    NDF (Given)
+*      The required dataset
+*    ADAM parameters = Any
+*      Any parameters accepted by the individual routines
+
+*  Example:
+
+*  Prior requirements:
+*    - The NDF perl module must exist
+*-
+
+
