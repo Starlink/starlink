@@ -49,27 +49,16 @@
             frame [ childsite ].control
          }
          itk_component add percentile {
-            menubutton $itk_component(control).percentile \
-               -width 10 \
-               -relief raised \
-               -menu $itk_component(control).percentile.menu
+            iwidgets::optionmenu $itk_component(control).percentile \
+               -width 160 \
+               -command [ code $this setvalue ]
          }
-         pack $itk_component(percentile)
-         set menubutton $itk_component(percentile)
-         itk_component add menu {
-            menu $menubutton.menu
-         }
-         set menu $itk_component(menu)
-
+         set omenu $itk_component(percentile)
+         pack $omenu
          pack $itk_component(control)
          eval itk_initialize $args
       }
 
-
-
-########################################################################
-#  Public methods.
-########################################################################
 
 
 ########################################################################
@@ -96,20 +85,14 @@
             }
 
 #  If necessary add a menu item to the menu to invoke the custom dialog box.
-            if { [ catch { $menu index "custom" } ] } {
-               $menu add command \
-                  -label "custom" \
-                  -command [ code "\
-                           $itk_component(percentiledialog) setvec \
-                                                  \[ $this cget -value \]; \
-                           $this configure -value \
-                            \[ $itk_component(percentiledialog) activate \]" ]
+            if { [ catch { $omenu index "custom" } ] } {
+               addchoice "custom"
             }
 
 #  If we are being asked to withdraw the option, simply remove it from the
 #  menu.
          } else {
-            catch { $menu delete "custom" }
+            catch { $omenu delete "custom" }
          }
       }
 
@@ -118,7 +101,7 @@
       public variable choices { { 1 99 } { 5 95 } { 10 90 } } {
 #-----------------------------------------------------------------------
 #  Clear out the current contents of the menu.
-         $menu delete 0 end
+         $omenu delete 0 end
 
 #  Add the items as selected.
          foreach ch $choices {
@@ -126,9 +109,7 @@
             set hi [ lindex $ch 1 ]
             if { $lo < 0 } { set lo 0 }
             if { $hi > 100 } { set hi 100 }
-            $menu add command \
-                -label [ present $lo $hi ] \
-                -command [ code "$this configure -value \[ list $lo $hi \]" ]
+            addchoice [ list2text $lo $hi ]
          }
 
 #  Reinstate the custom choice if required.
@@ -143,9 +124,9 @@
       public variable state { normal } {
 #-----------------------------------------------------------------------
          if { $state == "normal" } {
-            $menubutton configure -state normal
+            $omenu configure -state normal
          } elseif { $state == "disabled" } {
-            $menubutton configure -state disabled
+            $omenu configure -state disabled
          }
       }
  
@@ -160,16 +141,68 @@
             set hi 100
             configure -value [ list $lo $hi ] 
          }
-         $menubutton configure -text [ present $lo $hi ]
+         set text [ list2text $lo $hi ]
+         if { [ catch { $omenu select $text } ] } {
+            addchoice $text
+            $omenu select $text
+         }
       }
+
+
+########################################################################
+#  Private methods.
+########################################################################
+
+#-----------------------------------------------------------------------
+      private method addchoice { text } {
+#-----------------------------------------------------------------------
+         set val [ text2list $text ]
+         if { $val == "custom" } {
+            $omenu insert end $text
+            return
+         } else {
+            set lo [ lindex $val 0 ]
+            set hi [ lindex $val 1 ]
+            for { set i 0 } { $i < [ $omenu index end ] } { incr i } {
+               set ival [ text2list [ $omenu get $i ] ]
+               if { $ival != "custom" } {
+                  set ilo [ lindex $ival 0 ]
+                  set ihi [ lindex $ival 1 ]
+                  if { $hi > $ihi || $hi == $ihi && $lo < $ilo } {
+                     $omenu insert [ expr $i ] $text
+                     return
+                  }
+               }
+            }
+            if { [ $omenu get end ] == "custom" } {
+               $omenu insert "custom" $text
+            } else {
+               $omenu insert end $text
+            }
+         }
+      }
+
+
+#-----------------------------------------------------------------------
+      private method setvalue { } {
+#-----------------------------------------------------------------------
+         set val [ text2list [ $omenu get ] ]
+         if { [ llength $val ] == 2 } {
+            configure -value $val
+         } else {
+            $itk_component(percentiledialog) setvec $value
+            configure -value [ $itk_component(percentiledialog) activate ]
+         }
+      }
+   
+
 
 
 ########################################################################
 #  Private variables.
 ########################################################################
 
-      private variable menu              ;# Path name of the menu widget
-      private variable menubutton        ;# Path name of the menubutton widget
+      private variable omenu             ;# Path name of the optionmenu widget
 
 
 ########################################################################
@@ -177,7 +210,7 @@
 ########################################################################
 
 #-----------------------------------------------------------------------
-      private proc present { lo hi } {
+      private proc list2text { lo hi } {
 #-----------------------------------------------------------------------
          if { abs( $lo + $hi - 100 ) < 1 } {
             return "$hi%"
@@ -185,7 +218,20 @@
             return "$lo% - $hi% "
          }
       }
-  }
+
+
+#-----------------------------------------------------------------------
+      private proc text2list { text } {
+#-----------------------------------------------------------------------
+         if { [ regexp {^ *([0-9.]*)% *- *([0-9.]*)% *$} $text dummy lo hi ] } {
+            return [ list $lo $hi ]
+         } elseif { [ regexp {^ *([0-9.]*)% *$} $text dummy hi ] } {
+            return [ list [ expr 100 - $hi ] $hi ]
+         } else {
+            return "custom"
+         }
+      }
+   }
 
 
 ########################################################################
