@@ -8,7 +8,7 @@
 \newcommand{\stardocnumber}    {27.5}
 \newcommand{\stardocauthors}   {P N Daly}
 \newcommand{\stardocaddress}   {pnd$@$jach.hawaii.edu}
-\newcommand{\stardocdate}      {8 April 1996}
+\newcommand{\stardocdate}      {17 July 1996}
 \newcommand{\stardoctitle}     {Portable--CGS4DR \\
                                 CGS4 Data Reduction}
 \newcommand{\stardocversion}   {Version V1.3-0}
@@ -328,7 +328,7 @@ functionality of each release is:
  \begin{enumerate}
   \item Supports all features in V1.1-0.
   \item Bug fixes for pause\_on\_error, ukirtfig and NBS.
-  \item Supports {\sc tcladam} {\sc gui}.
+  \item Supports {\sc startcl} {\sc gui}.
  \end{enumerate}
 \item[] {\bf V1.3--0}
  \begin{enumerate}
@@ -2633,7 +2633,7 @@ was clear that tcl/tk was taking the astronomical world by storm (as, for
 example, had xmosaic a year or so earlier). Starlink had implemented some
 extensions to tcl to allow the system to communicate with {\sc adam} tasks.
 Later work done at ROE provided tcl extensions to communicate with NBS.
-Together these systems formed what is now known as {\sc tcladam} (Terrett, 1995)
+Together these systems formed what is now known as {\sc startcl} (Terrett, 1995)
 and it is this product that is the basis for the Portable-CGS4DR graphical
 user interface. 
 
@@ -2649,9 +2649,9 @@ interact with the system. Advanced {\sc gui}s have {\em keyboard traveral} so
 that a keyboard can be used for input when a mouse is not available. 
 
 \section{The Portable-CGS4DR Style}
-The Portable-CGS4DR {\sc tcladam} interface provides a window to each major
+The Portable-CGS4DR {\sc startcl} interface provides a window to each major
 task. Each window consists of a title bar, a menu bar, a text pane and a
-wigdet tree in some order. In addtion, {\sc tcladam} also provides a {\sc gwm} widget
+wigdet tree in some order. In addtion, {\sc startcl} also provides a {\sc gwm} widget
 which includes the xdisplay plotting surface. Note that the style described
 below may change as users feedback their preferences. 
 
@@ -2717,6 +2717,13 @@ and off, an action to clear the text widget and an action to communicate with th
 The text pane is a large area which the tasks use to output their
 messages of any type. It is not writeable by the user but may be
 cleared from the {\sf Options} menu using {\sf Clear Text Widget}.
+
+\subsection{Changing X Defaults}
+Portable-CGS4DR now features customizable X defaults located in the file \$CGS4DR\_ROOT/cgs4dr.xopts.
+This is a simple {\sc ascii} text file and features can be removed by preceding any line with the
+comment character (\#). New lines may be added using the same style contained within the file.
+
+Upon startup, a default file is copied to \$CGS4DR\_ROOT/cgs4dr.xopts if none exists.
 
 \subsection{The Widget Tree}
 The widget tree is specific to each task. They are dealt with in separate chapters.
@@ -2785,7 +2792,7 @@ for each of the four primary tasks. Initially, the backgrounds to these widgets 
 (meaning stop) and as the tasks are loaded and become available they turn to green (for go).
 Once all four tasks are `go' the window disappears to be replaced by the 
 3 full-size windows (cred4, p4\_disp and qman) and two iconic windows
-(red4 and p4 control). At this point, Portable-CGS4DR using {\sc tcladam} is
+(red4 and p4 control). At this point, Portable-CGS4DR using {\sc startcl} is
 ready.
 
 There is also a `setup' facility for defining evironmental variables without
@@ -2843,14 +2850,14 @@ When the night's observing is finished, you should remember to kill ADAMnet with
 
   The {\sc adam} extensions to tcl are not readable. 
 
-  The {\sc tcladam} software specifies a series of extensions to tcl that allow
+  The {\sc startcl} software specifies a series of extensions to tcl that allow
   communications with the {\sc adam} messaging system and, hence, the tasks. These
   extensions are held in some directory in a file called adamtask.tcl (and others).
   The {\sc gui} startup file {\sc \$cgs4dr\_root}/tcl/cgs4dr\_tcl has a line thus:
   \begin{verbatim}
     set tclAdamLib /star/lib/tk/adam
   \end{verbatim}
-  This needs to reflect the location of your site's copy of the {\sc tcladam} software.
+  This needs to reflect the location of your site's copy of the {\sc startcl} software.
 
 \item[{\bf \S}] {\sf cgs4dr\_tcl aborting, failed creating task rendezvous file: File exists.}
 
@@ -2913,7 +2920,13 @@ In Portable-CGS4DR the software tasks have been de-coupled which allows each tas
 run individually. Clearly this functionality is useful for debugging. Some tasks, however,
 are generic so that they can be used outside of Portable-CGS4DR. I am thinking particularly
 of the plotting task which can display {\sc dst} or {\sc ndf} data. If you wish to run the
-tasks separately, set up the symbolic links thus:
+tasks separately, some symbolic links should already be setup so you can do:
+
+\begin{quote}
+  \% \ \$(CGS4DR\_ROOT)/tcl/p4\_tcl \ \& \ \\
+\end{quote}
+
+If such links are absent, you can create your own:
 
 \begin{quote}
   \% \ ln -s \ \$(CGS4DR\_ROOT)/tcl/cgs4dr\_tcl \ p4\_tcl \\
@@ -2922,10 +2935,10 @@ tasks separately, set up the symbolic links thus:
   \% \ ln -s \ \$(CGS4DR\_ROOT)/tcl/cgs4dr\_tcl \ c4\_tcl 
 \end{quote}
 
-One can then invoke the plotting task, like so:
+And then run the (plotting) task, like so:
 
 \begin{quote}
-  \% \ p4\_tcl \ \&
+  \% \ ./p4\_tcl \ \&
 \end{quote}
 
 \markboth{The GUI Interfaces}{\stardocname}
@@ -2978,7 +2991,7 @@ are deleted.
 The {\sf Interrupt} action button uses widget grabs to seize control of the interface at
 any particular instant. It would normally be used in the situation where a user
 has inadvertently started writing a large number of entries to the queue. By clicking
-on the {\sf Interrupt} button, the normal flow of {\sc tcladam} messages to the
+on the {\sf Interrupt} button, the normal flow of {\sc startcl} messages to the
 qman task is interrupted thus preventing database overflowing and returning control to
 the user.
 
@@ -3242,7 +3255,7 @@ No, although this is being investigated. You can run the command line version mo
 once so long as it is loaded from a separate xterm.
 
 \section{May I Run the Software in Batch?}
-No. Unix does not recognize `batch' mode. The {\sc tcladam} interface, by default,
+No. Unix does not recognize `batch' mode. The {\sc startcl} interface, by default,
 runs as a background job but the system is inherently interactive.
 
 \section{Do I Still Need to Run the Kill Script?}
@@ -3272,10 +3285,15 @@ This is done on a task-by-task basis via the {\sf Options}
 menu. Click on the item {\sf Send Task an Action} and input the action name `status'
 into the data entry field. Then click on {\sf OK}.
 
-\section{How Do I Read Old Index Files from VMS?}
-Unfortunately, you can't. Under VMS the index file was maintained as an indexed sequential
+\section{How Do I Read Old Index Files?}
+If you mean old index files generated under VMS, you can't. Under VMS the index file was maintained as an indexed sequential
 access method (ISAM) file. These files were DEC Fortran compiler extensions and, as such,
-were not portable between systems. 
+were not portable between systems.
+
+There is a similar problem under Unix: if you write an index file under, say, Solaris (as you do at UKIRT) then that file will 
+{\em not} be readable under Digital Unix and vice-versa. You can re-create the index file (from the reduced observations)
+by entering a series of `END oyymmdd\_nnnn' commands into the queue using the `End Range' dialogue box in the Queue
+Manager options menu.
 
 \section{How Do I List the Available Masks and Colour Tables?}
 Under Portable-CGS4DR both masks and colour tables are held in the same sub-directory.
