@@ -130,6 +130,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.14  1997/05/22 21:21:01  timj
+*     Allow for null response to file open request.
+*
 *     Revision 1.13  1997/05/22 03:05:54  timj
 *     Allow all bolometers to be processed - not just the targeted ones.
 *
@@ -187,6 +190,7 @@ c
       INCLUDE 'NDF_PAR'                ! for NDF__xxxx constants
       INCLUDE 'PRM_PAR'                ! for VAL__xxxx constants
       INCLUDE 'REDS_SYS'               ! REDS constants
+      INCLUDE 'PAR_ERR'                ! PAR__ constants
 
 *    Status :
       INTEGER STATUS
@@ -418,6 +422,7 @@ c
       INTEGER          TEMP_PTR        ! temporary array pointer
       INTEGER          UBND (2)        ! pixel indices of top right corner
                                        ! of output image
+      LOGICAL          USEFILE         ! Am I writing the text file
       CHARACTER*15     UTDATE          ! date of input observation
       CHARACTER*15     UTSTART         ! UT of start of input observation
       REAL             WAVELENGTH      ! the wavelength of the map (microns)
@@ -432,6 +437,8 @@ c
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
+
+      USEFILE = .TRUE.
 
 *     Set the MSG output level (for use with MSG_OUTIF)
       CALL MSG_IFGET('MSG_FILTER', STATUS)
@@ -1155,7 +1162,7 @@ c
 
 *       Open a file and write header if this is first time through
 
-         IF (COUNT .EQ. 1) THEN
+         IF (USEFILE .AND. COUNT .EQ. 1) THEN
 
             CALL REDS_WRITE_PHOTOM_HEADER(ODF_NAME, UTDATE, UTSTART, 
      :           ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, 
@@ -1165,16 +1172,23 @@ c
      :           PHOT_BB, SCUBA__MAX_INT,
      :           N_INTEGRATIONS, FD, STATUS)
 
+            IF (STATUS .EQ. PAR__NULL) THEN
+               CALL ERR_ANNUL(STATUS)
+               USEFILE = .FALSE.
+            END IF
+
          END IF
 
 *     write the results out to an ASCII file
 
-         CALL REDS_WRITE_PHOTOM (FD, SCUBA__MAX_BEAM,   
-     :        N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, SCUBA__MAX_INT,
-     :        N_INTEGRATIONS,
-     :        PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
-     :        MEAS_1_D, MEAS_1_V, MEAS_1_X, MEAS_1_Y, MEAS_1_Q,
-     :        MEAS_2_D, MEAS_2_V, MEAS_2_Q, STATUS)
+         IF (USEFILE) THEN
+            CALL REDS_WRITE_PHOTOM (FD, SCUBA__MAX_BEAM,   
+     :           N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, SCUBA__MAX_INT,
+     :           N_INTEGRATIONS,
+     :           PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
+     :           MEAS_1_D, MEAS_1_V, MEAS_1_X, MEAS_1_Y, MEAS_1_Q,
+     :           MEAS_2_D, MEAS_2_V, MEAS_2_Q, STATUS)
+         END IF
 
       END DO
 
@@ -1183,7 +1197,7 @@ c
 
 *  close the file
 
-      CALL FIO_CLOSE (FD, STATUS)
+      IF (USEFILE) CALL FIO_CLOSE (FD, STATUS)
 
 
 *     free memory
