@@ -1,5 +1,152 @@
 <!DOCTYPE componentset SYSTEM "componentinfo.dtd">
 <componentset>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="daophot">
+  <version>1.3-2</version>
+  <path>applications/daophot</path>
+  <description>Stellar Photometry Package</description>
+  <abstract>
+    <p>DAOPHOT is a stellar photometry package designed by Peter Stetson
+    at DAO to deal with crowded fields. The package performs various
+    tasks including finding objects, aperture photometry, obtaining the
+    point-spread function, and profile-fitting photometry. 
+    Profile fitting in crowded regions is performed iteratively,
+    which improves the accuracy of the photometry.</p>
+  </abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>mers</build><build>subpar</build><build>ndf</build><build>psx</build><build>chr</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person><name>Peter Stetson</name><role>Original author</role></person>
+    <person><name>Nicholas Eaton</name></person>
+    <person><name>Grant Privett</name></person>
+    <person><name>Mark Taylor</name></person>
+  </developers>
+  <!-- <documentation> sun42</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="extractor">
+  <version>2.3</version>
+  <path>applications/extractor</path>
+  <description>EXTRACTOR - An Astronomical Source Detection Program</description>
+  <abstract><p>
+EXTRACTOR will detect sources in an astronomical image and build a catalogue
+listing them. It is based on the popular SExtractor program, has very
+flexible configuration facilities and can handle images and catalogues in a
+variety of formats.
+</p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>ast</build><build>ndf</build><build>sae</build><link>ndf</link>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun226</documentation>
+  <bugreports>extractor@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="generic">
+  <version>1.1-2</version>
+  <path>applications/generic</path>
+  <description>A Utility for Compiling Generic Fortran Subroutines</description>
+  <abstract><p>GENERIC is a utility which preprocesses a generic
+  Fortran subroutine into its different types and concatenates these
+  routines into a file.  The file can then be compiled with the
+  Fortran compiler to produce an object module.</p></abstract>
+  <dependencies >
+    <build>prm</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>S M Beard</name>
+    </person>
+    <person>
+      <name>P M Allan</name>
+    </person>
+  </developers>
+  <documentation> sun7</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="htx">
+  <version>1.2-10</version>
+  <path>applications/htx</path>
+  <description>Hypertext Cross-reference Utilities</description>
+  <abstract>
+  <p>This document describes a set of ``Hypertext Cross-Reference
+  Utilities'' (HTX) which are designed to help maintain large
+  documentation sets whose constituent documents are written using the
+  Hypertext Markup Language (HTML).
+  </p>
+  <p>The central part of HTX is a hypertext linker, hlink. This allows
+  hyper-links (or cross-references) to be established between related
+  documents in such a way that it is easy to maintain their integrity as
+  individual documents are updated. Information produced by this linking
+  process is also used by other HTX utilities to provide document search
+  facilities and the ability to randomly access any part of a documentation
+  set. This latter capability forms a basis for constructing hypertext
+  help systems for use by other software.
+  </p>
+  <p>The expected readership of this document includes those who read hypertext
+  documentation, those who write it, and those who maintain it, especially
+  those who write and maintain Starlink documentation. Software developers
+  may also be interested in the possibilities for hypertext help that
+  HTX provides.
+  </p>
+  </abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+  </developers>
+  -->
+  <!-- <documentation> sun188</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ifd">
+  <version>1.2-8</version>
+  <path>applications/ifd</path>
+  <description>Interface Definition Files</description>
+  <abstract>
+    <p>Interface Definition Files (IFDs) provide a generic method of 
+    defining the interface between Starlink (ADAM) applications and
+    various software environments. Software is described which enables
+    developers to create IFDs and use them to create files required
+    by the Starlink or IRAF environments.</p>
+  </abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan Chipperfield</name>
+    </person>
+  </developers>
+  <!-- <documentation> ssn68</documentation> -->
+  <bugreports>ussc@starlink.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
 
 <component id="messgen">
   <version>1.2</version>
@@ -32,6 +179,83 @@
       <email>norman@astro.gla.ac.uk</email>
     </person>
   </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="pisa">
+  <version>2.4-5</version>
+  <path>applications/pisa</path>
+  <description>PISA - Position Intensity and Shape Analysis</description>
+  <abstract><p>
+      
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>agi</build><build>cat</build><build>chr</build><build>fio</build><build>ndf</build><build>par</build><build>pda</build><build>prm</build><build>sae</build>
+  </dependencies>
+  <developers>
+    <person>
+      <uname>pwd</uname>
+      <name>Peter W. Draper</name>
+      <email>p.w.draper@durham.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun109</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ref">
+  <version>2.4-5</version>
+  <path>applications/rv</path>
+  <description>Radial Components of Observer's Velocity</description>
+  <abstract><p>The RV program produces a report listing the
+  components, in a given direction, of the observer's velocity on a
+  given date.  This allows an observed radial velocity to be referred
+  to an appropriate standard of rest -- typically either the Sun or an
+  LSR.
+    </p></abstract>
+  <dependencies >
+    <build>sla</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Patrick Wallace</name>
+      <uname>ptw</uname>
+    </person>
+    <person>
+      <name>Chris Clayton</name>
+      <uname>cac</uname>
+    </person>
+  </developers>
+  <documentation> sun78</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="sgmlkit">
+  <version>0.7-13</version>
+  <path>applications/sgmlkit</path>
+  <description>Starlink documentation SGML kit</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
@@ -72,7 +296,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="star2html">
-  <version>1.4-7</version>
+  <version>1.4-6</version>
   <path>applications/star2html</path>
   <description>Convert Starlink documents to hypertext</description>
   <abstract><p>Star2HTML lets you write (or convert) a Starlink document
@@ -93,12 +317,63 @@
     <person>
       <name>Peter Draper</name>
       <uname>pwd</uname>
-      <email>p.w.draper@durham.ac.uk</email>
+      <email>P.W.Draper@durham.ac.uk</email>
     </person>
   </developers>
   <documentation> sun199</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Starlink customised wrapper around latex2html</p></notes>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="startcl">
+  <version>1.5-5</version>
+  <path>applications/startcl</path>
+  <description>Starlink extensions to Tcl &amp; Tk</description>
+  <abstract>
+    <p>The STARTCL package is a set of extensions to the Tcl/Tk
+    language to enable Tcl and Tk applications to display Starlink
+    graphics inside widgets embedded in the application, send and
+    receive ADAM messages and access ADAM noticeboards.
+    This document will be of interest to programmers writing
+    graphics user interfaces for Starlink applications in Tcl/Tk.</p>
+  </abstract>
+  <dependencies >
+    <build>starx</build><build>pcs</build><build>ems</build><build>gwm</build><build>mers</build><build>tclsys</build><build>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name>Dave Terrett</name>
+      <uname>dlt</uname>
+      <email>dlt@star.rl.ac.uk</email>
+    </person>
+  </developers>
+  -->
+  <!-- <documentation> sun186 sun219</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="starx">
+  <version>1.2-1</version>
+  <path>applications/starx</path>
+  <description>X library linker helper</description>
+  <abstract><p>This application provides a simple routine for obtaining the link options suitable for linking against an X application. It is provided for backwards compatibility with the old Starlink linking scheme. New applications should use the configure system directly.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Martin J Bly</name>
+      <uname>mjb</uname>
+    </person>
+  </developers>
+  <documentation> ssn21</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
 </component>
 
 <component id="starconf" buildsupport="yes">
@@ -134,6 +409,37 @@
     </person>
   </developers>
   <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="agi">
+  <version>2.1-1</version>
+  <path>libraries/agi</path>
+  <description>Applications Graphics Interface Library</description>
+  <abstract><p>AGI and AGP interface.</p></abstract>
+  <dependencies >
+    <build>cnf</build><build>psx</build><build>gks</build><build>sae</build><build>hds</build><build>par</build><link>ref</link><link>trn</link><link>sgs</link><link>pgp</link><link>idi</link><link>hds</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name>Nicholas Eaton</name>
+      <uname>ne</uname>
+    </person>
+    <person>
+      <name>Brian McIlwrath</name>
+      <uname>bkm</uname>
+    </person>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+
+  </developers>
+  -->
+  <!-- <documentation> sun48</documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -191,7 +497,7 @@
 </component>
 
 <component id="ast">
-  <version>3.3</version>
+  <version>3.3-1</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -221,6 +527,34 @@
   </developers>
   <documentation> sun210 sun211</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="cat">
+  <version>8.1</version>
+  <path>libraries/cat</path>
+  <description>CAT -- Catalogue and Table Manipulation Library</description>
+  <abstract><p>
+CAT is the Starlink Fortran subroutine library for manipulating 
+astronomical catalogues and similar tabular datasets.
+</p></abstract>
+  <dependencies >
+    <build>ast</build><build>sae</build><build>par</build><build>prm</build><link>cfitsio</link><link>par</link><link>err</link><link>sla</link><link>chr</link><link>ast</link><sourceset>messgen</sourceset>
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name></name>
+      <uname></uname>
+      <email></email>
+    </person>
+  </developers>
+  -->
+  <documentation> sun181</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>
+No longer under active control.
+</p></notes>
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
@@ -351,6 +685,64 @@
     </person>
   </developers>
   <documentation> sun143</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="gks">
+  <version>1.37-1</version>
+  <path>libraries/gks</path>
+  <description>The tarlink RAL/ICL GKS graphics package.</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    <build>cnf</build><link>gwm</link><link>ems</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name>Dave L Terrett</name>
+      <uname>dlt</uname>
+    </person>
+  </developers>
+  -->
+  <!-- <documentation> sun83</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="gns">
+  <version>1.1-4</version>
+  <path>libraries/gns</path>
+  <description>Graphics Workstation Name Service</description>
+  <abstract><p> Almost any program that does any graphics requires the
+  user to identify which graphics device is to be used. When the
+  graphics package used by the program is GKS (SUN/83)---and for the
+  majority of Starlink software it is, at least indirectly---graphics
+  devices are identified by two integers, a `workstation type' and a
+  `connection identifier'. (`Workstation' is GKS terminology for a
+  graphics device of any description and this is the sense in which it
+  is used throughout this note.) No one can be expected to remember
+  the workstation types of all the devices supported by Starlink
+  (nearly 50 at present) so a library has been provided that
+  translates `friendly' and easy to remember names into their GKS
+  equivalents.
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>psx</build><build>ems</build><build>chr</build><build>gks</build><build>gwm</build><link>psx</link><link>ems</link><link>chr</link><link>gks</link><link>gwm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Terrett</name>
+      <uname>dlt</uname>
+    </person>
+    <person>
+      <name>Nicholas Eaton</name>
+      <uname>ne</uname>
+    </person>
+  </developers>
+  <documentation> sun57</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -714,6 +1106,31 @@
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="img">
+  <version>1.3-1</version>
+  <path>libraries/img</path>
+  <description>IMG - Simple Image Data Access</description>
+  <abstract><p>
+IMG is a subroutine library for accessing astronomical image data and
+associated header information. It is designed to be easy to use and
+understand.
+</p></abstract>
+  <dependencies >
+    <build>ndf</build><build>sae</build><build>hds</build><build>par</build><build>cnf</build><build>prm</build><link>ndf</link><link>prm</link><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun160</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="mag">
   <version>1.1-4</version>
   <path>libraries/mag</path>
@@ -848,6 +1265,71 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <documentation> ssn20 sun33</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ndg">
+  <version>5.2-1</version>
+  <path>libraries/ndg</path>
+  <description>NDG - Routines for Accessing Groups of NDFs</description>
+  <abstract><p>NDG provides facilities for handling groups of NDFs.
+      Facilities are provided which allow an application to obtain a
+      group of NDFs using a single parameter prompt, and then allow the
+      application to obtain NDF identifiers for specific members of the group.
+      The syntax for specifying groups of NDFs is inherited from the GRP
+      library (see SUN/150).</p></abstract>
+  <dependencies >
+    <build>hds</build><build>grp</build><build>ndf</build><build>par</build><build>prm</build><build>psx</build><build>cnf</build><build>sae</build><link>grp</link><link>ndf</link><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun2</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="one">
+  <version>1.1-4</version>
+  <path>libraries/one</path>
+  <description>General purpose Starlink odds and ends functions</description>
+  <abstract><p> This library is a set of Fortran and C routines of a
+  general nature and usefulness, which are not suitable for inclusion
+  in other more focussed Starlink libraries.
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>ems</build><build>chr</build><build>cnf</build><link>ems</link><link>cnf</link><link>chr</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Roy Platon</name>
+      <uname>rtp</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+    </person>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+    </person>
+    <person>
+      <name>Keith Shortridge</name>
+      <uname>ks</uname>
+    </person>
+    <person>
+      <name>Dave Terrett</name>
+      <uname>dlt</uname>
+    </person>
+  </developers>
+  <documentation> sun234</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -1611,5 +2093,58 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>This version of libtool is unpatched -- just the standard
       version.</p></notes>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="cfitsio">
+  <version>2.4-90</version>
+  <path>thirdparty/heasarc/cfitsio</path>
+  <description>CFITSIO -- C and Fortran libraries for access to FITS files
+        </description>
+  <abstract><p>
+The CFITSIO package is a series of C functions that provide easy access
+to FITS files on disk.  It was written by William D. Pence of HEASARC
+(High Energy Astrophysics Science Archive Research Center) at the
+Goddard Space Flight Center, USA.  Starlink is grateful to William
+Pence for giving his permission for CFITSIO to be released on Starlink.
+</p></abstract>
+  <dependencies >
+    
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name></name>
+      <uname></uname>
+      <email></email>
+    </person>
+  </developers>
+  -->
+  <documentation> sun227</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="tclsys">
+  <version>8.2.3</version>
+  <path>thirdparty/tclsys/tcl</path>
+  <description>The Tcl system</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <!-- Tcl is maintained by Scriptics, but this part of the tree
+         is maintained by... -->
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
 </component>
 </componentset>
