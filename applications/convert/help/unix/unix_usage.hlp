@@ -1,0 +1,74 @@
+1 UNIX_differences
+
+Although the UNIX and VMS implementations of CONVERT are similar, there
+are differences, and these are described in the various subtopics
+below.
+
+2 Running_applications
+
+To start you must issue the usual CONVERT command, but note that
+it must be in lowercase.
+
+     convert
+
+All commands must be given in full and in lowercase.  ICL is not
+available and hence there is no ADAM monolith version of CONVERT.  One
+consequence is that ADAM parameters cannot be passed easily between
+applications using ICL variables.  Since commands are invoked from the
+shell some command syntax is interpreted as shell metacharacters.  These
+include parenthesis, bracket, quote, double quote and backslash.  A
+backslash is needed before each metacharacter for these characters
+to be taken literally.  Here are some examples: 
+
+     ndf2gasp image\(100:199,~100\)
+
+or equivalently
+
+     ndf2gasp image"(100:199,~100)"
+
+converts the section of an NDF to a GASP-format file; while
+
+     ascii2ndf picture.dat picture type=_BYTE \\
+
+converts a text file called picture.dat to an NDF called picture with
+data type "_BYTE", accepting the suggested defaults for other parameters;
+and
+
+     unf2ndf radiant.dat geminid shape=\[70,60\]
+
+copies the data array from the sequential unformatted file radiant.dat
+to the NDF called geminid.  The NDF is two-dimensional: 70 elements
+in x by 60 in y.
+
+When responding to prompts neither the <TAB> function for editing the
+default nor command-line recall is available.
+
+Parameter values are case insensitive except for graphics devices
+and filenames.  No file extension is assumed for text or unformatted
+sequential files.  (On VMS ".DAT" is assumed if no extension is given.)
+
+2 Help
+
+There is no help command.  You must use conhelp to obtain CONVERT
+help.  For example, you should enter
+
+     conhelp dst2ndf
+
+to obtain help on CONVERT's dst2ndf command.
+
+2 Missing_applications
+
+The following applications are not available on UNIX:
+
+   Application    Reason
+   -----------    ------
+
+   BDF2NDF        Interim library will not be ported to UNIX
+   NDF2BDF            "      "      "      "     "     "
+
+2 HDS_files
+
+Although HDS files are portable you are recommended to copy them to
+the host machine, and run KAPPA application native on them for
+significant efficiency gains. 
+
