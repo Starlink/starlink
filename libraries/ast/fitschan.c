@@ -492,8 +492,10 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        diagonal PCi_j term for non-celestial axes with associated CROTA 
 *        values.  
 *     12-JAN-2004 (DSB):
-*        - Initialise "tmap1" pointer to NULL in case of error in
-*        CelestialAxes (avoids a segvio happening in the case of an error).
+*        - CelestialAxes: Initialise "tmap1" pointer to NULL in case of error 
+*        (avoids a segvio happening in the case of an error).
+*        - AddVersion: Do not attempt to add a Frame into the FITS header
+*        if the mapping from grid to frame is not invertable.
 *class--
 */
 
@@ -1204,6 +1206,15 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
 
 /* Abort if the FrameSet could not be produced. */
    if( !fset ) return ret;
+
+/* Get the Mapping from base to current Frame and check its inverse is
+   defined. Return if not. */
+   mapping = astGetMapping( fset, AST__BASE, AST__CURRENT );
+   if( !astGetTranInverse( mapping ) ) {
+      mapping = astAnnul( mapping );
+      fset = astAnnul( fset );
+      return ret;
+   }
 
 /* We now need to choose the "FITS WCS axis" (i.e. the number that is included 
    in FITS keywords such as CRVAL2) for each axis of the output Frame. For 
