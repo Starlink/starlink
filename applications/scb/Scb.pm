@@ -92,18 +92,18 @@ use Cwd;
 #  environment variables or mk script variables by the makefile at 
 #  build time.  The sequences "$VARIABLE_NAME" are substituted for 
 #  by sed(1), so it is important that the quoting syntax (in the pre-
-#  built files) is not modified in these assignments.  Since the mk 
+#  build files) is not modified in these assignments.  Since the mk 
 #  script/makefile modify these files at build time, if you are looking
 #  at the built version of this script it may look confusing.  The
-#  pre-built version can be seen by extracting the script directly
+#  pre-build version can be seen by extracting the script directly
 #  from the scb_source.tar tar file.
 #
-#  The script is written so that it works in its pre-built form also, 
+#  The script is written so that it works in its pre-build form also, 
 #  using default values.
 #
 #  Some of the values determined by build-time environment variables
 #  (or pre-build defaults) can be overridden at run-time by environment 
-#  variables of the same name, if they exist.
+#  variables of the same name, if they exist and have a value.
 
 #  Starlink source tree directory locations.
 
@@ -151,17 +151,72 @@ $indexdir = $ENV{'SCB_INDEX'} || "$SCB_INDEX" || cwd;
 @indexes = qw/func file/;
 
 #  Language-specific tagging routines.
-#     By defining the hash of references to functions %tagger, file tagging 
-#     can be done without explicit reference to any of the tagging routines.
-#     All that is required is a sequence like:
+#     Both the indexer and the extractor programs must be able to identify
+#     certain points in the source code.  This is done by calling 
+#     language-specific tagging routines using the sequence:
 #
 #        use Scb.pm;
 #        $tagged = &{$tagger{$ftype}} ($source, $ftype);
 #
 #     where $ftype is the file type (usually the filename extension), as
-#     given in the keys to %tagger below.  The $ftype argument to the 
-#     tagging routine is in general optional, but the routine may wish 
-#     to know what kind of file it has been given.
+#     given in the keys to %tagger below.  The mapping from file type 
+#     to tagging routine is done here, by setting the %tagger hash.
+#
+#     New tagging routines may be written, or the ones supplied may be
+#     replaced as desired (the existing ones are not very efficient, 
+#     especiallly with respect to memory, for large files).  
+#     The remainder of this comment block documents the interface 
+#     between the tagging routines and the rest of the package 
+#     for anybody wishing to do this.
+#
+#     The interface is fairly simple: the tagging routine must take the 
+#     raw source code as its first argument (and may optionally read the 
+#     second argument to tell it the file type), and must return the 
+#     tagged source code.  The tagged source is a kind of stripped down 
+#     HTML; it should be the same as the raw source, with the following 
+#     anchor tags added:
+#
+#        <a name=''> tags identifying function/subroutine definitions, 
+#        <a href=''> tags identifying function/subroutine calls, 
+#        <a href='INCLUDE-'> tags identifying references to files.
+#
+#     Closing </a> tags MUST be supplied (as per the HTML DTD, despite 
+#     the fact that this is often disregarded for <a name=''> tags).  
+#     Thus if the raw source is supplied as:
+#
+#        #include "header.h"
+#        int code (int argc, char **argv) {
+#        (void) do_stuff();
+#        }
+#
+#     then calling the tagger function should return:
+#
+#        #include "<a href='INCLUDE-header.h'>header.h</a>"
+#        int <a name='code'>code</a> (int argc, char **argv) {
+#        (void) <a href='do_stuff'>do_stuff</a>();
+#        }
+#        
+#     Note that the values of the href attributes are not URLs or even
+#     unique references, merely the name under which the file has been
+#     indexed.  It is the job of the extractor program to map the names
+#     in the hrefs to actual URLs where required.  The function index 
+#     names can be anything, as long as a function whose definition is 
+#     marked with an <a name=''> tag gets referred to using the same 
+#     name when it causes an <a href=''> tag.  Files referred to 
+#     (presumably include files or similar) must have index names 
+#     consisting of the literal 'INCLUDE-' followed by the bare name 
+#     of the file - this filename must not contain the path, only the 
+#     filename itself.
+#
+#     The function index names currently used are the same as the names 
+#     used by the Unix linker (on the supported platforms), i.e. for C
+#     the function name as it appears in the source code, and for Fortran 
+#     the function/subroutine name in lower case, followed by an 
+#     underscore.  If a tagger were written for a language (e.g. Perl or
+#     Tcl) with a separate namespace from C and the things which can be 
+#     linked with it, it would need to use a separate index from the 
+#     'func' one currently used.  There are hooks in the indexer and 
+#     extractor programs for this.
 
 use CTag;
 use FortranTag;
@@ -181,8 +236,9 @@ use FortranTag;
 #  List of files which are not to be tagged.  Each entry is a regular
 #  expression; if it matches the file's logical pathname then no tagging
 #  will be attempted on the file.  Files can be excluded for any reason
-#  you like, but one would be files which are known to take a very long
-#  time to tag in the current implementation of the tagging routine.
+#  you like, but one would be files which are known to be uninteresting
+#  and/or take a very long time to tag in the current implementation of 
+#  the tagging routine.
 
 my (@notag) = ();
 push @notag, 'tixSamLib.c$';  #  2MB file with 6e6 character literals, yuk.
@@ -332,8 +388,8 @@ sub tarxf {
 #     Perl 5
 
 #  Invocation:
-#     @fextracted = tarxf $tarfile;
-#     @fextracted = tarxf $tarfile @files;
+#     @fextracted = tarxf ($tarfile)
+#     @fextracted = tarxf ($tarfile, @files)
 
 #  Description:
 #     Extracts either all files, or a list of named files, from the 
@@ -381,6 +437,21 @@ sub tarxf {
 #  Get parameters.
 
    my ($tarfile, @files) = @_;
+
+#  Check the tarfile name for shell metacharacters; since it becomes
+#  part of a string passed to the shell, and especially since this may
+#  run as part of a CGI program, it would be bad (though rather unlikely)
+#  to have a tar file with a name like 'archive;rm *;.tar'.  This is
+#  rather a paranoid thing to do, since there is no reason to suppose
+#  that there will be tar files with pathological names; in particular
+#  their names are not under control of anybody apart from the maintainer
+#  of the $srcdir source code tree.  But better safe than sorry.
+
+   if ($tarfile =~ /[;&|><` ]/) {
+      error "Dangerous tar file name: $tarfile",
+         "The filename given is badly formed.  For security reasons " .
+         "execution has been aborted.";
+   }   
 
 #  Define a (possibly null) compression filter.
 
@@ -436,7 +507,8 @@ sub mkdirp {
 #  Description:
 #     Creates the given directory and, if required, its parents (like
 #     mkdir -p).  Any directories created are given the specified 
-#     access mode.  Directories which already exist are not modified.
+#     access mode (in this respect it differs from the mkdir(1) command).
+#     Directories which already exist are not modified.
 #     The routine exits using the 'error' routine if any of the creations
 #     fails.  The given access mode is not modified by the current umask.
 
@@ -551,7 +623,7 @@ sub starpack {
 
 #  Pattern match to find package identifier.
 
-   $location =~ /^(\w+)#/;
+   $location =~ m%^([^/>#]+)#%;
 
 #  Return value.
 
@@ -868,4 +940,5 @@ sub parsetag {
 
 
 1;
+
 # $Id$
