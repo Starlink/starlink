@@ -232,7 +232,7 @@ lib_LTLIBRARIES = libgsd.la
 libgsd_la_SOURCES = \
 	$(C_ROUTINES) \
 	GSD_PAR \
-	gsd.h
+	gsd.h gsd1.h gsd2.h
 
 C_ROUTINES = \
 gsd1_getval.c    gsd1_rdhead.c  gsdClose.c  gsdGet0x.c    gsdItem.c \

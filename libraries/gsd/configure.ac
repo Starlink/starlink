@@ -18,6 +18,7 @@ STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
+AC_HEADER_STDC
 AC_C_BIGENDIAN
 AC_PROG_LIBTOOL
 
