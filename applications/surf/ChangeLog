@@ -1,3 +1,9 @@
+2000-06-27  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_scuphot.f: Clear MEAS_Q so that the coadd works
+	correctly as a monolith (since it will inherit Q from previous
+	observation)
+
 2000-06-26  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* src/surf_read_rebin_ndf.f (SURF_READ_REBIN_NDF): Wavelengths of
