@@ -143,7 +143,7 @@
 *     near the median.
 
 *  Related Applications:
-*     KAPPA: HISTOGRAM, INSPECT, MSTATS, NDFTRACE, NUMB, STATS;
+*     KAPPA: HISTOGRAM, MSTATS, NDFTRACE, NUMB, STATS;
 *     Figaro: ISTAT.
 
 *  Implementation Status:

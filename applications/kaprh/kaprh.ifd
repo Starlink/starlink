@@ -430,6 +430,314 @@ package kaprh {
 
       }
 
+      action inspect {
+         alias {insp(ect)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter abslab {
+            type LITERAL
+            prompt {Give the label for the abscissa (pixel number) axis}
+            vpath PROMPT
+            ppath DYNAMIC
+            helpkey *
+          }
+
+         parameter filename {
+            type FILENAME
+            vpath PROMPT
+            prompt {Name of file to save listing}
+            helpkey *
+            default inspect_list.lis
+          }
+
+         parameter font {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Fount type?}
+            default GKS
+            helpkey *
+          }
+
+         parameter gdevice {
+            ptype DEVICE
+            position 3
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Graphics device to be used for line plots}
+            helpkey *
+          }
+
+         parameter hirep {
+            type _LOGICAL
+            prompt {Is the full histogram to be reported?}
+            vpath PROMPT
+            ppath DEFAULT
+            helpkey *
+            default FALSE
+          }
+
+         parameter histogram {
+            type NDF
+            access WRITE
+            vpath PROMPT
+            ppath DEFAULT
+            prompt {Name of file to save histogram}
+            helpkey *
+            default !
+          }
+
+         parameter hititle {
+            type LITERAL
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Title for histogram}
+            default {Kappa - Inspect_Histogram}
+          }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {Image to be inspected}
+            helpkey *
+          }
+
+         parameter lbound {
+            size *
+            type _INTEGER
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Lower bounds of the region}
+            helpkey *
+          }
+
+         parameter majtic {
+            type _REAL
+            prompt {Give the parameter controlling the numbers of major ticks for the x and y axes}
+            vpath DEFAULT
+            ppath DEFAULT
+            helpkey *
+            default 4. 4.
+            size *
+          }
+
+         parameter mintic {
+            type _REAL
+            prompt {Give the numbers of minor tick marks between major ticks for x and y axes}
+            vpath DEFAULT
+            ppath DEFAULT
+            helpkey *
+            default -1. -1.
+            size *
+          }
+
+         parameter mode {
+            position 2
+            type LITERAL
+            vpath GLOBAL
+            ppath GLOBAL DYNAMIC DEFAULT
+            prompt {Interaction mode}
+            association <->GLOBAL.INTERACTIONMODE
+            default Cursor
+            helpkey *
+          }
+
+         parameter numbin {
+            type _INTEGER
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Number of bins needed in the histogram}
+            helpkey *
+          }
+
+         parameter option {
+            position 4
+            type LITERAL
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Option required}
+            helpkey *
+          }
+
+         parameter ordlab {
+            type LITERAL
+            prompt {Give the label for the ordinate (pixel value) axis}
+            vpath PROMPT
+            ppath DYNAMIC
+            helpkey *
+          }
+
+         parameter out {
+            type NDF
+            access WRITE
+            vpath PROMPT
+            prompt {Name of NDF to save the region}
+            helpkey *
+          }
+
+         parameter outtic {
+            type _LOGICAL
+            prompt {Do you want the axis tick marks on the outside of the axes?}
+            vpath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter overlay {
+            ptype DEVICE
+            position 5
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_OVERLAY
+            prompt {Image-display overlay}
+            helpkey *
+          }
+
+         parameter peind {
+            size *
+            type _INTEGER
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Pixel indices at peep centre}
+            helpkey *
+          }
+
+         parameter plotstyle {
+            type _LOGICAL
+            prompt {Are the plotting options to be modified?}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            helpkey *
+            default FALSE
+          }
+
+         parameter pltitl {
+            type LITERAL
+            prompt {Give the title of the plot}
+            vpath PROMPT
+            ppath DYNAMIC
+            helpkey *
+          }
+
+         parameter slend {
+            size *
+            type _INTEGER
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {End indices of the slice}
+            helpkey *
+          }
+
+         parameter slice {
+            type NDF
+            access WRITE
+            vpath PROMPT
+            ppath DEFAULT
+            prompt {Name of file to save slice}
+            helpkey *
+            default !
+          }
+
+         parameter slstart {
+            size *
+            type _INTEGER
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Start indices of the slice}
+            helpkey *
+          }
+
+         parameter sltitle {
+            type LITERAL
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Title for slice}
+            default {Kappa - Inspect_Slice}
+          }
+
+         parameter thick {
+            type _REAL
+            prompt {Give the relative thickness of plotted lines}
+            vpath DEFAULT
+            default 1.0
+            helpkey *
+          }
+
+         parameter title {
+            type LITERAL
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Title for the region}
+            default {Kappa - Inspect}
+          }
+
+         parameter ubound {
+            size *
+            type _INTEGER
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Upper bounds of the region}
+            helpkey *
+          }
+
+         parameter vaind {
+            size *
+            type _INTEGER
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Pixel indices}
+            helpkey *
+          }
+
+         parameter xlog {
+            type _LOGICAL
+            prompt {Is the abscissa to be plotted logarithmically?}
+            vpath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter xycont {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DEFAULT
+            prompt {Do you wish to append to an existing ASCII file?}
+            helpkey *
+            default FALSE
+          }
+
+         parameter xyfile {
+            type FILENAME
+            vpath PROMPT
+            prompt {Name of file to store x,y positions and values of selected pixels}
+            helpkey *
+            default xylist.lis
+          }
+
+         parameter xytitle {
+            type LITERAL
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Title for ASCII file}
+            helpkey *
+            default {# Kappa - Inspect_XYcur}
+          }
+
+         parameter ylog {
+            type _LOGICAL
+            prompt {Is the ordinate to be plotted logarithmically?}
+            vpath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+      }
+
 iraf! {
 
       icl {defstring krhh(elp) !$KAPRH_DIR/krhhelp}

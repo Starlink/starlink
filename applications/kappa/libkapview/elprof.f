@@ -24,7 +24,7 @@
 *     or into a `fan' of adjacent sectors, centred on a specified
 *     position.  The mean data values in each bin are found, and stored 
 *     in a 1-dimensional NDF which can be examined using LINPLOT,
-*     INSPECT, etc.  A 2-dimensional mask image can optionally be 
+*     etc.  A 2-dimensional mask image can optionally be 
 *     produced indicating which bin each input pixel was placed in.
 *
 *     The area of the input image which is to be binned is the annulus 
@@ -160,7 +160,7 @@
 *        pixels.
 
 *  Related Applications:
-*     KAPPA: INSPECT; ESP: ELLFOU, ELLPRO, SECTOR.
+*     ESP: ELLFOU, ELLPRO, SECTOR.
 
 *  Implementation Status:
 *     -  This routine correctly processes the DATA, VARIANCE, TITLE,

@@ -14,17 +14,19 @@ KAPRH_SOURCE = kaprh.csh kaprh_link_adam kaprh.icl kaprh.hlp kaprh_mon.f
 # The contents of the kaprh_iraf.tar file:
 KAPRH_IRAF = doc helpdb.mip kaprh.hd  kaprh.par kaprh_mon.ifl root.hd \
 _kaprh.hd kaprh.cl  kaprh.men kaprh_mon.tcl greyplot.par contover.par \
-snapshot.par turbocont.par
+snapshot.par turbocont.par inspect.par
 
 #  Contents of the doc/ directory in kaprh_iraf.tar
-IRAF_DOCS = greyplot.hlp contover.hlp snapshot.hlp turbocont.hlp
+IRAF_DOCS = greyplot.hlp contover.hlp snapshot.hlp turbocont.hlp \
+inspect.hlp
 
 # The contents of the kaprh_ifls.tar file:
 KAPRH_IFLS = greyplot.ifl krhhelp.ifl kaprh_mon.ifl contover.ifl \
-snapshot.ifl turbocont.ifl
+snapshot.ifl turbocont.ifl inspect.ifl
 
 # The contents of the kaprh_sub.tar file:
-KAPRH_SUB = greyplot.f krhhelp.f contover.f snapshot.f turbocont.f
+KAPRH_SUB = greyplot.f krhhelp.f contover.f snapshot.f turbocont.f \
+inspect.f
 
 # The source RCS files needed to create the kapsub_sub.tar file:
 KAPSUB_SOURCES = $(KAPSUB_NONGEN) $(KAPSUB_GEN)
@@ -41,7 +43,10 @@ KAPSUB_GEN = kps1_dscl.gen
 KAPSUB_NONGEN = cnthlt.f cntkey.f cntsbp.f gethlp.f kaprh_mon.f \
 kps1_cnser.f kps1_cntur.f kps1_faind.f kps1_fainb.f kps1_faini.f \
 kps1_fainw.f kps1_fainr.f kps1_imzbo.f kps1_ncuco.f lccell.f \
-ncraxs.f
+ncraxs.f \
+getv2.f   hstrep.f  inpe.f   insl.f     inxy.f    peepsb.f \
+hstdsp.f  imlst.f   inpol.f  linplt.f  slc2t1.f \
+hstlo.f   inhi.f    inre.f   inva.f     linset.f  thrsr.f
 
 # A group of all the generic source files.
 GENERIC_SOURCES = $(KAPSUB_GEN) 

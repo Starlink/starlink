@@ -112,6 +112,9 @@
          ELSE IF ( NAME .EQ. 'GREYPLOT' ) THEN
             CALL GREYPLOT ( STATUS )
 
+         ELSE IF ( NAME .EQ. 'INSPECT' ) THEN
+            CALL INSPECT ( STATUS )
+
          ELSE IF ( NAME .EQ. 'KRHHELP' ) THEN
             CALL KRHHELP ( STATUS )
 

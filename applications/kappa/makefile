@@ -517,7 +517,6 @@ crelut.f cursor.f drawsig.f display.f elprof.f \
 gdclear.f gdnames.f gdset.f gdstate.f \
 idclear.f \
 idinvisible.f idpazo.f idset.f idstate.f \
-inspect.f \
 linplot.f lutable.f lutflip.f luthilite.f \
 lutrot.f lutsave.f luttweak.f lutview.f \
 mlinplot.f ovclear.f ovset.f paldef.f palentry.f \
@@ -2340,7 +2339,6 @@ inpe.o:	 SAE_PAR PAR_ERR
 inpol.o:	 SAE_PAR PRM_PAR
 inre.o:	 SAE_PAR
 insl.o:	 SAE_PAR DAT_PAR PRM_PAR PAR_ERR
-inspect.o:	 SAE_PAR DAT_PAR PRM_PAR SUBPAR_PAR PAR_ERR NDF_PAR NDF_ERR
 inva.o:	 SAE_PAR PRM_PAR PAR_ERR
 inxy.o:	 SAE_PAR PRM_PAR PAR_ERR FIO_PAR FIO_ERR
 kap_div.o:	 SAE_PAR NDF_PAR

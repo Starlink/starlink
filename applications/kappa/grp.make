@@ -54,7 +54,7 @@ fitslist.par fitsmod.par fitstext.par fitsurface.par fitsval.par \
 fitswrite.par flip.par fourier.par gausmooth.par gdclear.par gdnames.par \
 gdset.par gdstate.par glitch.par globals.par hiscom.par \
 hislist.par hisset.par histat.par histeq.par histogram.par idclear.par \
-idinvisible.par idpazo.par idset.par idstate.par inspect.par div.par \
+idinvisible.par idpazo.par idset.par idstate.par div.par \
 log10.par pow.par kappa.par kstest.par laplace.par permaxes.par \
 linplot.par logar.par loge.par look.par lucy.par lutable.par lutflip.par \
 luthilite.par lutread.par lutrot.par lutsave.par luttweak.par lutview.par \
@@ -70,7 +70,7 @@ setmagic.par setnorm.par setorigin.par setsky.par settitle.par \
 settype.par setunits.par setvar.par shadow.par slide.par \
 sqorst.par stats.par sub.par substitute.par surfit.par thresh.par \
 trandat.par traninvert.par tranjoin.par tranmake.par transformer.par \
-trantrace.par trig.par turbocont.par vecplot.par wiener.par zaplin.par \
+trantrace.par trig.par vecplot.par wiener.par zaplin.par \
 kappa_mon.tcl kapview_mon.tcl ndfpack_mon.tcl mem2d.tcl root.hd kappa.hd \
 _kappa.hd kappa.men helpdb.mip profile.par listshow.par listmake.par \
 wcsadd.par wcsalign.par wcsattrib.par wcscopy.par wcsframe.par \
@@ -94,7 +94,7 @@ fitswrite.hlp flip.hlp fourier.hlp gausmooth.hlp gdclear.hlp gdnames.hlp \
 gdset.hlp gdstate.hlp glitch.hlp getting_started.hlp globals.hlp \
 graphics_database.hlp hints.hlp hds_data_types.hlp colcomp.hlp \
 hiscom.hlp hislist.hlp hisset.hlp histat.hlp histeq.hlp histogram.hlp \
-idclear.hlp idinvisible.hlp idpazo.hlp idset.hlp idstate.hlp inspect.hlp \
+idclear.hlp idinvisible.hlp idpazo.hlp idset.hlp idstate.hlp \
 interaction_mode.hlp kaphelp.hlp kappa.hlp kstest.hlp laplace.hlp \
 linplot.hlp log10.hlp logar.hlp loge.hlp look.hlp lucy.hlp lutable.hlp \
 lutbgyrw.hlp lutwarm.hlp lutcol.hlp lutcont.hlp lutfc.hlp lutflip.hlp lutgrey.hlp \
@@ -114,7 +114,7 @@ setbound.hlp setext.hlp setlabel.hlp setmagic.hlp setnorm.hlp \
 setorigin.hlp setsky.hlp settitle.hlp settype.hlp setunits.hlp setvar.hlp \
 shadow.hlp slide.hlp sqorst.hlp stats.hlp substitute.hlp \
 summary.hlp surfit.hlp thresh.hlp trandat.hlp traninvert.hlp tranjoin.hlp \
-tranmake.hlp transformer.hlp trantrace.hlp trig.hlp turbocont.hlp \
+tranmake.hlp transformer.hlp trantrace.hlp trig.hlp \
 unix_usage.hlp using_help.hlp vecplot.hlp wiener.hlp zaplin.hlp \
 automatic_data_conv.hlp colour_table_and_pa.hlp getting_data_into_k.hlp \
 image_display_inter.hlp masking__bad_values.hlp selecting_graphics_.hlp \
@@ -147,11 +147,11 @@ tranjoin.ifl tranmake.ifl transformer.ifl trantrace.ifl trig.ifl colcomp.ifl \
 wiener.ifl zaplin.ifl contour.ifl crelut.ifl cursor.ifl \
 drawsig.ifl display.ifl elprof.ifl gdclear.ifl gdnames.ifl gdset.ifl \
 gdstate.ifl idclear.ifl idinvisible.ifl idpazo.ifl idset.ifl \
-idstate.ifl inspect.ifl linplot.ifl lutable.ifl lutflip.ifl luthilite.ifl \
+idstate.ifl linplot.ifl lutable.ifl lutflip.ifl luthilite.ifl \
 lutrot.ifl lutsave.ifl luttweak.ifl lutview.ifl mlinplot.ifl ovclear.ifl \
 ovset.ifl paldef.ifl palentry.ifl palread.ifl palsave.ifl piccur.ifl \
 picdef.ifl picempty.ifl picentire.ifl picin.ifl piclabel.ifl piclist.ifl \
-picsel.ifl pictrans.ifl picvis.ifl turbocont.ifl vecplot.ifl \
+picsel.ifl pictrans.ifl picvis.ifl vecplot.ifl \
 axconv.ifl axlabel.ifl axunits.ifl erase.ifl fitsdin.ifl fitsexp.ifl \
 fitsimp.ifl fitsin.ifl fitslist.ifl fitsmod.ifl fitstext.ifl hiscom.ifl \
 hislist.ifl hisset.ifl native.ifl ndfcopy.ifl ndftrace.ifl setaxis.ifl \
@@ -275,11 +275,11 @@ kps1_gliwr.f kps1_gligt.f kps1_saxlk.f
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = contour.f crelut.f cursor.f drawsig.f display.f \
 elprof.f gdclear.f gdnames.f gdset.f gdstate.f idclear.f \
-idinvisible.f idpazo.f idset.f idstate.f inspect.f linplot.f lutable.f \
+idinvisible.f idpazo.f idset.f idstate.f linplot.f lutable.f \
 lutflip.f luthilite.f lutrot.f lutsave.f luttweak.f lutview.f mlinplot.f \
 ovclear.f ovset.f paldef.f palentry.f palread.f palsave.f piccur.f \
 picdef.f picempty.f picentire.f picin.f piclabel.f piclist.f picsel.f \
-pictrans.f picvis.f scatter.f turbocont.f vecplot.f colcomp.f
+pictrans.f picvis.f scatter.f vecplot.f colcomp.f
 
 # The contents of the ndfpack_sub.tar file:
 NDFPACK_SUB = axconv.f axlabel.f axunits.f erase.f fitsdin.f fitsexp.f \

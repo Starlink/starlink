@@ -188,10 +188,6 @@
          ELSE IF ( NAME .EQ. 'IDSTATE' ) THEN
             CALL IDSTATE( STATUS )
 
-*  Inspects a 2-d NDF in a variety of ways.
-         ELSE IF ( NAME .EQ. 'INSPECT' ) THEN
-            CALL INSPECT ( STATUS )
-
 *  Draws a line plot of a 1-d NDF's data values against their axis
 *  co-ordinates.
          ELSE IF ( NAME .EQ. 'LINPLOT' ) THEN

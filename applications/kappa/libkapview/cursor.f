@@ -334,7 +334,7 @@
 *     cross) over the removed positions in a different colour.
 
 *  Related Applications:
-*     KAPPA: LISTSHOW, LISTMAKE, INSPECT, PICCUR; Figaro: ICUR, IGCUR.
+*     KAPPA: LISTSHOW, LISTMAKE, PICCUR; Figaro: ICUR, IGCUR.
 
 *  Authors:
 *     JM: Jo Murray  (STARLINK)

@@ -446,7 +446,7 @@ NUM_DEF_R IDI_PAR IDI_ERR
 F_ROUTINES = $(KAPRH_F_ROUTINES) $(KAPSUB_F_ROUTINES) \
              $(MONO_SOURCE) 
 
-KAPRH_F1_ROUTINES = greyplot.f contover.f snapshot.f turbocont.f
+KAPRH_F1_ROUTINES = greyplot.f contover.f snapshot.f turbocont.f inspect.f
 
 #  Kappa f files for which there are no corresponding iraf .par files.
 KAPRH_F2_ROUTINES = krhhelp.f
@@ -458,7 +458,10 @@ KAPRH_F_ROUTINES = $(KAPRH_F1_ROUTINES) $(KAPRH_F2_ROUTINES)
 KAPSUB_F_ROUTINES = cnthlt.f cntsbp.f gethlp.f kps1_cnser.f kps1_cntur.f \
 kps1_dsclb.f kps1_dscli.f kps1_dsclr.f kps1_dscld.f kps1_dsclw.f \
 kps1_faind.f kps1_fainb.f kps1_fainw.f kps1_fainr.f kps1_faini.f \
-kps1_imzbo.f lccell.f ncraxs.f kps1_ncuco.f cntkey.f
+kps1_imzbo.f lccell.f ncraxs.f kps1_ncuco.f cntkey.f \
+getv2.f   hstrep.f  inpe.f   insl.f     inxy.f    peepsb.f \
+hstdsp.f  imlst.f   inpol.f  linplt.f  slc2t1.f \
+hstlo.f   inhi.f    inre.f   inva.f     linset.f  thrsr.f
 
 MONO_SOURCE = kaprh_mon.f
 

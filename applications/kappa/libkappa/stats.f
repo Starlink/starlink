@@ -131,7 +131,7 @@
 *        displayed.
 
 *  Related Applications:
-*     KAPPA: HISTAT, INSPECT, NDFTRACE; Figaro: ISTAT.
+*     KAPPA: HISTAT, NDFTRACE; Figaro: ISTAT.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, VARIANCE,

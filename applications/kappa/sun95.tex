@@ -2681,7 +2681,7 @@ data file.  However, if we run CREFRAME like this:
 it would generate an output image using default values for all the
 parameters except OUTPIC, and write the output to file {\tt stars.sdf}.
 Another point to be wary of is that some applications have loops,
-{\it{e.g.}}\ \htmlref{INSPECT}{INSPECT}, \htmlref{LOOK}{LOOK},
+{\it{e.g.}}\ \htmlref{LOOK}{LOOK},
 \htmlref{LUTABLE}{LUTABLE}, and if you use the ACCEPT keyword
 it will only operate the first time the application gets a parameter
 value.
@@ -3378,7 +3378,7 @@ with a window.  This lets you clear the overlay independently of the
 image (task \htmlref{OVCLEAR}{OVCLEAR}), so you can annotate a picture
 with other graphics. This is most useful in interactive applications
 like \htmlref{ARDGEN}{ARDGEN}, \htmlref{CONTOUR}{CONTOUR},
-\htmlref{INSPECT}{INSPECT} or \htmlref{SEGMENT}{SEGMENT}.  A
+or \htmlref{SEGMENT}{SEGMENT}.  A
 {\footnotesize GWM} overlay does have one drawback, however: it halves the
 number of available colour indices.  If you want to use an X-windows
 overlay, you must ensure that you have made the window with the {\tt
@@ -3426,10 +3426,6 @@ issue these commands that often.
 \end{verbatim}
 \normalsize
 \bigskip
-
-For an X-windows overlay, INSPECT in the cursor
-mode uses dashed lines instead of changing colour, for example when
-indicating the position of a region or slice.  
 
 \subsection{Composite Hardcopy Plots}
 
@@ -8329,7 +8325,7 @@ Now we address how the applications obtain co-ordinate information
 itself.  Applications that require co-ordinates are being modified to
 permit a variety of mechanisms for obtaining those
 co-ordinates.\footnote{Those converted so far include
-\htmlref{ARDMASK}{ARDMASK}, CENTROID, INSPECT,
+\htmlref{ARDMASK}{ARDMASK}, CENTROID, 
 \htmlref{SEGMENT}{SEGMENT}, and \htmlref{ZAPLIN}{ZAPLIN}.}
 The possibilities are as follows.
 \begin{description}
@@ -8400,34 +8396,8 @@ going to be selected use the \htmlref{PICIN}{PICIN} command.
 \end{verbatim}
 \normalsize
 If we look at the global parameters again, indeed we see that it has
-become cursor mode.  To show that it is global we can run
-\htmlref{INSPECT}{INSPECT}.  Yes a cursor appears rather than a prompt
-for the pixel value.
+become cursor mode.  
 
-\small
-\begin{verbatim}
-     ICL> globals
-     The current interaction mode is      : CURSOR
-     ICL> inspect
-
-     For certain options, boxes will appear.  The functions are controlled
-     by the mouse/trackerball buttons and keyboard...
-        Press left button to select the operation shown in the left box.
-        Press middle button/keyboard "2" to select the operation shown in the middle box.
-        Press right button to select the operation shown in the right box.
-
-     Current picture has name: DATA, comment: KAPPA_DISPLAY.
-     Using /star/bin/kappa/ccdframec as the input NDF.
-     GDEVICE - Graphics device to be used for line plots /@xov/ >
-     OPTION - Option required /'Region'/ > VA
- 
-        VALUE of image at 59, 294 is 2753.928
-       
-        VALUE of image at 149, 311 is 3727.465
- 
-     OPTION - Option required /'Region'/ > ex
-\end{verbatim}
-\normalsize
 Now we'll see the effect of changing the mode parameter.  Note that
 unless it is undefined or the application does not support the current
 mode, you must change the mode on the command line.  First we shall
@@ -8471,8 +8441,7 @@ CENTROID in file mode.
 \end{verbatim}
 \normalsize
 Such co-ordinate files can also be created interactively with images by
-\htmlref{CURSOR}{CURSOR}, \htmlref{PICCUR}{PICCUR}, or the XYcur mode of
-INSPECT.
+\htmlref{CURSOR}{CURSOR} or \htmlref{PICCUR}{PICCUR}.
 
 \section{\xlabel{se_imagedisplay}Image-display Interface in KAPPA
 \label{se:imagedisplay}}
@@ -11366,8 +11335,6 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Selects a current image-display device.}
 \menuitem{IDSTATE}{
  Shows the current status of an image display.}
-\menuitem{INSPECT}{
- Inspects a 2-d NDF in a variety of ways.}
 \menuitem{KAPHELP}{
  Gives help about KAPPA.}
 \menuitem{KSTEST}{
@@ -11826,8 +11793,6 @@ functions as follows.
  Draws ${\pm}n$ standard-deviation lines on a line plot.
 \classitem{ELPROF}
  Creates a radial or azimuthal profile of a 2-dimensional image.
-\classitem{INSPECT}
- Inspects a 2-d NDF in a variety of ways.
 \classitem{LINPLOT}
  Draws a line plot of the data values in a 1-d NDF.
 \classitem{LISTSHOW}
@@ -11957,8 +11922,6 @@ functions as follows.
  Concatenates a series of vectorized NDFs.
 \classitem{FLIP}
  Reverses an NDF's pixels along a specified dimension.
-\classitem{INSPECT}
- Inspects a 2-d NDF in a variety of ways.
 \classitem{MANIC}
  Converts all or part of a data array from one dimensionality to another.
 \classitem{NDFCOPY}
@@ -12211,8 +12174,6 @@ functions as follows.
  Computes ordered statistics for an NDF's pixels using an histogram.
 \classitem{HISTOGRAM}
  Computes an histogram of an NDF's values.
-\classitem{INSPECT}
- Inspects a 2-d NDF in a variety of ways.
 \classitem{MSTATS}
  Does cumulative statistics on a 2-d sub-array over a sequence of data arrays.
 \classitem{NUMB}
@@ -17361,7 +17322,7 @@ default value.
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: LISTSHOW, LISTMAKE, INSPECT, PICCUR; Figaro: ICUR, IGCUR.
+      KAPPA: LISTSHOW, LISTMAKE, PICCUR; Figaro: ICUR, IGCUR.
    }
 }
 
@@ -18241,7 +18202,7 @@ plot (101k).
       or into a `fan{\tt '} of adjacent sectors, centred on a specified
       position.  The mean data values in each bin are found, and stored
       in a 1-dimensional NDF which can be examined using LINPLOT,
-      INSPECT, \emph{etc}.  A 2-dimensional mask image can optionally be
+      \emph{etc}.  A 2-dimensional mask image can optionally be
       produced indicating which bin each input pixel was placed in.
 
       The area of the input image which is to be binned is the annulus
@@ -18438,7 +18399,7 @@ plot (101k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: INSPECT; ESP: ELLFOU, ELLPRO, SECTOR.
+      ESP: ELLFOU, ELLPRO, SECTOR.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -23184,7 +23145,7 @@ plot (101k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: HISTOGRAM, INSPECT, MSTATS, NDFTRACE, NUMB, STATS;
+      KAPPA: HISTOGRAM, MSTATS, NDFTRACE, NUMB, STATS;
       Figaro: ISTAT.
    }
    \sstimplementationstatus{
@@ -24066,566 +24027,6 @@ plot (6k).
       Related Applications
    }{
       KAPPA: IDSTATE.
-   }
-}
-\sstroutine{
-   INSPECT
-}{
-   Inspects a 2-d NDF in a variety of ways
-}{
-   \sstdescription{
-      This application provides an interactive facility to inspect the
-      details of whole or part of the 2-dimensional data array in an input NDF.
-      Briefly, the inspection options permit: a region to be selected
-      for which statistics may be calculated, its values written to a
-      text file, or an histogram be plotted and saved in an NDF; the
-      region itself may be saved in an NDF; the value of a pixel or a
-      region of pixels to be viewed; a slice between two pixels may be
-      calculated, plotted and saved in an NDF; text files containing
-      $x$-$y$-value of selected pixels may be created and extended, and
-      chosen pixels marked.
-
-      The application has two modes of interaction: cursor and
-      interface.  In cursor mode the selection of pixels, and the
-      definition of the region are made by moving a graphics cursor
-      over a previously displayed image or contour plot.  Since
-      instructional text showing the function of the mouse or
-      trackerball buttons is shown, the graphics device providing the
-      cursor must be an image-display overlay.  Also the name of the
-      NDF used to display the image or contour plot is known and need
-      not be entered.  This is the recommended interaction mode.  The
-      alternative, interface, means that the pixel indices of pixels
-      and regions to be inspected are specified in response to prompts.
-
-      The application is composed of two parts.  First the preliminaries
-      obtains the mode, the input NDF and graphics devices.  In cursor
-      mode this usually amounts to a single prompt, and but two in
-      interface mode.  The second stage is a loop where the inspection
-      option is selected and performed.
-   }
-   \sstusage{
-      inspect in [mode] gdevice option [overlay]
-        \newline\hspace*{1.5em}
-        $\left\{ {\begin{tabular}{l}
-                   numbin=? hirep=? histogram=? hititle=? \\
-                   filename=? \\
-                   peind=? \\
-                   lbound=? ubound=? \\
-                   out=? \\
-                   slstart=? slend=? slice=? sltitle=? \\
-                   vaind=? \\
-                   xycont=? xyfile=? xytitle=?
-                   \end{tabular} }
-        \right.$
-        \newline\hspace*{1.9em}
-        \makebox[0mm][c]{\small option}
-   }
-   \sstparameters{
-      \sstsubsection{
-         FILENAME = FILENAME (Write)
-      }{
-         Name of the text file to contain the Listing of image values.
-         The suggested default is {\tt inspect\_list.lis}.  This is only
-         required for the {\tt "List"} option.
-      }
-      \sstsubsection{
-         GDEVICE = DEVICE (Read)
-      }{
-         The name of the graphics device for line plots produced by the
-         {\tt "Histogram"} and {\tt "Slice"} options.  The device should
-         not be the image display, but it may be the image-display overlay
-         plane used in the cursor-interaction mode, {\it i.e.}\ the same
-         value as parameter OVERLAY (though this is not advisable for
-         X-windows).  In the latter case plotting occurs in the same
-         picture as the overlay annotations, namely the current
-         picture.  If the existing plot on the base plane of the image
-         display has text, {\it e.g.}\ annotated axes, a mess can of confused
-         lines can appear.  To avoid this the current picture should be
-         made the DATA picture rather than the FRAME around it.  If
-         null, {\tt !}, is given no line plots will be drawn unless the
-         {\tt "Device"} option is selected.
-      }
-      \sstsubsection{
-         HIREP = \_LOGICAL (Read)
-      }{
-         {\tt TRUE} if the full Histogram is to be reported to you.  A
-         large number of bins may be required for the plot but need not
-         be listed in full.  This parameter provides a way of preventing
-         unwanted, tedious and long output.  The suggested default is
-         {\tt FALSE}.  HIREP is only required for the {\tt "Histogram"} option.
-      }
-      \sstsubsection{
-         HISTOGRAM = NDF (Read)
-      }{
-         Name of the NDF structure to save the Histogram in its data
-         array.  If null, {\tt !}, is entered, the histogram NDF is not
-         created.  This parameter is only required for the {\tt "Histogram"}
-         option.  The suggested default is {\tt !}.
-      }
-      \sstsubsection{
-         HITITLE = LITERAL (Read)
-      }{
-         Title for the output NDF containing the Histogram.  For the
-         first histogram saved this defaults to
-         {\tt "KAPPA - Inspect\_Histogram"}, and subsequently this becomes
-         the suggested default.   This parameter is only required for
-         the {\tt "Histogram"} option. {\tt []}
-      }
-      \sstsubsection{
-         IN = NDF (Read)
-      }{
-         NDF structure containing the 2-dimensional data array to be inspected.
-      }
-      \sstsubsection{
-         LBOUND( 2 ) = \_INTEGER (Read)
-      }{
-         Lower bounds in pixel indices of the Region.  The chosen pixel
-         must be different from that at the lower bound.  It is only
-         used in Interface mode with the {\tt "Region"} option.
-      }
-      \sstsubsection{
-         MODE = LITERAL (Read)
-      }{
-         The interaction mode.  The options are {\tt "Cursor"} to use a
-         graphics cursor to select regions and pixels to inspect,
-         or {\tt "Interface"} where prompted ADAM parameters are used to
-         define those parts of the image to inspect. {\tt [}Current
-         interaction mode{\tt ]}
-      }
-      \sstsubsection{
-         NUMBIN = \_INTEGER (Read)
-      }{
-         Number of bins needed for the Histogram.  The suggested default
-         is the current value, which is 100 initially.  A value is the
-         range 2--5000 is required.  This parameter is only required
-         for the {\tt "Histogram"} option.
-      }
-      \sstsubsection{
-         OPTION = LITERAL (Read)
-      }{
-         Current inspection mode.  The options are:
-         \begin{description}
-         \item {\tt "Device"} --- This allows the selection and opening of a new
-                          line-plot graphics device, at the same time
-                          closing down the old one, whose last plot is
-                          stored in the graphics database.
-         \item {\tt "Exit"} --- Exit the application.
-         \item {\tt "Histogram"} --- This calculates the histogram of the current
-                          region. A summary and plot (if there is a
-                          graphics device available) of the histogram
-                          is produced.  The style of the plot may be
-                          adjusted via several parameters.  The full
-                          histogram may also be reported. The histogram
-                          data can be stored in a 1-d NDF.
-         \item {\tt "List"} --- This produces a formatted and headed listing
-                          of the chosen region to a text file.
-         \item {\tt "Peep"} --- Obtain a formatted listing of the 7$\times$7 section
-                          of the array data, centred on a pixel
-                          specified using the cursor or via prompting.
-         \item {\tt "Region"} --- To define the region of the array to be used
-                          by other options. If the image display
-                          is available, then the cursor is used to
-                          define the area, otherwise, the pixel bounds
-                          of the region come from the environment. Using
-                          the cursor, the functions of the choice-device
-                          buttons are drawn on the overlay.
-         \item {\tt "Save"} --- Writes the current region to a new NDF,
-                          propagating all the components.
-         \item {\tt "Slice"} --- Two points are defined via the cursor or from
-                          parameter prompting between which a slice ({\it i.e.}
-                          cross-section) is calculated.  Using the
-                          cursor, the functions of the trackerball or
-                          mouse buttons are drawn on the overlay. A plot
-                          is made to the graphics device if available.
-                          The style of the plot may be adjusted via
-                          several parameters.  The slice can be stored
-                          in a 1-d NDF.  The slice abscissa has units in
-                          true pixels (assuming pixels are square), thus
-                          a 45\dgs\ slice would have a length $\surd$2
-                          times its projected length in $x$ or $y$.
-         \item {\tt "Statistics"} --- The key statistical parameters of the current
-                          region are determined and reported.
-         \item {\tt "Value"} --- Obtain the value of a pixel at a point selected
-                          via the cursor or via prompting.
-         \item {\tt "XYcur"} --- A list of the co-ordinates and values of pixels
-                          selected by the image-display cursor are
-                          written to a text file with Fortran carriage
-                          control. The functions of the trackerball or
-                          mouse buttons are displayed.  Optionally, an
-                          existing file in the same format as produced
-                          by XYcur can be appended to, for example, when
-                          a session has been interrupted.  These stored
-                          pixels are displayed on the overlay plane as
-                          if there had been no interruption.  XYcur
-                          requires cursor mode.
-         \end{description}
-         The suggested default is {\tt "Region"}.
-
-         If the option is specified on the command line a single
-         inspection may be undertaken, {\it i.e.}\  there is no looping.  This
-         feature is intended for command procedures.
-      }
-      \sstsubsection{
-         OUT = NDF (Read)
-      }{
-         Name of the NDF structure to contain the Saved Region.  This
-         is only used in the {\tt "Save"} option.
-      }
-      \sstsubsection{
-         OVERLAY = DEVICE (Read)
-      }{
-         Name of the overlay-plane device used in the cursor interaction
-         mode.  It must have class IMAGE\_OVERLAY or WINDOW\_OVERLAY and
-         support colour.  It is ignored when MODE is not {\tt "Cursor"}.
-         {\tt [}Current image-display-overlay device{\tt ]}
-      }
-      \sstsubsection{
-         PEIND( 2 ) = \_INTEGER (Read)
-      }{
-         $x$-$y$ pixel index of the pixel about which the Peep is required.
-         The values must lie within their respective bounds of the
-         input image.  The suggested default is the image centre.  It
-         is only used in Interface mode with the {\tt "Peep"} option.
-      }
-      \sstsubsection{
-         SLEND( 2 ) = \_INTEGER (Read)
-      }{
-         The $x$-$y$ pixel index defining the end of the Slice.  It
-         must lie within the bounds of the array and be distinct from
-         the start of the slice.  The suggested default is the upper
-         bound of the input NDF.  It is only used in Interface mode
-         with the {\tt "Slice"} option.
-      }
-      \sstsubsection{
-         SLICE = NDF (Read)
-      }{
-         Name of the NDF structure to save the Slice in its data array.
-         If null, {\tt !}, is entered, the slice NDF is not created.
-         It is only required in the {\tt "Slice"} option.  The
-         suggested default is {\tt !}. 
-      }
-      \sstsubsection{
-         SLSTART( 2 ) = \_INTEGER (Read)
-      }{
-         The $x$-$y$ pixel index defining the start of the Slice.  It must
-         lie within the bounds of the array.  The suggested default is
-         the lower bound of the input NDF.  It is only used in
-         Interface mode with the {\tt "Slice"} option.
-      }
-      \sstsubsection{
-         SLTITLE = LITERAL (Read)
-      }{
-         Title for the Slice NDF.  Title for the Region NDF.  For the
-         first region saved this defaults to {\tt "KAPPA - Inspect\_Slice"},
-         and subsequently this becomes the suggested default.  It is
-         only required in the {\tt "Slice"} option. {\tt []}
-      }
-      \sstsubsection{
-         TITLE = LITERAL (Read)
-      }{
-         Title for the Region NDF.  For the first region saved this
-         defaults to {\tt "KAPPA - Inspect"}, and subsequently this becomes
-         the suggested default.  It is only used in the {\tt "Save"} option.
-         {\tt []}
-      }
-      \sstsubsection{
-         UBOUND( 2 ) = \_INTEGER (Read)
-      }{
-         Upper bounds in pixel indices of the Region.  The chosen pixel
-         must be different from that at the lower bound.  It is only
-         used in Interface mode with the {\tt "Region"} option.
-      }
-      \sstsubsection{
-         VAIND( 2 ) = \_INTEGER (Read)
-      }{
-         $x$-$y$ pixel index of pixel whose Value is required.  The values
-         must lie within their respective bounds of the input image.
-         The suggested default is the image centre.  It is only used in
-         Interface mode with the {\tt "Value"} option.
-      }
-      \sstsubsection{
-         XYCONT = \_LOGICAL (Read)
-      }{
-         If {\tt TRUE}, an existing file is appended to in the XYcur option.
-         The suggested default is {\tt FALSE}.  It is only available in
-         cursor mode with the {\tt "XYcur"} option.
-      }
-      \sstsubsection{
-         XYFILE = FILENAME (Update)
-      }{
-         Name of the text file to which pixel data are written by
-         XYcur option.  The suggested default is {\tt xylist.lis}.  It is
-         only available in cursor mode with the {\tt "XYcur"} option.
-      }
-      \sstsubsection{
-         XYTITLE = LITERAL (Read)
-      }{
-         Title for the text file in XYcur option.  For the first file
-         created this defaults to {\tt "\# KAPPA - Inspect\_XYcur"}, and
-         subsequently this becomes the suggested default. It is not
-         accessed if XYCONT is {\tt TRUE}.   It is only available in cursor
-         mode with the {\tt "XYcur"} option. {\tt []}
-      }
-   }
-   \sstgraphparameters{
-      \sstsubsection{
-         ABSLAB  =  LITERAL (Read)
-      }{
-         Label for the line-plot abscissa, in which NCAR fancy founts
-         may be embedded when FONT = {\tt "NCAR"}.  Note Slice and
-         Histogram have different defaults and these are stored separately.
-
-         For a slice plot the suggested default is the current value,
-         which is initially {\tt "Pixels"}.  If an error occurs obtaining the
-         label the default is {\tt "Pixels"}.
-
-         If axis information is present the suggested default for a
-         plot of an histogram is the NDF's axis label followed by the
-         units, in parentheses.  If an error occurs obtaining the label
-         or there is no axis information, the label takes its current
-         value, which initially is {\tt "Values"}.
-
-         For the first plot ABSLAB is defaulted to the suggested value
-         unless PLOTSTYLE is included on the command line, and
-         subsequently will only be obtained whenever PLOTSTYLE is {\tt TRUE}.
-         {\tt []}
-      }
-      \sstsubsection{
-         FONT = LITERAL (Read)
-      }{
-         The fount to be used for the line graphics.  It can be either
-         {\tt "NCAR"} for the NCAR fancy characters and {\tt "GKS"} for the standard
-         GKS san-serif fount.   The former is intended for hardcopy
-         publication-quality plots, since it is relatively slow; the
-         latter is intended for normal interactive graphics requiring
-         rapid plotting, and it is clearer on small plots. The
-         suggested default is the current value.
-
-         For the first plot FONT is defaulted to {\tt "GKS"}, and subsequently
-         will only be obtained whenever PLOTSTYLE is {\tt TRUE}. {\tt []}
-      }
-      \sstsubsection{
-         MAJTIC( 2 ) = \_REAL (Read)
-      }{
-         The parameter controlling the numbers of major tick marks
-         for the $x$ and $y$ axes in the slice or histogram plot.
-         (The number used is between MAJTIC$+$2 and 5$*$MAJTIC/2$+$4.).
-
-         By default, it is {\tt [4.,4.]}.  For the first plot MAJTIC is
-         defaulted, and subsequently will only be obtained whenever
-         PLOTSTYLE is {\tt TRUE}.  {\tt []}
-      }
-      \sstsubsection{
-         MINTIC( 2 ) = \_REAL (Read)
-      }{
-         The number of minor tick marks between each major tick mark
-         for linear $x$ and $y$ axes in the slice or histogram plot.  A
-         negative value forces the graphics package to compute
-         appropriate values.  The number of minor tick marks per major
-         tick is fixed (8) for a logarithmic axis.
-
-         By default, it is {\tt [-1.,-1.]}.  For the first plot MINTIC is
-         defaulted, and subsequently will only be obtained whenever
-         PLOTSTYLE is {\tt TRUE}.  {\tt []}
-      }
-      \sstsubsection{
-         ORDLAB  =  LITERAL (Read)
-      }{
-         Label for the line-plot ordinate, in which NCAR fancy founts
-         may be embedded.  Note Slice and Histogram have different
-         defaults and these are stored separately.
-
-         For an histogram plot the suggested default is the current
-         value, which is initially {\tt "Number"}.  If an error occurs
-         obtaining the label the default is {\tt "Number"}.
-
-         If axis information is present the suggested default for a
-         plot of a slice is the NDF's axis label followed by the
-         units, in parentheses.  If an error occurs obtaining the label
-         or there is no axis information, the label takes its current
-         value, which initially is {\tt "Data values"}.
-
-         For the first plot ORDLAB is defaulted to the suggested value
-         unless PLOTSTYLE is included on the command line, and
-         subsequently will only be obtained whenever PLOTSTYLE is {\tt TRUE}.
-         {\tt []}
-      }
-      \sstsubsection{
-         OUTTIC = \_LOGICAL (Read)
-      }{
-         {\tt TRUE} if the axis tick marks are to appear on the outside of
-         the axes instead of inside in the slice or histogram plots.
-         This eliminates intersections of ticks with the data locus.
-
-         By default, the tick marks are drawn inside the plot region.
-         For the first plot OUTTIC is defaulted, and subsequently will
-         only be obtained whenever PLOTSTYLE is {\tt TRUE}.  {\tt []}
-      }
-      \sstsubsection{
-         PLOTSTYLE = \_LOGICAL (Read)
-      }{
-         If {\tt TRUE}, the plotting style of line plots is to be altered from
-         the default for the first plot, or the existing values for
-         subsequent graphs.  Initially, it is defaulted to {\tt FALSE}, then
-         the suggested value is the current value.  Therefore to
-         override the plotting-style parameters on the first plot, new
-         values should be given on the command line, and along with the
-         PLOTSTYLE keyword for ABSLAB, ORDLAB, and PLTITL.
-         Subsequently, the plotting style may be
-         retained or modified via prompts.  {\tt []}
-      }
-      \sstsubsection{
-         PLTITL = LITERAL (Read)
-      }{
-         The title of a line plot, in which NCAR fancy founts may be
-         embedded.  Note Slice and Histogram have different defaults
-         and these are stored separately.  Both attempt to use the NDF's
-         title if present and no error occurs, otherwise the current
-         value becomes the suggested default.  For the histogram plot
-         this is initially {\tt "Histogram of current region"} and for the
-         slice plot it is initially {\tt "Slice plot"}.
-
-         For the first plot PLTITL is defaulted to the suggested value
-         unless PLOTSTYLE is included on the command line, and
-         subsequently will only be obtained whenever PLOTSTYLE is {\tt TRUE}.
-         {\tt []}
-      }
-      \sstsubsection{
-         THICK = \_REAL (Read)
-      }{
-         The thickness of the axes and annotations in the histogram and
-         line plots, where 1.0 is the normal thickness.  Currently,
-         this is only available on a few devices.  It must take a value
-         in the range 0.5--5.0.
-
-         By default the line thickness is 1.0.  For the first plot
-         THICK is defaulted to the suggested value, and subsequently
-         will only be obtained whenever PLOTSTYLE is {\tt TRUE}.  {\tt []}
-      }
-      \sstsubsection{
-         XLOG = \_LOGICAL (Read)
-      }{
-         {\tt TRUE} if the line-plot abscissa is to be logarithmic.  Note, for
-         Slice and Histogram options each has its own independent
-         switch.  It is unlikely that you would want to do this.  By
-         default, the abscissa is linear.  For the first plot XLOG is
-         defaulted, and subsequently will only be obtained whenever
-         PLOTSTYLE is {\tt TRUE}. {\tt []}
-      }
-      \sstsubsection{
-         YLOG = \_LOGICAL (Read)
-      }{
-         {\tt TRUE} if the line-plot ordinate is to be logarithmic. Note, for
-         Slice and Histogram options each has its own independent
-         switch.  By default, the ordinate is linear.  For the first
-         plot YLOG is defaulted, and subsequently will only be
-         obtained whenever PLOTSTYLE is {\tt TRUE}.  {\tt []}
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         Note:
-      }{
-         Since INSPECT is an interacting, graphical and self-contained
-         monolith of applications it is not straightforward to give
-         command-line examples.  Generally, the best way to run INSPECT
-         is in cursor mode after having displayed an image.  The
-         following examples use the prompting mode.
-      }
-      \sstexamplesubsection{
-         inspect rulupi i canon\_l sl slstart=[3,10] slend=[9,42] slice=!
-      }{
-         Plots a slice from pixel (3,10) to (9,42) of the NDF called
-         rulupi to the CANON\_L graphics device.
-      }
-      \sstexamplesubsection{
-         inspect rulupi i gdevice=x2w option=hi numbin=100 histogram=ru\_hg
-      }{
-         Calculates the histogram of the NDF called rulupi, reporting
-         a summary to you, and plots the histogram to the x2w
-         device.  The histogram has one hundred bins and is stored in
-         an NDF called ru\_hg.
-      }
-      \sstexamplesubsection{
-         inspect rulupi i ! option=hi numbin=100 hirep $\backslash$
-      }{
-         As above except no plot is made, no NDF is created, and
-         the full one hundred histogram values are reported.  In this
-         particular example the second parameter could equally well be
-         C for cursor mode since no co-ordinate information is
-         obtained.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         In cursor mode there must be an existing DATA picture for the
-         chosen image display stored in the graphics database.  Valid
-         cursor positions are bounded by the DATA picture.
-
-         \sstitem
-         On exit the input picture, if there was one, is made the
-         current picture on the overlay; and the last graphics plot is
-         stored in the database as a FRAME picture.  Also, if the
-         {\tt "Device"} option is used a FRAME picture is stored for
-         that device.
-
-         \sstitem
-         The Histogram NDF has an AXIS component whose the LABEL and
-         UNITS are those of the input NDF's data array; its centres are
-         in data value of the bin centre.  The NDF LABEL is {\tt "Number"}.
-
-         \sstitem
-         The Slice NDF has an AXIS component whose LABEL is {\tt "Pixel"} and
-         centres are pixel co-ordinates from 0.5; its LABEL and UNITS are
-         propagated from the input NDF.
-
-         \sstitem
-         The current palette entries 1 to 4 associated with the OVERLAY
-         are used as follows in the cursor mode for IMAGE\_OVERLAY devices.
-         A sample slice or region, and the associated button, are drawn
-         with palette index 1.  Similarly, index 3 is used to indicate an
-         accepted slice or region.  The exit button is drawn in the colour
-         of index 2.  Index 4 is used to draw the boxes representing the
-         mouse or trackerball buttons.  Use the PAL$\lsk$ commands to select
-         suitable complementary colours for the image's colour table,
-         especially for palette indices 1 and 3.
-
-         For WINDOW\_OVERLAY devices, all the above are drawn with the
-         colour of palette index 1, but the various colours are replaced
-         by different dashed-line patterns.  Use PALENTRY to change the
-         colour of the lines.
-      }
-   }
-   \sstdiytopic{
-      Related Applications
-   }{
-      KAPPA: CURSOR, HISTOGRAM, ELPROF, LOOK, NDFCOPY, STATS; ESP:
-      SECTOR; Figaro: HIST, ICUR, IGCUR, ILIST, ISTAT, SLICE; GAIA.
-   }
-   \sstimplementationstatus{
-      \sstitemlist{
-
-         \sstitem
-         Only real data can be processed directly.  Other data types
-         will undergo a type conversion before processing occurs.
-
-         \sstitem
-         The routine correctly processes the AXIS, DATA, QUALITY, VARIANCE,
-         LABEL, TITLE, UNITS, and HISTORY components of an NDF, and
-         propagates the WCS component, plus all extensions, to the output 
-         Region NDF.
-
-         \sstitem
-         Processing of bad pixels and automatic quality masking are
-         supported.  Bad pixels are excluded from statistics and are
-         indicated in reports of data values by the word {\tt INVALID}.  In the
-         slice plot they appear as gaps, and they do not affect the limits
-         of the ordinate.  The same applies to zero or negative data
-         values if the plot is to have a logarithmic ordinate.  Similarly,
-         for the histogram abscissa.
-      }
    }
 }
 \sstroutine{
@@ -38014,7 +37415,7 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: HISTAT, INSPECT, NDFTRACE; Figaro: ISTAT.
+      KAPPA: HISTAT, NDFTRACE; Figaro: ISTAT.
    }
 }
 \sstroutine{
@@ -44886,6 +44287,7 @@ need that may occur for them (see SUN/xxx).
 CLEAR to ``N''.
 \item [GREYPLOT] Use \htmlref{DISPLAY}{DISPLAY} instead setting parameter
 KEY to ``Y''.
+\item [INSPECT] Use Gaia instead.
 \item [SNAPSHOT] Use a commonly available utility such as {\tt xv} instead.
 \item [TURBOCONT] Use \htmlref{CONTOUR}{CONTOUR} instead.
 \end{description}
@@ -45104,8 +44506,6 @@ functions as follows.
  Draws ${\pm}n$ standard-deviation lines on a line plot.
 \classitem{ELPROF}
  Creates a radial or azimuthal profile of a 2-dimensional image.
-\classitem{INSPECT}
- Inspects a 2-d NDF in a variety of ways.
 \classitem{LINPLOT}
  Draws a line plot of the data values in a 1-d NDF.
 \classitem{LISTSHOW}
@@ -45233,8 +44633,6 @@ functions as follows.
  Concatenates a series of vectorized NDFs.
 \classitem{FLIP}
  Reverses an NDF's pixels along a specified dimension.
-\classitem{INSPECT}
- Inspects a 2-d NDF in a variety of ways.
 \classitem{MANIC}
  Converts all or part of a data array from one dimensionality to another.
 \classitem{NDFCOPY}
@@ -45484,8 +44882,6 @@ functions as follows.
  Computes ordered statistics for an NDF's pixels using an histogram.
 \classitem{HISTOGRAM}
  Computes an histogram of an NDF's values.
-\classitem{INSPECT}
- Inspects a 2-d NDF in a variety of ways.
 \classitem{MSTATS}
  Does cumulative statistics on a 2-d sub-array over a sequence of data arrays.
 \classitem{NUMB}
