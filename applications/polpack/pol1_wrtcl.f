@@ -1,6 +1,6 @@
       SUBROUTINE POL1_WRTCL( CI, GOTRD, MAKERD, MAP, NCOL, GCOL, NROW, 
-     :                       IDCOL, FD, SZBAT, LBND, UBND, WORK1, WORK2, 
-     :                       WORK3, STATUS )
+     :                       IDCOL, ZCOL, FD, SZBAT, LBND, UBND, WORK1, 
+     :                       WORK2, WORK3, STATUS )
 *+
 *  Name:
 *     POL1_WRTCL
@@ -13,7 +13,8 @@
 
 *  Invocation:
 *     CALL POL1_WRTCL( CI, GOTRD, MAKERD, MAP, NCOL, GCOL, NROW, IDCOL, 
-*                      FD, SZBAT, LBND, UBND, WORK1, WORK2, WORK3, STATUS )
+*                      ZCOL, FD, SZBAT, LBND, UBND, WORK1, WORK2, WORK3, 
+*                      STATUS )
 
 *  Description:
 *     This routine writes out a Tcl list holding the column data in a 
@@ -41,14 +42,16 @@
 *        No. of rows.
 *     IDCOL = INTEGER (Given)
 *        Index of the ID column.
+*     ZCOL = INTEGER (Given)
+*        Index of the Z column, or -1 if there is no Z column.
 *     FD = INTEGER (Given)
 *        FIO identifier for text file to hold output catalogue.
 *     SZBAT = INTEGER (Given)
 *        First dimension of work arrays.
-*     LBND( 2 ) = REAL (Retuned)
-*        The lower bounds of columns 1 (X) and 2 (Y).
-*     UBND( 2 ) = REAL (Retuned)
-*        The upper bounds of columns 1 (X) and 2 (Y).
+*     LBND( 3 ) = REAL (Retuned)
+*        The lower bounds of columns 1 (X) and 2 (Y), and the Z column.
+*     UBND( 3 ) = REAL (Retuned)
+*        The upper bounds of columns 1 (X) and 2 (Y), and the Z column.
 *     WORK1( SZBAT, 2 ) = DOUBLE PRECISION (Returned)
 *        Work array.
 *     WORK2( SZBAT, 2 ) = DOUBLE PRECISION (Returned)
@@ -93,12 +96,13 @@
       INTEGER GCOL( NCOL )
       INTEGER NROW
       INTEGER IDCOL
+      INTEGER ZCOL
       INTEGER FD
       INTEGER SZBAT
       
 *  Arguments Returned:
-      REAL LBND( 2 )
-      REAL UBND( 2 )
+      REAL LBND( 3 )
+      REAL UBND( 3 )
       DOUBLE PRECISION WORK1( SZBAT, 2 ) 
       DOUBLE PRECISION WORK2( SZBAT, 2 ) 
       REAL WORK3( SZBAT, * ) 
@@ -163,6 +167,7 @@
       REAL Y                     ! Y column value
       REAL YC                    ! Estimate of central Y
       REAL YRAN( NRAN )          ! Y values at saved rows
+      REAL Z                     ! Z column value
 
 *  Store NRAN nearly random values between 0 and 1, in increasing order.
       DATA RAN/ 0.112368822, 0.149562612, 0.169489801, 0.202944234,
@@ -209,8 +214,10 @@
 *  Initialise the PIXEL Frame bound box for the catalogue.
       LBND( 1 ) = VAL__MAXR
       LBND( 2 ) = VAL__MAXR
+      LBND( 3 ) = VAL__MAXR
       UBND( 1 ) = VAL__MINR
       UBND( 2 ) = VAL__MINR
+      UBND( 3 ) = VAL__MINR
 
 *  Initialize some safe RA/DEC values.
       RAG = 0.0
@@ -318,6 +325,13 @@
                IF( X .GT. UBND( 1 ) ) UBND( 1 ) = X
                IF( Y .GT. UBND( 2 ) ) UBND( 2 ) = Y
 
+*  Update the Z bounds if available.               
+               IF( ZCOL .GT. 0 ) THEN 
+                  Z = REAL( WORK3( I, ZCOL - 4 ) )
+                  IF( Z .LT. LBND( 3 ) ) LBND( 3 ) = Z
+                  IF( Z .GT. UBND( 3 ) ) UBND( 3 ) = Z
+               END IF
+
             END DO
 
 *  Now deal with cases where no RA/DEC columns are to be included in the
@@ -356,6 +370,13 @@
                IF( Y .LT. LBND( 2 ) ) LBND( 2 ) = Y
                IF( X .GT. UBND( 1 ) ) UBND( 1 ) = X
                IF( Y .GT. UBND( 2 ) ) UBND( 2 ) = Y
+
+*  Update the Z bounds if available.               
+               IF( ZCOL .GT. 0 ) THEN 
+                  Z = REAL( WORK3( I, ZCOL - 2 ) )
+                  IF( Z .LT. LBND( 3 ) ) LBND( 3 ) = Z
+                  IF( Z .GT. UBND( 3 ) ) UBND( 3 ) = Z
+               END IF
 
             END DO
 

@@ -30,6 +30,7 @@
 *     The following internal quantity names are recognised:
 *        "X" - X pixel coordinate (mandatory)
 *        "Y" - Y pixel coordinate (mandatory)
+*        "Z" - Z pixel coordinate (optional)
 *        "RA" - Right ascension (mandatory only if RA/DEC columns requested)
 *        "DEC" - Declination (mandatory only if RA/DEC columns requested)
 *        "I" - Total intensity (mandatory)
@@ -53,7 +54,7 @@
 
 *  Arguments:
 *     INAME = CHARACTER * ( * ) (Given)
-*        The name of the quantity (e.g. X, Y, RA, DEC, I, Q, U, V, DI, DQ, 
+*        The name of the quantity (e.g. X, Y, Z, RA, DEC, I, Q, U, V, DI, DQ, 
 *        DU, DV, P, DP, ANG, DANG, PI, DPI, ID, etc). If INAME is blank,
 *        the config file is re-read, but no ENAME value is returned.
 *     INVERT = LOGICAL (Given)
@@ -79,6 +80,8 @@
 *  History:
 *     13-DEC-2000 (DSB):
 *        Original version.
+*     2-DEB-2001 (DSB):
+*        Added Z column.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -109,7 +112,7 @@
 
 *  Local Constants:
       INTEGER MXCOL              ! Max number of column definitions
-      PARAMETER ( MXCOL = 19 )
+      PARAMETER ( MXCOL = 20 )
 
 *  Local Variables:
       CHARACTER BUF*255          ! Buffer for line read from config file
@@ -132,7 +135,7 @@
 
 *  Local Data:
       DATA INIT /.FALSE./,
-     :     NAMES / 'X', 'Y', 'RA', 'DEC', 'I', 'Q', 'U', 'V', 'DI', 
+     :     NAMES / 'X', 'Y', 'Z', 'RA', 'DEC', 'I', 'Q', 'U', 'V', 'DI', 
      :             'DQ', 'DU', 'DV', 'P', 'PI', 'ANG', 'DP', 'DPI', 
      :             'DANG', 'ID' /
 

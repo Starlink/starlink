@@ -461,7 +461,7 @@ pol1_srtim.f pol1_stkim.f pol1_stknm.f pol1_stksm.f polstack.f \
 polversion.f pol1_3dwcs.f pol1_fbbox.f polwrtcl.f pol1_wrtcl.f \
 pol1_gcolr.f pol1_gcold.f pol1_fioer.f  polrdtcl.f pol1_rdtcl.f \
 pol1_ctprp.f pol1_put0r.f pol1_put0d.f pol1_gtcol.f pol1_cnews.f \
-pol1_colnm.f pol1_cnfig.f 
+pol1_colnm.f pol1_cnfig.f pol1_tiqac.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = 
@@ -1846,6 +1846,7 @@ pol1_stbin.o:	 SAE_PAR
 pol1_stk.o:	 SAE_PAR
 pol1_stk2.o:	 SAE_PAR PRM_PAR
 pol1_stkim.o:    SAE_PAR DAT_PAR PRM_PAR GRP_PAR NDF_PAR
+pol1_tioqac.o:   SAE_PAR CAT_ERR
 pol1_vecky.o:	 SAE_PAR AST_PAR
 pol1_vecpl.o:	 SAE_PAR PRM_PAR MSG_PAR
 pol1_vect.o:	 SAE_PAR

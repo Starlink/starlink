@@ -34,13 +34,17 @@
 *                 not.
 *      headings_: A Tcl list holding the column headings.
 *      uses_    : A Tcl list holding the quantity stored in each column.
-*                 These will chosen from X, Y, RA, DEC, I, Q, U, V, DI,
+*                 These will chosen from X, Y, Z, RA, DEC, I, Q, U, V, DI,
 *                 DQ, DU, DV, P, ANG, PI, DP, DANG, DPI, ID (or will be null
 *                 if the quantity in the column is not known).
 *      xlo_     : The minimum X pixel index value in the data
 *      ylo_     : The minimum Y pixel index value in the data
+*      zlo_     : The minimum Z pixel index value in the data (only set
+*                 if the catalogue has a Z column).
 *      xhi_     : The maximum X pixel index value in the data
 *      yhi_     : The maximum Y pixel index value in the data
+*      zhi_     : The maximum Z pixel index value in the data (only set
+*                 if the catalogue has a Z column).
 *      ncol_    : The number of columns in the catalogue
 *      nrow_    : The number of rows in the catalogue
 *      data_    : A Tcl list of rows. Each row is itself a Tcl list of
@@ -82,6 +86,8 @@
 *  History:
 *     6-SEP-2000 (DSB):
 *        Original version.
+*     13-FEB-2001 (DSB):
+*        Modified to support 3D data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -151,6 +157,7 @@
       CHARACTER TEXT*512         ! O/p text buffer
       CHARACTER XCNM*20          ! Name of the X column
       CHARACTER YCNM*20          ! Name of the Y column
+      CHARACTER ZCNM*20          ! Name of the Z column
       DOUBLE PRECISION DEQN      ! Input equinox
       INTEGER BFRM               ! Base Frame from input WCS FrameSet
       INTEGER CI                 ! CAT identifier for input catalogue
@@ -179,12 +186,13 @@
       INTEGER SZBAT              ! Size of each batch
       INTEGER XCOL               ! Index of X column within output catalogue 
       INTEGER YCOL               ! Index of Y column within output catalogue 
+      INTEGER ZCOL               ! Index of Z column within output catalogue 
       LOGICAL GOTRD              ! Will o/p catalogue have RA and DEC columns?
       LOGICAL MAKERD             ! Will we be creating new RA/DEC o/p columns?
       LOGICAL NULL               ! Is the stored value null?
       LOGICAL VERB               ! Verose errors required?
-      REAL LBND( 2 )             ! Lower bounds of X/Y bounding box
-      REAL UBND( 2 )             ! Upper bounds of X/Y bounding box
+      REAL LBND( 3 )             ! Lower bounds of X/Y/Z bounding box
+      REAL UBND( 3 )             ! Upper bounds of X/Y/Z bounding box
 
 *.
 
@@ -214,9 +222,10 @@
      :                 'allowed.', STATUS )
       END IF
 
-*  Get the names of the X, Y, Ra, Dec and ID columns in the input catalogue.
+*  Get the names of the X, Y, Z, Ra, Dec and ID columns in the input catalogue.
       CALL POL1_COLNM( 'X', .FALSE., XCNM, STATUS )
       CALL POL1_COLNM( 'Y', .FALSE., YCNM, STATUS )
+      CALL POL1_COLNM( 'Z', .FALSE., ZCNM, STATUS )
       CALL POL1_COLNM( 'RA', .FALSE., RACNM, STATUS )
       CALL POL1_COLNM( 'DEC', .FALSE., DECCNM, STATUS )
       CALL POL1_COLNM( 'ID', .FALSE., IDCNM, STATUS )
@@ -228,6 +237,7 @@
 *  Note, the indices of the X, Y, RA, DEC and ID columns. 
       XCOL = 0
       YCOL = 0
+      ZCOL = 0
       RACOL = 0
       DECCOL = 0
       IDCOL = 0
@@ -242,6 +252,9 @@
 
          ELSE IF( HEAD( ICOL ) .EQ. YCNM ) THEN
             YCOL = ICOL
+
+         ELSE IF( HEAD( ICOL ) .EQ. ZCNM ) THEN
+            ZCOL = ICOL
 
          ELSE IF( HEAD( ICOL ) .EQ. RACNM ) THEN
             RACOL = ICOL
@@ -294,8 +307,9 @@
       GCOL( 1 ) = ITEMP
 
       IF( YCOL .LT. XCOL ) YCOL = YCOL + 1
-      IF( RACOL .GT.0 .AND. RACOL .LT. XCOL ) RACOL = RACOL + 1
-      IF( DECCOL .GT.0 .AND. DECCOL .LT. XCOL ) DECCOL = DECCOL + 1
+      IF( RACOL .GT. 0 .AND. RACOL .LT. XCOL ) RACOL = RACOL + 1
+      IF( DECCOL .GT. 0 .AND. DECCOL .LT. XCOL ) DECCOL = DECCOL + 1
+      IF( ZCOL .GT. 0 .AND. ZCOL .LT. XCOL ) ZCOL = ZCOL + 1
       IF( IDCOL .LT. XCOL ) IDCOL = IDCOL + 1
       XCOL = 1
 
@@ -308,8 +322,9 @@
       HEAD( 2 ) = YCNM
       GCOL( 2 ) = ITEMP
 
-      IF( RACOL .GT.0 .AND. RACOL .LT. YCOL ) RACOL = RACOL + 1
-      IF( DECCOL .GT.0 .AND. DECCOL .LT. YCOL ) DECCOL = DECCOL + 1
+      IF( RACOL .GT. 0 .AND. RACOL .LT. YCOL ) RACOL = RACOL + 1
+      IF( DECCOL .GT. 0 .AND. DECCOL .LT. YCOL ) DECCOL = DECCOL + 1
+      IF( ZCOL .GT. 0 .AND. ZCOL .LT. YCOL ) ZCOL = ZCOL + 1
       IF( IDCOL .LT. YCOL ) IDCOL = IDCOL + 1
       YCOL = 2
 
@@ -532,6 +547,7 @@
    
          IF( DECCOL .LT. RACOL ) DECCOL = DECCOL + 1
          IF( IDCOL .LT. RACOL ) IDCOL = IDCOL + 1
+         IF( ZCOL .GT. 0 .AND. ZCOL .LT. RACOL ) ZCOL = ZCOL + 1
          RACOL = 3
 
          ITEMP = GCOL( DECCOL )
@@ -543,6 +559,7 @@
          GCOL( 4 ) = ITEMP
 
          IF( IDCOL .LT. DECCOL ) IDCOL = IDCOL + 1
+         IF( ZCOL .GT. 0 .AND. ZCOL .LT. DECCOL ) ZCOL = ZCOL + 1
          DECCOL = 4
 
       END IF
@@ -671,7 +688,7 @@
 
 *  Write values to the output file.
       CALL POL1_WRTCL( CI, GOTRD, MAKERD, MAP, NCOL, GCOL, NROW, 
-     :                 IDCOL, FD, SZBAT, LBND, UBND, %VAL( IPW1 ), 
+     :                 IDCOL, ZCOL, FD, SZBAT, LBND, UBND, %VAL( IPW1 ), 
      :                 %VAL( IPW2 ), %VAL( IPW3 ), STATUS )
 
 *  Free the work space.
@@ -699,6 +716,18 @@
       IAT = 9
       CALL CHR_PUTI( NINT( 0.5 + UBND( 2 ) ), TEXT, IAT )
       CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
+
+      IF( ZCOL .GT. 0 ) THEN 
+         TEXT = 'set zlo_ '
+         IAT = 9
+         CALL CHR_PUTI( NINT( 0.5 + LBND( 3 ) ), TEXT, IAT )
+         CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
+   
+         TEXT = 'set zhi_ '
+         IAT = 9
+         CALL CHR_PUTI( NINT( 0.5 + UBND( 3 ) ), TEXT, IAT )
+         CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
+      END IF
 
 *  Arrive here if an error occurs.
  999  CONTINUE
