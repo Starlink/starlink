@@ -831,7 +831,7 @@ ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf
 
 #  Define the package test data.
 
-TEST_FILES = ccdframec.sdf comwest.sdf spectrum.sdf
+TEST_FILES = ccdframec.sdf comwest.sdf spectrum.sdf m31.sdf
 
 #  Define the plotting style files.
 
