@@ -450,7 +450,8 @@ static void RemoveTask( volatile task_data *task ) {
    (void) sigprocmask( SIG_SETMASK, &oset, NULL );
 
 /* Free the memory used. */
-   free( task );
+/*   free( (void *) task ); -- not correct according to Solaris debug
+                               also line 385 (alloc) is leaked */
 }
 
 /* Kill a task and return immediately (without waiting). */
