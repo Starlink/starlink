@@ -1,3 +1,10 @@
+2003-03-28  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* applic/makemap.f (makemap): Must init FAULT variable
+
+	* applic/fake.f (FAKE): TS check must use 'IN' and not
+	'INPUT'. Must calculate NELM before using it.
+
 2000-10-25  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* applic/makemap.f (makemap): Must init status variable
