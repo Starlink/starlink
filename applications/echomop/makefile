@@ -446,6 +446,8 @@ PKG_LINK = ECHOMOP
 #  %%VERSION%%
 PKG_VERS = 3.3-6
 
+PKG_DATE = 2002 July 16
+
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
 #  package from source (including this makefile, the associated mk
@@ -718,9 +720,11 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS) $(PKG_NAME).news VERSION
 .SUFFIXES: .o .c .f .ifc .ifl .shl .hlp
 
 #  List of files which must be built from the source files before the
-#  package can be installed for use.  This should comprise all the files
-#  that are required to use the package (but excluding the date stamp
-#  file).
+#  package can be installed for use.  This should comprise all the
+#  files that are required to use the package (but excluding the date
+#  stamp file), and excluding the documentation (which should not be
+#  built when the rest of the package is being built, but only when
+#  it's being packaged).
 
 BUILT_FILES = $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(OBJECT_LIBRARIES) \
    $(MONOLITH) ech_ftrdb ech_scrn2d $(HELPTASK) $(DATA_FILES) \
@@ -905,6 +909,7 @@ alphainstall:
 	   sed -e s#INSTALL_BIN#`pwd`# \
                -e s#INSTALL_HELP#`pwd`# \
                -e s#PKG_VERS#$(PKG_VERS)# \
+               -e s#PKG_DATE#$(PKG_DATE)# \
               echomopalpha.csh > echalpha.csh;\
            chmod 755 echalpha.csh;\
 	else :; fi
@@ -1274,6 +1279,7 @@ install:
 		    sed -e s#INSTALL_BIN#$(INSTALL_BIN)# \
 			-e s#INSTALL_HELP#$(INSTALL_HELP)# \
 			-e s#PKG_VERS#$(PKG_VERS)# \
+			-e s#PKG_DATE#$(PKG_DATE)# \
 			$$f >$(INSTALL_BIN)/$$f ;\
 		    chmod 755 $(INSTALL_BIN)/$$f ;\
 		fi; \

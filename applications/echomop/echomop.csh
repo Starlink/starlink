@@ -142,7 +142,7 @@ alias ECHWWW "Mosaic ${ECHOMOP_HYPERDIR}/echomop.html &"
 # Show that the ECHOMOP commands are now available.
 #
 echo "              Echelle data reduction"
-echo "          Version PKG_VERS  13th June 1997"
+echo "          Version PKG_VERS,  PKG_DATE"
 echo " "
 echo "          Type" \"echhelp echomop\" for help
 echo "    or" \"echhelp news\" for news on changes
