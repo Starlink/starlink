@@ -28,11 +28,15 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 dnl    Look for tck/tk system
 STAR_PATH_TCLTK(8.2, [tcl])
 
-dnl    Build dependencies for this package.
-dnl    Includes: fio, par, sae; 
-dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [fio prm par sae hds kaplibs ard pgplot shl])
-dnl    No use dependencies
+dnl POLPACK source files depend on include files from the following components  
+STAR_DECLARE_DEPENDENCIES([build], [ast cat chr cnf hds fio grp mers ndf ndg par prm sae trn])
+
+dnl The POLPACK link script links against the following components
+STAR_DECLARE_DEPENDENCIES([build], [sla nbs kaplibs shl], [link])
+
+dnl Using POLPACK requires the following components to be available at run-time.
+STAR_DECLARE_DEPENDENCIES([use], [kappa ccdpack tcl tk])
+
 
 STAR_LATEX_DOCUMENTATION(sun223)
 STAR_PREDIST_SOURCES(polka.tex)
