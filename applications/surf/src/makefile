@@ -39,7 +39,7 @@ FSOURCES= reds.f reds_wtfn_rebin.f reds_crosstalk.f reds_extinction.f \
 	reds_scuphot.f reds_rebin.f reds_reduce_switch.f reds_restore.f \
 	reds_write_demod.f reds_write_flat.f reds_write_photom.f \
 	reds_skydip.f reds_scucat.f skydip_fit.f kstest.f ve08ad.f drawsig.f \
-	kpg1_ivci.f scuhelp.f reds_remsky.f
+	kpg1_ivci.f scuhelp.f reds_remsky.f reds_scuover.f
 
 IFL=    reds.ifl extinction.ifl modify.ifl reduce_switch.ifl flatfield.ifl \
 	rebin.ifl scucat.ifl kstest.ifl scuphot.ifl skydip.ifl drawsig.ifl \
