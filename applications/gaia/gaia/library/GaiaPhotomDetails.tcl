@@ -534,10 +534,6 @@ itcl::class gaia::GaiaPhotomDetails {
    #  Update the display to reflect the values of the given
    #  GaiaPhotomObject.
    public method update_display {object} {
-      #  Stop changes from leaving this object. Otherwise changes to
-      #  these values could be propagated back to whoever caused this
-      #  update, ending in a positive feedback loop!
-      #set propagate_ 0
       if { $phottype_ == "aperture" } {
          update_ap_ $object
       } else {
@@ -548,7 +544,6 @@ itcl::class gaia::GaiaPhotomDetails {
          }
       }
       ::update idletasks ;#  Needed to propagate changes now!
-      #set propagate_ 1
    }
 
    #  Update values of aperture photometry object.
@@ -733,9 +728,7 @@ itcl::class gaia::GaiaPhotomDetails {
    #  Current semimajor axes of apertures (== radius for circles).
    itk_option define -semimajor semimajor SemiMajor {5} {
       if { $itk_option(-object_list) != {} } {
-         if { $propagate_ } {
-            $itk_option(-object_list) configure -semimajor $itk_option(-semimajor)
-         }
+         $itk_option(-object_list) configure -semimajor $itk_option(-semimajor)
       }
    }
 
@@ -748,9 +741,7 @@ itcl::class gaia::GaiaPhotomDetails {
             $itk_component(OuterScale) configure \
                -from [expr $itk_option(-innerscale)*1.001]
          }
-         if { $propagate_ } {
-            $itk_option(-object_list) configure -innerscale $itk_option(-innerscale)
-         }
+         $itk_option(-object_list) configure -innerscale $itk_option(-innerscale)
       }
    }
 
@@ -763,18 +754,14 @@ itcl::class gaia::GaiaPhotomDetails {
             $itk_component(OuterScale) configure \
                -from [expr $itk_option(-innerscale)*1.001]
          }
-         if { $propagate_ } {
-            $itk_option(-object_list) configure -outerscale $itk_option(-outerscale)
-         }
+         $itk_option(-object_list) configure -outerscale $itk_option(-outerscale)
       }
    }
 
    #  Current eccentricity (constrained to line in range 0-1 by scale).
    itk_option define -eccentricity eccentricity Eccentricity {0.0} {
       if { $itk_option(-object_list) != {} } {
-         if { $propagate_ } {
-            $itk_option(-object_list) configure -eccentricity $itk_option(-eccentricity)
-         }
+         $itk_option(-object_list) configure -eccentricity $itk_option(-eccentricity)
       }
    }
 
@@ -782,9 +769,7 @@ itcl::class gaia::GaiaPhotomDetails {
    #  by scale).
    itk_option define -angle angle Angle {0.0} {
       if { $itk_option(-object_list) != {} } {
-         if { $propagate_ } {
-            $itk_option(-object_list) configure -angle $itk_option(-angle)
-         }
+         $itk_option(-object_list) configure -angle $itk_option(-angle)
       }
    }
 
@@ -804,18 +789,12 @@ itcl::class gaia::GaiaPhotomDetails {
    #  Optimal photometry parameters (clip is semimajor axis).
    itk_option define -seeing seeing Seeing 2.0 {
       if { $itk_option(-object_list) != {} } {
-         if { $propagate_ } {
-            $itk_option(-object_list) configure -seeing $itk_option(-seeing)
-         }
+         $itk_option(-object_list) configure -seeing $itk_option(-seeing)
       }
    }
 
    #  Protected variables: (available to instance)
    #  --------------------
-
-   #  Whether to inhibit non-interactive changes from propagating
-   #  back to list (where they may have originated).
-   protected variable propagate_ 1
 
    #  The type of photometry objects described in the photometry list.
    protected variable phottype_ aperture

@@ -293,6 +293,18 @@ itcl::class gaia::GaiaPhotomObject {
        set sky_defaults_(minor) [expr $major*sqrt(1.0-$ecc*$ecc)]
        set sky_defaults_(shape) $shape
    }
+
+   #  Synchronise the configuration options to reflect the drawn 
+   #  objects. Calling this method is necessary to follow any changes
+   #  in the image zoom, which is never seen.
+   public method sync {} {
+      update_eccen
+      if { $shape == "circle" } {
+         update_circle $canvas_id_ resize
+      } else {
+         update_ellipse $canvas_id_ resize
+      }
+   }
    
    #  Return the values of all options. If mode is "all" then for
    #  apertures the extended form is used, otherwise only basic PHOTOM
@@ -302,12 +314,7 @@ itcl::class gaia::GaiaPhotomObject {
 
       #  Make sure values are up to date as canvas zoom events are
       #  never received.
-      update_eccen
-      if { $shape == "circle" } {
-         update_circle $canvas_id_ resize
-      } else {
-         update_ellipse $canvas_id_ resize
-      }
+      sync
       if { $phottype == "aperture" } {
          return [getapvals_ $mode]
       } else {
@@ -396,8 +403,8 @@ itcl::class gaia::GaiaPhotomObject {
                set maj [image_dist $maj]
                set min [image_dist $min]
                set ecc [expr sqrt(1.0-(($min*$min)/($maj*$maj)))]
-               set description \
-                  "\#SKY$i [format "%10d %10f %10f %10s %10f %10f %10f" \
+               append description \
+                  "\n\#SKY$i [format "%10d %10f %10f %10s %10f %10f %10f" \
                                   $index $x $y $sky_details_($i,shape) \
                                   $maj $ecc $ang]"
             }
@@ -412,12 +419,7 @@ itcl::class gaia::GaiaPhotomObject {
 
       #  Make sure values are up to date as canvas zoom events are
       #  never received.
-      if { $shape == "circle" } {
-         update_circle $canvas_id_ resize
-      } else {
-         update_ellipse $canvas_id_ resize
-      }
-
+      sync
       if { $phottype == "aperture" } {
          return [getapdets_]
       } else {
@@ -543,11 +545,9 @@ itcl::class gaia::GaiaPhotomObject {
          #  overriden by update called during these commands.
          set x $xpos; set y $ypos
          set ma $major; set mi $minor; set a $angle
-
          $canvasdraw set_drawing_mode circle [code $this created_circle]
          $canvasdraw create_object $xpos $ypos
          $canvasdraw create_done $xpos $ypos
-
          set xpos $x; set ypos $y
          set major $ma; set minor $mi; set angle $a
 
@@ -555,11 +555,15 @@ itcl::class gaia::GaiaPhotomObject {
          $canvas itemconfigure $canvas_id_ \
             -semimajor $major -semiminor $minor -angle $angle
          update_circle $canvas_id_ move
-         add_bindings_ $canvas_id_
-         notify_change
+         #add_bindings_ $canvas_id_
+         #notify_change
+
+         #  Update display and deselect object (immediate resize isn't 
+         #  desirable).
+         update idletasks
+         $canvasdraw deselect_object $canvas_id_
       }
    }
-
 
    #  Finally created the new aperture, record details and add call
    #  backs for interactive updates etc. Execute the requested
@@ -568,14 +572,13 @@ itcl::class gaia::GaiaPhotomObject {
    public method created_circle {id args} {
       set state_ drawn
       set canvas_id_ $id
-      $canvasdraw add_notify_cmd $id [code $this update_circle $id] 0
       update_circle $id create
       add_bindings_ $id
+      notify_change
       if { $create_cmd_ != {} } {
          eval $create_cmd_ $id
          set create_cmd_ {}
       }
-      notify_change
    }
 
    #  Update apertures on creation, movement, resize or delete.
@@ -1154,7 +1157,6 @@ itcl::class gaia::GaiaPhotomObject {
          set minor $major
          set major $temp
          set angle [expr fmod($angle+90.0,180.0)]
-         $canvas coords $canvas_id_ $xpos $ypos
          $canvas itemconfigure $canvas_id_ \
             -semimajor $major -semiminor $minor -angle $angle
       }

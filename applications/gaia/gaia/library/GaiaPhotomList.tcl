@@ -32,7 +32,7 @@
 #
 #        GaiaPhotomList object_name [configuration options]
 #
-#     This creates an instance of a StarPhotom object. The return is
+#     This creates an instance of a GaiaPhotomList object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -53,7 +53,8 @@
 #
 #        -allow_resize boolean {1}
 #
-#     Whether apertures can be interactively resized or not.
+#     Whether apertures can be interactively resized or not during
+#     creation.
 #
 #         -angle angle {0.0}
 #
@@ -74,7 +75,7 @@
 #
 #        -details name_of_details {}
 #
-#     The name of the widget (StarPhotomDetails) used to display the
+#     The name of the widget (GaiaPhotomDetails) used to display the
 #     selected apertures details.
 #
 #        -eccentricity float {0.0}
@@ -254,9 +255,6 @@ itcl::class gaia::GaiaPhotomList {
             delete object $objects_($i)
          }
       }
-
-      #  Reset to allow interactive resize
-      $canvasdraw configure -show_selection_grips 1
    }
 
    #  Methods:
@@ -373,13 +371,15 @@ itcl::class gaia::GaiaPhotomList {
       $objects_($index) configure \
          -notify_delete_cmd [code $this deleted_ $index]
 
-      #  And simulate a notify now.
-      changed_ $index
-
-      #  Finally notify user of this class that a new object has been
+      #  Notify user of this class that a new object has been
       #  created.
       if { $notify_created_cmd != {} } {
          eval $notify_created_cmd
+      }
+
+      #  And simulate a notification of an initial change.
+      if { $allow_resize } { 
+         changed_ $index
       }
    }
 
@@ -422,6 +422,7 @@ itcl::class gaia::GaiaPhotomList {
                if { $psf } {
                   lassign $args selected_ xpos ypos fwhm1 fwhm2 angle \
                      code semimajor seeing positions
+                  set selected_ 0
                   set mag 0.0
                   set magerr 0.0
                   set sky 0.0
@@ -677,24 +678,40 @@ itcl::class gaia::GaiaPhotomList {
       return $ok
    }
 
-   #  Set a configuration option for the currently selected objects.
+   #  Set a configuration option for the currently selected
+   #  objects. If in "psf" mode then only one object exists.
    public method config_selected {item value} {
-      set ids [$canvasdraw selected_items]
-      if { $ids != {} } {
-         foreach id "$ids" {
-            if { [info exists objects_ids_($id)] } {
-               if { [info exists objects_($objects_ids_($id))] } {
-                  $objects_($objects_ids_($id)) configure -$item $value
+      if { $phottype != "aperture" && $psf } {
+         if { [info exists objects_(0)] } {
+            $objects_(0) sync
+            $objects_(0) configure -$item $value
+         }
+         return
+      }
+      if { ! $coupled } { 
+         set ids [$canvasdraw selected_items]
+         if { $ids != {} } {
+            foreach id "$ids" {
+               if { [info exists objects_ids_($id)] } {
+                  if { [info exists objects_($objects_ids_($id))] } {
+                     $objects_($objects_ids_($id)) sync
+                     $objects_($objects_ids_($id)) configure -$item $value
+                  }
                }
             }
          }
+      } else {
+         #  Using coupled scheme, or all values the same.
+         config_all $item $value
       }
    }
 
-   #  Set a configuration option for all objects.
+   #  Set a configuration option for all objects. Note we make sure
+   #  that the object is as drawn (sync), before applying the update.
    public method config_all {item value} {
       for {set i $lowest_index_} {$i <= $highest_index_} {incr i} {
          if { [info exists objects_($i)] } {
+            $objects_($i) sync
             $objects_($i) configure -$item $value
          }
       }
@@ -725,12 +742,10 @@ itcl::class gaia::GaiaPhotomList {
    #  Update the displayed details of current object.
    private method update_details_ {} {
       global ::tcl_version
-
       if { [winfo exists $details] && $canvasdraw != {} } {
          if { $selected_ != {} && [info exists objects_($selected_)] } {
             set id [$objects_($selected_) canvas_id]
             if { "$id" != "" } {
-               set selected_ $objects_ids_($id)
 	       # allan: 21.1.99, added tcl8 check
 	       if {$tcl_version >= 8.0} {
                   $details update_display [code $objects_($selected_)]
@@ -771,10 +786,7 @@ itcl::class gaia::GaiaPhotomList {
    #  Deal with notification that an object has been changed
    #  interactively.
    private method changed_ {index} {
-      puts "($this) object changed_ ($index)"
       set selected_ $index
-      update_details_
-      update_scrollbox_
 
       #  These values now become the default (for creation of
       #  new objects without resize). We also need to reset all objects
@@ -787,9 +799,10 @@ itcl::class gaia::GaiaPhotomList {
 	    if { $coupled } {
 	       for {set i $lowest_index_} {$i <= $highest_index_} {incr i} {
 		  if { [info exists objects_($i)] && $i != $index} {
+                     $objects_($i) sync
 		     $objects_($i) configure \
 			-major $semimajor \
-			-ecc $eccentricity \
+			-eccen $eccentricity \
 			-angle $angle \
 			-innerscale $innerscale \
 			-outerscale $outerscale
@@ -804,6 +817,7 @@ itcl::class gaia::GaiaPhotomList {
 	       if { $coupled } {
 		  for {set i $lowest_index_} {$i <= $highest_index_} {incr i} {
 		     if { [info exists objects_($i)] && $i != $index} {
+			$objects_($i) sync
 			$objects_($i) configure \
 			   -fwhm1 $fwhm1 \
 			   -fwhm2 $fwhm2 \
@@ -815,6 +829,7 @@ itcl::class gaia::GaiaPhotomList {
 		     }
 		  }
 	       }
+               set selected_ 0
             } else {
                lassign [$objects_($index) object_details] \
                   index x y mag magerr sky signal code \
@@ -822,6 +837,7 @@ itcl::class gaia::GaiaPhotomList {
 	       if { $coupled } {
 		  for {set i $lowest_index_} {$i <= $highest_index_} {incr i} {
 		     if { [info exists objects_($i)] && $i != $index} {
+			$objects_($i) sync
 			$objects_($i) configure \
 			   -major $semimajor \
 			   -innerscale $innerscale \
@@ -832,6 +848,10 @@ itcl::class gaia::GaiaPhotomList {
             }
          }
       }
+
+      #  Update displays of values.
+      update_details_
+      update_scrollbox_
 
       #  Send the changed notification, if needed.
       if { $notify_changed_cmd != {} } {
@@ -897,7 +917,7 @@ itcl::class gaia::GaiaPhotomList {
    #  Parent window for Scrollbox (if used).
    public variable scrollbox {.gaiaphotomlist} {}
 
-   #  Display current object details in StarPhotomDetails object if required.
+   #  Display current object details in GaiaPhotomDetails object if required.
    public variable details {} {
       if { [winfo exists $details] } {
          set show_details_ 1
@@ -916,10 +936,8 @@ itcl::class gaia::GaiaPhotomList {
    #  command to track changes. Should also do this for other options,
    #  but don't as not used yet.
    public variable semimajor 5.0 {
-      puts "($this) configure semimajor to $semimajor"
       config_selected major $semimajor
       if { $notify_changed_cmd != {} } {
-	 puts "($this) send notify changed command"
          eval $notify_changed_cmd
       }
    }

@@ -1,25 +1,26 @@
 #+
 #  Name:
-#     GaiaOptPhotom
+#     GaiaApPhotom
 
 #  Type of Module:
 #     [incr Tcl] class
 
 #  Purpose:
-#     Creates an instance of a toolbox for controlling optimal
+#     Creates an instance of a toolbox for controlling aperture
 #     photometry.
 
 #  Description:
 #     This routine defines a class of object that creates a toolbox
-#     for performing optimal photometry.
+#     for performing aperture photometry. The apertures can be placed
+#     and resized interactively and can be elliptical or circular.
 #
-#     Many objects can be identified at once and all are remeasured
+#     Many apertures can be placed at once and all are remeasured
 #     together (say after a change in frame zero point). The
-#     information about the objects can be saved (as can the results)
-#     and redisplayed over another image. The sky estimate for an
-#     object can be made either from an annular region or from a set
-#     of other apertures association with an object (each object
-#     is associated with its own sky regions).
+#     information about the apertures can be saved (as can the
+#     results) and redisplayed over another image. The sky estimate
+#     for an aperture can be made either from an annular region or from a
+#     set of other apertures association with an aperture (each
+#     aperture maintains its own sky regions).
 #
 #     The photometry is actually done by the PHOTOM application
 #     AUTOPHOTOM and the output results from an analysis can be used
@@ -35,9 +36,9 @@
 
 #  Invocations:
 #
-#        GaiaOptPhotom object_name magnitudes [configuration options]
+#        GaiaApPhotom object_name magnitudes [configuration options]
 #
-#     This creates an instance of a GaiaOptPhotom object. The return is
+#     This creates an instance of a GaiaApPhotom object. The return is
 #     the name of the object. The magnitudes flag is a boolean which
 #     sets the interface for calculating magnitudes or counts.
 #
@@ -74,16 +75,19 @@
 #        -annulus boolean
 #
 #     Controls if the sky regions are determined from annuli about the
-#     objects.
+#     apertures.
 #
-#        -psfannulus boolean
+#        -shape (circle|ellipse)
 #
-#     Controls if the sky regions are determined from annuli about the
-#     psf object.
+#     Controls the shape of the apertures when drawn.
 #
 #        -linewidth integer
 #
 #     Sets the width of any lines drawn.
+#
+#        -coupled (0|1)
+#
+#     Whether apertures are drawn at same size and keep so.
 
 #  Methods:
 #     public:
@@ -91,33 +95,37 @@
 #           Closes the toolbox, checking if the measurements have been
 #           saved first.
 #        define_object
-#           Creates a marker on the canvas when mouse button 1 is
+#           Creates an aperture on the canvas when mouse button 1 is
 #           pressed over the canvas.
 #        define_sky
 #           Creates an aperture on the canvas when mouse button 1 is
-#           pressed over the canvas. This method can only be used when
-#           annular sky regions are not in use.
+#           pressed over the canvas. This define a sky region, rather
+#           than an object aperture. It can only be used when annular
+#           sky regions are not in use.
 #        measure_objects
-#           Performs the photometry of the objects defined on the
+#           Performs the photometry of the apertures defined on the
 #           canvas. This is activated by a button, or by changing the
 #           frame zero point and pressing return.
 #        read_file [filename] [update]
-#           Reads a set of photometry measurements back from a
-#           file. The filename is not given it is chosen from an
-#           existing list using a selection dialog. Any existing
-#           objects are updated using the new values if update
+#           Reads a set of photometry apertures and measurments back
+#           from a file. The filename is not given it is chosen from
+#           an existing list using a selection dialog. Any existing
+#           apertures are updated using the new values if update
 #           is true.
 #        save_objects [filename]
-#           Saves the measurments into a file. If not given the file
-#           name is given using a selection dialog.
+#           Saves the apertures and their measurments into a file.
+#           If not given the file name is given using a selection
+#           dialog.
 #        view
-#           Invoked when a view of all the measurements is required.
+#           Invoked when a view of all the aperture is required.
 #
 #     private:
 #        created_object
-#           Invoked after an object is selected.
+#           Invoked after an aperture is created.
 #        measured_objects
-#           Invoked after the objects have been measured.
+#           Invoked after the apertures have been measured.
+#        set_shape
+#           Sets the shape configuration option.
 #        sky_method_changed
 #           Invoked when the sky region definition method has changed
 
@@ -129,16 +137,31 @@
 #     {enter_new_authors_here}
 
 #  History:
-#     27-MA7-1999 (PDRAPER):
+#     12-MAR-1996 (PDRAPER):
 #        Original version.
+#     8-JUL-1996 (PDRAPER):
+#        Converted to itcl2.0.
+#     21-NOV-1996 (PDRAPER):
+#        Output in magnitudes is now optional.
+#     16-JUL-1997 (PDRAPER):
+#        Modified so that files which are read in do re-create
+#        any associated sky apertures.
+#     30-MAR-1998 (PDRAPER):
+#        Modified to read file when given name.
+#     18-MAY-1998 (PDRAPER):
+#        Added support for image exposure times.
+#     21-MAY-1999 (PDRAPER):
+#        Substantial rework of interface to add panes (to save
+#        real-estate and a pop-up window) and the ability to append to
+#        a named file.
 #     {enter_further_changes_here}
 #-
 
 #.
 
-itk::usual GaiaOptPhotom {}
+itk::usual GaiaApPhotom {}
 
-itcl::class gaia::GaiaOptPhotom {
+itcl::class gaia::GaiaApPhotom {
 
    #  Inheritances:
    #  -------------
@@ -160,35 +183,31 @@ itcl::class gaia::GaiaOptPhotom {
       if { ! $mags } {
          set usemags_ 0
          wm title $w_ \
-            "GAIA: Optimal photometry -- counts ($itk_option(-number))"
+            "GAIA: Aperture photometry -- counts ($itk_option(-number))"
       } else {
          set usemags_ 1
          wm title $w_ \
-            "GAIA: Optimal photometry -- magnitudes ($itk_option(-number))"
+            "GAIA: Aperture photometry -- magnitudes ($itk_option(-number))"
       }
 
-      #  Add tab window for revealing the object details,
-      #  measurement parameters and possibly all results.
+      #  Add tab window for revealing the aperture details,
+      #  measurement parameters and possible all results.
       itk_component add TabNoteBook {
 	  iwidgets::tabnotebook $w_.tab \
 	      -angle 0 -tabpos n -width 350 -height 450
       }
 
-      #  Add pane for current object details.
-      $itk_component(TabNoteBook) add -label Object
+      #  Add pane for current aperture details.
+      $itk_component(TabNoteBook) add -label Aperture
       set child_(details) [$itk_component(TabNoteBook) childsite 0]
-
-      #  Add pane for defining the "PSF" object.
-      $itk_component(TabNoteBook) add -label PSF
-      set child_(psf) [$itk_component(TabNoteBook) childsite 1]
 
       #  Add pane for measurement parameters.
       $itk_component(TabNoteBook) add -label Parameters
-      set child_(params) [$itk_component(TabNoteBook) childsite 2]
+      set child_(params) [$itk_component(TabNoteBook) childsite 1]
 
       #  Add pane for viewing all measurements together (slower).
       $itk_component(TabNoteBook) add -label Results
-      set child_(results) [$itk_component(TabNoteBook) childsite 3]
+      set child_(results) [$itk_component(TabNoteBook) childsite 2]
 
       #  Add controls for viewing all measurements (do this now to get
       #  name).
@@ -205,66 +224,45 @@ itcl::class gaia::GaiaOptPhotom {
       add_short_help $itk_component(ViewAll) \
          {Display all measurements in scrollable window (slow)}
 
-      #  Create a GaiaPhotomList object to deal with the PSF
-      #  object details (actually there is only one of these).
-      set psf_list_ [GaiaPhotomList \#auto \
-                        -show_list 0 \
-                        -details $child_(psf).psfdetails \
-                        -canvasdraw $itk_option(-canvasdraw) \
-                        -canvas $itk_option(-canvas) \
-                        -rtdimage $itk_option(-rtdimage) \
-                        -annulus $itk_option(-psfannulus) \
-                        -linewidth $itk_option(-linewidth) \
-                        -notify_created_cmd [code $this created_psf]\
-                        -usemags $usemags_ \
-                        -phottype optimal \
-                        -psf 1 \
-                        -semimajor 5.0 \
-                        -allow_resize 0 \
-			-coupled 1 \
-                        -notify_changed_cmd [code $this changed_psf]]
-      
+      #  Create a GaiaPhotomDetails object to display the values
+      #  of the selected object.
+      itk_component add ObjectDetails {
+         GaiaPhotomDetails $child_(details).details \
+            -positions_cmd [code $this sky_method_changed] \
+            -usemags $usemags_
+      }
+      add_short_help $itk_component(ObjectDetails) \
+         {Details of the currently selected aperture}
+
       #  Create the GaiaPhotomList object to deal with the details of
       #  the objects that are being measured.
       set object_list_ [GaiaPhotomList \#auto \
                            -scrollbox $child_(results).box \
-                           -details $child_(details).details \
+                           -details $itk_component(ObjectDetails) \
                            -canvasdraw $itk_option(-canvasdraw) \
                            -canvas $itk_option(-canvas) \
                            -rtdimage $itk_option(-rtdimage) \
                            -annulus $itk_option(-annulus) \
                            -linewidth $itk_option(-linewidth) \
-                           -notify_created_cmd [code $this created_object] \
+                           -notify_created_cmd [code $this created_object]\
                            -usemags $usemags_ \
-                           -phottype optimal \
+                           -phottype "aperture" \
                            -psf 0 \
-                           -allow_resize 0 \
-			   -coupled 1 \
-			   -notify_changed_cmd [code $this changed_object]]
+                           -allow_resize 1 \
+                           -coupled $itk_option(-coupled)]
 
-      #  Create a GaiaPhotomDetails object to display the values
-      #  of the PSF object.
-      itk_component add PSFDetails {
-         GaiaPhotomDetails $child_(psf).psfdetails \
-            -positions_cmd [code $this sky_method_changed psf] \
-            -usemags $usemags_ \
-            -object_list [code $psf_list_]
+      #  Now inform details widget of this name!
+      #  (allan: 21.1.99 added tcl8 check)
+      if {$tcl_version >= 8.0} {
+	  $itk_component(ObjectDetails) configure \
+	      -object_list [code $object_list_]
+      } else {
+	  $itk_component(ObjectDetails) configure \
+	      -object_list [scope $object_list_]
       }
-      add_short_help $itk_component(PSFDetails) {Details of the PSF object}
-
-      #  Create a GaiaPhotomDetails object to display the values
-      #  of the selected object.
-      itk_component add ObjectDetails {
-         GaiaPhotomDetails $child_(details).details \
-            -positions_cmd [code $this sky_method_changed object] \
-            -usemags $usemags_ \
-            -object_list [code $object_list_]
-      }
-      add_short_help $itk_component(ObjectDetails) \
-         {Details of the currently selected object}
 
       #  Create a GaiaPhotomExtras object to deal with any additional
-      #  parameters for AUTOPHOTOM.
+      #  parameters for autophotom.
       itk_component add Extras {
          GaiaPhotomExtras $child_(params).extras
       }
@@ -281,7 +279,7 @@ itcl::class gaia::GaiaOptPhotom {
 
       #  Add window help.
       global gaia_library
-      add_help_button $gaia_library/GaiaOptPhotom.hlp "On Window..."
+      add_help_button $gaia_library/GaiaApPhotom.hlp "On Window..."
 
       #  Add the option to create a new window.
       $File add command -label {New window} \
@@ -321,18 +319,31 @@ itcl::class gaia::GaiaOptPhotom {
          -variable [scope skymethod_($this)] \
          -onvalue 1 \
          -offvalue 0 \
-         -command [code $this sky_method_changed object]
+         -command [code $this sky_method_changed]
       add_menu_short_help $Options {Use annular sky regions}  \
-         {Toggle to define sky in detached apertures for objects}
-      set psfskymethod_($this) 1
+         {Toggle to define sky in detached apertures}
+
+      #  Get shape of apertures (sky and object must be the same).
+      set shape_($this) 1
       $Options add checkbutton \
-         -label {Use PSF annular sky regions} \
-         -variable [scope psfskymethod_($this)] \
+         -label {Use circular apertures} \
+         -variable [scope shape_($this)] \
          -onvalue 1 \
          -offvalue 0 \
-         -command [code $this sky_method_changed psf]
-      add_menu_short_help $Options {Use annular sky regions}  \
-         {Toggle to define sky in detached apertures for PSF star}
+         -command [code $this set_shape]
+      $itk_component(ObjectDetails) set_for_circles 1
+      add_menu_short_help $Options {Use circular apertures}  \
+         {Toggle to get elliptical apertures}
+
+      #  Whether apertures are created and maintained as the same size.
+      $Options add checkbutton \
+         -label {Keep apertures same size} \
+         -variable [scope itk_option(-coupled)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this set_coupled_]
+      add_menu_short_help $Options {Keep apertures same size} \
+         {Toggle to keep all apertures the same size}
 
       #  Control of various colours.
       make_colours_menu_ $Colours
@@ -361,22 +372,22 @@ itcl::class gaia::GaiaOptPhotom {
          {Name of file that "Save" and "Append" buttons use}
 
       #  Create a button bar with options for defining either an
-      #  object or sky regions, not for PSF so keep on object pane.
+      #  object or sky regions.
       itk_component add Define {
-         frame $child_(details).define
+         frame $w_.define
       }
 
-      #  Define an object position.
+      #  Define an object aperture.
       itk_component add DefineObject {
          button $itk_component(Define).object \
-            -text {Select object} \
+            -text {Define object aperture} \
             -width 20 \
             -highlightthickness 3 \
             -command [code $this define_object]
       }
       $itk_component(DefineObject) configure -highlightbackground black
       add_short_help $itk_component(DefineObject) \
-      {Select object to measure; press button-1 over image}
+         {Press and then drag out aperture on image}
 
       #  Define sky regions (only used if skymethod is set to regions).
       itk_component add DefineSky  {
@@ -389,18 +400,18 @@ itcl::class gaia::GaiaOptPhotom {
       add_short_help $itk_component(DefineSky) \
          {Press and then drag out aperture on image}
 
-      #  Copy selected objects, again not for PSF.
+      #  Copy selected objects.
+      itk_component add MeasureFrame {frame $w_.copy}
       itk_component add Copy {
-         button $itk_component(Define).copy \
-            -text {Copy object} \
+         button $itk_component(MeasureFrame).copy \
+            -text {Copy aperture} \
             -width 20 \
             -command [code $object_list_ copy]
       }
       add_short_help $itk_component(Copy) \
-         {Create copy of current/last object details}
+         {Create copy of current/last aperture}
 
-      #  Measure all objects and close window.
-      itk_component add MeasureFrame {frame $w_.meas}
+      #  Measure all objects.
       itk_component add Measure {
          button $itk_component(MeasureFrame).measure \
             -text {Calculate results} \
@@ -408,14 +419,13 @@ itcl::class gaia::GaiaOptPhotom {
             -command [code $this measure_objects]
       }
       add_short_help $itk_component(Measure) \
-         {Calculate photometry of all objects}
+         {Calculate photometry of all apertures}
 
       #  Close window button.
+      itk_component add CloseFrame {frame $w_.close}
       itk_component add Close {
-         button $itk_component(MeasureFrame).close \
-            -text {Close}  \
-            -width 20 \
-            -command [code $this close]
+         button $itk_component(CloseFrame).close \
+            -text {Close}  -command [code $this close]
       }
       add_short_help $itk_component(Close) {Close this window}
 
@@ -440,56 +450,25 @@ itcl::class gaia::GaiaOptPhotom {
       add_short_help $itk_component(Append) \
          {Append current measurements to results file}
 
-      #  Create a button bar with options for defining either a PSF
-      #  object.
-      itk_component add PSFdef {
-         frame $child_(psf).define
-      }
-
-      #  Define an object position.
-      itk_component add DefinePSF {
-         button $itk_component(PSFdef).object \
-            -text {Select PSF object} \
-            -width 20 \
-            -highlightthickness 3 \
-            -command [code $this define_psf]
-      }
-      $itk_component(DefinePSF) configure -highlightbackground black
-      add_short_help $itk_component(DefinePSF) \
-         {Select object for PSF determination}
-
-      #  Define sky regions (only used if skymethod is set to regions).
-      itk_component add DefinePSFSky  {
-         button $itk_component(PSFdef).sky \
-            -text {Define sky aperture} \
-            -width 20 \
-            -command [code $this define_psf_sky] \
-            -state disabled
-      }
-      add_short_help $itk_component(DefinePSFSky) \
-         {Press and then drag out aperture on image}
-
       #  Pack up window.
+      pack $itk_component(Close) -side bottom -pady 2 -padx 2
+      pack $itk_component(CloseFrame) -side bottom -fill x -pady 2 -padx 2
       if { $usemags_ } {
          pack $itk_component(Skymag) -side top -fill x -pady 2
       }
-      pack $itk_component(MeasureFrame) -side bottom -fill x
-      pack $itk_component(Close) -side right -pady 2 -padx 2 -expand true
-      pack $itk_component(Measure) -side left -pady 2 -padx 2 -expand true
       pack $itk_component(Results) -side top -fill x -ipadx 1m -ipady 1m
       pack $itk_component(TabNoteBook) -fill both -expand 1
-      pack $itk_component(ObjectDetails) -fill x  -pady 2 -padx 2
-      pack $itk_component(PSFDetails) -fill x -pady 2 -padx 2
-      pack $itk_component(Extras) -fill x -pady 2 -padx 2
+      pack $itk_component(ObjectDetails) -fill both -expand true \
+	  -pady 2 -padx 2
+      pack $itk_component(Extras) -fill both -expand true -pady 2 -padx 2
 
       pack $itk_component(Define) -side top -fill x  -pady 2 -padx 2
-      pack $itk_component(Copy) -side bottom -pady 2 -padx 2 -expand true
       pack $itk_component(DefineObject) -side left -expand true -pady 2 -padx 2
-      pack $itk_component(DefineSky) -side right -expand true -pady 2 -padx 2
+      pack $itk_component(DefineSky) -side left -expand true -pady 2 -padx 2
 
-      pack $itk_component(PSFdef) -side top -fill x  -pady 2 -padx 2
-      pack $itk_component(DefinePSF) -side left -expand true -pady 2 -padx 2
-      pack $itk_component(DefinePSFSky) -side right -expand true -pady 2 -padx 2
+      pack $itk_component(MeasureFrame) -side top -fill x
+      pack $itk_component(Measure) -side right -pady 2 -padx 2 -expand true
+      pack $itk_component(Copy) -side right -pady 2 -padx 2 -expand true
 
       pack $itk_component(SaveFrame) -side top -fill x
       pack $itk_component(Save) -side right -pady 2 -padx 2 -expand true
@@ -504,9 +483,7 @@ itcl::class gaia::GaiaOptPhotom {
    destructor  {
       if { $object_list_ != {} } {
          delete object $object_list_
-      }
-      if { $psf_list_ != {} } {
-         delete object $psf_list_
+         set object_list_ {}
       }
       if { $autophotom_ != {} } {
          catch {$autophotom_ delete_sometime}
@@ -533,30 +510,17 @@ itcl::class gaia::GaiaOptPhotom {
       $object_list_ create_object
    }
 
-   #  Define an PSF object. This uses the current aperture size, sky
-   #  method etc.
-   method define_psf {} {
-      $itk_component(DefinePSF) configure -state disabled
-      $itk_component(DefinePSF) configure -relief sunken
-      $psf_list_ create_object
-   }
-
    #  Define a region of sky.
    method define_sky {} {
       $itk_component(DefineSky) configure -state disabled
       $itk_component(DefineSky) configure -relief sunken
-      $object_list_ configure -allow_resize 1
+      if { $itk_option(-coupled) } {
+         $object_list_ configure -allow_resize 1
+      }
       $object_list_ create_sky_region
-      $object_list_ configure -allow_resize 0
-   }
-
-   #  Define a region of sky for PSF object.
-   method define_psf_sky {} {
-      $itk_component(DefinePSFSky) configure -state disabled
-      $itk_component(DefinePSFSky) configure -relief sunken
-      $psf_list_ configure -allow_resize 1
-      $psf_list_ create_sky_region
-      $psf_list_ configure -allow_resize 0
+      if { $itk_option(-coupled) } {
+         $object_list_ configure -allow_resize 0
+      }
    }
 
    #  Close window checking first if measurements have been
@@ -567,8 +531,8 @@ itcl::class gaia::GaiaOptPhotom {
       #  offer not to quit.
       if { [$object_list_ cget -modified] } {
          DialogWidget $w_.dialog \
-            -title {Unsaved measurements} \
-            -text {There are unsaved measurements, are you sure you want to quit?} \
+            -title {Unsaved apertures} \
+            -text {There are unsaved apertures, are you sure you want to quit?} \
             -buttons [list Yes No]
          set answer [$w_.dialog activate]
          if { ! $answer } {
@@ -584,74 +548,64 @@ itcl::class gaia::GaiaOptPhotom {
       if { $filename == "" } {
 	 set w [FileSelect .\#auto -title "Choose PHOTOM file"]
 	 if {[$w activate]} {
-            set filename [$w get]
-	    $psf_list_ read_file $filename $update
-            $object_list_ configure -semimajor [$psf_list_ cget -semimajor]
-	    $object_list_ read_file $filename $update
+	    $object_list_ read_file [$w get] $update
 	 }
 	 destroy $w
       } else {
-	 $psf_list_ read_file $filename $update
-         $object_list_ configure -semimajor [$psf_list_ cget -semimajor]
 	 $object_list_ read_file $filename $update
       }
    }
 
-   #  Measure the current objects. Note we need the PSF object first.
+   #  Measure the current objects.
    method measure_objects {} {
-      if { [$psf_list_ write_file "GaiaPhotomIn.Dat"] } { 
-         if { [$object_list_ append_file "" "GaiaPhotomIn.Dat"] } {
-         
-            if { $autophotom_ == {} } {
-               #  Start autophotom application.
-               global env
-               set autophotom_ [StarApp \#auto -application \
-                                   $env(PHOTOM_DIR)/autophotom \
-                                   -notify [code $this measured_objects]]
-            }
-            if { $usemags_ } {
-               set skymag_ [$itk_component(Skymag) get]
-            } else {
-               set skymag_ 0
-            }
-            set image [$itk_option(-rtdimage) cget -file]
-            if { $image != "" } {
-               lassign [fileName $image] image slice
-               if { [file extension $image] == ".sdf" } {
-                  set image "[file rootname $image]${slice}"
-               }
-               #  Get any additional values from itk_component(Extras)
-               if { [winfo exists $itk_component(Extras)] } {
-                  set more [$itk_component(Extras) getstate]
-               } else {
-                  set more ""
-               }
-               
-               #  And run the command.
-               if { $usemags_ } {
-                  set ok "true"
-               } else {
-                  set ok "false"
-               }
-               blt::busy hold $w_
-               update idletasks
-               catch {file delete GaiaPhotomOut.Dat}
-               eval $autophotom_ runwith \
-                  in=$image \
-                  infile=GaiaPhotomIn.Dat \
-                  outfile=GaiaPhotomOut.Dat \
-                  optima=true \
-                  skymag=$skymag_ \
-                  usemags=$ok \
-                  $more
-            } else {
-               error_dialog "No image is displayed"
-            }
+      if { [$object_list_ write_file "GaiaPhotomIn.Dat"] } {
+         if { $autophotom_ == {} } {
+            #  Start autophotom application.
+            global env
+            set autophotom_ [StarApp \#auto -application \
+		                $env(PHOTOM_DIR)/autophotom \
+                                -notify [code $this measured_objects]]
+         }
+         if { $usemags_ } {
+            set skymag_ [$itk_component(Skymag) get]
          } else {
-            error_dialog "You need to define some object positions"
+            set skymag_ 0
+         }
+         set image [$itk_option(-rtdimage) cget -file]
+         if { $image != "" } {
+            lassign [fileName $image] image slice
+            if { [file extension $image] == ".sdf" } {
+               set image "[file rootname $image]${slice}"
+            }
+            #  Get any additional values from itk_component(Extras)
+            if { [winfo exists $itk_component(Extras)] } {
+               set more [$itk_component(Extras) getstate]
+            } else {
+               set more ""
+            }
+
+            #  And run the command.
+            if { $usemags_ } {
+               set ok "true"
+            } else {
+               set ok "false"
+            }
+            blt::busy hold $w_
+            update idletasks
+            catch {file delete GaiaPhotomOut.Dat}
+            eval $autophotom_ runwith \
+               in=$image \
+               infile=GaiaPhotomIn.Dat \
+               outfile=GaiaPhotomOut.Dat \
+               optima=false \
+               skymag=$skymag_ \
+               usemags=$ok \
+               $more
+         } else {
+            error_dialog "No image is displayed"
          }
       } else {
-         error_dialog "You need to define a PSF object"
+         error_dialog "You need to define some apertures"
       }
    }
 
@@ -672,14 +626,11 @@ itcl::class gaia::GaiaOptPhotom {
       if { $filename == "" } {
 	 set w [FileSelect .\#auto -title "Write PHOTOM file"]
 	 if {[$w activate]} {
-            set filename [$w get]
-	    $psf_list_ write_file $filename
-	    $object_list_ append_file "" $filename
+	    $object_list_ write_file [$w get]
 	 }
 	 destroy $w
       } else {
-         $psf_list_ write_file $filename
-	 $object_list_ append_file "" $filename
+	 $object_list_ write_file $filename
       }
    }
 
@@ -690,19 +641,17 @@ itcl::class gaia::GaiaOptPhotom {
      if { $filename == "" } {
 	 set w [FileSelect .\#auto -title "Write PHOTOM file"]
 	 if {[$w activate]} {
-	    $psf_list_ append_file $comment [$w get]
-	    $object_list_ append_file "" [$w get]
+	    $object_list_ append_file $comment [$w get]
 	 }
 	 destroy $w
       } else {
-         $psf_list_ append_file $comment $filename
-	 $object_list_ append_file "" $filename
+	 $object_list_ append_file $comment $filename
       }
    }
 
    #  Notification that the define_object method has been
    #  completed. This allows us to set the state of the sky region
-   #  button for plain objects.
+   #  button.
    private method created_object {} {
       if { $skymethod_($this) } {
          $itk_component(DefineSky) configure -state normal
@@ -712,43 +661,10 @@ itcl::class gaia::GaiaOptPhotom {
       $itk_component(DefineObject) configure -relief raised
    }
 
-   #  Notification that the define_object method has been
-   #  completed for a PSF object. 
-   private method created_psf {} {
-      if { $skymethod_($this) } {
-         $itk_component(DefinePSFSky) configure -state normal
-         $itk_component(DefinePSFSky) configure -relief raised
-      }
-      $itk_component(DefinePSF) configure -state normal
-      $itk_component(DefinePSF) configure -relief raised
-   }
-
-   #  Notification that the PSF or normal objects have changed shape
-   #  (we just allow the radius to be modified). Objects in other
-   #  list need to reflect this change.
-   private method changed_psf {} {
-      if { $propagate_ } { 
-	 set propagate_ 0
-	 $object_list_ configure -semimajor [$psf_list_ cget -semimajor]
-	 $object_list_ config_all major [$psf_list_ cget -semimajor]
-	 set propagate_ 1
-      }
-   }
-   private method changed_object {} {
-      if { $propagate_ } { 
-	 set propagate_ 0
-	 $psf_list_ configure -semimajor [$object_list_ cget -semimajor]
-	 $psf_list_ config_all major [$object_list_ cget -semimajor]
-	 set propagate_ 1
-      }
-   }
-
-   #  The measurements are made, read in the results.
+   #  The aperture are measured, read in the results.
    private method measured_objects {} {
       blt::busy release $w_
       if { [file exists GaiaPhotomOut.Dat] } {
-         $psf_list_ read_file GaiaPhotomOut.Dat 1
-         $object_list_ configure -semimajor [$psf_list_ cget -semimajor]
          $object_list_ read_file GaiaPhotomOut.Dat 1
       }
    }
@@ -758,46 +674,26 @@ itcl::class gaia::GaiaOptPhotom {
    #  string to which the button should be set. Note that when
    #  skymethod is not annulus the button state isn't changed until a
    #  new object is created (see created_object method).
-   private method sky_method_changed {type args} {
-       if { $type == "object" } { 
-	   if { $args != {} } {
-	       if { [lindex $args 0] == "annulus" } {
-		   set skymethod_($this) 1
-		   $itk_component(DefineSky) configure -state disabled
-	       } else {
-		   set skymethod_($this) 0
-		   $itk_component(DefineSky) configure -state normal
-		   $itk_component(DefineSky) configure -relief raised
-	       }
-	   } else {
-	       if { $skymethod_($this) } {
-		   $itk_component(DefineSky) configure -state disabled
-		   configure -annulus 1
-	       } else {
-		   configure -annulus 0
-	       }
-	   }
-       } else {
-	   if { $args != {} } {
-	       if { [lindex $args 0] == "annulus" } {
-		   set psfskymethod_($this) 1
-		   $itk_component(DefinePSFSky) configure -state disabled
-	       } else {
-		   set psfskymethod_($this) 0
-		   $itk_component(DefinePSFSky) configure -state normal
-		   $itk_component(DefinePSFSky) configure -relief raised
-	       }
-	   } else {
-	       if { $psfskymethod_($this) } {
-		   $itk_component(DefinePSFSky) configure -state disabled
-		   configure -psfannulus 1
-	       } else {
-		   configure -psfannulus 0
-	       }
-	   }
-       }
+   private method sky_method_changed {args} {
+      if { $args != {} } {
+         if { [lindex $args 0] == "annulus" } {
+            set skymethod_($this) 1
+            $itk_component(DefineSky) configure -state disabled
+         } else {
+            set skymethod_($this) 0
+            $itk_component(DefineSky) configure -state normal
+            $itk_component(DefineSky) configure -relief raised
+         }
+      } else {
+         if { $skymethod_($this) } {
+            $itk_component(DefineSky) configure -state disabled
+            configure -annulus 1
+         } else {
+            configure -annulus 0
+         }
+      }
    }
-   
+
    #  View all measurements in new window (controlled by
    #  GaiaPhotomList).
    method view {{value ""}} {
@@ -805,6 +701,16 @@ itcl::class gaia::GaiaOptPhotom {
 	 set view_($this) $value
       }
       $object_list_ configure -show_list $view_($this)
+   }
+
+   #  Set shape configuration option and disabled unwanted controls.
+   private method set_shape {} {
+      if { $shape_($this) } {
+         configure -shape circle
+      } else {
+         configure -shape ellipse
+      }
+      $itk_component(ObjectDetails) set_for_circles $shape_($this)
    }
 
    #  Sky zero point may have changed, remeasure objects if so.
@@ -816,58 +722,53 @@ itcl::class gaia::GaiaOptPhotom {
 
    #  Add a menu for controlling the aperture colours.
    protected method make_colours_menu_ {m} {
-      
-      #  Object & PSF colours.
-      $m add cascade -label Objects -menu [menu $m.objcol]
-      $m add cascade -label PSF -menu [menu $m.psfcol]
-      set objmen $m.objcol
-      set psfmen $m.psfcol
-      
-      set psf {}
-      foreach men "$m.objcol $m.psfcol" { 
 
-         #  Add the menus
-         foreach {label name} {{Selected colour}   selcol 
-            {Deselected colour} descol
-            {Selected sky colour} selskycol
-            {Deselected sky colour} desskycol} {
-            $men add cascade -label $label -menu [menu $men.$name]
-         }
-
-         foreach i $itk_option(-colors) {
-            $men.selcol add radiobutton \
-               -value $i \
-               -background $i \
-               -command [code $this configure -${psf}selected_colour $i] \
-               -variable [scope itk_option(-${psf}selected_colour)]
-         }
-         configure -${psf}selected_colour $itk_option(-${psf}selected_colour)
-         foreach i $itk_option(-colors) {
-            $men.descol add radiobutton \
-               -value $i \
-               -background $i \
-               -command [code $this configure -${psf}deselected_colour $i] \
-               -variable [scope itk_option(-${psf}deselected_colour)]
-         }
-         configure -${psf}deselected_colour $itk_option(-${psf}deselected_colour)
-         foreach i $itk_option(-colors) {
-            $men.selskycol add radiobutton \
-               -value $i \
-               -background $i \
-               -command [code $this configure -${psf}selected_sky_colour $i] \
-               -variable [scope itk_option(-${psf}selected_sky_colour)]
-         }
-         configure -${psf}selected_sky_colour $itk_option(-${psf}selected_sky_colour)
-         foreach i $itk_option(-colors) {
-            $men.desskycol add radiobutton \
-               -value $i \
-               -background $i \
-               -command [code $this configure -${psf}deselected_sky_colour $i] \
-               -variable [scope itk_option(-${psf}deselected_sky_colour)]
-         }
-         configure -${psf}deselected_sky_colour $itk_option(-${psf}deselected_sky_colour)
-         set psf psf_
+      #  Create the submenus.
+      foreach {label name} {
+         {Selected colour} selcol
+         {Deselected colour} descol
+         {Selected sky colour} selskycol
+         {Deselected sky colour} desskycol} {
+         $m add cascade -label $label -menu [menu $m.$name]
       }
+
+      foreach i $itk_option(-colors) {
+         $m.selcol add radiobutton \
+            -value $i \
+            -background $i \
+            -command [code $this configure -selected_colour $i] \
+            -variable [scope itk_option(-selected_colour)]
+      }
+      configure -selected_colour $itk_option(-selected_colour)
+      foreach i $itk_option(-colors) {
+         $m.descol add radiobutton \
+            -value $i \
+            -background $i \
+            -command [code $this configure -deselected_colour $i] \
+            -variable [scope itk_option(-deselected_colour)]
+         }
+      configure -deselected_colour $itk_option(-deselected_colour)
+      foreach i $itk_option(-colors) {
+         $m.selskycol add radiobutton \
+            -value $i \
+            -background $i \
+            -command [code $this configure -selected_sky_colour $i] \
+            -variable [scope itk_option(-selected_sky_colour)]
+      }
+      configure -selected_sky_colour $itk_option(-selected_sky_colour)
+      foreach i $itk_option(-colors) {
+         $m.desskycol add radiobutton \
+            -value $i \
+            -background $i \
+            -command [code $this configure -deselected_sky_colour $i] \
+            -variable [scope itk_option(-deselected_sky_colour)]
+      }
+      configure -deselected_sky_colour $itk_option(-deselected_sky_colour)
+   }
+
+   #  Set the coupled variable to reflect the current value.
+   protected method set_coupled_ {args} {
+      configure -coupled $itk_option(-coupled)
    }
 
    #  Configuration options: (public variables)
@@ -877,7 +778,6 @@ itcl::class gaia::GaiaOptPhotom {
    itk_option define -canvasdraw canvasdraw CanvasDraw {} {
       if { $object_list_ != {} } {
          $object_list_ configure -canvasdraw $itk_option(-canvasdraw)
-         $psf_list_ configure -canvasdraw $itk_option(-canvasdraw)
       }
    }
 
@@ -885,15 +785,13 @@ itcl::class gaia::GaiaOptPhotom {
    itk_option define -canvas canvas Canvas {} {
       if { $object_list_ != {} } {
          $object_list_ configure -canvas $itk_option(-canvas)
-         $psf_list_ configure -canvas $itk_option(-canvas)
       }
    }
 
-   #  Name of starrtdimage widget.
+   #  Name of rtdimage widget.
    itk_option define -rtdimage rtdimage RtdImage {} {
       if { $object_list_ != {} } {
          $object_list_ configure -rtdimage $itk_option(-rtdimage)
-         $psf_list_ configure -rtdimage $itk_option(-rtdimage)
       }
    }
 
@@ -903,9 +801,11 @@ itcl::class gaia::GaiaOptPhotom {
          $object_list_ configure -annulus $itk_option(-annulus)
       }
    }
-   itk_option define -psfannulus psfannulus PsfAnnulus 1 {
-      if { $psf_list_ != {} } {
-         $psf_list_ configure -annulus $itk_option(-annulus)
+
+   #  Shape of aperture.
+   itk_option define -shape shape Shape circle {
+      if { $object_list_ != {} } {
+         $object_list_ configure -shape $itk_option(-shape)
       }
    }
 
@@ -913,7 +813,6 @@ itcl::class gaia::GaiaOptPhotom {
    itk_option define -linewidth linewidth LineWidth 1 {
       if { $object_list_ != {} } {
          $object_list_ configure -linewidth $itk_option(-linewidth)
-         $psf_list_ configure -linewidth $itk_option(-linewidth)
       }
    }
 
@@ -939,27 +838,6 @@ itcl::class gaia::GaiaOptPhotom {
       }
    }
 
-   itk_option define -psf_selected_colour psf_selected_colour Psf_selected_colour {magenta} {
-      if { $object_list_ != {} } {
-         $psf_list_ configure -selected_colour $itk_option(-psf_selected_colour)
-      }
-   }
-   itk_option define -psf_deselected_colour psf_deselected_colour Psf_deselected_colour {magenta} {
-      if { $psf_list_ != {} } {
-         $psf_list_ configure -deselected_colour $itk_option(-psf_deselected_colour)
-      }
-   }
-   itk_option define -psf_selected_sky_colour psf_selected_sky_colour Psf_selected_skycolour {red} {
-      if { $psf_list_ != {} } {
-         $psf_list_ configure -selected_sky_colour $itk_option(-psf_selected_sky_colour)
-      }
-   }
-   itk_option define -psf_deselected_sky_colour psf_deselected_sky_colour Psf_deselected_skycolour {red} {
-      if { $psf_list_ != {} } {
-         $psf_list_ configure -deselected_sky_colour $itk_option(-psf_deselected_sky_colour)
-      }
-   }
-
    #  Identifying number for toolbox (shown in () in window title).
    itk_option define -number number Number 0 {}
 
@@ -971,14 +849,26 @@ itcl::class gaia::GaiaOptPhotom {
        red green blue cyan magenta yellow white grey90 grey40 grey10 black
    }
 
+   #  Whether apertures are keep the same size.
+   itk_option define -coupled coupled Coupled 0 {
+      puts "Defining coupled ($itk_option(-coupled),($object_list_))"
+      if { $object_list_ != {} } {
+         $object_list_ configure -coupled $itk_option(-coupled)
+         if { $itk_option(-coupled) } {
+            $object_list_ configure -allow_resize 0
+         } else {
+            $object_list_ configure -allow_resize 1
+         }
+      }
+   }
+
+   #  Whether aperures are keep same size.
+
    #  Protected variables: (only available to instance)
    #  --------------------
 
    #  Whether to work in magnitudes or counts.
    protected variable usemags_ 1
-
-   #  Object controlling list of PSF object properties.
-   protected variable psf_list_ {}
 
    #  Object controlling list of known photometry objects.
    protected variable object_list_ {}
@@ -989,18 +879,16 @@ itcl::class gaia::GaiaOptPhotom {
    #  Value of skymag when last known.
    protected variable skymag_ 50
 
-   #  Whether to allow propagation. Stop when setting values (in
-   #  GaiaPhotomLists) that may trigger a recall.
-   protected variable propagate_ 1
-
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Methods of estimating sky (these are global arrays visible
+   #  Methods of estimating sky (this is a global array visible
    #  in this namespace only and indexed by $this to resolve between
    #  different instances).
    common skymethod_
-   common psfskymethod_
+
+   #  Shape of aperture.
+   common shape_
 
    #  Whether to view all measurements or not.
    common view_

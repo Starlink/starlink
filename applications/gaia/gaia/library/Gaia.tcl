@@ -531,7 +531,7 @@ itcl::class gaia::Gaia {
    #  Make a magnitude aperture photometry toolbox.
    public method make_magphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarPhotom .\#auto 1 \
+         GaiaApPhotom .\#auto 1 \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
@@ -544,7 +544,7 @@ itcl::class gaia::Gaia {
    #  Make a counts aperture photometry toolbox.
    public method make_countphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarPhotom .\#auto 0 \
+         GaiaApPhotom .\#auto 0 \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \

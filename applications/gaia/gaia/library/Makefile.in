@@ -29,15 +29,17 @@ FILES        = \
  StarAstReference.tcl StarAstRefine.tcl StarAstSystem.tcl \
  StarAstTable.tcl StarBlink.tcl StarCanvasDraw.tcl StarCanvasObject.tcl \
  StarDemo.tcl StarEnterObject.tcl StarLabelCheck.tcl StarPatch.tcl \
- StarPhotom.tcl StarPhotomDetails.tcl StarPhotomExtras.tcl \
- StarPhotomList.tcl StarPhotomObject.tcl gaia2astrom.tcl gaiaMain.tcl \
+ GaiaApPhotom.tcl GaiaOptPhotom.tcl GaiaPhotomDetails.tcl \
+ GaiaPhotomExtras.tclGaiaPhotomList.tcl GaiaPhotomObject.tcl \
+ gaia2astrom.tcl gaiaMain.tcl \
  gaia_defaults.tcl gaia_util.tcl gaia_version.tcl graphics_features.tcl \
  Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp \
  StarArd.hlp StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp \
  StarAstGrid.hlp StarAstReference.hlp StarAstRefine.hlp \
- StarAstSystem.hlp StarBlink.hlp StarPatch.hlp StarPhotom.hlp \
+ StarAstSystem.hlp StarBlink.hlp StarPatch.hlp GaiaApPhotom.hlp \
+ GaiaOptPhotom.hlp \
  skycat.cfg gaiawcs2tab tclIndex pix2wcs gaia2astrom.tcl \
- gaia_logo.xpm adamtask.tcl
+ adamtask.tcl
 
 PROGRAMS     = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay
 srcdir	     = @srcdir@
