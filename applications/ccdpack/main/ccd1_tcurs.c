@@ -17,9 +17,10 @@
                                CHARACTER(sname), CHARACTER(domain), 
                                INTEGER_ARRAY(idi), DOUBLE_ARRAY(xipos), 
                                DOUBLE_ARRAY(yipos), INTEGER(nipos), 
+                               LOGICAL(verbos),
                                DOUBLE_ARRAY(percnt), DOUBLE(zoom), 
                                INTEGER(maxcanv), INTEGER(windim),
-                               CHARACTER(mstyle), LOGICAL(verbos),
+                               CHARACTER(mstyle), LOGICAL(centrd), 
                                POINTER(ipio), POINTER(ipxo), POINTER(ipyo),
                                INTEGER(nopos), INTEGER(status)
                                TRAIL(ndfnms) TRAIL(sname) TRAIL(domain) 
@@ -37,8 +38,8 @@
 
 *  Invocation:
 *     CALL CCD1_TCURS( NDFNMS, NNDF, SNAME, DOMAIN, IDI, XIPOS, YIPOS,
-*                      NIPOS, PERCNT, ZOOM, MAXCANV, WINDIM, MSTYLE,
-*                      VERBOS, IPIO, IPXO, IPYO, NOPOS, STATUS )
+*                      NIPOS, VERBOS, PERCNT, ZOOM, MAXCANV, WINDIM,
+*                      MSTYLE, CENTRD, IPIO, IPXO, IPYO, NOPOS, STATUS )
 
 *  Description:
 *     This routine calls a Tcl script which displays an NDF or Set
@@ -72,6 +73,9 @@
 *     NIPOS = INTEGER (Given)
 *        Number of positions in the initial list (size of IDI, XIPOS, 
 *        YIPOS).
+*     VERBOS = LOGICAL (Given)
+*        If true, then all the postions will be written to the user 
+*        at the end.
 *     PERCNT( 2 ) = DOUBLE PRECISION (Given and Returned)
 *        Lower and higher percentiles to use in displaying the images.
 *        They should satisfy 0 <= PERCNT( 0 ) <= PERCNT( 1 ) <= 100.
@@ -85,9 +89,8 @@
 *        Dimensions of the window used for display.
 *     MSTYLE = CHARACTER * ( * ) (Given and Returned)
 *        A string indicating how markers are to be plotted on the image.
-*     VERBOS = LOGICAL (Given)
-*        If true, then all the postions will be written to the user 
-*        at the end.
+*     CENTRD = LOGICAL (Given and Returned)
+*        Whether points should be centroided when they are added.
 *     IPIO = INTEGER (Returned)
 *        Pointer to the index idenfiers for the positions selected.
 *     IPXO = DOUBLE PRECISION (Returned)
@@ -136,6 +139,7 @@
       GENPTR_DOUBLE_ARRAY(xipos)
       GENPTR_DOUBLE_ARRAY(yipos)
       GENPTR_INTEGER(nipos)
+      GENPTR_LOGICAL(verbos)
 
 /* Arguments Given and Returned. */
       GENPTR_DOUBLE(zoom)
@@ -143,7 +147,7 @@
       GENPTR_INTEGER(maxcanv)
       GENPTR_INTEGER_ARRAY(windim)
       GENPTR_CHARACTER(mstyle)
-      GENPTR_LOGICAL(verbos)
+      GENPTR_LOGICAL(centrd)
 
 /* Arguments Returned. */
       GENPTR_POINTER(ipio)
@@ -198,6 +202,7 @@
       ccdTclSetI( cinterp, "WINX", windim[ 0 ], status );
       ccdTclSetI( cinterp, "WINY", windim[ 1 ], status );
       ccdTclSetC( cinterp, "MARKSTYLE", cmstyle, status );
+      ccdTclSetI( cinterp, "CENTROID", F77_ISTRUE(*centrd), status );
       ccdTclSetI( cinterp, "VERBOSE", F77_ISTRUE(*verbos), status );
       for ( i = 0; i < *nipos; i++ ) {
          sprintf( buffer, "lappend POINTS [ list %d %lf %lf ]", 
@@ -246,15 +251,17 @@
             *ipyo = (F77_POINTER_TYPE) NULL;
             *ipio = (F77_POINTER_TYPE) NULL;
          }
-         ccdTclGetD( cinterp, "set ZOOM", zoom, status );
-         ccdTclGetD( cinterp, "set PERCLO", percnt, status );
-         ccdTclGetD( cinterp, "set PERCHI", percnt + 1, status );
-         ccdTclGetI( cinterp, "set MAXCANV", maxcanv, status );
-         ccdTclGetI( cinterp, "set WINX", windim, status );
-         ccdTclGetI( cinterp, "set WINY", windim + 1, status );
-         cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLE", status ), 
-                   mstyle, mstyle_length );
       }
+      ccdTclGetD( cinterp, "set ZOOM", zoom, status );
+      ccdTclGetD( cinterp, "set PERCLO", percnt, status );
+      ccdTclGetD( cinterp, "set PERCHI", percnt + 1, status );
+      ccdTclGetI( cinterp, "set MAXCANV", maxcanv, status );
+      ccdTclGetI( cinterp, "set WINX", windim, status );
+      ccdTclGetI( cinterp, "set WINY", windim + 1, status );
+      ccdTclGetI( cinterp, "set CENTROID", centrd, status );
+      *centrd = F77_ISTRUE(*centrd);
+      cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLE", status ), 
+                mstyle, mstyle_length );
 
 /* Delete the Tcl interpreter. */
       ccdTclStop( cinterp, status );
