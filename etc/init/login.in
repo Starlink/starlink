@@ -444,7 +444,7 @@ endif
 if ( -e @bindir@/pongo/pongo.icl ) then
    setenv PONGO_BIN @bindir@/pongo
    setenv PONGO_HELP @starhelpdir@/pongo/pongohelp
-   setenv PONGO_EXAMPLES @bindir@/examples/pongo
+   setenv PONGO_EXAMPLES @datadir@/pongo
 endif
 
 #
