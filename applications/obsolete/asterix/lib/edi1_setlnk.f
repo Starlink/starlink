@@ -136,7 +136,7 @@
       CALL DAT_TYPE( LOC, TYP, STATUS )
 
 *  Type should be EVENT_DATASET, EVENTDS or EVDS. Issue warning and continue
-      IF ( .NOT. CHR_INSET( 'EVENTDS,EVDS,EVENT_DATASET', TYPE ) ) THEN
+      IF ( .NOT. CHR_INSET( 'EVENTDS,EVDS,EVENT_DATASET', TYP ) ) THEN
         STATUS = SAI__ERROR
         CALL MSG_SETC( 'T', TYP )
         CALL ERR_REP( 'EDI1_SETLNK_2', 'Object is of type ^T, '/
