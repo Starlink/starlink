@@ -307,7 +307,7 @@ GENERIC = $(STAR_BIN)/generic
 
 #  Pathname to directories holding KAPPA libraries.
  
-KAPPA_SOURCE = /dsbwork/kappa
+KAPPA_SOURCE = $(STARLINK)/sources/kappa
 
 #  Tcl/Tk 
 
@@ -507,8 +507,8 @@ TEST_SCRIPT = $(PKG_NAME)_test
 #  Lists of Latex and hypertext documents.
 
 LATEX_DOCS = sun223.tex
-HYPERTEXT_DOCS = 
-HYPERTEXT_HELP = 
+HYPERTEXT_DOCS = sun223.htx
+HYPERTEXT_HELP = polka.htx
 FIGURES = sun223_figures
 
 #  List of documentation files.
@@ -664,8 +664,8 @@ libpolpack.a: $(O_SUB2)
 
 $(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT) 
 	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
-            -L$(KAPPA_SOURCE) $(ADDLIBS) `./$(LINK_SCRIPT)` \
-            $(KAPPA_SOURCE)/grf_kappa.o $(TCLLIBS) $(LDFLAGS)
+            -L$(KAPPA_SOURCE) $(ADDLIBS) $(KAPPA_SOURCE)/grf_kappa.o \
+	    `./$(LINK_SCRIPT)` $(TCLLIBS) $(LDFLAGS)
 
 
 #  Rules for building the help libraries.
