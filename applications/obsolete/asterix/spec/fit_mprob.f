@@ -53,8 +53,8 @@
 *
 *    Function declarations :
 *
-      DOUBLE PRECISION 		G01ECF
-      DOUBLE PRECISION 		G01EAF
+c     DOUBLE PRECISION 		G01ECF
+c     DOUBLE PRECISION 		G01EAF
 *
 *
 *    Status :
@@ -80,7 +80,8 @@
 
 *      Get probability from NAG routine
         NAGSTAT = 0
-        FPROB = G01ECF( 'Lower-tail', STATMIN, DBLE(SSCALE), NAGSTAT )
+        FPROB = 0.0D0
+c       FPROB = G01ECF( 'Lower-tail', STATMIN, DBLE(SSCALE), NAGSTAT )
 
 *    Likelihood
       ELSE IF ( FSTAT .EQ. FIT__LOGL ) THEN
@@ -103,7 +104,8 @@
 
 *      Fit probability given
         NAGSTAT = 0
-        FPROB = 1.0D0 - G01EAF( 'L', (LFPM-LFPD)/SQRT(LFPDV),
+        FPROB = 1.0D0
+c       FPROB = 1.0D0 - G01EAF( 'L', (LFPM-LFPD)/SQRT(LFPDV),
      :                          NAGSTAT )
 
 *    Programmer error

@@ -42,7 +42,7 @@
 *
 *    Function declarations :
 *
-      DOUBLE PRECISION             G01FCF
+c     DOUBLE PRECISION             G01FCF
 *
 *    Local variables :
 *
@@ -58,6 +58,7 @@
 
 *    Get deviate
       IFAIL = 0
-      DEVIATE = G01FCF( PROB, DBLE(NDOF), IFAIL )
+      DEVIATE = 0.0
+c     DEVIATE = G01FCF( PROB, DBLE(NDOF), IFAIL )
 
       END

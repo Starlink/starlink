@@ -410,8 +410,8 @@
       IFAIL = -1
 
 *    Perform fit
-      CALL E02BEF(START, N, AXIS, DATA, WGT, DBLE(SFACTOR), NEST, NKNOT,
-     :                          LAMBDA, C, DFP, WRK, LWRK, IWRK, IFAIL )
+c     CALL E02BEF(START, N, AXIS, DATA, WGT, DBLE(SFACTOR), NEST, NKNOT,
+c    :                          LAMBDA, C, DFP, WRK, LWRK, IWRK, IFAIL )
       FP = REAL( DFP )
 
 *    Trap fit failure
@@ -429,7 +429,7 @@
 *    Evaluate spline
       IFAIL = -1
       DO I = 1, N
-        CALL E02BBF( NKNOT, LAMBDA, C, AXIS(I), OUT(I), IFAIL )
+c       CALL E02BBF( NKNOT, LAMBDA, C, AXIS(I), OUT(I), IFAIL )
       END DO
       IF ( IFAIL .GT. 0 ) THEN
         CALL MSG_PRNT( 'Error evaulating spline fit' )
@@ -508,10 +508,10 @@
       IFAIL = -1
 
 *    Perform fit
-      CALL E02DCF( START, DIMS(1), AXIS1, DIMS(2), AXIS2, DATA,
-     :             SFACTOR, NEST(1), NEST(2), NKNOT(1), LAMBDA,
-     :             NKNOT(2), MU, C, FP, WRK, LWRK, IWRK, LIWRK,
-     :                                                  IFAIL )
+c     CALL E02DCF( START, DIMS(1), AXIS1, DIMS(2), AXIS2, DATA,
+c    :             SFACTOR, NEST(1), NEST(2), NKNOT(1), LAMBDA,
+c    :             NKNOT(2), MU, C, FP, WRK, LWRK, IWRK, LIWRK,
+c    :                                                  IFAIL )
 
 *    Trap fit failure
       IF ( IFAIL .GT. 0 ) THEN
@@ -527,8 +527,8 @@
 
 *    Evaluate spline
       IFAIL = -1
-      CALL E02DFF( DIMS(1), DIMS(2), NKNOT(1), NKNOT(2), AXIS1, AXIS2,
-     :             LAMBDA, MU, C, OUT, WRK, LWRK, IWRK, LIWRK, IFAIL )
+c     CALL E02DFF( DIMS(1), DIMS(2), NKNOT(1), NKNOT(2), AXIS1, AXIS2,
+c    :             LAMBDA, MU, C, OUT, WRK, LWRK, IWRK, LIWRK, IFAIL )
       IF ( IFAIL .GT. 0 ) THEN
         CALL MSG_PRNT( 'Error evaulating spline fit' )
         STATUS = SAI__ERROR

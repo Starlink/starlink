@@ -21,7 +21,7 @@
 *    Functions :
 *
       REAL MATH_RND
-      INTEGER G05DRF
+c     INTEGER G05DRF
 *
 *    Local variables :
 *
@@ -35,12 +35,14 @@
 
 *    Initialise random number generator
       IF ( INITIALISE ) THEN
-	CALL G05CCF(NINT(MATH_RND()))
+c       CALL G05CCF(NINT(MATH_RND()))
         INITIALISE=.FALSE.
       END IF
 
 *    Poisson distribution
       IFAIL = 0
-      MATH_POISS = G05DRF( DBLE(LAMB), IFAIL )
+      MATH_POISS = INT( LAMB )
+c     MATH_POISS = G05DRF( DBLE(LAMB), IFAIL )
 
       END
+
