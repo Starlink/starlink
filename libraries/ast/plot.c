@@ -10921,13 +10921,14 @@ static int GetLabelUnits( AstPlot *this, int axis ) {
    the requested axis. The primary Frame is guaranteed not to be a CmpFrame. */
       astPrimaryFrame( fr, axis, &primframe, &primaxis );
 
-/* If the primary Frame is a SkyFrame representing equatorial, ecliptic,
+/* If the primary Frame is a SkyFrame representing ICRS, equatorial, ecliptic,
    galactic or supergalactic coords, use a default of "no" for LabelUnits.
    Otherwise use a default of "yes". */
       ret = 1;
       if( IsASkyFrame( (AstObject *) primframe ) ) {
         system = astGetSystem( primframe );
-        if( system == AST__FK4 ||
+        if( system == AST__ICRS ||
+            system == AST__FK4 ||
             system == AST__FK4_NO_E ||
             system == AST__FK5 ||
             system == AST__GAPPT ||
