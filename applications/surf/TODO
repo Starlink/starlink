@@ -1,0 +1,134 @@
+TO DO List
+==========
+
+- Add note to docs to explciitly state that REMSKY averages over
+  1 second for JIGGLE and 0.125 for SCAN -- after confusion over
+  how long a 'jiggle' is.
+
+- Aborted data files (eg those with headers but less than a full exposure)
+  Should die gracefully in REDUCE_SWITCH rather than complaining
+  that the bounds are less than 1 for the second dim. (since EXP_POINTER
+  is one and EXP_POINTER-1 is 0)
+
+- surf_write_map_info does not check status on entry,
+
+- Add note to documentation to point out that zero level in scan maps
+  is suspect.
+
+-2. Make sure that VEC_?TO+ have the BAD flag set to TRUE
+    so that bad values are converted correctly when changing
+    variable type (eg SCUOVER and SCUBA2MEM)
+
+-1. SURFLIB_CALC_OUTPUT_GRID returns error message saying >1000
+   instead of 4096
+
+0. Does cmp_getvr work in NDF perl module?
+   Got error about type from get_mortalspace.
+
+1. Sculog to support SCUBA_PREFIX
+
+
+3. Allow DESPIKE to interpolate rather than mark bad.
+
+4. Propogate HISTORY to REBIN output when only regridding one file. 
+
+6. Change SCUOVER to PGPLOT and extract into a separate monolith.
+     - difficult to remove SGS without dropping the Kappa 
+       routines (which contain a couple of SGS calls)
+       Essentially the colour index code is the problem.
+       Other than that SGS could be removed from surf_scuover.f
+       without too much trouble.
+
+7. SCUPA does not support numeric input (SCUBA_PREFIX)
+
+10. Update SCULIB_SKYDIP_TEMPERATURES so that it uses DOUBLE. 
+    This will prevent negative variance. [Note that this is
+    an ON-LINE issue as well]
+
+12. A utility to list the contents of DEM_PNTR in a meaningful way
+    to make life easier when despiking scan maps.
+
+
+16. Fix SCUSHIFT so that it modified PHOT_BB for photom data.
+
+17. Fix the 2 and 3 bolometer chopping data reduction to remove
+    the off-off part.
+
+18. Propogate switches through SURF....
+
+
+20. SCULIB_CALC_BOL_COORDS should deal with all the offsetting
+    issues.
+
+21  SCULOG sometimes prints a HST time in the wrong format
+
+
+24 Do threshold clipping for individual bolometers (rather than clipping based on 
+   STATS)
+
+25. Generate stats on each bolometer in turn.
+     (shell script)
+
+26. Change pointsum so that it doesn't show Uaz,Uel for DEM files.
+
+
+DONE
+====
+
+15. Don't do third regrid phase for LINEAR rebin [optional]
+
+
+19. Despike will not run unhindered if it attempts to write out
+    more than one output file. Need a way of always accepting the
+    default output file.
+
+
+-4 Allow configurable footprint size for REBIN
+
+-3. Make REMDBM use filenames related to process id to stop it
+    from clashing with junk.sdf....
+
+
+
+4. Propogate HISTORY to SCUPHOT output.
+
+
+23 Allow the ability to specify map sizes in REBIN
+
+
+2. Make the creation of the WEIGHTS array optional. (REBIN)
+
+
+1. Generate default output name from input name.
+     - use $SCUBA_SUFFIX env variable to determine whether default
+       is long or short (ie des_res_flat_ext_long vs _drfel)
+
+9. Change 'DUMMY' parameter messages since they can appear in 
+   PROMPT mode.
+
+14. Propogate AXIS through SCAN_RLB and DESPIKE
+
+16. Make sure sdip uses COSYS=DATA
+
+17. Despike:  Print message saying how many spikes were removed
+    from each bolometer. Tidy up logic in simple despike.
+    [ie Do I reset bit 5? Do I clip points with bad quality?]
+
+17. REMSKY can not accept more than 20 bolometers. Need to add 
+    groups (such as RING1, ALL, RING2, ALL except H7)
+
+8. Error in SCULIB_PUT_FITS_C - string can be missing '/'
+    [ON-line]
+   Error in SCULIB_PUT_FITS_I - No space between number and '='
+    [Also R and C]
+
+16. SCULIB_CONSTRUCT_OUT should do something if input filename
+    equals output filename.
+
+13. Check MAP_X and MAP_Y (especially when combining data with different
+    MAP_X and MAP_Y) Checked for RB offsets.
+
+
+9. Change 'DUMMY' parameter messages since they can appear in 
+   PROMPT mode - only need to do for the surf.ifl file
+
