@@ -33,6 +33,7 @@ STAR_DECLARE_DEPENDENCIES([link],  [ncar gks sgs])
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun90)
+STAR_DOC_FILES(sun90-fig-1.eps  sun90-fig-2.eps  sun90-fig-3.eps  sun90-fig-4.eps  sun90-fig-5.eps  sun90-fig-6.eps)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
