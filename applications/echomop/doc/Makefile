@@ -20,9 +20,13 @@ HYPERTEXT_DOCS=sun152.htx_tar
 $(LATEX_DOCS): sun152/sun152.tex
 	cd sun152; tar cf ../$@ sun152*
 
-# This isn't buildable at present -- it should simply be present.
-# Following fails with an error if the bundle isn't already there.
-$(HYPERTEXT_DOCS):
+$(HYPERTEXT_DOCS): sun152/sun152.htx/sun152.html
+	cd sun152; tar cf ../$@ sun152.htx
+
+# The LaTeX2html commands needs some preprocessing.  The .tex file has
+# the magic within it.
+sun152/sun152.htx/sun152.html: sun152/sun152.tex
+	cd sun152; sed -n 's/^%%S2HPOST//p' sun152.tex | csh
 
 # Bundle up the HTML version of the HELP.  Filename must match that
 # required by the makefile in the parent directory.
