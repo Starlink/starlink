@@ -192,6 +192,12 @@
 #        FFLAGS (-O)
 #           The Fortran compiler options to be used.
 #
+#        LEX (lex)
+#           The lex command to use.
+#
+#        LFLAGS ()
+#           Flags for the lex command.
+#
 #        LINK (ln)
 #           The command required to establish a link to a file.  The
 #           default assumes POSIX.2 behavior, which only provides a
@@ -236,6 +242,12 @@
 #           available on traditional UNIX systems.  These typically use
 #           a tar command such as 'tar -xf' instead.
 #
+#        YACC (yacc)
+#           The yacc command to use.
+#
+#        YFLAGS ()
+#           Flags for the yacc command.
+#
 #  Implementation Deficiencies:
 #     -  The implementation of shareable libraries on the alpha_OSF1
 #        system is still preliminary.
@@ -273,6 +285,8 @@
 #        Linux case added.
 #     16-OCT-1998 (MBT):
 #        Adapted for SCB.
+#     08-DEC-1999 (MBT):
+#        Added variables for lex/yacc processing.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -287,11 +301,15 @@
       export CFLAGS
       export FC
       export FFLAGS
+      export LEX
+      export LFLAGS
       export LINK
       export SOURCE_VARIANT
       export RANLIB
       export TAR_IN
       export TAR_OUT
+      export YACC
+      export YFLAGS
       export PERL_MOD_DIR
       export SCB_SOURCES
       export SCB_INDEX
@@ -318,13 +336,17 @@
                MIMETYPES_FILE=/usr/local/etc/httpd/conf/mime.types
                AR_IN='ar -r'
                CC='cc'
-               CFLAGS='-I$(STAR_INC) -O -std1'
+               CFLAGS='-O -std1'
                FC='f77'
                FFLAGS='-O'
+               LEX='lex'
+               LFLAGS='-n'
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'
+               YACC='yacc'
+               YFLAGS=''
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
@@ -335,7 +357,7 @@
             mips)
                AR_IN='ar -r'
                CC='c89'
-               CFLAGS='-I$(STAR_INC) -O'
+               CFLAGS='-O'
                FC='f77'
                FFLAGS='-O'
                LINK='ln -s'
@@ -352,7 +374,7 @@
             sun4)
                AR_IN='ar r'
                CC='gcc'
-               CFLAGS='-I$(STAR_INC) -O'
+               CFLAGS='-O'
                FC='f77'
                FFLAGS='-O'
                LINK='ln -s'
@@ -368,12 +390,16 @@
                MIMETYPES_FILE=/etc/http/mime.types
                AR_IN='ar -r'
                CC='cc'
-               CFLAGS='-I$(STAR_INC) -O'
+               CFLAGS='-O'
                FC='f77'
                FFLAGS='-O'
+               LEX='lex'
+               LFLAGS='-n'
                LINK='ln -s'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'
+               YACC=yacc
+               YFLAGS=''
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
@@ -385,13 +411,17 @@
                MIMETYPES_FILE=/etc/mime.types
                AR_IN='ar r'
                CC='gcc'
-               CFLAGS='-I$(STAR_INC) -O'
+               CFLAGS='-O'
                FC='g77'
                FFLAGS='-fno-second-underscore -O'
+               LEX='flex'
+               LFLAGS='-Sflex.skl -d'
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'
+               YACC='yacc'
+               YFLAGS='-d'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
