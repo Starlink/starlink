@@ -528,6 +528,7 @@ read or written.  The following symbolic constants are allowed for the
 value of {\tt datatype}:
 \begin{verbatim}
   TBYTE     unsigned char
+  TSBYTE    signed char
   TSHORT    signed short
   TUSHORT   unsigned short
   TINT      signed int
@@ -627,6 +628,7 @@ and in binary tables:
             rL  - logical
             rX  - bit
             rB  - unsigned byte
+            rS  - signed byte **
             rI  - signed 16-bit integer
             rU  - unsigned 16-bit integer **
             rJ  - signed 32-bit integer
@@ -637,9 +639,10 @@ and in binary tables:
             rC  - 32-bit complex pair
             rM  - 64-bit complex pair
 
-     ** The U and V format codes are not actual legal TFORMn values.
+     ** The S, U and V format codes are not actual legal TFORMn values.
         CFITSIO substitutes the somewhat more complicated set of
-        keywords that are used to represent unsigned integers.
+        keywords that are used to represent unsigned integers or
+        signed bytes.
 
     *** The 64-bit integer format is experimental and is not 
         officially recognized in the FITS Standard.
@@ -696,6 +699,9 @@ COL\_NOT\_FOUND}  is returned.
 _______________________________________________________________
 int fits_get_coltype(fitsfile *fptr, int colnum, int *typecode,
                      long *repeat, long *width, int *status)
+
+int fits_get_eqcoltype(fitsfile *fptr, int colnum, int *typecode,
+                     long *repeat, long *width, int *status)
 \end{verbatim}
 
 Return the datatype, vector repeat count, and the width in bytes of a
@@ -704,7 +710,38 @@ for the returned datatype in ASCII tables are:  {\tt TSTRING, TSHORT,
 TLONG, TFLOAT, and TDOUBLE}.  Binary tables support these additional
 types: {\tt TLOGICAL, TBIT, TBYTE, TINT32BIT, TCOMPLEX and TDBLCOMPLEX}.  The
 negative of the datatype code value is returned if it is a variable
-length array column.  The repeat count is always 1 in ASCII tables.
+length array column.
+
+These 2 routines are similar, except that in the case of scaled
+integer columns the 2nd routine, fit\_get\_eqcoltype, returns the
+'equivalent' datatype that is needed to store the scaled values, which
+is not necessarily the same as the physical datatype of the unscaled values
+as stored in the FITS table.  For example if a '1I' column in a binary
+table has TSCALn = 1 and TZEROn = 32768, then this column effectively
+contains unsigned short integer values, and thus the returned value of
+typecode will be TUSHORT, not TSHORT.  Or, if TSCALn or TZEROn are not
+integers, then the equivalent datatype will be returned as TFLOAT or
+TDOUBLE, depending on the size of the integer.
+
+The repeat count is always 1 in ASCII tables.
+The 'repeat' parameter returns the vector repeat count on the binary
+table TFORMn keyword value. (ASCII table columns always have repeat
+= 1).  The 'width' parameter returns the width in bytes of a single
+column element (e.g., a '10D' binary table column will have width =
+8, an ASCII table 'F12.2' column will have width = 12, and a binary
+table'60A' character string  column will have width = 60);  Note that
+this routine supports the local convention for specifying arrays of
+fixed length strings within a binary table character column using
+the syntax TFORM = 'rAw' where 'r' is the total number of
+characters (= the width of the column) and 'w' is the width of a
+unit string within the column.  Thus if the column has TFORM =
+'60A12' then this means that each row of the table contains
+5 12-character substrings within the 60-character field, and thus 
+in this case this routine will return typecode = TSTRING, repeat =
+60, and width = 12.  The number of substings in any binary table
+character string field can be calculated by (repeat/width). 
+A null pointer may be given for any of the output parameters that
+ are not needed.
 
 \begin{verbatim}
 ____________________________________________________________________________
