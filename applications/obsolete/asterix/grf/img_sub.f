@@ -1665,7 +1665,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 *  Local variables :
       CHARACTER*80 XUNITS,YUNITS
       INTEGER NDIM,DIMS(ADI__MXDIM)
-      INTEGER XPTR,YPTR
+      INTEGER XPTR,YPTR,SID
       LOGICAL DOK,AXOK,AYOK,AXREG,AYREG
       LOGICAL XNORM,YNORM
 *-
@@ -1754,6 +1754,16 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
             CALL CONV_UNIT2R(I_XYUNITS,I_WTORAD,STATUS)
             I_SPATIALIMAGE=.TRUE.
           ENDIF
+
+          IF (I_GUI) THEN
+            CALL NBS_FIND_ITEM(I_NBID,'WTODEG',SID,STATUS)
+            IF ( I_SPATIALIMAGE ) THEN
+              CALL NBS_PUT_VALUE(SID,0,VAL__NBR,I_WTORAD*MATH__RTOD,
+     :                 STATUS)
+            ELSE
+              CALL NBS_PUT_VALUE(SID,0,VAL__NBR,-1.0,STATUS)
+            END IF
+          END IF
 
           CALL BDI_AXGET0C( IFID, I_XAX, 'Label', I_XLABEL, STATUS )
           CALL BDI_AXGET0C( IFID, I_YAX, 'Label', I_YLABEL, STATUS )

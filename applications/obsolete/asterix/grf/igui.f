@@ -10,7 +10,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'PRM_PAR'
 *    Global variables :
@@ -91,7 +90,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'PRM_PAR'
 *    Import :
@@ -160,6 +158,10 @@
         CALL NBS_DEFINE_PRIMITIVE(ID,'XPMAX','_INTEGER',0,VAL__NBI,SID,
      :                                                         STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'YPMAX','_INTEGER',0,VAL__NBI,SID,
+     :                                                         STATUS)
+
+*  conversion of world coords to degrees
+        CALL NBS_DEFINE_PRIMITIVE(ID,'WTODEG','_REAL',0,VAL__NBR,SID,
      :                                                         STATUS)
 
 *  limits of current region
@@ -276,7 +278,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'PRM_PAR'
 *    Import :
