@@ -1207,7 +1207,7 @@
         MORE=.TRUE.
         I=1
         NAME='PAR'
-        DO WHILE (MORE)
+        DO WHILE (MORE.AND.I.LE.6)
           WRITE(NAME(4:4),'(I1)') I
           CALL GSET_GET0R( NAME, SETP(I), PAR(I), STATUS)
           IF (SETP(I)) THEN
