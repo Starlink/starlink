@@ -45,6 +45,7 @@ typedef int StatusType;
 typedef int WcsMapType;
 
 #include "ast.h"
+#include "grf.h"
 
 /* The following definitions are required for backwards compatible
    Since AST version 2 does not have these.
@@ -267,6 +268,18 @@ MODULE = Starlink::AST     PACKAGE = Starlink::AST
 BOOT:
           MUTEX_INIT(&AST_mutex);
           ErrBuff = newAV();
+          
+double
+AST__BAD()
+ CODE:
+#ifdef AST__BAD
+    RETVAL = AST__BAD;
+#else
+    Perl_croak(aTHX_ "Constant AST__BAD not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+          
 
 MODULE = Starlink::AST     PACKAGE = Starlink::AST PREFIX = ast
 
@@ -2033,3 +2046,6 @@ INCLUDE: AST_ERR.xsh
 
 INCLUDE: AST_WCSMAP.xsh
 
+# Then the Grf constants
+
+INCLUDE: AST_GRF.xsh
