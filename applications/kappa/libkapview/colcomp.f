@@ -20,7 +20,8 @@
 *     different primary colour (red, green or blue) to represent each NDF.
 *     The resulting colour composite image is available in two forms; as an
 *     NDF with an associated colour table (see parameters OUT and LUT), and 
-*     as an ASCII PPM image file (see parameter PPM). Note, this application 
+*     as an ASCII PPM image file (see parameter PPM). The full pixel
+*     resolution of the input NDFs is retained. Note, this application 
 *     does not actually display the image, it just creates various output 
 *     files which must be displayed using other tools (see below).
 *
@@ -167,7 +168,7 @@
 *        composite image stored in NDF m31_col. A colour look up table is
 *        also created and stored in NDF m31_lut. It is assumed that the
 *        output image will be displayed on the current graphics device.
-*        The created colour composite image should be displayed using the
+*        The created colour composite image should be dislayed using the
 *        command:
 *
 *           display m31_col scale=no lut=m31_lut
@@ -189,11 +190,7 @@
 
 *  Notes:
 *     -  The output image (PPM or NDF) covers the area of overlap between 
-*     the input NDFs at full resolution. If the input NDFs are very large
-*     is is a good idea to compress them first (for instance, using
-*     COMPAVE) to reduce the size of the output images. Note, compressing
-*     the output NDF will normally produce spurious colours in the
-*     compressed image.
+*     the input NDFs at full resolution. 
 *     -  The output image is based on the values in the DATA components
 *     of the input NDFs. Any VARIANCE and QUALITY arrays in the input NDFs 
 *     are ignored.
