@@ -61,9 +61,19 @@ if %?INSTALLMANIFEST%
 # rule.  This means that if this is being invoked from within an
 # install-manifest rule further up the process tree, we don't create
 # another manifest.
+## Pass the SHELL variable as /bin/sh, to ensure that the
+## install-manifest target is executed using that shell.  That target
+## requires that file descriptor 5 is inherited, open, by the submake,
+## and /bin/ksh carefully closes all fd > 2 when invoking children.
+## The configure script presumably rejected /bin/sh for a reason, but
+## as of autoconf 2.57 at least, it was because it didn't support
+## $LINENO, which we don't care about.  I've only seen that happen on
+## Tru64 (v5.1 at least), and that was only a problem when using a
+## non-default make, since the default one on Tru64 ignores $(SHELL)
+## and uses /bin/sh for everything.
 install: %maybe_BUILT_SOURCES% all-am
 	if test -n "$(STAR_MANIFEST_DIR)" -a -z "$$MANIFEST_FD"; then \
-	    $(MAKE) $(AM_MAKEFLAGS) install-manifest; \
+	    $(MAKE) SHELL=/bin/sh $(AM_MAKEFLAGS) install-manifest; \
 	else \
 	    $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL); \
 	fi
