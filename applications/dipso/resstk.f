@@ -83,6 +83,8 @@
 *  History:
 *     22-AUG-1994 (DSB):
 *        Original version.
+*     29-SEP-2004 (DSB):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -96,6 +98,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER COMM * ( * )
@@ -260,11 +263,14 @@
 
 *  Copy them to the returned arrays.
          IF( STATUS .EQ. SAI__OK ) THEN
-            CALL VEC_RTOR( .FALSE., STKNPT( NONSTK ), %VAL( IPX ),
+            CALL VEC_RTOR( .FALSE., STKNPT( NONSTK ), 
+     :                     %VAL( CNF_PVAL( IPX ) ),
      :                     XSTACK( STKLST + 1 ), IERR, NERR, STATUS )
-            CALL VEC_RTOR( .FALSE., STKNPT( NONSTK ), %VAL( IPY ),
+            CALL VEC_RTOR( .FALSE., STKNPT( NONSTK ), 
+     :                     %VAL( CNF_PVAL( IPY ) ),
      :                     YSTACK( STKLST + 1 ), IERR, NERR, STATUS )
-            CALL VEC_ITOI( .FALSE., BSTNPT( NONSTK ), %VAL( IPB ),
+            CALL VEC_ITOI( .FALSE., BSTNPT( NONSTK ), 
+     :                     %VAL( CNF_PVAL( IPB ) ),
      :                     BSTACK( BSTLST + 1 ), IERR, NERR, STATUS )
 
 *  Store the indices at which the data for the current stack entry starts.

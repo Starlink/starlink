@@ -97,6 +97,8 @@
 *     13-DEC-2003 (DSB):
 *        - Check for usable AXIS structures before using FITS WCS headers.
 *        - Check for unit plurals ("Angstroms" instead of "Angstrom")
+*     29-SEP-2004 (DSB):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -113,6 +115,7 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'AST_PAR'          ! AST__ constants and functions
       INCLUDE 'NDF_PAR'          ! NDF__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DECLARE_STKS'     ! DIPSO array sizes, etc.
@@ -349,8 +352,8 @@
 *  DATA array is always placed in element 1 of the returned array. This
 *  means that the break points (after the above modification) will refer
 *  to the correct elements.
-      CALL VEC_RTOR( .FALSE., NPOINT, %VAL( IPDATA ), FLUX, IERR, NERR, 
-     :               STATUS )
+      CALL VEC_RTOR( .FALSE., NPOINT, %VAL( CNF_PVAL( IPDATA ) ), FLUX, 
+     :               IERR, NERR, STATUS )
 
 *  Map the AXIS CENTRE array. This should hold the wavelength (or
 *  velocity) at the centre of each data pixel. If there is no AXIS
@@ -364,8 +367,8 @@
       IF( NPOINT .GT. ASIZE1 ) NPOINT = ASIZE1
 
 *  Copy the values to the common X array.
-      CALL VEC_RTOR( .FALSE., NPOINT, %VAL( IPAXIS ), WAVE, IERR, NERR,
-     :               STATUS )
+      CALL VEC_RTOR( .FALSE., NPOINT, %VAL( CNF_PVAL( IPAXIS ) ), WAVE, 
+     :               IERR, NERR, STATUS )
 
 *  If the NDF was created by DIPSO, the X array will now be correct. If
 *  the NDF was not created by DIPSO, then the X array may not contain
@@ -662,12 +665,12 @@
 
 *  Use the Mapping to transform the AXIS Centre values into spectral values, 
 *  putting the results in the work space just allocated.
-            CALL AST_TRAN1( ASMAP, NPOINT, %VAL( IPAXIS ), .TRUE., 
-     :                      %VAL( IPW1 ), STATUS ) 
+            CALL AST_TRAN1( ASMAP, NPOINT, %VAL( CNF_PVAL( IPAXIS ) ), 
+     :                      .TRUE., %VAL( CNF_PVAL( IPW1 ) ), STATUS ) 
 
 *  Copy these to the X array.
-           CALL VEC_DTOR( .TRUE., NPOINT, %VAL( IPW1 ), WAVE, IERR, 
-     :                    NERR, STATUS )
+           CALL VEC_DTOR( .TRUE., NPOINT, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                    WAVE, IERR, NERR, STATUS )
 
          END IF
 

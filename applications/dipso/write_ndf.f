@@ -66,6 +66,8 @@
 *        Original version.
 *     13-DEC-1995 (DSB):
 *        Modified to use NDF_PLACE instead of HDS_NEW.
+*     29-SEP-2004 (DSB):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -79,6 +81,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER COMM*(*)
@@ -164,7 +167,8 @@
 *  Copy the values from common to the DATA array, inserting 2 zeros
 *  for each break if we are creating a SPECTRUM format 0 file.
       CALL WRCOPY( COMM, NBREAK, BREAK, NPOINT, FLUX, WAVE, NDFSIZ, 
-     :             %VAL( IPDATA ), %VAL( IPAXIS ), STATUS )
+     :             %VAL( CNF_PVAL( IPDATA ) ), 
+     :             %VAL( CNF_PVAL( IPAXIS ) ), STATUS )
 
 *  Unmap the data array.
       CALL NDF_UNMAP( INDF, 'DATA', STATUS )

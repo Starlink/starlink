@@ -109,6 +109,8 @@
 *        Original version.
 *     13-DEC 1995 (DSB):
 *        Modified to use NDF_PLACE instead of HDS_NEW.
+*     29-SEP-2004 (DSB):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -123,6 +125,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'MSG_PAR'          ! MSG__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER NDFNAM*(*)
@@ -240,13 +243,16 @@
 *  Copy the supplied arrays to these new components.
          IF( STATUS .EQ. SAI__OK ) THEN
             CALL VEC_RTOR( .FALSE., STKNPT( ISTK ), 
-     :                     XSTACK( POINTR( ISTK ) ), %VAL( IPX ), IERR,
+     :                     XSTACK( POINTR( ISTK ) ), 
+     :                     %VAL( CNF_PVAL( IPX ) ), IERR,
      :                     NERR, STATUS )
             CALL VEC_RTOR( .FALSE., STKNPT( ISTK ), 
-     :                     YSTACK( POINTR( ISTK ) ), %VAL( IPY ), IERR,
+     :                     YSTACK( POINTR( ISTK ) ), 
+     :                     %VAL( CNF_PVAL( IPY ) ), IERR,
      :                     NERR, STATUS )
             CALL VEC_ITOI( .FALSE., BSTNPT( ISTK ), 
-     :                     BSTACK( BPOINT( ISTK ) ), %VAL( IPB ), IERR,
+     :                     BSTACK( BPOINT( ISTK ) ), 
+     :                     %VAL( CNF_PVAL( IPB ) ), IERR,
      :                     NERR, STATUS )
          END IF
 

@@ -46,6 +46,8 @@
 *        Modified to use NDF_PLACE instead of HDS_NEW.
 *     17-FEB-2003 (DSB):
 *        Modified to add a WCS component to the NDF.
+*     29-SEP-2004 (DSB):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -60,6 +62,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'AST_PAR'          ! AST__ constants and functions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'DECLARE_STKS'     ! DIPSO array sizes, etc.
@@ -178,7 +181,8 @@
 *  Copy the values from common to the DATA array, inserting 2 zeros
 *  for each break if we are creating a SPECTRUM format 0 file.
       CALL WRCOPY( COMM, NBREAK, BREAK, NPOINT, FLUX, WAVE, NDFSIZ, 
-     :             %VAL( IPDATA ), %VAL( IPAXIS ), STATUS )
+     :             %VAL( CNF_PVAL( IPDATA ) ), 
+     :             %VAL( CNF_PVAL( IPAXIS ) ), STATUS )
 
 *  Unmap the data array.
       CALL NDF_UNMAP( INDF, 'DATA', STATUS )

@@ -44,6 +44,8 @@
 *  History:
 *     2-SEP-1994 (DSB):
 *        Original version.
+*     29-SEP-2004 (DSB):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -57,6 +59,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Arguments Given:
       CHARACTER * ( * ) NDFNAM
@@ -108,7 +111,8 @@
 *  FLUX value is only assigned to a DATA element if the corresponding
 *  WAVE and AXIS CENTRE values are the same. DATA values which do not
 *  have a corresponding element in the FLUX array are set bad.
-      CALL AXMAT( EL, %VAL( IPAXIS ), %VAL( IPDATA ), NGOOD, STATUS )
+      CALL AXMAT( EL, %VAL( CNF_PVAL( IPAXIS ) ), 
+     :            %VAL( CNF_PVAL( IPDATA ) ), NGOOD, STATUS )
 
 *  Report an error if there was no overlap between the AXIS CENTRE
 *  values and the WAVE values.
