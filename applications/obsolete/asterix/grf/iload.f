@@ -98,12 +98,18 @@
         ELSE
           CALL MSG_PRNT('Loading image....')
           CALL IMG_LOAD(IFID,STATUS)
+	print *,'set region'
+	call flush(6)
           CALL IMG_SETWHOLE(STATUS)
+	print *,'set position'
+	call flush(6)
           CALL IMG_SETPOS(0.0,0.0,STATUS)
         ENDIF
 
 
 *  get graphics device
+	print *,'check device'
+	call flush(6)
         CALL GDV_STATUS(ACTIVE,STATUS)
         IF (.NOT.ACTIVE.AND.STATUS.EQ.SAI__OK) THEN
           CALL USI_GET0C('DEV',DEV,STATUS)
