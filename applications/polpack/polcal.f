@@ -103,6 +103,18 @@
 *        really necessary. MAXIT is always fixed at zero if WEIGHTS is 4
 *        (i.e. if all input data are given constant weight). See also
 *        parameter TOLR. []
+*     MINFRAC = _REAL (Read)
+*        This parameter is only accessed by the single-beam algorithm
+*        when iteratively rejecting input values (i.e. if MAXIT is
+*        greater than zero). It controls how much good input data is 
+*        required to form a good output pixel. It is given as a fraction 
+*        in the range 0 to 1. The miminum number of good input values 
+*        required to form a good output value at a particular pixel is 
+*        equal to this fraction multiplied by the number of input NDFs 
+*        which have good values for the pixel. The number is rounded to 
+*        the nearest integer and limited to at least 3. If ILEVEL is
+*        greater than 1, then the percentage of output pixels which fail 
+*        this test is displayed. [0.0]
 *     NSIGMA = _REAL (Read)
 *        This parameter is only accessed by the single-beam algorithm. It
 *        specifies the threshold at which to reject input data values. If
@@ -179,18 +191,6 @@
 *        may be, and would consequently give no information about the input
 *        variances. In this case, a larger value of SMBOX (say 9) may be
 *        necessary. [3]
-*     MINFRAC = _REAL (Read)
-*        This parameter is only accessed by the single-beam algorithm
-*        when iteratively rejecting input values (i.e. if MAXIT is
-*        greater than zero). It controls how much good input data is 
-*        required to form a good output pixel. It is given as a fraction 
-*        in the range 0 to 1. The miminum number of good input values 
-*        required to form a good output value at a particular pixel is 
-*        equal to this fraction multiplied by the number of input NDFs 
-*        which have good values for the pixel. The number is rounded to 
-*        the nearest integer and limited to at least 3. If ILEVEL is
-*        greater than 1, then the percentage of output pixels which fail 
-*        this test is displayed. [0.0]
 *     TITLE = LITERAL (Read)
 *        A title for the output cube. [Output from POLCAL]
 *     TOLR = _INTEGER (Read)

@@ -2803,6 +2803,21 @@ for NDF applications.
          parameter TOLR. []
       }
       \sstsubsection{
+         MINFRAC = \_REAL (Read)
+      }{
+         This parameter is only accessed by the single-beam algorithm
+         when iteratively rejecting input values (\emph{i.e.} if MAXIT is
+         greater than zero). It controls how much good input data is
+         required to form a good output pixel. It is given as a fraction
+         in the range 0 to 1. The miminum number of good input values
+         required to form a good output value at a particular pixel is
+         equal to this fraction multiplied by the number of input NDFs
+         which have good values for the pixel. The number is rounded to
+         the nearest integer and limited to at least 3. If ILEVEL is
+         greater than 1, then the percentage of output pixels which fail
+         this test is displayed. [0.0]
+      }
+      \sstsubsection{
          NSIGMA = \_REAL (Read)
       }{
          This parameter is only accessed by the single-beam algorithm. It
@@ -2895,21 +2910,6 @@ for NDF applications.
          may be, and would consequently give no information about the input
          variances. In this case, a larger value of SMBOX (say 9) may be
          necessary. [3]
-      }
-      \sstsubsection{
-         MINFRAC = \_REAL (Read)
-      }{
-         This parameter is only accessed by the single-beam algorithm
-         when iteratively rejecting input values (\emph{i.e.} if MAXIT is
-         greater than zero). It controls how much good input data is
-         required to form a good output pixel. It is given as a fraction
-         in the range 0 to 1. The miminum number of good input values
-         required to form a good output value at a particular pixel is
-         equal to this fraction multiplied by the number of input NDFs
-         which have good values for the pixel. The number is rounded to
-         the nearest integer and limited to at least 3. If ILEVEL is
-         greater than 1, then the percentage of output pixels which fail
-         this test is displayed. [0.0]
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
