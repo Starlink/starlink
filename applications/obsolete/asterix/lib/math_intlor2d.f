@@ -160,7 +160,7 @@
 
 *            Value of Lorentzian
               R2 = (XPS/XWID)**2 + YPS2
-              IF ( R2 .LE. RLIM2 ) THEN
+              IF ( R2 .LE. RLIM2*WID2 ) THEN
                 SUM = SUM + 1.0 / (R2 + WID2)
               END IF
 
