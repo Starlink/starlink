@@ -21,10 +21,10 @@
 
 *  Description:
 *     This application performs the arbitrary transformation of a list
-*     of images.  The output images are calculated by resampling
-*     the data of the input images. Output array elements are set to the
+*     of NDFs.  The output NDFs are calculated by resampling
+*     the data of the input NDFs. Output array elements are set to the
 *     bad value if their inverse-transformed coordinates lie outside the
-*     corresponding input image's coordinate limits.  Many images can 
+*     corresponding input NDF's coordinate limits.  Many NDFs can 
 *     be resampled with a single invocation of TRANNDF, but it is
 *     the user's responsibility to ensure that they are resampled 
 *     into the same coordinate system if they are subsequently to be
@@ -36,14 +36,14 @@
 *     If USEWCS is TRUE then they are resampled from their Pixel 
 *     coordinates into their Current attached coordinate system
 *     (this is the default).  Since the resampling means that a 1 x 1
-*     square in the Current coordinates will represent one pixel, 
-*     the Current coordinate system must be of an appropriate size
-*     (so for instance resampling into SKY coordinates is not suitable
-*     because they have units of radians).  The Current coordinate 
-*     system will typically have been added by the CCDPACK REGISTER or
-*     WCSREG applications, and be labelled 'CCD_REG' or 'CCD_WCSREG'
-*     accordingly - if it has another label (domain) a warning will
-*     be issued but resampling will proceed.
+*     square in the Current coordinates will represent one pixel
+*     in the output image, the Current coordinate system must be of 
+*     an appropriate size (so for instance resampling into SKY 
+*     coordinates is not suitable because they have units of radians).
+*     The Current coordinate system will typically have been added 
+*     by the CCDPACK REGISTER or WCSREG applications, and be labelled 
+*     'CCD_REG' or 'CCD_WCSREG' accordingly - if it has another label 
+*     (domain) a warning will be issued but resampling will proceed.
 *
 *     If USEWCS is set to FALSE, then the resampling will take place
 *     according to the TRANSFORM structure stored in the .MORE.CCDPACK
@@ -56,13 +56,12 @@
 *  ADAM Parameters:
 *     CONSERVE = _LOGICAL (Read)
 *        If CONSERVE is TRUE, the output values are normalised by the
-*        ratio of the output-to-input pixel areas.  In other words this
-*        conserves flux.  If CONSERVE is FALSE, there is no normalisation.
-*        If the NDFs WCS component (see USEWCS parameter) is used to define the
-*        transformation then the program will be unable to determine whether 
-*        the transformation is of a linear nature. If CONSERVE is set to TRUE,
-*        the program will warn the user that although it is atempting to
-*        conserve flux it may do so corretly if the transform is non-linear.
+*        ratio of the output-to-input pixel areas.  In other words 
+*        this conserves flux.  If CONSERVE is FALSE, there is no 
+*        normalisation.  Flux can only be conserved if the 
+*        transformation is linear, so that even if CONSERVE is TRUE,
+*        flux will be incorrectly conserved if the transformation is
+*        of a non-linear nature.
 *        [TRUE]
 *     IN = NDF (Read)
 *        A list of NDF names whose data are to be transformed. The NDF
@@ -172,19 +171,20 @@
 *        [Dynamic default]
 *     USEWCS = _LOGICAL (Read)
 *        If TRUE then the transformation which is to be applied to the
-*        NDF is stored in the NDF's WCS extension. If FALSE then the
-*        transformation is either stored as a TRN structure in the
-*        NDF's CCDPACK extension (.MORE.CCDPACK.TRANSFORM), or is
-*        supplied by the user (see the INEXT parameter). [TRUE]
+*        NDF is stored in the NDF's WCS extension as an attached 
+*        coordinate system. If FALSE then the transformation is either 
+*        stored as a TRN structure in the NDF's CCDPACK extension 
+*        (.MORE.CCDPACK.TRANSFORM), or is supplied by the user (see 
+*        the INEXT parameter). [TRUE]
 
 *  Examples:
 *     tranndf '*' '*-resamp' reset
 *        This transforms all the NDFs in the current directory from
-*        the coordinates represented by the PIXEL-domain frame
-*        to the coordinates represented by the Current frame in their
-*        WCS components.  It uses nearest-neighbour resampling and
-*        conserves the flux levels. The output NDFs are of a size such
-*        that all the input pixels have contributed.
+*        pixel coordinates to their Current coordinate system.
+*        It uses nearest-neighbour resampling and conserves the flux 
+*        levels (assuming that the transformation is linear). 
+*        The output NDFs are of a size such that all the input
+*        pixels have contributed.
 *     tranndf curved straight linint shape=same
 *        As above, except linear interpolation is used, and the straight
 *        array uses the bounds of curved.
