@@ -109,7 +109,7 @@ DVI2BITMAP=dvi2bitmap
 # Should we have something in here to check whether all fonts are available?
 # Eg, `-q 2>>missing-fonts'.  Or pre-test with -n
 %.imgeq.d2b.stamp: %.imgeq.dvi
-	$(DVI2BITMAP) -r 110 -m 2 -s 2 -t gif $<
+	$(DVI2BITMAP) -r 110 -m 2 -s 2 -Pt -t gif $<
 	touch $@
 
 # The LaTeX stylesheet, like the HTML stylesheet, outputs a stamp.
