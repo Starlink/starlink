@@ -715,12 +715,13 @@
 
 *  Release group resources.
       DO 4 I = 1, NTYPES
-         CALL GRP_DELET( GID( I ), STATUS )
+         IF ( GID( I ) .NE. GRP__NOID ) 
+     :      CALL GRP_DELET( GID( I ), STATUS )
  4    CONTINUE
-      CALL GRP_DELET( FTYPES, STATUS )
-      CALL GRP_DELET( FILT, STATUS )
-      CALL GRP_DELET( DARK, STATUS )
-      CALL GRP_DELET( FLASH, STATUS )
+      IF ( FTYPES .NE. GRP__NOID ) CALL GRP_DELET( FTYPES, STATUS )
+      IF ( FILT .NE. GRP__NOID ) CALL GRP_DELET( FILT, STATUS )
+      IF ( DARK .NE. GRP__NOID ) CALL GRP_DELET( DARK, STATUS )
+      IF ( FLASH .NE. GRP__NOID ) CALL GRP_DELET( FLASH, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
