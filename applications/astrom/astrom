@@ -1,36 +1,54 @@
-#!/bin/csh -f
+#!/bin/sh -
 #
-#  To invoke the astrom utility, type:
+# To invoke the astrom utility, type:
 #
-#     astrom  [input]  [report]
+#    astrom [input=inputfile] [report=reportfile] [summary=summaryfile]
+#        [log=logfile] [fits=fitsfileroot] [wcsstyle=keyword]
 #
-#  Either or both parameters may be defaulted, by omission
-#  or by use of the notation "", to astrom.dat and astrom.lis
-#  respectively.
+# The parameters may be in any order.  Any or all parameters may be
+# omitted, and default to
+#    input=astrom.dat
+#    report=astrom.lis
+#    summary=<terminal>
+# If `fits' is missing, no FITS WCS headers are generated, and if
+# `wcsstyle=' is missing, the headers are in the default style.
+# The specifiers `input=' and `report=' may be omitted: if so, then
+# the first and second unspecified arguments are taken to be the input
+# and report file names.
 #
-#  P.T.Wallace   Starlink   8 December 1993
-#
+# Norman Gray, Starlink, 2003 May 2
+# Based on an earlier version by P T Wallace, Starlink, 1993 December 8.
 
-#  Declare interrupt handler
-      onintr end
+needinput=true
+needreport=true
+cmdline=
 
-#  String to indicate defaulted terminal I/O arguments
-      set _tty = .
+while test $# -ge 1; do
+    if expr $1 : '.*=' >/dev/null; then
+        cmdline="$cmdline $1"
+    else
+        if $needinput; then
+            cmdline="$cmdline input=$1"
+            needinput=false
+        elif $needreport; then
+            cmdline="$cmdline report=$1"
+            needinput=false
+        else
+            echo "Lonely argument"
+            exit 1
+        fi
+    fi
+    shift
+done
 
-#  Copy arguments
-      set _input = $1
-      set _report = $2
+if $needinput; then
+    cmdline="$cmdline input=astrom.dat"
+fi
+if $needreport; then
+    cmdline="$cmdline report=astrom.lis"
+fi
 
-#  Resolve defaults
-      if ($_input == "") then
-         set _input = astrom.dat
-      endif
-      if ($_report == "") then
-         set _report = astrom.lis
-      endif
+echo astrom.x $cmdline
+astrom.x $cmdline
 
-#  Run the job
-      astrom.x $_tty $_input $_report $_tty
-
-end:
-      exit
+exit 0
