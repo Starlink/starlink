@@ -164,7 +164,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 85 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 86 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/lib/table
@@ -439,4 +439,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/frog/build.xml:388: Compile failed; see the compiler error output for details.
 
-Total time: 1 minute 40 seconds
+Total time: 1 minute 39 seconds

@@ -8519,6 +8519,7 @@ U java/source/table/src/main/uk/ac/starlink/table/RandomRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/RandomStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/RandomWrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/ReaderRowSequence.java
+U java/source/table/src/main/uk/ac/starlink/table/RowListStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/RowPermutedStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/RowRandomWrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/RowSequence.java
@@ -8608,6 +8609,7 @@ cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table
 U java/source/table/src/testcases/uk/ac/starlink/table/AutoStarTable.java
 U java/source/table/src/testcases/uk/ac/starlink/table/FormatsTest.java
+U java/source/table/src/testcases/uk/ac/starlink/table/RowListTableTest.java
 U java/source/table/src/testcases/uk/ac/starlink/table/RowSubsetTest.java
 U java/source/table/src/testcases/uk/ac/starlink/table/TableTest.java
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table/gui

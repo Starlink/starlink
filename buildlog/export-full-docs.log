@@ -1841,7 +1841,7 @@ dist:
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 111 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 112 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -2296,4 +2296,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/frog/build.xml:388: Compile failed; see the compiler error output for details.
 
-Total time: 5 minutes 55 seconds
+Total time: 6 minutes 12 seconds
