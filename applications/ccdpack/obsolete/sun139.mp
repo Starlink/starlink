@@ -164,8 +164,10 @@ bendy( ccdalign.c, bpath ccdalign, register.c, bpath register );
 % bendo( z2, dot2.out, tranndf.c, bpath tranndf );
 % bendo( z2, dot2.out, drizzle.c, bpath drizzle );
 bendo( register.c, bpath register, tranndf.c, bpath tranndf);
-bendo( register.c, bpath register, drizzle.c, bpath drizzle);
 bendo( tranndf.c, bpath tranndf, makemos.c, bpath makemos );
+drawoptions(dashed evenly scaled 3);
+bendo( register.c, bpath register, drizzle.c, bpath drizzle);
+drawoptions(); 
 
 
 forsuffixes t = allboxes:
