@@ -6,7 +6,7 @@
      $Id$
      -->
 
-<!ELEMENT dtddescription	(dtdsummary, (element+))>
+<!ELEMENT dtddescription	(dtdsummary, (element+), commentary*)>
 <!ELEMENT element		(p+, attribute*, commentary*)>
 <!ELEMENT attribute		(p+)>
 <!ELEMENT p			(#PCDATA | elemref | example | code 
@@ -121,12 +121,14 @@
 
 <!ATTLIST dtdelement 
 	gi
-		CDATA #REQUIRED
+		IDREF #REQUIRED
 	id
 		ID #REQUIRED
 	>
 	<!-- attributes:
-		gi		GI of this element
+		gi		GI of this element, a reference to the
+				ID with the same attribute name on the
+				`element' element.
 
 		id		ID which refers to this element
 	-->
