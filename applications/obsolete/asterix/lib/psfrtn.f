@@ -954,8 +954,12 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *
       REAL                     FW2SIG
         PARAMETER              ( FW2SIG = 2.354820 )
+      REAL			GIS_GAIN		! SIS PI gain
+        PARAMETER		( GIS_GAIN = 1.07E-2 )	! keV per PI channel
       REAL                     RTOM                    ! Radian to arcmin
         PARAMETER              ( RTOM = MATH__RTOD*60.0 )
+      REAL			SIS_GAIN		! SIS PI gain
+        PARAMETER		( SIS_GAIN = 3.65E-3 )	! keV per PI channel
 *
 *    Local variables :
 *
@@ -1002,6 +1006,17 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Symmetric?
       SYMMETRIC = ( ( X0 .EQ. 0.0 ) .AND. ( Y0 .EQ. 0.0 )
      :        .AND. ( QX .EQ. 0.0 ) .AND. ( QY .EQ. 0.0 ) )
+
+*    Defined energy band?
+      IF ( RX_PHA_DEF(SLOT) ) THEN
+        IF ( AS_INSTR(SLOT) .EQ. 'SIS' ) THEN
+          ENERGY = REAL(RX_PHALO(SLOT)) * SIS_GAIN
+        ELSE
+          ENERGY = REAL(RX_PHALO(SLOT)) * GIS_GAIN
+        END IF
+      ELSE
+        ENERGY = RX_ENERGY(SLOT)
+      END IF
 
 *    SIS detector?
       IF ( AS_INSTR(SLOT) .EQ. 'SIS' ) THEN
