@@ -2,7 +2,7 @@
 AutoAstrometry of Mosaics
 -------------------------
 
-%%VERSION%%    0.4
+%%VERSION%%    0.5
 
 
 This is a developers' release of the autoastrometry package.
@@ -31,12 +31,17 @@ There's a pre-installation regression test:
 A couple of regression tests fail on DUX, apparently due to rounding
 errors somewhere.
 
+This version includes plugins, and specifically a plugin to support
+the `match' application to be found at
+<http://acd188a-005.rit.edu/match/>.  The distribution does not,
+however, include the match distribution, so you need to build that
+yourself and install it in the directory $AUTOASTROM_DIR.
+
 The regression test t/t9 (which consists of two runs of autoastrom
 right after each other) seems to hang on rlspc5 at RAL (though it
 works on my box in Glasgow), with an error which suggests that the
 Perl/ADAM system has got itself into a terminal fankle.  I suspect
 that this is caused by something like the monoliths from the first run
-not being fully shut down before the second starts, and thus it's to
-do with the lack of a robust exit handler in autoastrom (coming
-next!).
+not being fully shut down before the second starts, but I don't have a 
+more specific explanation than that.
 
