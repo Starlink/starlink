@@ -208,7 +208,7 @@ c	    CALL FTRDEF( LUN, FSTAT )
         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Write keywords?
-          IF ( (NKEY .GT. 0) .OR. WRKEYS ) THEN
+          IF ( WRKEYS ) THEN
 
 *        Move to HDU unless already there
             IF ( .NOT. MOVED ) THEN
