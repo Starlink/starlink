@@ -31,9 +31,9 @@ shouldn't include the document name.  However, having
 <code/index.html/ confuses <code/hlink/, which seems to need the file
 to be called <code/sunxxx.html/.  So now the top file is still called
 <code/sunxxx.html/ but the component files have short opaque names.
-<code/hlink/ works fine, now that the <code/sgml2docs/ script
-post-processes the Jade output to put <code/&lt;a>/ elements on a
-single line.
+<code/hlink/, <code/showme/ and <code/findme/ work fine, now that the
+<code/sgml2docs/ script normalises the Jade output in a
+post-processing step.
 
 <li>The SGML declaration was changed in such a way that IDs within the
 document are now case-sensitive.  This could not be done without
@@ -83,7 +83,7 @@ package.
 <dt>Need simple commands <code/sgml2latex/ and <code/sgml2html/
 instead of makefile, leaving no temporary files (even in the event of
 failure), and doing all necessary processing (maths, backmatter, etc).  
-<dd>Done.  Script <code/sgml2docs/ provided.  See notes above.
+<dd>Script <code/sgml2docs/ provided.  See notes above.
 
 <dt>All HTML files to go in a <code/.htx/ sub-directory;
 The document name should not be included in the HTML file names;
@@ -92,10 +92,10 @@ Need shorter names for html files;
 There should be no links within the <code/.htx/ directory.
 <dd>All done.  See notes above.
 
-<dt>Need a fix for line breaks within tags in <code/htx/ index file.
-<dd>??
-<dt>Findme, showme and hlink should all work.
-<dd>??
+<dt>Need a fix for line breaks within tags in <code/htx/ index file;
+Findme, showme and hlink should all work.
+<dd>Jade output now normalised in a post-processing step, and the HTX
+programs now work.
 
 </dl>
 
@@ -113,7 +113,7 @@ sophisticated.  See above.
 <dt>There should be an ID index page at the end of the HTML version,
 containing links back to referenced points within the document. Each
 page should have a link to the start of its entries in the ID index.
-<dd>??
+<dd>Done
 
 <dt>Keep open the possibility of using document summaries as an option.
 For the moment, we will not generate or distribute such summaries (but 
