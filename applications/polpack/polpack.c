@@ -16,6 +16,9 @@
 *        Original version.
 *     22-APR-1999 (DSB):
 *        Removed new colourmap argument from doplka.
+*     7-DEC-2000 (DSB):
+*        Added cstring, pol1_tclex, pol1_tclgt and pol1_tcldl.
+*        Modified getSVar to return length of string.
 */
 
 
@@ -24,6 +27,7 @@
 #include "f77.h"
 #include "sae_par.h"
 #include "merswrap.h"
+#include <tcl.h>
 
 #define GRP__NOID 0
 #define PACK_DIR "POLPACK_DIR"
@@ -36,19 +40,22 @@ extern F77_SUBROUTINE(grp_infoc)( INTEGER(igrp), INTEGER(index),
 extern F77_SUBROUTINE(err_rep)( CHARACTER(param), CHARACTER(mess),
                                 INTEGER(STATUS) TRAIL(param) TRAIL(mess) );
 
+static Tcl_Interp *interp=NULL;
+
 char *split( char * );
 void Error( const char *, int * );
 const char *Envir( const char *, int * );
 void SetVar( FILE *, char *, char *, int, int * );
 char *GetName( int, int, int * );
 void SetSVar( FILE *, const char *, const char *, int, int * );
-void GetSVar( const char *, char *, int, int * );
+int GetSVar( const char *, char *, int, int * );
 void SetIVar( FILE *, const char *, int, int * );
 void SetRVar( FILE *, const char *, float, int * );
 void SetLVar( FILE *, const char *, LOGICAL(a), int * );
 void GetLVar( const char *, LOGICAL(a), int * );
 void GetIVar( const char *, int *, int * );
 void GetRVar( const char *, float *, int * );
+char *cstring( const char *, int, int * );
 
 F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3), 
                         INTEGER(DPI), LOGICAL(HAREA),
@@ -453,7 +460,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                GetIVar( value, SKYPAR, STATUS );
 
             } else if( !strcmp( buf, "ATASK_SI" ) ) {
-               GetSVar( value, SI, SI_length, STATUS );
+               (void) GetSVar( value, SI, SI_length, STATUS );
 
             } else if( !strcmp( buf, "ATASK_FIT" ) ) {
                GetIVar( value, FIT, STATUS );
@@ -468,26 +475,26 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                GetRVar( value, PHI, STATUS );
 
             } else if( !strcmp( buf, "ATASK_VIEW" ) ) {
-               GetSVar( value, VIEW, VIEW_length, STATUS );
+               (void) GetSVar( value, VIEW, VIEW_length, STATUS );
 
             } else if( !strcmp( buf, "ATASK_XHRCOL" ) ) {
-               GetSVar( value, XHRCOL, XHRCOL_length, STATUS );
+               (void) GetSVar( value, XHRCOL, XHRCOL_length, STATUS );
 
             } else if( !strcmp( buf, "ATASK_BADCOL" ) ) {
-               GetSVar( value, BADCOL, BADCOL_length, STATUS );
+               (void) GetSVar( value, BADCOL, BADCOL_length, STATUS );
 
             } else if( !strcmp( buf, "ATASK_CURCOL" ) ) {
-               GetSVar( value, CURCOL, CURCOL_length, STATUS );
+               (void) GetSVar( value, CURCOL, CURCOL_length, STATUS );
 
             } else if( !strcmp( buf, "ATASK_REFCOL" ) ) {
-               GetSVar( value, REFCOL, REFCOL_length, STATUS );
+               (void) GetSVar( value, REFCOL, REFCOL_length, STATUS );
 
             } else if( !strcmp( buf, "ATASK_SELCOL" ) ) {
-               GetSVar( value, SELCOL, SELCOL_length, STATUS );
+               (void) GetSVar( value, SELCOL, SELCOL_length, STATUS );
 
             } else if( !strcmp( buf, "ATASK_MODE" ) ) {
                if( *IGRP4 != GRP__NOID ) {
-                  GetSVar( value, MODE, MODE_length, STATUS );
+                  (void) GetSVar( value, MODE, MODE_length, STATUS );
                }
             } 
          }
@@ -643,7 +650,7 @@ char *GetName( int igrp, int i, int *STATUS ) {
 *        The inherited status.
 
 *  Returned Value:
-*     A pointer to a static string holding the element. This string should not 
+*     A pointer to a string holding the element. This string should not 
 *     be modified or freed by the caller.
 *     
 */
@@ -754,7 +761,7 @@ void SetSVar( FILE *interp, const char *var, const char *string,
 
 }
 
-void GetSVar( const char *val, char *string, int len, int *STATUS ) {
+int GetSVar( const char *val, char *string, int len, int *STATUS ) {
 /*
 *  Name:
 *     GetSVar
@@ -764,7 +771,8 @@ void GetSVar( const char *val, char *string, int len, int *STATUS ) {
 
 *  Description:
 *     This function gets an F77 string from the specified C string,
-*     and stores it in the supplied F77 character variable.
+*     and stores it in the supplied F77 character variable. Returns the
+*     used length of the F77 string.
 
 *  Parameters:
 *     val = const char * (Given)
@@ -788,7 +796,7 @@ void GetSVar( const char *val, char *string, int len, int *STATUS ) {
    n = strlen( val );
    if( len < n ) n = len;
    memcpy( string, val, n );
-
+   return n;
 }
 
 void SetIVar( FILE *interp, const char *var, int val, int *STATUS ) {
@@ -1037,5 +1045,276 @@ char *split( char *buf ){
    }
 
    return ret;   
+}
+
+F77_SUBROUTINE(pol1_tclex)( CHARACTER(FILE), INTEGER(STATUS) 
+                            TRAIL(FILE) ){
+/*
+*  Name:
+*     POL1_TCLEX
+
+*  Purpose:
+*     Creates a Tcl interpreter and executes a script in a supplied file.
+
+*  Description:
+*     This C function executes a Tcl script in the supplied text file,
+*     creating a new Tcl interpreter if necessary to do so. The
+*     interpreter should be deleted when no longer needed using POL1_TCLDL.
+
+*  Parameters:
+*     FILE = CHARACTER * ( * ) (Given)
+*        The name of file containing a Tcl script to be executed in the 
+*        interpreter.
+*     STATUS = INTEGER (Given and Returned)
+*        The inherited global status.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     7-DEC-2000 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*/
+
+/* Arguments: */
+   GENPTR_CHARACTER(FILE)
+   GENPTR_INTEGER(STATUS)
+
+/* Local Variables: */
+   int code;
+   char *file;
+   char mess[255];
+
+/* Check the inherited status */
+   if( *STATUS != SAI__OK ) return;
+
+/* Get a null terminated copy of the file name. */
+   file = cstring( FILE, FILE_length, STATUS );
+   if ( file ) {
+
+/* If necessary create an interpreter. */
+      if( !interp ) interp = Tcl_CreateInterp();
+
+/* Execute the script. */
+      code = Tcl_EvalFile( interp, file );
+
+/* Check for error in the tcl script */
+      if( code != TCL_OK ){
+         *STATUS = SAI__ERROR;
+         if( *interp->result ) {
+            sprintf( mess, "Error executing Tcl script %.50s: %.150s\n", file,
+                     interp->result );
+         } else {
+            sprintf( mess, "Error executing Tcl script %.50s", file );
+         }
+         Error( mess, STATUS );
+      }
+
+/*  Free memory used to hold the null-terminated file name */
+      free( file );
+
+   }
+}
+
+F77_SUBROUTINE(pol1_tcldl)( INTEGER(STATUS) ){
+/*
+*  Name:
+*     POL1_TCLDL
+
+*  Purpose:
+*     Deletes a Tcl interpreter.
+
+*  Description:
+*     This C function deletes any Tcl interpreter created earlier by
+*     POL1_TCLEX, etc.
+
+*  Parameters:
+*     STATUS = INTEGER (Given and Returned)
+*        The inherited global status.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     7-DEC-2000 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*/
+
+/* Arguments: */
+   GENPTR_INTEGER(STATUS)
+
+/* Just delete any interpreted. Do not check the inherited status since 
+   this is a clean up function. */
+   if( interp ) {
+      Tcl_DeleteInterp( interp );
+      interp = NULL;
+   }
+}
+
+F77_SUBROUTINE(pol1_tclgt)( CHARACTER(VARNAM), INTEGER(ELEM),
+                            CHARACTER(VARVAL), INTEGER(NC),
+                            INTEGER(STATUS) TRAIL(VARNAM) TRAIL(VARVAL) ){
+/*
+*  Name:
+*     POL1_TCLGT
+
+*  Purpose:
+*     Obtains the value of a Tcl list element from a Tcl interpreter.
+
+*  Description:
+*     This C function obtains the value of a Tcl list element from a Tcl 
+*     interpreter created earlier (e.g. using POL1_TCLEX).
+
+*  Parameters:
+*     VARNAM = CHARACTER * ( * ) (Given)
+*        The name of the Tcl list.
+*     ELEM = INTEGER (Given
+*        The index of the elment required (zero-based). If -1, the
+         variable is obtained as a scalar.
+*     VARVAL = CHARACTER * ( * ) (Returned)
+*        The value of the list element.
+*     NC = INTEGER (Returned)
+*        The number of characters returned in the value string.
+*     STATUS = INTEGER (Given and Returned)
+*        The inherited global status.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     7-DEC-2000 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*/
+
+/* Arguments: */
+   GENPTR_CHARACTER(VARNAM)
+   GENPTR_INTEGER(ELEM)
+   GENPTR_CHARACTER(VARVAL)
+   GENPTR_INTEGER(NC)
+   GENPTR_INTEGER(STATUS)
+
+/* Local Variables: */
+   int code;
+   char *varnam;
+   char buf[128];
+   char mess[128];
+
+/* Check the inherited status */
+   *NC = 0;   
+   if( *STATUS != SAI__OK ) return;
+
+/* Do nothing if no interpreter is available. */
+   if( interp ) {
+
+/* Get a null terminated copy of the variable name. */
+      varnam = cstring( VARNAM, VARNAM_length, STATUS );
+      if ( varnam ) {
+
+/* For a string holding a Tcl command which returns the value of the 
+   required list element, or scalar. */
+         if( *ELEM > -1 ) {
+            sprintf( buf, "lindex $%s %d", varnam, *ELEM );
+         } else {
+            sprintf( buf, "set %s", varnam );
+         }
+
+/* Execute this Tcl command. */
+         code = Tcl_Eval( interp, buf );
+
+/* Check for error in the tcl script */
+         if( code != TCL_OK ){
+            *STATUS = SAI__ERROR;
+            if( *interp->result ) {
+               sprintf( mess, "Error executing Tcl command '%.50s': %.150s\n", buf,
+                        interp->result );
+            } else {
+               sprintf( mess, "Error executing Tcl command '%.50s'", buf );
+            }
+            Error( mess, STATUS );
+
+/* If succesful, return an F77 copy of the result string. */
+         } else if( *interp->result ) {
+            *NC = GetSVar( interp->result, VARVAL, VARVAL_length, STATUS );
+         }
+
+/*  Free memory used to hold the null-terminated variable name */
+         free( varnam);
+      }
+   }
+}
+
+char *cstring( const char *fstring, int len, int *STATUS ) {
+/*
+*  Name:
+*     cstring
+
+*  Purpose:
+*     Returns a pointer to dynaically allocated memory holding a null
+*     terminated copy of an F77 string.
+
+*  Description:
+*     This function returns a pointer to dynaically allocated memory 
+*     holding a null terminated copy of an F77 string. The pointer should
+*     be freed using free() when no longer needed.
+
+*  Parameters:
+*     fstring = const char * (Given)
+*        The f77 string.
+*     len = int (Given)
+*        The length of the f77 string to be stored.
+*     STATUS = int * (Given and Returned)
+*        The inherited status.
+*     
+*/
+
+   char mess[81];
+   char *ret;
+
+   ret = NULL;
+
+/* Check the inherited status. */
+   if( *STATUS != SAI__OK ) return;
+
+/* Find the length excluding any trailing spaces. */
+   len = len - 1;
+   while( len && fstring[len] == ' ' ) len--;
+   len++;
+
+/* Allocate memory to hold a null-terminated copy of the supplied F77
+   string. */
+   ret = (char *) malloc ( sizeof(char)*(size_t) ( len + 1 ) );
+
+/* If successful, copy the string, and append a trailing null character. */
+   if ( ret ) {
+      memcpy( ret, fstring, len );
+
+      ret[ len ] = 0;
+
+/* Report an error if the memory could not be allocated. */
+   } else {
+      *STATUS = SAI__ERROR;
+      sprintf( mess, "Unable to allocate %d bytes of memory. ", len + 1 );
+      Error( mess, STATUS );
+   }
+
+   return ret;
 }
 

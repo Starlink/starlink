@@ -617,14 +617,13 @@
       CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
 *  Write out the epoch.
-      TEXT = 'set epoch_ "'
+      TEXT = 'set epoch_ '
       IAT = 12
       IF( EPOCH .NE. ' ' ) THEN
-         CALL CHR_PUTC( EPOCH, TEXT, IAT )
+         CALL CHR_APPND( EPOCH, TEXT, IAT )
       ELSE
-         IAT = IAT + 1
+         CALL CHR_APPND( EPOCH, '" "', IAT )
       END IF
-      CALL CHR_PUTC( '"', TEXT, IAT )
       CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
 *  Determine the size of each batch.

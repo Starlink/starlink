@@ -459,7 +459,8 @@ pol1_ptvrc.f pol1_gtvrc.f pol1_ptang.f pol1_gtang.f pol1_stftr.f \
 polimage.f pol1_axset.f pol1_xeval.f pol1_imprt.f pol1_dftab.f \
 pol1_srtim.f pol1_stkim.f pol1_stknm.f pol1_stksm.f polstack.f \
 polversion.f pol1_3dwcs.f pol1_fbbox.f polwrtcl.f pol1_wrtcl.f \
-pol1_gcolr.f pol1_gcold.f pol1_fioer.f
+pol1_gcolr.f pol1_gcold.f pol1_fioer.f  polrdtcl.f pol1_rdtcl.f \
+pol1_ctprp.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = 
@@ -499,7 +500,7 @@ TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 
 TASKS = polhelp polka datapic polcent polcal polimp polimpx polext \
 polexpx polexp polvec polplot polbin polsim polimage polstack polprep \
-polversion polwrtcl
+polversion polwrtcl polrdtcl
 
 #  Monolith routine source name.
 
@@ -518,7 +519,7 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polka.ifl polext.ifl \
 polcal.ifl polimp.ifl polexp.ifl polvec.ifl polplot.ifl polimage.ifl \
 polbin.ifl polsim.ifl polimpx.ifl polexpx.ifl polstack.ifl polprep.ifl \
-polversion.ifl polwrtcl.ifl
+polversion.ifl polwrtcl.ifl polrdtcl.ifl
 
 #  List of help library sources.
 
@@ -1804,10 +1805,14 @@ pol1_cm3rr.o:	 SAE_PAR
 pol1_cpctd.o:	 SAE_PAR PRM_PAR
 pol1_cpctr.o:	 SAE_PAR PRM_PAR
 pol1_ctclm.o:	 SAE_PAR PRM_PAR
+pol1_ctprp.o:	 SAE_PAR CAT_PAR 
 pol1_dbeam.o:	 SAE_PAR DAT_PAR
 pol1_dulbm.o:	 SAE_PAR PRM_PAR NDF_PAR DAT_PAR PAR_ERR
 pol1_fbbox.o:	 SAE_PAR PRM_PAR
 pol1_fillr.o:	 SAE_PAR
+pol1_fioer.o:	 SAE_PAR 
+pol1_gcold.o:    SAE_PAR PRM_PAR CAT_PAR CAT1_PAR CAT3_FIT_CMN CAT1_CATS_CMN
+pol1_gcolr.o:    SAE_PAR PRM_PAR CAT_PAR CAT1_PAR CAT3_FIT_CMN CAT1_CATS_CMN
 pol1_gtcta.o:	 SAE_PAR AST_PAR CAT_PAR
 pol1_gtctc.o:	 SAE_PAR CAT_PAR CAT_ERR PAR_ERR
 pol1_gtctw.o:	 SAE_PAR AST_PAR CAT_PAR
@@ -1818,6 +1823,7 @@ pol1_knext.o:	 SAE_PAR
 pol1_lnam.o:	 SAE_PAR GRP_PAR FIO_PAR
 pol1_mkcat.o:	 SAE_PAR AST_PAR CAT_PAR
 pol1_plvec.o:	 SAE_PAR PRM_PAR
+pol1_rdtcl.o:	 SAE_PAR CAT_PAR PRM_PAR 
 pol1_rmbnd.o:	 SAE_PAR PRM_PAR
 pol1_setd.o:	 SAE_PAR
 pol1_setft.o:	 SAE_PAR DAT_PAR
@@ -1830,13 +1836,14 @@ pol1_sngsm.o:	 SAE_PAR PRM_PAR
 pol1_sngsv.o:	 SAE_PAR GRP_PAR
 pol1_squar.o:	 SAE_PAR PRM_PAR
 pol1_srtim.o:	 SAE_PAR DAT_PAR PRM_PAR
-pol1_stkim.o:    SAE_PAR DAT_PAR PRM_PAR GRP_PAR NDF_PAR
 pol1_stbin.o:	 SAE_PAR
 pol1_stk.o:	 SAE_PAR
 pol1_stk2.o:	 SAE_PAR PRM_PAR
+pol1_stkim.o:    SAE_PAR DAT_PAR PRM_PAR GRP_PAR NDF_PAR
 pol1_vecky.o:	 SAE_PAR AST_PAR
 pol1_vecpl.o:	 SAE_PAR PRM_PAR MSG_PAR
 pol1_vect.o:	 SAE_PAR
+pol1_wrtcl.o:	 SAE_PAR PRM_PAR 
 pol1_xeval.o:	 SAE_PAR DAT_PAR GRP_PAR TRN_ERR
 pol_cale.o:	 SAE_PAR PRM_PAR
 pol_calf.o:	 SAE_PAR PRM_PAR
@@ -1854,17 +1861,14 @@ polimpx.o:	 SAE_PAR DAT_PAR GRP_PAR
 polka.o:	 SAE_PAR GRP_PAR PAR_ERR PRM_PAR NDF_PAR
 polpack_mon.o:	 SAE_PAR PAR_PAR
 polplot.o:	 SAE_PAR PRM_PAR AST_PAR CAT_PAR PAR_ERR
+polrdtcl.o:	 SAE_PAR AST_PAR
 polstack.o:	 SAE_PAR GRP_PAR PAR_ERR 
 polvec.o:	 SAE_PAR PAR_ERR PRM_PAR NDF_PAR AST_PAR
+polversion.o:	 SAE_PAR PAR_ERR
+polwrtcl.o:	 SAE_PAR AST_PAR CAT_PAR PRM_PAR CAT_ERR
 pthlpo.o:	 SAE_PAR HLPCMD
 rdndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
 wrndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
-polversion.o:	 SAE_PAR PAR_ERR
-polwrtcl.o:	 SAE_PAR AST_PAR CAT_PAR PRM_PAR CAT_ERR
-pol1_fioer.o:	 SAE_PAR 
-pol1_wrtcl.o:	 SAE_PAR PRM_PAR 
-pol1_gcolr.o:    SAE_PAR PRM_PAR CAT_PAR CAT1_PAR CAT3_FIT_CMN CAT1_CATS_CMN
-pol1_gcold.o:    SAE_PAR PRM_PAR CAT_PAR CAT1_PAR CAT3_FIT_CMN CAT1_CATS_CMN
 
 
 #-------------------------------------------------------------------------------

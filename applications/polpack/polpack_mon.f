@@ -49,6 +49,8 @@
 *        blank format strings.
 *     23-NOV-2000 (DSB):
 *        Added POLWRTCL.
+*     7-DEC-2000 (DSB):
+*        Added POLRDTCL.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -91,7 +93,7 @@
 *  Define the current application name for history. The package version
 *  number gets substituted in here when the POLPACK release source tar file 
 *  is contructed.
-      CALL NDF_HAPPN( NAME // ' (POLPACK PKG_VERS)', STATUS )
+      CALL NDF_HAPPN( NAME // ' (POLPACK 2.1-5)', STATUS )
 
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task
@@ -137,6 +139,9 @@
 
       ELSE IF ( NAME .EQ. 'POLPREP' ) THEN
          CALL POLPREP( STATUS )
+
+      ELSE IF ( NAME .EQ. 'POLRDTCL' ) THEN
+         CALL POLRDTCL( STATUS )
 
       ELSE IF ( NAME .EQ. 'POLSIM' ) THEN
          CALL POLSIM( STATUS )
