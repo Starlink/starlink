@@ -23,7 +23,8 @@ PRIVATE_INCLUDES = SHL_HLPCMD
 
 # These are the standard KAPPA help routines renamed to
 # enter the SHL namespace
-F_ROUTINES = shl_gethlp.f shl_gthlpi.f shl_pthlpo.f shl_sread.f
+F_ROUTINES = shl_gethlp.f shl_gthlpi.f shl_pthlpo.f shl_sread.f \
+	shl_trnvar.f
 
 # This is a modification of a standard A-task help application
 # subroutine re-written to be callable with the help environment

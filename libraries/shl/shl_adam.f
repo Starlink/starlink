@@ -196,62 +196,21 @@
 *  Local Variables:
       CHARACTER*19
      :  HLPTXT*80,             ! Composite command
-     :  LIBRAY*132,            ! Library name and path
-     :  PATH*122,              ! Library path
-     :  TOPIC( MAXLEV ),       ! Name of the topic required
-     :  ENVVAR*80              ! Environment variable to read
+     :  LIBRAY*256,            ! Library name and path
+     :  TOPIC( MAXLEV )       ! Name of the topic required
 
       INTEGER
-     :  I,                     ! Loop counter
-     :  NC                     ! Number of characters in the help string
-                               ! less trailing blanks
-      INTEGER IPOSN            ! Position in string
+     :  NC,                    ! Length of a string
+     :  I                      ! Loop counter
 *.
 
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Read the environment variable if we have one
-      IF ( ISENV ) THEN
-
-*  Copy environment variable name into local storage
-*  since we may need to modify it
-         ENVVAR = LIBNAM
-
-*  See if the envvar name include _HELP., appending if necessary
-*  Start searching from the end of the string
-         IPOSN = CHR_LEN( ENVVAR )
-         CALL CHR_FIND( ENVVAR, '_HELP', .FALSE., IPOSN )
-         IF (IPOSN .EQ. 0 ) THEN
-*  Not found
-            IPOSN = CHR_LEN( ENVVAR )
-            CALL CHR_APPND( '_HELP', ENVVAR, IPOSN )
-         END IF
-
-*  Translate the environment variable/logical name.
-         CALL PSX_GETENV( ENVVAR, PATH, STATUS )
-      ELSE
-
-*     Assume it is a help file directly
-         PATH = LIBNAM
-
-      END IF
+*  Translate the environment variable to a help file name
+      CALL SHL_TRNVAR( LIBNAM, ISENV, LIBRAY, STATUS )
 
       IF ( STATUS .EQ. SAI__OK ) THEN
-
-*  Form the full library name. Appending .shl if not present already
-         NC = CHR_LEN( PATH )
-         LIBRAY = PATH( :NC )
-
-*  Do we have .shl extension? Append one if not.
-*  Start searching from the end of the string backwards
-         IPOSN = NC
-         CALL CHR_FIND( PATH, '.shl', .FALSE., IPOSN)
-         IF (IPOSN .EQ. 0) THEN
-*     Not found
-            CALL CHR_APPND( '.shl', LIBRAY, NC )
-         END IF
-
 
 *  Get topic and subtopics.
          CALL PAR_GET0C( 'TOPIC', TOPIC(1), STATUS )

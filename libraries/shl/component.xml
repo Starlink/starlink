@@ -2,10 +2,10 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="hlps">
+<component id="shl">
   <version>1.0-1</version>
   <path>libraries/shl</path>
-  <description>SHL -- High level support library for HLP</description>
+  <description>SHL -- Support for HLP Library access</description>
   <abstract><p>The Starlink HLP system allows an application program
       to retrieve named items from a hierarchically-arranged library
       of text.  The facility resembles VAX/VMS HELP.  It consists of a
