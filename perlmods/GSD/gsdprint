@@ -1,0 +1,142 @@
+#!/usr/local/bin/perl -s
+# Simulates gsd_print.c - Much smaller!!!
+#
+# Tim Jenness (JACH)  - April 1996
+
+
+# Load in the GSD module
+use GSD;
+use Term::ReadLine;
+
+$version = "1.0";
+
+# Version
+($v) && do {
+    print "JCMT GSD file lister ($0) version $version\n";
+    print "Contact Tim Jenness for more information\n";
+    exit;
+};
+
+
+# Help listing
+($h) && do {
+    print "Usage: $0 [-h] [-v] [-nodata]\n";
+    print "Options\n\t -h \t help\n";
+    print "\t -v \t version \n";
+    print "\t -nodata\t Only list header\n";
+    exit;
+
+};
+
+$term = new Term::ReadLine 'gsdprint' unless ($noread);
+
+# Need a file name
+
+$filename = $ARGV[0];
+
+if ($filename !~ /./) {
+    $prompt = "Which GSD file to list : ";
+    ($noread) && do {print $prompt; chomp($filename = <>)} ||
+    ($filename = $term->readline($prompt));
+}
+
+
+# Strip the trailing dat
+#$filename = (split(/\./,$filename))[0];
+
+# Open the file 
+
+die "$!: $filename does not exist\n" unless ((-e "$filename") ||
+					     (-e "$filename.dat") ||
+					     (-e "$filename.gsd") || 
+					     (-e $ENV{'DATADIR'}."/$filename") ||
+					     (-e $ENV{'DATADIR'}."/$filename.dat") ||
+					     (-e $ENV{'DATADIR'}."/$filename.gsd"));
+
+
+
+$status = gsdOpenRead($filename,$version,$label,$no_items,$fptr,$file_dsc,
+		      $item_dsc,$data_ptr);
+
+
+die "Problem opening file. $filename may not be a GSD file\n" if ($status);
+
+# Strip trailing spaces from the label
+$label =~ s/\s+$//g;
+
+
+print "-"x78,"\n";
+print " G S D    P R I N T\n";
+print "-"x78,"\n";
+print "\n";
+print " Filename        : $filename\n";
+printf " GSD version     : %5.3f\n",$version;
+print " Label           : $label\n";
+print " Number of items : $no_items\n";
+print "\n\n\n";
+print "Name\t\tUnit\t\tType\tArr?\tValue\n";
+print "-"x78,"\n";
+
+for ($i=1; $i<=$no_items; $i++) {
+
+    $status = gsdItem($file_dsc,$item_dsc,$i,$name,$unit,$type,$array);
+
+    print "-"x78,"\n" if ($array);    
+    print "$name\t$unit\t$type\t$array\t";
+
+    $call = "gsdGet$array\l$type";
+
+    if ($array) {
+
+
+	@dimnm = ();
+	@dimunt = (); 
+	@dimvals = ();
+	$actdims = 0;
+	$status = gsdInqSize($file_dsc,$item_dsc,$data_ptr,$i,\@dimnm,\@dimunt,
+			     \@dimvals,$actdims,$size);
+	print "Size = $size\n";
+	
+	$status = &{$call}($file_dsc,$item_dsc,$data_ptr,$i,1,$size,1,$size,
+			   \@values,$actvals);
+	# Remove white space
+	grep(s/\s+//g,@dimunt);
+	grep(s/\s+//g,@dimvals);
+	grep(s/\s+//g,@dimnm);
+	
+	# Write the array definition
+	for ($j=0; $j < $actdims; $j++) {
+	    print "  > $dimnm[$j]:\t$dimvals[$j]\t $dimunt[$j]\n";
+	}
+
+	# Write the data
+	unless ($nodata && ($i == $no_items) ) {
+	    print "  Data:\n";
+	    for ($j=0; $j <$actvals; $j++) {
+	      if ($type =~ /C/i) {
+		printf "%20s ",$values[$j];
+	      } else {
+		printf "%15g",$values[$j];
+	      }
+	      print "\n" unless ((1+$j)%4);
+	    }
+	    print "\n" if ($actvals%4);
+	}
+
+
+    } else {
+
+	$status = &{$call}($file_dsc,$item_dsc,$data_ptr,$i,$newdata);
+	$newdata =~ s/\s+$//g if $type eq "C";
+	print "$newdata\n";
+    }
+
+}
+
+print "-"x78,"\n";
+$status = gsdClose($fptr,$file_dsc,$item_dsc,$data_ptr);
+
+
+
+
+
