@@ -1,0 +1,9 @@
+AC_INIT(ccdhelp, 4.0-16, ccdpack@starlink.ac.uk)
+AC_PREREQ(2.50)
+AM_INIT_AUTOMAKE(1.8.2-starlink)
+AC_CONFIG_SRCDIR(ccdhelp.f)
+STAR_DEFAULTS
+AC_PROG_FC
+AC_PROG_RANLIB
+AC_CONFIG_FILES(Makefile component.xml)
+AC_OUTPUT

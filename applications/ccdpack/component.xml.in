@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/ccdpack</path>
+  <description>CCD data reduction package</description>
+  <abstract>
+    <p>CCDPACK is a package of programs for reducing CCD-like data. They
+    allow you to debias, remove dark current, flatfield, register,
+    resample and normalize data from single- or multiple-CCD instruments.
+    </p>
+
+    <p>CCDPACK is designed to help you to reduce your data easily.
+    The basic reduction stages can be set up using an X based GUI that
+    controls an automated reduction system.
+    The GUI is designed to allow you to start working without any
+    detailed knowledge of the package (or indeed of CCD reduction).
+    Registration is performed using graphical, script based or automated
+    techniques that help reduce the amount of work to a minimum.
+    </p>
+
+    <p>This document is intended for all users of CCDPACK.
+    It provides instruction in how to use CCDPACK, describes CCD reduction
+    in general and contains complete descriptions of the individual
+    programs.
+    </p>
+  </abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+    </person>
+  </developers>
+  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
