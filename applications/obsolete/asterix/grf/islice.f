@@ -19,8 +19,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
@@ -262,7 +260,6 @@ c     :                        ABS(I_YSCALE*COS(ANGLE)))
         IMPLICIT NONE
 *    Global constants :
         INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
         INCLUDE 'QUAL_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
