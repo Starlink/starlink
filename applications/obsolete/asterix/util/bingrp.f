@@ -32,6 +32,8 @@
 *       POLAR   - Construct grouping array in X,Y plane using radial
 *                 and azimuthal bin specifications
 *       ARD     - Construct grouping array in X,Y plane using ARD file
+*       DUMP    - Write out a dataset whose single axis is group number
+*                 and whose data is the grouped data
 *
 *     If none of these options is selected then the user is prompted
 *     for axes on which groups are to be defined, after which ranges
@@ -61,6 +63,16 @@
 *        Size of azimuthal bins
 *     AZSTART = REAL (read)
 *        Start azimuth for azimuthal bins
+*     POLAR = LOGICAL (read)
+*        Work in POLAR mode?
+*     ARD = LOGICAL (read)
+*        Work in ARD mode?
+*     DUMP = LOGICAL (read)
+*        Work in DUMP mode?
+*     OUT = CHAR (read)
+*        Name of output grouped dataset
+*     CANCEL = LOGICAL (read)
+*        Work in CANCEL mode?
 
 *  Examples:
 *     {routine_example_text}
@@ -112,6 +124,8 @@
 *        Original Version
 *      2 Apr 1996 V2.0-2 (DJA):
 *        Added irregular bins
+*     15 Apr 1996 V2.0-3 (DJA):
+*        Support DUMP mode
 *     {enter_changes_here}
 
 *  Bugs:
@@ -132,7 +146,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'BINGRP Version V2.0-1' )
+        PARAMETER		( VERSION = 'BINGRP Version V2.0-3' )
       INTEGER			MXRNG
         PARAMETER		( MXRNG = 100 )
 
@@ -151,6 +165,7 @@
       REAL          		PRBIN			! Radial bin size in pixels
       REAL 	   		RBIN			! Radial bin size in axis units
       REAL			RBNDS(2*MXRNG)		! Radial boundaries
+      REAL			SPARR(2)		! Spaced axis data
       REAL          		XCENT,YCENT		! Coords of centre of polar region in
 							! axis units
       REAL          		XLOW,XHIGH,         	! Max and min values of axes
@@ -161,7 +176,9 @@
       INTEGER			AXPTR(ADI__MXDIM)	! Mapped axis data
       INTEGER       		DIMS(ADI__MXDIM)    	! Input dimensions
       INTEGER			GPTR			! Grouping array
+      INTEGER			GDPTR, GVPTR, GQPTR	! Grouped data
       INTEGER			I			! Loop over radial bounds
+      INTEGER			IDPTR, IVPTR, IQPTR	! Input data
       INTEGER			IGRP			! Group number
       INTEGER       		IGPTR               	! Input data
       INTEGER			IFID			! Input dataset id
@@ -172,7 +189,9 @@
       INTEGER			MSKPTR			! ARD mask array
       INTEGER       		NABIN,NRBIN		! # of azimuthal & radial bins
       INTEGER                   NGELM                   ! # pixels in grped axes
+      INTEGER			NGRP			! # groups
       INTEGER                   NOPAX                   ! # grouped axes
+      INTEGER			OFID			! Input dataset id
 
       LOGICAL			ARD			! ARD file mode?
       LOGICAL			AXMODE			! Axis mode?
@@ -208,11 +227,14 @@
       IF ( .NOT. (CANCEL.OR.POLAR) ) THEN
         CALL USI_GET0L( 'ARD', ARD, STATUS )
       END IF
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( .NOT. (CANCEL.OR.POLAR.OR.ARD) ) THEN
+        CALL USI_GET0L( 'DUMP', DUMP, STATUS )
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+      IF ( .NOT. (CANCEL.OR.POLAR.OR.ARD.OR.DUMP) ) THEN
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Only POLAR and ARD modes are supported '/
-     :                                     /'at the moment', STATUS )
+        CALL ERR_REP( ' ', 'Only POLAR, ARD, CANCEL and DUMP modes '/
+     :                       /'are supported at the moment', STATUS )
         AXMODE = .TRUE.
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -228,6 +250,12 @@
           CALL BDI_DELETE( IFID, 'Grouping', STATUS )
         END IF
         GOTO 99
+
+*  Grouping needs to be present in DUMP mode
+      ELSE IF ( DUMP .AND. .NOT. OK ) THEN
+        CALL MSG_PRNT( 'No grouping array present in input!' )
+        GOTO 99
+
       END IF
 
 *  Get input dimensionality
@@ -235,8 +263,62 @@
       CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, INDIM, STATUS )
       CALL ARR_SUMDIM( INDIM, DIMS, INELM )
 
+*  Dump mode?
+      IF ( DUMP ) THEN
+
+*    Map the input data
+        CALL BDI_MAPR( IFID, 'Data', 'READ', IDPTR, STATUS )
+        CALL BDI_CHK( IFID, 'Variance', VOK, STATUS )
+        IF ( VOK ) THEN
+          CALL BDI_MAPR( IFID, 'Variance', 'READ', IVPTR, STATUS )
+        END IF
+        CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
+        IF ( QOK ) THEN
+          CALL BDI_MAPUB( IFID, 'Quality', 'READ', IQPTR, STATUS )
+        END IF
+
+*    Group the data
+        CALL UTIL_GRPR( IFID, ' ', IDPTR, VOK, IVPTR, QOK, IQPTR,
+     :                  OK, NGRP, GDPTR, GVPTR, GQPTR, STATUS )
+
+*    No valid groups?
+        IF ( NGRP .LE. 0 ) THEN
+          STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'No valid data groups in input', STATUS )
+          GOTO 99
+        END IF
+
+*    Write out grouped dataset
+        CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
+        IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*    Define size of dataset
+        CALL BDI_LINK( 'BinDS', 1, NGRP, 'REAL', OFID, STATUS )
+
+*    Write elements
+        CALL BDI_PUT1R( OFID, 'Data', NGRP, %VAL(GDPTR), STATUS )
+        IF ( VOK ) THEN
+          CALL BDI_PUT1R( OFID, 'Variance', NGRP, %VAL(GVPTR), STATUS )
+        END IF
+        IF ( QOK ) THEN
+          CALL BDI_PUT1L( OFID, 'LogicalQuality', NGRP, %VAL(GQPTR),
+     :                    STATUS )
+        END IF
+        SPARR(1) = 1.0
+        SPARR(2) = 1.0
+        CALL BDI_AXPUT1R( OFID, 1, 'Data', 2, SPARR, STATUS )
+        CALL BDI_COPY( IFID, 'Label,Units,Title', OFID, ' ', STATUS )
+        CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Group number', STATUS )
+
+*    Copy ancillaries
+        CALL UDI_COPANC( IFID, 'grf,grp', OFID, STATUS )
+
+*    Write history
+        CALL HSI_COPY( IFID, OFID, STATUS )
+        CALL HSI_ADD( OFID, VERSION, STATUS )
+
 *  POLAR or ARD modes?
-      IF ( POLAR .OR. ARD ) THEN
+      ELSE IF ( POLAR .OR. ARD ) THEN
 
 *    Check dimensionality.
         IF ( INDIM .LT. 2 ) THEN
@@ -455,27 +537,32 @@
 
       END IF
 
-*  How many elements in grouped axes
-      CALL ARR_SUMDIM( NOPAX, DIMS, NGELM )
+*  Modifying grouping?
+      IF ( .NOT. DUMP ) THEN
 
-*  Range of group numbers in sub-array
-      CALL ARR_RANG1I( NGELM, %VAL(GPTR), IGMIN, IGMAX, STATUS )
+*    How many elements in grouped axes
+        CALL ARR_SUMDIM( NOPAX, DIMS, NGELM )
 
-*  Duplicate the selected sub-array through the grouping array
-      IGPTR = GPTR
-      DO K = 1, INELM/NGELM - 1
+*    Range of group numbers in sub-array
+        CALL ARR_RANG1I( NGELM, %VAL(GPTR), IGMIN, IGMAX, STATUS )
 
-*    Advance to next input slice
-        IGPTR = IGPTR + NGELM*VAL__NBI
+*    Duplicate the selected sub-array through the grouping array
+        IGPTR = GPTR
+        DO K = 1, INELM/NGELM - 1
 
-*    Add offset to distinguish slices
-        CALL ARR_ADD1I( NGELM, %VAL(GPTR), K*(IGMAX-IGMIN+1),
-     :                  %VAL(IGPTR), STATUS )
+*      Advance to next input slice
+          IGPTR = IGPTR + NGELM*VAL__NBI
 
-      END DO
+*      Add offset to distinguish slices
+          CALL ARR_ADD1I( NGELM, %VAL(GPTR), K*(IGMAX-IGMIN+1),
+     :                    %VAL(IGPTR), STATUS )
 
-*  Unmap the grouping array
-      CALL BDI_UNMAP( IFID, 'Grouping', GPTR, STATUS )
+        END DO
+
+*    Unmap the grouping array
+        CALL BDI_UNMAP( IFID, 'Grouping', GPTR, STATUS )
+
+      END IF
 
 *  Tidy up
  99   CALL AST_CLOSE()
