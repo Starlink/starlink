@@ -15,6 +15,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
@@ -28,6 +29,7 @@
       INTEGER ID
       LOGICAL EXCLUDE
       LOGICAL MERGE
+      REAL XMIN,XMAX,YMIN,YMAX
 *    Version :
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IREGION Version 1.8-3')
@@ -118,11 +120,28 @@
 
         ENDIF
 
+*  combine with previously defined regions
         IF (MERGE) THEN
           CALL IREGION_MERGE(SUBMODE,%val(I_REG_PTR),%val(RPTR),STATUS)
           CALL DYN_UNMAP(I_REG_PTR,STATUS)
           I_REG_PTR=RPTR
         ENDIF
+
+*  get outer limits of box enclosing region
+        CALL IMG_REGLIM(%val(I_REG_PTR),STATUS)
+        CALL IMG_PIXTOWORLD(REAL(I_IX1)-0.5,REAL(I_IY1)-0.5,XMIN,YMIN,
+     :                                                        STATUS)
+        CALL IMG_PIXTOWORLD(REAL(I_IX2)+0.5,REAL(I_IY2)+0.5,XMAX,YMAX,
+     :                                                        STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'REGXMIN',ID,STATUS)
+        CALL NBS_PUT_VALUE(ID,0,VAL__NBR,XMIN,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'REGXMAX',ID,STATUS)
+        CALL NBS_PUT_VALUE(ID,0,VAL__NBR,XMAX,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'REGYMIN',ID,STATUS)
+        CALL NBS_PUT_VALUE(ID,0,VAL__NBR,YMIN,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'REGYMAX',ID,STATUS)
+        CALL NBS_PUT_VALUE(ID,0,VAL__NBR,YMAX,STATUS)
+
 
 *  if running from GUI - save region type to noticeboard
         IF (I_GUI) THEN

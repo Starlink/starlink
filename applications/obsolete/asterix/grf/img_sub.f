@@ -2913,6 +2913,55 @@ c        INTEGER STATUS
 
 
 
+*+ IMG_REGLIM
+	SUBROUTINE IMG_REGLIM(REG,STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*  Import :
+      BYTE REG(I_NX,I_NY)
+*  Export :
+*  Status :
+        INTEGER STATUS
+*  Local constants :
+*  Local variables :
+        INTEGER I,J
+        INTEGER I1,I2,J1,J2
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+      I1=I_NX
+      I2=1
+      J1=I_NY
+      J2=1
+      DO J=1,I_NY
+        DO I=1,I_NX
+          IF (REG(I,J).EQ.'01'X) THEN
+            I1=MIN(I1,I)
+            I2=MAX(I2,I)
+            J1=MIN(J1,J)
+            J2=MAX(J2,J)
+          ENDIF
+        ENDDO
+      ENDDO
+
+      I_IX1=I1
+      I_IX2=I2
+      I_IY1=J1
+      I_IY2=J2
+
+      ENDIF
+
+      END
+
+
+
+
+
 *+ IMG_SETCIRC
 	SUBROUTINE IMG_SETCIRC(X,Y,R,EXCLUDE,STATUS)
 
@@ -2931,7 +2980,6 @@ c        INTEGER STATUS
 *  Local constants :
 *  Local variables :
         INTEGER I1,I2,J1,J2
-c        REAL XX,XP,YP
         BYTE FLAG
 *-
       IF (STATUS.EQ.SAI__OK) THEN
