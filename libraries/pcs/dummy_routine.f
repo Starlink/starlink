@@ -1,3 +1,3 @@
 C A dummy Fortran routine.  See comments in Makefile.am
-      SUBROUTINE DUMMY
+      SUBROUTINE PCS_DUMMY
       END
