@@ -556,6 +556,7 @@ given in <ref id=table.entities>.
 <row><entry><code>&amp;deg;</code><entry>&deg<entry>degrees symbol
 <row><entry><code>&amp;tilde;</code><entry>&tilde<entry>tilde
 <row><entry><code>&amp;underscore;</code><entry>&underscore<entry>underscore
+<row><entry><code>&amp;dot;</code><entry>&dot<entry>non-sentence-ending period
 <row><entry><code>&amp;latex;</code><entry>&latex<entry>&latex logo
 <row><entry><code>&amp;tex;</code><entry>&tex<entry>&tex logo
 </row>
@@ -939,7 +940,9 @@ document by including as much element and attribute detail as you can.
 <ref id='el.sun.keyword' text='keyword'>,
 <ref id='el.sun.otherauthors' text='otherauthors'>,
 <ref id='el.sun.sun' text='sun'>,
-<ref id='el.sun.title' text='title'>
+<ref id='el.sun.title' text='title'>,
+<ref id='el.sun.mapidlist' text='mapidlist'>,
+<ref id='el.sun.mapid' text='mapid'>
 
 <row>
 <entry>
@@ -1019,6 +1022,7 @@ document by including as much element and attribute detail as you can.
 <entry>
 <ref id=str.text>
 <entry>
+<ref id='el.sun.angle' text='angle'>,
 <ref id='el.sun.attribution' text='attribution'>,
 <ref id='el.sun.blockquote' text='blockquote'>,
 <ref id='el.sun.cite' text='cite'>,
@@ -1073,6 +1077,8 @@ appropriate for the document type), which contains
 <ref id='el.sun.manualtype' text='manualtype'>,
 <ref id='el.sun.otherauthors' text='otherauthors'>,
 <ref id='el.sun.softwareversion' text='softwareversion'>,
+<ref id='el.sun.mapidlist' text='mapidlist'>,
+<ref id='el.sun.mapid' text='mapid'>,
 <ref id='el.sun.title' text='title'>; and the latter contains the body
 text, the backmatter, and the
 <ref id='el.sun.appendices' text='appendices'>.
@@ -1599,6 +1605,7 @@ currently unsupported features, see the Oasis documentation referred
 to above.
 
 <subsect id=str.text export>Text markup
+<update versionid="v0.6">Added paragraph describing ANGLE element</update>
 
 <p>Paragraphing
 (<ref id='el.sun.p' text='p'> and
@@ -1671,6 +1678,11 @@ element, which notes the source of the quotation.
 <ref id='el.sun.li' text='li'>): These are the ordered, unordered and
 description lists familiar from HTML.  Unlike HTML, however, the dt
 and dd elements within the description list must be paired.
+
+<p>Angles (<ref id='el.sun.angle' text='angle'>): as appropriate for a
+DTD designed to document astronomical software, there is a special
+element for referring to astronomical angles.  This is an empty
+element, with the components of the angle specified as attributes.
 
 <subsect id=str.maths export>Maths
 <update versionid="v0-4">Slight edit to discuss new mline and mlabel
@@ -1875,17 +1887,28 @@ for brief notes on this.
 &lt;!ELEMENT <ref id=el.programcode.programcode text='programcode'>   O O (docblock, (codegroup | codereference)+)>
 &lt;!ELEMENT <ref id=el.programcode.codegroup text='codegroup'>     - O (docblock, routine+)>
 &lt;!ELEMENT <ref id=el.programcode.codereference text='codereference'> - O (docblock)>
-&lt;!ELEMENT <ref id=el.programcode.docblock text='docblock'>      O O (title, description?, authorlist?,
-                             copyright?, history?)>
+&lt;!ELEMENT <ref id=el.programcode.docblock text='docblock'>      O O (title, description?,
+                             userkeywords?, softwarekeywords?,
+                             authorlist?, copyright?, history?)>
 
 &lt;!ELEMENT <ref id=el.programcode.routine text='routine'>       O O (codeopener?, routineprologue, codebody)>
 &lt;!ELEMENT <ref id=el.programcode.codeopener text='codeopener'>    O O (#PCDATA)>
 &lt;!ELEMENT <ref id=el.programcode.codebody text='codebody'>      O O (#PCDATA)>
-&lt;!ELEMENT <ref id=el.programcode.routineprologue text='routineprologue'> O O (routinename? & purpose? & description & 
-                                returnvalue? & argumentlist? &
-                                parameterlist? & authorlist? & history? &
-                                usage? & invocation? & examplelist? &
-                                notelist? & implementationstatus? & bugs?)>
+&lt;!ELEMENT <ref id=el.programcode.routineprologue text='routineprologue'> O O (
+                                (routinename,   diytopic*)? &
+                                (purpose,       diytopic*)? &
+                                (description,   diytopic*)  & 
+                                (returnvalue,   diytopic*)? &
+                                (argumentlist,  diytopic*)? &
+                                (parameterlist, diytopic*)? &
+                                (authorlist,    diytopic*)? &
+                                (history,       diytopic*)? &
+                                (usage,         diytopic*)? & 
+                                (invocation,    diytopic*)? & 
+                                (examplelist,   diytopic*)? &
+                                (implementationstatus,  diytopic*)? & 
+                                (bugs,          diytopic*)?
+                                )>
 
 &lt;!ELEMENT <ref id=el.programcode.routinename text='routinename'>   O O (name, othernames?)>
 &lt;!ELEMENT <ref id=el.programcode.name text='name'>          O O (#PCDATA)>
@@ -1894,6 +1917,8 @@ for brief notes on this.
 &lt;!ELEMENT <ref id=el.programcode.purpose text='purpose'>       - O (%p.model)>
 &lt;!ELEMENT <ref id=el.programcode.title text='title'>         O O (#PCDATA)>
 &lt;!ELEMENT <ref id=el.programcode.description text='description'>   - O (%paralist;)>
+&lt;!ELEMENT (<ref id=el.programcode.userkeywords text='userkeywords'> | <ref id=el.programcode.softwarekeywords text='softwarekeywords'>)
+                                - O (#PCDATA)>
 &lt;!ELEMENT <ref id=el.programcode.returnvalue text='returnvalue'>   - O (%paralist;)>
 &lt;!ELEMENT (<ref id=el.programcode.argumentlist text='argumentlist'> | <ref id=el.programcode.parameterlist text='parameterlist'>)
                         O O (parameter*)>
@@ -1903,8 +1928,7 @@ for brief notes on this.
 &lt;!ELEMENT <ref id=el.programcode.example text='example'>       - O (#PCDATA)>
 &lt;!ELEMENT (<ref id=el.programcode.usage text='usage'> | <ref id=el.programcode.invocation text='invocation'> | <ref id=el.programcode.implementationstatus text='implementationstatus'> | bugs)
                         - O (%paralist;)>
-&lt;!ELEMENT <ref id=el.programcode.notelist text='notelist'>      O O (othernote+)>
-&lt;!ELEMENT <ref id=el.programcode.othernote text='othernote'>     - O (title, %paralist;)>
+&lt;!ELEMENT <ref id=el.programcode.diytopic text='diytopic'>     - O (title, %paralist;)>
 &lt;!ELEMENT <ref id=el.programcode.copyright text='copyright'>     - O (%paralist;)>
 
 &lt;!ELEMENT <ref id=el.programcode.authorlist text='authorlist'>    O O ((author+ | authorref+), otherauthors?)>
@@ -1980,8 +2004,9 @@ listing in <ref id=appx.programcode.dtd>.
 &lt;!ELEMENT <ref id=el.programcode.programcode text='programcode'>   O O (docblock, (codegroup | codereference)+)>
 &lt;!ELEMENT <ref id=el.programcode.codegroup text='codegroup'>     - O (docblock, routine+)>
 &lt;!ELEMENT <ref id=el.programcode.codereference text='codereference'> - O (docblock)>
-&lt;!ELEMENT <ref id=el.programcode.docblock text='docblock'>      O O (title, description?, authorlist?,
-                             copyright?, history?)>
+&lt;!ELEMENT <ref id=el.programcode.docblock text='docblock'>      O O (title, description?,
+                             userkeywords?, softwarekeywords?,
+                             authorlist?, copyright?, history?)>
 </verbatim>
 The <code/programcode/ top-level element, like the
 <code/codegroup/ and <code/codereference/ elements which it contains,
@@ -2006,11 +2031,21 @@ dependence of a source file on an `include' file.
 &lt;!ELEMENT <ref id=el.programcode.routine text='routine'>       O O (codeopener?, routineprologue, codebody)>
 &lt;!ELEMENT <ref id=el.programcode.codeopener text='codeopener'>    O O (#PCDATA)>
 &lt;!ELEMENT <ref id=el.programcode.codebody text='codebody'>      O O (#PCDATA)>
-&lt;!ELEMENT <ref id=el.programcode.routineprologue text='routineprologue'> O O (routinename? & purpose? & description & 
-                                returnvalue? & argumentlist? &
-                                parameterlist? & authorlist? & history? &
-                                usage? & invocation? & examplelist? &
-                                notelist? & implementationstatus? & bugs?)>
+&lt;!ELEMENT <ref id=el.programcode.routineprologue text='routineprologue'> O O (
+                                (routinename,   diytopic*)? &
+                                (purpose,       diytopic*)? &
+                                (description,   diytopic*)  & 
+                                (returnvalue,   diytopic*)? &
+                                (argumentlist,  diytopic*)? &
+                                (parameterlist, diytopic*)? &
+                                (authorlist,    diytopic*)? &
+                                (history,       diytopic*)? &
+                                (usage,         diytopic*)? & 
+                                (invocation,    diytopic*)? & 
+                                (examplelist,   diytopic*)? &
+                                (implementationstatus,  diytopic*)? & 
+                                (bugs,          diytopic*)?
+                                )>
 </verbatim>
 A <code/routine/ element documents a function, with arguments, a return
 value, and the like.
@@ -2070,6 +2105,15 @@ stage), then you should include the attribute `empty' in the
 start-tag; this has no effect at present, but could become significant
 if the documents are repurposed in future versions of this set.
 
+<p>The <code/routineprologue/ element contains all the `meta-information'
+for the routine, such as authorship, argument list, return value and
+the like.  The declaration here looks particularly complicated, but
+that is largely due to an unwieldiness in SGML's DTD syntax.  This
+declaration simply states that each of the <code/routinename/,
+<code/purpose/, etc., elements may appear at most once, but that each
+of these elements may be freely interspersed with <code/diytopic/
+elements.
+
 <p>
 <verbatim>
 &lt;!ELEMENT <ref id=el.programcode.routinename text='routinename'>   O O (name, othernames?)>
@@ -2087,6 +2131,8 @@ name, say <code/allocarray/, plus some specific names, say
 &lt;!ELEMENT <ref id=el.programcode.purpose text='purpose'>       - O (%p.model)>
 &lt;!ELEMENT <ref id=el.programcode.title text='title'>         O O (#PCDATA)>
 &lt;!ELEMENT <ref id=el.programcode.description text='description'>   - O (%paralist;)>
+&lt;!ELEMENT (<ref id=el.programcode.userkeywords text='userkeywords'> | <ref id=el.programcode.softwarekeywords text='softwarekeywords'>)
+                                - O (#PCDATA)>
 &lt;!ELEMENT <ref id=el.programcode.returnvalue text='returnvalue'>   - O (%paralist;)>
 &lt;!ELEMENT (<ref id=el.programcode.argumentlist text='argumentlist'> | <ref id=el.programcode.parameterlist text='parameterlist'>)
                         O O (parameter*)>
@@ -2096,8 +2142,7 @@ name, say <code/allocarray/, plus some specific names, say
 &lt;!ELEMENT <ref id=el.programcode.example text='example'>       - O (#PCDATA)>
 &lt;!ELEMENT (<ref id=el.programcode.usage text='usage'> | <ref id=el.programcode.invocation text='invocation'> | <ref id=el.programcode.implementationstatus text='implementationstatus'> | bugs)
                         - O (%paralist;)>
-&lt;!ELEMENT <ref id=el.programcode.notelist text='notelist'>      O O (othernote+)>
-&lt;!ELEMENT <ref id=el.programcode.othernote text='othernote'>     - O (title, %paralist;)>
+&lt;!ELEMENT <ref id=el.programcode.diytopic text='diytopic'>     - O (title, %paralist;)>
 &lt;!ELEMENT <ref id=el.programcode.copyright text='copyright'>     - O (%paralist;)>
 
 </verbatim>
@@ -2112,8 +2157,15 @@ elements, <code/authorlist/ is used in both <code/codeprologue/ and
 <code/docblock/ elements, and <code/name/ is used in the <code/author/,
 <code/othernames/, <code/parameter/ and <code/routinename/ elements.
 
-<p>The <code/notelist/ element is for other notes which aren't
-otherwise covered by the element types listed here.
+<p>The <code/diytopic/ element is for other notes which aren't
+otherwise covered by the element types listed here.  It has a very
+simple structure: a title followed by paragraphs of text.
+
+<p>The distinction between the <code/userkeywords/ and
+<code/softwarekeywords/ elements is that the former is intended to
+supply keywords to help the final user of the software, whereas the
+latter is intended to be a home for keywords concerned with the
+categorisation of the software within the Starlink project.
 
 <p>
 <verbatim>
