@@ -112,6 +112,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+
       INTEGER			FSTAT			! FITSIO status
       INTEGER			LUN			! Logical unit
       INTEGER			NKEY			! Number of keywords
@@ -125,12 +126,6 @@
 
 *  Locate the HDU buffer
       CALL ADI2_LOCHDU( FID, HDU, HID, STATUS )
-
-*  Ensure all previous HDU's data area's are now defined
-      CALL ADI_CGET0I( HID, '.IHDU', CHDU, STATUS )
-      IF ( CHDU .GT. 1 ) THEN
-        CALL ADI2_CHKPRV( FID, CHDU-1, STATUS )
-      END IF
 
 *  Get logical unit
       CALL ADI2_GETLUN( FID, LUN, STATUS )

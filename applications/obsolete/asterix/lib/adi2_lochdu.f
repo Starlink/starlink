@@ -117,19 +117,10 @@
 *  Locate the approriate place depending on the HDU value. Blank means
 *  primary HDU
       IF ( HDU(1:1) .EQ. ' ' ) THEN
-        CALL ADI_THERE( FID, 'PRIMARY', THERE, STATUS )
-        IF ( .NOT. THERE ) THEN
-          CALL ADI_CNEW0( FID, 'PRIMARY', 'STRUC', STATUS )
-          CREATED = .TRUE.
-        END IF
         CALL ADI_FIND( FID, 'PRIMARY', ID, STATUS )
 
 *  Otherwise named HDU in the EXTENSIONS structure
       ELSE
-        CALL ADI_THERE( FID, 'EXTENSIONS', THERE, STATUS )
-        IF ( .NOT. THERE ) THEN
-          CALL ADI_CNEW0( FID, 'EXTENSIONS', 'STRUC', STATUS )
-        END IF
         CALL ADI_FIND( FID, 'EXTENSIONS', EID, STATUS )
         CALL ADI_THERE( EID, HDU, THERE, STATUS )
         IF ( .NOT. THERE ) THEN
@@ -153,6 +144,9 @@
         CALL ADI_CPUT0I( ID, '.IHDU', NHDU, STATUS )
         CALL CHR_ITOC( NHDU, STR, NDIG )
         CALL ADI_CPUT0C( ID, '.HDU_'//STR(:NDIG), HDU, STATUS )
+
+*    Ensure previous HDU's data areas are defined
+        CALL ADI2_CHKPRV( FID, NHDU-1, STATUS )
 
 *    Mark HDU data area as undefined
         CALL ADI_CPUT0L( ID, '.CREATED', .FALSE., STATUS )
