@@ -6,7 +6,7 @@
       <!ENTITY src-parse        SYSTEM 'parse'>
 ]>
 
-<programcode><title>Upconverter tools
+<programcode><title>Programcode document autocreated by code2sgml
 
    <routine id=code2sgml>   &src-code2sgml;
    <routine id=latex2sgml>  &src-latex2sgml;

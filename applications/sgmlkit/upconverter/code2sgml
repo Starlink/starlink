@@ -131,9 +131,9 @@
 #     as <code>verbatim</code> and, especially, <foreign>vice 
 #     versa</foreign>.
 #     <p>
-#     The converter currently discards any top-level sections which 
+#     The converter currently discards top-level sections which 
 #     have no (non-ignored) content, so that placeholders for content,
-#     e.g. an empty `Bugs:' heading, will not be propagated into 
+#     e.g&dot; an empty `Bugs:' heading, will not be propagated into 
 #     the output document.
 #
 #  <diytopic><title>Configuration file</title>
@@ -397,7 +397,7 @@
 #        SGML document.  This will not include the main body of the 
 #        source code from the original files.
 #     <example>
-#     code2sgml -l script -c config.pl sub.f > new/sub.f
+#     code2sgml -l script -c config.pl setup.sh > new/setup.sh
 #        <examplenote>
 #        A new version of the named file is written to a different 
 #        directory; any prologues in it will be marked up, but changes

@@ -110,7 +110,9 @@
 #     for specifying particular SGML to be output at given places in
 #     the LaTeX source.  They do what you would expect them to:
 #     their contents, after normal expansion of any LaTeX macros,
-#     appear verbatim in the output SGML document.
+#     appear in the output SGML document.  Note these are not verbatim-
+#     like as far as latex is concerned, so that latex-like markup
+#     may get modified, though SGML-like markup should not.
 #     These may be useful when defining, or redefining, high-level
 #     user LaTeX macros defined in the document.
 #
@@ -131,7 +133,7 @@
 #     something nearly right, and after three passes the document is 
 #     stable.
 #     <p>
-#     For long documents, all of these stages may take a long time,
+#     For long documents, all of these stages may be slow,
 #     and it may be possible to speed matters up by not repeating 
 #     unnecessary stages.  Therefore the adventurous user may wish to
 #     run the <code>l2s.pl</code> and <code>trans.pl</code> scripts by
@@ -181,18 +183,14 @@
 #     <dd>Maths is embedded in latex notation in the final document 
 #         within <code>m</code>, <code>mequation</code> or 
 #         <code>meqnarray</code> elements, and should give the same 
-#         output as the original.  However, all user-defined macros 
+#         output as the original.  However, macros defined in the LaTeX
 #         (<code>\newcommand</code>s) are expanded before being 
 #         put into the output, which can lead to
 #         verbose and ugly inline latex-notation source.
-#         This is hard to avoid, since each latex-notation element is
-#         treated separately, so that a <code>\newcommand</code> near the
-#         start of the document is not visible to an <code>m</> element 
-#         later, and it is very difficult to know which definitions 
-#         are required for a given bit of LaTeX.
-#         If the original document makes heavy use of user-defined macros
-#         for mathematics, the only way of getting maintainable SGML
-#         may be to cut and paste source from the original document.
+#         This can be avoided by removing the definitions of such from 
+#         the input document before conversion; the definitions can
+#         then be replaced by hand in the output document within
+#         <code>mdefs</code> elements.
 #     <dt>Latex lengths
 #     <dd>Unlike commands, LaTeX lengths are not expanded, so that when
 #         a length is reset somewhere in a document and used later, 
