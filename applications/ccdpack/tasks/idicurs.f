@@ -211,14 +211,10 @@
 
 *  Execute startup.
       CALL CCD1_START( 'IDICURS', STATUS )
+      LOPEN = .FALSE.
 
 *  Begin NDF context.
       CALL NDF_BEGIN
-
-*  Get the NDF from the parameter system.  The only purpose of this is
-*  to get the NDF names which can be passed to the Tcl code; this means
-*  that the NDFs get opened twice, but it is easier all round to do
-*  the parameter system interfacing from here.
 
 *  Get display preference parameters from the parameter system.
       CALL PAR_GET0D( 'ZOOM', ZOOM, STATUS )
@@ -258,6 +254,7 @@
          CALL GRP_GET( LISTGR, INDEX, 1, FNAME, STATUS )
          CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FD, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 99
+         LOPEN = .TRUE.
 
 *  Write header to output position list file.
          CALL CCD1_FIOHD( FD, 'Output from IDICURS', STATUS )
