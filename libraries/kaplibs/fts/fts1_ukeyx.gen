@@ -1,8 +1,8 @@
-      SUBROUTINE FTS1_WKEY<T>( NCARD, BUFFER, STCARD, NAME, VALUE,
+      SUBROUTINE FTS1_UKEY<T>( NCARD, BUFFER, STCARD, NAME, VALUE,
      :                         CMTBGN, COMNT, THERE, CARD, STATUS )
 *+
 *  Name:
-*     FTS1_WKEYx
+*     FTS1_UKEYx
 
 *  Purpose:
 *     Write the value of type <COMM> to the specified keyword from a
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FTS1_WKEYx( NCARD, BUFFER, STCARD, NAME, CMTBGN, THERE,
-*                      VALUE, COMNT, CARD, STATUS )
+*     CALL FTS1_UKEYx( NCARD, BUFFER, STCARD, NAME, VALUE, CMTBGN,
+*                      COMNT, THERE, CARD, STATUS )
 
 *  Description:
 *     This routine searches a buffer containing the header card images
@@ -35,7 +35,7 @@
 *  Arguments:
 *     NCARD = INTEGER (Given)
 *        The number of card images in the buffer.
-*     BUFFER( NCARD ) = CHARACTER * ( * ) (Given)
+*     BUFFER( NCARD ) = CHARACTER * ( * ) (Given and Returned)
 *        The buffer containing the header card images.
 *     STCARD = INTEGER (Given)
 *        The number of the card from which to start search.
@@ -56,7 +56,7 @@
 *        The character which indicates the beginning of the comment
 *        string of to be appended to the keyword.  Normally it is '/'.
 *        when it is blank, no comment will be appended to the keyword.
-*     COMNT = CHARACTER * ( * ) (Returned)
+*     COMNT = CHARACTER * ( * ) (Given)
 *        The comment string of the keyword.  It may be truncated at the
 *        end to put into the space left after writing keyword value. 
 *     THERE = LOGICAL (Returned)
@@ -68,12 +68,16 @@
 *        The global status.
 
 *  Notes:
-*     - There is a routine for each of the data types logical, integer,
+*     -  There is a routine for each of the data types logical, integer,
 *     real and double precision: replace "x" in the routine name by L,
 *     I, R or D as appropriate.
-*     - The comments are written from column 32 or higher if the value
+*     -  The comments are written from column 32 or higher if the value
 *     demands more than the customary 20 characters for the value.  A
 *     comment may be omitted if the value is so long to leave no room.
+*     -  The BUFFER appears out of standard order because when this
+*     routine is called, BUFFER is expected to be a mapped array.
+*     This order prevents having to append several %VAL(length)
+*     arguments instead of just the one.
 
 *  Authors:
 *     WG: Wei Gong (IPMAF)
@@ -81,7 +85,7 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     9-SEP-1991 (WG):
+*     1991 September 9 (WG):
 *        Original version.
 *     1994 July 16 (MJC):
 *        Renamed and tidied.  Fixed violations of the Fortran standard
@@ -95,6 +99,9 @@
 *        comment rightward.  Append the old comment, if requested,
 *        after writing the value rather than trying to squeeze the
 *        new value into the space left by the old.
+*     1996 November 13 (MJC):
+*        Renamed from FTS1_WKEYx to FTS1_UKEYx, and calls new
+*        FTS1_WKEYx.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -110,12 +117,14 @@
 
 *  Arguments Given:
       INTEGER NCARD
-      CHARACTER * ( 80 ) BUFFER( NCARD )
       INTEGER STCARD
       CHARACTER * ( * ) NAME
       <TYPE> VALUE
       CHARACTER * ( 1 ) CMTBGN
       CHARACTER * ( * ) COMNT
+
+*  Arguments Given and Returned:
+      CHARACTER * ( 80 ) BUFFER( NCARD )
 
 *  Arguments Returned:
       LOGICAL THERE
@@ -177,11 +186,9 @@
       INTEGER POSDEL             ! Position of the start of the
                                  ! comment delimiter (w.r.t. = sign)
       INTEGER STARTW( MXWORD )   ! Start column of each keyword
-      CHARACTER * ( VALLN ) VALSTR ! String expression of keyword value
       INTEGER WORDLN             ! Length of each word
       CHARACTER * ( VALLN ) WORDS( MXWORD ) ! Keywords and value in a
                                  ! card image
-      INTEGER VALN               ! Length of the keyword value
 
 *.
 
@@ -275,18 +282,6 @@
 *  If the keyword is found, form the new image card.
       IF ( THERE ) THEN
 
-*  Format the value string.
-         CALL CHR_<T>TOC( VALUE, VALSTR, VALN )
-         
-*  See if there is any error during formation.
-         IF ( VALSTR( : VALN ) .EQ. '*' ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'FTS1_WKEY<T>_TYPCNV',
-     :                    'Unable to convert the given value to '/
-     :                   /'desired type.', STATUS )
-            GOTO 999
-         END IF
-
 *  Determine if the existing comment is to be used.  If it is, extract
 *  the old comment.
          OLDCOM = CMTBGN .EQ. ' ' .OR. COMNT .EQ. ' '
@@ -318,44 +313,18 @@
 *  The comment abuts the slash delimiter.
             ELSE
                CMTSTR = BUFFER( CARD )( POSDEL + EQUALS: )
+
             END IF
 
+         ELSE
+            CMTSTR = COMNT
+
          END IF
 
-*  Blank out the previous value and comment.
-         BUFFER( CARD )( EQUALS + 1: ) = ' '
+*  Call generic routine to write the header card.
+         CALL FTS1_WKEY<T>( KEYWRD, VALUE, CMTBGN, CMTSTR,
+     :                      BUFFER( CARD ), STATUS )
 
-*  Determine the column where the comment can begin.  If the length is
-*  less the minimum, this leaves the card padded with blanks to the
-*  minimum length.  The comment cannot begin before the minimum length
-*  of a non-character value (including the cumpulsory space after the
-*  equals sign), and so allowing for the trailing space, the comment
-*  must not appear until two columns after this.
-         COMPOS = MAX( COMCOL, EQUALS + VALN + 3 )
-
-*  Insert the new value, right justified.
-         BUFFER( CARD )( COMPOS-1-VALN:COMPOS-2 ) = VALSTR( :VALN )
-
-*  Only store a comment (new or old) if there is room for part of it.
-         IF ( COMPOS .LT. 79 ) THEN
-
-*  Append the comment (both new or old) to the header card...  Replace
-*  the old comment with a supplied one.
-            IF ( .NOT. OLDCOM ) CMTSTR = COMNT
-
-*  Initialise the character position.  The comment will be appended
-*  from column COMPOS.
-            CARDLN = COMPOS - 1
-
-*  Append the comment string to the card, or as much as can fit on to
-*  the card.  Notice that leading blanks are not removed from the
-*  comment in case the user is attempting some clever alignment.  Since
-*  a FITS comment may contain any ASCII character, it has not been
-*  cleaned.
-            CALL CHR_APPND( CMTBGN//' '//CMTSTR, BUFFER( CARD ),
-     :                      CARDLN )
-         END IF
-      
       END IF
 
  999  CONTINUE
