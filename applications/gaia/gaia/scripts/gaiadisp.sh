@@ -169,7 +169,7 @@ foreach image $argv {
    #  Construct the command needed to display the image. Note
    #  complication when we create GAIA, need to display into the first
    #  clone.
-   if { $created_instance } {
+   if { $created_instance || $clone == "" } {
       set cmd "$gaia open [$namer fullname]"
       set created_instance 0
    } else {
