@@ -72,6 +72,8 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *        access to SpecFrame attributes which may not be set, and to
 *        check that all required attributes have been set if UseDefs is 
 *        zero.
+*     23-MAR-2005 (DSB):
+*        - Added missing rest frames to SorEqual.
 *class--
 */
 
@@ -796,7 +798,8 @@ static int EqualSor( AstSpecFrame *this, AstSpecFrame *that ) {
              !EQUAL( astGetGeoLon( this ), astGetGeoLon( that ) ) ||
              !EQUAL( astGetGeoLat( this ), astGetGeoLat( that ) ) ) result = 0;
       
-      } else if( astOK ) {
+      } else if( sor != AST__LKSOR && sor != AST__LDSOR &&
+                 sor != AST__GLSOR && sor != AST__LGSOR && astOK ) {
          astError( AST__INTER, "SorEqual(SpecFrame): Function SorEqual "
                    "does not yet support rest frame %d (AST internal "
                    "programming error)", sor );
