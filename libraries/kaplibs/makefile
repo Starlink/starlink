@@ -1266,7 +1266,57 @@ unbuild: clean
 #  files).  These are normally generated automatically from the source
 #  files.
 
-$(PKG_NAME)_subroutine.o:       SAE_PAR
+ira1_aito.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
+ira1_ascre.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR
+ira1_asdef.o:	 SAE_PAR IRA_PAR
+ira1_asndf.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR IRA_COM
+ira1_asres.o:	 SAE_PAR DAT_PAR
+ira1_asset.o:	 SAE_PAR DAT_PAR
+ira1_check.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR IRA_COM
+ira1_chprj.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR
+ira1_chscs.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
+ira1_decod.o:	 SAE_PAR DAT_PAR IRA_ERR
+ira1_ecec.o:	 SAE_PAR DAT_PAR PRM_PAR
+ira1_eqecl.o:	 SAE_PAR DAT_PAR PRM_PAR
+ira1_eqeq.o:	 SAE_PAR DAT_PAR PRM_PAR
+ira1_eqgal.o:	 SAE_PAR DAT_PAR PRM_PAR
+ira1_fpars.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR
+ira1_galec.o:	 SAE_PAR DAT_PAR PRM_PAR
+ira1_getid.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR IRA_COM
+ira1_gnom.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
+ira1_iconv.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
+ira1_ictd1.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
+ira1_idtc1.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
+ira1_igtc1.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR PAR_ERR
+ira1_init.o:	 SAE_PAR DAT_PAR IRA_PAR PRM_PAR IRA_COM
+ira1_iprj.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
+ira1_iscnm.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR
+ira1_lamb.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
+ira1_orth.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
+ira1_prec.o:	 SAE_PAR DAT_PAR PRM_PAR
+ira_annul.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_COM
+ira_close.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_COM
+ira_convt.o:	 SAE_PAR DAT_PAR IRA_PAR
+ira_creat.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR IRA_COM
+ira_ctod.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR
+ira_ctod1.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
+ira_dtoc.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR
+ira_dtoc1.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
+ira_exprt.o:	 SAE_PAR DAT_PAR
+ira_find.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR
+ira_getco.o:	 SAE_PAR DAT_PAR IRA_PAR
+ira_geteq.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
+ira_gtco1.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR
+ira_gtscs.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR
+ira_init.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_COM
+ira_iproj.o:	 SAE_PAR DAT_PAR IRA_PAR
+ira_iscs.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR
+ira_locat.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_COM
+ira_norm.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR
+ira_read.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR IRA_COM
+ira_seteq.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
+ira_trans.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_COM
+ira_write.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR IRA_COM
 
 #-------------------------------------------------------------------------------
 #
