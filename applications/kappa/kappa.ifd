@@ -1374,6 +1374,16 @@ package kappa {
             helpkey *
           }
 
+         parameter like {
+            type NDF
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {NDF containing axis structures to copy}
+            helpkey *
+          }
+
          parameter mode {
             position 3
             type LITERAL

@@ -19,11 +19,12 @@
 *  Description:
 *     This routine modifies the values of an axis array component or
 *     system within an NDF data structure.  There are a number of
-*     options (see parameter MODE).  They permit the deletion of the
-*     axis system, or an individual variance or width component; the
-*     replacement of one or more individual values; assignment of the
+*     options (see parameters LIKE and  MODE).  They permit the deletion 
+*     of the axis system, or an individual variance or width component; 
+*     the replacement of one or more individual values; assignment of the
 *     whole array using Fortran-like mathematical expressions, or values
-*     in a text file, or to pixel co-ordinates.
+*     in a text file, or to pixel co-ordinates, or by copying from
+*     another NDF.
 *      
 *     If an AXIS structure does not exist, a new one whose centres are
 *     pixel co-ordinates is created before any modification.
@@ -87,6 +88,14 @@
 *        (!) terminates the loop during multiple replacements.  This
 *        parameter is only accessed when MODE="Edit".  The suggested
 *        default is the current value.
+*     LIKE = NDF (Read)
+*        A template NDF containing axis arrays. These arrays will be
+*        copied into the NDF given by parameter NDF. All axes are copied.
+*        The other parameters are only acceessed if a null (!) value is 
+*        supplied for LIKE. If the NDF being modified extends beyond the
+*        edges of the template NDF, then the template axis arrays will be
+*        extrapolated to cover the entire NDF. This is done using linear
+*        extrapolation through the last two extreme axis values.  [!]
 *     MODE = LITERAL (Read)
 *        The mode of the modification.  It can be one of the following:
 *
@@ -103,7 +112,8 @@
 *                          co-ordinates.  This is only available when
 *                          COMP="Data" or "Centre".
 *
-*        The suggested default is the current value.
+*        MODE is only accessed if a null (!) value is supplied for 
+*        parameter LIKE. The suggested default is the current value.
 *     NDF = NDF (Read and Write)
 *        The NDF data structure in which an axis array component is to
 *        be modified.
@@ -130,6 +140,10 @@
 *  Examples:
 *     setaxis ff mode=delete
 *        This erases the axis structure from the NDF called ff.
+*     setaxis ff like=hh
+*        This creates axis structures in the NDF called ff by copying
+*        them from the NDF called hh, extrapolating them as necessary to
+*        cover ff.
 *     setaxis abell4 1 expr exprs="CENTRE + 0.1 * (INDEX-1)"
 *        This modifies the axis centres along the first axis in the NDF
 *        called abell4.  The new centre values are spaced by 0.1 more
@@ -196,11 +210,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1995 April 24 (MJC):
 *        Original version.
+*     16 MAY 2000 (DSB):
+*        Parameter LIKE added.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -255,7 +272,8 @@
       LOGICAL LOOP               ! Loop for another section to replace
       CHARACTER * ( 8 ) MCOMP    ! Component name for mapping arrays
       CHARACTER * ( 10 ) MODE    ! Mode of the modification
-      INTEGER NDF                ! NDF identifier
+      INTEGER NDF                ! Input NDF identifier
+      INTEGER NDF2               ! NDF identifier for the LIKE parameter
       INTEGER NDIM               ! Number of dimensions of NDF
       INTEGER NERR               ! Number of conversion errors (dummy=0)
       INTEGER NIN                ! Number of inverse expressions
@@ -286,114 +304,128 @@
 *  Obtain an identifier for the NDF to be modified.
       CALL LPG_ASSOC( 'NDF', 'UPDATE', NDF, STATUS )
 
+*  Abort if an error occurred. 
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Obtain an identifier for an NDF containing AXIS structures to be
+*  copied to the first NDF.
+      CALL LPG_ASSOC( 'LIKE', 'READ', NDF2, STATUS )
+
+*  If an NDF was supplied, use it.
+      IF( STATUS .EQ. SAI__OK ) THEN 
+         CALL KPS1_SAXLK( NDF, NDF2, STATUS )
+
+*  If no LIKE NDF was supplied, annul the error and continue.
+      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )      
+
 *  Find the number of dimensions, and bounds in the NDF.
-      CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+         CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Obtain the array component to modify.  Derive the mapping component
 *  name, and equate the synonym.
-      CALL PAR_CHOIC( 'COMP', 'Data', 'Centre,Data,Error,Width,'/
-     :                /'Variance', .FALSE., COMP, STATUS )
-      MCOMP = COMP
-      IF ( COMP .EQ. 'ERROR' ) THEN
-         COMP = 'VARIANCE'
-      ELSE IF ( COMP .EQ. 'DATA' ) THEN
-         COMP = 'CENTRE'
-         MCOMP = 'CENTRE'
-      END IF
+         CALL PAR_CHOIC( 'COMP', 'Data', 'Centre,Data,Error,Width,'/
+     :                   /'Variance', .FALSE., COMP, STATUS )
+         MCOMP = COMP
+         IF ( COMP .EQ. 'ERROR' ) THEN
+            COMP = 'VARIANCE'
+         ELSE IF ( COMP .EQ. 'DATA' ) THEN
+            COMP = 'CENTRE'
+            MCOMP = 'CENTRE'
+         END IF
 
 *  Obtain the mode of the modification.  Note that the "Pixel" option
 *  is only available for the axis centres.
-      IF ( COMP .EQ. 'CENTRE' .OR. COMP .EQ. 'DATA' ) THEN
-         CALL PAR_CHOIC( 'MODE', 'Expression', 'Delete,Edit,'/
-     :                   /'Expression,File,Pixel', .FALSE., MODE,
-     :                   STATUS )
-      ELSE
-         CALL PAR_CHOIC( 'MODE', 'Expression', 'Delete,Edit,'/
-     :                   /'Expression,File', .FALSE., MODE, STATUS )
-      END IF
+         IF ( COMP .EQ. 'CENTRE' .OR. COMP .EQ. 'DATA' ) THEN
+            CALL PAR_CHOIC( 'MODE', 'Expression', 'Delete,Edit,'/
+     :                      /'Expression,File,Pixel', .FALSE., MODE,
+     :                      STATUS )
+         ELSE
+            CALL PAR_CHOIC( 'MODE', 'Expression', 'Delete,Edit,'/
+     :                      /'Expression,File', .FALSE., MODE, STATUS )
+         END IF
 
 *  Find which axis to modify only if there is more than one and the
 *  selection is not to delete the axis system
-      IAXIS = 1
-      IF ( ( MODE .NE. 'DELETE' .OR. COMP .NE. 'CENTRE' ) .AND.
-     :     NDIM .GT. 1 ) CALL PAR_GDR0I( 'DIM', 1, 1, NDIM, .FALSE.,
-     :                   IAXIS, STATUS )
+         IAXIS = 1
+         IF ( ( MODE .NE. 'DELETE' .OR. COMP .NE. 'CENTRE' ) .AND.
+     :        NDIM .GT. 1 ) CALL PAR_GDR0I( 'DIM', 1, 1, NDIM, .FALSE.,
+     :                      IAXIS, STATUS )
 
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
+         IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Check that the axis system exists.  If it does not, create a pixel
 *  co-ordinate system.
-      CALL NDF_STATE( NDF, 'Axis', THERE, STATUS )
-      IF ( .NOT. THERE ) CALL NDF_ACRE( NDF, STATUS )
+         CALL NDF_STATE( NDF, 'Axis', THERE, STATUS )
+         IF ( .NOT. THERE ) CALL NDF_ACRE( NDF, STATUS )
 
 *  Obtain the default data type for the component.  Find the current
 *  data type of the component and use that where possible.  Note that
 *  only floating-point types are allowed, so convert an integer type
 *  to _REAL.
-      CALL NDF_ASTAT( NDF, COMP, IAXIS, THERE, STATUS )
-      IF ( THERE ) THEN
-         CALL NDF_ATYPE( NDF, COMP, IAXIS, DEFTYP, STATUS )
-         IF ( DEFTYP .NE. '_REAL' .AND. DEFTYP .NE. '_DOUBLE' )
-     :      DEFTYP = '_REAL'
-      ELSE
-         DEFTYP = '_REAL'
-      END IF
+         CALL NDF_ASTAT( NDF, COMP, IAXIS, THERE, STATUS )
+         IF ( THERE ) THEN
+            CALL NDF_ATYPE( NDF, COMP, IAXIS, DEFTYP, STATUS )
+            IF ( DEFTYP .NE. '_REAL' .AND. DEFTYP .NE. '_DOUBLE' )
+     :         DEFTYP = '_REAL'
+         ELSE
+            DEFTYP = '_REAL'
+         END IF
 
 *  Process the array component in the desired mode.
 *
 *  Delete mode.
 *  ============
-      IF ( MODE .EQ. 'DELETE' ) THEN
+         IF ( MODE .EQ. 'DELETE' ) THEN
 
 *  The whole axis structure goes if the component is the axis-centre
 *  array.
-         IF ( COMP .EQ. 'CENTRE' ) THEN
-            CALL NDF_RESET( NDF, 'Axis', STATUS )
+            IF ( COMP .EQ. 'CENTRE' ) THEN
+               CALL NDF_RESET( NDF, 'Axis', STATUS )
 
 *  Delete the individual array component.
-         ELSE
-            CALL NDF_AREST( NDF, COMP, IAXIS, STATUS )
-
-         END IF
+            ELSE
+               CALL NDF_AREST( NDF, COMP, IAXIS, STATUS )
+            END IF
 
 *  Edit mode.
 *  ==========
-      ELSE IF ( MODE .EQ. 'EDIT' ) THEN
+         ELSE IF ( MODE .EQ. 'EDIT' ) THEN
 
 *  Cannot edit a non-existent component.  Issue an error message and
 *  exit.
-         IF ( .NOT. THERE ) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETC( 'CMP', COMP )
-            CALL MSG_SETI( 'N', IAXIS )
-            CALL MSG_SETC( 'TH', CHR_NTH( IAXIS ) )
-            CALL ERR_REP( 'SETAXIS_ERR3', 'There is no ^CMP array '/
-     :        /'along the ^N^TH dimension to edit.', STATUS )
-            GOTO 999
-         END IF
+            IF ( .NOT. THERE ) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETC( 'CMP', COMP )
+               CALL MSG_SETI( 'N', IAXIS )
+               CALL MSG_SETC( 'TH', CHR_NTH( IAXIS ) )
+               CALL ERR_REP( 'SETAXIS_ERR3', 'There is no ^CMP array '/
+     :           /'along the ^N^TH dimension to edit.', STATUS )
+               GOTO 999
+            END IF
 
 *  Determine whether or not to loop.  Looping does not occur if the
 *  NEWVAL is given on the command line, i.e. it is already in the active
 *  state.
-         CALL LPG_STATE( 'NEWVAL', ACTVAL, STATUS )
+            CALL LPG_STATE( 'NEWVAL', ACTVAL, STATUS )
 
 *  Map the array component of the axis in update mode.
-         TYPE = DEFTYP
-         CALL NDF_AMAP( NDF, MCOMP, IAXIS, TYPE, 'Update', AXPNTR, EL,
-     :                  STATUS )
+            TYPE = DEFTYP
+            CALL NDF_AMAP( NDF, MCOMP, IAXIS, TYPE, 'Update', AXPNTR,
+     :                     EL, STATUS )
 
-         LOOP = .TRUE.
-         DO WHILE ( STATUS .EQ. SAI__OK .AND. LOOP )
+            LOOP = .TRUE.
+            DO WHILE ( STATUS .EQ. SAI__OK .AND. LOOP )
 
 *  Do not loop if the value was given on the command line.
-            LOOP = ACTVAL .NE. PAR__ACTIVE
+               LOOP = ACTVAL .NE. PAR__ACTIVE
 
 *  Obtain the section.
-            CALL PAR_GDR0I( 'INDEX', VAL__BADI, LBND( IAXIS ),
-     :                      UBND( IAXIS ), .FALSE., PIND, STATUS )
+               CALL PAR_GDR0I( 'INDEX', VAL__BADI, LBND( IAXIS ),
+     :                         UBND( IAXIS ), .FALSE., PIND, STATUS )
 
 *  Shift the origin to element 1.
-            PIND = PIND + 1 - LBND( IAXIS )
+               PIND = PIND + 1 - LBND( IAXIS )
 
 *  Perform the replacement.
 *  ========================
@@ -403,305 +435,251 @@
 
 *  Real
 *  ----
-            IF ( TYPE .EQ. '_REAL' ) THEN
+               IF ( TYPE .EQ. '_REAL' ) THEN
 
 *  Get the replacement value.  The range depends on the processing data
 *  type.
-               SUGDEF = 'Junk'
-               CALL PAR_MIX0R( 'NEWVAL', SUGDEF, VAL__MINR, VAL__MAXR,
-     :                         'Bad', .FALSE., CVALUE, STATUS )
+                  SUGDEF = 'Junk'
+                  CALL PAR_MIX0R( 'NEWVAL', SUGDEF, VAL__MINR,
+     :                             VAL__MAXR, 'Bad', .FALSE., CVALUE, 
+     :                             STATUS )
 
 *  Convert the returned string to a numerical value.
-               IF ( CVALUE .EQ. 'BAD' ) THEN
-                  RVALUE = VAL__BADR
-               ELSE
-                  CALL CHR_CTOR( CVALUE, RVALUE, STATUS )
-               END IF
+                  IF ( CVALUE .EQ. 'BAD' ) THEN
+                     RVALUE = VAL__BADR
+                  ELSE
+                     CALL CHR_CTOR( CVALUE, RVALUE, STATUS )
+                  END IF
 
 *  Replace the element with the new value.
-               CALL KPG1_STORR( EL, PIND, RVALUE, %VAL( AXPNTR( 1 ) ),
-     :                          STATUS )
+                  CALL KPG1_STORR( EL, PIND, RVALUE, 
+     :                             %VAL( AXPNTR( 1 ) ), STATUS )
 
 *  Double precision
 *  ----------------
-            ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               SUGDEF = 'Junk'
-               CALL PAR_MIX0D( 'NEWVAL', SUGDEF, VAL__MIND, VAL__MAXD,
-     :                         'Bad', .FALSE., CVALUE, STATUS )
+               ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
+                  SUGDEF = 'Junk'
+                  CALL PAR_MIX0D( 'NEWVAL', SUGDEF, VAL__MIND,
+     :                             VAL__MAXD,'Bad', .FALSE., CVALUE, 
+     :                             STATUS )
 
 *  Convert the returned string to a numerical value.
-               IF ( CVALUE .EQ. 'BAD' ) THEN
-                  DVALUE = VAL__BADD
-               ELSE
-                  CALL CHR_CTOD( CVALUE, DVALUE, STATUS )
-               END IF
+                  IF ( CVALUE .EQ. 'BAD' ) THEN
+                     DVALUE = VAL__BADD
+                  ELSE
+                     CALL CHR_CTOD( CVALUE, DVALUE, STATUS )
+                  END IF
 
 *  Replace the element with the new value.
-               CALL KPG1_STORD( EL, PIND, DVALUE, %VAL( AXPNTR( 1 ) ),
-     :                          STATUS )
-            END IF
+                  CALL KPG1_STORD( EL, PIND, DVALUE, 
+     :                             %VAL( AXPNTR( 1 ) ), STATUS )
+               END IF
 
 *  Annul a null status as this is expected, and closes the loop.
-            IF ( STATUS .EQ. PAR__NULL ) THEN
-               CALL ERR_ANNUL( STATUS )
-               LOOP = .FALSE.
+               IF ( STATUS .EQ. PAR__NULL ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  LOOP = .FALSE.
 
 *  Cancel the previous values of NEWVAL and INDEX for the loop.
-            ELSE IF ( LOOP .AND. STATUS .EQ. SAI__OK ) THEN
-               CALL PAR_CANCL( 'INDEX', STATUS )
-               CALL PAR_CANCL( 'NEWVAL', STATUS )
-            END IF
+               ELSE IF ( LOOP .AND. STATUS .EQ. SAI__OK ) THEN
+                  CALL PAR_CANCL( 'INDEX', STATUS )
+                  CALL PAR_CANCL( 'NEWVAL', STATUS )
+               END IF
 
 *  End of the do-while loop for the elements.
-         END DO
+            END DO
 
 *  Unmap the axis array.  Note that 'Error' is not allowed as the
 *  component.
-         CALL NDF_AUNMP( NDF, COMP, IAXIS, STATUS )
+            CALL NDF_AUNMP( NDF, COMP, IAXIS, STATUS )
 
 *  Expression mode.
 *  ================
-      ELSE IF ( MODE .EQ. 'EXPRESSION' ) THEN
+         ELSE IF ( MODE .EQ. 'EXPRESSION' ) THEN
 
 *  Obtain the type of the output array.
-         CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .TRUE., TYPE,
-     :                   STATUS ) 
+            CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .TRUE.,
+     :                       TYPE, STATUS ) 
 
 *  Obtain the expression relating variance values to data values.
-         CALL PAR_GET0C( 'EXPRS', EXPRS, STATUS )
+            CALL PAR_GET0C( 'EXPRS', EXPRS, STATUS )
 
 *  Get the character lengths of the expression and the component.
-         IF ( STATUS .NE. SAI__OK ) GOTO 999
-         LCOMP = CHR_LEN( COMP ) 
-         LEXP = MAX( 1, CHR_LEN( EXPRS ) )
+            IF ( STATUS .NE. SAI__OK ) GOTO 999
+            LCOMP = CHR_LEN( COMP ) 
+            LEXP = MAX( 1, CHR_LEN( EXPRS ) )
 
 *  Find out whether or not the INDEX token appears in the expression by
 *  attempting to replace each name in turn by itself and seeing if a
 *  substitution results.
-         SUBIND = .FALSE.
-         CALL TRN_STOK( 'INDEX', 'INDEX', EXPRS( : LEXP ), NSUBS,
-     :                  STATUS )
+            SUBIND = .FALSE.
+            CALL TRN_STOK( 'INDEX', 'INDEX', EXPRS( : LEXP ), NSUBS,
+     :                     STATUS )
 
 *  Record whether or not there is a substitution to be made.
-         SUBIND = NSUBS .NE. 0
+            SUBIND = NSUBS .NE. 0
 
 *  Find out whether or not the CENTRE token appears in the expression by
 *  attempting to replace each name in turn by itself and seeing if a
 *  substitution results.
-         SUBCEN = .FALSE.
-         CALL TRN_STOK( 'CENTRE', 'CENTRE', EXPRS( : LEXP ), NSUBS,
-     :                  STATUS )
+            SUBCEN = .FALSE.
+            CALL TRN_STOK( 'CENTRE', 'CENTRE', EXPRS( : LEXP ), NSUBS,
+     :                     STATUS )
 
 *  Record whether or not there is a substitution to be made.
-         SUBCEN = NSUBS .NE. 0
-         IF ( STATUS .NE. SAI__OK ) GO TO 999
+            SUBCEN = NSUBS .NE. 0
+            IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  If there is neither an INDEX nor a CENTRE token and the component is
 *  the array of axis centres, this is an error.  Report it and exit.
-         IF ( COMP .EQ. 'CENTRE' .AND.
-     :        .NOT. ( SUBIND .OR. SUBCEN ) ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'SETAXIS_ERR2', 'The expression must '/
-     :        /'contain the INDEX or CENTRE tokens for the axis '/
-     :        /'centres.', STATUS )
-            GOTO 999
+            IF ( COMP .EQ. 'CENTRE' .AND.
+     :           .NOT. ( SUBIND .OR. SUBCEN ) ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'SETAXIS_ERR2', 'The expression must '/
+     :           /'contain the INDEX or CENTRE tokens for the axis '/
+     :           /'centres.', STATUS )
+               GOTO 999
 
 *  There must be one inverse for the transformation.  This is the index
 *  because it is always defined.
-         ELSE IF ( .NOT. ( SUBIND .OR. SUBCEN ) ) THEN
-            SUBIND = .TRUE.
+            ELSE IF ( .NOT. ( SUBIND .OR. SUBCEN ) ) THEN
+               SUBIND = .TRUE.
 
-         END IF
+            END IF
 
 *  Set up the required transformations.  To avoid a duplicate name,
 *  we can use CENTRE as a token and the forward variable.
-         IF ( COMP( 1:6 ) .EQ. 'CENTRE' ) THEN
-            FOR( 1 ) = 'COORD = ' // EXPRS( : LEXP )
-         ELSE
-            FOR( 1 ) = COMP( : LCOMP ) // ' = ' // EXPRS( : LEXP )
-         END IF
+            IF ( COMP( 1:6 ) .EQ. 'CENTRE' ) THEN
+               FOR( 1 ) = 'COORD = ' // EXPRS( : LEXP )
+            ELSE
+               FOR( 1 ) = COMP( : LCOMP ) // ' = ' // EXPRS( : LEXP )
+            END IF
 
-         NIN = 0
-         IF ( SUBIND ) THEN
-            NIN = NIN + 1
-            INV( NIN ) = 'INDEX'
-         END IF
-         IF ( SUBCEN ) THEN
-            NIN = NIN + 1
-            INV( NIN ) = 'CENTRE'
-         END IF
+            NIN = 0
+            IF ( SUBIND ) THEN
+               NIN = NIN + 1
+               INV( NIN ) = 'INDEX'
+            END IF
+            IF ( SUBCEN ) THEN
+               NIN = NIN + 1
+               INV( NIN ) = 'CENTRE'
+            END IF
 
 *  Create a temporary transformation structure.  Use an elastic data
 *  type for processing to cope with double-precision processing.
-         CALL TRN_NEW( NIN, 1, FOR, INV, '_REAL:',
-     :                 'INDEX --> ' // COMP( : LCOMP ), ' ', ' ',
-     :                 LOCTR, STATUS )
+            CALL TRN_NEW( NIN, 1, FOR, INV, '_REAL:',
+     :                    'INDEX --> ' // COMP( : LCOMP ), ' ', ' ',
+     :                    LOCTR, STATUS )
 
 *  Compile the transformation to give a mapping identifier.  Then delete
 *  the temporary transformation structure.
-         CALL TRN_COMP( LOCTR, .TRUE., IMAP, STATUS )
-         CALL TRN1_ANTMP( LOCTR, STATUS )
+            CALL TRN_COMP( LOCTR, .TRUE., IMAP, STATUS )
+            CALL TRN1_ANTMP( LOCTR, STATUS )
 
 *  Add context information at this point if an error occurs.
-         IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_REP( 'SETVAR_COMP',
-     :        'Error in %EXPRS expression.', STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_REP( 'SETVAR_COMP',
+     :           'Error in %EXPRS expression.', STATUS )
 
-         ELSE
+            ELSE
 
 *  Obtain the number of elements.
-            EL = UBND( IAXIS ) - LBND( IAXIS ) + 1
+               EL = UBND( IAXIS ) - LBND( IAXIS ) + 1
 
 *  Get some workspace for the pixel indices and centres.
-            IF ( SUBIND .OR. SUBCEN )
-     :         CALL PSX_CALLOC( NIN * EL, TYPE, PNTRW, STATUS )
+               IF ( SUBIND .OR. SUBCEN )
+     :            CALL PSX_CALLOC( NIN * EL, TYPE, PNTRW, STATUS )
 
-            IF ( SUBIND ) THEN
+               IF ( SUBIND ) THEN
 
 *  Fill the first EL elements with the indices (in the appropriate
 *  floating point).
-               IF ( TYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_ELNMR( LBND( IAXIS ), UBND( IAXIS ), EL,
-     :                             %VAL( PNTRW ), STATUS )
+                  IF ( TYPE .EQ. '_REAL' ) THEN
+                     CALL KPG1_ELNMR( LBND( IAXIS ), UBND( IAXIS ), EL,
+     :                                %VAL( PNTRW ), STATUS )
 
-               ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_ELNMD( LBND( IAXIS ), UBND( IAXIS ), EL,
-     :                             %VAL( PNTRW ), STATUS )
+                  ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
+                     CALL KPG1_ELNMD( LBND( IAXIS ), UBND( IAXIS ), EL,
+     :                                %VAL( PNTRW ), STATUS )
+                  END IF
                END IF
-            END IF
 
-            IF ( SUBCEN ) THEN
+               IF ( SUBCEN ) THEN
 
 *  Map the axis centres.
-               CALL NDF_AMAP( NDF, 'Centre', IAXIS, TYPE, 'READ',
-     :                        AXPNTR, EL, STATUS )
+                  CALL NDF_AMAP( NDF, 'Centre', IAXIS, TYPE, 'READ',
+     :                           AXPNTR, EL, STATUS )
 
 *  copy the input data into the NIN'th row of the appropriate work
 *  array (considered as 2-dimensional), using the appropriate routine
 *  for the data type.
-               IF ( TYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_PROWR( EL, %VAL( AXPNTR( 1 ) ), NIN,
-     :                             %VAL( PNTRW ), STATUS )
+                  IF ( TYPE .EQ. '_REAL' ) THEN
+                     CALL KPG1_PROWR( EL, %VAL( AXPNTR( 1 ) ), NIN,
+     :                                %VAL( PNTRW ), STATUS )
 
-               ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_PROWD( EL, %VAL( AXPNTR( 1 ) ), NIN,
-     :                             %VAL( PNTRW ), STATUS )
+                  ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
+                     CALL KPG1_PROWD( EL, %VAL( AXPNTR( 1 ) ), NIN,
+     :                                %VAL( PNTRW ), STATUS )
 
-               END IF
+                  END IF
 
 *  Unmap the centres.
-               CALL NDF_AUNMP( NDF, 'Centre', IAXIS, STATUS )
-            END IF
+                  CALL NDF_AUNMP( NDF, 'Centre', IAXIS, STATUS )
+               END IF
 
 *  Reset any pre-existing axis-array component and set its data type
 *  to the chosen data type.
-            IF ( COMP .NE. 'CENTRE' ) CALL NDF_AREST( NDF, COMP, IAXIS,
-     :        STATUS )
-            CALL NDF_ASTYP( TYPE, NDF, COMP, IAXIS, STATUS )
+               IF ( COMP .NE. 'CENTRE' ) CALL NDF_AREST( NDF, COMP, 
+     :                                               IAXIS, STATUS )
+               CALL NDF_ASTYP( TYPE, NDF, COMP, IAXIS, STATUS )
 
 *  Map the array component for write access.
-            CALL NDF_AMAP( NDF, MCOMP, IAXIS, TYPE, 'WRITE', AXPNTR,
-     :                     EL, STATUS )
+               CALL NDF_AMAP( NDF, MCOMP, IAXIS, TYPE, 'WRITE', AXPNTR,
+     :                        EL, STATUS )
 
 *  Calculate the new array values, using the appropriate precision.
 *  There may be bad pixels to be checked for during the calculations.
 
 *  Real
 *  ----
-            IF ( TYPE .EQ. '_REAL' ) THEN
-               CALL TRN_TRNR( .TRUE., EL, NIN, EL, %VAL( PNTRW ), IMAP,
-     :                        EL, 1, %VAL( AXPNTR( 1 ) ), STATUS )
+               IF ( TYPE .EQ. '_REAL' ) THEN
+                  CALL TRN_TRNR( .TRUE., EL, NIN, EL, %VAL( PNTRW ),
+     :                           IMAP, EL, 1, %VAL( AXPNTR( 1 ) ), 
+     :                           STATUS )
 
 *  Double precision
 *  ----------------
-            ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL TRN_TRND( .TRUE., EL, NIN, EL, %VAL( PNTRW ), IMAP,
-     :                        EL, 1, %VAL( AXPNTR( 1 ) ), STATUS )
-            END IF
+               ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
+                  CALL TRN_TRND( .TRUE., EL, NIN, EL, %VAL( PNTRW ),
+     :                            IMAP, EL, 1, %VAL( AXPNTR( 1 ) ), 
+     :                            STATUS )
+               END IF
 
 *  Annul the compiled mapping.
-            CALL TRN_ANNUL( IMAP, STATUS )
+               CALL TRN_ANNUL( IMAP, STATUS )
 
 *  Free the workspace.
-            CALL PSX_FREE( PNTRW, STATUS )
+               CALL PSX_FREE( PNTRW, STATUS )
 
 *  Unmap the array.  Note that 'Error' is not allowed as the component.
-            CALL NDF_AUNMP( NDF, COMP, IAXIS, STATUS )
+               CALL NDF_AUNMP( NDF, COMP, IAXIS, STATUS )
 
-         END IF
+            END IF
 
 *  File mode.
 *  ==========
-      ELSE IF ( MODE .EQ. 'FILE' ) THEN
+         ELSE IF ( MODE .EQ. 'FILE' ) THEN
 
 *  Obtain the type of the output array.
-         CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .TRUE.,
-     :                   TYPE, STATUS ) 
+            CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .TRUE.,
+     :                      TYPE, STATUS ) 
 
 *  Attempt to obtain and open a free-format data file.
-         CALL FIO_ASSOC( 'FILE', 'READ', 'LIST', 0, FD, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GOTO 999
+            CALL FIO_ASSOC( 'FILE', 'READ', 'LIST', 0, FD, STATUS )
+            IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Reset any pre-existing axis-array component and set its data type to
 *  the chosen data type.
-         IF ( COMP .NE. 'CENTRE' ) CALL NDF_AREST( NDF, COMP, IAXIS,
-     :     STATUS )
-         CALL NDF_ASTYP( TYPE, NDF, COMP, IAXIS, STATUS )
-
-*  Map the array component for writing.
-         CALL NDF_AMAP( NDF, MCOMP, IAXIS, TYPE, 'WRITE', AXPNTR, EL,
-     :                  STATUS )
-
-*  Append sequentially each value to the vector.  Choose the
-*  appropriate subroutine for the data type.
-         IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_TRNDD( FD, EL, %VAL( AXPNTR( 1 ) ), STATUS )
-
-         ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_TRNDR( FD, EL, %VAL( AXPNTR( 1 ) ), STATUS )
-
-         END IF
-
-*  Unmap the array.  Note that 'Error' is not allowed as the component.
-         CALL NDF_AUNMP( NDF, COMP, IAXIS, STATUS )
-
-*  Close free-format data file.
-         CALL FIO_ANNUL( FD, STATUS )
-
-*  Pixel mode.
-*  ===========
-      ELSE IF ( MODE .EQ. 'PIXEL' ) THEN
-
-*  Obtain the type of the output array.
-         CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .TRUE.,
-     :                   TYPE, STATUS ) 
-
-*  Specify the number of elements along the axis.
-         EL = UBND( IAXIS ) - LBND( IAXIS ) + 1
-
-*  Obtain workspace in which to read the file.  This is insurance in cas
-*  the file has in sufficient values or some other error.
-         CALL PSX_CALLOC( EL, TYPE, FPNTR, STATUS )
-
-*  Write the pixel co-ordinates to the array from block floating point
-*  (step size one, offset lower bound - 0.5).  Use the appropriate
-*  subroutine for the data type.
-         IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_SSAZD( EL, 1.0D0, DBLE( LBND( IAXIS ) ) - 0.5D0,
-     :                       %VAL( FPNTR ), STATUS )
-
-         ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_SSAZR( EL, 1.0D0, DBLE( LBND( IAXIS ) ) - 0.5D0,
-     :                       %VAL( FPNTR ), STATUS )
-
-         END IF
-
-*  Only if the reading was successful do we tamper with the array
-*  component.
-         IF ( STATUS .EQ. SAI__OK ) THEN
-
-*  Reset any pre-existing axis-centre component and set its data type
-*  to the chosen data type.
             IF ( COMP .NE. 'CENTRE' ) CALL NDF_AREST( NDF, COMP, IAXIS,
      :        STATUS )
             CALL NDF_ASTYP( TYPE, NDF, COMP, IAXIS, STATUS )
@@ -710,26 +688,87 @@
             CALL NDF_AMAP( NDF, MCOMP, IAXIS, TYPE, 'WRITE', AXPNTR, EL,
      :                     STATUS )
 
-*  Copy the work array into the axis array component.  Since there are
-*  no type conversions, the bad value need not be checked.  Call the
-*  appropriate routine for the data type.
+*  Append sequentially each value to the vector.  Choose the
+*  appropriate subroutine for the data type.
             IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL VEC_DTOD( .FALSE., EL, %VAL( FPNTR ),
-     :                        %VAL( AXPNTR( 1 ) ), IERR, NERR, STATUS )
-
+               CALL KPS1_TRNDD( FD, EL, %VAL( AXPNTR( 1 ) ), STATUS )
+   
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-               CALL VEC_RTOR( .FALSE., EL, %VAL( FPNTR ),
-     :                        %VAL( AXPNTR( 1 ) ), IERR, NERR, STATUS )
-
+               CALL KPS1_TRNDR( FD, EL, %VAL( AXPNTR( 1 ) ), STATUS )
+   
             END IF
 
 *  Unmap the array.  Note that 'Error' is not allowed as the component.
             CALL NDF_AUNMP( NDF, COMP, IAXIS, STATUS )
 
-         END IF
+*  Close free-format data file.
+            CALL FIO_ANNUL( FD, STATUS )
+
+*  Pixel mode.
+*  ===========
+         ELSE IF ( MODE .EQ. 'PIXEL' ) THEN
+
+*  Obtain the type of the output array.
+            CALL PAR_CHOIC( 'TYPE', DEFTYP, '_REAL,_DOUBLE', .TRUE.,
+     :                      TYPE, STATUS ) 
+
+*  Specify the number of elements along the axis.
+            EL = UBND( IAXIS ) - LBND( IAXIS ) + 1
+
+*  Obtain workspace in which to read the file.  This is insurance in cas
+*  the file has in sufficient values or some other error.
+            CALL PSX_CALLOC( EL, TYPE, FPNTR, STATUS )
+
+*  Write the pixel co-ordinates to the array from block floating point
+*  (step size one, offset lower bound - 0.5).  Use the appropriate
+*  subroutine for the data type.
+            IF ( TYPE .EQ. '_DOUBLE' ) THEN
+               CALL KPG1_SSAZD( EL, 1.0D0, DBLE( LBND( IAXIS ) ) - 
+     :                          0.5D0, %VAL( FPNTR ), STATUS )
+
+            ELSE IF ( TYPE .EQ. '_REAL' ) THEN
+               CALL KPG1_SSAZR( EL, 1.0D0, DBLE( LBND( IAXIS ) ) - 
+     :                          0.5D0, %VAL( FPNTR ), STATUS )
+
+            END IF
+
+*  Only if the reading was successful do we tamper with the array
+*  component.
+            IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  Reset any pre-existing axis-centre component and set its data type
+*  to the chosen data type.
+               IF ( COMP .NE. 'CENTRE' ) CALL NDF_AREST( NDF, COMP, 
+     :                                               IAXIS, STATUS )
+               CALL NDF_ASTYP( TYPE, NDF, COMP, IAXIS, STATUS )
+
+*  Map the array component for writing.
+               CALL NDF_AMAP( NDF, MCOMP, IAXIS, TYPE, 'WRITE', AXPNTR,
+     :                        EL, STATUS )
+
+*  Copy the work array into the axis array component.  Since there are
+*  no type conversions, the bad value need not be checked.  Call the
+*  appropriate routine for the data type.
+               IF ( TYPE .EQ. '_DOUBLE' ) THEN
+                  CALL VEC_DTOD( .FALSE., EL, %VAL( FPNTR ),
+     :                           %VAL( AXPNTR( 1 ) ), IERR, NERR, 
+     :                           STATUS )
+
+               ELSE IF ( TYPE .EQ. '_REAL' ) THEN
+                  CALL VEC_RTOR( .FALSE., EL, %VAL( FPNTR ),
+     :                           %VAL( AXPNTR( 1 ) ), IERR, NERR, 
+     :                           STATUS )
+
+               END IF
+
+*  Unmap the array.  Note that 'Error' is not allowed as the component.
+               CALL NDF_AUNMP( NDF, COMP, IAXIS, STATUS )
+
+            END IF
 
 *  Free the work array.
-         CALL PSX_FREE( FPNTR, STATUS )
+            CALL PSX_FREE( FPNTR, STATUS )
+         END IF
       END IF
 
   999 CONTINUE
