@@ -21,7 +21,8 @@
 \newcommand{\stardoctitle}     {EXTREME --- Handling extreme data sets}
 \newcommand{\stardocabstract}  {
 This package provides some utilities and background documentation 
-for adapting the USSC to handle very large data sets.
+for adapting the USSC, and software which uses it, 
+to handle very large data sets.
 The principal focus of this is to move to use of 64 bits of address
 space on 64-bit operating systems.
 }
@@ -268,14 +269,15 @@ space on 64-bit operating systems.
 
 % Private macro definitions.
 
-\newcommand{\xroutine}[1]{#1}
+\newcommand{\xroutine}[1]{{\tt #1}}
 \newcommand{\cc}[1]{{\tt #1}}
 \newenvironment{squote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
 
 \section{Introduction}
 
-The extreme dataset project is intended to allow use of ``unusually''
-large data sets, although the sizes for which special measures
+The Extreme Dataset project is intended to allow processing of ``unusually''
+large data sets by Starlink software, 
+although the sizes for which special measures
 are required will become less and less unusual as time goes on.
 The principal underlying problem is that as images get larger
 32 bits are no longer enough to index into an image.
@@ -369,7 +371,7 @@ SYSTEM will therefore be introduced:
 
 
 
-\section{Modifications to code}
+\section{Modifications to code\label{sec:modificienda}}
 
 Making Starlink packages able to run in 64-bit environment and 
 handle appropriately large data sets requires changes to the source
@@ -384,10 +386,11 @@ can address any allocated memory,
 and making sure that non-pointer integers in Fortran and C 
 are large enough to hold big numbers.
 
-Because of the difficulty of distinguishing variables which may 
-need to hold big numbers from those which will not in any automatic
-fashion, the approach taken is to change the type of {\em all\/} 
-such variables to a 64-bit type in 64-bit environments.
+Because of the difficulty of distinguishing, in any automatic fashion,
+variables which may 
+need to hold big numbers from those which will not,
+the approach taken is to change the type of {\em all\/} 
+integer variables to a 64-bit type in 64-bit environments.
 This is a somewhat extravagant solution,
 but the alternatives seem to be worse.
 Once the increase in integer size has been made 
@@ -409,12 +412,14 @@ integer size will not cause too many problems.
 \subsection{Pointer references in Fortran}
 
 As explained in \xref{SUN/209}{sun209}{pointers} 
-whenever the \%VAL directive is used to pass the value of allocated
+whenever the \%VAL Fortran compiler directive 
+is used to pass the value of allocated
 memory to a subroutine, its argument should be wrapped in a call
 to \xref{CNF\_PVAL}{sun209}{CNF\_PVAL}.  This effectively allows
 a 32-bit integer to address memory in a 64-bit address space.
 Additionally, the header file {\tt CNF\_PAR} needs to be included
-in affected source files to provide the declaration of CNF\_PVAL.
+in affected source files to provide the declaration of the CNF\_PVAL 
+function.
 This modification is fairly unproblematic, 
 since it should not under normal
 circumstances affect the behaviour of the code in either 32-bit or
@@ -436,10 +441,10 @@ as sometimes needs to be done when the compiler doesn't know that
 it's passing a character variable.  In this case the \%VAL 
 invocation should be left alone and no call to CNF\_PVAL inserted.
 In general, it is impossible to spot all such non-pointer uses
-of \%VAL automatically.  However, if %VAL is applied to a constant,
+of \%VAL automatically.  However, if \%VAL is applied to a constant,
 or a small integer, then it should be left alone.
 
-The program \xroutine{crepint} is supplied for inserting CNF\_PVALs
+The program \xroutine{inscnf} is supplied for inserting CNF\_PVALs
 in the right places.  It wraps {\em all\/} arguments of \%VAL 
 in calls to CNF\_PVAL, but emits warnings for those which look like
 they may not be pointers.  It is described further in section 
@@ -517,6 +522,7 @@ or
       CALL SUB( 5 + EXT__ZERO, STATUS )
 \end{verbatim}
 \end{squote}
+{\it (or perhaps this is a job for PRIMDAT?)}
 %
 \item[Intrinsic functions]\mbox{}
 \\
@@ -531,11 +537,11 @@ argument to a procedure, which is pretty rare.
 \\
 A few Fortran I/O statements have specifiers which require the name
 of an INTEGER variable.  In standard Fortran 77 these are 
-IOSTAT (all I/O statements) and 
-NUMBER, RECL and NEXTREC (the INQUIRE statement).
+IOSTAT in all I/O statements, and 
+NUMBER, RECL and NEXTREC in the INQUIRE statement.
 Particular compilers often provide a whole bunch more, but these
 should hopefully not be much used in Starlink code.
-So there may be a problem with the statement
+So there may be a problem with a statement like
 \begin{squote}
 \begin{verbatim}
       CLOSE( UNIT = 99, IOSTAT = STVAL )
@@ -546,8 +552,23 @@ Of the supported systems, Tru64 and Solaris seem to handle
 INTEGER*8 variables used for this purpose without complaint,
 while Linux/g77 fails to compile.
 %
+\item[Storage association]\mbox{}
+\\
+The Fortran 77 standard states that an INTEGER takes the same number of
+storage units as a REAL.  Converting all INTEGERs to INTEGER*8s will
+probably have the effect that this is no longer the case.
+Thus code which relies on this, for instance by using COMMON blocks or
+EQUIVALENCE statements to address the same memory as both INTEGER and REAL,
+will break.  
+Such practices are, as you might expect, deprecated by the 
+\xref{Starlink Application Programming Standard}{sgp16}{},
+but there may be instances of them lurking about.
+%
 \end{description}
 
+The program \xroutine{frepint} is provided for changing 
+INTEGER declarations to INTEGER*8.
+It is described in section \ref{sec:tools}.
 
 
 \subsection{Enlarging integer type in C}
@@ -556,11 +577,11 @@ All references to the type \cc{int} in C code should be changed to
 \cc{INT\_BIG}.  This is a reference to a macro which can be defined
 in a header file or on the compiler command line 
 (and hence typically in the CFLAG {\tt mk} environment variable).  
-For 32-bit systems it would normally be defined at build time as 
-\cc{int} and for 64-bit systems as \cc{long}.
+For a 32-bit build it would normally be defined at build time as 
+\cc{int} and for a 64-bit build as \cc{long}.
 As well as declarations of variables and functions, this applies
 to casts and arguments of \cc{sizeof} too (in fact any 
-syntactically significant occurrence of the identifier `\c{int}').
+syntactically significant occurrence of the identifier `\cc{int}').
 References to the types \cc{short~int} and \cc{long~int},
 which are just synonyms for \cc{short} and \cc{long} respectively,
 should not be changed.  Type \cc{unsigned INT\_BIG} 
@@ -599,13 +620,17 @@ The lesson is to make sure that header files are
 included.
 
 However this does not solve all problems.
-Where a function has a variable argument list, the function prototype
+Where a function has a variable argument list
+(as declared in the prototype using ellipsis `\cc{...}'
+and handled in the function using the {\tt stdarg.h} macros), 
+the function prototype
 is not able to specify the types of all arguments,
 and so the type of the actual argument must match the type of
 the formal argument for correctness.  If it is impractical
 to recode the function (as in the case of \cc{printf}),
 the best solution is to cast the variable arguments to the type
 which is expected where the function is called.
+
 A more difficult problem is when the address of an argument is
 passed so that the contents of that address can be changed by
 the function.  In this case if the called function has a
@@ -663,6 +688,8 @@ declaration.
 No warning is issued by the Solaris or Tru64 C runtime systems about
 such overflows.
 \end{description}
+Examples of these modifications in action are given in the discussion of 
+\cc{printf} and \cc{scanf} below.
 
 
 External libraries which code may have to link against
@@ -681,8 +708,7 @@ using header files).
 \\
 It is probably not a good idea to do \cc{INT\_BIG} conversion to
 large bodies of non-Starlink code used by the USSC; Perl and Tcl
-spring to mind.  Perhaps MEMSYS too (this may be required by the
-licencing agreement).
+spring to mind.  
 If there is function-level access to these packages,
 some recoding may be required as above.
 %
@@ -762,9 +788,9 @@ There is one other issue which arises from replacing \cc{int} type
 with \cc{INT\_BIG}:
 \begin{description}
 %
-\item[Limiting integer constants]\mbox{}
+\item[Integer limit constants]\mbox{}
 \\
-Where an integer is compared against one of the values 
+Where an \cc{int} is compared against one of the values 
 \cc{INT\_MAX}, \cc{INT\_MIN} and \cc{UINT\_MAX} 
 defined in the system header file {\tt limits.h},
 an \cc{INT\_BIG} should be compared against one of the corresponding
@@ -773,6 +799,12 @@ These macros are defined in the header file {\tt extreme.h},
 which should be included {\em after\/} {\tt limits.h} in the source file.
 %
 \end{description}
+
+The program \xroutine{crepint} is provided for making some of these
+changes.  It replaces all references to \cc{int} type, with a few exceptions,
+by \cc{INT\_BIG} type, and warns about constructs which might need further
+attention.
+It is described in section \ref{sec:tools}.
 
 
 \subsection{Changes to makefile/mk}
@@ -786,108 +818,119 @@ which should be included {\em after\/} {\tt limits.h} in the source file.
 This section documents utilities distributed with this package
 to modify source code for use in 64-bit environments.
 
-\subsection{Insertion of CNF\_PVAL invocations}
-
-
-The program {\tt inscnf} is provided to add such calls automatically
-to Fortran source code.  
-It also inserts a line including the required header file CNF\_PAR for
-affected routines.  It is invoked as a filter, so may take zero,
-one or two arguments, using standard input and standard output for 
-unsupplied filenames as appropriate.  It makes an attempt to abide by
-conventions of case usage and spacing in the source code, and to
-break lines where necessary at reasonable places.  For files,
-and for source lines, which do not contain any invocations of \%VAL, 
-the output will be identical to the input.  Hence a pipeline like
+Basically, one tool is provided for each of the source code conversion
+tasks described in the previous section:
+\begin{description}
+\item[inscnf:] Inserts CNF\_PVAL calls where required in Fortran source code
+\item[frepint:] Converts INTEGER to INTEGER*8 in Fortran source code
+\item[crepint:] Converts \cc{int} to \cc{INT\_BIG} in C source code
+\end{description}
+Each of these is a normal Unix filter command such as {\tt cat}, 
+so may be given zero, one or two arguments to specify its input and output.
+Where no change needs to be made, the input is written with no changes 
+to the output.  This means that the {\tt diff} command can be used 
+to see what changes the filters make, by doing something like:
 \begin{squote}
 \begin{verbatim}
-% inscnf foo.f | diff foo.f - 
+% inscnf file.f | diff file.f -
 \end{verbatim}
 \end{squote}
-will show up any differences the utility has made.
-
-The utility should be pretty robust, but it may be possible to
-confuse it with some illegal/deprecated things like 
-`\verb+\r+' or `\verb+\t+' 
-characters, using columns 73--80 for comments, or embedding whitespace
-in Fortran reserved words.
-If it believes
-that it might have got into serious trouble (that is, that it may
-have corrupted the meaning of the source code), then {\tt inscnf}
-will write a warning on standard error, or terminate with error
-status, or both.
-
-The CNF\_PAR header file must be included to declare the CNF\_PVAL
-function.  {\tt inscnf} therefore tries to insert the line
+which might give a result like:
 \begin{squote}
 \begin{verbatim}
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+94c94
+<       INTEGER STATUS             ! Global status
+---
+>       INTEGER * 8 STATUS         ! Global status
+97,98c97,98
+<       INTEGER I                  ! Loop variable
+<       INTEGER INDF               ! NDF identifier
+---
+>       INTEGER * 8 I              ! Loop variable
+>       INTEGER * 8 INDF           ! NDF identifier
 \end{verbatim}
 \end{squote}
-after  other INCLUDE lines in the relevant routine.  
-If there are no INCLUDE lines in the routine, {\tt inscnf} will
-complain and you will have to add this line by hand.
 
-{\tt inscnf} wraps {\it all\/} occurrences of \%VAL in a call to CNV\_PVAL,
-unless they are already so wrapped.
-This is not always the correct thing to do; sometimes, when communicating
-with a C routine, you want to pass non-pointer arguments by value,
-so that the \%VAL invocations should be left alone.
-In particular this arises when passing a string argument from fortran
-to C --- in this case the lengths of all the passed strings are passed
-as trailing arguments and, depending on the declaration of the arguments
-in the C function, may need to be passed by value.
-In general, it is impossible for {\tt inscnf} to spot these reliably.
-However, if it finds a \%VAL which looks suspicious, it will output
-a warning to this effect --- in this case you should look at the 
-indicated call and remove the unwanted CNF\_PVAL if required.
-A ``suspicious'' use of \%VAL is one of the following:
+Each of the filters draws attention to constructs which might need 
+further attention.  It will do this either by writing a message to
+standard error or by inserting a comment line in the output.
+Such comment lines contain the name of the filter followed by a colon
+and explanatory text, so for instance:
+\begin{squote}
+\begin{verbatim}
+% crepint file.c | grep crepint:
+/* crepint: Format string contains %[cdiouxX*]                           */
+\end{verbatim}
+\end{squote}
+If the filter thinks it has lost track of the source code in a dangerous
+way, i.e.\ that it might be making changes which are likely to invalidate
+the code, it may exit with an error status, and print a message to standard
+error to that effect.
+
+Each of the filters has a go at retaining the aesthetic 
+qualities of the code; an attempt is made to respect 
+case usage and spacing conventions in Fortran, 
+padding whitespace is shuffled to keep things at the same column as
+before if possible, and so on.
+If replacement text is of a different length to the original
+then Fortran lines are broken in hopefully reasonable places,
+but no line breaks in existing lines are introduced in C.
+
+In addition, for each of the filters, a driver script is provided. 
+For converting large numbers of files, this is likely to be the 
+most convenient way to proceed.  Basically the driver scripts simply
+run the filters on a given set of files, summarise the output, and
+write the files which need changes in a given place.
+They also perform some crude safety checks that the modified source
+files seem to have been changed in the right way (for instance, that
+no changes have been made except for the ones which should have been
+made, and that changes to Fortran code do not result in lines longer
+than 72 characters).  
+These checks do not nearly such careful parsing
+of the source code that the conversion filters themselves do, so
+they can throw up false positives or false negatives, but they give 
+an extra level of confidence.
+
+The driver script for \xroutine{inscnf} is called {\tt do\_inscnf}
+and is invoked with the files to be converted as command line arguments.
+For each of its command line arguments it runs \xroutine{inscnf} and
 \begin{itemize}
-\item
-\%VAL is the last argument in the argument list (this suggests it might
-be a trailing string length, especially since the last argument in a 
-Starlink subroutine call is normally STATUS).
-\item
-The argument of \%VAL looks like an integer constant (obviously this can't
-be a pointer)
-\item
-The argument of \%VAL looks like it contains a Starlink-style 
-symbolic constant, i.e.\ a token containing two consecutive underscores
-(this too suggests a constant value).
+\item Writes a line to a log file {\tt ./inscnf.log} 
+      saying how many lines were changed
+\item If and only if some changes were made, it writes the modified copy
+      of the file into a directory called {\tt ./inscnf.changed}
+\item If the filter or the driver script thinks there might be something 
+      which needs human attention, it writes a suitable message to standard
+      output.  These warning messages can be understood in conjunction 
+      with the documentation of the filter, or of the corresponding 
+      text in section \ref{sec:modificienda}.
 \end{itemize}
-The parsing which leads to these messages is not very watertight and
-may throw up false alarms.
-Equally, the argument of \%VAL could be not a pointer and none of 
-these alarms would ring.
+Finally it writes a short summary of the run.
+An excerpt of its output might look like this:
+\begin{squote}
+\begin{verbatim}
+% do_inscnf *.f *.gen
+***  astimp.f:            inscnf: Last arg %VAL in FTS1_GKEYD       ***
+***  import.f:            inscnf: Integer %VAL arg in CCD1_IMFIT?   ***
+***  import.f:            inscnf: Last arg %VAL in CCD1_IMFIT       ***
+  ...
+71/483 modified files written in ./inscnf.changed
+Logfile is ./inscnf.log
+\end{verbatim}
+\end{squote}
 
-A shell script, {\tt do\_inscnf}, gives an example of applying the filter
-to all the Fortran files in a directory.  This can be used as is
-or modified.
-It runs the filter on a list of files, places any which were changed
-in a subdirectory {\tt ./changed}, outputs warnings to standard
-output, and writes a log file {\tt inscnf.log}.
-It also performs some crude checks of its own on the input and output
-files to see if it looks like erroneous changes have been made:
-\begin{itemize}
-\item 
-It checks to see if an input file apparently contains any invocations
-of \%VAL and CNF\_PVAL, and guesses whether {\tt inscnf} 
-should have made any changes.
-\item
-Where {\tt inscnf} has made changes it performs a crude comparison of
-the input and output files to see if they look the same apart from
-insertion of CNF\_PVAL invocations.
-\item
-It checks that no modified lines are longer than 72 characters.
-This shouldn't happen (barring strange antics with carriage return
-or tab characters), but it doesn't hurt to have another check.
-\end{itemize}
-If any of these checks produces a surprising result it writes a 
-message to standard error; this does not mean for sure 
-that {\tt inscnf} has made an error, 
-but it is probably worth checking this by hand.
+The other driver scripts, {\tt do\_crepint} and {\tt do\_frepint},
+differ in the form of their output somewhat but otherwise work the
+same way as {\tt do\_inscnf}.
 
+Detailed descriptions of the behaviour of the filter programs is
+given in section \ref{sec:filters}
 
+\section{Filter utility descriptions\label{sec:filters}}
+
+\subsection{inscnf}
+\subsection{frepint}
+\subsection{crepint}
 
 
 
