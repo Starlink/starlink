@@ -18,19 +18,6 @@
 int ndf1_argc = -1;
 const char *const *ndf1_argv = NULL;
 
-/* On Linux (really gcc/g77/libf2c), we need to define these global
-   variables which are referenced by the Fortran system routine GETARG. 
-   GETARG is not actually called if ndfInit has been used, as the 
-   linker resolves the reference to these variables by pulling in a 
-   function called ``main'' from a standard library, which then conflicts 
-   with the user's ``main''. It may be necessary to tune the use of 
-   these variables for differing compilers and operating systems, for
-   now we just assume that gcc will be matched by g77/libf2c.
-*/
-#if defined( __GNUC__ )
-int f__xargc;
-char **f__xargv;
-#endif
 
 /* Function definitions. */
 /* ===================== */
