@@ -82,7 +82,7 @@ require DynaLoader;
 
 Exporter::export_tags('ams','adam');
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -179,7 +179,7 @@ sub adam_process_message {
   if ($status != &SAI__OK) {
     carp "adam_process_message: Error looking up path name\n";
   } else {
-    if ($inmsg_context == &OBEY | $inmsg_context == &CANCEL) {
+    if ($inmsg_context == &OBEY || $inmsg_context == &CANCEL) {
 
       # Translate message status from a number to a string
       if ($inmsg_status == &DTASK__ACTSTART) {
