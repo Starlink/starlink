@@ -185,10 +185,11 @@
 
 *    Not found?
         IF ( .NOT. FOUND ) THEN
-          STATUS = SAI__ERROR
           CALL MSG_SETC( 'C', QCODE )
+          CALL BDI0_DESCID( ID, 'ID', STATUS )
+          STATUS = SAI__ERROR
           CALL ERR_REP( 'BDI0_FNDAXC_1', 'Unable to locate axis '/
-     :                /'specified by quantity code ^C', STATUS )
+     :        /'specified by quantity code ^C in dataset ^ID', STATUS )
         END IF
 
 *  Report as unknown

@@ -21,6 +21,7 @@
 *     03 Mar 90 : V1.2-0  Original (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *      5 Apr 95 : V1.8-1 Use new data interfaces (DJA)
+*     14 Dec 1995 : V2.0-0 ADI port (DJA)
 *
 *    Type definitions :
 *
@@ -46,14 +47,11 @@
 *    Local variables :
 *
 	REAL			SIZE		 ! pixel size in arc secs
-	REAL			BASE, SCALE	 ! axis attributes
+	REAL			SCALE	 ! axis attributes
 
 	REAL   			FRAC(4),RADII(4) ! % values of PSF
 
-	INTEGER 		DIM		 ! axis attribute
-
 	INTEGER                 DIMS(ADI__MXDIM) ! Input dimensions
-	INTEGER                 TDIMS(ADI__MXDIM)!
 	INTEGER                 PSFDIMS(ADI__MXDIM)!
 	INTEGER                 PSF_FDIMS(ADI__MXDIM)!
 	INTEGER                 PSF_WDIMS(ADI__MXDIM)!
@@ -69,7 +67,6 @@
 	INTEGER                 VAR_PTR
 	INTEGER                 BDATA_PTR
 	INTEGER                 QUAL_PTR
-	INTEGER                 TNDIM
 	INTEGER                 ODATA_PTR
 	INTEGER                 PSF_FUNC         ! Pointer to PSF func
 	INTEGER                 PSF_STORE        ! Pointer to PSF func
@@ -80,12 +77,11 @@
         LOGICAL                 CREBSUB          ! Create background sub'd img
 	LOGICAL                 DATA_OK          ! Input data ok?
 	LOGICAL                 QUAL_OK, VAR_OK
-	LOGICAL                 ANYBAD
 *
 *    Version :
 *
 	CHARACTER*30   		VERSION
-	PARAMETER               (VERSION = 'BSUB Version 1.8-1')
+	PARAMETER               (VERSION = 'BSUB Version 2.0-0')
 
 	CHARACTER*80		  UNITS		!units of axis
 
@@ -110,7 +106,7 @@
 
 	INTEGER   SRCMAP_PTR			!
 
-	INTEGER   COMPX_PTR, COMPY_PTR
+	INTEGER   COMPX_PTR, COMPY_PTR,AXPTR
 *-
 
 *  Check status
@@ -129,10 +125,10 @@
       CALL USI_GET0L('OUT_MESSAGES',LOUD,STATUS)
 
 *  Associate the input and output objects (files)
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-      CALL USI_TASSOCO( 'OUT', 'BINDS', OFID, STATUS )
+      CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CREBSUB = .FALSE.
         CALL ERR_ANNUL( STATUS )
@@ -141,8 +137,8 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Background model
-      CALL USI_TASSOCO( 'BGND', 'BACKGROUND', BFID, STATUS )
+*  Background model
+      CALL USI_CLONE( 'INP', 'BGND', 'BinDS', BFID, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CREBACK = .FALSE.
         CALL ERR_ANNUL( STATUS )
@@ -152,57 +148,51 @@
         GOTO 99
       END IF
 
-*    Must have one or othjer
+*  Must have one or othjer
       IF ( .NOT. (CREBSUB .OR. CREBACK) ) THEN
         CALL MSG_PRNT( '! Must either background subtracted image'/
      :                                               /' or model' )
         GOTO 99
       END IF
 
-*    Copy file info from one to other and get the PSF handle
+*  Copy file info from one to other and get the PSF handle
       IF ( CREBSUB ) THEN
-        CALL ADI_FCOPY( IFID, OFID, STATUS )
-        CALL BDI_DELETE( OFID, 'Data', STATUS )
 	CALL HSI_ADD( OFID, VERSION, STATUS )
       END IF
       IF ( CREBACK ) THEN
-        CALL ADI_FCOPY( IFID, BFID, STATUS )
-        CALL BDI_DELETE( BFID, 'Data', STATUS )
 	CALL HSI_ADD( BFID, VERSION, STATUS )
       END IF
 
-*    Associate psf
+*  Associate psf
       CALL PSF_TASSOCI( IFID, PSFHAN, STATUS )
 
-*    Map input image
-      CALL BDI_MAPDATA( IFID, 'READ', DATA_PTR, STATUS )
+*  Check data
+      CALL BDI_CHK( IFID, 'Data', DATA_OK, STATUS )
+      CALL BDI_GETSHP( IFID, 2, DIMS, NDIM, STATUS )
 
-*    Check data
-      CALL BDI_CHKDATA( IFID, DATA_OK, NDIM, DIMS, STATUS )
+*  Map input image
+      CALL BDI_MAPR( IFID, 'Data', 'READ', DATA_PTR, STATUS )
 
       IF ( DATA_OK ) THEN
 
 *       Create output data in case input was not floating point
          IF ( CREBSUB ) THEN
 
-           CALL BDI_CREDATA( OFID, NDIM, DIMS, STATUS )
-	   CALL BDI_MAPDATA(OFID, 'WRITE', ODATA_PTR, STATUS)
+	   CALL BDI_MAPR(OFID, 'Data', 'WRITE', ODATA_PTR, STATUS)
 
 *         Get variance if present
-	   CALL BDI_CHKVAR( OFID, VAR_OK, TNDIM, TDIMS, STATUS )
+	   CALL BDI_CHK( OFID, 'Variance', VAR_OK, STATUS )
 C	   IF ( VAR_OK ) THEN
-C	     CALL BDI_MAPVAR( OFID, 'UPDATE', VAR_PTR, STATUS )
+C	     CALL BDI_MAPR( OFID, 'Variance', 'UPDATE', VAR_PTR, STATUS )
 C	   ELSE
-C	     CALL BDI_CREVAR( OFID, NDIM, DIMS, STATUS )
-C	     CALL BDI_MAPVAR( OFID, 'WRITE', VAR_PTR, STATUS )
+C	     CALL BDI_MAPR( OFID, 'Variance', 'WRITE', VAR_PTR, STATUS )
 C	   END IF
            IF ( STATUS .NE. SAI__OK ) GOTO 99
          END IF
 
-*       Create background model
+*     Create background model
          IF ( CREBACK ) THEN
-           CALL BDI_CREDATA( BFID, NDIM, DIMS, STATUS )
-	   CALL BDI_MAPDATA( BFID, 'WRITE', BDATA_PTR, STATUS)
+	   CALL BDI_MAPR( BFID, 'Data', 'WRITE', BDATA_PTR, STATUS)
            IF ( .NOT. CREBSUB ) THEN
              ODATA_PTR = BDATA_PTR
              OFID = BFID
@@ -211,14 +201,14 @@ C	   END IF
          CALL DYN_MAPR( NDIM, DIMS, VAR_PTR, STATUS )
 	 CALL ARR_INIT1R( 0.0, NELM, %VAL(VAR_PTR), STATUS )
 
-*       Make copy of input data in output (bsub'd unless bmodel only being
-*       created)
+*      Make copy of input data in output (bsub'd unless bmodel only being
+*      created)
 	  CALL ARR_COP1R( DIMS(1)*DIMS(2), %VAL(DATA_PTR),
      :                    %VAL(ODATA_PTR), STATUS )
 
 	  IF(STATUS.NE.SAI__OK)THEN
 
-	    CALL ERR_REP(' ','Error in BDI_MAPDATA',STATUS)
+	    CALL ERR_REP(' ','Error mapping data',STATUS)
 	    GOTO 99
 
 	  END IF
@@ -230,17 +220,14 @@ C	   END IF
 	END IF
 	IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      Find total number of elements in dataset
+*    Find total number of elements in dataset
         CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
-*      Map quality from input
-	CALL BDI_CHKQUAL( IFID, QUAL_OK, TNDIM, TDIMS, STATUS )
+*    Map quality from input
+	CALL BDI_CHK( IFID, 'Quality', QUAL_OK, STATUS )
 	IF ( QUAL_OK ) THEN
-	  CALL BDI_MAPLQUAL( IFID, 'READ', ANYBAD, QUAL_PTR, STATUS )
-	  IF ( .NOT. ANYBAD ) THEN
-	    QUAL_OK = .FALSE.
-	    CALL BDI_UNMAPLQUAL( IFID, STATUS )
-	  END IF
+	  CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ',
+     :                   QUAL_PTR, STATUS )
 	END IF
 
 	NEXPAND=5
@@ -263,46 +250,41 @@ C	   END IF
 
 *  Find out if image scale is in degrees or arc mins and then get axis scale
 *  in arc secs
-	CALL BDI_GETAXUNITS( IFID, 1, UNITS, STATUS)
+	CALL BDI_AXGET0C( IFID, 1, 'Units', UNITS, STATUS)
         CALL CONV_UNIT2R( UNITS, SCF, STATUS )
 
         IF ( STATUS .NE. SAI__OK ) THEN
-           CALL MSG_PRNT( 'Unrecognised axis units' )
-           GOTO 99
-        ELSE
-
+          CALL MSG_PRNT( 'Unrecognised axis units' )
+          GOTO 99
         END IF
 
 *    Get axis 1 stuff
-	CALL BDI_GETAXVAL( IFID, 1, BASE, SCALE, DIM, STATUS )
-
-*    Get min and max values of the axes (for spatial filter)
-	AXIS1(1)=BASE
-	AXIS1(2)=BASE+(DIMS(1)-1)*SCALE
-	AXIS1(3)=SCALE
+        CALL BDI_AXMAPR( IFID, 1, 'Data', 'READ', AXPTR, STATUS )
+        CALL ARR_ELEM1R( AXPTR, DIMS(1), 1, AXIS1(1), STATUS )
+        CALL ARR_ELEM1R( AXPTR, DIMS(1), DIMS(1), AXIS1(2), STATUS )
+        AXIS1(3) = (AXIS1(2)-AXIS1(1))/REAL(DIMS(1)-1)
+        CALL BDI_AXUNMAP( IFID, 1, 'Data', AXPTR, STATUS )
 
 *    Convert to arcsec
 	IF(STATUS.EQ.SAI__OK)THEN
-	  SIZE = ABS(SCALE * SCF)
+	  SIZE = ABS(AXIS1(3) * SCF)
 	ELSE
 	  CALL ERR_REP(' ',' Error reading pixel scale ')
 	  GOTO 99
 	END IF
 
 *    Get axis 2 stuff
-	CALL BDI_GETAXVAL( IFID, 2, BASE, SCALE, DIM, STATUS )
+        CALL BDI_AXMAPR( IFID, 2, 'Data', 'READ', AXPTR, STATUS )
+        CALL ARR_ELEM1R( AXPTR, DIMS(2), 1, AXIS2(1), STATUS )
+        CALL ARR_ELEM1R( AXPTR, DIMS(2), DIMS(2), AXIS2(2), STATUS )
+        AXIS2(3) = (AXIS2(2)-AXIS2(1))/REAL(DIMS(2)-1)
+        CALL BDI_AXUNMAP( IFID, 2, 'Data', AXPTR, STATUS )
 
-*    Get min and max values of the axes (for spatial filter)
-	AXIS2(1)=BASE
-	AXIS2(2)=BASE+(DIMS(2)-1)*SCALE
-	AXIS2(3)=SCALE
-
-*    Get 68,95,99% limits on PSF
-*    Get pixel size in radians
-
+*  Get 68,95,99% limits on PSF
+*  Get pixel size in radians
        SCALE=SIZE		!*4.8481368E-06
 
-*    Get radii
+*  Get radii
       FRAC(1)=0.68
       FRAC(2)=0.80
       FRAC(3)=0.90
@@ -316,8 +298,8 @@ C	   END IF
       R_90=RADII(3)/SCALE
       R_95=RADII(4)/SCALE
 
-*    Get number pixels at 68%
-      NPIX_R_PSF=NINT(MATH__PI*RADII(1)*RADII(1))
+*  Get number pixels at 68%
+      NPIX_R_PSF = NINT(MATH__PI*RADII(1)*RADII(1))
 
 *    Tell user radii of PSF
 	IF(LOUD)THEN
@@ -367,7 +349,6 @@ C	   END IF
 *
 *
 *  map source detection arrays
-*
 	SDIM=10000
 	CALL DYN_MAPI(1,SDIM,X_S_PTR,STATUS)
 	CALL DYN_MAPI(1,SDIM,Y_S_PTR,STATUS)
@@ -377,16 +358,13 @@ C	   END IF
 	CALL DYN_MAPI(1,DIMS(2),COMPY_PTR,STATUS)
 
 	CALL DYN_MAPR(2,DIMS,SRCMAP_PTR,STATUS)
-*
-* create quality array
-*
-	CALL BDI_CREQUAL( OFID,2,DIMS,STATUS)
-	CALL BDI_PUTMASK( OFID,QUAL__MASK,STATUS)
-	CALL BDI_MAPQUAL( OFID,'WRITE',QUAL_PTR,STATUS)
-*
-* calculate the background
-*
-        ISTATUS=BSUB_SUBTRACT_BACKGROUND(DIMS(1),DIMS(2),
+
+*  Create quality array
+      CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
+      CALL BDI_MAPUB( OFID, 'Quality', 'WRITE',QUAL_PTR,STATUS)
+
+*  Calculate the background
+      ISTATUS=BSUB_SUBTRACT_BACKGROUND(DIMS(1),DIMS(2),
      &  %VAL(COMPX_PTR),%VAL(COMPY_PTR),SIZE,AXIS1,AXIS2,
      &  PSF_FDIMS(1),PSF_FDIMS(2),%VAL(PSF_FUNC),PSF_WDIMS(1),
      &  PSF_WDIMS(2),PSF_WDIMS(3),%VAL(PSF_WORK),PSFDIMS(1),
@@ -410,7 +388,6 @@ C	   END IF
 
 *
 *  unmap source detection arrays
-*
 	  CALL DYN_UNMAP(COMPX_PTR,STATUS)
 	  CALL DYN_UNMAP(COMPY_PTR,STATUS)
 	  CALL DYN_UNMAP(X_S_PTR,STATUS)
@@ -446,18 +423,12 @@ C	   END IF
 
 *    Release datasets
           CALL PSF_RELEASE( PSFHAN, STATUS )
-	  CALL BDI_RELEASE( IFID, STATUS )
 
           IF ( CREBSUB ) THEN
 
 *           Set BACKGROUND SUBTRACT flag to true
              CALL PRF_SET( OFID, 'BGND_SUBTRACTED', .TRUE., STATUS )
 
-	     CALL BDI_RELEASE( OFID, STATUS )
-
-          END IF
-          IF ( CREBACK ) THEN
-	     CALL BDI_RELEASE( BFID, STATUS )
           END IF
 
 	END IF		!if status OK after call to BSUB_SUBTRACT_BACKGROUND
@@ -2766,7 +2737,7 @@ d		  E(M+1)=1.D0
       CALL TCI_GETID( OFID, TIMID, STATUS )
 
 *  Get units - if /C in string then exposure corrected
-      CALL BDI_GETUNITS( OFID, UNITS, STATUS )
+      CALL BDI_GET0C( OFID, 'Units', UNITS, STATUS )
       IF(STATUS.NE.SAI__OK)THEN
 	CALL MSG_PRNT('ERROR: No UNIT information in header')
         CALL ERR_ANNUL( STATUS )
@@ -2926,7 +2897,6 @@ d		  E(M+1)=1.D0
 
 
 *+
-*
 *  Subroutine BSUB_GET_PSF_GRID reads in the PSF data.
 *
 	SUBROUTINE BSUB_GET_PSF_GRID(PSFHAN,SIZE,XCEN,YCEN,xoff,yoff,

@@ -275,7 +275,7 @@
       IF (NDIM .EQ. 2 .AND. INDEX(INSTMNT, 'XRT') .NE. 0) THEN
 
 *    Find which axis is the PH axis
-        CALL AXIS_TFIND( IFID, 'PHA', NDIM, E_AX, STATUS)
+        CALL BDI0_FNDAXC( IFID, 'E', E_AX, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Set the other axis
