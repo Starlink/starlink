@@ -18002,6 +18002,16 @@ iraf! {
       }
    }
 
+   command lutbrown {
+      alias {lutbr(own)}
+      task lutable {
+         taskinherit device
+         taskparam mapping=linear
+         taskparam coltab=external
+         taskparam {lut=$KAPPA_DIR/brown_lut}
+      }
+   }
+
    command lutcol {
       task lutable {
          taskinherit device
