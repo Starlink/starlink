@@ -2785,6 +2785,8 @@ c      LOGICAL VOK,QOK
 *  Status :
         INTEGER STATUS
 *  Local constants :
+	REAL PI, DTOR
+	PARAMETER (PI = 3.141592, DTOR = PI/180.0)
 *  Local variables :
       REAL XP,YP,XPC,YPC
       REAL AP,BP
@@ -2798,8 +2800,8 @@ c      LOGICAL VOK,QOK
 
         CALL PGUPDT(0)
 
-        SANG=SIND(ANGLE)
-        CANG=COSD(ANGLE)
+        SANG=SIN(ANGLE*DTOR)
+        CANG=COS(ANGLE*DTOR)
 
         CALL IMG_WORLDTOPIX(XC,YC,XPC,YPC,STATUS)
         AP=A/ABS(I_XSCALE)
@@ -2815,8 +2817,8 @@ c      LOGICAL VOK,QOK
 
 
           ANG=REAL(IA)
-          CA=COSD(ANG)
-          SA=SIND(ANG)
+          CA=COS(ANG*DTOR)
+          SA=SIN(ANG*DTOR)
 
           XP=XPC + AP*CA*CANG - BP*SA*SANG
           YP=YPC + AP*CA*SANG + BP*SA*CANG
@@ -3862,6 +3864,9 @@ c        REAL XX,XP,YP
 *    Status :
         INTEGER STATUS
 *    Function declarations :
+*    Local constants :
+	REAL PI, DTOR
+	PARAMETER (PI = 3.141592, DTOR = PI/180.0)
 *    Local variables :
       REAL XP,YP,XPC,YPC,X,Y
       REAL AP,BP
@@ -3874,8 +3879,8 @@ c        REAL XX,XP,YP
         AP=MAJOR/ABS(I_XSCALE)
         BP=MINOR/ABS(I_XSCALE)
 
-        CANG=COSD(ANGLE)
-        SANG=SIND(ANGLE)
+        CANG=COS(ANGLE*DTOR)
+        SANG=SIN(ANGLE*DTOR)
 
         I1=INT(XPC)
         I2=NINT(XPC)
@@ -3886,18 +3891,29 @@ c        REAL XX,XP,YP
 
 
           ANG=REAL(IA)
-          CA=COSD(ANG)
-          SA=SIND(ANG)
+          CA=COS(ANG*DTOR)
+          SA=SIN(ANG*DTOR)
 
           XP=XPC + AP*CA*CANG - BP*SA*SANG
           YP=YPC + AP*CA*SANG + BP*SA*CANG
 
-          I1=MAX(1,MIN(I1,INT(XP)))
-          I2=MIN(I_NX,MAX(I2,NINT(XP)))
-          J1=MAX(1,MIN(J1,INT(YP)))
-          J2=MIN(I_NY,MAX(J2,NINT(YP)))
+          II1=INT(XP)
+          II2=NINT(XP)
+          JJ1=INT(YP)
+          JJ2=NINT(YP)
+
+
+          I1=MIN(I1,II1)
+          I2=MAX(I2,II2)
+          J1=MIN(J1,JJ1)
+          J2=MAX(J2,JJ2)
 
         ENDDO
+
+        I1=MAX(1,I1)
+        I2=MIN(I_NX,I2)
+        J1=MAX(1,J1)
+        J2=MIN(I_NY,J2)
 
 	print *,i1,i2,j1,j2
 
@@ -4258,12 +4274,12 @@ c        REAL XX,XP,YP
         DISP=SQRT((XP-XPC)**2 + (YP-YPC)**2)
 
 *  get distance to ellipse along same line
-        THETA=ATAN2((YP-YPC),(XP-XPC))/DTOR
-        ALPHA=THETA-ANGLE
-        XP=XPC + AP*COSD(ALPHA)*COSD(ANGLE) -
-     :                    BP*SIND(ALPHA)*SIND(ANGLE)
-        YP=YPC + AP*COSD(ALPHA)*SIND(ANGLE) +
-     :                    BP*SIND(ALPHA)*COSD(ANGLE)
+        THETA=ATAN2((YP-YPC),(XP-XPC))
+        ALPHA=THETA-ANGLE*DTOR
+        XP=XPC + AP*COS(ALPHA)*COS(ANGLE*DTOR) -
+     :                    BP*SIN(ALPHA)*SIN(ANGLE*DTOR)
+        YP=YPC + AP*COS(ALPHA)*SIN(ANGLE*DTOR) +
+     :                    BP*SIN(ALPHA)*COS(ANGLE*DTOR)
         RAD=SQRT((XP-XPC)**2 + (YP-YPC)**2)
 
 
