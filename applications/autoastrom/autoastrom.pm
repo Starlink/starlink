@@ -429,7 +429,6 @@ sub get_catalogue ($\%$$) {
     }
 
     my @wcs = @{$NDFinforef->{wcs}};
-    #my @ndfbound = @{$NDFinforef->{limits}};
 
     # Pass the WCS information to moggy, declaring that future points
     # will be specified in the pixel domain.
@@ -441,10 +440,14 @@ sub get_catalogue ($\%$$) {
     # 10% in linear dimension), anticipating some misalignment in the
     # initial astrometry.  The code below appears specific to the
     # case (p1=lower-left, p2=upper-right), but it isn't, in fact.
-    my $p1x = $NDFinforef->{x0};#$ndfbound[0];
-    my $p1y = $NDFinforef->{y0};#$ndfbound[1];
-    my $p2x = $NDFinforef->{x1};#$ndfbound[2];
-    my $p2y = $NDFinforef->{y1};#$ndfbound[3];
+    #
+    # XXX should we make this margin of 10% configurable?  Probably
+    # not -- it doesn't matter here if the projection pole is off the
+    # plate, as long as the centre of _this_ plate is reasonably accurate.
+    my $p1x = $NDFinforef->{x0};
+    my $p1y = $NDFinforef->{y0};
+    my $p2x = $NDFinforef->{x1};
+    my $p2y = $NDFinforef->{y1};
     my $sizex = $p2x-$p1x;
     my $sizey = $p2y-$p1y;
     my $p1xq = $p1x-0.1*$sizex;
@@ -454,8 +457,6 @@ sub get_catalogue ($\%$$) {
     $cat->searchtype('box');
     $cat->point     ($p1xq, $p1yq);
     $cat->otherpoint($p2xq, $p2yq);
-    #$cat->point($ndfbound[0], $ndfbound[1]);
-    #$cat->otherpoint($ndfbound[2], $ndfbound[3]);
 
     # Get a decent number of points
     $cat->maxrow($maxobj);
@@ -671,7 +672,7 @@ sub match_positions ($$$$$) {
 # It may additionally contain keys:
 #    astrom         : Results from last ASTROM run, or undef or empty hash
 #		      if none available (ie, first time) (ref to hash).
-#    nterms	    : Number of fit terms to try.
+#    maxnterms	    : Maximum number of fit terms to try.
 #		      6=fit posn, 7=q, 8=centre, 9=q&centre (default 6).
 #    findoffboxprop : Proportion of points assumed to lie in the FINDOFF
 #		      error box (default 0.5).
@@ -683,7 +684,7 @@ sub generate_astrom ($) {
 	defined($par->{$k})
 	  || croak "bad call to generate_astrom: parameter $k not specified\n";
     }
-    my $nterms = (defined($par->{nterms}) ? $par->{nterms} : 6);
+
     my $tempfn = $par->{tempfn};
 
     # Best astrometry so far, as a FITS file, or undef if none yet.
@@ -726,6 +727,19 @@ sub generate_astrom ($) {
     ($#CCDarray == $#CATarray)
       || die "generate_astrom: input files have different number of matches\n";
 
+
+    # {maxnterms} is the maximum number of fit terms to try, and
+    # $nterms is the number we will try in fact.  Unless we have more
+    # than 10 reference stars _and_ adequate Observation Data, $nterms
+    # should be at most 6.
+    my $nterms = (defined($par->{maxnterms}) ? $par->{maxnterms} : 6);
+    if ($nterms > 6 && ! (defined($par->{NDFinfo}->{astromtime})
+			  && defined($par->{NDFinfo}->{astromobs})
+			  && defined($par->{NDFinfo}->{astromcol})
+			  && ($#CCDarray >= 10))) {
+	print STDERR "generate_astrom: Not enough observation data, I'm doing only a 6-parameter fit\n";
+	$nterms = 6;
+    }
 
     #+ Want to calculate $\bar x=(\sum^n x_i)/n$ and
     # $M_x=\sum^n(x_i-\bar x)^2 = \sum x_i^2 - (\sum x_i)^2/n$, and
@@ -1045,10 +1059,12 @@ sub generate_astrom ($) {
 # Return an array of references to anonymous hashes, each containing
 # fields {nterms}, {q}, {rarad}, {decrad} (RA and Dec in radians),
 # {rasex}, {decsex} (RA and Dec in sexagesimal notation), {wcs} (name
-# of FITS-WCS file), {nstars}, {prms} (RMS residual in pixels).
+# of FITS-WCS file), {nstars}, {prms} (RMS residual in pixels),
+# {STATUS} (true if the fit was OK, false otherwise).
 #
-# Each reference is to a fit which worked -- fits which didn't work
-# (for any reason) are ignored in the output.
+# Return information about _all_ the fits, even the ones which didn't
+# work.  The field {STATUS} will always be defined, and if the fit
+# didn't work, it'll be set to 0=false.
 #
 # The residual is the sum of the squares of the X and Y pixel residuals.
 #
@@ -1092,16 +1108,33 @@ sub run_astrom ($$) {
     my %results;
     while (defined ($l=<SUM>)) {
 	chop $l;
-	($l =~ /^FIT/) && do { %results = (); next; };
+	($l =~ /^FIT/) && do {
+	    %results = ();
+	    $results{STATUS} = 0; # initialise to false
+	    next;
+	};
 
 	($l =~ /^RESULT +(\S+)\s+(\S+)/)
 	  && do { $results{$1} = $2;
 		  #print STDERR "run_astrom: RESULT $1=$2\n";
 		  next; };
 
+	($l =~ /^STATUS +(\S+)/)
+	  && do {
+	      if ($1 eq 'OK') {
+		  $results{STATUS} = 1;
+	      } elsif ($1 eq 'BAD') {
+		  $results{STATUS} = 0;
+	      } else {
+		  print STDERR "ASTROM logfile: unrecognised STATUS\n";
+		  $results{STATUS} = 0;
+	      }
+	      next;
+	  };
+
 	($l =~ /^ENDFIT/) && do {
 	    scalar(%results) || do {
-		print STDERR "ASTROM logfile malformed!\n";
+		print STDERR "ASTROM logfile: no results!\n";
 		next;
 	    };
 	    my %t = %results;	# create new hash
