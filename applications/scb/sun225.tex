@@ -344,20 +344,17 @@ perhaps with reference to section \ref{BROWSER-HELP}.
 
 The files comprising SCB should be obtained and installed into
 the Starlink tree in more or less the usual way.
-However, there are some environment variables which affect the
+There are some environment variables which affect the
 installation, determining for instance the locations of the 
-indexes, the Perl binary and temporary directories.  
-All default to sensible values, and the most important ones
-are described below, but the comments in the
-{\tt mk} script should be read and modifications made,
-or environment variables set, accordingly.
-
-Some of the environment variables can be used in two ways:
-when set before building the package (the {\tt mk build} step)
-they modify the default behaviour of the programs any time they are run.  
-If the environment variables are set when the programs are being
-run however, this value overrides the defaults set at build time.
-These variables are:
+indexes and temporary directories.  
+All default to sensible values, but if you are building the package
+you can tailor them to your requirements.
+If you have a pre-built version of the package for your system,
+the default built values 
+(recorded in the {\tt scb_datestamp} file)
+cannot be changed, but they can 
+be overridden if the same environment variables are set at run time.
+These variables are as follows:
 \begin{description}
 \item[SCB\_SOURCES]
 The directory containing the Starlink source code.  
@@ -369,12 +366,12 @@ respectively).
 The former of these is the usual format if the sources are in
 their usual location, {\tt /star/sources}.
 If undefined at build time and run time, SCB\_SOURCES 
-defaults to {\tt /star/sources}.
+defaults to {\tt \$STARLINK/sources}.
 \item[SCB\_INDEX]
 The directory containing the index files (around 5--10 Mbyte for the full
 Starlink source collection).
 If undefined at build time and run time, SCB\_INDEX defaults to
-{\tt /star/etc/scb}.
+{\tt $INSTALL/etc/scb}.
 \item[SCB\_BROWSER\_TMP]
 The directory used by the browser program to store temporary files. 
 If undefined at build time and run time, SCB\_BROWSER\_TMP defaults to
@@ -401,15 +398,17 @@ If undefined at build time, HTX\_SERVER defaults to
 This should give the location of a MIME type mapping file,
 which can probably be found named {\tt mime.types}
 as part of the HTTP server installation.
-It is used to serve some non-text documents as their proper MIME types,
+It is used for the CGI script
+to serve some non-text documents as their proper MIME types,
 but not much functionality is lost if it does not point to a suitable file.
 \end{description}
+The build-time values of all these variables will be recorded
+in the file 
 
-An example site installation might go as follows:
+An example site installation from source files might go as follows:
 \begin{quote}
 \begin{verbatim}
 % zcat scb.tar.Z | tar xf -
-% setenv PERL5 /usr/bin/perl
 % setenv SCB_BROWSER_TMP /scratch/scb/browser
 % setenv SCB_INDEXER_TMP /scratch/scb/indexer
 % setenv INSTALL /star
@@ -423,10 +422,17 @@ An example site installation might go as follows:
 *** Installation test for the SCB package has been run
 \end{verbatim}
 \end{quote}
-
-Note that the variables defining installation directories 
-etc.\ must be defined at {\em build} time, 
-and not between building and installation.
+or from a pre-built package:
+\begin{quote}
+\begin{verbatim}
+% zcat scb_ix86_Linux_run.tar.Z | tar xf -
+% setenv INSTALL /star
+% mk install
+    ...
+% mk test
+    ...
+\end{verbatim}
+\end{quote}
 
 The program uses a DBM file to store the indexes on disk.
 There will always be at least one library available on your system
@@ -453,9 +459,10 @@ Typically, BSD DB will be installed on a Linux or Digital Unix system,
 but a Solaris system may lack all of the preferred implementations. 
 
 
-
-SCB requires Perl 5.  It was developed using version 5.004\_04.
-Earlier versions of Perl may work, but have not been tested.
+SCB requires Perl 5
+and has been tested using the version distributed with the 
+Starlink software collection. 
+Other versions of Perl may work, but have not been tested.
 
 
 \subsection{\xlabel{sec:install-cgi}\label{sec:install-cgi}Installing the CGI script}
@@ -946,10 +953,12 @@ if you have built your own index).
 
 
 The top level page of the source code browser is a form
-with the following parts:
+which can be filled in to request a particular source file.
+It consists of the following parts:
 \begin{description}
 \item[Name of item]
-The name of the file or function/subroutine to locate, or the search term.
+The name of the file or function/subroutine to locate, 
+or a regular expression matching a file or routine.
 \item[Type of item]
 Describes how to interpret the ``Name of item'' box.  Select one of:
 \begin{description}
@@ -966,16 +975,16 @@ Describes how to interpret the ``Name of item'' box.  Select one of:
    The item is a filename.  This is case sensitive.
    \item[Either]
    The browser will try both of the above options (File and Routine).
-   \item[Search term]
+   \item[Regular expression]
    The item name is a Perl 5 regular expression, 
-   interpreted case-insensitively;
-   the browser will present a list of all the routines or filenames 
-   which match it.
+   interpreted case-insensitively,
+   to match the name of a file or function/subroutine
+   (note it does {\em not\/} match the full text of source files).
    For most practical purposes, Perl regular expressions are a superset
    of ordinary regular expressions, so they can be treated like the 
    argument of a `{\tt grep -i}' command.
-   A case sensitive search can be achieved by prepending `{\tt (?-i)}' to the
-   regular expression; however this requires Perl 5.005.
+   % A case sensitive search can be achieved by prepending `{\tt (?-i)}' to the
+   % regular expression; however this requires Perl 5.005.
 \end{description}
 \item[Name of package (optional)]
 If one of the listed packages is selected, it serves
@@ -986,9 +995,19 @@ If it is not in that package, or if no package is specified,
 then any such item in the whole source tree will be presented.
 In particular, this means that even when one package is specified here,
 a routine from another package may be presented.\\
-If the Type of item is ``Search term'' however, then filling in this
+If the Type of item is ``Regular expression'' however, then filling in this
 field will restrict the search to the named package.
 \end{description}
+If the type of item is ``Routine'' or ``File'', then submitting
+the form will take you to the unit requested, or a message
+that no such unit can be found
+(note that these will take you to the top of the file,
+not necessarily where the requested routine begins ---
+if this makes it hard to find the right place, you can browse the
+package and follow a link to the routine, as described below).
+If the type of item is ``Regular expression'', 
+it will present a list of links to
+matching files.
 
 Instead of entering the name of the file or routine you wish to
 see, you can browse the contents of a given package.
@@ -1015,7 +1034,7 @@ the names of commands which can be invoked from the Unix shell or ICL.
 Because the way these are identified is rather ad hoc,
 the list may be incomplete and/or contain spurious entries.
 \end{description}
-Sometimes the `Files' or `Routines' heading is a hyperlink to 
+Sometimes the ``Files'' or ``Routines'' heading is a hyperlink to 
 the actual lists of links, rather than having the list on the page.
 
 Following any of the listed links 
