@@ -1,5 +1,4 @@
 !  UNIX private parameter values used in NDG.
-      INTEGER   NDG__MAXIL    ! Max. no. of NDF identifier issued by NDG
       CHARACTER NDG__NDFTP*4  ! NDF/HDS file type.
       INTEGER   NDG__SZFMT    ! Size of string holding NDF formats list
       LOGICAL   NDG__UCASE    ! True if all file names are to be 
@@ -9,7 +8,6 @@
       CHARACTER NDG__STRUC*9  ! HDS type for structures created by NDG
 
       PARAMETER (
-     :            NDG__MAXIL = 100,
      :            NDG__NDFTP = '.sdf',
      :            NDG__SZFMT = 1024,
      :            NDG__UCASE = .false.,
