@@ -680,8 +680,9 @@
 *  spanned by the axes which are to mapped linearly onto the graphics 
 *  screen (distance from the starting point on the first axis, and raw 
 *  or logged data value on the second axis). This Frame corresponds to 
-*  the "uniform" co-ordinate system. A flag is returned if any of the 
-*  required Mappings do not have an inverse transformation. 
+*  the "uniform" co-ordinate system, and is given the Domain AGI_WORLD. A 
+*  flag is returned if any of the required Mappings do not have an inverse 
+*  transformation. 
       CALL  KPS1_LPLFS( INDF, IWCS, DIST, IAXIS, DIM, YLOG, MCOMP,
      :                  UNITS( : NCU ), NOINV, FSET, STATUS )
 
@@ -864,8 +865,8 @@
       CALL KPG1_PLOTA( AST__NULL, 'UNKNOWN', ' ', IPIC0, IPICD0, IPLOT, 
      :                 STATUS )
 
-*  Set a flag the new DATA picture should be created covering the same
-*  area as an existing DATA picture.
+*  Set a flag to indicate the new DATA picture should be created covering 
+*  the same area as an existing DATA picture.
       OLDPIC = ( IPLOT .NE. AST__NULL )
 
 *  Indicate we have not yet created the new DATA picture.
@@ -1236,7 +1237,8 @@
 
 *  Save the Plot and data reference with the new DATA picture. The Frame
 *  with index ICURR0 is made the current Frame for the Plot in AGI database.
-      CALL KPG1_PLOTS( IPLOT, IPICD, NDFNAM( : NC ), ICURR0, STATUS )
+      CALL KPG1_PLOTS( IPLOT, IPICD, NDFNAM( : NC ), ICURR0, 
+     :                 'AGI_WORLD', 'DATAPLOT', STATUS )
 
 *  If the user did not specify a Plot title (as indicated by the Plot title
 *  being the same as the FSET title), make the NDF Title the default Title for 

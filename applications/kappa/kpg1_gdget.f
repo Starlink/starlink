@@ -42,7 +42,7 @@
 *     DATA co-ordinates. This Frame will have Domain AGI_DATA, and the
 *     Mapping from world to data co-ordinates will be given by the
 *     TRANSFORM structure stored with the picture in the database. If
-*     present, it will be the Current Frame int the Plot on exit. See
+*     present, it will be the Current Frame in the Plot on exit. See
 *     "Usage" below for warnings about using this option.
 
 *  Usage:
@@ -86,20 +86,14 @@
 *     Frame and a world co-ordinate Frame as described above. A DATA
 *     co-ordinate Frame can optionally be included in the initial Plot
 *     (see below).
-*     -  The facility provided by AGI for storing a TRANSFORM structure
-*     defining AGI "DATA" co-ordinates complicates things. If an AST-based 
-*     application creates a new AGI picture, it should NOT store any DATA
-*     co-ordinates with the picture, either in the form of a TRANSFORM 
-*     structure, or in the form of Frames with Domain AGI_DATA in the Plot.
-*     -  If a AST-based application accesses an existing picture (created
-*     by a non-AST application) which has an associated TRANSFORM structure, 
-*     then the initial Plot created by this routine can optionally include
-*     a Frame with Domain AGI_DATA. This Frame will be connected to the 
-*     world co-ordinate Frame using an AST IntraMap which encapsulates the 
-*     mapping implemented by the TRANSFORM structure in the AGI database.
-*     If this option is selected, there are some restrictions on what can
-*     and cannot be done with the returned Plot, because of the potential
-*     presence of the IntraMap: 
+*     -  If an AST-based application accesses an existing picture which has 
+*     an associated TRANSFORM structure, then the Plot created by this 
+*     routine can optionally include a Frame with Domain AGI_DATA. This 
+*     Frame will be connected to the world co-ordinate Frame using an AST 
+*     IntraMap which encapsulates the mapping implemented by the TRANSFORM 
+*     structure in the AGI database. If this option is selected, there are 
+*     some restrictions on what can and cannot be done with the returned Plot, 
+*     because of the potential presence of the IntraMap: 
 *        1) The Plot must not be combined with another Plot if the other 
 *        Plot may also contain an AGI_DATA Frame.
 *        2) Before using the Plot (or a derived Mapping) to transform

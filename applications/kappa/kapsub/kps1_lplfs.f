@@ -32,7 +32,7 @@
 *        Axis 2 - Supplied data value.
 *
 *     Frame 2: This is the Frame which is to be mapped uniformly onto the
-*              graphics screen. 
+*              graphics screen, and is given the Domain AGI_WORLD. 
 *        Axis 1 - The distance from the first grid element, measured
 *                 along the profile.
 *        Axis 2 - This will correspond to raw data value if YLOG is
@@ -408,6 +408,9 @@
 
 *  Clear the Domain (set to DATAPLOT in the "what we want" Frame).
       CALL AST_CLEAR( UNIFRM, 'DOMAIN', STATUS )
+
+*  Set the new Domain ("AGI_WORLD").
+      CALL AST_SETC( UNIFRM, 'DOMAIN', 'AGI_WORLD', STATUS )
 
 *  Now create the returned FrameSet.
 *  =================================

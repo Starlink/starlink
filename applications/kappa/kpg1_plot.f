@@ -52,6 +52,15 @@
 *     different to the world co-ordinate system stored in the AGI database 
 *     with the new DATA picture.
 *
+*     If the returned Plot contains an AXIS Frame in which the axes are
+*     scaled and shifted versions of the axes of the AGI world co-ordinate 
+*     Frame (specified by argument DOMAIN), then a TRANSFORM structure is
+*     stored with the new DATA picture which defines AGI Data co-ordinates.
+*     This is purely for the benefit of non-AST based applications which
+*     may use AGI Data co-ordinates (AST-based applications should always
+*     use the Plot stored with the picture in preference to the TRANSFORM
+*     structure stored in the AGI database).
+*
 *     Various environment parameters are used to obtain options, etc. The
 *     names of these parameters are hard-wired into this subroutine in
 *     order to ensure conformity between application. 
@@ -138,9 +147,8 @@
 *        of zero is supplied, then the largest DATA picture is used 
 *        irrespective of FILL (which is then not accessed).
 *     DOMAIN = CHARACTER * ( * ) (Given)
-*        The Domain for AGI world co-ordinates. Only used if a FrameSet is 
-*        supplied (IWCS). If a blank value is supplied then "AGI_WORLD"
-*        will be used.
+*        The Domain name corresponding to the AGI world co-ordinates. If a 
+*        blank value is supplied then "AGI_WORLD" will be used.
 *     BOX( 4 ) = DOUBLE PRECISION (Given)
 *        The coordinates to be assigned to the bottom left, and top right 
 *        corners of the DATA picture in the AGI database (the coordinate 
@@ -194,6 +202,9 @@
 *  History:
 *     14-JUL-1998 (DSB):
 *        Original version.
+*     4-DEC-1998 (DSB):
+*        Added facilities for storing a TRANSFORM structure with the new
+*        DATA picture for the benefit of non-AST applications.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -284,8 +295,10 @@
 *  picture Plot, aligning the FrameSet and Plot in a suitable Frame. 
          IF( IWCS .NE. AST__NULL ) THEN
             CALL KPG1_ASMRG( IPLOT, IWCS, DOMAIN, .FALSE., 0, STATUS )
-            ALIGN = ( STATUS .EQ. SAI__OK ) 
          END IF
+
+*  Store a flag indicating if the alignment occurred.
+         ALIGN = ( STATUS .EQ. SAI__OK ) 
 
 *  If no existing DATA picture was found indicate that the stored Plot 
 *  should retain its original Current Frame.
@@ -306,8 +319,12 @@
 *  Set the attributes of the Plot to give the required Plotting style.     
       CALL KPG1_ASSET( APP, 'STYLE', IPLOT, STATUS )
 
-*  Save the Plot and data reference with the new DATA picture.
-      CALL KPG1_PLOTS( IPLOT, IPICD, DATREF, ICURR0, STATUS )
+*  Save the Plot and data reference with the new DATA picture. If possible,
+*  a TRANSFORM structure is stored with the AGI picture giving "AGI Data"
+*  co-ords for the benefit of non_AST applications. The Data co-ordinates
+*  are defined by any AXIS Frame in the Plot.
+      CALL KPG1_PLOTS( IPLOT, IPICD, DATREF, ICURR0, DOMAIN, 'AXIS', 
+     :                 STATUS )
 
 *  Export the Plot pointer so that it does not get annulled by the
 *  following call to AST_END. If an error has occurred, the pointer will
