@@ -3,6 +3,8 @@
 *    C functions replacing Fortran routines for handling the symbol HASH table
 */
 
+#include <string.h>
+#include <stdio.h>
 #include "f77.h"
 #include "symbols.h"
 
