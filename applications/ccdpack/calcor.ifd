@@ -120,7 +120,7 @@
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_preser
             default TRUE
-            prompt {Do you want to preserve the input type}
+            prompt "Do you want to preserve the input type[ccd_global]"
             helpkey *
           }
 
@@ -143,7 +143,7 @@
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto
-            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            prompt "Write log to (Logfile,Terminal,Neither,Both)[ccd_global]"
             default Both
             helpkey *
           }
@@ -155,7 +155,7 @@
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logfile
-            prompt {Logfile name}
+            prompt "Logfile name[ccd_global]"
             default CCDPACK.LOG
             helpkey *
           }
@@ -167,7 +167,7 @@
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default FALSE
-            prompt {Saturated data set to a non-BAD value}
+            prompt "Saturated data set to a non-BAD value[ccd_global]"
             helpkey *
           }
 
@@ -178,7 +178,7 @@
             vpath CURRENT PROMPT DEFAULT
             ppath CURRENT DEFAULT
             default 1.0D6
-            prompt {Saturation value}
+            prompt "Saturation value[ccd_global]"
             helpkey *
           }
 
