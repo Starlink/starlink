@@ -17,9 +17,12 @@
 *    History:
 *     $Id$
 *     $Log$
-*     Revision 1.1  1996/09/18 02:02:07  timj
-*     Initial revision
+*     Revision 1.2  1996/09/18 02:16:51  timj
+*     Add bad bit mask
 *
+c Revision 1.1  1996/09/18  02:02:07  timj
+c Initial revision
+c
 *    endhistory
 *    Type definitions:
       IMPLICIT NONE
@@ -43,6 +46,7 @@
       INTEGER MAX_FILE                  ! Max number of files
       PARAMETER (MAX_FILE = 20)
 *    Local variables:
+      BYTE          BADBIT              ! Bad bit mask
       CHARACTER*15  BOL(MAXCMP)         ! Name of bolometers present in NDF
       CHARACTER*15  BOLOMETER           ! Selected bolometer
       CHARACTER*(MAXCMP*15) BOL_LIST    ! List of all bolometers in NDF
@@ -311,7 +315,9 @@
          CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
          CALL NDF_CPUT(TITLE, OUT_NDF, 'Title', STATUS)
          CALL NDF_CPUT('Signal', OUT_NDF, 'LAB', STATUS)
-
+         
+         BADBIT = 1
+         CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
       ELSE 
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
