@@ -69,6 +69,9 @@ itcl::class gaia::GaiaImageCtrl {
       lappend tags mytag$this
       bindtags $canvas_ $tags
 
+      #  Create an object for handling image names.
+      set namer_ [GaiaImageName \#auto]
+
       #  Remove options we're overriding from base classes.
       itk_option remove rtd::RtdImage::show_object_menu
       itk_option remove rtd::RtdImage::drag_scroll
@@ -92,6 +95,10 @@ itcl::class gaia::GaiaImageCtrl {
 
       if { $after_id_ != {} } {
          catch {after cancel $after_id_}
+      }
+
+      if { $namer_ != {} } { 
+	 catch {delete object $namer_}
       }
    }
 
@@ -362,17 +369,7 @@ itcl::class gaia::GaiaImageCtrl {
    #  ability to deal with a list of possible file extensions and a
    #  possible image slice to this method.
    public method open {{dir "."} {pattern "*.*"}} {
-
       set file [get_file_ $dir $pattern $itk_option(-file_types)]
-
-      #  Deal with any slice information.
-      set image $file
-      set i1 [string last {(} $file]
-              set i2  [string last {)} $file]
-      if { $i1 > -1 && $i2 > -1 } {
-         incr i1 -1
-         set image [string range $image 0 $i1]
-      }
       if {"$file" != ""} {
          if { $last_file_ != "" } {
             #  Already have a displayed image. Check that we do
@@ -380,8 +377,11 @@ itcl::class gaia::GaiaImageCtrl {
             maybe_delete_
             delete_temporary_
          }
-         if {[file isfile $image]} {
-            configure -file $file
+
+	 #  Parse name to deal with slices etc. and make this current.
+	 $namer_ configure -imagename $file
+	 if { [$namer_ exists] } { 
+            configure -file [$namer_ fullname]
          } else {
             error_dialog "There is no file named '$file'" $w_
          }
@@ -400,28 +400,31 @@ itcl::class gaia::GaiaImageCtrl {
        }
    }
 
-   #  Save the current image to a file in FITS format chosen from a
-   #  file name dialog (added file patterns and .fit as default
-   #  extension and update to temporary status).
+   #  Save the current image to a file chosen from a file name dialog
+   #  (added file patterns and .fit as default extension and update to
+   #  temporary status).
    public method save_as {{dir "."} {pattern "*.*"}} {
       if {[$image_ isclear]} {
          warning_dialog "No image is currently loaded" $w_
          return
       }
+
       #  Special case: if input file is a FITS file then we can only
       #  save it as a fits file. NDFs may be saved as other formats.
-      set exten [file extension $itk_option(-file)]
+      $namer_ configure -imagename $itk_option(-file)
+      set exten [$namer_ type]
       if {  $exten == ".fit" || $exten == ".fits" } {
          set file [get_file_ $dir $pattern {{any * } {FITS *.fits} {FIT *.fit}}]
       } else {
          set file [get_file_ $dir $pattern $itk_option(-file_types)]
       }
       if {"$file" != ""} {
-         if {[file isfile $file]} {
+	 $namer_ configure -imagename $file
+         if {[$namer_ exists]} {
             if {![confirm_dialog "$file exists - Do you want to overwrite it ?" $w_]} {
                return
             }
-            if {[file isdir $file]} {
+            if {[file isdir [$namer_ diskfile]]} {
                error_dialog "$file is a directory" $w_
                return
             }
@@ -483,27 +486,21 @@ itcl::class gaia::GaiaImageCtrl {
       skycat::SkyCatCtrl::clear
    }
 
-   #  Load a FITS file (internal version: use -file option/public
-   #  variable), modified to deal with image slices.
+   #  Load an image (internal version: use -file option/public
+   #  variable), modified to deal with NDF image names.
    public method load_fits_ {} {
 
       #  See if the image should be saved (image server types).
       check_save
 
-      #  Deal with any slice specification.
-      set image $itk_option(-file)
-      set i1 [string last {(} $image]
-      set i2  [string last {)} $image]
-      if { $i1 > -1 && $i2 > -1 } {
-         incr i1 -1
-         set image [string range $image 0 $i1]
-      }
-      if {[file exists $image] || "$itk_option(-file)" == "-"} {
+      #  Parse filename.
+      $namer_ configure -imagename $itk_option(-file)
+      if { [$namer_ exists] } {
          set old_width [$image_ width]
          set old_height [$image_ height]
          busy {
             set center_ok_ 0
-            if {[catch {$image_ config -file $itk_option(-file) \
+            if {[catch {$image_ config -file [$namer_ fullname] \
                            -component $itk_option(-component)} msg]} {
                error_dialog $msg $w_
                clear
@@ -696,6 +693,9 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  Id of after event (used to autoscroll image).
    protected variable after_id_ {}
+
+   #  Name of image names handler.
+   protected variable namer_ {}
 
    #  Common variables:
    #  =================

@@ -46,38 +46,161 @@ if { $argc >= 1 } {
    exit
 }
 
-#  Define a useful procedure for handling image names with slices.
-proc fileName {image} {
-
-   # Return the proper filename of an image and any slice information.
-   set i1 [string last {(} $image]
-   set i2  [string last {)} $image]
-   if { $i1 > -1 && $i2 > -1 } {
-      set slice [string range $image $i1 $i2]
-      incr i1 -1
-      set image [string range $image 0 $i1]
-   } else {
-      set slice ""
+#  Define class for dealing with image names (included so will work
+#  with single binaries).
+itcl::class GaiaImageName {
+   constructor {args} {
+      eval configure $args
    }
-   set image2 "$image"
-   if { [file extension $image] == "" } {
-      set image "${image}.sdf"
+   destructor  {
    }
-   return [list $image $slice]
+   public method fullname {} {
+      return $fullname_
+   }
+   public method diskfile {} {
+      return $diskfile_
+   }
+   public method slice {} {
+      return $slice_
+   }
+   public method path {} {
+      return $path_
+   }
+   public method type {} {
+      return $type_
+   }
+   public method exists {} {
+      if { [file readable $diskfile_] && [file isfile $diskfile_] } {
+	 return 1
+      } else {
+	 return 0
+      }
+   }
+   public method absolute {} {
+      if { ! [string match {/*} $imagename] } {
+	 if { ! [catch {set here [pwd]}] } {
+            if { [string range $here 0 7] == "/tmp_mnt" } {
+               set here [string range $here 8 end]
+            }
+	    set imagename "$here/$imagename"
+	    parse_name_
+	 }
+      }
+   }
+   protected method parse_name_ {} {
+      reset_
+      get_slice_
+      get_type_
+      if { ! [check_type_] } {
+	 get_path_
+      }
+      get_diskfile_
+      get_fullname_
+   }
+   protected method get_slice_ {} {
+      set i1 [string last {(} $imagename]
+      set i2  [string last {)} $imagename]
+      if { $i1 > -1 && $i2 > -1 } {
+	 set slice_ [string range $imagename $i1 $i2]
+      } else {
+	 set slice_ ""
+      }
+   }
+   protected method get_type_ {} {
+      set tail [file tail $imagename]
+      set i1 [string first {.} $tail]
+      if { $i1 > -1 } {
+	 set type_ [string range $tail $i1 end]
+      } else {
+	 set type_ ".sdf"
+      }
+   }
+   protected method check_type_ {} {
+      if { [string match ".fit*" $type_] ||
+	   [string match ".FIT*" $type_] ||
+	   [string match ".sdf" $type_] } {
+	 return 1
+      }
+      global env
+      if { [info exists env(NDF_FORMATS_IN)] } {
+	 if { [string first $type_ $env(NDF_FORMATS_IN)] > -1 } {
+	    return 1
+	 }
+      }
+      return 0
+   }
+   protected method get_diskfile_ {} {
+      set i1 [string first $type_ $imagename]
+      if { $i1 > -1 } {
+	 incr i1 -1
+	 set diskfile_ "[string range $imagename 0 $i1]$type_"
+      } else {
+	 set i1 [string first $path_ $imagename]
+	 if { $i1 > -1 } {
+	    incr i1 -1
+	    set diskfile_ "[string range $imagename 0 $i1]$type_"
+	 } else {
+	    if { $slice_ != {} } {
+	       set i2 [expr [string first $slice_ $imagename]-1]
+	    } else {
+	       set i2 end
+	    }
+	    set diskfile_ "[string range $imagename 0 $i2]$type_"
+	 }
+      }
+   }
+   protected method get_fullname_ {} {
+      set fullname_ "$diskfile_$path_$slice_"
+   }
+   protected method get_path_ {} {
+      set i1 [string first {.sdf} $type_]
+      if { $i1 > -1 } {
+	 set i1 [expr $i1+4]
+	 if { $slice_ != {} } {
+	    set i2 [expr [string first $slice_ $type_]-1]
+	 } else {
+	    set i2 end
+	 }
+	 set path_ [string range $type_ $i1 $i2]
+	 
+      } else {
+	 if { $slice_ != {} } {
+	    set i2 [expr [string first $slice_ $type_]-1]
+	 } else {
+	    set i2 end
+	 }
+	 set path_ [string range $type_ 0 $i2]
+      }
+      set type_ ".sdf"
+   }
+   protected method reset_ {} {
+      set fullname_ {}
+      set diskfile_ {}
+      set slice_ {}
+      set path_ {}
+      set type_ {.sdf}
+   }
+   public variable imagename {} {
+      if { $imagename != {} } {
+	 parse_name_
+      }
+   }
+   protected variable fullname_ {}
+   protected variable diskfile_ {}
+   protected variable slice_ {}
+   protected variable path_ {}
+   protected variable type_ {.sdf}
 }
 
-#  See if the file exists and it so transform into an absolute name
-#  (GAIA may not be running in this directory).
-lassign [fileName $image] image slice
-if { ! [file readable $image] } { 
+#  Now parse name.
+set namer [GaiaImageName .namer -imagename $image]
+if { ! [$namer exists] } { 
    puts stderr "Cannot read image: $image"
    exit 1
-} else { 
-   if { ! [string match {/*} $image] } {
-      #  Name isn't absolute so must be relative.
-      set image [pwd]/$image
-   }
 }
+
+#  Make it absolute (also stripping off tmp_mnt, if present).
+$namer absolute
 
 #  Open a socket to a GAIA application and return the file descriptor
 #  for remote commands. If a GAIA isn't found then start one up.
@@ -160,9 +283,9 @@ set gaia [send_to_gaia remotetcl $cmd]
 
 #  Construct the command needed to display the image.
 if { $clone != "" } { 
-   set cmd "$gaia noblock_clone $clone $image"
+   set cmd "$gaia noblock_clone $clone [$namer fullname]"
 } else {
-   set cmd "$gaia open $image"
+   set cmd "$gaia open [$namer fullname]"
 }
  
 #  And send the command.

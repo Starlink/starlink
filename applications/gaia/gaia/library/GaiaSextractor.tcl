@@ -377,6 +377,9 @@ itcl::class gaia::GaiaSextractor {
       #  Set up ellipse drawing.
       toggle_draw_kron_ellipses_
       toggle_draw_iso_ellipses_
+
+      #  Create an object for dealing with image names.
+      set namer_ [GaiaImageName \#auto]
    }
 
    #  Destructor:
@@ -389,6 +392,9 @@ itcl::class gaia::GaiaSextractor {
       }
       if { $star_sex_ != {} } {
          $star_sex_ delete_sometime
+      }
+      if { $namer_ != {} } {
+	 catch {delete object $namer_}
       }
    }
 
@@ -1907,7 +1913,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Run the SExtractor program. This writes the current configs out,
    #  runs the program and then displays the resultant
-   #  catalogue. "args" are a command to run when the measurements are 
+   #  catalogue. "args" are a command to run when the measurements are
    #  available.
    public method run {args} {
       if { $itk_option(-sex_dir) != "" } {
@@ -1938,29 +1944,24 @@ itcl::class gaia::GaiaSextractor {
          #  image by default.
          set image [$itk_option(-rtdimage) cget -file]
          if { $image != "" } {
-            lassign [fileName $image] image slice
-            set ext [file extension $image]
-            if { $ext == ".sdf" } {
-               set image "[file rootname $image]${slice}"
-            }
+	    $namer_ configure -imagename $image
+	    set image [$namer_ ndfname]
             set detect $values_($this,detname)
             if { $detect != "" && $detect != "NONE" } {
-               lassign [fileName $detect] detect detslice
-               set detext [file extension $detect]
-               if { $detext == ".sdf" } {
-                  set detect "[file rootname $detect]${detslice}"
-               }
+	       $namer_ configure -imagename $detect
+	       set detect [$namer_ ndfname]
             } else {
                set detect ""
             }
 
 	    #  Set the command to run when measurements are available.
-	    if { $args != "" } { 
+	    if { $args != "" } {
 	       set complete_cmd_ $args
 	    }
 
-            #  And run the application as required. Note "sdf" files
-            #  cannot be processed by native version.
+            #  And run the application as required. Note NDFs cannot
+            #  be processed by native version.
+	    set ext [string tolower [$namer_ type]]
             if { $native && ( $ext == ".fits" || $ext == ".fit" ) } {
 
                busy {
@@ -2169,7 +2170,7 @@ itcl::class gaia::GaiaSextractor {
       }
 
       #  Issue the measurements available command if needed.
-      if { $complete_cmd_ != {} } { 
+      if { $complete_cmd_ != {} } {
 	 eval $complete_cmd_
 	 set complete_cmd_ {}
       }
@@ -2601,6 +2602,9 @@ itcl::class gaia::GaiaSextractor {
 
    #  Command to execute when measurements are available.
    protected variable complete_cmd_ {}
+
+   #  Name of object to deal with image names.
+   protected variable namer_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

@@ -26,6 +26,7 @@
 
 
 #  Define a useful procedure for handling image names with slices.
+#  --- NOTE use GaiaImageName class now ---
 proc fileName {image} {
 
    # return the proper filename of an image and any slice information.

@@ -86,6 +86,9 @@ itcl::class gaia::GaiaImageSpectrum {
       eval rtd::RtdImageSpectrum::constructor $args
    } {
       eval itk_initialize $args
+
+      #  Create image name control object.
+      set namer_ [GaiaImageName \#auto]
    }
 
    #  Destructor - clean up when deleted.
@@ -97,6 +100,10 @@ itcl::class gaia::GaiaImageSpectrum {
       #  Trap RtdImageSpectrum destructor as vector names do not seem
       #  available at that scope.
       catch {rtd::RtdImageSpectrum::destructor}
+
+      if { $namer_ != {} } {
+	 catch {delete object $namer_}
+      }
    }
 
    #  Make the graph subwindow. Override to get control of ranging and
@@ -199,20 +206,16 @@ itcl::class gaia::GaiaImageSpectrum {
       $image_ convert coords $x0 $y0 canvas xs ys image
       $image_ convert coords $x1 $y1 canvas xe ye image
 
-      #  Get the name of the current image (.sdf is special and needs
-      #  to be stripped).
+      #  Get the name of the current image.
       set image [$image_ cget -file]
       if { $image != "" } {
-         lassign [fileName $image] image slice
-         if { [file extension $image] == ".sdf" } {
-            set image "[file rootname $image]${slice}"
-         }
+	 $namer_ configure -imagename $image
+	 set image [$namer_ ndfname]
 
          #  Get a name for the slice.
          set slice [filename_dialog "." "*.sdf" $w_]
-         if { [file extension $slice] == ".sdf" } {
-            set slice [file rootname $slice]
-         }
+	 $namer_ configure -imagename $slice
+	 set slice [$namer_ ndfname]
 
          #  And create it.
          busy {
@@ -290,4 +293,7 @@ itcl::class gaia::GaiaImageSpectrum {
    #  BLT vectors.
    protected variable vVector_ {}
    protected variable iVector_ {}
+
+   #  Image name controller.
+   protected variable namer_ {}
 }

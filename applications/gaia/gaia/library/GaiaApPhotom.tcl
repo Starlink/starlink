@@ -476,6 +476,9 @@ itcl::class gaia::GaiaApPhotom {
 
       #  Reveal first page of controls.
       $itk_component(TabNoteBook) select 0
+
+      #  Create object to control image names.
+      set namer_ [GaiaImageName \#auto]
    }
 
    #  Destructor:
@@ -489,7 +492,9 @@ itcl::class gaia::GaiaApPhotom {
          catch {$autophotom_ delete_sometime}
          set autophotom_ {}
       }
-
+      if { $namer_ != {} } { 
+	 catch {object delete $namer_}
+      }
    }
 
    #  Methods:
@@ -573,10 +578,9 @@ itcl::class gaia::GaiaApPhotom {
          }
          set image [$itk_option(-rtdimage) cget -file]
          if { $image != "" } {
-            lassign [fileName $image] image slice
-            if { [file extension $image] == ".sdf" } {
-               set image "[file rootname $image]${slice}"
-            }
+	    $namer_ configure -imagename $image
+	    set image [$namer_ ndfname]
+
             #  Get any additional values from itk_component(Extras)
             if { [winfo exists $itk_component(Extras)] } {
                set more [$itk_component(Extras) getstate]
@@ -891,6 +895,9 @@ itcl::class gaia::GaiaApPhotom {
 
    #  Command to perform when command completes.
    protected variable complete_cmd_ {}
+
+   #  Name of image control object.
+   protected variable namer_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

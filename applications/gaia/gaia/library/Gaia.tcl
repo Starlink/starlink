@@ -100,7 +100,7 @@ Options:
  -debug <bool>            - debug flag: run bg processes in fg.
  -default_cmap <cmap>     - default colormap.
  -default_itt <itt>       - default intensity transfer table.
- -file <file>             - fits file to load ('-' for stdin).
+ -file <file>             - image file to load.
  -float_panel <bool>      - put info panel in a popup window (default: 0).
  -max_scale <n>           - maximum scale for magnification menu (default: 20).
  -min_scale <n>           - minimum scale for magnification menu (default: -10).
@@ -806,26 +806,23 @@ itcl::class gaia::Gaia {
    #  Open a new file without a filebrowser, or return the name of the
    #  displayed file. Always use an absolute name (for matching etc.)
    public method open {args} {
-      if {"$args" != ""} {
-         set file [lindex $args 0]
-         if {[file isfile $file]} {
-            if { [catch {set here [pwd]}] } {
-               set here ""
-            }
-            if { ! [string match {/*} $file] } {
-               set file "$here/[file tail $file]"
-            }
-            configure -file $file
+      if { "$args" != "" } {
+         set imagename [lindex $args 0]
+	 set namer [GaiaImageName \#auto -imagename $imagename]
+	 if { [$namer exists] } { 
+	    $namer absolute
+	    configure -file [$namer fullname]
 
             #  Make sure image exists before using it.
-            $image_ configure -file $file
+            $image_ configure -file [$namer fullname]
 
             #  Lower the image on the canvas so that any existing
             #  graphics are revealed.
             [$image_ get_canvas] lower [$image_ get_image]
          } else {
-            error_dialog "There is no file named '$file'" $w_
+            error_dialog "There is no file named '$imagename'" $w_
          }
+	 delete object $namer
       } else {
          return $itk_option(-file)
       }

@@ -392,6 +392,10 @@ itcl::class gaia::GaiaArd {
          $itk_component(close)           1,4 -fill x -pady 3 -padx 3
       pack $itk_component(logfile) -side top -fill x -ipadx 1m -ipady 1m
       pack $itk_component(statsresults) -fill both -expand 1 -side top
+
+      #  Create control object for image names.
+      set namer_ [GaiaImageName \#auto]
+
    }
 
    #  Destructor:
@@ -411,6 +415,9 @@ itcl::class gaia::GaiaArd {
       if { $autocrop_ != {} } {
          catch {$autocrop_ delete_sometime}
          set autocrop_ {}
+      }
+      if { $namer_ != {} } {
+	 catch {delete object $namer_}
       }
 
       # Remove all temporary files.
@@ -483,14 +490,11 @@ itcl::class gaia::GaiaArd {
                              -show_output $itk_component(statsresults)]
          }
 
-         #  Get the name of the current image (.sdf is special and needs
-         #  to be stripped).
+         #  Get the name of the current image.
          set image [$itk_option(-rtdimage) cget -file]
          if { $image != "" } {
-            lassign [fileName $image] image slice
-            if { [file extension $image] == ".sdf" } {
-               set image "[file rootname $image]${slice}"
-            }
+	    $namer_ configure -imagename $image
+	    set image [$namer_ ndfname]
 
 	    #  Set command to run on completion.
 	    if { $args != "" } {
@@ -570,16 +574,11 @@ itcl::class gaia::GaiaArd {
                              -notify [code $this modified_image_]]
          }
 
-         #  Get the name of the current image (.sdf is special and needs
-         #  to be stripped).
+         #  Get the name of the current image.
          set image [$itk_option(-rtdimage) cget -file]
          if { $image != "" } {
-            set ext ""
-            lassign [fileName $image] image slice
-            if { [file extension $image] == ".sdf" } {
-               set image "[file rootname $image]${slice}"
-               set ext ".sdf"
-            }
+	    $namer_ configure -imagename $image
+	    set image [$namer_ ndfname]
 
             #  Create a temporary file name.
             set tmpimage_ "GaiaArdImg${count_}"
@@ -638,16 +637,11 @@ itcl::class gaia::GaiaArd {
                                -notify [code $this modified_image_]]
 	   }
 
-	   #  Get the name of the current image (.sdf is special and needs
-	   #  to be stripped).
+	   #  Get the name of the current image.
 	   set image [$itk_option(-rtdimage) cget -file]
 	   if { $image != "" } {
-              set ext ""
-              lassign [fileName $image] image slice
-              if { [file extension $image] == ".sdf" } {
-                 set image "[file rootname $image]${slice}"
-                 set ext ".sdf"
-              }
+	      $namer_ configure -imagename $image
+	      set image [$namer_ ndfname]
 
               #  Create a temporary file name.
               incr count_
@@ -681,16 +675,11 @@ itcl::class gaia::GaiaArd {
                            -notify [code $this modified_image_]]
       }
 
-      #  Get the name of the current image (.sdf is special and needs
-      #  to be stripped).
+      #  Get the name of the current image.
       set image [$itk_option(-rtdimage) cget -file]
       if { $image != "" } {
-         set ext ""
-         lassign [fileName $image] image slice
-         if { [file extension $image] == ".sdf" } {
-            set image "[file rootname $image]${slice}"
-            set ext ".sdf"
-         }
+	 $namer_ configure -imagename $image
+	 set image [$namer_ ndfname]
 
          #  Create a temporary file name.
          incr count_
@@ -793,6 +782,9 @@ itcl::class gaia::GaiaArd {
 
    #  Command to perform when command completes.
    protected variable complete_cmd_ {}
+
+   #  Name of image name control object.
+   protected variable namer_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
