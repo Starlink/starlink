@@ -402,6 +402,10 @@ sub tarxf {
 #     named tar archive into their archived positions relative to the
 #     current directory, just as tar(1).  The tar archive may however
 #     be compressed using gzip(1) or compress(1).
+#
+#     If an error occurs during execution of the extraction, an error 
+#     message is printed, and the routine returns with an empty list
+#     of files.
 
 #  Arguments:
 #     $tarfile = string.
@@ -470,9 +474,13 @@ sub tarxf {
                 );
 
 #  Unpack the tar file, reading the list of file names into a list.
+#  If an error occurs print a warning message.
 
    my $command = "$filter{$ext} $tarfile | $tar xf - " . join ' ', @files;
-   system $command and error "$command failed: $!\n";
+   if (system $command) {
+      print STDERR "  !!! $command failed: $!\n";
+      return wantarray ? () : undef;
+   }
 
 #  In list context, generate and return list of regular files extracted.
 #  Otherwise, return the null value.
