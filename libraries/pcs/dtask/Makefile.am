@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = alink ilink dtask_link_adam
+bin_SCRIPTS = alink ilink dtask_link_adam dtask_libtool
 
 lib_LTLIBRARIES = libdtask_adam.la
 
@@ -70,6 +70,7 @@ install-exec-local: dtask_main.o
 # the autoconf manual).
 edit = sed \
     -e 's,@staretcdir\@,$(staretcdir),g' \
+    -e 's,@bindir\@,$(bindir),g' \
     -e 's,@libdir\@,$(libdir),g' \
     -e 's,@CC\@,$(CC),g' \
     -e 's,@CFLAGS\@,$(CFLAGS),g' \
@@ -97,3 +98,7 @@ $(srcdir)/alink.in: $(srcdir)/ailink.in.m4
 	$(M4) -DSCRIPTNAME=alink $(srcdir)/ailink.in.m4 >$@
 $(srcdir)/ilink.in: $(srcdir)/ailink.in.m4
 	$(M4) -DSCRIPTNAME=ilink $(srcdir)/ailink.in.m4 >$@
+# The installed dtask_libtool is just the libtool we configured for our.
+# own use -- it's specific to this configuration, not this directory.
+dtask_libtool: libtool
+	$(LN_S) libtool dtask_libtool
