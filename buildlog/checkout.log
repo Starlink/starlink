@@ -8632,6 +8632,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/util/SplatException.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/SplatSOAPServer.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/SplatSOAPServices.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/TreeviewAccess.java
+U java/source/splat/src/main/uk/ac/starlink/splat/util/UnitUtilities.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/Utilities.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/Version.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/VoigtFitter.java

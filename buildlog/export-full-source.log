@@ -419,7 +419,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/java
-     [copy] Copying 175 files to /apps/cvsbuild/java/source/splat/build/java
+     [copy] Copying 176 files to /apps/cvsbuild/java/source/splat/build/java
      [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:
@@ -450,7 +450,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 2248 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 2250 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 5 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
