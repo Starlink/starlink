@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_CFF2<T>( NX, NY, INARR, VAR, NVAR, INVAR, BOXSZ,
      :                         NITER, CLIP, LIMITS, ILEVEL, SAMBAD,
-     :                         WLIM, CINARR, OUTARR, OUTVAR, NGOOD,
+     :                         NLIM, CINARR, OUTARR, OUTVAR, NGOOD,
      :                         SIGMA, ASUM, NSUM, STATUS )
 *+
 *  Name:
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     CALL KPS1_CFF2x( NX, NY, INARR, VAR, NVAR, INVAR, BOXSZ, NITER,
-*                      CLIP, LIMITS, ILEVEL, SAMBAD, WLIM, CINARR,
+*                      CLIP, LIMITS, ILEVEL, SAMBAD, NLIM, CINARR,
 *                      OUTARR, OUTVAR, NGOOD, SIGMA, ASUM, NSUM,
 *                      STATUS )
 
@@ -116,7 +116,7 @@
 *        Convert to KAPPA/ADAM version
 *     1991 June 30 (MJC):
 *        Revised the calling sequence for just 2-d usage, removed FRACT
-*        and replaced by SAMBAD and WLIM, ditto DIMS( 2 ) by NX and NY.
+*        and replaced by SAMBAD and NLIM, ditto DIMS( 2 ) by NX and NY.
 *        Added error reporting.  Renamed from REJCT and made generic.
 *        Added range limits.
 *     {enter_further_changes_here}
@@ -150,8 +150,7 @@
      :  INVAR( NVAR )
 
       REAL
-     :  CLIP( NITER ),
-     :  WLIM
+     :  CLIP( NITER )
 
       LOGICAL
      :  SAMBAD,
