@@ -3,7 +3,7 @@
 
 <component id="@PACKAGE@">
   <version>@PACKAGE_VERSION@</version>
-  <path>librarries/fio</path>
+  <path>libraries/fio</path>
   <description>FORTRAN file I/O routines</description>
   <abstract>FIO/RIO is a subroutine package that allows a FORTRAN
       programmer to access sequential and direct access data files in
