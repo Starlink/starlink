@@ -17,7 +17,7 @@ TESTS = tester.sh
 ## opportunity to do any non-make-sensitive substitutions here as well.
 
 edit = sed -e 's%@bindir\@%$(bindir)%g' \
-           -e 's%@TCLSH\@%@TCLSH@%g'
+           -e 's%@TCLSH\@%@TCLSH8_2@%g'
 
 ifd2iraf: Makefile $(srcdir)/ifd2iraf.in
 	rm -f ifd2iraf ifd2iraf.tmp

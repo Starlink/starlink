@@ -9,9 +9,10 @@ STAR_DEFAULTS
 
 STAR_LATEX_DOCUMENTATION(ssn68)
 
-dnl    Locate the tclsh binary (should we use STAR_CHECK_PROGS instead?)
-AC_ARG_VAR([TCLSH],[TCL 8.2 shell])
-AC_PATH_PROG([TCLSH],[tclsh8.2])
+STAR_DECLARE_DEPENDENCIES(build, [tclsys])
+
+dnl    Locate the tclsh binary.
+STAR_CHECK_PROGS(tclsh8.2)
 
 AC_CONFIG_FILES([Makefile component.xml])
 
