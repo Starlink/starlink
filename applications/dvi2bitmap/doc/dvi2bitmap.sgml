@@ -540,7 +540,7 @@ the <code>&ddash;magnification</code> option to magnify the DVI file,
 and then the <code>&ddash;scale</code> option to scale it back down to
 the correct size.</p>
 
-<p><code>transparency=[boolean]</code>: if true, this makes the output
+<p><code>transparent=[boolean]</code>: if true, this makes the output
 bitmap have a transparent background, if that's supported by the
 particular format you choose using option
 <code>&ddash;output-type</code></p>
@@ -715,7 +715,8 @@ present, then the program returns success only if <em/all> fonts are present.
 <subsect id=usage.examples export>Examples
 
 <p><verbatim>
-% dvi2bitmap -r 110 -m 2 -s 2 -t gif hello.dvi
+% dvi2bitmap --resolution=110 --magnification=2 --scale=2 \
+        --output-type=gif hello.dvi
 </verbatim>
 This converts the file <code/hello.dvi> to a GIF bitmap.  It first sets the
 magnification factor to 2, so that the program uses a double-size font
@@ -723,7 +724,8 @@ magnification factor to 2, so that the program uses a double-size font
 factor of 2 to obtain a bitmap of the correct size.
 
 <p><verbatim>
-% dvi2bitmap -n -Qf -r 110 -m 1.5 -q hello.dvi
+% dvi2bitmap -n -Qf --resolution=110 --magnification=1.5 \
+        --verbose=quiet hello.dvi
 Qf cmr10 165 110 1.5 localfont
 </verbatim>
 This reads the DVI file to find out what fonts are required, but does
@@ -1294,11 +1296,37 @@ successfully on (at least):
   <entry>0.10b1</entry>
   <entry>gcc 2.96</entry>
 </row>
+<row>
+<entry>i686-pc-linux-gnu (RedHat 6.2)</entry>
+<entry>0.10b1</entry>
+<entry>egcs-2.91.66</entry>
+</row>
                     <row>
                       <entry>MacOS 10.2</entry>
                       <entry>0.10b1</entry>
                       <entry>gcc ???</entry>
                     </row>
+<row>
+<entry>sparc-sun-solaris2.8</entry>
+<entry>0.10b1</entry>
+<entry>Sun WorkShop 6 update 2 C++ 5.3</entry>
+</row>
+<row>
+<entry>sparc-sun-solaris2.8</entry>
+<entry>0.10b1</entry>
+<entry>egcs-2.91.66</entry>
+</row>
+<row>
+<entry>alphaev56-dec-osf5.0</entry>
+<entry>0.10b1</entry>
+<entry>Compaq C++ V6.5-014 for Compaq Tru64 UNIX V5.0A</entry>
+</row>
+<row>
+<entry>alphaev56-dec-osf5.0</entry>
+<entry>0.10b1</entry>
+<entry>egcs-2.91.66</entry>
+</row>
+
 <row><entry>i686-pc-linux-gnu (RedHat 6.2)<entry>0.9-7p1<entry>egcs-2.91.66
 <row><entry>powerpc-unknown-linux-gnu (Mac mklinux DR-0.3?)<entry>0.9<entry>egcs-2.90.25 980302 (egcs-1.0.2 prerelease)
 <row><entry>sparc-sun-solaris2.7<entry>0.9<entry>egcs-2.91.66
@@ -1329,14 +1357,27 @@ or
 <verbatim>
 % env CXX=cxx ./configure
 </verbatim>
-depending on your shell.
+depending on your shell.</p>
 
+<p>Run regression tests with <code>make test</code> in the build
+directory.  This includes a separate whole-program test which
+additionally gives advice about setting environment variables.  You
+can run this script separately with the command <code>(cd test;make
+pathtest)</code></p>
+
+<p>The program works on all the platforms on which it builds, but
+regression tests 2 and 3 fail to link when using Sun <code>CC</code>
+and Compaq <code>cxx</code>, for some arcane C++ reason I have yet to
+diagnose.  The whole-script test mentioned above works, though.</p>
+
+<!--
 <p>Notes:
 <ol>
 <li>Alphas: you may need to force the configure script to
 use the Alpha C++ compiler, <code>cxx</code>.  On the Alpha I use to
 test builds, <code/egcs-2.91.66> gets rather confused.
 </ol>
+-->
 
 <subsubsect id=install.web2c>Obtaining the <code/kpathsea> library
 <update versionid="v0-7">Improved instructions on getting the
