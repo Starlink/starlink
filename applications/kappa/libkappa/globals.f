@@ -44,6 +44,8 @@
 *     1995 December 6 (MJC):
 *        Revised the displayed wording for the current DATA_ARRAY to
 *        apply to foreign formats too.
+*     4-DEC-2001 (DSB):
+*        Removed image display and image overlay globals.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -172,21 +174,6 @@
       END IF
       CALL MSG_OUT( 'GLOBAL2',
      :  'The current graphics device is       : ^GLOVAL', STATUS )
-      CALL ERR_RLSE
-
-*    The image-display overlay device.
-      CALL ERR_MARK
-      PLOC = ' '
-      CALL DAT_FIND( LOC, 'IMAGE_OVERLAY', PLOC, STATUS )
-      CALL CMP_GET0C( PLOC, 'NAMEPTR', GLOVAL, STATUS )
-      IF ( STATUS .EQ. DAT__OBJNF ) THEN
-         CALL ERR_ANNUL( STATUS )
-         CALL MSG_SETC( 'GLOVAL', '<undefined>' )
-      ELSE
-         CALL MSG_SETC( 'GLOVAL', GLOVAL )
-      END IF
-      CALL MSG_OUT( 'GLOBAL4',
-     :  'The current image-display overlay is : ^GLOVAL', STATUS )
       CALL ERR_RLSE
 
 *    The lookup table.
