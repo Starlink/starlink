@@ -129,4 +129,10 @@ ones, and there's no corresponding manifest for the &latex; document.
 contain paragraphs.  Notes and warnings should be in p.content?  I'm
 not sure how necessary it is to support these so explicitly.
 
+<dt>CSS?
+<dd>INteraction with XML.
+
+<dt>Link colouring
+<dd>Dependent on type of link
+
 </dl>
