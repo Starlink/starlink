@@ -9,7 +9,7 @@
 *
 *    Environment parameters :
 *
-*     ILOC = UNIV(R)
+*     INP = UNIV(R)
 *       Dataset whose update mode is to be changed or reported
 *     DISABLED = LOGICAL(R)
 *       Set update mode to DISABLED
@@ -32,6 +32,7 @@
 *
 *      7 Jun 93 : Original (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     26 Mar 95 : V1.8-1 Use new data interface (DJA)
 *
 *    Type definitions :
 *
@@ -40,12 +41,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
-*
-*    Global variables :
-*
-      INCLUDE 'HIST_CMN'
 *
 *    Status :
 *
@@ -53,18 +49,19 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) ILOC 		! Input dataset
-      CHARACTER*10           MODE               ! HISTORY mode
+      CHARACTER*10           	MODE               	! HISTORY mode
 
-      LOGICAL                IPRIM              ! Input primitive?
-      LOGICAL                OK                 ! History already present?
-      LOGICAL                QUIET, NORMAL,     ! Mode toggles
-     :                       DISABLED, VERBOSE
+      INTEGER			HCID			! History control
+      INTEGER			IFID			! Dataset id
+
+      LOGICAL                	OK                 ! History already present?
+      LOGICAL                	QUIET, NORMAL,     ! Mode toggles
+     :                          DISABLED, VERBOSE
 *
 *    Version :
 *
       CHARACTER*30       VERSION
-        PARAMETER        (VERSION = 'HISTMODE Version 1.8-0')
+        PARAMETER        (VERSION = 'HISTMODE Version 1.8-1')
 *-
 
 *    Initialise
@@ -74,17 +71,20 @@
       CALL MSG_PRNT( VERSION )
 
 *    Get input
-      CALL USI_ASSOCI( 'INP', 'UPDATE', ILOC, IPRIM, STATUS )
+      CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    History already present?
-      CALL HIST_OK( ILOC, OK, STATUS )
+      CALL HSI_OK( IFID, OK, STATUS )
       IF ( .NOT. OK ) THEN
         CALL MSG_PRNT( 'No HISTORY structure present in dataset -'/
      :                                            /' creating it' )
-        CALL HIST_NEW( ILOC, STATUS )
+        CALL HSI_NEW( IFID, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*    Get control object
+      CALL HSI_GETCTR( IFID, HCID, STATUS )
 
 *    Get logicals
       DISABLED = .FALSE.
@@ -116,25 +116,11 @@
 *    Set the update mode?
       IF ( MODE .GT. ' ' ) THEN
 
-*      History not present?
-        IF ( .NOT. OK ) THEN
+*      Change the verbosity
+        CALL ADI_CPUT0C( HCID, 'Verbosity', MODE, STATUS )
 
-*        Create it
-          CALL HIST_NEW( ILOC, STATUS )
-
-*      Present, but no flag (old ASTERIX datasets)
-        ELSE IF ( .NOT. HTBL(REC).VERB_SET ) THEN
-
-*        Create the object
-          CALL DAT_NEW0C( HTBL(REC).HIST_LOC, 'UPDATE_MODE', 10,
-     :                                                  STATUS )
-          HTBL(REC).VERB_SET = .TRUE.
-
-        END IF
-
-*      Write the flag
-        CALL CMP_PUT0C( HTBL(REC).HIST_LOC, 'UPDATE_MODE', MODE,
-     :                                                  STATUS )
+*      Update the control info
+        CALL HSI_PUTCTR( IFID, HCID, STATUS )
 
 *    otherwise report it
       ELSE
@@ -143,12 +129,12 @@
         IF ( OK ) THEN
 
 *        Flag set?
-          IF ( HTBL(REC).VERB_SET ) THEN
-            CALL CMP_GET0C( HTBL(REC).HIST_LOC, 'UPDATE_MODE', MODE,
-     :                                                      STATUS )
+          CALL ADI_CGET0C( HCID, 'Verbosity', MODE, STATUS )
+          IF ( STATUS .EQ. SAI__OK ) THEN
             CALL MSG_SETC( 'MODE', MODE )
             CALL MSG_PRNT( '* Current HISTORY update mode is ^MODE *' )
           ELSE
+            CALL ERR_ANNUL( STATUS )
             CALL MSG_PRNT( '* No HISTORY update mode is set - '/
      :                                  /'default is NORMAL *' )
           END IF
@@ -158,6 +144,9 @@
         END IF
 
       END IF
+
+*    Release control object
+      CALL ADI_ERASE( HCID, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE()
