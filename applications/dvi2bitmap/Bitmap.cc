@@ -118,7 +118,7 @@ Bitmap::Bitmap (const int w, const int h, const int bpp,
 	if (maxwidth >= w)
 	    maxW_ = maxwidth;
 	else
-	    maxW_ = 4*W;	// default upper limit on expansion
+	    maxW_ = 10*W;	// default upper limit on expansion
 	if (maxheight >= h)
 	    maxH_ = maxheight;
 	else
@@ -255,6 +255,9 @@ void Bitmap::usesBitmapArea_(const int ulx, const int uly,
 
     if (tW == maxW_ && tH == maxH_) {
 	// the bitmap can't be expanded any more after this
+	if (verbosity_ >= normal)
+	    cerr << "Bitmap has reached maximum size, ("
+		 << maxW_ << "," << maxH_ << "), no further expansion" << endl;
 	isExpandable_ = false;
     }
 
@@ -350,7 +353,7 @@ void Bitmap::paint(const int x, const int y, const int w, const int h,
     if (y   < bbT) bbT = y;
     if (y+h > bbB) bbB = y+h;
 
-    if (verbosity_ > normal)
+    if (verbosity_ > debug)
 	cerr << "Bitmap::paint @ (" << x << ',' << y << "): (0:"
 	     << w << ",0:" << h << ") -> ("
 	     << col1 << ':' << col2 << ',' << row1 << ':' << row2
@@ -654,7 +657,15 @@ void Bitmap::cropDefault (Margin spec, int pixels, bool absolute)
 bool Bitmap::overlaps ()
     const
 {
-    return (bbL < 0 || bbR > W || bbT < 0 || bbB > H);
+    if (verbosity_ > normal) {
+	bool res = (bbL < 0 || bbR > W || bbT < 0 || bbB > H);
+	cerr << "Bitmap::overlaps [" << bbL << "," << bbR
+	     << "," << bbT << "," << bbB
+	     << "] vs [0," << W << ",0," << H << "] ==> " << res << endl;
+	return res;
+    } else {
+	return (bbL < 0 || bbR > W || bbT < 0 || bbB > H);
+    }
 }
 
 /**
