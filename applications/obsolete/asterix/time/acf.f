@@ -45,7 +45,7 @@
 *     12 Jun 89 : V1.0-0 Original (PLA)
 *     14 Jun 90 : V1.2-0 Does check for irregular axes and bad quality (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     20 Apr 95 : V1.8-1  New data interface (DJA)
+*     20 Apr 95 : V1.8-1 New data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -85,20 +85,20 @@
       INTEGER                TLDIMS(ADI__MXDIM)    ! Length of each dimension
       INTEGER                TNDIM                 ! Number of dimensions
 
-      REAL                   BASE                  ! } these define the
-      REAL                   SCALE                 ! } regular axis values
+      REAL                   	BASE                  ! } these define the
+      REAL                   	SCALE                 ! } regular axis values
 
-      LOGICAL                BAD                   ! Any bad quality?
-      LOGICAL                BIAS                  ! Use biassed autocovariance?
-      LOGICAL                OK                    ! Is data ok?
-      LOGICAL                QOK                   ! Is QUALITY ok?
-      LOGICAL                REG                   ! Regularly spaced T_AXIS?
-      LOGICAL                USEWT                 ! Use weighting algorithm?
+      LOGICAL                	BAD                   	! Any bad quality?
+      LOGICAL                	BIAS                  	! Biassed autocovariance?
+      LOGICAL                	OK                    	! Is data ok?
+      LOGICAL                	QOK                   	! Is QUALITY ok?
+      LOGICAL                	REG                   	! Regularly spaced T_AXIS?
+      LOGICAL                	USEWT                 	! Use weighting?
 *
 *    Version id :
 *
-      CHARACTER*80           VERSION
-        PARAMETER            (VERSION =' ACF Version 1.8-1')
+      CHARACTER*80		VERSION
+        PARAMETER            	( VERSION ='ACF Version 1.8-1' )
 *-
 
 *  Version
@@ -303,17 +303,17 @@
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
       IF (BIAS) THEN
-        TEXT(1) = '           Biassed autocorrelation function'
+        TEXT(1) = 'Biassed autocorrelation function'
       ELSE
-        TEXT(1) = '           Unbiassed autocorrelation function'
+        TEXT(1) = 'Unbiassed autocorrelation function'
       END IF
 
       IF (USEWT) THEN
-        TEXT(2) = '           Input VARIANCE and QUALITY were used.'
+        TEXT(2) = 'Input VARIANCE and QUALITY were used.'
       ELSE
-        TEXT(2) = '           Input VARIANCE and QUALITY were NOT used.'
+        TEXT(2) = 'Input VARIANCE and QUALITY were NOT used.'
       END IF
-      CALL HSI_PTXT (OFID, 2, TEXT, STATUS)
+      CALL HSI_PTXT( OFID, 2, TEXT, STATUS )
 
 *    Exit
   99  CALL AST_CLOSE()
