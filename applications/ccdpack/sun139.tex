@@ -5138,6 +5138,276 @@ The CCDPACK routine descriptions are contained in the following pages.
       \xroutine{CCDCLEAR} commands.
    }
 }
+\sstroutine{BOUNDS}{
+   Draws aligned boundaries of images on a graphics display
+} {
+   \sstdescription{
+      This routine draws on a graphics device the boundary outlines of
+      a set of images in their Current attached coordinate system.  This
+      will show their relative positions in their current coordinates,
+      and so can, for instance, be used to check that alignment looks
+      sensible prior to resampling and combining into a mosaic.
+      Each outline indicates the extent of the data array of the
+      corresponding image, and is therefore basically rectangular
+      in shape, though it may be distorted if the mapping
+      between pixel and Current coordinates is nonlinear.  The origin
+      (minimum X,Y pixel value) of each boundary can be marked and
+      the outline labelled with the image's name and/or index number
+      (as determined by the LABMODE parameter).
+
+      The results are only likely to be sensible if the Current
+      coordinate system of all the images is one in which they are all
+      registered.  If they do not all have the same current Domain
+      name, a warning will be issued, but plotting will proceed.
+
+      \routine{BOUNDS} uses the \xref{AGI graphics database}{sun95}{se_agitate} in a way which is
+      compatible with \xref{KAPPA}{sun95}{} applications; if the CLEAR parameter is set
+      to false then it will attempt to align the outline drawings with
+      suitably registered graphics which are already on the graphics
+      device.  So, for instance, it is easy to overlay the outlines
+      of a set of images on a mosaic image which has been constructed
+      using those images, or to see how an undisplayed set of images
+      would map onto one already displayed, either by a previous
+      invocation of BOUNDS or by a KAPPA program such as \xref{DISPLAY}{sun95}{DISPLAY}
+      or \xref{CONTOUR}{sun95}{CONTOUR}.
+
+      This routine is designed for use on two-dimensional images;
+      if the images presented have more than two dimensions, any extra
+      ones will be ignored.
+   }
+   \sstusage{
+      bounds in [device]
+   }
+   \sstparameters{
+      \sstsubsection{
+         AXES = \_LOGICAL (Read)
+      }{
+         True if labelled and annotated axes are to be drawn around the
+         outlines, showing the common Current coordinate system of the
+         images.  The appearance of the axes can be controlled using the
+         STYLE parameter.  This parameter has a dynamic default; it
+         defaults to the same value as the CLEAR parameter.
+         [dynamic]
+      }
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
+         If CLEAR is set to true, the graphics device will be cleared
+         before the plot is made.
+
+         If you want the outlines to be drawn over the top
+         of an existing DATA picture, for instance one displayed with
+         KAPPA's \xref{DISPLAY}{sun95}{DISPLAY} application, then set CLEAR to false.  If
+         possible, alignment will occur within the Current coordinate
+         system of the image.  If this is not possible, an attempt is
+         made in SKY, PIXEL or GRID domains.  If the image cannot be
+         aligned in any suitable domain, then \routine{BOUNDS} will terminate
+         with an error.  If CLEAR is set to FALSE, then there must
+         already be a picture displayed on the graphics device.
+         [TRUE]
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The name of the device on which to draw the outlines.
+         [Current display device]
+      }
+      \sstsubsection{
+         IN = LITERAL (Read)
+      }{
+         A list of the images whose boundaries are to be drawn.
+      }
+      \sstsubsection{
+         LABMODE = LITERAL( $*$ ) (Read)
+      }{
+         This is a comma-separated list of keywords indicating what
+         sort of label should be written to label the outlines.
+         Any combination of one or more of the following keywords may
+         be used:
+         \sstitemlist{
+
+            \sstitem
+               NAME   -- The name of the NDF is written
+
+            \sstitem
+               INDEX  -- The index number of the NDF is written
+
+            \sstitem
+               ORIGIN -- The pixel coordinate origin of the NDF is marked
+
+            \sstitem
+               OPAQUE -- The text is written on an opaque background
+
+         }
+         Unrecognised values will be ignored.  If you don't want any
+         of these options, use the null value (!).
+         [NAME,ORIGIN]
+      }
+      \sstsubsection{
+         LABPOS = LITERAL (Read)
+      }{
+         A two-character string identifying the positioning of the text
+         label (only used if the value of LABEL includes either {\tt "}INDEX{\tt "}
+         or {\tt "}NAME{\tt "}).  The first letter indicates the side-to-side
+         position and the second indicates the up-and-down position
+         in the pixel coordinates of each image.  Each letter must be
+         {\tt "}N{\tt "}, {\tt "}C{\tt "} or {\tt "}F{\tt "}, for Near to the origin, Central or Far from
+         the origin.  Normally (unless LABUP is true) the text
+         will be written parallel or antiparallel to the X pixel
+         direction for each image, with one edge anchored as per the
+         value of LABPOS in such a way that the text sits inside the
+         outline (if it will fit).
+
+         Only the first two characters are significant.
+
+         LABPOS normally defaults to {\tt "}NN{\tt "}, indicating the label written
+         next to the origin, but if LABUP is set TRUE, then it
+         defaults to {\tt "}CC{\tt "}.
+         [NN]
+      }
+      \sstsubsection{
+         LABUP = \_LOGICAL (Read)
+      }{
+         Normally this parameter is FALSE, and each text label (as
+         determined by LABMODE) is written parallel or anti-parallel
+         to the pixel X axis of the corresponding image.  If this
+         parameter is set TRUE however, text will be written upright,
+         that is, horizontal on the graphics device.  In this case
+         the positioning algorithm may fail to place it inside the
+         corresponding outline; it is generally not advisable to
+         set LABUP to TRUE unless the label is positioned in the
+         centre of the outline by setting LABPOS={\tt "}CC{\tt "}.
+         [FALSE]
+      }
+      \sstsubsection{
+         LOGFILE = FILENAME (Read)
+      }{
+         Name of the CCDPACK logfile.  If a null (!) value is given for
+         this parameter then no logfile will be written, regardless of
+         the value of the LOGTO parameter.
+
+         If the logging system has been initialised using CCDSETUP
+         then the value specified there will be used. Otherwise, the
+         default is {\tt "}CCDPACK.LOG{\tt "}.
+         [CCDPACK.LOG]
+      }
+      \sstsubsection{
+         LOGTO = LITERAL (Read)
+      }{
+         Every CCDPACK application has the ability to log its output
+         for future reference as well as for display on the terminal.
+         This parameter controls this process, and may be set to any
+         unique abbreviation of the following:
+         \sstitemlist{
+
+            \sstitem
+               TERMINAL  -- Send output to the terminal only
+
+            \sstitem
+               LOGFILE   -- Send output to the logfile only (see the
+                               LOGFILE parameter)
+
+            \sstitem
+               BOTH      -- Send output to both the terminal and the
+                               logfile
+
+            \sstitem
+               NEITHER   -- Produce no output at all
+
+         }
+         If the logging system has been initialised using CCDSETUP
+         then the value specified there will be used. Otherwise, the
+         default is {\tt "}BOTH{\tt "}.
+         [BOTH]
+      }
+      \sstsubsection{
+         PENROT = \_LOGICAL (Read)
+      }{
+         If TRUE, each outline will be drawn with a different pen
+         (colour).  Otherwise, they will all be drawn in the same pen.
+         [FALSE]
+      }
+      \sstsubsection{
+         STYLE = LITERAL (Read)
+      }{
+         A group of attribute settings describing the plotting style
+         to use for the outlines and annotated axes.  This should be
+         a string consisting of comma-separated `attribute=value{\tt '}
+         items, as explained in the `\xref{Plotting Styles and Attributes}{sun95}{se_style}'
+         section of \xref{SUN/95}{sun95}{}, except that colours may only be specified
+         by index, and not by name.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         bounds reg-data$*$ clear
+      }{
+         This will clear the current graphics device and plot on it
+         labelled outlines of all the `reg-data$*${\tt '} images, as well as
+         axes showing the common coordinate system in which they
+         all reside.  The plotting area will be made just large enough
+         that all the boundaries fit in.  Prior to running this, the
+         Current attached coordinate system of all the reg-data$*$ images
+         should be one in which they are all aligned.
+      }
+      \sstexamplesubsection{
+         bounds ccd$*$ noclear
+      }{
+         This will attempt to plot outlines of all the `ccd$*${\tt '} images
+         aligned with whatever is already plotted on the graphics
+         device, for instance the result of a KAPPA \xref{DISPLAY}{sun95}{DISPLAY} command
+         or of a previous call of \routine{BOUNDS}.  Parts of the image outlines
+         which fall outside the existing plot area will not be visible.
+      }
+      \sstexamplesubsection{
+         bounds in={\tt "}one,two,three{\tt '} axes=yes label=[name,index] 
+                penrot=yes style={\tt "}size(strings)=2,width(curves)=3{\tt "}
+      }{
+         This will draw outlines of the NDFs `one{\tt '}, `two{\tt '} and `three{\tt '}
+         in the current directory with labelled axes, in triple-thick
+         lines and with double-size text labels which read `1: one{\tt '},
+         `2: two{\tt '} and `3: three{\tt '} respectively.  The colour of each
+         outline and its associated text label will be different from
+         the others.
+      }
+      \sstexamplesubsection{
+         bounds in=a$*$ noclear nopenrot style={\tt "}colour=2{\tt "} 
+                label=!
+      }{
+         All the images beginning with `a{\tt '} will be outlined in colour 2,
+         with no text labels or indication of the origin.
+      }
+   }
+   \sstdiytopic{
+      Behaviour of Parameters
+   }{
+      All parameters retain their current value as default. The
+      {\tt "}current{\tt "} value is the value assigned on the last run of the
+      application. If the application has not been run then the
+      {\tt "}intrinsic{\tt "} defaults, as shown in the parameter help, apply.
+
+      Retaining parameter values has the advantage of allowing you to
+      define the default behaviour of the application. The intrinsic
+      default behaviour of the application may be restored by using the
+      RESET keyword on the command line.
+
+      Certain parameters (LOGTO and LOGFILE) have global
+      values. These global values will always take precedence, except
+      when an assignment is made on the command line. Global values may
+      be set and reset using the CCDSETUP and CCDCLEAR commands.
+
+      The DEVICE parameter also has a global association. This is not
+      controlled by the usual CCDPACK mechanisms, instead it works in
+      co-operation with \xref{KAPPA}{sun95}{} image display/control routines.
+   }
+   \sstimplementationstatus{
+      \routine{BOUNDS}{\tt '}s communication with the AGI database is compatible with
+      most of KAPPA{\tt '}s behaviour, but is slightly less capable; in
+      particular it will fail to align with pictures whose alignment
+      has been stored using TRANSFORM structures instead of MORE.AST
+      extensions.  This affects only older applications.
+   }
+}
 \sstroutine{CALCOR} {
    Subtracts a scaled dark or flash calibration image from a series of
    images
@@ -11885,276 +12155,6 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
            propagation to the output mosaic, which will typically have a
            larger extent than any of the input images).
       }
-   }
-}
-\sstroutine{BOUNDS}{
-   Draws aligned boundaries of images on a graphics display
-}{
-   \sstdescription{
-      This routine draws on a graphics device the boundary outlines of
-      a set of images in their Current attached coordinate system.  This
-      will show their relative positions in their current coordinates,
-      and so can, for instance, be used to check that alignment looks
-      sensible prior to resampling and combining into a mosaic.
-      Each outline indicates the extent of the data array of the
-      corresponding image, and is therefore basically rectangular
-      in shape, though it may be distorted if the mapping
-      between pixel and Current coordinates is nonlinear.  The origin
-      (minimum X,Y pixel value) of each boundary can be marked and
-      the outline labelled with the image's name and/or index number
-      (as determined by the LABMODE parameter).
-
-      The results are only likely to be sensible if the Current
-      coordinate system of all the images is one in which they are all
-      registered.  If they do not all have the same current Domain
-      name, a warning will be issued, but plotting will proceed.
-
-      \routine{BOUNDS} uses the \xref{AGI graphics database}{sun95}{se_agitate} in a way which is
-      compatible with \xref{KAPPA}{sun95}{} applications; if the CLEAR parameter is set
-      to false then it will attempt to align the outline drawings with
-      suitably registered graphics which are already on the graphics
-      device.  So, for instance, it is easy to overlay the outlines
-      of a set of images on a mosaic image which has been constructed
-      using those images, or to see how an undisplayed set of images
-      would map onto one already displayed, either by a previous
-      invocation of BOUNDS or by a KAPPA program such as \xref{DISPLAY}{sun95}{DISPLAY}
-      or \xref{CONTOUR}{sun95}{CONTOUR}.
-
-      This routine is designed for use on two-dimensional images;
-      if the images presented have more than two dimensions, any extra
-      ones will be ignored.
-   }
-   \sstusage{
-      bounds in [device]
-   }
-   \sstparameters{
-      \sstsubsection{
-         AXES = \_LOGICAL (Read)
-      }{
-         True if labelled and annotated axes are to be drawn around the
-         outlines, showing the common Current coordinate system of the
-         images.  The appearance of the axes can be controlled using the
-         STYLE parameter.  This parameter has a dynamic default; it
-         defaults to the same value as the CLEAR parameter.
-         [dynamic]
-      }
-      \sstsubsection{
-         CLEAR = \_LOGICAL (Read)
-      }{
-         If CLEAR is set to true, the graphics device will be cleared
-         before the plot is made.
-
-         If you want the outlines to be drawn over the top
-         of an existing DATA picture, for instance one displayed with
-         KAPPA's \xref{DISPLAY}{sun95}{DISPLAY} application, then set CLEAR to false.  If
-         possible, alignment will occur within the Current coordinate
-         system of the image.  If this is not possible, an attempt is
-         made in SKY, PIXEL or GRID domains.  If the image cannot be
-         aligned in any suitable domain, then \routine{BOUNDS} will terminate
-         with an error.  If CLEAR is set to FALSE, then there must
-         already be a picture displayed on the graphics device.
-         [TRUE]
-      }
-      \sstsubsection{
-         DEVICE = DEVICE (Read)
-      }{
-         The name of the device on which to draw the outlines.
-         [Current display device]
-      }
-      \sstsubsection{
-         IN = LITERAL (Read)
-      }{
-         A list of the images whose boundaries are to be drawn.
-      }
-      \sstsubsection{
-         LABMODE = LITERAL( $*$ ) (Read)
-      }{
-         This is a comma-separated list of keywords indicating what
-         sort of label should be written to label the outlines.
-         Any combination of one or more of the following keywords may
-         be used:
-         \sstitemlist{
-
-            \sstitem
-               NAME   -- The name of the NDF is written
-
-            \sstitem
-               INDEX  -- The index number of the NDF is written
-
-            \sstitem
-               ORIGIN -- The pixel coordinate origin of the NDF is marked
-
-            \sstitem
-               OPAQUE -- The text is written on an opaque background
-
-         }
-         Unrecognised values will be ignored.  If you don't want any
-         of these options, use the null value (!).
-         [NAME,ORIGIN]
-      }
-      \sstsubsection{
-         LABPOS = LITERAL (Read)
-      }{
-         A two-character string identifying the positioning of the text
-         label (only used if the value of LABEL includes either {\tt "}INDEX{\tt "}
-         or {\tt "}NAME{\tt "}).  The first letter indicates the side-to-side
-         position and the second indicates the up-and-down position
-         in the pixel coordinates of each image.  Each letter must be
-         {\tt "}N{\tt "}, {\tt "}C{\tt "} or {\tt "}F{\tt "}, for Near to the origin, Central or Far from
-         the origin.  Normally (unless LABUP is true) the text
-         will be written parallel or antiparallel to the X pixel
-         direction for each image, with one edge anchored as per the
-         value of LABPOS in such a way that the text sits inside the
-         outline (if it will fit).
-
-         Only the first two characters are significant.
-
-         LABPOS normally defaults to {\tt "}NN{\tt "}, indicating the label written
-         next to the origin, but if LABUP is set TRUE, then it
-         defaults to {\tt "}CC{\tt "}.
-         [NN]
-      }
-      \sstsubsection{
-         LABUP = \_LOGICAL (Read)
-      }{
-         Normally this parameter is FALSE, and each text label (as
-         determined by LABMODE) is written parallel or anti-parallel
-         to the pixel X axis of the corresponding image.  If this
-         parameter is set TRUE however, text will be written upright,
-         that is, horizontal on the graphics device.  In this case
-         the positioning algorithm may fail to place it inside the
-         corresponding outline; it is generally not advisable to
-         set LABUP to TRUE unless the label is positioned in the
-         centre of the outline by setting LABPOS={\tt "}CC{\tt "}.
-         [FALSE]
-      }
-      \sstsubsection{
-         LOGFILE = FILENAME (Read)
-      }{
-         Name of the CCDPACK logfile.  If a null (!) value is given for
-         this parameter then no logfile will be written, regardless of
-         the value of the LOGTO parameter.
-
-         If the logging system has been initialised using CCDSETUP
-         then the value specified there will be used. Otherwise, the
-         default is {\tt "}CCDPACK.LOG{\tt "}.
-         [CCDPACK.LOG]
-      }
-      \sstsubsection{
-         LOGTO = LITERAL (Read)
-      }{
-         Every CCDPACK application has the ability to log its output
-         for future reference as well as for display on the terminal.
-         This parameter controls this process, and may be set to any
-         unique abbreviation of the following:
-         \sstitemlist{
-
-            \sstitem
-               TERMINAL  -- Send output to the terminal only
-
-            \sstitem
-               LOGFILE   -- Send output to the logfile only (see the
-                               LOGFILE parameter)
-
-            \sstitem
-               BOTH      -- Send output to both the terminal and the
-                               logfile
-
-            \sstitem
-               NEITHER   -- Produce no output at all
-
-         }
-         If the logging system has been initialised using CCDSETUP
-         then the value specified there will be used. Otherwise, the
-         default is {\tt "}BOTH{\tt "}.
-         [BOTH]
-      }
-      \sstsubsection{
-         PENROT = \_LOGICAL (Read)
-      }{
-         If TRUE, each outline will be drawn with a different pen
-         (colour).  Otherwise, they will all be drawn in the same pen.
-         [FALSE]
-      }
-      \sstsubsection{
-         STYLE = LITERAL (Read)
-      }{
-         A group of attribute settings describing the plotting style
-         to use for the outlines and annotated axes.  This should be
-         a string consisting of comma-separated `attribute=value{\tt '}
-         items, as explained in the `\xref{Plotting Styles and Attributes}{sun95}{se_style}'
-         section of \xref{SUN/95}{sun95}{}, except that colours may only be specified
-         by index, and not by name.
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         bounds reg-data$*$ clear
-      }{
-         This will clear the current graphics device and plot on it
-         labelled outlines of all the `reg-data$*${\tt '} images, as well as
-         axes showing the common coordinate system in which they
-         all reside.  The plotting area will be made just large enough
-         that all the boundaries fit in.  Prior to running this, the
-         Current attached coordinate system of all the reg-data$*$ images
-         should be one in which they are all aligned.
-      }
-      \sstexamplesubsection{
-         bounds ccd$*$ noclear
-      }{
-         This will attempt to plot outlines of all the `ccd$*${\tt '} images
-         aligned with whatever is already plotted on the graphics
-         device, for instance the result of a KAPPA \xref{DISPLAY}{sun95}{DISPLAY} command
-         or of a previous call of \routine{BOUNDS}.  Parts of the image outlines
-         which fall outside the existing plot area will not be visible.
-      }
-      \sstexamplesubsection{
-         bounds in={\tt "}one,two,three{\tt '} axes=yes label=[name,index] 
-                penrot=yes style={\tt "}size(strings)=2,width(curves)=3{\tt "}
-      }{
-         This will draw outlines of the NDFs `one{\tt '}, `two{\tt '} and `three{\tt '}
-         in the current directory with labelled axes, in triple-thick
-         lines and with double-size text labels which read `1: one{\tt '},
-         `2: two{\tt '} and `3: three{\tt '} respectively.  The colour of each
-         outline and its associated text label will be different from
-         the others.
-      }
-      \sstexamplesubsection{
-         bounds in=a$*$ noclear nopenrot style={\tt "}colour=2{\tt "} 
-                label=!
-      }{
-         All the images beginning with `a{\tt '} will be outlined in colour 2,
-         with no text labels or indication of the origin.
-      }
-   }
-   \sstdiytopic{
-      Behaviour of Parameters
-   }{
-      All parameters retain their current value as default. The
-      {\tt "}current{\tt "} value is the value assigned on the last run of the
-      application. If the application has not been run then the
-      {\tt "}intrinsic{\tt "} defaults, as shown in the parameter help, apply.
-
-      Retaining parameter values has the advantage of allowing you to
-      define the default behaviour of the application. The intrinsic
-      default behaviour of the application may be restored by using the
-      RESET keyword on the command line.
-
-      Certain parameters (LOGTO and LOGFILE) have global
-      values. These global values will always take precedence, except
-      when an assignment is made on the command line. Global values may
-      be set and reset using the CCDSETUP and CCDCLEAR commands.
-
-      The DEVICE parameter also has a global association. This is not
-      controlled by the usual CCDPACK mechanisms, instead it works in
-      co-operation with \xref{KAPPA}{sun95}{} image display/control routines.
-   }
-   \sstimplementationstatus{
-      \routine{BOUNDS}{\tt '}s communication with the AGI database is compatible with
-      most of KAPPA{\tt '}s behaviour, but is slightly less capable; in
-      particular it will fail to align with pictures whose alignment
-      has been stored using TRANSFORM structures instead of MORE.AST
-      extensions.  This affects only older applications.
    }
 }
 \sstroutine{PAIRNDF} {
