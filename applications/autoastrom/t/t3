@@ -8,7 +8,7 @@ exec $PERLBIN <<'EOD';
 use NDF;
 
 use lib '..';
-use aalib;
+use autoastrom;
 
 print "canonicalise_ndfname...\n";
 foreach $n (('ndfname', 'HellO4.there-howd+yedo?',

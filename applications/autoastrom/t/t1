@@ -6,7 +6,7 @@ export AUTOASTROM_DIR;
 exec $PERLBIN <<'EOD';
 
 use lib '..';
-use aalib;
+use autoastrom;
 
 foreach $v (('0', '360', '261.636', '-12.345', '400')) {
 	printf "ra= %10f  -->  %s\n", $v, dmshms($v,1);

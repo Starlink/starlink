@@ -6,7 +6,7 @@ export AUTOASTROM_DIR;
 exec $PERLBIN <<'EOD';
 
 use lib '..';
-use aalib;
+use autoastrom;
 
 print "      chi2         dof     Q(chi2)       ratio\n";
 print "      ----         ---     -------       -----\n";
