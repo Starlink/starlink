@@ -6,10 +6,10 @@ interface ICOLOUR
     prompt 'Mode'
     help 'Reply with HELP for a full list'
   endparameter
-  parameter TABLE
+  parameter FILE
     position 2
-    type 'UNIV'
+    type '_CHAR'
     prompt 'Table'
-    help 'Object containing or to contain colour table'
+    help 'File containing or to contain colour table'
   endparameter
 endinterface
