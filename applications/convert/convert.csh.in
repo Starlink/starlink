@@ -24,7 +24,10 @@
 #  History:
 #     1993 August 20 (MJC):
 #        Original version.
+#     1993 September 5 (MJC):
+#        Added IRCAM2NDF.
 #     {enter_further_changes_here}
+#
 #  Bugs:
 #     {note_any_bugs_here}
 #
@@ -60,6 +63,7 @@ alias dipso2ndf  $CONVERT_DIR/dipso2ndf
 alias dst2ndf    $CONVERT_DIR/dst2ndf
 alias gasp2ndf   $CONVERT_DIR/gasp2ndf
 alias iraf2ndf   $CONVERT_DIR/iraf2ndf
+alias ircam2ndf  $CONVERT_DIR/ircam2ndf
 alias unf2ndf    $CONVERT_DIR/unf2ndf
 alias ndf2ascii  $CONVERT_DIR/ndf2ascii
 alias ndf2dipso  $CONVERT_DIR/ndf2dipso
@@ -76,6 +80,7 @@ alias con_dipso2ndf  $CONVERT_DIR/dipso2ndf
 alias con_dst2ndf    $CONVERT_DIR/dst2ndf
 alias con_gasp2ndf   $CONVERT_DIR/gasp2ndf
 alias con_iraf2ndf   $CONVERT_DIR/iraf2ndf
+alias con_ircam2ndf  $CONVERT_DIR/ircam2ndf
 alias con_unf2ndf    $CONVERT_DIR/unf2ndf
 alias con_ndf2ascii  $CONVERT_DIR/ndf2ascii
 alias con_ndf2dipso  $CONVERT_DIR/ndf2dipso
