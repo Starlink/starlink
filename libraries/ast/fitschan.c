@@ -15754,11 +15754,14 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
                bj = 'J';
             }
 
-/* Give a warning that a default RADESYS value is being used. */
-            sprintf( buf, "The original FITS header did not specify the "
-                     "RA/DEC reference frame. A default value of %s was "
-                     "assumed.", ( radesys == FK4 ) ? "FK4" : "FK5" );
-            Warn( this, "noradesys", buf );
+/* If an equatorial system is being used, give a warning that a default RADESYS value is 
+   being used. */
+            if( !strcmp( sys, "EQU" ) ){
+               sprintf( buf, "The original FITS header did not specify the "
+                        "RA/DEC reference frame. A default value of %s was "
+                        "assumed.", ( radesys == FK4 ) ? "FK4" : "FK5" );
+               Warn( this, "noradesys", buf );
+            }
          }
 
 /* If no equinox was supplied, use a default equinox value depending
@@ -15779,16 +15782,21 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
             equinox = 1950.0;
             bj = 'B';
             radesys = FK4;
-            Warn( this, "noradesys", "The original FITS header did not "
-                  "specify the RA/DEC reference frame. A default value of "
-                  "FK4 was assumed.");
+            if( !strcmp( sys, "EQU" ) ){
+               Warn( this, "noradesys", "The original FITS header did not "
+                     "specify the RA/DEC reference frame. A default value of "
+                     "FK4 was assumed.");
+            }
          }
 
-/* Issue a warning that a default equinox has been adopted. */
-         sprintf( buf, "The original FITS header did not specify the "
-                  "RA/DEC reference equinox. A default value of %c%.8g was "
-                  "assumed.", bj, equinox );
-         Warn( this, "noequinox", buf );
+/* If we have an equatorial or ecliptic system, issue a warning that a default
+   equinox has been adopted. */
+         if( !strcmp( sys, "EQU" ) || !strcmp( sys, "ECL" ) ){
+            sprintf( buf, "The original FITS header did not specify the "
+                     "reference equinox. A default value of %c%.8g was "
+                     "assumed.", bj, equinox );
+            Warn( this, "noequinox", buf );
+         }
       }
 
 /* Convert the equinox to a Modified Julian Date. */
