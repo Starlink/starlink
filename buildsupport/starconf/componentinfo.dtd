@@ -1,9 +1,10 @@
 <!-- A list of components -->
-<!ELEMENT componentlist (component+)>
+<!ELEMENT componentlist (component+, manifest*)>
 
 <!-- One component.  The ID attribute is a unique identifier for this
      component, used in, for example, <dependencies> elements of other
-     components. -->
+     components.  The ID should be the same as the package variable
+     declared as the first argument of the configure.ac AC_INIT macro. -->
 <!ELEMENT component     (description, path, dependencies, developers?, notes?)>
 <!ATTLIST component
         id      ID      #REQUIRED
@@ -18,7 +19,9 @@
 <!-- List components this component depends on, both those
      required in order to build the component, and those required
      after installation in order to use it.  Both are space-separated
-     lists of the IDs given in <component> start-tags. -->
+     lists of the IDs given in <component> start-tags.  In both cases
+     the list should contain only the direct dependencies, and not
+     dependencies of those in turn. -->
 <!ELEMENT dependencies  (build?, use?)>
 <!ELEMENT build         (#PCDATA)>
 <!ELEMENT use           (#PCDATA)>
@@ -33,3 +36,17 @@
 <!-- Any other notes -->
 <!ELEMENT notes         (p+)>
 <!ELEMENT p             (#PCDATA)>
+
+<!-- The installation manifest for one component.  The component ID
+     must be the ID attribute of a <component> element.  However it is
+     not declared as an IDREF below, as the <manifest> element is
+     sometimes used as a top-level document type. -->
+<!ELEMENT manifest      (files)>
+<!ATTLIST manifest
+        component       CDATA   #REQUIRED
+        >
+
+<!-- The list of installed files.  A whitespace-separated list; in
+     fact, the files should be separated by newlines, for easy
+     subsequent processing, though this is unenforceable here. -->
+<!ELEMENT files         (#PCDATA)>
