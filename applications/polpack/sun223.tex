@@ -250,7 +250,7 @@
 
 % ? Add picture here if required.
    \begin{center}
-   \includegraphics{sun223_figures/map2_htx.eps}\hfill
+   \includegraphics[clip,scale=0.5]{sun223_figures/map2.eps}\hfill
    \end{center}
 % ? End of picture
 
@@ -470,7 +470,7 @@ described more fully below.
    \begin{quote}
    \begin{figure}[bhtp]
    \label{fig:optical}
-   \includegraphics{sun223_figures/optical_htx.eps}
+   \includegraphics[clip,scale=0.5]{sun223_figures/optical.eps}
    \caption{The main optical components in a typical dual-beam imaging polarimeter.}
    \end{figure}
    \end{quote}
@@ -513,7 +513,7 @@ a mask containing only a single aperture), but the principle is the same.
    \begin{quote}
    \begin{figure}[hbtp]
    \label{fig:grids}
-   \includegraphics{sun223_figures/grids_htx.eps}
+   \includegraphics[clip,scale=0.65]{sun223_figures/grids.eps}
    \caption{An example of a masking system used in a dual-beam imaging polarimeter.}
    \end{figure}
    \end{quote}
@@ -643,7 +643,7 @@ further processing.
    \begin{quote}
    \begin{figure}[hbtp]
    \label{fig:extract}
-   \includegraphics{sun223_figures/extract_htx.eps}
+   \includegraphics[clip,scale=0.3]{sun223_figures/extract.eps}
    \caption{Extraction of the $O$ and $E$ ray images.}
    \end{figure}
    \end{quote}
@@ -787,7 +787,7 @@ This form of polarimeter is shown diagramatically in Figure~\ref{fig:singopt}.
    \begin{quote}
    \begin{figure}[bhtp]
    \label{fig:singopt}
-   \includegraphics{sun223_figures/singopt_htx.eps}
+   \includegraphics[clip,scale=0.45]{sun223_figures/singopt.eps}
    \caption{The main optical components in a typical single-beam imaging polarimeter.}
    \end{figure}
    \end{quote}
@@ -833,7 +833,7 @@ and half-wave plate (see Figure~\ref{fig:effan}).
    \begin{quote}
    \begin{figure}[bhtp]
    \label{fig:effan}
-   \includegraphics{sun223_figures/effan_htx.eps}
+   \includegraphics[clip,scale=0.4]{sun223_figures/effan.eps}
     \caption{The effective analyser position for a rotating half-wave plate.}
    \end{figure}
    \end{quote}
@@ -965,7 +965,7 @@ is given in Figure~\ref{fig:dataflow}.
    \begin{quote}
    \begin{figure}[bhtp]
    \label{fig:dataflow}
-   \includegraphics{sun223_figures/dataflow_htx.eps}
+   \includegraphics[clip,scale=0.6]{sun223_figures/dataflow.eps}
    \caption{The main steps in the production of a polarization map.}
    \end{figure}
    \end{quote}
@@ -1002,7 +1002,7 @@ you have two options:
 
 \item You can explicitly convert your data files into NDF format at the
 beginning, and use the NDF versions there-after. The \xref{CONVERT}{sun55}{} 
-package {\latexonly (see SUN/55)} provides facilities for converting to and
+package \latexonly{(see SUN/55)} provides facilities for converting to and
 from most common astronomical data formats. For instance, if your data is
 in the form of a set of FITS files, you could use commands similar to the
 following to convert them into NDFs:
@@ -1051,8 +1051,8 @@ proportional to the analysed intensity. You should therefore correct your
 data for any known instrumental effects such as non-linearity, variation
 of sensitivity across the detector, zero point offsets, \emph{etc}, before
 proceeding to use POLPACK. The details will obviously depend on your
-detector, but if you are using a CCD camera, then \xref{CCDPACK}{sun139}{} 
-{\latexonly (see SUN/139)} will usually be able to perform these corrections.
+detector, but if you are using a CCD camera, then the \xref{CCDPACK}{sun139}{} 
+package \latexonly{(see SUN/139)} will usually be able to perform these corrections.
 
 If you are using dual-beam data, and target exposures are available at 
 half-wave plate positions of
@@ -1315,7 +1315,7 @@ being made during this phase.
 \begin{latexonly}
   \begin{figure}[htpb]
   \begin{center}
-  \includegraphics[clip,scale=0.9]{sun223_figures/polka.eps}
+  \includegraphics[clip,scale=0.85]{sun223_figures/polka.eps}
   \vspace{4mm}
   \caption{The Graphical User Interface presented by POLKA.}
   \label{fig:polka}
@@ -1326,7 +1326,7 @@ being made during this phase.
    \begin{quote}
    \begin{figure}[bhtp]
    \label{fig:polka}
-   \includegraphics{sun223_figures/polka_htx.eps}
+   \includegraphics[clip,scale=0.8]{sun223_figures/polka.eps}
    \caption{The Graphical User Interface presented by POLKA.}
    \end{figure}
    \end{quote}
@@ -1467,7 +1467,7 @@ with the previously displayed picture.
 \end{quote}
 
 Since the polarization parameters are stored in a catalogue, the
-\xref{CURSA}{sun190}{} package {\latexonly (see SUN/190)} can be used to
+\xref{CURSA}{sun190}{} package \latexonly{(see SUN/190)} can be used to
 examine and manipulate them. One particularly useful facility within
 CURSA is the \xref{CATSELECT}{sun190}{SELECT} application, which
 allows rows within a catalogue to be selected on the basis of an
@@ -1786,7 +1786,7 @@ parameters later.
 created by POLKA (it doesn't really matter which one). This will usually 
 require you to know the RA and DEC of at least two features in the image. 
 See \hyperref{here}{appendix }{}{APP:GAIA} for a simple description of how 
-to use \xref{GAIA}{sun214}{} {\latexonly (SUN/214)} to do this.
+to use \xref{GAIA}{sun214}{} \latexonly{(SUN/214)} to do this.
 
 \item Create a cube of Stokes vectors using \htmlref{POLCAL}{POLCAL}. Any
 WCS information is copied from the first input image (given for parameter IN)
@@ -1846,7 +1846,7 @@ internally by POLPACK, rather than by the shell).
 
 \section{\label{SEC:GRPEXP}\xlabel{groupexpressions}Group Expressions}
 Several of the POLPACK applications have parameters which are described
-{\latexonly in appendix \ref{APP:DESCRIPTION}} as being associated with
+\latexonly{in appendix \ref{APP:DESCRIPTION}} as being associated with
 \emph{groups} (or \emph{lists}) of objects. For instance, the 
 \htmlref{POLKA}{POLKA} parameter ``IN'' specifies a group of input data 
 files, and the \htmlref{POLPLOT}{POLPLOT} parameter ``STYLE'' specifies a
@@ -5473,7 +5473,7 @@ their exposure factors, and another estimate of the F factor.
 
 \section{\label{APP:GAIA}\xlabel{gaia}Using GAIA to Create an RA/DEC Calibration}
 This section gives a very brief and simple outline of how to add an RA/DEC
-calibrate to a 2-dimensional image using \xref{GAIA}{sun214}{} {\latexonly (see 
+calibrate to a 2-dimensional image using \xref{GAIA}{sun214}{} \latexonly{(see 
 SUN/214)}. 
 
 \begin{enumerate}
@@ -5507,7 +5507,7 @@ dialogue box shown in Figure~\ref{fig:gaia1}.
    \begin{quote}
    \begin{figure}[bhtp]
    \label{fig:gaia1}
-   \includegraphics{sun223_figures/gaia1.eps}
+   \includegraphics[clip,scale=0.5]{sun223_figures/gaia1.eps}
    \caption{The main GAIA dialogue box used to create an RA/DEC calibration.}
    \end{figure}
    \end{quote}
@@ -5537,7 +5537,7 @@ should produce the dialogue box shown in Figure~\ref{fig:gaia2}.
    \begin{quote}
    \begin{figure}[bhtp]
    \label{fig:gaia2}
-   \includegraphics{sun223_figures/gaia2.eps}
+   \includegraphics[clip,scale=0.5]{sun223_figures/gaia2.eps}
    \caption{The GAIA dialogue box used to give a new reference position.}
    \end{figure}
    \end{quote}
@@ -5571,7 +5571,7 @@ object picker dialogue box
    \begin{quote}
    \begin{figure}[bhtp]
    \label{fig:gaia3}
-   \includegraphics{sun223_figures/gaia3.eps}
+   \includegraphics[clip,scale=0.5]{sun223_figures/gaia3.eps}
    \caption{The GAIA object picker dialogue box.}
    \end{figure}
    \end{quote}
@@ -5734,7 +5734,7 @@ Figure~\ref{fig:varest}:
 
 \begin{latexonly}
   \vspace{2mm}
-  \begin{figure}[htb]
+  \begin{figure}[htbp]
   \begin{center}
   \includegraphics[clip,scale=0.9]{sun223_figures/varest.eps}
   \caption{The estimation of input variances. The observed and expected
@@ -5747,7 +5747,7 @@ Figure~\ref{fig:varest}:
    \begin{quote}
    \begin{figure}[bhtp]
    \label{fig:varest}
-   \includegraphics{sun223_figures/varest_htx.eps}
+   \includegraphics[clip,scale=0.6]{sun223_figures/varest.eps}
    \caption{The estimation of input variances. The observed and expected
             intensity images are combined to form a single variance image.}
    \end{figure}
@@ -5827,7 +5827,7 @@ illustrated in Figure~\ref{fig:quadfit}.
 
 \begin{latexonly}
   \vspace{2mm}
-  \begin{figure}[htb]
+  \begin{figure}[htbp]
   \begin{center}
   \includegraphics[clip,scale=0.75]{sun223_figures/quadfit.eps}
   \caption{A 1-dimensional representation of the smoothing performed by
@@ -5842,7 +5842,7 @@ illustrated in Figure~\ref{fig:quadfit}.
    \begin{quote}
    \begin{figure}[bhtp]
    \label{fig:quadfit}
-   \includegraphics{sun223_figures/quadfit_htx.eps}
+   \includegraphics[clip,scale=0.5]{sun223_figures/quadfit.eps}
    \caption{A 1-dimensional representation of the smoothing performed by
             POLCAL in single-beam mode. In this example, each pixel is 
             replaced by the value of a quadratic surface fitted to the 
@@ -5959,9 +5959,9 @@ assumed that the reference direction is parallel to the first image axis).
 
 
 \begin{latexonly}
-  \begin{figure}[htb]
+  \begin{figure}[htbp]
   \begin{center}
-  \includegraphics[clip,scale=0.8]{sun223_figures/polext.eps}
+  \includegraphics[clip,scale=0.75]{sun223_figures/polext.eps}
   \caption{The allowed items within the POLPACK extension.}
   \label{fig:polext}
   \end{center}
@@ -5971,7 +5971,7 @@ assumed that the reference direction is parallel to the first image axis).
    \begin{quote}
    \begin{figure}[ht]
    \label{fig:polext}
-   \includegraphics{sun223_figures/polext_htx.eps}
+   \includegraphics[clip,scale=0.65]{sun223_figures/polext.eps}
    \caption{The allowed items within the POLPACK extension.}
    \end{figure}
    \end{quote}
