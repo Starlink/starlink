@@ -76,6 +76,27 @@ immediately resolve the indirection.
       (string-append (gi nd) (attribute-string (normalize "id") nd))
       (error "Can't generate references to unlabelled elements")))
 
+;; Given an FPI (a public identifier) of the form
+;; "-//Starlink//DOCUMENT Summary SUN/123//EN", this returns a sosofo
+;; which represents a reference to it
+;;
+;; Parameters:
+;;    fpi the FPI which refers to the document
+;;    linktext the content of the link, or #f, in which case a default
+;;        text is generated
+;;
+;; Returns:
+;;    A sosofo
+(define ($make-dummy-reference$ fpi linktext)
+  (if linktext
+      (literal linktext)
+      (let ((td (query-parse-fpi 'text-description
+                                 (parse-fpi fpi))))
+        (if td
+            (literal (car (reverse (tokenise-string td))))
+            #f))))
+
+
 <routine>
 <description>The <code>docxref</> element has a required attribute
 giving the document which is to be referred to, and an optional
@@ -100,94 +121,124 @@ it produces an <funcname>error</>.
 <p>The rule uses the <code>mk-docxref</> mode to process the target element.
 
 <codebody>
+;; The code here is adapted from the html version of this, in
+;; ../html/sllinks.dsl, and it's more fully explained there.  Only the
+;; differences from that code are documented here.
 (element docxref
-  (let* ((xrefent (attribute-string (normalize "doc") (current-node)))
-	 ;; At one time, I extracted the entity's system id here.
-	 ;; It's not clear why I did this, as the only apparent use to
-	 ;; which I put it was to check whether it existed, and object
-	 ;; vigourously if it did.  I don't know why I had such a
-	 ;; downer on system ids in the entity declaration -- if I
-	 ;; decide that this is, after all, a good thing to forbid,
-	 ;; then perhaps I can put some explanation in next time.
-	 ;;(xrefent-sysid (and xrefent
-	 ;;		     (entity-system-id xrefent)))
-	 (xrefent-gen-sysid (and xrefent
-				 (entity-generated-system-id xrefent)))
-	 (docelem (and xrefent-gen-sysid
-		       (document-element-from-entity xrefent)))
-	 (xrefid (attribute-string (normalize "loc") (current-node)))
-	 ;; xreftarget is the element the docxref refers to, or #f if
-	 ;; attribute LOC is implied or the document doesn't have such
-	 ;; an ID
-	 (tmp-xreftarget (and xrefid
-			      docelem
-			      (node-list-or-false (element-with-id xrefid
-								   docelem))))
-	 (xreftarget (if (and tmp-xreftarget
-			      (string=? (gi tmp-xreftarget)
-					(normalize "mapid")))
-			 (element-with-id (attribute-string (normalize "to")
-							    tmp-xreftarget)
-					  docelem)
-			 tmp-xreftarget))
-	 (xrefurl (and xreftarget
-		       (get-link-policy-target xreftarget no-urls: #t)))
-	 ;; If the element has content, make that the link text, else
-	 ;; if the element has a `text' attribute, make that the link
-	 ;; text, else generate the text below.
-	 (linktext (if (not (string=? (data (current-node)) ""))
-		       (data (current-node))
-		       (attribute-string (normalize "text")
-					 (current-node))))
-	 ;(linktext (attribute-string (normalize "text")
-		;		     (current-node)))
-	 )
-    (if (and xrefent-gen-sysid
-	     docelem
-	     (string=? (gi docelem)
-		       (normalize "documentsummary"))) ; sanity check...
-	(if linktext
-	    (literal linktext)	;override generation of link text
-	    (if xreftarget
-		(if (car xrefurl)	; link to element by id
-		    (error (car xrefurl)) ; violated policy - complain
-		    (make command name: "textit"
-			  (with-mode mk-docxref
-			    (process-node-list (document-element
-						xreftarget)))
-			  (literal ": ")
-			  (with-mode section-reference
-			    (process-node-list xreftarget))))
-		(make command name: "textit" ; link to whole document
-		      (with-mode mk-docxref
-			(process-node-list docelem)))))
-	(let ((xrefent-pubid (and xrefent
-				  (entity-public-id xrefent))))
-	  (cond
-	   (docelem (error (string-append "DOCXREF: target " xrefent
-					  " has document type " (gi docelem)
-					  ": expected "
-					  (normalize "documentsummary"))))
-	   ;;(xrefent-sysid (error (string-append "DOCXREF: entity " xrefent
-	   ;;					" has a SYSTEM id")))
-	   (xrefent-gen-sysid (error (string-append
-				      "DOCXREF: Couldn't parse "
-				      xrefent)))
-	   (xrefent-pubid (if linktext
-			      (literal linktext)
-			      (let* ((pfpi (parse-fpi xrefent-pubid))
-				     (td (query-parse-fpi 'text-description
-							  pfpi)))
-				(if td
-				    (literal
-				     (car (reverse (tokenise-string td))))
-				    (error (string-append
-					    "DOCXREF: couldn't make sense of FPI '"
-					    xrefent-pubid "'"))))))
-	   (xrefent (error (string-append
-			    "DOCXREF: entity " xrefent
-			    " has no PUBLIC identifier")))
-	   (else (error "DOCXREF: missing DOC attribute")))))))
+  (let ((xrefent (attribute-string (normalize "doc") (current-node)))
+
+        (linktext (if (not (string=? (data (current-node)) ""))
+                      (data (current-node))
+                      (attribute-string (normalize "text")
+                                        (current-node))))
+
+        (xrefid (attribute-string (normalize "loc") (current-node))))
+    (cond
+     ((not xrefent)
+      (error "DOCXREF: missing DOC attribute"))
+     
+     ((or (equal? (entity-type xrefent)
+                  'subdocument)
+          (and (equal? (entity-type xrefent)
+                       'ndata)
+               (string=? (notation-public-id  (entity-notation xrefent))
+                         "-//Starlink//NOTATION Document Summary//EN")))
+      (let* ((xrefent-gen-sysid (entity-generated-system-id xrefent))
+             (docelem (and xrefent-gen-sysid
+                           (document-element-from-entity xrefent)))
+
+             ;; xreftarget is the element the docxref refers to, or #f if
+             ;; attribute LOC is implied or the document doesn't have such
+             ;; an ID
+             (tmp-xreftarget (and xrefid
+                                  docelem
+                                  (node-list-or-false
+                                   (element-with-id xrefid docelem))))
+
+             (xreftarget
+              (if (and tmp-xreftarget
+                       (string=? (gi tmp-xreftarget)
+                                 (normalize "mapid")))
+                  (element-with-id (attribute-string (normalize "to")
+                                                     tmp-xreftarget)
+                                   docelem)
+                  tmp-xreftarget))
+             ;; no-urls: #t added
+             (xrefurl (and xreftarget
+                           (get-link-policy-target xreftarget no-urls: #t)))
+             
+             (xrefent-pubid (and xrefent
+                                 (entity-public-id xrefent))))
+        (cond
+         ((not xrefent)
+          (error "DOCXREF: missing DOC attribute"))
+         
+         ((not xrefent-pubid)
+          (error (string-append "DOCXREF: entity " xrefent
+                                " has no PUBLIC identifier")))
+         
+         ((not xrefent-gen-sysid)
+          (or ($make-dummy-reference$ xrefent-pubid linktext)
+              (error (string-append
+                      "DOCXREF: couldn't make sense of FPI '"
+                      xrefent-pubid "'"))))
+         
+         ((not docelem)
+          (error (string-append
+                  "DOCXREF: Couldn't parse " xrefent
+                  " (gen-sys-id " xrefent-gen-sysid ")")))
+         
+         ((string=? (gi docelem)
+                    (normalize "documentsummary"))
+          ;; This is the normal case: everything's working
+          ;; This is the main difference from ../html/sllinks.dsl for this element
+          (if linktext
+              (literal linktext)  ;override generation of link text
+            (if xreftarget
+                (if (car xrefurl)       ; link to element by id
+                    (error (car xrefurl)) ; violated policy - complain
+                  (make command name: "textit"
+                        (with-mode mk-docxref
+                                   (process-node-list (document-element
+                                                       xreftarget)))
+                        (literal ": ")
+                        (with-mode section-reference
+                                   (process-node-list xreftarget))))
+              (make command name: "textit" ; link to whole document
+                    (with-mode mk-docxref
+                               (process-node-list docelem))))))
+
+         (else
+          ;; Ooops, failed at the last hurdle: the target document is the
+          ;; wrong type
+          (error (string-append "DOCXREF: target " xrefent
+                                " has document type " (gi docelem)
+                                ": expected "
+                                (normalize "documentsummary")))))))
+
+     ((and (equal? (entity-type xrefent) 'ndata)
+           (string=? (notation-public-id (entity-notation xrefent))
+                     "+//IDN www.w3.org/TR/1998/REC-xml-19980210//NOTATION XML//EN"))
+      ;; A cross-reference to another XML document.  If there's a system id, 
+      ;; use that; if the system id is absent or blank (it's required to be
+      ;; present in XML), then generate a link based on the public id
+      (let ((pubid (entity-public-id xrefent))
+            (sysid (entity-system-id xrefent)))
+        (make sequence
+          (or ($make-dummy-reference$ pubid linktext)
+              (error (string-append
+                      "DOCXREF: couldn't make sense of FPI '" pubid "'")))
+          (if (and sysid
+                   (> (string-length sysid) 0))
+              (make command name: "UrlFootnote"
+                    (literal sysid))
+              (empty-sosofo)))))
+
+     (else
+      (error (string-append "DOCXREF: can't make any sense of entity "
+                            xrefent ", of type "
+                            (symbol->string (entity-type xrefent))))))))
+
 
 ;; possibly due to a bug in Jade, we need to provide dummy definitions
 ;; of %starlink-document-server% and the function href-to

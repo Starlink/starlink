@@ -104,6 +104,18 @@ immediately resolve the indirection.
 ; 		  "The stylesheet is presently unable to link to elements of type "
 ; 	          (gi target)))))))
 
+;; Given an FPI (a public identifier) of the form
+;; "-//Starlink//DOCUMENT Summary SUN/123//EN", this returns a sosofo
+;; which represents an "a" element, pointing to the correct place
+;;
+;; Parameters:
+;;    fpi the FPI which refers to the document
+;;    xrefid a location within that document, or #f
+;;    linktext the content of the link, or #f, in which case a default
+;;        text is generated
+;;
+;; Returns:
+;;    A sosofo
 (define ($make-dummy-link$ fpi xrefid linktext)
   (let* ((els (parse-fpi fpi))
 	 (descrip (query-parse-fpi 'text-description els))
@@ -173,130 +185,164 @@ it produces an <funcname>error</>.
 
 <codebody>
 (element docxref
-  (let* ((xrefent (attribute-string (normalize "doc") (current-node)))
-	 ;; At one time, I extracted the entity's system id here.
-	 ;; It's not clear why I did this, as the only apparent use to
-	 ;; which I put it was to check whether it existed, and object
-	 ;; vigourously if it did.  I don't know why I had such a
-	 ;; downer on system ids in the entity declaration -- if I
-	 ;; decide that this is, after all, a good thing to forbid,
-	 ;; then perhaps I can put some explanation in next time.
-	 ;(xrefent-sysid (and xrefent
-	 ;	     (entity-system-id xrefent)))
+  (let ((xrefent (attribute-string (normalize "doc") (current-node)))
+        ;; At one time, I extracted the entity's system id here.
+        ;; It's not clear why I did this, as the only apparent use to
+        ;; which I put it was to check whether it existed, and object
+        ;; vigourously if it did.  I don't know why I had such a
+        ;; downer on system ids in the entity declaration -- if I
+        ;; decide that this is, after all, a good thing to forbid,
+        ;; then perhaps I can put some explanation in next time.
+        ;;(xrefent-sysid (and xrefent
+        ;;	     (entity-system-id xrefent)))
 
-	 ;; If the target document does not exist (which is deemed to
-	 ;; be OK, and from which we recover by parsing the public
-	 ;; ID below), then xrefent-gen-sysid will become false.
-	 (xrefent-gen-sysid (and xrefent
-				 (entity-generated-system-id xrefent)))
-	 (docelem (and xrefent-gen-sysid
-		       (document-element-from-entity xrefent)
-		       ))
+        ;; If the element has content, make that the link text, else
+        ;; if the element has a `text' attribute (temporary, for
+        ;; backward compatibility), make that the link
+        ;; text, else generate the text below.
+        (linktext (if (not (string=? (data (current-node)) ""))
+                      (data (current-node))
+                      (attribute-string (normalize "text")
+                                        (current-node))))
 
-	 ;; xrefid is the ID of an element in the target document
-	 ;; which is to become the target of the link
-	 (xrefid (attribute-string (normalize "loc") (current-node)))
-	 ;; xreftarget is the element the docxref refers to, or docelem if
-	 ;; attribute LOC is implied (xrefid is #f) or the document
-	 ;; doesn't have such an ID (element-with-id returns #f).  If
-	 ;; the target document does not exist, then docelem will be
-	 ;; false, and hence so will tmp-xreftarget and xreftarget.
-	 (tmp-xreftarget (or (and xrefid
-				  docelem
-				  (node-list-or-false
-				   (element-with-id xrefid docelem)))
-			     docelem))
-	 ;; If the target element is a mapid element, then dereference it
-	 (xreftarget (if (and tmp-xreftarget
-			      (string=? (gi tmp-xreftarget)
-					(normalize "mapid")))
-			 (element-with-id (attribute-string (normalize "to")
-							    tmp-xreftarget)
-					  docelem)
-			 tmp-xreftarget))
-	 ;; Call get-link-policy-target to decide whether or not we
-	 ;; are allowed, by the target document's own settings, to
-	 ;; link to this `xreftarget'.
-	 (xrefurl (and xreftarget
-		       (get-link-policy-target xreftarget)))
+        ;; xrefid is the ID of an element in the target document
+        ;; which is to become the target of the link
+        (xrefid (attribute-string (normalize "loc") (current-node))))
+    (cond
+     ((not xrefent)
+      (error "DOCXREF: missing DOC attribute"))
+     
+     ((or (equal? (entity-type xrefent)
+                  'subdocument)
+          (and (equal? (entity-type xrefent)
+                       'ndata)
+               (string=? (notation-public-id  (entity-notation xrefent))
+                         "-//Starlink//NOTATION Document Summary//EN")))
+      ;; This is a cross-reference to a documentsummary document
+      (let* (
+             ;; If the target document does not exist (which is deemed to
+             ;; be OK, and from which we recover by parsing the public
+             ;; ID below), then xrefent-gen-sysid will become false.
+             (xrefent-gen-sysid (entity-generated-system-id xrefent))
+             (docelem (and xrefent-gen-sysid
+                           (document-element-from-entity xrefent)))
+             ;; xreftarget is the element the docxref refers to, or docelem if
+             ;; attribute LOC is implied (xrefid is #f) or the document
+             ;; doesn't have such an ID (element-with-id returns #f).  If
+             ;; the target document does not exist, then docelem will be
+             ;; false, and hence so will tmp-xreftarget and xreftarget.
+             (tmp-xreftarget (or (and xrefid
+                                      docelem
+                                      (node-list-or-false
+                                       (element-with-id xrefid docelem)))
+                                 docelem))
+             ;; If the target element is a mapid element, then dereference it
+             (xreftarget
+              (if (and tmp-xreftarget
+                       (string=? (gi tmp-xreftarget)
+                                 (normalize "mapid")))
+                  (element-with-id (attribute-string (normalize "to")
+                                                     tmp-xreftarget)
+                                   docelem)
+                  tmp-xreftarget))
+             ;; Call get-link-policy-target to decide whether or not we
+             ;; are allowed, by the target document's own settings, to
+             ;; link to this `xreftarget'.
+             (xrefurl (and xreftarget
+                           (get-link-policy-target xreftarget)))
+             
+             (xrefent-pubid (and xrefent
+                                 (entity-public-id xrefent))))
+        (cond
+         ((not xrefent)
+          (error "DOCXREF: missing DOC attribute"))
+         
+         ((not xrefent-pubid)
+          (error (string-append "DOCXREF: entity " xrefent
+                                " has no PUBLIC identifier")))
+         
+         ((not xrefent-gen-sysid)
+          ;; Here's the guesswork -- call $make-dummy-link$ to guess
+          ;; a link based on the public ID.
+          (or ($make-dummy-link$ xrefent-pubid xrefid linktext)
+              (error (string-append
+                      "DOCXREF: couldn't make sense of FPI '"
+                      xrefent-pubid "'"))))
+         
+         ((not docelem)
+          (error (string-append
+                  "DOCXREF: Couldn't parse " xrefent
+                  " (gen-sys-id " xrefent-gen-sysid ")")))
+         
+         ((string=? (gi docelem)
+                    (normalize "documentsummary"))
+          ;; This is the normal case: everything's working
+          ;;
+          ;; Target document exists, and has a document element of type
+          ;; `documentsummary'....
+          ;;
+          ;; There used to be two cases here, depending on whether
+          ;; xreftarget was true or not, which in turn depended on whether
+          ;; xrefid was true (ie, if we're linking to an element within
+          ;; the document, rather than the document as a whole).  Since
+          ;; revision 1.21, however, these two paths have been unified, so that
+          ;; xreftarget is either the element indicated by xrefid, or the
+          ;; document element, making the second of the following
+          ;; alternatives redundant.  I worry, however, that there's
+          ;; a case I haven't thought of, but it'll always be possible
+          ;; to reinstate the alternative case (or rewrite the damn
+          ;; thing from scratch).
+          (if (car xrefurl)
+              (error (car xrefurl)) ; violated policy - complain
+              (make element gi: "a"
+                    attributes: (list (list "href"
+                                            (cdr xrefurl)))
+                    (if linktext
+                        (literal linktext)
+                        (make sequence
+                          (with-mode mk-docxref
+                            (process-node-list (document-element
+                                                xreftarget)))
+                          (if (node-list=? xreftarget
+                                           (document-element
+                                            xreftarget))
+                              (empty-sosofo) ; nothing more...
+                              (make sequence ; add in a section reference
+                                (literal ": ")
+                                (with-mode section-reference
+                                  (process-node-list xreftarget)))))))))
 
-	 ;; If the element has content, make that the link text, else
-	 ;; if the element has a `text' attribute (temporary, for
-	 ;; backward compatibility), make that the link
-	 ;; text, else generate the text below.
-	 (linktext (if (not (string=? (data (current-node)) ""))
-		       (data (current-node))
-		       (attribute-string (normalize "text")
-					 (current-node)))))
-    (if (and xrefent-gen-sysid
-	     docelem
-	     (string=? (gi docelem)
-		       (normalize "documentsummary"))) ; sanity check...
-	;; Target document exists, and has a document element of type
-	;; `documentsummary'....
-	;;
-	;; There used to be two cases here, depending on whether
-	;; xreftarget was true or not, which in turn depended on whether
-	;; xrefid was true (ie, if we're linking to an element within
-	;; the document, rather than the document as a whole).  Since
-	;; revision 1.21, however, these two paths have been unified, so that
-	;; xreftarget is either the element indicated by xrefid, or the
-	;; document element, making the second of the following
-	;; alternatives redundant.  I worry, however, that there's
-	;; a case I haven't thought of, but it'll always be possible
-	;; to reinstate the alternative case (or rewrite the damn
-	;; thing from scratch).
-	(if (car xrefurl)
-	    (error (car xrefurl)) ; violated policy - complain
-	    (make element gi: "a"
-		  attributes: (list (list "href"
-					  (cdr xrefurl)))
-		  (if linktext
-		      (literal linktext)
-		      (make sequence
-			(with-mode mk-docxref
-			  (process-node-list (document-element
-					      xreftarget)))
-			(if (node-list=? xreftarget
-					 (document-element
-					  xreftarget))
-			    (empty-sosofo) ; nothing more...
-			    (make sequence ; add in a section reference
-			      (literal ": ")
-			      (with-mode section-reference
-				(process-node-list xreftarget))))))))
-	;; Or...
-	;; Something's wrong, either the target document does not
-	;; exist, or else it does but we can't find the document
-	;; element, or else we can but it doesn't have GI
-	;; `documentsummary'.  In either of the latter cases, simply
-	;; produce an error, but in the first case, recover by
-	;; constructing a link by guesswork, based on the public
-	;; ID...
-	(let ((xrefent-pubid (and xrefent
-				  (entity-public-id xrefent))))
-	  (cond
-	   (docelem (error (string-append "DOCXREF: target " xrefent
-					  " has document type " (gi docelem)
-					  ": expected "
-					  (normalize "documentsummary"))))
-	   ;;(xrefent-sysid (error (string-append "DOCXREF: entity " xrefent
-	   ;;				      " has a SYSTEM id")))
-	   (xrefent-gen-sysid (error (string-append
-				      "DOCXREF: Couldn't parse " xrefent
-				      " (gen-sys-id " xrefent-gen-sysid ")")))
-	   ;; Here's the guesswork -- call $make-dummy-link$ to guess
-	   ;; a link based on the public ID.
-	   (xrefent-pubid (or ($make-dummy-link$ xrefent-pubid xrefid linktext)
-			      (error (string-append
-				      "DOCXREF: couldn't make sense of FPI '"
-				      xrefent-pubid "'"))))
-	   (xrefent (error (string-append "DOCXREF: entity " xrefent
-					  " has no PUBLIC identifier")))
-	   ;;(xrefent (string-append
-	   ;;   "DOCXREF: Couldn't generate sysid for entity "
-	   ;;	   xrefent))
-	   (else (error "DOCXREF: missing DOC attribute")))))))
+         (else
+          ;; Ooops, failed at the last hurdle: the target document is the
+          ;; wrong type
+          (error (string-append "DOCXREF: target " xrefent
+                                " has document type " (gi docelem)
+                                ": expected "
+                                (normalize "documentsummary")))))))
+
+     ((and (equal? (entity-type xrefent) 'ndata)
+           (string=? (notation-public-id (entity-notation xrefent))
+                     "+//IDN www.w3.org/TR/1998/REC-xml-19980210//NOTATION XML//EN"))
+      ;; A cross-reference to another XML document.  If there's a system id, 
+      ;; use that; if the system id is absent or blank (it's required to be
+      ;; present in XML), then generate a link based on the public id
+      (let ((pubid (entity-public-id xrefent))
+            (sysid (entity-system-id xrefent)))
+        (if (and sysid
+                 (> (string-length sysid) 0))
+            (make element gi: "a"
+                  attributes: `(("href" ,sysid))
+                  ;; Use the linktext if specified, or the entity name otherwise.
+                  ;; Latter isn't great, but all we can do
+                  (literal (or linktext xrefent)))
+            (or ($make-dummy-link$ pubid xrefid linktext)
+                (error (string-append
+                        "DOCXREF: couldn't make sense of FPI '" pubid "'"))))))
+
+     (else
+      (error (string-append "DOCXREF: can't make any sense of entity "
+                            xrefent ", of type "
+                            (symbol->string (entity-type xrefent))))))))
 
 
 ; (mode section-reference
