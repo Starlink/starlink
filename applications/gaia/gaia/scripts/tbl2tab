@@ -1,0 +1,191 @@
+#!/bin/sh    
+# The next line is executed by /bin/sh, but not Tcl \
+exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
+#+
+#   Name:
+#      tbl2tab
+#
+#   Purpose:
+#      Convert an 2MASS IPAC table into a GAIA tab table
+#
+#   Usage:
+#      tbl2tab input output [autodisplay]
+#
+#   Description:
+#      This commands converts a plain text file of the type produced
+#      by the 2MASS IPAC source catalogues, into a file suitable 
+#      for displaying in GAIA. It can be automatically loaded into
+#      GAIA if requested.
+#
+#   Authors:
+#      Peter W. Draper (PWD):
+#
+#   History:
+#      10-APR-2001 (PWD):
+#         Original version.
+#-
+#.
+
+#  Add GAIA_DIR to autopath for some GAIA classes.
+lappend auto_path $env(GAIA_DIR)
+
+#  Open a socket to a GAIA application and return the file descriptor
+#  for remote commands. If a GAIA isn't found then start one up.
+proc connect_to_gaia {} {
+   global env
+
+   #  Get the hostname and port info from the file ~/.rtd-remote,
+   #  which is created by rtdimage when the remote subcommand is
+   #  used.
+   set tries 0
+   while { 1 } {
+      set needed 0
+
+      #  Open the file containing the GAIA process information and read it.
+      if {[catch {set fd [open $env(HOME)/.rtd-remote]} msg]} {
+         set needed 1
+      } else {
+         lassign [read $fd] pid host port
+         close $fd
+      }
+
+      #  See if the process is listening to this socket.
+      if { ! $needed } {
+         if {[catch {socket $host $port} msg]} {
+            set needed 1
+         } else {
+            fconfigure $msg -buffering line
+            return $msg
+         }
+      }
+
+      #  If the process doesn't exist and we've not been around the
+      #  loop already, then start a new GAIA.
+      if { $needed && $tries == 0 } {
+         puts stderr "Failed to connect to GAIA, starting new instance..."
+         exec $env(GAIA_DIR)/gaia.sh &
+      }
+
+      #  Now either wait and try again or give up if waited too long.
+      if { $needed && $tries < 500 } {
+         #  Wait for a while and then try again.
+         incr tries
+         after 1000
+      } elseif { $needed } {
+         puts stderr "Sorry timed out: failed to display image in GAIA"
+         exit 1
+      }
+   }
+}
+
+#  Send the command to GAIA and return the results or generate an error.
+proc send_to_gaia {args} {
+   global gaia_fd
+   puts $gaia_fd "$args"
+   lassign [gets $gaia_fd] status length
+   set result {}
+   if {$length > 0} {
+      set result [read $gaia_fd $length]
+   }
+   if {$status != 0} {
+      error "$result"
+   }
+   return "$result"
+}
+
+
+global argc
+global argv
+
+#  Get names of files.
+if { $argc == 0 } { 
+   puts -nonewline "Input file: "
+   flush stdout
+   gets stdin infile
+} else {
+   set infile [lindex $argv 0]
+}
+if { ! [file exists $infile] } { 
+   puts stderr "Sorry file: $infile, does not exist"
+   exit 1
+}
+if { $argc <= 1 } {
+   puts -nonewline "Output file: "
+   flush stdout
+   gets stdin outfile
+} else {
+   set outfile [lindex $argv 1]
+}
+
+#  Decide if catalogue is to automatically displayed.
+set autodisp 0
+if { $argc == 3 } {
+   set autodisp [lindex $argv 2]
+}
+
+#  Open the files.
+if { [catch "open $infile r" instr] } { 
+   puts stderr "Failed to open input file: $infile ($instr)"
+   exit
+}
+if { [catch "open $outfile w" outstr] } { 
+   puts stderr "Failed to open output file: $infile ($outstr)"
+   exit
+}
+
+#  Add the initialising commands.
+puts $outstr "QueryResult"
+puts $outstr "id_col: 0"
+puts $outstr "ra_col: 1"
+puts $outstr "dec_col: 2"
+puts $outstr "symbol: {} circle 4.0"
+puts $outstr "x_col: -1"
+puts $outstr "y_col: -1"
+
+puts $outstr "ident	ra	dec	emaj	emin	eang	designation	j_m	jmsig	jscom	h_m	hmsig	hscom	k_m	kmsig	kscom	rdf	blfl	ccfl	extd	m	idop	bmopt	rmopt	diopt	phio	nopt	date	hemi	scan	id	glon	glat	jpsfch	hpsfch	kpsfch	j_mstd	jsstd	h_mstd	hsstd	k_mstd	ksstd	ndetfl	j_h	h_k	j_k"
+puts $outstr "--"
+
+#  Loop over the input file reading all the elements and writing them
+#  back out with TAB separated fields.
+set id 0
+while { [gets $instr line] > -1 } { 
+   incr id
+   set nitems [llength $line]
+   if { $nitems > 0 } {
+      puts -nonewline $outstr "$id"
+      foreach part $line {
+         puts -nonewline $outstr "\t$part"
+      }
+      puts $outstr ""
+   }
+}
+close $instr
+close $outstr
+
+#  Now display the new catalogue (if requested).
+if { $autodisp } { 
+
+   #  Open up connection to GAIA.
+   set gaia_fd [connect_to_gaia]
+
+   #  Command needs to performed by Skycat or derived object. We just
+   #  talk to the first window on the list.
+   set cmd "skycat::SkyCat::get_skycat_images"
+   set images [send_to_gaia remotetcl $cmd]
+
+   #  Got list so select first and ask about the parent (should be 
+   #  top-level GAIA).
+   set ctrlwidget [lindex $images 0]
+   set cmd "winfo parent $ctrlwidget"
+   set gaia [send_to_gaia remotetcl $cmd]
+   
+   #  And display the catalogue window.
+   set cmd "cat::AstroCat::open_catalog_window \
+            $outfile \
+            $ctrlwidget \
+            ::skycat::SkySearch \
+            0 $gaia"
+   set astrocat [send_to_gaia remotetcl $cmd]
+   close $gaia_fd
+}
+exit
