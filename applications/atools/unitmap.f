@@ -25,7 +25,7 @@
 *     no effect on the coordinates supplied to it. They are simply copied.
 
 *  Usage:
-*     ncoord options result
+*     unitmap ncoord options result
 
 *  ADAM Parameters:
 *     NCOORD = _INTEGER (Read)
