@@ -1,3 +1,13 @@
+1998-09-12  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.xs: Add status checking before using unpack1D and array
+	functions since if status returns bad the counter variables (eg
+	el) may be set incorrectly and cause segmentation faults when
+	trying to unpack arrays.
+
+	* NDF.pm (par_get): Add support for monolith parameters. Simplify
+	the logic concerning $ADAM_USER and make -w clean.
+
 1998-06-08  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.xs: Improve DAT__ROOT, DAT__NOLOC routines so that gcc
