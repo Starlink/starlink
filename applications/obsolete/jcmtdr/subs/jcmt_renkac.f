@@ -146,6 +146,12 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*  Not yet denagified
+      STATUS = SAI__ERROR
+      CALL ERR_REP(' ','This routine has not yet been de-NAGged',
+     :     STATUS)
+      RETURN
+
 *  initialise the output arrays
 
       DO JOUT = 1, NJ
@@ -198,7 +204,7 @@
 *  Calculate the interpolating surface
 
       IFAIL = 0
-      CALL E01SAF (PIX, XCOPY, YCOPY, ZINCOPY, TRIANG, GRADS, IFAIL)
+*     CALL E01SAF (PIX, XCOPY, YCOPY, ZINCOPY, TRIANG, GRADS, IFAIL)
       IF (IFAIL .NE. 0) THEN
          STATUS = SAI__ERROR
          IGNORE = 0
@@ -228,8 +234,8 @@
                IF (ZOUT(IOUT,JOUT) .NE. FBAD) THEN
                   XX = DBLE(IOUT-ICEN) * XINC
                   IFAIL = 1
-                  CALL E01SBF (PIX, XCOPY, YCOPY, ZINCOPY, TRIANG, 
-     :               GRADS, XX, YY, ZZ, IFAIL)
+*                  CALL E01SBF (PIX, XCOPY, YCOPY, ZINCOPY, TRIANG, 
+*     :               GRADS, XX, YY, ZZ, IFAIL)
                   IF (IFAIL .EQ. 0) THEN
                      ZOUT (IOUT, JOUT) = REAL(ZZ)
                   ELSE IF (IFAIL .EQ. 2) THEN
