@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/extractor</path>
+  <description>GAIA - Graphical Astronomy and Image Analysis</description>
+  <abstract><p>
+GAIA is an image display and analysis tool for astronomy. It provides the
+usual facilities of image display tools, plus more astronomically useful ones
+such as aperture & optimal photometry, contouring, source detection, surface
+photometry, arbitrary region analysis, celestial coordinate readout,
+calibration and modification, grid overlays, blink comparison, defect patching
+and the ability to query on-line (WWW) catalogues.
+</p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

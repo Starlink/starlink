@@ -1,0 +1,140 @@
+## Process this file with automake to produce Makefile.in
+
+##  GAIA is a little different in that it uses three pre-existing
+##  directories (which are autoconfed using the their own methodologies). 
+##  These do most of the work, this is just a wrapper for extracting 
+##  the parts needed and installing them.
+
+##  All scripts and programs are built elsewhere, so we do not need to 
+##  associate these with sources, so installation as scripts of various kinds
+##  will do.
+dist_bin_SCRIPTS = $(TCL_FILES) $(SCRIPTS_GAIA) $(GAIA_LIB_FILES) \
+ $(GAIA_IFC_FILES)
+
+##  None distributed versions (binaries).
+bin_SCRIPTS = $(SKYCAT_FILES) $(GAIA_BIN_FILES)
+
+##  GAIA top-level scripts.
+SCRIPTS_GAIA = gaia.csh gaiadisp.csh tabbedgaia.csh .gaFilters
+
+## Things we need to create from the various sub-components.
+
+## Components of Tcl that are not built into the single binary.
+TCL_FILES = bltCanvEps.pro bltGraph.pro
+
+## Binaries used for real time display.
+SKYCAT_FILES = rtdServer rtdClient rtdCubeDisplay
+
+## Files needed from gaia/library.
+GAIA_LIB_FILES =  \
+ skycat2.0.cfg gaiawcs2tab pix2wcs wcs2pix gaia.sh gaiadisp.sh \
+ gaiaremote.sh adamMessageRelay displaycat gaiacut zoomcutandflip \
+ tabbedgaia.sh
+
+## Files needed from gaia/bin.
+GAIA_BIN_FILES = \
+ gaia_swish gaia_stcl gaiaMon 
+
+GAIA_IFC_FILES = gaiaMon.ifc ardstat.ifc autocrop.ifc cat2tab.ifc \
+ tab2cat.ifc asc2tab.ifc tab2asc.ifc
+
+GAIA_FILES = $(GAIA_LIB_FILES) $(GAIA_BIN_FILES) $(GAIA_IFC_FILES)
+
+BUILT_SOURCES = $(TCL_FILE) $(SKYCAT_FILES) $(GAIA_FILES)
+
+##  Tasks present in the gaiaMon binary.
+GAIA_TASKS = ardstat autocrop cat2tab tab2cat asc2tab tab2asc
+
+## Local rules for _configuring_ and building the sub-directories and
+## extracting the required products. When developing you need to use the
+## makefiles in the sub-directories and return to this level to complete the
+## build. Note these cannot be pre-configured as Tcl needs to be built first.
+
+##  Places to get Tcl components.
+SCRIPT_PLACES = \
+        ./built/lib/blt2.4/*.pro
+
+##  Build Tcl component.
+$(TCL_FILES):
+	- mkdir -p ./built ;\
+	pwd=`pwd`;\
+	(cd ./tcl; \
+	export INSTALL; unset INSTALL;\
+	export TCL_LIBRARY; unset TCL_LIBRARY;\
+	export TK_LIBRARY; unset TK_LIBRARY;\
+	./configure --prefix=$${pwd}/built;\
+	make -e World)
+	for f in $(SCRIPT_PLACES) ""; do \
+	   if test -f "$$f"; then \
+	      cp -p $$f . ;\
+	   else :; fi;\
+	done
+
+##  Build Skycat component.
+$(SKYCAT_FILES): $(TCL_FILES)
+	- mkdir -p ./built ;\
+	pwd=`pwd`;\
+	(cd ./skycat; \
+	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
+	export INSTALL; unset INSTALL; \
+	SKYCAT_WRAPPER_DIR=et; export SKYCAT_WRAPPER_DIR; \
+	./configure --prefix=$${pwd}/built;\
+	make -e all install)
+	cp -p ./built/bin/rtdClient .
+	cp -p ./built/bin/rtdServer .
+	cp -p ./built/bin/rtdCubeDisplay .
+	cp -p ./built/include/rtd/config.h rtdConfig.h
+	cp -p ./built/include/rtd/rtdImageEvent.h .
+	cp -p ./built/lib/librtdImgEvt.a .
+
+
+##  Build GAIA component.
+$(GAIA_FILES): $(TCL_FILES) $(SKYCAT_FILES)
+	- mkdir -p ./built ;\
+	pwd=`pwd`;\
+	(cd ./gaia; \
+	sed -e s#@PKG_VERS@#$(PACKAGE_VERSION)# VERSION.in >$ VERSION ;\
+	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
+	export INSTALL; unset INSTALL;\
+	./configure --prefix=$${pwd}/built;\
+	make -e all install)
+	for f in $(GAIA_BIN_FILES) $(GAIA_IFC_FILES) ""; do \
+	   if test -f "built/bin/$${f}"; then \
+	      cp -p built/bin/$${f} .;\
+	   else :; fi;\
+	done
+	for f in $(GAIA_LIB_FILES) ""; do \
+	   if test -f "built/lib/gaia/$${f}"; then \
+	      cp -p built/lib/gaia/$${f} .;\
+	   else :; fi;\
+	done
+
+
+##  Clean recurses into these directories.
+clean-local:
+	(cd tcl; make clean )
+	(cd skycat; make clean )
+	(cd gaia; make clean )
+
+distclean-local:
+	(cd tcl; make distclean )
+	(cd skycat; make distclean )
+	(cd gaia; make distclean )
+
+## Clean up extra generated files.
+MAINTAINERCLEANFILES =
+
+##  Need all the source code in the sub-directories.
+EXTRA_DIST = gaia skycat tcl gaia.news
+
+##  Before distributing subdirectories we need to clean then up (we get all
+##  the files in these directories). Also remove the CVS trace.
+dist-hook:
+	rm -rf `find $(distdir) -type d -name CVS`
+	- (cd $(distdir)/tcl; make distclean);
+	- (cd $(distdir)/skycat; make distclean);
+	- (cd $(distdir)/gaia; make distclean);
+
+## Not installed or processed, just recorded for history.
+##IRAF_SCRIPTS = gaia.cl gaia.hd _gaia.hd root.hd gaia.men \
+##               gaiadisp.cl gaiacut.cl gaiadispandcut.cl gaiapercent.cl
