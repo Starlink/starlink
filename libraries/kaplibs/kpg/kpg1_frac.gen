@@ -511,7 +511,7 @@
 *  there are outliers, which leads to an infinite loop.  The following
 *  test breaks out in this case.
             LOOP = LOOP .AND. NUM_GT<T>( DATLIM( 2 ), DATLIM( 1 ) )
-+
+
 *  The histogram may still be sparse but no trimming is possible.
 *  This could happen with a fraction close to 0.0 or 1.0 which locates
 *  an extreme outlier, leaving the vast majority of values in one to a

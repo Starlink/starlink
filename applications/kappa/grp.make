@@ -59,7 +59,7 @@ log10.par pow.par kappa.par kstest.par laplace.par permaxes.par \
 linplot.par logar.par loge.par look.par lucy.par lutable.par lutflip.par \
 luthilite.par lutread.par lutrot.par lutsave.par luttweak.par lutview.par \
 makesurface.par manic.par maths.par median.par mem2d.par mlinplot.par \
-mstats.par mult.par native.par ndfcopy.par ndftrace.par \
+ardplot.par mstats.par mult.par native.par ndfcopy.par ndftrace.par \
 noglobals.par nomagic.par normalize.par numb.par outset.par ovclear.par \
 ovset.par paldef.par palentry.par palread.par palsave.par parget.par \
 paste.par piccur.par picdef.par picempty.par picentire.par picgrid.par \
@@ -94,7 +94,7 @@ fitswrite.hlp flip.hlp fourier.hlp gausmooth.hlp gdclear.hlp gdnames.hlp \
 gdset.hlp gdstate.hlp glitch.hlp getting_started.hlp globals.hlp \
 graphics_database.hlp hints.hlp hds_data_types.hlp colcomp.hlp \
 hiscom.hlp hislist.hlp hisset.hlp histat.hlp histeq.hlp histogram.hlp \
-idclear.hlp idinvisible.hlp idpazo.hlp idset.hlp idstate.hlp \
+ardplot.hlp idclear.hlp idinvisible.hlp idpazo.hlp idset.hlp idstate.hlp \
 interaction_mode.hlp kaphelp.hlp kappa.hlp kstest.hlp laplace.hlp \
 linplot.hlp log10.hlp logar.hlp loge.hlp look.hlp lucy.hlp lutable.hlp \
 lutbgyrw.hlp lutwarm.hlp lutcol.hlp lutcont.hlp lutfc.hlp lutflip.hlp lutgrey.hlp \
@@ -147,7 +147,7 @@ tranjoin.ifl tranmake.ifl transformer.ifl trantrace.ifl trig.ifl colcomp.ifl \
 wiener.ifl zaplin.ifl contour.ifl crelut.ifl cursor.ifl \
 drawsig.ifl display.ifl elprof.ifl gdclear.ifl gdnames.ifl gdset.ifl \
 gdstate.ifl idclear.ifl idinvisible.ifl idpazo.ifl idset.ifl \
-idstate.ifl linplot.ifl lutable.ifl lutflip.ifl luthilite.ifl \
+idstate.ifl ardplot.ifl linplot.ifl lutable.ifl lutflip.ifl luthilite.ifl \
 lutrot.ifl lutsave.ifl luttweak.ifl lutview.ifl mlinplot.ifl ovclear.ifl \
 ovset.ifl paldef.ifl palentry.ifl palread.ifl palsave.ifl piccur.ifl \
 picdef.ifl picempty.ifl picentire.ifl picin.ifl piclabel.ifl piclist.ifl \
@@ -273,7 +273,7 @@ kps1_gliwd.f kps1_glibr.f kps1_glibd.f kps1_glidr.f \
 kps1_gliwr.f kps1_gligt.f kps1_saxlk.f 
 
 # The contents of the kapview_sub.tar file:
-KAPVIEW_SUB = contour.f crelut.f cursor.f drawsig.f display.f \
+KAPVIEW_SUB = ardplot.f contour.f crelut.f cursor.f drawsig.f display.f \
 elprof.f gdclear.f gdnames.f gdset.f gdstate.f idclear.f \
 idinvisible.f idpazo.f idset.f idstate.f linplot.f lutable.f \
 lutflip.f luthilite.f lutrot.f lutsave.f luttweak.f lutview.f mlinplot.f \

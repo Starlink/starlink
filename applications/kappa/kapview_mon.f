@@ -119,8 +119,12 @@
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task
 
+*  Plot the boundary of an ARD description.
+         IF ( NAME .EQ. 'ARDPLOT' ) THEN
+            CALL ARDPLOT ( STATUS )
+
 *  Produces a colour composite imaghe from 1,2 or 3 NDFs.
-         IF ( NAME .EQ. 'COLCOMP' ) THEN
+         ELSE IF ( NAME .EQ. 'COLCOMP' ) THEN
             CALL COLCOMP ( STATUS )
 
 *  Contours a 2-d NDF.
