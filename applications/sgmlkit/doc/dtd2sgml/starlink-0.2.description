@@ -83,6 +83,20 @@ necessarily) be set off from the text around it.
 
 <element gi='change'>
 <p>Records a change.  See <elemref gi=history>.
+<attribute name='date'>
+<p>The date this distribution was
+made. Format: dd-MMM-yyyy.
+<attribute name='author'>
+<p>Whom the release is attributable to.  This
+links to one of the author elements.   If this attribute is omitted,
+it defaults to the content of the author attribute of the previous
+<elemref self gi='distribution'> element.
+<attribute name='versionid'>
+<p>An id to allow UPDATE elements to refer to a
+specific version.  It can be anything, but a
+sensible format is v10-5, for example (it can't
+start with a number)
+
 
 <element gi='citation'>
 <p>Refers to an entry in the <elemref gi=bibliography> associated with
