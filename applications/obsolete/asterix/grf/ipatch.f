@@ -30,7 +30,7 @@
       CHARACTER*20 MODE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IPATCH Version 1.8-0')
+      PARAMETER (VERSION = 'IPATCH Version 1.8-1')
 *-
       CALL USI_INIT()
 
@@ -124,6 +124,7 @@
       BYTE MASK1,MASK2
       LOGICAL ALL
       LOGICAL EDGE
+      LOGICAL PATCHED
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
@@ -269,6 +270,7 @@
                       V(II,J)=(XSIGSQ+YSIGSQ)/4.0
                     ENDIF
                   ENDIF
+                  PATCHED=.TRUE.
                 ELSEIF (NX.GT.0) THEN
                   IF (IMG_INREG(II,J)) THEN
                     D(II,J)=AX*REAL(II)+BX
@@ -277,6 +279,7 @@
                       V(II,J)=XSIGSQ
                     ENDIF
                   ENDIF
+                  PATCHED=.TRUE.
                 ELSEIF (NY.GT.0) THEN
                   IF (IMG_INREG(II,J)) THEN
                     D(II,J)=AY*REAL(J)+BY
@@ -285,12 +288,19 @@
                       V(II,J)=YSIGSQ
                     ENDIF
                   ENDIF
+                  PATCHED=.TRUE.
                 ELSE
                   CALL MSG_SETI('I',II)
                   CALL MSG_SETI('J',J)
                   CALL MSG_PRNT(
      :             '** insufficient good pixels to patch (^I,^J)')
+                  PATCHED=.FALSE.
                 ENDIF
+
+                IF (PATCHED) THEN
+                  CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,II,II,J,J,
+     :                .TRUE.,%VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
+     :                           D,Q,MASK2,I_PMIN,I_PMAX,STATUS)
 
 
               ENDDO
@@ -398,6 +408,7 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get source box for pasting
+        CALL MSG_PRNT('Select box to paste from...')
         CALL IMG_GETBOX('XC','YC','XWID','YWID',XC,YC,DX,DY,STATUS)
         CALL IMG_BOX(XC,YC,DX,DY,STATUS)
         CALL IMG_BOXTOBOX(XC,YC,DX,DY,I1,I2,J1,J2,STATUS)
@@ -407,15 +418,15 @@
 
 
         CALL MSG_PRNT(
-     :     'Select centres of areas to paste to - X to exit')
+     :     'Select centres of areas to paste to - X to exit...')
 
         CH=' '
         RIGHT=.FALSE.
+        X=XC
+        Y=YC
         DO WHILE (.NOT.RIGHT.AND.CH.NE.'X'.AND.CH.NE.'x'.AND.
      :                                     STATUS.EQ.SAI__OK)
 
-          X=XC
-          Y=YC
           CALL GFX_CURS(X,Y,LEFT,RIGHT,CH,STATUS)
 
           CALL IMG_BOXTOBOX(X,Y,DX,DY,II1,II2,JJ1,JJ2,STATUS)
@@ -444,10 +455,9 @@
           I_PMAX=I_DMAX
 
 
-          CALL GFX_PIXEL(I_WKPTR,I_NX,I_NY,II1,II2,JJ1,JJ2,
+          CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,II1,II2,JJ1,JJ2,
      :                .TRUE.,%VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
-     :                                            %VAL(I_DPTR_W),
-     :                                         I_PMIN,I_PMAX,STATUS)
+     :                             D,Q,MASK,I_PMIN,I_PMAX,STATUS)
 
 
 
