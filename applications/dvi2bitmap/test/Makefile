@@ -9,6 +9,8 @@
 #
 # $Id$
 
+CXX=c++
+
 all: test
 
 test: dvi2bitmap.tested
@@ -31,3 +33,17 @@ magtest.dvi: magtest.tex
 
 modetest.dvi: modetest.tex
 	latex modetest
+
+dvi2bitmap.diff: ../dvi2bitmap dvi2bitmap.correct
+	../dvi2bitmap -X >dvi2bitmap.test
+	diff dvi2bitmap.correct dvi2bitmap.test >dvi2bitmap.diff; \
+		if test $$? -gt 0; then echo Fail; else echo OK; fi
+
+# The order of the files in the for statement below must match the
+# order of the calls in dvi2bitmap::doRegression.
+dvi2bitmap.correct: ../dvi2bitmap
+	rm -f $@
+	for f in ../PkFont.cc ../Util.cc; do \
+		FN=`echo $$f|sed -e 's+^.*/\([^.]*\).*$$+\1+' `; \
+		sed -n "/REGRESSIONTEST/s+^.*REGRESSIONTEST:+$$FN:+p" $$f >> $@; \
+	done

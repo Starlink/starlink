@@ -11,12 +11,12 @@
 #include "PageRange.h"
 #include <iostream>
 
-#if NO_CSTD_INCLUDE
-#include <stdlib.h>
-#include <ctype.h>
-#else
+#if HAVE_CSTD_INCLUDE
 #include <cstdlib>
 #include <cctype>
+#else
+#include <stdlib.h>
+#include <ctype.h>
 #endif
 
 verbosities PageRange::verbosity_ = normal;

@@ -16,12 +16,12 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <string.h>		// for strerror
-#if NO_CSTD_INCLUDE
-#include <stdio.h>
-#include <errno.h>
-#else
+#if HAVE_CSTD_INCLUDE
 #include <cstdio>
 #include <cerrno>
+#else
+#include <stdio.h>
+#include <errno.h>
 using std::sprintf;
 #endif
 

@@ -639,23 +639,30 @@ description of how to set DVI2BITMAP_PK_PATH.
 towards the next section.</px>
 </update>
 
-<p>The program searches in up to three places for fonts.
+<p>The program searches for fonts using a number of mechanisms.
 
 <ol>
 
 <li>The <code/-fp> option (see <span media=screen><ref
 id=usage.options.fp/></span><span media=print>above</span>) specifies a
-colon-separated list of directories which should be searched for font
+colon-separated list of filename templates which should be searched for font
 PK files.  If this is given on the command line, it overrides&ellip
 
 <li>The <code/DVI2BITMAP_PK_PATH> environment variable, if defined,
-specifies a colon-separated list of directories which are to be
+specifies a colon-separated list of filename templates which are to be
 searched for PK files.
 
 <li>If the program cannot find fonts using the environment variable,
 and if it was configured with support for the <code/kpathsea>
 library (see <ref id=install.nonstarlink/>), then it should find PK
 files using the same mechanism other DVI processors use.
+
+<li><code/dvi2bitmap> can be configured to use a script to find
+fonts.  If the program was not configured to use <code/kpathsea> or the
+search fails, then the program invokes a script which knows where to
+find font files, given a search pattern, and which returns a single
+line containing a discovered font filename.  See <ref
+id=conf.with-fontfinder/>.
 
 </ol>
 
@@ -668,6 +675,33 @@ worry about where fonts live.  The <code/kpathsea> library is
 generally integrated with the font-generation commands, and can be
 queried using the <code/kpsewhich> command.
 
+<p>The search-path and font-finder routes use font-string templates.
+Here, the components of a font file name, or a font-finding command,
+are specified using placeholders like <code>%f</code>.  You may use
+<tabular>
+<tgroup cols=2>
+<tbody>
+<row><entry><entry>
+<row><entry><code>%M</code><entry>mode (eg. ibmvga)
+<row><entry><code>%f</code><entry>font name (eg. cmr10)
+<row><entry><code>%d</code><entry>dpi (eg. 330)
+<row><entry><code>%b</code><entry>base dpi (eg. 110)
+<row><entry><code>%m</code><entry>magnification (eg. 3)
+<row><entry><code>%%</code><entry>%
+</tbody>
+</tabular>
+Thus, using these values as an example, if one of the entries in
+<code>DVI2BITMAP_PK_PATH</code> were 
+<code type=fspath>/var/tmp/%M/%f.%dpk</code>, this would expand into
+<code type=fspath>/var/tmp/ibmvga/cmr10.330pk</code>.  Alternatively,
+if we had given the font-finder script as 
+<code>/usr/local/teTeX/bin/kpsewhich pk %f.%dpk</code>, the
+<code/dvi2bitmap> would have executed the command <code>.../kpsewhich
+pk cmr10.330pk</code>, which would have returned with a suitable font path.
+
+
+<![ IGNORE [
+<!-- THIS ADVICE IS USEFUL, BUT OUT OF DATE -->
 <p>If you don't, or can't, use the <code/kpathsea> library, you have
 to let <code/dvi2bitmap> know where to find fonts.  How, then, do you
 establish a list of directories containing suitable PK 
@@ -715,6 +749,8 @@ directory.  This is true for for the font-building scripts I know
 about, but it's not any sort of formal standard, so your local
 system's behaviour may quite reasonably be different, in which case
 this script can't offer very reliable help.
+]]>
+
 
 <p>There are one or two possible wrinkles with the third method.  The
 path-searching library is very powerful and flexible, but it is
@@ -770,7 +806,15 @@ case is work out where the `correct place' is (<code/kpsepath> and
 <code/kpsewhich> can help here), and specify that place using either
 the <code/-fp> option or the <code/DVI2BITMAP_PK_PATH> variable, as
 above (this is confusing, I know, but more-or-less unavoidable, since
-we are here trying to do <code/kpathsea>'s job, without <code/kpathsea>).
+we are here trying to do <code/kpathsea>'s job, without
+<code/kpathsea>).
+
+<p>I think it is also possible to fall victim to a race condition,
+where the font is built successfully, but the program looks for it in
+the correct place before the font is fully flushed to disk, or
+(mumble) something like that.  Simply running <code/dvi2bitmap> a
+second time seems to work OK.  I'm not sure precisely what's going on
+here, and I'd welcome more precise observations, here.
 
 <p>Another, slightly nastier reason is as follows.
 
@@ -980,6 +1024,15 @@ suppress this behaviour by providing the flag
 do so using the MetaFont mode <code/ibmvga>, which has a resolution of
 110 dots-per-inch.
 
+<p>You can give an argument to this command, which specifies a
+command-line which will build and install a required font, and return
+its path on standard output.  This uses the font-string template
+described in <ref id=usage.fonts.finding/>.  You could duplicate the
+default (the <code/mktexpk> script if present) with the option
+<verbatim>
+--enable-fontgen='<path>mktexpk --dpi %d --bdpi %b --mag %m --mfmode %M %f'
+</verbatim>
+
 <![IGNORE[
 <p>If the <code/kpathsea> library is enabled, then the default for
 this option is `on' -- the program will attempt to generate fonts.  If
@@ -1005,15 +1058,31 @@ merely sets the default for font generation to `off', and it can be
 switched back on again using the option <code/-fG.>
 
 <p>If you wish
-to change the default mode, you can do so with an argument to this
-option.  For example, the option
-<code/&ddash;enable-fontgen=pcprevw,118> will make <code/pcprevw>,
+to change the default mode, you can do so using the option <ref
+id=conf.fontgen-mode/>.
+
+<dt id=conf.fontgen-mode><code/&ddash;with-fontgen-mode=mode,res
+<dd>If you wish to change the default parameters for font-generation,
+you can set both the Metafont mode and resolution using this option.
+For example, the option
+<code/&ddash;fontgen-mode=pcprevw,118> will make <code/pcprevw>,
 which has a resolution of 118 dpi, the default MetaFont mode.  Note
 that the resolution you specify <em/must> match the mode: see file
 <code/modes.mf> for a list of modes and resolutions (use
 <kbd/kpsewhich mf modes.mf> to find this).  You can change the
 resolution and mode on the fly using the <code/-fm> and <code/-r>
 options to the compiled program (<ref id=usage.options/>).
+
+<dt id=conf.with-fontfinder><code/&ddash;with-fontfinder>
+<dd>This specifies a command to run to find fonts.  It is preferable
+to use the <code/kpathsea> library if possible, but if this is
+difficult, then you can specify a script to run to find fonts.  This
+uses the font-string template described in <ref
+id=usage.fonts.finding/>.  To use the standard <code/kpsewhich>
+command, for example, you could give the option
+<verbatim>
+--with-fontfinder='/usr/local/teTeX/bin/kpsewhich pk %f.%dpk'
+</verbatim>
 
 <dt><code/&ddash;enable-mktexpk> and <code/&ddash;enable-maketexpk>
 <dd>In the default configuration, the program will generate missing
@@ -1070,6 +1139,16 @@ to this option (that is,
 <code>&ddash;enable-fake-progname=/path/to/dviprog</code>). 
 <p>Since this uses undocumented behaviour of the library (`use the
 source, Luke!'), you almost certainly shouldn't enable it unless you have to.
+
+<dt><code>&ddash;with-path-seps</code>
+<dd>The default configuration is for Unix, and uses the Unix defaults
+for filesystem path and search path separators.  If you are building
+it on some other architecture, you can alter the defaults by giving a
+two-character argument to this option, giving the two separators in
+order.  For example, the arguments appropriate for DOS would be
+<verbatim>
+--with-path-seps='\;'
+</verbatim>
 
 </dl>
 

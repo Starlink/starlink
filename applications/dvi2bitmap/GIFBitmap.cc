@@ -40,13 +40,13 @@
 #include "Bitmap.h"		// for BitmapError exception class
 #include "GIFBitmap.h"
 
-#if NO_CSTD_INCLUDE
-#include <math.h>		// for floor() and ceil() in iround
-#else
+#if HAVE_CSTD_INCLUDE
 #include <cmath>
+#else
+#include <math.h>		// for floor() and ceil() in iround
 #endif
 
-#if ! NO_CSTD_INCLUDE		// ie, there _is_ a <cstdio>
+#if HAVE_CSTD_INCLUDE		// ie, there _is_ a <cstdio>
 using std::fopen;
 using std::fwrite;
 using std::fputc;

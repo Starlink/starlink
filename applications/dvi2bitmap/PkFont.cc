@@ -14,28 +14,7 @@
 #include <unistd.h>
 #include <vector>
 
-#if ENABLE_KPATHSEA
-#include "kpathsea.h"
-#endif
-
-#if ENABLE_FONT_GEN
-#ifdef HAVE_SSTREAM
-#include <sstream>
-#define SSTREAM ostringstream
-#define C_STR(s) (s).str().c_str()
-#else
-#include <strstream>
-#define SSTREAM ostrstream
-#define C_STR(s) (s).str()
-#endif
-#endif
-
-#if NO_CSTD_INCLUDE
-#include <string.h>
-#include <math.h>
-#include <stdio.h>		// for sprintf
-#include <stdlib.h>		// for system()
-#else
+#if HAVE_CSTD_INCLUDE
 #include <cstring>
 #include <cmath>
 #include <cstdio>		// for sprintf
@@ -43,14 +22,21 @@
 using std::sprintf;
 using std::memcpy;
 using std::system;
-#endif
-
-#ifndef PATH_SEP
-#define PATH_SEP ':'
+#else
+#include <string.h>
+#include <math.h>
+#include <stdio.h>		// for sprintf
+#include <stdlib.h>		// for system()
 #endif
 
 #include "InputByteStream.h"
 #include "PkFont.h"
+#include "Util.h"
+#include "stringstream.h"
+#if ENABLE_KPATHSEA
+#include "kpathsea.h"
+#endif
+
 
 typedef vector<string> string_list;
 string_list break_path (string);
@@ -96,7 +82,7 @@ PkFont::PkFont(unsigned int dvimag,
 	     << " c=" << c
 	     << " s=" << s
 	     << " d=" << d
-	     << '\n';
+	     << endl;
 
     try
     {
@@ -104,35 +90,49 @@ PkFont::PkFont(unsigned int dvimag,
 	bool got_path = find_font (pk_file_path);
 	if (! got_path)
 	{
-#if ENABLE_FONT_GEN
+#ifdef FONT_GEN_TEMPLATE
 	    if (makeMissingFonts_)
 	    {
 		string cmd;
-		int rval;
 
 		cmd = fontgenCommand();
 		if (verbosity_ >= normal)
-		    cerr << "mktexpk: " << cmd << '\n';
+		    cerr << "mktexpk: " << cmd << endl;
 		if (cmd.length() == 0)
 		    throw InputByteStreamError
 			("can't generate fontgen command");
 
-		rval = system(cmd.c_str());
-		if (rval != 0)
+		string fontpath = Util::runCommandPipe (cmd);
+		if (fontpath.length() == 0)
 		    throw InputByteStreamError ("unable to generate font");
-		// try again...
+		// Try searching again, rather than relying on the
+		// return value from runCommandPipe (there's no reason
+		// to expect it to be unreliable, but re-using
+		// find_font() seems more consistent).
 		got_path = find_font (pk_file_path);
 		if (! got_path)
-		    throw InputByteStreamError
-			("tried (apparently successfully) to create font, but couldn't find it afterwards. Do you need to set DVI2BITMAP_PK_PATH?");
+		{
+		    // We didn't find it, for some reason, but
+		    // `fontpath' returned from runCommandPipe()
+		    // should have the string.  Use that instead, but
+		    // warn about it.  I _think_ there's a
+		    // race-condition which sometimes makes the
+		    // find_font() fail to find the font if it's
+		    // called immediately after the font is
+		    // successfully generated.
+		    if (verbosity_ >= normal)
+			cerr << "Warning: tried (apparently successfully) to create font, but couldn't find it afterwards. Do you need to set DVI2BITMAP_PK_PATH?  I'll use what I think is the correct path to it (fingers crossed)"
+			     << endl;
+		    pk_file_path = fontpath;
+		}
 	    }
 	    else
 		throw InputByteStreamError
 		    ("can't find font file, and instructed not to make fonts");
-#else
+#else /* defined(FONT_GEN_TEMPLATE) */
 	    throw InputByteStreamError
 		("can't find font file, and don't know how to make fonts");
-#endif
+#endif /* defined(FONT_GEN_TEMPLATE) */
 	}
 	path_ = pk_file_path;
 
@@ -143,14 +143,14 @@ PkFont::PkFont(unsigned int dvimag,
 	delete pkf_;		// don't need the file any more
 
 	if (verbosity_ > normal)
-	    cerr << "Opened font " << path_ << " successfully\n";
+	    cerr << "Opened font " << path_ << " successfully" << endl;
 
 	if (preamble_.cs != c)
 	    if (verbosity_ > quiet)
 		cerr << "Warning: Font " << name_
 		     << "found : expected checksum " << c
 		     << ", got checksum " << preamble_.cs
-		     << '\n';
+		     << endl;
 
 	font_loaded_ = true;
     }
@@ -161,7 +161,7 @@ PkFont::PkFont(unsigned int dvimag,
 		 << dpiScaled() << "dpi ("
 		 << path_ << ") not found ("
 		 << e.problem()
-		 << ")\n";
+		 << ")" << endl;
 	preamble_.cs = 0;
 	glyphs_[0] = new PkGlyph(resolution_, this); // dummy glyph
     }
@@ -170,7 +170,7 @@ PkFont::PkFont(unsigned int dvimag,
     word_space_ = 0.2*quad_;
     back_space_ = 0.9*quad_;
     if (verbosity_ > normal)
-	cerr << "Quad="<<quad_<<" dvi units\n";
+	cerr << "Quad="<<quad_<<" dvi units" << endl;
 }
 
 PkFont::~PkFont()
@@ -210,14 +210,14 @@ bool PkFont::find_font (string& path)
 	     << ", res " << resolution_
 	     << '*' << magnification()
 	     << " = " << scaled_res
-	     << '\n';
+	     << endl;
 
     string pkpath = "";
     if (fontpath_.length() > 0)
     {
 	pkpath = fontpath_;
 	if (verbosity_ > normal)
-	    cerr << "find_font: using fontpath=" << fontpath_ << '\n';
+	    cerr << "find_font: using fontpath=" << fontpath_ << endl;
     }
     else
     {
@@ -227,14 +227,14 @@ bool PkFont::find_font (string& path)
 	    pkpath = pkpath_p;
 	    if (verbosity_ > normal)
 		cerr << "find_font: using DVI2BITMAP_PK_PATH="
-		     << pkpath << '\n';
+		     << pkpath << endl;
 	}
     }
 
     if (pkpath.length() != 0)
     {
-	string found_file;
-	if (search_pkpath (pkpath, name_, scaled_res, found_file))
+	string& found_file = search_pkpath (pkpath, name_, scaled_res);
+	if (found_file.length() > 0)
 	{
 	    path = found_file;
 	    got_it = true;
@@ -257,20 +257,45 @@ bool PkFont::find_font (string& path)
     }
 #endif
 
+#if defined(FONT_SEARCH_SCRIPT)
+    if (! got_it)
+    {
+	string& cmd = substitute_font_string (FONT_SEARCH_SCRIPT,
+					      missingFontMode_,
+					      name_,
+					      dpiScaled(),
+					      dpiBase(),
+					      magnification());
+	string font_found = Util::runCommandPipe(cmd);
+
+	if (verbosity_ > normal)
+	    cerr << "PkFont::find_font: cmd <" << cmd
+		 << "> produced <" << font_found << '>' << endl;
+
+	if (font_found.length() > 0)
+	{
+	    path = font_found;
+	    got_it = true;
+	}
+    }
+#endif /* defined(FONT_SEARCH_SCRIPT) */
+
     return got_it;
 }
 
 // Find a file on the colon-separated path, with the specified name,
-// at the specified resolution.
+// at the specified resolution.  Return a reference to a static
+// string.  If not found, return a zero-length string.
 //
 // Do font rounding: Check all the integers between 0.998 and 1.002 of
 // the specified resolution.  If, however, this range falls within
 // (n,n+1) (non-inclusive) (ie, it doesn't span _any_ integers) then
 // simply round the number.
 // See DVI Driver Standard.
-bool PkFont::search_pkpath (string path,
-			    string name, double resolution, string& res_file)
+string& PkFont::search_pkpath (string path, string name, double resolution)
 {
+    static string fname;		// return value
+
     int size_low, size_high;
     size_low  = static_cast<int>(ceil  (0.998*resolution));
     size_high = static_cast<int>(floor (1.002*resolution));
@@ -279,30 +304,38 @@ bool PkFont::search_pkpath (string path,
 	size_low = size_high = static_cast<int>(floor(resolution+0.5));
     if (verbosity_ > normal)
 	cerr << "PkFont::search_pkpath: searching "
-	     << size_low << ".." << size_high << '\n';
+	     << size_low << ".." << size_high << endl;
 
     string_list pathlist = break_path (path);
     if (pathlist.size() == 0)
-	return false;		// ...silently
+    {
+	fname = "";
+	return fname;		// ...silently
+    }
 
     bool found = false;
 
+    // Can't use const_iterator, since this seems to be a pointer to
+    // the wrong type in gcc.
     for (unsigned int pathnum = 0;
 	 pathnum<pathlist.size() && !found;
 	 pathnum++)
     {
-	string prefix = pathlist[pathnum];
-	prefix += '/';
-	prefix += name;
-	prefix += '.';
+	// Each member of pathlist[] is a template as defined by
+	// PkFont::substitute_font_string().  Work through each in turn.
 
 	for (int size=size_low; size<=size_high && !found; size++)
 	{
-	    char numbers[10];
-	    sprintf (numbers, "%dpk", size);
-	    string fname = prefix + numbers;
+	    fname = substitute_font_string (pathlist[pathnum],
+					    PkFont::missingFontMode_,
+					    name,
+					    size,
+					    dpiBase(),
+					    magnification());
+
 	    if (verbosity_ > normal)
-		cerr << "PkFont::search_pkpath: trying " << fname << '\n';
+		cerr << "PkFont::search_pkpath: trying " << pathlist[pathnum]
+		     << "->" << fname << endl;
 
 	    struct stat S;
 	    if (stat (fname.c_str(), &S) == 0)
@@ -311,27 +344,96 @@ bool PkFont::search_pkpath (string path,
 		if (S_ISREG(S.st_mode)
 		    && (S.st_mode & (S_IRUSR|S_IRGRP|S_IROTH)))
 		{
-		    res_file = fname;
 		    found = true;	// exit the loop
 		    if (verbosity_ > normal)
 			cerr << "PkFont::search_pkpath: "
-			     << fname << " found\n";
+			     << fname << " found" << endl;
 		}
 		else
 		    if (verbosity_ > normal)
 			cerr << "PkFont::search_pkpath: " << fname
 			     << " mode " << oct << S.st_mode << dec
-			     << " (not readable)\n";
+			     << " (not readable)" << endl;
 	    }
 	    else
 		if (verbosity_ > normal)
 		    cerr << "PkFont::search_pkpath: "
-			 << fname << " not found\n";
+			 << fname << " not found" << endl;
 	}
     }
 
-    return found;	
+    return fname;	
 }
+
+// Given a format string, return a reference to a string with format
+// specifiers replaced by font information.
+//
+// Replacements are:
+//     %M = mode (eg. ibmvga)
+//     %f = font name (eg. cmr10)
+//     %d = dpi (eg. 330)
+//     %b = base dpi (eg. 110)
+//     %m = magnification (eg. 3)
+//     %% = %
+//
+// The return value is a reference to a static string, which is
+// overwritten on each call.
+//
+// Throws a PkError exception if it encounters an illegal format element.
+string& PkFont::substitute_font_string (const string fmt,
+					const string mode,
+					const string fontname,
+					const int dpi,
+					const int basedpi,
+					const double magnification)
+    throw (PkError)
+{
+    static string retval;
+    SSTREAM newstring;
+
+    for (const char *p = fmt.c_str(); *p != '\0'; p++)
+    {
+	if (*p == '%')
+	    switch (*++p)
+	    {
+	      case 'M':
+		newstring << mode;
+		break;
+	      case 'm':
+	        newstring << magnification;
+	        break;
+	      case 'f':
+		newstring << fontname;
+		break;
+	      case 'd':
+		newstring << dpi;
+		break;
+	      case 'b':
+		newstring << basedpi;
+		break;
+	      case '%':
+		newstring << '%';
+		break;
+	      default:
+		{
+		    SSTREAM msg;
+		    msg << "substitute_font_string: Invalid format character %"
+			<< *p
+			<< ".  Allowed characters {Mmfdb%}."
+			<< ends;
+		    throw PkError (C_STR(msg));
+		}
+		break;
+	    }
+	else
+	    newstring << *p;
+    }
+    newstring << ends;
+    retval = newstring.str();
+
+    return retval;
+}
+
 
 void PkFont::read_font (InputByteStream& pkf)
 {
@@ -362,7 +464,7 @@ void PkFont::read_font (InputByteStream& pkf)
 	     << " cs=" << preamble_.cs
 	     << " hppp=" << preamble_.hppp
 	     << " vppp=" << preamble_.vppp
-	     << "...\n";
+	     << "..." << endl;
 
     // Now scan through the file, reporting opcodes and character definitions
     bool end_of_scan = false;
@@ -417,7 +519,7 @@ void PkFont::read_font (InputByteStream& pkf)
 			     << " hoff=" << g_hoff
 			     << " voff=" << g_voff
 			     << dec
-			     << "(pos="<<pos<<" len="<<packet_length<<")\n";
+			     << "(pos="<<pos<<" len="<<packet_length<<")" << endl;
 
 		    PkRasterdata *rd
 			= new PkRasterdata (opcode,
@@ -466,7 +568,7 @@ void PkFont::read_font (InputByteStream& pkf)
 			     << " hoff=" << g_hoff
 			     << " voff=" << g_voff
 			     << dec
-			     << "(pos="<<pos<<" len="<<packet_length<<")\n";
+			     << "(pos="<<pos<<" len="<<packet_length<<")" << endl;
 
 		    PkRasterdata *rd
 			= new PkRasterdata (opcode,
@@ -515,7 +617,7 @@ void PkFont::read_font (InputByteStream& pkf)
 			 << " hoff=" << g_hoff
 			 << " voff=" << g_voff
 			 << dec
-			 << "(pos="<<pos<<" len="<<packet_length<<")\n";
+			 << "(pos="<<pos<<" len="<<packet_length<<")" << endl;
 
 		PkRasterdata *rd
 		    = new PkRasterdata (opcode,
@@ -533,7 +635,7 @@ void PkFont::read_font (InputByteStream& pkf)
 		     << " h="   << g_h
 		     << " off=(" << g_hoff << ',' << g_voff
 		     << ") at " << pos
-		     << '(' << packet_length << ")\n";
+		     << '(' << packet_length << ")" << endl;
 	}
 	else			// opcode is command
 	{
@@ -555,7 +657,7 @@ void PkFont::read_font (InputByteStream& pkf)
 			 special_len--)
 			special += static_cast<char>(pkf.getByte());
 		    if (verbosity_ > debug)
-			cerr << "Special \'" << special << "\'\n";
+			cerr << "Special \'" << special << "\'" << endl;
 		}
 		break;
 	      case 244:		// pk_yyy
@@ -575,7 +677,7 @@ void PkFont::read_font (InputByteStream& pkf)
     }
 
     if (verbosity_ > normal)
-	cerr << "PkFont::read_font ...finished reading " << name_ << '\n';
+	cerr << "PkFont::read_font ...finished reading " << name_ << endl;
 }
 
 // Return magnification, including both font scaling and overall DVI
@@ -587,7 +689,7 @@ double PkFont::magnification() const
     if (verbosity_ > normal)
 	cerr << "PkFont::magnification: "
 	     << font_header_.s << '/' << font_header_.d
-	     << " *" << dvimag_ << "/1000 = " << rval << '\n';
+	     << " *" << dvimag_ << "/1000 = " << rval << endl;
     return rval;
 }
 
@@ -693,7 +795,7 @@ unsigned int PkRasterdata::unpackpk ()
     }
     if (verbosity_ > debug)
 	cerr << '=' << res
-	     << ' ' << static_cast<int>(repeatcount_) << '\n';
+	     << ' ' << static_cast<int>(repeatcount_) << endl;
     return res;
 }
 
@@ -709,7 +811,7 @@ Byte PkRasterdata::nybble() {
     else
 	res = static_cast<Byte>((*rasterdata_++)&0xf);
     if (verbosity_ > debug)
-	cerr << '<' << static_cast<int>(res) << '\n';
+	cerr << '<' << static_cast<int>(res) << endl;
     return res;
 }
 
@@ -759,10 +861,10 @@ void PkRasterdata::construct_bitmap()
 	    cerr << "dyn_f=" << static_cast<int>(dyn_f_)
 		 << " h=" << h_
 		 << " w=" << w_
-		 << "\nrasterdata=" << hex;
+		 << endl << "rasterdata=" << hex;
 	    for (const Byte *p=rasterdata_; p<eob_; p++)
 		cerr << static_cast<int>(*p) << ' ';
-	    cerr << dec << '\n';
+	    cerr << dec << endl;
 	}
 
 	while (nrow < h_)
@@ -781,7 +883,7 @@ void PkRasterdata::construct_bitmap()
 			cerr << nrow << ':';
 			for (const Byte *p=rowstart; p<rowp; p++)
 			    cerr << (*p ? '*' : '.');
-			cerr << '+' << repeatcount_ << '\n';
+			cerr << '+' << repeatcount_ << endl;
 		    }
 		    if (repeatcount_ > 0)
 		    {
@@ -809,7 +911,7 @@ string_list break_path (string path)
     string_list l;
     string tmp = "";
     for (unsigned int i=0; i<path.length(); i++)
-	if (path[i] == PATH_SEP)
+	if (path[i] == SRCHPATH_SEP)
 	{
 	    l.push_back(tmp);
 	    tmp = "";
@@ -820,47 +922,53 @@ string_list break_path (string path)
     return l;
 }
 
+// Return a command which can be used to generate fonts.  The command
+// should return a single line containing the path to the generated
+// font file.  Return an empty string on errors, or if such a command
+// is not supported on a particular platform.
 string PkFont::fontgenCommand (void)
 {
     string rval;
 
-#if ENABLE_FONT_GEN
+#if defined(FONT_GEN_TEMPLATE)
+    try
+    {
+	rval = substitute_font_string (FONT_GEN_TEMPLATE,
+				       missingFontMode_, name_,
+				       dpiScaled(), dpiBase(),
+				       magnification());
+	if (verbosity_ > normal)
+	    cerr << "PkFont:font_gen_string=" << rval << endl;
+    }
+    catch (PkError& e)
+    {
+	if (verbosity_ > quiet)
+	    cerr << "Warning: can't generate fontgen command ("
+		 << e.problem() << ")" << endl;
+	rval = "";
+    }
 
-#if defined(MKTEXPK)
-
-    SSTREAM cmd;
-    cmd << MKTEXPK
-	<< " --dpi " << dpiScaled()
-	<< " --bdpi " << dpiBase()
-	<< " --mag " << magnification()
-	<< " --mfmode " << missingFontMode_
-	<< ' ' << name_
-	<< '\0';
-    rval = C_STR(cmd);
-
-#elif defined(MAKETEXPK)
-
-    SSTREAM cmd;
-    cmd << MAKETEXPK		<< ' '
-	<< name_		<< ' '
-	<< dpiScaled()		<< ' '
-	<< dpiBase()		<< ' '
-	<< magnification()	<< ' '
-	<< missingFontMode_
-	<< '\0';
-    rval = C_STR(cmd);
-
-#else
+#else /* defined(FONT_GEN_TEMPLATE) */
 
     rval = "";
 
-#endif /* defined(MKTEXPK) */
-
-#else  /* if ENABLE_FONT_GEN */
-
-    rval = "";
-
-#endif /* if ENABLE_FONT_GEN */
+#endif /* defined(FONT_GEN_TEMPLATE) */
 
     return rval;
+}
+
+
+int PkFont::regressionOutput (string prefix, ostream& o)
+{
+    o << prefix
+      << substitute_font_string ("mode=%M font=%f dpi=%d basedpi=%b mag=%m perc=%%",
+				 "mode", "font", 330, 110, 2.5) << endl;
+    // REGRESSIONTEST:mode=mode font=font dpi=330 basedpi=110 mag=2.5 perc=%
+
+    o << prefix
+      << substitute_font_string	("/var/tmp/texfonts/pk/%M/public/cm/%f.%dpk",
+				 "ibmvga", "cmr10", 330, 110, 3) << endl;
+    // REGRESSIONTEST:/var/tmp/texfonts/pk/ibmvga/public/cm/cmr10.330pk
+
+    return 0;
 }

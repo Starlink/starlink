@@ -21,25 +21,17 @@ static const char RCSID[] =
 #include <iostream>
 #include <string>
 
-#if NO_CSTD_INCLUDE
-#include <stdio.h>		// for vsprintf
-#include <stdlib.h>
-#include <stdarg.h>
-#include <ctype.h>
-#else
+#if HAVE_CSTD_INCLUDE
 #include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
 #include <cctype>
 using std::exit;
-#endif
-
-#ifdef HAVE_SSTREAM
-#include <sstream>
-#define SSTREAM ostringstream
 #else
-#include <strstream>
-#define SSTREAM ostrstream
+#include <stdio.h>		// for vsprintf
+#include <stdlib.h>
+#include <stdarg.h>
+#include <ctype.h>
 #endif
 
 #include "DviFile.h"
@@ -48,6 +40,8 @@ using std::exit;
 #include "BitmapImage.h"
 #include "verbosity.h"
 #include "PageRange.h"
+#include "Util.h"
+#include "stringstream.h"
 #include "version.h"
 
 #if ENABLE_KPATHSEA
@@ -84,6 +78,7 @@ bool process_special (DviFile *, string specialString,
 string_list& tokenise_string (string s);
 string get_ofn_pattern (string dviname);
 bool parseRGB (Bitmap::BitmapColour&, char*);
+int doRegression (ostream& o);
 void Usage (void);
 char *progname;
 
@@ -179,13 +174,13 @@ int main (int argc, char **argv)
 			}
 		    if (i == npapersizes)
 			cerr << "-bs " << *argv
-			     << " not recognised.  See -Qp\n";
+			     << " not recognised.  See -Qp" << endl;
 		    else
 			if (verbosity > normal)
 			    cerr << "Papersize " << *argv
 				 << ": H=" << bitmapH
 				 << " W=" << bitmapW
-				 << '\n';
+				 << endl;
 		    break;
 		    
 		  default:
@@ -286,6 +281,9 @@ int main (int argc, char **argv)
 			  case 'm': // debug main program
 			    verbosity = debuglevel;
 			    break;
+			  case 'u': // debug utility functions
+			    Util::verbosity(debuglevel);
+			    break;
 			  case 'g':
 			    if (debuglevel == debug)
 				debuglevel = everything;
@@ -373,6 +371,7 @@ int main (int argc, char **argv)
 		InputByteStream::verbosity(verbosity);
 		Bitmap::verbosity(verbosity);
 		BitmapImage::verbosity(verbosity);
+		Util::verbosity(verbosity);
 		break;
 	      case 'Q':		// various queries
 		while (*++*argv != '\0')
@@ -407,7 +406,7 @@ int main (int argc, char **argv)
 				cout << ' ' << ft;
 				ft = BitmapImage::nextBitmapImageFormat();
 			    }
-			    cout << '\n';
+			    cout << endl;
 			    // FIXME: remove the following line at the
 			    // next version change.  Change behaviour
 			    // so that -Qt does not automatically exit.
@@ -423,7 +422,7 @@ int main (int argc, char **argv)
 			cout << "Qp";
 			for (int i=0; i<npapersizes; i++)
 			    cout << ' ' << papersizes[i].name;
-			cout << '\n';
+			cout << endl;
 			break;
 
 		      default:
@@ -474,50 +473,68 @@ int main (int argc, char **argv)
 			 << *argv
 			 << ": using "
 			 << bm.ofile_type
-			 << " instead\n";
+			 << " instead" << endl;
 		}
 		break;
+	      case 'X':		// generate regression-test output
+		try
+		{
+		    doRegression(cout);
+		    processing_ = options_only;
+		    break;
+		}
+		catch (DviError& e)
+		{
+		    cerr << "Error exception running regression tests ("
+			 << e.problem() << ")" << endl;
+		}
+		catch (DviBug& e)
+		{
+		    cerr << "Bug exception running regression tests ("
+			 << e.problem() << ")" << endl;
+		}
+
 	      case 'V':		// display version
-		cout << version_string << "\nOptions:\n";
+		cout << version_string << endl << "Options:" << endl;
 
 		cout << "ENABLE_GIF       "
-		     << (ENABLE_GIF ? "yes" : "no") << '\n';
+		     << (ENABLE_GIF ? "yes" : "no") << endl;
 		cout << "ENABLE_PNG       "
-		     << (ENABLE_PNG ? "yes" : "no") << '\n';
+		     << (ENABLE_PNG ? "yes" : "no") << endl;
 #if ENABLE_PNG
 		cout << "  libpng: "
-		     << PNGBitmap::version_string() << '\n';
+		     << PNGBitmap::version_string() << endl;
 #endif
 
 		cout << "ENABLE_KPATHSEA  "
-		     << (ENABLE_KPATHSEA ? "yes" : "no") << '\n';
+		     << (ENABLE_KPATHSEA ? "yes" : "no") << endl;
 #if ENABLE_KPATHSEA
 		cout << "  libkpathsea: "
-		     << kpathsea::version_string() << '\n';
+		     << kpathsea::version_string() << endl;
+#endif
+#ifdef FONT_SEARCH_STRING
+		cout << "FONT_SEARCH_STRING=" << FONT_SEARCH_STRING << endl;
 #endif
 #ifdef DEFAULT_TEXMFCNF
-		cout << "  DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << '\n';
+		cout << "  DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << endl;
 #endif
 #ifdef FAKE_PROGNAME
-		cout << "  FAKE_PROGNAME=" << FAKE_PROGNAME << '\n';
+		cout << "  FAKE_PROGNAME=" << FAKE_PROGNAME << endl;
 #endif
 
-		cout << "ENABLE_FONT_GEN  "
-		     << (ENABLE_FONT_GEN ? "yes" : "no") << '\n';
-#ifdef MKTEXPK
-		cout << "  MKTEXPK=" << MKTEXPK << '\n';
-#endif
-#ifdef MAKETEXPK
-		cout << "  MAKETEXPK=" << MAKETEXPK << '\n';
+#if defined(FONT_GEN_TEMPLATE)
+		cout << "FONT_GEN_TEMPLATE=" << FONT_GEN_TEMPLATE << endl;
+#else
+		cout << "Font generation disabled" << endl;
 #endif
 #ifdef DEFAULT_MFMODE
-		cout << "  DEFAULT_MFMODE=" << DEFAULT_MFMODE << '\n';
+		cout << "  DEFAULT_MFMODE=" << DEFAULT_MFMODE << endl;
 #endif
 #ifdef DEFAULT_RESOLUTION
-		cout << "  DEFAULT_RESOLUTION=" << DEFAULT_RESOLUTION << '\n';
+		cout << "  DEFAULT_RESOLUTION=" << DEFAULT_RESOLUTION << endl;
 #endif
 
-		cout << RCSID << '\n';
+		cout << RCSID << endl;
 		processing_ = options_only; // ...and exit
 		break;
 
@@ -540,7 +557,7 @@ int main (int argc, char **argv)
 
     if (verbosity >= normal)
 	// Banner
-	cout << "This is " << version_string << '\n';
+	cout << "This is " << version_string << endl;
 
     if (bm.ofile_pattern.length() == 0)
 	bm.ofile_pattern = get_ofn_pattern (dviname);
@@ -548,7 +565,7 @@ int main (int argc, char **argv)
     {
 	if (verbosity > silent)
 	    cerr << "Error: Can't make output filename pattern from "
-		 << dviname << '\n';
+		 << dviname << endl;
 	exit(1);
     }
 
@@ -558,7 +575,8 @@ int main (int argc, char **argv)
 	if (dvif->eof())
 	{
 	    if (verbosity > silent)
-		cerr << "Error: Can't open file " << dviname << " to read\n";
+		cerr << "Error: Can't open file " << dviname
+		     << " to read" << endl;
 	    exit(1);
 	}
 
@@ -576,7 +594,7 @@ int main (int argc, char **argv)
 		// Set the fallback font to be the first font named cmr10,
 		// or the first font if there are none such.
 		if (verbosity > normal)
-		    cerr << "dvi2bitmap: loaded font " << f->name() << '\n';
+		    cerr << "dvi2bitmap: loaded font " << f->name() << endl;
 		if (fallback_font == 0)
 		    fallback_font = f;
 		else if (f->name() == "cmr10"
@@ -585,7 +603,7 @@ int main (int argc, char **argv)
 		    fallback_font = f;
 		    if (verbosity > normal)
 			cerr << "dvi2bitmap: fallback font now "
-			     << fallback_font->name() << '\n';
+			     << fallback_font->name() << endl;
 		}
 	    }
 	    else		// flag at least one missing
@@ -604,7 +622,7 @@ int main (int argc, char **argv)
 			    throw DviError ("configuration problem: I can't create a font-generation command");
 			cout << (f->loaded() ? "QG " : "Qg ")
 			     << f->fontgenCommand()
-			     << '\n';
+			     << endl;
 		    }
 		}
 		else
@@ -627,7 +645,7 @@ int main (int argc, char **argv)
 			    string unk = "unknown";
 			    cout << ' ' << (fn.length() > 0 ? fn : unk);
 			}
-			cout << '\n';
+			cout << endl;
 		    }
 	}
 
@@ -637,7 +655,7 @@ int main (int argc, char **argv)
 	    if (no_font_present) // give up!
 	    {
 		if (verbosity > silent)
-		    cerr << progname << ": no fonts found!  Giving up\n";
+		    cerr << progname << ": no fonts found!  Giving up" << endl;
 	    }
 	    else
 		process_dvi_file (dvif, bm, resolution, fallback_font, PR);
@@ -732,7 +750,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 			string ostr = pageind.str();
 			if (outcount + ostr.length() > 78)
 			{
-			    cout << '\n';
+			    cout << endl;
 			    outcount = 0;
 			}
 			cout << ostr;
@@ -760,7 +778,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 		    {
 			if (verbosity > quiet)
 			    cerr << "Warning: page " << pagenum
-				 << " empty: nothing written\n";
+				 << " empty: nothing written" << endl;
 		    }
 		    else
 		    {
@@ -774,7 +792,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 			     << (bitmapW > 0 ? bitmapW : dvif->hSize()+oneInch)
 			     << 'x'
 			     << (bitmapH > 0 ? bitmapH : dvif->vSize()+oneInch)
-			     << '\n';
+			     << endl;
 			}
 			if (b.crop_bitmap)
 			    bitmap->crop();
@@ -794,7 +812,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 				= BitmapImage::firstBitmapImageFormat();
 			    /*
 			    cerr << "Warning: unspecified image format.  Selecting default ("
-				 << b.ofile_type << ")\n";
+				 << b.ofile_type << ")" << endl;
 			    */
 			}
 			if (b.ofile_name.length() == 0)
@@ -835,7 +853,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 			 << " at position ("
 			 << dvif->currH() << ',' << dvif->currV()
 			 << ") plus oneInch=" << oneInch;
-		cerr << '\n';
+		cerr << endl;
 	    }
 	    // calculate glyph positions, taking into account the
 	    // offsets for the bitmaps, and the (1in,1in)=(72pt,72pt)
@@ -870,7 +888,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 		if (verbosity > quiet)
 		    cerr << "Warning: unrecognised special: "
 			 << special.specialString
-			 << '\n';
+			 << endl;
 	}
 	else if (DviFilePostamble *post
 		 = dynamic_cast<DviFilePostamble*>(ev))
@@ -880,7 +898,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
     }
 
     if (verbosity > quiet)
-	cout << '\n';
+	cout << endl;
 }
 
 // Process the special string, returning true on success.
@@ -936,7 +954,7 @@ bool process_special (DviFile *dvif, string specialString,
 			}
 			if (verbosity > normal)
 			    cerr << "special: ofile_pattern="
-				 << b.ofile_pattern << '\n';
+				 << b.ofile_pattern << endl;
 		    }
 		    else
 			b.ofile_name = *s;
@@ -978,7 +996,7 @@ bool process_special (DviFile *dvif, string specialString,
 		    cerr << "Crop " << side_s << '=' << dimen
 			 << (setDefault ? " default" : "")
 			 << (absolute ? " absolute" : "")
-			 << '\n';
+			 << endl;
 
 		if (stringOK)
 		    if (side == Bitmap::All)
@@ -1014,10 +1032,10 @@ bool process_special (DviFile *dvif, string specialString,
 			b.ofile_type = BitmapImage::firstBitmapImageFormat();
 			cerr << "Warning: imageformat " << *s
 			     << " not supported.  Using " << b.ofile_type
-			     << " instead.\n";
+			     << " instead." << endl;
 		    }
 		    if (!setDefault && verbosity > quiet)
-			cerr << "Warning: imageformat special should be prefixed with `default'\n";
+			cerr << "Warning: imageformat special should be prefixed with `default'" << endl;
 		}
 	    }
 	    else if (*s == "foreground" || *s == "background")
@@ -1044,7 +1062,7 @@ bool process_special (DviFile *dvif, string specialString,
 			     << " to "
 			     << static_cast<int>(rgb.red) << ','
 			     << static_cast<int>(rgb.green) << ','
-			     << static_cast<int>(rgb.blue) << '\n';
+			     << static_cast<int>(rgb.blue) << endl;
 		    if (setDefault)
 			Bitmap::setDefaultRGB (isfg, &rgb);
 		    else
@@ -1071,7 +1089,7 @@ bool process_special (DviFile *dvif, string specialString,
 		if (left<0 || right<0 || top<0 || bottom<0)
 		{
 		    if (verbosity > silent)
-			cerr << "Strut must have positive dimensions\n";
+			cerr << "Strut must have positive dimensions" << endl;
 		    stringOK = false;
 		}
 		else
@@ -1080,7 +1098,7 @@ bool process_special (DviFile *dvif, string specialString,
 			cerr << "Strut: (" << x << ',' << y
 			     << ") (lrtb)=("
 			     << left << ',' << right << ','
-			     << top  << ',' << bottom << ")\n";
+			     << top  << ',' << bottom << ")" << endl;
 		    bitmap->strut (x, y, left, right, top, bottom);
 		}
 	    }
@@ -1092,7 +1110,7 @@ bool process_special (DviFile *dvif, string specialString,
     }
 
     if (!stringOK && verbosity > quiet)
-	cerr << "Warning: unrecognised special: " << specialString << '\n';
+	cerr << "Warning: unrecognised special: " << specialString << endl;
 
     return stringOK;
 }
@@ -1108,8 +1126,8 @@ DviError::DviError(const char *fmt,...)
     delete[] p;
 }
 
-void DviError::print() const { cerr << "DVI error: " << problem_ << '\n'; }
-void DviBug::print() const { cerr << "BUG: " << problem_ << '\n'; }
+void DviError::print() const { cerr << "DVI error: " << problem_ << endl; }
+void DviBug::print() const { cerr << "BUG: " << problem_ << endl; }
 
 DviBug::DviBug(const char *fmt,...)
 {
@@ -1147,7 +1165,7 @@ string_list& tokenise_string (string str)
     static string_list *l;
 
     if (verbosity > normal)
-	cerr << "tokenise_string: string=<" << str << ">\n";
+	cerr << "tokenise_string: string=<" << str << ">" << endl;
 
     if (! initialised)
     {
@@ -1169,7 +1187,7 @@ string_list& tokenise_string (string str)
 	    i++;
 	string t = str.substr(wstart,i-wstart);
 	if (verbosity > normal)
-	    cerr << "tokenise:" << t << ":\n";
+	    cerr << "tokenise:" << t << ":" << endl;
 	l->push_back(t);
 	while (i < str.length() && isspace(str[i]))
 	    i++;
@@ -1212,34 +1230,43 @@ bool parseRGB (Bitmap::BitmapColour& rgb, char* s)
 }
 
 
+int doRegression (ostream& o)
+{
+    int rval = 0;
+    rval += PkFont::regressionOutput ("PkFont:", o);
+    rval += Util::regressionOutput ("Util:", o);
+    return rval;
+}
+
+
 void Usage (void)
 {
-    cerr << "Usage: " << progname << " [-b(h|w) size] [-bp a4|a4l|usletter...]\n\
-        [-[Cc][lrtb] size] [-fp PKpath ] [-fm mfmode] [-fg] [-fG]\n\
-        [-g[dpribmg]] [-l num] [-m magmag ] [-n[n]] [-o outfile-pattern]\n\
-        [-p num] [-pp ranges] [-P[bBtTcC]] [-q[q]] [-Q[FfGgtbp]]\n\
-        [-r resolution] [-R[fb] int,int,int] [-s scale-factor]\n\
-        [-t xbm"
+    cerr << "Usage: " << progname << " [-b(h|w) size] [-bp a4|a4l|usletter...]" << endl <<
+"        [-[Cc][lrtb] size] [-fp PKpath ] [-fm mfmode] [-fg] [-fG]" << endl <<
+"        [-g[dpribmg]] [-l num] [-m magmag ] [-n[n]] [-o outfile-pattern]" << endl <<
+"        [-p num] [-pp ranges] [-P[bBtTcC]] [-q[q]] [-Q[FfGgtbp]]" << endl <<
+"        [-r resolution] [-R[fb] int,int,int] [-s scale-factor]" << endl <<
+"        [-t xbm"
 #if ENABLE_GIF
 	 << "|gif"
 #endif
 #if ENABLE_PNG
 	 << "|png"
 #endif
-	 << "] [-V]\n\
-	dvifile" << "\n\n\
-  -bh, -bw  page height and width in pixels    -bp  bitmap <-- papersize\n\
-  -c   crop margins left, right, top, bottom   -C   crop absolute\n\
-  -fp  set font-path (DVI2BITMAP_PK_PATH)      -fg  switch off (-fG=on) fontgen\n\
-  -fm  Metafont mode (must match -r)           -r   Metafont resolution\n\
-  -m   DVI file magnification                  -s   scale-down of bitmap\n\
-  -o   set output file pattern, including %d   -g   debugging of sections\n\
-  -n   only process DVI file preamble          -nn  only process-options\n\
-  -q   switch off chatter and warnings         -qq  switch off errors, too\n\
-  -R   set foreground/background colour (RGB)  -V   version+features then exit\n\
-  -l num, -p num, -pp ranges  select pages to process (l--p, or ranges pp)\n\
-  -Q   query: f=missing fonts, g=missing font commands (F, G=all fonts)\n\
-       t=supported output types, b=output bitmap names, p=paper sizes in -bp\n\
-  -P   Processing: b=blur bitmap, t=set transparent, c=do cropping (BTC->off)\n";
+	 << "] [-V]" << endl <<
+"	dvifile" << endl << endl <<
+"  -bh, -bw  page height and width in pixels    -bp  bitmap <-- papersize" << endl <<
+"  -c   crop margins left, right, top, bottom   -C   crop absolute" << endl <<
+"  -fp  set font-path (DVI2BITMAP_PK_PATH)      -fg  switch off (-fG=on) fontgen" << endl <<
+"  -fm  Metafont mode (must match -r)           -r   Metafont resolution" << endl <<
+"  -m   DVI file magnification                  -s   scale-down of bitmap" << endl <<
+"  -o   set output file pattern, including %d   -g   debugging of sections" << endl <<
+"  -n   only process DVI file preamble          -nn  only process-options" << endl <<
+"  -q   switch off chatter and warnings         -qq  switch off errors, too" << endl <<
+"  -R   set foreground/background colour (RGB)  -V   version+features then exit" << endl <<
+"  -l num, -p num, -pp ranges  select pages to process (l--p, or ranges pp)" << endl <<
+"  -Q   query: f=missing fonts, g=missing font commands (F, G=all fonts)" << endl <<
+"       t=supported output types, b=output bitmap names, p=paper sizes in -bp" << endl <<
+"  -P   Processing: b=blur bitmap, t=set transparent, c=do cropping (BTC->off)" << endl;
     exit (1);
 }

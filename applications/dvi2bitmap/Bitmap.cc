@@ -14,16 +14,16 @@
 #include "config.h"
 #endif
 
-#if NO_CSTD_INCLUDE
-#include <stdarg.h>
-#include <stdio.h>
-#include <string.h>
-#include <limits.h>
-#else
+#if HAVE_CSTD_INCLUDE
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
 #include <climits>		// g++ doesn't have <limits>
+#else
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+#include <limits.h>
 #endif
 
 #include "Bitmap.h"

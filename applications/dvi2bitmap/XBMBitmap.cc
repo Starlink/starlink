@@ -13,12 +13,12 @@
 
 //#include <iostream>		// debug code writes to cerr
 
-#if NO_CSTD_INCLUDE
-#include <stdio.h>
-#include <ctype.h>
-#else
+#if HAVE_CSTD_INCLUDE
 #include <cstdio>
 #include <cctype>
+#else
+#include <stdio.h>
+#include <ctype.h>
 #endif
 
 XBMBitmap::XBMBitmap (const int w, const int h)

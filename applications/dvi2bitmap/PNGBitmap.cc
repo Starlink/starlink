@@ -11,16 +11,16 @@
 #include <time.h>
 #include <assert.h>
 
-#if NO_CSTD_INCLUDE
-#include <math.h>		// for floor()
-#else
+#if HAVE_CSTD_INCLUDE
 #include <cmath>		// for floor()
+#else
+#include <math.h>		// for floor()
 #endif
 
 #include "Bitmap.h"		// for BitmapError exception class
 #include "PNGBitmap.h"
 
-#if ! NO_CSTD_INCLUDE		// ie, there _is_ a <cstdio>
+#if HAVE_CSTD_INCLUDE		// ie, there _is_ a <cstdio>
 using std::fopen;
 //using std::fwrite;
 //using std::fputc;

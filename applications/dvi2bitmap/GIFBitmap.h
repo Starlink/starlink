@@ -9,10 +9,10 @@
 
 #include "dvi2bitmap.h"
 #include "BitmapImage.h"
-#if NO_CSTD_INCLUDE
-#include <stdio.h>
-#else
+#if HAVE_CSTD_INCLUDE
 #include <cstdio>
+#else
+#include <stdio.h>
 #endif
 
 typedef int             code_int;

@@ -6,14 +6,17 @@
  */
 
 
-/* Define as 1 if you do NOT have <cstdio> headers.  In this case, we use
+/* Define as 1 if you DO have <cstdio> headers.  Otherwise, we use
    <stdio.h> rather than standard <cstdio> */
-#define NO_CSTD_INCLUDE 0
+#define HAVE_CSTD_INCLUDE 0
 
 /* Define as 1 if you have <assert.h> and <sstream> (as opposed to
    older <strstream>) */
 #undef HAVE_ASSERT_H
 #undef HAVE_SSTREAM
+
+/* Specific functions */
+#undef HAVE_POPEN
 
 /* Define as 1 if you want to enable generation of PNGs */
 #define ENABLE_PNG 0
@@ -21,9 +24,11 @@
 /* Define as 1 if you want to enable generation of GIFs */
 #define ENABLE_GIF 0
 
-/* Define PATH_SEP to be the path separator.  The default colon is for
-   unix, but MS-DOS uses a semicolon. */
-#define PATH_SEP ':'
+/* Define filesystem and search path separator.
+   The default slash and colon are for unix, but DOS uses backslash
+   and semicolon. */
+#define FSPATH_SEP   '/'
+#define SRCHPATH_SEP ':'
 
 /* The alpha cxx compiler currently (v6.0) needs to be invoked with 
    __USE_STD_IOSTREAM defined, so that it uses a standards-conforming 
@@ -39,23 +44,28 @@
    and controlled only by ENABLE_FONT_GEN.  */
 #define ENABLE_KPATHSEA 0
 
-/* Define ENABLE_FONT_GEN to be 1 if you wish fonts to be generated
-   automatically.  One of MKTEXPK or MAKETEXPK must additionally be
-   defined, before font-generation will happen. */
-#define ENABLE_FONT_GEN 0
+/* Several strings below are in the format of a `font string
+   template'.  This is a printf-like string which has %? specifiers
+   replaced by font parameters, according to the following scheme:
+     %M = mode (eg. ibmvga)
+     %f = font name (eg. cmr10)
+     %d = dpi (eg. 330)
+     %b = base dpi (eg. 110)
+     %m = magnification (eg. 3)
+     %% = %
+*/
 
-/* Define MKTEXPK to be the path to the mktexpk program, or some other
-   program with the same interface.  Leave undefined if not known, not
-   available, or we should not use it.  If the value of this is a
-   program without a full path, then things will still work, but the
-   program will have to be in the PATH at run time. */
-#undef MKTEXPK
+/* Define FONT_GEN_TEMPLATE to be a command which generates fonts, and
+   returns a single line giving the name of the generated file.  It's
+   a `font-string template', as described above.  For example:
 
-/* Define MAKETEXPK to be the path to the MakeTeXPK program, or some
-   other program with the same interface.  Leave undefined if not
-   known, not available, or we should not use it.  The mktexpk program
-   is newer (I think), and should be used in preference. */
-#undef MAKETEXPK
+       /usr/local/teTeX/bin/mktexpk --dpi %d --bdpi %b --mag %m --mfmode %M %f
+   or
+       /usr/local/teTeX/bin/MakeTeXPK %f %d %b %m %M
+
+   Undefine to disable.
+   */
+#undef FONT_GEN_TEMPLATE
 
 /* Define DEFAULT_MFMODE and DEFAULT_RESOLUTION to be the default
    Metafont mode and resolution which should be used when generating
@@ -65,6 +75,16 @@
    internal defaults will be used.  */
 #undef DEFAULT_MFMODE
 #undef DEFAULT_RESOLUTION
+
+/* Specify a command-line which searches for fonts according to a
+   specification given in its argument list, and returns a single line
+   containing a found font file, or EOF if it can't find anything.
+   It's a `font-string template', as described above.  For example, 
+
+     kpsewhich %f.%dpk
+
+*/
+#undef FONT_SEARCH_SCRIPT
 
 /* Set DEFAULT_TEXMFCNF to be the location of the texmf.cnf file which
    the kpathsea library is to use.  This will be overridden by a value

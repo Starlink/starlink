@@ -122,8 +122,10 @@ class PkFont {
     string fontFilename() const { return path_; }
     string fontgenCommand();
     double magnification() const;
+    /* redundant?
     int dpi() const { return static_cast<int>(resolution_
 					      * (double)dvimag_ / 1000.0); }
+    */
     static int dpiBase() { return resolution_; }
     int dpiScaled() const {
 	return static_cast<int>(resolution_
@@ -151,15 +153,18 @@ class PkFont {
     unsigned int checksum() const { return preamble_.cs; }
     bool loaded() const { return font_loaded_; }
 
+    // Regression test.  Produce test output to given stream.
+    static int regressionOutput (string prefix, ostream& o);
+
  private:
     static const unsigned int nglyphs_ = 256;
     static const unsigned int two20_ = 1048576; // 2^20
     static const unsigned int two16_ = 65536; // 2^16
 
     string name_;
-    string path_;
+    string path_;		/* name of (tbd) file containing font */
     InputByteStream *pkf_;
-    bool font_loaded_;		// font loaded successfully
+    bool font_loaded_;		/* font loaded successfully */
     struct {
 	unsigned int c, s, d;
     } font_header_;		// this is the information retrieved
@@ -176,8 +181,20 @@ class PkFont {
     PkGlyph *glyphs_[nglyphs_];
     bool find_font (string&);
     void read_font(InputByteStream&);
-    bool search_pkpath (string path,
-			string name, double resolution, string& res_file);
+
+    /* Search the given path for a font.  Not static, so that it can
+       see the current font's parameters. */
+    string& search_pkpath (string path,
+			   string name, double resolution);
+
+    static string& substitute_font_string (const string fmt,
+					   const string mode, 
+					   const string fontname,
+					   const int dpi,
+					   const int basedpi,
+					   const double magnification)
+	throw (PkError);
+
     bool seen_in_doc_;		// true once the font_def command has been
     				// seen in the document, as well as the
     				// postamble

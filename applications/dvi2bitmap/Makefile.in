@@ -12,6 +12,7 @@ DEFS=@DEFS@
 CPPFLAGS=@CPPFLAGS@
 CXX=@CXX@
 CXXFLAGS=@CXXFLAGS@ $(CPPFLAGS) $(DEFS)
+CXXMM=@CXXMM@
 LIBS=-lm @LIBS@
 KPATHSEA_OBJ=@KPATHSEAOBJ@
 PNG_OBJ=@PNGOBJ@
@@ -19,7 +20,7 @@ GIF_OBJ=@GIFOBJ@
 
 EXEC=dvi2bitmap
 OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
-	BitmapImage.o XBMBitmap.o XPMBitmap.o PageRange.o \
+	BitmapImage.o XBMBitmap.o XPMBitmap.o PageRange.o Util.o \
 	$(KPATHSEA_OBJ) $(PNG_OBJ) $(GIF_OBJ)
 
 # Add a suffix rule for stupid makes (hello, Tru64...)
@@ -29,34 +30,6 @@ OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
 
 $(EXEC): $(OBJS)
 	$(CXX) $(OBJS) $(LIBS) -o $@
-
-# for i in *.cc;do echo `echo $i|sed 's/\.cc/.o/'`: $i `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $i`;done
-Bitmap.o: Bitmap.cc dvi2bitmap.h config.h Bitmap.h BitmapImage.h
-BitmapImage.o: BitmapImage.cc config.h BitmapImage.h PNGBitmap.h GIFBitmap.h XBMBitmap.h XPMBitmap.h
-DviFile.o: DviFile.cc DviFile.h PkFont.h InputByteStream.h
-GIFBitmap.o: GIFBitmap.cc config.h Bitmap.h GIFBitmap.h
-InputByteStream.o: InputByteStream.cc config.h dvi2bitmap.h InputByteStream.h
-PNGBitmap-greyscale.o: PNGBitmap-greyscale.cc config.h Bitmap.h PNGBitmap.h
-PNGBitmap.o: PNGBitmap.cc config.h Bitmap.h PNGBitmap.h
-PageRange.o: PageRange.cc config.h PageRange.h
-PkFont.o: PkFont.cc config.h dvi2bitmap.h kpathsea.h InputByteStream.h PkFont.h
-XBMBitmap.o: XBMBitmap.cc config.h Bitmap.h XBMBitmap.h
-XPMBitmap.o: XPMBitmap.cc config.h Bitmap.h XPMBitmap.h
-dvi2bitmap.o: dvi2bitmap.cc config.h dvi2bitmap.h DviFile.h PkFont.h Bitmap.h BitmapImage.h verbosity.h PageRange.h version.h kpathsea.h
-kpathsea.o: kpathsea.cc config.h kpathsea.h
-
-# for i in *.h *.cc;do echo "$i:" `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $i`;done
-Bitmap.h: dvi2bitmap.h verbosity.h
-BitmapImage.h: dvi2bitmap.h verbosity.h Bitmap.h
-DviFile.h: dvi2bitmap.h InputByteStream.h PkFont.h verbosity.h
-GIFBitmap.h: dvi2bitmap.h BitmapImage.h
-InputByteStream.h: dvi2bitmap.h verbosity.h
-PNGBitmap.h: dvi2bitmap.h BitmapImage.h
-PageRange.h: verbosity.h
-PkFont.h: InputByteStream.h dvi2bitmap.h verbosity.h
-XBMBitmap.h: dvi2bitmap.h BitmapImage.h
-XPMBitmap.h: dvi2bitmap.h BitmapImage.h
-kpathsea.h: verbosity.h
 
 # Distribution
 configure: config/configure.in
@@ -127,4 +100,24 @@ clean: tidy
 	rm -f config.log config.status
 	cd doc; $(MAKE) clean
 
+
+# simpledeps_ and deps_ are maintenance targets used by configure.
+# Probably best not used otherwise.
+simpledeps_:
+	@ for i in *.cc; do \
+		echo `echo $$i|sed 's/\.cc/.o/'`: $$i `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $$i` >> Makefile; \
+	done
+	for i in *.h *.cc; do \
+		echo "$$i:" `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $$i` >> Makefile; \
+	done
+
+deps_:
+	@ if test -z "$(CXXMM)"; then \
+		$(MAKE) simpledeps_; \
+	else \
+		$(CXX) $(DEFS) $(CXXMM) *.cc >> Makefile; \
+	fi
+
 FORCE:
+
+# DEPENDENCIES -- do not edit below this line

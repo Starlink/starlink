@@ -17,10 +17,10 @@
 #define NULL 0
 #include <iostream>		// for cerr
 
-#if NO_CSTD_INCLUDE
-#include <stdlib.h>
-#else
+#if HAVE_CSTD_INCLUDE
 #include <cstdlib>
+#else
+#include <stdlib.h>
 #endif
 
 #include "kpathsea.h"

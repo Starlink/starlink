@@ -8,10 +8,10 @@
 #include <iostream>
 #include <assert.h>
 
-//#if NO_CSTD_INCLUDE
-//#include <math.h>
-//#else
+//#if HAVE_CSTD_INCLUDE
 //#include <cmath>
+//#else
+//#include <math.h>
 //#endif
 
 
