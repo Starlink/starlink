@@ -74,8 +74,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     9 Aug 1995 (DJA):
+*      9 Aug 1995 (DJA):
 *        Original version.
+*     26 Mar 1996 (DJA)
+*        Check for silly dimension values
 *     {enter_changes_here}
 
 *  Bugs:
@@ -102,6 +104,9 @@
         EXTERNAL		AST_QPKGI
 
 *  Local Variables:
+      INTEGER                   IDIM                    ! Dimension loop
+
+      LOGICAL                   BAD                     ! Bad dimension?
       LOGICAL			THERE			! Object exists?
 *.
 
@@ -128,6 +133,24 @@
 
 *    Check validity
         CALL BDI0_CHKAOB( ID, STATUS )
+
+*    Check dimension values
+        IF ( STATUS .NE. SAI__OK ) THEN
+          BAD = .FALSE.
+          IDIM = 1
+          DO WHILE ( (IDIM.LE.NDIM) .AND. .NOT. BAD )
+            IF ( DIMS(IDIM) .LT. 1 ) THEN
+              BAD = .TRUE.
+              CALL MSG_SETI( 'ND', IDIM )
+              CALL MSG_SETI( 'D', DIMS(IDIM) )
+              STATUS = SAI__ERROR
+              CALL ERR_REP( ' ', 'Illegal value for dimension ^ND'/
+     :              /' - should be >= 1 but has value ^D', STATUS )
+            ELSE
+              IDIM = IDIM + 1
+            END IF
+          END DO
+        END IF
 
 *    SHAPE already exists?
         CALL ADI_THERE( ID, 'SHAPE', THERE, STATUS )
