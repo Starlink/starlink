@@ -58,7 +58,7 @@ pol1_sngsm.f polsim.f pol1_simcl.f polsim.ifl pol1_gtvrs.f pol1_sngmn.f \
 pol1_prsvr.f pol1_gtvrc.f polimage.f polimage.ifl pol1_axset.f pol1_gtang.f \
 pol1_ptang.f pol1_stftr.f pol1_blocr.f pol1_sngva.f pol1_sngct.f pol1_sngvn.f \
 pol1_srtim.f pol1_stkim.f pol1_stknm.f pol1_stksm.f polstack.f polstack.ifl \
-$(KAPFIX)
+$(KAPFIX) $(DATA)
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.
@@ -71,9 +71,7 @@ UNIX_RELEASE =  $(UNIX_SOURCE) $(UNIX_OTHERS) $(FIGS)
 
 #  The contents of polpack.tar.
 UNIX_TOTAL = polka.htx_tar ndg_source.tar polpack_source.tar \
-$(UNIX_OTHERS) sun223.htx_tar sun223_figures 
-
-#polpack_iraf.tar
+$(UNIX_OTHERS) sun223.htx_tar sun223_figures polpack_iraf.tar
 
 #  Target for use by the grp command.
 $(action)
