@@ -59,6 +59,10 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.15  1997/05/22 21:01:45  timj
+*     Allow for 200 components in an input NDF.
+*     (Necessary when using the ALLBOLS parameter in SCUPHOT)
+*
 *     Revision 1.14  1997/04/30 03:01:46  timj
 *     Add MSG_OUTIF.
 *
@@ -134,7 +138,7 @@ c
 
 *     Local constants:
       INTEGER MAXCMP             ! Max number of bolometers in an HDS
-      PARAMETER (MAXCMP = 15)
+      PARAMETER (MAXCMP = 200)
       INTEGER MAXBOLS            ! Max number of bolometers used
       PARAMETER (MAXBOLS = 132)
       CHARACTER * 10 TSKNAME     ! Name of task
