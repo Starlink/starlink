@@ -54,7 +54,8 @@
 
     - The measure band now works when image is scrolled and zoomed.
 
-    - The "pick" toolbox can now save/append its results to a file.
+    - The "pick" and "ard" toolboxes can now save/append their
+      results to a file.
 
     - Many others too numerous to mention.
    
