@@ -14,6 +14,7 @@ pisa_mon_SOURCES = \
 	$(PRIVATE_INCLUDES)
 
 pisa_mon_LDADD = $(LDADD) `$(srcdir)/pisa_link_adam`
+pisa_mon_LDFLAGS = -static
 
 pisa_mon_TASKS = addnoise pisa2ard pisacut pisafind pisafit pisagen \
  pisagrey pisaknn pisamatch pisapeak pisaplot pisa2cat
@@ -30,7 +31,7 @@ pisa_mon4_TASKS = pisafind4 pisafit4
 
 ##  Link the pisahelp program as an atask. 
 pisahelp_SOURCES = pisahelp.f
-pisahelp_LDADD = `kaplibs_link_adam`
+pisahelp_LDADD = `shl_link_adam`
 pisahelp_TASKS = 
 
 
