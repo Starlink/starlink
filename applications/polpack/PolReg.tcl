@@ -542,18 +542,21 @@
    MenuHelp $helpmenu "Pointer..."  ".  Select this menu item, and then click with the pointer over a widget to see help on the widget."
 
 # Add menu items to the File menu.
+   $filemenu add command -label "Dump        " -command {Dump ""} -accelerator "Ctrl-d"
+   $filemenu add command -label "Restore     " -command {Restore ""} -accelerator "Ctrl-r"
    $filemenu add command -label "Save        " -command Save -accelerator "Ctrl-s"
-   $filemenu add command -label "Save As     " -command SaveAs -accelerator "Ctrl-a"
    $filemenu add command -label "Exit        " -command {Finish 1} -accelerator "Ctrl-e"
    $filemenu add command -label "Quit        " -command {Finish 0} -accelerator "Ctrl+q"
 
+   MenuHelp $filemenu "Dump        " ".  Dump the current positions lists, masks and options values to a text file for later restoring."
+   MenuHelp $filemenu "Restore     " ".  Restore positions lists, masks and options values from a text file previously created using Dump. These replace the current positions list, etc."
    MenuHelp $filemenu "Save        " ".  Create the output images and save them."
-   MenuHelp $filemenu "Save As     " ".  Create the output images and save them to named files."
    MenuHelp $filemenu "Exit        " ".  Store the current image registration information and exit the application."
    MenuHelp $filemenu "Quit        " ".  Quit the application, thowing away the current image registration information."
 
+   bind . <Control-d> {Dump ""}
+   bind . <Control-r> {Restore ""}
    bind . <Control-s> Save
-   bind . <Control-a> SaveAs
    bind . <Control-e> {Finish 1}
    bind . <Control-q> {Finish 0}
 
@@ -614,7 +617,7 @@
    $OPTSMENU add command -label "Status Items..." -command GetItems
    $OPTSMENU add cascade -label "View" -menu $OPTSMENU.view
    $OPTSMENU add separator
-   $OPTSMENU add checkbutton -label "Use Cross-hair" -variable XHAIR -selectcolor $CB_COL
+   $OPTSMENU add checkbutton -label "Use Cross-hair" -variable XHAIR -selectcolor $CB_COL 
    $OPTSMENU add checkbutton -label "Remove Sky" -variable SKYOFF -selectcolor $CB_COL -command SkyOff
    $OPTSMENU add checkbutton -label "Display Help Area" -variable HAREA -command HelpArea -selectcolor $CB_COL
    $OPTSMENU add checkbutton -label "Display Status Area" -variable SAREA -command "StatusArea \$SAREA" -selectcolor $CB_COL

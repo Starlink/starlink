@@ -933,6 +933,7 @@ proc Clear {image obj} {
    global REFALN
    global IMMAP
    global IMAGE_DISP
+   global IMSEC_DISP
    global IMSEC_FIRST
    global IMSEC_REQ
    global OEMAP
@@ -1003,12 +1004,10 @@ proc Clear {image obj} {
          }
       }
 
-# If everything is being cleared, re-display the first image unzoomed.
+# If everything is being cleared, re-display the first image.
       if { $redisp } {
          set IMSEC_REQ $IMSEC_FIRST
-         set IMAGE_DISP ""
-         set SECTION_STACK ""
-         UpdateDisplay
+         UpdateDisplay gwm
       }
    }
 }
@@ -1197,6 +1196,7 @@ proc ColMenu {menu label var} {
 #    - The SetColours command is called whenever any of the colours are
 #    changed.
 #-
+   global COLMENU
 
 # Create a lower case version of the variable name.
    set lvar [string tolower $var]
@@ -1204,8 +1204,9 @@ proc ColMenu {menu label var} {
 # Create the new item to the Colours menu.
    $menu add cascade -label $label -menu $menu.$lvar
 
-# Create the sub-menu.
+# Create the sub-menu, and store its name in global array COLMENU.
    set thismenu [menu $menu.$lvar]
+   set COLMENU($var) $thismenu
 
 # Add the list of colours to the new sub-menu.
    foreach col "red blue green cyan yellow magenta black" {
@@ -3173,6 +3174,119 @@ proc DrawRef {} {
    set REFOBJ_DISP $REFOBJ_REQ
    set REFIM_DISP $REFIM_REQ
 
+}
+
+proc Dump {file} {
+#+
+#  Name:
+#     Dump
+#
+#  Purpose:
+#     Dump the current positions lists. masks, and options to a text file 
+#     which can be restored later (using procedure Restore).
+#
+#  Arguments:
+#     file 
+#        If supplied non-blank, then the dump is written to the specified
+#        file (any existing file with the same name is over-written).
+#        Otherwise, the user is asked to supply a file name.
+#
+#
+#  Returned Value:
+#     1 if a succesful dump was performed, zero otherwise.
+#
+#-
+   global E_RAY_FEATURES 
+   global E_RAY_MASK
+   global IMAGES
+   global O_RAY_FEATURES 
+   global O_RAY_MASK 
+   global O_RAY_SKY
+   global E_RAY_SKY
+   global IMMAP
+   global OEMAP
+   global PNTPX
+   global PNTPY
+   global PNTNXT
+   global PNTLBL
+   global PNTTAG
+
+# Assume no dump is made.
+   set ret 0
+
+# Open the supplied file, or open a file specified by the user.
+   if { $file != "" } {
+      if { [catch { set fd [open $file "w"]} ] } {
+         set ok 0
+      } {
+         set ok 1
+      }
+
+   } {
+      set ok [OpenFile "w" "Dump output file" \
+                           "Give name of dump file to create:" file fd] 
+   }
+
+# Only proceed if a file was opened.
+   if { $ok } {
+
+# Tell the user what is happening.
+      set told [SetInfo "Dumping current positions lists, etc, to disk..." 0]
+
+# Loop round all images...
+      foreach image $IMAGES {
+         puts $fd "Image $image"
+
+# Write the OE Mapping to the output file.
+         if { [info exists OEMAP($image)] && [llength $OEMAP($image)] == 6 } {
+            puts $fd $OEMAP($image)
+         } {
+            puts $fd ""
+         }
+
+# Write the image Mapping to the output file.
+         if { [info exists IMMAP($image)] && [llength $IMMAP($image)] == 6 } {
+            puts $fd $IMMAP($image)
+         } {
+            puts $fd ""
+         }
+
+# Loop round each object type...
+         foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK \
+                              $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY] {
+
+# Write out the number of posisions in this list.
+            puts $fd [llength $PNTPX($image,$object)]
+
+# Write out the arrays holding information describing the list.
+            puts $fd $PNTPX($image,$object)
+            puts $fd $PNTPY($image,$object)
+            puts $fd $PNTNXT($image,$object)
+            puts $fd $PNTLBL($image,$object)
+            puts $fd $PNTTAG($image,$object)
+         }
+      }
+
+# Save the names and values of the global variables holding the current 
+# option settings...
+      puts $fd "Options:"
+      foreach var "XHRCOL CURCOL BADCOL REFCOL SELCOL PSF_SIZE INTERP FITTYPE OEFITTYPE SKYPAR VIEW XHAIR SKYOFF HAREA SAREA" {
+         upvar #0 $var gvar
+         puts $fd [list $var $gvar]
+      }
+
+# Close the output dump file.
+      close $fd
+
+# Indicate a dump was made.
+      set ret 1
+
+# Cancel the informative text set earlier in this procedure.
+      if { $told } { SetInfo "" 0 }
+
+   }
+
+   return $ret
 }
 
 proc EditMapping {image mapping} {
@@ -6708,11 +6822,12 @@ proc Helper {} {
    global F4
    global HSTRUT
    global HLAB
+   global HAREA
 
 # If the vertical strut which stops the help area collapsing when the
 # the number of lines in the help area reduces, is smaller than the
 # current height of the help area, extend it.
-   if { $F4 != "" } {
+   if { $F4 != "" && $HAREA } {
       set whgt [winfo height $HLAB]
       set shgt [winfo height $HSTRUT]
       if { $shgt < $whgt } {
@@ -7646,6 +7761,7 @@ proc MakeDialog {w title grab} {
 # main PolReg window. Set the current value to be re-instated later.
    set old_f_owner $F_OWNER
    set F_OWNER $top
+   focus $top
 
 # Attempt put a grab on this window, so that other windows become
 # inactive. This is a bit fragile so put the grab inside a catch so that
@@ -7662,7 +7778,9 @@ proc MakeDialog {w title grab} {
    pack $topf0 -padx 2m -pady 2m -ipadx 2m -ipady 2m
 
 # Create a binding so that when the dialog box is destroyed, 
-   bind $top <Destroy> "set F_OWNER $old_f_owner"
+# the focus is handed back to the original window.
+   bind $top <Destroy> "set F_OWNER $old_f_owner
+                        focus $old_f_owner"
 
 # Return the name of the frame to contain everything else.
    return $topf
@@ -8692,6 +8810,134 @@ proc OEMapping {image args} {
    return $ret
 }
 
+proc OpenFile {mode title text lfile lfd} {
+#+
+#  Name:
+#     OpenFile
+#
+#  Purpose:
+#     Open a file for reading or writing, reporting any errors which occur.
+#     The user is asked to conform that it is ok to over-write an existing
+#     file.
+#
+#  Arguments:
+#     mode
+#        The access mode; "r" for read-only, anything else produces
+#        write access.
+#     title
+#        The string to use as the dialog window title.
+#     text
+#        A string to display as a label above the entry widget.
+#     lfile
+#        The name of the variable to recieve the file name.
+#     lfd
+#        The name of the variable to recieve the file descriptor
+#        for the opened file.
+#
+#  Returned Value:
+#     Zero if no file was opened, one otherwise.
+#-
+   global F_OWNER
+   global OPFILE_EXIT
+
+   upvar $lfd fd
+   upvar $lfile file
+
+# Assume no file is opened
+   set ret 0
+
+# Create the top level window for the dialogue box.
+   set top .openfile
+   set topf [MakeDialog $top $title 1]
+
+# Pack a label displaying the supplied text (if any).
+   if { $text != "" } {
+      pack [label $topf.lab -text $text] -expand 1 -fill x -side top -pady 2m
+   }
+
+# Create and pack an entry widget 
+   set ent [entry $topf.ent -width 40]
+   pack $ent -side top -expand 1 -fill x -pady 4m 
+
+# Pre-load the current value of the file name (if not blank).
+   if { [info exists file] && $file != "" } { $ent insert 0 $file }
+
+# Bind <Return> in the entry to the OK button.
+   bind $ent <Return> "set OPFILE_EXIT ok"
+
+# Give the focus to the entry.
+   focus $ent
+
+# Create the OK and Cancel buttons, but don't pack them yet.
+   set butfrm [frame $topf.butfrm]
+   set b1 [button $butfrm.ok -text "OK" -command "set OPFILE_EXIT ok"]
+   set b3 [button $butfrm.cancel -text "Cancel" -command "set OPFILE_EXIT cancel"]
+
+   SetHelp $b1 ".  Press to close the dialog box, adopting the currently displayed file name."
+   SetHelp $b3 ".  Press to close the dialog box, cancelling the current operation."
+
+# Now pack the nuttons so that they appear at the bottom of the dialog box.
+   pack $butfrm -fill x -expand 1
+   pack $b1 $b3 -side left -expand 1
+
+# Ensure that closing the window from the window manager is like pressing
+# the Cancel button.
+   wm protocol $top WM_DELETE_WINDOW "set OPFILE_EXIT cancel"
+
+# Loop until an exit button is pressed.
+   set exit 0
+   while { !$exit } {
+
+# Wait for the user to press a button.
+      tkwait variable OPFILE_EXIT
+
+# If the cancel button was pressed, exit returning zero.
+      if { $OPFILE_EXIT == "cancel" } {
+         set exit 1
+
+# If the OK button was pressed, attempt to open the file, and exit.
+      } elseif { $OPFILE_EXIT == "ok" } {
+
+# Get the file name from the entry.
+         set file [$ent get]
+
+# First deal with cases where the file is to be read.
+         if { $mode == "r" } {
+
+#  Attempt to open the file for reading. Catch any error which occurs.
+            if { [catch {set fd [open $file "r"]} msg] } {
+               Message "File \"$file\" cannot be read:\n\n\"$msg\""
+            } {
+               set ret 1
+            }
+
+# Now deal with cases where the file is to be written.
+         } {
+
+# If the file already exists, get the user to confirm that it is 
+# OK to over-write it. If so, attempt to opne it for writing. Report any
+# error.
+            if { ![file exists $file] || [Confirm "Over-write existing file \"$file\"?"] } {
+               if { [catch {set fd [open $file "w"]} msg] } {
+                  Message "File \"$file\" cannot be opened for writing:\n\n\"$msg\""
+               } {
+                  set ret 1
+               }
+            }
+         }
+
+# If the file was opened succesfully, indicate that the dialog box should be 
+# closed.
+         if { $ret } { set exit 1 }
+
+      }
+   }
+
+# Destroy the dialog box, and return.
+   destroy $top
+   return $ret
+}
+
 proc Paste {} {
 #+
 #  Name:
@@ -9332,6 +9578,266 @@ proc ReleaseBind {x y} {
          exit 1
       }
    }
+}
+
+proc Restore {file} {
+#+
+#  Name:
+#     Restore
+#
+#  Purpose:
+#     Restore positions lists, masks, and options from a text file 
+#     previously created using procedure Dump.
+#
+#  Arguments:
+#     file 
+#        If supplied non-blank, then the dump is read from the specified
+#        file. Otherwise, the user is asked to supply a file name.
+#
+#
+#  Returned Value:
+#     1 if a succesful dump was performed, zero otherwise.
+#-
+   global E_RAY_FEATURES 
+   global E_RAY_MASK
+   global IMAGES
+   global O_RAY_FEATURES 
+   global O_RAY_MASK 
+   global O_RAY_SKY
+   global E_RAY_SKY
+   global IMMAP
+   global OEMAP
+   global COLMENU
+   global XHAIR
+   global SKYOFF
+   global HAREA
+   global SAREA
+   global OPTSMENU
+   global SKYPAR
+   global PNTCY
+   global PNTCX
+   global PNTID
+   global PNTNXT
+   global PNTVID
+
+# Open an existing dump file, either the supplied one, or one specified by
+# the user.
+   if { $file != "" } {
+      set backup 1
+      if { [catch {set fd [open $file "r"]} mess] } {
+         Message "Could not restored original positions lists, etc.\n\n\"$mess\"."
+         set ok 0
+      } {
+         set ok 1
+      }
+      set info "Restoring original positions lists, etc."
+   } {
+      set backup 0
+      set ok [OpenFile "r" "Dump file" "Give name of dump file to read:" file fd]
+      set info "Restoring positions lists, etc, from disk."
+   }
+
+# Only proceed if a file was opened.
+   if { $ok } {
+
+# Tell the user what is happening.
+      set told [SetInfo $info 0]
+
+# Set a flag indicating that the supplied file is a valid dump file.
+      set bad 0
+
+# If the user supplied the dump file, dump the current positions, masks, etc, 
+# so that they can be restored if anything goes wrong. Abort if the dump fails.
+      if { !$backup } {
+         set safefile [UniqueFile]
+         if { ![Dump $safefile] } {
+            Message "Unable to create backup dump of current positions."
+            set bad 1
+         }
+      }
+
+# Loop round all images...
+      foreach image $IMAGES {
+         if { $bad } { break }
+
+# Check that this is the start of a new image. If no more images are
+# contained in the given file, break out of the image loop leaving
+# the other images unchanged.
+         if { [gets $fd line] == -1 } {
+            set bad 1
+            break
+         } 
+         if { ![regexp {^Image } $line] } { break }
+
+# Restore the the OE Mapping.
+         if { [gets $fd line] == -1 } {
+            set bad 1
+            break
+         } 
+
+         if { $line != "" } {
+            if { [llength $line] == 6 } {
+               set OEMAP($image) $line
+            } {
+               set bad 1
+               break
+            } 
+         } {
+            catch { unset OEMAP($image) }
+         }
+
+# Restore the the Image Mapping.
+         if { [gets $fd line] == -1 } {
+            set bad 1
+            break
+         } 
+
+         if { $line != "" } {
+            if { [llength $line] == 6 } {
+               set IMMAP($image) $line
+            } {
+               set bad 1
+               break
+            } 
+         } {
+            catch { unset IMMAP($image) }
+         }
+
+# Loop round each object type...
+         foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK \
+                              $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY] {
+
+# Delete the existing positions.
+            while { [NumPosn "" $image $object] > 0 } {
+               DelPosn 0 0 $image $object
+            }
+
+# Get the number of positions in this list ($npnt).
+            if { [gets $fd line] == -1 || [scan $line "%d" npnt] != 1 } {
+               set bad 1
+            } 
+
+# Read the arrays holding information describing the list.
+            foreach item "PX PY NXT LBL TAG" {
+               set aryname "PNT${item}"
+               upvar #0 $aryname ary 
+
+               if { $bad || [gets $fd line] == -1 || [llength $line] != $npnt } {
+                  set bad 1
+               } 
+
+# Store the new array values.
+               if { !$bad } {
+                  set ary($image,$object) $line
+               } {
+                  set ary($image,$object) ""
+               }
+            }
+
+# Initialise the other required arrays to indicate that nothing is
+# currently drawn.
+            if { !$bad } {
+               catch { unset PNTID($image,$object) }
+               catch { unset PNTCX($image,$object) }
+               catch { unset PNTCY($image,$object) }
+               catch { unset PNTVID($image,$object) }
+               foreach nxt $PNTNXT($image,$object) {
+                  lappend PNTID($image,$object) -1
+                  lappend PNTCX($image,$object) ""
+                  lappend PNTCY($image,$object) ""
+                  if { $nxt == "" } {
+                     lappend PNTVID($image,$object) ""
+                  } {
+                     lappend PNTVID($image,$object) -1
+                  }
+               }            
+            }
+         }
+      }
+
+# Find the line marking the start of the options.
+      while { $line != "Options:" } {
+         if { [gets $fd line] == -1 } {
+            set bad 1
+            break
+         } 
+      }      
+
+# Only proceed if the file is good so far.
+      if { !$bad } {
+
+# Save the current states of some of the Options menu items.
+         foreach var "XHAIR SKYOFF HAREA SAREA SKYPAR" {
+            upvar #0 $var gvar
+            set old_$var $gvar
+         }            
+
+# Restore the values of the global variables holding the option settings...
+         foreach var "XHRCOL CURCOL BADCOL REFCOL SELCOL PSF_SIZE INTERP FITTYPE OEFITTYPE SKYPAR VIEW XHAIR SKYOFF HAREA SAREA" {
+            upvar #0 $var gvar
+
+            if { [gets $fd line] == -1 || [llength $line] != 2 || [lindex $line 0] != $var } {
+               set bad 1
+               break
+            } 
+            set gvar [lindex $line 1]
+         }
+
+# Now update the Options menu to reflect these restored values.
+         if { !$bad } {
+
+            if { $old_XHAIR != $XHAIR } {
+               set XHAIR $old_XHAIR
+               $OPTSMENU invoke "Use Cross-hair"
+            }
+
+            if { $old_SKYOFF != $SKYOFF } {
+               set SKYOFF $old_SKYOFF
+               $OPTSMENU invoke "Remove Sky"
+            }
+
+            if { $old_HAREA != $HAREA } {
+               set HAREA $old_HAREA
+               $OPTSMENU invoke "Display Help Area" 
+            }
+
+            if { $old_SAREA != $SAREA } {
+               set SAREA $old_SAREA
+               $OPTSMENU invoke "Display Status Area"
+            }
+
+            if { $old_SKYPAR != $SKYPAR } {
+               SkyOff
+            }
+
+            foreach var "XHRCOL CURCOL BADCOL REFCOL SELCOL" {
+               upvar #0 $var gvar
+               $COLMENU($var) invoke $gvar
+            }
+
+         }
+
+      }
+
+# Close the dump file.
+      close $fd
+
+# Cancel the informative text set earlier in this procedure.
+      if { $told } { SetInfo "" 0 }
+
+#  If the specified file was bad, try restoring the dump saved at the start
+#  of this procedure. Do not do this if we are already restoring a saved
+#  "backup" dump.
+      if { $bad && !$backup } { 
+         Message "Syntax error encountered restoring positions from \"$file\". Last line read was:\n\n\"$line\""
+         Restore $safefile
+      }
+
+#  Re-display the reference and current objects.
+      UpdateDisplay ref
+
+   }
+
 }
 
 proc Save {} {
@@ -9975,278 +10481,6 @@ proc Save {} {
    if { $told } { SetInfo "" 0 }
 
    return $ok
-
-}
-
-proc SaveAs {} {
-#+
-#  Name:
-#     SaveAs
-#
-#  Purpose:
-#     Get new names for all the output files, and then call Save to
-#     create the required output images.
-#
-#  Arguments:
-#     None.
-#
-#  Returned Value:
-#     Zero if an error occurred creating the output images. One otherwise.
-#
-#  Globals:
-#     DBEAM (Read)
-#        Is PolReg being run in dual-beam mode?
-#     IMAGES (Read)
-#        A list of the input images (without any section specifiers).
-#     NEOUT (Read)
-#        The number of E-ray output intensity images to be created.
-#     NOOUT (Read)
-#        The number of O-ray, or single-beam, output intensity images to be 
-#        created.
-#     OUTIMS (Read and Write)
-#        A 2-D array, indexed by input image and ray, giving the name of
-#        the corresponding output image.
-#     RB_FONT (Read)
-#        The default font used for radiobuttons.
-#     SAVEAS_EXIT (Write)
-#        The label from the button which was pressed to close the
-#        dialogue box.
-#     STKOUT (Read and Write)
-#        The name of the output cube to hold Stokes parameters (if $STOKES
-#        is non-zero).
-#     STOKES (Read)
-#        If non-zero, then Stokes parameters are calculated and stored in
-#        a cube with name given by $STKOUT.
-#
-#-
-   global DBEAM
-   global IMAGES
-   global OUTIMS
-   global STOKES
-   global STKOUT
-   global NOOUT
-   global NEOUT
-   global RB_FONT
-   global SAVEAS_EXIT
-
-# Create the top level window for the dialogue box.
-   set top .saveas
-   set topf [MakeDialog $top "Specify output file names" 1]
-   pack [label $topf.title -text "Give new output file names:"] -side top \
-        -pady 4m
-
-#  Save the number of input images for which output image names are
-#  required.
-   if { $NOOUT > $NEOUT } {
-      set nout $NOOUT
-   } {
-      set nout $NEOUT
-   }
-
-#  Find the length of the longest input file name. Use a minimum of 14.
-   set maxl 14
-   foreach im $IMAGES {
-      set l [string length $im]
-      if { $l > $maxl } { set maxl $l }
-   }
-
-#  Create a label and entry for the user to enter a new name for the
-#  Stokes cube file name (if one is being produced).
-   if { $STOKES } { 
-      set f [frame $topf.fs]
-      set lb [label $f.l -text "Stokes cube: " -width $maxl -justify left] 
-      set ens [entry $f.e -width 40 -font $RB_FONT]
-      $ens delete 0 end
-      $ens insert 0 $STKOUT
-      pack $lb $ens -side left
-      pack $f -side top -pady 2m -padx 2m -expand 1 -fill x
-   }
-
-#  Create a label and entry for the user to enter a new name for each of
-#  the output aligned intensity images.
-   for {set i 0} {$i < $nout} {incr i} {
-      set im [lindex $IMAGES $i]
-
-      set f [frame $topf.f$i]
-      if { $DBEAM } {
-         if { $i < $NOOUT } {
-            set fo [frame $f.o]
-            set lb [label $fo.l -text "$im (O-ray): " -width $maxl -justify left] 
-            set en($im,O) [entry $fo.e -width 40 -font $RB_FONT]
-            $en($im,O) delete 0 end
-            $en($im,O) insert 0 $OUTIMS($im,O)
-            pack $lb $en($im,O) -side left
-         }
-
-         if { $i < $NEOUT } {
-            set fe [frame $f.e]
-            set lb [label $fe.l -text "$im (E-ray): " -width $maxl -justify left] 
-            set en($im,E) [entry $fe.e -width 40 -font $RB_FONT]
-            $en($im,E) delete 0 end
-            $en($im,E) insert 0 $OUTIMS($im,E)
-            pack $lb $en($im,E) -side left
-         }
-
-         pack $fo $fe -side top
-
-      } {
-         set lb [label $f.l -text "$im : " -width $maxl -justify left] 
-         set en($im,O) [entry $f.e -width 40 -font $RB_FONT]
-         $en($im,O) delete 0 end
-         $en($im,O) insert 0 $OUTIMS($im,O)
-         pack $lb $en($im,O) -side left
-      }
-      pack $f -side top -pady 2m -padx 2m -expand 1 -fill x
-   }
-
-# Create the OK, Clear, Cancel, Restore, Help buttons, but don't pack them yet.
-   set butfrm [frame $topf.butfrm]
-   set b1 [button $butfrm.ok -text "OK" -command "set SAVEAS_EXIT ok"]
-   set b2 [button $butfrm.clear -text "Clear" -command "set SAVEAS_EXIT clear"]
-   set b3 [button $butfrm.cancel -text "Cancel" -command "set SAVEAS_EXIT cancel"]
-   set b4 [button $butfrm.restore -text "Restore" -command "set SAVEAS_EXIT  restore"]
-   set b5 [button $butfrm.help -text "Help" -command "set SAVEAS_EXIT help"]
-
-   SetHelp $b1 ".  Press to close the dialog box, adopting the currently displayed file names."
-   SetHelp $b2 ".  Press to clear all file names."
-   SetHelp $b3 ".  Press to close the dialog box, re-instating the original file names."
-   SetHelp $b4 ".  Press to restore the original file names."
-   SetHelp $b5 ".  Press to see more help on this window."
-
-# Now pack the OK, Clear, Cancel, Restore, Help buttons so that they appear 
-# at the bottom of the dialog box.
-   pack $butfrm -fill x -expand 1
-   pack $b1 $b2 $b3 $b4 $b5 -side left -expand 1
-
-# Ensure that closing the window from the window manager is like pressing
-# the Cancel button.
-   wm protocol $top WM_DELETE_WINDOW "set SAVEAS_EXIT cancel"
-
-# Loop until an exit button is pressed.
-   set exit 0
-   while { !$exit } {
-
-# Wait for the user to press a button.
-      tkwait variable SAVEAS_EXIT
-
-# If the cancel button was pressed, exit without changing the stored
-# file names.
-      if { $SAVEAS_EXIT == "cancel" } {
-         set exit 1
-
-# If the OK button was pressed, check that all file names have been
-# supplied, store the new file names, and exit.
-      } elseif { $SAVEAS_EXIT == "ok" } {
-
-         set exit 1
-         for {set i 0} {$i < $nout} {incr i} {
-            set im [lindex $IMAGES $i]
-            if { $DBEAM } {
-               if { $i < $NOOUT } {
-                  if { [$en($im,O) get] == "" } {
-                     Message "No file given to receive O-ray intensity from $im."
-                     set exit 0
-                     break
-                  }
-               }
-               if { $i < $NEOUT } {
-                  if { [$en($im,E) get] == "" } {
-                     Message "No file given to receive E-ray intensity from $im."
-                     set exit 0
-                     break
-                  }
-               }
-            } {
-               if { $i < $NOOUT } {
-                  if { [$en($im,O) get] == "" } {
-                     Message "No file given to receive intensity from $im."
-                     set exit 0
-                     break
-                  }
-               }
-            }
-         }
-         if { $exit } {
-            if { $STOKES } {
-               if { [$ens get] == "" } {
-                  Message "No file given to receive Stokes cube."
-                  set exit 0
-               }
-            }
-         }
-
-# If all files have been give, store the local file names in the appropriate 
-# global variables.
-         if { $exit } {
-            for {set i 0} {$i < $nout} {incr i} {
-               set im [lindex $IMAGES $i]
-               if { $i < $NOOUT } { 
-                  set OUTIMS($im,O) [$en($im,O) get]
-               }
-               if { $i < $NEOUT } {
-                  set OUTIMS($im,E) [$en($im,E) get]
-               }
-            }
-            if { $STOKES } { set STKOUT [$ens get] }
-         }
-
-# If the Clear button was pressed, clear the file names.
-      } elseif { $SAVEAS_EXIT == "clear" } {
-         for {set i 0} {$i < $nout} {incr i} {
-            set im [lindex $IMAGES $i]
-
-            if { $i < $NOOUT } { 
-               $en($im,O) delete 0 end
-            }
-
-            if { $i < $NEOUT } {
-               $en($im,E) delete 0 end
-            }
-         }
-
-         if { $STOKES } { 
-            $ens delete 0 end
-         }
-
-# If the Restore button was pressed, restore the original file names.
-      } elseif { $SAVEAS_EXIT == "restore" } {
-         for {set i 0} {$i < $nout} {incr i} {
-            set im [lindex $IMAGES $i]
-
-            if { $i < $NOOUT } { 
-               $en($im,O) delete 0 end
-               $en($im,O) insert 0 $OUTIMS($im,O)
-            }
-
-            if { $i < $NEOUT } {
-               $en($im,E) delete 0 end
-               $en($im,E) insert 0 $OUTIMS($im,E)
-            }
-         }
-
-         if { $STOKES } { 
-            $ens delete 0 end
-            $ens insert 0 $STKOUT
-         }
-   
-# If the Help button was pressed, give more help.
-      } elseif { $SAVEAS_EXIT == "help" } {
-         ShowHelp "POLREG_SAVEAS_DIALOG" 
-
-      }
-   }
-
-# Destroy the dialog box.
-   destroy $top
-
-# If the OK button was pressed, call Save to create the output images.
-   if { $SAVEAS_EXIT == "ok" } { 
-      set ret [Save]
-   } {
-      set ret 1
-   }   
-
-   return $ret
 
 }
 
@@ -10915,6 +11149,9 @@ proc SetInfo {text def} {
    } {
       set INFO_TEXT $DEFAULT_INFO
    }   
+
+# Ensure the text is displayed.
+   update idletasks
 
    return $told
 }
