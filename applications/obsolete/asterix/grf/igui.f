@@ -250,6 +250,12 @@
      :                                                   SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_R5','_REAL',0,VAL__NBR,
      :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_I1','_INTEGER',0,VAL__NBI,
+     :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_I2','_INTEGER',0,VAL__NBI,
+     :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_C1','_CHAR',0,16,SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_C2','_CHAR',0,16,SID,STATUS)
 *  help string
         CALL NBS_DEFINE_PRIMITIVE(ID,'HELP','_CHAR',0,80,SID,STATUS)
 
@@ -352,6 +358,10 @@
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'PAR_R5',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
+        CALL IMG_NBPUT0I('PAR_I1',0,STATUS)
+        CALL IMG_NBPUT0I('PAR_I2',0,STATUS)
+        CALL IMG_NBPUT0C('PAR_C1',' ',STATUS)
+        CALL IMG_NBPUT0C('PAR_C2',' ',STATUS)
         CNAME='DATA'
         DO I=1,9
           DO J=1,9
