@@ -458,7 +458,6 @@
             YC = YRAN( IC )
             RAC = RARAN( IC )
             DECC = DECRAN( IC )
-            SS = 0.0D0
 
 *  We have found our estimate of the field centre in RA/DEC (the values
 *  for row IC). We now need an estimate of the pixel scale.  Loop round

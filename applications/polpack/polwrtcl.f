@@ -39,11 +39,11 @@
 *                 if the quantity in the column is not known).
 *      xlo_     : The minimum X pixel index value in the data
 *      ylo_     : The minimum Y pixel index value in the data
-*      zlo_     : The minimum Z column value in the data (only set
+*      zlo_     : The minimum Z pixel index value in the data (only set
 *                 if the catalogue has a Z column).
 *      xhi_     : The maximum X pixel index value in the data
 *      yhi_     : The maximum Y pixel index value in the data
-*      zhi_     : The maximum Z column value in the data (only set
+*      zhi_     : The maximum Z pixel index value in the data (only set
 *                 if the catalogue has a Z column).
 *      ncol_    : The number of columns in the catalogue
 *      nrow_    : The number of rows in the catalogue
@@ -65,10 +65,10 @@
 *                 Column values are formatted with this format.
 *      hfmts_   : A list of Tcl formats specifications, one for each column.
 *                 Column headings are formatted with this format.
-*      zaunit_  : The units associated with the Z axis in the current
+*      zaxunit_ : The units associated with the Z axis in the current
 *                 Frame of the catalogues WCS FrameSet. Not written if
 *                 the catalogue does not have a Z axis.
-*      zcunit_  : The units associated with the Z column in the catalogue.
+*      zcolunit_: The units associated with the Z column in the catalogue.
 *                 Not written if the catalogue does not have a Z column.
 
 *  Usage:
@@ -94,7 +94,7 @@
 *     13-FEB-2001 (DSB):
 *        Modified to support 3D data.
 *     2-MAR-2001 (DSB):
-*        Added zcunit_ and zaunit_,
+*        Added zcolunit_ and zaxunit_,
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -164,9 +164,9 @@
       CHARACTER TEXT*512         ! O/p text buffer
       CHARACTER XCNM*20          ! Name of the X column
       CHARACTER YCNM*20          ! Name of the Y column
-      CHARACTER ZAUNIT*20         ! Units for Z axis
+      CHARACTER ZAXUN*20         ! Units for Z axis
       CHARACTER ZCNM*20          ! Name of the Z column
-      CHARACTER ZCUNIT*20        ! Units for Z column
+      CHARACTER ZCOLUN*20        ! Units for Z column
       DOUBLE PRECISION DEQN      ! Input equinox
       INTEGER BFRM               ! Base Frame from input WCS FrameSet
       INTEGER CI                 ! CAT identifier for input catalogue
@@ -187,8 +187,6 @@
       INTEGER ITEMP              ! Temporary storage
       INTEGER IWCS               ! The WCS FrameSet from the input catalogue
       INTEGER MAP                ! AST Mapping used to create new RA/DEC values
-      INTEGER NAXB               ! No. of base frame axes
-      INTEGER NAXC               ! No. of current frame axes
       INTEGER NCIN               ! No. of columns in input catalogue
       INTEGER NCOL               ! No. of columns in output catalogue
       INTEGER NDIM               ! No. of dimensions in WCS Base Frame
@@ -352,29 +350,13 @@
       END IF
       CALL POL1_GTCTA( CI, NDIM, GA, IWCS, STATUS )
 
-*  Get the number of axes in the base and current Frames.
-      NAXB = AST_GETI( IWCS, 'NIN', STATUS )
-      NAXC = AST_GETI( IWCS, 'NOUT', STATUS )
-
 *  If a Z column is present, get the units strings from the 3rd axis in
 *  both base and current Frames.
       IF( ZCOL .GT. 0 ) THEN
-
-         IF( NAXC .GT. 2 ) THEN 
-            ZAUNIT = AST_GETC( AST_GETFRAME( IWCS, AST__CURRENT, 
-     :                                       STATUS ),
-     :                         'UNIT(3)', STATUS )
-         ELSE
-            ZAUNIT = ' '
-         END IF
-
-         IF( NAXB .GT. 2 ) THEN 
-            ZCUNIT = AST_GETC( AST_GETFRAME( IWCS, AST__BASE, STATUS ),
-     :                         'UNIT(3)', STATUS )
-         ELSE
-            ZCUNIT = ' '
-         END IF
-
+         ZAXUN = AST_GETC( AST_GETFRAME( IWCS, AST__CURRENT, STATUS ),
+     :                      'UNIT(3)', STATUS )
+         ZCOLUN = AST_GETC( AST_GETFRAME( IWCS, AST__BASE, STATUS ),
+     :                      'UNIT(3)', STATUS )
       END IF
 
 *  Assume for the moment that the output catalogue will contain RA/DEC
@@ -743,23 +725,23 @@
       IF( ZCOL .GT. 0 ) THEN 
          TEXT = 'set zlo_ '
          IAT = 9
-         CALL CHR_PUTR( LBND( 3 ), TEXT, IAT )
+         CALL CHR_PUTI( NINT( 0.5 + LBND( 3 ) ), TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
    
          TEXT = 'set zhi_ '
          IAT = 9
-         CALL CHR_PUTR( UBND( 3 ), TEXT, IAT )
+         CALL CHR_PUTI( NINT( 0.5 + UBND( 3 ) ), TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
-         TEXT = 'set zaunit_ "'
-         IAT = 13
-         CALL CHR_APPND( ZAUNIT, TEXT, IAT )
+         TEXT = 'set zaxunit_ "'
+         IAT = 14
+         CALL CHR_APPND( ZAXUN, TEXT, IAT )
          CALL CHR_APPND( '"', TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
-         TEXT = 'set zcunit_ "'
-         IAT = 13
-         CALL CHR_APPND( ZCUNIT, TEXT, IAT )
+         TEXT = 'set zcolunit_ "'
+         IAT = 15
+         CALL CHR_APPND( ZCOLUN, TEXT, IAT )
          CALL CHR_APPND( '"', TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
