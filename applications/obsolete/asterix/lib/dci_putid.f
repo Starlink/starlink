@@ -1,7 +1,7 @@
-      SUBROUTINE DCI_GETID( ID, DETID, STATUS )
+      SUBROUTINE DCI_PUTID( ID, DETID, STATUS )
 *+
 *  Name:
-*     DCI_GETID
+*     DCI_PUTID
 
 *  Purpose:
 *     Write detector configuration info to a dataset

@@ -108,10 +108,10 @@
 *  Local Variables:
       CHARACTER*20		DET			! Detector name
       CHARACTER*20		FILT			! Filter name
-      CHARACTER*(DAT__SZLOC)	HLOC			! HEADER object
-      CHARACTER*(DAT__SZLOC)	INLOC			! INSTRUMENT object
       CHARACTER*20		INSTRUM			!
       CHARACTER*20		MISSION			!
+
+      INTEGER			FID, DETID		! Extracted arguments
 
       LOGICAL			DOK, FOK, IOK, MOK	! Things present?
 *.
