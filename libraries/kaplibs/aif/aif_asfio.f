@@ -1,26 +1,25 @@
-*+  AIF_ASFIO - Opens a sequential file via a parameter
-
       SUBROUTINE AIF_ASFIO ( PNFILE, ACMODE, FORM, RECSZ, FD, OPEN,
      :                       STATUS )
 *+
 *  Name:
-*     AIF_ANTMP
+*     AIF_ASFIO
 
 *  Purpose:
-*     Opens a sequential file via a parameter
+*     Opens a sequential file via a parameter.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL AIF_ASFIO( PNFILE, ACMODE, FORM, RECSZ, FD, OPEN, STATUS )
 
 *  Description :
 *     This routine opens a sequential file via FIO_ASSOC.  Up to four
 *     attempts may be made to open the file.  If a null response is
 *     supplied the file is not opened, and the flag returned indicates
 *     this fact.
-*
-*    Invocation :
-*
-*      CALL AIF_ASFIO ( PNFILE, ACMODE, FORM, RECSZ, FD, OPEN, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments :
 *     PNFILE = CHARACTER*(*)
 *         Parameter name by which file is to be opened
 *     ACMODE = CHARACTER*(*)
@@ -40,9 +39,8 @@
 *         If true the file has been opened.
 *     STATUS = INTEGER( READ, WRITE )
 *         Global status value
-*
-*    Method :
-*
+
+*  Method :
 *     Check for error on entry - return if not o.k.
 *     Initialise looping flag
 *     Do while no error obtaining the name and opening the output file
@@ -70,20 +68,18 @@
 *        Report and abort
 *     Endif
 *     Return
-*
-*    Bugs :
-*
+
+*  Bugs :
 *     None known.
-*
-*    Authors :
-*
+
+*  Authors :
 *     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
+
+*  History :
 *     1989 Jul 25: Original (RL.STAR::CUR).
 *     1990 Feb 20: Renamed from AIF_OPFIO (RAL::CUR).
-*
+*-
+
 *    Type definitions :
 
       IMPLICIT  NONE           ! no implicit typing allowed
@@ -126,7 +122,7 @@
      :    LOOPAG,              ! Loop again to open output file
      :    OPEN                 ! File opened successfully
 
-*-
+*.
 
 *    check status on entry - return if not o.k.
 

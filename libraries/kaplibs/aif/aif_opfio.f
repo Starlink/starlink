@@ -1,21 +1,25 @@
-*+  AIF_OPFIO - Opens a Fortran sequential file by name.
+      SUBROUTINE AIF_OPFIO( FILNAM, ACMODE, FORM, RECSZ, FD, OPEN,
+     :                      STATUS )
+*+
+*  Name:
+*     AIF_OPFIO 
 
-      SUBROUTINE AIF_OPFIO ( FILNAM, ACMODE, FORM, RECSZ, FD, OPEN,
-     :                       STATUS )
-*
-*    Description :
-*
+*  Purpose:
+*     Opens a Fortran sequential file by name.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL AIF_OPFIO( FILNAM, ACMODE, FORM, RECSZ, FD, OPEN, STATUS )
+
+*  Description:
 *     This routine opens a sequential file via FIO_OPEN.  Up to four
 *     attempts may be made to open the file.  If a null response is
 *     supplied the file is not opened, and the flag returned indicates
 *     this fact.
-*
-*    Invocation :
-*
-*      CALL AIF_OPFIO ( FILNAM, ACMODE, FORM, RECSZ, FD, OPEN, STATUS )
-*
-*    Arguments :
-*
+
+*  Arguments :
 *     FILNAM = CHARACTER*(*)
 *         The name of the file to be opened.
 *     ACMODE = CHARACTER*(*)
@@ -36,8 +40,7 @@
 *     STATUS = INTEGER( READ, WRITE )
 *         Global status value
 *
-*    Method :
-*
+*  Method :
 *     Check for error on entry - return if not o.k.
 *     Initialise looping flag
 *     Do while no error obtaining the name and opening the output file
@@ -60,21 +63,19 @@
 *        Report and abort
 *     Endif
 *     Return
-*
-*    Bugs :
-*
+
+*  Bugs :
 *     None known.
-*
-*    Authors :
-*
+
+*  Authors :
 *     Malcolm Currie   STARLINK (RAL::CUR)
-*
-*    History :
-*
+
+*  History :
 *     1989 Jul 25: Original (RAL::CUR).
 *     1990 Feb 20: Obtains the file by name instead of by parameter
 *                  (RAL::CUR).
-*
+*-
+
 *    Type definitions :
 
       IMPLICIT  NONE           ! no implicit typing allowed
