@@ -1,0 +1,126 @@
+#!/bin/sh
+# $Id$
+
+#+
+#  Name:
+#     mksumm
+#
+#  Purpose:
+#     Generate all required summary files for SGML document crossreferencing.
+#
+#  Description:
+#     This script does what is required to fill a directory with 
+#     appropriate .summary files corresponding to the Starlink summary 
+#     DTD, and a corresponding CATALOG.  It acts as a driver for other
+#     scripts which actually do the work.
+#
+#     What it actually does is:
+#        Invoke htx2summ.pl on all the Starlink documents which have 
+#        associated .htx directories.
+#
+#        Invoke minsumm.pl to generate minimal summary files for all
+#        the other starlink documents.
+#
+#     The effect of this is to leave a .summary file in the appropriate
+#     place ($STARLINK_SGML_DIR/documents) for each Starlink document
+#     present on the system.  Each summary file should conform to the 
+#     Starlink summary DTD.  A CATALOG file is written in the same
+#     directory containing a public identifier for each of the summary 
+#     files.
+#
+#  Environment:
+#     This script requires that the htx2summ.pl and minsumm.pl are in 
+#     the PATH.  These perl scripts in turn require that the directory
+#     containing their dependencies is in PERL5LIB.
+#
+#  Arguments:
+#     None.
+#
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#
+#  History:
+#     25-AUG-1999 (MBT):
+#        Initial version.
+#-
+
+#  Set up directory locations.
+      if [ "$STARLINK_SGML_DIR" = "" ]
+      then
+         echo 1>&2 '$STARLINK_SGML_DIR is not set'
+         exit 1
+      fi
+      if [ "$STARLINK" = "" ]
+      then
+         STARLINK=/star
+         export STARLINK
+      fi
+      summdir=$STARLINK_SGML_DIR/documents
+      docdir=$STARLINK/docs
+      warnfile=$summdir/mksumm.warnings
+
+#  Clear out files.
+      rm -f $summdir/*.summary $summdir/CATALOG $warnfile
+
+#  Write summary files for all the documents which have been star2htmlized 
+#  and thus have HTX directories.
+      echo "Writing summary files in $summdir using $docdir/*.htx files:"
+      for htxfile in $docdir/*.htx
+      do
+         name=`echo $htxfile | sed -e's%.*/%%' -e's%\.htx$%%'`
+         echo "   $name"
+         texfile=`echo $htxfile | sed -e's%\.htx$%.tex%'`
+         summfile=$summdir/$name.summary
+         if [ -f $texfile ] 
+         then
+            args="$htxfile $texfile"
+         else
+            args="$htxfile"
+         fi
+         if htx2summ.pl $args >$summfile 2>>$warnfile
+         then
+            :
+         else
+            echo "Command failed:"
+            echo "   htx2summ.pl $args"
+            echo "see $warnfile."
+            exit 1
+         fi
+      done
+
+#  The rest of the script executes within the summary directory.
+      cd $summdir
+
+#  Write summary files for those entries in docs_lis which weren't
+#  covered by the previous procedure.
+      echo "Writing minimal summary files in $summdir using $docdir/docs_lis"
+      if minsumm.pl 2>>$warnfile
+      then
+         :
+      else
+         echo "Command failed:"
+         echo "   minsumm.pl"
+         echo "see $warnfile."
+         exit 1
+      fi
+
+#  Write info to user and update the CATALOG file.
+      echo "Summaries written - see $warnfile for warnings."
+      echo " "
+      echo "Writing $summdir/CATALOG file"
+      for f in *.summary
+      do
+         id=`echo $f | sed -e's%.summary%%' -e's%[0-9]%/&%' | tr a-z A-Z` 
+         echo "PUBLIC '-//Starlink//DOCUMENT Summary $id//EN' $f"
+      done >CATALOG
+
+#  Check that all summary files conform.
+      echo "Checking conformance of summary files"
+      for summ in *.summary
+      do
+         echo "   $summ"
+         nsgmls -s $summ
+      done 2>>$warnfile
+      echo "Non-conforming summary files logged in $warnfile."
+
+# $Id$
