@@ -173,7 +173,7 @@ int     index;
 float   lut0 [768], r;
 float   icol1();
 float   factor;
-#if defined (VAXC) || defined (ultrix)
+#if !HAVE_DECL_RINT
 double rint( double x );
 #endif
 FILE    *fdat;
@@ -1128,7 +1128,7 @@ int     iiderr;
 int     index;
 float   lut0 [768], r;
 float   factor;
-#if defined (VAXC) || defined (ultrix)
+#if !HAVE_DECL_RINT
 double rint( double x );
 #endif
 
@@ -1455,7 +1455,7 @@ int IIDQCI_C ( int display, int devcap, int size, int capdata[], int* ncap )
 char fildct[256];
 int  i , curconf , nit , nc , cap[16], xdev, xoff, ydev, yoff;
 int  iiderr;
-#if defined (VAXC) || defined (ultrix)
+#if !HAVE_DECL_RINT
 double rint( double x );
 #endif
 

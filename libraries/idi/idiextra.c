@@ -2637,7 +2637,7 @@ void snap_pix ( int display, int colmode, int npixel, int xoff, int yoff,
 {
 
 /* Local variables */
-#if defined (VAXC) || defined (ultrix)
+#if !HAVE_DECL_RINT
 double rint( double x );
 #endif
 unsigned char *curbm, *curbm1;
@@ -3347,7 +3347,7 @@ int   l , m , curconf , nit;
 int   iiderr;
 float r;
 char  fildct[256];
-#if defined (VAXC) || defined (ultrix)
+#if !HAVE_DECL_RINT
 double rint( double x );
 #endif
 

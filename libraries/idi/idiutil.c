@@ -1188,7 +1188,7 @@ void ebwmy ( int display, int confn, int memid, int x0, int y0, int* iierr )
 int            i , j , k , nb , bl , dd , pix , nr;
 unsigned char  *tmpbm;
 int            *curbm , *curbm0;
-#if defined (VAXC) || defined (ultrix)
+#if !HAVE_DECL_RINT
 double rint( double x );
 #endif
 
