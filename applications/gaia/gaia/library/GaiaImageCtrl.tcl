@@ -164,7 +164,7 @@ itcl::class gaia::GaiaImageCtrl {
             -rtdimage $image_ \
             -lowestitem $imageId_ \
             -regioncommand $itk_option(-regioncommand) \
-            -ignore_tag $itk_option(-grid_tag)
+            -ignore_tag $itk_option(-ast_tag)
       }
 
       set_drawing_area
@@ -665,9 +665,9 @@ itcl::class gaia::GaiaImageCtrl {
    #  Flag: if true, display menus over graphic objects when selected with <3>
    itk_option define -show_object_menu show_object_menu Show_object_menu 1
 
-   #  Canvas tag for the astrometry grid items. This is set to the
-   #  global value and shouldn't normally be changed.
-   itk_option define -grid_tag grid_tag Grid_Tag "ast_element"
+   #  Canvas tag for AST graphics items. This is set to the global
+   #  value and shouldn't normally be changed.
+   itk_option define -ast_tag ast_tag Ast_Tag "ast_element"
 
    #  Command to re-draw the astrometry grid.
    itk_option define -grid_command grid_command Grid_Command {}

@@ -53,13 +53,13 @@ extern "C" {
 //
 class StarRtdImageOptions : public RtdImageOptions {
 public:
-  char *grid_tag;               // canvas tag for all grid items
+  char *ast_tag;                // canvas tag for all ast graphics
   char *component;              // NDF component to display
   int plot_wcs;                 // Scale and orient plot symbols using
                                 // WCS system if available
 
   StarRtdImageOptions()
-    : grid_tag(NULL), component(NULL), plot_wcs(1)
+    : ast_tag(NULL), component(NULL), plot_wcs(1)
     {}
 };
 
@@ -69,7 +69,7 @@ public:
 #define GAIA_OPTION(x) Tk_Offset(StarRtdImageOptions, x)
 #define GAIA_OPTIONS \
   RTD_OPTIONS, \
-    {TK_CONFIG_STRING, "-grid_tag",  NULL, NULL, "ast_grid_item", GAIA_OPTION(grid_tag), 0}, \
+    {TK_CONFIG_STRING, "-ast_tag",   NULL, NULL, "ast_element", GAIA_OPTION(ast_tag), 0}, \
     {TK_CONFIG_STRING, "-component", NULL, NULL, "data", GAIA_OPTION(component), 0}, \
     {TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1", GAIA_OPTION(plot_wcs), 0}
 
@@ -215,8 +215,8 @@ protected:
   //  Load an image.
   virtual int loadFile();
 
-  //  Return the grid items tag.
-  char *grid_tag() const { return staroptionsPtr_->grid_tag; }
+  //  Return the AST graphics item tag.
+  char *ast_tag() const { return staroptionsPtr_->ast_tag; }
 
   //  Return the NDF component displayed.
   char *component() const { return staroptionsPtr_->component; }

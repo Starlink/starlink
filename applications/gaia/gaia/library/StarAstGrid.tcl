@@ -554,7 +554,7 @@ itcl::class gaia::StarAstGrid {
          }
 
          #  Set the grid tag
-         $itk_option(-rtdimage) configure -grid_tag $itk_option(-grid_tag)
+         $itk_option(-rtdimage) configure -ast_tag $itk_option(-ast_tag)
 
          #  If requested just display over the visible canvas +/- a little.
          if { ! $gridsize_($this,whole) } { 
@@ -581,7 +581,7 @@ itcl::class gaia::StarAstGrid {
 
    #  Remove the grid.
    protected method remove_grid_ {} {
-      $itk_option(-canvas) delete $itk_option(-grid_tag)
+      $itk_option(-canvas) delete $itk_option(-ast_tag)
       set drawn_ 0
    }
 
@@ -1727,10 +1727,10 @@ itcl::class gaia::StarAstGrid {
    #  If this is a clone, then it should die rather than be withdrawn.
    itk_option define -really_die really_die Really_Die 0
 
-   #  Grid tag used to control redraws etc.
-   itk_option define -grid_tag grid_tag Grid_Tag {} {
-      if { $itk_option(-grid_tag) == {} } {
-         set itk_option(-grid_tag) "ast_grid[incr grid_count_]"
+   #  Ast graphics tag used to control redraws etc.
+   itk_option define -ast_tag ast_tag Ast_Tag {} {
+      if { $itk_option(-ast_tag) == {} } {
+         set itk_option(-ast_tag) "ast_grid[incr grid_count_]"
       }
    }
 

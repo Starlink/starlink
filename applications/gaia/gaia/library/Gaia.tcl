@@ -303,7 +303,7 @@ itcl::class gaia::Gaia {
             -float_panel $itk_option(-float_panel) \
             -newimagecmd [code $this cleared] \
             -temporary $itk_option(-temporary) \
-            -grid_tag "grid_${this}" \
+            -ast_tag "ast_${this}" \
             -grid_command [code $this maybe_draw_grid_] \
             -with_warp 1 \
             -panel_layout $itk_option(-panel_layout) \
@@ -550,7 +550,7 @@ itcl::class gaia::Gaia {
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
-            -grid_tag "grid_${this}" \
+            -ast_tag "grid_${this}" \
             -clone_cmd [code $this make_toolbox astgrid 1] \
             -really_die $cloned
       }

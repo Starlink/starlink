@@ -41,7 +41,7 @@
 //        The loadImage member function becomes loadFile (which is now
 //        virtual) and we control configureImage completely at this
 //        level (this is needed to parse the options, plus the
-//        grid_tag item that we need). The RtdImage constructor is
+//        ast_tag item that we need). The RtdImage constructor is
 //        also changed, as we need to set the image name, the widget
 //        options and avoid some pitfalls with the RtdImage
 //        constructor calling loadFile (via the initImage member).
@@ -1097,7 +1097,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
       astTk_Init( interp_, canvasName_ );
 
       //  Define a tag for all items created in the plot.
-      astTk_Tag( grid_tag() );
+      astTk_Tag( ast_tag() );
 
       //  If we have the values gap1 and gap2 then these are
       //  actually divisors of the default value which we can only
@@ -3327,7 +3327,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
     astTk_Init( interp_, canvasName_ );
 
     //  Define a tag for all items created in the plot.
-    astTk_Tag( grid_tag() );
+    astTk_Tag( ast_tag() );
 
     if ( astOK && !inerror ) {
 
