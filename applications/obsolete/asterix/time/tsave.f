@@ -58,7 +58,7 @@
 
         CALL USI_ANNUL( 'OUT', STATUS )
 
-        CALL USI_CLOSE()
+c        CALL USI_CLOSE()
 
       ENDIF
 

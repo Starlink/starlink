@@ -41,7 +41,7 @@
           T_CLEAR=.FALSE.
         ENDIF
 
-        CALL USI_CLOSE()
+c        CALL USI_CLOSE()
 
       ENDIF
 
