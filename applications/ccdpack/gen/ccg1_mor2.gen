@@ -72,8 +72,6 @@
 *  History:
 *     20-MAY-1992 (PDRAPER):
 *        Original version.
-*     17-NOV-1998 (PDRAPER):
-*        Modified to use quicksort/insertion sort hybrid.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -182,7 +180,7 @@
          IF ( NGOOD .GT. 0 ) THEN
 
 *  Sort data.
-            CALL CCG1_SRT3R( WRK1, WRK2, POINT, NGOOD, STATUS )
+            CALL CCG1_IS3R( WRK1, WRK2, POINT, NGOOD, STATUS )
 
 *  Form mode.
             CALL CCG1_WMD3R( WRK1, WRK2, NGOOD, PBAD, NITER, TOLL,

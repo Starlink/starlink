@@ -23,6 +23,10 @@
 *     For arrays smaller than this value insertion sort is quicker
 *     (less operations), after this value quicksort is faster (nln(n)).
 *
+*     --- UPDATE, actually optimised insertion sort is even quicker
+*     and the change over point lies above 100 images. This code
+*     nolonger used.
+*
 *     The sort is extended to the ancillary data ANCDAT, this
 *     maintains is correspondence with the ORDDAT dataset on exit.
 

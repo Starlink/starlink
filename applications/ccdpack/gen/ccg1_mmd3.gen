@@ -52,8 +52,6 @@
 *  History:
 *     20-MAY-1992 (PDRAPER):
 *        Original version.
-*     17-NOV-1998 (PDRAPER):
-*        Modified to use quicksort/insertion sort hybrid.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -143,7 +141,7 @@
          IF ( NGOOD .GT. 0 ) THEN
 
 *  Sort these values into increasing order.
-            CALL CCG1_SRT2D( WRK1, POINT, NGOOD, STATUS )
+            CALL CCG1_IS2D( WRK1, POINT, NGOOD, STATUS )
 
 *  Find the min-max trimmed mean.
             CALL CCG1_TMN3D( 1, WRK1, NGOOD, USED, VAL, STATUS )

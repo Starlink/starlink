@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_SRT2<T>( ORDDAT, TDAT, PDAT, NENT, STATUS )
+*     CALL CCG1_SRT3<T>( ORDDAT, TDAT, PDAT, NENT, STATUS )
 
 *  Description:
 *     The routine sorts a list of data into increasing order, it uses
@@ -21,7 +21,13 @@
 *                               15
 *
 *     For arrays smaller than this value insertion sort is quicker
-*     (less operations), after this value quicksort is faster (nln(n)).
+*     (less operations), after this value quicksort is faster
+*     (nln(n)).
+*
+*     --- UPDATE, actually optimised insertion sort is even quicker
+*     and the change over point lies above 100 images. This code
+*     nolonger used.
+*
 *
 *     The sort is extended to the ancillary data TDAT and PDAT, these
 *     maintain their correspondence with the ORDDAT dataset on exit.

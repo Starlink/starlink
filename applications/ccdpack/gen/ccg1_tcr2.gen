@@ -74,8 +74,6 @@
 *        Original version.
 *     29-MAY-1992 (PDRAPER):
 *        Now performs weighted summation of covariances.
-*     17-NOV-1998 (PDRAPER):
-*        Modified to use quicksort/insertion sort hybrid.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -203,7 +201,7 @@
 *  non-central for (noisy) skew distributions, so the order statitics
 *  summation will be incorrect if we procede assuming that the mean is
 *  central and so correspondling are the covariances.
-            CALL CCG1_SRT3R( WRK1, WRK2, POINT, NGOOD, STATUS )
+            CALL CCG1_IS3R( WRK1, WRK2, POINT, NGOOD, STATUS )
 
 *  Decide which orders of data are to be rejected. Pick out the least
 *  bound greater than the lower bound and the highest bound less than
