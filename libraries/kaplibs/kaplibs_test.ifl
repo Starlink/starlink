@@ -9,7 +9,7 @@ interface kaplibs_test
       ptype 'DEVICE'
       vpath 'DEFAULT'
       prompt 'Name of graphics device'
-      default 'xw'
+      default '/XSERVE'
    endparameter
    parameter FILL
       type _LOGICAL
