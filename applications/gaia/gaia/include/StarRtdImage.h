@@ -121,6 +121,10 @@ class StarRtdImage : public Skycat {
    //  Create a new FITS channel
    int astcreateCmd( int argc, char *argv[] );
 
+   // Return true if there is an image and it has a celestial
+   // coordinate system.
+   int astcelestialCmd( int argc, char *argv[] );
+
    //  Replace the existing WCS FrameSet.
    int astreplaceCmd( int argc, char *argv[] );
 
