@@ -377,6 +377,7 @@
       INTEGER NVEC               ! No. of vectors in catalogue
       INTEGER VCI                ! Vector colour index
       LOGICAL AXES               ! Annotated axes to be drawn?
+      LOGICAL F1, F2, F3         ! Were explicit text heights set?
       LOGICAL KEY                ! A key to vector scale to be plotted?
       LOGICAL NEGATE             ! Negate supplied angles?
       LOGICAL THERE              ! Was a FrameSet read fom the catalogue?
@@ -407,7 +408,7 @@
 
 *  Local Data:
       DATA CLIP   / 4*4.0 /,
-     :     MARGIN / 4*0.1 /
+     :     MARGIN / 0.1, 0.15, 0.1, 0.15 /
 
 *.
 
@@ -762,8 +763,32 @@
 
 *  Produce the plot.
 *  =================
-*  First draw the axes if required.
-      IF ( AXES ) CALL AST_GRID( IPLOT, STATUS )
+*  First draw the axes if required. Set a default height if none has been
+*  given. Otherwise, PGPLOT produces constant sizes text irrespective of
+*  the size of the picture. Setting a size ensures that the text drawing 
+*  routine in grf_kappa.c adjusts the size of the text to a constant
+*  fraction of the current picture size. If text heights are set, clear
+*  them after drawing the axes.
+      IF ( AXES ) THEN
+
+         F1 = AST_TEST( IPLOT, 'SIZE(NUMLAB)', STATUS )
+         F2 = AST_TEST( IPLOT, 'SIZE(TEXTLAB)', STATUS )
+         F3 = AST_TEST( IPLOT, 'SIZE(TITLE)', STATUS )
+
+         IF( .NOT. F1 ) CALL AST_SETR( IPLOT, 'SIZE(NUMLAB)', 1.5, 
+     :                                 STATUS )
+         IF( .NOT. F2 ) CALL AST_SETR( IPLOT, 'SIZE(TEXTLAB)', 1.5, 
+     :                                 STATUS )
+         IF( .NOT. F3 ) CALL AST_SETR( IPLOT, 'SIZE(TITLE)', 1.5, 
+     :                                 STATUS )
+
+         CALL AST_GRID( IPLOT, STATUS )
+
+         IF( .NOT. F1 ) CALL AST_CLEAR( IPLOT, 'SIZE(NUMLAB)', STATUS )
+         IF( .NOT. F2 ) CALL AST_CLEAR( IPLOT, 'SIZE(TEXTLAB)', STATUS )
+         IF( .NOT. F3 ) CALL AST_CLEAR( IPLOT, 'SIZE(TITLE)', STATUS )
+
+      END IF
 
 *  Get the Mapping from the Frame in which catalogue positions are stored,
 *  to graphics world coordinates.
