@@ -113,7 +113,7 @@
       CALL NDF_BEGIN
 
 *  Get the input NDF.
-      CALL LPG_ASSOC( 'NDF', 'UPDATE', NDFIN, STATUS )
+      CALL LPG_ASSOC( 'IN', 'UPDATE', NDFIN, STATUS )
 
 *  Get the output NDF, propagating all components from the input to the 
 *  output (the HISTORY, LABEL, TITLE and all extensions are propagated by 

@@ -246,7 +246,6 @@
       INTEGER IPMASK             ! Pointer to the used mask.
       INTEGER IWCS               ! NDF WCS FrameSet
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds for input NDF.
-      INTEGER LBNDI( NDF__MXDIM )! Lower bounds for first input NDF.
       CHARACTER LOCS(5)*(DAT__SZLOC)! Locators used to access quality
                                  ! name information in the input NDF.
       INTEGER LQNAME             ! Length of the quality name string.
@@ -267,7 +266,6 @@
       LOGICAL THERE              ! True if quality name is already 
                                  ! defined within the input NDF.
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds for input NDF.
-      INTEGER UBNDI( NDF__MXDIM )! Upper bounds for first input NDF.
       LOGICAL VALUE              ! If FIXED is true, then VALUE is true
                                  ! if all pixel shold the quality, and 
                                  ! false if no pixels hold the quality.
@@ -295,7 +293,7 @@
       CALL LPG_ASSOC( 'NDF', 'UPDATE', NDFIN, STATUS )
 
 *  Get the bounds and number of dimensions.
-      CALL NDF_BOUND( NDFIN, NDF__MXDIM, LBNDI, UBNDI, NDIM, STATUS )
+      CALL NDF_BOUND( NDFIN, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
 *  Get a value for parameter QNAME.
       CALL PAR_GET0C( 'QNAME', QNAME, STATUS )
