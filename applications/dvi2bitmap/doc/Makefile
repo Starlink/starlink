@@ -15,30 +15,18 @@ doc.tar-htxsingle: dvi2bitmap.sgml
 		--packagedir ssn71.htxsingle --tarball $@ $<
 
 doc.tar: $(DOCTARBALLS)
-	test -d dvi2bitmap_doc || mkdir dvi2bitmap_doc
-	cd dvi2bitmap_doc; \
-	for i in $(DOCTARBALLS); do \
-		tar xf ../$$i; \
-	done
-	mv ssn71.htxsingle/index.html ssn71.htx/ssn71.single.html; \
-	mv dvi2bitmap_doc/ssn71.latex/ssn71.tex dvi2bitmap_doc/dvi2bitmap.tex
-	mv dvi2bitmap_doc/ssn71.htx/* dvi2bitmap_doc
-	rm -Rf dvi2bitmap_doc/ssn71.latex dvi2bitmap_doc/ssn71.htx
-	ln dvi2bitmap.sgml dvi2bitmap_doc/dvi2bitmap.sgml
-	#tar cf doc.tar dvi2bitmap_doc/dvi2bitmap.sgml dvi2bitmap_doc/ssn71.htx dvi2bitmap_doc/ssn71.tex
-	tar cf doc.tar dvi2bitmap_doc
-	#rm -Rf dvi2bitmap_doc
-
-
-#ps.stamp: dvi2bitmap.latex.stamp
-#	ROOT=`awk -F: '{print $$1}' $<`; \
-#	rm -f $$ROOT.ps.gz ;\
-#	$(MAKE) $$ROOT.ps.gz
-#
-#dvi2bitmap.html.stamp: dvi2bitmap.sgml dvi2bitmap.imgeq.list.stamp
-#
-#index.html: dvi2bitmap.html.stamp
-#	ln -sf `awk -F: '{print $$1}' $<`.html $@
+	test -d doc || mkdir doc
+	cd doc								;\
+		for i in $(DOCTARBALLS); do 				\
+			tar xf ../$$i					;\
+		done							;\
+		mv ssn71.latex/ssn71.tex ./dvi2bitmap.tex 		;\
+		mv ssn71.htx/* .					;\
+		mv ssn71.htxsingle/index.html ./dvi2bitmap.single.html	;\
+		rm -Rf ssn71.* sgmlnorm.errors MANIFEST			;\
+		ln ../dvi2bitmap.sgml dvi2bitmap.sgml
+	tar cf $@ doc
+	rm -Rf doc
 
 clean:
 	rm -f doc.tar $(DOCTARBALLS)
