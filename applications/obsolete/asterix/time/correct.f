@@ -115,6 +115,8 @@
 *        Better treatment of live times
 *     12 Sep 1995 V2.0-0 (DJA):
 *        Full ADI port.
+*     18 Dec 1995 V2.0-1 (DJA):
+*        Silly bug handling non-existent live times fixed.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -141,7 +143,7 @@
         PARAMETER               ( MAXHTEXT = 8 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'CORRECT Version V2.0-0' )
+        PARAMETER		( VERSION = 'CORRECT Version V2.0-1' )
 
 *  Local Variables:
       CHARACTER*80		HTXT(MAXHTEXT)		! History text
@@ -273,7 +275,7 @@
           CALL MSG_PRNT( '** LIVE_TIME structure does not contain'/
      :               /' expected components and will be ignored **' )
 
-        ELSE
+        ELSE IF ( LIVE_OK ) THEN
 
 *      Map live time data
           CALL ADI_CSIZE( TIMID, 'LiveOn', NSLOT, STATUS )
