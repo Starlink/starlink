@@ -83,7 +83,7 @@ AC_ARG_WITH(kpathsea,
   if test "$withval" = "yes"
   then
     AC_CHECK_HEADER(kpathsea/pathsearch.h,
-    AC_CHECK_LIB(kpathsea, main,
+    AC_CHECK_LIB(kpathsea, kpse_find_file,
       AC_DEFINE(ENABLE_KPATHSEA) 
       KPATHSEAOBJ="kpathsea.o" 
       LIBS="$LIBS -lkpathsea"
@@ -95,7 +95,7 @@ AC_ARG_WITH(kpathsea,
     safe_LIBS="$LIBS"
     LIBS="$LIBS -L$withval/lib -lkpathsea"
     AC_CHECK_HEADER(kpathsea/pathsearch.h,
-      AC_CHECK_LIB(kpathsea, main,
+      AC_CHECK_LIB(kpathsea, kpse_find_file,
         AC_DEFINE(ENABLE_KPATHSEA) 
         KPATHSEAOBJ="kpathsea.o" 
         safe_CPPFLAGS="$safe_CPPFLAGS -I$withval/include"
@@ -105,7 +105,7 @@ AC_ARG_WITH(kpathsea,
     LIBS="$safe_LIBS"
   fi,
   AC_CHECK_HEADER(kpathsea/pathsearch.h,
-    AC_CHECK_LIB(kpathsea, main,
+    AC_CHECK_LIB(kpathsea, kpse_find_file,
       AC_DEFINE(ENABLE_KPATHSEA) 
       KPATHSEAOBJ="kpathsea.o" 
       LIBS="$LIBS -lkpathsea"
