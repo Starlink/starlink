@@ -1,6 +1,11 @@
+ascii2ndf
 bdf2ndf
 dipso2ndf
 dst2ndf
+ndf2ascii
 ndf2bdf
 ndf2dipso
 ndf2dst
+ndf2iraf
+ndf2unf
+unf2ndf
