@@ -38,6 +38,8 @@
 *        arguments. This results in constants not being inverted in
 *        expressions such as "1/60 deg" (because all arguments are 
 *        constant in the the "1/60" node).
+*     18-JAN-2005 (DSB):
+*        Fix memory leaks.
 */
 
 /* Module Macros. */
@@ -1240,6 +1242,10 @@ static void FindFactors( UnitNode *node, UnitNode ***factors, double **powers,
 /* Modify the overall coefficient. */
       *coeff *= coeff1;
 
+/* Free resources */
+      fact1 = astFree( fact1 );
+      pow1 = astFree( pow1 );
+
 /* If the node at the head of the supplied tree is an OP_POW node, */
    } else if( node->opcode == OP_POW ) {
 
@@ -1305,6 +1311,10 @@ static void FindFactors( UnitNode *node, UnitNode ***factors, double **powers,
          astError( AST__BADUN, "Simplifying a units expression"
                    "requires a division by zero." );
       }
+
+/* Free resources */
+      fact1 = astFree( fact1 );
+      pow1 = astFree( pow1 );
 
 /* If the node at the head of the supplied tree is an OP_SQRT node, */
    } else if( node->opcode == OP_SQRT ) {
@@ -1632,6 +1642,7 @@ static UnitNode *FreeTree( UnitNode *node ) {
          for( i = 0; i < node->narg; i++ ) {
             (node->arg)[ i ] = FreeTree( (node->arg)[ i ] );
          }
+         node->arg = astFree( node->arg );
       }
 
 /* Nullify other pointers for safety. */
@@ -3603,12 +3614,6 @@ static void RemakeTree( UnitNode **node ) {
 /* If this is an LDVAR node... */
    if( (*node)->opcode == OP_LDVAR ) {
 
-/* See if the node refers to a known unit. If not, or if the known unit
-   is a basic unit (i.e. not a derived unit) leave the node unchanged. 
-   Otherwise, return a copy of the tree which defines the derived unit. */
-      unit = (*node)->unit;
-      if( unit && unit->head ) newnode = CopyTree( unit->head );
-
 /* If the LDVAR node has a multiplier associated with it, we need to
    introduce a OP_MULT node to perform the scaling. */ 
       if( (*node)->mult ) {
@@ -4012,6 +4017,10 @@ static int SimplifyTree( UnitNode **node, int std ) {
 /* Produce a new tree from these factors. The factors are standardised by
    ordering them alphabetically (after conversion to a character string). */
          newnode = CombineFactors( factors, powers, nfactor, coeff );
+
+/* Free resources */
+         factors = astFree( factors );
+         powers = astFree( powers );
 
       }
    }
