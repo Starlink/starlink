@@ -31,15 +31,17 @@ extern "C" {
 
 /* We're building this with a C++ compiler, essentially.  Such
    compilers are not required to define __STDC__, but the path we
-   should follow, below, is indeed that marked by __STDC__.  So define
-   it here.  This is a Bad Thing in general, but does the Correct Thing
-   here.  This might possibly cause a warning on some compilers. */
-#if !defined(__STDC__) || !__STDC__
-#  ifdef __STDC__
-#  undef __STDC__
-#  endif
-#define __STDC__ 1
-#endif
+   should follow, below, is indeed that marked by __STDC__.  We don't
+   want to force a definition of __STDC__ (though that works), because
+   (a) that feels bad, and (b) some compilers perfectly reasonable
+   complain bitterly about it.  So define THIS_IS__STDC__, and replace
+   occurrences of __STDC__ throughout with that.
+
+   That means that all of the occurrences of THIS_IS__STDC__ in this
+   file and in getopt_long.c are redundant, but I'm leaving them here
+   in case it becomes necessary to do cleverer things with it than
+   simply define it to be 1, and also as a sort of warped documentation. */
+#define THIS_IS__STDC__ 1
 
 #if !HAVE_DECL_GETOPT
 /* For communication from `getopt' to the caller.
@@ -99,7 +101,7 @@ extern int optopt;
 
 struct option
 {
-#if defined (__STDC__) && __STDC__
+#if defined (THIS_IS__STDC__) && THIS_IS__STDC__
   const char *name;
 #else
   char *name;
@@ -119,7 +121,7 @@ struct option
 
 #endif /* #if !HAVE_DECL_GETOPT_LONG */
 
-#if defined (__STDC__) && __STDC__
+#if defined (THIS_IS__STDC__) && THIS_IS__STDC__
 /* HAVE_DECL_* is a three-state macro: undefined, 0 or 1.  If it is
    undefined, we haven't run the autoconf check so provide the
    declaration without arguments.  If it is 0, we checked and failed
@@ -148,7 +150,7 @@ extern int _getopt_internal (int argc, char *const *argv,
 		             const struct option *longopts, int *longind,
 			     int long_only);
 #endif /* HAVE_DECL_GETOPT_LONG */
-#else /* not __STDC__ */
+#else /* not THIS_IS__STDC__ */
 #if !HAVE_DECL_GETOPT
 extern int getopt ();
 #endif /* HAVE_DECL_GETOPT */
@@ -158,7 +160,7 @@ extern int getopt_long_only ();
 
 extern int _getopt_internal ();
 #endif /* HAVE_DECL_GETOPT_LONG */
-#endif /* __STDC__ */
+#endif /* THIS_IS__STDC__ */
 
 
 #ifdef	__cplusplus

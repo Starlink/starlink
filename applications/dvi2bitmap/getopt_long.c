@@ -1,4 +1,7 @@
 /*
+ * THIS IS NOT A CLEAN COPY OF GETOPT.C AND GETOPT1.C 
+ * -- that is, do not use it in other projects.
+ *
  * Implementation of getopt_long, cobbled together from getopt.c and
  * getopt1.c from the GNU binutils distribution.  This is more-or-less
  * getopt.c inserted into getopt1.c, with the definition of getopt()
@@ -36,10 +39,14 @@
 #include <config.h>
 
 #ifndef HAVE_GETOPT_LONG
+/* We shouldn't be compiling this module in this case, but we clearly
+   are (damned configuration tools!), so avoid messing up. */
 
 #include "getopt_long.h"
+/* See getopt_long.h for discussion of THIS_IS__STDC__ */
 
-#if !defined __STDC__ || !__STDC__
+
+#if !defined THIS_IS__STDC__ || !THIS_IS__STDC__
 /* This is a separate conditional since some stdc systems
    reject `defined (const)'.  */
 #ifndef const
@@ -85,7 +92,7 @@
 #endif
 
 
-#if !defined __STDC__ || !__STDC__
+#if !defined THIS_IS__STDC__ || !THIS_IS__STDC__
 /* This is a separate conditional since some stdc systems
    reject `defined (const)'.  */
 # ifndef const
@@ -155,7 +162,6 @@
    GNU application programs can use a third alternative mode in which
    they can distinguish the relative order of options and other arguments.  */
 
-#include "getopt_long.h"
 
 
 /* Define HAVE_GETOPT if the getopt function (and thus, which is more
@@ -296,11 +302,11 @@ my_index (str, chr)
 #ifdef __GNUC__
 /* Note that Motorola Delta 68k R3V7 comes with GCC but not stddef.h.
    That was relevant to code that was here before.  */
-# if (!defined __STDC__ || !__STDC__) && !defined strlen
+# if (!defined THIS_IS__STDC__ || !THIS_IS__STDC__) && !defined strlen
 /* gcc with -traditional declares the built-in strlen to return int,
    and has done so at least since version 2.4.5. -- rms.  */
 extern int strlen (const char *);
-# endif /* not __STDC__ */
+# endif /* not THIS_IS__STDC__ */
 #endif /* __GNUC__ */
 
 #endif /* not __GNU_LIBRARY__ */
@@ -363,7 +369,7 @@ text_set_element (__libc_subinit, store_args_and_env);
    `first_nonopt' and `last_nonopt' are relocated so that they describe
    the new indices of the non-options in ARGV after they are moved.  */
 
-#if defined __STDC__ && __STDC__
+#if defined THIS_IS__STDC__ && THIS_IS__STDC__
 static void exchange (char **);
 #endif
 
@@ -449,7 +455,7 @@ exchange (argv)
 
 /* Initialize the internal data when the first call is made.  */
 
-#if defined __STDC__ && __STDC__
+#if defined THIS_IS__STDC__ && THIS_IS__STDC__
 static const char *_getopt_initialize (int, char *const *, const char *);
 #endif
 static const char *
