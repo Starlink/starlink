@@ -165,19 +165,37 @@ public class GenerateDependencies {
             System.out.println(cdString + c.componentPath() + " \\");
             if (c.getBuildsupport() != Component.BUILDSUPPORT_NO) {
                 System.out.println(makeBuildsupportString);
-                if (c.getBuildsupport() == Component.BUILDSUPPORT_AUTO)
-                    allbuildsupport.add(c);
+                allbuildsupport.add(c);
             }
             System.out.println(makeString);
             System.out.println();
         }
 
-        System.out.print("buildsupport:");
+        // Add all of the buildsupport tools to either autoBuildsupport or
+        // nonautoBuildsupport, depending on whether they are or are not
+        // (respectively) to be build automatically.
+        StringBuffer autoBuildsupport = new StringBuffer();
+        StringBuffer nonautoBuildsupport = new StringBuffer();
         for (Iterator i=allbuildsupport.iterator(); i.hasNext(); ) {
             Component c = (Component)i.next();
-            System.out.print(newlineString + manifestString + c.getName());
+            (c.getBuildsupport() == Component.BUILDSUPPORT_AUTO
+             ? autoBuildsupport
+             : nonautoBuildsupport)
+                    .append(newlineString)
+                    .append(manifestString)
+                    .append(c.getName());
         }
         System.out.println();
+        System.out.println("# Buildsupport tools -- building and cleaning");
+        System.out.println("BUILDSUPPORT_MANIFESTS ="
+                           + autoBuildsupport.toString());
+        System.out.println("EXTRA_BUILDSUPPORT_MANIFESTS ="
+                           + nonautoBuildsupport.toString());
+        System.out.println();
+        System.out.println("buildsupport: $(BUILDSUPPORT_MANIFESTS)");
+        System.out.println("clean-buildsupport:");
+        System.out.println("\trm -f $(BUILDSUPPORT_MANIFESTS) $(EXTRA_BUILDSUPPORT_MANIFESTS)");
+        
 
         System.exit(globalStatus);
     }
