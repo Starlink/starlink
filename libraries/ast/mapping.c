@@ -5653,6 +5653,7 @@ f        An array
 *        coordinate system of the Mapping. The number of elements in this 
 *        array should equal the value of the Mapping's Nin attribute. This
 *        box should specify the region over which linearity is required.
+c     ubnd
 f     UBND( * ) = DOUBLE PRECISION (Given)
 c        Pointer to an array of doubles
 f        An array
@@ -5666,8 +5667,8 @@ f     TOL = DOUBLE PRECISION (Given)
 *        transformation of the Mapping deviates from the true transformation 
 *        by more than this amount at any point which is tested, then no fit
 *        coefficients will be returned.
-*     fit
-*     FIT( * ) = DOUBLE PRECISION (Given)
+c     fit
+f     FIT( * ) = DOUBLE PRECISION (Given)
 c        Pointer to an array of doubles 
 f        An array
 *        in which to return the co-efficients of the linear
