@@ -29,6 +29,11 @@
 #  Notes:
 #     - This script is specific to the AST library and contains some knowledge
 #     of the input file contents.
+
+#  History:
+#     10-JAN-2005 (DSB):
+#        Added second argument (mode) to the mkdir invocation which creates 
+#        the temporary directory.
 #-
 
 ( $#ARGV >= 0 ) || Usage();
@@ -57,7 +62,7 @@ unless ( -d $tmpdir && -w $tmpdir ) {
     if ( -e $tmpdir ) {
         die "Temp $tmpdir exists, but is unwritable or is not a directory\n";
     }
-    mkdir $tmpdir ||
+    mkdir $tmpdir, 0777 ||
         die "Failed to create temporary directory $tmpdir\n";
 }
 
