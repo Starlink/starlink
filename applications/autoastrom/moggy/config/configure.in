@@ -26,6 +26,10 @@ AC_LANG_CPLUSPLUS
 dnl   Check for a Perl binary, looking in the likely Starlink area first
 AC_PATH_PROG(PERL, perl, perl, /star/bin:$PATH)
 
+dnl   Similarly, check for uncompress and gzip programs
+AC_PATH_PROG(PROGUNCOMPRESS, uncompress)
+AC_PATH_PROG(PROGGZIP, gzip)
+
 dnl   Check for other tools
 AC_PROG_RANLIB
 
@@ -139,9 +143,9 @@ else
 	# NB m4 quote brackets below
 	tarballext=[`expr $tarball : '.*\.\([^.]*\)$'`]
 	case "$tarballext" in
-	    Z)   tarballuncompress=`which uncompress 2>/dev/null`' -c' ;;
-	    gz)  tarballuncompress=`which gzip 2>/dev/null`' -d -c' ;;
-	    bz2) tarballuncompress=`which bzip2 2>/dev/null`' -d -c' ;;
+	    Z)   tarballuncompress="$PROGUNCOMPRESS -c" ;;
+	    gz)  tarballuncompress="$PROGGZIP -d -c" ;;
+	    #bz2) tarballuncompress=`which bzip2 2>/dev/null`' -d -c' ;;
 	    tar) tarballuncompress=cat ;;
 	    *)   tarballuncompress='' ;;
 	esac
