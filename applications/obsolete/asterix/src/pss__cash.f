@@ -100,7 +100,7 @@
 *
 *    Function definitions :
 *
-      DOUBLE PRECISION         G01ECF, G01CEF
+      DOUBLE PRECISION         G01ECF, G01FAF
       LOGICAL                  PSS_CONVERGED
 *
 *    Local constants :
@@ -130,7 +130,7 @@
       ELSE IF ( DELCHI .LT. 100.0 ) THEN
         IFAIL = 0
         PROB = G01ECF('Lower-tail',DBLE(DELCHI),1.0,IFAIL)
-        SIG = -REAL(G01CEF(PROB/2.0D0,IFAIL))
+        SIG = -REAL(G01FAF('Lower-tail',PROB/2.0D0,IFAIL))
 
 *    Use iteration scheme
       ELSE
