@@ -1,7 +1,7 @@
-      SUBROUTINE TRACE ( STATUS )
+      SUBROUTINE HDSTRACE( STATUS )
 *+
 *  Name:
-*     TRACE
+*     HDSTRACE
 
 *  Purpose:
 *     Examines the contents of a data-system object.
@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL TRACE ( STATUS )
+*     CALL HDSTRACE( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -26,7 +26,7 @@
 *     Now rather than writing separate code to read a variety of
 *     structures, this application is sufficiently general to examine
 *     almost all HDS structures or objects.  The examination may also
-*     be written to an ASCII file as well as being reported to the user.
+*     be written to a text file as well as being reported to the user.
 
 *     For the specified ADAM data-system object (X) there are three
 *     cases which are handled:
@@ -75,7 +75,7 @@
 *     This improves readability for long strings.
 
 *  Usage:
-*     TRACE OBJECT [FULL] [NLINES] [TYPIND] [VALIND] [LOGFILE]
+*     HDSTRACE OBJECT [FULL] [NLINES] [TYPIND] [VALIND] [LOGFILE]
 *        [EACHLINE] [NEWLINE] [WIDEPAGE]
 
 *  ADAM Parameters:
@@ -112,7 +112,7 @@
 *        Column indentation of the component's type with respect to
 *        the current indentation of the component's name.  If the name
 *        plus dimensions cannot fit in the space provided alignment
-*        will be lost, since TRACE insists that there be a gap of at
+*        will be lost, since HDSTRACE insists that there be a gap of at
 *        least two columns.  Note that HDS names can be up to 15
 *        characters, and the dimension in the format (dim1,dim2,...) is
 *        abutted to the name. [15]
@@ -122,7 +122,7 @@
 *        NEWLINE is false.  If, however, NEWLINE is true, VALIND is
 *        ignored and the value is indented by one column with respect
 *        to the component's name.  If the type cannot fit in the space
-*        provided alignment will be lost, since TRACE insists that
+*        provided alignment will be lost, since HDSTRACE insists that
 *        there be a gap of at least two columns.  HDS types can be up
 *        to 15 characters. [15]
 *     WIDEPAGE = _LOGICAL (Read)
@@ -137,7 +137,7 @@
 *          lines of values, the default indentation for type and value
 *        If no error then
 *           Get the necessary information for the HDS object.
-*           Put out the TRACE header message.
+*           Put out the HDSTRACE header message.
 *           Deal with the HDS object depending on whether it is of
 *             PRIMITIVE type, a STRUCTURE or an ARRAY of STRUCTURES.
 *           If object is of primitive type then put out the information
@@ -149,7 +149,7 @@
 *                structures recursively.
 *           Endif
 *        Endif
-*        Put out the TRACE termination message.
+*        Put out the HDSTRACE termination message.
 *        Tidy up the HDS object.
 *     Endif
 
@@ -185,6 +185,9 @@
 *        the blank line before the "End of Trace" message.
 *     1992 Sepember 25 (MJC):
 *        Removed AIF calls.
+*     1993 November 4 (MJC):
+*        Renamed to HDSTRACE from TRACE to avoid a name clash on UNIX
+*        systems.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -273,8 +276,8 @@
 *    Check for an error.  Report and abort if one has occurred.
 
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'TRACE__OPOBJ',
-     :     'TRACE: Error associating with the object.', STATUS )
+         CALL ERR_REP( 'HDSTRACE__OPOBJ',
+     :     'HDSTRACE: Error associating with the object.', STATUS )
          GOTO 999
       END IF
 
@@ -374,7 +377,7 @@
 
       CALL MSG_OUT( 'BLANK', ' ', STATUS )
       CALL MSG_SETC( 'TYPE', TYPE )
-      CALL MSG_OUT( 'TRACE_START', '$OBJECT  <^TYPE>', STATUS )
+      CALL MSG_OUT( 'HDSTRACE_START', '$OBJECT  <^TYPE>', STATUS )
       CALL MSG_OUT( 'BLANK', ' ', STATUS )
 
 *    Write the header to the logfile.
@@ -421,7 +424,7 @@
      :                      INDENT, CMNVAL, NEWLIN, NLINES, ONEPLN,
      :                      LOGEXM, FD, WDLINE, STATUS )
 
-*          Insert a blank line to match the output from the hieraRchical
+*          Insert a blank line to match the output from the Hierarchical
 *          trace.
 
             CALL MSG_BLANK( STATUS )
@@ -508,7 +511,7 @@
 
 *    Write the termination message.
 
-      CALL MSG_OUT( 'TRACE_END', 'End of Trace.', STATUS )
+      CALL MSG_OUT( 'HDSTRACE_END', 'End of Trace.', STATUS )
       CALL MSG_BLANK( STATUS )
 
 *    Write the terminator to the logfile.

@@ -1,9 +1,9 @@
-1 TRACE
+1 HDSTRACE
 Examines the contents of a data-system object.
 
 Usage:
 
-   TRACE OBJECT [FULL] [NLINES] [TYPIND] [VALIND] [LOGFILE]
+   HDSTRACE OBJECT [FULL] [NLINES] [TYPIND] [VALIND] [LOGFILE]
       [EACHLINE] [NEWLINE] [WIDEPAGE]
 
 Description:
@@ -103,7 +103,7 @@ TYPIND = _INTEGER (Read)
    Column indentation of the component's type with respect to
    the current indentation of the component's name.  If the name
    plus dimensions cannot fit in the space provided alignment
-   will be lost, since TRACE insists that there be a gap of at
+   will be lost, since HDSTRACE insists that there be a gap of at
    least two columns.  Note that HDS names can be up to 15
    characters, and the dimension in the format (dim1,dim2,...) is
    abutted to the name. [15]
@@ -114,7 +114,7 @@ VALIND = _INTEGER (Read)
    NEWLINE is false.  If, however, NEWLINE is true, VALIND is
    ignored and the value is indented by one column with respect
    to the component's name.  If the type cannot fit in the space
-   provided alignment will be lost, since TRACE insists that
+   provided alignment will be lost, since HDSTRACE insists that
    there be a gap of at least two columns.  HDS types can be up
    to 15 characters. [15]
 3 WIDEPAGE
@@ -156,3 +156,7 @@ MJC: Malcolm J. Currie (STARLINK)
 
  1992 Sepember 25 (MJC):
     Removed AIF calls.
+
+ 1993 November 4 (MJC):
+    Renamed to HDSTRACE from TRACE to avoid a name clash on UNIX
+    systems.

@@ -1,8 +1,8 @@
-## TRACE - Examines the contents of a data-system object.
+## HDSTRACE - Examines the contents of a data-system object.
 
 #+
 #  Name:
-#     TRACE.IFL
+#     HDSTRACE.IFL
 
 #  Type of module:
 #     ADAM A-task parameter interface.
@@ -14,13 +14,15 @@
 #  History:
 #     1991 January 31 (MJC):
 #	 Original version.
-#     {enter_changes_here}
+#     1993 November 4 (MJC):
+#     	 Renamed HDSTRACE from TRACE for use on UNIX systems.
+#     {enter_further_changes_here}
 
 #-
 
-interface TRACE
+interface HDSTRACE
 
-   helplib     TRACE_HELP:
+   helplib     HDSTRACE_HELP:
 
    parameter      OBJECT         # Input HDS object to be traced.
       position    1
