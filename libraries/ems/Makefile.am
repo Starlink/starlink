@@ -10,7 +10,8 @@ libems_la_SOURCES = \
 
 libemsf_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
-	$(CF_ROUTINES)
+	$(CF_ROUTINES) \
+	$(PLATFORM_CF)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
