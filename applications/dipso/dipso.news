@@ -1,7 +1,13 @@
 1 DIPSO - friendly spectrum analysis program
 
- V3.6 (18-FEB-2003) 
-    DIPSO V3.6 has been released. This includes the following changes:
+ V3.6-2 (26-AUG-2003) 
+    DIPSO V3.6-2 has been released. This includes the following changes:
+
+
+    o A bug in the READ and SP0RD commands has been fixed which could cause 
+    usable AXIS structures in the supplied NDF to be ignored.
+
+    -----------
 
     o  The READ command has been modified so that it will attempt to read
     spectral axis information from the WCS component of an NDF if the NDF
