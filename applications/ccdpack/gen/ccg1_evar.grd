@@ -1,35 +1,40 @@
-      SUBROUTINE CCG1_EVAR<T>( STACK, NLINES, NEL, VAR, STATUS )
+      SUBROUTINE CCG1_EVAR<T>( LINE, STACK, NEL, NLINES, VAR, STATUS )
 *+
 *  Name:
-*     CCG1_EVAR
+*     CCG1_EVAR<T>
 
 *  Purpose:
-*     To estimate the variances of a stack of image lines.
+*     To estimate data variances for a line of data.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_EVAR<T>( STACK, NLINES, NEL, VAR, STATUS )
+*     CALL CCG1_EVAR<T>( LINE, STACK, NEL, NLINES, VAR, STATUS )
 
 *  Description:
-*     This routine accepts an array of data lines (which are probably
-*     a series of vectorised images) and estimates the population
-*     variance of the data at each point in the lines. The variances
-*     produced are returned in the single line VAR. Using the
-*     population to estimate the variances should only be used when
+*     This routine estimates the data variances of a line of data
+*     generated from a given stack of data. It uses the variations of
+*     the stack values from the line (which is a mean or median etc.) to
+*     generate the estimate.
+*
+*     The resultant variances are returned in the single line VAR. Using
+*     the population to estimate the variances should only be used when
 *     the number of images is large.
 
 *  Arguments:
-*     STACK( NLINES, EL ) = <COMM> (Given)
-*        The input array of data lines.
+*     LINE( NEL ) = <COMM> (Given)
+*        The mean/median etc. of the data in the stack.
+*     STACK( NEL, NLINES ) = <COMM> (Given)
+*        Stack of input data lines used to generate LINE.
+*     NEL = INTEGER (Given)
+*        The number of values per data-line in the input array.
 *     NLINES = INTEGER (Given)
 *        The number of data lines (i.e. vectorised images) in the
 *        input array. Should be greater 2 and probably much larger.
-*     NEL = INTEGER (Given)
-*        The number of values per data-line in the input array.
-*     VAR( NEL ) =<COMM> (Given and Returned)
-*        The estimate variance array.
+*     VAR( NEL ) = <COMM> (Given and Returned)
+*        The estimated variance array.
+*     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
@@ -59,8 +64,9 @@
 
 *  Arguments Given:
       INTEGER NLINES
-      INTEGER EL
-      <TYPE> STACK( NLINES, NEL )
+      INTEGER NEL
+      <TYPE> LINE( NEL )
+      <TYPE> STACK( NEL, NLINES )
 
 *  Arguments Returned:
       <TYPE> VAR( NEL )
@@ -69,10 +75,13 @@
       INTEGER STATUS            ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION SUM      ! Sum of data values
       DOUBLE PRECISION SUMSQ    ! Sum of data values squared
       DOUBLE PRECISION VAL      ! Data value as DBLE
+      DOUBLE PRECISION DIF      ! Data value as DBLE
       INTEGER NGOOD             ! Number of non-BAD data values.
+      INTEGER I, J              ! Loop variables
+
+      DOUBLE PRECISION SUM
 
 *.
 
@@ -80,22 +89,30 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Loop over lines estimating the variance for each set of elements.
-      DO 1 I = 1, NLINES
-         SUM = 0.0D0
-         SUMSQ = 0.0D0
-         NGOOD = 0
-         DO 2 J = 1, NLINES
-            IF ( STACK( I, J ) .NE. VAL__BAD<T> ) THEN 
-               NGOOD = NGOOD + 1
-               VAL = DBLE( STACK( I, J ) )
-               SUM = SUM + VAL
-               SUMSQ = SUMSQ + VAL * VAL
+      DO 1 J = 1, NEL
+         IF ( LINE( J ) .NE. VAL__BAD<T> ) THEN 
+            VAL = DBLE( LINE( J ) )
+            SUMSQ = 0.0D0
+            SUM = 0.0D0
+            NGOOD = 0
+            DO 2 I = 1, NLINES
+               IF ( STACK( J, I ) .NE. VAL__BAD<T> ) THEN
+                  NGOOD = NGOOD + 1
+                  SUM = SUM + DBLE( STACK( J, I ) )
+                  DIF = DBLE( STACK( J, I ) ) - VAL
+                  SUMSQ = SUMSQ + ( DIF * DIF )
+               END IF
+ 2          CONTINUE
+            IF ( NGOOD .GT. 1 ) THEN
+
+*  Calculate variance of mean of values each of which has this variance,
+*  not the population variance (divide by extra NGOOD).
+               VAR( J ) = SUMSQ / ( DBLE( NGOOD - 1 ) * DBLE( NGOOD ) )
+            ELSE
+               VAR( J ) = VAL__BAD<T>
             END IF
- 2       CONTINUE
-         IF ( NGOOD .GT. 1 ) THEN
-            VAR( I ) = ( SUMSQ/DBLE(NGOOD) ) - ( SUM/DBLE(NGOOD) )**2
-         ELSE 
-            VAR( I ) = VAL__BAD<T>
+         ELSE
+            VAR( J ) = VAL__BAD<T>
          END IF
  1    CONTINUE
       END

@@ -98,15 +98,25 @@
 *        If GENVAR is set to TRUE and all the input NDFs supplied
 *        contain statistical error (variance) information, then
 *        variance information will also be calculated for the output
-*        mosaic NDF, provided that USEVAR is also TRUE. Otherwise,
-*        if GENVAR is set to FALSE (or if any input NDF does not
-*        contain variance information), then no output variance values
-*        will be generated.  This parameter is only used if all the
-*        input NDFs contain variance information.
-*        [TRUE]
+*        mosaic NDF, provided that USEVAR is also TRUE.
+*
+*        Otherwise if GENVAR is TRUE and either USEVAR is FALSE or some
+*        of the input NDFs do not contain error information, then output
+*        variances will be generated using the natural variations in the
+*        input data. Obviously this method should only be used if there
+*        are many input datasets, which also provide good coverage of
+*        the output area. If this option is chosen only regions of the
+*        output image that have data from at least 2 input images will
+*        processed. Normally only 1 contributing image is required.
+*
+*        The default for this parameter depends on the presence of error
+*        information in the input NDFs. If all have error information
+*        then the default is TRUE, otherwise it is FALSE.
+*
+*        [DYNAMIC]
 *     IN = LITERAL (Read and [optionally] Write)
 *        A list of the names of the input NDFs which are to be combined
-*        into a mosaic. The NDF names should be separated by commas 
+*        into a mosaic. The NDF names should be separated by commas
 *        and may include wildcards.
 *
 *        The input NDFs are normally accessed only for reading.
@@ -339,7 +349,7 @@
 *        Number of standard deviations at which to reject values if the
 *        "mode", "sigma" or "clipmed" data combination methods are
 *        selected (see the METHOD parameter). This value must be
-*        positive. [4.0] 
+*        positive. [4.0]
 *     SKYSUP = _REAL (Read)
 *        A positive "sky noise suppression factor" used to control the
 *        effects of sky noise when pairs of input NDFs are
@@ -416,6 +426,12 @@
 *        scale-factor corrections are being applied. Alternatively,
 *        explicit weights may be given for each input NDF via the
 *        WEIGHTS parameter.
+*
+*        If you want to add estimated variances to the output image
+*        (based on the natural variations of the input images) and all
+*        your input images contain variances then you will need to set
+*        this parameter FALSE (see GENVAR).
+*
 *        [TRUE]
 *     WEIGHTS( ) = _REAL (Read)
 *        A set of positive weighting factors to be used to weight the
@@ -594,10 +610,10 @@
 *       floating point type. It can process NDFs with any number of
 *       dimensions. The DATA, TITLE and VARIANCE components of an NDF
 *       are directly supported, with the AXIS, HISTORY, LABEL
-*       and UNITS components and all extensions being propagated from 
-*       the first input NDF supplied (note that AXIS values, if 
-*       present, will normally be extrapolated as a result of 
-*       propagation to the output mosaic, which will typically have a 
+*       and UNITS components and all extensions being propagated from
+*       the first input NDF supplied (note that AXIS values, if
+*       present, will normally be extrapolated as a result of
+*       propagation to the output mosaic, which will typically have a
 *       larger extent than any of the input NDFs).
 
 *  Behaviour of parameters:
@@ -607,6 +623,7 @@
 *     "intrinsic" defaults, as shown in the parameter help, apply.
 *     The exceptions to this rule are:
 *        - SKYSUP  -- dynamically defaulted
+*        - GENVAR  -- dynamically defaulted
 *        - SCALE   -- always FALSE
 *        - ZERO    -- always FALSE
 *        - MODIFY  -- always FALSE
@@ -626,7 +643,7 @@
 
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 1998-1999 Central Laboratory of the Research Councils
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -647,7 +664,7 @@
 *     13-APR-1993 (RFWS):
 *        Added new NNDF argument in call to CCD1_PRUNE.
 *     6-OCT-1995 (PDRAPER):
-*        Removed VMS references and changed examples to show C-shell 
+*        Removed VMS references and changed examples to show C-shell
 *        usage.
 *     18-SEP-1996 (PDRAPER):
 *        Removed all NAG calls.
@@ -663,6 +680,9 @@
 *        Added fastmed combination method.
 *     26-NOV-1998 (PDRAPER):
 *        Now propagates NDF WCS components.
+*     15-JAN-1999 (PDRAPER):
+*        Added changed to support estimation of output variances from 
+*        input data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -734,7 +754,7 @@
       INTEGER IDUM               ! Dummy integer
       INTEGER LBND( NDF__MXDIM , CCD1__MXNDF ) ! NDF lower bounds
       INTEGER LBNDX( NDF__MXDIM ) ! Minimum (overall) lower bound
-      INTEGER LW                 ! Size of workspace 
+      INTEGER LW                 ! Size of workspace
       INTEGER MAXIT              ! Maximum number of iterations
       INTEGER NCMP               ! Number of inter-comparisons
       INTEGER NCMP0              ! Total number of NDF overlaps
@@ -896,7 +916,7 @@
 *  the error stack and attempt to obtain a reference NDF to be used to
 *  normalise the corrections.
       IF ( GETS .OR. GETZ ) THEN
-         CALL ERR_MARK       
+         CALL ERR_MARK
          CALL CCD1_NDFAC( 'REF', 'READ', 1, 1, IDUM, NDFREF, STATUS )
 
 *  If a null reference NDF is specified, then annul the error and set
@@ -1012,7 +1032,7 @@
 *  If inter-comparisons will be made, then obtain the optimum number of
 *  overlaps to be used per input NDF.
       IF ( ADJUST ) THEN
-         CALL PAR_GDR0I( 'OPTOV', 3, 1, CCD1__MXNDF, .FALSE., OPTOV, 
+         CALL PAR_GDR0I( 'OPTOV', 3, 1, CCD1__MXNDF, .FALSE., OPTOV,
      :                   STATUS )
       END IF
 
@@ -1025,7 +1045,7 @@
      :                               .FALSE., TOLS, STATUS )
          IF ( GETZ ) CALL PAR_GDR0R( 'TOLZ', 0.05, 0.0, NUM__MAXR,
      :                               .FALSE., TOLZ, STATUS )
-         CALL PAR_GDR0I( 'MAXIT', 20, 1, NUM__MAXI, .FALSE., MAXIT, 
+         CALL PAR_GDR0I( 'MAXIT', 20, 1, NUM__MAXI, .FALSE., MAXIT,
      :                   STATUS )
       END IF
 
@@ -1099,19 +1119,20 @@
 *  ===============================================
 *  If an output NDF is to be produced, then see if variances should (a)
 *  be used to weight the input NDFs when combining them and (b) be
-*  generated for the output mosaic (this is only possible if all input
-*  NDFs contain variance information).
+*  generated for the output mosaic (if not enough input variances are
+*  available then they will be generated, if GENVAR is true).
       USEVAR = .FALSE.
       GENVAR = .FALSE.
       IF ( DOOUT ) THEN
          IF ( NVAR .EQ. NIN ) THEN
             CALL PAR_GET0L( 'USEVAR', USEVAR, STATUS )
-            IF ( USEVAR ) THEN
-               CALL PAR_GET0L( 'GENVAR', GENVAR, STATUS )
-            ELSE
-               GENVAR = .FALSE.
-            END IF
+            GENVAR = .TRUE.
          END IF
+
+*  GENVAR default is TRUE if all variances are available, otherwise it
+*  is FALSE.
+         CALL PAR_DEF0x( 'GENVAR', GENVAR, STATUS )
+         CALL PAR_GET0L( 'GENVAR', GENVAR, STATUS )
 
 *  Set up a list of NDF components for the output NDF.
          IF ( GENVAR ) THEN
@@ -1380,9 +1401,9 @@
 *  Solve to find globally optimised corrections for each NDF consistent
 *  with the inter-comparison results obtained above. Include an
 *  additional reference NDF, if provided.
-         CALL CCD1_SZSLV( GETS, GETZ, NNDF, NCMP, NMAX, SCALE, DSCALE, 
-     :                    ZERO, DZERO, ORIGIN, %VAL( WRK1 ), 
-     :                    %VAL( WRK2 ), %VAL( WRK3 ), %VAL( WRK4 ), 
+         CALL CCD1_SZSLV( GETS, GETZ, NNDF, NCMP, NMAX, SCALE, DSCALE,
+     :                    ZERO, DZERO, ORIGIN, %VAL( WRK1 ),
+     :                    %VAL( WRK2 ), %VAL( WRK3 ), %VAL( WRK4 ),
      :                    %VAL( WRK5 ), STATUS )
 
 *  Release the workspace.

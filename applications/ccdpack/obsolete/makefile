@@ -668,7 +668,7 @@ GENRDSRC = ccg1_ffrj.grd kpg1_bloc.grd ccg1_axin.grd \
  kpg1_mdet.grd kpg1_litn.grd kpg1_trbo.grd kpg1_trpi.grd \
  ccg1_irhg.grd ccg1_irhl.grd ccg1_cmpr.grd ccg1_crdt.grd \
  ccg1_mvdt.grd ccg1_ptbd.grd ccg1_qntl.grd ccg1_skys.grd \
- kpg1_ludc.grd
+ kpg1_ludc.grd ccg1_evar.grd
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = ccg1_fch0.glrdic ccg1_sto0.glrdic ccg1_fch1.glrdic \
@@ -2361,6 +2361,7 @@ ccg1_cpb.o: PRM_PAR SAE_PAR
 ccg1_crdt.o: PRM_PAR SAE_PAR
 ccg1_dcn.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_debi.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
+ccg1_evar.o: SAE_PAR PRM_PAR
 ccg1_fch0.o: DAT_PAR PRM_PAR SAE_PAR
 ccg1_fch1.o: DAT_PAR PRM_PAR SAE_PAR
 ccg1_ffrj.o: PRM_PAR SAE_PAR

@@ -297,10 +297,16 @@
 *        are needed for this array if left at NI**3, this reduces to
 *        just over 4 under the new scheme.
 *     26-JAN-1994 (PDRAPER):
-*        Fixed arguments to ccg1_cm3r and ccg1_cm3d to remove 
+*        Fixed arguments to ccg1_cm3r and ccg1_cm3d to remove
 *        RESVAR, this is not present in subroutines.
 *     19-SEP-1996 (PDRAPER):
 *        Replaced NAG sorting routine with PDA equivalent.
+*     14-JAN-1999 (PDRAPER):
+*        Added changes to estimate variances from data stack. This
+*        happens if GENVAR is TRUE and the input NDFs do not have any
+*        variances. Related changes are increasing the minimum number of
+*        contributing pixels to 2, when variances are estimated (the
+*        associated variance of such regions would be BAD anyway).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -356,62 +362,64 @@
       PARAMETER ( MXPIX0 = 500000 )
 
 *  Local Variables:
-      CHARACTER * ( 13 ) COMP1   ! Input NDF component list
-      CHARACTER * ( 13 ) COMP2   ! Output NDF component list
-      CHARACTER * ( 6 ) ACMODE   ! Access mode string
+      CHARACTER * ( 13 ) COMP1  ! Input NDF component list
+      CHARACTER * ( 13 ) COMP2  ! Output NDF component list
+      CHARACTER * ( 6 ) ACMODE  ! Access mode string
       CHARACTER * ( NDF__SZFTP ) DTYPE1 ! Input storage data type
       CHARACTER * ( NDF__SZTYP ) ITYPE1 ! Input processing data type
-      INTEGER DATSTK             ! Pointer to workspace (data stack)
-      INTEGER EL                 ! Number of array elements
-      INTEGER I                  ! Loop counter for input NDFs
-      INTEGER ICHUNK             ! Loop counter for NDF chunks
-      INTEGER IEND               ! Upper dimension bound of interval
-      INTEGER IFAIL              ! NAG library error flag
-      INTEGER IFIRST             ! Index of first significant dimension
-      INTEGER II                 ! Index into contributing NDF list
-      INTEGER INDF               ! ID for input NDF section
-      INTEGER INTVL              ! Loop counter for dimension intervals
-      INTEGER ISTART             ! Lower dimension bound of interval
-      INTEGER LBC                ! Saved lower chunk dimension limit
+      INTEGER DATSTK            ! Pointer to workspace (data stack)
+      INTEGER EL                ! Number of array elements
+      INTEGER I                 ! Loop counter for input NDFs
+      INTEGER ICHUNK            ! Loop counter for NDF chunks
+      INTEGER IEND              ! Upper dimension bound of interval
+      INTEGER IFAIL             ! NAG library error flag
+      INTEGER IFIRST            ! Index of first significant dimension
+      INTEGER II                ! Index into contributing NDF list
+      INTEGER INDF              ! ID for input NDF section
+      INTEGER INTVL             ! Loop counter for dimension intervals
+      INTEGER ISTART            ! Lower dimension bound of interval
+      INTEGER LBC               ! Saved lower chunk dimension limit
       INTEGER LBNDC( NDF__MXDIM ) ! Lower bounds of NDF chunk
       INTEGER LBNDX( NDF__MXDIM ) ! Lower bounds of output mosaic
-      INTEGER MINBAD             ! Minimum no. bad pixels expected
-      INTEGER MXPIX              ! Maximum number of pixels in a chunk
-      INTEGER NARY               ! Number of workspace arrays
-      INTEGER NBADD              ! Number of bad data pixels
-      INTEGER NBADV              ! Number of bad variance pixels
-      INTEGER NBASE              ! Base NDF identifier
-      INTEGER NCHUNK             ! Number of NDF chunks available
-      INTEGER NDFC               ! ID for NDF chunk
-      INTEGER NDIMC              ! Number of NDF chunk dimensions
-      INTEGER NDIMX              ! Number of output dimensions
-      INTEGER NIC                ! No. of NDFs contributing to a chunk
-      INTEGER NII                ! No. NDFs contributing to an interval
-      INTEGER NLINES             ! Number of "lines" in chunk
-      INTEGER NVAR               ! Number of input NDFs with variance
-      INTEGER NWRK4              ! Size of WRK4 workspace
-      INTEGER OPTLIN             ! Optimum number of lines to process
-      INTEGER PIC                ! Number of pixels in common
-      INTEGER PNTR2( 2 )         ! Pointers to mapped output arrays
-      INTEGER RESDAT             ! Pointer to result data array
-      INTEGER RESVAR             ! Pointer to result variance array
-      INTEGER UBC                ! Saved upper chunk dimension limit
+      INTEGER MINBAD            ! Minimum no. bad pixels expected
+      INTEGER MINPIX            ! Minimum no. contributing pixels
+      INTEGER MXPIX             ! Maximum number of pixels in a chunk
+      INTEGER NARY              ! Number of workspace arrays
+      INTEGER NBADD             ! Number of bad data pixels
+      INTEGER NBADV             ! Number of bad variance pixels
+      INTEGER NBASE             ! Base NDF identifier
+      INTEGER NCHUNK            ! Number of NDF chunks available
+      INTEGER NDFC              ! ID for NDF chunk
+      INTEGER NDIMC             ! Number of NDF chunk dimensions
+      INTEGER NDIMX             ! Number of output dimensions
+      INTEGER NIC               ! No. of NDFs contributing to a chunk
+      INTEGER NII               ! No. NDFs contributing to an interval
+      INTEGER NLINES            ! Number of "lines" in chunk
+      INTEGER NVAR              ! Number of input NDFs with variance
+      INTEGER NWRK4             ! Size of WRK4 workspace
+      INTEGER OPTLIN            ! Optimum number of lines to process
+      INTEGER PIC               ! Number of pixels in common
+      INTEGER PNTR2( 2 )        ! Pointers to mapped output arrays
+      INTEGER RESDAT            ! Pointer to result data array
+      INTEGER RESVAR            ! Pointer to result variance array
+      INTEGER UBC               ! Saved upper chunk dimension limit
       INTEGER UBNDC( NDF__MXDIM ) ! Upper bounds of NDF chunk
       INTEGER UBNDX( NDF__MXDIM ) ! Upper bounds of output mosaic
-      INTEGER VARSTK             ! Pointer to workspace (variance stack)
-      INTEGER WRK1               ! Pointer to workspace
-      INTEGER WRK2               ! Pointer to workspace
-      INTEGER WRK3               ! Pointer to workspace
-      INTEGER WRK4               ! Pointer to workspace
-      INTEGER WRK5               ! Pointer to workspace
-      INTEGER WRK6               ! Pointer to workspace
-      INTEGER WRK7               ! Pointer to workspace
-      LOGICAL BADCHK             ! Check for bad pixels needed?
-      LOGICAL BDOUTD             ! Output data has bad pixels?
-      LOGICAL BDOUTV             ! Output variance has bad pixels?
-      LOGICAL GVAR               ! Generate output variances?
-      LOGICAL UVAR               ! Use variances for weighting?
-      LOGICAL VAR                ! Input NDF has variance information?
+      INTEGER VARSTK            ! Pointer to workspace (variance stack)
+      INTEGER WRK1              ! Pointer to workspace
+      INTEGER WRK2              ! Pointer to workspace
+      INTEGER WRK3              ! Pointer to workspace
+      INTEGER WRK4              ! Pointer to workspace
+      INTEGER WRK5              ! Pointer to workspace
+      INTEGER WRK6              ! Pointer to workspace
+      INTEGER WRK7              ! Pointer to workspace
+      LOGICAL BADCHK            ! Check for bad pixels needed?
+      LOGICAL BDOUTD            ! Output data has bad pixels?
+      LOGICAL BDOUTV            ! Output variance has bad pixels?
+      LOGICAL GVAR              ! Generate output variances?
+      LOGICAL UVAR              ! Use variances for weighting?
+      LOGICAL VAR               ! Input NDF has variance information?
+      LOGICAL EVAR              ! Create variances from data
 
 *.
 
@@ -455,9 +463,20 @@
 *  Determine whether to use variances for weighting when the input data
 *  are combined, and whether to generate an output variance component.
 *  Both of these depend on the settings of input arguments and on
-*  whether all the input NDFs contain variance information.
+*  whether all the input NDFs contain variance information. Note if
+*  input NDFs do not have enough variances and GENVAR is true then
+*  variances will be created from the variation in the input data.
       UVAR = ( USEVAR .AND. ( NVAR .EQ. NIN ) )
       GVAR = ( GENVAR .AND. ( NVAR .EQ. NIN ) .AND. UVAR )
+      EVAR = ( GENVAR .AND. .NOT. UVAR )
+
+*  If EVAR is true then the minimum number of contributing pixels needs
+*  to be 2.
+      IF ( EVAR ) THEN 
+         MINPIX = 2
+      ELSE
+         MINPIX = 1
+      END IF
 
 *  Set up a list of input NDF array components to be accessed and a
 *  similar list of output NDF components.
@@ -466,7 +485,7 @@
       ELSE
          COMP1 = 'Data'
       ENDIF
-      IF ( GVAR ) THEN
+      IF ( GVAR .OR. EVAR ) THEN
          COMP2 = 'Data,Variance'
       ELSE
          COMP2 = 'Data'
@@ -543,7 +562,7 @@
 *  the whole of a chunk.)
       NARY = 2 * NIN + 2
       IF ( UVAR ) NARY = NARY + ( 2 * NIN )
-      IF ( GVAR ) NARY = NARY + 2
+      IF ( GVAR .OR. EVAR ) NARY = NARY + 2
       MXPIX = MIN( MAX( 1, MXPIX0 / NARY ),
      :             OPTLIN * ( UBNDX( IFIRST ) - LBNDX( IFIRST ) + 1 ) )
 
@@ -753,9 +772,10 @@
                         CALL CCD1_PTBAD( ITYPE1, LBC, UBC, NLINES,
      :                                   ISTART, IEND, PNTR2( 1 ),
      :                                   STATUS )
-                        IF ( GVAR ) CALL CCD1_PTBAD( ITYPE1, LBC,
-     :                                   UBC, NLINES, ISTART, IEND,
-     :                                   PNTR2( 2 ), STATUS )
+                        IF ( GVAR .OR. EVAR )
+     :                     CALL CCD1_PTBAD( ITYPE1, LBC, UBC, NLINES,
+     :                                      ISTART, IEND, PNTR2( 2 ),
+     :                                      STATUS )
                         BDOUTD = .TRUE.
                         BDOUTV = .TRUE.
 
@@ -783,6 +803,13 @@
      :                     IEND, 1, SCALE( II ), DSCALE( II ),
      :                     ZERO( II ), DZERO( II ), ORIGIN( II ), LBC,
      :                     UBC, PNTR2( 2 ), NBADV, STATUS )
+
+*  If creating variances and input NDF has none then set bad.
+                        IF ( EVAR .AND. .NOT. GVAR )
+     :                     CALL CCD1_PTBAD( ITYPE1, LBC, UBC,
+     :                                      NLINES, ISTART, IEND,
+     :                                      PNTR2( 2 ),STATUS )
+
 
 *  Note if the output chunk now contains bad pixels.
                         BDOUTD = ( BDOUTD .OR. ( NBADD .GT. 0 ) )
@@ -835,7 +862,7 @@
                         CALL PSX_CALLOC( EL, ITYPE1, RESVAR, STATUS )
                         CALL PSX_CALLOC( NII, ITYPE1, WRK1, STATUS )
                         CALL PSX_CALLOC( NII, ITYPE1, WRK2, STATUS )
-                        IF ( UVAR ) THEN 
+                        IF ( UVAR ) THEN
                            CALL PSX_CALLOC( NII, '_DOUBLE', WRK3,
      :                                      STATUS )
                            NWRK4 = MAX( 1, ( ( NII + 1 )**3 ) / 2 )
@@ -856,9 +883,9 @@
                         IF ( ITYPE1 .EQ. '_REAL' ) THEN
                            IF ( .NOT. UVAR ) THEN
                               CALL CCG1_CM3RR( %VAL( DATSTK ), EL,
-     :                                  NII, VARS, IMETH, 1, NITER,
+     :                                  NII, VARS, IMETH, MINPIX, NITER,
      :                                  NSIGMA, ALPHA, RMIN, RMAX,
-     :                                  %VAL( RESDAT ), 
+     :                                  %VAL( RESDAT ),
      :                                  %VAL( WRK1 ), %VAL( WRK2 ),
      :                                  %VAL( WRK5 ), %VAL( WRK6 ),
      :                                  %VAL( WRK7 ), STATUS )
@@ -866,9 +893,9 @@
 *  _REAL processing, with variances, variances always generated.
                            ELSE
                               CALL CCG1_CM1RR( %VAL( DATSTK ), EL,
-     :                                  NII, %VAL( VARSTK ), IMETH, 1,
-     :                                  NITER, NSIGMA, ALPHA, RMIN,
-     :                                  RMAX, %VAL( RESDAT ),
+     :                                  NII, %VAL( VARSTK ), IMETH, 
+     :                                  MINPIX, NITER, NSIGMA, ALPHA, 
+     :                                  RMIN, RMAX, %VAL( RESDAT ),
      :                                  %VAL( RESVAR ), %VAL( WRK1 ),
      :                                  %VAL( WRK2 ), %VAL( WRK3 ),
      :                                  %VAL( WRK4 ), NWRK4,
@@ -878,9 +905,9 @@
 
 *  _DOUBLE processing, no variances.
                         ELSE IF ( ITYPE1 .EQ. '_DOUBLE' ) THEN
-                           IF ( .NOT. UVAR ) THEN 
+                           IF ( .NOT. UVAR ) THEN
                               CALL CCG1_CM3DD( %VAL( DATSTK ), EL,
-     :                                  NII, VARS, IMETH, 1, NITER,
+     :                                  NII, VARS, IMETH, MINPIX, NITER,
      :                                  NSIGMA, ALPHA, RMIN, RMAX,
      :                                  %VAL( RESDAT ),
      :                                  %VAL( WRK1 ), %VAL( WRK2 ),
@@ -889,9 +916,9 @@
 *  _DOUBLE processing, with variances.
                            ELSE
                               CALL CCG1_CM1DD( %VAL( DATSTK ), EL,
-     :                                  NII, %VAL( VARSTK ), IMETH, 1,
-     :                                  NITER, NSIGMA, ALPHA, RMIN,
-     :                                  RMAX, %VAL( RESDAT ),
+     :                                  NII, %VAL( VARSTK ), IMETH, 
+     :                                  MINPIX, NITER, NSIGMA, ALPHA, 
+     :                                  RMIN, RMAX, %VAL( RESDAT ),
      :                                  %VAL( RESVAR ), %VAL( WRK1 ),
      :                                  %VAL( WRK2 ), %VAL( WRK3 ),
      :                                  %VAL( WRK4 ), NWRK4,
@@ -900,12 +927,30 @@
                            END IF
                         END IF
 
+*  Generate estimated variances, if required.
+                        IF ( EVAR ) THEN
+                           IF ( ITYPE1 .EQ. '_REAL' ) THEN
+                              CALL CCG1_EVARR( %VAL( RESDAT),
+     :                                         %VAL( DATSTK ),
+     :                                         EL, NII,
+     :                                         %VAL( RESVAR ),
+     :                                         STATUS )
+                           ELSE IF ( ITYPE1 .EQ. '_DOUBLE' ) THEN
+                              CALL CCG1_EVARD( %VAL( RESDAT),
+     :                                         %VAL( DATSTK ),
+     :                                         EL, NII,
+     :                                         %VAL( RESVAR ),
+     :                                         STATUS )
+                           END IF
+                        END IF
+
+
 *  Release the workspace.
                         CALL PSX_FREE( DATSTK, STATUS )
                         IF ( UVAR ) CALL PSX_FREE( VARSTK, STATUS )
                         CALL PSX_FREE( WRK1, STATUS )
                         CALL PSX_FREE( WRK2, STATUS )
-                        IF ( UVAR ) THEN 
+                        IF ( UVAR ) THEN
                            CALL PSX_FREE( WRK3, STATUS )
                            CALL PSX_FREE( WRK4, STATUS )
                         END IF
@@ -923,7 +968,8 @@
      :                     RESVAR , ISTART, IEND, 1, 1.0D0, 0.0D0,
      :                     0.0D0, 0.0D0, 0.0D0, LBC, UBC, PNTR2( 1 ),
      :                     NBADD, STATUS )
-                        IF ( GVAR ) CALL CCD1_MVDAT( ITYPE1, .FALSE.,
+                        IF ( GVAR .OR. EVAR )
+     :                     CALL CCD1_MVDAT( ITYPE1, .FALSE.,
      :                     .TRUE., .TRUE., ISTART, IEND, NLINES,
      :                     RESDAT, RESVAR, ISTART, IEND, 1, 1.0D0,
      :                     0.0D0, 0.0D0, 0.0D0, 0.0D0, LBC, UBC,
