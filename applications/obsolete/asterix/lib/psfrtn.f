@@ -115,10 +115,6 @@
 *  King profile
       ELSE IF ( KIND .EQ. 'KIN' ) THEN
 
-*    Get the profile control parameters
-        RC = W1
-        ALPHA = W2
-
 *    Fill in values
         CALL MATH_INTKING2D( W1, W2, 0.0, 0.0, QX, QY,
      :                       DX, DY, NX, NY, ARRAY, STATUS )
@@ -132,7 +128,7 @@
      :                      DX, DY, NX, NY, ARRAY, STATUS )
 
 *  Top hat
-      ELSE IF ( KIND .EQ. ANAL_TOPHAT ) THEN
+      ELSE IF ( KIND .EQ. 'TOP' ) THEN
 
 *    Get radius of tophat
         W = W1 / 2.0
