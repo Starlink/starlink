@@ -1668,8 +1668,7 @@ package kappa {
             position 3
             type LITERAL
             vpath PROMPT
-            ppath DYNAMIC
-            default SELECT
+            ppath DYNAMIC CURRENT
             prompt {Option to modify or examine the extension}
             helpkey *
           }
