@@ -59,6 +59,8 @@
 #  Generate the ifl files, and the icl and csh start-up scripts. 
       echo "Generating ifl files, etc form the ifd file"
       ifd2star atools_mon
+      mv atools_mon.csh atools.csh
+      mv atools_mon.icl atools.icl
 
 #  Generate the IRAF files.
       echo "Generating iraf files"
