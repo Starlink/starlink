@@ -152,6 +152,50 @@
 *        Attributes" in SUN/95 for a description of the available
 *        attributes. Any unrecognised attributes are ignored (no error is
 *        reported). [current value] 
+*     LMODE = LITERAL (Read)
+*        LMODE specifies how the defaults for parameters YBOT and YTOP (the 
+*        lower and upper limit of the vertical axis of the plot) should be 
+*        found. The supplied string should consist of up to three sub-strings,
+*        separated by commas. The first sub-string must specify the method 
+*        to use. If supplied, the other two sub-strings should be numerical 
+*        values as described below (default values will be used if these
+*        sub-strings are not supplied). The following methods are available:
+*
+*        - "Range" -- The minimum and maximum data values (including any
+*        error bars) are used as the defaults for YBOT and YTOP. No other
+*        sub-strings are needed by this option.
+*
+*        - "Extended" -- The minimum and maximum data values (including error 
+*        bars) are extended by percentages of the data range, specified by 
+*        the second and third sub-strings. For instance, if the value
+*        "Ex,10,5" is supplied, then the default for YBOT is set to the
+*        minimum data value minus 10% of the data range, and the default
+*        for YTOP is set to the maximum data value plus 5% of the data range.
+*        If only one value is supplied, the second value defaults to the
+*        supplied value. If no values are supplied, both values default to
+*        "2.5".
+*
+*        - "Percentile" -- The default values for YBOT and YTOP are set to 
+*        the specified percentiles of the data (excluding error bars). For 
+*        instance, if the value "Per,10,99" is supplied, then the default 
+*        for YBOT is set so that the lowest 10% of the plotted points are 
+*        off the bottom of the plot, and the default for YTOP is set so
+*        that the highest 1% of the points are off the top of the plot.
+*        If only one value, p1, is supplied, the second value, p2, defaults 
+*        to (100 - p1). If no values are supplied, the values default to
+*        "5,95".
+*
+*        - "Sigma" -- The default values for YBOT and YTOP are set to the 
+*        specified numbers of standard deviations below and above the mean 
+*        of the data. For instance, if the value "sig,1.5,3.0" is supplied, 
+*        then the default for YBOT is set to the mean of the data minus 1.5 
+*        standard deviations, and the default for YTOP is set to the mean
+*        plus 3 standard deviations. If only one value is supplied, the
+*        second value defaults to the supplied value. If no values are
+*        supplied, both default to "3.0".
+*
+*        The method name can be abbreviated to a single character, and is
+*        case insensitive. The initial value is "Extended". [current value]
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given 
 *        as fractions of the corresponding dimension of the DATA picture. 
@@ -287,9 +331,8 @@
 *     YBOT = LITERAL (Read)
 *        The axis value to place at the bottom end of the vertical
 *        axis. If a null (!) value is supplied, the value used is
-*        the lowest value within the supplied array (with a margin to 
-*        include any vertical error bars). The value supplied may be 
-*        greater than or less than the value supplied for YTOP. The value 
+*        determined by parameter LMODE. The value of LBOT may be 
+*        greater than or less than the value supplied for YTOP, and
 *        should be supplied as a floating point value for the quantity
 *        specified by parameter YLOG. See also parameter ALIGN. [!]
 *     YLOG = _LOGICAL (Read)
@@ -303,12 +346,11 @@
 *        bars are to represent. [current value]
 *     YTOP = LITERAL (Read)
 *        The axis value to place at the top end of the vertical
-*        axis. If a null (!) value is supplied, the value used is the
-*        highest value within the supplied array (with a margin to include 
-*        any vertical error bars). The value supplied may be greater than 
-*        or less than the value supplied for YBOT. The value should be 
-*        supplied as a floating point value for the quantity specified by 
-*        parameter YLOG. See also parameter ALIGN. [!]
+*        axis. If a null (!) value is supplied, the value used is
+*        determined by parameter LMODE. The value of LTOP may be 
+*        greater than or less than the value supplied for YBOT, and
+*        should be supplied as a floating point value for the quantity
+*        specified by parameter YLOG. See also parameter ALIGN. [!]
 
 *  Examples:
 *     linplot spectrum 
@@ -393,7 +435,7 @@
 *     before the plot is drawn.
 
 *  Authors:
-*     Malcolm Currie STARLINK (RAL::CUR)
+*     MJC: Malcolm Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
@@ -406,6 +448,8 @@
 *     6-SEP-1999 (DSB):
 *        USEAXIS changed so that "use offset" is indicated by supplying
 *        zero rather than a null value.
+*     28-SEP-1999 (DSB):
+*        Added parameter LMODE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1191,10 +1235,12 @@
      :                     STATUS )
          END IF
 
-*  Expand the default Y limits by 3 percent at each end.
-         DVAL = TR( 2 ) - BL( 2 )
-         TR( 2 ) = TR( 2 ) + 0.03*DVAL
-         BL( 2 ) = BL( 2 ) - 0.03*DVAL
+*  Find suitable default values for YTOP and YBOT.
+         BL( 2 ) = VAL__BADD
+         TR( 2 ) = VAL__BADD
+         CALL KPG1_GRLM2( 'LMODE', EL, %VAL( IPYCEN ), %VAL( IPXCEN ), 
+     :                    YVAR, %VAL( IPYBAR ), BL( 2 ), TR( 2 ), 
+     :                    STATUS )
 
 *  Ensure the limits are not equal.
          IF( BL( 2 ) .EQ. TR( 2 ) ) THEN

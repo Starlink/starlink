@@ -662,7 +662,8 @@ kpg1_wcatw.f kpg1_srcta.f kpg1_fit1d.f \
 kpg1_pllod.f kpg1_plsav.f kpg1_plget.f kpg1_plput.f kpg1_mkpos.f \
 kpg1_pseed.f kpg1_ndfnm.f kpg1_graph.f kpg1_grphw.f kpg1_assig.f kpg1_cpndb.f \
 kpg1_cpndd.f kpg1_cpndi.f kpg1_cpndr.f kpg1_cpndub.f kpg1_cpnduw.f \
-kpg1_cpndw.f kpg1_rglmt.f kpg1_envdf.f kpg1_env0r.f
+kpg1_cpndw.f kpg1_rglmt.f kpg1_envdf.f kpg1_env0r.f kpg1_grlm2.f \
+kpg1_cpbdd.f kpg1_mixvr.f
 
 KAPVIEW_F_ROUTINES = \
 contour.f contover.f \
