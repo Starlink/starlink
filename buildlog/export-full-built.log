@@ -740,6 +740,9 @@ docs:
   [javadoc] Constructing Javadoc information...
      [xslt] Processing /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml to /apps/cvsbuild/java/source/topcat/build/docs/sun253/sun253.html
      [xslt] Loading stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHTML1.xslt
+Xlib: connection to "europa:0.0" refused by server
+Xlib: No protocol specified
+
      [xslt] apps/cvsbuild/java/source/topcat/src/docs/toHTML1.xslt:566:68: Error! java.lang.reflect.InvocationTargetException Cause: java.lang.reflect.InvocationTargetException
      [xslt] : Fatal Error! java.lang.NullPointerException Cause: java.lang.NullPointerException
      [xslt] Failed to process /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml
@@ -747,4 +750,4 @@ docs:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/topcat/build.xml:1085: Fatal error during transformation
 
-Total time: 3 minutes 9 seconds
+Total time: 2 minutes 57 seconds
