@@ -28,8 +28,9 @@ AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init)
 AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init)
 
 # Note that the starlink Tcl, Tk and ITcl are required, since we need
-# some somewhat-private include files.  I'm not sure how naughty 
-# this is.
+# some somewhat-private include files.  I'm not sure how respectable
+# this is, but it seems unavoidable for what we want to do (for instance,
+# itcl uses the same ones).
 STAR_DECLARE_DEPENDENCIES([build], 
                           [chr agi ard ast chr fio ndf pgplot prm \
                            psx trn pda ndg tcl tk itcl startcl ifd])
