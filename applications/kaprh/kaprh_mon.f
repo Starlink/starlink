@@ -109,6 +109,9 @@
          IF ( NAME .EQ. 'CONTOVER' ) THEN
             CALL CONTOVER ( STATUS )
 
+         ELSE IF ( NAME .EQ. 'CRELUT' ) THEN
+            CALL CRELUT ( STATUS )
+
          ELSE IF ( NAME .EQ. 'GREYPLOT' ) THEN
             CALL GREYPLOT ( STATUS )
 

@@ -4,6 +4,175 @@ package kaprh {
 
    executable kaprh_mon {
 
+      action crelut {
+         alias {crel(ut)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter colour {
+            size *
+            type LITERAL
+            vpath PROMPT
+            prompt {New palette colour}
+            helpkey *
+          }
+
+         parameter colrange {
+            size *
+            type _INTEGER
+            vpath PROMPT
+            prompt {Select one or two colours from the palette}
+            helpkey *
+          }
+
+         parameter comp {
+            position 4
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DYNAMIC
+            prompt {Component to display}
+            helpkey *
+            default Data
+          }
+
+         parameter device {
+            ptype DEVICE
+            position 9
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_DISPLAY
+            prompt {Image-display device}
+            helpkey *
+          }
+
+         parameter high {
+            position 6
+            type _DOUBLE
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {High value for image scaling}
+            helpkey *
+          }
+
+         parameter inlut {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.LUT
+            prompt {NDF containing input lookup table}
+            helpkey *
+          }
+
+         parameter inpal {
+            position 7
+            type NDF
+            access READ
+            vpath DEFAULT
+            prompt {NDF containing input palette}
+            helpkey *
+            default !
+          }
+
+         parameter low {
+            position 5
+            type _DOUBLE
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Low value for image scaling}
+            helpkey *
+          }
+
+         parameter ndf {
+            position 3
+            type NDF
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {Image to be displayed}
+            helpkey *
+          }
+
+         parameter nn {
+            type _LOGICAL
+            prompt {Nearest-neighbour mapping?}
+            vpath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter ok {
+            type _LOGICAL
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Accept this colour (Y/N)?}
+            helpkey *
+          }
+
+         parameter outlut {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            ppath DEFAULT
+            prompt {NDF to save the lookup table}
+            association ->GLOBAL.LUT
+            helpkey *
+          }
+
+         parameter outpal {
+            position 8
+            type NDF
+            access WRITE
+            vpath PROMPT
+            ppath DEFAULT
+            prompt {NDF to save the palette}
+            helpkey *
+            default !
+          }
+
+         parameter palnum {
+            type _INTEGER
+            vpath PROMPT
+            prompt {Number of the palette entry to be modified}
+            helpkey *
+          }
+
+         parameter penrange {
+            size *
+            type _INTEGER
+            vpath PROMPT
+            prompt {First and last pen of the LUT to be modified}
+            helpkey *
+          }
+
+         parameter ptitle {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Title for the palette}
+            helpkey *
+            default {Kappa - Crelut}
+          }
+
+         parameter title {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Title for the lookup table}
+            helpkey *
+            default {Kappa - Crelut}
+          }
+
+         parameter valrange {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            prompt {Data-value range to be assigned colours}
+            helpkey *
+          }
+
+      }
+
       action contover {
          alias {contov(er)}
 

@@ -3910,6 +3910,10 @@ package kappa {
 
       }
 
+      action gdnames {
+         alias {gdna(mes) sho(dev)}
+      }
+
       action gdset {
          alias {gdse(t)}
 
@@ -6295,10 +6299,6 @@ package kappa {
             helpkey *
           }
 
-      }
-
-      action gdnames {
-         alias {gdna(mes) sho(dev)}
       }
 
       action idinvisible {
