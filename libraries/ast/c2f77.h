@@ -36,12 +36,16 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     15-NOV-1996 (RFWS):
 *        Original version.
 *     16-JUL-1997 (RFWS):
 *        Added astWatchSTATUS.
+*     13-JUN-2001 (DSB):
+*        Make astStringExport available to F77 interface modules as well
+*        as AST classes.
 *-
 */
 
@@ -134,7 +138,7 @@
 
 /* Function prototypes. */
 /* ==================== */
-#if defined(astCLASS)            /* Protected. */
+#if defined(astCLASS) || defined(astFORTRAN77)  /* Protected. */
 void astStringExport_( const char *, char *, int );
 #endif
 
@@ -142,7 +146,7 @@ void astStringExport_( const char *, char *, int );
 /* ==================== */
 /* These wrap up the functions defined by this module to make them
    easier to use. */
-#if defined(astCLASS)            /* Protected. */
+#if defined(astCLASS) || defined(astFORTRAN77)  /* Protected. */
 #define astStringExport astStringExport_
 #endif
 #endif
