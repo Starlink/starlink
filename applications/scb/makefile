@@ -865,7 +865,7 @@ do_test:
         echo " "; \
         $(INSTALL_BIN)/scb.pl -html -exact cmp_struc_ type=func >/dev/null; \
         $(INSTALL_BIN)/scb.pl -html -exact hds_copy_  type=func >/dev/null; \
-        rm -rf $$SCB_INDEXDIR
+        rm -rf $$SCB_INDEX
 #
 #  Note the test has been run.
 	@ touch .TESTED_$(SYSTEM)
