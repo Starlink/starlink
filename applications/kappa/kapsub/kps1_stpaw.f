@@ -37,9 +37,9 @@
 *        The number of pixels per line of the array.
 *     DIM2 = INTEGER (Given)
 *        The number of lines in the array.
-*     ARRAY( DIM1, DIM2 ) = ? (Given)
+*     ARRAY( DIM1, DIM2 ) = INTEGER*2 (Given)
 *        The input array containing the stars to be fitted.
-*     LBND( 2 ) = ? (Given)
+*     LBND( 2 ) = INTEGER (Given)
 *        The lower bounds of the input array.
 *     NXY = INTEGER (Given)
 *        The number of stars to be fitted.
@@ -97,6 +97,9 @@
 *        positions as if the lower bounds were both one.
 *     20-SEP-1999 (DSB):
 *        Reversed order of POS indices and made it _DOUBLE for use with AST.
+*     10-AUG-2000 (DSB):
+*        Report an error only if no stars at all can be used. Previously,
+*        an error was reported if any stars could not be used.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -369,7 +372,6 @@
             CALL KPS1_CLNSR( -IDP, IDP, 0.0, PSUM( -IDP ), STATUS )
             CALL KPS1_CLNSR( -IDP, IDP, 0.0, QSUM( -IDP ), STATUS )
  
- 
 *          Fit a Gaussian to each profile.
  
             CALL KPG1_GAUFR( XSUM( - IDX ), -IDX, IDX, NGAUIT, TOLL,
@@ -393,7 +395,7 @@
 *          Calculate shift of centre this iteration... if it satisfies
 *          the accuracy criterion, exit from the centre-finding
 *          iteration loop.
- 
+
             SHIFT = SQRT( ( X - XNEW ) *  * 2 + ( Y - YNEW ) *  * 2 )
             X = XNEW
             Y = YNEW
@@ -423,7 +425,7 @@
             SIG( STAR, 5 ) = AP + AQ + AX + AY 
  
 *          If the centre was not found successfully, record the
-*          weight as zero.
+*          weight as zero, and annul the error.
  
          ELSE
             SIG( STAR, 1 ) = 0.0
@@ -431,15 +433,26 @@
             SIG( STAR, 3 ) = 0.0
             SIG( STAR, 4 ) = 0.0
             SIG( STAR, 5 ) = 0.0
+            CALL ERR_ANNUL( STATUS )
          END IF
  
       END DO
  
-*    If at least one star was successful, find a mean width for each
-*    profile direction.
+*    If at least one star was successful, proceed.
  
       IF ( NGOOD .GE. 1 ) THEN
- 
+
+*    Warn the user about any unusable positions.
+         IF ( NGOOD .LT. NXY ) THEN
+            CALL MSG_SETI( 'M', NGOOD )
+            CALL MSG_SETI( 'N', NXY )
+            CALL MSG_OUT( 'KPS1_STPAW_MSG1', '  Stars could only be '//
+     :                    'found at ^M of the ^N supplied positions.',
+     :                    STATUS )
+         END IF
+
+*    Find a mean width for each profile direction.
+
          IF ( NGOOD .GT. 1 ) THEN
             DO NSIG = 1, 4
                CALL KPG1_WMODR( SIG( 1, NSIG ), SIG( 1, 5 ), NXY, 0.01,
@@ -459,6 +472,19 @@
 *       from the marginal widths.
  
          CALL KPS1_ELGAU( SIGMA, SIG0, AXISR, THETA, STATUS )
+
+*    If no star positions could be used, report an error.
+
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         IF( NXY .EQ. 1 ) THEN
+            CALL ERR_REP( 'KPS1_STPAW_ERR1', 'No star could be '//
+     :                    'found at the supplied position.', STATUS )
+         ELSE
+            CALL ERR_REP( 'KPS1_STPAW_ERR1', 'No stars could be '//
+     :                    'found at the supplied positions.', STATUS )
+         END IF
+
       END IF
  
 *    Close the new error context.
