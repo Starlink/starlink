@@ -1,0 +1,77 @@
+#! /bin/sh
+
+#+
+#  Name:
+#     scb_test.sh.in
+
+#  Purpose:
+#     Test script for SCB package.
+
+#  Description:
+#     Runs through each of the scripts which form part of the SCB package.
+#
+#     This file is edited by configure prior to use.
+#
+#     Though run in the build directory, this will only work following
+#     installation.
+
+#  Authors:
+#     MBT: Mark Taylor (Starlink)
+
+#  History:
+#     8-JUL-2004 (MBT):
+#        Original version, adapted from classic makefile test target.
+#-
+
+#  Set up locations.
+   perl="@PERL@ -w -I."
+   tmpdir="/usr/tmp/scb_index"
+
+#  The rest of the script is a single statement to ensure that it
+#  returns a non-zero status code if any step fails (this is what
+#  signals a failure to automake).
+
+#  Check we have a suitable version of perl. \
+   $perl -e 'require 5;' && \
+\
+#  Set up environment variables for a local test. \
+   SCB_DIR=. && \
+   SCB_INDEX=$tmpdir && \
+   SCB_BROWSER_TMP=$SCB_INDEX/browser_tmp && \
+   SCB_INDEXER_TMP=$SCB_INDEX/indexer_tmp && \
+   export SCB_DIR SCB_INDEX SCB_BROWSER_TMP SCB_INDEXER_TMP && \
+   echo SCB_INDEX: $SCB_INDEX && \
+\
+#  Set up directories. \
+   rm -rf $SCB_INDEX && \
+   mkdir $SCB_INDEX $SCB_BROWSER_TMP $SCB_INDEXER_TMP && \
+\
+#  Test scbindex. \
+   echo && \
+   echo "scbindexer.pl:  Build test index of scb_test.tar" && \
+   $perl scbindex.pl scb_test.tar && \
+\
+#  Test scbcp. \
+   echo && \
+   echo "scbcp.pl: Copy indexes to new directory" && \
+   mkdir $SCB_INDEX/junk && \
+   $perl scbcp.pl $SCB_INDEX $SCB_INDEX/junk && \
+\
+#  Test dbmcat. \
+   echo && \
+   echo "dbmcat.pl: Print index file contents" && \
+   $perl dbmcat.pl $SCB_INDEX/junk/func && \
+\
+#  Test scb. \
+   echo && \
+   echo "scb.pl: Extract test files" && \
+   $perl scb.pl -html -exact scb_hw_  type=func >/dev/null && \
+   $perl scb.pl -html -exact scb_hw   type=func >/dev/null && \
+   $perl scb.pl -html -exact Makefile type=file >/dev/null && \
+\
+#  Done. \
+   echo && \
+   echo "  ** Test successful ** " && \
+   echo && \
+   SCB_INDEX=$tmpdir && \
+   rm -rf $SCB_INDEX
