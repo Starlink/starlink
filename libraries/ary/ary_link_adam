@@ -31,6 +31,7 @@
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hilo)
 #     {enter_new_authors_here}
 
 #  History:
@@ -42,6 +43,8 @@
 #        Generic version.
 #     27-MAR-1996 (BLY):
 #        Version for ARY.
+#     13-MAR-2004 (TIMJ):
+#        No longer use libary_adam. Use libary
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -49,7 +52,7 @@
 
 #-
 
-      echo -lary_adam -lary `prm_link_adam` `err_link_adam` \
+      echo -lary -lary `prm_link_adam` `err_link_adam` \
            `hds_link_adam` `chr_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
