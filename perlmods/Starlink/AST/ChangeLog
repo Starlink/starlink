@@ -1,0 +1,28 @@
+2004-12-29  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* AST.xs: Add Region support (including Box, Circle and Ellipse)
+	
+	* AST.xs: Support astPutCards if available
+
+	* AST.xs: Add astEscapes
+
+	* AST.xs: Add RateMap constructor
+	
+	* AST.xs: Add FluxFrame and SpecFluxFrame constructors
+
+2004-12-28  Tim Jenness  <tjenness@cpan.org>
+
+	* Begin synchronizing with AST v3.5
+
+	* AST.xs: Add astKeyMap functions and constants
+
+	* t/keymap.t: Add tests for astKeyMap
+	
+        * AST.xs: Allow module to compile with both variants of astRate.
+          Now only returns the second derivative if the version of astRate
+          supports that.
+
+	* AST.xs: astSetFits<X> methods for FitsChan
+
+	* AST_ERR.xsh: Add new status codes: AST__REGIN, AST__BADOC,
+	AST__MPGER, AST__MPIND
