@@ -85,7 +85,7 @@ F77_SUBROUTINE(kpg1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
    AstObject *obj;
    AstChannel *chan;
    Tcl_Interp *interp = NULL;
-   char *fname = NULL;
+   char fname[ 255 ];
    char script[1024];
    int i;
    int j;
