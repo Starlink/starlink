@@ -314,25 +314,26 @@
 *        any value (i.e. they are not restricted to the values 0.0, 22.5,
 *        45.0 and 67.5 degrees as in the dual-beam algorithm).
 *
-*        If the input intensity NDFs do not contain usable variances,
-*        then estimates of these variances can be made from the spread of
-*        supplied data values. This is an expensive iterative process
-*        (see parameters TOLR and WEIGHTS). Initially, Stokes vectors
-*        are estimated by assigning a uniform constant weight to all input
-*        data values. The I, Q and U arrays are then smoothed spatially by 
-*        fitting a quadratic surface to the data within a box centred on each
-*        pixel (the size of the box can be specified using parameter SMBOX 
-*        - no smoothing is applied along any frequency axis). For each input 
-*        NDF, a similar array is then created holding the squared residual 
-*        between the input intensity values, and the intensity values implied 
-*        by the smoothed Stokes vectors (using the known analyser positions, 
-*        etc, for the NDFs). These arrays containing squared residuals are 
-*        then stacked together to obtain a single array holding the mean 
-*        squared residual at each pixel. This array is then smoothed spatially
-*        using a mean box filter of size specified by parameter SMBOX. The 
-*        values in the resulting array are used as the variance estimates for 
-*        the input data (note, the same variance estimates are used for all 
-*        the input NDFs).
+*        If the input intensity NDFs do not contain usable variances, then
+*	 estimates of these variances can be made from the spread of
+*	 supplied data values. This is an expensive iterative process (see
+*	 parameters TOLR and WEIGHTS). Initially, Stokes vectors are
+*	 estimated by assigning a uniform constant weight to all input
+*	 data values. The I, Q and U arrays are then smoothed spatially by
+*	 fitting a quadratic surface to the data within a box centred on
+*	 each pixel (the size of the box can be specified using parameter
+*	 SMBOX with the priviso that no smoothing is ever applied along
+*	 any frequency axis). For each input NDF, a similar array is then
+*	 created holding the squared residual between the input intensity
+*	 values, and the intensity values implied by the smoothed Stokes
+*	 vectors (using the known analyser positions, etc, for the NDFs).
+*	 These arrays containing squared residuals are then stacked
+*	 together to obtain a single array holding the mean squared
+*	 residual at each pixel. This array is then smoothed spatially
+*	 using a mean box filter of size specified by parameter SMBOX. The
+*	 values in the resulting array are used as the variance estimates
+*	 for the input data (note, the same variance estimates are used
+*	 for all the input NDFs).
 *
 *        If the input NDFs have differing zero points, the residuals
 *        for any one NDF will usually not be centred on zero, but will
