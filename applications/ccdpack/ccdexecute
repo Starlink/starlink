@@ -156,11 +156,14 @@ check_script:
 #  Make sure that ccdpack is ready to go.
       set ccdpack_defined = `alias ccdpack`
       if ( "$ccdpack_defined" == "" ) then
-         if ( -e /star/etc/cshrc ) then
+         if ( $?STARLINK && -e $STARLINK/etc/cshrc ) then
+            source $STARLINK/etc/cshrc
+         else if ( -e /star/etc/cshrc ) then
             source /star/etc/cshrc
+         else if ( -e /stardev/etc/cshrc ) then
+            source /stardev/etc/cshrc
          else
-	    echo "Unable to locate Starlink C shell startup script - aborting"
-	    exit
+	    echo "Warning - unable to locate Starlink C shell startup script"
          endif
       endif
 
