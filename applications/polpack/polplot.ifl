@@ -57,6 +57,7 @@ interface POLPLOT
       position    1
       type        LITERAL
       ppath       'CURRENT'
+      association <-GLOBAL.CATALOGUE
       prompt      'Input catalogue'
       helpkey     '*'
    endparameter

@@ -50,6 +50,7 @@ interface POLVEC
       type        LITERAL
       ppath       'CURRENT'
       prompt      'Output catalogue'
+      association ->GLOBAL.CATALOGUE
       helpkey     '*'
    endparameter
 
