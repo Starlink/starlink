@@ -56,11 +56,15 @@ proc p4Configs {taskname} {
           set bv2 [dialogShow .p4File .p4File]
 	  if {$bv2==0} {
             exec /usr/bin/rm -f $p4config_file
-            $taskname obey save "file=$p4config_file port=-1" -inform "cgs4drInform $taskname %V"
+            set save_done -1
+            $taskname obey save "file=$p4config_file port=-1" -inform "cgs4drInform $taskname %V" -endmsg {set save_done 1}
+            tkwait variable save_done
           }
           destroy .p4File
 	} else {
-          $taskname obey save "file=$p4config_file port=-1" -inform "cgs4drInform $taskname %V"
+          set save_done -1
+          $taskname obey save "file=$p4config_file port=-1" -inform "cgs4drInform $taskname %V" -endmsg {set save_done 1}
+          tkwait variable save_done
 	}
       }
 
@@ -77,8 +81,9 @@ proc p4Configs {taskname} {
           set message "p4Configs error : File $p4config_file does not exist!"
           cgs4drInform $taskname $message
 	} else {
-          $taskname obey restore "file=$p4config_file port=-1" -inform "cgs4drInform $taskname %V" -endmsg {set done 1}
-          tkwait variable done
+          set rest_done -1
+          $taskname obey restore "file=$p4config_file port=-1" -inform "cgs4drInform $taskname %V" -endmsg {set rest_done 1}
+          tkwait variable rest_done
 
 # Reset device name as appropriate
           set port 0
