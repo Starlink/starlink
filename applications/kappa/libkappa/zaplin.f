@@ -249,13 +249,13 @@
 *        current graphics device.  Linear interpolation is used to obtain
 *        the replacement values. A record of the areas replaced will be 
 *        stored in a text file named "fudge.dat".
-*     zaplin grubby cleaned i lincol=r columns=[188,190] lines=[15,16]
+*     zaplin grubby cleaned i lincol=r columns='"188,190"' lines='"15,16"'
 *        This replaces a region from pixel (188,15) to (190,16) within the
 *        NDF called "grubby" and stores the result in the NDF called
 *        "cleaned".  The current co-ordinate Frame in the input NDF should
 *        be set to PIXEL first (using WCSFRAME). The replacement is
 *        performed using linear interpolation.
-*     zaplin grubby(6,,) cleaned i lincol=r columns=[188,190]
+*     zaplin grubby(6,,) cleaned i lincol=r columns='"188,190"'
 *        This replaces columns 188 to 190 in the 6th y-z plane region
 *        within the NDF called "grubby" and stores the result in the NDF
 *        called "cleaned".  The current co-ordinate Frame in the input NDF 
@@ -366,6 +366,9 @@
 *        Changed to use PGPLOT for graphics and to read and write
 *        co-ordinates in the current Frame of the NDF. Reformatted code
 *        layout.
+*     15-APR-2004 (DSB):
+*        Correct use of LINCOL to suppress looping if supplied on command
+*        line.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1348,6 +1351,11 @@
          END IF
 
          FIRST = .FALSE.
+
+*  If LINCOL was supplied on the command line, then quit the loop in
+*  interface mode.
+         IF( INTERF .AND. LCDEF ) AGAIN = .FALSE.
+
       END DO
 
 *  Annul the error caused by the end of file being reached.
