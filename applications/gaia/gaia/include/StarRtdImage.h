@@ -200,7 +200,7 @@ public:
 
   //  HDU command.
   int hduCmd( int argc, char *argv[] );
-  
+
   //  Replacement mband command, also allows for pixels and non-celestial.
   gbandCmd( int argc, char *argv[] );
 
@@ -219,7 +219,9 @@ protected:
   virtual ImageData* makeImage(ImageIO);
 
   //  Load an image file and return a pointer to the ImageData object for it.
-  virtual ImageData* getStarImage(const char* filename, const char* slice);
+  virtual ImageData* getStarImage(const char* filename, 
+				  const char* slice,
+				  const char* path);
 
   //  Load an image.
   virtual int loadFile();
@@ -235,6 +237,13 @@ protected:
 
   //  Test if file extension is known to NDF.
   int isNDFtype( const char *);
+
+  //  Parse and test image name.
+  int parseName( const char *imagename, char **fullname,
+		 char **slice, char **path );
+
+  //  Check if the named file exists.
+  int fileExists( const char *filename );
 
   //  Pointer to the original FrameSet.
   AstFrameSet *origset_;
@@ -284,7 +293,7 @@ protected:
   AstFrameSet* StarRtdImage::makePixelWCS( ImageData *image = NULL );
 
   //  Create AST plot for drawing grids and contours to canvas.
-  AstPlot* createPlot( AstFrameSet *wcs, AstFrameSet *extraset, 
+  AstPlot* createPlot( AstFrameSet *wcs, AstFrameSet *extraset,
                        int full, int image, double region[] );
  private:
 
