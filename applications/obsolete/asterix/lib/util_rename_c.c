@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     util_rename_c
+*     UTIL_RENAME
 
 *  Purpose:
 *     Rename a file
@@ -10,7 +10,7 @@
 *     Starlink ANSI C
 
 *  Invocation:
-*     CALL UTIL_RENAME_C( INFIL, OUTFIL, STATUS )
+*     CALL UTIL_RENAME( INFIL, OUTFIL, STATUS )
 
 *  Description:
 *     Provides a Fortran interface to rename files. The file with the
@@ -108,8 +108,8 @@ F77_INTEGER_FUNCTION(lib$rename_file)( CHARACTER(arg1), CHARACTER(arg2)
 /*
  *  Body of code
  */
-F77_SUBROUTINE(util_rename_c)( CHARACTER(infil), CHARACTER(outfil),
-                               INTEGER(status) TRAIL(infil) TRAIL(outfil) )
+F77_SUBROUTINE(util_rename)( CHARACTER(infil), CHARACTER(outfil),
+                             INTEGER(status) TRAIL(infil) TRAIL(outfil) )
   {
   GENPTR_CHARACTER(infil)
   GENPTR_CHARACTER(outfil)
