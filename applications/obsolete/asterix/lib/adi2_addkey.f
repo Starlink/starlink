@@ -1,30 +1,30 @@
-      SUBROUTINE ADI2_ADDKEY( HDUID, KEY, KID, UPDATE, STATUS )
+      SUBROUTINE ADI2_ADDKEY( HDUID, KEY, VALUE, CMNT, STATUS )
 *+
 *  Name:
 *     ADI2_ADDKEY
 
 *  Purpose:
-*     Add a keyword description to an HDU
+*     Read keywords from an HDU and store
 
 *  Language:
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI2_ADDKEY( HDUID, KEY, KID, UPDATE, STATUS )
+*     CALL ADI2_ADDKEY( HDUID, KEY, VALUE, CMNT, STATUS )
 
 *  Description:
-*     Write value of keyword to specified HDU. Any existing keyword value
-*     is overwritten.
+*     {routine_description}
 
 *  Arguments:
 *     HDUID = INTEGER (given)
-*        ADI identifier of HDU object
+*        HDU to add key to
 *     KEY = CHARACTER*(*) (given)
-*        The name of the keyword to be extracted
-*     KID = INTEGER (given)
-*        ADI object describing keyword value
-*     UPDATE = LOGICAL (given)
-*        The keyword is being added with the intention of updating the file?
+*        Name of keyword. Prefix with '@' to inhibit HDU modification flag
+*        being set true. Prefix with ',' to only write the comment
+*     VALUE = INTEGER (given)
+*        ADI identifier of value
+*     CMNT = CHARACTER*(*) (given)
+*        Comment. Use '~' for standard comment
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -76,8 +76,6 @@
 *  History:
 *     11 Sep 1995 (DJA):
 *        Original version.
-*     22 Feb 1996 (DJA):
-*        Changes in string concatenation for Linux port
 *     {enter_changes_here}
 
 *  Bugs:
@@ -90,82 +88,64 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
-      INTEGER			HDUID, KID
-      CHARACTER*(*)		KEY
-      LOGICAL			UPDATE
+      INTEGER			HDUID, VALUE
+      CHARACTER*(*)		KEY, CMNT
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  External References:
+      EXTERNAL			CHR_LEN
+        INTEGER			CHR_LEN
+
 *  Local Variables:
-      CHARACTER*9		LKEY			! Local key name
+      INTEGER			CID			! Card cache object
+      INTEGER			FC			! First key character
 
-      INTEGER			KCID			! Keywords list
-      INTEGER			NCARD			! HDU card number
-      INTEGER			OKID			! Existing keyword data
-
-      LOGICAL			THERE			! Keyword exists?
+      LOGICAL			DIDCRE			! Created keyword?
+      LOGICAL			THERE			! Object exists?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Locate keywords container
-      CALL ADI_FIND( HDUID, 'Keys', KCID, STATUS )
+*  First character of key name
+      FC = 1
+      IF ( KEY(1:1) .EQ. '@' ) FC = 2
+      IF ( KEY(1:1) .EQ. ',' ) FC = 2
 
-*  Make CRC name
-      LKEY(1:1) = 'K'
-      LKEY(2:) = KEY
+*  Locate the keyword cache object, creating if required
+      CALL ADI2_CFIND_KEY( HDUID, KEY(FC:), .TRUE., CID, DIDCRE,
+     :                     STATUS )
 
-*  Does our keyword exist?
-      IF ( UPDATE ) THEN
-        CALL ADI_THERE( KCID, KEY, THERE, STATUS )
-        IF ( THERE ) THEN
-
-*      Locate the keyword
-          CALL ADI_FIND( KCID, KEY, OKID, STATUS )
-
-*      Read the old keyword index
-          CALL ADI_CGET0I( OKID, '.Icard', NCARD, STATUS )
-
-*      Erase value
-          CALL ADI_ERASE( OKID, STATUS )
-          CALL ADI_CERASE( KCID, KEY, STATUS )
-
-        END IF
+*  Write value to cache object
+      IF ( KEY(1:1) .NE. ',' ) THEN
+        CALL ADI_CPUTID( CID, 'Value', VALUE, STATUS )
       END IF
 
-*  Get keyword number and update
-      IF ( UPDATE ) THEN
-
+*  Write comment if non-blank
+      IF ( CMNT .GT. ' ' ) THEN
+        CALL ADI_THERE( CID, 'Comment', THERE, STATUS )
         IF ( THERE ) THEN
-          CALL ADI_CPUT0I( KID, '.Icard', NCARD, STATUS )
-        ELSE
-          CALL ADI2_ADDCRC( HDUID, LKEY(:LEN(KEY)+1), KID, NCARD,
-     :                      STATUS )
-          CALL ADI_CPUT0L( KID, '.New', .TRUE., STATUS )
-
+          CALL ADI_CERASE( CID, 'Comment', STATUS )
         END IF
-
-*    Mark keyword as changed
-        CALL ADI2_MRKCHG( HDUID, KID, STATUS )
-
-      ELSE
-
-        CALL ADI2_ADDCRC( HDUID, LKEY(:LEN(KEY)+1), KID, NCARD,
-     :                    STATUS )
-
+        CALL ADI_CNEWV0C( CID, 'Comment', CMNT(:CHR_LEN(CMNT)), STATUS )
       END IF
 
-*  Write component to container
-      CALL ADI_CPUTID( KCID, KEY, KID, STATUS )
+*  Release the card
+      CALL ADI_ERASE( CID, STATUS )
 
-*  Release keyword container
-      CALL ADI_ERASE( KCID, STATUS )
+*  Mark HDU as modified
+      IF ( FC .EQ. 1 ) THEN
+        CALL ADI_CPUT0L( HDUID, 'Modified', .TRUE., STATUS )
+      END IF
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_ADDKEY', STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'ADI2_ADDKEY', STATUS )
+      END IF
 
       END
