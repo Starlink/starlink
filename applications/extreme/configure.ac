@@ -56,7 +56,16 @@ fi
 AC_MSG_RESULT($big_int)
 AC_SUBST(big_int)
 
-dnl   Work out the name of a pointer-sized FORTRAN 77 integer type.
+dnl   Work out the name of a big-enough FORTRAN 77 integer type.
+dnl   Note this doesn't need to match the size of a pointer, it's just
+dnl   an integer type which is going to be big enough to store values
+dnl   which might be encountered on this platform (such as pixel counts
+dnl   in an array).  It does need to be the same for all routines
+dnl   linked together though, so all packages must use the same type.
+dnl   We set it to "INTEGER * 8" for systems with a 64-bit pointer type
+dnl   and "INTEGER    " for systems with a 32-bit pointer type.
+dnl   If other possibilities emerge, write a new condition here.
+AC_MSG_CHECKING([type for large FORTRAN integer])
 if test "$ac_cv_sizeof_int_p" == "8"
 then
    integer8="INTEGER * 8"
@@ -65,10 +74,9 @@ else
    then
        integer8="INTEGER    "
    else
-       AC_MSG_ERROR(cannot determine fortran pointer type)
+       AC_MSG_ERROR(cannot determine large FORTRAN integer type)
    fi
 fi
-AC_MSG_CHECKING([f77 type for pointer])
 AC_MSG_RESULT($integer8)
 AC_SUBST(integer8)
 
