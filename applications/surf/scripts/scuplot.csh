@@ -112,7 +112,7 @@ while ( "$mode" != "d" && "$mode" != "D" && "$mode" != "P" && "$mode" != "R" && 
   echo " "
   echo "INVALID MODE: '$mode'. Allowed modes p(ltbol), d(spbol), r(linplot)."
   echo -n "Mode (p/d/r) > "
-  set mode = $<
+  set mode = "$<"
   set mode = `echo $mode | cut -c1 | tr '[A-Z]' '[a-z]'`
 end
 
@@ -128,7 +128,7 @@ endif
 #
 if ( "$sdf" == "" ) then
   echo -n "Input file? > "
-  set answer = $<
+  set answer = "$<"
   set sdf = `echo $answer | sed s/".sdf"/""/`
 endif
   
@@ -141,7 +141,7 @@ if ( "$mn" == "" || "$mx" == "" ) then
       set mx =  0.01
     endif
 #    echo -n "Y-axis limits? ${mn} ${mx}> "
-#    set answer = $<
+#    set answer = "$<"
 #    if ( "$answer" != "" ) then
 #       set limits = `echo "$answer" | sed s/","/" "/g | sed s/"  "/" "/g`
 #       set mn = `echo $limits | awk -F" " '{print $1}'`
@@ -155,10 +155,10 @@ if ( "$lbol" == "" )  then
     set lbol = ""
     echo "Note: additional bolometers can be set via menu below"
     echo -n "Which bolometer(s) [all]? ${lbol} > "
-    set answer = $<
+    set answer = "$<"
     if ( "$answer" != "" ) then       
        set lbol = `echo " $answer" | sed s/","/" "/g | sed s/"  "/" "/g | sed s/"b"/""/g`
-       set nbol = `echo "$answer" | awk -f" " '{print NF}'`
+       set nbol = `echo "$answer" | awk -F" " '{print $NF}'`
     else
        set lbol = "all"
     endif
@@ -213,7 +213,7 @@ endif
 # ----------------------------------------------------------------------
 # Photometry?
 #
-if (`${kap}/fitslist ${sdf} | fgrep -ci photom` == 1) then
+if (`${kap}/fitslist ${sdf} | fgrep MODE | fgrep -c PHOTOM` == 1) then
   set phsec = "(,,2)"
 endif
 
@@ -352,7 +352,7 @@ while (${iset} < ${nsets})
   OPTION:
   echo -n "Option > "
 
-  set answer = $<
+  set answer = "$<"
   set answer = `echo "${answer}" | sed s/"\["/""/g | sed s/"\]"/""/g`
 
   # ----------------------------------------------------------------------
@@ -386,6 +386,7 @@ while (${iset} < ${nsets})
     set pmx = `echo $limits | awk -F" " '{print $NF}'`
     if ( "$pmn" == "" || "$pmx" == "x" ) then
        echo "Cursor: Left button: New plot center; Right button: Accept"
+       echo "Hit return to activate cursor in xwindow"
 
        if ($newkappa == 0) then
          ${kap}/cursor >& /dev/null
@@ -447,6 +448,7 @@ while (${iset} < ${nsets})
     set point = `echo "$point" | sed s/"-"/":"/g | sed s/" "/":"/g `
     if ( "$point" == "p" || "$point" == "p " ) then
        echo "Cursor: Left button: Bad channel; Right button: Accept"
+       echo "Hit return to activate cursor in xwindow"
 
        if ($newkappa == 0) then
          ${kap}/cursor >& /dev/null
@@ -474,7 +476,7 @@ while (${iset} < ${nsets})
     endif
 
     echo -n " Accept [y]/n > "
-    set accept = $<
+    set accept = "$<"
     if ( $accept =~ [Nn]* ) then
        echo " Resetting quality ${point} GOOD"
        ${sur}/change_quality "'${sdf}{b${bol};${point}}'" no  > /dev/null
@@ -761,6 +763,11 @@ exit
 
 *  History:
 *     $Log$
+*     Revision 1.9  2000/02/08 20:19:00  timj
+*     Fix problems with $< in linux. Add "press return" message for CURSOR
+*     use. Fix problem with $phsec not recognising PHOTOM observations when
+*     the 'photom' string appears twice.
+*
 *     Revision 1.8  1999/11/04 04:36:16  timj
 *     Update for Kappa 0.14
 *
