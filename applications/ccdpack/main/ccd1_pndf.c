@@ -15,13 +15,14 @@
                               INTEGER(namgid), DOUBLE_ARRAY(percnt), 
                               LOGICAL(skip2), DOUBLE(zoom), INTEGER(maxcnv), 
                               INTEGER_ARRAY(windim), INTEGER_ARRAY(prvdim),
-                              CHARACTER(mstyle), INTEGER(count), 
+                              CHARACTER(mstya), CHARACTER(mstyb), 
+                              INTEGER(count), 
                               INTEGER_ARRAY(nodes), INTEGER_ARRAY(nmat),
                               DOUBLE_ARRAY(xoff), DOUBLE_ARRAY(yoff),
                               POINTER_ARRAY(ipx1), POINTER_ARRAY(ipy1),
                               POINTER_ARRAY(ipx2), POINTER_ARRAY(ipy2),
                               INTEGER(status) 
-                              TRAIL(mstyle) ) {
+                              TRAIL(mstya) TRAIL(mstyb) ) {
 /*
 *+
 *  Name:
@@ -35,8 +36,9 @@
 
 *  Invocation:
 *     CALL CCD1_PNDF( NDFGID, NSET, IMEM, IMEMOF, NAMGID, PERCNT, SKIP2, 
-*                     ZOOM, MAXCNV, WINDIM, PRVDIM, MSTYLE, COUNT, NODES,
-*                     NMAT, XOFF, YOFF, IPX1, IPY1, IPX2, IPY2, STATUS )
+*                     ZOOM, MAXCNV, WINDIM, PRVDIM, MSTYA, MSTYB,
+*                     COUNT, NODES, NMAT, XOFF, YOFF, IPX1, IPY1, 
+*                     IPX2, IPY2, STATUS )
 
 *  Description:
 *     This routine calls a Tcl script which presents the user with a
@@ -76,8 +78,12 @@
 *     PRVDIM( 2 ) = INTEGER (Given and Returned)
 *        Dimensions of the preview window for each Set used in the 
 *        chooser widget.
-*     MSTYLE = CHARACTER * ( * ) (Given and Returned)
-*        A string indicating how markers are to be plotted on the image.
+*     MSTYA = CHARACTER * ( * ) (Given and Returned)
+*        A string indicating how markers are to be plotted on the first 
+*        image.
+*     MSTYB = CHARACTER * ( * ) (Given and Returned)
+*        A string indicating how markers are to be plotted on the second
+*        image.
 *     COUNT = INTEGER (Returned)
 *        Number of pairings made by the user.
 *     NODES( 2, * ) = INTEGER (Returned)
@@ -166,7 +172,8 @@
       GENPTR_INTEGER(maxcnv)
       GENPTR_INTEGER_ARRAY(windim)
       GENPTR_INTEGER_ARRAY(prvdim)
-      GENPTR_CHARACTER(mstyle)
+      GENPTR_CHARACTER(mstya)
+      GENPTR_CHARACTER(mstyb)
 
 /* Arguments Returned. */
       GENPTR_INTEGER(count)
@@ -192,7 +199,8 @@
       char buffer[ 1024 ];
       char ndfname[ GRP__SZNAM + 1 ];
       char setname[ GRP__SZNAM + 1 ];
-      char *cmstyle;
+      char *cmstya;
+      char *cmstyb;
 
 /* Test the global status. */
       if ( *status != SAI__OK ) return;
@@ -227,12 +235,14 @@
       }
 
 /* Set the value of other Tcl variables to be passed into the script. */
-      if ( ( cmstyle = malloc( mstyle_length + 1 ) ) == NULL ) {
+      if ( ( cmstya = malloc( mstya_length + 1 ) ) == NULL ||
+           ( cmstyb = malloc( mstyb_length + 1 ) ) == NULL ) {
          *status = SAI__ERROR;
          errRep( " ", "Memory allocation failed", status );
          return;
       }
-      cnfImprt( mstyle, mstyle_length, cmstyle );
+      cnfImprt( mstya, mstya_length, cmstya );
+      cnfImprt( mstyb, mstyb_length, cmstyb );
       ccdTclSetI( cinterp, "SKIP2", F77_ISTRUE(*skip2), status );
       ccdTclSetD( cinterp, "PERCLO", percnt[ 0 ], status );
       ccdTclSetD( cinterp, "PERCHI", percnt[ 1 ], status );
@@ -243,7 +253,8 @@
       ccdTclSetI( cinterp, "WINY", windim[ 1 ], status );
       ccdTclSetI( cinterp, "PREVX", prvdim[ 0 ], status );
       ccdTclSetI( cinterp, "PREVY", prvdim[ 1 ], status );
-      ccdTclSetC( cinterp, "MARKSTYLE", cmstyle, status );
+      ccdTclSetC( cinterp, "MARKSTYLEA", cmstya, status );
+      ccdTclSetC( cinterp, "MARKSTYLEB", cmstyb, status );
 
 /* Execute the Tcl script. */
       ccdTclRun( cinterp, "pairndf.tcl", status );
@@ -296,9 +307,12 @@
       ccdTclGetI( cinterp, "set WINY", windim + 1, status );
       ccdTclGetI( cinterp, "set PREVX", prvdim + 0, status );
       ccdTclGetI( cinterp, "set PREVY", prvdim + 1, status );
-      cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLE", status ),
-                mstyle, mstyle_length );
-      free( cmstyle );
+      cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLEA", status ),
+                mstya, mstya_length );
+      cnfExprt( ccdTclGetC( cinterp, "set MARKSTYLEB", status ),
+                mstyb, mstyb_length );
+      free( cmstya );
+      free( cmstyb );
 
 /* Delete the Tcl interpreter. */
       ccdTclStop( cinterp, status );
