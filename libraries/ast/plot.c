@@ -223,6 +223,10 @@ f     using AST_GRID
 *     23-MAR-1998 (DSB):
 *        Added extra checks on global status into routine Grid to avoid
 *        segmentation violations occuring due to null pointers being used.
+*     10-JUN-1998 (DSB):
+*        Modify DrawTicks so that ticks are drawn closer to singularities
+*        than previously. Also normalise this constraint to the screen size
+*        rather than the length of a major tick mark.
 *class--
 */
 
@@ -7407,7 +7411,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 
 /* Store the smallest squared distance in graphics coordinates which 
    can reliably be used to determine the direction of a tick mark. */
-         dl2_limit = 0.1*mjtklen;
+         dl2_limit = 0.0001*mindim;
          dl2_limit *= dl2_limit;
 
 /* Store pointers to the places where normalised physical coordinates are
