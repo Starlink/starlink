@@ -1,11 +1,14 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = do-xxx cmp-xxx extmk extmakefile $(DO_FILTERS) $(CMP_FILTERS) \
-              extreme.csh
+dist_bin_SCRIPTS = do-xxx cmp-xxx extmk extmakefile \
+                   $(DO_FILTERS) $(CMP_FILTERS) \
+                   extreme.csh
 
 bin_PROGRAMS = $(FILTERS)
 
 include_HEADERS = EXT_DEC EXT_DEF EXT_PAR extreme.h
+
+noinst_HEADERS = ctokens.h ftokens.h ygen.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
@@ -30,4 +33,6 @@ $(CMP_FILTERS): cmp-xxx
 
 ssn73.tex: ssn73-pre.tex mkdoc
 	$(srcdir)/mkdoc 
+
+EXTRA_DIST = ssn73-pre.tex extreme_test.sh
 
