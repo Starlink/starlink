@@ -43,4 +43,5 @@ proc cgs4drShowEnv {taskname} {
   cgs4drInform $taskname "RODIR              = $env(RODIR)"
   cgs4drInform $taskname "RGDIR              = $env(RGDIR)"
   cgs4drInform $taskname "FIGARO_FORMATS     = $env(FIGARO_FORMATS)"
+  cgs4drInform $taskname "Taskname           = $taskname"
 }
