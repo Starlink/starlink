@@ -881,7 +881,7 @@ new( class, map1, map2, options )
    Perl_croak(aTHX_ "TranMap: Please upgrade to AST V3.2 or greater");
 #else
   ASTCALL(
-   RETVAL = astSpecMap( map1, map2, options );
+   RETVAL = astTranMap( map1, map2, options );
   )
 #endif
  OUTPUT:
