@@ -168,9 +168,10 @@
 		<entry>show messages from monoliths?</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.obsdata">&ddash;wcs</ref></entry>
+		<entry><ref id="opt.obsdata">&ddash;obsdata</ref></entry>
 		<entry>string</entry>
-		<entry>provide observation information</entry>
+		<entry>provide observation information, including WCS
+		  information</entry>
 	      </row>
 	      <row>
 		<entry><ref id="opt.skycatconfig">&ddash;skycatconfig</ref></entry>
@@ -257,9 +258,7 @@
 	  you set through something like
 	  <verbatim>csh% setenv http_proxy http://wwwcache.example.ac.uk:8080/</verbatim>
 	  or
-	  <verbatim>
-	    sh% http_proxy=http://www.example.ac.uk:8080/; export http_proxy
-	  </verbatim>
+	  <verbatim>sh% http_proxy=http://www.example.ac.uk:8080/; export http_proxy</verbatim>
 	  depending on whether you use a csh-like (tcsh) or sh-like
 	  (bash, zsh) shell.</p>
 
@@ -407,34 +406,52 @@
 	  </subhead>
 
 	  <p>Specifies a source for the observation data, including
-	    WCS information.  The keyword 
-	    value can be
-	    <code>source=AST</code>, indicating that the information should
-	    come from the AST WCS component of the NDF; or
-	    <code>source=FITS</code>, indicating that it should come from any 
-	    FITS extension in the file; or a list of keyword-value
-	    pairs giving the approximate astrometry explicitly.  If
-	    the option is not present, then &autoastrom; attempts to
-	    find AST information, then FITS.  If the option is
-	    present, and the corresponding information is not present,
-	    the program stops.
+	    WCS information.  The keyword has the multiple role of
+	    specifying the source of WCS information, supplying
+	    approximate WCS information directly, and supplying the
+	    observation data (time, observatory, temperature and
+	    pressure, and colour) which &astrom; needs if it is to
+	    attempt one of its higher-order fits.  This information is
+	    only needed if it is missing from the NDF or any FITS
+	    extension it incorporates, and if you wish to attempt the
+	    slight increase in accuracy of the more elaborate fits.
 	  </p>
-
-	  <p>As well, this option allows you to specify observation
-	    data for passing to ASTROM.</p>
 
 	  <p>Do not specify a keyword more than once with distinct
 	    values.</p>
 
 	  <p>The value of the <code>--obsdata</code> option can specify
 	    approximate astrometry through a comma-separated list of
-	    <code>key=value</code> pairs.  For example, you might
+	    <code>key=value</code> pairs.  For example, to supply a
+	    plate centre, overriding any astrometry in the file, you might
 	    write 
-	    <verbatim>--obsdata=ra=14:24:00,dec=-12.34</verbatim>The
-	    available astrometry keywords are
+	    <verbatim>
+	      --obsdata=ra=14:24:00,dec=-12.34
+	    </verbatim>
+	    and to supply this as a backup, in case there is no
+	    astrometry elsewhere, you could write
+	    <verbatim>
+	      --obsdata=source=AST:FITS:USER,ra=14:24:00,dec=-12.34
+	    </verbatim>
+	    The available astrometry keywords are
 	    <tabular>
 	      <tgroup cols="2">
 		<tbody>
+		  <row>
+		    <entry>source</entry>
+		    <entry>This is a colon-separated list of sources
+		      of WCS information.  The values may be `AST',
+		      indicating that the information should come from 
+		      the AST WCS component of the NDF, or `FITS',
+		      indicating that it should come from any FITS
+		      extension there, or `USER', indicating that the
+		      following obsdata keywords should be used.  The
+		      default is `<code>source=USER:AST:FITS</code>'.
+		      The keywords are not case-sensitive.
+		      If the program gets through this list without
+		      finding any WCS information, it exits with an
+		      error.</entry>
+		  </row>
 		  <row>
 		    <entry>ra</entry>
 		    <entry>Right ascention of the centre of the pixel
@@ -494,23 +511,26 @@
 	    <code>i</code> represents an integer, <code>r</code> a
 	    real, optional entries are in <code>[...]</code>, and the
 	    separator <code>:</code> may be either a colon or
-	    whitespace.
+	    whitespace.  Note that the <code>source</code> keyword
+	    discussed above
+	    does not affect the priority of these keywords: if they
+	    are specified, they override any values obtained from the
+	    NDF or its FITS extensions.
 	    <tabular>
 	      <tgroup cols="2">
 		<tbody>
 		  <row>
 		    <entry>time</entry>
 		    <entry>An observation time, given as a Julian
-		      epoch (a single double), or a local sidereal
+		      epoch (format <code>r</code>), or a local sidereal
 		      time (format <code>i:i</code>) or UT
-		      (<code>i:i:i:i:i</code> specifying four-digit
-		      year, month, day, hours minutes).</entry>
+		      (<code>i:i:i:i:r</code> specifying four-digit
+		      year, month, day, hours and minutes).</entry>
 		  </row>
 		  <row>
 		    <entry>obs</entry>
 		    <entry>An observation station, given either as one 
-		    of the SLALIB observatory codes; or else latitude,
-		      longitude and height, in the format
+		      of the SLALIB observatory codes; or else in the format
 		      <code>i:r:i:r[:r]</code>, giving longitude,
 		      latitude and optional height.
 		      Longitudes are east longitudes -- west
@@ -520,7 +540,9 @@
 		  <row>
 		    <entry>met</entry>
 		    <entry>Temperature and pressure at the telescope,
-		      in degrees Kelvin and millibars.
+		      in degrees Kelvin and millibars.  The defaults are
+		      278K and a pressure computed from the
+		      observatory height.
 		      Format <code>r[:r]</code>.</entry>
 		  </row>
 		  <row>
@@ -534,9 +556,6 @@
 	    </tabular>
 	  </p>
 
-	  <!-- How about 'FITS?' indicating that FITS is
-	  preferred, but the program should fail over to AST if that's 
-	  not there?  How about 'FITS:AST' to specify a sequence? -->
 	</subsubsect>
 
 	<subsubsect id="opt.skycatconfig">
