@@ -242,11 +242,9 @@ c                              ! rebinning to new frame
      :  MINY,                  !    "    y   "      "    "     "
      :  MAXX,                  ! maximum x   "      "    "     "
      :  MAXY,                  !    "    y   "      "    "     "
-     :  I, J, K, L,            ! counters
-     :  NLINES                 ! Number of lines of text to write into history
+     :  I, J, K, L             ! counters
 
       CHARACTER*(PAR__SZNAM) 	PARM       		! Parameter name
-      CHARACTER*80	     	PATH(MXFRAM*4)     	! Paths of input data arrays
 
       DOUBLE PRECISION		POINT(2)		! N'th dataset pointing
       DOUBLE PRECISION		POINT_1(2)		! 1st dataset pointing
@@ -259,6 +257,7 @@ c                              ! rebinning to new frame
       REAL			SPARR(2)		! Spaced array data
 
       INTEGER			IFID(MXFRAM)		! Input dataset ids
+      INTEGER			IFILES			! USI input file info
       INTEGER                	IPTRD,IPTRV,IPTRQ  	! Loops over input slices
       INTEGER			IX, IY			! Loops over corners
       INTEGER			OFID			! Output dataset id
@@ -993,8 +992,8 @@ c                              ! axis units
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *  Put names of input datafiles used into history
-      CALL USI_NAMEI( NLINES, PATH, STATUS )
-      CALL HSI_PTXT( OFID, NLINES, PATH, STATUS )
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
 
 *  Tidy up
  99   CALL AST_CLOSE()

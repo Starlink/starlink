@@ -123,7 +123,6 @@
         PARAMETER		( VERSION = 'ENMAP Version V2.0-0' )
 
 *  Local Variables:
-      CHARACTER*80              PATH(4)                 ! Input dataset path
       CHARACTER*80              TEXT                    ! History text
 
       REAL                      THRESH                  ! Threshold below which to zero
@@ -132,9 +131,9 @@
       INTEGER                   ENAX                    ! Energy axis number
       INTEGER                   IDPTR                   ! Input data
       INTEGER			IFID			! Input dataset id
+      INTEGER			IFILES			! USI input file info
       INTEGER                   IQPTR                   ! Input quality
       INTEGER                   NDIM, DIMS(3)           ! Data dimensions
-      INTEGER                   NLINES                  ! # history lines
       INTEGER                   ODIM(2)                 ! O/p dimension
       INTEGER                   ODPTR                   ! Output data
       INTEGER			OFID			! Output dataset id
@@ -275,15 +274,13 @@
       CALL BDI_AXCOPY( IFID, ORDER(1), ' ', OFID, 1, STATUS )
       CALL BDI_AXCOPY( IFID, ORDER(2), ' ', OFID, 2, STATUS )
 
-*  Copy history from the original file
+*  Copy history from the original file and add our record
       CALL HSI_COPY( IFID, OFID, STATUS )
-
-*  Add history record
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *  Create text strings for history
-      CALL USI_NAMEI( NLINES, PATH, STATUS)
-      CALL HSI_PTXT( OFID, NLINES, PATH, STATUS )
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
 
 *  Write threshold value
       CALL MSG_SETR( 'THRESH', THRESH )

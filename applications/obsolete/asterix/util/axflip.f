@@ -136,7 +136,6 @@
       INTEGER			IFILES			! Input file list
       INTEGER                   NDIGIT            	! Length of number in char
       INTEGER                   NDIM              	! Dimensionality
-      INTEGER                   NLINES            	! History lines used
       INTEGER                   OPTR                    ! O/p data
       INTEGER			OFID			! Output dataset id
       INTEGER                   NSEL              	! Number of axes to flip
