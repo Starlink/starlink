@@ -5389,6 +5389,13 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
       astClearDrawAxes( this, 0 );
       astClearDrawAxes( this, 1 );
 
+/* DrawAxes(axis). */
+/* --------------- */
+   } else if ( nc = 0,
+               ( 1 == sscanf( attrib, "drawaxes(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      astClearDrawAxes( this, axis - 1 );
+
 /* Escape. */
 /* ------- */
    } else if ( !strcmp( attrib, "escape" ) ) {
@@ -10950,6 +10957,17 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* ----------- */
    } else if ( !strcmp( attrib, "drawaxes" ) ) {
       ival = astGetDrawAxes( this, 0 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* DrawAxes(axis). */
+/* --------------- */
+   } else if ( nc = 0,
+               ( 1 == sscanf( attrib, "drawaxes(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      ival = GetUsedDrawAxes( this, axis - 1 );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
