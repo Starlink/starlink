@@ -26,5 +26,6 @@ $(EPSFILES): ssn78.mp
 	    $(PSTOIMG) -gif -scale 1.5 -antialias -out $@ $<
 
 ssn78.dvi: $(EPSFILES)
+ssn78.pdf: $(PDFFILES)
 
 MOSTLYCLEANFILES = $(EPSFILES) $(PDFFILES) $(GIFFILES)
