@@ -98,7 +98,7 @@
 
 *  If any elements are left in the group, get the next one.
       IF ( CMN_NXTLN .LE. DIM ) THEN
-         CALL GRP_GET( CMN_IGRP, CMN_NXTLN, 1, TEXT, STATUS )
+         CALL ARD1_GET( CMN_IGRP, CMN_NXTLN, 1, TEXT, STATUS )
 
 *  Store its used length.
          L = CHR_LEN( TEXT )

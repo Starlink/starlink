@@ -87,7 +87,7 @@
       END IF
 
 *  Append the opening "WCS(" string.
-      CALL GRP_PUT( IGRP, 1, 'WCS(', 0, STATUS ) 
+      CALL GRP_PUT( IGRP, 1, 'WCS(<!!', 0, STATUS ) 
 
 *  Create an AST_ Channel to write the supplied Object to the group.
 *  Supply the ARD1_SNKTA routine as the "sink" routine for storing the 
@@ -116,7 +116,7 @@
       CALL AST_ANNUL( CHAN, STATUS )
 
 *  Finish off with the final ")" string.
-      CALL GRP_PUT( IGRP, 1, ')', 0, STATUS ) 
+      CALL GRP_PUT( IGRP, 1, '!!>)', 0, STATUS ) 
 
 *  If an error occurred, tidy up.
       IF( STATUS .NE. SAI__OK ) THEN

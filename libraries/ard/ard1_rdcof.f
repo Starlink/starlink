@@ -85,7 +85,7 @@
       END IF
 
 *  Get the first elment from the group.
-      CALL GRP_GET( IGRP, 1, 1, TEXT, STATUS ) 
+      CALL ARD1_GET( IGRP, 1, 1, TEXT, STATUS ) 
 
 *  If there is a comma in it, the Frame Domain is the text before the 
 *  first comma.
@@ -117,7 +117,7 @@
 *  Loop round any remaining elements in the group, using them to assign
 *  values to Frame attributes
       DO I = 2, SIZE
-         CALL GRP_GET( IGRP, I, 1, TEXT, STATUS ) 
+         CALL ARD1_GET( IGRP, I, 1, TEXT, STATUS ) 
          CALL AST_SET( FR, TEXT, STATUS )
       END DO
 

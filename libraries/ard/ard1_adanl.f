@@ -272,7 +272,7 @@
 *  Otherwise, get the next element from the group containing the ARD
 *  description.
             ELSE
-               CALL GRP_GET( IGRP, IELEM, 1, ELEM, STATUS )      
+               CALL ARD1_GET( IGRP, IELEM, 1, ELEM, STATUS )      
 
 *  Increment the element index.
                IELEM = IELEM + 1
