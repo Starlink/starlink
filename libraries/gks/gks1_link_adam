@@ -1,0 +1,2 @@
+echo -lgks `gwm_link_adam` `starX_link` `ems_link_adam` \
+| awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
