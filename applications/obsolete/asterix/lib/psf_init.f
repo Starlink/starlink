@@ -71,6 +71,6 @@
       CALL PSF0_DEFPSF( 'XRT_PSPC', PSF_XRT_PSPC_INIT, STATUS )
 
 *  Now initialised
-      CALL AST_SPKGI( DCI__PKG )
+      CALL AST_SPKGI( PSF__PKG )
 
       END
