@@ -120,6 +120,8 @@
 *        Do not remove insignificant axes from the current Frame if TRIM
 *        indicates that a precise number of axes is required in the
 *        current Frame.
+*     30-AUG-2004 (DSB):
+*        Replaced hardwired "3" by "NDIMS" in call to KPG1_ASSIG!
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -232,7 +234,8 @@
 *  Remove any insignificant axes from the Current Frame. We do not do
 *  this if later code will trim the current Frame to have the required
 *  number of axes.
-      IF( .NOT. TRIM ) CALL KPG1_ASSIG( IWCS, 3, LBND, UBND, STATUS )
+      IF( .NOT. TRIM ) CALL KPG1_ASSIG( IWCS, NDIMS, LBND, UBND, 
+     :                                  STATUS )
 
 *  Re-map the Base (GRID) Frame by selecting the chosen axes.
 *  ==========================================================
