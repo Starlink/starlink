@@ -713,13 +713,13 @@
 	    IF ( WEIGHTS ) THEN
 	      CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).WPTR,STATUS)
               IF ( OBDAT(NDS).GFLAG ) THEN
-                CALL DYN_MAPR( 1, OBDAT(NDS).NGDAT, OBDAT(NDS).GVPTR,
+                CALL DYN_MAPR( 1, OBDAT(NDS).NGDAT, OBDAT(NDS).GWPTR,
      :                         STATUS )
               END IF
 	      IF (STATUS.NE.SAI__OK) GOTO 99
 	    ELSE
 	      OBDAT(NDS).WPTR = 0				! Flag
-              OBDAT(NDS).GVPTR = 0
+              OBDAT(NDS).GWPTR = 0
 	    END IF
 
 *        Enter weights (=inverse variances)
@@ -798,7 +798,7 @@
      :                 (OBDAT(NDS).WPTR.NE.0), %VAL(OBDAT(NDS).WPTR),
      :                 OBDAT(NDS).QFLAG, %VAL(OBDAT(NDS).QPTR),
      :                 %VAL(OBDAT(NDS).GPTR), OBDAT(NDS).NGDAT,
-     :                 %VAL(OBDAT(NDS).GDPTR), %VAL(OBDAT(NDS).GVPTR),
+     :                 %VAL(OBDAT(NDS).GDPTR), %VAL(OBDAT(NDS).GWPTR),
      :                 %VAL(OBDAT(NDS).GQPTR), STATUS )
             END IF
 
