@@ -22,6 +22,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     MBT: M.B. Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -31,6 +32,8 @@
 *        Added the ARY__FACNO constant.
 *     24-MAR-1999 (RFWS):
 *        Increased array sizes to allow more array identifiers.
+*     31-AUG-2004 (MBT):
+*        Increased control block size limits by a factor of 4.
 *     {enter_further_changes_here}
 
 *-
@@ -42,19 +45,19 @@
 
 *  Maximum number of entries in the Access Control Block.
       INTEGER ARY__MXACB
-      PARAMETER ( ARY__MXACB = 1024 )
+      PARAMETER ( ARY__MXACB = 4096 )
 
 *  Maximum number of entries in the Data Control Block.
       INTEGER ARY__MXDCB
-      PARAMETER ( ARY__MXDCB = 512 )
+      PARAMETER ( ARY__MXDCB = 2048)
 
 *  Maximum number of entries in the Mapping Control Block.
       INTEGER ARY__MXMCB
-      PARAMETER ( ARY__MXMCB = 256 )
+      PARAMETER ( ARY__MXMCB = 1024 )
 
 *  Maximum number of entries in the Placeholder Control Block.
       INTEGER ARY__MXPCB
-      PARAMETER ( ARY__MXPCB = 20 )
+      PARAMETER ( ARY__MXPCB = 80 )
 
 *  Common block identifiers.
 *  ========================
