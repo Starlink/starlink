@@ -253,7 +253,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Locate GRAFIX structure
-      CALL ADI1_LOCGRAF( ARGS(1), .TRUE., GLOC, STATUS )
+      CALL ADI1_LOCGRAF( FID, .TRUE., GLOC, STATUS )
 
 *  See if component already there
       CALL DAT_THERE( GLOC, 'GRAFIX_CONTROL', OK, STATUS )

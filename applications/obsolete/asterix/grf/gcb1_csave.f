@@ -101,6 +101,7 @@
       CHARACTER*(DAT__SZLOC)	GCBLOC			! Locator to GCB
 
       INTEGER			CACHE			! Cache address
+      INTEGER			DISP			!
       INTEGER			GCBPTR			! Mapped file GCB
       INTEGER			NBYTE			! Bytes to store GCB
       INTEGER			NSCAL, NSTRUC		! # cmps in GCB
