@@ -13,6 +13,9 @@
 *                       28/10/98 (AJC):
 *                          Major remodel to produce NDFs
 *                          N.B. Header information lost.
+*                       22/10/99 (PWD):
+*                          Added initialisation of overlay, this fixes
+*                          a problem with aperture display.
 *	Last modify:	23/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,23 +147,23 @@ void	blankcheck(checkstruct *check, PIXTYPE *mask, int w,int h,
 /*
 initialize check-image.
 */
-checkstruct	*initcheck(picstruct *field, char *filename,
-			checkenum check_type)
+checkstruct	*initcheck( picstruct *field, char *filename,
+                            checkenum check_type)
 
-  {
-   checkstruct	*check;
-   char		*buf;
-   int		i, ival;
-   size_t	padsize;
-   double	dval;
-   USHORT	*pntri;
-   PIXTYPE	*pntrf;
-   void         *pntr[3];
-   int 		placehldr;
-   int          lbnd[2], ubnd[2];
-   int 		ndim;
-   int          status = SAI__OK;
-
+{
+  checkstruct	*check;
+  char		*buf;
+  int		i, ival;
+  size_t	padsize;
+  double	dval;
+  USHORT	*pntri;
+  PIXTYPE	*pntrf;
+  void         *pntr[3];
+  int 		placehldr;
+  int          lbnd[2], ubnd[2];
+  int 		ndim;
+  int          status = SAI__OK;
+  
   QCALLOC(check, checkstruct, 1);
 
   strcpy(check->filename, filename);
@@ -211,6 +214,7 @@ checkstruct	*initcheck(picstruct *field, char *filename,
      ubnd[0] = check->width = field->width;
      ubnd[1] = check->height = field->height;
      check->npix = field->npix;
+     check->overlay = 30*field->backsig;
 /*     ndfBound( field->ndf, 2, lbnd, ubnd, &ndim, &status );*/
      ndfNew( "_REAL", 2, lbnd, ubnd, &placehldr, &check->ndf, &status );
      break;
@@ -259,8 +263,9 @@ checkstruct	*initcheck(picstruct *field, char *filename,
      ndfMap( check->ndf, "DATA", "_REAL", "WRITE/ZERO", 
              pntr, &check->nel, &status );
      check->map = pntr[0];
-     if ( !check->pix )
-        check->pix = check->map;
+     if ( check->pix == NULL ) {
+       check->pix = check->map;
+     }
      break;
   case CHECK_ASSOC:
      ndfMap( check->ndf, "DATA", "_REAL", "WRITE/BAD", 
@@ -349,6 +354,7 @@ void	endcheck(picstruct *field, checkstruct *check)
   {
    char		*buf;
    size_t	padsize;
+   int          status = SAI__OK;
 
   switch(check->type)
     {
@@ -397,7 +403,7 @@ void	endcheck(picstruct *field, checkstruct *check)
     }
 
   free(check);
-
+  ndfAnnul( &check->ndf, &status );
   return;
   }
 
