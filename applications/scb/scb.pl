@@ -913,20 +913,13 @@ sub search_keys {
             foreach $name (sort keys %{$match{$iname}{$pack}}) {
                $loc = $match{$iname}{$pack}{$name};
                if ($html) {
-                  if ($iname eq 'func') {
-                     print
-                        "<dd>",
-                        "<a href='${scb}$name&$package&$type=func#$name'>",
-                        "$name</a>",
-                        "</dd>\n";
-                  }
-                  else {
-                     print
-                        "<dd>",
-                        "<a href='${scb}$name&$package&$type=iname'>",
-                        "$name</a>",
-                        "</dd>\n";
-                  }
+                  print
+                     "<dd>",
+                     "<a href='${scb}$name&package=$package&type=$iname",
+                     ($iname eq "func" ? "#$name" : ""),
+                     "'>",
+                     "$name</a>",
+                     "</dd>\n";
                }
                else {
                   printf "%-20s => %s\n", $name, $loc;
