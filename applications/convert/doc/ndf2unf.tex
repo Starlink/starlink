@@ -6,8 +6,8 @@
 }{
    \sstdescription{
       This application converts an NDF to a sequential unformatted
-      file.  Only one of the array components may be copied to the
-      output file.  Preceding the data there is an optional header
+      Fortran file.  Only one of the array components may be copied to
+      the output file.  Preceding the data there is an optional header
       consisting of either the FITS extension with the values of
       certain keywords replaced by information derived from the NDF, or
       a minimal FITS header also derived from the NDF.
@@ -38,10 +38,11 @@
       \sstsubsection{
          NOPEREC = \_INTEGER (Read)
       }{
-         The number of data values per record of the output file.  It
-         should be in the range 1 to $n$, where $n$ is 32764 divided by
-         the number of bytes per data value.  The suggested
-         default is the current value. {\tt [}The first dimension of the NDF
+         The number of data values per record of the output file.  On
+         VMS systems it should be in the range 1 to $n$, where $n$ is 32764
+         divided by the number of bytes per data value; on UNIX systems
+         it need only be positive.  The suggested default is the
+         the current value. {\tt [}The first dimension of the NDF
          (or $n$ if this is smaller){\tt ]}
       }
       \sstsubsection{

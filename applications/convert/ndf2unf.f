@@ -21,8 +21,8 @@
 
 *  Description:
 *     This application converts an NDF to a sequential unformatted
-*     file.  Only one of the array components may be copied to the
-*     output file.  Preceding the data there is an optional header
+*     Fortran file.  Only one of the array components may be copied to
+*     the output file.  Preceding the data there is an optional header
 *     consisting of either the FITS extension with the values of
 *     certain keywords replaced by information derived from the NDF, or
 *     a minimal FITS header also derived from the NDF.
@@ -42,11 +42,12 @@
 *        Input NDF data structure. The suggested default is the current
 *        NDF if one exists, otherwise it is the current value.
 *     NOPEREC = _INTEGER (Read)
-*        The number of data values per record of the output file.  It
-*        should be in the range 1 to n, where n is 32764 divided by
-*        the number of bytes per data value.  The suggested
-*        default is the current value. [The first dimension of the NDF
-*        (or n if this is smaller)]
+*        The number of data values per record of the output file.  On
+*        VMS systems it should be in the range 1 to n, where n is 32764
+*        divided by the number of bytes per data value; on UNIX systems
+*        it need only be positive.  The suggested default is the
+*        current value. [The first dimension of the NDF (or n if this
+*        is smaller)]
 *     OUT = FILENAME (Write)
 *        Name of the output sequential unformatted file.  The file will
 *        normally have variable-length records when there is a header,
@@ -211,21 +212,27 @@
       LOGICAL IDATA              ! True if NDF array is integer type
       LOGICAL LABFND             ! True if NDF LABEL found
       INTEGER LUN                ! Logical-unit number
+      CHARACTER MACHIN * ( 24 )  ! Machine name
       INTEGER NCARD              ! Number of cards in FITS extension
       INTEGER NDIM               ! Number of dimensions 
       INTEGER NUMMAX             ! Maximum number of values per record
       INTEGER NDF                ! Identifier for NDF
+      CHARACTER NODE * ( 20 )    ! Node name
       INTEGER NUMPRE             ! Number of data values per record
       INTEGER PNTR( 1 )          ! Pointer to NDF mapped array
       INTEGER RECL               ! Maximum recordlength of unformatted
                                  ! file in bytes
       INTEGER RECMIN             ! Minimum record length of the
                                  ! unformatted file
+      CHARACTER RELEAS * ( 10 )  ! Release of operating system
+      CHARACTER SYSNAM * ( 10 )  ! Operating system
       LOGICAL THERE              ! FITS extension is present
       LOGICAL TITFND             ! True if NDF TITLE found
       CHARACTER * ( NDF__SZTYP ) TYPE ! Data type for processing
       LOGICAL UNTFND             ! True if NDF UNITS found
       CHARACTER VALUE * ( SZVAL ) ! Accommodates descriptor value
+      CHARACTER VERSIO * ( 10 )  ! Sub-version of operating system
+      LOGICAL VMS                ! True if running on a VAX/VMS system
 
 *.
 
@@ -282,22 +289,32 @@
       CALL PAR_GET0L( 'FITS', HEADER, STATUS )
 
 *  Is there a FITS extension to be copied?  If there is, set the minimum
-*  recordlength to 20 longwords for the unformatted FITS headers.  Note
-*  that longwords are used because that's the way FIO works for
-*  unformatted files despite the FIO documentation saying it uses bytes.
+*  recordlength to 80 bytes for the unformatted FITS headers.
       CPFITS = HEADER .AND. THERE
       IF ( CPFITS ) THEN
-         RECMIN = 20
+         RECMIN = 80
       ELSE
          RECMIN = 1
       END IF
+
+*  Determine whether or not the operating system is VMS.
+*  =====================================================
+*
+*  This assumes that the system is either VMS or UNIX.  It is needed
+*  to specify the path of the file containing the global parameters.
+      CALL PSX_UNAME( SYSNAM, NODE, RELEAS, VERSIO, MACHIN, STATUS )
+      VMS = INDEX( SYSNAM, 'VMS' ) .NE. 0
 
 *  Find the formatting arrangement for the output file.
 *  ====================================================
 
 *  Derive the maximum number of values per record for the data type.
 *  The maximum is imposed by VMS (8191 maximum number of longwords).
-      IF ( TYPE .EQ. '_DOUBLE' ) THEN
+*  On UNIX set it to the largest innteger, i.e. no practical limit.
+      IF ( .NOT. VMS ) THEN
+         NUMMAX = VAL__MAXI
+
+      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
          NUMMAX = 32764 / VAL__NBD 
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
@@ -329,28 +346,27 @@
       CALL PAR_GDR0I( 'NOPEREC', MIN( NUMMAX, DIMS( 1 ) ), 1, NUMMAX,
      :                .FALSE., NUMPRE, STATUS )
 
-*  Derive the recordlength in longwords (4 bytes).  This may have to
-*  change if FIO is made consistent and use bytes throughout.
+*  Derive the recordlength in bytes.
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         RECL = ( NUMPRE * VAL__NBD - 1 ) / 4 + 1
+         RECL = NUMPRE * VAL__NBD
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-         RECL = ( NUMPRE * VAL__NBR - 1 ) / 4 + 1
+         RECL = NUMPRE * VAL__NBR
 
       ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-         RECL = ( NUMPRE * VAL__NBI - 1 ) / 4 + 1
+         RECL = NUMPRE * VAL__NBI
 
       ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-         RECL = ( NUMPRE * VAL__NBUW - 1 ) / 4 + 1
+         RECL = NUMPRE * VAL__NBUW
 
       ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-         RECL = ( NUMPRE * VAL__NBW - 1 ) / 4 + 1
+         RECL = NUMPRE * VAL__NBW
 
       ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-         RECL = ( NUMPRE * VAL__NBUB - 1 ) / 4 + 1
+         RECL = NUMPRE * VAL__NBUB
 
       ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
-         RECL = ( NUMPRE * VAL__NBB - 1 ) / 4 + 1
+         RECL = NUMPRE * VAL__NBB
 
       END IF
 
