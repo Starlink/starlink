@@ -3,7 +3,7 @@
  *     EXTRACTOR
  
  *  Purpose:
- *     Detects and parameterised objects on an image.
+ *     Detects and parameterises objects on an image.
  
  *  Language:
  *     ANSI C
@@ -22,8 +22,6 @@
  *     This program is a version of the SExtractor program written by
  *     Emmanual Bertin, that reads NDF format (and NDF supported
  *     foreign data formats) images. 
- *
- *    
  
  *  Usage:
  *     extractor image config

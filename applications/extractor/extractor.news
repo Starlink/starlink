@@ -1,9 +1,34 @@
-EXTRACTOR !.0
--------------
+1 EXTRACTOR
 
-This is the first releease of Starlink's version of Emmanuel Bertin's
-SExtractor.  Basically the I/O has been changed to use the Starlink
-NDF library, thereby giving access to numerous other data formats and
-the Starlink AST facilities.
+ EXTRACTOR is a new program for automatically detecting objects on an
+ astronomical image and building a catalogue of their measured
+ properties. It is particularly suited for the reduction of large
+ scale galaxy-survey data, but also performs well on other
+ astronomical images.
 
-AJC 23/11/98
+ EXTRACTOR is really Emmanuel Bertin's SExtractor program modified
+ to use the NDF data format and the Starlink astrometry library
+ (AST). This allows it to read foreign data formats (e.g. IRAF ".imh" )
+ and use non-FITS astrometric calibrations, such as native AST and
+ DSS. The native version of SExtractor (v2.0.15) is also provided as
+ part of this release.
+
+ GAIA, the Graphical Astronomy and Image Analysis Tool, has been
+ upgraded to make use of EXTRACTOR (and SExtractor) and now provides
+ an interactive environment to visually inspect how the extraction
+ process has proceeded and to specify the detection and catalogue
+ parameters. It also displays the catalogue of results and provides
+ interaction between the catalogue and detected objects (i.e. you
+ can select a detected object and view its related measurements, or
+ select a row of measurements and see the related object).
+
+ It is expected that EXTRACTOR will eventually replace the PISA
+ package, so existing users of PISA are encouraged to use EXTRACTOR.
+
+ EXTRACTOR is described in SUN/225, which can be viewed on-line by the
+ command:
+
+    % showme sun225
+
+
+ Peter W. Draper & Alan Chipperfield      1st December 1998.

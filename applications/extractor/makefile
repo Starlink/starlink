@@ -535,7 +535,7 @@ TEST_FILES =
 #  Lists of Latex and hypertext documents.
 
 LATEX_DOCS = sun225.tex
-HYPERTEXT_DOCS = sun225.htx_tar
+HYPERTEXT_DOCS = sun225.htx
 MUD_DOCS = mud165.ps sex1_doc.ps.gz sexpaper.ps.gz
 
 #  List of documentation files.

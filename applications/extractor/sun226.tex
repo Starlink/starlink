@@ -1,7 +1,7 @@
 \documentclass[twoside,11pt]{article}
 
 % ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
+\usepackage{graphicx}        %  Use this one for final production.
 % \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
@@ -18,14 +18,14 @@
 \newcommand{\stardocnumber}    {225.1}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {27 November 1998}
+\newcommand{\stardocdate}      {1 December 1998}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
 \newcommand{\stardocversion}   {1.0}
 \newcommand{\stardocmanual}    {User Manual}
 \newcommand{\stardocabstract}  {\EXTRACTOR\ will detect sources in
 an astronomical image and build a catalogue listing them. It is based on the
-popular \SExtractor\ program, has very flexible configuration 
+popular \SExtractor\ program, has very flexible configuration
 facilities and can handle images and catalogues in a variety of formats.}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ facilities and can handle images and catalogues in a variety of formats.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
@@ -448,7 +448,7 @@ facilities and can handle images and catalogues in a variety of formats.}
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   CCLRC / {\textsc Rutherford Appleton Laboratory} \hfill {\textbf \stardocname}\\
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
    {\large \stardoccategory\ \stardocnumber}
@@ -458,22 +458,20 @@ facilities and can handle images and catalogues in a variety of formats.}
    \end{flushright}
    \vspace{-4mm}
    \rule{\textwidth}{0.5mm}
-   \vspace{5mm}
+   \vspace{4mm}
    \begin{center}
-   {\Huge\textbf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\textbf \stardocversion \\ [4ex]}
-   {\Huge\textbf  \stardocmanual}
-   \end{center}
-   \vspace{5mm}
+   {\LARGE\textbf{\stardoctitle} \\ [2.5ex]}
+   \vspace{4mm}
 
 % ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
+   \includegraphics[scale=0.6]{sun225fig.ps}
 % ? End of picture
+   \end{center}
 
 % ? Heading for abstract if used.
-   \vspace{10mm}
+   \vspace{5mm}
    \begin{center}
-      {\Large\textbf Abstract}
+      {\Large\textbf{Abstract}}
    \end{center}
 % ? End of heading for abstract.
 \end{latexonly}
@@ -489,7 +487,7 @@ facilities and can handle images and catalogues in a variety of formats.}
    \begin{rawhtml} </H1> <HR> \end{rawhtml}
 
 % ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
+   \htmladdimg{sun225fig.gif}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
@@ -508,12 +506,12 @@ facilities and can handle images and catalogues in a variety of formats.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -547,49 +545,51 @@ facilities and can handle images and catalogues in a variety of formats.}
 \setcounter{page}{1}
 
 % ? Main text
-\section{\xlabel{introduction}\label{introduction}Introduction}
-\EXTRACTOR\ is basically Emmanuel Bertin's \SExtractor\ (Source-Extractor)
-program\footnote{BERTIN E. and ARNOUTS S., 1996, A\&AS 117,393}
-packaged as a task for the 
-\xref{Starlink Software Environment}{sg4}{}\latex{ (see SG/4)}.
-It gets parameters via the Starlink Parameter System and handles image files 
-using the Starlink 
-\xref{NDF}{sun33}{abstract}
-library \latex{(see SUN/33)}
-rather than the native FITS handling functions. In this way the program
-can read and write different image formats using the NDF library's
-\xref{`on-the-fly' conversion facility}{ssn20}{abstract}\latex{ (see SSN/20)}.
-You can easily use the Starlink
-\xref{\CONVERT}{sun55}{abstract}
-package \latex{(see SUN/55)} to set up automatic conversion from or to 
-\xref{a large number of different formats}{sun55}{the_default_conversion_commands}
-including 
-\htmladdnormallink{FITS}{\FITSURL}
-and 
-\htmladdnormallink{IRAF}{\IRAFURL}
-OIF.
+\section{Introduction}
+\EXTRACTOR\ is a program for automatically detecting objects on an
+astronomical image and building a catalogue of their properties. It is
+particularly suited for the reduction of large scale galaxy-survey
+data, but also performs well on other astronomical images.
 
-Native \SExtractor\ is also included in the distribution of \EXTRACTOR\.
-You can find details of \SExtractor's operation, and how to configure it, in 
-the 
-\htmladdnormallink{\SExtractor\ User's Guide}{\MUD} 
-(which is issued as a Starlink Miscellaneous User Document, MUD/165) 
-\dash\ you configure \EXTRACTOR\ in much the same way, although 
-\htmlref{some restrictions}{some_restrictions}\latex{ (see
+\EXTRACTOR\ is basically Emmanuel Bertin's \SExtractor\
+(Source-Extractor) program\footnote{BERTIN E. and ARNOUTS S., 1996,
+A\&AS 117,393} re-packaged for use in the \xref{Starlink Software
+Environment}{sg4}{}\latex{ (see SG/4)}.  This means that it uses the
+Starlink parameter system, accepts images in the Starlink
+\xref{NDF}{sun33}{abstract} format \latex{(see SUN/33)} and uses the
+\xref{AST}{sun210}{} library \latex{(SUN/210)} for astrometry.
+
+Extending the program to use NDFs allows it to read and write other
+image formats using the NDF library \xref{`on-the-fly' conversion
+facility}{ssn20}{abstract} \latex{(see SSN/20)}.  Conversion to and
+from many ``standard'' astronomical
+\xref{formats}{sun55}{the_default_conversion_commands} are available
+by using the \xref{\CONVERT}{sun55}{abstract} package \latex{(see
+SUN/55)} -- these include \htmladdnormallink{FITS}{\FITSURL} and
+\htmladdnormallink{IRAF}{\IRAFURL} OIF.
+
+Native \SExtractor, version 2.0.15, is also included in the
+distribution of \EXTRACTOR.  You can find details of \SExtractor's
+operation, and how to configure it, in the
+\htmladdnormallink{\SExtractor\ User's Guide}{\MUD} (which is issued
+as a Starlink
+Miscellaneous User Document, MUD/165\footnote{Note this
+document is still in draft consequently you should read this in
+conjunction with the A\&AS paper.}) \dash\ you configure \EXTRACTOR\
+in much the same way, although \htmlref{some restrictions}{some_restrictions}\latex{ (see
 Section~\ref{some_restrictions})} will apply.
 
-Here we describe how to run \EXTRACTOR\, and give brief
+This document describes how to run \EXTRACTOR, and gives
 \htmlref{instructions for running \SExtractor}{running_sextractor}
-from the Starlink distribution\latex{ in Section~\ref{running_sextractor}}.
+from the Starlink distribution.
 
-\section{\xlabel{running_extractor}\label{running_extractor}Running \EXTRACTOR}
-Like any Starlink Software Environment task, \EXTRACTOR\ may be run from the
-Unix shell or from a user-interface such as 
-\xref{ICL}{sg5}{abstract}\latex{ (see SG/5)},
-where it is controlled via the ADAM message system.
+\section{\EXTRACTOR}
+
+Like any Starlink program, \EXTRACTOR\ may be run from the
+Unix shell or from a user-interface such as
+\xref{ICL}{sg5}{abstract}\latex{ (see SG/5)}.
 A useful summary of the rich variety of methods of specifying parameter values
-for Starlink Environment Programs is given in
-\xref{SUN/95}{sun95}{se_param}.
+is given in \xref{SUN/95}{sun95}{se_param}.
 
 The examples below assume you are running from the Unix shell but the commands
 and parameters are exactly the same from ICL.
@@ -603,37 +603,30 @@ After normal Starlink startup, at the shell prompt, type:
 You will be prompted for the values of parameters CONFIG and IMAGE in turn:
 
 \begin{quote} \begin{verbatim}
-CONFIG /'$EXTRACTOR_DIR/config/default.sex'/ >
-IMAGE /'image'/ >
+CONFIG - Configuration file /'$EXTRACTOR_DIR/config/default.sex'/ >
+IMAGE - Input image /'image'/ >
 \end{verbatim} \end{quote}
 
-where CONFIG is the name of the `preferences' file and IMAGE is the name of 
+where CONFIG is the name of the `preferences' file and IMAGE is the name of
 the image file to be processed.
 
 Suggested values are given between \texttt{//} in the prompt.
-You can accept the suggested values by just typing \verb!<RETURN>!, or type in 
-new values of your own, terminated by \verb!<RETURN>!.
+You can accept the suggested values by just typing \verb!<RETURN>!, or type in
+new values of your own.
 If you accept the above suggested values, \EXTRACTOR\ will process the NDF
-file \texttt{image} using the installed default configuration files to 
-produce a catalogue named \texttt{test.cat} (this name is specified in the 
+file \texttt{image} using the installed default configuration files to
+produce a catalogue named \texttt{test.cat} (this name is specified in the
 preferences file).
 
-CONFIG has a `default' value of 
-\texttt{\$EXTRACTOR\_DIR/config/default.sex}.
-This file has some 
-\htmlref{sensible defaults}{defaults}
-\latex{(described in Section~\ref{defaults})} but you may wish to copy it to 
-your own directories and modify it to your taste.
-Similarly with the other configuration files. 
-Environment variable \texttt{EXTRACTOR\_DIR} is defined, by Starlink startup,
-pointing to the directory containing the \EXTRACTOR\ executable image and the
+CONFIG has a `default' value of
+\texttt{\$EXTRACTOR\_DIR/config/default.sex}.  This file has some
+\htmlref{sensible defaults}{defaults} \latex{(described in
+Section~\ref{defaults})} but you will probably want to copy it to your
+own directories and modify it to your taste (as you would for the
+native \SExtractor program).  Similarly with the other configuration
+files.  The environment variable \texttt{EXTRACTOR\_DIR} is defined to
+point to the directory containing the \EXTRACTOR\ program and the
 \texttt{config} directory.
-
-Actually, the suggested value given in a prompt will usually be the last value
-used. If you want to return to using the `default' value, you can type:
-\begin{quote} \begin{verbatim}
-% extract reset
-\end{verbatim} \end{quote}
 
 You can also provide parameter values on the command line.
 Either positionally,
@@ -646,78 +639,31 @@ or by keyword,
 \end{verbatim} \end{quote}
 (In this case, you would be prompted for IMAGE but not for CONFIG.)
 
-If you want to read an image in one of the 
-\xref{formats handled by \CONVERT}{sun55}{the_default_conversion_commands}, 
-just start up \CONVERT\ before running \EXTRACTOR\ and specify the image with 
-an appropriate extension. For example:
-
-\begin{quote} \begin{verbatim}
-% convert
-
-   CONVERT commands are now available -- (Version 1.1-1, 1998 June)
-
-   Defaults for automatic NDF conversion are set.
-
-   Type conhelp for help on CONVERT commands.
-   Type "showme sun55" to browse the hypertext documentation.
-
-% extract
-CONFIG /'$EXTRACTOR_DIR/config/default.sex'/ >
-IMAGE /'image'/ > image.fit
-\end{verbatim} \end{quote}
-will use the FITS file \texttt{image.fit}, automatically converting it to a
-temporary NDF file and then reading the temporary file.
-
-Additional parameters KEYWORDS, NAME and VALUE allow
-configuration parameters specified in the preferences file to be overridden 
+The additional parameters KEYWORDS, NAME and VALUE allow
+configuration parameters specified in the preferences file to be overridden
 without editing the file. For example:
 \begin{quote} \begin{verbatim}
 % extract KEYWORDS
-NAME > CATALOG_NAME
-VALUE > sky.cat
-NAME > CATALOG_TYPE
-VALUE > ASCII_SKYCAT
-NAME > !
-CATALOG_NAME sky.cat
-CATALOG_TYPE ASCII_SKYCAT
-CONFIG /'$EXTRACTOR_DIR/config/default.sex'/ >
-IMAGE /'image'/ >
+NAME - Parameter name /!/ > CATALOG_NAME
+VALUE - Parameter value /!/ > sky.cat
+NAME - Parameter name /!/ > CATALOG_TYPE
+VALUE - Parameter value /!/ > ASCII_SKYCAT
+NAME - Parameter name /!/ >
+CONFIG - Configuration file /'$EXTRACTOR_DIR/config/default.sex'/ >
+IMAGE - Input image /'image'/ >
 \end{verbatim} \end{quote}
 would change the name and type of the catalogue produced (for this
-run only). The list of changes is terminated by replying with the NULL 
+run only). The list of changes is terminated by replying with the NULL
 response (\texttt{!}) to the prompt.
-The 
+The
 \htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}
-gives a full list of possible parameter names and values but it is only 
+gives a full list of possible parameter names and values but it is only
 sensible to change a few in this way.
 
-\section{\label{running_sextractor}\xlabel{running_sextractor}Running \SExtractor}
-The native version of \SExtractor\ is also distributed with \EXTRACTOR.
-This works exclusively with FITS files but will provide the full range of
-facilities. The executable image will be installed in \texttt{\$EXTRACTOR\_DIR}.
-and it is run as described in the
-\htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}.
+\section{\label{defaults}\xlabel{defaults}The Default Configuration}
 
-Either put \texttt{\$EXTRACTOR\_DIR} on your \texttt{PATH} or define an alias:
-\begin{quote} \begin{verbatim}
-% alias sex $EXTRACTOR_DIR/sex
-\end{verbatim}\end{quote}
-then type:
-\begin{quote}
-\texttt{\% sex \textit{image} [-c \textit{configuration-file}]} \verb!\! \\
-\texttt{? [-\textit{Parameter1 Value1}] [-\textit{Parameter2 Value2}] ...}
-\end{quote}
-(see the 
-\htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}
-for details).
-
-Note that if the \texttt{-c} option is omitted, file \texttt{default.sex} in the
-current working directory will be used \dash\ if you want to use the installed
-default file, you will need to specify it explicitly.
-
-\section{\label{defaults}\xlabel{the_default_configuration}The Default Configuration}
-Directory \texttt{\$EXTRACTOR\_DIR/config} contains the default configuration
-files and a number of `classical' convolution masks.
+The directory \texttt{\$EXTRACTOR\_DIR/config} contains the default
+configuration files.
 
 The main `preferences' file, \texttt{default.sex} is listed in
 Appendix~\ref{default_sex}.
@@ -725,8 +671,9 @@ You will see that it uses the default convolution mask and `Neural Network
 Weights' file, and specifies that an ASCII\_HEAD-type catalogue named
 \texttt{test.cat} is to be produced.
 
-File \texttt{default.param} specifies which parameters are to be placed in the 
-catalogue. The defaults are:
+File \texttt{default.param} specifies which measurements are to be
+made of the objects (these are all written to the output
+catalogue). The defaults are:
 \begin{quote}\begin{verbatim}
 NUMBER
 X_IMAGE
@@ -745,11 +692,76 @@ ELLIPTICITY
 FLAGS
 \end{verbatim}\end{quote}
 
-For a full description of the meaning of the configuration parameters, see 
-the 
+For a full description of the meaning of the configuration parameters, see
+the
 \htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}.
 
-\section{\xlabel{some_restrictions}\label{some_restrictions}Some Restrictions}
+\section{Using images in non-NDF formats}
+If you want to read an image in one of the
+\xref{formats handled by the
+\CONVERT}{sun55}{the_default_conversion_commands} package,
+just start up \CONVERT\ before running \EXTRACTOR\ and specify the image with
+an appropriate extension. For example:
+
+\begin{quote} \begin{verbatim}
+% convert
+
+   CONVERT commands are now available -- (Version 1.1-1, 1998 June)
+
+   Defaults for automatic NDF conversion are set.
+
+   Type conhelp for help on CONVERT commands.
+   Type "showme sun55" to browse the hypertext documentation.
+
+% extract
+CONFIG - Configuration file /'$EXTRACTOR_DIR/config/default.sex'/ >
+IMAGE - Input image /'image'/ > image.fit
+\end{verbatim} \end{quote}
+will use the FITS file \texttt{image.fit}, automatically converting it to a
+temporary NDF file and then reading the temporary file.
+
+\section{Running \SExtractor}
+The native version of \SExtractor\ is also distributed with \EXTRACTOR.
+This works exclusively with FITS files but will provide the full range of
+facilities. The executable image will be installed in \texttt{\$EXTRACTOR\_DIR}.
+and it is run as described in the
+\htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}.
+
+Either put \texttt{\$EXTRACTOR\_DIR} on your \texttt{PATH} or define an alias:
+\begin{quote} \begin{verbatim}
+% alias sex $EXTRACTOR_DIR/sex
+\end{verbatim}\end{quote}
+then type:
+\begin{quote}
+\texttt{\% sex \textit{image} [-c \textit{configuration-file}]} \verb!\! \\
+\texttt{? [-\textit{Parameter1 Value1}] [-\textit{Parameter2 Value2}] ...}
+\end{quote}
+(see the
+\htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}
+for details).
+
+Note that if the \texttt{-c} option is omitted, file \texttt{default.sex} in the
+current working directory will be used \dash\ if you want to use the installed
+default file, you will need to specify it explicitly.
+
+\section{Using GAIA and \EXTRACTOR}
+The Graphical Astronomy and Image Analysis Tool (GAIA -
+\xref{SUN/214}{sun214}{}), has an interactive toolbox facility that
+uses the \EXTRACTOR\ (and \SExtractor) programs. This allows you to
+interactively adjust the detection preferences and identifies the
+objects that have been detected by drawing suitable ellipses over your
+image (in fact GAIA produced the image used on the title page of this
+document).
+
+GAIA also displays the results catalogue so you can view the
+measurements associated with each object and vice versa (i.e. you can
+select one of the displayed ellipses and view the associated
+measurements, or select a row of measurements and view the associated
+object). The catalogue interface also allows you to sort and select
+objects on the basis of their measurements.
+
+\section{\label{some_restrictions}\xlabel{some_restrictions}Some Restrictions}
+
 \SExtractor\ uses various configuration files to provide numerous processing
 options.
 Many of these options have not been tried via the \EXTRACTOR\ route so it is
@@ -761,35 +773,27 @@ is planned.
 \item Some areas which have not been implemented are:
 \begin{itemize}
  \item Bad pixel support.
- \item Propagation of anclliary data into check images.
+ \item Propagation of ancillary data into check images.
  \item The catalogue cannot be piped to STDOUT.
 \end{itemize}
 \item Some areas which have not been tried are:
 \begin{itemize}
  \item Weight images.
- \item Different measurement images (double-image mode).
- \item Catalogues other than ASCII\_SKYCAT and FITS\_LDAC.
+ \item Flag images.
 \end{itemize}
 \end{itemize}
 
 \section{References}
+Bailey J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\
+Bertin E. : MUD/165 : SExtractor V2.0 User's Guide (DRAFT).\\
 Bertin E. and Arnouts S., 1996, A\&AS 117,393\\
-Bertin E. : MUD/165 : 
-SExtractor V2.0 User's Guide (DRAFT).\\
-Lawden M.D.: \xref{SG/4}{sg4}{} : 
-ADAM \dash\ The Starlink Software Environment.\\
-Warren-Smith R.F. : \xref{SUN/33}{sun33}{} : 
-NDF \dash\ Routines for Accessing the Extensible
-N-Dimensional Data Format.\\
-Warren-Smith R.F. : \xref{SSN/20}{ssn20}{} : 
-Adding Format Conversion Facilities to the NDF Data
-Access Library.\\
-Currie M.J. \textit{et al.} : \xref{SUN/55}{sun55}{} : 
-CONVERT \dash\ A Format-conversion Package.\\
-Bailey J.A. : \xref{SG/5}{sg5}{} : 
-ICL \dash\ The Interactive Command Language for ADAM.\\
-Currie M.J. : \xref{SUN/95}{sun95}{} : 
-KAPPA \dash\ Kernel Application Package.
+Currie M.J. : \xref{SUN/95}{sun95}{} : KAPPA \dash\ Kernel Application Package.
+Currie M.J. \textit{et al.} : \xref{SUN/55}{sun55}{} : CONVERT \dash\ A Format-conversion Package.\\
+Davenhall, A.C. : \xref{SUN/190} : CURSA \dash\ Catalogue and Table Manipulation Applications.\\
+Draper, P.W. : \xref{SUN/214} : GAIA \dash\ Graphical Astronomy and Image Analysis Tool.
+Lawden M.D.: \xref{SG/4}{sg4}{} : ADAM \dash\ The Starlink Software Environment.\\
+Warren-Smith R.F. : \xref{SSN/20}{ssn20}{} : Adding Format Conversion Facilities to the NDF Data Access Library.\\
+Warren-Smith R.F. : \xref{SUN/33}{sun33}{} : NDF \dash\ Routines for Accessing the Extensible N-Dimensional Data Format.\\
 
 \newpage
 \appendix
@@ -802,17 +806,22 @@ KAPPA \dash\ Kernel Application Package.
    Extracts sources from astronomical images.
 }{
    \sstdescription{
-      \EXTRACTOR\ is a Starlink Software Environment task which will detect
-      sources in an astronomical image and build a catalogue listing them. 
-      It is based on the popular \SExtractor\ program, has very flexible 
-      configuration facilities and can handle images and catalogues in a 
-      variety of formats.
+      \EXTRACTOR\ is a program for detecting and measuring the
+      properties of all the sources on an astronomical image. It
+      offers a large range of configuration options for controlling
+      the way that objects are detected and the measurements that are
+      made of them.
 
-      The program first obtains the name of the image and the preferences 
-      file via the Starlink parameter system and reads and writes image files
-      using the Starlink NDF library, thus readily handling NDF's and opening
-      up the possibility of reading numerous other image formats via the NDF
-      library's automatic conversion facility.
+      The source measurements are written to a catalogue (which can be
+      of several different formats), so that they can be analysed
+      (possibly by a catalogue handling package like CURSA
+      -- \xref{SUN190}{sun190}{}).
+
+      \EXTRACTOR, is based on the \SExtractor\ program which is
+      described in the \SExtractor's User Guide
+      (\xref{MUD/165}{mud165}{}). Consult this about all the various
+      options that are available and for the rationale behind the
+      program.
    }
    \sstusage{
       extract image config [keywords] [name] [value]
@@ -821,44 +830,82 @@ KAPPA \dash\ Kernel Application Package.
       \sstsubsection{
          IMAGE = LITERAL (Read)
       }{
-         The name of the image file to be processed. If it is an NDF,
-         the .sdf extension must be omitted.  For other format files
-         an appropriate extension (\texttt{.fit}, \texttt{.imh} \textit{etc}.)
-         is essential. \texttt{[image]}
+        The name of the image which contains the objects you wanted
+        detected and parameterised. If you have initialised the
+        CONVERT package (see \xref{SUN/55}{sun55}{}) then you may
+        process foreign formats, such as FITS and IRAF.
+
+        Using this parameter you may give two image files. The
+        first image will be used for detection and parameterising
+        and the second will be used to actually measure the data
+        values. Using this method allows you to measure the same
+        objects many images, or two use a high signal to noise image
+        to determine the measurement regions on a low signal to noise
+        image
+
+        [global\_data\_file]
       }
       \sstsubsection{
          CONFIG = LITERAL (Read)
       }{
-         The name of the preferences file. For details of the preference
-         file contents, see \SExtractor\ documentation.
+        The name of the file that contains the many program
+        parameters (things like the threshold for object
+        detection). This is initially a file named \texttt{default.sex}
+        that can be found in the directory
+        \texttt{\$EXTRACTOR\_DIR/config}. To
+        modify the parameters used by this program, you must take a
+        copy of this file and edit it. Guidance about the values
+        that parameters can take may be found in this file as well
+        as in the associated \SExtractor\ documentation (see MUD/165).
+
+        The measurements made are determined by a list of parameters
+        in the file \\
+        \texttt{\$EXTRACTOR\_DIR/config/default.param}. Again if
+        you want measurements that are not available by default, you
+        must take a copy of this file and edit it. Remember to
+        also change \texttt{default.sex} to use this file (otherwise you
+        will continue to use the system-wide defaults).
+
+        One off modifications of parameters can be made using the
+        KEYWORDS, NAME and VALUE parameters.
+
+        [\texttt{\$EXTRACTOR\_DIR/config/default.sex}]
       }
       \sstsubsection{
          KEYWORDS = \_LOGICAL (Read)
       }{
-         Whether alternative preferences are to be given to override those
-         in the specified preferences file.
-         \texttt{[FALSE]}
+       Whether you want to enter a series of parameter names and
+       values interactively. If TRUE then the parameters NAME and
+       VALUE are used to cyclically prompt for program parameters
+       and the values you want to use. To end the cycle respond
+       with a null symbol (!)
+
+       [FALSE]
       }
       \sstsubsection{
          NAME = LITERAL (Read)
       }{
-         The name of a preferences file keyword to be overridden. If 
-         KEYWORDS is TRUE, pairs of NAME/VALUE parameters will be 
-         requested until a null value (\texttt{!}) is given.
+       The name of a preferences parameter that you want to
+       set interactively. Respond with \texttt{!} when you have no
+       more to enter.
+       [!]
       }
       \sstsubsection{
          VALUE = LITERAL (Read)
       }{
-         The alternative value for the preferences file keyword specified
-         by the corresponding NAME parameter value.
+        The value of the parameter you have just specified using the
+        NAME prompt.
+        [!]
       }
    }
 }
 \normalsize
 \newpage
-\section{\label{default_sex}\xlabel{the_default_preferences}The Default
-Preferences}
-This is a listing of \texttt{\$EXTRACTOR\_DIR/config/default.sex}, the 
+\section{\label{default_sex}
+         \xlabel{default_sex}
+         The Default Preferences}
+
+This is a listing of \texttt{\$EXTRACTOR\_DIR/config/default.sex}, the
 installed default preferences file.
 \small
 \begin{quote} \begin{verbatim}
@@ -870,77 +917,77 @@ installed default preferences file.
 
 #-------------------------------- Catalog ------------------------------------
 
-CATALOG_NAME	test.cat	# name of the output catalog
-CATALOG_TYPE	ASCII_HEAD	# "NONE","ASCII_HEAD","ASCII","FITS_1.0"
-				# or "FITS_LDAC"
+CATALOG_NAME    test.cat        # name of the output catalog
+CATALOG_TYPE    ASCII_HEAD      # "NONE","ASCII_HEAD","ASCII","FITS_1.0"
+                                # or "FITS_LDAC"
 
-PARAMETERS_NAME	$EXTRACTOR_DIR/config/default.param	
+PARAMETERS_NAME $EXTRACTOR_DIR/config/default.param
                                 # name of the file containing catalog contents
 
 #------------------------------- Extraction ----------------------------------
 
-DETECT_TYPE	CCD		# "CCD" or "PHOTO" (*)
-FLAG_IMAGE	flag.fits	# filename for an input FLAG-image
-DETECT_MINAREA	5		# minimum number of pixels above threshold
-DETECT_THRESH	1.5		# <sigmas> or <threshold>,<ZP> in mag.arcsec-2
-ANALYSIS_THRESH	1.5		# <sigmas> or <threshold>,<ZP> in mag.arcsec-2
+DETECT_TYPE     CCD             # "CCD" or "PHOTO" (*)
+FLAG_IMAGE      flag.fits       # filename for an input FLAG-image
+DETECT_MINAREA  5               # minimum number of pixels above threshold
+DETECT_THRESH   1.5             # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
+ANALYSIS_THRESH 1.5             # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
 
-FILTER		Y		# apply filter for detection ("Y" or "N")?
-FILTER_NAME	$EXTRACTOR_DIR/config/default.conv	
+FILTER          Y               # apply filter for detection ("Y" or "N")?
+FILTER_NAME     $EXTRACTOR_DIR/config/default.conv
                                 # name of the file containing the filter
 
-DEBLEND_NTHRESH	32		# Number of deblending sub-thresholds
-DEBLEND_MINCONT	0.005		# Minimum contrast parameter for deblending
+DEBLEND_NTHRESH 32              # Number of deblending sub-thresholds
+DEBLEND_MINCONT 0.005           # Minimum contrast parameter for deblending
 
-CLEAN		Y		# Clean spurious detections? (Y or N)?
-CLEAN_PARAM	1.0		# Cleaning efficiency
+CLEAN           Y               # Clean spurious detections? (Y or N)?
+CLEAN_PARAM     1.0             # Cleaning efficiency
 
-MASK_TYPE	CORRECT		# type of detection MASKing: can be one of
-				# "NONE", "BLANK" or "CORRECT"
+MASK_TYPE       CORRECT         # type of detection MASKing: can be one of
+                                # "NONE", "BLANK" or "CORRECT"
 
 #------------------------------ Photometry -----------------------------------
 
-PHOT_APERTURES	5		# MAG_APER aperture diameter(s) in pixels
-PHOT_AUTOPARAMS	2.5, 3.5	# MAG_AUTO parameters: <Kron_fact>,<min_radius>
+PHOT_APERTURES  5               # MAG_APER aperture diameter(s) in pixels
+PHOT_AUTOPARAMS 2.5, 3.5        # MAG_AUTO parameters: <Kron_fact>,<min_radius>
 
-SATUR_LEVEL	50000.0		# level (in ADUs) at which arises saturation
+SATUR_LEVEL     50000.0         # level (in ADUs) at which arises saturation
 
-MAG_ZEROPOINT	0.0		# magnitude zero-point
-MAG_GAMMA	4.0		# gamma of emulsion (for photographic scans)
-GAIN		0.0		# detector gain in e-/ADU.
-PIXEL_SCALE	1.0		# size of pixel in arcsec (0=use FITS WCS info).
+MAG_ZEROPOINT   0.0             # magnitude zero-point
+MAG_GAMMA       4.0             # gamma of emulsion (for photographic scans)
+GAIN            0.0             # detector gain in e-/ADU.
+PIXEL_SCALE     1.0             # size of pixel in arcsec (0=use FITS WCS info).
 
 #------------------------- Star/Galaxy Separation ----------------------------
 
-SEEING_FWHM	1.2		# stellar FWHM in arcsec
-STARNNW_NAME	$EXTRACTOR_DIR/config/default.nnw	
+SEEING_FWHM     1.2             # stellar FWHM in arcsec
+STARNNW_NAME    $EXTRACTOR_DIR/config/default.nnw
                                 # Neural-Network_Weight table filename
 
 #------------------------------ Background -----------------------------------
 
-BACK_SIZE	64		# Background mesh: <size> or <width>,<height>
-BACK_FILTERSIZE	3		# Background filter: <size> or <width>,<height>
+BACK_SIZE       64              # Background mesh: <size> or <width>,<height>
+BACK_FILTERSIZE 3               # Background filter: <size> or <width>,<height>
 
-BACKPHOTO_TYPE	GLOBAL		# can be "GLOBAL" or "LOCAL" (*)
-BACKPHOTO_THICK	24		# thickness of the background LOCAL annulus (*)
+BACKPHOTO_TYPE  GLOBAL          # can be "GLOBAL" or "LOCAL" (*)
+BACKPHOTO_THICK 24              # thickness of the background LOCAL annulus (*)
 
 #------------------------------ Check Image ----------------------------------
 
-CHECKIMAGE_TYPE	NONE		# can be one of "NONE", "BACKGROUND",
-				# "MINIBACKGROUND", "-BACKGROUND", "OBJECTS",
-				# "-OBJECTS", "SEGMENTATION", "APERTURES",
-				# or "FILTERED" (*)
-#CHECKIMAGE_NAME	check		# Filename for the check-image (*)
+CHECKIMAGE_TYPE NONE            # can be one of "NONE", "BACKGROUND",
+                                # "MINIBACKGROUND", "-BACKGROUND", "OBJECTS",
+                                # "-OBJECTS", "SEGMENTATION", "APERTURES",
+                                # or "FILTERED" (*)
+#CHECKIMAGE_NAME        check           # Filename for the check-image (*)
 
 #--------------------- Memory (change with caution!) -------------------------
 
-MEMORY_OBJSTACK	2000		# number of objects in stack
-MEMORY_PIXSTACK	100000		# number of pixels in stack
-MEMORY_BUFSIZE	1024		# number of lines in buffer
+MEMORY_OBJSTACK 2000            # number of objects in stack
+MEMORY_PIXSTACK 100000          # number of pixels in stack
+MEMORY_BUFSIZE  1024            # number of lines in buffer
 
 #----------------------------- Miscellaneous ---------------------------------
 
-VERBOSE_TYPE	NORMAL		# can be "QUIET", "NORMAL" or "FULL" (*)
+VERBOSE_TYPE    NORMAL          # can be "QUIET", "NORMAL" or "FULL" (*)
 
 #------------------------------- New Stuff -----------------------------------
 \end{verbatim}\end{quote}
