@@ -102,7 +102,10 @@
 *       default output file.
 
 *  Notes:
-*     Care must be taken when despiking bright sources.
+*     - Care must be taken when despiking bright sources.
+*     - If there are 3 spikes in a row and the middle spike is approximately
+*       the mean of the spikes either side, the middle spike will not be
+*       treated as a spike (and will not be changed)
 
 *  Related Applications:
 *     SURF: DESPIKE, SCUCLIP, SIGCLIP, RESTORE
@@ -113,6 +116,10 @@
 
 *    History :
 *     $Log$
+*     Revision 1.5  1997/12/22 23:57:06  timj
+*     Add note to documentation. Remove locator to SCUCD extension. Map input data
+*     after checking the data dimensions.
+*
 *     Revision 1.4  1997/12/19 03:17:05  timj
 *     Write out total number of spikes removed.
 *
@@ -171,9 +178,6 @@
                                         ! file
       CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC
                                         ! locator to SCUBA extension in input
-                                        ! file
-      CHARACTER*(DAT__SZLOC) IN_SCUCDX_LOC
-                                        ! locator to SCUCD extension in input
                                         ! file
       INTEGER      IN_VARIANCE_PTR      ! pointer to variance array in input
                                         ! file
@@ -234,7 +238,6 @@
 
       CALL NDF_XLOC (INDF, 'FITS', 'READ', IN_FITSX_LOC, STATUS)
       CALL NDF_XLOC (INDF, 'SCUBA', 'READ', IN_SCUBAX_LOC, STATUS)
-      CALL NDF_XLOC (INDF, 'SCUCD', 'READ', IN_SCUCDX_LOC, STATUS)
 
       CALL DAT_SIZE (IN_FITSX_LOC, ITEMP, STATUS)
       IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
@@ -325,15 +328,9 @@
          ABORTED = .TRUE.
       END IF
 
-*  map the various components of the data array and check the data dimensions 
+*     check the data dimensions 
 
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
-      CALL NDF_MAP (INDF, 'QUALITY', '_UBYTE', 'READ',
-     :  IN_QUALITY_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (INDF, 'DATA', '_REAL', 'READ', IN_DATA_PTR,
-     :  ITEMP, STATUS)
-      CALL NDF_MAP (INDF, 'VARIANCE', '_REAL', 'READ', IN_VARIANCE_PTR,
-     :  ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF ((NDIM .NE. 2) .OR.
@@ -351,6 +348,16 @@
 
       N_BOL = DIM (1)
       N_POS = DIM (2)
+
+*     Map the input data
+
+      CALL NDF_MAP (INDF, 'QUALITY', '_UBYTE', 'READ',
+     :  IN_QUALITY_PTR, ITEMP, STATUS)
+      CALL NDF_MAP (INDF, 'DATA', '_REAL', 'READ', IN_DATA_PTR,
+     :  ITEMP, STATUS)
+      CALL NDF_MAP (INDF, 'VARIANCE', '_REAL', 'READ', IN_VARIANCE_PTR,
+     :  ITEMP, STATUS)
+
 
 *  map the DEM_PNTR array and check its dimensions
 
@@ -464,7 +471,6 @@
       CALL CMP_UNMAP (IN_SCUBAX_LOC, 'DEM_PNTR', STATUS)
 
       CALL DAT_ANNUL (IN_SCUBAX_LOC, STATUS)
-      CALL DAT_ANNUL (IN_SCUCDX_LOC, STATUS)
 
       CALL NDF_ANNUL (INDF, STATUS)
       CALL NDF_ANNUL (OUTNDF, STATUS)
