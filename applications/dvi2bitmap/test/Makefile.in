@@ -21,14 +21,17 @@ test: regression pathtest
 regression:
 	PERLBIN=$(PERLBIN) ./runtests
 
-pathtest: ../dvi2bitmap hello.dvi
+#pathtest: ../dvi2bitmap hello.dvi
+pathtest: hello.dvi
 	sh ./test-font-gen.sh ../dvi2bitmap hello.dvi
 	touch pathtest
 
-magtest: ../dvi2bitmap magtest.dvi
+#magtest: ../dvi2bitmap magtest.dvi
+magtest: magtest.dvi
 	sh ./test-font-gen.sh ../dvi2bitmap magtest.dvi magtest-output
 
-modetest: ../dvi2bitmap modetest.dvi
+#modetest: ../dvi2bitmap modetest.dvi
+modetest: modetest.dvi
 	sh ./test-font-gen.sh ../dvi2bitmap modetest.dvi modetest-output
 
 hello.dvi: hello.tex
@@ -49,8 +52,9 @@ modetest.dvi: modetest.tex
 .cc.o:
 	$(CXX) $(CXXFLAGS) -c $<
 
-t1.run: t1.cc libdvi2bitmap.a
-	$(CXX) $(CXXFLAGS) -o $@ t1.cc -L.. -ldvi2bitmap
+%.run: %.o ../libdvi2bitmap.a
+	cd ..; $(MAKE) libdvi2bitmap.a
+	$(CXX) $(CXXFLAGS) -o $@ $< -L.. -ldvi2bitmap
 
 # For some reason, linking t2.o against the library in the parent
 # directory doesn't work, because they seem determined
@@ -58,13 +62,10 @@ t1.run: t1.cc libdvi2bitmap.a
 # some reason I am unable to fathom.  So link it against the full list
 # of object files.  libdvi2bitmap.a is therefore a phony target, here
 # to force all the parent object files to be built.
-t2.run: t2.o libdvi2bitmap.a
-	$(CXX) $(CXXFLAGS) -o $@ t2.o `ls ../*.o|sed '/dvi2bitmap/d'` $(LIBS)
+#t2.run: t2.o
+#	cd ..; $(MAKE)
+#	$(CXX) $(CXXFLAGS) -o $@ t2.o `ls ../*.o|sed '/dvi2bitmap/d'` $(LIBS)
 #	$(CXX) $(CXXFLAGS) -o $@ t2.cc -L.. -ldvi2bitmap
-
-libdvi2bitmap.a:
-	cd ..; $(MAKE) libdvi2bitmap.a
-	cp ../libdvi2bitmap.a .
 
 #dvi2bitmap.diff: ../dvi2bitmap dvi2bitmap.correct
 #	../dvi2bitmap -X >dvi2bitmap.test
@@ -81,3 +82,8 @@ libdvi2bitmap.a:
 #		FN=`echo $$f|sed -e 's+^.*/\([^.]*\).*$$+\1+' `; \
 #		sed -n "/REGRESSIONTEST/s+^.*REGRESSIONTEST:+$$FN:+p" $$f >> $@; \
 #	done
+
+clean:
+	rm -f *~ *.o *.run
+	rm -f *.log *.aux *.dvi *.pdf
+	rm -f pathtest test-output*

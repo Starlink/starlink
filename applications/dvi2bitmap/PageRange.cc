@@ -1,8 +1,29 @@
-// Part of dvi2bitmap
-// Copyright 1999, 2000 Council for the Central Laboratory of the Research Councils.
-// See file LICENCE for conditions
+//    This file is part of dvi2bitmap.
+//    Copyright 1999--2002, Council for the Central Laboratory of the Research Councils
+//    
+//    This program is part of the Starlink Software Distribution: see
+//    http://www.starlink.ac.uk 
 //
-// $Id$
+//    dvi2bitmap is free software; you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation; either version 2 of the License, or
+//    (at your option) any later version.
+//
+//    dvi2bitmap is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with dvi2bitmap; if not, write to the Free Software
+//    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+//
+//    The General Public License is distributed along with this
+//    program in the file LICENCE.
+//
+//    Author: Norman Gray <norman@astro.gla.ac.uk>
+//    $Id$
+
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -27,9 +48,10 @@ PageRange::PageRange()
 {
 }
 
-bool PageRange::addSpec (const char *type, const char *spec) 
+bool PageRange::addSpec (const char type, const char *spec) 
 {
-    //  -l pagenum The  last  page  printed will be the first one num-
+    //  'l' pagenum
+    //        The  last  page  printed will be the first one num-
     //        bered num Default is the last page in the document.
     //        If  the  num is prefixed by an equals sign, then it
     //        (and any argument to the -p option) is treated as a
@@ -38,7 +60,8 @@ bool PageRange::addSpec (const char *type, const char *spec)
     //        with the ninth page of the document, no matter what
     //        the pages are actually numbered.
     //
-    //  -p pagenum The  first  page printed will be the first one num-
+    //  'p' pagenum
+    //        The  first  page printed will be the first one num-
     //        bered num.  Default is the first page in the  docu-
     //        ment.   If  the  num is prefixed by an equals sign,
     //        then it (and any argument  to  the  -l  option)  is
@@ -47,7 +70,7 @@ bool PageRange::addSpec (const char *type, const char *spec)
     //        will  start with the third page of the document, no
     //        matter what the pages are actually numbered.
     //
-    // -pp pagelist
+    // 'P' pagelist
     //        A comma-separated list of pages  and  ranges  (a-b)
     //        may  be given, which will be interpreted as \count0
     //        values.  Pages not specified will not  be  printed.
@@ -55,17 +78,19 @@ bool PageRange::addSpec (const char *type, const char *spec)
     //        and page ranges  can  be  specified  with  one  -pp
     //        option.
     //
-    // I extend the pagelist to satisfy:
+    // Any of these specifications may be prefixed by either = or ':n:'
+    // In the former case, DVI page numbers are used rather than TeX
+    // \count registers; in the latter case, the program examines the
+    // \countn register rather than the default \count0
+    //
+    // Thus, the syntax of pagelist is extended to satisfy:
     //
     //    pagenum:  prefix* number
     //    pagelist: prefix* page-or-range [',' page-or-range]*
-    //    prefix: '=' | ':' number ','
+    //    prefix: '=' | ':' number ':'
     //    page-or-range: number | number-number
     //
     bool parseOK = true;
-
-    if (*type == '-')
-	type++;
 
     // prefix*
     for (bool readPrefix = true; readPrefix; )
@@ -81,15 +106,14 @@ bool PageRange::addSpec (const char *type, const char *spec)
 		char *endp;
 		int countnum = static_cast<int>(strtol (spec, &endp, 10));
 		spec = endp;
-		if (*spec != ',')
+		if (*spec != ':')
 		{
 		    parseOK = false;
 		    readPrefix = false;
 		}
 		else
 		{
-		    if (countnum < 0) parseOK = false;
-		    if (countnum > 9) parseOK = false;
+		    if (countnum < 0 || countnum > 9) parseOK = false;
 		    useCountNo_ = countnum;
 		    spec++;
 		}
@@ -100,15 +124,29 @@ bool PageRange::addSpec (const char *type, const char *spec)
 	}
     // now have spec pointing at first page-or-range or pagenum
 
-    if (*type == 'p')
+    switch (type)
     {
-	if (type[1] == 'p')	// -pp option
+      case 'p':
+	if (rangeType_ == ranges)
+	{
+	    if (verbosity_ >= normal)
+		std::cerr << "Inconsistent range specs\n";
+	    parseOK = false;
+	}
+	else
+	{
+	    first_ = atoi (spec);
+	    rangeType_ = oneRange;
+	}
+	break;
+
+      case 'P':
 	{
 	    if (rangeType_ == oneRange)
 		parseOK = false;
 	    else
 		rangeType_ = ranges;
-
+	
 	    char *endp;
 	    int p1=0, p2;
 	    endp = const_cast<char*>(spec);
@@ -145,23 +183,9 @@ bool PageRange::addSpec (const char *type, const char *spec)
 		// spec at next char
 	    }
 	}
-	else			// -p option
-	{
-	    if (rangeType_ == ranges)
-	    {
-		if (verbosity_ >= normal)
-		    std::cerr << "Inconsistent range specs\n";
-		parseOK = false;
-	    }
-	    else
-	    {
-		first_ = atoi (spec);
-		rangeType_ = oneRange;
-	    }
-	}
-    }
-    else if (*type == 'l')
-    {
+	break;
+
+      case 'l':
 	if (rangeType_ == ranges)
 	{
 	    if (verbosity_ >= normal)
@@ -173,13 +197,17 @@ bool PageRange::addSpec (const char *type, const char *spec)
 	    last_ = atoi (spec);
 	    rangeType_ = oneRange;
 	}
-    }
-    else
+
+      default:
 	parseOK = false;
+    }
 
     return parseOK;
 }
 
+// Returns true if the specified page is to be included.  pagenum is a
+// page-sequence number, counting pages from the beginning of the DVI
+// file; count[0-9] is the array of TeX \count0-9 registers.
 bool PageRange::isSelected (const int pagenum, const int* count)
 {
     bool rval;

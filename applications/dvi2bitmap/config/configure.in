@@ -11,6 +11,9 @@ AC_REVISION($Revision$)dnl
 AC_INIT
 AC_CONFIG_SRCDIR([dvi2bitmap.cc])
 
+dnl   The syntax in here is for autoconf 2.50 and later
+AC_PREREQ(2.50)
+
 dnl   Use a config file (the list of settings is getting too long)
 AC_CONFIG_HEADER(config.h)
 
@@ -19,6 +22,7 @@ AC_CONFIG_AUX_DIR(config)
 
 dnl   Checks for programs.
 AC_PROG_CXX
+AC_PROG_CC
 AC_PROG_RANLIB
 
 dnl   use C++ to compile test programs
@@ -63,10 +67,17 @@ dnl   Check if we've got sstream.  If not, we'll assume we have the older
 dnl   strstream
 AC_CHECK_HEADERS(sstream)
 
-dnl   Checks for library functions (...nor these)
-dnl AC_FUNC_VPRINTF
-dnl AC_CHECK_FUNCS(strerror)
-AC_CHECK_FUNCS(popen)
+dnl   Checks for library functions
+AC_CHECK_FUNCS(popen getopt)
+
+dnl We don't have to worry about getopt.h, getopt{,1}.c, since they can always
+dnl be unconditionally compiled and linked.  See
+dnl http://mail.gnu.org/archive/html/autoconf/2000-12/msg00049.html
+dnl and surrounding thread for discussion.  But following may help --
+dnl see magic within getopt.h
+AC_CHECK_DECLS([getopt])
+AC_SUBST(GETOPT_LONG_OBJ)
+AC_REPLACE_FUNCS(getopt_long)
 
 dnl   What type of system are we on?
 dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with 

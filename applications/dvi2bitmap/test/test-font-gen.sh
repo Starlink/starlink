@@ -44,8 +44,8 @@ if [ -z "$KPW" ]; then
 fi
 
 # Force the output filename, and set what file we expect to be generated
-opfmt="-o $opfroot-%d"
-defaultftype=`$d2bpath -Qt -nn | awk '/^Qt/{print $2}'`
+opfmt="--output=$opfroot-%d"
+defaultftype=`$d2bpath --query=types --process=options-only | awk '/^Qtypes/{print $2}'`
 opfname="$opfroot-1.$defaultftype"
 rm -f $opfname
 
@@ -55,7 +55,7 @@ postline='^^^^^^^^^^^^^^^^^^^^'
 # Find out what was enabled in dvi2bitmap,
 # by parsing the output with the -V option
 #eval `$d2bpath -V | sed -n '/^ENABLE/s/  */=/p'`
-eval `$d2bpath -V | sed -n 's/^\([A-Z_][A-Z_]*\)  *\(.*\)$/D2B_\1=\"\2\"/p'`
+eval `$d2bpath --version | sed -n 's/^\([A-Z_][A-Z_]*\)  *\(.*\)$/D2B_\1=\"\2\"/p'`
 
 if [ -n "$D2B_FONT_GEN_TEMPLATE" ]; then
     echo "Font generation ... enabled"
@@ -99,20 +99,21 @@ else
 	echo "use of the kpathsea library, or else it is not available."
 	echo
 	echo "You therefore MUST set the environment variable"
-	echo "DVI2BITMAP_PK_PATH (or use the -fp option), if dvi2bitmap"
-	echo "is to find the fonts it asks the system to generate."
+	echo "DVI2BITMAP_PK_PATH (or use the --font-search=path option),"
+	echo "if dvi2bitmap is to find the fonts it asks the system"
+	echo "to generate."
 	echo
 	echo "I will now try to generate the fonts required for the test file."
 	echo "This might be redundant, but it won't be wrong."
 	echo $preline
-	echo "% $d2bpath -Qg -n $infile -q | sed -n '/^Qg/s/^Qg *//p' | sh"
-	$d2bpath -Qg -n $infile -q | \
-	    sed -n '/^Qg/s/^Qg *//p' | \
+	echo "% $d2bpath --query=missing-fontgen -n $infile --verbose=quiet | sed -n '/^Qmissing-fontgen/s/^Qmissing-fontgen *//p' | sh"
+	$d2bpath --query=missing-fontgen -n $infile --verbose=quiet | \
+	    sed -n '/^Qmissing-fontgen/s/^Qmissing-fontgen *//p' | \
 	    sh
 	echo $postline
 
 	# Get just the first fontname, in case there's more than one
-	fontname=`$d2bpath -QF -n $infile -q | \
+	fontname=`$d2bpath -QF -n --verbose=quiet $infile | \
 	    awk '/^Q[fF]/{printf "%s.%spk",$2,$3; exit}'`
 	echo
 	echo "Looking for font $fontname..."
@@ -143,8 +144,8 @@ else
 	echo
 	echo "Trying to convert the test file...."
 	echo $preline
-	echo "% $d2bpath $opfmt -fp $d2bpkpath/%f.%dpk $infile"
-	$d2bpath $opfmt -fp $d2bpkpath/%f.%dpk $infile
+	echo "% $d2bpath $opfmt --font-search=path=$d2bpkpath/%f.%dpk $infile"
+	$d2bpath $opfmt --font-search=path=$d2bpkpath/%f.%dpk $infile
 	d2bstatus=$?
 	echo $postline
 	
@@ -162,7 +163,7 @@ else
 	    awk '{printf "%s.%spk\n", $2, $3}' $tfile
 	    echo "Then point dvi2bitmap to the directory containing"
 	    echo "those fonts, using either the environment variable"
-	    echo "DVI2BITMAP_PK_PATH, or the -fp option."
+	    echo "DVI2BITMAP_PK_PATH, or the --font-search=path option."
 	    rm -f $tfile
 	    exit 1
 	else

@@ -1,8 +1,29 @@
-# part of dvi2bitmap
-# Copyright 1999, 2000, 2001 Council for the Central Laboratory of the Research Councils.
-# See file LICENCE for conditions.
+#    This file is part of dvi2bitmap.
+#    Copyright 1999--2002, Council for the Central Laboratory of the Research Councils
+#    
+#    This program is part of the Starlink Software Distribution: see
+#    http://www.starlink.ac.uk 
 #
-# $Id$
+#    dvi2bitmap is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    dvi2bitmap is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with dvi2bitmap; if not, write to the Free Software
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#    The General Public License is distributed along with this
+#    program in the file LICENCE.
+#
+#    Author: Norman Gray <norman@astro.gla.ac.uk>
+#    $Id$
+
 
 # C++ all-warnings flags:
 #  g++ -Wall  (GNU)
@@ -13,16 +34,19 @@ CPPFLAGS=@CPPFLAGS@
 CXX=@CXX@
 CXXFLAGS=@CXXFLAGS@ $(CPPFLAGS) $(DEFS)
 CXXMM=@CXXMM@
+CC=@CC@
 LIBS=-lm @LIBS@
 KPATHSEA_OBJ=@KPATHSEAOBJ@
 PNG_OBJ=@PNGOBJ@
 GIF_OBJ=@GIFOBJ@
 RANLIB=@RANLIB@
+LIBOBJS=@LIBOBJS@
 
 EXEC=dvi2bitmap
-OBJS=DviFile.o InputByteStream.o PkFont.o Bitmap.o \
+CXXOBJS=DviFile.o InputByteStream.o PkFont.o Bitmap.o \
 	BitmapImage.o XBMBitmap.o XPMBitmap.o PageRange.o Util.o DviError.o \
 	$(KPATHSEA_OBJ) $(PNG_OBJ) $(GIF_OBJ)
+OBJS=$(CXXOBJS) $(LIBOBJS)
 
 D2BLIB=libdvi2bitmap.a
 
@@ -30,9 +54,15 @@ D2BLIB=libdvi2bitmap.a
 .SUFFIXES: .o .cc
 .cc.o:
 	$(CXX) $(CXXFLAGS) -c $<
+.c.o:
+	$(CC) $(CPPFLAGS) $(DEFS) -c $<
 
 $(EXEC): dvi2bitmap.o $(OBJS)
 	$(CXX) dvi2bitmap.o $(OBJS) $(LIBS) -o $@
+
+#getopt.o: getopt.c
+#getopt1.o: getopt1.c
+getopt_long.o: getopt_long.c
 
 # Make a library of all the (OBJS) files.  We don't use this in this
 # makefile (partly because it's not necessary, but mostly because I
@@ -49,7 +79,7 @@ configure: config/configure.in
 	chmod 755 configure
 
 dvi2bitmap.mantext: dvi2bitmap.1
-	nroff -man dvi2bitmap.1 >dvi2bitmap.mantext
+	tbl dvi2bitmap.1 | nroff -man >dvi2bitmap.mantext
 
 dvi2bitmap_source.tar: configure dvi2bitmap.mantext
 	echo "Packaging up dvi2bitmap version" `cat VERSION`
@@ -111,6 +141,7 @@ clean: tidy
 	rm -f dvi2bitmap.tar.Z dvi2bitmap_source.tar
 	rm -f config.log config.status
 	cd doc; $(MAKE) clean
+	cd test; $(MAKE) clean
 
 
 # simpledeps_ and deps_ are maintenance targets used by configure.
@@ -130,8 +161,11 @@ deps_:
 	@ if test -z "$(CXXMM)"; then \
 		$(MAKE) simpledeps_; \
 	else \
-		for c in dvi2bitmap.cc `echo $(OBJS) | sed 's/\.o/\.cc/g'`; do \
+		for c in dvi2bitmap.cc `echo $(CXXOBJS) | sed 's/\.o/\.cc/g'`; do \
 			$(CXX) $(CPPFLAGS) $(DEFS) $(CXXMM) $$c >> Makefile; \
+		done; \
+		for c in `echo $(CCOBJS) | sed 's/\.o/\.c/g'`; do \
+			$(CC) $(CPPFLAGS) -I. $(DEFS) $(CXXMM) $$c >> Makefile; \
 		done; \
 	fi
 

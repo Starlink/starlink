@@ -1,31 +1,76 @@
-<!--
-<subsect id=rn-0.10 export>Release 0.10???
+<subsect id=rn-0.10 export>Release 0.10b1
+
+<p><code>dvi2bitmap</code> is now GPLed!
+
+<p>Option processing has completely changed, with long options added, and
+the short options reorganised.  The following table highlights
+important changes, where there is a straightforward mapping.
+<tabular>
+<tgroup cols=2>
+<thead>
+<row><entry>old</entry><entry>new</code></entry><entry>Note</entry></row>
+<tbody>
+<row><entry><code>-bh</code></entry><entry><code>-h, --height</code></entry></row>
+<row><entry><code>-bw</code></entry><entry><code>-w, --width</code></entry></row>
+<row><entry><code>-bp</code></entry><entry><code>-t, --paper-size</code></entry></row>
+<row><entry><code>-C, -c</code></entry><entry><code>-c, --crop</code></entry></row>
+<row><entry><code>-fp</code></entry><entry><code>-F, --font-search</code></entry><entry>(1)</entry></row>
+<row><entry><code>-fm</code></entry><entry><code>-M, --font-mode</code></entry></row>
+<row><entry><code>-fg, -fG</code></entry><entry><code>-G, --font-gen</code></entry></row>
+<row><entry><code>-g</code></entry><entry><code>-g, --debug</code></entry></row>
+<row><entry><code>-m</code></entry><entry><code>-m, --magnification</code></entry></row>
+<row><entry><code>-n</code></entry><entry><code>-n, --preamble-only</code></entry><entry>(2)</entry></row>
+<row><entry><code>-l</code></entry><entry><code>-l, --end-page</code></entry></row>
+<row><entry><code>-p</code></entry><entry><code>-p, --start-page</code></entry></row>
+<row><entry><code>-pp</code></entry><entry><code>-P, --page-range</code></entry><entry>(3)</entry></row>
+<row><entry><code>-o</code></entry><entry><code>-o, --output</code></entry></row>
+<row><entry><code>-P:-X, --process</code></entry><entry><code>extra syntax</code></entry></row>
+<row><entry><code>-q</code></entry><entry><code>-v, --verbose</code></entry></row>
+<row><entry><code>-Q</code></entry><entry><code>-Q, --query</code></entry></row>
+<row><entry><code>-r</code></entry><entry><code>-r, --resolution</code></entry></row>
+<row><entry><code>-R:-R, --colours</code></entry><entry><code>extra syntax</code></entry></row>
+<row><entry><code>-s</code></entry><entry><code>-s, --scalefactor</code></entry></row>
+<row><entry><code>-t</code></entry><entry><code>-T, --output-type</code></entry></row>
+<row><entry><code>-V</code></entry><entry><code>-V, --version</code></entry></row>
+</tbody>
+</tabular>
+
+<p>Note 1: this is now more flexible.  Old <code>-fp mypath</code> is
+now <code>--font-search=path=mypath</code></p>
+
+<p>Note 2: <code>-n</code> is (conventional) shorthand for
+<code>--process=preamble-only</code></p>
+
+<p>Note 3: page-selection syntax has changed.</p>
 
 <p>Slight changes in functionality (enough that scripts might
 break):
 <ul>
 
-<li>Options <code/-fg> and <code/-fG> have swapped functions (so that
-<code/-fG> switches off font-generation).  This is to be consistent
-with the <code/-P> option.
-<li>Option <code/-nf> has disappeared, since it was redundant with
-(new) <code/-fG>.
-<li>Option <code/-nn> has been added.  It's necessary since, for
-consistency, option <code/-Qt> no longer automatically exits.
+<li>For consistency, <em>none</em> of the query options
+<code>--query</code> now automatially exit.
 
 </ul>
 
-<p>Changes in the configure script
+<p>Font searching can now be done by a script specified either at
+compile time, or as the argument to the
+<code>--font-search=command=...</code> option.  This frees you from
+dependence on the <code>kpathsea</code> library, without being
+therefore obliged to specify an explicity font path.
+
+<p>Changes in the configure script:
 <ul>
+
 <li>Configure option <code>&ddash;enable-png</code> has turned into
 <code>&ddash;with-png</code> for consistency with
 <code>&ddash;with-kpathsea</code>, since part of this option's purpose
 is to indicate the possibly non-standard location of the
 <code>libpng</code> library.</li>
 
+<li>Addition of <code>--with-fontfinder</code> option.
+
 </ul>
 </p>
--->
 
 <subsect id=rn-0.9-7p1 export>Release 0.9-7p1
 
