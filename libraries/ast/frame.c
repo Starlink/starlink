@@ -35,7 +35,6 @@ f     AST_FRAME
 *     Frame also has the following attributes:
 *
 *     - Bottom(axis): Lowest axis value to display
-*     - Direction(axis): Display axis in conventional direction?
 *     - Digits/Digits(axis): Number of digits of precision
 *     - Direction(axis): Display axis in conventional direction?
 *     - Domain: Coordinate system domain
@@ -7650,7 +7649,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
          dval = astGetBottom( this, invperm[ axis ] );
 
 /* Show the value if it is zero. */
-         helpful = ( ival != -DBL_MAX );
+         helpful = ( dval != -DBL_MAX );
          (void) sprintf( key, "Bot%d", axis + 1 );
          astWriteDouble( channel, key, 0, helpful, dval, "Lowest legal axis value");
       }
@@ -7662,7 +7661,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
          dval = astGetTop( this, invperm[ axis ] );
 
 /* Show the value if it is zero. */
-         helpful = ( ival != DBL_MAX );
+         helpful = ( dval != DBL_MAX );
          (void) sprintf( key, "Top%d", axis + 1 );
          astWriteDouble( channel, key, 0, helpful, dval, "Highest legal axis value");
       }
