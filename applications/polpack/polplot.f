@@ -220,7 +220,7 @@
 *        bottom, right, top, left. If fewer than four values are given, 
 *        extra values are used equal to the first supplied value. If these 
 *        margins are too narrow any axis annotation may be clipped. The
-*        dynamic default is 0.18 (for all edges) if annotated axes are being 
+*        dynamic default is 0.22 (for all edges) if annotated axes are being 
 *        produced, and zero otherwise. See also parameter KEYPOS. []
 *     NEGATE = _LOGICAL (Read)
 *        If a TRUE value is supplied, then the angles giving the
@@ -769,7 +769,7 @@
 
 *  Set the dynamic defaults for MARGIN.
       IF( AXES ) THEN
-         CALL PAR_DEF1R( 'MARGIN', 1, 0.18, STATUS )
+         CALL PAR_DEF1R( 'MARGIN', 1, 0.22, STATUS )
       ELSE
          CALL PAR_DEF1R( 'MARGIN', 1, 0.0, STATUS )
       END IF
