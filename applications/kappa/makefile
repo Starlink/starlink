@@ -1575,10 +1575,9 @@ install:
 #  Install the public scripts, giving them world execute permission.
 	for f in $(PUBLIC_SCRIPTS) ""; do \
            if test -n "$$f"; then \
-              cp -p $$f $(INSTALL_BIN);\
+              sed -e s#STAR_BIN#$(STAR_BIN)# \
+                 $$f >$(INSTALL_BIN)/$$f;\
               chmod 755 $(INSTALL_BIN)/$$f;\
-              rm -f $$f;\
-              $(LINK) $(INSTALL_BIN)/$$f $$f;\
            else :; fi;\
         done
 #
@@ -1908,8 +1907,6 @@ do_deinstall:
 #  Deinstall the public script files, if installed versions exist.
 	- for f in $(PUBLIC_SCRIPTS) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
-              rm -f $$f;\
-              cp -p $(INSTALL_BIN)/$$f .;\
               rm -f $(INSTALL_BIN)/$$f;\
            else :; fi;\
         done
