@@ -104,14 +104,18 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      INTEGER			FID			! File object
       INTEGER			OARG			! Method output
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Get the file object
+      CALL ADI_GETFILE( ID, FID, STATUS )
+
 *  Invoke the method
-      CALL ADI_EXEC( 'FileTrace', 1, ID, OARG, STATUS )
+      CALL ADI_EXEC( 'FileTrace', 1, FID, OARG, STATUS )
 
 *  Extract data from the returned object
       CALL ADI_CGET0C( OARG, 'File', FILE, STATUS )

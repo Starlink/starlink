@@ -133,9 +133,9 @@
 
 *            Do an HDS trace on the object
               IF ( DS(CODE).ADIFPN ) THEN
-                CALL HDS_TRACE( PLOC, LEVELS, PATH, FILE, STATUS )
-              ELSE
                 CALL ADI_FTRACE( PID, LEVELS, PATH, FILE, STATUS )
+              ELSE
+                CALL HDS_TRACE( PLOC, LEVELS, PATH, FILE, STATUS )
               END IF
               IF ( STATUS .NE. SAI__OK ) GOTO 99
                 USE = USE + 1
