@@ -85,16 +85,14 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'GCI_CMN'					! GCI globals
-*        GCI_INIT = LOGICAL (given and returned)
-*           GCI definitions load attempted?
+      INCLUDE 'AST_PKG'
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
       EXTERNAL			ADI_REQPKG
 *.
 
@@ -102,13 +100,13 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check not already initialised?
-      IF ( .NOT. GCI_INIT ) THEN
+      IF ( .NOT. AST_QPKGI( GCI__PKG ) ) THEN
 
 *    Load the ADI classes
         CALL ADI_REQPKG( 'gencal', STATUS )
 
 *    Now initialised
-	GCI_INIT = .TRUE.
+        CALL AST_SPKGI( GCI__PKG )
 
       END IF
 
