@@ -1,0 +1,93 @@
+#  Name:
+#     POLZCONV.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 2001 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-FEB-2001 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface POLZCONV
+
+   helplib        'POLPACK_HELP:'
+
+   parameter      CAT
+      position    1
+      type        LITERAL
+      ppath       'GLOBAL'
+      association '<-GLOBAL.CATALOGUE'
+      prompt      'Input catalogue'
+      helpkey     '*'
+   endparameter
+
+   parameter      COLX
+      type        LITERAL
+      ppath       'DYNAMIC'
+      vpath       'DYNAMIC'
+      prompt      'Name of catalogue column holding vector X position'
+      helpkey     '*'
+   endparameter
+
+   parameter      COLY
+      type        LITERAL
+      ppath       'DYNAMIC'
+      vpath       'DYNAMIC'
+      prompt      'Name of catalogue column holding vector Y position'
+      helpkey     '*'
+   endparameter
+
+   parameter      COLZ
+      type        LITERAL
+      ppath       'DYNAMIC,DEFAULT'
+      vpath       'DYNAMIC,DEFAULT'
+      default     !
+      prompt      'Name of catalogue column holding vector Z position'
+      helpkey     '*'
+   endparameter
+
+   parameter      ZAXVAL
+      type        'LITERAL'
+      prompt      'The Z axis value to plot'
+      ppath       'CURRENT'
+      helpkey     '*'
+   endparameter
+
+   parameter      ZCOLVAL
+      type        'LITERAL'
+      prompt      'The Z column value to plot'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     !
+      helpkey     '*'
+   endparameter
+
+   parameter      ZAXUSE
+      type        LITERAL 
+      access      WRITE
+      vpath       'DEFAULT'
+      default     'A default string'
+      prompt      'The Z axis value to use'
+      helpkey     '*'
+   endparameter
+
+   parameter      ZCOLUSE
+      type        LITERAL 
+      access      WRITE
+      vpath       'DEFAULT'
+      default     'A default string'
+      prompt      'The Z column value to use'
+      helpkey     '*'
+   endparameter
+
+endinterface
