@@ -421,7 +421,7 @@ numerical types. The \emph{actual} routines names will not include the trailing
   \begin{rawhtml} 
     <SCRIPT LANGUAGE=JavaScript>
        self.name="MAIN";
-       var w = open( "./search.html", "SEARCH", "width=700,height=500" );
+       var w = open( "./search.html", "SEARCH", "status,width=700,height=500" );
        w.oldurl = self.location;
        w.loaded = false;
        w.onload = function(){ w.loaded = true; }
