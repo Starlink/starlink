@@ -21,6 +21,7 @@
       integer len
 	character*(*) card
       save
+
          call smark (sp)
          call salloc (cp, 161 , 2)
          rp=cp
@@ -29,7 +30,7 @@
 111         rp=rp+1
             goto 110
 112      continue
-         ua = ((((im+713 )-1)*2+1))
+         ua = ((((im+713)-1)*2+1))
          start = ua
          n = 0
          rp=ua
@@ -46,10 +47,13 @@
 121         rp=rp+1
             goto 120
 122      continue
+       
          len = endc - start
+
          call amovc (memc(start), memc(cp), len)
          call f77pak ( memc(cp), card, 161 )
          call sfree(cp)
          call sfree (sp)
+        
 100      return
       end
