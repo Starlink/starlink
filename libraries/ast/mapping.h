@@ -264,7 +264,20 @@ typedef struct AstMappingVtab {
    int (* GetTranForward)( AstMapping * );
    int (* GetTranInverse)( AstMapping * );
    int (* MapMerge)( AstMapping *, int, int, int *, AstMapping ***, int ** );
-   int (* Resample)( AstMapping *, int, const int *, const int *, const double *, AstInterpolate, double, int, double, int, const int *, const int *, const int *, const int *, double * );
+#define astRESAMPLE_VTAB_ENTRY(abbrev,type) \
+   int (* Resample##abbrev)( AstMapping *, int, const int *, const int *, const type *, AstInterpolate, double, int, type, int, const int *, const int *, const int *, const int *, type * );
+astRESAMPLE_VTAB_ENTRY(LD,long double)
+astRESAMPLE_VTAB_ENTRY(D,double)
+astRESAMPLE_VTAB_ENTRY(F,float)
+astRESAMPLE_VTAB_ENTRY(L,long int)
+astRESAMPLE_VTAB_ENTRY(UL,unsigned long int)
+astRESAMPLE_VTAB_ENTRY(I,int)
+astRESAMPLE_VTAB_ENTRY(UI,unsigned int)
+astRESAMPLE_VTAB_ENTRY(S,short int)
+astRESAMPLE_VTAB_ENTRY(US,unsigned short int)
+astRESAMPLE_VTAB_ENTRY(B,signed char)
+astRESAMPLE_VTAB_ENTRY(UB,unsigned char)
+#undef astRESAMPLE_VTAB_ENTRY
    int (* TestInvert)( AstMapping * );
    int (* TestReport)( AstMapping * );
    void (* ClearInvert)( AstMapping * );
@@ -305,7 +318,20 @@ AstMapping *astLoadMapping_( void *, size_t, int, AstMappingVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 AstMapping *astSimplify_( AstMapping * );
-int astResample_( AstMapping *, int, const int *, const int *, const double *, AstInterpolate, double, int, double, int, const int *, const int *, const int *, const int *, double * );
+#define astRESAMPLE_PROTOTYPE(abbrev,type) \
+int astResample##abbrev##_( AstMapping *, int, const int *, const int *, const type *, AstInterpolate, double, int, type, int, const int *, const int *, const int *, const int *, type * );
+astRESAMPLE_PROTOTYPE(LD,long double)
+astRESAMPLE_PROTOTYPE(D,double)
+astRESAMPLE_PROTOTYPE(F,float)
+astRESAMPLE_PROTOTYPE(L,long int)
+astRESAMPLE_PROTOTYPE(UL,unsigned long int)
+astRESAMPLE_PROTOTYPE(I,int)
+astRESAMPLE_PROTOTYPE(UI,unsigned int)
+astRESAMPLE_PROTOTYPE(S,short int)
+astRESAMPLE_PROTOTYPE(US,unsigned short int)
+astRESAMPLE_PROTOTYPE(B,signed char)
+astRESAMPLE_PROTOTYPE(UB,unsigned char)
+#undef astRESAMPLE_PROTOTYPE
 void astInvert_( AstMapping * );
 void astTran1_( AstMapping *, int, const double [], int, double [] );
 void astTran2_( AstMapping *, int, const double [], const double [], int, double [], double [] );
@@ -375,8 +401,28 @@ astINVOKE(O,astLoadMapping_(mem,size,init,vtab,name,astCheckChannel(channel)))
    pointer to the wrong sort of object is supplied. */
 #define astInvert(this) \
 astINVOKE(V,astInvert_(astCheckMapping(this)))
-#define astResample(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
-astINVOKE(V,astResample_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method, acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
+#define astResampleLD(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
+astINVOKE(V,astResampleLD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method, acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
+#define astResampleD(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
+astINVOKE(V,astResampleD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method, acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
+#define astResampleF(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
+astINVOKE(V,astResampleF_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method, acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
+#define astResampleL(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
+astINVOKE(V,astResampleL_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method, acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
+#define astResampleUL(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
+astINVOKE(V,astResampleUL_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method, acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
+#define astResampleI(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
+astINVOKE(V,astResampleI_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method, acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
+#define astResampleUI(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
+astINVOKE(V,astResampleUI_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method, acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
+#define astResampleS(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
+astINVOKE(V,astResampleS_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method, acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
+#define astResampleUS(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
+astINVOKE(V,astResampleUS_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method, acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
+#define astResampleB(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
+astINVOKE(V,astResampleB_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method, acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
+#define astResampleUB(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
+astINVOKE(V,astResampleUB_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method, acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
 #define astSimplify(this) astINVOKE(O,astSimplify_(astCheckMapping(this)))
 #define astTran1(this,npoint,xin,forward,xout) \
 astINVOKE(V,astTran1_(astCheckMapping(this),npoint,xin,forward,xout))

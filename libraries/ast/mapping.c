@@ -186,254 +186,436 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
 /* Member functions. */
 /* ================= */
 #if REBIN
-static int InterpolatePixelNearest( int ndim, const int *lbnd, const int *ubnd,
-                                    const double *in,
-                                    int npoint, const int *offset,
-                                    double *coord,
-                                    int usebad, double badflag, double *out ) {
-   int point;
-   int bad;
-   int s;
-   int *stride;
-   int pixel;
-   double x;
-   int ix;
-   int result;
-   int dim;
+typedef enum DataType {
+   LDOUBLE,
+   DOUBLE,
+   FLOAT,
+   LONG,
+   ULONG,
+   INT,
+   UINT,
+   SHORT,
+   USHORT,
+   BYTE,
+   UBYTE
+} DataType;
 
-   result = 0;
-   if ( !astOK ) return result;
-printf( "nearest\n" );
-
-   stride = astMalloc( sizeof( int ) * (size_t) ndim );
-   
-/* Calculate the input pixel stride for each dimension. */
-   if ( astOK ) {
-      s = 1;
-      for ( dim = 0; dim < ndim; dim++ ) {
-         stride[ dim ] = s;
-         s *= ubnd[ dim ] - lbnd[ dim ] + 1;
-      }
-
-/* Loop through the output points (i.e. pixel centres). */
-      for ( point = 0; point < npoint; point++ ) {
-
-/* Initialise the offset into the input image. Then examine each
-   coordinate from the corresponding input point in turn. */
-        pixel = 0;
-        for ( dim = 0; dim < ndim; dim++ ) {
-           x = coord[ dim * npoint + point ];
-
-/* Test if the coordinate lies outside the input image, or is bad. If
-   either is true, the corresponding output pixel value will be bad,
-   so quit. */
-           bad = ( x < ( ( (double) lbnd[ dim ] ) ) - 0.5 ) ||
-                 ( x > ( ( (double) ubnd[ dim ] ) ) + 0.5 ) ||
-                 ( x == AST__BAD );
-           if ( bad ) break;
-
-/* Obtain the index along the current input image dimension of the
-   pixel which contains the input point. */
-           ix = (int) floor( x + 0.5 );
-
-/* Accumulate this pixel's offset (in pixels) from the start of the
-   input image. */
-           pixel += ( ix - lbnd[ dim ] ) * stride[ dim ];
-        }
-        bad = bad || ( ( in[ pixel ] == badflag ) && usebad );
-       
-        if ( bad ) {
-           out[ offset[ point ] ] = badflag;
-           result++;
-
-        } else {
-           out[ offset[ point ] ] = in[ pixel ];
-        }
-      }
-   }
-   stride = astFree( stride );
-   if ( !astOK ) result = 0;
-   return result;
+#define MAKE_INTERPOLATE_PIXEL_NEAREST(abbrev,type) \
+static int InterpolatePixelNearest##abbrev( int ndim, \
+                                            const int *lbnd, const int *ubnd, \
+                                            const type *in, \
+                                            int npoint, const int *offset, \
+                                            double *coord, \
+                                            int usebad, double badflag, \
+                                            type *out ) { \
+\
+/* Local Variables: */ \
+   double *xn_max;               /* Pointer to upper limits array (n-d) */ \
+   double *xn_min;               /* Pointer to lower limits array (n-d) */ \
+   double x;                     /* x coordinate value */ \
+   double xmax;                  /* x upper limit */ \
+   double xmin;                  /* x lower limit */ \
+   double xn;                    /* Coordinate value (n-d) */ \
+   double y;                     /* y coordinate value */ \
+   double ymax;                  /* y upper limit */ \
+   double ymin;                  /* y lower limit */ \
+   int *stride;                  /* Pointer to array of dimension strides */ \
+   int bad;                      /* Output pixel bad? */ \
+   int idim;                     /* Loop counter for dimensions */ \
+   int ix;                       /* Number of pixel offset in x direction */ \
+   int ixn;                      /* Number of pixels offset (n-d) */ \
+   int iy;                       /* Number of pixel offset in y directyion */ \
+   int off_in;                   /* Pixel offset into input array */ \
+   int point;                    /* Loop counter for output points */ \
+   int result;                   /* Returned result value */ \
+   int s;                        /* Temporary variable for strides */ \
+   int ystride;                  /* Stride along input array y direction */ \
+\
+/* Initialise. */ \
+   result = 0; \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return result; \
+\
+/* Handle the 1-dimensional case optimally. */ \
+/* ---------------------------------------- */ \
+   if ( ndim == 1 ) { \
+\
+/* Calculate the coordinate limits of the input array. */ \
+      xmin = ( (double) lbnd[ 0 ] ) - 0.5; \
+      xmax = ( (double) ubnd[ 0 ] ) + 0.5; \
+\
+/* Loop through the list of output points. */ \
+      for ( point = 0; point < npoint; point++ ) { \
+\
+/* Obtain the x coordinate of the current point and test if it lies \
+   outside the input image, or is bad. */ \
+         x = coord[ point ]; \
+         bad = ( x < xmin ) || ( x > xmax ) || ( x == AST__BAD ); \
+         if ( !bad ) { \
+\
+/* If not, then obtain the offset within the input image of the pixel \
+   which contains the current point. */ \
+            off_in = ( (int) floor( x + 0.5 ) ) - lbnd[ 0 ]; \
+\
+/* If necessary, test if the input pixel is bad. */ \
+            bad = ( in[ off_in ] == badflag ) && usebad; \
+         } \
+\
+/* If the output pixel is not bad, obtain its value from the input \
+   image. */ \
+         if ( !bad ) { \
+            out[ offset[ point ] ] = in[ off_in ]; \
+\
+/* Otherwise, assign a bad output pixel and count it. */ \
+         } else { \
+            out[ offset[ point ] ] = badflag; \
+            result++; \
+         } \
+      } \
+\
+/* Handle the 2-dimensional case optimally. */ \
+/* ---------------------------------------- */ \
+   } else if ( ndim == 2 ) { \
+\
+/* Calculate the input array stride along the y direction. */ \
+      ystride = ubnd[ 0 ] - lbnd[ 0 ] + 1; \
+\
+/* Calculate the coordinate limits of the input array in each \
+   dimension. */ \
+      xmin = ( (double) lbnd[ 0 ] ) - 0.5; \
+      xmax = ( (double) ubnd[ 0 ] ) + 0.5; \
+      ymin = ( (double) lbnd[ 1 ] ) - 0.5; \
+      ymax = ( (double) ubnd[ 1 ] ) + 0.5; \
+\
+/* Loop through the list of output points. */ \
+      for ( point = 0; point < npoint; point++ ) { \
+\
+/* Obtain the x coordinate of the current point and test if it lies \
+   outside the input image, or is bad. */ \
+         x = coord[ point ]; \
+         bad = ( x < xmin ) || ( x > xmax ) || ( x == AST__BAD ); \
+         if ( !bad ) { \
+\
+/* If not, then similarly obtain and test the y coordinate. */ \
+            y = coord[ npoint + point ]; \
+            bad = ( y < ymin ) || ( y > ymax ) || ( y == AST__BAD ); \
+            if ( !bad ) { \
+\
+/* Obtain the offsets along each input image dimension of the input \
+   pixel which contains the current point. */ \
+               ix = ( (int) floor( x + 0.5 ) ) - lbnd[ 0 ]; \
+               iy = ( (int) floor( y + 0.5 ) ) - lbnd[ 1 ]; \
+\
+/* Accumulate this pixel's offset from the start of the input \
+   array. */ \
+               off_in = iy * ystride + ix; \
+\
+/* If necessary, test if the input pixel is bad. */ \
+               bad = ( in[ off_in ] == badflag ) && usebad; \
+            } \
+         } \
+\
+/* If the output pixel is not bad, obtain its value from the input \
+   image. */ \
+         if ( !bad ) { \
+            out[ offset[ point ] ] = in[ off_in ]; \
+\
+/* Otherwise, assign a bad output pixel and count it. */ \
+         } else { \
+            out[ offset[ point ] ] = badflag; \
+            result++; \
+         } \
+      } \
+\
+/* Handle other numbers of dimensions. */ \
+/* ----------------------------------- */ \
+   } else { \
+\
+/* Allocate workspace. */ \
+      stride = astMalloc( sizeof( int ) * (size_t) ndim ); \
+      xn_max = astMalloc( sizeof( double ) * (size_t) ndim ); \
+      xn_min = astMalloc( sizeof( double ) * (size_t) ndim ); \
+      if ( astOK ) { \
+\
+/* Calculate the input array stride along each dimension. */ \
+         for ( s = 1, idim = 0; idim < ndim; idim++ ) { \
+            stride[ idim ] = s; \
+            s *= ubnd[ idim ] - lbnd[ idim ] + 1; \
+\
+/* Calculate the coordinate limits of the input array in each \
+   dimension. */ \
+            xn_min[ idim ] = ( (double) lbnd[ idim ] ) - 0.5; \
+            xn_max[ idim ] = ( (double) ubnd[ idim ] ) + 0.5; \
+         } \
+\
+/* Loop through the list of output points. */ \
+         for ( point = 0; point < npoint; point++ ) { \
+\
+/* Initialise the offset into the input image. Then loop to obtain \
+   each coordinate of the current output point. */ \
+            off_in = 0; \
+            for ( idim = 0; idim < ndim; idim++ ) { \
+               xn = coord[ idim * npoint + point ]; \
+\
+/* Test if the coordinate lies outside the input image, or is bad.  If \
+   either is true, the corresponding output pixel value will be bad, \
+   so give up on this point. */ \
+               bad = ( xn < xn_min[ idim ] ) || ( xn > xn_max[ idim ] ) || \
+                     ( xn == AST__BAD ); \
+               if ( bad ) break; \
+\
+/* Obtain the offset along the current input image dimension of the \
+   input pixel which contains the current point. */ \
+               ixn = ( (int) floor( xn + 0.5 ) ) - lbnd[ idim ]; \
+\
+/* Accumulate this pixel's offset from the start of the input \
+   array. */ \
+               off_in += ixn * stride[ idim ]; \
+            } \
+\
+/* Once the required input pixel has been located, test if it is bad \
+   if necessary. */ \
+            bad = bad || ( ( in[ off_in ] == badflag ) && usebad ); \
+\
+/* If the output pixel is not bad, obtain its value from the input \
+   image. */ \
+            if ( !bad ) { \
+               out[ offset[ point ] ] = in[ off_in ]; \
+\
+/* Otherwise, assign a bad output pixel and count it. */ \
+            } else { \
+               out[ offset[ point ] ] = badflag; \
+               result++; \
+            } \
+         } \
+      } \
+\
+/* Free workspace. */ \
+      stride = astFree( stride ); \
+      xn_max = astFree( xn_max ); \
+      xn_min = astFree( xn_min ); \
+   } \
+\
+/* If an error has occurred, clear the returned result. */ \
+   if ( !astOK ) result = 0; \
+\
+/* Return the result. */ \
+   return result; \
 }
+MAKE_INTERPOLATE_PIXEL_NEAREST(LD,long double)
+MAKE_INTERPOLATE_PIXEL_NEAREST(D,double)
+MAKE_INTERPOLATE_PIXEL_NEAREST(F,float)
+MAKE_INTERPOLATE_PIXEL_NEAREST(L,long int)
+MAKE_INTERPOLATE_PIXEL_NEAREST(UL,unsigned long int)
+MAKE_INTERPOLATE_PIXEL_NEAREST(I,int)
+MAKE_INTERPOLATE_PIXEL_NEAREST(UI,unsigned int)
+MAKE_INTERPOLATE_PIXEL_NEAREST(S,short int)
+MAKE_INTERPOLATE_PIXEL_NEAREST(US,unsigned short int)
+MAKE_INTERPOLATE_PIXEL_NEAREST(B,signed char)
+MAKE_INTERPOLATE_PIXEL_NEAREST(UB,unsigned char)
+#undef MAKE_INTERPOLATE_PIXEL_NEAREST
 
-static int InterpolatePixelLinear( int ndim,
-                                    const int *lbnd, const int *ubnd,
-                                    const double *in,
-                                    int npoint, const int *offset,
-                                    double *coord,
-                                    int usebad, double badflag, double *out ) {
-   int point;
-   int bad;
-   int s;
-   int *stride;
-   int dim;
-   int pixel;
-   double x;
-   double dx;
-   int *lo;
-   int *hi;
-   int ix;
-   int *idim;
-   int off;
-   double *frac_lo;
-   double *frac_hi;
-   double *wt;
-   double sum;
-   double wtsum;
-   int done;
-   double pixwt;
-   int result;
-
-   result = 0;
-   if ( !astOK ) return result;
-printf( "linear\n" );
-
-/* Allocate workspace. */
-   frac_hi = astMalloc( sizeof( double ) * (size_t) ndim );
-   frac_lo = astMalloc( sizeof( double ) * (size_t) ndim );
-   hi = astMalloc( sizeof( int ) * (size_t) ndim );
-   idim = astMalloc( sizeof( int ) * (size_t) ndim );
-   lo = astMalloc( sizeof( int ) * (size_t) ndim );
-   stride = astMalloc( sizeof( int ) * (size_t) ndim );
-   wt = astMalloc( sizeof( double ) * (size_t) ndim );
-
-/* Calculate the input pixel stride for each dimension. */
-   if ( astOK ) {
-      s = 1;
-      for ( dim = 0; dim < ndim; dim++ ) {
-         stride[ dim ] = s;
-         s *= ubnd[ dim ] - lbnd[ dim ] + 1;
-      }
-
-/* Loop through the output points (i.e. pixel centres). */
-      for ( point = 0; point < npoint; point++ ) {
-
-/* Initialise the offset into the input image. Then examine each
-   coordinate from the corresponding input point in turn. */
-         pixel = 0;
-         off = 0;
-         for ( dim = 0; dim < ndim; dim++ ) {
-            x = coord[ dim * npoint + point ];
-
-/* Test if the coordinate lies outside the input image, or is bad. If
-   either is true, the corresponding output pixel value will be bad,
-   so quit. */
-            bad = ( x < ( ( (double) lbnd[ dim ] ) ) - 0.5 ) ||
-                  ( x > ( ( (double) ubnd[ dim ] ) ) + 0.5 ) ||
-                  ( x == AST__BAD );
-            if ( bad ) break;
-
-/* Obtain the index along the current input image dimension of the
-   pixel which contains the input point. */
-            ix = (int) floor( x + 0.5 );
-
-/* Accumulate this pixel's offset (in pixels) from the start of the
-   input image. */
-            pixel += ( ix - lbnd[ dim ] ) * stride[ dim ];
-
-/* Calculate the offset of the input position from the pixel's centre. */
-            dx = x - (double) ix;
-
-/* Test if the position lies below (or on) the pixel's centre. */
-            if ( dx <= 0.0 ) {
-
-/* If so, obtain the offsets from the start of the image (due to
-   displacement along the current dimension) of the two pixels which
-   will contribute to the output value. If necessary, restrict the
-   pixel with the lower index to ensure it does not lie outside the
-   input image. */
-               hi[ dim ] = ix;
-               frac_hi[ dim ] = 1.0 + dx;
-               if ( ix > lbnd[ dim ] ) {
-                  lo[ dim ] = ix - 1;
-                  frac_lo[ dim ] = -dx;
-               } else {
-                  lo[ dim ] = hi[ dim ];
-                  frac_lo[ dim ] = frac_hi[ dim ];
-               }
-               
-/* If the input position lies above the pixel's centre, repeat the
-   above process, this time restricting the pixel with the larger
-   index if necessary. */
-            } else {
-               lo[ dim ] = ix;
-               frac_lo[ dim ] = 1.0 - dx;
-               if ( ix < ubnd[ dim ] ) {
-                  hi[ dim ] = ix + 1;
-                  frac_hi[ dim ] = dx;
-               } else {
-                  hi[ dim ] = lo[ dim ];
-                  frac_hi[ dim ] = frac_lo[ dim ];
-               }
-            }
-
-/* Store the lower index involved in interpolation along each
-   dimension and accumulate the offset from the start of the image of
-   the pixel which has these indices. */
-
-            idim[ dim ] = lo[ dim ];
-            off += ( lo[ dim ] - lbnd[ dim ] ) * stride[ dim ];
-
-/* Also store the fractional weight associated with the lower pixel
-   along each dimension. */
-            wt[ dim ] = frac_lo[ dim ];
-         }
-
-         bad = bad || ( ( in[ pixel ] == badflag ) && usebad );
-       
-         if ( bad ) {
-            out[ offset[ point ] ] = badflag;
-            result++;
-
-         } else {
-            done = 0;
-            sum = 0.0;
-            wtsum = 0.0;
-            while ( !done ) {
-               if ( ( in[ off ] != badflag ) || !usebad ) {
-                  for ( pixwt = 1.0, dim = 0; dim < ndim; dim++ ) {
-                     pixwt *= wt[ dim ];
-                  }
-                  sum += in[ off ] * pixwt;
-                  wtsum += pixwt;
-               }
-               dim = 0;
-               while ( !done ) {
-                  if ( idim[ dim ] != hi[ dim ] ) {
-                     idim[ dim ] = hi[ dim ];
-                     off += stride[ dim ];
-                     wt[ dim ] = frac_hi[ dim ];
-                     break;
-                  } else {
-                     idim[ dim ] = lo[ dim ];
-                     off -= stride[ dim ];
-                     wt[ dim ] = frac_lo[ dim ];
-                     done = ( ++dim == ndim );
-                  }
-               }
-            }
-            out[ offset[ point ] ] = sum / wtsum;
-         }
-      }
-   }
-   frac_hi = astFree( frac_hi );
-   frac_lo = astFree( frac_lo );
-   hi = astFree( hi );
-   idim = astFree( idim );
-   lo = astFree( lo );
-   stride = astFree( stride );
-   wt = astFree( wt );
-   if ( !astOK ) result = 0;
-   return result;
+#define MAKE_INTERPOLATE_PIXEL_LINEAR(abbrev,type,is_flt,flt_type) \
+static int InterpolatePixelLinear##abbrev( int ndim, \
+                                           const int *lbnd, const int *ubnd, \
+                                           const type *in, \
+                                           int npoint, const int *offset, \
+                                           double *coord, \
+                                           int usebad, type badflag, \
+                                           type *out ) { \
+   double *frac_hi; \
+   double *frac_lo; \
+   double *wt; \
+   double dx; \
+   double pixwt; \
+   double x; \
+   flt_type sum; \
+   flt_type val; \
+   flt_type wtsum; \
+   int *hi; \
+   int *idim; \
+   int *lo; \
+   int *stride; \
+   int bad; \
+   int dim; \
+   int done; \
+   int ix; \
+   int off; \
+   int pixel; \
+   int point; \
+   int result; \
+   int s; \
+ \
+   result = 0; \
+   if ( !astOK ) return result; \
+ \
+/* Allocate workspace. */ \
+   frac_hi = astMalloc( sizeof( double ) * (size_t) ndim ); \
+   frac_lo = astMalloc( sizeof( double ) * (size_t) ndim ); \
+   hi = astMalloc( sizeof( int ) * (size_t) ndim ); \
+   idim = astMalloc( sizeof( int ) * (size_t) ndim ); \
+   lo = astMalloc( sizeof( int ) * (size_t) ndim ); \
+   stride = astMalloc( sizeof( int ) * (size_t) ndim ); \
+   wt = astMalloc( sizeof( double ) * (size_t) ndim ); \
+ \
+/* Calculate the input pixel stride for each dimension. */ \
+   if ( astOK ) { \
+      s = 1; \
+      for ( dim = 0; dim < ndim; dim++ ) { \
+         stride[ dim ] = s; \
+         s *= ubnd[ dim ] - lbnd[ dim ] + 1; \
+      } \
+ \
+/* Loop through the output points (i.e. pixel centres). */ \
+      for ( point = 0; point < npoint; point++ ) { \
+ \
+/* Initialise the offset into the input image. Then examine each \
+   coordinate from the corresponding input point in turn. */ \
+         pixel = 0; \
+         off = 0; \
+         for ( dim = 0; dim < ndim; dim++ ) { \
+            x = coord[ dim * npoint + point ]; \
+ \
+/* Test if the coordinate lies outside the input image, or is bad. If \
+   either is true, the corresponding output pixel value will be bad, \
+   so quit. */ \
+            bad = ( x < ( ( (double) lbnd[ dim ] ) ) - 0.5 ) || \
+                  ( x > ( ( (double) ubnd[ dim ] ) ) + 0.5 ) || \
+                  ( x == AST__BAD ); \
+            if ( bad ) break; \
+ \
+/* Obtain the index along the current input image dimension of the \
+   pixel which contains the input point. */ \
+            ix = (int) floor( x + 0.5 ); \
+ \
+/* Accumulate this pixel's offset (in pixels) from the start of the \
+   input image. */ \
+            pixel += ( ix - lbnd[ dim ] ) * stride[ dim ]; \
+ \
+/* Calculate the offset of the input position from the pixel's centre. */ \
+            dx = x - (double) ix; \
+ \
+/* Test if the position lies below (or on) the pixel's centre. */ \
+            if ( dx <= 0.0 ) { \
+ \
+/* If so, obtain the offsets from the start of the image (due to \
+   displacement along the current dimension) of the two pixels which \
+   will contribute to the output value. If necessary, restrict the \
+   pixel with the lower index to ensure it does not lie outside the \
+   input image. */ \
+               hi[ dim ] = ix; \
+               frac_hi[ dim ] = 1.0 + dx; \
+               if ( ix > lbnd[ dim ] ) { \
+                  lo[ dim ] = ix - 1; \
+                  frac_lo[ dim ] = -dx; \
+               } else { \
+                  lo[ dim ] = hi[ dim ]; \
+                  frac_lo[ dim ] = frac_hi[ dim ]; \
+               } \
+                \
+/* If the input position lies above the pixel's centre, repeat the \
+   above process, this time restricting the pixel with the larger \
+   index if necessary. */ \
+            } else { \
+               lo[ dim ] = ix; \
+               frac_lo[ dim ] = 1.0 - dx; \
+               if ( ix < ubnd[ dim ] ) { \
+                  hi[ dim ] = ix + 1; \
+                  frac_hi[ dim ] = dx; \
+               } else { \
+                  hi[ dim ] = lo[ dim ]; \
+                  frac_hi[ dim ] = frac_lo[ dim ]; \
+               } \
+            } \
+ \
+/* Store the lower index involved in interpolation along each \
+   dimension and accumulate the offset from the start of the image of \
+   the pixel which has these indices. */ \
+ \
+            idim[ dim ] = lo[ dim ]; \
+            off += ( lo[ dim ] - lbnd[ dim ] ) * stride[ dim ]; \
+ \
+/* Also store the fractional weight associated with the lower pixel \
+   along each dimension. */ \
+            wt[ dim ] = frac_lo[ dim ]; \
+         } \
+ \
+         bad = bad || ( ( in[ pixel ] == badflag ) && usebad ); \
+        \
+         if ( bad ) { \
+            out[ offset[ point ] ] = badflag; \
+            result++; \
+ \
+         } else { \
+            done = 0; \
+            sum = (flt_type) 0.0; \
+            wtsum = (flt_type) 0.0; \
+            while ( !done ) { \
+               if ( ( in[ off ] != badflag ) || !usebad ) { \
+                  for ( pixwt = 1.0, dim = 0; dim < ndim; dim++ ) { \
+                     pixwt *= wt[ dim ]; \
+                  } \
+                  sum += ( (flt_type) pixwt ) * ( (flt_type) in[ off ] ); \
+                  wtsum += pixwt; \
+               } \
+               dim = 0; \
+               while ( !done ) { \
+                  if ( idim[ dim ] != hi[ dim ] ) { \
+                     idim[ dim ] = hi[ dim ]; \
+                     off += stride[ dim ]; \
+                     wt[ dim ] = frac_hi[ dim ]; \
+                     break; \
+                  } else { \
+                     idim[ dim ] = lo[ dim ]; \
+                     off -= stride[ dim ]; \
+                     wt[ dim ] = frac_lo[ dim ]; \
+                     done = ( ++dim == ndim ); \
+                  } \
+               } \
+            } \
+            if ( is_flt ) { \
+               out[ offset[ point ] ] = (type) ( sum / wtsum ); \
+            } else { \
+               val = sum / wtsum; \
+               out[ offset[ point ] ] = \
+                  (type) ( val + ( ( val > (flt_type) 0.0 ) ? \
+                                   ( (flt_type) 0.5 ) : \
+                                   ( (flt_type) -0.5 ) ) ); \
+            } \
+         } \
+      } \
+   } \
+   frac_hi = astFree( frac_hi ); \
+   frac_lo = astFree( frac_lo ); \
+   hi = astFree( hi ); \
+   idim = astFree( idim ); \
+   lo = astFree( lo ); \
+   stride = astFree( stride ); \
+   wt = astFree( wt ); \
+   if ( !astOK ) result = 0; \
+   return result; \
 }
+MAKE_INTERPOLATE_PIXEL_LINEAR(LD,long double,1,long double)
+MAKE_INTERPOLATE_PIXEL_LINEAR(D,double,1,double)
+MAKE_INTERPOLATE_PIXEL_LINEAR(F,float,1,float)
+MAKE_INTERPOLATE_PIXEL_LINEAR(L,long int,0,long double)
+MAKE_INTERPOLATE_PIXEL_LINEAR(UL,unsigned long int,0,long double)
+MAKE_INTERPOLATE_PIXEL_LINEAR(I,int,0,double)
+MAKE_INTERPOLATE_PIXEL_LINEAR(UI,unsigned int,0,double)
+MAKE_INTERPOLATE_PIXEL_LINEAR(S,short int,0,float)
+MAKE_INTERPOLATE_PIXEL_LINEAR(US,unsigned short int,0,float)
+MAKE_INTERPOLATE_PIXEL_LINEAR(B,signed char,0,float)
+MAKE_INTERPOLATE_PIXEL_LINEAR(UB,unsigned char,0,float)
+#undef MAKE_INTERPOLATE_PIXEL_LINEAR
 
-static int ResampleSection( AstMapping *this, const double *linear,
+static int ResampleSection( AstMapping *this, const double *linear_fit,
                       int ndim_in, const int *lbnd_in, const int *ubnd_in,
-                      const double *in,
+                      const void *in, DataType type,
                       AstInterpolate method,
-                      int usebad, double badflag,
+                      int usebad, const void *badflag_ptr,
                       int ndim_out, const int *lbnd_out, const int *ubnd_out,
-                      const int *lbnd, const int *ubnd, double *out ) {
+                      const int *lbnd, const int *ubnd, void *out ) {
    int npoint;
    int idim;
    int *offset;
@@ -448,6 +630,12 @@ static int ResampleSection( AstMapping *this, const double *linear,
    int off;
    int s;
    int result;
+   const double *zero;
+   const double *grad;
+   int a1;
+   int a2;
+   int g1;
+   int g2;
 
    result = 0;
    if ( !astOK ) return result;
@@ -469,7 +657,60 @@ static int ResampleSection( AstMapping *this, const double *linear,
       off += ( dim[ idim ] - lbnd_out[ idim ] ) * stride[ idim ];
    }
 
-   if ( !linear ) {
+   if ( linear_fit ) {
+      double *accum;
+      int coord_in;
+      int coord_out;
+      int ndim_in = astGetNin( this );
+      int nd1;
+      zero = linear_fit;
+      grad = linear_fit + ndim_out;
+      pset_in = astPointSet( npoint, ndim_in, "" );
+      ptr_in = astGetPoints( pset_in );
+      accum = astMalloc( sizeof( double ) *
+                         (size_t) ( ndim_in * ( ndim_out + 1 ) ) );
+      nd1 = ndim_out + 1;
+      for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+         a1 = coord_in * nd1;
+         g1 = coord_in * ndim_out;
+         accum[ a1 + ndim_out ] = 0.0;
+         for ( coord_out = ndim_out - 1; coord_out >= 0; coord_out-- ) {
+            a2 = a1 + coord_out;
+            g2 = g1 + coord_out;
+            accum[ a2 ] = accum[ a2 + 1 ] + grad[ g2 ] *
+                                        (double) lbnd[ coord_out ];
+         }
+      }
+
+      for ( done = 0, point = 0; !done; point++ ) {
+         for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+            ptr_in[ coord_in ][ point ] = accum[ coord_in * nd1 ];
+         }
+         offset[ point ] = off;
+         coord_out = 0;
+         do {
+            if ( dim[ coord_out ] < ubnd[ coord_out ] ) {
+               dim[ coord_out ]++;
+               off += stride[ coord_out ];
+               break;
+            } else {
+               dim[ coord_out ] = lbnd[ coord_out ];
+               off -= ( ubnd[ coord_out ] - lbnd[ coord_out ] ) * stride[ coord_out ];
+               done = ( ++coord_out == ndim_out );
+            }
+         } while ( !done );
+         for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+            a1 = coord_in * nd1;
+            g1 = coord_in * ndim_out;
+            for ( idim = coord_out; idim >= 0; idim-- ) {
+               a2 = a1 + idim;
+               g2 = g1 + idim;
+               accum[ a2 ] = accum[ a2 + 1 ] + dim[ idim ] * grad[ g2 ];
+            }
+         }
+      }
+      accum = astFree( accum );
+   } else {
       pset_out = astPointSet( npoint, ndim_out, "" );
       ptr_out = astGetPoints( pset_out );
       for ( done = 0, point = 0; !done; point++ ) {
@@ -493,53 +734,69 @@ static int ResampleSection( AstMapping *this, const double *linear,
       pset_in = astTransform( this, pset_out, 0, NULL );
       ptr_in = astGetPoints( pset_in );
       pset_out = astAnnul( pset_out );
-   } else {
-      int coord_in;
-      int coord_out;
-      int ndim_in = astGetNin( this );
-      const double *zero = linear + ndim_in * ndim_out;
-      pset_in = astPointSet( npoint, ndim_in, "" );
-      ptr_in = astGetPoints( pset_in );
-
-      for ( done = 0, point = 0; !done; point++ ) {
-         for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
-            double y = zero[ coord_in ];
-            for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-               double x = (double) dim[ coord_out ];
-               double x0 = 0.5 * (double) ( lbnd[ coord_out ] +
-                                            ubnd[ coord_out ] );
-               y += linear[ coord_in + ndim_in * coord_out ] * ( x - x0 );
-            }
-            ptr_in[ coord_in ][ point ] = y;
-         }
-         offset[ point ] = off;
-         idim = 0;
-         while ( !done ) {
-            if ( dim[ idim ] < ubnd[ idim ] ) {
-               dim[ idim ]++;
-               off += stride[ idim ];
-               break;
-            } else {
-               dim[ idim ] = lbnd[ idim ];
-               off -= ( ubnd[ idim ] - lbnd[ idim ] ) * stride[ idim ];
-               done = ( ++idim == ndim_out );
-            }
-         }
-      }
    }
    if ( astOK ) {
       if ( method == AST__NEAREST ) {
-         result = InterpolatePixelNearest( ndim_in, lbnd_in, ubnd_in, in,
-                                           npoint, offset, ptr_in[ 0 ],
-                                           usebad, badflag, out );
+
+#define CASE(name,abbrev,type) \
+            case ( name ): \
+               result = \
+               InterpolatePixelNearest##abbrev( ndim_in, lbnd_in, ubnd_in, \
+                                                (type *) in, npoint, offset, \
+                                                ptr_in[ 0 ], usebad, \
+                                                *( (type *) badflag_ptr ), \
+                                                (type *) out ); \
+               break;
+       
+         switch ( type ) {
+            CASE(LDOUBLE,LD,long double)
+            CASE(DOUBLE,D,double)
+            CASE(FLOAT,F,float)
+            CASE(LONG,L,long int)
+            CASE(ULONG,UL,unsigned long int)
+            CASE(INT,I,int)
+            CASE(UINT,UI,unsigned int)
+            CASE(SHORT,S,short int)
+            CASE(USHORT,US,unsigned short int)
+            CASE(BYTE,B,signed char)
+            CASE(UBYTE,UB,unsigned char)
+         }
+#undef CASE
+               
       } else if ( method == AST__LINEAR ) {
-         result = InterpolatePixelLinear( ndim_in, lbnd_in, ubnd_in, in,
-                                          npoint, offset, ptr_in[ 0 ],
-                                          usebad, badflag, out );
+
+#define CASE(name,abbrev,type) \
+            case ( name ): \
+               result = \
+               InterpolatePixelLinear##abbrev( ndim_in, lbnd_in, ubnd_in,\
+                                               (type *) in, npoint, offset, \
+                                               ptr_in[ 0 ], usebad, \
+                                               *( (type *) badflag_ptr ), \
+                                               (type *) out ); \
+               break;
+
+         switch ( type ) {
+            CASE(LDOUBLE,LD,long double)
+            CASE(DOUBLE,D,double)
+            CASE(FLOAT,F,float)
+            CASE(LONG,L,long int)
+            CASE(ULONG,UL,unsigned long int)
+            CASE(INT,I,int)
+            CASE(UINT,UI,unsigned int)
+            CASE(SHORT,S,short int)
+            CASE(USHORT,US,unsigned short int)
+            CASE(BYTE,B,signed char)
+            CASE(UBYTE,UB,unsigned char)
+         }
+#undef CASE
+
       } else {
-         result = ( *method )( ndim_in, lbnd_in, ubnd_in, in,
+         result = ( *method )( ndim_in, lbnd_in, ubnd_in,
+                               (double *) in,
                                npoint, offset, ptr_in[ 0 ],
-                               usebad, badflag, out );
+                               usebad,
+                               *( (double *) badflag_ptr ),
+                               (double *) out );
       }
    }
    dim = astFree( dim );
@@ -565,7 +822,7 @@ static double *TestIfLinear( AstMapping *this,
    double **ptr_inb;
    double **ptr_outa;
    double **ptr_outb;
-   double *grad;
+   double *fit;
    double z;
    double diff;
    double err;
@@ -590,13 +847,16 @@ static double *TestIfLinear( AstMapping *this,
    double out2;
    double outdiff;
    double *zero;
+   int ii;
+   double *grad;
 
    ndim_in = astGetNin( this );
    ndim_out = astGetNout( this );
    linear = 1;
 
-   grad = astMalloc( sizeof( double ) * (size_t) ( ( ndim_in + 1 ) * ndim_out ) );
-   zero = grad + ndim_in * ndim_out;
+   fit = astMalloc( sizeof( double ) * (size_t) ( ( ndim_in + 1 ) * ndim_out ) );
+   zero = fit;
+   grad = fit + ndim_out;
    limit = astMalloc( sizeof( int ) * (size_t) ndim_out );
    pset_outa = astPointSet( 2 * ndim_out, ndim_out, "" );
    ptr_outa = astGetPoints( pset_outa );
@@ -620,6 +880,7 @@ static double *TestIfLinear( AstMapping *this,
    if ( astOK ) {
 
 /* Calculate gradients and zero points assuming a linear transformation. */
+      ii = 0;
       for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
          z = 0.0;
          for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
@@ -636,14 +897,20 @@ static double *TestIfLinear( AstMapping *this,
             z += ( in1 + in2 );
             outdiff = out2 - out1;
             if ( outdiff != 0.0 ) {
-               grad[ coord_in + ndim_in * coord_out ] = ( in2 - in1 ) /
-                                                        outdiff;
+               grad[ ii++ ] = ( in2 - in1 ) / outdiff;
             } else {
-               grad[ coord_in + ndim_in * coord_out ] = 0.0;
+               grad[ ii++ ] = 0.0;
             }
          }
          if ( !linear ) break;
          zero[ coord_in ] = z / (double) ( 2 * ndim_out );
+      }
+      ii = 0;
+      for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+            x0 = 0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+            zero[ coord_in ] -= grad[ ii++ ] * x0;
+         }
       }
    }
 
@@ -710,6 +977,7 @@ static double *TestIfLinear( AstMapping *this,
 /* Apply the linear transformation to each test point. */
       for ( point = 0; point < npoint; point++ ) {
          err = 0.0;
+         ii = 0;
          for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
             y = zero[ coord_in ];
             for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
@@ -718,22 +986,15 @@ static double *TestIfLinear( AstMapping *this,
                   linear = 0;
                   break;
                }
-               x0 = 0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
-               y += grad[ coord_in + ndim_in * coord_out ] * ( x - x0 );
+               y += grad[ ii++ ] * x;
             }
             if ( !linear ) break;
-printf( "%g ", y );
 
 /* Test if the maximum difference is significant. */
             diff = ( y - ptr_inb[ coord_in ][ point ] );
             err += diff * diff;
          }
          if ( !linear ) break;
-printf( "\n" );
-for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
-   printf( "%g ", ptr_inb[ coord_in ][ point ] );
-}
-printf( ", err = %g\n", sqrt( err ) );
          if ( sqrt( err ) > acc ) {
             linear = 0;
             break;
@@ -743,18 +1004,17 @@ printf( ", err = %g\n", sqrt( err ) );
    pset_ina = astAnnul( pset_ina );
    pset_outa = astAnnul( pset_outa );
    limit = astFree( limit );
-printf( "linear = %d\n", linear );
-   if ( ! linear || !astOK ) grad = astFree( grad );
-   return grad;
+   if ( ! linear || !astOK ) fit = astFree( fit );
+   return fit;
 }
                          
 static int ResampleBlock( AstMapping *this, const double *linear,
                       int ndim_in, const int *lbnd_in, const int *ubnd_in,
-                      const double *in,
+                      const void *in, DataType type,
                       AstInterpolate method, double acc,
-                      int usebad, double badflag,
+                      int usebad, const void *badflag_ptr,
                       int ndim_out, const int *lbnd_out, const int *ubnd_out,
-                      const int *lbnd, const int *ubnd, double *out ) {
+                      const int *lbnd, const int *ubnd, void *out ) {
 
    int *lbnd_sect;
    int *ubnd_sect;
@@ -803,7 +1063,7 @@ static int ResampleBlock( AstMapping *this, const double *linear,
       lbnd_sect[ idim ] = lbnd[ idim ];
       ubnd_sect[ idim ] = Min( lbnd[ idim ] + step[ idim ] - 1, ubnd[ idim ] );
    }
-#if 1
+#if 0
    npix = 1;
    for ( idim = 0; idim < ndim_out ; idim++ ) {
       printf( "%d ", step[ idim ] );
@@ -814,7 +1074,7 @@ static int ResampleBlock( AstMapping *this, const double *linear,
 #endif
    done = 0;
    while ( !done ) {
-#if 1
+#if 0
       {
          int i;
          for ( i = 0; i < ndim_out; i++ ) {
@@ -824,9 +1084,10 @@ static int ResampleBlock( AstMapping *this, const double *linear,
          printf( "\n" );
       }
 #endif
-      result += ResampleSection( this, linear, ndim_in, lbnd_in, ubnd_in, in,
-                                 method,
-                            usebad, badflag,
+      result += ResampleSection( this, linear, ndim_in, lbnd_in, ubnd_in,
+                                 in,
+                                 type, method,
+                            usebad, badflag_ptr,
                             ndim_out, lbnd_out, ubnd_out,
                             lbnd_sect, ubnd_sect, out );
       idim = 0;
@@ -853,32 +1114,100 @@ static int ResampleBlock( AstMapping *this, const double *linear,
    return result;
 }
 
-static int Resample( AstMapping *this,
-                      int ndim_in, const int *lbnd_in, const int *ubnd_in,
-                      const double *in,
-                      AstInterpolate method, double acc,
-                      int usebad, double badflag,
-                      int ndim_out, const int *lbnd_out, const int *ubnd_out,
-                      const int *lbnd, const int *ubnd, double *out ) {
-   double *linear;
-   int result;
-
-   result = 0;
-   if ( !astOK ) return result;
-
-   linear = TestIfLinear( this, lbnd, ubnd, acc );
-
-
-   result = ResampleBlock( this, linear,
-                           ndim_in, lbnd_in, ubnd_in, in,
-                           method, acc,
-                           usebad, badflag,
-                           ndim_out, lbnd_out, ubnd_out,
-                           lbnd, ubnd, out );
-   if ( linear ) linear = astFree( linear );
-   if ( !astOK ) result = 0;
-   return result;
+#define MAKE_RESAMPLE(name,abbrev,type) \
+static int Resample##abbrev( AstMapping *this, int ndim_in, \
+                             const int *lbnd_in, const int *ubnd_in, \
+                             const type *in, AstInterpolate method, double acc, \
+                             int usebad, type badflag, int ndim_out, \
+                             const int *lbnd_out, const int *ubnd_out, \
+                             const int *lbnd, const int *ubnd, type *out ) { \
+   double *linear_fit; \
+   int result; \
+   int npix; \
+   int mxdim; \
+   int coord_out; \
+   int dim; \
+   int divide; \
+   int toobig; \
+   int toosmall; \
+   int dimx; \
+ \
+   result = 0; \
+   if ( !astOK ) return result; \
+ \
+   npix = 1; \
+   mxdim = 0; \
+   dimx = 1; \
+   for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) { \
+      dim = ubnd[ coord_out ] - lbnd[ coord_out ] + 1; \
+      npix *= dim; \
+      if ( dim > mxdim ) { \
+         mxdim = dim; \
+         dimx = coord_out; \
+      } \
+   } \
+    \
+   toosmall = npix <= 100; \
+   toobig = mxdim > 50; \
+ \
+   linear_fit = NULL; \
+   if ( toosmall ) { \
+      divide = 0; \
+   } else if ( toobig ) { \
+      divide = 1; \
+   } else { \
+     linear_fit = TestIfLinear( this, lbnd, ubnd, acc ); \
+     divide = !linear_fit; \
+   } \
+   if ( astOK ) { \
+      if ( !divide ) { \
+         result += ResampleBlock( this, linear_fit, \
+                                  ndim_in, lbnd_in, ubnd_in, \
+                                  (void *) in, name, \
+                                  method, acc, \
+                                  usebad, (void *) &badflag, \
+                                  ndim_out, lbnd_out, ubnd_out, \
+                                  lbnd, ubnd, (void *) out ); \
+      } else { \
+         int lo[ 100 ]; \
+         int hi[ 100 ]; \
+         int tmp; \
+         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) { \
+            lo[ coord_out ] = lbnd[ coord_out ]; \
+            hi[ coord_out ] = ubnd[ coord_out ]; \
+         } \
+         tmp = hi[ dimx ]; \
+         hi[ dimx ] = ( ubnd[ dimx ] + lbnd[ dimx ] ) / 2; \
+         result += Resample##abbrev( this, ndim_in, lbnd_in, ubnd_in, in, \
+                             method, acc, \
+                             usebad, badflag, \
+                             ndim_out, lbnd_out, ubnd_out, \
+                             lo, hi, out ); \
+         lo[ dimx ] = hi[ dimx ] + 1; \
+         hi[ dimx ] = tmp; \
+         result += Resample##abbrev( this, ndim_in, lbnd_in, ubnd_in, in, \
+                             method, acc, \
+                             usebad, badflag, \
+                             ndim_out, lbnd_out, ubnd_out, \
+                             lo, hi, out ); \
+      } \
+   } \
+   if ( linear_fit ) linear_fit = astFree( linear_fit ); \
+   if ( !astOK ) result = 0; \
+   return result; \
 }
+MAKE_RESAMPLE(LDOUBLE,LD,long double)
+MAKE_RESAMPLE(DOUBLE,D,double)
+MAKE_RESAMPLE(FLOAT,F,float)
+MAKE_RESAMPLE(LONG,L,long int)
+MAKE_RESAMPLE(ULONG,UL,unsigned long int)
+MAKE_RESAMPLE(INT,I,int)
+MAKE_RESAMPLE(UINT,UI,unsigned int)
+MAKE_RESAMPLE(SHORT,S,short int)
+MAKE_RESAMPLE(USHORT,US,unsigned short int)
+MAKE_RESAMPLE(BYTE,B,signed char)
+MAKE_RESAMPLE(UBYTE,UB,unsigned char)
+#undef MAKE_RESAMPLE
 #endif
 
 static void ClearAttrib( AstObject *this_object, const char *attrib ) {
@@ -1977,7 +2306,17 @@ static void InitVtab( AstMappingVtab *vtab ) {
    vtab->MapList = MapList;
    vtab->MapMerge = MapMerge;
    vtab->ReportPoints = ReportPoints;
-   vtab->Resample = Resample;
+   vtab->ResampleB = ResampleB;
+   vtab->ResampleD = ResampleD;
+   vtab->ResampleF = ResampleF;
+   vtab->ResampleI = ResampleI;
+   vtab->ResampleL = ResampleL;
+   vtab->ResampleLD = ResampleLD;
+   vtab->ResampleS = ResampleS;
+   vtab->ResampleUB = ResampleUB;
+   vtab->ResampleUI = ResampleUI;
+   vtab->ResampleUL = ResampleUL;
+   vtab->ResampleUS = ResampleUS;
    vtab->SetInvert = SetInvert;
    vtab->SetReport = SetReport;
    vtab->Simplify = Simplify;
@@ -5739,21 +6078,34 @@ void astReportPoints_( AstMapping *this, int forward,
    (**astMEMBER(this,Mapping,ReportPoints))( this, forward,
                                              in_points, out_points );
 }
-int astResample_( AstMapping *this,
-                  int ndim_in, const int *lbnd_in, const int *ubnd_in,
-                  const double *in,
-                  AstInterpolate method, double acc,
-                  int usebad, double badflag,
-                  int ndim_out, const int *lbnd_out, const int *ubnd_out,
-                  const int *lbnd, const int *ubnd, double *out ) {
-   if ( !astOK ) return 0;
-   return (**astMEMBER(this,Mapping,Resample))( this, ndim_in,
-                                                lbnd_in, ubnd_in, in,
-                                                method, acc,
-                                                usebad, badflag,
-                                                ndim_out, lbnd_out, ubnd_out,
-                                                lbnd, ubnd, out );
+#define MAKE_RESAMPLE_(abbrev,type) \
+int astResample##abbrev##_( AstMapping *this, int ndim_in, \
+                            const int *lbnd_in, const int *ubnd_in, \
+                            const type *in, AstInterpolate method, \
+                            double acc, int usebad, type badflag, \
+                            int ndim_out, const int *lbnd_out, \
+                            const int *ubnd_out, const int *lbnd, \
+                            const int *ubnd, type *out ) { \
+   if ( !astOK ) return 0; \
+   return (**astMEMBER(this,Mapping,Resample##abbrev))( this, ndim_in, \
+                                                        lbnd_in, ubnd_in, in, \
+                                                        method, acc, usebad, \
+                                                        badflag, ndim_out, \
+                                                        lbnd_out, ubnd_out, \
+                                                        lbnd, ubnd, out ); \
 }
+MAKE_RESAMPLE_(LD,long double)
+MAKE_RESAMPLE_(D,double)
+MAKE_RESAMPLE_(F,float)
+MAKE_RESAMPLE_(L,long int)
+MAKE_RESAMPLE_(UL,unsigned long int)
+MAKE_RESAMPLE_(I,int)
+MAKE_RESAMPLE_(UI,unsigned int)
+MAKE_RESAMPLE_(S,short int)
+MAKE_RESAMPLE_(US,unsigned short int)
+MAKE_RESAMPLE_(B,signed char)
+MAKE_RESAMPLE_(UB,unsigned char)
+#undef MAKE_RESAMPLE_
 AstMapping *astSimplify_( AstMapping *this ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Mapping,Simplify))( this );
