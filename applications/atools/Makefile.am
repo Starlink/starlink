@@ -34,6 +34,18 @@ CSRC = atl1_rm.c
 HELP_SOURCES = atools.hlp
 starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
 
+prohlp=	@PROHLP@
+
+atools.hlp: $(atools_mon_TASKS:=.f) history.help atools.star-hlp
+	for f in $(atools_mon_TASKS:=.f); do \
+	   $(prohlp) in=$${f} out=$${f}.help ;\
+	done
+	cat atools.star-hlp *.help > atools.hlp
+	rm *.help
+
+history.help: atools.news
+	./make_history_help
+
 #  Rule for building the help library from the help source.
 .hlp.shl:
 	@HLIB@ $<
