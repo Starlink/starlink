@@ -1478,7 +1478,7 @@ static double AxAngle( AstFrame *this_frame, const double a[], const double b[],
 *        (Naxes attribute) containing the coordinates of the second point.
 *     axis
 *        The number of the Frame axis from which the angle is to be
-*        measured.
+*        measured (one-based).
 
 *  Returned Value:
 *        The angle in radians, from the positive direction of the
@@ -1510,7 +1510,7 @@ static double AxAngle( AstFrame *this_frame, const double a[], const double b[],
    this = (AstFrameSet *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astAxAngle" );
+   (void) astValidateAxis( this, axis - 1, "astAxAngle" );
 
 /* Obtain a pointer to the FrameSet's current Frame and invoke the
    astAxAngle method for this Frame. Annul the Frame pointer
@@ -1587,7 +1587,7 @@ static double AxDistance( AstFrame *this_frame, int axis, double v1, double v2 )
    this = (AstFrameSet *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astAxDistance" );
+   (void) astValidateAxis( this, axis - 1, "astAxDistance" );
 
 /* Obtain a pointer to the FrameSet's current Frame and invoke the
    astAxDistance method for this Frame. Annul the Frame pointer
@@ -1664,7 +1664,7 @@ static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist )
    this = (AstFrameSet *) this_frame;
 
 /* Validate the axis index. */
-   (void) astValidateAxis( this, axis, "astAxOffset" );
+   (void) astValidateAxis( this, axis - 1, "astAxOffset" );
 
 /* Obtain a pointer to the FrameSet's current Frame and invoke the
    astAxOffset method for this Frame. Annul the Frame pointer
