@@ -9,7 +9,7 @@
  indeed CCD reduction) using an X based GUI.
 
  For instruction in how to use CCDPACK and more about CCD reduction
- in general refer to SUN/139 (or use the "ccdwww" to view the 
+ in general refer to SUN/139 (or use the "ccdwww" to view the
  hypertext version).
 
 1 CCDPACK
@@ -81,16 +81,16 @@
 
 
 1 Command_descriptions
- 
+
      CALCOR: Performs dark or flash count corrections.
- 
+
      CCDALIGN: Determines general inter-image transformations.
 
      CCDCLEAR: Clears global parameters.
 
      CCDEDIT: Edits the CCDPACK extensions of images.
 
-     CCDFORK: Creates a script for executing CCDPACK commands in 
+     CCDFORK: Creates a script for executing CCDPACK commands in
               a background process.
 
      CCDNDFAC: Accesses a list of images, writing their names to a file.
@@ -99,9 +99,9 @@
 
      CCDSETUP: Sets up the CCDPACK global parameters.
 
-     CCDSHOW: Displays the current values of any CCDPACK global parameters. 
+     CCDSHOW: Displays the current values of any CCDPACK global parameters.
 
-     DEBIAS: Debiasses lists of images either by bias subtraction 
+     DEBIAS: Debiasses lists of images either by bias subtraction
              or by interpolation -- applies bad data masks --
              extracts a subset of the data area -- produces variances --
              applies saturation values.
@@ -110,12 +110,12 @@
 
      FINDOBJ: Locates and centroids image features.
 
-     FINDOFF: Performs pattern-matching between position lists related 
+     FINDOFF: Performs pattern-matching between position lists related
               by simple offsets.
 
      FLATCOR: Performs the flatfield correction on a list of images.
 
-     IDICURS: Reads co-ordinates from an X display (allows zooming 
+     IDICURS: Reads co-ordinates from an X display (allows zooming
               and panning).
 
      IMPORT: Imports FITS information into CCDPACK extensions.
@@ -128,7 +128,7 @@
 
      MAKEMOS: Makes image mosaics by combining and (optionally) normalising.
 
-     PAIRNDF: Displays and manipulates image pairs to allow easy registration 
+     PAIRNDF: Displays and manipulates image pairs to allow easy registration
               (offsets only).
 
      PLOTLIST: Draws position markers on a graphics display.
@@ -154,17 +154,21 @@
 
     makemos in=*.fit out=mosaic.imh
 
- CCDPACK can now also be used from the IRAF/CL command interpreter. 
+ CCDPACK can now also be used from the IRAF/CL command interpreter.
 
  More minor changes include:
+
+    o  An error in calculating the variances when median stacking
+       2 images has been corrected (previous values where an
+       underestimate).
 
     o  The restoration output from CCDSETUP is fixed to work
        correctly when just recording two bias strip bounds.
 
-    o  The PAIRNDF application has been improved to give better 
+    o  The PAIRNDF application has been improved to give better
        control of reserved pens.
 
-    o  The FINDOFF application now reports when any input files 
+    o  The FINDOFF application now reports when any input files
        have less than 2 positions.
 
     o  The IMPORT application now works on Linux.
@@ -172,17 +176,17 @@
     o  The IMPORT application has been extended to allow the
        concatenation of FITS character strings.
 
-    o  The SCHEDULE application now uses the correct comment  
+    o  The SCHEDULE application now uses the correct comment
        delimeter on Linux.
 
     o  The REGISTER application FITTYPE parameter now works when set
        to 3 (shift of origin and magnification).
-  
+
     o  HDS files with an object called DATA_ARRAY which are not NDFs
        are now correctly ignored.
 
- CCDPACK is fully described in SUN/139 and can be viewed on-line using 
- the "showme sun139" command. The latest information about CCDPACK 
+ CCDPACK is fully described in SUN/139 and can be viewed on-line using
+ the "showme sun139" command. The latest information about CCDPACK
  problems is always available at:
 
     <URL: http://star-www.dur.ac.uk/~pdraper/ccdpack>
@@ -367,7 +371,7 @@ calcor frame1 frame2 calibration 250
    automatically. The output data will be of the same type as the
    input data.
 
-calcor in=^frames.dat out='*_darksub' cal=dark_master 
+calcor in=^frames.dat out='*_darksub' cal=dark_master
        expose=^dark_exposures
    In this example a list of images are sequentially processed. The
    list of image names is stored in the file frames.dat. The output
@@ -1063,7 +1067,7 @@ PDRAPER: Peter Draper (STARLINK - Durham University)
  19-JUL-1995 (PDRAPER):
     Removed AIF calls.
 1 CCDFORK
-   Creates a script for executing CCDPACK commands in a background 
+   Creates a script for executing CCDPACK commands in a background
    process.
 
 Usage:
@@ -1077,7 +1081,7 @@ Description:
 
    The input to it is a file that contains just the CCDPACK commands
    that you want to execute. This procedure then writes another
-   script that re-initializes CCDPACK and isolates any existing 
+   script that re-initializes CCDPACK and isolates any existing
    program parameters from your interactive processes.
 
    The output script should be executed as a nice priority
@@ -1185,7 +1189,7 @@ LOGTO = LITERAL (Read)
    [BOTH]
 3 IN
 IN = LITERAL (Read)
-   A list of image names. The image names should be separated by commas 
+   A list of image names. The image names should be separated by commas
    and may include wildcards.
    [!]
 3 MAXNDF
@@ -2311,7 +2315,7 @@ INLIST = LITERAL (Read)
 
       INLIST > *.dat
 
-   If the input list names are a modification of the image names say 
+   If the input list names are a modification of the image names say
    with a trailing type of "_initial.positions". Then a response of
 
       INLIST > *_initial.positions
@@ -3624,7 +3628,7 @@ import in='*' table=$CCDPACK_DIR/WHTSKY.DAT
       TIMES.DARK    _DOUBLE       (TAI1-TAI0)
 
    The function may use any of the usual Fortran operators; +, -, *,
-   /, ** and many others that are supported by the TRANSFORM package 
+   /, ** and many others that are supported by the TRANSFORM package
    (SUN/61).
 
    Functions are allowed to not contain any FITS-keywords in which
@@ -3638,8 +3642,8 @@ import in='*' table=$CCDPACK_DIR/WHTSKY.DAT
    In this way import tables could actually be used to set all the
    required values in the CCDPACK extension (but see PRESENT also).
 
-   Characters strings cannot be manipulated by functions so two 
-   special formats for translating their values are provided. 
+   Characters strings cannot be manipulated by functions so two
+   special formats for translating their values are provided.
    The first form allows for the concatenation of keywords and
    the second the translation from a known word to another
    (which is usually one of the CCDPACK special names). The
@@ -3649,14 +3653,14 @@ import in='*' table=$CCDPACK_DIR/WHTSKY.DAT
       _CHAR         HWP
       FILTER        _CHAR          FILTER//HWP
 
-   Which results in the FILTER extension item being set to the 
+   Which results in the FILTER extension item being set to the
    concatenation of the values of the FITS keywords FILTER and
    HWP (you can concatentate more than two values).
 
-   In the second special form the name of the destination extension 
-   item and (optionally) its type are given as usual followed by a 
-   FITS-keyword which contains the string to be translated. This is 
-   then followed by statements which translate an "input" string 
+   In the second special form the name of the destination extension
+   item and (optionally) its type are given as usual followed by a
+   FITS-keyword which contains the string to be translated. This is
+   then followed by statements which translate an "input" string
    into an "output" string. I.e.
 
       FITS1 = Ext1 FITS2 = Ext2 FITS3 = Ext3 ... FITSn = Extn
@@ -3736,12 +3740,12 @@ Usage:
 
 Description:
 
-   This routine processes a series of bias frames, so as to produce 
-   a single "master bias" frame in which the noise levels are reduced. 
-   This master bias frame can then be used to de-bias other CCD frames 
-   (using DEBIAS). Using the given readout noise an, optional, variance 
-   component may be produced for the output data. The use of a variance 
-   component allows the effects of noise in bias subtraction to be 
+   This routine processes a series of bias frames, so as to produce
+   a single "master bias" frame in which the noise levels are reduced.
+   This master bias frame can then be used to de-bias other CCD frames
+   (using DEBIAS). Using the given readout noise an, optional, variance
+   component may be produced for the output data. The use of a variance
+   component allows the effects of noise in bias subtraction to be
    properly monitored.
 
    MAKEBIAS also performs other functions during processing, such as
@@ -4506,8 +4510,8 @@ makeflat in='flatr/*' out='flatr/master_flat' gamma=2.5 iter=5
    in the output image.
 makeflat in='ff*' out=master_flat gamma=10 iter=1
    In this example all the frames "ff*" are combined into a master
-   flatfield. Defect rejection is still performed but with 
-   gamma set so high and by performing only one iteration 
+   flatfield. Defect rejection is still performed but with
+   gamma set so high and by performing only one iteration
    almost no bad data will be detected.
 
 2 Notes
@@ -5401,8 +5405,8 @@ pairndf '*'  '*.dat' xw '[1,99]'
   In this routine the positional nature of the parameters is
   shown. All the images in the current directory are displayed.
   Their output positions lists have the same name as the images
-  except that they have a file type of .dat. The images are 
-  displayed using the percentile limits 1,99 which shows bright 
+  except that they have a file type of .dat. The images are
+  displayed using the percentile limits 1,99 which shows bright
   detail well.
 
 pairndf msize=0.1 thick=7
@@ -5756,14 +5760,14 @@ Description:
 
    This routine enters reduction information into the CCDPACK
    extensions of a list of images. This information is required if an
-   automated reduction schedule is to be produced using SCHEDULE. 
+   automated reduction schedule is to be produced using SCHEDULE.
    Before using this routine you should set up the CCDPACK global
    parameters, describing the CCD characteristics, using the CCDSETUP
    application.
 
    If the input images have not already been categorised then this
    routine performs this task for the "frame types" BIAS, TARGET,
-   DARK, FLASH, FLAT, MASTER_BIAS, MASTER_FLAT, MASTER_DARK and 
+   DARK, FLASH, FLAT, MASTER_BIAS, MASTER_FLAT, MASTER_DARK and
    MASTER_FLASH (these are input as different groups of images).
 
 
@@ -6044,7 +6048,7 @@ MASTERFLAT = LITERAL (Read)
 3 MASTERS
 MASTERS = _LOGICAL (Read)
    If this parameter is TRUE then prompts will be made for all the
-   master calibration types (MASTERBIAS, MASTERDARK, MASTERFLAT 
+   master calibration types (MASTERBIAS, MASTERDARK, MASTERFLAT
    and MASTERFLASH).
    [FALSE]
 3 MODIFY
@@ -6121,7 +6125,7 @@ ONEDARKTIME = _LOGICAL (Read)
 ONEFILTER = _LOGICAL (Read)
    If the input data have only one filter type then this parameter
    may be set to inhibit repeated prompting for a filter name
-   for every frame (that is filter dependent). This parameter 
+   for every frame (that is filter dependent). This parameter
    is of particular use when running from scripts.
    [FALSE]
 3 ONEFLASHTIME
@@ -6175,10 +6179,10 @@ TARGET = LITERAL (Read)
    etc.  On exit these images will have their FTYPE extension item
    set to the value "TARGET".
    [!]
-3 ZEROED 
+3 ZEROED
 ZEROED = _LOGICAL (Read)
    If a master bias frame is given, then this parameter indicates
-   whether or not it has a mean value of zero. If SIMPLE and 
+   whether or not it has a mean value of zero. If SIMPLE and
    MULTIENTRY are TRUE then this value (TRUE or FALSE) can be entered
    as the fourth field to the IN parameter.
    [FALSE]
@@ -6858,8 +6862,8 @@ IRFLATS = _LOGICAL (Read)
    exposures, so that taking the median of a stack of frames
    results in the rejection of any object data (leaving the
    equivalent of a map of a blank piece of sky).
- 
-   TARGET frames will only be used to create flatfields, if no 
+
+   TARGET frames will only be used to create flatfields, if no
    flatfields (of the correct colour) are present in the input list.
    [FALSE]
 3 LOGFILE
@@ -7485,6 +7489,10 @@ SHAPE = LITERAL (Read)
                    all the output images. (See the LBOUND and UBOUND
                    parameters.)
    [AUTO]
+3 TITLE
+TITLE = LITERAL (Read)
+   Title for the output images.
+   [Output from TRANNDF]
 3 TRANSFORM
 TRANSFORM = TRN (Read)
    If INEXT is FALSE then this parameter specifies the
@@ -7628,7 +7636,7 @@ Unknown detectors.
         hypertext help. This may only be Mosaic or netscape (or
         whatever the names of these browsers are on your system)
         and should be the full path names if they are not located
-        on your PATH. 
+        on your PATH.
 
         This option can also be set using the environment variable
         HTX_BROWSER.
@@ -7682,7 +7690,7 @@ Unknown detectors.
 
    This sets the default browser to netscape, allows any .Xdefaults
    to override any internal preferences, makes the focus follow the
-   mouse and defines a local directory that contains setups and 
+   mouse and defines a local directory that contains setups and
    import tables.
 
 
@@ -7743,7 +7751,7 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
  ability to accept, and process, lists of data files and other
  associated parameters, such as exposure times and position list
  names.
- 
+
  A list of `names' can be supplied in response to one prompt, or can
  be supplied on successive lines using the continuation character `-'
  to force a reprompt for more specifications. A list of names consists
@@ -7772,22 +7780,22 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
 
       IN > bias/*            (all images in the bias/ subdirectory)
 
-      IN > rdata/*,bdata/*   (all images in the rdata/ and bdata/  
-                              subdirectories)                    
+      IN > rdata/*,bdata/*   (all images in the rdata/ and bdata/
+                              subdirectories)
       IN > ffr*              (all images whose names begin with ffr)
-                                                           
+
       IN > NGC2261_?         (all images whose names begin with NGC2261_
                               followed by one extra character)
 
  If you are processing foreign data formats (i.e. non-NDF ones) then
- you can also wildcard these files, which may or may not include the 
+ you can also wildcard these files, which may or may not include the
  file extension.
 
 2 Indirection
  Names can also be stored in ordinary text files. Indirection through a
  text file is indicated by the character.
 
-      ^ 
+      ^
 
  The names may include wildcards (for images) and other indirections (up to
  7 deep). A typical response might be:
@@ -7837,8 +7845,8 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
 
  When image names include the directories too, only the image name
  itself may be modified. Image names always exclude the `.sdf' file type
- extension (or whatever your foreign data format extension is). Changing 
- the directory of the output images (which otherwise will always be the 
+ extension (or whatever your foreign data format extension is). Changing
+ the directory of the output images (which otherwise will always be the
  same as the input images) is achieved by commands like:
 
       IN > /temp/auser/raw/*_ccd
@@ -7879,7 +7887,7 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
      ---
 
  % ccdclear
-  
+
      Now set up the new global parameters. Set the bounds of the bias
      strip, the nominal readout noise value (in ADUs), the nominal
      Analogue to Digital Conversion (ADC) factor, the readout
@@ -7898,7 +7906,7 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
      ccdfork, whose output could then be forked into a background
      process.
      ---
- 
+
  % ccdnote '"Example of typical CCDPACK reduction sequence"'
 
      Make the calibration bias image. RESET any previous parameter
@@ -7908,7 +7916,7 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
 
  % makebias in='bias/*' out=bias/master_bias method=median reset accept
 
-     DEBIAS all the images. Note using a calibration bias image and 
+     DEBIAS all the images. Note using a calibration bias image and
      normalising to the bias strip.
      ---
 
@@ -7929,10 +7937,10 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
  % flatcor in='bdata/*_debias' out='bdata/*|debias|flattened|' \
            flat=flatb/master_flat reset accept
 
-  
+
  If dark counts or pre-flash frames need processing, then they should
  be debiassed and made into calibration masters using MAKECAL. The
- calibration frame should then be (appropriately) subtracted from all 
+ calibration frame should then be (appropriately) subtracted from all
  frames before producing the flatfields and performing flatfield
  correction.
 
