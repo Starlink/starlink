@@ -22,9 +22,11 @@
 #ifdef HAVE_SSTREAM
 #include <sstream>
 #define SSTREAM ostringstream
+#define C_STR(s) (s).str().c_str()
 #else
 #include <strstream>
 #define SSTREAM ostrstream
+#define C_STR(s) (s).str()
 #endif
 #endif
 
@@ -40,6 +42,7 @@
 #include <cstdlib>		// for system()
 using std::sprintf;
 using std::memcpy;
+using std::system;
 #endif
 
 #ifndef PATH_SEP
@@ -117,7 +120,7 @@ PkFont::PkFont(unsigned int dvimag,
 #endif
 		if (verbosity_ >= normal)
 		    cerr << "mktexpk: " << cmd.str() << '\n';
-		std::system (cmd.str().c_str());
+		system (C_STR(cmd));
 		// try again...
 		got_path = find_font (pk_file_path);
 		if (! got_path)
