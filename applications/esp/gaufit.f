@@ -62,7 +62,7 @@
 *        Name of the graphics device on which the results graph should 
 *        be displayed.
 *     INFILE = _CHAR (Read)
-*        Name of a text file containing the co-ordinates sources 
+*        Name of a text file containing the co-ordinates of sources 
 *        to be profiled.  Co-ordinates are in the Current co-ordinate
 *        system of the WCS component of IN.
 *     IN = _NDF (Read)
@@ -75,8 +75,7 @@
 *     MODTYP=_CHAR (Read)
 *        The type of output NDF file to be created. MODTYP=R gives
 *        residuals near the sources. MODTYP=W gives the whole
-*        image model. Angular offset for position angles generated. 
-*        Units degrees.
+*        image model.
 *     NSIGMA = _REAL (Read)
 *        Number of sigma above sky at which pixels are considered 
 *        to be significant.
@@ -87,7 +86,9 @@
 *        The amount by which the peak of a source may vary.
 *        1 = free to move as required. 0 = unable to move.  
 *     PSIZE = _REAL (Read)
-*        Pixel size, in units of arcsec.
+*        The size of each pixel in arc seconds.  If the image contains
+*        a SKY co-ordinate frame this value will be determined 
+*        automatically.
 *     SAINC = _REAL (Read)
 *        The amount by which the standard deviation of a source may vary
 *        per iteration. Largest axis. 1 = free to move as required. 

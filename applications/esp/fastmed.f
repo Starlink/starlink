@@ -44,11 +44,14 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     18-MAY-1993 (GJP)
 *     (Original version)
+*     11-NOV-1999 (MBT)
+*     Modified for use with WCS components.
 
 *  Examples:
 *     fastmed in=field out=flatgal back=760. sigma=27. width=72

@@ -37,11 +37,14 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     08-Jun-1994 (GJP)
 *     (Original version)
+*     11-NOV-1999 (MBT)
+*     Modified for use with WCS components.
 
 *  Examples:
 *     

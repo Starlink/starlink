@@ -50,40 +50,6 @@
 *            ZEROP OUT [IN] [DEVICE] [IMGDEV] [FITLIM] [POSANG] 
 *            [ANGWID] [RLIM] [SAME] [AGAIN] [ORIGIN] (COLOUR)
  
-*  Examples:
-*     sector cursor=true ardfil=^ardup.dat back=6200 sigma=390 
-*            psize=0.96 surf=true radisp=r mirror=true autol=true 
-*            zerop=27.5 out=x2windows device=x2windows 
-*            imgdev=xwindows same=false
-*
-*        Profiles an object identified on the currently displayed
-*        image using a cursor/mouse. The resulting profile is displayed
-*        as linear radius versus surface brightness. ARD file ARDUP is
-*        used to identify parts of the image that may not be used.
-*        The source image is currently displayed on device XWINDOW and
-*        the graphs will appear on device X2WINDOW. The galaxy centre
-*        co-ordinate identified is refined automatically. The radius 
-*        limits to be employed when calculating scale length are 
-*        defined using the cursor/mouse.
-*       
-*     sector cursor=false ardfil=^ardfile.dat back=760 sigma=23 
-*            surf=true radisp=q mirror=false autol=false 
-*            zerop=26.4 in=ic3374 out=ic3374.pro device=xwindows 
-*            fitlm=0,20 posang=25 angwid=5 
-*            rlim=25 origin="12:36:53.42 62:12:21.8"
-* 
-*        An object located at the co-ordinates indicated on image IC3374
-*        is profiled in the 25 degree direction out to a distance of 25
-*        arc seconds. The Current co-ordinate frame of IC3374 is in 
-*        the SKY domain. The pixel size in arcseconds is determined 
-*        automatically from the SKY coordinate frame. The wedge/sector 
-*        used will be 5 degrees wide and the scale length will be
-*        calculated using data obtained in the radius range 0-20 arc
-*        seconds. The user supplied estimate of the galaxy centre will
-*        not be refined. Output is to the text file ic3374.pro. The 
-*        graphs generated will be quarter power radius versus surface 
-*        brightness.
- 
 *  ADAM Parameters:
 *     AGAIN = _LOGICAL(Read)
 *        Should another profile be attempted?
@@ -109,7 +75,7 @@
 *        should be displayed.
 *     FITLIM = _REAL (Read)
 *        The range of radius values over which the scale length 'fits' 
-*        are to be calculated.
+*        are to be calculated.  Units arc seconds.
 *     IMGDEV = _DEVICE (Read)
 *        Name of the graphics device displaying the image.
 *     IN = _NDF (Read)
@@ -129,7 +95,9 @@
 *        image. Convention is clockwise increases angle and the image
 *        Y axis represents 0 degrees. Units degrees.
 *     PSIZE = _REAL (Read)
-*        Size of the image pixels in arc seconds. Units arc secs.
+*        The size of each pixel in arc seconds.  If the image contains
+*        a SKY co-ordinate frame this value will be determined 
+*        automatically.
 *     RADISP = _CHAR (Read)
 *        The display mode used for the radius axis of the graphs.
 *         - Q=quarter power
@@ -155,6 +123,40 @@
 *        Zero point of the scale for surface brightness plots. Units 
 *        magnitudes per square arc second.
  
+*  Examples:
+*     sector cursor=true ardfil=^ardup.dat back=6200 sigma=390 
+*            psize=0.96 surf=true radisp=r mirror=true autol=true 
+*            zerop=27.5 out=x2windows device=x2windows 
+*            imgdev=xwindows same=false
+*
+*        Profiles an object identified on the currently displayed
+*        image using a cursor/mouse. The resulting profile is displayed
+*        as linear radius versus surface brightness. ARD file ARDUP is
+*        used to identify parts of the image that may not be used.
+*        The source image is currently displayed on device XWINDOW and
+*        the graphs will appear on device X2WINDOW. The galaxy centre
+*        co-ordinate identified is refined automatically. The radius 
+*        limits to be employed when calculating scale length are 
+*        defined using the cursor/mouse.
+*       
+*     sector cursor=false ardfil=^ardfile.dat back=760 sigma=23 
+*            surf=true radisp=q mirror=false autol=false 
+*            zerop=26.4 in=ic3374 out=ic3374.pro device=xwindows 
+*            fitlim=0,20 posang=25 angwid=5 
+*            rlim=25 origin="12:36:53.42 62:12:21.8"
+* 
+*        An object located at the co-ordinates indicated on image IC3374
+*        is profiled in the 25 degree direction out to a distance of 25
+*        arc seconds. The Current co-ordinate frame of IC3374 is in 
+*        the SKY domain. The pixel size in arcseconds is determined 
+*        automatically from the SKY coordinate frame. The wedge/sector 
+*        used will be 5 degrees wide and the scale length will be
+*        calculated using data obtained in the radius range 0-20 arc
+*        seconds. The user supplied estimate of the galaxy centre will
+*        not be refined. Output is to the text file ic3374.pro. The 
+*        graphs generated will be quarter power radius versus surface 
+*        brightness.
+
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     MBT: Mark Taylor (STARLINK)

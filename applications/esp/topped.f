@@ -44,7 +44,9 @@
 *     OUT = _NDF (Write)
 *        The name of the output NDF that will be created.  
 *     PSIZE = _REAL (Read)
-*        The size of each pixel. Units arc seconds.
+*        The size of each pixel in arc seconds.  If the image contains
+*        a SKY co-ordinate frame this value will be determined 
+*        automatically.
 *     SIGMA = _REAL (Read)                     
 *        The background pixel count standard deviation value. Units 
 *        counts.
@@ -54,6 +56,7 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -61,6 +64,8 @@
 *     Original version.
 *     19-Oct-1996 (GJP)
 *     NAG routines removed.
+*     19-NOV-1999 (MBT)
+*     Modified for use with WCS components.
 
 *  Examples:
 *     topped in=eggs out=scrambled width=2.5 psize=0.44 back=1000. 
@@ -70,12 +75,14 @@
 *        all set to the bad value. In addition, all pixels within a 
 *        radius of 1.25 arc seconds are also set to bad.
 * 
-*     topped in=objects out=cut width=4. psize=1. back=6200. sigma=390.
+*     topped in=objects out=cut width=4. back=6200. sigma=390.
 *            nsigma=10. noise=true
 *        Uses OBJECTS as the input image and finds all pixels within
 *        the image that have a count value greater than 6200.+10.x390..
 *        These are all set to random values, as are all the pixels 
-*        within a radius of 2. arc seconds. 
+*        within a radius of 2. arc seconds. Pixel size in arc seconds
+*        will be determined if possible from the WCS component of the 
+*        image.
        
 *  Notes:
 *     The distribution of pixel values used when NOISE=TRUE comes 
@@ -635,10 +642,13 @@
  
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
  
 *  History:
 *     12-Oct-1996 (GJP)
 *     (Original version)
+*     11-NOV-1999 (MBT)
+*     Modified for use with WCS components.
  
 *  Bugs:
 *     None known.

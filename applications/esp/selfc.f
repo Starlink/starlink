@@ -17,7 +17,7 @@
 *     The global status.
 
 *  Description:
-*     Performs an self-correlation calculation on an input NDF image 
+*     Performs a self-correlation calculation on an input NDF image 
 *     file. The resulting correlation image/plot is stored to disk.
 *
 *     The self-correlated image may be used to find flat-fielding 
@@ -79,7 +79,9 @@
 *     OUT = _NDF (Write)
 *        The name of the NDF that will be created. 
 *     PSIZE = _REAL (Read)
-*        The size of each pixel. Units arc seconds.
+*        The size of each pixel in arc seconds.  If the image contains
+*        a SKY co-ordinate frame this value will be determined 
+*        automatically.
 *     SIGMA = _REAL (Read)
 *        The standard deviation of the background count within the 
 *        input NDF. Should be determined using a routine such as
@@ -97,14 +99,15 @@
 *        is 727. USEALL=TRUE ensures that no pixels are excluded from 
 *        the correlation calculation.     
 *
-*     selfc in=plate out=plates diam=5. psize=1. back=6600. 
+*     selfc in=plate out=plates diam=5. back=6600. 
 *           useall=false sigma=35. nsigma=5.
 *        A self-correlation is carried out on image PLATE. The search
-*        is for an object 5 arc seconds across. The image pixel size
-*        is 1 arc second and the background count level is 6600. 
-*        Since USEALL=FALSE, all pixels with a count value above
-*        6600+35.x5. are excluded from the correlation calculation. 
-*        The output image is named PLATES    
+*        is for an object 5 arc seconds across.  The background count
+*        level is 6600 and the image pixel size in arc seconds will 
+*        be determined from a SKY coordinate frame in the image's WCS
+*        component if possible.  Since USEALL=FALSE, all pixels with 
+*        a count value above 6600+35.x5. are excluded from the 
+*        correlation calculation.  The output image is named PLATES.
 
 *  Implementation Status:
 *     At present suitable normalisation factors have not been 
@@ -117,11 +120,14 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     13-OCT-1992 (GJP)
 *     (Original version)
+*     11-NOV-1999 (MBT)
+*     Modified for use with WCS components.
 
 *  Notes: 
 *     It is assumed through out that the x and y axis pixels 

@@ -68,7 +68,9 @@
 *     OUT = _NDF (Write)
 *        The name of the NDF data that will be created. 
 *     PSIZE = _REAL (Read)
-*        The size of each image pixel. Units arc seconds.
+*        The size of each pixel in arc seconds.  If the image contains
+*        a SKY co-ordinate frame this value will be determined 
+*        automatically.
 *     SCALE = _REAL (Read)
 *        The scale length of the galaxies to be highlighted in the 
 *        output image. Units arc seconds.
@@ -78,7 +80,7 @@
 *        HISTPEAK which ignores outliers. 
 *     USEALL = _LOGICAL (Read)
 *        Used to indicate whether a pixel count threshold is to
-*        be a applied when calculating the correlation.
+*        be applied when calculating the correlation.
 
 *  Examples:
 *     corr in=hh1826 out=correl scale=8. psize=0.3 back=7437.
@@ -103,11 +105,14 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     13-MAY-1993 (GJP)
 *     (Original version)
+*     11-NOV-1999 (MBT)
+*     Modified for use with WCS components.
 
 *  Notes:
 *     It is assumed that the x and y axis pixels are of the same size.

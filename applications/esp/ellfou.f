@@ -17,7 +17,6 @@
 *        The global status.
 
 *  Description: 
-*
 *     Performs the calculations to fit galaxy profiles using ellipses. 
 *     The method used involves fitting an ellipse to the shape
 *     of the isophote contour.
@@ -32,8 +31,8 @@
 *     profiles are generated for all these objects.
 *
 *     If MODE is true, a value for the parameter CURSOR
-*     is required. If CURSOR is true, then a cursor/mouse is used in 
-*     (conjunction with the most recent image displayed) to determine 
+*     is required. If CURSOR is true, then a cursor/mouse is used (in 
+*     conjunction with the most recent image displayed) to determine 
 *     information such as proposed galaxy centre and the largest 
 *     ellipse radius to be used. If CURSOR is false, a keyboard is 
 *     used for all input required by the application.
@@ -76,7 +75,7 @@
 *        The name of the graphics device on which the graph of results
 *        should be displayed.
 *     FRACT=_REAL (Read)
-*         Fraction of pixels that must be present for a fit to be okay.
+*        Fraction of pixels that must be present for a fit to be okay.
 *     FINE=_REAL (Read)
 *        A factor modifying the default separation of isophotal 
 *        separation of the pixels used to create ellipses.
@@ -92,7 +91,7 @@
 *     INFILE=_CHAR (Read)
 *        Name of a text file containing the co-ordinates of galaxies
 *        to be profiled. (Only used in file mode i.e. MODE=FALSE). 
-*        Co-ordinates are in the Current co-ordinate system of the WCS
+*        Co-ordinates are in the Current co-ordinate frame of the WCS
 *        component of IN.  The file may also contain a third column 
 *        containing the background count value. If this is found to be 
 *        absent the global background count value (BACK) is substituted. 
@@ -112,13 +111,15 @@
 *        Whether the application is to run in file input mode or 
 *        interactively. Interactive MODE=TRUE. File mode=FALSE.
 *     ORIGIN=_CHAR (Read)
-*        Image indices for the galaxy origin point to be used. To be 
-*        given in the Current coordinate system of the NDF.
+*        Image co-ordinates for the galaxy origin point to be used. To be 
+*        given in the Current coordinate system of the source NDF.
 *     OUT=_CHAR (Read)
 *        File name for the output text file containing the profile 
 *        data.
 *     PSIZE=_REAL (Read)
-*        Size of the image pixels in arc seconds.
+*        The size of each pixel in arc seconds.  If the image contains
+*        a SKY co-ordinate frame this value will be determined 
+*        automatically.
 *     RLIM=_REAL (Read)
 *        Radius at which the profiling will be stopped. Units pixels.
 *     SAME=_LOGICAL (Read)
@@ -194,6 +195,7 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:

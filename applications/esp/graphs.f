@@ -42,6 +42,10 @@
 *     alternatively, several such files concatenated together.
 *     In both modes, the name of the text file created by GRAPHS to 
 *     store results in, is supplied by the user.
+*
+*     The X and Y co-ordinates output by SECTOR, ELLFOU and ELLPRO,
+*     and hence those plotted by GRAPHS, are in the Base frame
+*     coordinate system (units pixels) of the processed NDF images.
              
 *  Usage:
 *     GRAPHS MODE INFILE OUT RRANGE [AGAIN] [CURSOR] [DEVICE]
@@ -49,7 +53,7 @@
  
 *  ADAM Parameters:
 *     AGAIN = _LOGICAL(Read)
-*        Should the profile be displayed/anaylsed again?
+*        Should the profile be displayed/analysed again?
 *     ANGCON = _LOGICAL (Read)
 *        Position angle rotation convention. TRUE=clockwise positive.
 *     ANGOFF = _REAL (Read)
@@ -101,8 +105,8 @@
 *        -   FS4 = Fourth sine Fourier descriptor
 *        -   P   = Position angle of the profile
 *        -   S   = Surface brightness of the profile
-*        -   X   = X co-ordinate
-*        -   Y   = Y co-ordinate 
+*        -   X   = X co-ordinate (Base frame)
+*        -   Y   = Y co-ordinate (Base frame)
  
 *  Examples:
 *     graphs mode=true infile=results.dat out=scales.dat rrange=true 

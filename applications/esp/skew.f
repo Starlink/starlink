@@ -33,7 +33,7 @@
 *     - a local mean value may be used as the mode.
 * 
 *     The user is required to enter the size of the sampling area
-*     and the pixel size (in arc secs). This is used to define the 
+*     and the pixel size in arc secs. This is used to define the 
 *     width of pixel template radius employed. It is assumed that 
 *     pixels are the same size in the x and y directions.
 *      
@@ -82,7 +82,9 @@
 *     OUT = _NDF (Write)
 *        The name of the NDF that will be created. 
 *     PSIZE = _REAL (Read)
-*        The width of each pixel. Units arc seconds.
+*        The size of each pixel in arc seconds.  If the image contains
+*        a SKY co-ordinate frame this value will be determined 
+*        automatically.
 *     SIGMA = _REAL (Read)
 *        The standard deviation of the back ground count within the 
 *        input NDF. Should be determined using a routine such as
@@ -109,13 +111,14 @@
 *        by a factor of 1000, and local background values are used 
 *        throughout.
 *
-*     skew in=jet out=sjet modet=true width=5. psize=1. mult=1000. 
+*     skew in=jet out=sjet modet=true width=5. mult=1000. 
 *          back=2010. useall=true
 *        An output image SJET is generated using JET as the source 
-*        image. The pixel size is 1 arc second, the background count 
-*        2010. and all the pixels in the image can be used in the 
-*        calculation. The sampling area width is 5 arc seconds. All 
-*        the pixels in the image can be used in the calculation.
+*        image. The background count is 2010 and the pixel size will
+*        be determined from the WCS component of the source image.
+*        All the pixels in the image can be used in the calculation.
+*        The sampling area width is 5 arc seconds. All the pixels
+*        in the image can be used in the calculation.
 *
 *     skew in=sgp27 out=result modet=true width=8. psize=1. mult=1000. 
 *          back=4505. sigma=23.7 nsigma=10. useall=false
@@ -133,11 +136,14 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     13-OCT-1992 (GJP)
 *     (Original version)
+*     11-NOV-1999 (MBT)
+*     Modified for use with WCS components.
 
 *-
 

@@ -97,7 +97,7 @@
 *        Allows the origin given (or the values determined via AUTOL)
 *        to remain unchanged throughout if FRZORI=TRUE.
 *     IMGDEV=_DEVICE (Read)
-*        Name of the graphics graphics device displaying an image.
+*        Name of the graphics device displaying an image.
 *     INFILE=_CHAR (Read)
 *        Name of a text file containing the co-ordinates of galaxies 
 *        to be profiled. (Only used in file mode i.e. MODE=FALSE)
@@ -126,14 +126,16 @@
 *        Whether the application is to run in file input mode or 
 *        interactively. Interactive MODE=TRUE. File mode=FALSE.
 *     ORIGIN=_REAL (Read)
-*        Image indices for the origin point to be used.  Co-ordinates
+*        Image co-ordinates for the origin point to be used.  Co-ordinates
 *        are in the Current co-ordinate system of the WCS component
 *        of IN.
 *     OUT=_CHAR (Read)
 *        File name for the output text file containing the profile 
 *        data.
 *     PSIZE=_REAL (Read)
-*        Size of the image pixels in arc seconds.
+*        The size of each pixel in arc seconds.  If the image contains
+*        a SKY co-ordinate frame this value will be determined 
+*        automatically.
 *     RLIM=_REAL (Read)
 *        Radius at which the profiling will be stopped. Units pixels.
 *     SAME=_LOGICAL (Read)

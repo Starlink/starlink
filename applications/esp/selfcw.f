@@ -68,7 +68,9 @@
 *     OUT = _NDF (Write)
 *        The name of the NDF that will be created. 
 *     PSIZE = _REAL (Read)
-*        The size of each pixel. Units arc seconds.
+*        The size of each pixel in arc seconds.  If the image contains
+*        a SKY co-ordinate frame this value will be determined 
+*        automatically.
 *     SCALE = _REAL (Read)
 *        The scale length of the galaxies being searched for.
 *        Units arc seconds.
@@ -89,24 +91,28 @@
 *        on the image is .96 arc second and the background count value 
 *        for the source image is 1000.2
 *
-*     selfcw in=lsbg1 out=lsbg2 scale=8. psize=1.5 back=444.
-*            useall=false sigma=12. nsigma=4.
+*     selfcw in=lsbg1 out=lsbg2 scale=8. back=444.  useall=false 
+*            sigma=12. nsigma=4.
 *        A self-correlation image, optimised for galaxies of a 8 arc
 *        second scale length, is generated using image P2 as the input 
-*        source image and SCP2 as the output image. The pixel size
-*        on the image is 1.5 arc second and the background count value 
-*        for the source image is 444.
+*        source image and SCP2 as the output image.  The background 
+*        count value for the source image is 444 and the pixel size
+*        in arc seconds will be determined from a SKY frame in the 
+*        image's WCS component if possible.
 *
 *        All pixels with a count value greater than 444.+12.x4. are
 *        excluded from the correlation calculations.
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     13-MAY-1993 (GJP)
 *     (Original version)
+*     11-NOV-1999 (MBT)
+*     Modified for use with WCS components.
 
 *  Notes:
 *     It is assumed that the x and y axis pixels sizes are the same 
