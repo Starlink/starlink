@@ -33,6 +33,6 @@
 #-
 #
 source INSTALL_BIN/polpack.csh
-polka INSTALL_BIN/test_data nostarthelp accept
+polka INSTALL_BIN/test_data nostarthelp out_s=\! out_o=\! out_e=\! accept
 echo "  POLPACK test script completed."
 #      End of shell script.
