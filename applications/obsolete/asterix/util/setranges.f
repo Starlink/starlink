@@ -14,18 +14,18 @@
 *
 *    Parameters :
 *
-*     Value_Object(1D)= real (read)
+*     input_Value(1D)= real (read)
 *       This is the array of data from which you are trying to select subsets
 *       having a certain range of values. In the example above they correspond
 *       to counts or quality
 *
-*     Range_object(1D)= real (read)
-*       This is the array of data which corresponds to the data in Value_object.
+*     input_Range(1D)= real (read)
+*       This is the array of data which corresponds to the data in input_Value.
 *       In the example above it corresponds to time.
 *
-*     Value_ranges(1D)= real (read)
+*     limits(1D)= real (read)
 *       This array of size 2 contains the lower and upper bounds of the values
-*       of Value-object for which you are searching. In the examples it would
+*       of input_Value for which you are searching. In the examples it would
 *       be 10,100 (cts per sec) or 1,2 (Quality).
 *
 *     Ranges(1D)= real (update)
@@ -149,7 +149,7 @@
       CALL AST_INIT
 
 *    Get the value data object, check that it is primitive
-      CALL USI_ASSOCI( 'VALUE_OBJECT', 'READ', OLOC, PRIM1, STATUS )
+      CALL USI_ASSOCI( 'INPUT_VALUE', 'READ', OLOC, PRIM1, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
       IF ( .NOT. PRIM1 ) THEN
@@ -171,7 +171,7 @@
 
 *    Now the range object - if not primitive then check for the case where
 *    we have a spaced data array.
-      CALL USI_ASSOCI( 'RANGE_OBJECT', 'READ', PLOC, PRIM2, STATUS )
+      CALL USI_ASSOCI( 'INPUT_RANGE', 'READ', PLOC, PRIM2, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
       IF ( PRIM2 ) THEN
@@ -214,7 +214,7 @@
 *    Check data objects have same shape
       IF ( VALVAL .NE. RNGVAL ) THEN
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Range_Object and Value_object do not'/
+        CALL ERR_REP( ' ', 'Range and Value objects do not'/
      :   /' have same number of values, aborting program', STATUS )
         GOTO 99
       END IF
@@ -223,13 +223,13 @@
 *    to help user select required value_ranges
       CALL ARR_RANG1R( VALVAL, %VAL(VALPTR), VALMIN, VALMAX, STATUS )
       CALL MSG_SETR( 'VALMIN', VALMIN )
-      CALL MSG_PRNT( 'Minimum value of Value_object: ^VALMIN' )
+      CALL MSG_PRNT( 'Minimum value of Value object: ^VALMIN' )
       CALL MSG_SETR( 'VALMAX', VALMAX )
-      CALL MSG_PRNT( 'Maximum value of Value_object: ^VALMAX' )
+      CALL MSG_PRNT( 'Maximum value of Value object: ^VALMAX' )
 
 *    Get required ranges from parameter system and set values of MINVAL
 *    and MAXAVL
-      CALL USI_GET1R( 'VALUE_RANGES', 2, RANGE, ACTVAL, STATUS )
+      CALL USI_GET1R( 'LIMITS', 2, RANGE, ACTVAL, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         GOTO 99
       ELSE
