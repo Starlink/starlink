@@ -8,6 +8,8 @@ licence:      gpl
 recommends:
   Tk: 0
   Graphics::PLplot: 0
+  Astro::FITS::CFITSIO: 0
+  Astro::FITS::Header: 0
 requires:
   Data::Dumper: 0
   DynaLoader: 0
