@@ -3981,13 +3981,14 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* If the epochs are the same, or if the alignment system is FK5, we do 
    not need to transform between intermediate FK5 system and the alignment 
    system. */
+   result_epoch = astGetEpoch( result );
+   target_epoch = astGetEpoch( target );
+
    if( align_sys == AST__FK5 ) {
       align_sys = AST__BADSYSTEM;
    } else {
       VerifyAttrs( result, vmess, "Epoch", "astMatch" );
       VerifyAttrs( target, vmess, "Epoch", "astMatch" );
-      result_epoch = astGetEpoch( result );
-      target_epoch = astGetEpoch( target );
       if( result_epoch == target_epoch ) align_sys = AST__BADSYSTEM;
    }
 
@@ -7690,6 +7691,12 @@ static void VerifyAttrs( AstSkyFrame *this, const char *purp,
    will be used if no explicit value has been set. So we only need to do
    any checks if UseDefs is zero. */
    if( !astGetUseDefs( this ) ) {   
+
+/* Initialise variables to avoid compiler warnings. */
+      a = NULL;
+      desc = NULL;
+      len = 0;
+      set = 0;
 
 /* Loop round the "attrs" string identifying the start and length of each
    non-blank word in the string. */

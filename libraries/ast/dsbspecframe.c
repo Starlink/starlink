@@ -1788,6 +1788,12 @@ static void VerifyAttrs( AstDSBSpecFrame *this, const char *purp,
    any checks if UseDefs is zero. */
    if( !astGetUseDefs( this ) ) {   
 
+/* Initialise variables to avoid compiler warnings. */
+      a = NULL;
+      desc = NULL;
+      len = 0;
+      set = 0;
+
 /* Loop round the "attrs" string identifying the start and length of each
    non-blank word in the string. */
       state = 0;
