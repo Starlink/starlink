@@ -2839,11 +2839,14 @@ proc SetCom {com args} {
 }
 
 proc Agitate {} {
-#  Delete the AGI database.
+   global CHECK_DEMO
    global env
-   set fl [glob $env(AGI_USER)/agi_*.sdf]
-   if { $fl != "" } {
-      file delete $fl
+
+   if { !$CHECK_DEMO } {
+      set fl [glob -nocomplain $env(AGI_USER)/agi_*.sdf]
+      if { $fl != "" } {
+         file delete $fl
+      }
    }
 }
 
