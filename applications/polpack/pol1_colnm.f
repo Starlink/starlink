@@ -120,8 +120,8 @@
 
 *  Local Data:
       DATA INIT /.FALSE./,
-     :     NAMES / "X", "Y", "RA", "DEC", "I", "Q", "U", "V", "DI", 
-     :             "DQ", "DV", "P", "PI", "ANG", "DP", "DPI", "DANG" /
+     :     NAMES / 'X', 'Y', 'RA', 'DEC', 'I', 'Q', 'U', 'V', 'DI', 
+     :             'DQ', 'DV', 'P', 'PI', 'ANG', 'DP', 'DPI', 'DANG' /
 
 
 *  Ensure the necessary variale values are retained between invocations
