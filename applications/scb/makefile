@@ -340,7 +340,7 @@ PKG_NAME = scb
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.1-0
+PKG_VERS = 1.1-1
 
 #  List of files comprising the distributed source-only system. This
 #  defines the minimum set of files required to rebuild completely the
@@ -654,18 +654,18 @@ install:
 #  stream editing.
 
 VAR_SUBST = sed \
-            -e 's%"$$STARLINK"%"$(STARLINK)"%' \
-            -e 's%"$$SCB_INDEX"%"$(SCB_INDEX)"%' \
-            -e 's%"$$SCB_SOURCES"%"$(SCB_SOURCES)"%' \
-            -e 's%"$$SCB_BROWSER_TMP"%"$(SCB_BROWSER_TMP)"%' \
-            -e 's%"$$SCB_INDEXER_TMP"%"$(SCB_INDEXER_TMP)"%' \
-            -e 's%"$$HTX_SERVER"%"$(HTX_SERVER)"%' \
-            -e 's%"$$MIMETYPES_FILE"%"$(MIMETYPES_FILE)"%' \
-            -e 's%"$$PKG_VERS"%"$(PKG_VERS)"%' \
-            -e 's%"$$SCB_DIR"%"$(INSTALL_BIN)"%'
+   -e 's%"$$STARLINK"%"$(STARLINK)"%' \
+   -e 's%"$$SCB_INDEX"%"$(SCB_INDEX)"%' \
+   -e 's%"$$SCB_SOURCES"%"$(SCB_SOURCES)"%' \
+   -e 's%"$$SCB_BROWSER_TMP"%"$(SCB_BROWSER_TMP)"%' \
+   -e 's%"$$SCB_INDEXER_TMP"%"$(SCB_INDEXER_TMP)"%' \
+   -e 's%"$$HTX_SERVER"%"$(HTX_SERVER)"%' \
+   -e 's%"$$MIMETYPES_FILE"%"$(MIMETYPES_FILE)"%' \
+   -e 's%"$$PKG_VERS"%"$(PKG_VERS)"%' \
+   -e 's%"$$SCB_DIR"%"$(INSTALL_BIN)"%'
 
 VARLIB_SUBST = $(VAR_SUBST) \
-            -e '1s%\#! *[^ ]*perl[^ ]*%\#!$(PERL5) -I$(INSTALL_PERL_MOD)%'
+   -e '1s%\#! *[^ ]*perl[^ ]*\(.*\)%\#!$(PERL5)\1 -I$(INSTALL_PERL_MOD)%'
 
 .INSTALLED_$(SYSTEM): $(INSTALL_DIRS)
 #
@@ -1106,6 +1106,7 @@ check_source:
               $(PERL_MODULES) $(YY_SOURCES) $(AUX_FILES)
 	cd test; make -s clean
 	$(TAR_IN) $(PKG_NAME)_test.tar test
+	-tar --delete -f $(PKG_NAME)_test.tar test/CVS
 	rm -rf /tmp/sun225
 	mkdir /tmp/sun225
 	cp sun225.tex /tmp/sun225
@@ -1114,7 +1115,9 @@ check_source:
 	( cd /tmp/sun225; tar cf - sun225.htx ) > sun225.htx_tar
 
 clean_source:
-	rm -f $(PKG_NAME)_source.tar $(PKG_NAME)_test.tar sun225.htx_tar
+	rm -f $(PKG_NAME)_source.tar $(PKG_NAME)_test.tar sun225.htx_tar		rm -f $(PKG_NAME)_datestamp
+	rm -f $(YY_BINARIES) $(YY_BINARIES:=-l.c) $(YY_BINARIES:=-y.c) \
+              $(YY_BINARIES:=-y.o) tag.o y.tab.c y.tab.h y.output lex.yy.c
 
                                          
 
