@@ -7678,8 +7678,8 @@ package kappa {
 
          parameter trim {
             type _LOGICAL
-            vpath CURRENT,DEFAULT
-            ppath CURRENT,DEFAULT
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
             default TRUE
             prompt {Trim input NDF to a whole number of compression boxes?}
             helpkey *
@@ -7771,8 +7771,8 @@ package kappa {
 
          parameter trim {
             type _LOGICAL
-            vpath CURRENT,DEFAULT
-            ppath CURRENT,DEFAULT
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
             default TRUE
             prompt {Trim input NDF to a whole number of compression boxes?}
             helpkey *
@@ -11381,6 +11381,16 @@ iraf! {
             default Data
          }
 
+         parameter ilevel {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            prompt {Interaction level}
+            ppath CURRENT DEFAULT
+            default 2
+            helpkey *
+         }
+
          parameter in {
             position 1
             type NDF
@@ -11390,6 +11400,22 @@ iraf! {
             ppath CURRENT
             helpkey *
          }
+
+         parameter mean {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            helpkey *
+            default 0.0D0
+          }
+
+         parameter median {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            helpkey *
+            default 0.0D0
+          }
 
          parameter out {
             position 2
@@ -11447,14 +11473,13 @@ iraf! {
             helpkey *
          }
 
-         parameter verb {
-            type _LOGICAL
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default TRUE
-            prompt {Display value of each pixel?}
+         parameter var {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
             helpkey *
-         }
+            default 0.0D0
+          }
 
       }
 

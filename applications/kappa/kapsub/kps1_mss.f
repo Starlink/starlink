@@ -1,4 +1,5 @@
-      SUBROUTINE KPS1_MSS( IGRP, NNDF, COMP, VERB, NGOOD, PIXS, STATUS )
+      SUBROUTINE KPS1_MSS( IGRP, NNDF, COMP, ILEVEL, NGOOD, PIXS, 
+     :                     STATUS )
 *+
 *  Name:
 *     KPS1_MSS
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     KPS1_MSS( IGRP, NNDF, COMP, VERB, NGOOD, PIXS, STATUS )
+*     KPS1_MSS( IGRP, NNDF, COMP, ILEVEL, NGOOD, PIXS, STATUS )
 
 *  Description:
 *     The user is asked for the coordinates of a point in the current
@@ -26,8 +27,9 @@
 *     COMP = CHARACTER * ( * ) (Given)
 *        The component of the NDFs which is to be interrogated.  May
 *        be Data, Variance, Error or Quality. 
-*     VERB = LOGICAL (Given)
-*        Whether to output the value of each pixel used.
+*     ILEVEL = INTEGER (Given)
+*        If 1 nothing is printed. If 2 print statistics. If 3, print 
+*        statistics and pixel values.
 *     NGOOD = INTEGER (Returned)
 *        The number of good pixels found.
 *     PIXS( * ) = DOUBLE PRECISION (Returned)
@@ -60,7 +62,7 @@
       INTEGER IGRP
       INTEGER NNDF
       CHARACTER COMP * ( * )
-      LOGICAL VERB
+      INTEGER ILEVEL
 
 *  Arguments Returned:
       INTEGER NGOOD
@@ -125,27 +127,29 @@
 *  Get the position at which the statistics will be gathered.
       CALL KPG1_GTPOS( 'POS', IFRM0, .FALSE., CPOS, 0.0D0, STATUS )
 
-*  Write an introductory message.
-      CALL MSG_BLANK( STATUS )
-      BUF = ' '
-      IAT = 0
-      CALL CHR_APPND( '(', BUF, IAT )
-      IAT = IAT + 1
-      DO I = 1, NCDIM0
-         CALL CHR_APPND( AST_FORMAT( IFRM0, I, CPOS( I ), STATUS ),
-     :                   BUF, IAT )
-         IF ( I .LT. NCDIM0 ) THEN
-            CALL CHR_APPND( ',', BUF, IAT )
-         END IF
+*  Write an introductory message, if necessary.
+      IF( ILEVEL .GT 1 ) THEN
+         CALL MSG_BLANK( STATUS )
+         BUF = ' '
+         IAT = 0
+         CALL CHR_APPND( '(', BUF, IAT )
          IAT = IAT + 1
-      END DO
-      CALL CHR_APPND( ')', BUF, IAT )
-      CALL MSG_SETC( 'POS', BUF( 1:IAT ) )
-      CALL MSG_OUT( ' ', ' Pixel statistics at position ^POS ' //
-     :              'in current Frame.', STATUS )
+         DO I = 1, NCDIM0
+            CALL CHR_APPND( AST_FORMAT( IFRM0, I, CPOS( I ), STATUS ),
+     :                      BUF, IAT )
+            IF ( I .LT. NCDIM0 ) THEN
+               CALL CHR_APPND( ',', BUF, IAT )
+            END IF
+            IAT = IAT + 1
+         END DO
+         CALL CHR_APPND( ')', BUF, IAT )
+         CALL MSG_SETC( 'POS', BUF( 1:IAT ) )
+         CALL MSG_OUT( ' ', ' Pixel statistics at position ^POS ' //
+     :                 'in current Frame.', STATUS )
+      END IF
 
 *  Write headings if necessary.
-      IF ( VERB ) THEN
+      IF ( ILEVEL .GE. 3 ) THEN
          CALL MSG_BLANK( STATUS )
          BUF = ' '
          BUF( 5: ) = 'NDF'
@@ -193,7 +197,7 @@
      :                    'Current Frames of ^NDF1 ' //
      :                    'and ^NDF2 have different ' //
      :                    'dimensionalities.', STATUS )
-            GO TO 99
+            GO TO 999
          END IF
 
 *  Locate the position in the base (GRID-domain) Frame of the NDF which
@@ -223,7 +227,7 @@
      :                    EL, STATUS )
 
 *  Extract the single pixel value.
-            CALL KPG1_RETRD( EL, 1, %VAL( IPCOMP ), PIXS( NGOOD + 1 ),
+            CALL KPG1_RETRD( EL, 1, %VAL( IPCOMP ), PIXS( NGOOD + 1 ), 
      :                       STATUS )
 
 *  Check if this pixel is good.
@@ -250,7 +254,7 @@
          END IF
 
 *  Log to user if required.
-         IF ( VERB ) THEN
+         IF ( ILEVEL .GE. 3 ) THEN
             BUF = ' '
             CALL GRP_GET( IGRP, I, 1, BUF( 5: ), STATUS )
             BUF( 29: ) = ' ' // AST_GETC( IWCS, 'DOMAIN', STATUS )
@@ -260,17 +264,19 @@
         
       END DO
 
-
 *  Write summary information.
-      IF ( VERB ) THEN
+      IF ( ILEVEL .GE. 3 ) THEN
          CALL MSG_BLANK( STATUS )
       END IF
-      CALL MSG_SETI( 'NGOOD', NGOOD )
-      CALL MSG_OUT( ' ', ' Number of non-bad pixels:  ^NGOOD',
-     :              STATUS )
-      CALL MSG_BLANK( STATUS )
+
+      IF( ILEVEL .GE. 2 ) THEN
+         CALL MSG_SETI( 'NGOOD', NGOOD )
+         CALL MSG_OUT( ' ', ' Number of non-bad pixels:  ^NGOOD',
+     :                 STATUS )
+         CALL MSG_BLANK( STATUS )
+      END IF
 
 *  Error exit label.
-   99 CONTINUE
+  999 CONTINUE
 
       END

@@ -29198,7 +29198,7 @@ plot (9k).
       In single pixel mode (SINGLE=TRUE) a position in the current
       co-ordinate Frame of all the NDFs is given, and the value at
       the pixel covering this point in each of the input NDFs is
-      accumulated to form the result.  The result, and if VERB=TRUE
+      accumulated to form the result.  The result, and if ILEVEL = 3,
       the value of each contributing pixel, is reported directly
       to the user.
    }
@@ -29217,6 +29217,14 @@ plot (9k).
          the range 0 to 255).  In cases other than {\tt "}Data{\tt "}, which is
          always present, a missing component will be treated as having
          all pixels set to the `bad{\tt '} value.  {\tt ["Data"]}
+      }
+      \sstsubsection{
+         ILEVEL = \_INTEGER (Read)
+      }{
+         The interactive level of the routine (only used if SINGLE=TRUE). If
+         it is 1, nothing is reported on the screen. If is is 2 or 3, the
+         statistics are reported. If is is 3, the individual pixel values
+         are also reported. It should lie between 1 and 3. {\tt [2]}
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -29245,6 +29253,18 @@ plot (9k).
          sign {\tt "}-{\tt "}, then the user is re-prompted for further input until
          a value is given which does not end with a minus sign. All the
          images given in this way are concatenated into a single group.
+      }
+      \sstsubsection{
+         MEAN = \_DOUBLE (Write)
+      }{
+         An output parameter to which is written the mean pixel value, if
+         SINGLE=TRUE.
+      }
+      \sstsubsection{
+         MEDIAN = \_DOUBLE (Write)
+      }{
+         An output parameter to which is written the median pixel value, if
+         SINGLE=TRUE.
       }
       \sstsubsection{
          OUT = NDF (Read)
@@ -29303,12 +29323,10 @@ plot (9k).
          will be represented in the output.  {\tt [TRUE]}
       }
       \sstsubsection{
-         VERB = \_LOGICAL (Read)
+         VAR = \_DOUBLE (Write)
       }{
-         In single pixel mode (SINGLE=TRUE), if VERB is TRUE then the
-         value of each pixel will be written to the screen as well as
-         the calculated statistics.  Otherwise only the statistics
-         will be written. {\tt [TRUE]}
+         An output parameter to which is written the variance of the pixel
+         values, if SINGLE=TRUE.
       }
    }
    \sstexamples{
@@ -29340,7 +29358,7 @@ plot (9k).
          will be the variances of the variances of the input data.
       }
       \sstexamplesubsection{
-         mstats m31$*$ single=true pos={\tt "}0:42:38,40:52:20{\tt "} verb=no
+         mstats m31$*$ single=true pos={\tt "}0:42:38,40:52:20{\tt "}
       }{
          This example is analysing the pixel brightness at the indicated
          sky position in a number of NDFs whose name start with {\tt "}m31{\tt "},
@@ -29349,7 +29367,7 @@ plot (9k).
          the NDFs are printed to the screen.
       }
       \sstexamplesubsection{
-         mstats m31$*$ single pos={\tt "}0:42:38,40:52:20{\tt "} verb
+         mstats m31$*$ single pos={\tt "}0:42:38,40:52:20{\tt "} ilevel=3
       }{
          This does the same as the previous example, but also prints
          out the value of the sampled pixel in each of the NDFs.

@@ -45,7 +45,7 @@
 *     In single pixel mode (SINGLE=TRUE) a position in the current
 *     co-ordinate Frame of all the NDFs is given, and the value at
 *     the pixel covering this point in each of the input NDFs is
-*     accumulated to form the result.  The result, and if VERB=TRUE
+*     accumulated to form the result.  The result, and if ILEVEL = 3,
 *     the value of each contributing pixel, is reported directly 
 *     to the user.
 
@@ -82,6 +82,17 @@
 *        sign "-", then the user is re-prompted for further input until
 *        a value is given which does not end with a minus sign. All the
 *        images given in this way are concatenated into a single group.
+*     ILEVEL = _INTEGER (Read)
+*        The interactive level of the routine (only used if SINGLE=TRUE). If 
+*        it is 1, nothing is reported on the screen. If is is 2 or 3, the 
+*        statistics are reported. If is is 3, the individual pixel values 
+*        are also reported. It should lie between 1 and 3. [2]
+*     MEAN = _DOUBLE (Write)
+*        An output parameter to which is written the mean pixel value, if
+*        SINGLE=TRUE.
+*     MEDIAN = _DOUBLE (Write)
+*        An output parameter to which is written the median pixel value, if
+*        SINGLE=TRUE.
 *     OUT = NDF (Read)
 *        The name of an NDF to receive the results.  Each pixel of
 *        the Data (and perhaps Variance) component represents the
@@ -120,11 +131,9 @@
 *        If TRIM=FALSE, the output is the shape of the union of the
 *        inputs, i.e. every pixel which appears in the input arrays
 *        will be represented in the output.  [TRUE]
-*     VERB = _LOGICAL (Read)
-*        In single pixel mode (SINGLE=TRUE), if VERB is TRUE then the
-*        value of each pixel will be written to the screen as well as
-*        the calculated statistics.  Otherwise only the statistics
-*        will be written. [TRUE]
+*     VAR = _DOUBLE (Write)
+*        An output parameter to which is written the variance of the pixel
+*        values, if SINGLE=TRUE.
 
 *  Examples:
 *     mstats idat* ostats
@@ -145,13 +154,13 @@
 *        are calculated on the Variance components of all the input
 *        NDFs.  Thus the pixels of the Variance component of "ostats" 
 *        will be the variances of the variances of the input data.
-*     mstats m31* single=true pos="0:42:38,40:52:20" verb=no
+*     mstats m31* single=true pos="0:42:38,40:52:20" 
 *        This example is analysing the pixel brightness at the indicated
 *        sky position in a number of NDFs whose name start with "m31",
 *        which all have SKY as their current co-ordinate Frame.
 *        The mean and variance of the pixels at that position in all
 *        the NDFs are printed to the screen.
-*     mstats m31* single pos="0:42:38,40:52:20" verb
+*     mstats m31* single pos="0:42:38,40:52:20" ilevel=3
 *        This does the same as the previous example, but also prints
 *        out the value of the sampled pixel in each of the NDFs.
 *        For those in which the pixel at the selected position is
@@ -204,6 +213,7 @@
       INTEGER EL               ! Number of pixels in mapped array
       INTEGER I                ! Loop variable
       INTEGER IGRP             ! GRP identifier for the group of input NDFs
+      INTEGER ILEVEL           ! The interaction level
       INTEGER IPDAT            ! Pointer to data array
       INTEGER IPNDF            ! Pointer to array of NDF identifiers
       INTEGER IPODAT           ! Pointer to output data array
@@ -219,7 +229,6 @@
       INTEGER UBND( NDF__MXDIM ) ! Upper pixel bounds of output NDF
       LOGICAL SINGLE           ! Are we in SINGLE or ARRAY mode?
       LOGICAL TRIM             ! Will be trim or pad arrays?
-      LOGICAL VERB             ! Verbose pixel output in single pixel mode?
 
 *.
 
@@ -251,11 +260,11 @@
 *  Allocate some work space.
          CALL PSX_CALLOC( NNDF, '_DOUBLE', IPDAT, STATUS )
 
-*  See if we want to see the value of each pixel.
-         CALL PAR_GET0L( 'VERB', VERB, STATUS )
+*  Get interaction level for rejection algorithm.
+         CALL PAR_GDR0I( 'ILEVEL', 2, 1, 3, .TRUE., ILEVEL, STATUS )
 
 *  Get the pixels from which to calculate the statistics.
-         CALL KPS1_MSS( IGRP, NNDF, COMP, VERB, NGOOD, %VAL( IPDAT ),
+         CALL KPS1_MSS( IGRP, NNDF, COMP, ILEVEL, NGOOD, %VAL( IPDAT ),
      :                  STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -280,17 +289,24 @@
             MEAN = SUM / DBLE( NGOOD )
             VAR = SUM2 / DBLE( NGOOD ) - MEAN * MEAN
 
-*  Output the results.
-            CALL MSG_SETD( 'MED', MED )
-            CALL MSG_OUT( ' ', '    Pixel median:      ^MED',
-     :                    STATUS )
-            CALL MSG_SETD( 'MEAN', MEAN )
-            CALL MSG_OUT( ' ', '    Pixel mean:        ^MEAN',
-     :                    STATUS )
-            CALL MSG_SETD( 'VAR', VAR )
-            CALL MSG_OUT( ' ', '    Pixel variance:    ^VAR',
-     :                    STATUS )
-            CALL MSG_BLANK( STATUS )
+*  Output the results, if required.
+            IF( ILEVEL .GT. 1 ) THEN
+               CALL MSG_SETD( 'MED', MED )
+               CALL MSG_OUT( ' ', '    Pixel median:      ^MED',
+     :                       STATUS )
+               CALL MSG_SETD( 'MEAN', MEAN )
+               CALL MSG_OUT( ' ', '    Pixel mean:        ^MEAN',
+     :                       STATUS )
+               CALL MSG_SETD( 'VAR', VAR )
+               CALL MSG_OUT( ' ', '    Pixel variance:    ^VAR',
+     :                       STATUS )
+               CALL MSG_BLANK( STATUS )
+            END IF
+
+*  Write them to output parameters.
+            CALL PAR_PUT0D( 'MEDIAN', MED, STATUS )
+            CALL PAR_PUT0D( 'MEAN', MEAN, STATUS )
+            CALL PAR_PUT0D( 'VAR', VAR, STATUS )
 
 *  There were no good pixels - write an error message.
          ELSE
