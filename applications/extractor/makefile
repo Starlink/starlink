@@ -398,7 +398,7 @@ PKG_LINK =
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.1-0
+PKG_VERS = 1.1-2
 
 #  List the source subdirectories
 

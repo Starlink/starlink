@@ -29,3 +29,10 @@
     % showme sun226
 
  Peter W. Draper 24th May 1999 (P.W.Draper@durham.ac.uk).
+
+----
+
+1.1-2 release:
+
+    Fixed normalisation of output WCS coordinates
+
