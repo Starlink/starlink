@@ -1,0 +1,100 @@
+      SUBROUTINE CCG1_SRT2<T>( ORDDAT, ANCDAT, NENT, STATUS )
+*+
+*  Name:
+*     CCG1_SRT2<T>
+
+*  Purpose:
+*     To sort the list of data orddat into increasing order, also sorts
+*     the ancillary data ANCDAT correspondingly.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_SRT2<T>( ORDDAT, ANCDAT, NENT, STATUS )
+
+*  Description:
+*     The routine sorts a list of data into increasing order, it uses
+*     either an insertion sort or quick sort method, depending on the
+*     number of items to sort. At present this cut-off is set to:
+*
+*                               15
+*
+*     For arrays smaller than this value insertion sort is quicker
+*     (less operations), after this value quicksort is faster (nln(n)).
+*
+*     The sort is extended to the ancillary data ANCDAT, this
+*     maintains is correspondence with the ORDDAT dataset on exit.
+
+*  Arguments:
+*     ORDDAT( NENT ) = <COMM> (Given and Returned)
+*        The data to order. On output it contains the data in increasing
+*        order.
+*     ANCDAT( NENT ) = INTEGER (Given and Returned)
+*        A list of data associated with ORDDAT which needs to retain its
+*        correspondence with the items in ORDDAT (probably pointers).
+*     NENT = INTEGER (Given)
+*        The number of entries in ORDDAT.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     17-NOV-1998 (PDRAPER):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE             ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER NENT
+
+*  Arguments Given and Returned:
+      <TYPE> ORDDAT( NENT )
+      INTEGER ANCDAT( NENT )
+
+*  Status:
+      INTEGER STATUS            ! Global status
+
+*  Local Constants:
+      INTEGER CUTOFF
+      PARAMETER ( CUTOFF = 15 ) ! Cutoff for insertion sort
+
+*  Local Variables:
+      INTEGER IPTMP             ! Pointer to temporary data
+      INTEGER IFAIL             ! Local status
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If less than cutoff then use insertion sort.
+      IF ( NENT .LT. CUTOFF ) THEN
+         CALL CCG1_IS2<T>( ORDDAT, ANCDAT, NENT, STATUS )
+      ELSE
+
+*  Use quicksort, need an array of pointers to permute.
+         CALL CCD1_MALL( NENT, '_INTEGER', IPTMP, STATUS )
+         CALL CCG1_QSRT<T>( NENT, ORDDAT, %VAL( IPTMP ), STATUS )
+
+*  Now permute data.
+         IFAIL = 0
+         CALL PDA_RINP<T>( %VAL( IPTMP ), NENT, ORDDAT, IFAIL )
+         CALL PDA_RINPI( %VAL( IPTMP ), NENT, ANCDAT, IFAIL )
+         CALL CCD1_MFREE( IPTMP, STATUS )
+      END IF
+      END
+* $Id$
