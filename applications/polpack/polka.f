@@ -156,16 +156,6 @@
 *        output (usually the screen). If a null (!) value is supplied, then 
 *        no log file will be created. Note, this parameter cannot be set 
 *        from the GUI's "Options" menu. [!]
-*     NEWCOLMAP = _LOGICAL (Read)
-*        If a TRUE value is supplied for NEWCOLMAP, then the GUI will use
-*        its own private X colour map. Otherwise it will share the standard 
-*        X colour map. Note, with a FALSE value for NEWCOLMAP, there may 
-*        be insufficient free colours in the standard colour map (i.e. if
-*        other X applications are running). In this case POLKA will report 
-*        an error and abort. If this happens, try re-running with a true
-*        value for NEWCOLMAP. Note, when using a private X colour map, the
-*        cursor must be over the POLKA window to see the "correct" colours.
-*        [FALSE]
 *     OEFITTYPE = _INTEGER (Update)
 *        The type of mapping which should be used between O and E rays. See
 *        parameter FITTYPE for a description of the allowed values. This
@@ -367,6 +357,8 @@
 *        and allow ANLANG to be used in place of WPLATE.
 *        - Remove restriction which prevented linear Stokes vectors being
 *        produced in single-beam mode.
+*     22-APR-1999 (DSB):
+*        Removed parameter NEWCOLMAP.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -423,7 +415,6 @@
      :        SSIZE              ! Total size of the sky frame group
       LOGICAL 
      :        AGAIN,             ! Get a list of sky frames again?
-     :        NEWCM,             ! Use a new colour map?
      :        DBEAM,             ! Run in Dual-beam mode?
      :        HAREA,             ! Is the help area to be displayed?
      :        POL,               ! Are we processing polarimetry data?
@@ -608,9 +599,6 @@
 
       END IF
 
-*  See if a new colour map should be used.
-      CALL PAR_GET0L( 'NEWCOLMAP', NEWCM, STATUS )
-
 *  See if a sky background should be subtracted.
       CALL PAR_GET0L( 'SKYOFF', SKYOFF, STATUS )
 
@@ -707,7 +695,7 @@
       CALL DOPLKA( IGRP1, IGRP2, IGRP3, DPI, HAREA, SAREA, PSF, 
      :             SI, FIT, OEFIT, LOGFIL( : CHR_LEN( LOGFIL ) ),
      :             BADCOL, CURCOL, REFCOL, SELCOL, VIEW, PERCNT(1),
-     :             PERCNT(2), NEWCM, XHAIR, XHRCOL, STHLP, 
+     :             PERCNT(2), XHAIR, XHRCOL, STHLP, 
      :             IGRPS, SSIZE, SKYOFF, SKYPAR, IGRP4, DBEAM, 
      :             MODE( : CHR_LEN( MODE ) ), POL, STATUS )
 

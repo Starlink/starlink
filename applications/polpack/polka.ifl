@@ -17,6 +17,8 @@
 #     	 Original version.
 #     3-JUL-1998 (DSB):
 #        Change MODE to PMODE. Take POSITION away from SKYFRAMES.
+#     22-APR-1999 (DSB):
+#        Removed NEWCOLMAP.
 #     {enter_changes_here}
 
 #-
@@ -113,16 +115,6 @@ interface POLKA
       ppath    'DEFAULT'
       default  !
       prompt   'The name of a file in which to store all ATASK messages.'
-      helpkey  '*'
-   endparameter
-
-   parameter NEWCOLMAP
-      type     _LOGICAL
-      access   READ
-      vpath    'DEFAULT'
-      ppath    'DEFAULT'
-      default  NO
-      prompt   'Use a private colour map?'
       helpkey  '*'
    endparameter
 

@@ -2430,17 +2430,17 @@ its path:
 
 replacing the example path with the correct path for your machine.
 
-\item [``POLKA always requires NEWCOLMAP to be set true''] - POLKA
+\item [``POLKA always uses a private colour map''] - POLKA
 requires its own private colour table if there are other colour-greedy
 applications running when POLKA tries to create the image display area.
 The \texttt{netscape} hypertext browser is a common example. Shutting down
 such applications before running POLKA should get round the problem. 
 
-Note, if the parameter STARTHELP has a true value when running POLKA, then
-a hypertext browser will be created automatically \emph{before} the image
-display area is created. If this causes the ``NEWCOLMAP'' problem, then
-disable the automatic creation of the hypertext browser by setting
-STARTHELP to a false value when running POLKA:
+Note, if the parameter STARTHELP has a true value when running POLKA,
+then a hypertext browser will be created automatically \emph{before} the
+image display area is created. If this causes a private colour map to be
+used, then you could disable the automatic creation of the hypertext
+browser by setting STARTHELP to a false value when running POLKA:
 
 \begin{myquote}
 \begin{verbatim}
@@ -4088,19 +4088,6 @@ for NDF applications.
          output (usually the screen). If a null (!) value is supplied, then
          no log file will be created. Note, this parameter cannot be set
          from the GUI{\tt '}s {\tt "}Options{\tt "} menu. [!]
-      }
-      \sstsubsection{
-         NEWCOLMAP = \_LOGICAL (Read)
-      }{
-         If a TRUE value is supplied for NEWCOLMAP, then the GUI will use
-         its own private X colour map. Otherwise it will share the standard
-         X colour map. Note, with a FALSE value for NEWCOLMAP, there may
-         be insufficient free colours in the standard colour map (i.e. if
-         other X applications are running). In this case POLKA will report
-         an error and abort. If this happens, try re-running with a true
-         value for NEWCOLMAP. Note, when using a private X colour map, the
-         cursor must be over the POLKA window to see the {\tt "}correct{\tt "} colours.
-         [FALSE]
       }
       \sstsubsection{
          OEFITTYPE = \_INTEGER (Update)
@@ -5931,6 +5918,9 @@ single-beam data.
 
 \item \htmlref{POLKA}{POLKA} will now allow rotation between images in
 single-beam mode.
+
+\item The NEWCOLMAP parameter has been removed from \htmlref{POLKA}{POLKA}.
+POLKA will now use a private colour map automatically when necessary.
 
 \item A new command called \htmlref{POLSIM}{POLSIM} has been added, which
 creates simulated intensity data from a cube of Stokes vectors and a set

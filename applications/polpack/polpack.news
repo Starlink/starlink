@@ -23,3 +23,7 @@
 
    o  Multiple NDFs within a single HDS container file can now be processed
    without needing to first extract them into separate files.
+
+   o  POLKA nows uses a private colour map automatically when necessary.
+   The NEWCOLMAP parameter which was previously used to request a private
+   colour map, has been withdrawn.

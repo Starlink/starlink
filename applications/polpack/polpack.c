@@ -14,6 +14,8 @@
 *  History:
 *     27-AUG-1997 (DSB):
 *        Original version.
+*     22-APR-1999 (DSB):
+*        Removed new colourmap argument from doplka.
 */
 
 
@@ -363,7 +365,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                         INTEGER(OEFIT), CHARACTER(LOGFIL),
                         CHARACTER(BADCOL), CHARACTER(CURCOL), 
                         CHARACTER(REFCOL), CHARACTER(SELCOL), 
-                        CHARACTER(VIEW), REAL(PLO), REAL(PHI), LOGICAL(NEWCM),
+                        CHARACTER(VIEW), REAL(PLO), REAL(PHI), 
                         LOGICAL(XHAIR), CHARACTER(XHRCOL), LOGICAL(STHLP),
                         INTEGER(IGRPS), INTEGER(SSIZE), LOGICAL(SKYOFF),
                         INTEGER(SKYPAR), INTEGER(IGRP4), LOGICAL(DBEAM),
@@ -434,8 +436,6 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *        The lower percentile for the image display.
 *     PHI = REAL (Given and Returned)
 *        The upper percentile for the image display.
-*     NEWCM = LOGICAL (Given)
-*        Use a private colour map?
 *     XHAIR = LOGICAL (Given and Returned)
 *        Is a cross-hair required over the image display area?
 *     XHRCOL = CHARACTER (Given and Returned)
@@ -499,7 +499,6 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    GENPTR_REAL(PLO)
    GENPTR_REAL(PHI)
    GENPTR_CHARACTER(VIEW)
-   GENPTR_LOGICAL(NEWCM)
    GENPTR_LOGICAL(XHAIR)
    GENPTR_CHARACTER(XHRCOL)
    GENPTR_INTEGER(IGRPS)
@@ -590,12 +589,6 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    variable. */
    if( F77_ISTRUE(*STHLP) ) {
       SetVar( interp, "START_HELP", "1", TCL_LEAVE_ERR_MSG, STATUS );
-   }
-
-/* If required, indicate that a private colour map should be used by
-   Tcl creating the variable NEWCOLMAP. */
-   if( F77_ISTRUE(*NEWCM) ) {
-      SetVar( interp, "NEWCOLMAP", "1", TCL_LEAVE_ERR_MSG, STATUS );
    }
 
 /* Set the Tcl variables storing the options values to use. */
