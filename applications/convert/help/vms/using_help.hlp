@@ -32,8 +32,9 @@
  response to the "Subtopic?" prompt instead of typing a subtopic name,
  the "Topic?" prompt reappears,  enabling you to enter another topic
  name.  If you press RETURN in response to the "Topic?" prompt, you
- will exit from HELP.  You can also exit directly from any level
- by typing CTRL/Z (pressing the control and Z keys simultaneously).
+ will exit from HELP.  You can also exit DCL HELP directly from any
+ level by typing CTRL/Z (pressing the control and Z keys
+ simultaneously).
 
 2 Help_Parameters
 
