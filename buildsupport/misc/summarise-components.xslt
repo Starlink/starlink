@@ -76,7 +76,9 @@ tr.r1 {
           <tr>
             <th>Component</th>
             <th>Repository path</th>
-            <th>Contact</th>
+            <th>Sup'd?</th>
+            <th>Copyright</th>
+            <th>Author/contact</th>
           </tr>
           <x:apply-templates select="component">
             <x:sort select="@id"/>
@@ -91,10 +93,16 @@ tr.r1 {
       <td>
         <x:value-of select="@id"/>
       </td>
-        <td>
+      <td>
         <a href="{$cvsweb}/{path}/">
           <x:apply-templates select="path"/>
         </a>
+      </td>
+      <td>
+        <x:if test="contains(@support, 'S')">Yes</x:if>
+      </td>
+      <td>
+        <x:apply-templates select="copyright"/>
       </td>
       <td>
         <x:apply-templates select="developers"/>
@@ -127,6 +135,11 @@ tr.r1 {
       <x:text>, </x:text>
     </x:if>
     <x:choose>
+      <x:when test="uname">
+        <a href="mailto:{uname}@star.rl.ac.uk">
+          <x:value-of select="name"/>
+        </a>
+      </x:when>
       <x:when test="email">
         <a href="mailto:{email}">
           <x:value-of select="name"/>
@@ -134,6 +147,19 @@ tr.r1 {
       </x:when>
       <x:otherwise>
         <x:value-of select="name"/>
+      </x:otherwise>
+    </x:choose>
+  </x:template>
+
+  <x:template match="copyright">
+    <x:if test="position() &gt; 1">
+      <x:text>, </x:text>
+    </x:if>
+    <x:choose>
+      <x:when test="contains(name, 'Central Laboratory')"
+        >CCLRC</x:when>
+      <x:otherwise>
+        <x:apply-templates select="name"/>
       </x:otherwise>
     </x:choose>
   </x:template>
