@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+SUBDIRS = @subdirs@
+
 # grfont.dat and rgb.txt are not actually programs but they still need to
 # go into bin/
 

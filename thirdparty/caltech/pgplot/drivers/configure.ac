@@ -34,6 +34,7 @@ dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+AC_CONFIG_SUBDIRS([xathena])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
