@@ -115,6 +115,13 @@
 *    Length of FSPEC
       FLEN = CHR_LEN( FSPEC )
 
+*    Look for % delimiter, so that trailing representation can be ignored
+      ICP = FLEN
+      DO WHILE ( (ICP.GT.0) .AND. (FSPEC(ICP:ICP).NE.'%') )
+        ICP = ICP - 1
+      END DO
+      IF ( ICP .NE. 0 ) FLEN = ICP - 1
+
 *    Default values
       LFILEC = FLEN
       HDU = 0
