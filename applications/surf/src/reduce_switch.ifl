@@ -21,9 +21,11 @@
 #     1996 November 1 (TIMJ)
 #        Add header and HELPLIB
 #     1997 April 11 (TIMJ)
-#        Make 'NO' the default for REDUCE_SWITCH
+#        Make 'NO' the default for REDUCE_SWITCH USE_CALIBRATOR
 #     1997 April 23 (TIMJ)
 #        Add ability to select a switch
+#     1997 June 20 (TIMJ)
+#        Use default value as VPATH in USE_CALIBRATOR and SPIKE_LEVEL
 
 #     {enter_further_changes_here}
 
@@ -31,7 +33,7 @@
 
    INTERFACE REDUCE_SWITCH
 
-      HELPLIB 'SCUBA_HELP:'
+      HELPLIB 'SURF_HELP:'
 
       PARAMETER IN
          POSITION 1
@@ -49,17 +51,17 @@
       ENDPARAMETER
 
       PARAMETER USE_CALIBRATOR
-         POSITION 2
          TYPE     '_LOGICAL'
 	 DEFAULT 'NO'
+         VPATH    'DEFAULT'
          PROMPT   'Should the data be divided by the internal calibrator'
 	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER SPIKE_LEVEL
-	 POSITION 3
 	 TYPE '_INTEGER'
-	 DEFAULT 0
+	 DEFAULT 5
+	 VPATH 'DEFAULT'
  	 PROMPT   'De-spike level'
 	 HELPKEY  '*'
       ENDPARAMETER
@@ -75,7 +77,7 @@
 
 
       PARAMETER 'OUT'
-         POSITION 4
+         POSITION 2
          TYPE     'FILENAME'
 	 ACCESS   'WRITE'
 	 VPATH    'PROMPT'

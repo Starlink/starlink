@@ -1,13 +1,66 @@
+## RESTORE - Remove dual beam response for SCAN/MAP data
+ 
+#+
+#  Name:
+#     RESTORE.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     JFL:  John Lightfoot (ROE)
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1995 (JFL)
+#        Original Version
+#     1997 April (TIMJ)
+#        Add header and HELPLIB and CHOP and defaults
+#     1997 April 29 (TIMJ)
+#        Add GLOBAL association to 'IN' and MSG_FILTER
+#     {enter_further_changes_here}
+ 
+#-
+
+
    INTERFACE RESTORE
 
+      HELPLIB 'SURF_HELP:'
+
+     PARAMETER   CHOP
+        POSITION 3
+        PROMPT   'Size of chop'
+        TYPE     '_REAL'
+        RANGE    0, 360
+        HELPKEY '*'
+      ENDPARAMETER
+
       PARAMETER IN
+         POSITION  1
          TYPE     'FILENAME'
          PROMPT   'Name of input file containing demodulated data'
+         VPATH    'PROMPT'
+         PPATH    'GLOBAL'
+         ASSOCIATION '<-GLOBAL.DATA_ARRAY'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER OUT
+         POSITION 2
          TYPE     'FILENAME'
          PROMPT   'Name of file to contain restored data'
+         VPATH    'PROMPT'
+         PPATH    'GLOBAL'
+         ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         HELPKEY  '*'
       ENDPARAMETER
 
    ENDINTERFACE

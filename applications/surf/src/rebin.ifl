@@ -23,24 +23,48 @@
 #        Add NA,AZ output coords
 #     1997 January 9 (TIMJ)
 #        Comment out defaults and in for REBIN_METHOD (using PAR_CHOIC)
+#     1997 April 7 (TimJ)
+#	 Change IN and REF to a CHAR
+#        Add MSG_FILTER
+#     1997 April 8 (TimJ)
+#        Change USE_INTS to USE_SECTION
+#	 Remove SELECT_INTS and INTEGRATIONS
+#     1997 April 9 (TimJ)
+#	 Add DUMMY to deal with GLOBAL defaults in REF	
+#     1997 April 21 (TimJ)
+#        Add SFACTOR
+#     1997 May 9 (TimJ)
+#	 Add PL output coords
+#     1997 May 15 (TimJ)
+#        Add LOOP parameter
+#     1997 June 19 (TIMJ)
+#        Remove USE_SECTION
+#     {enter_further_changes_here}
 
 #-
 
    INTERFACE REBIN
 
-      HELPLIB 'SCUBA_HELP:'
+      HELPLIB 'SURF_HELP:'
 
       PARAMETER REF        # First reference date file
-         TYPE NDF
+         TYPE '_CHAR'
          ACCESS 'READ'
          PPATH 'GLOBAL'
-         ASSOCIATION '<-GLOBAL.DATA_ARRAY'
 	 PROMPT   'Name of first data file to be rebinned'
 	 HELPKEY  '*'
       ENDPARAMETER
 
+      PARAMETER LOOP
+	TYPE '_LOGICAL'
+	PROMPT 'Ask for multiple input files'
+	DEFAULT 'yes'
+	VPATH 'default'
+	 HELPKEY  '*'
+      ENDPARAMETER
+
       PARAMETER IN
-         TYPE     NDF
+         TYPE     '_CHAR'
          ACCESS   'READ'
          VPATH    'PROMPT'
          PPATH    'DYNAMIC, DEFAULT'
@@ -48,6 +72,24 @@
          PROMPT   'Name of next input file to be rebinned'
 	 HELPKEY  '*'
       ENDPARAMETER
+
+      PARAMETER DUMMY
+# Allows me to read GLOBAL filename
+         TYPE NDF
+         ACCESS 'READ'
+         VPATH 'GLOBAL'
+         ASSOCIATION '<-GLOBAL.DATA_ARRAY'
+         PROMPT 'Should never appear, eek'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
 
       PARAMETER REBIN_METHOD
          TYPE    '_CHAR'
@@ -57,31 +99,16 @@
 	 HELPKEY  '*'
       ENDPARAMETER
  
-      PARAMETER SELECT_INTS
-	TYPE '_LOGICAL'
-	PROMPT 'Do you wish to select specific integrations'
-	DEFAULT 'no'
-	 HELPKEY  '*'
-      ENDPARAMETER
-
-      PARAMETER INTEGRATIONS
-         TYPE    '_INTEGER'
-         PROMPT  'The integrations with quality to change; 0 for all'
-	 DEFAULT 0
-	 HELPKEY  '*'
-      ENDPARAMETER
-
-      PARAMETER USE_INTS
-	TYPE '_LOGICAL'
-	PROMPT 'Keep only these (else discard)'
-	DEFAULT 'yes'
-	 HELPKEY  '*'
-      ENDPARAMETER
-
       PARAMETER WEIGHT
         TYPE     '_REAL'
         PROMPT   'Weight to be assigned to input dataset'
         DEFAULT  1.0
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER SFACTOR
+        TYPE     '_REAL'
+        PROMPT   'Smoothing factor for spline interpolation
 	 HELPKEY  '*'
       ENDPARAMETER
 
@@ -108,8 +135,8 @@
 
       PARAMETER OUT_COORDS
          TYPE    '_CHAR'
-         PROMPT  'Coordinate system of output map; AZ,NA,RB,RJ,RD or GA'
-#	 IN      'RB','RJ','RD','GA', 'NA','AZ'
+         PROMPT  'Coordinate sys of output map; PL,AZ,NA,RB,RJ,RD or GA'
+#	 IN      'RB','RJ','RD','GA', 'NA','AZ','PL'
 	 HELPKEY  '*'
       ENDPARAMETER
 
