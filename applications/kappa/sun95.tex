@@ -1012,8 +1012,7 @@ a selection of scaling modes and many options such as axes;
 tables and palettes}{se:coltab} (for axes, annotation, coloured markers
 and borders);
 \item \htmlref{snapshot}{SNAPSHOT} of an image display to hardcopy; and
-\item line graphics: \htmlref{contouring}{TURBOCONT}, including
-\htmlref{overlay}{CONTOVER}; histogram; \htmlref{line
+\item line graphics: \htmlref{contouring}{CONTOUR}; histogram; \htmlref{line
 plots}{LINPLOT} of 1-dimensional arrays, and \htmlref{multiple-line
 plot}{MLINPLOT} of images; \htmlref{pie sections}{ELPROF}, and slices
 through an image; \htmlref{vector plot}{VECPLOT} of image; all of
@@ -3316,7 +3315,7 @@ yellow.
 with a window.  This lets you clear the overlay independently of the
 image (task \htmlref{OVCLEAR}{OVCLEAR}), so you can annotate a picture
 with other graphics. This is most useful in interactive applications
-like \htmlref{ARDGEN}{ARDGEN}, \htmlref{CONTOVER}{CONTOVER},
+like \htmlref{ARDGEN}{ARDGEN}, \htmlref{CONTOUR}{CONTOUR},
 \htmlref{INSPECT}{INSPECT} or \htmlref{SEGMENT}{SEGMENT}.  A
 {\footnotesize GWM} overlay does have one drawback, however: it halves the
 number of available colour indices.  If you want to use an X-windows
@@ -3368,9 +3367,7 @@ issue these commands that often.
 
 For an X-windows overlay, INSPECT in the cursor
 mode uses dashed lines instead of changing colour, for example when
-indicating the position of a region or slice.  Similarly for
-CONTOVER when pen rotation is selected, and for
-annotations in \htmlref{CURSOR}{CURSOR} and SEGMENT.
+indicating the position of a region or slice.  
 
 \subsection{Composite Hardcopy Plots}
 
@@ -3399,7 +3396,7 @@ on an image.
 \begin{verbatim}
     % idset epsfcol_l
     % display $KAPPA_DIR/comwest lut=$KAPPA_DIR/spectrum_lut mode=ra axes
-    % contover device=epsfcol_l mode=au \\
+    % contour noclear device=epsfcol_l mode=au \\
     % psmerge gks74.ps* > myplot.ps
     % rm gks74.ps*
 \end{verbatim}
@@ -10563,7 +10560,7 @@ parenthesis is essential.
 
      { Draw a contour plot around the star on the current graphics device
      { at the given percentiles.
-        TURBOCONT NDF=(NDFOUT) MODE=PE PERCENTILES=[80,90,95,99]
+        CONTOUR NDF=(NDFOUT) MODE=PE PERCENTILES=[80,90,95,99]
 
      { Exit if an error occurred, such as not being able to find a star
      { near the supplied position, or being unable to make the plot.
@@ -11079,12 +11076,12 @@ example,
 
 \small
 \begin{verbatim}
-     DEFSTRING MYC{ON} TURBOCONT CLEAR=F PENROT MODE=AU NCONT=7
+     DEFSTRING MYC{ON} CONTOUR CLEAR=F PENROT MODE=AU NCONT=7
 \end{verbatim}
 \normalsize
 
 defines {\tt MYC} or {\tt MYCO} or {\tt MYCON} to run
-\htmlref{TURBOCONT}{TURBOCONT} without clearing the screen, with pen
+\htmlref{CONTOUR}{CONTOUR} without clearing the screen, with pen
 rotation and seven equally spaced contour heights.  The symbols are not
 limited to {\footnotesize KAPPA}.  Indeed they can include shorthands for
 shell commands.  For example,
@@ -11110,7 +11107,7 @@ example,
  
 \small
 \begin{verbatim}
-     % alias mycon turbocont clear=f penrot mode=au ncont=7
+     % alias mycon contour clear=f penrot mode=au ncont=7
 \end{verbatim}
 \normalsize
  
@@ -11185,8 +11182,6 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Reduces the size of an NDF by picking equally spaced pixels.}
 \menuitem{CONTOUR}{
  Contours a 2-d NDF.}
-\menuitem{CONTOVER}{
- Contours a 2-d NDF overlaid on an image displayed previously.}
 \menuitem{CONVOLVE}{
  Convolves a pair of 1- or 2-dimensional NDFs together.}
 \menuitem{COPYBAD}{
@@ -11512,8 +11507,6 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Lists the contents of a transformation structure.}
 \menuitem{TRIG}{
  Performs a trigonometric  transformation on a data array.}
-\menuitem{TURBOCONT}{
- Contours a 2-d NDF quickly.}
 \menuitem{VECPLOT}{
  Plots a 2-dimensional vector map.}
 \menuitem{WCSADD}{
@@ -11733,8 +11726,6 @@ functions as follows.
 \begin{description}
 \classitem{CONTOUR}
  Contours a 2-d NDF.
-\classitem{CONTOVER}
- Contours a 2-d data array overlaid on an image displayed previously.
 \classitem{DISPLAY}
  Displays a 1-d or 2-d NDF.
 \classitem{DRAWSIG}
@@ -11758,8 +11749,6 @@ functions as follows.
 \classitem{SNAPSHOT}
  Dumps an image-display memory to a graphics hardcopy and
  optionally to an NDF.
-\classitem{TURBOCONT}
- Contours a 2-d NDF quickly.
 \classitem{VECPLOT}
  Plots a 2-dimensional vector map.
 \end{description}
@@ -12285,12 +12274,10 @@ shows how to run the application from the command line.  More often
 you'll enter the command name and just some of the parameters, and be
 prompted for the rest. {\em Note that from the C-shell you must escape
 any special characters that appear in these examples.} For instance,
-the fourth example of COMPAVE and the third of CONTOVER would be
-written like this
+the fourth example of COMPAVE would be written like this
 
 \begin{verbatim}
      compave cosmos galaxy '[4,3]' weight title='"COSMOS compressed"'
-     contover iras60'(200:300,100:350)' comp=d offset='[3,5]' \\
 \end{verbatim}
 
 from the C-shell.
@@ -15170,13 +15157,13 @@ default value.
       }{
          The widths of the margins to leave around the contour map for axis
          annotation. The widths should be given as fractions of the
-         corresponding dimension of the DATA picture.
-         The actual margins used may be increased to preserve the aspect
+         corresponding dimension of the current picture. The actual margins 
+         used may be increased to preserve the aspect
          ratio of the DATA picture. Four values may be given, in the order;
          bottom, right, top, left. If fewer than four values are given,
          extra values are used equal to the first supplied value. If these
          margins are too narrow any axis annotation may be clipped. If a
-         null (!) value is supplied, the value used is 0.18 (for all edges)
+         null (!) value is supplied, the value used is 0.15 (for all edges)
          if annotated axes are being produced, and zero otherwise. See also
          parameter KEYPOS. {\tt [current value]}
       }
@@ -15446,7 +15433,7 @@ default value.
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: WCSFRAME, TURBOCONT, PICDEF; Figaro: ICONT; SPECDRE: SPECCONT.
+      KAPPA: WCSFRAME, PICDEF; Figaro: ICONT; SPECDRE: SPECCONT.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -15467,6 +15454,16 @@ default value.
    Contours a 2-d NDF overlaid on an image displayed previously
 }{
    \sstdescription{
+
+\vspace{5mm}
+\begin{quote}
+\begin{center}
+\emph{ Note, this application will be withdrawn at the next release of
+KAPPA. Use ``CONTOUR CLEAR=NO'' instead.} 
+\end{center}
+\end{quote}
+\vspace{5mm}
+
       This application draws a contour plot of a 2-dimensional NDF
       using an efficient algorithm.  The array may be part or whole of
       the data array, but also the variance or quality can be shown.
@@ -15777,7 +15774,7 @@ default value.
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: CONTOUR, TURBOCONT; Figaro: ICONT, SPECCONT.
+      KAPPA: CONTOUR; Figaro: ICONT, SPECCONT.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -17257,7 +17254,7 @@ default value.
          given, extra values are used equal to the first supplied value. If
          these margins are too narrow any axis annotation may be clipped.
          If a null (!) value is supplied, the value used is (for all edges);
-         0.2 if annotated axes are being produced; 0.06, if a simple border
+         0.15 if annotated axes are being produced; 0.04, if a simple border
          is being produced; and 0.0 if neither border nor axes are being
          produced. {\tt [current value]}
       }
@@ -23224,12 +23221,12 @@ scaling limits are used for both images.
          MARGIN( 4 ) = \_REAL (Read)
       }{
          The widths of the margins to leave for axis annotation, given
-         as fractions of the corresponding dimension of the DATA picture.
+         as fractions of the corresponding dimension of the current picture.
          Four values may be given, in the order - bottom, right, top, left.
          If less than four values are given, extra values are used equal to
          the first supplied value. If these margins are too narrow any axis
          annotation may be clipped. If a null ({\tt !}) value is supplied, the
-         value used is 0.18 (for all edges) if either annotated axes or
+         value used is 0.15 (for all edges) if either annotated axes or
          a key are produced, and zero otherwise. {\tt [current value]}
       }
       \sstsubsection{
@@ -24960,12 +24957,12 @@ plot (6k).
          MARGIN( 4 ) = \_REAL (Read)
       }{
          The widths of the margins to leave for axis annotation, given
-         as fractions of the corresponding dimension of the DATA picture.
+         as fractions of the corresponding dimension of the current picture.
          Four values may be given, in the order - bottom, right, top, left.
          If less than four values are given, extra values are used equal to
          the first supplied value. If these margins are too narrow any axis
          annotation may be clipped. If a null (!) value is supplied, the
-         value used is 0.18 (for all edges) if either annotated axes or a
+         value used is 0.15 (for all edges) if either annotated axes or a
          key are produced, and zero otherwise. {\tt [current value]}
       }
       \sstsubsection{
@@ -29562,7 +29559,7 @@ plot (10k).
       }{
          The widths of the margins to leave around the contour map for axis
          annotation. The widths should be given as fractions of the
-         corresponding dimension of the DATA picture. Four values may be
+         corresponding dimension of the current picture. Four values may be
          given, in the order; bottom, right, top, left. If fewer than four
          values are given, extra values are used equal to the first supplied
          value. If these margins are too narrow any axis annotation may be
@@ -30897,12 +30894,12 @@ plot (9k).
          MARGIN( 4 ) = \_REAL (Read)
       }{
          The widths of the margins to leave for axis annotation, given
-         as fractions of the corresponding dimension of the DATA picture.
+         as fractions of the corresponding dimension of the current picture.
          Four values may be given, in the order - bottom, right, top, left.
          If less than four values are given, extra values are used equal to
          the first supplied value. If these margins are too narrow any axis
          annotation may be clipped. If a null (!) value is supplied, the
-         value used is 0.18 (for all edges) if annotated axes are produced, 
+         value used is 0.15 (for all edges) if annotated axes are produced, 
          and zero otherwise. {\tt [current value]}
       }
       \sstsubsection{
@@ -33840,12 +33837,12 @@ plot (9k).
          MARGIN( 4 ) = \_REAL (Read)
       }{
          The widths of the margins to leave for axis annotation, given
-         as fractions of the corresponding dimension of the DATA picture.
+         as fractions of the corresponding dimension of the current picture.
          Four values may be given, in the order - bottom, right, top, left.
          If less than four values are given, extra values are used equal to
          the first supplied value. If these margins are too narrow any axis
          annotation may be clipped. If a null ({\tt !}) value is upplied, the
-         value used is 0.18 (for all edges) if either annotated axes or a
+         value used is 0.15 (for all edges) if either annotated axes or a
          key are produced, and zero otherwise. {\tt [current value]}
       }
       \sstsubsection{
@@ -34670,12 +34667,12 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          MARGIN( 4 ) = \_REAL (Read)
       }{
          The widths of the margins to leave for axis annotation, given
-         as fractions of the corresponding dimension of the DATA picture.
+         as fractions of the corresponding dimension of the current picture.
          Four values may be given, in the order - bottom, right, top, left.
          If less than four values are given, extra values are used equal to
          the first supplied value. If these margins are too narrow any axis
          annotation may be clipped. If a null (!) value is supplied, the
-         value used is 0.18 (for all edges) if annotated axes are produced, 
+         value used is 0.15 (for all edges) if annotated axes are produced, 
          and zero otherwise. {\tt [current value]}
       }
       \sstsubsection{
@@ -39457,6 +39454,16 @@ right.
    Contours a 2-d NDF quickly
 }{
    \sstdescription{
+
+\vspace{5mm}
+\begin{quote}
+\begin{center}
+\emph{ Note, this application will be withdrawn at the next release of
+KAPPA. Use ``CONTOUR'' instead.} 
+\end{center}
+\end{quote}
+\vspace{5mm}
+
       This application draws a contour plot of a 2-dimensional NDF on the
       current graphics device via an efficient algorithm.  The image may be
       part or whole of the data array, but also the variance or quality
@@ -39927,7 +39934,7 @@ right.
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: CONTOUR, CONTOVER; Figaro: ICONT, SPECCONT.
+      KAPPA: CONTOUR; Figaro: ICONT, SPECCONT.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -39966,10 +39973,10 @@ right.
       picture contains suitable co-ordinate Frame information (see
       parameter CLEAR).
 
-      Annotated axes or a simple border can be produced (see parameters
-      AXES and BORDER), and the appearance of these can be controlled in
-      detail using parameter STYLE. The axes show co-ordinates in the
-      current co-ordinate Frame of NDF1.
+      Annotated axes can be produced (see parameter AXES), and the
+      appearance of these can be controlled in detail using parameter
+      STYLE. The axes show co-ordinates in the current co-ordinate Frame
+      of NDF1.
 
       A key to the vector scale can be displayed to the right of the
       vector map (see parameter KEY). The appearance and position of this
@@ -40002,15 +40009,8 @@ right.
          Frame NDF1 - which may be changed using application WCSFRAME
          (see also parameter USEAXIS). The width of the margins left for
          the annotation may be controlled using parameter MARGIN. The
-         appearance of the axes (colours, fonts, etc) can be controlled
+         appearance of the axes (colours, fonts, \emph{etc.}) can be controlled
          using the STYLE parameter. {\tt [TRUE]}
-      }
-      \sstsubsection{
-         BORDER = \_LOGICAL (Read)
-      }{
-         TRUE if a simple border is to be drawn around the vector map.
-         The appearance of the border (colour, width, etc) can be
-         controlled using parameter STYLE. {\tt [FALSE]}
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -40122,18 +40122,18 @@ right.
          reported).
 
          The appearance of the text in the key is controlled using {\tt "}String{\tt "}
-         attributes (e.g. COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
+         attributes (\emph{e.g.} COLOUR(STRINGS), FONT(STRINGS), \emph{etc.} - the synonym
          TEXT can be used in place of STRINGS). Note, the Size attribute
          specifies the size of key text relative to the size of the numerical
          labels on the vector map axes. Thus a value of 2.0 for Size will
          result in text which is twice the size of the numerical axis labels.
          The appearance of the example vector is controlled using {\tt "}Curve{\tt "}
-         attributes (e.g. COLOUR(CURVES), etc - the synonym VECTOR can be
+         attributes (\emph{e.g.} COLOUR(CURVES), \emph{etc.} - the synonym VECTOR can be
          used in place of CURVES). The numerical scale value is formatted as
-         an axis 1 value (using attributes FORMAT(1), DIGITS(1), etc - the
+         an axis 1 value (using attributes FORMAT(1), DIGITS(1), \emph{etc.} - the
          synonym SCALE can be used in place of the value 1). The length of
          the example vector is formatted as an axis 2 value (using attribute
-         FORMAT(2), etc - the synonym VECTOR can be used in place of the
+         FORMAT(2), \emph{etc.} - the synonym VECTOR can be used in place of the
          value 2). The vertical space between lines in the key can be
          controlled using attribute TextLabGap. A value of 1.0 is used if
          no value is set for this attribute, and produces default vertical
@@ -40152,16 +40152,15 @@ right.
       }{
          The widths of the margins to leave around the vector map for axis
          annotation. The widths should be given as fractions of the
-         corresponding dimension of the DATA picture.
-         The actual margins used may be increased to preserve the aspect
-         ratio of the DATA picture. Four values may be given, in the order;
-         bottom, right, top, left. If fewer than four values are given,
-         extra values are used equal to the first supplied value. If these
-         margins are too narrow any axis annotation may be clipped. The
-         dynamic default is 0.2 (for all edges) if annotated axes are being
-         produced, otherwise 0.06 (for all edges) if a border is being
-         produced, and zero otherwise. See also parameter KEYPOS.
-         {\tt [current value]}
+         corresponding dimension of the current picture. The actual margins
+         used may be increased to preserve the aspect ratio of the DATA
+         picture. Four values may be given, in the order; bottom, right,
+         top, left. If fewer than four values are given, extra values are
+         used equal to the first supplied value. If these margins are too
+         narrow any axis annotation may be clipped. If a null (!) value
+         is supplied, the value used is 0.15 (for all edges) if annotated
+         axes are being produced, and zero otherwise. See also parameter
+         KEYPOS. {\tt [current value]}
       }
       \sstsubsection{
          NDF1 = NDF (Read)
@@ -40214,7 +40213,7 @@ right.
          reported).
 
          The appearance of the vectors is controlled by the attributes
-         Colour(Curves), Width(Curves), etc (the synonym Vectors may be
+         Colour(Curves), Width(Curves), \emph{etc.} (the synonym Vectors may be
          used in place of Curves). {\tt [current value]}
       }
       \sstsubsection{
@@ -43931,6 +43930,12 @@ The following applications have been modified:
                \end{description}
          \end{itemize}
 
+      \item [\htmlref{CONTOVER}{CONTOVER}] \mbox{}
+         CONTOVER has been scheduled for withdrawl at the next release of
+         KAPPA, and a warning message is now displayed every time
+         CONTOVER is run. Use ``CONTOUR CLEAR=NO'' instead to draw a contour
+         map over an existing data picture.
+
       \item [\htmlref{CURSOR}{CURSOR}] \mbox{}
          A bug has been fixed which resulted in CURSOR running out of
          picture identifiers (and consequently aborting) if more than
@@ -44318,6 +44323,15 @@ The following applications have been modified:
             Negative rotation angles are now accepted.
          \end{itemize}
 
+      \item [\htmlref{TURBOCONT}{TURBOCONT}] \mbox{}
+         TURBOCONT has been scheduled for withdrawl at the next release of
+         KAPPA, and a warning message is now displayed every time
+         TURBOCONT is run. To retain TURBOCONT would require it to be
+         converted to use PGPLOT/AST. This would slow it down so that it
+         would offer little speed benefit over CONTOUR. In these days of
+         higher powered workstatations the small difference in speed would 
+         not justify having two essentially identical applications.
+
       \item [\htmlref{VECPLOT}{VECPLOT}] \mbox{}
          \begin{itemize}
             \item Axes are now annotated with values in the current co-ordinate
@@ -44401,6 +44415,13 @@ The following applications have been modified:
 
 \subsection{Other Changes}
 \begin{itemize}
+\item The use of MARGIN parameters to determine the width of the margins 
+to place around annotated axes has been changed. The widths of the margins
+used to be specified as fractions of the height or width of the
+corresponding DATA plot. They are now given as fractions of the height or
+width of the current picture. Applications affected include CONTOUR,
+DISPLAY, LINPLOT.
+
 \item A bug has been fixed in the random number generators which could
 cause the same set of random numbers to be used on succesive invocations
 of an application, if the invocations occurred within one second of each
@@ -44644,8 +44665,6 @@ functions as follows.
 \begin{description}
 \classitem{CONTOUR}
  Contours a 2-d NDF.
-\classitem{CONTOVER}
- Contours a 2-d data array overlaid on an image displayed previously.
 \classitem{DISPLAY}
  Displays a 1-d or 2-d NDF.
 \classitem{DRAWSIG}
@@ -44669,8 +44688,6 @@ functions as follows.
  optionally to an NDF.
 \classitem{SCATTER}
  Displays a scatter plot between data in two NDFs.
-\classitem{TURBOCONT}
- Contours a 2-d NDF quickly.
 \classitem{VECPLOT}
  Plots a 2-dimensional vector map.
 \end{description}
