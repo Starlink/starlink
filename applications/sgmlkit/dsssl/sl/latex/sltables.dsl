@@ -32,16 +32,11 @@ first.
 <codebody>
 (element table
   (make environment name: "table"
-	(process-matching-children 'tgroup)
+	(process-matching-children 'tabular)
 	(process-matching-children 'caption)))
 
-;; caption dealt with in slmisc.dsl
-;;(element caption
-;;  (let* ((caption-details (get-caption-details (parent (current-node)))))
-;;    (make command name: "caption"
-;;	  parameters: '("?")		; empty [] to suppress LOF entry
-;;	  (literal (string-append (car caption-details) ": "))
-;;	  (process-children))))
+(element tabular
+  (process-matching-children 'tgroup))
 
 (element tgroup
   (let* ((colno (table-colno))
