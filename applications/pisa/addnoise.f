@@ -126,8 +126,8 @@
       
 *  get the output image, remove any variances it may have, and copy the
 *  input data array into it.
-      CALL  NDF_PROP( NDFIN, 'DATA,QUALITY,NOVARIANCE', 'OUT', NDFOUT,
-     :          STATUS )
+      CALL NDF_PROP( NDFIN, 'DATA,QUALITY,NOVARIANCE', 'OUT', NDFOUT,
+     :               STATUS )
 
 *  map in the data component
       CALL NDF_MAP( NDFOUT, 'DATA', '_REAL', 'UPDATE', IPOUT, EL,

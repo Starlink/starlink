@@ -1,4 +1,3 @@
-
       SUBROUTINE PISAGEN( STATUS )
 *+
 *  Name:
@@ -372,7 +371,8 @@
 *  Add some noise to the data, if required 
       IF ( ADDNOI ) THEN
          CALL ANOISE( %VAL( CNF_PVAL( PNTR ) ), IDIM( 1 ) * IDIM( 2 ), 
-     :                POISON, SIGMA, ADU, %VAL( IPVAR ), STATUS )
+     :                POISON, SIGMA, ADU, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                STATUS )
       END IF
 
 *  Add title to the output frame.
