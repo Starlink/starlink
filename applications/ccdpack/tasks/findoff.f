@@ -436,6 +436,10 @@
 *        coordinate frame.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     23-JAN-2001 (MBT):
+*        Fixed a bug in place probably since MAR-1999 which altogether
+*        prevented FINDOFF working when NDFNAMES=false (failure to
+*        initialise PSIZE).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -647,9 +651,14 @@
 
 *  See if we should use WCS information to restrict lists of objects
 *  to be matched.
-      IF ( USEWCS ) CALL PAR_GET0L( 'RESTRICT', RSTRCT, STATUS )
+      IF ( USEWCS ) THEN
+         CALL PAR_GET0L( 'RESTRICT', RSTRCT, STATUS )
+      ELSE
+         RSTRCT = .FALSE.
+      END IF
 
-*  Write the names of the associated NDFs out to the user.
+*  If appropriate write a header to the user for the names of the
+*  associated NDFs.
       IF ( NDFS ) THEN 
          CALL CCD1_MSG( ' ', ' ', STATUS )
          LINE1 = '    NDFs containing position lists'
@@ -661,38 +670,40 @@
          CALL CCD1_MSG( ' ', LINE1, STATUS )
          CALL CCD1_MSG( ' ', LINE2, STATUS )
          DIFDMN = .FALSE.
+      END IF
 
-         DO 7 I = 1, NOPEN
+*  Loop over position lists to acquire coordinate information.
+      DO 7 I = 1, NOPEN
 
 *  Get World Coordinate System information from NDFs.
-            IF ( USEWCS ) THEN
+         IF ( USEWCS ) THEN
 
 *  Get pointer to WCS frameset.
-               CALL NDG_NDFAS( NDFGR, I, 'READ', IDIN, STATUS )
-               CALL CCD1_GTWCS( IDIN, IWCS, STATUS )
+            CALL NDG_NDFAS( NDFGR, I, 'READ', IDIN, STATUS )
+            CALL CCD1_GTWCS( IDIN, IWCS, STATUS )
 
 *  Get Current domain of frameset, and check against previous one.
-               DMN = AST_GETC( IWCS, 'Domain', STATUS )
-               IF ( I .EQ. 1 ) THEN
-                  DMN1 = DMN
-               ELSE IF ( DMN .NE. DMN1 ) THEN
-                  DIFDMN = .TRUE.
-               END IF
+            DMN = AST_GETC( IWCS, 'Domain', STATUS )
+            IF ( I .EQ. 1 ) THEN
+               DMN1 = DMN
+            ELSE IF ( DMN .NE. DMN1 ) THEN
+               DIFDMN = .TRUE.
+            END IF
 
 *  Get a mapping from the position list as read (PIXEL-domain
 *  coordinates) to the values to be used for comparison (coordinates
 *  of the Current domain of each NDF).
-               CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
-               MAP1 = AST_GETMAPPING( IWCS, JPIX, AST__CURRENT, STATUS )
-               MAPS( I ) = AST_SIMPLIFY( MAP1, STATUS )
+            CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
+            MAP1 = AST_GETMAPPING( IWCS, JPIX, AST__CURRENT, STATUS )
+            MAPS( I ) = AST_SIMPLIFY( MAP1, STATUS )
 
 *  Get the Current frame of the WCS component (used for formatting 
 *  coordinate output).
-               FRMS( I ) = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+            FRMS( I ) = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
 *  Get NDF bounding box in pixel coordinates.
-               CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
-               IF ( RSTRCT ) THEN
+            CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
+            IF ( RSTRCT ) THEN
 
 *  Get bounding box: BNDX and BNDY contain the X and Y pixel coordinates
 *  of the corners of the NDF's DATA array, for the purpose of determining
@@ -700,19 +711,19 @@
 *  They must be listed in BNDX and BNDY in a clockwise, or anti-clockwise, 
 *  order.  They are modified here by the ERROR parameter so that pixels 
 *  outside the box by that distance are considered for matching.
-                  XP( 1 ) = DBLE( LBND( 1 ) - 1 ) - ERROR
-                  XP( 2 ) = DBLE( UBND( 1 ) ) + ERROR
-                  XP( 3 ) = DBLE( UBND( 1 ) ) + ERROR
-                  XP( 4 ) = DBLE( LBND( 1 ) - 1 ) - ERROR
-                  YP( 1 ) = DBLE( LBND( 2 ) - 1 ) - ERROR
-                  YP( 2 ) = DBLE( LBND( 2 ) - 1 ) - ERROR
-                  YP( 3 ) = DBLE( UBND( 2 ) ) + ERROR
-                  YP( 4 ) = DBLE( UBND( 2 ) ) + ERROR
+               XP( 1 ) = DBLE( LBND( 1 ) - 1 ) - ERROR
+               XP( 2 ) = DBLE( UBND( 1 ) ) + ERROR
+               XP( 3 ) = DBLE( UBND( 1 ) ) + ERROR
+               XP( 4 ) = DBLE( LBND( 1 ) - 1 ) - ERROR
+               YP( 1 ) = DBLE( LBND( 2 ) - 1 ) - ERROR
+               YP( 2 ) = DBLE( LBND( 2 ) - 1 ) - ERROR
+               YP( 3 ) = DBLE( UBND( 2 ) ) + ERROR
+               YP( 4 ) = DBLE( UBND( 2 ) ) + ERROR
 
 *  Convert the bounding box from pixel to current coordinates.
-                  CALL AST_TRAN2( MAPS( I ), 4, XP, YP, .TRUE.,
-     :                            BNDX( 1, I ), BNDY( 1, I ), STATUS )
-               END IF
+               CALL AST_TRAN2( MAPS( I ), 4, XP, YP, .TRUE.,
+     :                         BNDX( 1, I ), BNDY( 1, I ), STATUS )
+            END IF
 
 *  Work out the approximate linear size of a pixel.  This will
 *  be used to convert ERROR and MAXDISP from pixel coordinates to the
@@ -724,39 +735,39 @@
 *  but if they aren't of very similar scale they are not going to 
 *  match anyway.
 *  First get two points to convert.
-               XP( 1 ) = 0.5D0 * DBLE( LBND( 1 ) + UBND( 1 ) ) - 0.5D0
-               XP( 2 ) = XP( 1 ) + 1D0
-               YP( 1 ) = 0.5D0 * DBLE( LBND( 2 ) + UBND( 2 ) ) - 0.5D0
-               YP( 2 ) = YP( 1 ) + 1D0
+            XP( 1 ) = 0.5D0 * DBLE( LBND( 1 ) + UBND( 1 ) ) - 0.5D0
+            XP( 2 ) = XP( 1 ) + 1D0
+            YP( 1 ) = 0.5D0 * DBLE( LBND( 2 ) + UBND( 2 ) ) - 0.5D0
+            YP( 2 ) = YP( 1 ) + 1D0
 
 *  Convert the points from pixel to current coordinates.
-               CALL AST_TRAN2( MAPS( I ), 2, XP, YP, .TRUE., XQ, YQ,
-     :                         STATUS )
+            CALL AST_TRAN2( MAPS( I ), 2, XP, YP, .TRUE., XQ, YQ,
+     :                      STATUS )
 
 *  Get the linear size of a pixel in current coordinates.
-               PSIZE( I ) = SQRT( ( XQ( 2 ) - XQ( 1 ) ) ** 2 + 
-     :                            ( YQ( 2 ) - YQ( 1 ) ) ** 2 ) 
-     :                                / SQRT( 2D0 )
+            PSIZE( I ) = SQRT( ( XQ( 2 ) - XQ( 1 ) ) ** 2 + 
+     :                         ( YQ( 2 ) - YQ( 1 ) ) ** 2 ) 
+     :                             / SQRT( 2D0 )
 
 *  Release NDF.
-               CALL NDF_ANNUL( IDIN, STATUS )
-            ELSE
+            CALL NDF_ANNUL( IDIN, STATUS )
+         ELSE
 
 *  Not using WCS; set pixel size to unity, since the coordinates we will
-*  be using will be pixel coordinates, and set coordinate frames to null
-*  values.
-               PSIZE( I ) = 1D0
-            END IF
+*  be using will be pixel coordinates.
+            PSIZE( I ) = 1D0
+         END IF
 
-*  Write message about NDF name and domain.
+*  Write message about NDF name and possibly domain.
+         IF ( NDFS ) THEN
             CALL GRP_GET( NDFGR, I, 1, FNAME, STATUS )
             CALL MSG_SETC( 'FNAME', FNAME )
             CALL MSG_SETI( 'N', I )
             CALL MSG_LOAD( ' ', '  ^N) ^FNAME', LINE, IAT, STATUS )
             IF ( USEWCS ) LINE( MAX( 45, IAT + 2 ): ) = DMN
             CALL CCD1_MSG( ' ', LINE, STATUS )
- 7       CONTINUE
-      END IF
+         END IF
+ 7    CONTINUE
 
 *  Warn if not all domains were the same.
       IF ( USEWCS .AND. DIFDMN ) THEN
