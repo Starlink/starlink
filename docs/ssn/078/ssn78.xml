@@ -527,7 +527,7 @@ const char version[] = "@PACKAGE_VERSION@";
             substituted by default, and if this file were listed as
             one of those to be substituted (by mentioning it in the
             autoconf macro
-            <code>AC_CONFIG_FILES(version.h)</code><index>AC_CONFIG_FILES</index>), 
+            <code>AC_CONFIG_FILES(version.h)</code><index>autoconf macros!AC_CONFIG_FILES</index>), 
             then a file <code>version.h</code> would be created
             containing the contents of the <code>version.h.in</code>
             file with the <code>@PACKAGE_VERSION@</code> substituted by the
@@ -614,7 +614,7 @@ AC_CHECK_FUNCS([strchr])
             macros such as <code>AC_CHECK_HEADERS</code> above; if you
             wish to add further switches to the <code>config.h.in</code>
             file, you should do so by calling the autoconf macro
-            <code>AC_DEFINE</code><index>AC_DEFINE</index>.  See the
+            <code>AC_DEFINE</code><index>autoconf macros!AC_DEFINE</index>.  See the
             section <webref 
               url="&autoconfhtml;/autoconf_82.html" >7.1 Defining C
               Preprocessor Symbols</webref> in the autoconf manual for
@@ -669,7 +669,7 @@ AC_CHECK_FUNCS([strchr])
               <webref url='&autoconfhtml;/autoconf_18.html' >4.3 Finding configure Input</webref></span></p>
 
           <p>Line 3: This macro is one of the Starlink extensions, and
-            the only required Starlink macro<index>STAR_DEFAULTS</index>.  It
+            the only required Starlink macro<index>starconf!macros!STAR_DEFAULTS</index>.  It
             sets up the defaults required for building Starlink
             applications, and assures the <code>starconf</code>
             program that it's being run in the correct directory.  See
@@ -1856,7 +1856,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           <code>AC_PROG_FPP</code>.</p>
 
         <p>You should use
-          <code>AC_PROG_FC</code><index>AC_PROG_FC</index> in
+          <code>AC_PROG_FC</code><index>autoconf macros!AC_PROG_FC</index> in
           preference to the 
           macro <code>AC_PROG_F77</code> described in the autoconf
           manual, since the `FC' support in autoconf is more flexible
@@ -1902,7 +1902,7 @@ AC_PROG_FC([], 77)
 
         <p>Starlink autoconf and automake between them add support for
           preprocessable Fortran.  Autoconf supplies the
-          <code>AC_PROG_FPP</code><index>AC_PROG_FPP</index> macro
+          <code>AC_PROG_FPP</code><index>autoconf macros!AC_PROG_FPP</index> macro
           described in <ref 
             id="macro-ac-prog-fpp"/>, to investigate what compiler and
           preprocessor are available, and automake works with the
@@ -2829,7 +2829,7 @@ AC_OUTPUT
           by looking for a f95 compiler before looking for a f77
           compiler; if you know or discover this is inappropriate,
           then you can constrain the Fortran dialect that
-          <code>AC_PROG_FC</code><index>AC_PROG_FC</index> will look
+          <code>AC_PROG_FC</code><index>autoconf macros!AC_PROG_FC</index> will look
           for by giving a value for 
           its optional dialect argument.  Macro
           <code>AC_PROG_FC</code> is not yet documented in the
@@ -3014,16 +3014,7 @@ dist_noinst_SCRIPTS = makeh
         <p>Incidentally, the other occasionally important `prefix-prefix' like
           <code>dist</code> is
           <code>nobase</code><index>installation!nobase
-          prefix</index>.  A 
-          <code>Makefile.am</code> line like
-          <code>include_HEADERS = a.h subdir/b.h</code> will cause
-          both <code>a.h</code> and <code>b.h</code> to be installed
-          in the same place: <code>nobase_include_HEADERS</code> will
-          cause the hierarchy to be preserved.  This is documented
-          rather in passing in the automake manual, in the section
-          <webref url="&automakehtml/Alternative.html" >An Alternative
-            Approach to Subdirectories</webref> (and no, I don't know
-          why `nobase' is supposed to be intuitive, either).</p>
+            prefix</index>.  See <ref id="nobase-faq"/>.</p>
 
         <p>On the other hand, files in <code>_SOURCES</code> variables
           are distributed by default, so you must turn this off if one
@@ -3068,7 +3059,7 @@ nodist_libast_la_SOURCES = \
           <em>only</em> prior to the distribution should be listed in
           <code>configure.ac</code> inside macro <ref
             id="macro-predist-sources"
-          >STAR_PREDIST_SOURCES</ref><index>STAR_PREDIST_SOURCES</index>.
+          >STAR_PREDIST_SOURCES</ref><index>starconf!macros!STAR_PREDIST_SOURCES</index>.
           The <code>./configure</code> script expects to find either
           all of these files or none of them, and if it finds some
           other number, it will warn you.  If it finds these files, it
@@ -3258,12 +3249,10 @@ test1_wrap.c:
           <title>Importing third-party sources</title>
         </subhead>
 
-        <p><strong>NOTE: this section is subject to change.</strong>
-          It's not yet clear what the best mechanism is for doing this
-          work, because it's not yet clear how general the support
-          should be.  Therefore the autoconf/automake support is likely to
-          change.  The documentation below is almost certain to
-          change.  If you're working on this area, let Norman know.</p>
+        <p><strong>NOTE: this section is subject to a little
+            change.</strong>  The guidance in this section is to some
+          extent subject to change as we get more experience including
+          third-party sources into the tree.</p>
 
         <p>If an application needs to rely on a non-Starlink
           application, and especially if it relies on a modified
@@ -3271,10 +3260,15 @@ test1_wrap.c:
           checked in to the <code>thirdparty/</code> part of the
           tree.</p>
 
+        <p>There are two stages to this.  Firstly we have to import a
+          distribution version of the software, and secondly we have to bring
+          it in to the Starlink build system.</p>
+
         <p>The example here is the GNU m4 distribution, which is
           one of the buildsupport tools necessary on Solaris, which
           has a non-GNU m4 (autoconf relies on language extensions in
-          GNU m4, which is therefore required).</p>
+          GNU m4, which is therefore required).  The first step is
+          rather mechanical, the second better introduced by example.</p>
 
         <p>First, we get and import the sources (see the fuller
           details in the <webref
@@ -3311,6 +3305,15 @@ test1_wrap.c:
           repository, namely the component name and version
           number.</p>
 
+        <p>Note that we import a <em>distribution tarball</em> of the
+          source, namely one including the <code>configure</code>
+          script and any other generated files.  This is because we
+          cannot reliably bootstrap the original sources if they, for
+          example, and also so that we can reliably track any future
+          releases of the tarball.  Even if the component has a public
+          CVS archive, resist the temptation to import a snapshot of
+          that.</p>
+
         <p>Now that the source set is in the repository, you can go
           back to your checkout tree and check the new component out:
           <verbatim>
@@ -3338,25 +3341,358 @@ File: configure.in      Status: Up-to-date
           trunk.</p>
 
         <p>What you do next depends on how easy it is to configure the
-          new component.  We'll look at two examples, the tclsys
-          component, containing a distribution of Tcl, and the m4
-          component, containing the GNU version of m4.  The tclsys
-          component comes with its own fearsomely intricate configuration,
-          which we want to disturb as little as possible, but the m4
-          configuration is more regular (as befits a core GNU
-          component), and admits of reasonable adaptation.</p>
+          new component.  We'll look at three examples,
+          the <code>m4</code> component, containing the GNU version of m4,
+          the <code>cfitsio</code> component, containing the HEASARC
+          FITS library, and
+          the <code>tclsys</code> component, containing a distribution
+          of Tcl.
+          <ol>
+            <li>
+              <p>The <code>m4</code> configuration is quite regular
+                (as befits a core GNU component), and so admits of
+                reasonable adaptation in place, by simply editing the
+                configuration files included in the distribution (and
+                then, despite what we said above, regenerating the
+                distributed <code>./configure</code> script.</p>
+            </li>
 
-        <subsubsect id="config-tclsys">
+            <li>
+              <p>The <code>cfitsio</code> distribution comes with its
+                own configure scripts, but they are generated using a
+                rather old version of autoconf, so we want to avoid
+                touching them.  However the build is basically rather
+                simple, and only a few built files need to be
+                installed.  This component shows how to wrap a
+                distribution's own configuration in a straightforward
+                way.</p>
+            </li>
+
+            <li>
+              <p>The <code>tclsys</code> component, on the other hand
+                comes with its own fearsomely intricate configuration
+                and installation mechanism, which we want to disturb
+                (or indeed know about) as little as possible.  This
+                section shows how to wrap such an installation in the
+                most general way.</p>
+            </li>
+          </ol>
+        </p>
+
+        <subsubsect indexkey="components!m4">
           <subhead>
-            <title>Configuring tclsys</title>
+            <title>Configuring m4</title>
           </subhead>
 
-          <p>The <code>tclsys</code> component is actually quite easy to
+          <p>The first thing to do is to add the
+            <code>component.xml.in</code> file:
+<verbatim>
+% cp `starconf --show buildsupportdata`/template-component.xml.in \
+      component.xml.in
+</verbatim>
+            after which we edit <code>component.xml.in</code>
+            appropriately.  This editing turns out to be slightly more
+            intricate than usual: the <code>configure.in</code> file is
+            old-fashioned enough that it does not define the
+            substitution variables that <code>component.xml.in</code> is
+            expecting, and it requires a slightly closer inspection of
+            <code>configure.in</code> to determine what these should be
+            (<code>@PRODUCT@</code> and <code>@VERSION@</code> in this
+            case).  Although this step seems redundant, it is best to
+            have this file configured rather than completely static, so
+            that the generated <code>component.xml</code> will remain
+            correct when and if a new version of the `m4' component were
+            imported.  Having said that, ensure that the
+            <code>&lt;bugreports&gt;</code> element in the
+            <code>component.xml.in</code> file points to a Starlink
+            address -- we don't want bugs in <em>our</em> modifications
+            to be reported to the original maintainers.</p>
+
+          <p>Note that it is the now-deprecated
+            <code>configure.in</code> file that is the autoconf source
+            in this component, and that it has now-deprecated syntax;
+            there is no need to update this.  When we run autoreconf, we
+            discover that this is not the only obsolete feature, and we
+            have to do some futher mild editing of
+            <code>configure.in</code> before it is acceptable to the
+            repository version of autoconf, though it still produces a
+            good number of warnings.  These don't matter for our present
+            purposes: the <code>./configure</code> which autoreconf
+            produces (and which we commit) still works, and the
+            component builds and runs successfully.  If the
+            <code>configure.in</code> were old enough that our current
+            autoconf could not process it at all, then we might consider
+            retrieving and temporarily installing an older version of
+            autoconf -- the <code>./configure</code> script includes at
+            the top a note of the autoconf version which produced
+            it.<index>autoconf!old versions</index></p>
+
+          <p>In order for the new component to be a good citizen in the
+            Starlink build tree, it needs to install a file manifest as
+            part of the <code>install</code> target<index>manifests!and
+              third-party code</index>.
+            Add to the <code>configure.in</code> file the lines
+<verbatim>
+: ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
+AC_SUBST(STAR_MANIFEST_DIR)
+</verbatim>
+            If we were using Starlink automake, this would be enough to
+            prompt it to include support for installing a manifest in the
+            <code>Makefile.in</code> it generates.  The GNU m4
+            distribution does not, however, use automake, so we need to
+            add this by hand.  The following additions to
+            <code>Makefile.in</code> do the right thing, though they are
+            rather clumsier than the support that Starlink automake adds:
+<verbatim>
+STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
+
+[...]
+
+# Change the install target from the default
+install: config.h install-manifest.xml
+         for subdir in $(SUBDIRS); do \
+             echo making $@ in $$subdir; \
+             (cd $$subdir && $(MAKE) $(MDEFINES) $@) || exit 1; \
+         done
+         $(srcdir)/mkinstalldirs $(STAR_MANIFEST_DIR)
+         $(INSTALL_DATA) install-manifest.xml $(STAR_MANIFEST_DIR)/$(PRODUCT)
+              
+# Add the install-manifest.xml target
+install-manifest.xml: all
+        rm -Rf STAGING
+        mkdir STAGING
+        $(MAKE) prefix=`pwd`/STAGING install
+        rm -f $@
+        echo "&lt;?xml version='1.0'?>"                            >$@
+        echo "&lt;!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
+        echo "&lt;manifest component='$(PACKAGE_NAME)'>"           >>$@
+        echo "&lt;version>$(PACKAGE_VERSION)&lt;/version>"            >>$@
+        echo "&lt;files>"                                          >>$@
+        find STAGING -type f | sed 's,^.*STAGING,$(prefix),'    >>$@
+        echo "&lt;/files>"                                         >>$@
+        echo "&lt;/manifest>"                                      >>$@
+        rm -Rf STAGING
+</verbatim>
+            (if you look at <code>thirdparty/fsf/m4/Makefile.in</code>
+            you will see that we actually need to have <code>PRODUCT</code> and
+            <code>VERSION</code> there instead of the more general
+            <code>PACKAGE_NAME</code> and <code>PACKAGE_VERSION</code>
+            above).  Note that the actual installation happens within
+            the rule for <code>install-manifest.xml</code> -- this
+            guarantees that the <code>$(prefix)</code> stored in the
+            manifest is the same as the <code>$(prefix)</code> actually
+            used for the installation.</p>
+
+          <p>Since we are creating this manifest entirely by hand, we
+            are responsible for ensuring that the resulting file
+            conforms to the DTD in <code>componentinfo.dtd</code> (in
+            the starconf <code>buildsupportdata</code> directory).</p>
+
+          <p>We add the <code>component.xml.in</code> file to the
+            repository, and look at what we have.
+<verbatim>
+% cvs add component.xml.in
+% cvs -n update
+</verbatim>
+            This tells us that <code>configure</code>,
+            <code>configure.in</code> and <code>config.h.in</code> have
+            been modified, and <code>component.xml.in</code> added, but
+            we also discover that files <code>stamp-h.in</code>,
+            <code>doc/stamp-vti</code> and <code>doc/version.texi</code>
+            have also been modified, as part of the regeneration of the
+            <code>./configure</code> script.  The modification to the
+            stamp file <code>stamp-h.in</code> we should probably
+            commit, to avoid dependency niggles in the future, but the
+            meaningless changes to the two <code>doc/</code> files we
+            can just discard:
+<verbatim>
+% cvs commit -m "Add component.xml template" component.xml.in 
+% cvs commit -m "...blah..." configure configure.in config.h.in 
+% cvs commit -m "Stamp file regenerated by autoreconf" stamp-h.in
+% rm doc/stamp-vti doc/version.texi 
+% cvs update doc
+</verbatim></p>
+
+          <p>We can see that the changes to <code>configure.in</code>
+            are now on the trunk for this component, rather than the
+            FSF branch.
+<verbatim>
+% cvs status configure.in
+===================================================================
+File: configure.in      Status: Up-to-date
+
+Working revision:    1.2
+Repository revision: 1.2     /cvs/thirdparty/fsf/m4/configure.in,v
+Sticky Tag:          (none)
+Sticky Date:         (none)
+Sticky Options:      -ko
+</verbatim>
+            </p>
+        </subsubsect>
+
+        <subsubsect id="config-cfitsio" indexkey="components!cfitsio">
+          <subhead>
+            <title>Configuring CFITSIO</title>
+          </subhead>
+
+          <p>The <code>cfitsio</code> component wraps the HEASARC FITS
+            library of the same name, and installs from it the library
+            itself, plus a few header files.  Although we probably
+            could adapt the library's distributed autoconf script,
+            that script is sufficiently old, and there are
+            sufficiently few components installed, that it is less
+            trouble to simply wrap this configuration in another
+            one.</p>
+
+          <p>The <code>cfitsio</code> component contains a
+            <code>cfitsio/</code> directory containing the distributed
+            library source.  Along with it are the usual
+            <code>component.xml.in</code> file, copied from the
+            template in <code>`starconf --show
+            buildsupportdata`</code>, and <code>Makefile.am</code> and
+            <code>configure.ac</code> files, which are too different
+            from the template ones for them to be helpful.</p>
+
+          <p>The <code>configure.ac</code> looks like this:
+<verbatim>
+dnl    Process this file with autoconf to produce a configure script
+AC_REVISION($Revision$)
+AC_INIT(cfitsio, 2.4-90, ussc@star.rl.ac.uk)
+
+AC_PREREQ(2.50)
+AM_INIT_AUTOMAKE(1.8.2-starlink)
+
+AC_CONFIG_SRCDIR([cfitsio.news])
+
+STAR_DEFAULTS
+
+dnl    To configure CFITSIO proper we just run ./configure in the
+dnl    cfitsio sub-directory. Do not invoke AC_CONFIG_SUBDIRS,
+dnl    since that prompts autoreconf to try to reconfigure that directory, and
+dnl    automake to assume it's allowed to play there, too.
+(
+    cd cfitsio
+    ./configure --prefix=$prefix
+)
+
+dnl    Find required versions of the programs we need for configuration
+AC_PROG_LIBTOOL
+AC_PROG_MAKE_SET
+
+STAR_LATEX_DOCUMENTATION(sun227)
+
+AC_CONFIG_FILES([Makefile component.xml])
+AC_OUTPUT
+</verbatim>
+            Note that we must use <code>STAR_DEFAULTS</code>, and we
+            must not use <code>AC_CONFIG_SUBDIRS</code>, for the reason
+            described in the comments above, even though configuring
+            the subdirectories is exactly what we want to do. This
+            particular combination of commands is sufficient to
+            configure the <code>cfitsio</code> distribution -- you might
+            need to do different things for other third-party
+            packages.  That's all the configuration we need; how about
+            the Makefile?</p>
+
+          <p>The <code>Makefile.am</code> looks like this:
+<verbatim>
+## Process this file with automake to produce Makefile.in
+
+dist_bin_SCRIPTS = cfitsio_link
+
+lib_LIBRARIES = cfitsio/libcfitsio.a
+# There are no sources for libcfits in this directory.
+cfitsio_libcfitsio_a_SOURCES =
+
+include_HEADERS = cfitsio/fitsio.h cfitsio/longnam.h \
+    cfitsio/fitsio2.h cfitsio/drvrsmem.h
+
+EXAMPLE_SOURCES = cfitsio/cookbook.c cfitsio/cookbook.f
+
+# Put examples in dist_pkgdata
+dist_pkgdata_DATA = $(EXAMPLE_SOURCES) \
+    cfitsio_changes.txt CFITSIO_CONDITIONS Licence.txt cfitsio.news
+
+# Headers and example sources are made within cfitsio
+$(include_HEADERS) $(EXAMPLE_SOURCES):
+	(cd cfitsio; unset CFLAGS; $(MAKE))
+
+# Must be a separate target from above, otherwise automake doesn't notice,
+# and adds its own, conflicting, target.
+cfitsio/libcfitsio.a:
+	(cd cfitsio; unset CFLAGS; $(MAKE))
+
+...
+</verbatim>
+            (if you look in the <code>cfitsio</code> component, you will
+            see that the actual <code>Makefile.am</code> does a little
+            more than this, and is rather more copiously commented,
+            but these are the important parts).</p>
+
+          <p>This uses a number of useful automake features.  First of
+            all, the assignments which control what is installed --
+            the contents of the <code>_LIBRARIES</code>,
+            <code>_HEADERS</code> and (via
+            <code>EXAMPLE_SOURCES</code>) <code>_DATA</code> primaries
+            -- refer to files within the <code>cfitsio/</code>
+            subdirectory.  When these are installed, the path to them
+            is stripped, so that <code>libcfitsio.a</code>, for
+            example, ends up installed in <code>.../lib/</code> and not
+            in <code>.../lib/cfitsio/</code>, as you might possibly
+            intuit.  This is the useful behaviour which is turned off
+            by the use of the <code>nobase_</code>
+            prefix<index>installation!nobase prefix</index>, as
+            described in <ref id="nobase-faq"/>.</p>
+
+          <p>Second, the presence of the <code>lib_LIBRARIES</code>
+            line means that automake expects to find some library
+            sources somewhere, and if it is not told where they are
+            with a <code>xxx_SOURCES</code> variable, then it will
+            assume a default based on the library name.  In this case,
+            of course, the sources are not in this directory, and we
+            do not wish automake to generate rules to build them, so
+            we have to pacify it by giving a value for the
+            <code>cfitsio_libcfitsio_a_SOURCES</code> variable (note
+            the canonicalisation of the library name).</p>
+
+          <p>Each of the
+            <code>cfitsio/</code> targets is built in the same way, by
+            switching to the <code>cfitsio/</code> directory and
+            making `all' using that directory's own Makefile.  The
+            only remaining wrinkle is that it turns out we have to
+            specify the <code>cfitsio/libcfitsio.a</code> target by
+            itself, rather than as part of the previous compendium
+            target.  Due, probably, to a bug, automake does not appear
+            to `notice' the library if it's mentioned in the
+            compendium target, and instead generates its own
+            conflicting target.</p>
+        </subsubsect>
+
+        <subsubsect id="config-tclsys" indexkey="components!tcl">
+          <subhead>
+            <title>Configuring tcl</title>
+          </subhead>
+
+          <!-- NB: section macro-special-install-command refers to
+               this section as an example. -->
+
+          <p>The <code>tcl</code> component (like the parallel
+            <code>tk</code> component) is paradoxically easy to
             configure, partly because its distributed
             <code>./configure</code> script is generated by a version
             of autoconf too old for us to handle directly, which means
-            that we want to avoid touching it as much as possible.
-	    After being unpacked and imported as described above, the
+            that we want to avoid touching it as much as possible, but
+            also because the Tcl distribution has an installation
+            mechanism which is too complicated to be handled by the
+            simple scheme in the previous <code>cfitsio</code>
+            section.  The method we use instead, as described below,
+            actually looks simpler, but you should probably not resort
+            to it unless necessary, since the starconf macro is uses
+            -- <ref id="macro-special-install-command"
+              ><code>STAR_SPECIAL_INSTALL_COMMAND</code></ref> -- is a
+            dangerously blunt instrument.</p>
+
+          <p>After being unpacked and imported as described above, the
             top-level of the checked out Tcl distribution looks like this:
 <verbatim>
 ptolemy:tcl> ls
@@ -3370,22 +3706,10 @@ ChangeLog  changes  doc/     library/  mac/           tools/  win/
             <code>configure.ac</code> in this directory, which handle
             this for us.</p>
 
-        <p>The first thing to do is to add the
-          <code>component.xml.in</code> file:
-<verbatim>
-% cp `starconf --show buildsupportdata`/template-component.xml.in \
-    component.xml.in
-</verbatim>
-          after which we edit <code>component.xml.in</code>
-          appropriately.  We could similarly copy the template
-          <code>Makefile.am</code> and <code>configure.ac</code>
-          files, but these are sufficiently special that it wouldn't
-          help.</p>
-
-          <!-- NB: section variable-special-install-command refers to
-               this section as an example. -->
-
-          <p>The <code>configure.ac</code> should look like this:
+          <p>We add a <code>component.xml.in</code> as before, plus
+            non-standard <code>configure.ac</code> and
+            <code>Makefile.am</code> files.  The
+            <code>configure.ac</code> should look like this:
 <verbatim>
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
@@ -3406,8 +3730,7 @@ dnl    to try to reconfigure that directory, and automake to assume
 dnl    it's allowed to play there, too.
 (
     cd unix
-    echo ./configure --prefix=$prefix --cache-file=config.cache
-    ./configure --prefix=$prefix --cache-file=config.cache
+    ./configure --prefix=$prefix
 )
 
 STAR_SPECIAL_INSTALL_COMMAND([cd unix;
@@ -3417,29 +3740,41 @@ AC_CONFIG_FILES([Makefile component.xml])
 AC_OUTPUT
 </verbatim></p>
 
-          <p>Note that we must use <code>STAR_DEFAULTS</code>, and we
-            must <em>not</em> use <code>AC_CONFIG_SUBDIRS</code>, for
-	    the reason described in the comments above, even
-            though configuring the subdirectories is exactly what we
-            want to do.  This particular combination of commands is
-            exactly what we need to do to configure Tcl -- you might
-            need to do different things for different third-party
-            packages.</p>
+          <p>This looks rather like the
+            <ref id="config-cfitsio"><code>cfitsio</code> example</ref>,
+            except for the addition of the new macro, which uses a
+            parameterised version of the distribution's own install
+            command to make the installation into the Starlink tree.</p>
 
-          <p>As described in
-            <ref id="macro-special-install-command"/>
-            <index>STAR_SPECIAL_INSTALL_COMMAND</index>,
-            this adapts the  
-            standard Makefile <code>install</code> target so that it
-            uses the given command to make an installation.  Note that
-            the version of autoconf which generated the Tcl
+          <p>As described in <ref id="macro-special-install-command"/>,
+            <index>starconf!macros!STAR_SPECIAL_INSTALL_COMMAND</index> this adapts
+            the standard Makefile <code>install</code> target so that
+            it uses the given command to make an installation.  Note
+            that the version of autoconf which generated the Tcl
             <code>Makefile.in</code> template was one which used the
             <code>INSTALL_ROOT</code> variable instead of the
             <code>DESTDIR</code> variable used by more modern
             versions, and so we have to adjust this in this command
             line.  This <code>DESTDIR</code> variable is important, as
             it is used during the installation of the component, to do
-            a staged installation.</p>
+            a staged installation, from which a manifest can be
+            derived.</p>
+
+          <p>This staging step is important, and is rather easy to get
+            wrong.  If you do get it wrong, then the installed
+            manifest will be wrong, probably causing problems later
+            when it comes to deinstalling or packaging this component.
+            The role of the <code>INSTALL_ROOT</code> variable above
+            was discovered only by inspecting the
+            <code>Makefile.in</code> in the Tcl distribution: if there
+            were no such facility, we could (probably) fake much of it
+            by using something like <code>$(MAKE)
+            prefix=$$DESTDIR$$prefix install</code> in the
+            installation macro.  The distributed Tcl Makefile appears
+            to respect the variable, but it is important to check for
+            errors such as making absolute links, or using the current
+            directory incautiously (search for <code>LN_S</code> or
+            <code>`pwd`</code> in the <code>Makefile.in</code>).</p>
 
           <p>The <code>Makefile.am</code> file is even simpler:
 <verbatim>
@@ -3462,145 +3797,6 @@ $(RECURSIVE_TARGETS):
 
           <p>That's it!</p>
 
-        </subsubsect>
-
-        <subsubsect>
-          <subhead>
-            <title>Configuring m4</title>
-          </subhead>
-
-        <p>The first thing to do is to add the
-        <code>component.xml.in</code> file:
-<verbatim>
-% cp `starconf --show buildsupportdata`/template-component.xml.in \
-    component.xml.in
-</verbatim>
-          after which we edit <code>component.xml.in</code>
-          appropriately.  This turns out to be more intricate than
-          usual: the <code>configure.in</code> file is old-fashioned
-          enough that it does not define the substitution variables
-          that <code>component.xml.in</code> is expecting, and it
-          requires a slightly closer inspection of
-          <code>configure.in</code> to determine what these should be
-          (<code>@PRODUCT@</code> and <code>@VERSION@</code> in this
-          case).  Although this step seems redundant, it is best to
-          have this file configured rather than completely static, so
-          that the generated <code>component.xml</code> will remain
-          correct when and if a new version of the `m4' component were
-          imported.  Having said that, ensure that the
-          <code>&lt;bugreports&gt;</code> element in the
-          <code>component.xml.in</code> file points to a Starlink
-          address -- we don't want bugs in <em>our</em> modifications to
-          be reported to the original maintainers.</p>
-
-        <p>Note that it is the now-deprecated
-          <code>configure.in</code> file that is the autoconf source in
-          this component, and that it has now-deprecated syntax; there
-          is no need to update this.  When we run autoreconf, we
-          discover that this is not the only obsolete feature, and we
-          have to do some futher mild editing of
-          <code>configure.in</code> before it is acceptable to the
-          repository version of autoconf, though it still produces a
-          good number of warnings.  These don't matter for our present
-          purposes: the <code>./configure</code> which autoreconf
-          produces still works, and the component builds and runs
-          successfully.</p>
-
-        <p>In order for the new component to be a good citizen in the
-          Starlink build tree, it needs to install a file manifest as
-          part of the <code>install</code> target<index>manifests!and
-          third-party code</index>.
-          Add to the <code>configure.in</code> file the lines
-          <verbatim>
-: ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
-AC_SUBST(STAR_MANIFEST_DIR)
-</verbatim>
-          If we were using Starlink automake, this would be enough to
-          prompt it to include support for installing a manifest in the
-          <code>Makefile.in</code> it generates.  The GNU m4
-          distribution does not, however, use automake, so we need to
-          add this by hand.  The following additions to
-          <code>Makefile.in</code> do the right thing, though they are
-          rather clumsier than the support that Starlink automake adds:
-          <verbatim>
-STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
-
-[...]
-
-# Change the install target from the default
-install: config.h install-manifest.xml
-        for subdir in $(SUBDIRS); do \
-          echo making $@ in $$subdir; \
-          (cd $$subdir && $(MAKE) $(MDEFINES) $@) || exit 1; \
-        done
-        $(srcdir)/mkinstalldirs $(STAR_MANIFEST_DIR)
-        $(INSTALL_DATA) install-manifest.xml $(STAR_MANIFEST_DIR)/$(PRODUCT)
- 
-# Add the install-manifest.xml target
-install-manifest.xml: all
-        rm -Rf STAGING
-        mkdir STAGING
-        $(MAKE) prefix=`pwd`/STAGING install
-        rm -f $@
-        echo "&lt;?xml version='1.0'?>"                            >$@
-        echo "&lt;!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
-        echo "&lt;manifest component='$(PACKAGE_NAME)'>"           >>$@
-        echo "&lt;version>$(PACKAGE_VERSION)&lt;/version>"            >>$@
-        echo "&lt;files>"                                          >>$@
-        find STAGING -type f | sed 's,^.*STAGING,$(prefix),'    >>$@
-        echo "&lt;/files>"                                         >>$@
-        echo "&lt;/manifest>"                                      >>$@
-        rm -Rf STAGING
-</verbatim>
-          (if you look at <code>thirdparty/fsf/m4/Makefile.in</code>
-          you will see that we actually need to have <code>PRODUCT</code> and
-          <code>VERSION</code> there instead of the more general
-          <code>PACKAGE_NAME</code> and <code>PACKAGE_VERSION</code>
-          above).  Note that the actual installation happens within
-          the rule for <code>install-manifest.xml</code> -- this
-          guarantees that the <code>$(prefix)</code> stored in the
-          manifest is the same as the <code>$(prefix)</code> actually
-          used for the installation.</p>
-
-        <p>We add the <code>component.xml.in</code> file to the
-          repository, and look at what we have.
-          <verbatim>
-% cvs add component.xml.in
-% cvs -n update
-</verbatim>
-          This tells us that <code>configure</code>,
-          <code>configure.in</code> and <code>config.h.in</code> have
-          been modified, and <code>component.xml.in</code> added, but
-          we also discover that files <code>stamp-h.in</code>,
-          <code>doc/stamp-vti</code> and <code>doc/version.texi</code>
-          have also been modified, as part of the regeneration of the
-          <code>./configure</code> script.  The modification to the
-          stamp file <code>stamp-h.in</code> we should probably
-          commit, to avoid dependency niggles in the future, but the
-          meaningless changes to the two <code>doc/</code> files we
-          can just discard:
-          <verbatim>
-% cvs commit -m "Add component.xml template" component.xml.in 
-% cvs commit -m "...blah..." configure configure.in config.h.in 
-% cvs commit -m "Stamp file regenerated by autoreconf" stamp-h.in
-% rm doc/stamp-vti doc/version.texi 
-% cvs update doc
-</verbatim></p>
-
-        <p>We can see
-          <verbatim>
-% cvs status configure.in
-===================================================================
-File: configure.in      Status: Up-to-date
-
-   Working revision:    1.2
-   Repository revision: 1.2     /cvs/thirdparty/fsf/m4/configure.in,v
-   Sticky Tag:          (none)
-   Sticky Date:         (none)
-   Sticky Options:      -ko
-</verbatim>
-          that the changes to <code>configure.in</code> are now on the
-          trunk for this component, rather than the FSF branch.</p>
         </subsubsect>
       </subsect>
 
@@ -3692,6 +3888,33 @@ M Makefile.dependencies
                 using <code>noinst_</code> tools, the Fortran
                 preprocessor, and <code>./configure</code> variables
                 in a reasonably tidy way.</p>
+            </dd>
+
+            <dt id="nobase-faq">Automake flattens paths when it
+              installs things.  Why?</dt>
+            <dd>
+              <p>This is a feature, which you can turn off if
+                necessary.  A <code>Makefile.am</code> line like
+                <code>include_HEADERS = a.h subdir/b.h</code> will
+                cause both <code>a.h</code> and <code>b.h</code> to be
+                installed in the same place, as indicated by the
+                <code>_HEADERS</code> primary.  It means that if you
+                had some good reason for creating or distributing the
+                header <code>b.h</code> in its subdirectory, you don't
+                have to copy it into the top directory just prior to
+                installation.  If you specify
+                <code>nobase_include_HEADERS</code><index>installation!nobase
+                  prefix</index>, on the other
+                hand, this will cause the hierarchy to be preserved.
+                This is documented rather in passing in the automake
+                manual, in the section <webref
+                url="&automakehtml/Alternative.html" >An Alternative
+                Approach to Subdirectories</webref> (and no, I don't
+                know why `nobase' is supposed to be intuitive,
+                either).</p>
+
+              <p>There's an example of using this in <ref
+                  id="config-cfitsio"/>.</p>
             </dd>
 
             <dt>I want to do odd things at install time.
@@ -4121,7 +4344,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </subsect>
 
         <subsect id="macro-ac-fc-check-intrinsics" export="export"
-        indexkey="AC_FC_CHECK_INTRINSICS"> 
+        indexkey="autoconf macros!AC_FC_CHECK_INTRINSICS"> 
           <subhead>
             <title>AC_FC_CHECK_INTRINSICS</title>
           </subhead>
@@ -4141,7 +4364,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </subsect>
 
         <subsect id="macro-ac-fc-check-headers" export="export"
-        indexkey="AC_FC_CHECK_HEADERS"> 
+        indexkey="autoconf macros!AC_FC_CHECK_HEADERS"> 
           <subhead>
             <title>AC_FC_CHECK_HEADERS</title>
           </subhead>
@@ -4157,7 +4380,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </subsect>
 
         <subsect id="ac-fc-have-percentval" export="export"
-        indexkey="AC_FC_HAVE_PERCENTVAL"> 
+        indexkey="autoconf macros!AC_FC_HAVE_PERCENTVAL"> 
           <subhead>
             <title>AC_FC_HAVE_PERCENTVAL</title>
           </subhead>
@@ -4171,7 +4394,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </subsect>
 
         <subsect id="macro-ac-fc-open-specifiers" export="export"
-          indexkey="AC_FC_OPEN_SPECIFIERS">
+          indexkey="autoconf macros!AC_FC_OPEN_SPECIFIERS">
           <subhead>
             <title>AC_FC_OPEN_SPECIFIERS</title>
           </subhead>
@@ -4202,7 +4425,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </subsect>
 
         <subsect id="macro-ac-fc-recl-unit" export="export"
-          indexkey="AC_FC_RECL_UNIT">
+          indexkey="autoconf macros!AC_FC_RECL_UNIT">
           <subhead>
             <title>AC_FC_RECL_UNIT</title>
           </subhead>
@@ -4272,7 +4495,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             X).</p>
 
           <p>The macro works out if the Fortran compiler discovered by
-            macro <code>AC_PROG_FC</code><index>AC_PROG_FC</index> has
+            macro <code>AC_PROG_FC</code><index>autoconf macros!AC_PROG_FC</index> has
             the requested set of 
             features.  If so, it arranges for the compilation to be done
             `directly'; if not, it arranges for `indirect' compilation,
@@ -4409,7 +4632,7 @@ file.f: file.$(FPP_SRC_EXT)
         </subsect>
 
         <subsect id='macro-check-progs' export='export'
-          indexkey="STAR_CHECK_PROGS">
+          indexkey="starconf!macros!STAR_CHECK_PROGS">
           <subhead>
             <title>STAR_CHECK_PROGS</title>
           </subhead>
@@ -4426,7 +4649,7 @@ file.f: file.$(FPP_SRC_EXT)
             can be found.  Because of this default behaviour, this
             macro should _only_ be used for locating Starlink programs
             such as messgen or alink, and not as a general replacement
-            for <code>AC_CHECK_PROG</code><index>AC_CHECK_PROG!and
+            for <code>AC_CHECK_PROG</code><index>autoconf macros!AC_CHECK_PROG!and
             STAR_CHECK_PROGS</index>.  Any characters in the 
             program outside of the set of alphanumerics and
             underscores are normalised to underscores.</p>
@@ -4459,7 +4682,7 @@ file.f: file.$(FPP_SRC_EXT)
         </subsect>
 
         <subsect id='macro-cnf-compatible-symbols' export='export'
-          indexkey="STAR_CNF_COMPATIBLE_SYMBOLS">
+          indexkey="starconf!macros!STAR_CNF_COMPATIBLE_SYMBOLS">
           <subhead>
             <title>STAR_CNF_COMPATIBLE_SYMBOLS</title>
           </subhead>
@@ -4499,7 +4722,7 @@ file.f: file.$(FPP_SRC_EXT)
         </subsect>
 
         <subsect id='macro-declare-dependencies' export='export'
-          indexkey="STAR_DECLARE_DEPENDENCIES">
+          indexkey="starconf!macros!STAR_DECLARE_DEPENDENCIES">
           <subhead>
             <title>STAR_DECLARE_DEPENDENCIES</title>
           </subhead>
@@ -4624,7 +4847,7 @@ file.f: file.$(FPP_SRC_EXT)
 
 
         <subsect id='macro-defaults' export='export'
-          indexkey="STAR_DEFAULTS">
+          indexkey="starconf!macros!STAR_DEFAULTS">
           <subhead>
             <title>STAR_DEFAULTS</title>
           </subhead>
@@ -4737,7 +4960,7 @@ file.f: file.$(FPP_SRC_EXT)
         </subsect>
 
         <subsect id="macro-fc-library-ldflags" export="export"
-          indexkey="STAR_FC_LIBRARY_LDFLAGS">
+          indexkey="starconf!macros!STAR_FC_LIBRARY_LDFLAGS">
           <subhead>
             <title>STAR_FC_LIBRARY_LDFLAGS</title>
           </subhead>
@@ -4776,7 +4999,7 @@ file.f: file.$(FPP_SRC_EXT)
         </subsect>
 
         <subsect id='macro-latex-documentation' export='export'
-          indexkey="STAR_LATEX_DOCUMENTATION">
+          indexkey="starconf!macros!STAR_LATEX_DOCUMENTATION">
           <subhead>
             <title>STAR_LATEX_DOCUMENTATION</title>
           </subhead>
@@ -4811,7 +5034,7 @@ file.f: file.$(FPP_SRC_EXT)
         </subsect>
 
         <subsect id="variable-manifest-dir" export="export"
-          indexkey="STAR_MANIFEST_DIR">
+          indexkey="starconf!macros!STAR_MANIFEST_DIR">
           <subhead>
             <title>Variable STAR_MANIFEST_DIR</title>
           </subhead>
@@ -4847,7 +5070,7 @@ AC_SUBST(STAR_MANIFEST_DIR)
 
           <p>You do <em>not</em> have to set this in general, as this
             is one of the things that the
-            <code>STAR_DEFAULTS</code><index>STAR_DEFAULTS</index>
+            <code>STAR_DEFAULTS</code><index>starconf!macros!STAR_DEFAULTS</index>
             macro (<ref id="macro-defaults"/>) takes care of.  The
             only time you need to use this feature is when you are
             importing a third-party code set into the tree (as
@@ -4863,7 +5086,7 @@ AC_SUBST(STAR_MANIFEST_DIR)
 
         <subsect id="macro-special-install-command"
             export="export"
-          indexkey="STAR_SPECIAL_INSTALL_COMMAND">
+          indexkey="starconf!macros!STAR_SPECIAL_INSTALL_COMMAND">
           <subhead>
             <title>STAR_SPECIAL_INSTALL_COMMAND</title>
           </subhead>
@@ -4916,7 +5139,7 @@ AC_SUBST(STAR_MANIFEST_DIR)
         </subsect>
 
         <subsect id='macro-messgen' export='export'
-          indexkey="STAR_MESSGEN">
+          indexkey="starconf!macros!STAR_MESSGEN">
           <subhead>
             <title>STAR_MESSGEN</title>
           </subhead>
@@ -4952,7 +5175,7 @@ AC_SUBST(STAR_MANIFEST_DIR)
           <p>This macro also declares that the .msg files are
             pre-distribution files (it calls <ref
               id="macro-predist-sources"
-              ><code>STAR_PREDIST_SOURCES</code></ref><index>STAR_PREDIST_SOURCES</index>)
+              ><code>STAR_PREDIST_SOURCES</code></ref><index>starconf!macros!STAR_PREDIST_SOURCES</index>)
             on them, and so 
             the resulting configure script should expect not to find
             them in an unpacked distribution.</p>
@@ -4969,7 +5192,7 @@ AC_SUBST(STAR_MANIFEST_DIR)
         </subsect>
 
         <subsect id='macro-monoliths' export='export'
-          indexkey="STAR_MONOLITHS">
+          indexkey="starconf!macros!STAR_MONOLITHS">
           <subhead>
             <title>STAR_MONOLITHS</title>
           </subhead>
@@ -4996,7 +5219,7 @@ AC_SUBST(STAR_MANIFEST_DIR)
         </subsect>
 
         <subsect id="path-tcltk" export="export"
-          indexkey="STAR_PATH_TCLTK">
+          indexkey="starconf!macros!STAR_PATH_TCLTK">
           <subhead>
             <title>STAR_PATH_TCLTK</title>
           </subhead>
@@ -5046,7 +5269,7 @@ AC_SUBST(STAR_MANIFEST_DIR)
         </subsect>
 
         <subsect id='macro-platform-sources' export='export'
-          indexkey="STAR_PLATFORM_SOURCES">
+          indexkey="starconf!macros!STAR_PLATFORM_SOURCES">
           <subhead>
             <title>STAR_PLATFORM_SOURCES</title>
           </subhead>
@@ -5100,7 +5323,7 @@ AC_SUBST(STAR_MANIFEST_DIR)
         </subsect>
 
         <subsect id="macro-predist-sources" export="export"
-          indexkey="STAR_PREDIST_SOURCES">
+          indexkey="starconf!macros!STAR_PREDIST_SOURCES">
           <subhead>
             <title>STAR_PREDIST_SOURCES</title>
           </subhead>
