@@ -635,6 +635,7 @@
                                ! successfully
 
       INTEGER
+     :  PICID,                 ! 
      :  PICID1,                ! Graphics' database identifier on input
      :  PICID2,                ! Graphics' database identifier for
                                ! the frame (contour + key) picture
@@ -1721,7 +1722,20 @@
 *    =======================
 
  960  CONTINUE
-      CALL AGS_DEASS( 'DEVICE', DEVCAN, STATUS )
+
+*  Deactivate SGS and close the workstation.  If the workstation was
+*  not activated an error results. >>> THIS IS COMMENTED OUT SINCE 
+*  IT CAUSES THE SCREEN TO BE CLEARED! 24/5/01 DSB
+*      CALL AGS_DEACT( STATUS )
+
+*  Close the AGI context and reinstate the input current picture.  If
+*  there is no current picture an error results.
+      CALL AGI_END( -1, STATUS )
+
+*  Inquire the input picture identifier so that it may be annulled
+*  and the database closed.
+      CALL AGI_ICURP( PICID, STATUS )
+      CALL AGI_ANNUL( PICID, STATUS )
 
 *    Unmap and annul NDF data.
 *    =========================
