@@ -108,15 +108,12 @@
       EXTERNAL			BDI0_BLK		! Ensures inclusion
 
 *  Local Variables:
-      CHARACTER*20		LITEM			! Local item name
-
-      INTEGER			ARGS(4)			! Function args
       INTEGER			C1, C2			! Character pointers
+      INTEGER			DOBJ			! Temp data object
       INTEGER			CURELM			! Current o/p element
       INTEGER			IITEM			! Item counter
-      INTEGER			LITL			! Used length of LITEM
+      INTEGER			LID			! Linked object
       INTEGER			NELM			! Max elements per item
-      INTEGER			OARG			! Return value
 *.
 
 *  Check inherited global status.
@@ -125,11 +122,8 @@
 *  Check initialised
       IF ( .NOT. BDI_INIT ) CALL BDI0_INIT( STATUS )
 
-*  First function argument is the identifier
-      ARGS(1) = ID
-
 *  Second is the linked file object
-      CALL ADI_GETLINK( ID, ARGS(2), STATUS )
+      CALL ADI_GETLINK( ID, LID, STATUS )
 
 *  Current element in output buffer
       CURELM = 1
@@ -141,33 +135,15 @@
       CALL UDI0_CREITI( ITEMS, C1, C2, IITEM, STATUS )
       DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
 
-*    Check item name is valid, and make a local copy. Removes any
-*    special item names such as E_Axis_Label.
-        CALL BDI0_CHKITM( ID, ITEMS(C1:C2), LITEM, LITL, STATUS )
-
-*    Check that item can be created
-        CALL BDI0_CHKOP( LITEM(:LITL), 'Put', STATUS )
-
-*    Construct string for this item
-        CALL ADI_NEWV0C( LITEM(:LITL), ARGS(3), STATUS )
-
 *    Construct ADI object holding value
-        CALL ADI_NEWVC( NDIM, DIMS, DATA, ARGS(4), STATUS )
+        CALL ADI_NEWVC( NDIM, DIMS, DATA, DOBJ, STATUS )
 
-*    Invoke the function
-        CALL ADI_FEXEC( 'FileItemPut', 4, ARGS, OARG, STATUS )
+*    Write the data
+        CALL BDI_PUT1( ID, LID, ITEMS(C1:C2), DOBJ, STATUS )
 
-*    Extract data from return value
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL MSG_SETC( 'ITEM', LITEM(:LITL) )
-          CALL ERR_REP( 'BDI_PUTC_1', 'Unable to get item ^ITEM',
-     :                  STATUS )
-        END IF
-
-*    Release the item string and our temporary data object
+*    Release our temporary data object
         CALL ERR_BEGIN( STATUS )
-        CALL ADI_ERASE( ARGS(3), STATUS )
-        CALL ADI_ERASE( ARGS(4), STATUS )
+        CALL ADI_ERASE( DOBJ, STATUS )
         CALL ERR_END( STATUS )
 
 *    Advance pointer into output buffer

@@ -143,8 +143,8 @@
       CALL UDI0_CREITI( ITEMS, C1, C2, IITEM, STATUS )
       DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
 
-*    Get item value as ADI object
-        CALL BDI_GET1( ID, LID, ITEMS(C1:C2), OARG, STATUS )
+*    Get item value as ADI object using mode 0 (invent if not present)
+        CALL BDI_GET1( ID, LID, ITEMS(C1:C2), 0, OARG, STATUS )
 
 *    Extract data from return value
         IF ( (STATUS .EQ. SAI__OK) .AND. (OARG.NE.ADI__NULLID) ) THEN

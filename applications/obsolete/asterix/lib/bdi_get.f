@@ -154,8 +154,9 @@
       CALL UDI0_CREITI( ITEMS, C1, C2, IITEM, STATUS )
       DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
 
-*    Get an ADI object holding the objec tdata
-        CALL BDI_GET1( ID, LID, ITEMS(C1:C2), OARG, STATUS )
+*    Get an ADI object holding the object data using mode 0 (invent if
+*    not present)
+        CALL BDI_GET1( ID, LID, ITEMS(C1:C2), 0, OARG, STATUS )
 
 *    Extract data from return value
         IF ( (STATUS .EQ. SAI__OK) .AND. (OARG.NE.ADI__NULLID) ) THEN
@@ -181,7 +182,7 @@
 
 
 
-      SUBROUTINE BDI_GET1( ID, LID, ITEM, DID, STATUS )
+      SUBROUTINE BDI_GET1( ID, LID, ITEM, IMODE, DID, STATUS )
 *+
 *  Name:
 *     BDI_GET1
@@ -193,10 +194,15 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI_GET1( ID, LID, ITEM, DID, STATUS )
+*     CALL BDI_GET1( ID, LID, ITEM, IMODE, DID, STATUS )
 
 *  Description:
-*     Retrieves the item specified by the ITEM string as an ADI object
+*     Retrieves the item specified by the ITEM string as an ADI object.
+*     The behaviour when the item does not exist is controlled by IMODE.
+*     With a value of zero BDI_GET1 will try to invent replacement data
+*     and if it cannot will report an error. If IMODE is one then a
+*     missing item results in an error. If IMODE is two then no error
+*     is reported, but DID is set to ADI__NULLID.
 
 *  Arguments:
 *     ID = INTEGER (given)
@@ -206,6 +212,8 @@
 *        Object ID is linked to
 *     ITEM = CHARACTER*(*) (given)
 *        Single item to be retrieved
+*     IMODE = INTEGER (given)
+*        How to handle missing items (see above)
 *     DID = INTEGER (returned)
 *        The ADI object containing the item data
 *     STATUS = INTEGER (given and returned)
@@ -275,7 +283,7 @@
       INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
-      INTEGER		        ID, LID
+      INTEGER		        ID, LID, IMODE
       CHARACTER*(*)		ITEM
 
 *  Arguments Returned:
@@ -322,8 +330,16 @@
 *  can default
       IF ( STATUS .NE. SAI__OK ) THEN
 
+*    Caller doesn't want to know about missing items
+        IF ( IMODE .EQ. 2 ) THEN
+          CALL ERR_ANNUL( STATUS )
+          DID = ADI__NULLID
+
+*    Caller will accept errors about missing items
+        ELSE IF ( IMODE .EQ. 1 ) THEN
+
 *    All text items just get defaulted to blank
-        IF ( CHR_INSET( 'Title,Units,Label', LITEM(:LITL) ) .OR.
+        ELSE IF ( CHR_INSET( 'Title,Units,Label', LITEM(:LITL) ) .OR.
      :       CHR_INSET( 'Units,Label', LITEM(MAX(1,LITL-4):LITL) )
      :     ) THEN
 
