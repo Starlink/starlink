@@ -1208,7 +1208,7 @@ $(MONOLITH4): $(PKG_NAME)_nag.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
 	   $(ALINK) $(PKG_NAME)_nag.o -o $(PKG_NAME)_nag \
 	            $(ADDLIBS) $(OBJECT_LIBRARIES) -lnag \
                    `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
-		   $(OBJECT_LIBRARIES); \
+		   $(OBJECT_LIBRARIES) -lpda; \
         else \
 	   if test -f $(MONOLITH4) ; then $(RM) -f $(MONOLITH4) ; else :; fi;\
 	   echo "#!/bin/sh" > $(MONOLITH4);\
