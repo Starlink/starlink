@@ -535,6 +535,7 @@ c     RECORD /ADATUM/       DATUM                     ! General data object
 
       CHARACTER*20          ESTR                      ! Error value string
       CHARACTER*132         LINE                      ! Output line
+      CHARACTER*10	    FORMAT	              ! Format statement
 
       INTEGER               CRHS                      ! Right hand column
       INTEGER               FCW                       ! Width of number column
@@ -632,8 +633,9 @@ c     RECORD /ADATUM/       DATUM                     ! General data object
 
 *          Write source number
             IF ( L .EQ. 1 ) THEN
-              WRITE( LINE, 10 ) I
- 10           FORMAT( I<FCW> )
+              WRITE( FORMAT, 10 ) FCW
+ 10           FORMAT( '(I', I3.3, ')' )
+              WRITE( LINE, FORMAT ) I
             END IF
 
 *          Loop over fields
@@ -668,7 +670,7 @@ c     RECORD /ADATUM/       DATUM                     ! General data object
                   IF ( FIELD_TYPE(J)(1:5) .EQ. '_REAL' ) THEN
                     WRITE( LINE(FIELD_COL(J):), '('//
      :                   FIELD_DFMT(J)//')', IOSTAT=FSTAT ) DATUM_RVAL
-                  ELSE IF ( FIELD_TYPE(1:7) .EQ. '_DOUBLE' ) THEN
+                  ELSE IF ( FIELD_TYPE(J)(1:7) .EQ. '_DOUBLE' ) THEN
                     WRITE( LINE(FIELD_COL(J):), '('//
      :                   FIELD_DFMT(J)//')', IOSTAT=FSTAT ) DATUM_DVAL
                   ELSE
@@ -683,13 +685,13 @@ c     RECORD /ADATUM/       DATUM                     ! General data object
               IF ( FIELD_ETHERE(J) .AND. (L.LE.FIELD_ENELM(J)) ) THEN
 
 *              Get the value
-                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J) +
+                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J)) +
      :                             (I-1)*FIELD_ENELM(J) +
      :                             (L-1))*VAL__NBR), DATUM_DVAL, STATUS )
-                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J) +
+                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J)) +
      :                             (I-1)*FIELD_ENELM(J) +
      :                             (L-1))*VAL__NBR), DATUM_RVAL, STATUS )
-                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J) +
+                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J)) +
      :                             (I-1)*FIELD_ENELM(J) +
      :                             (L-1))*VAL__NBR), DATUM_IVAL, STATUS )
 
@@ -705,7 +707,7 @@ c     RECORD /ADATUM/       DATUM                     ! General data object
                 END IF
 
 *              Null error?
-                IF ( DATUM.RVAL .EQ. NULLERROR ) THEN
+                IF ( DATUM_RVAL .EQ. NULLERROR ) THEN
                   ESTR = ' *NA*'
                 ELSE
                   WRITE( ESTR, '('//FIELD_EFMT(J)//')',
@@ -923,7 +925,7 @@ c     RECORD /FIELD/           FLD(*)                  ! Field data
 *          Get field data dimensions
             CALL CMP_SHAPE( FLOC, 'DATA_ARRAY', DAT__MXDIM,
      :                      FIELD_DIMS(NFLD), FIELD_NDIM(NFLD), STATUS )
-            CALL ARR_SUMDIM( FIELD_NDIM-1, FIELD_DIMS(NFLD),
+            CALL ARR_SUMDIM( FIELD_NDIM(NFLD)-1, FIELD_DIMS(NFLD),
      :                                        FIELD_NELM(NFLD) )
 
 *          Field units present?
@@ -933,7 +935,7 @@ c     RECORD /FIELD/           FLD(*)                  ! Field data
               IF ( FIELD_UNITS(NFLD) .LE. ' ' )
      :                          FIELD_UNITS(NFLD) = 'UNDEFINED'
             ELSE
-              FLD(NFLD).UNITS(NFLD) = 'UNDEFINED'
+              FIELD_UNITS(NFLD) = 'UNDEFINED'
             END IF
 
 *          Field errors?
@@ -944,7 +946,7 @@ c     RECORD /FIELD/           FLD(*)                  ! Field data
      :                                 FIELD_EPTR(NFLD), STATUS )
 
 *            Find column
-              FLD(NFLD).EFMT(NFLD) = FEFMT(I)
+              FIELD_EFMT(NFLD) = FEFMT(I)
               CALL UTIL_FMTWID( FEFMT(I), FIELD_EWID(NFLD), STATUS )
               FIELD_ECOL(NFLD) = CCOL - 2
               CCOL = CCOL + FIELD_EWID(NFLD) + 2
