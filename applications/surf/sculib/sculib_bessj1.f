@@ -63,6 +63,10 @@
      :  -0.88228987D-6,0.105787412D-6/  
 *-
 
+*     Set to bad in case status is bad
+*     Otherwise we would be undefined on return
+      SCULIB_BESSJ1 = VAL__BADR
+
       IF (STATUS .NE. SAI__OK) RETURN
 
       IF (ABS(X) .LT. 8.0) THEN
