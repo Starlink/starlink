@@ -372,9 +372,9 @@
         DIMS(2) = DIMS(2) + 1
       END IF
       XLO = XBASE - XSCALE
-      XHI = XLO + XSCALE*(IDIMS(X_AX)+1)
+      XHI = XLO + XSCALE*(IDIMS(X_AX)+2)
       YLO = YBASE - YSCALE
-      YHI = YLO + YSCALE*(IDIMS(Y_AX)+1)
+      YHI = YLO + YSCALE*(IDIMS(Y_AX)+2)
 
       IF ( RADIAL ) THEN
         MAXR = SQRT( MAX(XLO*XLO+YLO*YLO,XLO*XLO+YHI*YHI,
