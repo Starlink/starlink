@@ -154,8 +154,6 @@
       INTEGER I                  ! Index of current input NDF
       INTEGER INDF               ! NDF identifier for the current input NDF
       INTEGER INDFS              ! NDF identifier for the input section
-      INTEGER IPCM1              ! Pointers to 1st curvature matrix image
-      INTEGER IPCM2              ! Pointers to 2nd curvature matrix image
       INTEGER IPCOUT             ! Pointer to output (co-variance) DATA array
       INTEGER IPDIN              ! Pointer to input DATA array
       INTEGER IPDOUT             ! Pointer to output DATA array
@@ -230,11 +228,6 @@
       CALL PSX_CALLOC( EL, '_REAL', IPMT32, STATUS )     
       CALL PSX_CALLOC( EL, '_REAL', IPMT33, STATUS )     
 
-*  We also need two extra work arrays to hold the values needed to 
-*  calculate the curvature matrix.
-      CALL PSX_CALLOC( EL, '_REAL', IPCM1, STATUS )     
-      CALL PSX_CALLOC( EL, '_REAL', IPCM2, STATUS )     
-
 *  We also need an extra work array to hold the number of input images
 *  contributing to each output pixel.
       CALL PSX_CALLOC( EL, '_REAL', IPN, STATUS )     
@@ -254,7 +247,7 @@
 *  squares quadratic surface to the data within a 5x5 fitting box.
       IF( ITER .GT. 0 ) CALL POL1_SNGSM( ILEVEL, DIM1, DIM2, DIM3, 
      :                                   %VAL( IPVOUT ), %VAL( IPDOUT ), 
-     :                                   %VAL( IPCOUT ), %VAL( IPCM1 ),
+     :                                   %VAL( IPCOUT ), %VAL( IPIE1 ),
      :                                   STATUS )
 
 *  Calculate the effective intensities, transmittances, eficiciencies and
@@ -271,8 +264,6 @@
       CALL POL1_FILLR( 0.0, EL, %VAL( IPMT22 ), STATUS )
       CALL POL1_FILLR( 0.0, EL, %VAL( IPMT32 ), STATUS )
       CALL POL1_FILLR( 0.0, EL, %VAL( IPMT33 ), STATUS )
-      CALL POL1_FILLR( 0.0, EL, %VAL( IPCM1 ), STATUS )
-      CALL POL1_FILLR( 0.0, EL, %VAL( IPCM2 ), STATUS )
       CALL POL1_FILLR( 0.0, EL, %VAL( IPN ), STATUS )
 
 *  Loop round each NDF.
@@ -305,8 +296,7 @@
      :                   %VAL( IPMT11 ), %VAL( IPMT21 ), %VAL( IPMT31 ), 
      :                                   %VAL( IPMT22 ), %VAL( IPMT32 ),
      :                                                   %VAL( IPMT33 ), 
-     :                   %VAL( IPCM1 ), %VAL( IPCM2 ), %VAL( IPN ),
-     :                   STATUS )
+     :                   %VAL( IPN ), STATUS )
 
 *  End the NDF context.
          CALL NDF_END( STATUS )
@@ -324,9 +314,8 @@
      :                 %VAL( IPMT11 ), %VAL( IPMT21 ), %VAL( IPMT31 ), 
      :                                 %VAL( IPMT22 ), %VAL( IPMT32 ),
      :                                                   %VAL( IPMT33 ), 
-     :                 %VAL( IPCM1 ), %VAL( IPCM2 ), %VAL( IPN ),
-     :                 %VAL( IPDOUT ), %VAL( IPVOUT ), %VAL( IPCOUT ), 
-     :                 STATUS )
+     :                 %VAL( IPN ), %VAL( IPDOUT ), %VAL( IPVOUT ), 
+     :                 %VAL( IPCOUT ), STATUS )
 
 *  Go back to recalculate the output I,Q,U values excluding aberrant input
 *  data values unless we have already done the required number of iterations.
@@ -351,8 +340,6 @@
       CALL PSX_FREE( IPMT22, STATUS )
       CALL PSX_FREE( IPMT32, STATUS )
       CALL PSX_FREE( IPMT33, STATUS )
-      CALL PSX_FREE( IPCM1, STATUS )     
-      CALL PSX_FREE( IPCM2, STATUS )     
       CALL PSX_FREE( IPN, STATUS )     
     
       IF( .NOT. OUTVAR ) THEN

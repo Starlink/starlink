@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SNGAD( EL, DIN, VIN, PHI, T, EPS, IE1, IE2, 
      :                       IE3, MAT11, MAT21, MAT31, MAT22, MAT32, 
-     :                       MAT33, CM1, CM2, COUNT, STATUS )
+     :                       MAT33, COUNT, STATUS )
 *+
 *  Name:
 *     POL1_SNGAD
@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     CALL POL1_SNGAD( EL, DIN, VIN, PHI, T, EPS, IE1, IE2, IE3, 
-*                      MAT11, MAT21, MAT31, MAT22, MAT32, MAT33, CM1, 
-*                      CM2, COUNT, STATUS )
+*                      MAT11, MAT21, MAT31, MAT22, MAT32, MAT33, 
+*                      COUNT, STATUS )
 
 *  Description:
 *     This routine updates a set of images holding different quanities by 
@@ -57,10 +57,6 @@
 *        (equals column 2, row 3). 
 *     MAT33( EL ) = REAL (Given and Returned)
 *        Column 3, row 3 of the matrix giving the effective intensities.
-*     CM1( EL ) = REAL (Given and Returned)
-*        The first term needed to calculate the curvature matrix.
-*     CM2( EL ) = REAL (Given and Returned)
-*        The second term needed to calculate the curvature matrix.
 *     COUNT( EL ) = REAL (Given and Returned)
 *        The number of input images contributing to each output pixel.
 *     STATUS = INTEGER (Given and Returned)
@@ -108,8 +104,6 @@
       REAL MAT22( EL )
       REAL MAT32( EL )
       REAL MAT33( EL )
-      REAL CM1( EL )
-      REAL CM2( EL )
       REAL COUNT( EL )
 
 *  Status:
@@ -117,7 +111,7 @@
 
 *  Local Variables:
       INTEGER I                  ! Element index
-      DOUBLE PRECISION COS2, SIN2, RCOS, RSIN, RT, R1, RC, RS ! Constant terms
+      DOUBLE PRECISION COS2, SIN2, RCOS, RSIN, RT, R1, R2, RC, RS ! Constant terms
       REAL VARVAL                ! Variance value to use
 *.
 
@@ -142,13 +136,14 @@
 
 *  Constants...
             R1 = RT/VARVAL
+            R2 = DBLE( T )/DBLE( VARVAL )
             RC = R1*RCOS
             RS = R1*RSIN
 
 *  Effective intensities...
-            IE1( I ) = IE1( I ) + DIN( I )*T/VARVAL
-            IE2( I ) = IE2( I ) + DIN( I )*RC
-            IE3( I ) = IE3( I ) + DIN( I )*RS
+            IE1( I ) = IE1( I ) + DIN( I )*R2
+            IE2( I ) = IE2( I ) + DIN( I )*R2*RCOS 
+            IE3( I ) = IE3( I ) + DIN( I )*R2*RSIN
 
 *  Matrix elements... Row 1:
             MAT11( I ) = MAT11( I ) + R1
@@ -161,10 +156,6 @@
 
 *  Matrix elements... Row 3:
             MAT33( I ) = MAT33( I ) + RS*RSIN
-
-*  Curvature matrix...
-            CM1( I ) = CM1( I ) + RC
-            CM2( I ) = CM2( I ) + RS
 
 *  Increase the count of input images contributing to this pixel.
             COUNT( I ) = COUNT( I ) + 1.0D0

@@ -1,5 +1,5 @@
       SUBROUTINE POL1_SNGCL( EL, IE1, IE2, IE3, MAT11, MAT21, 
-     :                       MAT31, MAT22, MAT32, MAT33, CM1, CM2, 
+     :                       MAT31, MAT22, MAT32, MAT33, 
      :                       COUNT, DOUT, VOUT, COUT, STATUS )
 *+
 *  Name:
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     CALL POL1_SNGCL( EL, IE1, IE2, IE3, MAT11, MAT21, MAT31, MAT22, 
-*                      MAT32, MAT33, CM1, CM2, COUNT, DOUT, VOUT, COUT, 
+*                      MAT32, MAT33, COUNT, DOUT, VOUT, COUT, 
 *                      STATUS )
 
 *  Description:
@@ -46,10 +46,6 @@
 *        (equals column 2, row 3). 
 *     MAT33( EL ) = REAL (Given)
 *        Column 3, row 3 of the matrix giving the effective intensities.
-*     CM1( EL ) = REAL (Given)
-*        The first term needed to calculate the curvature matrix.
-*     CM2( EL ) = REAL (Given)
-*        The second term needed to calculate the curvature matrix.
 *     COUNT( EL ) = REAL (Given)
 *        The number of input images contributing to each output pixel.
 *     DOUT( EL, 3 ) = REAL (Returned)
@@ -97,8 +93,6 @@
       REAL MAT22( EL )
       REAL MAT32( EL )
       REAL MAT33( EL )
-      REAL CM1( EL )
-      REAL CM2( EL )
       REAL COUNT( EL )
 
 *  Arguments Returned:
@@ -116,6 +110,7 @@
       DOUBLE PRECISION D1, D2, D3, D4, D5, D6, D7, D8, D9 ! The D matrix
       DOUBLE PRECISION DEN       ! Denominator value
       DOUBLE PRECISION Y1, Y2, Y3! The effective intensities
+      DOUBLE PRECISION V11, V22, V33, V23, V31, V21 ! Matrix factors
 *.
 
 *  Check the inherited global status.
@@ -157,53 +152,31 @@
             Y2 = 2.0*IE2( I )
             Y3 = 2.0*IE3( I )
 
-            DOUT( I, 1 ) = ( Y1*( D6*D6 - D9*D5 ) + 
-     :                       Y2*( D2*D9 - D6*D3 ) + 
-     :                       Y3*( D3*D5 - D6*D2 ) ) / DEN
-            DOUT( I, 2 ) = ( Y1*( D9*D2 - D6*D3 ) + 
-     :                       Y2*( D3*D3 - D1*D9 ) + 
-     :                       Y3*( D6*D1 - D3*D2 ) ) / DEN
-            DOUT( I, 3 ) = ( Y1*( D5*D3 - D6*D2 ) + 
-     :                       Y2*( D6*D1 - D2*D3 ) + 
-     :                       Y3*( D2*D2 - D5*D1 ) ) / DEN
+            V11 = D6*D6 - D9*D5 
+            V22 = D3*D3 - D1*D9 
+            V33 = D2*D2 - D5*D1 
+            V23 = D6*D1 - D2*D3 
+            V31 = D5*D3 - D2*D6 
+            V21 = D2*D9 - D6*D3 
 
-*  Calculate the C matrix. This gives the curvature of chi-squared with
-*  respect to (I,Q,U).
-            C1 = 0.25*D1
-            C2 = 0.25*CM1( I )
-            C3 = 0.25*CM2( I )
-            C4 = C2
-            C5 = 0.25*D5
-            C6 = 0.25*D6
-            C7 = C3
-            C8 = C6
-            C9 = 0.25*D9
+            DOUT( I, 1 ) = ( Y1*V11 + Y2*V21 + Y3*V31 ) / DEN
+            DOUT( I, 2 ) = ( Y1*V21 + Y2*V22 + Y3*V23 ) / DEN
+            DOUT( I, 3 ) = ( Y1*V31 + Y2*V23 + Y3*V33 ) / DEN
 
 *  Store the I, Q and U variances, and the the QU co-variance in the output 
 *  arrays. Store bad values if the matrix is singular. The variances are
 *  the diagonal elements of the inverted curvature matrix, and the QU
 *  co-variance is column 3 row 2 of the inverted curvature matrix.
-            DEN = C3*C3*C5 + C6*C6*C1 + C9*C2*C2 - C9*C5*C1 - 
-     :            2*C2*C3*C6
+            VOUT( I, 1 ) = 4.0*V11/DEN
+            IF( VOUT( I, 1 ) .LE. 0.0 ) VOUT( I, 1 ) = VAL__BADR
 
-            IF( DEN .EQ. 0.0 ) THEN
-               VOUT( I, 1 ) = VAL__BADR
-               VOUT( I, 2 ) = VAL__BADR
-               VOUT( I, 3 ) = VAL__BADR
-               COUT( I ) = VAL__BADR
+            VOUT( I, 2 ) = 4.0*V22/DEN
+            IF( VOUT( I, 2 ) .LE. 0.0 ) VOUT( I, 2 ) = VAL__BADR
 
-            ELSE
-               VOUT( I, 1 ) = ( C6*C6 - C9*C5 )/DEN
-               IF( VOUT( I, 1 ) .LE. 0.0 ) VOUT( I, 1 ) = VAL__BADR
+            VOUT( I, 3 ) = 4.0*V33/DEN
+            IF( VOUT( I, 3 ) .LE. 0.0 ) VOUT( I, 3 ) = VAL__BADR
 
-               VOUT( I, 2 ) = ( C3*C3 - C1*C9 )/DEN
-               IF( VOUT( I, 2 ) .LE. 0.0 ) VOUT( I, 2 ) = VAL__BADR
-
-               VOUT( I, 3 ) = ( C2*C2 - C5*C1 )/DEN
-               IF( VOUT( I, 3 ) .LE. 0.0 ) VOUT( I, 3 ) = VAL__BADR
-
-               COUT( I ) = ( C6*C1 - C2*C3 )/DEN
-            END IF
+            COUT( I ) = 4.0*V23/DEN
 
 *  Increment the number of good output pixels.
             NGOOD = NGOOD + 1
