@@ -272,8 +272,8 @@
       IF ( SUM0 .LE. 0.0D0 .OR. SUM1 .LE. 0.0D0 ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'KPG1_GAUFx_CONDA',
-     :     'Unable to fit a Gaussian because the data have the same 
-     :     value.', STATUS )
+     :     'Unable to fit a Gaussian because the data have the same '/
+     :     /'value.', STATUS )
          GO TO 100
       END IF
 
