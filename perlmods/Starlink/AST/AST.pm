@@ -423,6 +423,14 @@ sub GAttr {
   return $self->{_gattr};
 }
 
+# Foreign graphics object (e.g. a Tk canvas) to be passed
+# as first argument to the registered plot callbacks.
+sub GExternal {
+  my $self = shift;
+  if (@_) { $self->{_gexternal} = shift; }
+  return $self->{_gexternal};
+}
+
 # Nullify graphic callbacks
 
 sub null {

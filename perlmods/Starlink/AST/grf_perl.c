@@ -72,12 +72,15 @@ void Perl_clearGrfObject() {
   CurrentPlot = NULL;
 }
 
-/* An internal hash attribute name 
-   return the relevant CVREF that can be called. Uses the global static
-   object. Returns NULL if no callback is registered.
+/* An internal hash object attribute accessor return the relevant
+   SV. Uses the global static object stored when the object was
+   registered during the PLOTCALL macro. Returns NULL if no value is
+   stored.
+
+   Does not set astError.
 */
 
-SV* Perl_getcb ( char * attr ) {
+SV* Perl_getHashAttr ( char * attr ) {
   SV** elem;
 
   if (!astOK) return NULL;
@@ -103,8 +106,7 @@ SV* Perl_getcb ( char * attr ) {
 int astGFlush( void ){
   dSP;
   SV * cb;
-  AV * XX;
-  AV * YY;
+  SV * external;
   int retval;
 
   if (!astOK) return 0;
@@ -113,7 +115,7 @@ int astGFlush( void ){
     return 0;
   }
 
-  cb = Perl_getcb( "_gflush" );
+  cb = Perl_getHashAttr( "_gflush" );
  
   if (astOK) {
     if ( cb != NULL ) {
@@ -121,7 +123,14 @@ int astGFlush( void ){
       ENTER;
       SAVETMPS;
 
-      count = perl_call_sv( SvRV(cb), G_NOARGS | G_SCALAR );
+      /* If we have a registered external object, push that on as
+	 a first argument. */
+      external = Perl_getHashAttr( "_gexternal" );
+      if ( external != NULL ) {
+	XPUSHs( external );
+      }
+
+      count = perl_call_sv( SvRV(cb), G_SCALAR );
 
       SPAGAIN;
 
@@ -156,6 +165,7 @@ int astGLine( int n, const float *x, const float *y ){
   SV * cb;
   AV * XX;
   AV * YY;
+  SV * external;
   int retval;
 
   printf("Calling astGLine with %d points\n", n);
@@ -167,7 +177,7 @@ int astGLine( int n, const float *x, const float *y ){
     return 0;
   }
 
-  cb = Perl_getcb( "_gline" );
+  cb = Perl_getHashAttr( "_gline" );
  
   if (astOK) {
     if ( cb != NULL ) {
@@ -176,6 +186,13 @@ int astGLine( int n, const float *x, const float *y ){
       SAVETMPS;
 
       PUSHMARK(sp);
+
+      /* If we have a registered external object, push that on as
+	 a first argument. */
+      external = Perl_getHashAttr( "_gexternal" );
+      if ( external != NULL ) {
+	XPUSHs( external );
+      }
     
       /* unpack is now reverse to XS norm */
       XX = newAV();
@@ -243,6 +260,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 int astGAttr( int attr, double value, double *old_value, int prim ){
   dSP;
   SV * cb;
+  SV * external;
   int retval;
   double cache;
 
@@ -252,7 +270,7 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
     return 0;
   }
 
-  cb = Perl_getcb( "_gattr" );
+  cb = Perl_getHashAttr( "_gattr" );
  
   if (astOK) {
     if ( cb != NULL ) {
@@ -261,6 +279,13 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
       SAVETMPS;
 
       PUSHMARK(sp);
+
+      /* If we have a registered external object, push that on as
+	 a first argument. */
+      external = Perl_getHashAttr( "_gexternal" );
+      if ( external != NULL ) {
+	XPUSHs( external );
+      }
     
       XPUSHs( sv_2mortal(newSViv(attr) ) );
       XPUSHs( sv_2mortal(newSVnv(value) ) );
