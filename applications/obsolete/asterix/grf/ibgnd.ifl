@@ -8,13 +8,15 @@ interface IBGND
 
   parameter X
     type '_REAL'
-    ppath 'DYNAMIC'
+    ppath 'DYNAMIC,DEFAULT'
+    default 0.0
     prompt 'X centre'
     help 'X-coord of centre in axis units'
   endparameter
   parameter Y
     type '_REAL'
-    ppath 'DYNAMIC'
+    ppath 'DYNAMIC,DEFAULT'
+    default 0.0
     prompt 'Y centre'
     help 'Y-coord of centre in axis units'
   endparameter
