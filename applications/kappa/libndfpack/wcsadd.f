@@ -21,25 +21,26 @@
 *        The global status.
 
 *  Description:
-*     This application can be used either to add a new co-ordinate
-*     Frame into the WCS component of an NDF using a specified Mapping, 
-*     or to store a specified Mapping in a text file for future use by
-*     other applications (see parameter WRITEMAP). A number of different 
-*     types of Mapping can be used (see parameter MAPTYPE).
+*     This application can be used to create a new AST Mapping and
+*     optionally use the Mapping to add a new co-ordinate Frame into 
+*     the WCS component of an NDF (see parameter NDF). An output text file 
+*     may also be created holding a textual representation of the 
+*     Mapping for future use by other applications such as RESAMPLE (see 
+*     parameter MAPOUT). A number of different types of Mapping can be 
+*     used (see parameter MAPTYPE).
 *     
-*     When adding a new Frame to a WCS component (WRITEMAP=FALSE), 
-*     the Mapping is used to connect the the new Frame to an existing 
-*     one (called the "basis" Frame).  The newly added Frame is a copy 
-*     of the basis Frame, with the new Domain attribute specified by 
-*     parameter DOMAIN, and becomes the current co-ordinate Frame in 
-*     the NDF.  If necessary, other attributes of the new Frame 
-*     (Title, Label, Format, etc) can be changed using application
-*     WCSATTRIB.
+*     When adding a new Frame to a WCS component, the Mapping is used to 
+*     connect the the new Frame to an existing one (called the "basis" 
+*     Frame). The newly added Frame is a copy of the basis Frame, with 
+*     the new Domain attribute specified by parameter DOMAIN, and becomes 
+*     the current co-ordinate Frame in the NDF. If necessary, other 
+*     attributes of the new Frame (Title, Label, Format, etc) can be 
+*     changed using application WCSATTRIB.
 *
 *     WCSADD will only generate Mappings with the same number of 
 *     input and output axes; this number is determined by the number
-*     of axes in the basis Frame if WRITEMAP=FALSE or by the 
-*     NAXES parameter if WRITEMAP=TRUE.
+*     of axes in the basis Frame if an NDF is supplied, or by the 
+*     NAXES parameter otherwise.
 
 *  Usage:
 *     wcsadd ndf frame domain maptype
@@ -47,16 +48,16 @@
 *  ADAM Parameters:
 *     CENTRE( 2 ) = _DOUBLE (Read)
 *        The co-ordinates of the centre of a pincushion distortion.
-*        Only used when MAPTYPE=PINCUSHION.  See also DISCO.
+*        Only used when MAPTYPE=PINCUSHION. See also DISCO.
 *        [0,0]
 *     DIAG( ) = _DOUBLE (Read)
 *        The elements along the diagonal of the linear transformation 
 *        matrix. There will be as many of these as there are axes in the
-*        basis Frame.  Each effectively gives the factor by which 
+*        basis Frame. Each effectively gives the factor by which 
 *        co-ordinates on the corresponding axis should be multiplied.
 *        This parameter is only used when MAPTYPE=DIAG.
 *     DISCO = _DOUBLE (Read)
-*        The distortion coefficient of a pincushion distortion.  Used
+*        The distortion coefficient of a pincushion distortion. Used
 *        in conjunction with the CENTRE parameter, this defines the
 *        forward transformation to be used as follows:
 *
@@ -74,7 +75,6 @@
 *        use within the WCS component, particularly the standard domain names
 *        such as GRID, PIXEL, AXIS and GRAPHICS. The supplied value is 
 *        stripped of spaces, and converted to upper case before being used.
-*        Only used if WRITEMAP=FALSE.
 *     EPOCH = _DOUBLE (Read)
 *        If the basis Frame is specified using a "Sky Co-ordinate System" 
 *        specification for a celestial co-ordinate system (see parameter 
@@ -86,11 +86,11 @@
 *        suggested default is the value stored in the basis Frame.
 *     FOREXP( ) = LITERAL (Read)
 *        The expressions to be used for the forward co-ordinate 
-*        transformations in a MathMap.  There must be at least as many
+*        transformations in a MathMap. There must be at least as many
 *        expressions as the number of axes of the Mapping, but there
 *        may be more if intermediate expressions are to be used.
 *        Expression syntax is fortran-like; see the AST_MATHMAP
-*        documentation in SUN/210 for details.  Only used when
+*        documentation in SUN/210 for details. Only used when
 *        MAPTYPE=MATH.
 *     FRAME = LITERAL (Read)
 *        A string specifying the basis Frame. If a null value is supplied
@@ -110,27 +110,28 @@
 *
 *     INVEXP( ) = LITERAL (Read)
 *        The expressions to be used for the inverse co-ordinate 
-*        transformations in a MathMap.  There must be at least as many
+*        transformations in a MathMap. There must be at least as many
 *        expressions as the number of axes of the Mapping, but there
 *        may be more if intermediate expressions are to be used.
 *        Expression syntax is fortran-like; see the AST_MATHMAP
-*        documentation in SUN/210 for details.  Only used when
+*        documentation in SUN/210 for details. Only used when
 *        MAPTYPE=MATH.
 *     MAPIN = FILENAME (Read)
 *        The  name of a file containing an AST Mapping with which to
-*        connect the basis Frame to the new one.  The file may be a text
+*        connect the basis Frame to the new one. The file may be a text
 *        file which contains the textual representation of an AST Mapping,
 *        or a FITS file which contains the Mapping as an AST object
-*        encoded in its headers, or an NDF.  If it is an NDF, the
+*        encoded in its headers, or an NDF. If it is an NDF, the
 *        Mapping from its base (GRID-domain) to current Frame will be
-*        used.  Only used when MAPTYPE=FILE.
+*        used. Only used when MAPTYPE=FILE.
 *     MAPOUT = FILENAME (Write)
-*        The name of a file to which the AST Mapping will be written.
-*        This can be used for instance by the RESAMPLE application.
-*        Only used if WRITEMAP is TRUE.
+*        The name of a text file in which to store a textual representation 
+*        of the Mapping. This can be used, for instance, by the RESAMPLE 
+*        application. If a null (!) value is supplied, no file is
+*        created. [!]
 *     MAPTYPE = LITERAL (Read)
 *        The type of Mapping to be used to connect the new Frame to the
-*        basis Frame.  It must be one of the following strings, each
+*        basis Frame. It must be one of the following strings, each
 *        of which require some additional parameters as indicated:
 * 
 *        - DIAGONAL   -- A linear mapping with no translation
@@ -156,23 +157,24 @@
 *        ["LINEAR"]
 *     NAXES = _INTEGER (Read)
 *        The number of input and output axes which the Mapping will have.
-*        Only used if WRITEMAP is TRUE.
+*        Only used if a null value is supplied for parameter NDF.
 *     NDF = NDF (Read and Write)
-*        The NDF in which the new Frame is to be stored.  Only used if
-*        WRITEMAP is FALSE.
+*        The NDF in which to store a new co-ordinate Frame. Supply a null (!)
+*        value if you do not wish to add a Frame to an NDF (you can still 
+*        use the MAPOUT parameter to write the Mapping to a text file).
 *     SHIFT( ) = _DOUBLE (Read)
 *        A vector giving the displacement represented by the translation.
-*        There must be one element for each axis.  Only used when
+*        There must be one element for each axis. Only used when
 *        MAPTYPE=SHIFT.
 *     SIMPFI = _LOGICAL (Read)
 *        The value of the Mapping's SimpFI attribute (whether it is 
 *        legitimate to simplify the forward followed by the inverse 
-*        transformation to a unit transformation).  Only used when
+*        transformation to a unit transformation). Only used when
 *        MAPTYPE=MATH.  [TRUE]
 *     SIMPIF = _LOGICAL (Read)
 *        The value of the Mapping's SimpIF attribute (whether it is 
 *        legitimate to simplify the inverse followed by the forward 
-*        transformation to a unit transformation).  Only used when
+*        transformation to a unit transformation). Only used when
 *        MAPTYPE=MATH.  [TRUE]
 *     TR( ) = _DOUBLE (Read)
 *        The values of this parameter are the coefficients of a linear 
@@ -205,18 +207,11 @@
 *        where N is the number of axes in the new and old Frames). If a 
 *        null value (!) is given it is assumed that the new Frame and the
 *        basis Frame are connected using a unit mapping (i.e. corresponding
-*        axis values are identical in the two Frames).  Only used when
+*        axis values are identical in the two Frames). Only used when
 *        MAPTYPE=LINEAR. [!]
-*     WRITEMAP = _LOGICAL (Read)
-*        Whether to write the Mapping out as a text file or use it to
-*        add a new Frame to a WCS FrameSet.  If FALSE, the specified
-*        Mapping will be used to add a new Frame to the WCS component
-*        of the NDF given by parameter NDF.  If TRUE, the application
-*        will instead write a text file with the name given by the
-*        MAPOUT parameter which contains the Mapping.  [FALSE]
 *     ZOOM = _DOUBLE (Read)
 *        The scaling factor for a ZoomMap; every coordinate will be 
-*        multiplied by this factor in the forward transformation.  
+*        multiplied by this factor in the forward transformation. 
 *        Only used when MAPTYPE=ZOOM. 
 
 *  Examples:
@@ -238,9 +233,10 @@
 *        the "Unit" attribute for axis 1 of the new Frame to "AU".
 *     wcsadd my_data dist-lum dist(au)-lum diag diag=[2.0628E5,1]
 *        This does exactly the same as the previous example.
-*     wcsadd ax322 ! shrunk zoom zoom=0.25
+*     wcsadd ax322 ! shrunk zoom zoom=0.25 mapout=zoom.ast
 *        This adds a new Frame to the WCS component of ax322 which is a 
-*        one-quarter-scale copy of its current co-ordinate Frame.
+*        one-quarter-scale copy of its current co-ordinate Frame. The
+*        Mapping is also stored in the text file "zoom.ast".
 *     wcsadd cube grid slid shift shift=[0,0,1024]
 *        This adds a new Frame to the WCS component of the NDF cube 
 *        which matches the GRID-domain co-ordinates in the first two
@@ -250,14 +246,14 @@
 *     invexp=["x=r*cos(theta)","y=r*sin(theta)"]
 *        A new Frame is added giving a polar view of the pixel 
 *        co-ordinates
-*     wcsadd writemap=true naxes=2 mapout=pcd.ast maptype=pincushion
+*     wcsadd ndf=\! naxes=2 mapout=pcd.ast maptype=pincushion
 *     disco=5.3e-10
 *        This constructs a pincushion-type distortion Mapping centred
 *        on the origin with a distortion coefficient of 5.3e-10,
 *        and writes out the Mapping as a text file called pcd.ast.
 *        This file could then be used by RESAMPLE to resample
 *        the pixels of an NDF according to this transformation.
-*        No NDF is accessed using this form of the command.
+*        No NDF is accessed.
 
 *  Notes:
 *     -  The new Frame has the same number of axes as the basis Frame.
@@ -356,7 +352,6 @@
       LOGICAL FIBOTH             ! Do we have both forward and inverse mappings?
       LOGICAL SIMPFI             ! SimpFI attribute of MathMap
       LOGICAL SIMPIF             ! SimpIF attribute of MathMap
-      LOGICAL WRMAP              ! Are we outputting to an AST text file?
 
 *.
 
@@ -372,21 +367,26 @@
 *  Get required information from NDF or parameters.
 *  ================================================
 
-*  See whether we are modifying a FrameSet or writing out a Mapping.
-      CALL PAR_GET0L( 'WRITEMAP', WRMAP, STATUS )
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  If we are writing the Mapping to a text file, we just need to 
-*  enquire the number of axes.
-      IF ( WRMAP ) THEN
+*  Obtain an identifier for the NDF to be modified.
+      CALL LPG_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
+
+*  If a null value was supplied annull the error and indicate that 
+*  we have no ndf.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         INDF = NDF__NOID
+
+*  If we have no NDF we need to get the number of axes for the Mapping
+*  from the user.
          CALL PAR_GDR0I( 'NAXES', -1, 1, VAL__MAXI, .FALSE., NAXB,
      :                   STATUS )
 
-*  If we are adding a new Frame to a WCS FrameSet, we need to open the
-*  NDF and extract some information about the FrameSet.
+*  If we are adding a new Frame to a WCS FrameSet, we need to extract some 
+*  information about the FrameSet.
       ELSE
-
-*  Obtain an identifier for the NDF to be modified.
-         CALL LPG_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
 
 *  Get the WCS FrameSet associated with the NDF.
          CALL KPG1_GTWCS( INDF, IWCS, STATUS )
@@ -624,19 +624,16 @@
 *  Use the constructed Mapping.
 *  ============================
 
-*  Writing the Mapping to a text file.
-      IF ( WRMAP ) THEN
-
-*  Write it out.
-         CALL ATL1_CREAT( 'MAPOUT', MAP, STATUS )
-
-*  Adding it to an NDF.
-      ELSE
-
-*  Add the new Frame into the FrameSet. It becomes the Current Frame.
+*  Write the Mapping out to a text file. If no text file was required (i.e.
+*  if a null parameter value was supplied), annull the error.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+      CALL ATL1_CREAT( 'MAPOUT', MAP, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+         
+*  If we have an NDF, add the new Frame into the FrameSet, and store
+*  the modified FrameSet in the NDF.
+      IF( INDF .NE. NDF__NOID ) THEN 
          CALL AST_ADDFRAME( IWCS, IBASIS, MAP, FRMN, STATUS ) 
-
-*  Save the FrameSet in the NDF.
          CALL NDF_PTWCS( IWCS, INDF, STATUS )
       END IF
 
