@@ -3457,7 +3457,7 @@ void adix_shape( ADIobj id, char *name, int nlen, int mxndim, int dims[],
 	for( idim=0; idim<adata->ndim; idim++ )
 	  dims[idim] = adata->dims[idim];
 
-	for( ; mxndim; idim++ )
+	for( ; idim<mxndim; idim++ )
 	  dims[idim] = 0;
 	}
       else
