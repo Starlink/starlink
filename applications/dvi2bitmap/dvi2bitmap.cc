@@ -53,6 +53,9 @@ using std::exit;
 #if ENABLE_KPATHSEA
 #include "kpathsea.h"
 #endif
+#if ENABLE_PNG
+#include "PNGBitmap.h"		// for PNGBitmap::libpng_version
+#endif
 
 #define DVI2BITMAPURL "http://www.astro.gla.ac.uk/users/norman/star/dvi2bitmap/"
 
@@ -481,9 +484,17 @@ int main (int argc, char **argv)
 		     << (ENABLE_GIF ? "yes" : "no") << '\n';
 		cout << "ENABLE_PNG       "
 		     << (ENABLE_PNG ? "yes" : "no") << '\n';
+#if ENABLE_PNG
+		cout << "  libpng: "
+		     << PNGBitmap::version_string() << '\n';
+#endif
 
 		cout << "ENABLE_KPATHSEA  "
 		     << (ENABLE_KPATHSEA ? "yes" : "no") << '\n';
+#if ENABLE_KPATHSEA
+		cout << "  libkpathsea: "
+		     << kpathsea::version_string() << '\n';
+#endif
 #ifdef DEFAULT_TEXMFCNF
 		cout << "  DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << '\n';
 #endif

@@ -95,6 +95,12 @@ void kpathsea::init (const char *program_name, const int basedpi)
     initialised_ = true;
 }
 
+const char *kpathsea::version_string (void)
+{
+    extern char *kpathsea_version_string;
+    return kpathsea_version_string;
+}
+
 const char *kpathsea::find (const char *fontname, int resolution)
 {
     if (! initialised_ && verbosity_ > silent)

@@ -23,6 +23,7 @@ class PNGBitmap : public BitmapImage {
     ~PNGBitmap ();
     void write (const string filename);
     string fileExtension () const { return "png"; }
+    static const char *version_string (void) { return PNG_LIBPNG_VER_STRING; };
 
  private:
     static png_structp png_ptr_;
