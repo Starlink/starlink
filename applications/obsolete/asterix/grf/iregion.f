@@ -22,6 +22,7 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*10 MODE,SUBMODE
+      INTEGER RPTR
       LOGICAL EXCLUDE
       LOGICAL MERGE
 *    Version :
@@ -811,7 +812,7 @@
      :      MODE.EQ.'POL'.OR.		! polygon
      :      MODE.EQ.'ANN'.OR.		! annulus
      :      MODE.EQ.'ELL'.OR.		! ellipse
-     :      MODE.EQ.'REC'.OR.		! rectangle
+     :      MODE.EQ.'SLI'.OR.		! rectangular slice
      :      MODE.EQ.'GTE'.OR.		! >= level
      :      MODE.EQ.'ARD') THEN		! ARD text
 
