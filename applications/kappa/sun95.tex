@@ -140,21 +140,21 @@
 
 % degrees symbol
 \newcommand{\dgs}{\hbox{$^\circ$}} 
-\begin{htmlonly}
-\renewcommand{\dgs}{{\rawhtml &deg;}} 
-\end{htmlonly}
+% \begin{htmlonly}
+% \renewcommand{\dgs}{{\rawhtml &deg;}} 
+% \end{htmlonly}
 
 % arcminute symbol
 \newcommand{\arcm}{\hbox{$^\prime$}} 
-\begin{htmlonly}
-\renewcommand{\arcm}{{\rawhtml &acute;}} 
-\end{htmlonly}
+% \begin{htmlonly}
+% \renewcommand{\arcm}{{\rawhtml &acute;}} 
+% \end{htmlonly}
 
 % arcsec symbol
 \newcommand{\arcsec}{\arcm\hskip -0.1em\arcm}
-\begin{htmlonly}
-\renewcommand{\arcsec}{{\rawhtml &quot;}} 
-\end{htmlonly}
+% \begin{htmlonly}
+% \renewcommand{\arcsec}{{\rawhtml &quot;}} 
+% \end{htmlonly}
 
 % hours symbol
 \newcommand{\hr}{\hbox{$^{\rm h}$}}
@@ -285,6 +285,8 @@
 \newcommand{\PONGOref}{\xref{{\footnotesize PONGO}}{sun137}{}}
 \newcommand{\PSMERGEref}{\xref{{\footnotesize PSMERGE}}{sun164}{}}
 \newcommand{\TSPref}{\xref{{\footnotesize TSP}}{sun66}{}}
+\newcommand{\POLPACKref}{\xref{{\footnotesize POLPACK}}{sun223}{}}
+\newcommand{\STLref}{\xref{{\footnotesize STL}}{sun190}{STLREF}}
 \newcommand{\TWODSPECref}{\xref{{\footnotesize TWODSPEC}}{sun16}{}}
 
 
@@ -926,9 +928,7 @@ processing, data visualisation, and manipulating
 facilities that integrate with specialised Starlink packages such as
 those for CCD reduction (\CCDPACKref ), stellar and galaxy photometry
 (\PHOTOMref , \PISAref , \ESPref ), spectroscopy (\ECHOMOPref , \Figaroref ,
-\TWODSPECref ), X-ray (\ASTERIXref ), graphics (\PONGOref ),
-time-series polarimetry (\TSPref ), instrument-specific (\CGSDRref ,
-\IRASref , \IRCAMPACKref , \JCMTDRref ) {\it etc.}  {\em Thus the
+), polarimetry (\POLPACKref, \TSPref ), {\it etc.}  {\em Thus the
 functionality of {\footnotesize KAPPA} should not be regarded in isolation.}
 
 In a wider context, {\footnotesize KAPPA} offers facilities not in \IRAFref ,
@@ -955,7 +955,7 @@ NDF \htmlref{FITS extension}{se:fitsairlock};
 \item \htmlref{generation of test data}{cl:datagen}, and
 \htmlref{NDF creation from text files}{TRANDAT};
 \item setting and examining \htmlref{NDF components}{ap:NDFformat};
-\item definition or \htmlref{calculation of a sky co-ordinate
+\item \htmlref{definition}{cl:wcs}, or \htmlref{calculation of a sky co-ordinate
 system}{SETSKY};
 \item arithmetic including a \htmlref{powerful application}{MATHS}
 that handles expressions;
@@ -968,7 +968,7 @@ whose variances are too large}{ERRCLIP};
 \htmlref{rotate}{ROTATE}, \htmlref{shift}{SLIDE},
 \htmlref{reshape}{RESHAPE}, subset, change
 dimensionality;
-\item normalisation of NDF pairs;
+\item \htmlref{normalisation}{NORMALIZE} of NDF pairs;
 \item \htmlref{compression and expansion of images}{cl:compexp};
 \item \htmlref{generalised resampling}{cl:regrid} of NDFs using
 arbitrary transformations;
@@ -981,7 +981,7 @@ and \htmlref{median smoothing}{MEDIAN}; very efficient
 \item statistics including \htmlref{ordered statistics}{HISTAT},
 \htmlref{histogram}{HISTOGRAM}; \htmlref{pixel-by-pixel
 statistics over a sequence of images}{MSTATS};
-\item inspection of image values;
+\item \htmlref{inspection}{LOOK} of image values;
 \item \htmlref{centroids of features}{CENTROID}, particularly stars;
 \htmlref{stellar PSF fitting}{PSF};
 \item detail enhancement using \htmlref{histogram equalisation}{HISTEQ}
@@ -1005,14 +1005,15 @@ and borders);
 \item line graphics: \htmlref{contouring}{CONTOUR}; histogram; \htmlref{line
 plots}{LINPLOT} of 1-dimensional arrays, and \htmlref{multiple-line
 plot}{MLINPLOT} of images; \htmlref{pie sections}{ELPROF}, and slices
-through an image; \htmlref{vector plot}{VECPLOT} of image; all of
-which offer control of the appearance of plots.
+through an image; \htmlref{vector plot}{VECPLOT} of image.
+\item many aspects of the appearance of line graphics can be taylored to
+individual needs and stored within ``style files''.
 \end{itemize} 
 
 \subsubsection{General}
 {\footnotesize KAPPA} handles \htmlref{bad pixels, and processes
-quality}{se:masking}, variance, World Co-ordinate System (WCS), and other 
-information stored within
+quality}{se:masking}, variance, \htmlref{World Co-ordinate System}{se:wcsuse}
+(WCS), and other information stored within
 NDFs \latexonly{(SUN/33 and Section~\ref{se:datastr})}.  In order to
 achieve generality {\footnotesize KAPPA} does not process non-standard
 extensions; however, it does not lose non-standard ancillary data
@@ -1028,8 +1029,14 @@ Many applications handle all non-complex data types directly, for
 efficient memory and disc usage.  Those that do not will usually
 undergo automatic data conversion to produce the desired result.
 
-{\footnotesize KAPPA}'s graphics are device independent.  X-windows is 
-supported.
+{\footnotesize KAPPA}'s graphics are produced using the widely used
+\PGPLOTref package, and are thus device independent.  
+
+Most commands can be automatically re-invoked to process multiple NDFs by
+supplying a group of NDFs as input. Groups of NDFs can be specified using
+wild-cards, or by listing them explicitly either in response to a prompt
+or within a text file. 
+
 
 \subsection{This document}
 This document is arranged as follows.  First are two annotated {\footnotesize
@@ -2715,8 +2722,8 @@ added to those specified by the first. This re-prompting continues until
 a group expression is supplied which does not end with a minus sign.
 
 Certain classes of objects have additional features, for instance if the
-objects are the names of data files, then wild-card characters are
-allowed in the supplied values (see \hyperref{here}{section }{}{SEC:NDF})
+objects are the names of data files, then \htmlref{wild-card
+characters}{SEC:NDF} are allowed in the supplied values.
 
 \subsubsection{\label{SEC:IND}Indirection}
 It is sometimes convenient to store the strings specifying the objects to
@@ -3185,9 +3192,9 @@ closely to that of the Starlink Graphics workstation Name Service (GNS)
 library (see \xref{SUN/188}{sun188}{}). In this scheme a complete
 workstation specification is of the form \verb+<type>;<file>+. This is
 very similar to the PGPLOT scheme described above, but the device type
-and file are swapped round, and the separator is a semi-colon instead of
+and file are swapped round, and the separator is a semicolon instead of
 a slash. As for PGPLOT, the device file can be omitted, in which case a
-default is used, but note that \emph{in this case the semi-colon should
+default is used, but note that \emph{in this case the semicolon should
 also be omitted}. The only supported devices are those for which PGPLOT
 drivers are available. If a device was also available in the GKS-based
 graphics systems previously used by {\footnotesize KAPPA}, then you can
@@ -4725,8 +4732,7 @@ the help or the reference manual.  If none is given you can assume that
 processing will occur in \_REAL.
 
 In {\footnotesize KAPPA} the elements of the data array are often called 
-\htmlref{{\em pixels}}{se:pixelindices}, even if the NDF is not
-two-dimensional.
+{\em pixels}, even if the NDF is not two-dimensional.
 
 \subsection{Looking at the Data Structures}
 
@@ -5567,7 +5573,7 @@ right corners of a box enclosing the required sub-section of the image:
 The box I selected is indicated in Figure~ \latexelsehtml{\ref{fi:agi3}}{3}. 
 
 When an application such as DISPLAY produces a DATA picture containing a
-representation of an NDF, it saves a copy of the NDF's WCS component
+representation of an NDF, it saves a copy of the NDF's \htmlref{WCS component}{apndf:wcs}
 (which contains co-ordinate Frame information) with the DATA picture in
 the graphics database. When \htmlref{CURSOR}{CURSOR} subsequently reports
 a position, it uses this saved WCS information to convert the graphics
@@ -6917,7 +6923,7 @@ instance, celestial co-ordinates cannot (in general) be described using
 AXIS structures because celestial longitude and latitude may both vary
 along any given row or column of an NDF.\footnote{For this and other
 reasons, new applications will avoid using AXIS structures, and make use
-of the more versatile WCS component instead.} If an application is used
+of the more versatile \htmlref{WCS component}{apndf:wcs} instead.} If an application is used
 which renders the AXIS structures in an NDF invalid, then the AXIS
 structures will not be copied to the output NDF. For instance, if
 \htmlref{ROTATE}{ROTATE} is used to rotate an NDF by an angle which is
@@ -6958,7 +6964,7 @@ co-ordinates of stars with known celestial co-ordinates (see
 \htmlref{SETSKY}{SETSKY} and \GAIAref\ ).
 
 \subsection{\xlabel{se_curframe}FrameSets, and the Current Frame\label{se:curframe}}
-Any co-ordinate Frames described in the WCS component, together with the
+Any co-ordinate Frames described in the \htmlref{WCS component}{apndf:wcs}, together with the
 standard GRID, PIXEL and AXIS Frames, form a collection of inter-related
 Frames called a \emph{FrameSet}. A FrameSet contains descriptions of each
 Frame, plus recipes (called \emph{Mappings}) describing how to convert
@@ -6987,7 +6993,7 @@ application requests a position from the user (for instance, the position
 to be placed at the centred of a displayed image), it will expect the
 position to be given within the current co-ordinate Frame of the NDF,
 
-The contents of the WCS component of an an NDF can be examined using
+The contents of the \htmlref{WCS component}{apndf:wcs} of an an NDF can be examined using
 \htmlref{NDFTRACE}{NDFTRACE}. By default, this just shows the number of
 co-ordinates Frames defined within the NDF (including the three standard
 ones), and the {\tt Title} and {\tt Domain} of the current co-ordinate Frame. More
@@ -7012,7 +7018,7 @@ will make the PIXEL Frame the current co-ordinate Frame in the NDF
 \verb+m31+. After this, all references to positions within the NDF
 \verb+m31+ will refer to pixel co-ordinates.
 
-\subsection{Reserved Domain Names}
+\subsection{\xlabel{se_resdoms}Reserved Domain Names\label{se:resdoms}}
 New co-ordinates Frames can be created and added into an NDF using 
 \htmlref{WCSADD}{WCSADD}. When you create a new Frame you should give it
 a meaningful {\tt Domain} name which indicates the sort of co-ordinates which it
@@ -7048,7 +7054,7 @@ Several applications (\htmlref{WCSFRAME}{WCSFRAME},
 \htmlref{CURSOR}{CURSOR}, \htmlref{LISTMAKE}{LISTMAKE}, {\it etc}) have
 parameters which are used to select a co-ordinate Frame.
 These parameters are usually called FRAME. When selecting a Frame from an
-existing FrameSet ({\it e.g.}\ read from the WCS component of an NDF),
+existing FrameSet ({\it e.g.}\ read from the \htmlref{WCS component}{apndf:wcs} of an NDF),
 the Frame may be specified in one of the following ways:
 
 \begin{itemize}
@@ -7115,11 +7121,11 @@ case a two dimensional Frame is always created.
 
 
 \subsection{Propagation of WCS Information}
-{\footnotesize KAPPA} applications which create an output NDF on the basis of a given
-input NDF usually copy the contents of the WCS component from the input
-to the output, modifying it as appropriate to take account of any linear 
-mapping of pixel co-ordinates introducing by the application. The following 
-are exceptions to this rule:
+{\footnotesize KAPPA} applications which create an output NDF on the
+basis of a given input NDF usually copy the contents of the \htmlref{WCS component}{apndf:wcs}
+from the input to the output, modifying it as appropriate to take account
+of any linear mapping of pixel co-ordinates introducing by the
+application. The following are exceptions to this rule:
 
 \begin{itemize}
 
@@ -7133,11 +7139,13 @@ of the input NDF ({\it e.g.}\ \htmlref{FOURIER}{FOURIER}).
 
 \end{itemize}
 
-The output NDFs produced by such applications will contain no WCS component
-(but they will still have the three standard Frames --- GRID, PIXEL and
-AXIS --- albeit the AXIS Frame will probably just describe pixel
-co-ordinates since these applications will not usually copy the
-AXIS structures either).
+The output NDFs produced by such applications will contain no 
+\htmlref{WCS component}{apndf:wcs}
+(but they will still have the three \htmlref{standard Frames}{se:resdoms}
+ --- GRID, PIXEL and
+AXIS --- albeit the AXIS Frame will probably just describe 
+\htmlref{pixel co-ordinates}{se:pixgrd} since these applications will not 
+usually copy the AXIS structures either).
 
 The application \htmlref{WCSCOPY}{WCSCOPY} can be used to copy the WCS
 component from one NDF to another, optionally introducing a linear
@@ -7170,7 +7178,7 @@ to read WCS information from the FITS header cards in the FITS extension.
 \end{enumerate}
 
 Note, {\footnotesize KAPPA} applications always \emph{write} WCS
-information in the form of a standard WCS component. You should remember
+information in the form of a standard \htmlref{WCS component}{apndf:wcs}. You should remember
 that astrometry information stored within an IRAS90 or FITS extension will
 not be corrected to take account of geometric manipulation produced by 
 applications such as \htmlref{ROTATE}{ROTATE}, \htmlref{COMPAVE}{COMPAVE},
@@ -7940,10 +7948,11 @@ co-ordinates. Typical possibilities are as follows.
 \begin{description}
 \item [Catalogue] --- In this mode the application reads a file
 containing a positions list. This can either be a FITS binary
-table, or a text file in STL format, and can contain WCS Information
+table, or a text file in \STLref format, and can contain WCS information
 allowing positions within the catalogue to be aligned with other data.
-Positions lists can be created by several applications such as CURSOR,
-LISTMAKE, CENTROID, \emph{etc.}
+Positions lists can be created by several applications such as 
+\htmlref{CURSOR}{CURSOR}, \htmlref{LISTMAKE}{LISTMAKE},
+\htmlref{CENTROID}{CENTROID}, \emph{etc.}
 \item [Cursor] --- This mode utilises the cursor of the current graphics
 device.  For this to work the array must already be displayed as an
 image, or a contour plot, or line plot (provided the application handles
@@ -8295,18 +8304,19 @@ care! For this reason, KAPPA keeps a copy of the ``current'' palette and
 colour table in a special file. Each time a graphics application is run,
 the current colour table and palette are read back from this file, and
 used to reset the pen colours in the PGPLOT colour table before any
-drawing is performed. Some application change the colour table or palette;
-PALENTRY, LUTABLE, {\em etc.}. When such applications terminates, they
-write the modified colour table or palette back to the file so that it will
-be used by subsequent graphics applications.
+drawing is performed. Some application change the colour table or
+palette; \htmlref{PALENTRY}, \htmlref{LUTABLE}, {\em etc.}. When such
+applications terminates, they write the modified colour table or palette
+back to the file so that it will be used by subsequent graphics
+applications.
 
 Separate palettes and colour tables are maintained for each known
-graphics device, so running LUTGREY on an xwindows device will have no
-effect on the colour table used for postscript devices (for instance).
-The palettes for all known devices are stored in a file called {\tt
-kappa\_palette.sdf} located within your ADAM directory (usually
-\$HOME/adam). The colour tables for all known devices are stored in a
-file called {\tt kappa\_lut.sdf} located within the same directory.
+graphics device, so running \htmlref{LUTGREY}{LUTGREY} on an xwindows
+device will have no effect on the colour table used for postscript
+devices (for instance). The palettes for all known devices are stored in
+a file called {\tt kappa\_palette.sdf} located within your ADAM directory
+(usually \$HOME/adam). The colour tables for all known devices are stored
+in a file called {\tt kappa\_lut.sdf} located within the same directory.
 
 \newpage
 \section{\xlabel{se_masking}Masking, Bad Values, and Quality\label{se:masking}}
@@ -8389,7 +8399,7 @@ semi-minor axis of 16 pixels, at orientation 78\dgs\ clockwise from the
 $x$ axis, and an annulus centred on pixel co-ordinates (10.0,~10.0)
 between radius 30 and 40 pixels. a circle centred on RA 10:09:12.2, and
 DEC -45:12:13 of radius 40 arc-seconds. The COFRAME statements indicate
-the coordinate system in which subsequent positions are supplied. There
+the co-ordinate system in which subsequent positions are supplied. There
 are several other keywords besides those shown here.  ARD has powerful
 syntax for combining regions and supplying WCS information, described
 fully in \xref{SUN/183}{sun183}{}, But you'll be relieved to learn that
@@ -9039,7 +9049,7 @@ to set the current co-ordinate Frame to SKY for a group of NDFs. To do
 this, you would set the FRAME Parameter to SKY either on the command line
 or when prompted during the first invocation. This value would be
 retained for subsequent invocations, but what happens if one of the NDFs
-does not have a SKY Frame defined in its WCS component? Not surprisingly,
+does not have a SKY Frame defined in its \htmlref{WCS component}{apndf:wcs}? Not surprisingly,
 you get an error message identifying the NDF, and you are asked to supply a
 new value for FRAME. You could, for instance supply ``PIXEL'' as the new
 value. This changes the current value of the FRAME parameter to PIXEL,
@@ -11676,7 +11686,8 @@ functions as follows.
 \end{description}
 \vspace*{0.7ex}
 %
-\item {\large\bf NDF World Coordinate Systems}
+\label{cl:wcs}
+\item {\large\bf NDF World Co-ordinate Systems}
 \begin{description}
 \classitem{PERMAXES}
  Permutes the axes of an NDF.
@@ -12672,10 +12683,10 @@ default value.
           regions will be curves of constant DEC, {\tt "}ROW{\tt "} regions will be curves
           of constant RA (assuming axis 1 is RA and axis 2 is DEC), straight
           lines will correspond to geodesics, \emph{etc}. Numerical values will be
-          stored in the output text file in the current coordinate Frame of
+          stored in the output text file in the current co-ordinate Frame of
           the NDF. WCS information will also be stored in the output text
           file allowing the stored positions to be converted to other systems
-          (pixel coordinates, for instance).
+          (pixel co-ordinates, for instance).
       }
    }
    \sstdiytopic{
@@ -12817,7 +12828,7 @@ default value.
       This application draws the outlines of regions described in
       a supplied 2-dimensional ARD file (an `ARD Description{\tt '} - see
       SUN/183). The outlines are drawn over the top of a previously
-      displayed picture, aligned (if possible) in the current coordinate
+      displayed picture, aligned (if possible) in the current co-ordinate
       Frame of the previously drawn picture.
    }
    \sstusage{
@@ -15975,7 +15986,7 @@ default value.
       \sstsubsection{
          PENS = GROUP (Read)
       }{
-         A group of strings, separated by semi-colons, each of which specifies
+         A group of strings, separated by semicolons, each of which specifies
          the appearance of a pen to be used to draw a contour. The first
          string in the group describes the pen to use for the first contour,
          the second string describes the pen for the second contour, \emph{etc}. If
@@ -29016,7 +29027,7 @@ plot (6k).
       \sstsubsection{
          PENS = GROUP (Read)
       }{
-         A group of strings, separated by semi-colons, each of which specifies
+         A group of strings, separated by semicolons, each of which specifies
          the appearance of a pen to be used to draw a curve. The first
          string in the group describes the pen to use for the first curve,
          the second string describes the pen for the second curve, \emph{etc}. If
@@ -31491,7 +31502,7 @@ plot (9k).
    \sstdescription{
      This application re-orders the pixel axes of an NDF, together with
      all related information (AXIS structures, and the axes of all 
-     coordinate Frames stored in the WCS component of the NDF).
+     co-ordinate Frames stored in the WCS component of the NDF).
    }
    \sstusage{
       permaxes in out perm
@@ -31543,12 +31554,12 @@ plot (9k).
    \sstnotes{
       \sstitemlist{
          \sstitem
-         If any WCS coordinate Frame has more axes then the number of
+         If any WCS co-ordinate Frame has more axes then the number of
 	 pixel axes in the NDF, then the high numbered surplus axes in
 	 the WCS Frame are left unchanged.
 
          \sstitem
-         If any WCS coordinate Frame has fewer axes then the number of
+         If any WCS co-ordinate Frame has fewer axes then the number of
 	 pixel axes in the NDF, then the Frame is left unchanged if the
 	 specified permutation would change any of the high numbered
 	 surplus pixel axes. A warning message is issued if this occurs.
@@ -34803,7 +34814,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       }{
          This rotates the NDF called m31 so that north is vertical and
          stores the results in an NDF called m31r. This assumes that the
-         current WCS Frame in the input NDF is a celestial coordinate Frame.
+         current WCS Frame in the input NDF is a celestial co-ordinate Frame.
       }
       \sstexamplesubsection{
          rotate angle=180 out=sn in=ns
@@ -35744,7 +35755,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          error and the axis array is unchanged.
 
          \sstitem
-         The chapter entitled {\tt "}The Axis Coordinate System{\tt "} in SUN/33
+         The chapter entitled {\tt "}The Axis co-ordinate System{\tt "} in SUN/33
          describes the NDF axis co-ordinate system and is recommended
          reading especially if you are using axis widths.
 
@@ -37240,7 +37251,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          If WCS information is stored in the form of an IRAS90 astrometry
          structure (see parameter IRAS90), it will in general be invalidated
          by any subsequent KAPPA commands which modify the transformation
-         between sky and pixel coordinates. For instance, if the image is
+         between sky and pixel co-ordinates. For instance, if the image is
          moved using SLIDE (for example), then the IRAS90 astrometry
          structure will no longer correctly describe the sky co-ordinates
          associated with each pixel. For this reason (amongst others) it is
@@ -39948,7 +39959,7 @@ plot (7k).
       \sstsubsection{
          ZOOM = \_DOUBLE (Read)
       }{
-         The scaling factor for a ZoomMap; every coordinate will be
+         The scaling factor for a ZoomMap; every co-ordinate will be
          multiplied by this factor in the forward transformation.
          Only used when MAPTYPE=ZOOM.
       }
@@ -41647,7 +41658,7 @@ by applications such as \htmlref{REGRID}{REGRID} which require a mapping.
    \end{verbatim}
 
    which defines a transformation from Cartesian to polar
-   coordinates. Here, the variables that appear on the left of each
+   co-ordinates. Here, the variables that appear on the left of each
    expression (R and THETA) provide names for the output variables and
    those that appear on the right (X and Y) are references to input
    variables.
@@ -41655,7 +41666,7 @@ by applications such as \htmlref{REGRID}{REGRID} which require a mapping.
    To complement this, you must also supply expressions for the inverse
    transformation.  In this case, the number of
    expressions given would normally match the number of MathMap input
-   coordinates, Nin.  If Nin is 2, you might use:
+   co-ordinates, Nin.  If Nin is 2, you might use:
 
    \begin{verbatim}
       'X = R $*$ COS( THETA )'
@@ -41663,7 +41674,7 @@ by applications such as \htmlref{REGRID}{REGRID} which require a mapping.
    \end{verbatim}
 
    which expresses the transformation from polar to Cartesian
-   coordinates. Note that here the input variables (X and Y) are named on
+   co-ordinates. Note that here the input variables (X and Y) are named on
    the left of each expression, and the output variables (R and THETA)
    are referenced on the right.
 
@@ -43327,7 +43338,7 @@ withdrawn, two to enable {\footnotesize KAPPA} to be NAG-free.
 
 \section{Release Notes---V0.12}
 V0.12 introduces limited support for the NDF WCS component which allows
-descriptions of world coordinate systems to be stored within NDF data
+descriptions of world co-ordinate systems to be stored within NDF data
 structures. Currently, this support only includes:
 
 \begin{itemize}
@@ -43365,10 +43376,10 @@ zeros.
   \item \htmlref{FITSEDIT}{FITSEDIT} now creates a new FITS extension if
 the specified NDF does not already contain a FITS extension.
   \item \htmlref{FITSIN}{FITSIN} now creates an NDF WCS component (if
-possible) storing a description of any world coordinate systems defined
+possible) storing a description of any world co-ordinate systems defined
 in the FITS headers.
   \item \htmlref{FITSDIN}{FITSDIN} now creates an NDF WCS component (if
-possible) storing a description of any world coordinate systems defined
+possible) storing a description of any world co-ordinate systems defined
 in the FITS headers.
   \item \htmlref{LINPLOT}{LINPLOT} changed to avoid spurious clearing of
 X displays when using two or more GWM windows under ICL.
@@ -45109,7 +45120,7 @@ The following applications have been modified:
       \begin{itemize}
          \item The MODE parameter can now take the new value ``WCS'',
          which causes the AXIS centre values to be copied from the 
-         corresponding axis of the current coordinate Frame in the 
+         corresponding axis of the current co-ordinate Frame in the 
          WCS component of the NDF.
       \end{itemize}
 
@@ -45218,8 +45229,8 @@ now allow the user to specify the co-ordinate Frame in which positions
 should be stored within the catalogue columns. This is done using a new
 parameter called CATFRAME which has been added to all appropriate
 commands. Previously positions were always stored in the base Frame of
-the associated WCS information. Now, the default is to use SKY coordinates
-if available, otherwise PIXEL coordinates.
+the associated WCS information. Now, the default is to use SKY co-ordinates
+if available, otherwise PIXEL co-ordinates.
 
 \end{itemize}
 
@@ -45863,7 +45874,7 @@ functions as follows.
 \end{description}
 \vspace*{0.7ex}
 %
-\item {\large\bf NDF World Coordinate Systems}
+\item {\large\bf NDF World Co-ordinate Systems}
 \begin{description}
 \classitem{PERMAXES}
  Permutes the axes of an NDF.
