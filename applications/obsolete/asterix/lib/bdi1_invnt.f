@@ -102,6 +102,8 @@
 *        Added LoError and HiError invention
 *     31 May 1996 (DJA):
 *        Had forgotten to divide ASCALE by two for LoWidth and HiWidth
+*     10 Jul 1996 (RJV):
+*        Did LoWidth and HiWidth properly
 *     {enter_changes_here}
 
 *  Bugs:
@@ -580,7 +582,7 @@
           CALL ADI_NEW1( TYPE, NELM, ITID, STATUS )
           CALL ADI_MAPR( ITID, 'WRITE', WPTR, STATUS )
 
-*      Convert to widths to half-widths
+*      Convert widths to half-widths
           CALL BDI1_INVNT_W2HW( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
 
 *      Free mapped data
@@ -624,8 +626,12 @@
 
 *        Convert to values to half-widths
             ELSE
-              CALL BDI1_INVNT_V2HW( NELM, %VAL(PTR), %VAL(WPTR),
-     :                              STATUS )
+
+              IF (ITEM(8:).EQ.'LoWidth') THEN
+                CALL BDI1_INVNT_V2LW(NELM,%val(PTR),%val(WPTR),STATUS)
+              ELSEIF (ITEM(8:).EQ.'HiWidth') THEN
+                CALL BDI1_INVNT_V2HW(NELM,%val(PTR),%val(WPTR),STATUS)
+              ENDIF
 
             END IF
 
@@ -979,8 +985,6 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     9 Aug 1995 (DJA):
-*        Original version.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -1020,13 +1024,131 @@
 
 
 
+
+      SUBROUTINE BDI1_INVNT_V2LW( NVAL, VALUE, LWIDTH, STATUS )
+*+
+*  Name:
+*     BDI1_INVNT_V2LW
+
+*  Purpose:
+*     Invent axis lower half-widths from axis values
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL BDI1_INVNT_V2LW( NVAL, VALUE, LWIDTH, STATUS )
+
+*  Description:
+
+*  Arguments:
+*     NVAL = INTEGER (given)
+*        Number of axis widths to invent
+*     VALUE(*) = REAL (given)
+*        Axis values
+*     LWIDTH(*) = REAL (returned)
+*        Axis lower half widths
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
+
+*  Keywords:
+*     package:bdi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     RJV: (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER                   NVAL
+      REAL			VALUE(*)
+
+*  Arguments Given and Returned:
+      REAL			LWIDTH(*)
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			I			! Loop over values
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Convert values to half-widths
+      IF ( NVAL .EQ. 1 ) THEN
+        LWIDTH(NVAL)=0.0
+      ELSE
+        LWIDTH(1)=ABS
+        DO I = 2, NVAL
+          LWIDTH(I) = ABS(VALUE(I)-VALUE(I-1))/2.0
+        END DO
+        LWIDTH(1) = LWIDTH(2)
+      ENDIF
+
+      END
+
+
+
       SUBROUTINE BDI1_INVNT_V2HW( NVAL, VALUE, HWIDTH, STATUS )
 *+
 *  Name:
 *     BDI1_INVNT_V2HW
 
 *  Purpose:
-*     Invent axis half-widths from axis values
+*     Invent axis upper half-widths from axis values
 
 *  Language:
 *     Starlink Fortran
@@ -1088,7 +1210,7 @@
 *     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
-*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RJV:  (Jet-X, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -1124,15 +1246,14 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Convert values to half-widths
       IF ( NVAL .EQ. 1 ) THEN
+        HWIDTH(NVAL)=0.0
+      ELSE
         DO I = 1, NVAL-1
           HWIDTH(I) = ABS(VALUE(I+1)-VALUE(I))/2.0
         END DO
         HWIDTH(NVAL) = HWIDTH(NVAL-1)
-      ELSE
-        HWIDTH(NVAL) = 0.0
-      END IF
+      ENDIF
 
       END
 
