@@ -1,28 +1,28 @@
 ## Process this file with automake to produce Makefile.in
 
+if BUILDJAVA
 java_DATA = starconf.jar
+else !BUILDJAVA
+# Can't build Java on this platform
+java_DATA = 
+endif !BUILDJAVA
+
 # The following must match what's returned by
 # `starconf --show buildsupportjar`
 javadir = $(pkgdatadir)
-
-# Default target.  We must be able to cope with Java not being
-# present.  Test the value of the JAVAC variable, and if it is
-# NOJAVAC, do nothing (successfully).  The rest of the buildsupport
-# system is (well, should be) written to cope with this absence.  If
-# JAVAC is available, we assume JAR is, too.
-all:
-	if test $(JAVAC) = NOJAVAC; then \
-	  echo "Warning: No Java available -- not building starconf.jar"; \
-	else \
-	  $(MAKE) starconf.jar; \
-	fi
 
 starconf.jar: GenerateDependencies.class Transformer.class
 	$(JAR) cf $@ *.class
 
 SUFFIXES = .java .class
+if BUILDJAVA
 .java.class:
-	$(JAVAC) -source 1.4 $<
+	$(JAVAC) $<
+else !BUILDJAVA
+.java.class:
+	echo "Can't build Java on this platform" >&2
+	false
+endif !BUILDJAVA
 
 check: GenerateDependencies.class testdeps.xml testdeps.correct
 	rm -f testdeps.stdout testdeps.stderr
@@ -30,4 +30,3 @@ check: GenerateDependencies.class testdeps.xml testdeps.correct
 	    --makefile=testdeps.stdout 2>testdeps.stderr
 	diff testdeps.correct testdeps.stdout
 	rm -f testdeps.stdout testdeps.stderr
-
