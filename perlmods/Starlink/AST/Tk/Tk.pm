@@ -466,15 +466,13 @@ Zero should be returned if the supplied capability is not recognised.
 sub _GCap {
   my $cap = shift;
   my $value = shift;
-   print "_GCap: Placeholder routine called [assume lack capability]\n";
+  print "_GCap: Placeholder routine called [assume lack capability]\n";
   return 0;
 }
 
 # Internal error setting routine
 sub ReportGrfError {
   my $text = shift;
-  my $canvas = $$external[0];
-  my ($xlo,$xhi,$ylo,$yhi) = @$external[1 .. 4];
   warn "Generated AST error in perl PGPLOT callback: $text\n";
   Starlink::AST::_Error( &Starlink::AST::Status::AST__GRFER(), $text);
 }
