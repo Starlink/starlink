@@ -251,8 +251,8 @@
               PTR = WPTR
 
 *          Store dynamic mapped widths
-              CALL BDI1_STOMAP( PSID, .TRUE., DAT__NOLOC, 0, PTR, 'REAL',
-     :                          'READ', STATUS )
+              CALL BDI1_STOMAP( PSID, .TRUE., DAT__NOLOC, 0, PTR,
+     :                          'REAL', 'READ', STATUS )
 
             END IF
 
@@ -614,7 +614,7 @@
 
 *  Arguments Given:
       INTEGER                   NVAL
-      REAL			WIDTH(*)
+      REAL			VALUE(*)
 
 *  Arguments Given and Returned:
       REAL			HWIDTH(*)
