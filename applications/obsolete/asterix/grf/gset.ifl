@@ -292,6 +292,42 @@ interface GSET
      prompt 'Shape parameter 3'
      help 'Parameter defining shape, image units for lengths, degrees for angles'
    endparameter
+   parameter FUNC
+     type '_CHAR'
+     default !
+     prompt 'Function type'
+     help 'Just POLY at the moment'
+   endparameter
+   parameter PAR1
+     type '_REAL'
+     default !
+     prompt 'Function parameter 1'
+   endparameter
+   parameter PAR2
+     type '_REAL'
+     default !
+     prompt 'Function parameter 2'
+   endparameter
+   parameter PAR3
+     type '_REAL'
+     default !
+     prompt 'Function parameter 3'
+   endparameter
+   parameter PAR4
+     type '_REAL'
+     default !
+     prompt 'Function parameter 4'
+   endparameter
+   parameter PAR5
+     type '_REAL'
+     default !
+     prompt 'Function parameter 5'
+   endparameter
+   parameter PAR6
+     type '_REAL'
+     default !
+     prompt 'Function parameter 6'
+   endparameter
    parameter FRAME
      type '_INTEGER'
      default 1
