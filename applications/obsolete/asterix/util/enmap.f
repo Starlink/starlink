@@ -77,7 +77,7 @@
 
       BYTE                     IQMASK           ! input quality mask
 
-      LOGICAL                  INPRIM,OK
+      LOGICAL                  OK
       LOGICAL                  QOK              ! Input quality present
 *
 *    Version :
