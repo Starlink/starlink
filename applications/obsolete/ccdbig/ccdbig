@@ -49,11 +49,17 @@
       # (else explicitly impose mask on data using ARDMASK).
             set keepard = TRUE
 
+      # Do we want to use a bias frame? (else just interpolate)
+            set biasframe = TRUE
+
       # Set list of image sizes of frames (pixels along a side)
             set image_sizes = ( 1000 2000 3000 4000 5000 6000 )
 
       # Set list of object densities (objects per million pixels)
             set object_densities = ( 50 )
+
+      # Set minimum number of objects per frame (can override object_densities)
+            set min_objects = 300
 
       # Set logging interval (seconds)
             set interval = 15
@@ -68,15 +74,14 @@
       set null = "\!"
       set abort = "\!\!"
 
-#  Validation
-      if ("$variance" != "TRUE" && "$variance" != "FALSE") then
-         echo "Variable variance must be set TRUE or FALSE."
-         goto EXIT
-      endif
-      if ("$keepard"  != "TRUE" && "$keepard"  != "FALSE") then
-         echo "Variable keepard must be set TRUE or FALSE."
-         goto EXIT
-      endif
+#  Validation of booleans
+      foreach boolean ( variance keepard biasframe )
+         set value = `eval echo '$'$boolean`
+         if ( "$value" != "TRUE" && "$value" != "FALSE" ) then
+            echo "Variable $boolean='$value'; must be set to 'TRUE' or 'FALSE'."
+            goto EXIT
+         endif
+      end
 
 #  Initialize starlink environment
       source /star/etc/cshrc
@@ -94,8 +99,11 @@
 
 #  Check CCDBIG_DIR is defined
       if ( ! $?CCDBIG_DIR ) then
-         echo "Please define CCDBIG_DIR as the directory containing the"
-         echo "ccdbig files."
+         echo " "
+         echo "  Directory CCDBIG_DIR must be defined to run this script."
+         echo "  Please define CCDBIG_DIR as the directory containing the"
+         echo "  original ccdbig script and data files."
+         echo " "
          goto EXIT
       endif
 
@@ -157,7 +165,7 @@
 #  Loop over number of objects in frame
          foreach density ( $object_densities )
             @ objects = ($field_pixels * $field_pixels * $density) / 1000000
-            if ($objects < 50) set objects = 50 
+            if ( $objects < $min_objects ) set objects = $min_objects
 
 #  Generate file containing objects for use by ccdgenerate:
 #  First strip comments and blank lines,
@@ -258,6 +266,9 @@
      	       accept
 #           end ccdgenerate
 
+#  Delete bias frames if we don't need them.
+            if ($biasframe == "FALSE") rm bias?.sdf
+
 #  If display capability is enabled then display one DATA frame.
             if ( "$device" != "NONE" ) then
                echo " "
@@ -287,47 +298,59 @@
                accept
 #           end ccdnote
  
+
+            if ( $biasframe == "TRUE" ) then
+
 #  Make a BIAS frame.
-            echo " "
-            echo "  Producing a master bias calibration frame. This is produced"
-            echo "  by median stacking the ordinary bias frames. This process"
-            echo "  reduces the noise introduced in debiassing."
-            echo " "
-            log_start makebias
-            makebias \
-               in='bias*' \
-               out=master_bias \
-               preserve=true \
-               genvar=$variance \
-               accept
-#           end makebias
+               echo " "
+               echo "  Producing a master bias calibration frame. This is"
+               echo "  produced by median stacking the ordinary bias frames."
+               echo "  This process reduces the noise introduced in debiassing."
+               echo " "
+               log_start makebias
+               makebias \
+                  in='bias*' \
+                  out=master_bias \
+                  preserve=true \
+                  genvar=$variance \
+                  accept
+#              end makebias
 
-#  Apply masking directly to the frames if we're not using the ARD file
-#  implicitly
-            if ( "$keepard" == "FALSE" ) then
-               echo
-               echo "  Use ARDMASK to apply ARD file directly to bias frame."
-               echo
-               log_start ardmask
-               ardmask  \
-                  in=master_bias \
-                  out=masked_bias \
-                  ardfile=ccdtest_ard.dat 
-#              end ardmask
-               mv masked_bias.sdf master_bias.sdf
+#  DEBIAS all frames (including flatfields) using master bias frame
+               echo " "
+               echo "  Debias the data and flatfield frames, using the master"
+               echo "  bias frame."
+               echo " "
+               log_start debias
+               debias \
+                  in='"data?,ff?"' \
+                  out='debias_*' \
+                  getmask=$keepard \
+                  genvar=$variance \
+                  bias=master_bias \
+                  accept
+#              end debias
+
+            else
+
+#  DEBIAS all frames (including flatfields) using bias strips
+               log_start debias
+               echo " "
+               echo "  Debias the data and flatfield frames, determining the"
+               echo "  bias level by interpolating between the bias strips."
+               echo " "
+               debias \
+                  in='"data?,ff?"' \
+                  out='debias_*' \
+                  getmask=$keepard \
+                  genvar=$variance \
+                  bias=\! \
+                  accept
+#              end debias
+
             endif
-
-#  DEBIAS all frames (including flatfields)
-            log_start debias
-            debias \
-               in='"data?,ff?"' \
-               out='debias_*' \
-               getmask=$keepard \
-               genvar=$variance \
-               accept
-#           end debias
-
-#  Display all the debiassed frames.
+            
+#  Display a debiassed frame.
            if ( "$device" != "NONE" ) then
               echo " "
               echo "  Displaying debiassed target frame. Note the absence of"
@@ -376,6 +399,23 @@
                  accept
 #             end display
            endif
+
+#  Apply masking directly to the master flatfield (it will get propagated
+#  from there to subsequent reduced frames), if we're not using the ARD file
+#  implicitly.
+            if ( "$keepard" == "FALSE" ) then
+               echo " "
+               echo "  Use ARDMASK to apply ARD file directly to master flat."
+               echo " "
+               log_start ardmask
+               ardmask  \
+                  in=master_flat \
+                  out=masked_flat \
+                  ardfile=ccdtest_ard.dat 
+#              end ardmask
+               mv masked_flat.sdf master_flat.sdf
+            endif
+
 
 #  Flatfield all the DATA frames
            echo " "
