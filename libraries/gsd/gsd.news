@@ -1,0 +1,7 @@
+GSD Version 1.0 released
+
+This is the first standalone release of the GSD library.
+This library provides read-only access to files created using the GSD
+format as used on the James Clerk Maxwell Telescope (JCMT) for heterodyne
+data. It is currently used by SPECX and JCMTDR.
+
