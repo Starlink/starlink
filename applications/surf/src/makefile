@@ -1,13 +1,13 @@
 # makefile for SURF package
 
 #  Copyright:
-#     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+#     Copyright (C) 1995-2002 Particle Physics and Astronomy
 #     Research Council. All Rights Reserved.
 
 .SUFFIXES : .ifl .ifc
 
 # Version string
-PKG_VERS = "'1.6-8JACtest'"
+PKG_VERS = "'1.6-10JACtest'"
 
 # Location of libsculib.a
 SCULIB   = ../sculib
@@ -16,10 +16,10 @@ SURF_KAP = ../surf_kap
 PKG = surf
 
 # Starlink
-STARLINK = /star
+STARLINK = /stardev
 STAR_INC = $(STARLINK)/include
 STAR_LIB = $(STARLINK)/lib
-
+STAR_BIN = $(STARLINK)/bin
 
 # Libraries
 
@@ -32,7 +32,7 @@ ADAMLIBS = `./surf_link_adam`
 
 
 # Linker
-ALINK  = alink -xdbx
+ALINK  = $(STAR_BIN)/alink -xdbx
 LDFLAGS =  -C -g
 LDFLAGS = 
 
