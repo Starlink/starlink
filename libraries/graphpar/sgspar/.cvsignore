@@ -1,3 +1,5 @@
+sgs_test
+sgspar_test
 *.lo
 *.la
 Makefile

@@ -1,3 +1,6 @@
+config.h
+config.h.in
+sun143.ps
 *.lo
 *.la
 Makefile

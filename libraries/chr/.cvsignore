@@ -1,3 +1,5 @@
+config.h
+sun40.ps
 *.lo
 *.la
 Makefile

@@ -1,3 +1,5 @@
+config.cache
+sun113.ps
 *.lo
 *.la
 Makefile

@@ -1,3 +1,6 @@
+gks_test
+gkspar_test
+starconf.status
 *.lo
 *.la
 Makefile

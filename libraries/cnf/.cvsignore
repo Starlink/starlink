@@ -1,3 +1,5 @@
+config.h
+sun209.ps
 *.lo
 *.la
 Makefile

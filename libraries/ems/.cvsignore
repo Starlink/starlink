@@ -1,3 +1,9 @@
+EMS_ERR
+config.h
+ems_err.h
+ems_fioer.c
+fac_104_err
+ssn4.ps
 *.lo
 *.la
 Makefile

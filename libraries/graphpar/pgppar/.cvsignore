@@ -1,3 +1,5 @@
+pgp_test
+pgppar_test
 *.lo
 *.la
 Makefile
