@@ -1,9 +1,9 @@
 #+
 #  Name:
-#     tcurs.tcl
+#     idicurs.tcl
 #
 #  Purpose:
-#     Script to do the work for the TCURS application.
+#     Script to do the work for the IDICURS application.
 #
 #  Language:
 #     Tcl.
@@ -56,7 +56,7 @@
 
 #  Create an NDF viewer widget.
       ndfview .viewer \
-                      -title "TCURS: %n" \
+                      -title "IDICURS: %n" \
                       -percentiles [ list $PERCLO $PERCHI ] \
                       -watchstate viewstate \
                       -zoom $ZOOM \
