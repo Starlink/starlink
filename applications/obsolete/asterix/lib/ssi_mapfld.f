@@ -24,10 +24,6 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *
-*    Global variables :
-*
-      INCLUDE 'SSI_CMN'
-*
 *    Import :
 *
       CHARACTER*(DAT__SZLOC)       LOC           ! SSDS locator

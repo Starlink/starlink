@@ -39,11 +39,10 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)       PLOC          ! POSIT structure
-      CHARACTER*(DAT__SZLOC)       TLOC          ! Temp structure
-*-
       INTEGER ID
       INTEGER FID
+*-
+
       IF(STATUS.EQ.SAI__OK) THEN
         CALL ADI1_GETLOC(LOC,ID,STATUS)
         CALL SSO_LOCFLD( ID, FLD, FLOC, STATUS )
