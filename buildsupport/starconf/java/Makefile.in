@@ -10,7 +10,7 @@ GenerateDependencies.class: GenerateDependencies.java
 check: GenerateDependencies.class testdeps.xml testdeps.correct
 	rm -f testdeps.stdout testdeps.stderr
 	$(JAVA) GenerateDependencies --test testdeps.xml \
-	    >testdeps.stdout 2>testdeps.stderr
+	    --makefile=testdeps.stdout 2>testdeps.stderr
 	diff testdeps.correct testdeps.stdout
 	rm -f testdeps.stdout testdeps.stderr
 
