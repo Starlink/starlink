@@ -80,6 +80,7 @@
           NBOX=NBOX+STR_OCCUR('BOX',TEXT)
           NAND=NAND+STR_OCCUR('AND',TEXT)
           NNOT=NNOT+STR_OCCUR('NOT',TEXT)
+	print *,text
         ENDDO
 
 
