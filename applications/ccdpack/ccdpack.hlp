@@ -6636,7 +6636,7 @@ AALLAN: Alasdair Allan (Keele University, STARLINK)
      propagation to the output mosaic, which will typically have a
      larger extent than any of the input images).
 1 OUTLINE
-Draws aligned outlines of NDFs on a graphics display.
+Draws aligned outlines of images on a graphics display.
 
 Usage:
 
