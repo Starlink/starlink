@@ -88,6 +88,30 @@
             helpkey *
          }
 
+         parameter image {
+                          # Resample images onto the graphics device?
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Plot images as well as outlines?}
+            helpkey *
+         }
+
+         parameter percentiles {
+                               # Percentile limits for display
+            type _DOUBLE
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Lower and upper percentiles for image display}
+            default 2 98
+            range 0 100
+            helpkey *
+            size *
+         }
+
          parameter style {
                           # Plot style
             type LITERAL
@@ -99,6 +123,61 @@
             helpkey *
          }
 
+         parameter labname {
+                            # Plot name in label?
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Label images with their names?}
+            default TRUE
+            helpkey *
+         }
+
+         parameter labnum {
+                           # Plot index in label?
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Label images with their numbers?}
+            default FALSE
+            helpkey *
+         }
+
+         parameter labopaque {
+                              # Opaque label backgrounds?
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Use opaque background for text labels?}
+            default TRUE
+            helpkey *
+         }
+
+         parameter origin {
+                           # Mark origin?
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Draw marker at image origins?}
+            default TRUE
+            helpkey *
+         }
+
+         parameter lines {
+                          # Draw outlines?
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Draw image outlines?}
+            default TRUE
+            helpkey *
+         }
+
          parameter labup {
                           # Labelling orientation
             type _LOGICAL
@@ -107,17 +186,6 @@
             ppath CURRENT DEFAULT
             default FALSE
             prompt {Write text upright on graphics device?}
-            helpkey *
-         }
-
-         parameter labmode {
-                            # Labelling mode
-            type LITERAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default {NAME,ORIGIN}
-            prompt {Labelling mode (NAME,INDEX,ORIGIN,OPAQUE)}
             helpkey *
          }
 
