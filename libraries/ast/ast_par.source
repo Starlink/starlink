@@ -18,6 +18,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MBT: Mark Taylor (STARLINK)
+*     DSB: David S. Berry
 
 *  History:
 *     12-NOV-1996 (RFWS):
@@ -30,6 +31,8 @@
 *        Added definitions for PcdMap.
 *     24-NOV-2000 (MBT):
 *        Added AST__BLOCKAVE interpolation scheme.
+*     22-JUN-2001 (DSB):
+*        Added AST_OFFSET2 and AST_ANGLE to Frame class.
 *-
 
 *  Length of character string returned by a character function.
@@ -132,6 +135,8 @@ c      PARAMETER ( AST__UKERNN = 2 )
       INTEGER AST_PICKAXES
       INTEGER AST_UNFORMAT
       LOGICAL AST_ISAFRAME
+      DOUBLE PRECISION AST_ANGLE
+      DOUBLE PRECISION AST_OFFSET2
 
 *  CmpFrame class.
       INTEGER AST_CMPFRAME
