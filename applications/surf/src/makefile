@@ -7,7 +7,7 @@
 .SUFFIXES : .ifl .ifc
 
 # Version string
-PKG_VERS = "'1.6-3JACtest'"
+PKG_VERS = "'1.6-5JACtest'"
 
 # Location of libsculib.a
 SCULIB   = ../sculib
