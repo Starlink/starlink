@@ -165,7 +165,7 @@ Here is a summary of the main modifications.
   o  DST2NDF has had a number of bug fixes applied.  In V0.4 it was
      possible for an axis data array to have the wrong number of
      elements in certain circumstances; the FLAGGED value could have
-     been set incorrectly when the FITS structure preceeded the .Z
+     been set incorrectly when the FITS structure preceded the .Z
      structure within the DST file.
 
   o  DST2NDF and NDF2DST now handle quotes in FITS character values.
@@ -202,3 +202,70 @@ Here is a summary of the main modifications.
 
   o  NDF2IRAF can produce a signed-word IRAF image.  The output data
      type depends on the data type of the NDF's data array.
+
+2 V0.6
+
+3 New_applications
+There are six new applications.
+  o  NDF2FITS -- Converts an NDF to FITS format.
+
+                 Conversion from FITS to NDF format can be done with
+                 the FITS readers in the KAPPA package.
+
+  o  GIF2NDF and NDF2GIF -- Convert between GIF files and NDFs.
+
+  o  TIFF2NDF and NDF2TIFF -- Convert between TIF files and NDFs.
+
+  o  NDF2PGM  -- Converts an NDF into a PBMPLUS PGM file.
+
+In addition, SUN/55 now describes how to convert NDFs to IDL format.
+
+3 Withdrawn_Applications
+
+  BDF2NDF, NDF2BDF, DIPSO2NDF, and NDF2DIPSO.  See topic 
+  "VMS_differences".
+
+3 Changed_Applications
+  o  IRAF2NDF and NDF2IRAF utilities are now available for alpha
+     OSF/1 and sun4 Solaris platforms.  The libraries necessary to
+     build them for sunOS and Ultrix are no longer distributed. 
+     The availability on different systems is now documented.
+
+  o  ASCII2NDF, NDF2ASCII, NDF2UNF, and UNF2NDF have no upper-limit
+     restriction on parameter NOPEREC.
+
+  o  Fixed bugs in DST2NDF.  A Figaro n-dimensional array of axis
+     centres is now placed into AXIS.MORE.FIGARO.DATA_ARRAY.
+     The component name was previously called DATA.  DST2NDF now
+     allows the axis width to be a scalar in the DST file, expanding
+     it to a vector in the NDF.  Missing axes in the DST are always
+     created in the NDF; formerly this step would be omitted if
+     there were no FITS extension to write.
+
+  o  Fixed bugs in NDF2DST.  An n-dimensional axis now uses the
+     component name DATA rather than DATA_ARRAY for the pixel
+     centres.  If AXIS().MORE.FIGARO.DATA_ARRAY is primitive, its
+     DATA component becomes the new n-dimensional axis array in the
+     Figaro file.  It was previously renamed from DATA_ARRAY to DATA.
+     NDF2DST now also checks whether or not AXIS().MORE.FIGARO.WIDTH
+     is primitive, and if it is, its DATA component becomes the new
+     n-dimnensional axis-width array in the Figaro file.
+
+3 Global_changes
+  o  NDF Support -- CONVERT startup will now define sensible default
+           values for the environment variables associated with the
+           format-conversion facilities of the NDF library, so that
+           NDF library calls may do `on the fly' conversion of
+           `foreign' formats using the CONVERT utilities.
+
+  o  Documentation -- SUN/55 now describes the use of CONVERT on UNIX
+           platforms.  There is some residual reference to VMS,
+           particularly in application specifications, and an appendix
+           which points the reader at further information on the
+           VMS release.
+
+           A hypertext version of this document is available.
+
+  o  Platform Support -- CONVERT is no longer supported on sunOS or
+           Ultrix.  The VMS release is frozen at version 0.5.
+
