@@ -102,9 +102,9 @@
 
       DOUBLE PRECISION 		DSCS			! Spacecraft clock
 
-      REAL			BASESC			! S/c clock at start
-      REAL			GSTART(MAXGTIME)	! Good time starts
-      REAL			GEND(MAXGTIME)		! Good time ends
+      DOUBLE PRECISION		BASESC			! S/c clock at start
+      DOUBLE PRECISION		GSTART(MAXGTIME)	! Good time starts
+      DOUBLE PRECISION		GEND(MAXGTIME)		! Good time ends
 
       INTEGER			ANDIM			! Attitude dimensionality
       INTEGER			ATT_R_PTR		! Attitude ROLL
@@ -147,7 +147,7 @@ C
 C
 	CHARACTER INSMAP*80
 c	From INTEGER to improve exposure time evaluation
-	REAL IACTBE, IACTEN
+	DOUBLE PRECISION IACTBE, IACTEN
 *
 *    Local data :
 *
@@ -474,7 +474,7 @@ c	From INTEGER to improve exposure time evaluation
 *      Process the attitude step, first check the accepted time file
 *      to see if the attitude step is in an accepted time period
         ITIME = 1
-        DO WHILE ( (ISCS .GT. IACTEN) .AND. (ITIME.LE.NACTGTIME) )
+        DO WHILE ( (DBLE(ISCS) .GT. IACTEN) .AND. (ITIME.LE.NACTGTIME) )
           IACTBE = GSTART(ITIME)
           IACTEN = GEND(ITIME)
 
@@ -485,7 +485,7 @@ c	From INTEGER to improve exposure time evaluation
 
 *      If a good time, or no time slots supplied...
         IF ( (NACTGTIME.EQ.0) .OR.
-     :       ((ISCS .GE. IACTBE) .AND. (ITIME.LE.NACTGTIME)) ) THEN
+     :       ((DBLE(ISCS) .GE. IACTBE) .AND. (ITIME.LE.NACTGTIME)) ) THEN
 
 *        Accepted time, now find the live time.
           NUM = NUM + 1
