@@ -18,7 +18,7 @@ libary_la_SOURCES = \
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
 if !NOPIC
-libary_la_FCFLAGS = -prefer-pic
+libary_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
 include_HEADERS = $(PUBLIC_INCLUDES)

@@ -25,10 +25,10 @@ libndf_adam_la_SOURCES = \
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
 if !NOPIC
-libndf_la_CFLAGS = -prefer-pic
-libndf_la_FCFLAGS = -prefer-pic
-libndf_adam_la_CFLAGS = -prefer-pic
-libndf_adam_la_FCFLAGS = -prefer-pic
+libndf_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libndf_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+libndf_adam_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libndf_adam_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
 include_HEADERS = $(PUBLIC_INCLUDES)

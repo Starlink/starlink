@@ -15,7 +15,7 @@ libsla_la_LIBADD = $(LTLIBOBJS)
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
 if !NOPIC
-libsla_la_FCFLAGS = -prefer-pic
+libsla_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
 FPP_ROUTINES = \

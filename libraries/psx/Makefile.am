@@ -7,7 +7,7 @@ lib_LTLIBRARIES = libpsx.la
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
 if !NOPIC
-libpsx_la_CFLAGS = -prefer-pic
+libpsx_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 endif
 
 libpsx_la_SOURCES = \

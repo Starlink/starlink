@@ -13,8 +13,8 @@ libchr_la_SOURCES = \
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
 if !NOPIC
-libchr_la_CFLAGS = -prefer-pic
-libchr_la_FCFLAGS = -prefer-pic
+libchr_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libchr_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
 include_MESSAGES = CHR_ERR

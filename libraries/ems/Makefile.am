@@ -7,8 +7,8 @@ lib_LTLIBRARIES = libems.la libemsf.la
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).
 if !NOPIC
-libems_la_CFLAGS = -prefer-pic
-libemsf_la_CFLAGS = -prefer-pic
+libems_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libemsf_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 endif
 
 libems_la_SOURCES = \
