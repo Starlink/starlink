@@ -514,9 +514,11 @@ void InputByteStream::bufferSeek(unsigned int offset)
 		("Call to protected bufferSeek too large for buffer");
     p_ = buf_ + offset;
     eof_ = (p_ == eob_);
-    cerr << "bufferSeek to " << offset << "; eof=" << (eof_ ? "true" : "false")
-	 << ", p=buf+" << p_-buf_ << ", eob=buf+" << eob_-buf_
-	 << endl;
+    if (verbosity_ > normal)
+	cerr << "bufferSeek to " << offset
+	     << "; eof=" << (eof_ ? "true" : "false")
+	     << ", p=buf+" << p_-buf_ << ", eob=buf+" << eob_-buf_
+	     << endl;
     assert(buf_ <= p_ && p_ <= eob_);
 }
 
