@@ -65,8 +65,12 @@ the main DSSSL stylesheet for the LaTeX stylesheet.
 ;;; Phrase markup
 
 (element code
-  (make command name: "Code"
-	(process-children)))
+  (let ((codetype (attribute-string (normalize "type"))))
+    (if codetype
+	(make command name: "Url"	; type=fspath is only one at present
+	      (process-children))	; present as URL to get good hyphen'n
+	(make command name: "Code"
+	      (process-children)))))
 
 (element em
   (make command name: "emph"
@@ -146,3 +150,6 @@ the main DSSSL stylesheet for the LaTeX stylesheet.
   (make command name: "textbf"
 	(literal "Draft Note:")
 	(process-children)))
+
+(element update				; ignore in default mode
+  (empty-sosofo))

@@ -43,7 +43,9 @@ This file forms the effective body of sl.dsl, the main DSSSL stylesheet.
 		  (make sequence
 		    (if caption-id
 			(make element gi: "a"
-			      attributes: (list (list "name" caption-id))
+			      attributes:
+			      (list (list "name"
+					  (string-append "xref_" caption-id)))
 			      (literal (car caption-details)))
 			(literal (car caption-details)))
 		    (literal ": ")

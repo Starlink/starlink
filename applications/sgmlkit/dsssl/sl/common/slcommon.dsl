@@ -184,6 +184,12 @@ the <code/section-reference/ mode (which might well call this function in
 turn.  In the former case, you can include keyword attributes.
 <p>This function should be able to generate a reference to all the
 functions listed in the returnvalue of function
+<p>In the body of the function, we call <funcname/process-node-list/ on the 
+first child of the target node.  This is because we call this function for 
+elements both within the Starlink General DTD and within the DocumentSummary
+DTD.  The former has sub*sect enclosing subhead enclosing title, and the
+latter has sub*sect enclosing title, and in both cases it is the title we 
+wish to get at.
 <funcname/section-element-list/.
 <returnvalue type=sosofo>Number? and name of section
 <parameter keyword default='extracted from node'>title
@@ -237,8 +243,9 @@ functions listed in the returnvalue of function
       (if title
 	  title
 	  (with-mode section-reference	;in case we're not in this mode already
-	    (process-node-list (select-elements (children target)
-						(normalize "subhead"))))
+	    ;; process the first child (see note above)
+	    (process-node-list (node-list-first (children target)))
+	    )
 	  ))))
 
 ; (define (make-section-reference level #!optional (ts #f))
@@ -295,8 +302,9 @@ is in effect.
 	(normalize "routinelist")
 	(normalize "codecollection")
 	(normalize "backmatter")
-	(normalize "notecontents")
-	(normalize "bibliography")))
+	;(normalize "notecontents")
+	;(normalize "bibliography")
+	))
 
 <misccode>
 <miscprologue>
@@ -356,24 +364,24 @@ is in effect.
   )
 
 
-;; return the title of a section
-(define (section-title nd)
-  (let* ((subhead (select-elements (children nd) (normalize "subhead")))
-	 (title (select-elements (children subhead) (normalize "title"))))
-    (if (node-list-empty? title)
-	""
-	(data (node-list-first title)))))
-
-;; Returns the data of the title of the element
-(define (element-title nd)
-  (if (note-list-empty? nd)
-      ""
-      (cond
-       ((equal? (gi nd) (normalise "sect")) (section-title nd))
-       ((equal? (gi nd) (normalise "subsect")) (section-title nd))
-       ((equal? (gi nd) (normalise "subsubsect")) (section-title nd))
-       ((equal? (gi nd) (normalise "subsubsubsect")) (section-title nd))
-       (else (literal "UNKNOWN TITLE!")))))
+;;; return the title of a section
+;(define (section-title nd)
+;  (let* ((subhead (select-elements (children nd) (normalize "subhead")))
+;	 (title (select-elements (children subhead) (normalize "title"))))
+;    (if (node-list-empty? title)
+;	""
+;	(data (node-list-first title)))))
+;
+;;; Returns the data of the title of the element
+;(define (element-title nd)
+;  (if (node-list-empty? nd)
+;      ""
+;      (cond
+;       ((equal? (gi nd) (normalize "sect")) (section-title nd))
+;       ((equal? (gi nd) (normalize "subsect")) (section-title nd))
+;       ((equal? (gi nd) (normalize "subsubsect")) (section-title nd))
+;       ((equal? (gi nd) (normalize "subsubsubsect")) (section-title nd))
+;       (else (literal "UNKNOWN TITLE!")))))
 </misccode>
 
 <func>
@@ -428,13 +436,15 @@ char-property - see notes at
 ;; Given a list of characters, return the list with leading whitespace 
 ;; characters removed
 (define (trim-leading-whitespace charlist)
-  (let loop ((cl charlist))
-    (let ((firstchar (car cl)))
-      (if (not (or (equal? firstchar #\space)
-		   (equal? firstchar #\&#TAB)
-		   (equal? firstchar #\&#RE)))
-	  cl
-	  (loop (cdr cl))))))
+  (if (null? charlist)
+      charlist
+      (let loop ((cl charlist))
+	(let ((firstchar (car cl)))
+	  (if (not (or (equal? firstchar #\space)
+		       (equal? firstchar #\&#TAB)
+		       (equal? firstchar #\&#RE)))
+	      cl
+	      (loop (cdr cl)))))))
 
 ;; Trim both ends of a string by converting it to a list, trimming
 ;; leading whitespace, then reversing it and doing it again, then
@@ -977,6 +987,18 @@ number of columns.
 	       (string->number tgroup-cols))
 	#f				; we're not in a table
 	)))
+
+<func>
+<routinename>get-updates
+<description>
+Scoop up all the update elements.
+<returnvalue type='node-list'>All the update elements in the document
+<argumentlist none>
+<codebody>
+(define (get-updates)
+  (select-elements (select-by-class (descendants (document-element))
+				    'element)
+		   (normalize "update")))
 
 <!-- now scoop up the remaining common functions, from sl-gentext.dsl -->
 <misccode>

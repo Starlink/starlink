@@ -45,8 +45,8 @@ must be a subset of the return value of <funcname/section-element-list/.
 	(normalize "routinelist")
 	(normalize "codecollection")
 	(normalize "backmatter")
-	(normalize "notecontents")
-	(normalize "bibliography")
+	;(normalize "notecontents")
+	;(normalize "bibliography")
 	))
 
 <func>
@@ -133,15 +133,20 @@ which will hold this node
 <func>
 <routinename>html-file
 <description>
-Returns the filename of the html file that contains given node
+Returns the filename of the html file that contains the given node.
 <returnvalue type=string>Complete filename
-<argumentlist>
-<parameter optional default='(current-node)'>
-  input_nd<type>node-list<description>Node whose file we want
+<parameter keyword default='(current-node)'>
+  target_nd<type>node-list<description>Node whose file we want
+<parameter keyword default='#f'>
+  uniq<type>string<description>If present, this gives a unique string which 
+  will be used to construct the file name.  This is need in the case of,
+  for example, the note contents file, which has no associated element.
 <codebody>
-(define (html-file #!optional (input_nd (current-node)))
-  (let* ((nd (chunk-parent input_nd))
-	 (base (cond ((member (gi nd) (section-element-list))
+(define (html-file #!key (target_nd (current-node)) (uniq #f))
+  (let* ((nd (chunk-parent target_nd))
+	 (base (cond (uniq
+		      (string-append (root-file-name target_nd) "-" uniq))
+		     ((member (gi nd) (section-element-list))
 		      (main-html-base nd))
 		     ((node-list-empty? nd)
 				; if the node-list nd is empty, then
@@ -150,8 +155,8 @@ Returns the filename of the html file that contains given node
 				; means either that we're not
 				; chunking, or else that this is the
 				; root chunk.
-		      (root-file-name input_nd)
-				; give input_nd as argument - this is
+		      (root-file-name target_nd)
+				; give target_nd as argument - this is
 				; a singleton-node-list (required
 				; argument for document-element), but
 				; chunk-parent produces a node-list (mmm?)
@@ -244,14 +249,18 @@ list their children.  It does not supply any header.
 	      (node-list-reduce
 	       subsects
 	       (lambda (last el)
-		 (sosofo-append last
-				(make element gi: "li"
-				      (make element gi: "a"
-					    attributes: (list (list "href"
-								    (href-to el)))
-					    (with-mode section-reference
-					      (process-node-list el)))
-				      (make-contents el (- depth 1)))))
+		 (sosofo-append
+		  last
+		  (cond
+		    ((string=? (gi el) (normalize "backmatter"))
+		     (make-contents-backmatter))
+		    (else (make element gi: "li"
+				(make element gi: "a"
+				      attributes: (list (list "href"
+							      (href-to el)))
+				      (with-mode section-reference
+					(process-node-list el)))
+				(make-contents el (- depth 1)))))))
 	       (empty-sosofo))))))
 
 
@@ -359,48 +368,43 @@ generated HTML documents.
 (define (section-footer-navigation elemnode)
   (empty-sosofo))
 
-(define (nav-footer elemnode)
-  (let* ((authors (children (getdocinfo 'authorlist)))
-	 (rel (document-release-info))
-	 (subsects (chunk-children elemnode))
-	 ; If this is the root element, and we _are_ chunking, then
-	 ; return a list of the children of the root element.
-	 ; Otherwise, return an empty-node-list
-	 ; (this is because (chunk-children) doesn't find sections from within
-	 ; the root element, and so needs a special case).
+;; Return a pair consisting of ("Legend" . (node-list with
+;; the `next' chunk to go to))
+(define (onwards #!optional (elemnode (current-node)))
+  (let* ((subsects (chunk-children elemnode))
+	 ;; If this is the root element, and we _are_ chunking, then
+	 ;; return a list of the children of the root element.
+	 ;; Otherwise, return an empty-node-list
+	 ;; (this is because (chunk-children) doesn't find sections from within
+	 ;; the root element, and so needs a special case).
 	 (root-subsects (if (and (chunking?)
 				 (node-list=? elemnode
 					      (document-element)))
 			    (chunk-children (select-elements
 					     (children elemnode)
 					     (normalize "docbody")))
-			    (empty-node-list)))
-	 ; nextchunk is set to a pair consisting of a node-list with
-	 ; the `next' chunk to go to, and a legend for it.
-	 (nextchunk (cond ((not (node-list-empty? root-subsects))
-			   (cons
-			    "Begin" (node-list-first root-subsects)))
-			  ((not (node-list-empty? subsects))
+			    (empty-node-list))))
+    (cond ((not (node-list-empty? root-subsects))
+	   (cons "Begin" (node-list-first root-subsects)))
+	  ((not (node-list-empty? subsects))
 					; first of any children
-			   (cons
-			    "Down to" (node-list-first subsects)))
-			  ((nav-next? elemnode)	; next at this level
-			   (cons
-			    "Next" (nav-next-element elemnode)))
-			  ((not (node-list-empty?
-				 (nav-next-element
-				  (nav-up-element elemnode))))
-			   (cons
-			    "Next up" (nav-next-element
-				       (nav-up-element elemnode))))
-;                         Don't go UP - when there's no longer a `next
-;                         up', then we've got to the end of the trail.
-;			  ((nav-up? elemnode) ; up
-;			   (cons
-;			    "Up"
-;			    (nav-up-element elemnode)))
-			  (else (cons "None" (empty-node-list)))))
-	 )
+	   (cons "Next down" (node-list-first subsects)))
+	  ((nav-next? elemnode)	; next at this level
+	   (cons "Next" (nav-next-element elemnode)))
+	  ((not (node-list-empty?
+		 (nav-next-element
+		  (nav-up-element elemnode))))
+	   (cons "Next up" (nav-next-element
+			    (nav-up-element elemnode))))
+	  ;; Don't go UP - when there's no longer a `next up', 
+	  ;; then we've got to the end of the trail.
+	  (else (cons "End" (empty-node-list))))))
+
+(define (nav-footer elemnode)
+  (let* ((authors (children (getdocinfo 'authorlist)))
+	 (rel (document-release-info))
+	 (subsects (chunk-children elemnode))
+	 (nextchunk (onwards)))
     (make sequence
       (make element gi: "TABLE" attributes: %nav-footer-table-attr%
 	    (make sequence

@@ -31,61 +31,66 @@ and support indexing (soon!) using makeindex.
 <description>
 Support back-matter elements
 <codebody>
+;(element backmatter
+;  ($html-section$))
 (element backmatter
-  ($html-section$))
+  (html-document (with-mode section-reference
+		   (process-node-list (current-node)))
+		 (make sequence
+		   (make-notecontents)
+		   (make-bibliography)
+		   (make-updatelist))))
+
+(define (make-contents-backmatter)
+  (make sequence
+    (if (node-list-empty? (get-notelist))
+	(empty-sosofo)
+	(make element gi: "li"
+	      (make element gi: "a"
+		    attributes: (list (list "href" (notes-sys-id)))
+		    (literal "Notes"))))
+    (if (get-bibliography-name)
+	(make element gi: "li"
+	      (make element gi: "a"
+		    attributes: (list (list "href" (bibliography-sys-id)))
+		    (literal "Bibliography")))
+	(empty-sosofo))
+    (if (node-list-empty? (get-updates))
+	(empty-sosofo)
+	(make element gi: "li"
+	      (make element gi: "a"
+		    attributes: (list (list "href" (updatelist-sys-id)))
+		    (literal "Changes"))))
+    ))
 
 (mode section-reference
   (element backmatter
     (make-section-reference title: (literal "Notes, etc..."))))
-; (mode section-reference
-;   (element backmatter
-;     (let* ((kids (children (current-node)))
-; 	   (cont (node-list-reduce kids
-; 				   (lambda (result i)
-; 				     (string-append result
-; 						    (if (equal? result "")
-; 							""
-; 							", ")
-; 						    (gi i)))
-; 				   "")))
-;     (make-section-reference title: (literal cont)))))
 
 <misccode>
 <description>
 Support notes as endnotes.  
 <codebody>
-(element notecontents
-  (let ((notelist (select-elements (select-by-class (descendants (getdocbody))
-						    'element)
-				   (normalize "note"))))
-    (if (node-list-empty? notelist)
-	(error "Have NOTECONTENTS but no NOTEs")
-	($html-section$ (make element gi: "dl"
-			      (with-mode make-notecontents
-				(process-node-list notelist)))))))
+(define (notes-sys-id)
+  (if (chunking?)
+      (html-file uniq: "notes")
+      ""))
 
-(mode section-reference
-  (element notecontents
-    (make-section-reference title: (literal "Notes"))))
+;(mode section-reference
+;  (element notecontents
+;    (make-section-reference title: (literal "Notes"))))
 
 (element note
-  (let ((notecontents-el (select-elements
-			  (select-by-class (descendants (getdocbody))
-					   'element)
-			  (normalize "notecontents")))
-	(en (number->string (element-number (current-node)))))
+  (let ((en (number->string (element-number (current-node)))))
     (make element gi: "small"
       (literal "[")
-      (if (node-list-empty? notecontents-el)
-	  (error "Have NOTE but no NOTECONTENTS")
-	  (make element gi: "a"
-		attributes: (list (list "href" (string-append
-						(href-to notecontents-el)
-						"#NOTETEXT" en))
-				  (list "name" (string-append "NOTEREF" en)))
-		(literal (string-append "Note " en))))
+      (make element gi: "a"
+	    attributes: (list (list "href" (string-append (notes-sys-id)
+							  "#NOTETEXT" en))
+			      (list "name" (string-append "NOTEREF" en)))
+	    (literal (string-append "Note " en)))
       (literal "]"))))
-(mode make-notecontents
+(mode extract-notecontents
   (element note
     (let ((en (number->string (element-number (current-node)))))
       (make sequence
@@ -100,43 +105,110 @@ Support notes as endnotes.
 	(make element gi: "dd"
 	      (process-children))))))
 
+(define (get-notelist)
+  (select-elements (select-by-class (descendants (getdocbody))
+				    'element)
+		   (normalize "note")))
+
+(define (make-notecontents)
+  (let ((notelist (get-notelist)))
+    (if (node-list-empty? notelist)
+	(empty-sosofo)
+	(html-document (literal "Notes")
+		       (make element gi: "dl"
+			     (with-mode extract-notecontents
+			       (process-node-list notelist)))
+		       system-id: (notes-sys-id)))))
+
 <misccode>
 <description>
 Bibliography support.  The bibliography preprocessor (BibTeX) produces
 an HTML DL element with entries referrable to by the bibkey, which is
 the data of the CITATION element.
 <codebody>
+(define (bibliography-sys-id)
+  (if (chunking?)
+      (html-file uniq: "bibliography")
+      ""))
+
+(define (get-bibliography-name)
+  (attribute-string (normalize "bibliography")
+		    (getdocbody 'backmatter)))
+
 (element citation
-  (let ((bib-el (select-elements (select-by-class (descendants (getdocbody))
-						  'element)
-				 (normalize "bibliography")))
+  (let ((bib-name (get-bibliography-name))
 	(cit-data (trim-data (current-node))))
-    (if (node-list-empty? bib-el)
-	(error "Have CITATION but no BIBLIOGRAPHY")
+    (if bib-name
 	(make element gi: "a"
 	      attributes: (list (list "href" (string-append
-					      (href-to bib-el)
+					      (bibliography-sys-id)
 					      "#"
 					      cit-data)))
-	      (literal (string-append "[" cit-data "]"))))))
+	      (literal (string-append "[" cit-data "]")))
+	(error "Have CITATION but no BIBLIOGRAPHY"))))
 
-(element bibliography
+(define (make-bibliography)
   (let ((bibcontents (read-entity (string-append (root-file-name)
 						 ".htmlbib.bbl"))))
-    ($html-section$ (if bibcontents
-			(make fi data: bibcontents)
-			(literal "No bibliography found")))))
+    (if bibcontents
+	(html-document (literal "Bibliography")
+		       (make fi data: bibcontents)
+		       system-id: (bibliography-sys-id))
+	(empty-sosofo))))
+;    ($html-section$ (if bibcontents
+;			(make fi data: bibcontents)
+;			(literal "No bibliography found")))))
+;
+;(mode section-reference
+;  (element bibliography
+;    (make-section-reference title: (literal "Bibliography"))))
 
-(mode section-reference
-  (element bibliography
-    (make-section-reference title: (literal "Bibliography"))))
+<misccode>
+<description>
+Collect all the update elements
+<codebody>
+(define (updatelist-sys-id)
+  (if (chunking?)
+      (html-file uniq: "updates")
+      ""))
 
+(define (make-updatelist)
+  (let ((updatelist (get-updates)))
+    (if (node-list-empty? updatelist)
+	(empty-sosofo)
+	(html-document (literal "Change history")
+		       (make element gi: "dl"
+			     (with-mode extract-updatelist
+			       (process-node-list updatelist)))
+		       system-id: (updatelist-sys-id)))))
+
+(mode extract-updatelist
+  (element update
+    (let* ((change (element-with-id (attribute-string (normalize "versionid"))))
+	   (thisautid (attribute-string (normalize "author")))
+	   (author (element-with-id (or thisautid
+					(attribute-string (normalize "author")
+							  change)))))
+      (make sequence
+	(make element gi: "dt"
+	      (process-node-list author)
+	      (literal ", "
+		       (format-date (attribute-string (normalize "date")
+						      change))))
+	(make element gi: "dd"
+	      (process-children))))))
+
+(element update				; ignore in default mode
+  (empty-sosofo))
+
+<![ignore[
 <misccode>
 <description>
 Linking support.  Create a page listing all the exported IDs in the document,
 so that document authors can find them in once place.
 <codebody>
 ; nothing yet
+]]>
 
 <codereference doc="lib.dsl" id="code.lib">
 <title>Library code
@@ -174,9 +246,12 @@ by BibTeX.
       (get-bibliography)))
 
 (define (get-bibliography)
-  (let* ((kids (select-by-class (descendants (document-element)) 'element))
+  (let* ((kids (select-by-class (descendants (getdocbody)) 'element))
 	 (citations (select-elements kids (normalize "citation")))
-	 (bibelement (select-elements kids (normalize "bibliography"))))
+	 ;(bibelement (select-elements kids (normalize "bibliography")))
+	 (bibname (attribute-string (normalize "bibliography")
+				    (getdocbody 'backmatter)))
+	 )
     (if (node-list-empty? citations)
 	(empty-sosofo)
 	(make entity system-id: (string-append (root-file-name)
@@ -184,19 +259,25 @@ by BibTeX.
 	      (make fi data: "\\relax
 ")
 	      (process-node-list citations)
-	      (if (node-list-empty? bibelement)
-		  (error "Citations but no BIBLIOGRAPHY in document")
-		  (process-node-list bibelement))))))
+	      (if bibname
+		  (make fi data: (string-append "\\bibdata{" bibname "}
+\\bibstyle{plainhtml}
+"))
+		  (error "Citations but no BIBLIOGRAPHY in document"))
+	      ;(if (node-list-empty? bibelement)
+		;  (error "Citations but no BIBLIOGRAPHY in document")
+		;  (process-node-list bibelement))
+	      ))))
 
 (element citation
   (make fi data: (string-append "\\citation{" (trim-data (current-node)) "}
 ")))
 
-(element bibliography
-  (make sequence
-    (make fi data: (string-append "\\bibdata{"
-				  (attribute-string "BIB" (current-node))
-				  "}
-"))
-    (make fi data: "\\bibstyle{plainhtml}
-")))
+;(element bibliography
+;  (make sequence
+;    (make fi data: (string-append "\\bibdata{"
+;				  (attribute-string "BIB" (current-node))
+;				  "}
+;"))
+;    (make fi data: "\\bibstyle{plainhtml}
+;")))

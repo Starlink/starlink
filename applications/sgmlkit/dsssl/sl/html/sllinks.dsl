@@ -79,8 +79,7 @@ it produces an <funcname/error/.
 	 ;; attribute LOC is implied or the document doesn't have such
 	 ;; an ID
 	 (xreftarget (and xrefid
-			  (non-empty-nl (element-with-id xrefid
-							 docelem))))
+			  (non-empty-nl (element-with-id xrefid docelem))))
 	 (xrefurl (and xreftarget
 		       (get-link-policy-target xreftarget))))
     (if (string=? (gi docelem)

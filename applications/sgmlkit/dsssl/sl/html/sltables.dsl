@@ -39,7 +39,9 @@ first.
 	    (make element gi: "p"
 		  (if caption-id
 		      (make element gi: "a"
-			    attributes: (list (list "name" caption-id))
+			    attributes:
+			    (list (list "name"
+					(string-append "xref_" caption-id)))
 			    (literal (car caption-details)))
 		      (literal (car caption-details))))
 	    (process-matching-children 'caption)))))

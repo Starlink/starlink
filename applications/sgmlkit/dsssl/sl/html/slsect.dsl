@@ -68,18 +68,16 @@ the section title.
     (make element
       gi: (string-append "H" (number->string (sectlevel)))
       (if (attribute-string (normalize "id") (current-node))
-	  (make sequence
-	    (make element
-	      gi: "A"
-	      attributes: (list (list "name"
-					;(attribute-string (normalize "id")
-					;	      (current-node))
-				      (href-to (current-node))
-				      ))
-	      (with-mode section-reference
-		(process-node-list (current-node))))
-	    (make formatting-instruction
-	      data: (string-append "<" "!-- link target " (href-to (current-node)) "-->")))
+	  (make element
+	    gi: "A"
+	    attributes: (list
+			 (list "name" (string-append
+				       "xref_"
+				       (attribute-string (normalize "id")
+							 (current-node)))
+				    ))
+	    (with-mode section-reference
+	      (process-node-list (current-node))))
 	  (with-mode section-reference
 	    (process-node-list (current-node)))))))
 

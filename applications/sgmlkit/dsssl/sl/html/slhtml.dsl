@@ -37,8 +37,16 @@ depending on whether the element is to be chunked.
 <parameter>body-sosofo
   <type>sosofo
   <description>The body of the element
+<parameter keyword default='#f'>system-id
+  <type>string
+  <description>If present, this gives the name of the system-id which is too 
+  be used for the output file (if a file is in fact output), overriding the
+  name obtained from <funcname/html-file/.  This is need in the case of those
+  files (such as the notes) which have no associated element.  If this is
+  present, then the document <em/will/ be chunked, because it wouldn't make
+  much sense otherwise.
 <codebody>
-(define (html-document title-sosofo body-sosofo)
+(define (html-document title-sosofo body-sosofo #!key (system-id #f))
   (let* ((is-de? (node-list=? (current-node) (document-element)))
 	 (doc-sosofo 
 	  (if (or (chunk?) is-de?)
@@ -62,9 +70,10 @@ depending on whether the element is to be chunked.
 	      (empty-sosofo))
 	  doc-sosofo)
 	(if (or (chunk?)
-		(node-list=? (current-node) (document-element)))
+		(node-list=? (current-node) (document-element))
+		system-id)
 	    (make entity
-	      system-id: (html-file)
+	      system-id: (or system-id (html-file))
 	      (make document-type
 		name: "HTML"
 		public-id: %html-pubid%)
@@ -90,7 +99,7 @@ the current node.
 <codebody>
 (define (href-to target #!key (reffrag #t) (full-url #f))
   (let* ((id (attribute-string (normalize "id") target))
-	 (entfile (html-file target))
+	 (entfile (html-file target_nd: target))
 	 (url (string-append (if full-url %starlink-document-server% "")
 			     entfile))
 	 (fragid (if (or (chunk? target)
@@ -118,10 +127,12 @@ A hook function to add additional tags to the HEAD of your HTML files
 <codebody>
 (define ($standard-html-header$)
   (let* (
-;	 (home (nav-home (current-node)))
-;	 (up   (parent (current-node)))
-;	 (prev (prev-chunk-element (current-node)))
-;	 (next (next-chunk-element (current-node)))
+	 ;(home (nav-home (current-node)))
+	 (up   (parent (current-node)))
+	 ;(prev (prev-chunk-element (current-node)))
+	 ;(next (next-chunk-element (current-node)))
+	 (onpair (onwards))
+	 (next (cdr onpair))
 	 (kws  (if (getdocinfo 'keyword) ; node-list, possibly empty
 		   (getdocinfo 'keyword)
 		   (empty-node-list)))
@@ -135,40 +146,39 @@ A hook function to add additional tags to the HEAD of your HTML files
       (with-mode make-html-author-links
 	(process-node-list (getdocinfo 'authorlist)))
 
-;      ;; Add the LINK REL=HOME tag
-;      (if (nav-home? (current-node))
-;	  (make empty-element gi: "LINK"
-;		attributes: (list (list "REL" "HOME")
-;				  (list "TITLE"  (element-title home))
-;				  (list "HREF" (href-to home))))
-;	  (empty-sosofo))
-
-;      ;; Add the LINK REL=UP tag
-;      (if (nav-up? (current-node))
-;	  (if (or (node-list-empty? up)
-;		  (node-list=? up (document-element)))
-;	      (empty-sosofo)
-;	      (make empty-element gi: "LINK"
-;		    attributes: (list (list "REL" "UP")
-;				      (list "TITLE"  (element-title up))
-;				      (list "HREF" (href-to up)))))
-;	  (empty-sosofo))
-
 ;      ;; Add the LINK REL=PREVIOUS tag
 ;      (if (node-list-empty? prev)
 ;	  (empty-sosofo)
 ;	  (make empty-element gi: "LINK"
 ;		attributes: (list (list "REL" "PREVIOUS")
-;				  (list "TITLE"  (element-title prev))
+;				  ;;(list "TITLE"  (element-title prev))
 ;				  (list "HREF" (href-to prev)))))
 
-;      ;; Add the LINK REL=NEXT tag
-;      (if (node-list-empty? next)
-;	  (empty-sosofo)
+      ;; Add the LINK REL=NEXT tag
+      (if (node-list-empty? next)
+	  (empty-sosofo)
+	  (make empty-element gi: "LINK"
+		attributes: (list (list "REL" "NEXT")
+				  (list "TITLE" (car onpair))
+				  (list "HREF" (href-to next)))))
+
+;      ;; Add the LINK REL=HOME tag
+;      (if (nav-home? (current-node))
 ;	  (make empty-element gi: "LINK"
-;		attributes: (list (list "REL" "NEXT")
-;				  (list "TITLE"  (element-title next))
-;				  (list "HREF" (href-to next)))))
+;		attributes: (list (list "REL" "HOME")
+;				  ;;(list "TITLE"  (element-title home))
+;				  (list "HREF" (href-to home))))
+;	  (empty-sosofo))
+
+      ;; Add the LINK REL=UP tag
+      (if (nav-up? (current-node))
+	  (if (or (node-list-empty? up)
+		  (node-list=? up (document-element)))
+	      (empty-sosofo)
+	      (make empty-element gi: "LINK"
+		    attributes: (list (list "REL" "UP")
+				      (list "HREF" (href-to up)))))
+	  (empty-sosofo))
 
       ;; Add META NAME=KEYWORD tags
       (let loop ((nl kws))
