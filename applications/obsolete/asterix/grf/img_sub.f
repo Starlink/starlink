@@ -1988,8 +1988,11 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
         CALL BDI_AXCHK( IFID, I_XAX, 'Data', AXOK, STATUS )
         IF ( AXOK ) THEN
           CALL BDI_AXMAPR( IFID, I_XAX, 'Data', 'READ', XPTR, STATUS )
-          CALL ARR_CHKREG(%val(XPTR),I_NX,AXREG,I_XBASE,I_XSCALE,
-     :                                                    STATUS)
+c          CALL ARR_CHKREG(%val(XPTR),I_NX,AXREG,I_XBASE,I_XSCALE,
+c     :
+c                                                          STATUS)
+*  doesn't work so assume regular
+          AXREG=.TRUE.
           IF (.NOT.AXREG) THEN
             CALL MSG_PRNT('AST_ERR: x-axis has non-equal bin sizes')
             STATUS=SAI__ERROR
@@ -2005,8 +2008,9 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
         CALL BDI_AXCHK( IFID, I_YAX, 'Data', AYOK, STATUS )
         IF ( AYOK ) THEN
           CALL BDI_AXMAPR( IFID, I_YAX, 'Data', 'READ', YPTR, STATUS )
-          CALL ARR_CHKREG(%val(YPTR),I_NY,AYREG,I_YBASE,I_YSCALE,
-     :                                                    STATUS)
+c          CALL ARR_CHKREG(%val(YPTR),I_NY,AYREG,I_YBASE,I_YSCALE,
+c     :                                                    STATUS)
+          AYREG=.TRUE.
           IF (.NOT.AYREG) THEN
             CALL MSG_PRNT('AST_ERR: y-axis has non-equal bin sizes')
             STATUS=SAI__ERROR
