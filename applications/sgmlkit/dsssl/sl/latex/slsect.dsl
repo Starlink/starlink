@@ -43,7 +43,13 @@ commands.
 Section constructors
 
 <codebody>
-(element sect ($latex-section$ "section"))
+(element sect
+  (let ((in-appx? (have-ancestor? (normalize "appendices") (current-node))))
+    (make sequence
+      (if (if in-appx? appendix-samepage section-samepage)
+	  (empty-sosofo)
+	  (make empty-command name: "clearpage"))
+      ($latex-section$ "section"))))
 (element subsect ($latex-section$ "subsection"))
 (element subsubsect ($latex-section$ "subsubsection"))
 (element subsubsubsect ($latex-section$ "paragraph"))
