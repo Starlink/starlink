@@ -251,7 +251,7 @@ sub mem2array ($$$) {
 #    par_get
 
 #  Purpose:
-#    To find the values of parameters stored in ~/adam
+#    To find the values of parameters stored in $ADAM_USER
 
 #  Type of module:
 #    Perl 5 script
@@ -261,6 +261,8 @@ sub mem2array ($$$) {
 #    The current value of a parameter associated with a Starlink application
 #    is returned.
 #
+#    For monolithic A-tasks an application name of monolith.task
+#    is supported.
 
 #  Usage:
 #    @values = par_get($par, $file, \$status)
@@ -279,6 +281,9 @@ sub mem2array ($$$) {
 #  Example:
 #     @values = par_get("nsigma", "drawsig", \$status);
 #        Returns the value of the NSIGMA parameter (an array)
+#     ($mean) = par_get("mean","kappa_mon.stats", $status);
+#        Returns the mean value from the STATS task of the kappa_mon
+#        A-task.
 
 #  Prior requirements:
 #    - The NDF perl module must exist (but since this is in the NDF module
@@ -411,8 +416,18 @@ sub par_get ($$$) {
   dat_size($loco, $size, $$status);
 
   # Get the values as a character array
-  dat_getvc($loco, $size, \@cvalues, $el, $$status); # Need to pass reference
-                                                     # when in module
+  #  - For double precision values we need to use dat_getvd here
+  #    so first need to check for this
+  my $data_type;
+  dat_type($loco, $data_type, $$status);
+
+  if ($data_type eq '_DOUBLE') {
+    dat_getvd($loco, $size, \@cvalues, $el, $$status);
+  } else {
+    dat_getvc($loco, $size, \@cvalues, $el, $$status); # Need to pass reference
+                                                       # when in module
+  }
+
   # Finish off
 
   dat_annul($loco, $$status) if defined $loco;
