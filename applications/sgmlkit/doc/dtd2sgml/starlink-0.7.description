@@ -1399,8 +1399,12 @@ made an active link.
 <p>The enclosed text is displayed verbatim, specifically with
 linebreaks respected, and typically in a fixed-width font.  Note that
 the element's content is <em>not</em> specially escaped.  If you wish to
-include text which is meaningful to the SGML parser, you should
-surround the text with a <code>CDATA</code> marked section.
+include text which is meaningful to the SGML parser, you should either
+use entities such as <code>&amp;amp;</code>, or 
+surround the text with a <code>CDATA</code> marked section.  Note also
+that you should not rely on consistency between different
+down-converters as regards respecting or ignoring <em>leading</em>
+whitespace in any line.
 </p>
 </element>
 
