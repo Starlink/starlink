@@ -40,6 +40,12 @@ get_ast_source:
 assemble_java:
 
 javadoc-sources:
+     [echo] Executing DIVA target: javadoc-sources
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/diva/build/java
+     [copy] Copying 852 files to /apps/cvsbuild/java/source/diva/build/java
+     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/diva/build/java
      [echo] Executing ASTGUI target: javadoc-sources
 
 javadoc-sources:
@@ -62,8 +68,6 @@ javadoc-sources:
 prepare:
 
 assemble_java:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/array/build/java
-     [copy] Copying 42 files to /apps/cvsbuild/java/source/array/build/java
 
 javadoc-sources:
      [echo] Executing NDX target: javadoc-sources
@@ -92,12 +96,6 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/java
      [copy] Copying 13 files to /apps/cvsbuild/java/source/fits/build/java
-     [echo] Executing DIVA target: javadoc-sources
-
-javadoc-sources:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/diva/build/java
-     [copy] Copying 852 files to /apps/cvsbuild/java/source/diva/build/java
-     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/diva/build/java
      [echo] Executing JSky target: javadoc-sources
 
 javadoc-sources:
@@ -132,7 +130,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/java
-     [copy] Copying 150 files to /apps/cvsbuild/java/source/splat/build/java
+     [copy] Copying 153 files to /apps/cvsbuild/java/source/splat/build/java
      [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:
@@ -275,142 +273,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/Compression.java:7: package org.apache.tools.bzip2 does not exist
   [javadoc] import org.apache.tools.bzip2.CBZip2InputStream;
   [javadoc]                               ^
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:3: package edu.jhu.htm.core does not exist
-  [javadoc] import edu.jhu.htm.core.HTMException;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:4: package edu.jhu.htm.core does not exist
-  [javadoc] import edu.jhu.htm.core.HTMindex;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:5: package edu.jhu.htm.core does not exist
-  [javadoc] import edu.jhu.htm.core.HTMindexImp;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:6: package edu.jhu.htm.core does not exist
-  [javadoc] import edu.jhu.htm.core.HTMrange;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:7: package edu.jhu.htm.core does not exist
-  [javadoc] import edu.jhu.htm.core.HTMrangeIterator;
-  [javadoc]                         ^
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:8: package edu.jhu.htm.geometry does not exist
-  [javadoc] import edu.jhu.htm.geometry.Circle;
-  [javadoc]                             ^
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/join/HTMMatchEngine.java:27: cannot resolve symbol
-  [javadoc] symbol  : class HTMindex 
-  [javadoc] location: class uk.ac.starlink.table.join.HTMMatchEngine
-  [javadoc]     private final HTMindex htm;
-  [javadoc]                   ^
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/whiteboard/WhiteboardView.java:23: package Acme.JPM.Encoders does not exist
-  [javadoc] import Acme.JPM.Encoders.GifEncoder;
-  [javadoc]                          ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/fits/codec/FITSImage.java:46: package ca.nrc.cadc.arch.io does not exist
-  [javadoc] import ca.nrc.cadc.arch.io.FitsFilterInputStream;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/TablePlotSymbol.java:19: package gnu.jel does not exist
-  [javadoc] import gnu.jel.DVResolver;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/TablePlotSymbol.java:33: cannot resolve symbol
-  [javadoc] symbol  : class DVResolver 
-  [javadoc] location: class jsky.catalog.TablePlotSymbol
-  [javadoc] public class TablePlotSymbol implements DVResolver {
-  [javadoc]                                         ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:10: package gnu.jel does not exist
-  [javadoc] import gnu.jel.CompilationException;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:11: package gnu.jel does not exist
-  [javadoc] import gnu.jel.CompiledExpression;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:12: package gnu.jel does not exist
-  [javadoc] import gnu.jel.DVResolver;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:13: package gnu.jel does not exist
-  [javadoc] import gnu.jel.Evaluator;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:14: package gnu.jel does not exist
-  [javadoc] import gnu.jel.Library;
-  [javadoc]                ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:27: cannot resolve symbol
-  [javadoc] symbol  : class DVResolver 
-  [javadoc] location: class jsky.util.JavaExpr
-  [javadoc] public class JavaExpr implements DVResolver {
-  [javadoc]                                  ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:30: cannot resolve symbol
-  [javadoc] symbol  : class CompiledExpression 
-  [javadoc] location: class jsky.util.JavaExpr
-  [javadoc]     private CompiledExpression _expr;
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/util/JavaExpr.java:90: cannot resolve symbol
-  [javadoc] symbol  : class DVResolver 
-  [javadoc] location: class jsky.util.JavaExpr
-  [javadoc]     public JavaExpr(String exprStr, DVResolver resolver) throws Throwable {
-  [javadoc]                                     ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/astrocat/AstroCatXML.java:30: package org.dom4j.io does not exist
-  [javadoc] import org.dom4j.io.OutputFormat;
-  [javadoc]                     ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/astrocat/AstroCatXML.java:31: package org.dom4j.io does not exist
-  [javadoc] import org.dom4j.io.XMLWriter;
-  [javadoc]                     ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/astrocat/AstroCatXML.java:433: cannot resolve symbol
-  [javadoc] symbol  : class XMLWriter 
-  [javadoc] location: class jsky.catalog.astrocat.AstroCatXML
-  [javadoc]     private static void _saveCatalogs(XMLWriter xml, List catalogs) throws SAXException {
-  [javadoc]                                       ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/astrocat/AstroCatXML.java:453: cannot resolve symbol
-  [javadoc] symbol  : class XMLWriter 
-  [javadoc] location: class jsky.catalog.astrocat.AstroCatXML
-  [javadoc]     private static void _saveCatalog(XMLWriter xml, Catalog catalog) throws SAXException {
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/astrocat/AstroCatXML.java:500: cannot resolve symbol
-  [javadoc] symbol  : class XMLWriter 
-  [javadoc] location: class jsky.catalog.astrocat.AstroCatXML
-  [javadoc]     private static void _saveSymbols(XMLWriter xml, TablePlotSymbol[] symbols) throws SAXException {
-  [javadoc]                                      ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/catalog/astrocat/AstroCatXML.java:513: cannot resolve symbol
-  [javadoc] symbol  : class XMLWriter 
-  [javadoc] location: class jsky.catalog.astrocat.AstroCatXML
-  [javadoc]     private static void _saveSymbol(XMLWriter xml, TablePlotSymbol symbol) throws SAXException {
-  [javadoc]                                     ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:17: package com.jrefinery.chart does not exist
-  [javadoc] import com.jrefinery.chart.ChartFactory;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:18: package com.jrefinery.chart does not exist
-  [javadoc] import com.jrefinery.chart.JFreeChart;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:19: package com.jrefinery.chart does not exist
-  [javadoc] import com.jrefinery.chart.ChartPanel;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:20: package com.jrefinery.chart does not exist
-  [javadoc] import com.jrefinery.chart.Plot;
-  [javadoc]                            ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:21: package com.jrefinery.data does not exist
-  [javadoc] import com.jrefinery.data.DatasetChangeListener;
-  [javadoc]                           ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:22: package com.jrefinery.data does not exist
-  [javadoc] import com.jrefinery.data.XYDataset;
-  [javadoc]                           ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:65: cannot resolve symbol
-  [javadoc] symbol  : class JFreeChart 
-  [javadoc] location: class jsky.image.gui.ImageCutLevels
-  [javadoc]     protected JFreeChart chart;
-  [javadoc]               ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:127: cannot resolve symbol
-  [javadoc] symbol  : class ChartPanel 
-  [javadoc] location: class jsky.image.gui.ImageCutLevels
-  [javadoc]     ChartPanel makeGraph() {
-  [javadoc]     ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:377: cannot resolve symbol
-  [javadoc] symbol  : class XYDataset 
-  [javadoc] location: class jsky.image.gui.ImageCutLevels.SimpleDataset
-  [javadoc]     class SimpleDataset implements XYDataset {
-  [javadoc]                                    ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:414: cannot resolve symbol
-  [javadoc] symbol  : class DatasetChangeListener 
-  [javadoc] location: class jsky.image.gui.ImageCutLevels.SimpleDataset
-  [javadoc]         public void addChangeListener(DatasetChangeListener listener) {
-  [javadoc]                                       ^
-  [javadoc] /apps/cvsbuild/java/source/jsky/build/java/jsky/image/gui/ImageCutLevels.java:421: cannot resolve symbol
-  [javadoc] symbol  : class DatasetChangeListener 
-  [javadoc] location: class jsky.image.gui.ImageCutLevels.SimpleDataset
-  [javadoc]         public void removeChangeListener(DatasetChangeListener listener) {
-  [javadoc]                                          ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/Compression.java:148: cannot resolve symbol
@@ -499,10 +361,11 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: missing #: "java.lang.Double.compareTo()"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: can't find java.lang.Double.compareTo() in uk.ac.starlink.ast.gui.AstDouble
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/modular/CompositeNode.java:16: warning - The first sentence is interpreted to be:
-  [javadoc] "A node that is also a graph, i.e."
+  [javadoc] "A node that is also a graph, i.e.<!-- -->it can contain other nodes."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "A node that is also a graph, i.e. it can contain other nodes."
+  [javadoc] "A node that is also a graph, i.e.<!"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFigureFactory.java:87: warning - Tag @link: reference not found: Figure
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/DashedPathRecognizer.java:71: warning - Tag @see: missing #: "DashedPathRecognizer(SceneRecognizer, double, double, double)"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/DecimalField.java:19: warning - The first sentence is interpreted to be:
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
@@ -574,8 +437,8 @@ javadoc-sources:
   [javadoc] "DrawPathFigure extends the diva PathFigure class to add support for
   [javadoc]  events that allow users of any derived figures to be made aware of
   [javadoc]  any changes, i.e.<!"
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/Scene.java:83: warning - Tag @see: missing #: "isConsistent(SceneElement, SceneElement)"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/BasicScene.java:239: warning - Tag @see: missing #: "isConsistent(SceneElement, SceneElement)"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/Scene.java:83: warning - Tag @see: missing #: "isConsistent(SceneElement, SceneElement)"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureListener.java:35: warning - The first sentence is interpreted to be:
   [javadoc] "Send when a figure is changed (i.e.&nbsp;moved or transformed)."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -585,15 +448,15 @@ javadoc-sources:
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstTitle.java:71: warning - The first sentence is interpreted to be:
+  [javadoc] "The suggested gap resolution (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstNumberLabels.java:99: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
-  [javadoc] "The suggested gap resolution (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstTitle.java:71: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
@@ -646,12 +509,12 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e. it contains children."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/TrainableClassifier.java:31: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/RubineClassifier.java:269: warning - The first sentence is interpreted to be:
   [javadoc] "Return whether this classifier is incremental, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return whether this classifier is incremental, i.e. whether
   [javadoc]  this classifier can support multiple calls to "train"."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/RubineClassifier.java:269: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/TrainableClassifier.java:31: warning - The first sentence is interpreted to be:
   [javadoc] "Return whether this classifier is incremental, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return whether this classifier is incremental, i.e. whether
@@ -849,9 +712,9 @@ javadoc-sources:
   [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/modular/CompositeNode.java:16: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/modular/package-summary.html...
-  [javadoc] "A node that is also a graph, i.e."
+  [javadoc] "A node that is also a graph, i.e.<!-- -->it can contain other nodes."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "A node that is also a graph, i.e. it can contain other nodes."
+  [javadoc] "A node that is also a graph, i.e.<!"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphUtilities.java:26: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graphx/package-summary.html...
   [javadoc] "A set of utilities for traversing/manipulating/etc."
@@ -1232,6 +1095,9 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LineRecognizer.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:49: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneRecognizer.java:22: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ModedIncrRecognizer.java:24: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ModedIncrRecognizer.java:74: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/toolbox/LLRSceneMetric.html...
   [javadoc] "Return a similarity metric based only on the LLR (terminal)
   [javadoc]  values of the test and reference databases:
@@ -1247,9 +1113,6 @@ javadoc-sources:
   [javadoc]  
   [javadoc]  Assumes that the two scenes are composed of the
   [javadoc]  same number of strokes in the same order."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneRecognizer.java:22: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ModedIncrRecognizer.java:24: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ModedIncrRecognizer.java:74: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/toolbox/ModedIncrRecognizer.html...
   [javadoc] "Process an "action" event, performing the appropriate action
   [javadoc]  behavior (e.g."
@@ -1478,6 +1341,11 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorListener.java:36: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ArcConnector.java:52: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ArcConnector.java:364: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/Arrowhead.java:173: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/CenterSite.java:40: warning - @ is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorAdapter.java:18: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorEvent.java:25: warning - @contributor is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorEvent.java:25: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/connector/ArcConnector.html...
   [javadoc] "Set the flag that says that this arc is drawn as a "self-loop."
   [javadoc]  Apart from changing (slightly) the way the arc geometry is
@@ -1487,18 +1355,13 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the flag that says that this arc is drawn as a "self-loop."
   [javadoc]  "
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/Arrowhead.java:173: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/CenterSite.java:40: warning - @ is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorAdapter.java:18: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorEvent.java:25: warning - @contributor is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorEvent.java:25: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/StraightConnector.java:27: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/connector/Arrowhead.html...
   [javadoc] "Set the flag that says the arrowhead is "flipped." This means
   [javadoc]  that the arrowhead is drawn so that the apparent direction
   [javadoc]  of the arrowhead is the same as its normal."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the flag that says the arrowhead is "flipped." "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/StraightConnector.java:27: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/tutorial/CompositeFigureTutorial.java:119: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/tutorial/TransformedFigureTutorial.java:213: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/tutorial/TransformedFigureTutorial.html...
@@ -1652,6 +1515,8 @@ javadoc-sources:
   [javadoc] "Send when a figure is changed (i.e."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawFigures
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawGraphicMenu
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFigureFactory.java:87: warning - Tag @link: reference not found: Figure
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFigureFactory.java:87: warning - Tag @link: reference not found: Figure
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureChangedEvent.java:36: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/FigureChangedEvent.html...
   [javadoc] "Used when figure is changed (i.e.<!-- -->transformed)."
@@ -1681,7 +1546,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 614 warnings
+  [javadoc] 581 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 34 seconds
+Total time: 1 minute 38 seconds

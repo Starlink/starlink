@@ -8297,13 +8297,16 @@ U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/TickControls.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/TitleControls.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/XMLEncodeAndDecode.java
 cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink/splat/util
+U java/source/splat/src/main/uk/ac/starlink/splat/util/AbstractFunctionFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AsciiFileParser.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AvailableLocales.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AverageFilter.java
+U java/source/splat/src/main/uk/ac/starlink/splat/util/CompositeFunctionFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/CrossCorrelate.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/ExceptionDialog.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/FitVoigt.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/FunctionFitter.java
+U java/source/splat/src/main/uk/ac/starlink/splat/util/FunctionGenerator.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/FuzzyBoolean.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/GaussianFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/GaussianGenerator.java
