@@ -82,7 +82,7 @@
 
          CALL PSX_FREE (START_PTR-VAL__NBI, STATUS)
          START_PTR = 0
-         END _PTR = 0
+         END_PTR = 0
 
 *  report sentinel corruption
 
