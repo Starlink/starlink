@@ -18,6 +18,7 @@ STAR_DEFAULTS(per-package-dirs)
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
+AC_PROG_FPP
 AC_PROG_LIBTOOL
 
 dnl    Setup for building monoliths.
@@ -39,6 +40,14 @@ STAR_LATEX_DOCUMENTATION([sun55])
 
 dnl    Library/component sub-directories.
 AC_CONFIG_SUBDIRS([aif cof coi con idl iraf])
+
+dnl    Check if we have any IRAF libraries on this platform.
+dnl    On success this section gives a -DHAVE_IRAF_LIBIMFORT_A=1 macro 
+dnl    definition and substitutes @IRAFLIBS@ in the Makefile.am/.in.
+AC_CHECK_FILES([iraf/libimfort.a],
+ [IRAFLIBS="iraf/libimfort.a iraf/libsys.a iraf/libvops.a iraf/libos.a iraf/libcompat.a"],
+ [IRAFLIBS=])
+AC_SUBST(IRAFLIBS)
 
 dnl    Configure .in files.
 AC_CONFIG_FILES([Makefile component.xml])

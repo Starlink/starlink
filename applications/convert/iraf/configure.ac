@@ -25,8 +25,14 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    The system we're building for determines if we have IRAF data support
 dnl    as this is only available as pre-built static object libraries. Make
-dnl    links to various forms of these libraries.
-STAR_PLATFORM_SOURCES([libcompat.a], [_pc_linux_gnu _sun_solaris _dec_osf])
+dnl    links to various forms of these libraries. Make sure libimfort doesn't
+dnl    exist as we use this to test if libraries for this platform have been
+dnl    found. 
+if test -f "libimfort.a"; then
+  rm libimfort.a
+fi
+STAR_PLATFORM_SOURCES([libcompat.a libimfort.a libos.a libsys.a libvops.a], 
+        [_pc_linux_gnu _sun_solaris _dec_osf NONE])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.

@@ -7,15 +7,20 @@ SUBDIRS = @subdirs@
 ## useful libraries in libpkgdir
 FIGLIBS = ../figaro/dta/libdta.la ../figaro/ich/libich.la
 
+## The IRAF libraries are platform dependent, so we must be prepared to deal
+## with their absence.
+IRAFLIBS=@IRAFLIBS@
+
 bin_SCRIPTS = convert.csh convert.icl gif2ndf ndf2gif tiff2ndf mtfits2ndf.tcsh\
  convertndf convertawk
 
 LOCAL_LINK = coi/libcoi.la cof/libcof.la con/libcon.la aif/libaif.la \
-             iraf/libconspp.la $(FIGLIBS) `$(srcdir)/convert_link_adam`
+             iraf/libconspp.la $(FIGLIBS) $(IRAFLIBS) \
+             `$(srcdir)/convert_link_adam`
 
 bin_MONOLITHS = convert_mon
 
-convert_mon_SOURCES = convert_mon.f $(TASKS:=.f)
+convert_mon_SOURCES = convert_mon.fpp $(TASKS:=.f)
 convert_mon_LDADD = $(LOCAL_LINK)
 convert_mon_TASKS = $(TASKS)
 
