@@ -1,0 +1,23 @@
+This is the Starlink::Config module.
+It is used by other modules to determine the location of the
+Starlink system.
+
+To install:
+
+  % perl Makefile.PL
+  % make
+  % make test
+  % make install
+
+On a Starlink system perl is located in /star/Perl/bin. The configuration file is automatically built
+during the initial phase. The Starlink environment is determined by looking at environment variables.
+
+The location of the starlink system is determined by first looking for $STARLINK, else $INSTALL
+else failling back to '/star'. An error is raised if the Starlink base directory does not actually
+exist.
+
+See the pod documentation for more information:
+
+   % perldoc Starlink::Config
+
+
