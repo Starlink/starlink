@@ -1,21 +1,21 @@
 Interface CROSSPEC
    Parameter    INP1
       position    1
-      type        'UNIV'
+      type        'LITERAL'
       prompt      'Enter name of first input object'
       help        '1 dimensional dataset or primitive object'
    EndParameter
 
    Parameter    INP2
       position    2
-      type        'UNIV'
+      type        'LITERAL'
       prompt      'Enter name of second input object'
       help        '1 dimensional dataset or primitive object'
    EndParameter
 
    Parameter    OUT
       position    3
-      type        'UNIV'
+      type        'LITERAL'
       association '->GLOBAL.GRAFDS'
       prompt      'Output dataset'
    EndParameter
