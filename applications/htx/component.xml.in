@@ -5,7 +5,7 @@
 <component id="@PACKAGE@">
   <version>@PACKAGE_VERSION@</version>
   <path>applications/htx</path>
-  <description>HTX - Hypertext Cross-reference Utilities<description>
+  <description>Hypertext Cross-reference Utilities</description>
   <abstract>
   <p>This document describes a set of ``Hypertext Cross-Reference
   Utilities'' (HTX) which are designed to help maintain large
