@@ -1795,7 +1795,7 @@ D        WRITE(*,*) RLP
 * Get pixel widths from the axes
         CALL BDI_AXGET1R( IFID, ORDER(1), 'SpacedData', 2, SPARR,
      :                    IDUM, STATUS )
-        HEAD.XSCALE = SPARR(1)
+        HEAD.XSCALE = SPARR(2)
         CALL BDI_AXGET1R( IFID, ORDER(2), 'SpacedData', 2, SPARR,
      :                    IDUM, STATUS )
         HEAD.YSCALE = SPARR(2)
