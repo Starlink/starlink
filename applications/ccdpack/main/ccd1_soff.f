@@ -1,7 +1,8 @@
-      SUBROUTINE CCD1_SOFF( ERROR, XIN1, YIN1, INDI1, NREC1, XIN2,
-     :                      YIN2, INDI2, NREC2, XDIST, YDIST, XRANK,
-     :                      CRANK, WORK1, XOUT1, YOUT1, XOUT2, YOUT2,
-     :                      NOUT, XOFF, YOFF, INDO1, INDO2, STATUS )
+      SUBROUTINE CCD1_SOFF( ERROR, MAXDIS, XIN1, YIN1, INDI1, NREC1,
+     :                      XIN2, YIN2, INDI2, NREC2, XDIST, YDIST,
+     :                      XRANK, CRANK, WORK1, XOUT1, YOUT1, XOUT2,
+     :                      YOUT2, NOUT, XOFF, YOFF, INDO1, INDO2, 
+     :                      STATUS )
 *+
 *  Name:
 *     CCD1_SOFF
@@ -13,7 +14,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_SOFF( ERROR, XIN1, YIN1, INDI1, NREC1, XIN2,
+*     CALL CCD1_SOFF( ERROR, MAXDIS, XIN1, YIN1, INDI1, NREC1, XIN2,
 *                     YIN2, INDI2, NREC2, XDIST, YDIST, XRANK,
 *                     CRANK, WORK1, XOUT1, YOUT1, XOUT2, YOUT2,
 *                     NOUT, XOFF, YOFF, INDO1, INDO2, STATUS )
@@ -47,6 +48,11 @@
 *  Arguments:
 *     ERROR = DOUBLE PRECISION (Given)
 *        The error in the positions.
+*     MAXDIS = DOUBLE PRECISION (Given)
+*        The maximum acceptable displacement in pixels between two 
+*        frames.  If an object match requires a displacement greater
+*        than this it will be rejected.  If it is set to zero, there
+*        are no restrictions.
 *     XIN1( NREC1 ) = DOUBLE PRECISION (Given)
 *        First set of X positions.
 *     YIN1( NREC1 ) = DOUBLE PRECISION (Given)
@@ -128,6 +134,9 @@
 *        guaranteed. 
 *     8-FEB-1999 (MBT):
 *        Added input index lists.
+*     30-MAR-1999 (MBT):
+*        Modified to reject matches at greater displacements than 
+*        MAXDIS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -144,6 +153,7 @@
 
 *  Arguments Given:
       DOUBLE PRECISION ERROR
+      DOUBLE PRECISION MAXDIS
       INTEGER NREC1
       DOUBLE PRECISION XIN1( NREC1 )
       DOUBLE PRECISION YIN1( NREC1 )
@@ -175,6 +185,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      DOUBLE PRECISION D2MAX     ! Maximum acceptable displacement squared
       DOUBLE PRECISION RMS       ! RMS distance 
       DOUBLE PRECISION RMSMIN    ! RMS minimum
       DOUBLE PRECISION RMSSUM    ! Current sum of RMS values
@@ -233,6 +244,13 @@
 *  values to occupy nearby portions of the array)
       CALL PDA_SAACD( XDIST, NREC1, NREC1, NREC2, CRANK, WORK1, IFAIL )
 
+*  Set the maximum acceptable displacement squared.
+      IF ( MAXDIS .EQ. 0D0 ) THEN
+         D2MAX = VAL__MAXD
+      ELSE
+         D2MAX = ( MAXDIS + ERROR ) ** 2
+      END IF
+
 *  Initialise pointers to best fit position.
       BESTI = 0
       BESTJ = 0
@@ -251,6 +269,9 @@
             JJ = CRANK( J )
             XDIFF = XDIST( I, JJ )
             YDIFF = YDIST( I, JJ )
+
+*  Reject this possibility if the displacement is too large.
+            IF ( XDIFF ** 2 + YDIFF ** 2 .GT. D2MAX ) GO TO 4
 
 *  Now initialise counters for number of matches and the sum of their
 *  differences.

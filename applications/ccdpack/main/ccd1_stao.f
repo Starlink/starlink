@@ -1,7 +1,7 @@
-      SUBROUTINE CCD1_STAO( ERROR, XIN1, YIN1, INDI1, NREC1, XIN2, 
-     :                      YIN2, INDI2, NREC2, DIST, XOUT1, YOUT1, 
-     :                      XOUT2, YOUT2, NOUT, XOFF, YOFF, INDO1,
-     :                      INDO2, STATUS )
+      SUBROUTINE CCD1_STAO( ERROR, MAXDIS, XIN1, YIN1, INDI1, NREC1,
+     :                      XIN2, YIN2, INDI2, NREC2, DIST, XOUT1,
+     :                      YOUT1, XOUT2, YOUT2, NOUT, XOFF, YOFF,
+     :                      INDO1, INDO2, STATUS )
 *+                          
 *  Name:                    
 *     CCD1_STAO             
@@ -13,9 +13,9 @@
 *     Starlink Fortran 77   
                             
 *  Invocation:              
-*      CALL CCD1_STAO( ERROR, XIN1, YIN1, INDI1, NREC1, XIN2, YIN2,
-*                      INDI2, NREC2, DIST, XOUT1, YOUT1, XOUT2, YOUT2,
-*                      NOUT, XOFF, YOFF, INDO1, INDO2, STATUS )
+*      CALL CCD1_STAO( ERROR, MAXDIS, XIN1, YIN1, INDI1, NREC1, XIN2,
+*                      YIN2, INDI2, NREC2, DIST, XOUT1, YOUT1, XOUT2,
+*                      YOUT2, NOUT, XOFF, YOFF, INDO1, INDO2, STATUS )
 
 *  Description:
 *     This routine performs the work for the CCDOFF application. It
@@ -38,6 +38,11 @@
 *  Arguments:
 *     ERROR = DOUBLE PRECISION (Given)
 *        The error in the positions.
+*     MAXDIS = DOUBLE PRECISION (Given)
+*        The maximum acceptable displacement in pixels between two
+*        frames.  If an object match requires a displacement greater
+*        than this it will be rejected.  If it is set to zero, there
+*        are no restrictions.
 *     XIN1( NREC1 ) = DOUBLE PRECISION (Given)
 *        First set of X positions.
 *     YIN1( NREC1 ) = DOUBLE PRECISION (Given)
@@ -95,6 +100,9 @@
 *     8-FEB-1999 (MBT):
 *        Modified to accept input index arrays rather than assuming 
 *        input lists are stored in rank order.
+*     30-MAR-1999 (MBT):
+*        Modified to reject matches at greater displacements than 
+*        MAXDIS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -110,6 +118,7 @@
 
 *  Arguments Given:
       DOUBLE PRECISION ERROR
+      DOUBLE PRECISION MAXDIS
       INTEGER NREC1
       DOUBLE PRECISION XIN1( NREC1 )
       DOUBLE PRECISION YIN1( NREC1 )
@@ -239,6 +248,14 @@
          END IF
          GO TO 11
       END IF     
+
+*  Check that we are within the range of acceptable displacements.
+      IF ( ( MAXDIS .NE. 0D0 ) .AND. 
+     :     ( XOFF ** 2 + YOFF ** 2 .GT. MAXDIS ** 2 ) ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'CCD1_STAO1_MAXDISP', 
+     :   '  Displacements too large for histogram mode', STATUS )
+      END IF
 
 *  Exit with error label.
  99   CONTINUE
