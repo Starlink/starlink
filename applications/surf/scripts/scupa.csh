@@ -63,7 +63,7 @@ scuquick -quick -notau -rebin -quiet --sub=$sub MSG_FILTER=quiet OUT_COORDS=AZ O
 
 set smallsub = `echo $sub | cut -c -3 | tr 'A-Z' 'a-z'`
 
-set file = "${out}_reb_$smallsub"
+set file = "${out}_${smallsub}_reb"
 
 # Now display the file
 
@@ -73,22 +73,24 @@ if (-e ${file}.sdf) then
 
    display axes clear $file device=xwindows accept
 
+   lutbgyrw device=xwindows
+
 # And overlay the bolometer names
 
-   scuover msg_filter=quiet device=xwindows name
+   scuover msg_filter=quiet device=xwindows col=white name
 endif
 
 # Remove some of the intermediate files if necessary
 
 if (-e ${out}.sdf) \rm ${out}.sdf
 if (-e ${out}_flat.sdf) \rm ${out}_flat.sdf
-if (-e ${out}_ext_${smallsub}.sdf) \rm ${out}_ext_${smallsub}.sdf
+if (-e ${out}_${smallsub}_ext.sdf) \rm ${out}_${smallsub}_ext.sdf
 if (-e ${file}.sdf) \rm ${file}.sdf
 
 # and maybe even remove some photometry files
 
-if (-e ${out}_pht_${smallsub}.sdf) \rm ${out}_pht_${smallsub}.sdf
-if (-e ${out}_pht_${smallsub}.dat) \rm ${out}_pht_${smallsub}.dat
+if (-e ${out}_${smallsub}_pht.sdf) \rm ${out}_${smallsub}_pht.sdf
+if (-e ${out}_${smallsub}_pht.dat) \rm ${out}_${smallsub}_pht.dat
 
 exit
 
