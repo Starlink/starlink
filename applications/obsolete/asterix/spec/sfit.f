@@ -275,7 +275,11 @@
 
 *      Finds NDOF from frozen array and constraints
         CALL FIT1_NDOF( NGOOD, MODEL, FROZEN, NDOF, STATUS )
-
+	print *,ngood,ndof
+	print *,model.ntie
+	do j=1,model.npar
+	print *,model.tgroup(j),frozen(j)
+	end do
 *      NDOF to be used for scaling chisq statistic
 	SSCALE = NDOF
 
