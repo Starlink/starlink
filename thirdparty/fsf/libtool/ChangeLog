@@ -1,38 +1,210 @@
+2004-09-19  Peter O'Gorman  <peter@pogma.com>
+
+	GNU libtool 1.5.10 is released.
+
+	* configure.ac: Bump version.
+	* NEWS: Updated.
+
+2004-09-19  Ralf Wildenhues <Ralf.Wildenhues@gmx.de>
+
+	* libtool.m4 (AC_LIBTOOL_SYS_GLOBAL_SYMBOL_PIPE): The linker
+	distinguishes data and code symbols on linux-gnu/ia64.  Fixes
+	multiple testsuite failures.  Backport from 1.9c.
+
+2004-09-19  Alexandre Duret-Lutz  <adl@gnu.org>,
+	    Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+	* demo/Makefile.am, pdemo/Makefile.am: Use per-target CFLAGS
+	only for the Libtool-built objects, so that automake won't
+	complain about missing AM_PROG_CC_C_O but still compile Libtool-
+	and non-Libtool objects into different names.
+
+2004-09-13  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* ltdl.c (memcpy, memmove): Fix pre-ANSI replacement functions
+	to not use pointer-to-void arithmetic.
+	(memmove): Fix infinite loop.
+
+2004-09-12  Brad <brad@comstyle.com>
+
+	* libtool.m4: Fixes for the OpenBSD support
+
+2004-08-12  Maciej W. Rozycki  <macro@linux-mips.org>
+
+	* demo/Makefile.am: Stop automake warning by defining
+	libhell0_a_CFLAGS.
+	* pdemo/Makefile.am: Ditto.
+
+2004-08-12  Peter O'Gorman  <peter@pogma.com>
+
+	* configure.ac, libtool.m4: Ensure that a c++ compiler exists before
+	checking for the c++ preprocessor. Apparently reported by multiple
+	people, multiple times.
+
+	* libtool.m4 [GNU/linux] (AC_DEPLIBS_CHECK_METHOD): Cleanup,
+	thanks to Daniel Reed.
+
+2004-08-11  Daniel Reed  <djr@redhat.com>
+
+	* tests/demo-nopic.test: Do not run on x86_64 or s390*
+
+2004-08-07  Peter O'Gorman  <peter@pogma.com>
+
+	* configure.ac: Bumped version to 1.5.9a.
+	* NEWS: updated.
+
+	GNU libtool-1.5.8 is released.
+
+	* NEWS: updated.
+	* configure.ac: Bumped version to 1.5.8.
+	* config.guess, config.sub:  Synchronized from ftp.gnu.org.
+
+2004-08-04  Peter O'Gorman  <peter@pogma.com>
+
+	* libtool.m4 (AC_LIBTOOL_SYS_MAX_CMD_LEN): Since CONFIG_SHELL may
+	not actually be set, we should use SHELL here, also make darn sure
+	that SHELL is set to something. Bug from Willem Jan Palenstijn
+	<wpalenst@math.leidenuniv.nl>.
+
+2004-08-03  Jacob Meuser <jakemsr@jakemsr.com>
+
+	* ltmain.in: Allow some static libraries to be used in generating a
+	shared library on NetBSD and OpenBSD. match-pattern_regex decides
+	which are good.
+
+2004-08-02  Todd Vierling  <tv@duh.org>,
+	Peter O'Gorman  <peter@pogma.com>
+
+	* libtool.m4 (AC_LIBTOOL_SYS_MAX_CMD_LEN): Use sysctl to get the
+	max cmd length on BSD* and darwin. Make sure that there is a safety
+	factor too.
+
+2004-08-02  Geoffrey Keating  <geoffk@apple.com>
+
+	* libtool.m4 [darwin]: Don't use -all_load.
+
+2004-08-01  Maciej W. Rozycki  <macro@linux-mips.org>
+
+	* libtool.m4 (LT_AC_PROG_SED): Set SED when running from cache as
+	well.
+
+2004-07-30  Peter O'Gorman  <peter@pogma.com>
+
+	* libtool.m4, ltmain.in:  autoconf now says the best thing to do
+	with CDPATH is to (unset CDPATH) >/dev/null 2>&1 && unset CDPATH,
+	so do it.
+
+	* libtool.m4 [darwin]: $GREP is not defined here, use $EGREP.
+	* ltmain.in (func_extract_archives): Backport func_extract_archives
+	from cvs HEAD to reduce code size and enable the darwin fat archive
+	extraction.
+
+2004-07-28  Peter O'Gorman  <peter@pogma.com>
+
+	* libtool.m4, ltmain.in [darwin]: Backport xlc support from cvs HEAD.
+
+2004-07-22  Joe Orton  <joe@manyfish.co.uk>
+
+	* libtool.m4: Treat bsdi5* like bsdi4*.
+
+2004-07-08  Peter O'Gorman  <peter@pogma.com>
+
+	* libtool.m4 [darwin](AC_PROG_LD_RELOAD_FLAG): Use $CC -nostdlib -r
+	on darwin so that ld will not thin fat files.
+
+	* libtool.m4 [darwin]: Clean up darwin bits. Looks more normal now.
+
+2004-07-07  Brad <brad@comstyle.com>
+
+	* libtool.m4: Fixes for the OpenBSD support
+
+2004-07-07  Peter O'Gorman  <peter@pogma.com>
+
+	* libltdl/ltdl.h: Undo inadvertent changes from the last commit.
+
+2004-06-24  Noah Misch  <noah@cs.caltech.edu>
+
+	* ltmain.in: Unset the zsh GLOB_SUBST option, which makes zsh
+	handle backslash quoting poorly, before doing anything else.
+	* tests/defs: Likewise.
+
+2004-06-16  Brad  <brad@comstyle.com>
+
+	* libtool.m4: More improvements to OpenBSD support.
+	* NEWS: Updated.
+
+2004-05-05  Peter O'Gorman  <peter@pogma.com>
+
+	* libtool.m4 (AC_LIBTOOL_PROG_LD_HARDCODE_LIBPATH): Insert space
+	around = for a test and a comma between runpath_var and $1. Bug
+	reported by Max Bowsher.
+
+2004-04-29  Peter O'Gorman  <peter@pogma.com>
+
+	* ltmain.in: Fix problem with .libs/.libs/libfoo.so appearing on
+	the link line, reported and fix confirmed by Dan S. Camper.
+
+2004-04-20  Gary V. Vaughan  <gary@gnu.org>
+
+	* m4/libtool.m4 (_LT_LANG_CXX_CONFIG): Detect Intel C++ compiler
+	version more idiomatically.
+
+2004-04-19  Gary V. Vaughan  <gary@gnu.org>
+
+	* m4/libtool.m4 (_LT_LANG_CXX_CONFIG): Intel C++ compiler 8.0 and
+	newer adds predep_objects and postdep_objects itself, so don't
+	duplicate them in $archive_cmds and $archive_expsym_cmds.
+	* NEWS: Updated.
+	Reported by Roberto Bagnare <bagnara@cs.unipr.it>
+
+2004-04-14  Alexandre Duret-Lutz  <adl@gnu.org>
+
+	* bootstrap: Delete acinclude.m4.
+
+2004-04-13  Scott James Remnant  <scott@netsplit.com>
+
+	* Makefile.am (XDELTA_OPTIONS): Remove --pristine as that
+	generates huge xdeltas.
+
 2004-04-11  Peter O'Gorman  <peter@pogma.com>
+
+	* configure.ac: Bumped version to 1.5.7a.
+	* NEWS: updated.
+
+	Released 1.5.6
 
 	* configure.ac: Bumped version to 1.5.6.
 	* NEWS: updated.
 
 2004-04-10  Peter Breitenlohner <peb@mppmu.mpg.de>
-	
+
 	* libltdl/Makefile.am (local-install-files): remove $srcdir from
 	file names, they may have been placed there by automake-1.8.
-	
+
 2004-04-08  Fredrik Estreen  <estreen@algonet.se>
 
 	* ltdl.m4: Rename shrext to shrext_cmds here too.
-	
+
 2004-04-04  Peter O'Gorman  <peter@pogma.com>
 
 	* Makefile.am: One install-data-hook target is better than two.
-	
+
 2004-04-03  Peter O'Gorman  <peter@pogma.com>
 
 	* configure.ac: Bumped version to 1.5.5a.
 	* NEWS: updated.
 
 	Released 1.5.4
-	
+
 	* configure.ac: Bumped version to 1.5.4.
 	* NEWS: updated.
 	* config.guess, config.sub, texinfo.tex:  Synchronized from
 	ftp.gnu.org.
-	
+
 2004-04-01  Peter O'Gorman  <peter@pogma.com>
 
 	* ltmain.in: Remove an extra eval concat_cmds that some idiot added.
 	Fixes double eval on AIX, reported by Albert Chin and Uwe Moeller.
-	
+
 2004-03-24  Scott James Remnant  <scott@netsplit.com>
 
 	* ltmain.in <prog linkmode>: Always add -L options to

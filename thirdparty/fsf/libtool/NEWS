@@ -1,5 +1,19 @@
 NEWS - list of user-visible changes between releases of GNU Libtool
 
+New in 1.5.10: 2004-09-19; CVS version 1.5.9a, Libtool team:
+* GNU/linux ia64 fixes.
+* Works on platforms with no c++ compiler.
+* Bug Fixes.
+
+New in 1.5.8: 2004-08-07; CVS version 1.5.7a, Libtool team:
+* Support for Intel C++ version 8.0.
+* Improved support for OpenBSD.
+* Support for xlc on Mac OS X.
+* Better support for zsh as /bin/sh.
+* Much faster check for command line length on all BSD systems.
+* Better Mac OS X/darwin support.
+* Bug Fixes.
+
 New in 1.5.6: 2004-04-11; CVS version 1.5.5a, Libtool team:
 * Installs libltdl files properly in $prefix/share/libtool/libltdl. 1.5.4
   did not install them at all.

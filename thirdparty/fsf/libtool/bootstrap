@@ -5,6 +5,9 @@
 
 rm -rf `find . -path './{arch}' -prune -o \( -name autom4te.cache -o -name libtool \) -print`
 
+# Delete stale acinclude.m4 from previous libtool versions.
+rm -f acinclude.m4
+
 : ${ACLOCAL=aclocal}
 : ${AUTOMAKE=automake}
 : ${AUTOCONF=autoconf}
@@ -17,7 +20,7 @@ touch libtoolize
 
 for sub in . libltdl cdemo demo depdemo mdemo mdemo2 pdemo tagdemo f77demo; do
   case $sub in
-  .) 
+  .)
     top_srcdir=.
     acfiles="$top_srcdir/libtool.m4"
     AUTOMAKE_FLAGS="--gnu --add-missing --copy"

@@ -13,8 +13,8 @@ fi
 # This doesn't work on hppa
 HOST=`../config.guess`
 case "$HOST" in
-hppa*)
-        echo "Not running on hppa, it doesn't like non-PIC shared libs" 2>&1
+hppa*|x86_64*|s390*)
+        echo "Not running on $HOST, it doesn't like non-PIC shared libs" 2>&1
         exit 77
 esac
 

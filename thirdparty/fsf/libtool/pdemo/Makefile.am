@@ -7,6 +7,7 @@ EXTRA_DIST = acinclude.m4
 # Build a libtool library, libhello.la for installation in libdir.
 lib_LTLIBRARIES = libhello.la
 libhello_la_SOURCES = longer_file_name_hello.c longer_file_name_foo.c longer_file_name_foo2.c
+libhello_la_CFLAGS = $(AM_CFLAGS)
 libhello_la_LIBADD = $(LIBM)
 libhello_la_LDFLAGS = -no-undefined -version-info 3:12:1
 

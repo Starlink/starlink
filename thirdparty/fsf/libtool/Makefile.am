@@ -247,7 +247,7 @@ delta-diff: prev-tarball new-tarball
 	rm -rf delta-diff
 
 XDELTA = xdelta
-XDELTA_OPTIONS = --pristine -9
+XDELTA_OPTIONS = -9
 
 .PHONY: delta-xdelta
 delta-xdelta: prev-tarball new-tarball got-xdelta
