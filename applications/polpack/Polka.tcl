@@ -826,8 +826,11 @@
       lappend IMAGES $image
 
 # Ensure we have a standard NDF section expressed as ranges of pixel indices.
+# Save the section specified in an array, and append it to the image name
+# to get a full image section specification.
       set stdsec $image
-      append stdsec [PixIndSection $imsec]
+      set SECTIONS($image) [PixIndSection $imsec]
+      append stdsec $SECTIONS($image)
 
 # Save the standard section for the first image.
       if { ![info exists IMSEC_FIRST] } { set IMSEC_FIRST $stdsec }

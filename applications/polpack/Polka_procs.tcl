@@ -23,6 +23,9 @@
 #        as a Tk window. DrawGwm modified to use KAPPA V0.13 version of
 #        DISPLAY. Procedure TranImage modified to propgate WCS from input
 #        to output. POLPACK:SEGMENT replaced by KAPPA:SEGMENT.
+#     12-NOV-1998 (DSB):
+#        Default sky areas are now not used if they do not fall within the
+#        image (see CheckSky).
 #---------------------------------------------------------------------------
 
 proc Accept {} {
@@ -880,6 +883,87 @@ proc CheckRF {task} {
    }
 
    return $ret   
+
+}
+
+proc CheckSky {image object} {
+#+
+#  Name:
+#    CheckSky
+#
+#  Purpose:
+#    Checks that the supplied mask or sky object overlaps the supplied image. 
+#    At least one vertex must be more than 2 pixels away from the nearest 
+#    image edge for the area to be usable.
+#
+#  Arguments:
+#     image
+#        The name of the image.
+#     object
+#        The object to be checked. This should be one of O_RAY_MASK,
+#        O_RAY_SKY, E_RAY_MASK or E_RAY_SKY.
+#
+#  Globals:
+#     E_RAY_MASK (Read)
+#        An integer representing the "E-ray mask" object type.
+#     E_RAY_SKY (Read)
+#        An integer representing the "E-ray sky" object type.
+#     O_RAY_MASK (Read)
+#        An integer representing the "O-ray mask" object type.
+#     O_RAY_SKY (Read)
+#        An integer representing the "O-ray sky" object type.
+#     PNTPX (Read)
+#        A 2-d array indexed by image and object type. Each element
+#        is a list of pixel X coordinates. 
+#     PNTPY (Read)
+#        A 2-d array indexed by image and object type. Each element
+#        is a list of pixel Y coordinates. 
+#     SECTIONS (Read)
+#        An array, indexed by image name, holding the pixel bounds of
+#        the image as a standard NDF section specifier (eg "(100:230,-10:20)").
+#
+#  Returned Value:
+#     1 if the supplied mask or sky area overlaps the supplied image.
+#     Zero otherwise.
+#
+#-
+   global E_RAY_MASK
+   global E_RAY_SKY
+   global O_RAY_MASK 
+   global O_RAY_SKY
+   global SECTIONS
+   global PNTPX
+   global PNTPY
+
+# Initialise
+   set ret 0
+
+# Get the pixel co-ordinate bounds for the image.
+   set sec [SecList $SECTIONS($image)]
+   if { $sec != "" } {
+      set lx [expr [lindex $sec 0] - 1]
+      set ux [lindex $sec 1] 
+      set ly [expr [lindex $sec 2] - 1]
+      set uy [lindex $sec 3] 
+
+# Loop round each vertex in the mask or sky area.
+      set size [llength $PNTPX($image,$object)]
+      for {set i 0} {$i < $size} {incr i} {
+         set px [lindex $PNTPX($image,$object) $i]
+         set py [lindex $PNTPY($image,$object) $i]
+
+# If this vertex is well within the image, set the returned flag and
+# leave the loop.
+         if { $px < ($ux - 3) && $px > ($lx + 3) && \
+              $py < ($uy - 3) && $py > ($ly + 3) } {
+            set ret 1
+            break
+         }
+      }
+   }
+
+# Return the answer.
+   return $ret
 
 }
 
@@ -1829,9 +1913,14 @@ proc CreateSky {image object} {
    global O_RAY_SKY
    global OBJTYPE
    global PNTPX
+   global RESAVE
 
 # Assume success.
    set ok 1
+
+# Indicate that we do not need to issue a warning about sky areas not
+# overlapping the image.
+   set warn 0
 
 # If the requested sky area already exists, do nothing.
    if { [llength $PNTPX($image,$object)] == 0 } {
@@ -1866,8 +1955,20 @@ proc CreateSky {image object} {
       if { $other != "" && [llength $PNTPX($image,$other)] > 0 } {
          set map [OEMapping $image]
          if { $map != "" } {
+            set oldrs $RESAVE
             TranPXY $map $inv $image $other $image $object
-            set ok 1
+
+# Check that the new sky area overlaps the image. If it does not, the sky
+# area cannot be used so erase it.
+            if { ![CheckSky $image $object] } {
+               set ok 0
+               set warn 1
+               Erase $image $object
+               set RESAVE $oldrs
+
+            } {
+               set ok 1
+            }
          }
       }
 
@@ -1885,9 +1986,23 @@ proc CreateSky {image object} {
 # Create the require sky area from this image's sky area.
                set map [ConcMap $map1 0 $map0 1]
                if { $map != "" } {
+                  set oldrs $RESAVE
                   TranPXY $map 0 $im $object $image $object
-                  set ok 1
-                  break
+
+# Check that the new sky area overlaps the image. If it does not, the sky
+# area cannot be used so erase it.
+                  if { ![CheckSky $image $object] } {
+                     set ok 0
+                     set warn 1
+                     Erase $image $object
+                     set RESAVE $oldrs
+
+# If the new sky area overlaps the image, we can use it. So leave the loop.
+                  } {
+                     set ok 1
+                     break
+                  }
+
                }
             }
          }
@@ -1908,9 +2023,22 @@ proc CreateSky {image object} {
 # Create the require sky area from this image's other sky area.
                   set map [ConcMap [ConcMap $map2 $inv $map1 0] 0 $map0 1]
                   if { $map != "" } {
+                     set oldrs $RESAVE
                      TranPXY $map 0 $im $other $image $object
-                     set ok 1
-                     break
+
+# Check that the new sky area overlaps the image. If it does not, the sky
+# area cannot be used so erase it.
+                     if { ![CheckSky $image $object] } {
+                        set ok 0
+                        set warn 1
+                        Erase $image $object
+                        set RESAVE $oldrs
+
+# If the new sky area overlaps the image, we can use it. So leave the loop.
+                     } {
+                        set ok 1
+                        break
+                     }
                   }
                }
             }
@@ -1920,6 +2048,11 @@ proc CreateSky {image object} {
 # Cancel the informative text set earlier in this procedure.
       if { $told } { SetInfo "" 0 }
 
+# If a sky area could not be created because the existing sky areas were
+# off the image, issue a warning.
+      if { !$ok && $warn } {
+         Message "Cannot use existing sky areas because they do not fall within the displayed image. Please supply new sky areas for this image."
+      }
    }
 
    return $ok
@@ -5081,6 +5214,52 @@ proc Message {message} {
 
 }
 
+proc Erase {image object} {
+#+
+#  Name:
+#     Erase
+#
+#  Purpose:
+#     Erase an object. This includes clearing the associated markers on
+#     the canvas, and clearing the global arrays holding information 
+#     describing the object.
+#
+#  Arguments:
+#     image 
+#        The image with which the object is associated.
+#     obj_out
+#        The object type ($E_RAY_MASK, $O_RAY_MASK, etc)
+#-
+   global PNTCX
+   global PNTCY
+   global PNTID
+   global PNTLBL
+   global PNTNXT
+   global PNTPX
+   global PNTPY
+   global PNTVID
+   global PNTTAG
+   global RESAVE
+
+# Erase any canvas items currently associated with the output list.
+   ClearPosns $image $object
+
+# Nullify the output lists.
+   set PNTPX($image,$object) ""
+   set PNTPY($image,$object) ""
+   set PNTCX($image,$object) ""
+   set PNTCY($image,$object) ""
+   set PNTLBL($image,$object) ""
+   set PNTNXT($image,$object) ""
+   set PNTID($image,$object) ""
+   set PNTVID($image,$object) ""
+   set PNTTAG($image,$object) ""
+
+# Indicate the output images will need to be re-calculated.
+   set RESAVE 1
+
+}
+
 proc EndUF {context leave} {
 #+
 #  Name:
@@ -6986,7 +7165,9 @@ proc GetPosn {i name args} {
          }
       }
    }
-    return $ret
+
+   return $ret
+
 }
 
 proc GetSec {imsec imv secv} {
@@ -13612,22 +13793,8 @@ proc TranPXY {map inv im_in obj_in im_out obj_out} {
    global RECALC_IMMAP
    global RECALC_OEMAP
 
-# Erase any canvas items currently associated with the output list.
-   ClearPosns $im_out $obj_out
-
-# Nullify the output lists.
-   set PNTPX($im_out,$obj_out) ""
-   set PNTPY($im_out,$obj_out) ""
-   set PNTCX($im_out,$obj_out) ""
-   set PNTCY($im_out,$obj_out) ""
-   set PNTLBL($im_out,$obj_out) ""
-   set PNTNXT($im_out,$obj_out) ""
-   set PNTID($im_out,$obj_out) ""
-   set PNTVID($im_out,$obj_out) ""
-   set PNTTAG($im_out,$obj_out) ""
-
-# Indicate that we will need to re-save the output images.
-   set RESAVE 1
+# Erase the output object.
+   Erase $im_out $obj_out
 
 # Unless we are creating a mask (which do not effect mappings), indicate
 # that the mappings related to the returned positions lists will need to be
