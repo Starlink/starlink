@@ -1004,7 +1004,7 @@
         DO I = 1, NREC
 
 *      Announce this one
-          CALL MSG_SETC( 'N', I )
+          CALL MSG_SETI( 'N', I )
           CALL AIO_IWRITE( OCH, 4, 'Selection Record ^N', STATUS )
           CALL AIO_BLNK( OCH, STATUS )
 
