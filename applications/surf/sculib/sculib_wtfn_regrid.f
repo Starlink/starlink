@@ -1,6 +1,7 @@
       SUBROUTINE SCULIB_WTFN_REGRID( N_MAPS, N_PTS, WTFNRAD, WTFNRES,
      :     WEIGHTSIZE, DIAMETER, WAVELENGTH, PXSIZE, NX_OUT, NY_OUT, 
-     :     I_CENTRE, J_CENTRE, WTFN, WEIGHT, DATA_PTR, VAR_PTR, 
+     :     I_CENTRE, J_CENTRE, WTFN, WEIGHT, BOLWT, N_BOL, MAX_BOLS,
+     :     DATA_PTR, VAR_PTR, 
      :     XPOS_PTR, YPOS_PTR, OUT_DATA, OUT_VARIANCE, 
      :     OUT_QUALITY, CONV_WEIGHT, STATUS )
 *+
@@ -16,7 +17,8 @@
 *  Invocation:
 *     SUBROUTINE SCULIB_PROCESS_BOLS(N_MAPS, N_PTS, WTFNRAD, WTFNRES,
 *    :     WEIGHTSIZE, DIAMETER, WAVELENGTH, PXSIZE, NX_OUT, NY_OUT, 
-*    :     I_CENTRE, J_CENTRE, WTFN, WEIGHT, DATA_PTR, VAR_PTR, 
+*    :     I_CENTRE, J_CENTRE, WTFN, WEIGHT, BOLWT, N_BOL, MAX_BOLS,
+*    :     DATA_PTR, VAR_PTR, 
 *    :     XPOS_PTR,YPOS_PTR, OUT_DATA, OUT_VARIANCE, 
 *    :     OUT_QUALITY, CONV_WEIGHT,
 *    :     STATUS)
@@ -55,6 +57,12 @@
 *        The weighting function
 *     WEIGHT(N_MAPS) = REAL (Given)
 *        The weight of each input dataset
+*     BOLWT (MAX_BOLS, N_MAPS) = REAL (Given)
+*        Relative weight for each bolometer
+*     N_BOL (N_MAPS) = INTEGER (Given)
+*        Number of bolometers from each map
+*     MAX_BOLS = INTEGER (Given)
+*        Max number of bolometers allowable in BOLWT
 *     DATA_PTR(N_MAPS) = INTEGER (Given)
 *        Array of pointers to REAL input data
 *     VAR_PTR(N_MAPS) = INTEGER (Given)
@@ -97,11 +105,14 @@
  
 *  Arguments Given:
       INTEGER N_MAPS
+      INTEGER MAX_BOLS
+      REAL    BOLWT(MAX_BOLS, N_MAPS)
       INTEGER DATA_PTR(N_MAPS)
       REAL    DIAMETER
       INTEGER I_CENTRE
       INTEGER J_CENTRE
-      INTEGER N_PTS(N_MAPS)
+      INTEGER N_BOL (N_MAPS)
+      INTEGER N_PTS (N_MAPS)
       INTEGER NX_OUT
       INTEGER NY_OUT
       REAL    PXSIZE
@@ -134,16 +145,22 @@
       PARAMETER (MSG_LEV = MSG__NORM)
  
 *  Local Variables:
-      INTEGER CONV_WEIGHT_PTR    ! Sum of convolution weights
-      INTEGER CONV_WEIGHT_END    ! End of array
+      INTEGER BOLWT_PTR          ! Bolometer weights
+      INTEGER BOLWT_END          ! End of bolometer weights
+      INTEGER DATA_OFFSET        ! Position in BOLWT_PTR
       INTEGER I                  ! Loop counter
+      INTEGER IERR               ! For VEC_
+      INTEGER J                  ! Loop counter
+      INTEGER K                  ! Loop counter
+      INTEGER NERR               ! For VEC_
       INTEGER REGRID1_PTR        ! Pointer to scratch array
       INTEGER REGRID1_END        ! end of scratch array
+      REAL    RTEMP              ! Scratch real
       REAL    T0                 ! Time at start of regrid
       REAL    T1                 ! Time at each stage
       INTEGER TOTAL_WEIGHT_PTR   ! Pointer to total_weight
       INTEGER TOTAL_WEIGHT_END   ! Pointer to end of total_weight
-
+      LOGICAL USEBOLWT           ! Are we using bolometer weights?
 
 
 *.
@@ -154,8 +171,7 @@
       TOTAL_WEIGHT_END = 0
       REGRID1_PTR = 0
       REGRID1_END = 0
-      CONV_WEIGHT_PTR = 0
-      CONV_WEIGHT_END = 0
+
 
 *     get some workspace for the `total weight' array and the scratch area
 *     used by SCULIB_BESSEL_REGRID_1
@@ -189,14 +205,9 @@
      :        %val(REGRID1_PTR), STATUS)
       END DO
 
-*     get scratch array to hold convolution weights, initialise it to zero
+*     Free the scratch array
+      CALL SCULIB_FREE ('REGRID1', REGRID1_PTR, REGRID1_END, STATUS)
 
-      CALL SCULIB_MALLOC (NX_OUT * NY_OUT * VAL__NBR, CONV_WEIGHT_PTR,
-     :  CONV_WEIGHT_END, STATUS)
-      IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLR (NX_OUT * NY_OUT, 0.0, 
-     :     %val(CONV_WEIGHT_PTR))
-      END IF
 
 *  go through the input datasets coadding them into the convolution
 
@@ -207,13 +218,68 @@
      :     ' (T = ^T1 seconds)', STATUS)
 
       DO I = 1, N_MAPS
+
+*     Need to generate a weights array for each data point on the basis
+*     of BOLWT. Much more efficient on memory to create this
+*     array once for each map.
+
+*     Go through BOLWT to see if we even need to set some weights
+*     Ignore BOLWT if every value is 1.0
+         RTEMP = 1.0
+         USEBOLWT = .FALSE.
+         DO J = 1, N_BOL(I)
+            IF (RTEMP .NE. BOLWT(J,I)) THEN
+               USEBOLWT = .TRUE.
+            END IF
+         END DO
+         
+*     Now create the bolometer weights array
+         BOLWT_PTR = 0
+         BOLWT_END = 0
+         IF (USEBOLWT) THEN
+            
+            CALL MSG_SETI('I',I)
+            CALL MSG_OUT(' ','Using bolometer weights for map ^I',
+     :           STATUS)
+
+            CALL SCULIB_MALLOC(N_PTS(I) * VAL__NBR, BOLWT_PTR,
+     :           BOLWT_END, STATUS)
+
+*     I know the positional data is read in for all bolometers
+*     and all times as a (N_BOL,N_POS) array. 
+*     No bolometers are dropped en route so it is a simple case to
+*     add in the bolometer weights at this point
+*     The array is the wrong shape to simply copy in the data at one go.
+            DO J = 1, N_BOL(I)
+               DO K = 1, N_PTS(I) / N_BOL(I)
+
+                  DATA_OFFSET = ((K-1) * N_BOL(I)) + (J-1)
+
+                  CALL VEC_RTOR(.FALSE., 1, BOLWT(J,I),
+     :                 %VAL(BOLWT_PTR + (DATA_OFFSET * VAL__NBR)),
+     :                 IERR, NERR, STATUS)
+
+               END DO
+            END DO
+
+
+         END IF
+
+*     The actual dirty work
          CALL SCULIB_WTFN_REGRID_2 (DIAMETER, WTFNRES,
      :        %val(DATA_PTR(I)), %val(VAR_PTR(I)),
-     :        WEIGHT(I), %val(XPOS_PTR(I)), %val(YPOS_PTR(I)),
+     :        WEIGHT(I), USEBOLWT, %VAL(BOLWT_PTR),
+     :        %val(XPOS_PTR(I)), %val(YPOS_PTR(I)),
      :        N_PTS(I), PXSIZE, NX_OUT, NY_OUT,
      :        I_CENTRE, J_CENTRE, %VAL(TOTAL_WEIGHT_PTR),
      :        WAVELENGTH, OUT_DATA, OUT_VARIANCE,
      :        CONV_WEIGHT, WEIGHTSIZE, WTFN, STATUS)
+
+
+*     Free the bolometer weights array
+         IF (USEBOLWT) CALL SCULIB_FREE('BOLWT',BOLWT_PTR, BOLWT_END,
+     :        STATUS)
+
       END DO 
 
 *  now add the output pixels with zero `total weight' into the
@@ -246,8 +312,6 @@
 
       CALL SCULIB_FREE ('TOTAL WEIGHT', TOTAL_WEIGHT_PTR,
      :  TOTAL_WEIGHT_END, STATUS)
-      CALL SCULIB_FREE ('REGRID1', REGRID1_PTR, REGRID1_END, STATUS)
-      CALL SCULIB_FREE ('CONV_WEIGHT', CONV_WEIGHT_PTR,
-     :  CONV_WEIGHT_END, STATUS)
+
 
       END
