@@ -218,7 +218,7 @@
       INCLUDE 'INC_XRTHEAD'
 
 *  Arguments Given:
-      CHARACTER*(*)			FNAME, RTNAME
+      CHARACTER*(*)		FNAME, RTNAME
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -275,7 +275,7 @@
         CALL ADI2_FITERP( ISTATUS, STATUS )
         CALL MSG_PRNT('Error detected reading FITS file')
         GOTO 99
-      ENDI
+      END IF
 
 *  Read the header infotmation
       CALL RAT_GETXRTHEAD( RTNAME, HEAD, STATUS )
