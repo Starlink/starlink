@@ -1,0 +1,6 @@
+open 
+copy5828
+setcmp
+;ra;dec;mag;gsc_id
+list
+exit
