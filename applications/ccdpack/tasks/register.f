@@ -172,7 +172,7 @@
 *        coordinate system is added, any previously existing one with
 *        the same Domain will be removed.
 *
-*        If PLACEIN is "FILE", then the new coordinate systems are all
+*        If PLACEIN is "SINGLE", then the new coordinate systems are all
 *        attached to a single NDF.  In this case the  domains are
 *        OUTDOMAIN_1, OUTDOMAIN_2, ....
 *
@@ -194,9 +194,10 @@
 *           - SINGLE  -- attach them all to a single NDF
 *
 *        If the EACH option is chosen then you will have the option of
-*        supplying the NDF names via the parameter IN. If the EACH
-*        option is chosen then the name of an existing NDF should be
-*        given in response to the WCSFILE parameter.
+*        supplying the NDF names via the parameter IN. If the SINGLE
+*        option is chosen then the name of an NDF should be
+*        given in response to the WCSFILE parameter; if no NDF by this
+*        name exists, a new dummy one will be created.
 *        [EACH]
 *     REFPOS = _INTEGER (Read)
 *        The position within the list of inputs which corresponds to
@@ -261,8 +262,9 @@
 *        If PLACEIN is "SINGLE" then the value of this parameter gives the
 *        the name of an NDF which will have the new coordinate systems
 *        attached to it.  They will be added with domains given by the
-*        OUTDOMAIN parameter with '_1', '_2', ... appended.  The NDF
-*        named by this parameter must already exist.
+*        OUTDOMAIN parameter with '_1', '_2', ... appended.  If the NDF
+*        named by this parameter does not exist, a dummy one will be
+*        created.
 *     XFOR = LITERAL (Read)
 *        If FITTYPE=6 then this parameter specifies the parameterised
 *        algebraic expression to be used as the forward X
@@ -490,6 +492,9 @@
 *        all when there are no positions.
 *     8-MAY-2002 (MBT):
 *        Fixed coredumping bug for FITTYPE=6.
+*     12-FEB-2003 (MBT):
+*        Modified to create a new NDF using WCSFILE parameter when
+*        PLACEIN=SINGLE if named NDF does not already exist.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -507,6 +512,7 @@
       INCLUDE 'TRN_PAR'          ! Transform parameters
       INCLUDE 'FIO_PAR'          ! FIO parameters
       INCLUDE 'AST_PAR'          ! AST parameters
+      INCLUDE 'NDF_PAR'          ! NDF parameters
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -538,6 +544,8 @@
       DOUBLE PRECISION RMS      ! Root mean square difference in fitted lists and reference list
       DOUBLE PRECISION TOLER    ! Tolerance in RMS devations
       DOUBLE PRECISION TR( 6, CCD1__MXLIS + 1 ) ! The transformation coeffs
+      INTEGER BND1( 2 )         ! Bounds of dummy NDF
+      INTEGER ELDUM             ! Number of elements in dummy data array
       INTEGER FDIN              ! FIO file descriptors
       INTEGER FDREFO            ! Output reference set descriptor
       INTEGER FIOGR             ! Group of input list names
@@ -553,6 +561,7 @@
       INTEGER INLSUP( CCD1__MXLIS + 1 ) ! Superlist index for NDFs without lists
       INTEGER IP                ! Positional pointer into appended lists
       INTEGER IPDAT( CCD1__MXLIS + 1 ) ! Pointer to file data
+      INTEGER IPDUM             ! Pointer to dummy data component
       INTEGER IPID              ! Pointer to identifier workspace
       INTEGER IPIDR             ! Pointer to identifier workspace
       INTEGER IPIG( 2 )         ! Pointer to identifier workspace
@@ -624,6 +633,7 @@
 
 *  Local Data:
       DATA ALPBET/ 'ABCDEFGHIJKLNMOPQRSTUVWXYZ' /
+      DATA BND1/ 1, 1 /
 *.
 
 *  Check inherited global status.
@@ -726,8 +736,26 @@
          ELSE
 
 *  User wants to store them as frames in an existing NDF's WCS component.
-*  Get the identifier of the NDF.
-            CALL NDF_ASSOC( 'WCSFILE', 'UPDATE', IDWCS, STATUS )
+*  Get the identifier of this NDF if it already exists.
+            CALL NDF_EXIST( 'WCSFILE', 'UPDATE', IDWCS, STATUS )
+
+*  If it does not exist, create a dummy NDF to hold the WCS.
+            IF ( IDWCS .EQ. NDF__NOID ) THEN
+
+*  Create the NDF.
+                CALL NDF_CREAT( 'WCSFILE', '_INTEGER', 2, BND1, BND1,
+     :                          IDWCS, STATUS )
+
+*  Ensure that its DATA component is in a defined state.
+                CALL NDF_MAP( IDWCS, 'DATA', '_INTEGER', 'WRITE/BAD',
+     :                        IPDUM, ELDUM, STATUS );
+                CALL NDF_UNMAP( IDWCS, 'DATA', STATUS )
+
+*  Assign informative values to its character components.
+                CALL NDF_CPUT( 'Dummy NDF', IDWCS, 'TITLE', STATUS )
+                CALL NDF_CPUT( 'Created by REGISTER to store WCS ' //
+     :                         'information', IDWCS, 'LABEL', STATUS )
+            END IF
          END IF
       END IF
 

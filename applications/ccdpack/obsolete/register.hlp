@@ -202,7 +202,7 @@ OUTDOMAIN = LITERAL (Read)
    coordinate system is added, any previously existing one with
    the same Domain will be removed.
 
-   If PLACEIN is "FILE", then the new coordinate systems are all
+   If PLACEIN is "SINGLE", then the new coordinate systems are all
    attached to a single image.  In this case the  domains are
    OUTDOMAIN_1, OUTDOMAIN_2, ....
 
@@ -232,9 +232,10 @@ PLACEIN = LITERAL (Read)
       - SINGLE  -- attach them all to a single image
 
    If the EACH option is chosen then you will have the option of
-   supplying the image names via the parameter IN. If the EACH
-   option is chosen then the name of an existing image should be
-   given in response to the WCSFILE parameter.
+   supplying the image names via the parameter IN. If the SINGLE
+   option is chosen then the name of an image should be
+   given in response to the WCSFILE parameter; if no image by this
+   name exists, a new dummy one will be created.
    [EACH]
 
 REFPOS
@@ -320,8 +321,9 @@ WCSFILE = NDF (Read)
    If PLACEIN is "SINGLE" then the value of this parameter gives the
    the name of an image which will have the new coordinate systems
    attached to it.  They will be added with domains given by the
-   OUTDOMAIN parameter with '_1', '_2', ... appended.  The image
-   named by this parameter must already exist.
+   OUTDOMAIN parameter with '_1', '_2', ... appended.  If the image
+   named by this parameter does not exist, a dummy one will be
+   created.
 
 XFOR
 
