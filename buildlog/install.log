@@ -784,7 +784,6 @@ dist:
      [copy] Copying 55 files to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copying 513 files to /apps/cvsbuild/java/source/splat/docs/splat
-    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -1123,4 +1122,4 @@ install:
 [loggedcopy] Copied 1 empty directory to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 13 seconds
+Total time: 4 minutes 14 seconds
