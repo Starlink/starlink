@@ -2,6 +2,7 @@ import org.w3c.dom.*;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Map;
+import java.util.Stack;
 
 
 /**
@@ -161,7 +162,7 @@ public class GenerateDependencies {
         /** Name of the component */
         public String getName() {
             if (name == null)
-                name = el.getAttribute("id");
+                name = el.getAttribute("id").intern();
             return name;
         }
 
@@ -214,59 +215,94 @@ public class GenerateDependencies {
         /**
          * Gets the complete set of dependencies.  As for
          * <code>getDeps</code>, except that the dependencies of the
-         * direct dependencies, and their dependencies, are returned.
-         * @param one of the type strings
+         * direct dependencies are returned, and so on recursively.
+         * @param type one of the type strings
          * @return a set of all the dependencies, or null (and prints
-         * a message on <code>stderr</code>) if it detects a circular dependency.
+         * a message on <code>stderr</code>) if it detects a circular
+         * dependency.
          */
         public Set getAllDeps(String type) {
-            return getAllDeps(type, getName());
+            Set collectedDeps = new java.util.TreeSet();
+
+            Stack s = new Stack();
+            s.push(getName());
+            collectDeps(type, collectedDeps, s, true);
+            if (collectedDeps.contains(new Dependency(getName()))) {
+                return null;
+            } else {
+                return collectedDeps;
+            }
+            
         }
 
         /**
-         * Gets the complete set of dependencies, checking for
-         * circularities.  As for <code>getAllDeps</code>, except that
-         * if any of the dependencies are the string
-         * <code>failIfFound</code>, then this is a circular
-         * dependency, and this prints a warning message on
-         * <code>stderr</code> and returns null.
+         * Collect all dependencies into a set.
+         * @param type the type of dependencies to collect
+         * @param allDeps the set which has the dependencies added to
+         * it (NB, sideeffect)
+         * @param pathHere a Stack holding the path of dependencies
+         * which led us here, to help reporting circularities
+         * @param warnCircular if true, warn when we detect
+         * circularities; if false, silently omit them
          */
-        private Set getAllDeps(String type, String failIfFound) {
+        private void collectDeps(String type, Set allDeps, Stack pathHere,
+                                 boolean warnCircular) {
             Set currentDeps = getDeps(type);
-            Set ret = new java.util.TreeSet();
-            ret.addAll(currentDeps);
             for (Iterator i=currentDeps.iterator(); i.hasNext(); ) {
                 Dependency dep = (Dependency)i.next();
-                if (dep.packName().equals(failIfFound)) {
-                    System.err.println("Circular dependence of " + failIfFound
-                                       + ": package " + getName()
-                                       + " depends on " + failIfFound);
-                    return null;
-                }
-                Component c = (Component)allComponents.get(dep.packName());
-                if (c == null) {
-                    System.err.println("Package " + getName()
-                                       + " depends on non-existent "
-                                       + dep.packName());
-                    return null;
-                }
-                Set subdeps = c.getAllDeps(type, failIfFound);
-                if (subdeps == null) {
-                    System.err.println("Circular dependence of " + failIfFound
-                                       + ": package " + getName()
-                                       + " depends on " + dep.packName());
-                    return null;
-                } else {
-                    ret.addAll(subdeps);
-                }
+                if (! allDeps.contains(dep)) {
+                    // process it
+                    Component c = (Component)allComponents.get(dep.packName());
+                    if (c == null) {
+                        // never heard of it!
+                        System.err.println("Package " + getName()
+                                           + " depends on non-existent "
+                                           + dep);
+                    } else if (pathHere.search(dep.packName()) >= 0) {
+                        // circular dependency
+                        if (warnCircular) {
+                            System.err.print("Circular dependency: "
+                                             + dep.packName());
+                            Stack pathCopy = (Stack)pathHere.clone();
+                            while (! pathCopy.empty())
+                                System.err.print(" <- " + pathCopy.pop());
+                            System.err.println();
+                            // ...but add it to the dependency list
+                            // nonetheless.  This triggers an error
+                            // message above.
+                            allDeps.add(dep);
+                            // But don't recurse.
+                        }
+                        // If we're not to warn about circularity (see
+                        // below), then simply avoid adding this dependency.
+                    } else {
+                        // normal case
+                        allDeps.add(dep);
+                        pathHere.push(dep.packName());
+                        c.collectDeps(type, allDeps, pathHere, true);
 
-                // Check if there are any option dependencies.  If so,
-                // add all of the dependencies of that type, too.
-                String optionDeps = dep.option();
-                if (optionDeps != null)
-                    ret.addAll(c.getAllDeps(optionDeps, failIfFound));
+                        // Check if there are any option dependencies.  If
+                        // so, add all of the dependencies of that type,
+                        // too.  
+                        if (dep.option() == Dependency.LINK)
+                            // In this particular case it doesn't
+                            // matter if we have a circular
+                            // dependency: the link will still work.
+                            // Thus suppress the warning that the
+                            // above code normally produces in this case.
+                            c.collectDeps(dep.option(), allDeps, pathHere,
+                                          false);
+                        else if (dep.option() != null)
+                            System.err.println("Non-link option "
+                                               + dep.option() 
+                                               + " on component "
+                                               + dep.packName()
+                                               + " -- you sure?");
+
+                        pathHere.pop();
+                    }
+                }
             }
-            return ret;
         }
 
         /**
@@ -290,6 +326,11 @@ public class GenerateDependencies {
         }
     }
 
+    /**
+     * Encapsulates a dependency on a component.  Expresses that there
+     * is a dependency of type {@link #type} on the component {@link
+     * #packName}.
+     */
     private static class Dependency
             implements Comparable {
         private String mytype;
@@ -300,6 +341,7 @@ public class GenerateDependencies {
         public static final String BUILD = "build".intern();
         public static final String LINK = "link".intern();
         public static final String USE = "use".intern();
+        private static final String DUMMY = "dummy".intern();
 
         Dependency(Element el) {
 
@@ -325,6 +367,16 @@ public class GenerateDependencies {
                 option = attval.trim().intern();
         }
 
+        /**
+         * Dummy constructor so that strings can be tested for
+         * equality with dependencies.
+         */
+        Dependency(String name) {
+            pack = name.intern();
+            mytype = DUMMY;
+            option = null;
+        }
+
         public String type() {
             return mytype;
         }
@@ -333,6 +385,13 @@ public class GenerateDependencies {
         }
         public String option() {
             return option;
+        }
+        public String toString() {
+            return pack;
+        }
+        public boolean equals(Object o) {
+            return o instanceof Dependency
+                    && ((Dependency)o).packName() == packName();
         }
         public int compareTo(Object o) 
                 throws ClassCastException {
