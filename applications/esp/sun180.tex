@@ -7,9 +7,9 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {180.4}
-\newcommand{\stardocauthors}   {Norman Gray\\Grant Privett}
-\newcommand{\stardocdate}      {15 June 1998}
+\newcommand{\stardocnumber}    {180.5}
+\newcommand{\stardocauthors}   {Norman Gray\\Grant Privett\\Mark Taylor}
+\newcommand{\stardocdate}      {11 November 1999}
 \newcommand{\stardoctitle}     {ESP --- Extended Surface Photometry}
 \newcommand{\stardocversion}   {Version 0.9}
 \newcommand{\stardocmanual}    {User's Manual}
@@ -19,7 +19,7 @@ of application programs developed to allow you to determine the photometric
 properties of galaxies and other extended objects. 
 
 It has applications that:
-detect flatfielding faults, remove cosmics rays, median filter images,
+detect flatfielding faults, remove cosmic rays, median filter images,
 determine image statistics, determine local background values,
 perform galaxy profiling, fit 2-D Gaussian profiles to galaxies, 
 generate  pie slice cross-sections of galaxies and display 
@@ -444,11 +444,11 @@ and may be skipped by the normal user.
 
 ESP is supplied as a compressed tar file: {\tt esp.tar.Z}. To install ESP 
 the file must be must be uncompressed and the contents extracted to a
-suitable directory.  On Starlink systems, this would be {\tt /star/esp}.
+suitable directory.  On Starlink systems, this would be {\tt /star/sources/esp}.
 
 \begin{myquote}
 \begin{verbatim}
-% mkdir /star/esp ; cd /star/esp
+% mkdir /star/sources/esp ; cd /star/sources/esp
 % zcat /tmp/esp.tar.Z | tar xvf -
 \end{verbatim}
 \end{myquote}
@@ -493,9 +493,6 @@ setenv ESP_HELP /star/help/esp/esp
 \end{verbatim}
 \end{myquote}
 
-Users with very limited disk space may gain 5 megabytes by removing the 
-{\tt esp\_demo.tar} file once installation is complete.
-
 \section{Starting up ESP}
 \label{sec:starting}
 
@@ -508,6 +505,12 @@ your {\verb+ ~/.login+} file.
 \begin{myquote}
 \begin{verbatim}
 % source esp.csh
+\end{verbatim}
+\end{myquote}
+On Starlink systems this can usually be abbreviated
+\begin{myquote}
+\begin{verbatim}
+% esp
 \end{verbatim}
 \end{myquote}
 
@@ -583,7 +586,7 @@ another level of help:
  
    Usage:
  
-      LOBACK IN INFILE SFACT THIRD COSYS OUT WIDE
+      LOBACK IN INFILE SFACT THIRD OUT WIDE
  
    Description:
  
@@ -604,7 +607,8 @@ another level of help:
       All co-ordinates are read from a two or three columns
       ASCII text file. If two columns are present then these are
       taken as representing the image co-ordinates required for the
-      regions of the image to be considered. If three columns are
+      regions of the image to be considered.  Co-ordinates are in
+      the Current coordinate system of the NDF. If three columns are
       present the third column respresents the width of the area
       to be sampled or the number of contiguous pixels detected there
       by FOCAS or IMAGES.
@@ -627,7 +631,7 @@ another level of help:
 
 An obvious example is determining the statistics (and in particular the
 modal count)  of an image. So, imagine you are logged in and the
-espstart command has already been issued, then the following session is
+{\tt esp} command has already been issued, then the following session is
 what would be required to examine the NDF image p2 stored in the
 current directory.
 
@@ -795,7 +799,7 @@ Interpolated:              39.609
 
 One of the key uses of ESP is for profiling images of galaxies.
 The ESP application for doing this is ELLPRO. If we again assume we
-are logged on and that the espstart command has been issued,
+are logged on and that the {\tt esp} command has been issued,
 then the following is a simple session using it. The example 
 assumes also, that the \xref{KAPPA}{sun95}{} command has been issued allowing use of the
 DISPLAY routine. For the simplest use of ELLPRO, the image containing
@@ -827,7 +831,7 @@ CURSOR - Use the cursor to identify the galaxy centre? /TRUE/ > Y
  
 Choosing a value of TRUE for MODE tells the program that you will
 either be typing in a value for the location of the galaxy centre on the image
-or using a cursor to indiate where it is. The alternative is for the program to
+or using a cursor to indicate where it is. The alternative is for the program to
 read in a list of co-ordinates from a text file. Specifying a value of TRUE
 for CURSOR then tells the program that you will be inputting the location by
 using a cursor. This is only possible if you have previously displayed an
@@ -836,11 +840,8 @@ displayed on a device then the most recently added image displayed
 (containing a DATA component) is examined. This information is obtained from
 the AGI database.
 
-The next information required is to name an ARD file if one is to be used to
-define the good parts of the image. In this case `!' is entered because no
-ARD file will be used. Instead, the whole image will be used. To make sure
-you're aware of this, the program issues a warning. It then requests the
-name of the display device on which your galaxy is currently displayed - 
+The next information required is the
+name of the display device on which your galaxy is currently displayed --
 in this case Xwindows. It then looks at the AGI database to determine 
 what image you used to create the displayed image and displays its name
 to allow you to check that it is the right one. After a brief pause
@@ -851,31 +852,49 @@ of the space bar and buttons on IKONs.
 
 \begin{myquote}
 \begin{verbatim}
-ARDFIL - masking ARD file / / > !
-WARNING! - ARD file not used.
-IMGDEV - Which device is displaying the image /@xwindows/ > xw
+IMGDEV - Which device is displaying the image? /@xwindows/ > xw
 
-Using ic3374c as the input NDF.
+Using /local2/data/esp/ic3374c as the input NDF.
 
-Select the galaxy origin via mouse and
-using 1 or space. Type . or use button to exit.
-Current data co-ordinate 93,96
-Current world co-ordinate 92.43, 95.35
+Select the centre of the galaxy to be profiled.
+Keyboard "2" key:   Quit the program.
+Keyboard "." key:   Select the galaxy.
+Keyboard "1" key:   Show the cursor co-ordinates.
+  SKY frame co-ordinates:  RA = -11:23:21.6,  Dec = 62:13:07
 \end{verbatim}
 \end{myquote}
 
-When you identify the location you want, the program identifies that location in
-terms of world and data co-ordinate systems.
+When you identify the location you want,
+the program identifies that location in the Current co-ordinate 
+system of the image.
+In this example, the image's Current co-ordinate frame is in the
+SKY domain, which has co-ordinates of RA and Dec.
+If you wanted to have positions reported instead in a different
+co-ordinate frame in the image's World Coordinate System component,
+then prior to displaying it, you should select
+a different frame using \xref{KAPPA}{sun95}{}'s
+\xref{WCSFRAME}{sun95}{WCSFRAME} command.
+For instance the following would cause all the co-ordinates to 
+be reported in PIXEL co-ordinates:
+\begin{myquote}
+\begin{verbatim}
+% wcsframe ic3374 pixel
+\end{verbatim}
+\end{myquote}
+You can find out more about World Co-ordinate System (WCS)
+components of NDFs in \xref{SUN/95}{sun95}{se:wcsuse}.
+
 Once the galaxy centre is identified, it is necessary to describe how far out
 from the centre you want the profiling to continue (if possible). This is again
 achieved via the cursor. 
-                                      
+
 \begin{myquote}
 \begin{verbatim}
-Select a point defining the maximum permitted radius via the mouse
-using 1 or space. Type . or use button to exit.
-Current data co-ordinate 67,76
-Current world co-ordinates 66.09, 75.78
+Indicate the outer limit of the galaxy.
+Keyboard "2" key:   Quit the program.
+Keyboard "." key:   Select the outer limit of the galaxy.
+Keyboard "1" key:   Show the cursor co-ordinates.
+  SKY frame co-ordinates:  RA = -11:23:17.0,  Dec = 62:12:43
 \end{verbatim}
 \end{myquote}
 
@@ -892,31 +911,54 @@ command line parameter COLOUR when starting ELLPRO, i.e.:
 
 Where the valid range of colours (N) for drawing the lines is 0-3.
 
-The next prompts displayed are very simple to understand.
+The next prompts displayed are simple to understand.
 
 \begin{myquote}
 \begin{verbatim}
 FRZORI - Is the galaxy origin to be frozen? /FALSE/ > F
 BACK - Background value /6179/ > 760.5
 SIGMA - Standard deviation of the background /392/ > 12.07
-PSIZE - Size of the pixels /1/  1.
-AUTOL - Automatically search for better origin? /TRUE/ > T 
-AUTOLT - Use a centroid? /FALSE/ > Y
+Using info from SKY frame - pixels are  0.961 arcseconds square.
 \end{verbatim}
 \end{myquote}
-
-BACK and SIGMA are the modal pixel value in the image and its associated
-standard deviation. PSIZE is the image pixel size (in arc seconds). AUTOL will refine 
+The first parameter, FRZORI,
+asks if the galaxy position you proposed (and refined with
+AUTOL if required) should be held to
+be the galaxy centre throughout the profiling operation or, 
+is it allowed to vary slightly 
+from ellipse to ellipse if that provides a better fit? 
+BACK and SIGMA are the modal pixel value in the image and its
+associated standard deviation.
+Since the image in this example has a SKY co-ordinate frame
+(it does not have to be the Current frame),
+the program then works out the pixel size in arc seconds and reports it.
+If your image does not have any SKY co-ordinates, then you will
+be prompted to enter this as the value of a parameter PSIZE.
+The final group of configuration parameters is as follows:
+\begin{myquote}
+\begin{verbatim}
+ZEROP - Surface brightness zerop point (in magnitudes per arcsec) /27.5/ > 
+AUTOL - Automatically search for better origin? /YES/ > yes
+AUTOLT - Use a centroid? /NO/ > yes
+ARDFIL - Masking ARD file /@ardfile.dat/ > !
+!! SUBPAR: Null (!) response to prompt for parameter ARDFIL
+WARNING! - ARD file not used.
+\end{verbatim}
+\end{myquote}
+ZEROP is the base of the scale for the surface brightness plot 
+which will be made.
+AUTOL will refine 
 the estimate of the galaxy centre position you have proposed with the cursor
 if set to TRUE. In the case shown it has been requested and the method
-chosen was a centroid. The remaining parameter, FRZORI, asks if the galaxy 
-position you proposed (and refined with AUTOL if required) should be held to 
-be the galaxy centre throughout the profiling operation or, is it allowed to vary slightly 
-from ellipse to ellipse if that provides a better fit? It should be noted  
-that in this case the required inputs for FRZORI, PSIZE and AUTOL agreed with 
-those proposed by
-the application (value between `/'s), thus it was only really necessary to
-press the Return/Enter key to accept the proposed value. 
+chosen was a centroid. 
+The last information required is to name an ARD file if one is to be used to
+define the good parts of the image. In this case `!' is entered because no
+ARD file will be used. Instead, the whole image will be used. To make sure
+you're aware of this, the program issues a warning. 
+
+It should be noted that for those required inputs which match the 
+values suggested by the program, it is sufficient just to press
+the Return/Enter key to accept the proposed value.
 
 The program then starts to work on the profiles. It first makes a guess at 
 the crude shape of the galaxy at some smallish radius and (hopefully) 
@@ -932,18 +974,20 @@ you to see what progress is being made.
 \begin{myquote}
 \begin{verbatim}
 Initial parameter estimates
-Rad(*)   4.7   Posang  -22.5  Ellipt. .727
+Rad(*)     5.41  Posang   12.1  Ellipt.  .692
 
-  X       Y       Points  Rad(*)   Count    PA     Ellipt   Dev.   PPU
-  93.2    96.4     64     4.11    139.5    -21.4    0.559   1.0    100.
-  93.0    96.2     24     2.50    184.5    -25.3    0.590   1.5    100.
-  93.2    96.4     60     3.96     144.4   -21.4    0.568   1.1    100.
-  93.4    96.4     88     5.75      95.1   -13.8    0.630   0.8    100.
-  93.4    96.3    100     6.39      80.4   -15.1    0.599   0.6    100.
+  X       Y     Points   Rad(*)    Count     PA   Ellipt  Dev.  PPU  Statistic
+
+Residual calculation: weighted SD
+  93.3    96.5    76      4.81      114.2  -16.4  0.593    0.9  100.  0.87E+03
+  93.0    96.1    20      0.16      213.8  -31.7  0.116    0.4  100.  0.97E+03
+  93.0    96.2    20      0.27      211.6  -23.4  0.141    0.9  100.  0.97E+03
+  93.0    96.1    20      0.36      211.3  -23.4  0.141    0.8  100.  0.97E+03
+  92.9    96.2    20      0.45      210.6  -23.4  0.141    0.8  100.  0.97E+03
   ----    ----    ---     ----       ---    ----    -----   ---    ----
   ----    ----    ---     ----       ---    ----    -----   ---    ----
   ----    ----    ---     ----       ---    ----    -----   ---    ----
-  93.1    96.0    332    20.24       5.4    -0.9    0.573   0.4     94.
+  93.5    95.8   332     19.93        1.9   -2.9  0.602    0.5   92.  0.76E+03
  
 Mean count below threshold LIM2.
 \end{verbatim}
@@ -991,7 +1035,7 @@ AGAIN - Profile again? /FALSE/ >
 
 You are also prompted for the name of an output file into which the 
 profiling results are to be placed. If it is found that the name you provide is
-not allowable (i.e. there are illegal characters in the name or the file name
+not allowable (e.g.\ there are illegal characters in the name or the file name
 already exists) you will be reprompted. A `!' may be used to avoid creating a
 file if you do not wish to retain a copy of the results.
 
@@ -1035,6 +1079,20 @@ used for each of the galaxies. In the absence of a third column, the image's
 global value is employed. Local background values for different points may be
 easily determined using the ESP LOBACK application. 
 
+The co-ordinates given in this file should be in the 
+Current co-ordinate system of the image (which can be selected by
+\xref{WCSFRAME}{sun95}{WCSFRAME} as described in the previous section),
+so that for instance if the image had the SKY frame as Current,
+a suitable file might read something like:
+
+\begin{myquote}
+\begin{verbatim}
+ 0:07:21.4   30:33:04
+ 0:07:42.6   30:32:10
+ 0:07:22.9   30:27:20
+\end{verbatim}
+\end{myquote}
+
 An example of the sort of input required is shown below.
 
 \begin{myquote}
@@ -1043,32 +1101,35 @@ An example of the sort of input required is shown below.
  
 ESP ELLPRO running.
 MODE - Use the application interactively? /TRUE/ > f
-INFILE - Text file containing co-ordinates /@coords.dat/ > 
-ARDFIL - Masking ARD file /@ardfile.dat/ > !
-WARNING! - ARD file not used.
-IN - Image NDF filename /@F5FLAT/ > 
-COSYS - Use world or data co-ordinates to define a pixel /'D'/ > 
+INFILE - Text file containing co-ordinates /@coords.dat/ > f5coords.dat
+IN - Image NDF filename /@ic3374c/ > f5flat
 FRZORI - Is the galaxy origin to be frozen? /FALSE/ > 
 BACK - Background value /760/ > 22712
 SIGMA - Standard deviation of the background /12/ > 57
-RLIM - Maximum ellipse radius /10/ > 40
-PSIZE - Size of the pixels /1/ > 
-ZEROP - Surface brightness zerop point /27.5/ > 
+PSIZE - Size of the pixels (in arcsec) /1/ > 1
+RLIM - Maximum ellipse radius (in pixels) /10/ > 40
+ZEROP - Surface brightness zerop point (in magnitudes per arcsec) /27.5/ > 
 AUTOL - Automatically search for better origin? /TRUE/ > 
-AUTOLT - Use a centroid? /FALSE/ > f
+AUTOLT - Use a centroid? /TRUE/ > f
 Default background used for object at  426.9,  155.3 
 Default background used for object at  278.7,  300.0 
 Default background used for object at  206.6,  350.2 
-OUT - Text file for profile output /@testprof.dat/ > f5results
+ARDFIL - Masking ARD file /@ardfile.dat/ > !
+WARNING! - ARD file not used.
+OUT - Text file for profile output /@testprof.dat/ > f5results.dat
  
-Working on data co-ordinates: 426.9  155.3
+Working on PIXEL co-ordinates: 426.9  155.3
   19 ellipses determined.
-Working on data co-ordinates: 278.7  300.0
+Working on PIXEL co-ordinates: 278.7  300.0
   30 ellipses determined.
-Working on data co-ordinates: 206.6  350.2
+Working on PIXEL co-ordinates: 206.6  350.2
   12 ellipses determined.
 \end{verbatim}
 \end{myquote}
+
+Note that since the image in this example does not have a SKY 
+frame in its World Coordinate System component,
+you have to enter the PSIZE parameter by hand.
 
 In the example given, the co-ordinates file coords.dat identified the
 locations of 3 galaxies, but it could just as 
@@ -1098,15 +1159,12 @@ simpler to use a cursor, as in the example below.
  
 ESP SECTOR running.
 CURSOR - Use the cursor to identify the galaxy centre? /TRUE/ > 
-ARDFIL - Masking ARD file /@ardfile.dat/ > !
-WARNING! - ARD file not used.
 IMGDEV - Which device is displaying the image /@xwindows/ > 
-Using p2 as the input NDF.
 \end{verbatim}
 \end{myquote}
- 
-You are then asked if the image is to be masked with an ARD file (ARDFIL)
-and also on what device the image to be examined is displayed (DEVICE).
+
+You are then asked
+on what device the image to be examined is displayed (DEVICE).
 SECTOR then examines the AGI image database to determine the image's name.
 This is displayed so that the you can be sure the image used is as expected.
 
@@ -1116,38 +1174,48 @@ the pie-slice cross-section.
 
 \begin{myquote}
 \begin{verbatim}
-Select the sector origin pixel via mouse and
-using 1 or space. Type . or use button to exit.
-Current data co-ordinate x and y 84, 97
-Current world co-ordinate x and y 1782.266, 695.7253
- 
-Select the sector extent and direction via mouse
-and using 1 or space. Type . or use button to exit.
-Current data co-ordinate x and y 83, 77
-Current world co-ordinate x and y 1781.87, 675.8588
- 
-Select the sector angular width via mouse and
-using 1 or space. Use . or use button to exit.
-Current data co-ordinate x and y 89, 79
-Current world co-ordinate x and y 1787.813, 677.0508
+Using /local2/data/esp/ic3374c as the input NDF.
+
+Select the centre of the galaxy.
+Keyboard "2" key:   Quit the program.
+Keyboard "." key:   Select the galaxy.
+Keyboard "1" key:   Show the cursor co-ordinates.
+  SKY frame co-ordinates:  RA = -11:23:21.7,  Dec = 62:13:07
+
+Indicate centre of the outer limit of the sector.
+Keyboard "2" key:   Quit the program.
+Keyboard "." key:   Select centre of the outer  limit of the sector.
+Keyboard "1" key:   Show the cursor co-ordinates.
+  SKY frame co-ordinates:  RA = -11:23:21.4,  Dec = 62:12:25
+
+Select the sector angular width.
+Keyboard "2" key:   Quit the program.
+Keyboard "." key:   Select width of the sector.
+Keyboard "1" key:   Show the cursor co-ordinates.
+  SKY frame co-ordinates:  RA = -11:23:23.6,  Dec = 62:12:27
 \end{verbatim}
 \end{myquote}
 
-The application then asks for information about the image (BACK,
-SIGMA, ZEROP and PSIZE), how the results are to be displayed (SURF, RADISP)
+The application then asks 
+for information about the image (BACK, SIGMA and, if necessary, PSIZE),
+how the results are to be displayed (SURF, RADISP, ZEROP)
 and where the results are to be displayed (SAME, DEVICE).
 
 \begin{myquote}
 \begin{verbatim}
 MIRROR - Use two diametrically opposite slices? /TRUE/ > TRUE
-BACK - Background value /6179/ > 
-SIGMA - Standard deviation of the background /400/ > 
-PSIZE - Size of the pixels /1/ > 
+BACK - Background count value /760.5/ > 
+SIGMA - Standard deviation of the background /12/ > 
+Using info from SKY frame - pixels are  0.961 arcseconds square.
+
 SURF - Display counts as surface brightness? /TRUE/ > TRUE
 RADISP - Radius display mode /'r'/ > r
 ZEROP - Surface brightness zerop point /27.5/ > 
 AUTOL - Automatically search for better origin? /TRUE/ > 
-SAME - Use the same graphics device for the results graph? /FALSE/ > 
+ARDFIL - Masking ARD file /@ardfile.dat/ > !
+!! SUBPAR: Null (!) response to prompt for parameter ARDFIL
+WARNING! - ARD file not used.
+SAME - Use the same graphics device for the results graph? /TRUE/ > f
 DEVICE - Which device/type to display the graph /@x2windows/ > 
 \end{verbatim}
 \end{myquote}
@@ -1176,11 +1244,13 @@ lengths.
 
 \begin{myquote}
 \begin{verbatim}
-Select a point defining the lower limit for
-radius required. Type . or use button to exit.
- 
-Select a point defining the upper limit for
-radius required. Type . or use button to exit.
+Select a point defining the lower radius limit.
+Keyboard "2" key:   Quit the program.
+Keyboard "." key:   Select lower radius limit.
+
+Select a point defining the upper radius limit.
+Keyboard "2" key:   Quit the program.
+Keyboard "." key:   Select upper radius limit.
 \end{verbatim}
 \end{myquote}
  
@@ -1206,28 +1276,27 @@ and spiral galaxy models.
 
 \begin{myquote}
 \begin{verbatim}
-SECTOR Results for file: p2
- 
-Origin (data):    89.00, 101.00
-Origin (world): 1788.00, 700.00
- 
-Pixel count (raw):             9065.00
-Pixel count (subtracted):      2886.00
-Pixel count (sigma):              7.22
-Pixel count (Log(I-BACK)):        3.46
-Mag. rel. zero point:          18.8493
- 
-Central mag. spiral:  19.2929
-Central mag. ellipt:  17.6202
-Above or below sky:   -0.3306
- 
-Number of data points:      20 ie.  19.00"
-Range used (arc sec):     3.08,   8.84
- 
-Points used for spiral calculation:         5
-Scale length spiral:                  11.5530
-Points used for elliptical calculation.:    5
-Scale length elliptical:              3.98091
+SECTOR Results for file: /local2/data/esp/ic3374c
+
+Origin:  -11:23:21.6  62:13:08
+
+Pixel count (raw):              980.00
+Pixel count (subtracted):       219.50
+Pixel count (sigma):             18.29
+Pixel count (Log(I-BACK)):        2.34
+Mag. rel. zero point:          21.6464
+
+Central mag. spiral:  21.4506
+Central mag. ellipt:  16.9384
+Above or below sky:   -0.5397
+
+Number of data points:      46 ie.  43.22"
+Range used (arc sec):     0.63,  26.88
+
+Points used for spiral calculation:        27
+Scale length spiral:                   6.2582
+Points used for elliptical calculation.:   27
+Scale length elliptical:              0.08769
 \end{verbatim}
 \end{myquote}
 
@@ -1278,14 +1347,14 @@ Figure 5.
 \begin{myquote}
 \begin{verbatim}
 ELLPRO Header found.
-Source image was: F5FLAT
+Source image was: f5flat
 End of filename report.
  
 WHATD - Parameter to display /'s'/ > s
 RADISP - Radius display mode /'q'/ > r
 DEVICE - Which device/type to display the graph /@xw/ > xw
 RRANGE - Automatic radius limit selection? /TRUE/ > f
-FITLIM - Limit of the radius range to be fitted > 2.5,15 
+FITLIM - Limit of the radius range to be fitted (in arcsec) > 2.5,15 
 \end{verbatim}
 \end{myquote}
 
@@ -1316,8 +1385,39 @@ radius range of the part of the profile to be fitted.
 \begin{verbatim}
 Number of data points:      19
 Range used (arc sec):     2.5,  14.75
-X and Y co-ordinates (data):  426.10, 426.10
-X and Y co-ordinates (world):  426.10, 426.10
+X and Y co-ordinates (Base):  89.3, 99.8
+X and Y co-ordinates (Current):  1787.8, 698.3
+\end{verbatim}
+\end{myquote}
+
+Two sets of co-ordinates are displayed here to identify the point
+in question: those of the Base frame (GRID co-ordinates, which 
+always start at (1,1) for the bottom left pixel in the image)
+and those of whatever was the Current frame when the
+file being plotted by GRAPHS was generated.
+If the Current co-ordinate frame of the image has been changed
+using \xref{WCSFRAME}{sun95}{WCSFRAME} then the Current co-ordinates
+will no longer be correct, but the Base frame ones always will.
+You can set the Base frame to be Current, 
+and so used for display etc.,
+at any time by doing
+\begin{myquote}
+\begin{verbatim}
+% wcsframe myimage grid
+\end{verbatim}
+\end{myquote}
+
+More information is then given;
+values for central surface brightness (CSB), scale length and 
+range of data points used are displayed. The LCC (linear correlation
+coefficient) values give an idea of how good the fit was. Finally, you are 
+given the option to try fitting the profile again. If there is only one 
+object in the input file, the application will then stop, otherwise the 
+next profile from the file will be read and you will be allowed to profile 
+that.
+
+\begin{myquote}
+\begin{verbatim}
 Points used for spiral calculation:        12
 Scale length spiral:                   2.0442
 Points used for elliptical calculation.:   12
@@ -1327,20 +1427,11 @@ Extrapolated CSB elliptical:           4.6
 Spiral LCC squared:                    .92            
 Ellip. LCC squared:                    .95
  
- 
 AGAIN - Display again? /TRUE/ > f
  
 End of file found.
 \end{verbatim}
 \end{myquote}
-
-Thereafter, values for central surface brightness (CSB), scale length and 
-range of data points used are displayed. The LCC (linear correlation
-coefficient) values give an idea of how good the fit was. Finally, you are 
-given the option to try fitting the profile again. If there is only one 
-object in the input file, the application will then stop, otherwise the 
-next profile from the file will be read and you will be allowed to profile 
-that.
 
 One detail of this example needs a little more explanation. In one
 of its modes, GRAPHS can work automatically on input files
@@ -1352,9 +1443,10 @@ This method of working is selected by setting MODE to FALSE, but otherwise
 differs only slightly from the example above. 
 
 
+
 \subsection{Session 6 --- Looking at the image background variation}
 \xlabel{SESSION6}
-In this last session, the ESP application SKEW is employed to show
+In this  session, the ESP application SKEW is employed to show
 what parts of a source image suffer from poor flat fielding.
 Before you run this program you should run HISTPEAK for the source image to
 determine its background value and also its associated standard deviation.
@@ -1374,7 +1466,7 @@ Shape:      525 x 520 pixels
 Bounds:     x= 1:525  y= 1:520
 Image size: 273000 pixels
 OUT - Output NDF filename /@skew/ > skew
-WIDTH - Template width /8/ > 
+WIDTH - Template width (in arcsec) /8/ > 
 PSIZE - Pixel size /1/ > .88
 MODET - Use a global mode value (y/n)? /YES/ > 
 BACK - Background sky value /6200/ > 22716
@@ -1491,12 +1583,15 @@ Select the source location
 Left mouse button:        Select location.
 Middle mouse button:      Show cursor coordinates.
 Right button or CTRL-C:  Quit selection.
- 
+
+  PIXEL frame co-ordinates:  p1 = 92.7,  p2 = 93.7
  
 Indicate the outer limit of the source.
 Left mouse button:        Select location.
 Middle mouse button:      Show cursor coordinates.
 Right button or CTRL-C:  Quit selection.
+
+  PIXEL frame co-ordinates:  p1 = 92.7,  p2 = 93.7
 \end{verbatim}
 \end{myquote}
 
@@ -1518,7 +1613,10 @@ source image chosen (IMGDEV).
 Note that the PSIZE and FWHM parameters are new.  The first allows
 you to give the size of a single pixel in arcseconds; if you give a
 null parameter to PSIZE (that is, just an exclamation mark `!') then
-it will display results in units of pixels.  If you set FWHM to be
+it will display results in units of pixels.  As usual, if a SKY
+co-ordinate frame is present, the PSIZE will be worked out automatically
+without asking you.
+If you set FWHM to be
 true, then results will be displayed as FWHM, rather than the gaussian
 width parameter, sigma.
 
@@ -1636,7 +1734,7 @@ Source      X           Y         Angle   FWHMa/as     FWHMb/as         Peak
   1       93.17       96.13      110.00     6.9          4.0           198.39
 
 Current arbitrary residual   35.8
-OUT - Text file for parameter /@gaufit12.dat/ >
+OUT - Text file for parameter /@gaufit12.dat/ > gau.out
 
 \end{verbatim}
 \end{myquote}
@@ -1646,9 +1744,9 @@ As you can see, the source positions remained unchanged during the minimisation
 the other parameters varied considerably -  note that even at the last 
 iteration the position angle of one of the sources is still varying and the
 residual is dropping. 
-
-The information describing the model 
-sources created is placed in the output file gau.out.  
+The X and Y co-ordinates reported here,
+and those written to the output file {\tt gau.out}, 
+are in the Base co-ordinate system of the image.
 
 An example output file is shown in Section \ref{sec:output}
 and described in Appendix \ref{app:outputfiles}.
@@ -1679,12 +1777,14 @@ Left mouse button:        Select location.
 Middle mouse button:      Show cursor coordinates.
 Right button or CTRL-C:  Quit selection.
 
+  PIXEL frame co-ordinates:  p1 = 92.7,  p2 = 93.7
 
 Indicate the outer limit of the source.
 Left mouse button:        Select location.
 Middle mouse button:      Show cursor coordinates.
 Right button or CTRL-C:  Quit selection.
 
+  PIXEL frame co-ordinates:  p1 = 92.7,  p2 = 93.7
 
 Select the source location
 Left mouse button:        Select location.
@@ -1774,7 +1874,7 @@ Source      X           Y         Angle   FWHMa/as     FWHMb/as         Peak
 
 Background (fitted) = 774.059
 
-OUT - Text file for parameter /@gaufit13.dat/ > gaufit14.dat
+OUT - Text file for parameter /@gau.out/ > gau-2.out
 \end{verbatim}
 \end{myquote}
 
@@ -1874,7 +1974,7 @@ parts of the image to be ignored. In that case the syntax is:
 \end{myquote}
 
 In this example the source image p2 is used together with the 
-ARD file definition areas.dat (note the use of the '\^{ }' character). 
+ARD file definition areas.dat (note the use of the `\^{ }' character). 
 The histogram generated to 
 calculate the modal value is smoothed using a Gaussian filter 
 of radius 4 counts. The histogram generated is displayed on 
@@ -1917,7 +2017,7 @@ Interpolated:              39.609
 \end{myquote}
 
 The first section gives the name of the file used, the shape of the image,
-its title and the world co-ordinate range involved. This is output as soon as
+its title and the co-ordinate range involved. This is output as soon as
 the file name has been input, thereby allowing you to exit the application
 at an early stage if the wrong file has been requested.
 
@@ -2010,8 +2110,7 @@ The application can be used with the following syntax:
 
 \begin{myquote}
 \begin{verbatim}
-% loback in=p2 infile=coords.dat sfact=2 third=true cosys=w 
-         out=backs.dat width=64
+% loback in=p2 infile=coords.dat sfact=2 third=true out=backs.dat width=64
 \end{verbatim}
 \end{myquote}
 
@@ -2032,8 +2131,10 @@ reading the object list working on each in turn. The modal pixel values
 generated use the same methods as HISTPEAK, i.e. (un)smoothed histogram,
 projection and interpolation (see HISTPEAK).
 
-An example output file is shown in Section \ref{sec:output}
-and described in Appendix \ref{app:outputfiles}.
+An example output file is shown in 
+Appendix \ref{app:outputfiles}
+and described in 
+Section \ref{sec:output}.
 
 
 \section{Removing image contamination}
@@ -2078,7 +2179,7 @@ The application can be used with the following syntax:
 \end{myquote}
 
 This looks at the ARD text file areas.dat (note the use of the 
-'\^{ }' character and then sets the pixels defined 
+`\^{ }' character) and then sets the pixels defined 
 in p2 to be bad. The image so generated is output as the NDF masked.
 Other examples may be found in Appendix \ref{des:mask}.
 
@@ -2096,7 +2197,7 @@ by interactive use of the \xref{KAPPA}{sun95}{}'s ARDGEN and ARDMASK application
 Unfortunately, it is usually necessary to carry out this process with all the 
 images that are to be profiled. 
 
-\section{Removing cosmics rays and bright regions}
+\section{Removing cosmic rays and bright regions}
 \label{sec:removc}
 
 It is often found that images contain small bright dots scattered throughout 
@@ -2135,11 +2236,13 @@ The application can be used with the following syntax:
 
 \begin{myquote}
 \begin{verbatim}
-% topped in=galaxy out=cleaned psize=0.22 noise=false width=3.
-       back=6200 sigma=23 nsigma=10
+% topped in=galaxy out=cleaned noise=false width=3. back=6200 
+         sigma=23 nsigma=10
 \end{verbatim}
 \end{myquote}
 
+As usual, if there is no SKY frame in the NDF {\tt galaxy}
+then pixel size must also be supplied via the PSIZE parameter.
 In this example all pixels in the image galaxy with a pixel value 
 greater than BACK$+$10$\times$SIGMA are identified. Then, all the pixels 
 within a radius of 1.5 arc second of the bright pixels are set to the 
@@ -2213,7 +2316,10 @@ pixels are allowed to contribute to the skewness calculations (best used
 only if no bright objects are present). The sampling area used for the 
 calculation will be WIDTH/PSIZE by WIDTH/PSIZE pixels in size. 
 The final skewness values calculated are multiplied by the factor 
-1000 (making them more acceptable to HISTPEAK). Other examples may be 
+1000 (making them more acceptable to HISTPEAK). 
+As usual, if the image contains a SKY co-ordinate frame then the 
+need not be speficied.
+Other examples may be 
 found in Appendix \ref{des:skew}.
 
 \section{Highlighting faint diffuse objects}
@@ -2223,7 +2329,10 @@ Three small applications are included in ESP for the purposes of detecting faint
 diffuse objects in an image. The algorithms employed are used to generate 
 versions of the source image in which the contrast has been heightened for
 an object of a given scale length. They are described in the sections that 
-follow. 
+follow.
+For all the commands given here, if the image IN has a SKY co-ordinate
+frame in its WCS component, the PSIZE parameter will be calculated
+automatically and need not be given explicitly.
 
 \subsection{Self-correlation}
 
@@ -2463,28 +2572,27 @@ and the latter might take some time.
 The number of inputs required for ELLPRO can be quite large, but the 
 following examples can get you started :
 
-\begin{myquote}
-\begin{verbatim}
-% ellpro mode=true cursor=true in=img001 autol=true frzori=true 
-
+\begin{description}
+\item[{\tt
+   \% ellpro mode=true cursor=true in=img001 autol=true frzori=true}] 
+   \mbox{}\\
   Allows you to use the keyboard and cursor for input. The initial 
   cursor generated guess for the galaxy centre will be refined and 
   not allowed to move from isophote to isophote.
-
-% ellpro mode=true cursor=false in=img001 origin=[96,92] rlim=10 cosys=w
-
+\item[{\tt
+   \% ellpro mode=true cursor=false in=img001 origin="96 92" rlim=10}]
+   \mbox{}\\
   Permits interactive use of ELLPRO but only via the keyboard. The origin 
-  to be used is at world co-ordinates 96,92 and the profiling will extend 
+  to be used is at Current co-ordinates 96,92 and the profiling will extend 
   out to a radius of 10 arc seconds.
-
-% ellpro mode=false in=hh10 infile=objs out=profs autol=true autolt=true
-
+\item[{\tt
+   \% ellpro mode=false in=hh10 infile=objs out=profs autol=true autolt=true}]
+   \mbox{}\\
   A list of galaxy co-ordinates on image HH10 will be read from text 
   file OBJS. Each object will be profiled in turn and the results placed 
   in text output file PROFS. All galaxy centre values will be refined
   using a centroid method.
-\end{verbatim}
-\end{myquote}
+\end{description}
 
 An example output file for ELLPRO is shown in Appendix \ref{app:outputfiles}
 and described in Section \ref{sec:output}
@@ -2517,28 +2625,27 @@ somewhat.
 As for ELLPRO, the number of inputs required for ELLFOU can be quite large, 
 but the following examples can get you started :
 
-\begin{myquote}
-\begin{verbatim}
-% ellfou mode=true cursor=true in=img001 autol=true device=xw
-
+\begin{description}
+\item[{\tt
+   \% ellfou mode=true cursor=true in=img001 autol=true device=xw zerop=29}]
+   \mbox{}\\
   Allows you to use the keyboard and cursor for input. The initial cursor 
   generated guess for the galaxy centre will be refined and the profile 
-  displayed on device XW.
-
-% ellfou mode=true cursor=false in=img001 origin=[96,92] zerop=27.5
-         cosys=w
-
+  displayed on device XW.  The magnitude sacle zero point is at 29 
+  magnitudes per arc second.
+\item[{\tt
+   \% ellfou mode=true cursor=false in=img001 origin="8:36:50.2 0:17:22"}]
+  \mbox{}\\
   Permits interactive use of ELLPRO but only via the keyboard. The origin 
-  to be used is at world co-ordinates 96,92 and the magnitude scale zero 
-  point is at magnitude 27.5.
-
-% ellfou mode=false in=hh10 infile=objs out=profs autol=true
-
+  to be used is at Current co-ordinates (here in the SKY domain) 
+  (RA=8:36:50.2, Dec=31:17:22).
+\item[{\tt
+   \% ellfou mode=false in=hh10 infile=objs out=profs autol=true}]
+   \mbox{}\\
   A list of galaxy co-ordinates on image HH10 will be read from text 
   file OBJS. Each object will be profiled in turn and the results placed in 
   text output file PROFS. All galaxy centre values will be refined.
-\end{verbatim}
-\end{myquote}
+\end{description}
 
 A sample output file for ELLFOU is shown in Appendix \ref{app:outputfiles}
 and described in Section \ref{sec:output}.
@@ -2619,24 +2726,20 @@ GRAPHS. This application allows data derived during profiling to be displayed.
 
 The application operates in one of three ways:
 
-\begin{myquote}
-\begin{verbatim}
-- via use of a graphics display unit, a keyboard and a cursor or mouse.
-- via use of a graphics display unit and a keyboard.
-- via use of keyboard only (for automatic scale length determinations).
-\end{verbatim}
-\end{myquote}
+\begin{itemize}
+\item via use of a graphics display unit, a keyboard and a cursor or mouse.
+\item via use of a graphics display unit and a keyboard.
+\item via use of keyboard only (for automatic scale length determinations).
+\end{itemize}
 
 The mode of operation is defined by the parameters  MODE and CURSOR. 
 The settings required for each mode are, respectively:
 
-\begin{myquote}
-\begin{verbatim}
-- MODE=TRUE CURSOR=TRUE
-- MODE=TRUE CURSOR=FALSE
-- MODE=FALSE (A value for CURSOR will not be requested)
-\end{verbatim}
-\end{myquote}
+\begin{itemize}
+\item MODE=TRUE CURSOR=TRUE
+\item MODE=TRUE CURSOR=FALSE
+\item MODE=FALSE (A value for CURSOR will not be requested)
+\end{itemize}
 
 For the simplest case, files generated by SECTOR, the data 
 to be displayed is brightness (either in the form of magnitudes or relative 
@@ -2658,28 +2761,30 @@ stored in the output files can be shown in graphs. The data that may be
 displayed includes any of the following quantities (specify which using 
 parameter WHATD) versus radius:
 
-\begin{myquote}
-\begin{verbatim}
-- E --- ellipticity of the isophote ellipse
-- P --- position angle of the isophotal ellipses (units degrees)
-- S --- surface brightness of the isophotes 
-- X --- $x$ co-ordinate of the isophote centres
-- Y --- $y$ co-ordinate of the isophote centres
-- FC1/4 --- Fourier cosine descriptors
-- FS1/4 --- Fourier sine descriptors
-\end{verbatim}
-\end{myquote}
+\begin{itemize}
+\item[] E --- ellipticity of the isophote ellipse
+\item[] P --- position angle of the isophotal ellipses (units degrees)
+\item[] S --- surface brightness of the isophotes 
+\item[] X --- $x$ co-ordinate of the isophote centres (Base frame)
+\item[] Y --- $y$ co-ordinate of the isophote centres (Base frame)
+\item[] FC1/4 --- Fourier cosine descriptors
+\item[] FS1/4 --- Fourier sine descriptors
+\end{itemize}
 
-The radius value used for the graphs may be transformed by:
+Note that the X and Y co-ordinates are always stored in output files
+in the co-ordinates of the Base frame, not that of the Current frame.
+The Base (GRID) frame co-ordinates are in units of pixels and 
+always start at (1,1); they remain the same for a given image NDF,
+whereas Current co-ordinates may change according to which frame is
+selected as the Current one.
+The radius value (in arc seconds) used for the graphs may be transformed by:
 
-\begin{myquote}
-\begin{verbatim}
-- Q --- a quarter power law
-- L --- a logarithmic (base 10) function
-- S --- a half power law (square root)
-- R --- no transformation (simple linear)
-\end{verbatim}
-\end{myquote}
+\begin{itemize}
+\item[] Q --- a quarter power law
+\item[] L --- a logarithmic (base 10) function
+\item[] S --- a half power law (square root)
+\item[] R --- no transformation (simple linear)
+\end{itemize}
 
 The transformation required is chosen using the RADISP parameter.
 
@@ -2725,8 +2830,9 @@ Each has as its first line a title identifying the format version
 of the rest of the file together with the name of the application 
 that generated it. This is then followed by lines of text
 that define the source image that was used, its background 
-value (and its associated standard deviation), the pixel size, the galaxy
-co-ordinates employed, the zero point of the surface brightness
+value (and its associated standard deviation), the pixel size in arc seconds, 
+the galaxy co-ordinates in both Current and Base frames, 
+the zero point of the surface brightness
 magnitude scale (magnitudes per arc seconds) and the number of points 
 present. Essentially every piece of data required for subsequent
 calculation of scale length, display of results or reconstruction of
@@ -2804,7 +2910,7 @@ sources, to your (and GAUFIT's) considerable confusion.
 
 The software written for the HISTPEAK application contains routines that generate 
 a wide range of statistical quantities concerning the pixel values in
-an image. Clearly then, some uses writing their own software might want to 
+an image. Clearly then, some users writing their own software might want to 
 incorporate such routines into their own code. To make this easier to acheive 
 the salient parts of HISTPEAK have been made into an application HSUB wherein
 HISTPEAK (in a slightly modified form) is called from the main subroutine.
@@ -6135,7 +6241,8 @@ Sigma.     Width of the smoothed histogram peak.
 SLenS      Scale length (arc secs) of the spiral model fit.
 SLenE      Scale length (arc secs) of the elliptical model fit.
 Smoothed   Modal value of smoothed count histogram.
-X/Y        The x and y co-ordinate of the centre on the image.    
+X/Y        The x and y co-ordinate of the centre on the image (Base frame).
+Xc/Yc      The x and y co-ordinate of the centre on the image (Current frame).
 \end{verbatim}
 \end{myquote}
 
@@ -6143,56 +6250,57 @@ The output file examples are shown on the following pages.
 
 \newpage
 \textbf{ELLPRO} output text file.
-
 \begin{myquote}
 \begin{verbatim}
-## ESP ELLPRO V1.0 OUTPUT FILE
+## ESP ELLPRO V1.1 OUTPUT FILE
 ##
 ## Filename: 
-ic3374c                                                   
+/local2/data/esp/ic3374c
 ## Sigma (counts): 
-12
+12.07
 ## Pixel size (arc secs): 
-1
-## X/Y co-ordinates (data):
-93.09995 96.09995
-## X/Y co-ordinates (world):
-93.09995 96.09995
+0.9605179
+## X/Y co-ordinates (Base):
+93.0503 95.97249
+## X/Y co-ordinates (SKY):
+-11:23:21.6 62:13:08
 ## Background (counts): 
-760
+760.5
 ## Zero point of magnitude:
 27.5
 ## Number of points:
 11
 ## Ellipse Parameters:
-!! X       Y     Points  Rad(a)     Count     PA     Ellipt     Dev   PPU       
-  93.2    96.4     64     5.50       139.5   -21.5   0.559       1.0  100.      
-  93.0    96.2     20     1.00       211.8   -26.0   0.141       0.8  100.      
-  92.9    96.2     24     2.25       209.5   -26.0   0.141       0.8  100.      
-  93.2    96.2     48     4.25       164.9   -26.0   0.573       1.3  100.      
-  93.2    96.4     76     6.25       121.5   -16.8   0.578       0.9  100.      
-  93.4    96.3    100     8.25        81.1   -15.0   0.593       0.6  100.      
-  93.2    95.9    124    10.25        57.9   -17.8   0.592       0.7  100.      
-  93.5    95.9    200    16.25        21.6   -23.6   0.612       0.6  100.      
-  93.3    96.1    236    19.25        14.2   -13.2   0.612       0.5  100.      
-  93.2    95.9    280    22.75        14.4   -11.8   0.489       0.5   91.      
-  93.2    95.9    332    26.75         4.2   -13.1   0.650       0.5   89.      
-## Fourier Descriptors:
-!! Rad(a)  1xSin   1xCos   2xSin   2xCos   3xSin   3xCos   4xSin   4xCos        
-   5.50   -0.011   0.006  -0.009   0.011   0.043   0.054  -0.017  -0.009        
-   1.00   -0.008  -0.016  -0.002  -0.015   0.000   0.004   0.000   0.005        
-   2.25   -0.010  -0.020  -0.007  -0.010   0.008   0.000   0.002   0.000        
-   4.25   -0.006  -0.011  -0.015   0.012   0.064   0.026  -0.003  -0.003        
-   6.25   -0.019  -0.004  -0.028   0.005   0.018   0.048  -0.033  -0.034        
-   8.25    0.000  -0.030   0.005  -0.013  -0.009  -0.005  -0.035  -0.038        
-  10.25    0.069   0.025   0.002   0.016  -0.028  -0.020   0.022  -0.008        
-  16.25   -0.078  -0.037   0.056  -0.022   0.013   0.064  -0.093  -0.035        
-  19.25   -0.132  -0.061  -0.059  -0.009   0.028   0.003   0.105  -0.093        
-  22.75   -0.120  -0.227  -0.172  -0.005  -0.011  -0.061   0.102   0.061        
-  26.75   -0.211  -0.273  -0.058   0.123   0.323   0.293  -0.272  -0.493        
-!! NOTE: Radii values are stored on file as semi-major axis length              
-!!       measured in pixels but on screen as effective radii in arc secs.       
-## END                                                                          
+!! X       Y     Points   Rad(a)   Count     PA     Ellipt   Dev   PPU  Statistic
+  93.2    96.5     64      5.50     139.0   -21.5   0.558     1.0  100.     899.5
+  93.0    96.1     20      0.75     212.3   -26.0   0.141     0.7  100.     972.8
+  92.9    96.2     20      1.25     211.2   -26.0   0.141     0.8  100.     971.7
+  93.2    96.1     48      4.25     163.6   -26.0   0.580     1.3  100.     924.1
+  93.2    96.4     76      6.25     120.3   -16.9   0.584     0.9  100.     880.8
+  93.5    96.3    100      8.25      79.6   -14.9   0.602     0.6  100.     840.1
+  93.3    95.9    124     10.25      57.7   -17.8   0.587     0.6  100.     818.2
+  93.5    96.0    164     13.25      36.4   -27.0   0.575     0.7  100.     796.9
+  93.5    96.1    236     19.25      13.4   -15.9   0.626     0.5  100.     773.9
+  93.5    96.1    280     22.75      12.4   -12.7   0.528     0.5   91.     772.9
+  93.3    95.9    332     26.75       3.7   -12.9   0.643     0.5   90.     764.2
+## Fourier Descriptors
+!! Rad(a)   1xSin   1xCos   2xSin   2xCos   3xSin   3xCos   4xSin   4xCos
+     5.50   -0.011   0.000  -0.009   0.011   0.043   0.053  -0.018  -0.010
+     0.75   -0.006  -0.013  -0.001  -0.014   0.000   0.002   0.000   0.003
+     1.25   -0.008  -0.015  -0.003  -0.011   0.000   0.006   0.000   0.006
+     4.25   -0.003  -0.002  -0.017   0.013   0.062   0.026  -0.001  -0.004
+     6.25   -0.022  -0.005  -0.026   0.010   0.018   0.048  -0.034  -0.034
+     8.25   -0.004  -0.030   0.004   0.002  -0.015  -0.005  -0.035  -0.042
+    10.25    0.059   0.014   0.005   0.012  -0.043  -0.015   0.021  -0.009
+    13.25    0.041  -0.084   0.135  -0.044  -0.024   0.078  -0.065  -0.026
+    19.25   -0.246  -0.060   0.004   0.044   0.066   0.013   0.059  -0.075
+    22.75   -0.175  -0.311  -0.190   0.121   0.070  -0.039   0.090   0.018
+    26.75   -0.113  -0.219  -0.070   0.136   0.183   0.224  -0.417  -0.650
+!! NOTE: Radii values are stored on file as semi-major axis length
+!!       measured in pixels but on screen as equivalent radii in arc secs.
+!! NOTE: Position angles are stored on file with origin upward and clockwise 
+!!        rotation positive.
+## END
 \end{verbatim}
 \end{myquote}
 
@@ -6204,18 +6312,18 @@ one sheet of paper.
 
 \begin{myquote}
 \begin{verbatim}
-## ESP ELLFOU V1.0 OUTPUT FILE
+## ESP ELLFOU V1.1 OUTPUT FILE
 ##
 ## Filename: 
 ic3374c                                                   
 ## Sigma (counts): 
 12
 ## Pixel size (arc secs): 
-1
-## X/Y co-ordinates (data):
+0.9605179
+## X/Y co-ordinates (Base):
 93.09997 96.09995
 ## X/Y co-ordinates (world):
-93.09997 96.09995
+92.59997 95.59995
 ## Background (counts): 
 760
 ## Zero point of magnitude:
@@ -6248,6 +6356,7 @@ ic3374c
     17.03   0.063   0.258  -0.272  -1.155  -0.077  -0.113   0.146   0.499       
 !! NOTE: Radii values are stored on file as semi-major axes length              
 !!       measured in pixels but on screen as effective radii in arc secs.       
+!! NOTE: Position angles are stored on file with origin upward and clockwise rot
 ## END                                                                          
 \end{verbatim}
 \end{myquote}
@@ -6260,7 +6369,7 @@ one sheet of paper.
 
 \begin{myquote}
 \begin{verbatim}
-## ESP SECTOR V1.0 OUTPUT FILE 
+## ESP SECTOR V1.1 OUTPUT FILE 
 ##
 ## Filename: 
 ic3374c                                                   
@@ -6269,11 +6378,11 @@ ic3374c
 ## Sigma (counts):
 12
 ## Pixel size (arc secs):
-1
+0.9605179
 ## X/Y co-ordinates (data):
 93 96
-## X/Y co-ordinates (world):
-93 96
+## X/Y co-ordinates (SKY):
+-11:23:21.6 62:13:08
 ## Number of points:
 24
 ## Zero point for magnitude:
@@ -6317,12 +6426,12 @@ ic3374c
 
 \begin{myquote}
 \begin{verbatim}
-## ESP GRAPHS V1.0 OUTPUT FILE 
+## ESP GRAPHS V1.1 OUTPUT FILE 
 ##
 ## Filename: 
 ic3374c                                                   
-##  X       Y       X       Y     SLenS   SLenE    SCSB    ECSB
-  93.10   96.10   93.10   96.10  6.2129  0.2726    21.3    18.0                 
+##  X       Y         Xc        Yc      SLenS    SLenE   SCSB  ECSB   LCCS  LCCE
+   93.05   95.97 -11:23:21.6 62:13:08   5.0984   0.4906  21.5  19.4 0.991 0.827
 \end{verbatim}
 \end{myquote}
 
@@ -6331,7 +6440,7 @@ ic3374c
 
 \begin{myquote}
 \begin{verbatim}
-## ESP LOBACK V1.0 OUTPUT FILE
+## ESP LOBACK V1.1 OUTPUT FILE
 ##
 ## Filename: 
 ic3374c                                                    
@@ -6347,20 +6456,29 @@ ic3374c
 
 \begin{myquote}
 \begin{verbatim}
-## ESP GAUFIT V1.0 OUTPUT FILE
+## ESP GAUFIT V1.1 OUTPUT FILE
 ##
 ## Filename: 
-/home/user1/gjp/gauss/testsm                                                 
-   
+/local2/data/esp/hdf3                                                           
+!! Algorithm: least-squares
 ## Sigma: 
-9
+!! fitted
+15.98624
 ## Background: 
-12.2
+!! given
+39
 ## Source Parameters:
-!!   X         Y       Angle       Sa       Sb       Peak                    
-    44.1      75.4     167.0       8.8      8.1     101.7                      
-   215.2      82.0     108.3       9.6      7.9      25.5                       
-## END
+!!  X           Y         Angle       FWHMa/as     FWHMb/as      Peak 
+      306.2        57.2        12.7   0.268E+00    0.130E+00    0.264E+03
+      168.1        46.2        50.8   0.206E+00    0.180E+00    0.158E+03
+      182.9        85.4       115.0   0.185E+00    0.100E+00    0.114E+03
+       34.8       341.8        96.0   0.489E+00    0.148E+00    0.832E+02
+## Source Parameter Uncertainties:
+  0.737E-01   0.360E-01   0.173E-01   0.523E-02    0.250E-02   -0.100E+01
+  0.917E-01   0.869E-01   0.200E+00   0.809E-02    0.692E-02   -0.100E+01
+  0.111E+00   0.179E+00   0.819E-01   0.152E-01    0.885E-02   -0.100E+01
+  0.130E+00   0.438E+00   0.378E-01   0.710E-01    0.103E-01   -0.100E+01
+## END                                     
 \end{verbatim}
 \end{myquote}
  
