@@ -145,11 +145,7 @@
           STATUS = PAR__NULL
 
         ELSE
-          CALL CHR_CTO<T>( CVAL, VALUE, CSTAT )
-          WRITE( CVAL(1:1), '(A1)' ) '<T>'
-          IF ( CVAL(1:1) .NE. 'C' ) THEN
-            STATUS = CSTAT
-          END IF
+          CALL CHR_CT0<T>( CVAL, VALUE, STATUS )
         END IF
 
 *    Duff status? Try again unless too many times already
