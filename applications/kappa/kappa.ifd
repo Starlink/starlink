@@ -2224,13 +2224,13 @@ package kappa {
             helpkey *
           }
 
-         parameter in {
+         parameter ndf {
             position 1
             type NDF
             access READ
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
-            prompt {The input NDFs}
+            prompt {The input NDF}
             helpkey *
           }
       }

@@ -730,7 +730,7 @@ HYPERTEXT_DOCS = sun238.htx
 #  List of documentation files.
 
 DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
-$(PKG_NAME).news $(LICENCE)
+$(PKG_NAME).news $(LICENCE) id6.tex
 
 #  Conditions of use file.
 
@@ -756,7 +756,7 @@ LICENCE = $(PACK_NAME)_CONDITIONS
 #  file).
 
 BUILT_FILES = $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(OBJECT_LIBRARIES) \
-$(SHAREABLE_LIBRARIES) $(STARTUP_SCRIPT) $(FAC_ERRS) 
+$(SHAREABLE_LIBRARIES) $(STARTUP_SCRIPT) $(FAC_ERRS) $(OTHER_DOCS)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include

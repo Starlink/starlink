@@ -250,7 +250,7 @@ $(AIF_SOURCE) $(FTS_SOURCE) $(KPG_SOURCES) $(SEARCHTOOLS) $(KAPGRF_SOURCE)
 #  The contents of kaplibs.tar.
 UNIX_TOTAL = kaplibs_source.tar makefile mk sun238.tex sun238.htx_tar \
 kaplibs.news ira_source.tar fts_source.tar aif_source.tar ctg_source.tar \
-irq_source.tar kpg_source.tar lpg_source.tar kapgrf_source.tar \
+irq_source.tar kpg_source.tar lpg_source.tar kapgrf_source.tar id6.tex \
 KAPLIBS_CONDITIONS
 
 #  Target for use by the grp command.
