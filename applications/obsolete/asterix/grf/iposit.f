@@ -57,7 +57,7 @@
           CALL IPOSIT_SELECT(STATUS)
         ELSEIF (MODE.EQ.'SHO') THEN
           CALL IPOSIT_SHOW(STATUS)
-        ELSEIF (MODE.EQ.'SAV')
+        ELSEIF (MODE.EQ.'SAV') THEN
           CALL IPOSIT_SAVE(STATUS)
         ENDIF
 
@@ -600,3 +600,40 @@
 
 
 
+
+*+  IPOSIT_SAVE - save positions to file
+      SUBROUTINE IPOSIT_SAVE(STATUS)
+*    Description :
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+*    Import :
+*    Import-Export :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Functions :
+*    Local Constants :
+*    Local variables :
+      CHARACTER*40 REC/' '/
+      INTEGER IPOS
+*    Global Variables :
+      INCLUDE 'IMG_CMN'
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL MSG_BLNK()
+        DO IPOS=1,I_NPOS
+          CALL GRP_GET(I_POS_ID,IPOS,1,REC(6:),STATUS)
+          WRITE(REC(:3),'(I3)') IPOS
+          CALL MSG_PRNT(REC)
+        ENDDO
+        CALL MSG_BLNK()
+
+      ENDIF
+
+      END
