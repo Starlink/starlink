@@ -249,6 +249,6 @@
  99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'EDI1_SETLNK', STATUS )
 
 *  Invoke base method to perform linkage
-      CALL ADI_CALNXT( STATUS )
+      CALL ADI_SETLNK( ARGS(1), ARGS(2), STATUS )
 
       END

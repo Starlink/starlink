@@ -68,8 +68,6 @@
 *	adi_ccopy	 - Copy object component to output object component
 *	adi_copy	 - Make a copy of an objects data
 *	adi_print	 - Text representation of object
-*	adi_setlnk	 - Set ADI link field for ADIbase derived class pairs
-*	adi_unlnk	 - Reset ADI link field
 *
 *      Primitive data creation :
 *
@@ -141,6 +139,7 @@
 *       adi_fcomit	 - Commit buffered file changes to disk
 *       adi_fcreat	 - Create a new file system object
 *       adi_fopen	 - Open existing file system object
+*	adi_setlnk	 - Set ADI link field for ADIbase derived class pairs
 *
 *      Exception handling :
 *
@@ -678,19 +677,6 @@ F77_SUBROUTINE(adifn(print))( INTEGER(id), INTEGER(status) )
   }
 
 /*
-F77_SUBROUTINE(adifn(setlnk))( INTEGER(id), INTEGER(lid), INTEGER(status) )
-  {
-  GENPTR_INTEGER(id)
-  GENPTR_INTEGER(lid)
-  GENPTR_INTEGER(status)
-
-  _chk_stat;
-
-  adix_setlnk( (ADIobj) *id, (ADIobj) *lid, status );
-
-  _ERR_REP( "ADI_SETLNK", Estr__LnkFilObj );
-  }
-
 F77_SUBROUTINE(adifn(unlnk))( INTEGER(id), INTEGER(status) )
   {
   GENPTR_INTEGER(id)
@@ -2426,6 +2412,23 @@ F77_SUBROUTINE(adifn(fopen))( CHARACTER(fspec), CHARACTER(cls),
 	      mode, mode_length, (ADIobj *) id, status );
 
   _ERR_REP( "ADI_FOPEN", Estr__OpeFilObj );
+  }
+
+F77_SUBROUTINE(adifn(setlnk))( INTEGER(id), INTEGER(lid), INTEGER(status) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_INTEGER(lid)
+  GENPTR_INTEGER(status)
+
+  ADIobj        args[2];
+
+  _chk_stat;
+
+  args[0] = *id; args[1] = *lid;
+
+  adix_base_SetLink( 2, args, status );
+
+  _ERR_REP( "ADI_SETLNK", Estr__LnkFilObj );
   }
 
 /* -------------------------------------------------------------------------

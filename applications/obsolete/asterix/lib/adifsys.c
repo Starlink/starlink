@@ -778,7 +778,7 @@ void ADIfsysInit( ADIstatus status )
     MTHD_TENTRY( "FileCommit(_ADIbase)",        adix_base_null1 ),
     MTHD_TENTRY( "FileClose(_ADIbase)",        adix_base_null1 ),
     MTHD_TENTRY( "NewLink(_ADIbase,_ADIbase)", adix_base_NewLink ),
-    MTHD_TENTRY( "SetLink(_ADIbase,_ADIbase)", adix_base_SetLink ),
+/*    MTHD_TENTRY( "SetLink(_ADIbase,_ADIbase)", adix_base_SetLink ), */
     MTHD_TENTRY( "UnLink(_ADIbase,_ADIbase)",  adix_base_UnLink ),
   END_MTHD_TABLE;
 

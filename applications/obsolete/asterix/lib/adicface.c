@@ -70,8 +70,6 @@
 *	adic_ccopy	- Copy object component to output object component
 *	adic_copy	- Make a copy of an objects data
 *	adic_print	- Text representation of object
-*	adic_setlnk	- Set ADI link field for ADIbase derived class pairs
-*	adic_unlnk	- Reset ADI link field
 *
 *      Data creation :
 *
@@ -138,12 +136,13 @@
 *
 *      Data system :
 *
-*       adi_fclone       - Create a new as a clone of an input
-*       adi_fclose       - Close a file system object
-*       adi_fcomit       - Comit any buffered file changes to disk
-*       adi_fcreat       - Create a new file system object
-*       adi_fopen        - Open existing file system object
-*
+*       adic_fclone      - Create a new as a clone of an input
+*       adic_fclose      - Close a file system object
+*       adic_fcomit      - Comit any buffered file changes to disk
+*       adic_fcreat      - Create a new file system object
+*       adic_fopen       - Open existing file system object
+*       adic_setlnk      - Link two objects
+
 *      Exception handling :
 *
 *	adic_accpt	 - Accept an exception with given C name
@@ -553,24 +552,6 @@ void adic_print( ADIobj id, ADIstatus status )
 
   _ERR_REP( "adic_print", Estr__PriObj );
   }
-
-/* void adic_setlnk( ADIobj id, ADIobj lid, ADIstatus status )
-  {
-  _chk_stat;
-
-  adix_setlnk( id, lid, status );
-
-  _ERR_REP( "adic_setlnk", Estr__LnkFilObj );
-  }
-
- void adic_unlnk( ADIobj id, ADIstatus status )
-  {
-  _chk_stat;
-
-  adix_unlnk( id, status );
-
-  _ERR_REP( "adic_unlnk", Estr__UlnFilObj );
-  } */
 
 /* -------------------------------------------------------------------------
  * Data creation
@@ -1755,6 +1736,30 @@ void adic_fopen( char *fspec, char *cls, char *mode, ADIobj *id,
 
   _ERR_REP( "adic_fopen", Estr__OpeFilObj );
   }
+
+void adic_setlnk( ADIobj id, ADIobj lid, ADIstatus status )
+  {
+  ADIobj	args[2];
+
+  _chk_stat;
+
+  args[0] = id; args[1] = lid;
+
+  adix_base_SetLink( 2, args, status );
+
+  _ERR_REP( "adic_setlnk", Estr__LnkFilObj );
+  }
+
+/*
+ void adic_unlnk( ADIobj id, ADIstatus status )
+  {
+  _chk_stat;
+
+  adix_unlnk( id, status );
+
+  _ERR_REP( "adic_unlnk", Estr__UlnFilObj );
+  } */
+
 
 /* -------------------------------------------------------------------------
  * Exception handling
