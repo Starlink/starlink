@@ -69,6 +69,10 @@
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.2  1997/10/22 02:02:21  timj
+*     Add check for index range.
+*     Really do the check for good data.
+*
 *     Revision 1.1  1997/10/22 01:39:16  timj
 *     Initial revision
 *
@@ -108,6 +112,7 @@
 *     Local Variables:
       INTEGER I               ! Loop variable
       INTEGER J               ! Loop index
+      LOGICAL WARNING         ! Flag to indicate a warning should be issued
 
 *    External functions:
       INCLUDE 'NDF_FUNC'
@@ -115,19 +120,58 @@
 *.
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     Set no warning
+      WARNING = .FALSE.
+
+
 *     Loop through all points in the input data
-*     adding into the histogram
+*     adding into the histogram. 
+*     Should make sure that the I,Js are valid
 
-      DO I = 1, N_PTS
+*     Implement one loop that checks for data and one that just uses IJ
+*     More efficient than putting the IF inside the loop.
 
-         IF ((IN_DATA(I) .NE. VAL__BADR) .AND.
-     :        (NDF_QMASK(IN_QUALITY(I), BADBIT))) THEN
+      IF (USEDATA) THEN
 
-            GRID(IJ(1,I), IJ(2,I)) = GRID(IJ(1,I), IJ(2,I)) + 1
+         DO I = 1, N_PTS
 
-         END IF
+            IF ((IN_DATA(I) .NE. VAL__BADR) .AND.
+     :           (NDF_QMASK(IN_QUALITY(I), BADBIT))) THEN
 
-      END DO
+               IF ((IJ(1,I) .LE. NX) .AND. (IJ(1,I) .GT. 1) .AND.
+     :              (IJ(2,I) .LE. NY) .AND. (IJ(2,I) .GT. 1)) THEN
+               
+                  GRID(IJ(1,I), IJ(2,I)) = GRID(IJ(1,I), IJ(2,I)) + 1
+
+               ELSE
+                  
+                  WARNING = .TRUE.
+
+               END IF
+
+            END IF
+
+         END DO
+
+      ELSE
+
+         DO I = 1, N_PTS
+
+            IF ((IJ(1,I) .LE. NX) .AND. (IJ(1,I) .GT. 1) .AND.
+     :           (IJ(2,I) .LE. NY) .AND. (IJ(2,I) .GT. 1)) THEN
+
+               GRID(IJ(1,I), IJ(2,I)) = GRID(IJ(1,I), IJ(2,I)) + 1
+
+            ELSE
+
+               WARNING = .TRUE.
+               
+            END IF
+
+         END DO
+
+      END IF
+
 
 *     Find the maximum position
 
@@ -146,5 +190,18 @@
 
          END DO
       END DO
+
+*     Issue a warning if necessary. The WARNING flag will only
+*     be set if an index was found to be out of range in array IJ
+
+      IF (WARNING) THEN
+
+         STATUS = SAI__WARN
+
+         CALL ERR_REP(' ', 'SURFLIB_HISTOGRAM_GRID: Index out '//
+     :        'range when generating histogram', STATUS)
+
+      END IF
+
 
       END
