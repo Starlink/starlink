@@ -61,7 +61,11 @@ foreach $e (@elements) {
     foreach $ce (@content) {
 	$ce = lc($ce);
 	if ($ce =~ /[a-z]+/) {
-	    print "<elemref gi='$ce'>";
+	    if (SGML::DTD->is_elem_keyword($ce)) {
+		print "$ce";
+	    } else {
+		print "<elemref gi='$ce'>";
+	    }
 	} else {
 	    print "$ce ";
 	}
