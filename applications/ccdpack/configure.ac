@@ -23,7 +23,7 @@ AC_CHECK_LIB(itk3.1,Itk_Init)
 # this is.
 STAR_DECLARE_DEPENDENCIES([build], 
                           [chr agi ard ast chr fio ndf pgplot prm \
-                           psx trn pda ndg tcl tk itcl startcl])
+                           psx trn pda ndg tcl tk itcl startcl ifd])
 # STAR_LATEX_DOCUMENTATION(sun139)
 # STAR_LATEX_DOCUMENTATION(ccdpack)
 AC_CONFIG_SUBDIRS([tasks gen help main])
