@@ -119,11 +119,18 @@
 #     curselection
 #        Returns a list of the indices of any items selected in the
 #	 listbox.
+#     vmoveto pos
+#        Moves the viewable region vertically according to the value of
+#        the pos argument: 0 means the top is visible and 1 means the
+#        bottom is visible.
+#     hmoveto pos
+#        Moves the viewable region horizontally according to the value of
+#        the pos argument: 0 means the left is visible and 1 means the
+#        right is visible.
 
 #  Inheritance:
 #     This class inherits Ccd_base and its methods and configuration
 #     options, which are not directly occluded by those specified here.
-
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -142,6 +149,8 @@
 #        Added sethelp method.
 #     15-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     5-JUL-2001 (MBT):
+#        Added hmoveto and vmoveto methods.
 #     {enter_further_changes_here}
 
 #-
@@ -241,6 +250,20 @@
 #  Size of listbox contents.
       method size {} {
          return [$List size]
+      }
+
+#  Scrollbar positioning
+      method vmoveto { pos } {
+         set bar [lindex [scrollbarnames {left right}] 0]
+         if { $bar != "" } {
+            eval [$bar cget -command] moveto $pos
+         }
+      }
+      method hmoveto { pos } {
+         set bar [lindex [scrollbarnames {top bottom}] 0]
+         if { $bar != "" } {
+            eval [$bar cget -command] moveto $pos
+         }
       }
 
 #  Internal method for creating and or re-packing scrollbars
