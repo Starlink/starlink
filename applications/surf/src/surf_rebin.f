@@ -195,6 +195,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.54  1998/06/03 22:05:31  timj
+*     Add CALCSKY
+*
 *     Revision 1.53  1998/05/06 18:30:11  timj
 *     Increase size of 'IN' parameter.
 *
@@ -434,6 +437,7 @@ c
                                        ! pointer to scratch space holding
                                        ! apparent RA / x offset positions of
                                        ! measured points in input file (radians)
+      LOGICAL          CALCSKY         ! Are we calc skying?
       CHARACTER*5      CHOP_CRD        ! Chop coordinate frame
       REAL             CHOP_PA         ! Chop PA in arcsec
       REAL             CHOP_THROW      ! Chop throw in arcsec
@@ -576,6 +580,11 @@ c
                                        ! y shift to be applied to component map
                                        ! in OUTPUT_COORDS frame (radians)
       CHARACTER*1      SIGN            ! + or -
+      INTEGER          SKYNDF          ! NDF identifier to SKY
+      INTEGER          SKY_PTR(MAX_FILE) ! Pointer to SKY data
+      INTEGER          SKY_END(MAX_FILE) ! Pointer to end of SKY data
+      INTEGER          SKY_VPTR(MAX_FILE) ! Pointer to SKY error
+      INTEGER          SKY_VEND(MAX_FILE) ! Pointer to end of SKY error
       CHARACTER*40     SOBJECT         ! name of first object
       CHARACTER*10     SPMETHOD        ! Method of spline interpolation
       CHARACTER*80     STEMP           ! scratch string
@@ -584,6 +593,7 @@ c
       CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
       CHARACTER*15     SUTDATE         ! date of first observation
       CHARACTER*15     SUTSTART        ! UT of start of first observation
+      LOGICAL          THERE           ! Is a component there?
       LOGICAL          TIMES           ! Store the TIMES array
       INTEGER          TOT(MAX_FILE)   ! Number of integrations per input file
       INTEGER          TOTAL_BOLS      ! Number of bolometers
@@ -612,6 +622,7 @@ c
       INTREBIN = .FALSE.
       BOLREBIN = .FALSE.
       DESPIKE  = .FALSE.
+      CALCSKY  = .FALSE.
       QMF = .TRUE.
 
 
@@ -623,6 +634,9 @@ c
          INTREBIN = .TRUE.
       ELSE IF (TSKNAME .EQ. 'DESPIKE') THEN
          DESPIKE = .TRUE.
+         QMF = .FALSE.
+      ELSE IF (TSKNAME .EQ. 'CALCSKY') THEN
+         CALCSKY = .TRUE.
          QMF = .FALSE.
       END IF
 
@@ -643,11 +657,17 @@ c
          CALL MSG_OUTIF(MSG__VERB, ' ', '^PKG: Despiking data',
      :        STATUS)
 
+      ELSE IF (TSKNAME .EQ. 'CALCSKY') THEN
+
+         CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_OUTIF(MSG__VERB, ' ', '^PKG: Calculating sky',
+     :        STATUS)
+
       ELSE
 
          CALL PAR_CHOIC('REBIN_METHOD', 'Linear', 
-     :        'Linear,Bessel,Gaussian,Spline1,Spline2,Spline3', .TRUE.,
-     :        METHOD, STATUS)
+     :        'Linear,Bessel,Gaussian,Spline1,Spline2,Spline3,Median', 
+     :        .TRUE.,METHOD, STATUS)
 
          IF (METHOD.EQ.'BESSEL') THEN
 *     Bessel
@@ -672,8 +692,15 @@ c
             CALL MSG_OUTIF(MSG__NORM, ' ', 
      :           '^PKG: Initialising GAUSSIAN weighting functions',
      :           STATUS)
-            WEIGHTSIZE = 2
+            WEIGHTSIZE = 1
             CALL SCULIB_GAUSS_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
+
+         ELSE IF (METHOD.EQ.'MEDIAN') THEN
+*     Median
+            CALL MSG_SETC('PKG',PACKAGE)
+            CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :           '^PKG: Median regridding selected',
+     :           STATUS)
             
          ELSE IF (METHOD(1:6) .EQ. 'SPLINE') THEN
 *     Do nothing
@@ -1041,7 +1068,7 @@ c
 *     If we are just despiking we don't need to ask about the
 *     coordinates
 
-         IF (.NOT.DESPIKE) THEN
+         IF (.NOT.DESPIKE .AND. .NOT.CALCSKY) THEN
 
             IF (STATUS .EQ. SAI__OK) THEN
                IF (HOURS) then
@@ -1215,11 +1242,11 @@ c
 *     for REBIN and BOLREBIN but there doesn't seem to be much gain
 *     in doing this in the shared code.
             
-            IF (STATUS .EQ. SAI__OK) THEN
-               DO I = 1, FILE
-                  N_PTS(I) = N_BOL(I) * N_POS(I)
-               END DO
-            END IF
+         IF (STATUS .EQ. SAI__OK) THEN
+            DO I = 1, FILE
+               N_PTS(I) = N_BOL(I) * N_POS(I)
+            END DO
+         END IF
 
 *     First we have to put the data into bins related to position
 *     Returns the 2-D array filled with pointers to the individual
@@ -1227,31 +1254,31 @@ c
 
 *     Select the bit that is used for despiking
 
-            BITNUM = 4
+         BITNUM = 4
 
 *     Bin and despike the data
 
-            CALL SURF_GRID_DESPIKE(FILE, N_PTS, N_POS, N_BOL, BITNUM,
-     :           WAVELENGTH, DIAMETER, BOL_RA_PTR, BOL_DEC_PTR, 
-     :           IN_DATA_PTR, IN_QUALITY_PTR, 
-     :           MAP_SIZE(1), MAP_SIZE(2), I_CENTRE, J_CENTRE, NSPIKES,
-     :           QBITS, STATUS)
+         CALL SURF_GRID_DESPIKE(FILE, N_PTS, N_POS, N_BOL, BITNUM,
+     :        WAVELENGTH, DIAMETER, BOL_RA_PTR, BOL_DEC_PTR, 
+     :        IN_DATA_PTR, IN_QUALITY_PTR, 
+     :        MAP_SIZE(1), MAP_SIZE(2), I_CENTRE, J_CENTRE, NSPIKES,
+     :        QBITS, STATUS)
 
 *     Look through NSPIKES and see whether any spikes were detected
 *     Report the number to the user. Do it here as I want to get the
 *     list before I start asking for output files
 
-            DO I = 1, FILE
-               IF (NSPIKES(I) .GT. 0) THEN
-
-                  CALL MSG_SETC('FILE', FILENAME(I))
-                  CALL MSG_SETI('NS', NSPIKES(I))
-                  CALL MSG_SETC('PKG', PACKAGE)
-                  CALL MSG_OUTIF(MSG__NORM, ' ', 
-     :                 '^PKG: ^NS spikes detected in file ^FILE',
-     :                 STATUS)
-               END IF
-            END DO
+         DO I = 1, FILE
+            IF (NSPIKES(I) .GT. 0) THEN
+               
+               CALL MSG_SETC('FILE', FILENAME(I))
+               CALL MSG_SETI('NS', NSPIKES(I))
+               CALL MSG_SETC('PKG', PACKAGE)
+               CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :              '^PKG: ^NS spikes detected in file ^FILE',
+     :              STATUS)
+            END IF
+         END DO
 
 *     Now we need to write the new quality data to an output file
 *     Do this by propogating everything from each input file
@@ -1262,72 +1289,180 @@ c
 *     each input file. Also means that we now have to generate
 *     an output filename from the input
 
-            DO I = 1, FILE
+         DO I = 1, FILE
 
 *     No point writing an output file if there were none.
-               IF (NSPIKES(I) .GT. 0) THEN
+            IF (NSPIKES(I) .GT. 0) THEN
 
 *     Generate a default name for the output file
-                  CALL SCULIB_CONSTRUCT_OUT(FILENAME(I), SUFFIX_ENV, 
-     :                 SCUBA__N_SUFFIX,
-     :                 SUFFIX_OPTIONS, SUFFIX_STRINGS, OUT, STATUS)
+               CALL SCULIB_CONSTRUCT_OUT(FILENAME(I), SUFFIX_ENV, 
+     :              SCUBA__N_SUFFIX,
+     :              SUFFIX_OPTIONS, SUFFIX_STRINGS, OUT, STATUS)
 
 *     set the default
-                  CALL PAR_DEF0C('OUT', OUT, STATUS)
+               CALL PAR_DEF0C('OUT', OUT, STATUS)
 
 *     Get an NDF identifier to the input file
 *     (could simply do a SYSTEM copy!)
 
-                  CALL NDF_FIND (DAT__ROOT, FILENAME(I), ITEMP, STATUS) 
+               CALL NDF_FIND (DAT__ROOT, FILENAME(I), ITEMP, STATUS) 
 
 *     OK, propagate the input ndf to the output
  
-                  CALL NDF_PROP (ITEMP, 
-     :                 'Units,Axis,DATA,VARIANCE,Quality',
-     :                 'OUT', OUT_NDF, STATUS)
-
+               CALL NDF_PROP (ITEMP, 
+     :              'Units,Axis,DATA,VARIANCE,Quality',
+     :              'OUT', OUT_NDF, STATUS)
+               
 *     Check status for NULL (ie didn't want to write a file)
                
-                  IF (STATUS .EQ. PAR__NULL) THEN
+               IF (STATUS .EQ. PAR__NULL) THEN
 
-                     CALL ERR_ANNUL(STATUS)
-                     CALL NDF_ANNUL(ITEMP, STATUS)
+                  CALL ERR_ANNUL(STATUS)
+                  CALL NDF_ANNUL(ITEMP, STATUS)
 
-                  ELSE
+               ELSE
 
 *     Annul the input
-                     CALL NDF_ANNUL(ITEMP, STATUS)
+                  CALL NDF_ANNUL(ITEMP, STATUS)
 
 *     Map the quality array
 
-                     CALL NDF_MAP(OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
-     :                    QPTR, ITEMP, STATUS)
+                  CALL NDF_MAP(OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
+     :                 QPTR, ITEMP, STATUS)
                   
 *     Copy the new quality array
 
-                     CALL VEC_UBTOUB(.FALSE., N_POS(I) * N_BOL(I),
-     :                    %VAL(IN_QUALITY_PTR(I)), %VAL(QPTR), IERR,
-     :                    NERR, STATUS)
+                  CALL VEC_UBTOUB(.FALSE., N_POS(I) * N_BOL(I),
+     :                 %VAL(IN_QUALITY_PTR(I)), %VAL(QPTR), IERR,
+     :                 NERR, STATUS)
 
 *     Get and set the bad bits mask
-                     CALL NDF_BB(OUT_NDF, BADB, STATUS)
-                     BADB = SCULIB_BITON(BADB, 4)
-                     CALL NDF_SBB(BADB, OUT_NDF, STATUS)
+                  CALL NDF_BB(OUT_NDF, BADB, STATUS)
+                  BADB = SCULIB_BITON(BADB, 4)
+                  CALL NDF_SBB(BADB, OUT_NDF, STATUS)
                   
 *     Close output
                
-                     CALL NDF_UNMAP(OUT_NDF, 'QUALITY', STATUS)
-                     CALL NDF_ANNUL(OUT_NDF, STATUS)
-
-                  END IF
-
-*     Dont cancel the parameter if this is the last time round the loop
-*     This means that the HISTORY will contain some mention of this param
-                  IF (I .NE. FILE) CALL PAR_CANCL('OUT', STATUS)
+                  CALL NDF_UNMAP(OUT_NDF, 'QUALITY', STATUS)
+                  CALL NDF_ANNUL(OUT_NDF, STATUS)
 
                END IF
 
+*     Dont cancel the parameter if this is the last time round the loop
+*     This means that the HISTORY will contain some mention of this param
+               IF (I .NE. FILE) CALL PAR_CANCL('OUT', STATUS)
+
+            END IF
+
+         END DO
+
+*     Calculate sky contribution
+      ELSE IF (CALCSKY) THEN
+
+*     Construct a N_PTS array containing the total number of data
+*     points for each map. This is calculated in a different place
+*     for REBIN and BOLREBIN but there doesn't seem to be much gain
+*     in doing this in the shared code. Also used in DESPIKE!!!
+            
+         IF (STATUS .EQ. SAI__OK) THEN
+            DO I = 1, FILE
+               N_PTS(I) = N_BOL(I) * N_POS(I)
             END DO
+         END IF
+
+
+*     Need to allocate memory for the sky calculation
+*     Probably shouldnt try to open all the input NDF at once
+*     since I may well run out of NDF identifiers
+
+*     In that case allocate memory using MALLOC
+         DO I = 1, FILE
+            SKY_PTR(I) = 0
+            SKY_END(I) = 0
+            SKY_VPTR(I) = 0
+            SKY_VEND(I) = 0
+            CALL SCULIB_MALLOC(N_POS(I)*VAL__NBR, SKY_PTR(I), 
+     :           SKY_END(I), STATUS)
+            CALL SCULIB_MALLOC(N_POS(I)*VAL__NBR, SKY_VPTR(I), 
+     :           SKY_VEND(I), STATUS)
+            
+         END DO
+
+*     Calculate the sky contribution
+         CALL SURF_GRID_CALCSKY(TSKNAME, FILE, N_PTS, N_POS, N_BOL,
+     :        WAVELENGTH, DIAMETER, BOL_RA_PTR, BOL_DEC_PTR, 
+     :        IN_DATA_PTR, IN_QUALITY_PTR, SKY_PTR, SKY_VPTR, QBITS,
+     :        STATUS)
+
+*     Open the input NDFs and create a new SKY NDF in the
+*     REDS extension of each
+
+         DO I = 1, FILE
+*     Open for read/write access
+            CALL NDF_OPEN (DAT__ROOT, FILENAME(I), 'UPDATE',
+     :           'OLD', OUT_NDF, ITEMP, STATUS) 
+
+*     Return locator to REDS extension
+            IF (STATUS .EQ. SAI__OK) THEN
+               CALL NDF_XLOC (OUT_NDF, 'REDS', 'UPDATE', OUT_REDSX_LOC, 
+     :              STATUS)
+               IF (STATUS .NE. SAI__OK) THEN
+                  CALL ERR_ANNUL (STATUS)
+                  CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
+     :                 0, 0, OUT_REDSX_LOC, STATUS)
+               END IF
+            END IF
+
+*     Create a 'SKY' extension (unless one already exists)
+            STEMP = 'SKY'
+
+            CALL DAT_THERE(OUT_REDSX_LOC, STEMP, THERE, STATUS)
+
+*     Delete if it is there
+            IF (THERE) CALL DAT_ERASE(OUT_REDSX_LOC, STEMP, STATUS)
+
+*     Create a new one
+            CALL NDF_PLACE (OUT_REDSX_LOC, STEMP, PLACE, 
+     :           STATUS) 
+            CALL NDF_NEW('_REAL', 1, 1, N_POS(I), PLACE, SKYNDF,
+     :           STATUS)
+
+*     Map the data array
+            CALL NDF_MAP(SKYNDF, 'DATA', '_REAL', 'WRITE',
+     :           QPTR, ITEMP, STATUS)
+
+*     Copy the sky data in
+            CALL VEC_RTOR(.FALSE., N_POS(I), %VAL(SKY_PTR(I)),
+     :           %VAL(QPTR), IERR, NERR, STATUS)
+
+*     Unmap DATA
+            CALL NDF_UNMAP(SKYNDF, 'DATA', STATUS)
+
+*     Free the sky data
+            CALL SCULIB_FREE('SKY', SKY_PTR(I), SKY_END(I), STATUS)
+
+*     Map the error array
+            CALL NDF_MAP(SKYNDF, 'ERROR', '_REAL', 'WRITE',
+     :           QPTR, ITEMP, STATUS)
+
+*     Copy in error
+            CALL VEC_RTOR(.FALSE., N_POS(I), %VAL(SKY_VPTR(I)),
+     :           %VAL(QPTR), IERR, NERR, STATUS)
+
+*     Unmap variance
+            CALL NDF_UNMAP(SKYNDF, '*', STATUS)
+
+*     Free the sky error
+            CALL SCULIB_FREE('SKY', SKY_VPTR(I), SKY_VEND(I), STATUS)
+
+
+*     Unmap the data array and close the NDF
+
+            CALL NDF_ANNUL(SKYNDF, STATUS)
+            CALL DAT_ANNUL(OUT_REDSX_LOC, STATUS)
+            CALL NDF_ANNUL(OUT_NDF, STATUS)
+
+         END DO
 
       ELSE
 
@@ -1672,6 +1807,17 @@ c
      :                    ABOL_RA_PTR, ABOL_DEC_PTR, %VAL(OUT_DATA_PTR), 
      :                    %VAL(OUT_VARIANCE_PTR), %VAL(OUT_QUALITY_PTR), 
      :                    %VAL(OUT_WEIGHT_PTR), STATUS )
+
+                  ELSE IF (METHOD .EQ. 'MEDIAN') THEN
+
+                     CALL SURFLIB_MEDIAN_REGRID(NFILES, N_PTS,
+     :                    DIAMETER, WAVELENGTH,
+     :                    OUT_PIXEL, MAP_SIZE(1), MAP_SIZE(2),
+     :                    I_CENTRE, J_CENTRE, 
+     :                    ABOL_RA_PTR, ABOL_DEC_PTR,
+     :                    ABOL_DATA_PTR,
+     :                    %VAL(OUT_DATA_PTR), %VAL(OUT_VARIANCE_PTR),
+     :                    %VAL(OUT_QUALITY_PTR), STATUS)
 
                   ELSE IF (METHOD(1:6) .EQ. 'SPLINE') THEN
 
