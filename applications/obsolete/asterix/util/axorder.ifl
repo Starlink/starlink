@@ -19,9 +19,9 @@
 
     PARAMETER SELAX
        POSITION 3
-       TYPE 'CHAR'
+       TYPE 'LITERAL'
        VPATH 'PROMPT'
-       PROMPT 'New order of axes - separate by spaces'
+       PROMPT 'New order of axes'
        HELP 'Use ASTERIX list notation, eg. 1,2 or 4,1:3'
     ENDPARAMETER
 
