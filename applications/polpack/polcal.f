@@ -701,8 +701,10 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
       ENDIF
       CALL NDF_CREAT( 'OUT', '_REAL', 3, LBND, UBND, NDFOUT, STATUS )
 
-*  Set the TITLE component for the output.
+*  Set the default TITLE component for the output, and then ask the user for a
+*  new title.
       CALL NDF_CPUT( TITLE, NDFOUT, 'TITLE', STATUS )
+      CALL NDF_CINP( 'TITLE', NDFOUT, 'TITLE', STATUS )
 
 *  Set the LABEL component for the output.
       CALL NDF_CPUT( LABEL, NDFOUT, 'LABEL', STATUS )

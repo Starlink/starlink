@@ -32,12 +32,21 @@ interface POLCAL
    endparameter
 
    parameter MODE
-      type     _CHAR
+      type     LITERAL
       access   READ
       vpath    'CURRENT, DEFAULT'
       default  'LINEAR'
       ppath    'DEFAULT'
       prompt   'Polarimetric mode (LINEAR or CIRCULAR)'
+   endparameter
+
+   parameter TITLE
+      type     LITERAL
+      access   READ
+      vpath    'DYNAMIC, DEFAULT'
+      default  'Output from POLPACK'
+      ppath    'DYNAMIC, DEFAULT'
+      prompt   'Title for output NDF'
    endparameter
 
    parameter VARIANCE		 # Variances required?
