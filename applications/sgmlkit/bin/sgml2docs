@@ -125,7 +125,7 @@ OPTIONS=
 DEBUGGING=false
 USEMANIFEST=true
 VERBOSE=true
-NORMTYPE=nonorm  # no normalisation by default
+NORMTYPE=simplenorm  # simple normalisation by default
 run=
 runn=
 tempdest=tmp.stamp
@@ -427,7 +427,10 @@ fi
 # declared in the entity, which may have a path.
 #
 # hlink and showme/findme get confused by Jade's way of generating elements.
-# To help out, run the files through sgmlnorm.
+# To help out, run the files through one of the normalising methods.
+# The option `simplenorm' just uses sed, and normalises the <a>
+# opening tags so that the entire opening tag is on one line;
+# sgmlnorm is bulletproof, but slow and more than seems necessary.
 if [ -r MANIFEST -o -n "$run" ]; then
     #mv `awk 'NF==1 {print $1}' MANIFEST` $PACKAGEDIR
     for f in `awk 'NF==1 {print $1}' MANIFEST`; do
@@ -436,6 +439,7 @@ if [ -r MANIFEST -o -n "$run" ]; then
 	    case $NORMTYPE in
 		nonorm) 
 		    cp $f $PACKAGEDIR/$f ;;
+
 		simplenorm)
 		    sed '/<[aA] *$/{:a;N;s/\n>/ >/;t;s/\n/ /;b a;}' $f >$PACKAGEDIR/$f ;;
 		sgmlnorm)
