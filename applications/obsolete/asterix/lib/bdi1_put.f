@@ -101,6 +101,7 @@
       CHARACTER*(DAT__SZLOC)	CLOC			! New component
       CHARACTER*20		ITEM
 
+      DOUBLE PRECISION		SCWID			! Scalar width
       DOUBLE PRECISION		SPARR(2)		! Spaced array data
 
       INTEGER			NELM			! # data elements
@@ -132,6 +133,26 @@
 
 *    Fill with regularly spaced values
         CALL ARR_REG1D( SPARR(1), SPARR(2), NELM, %VAL(PTR), STATUS )
+
+*    Unmap the array
+        CALL DAT_UNMAP( CLOC, STATUS )
+
+*  Trap the Axis_<n>_ScalarWidth item
+      ELSE IF ( (ITEM(1:5) .EQ. 'Axis_') .AND.
+     :          (ITEM(8:18).EQ.'ScalarWidth') ) THEN
+
+*    Locate object to be got
+        CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM(:7)//'Width', .TRUE.,
+     :                   CLOC, STATUS )
+
+*    Extract spaced parameters
+        CALL ADI_GET0D( ARGS(4), SCWID, STATUS )
+
+*    Map array for write
+        CALL DAT_MAPV( CLOC, '_DOUBLE', 'WRITE', PTR, NELM, STATUS )
+
+*    Fill with regularly spaced values
+        CALL ARR_INIT1D( SCWID, NELM, %VAL(PTR), STATUS )
 
 *    Unmap the array
         CALL DAT_UNMAP( CLOC, STATUS )

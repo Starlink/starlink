@@ -89,11 +89,10 @@
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
-      INTEGER                   NARG                    ! # arguments
-      INTEGER                   ARGS(*)                 ! Method arguments
+      INTEGER                   NARG, ARGS(*)
 
 *  Arguments Returned:
-      INTEGER                   OARG                    ! Returned data
+      INTEGER                   OARG
 
 *  Status:
       INTEGER 			STATUS             	! Global status

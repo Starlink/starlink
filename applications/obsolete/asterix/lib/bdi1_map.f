@@ -100,18 +100,13 @@
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
-      INTEGER                   NARG                    ! # arguments
-      INTEGER                   ARGS(*)                 ! Method arguments
+      INTEGER                   NARG, ARGS(*)
 
 *  Arguments Returned:
-      INTEGER                   OARG                    ! Returned data
+      INTEGER                   OARG
 
 *  Status:
       INTEGER 			STATUS             	! Global status
-
-*  External References:
-C      [external_declaration]
-C      {data_type} {external_name} ! [external_description]
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	CLOC			! New component
@@ -120,12 +115,9 @@ C      {data_type} {external_name} ! [external_description]
       CHARACTER*6		MODE
       CHARACTER*7		TYPE
 
-      INTEGER			FPTR			! Mapped file data
       INTEGER			NELM			! # mapped items
       INTEGER			PSID			! Private item storage
       INTEGER			PTR			! Mapped data address
-
-      LOGICAL			ISDYN			! Ptr is DYN object?
 *.
 
 *  Check inherited global status.
@@ -152,25 +144,24 @@ C      {data_type} {external_name} ! [external_description]
 *    Write mode?
         IF ( MODE .EQ. 'WRITE' ) THEN
 
-          CALL BDI1_ARYMAP( CLOC, TYPE, MODE, .FALSE., FPTR, PTR,
-     :                      ISDYN, NELM, STATUS )
+          CALL BDI1_ARYMAP( CLOC, TYPE, MODE, .FALSE., PSID, PTR,
+     :                      NELM, STATUS )
 
         ELSE
 
-          CALL BDI1_ARYMAP( CLOC, TYPE, MODE, .FALSE., FPTR, PTR,
-     :                      ISDYN, NELM, STATUS )
+          CALL BDI1_ARYMAP( CLOC, TYPE, MODE, .FALSE., PSID, PTR,
+     :                      NELM, STATUS )
 
         END IF
-
-*    Store the pointer and the locator in the private storage
-        CALL BDI1_STOMAP( PSID, ISDYN, CLOC, FPTR, PTR, TYPE, MODE,
-     :                    STATUS )
 
 *    Release storage
         CALL ADI_ERASE( PSID, STATUS )
 
 *    If mapping went ok, store the pointer in the return argument
         CALL ADI_NEWV0I( PTR, OARG, STATUS )
+
+*    Release the object
+        CALL DAT_ANNUL( CLOC, STATUS )
 
 *  Objects doesn't exist?
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
