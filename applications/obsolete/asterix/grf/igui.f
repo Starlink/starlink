@@ -131,6 +131,14 @@
         CALL NBS_DEFINE_PRIMITIVE(ID,'Y','_REAL',0,VAL__NBR,SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'RA','_CHAR',0,12,SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'DEC','_CHAR',0,12,SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'RA2000','_DOUBLE',0,VAL__NBD,
+     :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'DEC2000','_DOUBLE',0,VAL__NBD,
+     :                                                    SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'RA1950','_DOUBLE',0,VAL__NBD,
+     :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'DEC1950','_DOUBLE',0,VAL__NBD,
+     :                                                    SID,STATUS)
 *  data min/max
         CALL NBS_DEFINE_PRIMITIVE(ID,'MIN','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)

@@ -2699,12 +2699,21 @@ c        INTEGER STATUS
           CALL NBS_FIND_ITEM(I_NBID,'Y',ID,STATUS)
           CALL NBS_PUT_VALUE(ID,0,VAL__NBR,Y,STATUS)
           CALL IMG_WORLDTOCEL(X,Y,RA,DEC,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'RA2000',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBD,RA,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'DEC2000',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBD,DEC,STATUS)
           CALL CONV_DEGHMS(REAL(RA),RAS)
           CALL CONV_DEGDMS(REAL(DEC),DECS)
           CALL NBS_FIND_ITEM(I_NBID,'RA',ID,STATUS)
           CALL NBS_PUT_CVALUE(ID,0,RAS,STATUS)
           CALL NBS_FIND_ITEM(I_NBID,'DEC',ID,STATUS)
           CALL NBS_PUT_CVALUE(ID,0,DECS,STATUS)
+C          CALL IMG_WORLDTOCEL50(X,Y,RA,DEC,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'RA1950',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBD,RA,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'DEC1950',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBD,DEC,STATUS)
         ENDIF
 
       ENDIF
@@ -3689,6 +3698,7 @@ c        REAL XX,XP,YP
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
+        INCLUDE 'PRM_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -3699,6 +3709,8 @@ c        REAL XX,XP,YP
         BYTE ZERO
         PARAMETER (ZERO='00'X)
 *  Local variables :
+      REAL X1,X2,Y1,Y2
+      INTEGER ID
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
@@ -3714,11 +3726,48 @@ c        REAL XX,XP,YP
         CALL ARR_INIT1B(ZERO,I_NX*I_NY,%val(I_REG_PTR),STATUS)
         I_REG_TYPE='NONE'
 
+
+*  if running from a GUI put stuff on noticeboard
+        IF (I_GUI) THEN
+          CALL IMG_REGPERIM(X1,X2,Y1,Y2)
+          CALL NBS_FIND_ITEM(I_NBID,'REGXMIN',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,X1,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'REGXMAX',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,X2,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'REGYMIN',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,Y1,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'REGYMAX',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,Y2,STATUS)
+        ENDIF
+
       ENDIF
 
       END
 
 
+*+
+      SUBROUTINE IMG_REGPERIM(X1,X2,Y1,Y2)
+
+      IMPLICIT NONE
+
+*  Global constants :
+*  Global variables :
+      INCLUDE 'IMG_CMN'
+*  Import :
+*  Export :
+*  Status :
+*  Local constants :
+*  Local variables :
+*-
+
+*  calculate bounds in axis coords of current region
+      X1=I_XBASE+REAL(I_IX1-1)*I_XSCALE-0.5*I_XSCALE
+      X2=I_XBASE+REAL(I_IX2-1)*I_XSCALE+0.5*I_XSCALE
+      Y1=I_YBASE+REAL(I_IY1-1)*I_YSCALE-0.5*I_YSCALE
+      Y2=I_YBASE+REAL(I_IY2-1)*I_YSCALE+0.5*I_YSCALE
+
+
+      END
 
 *+ IMG_INBOUNDS
 	LOGICAL FUNCTION IMG_INBOUNDS(I,J)
