@@ -3,7 +3,7 @@ INTERFACE CORRECT
   PARAMETER INP
     POSITION    1
     TYPE        'LITERAL'
-    PROMPT      'First input data object'
+    PROMPT      'Input dataset'
     HELP        'May be N-d binned dataset, or even a scalar'
   ENDPARAMETER
 
