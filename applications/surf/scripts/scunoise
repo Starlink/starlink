@@ -24,11 +24,16 @@
 #   Programmer(s):      Remo Tilanus (JAC)
 #
 #   Comments:
+#     Starlink 'prologue' is at end since # is not a recognised comment
 #
 #   Modification History:
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
-#			
+#        $Log$
+#        Revision 1.2  1998/06/15 21:24:39  timj
+#        Add a Starlink prologue.
+#
+#    			
 ####                                                                ####
 ########################################################################
 #
@@ -1562,3 +1567,59 @@ sub fill_bol {
      'I6', "-0.6020E+02 0.4057E+02", 'I7', "-0.3669E+02 0.5404E+02",
      'I8', "-0.1578E+02 0.6389E+02", 'I9', "0.9047E+01 0.7776E+02");
 }
+
+
+
+_END_
+
+*+
+*  Name:
+*    SCUNOISE
+
+*  Purpose:
+*    Display SCUBA noise data
+
+*  Language:
+*    Perl 5
+
+*  Description:
+*    Scunoise can read in a directory of noise summaries (the .dat
+*    files produced by the real-time system) and plot them. A date
+*    must be supplied so that SCUNOISE can pick up the correct file
+*    associated with a given run number.
+*    Once the noise data are displayed the pointer can be moved over
+*    a point to determine the associated bolometer name. Double
+*    on the window will bring up a diagram of the array with all
+*    bolometers above the specified noise level (specified by the position
+*    of the pointer for the double click) highlighted in a different 
+*    colour.
+
+*  Usage:
+     scunoise [-h | -v | -d] [obsdate] [runnr]
+
+*  ADAM Parameter:
+*    -h
+*      Return a help message only.
+*    -v
+*      Return the version number of scunoise
+*    -d
+*      Switch on debug output
+*    obsdate
+*      Observation directory/date (eg. 19980210) 
+*    runnr
+*      SCUBA observation number of noise measurement.
+
+*  Examples:
+*    scunoise
+*      Prompt for date and run number
+*    scunoise 19980210 5
+*      Display the noise data for observation 5 on 19980210
+*    scunoise 19980315
+*      Prompt user for observation number, using data from 19980315.
+
+*  Notes:
+*    SCUNOISE has been developed for use at the JAC and therefore knows
+*    where to find the archived data. The current directory and $DATADIR
+*    are searched for files when the program is run outside of JAC.
+
+*-
