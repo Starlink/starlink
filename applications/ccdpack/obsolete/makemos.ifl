@@ -43,8 +43,8 @@ interface MAKEMOS
    parameter GENVAR              # Generate output variance information?
       type     _LOGICAL
       access   READ
-      vpath    'CURRENT,DEFAULT'
-      ppath    'CURRENT,DEFAULT '
+      vpath    'DYNAMIC,CURRENT,DEFAULT'
+      ppath    'DYNAMIC,CURRENT,DEFAULT '
       default  TRUE
       prompt   'Generate output variance information?'
       helpkey  *
