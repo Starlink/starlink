@@ -829,16 +829,16 @@ double StarWCS::width() const
 
     // And now get the distance between these positions in degrees.
     if ( raIndex_ == 1 ) {
-        point1[0] = xout[0];
-        point1[1] = yout[0];
-        point2[0] = xout[1];
-        point2[1] = yout[1];
-    } 
-    else {
         point1[1] = xout[0];
         point1[0] = yout[0];
         point2[1] = xout[1];
         point2[0] = yout[1];
+    } 
+    else {
+        point1[0] = xout[0];
+        point1[1] = yout[0];
+        point2[0] = xout[1];
+        point2[1] = yout[1];
     }
     dist = astDistance( wcs_, point1, point2 );
     if ( ! astOK ) astClearStatus;
@@ -855,6 +855,7 @@ double StarWCS::width() const
     else {
         dist *= 60.0 * r2d_;
     }
+    cout << "width = " << dist << endl;
     return dist;
 }
 
@@ -908,6 +909,7 @@ double StarWCS::height() const
     else {
         dist *= 60.0 * r2d_;
     }
+    cout << "height = " << dist << endl;
     return dist;
 }
 
