@@ -1,0 +1,92 @@
+## CHANGE_DATA - Modify data values
+ 
+#+
+#  Name:
+#     CHANGE_DATA.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     JFL:  John Lightfoot (ROE)
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1995 (JFL)
+#        Original Version
+#     1996 October (TIMJ)
+#        Add GLOBAL associations
+#     1996 November 1 (TIMJ)
+#        Add header and HELPLIB
+#     1997 March 19 (TIMJ)
+#	 Separate from MODIFY
+#     1997 March 31 (JFL)
+#        Use just BAD_QUALITY and IN parameters
+#     1997 April 30 (TIMJ)
+#        Add MSG_FILTER
+#     1997 May 1 (TIMJ)
+#        CHANGE_QUALITY.IFL becomes CHANGE_DATA.IFL
+#     {enter_further_changes_here}
+ 
+#-
+
+   INTERFACE CHANGE_DATA
+
+      HELPLIB 'SCUBA_HELP:'
+
+      PARAMETER      COMP           # NDF COMPONENT TO BE ANALYSED
+         TYPE        LITERAL
+         ACCESS      UPDATE
+         VPATH       'DEFAULT'
+         PPATH       'CURRENT, DEFAULT'
+         DEFAULT     'DATA'
+         PROMPT      'NDF array component to analyse'
+         HELPKEY     '*'
+#        IN          'DATA', 'ERROR', 'QUALITY', 'VARIANCE'
+      ENDPARAMETER
+ 
+      PARAMETER IN
+         POSITION 1
+         TYPE     '_CHAR'
+         VPATH    'PROMPT'
+         PROMPT   'Data to be modified ndf{data-spec}'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER 'OUT'
+         POSITION 3
+         TYPE     'FILENAME'
+         ACCESS   'WRITE'
+         VPATH    'PROMPT'
+         ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         PROMPT   'Name of output file to contain modified data'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER USE_SECTION
+        TYPE '_LOGICAL'
+        PROMPT 'Change this section (else change everything else)'
+        DEFAULT 'yes'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER VALUE
+	 POSITION 2
+         TYPE     LITERAL
+         DEFAULT  'bad'
+         PPATH    'DEFAULT'
+         PROMPT   'New data value'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+
+   ENDINTERFACE
+
