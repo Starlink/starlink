@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = ams_link_adam
+dist_bin_SCRIPTS = ams_link_adam
 
 lib_LTLIBRARIES = libams_adam.la
 
@@ -27,9 +27,11 @@ TESTS = amsmastertest
 check_PROGRAMS = amsmaster amsslave
 amsmaster_SOURCES = amsmaster.c
 amsslave_SOURCES = amsslave.c
+amsmaster_LDADD = `$(srcdir)/ams_link_adam`
+amsslave_LDADD = `$(srcdir)/ams_link_adam`
 amsmastertest: amsmaster amsslave
 	rm -f $@
 	echo "#! /bin/sh -" >$@
 	echo "./amsslave&" >>$@
-	echo "status=./amsmaster" >>$@
-	echo "exit $status" >>$@
+	echo "./amsmaster" >>$@
+	chmod 755 amsmastertest
