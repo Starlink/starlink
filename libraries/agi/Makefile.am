@@ -21,7 +21,7 @@ lib_LTLIBRARIES = libagi.la libagi_adam.la libagp.la libagp_adam.la
 
 # AGI libraries
 libagi_la_SOURCES = $(COMMON_F_ROUTINES) $(AGI_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
-libagi_adam_la_SOURCES = $(AGI_ADAM_F_ROUTINES) \
+libagi_adam_la_SOURCES = $(AGI_ADAM_F_ROUTINES) $(AGI_F_ROUTINES) \
                          $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
 
 # Shared AGP infrastructure
