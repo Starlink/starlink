@@ -73,11 +73,15 @@
 
 *  Authors:
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     AA: Alasdair Allan (Starlink, University of Exeter)
 *     {enter_new_authors_here}
 
 *  History:
 *     21-JUN-2000 (AJC):
 *        Original version.
+*     30-JUN-2004 (AA):
+*        Defined *psxtmstr as NULL, otherwise we'll get an undefined
+*        symbol when linking using the new autoconf system.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -99,7 +103,7 @@
 #include "psx_err.h"             /* PSX errors                              */
 #include "psx1.h"                /* declares psx1_rep_c */
 
-struct tm *psxtmstr;             /* Pointer to storage for tm struct        */
+struct tm *psxtmstr = NULL;     /* Pointer to storage for tm struct        */
 
 F77_SUBROUTINE(psx_gmtime)( INTEGER(nticks),
                             INTEGER(secs), INTEGER(mins), INTEGER(hours),
