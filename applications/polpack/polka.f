@@ -369,6 +369,9 @@
 *        produced in single-beam mode.
 *     22-APR-1999 (DSB):
 *        Removed parameter NEWCOLMAP.
+*     5-OCT-1999 (DSB):
+*        Corrected check on SSIZE prior to accessing SKYPAR. Previously
+*        SKYPAR was never accessed.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -627,7 +630,7 @@
       IF ( PSF .LT. 0 ) PSF = 0
 
 *  Get the order of the polynomial fit along each axis of a sky surface.
-      IF ( SSIZE .LT. 0 ) THEN
+      IF ( SSIZE .LE. 0 ) THEN
          CALL PAR_GDR0I( 'SKYPAR', 0, 0, 14, .FALSE., SKYPAR, STATUS )
       ELSE
          SKYPAR = 0
