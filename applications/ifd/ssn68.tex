@@ -799,8 +799,9 @@ associated with the package and known as the package \texttt{.icl} file.
 These files are described in detail in
 \xref{SSN/64}{ssn64}{}.
 \item[Shell Package Definition File] Defining the commands associated with 
-running the package direct from the shell. This file is known as the 
-package \texttt{.csh} file.
+running the package direct from the shell. This file is written in two
+syntaxes, the package \texttt{.csh} file for csh-type shells, and a
+\texttt{.sh} file for sh-type shells.
 These files are described in detail in
 \xref{SSN/64}{ssn64}{}.
 \end{description}
@@ -922,7 +923,7 @@ prefix pkg               # specifies a prefix for automatic aliases E.g
                          # being defined in addition to add.
 
 display {                 
-Message to display whilst .csh, .icl scripts for example are running
+Message to display whilst .csh, .sh, .icl scripts for example are running
 It will usually be the welcome message for the package.
 A display may contain any number of lines which will be displayed line
 for line. There may be more that one display in an IFD.
@@ -1101,7 +1102,7 @@ parameter \texttt{edit} set to \texttt{exist}
 and
 parameter \texttt{mode} set to \texttt{interface}.
 
-Note that in Starlink mode, both the csh and ICL user-interfaces will just
+Note that in Starlink mode, the csh, sh and ICL user-interfaces will just
 append anything following the \texttt{fitsexist} command to the 
 \texttt{fitsmod} command, following the fixed parameters. The
 \texttt{taskinherit} keyword has no effect.
@@ -1137,6 +1138,14 @@ load file
 # Define an alias in the .csh file
    alias command shell_command
   }
+
+# Output to the package.sh file.
+  sh {
+# Define a shell function in the .sh file.
+# (the exotic reference to the positional arguments is a portable
+# version of plain "$@")
+   command () { shell_command ${1+"$@"}; }
+  } 
 
 # Output to the package.cl file.
   cl {
@@ -1809,7 +1818,8 @@ File Keywords}
 }{
    \sstdescription{
       The specified filename is used in constructing ADAM Interface Files
-      and the package definition files package.icl and package.csh. IT IS
+      and the package definition files package.icl, package.csh and
+      package.sh.  IT IS
       NOT USED IN PRODUCING THE IRAF FILES.
 
       If not specified, the directory \${\em{PACKAGE}}\_HELP is used.
@@ -2101,7 +2111,8 @@ File Keywords}
       \htmlref{{\ssttt defhelp}}{defhelp},
       \htmlref{{\ssttt command}}{command},
       \htmlref{{\ssttt icl}}{icl},
-      \htmlref{{\ssttt csh}}{csh}.
+      \htmlref{{\ssttt csh}}{csh},
+      \htmlref{{\ssttt sh}}{sh}.
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -2453,6 +2464,43 @@ File Keywords}
    \ssteffects{
       \sstsubsection{ADAM:}{None.}
       \sstsubsection{IRAF:}{The parameter is set to `query' mode.}
+   }
+}
+
+\sstroutine{
+   sh
+}{
+   Lines for output to the \texttt{.sh} file
+}{
+   \sstdescription{
+      Specifies lines of text to be output to the \texttt{.sh} file.
+   }
+   \sstinvocation{
+      sh \{ \textit{text} \}
+   }
+   \sstarguments{
+      \sstsubsection{
+         \textit{text}
+      }{
+         The specified text is written to the \texttt{.sh} file. It may consist
+         of more than one line. The text should be legal sh-style
+         shell command language.
+      }
+         
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         sh \{ \# Define the help library\\
+         \tab KAPPA\_HELP=INSTALL\_HELP/kappa; export KAPPA\_HELP \\
+         \}
+      }{
+         Inserts a comment, and a command to set an environment
+         variable, into the \texttt{.sh} file.
+      }
+   }
+   \ssteffects{
+      \sstsubsection{ADAM:}{As defined.}
+      \sstsubsection{IRAF:}{None.}
    }
 }
 
