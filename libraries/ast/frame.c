@@ -8153,11 +8153,11 @@ void astNorm_( AstFrame *this, double value[] ) {
 }
 double astAxDistance_( AstFrame *this, int axis, double v1, double v2 ) {
    if ( !astOK ) return AST__BAD;
-   (**astMEMBER(this,Frame,AxDistance))( this, axis, v1, v2 );
+   return (**astMEMBER(this,Frame,AxDistance))( this, axis, v1, v2 );
 }
 double astAxOffset_( AstFrame *this, int axis, double v1, double dist ) {
    if ( !astOK ) return AST__BAD;
-   (**astMEMBER(this,Frame,AxOffset))( this, axis, v1, dist );
+   return (**astMEMBER(this,Frame,AxOffset))( this, axis, v1, dist );
 }
 void astOffset_( AstFrame *this, const double point1[], const double point2[],
                  double offset, double point3[] ) {
