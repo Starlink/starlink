@@ -159,7 +159,10 @@
 
 1 Changes_this_release
 
-  This is a major update to CCDPACK.
+  Release 3.0-1 makes only non-user-visible code modifications and minor
+  documentation bugfixes to the beta test release 3.0-0b.
+
+  Version 3.0 is a major update to CCDPACK.
 
   * CCDPACK has been revised to be aware of, and use, the World Coordinate
     System (WCS) components of NDFs - see SUN/95 and SUN/210.  This has 
@@ -237,11 +240,6 @@
              instead of exiting.
 
      - REGISTER: output to screen has changed slightly for readability.
-
-2 CCDPACK_release_v3.0-1
-
-  Changes between v3.0-0b and v3.0-1 comprise only non-user-visible
-  code modifications and minor documentation bugfixes.
 
 1 ASTEXP
 Exports coordinate system information from images to an AST file
