@@ -1,6 +1,7 @@
 
 #  Initialise linking options.
       nogks=''
+      notk=''
 
 #  Interpret command line switches.
 #  --------------------------------
@@ -10,6 +11,11 @@
 #  -nogks - Requests linking with native pgplot and without GKS or IDI
          -nogks)
             nogks='y'
+            shift;;
+
+#  -notk  - Requests linking without Tcl/Tk dependency
+         -notk)
+            notk='y'
             shift;;
 
 #  Once all switches have been read, continue with the rest of the script.
@@ -22,10 +28,17 @@
          esac
       done
 
+#  Sort out Tk libs
+      tklibs='-lkpgtk @TCL_LIBS@ @TK_LIBS@'
+      if test "${notk}" = 'y'; then
+        tklibs=''
+      fi
+
+
 #  Form list of graphics libraries.
       if test "${nogks}" = 'y'; then 
          echo -lkpg -lira -lirq -llpg -lctg -lfts -laif -lkapgrf  \
-           @TCL_LIBS@ @TK_LIBS@ \
+           ${tklibs} \
            `cat_link_adam` `ndg_link_adam` \
            `ndf_link_adam` `ast_link_adam -grf` \
            `agp_link_adam` `fio_link_adam` \
@@ -38,7 +51,7 @@
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
       else
          echo -lkpg -lkgs -lira -lirq -llpg -lctg -lfts -laif -lkapgrf \
-           @TCL_LIBS@ @TK_LIBS@ \
+           ${tklibs} \
            `cat_link_adam` `snx_link_adam` \
            `sgs_link_adam` `ndg_link_adam` \
            `gks_link_adam` `gns_link_adam` \

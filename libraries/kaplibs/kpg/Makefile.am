@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libkpg.la
+lib_LTLIBRARIES = libkpg.la libkpgtk.la
 
 libkpg_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
@@ -9,6 +9,8 @@ libkpg_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(C_ROUTINES) 
 
+libkpgtk_la_SOURCES = $(TK_ROUTINES)
+
 include_HEADERS = $(PUBLIC_INCLUDES)
 
 PUBLIC_INCLUDES = HLPCMD CTM_COM CTM_PAR
@@ -16,7 +18,9 @@ PRIVATE_INCLUDES = KPG_PAR KPG_AST
 BLOCK_DATA_FILES = ctm_xcols.f
 
 C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c  kpg1_trmsz.c \
-kpg1_ieeer.c  kpg1_isfinr.c  kpg1_tkast.c
+kpg1_ieeer.c  kpg1_isfinr.c
+
+TK_ROUTINES = kpg1_tkast.c
 
 F_ROUTINES = $(KPG_NONGEN) $(GEN_F_ROUTINES)
 
