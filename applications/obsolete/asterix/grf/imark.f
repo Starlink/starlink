@@ -167,7 +167,7 @@
 
 *  HEASARC format?
                       IF ( HDB ) THEN
-                        READ( REC, '(2(1X,F11.7))',IOSTAT=FSTAT )
+                        READ( REC, '(F11.7,1X,F11.7)',IOSTAT=FSTAT )
      :                                          CEL1950(1),CEL1950(2)
                         IF ( FSTAT.NE. 0 ) THEN
                           STATUS = SAI__ERROR
