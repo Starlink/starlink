@@ -136,7 +136,7 @@
       IF ( .NOT. AS_SIS_LOADED ) THEN
 
 *    Load grid
-        CALL PSF0_LDGRID( 'asca_sis_psfs', AS_SIS_DIMS, AS_SIS_NDIM,
+        CALL PSF0_LDGRID( 'asca_sis_psf', AS_SIS_DIMS, AS_SIS_NDIM,
      :                    AS_SIS_DX, AS_SIS_XYSAM, AS_SIS_RPTR,
      :                    AS_SIS_EPTR, AS_SIS_FLAGS, AS_SIS_DPTR,
      :                    STATUS )
