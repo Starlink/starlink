@@ -5,6 +5,7 @@ AST_ERR.xsh
 AST_WCSMAP.xsh
 AST_GRF.xsh
 MANIFEST
+ChangeLog
 Makefile.PL
 PGPLOT/PGPLOT.pm
 PGPLOT/Makefile.PL
@@ -38,7 +39,7 @@ t/specframe.t
 t/unitmap.t
 t/xmlchan.t
 t/zoommap.t
+t/keymap.t
 typemap
 typemap.561
-
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml
