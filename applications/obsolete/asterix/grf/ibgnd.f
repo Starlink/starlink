@@ -136,8 +136,6 @@
 *  Check image processing active
       IF ( .NOT. I_OPEN ) THEN
         CALL MSG_PRNT('AST_ERR: image processing system not active')
-      ELSE IF ( .NOT. I_DISP ) THEN
-        CALL MSG_PRNT('AST_ERR: no image currently displayed')
       ELSE
 
 *    Make sure transformations are correct
@@ -204,6 +202,15 @@
 
 *        Mark the new soruce
             CALL IBGND_MARK( I_BGM_NSRC, STATUS )
+
+*      Set the top source to display
+          ELSE IF ( CMD .EQ. 'TOPSRC' ) THEN
+
+*        Get top source number
+            CALL USI_GET0I( 'ISRC', ISRC, STATUS )
+
+*        Set top source
+            CALL IBGND_TOPSRC( ISRC, STATUS )
 
 *      Mark sources
           ELSE IF ( CMD .EQ. 'MARKSRC' ) THEN
@@ -740,7 +747,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'QUAL_PAR'
+      INCLUDE 'PRM_PAR'
 
 *  Global Variables:
       INCLUDE 'IMG_CMN'
@@ -750,6 +757,9 @@
 
 *  Status:
       INTEGER			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			ITEMID
 *.
 
 *  Check inherited global status.
@@ -779,6 +789,166 @@
 *    Recompute the samples and surface
         CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
 
+*    Update noticeboard
+        IF ( I_GUI ) THEN
+
+          CALL NBS_FIND_ITEM( I_NBID, 'BG_NSRC', ITEMID, STATUS )
+          CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBI, I_BGM_NSRC, STATUS )
+
+          CALL NBS_FIND_ITEM( I_NBID, 'BG_TSRC', ITEMID, STATUS )
+          CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBI, I_BGM_TSRC, STATUS )
+
+        END IF
+
+      END IF
+
+      END
+
+
+
+      SUBROUTINE IBGND_TOPSRC( SRC, STATUS )
+*+
+*  Name:
+*     IBGND_TOPSRC
+
+*  Purpose:
+*     Set the index of the first source to display
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Task subroutine
+
+*  Invocation:
+*     CALL IBGND_TOPSRC( SRC, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     SRC = INTEGER (given)
+*        Top source number
+*     STATUS = INTEGER (given)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ibgnd, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     23 Jan 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Global Variables:
+      INCLUDE 'IMG_CMN'
+
+*  Arguments Given:
+      INTEGER			SRC
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Variables:
+      CHARACTER*1		C			! Source index code
+      CHARACTER*33		SSTR			! Source data string
+
+      INTEGER			ISRC			! Source loop
+      INTEGER			ISTAT			! I/o status code
+      INTEGER			ITEMID			! Source NBS item id
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Is SRC in range
+      IF ( (SRC.GE.1) .AND. (SRC.LE.I_BGM_NSRC) ) THEN
+
+*    Set top source
+        I_BGM_TSRC = SRC
+
+*    Update noticeboard
+        IF ( I_GUI ) THEN
+
+*      Loop over sources to display
+          DO ISRC = I_BGM_TSRC, MIN( I_BGM_NSRC, I_BGM_TSRC+7 )
+
+*        Extract source data
+            CALL IBGND_GETSRC( ISRC, X, Y, R, STATUS )
+
+*        Encode that info
+            WRITE( SSTR, '(I3,3(1X,1PG9.4))', IOSTAT=ISTAT )
+     :                                              ISRC, X, Y, R
+
+*        Write to noticeboard
+            C = CHAR( ICHAR('1') + ISRC - I_BGM_TSRC )
+            CALL NBS_FIND_ITEM( I_NBID, 'BG_SRC'//C, ITEMID, STATUS )
+            CALL NBS_PUT_CVALUE( ITEMID, 0, SSTR, STATUS )
+
+          END DO
+
+        END IF
+
+      ELSE
+        STATUS = SAI__ERROR
+        CALL MSG_SETI( 'S', SRC )
+        CALL ERR_REP( ' ', 'Source number ^S is outside valid range' )
       END IF
 
       END
@@ -907,6 +1077,18 @@
 
 *  Update number of sources
       I_BGM_NSRC = I_BGM_NSRC - 1
+      I_BGM_TSRC = MIN( I_BGM_TSRC, I_BGM_NSRC )
+
+*  Update noticeboard
+      IF ( I_GUI ) THEN
+
+        CALL NBS_FIND_ITEM( I_NBID, 'BG_NSRC', ITEMID, STATUS )
+        CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBI, I_BGM_NSRC, STATUS )
+
+        CALL NBS_FIND_ITEM( I_NBID, 'BG_TSRC', ITEMID, STATUS )
+        CALL NBS_PUT_VALUE( ITEMID, 0, VAL__NBI, I_BGM_TSRC, STATUS )
+
+      END IF
 
 *  Initialise the the background model quality array. This is ok for points
 *  inside the current region, and bad outside and for bad input pixels
@@ -2830,6 +3012,7 @@
         DO I = 1, I__NSRCATT
           CALL DYN_MAPR( 1, I__MXBGSRC, I_BGM_SRCPTR(I), STATUS )
         END DO
+        I_BGM_TSRC = 1
       END IF
 
 *  Destroy sampling data if defined
