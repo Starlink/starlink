@@ -30,6 +30,7 @@
 
 #  Set aliases for all the public commands provided by the package.
       alias extmk $EXTREME_DIR/extmk
+      alias extmakefile $EXTREME_DIR/extmakefile
 
       alias crepint $EXTREME_DIR/crepint
       alias frepint $EXTREME_DIR/frepint
@@ -41,7 +42,7 @@
 
       alias cmp-crepint $EXTREME_DIR/cmp-crepint
       alias cmp-frepint $EXTREME_DIR/cmp-frepint
-      alias cmp-inscnf $EXTREME_DIR/cmp-insncf
+      alias cmp-inscnf $EXTREME_DIR/cmp-inscnf
 
 #  Write startup message.
       echo " "
