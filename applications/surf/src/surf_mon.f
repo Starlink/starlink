@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.25  1998/01/08 20:08:51  timj
+*     Add SCUBA2MEM
+*
 *     Revision 1.24  1997/10/28 01:24:17  timj
 *     Add EXTRACT_FLAT.
 *
@@ -212,6 +215,10 @@ c
       ELSE IF (NAME .EQ. 'SCAN_RLB') THEN
 
          CALL SURF_SCAN_RLB (STATUS)
+
+      ELSE IF (NAME .EQ. 'SCUBA2MEM') THEN
+
+         CALL SURF_SCUBA2MEM (STATUS)
 
       ELSE IF (NAME .EQ. 'SCUCAT') THEN
 
