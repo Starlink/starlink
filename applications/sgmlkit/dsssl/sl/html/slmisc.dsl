@@ -195,20 +195,103 @@ to need explanation or elaboration.
 
 ;;; Paragraphing
 
-(element p
-  (let ((id (attribute-string (normalize "id")
-			      (current-node))))
-    (if id
-	(let ((kids (children (current-node))))
-	  (make sequence
-	    (make element gi: "a"
-		  attributes: (list (list "name" (string-append "xref_" id)))
-		  (process-node-list (node-list-first kids)))
-	    (process-node-list (node-list-rest kids))))
-	(make element gi: "p"
-	      (process-children-trim)))))
+;(element p
+;  (let ((id (attribute-string (normalize "id")
+;			      (current-node))))
+;    (if id
+;	(let ((kids (children (current-node))))
+;	  (make sequence
+;	    (make element gi: "a"
+;		  attributes: (list (list "name" (string-append "xref_" id)))
+;		  (process-node-list (node-list-first kids)))
+;	    (process-node-list (node-list-rest kids))))
+;	(make element gi: "p"
+;	      (process-children-trim)))))
+
+;; In the HTML DTDs, the list elements and blockquote are (amongst the)
+;; %block elements, though these are para-content elements in the
+;; Starlink General's paracontent DTD.  To produce conformant output,
+;; therefore, we must move these elements `up' a level on output
+;; (include linespecific because it's mapped to blockquote in this 
+;; stylesheet).
+;;
+;; This is complicated by our desire to generate a link target for 
+;; any ID attribute on the paragraph
+;(element p
+;  (let* ((shift-els (list (normalize "ul") (normalize "ol") (normalize "dl")
+;			  (normalize "blockquote") (normalize "linespecific")))
+;	 (kids-nl (node-list-split-by-gi (children (current-node))
+;					 shift-els)))
+;      (let loop ((l kids-nl) 
+;		 (id (attribute-string (normalize "id") (current-node))))
+;	(if (null? l)
+;	    (empty-sosofo)
+;	    (let* ((nl (car l))
+;		   (g (gi (node-list-first nl))))
+;	      (make sequence
+;		(if (and g (member g shift-els))
+;		    (make sequence
+;		      (if id
+;			  ;; make a paragraph containing only a space. Yuk!
+;			  (make element gi: "p"
+;				(make element gi: "a"
+;				      attributes:
+;				      (list (list "name"
+;						  (string-append "xref_" id)))
+;				      " "))
+;			  (empty-sosofo))
+;		      (process-node-list nl))
+;		    (if id
+;			(make sequence
+;			  (make element gi: "a"
+;				attributes:
+;				(list (list "name" (string-append "xref_" id)))
+;				(process-node-list (node-list-first nl)))
+;			  (process-node-list (node-list-rest nl)))
+;			(make element gi: "p"
+;			      (process-node-list nl))))
+;		(loop (cdr l) #f)))))))
+
+;(element px				;identical to `p'
+;  (let* ((shift-els (list (normalize "ul") (normalize "ol") (normalize "dl")
+;			  (normalize "blockquote") (normalize "linespecific")))
+;	 (kids-nl (node-list-split-by-gi (children (current-node))
+;					 shift-els)))
+;      (let loop ((l kids-nl) 
+;		 (id (attribute-string (normalize "id") (current-node))))
+;	(if (null? l)
+;	    (empty-sosofo)
+;	    (let* ((nl (car l))
+;		   (g (gi (node-list-first nl))))
+;	      (make sequence
+;		(if (and g (member g shift-els))
+;		    (make sequence
+;		      (if id
+;			  ;; make a paragraph containing only a space. Yuk!
+;			  (make element gi: "p"
+;				(make element gi: "a"
+;				      attributes:
+;				      (list (list "name"
+;						  (string-append "xref_" id)))
+;				      " "))
+;			  (empty-sosofo))
+;		      (process-node-list nl))
+;		    (if id
+;			(make sequence
+;			  (make element gi: "a"
+;				attributes:
+;				(list (list "name" (string-append "xref_" id)))
+;				(process-node-list (node-list-first nl)))
+;			  (process-node-list (node-list-rest nl)))
+;			(make element gi: "p"
+;			      (process-node-list nl))))
+;		(loop (cdr l) #f)))))))
+
 
 (element px
+  (make element gi: "p"
+    (process-children-trim)))
+(element p
   (make element gi: "p"
     (process-children-trim)))
 
