@@ -8,6 +8,7 @@
 *
 *     Simon Duck  (BHVAD::SRD)
 *     David Allan (BHVAD::DJA)
+*     Richard Beard (Birmingham)
 *
 *    History :
 *
@@ -16,6 +17,7 @@
 *      8 Oct 92 : V1.7-0  Uses D.P. NAG for portability (DJA)
 *     20 Apr 95 : V1.8-0  Use new data interface (DJA)
 *     13 Dec 1995 : V2.0-0 ADI port (DJA)
+*     23 Jun 1997 : V2.1-9 Replace NAG with ASTPDA (RB)
 *
 *    Type Definitions :
 *
@@ -59,7 +61,6 @@
 
 *    Version ID.
       CALL MSG_PRNT( VERSION )
-      CALL NAG_MISSING( 'G01BKF', STATUS )
 
 *    Initialize ASTERIX
       CALL AST_INIT()
@@ -263,10 +264,10 @@
            KS=NINT((VAL(MAXSIGI)*VIGS(MAXSIGI))+
      :                (BI*VIGS(MAXSIGI)*AREA/VIGB(MAXSIGI)))
            RLAMBDAS = DBLE((CR+BACK(MAXSIGI)*AREA)*VIGS(MAXSIGI))
-c          CALL G01BKF(RLAMBDAS,KS,PLEKS,PGTKS,PEQKS,IFAIL)
+           CALL PDA_POIPRB(RLAMBDAS,KS,PLEKS,PGTKS,PEQKS,IFAIL)
            RLAMBDAB = DBLE(BACK(MAXSIGI)*VIGB(MAXSIGI))
            KB=BI
-c          CALL G01BKF(RLAMBDAB,KB,PLEKB,PGTKB,PEQKB,IFAIL)
+           CALL PDA_POIPRB(RLAMBDAB,KB,PLEKB,PGTKB,PEQKB,IFAIL)
            IF(VAL(MAXSIGI).GT.CR)THEN
               C1=C1+((PGTKS+PEQKS)*PEQKB)
            ELSE
