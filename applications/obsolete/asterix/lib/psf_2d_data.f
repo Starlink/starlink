@@ -41,6 +41,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'PSF_PAR'
+      INCLUDE 'MATH_PAR'
 *
 *    Global variables :
 *
@@ -80,7 +81,7 @@
       INTEGER                  PDATA                   ! Model psf data ptr
       INTEGER                  X_AX, Y_AX, E_AX, T_AX  ! Axis identifiers
 
-      LOGICAL*1                PSF_STATE               ! Model accessed yet?
+      LOGICAL                  PSF_STATE               ! Model accessed yet?
 *-
 
 *    Check status
@@ -119,7 +120,7 @@
             CALL DYN_UNMAP( SM_DATA(SLOT), STATUS )
             SM_GOTDATA(SLOT) = .FALSE.
           ELSE
-            CALL DYN_MAPB( 1, SM_NMOD(SLOT), SM_FLAG(SLOT), STATUS )
+            CALL DYN_MAPL( 1, SM_NMOD(SLOT), SM_FLAG(SLOT), STATUS )
           END IF
 
 *        Define new model size
@@ -136,7 +137,7 @@
           END IF
 
 *        Clear the flags
-          CALL ARR_INIT1B( 0, SM_NMOD(SLOT),
+          CALL ARR_INIT1L( .FALSE., SM_NMOD(SLOT),
      :                     %VAL(SM_FLAG(SLOT)), STATUS )
 
         END IF
@@ -180,8 +181,8 @@
         END IF
 
 *      Is the flag set for this model index
-        CALL ARR_COP1B( 1, %VAL(SM_FLAG(SLOT)+MODI-1),
-     :                  PSF_STATE, STATUS )
+        CALL ARR_ELEM1L( SM_FLAG(SLOT), SM_NMOD(SLOT), MODI,
+     :                   PSF_STATE, STATUS )
 
 *      If the psf hasn't been access yet, do so now
         PDATA = SM_DATA(SLOT) + (MODI-1)*SM_NELM(SLOT)*VAL__NBR
@@ -212,8 +213,8 @@
      :                  SQRT(SM_P_RUP(IR-1,SLOT)))/2.0
                 END IF
               END IF
-              MX0 = MR * COSD(MA)
-              MY0 = MR * SIND(MA)
+              MX0 = MR * COS(MA*MATH__DTOR)
+              MY0 = MR * SIN(MA*MATH__DTOR)
             END IF
           ELSE
             MX0 = SIGN( (REAL(IX-1)+0.5)*SM_R_DX(SLOT), X0 )
@@ -225,9 +226,8 @@
      :                          MX0, MY0, 0.0, 0.0, DX, DY, INTEG,
      :                          SM_NX(SLOT), SM_NY(SLOT),
      :                          %VAL(PDATA), STATUS )
-          PSF_STATE = .TRUE.
-          CALL ARR_COP1B( 1, PSF_STATE, %VAL(SM_FLAG(SLOT)
-     :                                         +MODI-1), STATUS )
+          CALL ARR_SELEM1L( SM_FLAG(SLOT), SM_NMOD(SLOT), MODI,
+     :                      .TRUE., STATUS )
 
         END IF
 

@@ -318,6 +318,7 @@
 *    Export :
 *
 *    Local constants :
+      INCLUDE 'MATH_PAR'
 
 *    Local variables :
       INTEGER I,J,K,NUMSIN,BSF
@@ -338,7 +339,8 @@
 	   CALL USI_CANCL('AMP1',STATUS)
 	   DO J=1,DIM
 	      DO K=0,BSF
-	         Z=SIND(((AXIS(J)-AXWI(J)/2+(AXWI(J)*K/BSF))/PER*360)+PHA)
+                 Z=SIN((((AXIS(J)-AXWI(J)/2+(AXWI(J)*K/BSF))/PER*360)
+     :           +PHA)*MATH__DTOR)
 	         TOT=TOT+Z
 	      ENDDO
 	      DATA(J)=DATA(J)+AMP*TOT/(BSF+1)
