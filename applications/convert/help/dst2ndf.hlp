@@ -150,6 +150,12 @@ MJC: Malcolm J. Currie (STARLINK)
     applications.  Corrected the closedown sequence of DTA-error
     reporting.  Added message tokens for the filenames to clarify
     some error reports.
+
+ 1992 October 13 (MJC):
+    Fixed a bug where given a DST that has a non-empty FITS
+    structure, and an axis array that is missing from the first or
+    second axis, the corresponding NDF axis-centre array is given
+    a dimension equal to the number of FITS headers.
 2 Implementation_Status
    -  Note the data array in the NDF is of the primitive form.
 

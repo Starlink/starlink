@@ -1,4 +1,4 @@
-      SUBROUTINE DST2NDF (STATUS)
+      SUBROUTINE DST2NDF( STATUS )
 *+ 
 *   Name:
 *      DST2NDF
@@ -13,7 +13,7 @@
 *      ADAM A-task
 
 *   Invocation:
-*      CALL DST2NDF (STATUS)
+*      CALL DST2NDF( STATUS )
 
 *   Arguments:
 *      STATUS = INTEGER (Given and Returned)
@@ -163,6 +163,11 @@
 *        applications.  Corrected the closedown sequence of DTA-error
 *        reporting.  Added message tokens for the filenames to clarify
 *        some error reports.
+*     1992 October 13 (MJC):
+*        Fixed a bug where given a DST that has a non-empty FITS
+*        structure, and an axis array that is missing from the first or
+*        second axis, the corresponding NDF axis-centre array is given
+*        a dimension equal to the number of FITS headers.
 *     {enter_further_changes_here}
 
 *  Bugs:
