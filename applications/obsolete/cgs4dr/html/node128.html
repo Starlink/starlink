@@ -5,7 +5,7 @@
 <P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
 <MAP NAME=cgs4map>
 <AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node129.html">
-<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node127.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node127a.html">
 <AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
 <AREA SHAPE=default HREF="sun27.html">
 </MAP>
@@ -21,8 +21,7 @@
 <P>
   By default, awish is installed in /star/bin/awish and this is reflected
   in the first line of the file $CGS4DR_ROOT/tcl/cgs4dr_tcl:
-  <PRE>           #!/star/bin/awish -file
-</PRE>
+  <PRE>  #!/star/bin/awish -file </PRE>
   If awish has been installed elsewhere, this line will need editing to reflect 
   the correct location.
 <P>
@@ -34,8 +33,7 @@
   communications with the ADAM messaging system and, hence, the tasks. These
   extensions are held in some directory in a file called adamtask.tcl (and others).
   The GUI startup file $CGS4DR_ROOT/tcl/cgs4dr_tcl has a line thus:
-  <PRE>           set tclAdamLib /star/lib/tk/adam
-</PRE>
+  <PRE>  set tclAdamLib /star/lib/tk/adam </PRE>
   This needs to reflect the location of your site's copy of the TCLADAM software.
 <P>
 <LI> <i> cgs4dr_tcl aborting, failed creating task rendezvous file: File exists.</i>
@@ -51,8 +49,7 @@
   Subsequent attempts to run the software will fail until these rendezvous files are
   deleted. A list of current rendezvous files can be created thus:
 <P>
-  <PRE>           % ls -l ~/adam | grep 'p---'
-</PRE>
+  <PRE>  % ls -l ~/adam | grep 'p---' </PRE>
 <P>
   Note that if you run the software more than once, some files are created with names such as
   `cgs4dr_tcl #2_xxxx'. The quotes are deliberate as the filename contains a space character
@@ -85,6 +82,15 @@ Figure 11.4: The Paramter Prompt Box</CENTER>
   The number of colour cells is finite. Running too many (colour) applications (such as
   netscape, xmosaic etc) can exhaust the number of colour cells resulting in a failure
   to load the GUI. If this happens, you must delete some applications.
+<P>
+<LI> <i> adamnet failed to bind socket: Address already in use <br>
+         adamnet: bad initialisation status = 141525083</i>
+<P>
+ This only happens at UKIRT where distributed ADAMnet communications are required
+ between the VAX data acquisition and Unix data reduction systems. This happens because
+ another user left ADAMnet running. The solution is to login as a privileged user and do:
+<P>
+  <PRE>  % kill -9 `ps -ef | grep adamnet | grep -v grep | nawk '{print $2}'` </PRE>
 </UL>
 <P>
 <HR><P>

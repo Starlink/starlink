@@ -8,18 +8,32 @@ proc cgs4drLoadTask {task} {
 
 # Cred4
    if {$ltask == "cred4"} {
+     exec /usr/bin/cp $env(CGS4DR_ROOT)/standard.cred4 $env(CGS4_CONFIG)/standard.cred4
      if {[file exists $env(CGS4_CONFIG)/default.cred4]==0} {
        exec /usr/bin/cp $env(CGS4DR_ROOT)/default.cred4 $env(CGS4_CONFIG)/default.cred4
      }
+     set taskname $env(PID)_$ltask
+     adamtask $taskname $env(CGS4DR_ROOT)/$ltask
+     cgs4drPath $taskname
+     return $taskname
 
 # P4
    } elseif {$ltask == "p4"} {
+     exec /usr/bin/cp $env(CGS4DR_ROOT)/standard.p4 $env(CGS4_CONFIG)/standard.p4
      if {[file exists $env(P4_CONFIG)/default.p4]==0} {
        exec /usr/bin/cp $env(CGS4DR_ROOT)/default.p4 $env(P4_CONFIG)/default.p4
      }
+     set taskname $env(PID)_$ltask
+     adamtask $taskname $env(CGS4DR_ROOT)/$ltask
+     cgs4drPath $taskname
+     return $taskname
 
 # Red4
    } elseif {$ltask == "red4"} {
+     set taskname $env(PID)_$ltask
+     adamtask $taskname $env(CGS4DR_ROOT)/$ltask
+     cgs4drPath $taskname
+     return $taskname
 
 # Qman
    } elseif {$ltask == "qman"} {
@@ -28,19 +42,13 @@ proc cgs4drLoadTask {task} {
      }
      if {$env(DOMAIN) != "ukirt.jach.hawaii.edu."} {
        set QmanAccess "password=$env(QMAN_PASS) lockword=$env(QMAN_LOCK)"
+       set taskname $env(PID)_$ltask
      } else {
        set QmanAccess "password='' lockword=''"
+       set taskname $ltask
      }
+     adamtask $taskname $env(CGS4DR_ROOT)/$ltask
+     cgs4drPath $taskname
+     return $taskname
    }
-
-# Load the task and return name
-   if {$env(DOMAIN) != "ukirt.jach.hawaii.edu."} {
-     set taskname $env(PID)_$ltask
-   } else {
-     set taskname [string tolower [string trim $ltask]]
-   }
-   adamtask $taskname $env(CGS4DR_ROOT)/$ltask
-   cgs4drPath $taskname
-   return $taskname
 }
-

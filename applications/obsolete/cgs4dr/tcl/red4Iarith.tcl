@@ -111,8 +111,7 @@ proc red4Iarith {taskname action} {
         $taskname obey ieor4 "image1=$image1 image2=$image2 output=$output" -inform "cgs4drInform $taskname %V"
       } else {
         cgs4drClear $taskname
-        set message "red4Iarith error : Action $action not recognised!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4Iarith error : Action $action not recognised!"
       }
     }
 

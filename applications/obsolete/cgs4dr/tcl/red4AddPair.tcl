@@ -53,8 +53,7 @@ proc red4AddPair {taskname pair} {
       set sky [string trim [$Red4Widgets(AP_SKYWT) get]]
       if {$obs=="" || $obs==$Red4Widgets(DOB)} {
         cgs4drClear $taskname
-        set message "red4AddPair error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4AddPair error : A dataset has not been specified properly!"
       } else {
 
 # Remove observation

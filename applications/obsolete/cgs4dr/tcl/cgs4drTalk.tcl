@@ -39,7 +39,6 @@ proc cgs4drTalk {taskname} {
 # If user presses OK, send it to the task
     set bv [dialogShow .cgs4drDialogue .cgs4drDialogue]
     if {$bv==0} {
-      cgs4drClear $taskname
       cgs4drCursor watch red white
       set actnam [string trim [$action get]]
       set parnam [string trim [$param get]]

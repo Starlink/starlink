@@ -57,8 +57,7 @@ proc red4NormObs {taskname} {
       set box [string trim [$Red4Widgets(NO_ENT03) get]]
       if {$obs=="" || $obs==$Red4Widgets(DOB)} {
         cgs4drClear $taskname
-        set message "red4NormObs error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4NormObs error : A dataset has not been specified properly!"
       } else {
 
 # Remove observation

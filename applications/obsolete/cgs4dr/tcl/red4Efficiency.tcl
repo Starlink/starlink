@@ -33,8 +33,7 @@ proc red4Efficiency {taskname} {
       set data [string trim [$Red4Widgets(EF_ENTRY) get]]
       if {$data=="" || $data==$Red4Widgets(DRO)} {
         cgs4drClear $taskname
-        set message "red4Efficiency error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4Efficiency error : A dataset has not been specified properly!"
       } else {
         set Red4Widgets(RO) $data
         $taskname obey efficiency "data=$data" -inform "cgs4drInform $taskname %V"

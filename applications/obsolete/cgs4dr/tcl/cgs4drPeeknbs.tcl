@@ -31,8 +31,7 @@ proc cgs4drPeeknbs {taskname noticeboard} {
       set item [string trim [$inbs get]]
       if {$item==""} {
         cgs4drClear $taskname
-        set message "cgs4drPeeknbs error : Noticeboard or value incorrectly specified!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "cgs4drPeeknbs error : Noticeboard or value incorrectly specified!"
       } else {
         cgs4drListnbs $taskname $item
       }

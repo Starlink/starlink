@@ -45,8 +45,7 @@ proc red4Int {taskname action} {
       set int [string trim [$Red4Widgets(AI_ENTRY) get]]
       if {$int=="" || $int==$Red4Widgets(DIN)} {
         cgs4drClear $taskname
-        set message "red4Int error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4Int error : A dataset has not been specified properly!"
       } else {
 
 # Add or remove integration

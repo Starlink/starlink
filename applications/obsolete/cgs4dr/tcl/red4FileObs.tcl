@@ -34,8 +34,7 @@ proc red4FileObs {taskname type} {
       set obs [string trim [$Red4Widgets(FO_ENTRY) get]]
       if {$obs=="" || $obs==$Red4Widgets(DOB)} {
         cgs4drClear $taskname
-        set message "red4FileObs error : dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4FileObs error : A dataset has not been specified properly!"
       } else {
 
 #     If type is whatever or bad, just do it
@@ -66,8 +65,7 @@ proc red4FileObs {taskname type} {
             $taskname obey file_obs "observation=$obs type=$type" -inform "cgs4drInform $taskname %V"
           } else {
             cgs4drClear $taskname
-            set message "red4FileObs error : Observation number must be a positive integer!"
-            cgs4drInform $taskname $message
+            cgs4drInform $taskname "red4FileObs error : Observation number must be a positive integer!"
           }
         }
       }

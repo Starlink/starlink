@@ -54,8 +54,7 @@ proc red4CleanObs {taskname} {
       set tlow [string trim [$Red4Widgets(CO_ENT03) get]]
       if {$obs=="" || $obs==$Red4Widgets(DRO)} {
         cgs4drClear $taskname
-        set message "red4CleanObs error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4CleanObs error : A dataset has not been specified properly!"
       } else {
 
 # Remove observation

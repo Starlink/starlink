@@ -8,8 +8,7 @@ proc p4Plot {taskname} {
     set data [string trim [$P4Widgets(DATA) get]]
     if {$data == ""} {
         cgs4drClear $taskname
-	set message "p4Plot error : You must specify a data set name!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "p4Plot error : You must specify a data set name!"
 	return
     }
 
@@ -119,8 +118,7 @@ proc p4Plot {taskname} {
       $taskname obey display "data=$data port=$port" -inform "cgs4drInform $taskname %V"
     } else {
       cgs4drClear $taskname
-      set message "No path to the plotting task - reload software?!"
-      cgs4drInform $taskname $message
+      cgs4drInform $taskname "p4Plot error : No path to the plotting task - reload software?!"
     }
     cgs4drCursor arrow green black
 }

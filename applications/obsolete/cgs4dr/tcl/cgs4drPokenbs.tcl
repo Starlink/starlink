@@ -42,14 +42,12 @@ proc cgs4drPokenbs {taskname noticeboard} {
       set vb [string trim [$valu get]]
       if {$nb=="" || $vb==""} {
         cgs4drClear $taskname
-        set message "cgs4drPokenbs error : Noticeboard or value incorrectly specified!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "cgs4drPokenbs error : Noticeboard or value incorrectly specified!"
       } else {
         set status [catch {nbs put $nb $vb}]
         if {$status!=0} {
           cgs4drClear $taskname
-          set message "cgs4drPokenbs error : Cannot put incorrect value or type!"
-          cgs4drInform $taskname $message
+          cgs4drInform $taskname "cgs4drPokenbs error : Cannot put incorrect value or type!"
         }
       }
     }

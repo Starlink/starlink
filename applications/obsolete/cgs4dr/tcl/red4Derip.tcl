@@ -56,8 +56,7 @@ proc red4Derip {taskname} {
       set data [string trim [$Red4Widgets(DR_ENT01) get]]
       if {$data=="" || $data==$Red4Widgets(DSP)} {
         cgs4drClear $taskname
-        set message "red4Derip error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4Derip error : A dataset has not been specified properly!"
       } else {
         set Red4Widgets(SP) $data
         set irff ${data}_irff

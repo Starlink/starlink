@@ -51,8 +51,7 @@ proc red4AppMask {taskname} {
       set data [string trim [$Red4Widgets(AM_ENT02) get]]
       if {$data=="" || $data==$Red4Widgets(DRO) || $mask=="#"} {
         cgs4drClear $taskname
-        set message "red4AppMask error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4AppMask error : A dataset has not been specified properly!"
       } else {
 
 # Remove observation

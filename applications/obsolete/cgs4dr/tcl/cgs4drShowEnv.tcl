@@ -1,6 +1,5 @@
 proc cgs4drShowEnv {taskname} {
   global env
-  cgs4drClear $taskname
   cgs4drInform $taskname "PID                = $env(PID)"
   cgs4drInform $taskname "CGS4_CT            = $env(CGS4_CT)"
   cgs4drInform $taskname "CGS4_TEMPLATES     = $env(CGS4_TEMPLATES)"
@@ -34,10 +33,8 @@ proc cgs4drShowEnv {taskname} {
   cgs4drInform $taskname "QMAN_ICL           = $env(QMAN_ICL)"
   cgs4drInform $taskname "QMAN_CONFIG        = $env(QMAN_CONFIG)"
   cgs4drInform $taskname "QMAN_DATE          = $env(QMAN_DATE)"
-  if {$env(DOMAIN) != "ukirt.jach.hawaii.edu."} {
-    cgs4drInform $taskname "QMAN_PASS          = $env(QMAN_PASS)"
-    cgs4drInform $taskname "QMAN_LOCK          = $env(QMAN_LOCK)"
-  }
+  cgs4drInform $taskname "QMAN_PASS          = $env(QMAN_PASS)"
+  cgs4drInform $taskname "QMAN_LOCK          = $env(QMAN_LOCK)"
   cgs4drInform $taskname "IDIR               = $env(IDIR)"
   cgs4drInform $taskname "ODIR               = $env(ODIR)"
   cgs4drInform $taskname "RIDIR              = $env(RIDIR)"

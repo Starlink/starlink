@@ -103,8 +103,7 @@ proc red4TwoDLineFit {taskname} {
    set status [catch {incr number 0}]
    if {$data=="" || $data==$Red4Widgets(DRO) || $status!=0 || $number<=0} {
      cgs4drClear $taskname
-     set message "red4TwoDLineFit error : A dataset has not been specified properly!"
-     cgs4drInform $taskname $message
+     cgs4drInform $taskname "red4TwoDLineFit error : A dataset has not been specified properly!"
      destroy .red4Dialogue
      cgs4drCursor arrow green black
      return
@@ -157,7 +156,7 @@ proc red4TwoDLineFit {taskname} {
      $taskname obey report_emlt "" -inform "cgs4drInform $taskname %V" -endmsg {set remlt2_done 1}
      tkwait variable remlt2_done
    } else {
-     set message "red4TwoDLineFit error : unable to locate emlt.lis file!"
+     set message "red4TwoDLineFit error : Unable to locate emlt.lis file!"
      cgs4drInform $taskname $message
    }
 

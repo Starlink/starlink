@@ -13,7 +13,7 @@
     set cgs4drBitmaps $env(CGS4DR_ROOT)/tcl
     set cgs4drHtml    STAR_DOCS/sun27.htx
 
-# Set up library search path (including the current directory)
+# Set up library search path
     lappend auto_path $tclAdamLib [exec /usr/bin/pwd] $cgs4drTclLib 
 
 # Create default directories

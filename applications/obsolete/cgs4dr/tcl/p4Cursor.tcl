@@ -46,7 +46,7 @@ proc p4Cursor {taskname} {
   tkwait variable dataqual
 
 # Inform the user what happened
-  set message [format "Pixel ( %3i , %3i ) has values:   Data = %10.4f  Error = %10.4f  Quality = %1i" \
+  set message [format "Pixel ( %f , %f ) has values:   Data = %10.4f  Error = %10.4f  Quality = %1i" \
     $act_x $act_y $dataval $dataerr $dataqual]
   cgs4drInform $taskname $message 
 
@@ -63,7 +63,6 @@ proc p4GetResponse {task param value status} {
     return $param
   } else {
     cgs4drClear $task
-    set message "p4GetResponse error : $param = $value returned with status != SAI__OK"
-    cgs4drInform $task $message
+    cgs4drInform $task "p4GetResponse error : $param = $value returned with status != SAI__OK"
   }
 }

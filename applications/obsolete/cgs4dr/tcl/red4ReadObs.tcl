@@ -33,8 +33,7 @@ proc red4ReadObs {taskname} {
       set data [string trim [$Red4Widgets(ERO_ENTRY) get]]
       if {$data=="" || $data==$Red4Widgets(DRO)} {
         cgs4drClear $taskname
-        set message "red4Efficiency error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4Efficiency error : A dataset has not been specified properly!"
       } else {
         set Red4Widgets(RO) $data
         $taskname obey read_obs "observation=$data" -inform "cgs4drInform $taskname %V"

@@ -32,8 +32,7 @@ proc red4Dbs {taskname} {
       set data [string trim [$Red4Widgets(DBS_ENTRY) get]]
       if {$data=="" || $data==$Red4Widgets(DRG)} {
         cgs4drClear $taskname
-        set message "red4Dbs error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4Dbs error : A dataset has not been specified properly!"
       } else {
         set output ${data}_dbs
         set Red4Widgets(RG) $data

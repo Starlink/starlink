@@ -7,7 +7,6 @@ proc red4GetResponse {task param value status} {
     return $param
   } else {
     cgs4drClear $task
-    set message "red4GetResponse error : $param = $value returned with status != SAI__OK"
-    cgs4drInform $task $message
+    cgs4drInform $task "red4GetResponse error : $param = $value returned with status != SAI__OK"
   }
 }

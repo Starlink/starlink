@@ -96,8 +96,7 @@ proc red4Flux {taskname} {
       set data [string trim [$Red4Widgets(FC_ENT01) get]]
       if {$data=="" || $data==$Red4Widgets(DDS)} {
         cgs4drClear $taskname
-        set message "red4Flux error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4Flux error : A dataset has not been specified properly!"
       } else {
         set Red4Widgets(DS) $data
         set out ${data}_fc

@@ -23,7 +23,7 @@ proc red4DoSomething {taskname dowhat inputs} {
   set dowhat [string trim [string tolower $dowhat]]
 
 # Clear the output text widget
-  if {$dowhat=="action"} {cgs4drClear $taskname}
+  #if {$dowhat=="action"} {cgs4drClear $taskname}
 
   switch $inputs {
     add_integration_to_observation
@@ -72,6 +72,14 @@ proc red4DoSomething {taskname dowhat inputs} {
          red4Iarith $taskname IAND4
        } elseif {$dowhat=="help"} {
          cgs4drHelpDialog .helpDialog $cgs4drHtml/red4IarithBox7.html
+       }
+      }
+    array_tests
+      {
+       if {$dowhat=="action"} {
+         red4ArrayTests $taskname
+       } elseif {$dowhat=="help"} {
+         cgs4drHelpDialog .helpDialog $cgs4drHtml/red4ArrayTests.html
        }
       }
     calculate_observation_efficiency

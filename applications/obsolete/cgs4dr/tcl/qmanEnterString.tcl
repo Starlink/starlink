@@ -25,8 +25,7 @@ proc qmanEnterString {taskname} {
         $taskname obey write "$QmanAccess qposition=$qpos string=\"$name\"" -inform "cgs4drInform $taskname %V"
       } else {
         cgs4drClear $taskname
-        set message "qmanEnterString error : cannot accept a null string for $fval!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "qmanEnterString error : Cannot accept a null string for $fval!"
       }
     }
 

@@ -81,8 +81,7 @@ proc red4CreWinMask {taskname} {
       set mask [string trim [$Red4Widgets(WM_ENT01) get]]
       if {$mask==""} {
         cgs4drClear $taskname
-        set message "red4CreWinMask error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4CreWinMask error : A dataset has not been specified properly!"
       } else {
         set imin [string trim [$Red4Widgets(WM_ENT02) get]]
         set imax [string trim [$Red4Widgets(WM_ENT03) get]]

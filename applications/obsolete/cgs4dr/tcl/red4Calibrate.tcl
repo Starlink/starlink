@@ -102,8 +102,7 @@ proc red4Calibrate {taskname lamp} {
    set status [catch {incr number 0}]
    if {$data=="" || $data==$Red4Widgets(DRO) || $status!=0 || $number<=0} {
      cgs4drClear $taskname
-     set message "red4Calibrate error : A dataset has not been specified properly!"
-     cgs4drInform $taskname $message
+     cgs4drInform $taskname "red4Calibrate error : A dataset has not been specified properly!"
      destroy .red4Dialogue
      cgs4drCursor arrow green black
      return

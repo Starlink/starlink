@@ -37,14 +37,12 @@ proc red4Fits {taskname method} {
       set data [string trim [$Red4Widgets(FI_ENT01) get]]
       if {$data=="" || $data==$Red4Widgets(DOB)} {
         cgs4drClear $taskname
-        set message "red4Fits error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4Fits error : A dataset has not been specified properly!"
       } else {
         set item [string trim [$Red4Widgets(FI_ENT02) get]]
         if {$item==""} {
           cgs4drClear $taskname
-          set message "red4Fits error : A FITS item has not been specified properly!"
-          cgs4drInform $taskname $message
+          cgs4drInform $taskname "red4Fits error : A FITS item has not been specified properly!"
         } else {
           set Red4Widgets(OB) $data
           $taskname obey poke_fits "data=$data item=$item method=$method mode='VERBOSE'" -inform "cgs4drInform $taskname %V"

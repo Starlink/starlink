@@ -30,8 +30,7 @@ proc red4Package {taskname args} {
       set obs [string trim [$Red4Widgets(PK_ENTRY) get]]
       if {$obs=="" || $obs==$Red4Widgets(DRO)} {
         cgs4drClear $taskname
-        set message "red4package error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4Package error : A dataset has not been specified properly!"
       } else {
 
 #       Check to see if action is known and, if not, load the task
@@ -50,12 +49,11 @@ proc red4Package {taskname args} {
           }
           set count 0
           while {[$pack path] == 0} {
-            after 0
+            after 100
             incr count
-            if {$count >0} {
+            if {$count >100} {
               cgs4drClear $taskname
-              set message "red4Package error : Failed to start ${pack}!"
-              cgs4drInform $taskname $message
+              cgs4drInform $taskname "red4Package error : Failed to start ${pack}!"
               $pack kill
               cgs4drCursor arrow green black
               return

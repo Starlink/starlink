@@ -29,8 +29,6 @@ proc bindCred4Widgets {taskname} {
     bind $Cred4Widgets(SKY)       <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4SkyBox1.html"
     bind $Cred4Widgets(POLYSKY)   <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4PolyskyBox1.html"
     bind $Cred4Widgets(EXTRACT)   <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4ExtractBox1.html"
-    #bind $Cred4Widgets(REDPARAMS) <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4RedParams.html"
-    #bind $Cred4Widgets(ASTPARAMS) <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4AstParams.html"
 
 # Command buttons.
     $Cred4Widgets(DRSTART) configure -command "cred4Drstart $taskname"
@@ -47,8 +45,6 @@ proc bindCred4Widgets {taskname} {
     $Cred4Widgets(SKY) configure -command "cred4Sky $taskname"
     $Cred4Widgets(POLYSKY) configure -command "cred4Polysky $taskname"
     $Cred4Widgets(EXTRACT) configure -command "cred4Extract $taskname"
-    #$Cred4Widgets(REDPARAMS) configure -command "cred4RedParams $taskname"
-    #$Cred4Widgets(ASTPARAMS) configure -command "cred4AstParams"
 
 # Traces and monitors
     nbs monitor ${Cred4NoticeBoard}.flags.pause_reduction Cred4Widgets(PAUSE)

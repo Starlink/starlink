@@ -61,8 +61,7 @@ proc red4ModelBB {taskname} {
       set rfl [string trim [$Red4Widgets(BB_ENT04) get]]
       if {$obs=="" || $obs==$Red4Widgets(DOB)} {
         cgs4drClear $taskname
-        set message "red4ModelBB error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4ModelBB error : A dataset has not been specified properly!"
       } else {
 
 # Remove observation

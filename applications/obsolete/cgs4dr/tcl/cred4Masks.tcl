@@ -1,6 +1,7 @@
 proc cred4Masks {taskname} {
 
 # Get some global values
+    global env
     global Cred4NoticeBoard
     global Cred4Widgets
     global cgs4drHtml
@@ -40,11 +41,17 @@ proc cred4Masks {taskname} {
     set bv [dialogShow .cred4Dialogue .cred4Dialogue]
     if {$bv == 0} {
       cgs4drCursor watch red white
-      cgs4drClear $taskname
+      set fext [string tolower $env(CGS4_FORMAT)]
+      if {$fext == "ndf"} {set fext "sdf"}
 
 #   Set the bad pixel mask and linearisation file
       set file [string trim [$Cred4Widgets(MASK) get]]
-      nbs put ${Cred4NoticeBoard}.miscellaneous.mask $file
+      if {$file == "#" || [file exists $env(CGS4_MASKS)/${file}.${fext}]==1} {
+        nbs put ${Cred4NoticeBoard}.miscellaneous.mask $file
+      } else {
+        cgs4drClear $taskname
+        cgs4drInform $taskname "cred4Masks error : No such mask ($file)!"
+      }
       set file [string trim [$Cred4Widgets(LINCOEFFS) get]]
       nbs put ${Cred4NoticeBoard}.miscellaneous.lincoeffs $file
     }

@@ -118,8 +118,7 @@ proc red4Ext {taskname} {
       set data [string trim [$Red4Widgets(SPC_ENT01) get]]
       if {$data=="" || $data==$Red4Widgets(DRG)} {
         cgs4drClear $taskname
-        set message "red4Ext error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4Ext error : A dataset has not been specified properly!"
       } else {
         set Red4Widgets(RG) $data
         set spect ${data}_spc

@@ -10,8 +10,7 @@ proc cgs4drDemo {} {
 # Check demo system directory
   if {[catch {glob $env(CGS4DR_ROOT)/demo/*941011*.sdf}] == 1} {
     cgs4drClear $Cred4Task
-    set message "cgs4drDemo error : Demo files not installed on this system!"
-    cgs4drInform $Cred4Task $message
+    cgs4drInform $Cred4Task "cgs4drDemo error : Demo files not installed on this system!"
     return
   }
 
@@ -19,14 +18,12 @@ proc cgs4drDemo {} {
   if {$env(CGS4_DATE) != "941011"} {
     if {$env(CGS4_DATE) != "19941011"} {
       cgs4drClear $Cred4Task
-      set message "cgs4drDemo error : System initialised with wrong date!"
-      cgs4drInform $Cred4Task $message
+      cgs4drInform $Cred4Task "cgs4drDemo error : System initialised with wrong date!"
       return
     }
   }
 
 # Get temp directories for demo data
-  cgs4drClear $Cred4Task
   cgs4drInform $Cred4Task "Copying data files ... please wait"
   if {[file exists $env(CGS4_DATA)] == 0} {exec /usr/bin/mkdir $env(CGS4_DATA)}
   if {[file exists $env(IDIR)] == 0} {exec /usr/bin/mkdir $env(IDIR)}
@@ -165,7 +162,6 @@ proc cgs4drDemo {} {
   nbs put ${P4NoticeBoard}.port_6.slice_start 29
   nbs put ${P4NoticeBoard}.port_6.slice_end 29
 
-  cgs4drClear $Cred4Task
   cgs4drInform $Cred4Task "Click on START REDUCTION when ready"
 }
 
@@ -181,8 +177,7 @@ proc cgs4drDemo2 {} {
 # Check demo system directory
   if {[catch {glob $env(CGS4DR_ROOT)/demo/*941011*.sdf}] == 1} {
     cgs4drClear $Cred4Task
-    set message "cgs4drDemo error : Demo files not installed on this system!"
-    cgs4drInform $Cred4Task $message
+    cgs4drInform $Cred4Task "cgs4drDemo error : Demo files not installed on this system!"
     return
   }
 
@@ -190,14 +185,12 @@ proc cgs4drDemo2 {} {
   if {$env(CGS4_DATE) != "941011"} {
     if {$env(CGS4_DATE) != "19941011"} {
       cgs4drClear $Cred4Task
-      set message "cgs4drDemo error : System initialised with wrong date!"
-      cgs4drInform $Cred4Task $message
+      cgs4drInform $Cred4Task "cgs4drDemo error : System initialised with wrong date!"
       return
     }
   }
 
 # Get temp directories for demo data
-  cgs4drClear $Cred4Task
   cgs4drInform $Cred4Task "Copying data files ... please wait"
   if {[file exists $env(HOME)/cgs4dr_demo] == 0} {exec /usr/bin/mkdir $env(HOME)/cgs4dr_demo}
   if {[file exists $env(IDIR)] == 0} {exec /usr/bin/mkdir $env(IDIR)}

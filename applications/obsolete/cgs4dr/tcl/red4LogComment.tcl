@@ -33,8 +33,7 @@ proc red4LogComment {taskname} {
         $taskname obey log_comment "comment='$comment'" -inform "cgs4drInform $taskname %V"
       } else {
         cgs4drClear $taskname
-        set message "red4LogComment error : Null comments are not logged!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4LogComment error : Null comments are not logged!"
       }
     }
 

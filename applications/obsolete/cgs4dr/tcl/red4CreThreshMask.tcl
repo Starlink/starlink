@@ -88,14 +88,12 @@ proc red4CreThreshMask {taskname array} {
       if {$data=="" || $data==$Red4Widgets(DRO) || $mask=="" || $mask=="#" || $mask=="Name_of_new_bad_pixel_mask"} {
         set Red4Widgets(RO) $Red4Widgets(DRO)
         cgs4drClear $taskname
-        set message "red4CreThreshMask error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4CreThreshMask error : A dataset has not been specified properly!"
         cgs4drCursor arrow green black
         return
       }
 
 #   Display the dataset
-      cgs4drClear $taskname
       set message "Plotting $data ($array array) in port $port as a HISTOGRAM"
       cgs4drInform $taskname $message
       nbs put ${P4NoticeBoard}.port_${port}.display_type HISTOGRAM
@@ -137,12 +135,10 @@ proc red4CreThreshMask {taskname array} {
         if {$cursor_status==0} {
           $taskname obey cre_thresh_mask "input=$data mask=$mask tlow=$tlow thigh=$thigh" -inform "cgs4drInform $taskname %V"
         } else {
-          cgs4drClear $taskname
           set message "Application terminated by non-zero cursor status"
           cgs4drInform $taskname $message
         }
       } else {
-        cgs4drClear $taskname
         set message "Application terminated by non-zero cursor status"
         cgs4drInform $taskname $message
       }

@@ -51,8 +51,7 @@ proc red4Remove {taskname type} {
     # If it doesn't match our criteria signal an error and abort
       if {$obs=="" || $obs==$Red4Widgets(DRG) || $obs==$Red4Widgets(DRO) || $number<=0} {
         cgs4drClear $taskname
-        set message "red4Remove error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4Remove error : A dataset has not been specified properly!"
       } else {
 
     # OK we have a cosher RO or RG but don't know if it's a DST or SDF so try both
@@ -70,8 +69,7 @@ proc red4Remove {taskname type} {
         if {[file exists $dst_file]==1} {set status [catch {exec /usr/bin/rm -rf ${dst_file}}]}
         if {$status!=0} {
           cgs4drClear $taskname
-          set message "red4Remove error : Unable to delete file ${obs}!"
-          cgs4drInform $taskname $message
+          cgs4drInform $taskname "red4Remove error : Unable to delete file ${obs}!"
         }
       }
     }

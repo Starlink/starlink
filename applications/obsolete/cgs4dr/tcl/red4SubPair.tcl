@@ -63,8 +63,7 @@ proc red4SubPair {taskname pair} {
       if {$pair==2} {set sky [string trim [$Red4Widgets(SP_ENT02) get]]}
       if {$obj=="" || $obj==$Red4Widgets(DOB) || $sky=="" || $sky==$Red4Widgets(DOB)} {
         cgs4drClear $taskname
-        set message "red4SubPair error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4SubPair error : A dataset has not been specified properly!"
       } else {
 
 # Remove observation or pair

@@ -107,8 +107,7 @@ proc red4Stats {taskname} {
       set obs [string trim [$Red4Widgets(GS_ENT01) get]]
       if {$obs=="" || $obs==$Red4Widgets(DRO)} {
         cgs4drClear $taskname
-        set message "red4Stats error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4Stats error : A dataset has not been specified properly!"
       } else {
 
 # Do the stats

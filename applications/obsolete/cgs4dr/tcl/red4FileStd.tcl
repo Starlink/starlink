@@ -74,8 +74,7 @@ proc red4FileStd {taskname} {
       set ye [string trim [$Red4Widgets(FS_ENT05) get]]
       if {$data=="" || $data==$Red4Widgets(DRG)} {
         cgs4drClear $taskname
-        set message "red4FileStd error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4FileStd error : A dataset has not been specified properly!"
       } else {
         set Red4Widgets(RG) $data
         $taskname obey file_standard \

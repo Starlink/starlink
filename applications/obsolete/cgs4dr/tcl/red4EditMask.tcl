@@ -80,17 +80,14 @@ proc red4EditMask {taskname qval} {
 #   Return if no data specified
       if {$data=="" || $data=="#"} {
         cgs4drClear $taskname
-        set message "red4EditMask error : A dataset has not been specified properly!"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "red4EditMask error : A dataset has not been specified properly!"
         cgs4drCursor arrow green black
         return
       }
 
 #   Display the dataset
       if {[file exists ${data}*]==0} {set data \$CGS4_MASKS/${data}}
-      cgs4drClear $taskname
-      set message "Plotting $data in port $port as an image"
-      cgs4drInform $taskname $message
+      cgs4drInform $taskname "Plotting $data in port $port as an image"
       nbs put ${P4NoticeBoard}.port_${port}.display_type IMAGE
       set status [catch {$P4Task obey display "data=$data port=$port" -inform "cgs4drInform $taskname %V"}]
       if {$status!=0} {
@@ -103,8 +100,7 @@ proc red4EditMask {taskname qval} {
       while {$loop_status==0} {
 
 #     Issue a message
-        set message "Click on data-point with MB1; Use MB3 to abort"
-        cgs4drInform $taskname $message
+        cgs4drInform $taskname "Click on data-point with MB1; Use MB3 to abort"
 
 #     Do the cursor
         set done_cval 0
@@ -126,9 +122,7 @@ proc red4EditMask {taskname qval} {
         if {$cursor_status==0} {
           $taskname obey edit_mask "loop=FALSE mask=$data ipos=$mask_x jpos=$mask_y qval=$qval" -inform "cgs4drInform $taskname %V"
         } else {
-          cgs4drClear $taskname
-          set message "Application terminated by non-zero cursor status"
-          cgs4drInform $taskname $message
+          cgs4drInform $taskname "Application terminated by non-zero cursor status"
           set loop_status 1
         }
       }
@@ -140,18 +134,4 @@ proc red4EditMask {taskname qval} {
 
 # Change the cursor and exit
     cgs4drCursor arrow green black
-}
-
-proc red4GetResponse {task param value status} {
-  global $param
-  if {[lindex $status 0]=="SAI__OK"} {
-    set message "$param = $value"
-    cgs4drInform $task $message
-    set $param $value
-    return $param
-  } else {
-    cgs4drClear $task
-    set message "red4GetResponse error : $param = $value returned with status != SAI__OK"
-    cgs4drInform $task $message
-  }
 }

@@ -43,6 +43,7 @@ proc buildRed4Widgets w {
     $Red4Widgets(LB) insert end add_two_images
     $Red4Widgets(LB) insert end apply_bad_pixel_mask
     $Red4Widgets(LB) insert end AND_two_images
+    $Red4Widgets(LB) insert end array_tests
     $Red4Widgets(LB) insert end calculate_observation_efficiency
     $Red4Widgets(LB) insert end cgs4list
     $Red4Widgets(LB) insert end clean_observation
