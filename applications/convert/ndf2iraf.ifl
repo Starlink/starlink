@@ -1,4 +1,4 @@
-## NDF2IRAF - Converts an NDF to an IRAF (OIF) image.
+## NDF2IRAF - Converts an NDF to an IRAF image.
 
 #+
 #  Name:
@@ -18,13 +18,15 @@
 #     1992 September 29 (MJC):
 #     	 Added help library.  Used global association for IN.  Renamed
 #	 the parameteres to IN and OUT.  Removed unused parameter.
+#     1992 July 21 (MJC):
+#     	 Added FILLBAD.
 #     {enter_further_changes_here}
 
 #-
 
 interface NDF2IRAF
 
-   helplib        'CONVERT_DIR:CONVERT'
+   helplib        'CONVERT_HELP:'
 
    parameter      IN            # The input NDF
       position    1
@@ -37,9 +39,19 @@ interface NDF2IRAF
       helpkey     '*'
    endparameter
 
+   parameter      FILLBAD       # Replacement value for bad pixels
+      position    3
+      type        '_REAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT'
+      prompt      'Value to replace any bad values'
+      default     !
+      helpkey     '*'
+   endparameter
+
    parameter      OUT           # The output IRAF name
       position    2
-      type        '_CHAR'
+      type        'LITERAL'
       vpath       'PROMPT'
       ppath       'CURRENT'
       prompt      'Name of IRAF image to be produced'
