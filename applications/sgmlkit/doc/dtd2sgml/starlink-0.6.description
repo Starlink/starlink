@@ -12,6 +12,29 @@
 <element gi='abstract'>
 <p>The abstract for the document
 
+<element gi='angle'>
+<p>Allows you to specify an astronomical angle, either in degrees or
+as an hour angle.  All the attributes are (syntactically) individually
+omissable: the system does not perform any check that the
+supplied value is reasonable.
+<example>
+&lt;angle angle=45 minutes=30 seconds=10 fraction=0> is an angle in
+degrees (the default), and &lt;angle unit=hours angle=6 minutes=45> is
+an angle in hours, with the number of seconds and fractions of seconds
+omitted.  An angle like &lt;angle angle=1000 fraction=10> is
+syntactically acceptable, but astronomical nonsense.
+</example>
+<attribute name='unit'>
+<p>May be `hours' or `degrees', defaulting to `degrees'.
+<attribute name='angle'>
+<p>The angle in units of hours or degrees as appropriate.
+<attribute name='minutes'>
+<p>The number of minutes of arc.
+<attribute name='seconds'>
+<p>The number of seconds of arc.
+<attribute name='fraction'>
+<p>The fraction of seconds of arc.
+
 <element gi='appendices'> 
 
 <p>The appendices element contains the
@@ -472,6 +495,14 @@ not conflict.
 content, and this attribute indicates its notation.  The application
 should signal an error if neither attribute is present.
 
+<element gi='foreign'>
+<p>This element indicates that the words it encloses are in a foreign
+language.  For example, you might write <code>&lt;foreign>et
+al.&lt;/foreign></code>.  This is different from putting them in an
+<elemref gi=em> element; whereas emphasises words might be shown as
+such by being put in bold rather than italicised, foreign words should
+always be italicised.
+
 <element gi='history'>
 <p>This element records the history of the document.  It is 
 available in most of the Starlink DTDs, but not all, and when it is
@@ -583,6 +614,28 @@ the element's content may be left empty.
 <p>One of `users', `programmers', `programmers.c',
 `programmers.fortran', or `other'.  If you chose `other', then you
 should give the manual type as this element's content.
+
+<element gi='mapidlist'>
+<p>A list of <elemref gi=mapid> elements (q.v.).
+
+<element gi='mapid'>
+<p>Several elements, including the sectioning elements (see <elemref
+gi=sect>), <elemref gi=table> and <elemref gi=figure>, have an
+`export' attribute.  Amongst other things, this expresses a
+committment to keep the associated ID valid in future versions of a
+document.  Sometimes, however, it is necessary to remove sections, or
+change their content in such a way that a reference via their original
+ID would be inappropriate.  In this case, you can use the <elemref
+self gi=mapid> element to remap the target of the reference, either to
+some other element which is now appropriate, or to some section which
+explains that the targeted section has been deleted.
+<p>The <elemref self gi=mapid> element takes two attributes, the
+original ID and a replacement, to which it is to be transparently and
+silently mapped.
+<attribute name='from'>
+<p>The name of the original ID
+<attribute name='to'>
+<p>The name of the ID to which the original ID is to be mapped.
 
 <element gi='m'>
 <p>Inline maths.  Use LaTeX notation, as if you were writing inside a
@@ -728,6 +781,8 @@ is therefore impossible to break the sectioning structure.
 documents to link to this section using this ID.  In other words, the
 presence of this attribute is a commitment to maintain this ID as a
 meaningful link target in future versions of this document.
+See the <elemref gi=mapid> element for a mechanism which allows you to
+rename obsolete IDs.
 <p>You should include this attribute on all sections and subsections.
 This is enforced by the DTD for <elemref self gi=sect> and <elemref
 gi=subsect> elements (this can be controlled by the
