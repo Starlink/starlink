@@ -13,10 +13,17 @@ proc cgs4drGetArgs {directory date format} {
     set confirmFormat    0
 
     set dataRoot [string trim $directory]
+    regsub {/$} $dataRoot { } dataRoot
+    set dataRoot [string trim $dataRoot]
     if {$dataRoot==""} {set confirmDirectory 1}
     if {![file exists $dataRoot]} {set confirmDirectory 1}
+
     set utRoot [string trim $date]
+    regsub {^19} $utRoot {  } utRoot
+    regsub {^20} $utRoot {  } utRoot
+    set utRoot [string trim $utRoot]
     if {$utRoot==""} {set confirmDate 1}
+
     set fmtRoot [string trim [string toupper $format]]
     if {$fmtRoot==""} {set confirmFormat 1}
     if {$fmtRoot!="NDF" && $fmtRoot!="DST"} {set confirmFormat 1}
