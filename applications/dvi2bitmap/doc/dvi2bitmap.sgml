@@ -1030,7 +1030,7 @@ its path on standard output.  This uses the font-string template
 described in <ref id=usage.fonts.finding/>.  You could duplicate the
 default (the <code/mktexpk> script if present) with the option
 <verbatim>
---enable-fontgen='<path>mktexpk --dpi %d --bdpi %b --mag %m --mfmode %M %f'
+--enable-fontgen='&lt;path>mktexpk --dpi %d --bdpi %b --mag %m --mfmode %M %f'
 </verbatim>
 
 <![IGNORE[
@@ -1061,7 +1061,7 @@ switched back on again using the option <code/-fG.>
 to change the default mode, you can do so using the option <ref
 id=conf.fontgen-mode/>.
 
-<dt id=conf.fontgen-mode><code/&ddash;with-fontgen-mode=mode,res
+<dt id=conf.fontgen-mode><code/&ddash;with-fontgen-mode=mode,res>
 <dd>If you wish to change the default parameters for font-generation,
 you can set both the Metafont mode and resolution using this option.
 For example, the option
