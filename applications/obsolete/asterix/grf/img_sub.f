@@ -3722,7 +3722,9 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         CALL IMG_PIXTOWORLD(REAL(I),REAL(J),X,Y,STATUS)
 
 *  adjust angle to direction of axes
-        LANGLE=ANGLE*SIGN(I_XSCALE)*SIGN(I_YSCALE)
+        LANGLE=ANGLE*(I_XSCALE/ABS(I_XSCALE))
+     :                         *(I_YSCALE/ABS(I_YSCALE))
+
 
 *  transform to frame centred on slice
         X=X-XC
