@@ -488,10 +488,12 @@ TCL_SCRIPTS = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
  CCDTaskQuery.tcl CCDGeomSetPercent.tcl CCDExit.tcl \
  CCDFileMonitorMain.tcl CCDDoPresent.tcl \
  CCDTkWidget.tcl CCDCcdWidget.tcl CCDNameTail.tcl CCDPathOf.tcl CCDCmdOf.tcl \
+ Buttoncontrol.tcl \
  Ccdtop.tcl Control.tcl Gwmview.tcl Marknumcontrol.tcl Ndfalign.tcl \
  Ndfchoose.tcl Ndfview.tcl Percentilecontrol.tcl Stylecontrol.tcl \
- Vectordialog.tcl Waiter.tcl Zoomcontrol.tcl \
- taskrun.tcl tasksetup.tcl ccdalign.tcl pairndf.tcl idicurs.tcl
+ Vectordialog.tcl Waiter.tcl Wcsframecontrol.tcl Zoomcontrol.tcl \
+ raisehack.tcl taskrun.tcl tasksetup.tcl ccdalign.tcl pairndf.tcl idicurs.tcl \
+ ccdwishrc
 
 
 TCL_SUPPORT_BIN = atclsh
@@ -744,7 +746,7 @@ PLATFORM_F =
 C_ROUTINES = $(CSUBSRC) $(WISH_SOURCE)
 
 CSUBSRC = ccd1_exec.c slv.c find_file.c \
- tcltalk.c tclbgcmd.c ndf.c ndfdrawpair.c ndfcentroffset.c ccdputs.c \
+ tcltalk.c tclbg.c ndf.c ndfdrawpair.c ndfcentroffset.c ccdputs.c \
  intersect.c ccdAppInit.c \
  ccd1_tcurs.c ccd1_algn.c ccd1_pndf.c
 
@@ -1019,7 +1021,7 @@ $(TCL_SUPPORT_IWIDGETS):
 	cp $(STAR_LIB)/iwidgets$(IWIDGETS_VERS)/scripts/$@ $@
 $(TCL_INDEX): $(TCL_SCRIPTS) $(TCL_SUPPORT_NOEXE) $(WISH)
 	CCDPACK_DIR=$(STAR_LIB); export CCDPACK_DIR; \
-        echo 'auto_mkindex . *.tcl *.tk *.itcl *.itk; exit' | $(WISH)
+        echo 'auto_mkindex . *.tcl *.tk *.itcl *.itk; exit' | ./$(WISH)
 
 
 #  Personal rules for building source code archives from RCS and
@@ -1306,7 +1308,7 @@ $(WISH): $(OBJECT_LIBRARIES) $(WISH).o
 	$(FC) $(FFLAGS) -o $(WISH) $(WISH).o \
               -L$(STAR_LIB) $(ADDLIBS) $(OBJECT_LIBRARIES) \
               $(STARTCL_OBJ) $(TCL_LIBRARIES) $(LDFLAGS) \
-              -lcpgplot `agp_link_adam` \
+              -lcpgplot `agp_link_adam` `ast_link -pgplot` \
               `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
               $(OBJECT_LIBRARIES) \
               -lpar_adam `dtask_link_adam`
@@ -2226,7 +2228,7 @@ ndfdrawpair.o: tclndf.h
 ndfcentroffset.o: tclndf.h
 slv.o: slv.h
 tcltalk.o: ccdtcl.h
-tclbgcmd.o:
+tclbg.o:
 
 aif_antmp.o: DAT_PAR SAE_PAR
 aif_asfio.o: PAR_ERR SAE_PAR
