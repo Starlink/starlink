@@ -12,7 +12,6 @@ require DynaLoader;
 # Export the main routine
 @EXPORT = qw(
 	     ems1_get_facility_error
-	     SAI__OK SAI__ERROR SAI__WARN
 );
 
 %EXPORT_TAGS = (
@@ -24,6 +23,7 @@ require DynaLoader;
 			  ems_renew ems_rep ems_rlse
 			  ems_setc ems_setd ems_seti ems_setl ems_setr
 			  ems_stat ems_syser
+			  get_facility_error
 			  /],
 		'emserr' => [qw/
 			     EMS__NOMSG
@@ -40,6 +40,13 @@ Exporter::export_tags('ems','emserr','sai');
 
 bootstrap Starlink::EMS $VERSION;
 
+sub get_facility_error ($) {
+  my ($fac, $id, $text);
+  ems1_get_facility_error($_[0], $fac, $id, $text);
+  return ($fac, $id, $text);
+}
+
+
 1;
 __END__
 
@@ -51,33 +58,92 @@ Starlink::EMS - Perl extension for Starlink EMS library
 =head1 SYNOPSIS
 
   use Starlink::EMS;
-  ems1_get_facility_error($status, $facility, $ident, $text);
+  use Starlink::EMS qw/:ems :sai/;
+
   $ok = SAI__OK;
+
+  ems_begin($status = $ok);
+
+  $status = SAI__ERROR;
+
+  ems_setc('TOKEN', $string);
+  ems_rep($par, $error, $status);
+
+  ($par, $str, $status) = ems_eload;
+  $level = ems_level;
+
+  ems_end( $status );
+
+
+  ems1_get_facility_error($status, $facility, $ident, $text);
 
 
 =head1 DESCRIPTION
 
 This module provides a simple interface to the Starlink EMS library.
-All C routines are available plus an extra internal routien
+All C routines are available plus an extra internal routine
 for converting a status code directly to the error mesage
 components (ems1_get_facility_error).
+
+The ems function can be imported using the 'ems' tag:
+
+ use Starlink::EMS qw( :ems );
+
+The following routines are available:
+
+ems_annul(), ems_begin(), ems_eload(), ems_end(), ems_errno(),
+ems_facer(), ems_fmtc(), ems_fmtd(), ems_fmti(), ems_fmtl(), ems_fmtr()
+ems_level(), ems_mark(), ems_mload(), ems_renew(), ems_rep(), ems_rlse(),
+ems_setc(), ems_setd(), ems_seti(), ems_setl(), ems_setr(), ems_stat(),
+ems_syser().
+
+These routines are explained in SSN/4. One difference between the
+perl implementation and the C/Fortran version described in SSN/4
+concerned return values. Routines with arguments that contain pure return
+values (as opposed to modifications of an existing variable) return the
+values as a perl list. The routines are:
+
+  ($par, $str, $status) = ems_load();
+  $level = ems_level();
+  $string = ems_mload($par, $str, $status);
+
+Use the ERR_ calls (available from the C<NDF> perl module) for a
+higher level interface to the error message system.
+
+=head1 EXTRA ROUTINES
+
+The ems1_get_facility_error() routine is not documented in SSN/4
+but can be used to convert an error status to the corresponding error code
+and text.
+
+This is similar to the ems_facer() routine (also available) but gives more
+control over the use of this information and does not go via a token.
+
+This command is available in two forms. One form is identical to the C
+implementation, the other provides the values as a perl array:
+
+  ems1_get_facility_error($status, $facility, $ident, $text);
+  ($facility, $ident, $text) = get_facility_error($status);
+
 
 =head1 CONSTANTS
 
 The following constants are available: SAI__OK, SAI__ERROR,
-SAI__WARN. They are exported by default.
+SAI__WARN. They are imported via the 'sai' tag:
+
+  use Starlink::EMS qw( :sai );
+
+=head1 SEE ALSO
+
+Starlink System Note 4 (SSN/4).
+L<NDF>
 
 =head1 REVISION
 
 $Id$
 
-
 =head1 AUTHOR
 
 Tim Jenness (t.jenness@jach.hawaii.edu)
-
-=head1 SEE ALSO
-
-perl(1).
 
 =cut
