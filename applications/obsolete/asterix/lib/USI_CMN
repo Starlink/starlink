@@ -28,11 +28,11 @@
       STRUCTURE /PARAMETER/
 	BYTE			TYPE			! Type code
         BYTE			POSITION		! Parameter position
-        INTEGER			PRO_PTR, PRO_LEN	! Prompt data
-        INTEGER			DEF_PTR, DEF_LEN	! Default data
-        INTEGER			HLP_PTR, HLP_LEN	! Help data
-        INTEGER			ASS_PTR, ASS_LEN	! Association data
-        INTEGER			KEY_PTR, KEY_LEN	! Keyword data
+        INTEGER			PROMPT			! ADI prompt id
+        INTEGER			DEF			! ADI default id
+        INTEGER			HLP			! ADI help id
+        INTEGER			ASS			! ADI association id
+        INTEGER			KEY			! ADI key id
         BYTE                    VPATH(5), PPATH(5)
         CHARACTER*16		NAME			! Parameter name
       END STRUCTURE
