@@ -1,3 +1,6 @@
+// part of dvi2bitmap
+// $Id$
+
 #ifndef PK_FONT_HEADER_READ
 #define PK_FONT_HEADER_READ 1
 
@@ -13,12 +16,11 @@ class PkGlyph {
 	    unsigned int w,
 	    unsigned int h,
 	    int hoff,
-	    int voff,
-	    unsigned int pos)
+	    int voff)
 	: dyn_f_(dyn_f),
 	cc_(cc), tfmwidth_(tfmwidth), dm_(dm), w_(w), h_(h),
-	hoff_(hoff), voff_(voff), pos_(pos),
-	longform_(false) { };
+	hoff_(hoff), voff_(voff),
+	longform_(false), bitmap_(0) { };
     PkGlyph(Byte dyn_f,
 	    unsigned int cc,
 	    unsigned int tfmwidth,
@@ -27,42 +29,44 @@ class PkGlyph {
 	    unsigned int w,
 	    unsigned int h,
 	    unsigned int hoff,
-	    unsigned int voff,
-	    unsigned int pos)
+	    unsigned int voff)
 	: dyn_f_(dyn_f),
 	cc_(cc), tfmwidth_(tfmwidth), dx_(dx), dy_(dy), w_(w), h_(h),
-	hoffu_(hoff), voffu_(voff), pos_(pos),
-	longform_(true) { };
-    inline unsigned int pos () const { return pos_; }
-    inline Byte *bitmap() const	{
-	if (!bitmap_) get_bitmap ();
-	return bitmap_;
-    }
+	hoffu_(hoff), voffu_(voff),
+	longform_(true), bitmap_(0) { };
+    inline Byte *bitmap() const	{ return bitmap_; }
+    inline unsigned int w() const { return w_; }
+    inline unsigned int h() const { return h_; }
+    void construct_bitmap (const Byte *rasterinfo);
  private:
     Byte dyn_f_;
     unsigned int cc_, tfmwidth_, dm_, dx_, dy_, w_, h_;
     int hoff_, voff_;
     unsigned int hoffu_, voffu_;
     bool longform_;
-    unsigned int pos_;
     Byte *bitmap_;
-    bool highnybble;		// set to false initially
-    unsigned int unpackpk();
+    // PKDecodeState keeps state for nybble and get_bitmap
+    struct PKDecodeState {
+	const Byte *rasterp;
+	bool highnybble;
+	unsigned int repeatcount;
+    };
+    unsigned int unpackpk(PKDecodeState &);
     void get_bitmap();
-    inline Byte nybble(const Byte *p) {
-	highnybble = !highnybble;
-	return (highnybble ? (*p)>>4 : (*p++)&0xf);
+    inline static Byte nybble(PKDecodeState & s) {
+	s.highnybble = !s.highnybble;
+	return (s.highnybble ? (*s.rasterp)>>4 : (*s.rasterp++)&0xf);
     }
 };
 
 class PkFont {
  public:
-    PkFont(unsigned int c,
-	   unsigned int s,
-	   unsigned int d,
-	   string name);
+    PkFont (unsigned int c,
+	    unsigned int s,
+	    unsigned int d,
+	    string name);
     ~PkFont();
-    PkGlyph character() const { };
+    PkGlyph *glyph (unsigned int i) const;
     
  private:
     unsigned int checksum_, scalefactor_, designsize_;
@@ -72,6 +76,7 @@ class PkFont {
     string comment_;
     const nglyphs_ = 256;
     PkGlyph *glyphs_[nglyphs_];
+    struct { unsigned int pos, len; } glyph_data_[nglyphs_];
     void read_font(InputByteStream&);
 };
 
