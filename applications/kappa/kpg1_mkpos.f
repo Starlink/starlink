@@ -1,5 +1,5 @@
       SUBROUTINE KPG1_MKPOS( NAX, POS, IPLOT, CURR, MODE, MARKER,
-     :                       GEO, DONE, CLOSE, TEXT, STATUS )
+     :                       GEO, DONE, CLOSE, TEXT, JUST, STATUS )
 *+
 *  Name:
 *     KPG1_MKPOS
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL KPG1_MKPOS( NAX, POS, IPLOT, CURR, MODE, MARKER, GEO, DONE, 
-*                      CLOSE, TEXT, STATUS )
+*                      CLOSE, TEXT, JUST, STATUS )
 
 *  Description:
 *     This routine marks a position on a graphics device in various ways.
@@ -86,6 +86,14 @@
 *     TEXT = CHARACTER * ( * ) (Given)
 *        The text to display if MODE is "TEXT". Trailing spaces are
 *        ignored. 
+*     JUST = CHARACTER * ( * ) (Given)
+*        A string specifying the justification to be used when displaying 
+*        the text supplied in TEXT (ignored if MODE is not "Text"). This
+*        should be a string of two characters; the first should be "B",
+*        "C" or "T", meaning bottom, centre or top. The second should be
+*        "L", "C" or "R", meaning left, centre or right. The text is
+*        displayed so that the position supplied in POS is at the
+*        specified point within the displayed text string.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -97,7 +105,7 @@
 *     17-NOV-1998 (DSB):
 *        Original version.
 *     14-DEC-1998 (DSB):
-*        Added BLANK option for MODE.
+*        Added BLANK option for MODE. Added argument JUST.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -124,6 +132,7 @@
       LOGICAL DONE
       LOGICAL CLOSE
       CHARACTER TEXT*(*)
+      CHARACTER JUST*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -665,7 +674,7 @@
          UP( 2 ) = 1.0D0
 
 *  Draw the text, horizontal, and centre justified.
-         CALL AST_TEXT( IPLOT, TEXT, POS, UP, 'CC', STATUS )
+         CALL AST_TEXT( IPLOT, TEXT, POS, UP, JUST, STATUS )
 
 *  Re-instate the original Current Frame if necessary.
          IF( .NOT. CURR ) CALL AST_SETI( IPLOT, 'CURRENT', ICURR, 
