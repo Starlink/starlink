@@ -8,10 +8,31 @@
 # 1 Argument required: the demodulated data file
 
 # Start up Starlink just in case
+#source /star/etc/login
+#source /star/etc/cshrc
 
-source /star/etc/login
-source /star/etc/cshrc
+# Check if Starlink was initialised
+if !($?STAR_LOGIN) then
 
+# Start up Starlink (if possible)
+# note that should probably put in something that gets
+# updated during INSTALLation.
+
+  if (-e /star/etc/login) then
+    source /star/etc/login
+  else
+    echo 'Error: Starlink system not initialised'
+    exit 1
+  endif
+
+  if (-e /star/etc/cshrc) then
+    source /star/etc/cshrc
+  else
+    echo 'Error: Starlink system not initialised'
+    exit 1
+  endif
+
+endif
 # Switch off messages
 alias echo "echo > /dev/null"
 
