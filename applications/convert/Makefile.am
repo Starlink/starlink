@@ -34,7 +34,15 @@ IFL_FILES = convert_mon.ifl $(TASKS:=.ifl)
 EXAMPLE_FILES = test_data/*
 
 ##  On-line help
-HELP_FILES = convert.hlp
+HELP_SOURCES = convert.hlp
+starhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
+
+#  Rule for building the help library from the help source.
+.hlp.shl:
+	@HLIB@ $<
+
+##  Any misc files that have no where else.
+dist_pkgdata_DATA = convert.news
 
 ##  Edit scripts during make to have the correct paths.
 
@@ -49,31 +57,31 @@ edit = sed \
         -e 's,@TIFFTOPNM\@,$(TIFFTOPNM),g' \
         -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g'
 
-convert.csh: convert.csh.in
+convert.csh: convert.csh.in Makefile
 	rm -f convert.csh.tmp convert.csh
 	$(edit) \
 	   $(srcdir)/convert.csh.in >convert.csh.tmp
 	mv convert.csh.tmp convert.csh
 
-convert.icl: convert.icl.in
+convert.icl: convert.icl.in Makefile
 	rm -f convert.icl.tmp convert.icl
 	$(edit) \
 	   $(srcdir)/convert.icl.in >convert.icl.tmp
 	mv convert.icl.tmp convert.icl
 
-gif2ndf: gif2ndf.in
+gif2ndf: gif2ndf.in Makefile
 	rm -f gif2ndf.tmp gif2ndf
 	$(edit) \
 	   $(srcdir)/gif2ndf.in >gif2ndf.tmp
 	mv gif2ndf.tmp gif2ndf
 
-ndf2gif: ndf2gif.in
+ndf2gif: ndf2gif.in Makefile
 	rm -f ndf2gif.tmp ndf2gif
 	$(edit) \
 	   $(srcdir)/ndf2gif.in >ndf2gif.tmp
 	mv ndf2gif.tmp ndf2gif
 
-tiff2ndf: tiff2ndf.in
+tiff2ndf: tiff2ndf.in Makefile
 	rm -f tiff2ndf.tmp tiff2ndf
 	$(edit) \
 	   $(srcdir)/tiff2ndf.in >tiff2ndf.tmp

@@ -61,15 +61,17 @@
 
 { Define environment variables.
 {
-{ The actual INSTALL_[BIN/HELP] directories get inserted at install time.
-if getenv("CONVERT_DIR") <> ""
-   echo "You have not define the environment variable CONVERT_DIR."
-   echo "You should do this by sourcing the Starlink initialisation scripts:"
-   echo "   @STARLINK@/etc/login"
-   echo "and"
-   echo "   @STARLINK@/etc/cshrc"
-   exit
+hidden proc check_setup
+if getenv("CONVERT_DIR") = ""
+   print "You have not define the environment variable CONVERT_DIR."
+   print "You should do this by sourcing the Starlink initialisation scripts:"
+   print "   /loc/pwdc/pdraper/starlink_cvs/build/etc/login"
+   print "and"
+   print "   /loc/pwdc/pdraper/starlink_cvs/build/etc/cshrc"
+   signal ADAMERR "No CONVERT_DIR"
 endif
+endproc
+check_setup
 
 { Define the CONVERT commands.
 { ============================

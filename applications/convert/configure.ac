@@ -24,16 +24,19 @@ AC_PROG_LIBTOOL
 dnl    Setup for building monoliths.
 STAR_MONOLITHS
 
-dnl    Progs needed for gif2ndf, ndf2gif and tiff2ndf
-AC_CHECK_PROGS(ppmtogif)
-AC_CHECK_PROGS(giftopnm)
-AC_CHECK_PROGS(ppmtopgm)
-AC_CHECK_PROGS(pnmflip)
-AC_CHECK_PROGS(pnmtofits)
-AC_CHECK_PROGS(tifftopnm)
-
 dnl    Build dependencies for this package.
 STAR_DECLARE_DEPENDENCIES([build], [figaro ast sae chr hds fio cnf grp mers prm ndf ndg par psx subpar])
+
+dnl    Progs needed for gif2ndf, ndf2gif and tiff2ndf
+STAR_CHECK_PROGS(ppmtogif)
+STAR_CHECK_PROGS(giftopnm)
+STAR_CHECK_PROGS(ppmtopgm)
+STAR_CHECK_PROGS(pnmflip)
+STAR_CHECK_PROGS(pnmtofits)
+STAR_CHECK_PROGS(tifftopnm)
+
+dnl    Need "hlib" command to build the help library.
+STAR_CHECK_PROGS(hlib)
 
 dnl    Documentation.
 STAR_LATEX_DOCUMENTATION([sun55])
