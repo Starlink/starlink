@@ -110,7 +110,7 @@
       IF ( .NOT. G_MTHINIT ) CALL GCB0_INIT( STATUS )
 
 *  Get base file object
-      CALL ADI_GETFILE( ID, FILID, STATUS )
+      CALL ADI_GETFILE( FID, FILID, STATUS )
 
 *  Simply invoke the method
       CALL ADI_EXEC( 'SaveGCB', 1, FILID, RESID, STATUS )
