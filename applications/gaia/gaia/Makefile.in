@@ -111,7 +111,7 @@ COMPIFL  = @STARLINK@/bin/compifl
 #  ast_link and ndf_link must be carefully managed to avoid picking up
 #  default AST libraries for errors and graphics.
 AST_LIBS = -L$(STAR_LIB) `ast_link -myerr -mygrf`
-ADAM_LIBS = -L$(STAR_LIB) `ard_link` `ams_link_adam` `fio_link` `cat_link_adam` `subpar_link_adam` `ndf_link`  -lpda
+ADAM_LIBS = -L$(STAR_LIB) `ard_link` `ams_link_adam` `fio_link` `cat_link` `subpar_link_adam` `ndf_link`  -lpda
 
 #  Main wish interpreter for GAIA.
 DEMO_WISH = bin/gaia_wish
@@ -173,7 +173,7 @@ $(GAIAMON): normallib gaiaMon.c gaiaMon.ifc
 	echo "linking \"$(GAIAMON)\"..."
 	$(ALINK) gaiaMon.c -o $(GAIAMON) $(LOCAL_LIBRARY) $(ADDLIBS) \
 	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) \
-	   `fio_link` `ard_link_adam` `ndf_link_adam` `cat_link_adam`
+	   `fio_link` `ard_link_adam` `ndf_link_adam` `cat_link`
 	for f in gaiaMon $(IFC_FILES) ""; do \
 	   if test -f "$${f}.ifl"; then \
 	      $(COMPIFL) $$f; \
