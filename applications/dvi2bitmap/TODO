@@ -1,0 +1,12 @@
+
+Refactor runCommandPipe as PipeStream, a subclass of InputByteStream
+    Done, 3 August 2003
+
+Reimplement kpathsea as a singleton object
+    Done, 3 August 2003
+
+----------------------------------------------------------------------
+
+Implement PostscriptImage, either using PipeStream, or using libgs
+
+Handle multiple DVI files on the command line
