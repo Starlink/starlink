@@ -28,6 +28,11 @@
 *    Import :
 *
       INTEGER          SLOT                   ! Psf handle
+*
+*    Local Variables:
+      INTEGER			RTNPTR			! Psf routine ptr
+
+      LOGICAL			THERE			! Routine exists?
 *-
 
 *    Check status
@@ -40,10 +45,10 @@
       ELSE
 
 *    Invoke psf close routine if present
-        IF ( L_MOD_C(P_MODID(SLOT),P_LIBID(SLOT)) .NE. 0 ) THEN
-
-          CALL PSF_REL_EXEC( %VAL(L_MOD_C(P_MODID(SLOT),P_LIBID(SLOT))),
-     :                       P_PSID(SLOT), STATUS )
+        CALL PSF0_FNDRTN( P_PSID(SLOT), 'Close', THERE, RTNPTR,
+     :                    STATUS )
+        IF ( THERE ) THEN
+          CALL PSF_REL_EXEC( %VAL(RTNPTR), P_PSID(SLOT), STATUS )
         END IF
 
 *    Mark slot as free

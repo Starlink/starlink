@@ -215,8 +215,8 @@
 
 
 
-*+  PSF_PSF_INIT_EXEC - Call initialisation routine for a given slot
-      SUBROUTINE PSF_PSF_INIT_EXEC( ROUTINE, PSID, FID, INST, STATUS )
+*+  PSF_INIT_EXEC - Call initialisation routine for a given slot
+      SUBROUTINE PSF_INIT_EXEC( ROUTINE, PSID, FID, INST, STATUS )
 *
 *    Authors :
 *

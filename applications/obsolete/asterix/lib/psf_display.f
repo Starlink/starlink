@@ -63,7 +63,7 @@
       DO ICMP = 1, NPSF
 
 *    Index it
-        CALL ADI_IDXCMP( P_PLIST, PID, STATUS )
+        CALL ADI_INDCMP( P_PLIST, PID, STATUS )
         CALL ADI_NAME( PID, NAME, STATUS )
         CALL ADI_ERASE( PID, STATUS )
 
