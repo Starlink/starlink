@@ -71,6 +71,8 @@
 *  History:
 *     20 Mar 1995 (DJA):
 *        Original version.
+*     10 Jan 1996 (DJA):
+*        Added diagnostic
 *     {enter_changes_here}
 
 *  Bugs:
@@ -96,7 +98,7 @@
 *         Number of items in a memory area
 
 *  Arguments Given:
-      INTEGER			SLOT			! Internal slot number
+      INTEGER			SLOT
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -128,6 +130,13 @@
 
         CALL PSX_FREE( DYS_PTR(SLOT), STATUS )
 
+      END IF
+
+*  Diagnostic?
+      IF ( DYS_DIAG ) THEN
+        CALL MSG_SETI( 'PTR', PTR )
+        CALL MSG_SETI( 'NB', DYS_NBYTE(SLOT) )
+        CALL ADP_OUT( 'DYN: Deallocated ^NB bytes at address ^PTR' )
       END IF
 
 *  Zero the slot regardless of status
