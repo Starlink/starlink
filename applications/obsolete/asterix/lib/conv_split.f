@@ -23,7 +23,7 @@
       INTEGER CHR_LEN
 *    Local constants :
       CHARACTER*1 BLANK,TAB
-      PARAMETER (TAB=CHAR(9),BLANK=' ')
+      PARAMETER (BLANK=' ')
 *    Local variables :
       INTEGER CF,CL
       INTEGER IC,JC
@@ -33,6 +33,8 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
+
+        TAB=CHAR(9)
 
 *  ignore any leading spaces
         CF=1
