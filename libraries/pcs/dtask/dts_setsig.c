@@ -78,7 +78,7 @@ static void
 dtask_sighdlr(int isig);
 #else
 #ifndef __alpha
-dtask_sighdlr(int isig, struct siginfo *info, void *dummy);
+dtask_sighdlr(int isig, siginfo_t *info, void *dummy);
 #else
 dtask_sighdlr(int isig, int sigcode, struct sigcontext *scp);
 #endif
@@ -235,7 +235,7 @@ static void
 dtask_sighdlr(int isig)
 #else
 #ifndef __alpha
-dtask_sighdlr(int isig, struct siginfo *info, void *dummy)
+dtask_sighdlr(int isig, siginfo_t *info, void *dummy)
 #else
 dtask_sighdlr(int isig, int sigcode, struct sigcontext *scp)
 #endif
