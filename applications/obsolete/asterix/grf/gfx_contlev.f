@@ -14,7 +14,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'GCB_PAR'
 *    Import :
       REAL ZMIN,ZMAX
@@ -51,7 +50,7 @@
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GFX_CONTLEV',STATUS)
+          CALL AST_REXIT('GFX_CONTLEV',STATUS)
         ENDIF
 
       ENDIF

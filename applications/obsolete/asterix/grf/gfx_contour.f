@@ -15,7 +15,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'GCB_PAR'
 *    Import :
       INTEGER NX,NY
@@ -137,7 +136,7 @@
         CALL PGEBUF()
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GFX_CONTOUR',STATUS)
+          CALL AST_REXIT('GFX_CONTOUR',STATUS)
         ENDIF
 
       ENDIF
@@ -185,6 +184,5 @@
       ELSEIF (VSBL.EQ.0) THEN
         CALL PGMOVE(XW,YW)
       ENDIF
-
 
       END

@@ -14,7 +14,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER WKPTR
       INTEGER NX,NY
@@ -209,7 +208,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Import :
       INTEGER NX,NY
@@ -259,7 +257,7 @@
 
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GFX_QPIXEL_SET',STATUS)
+          CALL AST_REXIT('GFX_QPIXEL_SET',STATUS)
         ENDIF
 
       ENDIF

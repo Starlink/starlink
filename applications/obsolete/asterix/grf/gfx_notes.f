@@ -1,4 +1,3 @@
-
 *+  GFX_NOTES - puts annotations onto plot
       SUBROUTINE GFX_NOTES(STATUS)
 *    Description :
@@ -11,7 +10,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
 *    Import-Export :
 *    Export :
@@ -110,7 +108,7 @@
         CALL GCB_SETDEF(STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GFX_NOTES',STATUS)
+          CALL AST_REXIT('GFX_NOTES',STATUS)
         ENDIF
       ENDIF
       END

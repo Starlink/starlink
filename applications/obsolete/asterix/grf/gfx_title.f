@@ -11,7 +11,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'GCB_PAR'
 *    Import :
       CHARACTER*(*) DEFAULT
@@ -103,7 +102,7 @@
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GFX_TITLE',STATUS)
+          CALL AST_REXIT('GFX_TITLE',STATUS)
         ENDIF
 
       ENDIF

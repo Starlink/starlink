@@ -15,7 +15,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'GCB_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'QUAL_PAR'
@@ -149,7 +148,7 @@
         CALL PGEBUF()
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GFX_CONTOURQ',STATUS)
+          CALL AST_REXIT( 'GFX_CONTOURQ',STATUS)
         ENDIF
 
       ENDIF
