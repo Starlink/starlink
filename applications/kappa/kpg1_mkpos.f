@@ -106,6 +106,8 @@
 *        Original version.
 *     14-DEC-1998 (DSB):
 *        Added BLANK option for MODE. Added argument JUST.
+*     12-APR-2000 (DSB):
+*        Corrected erroneous use of Y2 instead of Y1 in calls to PGQWIN.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -508,7 +510,7 @@
       ELSE IF( MODE .EQ. 'VLINE' ) THEN
 
 *  Find the bounds of the PGPLOT window. 
-         CALL PGQWIN( X1, X2, Y2, Y2 )
+         CALL PGQWIN( X1, X2, Y1, Y2 )
 
 *  Ensure the supplied position is in the Base Frame. If not, transform it 
 *  into the Base Frame.
@@ -556,7 +558,7 @@
       ELSE IF( MODE .EQ. 'HLINE' ) THEN
 
 *  Find the bounds of the PGPLOT window. 
-         CALL PGQWIN( X1, X2, Y2, Y2 )
+         CALL PGQWIN( X1, X2, Y1, Y2 )
 
 *  Ensure the supplied position is in the Base Frame. If not, transform it 
 *  into the Base Frame.
@@ -604,7 +606,7 @@
       ELSE IF( MODE .EQ. 'CROSS' ) THEN
 
 *  Find the bounds of the PGPLOT window. 
-         CALL PGQWIN( X1, X2, Y2, Y2 )
+         CALL PGQWIN( X1, X2, Y1, Y2 )
 
 *  Ensure the supplied position is in the Base Frame. If not, transform it 
 *  into the Base Frame.
