@@ -2,9 +2,11 @@ package Starlink::AST::PGPLOT;
 
 use strict;
 use vars qw/ $VERSION /;
-use constant R2D => 57.29578;  # Radians to degrees factor
+use constant R2D     => 57.29578;        # Radians to degrees factor
+use constant FLT_MAX => 3.40282347e+38;  # Maximum float on ix86 platform
 
 use PGPLOT;
+use Carp;
 
 '$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
@@ -14,8 +16,21 @@ Starlink::AST::PGPLOT - AST wrapper to the PGPLOT library
 
 =head1 SYNOPSIS
 
-  use Starlink::AST::PGPLOT
- 
+   use Starlink::AST::PGPLOT
+
+The main methods which need to be registered with the AST package
+are shown below,
+
+   $status = _GFlush();
+   $status = _GLine( \@x, \@y );
+   $status = _GMark( \@x, \@y, $type );
+   $status = _GText( $text, $x, $y, $just, $upx, $upy );
+   $status = _GTxtExt( $text, $x, $y, $just, $upx, $upy, $xb, $yb );
+
+The following helper methods are also provided,
+
+   my ( $status, $alpha, $beta ) = _GAxScale()
+
 =head1 DESCRIPTION
   
 This file implements the low level graphics functions required by the rest
@@ -25,18 +40,24 @@ is used).
 This file can be used as a template for the development of similar modules
 to support alternative graphics systems.
 
+=head1 NOTES
+
+All teh functions in this module are private, and are intended to be called
+from the AST module. None of these functions should be considered to be part
+of the packages public interface.
+
 =head1 REVISION
 
 $Id$
 
 =head1 METHODS
 
-=item B<GFlush>
+=item B<_GFlush>
 
 This function ensures that the display device is up-to-date, by flushing 
 any pending graphics to the output device.
 
-   _GFlush();
+   my $status = _GFlush();
 
 =cut
 
@@ -84,25 +105,23 @@ sub _GMark {
    return 1;
 }
 
-
 =item B<_GText>
 
 This function displays a character string $text at a given position using 
 a specified justification and up-vector.
 
-   my $status = _GText( $text, $x, $y, $justification, $upx, $upy );
+   my $status = _GText( $text, $x, $y, $just, $upx, $upy );
 
 where $x is the reference x coordinate, $y is the reference y coordinate, 
-and where $justification is a character string which specifies the
-location within the text string which is to be placed at the reference
-position given by x and y. The first character may be 'T' for "top", 'C'
-for "centre", or 'B' for "bottom", and specifies the vertical location of
-the reference position. Note, "bottom" corresponds to the base-line of
-normal text. Some characters  (eg "y", "g", "p", etc) descend below the
-base-line. The second  character may be 'L' for "left", 'C' for "centre",
-or 'R'  for "right", and specifies the horizontal location of the 
-reference position. If the string has less than 2 characters then 'C' is
-used for the missing characters. 
+and where $just is a character string which specifies the location within
+the text string which is to be placed at the reference position given by x
+and y. The first character may be 'T' for "top", 'C' for "centre", or 'B'
+for "bottom", and specifies the vertical location of the reference position.
+Note, "bottom" corresponds to the base-line of normal text. Some characters 
+(eg "y", "g", "p", etc) descend below the base-line. The second  character
+may be 'L' for "left", 'C' for "centre", or 'R'  for "right", and specifies
+the horizontal location of the  reference position. If the string has less
+than 2 characters then 'C' is used for the missing characters.
 
 And $upx is the x component of the up-vector for the text, in graphics
 world coordinates. If necessary the supplied value should be negated to
@@ -250,6 +269,299 @@ sub _GAxScale {
     }
     return ( $ret, $alpha, $beta );
 }       
+
+
+=item B<_GTxExt>
+
+This function returns the corners of a box which would enclose the 
+supplied character string if it were displayed using astGText. The 
+returned box INCLUDES any leading or trailing spaces.
+
+   my $status = _GTxtExt( $text, $x, $y, $just, $upx, $upy, $xb, $yb );
+
+where $x is the reference x coordinate, $y is the reference y coordinate, 
+and where $justification is a character string which specifies the
+location within the text string which is to be placed at the reference
+position given by x and y. The first character may be 'T' for "top", 'C'
+for "centre", or 'B' for "bottom", and specifies the vertical location of
+the reference position. Note, "bottom" corresponds to the base-line of
+normal text. Some characters  (eg "y", "g", "p", etc) descend below the
+base-line. The second  character may be 'L' for "left", 'C' for "centre",
+or 'R'  for "right", and specifies the horizontal location of the 
+reference position. If the string has less than 2 characters then 'C' is
+used for the missing characters. 
+
+And $upx is the x component of the up-vector for the text, in graphics
+world coordinates. If necessary the supplied value should be negated to
+ensure that positive values always refer to displacements from  left to
+right on the screen.
+
+While $upy is the y component of the up-vector for the text, in graphics
+world coordinates. If necessary the supplied value should be negated to
+ensure that positive values always refer to displacements from  bottom to
+top on the screen.
+
+Finally $xb is a refernce to an array of 4 elements in which to return the
+x coordinate of each corner of the bounding box, and $yb is a reference to
+an array of 4 elements in which to return the y coordinate of each corner
+of the bounding box.
+
+Notes:
+     -  The order of the corners is anti-clockwise (in world coordinates)
+        starting at the bottom left.
+     -  A NULL value for "just" causes a value of "CC" to be used.
+     -  Both "upx" and "upy" being zero causes an error.
+     -  Any unrecognised character in "just" causes an error.
+     -  Zero is returned for all bounds of the box if an error occurs.
+
+=cut
+
+sub _GTxtEx {
+   my ( $text, $x, $y, $just, $upx, $upy, $xb, $yb ) = @_;
+   
+   # initalise @$xb and @$yb
+   foreach my $i ( 0 ... 4 ) {
+      $$xb[$i] = 0.0;
+      $$yb[$i] = 0.0;
+   }   
+   
+   # check we have a string to print
+   if( defined $text && length($text) != 0 ) {
+   
+      # validate the justifcation
+      my $just1 = substr $just, 0, 1;
+      my $just2 = substr $just, 1, 1;
+      if ( defined $just && length($just) == 2 ) {
+         
+        # if we have a bogus justification string default it 
+        unless( $just1 =~ /[TBC]/ ) {
+           print "_GText: bad vertical justification defaulting to 'C'\n";
+           $just1 = "C";
+        }
+        unless( $just2 =~ /[LCR]/ ) {
+           print "_GText: bad horizontal justification defaulting to 'C'\n";
+           $just2 = "C"; 
+        }
+      } else {
+         print "_GText: No justification string defaulting to 'CC'\n";
+         $just1 = "C";
+         $just2 = "C";
+      }
+      $just = $just1 . $just2;
+      
+      # get the axis scaling
+      my ( $ret, $alpha, $beta ) = _GAxScale();
+      return 0 if $ret == 0;
+      
+      # If either axis is reversed, reverse the supplied up-vector 
+      # components so that they refer to the world-coordinates axes.
+      $upx = -$upx if $alpha < 0.0;
+      $upy = -$upy if $beta < 0.0;
+      
+      # convert the up-vector into millimetres
+      my $ux = $alpha*$upx;
+      my $uy = $beta*$upy;
+      
+      # normalise the up-vector to a length of 1 millimetre
+      my $uplen = sqrt( $ux*$ux + $uy*$uy );
+      if ( $uplen > 0.0 ) {
+         $ux /= $uplen;
+         $uy /= $uplen;
+      } else {
+         print "_GTxtExt: Zero length up-vector supplied.";
+         return 0;
+      }
+ 
+      # Form the base-line vector by rotating the up-vector by 90 degrees 
+      # clockwise.
+      my $vx = $uy;
+      my $vy = -$ux;
+
+      # Get the angle between the text base-line and horizontal.
+      my $angle = atan2( $vy, $vx )*R2D;
+
+      # Get the bounding box of the string drawn with its bottom left corner
+      # at the origin.
+      my ( $xbox, $ybox );
+      pgqtxt( 0.0, 0.0, $angle, 0.0, $text, $xbox, $ybox );
+
+      # Convert the returned bounding box world coordinates into millimetres.
+      for my $i ( 0 ... 4 ){
+         $$xbox[ $i ] *= $alpha;
+         $$ybox[ $i ] *= $beta;
+      }
+
+      # Find the height of the bounding box, in millimetres. Note, 
+      # the PGPLOT manual is not clear about the order of the corners 
+      # returned by pgqtxt, so we have to find the largest distance between
+      # the corners in the direction of the supplied up-vector. The reference
+      # point is on the text base-line which is not usually at the bottom of
+      # the bounding box (some letters - like "y" - extend below the base-line).
+      # Find the distance from the base-line to the top (hu) and bottom (hd)
+      # of the bounding box. */
+      my $hu = -(FLT_MAX);
+      my $hd = FLT_MAX;
+      foreach my $i ( 0 ... 4 ) {
+         my $test = $ux*$$xbox[ $i ] + $uy*$$ybox[ $i ];
+         $hu = $test if $test > $hu; 
+         $hd = $test if $test < $hd;
+      }
+
+      # Get an up and a down vector scaled to the height/depth of the
+      # bounding box above/below the text base-line .
+      my $uxu = $ux*$hu;
+      my $uyu = $uy*$hu;
+      my $uxd = $ux*$hd;
+      my $uyd = $uy*$hd;
+
+      # The bounding box returned by pgqtxt does not include any leading or
+      # trailing spaces. We need to include such spaces in the returned box.
+      # To do this we get the length of the text string in millimetres
+      # using pglen instead of using the bounding box returned by pgqtxt.
+      my ( $xl, $yl );
+      pglen( 2, $text, $xl, $yl );
+
+      # The abolute width of the string in millimetres may depend on the   
+      # up-vector. The values returned by pglen are for horizontal and
+      # vertical text. Find the width using the supplied up-vector. 
+      my $a = $uy*$xl;
+      my $b = $ux*$yl;
+      my $width = sqrt( $a*$a + $b*$b );
+
+      # The pglen function returns a value which is slightly smaller than
+      # the area cleared to hold the text when written using pgptxt. Increase
+      # the text width so that it is about equal to the area cleared. 
+      my $width += 0.2*$hu;
+
+      # Scale the base-line vector so that its length is equal to the width
+      # of the bounding box (including spaces). 
+      $vx *= $width;
+      $vy *= $width;
+
+      # Convert the base-line vector back into world coordinates. 
+      $vx /= $alpha;
+      $vy /= $beta;
+
+      # Convert the up and down vectors into world coordinates. 
+      $uxu /= $alpha;
+      $uyu /= $beta;
+      $uxd /= $alpha;
+      $uyd /= $beta;
+
+      # Find the coordinates at the centre of the bounding box in world
+      # coordinates. 
+      my $xc = $x;
+      my $yc = $y;
+
+      if( $just1 eq 'B' ) {
+         $xc += 0.5*$uxu;
+         $yc += 0.5*$uyu;
+      } elsif( $just1 eq 'T' ) {
+         $xc -= 0.5*$uxu;
+         $yc -= 0.5*$uyu;
+      }
+
+      if( $just2 == 'L' ) {
+         $xc += 0.5*$vx;
+         $yc += 0.5*$vy;
+      } elsif( $just2 == 'R' ) {
+         $xc -= 0.5*$vx;
+         $yc -= 0.5*$vy;
+      }
+
+      # Get the corners of the bounding box. 
+      my $vdx = 0.5*$vx;
+      my $vdy = 0.5*$vy;
+      my $udx = 0.5*$uxu;
+      my $udy = 0.5*$uyu;
+
+      # Bottom left corner... 
+      $$xb[ 0 ] = $xc - $vdx - $udx + $uxd;
+      $$yb[ 0 ] = $yc - $vdy - $udy + $uyd;
+
+      # Bottom right corner...
+      $$xb[ 1 ] = $xc + $vdx - $udx + $uxd;
+      $$yb[ 1 ] = $yc + $vdy - $udy + $uyd;
+
+      # Top right corner... 
+      $$xb[ 2 ] = $xc + $vdx + $udx;
+      $$yb[ 2 ] = $yc + $vdy + $udy;
+
+      # Top left corner... 
+      $$xb[ 3 ] = $xc - $vdx + $udx;
+      $$yb[ 3 ] = $yc - $vdy + $udy;
+      
+      print "xb[0] = " . $$xb[ 0 ] ."\n";
+      print "yb[0] = " . $$yb[ 0 ] ."\n";
+      print "xb[1] = " . $$xb[ 1 ] ."\n";
+      print "yb[1] = " . $$yb[ 1 ] ."\n";
+      print "xb[2] = " . $$xb[ 2 ] ."\n";
+      print "yb[2] = " . $$yb[ 2 ] ."\n";
+      print "xb[3] = " . $$xb[ 3 ] ."\n";
+      print "yb[3] = " . $$yb[ 3 ] ."\n";
+
+   }
+   
+   # Return
+   return 1;     
+      
+}          
+
+=item B<_GQch>
+
+This function returns the heights of characters drawn vertically and
+horizontally in world coordinates.
+
+   my ( $status, $chv, $chh ) = _GQch( );
+
+Where $chv is a reference which is to receive the height of characters 
+drawn with a vertical baseline. This will be an increment in the X axis.
+
+Where $chh is a reference which is to receive the height of characters 
+drawn with a horizontal baseline. This will be an increment in the Y axis.
+
+=cut
+
+sub _GQch {
+   croak( "_GQch: Not yet implemented.");
+}   
+
+
+=item B<_GAttr>
+
+This function returns the current value of a specified graphics
+attribute, and optionally establishes a new value. The supplied
+value is converted to an integer value if necessary before use.
+
+
+   my $status = _GAttr( $attr, $value, $old_value, $prim );
+
+Where $attr is an integer value identifying the required attribute. 
+The following symbolic values are defined in the AST grf.h:
+
+           GRF__STYLE  - Line style.
+           GRF__WIDTH  - Line width.
+           GRF__SIZE   - Character and marker size scale factor.
+           GRF__FONT   - Character font.
+           GRF__COLOUR - Colour index.
+
+$value is a new value to store for the attribute. If this is 
+AST__BAD no value is stored, and $old_value is a scalar containing
+th eold attribute value, if this is NULL no value is returned. 
+ 
+Finally $prim is the sort of graphics primitive to be drawn with 
+the new attribute. Identified by the following values defined in 
+AST's grf.h:
+
+           GRF__LINE
+           GRF__MARK
+           GRF__TEXT
+
+=cut
+
+sub _GAttr {
+   croak( "_GAttr: Not yet implemented.");
+}   
 
 =head1 COPYRIGHT
 
