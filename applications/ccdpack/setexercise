@@ -98,6 +98,7 @@
 	 logfile=ccdtest.log \
 	 preserve=true \
 	 direction=x \
+         useset=true \
          reset accept
 
 #  Try to locate the object specification file. If this does not exist
@@ -196,10 +197,10 @@
          picgrid xpic=3 ypic=1 accept
          lutheat accept
          picsel 1 
-         bounds data-a image nolabnum nolabname noorigin \
-                style='"title=Raw data"' reset accept
-         picsel 2; bounds data-b
-         picsel 3; bounds data-c
+         drawndf data-a image nolabnum nolabname noorigin \
+                 style='"title=Raw data"' reset accept
+         picsel 2; drawndf data-b
+         picsel 3; drawndf data-c
       endif
 	 
 #  Make a bias frame.
@@ -214,8 +215,8 @@
       if ( "$device" != "NONE" ) then
          gdclear
          lutheat
-         bounds master_bias image nolabnum nolabname noorigin \
-                style='"title=Master bias frames"' reset accept
+         drawndf master_bias image nolabnum nolabname noorigin \
+                 style='"title=Master bias frames"' reset accept
       endif
 
 #  Debias all frames (including flatfields)
@@ -231,10 +232,10 @@
          picgrid xpic=3 ypic=1
          lutheat
          picsel 1; 
-         bounds debias_data-a image nolabnum nolabname noorigin \
-                style='"title=Debiassed data"' reset accept
-         picsel 2; bounds debias_data-b
-         picsel 3; bounds debias_data-c
+         drawndf debias_data-a image nolabnum nolabname noorigin \
+                 style='"title=Debiassed data"' reset accept
+         picsel 2; drawndf debias_data-b
+         picsel 3; drawndf debias_data-c
       endif
 
 #  Create a flat field master
@@ -249,8 +250,8 @@
       if ( "$device" != "NONE" ) then 
          gdclear accept
          lutheat accept
-         bounds master_flat image nolabnum nolabname noorigin \
-                style='"title=Master flat fields"' reset accept
+         drawndf master_flat image nolabnum nolabname noorigin \
+                 style='"title=Master flat fields"' reset accept
       endif
 
 #  Flatfield all the data frames
@@ -264,10 +265,10 @@
          gdclear accept
          picgrid xpic=3 ypic=1
          picsel 1
-         bounds reduced_data-a nolabnum nolabname noorigin image \
-                style='"title=Reduced data"' reset accept
-         picsel 2; bounds reduced_data-b
-         picsel 3; bounds reduced_data-c
+         drawndf reduced_data-a nolabnum nolabname noorigin image \
+                 style='"title=Reduced data"' reset accept
+         picsel 2; drawndf reduced_data-b
+         picsel 3; drawndf reduced_data-c
       endif
 
 #  Now proceed to test out some alignment functionality.
@@ -414,7 +415,7 @@
          gdclear
          picgrid xpic=2 ypic=1
          picsel 1
-         bounds \
+         drawndf \
             in='"xdata-[abc]"' \
             labnum=true \
             labname=false \

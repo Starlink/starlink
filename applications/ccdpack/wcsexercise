@@ -38,7 +38,7 @@
 #        Changed name CCDEXERCISE -> WCSEXERCISE and removed
 #        pre-registration steps.
 #     9-JAN-2001 (MBT):
-#        Added demo of BOUNDS task.
+#        Added demo of DRAWNDF task.
 #     {enter_further_changes_here}
 #-
 #
@@ -363,11 +363,11 @@
          echo "  alignment."
          echo " "
          gdclear \\
-         bounds \
+         drawndf \
             in='data-??' \
             clear \
             reset accept
-#        end bounds
+#        end drawndf
          plotlist \
             inlist='data-1?' \
             mtype=2 \
@@ -439,20 +439,20 @@
          echo " "
          echo "  Drawing outlines of the images over the displayed mosaic."
          echo " "
-         bounds \
+         drawndf \
             in='data-1?' \
             noclear \
             nopenrot \
             style='"colour=2"' \
             reset accept
-#        end bounds
-         bounds \
+#        end drawndf
+         drawndf \
             in='data-2?' \
             noclear \
             nopenrot \
             style='"colour=3"' \
             reset accept
-#        end bounds
+#        end drawndf
       endif
 
 #  Exercise is completed.

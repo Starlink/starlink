@@ -39,7 +39,7 @@
 *     21-SEP-1999 (MBT):
 *        Added new task DRIZZLE.
 *     22-DEC-2000 (MBT):
-*        Added new task BOUNDS.
+*        Added new task DRAWNDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -80,11 +80,11 @@
       ELSE IF ( ACTION .EQ. 'ASTIMP' ) THEN
          CALL ASTIMP( STATUS )
 
-      ELSE IF ( ACTION .EQ. 'BOUNDS' ) THEN
-         CALL BOUNDS( STATUS )
-
       ELSE IF ( ACTION .EQ. 'CCDEDIT' ) THEN
          CALL CCDEDIT( STATUS )
+
+      ELSE IF ( ACTION .EQ. 'DRAWNDF' ) THEN
+         CALL DRAWNDF( STATUS )
 
       ELSE IF ( ACTION .EQ. 'DRIZZLE' ) THEN
          CALL DRIZZLE( STATUS )

@@ -82,7 +82,7 @@ package ccdpack {
 #     21-SEP-1999 (MBT):
 #        Added inclusion of drizzle.ifd
 #     6-FEB-2001 (MBT):
-#        Added entries for BOUNDS, MAKESET, SHOWSET.
+#        Added entries for DRAWNDF, MAKESET, SHOWSET.
 #     {enter_changes_here}
 #-
 
@@ -123,7 +123,7 @@ package ccdpack {
       source astexp.ifd
       source wcsedit.ifd
       source wcsreg.ifd
-      source bounds.ifd
+      source drawndf.ifd
    }
 
    executable ccdpack_res {

@@ -1,10 +1,10 @@
-      SUBROUTINE BOUNDS( STATUS )
+      SUBROUTINE DRAWNDF( STATUS )
 *+
 *  Name:
-*     BOUNDS
+*     DRAWNDF
 
 *  Purpose:
-*     Draws aligned boundaries of NDFs on a graphics display.
+*     Draws aligned images or outlines on a graphics display.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL BOUNDS( STATUS )
+*     CALL DRAWNDF( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -24,7 +24,7 @@
 *     group of NDFs in their Current attached coordinate system.  This
 *     will show their relative positions in their current coordinates,
 *     and so can, for instance, be used to check that alignment looks
-*     sensible prior to resampling and combining into a mosaic.
+*     correct prior to resampling and combining into a mosaic.
 *     Depending on the CLEAR parameter it will either clear the 
 *     display device and set the plotting area to the right size to 
 *     fit in all the images, or leave the display intact and plot those
@@ -32,9 +32,9 @@
 *
 *     Depending on the LINES and IMAGE parameters, an outline showing
 *     the extent of each NDF can be plotted, or the pixels of the NDF
-*     resampled into the given coordinate system, or both.
-*     Each outline indicates the extent of the data array of the 
-*     corresponding NDF, and is therefore basically rectangular
+*     plotted resampled into the given coordinate system, or both.
+*     Each outline or pixel block shows the extent of the data array of
+*     the corresponding NDF, and is therefore basically rectangular
 *     in shape, though it may be distorted if the mapping
 *     between pixel and Current coordinates is nonlinear.  The origin
 *     (minimum X,Y pixel value) of each boundary can be marked and
@@ -43,16 +43,16 @@
 *     be restricted to the useful extent of the image, enabling 
 *     overscan regions or bias strips to be ignored.
 *
-*     If the OUTLINES parameter is true, the position of each NDF's
+*     If the LINES parameter is true, the position of each NDF's
 *     data array will be indicated by a (perhaps distorted) rectangle
 *     drawn on the device.  If the IMAGE parameter is true, then
 *     the image's pixels will be plotted as well as its position.
 *     The colour levels in this case are determined by the PERCENTILES
-*     argument applied separately to each plotted data set.  Overlapping
-*     images will simply be drawn on top of each other (no averaging is
-*     performed).  If the IMAGES parameter is false, the program does
-*     not need to examine the data pixels at all, so it will run
-*     much faster.
+*     argument applied separately to each plotted frame, and overlapping
+*     images will simply be drawn on top of each other - no averaging
+*     or scaling is performed.  If the IMAGES parameter is false, 
+*     the program does not need to examine the data pixels at all, 
+*     so it can run much faster.
 *
 *     The results are only likely to be sensible if the Current 
 *     coordinate system of all the NDFs is one in which they are all
@@ -60,7 +60,7 @@
 *     systems of all do not all have the same Domain (name), a 
 *     warning will be issued, but plotting will proceed.
 *
-*     BOUNDS uses the AGI graphics database in a way which is 
+*     DRAWNDF uses the AGI graphics database in a way which is 
 *     compatible with KAPPA applications; if the CLEAR parameter is 
 *     set to false (only possible when IMAGE is also false) then it 
 *     will attempt to align the plotted outlines with suitably
@@ -71,7 +71,7 @@
 *     of a set of NDFs on a mosaic image which has been constructed 
 *     using those NDFs, or to see how an undisplayed set of NDFs 
 *     would map onto one already displayed, either by a previous 
-*     invocation of BOUNDS or by a KAPPA program such as DISPLAY
+*     invocation of DRAWNDF or by a KAPPA program such as DISPLAY
 *     or CONTOUR.
 *
 *     This routine is designed for use on two-dimensional NDFs;
@@ -79,7 +79,7 @@
 *     ones will be ignored.
 
 *  Usage:
-*     bounds in [device]
+*     drawndf in [device]
 
 *  ADAM Parameters:
 *     AXES = _LOGICAL (Read)
@@ -99,14 +99,15 @@
 *        possible, alignment will occur within the Current coordinate
 *        system of the NDF.  If this is not possible, an attempt is
 *        made in SKY, PIXEL or GRID domains.  If the image cannot be
-*        aligned in any suitable domain, then BOUNDS will terminate
+*        aligned in any suitable domain, then DRAWNDF will terminate
 *        with an error.  If CLEAR is set to FALSE, then there must
 *        already be a picture displayed on the graphics device.
 *
-*        The CLEAR parameter is ignored if IMAGE is true.
+*        The CLEAR parameter is ignored (and the device cleared anyway)
+*        if IMAGE is true.
 *        [TRUE]
 *     DEVICE = DEVICE (Read)
-*        The name of the device on which to draw the outlines.
+*        The name of the device on which to make the plot.
 *        [Current display device]
 *     EXTENT( 4 ) = _INTEGER (Read)
 *        The extent of the useful CCD area.  This should be given in
@@ -117,8 +118,8 @@
 *        given in the order XMIN,XMAX,YMIN,YMAX.
 *
 *        If the TRIM parameter is set true, then only the area defined
-*        by these values is outlined or displayed.  If TRIM is false,
-*        this parameter is ignored.
+*        by these values is drawn.  If TRIM is false, this parameter 
+*        is ignored.
 *
 *        If USEEXT is set, then these values will be sought from the
 *        .MORE.CCDPACK.EXTENT extension of each NDF; this will only
@@ -130,11 +131,11 @@
 *     IN = LITERAL (Read)
 *        A list of the NDFs to be displayed.
 *     IMAGE = _LOGICAL (Read)
-*        If true, the pixels of the each image will be plotted as well
-*        as the outlines.  In this case the existing image is always
-*        cleared, regardless of the value of the CLEAR parameter.
-*        Note that BOUNDS does not need to examine the NDF pixels
-*        at all unless this option is true, so setting it will make
+*        If true, the pixels of the each image will be plotted.
+*        In this case any existing plot on the graphics device is
+*        always cleared, regardless of the value of the CLEAR parameter.
+*        Note that DRAWNDF does not need to examine the NDF pixels
+*        at all unless this option is true, so setting it can make
 *        the program run much more slowly.
 *        [FALSE]
 *     LABNAME = _LOGICAL (Read)
@@ -150,10 +151,10 @@
 *        Label positioning is determined by the LABPOS parameter.
 *        [FALSE]
 *     LABOPAQUE = _LOGICAL (Read)
-*        If true, the background on which the label (if the LABNUM or
-*        LABNAME parameters are true) will be an opaque rectangle of
-*        the background colour.  If false, the text will just be
-*        plotted over the top, and may be hard to read.
+*        If true, the label text indicated by the LABNUM and LABNAME
+*        parameters will be written on an opaque rectangle of background
+*        colour obscuring the picture below.  If false, the text will
+*        be plotted directly on the picture, which may be hard to read.
 *        [TRUE]
 *     LABPOS = LITERAL (Read)
 *        A two-character string identifying the positioning of the text 
@@ -186,7 +187,7 @@
 *        centre of the outline by setting LABPOS="CC".
 *        [FALSE]
 *     LINES = _LOGICAL (Read)
-*        If true, outlines of each NDF are plotted.  If false, no
+*        If true, the outline of each NDF is plotted.  If false, no
 *        outlines are plotted.
 *        [TRUE]
 *     LOGFILE = FILENAME (Read)
@@ -215,7 +216,7 @@
 *        default is "BOTH".
 *        [BOTH]
 *     ORIGIN = _LOGICAL (Read)
-*        If true, a marker is placed at the GRID coordinate origin
+*        If true, a marker is placed at the grid coordinate origin
 *        of each NDF (the corner of the data region being considered
 *        which has the lowest X and Y pixel coordinates).
 *        [TRUE]
@@ -283,23 +284,25 @@
 *        [TRUE]
 
 *  Examples:
-*     bounds reg-data* clear
+*     drawndf reg-data* clear
 *        This will clear the current graphics device and plot on it 
 *        labelled outlines of all the `reg-data*' NDFs, as well as
 *        axes showing the common coordinate system in which they
 *        all reside.  The plotting area will be made just large enough
-*        that all the outlines fit in.  Prior to running this, the 
+*        that all the outlines fit in.  Prior to running this, the
 *        Current attached coordinate system of all the reg-data* NDFs
 *        should be one in which they are all aligned.
 *
-*     bounds ccd* noclear
+*     drawndf ccd* noclear
 *        This will attempt to plot boundaries of all the `ccd*' NDFs 
 *        aligned with whatever is already plotted on the graphics 
 *        device, for instance the result of a KAPPA DISPLAY command
-*        or of a previous call of BOUNDS.  Parts of the NDF outlines
+*        or of a previous call of DRAWNDF.  Parts of the NDF outlines
 *        which fall outside the existing plot area will not be visible.
+*        If this is attempted when there is no existing picture on
+*        the graphics device it will fail with an error.
 *
-*     bounds in="one,two,three' axes=yes labname labnum penrot=yes
+*     drawndf in="one,two,three" axes labname labnum penrot
 *             style="size(strings)=2,width(curves)=3"
 *        This will draw outlines of the NDFs `one', `two' and `three' 
 *        in the current directory with labelled axes, in triple-thick 
@@ -308,19 +311,18 @@
 *        outline and its associated text label will be different from
 *        the others.
 *
-*     bounds in=a* noclear nopenrot style="colour=2" nolabel nolabnum
+*     drawndf in=a* noclear nopenrot style="colour=2" nolabel nolabnum
 *        All the NDFs beginning with `a' will be outlined in colour 2,
 *        with no text labels or indication of the origin.
 *
-*     bounds in=gc2112 nolines image percentiles=1,99
+*     drawndf in=gc2112 nolines image percentiles=[20,90]
 *        The graphics device will be cleared, and the named image
 *        resampled into its Current attached coordinate system will
-*        be displayed.  The data will be scaled such that any pixels
-*        brighter than the 99th percentile are plotted in the highest
-*        available colour and any dimmer than the 1st percentile are
-*        plotted in the lowset available colour.
+*        be displayed.  The data will be scaled such that the brightest
+*        10% of pixels are plotted in the highest available colour and
+*        the dimmest 20% in the lowest.
 *
-*     bounds obs-[abc] image lines labup labopaque=false
+*     drawndf "obs-[abc]" image lines labup labopaque=false
 *        The files obs-a, obs-b and obs-c will be plotted; both the
 *        outlines and the pixel data will be shown, and the name of
 *        each will be drawn upright in the middle of each one,
@@ -331,7 +333,7 @@
 *        When the IMAGE parameter is true and image pixels are plotted,
 *        the image data has to be resampled into the Current coordinate
 *        system prior to being displayed on the graphics device.
-*        BOUNDS currently does this using a nearest-neighbour 
+*        DRAWNDF currently does this using a nearest-neighbour 
 *        resampling scheme if the display pixels are of comparable
 *        size or larger than the image pixels, and a block averaging
 *        scheme if they are much smaller (less than one third the size).
@@ -352,8 +354,7 @@
 *     -  Display:
 *        The IMAGE display mode is not particularly sophisticated.
 *        If you wish to view a single image in its pixel coordinate 
-*        system, you may find KAPPA's DISPLAY program more suitable.
-
+*        system, you may find KAPPA's DISPLAY program more versatile.
 
 *  Behaviour of Parameters:
 *     All parameters retain their current value as default. The
@@ -381,7 +382,7 @@
 *     from its global or command-line value if it is not present there.
 
 *  Implementation Status:
-*     BOUNDS's communication with the AGI database is compatible with
+*     DRAWNDF's communication with the AGI database is compatible with
 *     most of KAPPA's behaviour, but is slightly less capable; in 
 *     particular it will fail to align with pictures whose alignment
 *     has been stored using TRANSFORM structures instead of MORE.AST
@@ -585,7 +586,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Start up CCDPACK.
-      CALL CCD1_START( 'BOUNDS', STATUS )
+      CALL CCD1_START( 'DRAWNDF', STATUS )
 
 *  Start an NDF context.
       CALL NDF_BEGIN
@@ -670,7 +671,7 @@
      :        LABPOS( 2:2 ) .NE. 'N' .AND. LABPOS( 2:2 ) .NE. 'C' .AND.
      :        LABPOS( 2:2 ) .NE. 'F' ) ) THEN
             STATUS = SAI__ERROR
-            CALL CCD1_ERREP( 'BOUNDS_BADJUST', 'BOUNDS: LABPOS ' //
+            CALL CCD1_ERREP( 'DRAWNDF_BADJUST', 'DRAWNDF: LABPOS ' //
      :                       'parameter not of form [NCF][NCF]',
      :                       STATUS )
             GO TO 99
@@ -790,7 +791,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'NDF', NDFNAM )
             CALL MSG_SETI( 'NAXES', NAXES )
-            CALL CCD1_ERREP( ' ', 'BOUNDS: NDF ''^NDF'' has ^NAXES '
+            CALL CCD1_ERREP( ' ', 'DRAWNDF: NDF ''^NDF'' has ^NAXES '
      :                    // 'axes in Current coordinates.', STATUS )
             CALL CCD1_ERREP( ' ', '         It must have 2.', STATUS )
             GO TO 99
@@ -806,7 +807,7 @@
          IF ( NAXES .LT. 2 .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'NDF', NDFNAM )
-            CALL CCD1_ERREP( ' ', 'BOUNDS: NDF ''^NDF'' must have at '
+            CALL CCD1_ERREP( ' ', 'DRAWNDF: NDF ''^NDF'' must have at '
      :                    // 'least 2 dimensions.', STATUS )
             GO TO 99
          ELSE IF ( NAXES .GT. 2 ) THEN
@@ -967,7 +968,7 @@
       CALL CCD1_PLSTY( PLOT, 'Tol=0.001', 'STYLE', STATUS )
 
 *  Save the PGPLOT viewport as a new picture in the AGI database.
-      CALL AGP_SVIEW( 'DATA', 'CCDPACK_BOUNDS', PICOD, STATUS )
+      CALL AGP_SVIEW( 'DATA', 'CCDPACK_DRAWNDF', PICOD, STATUS )
 
 *  Save the Plot in the new picture.
       CALL CCD1_SPLOT( PICOD, PLOT, STATUS )
@@ -1322,8 +1323,8 @@
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP( 'BOUNDS_ERR',
-     :                  'BOUNDS: Boundary plotting failed.', STATUS )
+          CALL ERR_REP( 'DRAWNDF_ERR',
+     :                  'DRAWNDF: Boundary plotting failed.', STATUS )
       END IF
 
 *  Close CCDPACK logging system.
