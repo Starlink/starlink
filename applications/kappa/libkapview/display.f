@@ -157,7 +157,7 @@
 *     KEYPOS = _REAL (Read)
 *        A value giving the gap between the right hand edge of the display
 *        and the left hand edge of the key, given as a fraction of the
-*        width of the current picture). If a key is produced, then the 
+*        width of the current picture. If a key is produced, then the 
 *        right hand margin specified by parameter MARGIN is ignored, and
 *        the value supplied for KEYPOS is used instead. [current value]
 *     KEYSTYLE = GROUP (Read)
