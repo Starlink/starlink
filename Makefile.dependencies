@@ -827,6 +827,7 @@ $(MANIFEST)/hdstrace: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/fio \
+		$(MANIFEST)/generic \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/mers \
