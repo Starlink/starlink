@@ -63,6 +63,7 @@ install-am: all-am
 	echo "component=$(PACKAGE_NAME)" >stamp-starlink-install
 	echo "version=$(PACKAGE_VERSION)" >>stamp-starlink-install
 	echo "date=\"`date`\"" >>stamp-starlink-install
+	$(mkdir_p) $(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) stamp-starlink-install \
 	    $(STAR_MANIFEST_DIR)/stamp-$(PACKAGE_NAME)
 	rm -f stamp-starlink-install
