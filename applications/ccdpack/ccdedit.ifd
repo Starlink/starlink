@@ -19,6 +19,8 @@
 #     	 Original version.
 #     7-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     26-FEB-2001 (MBT):
+#        Added FIXWCS parameter.
 #     {enter_changes_here}
 
 #-
@@ -161,6 +163,16 @@
             vpath PROMPT CURRENT
             ppath CURRENT
             prompt {Transformation classifications}
+            helpkey *
+          }
+
+         parameter fixwcs {
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Erase CCD_SET coordinate frames from WCS component too?}
+            default TRUE
             helpkey *
           }
 

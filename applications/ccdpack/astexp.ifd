@@ -92,7 +92,7 @@
             access READ
             vpath PROMPT
             ppath CURRENT DEFAULT
-            prompt {Type of frameset identifier (FITSID,INDEX)}
+            prompt {Type of frameset identifier (SET,FITSID,INDEX)}
             default INDEX
             helpkey *
           }

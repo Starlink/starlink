@@ -23,6 +23,8 @@
 #     	 Added KEEPIN parameter.
 #     6-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     12-FEB-2001 (MBT):
+#        Added USESET parameter.
 #     {enter_further_changes_here}
 
 #-
@@ -95,6 +97,16 @@
             ppath CURRENT DEFAULT
             default {Output from FLATCOR}
             prompt {Title for the output NDF}
+            helpkey *
+          }
+
+         parameter useset {
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Use Set header information?}
+            default TRUE
             helpkey *
           }
 

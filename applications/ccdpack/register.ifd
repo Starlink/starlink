@@ -23,6 +23,8 @@
 #        Added OUTDOMAIN.
 #     7-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     23-FEB-2001 (MBT):
+#        Added USESET parameter.
 #     {enter_changes_here}
 
 #-
@@ -121,6 +123,16 @@
             vpath PROMPT CURRENT
             ppath CURRENT
             prompt {List of NDFs to contain new coordinate systems}
+            helpkey *
+          }
+
+         parameter useset {
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Group lists using Set header information?}
+            default TRUE
             helpkey *
           }
 

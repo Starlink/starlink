@@ -20,6 +20,8 @@
 #        Added OVERRIDE parameter.
 #     7-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     16-FEB-2001 (MBT):
+#        Upgraded for use with Sets.
 #     {enter_further_changes_here}
 
 #-
@@ -74,6 +76,16 @@
             ppath CURRENT DEFAULT
             default FALSE
             prompt {Continue when not all NDFs can be aligned}
+            helpkey *
+          }
+
+         parameter useset {
+            type _LOGICAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Should Set information (CCD_SET frames) take precedence?}
             helpkey *
           }
 

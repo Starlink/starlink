@@ -77,6 +77,17 @@
             helpkey *
          }
 
+         parameter useset {
+                           # Whether to use Set header information
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Rotate pens by Set membership?}
+            helpkey *
+         }
+
          parameter style {
                           # Plot style
             type LITERAL

@@ -44,6 +44,11 @@
 *        calibration image contains dark or flash exposure CCD data
 *        which have been bias corrected.
 *
+*        If USESET is true, CAL should be a group expression referring
+*        to one calibration frame matching each of the Set Index
+*        attributes represented in the IN list; again the name of
+*        the file produced by MAKECAL will normally be suitable.
+*
 *        The name of this file may be specified using indirection
 *        through a file.
 *        [Global calibration image]
@@ -169,6 +174,17 @@
 *     TITLE = LITERAL (Read)
 *        Title for the output images.
 *        [Output from CALCOR].
+*     USESET = _LOGICAL (Read)
+*        Whether to use Set header information or not.  If USESET is
+*        false then any Set header information will be ignored.
+*        If USESET is true, then the CAL parameter is taken to
+*        refer to a group of files, and each IN file will be 
+*        processed using a calibration image with a Set Index 
+*        attribute which matches its own.  An IN file with no Set
+*        header is considered to match a CAL file with no Set header,
+*        so USESET can safely be set true (the default) when the 
+*        input files contain no Set header information.
+*        [TRUE]
 
 *  Examples:
 *     calcor frame1 frame2 calibration 250
@@ -271,6 +287,8 @@
 *        Modified to propagate WCS component.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     14-FEB-2001 (MBT):
+*        Upgraded for use with Sets.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -300,30 +318,39 @@
       CHARACTER * ( GRP__SZNAM ) CVAL  ! String to hold the EXPOSURE factors expressed as a string
       CHARACTER * ( NDF__SZTYP ) CTYPE ! Calibration data type
       CHARACTER * ( NDF__SZTYP ) DTYPE ! Current data type
-      CHARACTER * ( 6 ) ACCESS   ! Access mode for NDFs
+      DOUBLE PRECISION EFACIN( CCD1__MXNDF ) ! Exposure factors for all NDFs
+      DOUBLE PRECISION EFACT( CCD1__MXNDF ) ! Exposure factors for subgroup
       DOUBLE PRECISION EXPOSE    ! Exposure factor (dark or flash).
       DOUBLE PRECISION SATVAL    ! Saturation value
+      INTEGER CALGRP             ! GRP identifier for CAL NDFs
       INTEGER EL                 ! Number of elements in input array components
-      INTEGER FACGID             ! Group identifier for exposure factors
       INTEGER GIDIN              ! Group identifier for input NDFs
       INTEGER GIDOUT             ! Group identifier for output NDFs
+      INTEGER I                  ! Loop index
       INTEGER IDCAL              ! Input NDF identifier (calibration)
       INTEGER IDCTMP             ! Current section of input NDF (calibration)
       INTEGER IDIN               ! Input NDF identifier
       INTEGER IDOUT              ! Output NDF identifier
       INTEGER INDEX              ! Counter for NDF processing loop
+      INTEGER INGRP              ! NDG identifer for group of all IN NDFs
       INTEGER IPDCAL             ! Pointer to input Data component (cal)
       INTEGER IPDIN              ! Pointer to input Data component
       INTEGER IPDOUT             ! Pointer to output Data component
       INTEGER IPVCAL             ! Pointer to input Variance component (cal)
       INTEGER IPVIN              ! Pointer to input Variance component
       INTEGER IPVOUT             ! Pointer to output Data component
+      INTEGER ISUB               ! Subgroup loop index
       INTEGER IVAL               ! Dummy
+      INTEGER KEYGRP             ! GRP identifer for subgroup Index keys
       INTEGER LBND( 2 )          ! Lower of bounds of input NDF
       INTEGER LBNDC( 2 )         ! Lower bounds of calibration NDF.
       INTEGER LBNDL( 2 )         ! Lower bounds of last ndf
       INTEGER NDIM               ! Number of dimensions of input NDF
       INTEGER NNDF               ! Number of NDFs to process
+      INTEGER NSUB               ! Number of subgroups
+      INTEGER NTOT               ! Total number of IN NDFs
+      INTEGER OUTGRP             ! GRP identifier for all output NDFs
+      INTEGER SUBGRP( CCD1__MXNDF ) ! NDG identifer for NDFs in each subgroup
       INTEGER UBND( 2 )          ! Upper bounds of input NDF
       INTEGER UBNDC( 2 )         ! Upper bounds of calibration NDF.
       INTEGER UBNDL( 2 )         ! Upper bounds of last NDF
@@ -337,6 +364,7 @@
       LOGICAL REMAP              ! Controls remapping of Calibration frame
       LOGICAL SETSAT             ! Set if have saturated values
       LOGICAL USEEXT             ! Use extension items
+      LOGICAL USESET             ! Are we using Set headers?
 *.
 
 *  Check inherited global status.
@@ -344,6 +372,18 @@
 
 *  Startup logging and write task introduction.
       CALL CCD1_START( 'CALCOR', STATUS )
+
+*  Initialise GRP identifiers, so that a later call of CCD1_GRDEL on
+*  an uninitialised group cannot cause trouble.
+      GIDIN = GRP__NOID
+      GIDOUT = GRP__NOID
+      INGRP = GRP__NOID
+      OUTGRP = GRP__NOID
+      KEYGRP = GRP__NOID
+      CALGRP = GRP__NOID
+      DO I = 1, CCD1__MXNDF
+         SUBGRP( I ) = GRP__NOID
+      END DO
 
 *  See if the user wants to save disk space by deleting the input NDFs
 *  when DEBIAS is finished with them. This will use the NDF_DELET
@@ -364,121 +404,156 @@
       CALL PAR_CHOIC( 'TYPE', 'NONE', 'NONE,DARK,FLASH', .TRUE., FTYPE,
      :                STATUS )
 
-*  Set the access mode for the NDFs.
-      IF ( DELETE ) THEN
-         ACCESS = 'UPDATE'
-      ELSE
-         ACCESS = 'READ'
-      END IF
-
 *  Access a group of NDF and exposure factors, which require processing.
 *  If asked look for these values in the extensions of the input NDFs.
 *  Do not allow this if the frame type is unknown.
       CALL NDF_BEGIN
       IF ( FTYPE .EQ. 'NONE' ) USEEXT = .FALSE.
-      CALL CCD1_NDFGB( FTYPE, USEEXT, 'IN', 'EXPOSE', GIDIN, FACGID,
-     :                 NNDF, STATUS )
+      CALL CCD1_NDFAB( FTYPE, USEEXT, 'IN', CCD1__MXNDF, 'EXPOSE',
+     :                 INGRP, EFACIN, NTOT, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
-*  Ask for a calibration NDF. Check for its variance also.
-      CALL CCD1_NDFAC( 'CAL', 'READ', 1, 1, IVAL, IDCAL, STATUS )
-      CALL NDF_STATE( IDCAL, 'Variance', HAVCV, STATUS )
+*  Find out if we are using Set header information.
+      CALL PAR_GET0L( 'USESET', USESET, STATUS )
+
+*  Split the group of input NDFsby Set Index if necessary.
+      NSUB = 1
+      IF ( USESET ) THEN
+         CALL CCD1_SETSP( INGRP, 'INDEX', CCD1__MXNDF, SUBGRP, NSUB,
+     :                    KEYGRP, STATUS )
+      ELSE
+         SUBGRP( 1 ) = INGRP
+         KEYGRP = GRP__NOID
+      END IF
+
+*  Ask for a calibration NDF, or a group of NDFs matching the Set Index
+*  attributes we have. 
+      IF ( USESET ) THEN
+         CALL CCD1_NDFMI( 'CAL', KEYGRP, CALGRP, STATUS )
+      ELSE
+         CALL CCD1_NDFGL( 'CAL', 1, 1, CALGRP, IVAL, STATUS )
+      END IF
+
+*  Get the names of the output NDFs. Use the input names as a 
+*  modification group for these.
+      CALL CCD1_NDFPG( 'OUT', INGRP, NTOT, OUTGRP, STATUS )
+
+*  Loop over subgroups performing calculations separately for each one.
+      DO ISUB = 1, NSUB
+
+*  Write a header unless this is the only subgroup.
+         IF ( NSUB .GT. 1 ) THEN
+            CALL CCD1_SETHD( KEYGRP, ISUB, 
+     :                       'Applying calibration correction', 'Index',
+     :                       STATUS )
+         END IF
+
+*  Set up the group of input NDFs for this subgroup.
+         GIDIN = SUBGRP( ISUB )
+         CALL GRP_GRPSZ( GIDIN, NNDF, STATUS )
+
+*  Set up the exposure factors for this subgroup.
+         CALL CCG1_ORDD( INGRP, EFACIN, SUBGRP( ISUB ), EFACT, STATUS )
+
+*  Set up the group of output NDFs for this subgroup.
+         CALL CCD1_ORDG( INGRP, OUTGRP, GIDIN, GIDOUT, STATUS )
+
+*  Get the calibration frame's NDF identifier for this subgroup.
+         CALL NDG_NDFAS( CALGRP, ISUB, 'READ', IDCAL, STATUS )
+
+*  Check for the calibration frame's variance.
+         CALL NDF_STATE( IDCAL, 'Variance', HAVCV, STATUS )
 
 *  Check the frame type of the calibration frame. This should be
 *  MASTER_something, depending on the value of FTYPE. If FTYPE is none
 *  just look for a MASTER_CAL type. If this is wrong this is not a
 *  serious problem.
-      IF ( FTYPE .EQ. 'DARK' ) THEN
-         CALL CCD1_CKTYP( IDCAL, 1, 'MASTER_DARK', STATUS )
-      ELSE IF ( FTYPE .EQ. 'FLASH' ) THEN
-         CALL CCD1_CKTYP( IDCAL, 1, 'MASTER_FLASH', STATUS )
-      ELSE
-         CALL CCD1_CKTYP( IDCAL, 1, 'MASTER_CAL', STATUS )
-      END IF
+         IF ( FTYPE .EQ. 'DARK' ) THEN
+            CALL CCD1_CKTYP( IDCAL, 1, 'MASTER_DARK', STATUS )
+         ELSE IF ( FTYPE .EQ. 'FLASH' ) THEN
+            CALL CCD1_CKTYP( IDCAL, 1, 'MASTER_FLASH', STATUS )
+         ELSE
+            CALL CCD1_CKTYP( IDCAL, 1, 'MASTER_CAL', STATUS )
+         END IF
 
 *  Get bounds of calibration NDF.
-      CALL NDF_BOUND( IDCAL, 2, LBNDC, UBNDC, NDIM, STATUS )
+         CALL NDF_BOUND( IDCAL, 2, LBNDC, UBNDC, NDIM, STATUS )
 
 *  Get the data type of the calibration frame.
-      CALL NDF_TYPE( IDCAL, 'Data,Variance', CTYPE, STATUS )
-
-*  Get the names of the output NDFs. Use GIDIN as a modification group
-*  for these.
-      CALL CCD1_NDFPG( 'OUT', GIDIN, NNDF, GIDOUT, STATUS )
+         CALL NDF_TYPE( IDCAL, 'Data,Variance', CTYPE, STATUS )
 
 *  Begin processing loop.
-      DO 99999 INDEX = 1, NNDF
+         DO 99999 INDEX = 1, NNDF
 
 *  Get the input NDF identifier
-         CALL NDG_NDFAS( GIDIN, INDEX, ACCESS, IDIN, STATUS )
+            CALL NDG_NDFAS( GIDIN, INDEX, 'READ', IDIN, STATUS )
 
 *  Write out name of this NDF.
-         CALL CCD1_MSG( ' ',  ' ', STATUS )
-         CALL NDF_MSG( 'CURRENT_NDF', IDIN )
-         CALL CCD1_MSG( ' ', '  +++ Processing NDF: ^CURRENT_NDF',
-     :                  STATUS )
+            CALL CCD1_MSG( ' ',  ' ', STATUS )
+            CALL NDF_MSG( 'CURRENT_NDF', IDIN )
+            CALL CCD1_MSG( ' ', '  +++ Processing NDF: ^CURRENT_NDF',
+     :                     STATUS )
 
 *  Inform user how many NDFs we've processed out of the total number.
-         CALL MSG_SETI( 'CURRENT_NUM', INDEX )
-         CALL MSG_SETI( 'MAX_NUM', NNDF )
-         CALL CCD1_MSG( ' ', '  (Number ^CURRENT_NUM of ^MAX_NUM)',
-     :                  STATUS )
+            CALL MSG_SETI( 'CURRENT_NUM', INDEX )
+            CALL MSG_SETI( 'MAX_NUM', NNDF )
+            CALL CCD1_MSG( ' ', '  (Number ^CURRENT_NUM of ^MAX_NUM)',
+     :                     STATUS )
 
 *  Check that this is an NDF which is ok for correcting in this fashion.
 *  This means it shouldn't be a BIAS or MASTER of any kind and should
 *  have been debiassed.
-         CALL CCD1_CKCCL( IDIN, STATUS )
+            CALL CCD1_CKCCL( IDIN, STATUS )
 
 *  And the associated exposure factor.
-         CALL GRP_GET( FACGID, INDEX, 1, CVAL, STATUS )
-         CALL CHR_CTOD( CVAL, EXPOSE, STATUS )
+            EXPOSE = EFACT( ISUB )
 
 *  Check for presence of a variance component.
-         CALL NDF_STATE( IDIN, 'Variance', HAVDV, STATUS )
+            CALL NDF_STATE( IDIN, 'Variance', HAVDV, STATUS )
 
 *  If no input variance is present them cannot process any variances
 *  set the calibration variance flag.
-         IF ( .NOT. HAVDV ) THEN
-            HAVCV2 = .FALSE.
-         ELSE
-            HAVCV2 = HAVCV
-         END IF
+            IF ( .NOT. HAVDV ) THEN
+               HAVCV2 = .FALSE.
+            ELSE
+               HAVCV2 = HAVCV
+            END IF
 
 *  Get the bounds of the current NDF.
-         CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
+            CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
 
 *  If the size of the input NDF has changed from the last NDF, then we
 *  require a retrimming of the calibration frame. Trim any way if this
 *  is the first loop.
-         IF ( INDEX .EQ. 1 ) THEN
-            REMAP = .TRUE.
-         ELSE
-            IF ( LBND( 1 ) .NE. LBNDL( 1 ) .OR.
-     :           UBND( 1 ) .NE. UBNDL( 1 ) .OR.
-     :           LBND( 2 ) .NE. LBNDL( 2 ) .OR.
-     :           UBND( 2 ) .NE. UBNDL( 2 ) ) THEN
+            IF ( INDEX .EQ. 1 ) THEN
                REMAP = .TRUE.
             ELSE
+               IF ( LBND( 1 ) .NE. LBNDL( 1 ) .OR.
+     :              UBND( 1 ) .NE. UBNDL( 1 ) .OR.
+     :              LBND( 2 ) .NE. LBNDL( 2 ) .OR.
+     :              UBND( 2 ) .NE. UBNDL( 2 ) ) THEN
+                  REMAP = .TRUE.
+               ELSE
 
 *  No change in bonds remapping may not be necessary.
-               REMAP = .FALSE.
+                  REMAP = .FALSE.
+               END IF
             END IF
-         END IF
 
 *  Check the bounds of the CALIBRATION frame against those of the
 *  current input NDF. If the bounds are not the same as those of the
 *  input NDF then trimming will occur.
-         IF ( LBND( 1 ) .NE. LBNDC( 1 ) .OR.
-     :        UBND( 1 ) .NE. UBNDC( 1 ) .OR.
-     :        LBND( 2 ) .NE. LBNDC( 2 ) .OR.
-     :        UBND( 2 ) .NE. UBNDC( 2 ) ) THEN
-            REMAP = .TRUE.
+            IF ( LBND( 1 ) .NE. LBNDC( 1 ) .OR.
+     :           UBND( 1 ) .NE. UBNDC( 1 ) .OR.
+     :           LBND( 2 ) .NE. LBNDC( 2 ) .OR.
+     :           UBND( 2 ) .NE. UBNDC( 2 ) ) THEN
+               REMAP = .TRUE.
 
 *  Issue warning about this, in general it should be a mistake.
-            CALL MSG_OUT( 'BAD_BOUNDS',
-     :      ' Warning - bounds of NDFs do not match'
-     :      , STATUS )
-         END IF
+               CALL MSG_OUT( 'BAD_BOUNDS',
+     :         ' Warning - bounds of NDFs do not match'
+     :         , STATUS )
+            END IF
 
 *  Sort out data typing. If the user wants to preserve the input data
 *  types on exit then no action is required CALCOR can process any
@@ -486,167 +561,178 @@
 *  want to preserve the input data type (say because many numeric
 *  errors are expected in the current precision) then select a minimum
 *  floating data type.
-         CALL PAR_GET0L( 'PRESERVE', PRESER, STATUS )
+            CALL PAR_GET0L( 'PRESERVE', PRESER, STATUS )
 
 *  Get the input data type.
-         CALL NDF_TYPE( IDIN, 'Data,Variance', DTYPE, STATUS )
+            CALL NDF_TYPE( IDIN, 'Data,Variance', DTYPE, STATUS )
 
 *  If not preserving then determine a suitable floating point
 *  representation..
-         IF ( .NOT. PRESER ) THEN
-            IF ( ( DTYPE .EQ. '_UBYTE' )  .OR.
-     :           ( DTYPE .EQ. '_BYTE'  )  .OR.
-     :           ( DTYPE .EQ. '_WORD'  )  .OR.
-     :           ( DTYPE .EQ. '_UWORD' )  .OR.
-     :           ( DTYPE .EQ. '_REAL'  ) )    THEN
+            IF ( .NOT. PRESER ) THEN
+               IF ( ( DTYPE .EQ. '_UBYTE' )  .OR.
+     :              ( DTYPE .EQ. '_BYTE'  )  .OR.
+     :              ( DTYPE .EQ. '_WORD'  )  .OR.
+     :              ( DTYPE .EQ. '_UWORD' )  .OR.
+     :              ( DTYPE .EQ. '_REAL'  ) )    THEN
 
 *  Single precision enough use this.
-               DTYPE = '_REAL'
-            ELSE
+                  DTYPE = '_REAL'
+               ELSE
 
 *  Need a double precision representation (for _DOUBLE or _INTEGER)
-               DTYPE = '_DOUBLE'
+                  DTYPE = '_DOUBLE'
+               END IF
             END IF
-         END IF
 
 *  By this stage remapping decisions complete, unmap the old
 *  calibration frame section and annul the identifier.
-         IF ( REMAP ) THEN
+            IF ( REMAP ) THEN
 
 *  If not the first loop unmap the calibration data.
-            IF ( INDEX .NE. 1 ) THEN
-               CALL NDF_UNMAP( IDCTMP, '*', STATUS )
-               CALL NDF_ANNUL( IDCTMP, STATUS )
-            END IF
+               IF ( INDEX .NE. 1 ) THEN
+                  CALL NDF_UNMAP( IDCTMP, '*', STATUS )
+                  CALL NDF_ANNUL( IDCTMP, STATUS )
+               END IF
 
 *  Get a clone of the input calibration frame identifier, this ensures
 *  that a valid copy of the input NDF identifier is always used.
 *  NDF_MBND annuls the input identifiers and replaces them with the
 *  section ones.
-            CALL NDF_CLONE( IDCAL, IDCTMP, STATUS )
+               CALL NDF_CLONE( IDCAL, IDCTMP, STATUS )
 
 *  Trim the data to match bounds.
-            CALL NDF_MBND( 'TRIM', IDIN, IDCTMP, STATUS )
-         END IF
+               CALL NDF_MBND( 'TRIM', IDIN, IDCTMP, STATUS )
+            END IF
 
 *  Merge the BAD pixel flags.
-         CALL NDF_MBAD( .TRUE., IDIN, IDCTMP, 'Data,Variance', .FALSE.,
-     :                  BAD, STATUS )
+            CALL NDF_MBAD( .TRUE., IDIN, IDCTMP, 'Data,Variance',
+     :                     .FALSE., BAD, STATUS )
 
 *  Get the output NDF. Propagate everything except the Data.
 *  The variance will be unchanged if the calibration frame has none.
-         CALL NDG_NDFPR( IDIN, 'Axis,Quality,Variance,WCS', GIDOUT, 
-     :                   INDEX, IDOUT, STATUS )
+            CALL NDG_NDFPR( IDIN, 'Axis,Quality,Variance,WCS', GIDOUT,
+     :                      INDEX, IDOUT, STATUS )
 
 *  Make sure that data is in the intended output form
-         CALL NDF_STYPE( DTYPE, IDOUT, 'Data,Variance', STATUS )
+            CALL NDF_STYPE( DTYPE, IDOUT, 'Data,Variance', STATUS )
 
 *  Map in the calibration data if input data size has changed.
 *  New stratedgy -- map in (possible) permanent NDFs first may decrease
 *  virtual space fragmentation. (Mapping/remapping of large contiguous
 *  addresses.)
-         IF ( REMAP ) THEN
-            CALL NDF_MAP( IDCTMP, 'Data', CTYPE, 'READ', IPDCAL, EL,
-     :                    STATUS )
-            IF ( HAVCV2 ) CALL NDF_MAP( IDCTMP, 'Variance', CTYPE,
-     :                                  'READ', IPVCAL, EL, STATUS )
-         END IF
+            IF ( REMAP ) THEN
+               CALL NDF_MAP( IDCTMP, 'Data', CTYPE, 'READ', IPDCAL, EL,
+     :                       STATUS )
+               IF ( HAVCV2 ) CALL NDF_MAP( IDCTMP, 'Variance', CTYPE,
+     :                                     'READ', IPVCAL, EL, STATUS )
+            END IF
 
 *  Map in the input data. (Volatile)
-         CALL NDF_MAP( IDIN, 'Data', DTYPE, 'READ', IPDIN, EL, STATUS )
-         IF ( HAVDV ) CALL NDF_MAP( IDIN, 'Variance', DTYPE, 'READ',
-     :                              IPVIN, EL, STATUS )
+            CALL NDF_MAP( IDIN, 'Data', DTYPE, 'READ', IPDIN, EL,
+     :                    STATUS )
+            IF ( HAVDV ) CALL NDF_MAP( IDIN, 'Variance', DTYPE, 'READ',
+     :                                 IPVIN, EL, STATUS )
 
 *  Map in the outputs. Note the output variance is not propagated if
 *  does not exist. (Volatile)
-         CALL NDF_MAP( IDOUT, 'Data', DTYPE, 'WRITE', IPDOUT, EL,
-     :                 STATUS )
-         IF ( HAVDV ) CALL NDF_MAP( IDOUT, 'Variance', DTYPE, 'WRITE',
-     :                              IPVOUT, EL, STATUS )
+            CALL NDF_MAP( IDOUT, 'Data', DTYPE, 'WRITE', IPDOUT, EL,
+     :                    STATUS )
+            IF ( HAVDV ) CALL NDF_MAP( IDOUT, 'Variance', DTYPE,
+     :                                 'WRITE', IPVOUT, EL, STATUS )
 
 *  Look at the CCDPACK extension and see if a saturation _value_ has
 *  been applied (instead of using BAD values). If it has then extract
 *  the value.
-         CALL CCG1_FCH0D( IDIN, 'SATVAL', SATVAL, SETSAT, STATUS )
-         EXTSAT = SETSAT
-         IF ( .NOT. EXTSAT ) THEN
+            CALL CCG1_FCH0D( IDIN, 'SATVAL', SATVAL, SETSAT, STATUS )
+            EXTSAT = SETSAT
+            IF ( .NOT. EXTSAT ) THEN
 
 *  Find out if a saturation value has been applied by some other route.
-            CALL PAR_GET0L( 'SETSAT', SETSAT, STATUS )
+               CALL PAR_GET0L( 'SETSAT', SETSAT, STATUS )
 
 *  If saturation has been applied at what value?
-            IF ( SETSAT ) THEN
-               CALL PAR_GET0D( 'SATURATION', SATVAL, STATUS )
+               IF ( SETSAT ) THEN
+                  CALL PAR_GET0D( 'SATURATION', SATVAL, STATUS )
+               END IF
             END IF
-         END IF
 
 *  Do the actual processing.
-         CALL CCD1_CLCOR( CTYPE, DTYPE, BAD, EL, IPDIN, IPVIN, IPDCAL,
-     :                    IPVCAL, HAVDV, HAVCV2, EXPOSE, SETSAT, SATVAL,
-     :                    IPDOUT, IPVOUT, STATUS )
+            CALL CCD1_CLCOR( CTYPE, DTYPE, BAD, EL, IPDIN, IPVIN,
+     :                       IPDCAL, IPVCAL, HAVDV, HAVCV2, EXPOSE,
+     :                       SETSAT, SATVAL, IPDOUT, IPVOUT, STATUS )
 
 *  Set the output type if required.
-         CALL NDF_UNMAP( IDOUT, '*', STATUS )
+            CALL NDF_UNMAP( IDOUT, '*', STATUS )
 
 *  Set BAD flag.
-         CALL NDF_SBAD( BAD, IDOUT, 'Data,Variance', STATUS )
+            CALL NDF_SBAD( BAD, IDOUT, 'Data,Variance', STATUS )
 
 *  Output title.
-         CALL NDF_CINP( 'TITLE', IDOUT, 'TITLE', STATUS )
+            CALL NDF_CINP( 'TITLE', IDOUT, 'TITLE', STATUS )
 
 *  Report this NDF processing.
-         CALL CCD1_RCCR( FTYPE, IDCAL, EXPOSE, USEEXT, SETSAT, SATVAL,
-     :                   EXTSAT, IDOUT, PRESER, CTYPE, DTYPE, STATUS )
+            CALL CCD1_RCCR( FTYPE, IDCAL, EXPOSE, USEEXT, SETSAT,
+     :                      SATVAL, EXTSAT, IDOUT, PRESER, CTYPE,
+     :                      DTYPE, STATUS )
 
 *  Touch the NDF leaving an audit-like trail.
-         IF ( FTYPE .EQ. 'DARK' ) THEN
-            CALL CCD1_TOUCH( IDOUT, 'DARKCOR', STATUS )
-         ELSE IF ( FTYPE .EQ. 'FLASH' ) THEN
-            CALL CCD1_TOUCH( IDOUT, 'FLASHCOR', STATUS )
-         END IF
-         CALL CCD1_TOUCH( IDOUT, 'CALCOR', STATUS )
+            IF ( FTYPE .EQ. 'DARK' ) THEN
+               CALL CCD1_TOUCH( IDOUT, 'DARKCOR', STATUS )
+            ELSE IF ( FTYPE .EQ. 'FLASH' ) THEN
+               CALL CCD1_TOUCH( IDOUT, 'FLASHCOR', STATUS )
+            END IF
+            CALL CCD1_TOUCH( IDOUT, 'CALCOR', STATUS )
 
 *  Write terminator for Processing NDF: message.
-         IF ( DELETE ) CALL CCD1_MSG( ' ',
-     :                 '  Input NDF deleted**',STATUS )
-         CALL CCD1_MSG( ' ', '  ---',STATUS )
+            CALL CCD1_MSG( ' ', '  ---',STATUS )
 
-*  Delete the input NDF if required.
-         IF ( DELETE .AND. STATUS .EQ. SAI__OK ) THEN
-            CALL NDF_DELET( IDIN, STATUS )
-         ELSE
-
-*  Just release the NDF.
+*  Release the NDF.
             CALL NDF_UNMAP( IDIN, '*', STATUS )
             CALL NDF_ANNUL( IDIN, STATUS )
-         END IF
 
 *  Release the output NDF.
-         CALL NDF_ANNUL( IDOUT, STATUS )
+            CALL NDF_ANNUL( IDOUT, STATUS )
 
 *  Reset the mapping control flag.
-         REMAP =.TRUE.
+            REMAP =.TRUE.
 
 *  Store the present size of the NDFs.
-         LBNDL( 1 ) = LBND( 1 )
-         LBNDL( 2 ) = LBND( 2 )
-         UBNDL( 1 ) = UBND( 1 )
-         UBNDL( 2 ) = UBND( 2 )
+            LBNDL( 1 ) = LBND( 1 )
+            LBNDL( 2 ) = LBND( 2 )
+            UBNDL( 1 ) = UBND( 1 )
+            UBNDL( 2 ) = UBND( 2 )
 
 *  Break out if status set BAD.
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
-99999 CONTINUE
+            IF ( STATUS .NE. SAI__OK ) GO TO 99
+99999    CONTINUE
+      END DO
+
+*  Delete the input NDFs if so requested.
+      IF ( DELETE .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+         CALL CCD1_MSG( ' ', '  *** Deleting input NDFs.', STATUS )
+         DO I = 1, NTOT
+            CALL NDG_NDFAS( INGRP, I, 'UPDATE', IDIN, STATUS )
+            CALL NDF_DELET( IDIN, STATUS )
+         END DO
+      END IF
 
 *  Break out here if status set BAD.
  99   CONTINUE
 
-*  Release calibration frame.
+*  Exit NDF context.
       CALL NDF_END( STATUS )
 
 *  Release group resources.
       CALL CCD1_GRDEL( GIDIN, STATUS )
       CALL CCD1_GRDEL( GIDOUT, STATUS )
-      CALL CCD1_GRDEL( FACGID, STATUS )
+      CALL CCD1_GRDEL( INGRP, STATUS )
+      CALL CCD1_GRDEL( OUTGRP, STATUS )
+      CALL CCD1_GRDEL( KEYGRP, STATUS )
+      CALL CCD1_GRDEL( CALGRP, STATUS )
+      DO I = 1, MIN( NSUB, CCD1__MXNDF )
+         CALL CCD1_GRDEL( SUBGRP( I ), STATUS )
+      END DO
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

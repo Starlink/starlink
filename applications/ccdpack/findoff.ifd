@@ -25,6 +25,8 @@
 #        Added MAXDISP.
 #     7-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     20-FEB-2001 (MBT):
+#        Added USESET.
 #     {enter_further_changes_here}
 
 #-
@@ -156,6 +158,16 @@
             ppath CURRENT DEFAULT
             default TRUE
             prompt {Use NDF World Coordinate System extension if it exists}
+            helpkey *
+          }
+
+         parameter useset {
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Group lists by Set membership?}
             helpkey *
           }
 

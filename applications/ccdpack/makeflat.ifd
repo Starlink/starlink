@@ -27,6 +27,8 @@
 #        Added GENVAR and USEVAR parameters.
 #     6-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     9-FEB-2001 (MBT):
+#        Added USESET parameter.
 #     {enter_further_changes_here}
 
 #-
@@ -153,6 +155,16 @@
             ppath CURRENT DEFAULT
             default {Output from MAKEFLAT}
             prompt {Title for the output NDF}
+            helpkey *
+          }
+
+         parameter useset {
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Use Set headers if available?}
+            default TRUE
             helpkey *
           }
 

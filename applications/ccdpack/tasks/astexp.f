@@ -122,6 +122,10 @@
 *                         INDICES parameter.  This normally gives the
 *                         frameset generated from the N'th NDF in the
 *                         IN list an ID with index N.
+*           -  SET     -- ID is given by an integer taken from the
+*                         Set Index attribute of the CCDPACK Set header
+*                         of each input file.
+*
 *        [INDEX]
 *     IN = LITERAL (Read)
 *        A list of NDFs from which framesets are to be extracted.
@@ -284,6 +288,10 @@
 *                 framesets in the file.  Typically the N'th NDF in a 
 *                 list will match the one with an ID of "INDEX N".
 *
+*           -  "SET N"
+*                 This will match an NDF if the Set Index attribute
+*                 in its CCDPACK Set header is equal to the integer N.
+*
 *        Modifiers:
 *           Modifiers describe additional modifications to be made
 *           to the framesets on import.  They are of the form 
@@ -337,6 +345,8 @@
 *        Added the BASEFRAME parameter and tidied up a bit.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     27-FEB-2001 (MBT):
+*        Upgraded for use with Sets.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -351,6 +361,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST parameters
       INCLUDE 'FIO_PAR'          ! FIO parameters
+      INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK private parameters
       INCLUDE 'PAR_ERR'          ! PAR system error codes
 
@@ -380,6 +391,7 @@
       CHARACTER * ( CCD1__BLEN ) FITROT ! FITS keyword for rotation
       CHARACTER * ( CCD1__BLEN ) LABEL ! Identifier label for frameset
       CHARACTER * ( FIO__SZFNM ) ASTFIL ! Name of frameset file
+      CHARACTER * ( GRP__SZNAM ) SNAME ! Set Name attribute value
       INTEGER CHEXP              ! AST pointer to export channel
       INTEGER FDAST              ! FIO file descriptor of frameset file
       INTEGER FRCUR              ! AST pointer to current frame
@@ -393,11 +405,13 @@
       INTEGER INGRP              ! GRP identifier of IN group
       INTEGER IWCS               ! AST pointer to WCS component of NDF
       INTEGER IX                 ! Index of label in group
-      INTEGER JCUR               ! Index of Current frame for exported frameset
       INTEGER JBAS               ! Index of Base frame for exported frameset
+      INTEGER JCUR               ! Index of Current frame for exported frameset
+      INTEGER JSET               ! Index of CCD_SET frame (not used)
       INTEGER MAP                ! AST mapping between frames
       INTEGER NNDF               ! Number of NDFs in in group
       INTEGER NEXP               ! Number of AST objects output
+      INTEGER SINDEX             ! Set Index attribute
       LOGICAL DIFBAS             ! Base domains don't all match
       LOGICAL DIFCUR             ! Current domains don't all match
       LOGICAL DUPID              ! Duplicate ID value was generated
@@ -460,7 +474,7 @@
 *  Get the type of ID value which will be used to distinguish different
 *  framesets.
       IDTYPE = ' '
-      CALL PAR_CHOIC( 'IDTYPE', 'INDEX', 'INDEX,FITSID', .FALSE.,
+      CALL PAR_CHOIC( 'IDTYPE', 'INDEX', 'INDEX,FITSID,SET', .FALSE.,
      :                IDTYPE, STATUS )
 
 *  Get additional information depending on IDTYPE.
@@ -541,6 +555,9 @@
       DO 1 I = 1, NNDF
          CALL NDG_NDFAS( INGRP, I, 'READ', INDF, STATUS )
 
+*  Get WCS component from NDF.
+         CALL CCD1_GTWCS( INDF, IWCS, STATUS )
+
 *  Output name of NDF.
          CALL CCD1_MSG( ' ', ' ', STATUS )
          CALL NDF_MSG( 'NDF', INDF )
@@ -563,6 +580,13 @@
             LABEL( IAT: ) = FITSID
             IAT = IAT + CHR_LEN( FITSID ) + 1
             CALL CCD1_FTVAL( FITSID, INDF, LABEL( IAT: ), STATUS )
+         ELSE IF ( IDTYPE .EQ. 'SET' ) THEN
+
+*  IDTYP of SET: get the Set Index attribute and set the label to the
+*  form 'SET n'.
+            CALL CCD1_SETRD( INDF, IWCS, SNAME, SINDEX, JSET, STATUS )
+            CALL MSG_SETI( 'SINDEX', SINDEX )
+            CALL MSG_LOAD( ' ', 'SET ^SINDEX', LABEL, IAT, STATUS )
          END IF
 
 *  Check whether frameset information has been written for a frame with
@@ -574,12 +598,6 @@
          ELSE
             DUPID = .TRUE.
          END IF
-
-*  Begin AST context.
-         CALL AST_BEGIN( STATUS )
-
-*  Get WCS component from NDF.
-         CALL CCD1_GTWCS( INDF, IWCS, STATUS )
 
 *  Get the indices of the frames which will form the output frameset.
 *  The Current frame of the output frameset is the Current frame of
@@ -662,9 +680,6 @@
 
 *  Write a blank line to terminate this section of the AST file.
          CALL FIO_WRITE( FDAST, ' ', STATUS )
-
-*  End AST context.
-         CALL AST_END( STATUS )
  1    CONTINUE 
 
 *  Warn if there were non-matching domain names or duplicate frameset

@@ -163,6 +163,13 @@
 *        section of SUN/95, except that colours may only be specified
 *        by index, and not by name.
 *        [""]
+*     USESET = _LOGICAL (Read)
+*        If the pen colour is being rotated because PENROT is true,
+*        USESET determines whether a new colour is used for each 
+*        individual NDF or each Set.  This parameter is ignored if
+*        PENROT is false, and has no effect if the input NDFs have
+*        no Set header information.
+*        [TRUE]
 
 *  Examples:
 *     bounds reg-data* clear
@@ -173,12 +180,14 @@
 *        that all the boundaries fit in.  Prior to running this, the 
 *        Current attached coordinate system of all the reg-data* NDFs
 *        should be one in which they are all aligned.
+*
 *     bounds ccd* noclear
 *        This will attempt to plot boundaries of all the `ccd*' NDFs 
 *        aligned with whatever is already plotted on the graphics 
 *        device, for instance the result of a KAPPA DISPLAY command
 *        or of a previous call of BOUNDS.  Parts of the NDF outlines
 *        which fall outside the existing plot area will not be visible.
+*
 *     bounds in="one,two,three' axes=yes label=[name,index] penrot=yes
 *             style="size(strings)=2,width(curves)=3"
 *        This will draw outlines of the NDFs `one', `two' and `three' 
@@ -187,6 +196,7 @@
 *        `2: two' and `3: three' respectively.  The colour of each 
 *        outline and its associated text label will be different from
 *        the others.
+*
 *     bounds in=a* noclear nopenrot style="colour=2" label=\!
 *        All the NDFs beginning with `a' will be outlined in colour 2,
 *        with no text labels or indication of the origin.
@@ -228,6 +238,8 @@
 *     29-JAN-2001 (MBT):
 *        Modified so that it writes the whole frameset from each NDF into
 *        the AGI database, not just the GRID frame.
+*     15-FEB-2001 (MBT):
+*        Upgraded for use with Sets.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -268,9 +280,11 @@
       INTEGER GID                ! NDG group identifier for input NDFs
       INTEGER HICOL              ! Highest colour index available
       INTEGER I                  ! Loop variable
+      INTEGER IGOT               ! Index of name found in a group
       INTEGER INDF               ! NDF identifier
       INTEGER INIPEN             ! Initial pen index
       INTEGER IPEN               ! Current pen index
+      INTEGER ISET( CCD1__MXNDF ) ! Index of Set for each NDF
       INTEGER IX                 ! Group search index
       INTEGER IWCS               ! AST identifier for WCS frameset
       INTEGER J                  ! Loop variable
@@ -278,6 +292,8 @@
       INTEGER JBAS               ! Index of Base frame in frameset
       INTEGER JCUR               ! Index of Current frame in frameset
       INTEGER JGRID( CCD1__MXNDF ) ! Relative frame indices of Grid-like frames
+      INTEGER JSET               ! Set alignment frame index (dummy)
+      INTEGER KEYGID             ! GRP identifier for Set Name attributes
       INTEGER LBGCOL             ! Label text background colour
       INTEGER LMGID              ! Labelling mode option GRP identifier
       INTEGER LOCOL              ! Lowest colour index available
@@ -292,11 +308,13 @@
       INTEGER NLAB               ! Number of labelling options
       INTEGER NNDF               ! Number of input NDFs in group
       INTEGER NPEN               ! Number of distinct pens for rotation
+      INTEGER NSET               ! Number of distinct Sets in input NDFs
       INTEGER PAXES( 2 )         ! Map for picking two axes from many
       INTEGER PENGID             ! GRP identifier for pen style strings
       INTEGER PICID              ! AGI identifier for initial DATA picture
       INTEGER PICOD              ! AGI identifier for new picture
       INTEGER PLOT               ! AST identifier of plot
+      INTEGER SINDEX             ! Set Index attribute value (dummy)
       INTEGER STATE              ! Parameter state
       INTEGER STYLEN             ! Length of style element
       LOGICAL AXES               ! Draw axes?
@@ -309,6 +327,7 @@
       LOGICAL LABUP              ! Write labels upright on graphics device?
       LOGICAL PENROT             ! Rotate pen styles for different outlines?
       LOGICAL NOINV              ! Has coordinate system been reflected?
+      LOGICAL USESET             ! Rotate pen styles by Set?
       REAL XCH                   ! Vertical baseline text character height
       REAL YCH                   ! Horizontal baseline text character height
       REAL UP( 2 )               ! Up direction for text
@@ -352,6 +371,7 @@
       CHARACTER * ( AST__SZCHR ) DMN ! Current domain for this NDF
       CHARACTER * ( AST__SZCHR ) COMDMN ! Domain of common frame
       CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of the NDF
+      CHARACTER * ( GRP__SZNAM ) SNAME ! Set Name attribute value
       CHARACTER * ( GRP__SZNAM ) STYEL ! Style element
 
 *  Local data:
@@ -371,6 +391,12 @@
 
 *  Start an AST context.
       CALL AST_BEGIN( STATUS )
+
+*  Initialise GRP identifiers, so that a later call of CCD1_GRDEL on
+*  an uninitialised group cannot cause trouble.
+      GID = GRP__NOID
+      PENGID = GRP__NOID
+      KEYGID = GRP__NOID
 
 *  Get the list of NDFs for display.
       NNDF = 0
@@ -453,6 +479,9 @@
 *  Determine whether we will be rotating pens for different outlines.
       CALL PAR_GET0L( 'PENROT', PENROT, STATUS )
 
+*  Determine whether we will be rotating pens by Set or by image.
+      IF ( PENROT ) CALL PAR_GET0L( 'USESET', USESET, STATUS )
+
 *  Determine whether we should clear the display device before plotting.
       CALL PAR_GET0L( 'CLEAR', CLEAR, STATUS )
 
@@ -498,6 +527,13 @@
       BUFFER( 12: ) = '---'
       BUFFER( 40: ) = '------'
       CALL CCD1_MSG( ' ', BUFFER( 1:CHR_LEN( BUFFER ) ), STATUS )
+
+*  Initialise a group for Set Name attributes if necessary.
+      IF ( USESET ) THEN
+         CALL GRP_NEW( 'CCD:SETNAME', KEYGID, STATUS )
+      ELSE
+         KEYGID = GRP__NOID
+      END IF
 
 *  Store the information we need from each of the NDFs.
       DO I = 1, NNDF
@@ -575,6 +611,25 @@
 *  mapping from its Current frame to the common frame.
          CALL AST_ADDFRAME( FSET, JCOM, MAPU, IWCS, STATUS )
 
+*  If necessary, find Set information from its Set header.
+         IF ( USESET ) THEN
+
+*  Read the Set header.
+            CALL CCD1_SETRD( INDF, AST__NULL, SNAME, SINDEX, JSET,
+     :                       STATUS )
+
+*  See if we have encountered this Set Name before.  If not, add it to
+*  the group.
+            CALL GRP_INDEX( SNAME, KEYGID, 1, IGOT, STATUS )
+            IF ( IGOT .EQ. 0 .OR. SNAME .EQ. ' ' ) THEN
+               CALL GRP_PUT( KEYGID, 1, SNAME, 0, STATUS )
+               CALL GRP_GRPSZ( KEYGID, IGOT, STATUS )
+            END IF
+
+*  Record this Set Name's position in the group of encountered Names.
+            ISET( I ) = IGOT
+         END IF
+
 *  Release the NDF.
          CALL NDF_ANNUL( INDF, STATUS )
       END DO
@@ -609,14 +664,6 @@
 *  Attempt to get a plot aligned with the AGI current picture.
          IF ( STATUS .NE. SAI__OK ) GO TO 99
          CALL CCD1_APLOT( FSET, PICID, .TRUE., PLOT, STATUS )
-
-*  It would probably be a good idea to deactivate clipping here, since
-*  it may be useful to see outlines which go outside of the plotted
-*  image.  In any case text labels get plotted outside of the clipping
-*  region.  However, the PGSCLP call is not available in the Starlink
-*  version of PGPLOT.
-c        CALL AST_CLIP( PLOT, AST__NOFRAME, GLBND, GUBND, STATUS )
-c        CALL PGSCLP( 0 )
       END IF
 
 *  If we have been asked to clear the device, we need to determine the 
@@ -728,7 +775,13 @@ c        CALL PGSCLP( 0 )
 
 *  Write a group entry for each of the available colours, or one for each
 *  NDF, whichever is the fewer.
-         NPEN = MIN( HICOL - LOCOL + 1, NNDF + IPEN )
+         IF ( USESET ) THEN
+            CALL GRP_GRPSZ( KEYGID, NSET, STATUS )
+            NPEN = NSET + INIPEN
+         ELSE
+            NPEN = NNDF + INIPEN
+         END IF
+         NPEN = MIN( NPEN, HICOL - LOCOL + 1 )
          DO I = 1, NPEN
             CALL MSG_SETI( 'IPEN', I )
             CALL MSG_LOAD( ' ', 'Colour=^IPEN', STYEL, STYLEN, STATUS )
@@ -753,18 +806,18 @@ c        CALL PGSCLP( 0 )
       CALL PGQCS( 4, XCH, YCH )
       OFS = XCH * 0.7D0
 
-*  Initialise pen colour.
-      IPEN = INIPEN
-
 *  Loop for each NDF.
       DO I = 1, NNDF
 
 *  Set pen colour if required.
          IF ( PENGID .NE. GRP__NOID ) THEN
-            IF ( IPEN .GT. NPEN ) IPEN = 1
+            IF ( USESET ) THEN
+               IPEN = 1 + MOD( INIPEN + ISET( I ) - 1, NPEN )
+            ELSE
+               IPEN = 1 + MOD( INIPEN + I - 1, NPEN )
+            END IF
             CALL GRP_GET( PENGID, IPEN, 1, STYEL, STATUS )
             CALL AST_SET( PLOT, STYEL, STATUS )
-            IPEN = IPEN + 1
          END IF
 
 *  Set up an array giving the GRID-like coordinates of the corners of 
@@ -800,18 +853,18 @@ c        CALL PGSCLP( 0 )
 *  it will not get overwritten by the outlines of other NDFS.
       IF ( LFMT .NE. ' ' ) THEN
 
-*  Initialise pen colour.
-         IPEN = INIPEN
-
 *  If so, loop over all the NDFs.  
          DO I = 1, NNDF
      
 *  Set pen colour if required.
             IF ( PENGID .NE. GRP__NOID ) THEN
-               IF ( IPEN .GT. NPEN ) IPEN = 1
+               IF ( USESET ) THEN
+                  IPEN = 1 + MOD( INIPEN + ISET( I ) - 1, NPEN )
+               ELSE
+                  IPEN = 1 + MOD( INIPEN + I - 1, NPEN )
+               END IF
                CALL GRP_GET( PENGID, IPEN, 1, STYEL, STATUS )
                CALL AST_SET( PLOT, STYEL, STATUS )
-               IPEN = IPEN + 1
             END IF
 
 *  Set the Current frame of the Plot object to the GRID-like coordinate 
@@ -946,6 +999,7 @@ c        CALL PGSCLP( 0 )
 *  Annul group resources.
       CALL CCD1_GRDEL( GID, STATUS )
       CALL CCD1_GRDEL( PENGID, STATUS )
+      CALL CCD1_GRDEL( KEYGID, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

@@ -29,6 +29,8 @@
 #        Removed FIXORIGIN global association to SETSAT!
 #     6-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     14-FEB-2001 (MBT):
+#        Upgraded for use with Sets.
 #     {enter_further_changes_here}
 
 #-
@@ -298,6 +300,16 @@
             ppath CURRENT DEFAULT
             default FALSE
             prompt {Do you want to supply a global zero level}
+            helpkey *
+          }
+
+         parameter useset {
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Use Set header information?}
+            default TRUE
             helpkey *
           }
 

@@ -81,6 +81,8 @@ package ccdpack {
 #        existing files ccdpack.csh, ccdpack.icl, ccdpack.cl.
 #     21-SEP-1999 (MBT):
 #        Added inclusion of drizzle.ifd
+#     6-FEB-2001 (MBT):
+#        Added entries for BOUNDS, MAKESET, SHOWSET.
 #     {enter_changes_here}
 #-
 
@@ -137,6 +139,8 @@ package ccdpack {
       source picinfo.ifd
       source ccdimp.ifd
       source ccdexp.ifd
+      source makeset.ifd
+      source showset.ifd
    }
 
    executable ccdpack_scr {
