@@ -120,6 +120,7 @@
                                  ! components
       INTEGER IDIMS( NDF__MXDIM )! Dimensions of input NDF
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Numeric type for processing
+      INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
       INTEGER NCD                ! No. of characters in dimension list
       INTEGER NDFI               ! Identifier to the input NDF
@@ -132,6 +133,7 @@
       INTEGER PNTRO( 2 )         ! Pointer to output array component(s)
       LOGICAL QUAL               ! Quality is present?
       INTEGER TOTEXP             ! Total expansion factor
+      INTEGER UBNDI( NDF__MXDIM )! Upper bounds of input NDF
       INTEGER UBNDO( NDF__MXDIM )! Upper bounds of output NDF
       LOGICAL VAR                ! Variance is present?
       LOGICAL WIDTH              ! Axis width is present?
@@ -571,9 +573,11 @@
          MATRIX( I ) = 0.0
       END DO
 
+      CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDI, UBNDI, NDIM, STATUS )
+
       DO I = 1, NDIM
          OFFSET( I ) = DBLE( LBNDO( I ) - 1 ) - EXPAND( I )*
-     :                 DBLE( LBND( I ) - 1 )
+     :                 DBLE( LBNDI( I ) - 1 )
          MATRIX( NDIM*( I - 1 ) + I ) = DBLE( EXPAND( I ) )
       END DO
 
