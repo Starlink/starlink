@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_CSUBD( BAD, EL, A, CONST, B, NERR, STATUS )
+      SUBROUTINE KPG1_CSUB<T>( BAD, EL, A, CONST, B, NERR, STATUS )
 *+
 *  Name:
 *     KPG1_CSUBx
@@ -48,6 +48,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
  
 *  History:
@@ -55,6 +56,8 @@
 *        Original version.
 *     1996 May 20 (MJC):
 *        Replaced LIB$ESTABLISH and LIB$REVERT calls.
+*     2004 Oct 1 (TIMJ):
+*        Recreate GENERIC version
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -75,11 +78,11 @@
 *  Arguments Given:
       LOGICAL BAD
       INTEGER EL
-      DOUBLE PRECISION A( EL )
+      <TYPE> A( EL )
       DOUBLE PRECISION CONST
  
 *  Arguments Returned:
-      DOUBLE PRECISION B( EL )
+      <TYPE> B( EL )
       INTEGER NERR
  
 *  Status:
@@ -88,18 +91,18 @@
 *  External References:
       EXTERNAL NUM_TRAP
       INTEGER NUM_TRAP           ! Numerical error handler
-      DOUBLE PRECISION VAL_DTOD          ! Convert from double precision
+      <TYPE> VAL_DTO<T>          ! Convert from double precision
  
 *  Local Variables:
-      DOUBLE PRECISION DCON              ! Type converted constant
+      <LTYPE> <T>CON              ! Type converted constant
       INTEGER I                  ! Loop counter for array elements
       LOGICAL ALLBAD             ! Set output array all bad?
  
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
-      INCLUDE 'NUM_DEC_D'      ! NUM_ arithmetic/maths functions
+      INCLUDE 'NUM_DEC_<T>'      ! NUM_ arithmetic/maths functions
       INCLUDE 'NUM_DEF_CVT'      ! Define functions...
-      INCLUDE 'NUM_DEF_D'
+      INCLUDE 'NUM_DEF_<T>'
  
 *.
  
@@ -111,7 +114,7 @@
  
 *  Convert the constant to be subtracted to the appropriate data type.
       ALLBAD = .FALSE.
-      DCON = VAL_DTOD( .FALSE., CONST, STATUS )
+      <T>CON = VAL_DTO<T>( .FALSE., CONST, STATUS )
  
 *  If conversion failed, then annul the error and note that all the
 *  output array elements must be set to the bad value.
@@ -126,7 +129,7 @@
 *  Set all output elements to the bad value if required.
       IF ( ALLBAD ) THEN
          DO 1 I = 1, EL
-            B( I ) = VAL__BADD
+            B( I ) = VAL__BAD<T>
 1        CONTINUE
          NERR = EL
  
@@ -143,13 +146,13 @@
  
 *  Subtract the constant from the array.
             DO 2 I = 1, EL
-               B( I ) = NUM_SUBD( A( I ), DCON )
+               B( I ) = NUM_SUB<T>( A( I ), <T>CON )
  
 *  Check for numerical errors (i.e. overflow). If present, then assign
 *  a bad value to the output array element and count the error. Reset
 *  the numerical error flag.
                IF ( NUM_ERROR .NE. SAI__OK ) THEN
-                  B( I ) = VAL__BADD
+                  B( I ) = VAL__BAD<T>
                   NERR = NERR + 1
                   NUM_ERROR = SAI__OK
                END IF
@@ -161,15 +164,15 @@
  
 *  If the input array element is bad, then so is the output element.
             DO 3 I = 1, EL
-               IF ( A( I ) .EQ. VAL__BADD ) THEN
-                  B( I ) = VAL__BADD
+               IF ( A( I ) .EQ. VAL__BAD<T> ) THEN
+                  B( I ) = VAL__BAD<T>
  
 *  Otherwise, subtract the constant, again checking for numerical
 *  errors.
                ELSE
-                  B( I ) = NUM_SUBD( A( I ), DCON )
+                  B( I ) = NUM_SUB<T>( A( I ), <T>CON )
                   IF ( NUM_ERROR .NE. SAI__OK ) THEN
-                     B( I ) = VAL__BADD
+                     B( I ) = VAL__BAD<T>
                      NERR = NERR + 1
                      NUM_ERROR = SAI__OK
                   END IF

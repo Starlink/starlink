@@ -28,7 +28,8 @@ KPG_NXD_GEN = kpg1_cmul.gnxd
 
 # All numeric types
 KPG_N_GEN = kpg1_dara.gn kpg1_frac.gn kpg1_hsta.gn kpg1_thrs.gn \
-kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn kpg1_cadd.gn
+kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn kpg1_cadd.gn \
+kpg1_csub.gn
 
 
 # Double and REAL
@@ -61,8 +62,8 @@ kpg1_cmuld.f \
 kpg1_cmvdd.f kpg1_cmvdr.f kpg1_cmvvd.f kpg1_cmvvr.f \
 kpg1_cnlim.f kpg1_colnm.f kpg1_cpntb.f kpg1_cpntd.f kpg1_cpnti.f \
 kpg1_cpntr.f kpg1_cpntub.f kpg1_cpntuw.f kpg1_cpntw.f \
-kpg1_crout.f kpg1_csubb.f kpg1_csubd.f kpg1_csubi.f kpg1_csubr.f \
-kpg1_csubub.f kpg1_csubuw.f kpg1_csubw.f kpg1_d2w2d.f kpg1_d2w2r.f \
+kpg1_crout.f \
+kpg1_d2w2d.f kpg1_d2w2r.f \
 kpg1_danot.f kpg1_dauni.f kpg1_dclid.f kpg1_dclir.f kpg1_divd.f \
 kpg1_divr.f kpg1_dwsod.f kpg1_dwsor.f kpg1_elnmb.f kpg1_elnmd.f \
 kpg1_elnmi.f kpg1_elnmr.f kpg1_elnmub.f kpg1_elnmuw.f kpg1_elnmw.f \
