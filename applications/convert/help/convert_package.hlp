@@ -1,0 +1,23 @@
+2 CONVERT
+ The CONVERT package contains some of the numerous format conversion
+ routines which are necessary to translate data files to and from the
+ Starlink standard n-Dimensional-data format--the NDF---described in
+ SUN/33 and SGP/38.
+
+ The commands available are:
+
+     BDF2NDF   -  INTERIM BDF to NDF.
+     NDF2BDF   -  NDF to INTERIM BDF.
+     DIPSO2NDF -  DIPSO to NDF. 
+     NDF2DIPSO -  NDF to DIPSO.
+     DST2NDF   -  Figaro Version 2 DST to NDF.
+     NDF2DST   -  NDF to Figaro DST file.
+
+ More details can be found in SUN/55.
+
+ To make all the format conversion routines available, type:
+
+     ICL> CONVERT
+
+ Then type the appropriate command.
+
