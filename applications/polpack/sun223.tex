@@ -1675,11 +1675,10 @@ you started up the CONVERT package has described \hyperref{here}{in section }
 
 \item [``\texttt{Rendezvous file has disappeared!}''] - If this message
 appears while using \htmlref{POLKA}{POLKA}, you may have run out of disk 
-space. POLKA attempts to create files within your \emph{ADAM directory},
-and this message may appear if file creation fails. Your ADAM directory is
+space in your \emph{ADAM directory}. Your ADAM directory is
 usually a sub-directory named \texttt{adam} within your home directory.
-This may be changed by assigning an alternative directory path to the 
-environment variable ADAM\_USER.
+It may be changed to a new directory by assigning an alternative directory 
+path to the environment variable ADAM\_USER.
 
 \item [``Odd messages appear when I run POLKA from ICL''] - When POLKA is
 run from ICL, you may get messages on start-up and exit about errors
@@ -3331,6 +3330,16 @@ for NDF applications.
               stored in the corresponding plane of the data array, and will be one
               of I, Q, U or V.
          }
+
+         \sstitem
+         Intermediate files created during the execution of POLKA are
+	 stored in a separate directory created each time POLKA is run,
+	 and deleted when POLKA exits. The directory will have a name of
+	 the form \texttt{polka_temp_<nnn>} where \texttt{<nnn>} is some
+	 number. This directory will be created within the directory
+	 specified by the \texttt{HDS_SCRATCH} environment variable. If
+	 \texttt{HDS_SCRATCH} is not defined then it will be created
+	 within the current directory.
       }
    }
 }

@@ -337,6 +337,14 @@
 *       the data cube. Each character identifies the quantity 
 *       stored in the corresponding plane of the data array, and will be one 
 *       of I, Q, U or V. 
+*
+*     - Intermediate files created during the execution of POLKA are stored
+*     in a separate directory created each time POLKA is run, and deleted
+*     when POLKA exits. The directory will have a name of the form 
+*     "polka_temp_<nnn>" where <nnn> is some number. This directory will be 
+*     created within the directory specified by the HDS_SCRATCH environment
+*     variable. If HDS_SCRATCH is not defined then it will be created within 
+*     the current directory.
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
