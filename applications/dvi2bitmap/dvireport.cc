@@ -13,10 +13,10 @@ using STD::endl;
 
 char *progname;
 void Usage();
-void show_position(DviFile *dvi, char* unitlist);
+void show_position(DviFile *dvi, const char* unitlist);
 
 
-void show_position(DviFile *dvi, char* unitlist)
+void show_position(DviFile *dvi, const char* unitlist)
 {
 #define CVTXY(unit)							\
     cout << " "								\
@@ -29,7 +29,7 @@ void show_position(DviFile *dvi, char* unitlist)
 	     DviFile::unit_##unit)					\
 	 << #unit
     
-    for (char *p=unitlist; *p != '\0'; p++) {
+    for (const char *p=unitlist; *p != '\0'; p++) {
 	switch (*p) {
 	  case 'x':
 	    cout << " " << dvi->currH() << "," << dvi->currV()
@@ -83,7 +83,7 @@ int main (int argc, char **argv)
     progname = argv[0];
     if (argc == 1)
 	Usage();
-    char *unitlist = 0;
+    const char *unitlist = 0;
     enum { feature_characters=0, feature_rules,
 	   feature_fonts, feature_specials };
     STD::bitset<8> show_features;
