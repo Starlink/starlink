@@ -85,16 +85,22 @@ defined($srcdir) || do { $srcdir = '.'; };
 $nwarnings = 0;
 $nerrors = 0;
 
+@list_err_missing_required = ();
+@list_err_not_checked_in = ();
+@list_err_checked_in = ();
+
 foreach $r (@definitely_required) {
     if ( ! -e $r ) {
-        print "$progname: required file $r does not exist\n";
+        #print "$progname: required file $r does not exist\n";
+        push(@list_err_missing_required, $r);
         $nerrors++;
     }
 }
 
 foreach $r (@required_files) {
     if ( ! -e $r ) {
-        print "$progname: required file $r does not exist\n";
+        # print "$progname: required file $r does not exist\n";
+        push(@list_err_missing_required, $r);
         $nwarnings++;
     }
 }
@@ -116,13 +122,15 @@ if ( -d "CVS" && -f "CVS/Entries" ) {
     push(@allcvsfiles, @extra_checkins);
     foreach $f (@allcvsfiles) {
         if (! grep (m{^$f$}, @allent)) {
-            print "$progname: file $f is not checked in, but should be\n";
+            #print "$progname: file $f is not checked in, but should be\n";
+            push(@list_err_not_checked_in, $f);
             $nwarnings++;
         }
     }
     foreach $f (@non_checkins) {
         if (grep (m{^$f$}, @allent)) {
-            print "$progname: file $f is checked in, but shouldn't be\n";
+            #print "$progname: file $f is checked in, but shouldn't be\n";
+            push(@list_err_checked_in, $f);
             $nwarnings++;
         }
     }
@@ -141,6 +149,16 @@ if (-e "$srcdir/configure.ac") {
 if (-e "$srcdir/Makefile.am") {
     $nerrors += check_makefile("$srcdir/Makefile.am");
 }
+
+$#list_err_missing_required < 0 ||
+  print "$progname: the following files are required but do not exist:\n\t", 
+    "@list_err_missing_required\n";
+$#list_err_not_checked_in < 0 ||
+  print "$progname: the following files should be checked in, but aren't\n\t",
+    "@list_err_not_checked_in\n";
+$#list_err_checked_in < 0 ||
+  print "$progname: the following files should not be checked in, but are\n\t",
+    "@list_err_checked_in\n";
 
 exit ($force ? $nerrors : $nerrors+$nwarnings);
 
