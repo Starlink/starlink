@@ -7,61 +7,10 @@
 
 sub compare_bitmaps($$\@);
 
-sub compare_bitmaps ($$\@) {
-    my $testlabel = shift;
-    my $cmd = shift;
-    my $exref = shift;
-    my $nerr = 0;
-
-    my @exp = @$exref;
-
-    open (DB, "$cmd |") || die "Can't open $cmd in a pipe";
-
-    my $ntests = 0;
-    while (<DB>) {
-        chomp;
-        s/^Qbitmaps \S*\s*//;
-        my @a = split;
-
-        if ($#expected < 0) {
-            print STDERR "More actual than expected\n";
-            $nerr++;
-            last;
-        }
-        my @e = @{$exp[$ntests]};
-        $ntests++;
-
-        my $isok = 1;
-        my $i = 0;
-        while (1) {
-            if (! (defined($e[$i]) && defined($a[$i]))) { # one list has ended
-                $isok = !(defined($e[$i]) || defined($a[$i]));
-                # false unless both undef
-                last;
-            }
-            if ($e[$i] != $a[$i]) {
-                $isok = 0;
-                last;
-            }
-            $i++;
-        }
-        if (!$isok) {
-            print STDERR "$testlabel, page $ntests: expected [";
-            foreach $i (0..$#e) {
-                printf STDERR " %.1f", $e[$i];
-            }
-            print STDERR " ], got [";
-            foreach $i (0..$#a) {
-                printf STDERR " %.1f", $a[$i];
-            }
-            print " ]\n";
-            $nerr++;
-        }
-    }
-
-    close(DB);
-
-    return $nerr;
+$texbin='@TEX@';
+if ($texbin eq 'NOTEX') {
+    print STDERR "No TeX binary available.  Can't run t8, so assume success\n";
+    exit 0;
 }
 
 $prefix = 'temp-t8';
@@ -110,7 +59,7 @@ print TEX "\\bye\n";
 
 close(TEX);
 
-system("tex $prefix") == 0
+system("$texbin $prefix") == 0
     || die "Command 'tex $prefix' failed";
 
 ########## test 1
@@ -185,5 +134,63 @@ print "XXX t8:test4 fails -- commented out!\n";
 
 
 exit($nerrors);
+
+
+sub compare_bitmaps ($$\@) {
+    my $testlabel = shift;
+    my $cmd = shift;
+    my $exref = shift;
+    my $nerr = 0;
+
+    my @exp = @$exref;
+
+    open (DB, "$cmd |") || die "Can't open $cmd in a pipe";
+
+    my $ntests = 0;
+    while (<DB>) {
+        chomp;
+        s/^Qbitmaps \S*\s*//;
+        my @a = split;
+
+        if ($#expected < 0) {
+            print STDERR "More actual than expected\n";
+            $nerr++;
+            last;
+        }
+        my @e = @{$exp[$ntests]};
+        $ntests++;
+
+        my $isok = 1;
+        my $i = 0;
+        while (1) {
+            if (! (defined($e[$i]) && defined($a[$i]))) { # one list has ended
+                $isok = !(defined($e[$i]) || defined($a[$i]));
+                # false unless both undef
+                last;
+            }
+            if ($e[$i] != $a[$i]) {
+                $isok = 0;
+                last;
+            }
+            $i++;
+        }
+        if (!$isok) {
+            print STDERR "$testlabel, page $ntests: expected [";
+            foreach $i (0..$#e) {
+                printf STDERR " %.1f", $e[$i];
+            }
+            print STDERR " ], got [";
+            foreach $i (0..$#a) {
+                printf STDERR " %.1f", $a[$i];
+            }
+            print " ]\n";
+            $nerr++;
+        }
+    }
+
+    close(DB);
+
+    return $nerr;
+}
 
 
