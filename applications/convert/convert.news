@@ -1,40 +1,19 @@
 1 CONVERT_new_release
-                                             Expires 1994 February 28
+                                             
+A new version of CONVERT (V0.6) is now available.
+It is available for Alpha/OSF1 and Sun/Solaris,
 
-A new version of CONVERT (V0.5) is now available.  This is the first
-release for UNIX, and is available for Alpha/OSF1, Sun/Solaris,
-DEC/Ultrix, and Sun/SunOS with the following exceptions:
+Starting up the CONVERT package will switch on the `on-the-fly' data 
+conversion facilities of the NDF library which are described in SSN/20.
+Default commands are set up for the formats handled by CONVERT (except 
+IRCAM and PGM), and for compressed NDFs.
 
-  - BDF2NDF and NDF2BDF are not available because the Interim
-    library is not being ported.
+The release includes six new applications:
 
-  - DIPSO2NDF and NDF2DIPSO are not required because UNIX DIPSO
-    processes NDFs.
+ NDF2FITS, converts from an NDF to a FITS file.
+ GIF2NDF and NDF2GIF, for converting between NDFs and GIF files.
+ TIFFF2NDF and NDF2TIFF, for converting between NDFs and TIFF files.
+ NDF2PGM, converts from an NDF to a PBMPLUS PGM file.
 
-  - IRAF2NDF and NDF2IRAF are currently not available under OSF/1
-    and Solaris, because at the time of development there were no
-    IRAF IMFORT libraries released for these platforms.
-
-
-To use the package from the UNIX shell, just enter
-
-    % convert
-
-and the CONVERT commands are then available.  Note that from
-CONVERT commands must be in lowercase and cannot be abbreviated
-from the UNIX shell.
-
-The release also includes four new applications for converting from
-an IRAF image to an NDF, from an IRCAM-format file to a series of
-NDFs, and between GASP-format files and NDFs.  There are various
-improvements to existing applications, and bug fixes.  For details
-see the "Changes_to_CONVERT V0.5" topic in the CONVERT online help,
-for example on UNIX systems you enter
-
-    % conhelp changes V0.5
-
-or consult the new SUN/55.5 (Appendix B), which accompanies this
-release. 
-
-Malcolm Currie         Internet: CUR@STAR.RL.AC.UK 
-                       SPAN    : RLVAD::CUR
+SUN/55 describes the CONVERT package and now includes a section giving
+advice on converting NDFs to and from IDL format.
