@@ -7,8 +7,16 @@
   file easier - for example, the Fortran DTD makes `^*+' a shortref
   for the CODEPROLOGUE start tag, and ignores `^*' within the
   CODEPROLOGUE.  However, since it _is_ intended to be used as an
-  architecture, it _may_ be used on its own, if you have an
-  application which can benefit from that.
+  architecture, it _could_ be used on its own, if you have an
+  application which can benefit from that.  I would recommend not
+  doing that, however, until there's a clear benefit: the present
+  practice of making different `editions' of this for different
+  languages forces me to think a little about the different languages'
+  requirements, and which features might need to be restricted or expanded.
+
+  Additions to the list of supported languages requires at least
+  modifying the %notationlist entity, and adding appropriate notation
+  definitinos.
 
   Invoke with something like:
 
@@ -203,7 +211,7 @@
 
 <!element purpose	- o (%para.content;)
 				-- brief (one line?) description -->
-<!element title		- o (#pcdata)>
+<!element title		o o (#pcdata)>
 <!element description	- o (p+)
 				-- longer discursive description -->
 <!element returnvalue	- o (%para.content | p+)
