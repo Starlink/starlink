@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ABIA( IMAGE, NPIX, SEED, ADU, STATUS )
+*     CALL ABIA( IMAGE, NPIX, SEED, STATUS )
 
 *  Arguments:
 *     IMAGE( NPIX ) = REAL (Given and Returned)
@@ -22,9 +22,6 @@
 *        Integer seed, fed to PDA pseudo-random number routines
 *        for generating a reproducible sequence of random numbers.
 *        Should be of form 4 * INT + 1
-*     ADU = REAL (Given)
-*        The scaling factor to get the values in IMAGE to their counting
-*        values.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -54,7 +51,6 @@
 *  Arguments Given:
       INTEGER NPIX
       INTEGER SEED
-      REAL ADU
 
 *  Arguments Given and Returned:
       REAL IMAGE( NPIX )
@@ -91,4 +87,4 @@
       END DO
 
       END
-* $Id: ccd1_anoi.f,v 1.1 1997/06/27 09:01:41 pwd Exp $
+* $Id: ccdb1_abia.f,v 1.1 1998/06/16 09:40:54 mbt Exp $
