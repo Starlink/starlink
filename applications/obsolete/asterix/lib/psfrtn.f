@@ -1501,7 +1501,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
           ELSE
             RCHI = 1023.0
           END IF
-          CALL MSG_SETI( 'TOP', RCHI )
+          CALL MSG_SETR( 'TOP', RCHI )
           CALL MSG_PRNT( 'Error reading raw channel bounds, '/
      :                 /'assuming 0..^TOP' )
         END IF
@@ -1511,7 +1511,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
         IF ( E_AX .GT. 0 ) THEN
           CALL PSF_QAXEXT( SLOT, E_AX, CLO, CHI, STATUS )
           AS_CHAN_SCALE(SLOT) = REAL(RCHI-RCLO)/REAL(CHI-CLO)
-	PRINT *,'User to RAW channel scaling = ',as_chan_scale(slot)
+          CALL MSG_SETR( 'SC', AS_CHAN_SCALE(SLOT) )
+	  CALL MSG_PRNT( 'User to RAW channel scaling = ^SC' )
         ELSE
           AS_CHAN_SCALE(SLOT) = 1.0
         END IF

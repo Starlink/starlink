@@ -141,6 +141,7 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC) ALOC           	! Input ASTERIX structure
+      CHARACTER*40		EAXLAB			! Energy axis label
       CHARACTER*(DAT__SZLOC) SLOC           	! SPATIAL_RESP object
       CHARACTER*40           UNITS              ! Axis units
 
@@ -284,6 +285,9 @@
 
 *      Map energy if defined
         IF ( E_AX .GT. 0 ) THEN
+
+*        Get axis label
+          CALL BDI_GETAXLABEL( IFID, E_AX, EAXLAB, STATUS )
 
 *        Get number of output energy bins from user
           CALL USI_DEF0I( 'NEBIN', IDIMS(E_AX), STATUS )
@@ -442,7 +446,8 @@
 
 *        Announce to user
           CALL MSG_SETR( 'ENERGY', E )
-          CALL MSG_PRNT( 'Doing energy band ^ENERGY' )
+          CALL MSG_SETC( 'AXLIB', EAXLAB )
+          CALL MSG_PRNT( 'Doing ^AXLAB band ^ENERGY' )
 
         END IF
 
