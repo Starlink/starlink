@@ -1,4 +1,18 @@
+1999-01-22  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/scusetenv.csh: First version
+
+1999-01-21  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_calc_bol_coords.f (SCULIB_CALC_BOL_COORDS): Use
+	two argument ATAN to calculate parallactic angle.
+
+	* sculib/sculib_get_bol_desc.f (SCULIB_GET_BOL_DESC): Change
+	BOL_TYPE to CHARACTER*(*) rather than specifying the size.
+
 1999-01-11  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* starlink/makefile (NDF_ERR): Add ADD_DBM to makefile
 
 	* src/surf_add_dbm.f (SURF_ADD_DBM): Create
 
