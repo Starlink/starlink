@@ -15,23 +15,24 @@ atl1_creat.f atl1_gtfrm.f atl1_gtobj.f atl1_ptobj.f atl1_rm.c \
 atl1_setop.f atools.csh atools.hlp atools.icl atools_link_adam \
 atools_mon.ifl atools_mon.f cmpframe.f cmpframe.ifl cmpmap.f cmpmap.ifl \
 frame.f frame.ifl getframe.f getframe.ifl getmapping.ifl getmapping.f \
-kpg1_gtgrp.f unitmap.f unitmap.ifl atlhelp.f atlhelp.ifl
+kpg1_gtgrp.f unitmap.f unitmap.ifl atlhelp.f atlhelp.ifl frameset.f \
+frameset.ifl skyframe.f skyframe.ifl
 
 # The contents of the atools_iraf.tar file:
 ATOOLS_IRAF = doc addframe.par astclear.par astget.par astset.par \
 asttest.par cmpframe.par cmpmap.par frame.par getframe.par getmapping.par \
-unitmap.par
+unitmap.par skyframe.par frameset.par
 
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.
 USER_TASKS = addframe.f astclear.f astget.f astset.f atlhelp.f \
 asttest.f cmpframe.f cmpmap.f frame.f getframe.f getmapping.f \
-unitmap.f
+unitmap.f skyframe.f frameset.f
 
 #  Contents of the doc/ directory in atools_iraf.tar
 IRAF_DOCS = addframe.hlp astclear.hlp astget.hlp astset.hlp \
 asttest.hlp cmpframe.hlp cmpmap.hlp frame.hlp getframe.hlp getmapping.hlp \
-unitmap.hlp
+unitmap.hlp skyframe.hlp frameset.hlp
 
 # The other files which need to be extracted from the source code
 # repository and which end up in atools.tar.

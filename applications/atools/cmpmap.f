@@ -119,7 +119,7 @@
 
 *  Give a context message if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'CMPMAP_ERR', 'Error creating a new CmpFrame.',
+         CALL ERR_REP( 'CMPMAP_ERR', 'Error creating a new CmpMap.',
      :                 STATUS )
       END IF
 

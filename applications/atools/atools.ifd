@@ -349,6 +349,36 @@ iraf! {
           }
 
       }
+      action frameset {
+         helplib {$ATOOLS_HELP}
+
+         parameter frame {
+            position 1
+            type NDF
+            prompt {A Frame to store in the FrameSet}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter options {
+            position 2
+            type LITERAL
+            prompt {Options for the FrameSet}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 3
+            type LITERAL
+            prompt {Name of file or NDF in which to store the FrameSet}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
       action getframe {
          helplib {$ATOOLS_HELP}
          parameter frame {
@@ -415,6 +445,28 @@ iraf! {
             prompt {The input FrameSet}
             ppath GLOBAL CURRENT
             association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+      action skyframe {
+         helplib {$ATOOLS_HELP}
+
+         parameter options {
+            position 1
+            type LITERAL
+            prompt {Options for the SkyFrame}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 2
+            type LITERAL
+            prompt {Name of file in which to store the SkyFrame}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
             helpkey *
           }
 
