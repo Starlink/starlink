@@ -2,7 +2,7 @@
 
     PARAMETER INP
        POSITION 1
-       TYPE 'UNIV'
+       TYPE 'LITERAL'
        PPATH 'GLOBAL'
        ASSOCIATION '<-GLOBAL.BINDS'
        PROMPT 'Input object'
@@ -11,7 +11,7 @@
 
     PARAMETER OUT
        POSITION 2
-       TYPE 'UNIV'
+       TYPE 'LITERAL'
        ASSOCIATION '->GLOBAL.BINDS'
        PROMPT 'Dataset to receive distribution'
        HELP 'This will be a 1D binned dataset'
@@ -42,7 +42,8 @@
     PARAMETER NORM
        TYPE '_LOGICAL'
        PROMPT 'Normalise (Y/N)'
+       DEFAULT Y
        HELP 'Answer Y if you want the "area" under the curve to be 1'
     ENDPARAMETER
 
- ENDINTERFACE
+ENDINTERFACE
