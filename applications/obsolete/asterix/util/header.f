@@ -290,10 +290,19 @@
           CALL DAT_FIND( HLOC, ITEM, CLOC,STATUS)
           CALL DAT_STATE( CLOC, SET, STATUS )
           IF ( SET ) THEN
-C            IF ( TITEM .EQ. 'C' ) THEN
+            IF ( TITEM .EQ. 'C' ) THEN
               CALL DAT_GET0C( CLOC, CVAL, STATUS )
               CALL USI_DEF0C( ITEM, CVAL, STATUS )
-C            END IF
+            ELSE IF ( TITEM .EQ. 'I' ) THEN
+              CALL DAT_GET0I( CLOC, IVAL, STATUS )
+              CALL USI_DEF0I( ITEM, IVAL, STATUS )
+            ELSE IF ( TITEM .EQ. 'R' ) THEN
+              CALL DAT_GET0R( CLOC, RVAL, STATUS )
+              CALL USI_DEF0R( ITEM, RVAL, STATUS )
+            ELSE IF ( TITEM .EQ. 'D' ) THEN
+              CALL DAT_GET0D( CLOC, DVAL, STATUS )
+              CALL USI_DEF0D( ITEM, DVAL, STATUS )
+            END IF
           END IF
           CALL DAT_ANNUL( CLOC, STATUS )
         END IF
