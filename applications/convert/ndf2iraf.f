@@ -297,8 +297,8 @@
 *  Map the data array with the type needed by the IRAF image.
       CALL NDF_MAP( NDF, 'Data', ITYPE, 'READ', PNTR, EL, STATUS )
 
-*  Deal with any bad pixels.
-*  =========================
+*  Look for any bad pixels and get a replacement value.
+*  ====================================================
 
 *  Check whether NDF contains bad pixels.
       CHECK = .TRUE.
@@ -324,6 +324,11 @@
             REPBAD = .TRUE.
          END IF
          CALL ERR_RLSE
+      END IF
+
+*  Replace the bad values in a temporary NDF.
+*  ==========================================
+      IF ( REPBAD ) THEN
 
 *  Get a temporary NDF in which we can replace the bad values by the
 *  nominated value.
@@ -391,7 +396,13 @@
 
 *  Call PSX_CALLOC() for a one-dimensional array of the appropriate
 *  data type to hold each line of the image.
-      CALL PSX_CALLOC( DIMS( 1 ), ITYPE, LIPNTR, STATUS )
+*  As a temporary measure until PSX_CALLOC supports _WORD type we have
+*  to call PSX_MALLOC instead.
+      IF ( ITYPE .EQ. '_WORD' ) THEN
+         CALL PSX_MALLOC( DIMS( 1 ) * VAL__NBW, LIPNTR, STATUS )
+      ELSE
+         CALL PSX_CALLOC( DIMS( 1 ), ITYPE, LIPNTR, STATUS )
+      END IF
 
 *  Copy the data array to the IRAF image, using the line buffer to
 *  reduce the required virtual memory in an appropriate routine for
@@ -408,13 +419,14 @@
       END IF
 
 *  Report the number of replacements.
-      IF ( NREP .GT. 0 ) THEN
+      IF ( NREP .GT. 0 .AND. REPBAD ) THEN
          CALL MSG_SETI( 'NR', NREP )
+         CALL MSG_SETC( 'IRAFIL', IRAFIL )
          CALL MSG_SETR( 'RV', FILBAD )
-         CALL NDF_MSG( NDF, NDF )
+         CALL NDF_MSG( 'NDF', NDF )
          CALL MSG_OUTIF( MSG__NORM, 'NUMREP',
-     :      '^NR bad values in the NDF ^NDF have been replaced by ^RV.',
-     :      STATUS )
+     :      '^NR bad values in the NDF ^NDF have been replaced by ^RV '/
+     :      /'in the IRAF file ^IRAFIL.', STATUS )
       END IF
 
 *  Free the CALLOCked array.
