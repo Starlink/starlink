@@ -61,10 +61,10 @@ ImageColor::ImageColor(Display* display, Visual* visual,
   //  If default visual isn't the same then create a local colormap.
   Visual *defvis = DefaultVisual(display_, screen_);
   if ( defvis->c_class != visual_->c_class ) {
-    colormap_ = XCreateColormap(display_,
-                                XRootWindow(display_, screen_),
-                                visual_,
-                                AllocNone);
+     colormap_ = XCreateColormap( display_,
+                                  XRootWindow(display_, screen_),
+                                  visual_,
+                                  AllocNone );
   }
 
   //  Initialisations.
