@@ -101,7 +101,7 @@
 *        astMapBox
 *           Find a bounding box for a Mapping.
 *        astResample<X>
-*           Resample a grid of data.
+*           Resample a region of a data grid.
 *        astSimplify
 *           Simplify a Mapping.
 *        astTran1
@@ -165,22 +165,21 @@
 *  Macros:
 *     Public:
 *        AST__LINEAR
-*           Simple linear interpolation (astResample<X>).
+*           Simple linear interpolation.
 *        AST__NEAREST
-*           Use nearest pixel centre (astResample<X>).
+*           Use nearest pixel centre.
 *        AST__SINC
-*           Use sinc interpolation (astResample<X>).
+*           Use sinc(x) interpolation.
 *        AST__SINCSINC
-*           Use sinc(x) * sinc(x/2) interpolation (astResample<X>).
+*           Use sinc(x) * sinc(x/2) interpolation.
 *        AST__UINTERP
-*           Use user-defined general sub-pixel interpolation algorithm
-*           (astResample<X>).
+*           Use general user-defined sub-pixel interpolation algorithm.
 *        AST__UKERN1
-*           Use user-defined 1-d interpolation kernel (astResample<X>).
+*           Use user-defined 1-d interpolation kernel.
 *        AST__URESAMP1, 2, 3 & 4
-*           Flags reserved for user-defined purposes (astResample<X>).
+*           Flags reserved for user-defined purposes.
 *        AST__USEBAD
-*           Recognise bad pixels (astResample<X>)?
+*           Recognise bad pixels?
 *
 *     Protected:
 *        AST__USEVAR
@@ -234,7 +233,7 @@
 /* ---------------------- */
 #include "object.h"              /* Base Object class */
 #include "pointset.h"            /* Sets of points/coordinates */
-#include "channel.h"
+#include "channel.h"             /* I/O channels */
 
 /* C header files. */
 /* --------------- */
@@ -245,8 +244,8 @@
 /* Resampling flags. */
 /* ----------------- */
 /* These macros define flag values which may be passed to
-   astResample<X> (via the "flags" argument) to control the resampling
-   process. */
+   astResample<X> (via the "flags" argument) to provide control over
+   resampling operations. */
 #define AST__URESAMP1 (1)        /* Flags reserved for user-defined purposes */
 #define AST__URESAMP2 (2)
 #define AST__URESAMP3 (4)
@@ -259,12 +258,15 @@
 /* These macros identify standard sub-pixel interpolation algorithms
    for use by astResample<X>. They are used by giving the macro's
    value for the "interp" argument. */
-#define AST__UINTERP (1)         /* Use user-supplied interpolation function */
-#define AST__UKERN1 (2)          /* Use user-supplied interpolation kernel */
-#define AST__NEAREST (3)         /* Use pixel with nearest centre */
-#define AST__LINEAR (4)          /* Simple linear interpolation */
-#define AST__SINC (5)            /* sinc(x) interpolation */
-#define AST__SINCSINC (6)        /* sinc(x) * sinc(x/2) interpolation */
+#define AST__UKERN1 (1)          /* User-supplied 1-d interpolation kernel */
+#if 0
+#define AST__UKERNN (2)          /* User-supplied n-d interpolation kernel */
+#endif
+#define AST__UINTERP (3)         /* User-supplied interpolation function */
+#define AST__NEAREST (4)         /* Use pixel with nearest centre */
+#define AST__LINEAR (5)          /* Simple linear interpolation */
+#define AST__SINC (6)            /* sinc(x) interpolation */
+#define AST__SINCSINC (7)        /* sinc(x) * sinc(x/2) interpolation */
 
 /* Type Definitions. */
 /* ================= */

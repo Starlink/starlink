@@ -14,10 +14,12 @@
 *     of coordinates (representing "input" points) to give a new set
 *     of coordinates (representing "output" points).  It is used to
 *     describe the relationship which exists between two different
-*     coordinate systems.  However, the Mapping class does not have a
-*     constructor function of its own, as it is simply a container
-*     class for a family of specialised Mappings which implement
-*     particular types of coordinate transformation.
+*     coordinate systems and to implement operations which make use of
+*     this (such as transforming coordinates and resampling grids of
+*     data).  However, the Mapping class does not have a constructor
+*     function of its own, as it is simply a container class for a
+*     family of specialised Mappings which implement particular types
+*     of coordinate transformation.
 
 *  Inheritance:
 *     The Mapping class inherits from the Object class.
@@ -321,9 +323,9 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    read-only attributes of this class. If it does, then report an
    error. */
    } else if ( !strcmp( attrib, "nin" ) ||
-        !strcmp( attrib, "nout" ) ||
-        !strcmp( attrib, "tranforward" ) ||
-        !strcmp( attrib, "traninverse" ) ) {
+               !strcmp( attrib, "nout" ) ||
+               !strcmp( attrib, "tranforward" ) ||
+               !strcmp( attrib, "traninverse" ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
                 "value for a %s.", attrib, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." );
@@ -1820,7 +1822,7 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
             } \
          } \
       } \
-KERNEL_ERROR_1D:                 /* Exit point on error in kernel function */ \
+KERNEL_ERROR_1D: ;               /* Exit point on error in kernel function */ \
 \
 /* Handle the 2-dimensional case optimally. */ \
 /* ---------------------------------------- */ \
@@ -2040,7 +2042,7 @@ KERNEL_ERROR_1D:                 /* Exit point on error in kernel function */ \
                } \
             } \
          } \
-KERNEL_ERROR_2D:                 /* Exit point on error in kernel function */ \
+KERNEL_ERROR_2D: ;               /* Exit point on error in kernel function */ \
       } \
 \
 /* Free the workspace. */ \
@@ -2312,7 +2314,7 @@ KERNEL_ERROR_2D:                 /* Exit point on error in kernel function */ \
                } \
             } \
          } \
-KERNEL_ERROR_ND:                 /* Exit point on error in kernel function */ \
+KERNEL_ERROR_ND: ;               /* Exit point on error in kernel function */ \
       } \
 \
 /* Free the workspace. */ \
@@ -2333,11 +2335,6 @@ KERNEL_ERROR_ND:                 /* Exit point on error in kernel function */ \
 /* Return the result. */ \
    return result; \
 }
-
-/* This subsidiary macro tests for negative variance values in the
-   macro above. This check is required only for signed data types. */
-#define CHECK_FOR_NEGATIVE_VARIANCE(Xtype) \
-        bad_var = bad_var || ( var < ( (Xtype) 0 ) );
 
 /* These subsidiary macros define limits for range checking of results
    before conversion to the final data type. For each data type code
@@ -2386,6 +2383,11 @@ KERNEL_ERROR_ND:                 /* Exit point on error in kernel function */ \
 #define LO_B ( ( (float) ( SCHAR_MIN ) ) - 0.5f )
 #define HI_UB ( ( (float) ( UCHAR_MAX ) ) + 0.5f )
 #define LO_UB ( -0.5f )
+
+/* This subsidiary macro tests for negative variance values in the
+   macro above. This check is required only for signed data types. */
+#define CHECK_FOR_NEGATIVE_VARIANCE(Xtype) \
+        bad_var = bad_var || ( var < ( (Xtype) 0 ) );
 
 /* Expand the main macro above to generate a function for each
    required signed data type. */
