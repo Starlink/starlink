@@ -1,6 +1,6 @@
 \documentclass[twoside,11pt]{article}
 
-%% Copyright 1998-2000 Particle Physics and Astronomy Research Council.
+%% Copyright 1998-2003 Particle Physics and Astronomy Research Council.
 %% All Rights Reserved.
 
 % ? Specify used packages
@@ -18,13 +18,15 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {228.4}
+\newcommand{\stardocnumber}    {228.5}
 \newcommand{\stardocauthors}   {T.\ Jenness, F.\ Economou\\
                                 Joint Astronomy Centre, Hilo, Hawaii}
-\newcommand{\stardocdate}      {11 July 2000}
+\newcommand{\stardocdate}      {6 May 2003}
 \newcommand{\stardoctitle}     {STARPERL -- Starlink perl modules}
-\newcommand{\stardocversion}   {1.12}
+\newcommand{\stardocversion}   {1.13}
 \newcommand{\stardocmanual}    {User's manual}
+\newcommand{\stardoccopyright} {Copyright \copyright\ 1998-2000,2003 Particle
+  Physics and Astronomy Research Council}
 \newcommand{\stardocabstract}  {The StarPerl package is a selection
 of perl modules that provide access to Starlink infrastructure libraries.
 Currently, interfaces are provided to the ADAM messaging system,
@@ -64,6 +66,8 @@ GSD format data files.
 
 
 \newcommand{\delobj}{\xref{\task{delobj}}{sun86}{DELOBJ}}
+\newcommand{\creobj}{\xref{\task{creobj}}{sun86}{CREOBJ}}
+\newcommand{\setobj}{\xref{\task{setobj}}{sun86}{SETOBJ}}
 \newcommand{\copobj}{\xref{\task{copobj}}{sun86}{COPOBJ}}
 \newcommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
 
@@ -302,6 +306,17 @@ GSD format data files.
 %  ==================
 \stardocabstract
 % ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? LateX Copyright Statement
+%  =========================
+\begin{latexonly}
+\newpage
+\vspace*{\fill}
+\stardoccopyright
+\end{latexonly}
+% ? End of Latex copyright statement
+
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
@@ -374,7 +389,7 @@ provides a simple way of doing this from \perl\ (even allowing the use
 of tied hashes).
 
 The Starlink::HDSPACK module provides a \perl\ alternative to using the
-\Figaro\ \copobj\ and \delobj\ commands.
+\Figaro\ \copobj, \creobj, and \setobj\ and \delobj\ commands.
 
 \section{The Starlink Perl modules}
 
@@ -678,6 +693,12 @@ Remember that, at present, these routines \emph{do not\/} work with
 
 \subsection{\xlabel{accessing_fits_entries}Accessing FITS entries}%
 \label{accessing_fits_entries}\index{Accessing FITS entries}
+
+\textit{This approach is now deprecated. Please use the
+  \texttt{Astro::FITS::Header} module (distributed as part of the
+  \textsc{perlmods} package) whenever possible. The
+  \texttt{Astro::FITS::Header} module provides much finer control of the
+  header and can retain the key order.}
 
 FITS entries are stored in the FITS extension of an NDF. The FITS array
 can be accessed by using raw HDS commands as follows:
@@ -1129,26 +1150,39 @@ More information can be found in the Starlink::NBS man page
 \section{HDS wrapper commands}
  
 The Starlink::HDSPACK module provides some high level HDS manipulation
-routines (cf. NDFPACK in \Kappa). Routines are provided for deleting and 
-copying HDS structures. For example:
+routines (cf. NDFPACK in \Kappa). Routines are provided for creating,
+deleting, copying and setting the values of HDS structures and primitives. For
+example:
 
 \begin{myquote}
 \begin{verbatim}
 $status = copobj("file.more.fits","file1.more", $status);
 $status = delobj("file.more.fits", $status);
+$status = creobj("file", "NDF", $status);
+$status = creobj("file.DATA_ARRAY", "ARRAY", $status);
+$status = creobj("file.DATA_ARRAY.DATA", "_REAL",[20,30], $status);
+$status = setobj("file.more.xxx",52.5,$status);
 \end{verbatim}
 \end{myquote}
 
 To avoid confusion with \perl\ prototypes, these routines have to return
-the status rather than changing the input status variable
-directly\footnote{this restriction may be removed in the future but would have
-  to be called a different name to provide backwards compatibility.}
+the status rather than changing the input status variable. A more perl-like
+interface is available at the loss of inherited status:
 
+\begin{myquote}
+\begin{verbatim}
+copy_hdsobj("file.more.fits","file1.more") or die "Oops";
+create_hdsobj("file.DATA_ARRAY","ARRAY") or die "Oops2";
+delete_hdsobj("file.more.fits") or die "Oops3";
+set_hdsobj("file.more.xxx", 52.5) or die "Oops4";
+\end{verbatim}
+\end{myquote}
  
-These are similar to the \Figaro\ \copobj\ and \delobj\ commands.
-This module requires that the NDF module (\S\ref{ndfperl}) is available.
+These are similar to the \Figaro\ \copobj, \creobj, \setobj\ and \delobj\ 
+commands.  This module requires that the NDF module (\S\ref{ndfperl}) is
+available.
 
-A more detailed description can be found in the appendix
+A more detailed description can be found in the appendix.
 
 \section{Starlink configuration}
 
@@ -1392,7 +1426,7 @@ The calling arguments are detailed in appendix \ref{starversion}.
 
 \section{GSD}
 
-The GSD add the ability to read \jcmt\ \gsd\ data from \perl\. Since the
+The GSD add the ability to read \jcmt\ \gsd\ data from \perl. Since the
 \gsd\ library is read only, GSD files can not be written by this module.
 An interface using the C API is provided but in general it is recommended
 that either the object-oriented or tied interfaces are used since these
@@ -1427,6 +1461,26 @@ information on the calling arguments of this command.
 \appendix
 
 \section{Changes}
+
+\subsection{New in version 1.14}
+
+\begin{itemize}
+\item Add \texttt{creobj} and \texttt{setobj} to the
+  \texttt{Starlink::HDSPACK} interface.
+\item Make sure we export \texttt{dat\_put0i} from the NDF module.
+\item Fix compilation problem of GSD module with perl 5.8.0.
+\end{itemize}
+
+\subsection{New in version 1.13}
+
+\begin{itemize}
+\item Support EMS v2.0 (pure C). Including the addition of \texttt{emsTune}
+  and \texttt{emsExpnd}. \texttt{emsFmt*} routines have been removed.
+\item Fix problem in Starlink::AMS::Core with first character of parameter
+  string always downcasing.
+\item Fix problem in Starlink::HDSPACK when using './file' syntax. Now
+  correctly return status from \texttt{\_find\_loc} function.
+\end{itemize}
 
 \subsection{New in version 1.12}
 
@@ -1607,6 +1661,7 @@ All \texttt{hds\_} routines are implemented:
 \texttt{dat\_state} \texttt{dat\_struc} \texttt{dat\_temp}
 \texttt{dat\_there} \texttt{dat\_type} \texttt{dat\_unmap}
 \texttt{dat\_valid} \texttt{dat\_vec} \texttt{dat\_where}
+\texttt{dat\_put0i}
 \end{flushleft}
 
 \item[:cmp]%
@@ -2289,67 +2344,263 @@ This module provides wrapper routines for common HDS manipulations.
 Functions are provided for copying data structures between locations
 and for deleting structures.
 
-\subsection{Functions}%
-\index{FUNCTIONS}
+Two interfaces are provided. The first mirrors the \Figaro\ routines
+\copobj, \creobj, \setobj\ and \delobj\ and use Starlink inherited status.
+The more verbose functions provide wrappers that assume good status
+on input and return perl status (either true or false).
 
-The following functions are available:
+\section{Functions}
+
+The following functions provide the core functionality without worrying
+about the Starlink environment.
 
 \begin{description}
 
-\item[{\bf retrieve\_locs}] \mbox{}
+\item[\textbf{create\_hdsobj}] \mbox{}
+
+Create a HDS object within an HDS structure.
+
+\begin{verbatim}
+  create_hdsobj( $path, $type, \@dims );
+\end{verbatim}
+\begin{verbatim}
+  create_hdsobj( $path, $type );
+\end{verbatim}
+
+
+Returns 1 if successful, false otherwise. See \texttt{creobj}
+for more details on the arguments.
+
+
+\item[\textbf{set\_hdsobj}] \mbox{}
+
+Set the value of an HDS object within an HDS structure.
+
+\begin{verbatim}
+  set_hdsobj( $path, $value );
+\end{verbatim}
+
+
+Returns 1 if successful, false otherwise. See \texttt{setobj}
+for more details on the arguments.
+
+
+
+Scalar values can be stored in scalar items and individual
+elements of a data array can be addressed using parentheses:
+
+\begin{verbatim}
+ set_hdsobj("file.data_array(5,5)", 52);
+\end{verbatim}
+
+
+Array values can be supplied in vectorized form by using a reference
+to an array. Note that an error will be raised if the number of
+elements in the array does not match the number of elements in the HDS
+object \textit{or} if the values overflow the underlying type.
+
+
+\item[\textbf{delete\_hdsobj}] \mbox{}
+
+Delete an HDS object from an HDS file.
+
+\begin{verbatim}
+  delete_hdsobj( $path );
+\end{verbatim}
+
+
+Returns 1 if successful, false otherwise. See \texttt{delobj}
+for more details on the arguments.
+
+
+\item[\textbf{copy\_hdsobj}] \mbox{}
+
+Copy an HDS structure from one location to another.
+
+\begin{verbatim}
+  copy_hdsobj( $source, $destination );
+\end{verbatim}
+
+
+Returns 1 if successful, false otherwise. See \texttt{copobj}
+for more details on the arguments.
+
+\end{description}
+\subsection*{Starlink status\label{Starlink_status}\index{Starlink status}}
+
+
+The following functions are available using Starlink inherited status:
+
+\begin{description}
+
+\item[\textbf{retrieve\_locs}] \mbox{}
 
 Given a full path to a HDS structure, returns an array of 
 locators corresponding to each structure referenced in the path.
-\begin{myquote}
+
 \begin{verbatim}
-($status, @locators) = retrieve_locs("file.more.fits", $mode, $status);
+  ($status, @locators) = retrieve_locs("file.more.fits", $mode, $status);
 \end{verbatim}
-\end{myquote} %$
+
 
 The mode argument specifies the file access type. Can be 'READ', 'WRITE'
-or `UPDATE'.
+or 'UPDATE'.
 
-In the above example, {\tt @locators} would contain three entries,
-a locator to the file itself, a locator to the {\tt more} structure
-and a locator to the {\tt fits} component.
+
+
+In the above example, \texttt{@locators} would contain three entries,
+a locator to the file itself, a locator to the \texttt{more} structure
+and a locator to the \texttt{fits} component.
+
+
 
 Bad status is returned if the named components do not exist or cannot
 be opened.
 
-This routine assumes we are in a valid error context (eg {\em err\_begin()\/}
+
+
+This routine assumes we are in a valid error context (eg err\_begin()
 has been called).
+
+
 
 The locators returned by this routine must be annulled by the caller.
 
-\item[{\bf copobj}] \mbox{}
+
+\item[\textbf{copobj}] \mbox{}
 
 Copy an HDS object to a specified output structure.
-\begin{myquote}
-\begin{verbatim}
-$status = copobj("file.more.fits", "file2.more.fits2", $status);
-\end{verbatim}
-\end{myquote}
 
-The above example will copy the FITS component from {\tt file.sdf} to
-the {\tt FITS2} extension of {\tt file2.sdf}. If the target structure
+\begin{verbatim}
+  $status = copobj("file.more.fits", "file2.more.fits2", $status);
+\end{verbatim}
+
+
+The above example will copy the FITS component from \texttt{file.sdf} to
+the \texttt{FITS2} extension of \texttt{file2.sdf}. If the target structure
 already exists it is overwritten.
 
-This routine assumes we are in a valid error context (eg {\em err\_begin()\/}
+
+
+This routine assumes we are in a valid error context (eg err\_begin()
 has been called).
 
-\item[{\bf delobj}] \mbox{}
+
+\item[\textbf{setobj}] \mbox{}
+
+Set the value of the named HDS object.
+
+\begin{verbatim}
+ $status = setobj("file.xxx", "hello");
+ $status = setobj("file.more.fits", \@fits);
+\end{verbatim}
+
+
+Scalar values can be stored in scalar items and individual
+elements of a data array can be addressed using parentheses:
+
+\begin{verbatim}
+ $status = setobj("file.data_array(5,5)", 52, $status);
+\end{verbatim}
+
+
+Array values can be supplied in vectorized form by using a reference
+to an array. Note that an error will be raised if the number of
+elements in the array does not match the number of elements in the HDS
+object \textit{or} if the values overflow the underlying type.
+
+
+
+The HDS object must refer to an HDS structure and not simply a root filename.
+
+
+
+This routine assumes we are in a valid error context (eg err\_begin()
+has been called).
+
+
+\item[\textbf{delobj}] \mbox{}
 
 Delete the named object structure.
-\begin{myquote}
+
 \begin{verbatim}
-$status = delobj("file.more.fits", $status);
+  $status = delobj("file.more.fits", $status);
 \end{verbatim}
-\end{myquote}
 
-This example will remove the FITS extension from {\tt file.sdf}.
 
-This routine assumes we are in a valid error context (eg {\em err\_begin()\/}
+This example will remove the FITS extension from \texttt{file.sdf}.
+
+
+
+This routine assumes we are in a valid error context (eg err\_begin()
 has been called).
+
+
+\item[\textbf{creobj}] \mbox{}
+
+Create a new HDS object, structure orprimitive, scalar or array.
+Generally used to tweak data structures.
+
+\begin{verbatim}
+  $status = creobj( $object, $type, \@dims, $status );
+\end{verbatim}
+
+
+Where \texttt{\$object} is the name of the object to be created including
+a full HDS path. Anything before the first dot is assumed to be
+a filename specification (directory specification is allowed) and
+everything after the first do is assumed to be a HDS hierarchy.
+The entire hierarchy must exist except for the last element.
+
+
+
+The second argument is the HDS type of the new object. Values such
+as '\_REAL', '\_INTEGER' are treated as primitive types, all other
+values are treated as structures (e.g. 'NDF'). Note that a character
+string must be specified with its expected length if you wish
+it to be presized (e.g. '\_CHAR' would create a single character
+whereas '\_CHAR*15' would create space for 15 characters).
+
+
+
+The third (optional) argument specfiies the dimensions of the new
+object supplied as a reference to an array. If no argument is
+specified the object is assumed to be a scalar (dims=0).
+
+
+
+The last argument must be Starlink status.
+
+\begin{verbatim}
+  $status = creobj("file", "NDF", $status);
+\end{verbatim}
+
+
+Creates a file on disk of type "NDF".
+
+\begin{verbatim}
+  $status = creobj("file.DATA_ARRAY", 'ARRAY', $status);
+\end{verbatim}
+
+
+Creates a DATA\_ARRAY structure of type "ARRAY".
+
+\begin{verbatim}
+  $status = creobj("file.DATA_ARRAY.DATA", '_REAL', [20,30],
+                   $status);
+\end{verbatim}
+
+
+Creates a REAL array of dimension 20x30 called 'DATA'.
+
+
+
+Accepts and returns Starlink status. This routine assumes we are in a
+valid error context (eg err\_begin() has been called).
+
+
+
+Attempting to create entire NDFs using this routine is not recommended.
 
 \end{description}
 
@@ -2961,7 +3212,7 @@ Note that following Perl convention, the first element in the array
 (position 0) is GSD item 1.
 
 Also, array items are returned in an array reference since hashes
-and arrays can only return scalar items.  The L<GSD::PDL|GSD::PDL>
+and arrays can only return scalar items.  The GSD::PDL
 module can be used for the tie in order to return PDL objects
 rather than \perl\ arrays.
 
