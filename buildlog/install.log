@@ -283,7 +283,7 @@ install:
 prepare:
 
 check_packages:
-[available] Apr 30, 2003 4:14:51 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] May 1, 2003 4:15:19 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -446,7 +446,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/table
 [loggedcopy] Copying 3 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 3 files to /apps/cvsbuild/star/bin
-[loggedcopy] Copying 97 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 104 files to /apps/cvsbuild/star/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -838,4 +838,4 @@ install:
 [loggedcopy] Copying 132 files to /apps/cvsbuild/star/docs
 
 BUILD SUCCESSFUL
-Total time: 41 seconds
+Total time: 42 seconds

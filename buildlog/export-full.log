@@ -383,7 +383,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 76 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 82 files to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
 javadoc-sources:
@@ -448,7 +448,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1227 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1239 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 3 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
@@ -866,7 +866,7 @@ install:
 prepare:
 
 check_packages:
-[available] Apr 30, 2003 4:22:51 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] May 1, 2003 4:23:16 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1347,7 +1347,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 74 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 80 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
      [copy] Copying 2 files to /apps/cvsbuild/java/source/table/lib/table
@@ -1362,6 +1362,7 @@ javadocs:
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.table...
+  [javadoc] Loading source files for package uk.ac.starlink.table.formats...
   [javadoc] Loading source files for package uk.ac.starlink.table.gui...
   [javadoc] Loading source files for package uk.ac.starlink.table.jdbc...
   [javadoc] Loading source files for package uk.ac.starlink.table.view...
@@ -1374,13 +1375,14 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:32: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableBuilder
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:32: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableBuilder
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:33: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableBuilder
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:33: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableBuilder
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:33: warning - Tag @link: reference not found: uk.ac.starlink.formats.WDCTableBuilder
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
   [javadoc] Generating /apps/cvsbuild/java/source/table/docs/table/javadocs/stylesheet.css...
-  [javadoc] 8 warnings
+  [javadoc] 9 warnings
 
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/bin
@@ -1391,7 +1393,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/table
 [loggedcopy] Copying 3 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 3 files to /apps/cvsbuild/star/bin
-[loggedcopy] Copying 97 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 104 files to /apps/cvsbuild/star/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -2704,7 +2706,7 @@ build:
     [javac] Note: Recompile with -deprecation for details.
      [copy] Copying 12 files to /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/treeview/build/classes
-     [copy] Copying 64 files to /apps/cvsbuild/java/source/treeview/build/classes
+     [copy] Copying 65 files to /apps/cvsbuild/java/source/treeview/build/classes
 
 jars:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/lib/treeview
@@ -3873,6 +3875,7 @@ javadoc-sources:
   [javadoc] Loading source files for package uk.ac.starlink.table.jdbc...
   [javadoc] Loading source files for package uk.ac.starlink.table.gui...
   [javadoc] Loading source files for package uk.ac.starlink.table.view...
+  [javadoc] Loading source files for package uk.ac.starlink.table.formats...
   [javadoc] Loading source files for package uk.ac.starlink.fits...
   [javadoc] Loading source files for package uk.ac.starlink.votable...
   [javadoc] Loading source files for package uk.ac.starlink.hdx...
@@ -4138,6 +4141,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableFactory.java:33: warning - Tag @link: reference not found: uk.ac.starlink.formats.WDCTableBuilder
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableOutput.java:30: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
@@ -4152,7 +4156,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 85 warnings
+  [javadoc] 86 warnings
 
 export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
@@ -4161,4 +4165,4 @@ export-full:
      [copy] Copying 2 files to /apps/cvsbuild/export
 
 BUILD SUCCESSFUL
-Total time: 12 minutes 40 seconds
+Total time: 12 minutes 57 seconds
